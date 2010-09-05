@@ -1,0 +1,37 @@
+<h1>Details for {{ team.nickname }}</h1>
+
+<h2>Basic Information</h2>
+<table>
+    <tr>
+        <td>Formal Team Name</td>
+        <td>{{ team.name }}</td>
+    </tr>
+    <tr>
+        <td>Location</td>
+        <td>{{ team.address }}</td>
+    </tr>
+    <tr>
+        <td>Official Events Attended</td>
+        <td>{{ team.rookie_year }}</td>
+    </tr>
+    <tr>
+        <td>Record at official events</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Website</td>
+        <td><a href="{{ team.website }}">{{ team.website }}</a></td>
+    </tr>
+</table>
+
+<h2>Match Participation</h2>
+{% for event in participation %}
+    
+    <h3>{{ event.name }}</h3>
+    <ul>
+    {% for match in event.matches %}
+        <li>{{ match.comp_level }} {{ match.match_number }}</li>
+    {% endfor %}
+    </ul>
+
+{% endfor %}

@@ -1,0 +1,8 @@
+cron:
+#- description: FIRST event detail scraping
+#  url: /tasks/enqueue_usfirst_event_updates
+#  schedule: every 24 hours
+
+#- description: FIRST match results detail scraping
+#  url: /tasks/enqueue_usfirst_match_results?year=2010
+#  schedule: every 5 minutes

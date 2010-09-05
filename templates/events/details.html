@@ -1,0 +1,34 @@
+<h1>Details for {{ event.name }}</h1>
+
+<table>
+    <tr>
+        <td>Dates</td>
+        <td>{{ event.start_date|date:"M d, Y" }} to {{ event.end_date|date:"M d, Y" }}</td>
+    </tr>
+    <tr>
+        <td>Event Location</td>
+        <td><a href="http://maps.google.com/maps?q={{ event.location }}">{{ event.location }}</a></td>
+    </tr>
+    <tr>
+        <td>Teams Attending</td>
+        <td>{{ event.teams.count }}</td>
+    </tr>
+</table>
+
+<h2>Match Listing</h2>
+
+{% for m in event.matches %}
+
+    <tr>
+        <td>{{ m.comp_level }} {{ m.match_number }}</td>
+        <td>{{ m.red.1.team_number }}</td>
+        <td>{{ m.red.2.team_number }}</td>
+        <td>{{ m.red.3.team_number }}</td>
+        <td>{{ m.blue.1.team_number }}</td>
+        <td>{{ m.blue.2.team_number }}</td>
+        <td>{{ m.blue.3.team_number }}</td> <!-- I am pretty sure this works. Can you access indices with dot syntax? -->
+        <td>{{ m.redscore.score }}</td>
+        <td>{{ m.bluescore.score }}</td>
+    </tr>
+
+{% endfor %}

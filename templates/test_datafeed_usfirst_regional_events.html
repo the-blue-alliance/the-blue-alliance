@@ -1,0 +1,16 @@
+<h2>Got some Events</h2>
+{% for event in events %}
+    <ul>
+        <li>Type: {{event.event_type}}</li>
+        <li>Name: {{event.name}}</li>
+        <li>Event Short: {{event.event_short}}</li>
+        <li>Year: {{event.year}}</li>
+        <li>FIRST eid: {{event.first_eid}}</li>
+        <li>Venue: {{event.venue}}</li>
+        <li>Venue Address: {{event.venue_address}}</li>
+        <li>Location {{event.location}}</li>
+        <li>Starts on: {{event.start_date}}</li>
+        <li>Ends on: {{event.end_date}}</li>
+        <li>Website: {{event.website}}</li>
+    </ul>
+{% endfor %}

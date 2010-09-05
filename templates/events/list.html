@@ -1,0 +1,19 @@
+<h1>All Events</h1>
+<p>{{ events|length }} total events</p>
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Year</th>
+        <th>Event Short</th>
+        <th>EID</th>
+    </tr>
+    
+    {% for event in events %}
+    <tr>
+        <td>{{ event.name }}</td>
+        <td>{{ event.year }}</td>
+        <td>{{ event.event_short }}</td>
+        <td>{{ event.first_eid }}</td>
+    </tr>
+    {% endfor %}
+</table>

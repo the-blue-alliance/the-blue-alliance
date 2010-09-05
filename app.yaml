@@ -1,0 +1,17 @@
+application: tbatv-dev
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+- url: /stats.*
+  script: $PYTHON_LIB/google/appengine/ext/appstats/ui.py
+- url: /tasks/.*
+  script: cron_main.py
+- url: .*
+  script: main.py
+  
+admin_console:
+  pages:
+  - name: Appstats
+    url: /stats

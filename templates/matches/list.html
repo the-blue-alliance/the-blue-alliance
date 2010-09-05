@@ -1,0 +1,19 @@
+<h1>All Matches</h1>
+<p>{{ matches|length }} matches being listed</p>
+<table>
+    <tr>
+        <th>Event</th>
+        <th>Match</th>
+        <th>Teams</th>
+        <th>Scores</th>
+    </tr>
+    
+    {% for match in matches %}
+    <tr>
+        <td>{{ match.event.year }} {{ match.event.name }}</td>
+        <td>{{ match.key.name }}</td>
+        <td>{{ match.team_key_names }}</td>
+        <td>{{ match.alliances_json }}</td>
+    </tr>
+    {% endfor %}
+</table>

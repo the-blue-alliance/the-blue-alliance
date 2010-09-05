@@ -1,0 +1,10 @@
+<h2>Got some Matches</h2>
+{% for match_dict in match_dicts %}
+    <ul>
+        <li>Complevel: {{match_dict.match.comp_level}}</li>
+        <li>Set Number: {{match_dict.match.set_number}}</li>
+        <li>Match Number: {{match_dict.match.match_number}}</li>
+        <li>Teams: {{match_dict.team_key_names}}</li>
+        <li>Scores: {{match_dict.alliances_json}}</li>
+    </ul>
+{% endfor %}
