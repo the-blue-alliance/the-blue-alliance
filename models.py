@@ -51,11 +51,6 @@ class EventTeam(db.Model):
     team = db.ReferenceProperty(Team,
                                 collection_name='events')
 
-class MatchScore(db.Model):
-    alliance = db.StringProperty()
-
-class MatchTeam(db.Model):
-    alliance = db.StringProperty()
 
 class Match(db.Model):
     """
@@ -102,6 +97,8 @@ class Match(db.Model):
     team_key_names = db.StringListProperty(required=True) #list of teams in Match, for indexing.
     alliances_json = db.StringProperty(required=True) #JSON dictionary with alliances and scores.
     
+    no_auto_update = db.BooleanProperty(default=False) #Set to True after manual update
+    
     # {
     # "red": {
     #    "teams": ["frc177", "frc195", "frc125"], # These are Team keys
@@ -112,11 +109,6 @@ class Match(db.Model):
     #    "score": 12
     # }
     # }
-    
-    #def __init__(self):
-    #    super.__init__()
-    #    
-    #    self.alliances = simplejson.loads(self.alliances_json)
     
     def get_key_name(self):
         if self.comp_level == "qm":

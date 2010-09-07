@@ -105,6 +105,10 @@ transformers:
     - property: team_key_names
       external_name: team_key_names
       
+    - property: no_auto_update
+      external_name: no_auto_update
+      import_transform: transform.regexp_bool('true', re.IGNORECASE)
+
 
 - kind: Team
   connector: csv
