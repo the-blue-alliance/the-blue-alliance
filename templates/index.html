@@ -1,26 +1,17 @@
 <h1>TBATV GAE</h1>
 <p>Some things you may be interested in doing:</p>
 <p>To process TaskQueues offline use the following command: <strong>python2.5 run_tasks.py -p <em>port</em></strong></p>
-<blockquote>Usage: run_tasks.py [OPTIONS] [queue-name]<br />
-    <br />
-    Options:
-      -h, --help            show this help message and exit<br />
-      -n NAME, --name=NAME  name of the queue. default: default<br />
-      -s HOST, --srv=HOST   the host where the server runs. default: localhost<br />
-      -p PORT, --port=PORT  the port where the server listens. default: 8080<br />
-      -l, --list            Just list the first 25 tasks in the queue and exit<br />
-</blockquote>
 <h2>Setup</h2>
 <ol>
     <strong>You must do these things first</strong>.
-    <li><a href="/tasks/instantiate_usfirst_teams?skip=0">InstantiateUsfirstTeams</a>, creates Team objects for all teams from USFIRST.  Uses code borrowed from Patrick Fairbank's FRCLinks.</li>
-    <li><a href="/tasks/instantiate_usfirst_regional_events">InstantiateRegionalEvents</a>, enqueues Tasks to create Event objects for regional events from USFIRST.</li>
+    <li><a href="/tasks/usfirst_teams_instantiate?skip=0">UsfirstTeamsInstantiate</a>, creates Team objects for all teams from USFIRST.  Uses code borrowed from Patrick Fairbank's FRCLinks.</li>
+    <li><a href="/tasks/usfirst_events_instantiate">UsfirstEventsInstantiate</a>, enqueues Tasks to create Event objects for regional events from USFIRST.</li>
 </ol>
 <h2>Updates</h2>
 <ul>
-    <li><a href="/tasks/enqueue_usfirst_event_updates">EnqueueGetUsfirstEvents</a>, which sets up the TaskQueue to update details for all official Event objects.</li>
-    <li><a href="/tasks/enqueue_usfirst_match_results?year=2010">EnqueueGetUsfirstMatchResults</a>, which sets up the TaskQueue to get match results for all known Event objects, which will create or update Match objects, along with their affiliated Alliance objects. This will currently fail for Alliances which contain a Team that does not exist (I think, -greg 6/21/10).</li>
-    <li><a href="/tasks/enqueue_get_usfirst_teams">EnqueueGetUsfirstTeams</a>, which sets up the TaskQueue to read the USFIRST team details, updating Team objects.</li>
+    <li><a href="/tasks/usfirst_event_get_enqueue">UsfirstEventGetEnqueue</a>, which sets up the TaskQueue to update details for all official Event objects.</li>
+    <li><a href="/tasks/usfirst_matches_get_enqueue?year=2010">UsfirstMatchesGetEnqueue</a>, which sets up the TaskQueue to get match results for all known Event objects, which will create or update Match objects.</li>
+    <li><a href="/tasks/usfirst_team_get_enqueue?offset=0">UsfirstTeamGetEnqueue @ 0</a> and <a href="/tasks/usfirst_team_get_enqueue?offset=1000">UsfirstTeamGetEnqueue @ 1k</a>, which set up the TaskQueue to read the USFIRST team details, updating Team objects.</li>
 </ul>
 <h2>View</h2>
 <ul>

@@ -5,29 +5,23 @@ import os
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import util
 
-from controllers.datafeed_controller import InstantiateUsfirstTeams
-from controllers.datafeed_controller import EnqueueGetUsfirstEvents
-from controllers.datafeed_controller import EnqueueGetUsfirstMatchResults
-from controllers.datafeed_controller import EnqueueGetUsfirstTeams
-from controllers.datafeed_controller import GetUsfirstEvent
-from controllers.datafeed_controller import GetUsfirstMatchResults
-from controllers.datafeed_controller import InstantiateRegionalEvents
-from controllers.datafeed_controller import GetUsfirstTeam
-
+from controllers.datafeed_controller import UsfirstEventGetEnqueue, UsfirstEventGet, UsfirstEventsInstantiate
+from controllers.datafeed_controller import UsfirstMatchesGetEnqueue, UsfirstMatchesGet
+from controllers.datafeed_controller import UsfirstTeamGetEnqueue, UsfirstTeamGet, UsfirstTeamsInstantiate
 from controllers.datafeed_controller import FlushTeams, FlushMatches, FlushEvents
 
 def main():
-    application = webapp.WSGIApplication([('/tasks/enqueue_usfirst_event_updates', EnqueueGetUsfirstEvents),
-                                          ('/tasks/enqueue_usfirst_match_results', EnqueueGetUsfirstMatchResults),
-                                          ('/tasks/enqueue_get_usfirst_teams', EnqueueGetUsfirstTeams),
-                                          ('/tasks/instantiate_usfirst_teams', InstantiateUsfirstTeams),
-                                          ('/tasks/update_usfirst_event', GetUsfirstEvent),
-                                          ('/tasks/instantiate_usfirst_regional_events', InstantiateRegionalEvents),
-                                          ('/tasks/get_usfirst_match_results/(.*)', GetUsfirstMatchResults),
-                                          ('/tasks/get_usfirst_team/(.*)', GetUsfirstTeam),
-                                          ('/tasks/flush/teams', FlushTeams), # Danger!
-                                          ('/tasks/flush/matches', FlushMatches), # Danger!
+    application = webapp.WSGIApplication([('/tasks/usfirst_event_get_enqueue', UsfirstEventGetEnqueue),
+                                          ('/tasks/usfirst_event_get/(.*)', UsfirstEventGet),
+                                          ('/tasks/usfirst_events_instantiate', UsfirstEventsInstantiate),
+                                          ('/tasks/usfirst_matches_get_enqueue', UsfirstMatchesGetEnqueue),
+                                          ('/tasks/usfirst_matches_get/(.*)', UsfirstMatchesGet),
+                                          ('/tasks/usfirst_team_get_enqueue', UsfirstTeamGetEnqueue),
+                                          ('/tasks/usfirst_team_get/(.*)', UsfirstTeamGet),
+                                          ('/tasks/usfirst_teams_instantiate', UsfirstTeamsInstantiate),
                                           ('/tasks/flush/events', FlushEvents), # Danger!
+                                          ('/tasks/flush/matches', FlushMatches), # Danger!
+                                          ('/tasks/flush/teams', FlushTeams), # Danger!
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)

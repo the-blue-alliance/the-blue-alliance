@@ -17,23 +17,68 @@ from helpers.team_helper import TeamTpidHelper, TeamUpdater
 
 from models import Event
 from models import Team
-from models import Match, MatchScore, MatchTeam
+from models import Match
 
-class EnqueueGetUsfirstEvents(webapp.RequestHandler):
+
+class UsfirstEventsInstantiate(webapp.RequestHandler):
+    """
+    Handles reading the USFIRST event list.
+    Enqueues a bunch of detailed reads that actually establish Event objects.
+    """
+    def get(self):
+        df = DatafeedUsfirstEvents()
+        
+        # These are dicts with a first_eid
+        events = df.getEventList()
+        
+        #TODO: This is only doing Regional events, not Michigan or Nats -gregmarra 4 Sep 2010
+        
+        for event in events:
+            logging.info("Event with eid: " + str(event.get("first_eid", 0)))
+            taskqueue.add(
+                url='/tasks/usfirst_event_get/' + event.get("first_eid", 0),
+                method='GET')
+        
+        template_values = {
+            'events': events,
+        }
+
+
+class UsfirstEventGetEnqueue(webapp.RequestHandler):
     """
     Handles enqueing updates to individual USFIRST events.
     """
     def get(self):
         events = Event.all()
         events.filter('first_eid != ', None) # Official events with EIDs
+        events.filter('year=', 2010) #Just this year #FIXME: Do this right
         
         for event in events.fetch(100):
             taskqueue.add(
-                url='/tasks/update_usfirst_event', 
-                params={'first_eid':event.first_eid},
+                url='/tasks/usfirst_event_get/' + event.first_eid, 
                 method='GET')
 
-class EnqueueGetUsfirstMatchResults(webapp.RequestHandler):
+
+class UsfirstEventGet(webapp.RequestHandler):
+    """
+    Handles reading a USFIRST event page and creating or updating the model as needed.
+    """
+    def get(self, first_eid):
+        df = DatafeedUsfirstEvents()
+        
+        event = df.getEvent(first_eid)
+        
+        event = EventUpdater.createOrUpdate(event)
+        
+        template_values = {
+            'event': event,
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_get.html')
+        self.response.out.write(template.render(path, template_values))
+
+
+class UsfirstMatchesGetEnqueue(webapp.RequestHandler):
     """
     Handles enqueing getting match results for USFIRST events.
     """
@@ -47,82 +92,17 @@ class EnqueueGetUsfirstMatchResults(webapp.RequestHandler):
                 events.filter('year =', int(self.request.get('year')))
         except Exception, detail:
             logging.error('Getting Year Failed: ' + str(detail))
-        
+            
         for event in events.fetch(100):
             logging.info(event)
             taskqueue.add(
-                url='/tasks/get_usfirst_match_results/' + event.key().name(),
+                url='/tasks/usfirst_matches_get/' + event.key().name(),
                 method='GET')
 
-class EnqueueGetUsfirstTeams(webapp.RequestHandler):
-    """
-    Handles enqueing updates to individual USFIRST teams.
-    """
-    def get(self):
-        
-        offset = self.request.get("offset")
-        if (offset is None):
-            offset = 0
-        
-        counter = 0
-        for team_key in Team.all(keys_only=True).fetch(1000, int(offset)):
-            counter =+ 1
-            taskqueue.add(url='/tasks/get_usfirst_team/' + team_key.name(),
-                          method='POST')
-            
-        self.response.out.write(str(counter) + " team gets have been enqueued.<br />")
-        self.response.out.write("Reload with ?offset=n to enqueue more.")
 
-class InstantiateRegionalEvents(webapp.RequestHandler):
-    """
-    Handles reading the USFIRST Regional event list.
-    Enqueues a bunch of detailed reads that actually establish
-    Event objects.
-    """
-    def get(self):
-        df = DatafeedUsfirstEvents()
-        
-        # These are dicts with a first_eid
-        events = df.getEventList()
-        
-        for event in events:
-            logging.info("Event with eid: " + str(event.get("first_eid", None)))
-            taskqueue.add(
-                url='/tasks/update_usfirst_event',
-                params={'first_eid':event.get("first_eid", None)},
-                method='GET')
-        
-        template_values = {
-            'events': events,
-        }
-        
-        path = os.path.join(os.path.dirname(__file__), '../templates/test_datafeed_usfirst_regional_events.html')
-        self.response.out.write(template.render(path, template_values))
-
-class GetUsfirstEvent(webapp.RequestHandler):
-    """
-    Handles reading a USFIRST event page and creating or updating the model as needed.
-    """
-    def get(self):
-        df = DatafeedUsfirstEvents()
-        
-        first_eid = self.request.get('first_eid')
-        event = df.getEvent(first_eid)
-        
-        event = EventUpdater.createOrUpdate(event)
-
-        template_values = {
-            'events': [event],
-        }
-
-        path = os.path.join(os.path.dirname(__file__), '../templates/test_datafeed_usfirst_regional_events.html')
-        self.response.out.write(template.render(path, template_values))
-
-class GetUsfirstMatchResults(webapp.RequestHandler):
+class UsfirstMatchesGet(webapp.RequestHandler):
     """
     Handles reading a USFIRST match results page and updating the datastore as needed.
-    Pushes Match Result Scores and Alliances to a deferred Handler because we're inefficient
-    about them right now.
     """
     def get(self, event_key):
         df = DatafeedUsfirstMatches()
@@ -145,11 +125,11 @@ class GetUsfirstMatchResults(webapp.RequestHandler):
             'matches': new_matches,
         }
         
-        path = os.path.join(os.path.dirname(__file__), '../templates/test_datafeed_usfirst_match_results.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_matches_get.html')
         self.response.out.write(template.render(path, template_values))
 
 
-class InstantiateUsfirstTeams(webapp.RequestHandler):
+class UsfirstTeamsInstantiate(webapp.RequestHandler):
     """
     A run-as-needed function that instantiates new Team objects based on 
     FIRST's full team list.
@@ -175,29 +155,52 @@ class InstantiateUsfirstTeams(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), '../templates/test_datafeed_instantiate_usfirst_teams.html')
         self.response.out.write(template.render(path, template_values))
 
-class GetUsfirstTeam(webapp.RequestHandler):
+
+class UsfirstTeamGetEnqueue(webapp.RequestHandler):
+    """
+    Handles enqueing updates to individual USFIRST teams.
+    """
+    def get(self):
+        
+        offset = self.request.get("offset")
+        if (offset is None):
+            offset = 0
+            
+        counter = 0
+        for team_key in Team.all(keys_only=True).fetch(1000, int(offset)):
+            counter += 1
+            taskqueue.add(url='/tasks/usfirst_team_get/' + team_key.name(),
+                          method='POST')
+                          
+        self.response.out.write(str(counter) + " team gets have been enqueued.<br />")
+        self.response.out.write("Reload with ?offset=n+1000 to enqueue more.")
+
+
+class UsfirstTeamGet(webapp.RequestHandler):
     """
     Handles reading a USFIRST team information page and updating the
     model accordingly.
     """
     def get(self, key_name):
         df = DatafeedUsfirstTeams()
-
+        
         old_team = Team.get_by_key_name(key_name)
-
+        
         logging.info("Updating team " + str(old_team.team_number))
         new_team = df.getTeamDetails(old_team.team_number)
         team = TeamUpdater.createOrUpdate(new_team)
-
+        
         template_values = {
             'team': team,
         }
-
+        
         path = os.path.join(os.path.dirname(__file__), '../templates/team.html')
         self.response.out.write(template.render(path, template_values))
-
+        
     def post(self, key_name):
         self.get(key_name)
+        
+
 
 class FlushTeams(webapp.RequestHandler):
     """
@@ -210,6 +213,7 @@ class FlushTeams(webapp.RequestHandler):
         team_count = Team.all().count()
         
         self.response.out.write("Teams flushed. " + str(team_count) + " teams remain. What have we done?!")
+
 
 class FlushMatches(webapp.RequestHandler):
     """
@@ -227,7 +231,8 @@ class FlushMatches(webapp.RequestHandler):
         
         path = os.path.join(os.path.dirname(__file__), '../templates/matches/flush.html')
         self.response.out.write(template.render(path, template_values))
-        
+
+
 class FlushEvents(webapp.RequestHandler):
     """
     NEVER CALL THIS FUNCTION.
