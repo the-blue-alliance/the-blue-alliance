@@ -11,6 +11,9 @@ handlers:
   script: $PYTHON_LIB/google/appengine/ext/appstats/ui.py
 - url: /tasks/.*
   script: cron_main.py
+- url: /admin/.*
+  script: admin_main.py
+  login: required
 - url: .*
   script: main.py
   

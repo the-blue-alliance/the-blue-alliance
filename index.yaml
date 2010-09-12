@@ -14,3 +14,8 @@ indexes:
   - name: event_short
   - name: year
   - name: event_short
+
+- kind: Event
+  properties:
+  - name: year
+  - name: start_date

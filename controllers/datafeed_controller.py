@@ -152,7 +152,7 @@ class UsfirstTeamsInstantiate(webapp.RequestHandler):
             'team_count': team_count
         }
         
-        path = os.path.join(os.path.dirname(__file__), '../templates/test_datafeed_instantiate_usfirst_teams.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_teams_instantiate.html')
         self.response.out.write(template.render(path, template_values))
 
 
