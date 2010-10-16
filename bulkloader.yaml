@@ -20,6 +20,7 @@ python_preamble:
 - import: google.appengine.ext.db
 - import: google.appengine.api.datastore
 - import: google.appengine.api.users
+- import: helpers.bulkloader_helper
 
 transformers:
 
@@ -82,6 +83,9 @@ transformers:
 
     - property: alliances_json
       external_name: alliances_json
+      import_transform: bulkloader_helper.fix_json
+      #TODO: Make this work
+      # JSON gets enclosed by ", but only " is allowed in JSON. -gregmarra 26 Sept 2010.
       
     - property: comp_level
       external_name: comp_level
@@ -104,6 +108,8 @@ transformers:
 
     - property: team_key_names
       external_name: team_key_names
+      import_transform: bulkloader_helper.fix_list
+      #This is such a dirty hack. It should be replaced with a better function. -gregmarra 26 Sept 2010.
       
     - property: no_auto_update
       external_name: no_auto_update

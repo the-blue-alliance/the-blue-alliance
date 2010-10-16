@@ -1,19 +1,53 @@
 {% extends "../base.html" %}
 
-{% block title %}frc{{team.team_number}} - TBA Admin{% endblock %}
+{% block title %}{{event.year}}{{event.event_short}} - Event - TBA Admin{% endblock %}
 
 {% block content %}
 
-<h1>Details for {{ event.name }}</h1>
+<h1>Details for {{ event.year }} {{ event.name }}</h1>
+
+<p><a href="/admin/event/edit/{{event.year}}{{event.event_short}}" title="Edit {{event.year}}{{event.name}}">Edit {{event.year}} {{event.name}}</a></p>
 
 <table>
+    <tr>
+        <td>Name</td>
+        <td>{{ event.name }}</td>
+    </tr>
     <tr>
         <td>Dates</td>
         <td>{{ event.start_date|date:"M d, Y" }} to {{ event.end_date|date:"M d, Y" }}</td>
     </tr>
     <tr>
+        <td>Short Name</td>
+        <td>{{ event.short_name }}</td>
+    </tr>
+    <tr>
+        <td>Website</td>
+        <td>{{ event.website }}</td>
+    </tr>
+    <tr>
+        <td>Year</td>
+        <td>{{ event.year }}</td>
+    </tr>
+    <tr>
+        <td>Event Short</td>
+        <td>{{ event.event_short }}</td>
+    </tr>
+    <tr>
+        <td>Event Type</td>
+        <td>{{ event.event_type }}</td>
+    </tr>
+    <tr>
         <td>Event Location</td>
         <td><a href="http://maps.google.com/maps?q={{ event.location }}">{{ event.location }}</a></td>
+    </tr>
+    <tr>
+        <td>Official</td>
+        <td>{{ event.official }}</td>
+    </tr>
+    <tr>
+        <td>FIRST Event ID</td>
+        <td>{{ event.first_eid }}</td>
     </tr>
     <tr>
         <td>Teams Attending</td>
@@ -23,20 +57,17 @@
 
 <h2>Match Listing</h2>
 
-{% for m in event.matches %}
-
+<table>
     <tr>
-        <td>{{ m.comp_level }} {{ m.match_number }}</td>
-        <td>{{ m.red.1.team_number }}</td>
-        <td>{{ m.red.2.team_number }}</td>
-        <td>{{ m.red.3.team_number }}</td>
-        <td>{{ m.blue.1.team_number }}</td>
-        <td>{{ m.blue.2.team_number }}</td>
-        <td>{{ m.blue.3.team_number }}</td> <!-- I am pretty sure this works. Can you access indices with dot syntax? -->
-        <td>{{ m.redscore.score }}</td>
-        <td>{{ m.bluescore.score }}</td>
+        <th>Match Key</th>
+        <th>Alliances JSON</th>
     </tr>
-
-{% endfor %}
+    {% for match in event.match_set %}
+    <tr>
+        <td><a href="/admin/match/{{match.key.name}}">{{ match.key.name }}</a></td>
+        <td>{{ match.alliances_json }}</td>
+    </tr>
+    {% endfor %}
+</table>
 
 {% endblock %}

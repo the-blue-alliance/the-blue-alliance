@@ -1,0 +1,31 @@
+{% extends "../base.html" %}
+
+{% block title %}{{match.key.name}} - Edit Match - TBA Admin{% endblock %}
+
+{% block content %}
+
+<h1>Edit {{ match.key.name }}</h1>
+
+<form action="/admin/match/edit/{{match.key.name}}" method="post">
+    <fieldset>
+        <legend>Edit {{ match.key.name }}</legend>
+        <ul>
+            
+            <li><input type="text" name="disabled_event_key_name" value="{{match.event.key.name}}" disabled="disabled" /><input type="hidden" name="event_key_name" value="{{match.event.key.name}}" /><label for="event_key_name">Event</label></li>
+            <li><input type="text" name="game" value="{{match.game}}" /><label for="game">Game</label></li>
+            
+            <li><input type="text" name="disabled_comp_level" value="{{match.comp_level}}" disabled="disabled" /><input type="hidden" name="comp_level" value="{{match.comp_level}}" /><label for="comp_level">Comp Level</label></li>
+            <li><input type="text" name="disabled_set_number" value="{{match.set_number}}" disabled="disabled" /><input type="hidden" name="set_number" value="{{match.set_number}}" /><label for="set_number">Set Number</label></li>
+            <li><input type="text" name="disabled_match_number" value="{{match.match_number}}" disabled="disabled" /><input type="hidden" name="match_number" value="{{match.match_number}}" /><label for="match_number">Match Number</label></li>
+            
+            
+            <li><textarea type="text" name="alliances_json" rows="6" cols="60">{{match.alliances_json}}</textarea><label for="alliances_json">Alliances JSON</label></li>
+            
+            <li><input type="checkbox" name="no_auto_update" value="True" {% if match.no_auto_update %}checked="checked"{% endif %} /><label for="no_auto_update">no_auto_update</label></li>
+            
+            <li><input type="submit" id="submit" name="submit" value="Save"></li>
+        </ul>
+    </fieldset>
+</form>
+
+{% endblock %}

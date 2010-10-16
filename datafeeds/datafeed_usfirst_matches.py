@@ -18,28 +18,6 @@ class DatafeedUsfirstMatches(object):
     It returns Match model objects, but does no database IO itself.
     """
     
-    FRC_GAMES_BY_YEAR = {
-        2010: "frc_2010_bkwy",
-        2009: "frc_2009_lncy",
-        2008: "frc_2008_ovdr",
-        2007: "frc_2007_rkrl",
-        2006: "frc_2006_amhi",
-        2005: "frc_2005_trpl",
-        2004: "frc_2004_frnz",
-        2003: "frc_2003_stck",
-        2002: "frc_2002_znzl",
-        2001: "frc_2001_dbdy",
-        2000: "frc_2000_coop",
-        1999: "frc_1999_trbl",
-        1998: "frc_1998_lddr",
-        1997: "frc_1997_trdt",
-        1996: "frc_1996_hxgn",
-        1995: "frc_1995_rmpr",
-        1994: "frc_1994_tpwr",
-        1993: "frc_1993_rgrg",
-        1992: "frc_1992_maiz"
-    }
-    
     MATCH_RESULTS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/matchresults.html" # % (year, event_short)
     MATCH_SCHEDULE_QUAL_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/schedulequal.html"
     MATCH_SCHEDULE_ELIMS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/scheduleelim.html"
@@ -119,7 +97,7 @@ class DatafeedUsfirstMatches(object):
                         match = Match(
                             key_name = self.getKeyName(event, "qm", 1, match_number),
                             event = event.key(),
-                            game = self.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
+                            game = Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
                             set_number = 1,
                             match_number = match_number,
                             comp_level = "qm",
@@ -167,7 +145,7 @@ class DatafeedUsfirstMatches(object):
                         match = Match(
                             key_name = self.getKeyName(event, match_number_info["comp_level"], match_number_info["set_number"], match_number_info["match_number"]),
                             event = event.key(),
-                            game = self.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
+                            game = Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
                             set_number = match_number_info["set_number"],
                             match_number = match_number_info["match_number"],
                             comp_level = match_number_info["comp_level"],

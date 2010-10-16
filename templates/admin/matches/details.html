@@ -1,0 +1,29 @@
+{% extends "../base.html" %}
+
+{% block title %}{{match.key.name}} - TBA Admin{% endblock %}
+
+{% block content %}
+
+<h1>{{match.key.name}}</h1>
+<p><a href="/admin/match/edit/{{match.key.name}}">edit</a></p>
+<table>
+    <tr>
+        <td>Event</td>
+        <td>{{ match.event.year }} {{ match.event.name }}</td>
+    </tr>
+    <tr>
+        <td>Match</td>
+        <td>{{ match.key.name }}</td>
+    </tr>
+    <tr>
+        <td>Team Key Names</td>
+        <td>{{ match.team_key_names }}</td>
+    </tr>
+    
+    <tr>
+        <td>Alliances JSON</td>
+        <td>{{ match.alliances_json }}</td>
+    </tr>
+</table>
+
+{% endblock %}

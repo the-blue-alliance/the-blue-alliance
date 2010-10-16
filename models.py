@@ -85,6 +85,28 @@ class Match(db.Model):
         "frc_unknown",
     ]
     
+    FRC_GAMES_BY_YEAR = {
+        2010: "frc_2010_bkwy",
+        2009: "frc_2009_lncy",
+        2008: "frc_2008_ovdr",
+        2007: "frc_2007_rkrl",
+        2006: "frc_2006_amhi",
+        2005: "frc_2005_trpl",
+        2004: "frc_2004_frnz",
+        2003: "frc_2003_stck",
+        2002: "frc_2002_znzl",
+        2001: "frc_2001_dbdy",
+        2000: "frc_2000_coop",
+        1999: "frc_1999_trbl",
+        1998: "frc_1998_lddr",
+        1997: "frc_1997_trdt",
+        1996: "frc_1996_hxgn",
+        1995: "frc_1995_rmpr",
+        1994: "frc_1994_tpwr",
+        1993: "frc_1993_rgrg",
+        1992: "frc_1992_maiz"
+    }
+    
     game = db.StringProperty(required=True,choices=set(FRC_GAMES))
     
     event = db.ReferenceProperty(Event, required=True)
@@ -136,3 +158,4 @@ class YoutubeVideo(db.Model):
     match = db.ReferenceProperty(Match,
                                  required=True)
     youtube_id = db.StringProperty()
+
