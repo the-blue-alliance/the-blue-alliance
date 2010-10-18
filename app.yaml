@@ -3,16 +3,15 @@ version: 1
 runtime: python
 api_version: 1
 
+builtins:
+- appstats: on
+- remote_api: on
+
 handlers:
 - url: /css
   static_dir: css
 - url: /images
   static_dir: images
-- url: /remote_api
-  script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
-  login: admin
-- url: /stats.*
-  script: $PYTHON_LIB/google/appengine/ext/appstats/ui.py
 - url: /tasks/.*
   script: cron_main.py
 - url: /admin/.*
@@ -20,8 +19,4 @@ handlers:
   login: required
 - url: .*
   script: main.py
-  
-admin_console:
-  pages:
-  - name: Appstats
-    url: /stats
+
