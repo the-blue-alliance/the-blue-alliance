@@ -1,3 +1,9 @@
+{% extends "../base.html" %}
+
+{% block title %}The Blue Alliance - Dev Help{% endblock %}
+
+{% block content %}
+
 <h1>TBATV GAE</h1>
 <p>Some things you may be interested in doing:</p>
 <p>To process TaskQueues offline use the following command: <strong>python2.5 run_tasks.py -p <em>port</em></strong></p>
@@ -21,3 +27,4 @@
 </ul>
 <h2>Bulkloading</h2>
 <p>appcfg.py upload_data --config_file=bulkloader.yaml --filename=<em>something</em>.csv --kind=<em>Something</em> --url=http://<em>something</em>/_ah/remote_api --application=tbatv-dev</p>
+{% endblock %}
