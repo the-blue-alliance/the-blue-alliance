@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>{% block title %}The Blue Alliance{% endblock %}</title>
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/css/style.css" type="text/css" />
+    <!-- TODO: ga.js -->
+</head>
+<body>
+    <div id="wrapper">
+        <div id="header">
+            <div id="login">
+                {% if user %}
+                    {{user.email}} | <a href="/admin/logout">log out</a>
+                {% else %}
+                    <a href="/admin/login">log in</a>
+                {% endif %}
+            </div>
+            <div id="titles">
+                <h1><a href="/">TBA</a></h1>
+                <h2>Like the WWF, but for smart people.</h2>
+            </div>
+            <div id="nav">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/team/">Teams</a></li>
+                    <li><a href="/event/">Events</a></li>
+                </ul>
+            </div>
+        </div>
+        <div id="content">
+            {% block content %}{% endblock %}
+        </div>
+        <div id="footer">
+            <p>The Blue Alliance. <a href="/debug/">debug + dev</a>.</p>
+        </div>
+    </div>
+</body>
+</html>
