@@ -16,7 +16,7 @@
     
     {% for event in events %}
     <tr>
-        <td><a href="/admin/event/{{event.year}}{{event.event_short}}">{{ event.name }}</td>
+        <td><a href="/admin/event/{{event.key.name}}">{{ event.name }}</td>
         <td>{{ event.year }}</td>
         <td>{{ event.event_short }}</td>
         <td>{{ event.first_eid }}</td>

@@ -1,3 +1,9 @@
+{% extends "../base.html" %}
+
+{% block title %}Events - The Blue Alliance{% endblock %}
+
+{% block content %}
+
 <h1>All Events</h1>
 <p>{{ events|length }} total events</p>
 <table>
@@ -10,10 +16,12 @@
     
     {% for event in events %}
     <tr>
-        <td>{{ event.name }}</td>
+        <td><a href="/event/{{event.year}}{{event.event_short}}">{{ event.name }}</a></td>
         <td>{{ event.year }}</td>
         <td>{{ event.event_short }}</td>
         <td>{{ event.first_eid }}</td>
     </tr>
     {% endfor %}
 </table>
+
+{% endblock %}

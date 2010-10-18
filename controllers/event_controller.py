@@ -1,15 +1,16 @@
-import os
+import os, logging
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
 
-from models import Event
+from models import Event, Match
 
 class EventList(webapp.RequestHandler):
     """
     List all Events.
     """
-    def get(self):
+    def get(self, year=None):
+        if not year: year = 2010 #fixme -gregmarra 17 Oct 2010
         
         events = Event.all().order('start_date').fetch(10000)
         
@@ -23,15 +24,29 @@ class EventList(webapp.RequestHandler):
 class EventDetail(webapp.RequestHandler):
     """
     Show an Event.
+    event_code like "2010ct"
     """
-    def get(self, year, event_short):
+    def get(self, event_code):
         
-        event = Event.all().filter("year =", int(year)).filter("event_short = ", event_short)[0]
+        year = event_code[0:4]
+        event_short = event_code[4:]
         
-        event.red = event.teams.filter("alliance=", "red")
-        event.blue = event.teams.filter("alliance=", "blue")
-        event.redscore = event.scores.filter("alliance=", "red")
-        event.bluescore = event.scores.filter("alliance=", "blue")
+        event = Event.get_by_key_name(year + event_short)
+        match_list = event.match_set.order("match_number").order("set_number").fetch(500)
         
+        # Eh, this could be better. -gregmarra 17 oct 2010
+        # todo: abstract this so we can use it in the team view.
+        # todo: figure out how slow this is
+        [match.unpack_json() for match in match_list]
+        matches = dict([(comp_level, list()) for comp_level in Match.COMP_LEVELS])
+        while len(match_list) > 0:
+            match = match_list.pop(0)
+            matches[match.comp_level].append(match)
+        
+        template_values = {
+            "event": event,
+            "matches": matches,
+        }
+                
         path = os.path.join(os.path.dirname(__file__), '../templates/events/details.html')
-        self.response.out.write(template.render(path, { 'event' : event }))
+        self.response.out.write(template.render(path, template_values))

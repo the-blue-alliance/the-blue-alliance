@@ -19,3 +19,23 @@ indexes:
   properties:
   - name: year
   - name: start_date
+
+- kind: Match
+  properties:
+  - name: event
+  - name: comp_level
+  - name: match_number
+  - name: set_number
+
+- kind: Match
+  properties:
+  - name: event
+  - name: match_number
+  - name: set_number
+
+- kind: Match
+  properties:
+  - name: event
+  - name: match_number
+  - name: set_number
+  - name: comp_level

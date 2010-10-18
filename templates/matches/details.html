@@ -1,0 +1,37 @@
+{% extends "../base.html" %}
+
+{% block title %}{{match.key.name}} - {{match.event.year}} {{match.event.name}} - The Blue Alliance{% endblock %}
+
+{% block content %}
+
+<h1><a href="/event/{{match.event.key.name}}">{{match.event.year}} {{match.event.name}}</a></h1>
+<h2>{{match.key.name}}</h2>
+
+<table>
+    {% for items in match.alliances.items %}
+    <tr>
+        <td>{{ items.0 }}</td>
+        {% for team in items.1.teams %}
+            <td>{{ team|slice:"3:" }}</td>
+        {% endfor %}
+        <td>{{ items.1.score}}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<p>VIDEOS HERE</p>
+
+<h3>Debug</h3>
+<table>
+    <tr>
+        <td>Team Key Names</td>
+        <td>{{ match.team_key_names }}</td>
+    </tr>
+    
+    <tr>
+        <td>Alliances JSON</td>
+        <td>{{ match.alliances_json }}</td>
+    </tr>
+</table>
+
+{% endblock %}

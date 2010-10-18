@@ -1,4 +1,5 @@
 import os
+import logging
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
@@ -10,7 +11,6 @@ class MatchList(webapp.RequestHandler):
     Display all Matches.
     """
     def get(self):
-        
         matches = Match.all().order('event').fetch(100)
         
         template_values = {
@@ -26,11 +26,12 @@ class MatchDetail(webapp.RequestHandler):
     """
     def get(self, key_name):
         
-        match = Match.all().get_by_key_name(key_name)
+        match = Match.get_by_key_name(key_name)
         
         if match:
-            path = os.path.join(os.path.dirname(__file__), '../templates/events/details.html')
-            self.response.out.write(template.render(path, { 'event' : event }))
+            match.unpack_json()
+            path = os.path.join(os.path.dirname(__file__), '../templates/matches/details.html')
+            self.response.out.write(template.render(path, { 'match' : match }))
         else:
             # TODO: Add real "match not found" template
             self.response.out.write("404.")

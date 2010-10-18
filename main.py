@@ -15,12 +15,12 @@ from controllers.team_controller import TeamList, TeamDetail
 def main():
     application = webapp.WSGIApplication([('/', MainHandler),
                                           ('/debug/', MainDebugHandler),
-                                          ('/event/list', EventList),
-                                          ('/events/(.*)/(.*)', EventDetail),
+                                          ('/events/(.*)', EventList),
+                                          ('/event/(.*)', EventDetail),
                                           ('/match/list', MatchList),
                                           ('/match/(.*)', MatchDetail),
                                           ('/team/list', TeamList),
-                                          ('/team/(.*)/(.*)', TeamDetail),
+                                          ('/team/(.*)', TeamDetail),
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)

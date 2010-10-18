@@ -1,4 +1,10 @@
-<h1>Details for {{ event.name }}</h1>
+{% extends "../base.html" %}
+
+{% block title %}{{event.year}} {{event.name}} - The Blue Alliance{% endblock %}
+
+{% block content %}
+
+<h1>Details for {{event.year}} {{ event.name }}</h1>
 
 <table>
     <tr>
@@ -17,18 +23,40 @@
 
 <h2>Match Listing</h2>
 
-{% for m in event.matches %}
-
+<!-- todo, break out per-game match rows into template partials. reduce repetition -gregmarra 17 oct 2010-->
+<table>
+    <tr><th>qm</th></tr>
+    {% for match in matches.qm %}
     <tr>
-        <td>{{ m.comp_level }} {{ m.match_number }}</td>
-        <td>{{ m.red.1.team_number }}</td>
-        <td>{{ m.red.2.team_number }}</td>
-        <td>{{ m.red.3.team_number }}</td>
-        <td>{{ m.blue.1.team_number }}</td>
-        <td>{{ m.blue.2.team_number }}</td>
-        <td>{{ m.blue.3.team_number }}</td> <!-- I am pretty sure this works. Can you access indices with dot syntax? -->
-        <td>{{ m.redscore.score }}</td>
-        <td>{{ m.bluescore.score }}</td>
-    </tr>
+        <td>{{match}}</td>
+        <td><a href="/match/{{match.key.name}}">{{ match.key.name }}</td>
+        <td>{{ match.alliances_json }}</td>
+    </tr>    
+    {% endfor %}
+    <tr><th>qf</th></tr>
+    {% for match in matches.qf %}
+    <tr>
+        <td>{{match}}</td>
+        <td><a href="/match/{{match.key.name}}">{{ match.key.name }}</td>
+        <td>{{ match.alliances_json }}</td>
+    </tr>    
+    {% endfor %}
+    <tr><th>sf</th></tr>
+    {% for match in matches.sf %}
+    <tr>
+        <td>{{match}}</td>
+        <td><a href="/match/{{match.key.name}}">{{ match.key.name }}</td>
+        <td>{{ match.alliances_json }}</td>
+    </tr>    
+    {% endfor %}
+    <tr><th>f</th></tr>
+    {% for match in matches.f %}
+    <tr>
+        <td>{{match}}</td>
+        <td><a href="/match/{{match.key.name}}">{{ match.key.name }}</td>
+        <td>{{ match.alliances_json }}</td>
+    </tr>    
+    {% endfor %}
+</table>
+{% endblock %}
 
-{% endfor %}

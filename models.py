@@ -36,7 +36,7 @@ class Event(db.Model):
     
     def get_key_name(self):
         """
-        Returns the string of the key_name of the Event object.
+        Returns the string of the key_name of the Event object before writing it.
         """
         return str(self.year) + self.event_short
 
@@ -138,6 +138,12 @@ class Match(db.Model):
         else:
             return (self.event.get_key_name() + '_' + self.comp_level +
                 str(self.set_number) + 'm' + str(self.match_number))
+    
+    def unpack_json(self):
+        """Turn that JSON into a dict."""
+        self.alliances = simplejson.loads(self.alliances_json)
+        # TODO: there's a way to do this lazily as soon as we try to access 
+        # something under .alliances., right? -gregmarra 17 Oct 2010
 
 
 # TODO: Make Video subclasses inherit from an Interface class.
