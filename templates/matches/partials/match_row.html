@@ -1,0 +1,11 @@
+<tr>
+    <td><a href="/match/{{match.key.name}}">{{match.verbose_name}}</td>
+    <td><a href="/team/{{ match.alliances.red.teams.0|slice:"3:" }}">{{ match.alliances.red.teams.0|slice:"3:" }}</a></td>
+    <td><a href="/team/{{ match.alliances.red.teams.1|slice:"3:" }}">{{ match.alliances.red.teams.1|slice:"3:" }}</a></td>
+    <td><a href="/team/{{ match.alliances.red.teams.2|slice:"3:" }}">{{ match.alliances.red.teams.2|slice:"3:" }}</a></td>
+    <td><a href="/team/{{ match.alliances.blue.teams.0|slice:"3:" }}">{{ match.alliances.blue.teams.0|slice:"3:" }}</a></td>
+    <td><a href="/team/{{ match.alliances.blue.teams.1|slice:"3:" }}">{{ match.alliances.blue.teams.1|slice:"3:" }}</a></td>
+    <td><a href="/team/{{ match.alliances.blue.teams.2|slice:"3:" }}">{{ match.alliances.blue.teams.2|slice:"3:" }}</a></td>
+    <td>{{ match.alliances.red.score }}</td>
+    <td>{{ match.alliances.blue.score }}</td>
+</tr>

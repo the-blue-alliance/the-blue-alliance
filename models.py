@@ -60,7 +60,14 @@ class Match(db.Model):
     key_name is like 2010ct_qm10 or 2010ct_sf1m2
     """
     
-    COMP_LEVELS = ["qm", "qf", "sf", "f"]
+    COMP_LEVELS = ["qm", "ef", "qf", "sf", "f"]
+    COMP_LEVELS_VERBOSE = {
+        "qm": "Qualifications",
+        "ef": "Eighths",
+        "qf": "Quarters",
+        "sf": "Semis",
+        "f": "Finals",
+    }
         
     FRC_GAMES = [
         "frc_2010_bkwy",
@@ -144,6 +151,12 @@ class Match(db.Model):
         self.alliances = simplejson.loads(self.alliances_json)
         # TODO: there's a way to do this lazily as soon as we try to access 
         # something under .alliances., right? -gregmarra 17 Oct 2010
+    
+    def verbose_name(self):
+        if self.comp_level == "qm" or self.comp_level == "f":
+            return "%s %s" % (self.COMP_LEVELS_VERBOSE[self.comp_level], self.match_number)
+        else:
+            return "%s %s Match %s" % (self.COMP_LEVELS_VERBOSE[self.comp_level], self.set_number, self.match_number)
 
 
 # TODO: Make Video subclasses inherit from an Interface class.

@@ -32,7 +32,7 @@ class EventDetail(webapp.RequestHandler):
         event_short = event_code[4:]
         
         event = Event.get_by_key_name(year + event_short)
-        match_list = event.match_set.order("match_number").order("set_number").fetch(500)
+        match_list = event.match_set.order("set_number").order("match_number").fetch(500)
         
         # Eh, this could be better. -gregmarra 17 oct 2010
         # todo: abstract this so we can use it in the team view.

@@ -39,3 +39,9 @@ indexes:
   - name: match_number
   - name: set_number
   - name: comp_level
+
+- kind: Match
+  properties:
+  - name: event
+  - name: set_number
+  - name: match_number

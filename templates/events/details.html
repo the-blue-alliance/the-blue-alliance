@@ -23,39 +23,33 @@
 
 <h2>Match Listing</h2>
 
-<!-- todo, break out per-game match rows into template partials. reduce repetition -gregmarra 17 oct 2010-->
+<!-- if out 0 sets -gregmarra 17 oct 2010-->
 <table>
-    <tr><th>qm</th></tr>
+    <tr>
+        <th>Match Number</th>
+        <th colspan="3">Red Alliance</th>
+        <th colspan="3">Blue Alliance</th>
+        <th colspan="2">Scores</th>
+    </tr>
+    <tr><th colspan="9">Qualifications</th></tr>
     {% for match in matches.qm %}
-    <tr>
-        <td>{{match}}</td>
-        <td><a href="/match/{{match.key.name}}">{{ match.key.name }}</td>
-        <td>{{ match.alliances_json }}</td>
-    </tr>    
+        {% include "../matches/partials/match_row.html" %}
     {% endfor %}
-    <tr><th>qf</th></tr>
+    <tr><th colspan="9">Eighth Finals</th></tr>
+    {% for match in matches.ef %}
+        {% include "../matches/partials/match_row.html" %}
+    {% endfor %}
+    <tr><th colspan="9">Quarterfinals</th></tr>
     {% for match in matches.qf %}
-    <tr>
-        <td>{{match}}</td>
-        <td><a href="/match/{{match.key.name}}">{{ match.key.name }}</td>
-        <td>{{ match.alliances_json }}</td>
-    </tr>    
+        {% include "../matches/partials/match_row.html" %}
     {% endfor %}
-    <tr><th>sf</th></tr>
+    <tr><th colspan="9">Semifinals</th></tr>
     {% for match in matches.sf %}
-    <tr>
-        <td>{{match}}</td>
-        <td><a href="/match/{{match.key.name}}">{{ match.key.name }}</td>
-        <td>{{ match.alliances_json }}</td>
-    </tr>    
+        {% include "../matches/partials/match_row.html" %}
     {% endfor %}
-    <tr><th>f</th></tr>
+    <tr><th colspan="9">Finals</th></tr>
     {% for match in matches.f %}
-    <tr>
-        <td>{{match}}</td>
-        <td><a href="/match/{{match.key.name}}">{{ match.key.name }}</td>
-        <td>{{ match.alliances_json }}</td>
-    </tr>    
+        {% include "../matches/partials/match_row.html" %}
     {% endfor %}
 </table>
 {% endblock %}
