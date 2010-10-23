@@ -159,22 +159,22 @@ class Match(db.Model):
             return "%s %s Match %s" % (self.COMP_LEVELS_VERBOSE[self.comp_level], self.set_number, self.match_number)
 
 
-# TODO: Make Video subclasses inherit from an Interface class.
 class TBAVideo(db.Model):
     """
-    Store information related to videos of Matches hosted on
-    The Blue Alliance.
+    Store information related to videos of Matches hosted on 
+    videos.thebluealliance.net. Generally, there should only be one TBAVideo
+    per Match.
     """
-    match = db.ReferenceProperty(Match,
-                                 required=True)
-    location = db.StringProperty()
-
+    
+    match = db.ReferenceProperty(Match, required=True)
+    url = db.StringProperty()
+    filetype = db.StringProperty() # "mp4", "wmv", etc
+    
 
 class YoutubeVideo(db.Model):
     """
     Store information related to videos of Matches hosted on YouTube.
     """
-    match = db.ReferenceProperty(Match,
-                                 required=True)
+    match = db.ReferenceProperty(Match, required=True)
     youtube_id = db.StringProperty()
 

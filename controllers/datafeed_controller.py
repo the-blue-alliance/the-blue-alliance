@@ -10,15 +10,46 @@ from google.appengine.ext.webapp import template, util
 from datafeeds.datafeed_usfirst_events import DatafeedUsfirstEvents
 from datafeeds.datafeed_usfirst_matches import DatafeedUsfirstMatches
 from datafeeds.datafeed_usfirst_teams import DatafeedUsfirstTeams
+from datafeeds.datafeed_tba_videos import DatafeedTbaVideos
 
 from helpers.event_helper import EventUpdater
 from helpers.match_helper import MatchUpdater
 from helpers.team_helper import TeamTpidHelper, TeamUpdater
+from helpers.tbavideo_helper import TBAVideoUpdater
 
 from models import Event
 from models import Team
 from models import Match
 
+
+class TbaVideosGet(webapp.RequestHandler):
+    """
+    Handles reading a TBA video listing page and updating the datastore as needed.
+    TODO: We never deal with TBAVideos going away.
+    """
+    def get(self, event_key):
+        df = DatafeedTbaVideos()
+        
+        event = Event.get_by_key_name(event_key)
+        tbavideos = df.getEventVideosList(event)
+        
+        new_tbavideos = list()
+        
+        if len(tbavideos) < 1:
+            logging.info("No tbavideos found for event " + event.key().name())
+        else:
+            for tbavideo in tbavideos:
+                new_tbavideo = TBAVideoUpdater.findOrSpawn(tbavideo) # findOrSpawn doesn't put() things.
+                new_tbavideos.append(new_tbavideo)
+            
+            keys = db.put(new_tbavideos) # Doing a bulk put() is faster than individually.
+        
+        template_values = {
+            'tbavideos': new_tbavideos,
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/tba_videos_get.html')
+        self.response.out.write(template.render(path, template_values))
 
 class UsfirstEventsInstantiate(webapp.RequestHandler):
     """

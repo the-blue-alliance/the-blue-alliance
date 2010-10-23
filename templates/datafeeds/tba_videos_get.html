@@ -1,0 +1,8 @@
+<h2>Got some tbavideos</h2>
+{% for tbavideo in tbavideos %}
+    <ul>
+        <li>Match: {{tbavideo.match.key.name}}</li>
+        <li>Filetype: {{tbavideo.filetype}}</li>
+        <li>URL: {{tbavideo.url}}</li>
+    </ul>
+{% endfor %}
