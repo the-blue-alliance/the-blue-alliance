@@ -23,7 +23,7 @@ class TBAVideoUpdater(object):
     @classmethod
     def findOrSpawn(self, new_tbavideo):
         """"
-        Check if an tbavideo currently exists in the database based on (match, filetype)
+        Check if an tbavideo currently exists in the database based on match
         Doesn't put objects.
         If it does, update it and give it back.
         If it does not, give it back.
@@ -31,7 +31,7 @@ class TBAVideoUpdater(object):
         query = TBAVideo.all()
         
         # Look for a collision.
-        tbavideo = TBAVideo.all().filter("match =", new_tbavideo.match).filter("filetype =", new_tbavideo.filetype).get()
+        tbavideo = TBAVideo.all().filter("match =", new_tbavideo.match).get()
         if tbavideo is not None:
             tbavideo = self.updateMerge(new_tbavideo, tbavideo)
             return tbavideo
@@ -42,9 +42,9 @@ class TBAVideoUpdater(object):
     def updateMerge(self, new_tbavideo, old_tbavideo):
         """
         Given an "old" and a "new" TBAVideo object, replace the fields in the
-        "old" team that are present in the "new" team.
+        "old" that are present in the "new".
         """
         
-        old_tbavideo.url = new_tbavideo.url
+        old_tbavideo.filetypes = new_tbavideo.filetypes
         return old_tbavideo
 

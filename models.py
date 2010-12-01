@@ -162,14 +162,12 @@ class Match(db.Model):
 class TBAVideo(db.Model):
     """
     Store information related to videos of Matches hosted on 
-    videos.thebluealliance.net. Generally, there should only be one TBAVideo
-    per Match.
+    videos.thebluealliance.net. Generally, there should only be one
+    TBAVideo per match
     """
     
     match = db.ReferenceProperty(Match, required=True)
-    url = db.StringProperty()
-    filetype = db.StringProperty() # "mp4", "wmv", etc
-    
+    filetypes = db.StringListProperty() # ["mp4", "flv", "wmv"] etc
 
 class YoutubeVideo(db.Model):
     """

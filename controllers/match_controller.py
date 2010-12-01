@@ -27,12 +27,12 @@ class MatchDetail(webapp.RequestHandler):
     def get(self, key_name):
         
         match = Match.get_by_key_name(key_name)
-        
-        if match:
-            match.unpack_json()
-            path = os.path.join(os.path.dirname(__file__), '../templates/matches/details.html')
-            self.response.out.write(template.render(path, { 'match' : match }))
-        else:
+        if not match:
             # TODO: Add real "match not found" template
             self.response.out.write("404.")
-
+            return None
+        
+        match.unpack_json()
+        path = os.path.join(os.path.dirname(__file__), '../templates/matches/details.html')
+        self.response.out.write(template.render(path, { 'match' : match }))
+        

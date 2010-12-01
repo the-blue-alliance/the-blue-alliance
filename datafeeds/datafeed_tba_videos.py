@@ -15,8 +15,6 @@ class DatafeedTbaVideos(object):
     """
     
     TBA_VIDS_DIR_URL_PATTERN = "http://thebluealliance.net/tbatv/vids/%s/"
-    TBA_VIDS_VID_URL_PATTERN = "http://thebluealliance.net/tbatv/vids/%s/%s"
-    SKIP_FILETYPES = ["jpg", "jpeg", "JPG", "JPEG"]
     
     def getEventVideosList(self, event):
         """
@@ -42,33 +40,35 @@ class DatafeedTbaVideos(object):
         
         matches = event.match_set
         match_dict = dict()
+        match_filetypes = dict()
         for match in matches:
             match_dict.setdefault(match.key().name()[4:], match)
         
-        tbavideos = list()
-        
         for a in soup.findAll("a", href=True):
-            
             logging.info(a)
             
             parts = a["href"].split(".")
             if len(parts) == 2:
                 (key, filetype) = parts
             else:
+                logging.info("Malformed video filename: " + a["href"])
                 continue
                 
-            if filetype in self.SKIP_FILETYPES:
-                continue
-            
-            if key in match_dict.keys():
-                tbavideo = TBAVideo(
-                    match = match_dict[key],
-                    url = self.TBA_VIDS_VID_URL_PATTERN % (event.key().name()[2:], a["href"]),
-                    filetype = filetype,
-                )
-                tbavideos.append(tbavideo)
+            if key in match_dict:
+                match_filetypes.setdefault(key, list())
+                match_filetypes[key].append(filetype)
             else:
                 logging.info("Unexpected match: " + a["href"])
+        
+        tbavideos = list()
+        
+        for match_key in match_filetypes.keys():
+            tbavideo = TBAVideo(
+                match = match_dict[match_key],
+                filetypes = match_filetypes[match_key],
+            )
+            logging.info(match_key)
+            tbavideos.append(tbavideo)            
         
         return tbavideos
 
