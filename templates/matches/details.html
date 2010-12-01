@@ -19,7 +19,8 @@
     {% endfor %}
 </table>
 
-<p>VIDEOS HERE</p>
+<h3>Video</h3>
+{% include "../videos/partials/tbavideo_player.html" %}
 
 <h3>Debug</h3>
 <table>
@@ -27,10 +28,17 @@
         <td>Team Key Names</td>
         <td>{{ match.team_key_names }}</td>
     </tr>
-    
     <tr>
         <td>Alliances JSON</td>
         <td>{{ match.alliances_json }}</td>
+    </tr>
+    <tr>
+        <td>TBAVideo filetypes</td>
+        <td>
+            {% for tbavideo in match.tbavideo_set  %}
+                {{ tbavideo.filetypes }}
+            {% endfor %}
+        </td>
     </tr>
 </table>
 

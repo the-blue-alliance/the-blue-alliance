@@ -1,0 +1,20 @@
+<h3>TBAVideo Player</h3>
+<video
+    src="http://www.thebluealliance.net/tbatv/vids/{{match.event.key.name|slice:"2:"}}/{{match.key.name|slice:"4:"}}.mp4"
+    height="270"
+    id="tbavideo_container"
+    poster="http://www.thebluealliance.net/tbatv/vids/{{match.event.key.name|slice:"2:"}}/{{match.key.name|slice:"4:"}}.jpg"
+    width="480">
+</video>
+
+<script type="text/javascript">
+    jwplayer("tbavideo_container").setup({
+        players: [
+            { type: "html5" },
+            { type: "flash", src: "/jwplayer/player.swf" }
+        ],
+        controlbar: "bottom",
+    });
+</script>
+<p>TODO: Fix buffering issues where mp4's take too long to start playback.</p>
+<p>All file types: {% for tbavideo in match.tbavideo_set  %}{{ tbavideo.filetypes }}{% endfor %}.</p>
