@@ -7,7 +7,14 @@
 <h1>TBATV GAE</h1>
 <p>Some things you may be interested in doing:</p>
 <p>To process TaskQueues offline use the following command: <strong>python2.5 run_tasks.py -p <em>port</em></strong></p>
-<h2>Setup</h2>
+<h2>Fast Setup</h2>
+<ol>
+    <li>Instantiate Teams: <a href="/tasks/usfirst_teams_instantiate?skip=0">UsfirstTeamsInstantiate @ 0</a>, <a href="/tasks/usfirst_teams_instantiate?skip=1000">UsfirstTeamsInstantiate @ 1000</a>, <a href="/tasks/usfirst_teams_instantiate?skip=2000">UsfirstTeamsInstantiate @ 2000</a></li>
+    <li>Bulkload Events:<br />appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/events.csv --kind=Event --url=http://localhost:8085/_ah/remote_api --application=tbatv-dev</li>
+    <li>Bulkload 2010cmp Matches: <br />appcfg.py upload_data --config_file=bulkloader.yaml --filename=matches_2010cmp.csv --kind=Match --url=http://localhost:8085/_ah/remote_api --application=tbatv-dev</li>
+    <li><a href="/tasks/tba_videos_get/2010cmp">Scrape 2010cmp TBAVideos</a></li>
+</ol>
+<h2>Realer Setup</h2>
 <ol>
     <strong>You must do these things first</strong>.
     <li><a href="/tasks/usfirst_teams_instantiate?skip=0">UsfirstTeamsInstantiate</a>, creates Team objects for all teams from USFIRST.  Uses code borrowed from Patrick Fairbank's FRCLinks.</li>
@@ -18,6 +25,7 @@
     <li><a href="/tasks/usfirst_event_get_enqueue">UsfirstEventGetEnqueue</a>, which sets up the TaskQueue to update details for all official Event objects.</li>
     <li><a href="/tasks/usfirst_matches_get_enqueue?year=2010">UsfirstMatchesGetEnqueue</a>, which sets up the TaskQueue to get match results for all known Event objects, which will create or update Match objects.</li>
     <li><a href="/tasks/usfirst_team_get_enqueue?offset=0">UsfirstTeamGetEnqueue @ 0</a> and <a href="/tasks/usfirst_team_get_enqueue?offset=1000">UsfirstTeamGetEnqueue @ 1k</a>, which set up the TaskQueue to read the USFIRST team details, updating Team objects.</li>
+    <li><a href="/tasks/tba_videos_get/2010cmp">TBAVideosGet</a> with an Event key to scrape TBA.net for TBAVideos.</li>
 </ul>
 <h2>View</h2>
 <ul>
