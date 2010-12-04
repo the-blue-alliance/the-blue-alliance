@@ -59,6 +59,7 @@ class DatafeedUsfirstMatches(object):
         matches.extend(self.parseQualMatchResultList(event, tables[2]))
         matches.extend(self.parseElimMatchResultList(event, tables[3]))
         
+        
         return matches
     
     def parseQualMatchResultList(self, event, table):
@@ -152,8 +153,9 @@ class DatafeedUsfirstMatches(object):
                             team_key_names = red_teams + blue_teams,
                             alliances_json = simplejson.dumps(alliances)
                         )
-                    
+                        
                         matches.append(match)
+                        
                     except Exception, detail:
                         logging.error('Match Parse Failed: ' + str(detail))
             

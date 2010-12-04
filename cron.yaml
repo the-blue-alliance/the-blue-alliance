@@ -1,7 +1,7 @@
 cron:
-- description: FIRST match results detail scraping
-  url: /tasks/usfirst_matches_get_enqueue?year=2010
-  schedule: every 5 minutes
+#- description: FIRST match results detail scraping
+#  url: /tasks/usfirst_matches_get_enqueue?year=2010
+#  schedule: every 5 minutes
 
 - description: FIRST event detail scraping
   url: /tasks/usfirst_event_get_enqueue
