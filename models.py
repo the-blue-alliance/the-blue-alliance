@@ -1,3 +1,5 @@
+import logging
+
 from google.appengine.ext import db
 
 from django.utils import simplejson
@@ -168,6 +170,29 @@ class TBAVideo(db.Model):
     
     match = db.ReferenceProperty(Match, required=True)
     filetypes = db.StringListProperty() # ["mp4", "flv", "wmv"] etc
+    
+    TBA_NET_VID_PATTERN = "http://www.thebluealliance.net/tbatv/vids/%s/%s.%s"
+    
+    THUMBNAIL_FILETYPES = ["jpg", "jpeg"]
+    STREAMABLE_FILETYPES = ["mp4", "flv"]
+    DOWNLOADABLE_FILETYPES = ["mp4", "mov", "avi", "wmv"]
+    
+    def getThumbnailPath(self):
+        logging.info("thumbnail: " + self.getBestPathOf(self.THUMBNAIL_FILETYPES))
+        return self.getBestPathOf(self.THUMBNAIL_FILETYPES)
+
+    def getStreamablePath(self):
+        return self.getBestPathOf(self.STREAMABLE_FILETYPES)
+    
+    def getDownloadablePath(self):
+        return self.getBestPathOf(self.DOWNLOADABLE_FILETYPES)
+
+    def getBestPathOf(self, consider_filetypes):
+        for filetype in consider_filetypes:
+            if filetype in self.filetypes:
+                return self.TBA_NET_VID_PATTERN % (self.match.event.key().name()[2:], self.match.key().name()[4:], filetype)
+        return None
+
 
 class YoutubeVideo(db.Model):
     """

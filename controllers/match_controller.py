@@ -33,6 +33,12 @@ class MatchDetail(webapp.RequestHandler):
             return None
         
         match.unpack_json()
+        
+        template_values = {
+            "match": match,
+            "tbavideo": match.tbavideo_set[0],
+        }
+        
         path = os.path.join(os.path.dirname(__file__), '../templates/matches/details.html')
-        self.response.out.write(template.render(path, { 'match' : match }))
+        self.response.out.write(template.render(path, template_values))
         
