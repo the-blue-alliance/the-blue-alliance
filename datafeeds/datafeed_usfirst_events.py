@@ -17,14 +17,14 @@ class DatafeedUsfirstEvents(object):
     """
     
     # The types of events listed in the event list:
-    REGIONAL_EVENT_TYPES = ["Regional", "MI FRC State Championship"]
+    REGIONAL_EVENT_TYPES = ["Regional", "MI FRC State Championship", "MI District"]
     
     # The URL for the event list:
-    REGIONAL_EVENTS_URL = "https://my.usfirst.org/myarea/index.lasso?event_type=FRC&season_FRC=2010"
+    REGIONAL_EVENTS_URL = "https://my.usfirst.org/myarea/index.lasso?event_type=FRC&season_FRC=%s"
     # The URL pattern for specific event pages, based on their USFIRST event id.
     EVENT_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=event_details&eid=%s&-session=myarea:%s"
     # A URL that gives us session keyed URLs.
-    SESSION_KEY_GENERATING_URL = "https://my.usfirst.org/myarea/index.lasso?page=searchresults&programs=FRC&reports=teams&omit_searchform=1&season_FRC=2010"
+    SESSION_KEY_GENERATING_URL = "https://my.usfirst.org/myarea/index.lasso?page=searchresults&programs=FRC&reports=teams&omit_searchform=1&season_FRC=2011"
     
     def getSessionKey(self):
         """
@@ -45,15 +45,15 @@ class DatafeedUsfirstEvents(object):
         else:
             logging.error('Unable to retreive url: ' + self.SESSION_KEY_GENERATING_URL)
     
-    def getEventList(self):
+    def getEventList(self, year):
         """
         Return a list of Event objects from the FIRST event listing page.
         """
-        result = urlfetch.fetch(self.REGIONAL_EVENTS_URL)
+        result = urlfetch.fetch(self.REGIONAL_EVENTS_URL % year)
         if result.status_code == 200:
             return self.parseEventList(result.content)
         else:
-            logging.error('Unable to retreive url: ' + self.REGIONAL_EVENTS_URL)
+            logging.error('Unable to retreive url: ' + (self.REGIONAL_EVENTS_URL % year))
     
     def getEvent(self, eid):
         """
@@ -140,7 +140,7 @@ class DatafeedUsfirstEvents(object):
                     event_dict["website"] = unicode(tds[1].a['href'])
                 if field == "Match Results":
                     #http://www2.usfirst.org/2010comp/Events/SDC/matchresults.html
-                    m = re.match(r"http://www2\.usfirst\.org/2010comp/Events/([a-zA-Z0-9]*)/matchresults\.html", tds[1].a["href"])
+                    m = re.match(r"http://www2\.usfirst\.org/%scomp/Events/([a-zA-Z0-9]*)/matchresults\.html" % event_dict["year"], tds[1].a["href"])
                     event_dict["event_short"] = m.group(1).lower()
         
         event = Event(

@@ -72,9 +72,9 @@ class UsfirstEventsInstantiate(webapp.RequestHandler):
         df = DatafeedUsfirstEvents()
         
         # These are dicts with a first_eid
-        events = df.getEventList()
+        events = df.getEventList(2011)
         
-        #TODO: This is only doing Regional events, not Michigan or Nats -gregmarra 4 Sep 2010
+        #TODO: This is only doing Regional events, not Nats -gregmarra 4 Dec 2010
         
         for event in events:
             logging.info("Event with eid: " + str(event.get("first_eid", 0)))
