@@ -45,8 +45,6 @@ class DatafeedTbaVideos(object):
             match_dict.setdefault(match.key().name()[4:], match)
         
         for a in soup.findAll("a", href=True):
-            logging.info(a)
-            
             parts = a["href"].split(".")
             if len(parts) == 2:
                 (key, filetype) = parts
@@ -67,7 +65,6 @@ class DatafeedTbaVideos(object):
                 match = match_dict[match_key],
                 filetypes = match_filetypes[match_key],
             )
-            logging.info(match_key)
             tbavideos.append(tbavideo)            
         
         return tbavideos

@@ -45,3 +45,10 @@ indexes:
   - name: event
   - name: set_number
   - name: match_number
+
+- kind: Match
+  properties:
+  - name: event
+  - name: team_key_names
+  - name: set_number
+  - name: match_number
