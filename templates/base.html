@@ -11,30 +11,20 @@
 </head>
 <body>
     <div id="header">
-        <div id="headerContent">
-            <div id="headerTitle">
-                <a href="/"><img src="/images/header_logo.png" height="24" width="180" alt="The Blue Alliance" /></a>
-            </div>
-            <div id="headerRight">
-                <div id="headerSearch">
-                    <form>
-                        <span class="textInput">
-                            <input id="search_query" name="search_query" />
-                            <button id="search_submit" name="search_submit" type="submit" />
-                        </span>
-                    </form>
-                </div>
-                <ul id="headerNav">
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/teams/">Teams</a></li>
-                    <li><a href="/events/">Events</a></li>
-                    <li>
-                        {% if user %}
-                            {{user.email}} | <a href="/admin/logout">log out</a>
-                        {% else %}
-                            <a href="/admin/login">log in</a>
-                        {% endif %}
-                    </li>
+        <div id="headerSpacer">
+            <div id="headerContent">
+                <div id="headerRight">
+                    <div id="headerTitle">
+                        <a href="/"><img src="/images/header_logo.png" height="48" width="320" alt="The Blue Alliance" /></a>
+                    </div>
+                    <div id="headerSearch">
+                        <form>
+                            <span class="textInput">
+                                <input id="search_query" name="search_query" />
+                                <button id="search_submit" name="search_submit" type="submit" />
+                            </span>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -42,7 +32,6 @@
     <div id="main">
         <div id="leftCol">
             {% block leftCol %}
-            <img src="http://www2.huronvalley.k12.mi.us/schools/mhs/activity/hot_team/index1_files/IMG_3246%20%28800x600%29.jpg" width="200" height="160" class="profileImg" />
             <ul class="leftNav">
                 <li class="event"><a href="/events/">Events</a></li>
                 <li class="robot"><a href="/teams/">Teams</a></li>
@@ -59,42 +48,37 @@
         <div id="content">
             {% block content %}
             <div id="contentTop">
-                <h1>Bobcat Robotics <span class="annotation">team 177</span></h1>
-                <h2><a href="http://bobcatrobotics.org">bobcatrobotics.org</a></h2>
+                <h1>The Blue Alliance <span class="annotation">Google AppEngine</span></h1>
+                <h2><a href="http://thebluealliance.com">thebluealliance.com</a></h2>
             </div>
             <div id="contentRight">
                 <div class="contentBlock">
                     <div class="contentBlockTopper">
-                        <span>Related Events</span>
+                        <h2>Relevant Links</h2>
                     </div>
-                    <p>There are all kinds of related events!</p>
+                    <p><a href="/debug/">Debug</a></p>
+                    <p><a href="/admin/">Admin</a></p>
                 </div>
             </div>
             <div id="contentCenter">
                 <div class="contentBlock">
                     <div class="contentBlockTopper">
-                        <span>Information</span>
+                        <h2>Information</h2>
                     </div>
                     <table class="infoTable">
                         <tr>
                             <th>Location</th>
-                            <td>South Windsor, CT</th>
+                            <td>Github</th>
                         </tr>
                         <tr>
                             <th>Website</th>
-                            <td><a href="http://bobcatrobotics.org">bobcatrobotics.org</a></td>
+                            <td><a href="http://tbatv-dev.appspot.com">tbatv-dev.appspot.com</a></td>
                         </tr>
                         <tr>
                             <th>Rookie Year</th>
-                            <td>1995</td>
+                            <td>2010</td>
                         </tr>
                     </table>
-                </div>
-                <div class="contentBlock">
-                    <div class="contentBlockTopper">
-                        <span>Events</span>
-                    </div>
-                    <p>Matches Go Here</p>
                 </div>
             </div>
             {% endblock %}
