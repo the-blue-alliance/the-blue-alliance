@@ -23,6 +23,8 @@ class DatafeedUsfirstEvents(object):
     REGIONAL_EVENTS_URL = "https://my.usfirst.org/myarea/index.lasso?event_type=FRC&season_FRC=%s"
     # The URL pattern for specific event pages, based on their USFIRST event id.
     EVENT_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=event_details&eid=%s&-session=myarea:%s"
+    # The URL pattern for team registration information, based on USFIRST event id.
+    EVENT_REGISTRATION_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=event_teamlist&results_size=250&eid=%s&-session=myarea:%s"
     # A URL that gives us session keyed URLs.
     SESSION_KEY_GENERATING_URL = "https://my.usfirst.org/myarea/index.lasso?page=searchresults&programs=FRC&reports=teams&omit_searchform=1&season_FRC=2011"
     
@@ -67,6 +69,19 @@ class DatafeedUsfirstEvents(object):
             event.first_eid = eid
             event.official = True
             return event
+        else:
+            logging.error('Unable to retreive url: ' + url)
+    
+    def getEventRegistration(self, eid):
+        """
+        Returns a list of team_numbers attending a particular Event
+        """
+        session_key = self.getSessionKey()
+        url = self.EVENT_REGISTRATION_URL_PATTERN % (eid, session_key)
+        result = urlfetch.fetch(url)
+        if result.status_code == 200:
+            teams = self.parseEventRegistration(result.content)
+            return teams
         else:
             logging.error('Unable to retreive url: ' + url)
     
@@ -178,3 +193,25 @@ class DatafeedUsfirstEvents(object):
         stop_date = datetime(stop_year, stop_month, stop_day)
         
         return (start_date, stop_date)
+    
+    def parseEventRegistration(self, html):
+        """
+        Find what Teams are attending an Event, and return their team_numbers.
+        """
+        # This code is based on TeamTpidHelper, and show probably be refactored.
+        # -gregmarra 5 Dec 2010
+        
+        teamRe = re.compile(r'tpid=[A-Za-z0-9=&;\-:]*?">\d+')
+        teamNumberRe = re.compile(r'\d+$')
+        tpidRe = re.compile(r'\d+')
+        
+        logging.info(html)
+        
+        teams = list()        
+        for teamResult in teamRe.findall(html):
+          team = dict()
+          team["number"] = teamNumberRe.findall(teamResult)[0]
+          team["tpid"] = tpidRe.findall(teamResult)[0]
+          teams.append(team)
+        
+        return teams

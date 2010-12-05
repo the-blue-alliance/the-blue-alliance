@@ -18,6 +18,7 @@ from helpers.team_helper import TeamTpidHelper, TeamUpdater
 from helpers.tbavideo_helper import TBAVideoUpdater
 
 from models import Event
+from models import EventTeam
 from models import Team
 from models import Match
 
@@ -105,16 +106,37 @@ class UsfirstEventGetEnqueue(webapp.RequestHandler):
 class UsfirstEventGet(webapp.RequestHandler):
     """
     Handles reading a USFIRST event page and creating or updating the model as needed.
+    Includes registered Teams.
     """
     def get(self, first_eid):
         df = DatafeedUsfirstEvents()
         
         event = df.getEvent(first_eid)
-        
         event = EventUpdater.createOrUpdate(event)
+        
+        teams = df.getEventRegistration(first_eid)
+        eventteams_count = 0
+        for team_dict in teams:
+            # This could be refactored to do a lot fewer DB requests by batching the Team and EventTeam gets.
+            # -gregmarra 5 Dec 2010
+            team = Team.get_by_key_name("frc" + str(team_dict["number"]))
+            if team is None:
+                team = Team(
+                    team_number = int(team_dict["number"]),
+                    first_tpid = int(team_dict["tpid"]),
+                    key_name = "frc" + str(team_dict["number"])
+                )
+                team.put()
+            
+            et = EventTeam.get_or_insert(
+                key_name = event.key().name() + "_" + team.key().name(),
+                event = event,
+                team = team)
+            eventteams_count = eventteams_count + 1
         
         template_values = {
             'event': event,
+            'eventteams_count': eventteams_count,
         }
         
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_get.html')
