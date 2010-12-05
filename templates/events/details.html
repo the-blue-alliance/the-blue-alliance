@@ -2,69 +2,104 @@
 
 {% block title %}{{event.year}} {{event.name}} - The Blue Alliance{% endblock %}
 
+{% block leftCol %}
+    <img src="http://firsthandtechnology.org.uk/blogs/fllteam/WindowsLiveWriter/TSMRoboteam2K7PowerPuzzleWorldFestivalAt_A81D/Opening%20Ceremony%20Georgia%20Dome_2.jpg" width="200" height="160" class="profileImg" />
+    <ul class="leftNav">
+        <li class="info"><a href="#info">Information</a></li>
+        <li class="robot"><a href="#teams">Teams</a></li>
+        <li class="match"><a href="#matches">Matches</a></li>
+    </ul>
+    <div class="divider"></div>
+{% endblock %}
+
 {% block content %}
 
-<h1>Details for {{event.year}} {{ event.name }}</h1>
+<div id="contentTop">
+    <h1>{{ event.name }} <span class="annotation">{{ event.year }}</span></h1>
+    <p>{{ event.start_date|date:"M d" }} - {{ event.location }}</a></p>
+</div>
+<div id="contentRight">
+    <div class="contentBlock">
+        <div class="contentBlockTopper">
+            <h2>Related Events</h2>
+        </div>
+        <p>There are all kinds of related events!</p>
+    </div>
+</div>
 
-<table>
-    <tr>
-        <td>Dates</td>
-        <td>{{ event.start_date|date:"M d, Y" }} to {{ event.end_date|date:"M d, Y" }}</td>
-    </tr>
-    <tr>
-        <td>Event Location</td>
-        <td><a href="http://maps.google.com/maps?q={{ event.location }}">{{ event.location }}</a></td>
-    </tr>
-    <tr>
-        <td>Teams Attending</td>
-        <td>{{ event.teams.count }}</td>
-    </tr>
-</table>
+<div id="contentCenter">
+    <div class="contentBlock">
+        <div class="contentBlockTopper">
+            <h2 id="info">Information</h2>
+        </div>
+        <table class="infoTable">
+            <tr>
+                <th>Dates</th>
+                <td>{{ event.start_date|date:"M d, Y" }} to {{ event.end_date|date:"M d, Y" }}</th>
+            </tr>
+            <tr>
+                <th>Location</th>
+                <td><a href="http://maps.google.com/maps?q={{ event.location }}">{{ event.location }}</a></td>
+            </tr>
+            <tr>
+                <th>Website</th>
+                <td>{{ event.website }}</td>
+            </tr>
+            <tr>
+                <th>Teams Attending</th>
+                <td>{{ event.teams.count }}</td>
+            </tr>
+        </table>
+    </div>
+    <div class="contentBlock">
+        <div class="contentBlockTopper">
+            <h2 id="matches">Matches</h2>
+        </div>
+        <table class="matchTable">
+            <tr class="key">
+                <th>Match Number</th>
+                <th colspan="3">Red Alliance</th>
+                <th colspan="3">Blue Alliance</th>
+                <th colspan="2">Scores</th>
+            </tr>
 
-<h2>Match Listing</h2>
+            {% if matches.qm %}
+                <tr class="key"><th colspan="9">Qualifications</th></tr>
+                {% for match in matches.qm %}
+                    {% include "../matches/partials/match_row.html" %}
+                {% endfor %}
+            {% endif %}
 
-<!-- if out 0 sets -gregmarra 17 oct 2010-->
-<table>
-    <tr>
-        <th>Match Number</th>
-        <th colspan="3">Red Alliance</th>
-        <th colspan="3">Blue Alliance</th>
-        <th colspan="2">Scores</th>
-    </tr>
-    {% if matches.qm %}
-        <tr><th colspan="9">Qualifications</th></tr>
-        {% for match in matches.qm %}
-            {% include "../matches/partials/match_row.html" %}
-        {% endfor %}
-    {% endif %}
-    
-    {% if matches.ef %}
-        <tr><th colspan="9">Eighth Finals</th></tr>
-        {% for match in matches.ef %}
-            {% include "../matches/partials/match_row.html" %}
-        {% endfor %}
-    {% endif %}
-    
-    {% if matches.qf %}
-        <tr><th colspan="9">Quarterfinals</th></tr>
-        {% for match in matches.qf %}
-            {% include "../matches/partials/match_row.html" %}
-        {% endfor %}
-    {% endif %}
-    
-    {% if matches.sf %}
-        <tr><th colspan="9">Semifinals</th></tr>
-        {% for match in matches.sf %}
-            {% include "../matches/partials/match_row.html" %}
-        {% endfor %}
-    {% endif %}
-    
-    {% if matches.f %}
-        <tr><th colspan="9">Finals</th></tr>
-        {% for match in matches.f %}
-            {% include "../matches/partials/match_row.html" %}
-        {% endfor %}
-    {% endif %}
-</table>
+            {% if matches.ef %}
+                <tr class="key"><th colspan="9">Eighth Finals</th></tr>
+                {% for match in matches.ef %}
+                    {% include "../matches/partials/match_row.html" %}
+                {% endfor %}
+            {% endif %}
+
+            {% if matches.qf %}
+                <tr class="key"><th colspan="9">Quarterfinals</th></tr>
+                {% for match in matches.qf %}
+                    {% include "../matches/partials/match_row.html" %}
+                {% endfor %}
+            {% endif %}
+
+            {% if matches.sf %}
+                <tr class="key"><th colspan="9">Semifinals</th></tr>
+                {% for match in matches.sf %}
+                    {% include "../matches/partials/match_row.html" %}
+                {% endfor %}
+            {% endif %}
+
+            {% if matches.f %}
+                <tr class="key"><th colspan="9">Finals</th></tr>
+                {% for match in matches.f %}
+                    {% include "../matches/partials/match_row.html" %}
+                {% endfor %}
+            {% endif %}
+        </table>
+    </div>
+</div>
+
 {% endblock %}
 

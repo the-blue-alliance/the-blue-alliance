@@ -172,11 +172,12 @@ strong {
 .leftNav li.event {
     background-image: url("/images/icons/event.png");
 }
-
 .leftNav li.robot {
     background-image: url("/images/icons/robot.png");
 }
-
+.leftNav li.match {
+    background-image: url("/images/icons/match.png");
+}
 .leftNav li.info {
     background-image: url("/images/icons/info.png");
 }
@@ -255,7 +256,7 @@ strong {
 .contentBlock h3 {
     font-size: 1.5em;
     font-weight: bold;
-    margin: .5em 8px;
+    margin: .5em 8px .25em 8px;
 }
 
 table.infoTable {
@@ -274,8 +275,8 @@ table.infoTable th {
 table.matchTable {
     border-bottom: 1px solid #cccccc;
     padding: 3px 0;
-    ;
     margin-left: 8px;
+    margin-top: 1em;
     width: 492px;
 }
 

@@ -5,8 +5,8 @@
 {% block leftCol %}
     <img src="http://www2.huronvalley.k12.mi.us/schools/mhs/activity/hot_team/index1_files/IMG_3246%20%28800x600%29.jpg" width="200" height="160" class="profileImg" />
     <ul class="leftNav">
-        <li class="info"><a href="/team/177#info">Information</a></li>
-        <li class="event"><a href="/team/177#events">Events</a></li>
+        <li class="info"><a href="#info">Information</a></li>
+        <li class="event"><a href="#events">Events</a></li>
     </ul>
     <div class="divider"></div>
 {% endblock %}
@@ -28,7 +28,7 @@
 <div id="contentCenter">
     <div class="contentBlock">
         <div class="contentBlockTopper">
-            <h2>Information</h2>
+            <h2 id="info">Information</h2>
         </div>
         <table class="infoTable">
             <tr>
@@ -51,7 +51,7 @@
     </div>
     <div class="contentBlock">
         <div class="contentBlockTopper">
-            <h2>Events</h2>
+            <h2 id="events">Events</h2>
             <p><a href="/"><strong>2010</strong></a> - <a href="/">2009</a> - <a href="/">all years &#x25BE;</a></p>
         </div>
         {% for comp in participation %}
