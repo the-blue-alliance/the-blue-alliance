@@ -25,13 +25,34 @@
 </table>
 
 <h2>Match Participation</h2>
-{% for event in participation %}
-    
-    <h3>{{ event.name }}</h3>
-    <ul>
-    {% for match in event.matches %}
-        <li>{{ match.comp_level }} {{ match.match_number }}</li>
-    {% endfor %}
-    </ul>
-
+{% for comp in participation %}
+    <!-- if out 0 sets -gregmarra 17 oct 2010-->
+    <table>
+        <tr>
+            <th>Match Number</th>
+            <th colspan="3">Red Alliance</th>
+            <th colspan="3">Blue Alliance</th>
+            <th colspan="2">Scores</th>
+        </tr>
+        <tr><th colspan="9">Qualifications</th></tr>
+        {% for match in comp.matches.qm %}
+            {% include "../matches/partials/match_row.html" %}
+        {% endfor %}
+        <tr><th colspan="9">Eighth Finals</th></tr>
+        {% for match in comp.matches.ef %}
+            {% include "../matches/partials/match_row.html" %}
+        {% endfor %}
+        <tr><th colspan="9">Quarterfinals</th></tr>
+        {% for match in comp.matches.qf %}
+            {% include "../matches/partials/match_row.html" %}
+        {% endfor %}
+        <tr><th colspan="9">Semifinals</th></tr>
+        {% for match in comp.matches.sf %}
+            {% include "../matches/partials/match_row.html" %}
+        {% endfor %}
+        <tr><th colspan="9">Finals</th></tr>
+        {% for match in comp.matches.f %}
+            {% include "../matches/partials/match_row.html" %}
+        {% endfor %}
+    </table>
 {% endfor %}

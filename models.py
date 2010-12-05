@@ -47,6 +47,7 @@ class EventTeam(db.Model):
     """
     EventTeam serves as a join model between Events and Teams, indicating that
     a team will or has competed in an Event.
+    key_name is like 2010cmp_frc177 or 2007ct_frc195
     """
     event = db.ReferenceProperty(Event,
                                  collection_name='teams')
@@ -153,6 +154,7 @@ class Match(db.Model):
         self.alliances = simplejson.loads(self.alliances_json)
         # TODO: there's a way to do this lazily as soon as we try to access 
         # something under .alliances., right? -gregmarra 17 Oct 2010
+        return ""
     
     def verbose_name(self):
         if self.comp_level == "qm" or self.comp_level == "f":

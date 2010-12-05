@@ -1,3 +1,4 @@
+{{ match.unpack_json }}
 <tr>
     <td><a href="/match/{{match.key.name}}">{{match.verbose_name}}</td>
     <td><a href="/team/{{ match.alliances.red.teams.0|slice:"3:" }}">{{ match.alliances.red.teams.0|slice:"3:" }}</a></td>

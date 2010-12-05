@@ -4,6 +4,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
 
 from models import Event, Match
+from helpers.match_helper import MatchHelper
 
 class EventList(webapp.RequestHandler):
     """
@@ -32,16 +33,7 @@ class EventDetail(webapp.RequestHandler):
         event_short = event_code[4:]
         
         event = Event.get_by_key_name(year + event_short)
-        match_list = event.match_set.order("set_number").order("match_number").fetch(500)
-        
-        # Eh, this could be better. -gregmarra 17 oct 2010
-        # todo: abstract this so we can use it in the team view.
-        # todo: figure out how slow this is
-        [match.unpack_json() for match in match_list]
-        matches = dict([(comp_level, list()) for comp_level in Match.COMP_LEVELS])
-        while len(match_list) > 0:
-            match = match_list.pop(0)
-            matches[match.comp_level].append(match)
+        matches = MatchHelper.organizeMatches(event.match_set)
         
         template_values = {
             "event": event,

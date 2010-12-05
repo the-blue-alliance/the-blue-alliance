@@ -1,8 +1,10 @@
 import os
+import logging
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
 
+from helpers.match_helper import MatchHelper
 from models import Team
 
 # The view of a list of teams.
@@ -27,20 +29,19 @@ class TeamDetail(webapp.RequestHandler):
         #todo 404 handling
                 
         # First, get a list of events attended by this team in the given year.
-        events = team.events.filter('year=', int(year))
+        # We don't build this index properly yet! -gregmarra 4 Dec 2010
+        events = [a.event for a in team.events]
         
         participation = list()
-        matches = list()
         
         # Return an array of event names and a list of matches from that event that the
         # team was a participant in.
         for e in events:
-            for m in e.matches:
-                if team in m.teams:
-                    matches.append(m)
-            participation.append({ 'name' : e.name,
+            match_list = e.match_set.filter("team_key_names =", team.key().name())
+            matches = MatchHelper.organizeMatches(match_list)
+            participation.append({ 'event' : e,
                                    'matches' : matches })
-                                   
+        
         template_values = { 'team' : team,
                             'participation' : participation }
         

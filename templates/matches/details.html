@@ -12,7 +12,7 @@
     <tr>
         <td>{{ items.0 }}</td>
         {% for team in items.1.teams %}
-            <td>{{ team|slice:"3:" }}</td>
+            <td><a href="/team/{{ team|slice:"3:" }}">{{ team|slice:"3:" }}</a></td>
         {% endfor %}
         <td>{{ items.1.score}}</td>
     </tr>

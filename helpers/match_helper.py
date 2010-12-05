@@ -4,6 +4,25 @@ from google.appengine.ext import db
 
 from models import Match, Team
 
+class MatchHelper(object):
+    """
+    Helper to put matches into sub-dictionaries for the way we render match tables
+    """
+    @classmethod
+    def organizeMatches(self, match_list):
+        match_list = match_list.order("set_number").order("match_number").fetch(500)
+        
+        # Eh, this could be better. -gregmarra 17 oct 2010
+        # todo: abstract this so we can use it in the team view.
+        # todo: figure out how slow this is
+        [match.unpack_json() for match in match_list]
+        matches = dict([(comp_level, list()) for comp_level in Match.COMP_LEVELS])
+        while len(match_list) > 0:
+            match = match_list.pop(0)
+            matches[match.comp_level].append(match)
+        
+        return matches
+
 class MatchUpdater(object):
     """
     Helper class to handle Match objects when we are not sure whether they

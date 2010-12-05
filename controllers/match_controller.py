@@ -34,9 +34,13 @@ class MatchDetail(webapp.RequestHandler):
         
         match.unpack_json()
         
+        tbavideo = None
+        if match.tbavideo_set.count() > 0:
+            tbavideo = match.tbavideo_set[0]
+        
         template_values = {
             "match": match,
-            "tbavideo": match.tbavideo_set[0],
+            "tbavideo": tbavideo,
         }
         
         path = os.path.join(os.path.dirname(__file__), '../templates/matches/details.html')
