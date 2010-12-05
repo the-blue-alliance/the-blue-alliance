@@ -11,10 +11,11 @@ from controllers.datafeed_controller import UsfirstMatchesGetEnqueue, UsfirstMat
 from controllers.datafeed_controller import UsfirstTeamGetEnqueue, UsfirstTeamGet, UsfirstTeamsInstantiate
 from controllers.datafeed_controller import FlushTeams, FlushMatches, FlushEvents
 
-from controllers.cron_controller import EventTeamUpdater
+from controllers.cron_controller import EventTeamUpdate, EventTeamUpdateEnqueue
 
 def main():
-    application = webapp.WSGIApplication([('/tasks/eventteam_update/(.*)', EventTeamUpdater),
+    application = webapp.WSGIApplication([('/tasks/eventteam_update_enqueue', EventTeamUpdateEnqueue),
+                                          ('/tasks/eventteam_update/(.*)', EventTeamUpdate),
                                           ('/tasks/tba_videos_get/(.*)', TbaVideosGet),
                                           ('/tasks/usfirst_event_get_enqueue', UsfirstEventGetEnqueue),
                                           ('/tasks/usfirst_event_get/(.*)', UsfirstEventGet),

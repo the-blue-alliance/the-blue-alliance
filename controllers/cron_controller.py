@@ -11,7 +11,7 @@ from models import Event
 from models import Team
 from models import EventTeam
 
-class EventTeamUpdater(webapp.RequestHandler):
+class EventTeamUpdate(webapp.RequestHandler):
     """
     Task that updates the EventTeam index for an Event.
     """
@@ -34,3 +34,14 @@ class EventTeamUpdater(webapp.RequestHandler):
         
         path = os.path.join(os.path.dirname(__file__), '../templates/cron/eventteam_update.html')
         self.response.out.write(template.render(path, template_values))
+        
+class EventTeamUpdateEnqueue(webapp.RequestHandler):
+    """
+    Handles enqueing building attendance for Events.
+    """
+    def get(self):
+        for event in Event.all().fetch(1000):
+            logging.info(event.name)
+            taskqueue.add(
+                url='/tasks/eventteam_update/' + event.key().name(),
+                method='GET')
