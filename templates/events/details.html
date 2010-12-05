@@ -99,6 +99,16 @@
             {% endif %}
         </table>
     </div>
+    <div class="contentBlock">
+        <div class="contentBlockTopper">
+            <h2 id="teams">Teams</h2>
+        </div>
+        <ul>
+        {% for team in teams %}
+            <li>{{ team.team_number }} - {{ team.nickname }}</li>
+        {% endfor %}
+        </ul>
+    </div>
 </div>
 
 {% endblock %}

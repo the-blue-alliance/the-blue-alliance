@@ -5,6 +5,7 @@ from google.appengine.ext.webapp import template, util
 
 from models import Event, Match
 from helpers.match_helper import MatchHelper
+from helpers.team_helper import TeamHelper
 
 class EventList(webapp.RequestHandler):
     """
@@ -34,10 +35,12 @@ class EventDetail(webapp.RequestHandler):
         
         event = Event.get_by_key_name(year + event_short)
         matches = MatchHelper.organizeMatches(event.match_set)
+        teams = TeamHelper.sortTeams([a.team for a in event.teams])
         
         template_values = {
             "event": event,
             "matches": matches,
+            "teams": teams,
         }
                 
         path = os.path.join(os.path.dirname(__file__), '../templates/events/details.html')

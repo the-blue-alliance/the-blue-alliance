@@ -6,6 +6,19 @@ from google.appengine.ext import db
 
 from models import Team
 
+class TeamHelper(object):
+    """
+    Helper to sort teams and stuff
+    """
+    @classmethod
+    def sortTeams(self, team_list):
+        """
+        Takes a list of Teams (not a Query object).
+        """
+        team_list = sorted(team_list, key=lambda team: team.team_number)
+        
+        return team_list
+
 class TeamTpidHelper(object):
     
     # Separates tpids on the FIRST list of all teams.
