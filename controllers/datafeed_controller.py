@@ -51,6 +51,18 @@ class TbaVideosGet(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/tba_videos_get.html')
         self.response.out.write(template.render(path, template_values))
 
+class TbaVideosGetEnqueue(webapp.RequestHandler):
+    """
+    Handles enqueing grabing TBAVideos for individual Events.
+    """
+    def get(self):
+        events = Event.all()
+
+        for event in events.fetch(500):
+            taskqueue.add(
+                url='/tasks/tba_videos_get/' + event.key().name(), 
+                method='GET')
+
 class UsfirstEventsInstantiate(webapp.RequestHandler):
     """
     Handles reading the USFIRST event list.

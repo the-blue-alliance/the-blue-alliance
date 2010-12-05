@@ -5,7 +5,7 @@ import os
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import util
 
-from controllers.datafeed_controller import TbaVideosGet
+from controllers.datafeed_controller import TbaVideosGet, TbaVideosGetEnqueue
 from controllers.datafeed_controller import UsfirstEventGetEnqueue, UsfirstEventGet, UsfirstEventsInstantiate
 from controllers.datafeed_controller import UsfirstMatchesGetEnqueue, UsfirstMatchesGet
 from controllers.datafeed_controller import UsfirstTeamGetEnqueue, UsfirstTeamGet, UsfirstTeamsInstantiate
@@ -17,6 +17,7 @@ def main():
     application = webapp.WSGIApplication([('/tasks/eventteam_update_enqueue', EventTeamUpdateEnqueue),
                                           ('/tasks/eventteam_update/(.*)', EventTeamUpdate),
                                           ('/tasks/tba_videos_get/(.*)', TbaVideosGet),
+                                          ('/tasks/tba_videos_get_enqueue', TbaVideosGetEnqueue),
                                           ('/tasks/usfirst_event_get_enqueue', UsfirstEventGetEnqueue),
                                           ('/tasks/usfirst_event_get/(.*)', UsfirstEventGet),
                                           ('/tasks/usfirst_events_instantiate', UsfirstEventsInstantiate),
