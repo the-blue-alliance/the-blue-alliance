@@ -26,9 +26,9 @@
     </div>
 </div>
 <div id="contentCenter">
-    <div class="contentBlock">
+    <div id="info" class="contentBlock">
         <div class="contentBlockTopper">
-            <h2 id="info">Information</h2>
+            <h2>Information</h2>
         </div>
         <table class="infoTable">
             <tr>
@@ -49,13 +49,18 @@
             </tr>
         </table>
     </div>
-    <div class="contentBlock">
+    <div id="events" class="contentBlock">
         <div class="contentBlockTopper">
-            <h2 id="events">Events</h2>
+            <h2>Events</h2>
             <p><a href="/"><strong>2010</strong></a> - <a href="/">2009</a> - <a href="/">all years &#x25BE;</a></p>
         </div>
         {% for comp in participation %}
-            <h3><a href="/event/{{comp.event.key.name}}">{{ comp.event.year }} {{ comp.event.name }}</a></h3>
+            <ul class="infoList">
+                <li>
+                    <h3><a href="/event/{{comp.event.key.name}}">{{ comp.event.name }} <span class="annotation">{{ comp.event.location }}</span></a></h3>
+                    <p>{{ event.start_date|date:"M d, Y" }}</p>
+                </li>
+            </ul>
             <!-- if out 0 sets -gregmarra 17 oct 2010-->
             <table class="matchTable">
                 <tr class="key">

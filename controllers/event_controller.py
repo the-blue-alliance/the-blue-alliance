@@ -17,6 +17,7 @@ class EventList(webapp.RequestHandler):
         events = Event.all().filter("year =", int(year)).order('start_date').fetch(1000)
         
         template_values = {
+            "year": year,
             "events": events,
         }
         

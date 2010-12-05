@@ -4,28 +4,34 @@
 
 {% block content %}
 
-<h1>All Events</h1>
-<p>{{ events|length }} total events</p>
-<table>
-    <tr>
-        <th>Name</th>
-        <th>Matches</th>
-        <th>Teams</th>
-        <th>Year</th>
-        <th>Event Short</th>
-        <th>EID</th>
-    </tr>
-    
-    {% for event in events %}
-    <tr>
-        <td><a href="/event/{{event.year}}{{event.event_short}}">{{ event.name }}</a></td>
-        <td>{{ event.match_set.count }}</td>
-        <td>{{ event.teams.count }}</td>
-        <td>{{ event.year }}</td>
-        <td>{{ event.event_short }}</td>
-        <td>{{ event.first_eid }}</td>
-    </tr>
-    {% endfor %}
-</table>
+<div id="contentTop">
+    <h1>{{year}} Events</h1>
+    <p>{{ events|length }} total events</p>
+</div>
+<div id="contentRight">
+    <div class="contentBlock">
+        <div class="contentBlockTopper">
+            <h2>Related Events</h2>
+        </div>
+        <p>There are all kinds of related events!</p>
+    </div>
+    {% include "../base_partials/right_col.html" %}
+</div>
+
+<div id="contentCenter">
+    <div id="events" class="contentBlock">
+        <div class="contentBlockTopper">
+            <h2>Events</h2>
+        </div>
+        <ul class="infoList">
+        {% for event in events %}
+            <li>
+                <h3><a href="/event/{{event.key.name}}">{{ event.name }} <span class="annotation">{{ event.location }}</span></a></h3>
+                <p>{{ event.start_date|date:"M d, Y" }} - {{ event.teams.count }} teams</p>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+</div>
 
 {% endblock %}

@@ -1,49 +1,84 @@
 {% extends "../base.html" %}
 
-{% block title %}{{match.key.name}} - {{match.event.year}} {{match.event.name}} - The Blue Alliance{% endblock %}
+{% block title %}{{match.verbose_name}} - {{match.event.year}} {{match.event.name}} - The Blue Alliance{% endblock %}
+
+{% block leftCol %}
+    <ul class="leftNav">
+        <li class="event"><a href="/event/{{match.event.key.name}}">{{ match.event.name }}</a></li>
+        <li class="info"><a href="#info">Information</a></li>
+        <li class="video"><a href="#video">Video</a></li>
+        <li class="photo"><a href="#photos">Photos</a></li>
+    </ul>
+    <div class="divider"></div>
+{% endblock %}
 
 {% block content %}
 
-<h1><a href="/event/{{match.event.key.name}}">{{match.event.year}} {{match.event.name}}</a></h1>
-<h2>{{match.key.name}}</h2>
+<div id="contentTop">
+    <h1>{{match.verbose_name}} <span class="annotation"><a href="/event/{{match.event.key.name}}">{{ match.event.year }} {{ match.event.name }}</span></a></h1>
+</div>
+<div id="contentRight">
+    <div class="contentBlock">
+        <div class="contentBlockTopper">
+            <h2>Related Events</h2>
+        </div>
+        <p>There are all kinds of related events!</p>
+    </div>
+    {% include "../base_partials/right_col.html" %}
+</div>
 
-<table>
-    {% for items in match.alliances.items %}
-    <tr>
-        <td>{{ items.0 }}</td>
-        {% for team in items.1.teams %}
-            <td><a href="/team/{{ team|slice:"3:" }}">{{ team|slice:"3:" }}</a></td>
-        {% endfor %}
-        <td>{{ items.1.score}}</td>
-    </tr>
-    {% endfor %}
-</table>
-
-<h3>Video</h3>
-{% if tbavideo %}
-    {% include "../videos/partials/tbavideo_player.html" %}
-{% else %}
-    <h4>No Video Available.</h4>
-{% endif %}
-
-<h3>Debug</h3>
-<table>
-    <tr>
-        <td>Team Key Names</td>
-        <td>{{ match.team_key_names }}</td>
-    </tr>
-    <tr>
-        <td>Alliances JSON</td>
-        <td>{{ match.alliances_json }}</td>
-    </tr>
-    <tr>
-        <td>TBAVideo filetypes</td>
-        <td>
-            {% for tbavideo in match.tbavideo_set  %}
-                {{ tbavideo.filetypes }}
+<div id="contentCenter">
+    <div id="info" class="contentBlock">
+        <div class="contentBlockTopper">
+            <h2>Information</h2>
+        </div>
+        <table class="matchTable">
+            <tr class="key">
+                <th colspan="{{match.alliances.items.0.1.teams|length}}">Teams</th>
+                <th>Score</th>
+            </tr>
+            {% for items in match.alliances.items %}
+            <tr>
+                {% for team in items.1.teams %}
+                    <td class="{{ items.0 }}"><a href="/team/{{ team|slice:"3:" }}">{{ team|slice:"3:" }}</a></td>
+                {% endfor %}
+                <td class="{{items.0}}Score">{{ items.1.score}}</td>
+            </tr>
             {% endfor %}
-        </td>
-    </tr>
-</table>
+        </table>
+    </div>
+    <div id="video" class="contentBlock">
+        <div class="contentBlockTopper">
+            <h2>Video</h2>
+        </div>
+        {% if tbavideo %}
+            {% include "../videos/partials/tbavideo_player.html" %}
+        {% else %}
+            <h4>No Video Available.</h4>
+        {% endif %}
+    </div>
+    <div id="debug" class="contentBlock">
+        <div class="contentBlockTopper">
+            <h2>Debug</h2>
+        </div>
+        <table>
+            <tr>
+                <td>Team Key Names</td>
+                <td>{{ match.team_key_names }}</td>
+            </tr>
+            <tr>
+                <td>Alliances JSON</td>
+                <td>{{ match.alliances_json }}</td>
+            </tr>
+            <tr>
+                <td>TBAVideo filetypes</td>
+                <td>
+                    {% for tbavideo in match.tbavideo_set  %}
+                        {{ tbavideo.filetypes }}
+                    {% endfor %}
+                </td>
+            </tr>
+        </table>
+    </div>
 
 {% endblock %}

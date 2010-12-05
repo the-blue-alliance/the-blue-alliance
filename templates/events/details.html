@@ -6,8 +6,8 @@
     <img src="http://firsthandtechnology.org.uk/blogs/fllteam/WindowsLiveWriter/TSMRoboteam2K7PowerPuzzleWorldFestivalAt_A81D/Opening%20Ceremony%20Georgia%20Dome_2.jpg" width="200" height="160" class="profileImg" />
     <ul class="leftNav">
         <li class="info"><a href="#info">Information</a></li>
-        <li class="robot"><a href="#teams">Teams</a></li>
         <li class="match"><a href="#matches">Matches</a></li>
+        <li class="robot"><a href="#teams">Teams</a></li>
     </ul>
     <div class="divider"></div>
 {% endblock %}
@@ -25,12 +25,13 @@
         </div>
         <p>There are all kinds of related events!</p>
     </div>
+    {% include "../base_partials/right_col.html" %}
 </div>
 
 <div id="contentCenter">
-    <div class="contentBlock">
+    <div id="info" class="contentBlock">
         <div class="contentBlockTopper">
-            <h2 id="info">Information</h2>
+            <h2>Information</h2>
         </div>
         <table class="infoTable">
             <tr>
@@ -51,9 +52,9 @@
             </tr>
         </table>
     </div>
-    <div class="contentBlock">
+    <div id="matches" class="contentBlock">
         <div class="contentBlockTopper">
-            <h2 id="matches">Matches</h2>
+            <h2>Matches</h2>
         </div>
         <table class="matchTable">
             <tr class="key">
@@ -99,13 +100,16 @@
             {% endif %}
         </table>
     </div>
-    <div class="contentBlock">
+    <div id="teams" class="contentBlock">
         <div class="contentBlockTopper">
-            <h2 id="teams">Teams</h2>
+            <h2>Teams</h2>
         </div>
-        <ul>
+        <ul class="infoList">
         {% for team in teams %}
-            <li>{{ team.team_number }} - {{ team.nickname }}</li>
+            <li>
+                <h3><a href="/team/{{team.team_number}}">{{ team.team_number }} <span class="annotation">{{ team.nickname }}</span></a></h3>
+                <p>{{ team.address }}</p>
+            </li>
         {% endfor %}
         </ul>
     </div>

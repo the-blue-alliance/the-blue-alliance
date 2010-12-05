@@ -16,8 +16,14 @@ strong {
     clear: both;
 }
 
-#wrapper {
-    
+span.annotation {
+    color: #999999;
+    font-size: .8em;
+    font-variant: small-caps;
+}
+
+
+#main {
 }
 
 #header {
@@ -46,7 +52,6 @@ strong {
     float: left;
     width: 200px;
 }
-
 #headerTitle img {
     height: 48px;
     margin: 0;
@@ -75,14 +80,12 @@ strong {
     padding: 1px 2px 1px 6px;
     width: 240px;
 }
-
 .textInput input {
     border: 0;
     font-size: 16px;
     font-weight: normal;
     width: 216px;
 }
-
 .textInput button {
     background-color: #ffffff;
     background-image: url("/images/icons/search.png");
@@ -110,7 +113,6 @@ strong {
     float: left;
     width:200px;
 }
-
 #leftCol img.profileImg {
     margin-bottom: .5em;
 }
@@ -120,37 +122,27 @@ strong {
     display: inline-block;
     line-height: 21px;
     padding-top: 1px;
-    padding-left: 23px;
+    padding-left: 25px;
     width: 168px;
 }
-
 .leftNav ul { 
     list-style-image: none;
     list-style-type: none;
 }
-
 .leftNav li {
     background-repeat: no-repeat;
     background-position: 3px 4px;
     margin-bottom: 1px;
 }
-
 .leftNav li:hover {
     background-color: #f0f0f0;
 }
-
-.leftNav li.event {
-    background-image: url("/images/icons/event.png");
-}
-.leftNav li.robot {
-    background-image: url("/images/icons/robot.png");
-}
-.leftNav li.match {
-    background-image: url("/images/icons/match.png");
-}
-.leftNav li.info {
-    background-image: url("/images/icons/info.png");
-}
+.leftNav li.event { background-image: url("/images/icons/event.png"); }
+.leftNav li.info { background-image: url("/images/icons/info.png"); }
+.leftNav li.match { background-image: url("/images/icons/match.png"); }
+.leftNav li.photo { background-image: url("/images/icons/photo.png"); }
+.leftNav li.robot { background-image: url("/images/icons/robot.png"); }
+.leftNav li.video { background-image: url("/images/icons/video.png"); }
 
 .divider {
     border-top: 1px solid #dddddd;
@@ -171,16 +163,9 @@ strong {
     margin: 0 0 8px 0;
     padding: 5px 0 0 15px;
 }
-
 #contentTop h1 {
     font-size: 1.75em;
     font-weight: bold;
-}
-
-#contentTop h1 span.annotation {
-    color: #999999;
-    font-size: .8em;
-    font-variant: small-caps;
 }
 
 #contentCenter {
@@ -198,28 +183,23 @@ strong {
     display: block;
     margin-bottom: 1.5em;
 }
-
 .contentBlock .contentBlockTopper {
     border-top: 2px solid #cccccc;
     border-bottom: 1px solid #cccccc;
     padding: 4px 0 3px 8px;
-    margin-bottom: 3px;
+    margin-bottom: .5em;
 }
-
 .contentBlock .contentBlockTopper h2 {
     font-weight: bold;
     display: inline-block;
 }
-
 .contentBlock .contentBlockTopper p {
     float: right;
     margin-right: 8px;
 }
-
 .contentBlock p {
     margin-left: 8px;
 }
-
 .contentBlock h3 {
     font-size: 1.5em;
     font-weight: bold;
@@ -229,11 +209,9 @@ strong {
 table.infoTable {
     margin-left: 8px;
 }
-
 table.infoTable tr {
     line-height: 1.75em;
 }
-
 table.infoTable th {
     font-weight: bold;
     padding-right: 1em;
@@ -245,30 +223,25 @@ table.matchTable {
     margin: 1em 0 1em 8px;
     width: 492px;
 }
-
 table.matchTable tr {
     border-top: 1px solid #cccccc;
     border-left: 1px solid #cccccc;
     padding: 3px 0;
 }
-
 table.matchTable tr.key {
     background-color: #f0f0f0;
 }
-
 table.matchTable th {
     border-right: 1px solid #cccccc;
     font-weight: bold;
     text-align: center;
     padding: 3px;
 }
-
 table.matchTable td {
     border-right: 1px solid #cccccc;
     text-align: center;
     padding: 3px;
 }
-
 table.matchTable td.red {
     background-color: #ffeeee;
 }
@@ -280,6 +253,10 @@ table.matchTable td.redScore {
 }
 table.matchTable td.blueScore {
     background-color: #ddddff;
+}
+
+ul.infoList {
+    
 }
 
 #footer {
