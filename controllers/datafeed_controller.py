@@ -82,7 +82,7 @@ class UsfirstEventGetEnqueue(webapp.RequestHandler):
     def get(self):
         events = Event.all()
         events.filter('first_eid != ', None) # Official events with EIDs
-        events.filter('year=', 2010) #Just this year #FIXME: Do this right
+        events.filter('year =', 2010) #Just this year #FIXME: Do this right
         
         for event in events.fetch(100):
             taskqueue.add(

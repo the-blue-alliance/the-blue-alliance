@@ -9,6 +9,8 @@
 <table>
     <tr>
         <th>Name</th>
+        <th>Matches</th>
+        <th>Teams</th>
         <th>Year</th>
         <th>Event Short</th>
         <th>EID</th>
@@ -17,6 +19,8 @@
     {% for event in events %}
     <tr>
         <td><a href="/event/{{event.year}}{{event.event_short}}">{{ event.name }}</a></td>
+        <td>{{ event.match_set.count }}</td>
+        <td>{{ event.teams.count }}</td>
         <td>{{ event.year }}</td>
         <td>{{ event.event_short }}</td>
         <td>{{ event.first_eid }}</td>

@@ -13,7 +13,7 @@ class EventList(webapp.RequestHandler):
     def get(self, year=None):
         if not year: year = 2010 #fixme -gregmarra 17 Oct 2010
         
-        events = Event.all().order('start_date').fetch(10000)
+        events = Event.all().filter("year =", int(year)).order('start_date').fetch(1000)
         
         template_values = {
             "events": events,
