@@ -1,38 +1,77 @@
 {% extends "../base.html" %}
 
-{% block title %}The Blue Alliance - Dev Help{% endblock %}
+{% block title %}The Blue Alliance - Debug Help{% endblock %}
+
+{% block leftCol %}
+    <img src="http://firsthandtechnology.org.uk/blogs/fllteam/WindowsLiveWriter/TSMRoboteam2K7PowerPuzzleWorldFestivalAt_A81D/Opening%20Ceremony%20Georgia%20Dome_2.jpg" width="200" height="160" class="profileImg" />
+    <ul class="leftNav">
+        <li class="info"><a href="#info">Information</a></li>
+        <li class="match"><a href="#matches">Matches</a></li>
+        <li class="robot"><a href="#teams">Teams</a></li>
+    </ul>
+    <div class="divider"></div>
+{% endblock %}
 
 {% block content %}
 
-<h1>TBATV GAE</h1>
-<p>Some things you may be interested in doing:</p>
-<p>To process TaskQueues offline use the following command: <strong>python2.5 run_tasks.py -p <em>port</em></strong></p>
-<h2>Fast Setup</h2>
-<ol>
-    <li>Instantiate Teams: <a href="/tasks/usfirst_teams_instantiate?skip=0">UsfirstTeamsInstantiate @ 0</a>, <a href="/tasks/usfirst_teams_instantiate?skip=1000">UsfirstTeamsInstantiate @ 1000</a>, <a href="/tasks/usfirst_teams_instantiate?skip=2000">UsfirstTeamsInstantiate @ 2000</a></li>
-    <li>Bulkload Events:<br />appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/events.csv --kind=Event --url=http://localhost:8085/_ah/remote_api --application=tbatv-dev</li>
-    <li>Bulkload 2010cmp Matches: <br />appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/matches_2010cmp.csv --kind=Match --url=http://localhost:8085/_ah/remote_api --application=tbatv-dev</li>
-    <li><a href="/tasks/tba_videos_get/2010cmp">Scrape 2010cmp TBAVideos</a></li>
-</ol>
-<h2>Realer Setup</h2>
-<ol>
-    <strong>You must do these things first</strong>.
-    <li><a href="/tasks/usfirst_teams_instantiate?skip=0">UsfirstTeamsInstantiate</a>, creates Team objects for all teams from USFIRST.  Uses code borrowed from Patrick Fairbank's FRCLinks.</li>
-    <li><a href="/tasks/usfirst_events_instantiate">UsfirstEventsInstantiate</a>, enqueues Tasks to create Event objects for regional events from USFIRST.</li>
-</ol>
-<h2>Updates</h2>
-<ul>
-    <li><a href="/tasks/usfirst_event_get_enqueue">UsfirstEventGetEnqueue</a>, which sets up the TaskQueue to update details for all official Event objects.</li>
-    <li><a href="/tasks/usfirst_matches_get_enqueue?year=2010">UsfirstMatchesGetEnqueue</a>, which sets up the TaskQueue to get match results for all known Event objects, which will create or update Match objects.</li>
-    <li><a href="/tasks/usfirst_team_get_enqueue?offset=0">UsfirstTeamGetEnqueue @ 0</a> and <a href="/tasks/usfirst_team_get_enqueue?offset=1000">UsfirstTeamGetEnqueue @ 1k</a>, which set up the TaskQueue to read the USFIRST team details, updating Team objects.</li>
-    <li><a href="/tasks/tba_videos_get/2010cmp">TBAVideosGet</a> with an Event key to scrape TBA.net for TBAVideos.</li>
-</ul>
-<h2>View</h2>
-<ul>
-    <li><a href="/team/list">Team List</a>, attempts to list all teams. Eventually a public facing page.</li>
-    <li><a href="/event/list">Event List</a>, attempts to list all events. Eventually a public facing page.</li>
-    <li><a href="/match/list">Match List</a>, attempts to list all matches. Eventually a public facing page?</li>
-</ul>
-<h2>Bulkloading</h2>
-<p>appcfg.py upload_data --config_file=bulkloader.yaml --filename=<em>something</em>.csv --kind=<em>Something</em> --url=http://<em>something</em>/_ah/remote_api --application=tbatv-dev</p>
+<div id="contentTop">
+    <h1>The Blue Alliance <span class="annotation">Debug and Setup</span></h1>
+</div>
+<div id="contentRight">
+    <div class="contentBlock">
+        <div class="contentBlockTopper">
+            <h2>Related Events</h2>
+        </div>
+        <p>There are all kinds of related events!</p>
+    </div>
+    {% include "../base_partials/right_col.html" %}
+</div>
+
+<div id="contentCenter">
+    <div id="fastSetup" class="contentBlock">
+        <div class="contentBlockTopper">
+            <h2>Fast Setup</h2>
+        </div>
+        <ol>
+            <li>Instantiate Teams: <a href="/tasks/usfirst_teams_instantiate?skip=0">UsfirstTeamsInstantiate @ 0</a></li>
+            <li>Bulkload Events:<br />appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/events.csv --kind=Event --url=http://localhost:8088/_ah/remote_api --application=tbatv-dev</li>
+            <li>Bulkload 2010cmp Matches: <br />appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/matches_2010cmp.csv --kind=Match --url=http://localhost:8088/_ah/remote_api --application=tbatv-dev</li>
+            <li><a href="/tasks/tba_videos_get/2010cmp">Scrape 2010cmp TBAVideos</a></li>
+        </ol>        
+    </div>
+    
+    <div id="moreSetup" class="contentBlock">
+        <div class="contentBlockTopper">
+            <h2>More Setup</h2>
+        </div>
+        <ol>
+            <strong>You must do these things first</strong>.
+            <li><a href="/tasks/usfirst_teams_instantiate?skip=0">UsfirstTeamsInstantiate</a>, creates Team objects for all teams from USFIRST.  Uses code borrowed from Patrick Fairbank's FRCLinks.</li>
+            <li><a href="/tasks/usfirst_events_instantiate">UsfirstEventsInstantiate</a>, enqueues Tasks to create Event objects for regional events from USFIRST.</li>
+        </ol>
+    </div>
+    
+    <div id="updates" class="contentBlock">
+        <div class="contentBlockTopper">
+            <h2>Updates</h2>
+        </div>
+        <ul>
+            <li><a href="/tasks/usfirst_event_get_enqueue">UsfirstEventGetEnqueue</a>, which sets up the TaskQueue to update details for all official Event objects.</li>
+            <li><a href="/tasks/usfirst_matches_get_enqueue?year=2010">UsfirstMatchesGetEnqueue</a>, which sets up the TaskQueue to get match results for all known Event objects, which will create or update Match objects.</li>
+            <li><a href="/tasks/usfirst_team_get_enqueue?offset=0">UsfirstTeamGetEnqueue @ 0</a> and <a href="/tasks/usfirst_team_get_enqueue?offset=1000">UsfirstTeamGetEnqueue @ 1k</a>, which set up the TaskQueue to read the USFIRST team details, updating Team objects.</li>
+            <li><a href="/tasks/tba_videos_get/2010cmp">TBAVideosGet</a> with an Event key to scrape TBA.net for TBAVideos.</li>
+        </ul>
+    </div>
+    
+    <div id="commands" class="contentBlock">
+        <div class="contentBlockTopper">
+            <h2>Useful Commands</h2>
+        </div>
+        <ul>
+            <li>appcfg.py upload_data --config_file=bulkloader.yaml --filename=<em>something</em>.csv --kind=<em>Something</em> --url=http://<em>something</em>/_ah/remote_api --application=tbatv-dev</li>
+            <li>To process TaskQueues offline use the following command: <strong>python2.5 run_tasks.py -p <em>port</em></strong></li>
+        </ul>
+    </div>
+</div>
+
 {% endblock %}
