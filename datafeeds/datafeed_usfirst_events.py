@@ -205,8 +205,6 @@ class DatafeedUsfirstEvents(object):
         teamNumberRe = re.compile(r'\d+$')
         tpidRe = re.compile(r'\d+')
         
-        logging.info(html)
-        
         teams = list()        
         for teamResult in teamRe.findall(html):
           team = dict()
