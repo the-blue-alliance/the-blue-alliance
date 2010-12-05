@@ -20,7 +20,11 @@
 </table>
 
 <h3>Video</h3>
-{% include "../videos/partials/tbavideo_player.html" %}
+{% if tbavideo %}
+    {% include "../videos/partials/tbavideo_player.html" %}
+{% else %}
+    <h4>No Video Available.</h4>
+{% endif %}
 
 <h3>Debug</h3>
 <table>

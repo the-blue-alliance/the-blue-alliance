@@ -13,8 +13,9 @@
             { type: "html5" },
             { type: "flash", src: "/jwplayer/player.swf" }
         ],
+        provider: "http",
         controlbar: "bottom",
     });
 </script>
 <p>TODO: Fix buffering issues where mp4's take too long to start playback.</p>
-<p>All file types: {{ tbavideo.filetypes }}.</p>
+<p>DEBUG filetypes: {{ tbavideo.filetypes }}.</p>
