@@ -275,8 +275,7 @@ table.infoTable th {
 table.matchTable {
     border-bottom: 1px solid #cccccc;
     padding: 3px 0;
-    margin-left: 8px;
-    margin-top: 1em;
+    margin: 1em 0 1em 8px;
     width: 492px;
 }
 

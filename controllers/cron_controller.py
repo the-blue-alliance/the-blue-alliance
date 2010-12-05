@@ -18,18 +18,21 @@ class EventTeamUpdate(webapp.RequestHandler):
     def get(self, event_key):
         event = Event.get_by_key_name(event_key)
         matches = event.match_set
-        eventteams = list()
+        teams = set()
         for m in matches:
             for team in m.team_key_names:
-                et = EventTeam.get_or_insert(
-                    key_name = m.event.key().name() + "_" + team,
-                    event = m.event,
-                    team = Team.get_by_key_name(team))
-                eventteams.append(et)
-                logging.info(et)
+                teams.add(team)
+        
+        eventteams_count = 0
+        for team in teams:
+            et = EventTeam.get_or_insert(
+                key_name = event_key + "_" + team,
+                event = event,
+                team = Team.get_by_key_name(team))
+            eventteams_count = eventteams_count + 1
         
         template_values = {
-            'eventteams': eventteams,
+            'eventteams_count': eventteams_count,
         }
         
         path = os.path.join(os.path.dirname(__file__), '../templates/cron/eventteam_update.html')
