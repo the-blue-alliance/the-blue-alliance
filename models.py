@@ -152,9 +152,19 @@ class Match(db.Model):
     def unpack_json(self):
         """Turn that JSON into a dict."""
         self.alliances = simplejson.loads(self.alliances_json)
+        self.winning_alliance = self.get_winning_alliance()
         # TODO: there's a way to do this lazily as soon as we try to access 
         # something under .alliances., right? -gregmarra 17 Oct 2010
         return ""
+    
+    def get_winning_alliance(self):
+        highest_score = 0
+        winner = ""
+        for alliance in self.alliances:
+            if self.alliances[alliance]["score"] > highest_score:
+                highest_score = self.alliances[alliance]["score"]
+                winner = alliance
+        return winner
     
     def verbose_name(self):
         if self.comp_level == "qm" or self.comp_level == "f":

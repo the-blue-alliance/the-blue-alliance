@@ -254,6 +254,9 @@ table.matchTable td.redScore {
 table.matchTable td.blueScore {
     background-color: #ddddff;
 }
+table.matchTable td.winner {
+    font-weight: bold;
+}
 
 ul.infoList {
     
