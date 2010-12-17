@@ -3,7 +3,7 @@ import os
 
 from django.utils import simplejson
 
-from google.appengine.api.labs import taskqueue
+from google.appengine.api import taskqueue
 from google.appengine.ext import db, webapp
 from google.appengine.ext.webapp import template, util
 
