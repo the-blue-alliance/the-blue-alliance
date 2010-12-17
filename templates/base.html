@@ -7,7 +7,19 @@
     <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.2.0/build/cssreset/reset-min.css">
     <link rel="stylesheet" href="/css/style.css" type="text/css" />
     <script type="text/javascript" src="/jwplayer/jwplayer.js"></script>
-    <!-- TODO: ga.js -->
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-1090782-5']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
 </head>
 <body>
     <div id="header">
@@ -32,62 +44,16 @@
     <div id="main">
         <div id="leftCol">
             {% block leftCol %}
-            <ul class="leftNav">
-                <li class="event"><a href="/events/">Events</a></li>
-                <li class="robot"><a href="/teams/">Teams</a></li>
-                <li class="info"><a href="/">Live!</a></li>
-            </ul>
-            <div class="divider"></div>
-            <ul class="leftNav">
-                <li class="event"><a href="/events/">Events</a></li>
-                <li class="robot"><a href="/teams/">Teams</a></li>
-                <li class="info"><a href="/">Live!</a></li>
-            </ul>
             {% endblock %}
         </div>
         <div id="content">
             {% block content %}
-            <div id="contentTop">
-                <h1>The Blue Alliance <span class="annotation">Google AppEngine</span></h1>
-                <h2><a href="http://thebluealliance.com">thebluealliance.com</a></h2>
-            </div>
-            <div id="contentRight">
-                <div class="contentBlock">
-                    <div class="contentBlockTopper">
-                        <h2>Relevant Links</h2>
-                    </div>
-                    <p><a href="/debug/">Debug</a></p>
-                    <p><a href="/admin/">Admin</a></p>
-                </div>
-                {% include "../base_partials/right_col.html" %}
-            </div>
-            <div id="contentCenter">
-                <div class="contentBlock">
-                    <div class="contentBlockTopper">
-                        <h2>Information</h2>
-                    </div>
-                    <table class="infoTable">
-                        <tr>
-                            <th>Location</th>
-                            <td>Github</th>
-                        </tr>
-                        <tr>
-                            <th>Website</th>
-                            <td><a href="http://tbatv-dev.appspot.com">tbatv-dev.appspot.com</a></td>
-                        </tr>
-                        <tr>
-                            <th>Rookie Year</th>
-                            <td>2010</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
             {% endblock %}
         </div>
     </div>
     <div id="footer">
-        <p class="left">The Blue Alliance. <a href="/debug/">debug + dev</a></p>
-        <p class="right"><a href="/">contact</a> - <a href="/">about</a> - <a href="/">developers</a></p>
+        <p class="left">The Blue Alliance. <a href="/admin/debug/">debug + dev</a></p>
+        <p class="right"><a href="mailto:contact@thebluealliance.net">contact</a> - <a href="http://thebluealliance.tumblr.com/">blog</a> - <a href="http://thebluealliance.tumblr.com/post/1066946079/tba-on-github">code</a> - <a href="http://twitter.com/thebluealliance">@thebluealliance</a></p>
     </div>
 </body>
 </html>

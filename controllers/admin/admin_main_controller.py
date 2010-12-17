@@ -16,3 +16,8 @@ class AdminMain(webapp.RequestHandler):
         
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/index.html')
         self.response.out.write(template.render(path, template_values))
+
+class AdminDebugHandler(webapp.RequestHandler):
+    def get(self):
+        path = os.path.join(os.path.dirname(__file__), '../../templates/main/debug.html')
+        self.response.out.write(template.render(path, {}))
