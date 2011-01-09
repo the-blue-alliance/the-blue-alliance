@@ -43,6 +43,7 @@ class TeamTpidHelper(object):
       """
       teams_to_put = list()
       while 1:
+        logging.info("Fetching 250 teams from %s." % skip)
         # TODO: Make this robust to season changes. -gregmarra 9 Jan 2011
         teamList = urlfetch.fetch(
             'https://my.usfirst.org/myarea/index.lasso?page=searchresults&' +
@@ -75,8 +76,10 @@ class TeamTpidHelper(object):
         skip = int(skip) + 250
         db.put(teams_to_put)
         teams_to_put = list()
+        
         if tpid:
           return tpid
+        
         if len(self.lastPageRe.findall(teamList.content)) == 0:
           return None
 
