@@ -76,6 +76,7 @@ class DatafeedUsfirstTeams(object):
         if team.first_tpid is not None:
             session_key = self.getSessionKey()
             url = self.TEAM_DETAILS_URL_PATTERN % (team.first_tpid, session_key)
+            logging.info("Fetch url: " + url)
             result = urlfetch.fetch(url)
             if result.status_code == 200:
                 return self.parseTeamDetails(result.content)
@@ -115,16 +116,20 @@ class DatafeedUsfirstTeams(object):
                         team_info["website"] = db.Link(unicode(tds[1].a["href"]))
                     except Exception, details:
                         logging.info("Team website is invalid for team " + str(team_info["number"]) + ".")
+        try:
+            team = Team(
+                team_number = team_info["number"],
+                name = team_info.get("name", None),
+                address = team_info.get("address", None),
+                nickname = team_info.get("nickname", None),
+                website = team_info.get("website", None)
+            )        
+            return team
         
-        team = Team(
-            team_number = team_info["number"],
-            name = team_info.get("name", None),
-            address = team_info.get("address", None),
-            nickname = team_info.get("nickname", None),
-            website = team_info.get("website", None)
-        )
-        
-        return team
+        except Exception, e:
+            logging.error("Team parsing failed. " + str(e))
+            logging.info(soup.findAll('tr'))
+            return None
   
     def smart_truncate(self, content, length=100, suffix='...'):
         # from http://stackoverflow.com/questions/250357/smart-truncate-in-python

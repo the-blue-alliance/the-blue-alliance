@@ -43,11 +43,11 @@ class TeamTpidHelper(object):
       """
       teams_to_put = list()
       while 1:
-        
+        # TODO: Make this robust to season changes. -gregmarra 9 Jan 2011
         teamList = urlfetch.fetch(
             'https://my.usfirst.org/myarea/index.lasso?page=searchresults&' +
             'programs=FRC&reports=teams&sort_teams=number&results_size=250&' +
-            'omit_searchform=1&season_FRC=2010&skip_teams=' + str(skip),
+            'omit_searchform=1&season_FRC=2011&skip_teams=' + str(skip),
             deadline=10)
         teamResults = self.teamRe.findall(teamList.content)
         tpid = None
@@ -57,7 +57,9 @@ class TeamTpidHelper(object):
           teamTpid = self.tpidRe.findall(teamResult)[0]
           if teamNumber == number:
             tpid = teamTpid
-        
+          
+          logging.info("Team %s TPID is now %s." % (teamNumber, teamTpid))
+          
           team = Team.get_by_key_name('frc' + str(teamNumber))
           if team is None:
             new_team = Team(
