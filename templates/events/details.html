@@ -40,11 +40,19 @@
             </tr>
             <tr>
                 <th>Location</th>
-                <td><a href="http://maps.google.com/maps?q={{ event.location }}">{{ event.location }}</a></td>
+                    {% if event.location %}
+                      <td><a href="http://maps.google.com/maps?q={{ event.location }}">{{ event.location }}</a></td>
+                    {% else %}
+                      <td>N/A</td>
+                    {% endif %}
             </tr>
             <tr>
                 <th>Website</th>
-                <td>{{ event.website }}</td>
+                    {% if event.website %}
+                      <td><a href="{{ event.website }}" title="{{ event.name }}">{{ event.website }}</a></td>
+                    {% else %}
+                      <td>N/A</td>
+                    {% endif %}                
             </tr>
             <tr>
                 <th>Teams Attending</th>
