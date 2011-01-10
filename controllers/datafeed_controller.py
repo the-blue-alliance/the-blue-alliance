@@ -59,10 +59,17 @@ class TbaVideosGetEnqueue(webapp.RequestHandler):
     def get(self):
         events = Event.all()
 
-        for event in events.fetch(500):
+        for event in events.fetch(5000):
             taskqueue.add(
                 url='/tasks/tba_videos_get/' + event.key().name(), 
                 method='GET')
+        
+        template_values = {
+            'event_count': Event.all().count(),
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/tba_videos_update_enqueue.html')
+        self.response.out.write(template.render(path, template_values))
 
 class UsfirstEventsInstantiate(webapp.RequestHandler):
     """
