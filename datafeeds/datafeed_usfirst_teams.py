@@ -19,18 +19,18 @@ class DatafeedUsfirstTeams(object):
     TEAM_DETAILS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=team_details&tpid=%s&-session=myarea:%s"
     IMPOSSIBLY_HIGH_TEAM_NUMBER = 9999
     
-    SESSION_KEY_GENERATING_URL = "https://my.usfirst.org/myarea/index.lasso?page=searchresults&programs=FRC&reports=teams&omit_searchform=1&season_FRC=2011"
+    SESSION_KEY_GENERATING_URL = "https://my.usfirst.org/myarea/index.lasso?page=searchresults&programs=FRC&reports=teams&omit_searchform=1&season_FRC=%s"
     # It appears the Season we retreive from impacts the session key's working or not. 
     # "2010" keys did not work. -gregmarra 5 Dec 2010
     
-    def getSessionKey(self):
+    def getSessionKey(self, year=2011):
         """
         Grab a page from FIRST so we can get a session key out of URLs on it. This session
         key is needed to construct working event detail information URLs.
         """
         sessionRe = re.compile(r'myarea:([A-Za-z0-9]*)')
         
-        result = urlfetch.fetch(self.SESSION_KEY_GENERATING_URL)
+        result = urlfetch.fetch(self.SESSION_KEY_GENERATING_URL % year)
         if result.status_code == 200:
             regex_results = re.search(sessionRe, result.content)
             if regex_results is not None:
@@ -42,7 +42,7 @@ class DatafeedUsfirstTeams(object):
         else:
             logging.error('Unable to retreive url: ' + self.SESSION_KEY_GENERATING_URL)
     
-    def instantiateTeams(self, skip=0):
+    def instantiateTeams(self, skip=0, year=2011):
         """
         Calling this function once establishes all of the Team objects in the Datastore.
         It does this by calling up USFIRST to search for Tpids. We have to do this in
@@ -50,7 +50,7 @@ class DatafeedUsfirstTeams(object):
         """
         
         #TeamTpidHelper actually creates Team objects.
-        TeamTpidHelper.scrapeTpid(self.IMPOSSIBLY_HIGH_TEAM_NUMBER, skip)
+        TeamTpidHelper.scrapeTpid(self.IMPOSSIBLY_HIGH_TEAM_NUMBER, skip, year)
     
     
     def flushTeams(self):
@@ -74,7 +74,7 @@ class DatafeedUsfirstTeams(object):
         team = Team.all().filter('team_number =', team_number).get()
         
         if team.first_tpid is not None:
-            session_key = self.getSessionKey()
+            session_key = self.getSessionKey(team.first_tpid_year)
             url = self.TEAM_DETAILS_URL_PATTERN % (team.first_tpid, session_key)
             logging.info("Fetch url: " + url)
             result = urlfetch.fetch(url)

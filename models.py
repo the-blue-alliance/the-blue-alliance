@@ -15,6 +15,7 @@ class Team(db.Model):
     address = db.PostalAddressProperty()
     website = db.LinkProperty()
     first_tpid = db.IntegerProperty() #from USFIRST. FIRST team ID number. -greg 5/20/2010
+    first_tpid_year = db.IntegerProperty() # from USFIRST. Year tpid is applicable for. -greg 9 Jan 2011
 
 
 class Event(db.Model):

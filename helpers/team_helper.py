@@ -31,7 +31,7 @@ class TeamTpidHelper(object):
     lastPageRe = re.compile(r'Next ->')
     
     @classmethod
-    def scrapeTpid(self, number, skip=0):
+    def scrapeTpid(self, number, skip=0, year=2011):
       """
       Searches the FIRST list of all teams for the requested team's tpid, caching
       all it encounters in the datastore. This has the side effect of creating Team
@@ -43,12 +43,12 @@ class TeamTpidHelper(object):
       """
       teams_to_put = list()
       while 1:
-        logging.info("Fetching 250 teams from %s." % skip)
+        logging.info("Fetching 250 teams based on %s data, skipping %s" % (year, skip))
         # TODO: Make this robust to season changes. -gregmarra 9 Jan 2011
         teamList = urlfetch.fetch(
             'https://my.usfirst.org/myarea/index.lasso?page=searchresults&' +
             'programs=FRC&reports=teams&sort_teams=number&results_size=250&' +
-            'omit_searchform=1&season_FRC=2011&skip_teams=' + str(skip),
+            'omit_searchform=1&season_FRC=%s&skip_teams=%s' % (year, skip),
             deadline=10)
         teamResults = self.teamRe.findall(teamList.content)
         tpid = None
@@ -59,18 +59,19 @@ class TeamTpidHelper(object):
           if teamNumber == number:
             tpid = teamTpid
           
-          logging.info("Team %s TPID is now %s." % (teamNumber, teamTpid))
+          logging.info("Team %s TPID was %s in year %s." % (teamNumber, teamTpid, year))
           
           team = Team.get_by_key_name('frc' + str(teamNumber))
+          new_team = Team(
+            team_number = int(teamNumber),
+            first_tpid = int(teamTpid),
+            first_tpid_year = int(year),
+            key_name = "frc" + str(teamNumber)
+          )
           if team is None:
-            new_team = Team(
-              team_number = int(teamNumber),
-              first_tpid = int(teamTpid),
-              key_name = "frc" + str(teamNumber)
-            )
             teams_to_put.append(new_team)
           else:
-            team.first_tpid = int(teamTpid)
+            team = TeamUpdater.updateMerge(new_team, team)
             teams_to_put.append(team)
         
         skip = int(skip) + 250
@@ -127,7 +128,10 @@ class TeamUpdater(object):
             old_team.website = new_team.website
         if new_team.address is not None:
             old_team.address = new_team.address
-        if new_team.first_tpid is not None:
+        
+        # Take the new tpid and tpid_year iff the year is newer than the old one
+        if (new_team.first_tpid_year > old_team.first_tpid_year):
+            old_team.first_tpid_year = new_team.first_tpid_year
             old_team.first_tpid = new_team.first_tpid
         
         return old_team

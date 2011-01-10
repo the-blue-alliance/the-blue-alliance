@@ -202,6 +202,8 @@ class UsfirstTeamsInstantiate(webapp.RequestHandler):
     def get(self):
         df = DatafeedUsfirstTeams()
         skip = 0
+        year = 2011
+        
         try:
             skip = self.request.get("skip")
             if skip == '':
@@ -209,7 +211,15 @@ class UsfirstTeamsInstantiate(webapp.RequestHandler):
         except Exception, detail:
             logging.error('Failed to get skip value')
         
-        df.instantiateTeams(skip)
+        try:
+            year = self.request.get("year")
+            if year == '':
+                year = 2011
+        except Exception, detail:
+            logging.error('Failed to get year value')
+        
+        logging.info("YEAR: %s", year)
+        df.instantiateTeams(skip, year)
         
         team_count = Team.all().count()
         
