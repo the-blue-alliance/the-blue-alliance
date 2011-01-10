@@ -72,8 +72,15 @@ class UsfirstEventsInstantiate(webapp.RequestHandler):
     def get(self):
         df = DatafeedUsfirstEvents()
         
+        try:
+            year = self.request.get("year")
+            if year == '':
+                year = 2011
+        except Exception, detail:
+            logging.error('Failed to get year value')
+        
         # These are dicts with a first_eid
-        events = df.getEventList(2011)
+        events = df.getEventList(year)
         
         #TODO: This is only doing Regional events, not Nats -gregmarra 4 Dec 2010
         
@@ -84,9 +91,12 @@ class UsfirstEventsInstantiate(webapp.RequestHandler):
                 method='GET')
         
         template_values = {
-            'events': events,
+            'event_count': len(events),
+            'year': year,
         }
-
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_events_instantiate.html')
+        self.response.out.write(template.render(path, template_values))
 
 class UsfirstEventGetEnqueue(webapp.RequestHandler):
     """
