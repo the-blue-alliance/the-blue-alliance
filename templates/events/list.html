@@ -2,11 +2,26 @@
 
 {% block title %}Events - The Blue Alliance{% endblock %}
 
+{% block leftCol %}
+<img src="/images/logo_square_200.png" width="200" class="profileImg" />
+<ul class="leftNav">
+    <li class="event"><strong>Events</strong></li>
+    <li><a href="/events/2002">2002</a></li>
+    <li><a href="/events/2006">2006</a></li>
+    <li><a href="/events/2007">2007</a></li>
+    <li><a href="/events/2008">2008</a></li>
+    <li><a href="/events/2009">2009</a></li>
+    <li><a href="/events/2010">2010</a></li>
+    <li><a href="/events/2011">2011</a></li>
+</ul>
+{% endblock %}
+
+
 {% block content %}
 
 <div id="contentTop">
     <h1>{{year}} Events</h1>
-    <p>{{ events|length }} total events</p>
+    <p>{{ events|length }} events</p>
 </div>
 <div id="contentRight">
     <div class="contentBlock">

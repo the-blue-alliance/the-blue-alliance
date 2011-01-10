@@ -48,3 +48,10 @@ class EventTeamUpdateEnqueue(webapp.RequestHandler):
             taskqueue.add(
                 url='/tasks/eventteam_update/' + event.key().name(),
                 method='GET')
+        
+        template_values = {
+            'event_count': Event.all().count(),
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/cron/eventteam_update_enqueue.html')
+        self.response.out.write(template.render(path, template_values))
