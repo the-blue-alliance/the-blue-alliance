@@ -17,7 +17,17 @@
         <ul class="infoList">
         {% for team in teams %}
             <li>
-                <h3><a href="/team/{{team.team_number}}">{{ team.name }} <span id="team_number" class="annotation">{{ team.first_tpid }}</span></h3>
+                <h3><a href="/team/{{team.team_number}}">
+                    {% if team.nickname %}
+                        {{ team.nickname }} <span id="team_number" class="annotation">Team {{ team.team_number }}</span>
+                    {% else %}
+                        {% if team.name %}
+                            {{ team.name }} <span id="team_number" class="annotation">Team {{ team.team_number }}</span>
+                        {% else %}
+                            Team {{ team.team_number }}
+                        {% endif %}
+                    {% endif %}
+                </a></h3>
             </li>
         {% endfor %}
         </ul>
