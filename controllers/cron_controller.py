@@ -25,10 +25,15 @@ class EventTeamUpdate(webapp.RequestHandler):
         
         eventteams_count = 0
         for team in teams:
+            team_object = Team.get_or_insert(
+                key_name = team,
+                team_number = int(team[3:]), #"frc177"->"177"
+                )
+            
             et = EventTeam.get_or_insert(
                 key_name = event_key + "_" + team,
                 event = event,
-                team = Team.get_by_key_name(team))
+                team = team_object)
             eventteams_count = eventteams_count + 1
         
         template_values = {
