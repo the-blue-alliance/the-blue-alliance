@@ -15,6 +15,8 @@ class TeamHelper(object):
         """
         Takes a list of Teams (not a Query object).
         """
+        # Sometimes there are None objects in the list.
+        team_list = filter(None, team_list)
         team_list = sorted(team_list, key=lambda team: team.team_number)
         
         return team_list
