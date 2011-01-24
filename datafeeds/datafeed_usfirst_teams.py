@@ -76,15 +76,15 @@ class DatafeedUsfirstTeams(object):
         if team.first_tpid is not None:
             session_key = self.getSessionKey(team.first_tpid_year)
             url = self.TEAM_DETAILS_URL_PATTERN % (team.first_tpid, session_key)
-            logging.info("Fetch url: " + url)
+            logging.info("Fetch url: %s" % url)
             result = urlfetch.fetch(url)
             if result.status_code == 200:
                 return self.parseTeamDetails(result.content)
             else:
-                logging.error('Unable to retreive url: ' + url)
+                logging.error('Unable to retreive url: %s' % url)
                 return None
         else:
-            logging.error('Do not know Tpid for team ' + team_number)
+            logging.error('Do not know Tpid for team %s' % team_number)
             return None
     
     def parseTeamDetails(self, html):
@@ -115,7 +115,7 @@ class DatafeedUsfirstTeams(object):
                     try:
                         team_info["website"] = db.Link(unicode(tds[1].a["href"]))
                     except Exception, details:
-                        logging.info("Team website is invalid for team " + str(team_info["number"]) + ".")
+                        logging.info("Team website is invalid for team %s." % team_info["number"])
         try:
             team = Team(
                 team_number = team_info["number"],
@@ -127,7 +127,7 @@ class DatafeedUsfirstTeams(object):
             return team
         
         except Exception, e:
-            logging.error("Team parsing failed. " + str(e))
+            logging.error("Team parsing failed. %s" % e)
             logging.info(soup.findAll('tr'))
             return None
   

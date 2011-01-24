@@ -9,3 +9,7 @@ class MainHandler(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), '../templates/main/index.html')
         self.response.out.write(template.render(path, {}))
 
+class ThanksHandler(webapp.RequestHandler):
+    def get(self):
+        path = os.path.join(os.path.dirname(__file__), '../templates/main/thanks.html')
+        self.response.out.write(template.render(path, {}))
