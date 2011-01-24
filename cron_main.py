@@ -9,7 +9,7 @@ from controllers.datafeed_controller import TbaVideosGet, TbaVideosGetEnqueue
 from controllers.datafeed_controller import UsfirstEventGetEnqueue, UsfirstEventGet, UsfirstEventsInstantiate
 from controllers.datafeed_controller import UsfirstMatchesGetEnqueue, UsfirstMatchesGet
 from controllers.datafeed_controller import UsfirstTeamGetEnqueue, UsfirstTeamGet, UsfirstTeamsInstantiate
-from controllers.datafeed_controller import FlushTeams, FlushMatches, FlushEvents
+from controllers.datafeed_controller import FlushTeams, FlushMatches, FlushEvents, FlushEventTeams
 
 from controllers.cron_controller import EventTeamUpdate, EventTeamUpdateEnqueue
 
@@ -29,6 +29,7 @@ def main():
                                           ('/tasks/flush/events', FlushEvents), # Danger!
                                           ('/tasks/flush/matches', FlushMatches), # Danger!
                                           ('/tasks/flush/teams', FlushTeams), # Danger!
+                                          ('/tasks/flush/eventteams', FlushEventTeams) # Danger!
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)

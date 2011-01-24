@@ -325,13 +325,27 @@ class FlushMatches(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
 
 
+class FlushEventTeams(webapp.RequestHandler):
+    """
+    NEVER CALL THIS FUNCTION.
+    """
+    def get(self):
+        #500 is max delete at once limit.
+        db.delete(EventTeam.all().fetch(500))
+        db.delete(EventTeam.all().fetch(500))
+        
+        eventteam_count = EventTeam.all().count()
+        
+        self.response.out.write("EventTeams flushed. " + str(eventteam_count) + " EventTeams remain. What have we done?!")
+
+
 class FlushEvents(webapp.RequestHandler):
     """
     NEVER CALL THIS FUNCTION.
     """
     def get(self):
         db.delete(Event.all().fetch(500))
-
+        
         event_count = Event.all().count()
         
         self.response.out.write("Events flushed. " + str(event_count) + " teams remain. What have we done?!")

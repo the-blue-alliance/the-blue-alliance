@@ -25,10 +25,6 @@ class EventTeamUpdate(webapp.RequestHandler):
             for team in m.team_key_names:
                 teams.add(team)
         
-        # Add teams from existing EventTeams
-        for a in event.teams:
-            teams.add("frc" + str(a.team.team_number))
-        
         eventteams_count = 0
         for team in teams:
             team_object = Team.get_or_insert(
@@ -36,12 +32,11 @@ class EventTeamUpdate(webapp.RequestHandler):
                 team_number = int(team[3:]), #"frc177"->"177"
                 )
             
-            #TODO: If we don't always put these, we'll use less resources. -gregmarra 23 Jan 2010
-            et = EventTeam.get_or_insert(key_name = event_key + "_" + team)
-            et.event = event
-            et.team = team_object
-            et.year = event.year
-            et.put()
+            et = EventTeam.get_or_insert(
+                key_name = event_key + "_" + team,
+                event = event,
+                team = team_object,
+                year = year)
             
             eventteams_count = eventteams_count + 1
         
