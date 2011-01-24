@@ -2,6 +2,9 @@
 
 {% block title %}{{team.nickname}} - FIRST Team {{team.team_number}} - The Blue Alliance{% endblock %}
 
+{% block meta_description %}{{team.nickname}} from {{team.address}}. Team information, match results, and match videos from {{year}}.{% endblock %}
+
+
 {% block leftCol %}
     <img src="/images/logo_square_200.png" width="200" class="profileImg" />
     <ul class="leftNav">
@@ -37,23 +40,23 @@
                 <td>{{ team.address }}</th>
             </tr>
             <tr>
-                <th>Website</th>
-                <td><a href="{{ team.website }}" title="{{ team.nicknam }}">{{ team.website }}</a></td>
-            </tr>
-            <tr>
                 <th>Full Name</th>
                 <td>{{ team.name }}</td>
             </tr>
+            {% if team.rookie_year %}
             <tr>
                 <th>Rookie Year</th>
                 <td>{{ team.rookie_year }}</td>
             </tr>
+            {% endif %}
         </table>
     </div>
     <div id="events" class="contentBlock">
         <div class="contentBlockTopper">
-            <h2>Events</h2>
-            <p><a href="/"><strong>2010</strong></a> - <a href="/">2009</a> - <a href="/">all years &#x25BE;</a></p>
+            <h2>Events in {{year}}</h2>
+            <p>
+                {% for a_year in years %}<a href="/team/{{team.team_number}}/{{a_year}}">{{a_year}}</a>{% if not forloop.last %} - {% endif %}{% endfor %}
+            </p>
         </div>
         {% for comp in participation %}
             <ul class="infoList">
@@ -62,7 +65,7 @@
                     <p>{{ event.start_date|date:"M d, Y" }}</p>
                 </li>
             </ul>
-            <!-- if out 0 sets -gregmarra 17 oct 2010-->
+            <!-- TODO: Handle Events with 0 Matches more gracefully -gregmarra 17 oct 2010-->
             <table class="matchTable">
                 <tr class="key">
                     <th>Match Number</th>

@@ -54,6 +54,7 @@ class EventTeam(db.Model):
                                  collection_name='teams')
     team = db.ReferenceProperty(Team,
                                 collection_name='events')
+    year = db.IntegerProperty()
 
 
 class Match(db.Model):

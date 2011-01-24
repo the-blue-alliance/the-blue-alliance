@@ -19,7 +19,8 @@ def main():
                                           ('/match/list', MatchList),
                                           ('/match/(.*)', MatchDetail),
                                           ('/team/list', TeamList),
-                                          ('/team/(.*)', TeamDetail),
+                                          ('/team/([0-9]*)', TeamDetail),
+                                          ('/team/([0-9]*)/(.*)', TeamDetail),
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)

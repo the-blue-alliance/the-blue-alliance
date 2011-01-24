@@ -1,3 +1,4 @@
+import datetime
 import os
 import logging
 
@@ -5,7 +6,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
 
 from helpers.match_helper import MatchHelper
-from models import Team
+from models import EventTeam, Team
 
 # The view of a list of teams.
 class TeamList(webapp.RequestHandler):
@@ -23,14 +24,19 @@ class TeamList(webapp.RequestHandler):
 # The view of a single Team.
 class TeamDetail(webapp.RequestHandler):
     def get(self, team_number, year=None):
-        if not year: year = 2010 #fixme: make this real. -gregmarra 17 Oct 2010
+        if type(year) == str: 
+            year = int(year)
+        else:
+            year = datetime.datetime.now().year
+        
         team = Team.get_by_key_name("frc" + team_number)
         
-        #todo 404 handling
-                
-        # First, get a list of events attended by this team in the given year.
-        # We don't build this index properly yet! -gregmarra 4 Dec 2010
-        events = [a.event for a in team.events]
+        #todo better 404 handling
+        if not team:
+            self.redirect("/")
+        
+        events = [a.event for a in team.events if a.year == year]
+        years = sorted(set([a.year for a in team.events if a.year != None]))
         
         participation = list()
         
@@ -42,8 +48,10 @@ class TeamDetail(webapp.RequestHandler):
             participation.append({ 'event' : e,
                                    'matches' : matches })
         
-        template_values = { 'team' : team,
-                            'participation' : participation }
+        template_values = { "team": team,
+                            "participation": participation,
+                            "year": year,
+                            "years": years, }
         
         path = os.path.join(os.path.dirname(__file__), '../templates/teams/details.html')
         self.response.out.write(template.render(path, template_values))
