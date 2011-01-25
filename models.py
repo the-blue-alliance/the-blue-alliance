@@ -75,6 +75,7 @@ class Match(db.Model):
     }
         
     FRC_GAMES = [
+        "frc_2011_logo",
         "frc_2010_bkwy",
         "frc_2009_lncy",
         "frc_2008_ovdr",
@@ -98,6 +99,7 @@ class Match(db.Model):
     ]
     
     FRC_GAMES_BY_YEAR = {
+        2011: "frc_2011_logo",
         2010: "frc_2010_bkwy",
         2009: "frc_2009_lncy",
         2008: "frc_2008_ovdr",
@@ -116,7 +118,7 @@ class Match(db.Model):
         1995: "frc_1995_rmpr",
         1994: "frc_1994_tpwr",
         1993: "frc_1993_rgrg",
-        1992: "frc_1992_maiz"
+        1992: "frc_1992_maiz",
     }
     
     game = db.StringProperty(required=True,choices=set(FRC_GAMES))
