@@ -6,37 +6,34 @@
 <img src="/images/logo_square_200.png" width="200" class="profileImg" />
 <ul class="leftNav">
     <li class="event"><a href="/events"><strong>Events</strong></a></li>
-    <li><a href="/events/2002">2002</a></li>
-    <li><a href="/events/2006">2006</a></li>
-    <li><a href="/events/2007">2007</a></li>
-    <li><a href="/events/2008">2008</a></li>
-    <li><a href="/events/2009">2009</a></li>
-    <li><a href="/events/2010">2010</a></li>
     <li><a href="/events/2011">2011</a></li>
+    <li><a href="/events/2010">2010</a></li>
+    <li><a href="/events/2009">2009</a></li>
+    <li><a href="/events/2008">2008</a></li>
+    <li><a href="/events/2007">2007</a></li>
+    <li><a href="/events/2006">2006</a></li>
+    <li><a href="/events/2002">2002</a></li>
 </ul>
 {% endblock %}
 
 
 {% block content %}
-
 <div id="contentTop">
     <h1>{{year}} Events</h1>
-    <p>{{ events|length }} events</p>
 </div>
 <div id="contentRight">
     {% include "../base_partials/right_col.html" %}
 </div>
-
 <div id="contentCenter">
     <div id="events" class="contentBlock">
         <div class="contentBlockTopper">
-            <h2>Events</h2>
+            <h2>{{ events|length }} Events</h2>
         </div>
         <ul class="infoList">
         {% for event in events %}
             <li>
-                <h3><a href="/event/{{event.key.name}}">{{ event.name }} <span class="annotation">{{ event.location }}</span></a></h3>
-                <p>{{ event.start_date|date:"M d, Y" }} - {{ event.teams.count }} teams</p>
+                <h3><a href="/event/{{event.key.name}}">{{ event.name }}{%if event.location  %} <span class="annotation">{{ event.location }}</span>{% endif %}</a></h3>
+                <p>{% if event.start_date %}{{ event.start_date|date:"M d, Y" }} - {% endif %}{{ event.teams.count }} teams</p>
             </li>
         {% endfor %}
         </ul>
