@@ -17,6 +17,7 @@ class MatchHelper(object):
         # todo: figure out how slow this is
         [match.unpack_json() for match in match_list]
         matches = dict([(comp_level, list()) for comp_level in Match.COMP_LEVELS])
+        matches["num"] = len(match_list)
         while len(match_list) > 0:
             match = match_list.pop(0)
             matches[match.comp_level].append(match)

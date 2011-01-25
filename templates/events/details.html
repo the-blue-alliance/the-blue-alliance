@@ -6,8 +6,8 @@
     <img src="/images/logo_square_200" width="200" class="profileImg" />
     <ul class="leftNav">
         <li class="info"><a href="#info">Information</a></li>
-        <li class="match"><a href="#matches">Matches</a></li>
-        <li class="robot"><a href="#teams">Teams</a></li>
+        <li class="match"><a href="#matches">Matches{% if matches.num %} ({{ matches.num }}){% endif %}</a></li>
+        <li class="robot"><a href="#teams">Teams{% if teams %} ({{ teams|length }}){% endif %}</a></li>
     </ul>
     <div class="divider"></div>
 {% endblock %}
@@ -16,15 +16,8 @@
 
 <div id="contentTop">
     <h1>{{ event.name }} <span class="annotation">{{ event.year }}</span></h1>
-    <p>{{ event.start_date|date:"M d" }} - {{ event.location }}</a></p>
 </div>
 <div id="contentRight">
-    <div class="contentBlock">
-        <div class="contentBlockTopper">
-            <h2>Related Events</h2>
-        </div>
-        <p>There are all kinds of related events!</p>
-    </div>
     {% include "../base_partials/right_col.html" %}
 </div>
 
@@ -38,32 +31,21 @@
                 <th>Dates</th>
                 <td>{{ event.start_date|date:"M d, Y" }} to {{ event.end_date|date:"M d, Y" }}</th>
             </tr>
-            <tr>
+            {% if event.location %}<tr>
                 <th>Location</th>
-                    {% if event.location %}
-                      <td><a href="http://maps.google.com/maps?q={{ event.location }}">{{ event.location }}</a></td>
-                    {% else %}
-                      <td>N/A</td>
-                    {% endif %}
-            </tr>
-            <tr>
+                <td><a href="http://maps.google.com/maps?q={{ event.location }}">{{ event.location }}</a></td>
+            </tr>{% endif %}
+            {% if event.website %}<tr>
                 <th>Website</th>
-                    {% if event.website %}
-                      <td><a href="{{ event.website }}" title="{{ event.name }}">{{ event.website }}</a></td>
-                    {% else %}
-                      <td>N/A</td>
-                    {% endif %}                
-            </tr>
-            <tr>
-                <th>Teams Attending</th>
-                <td>{{ event.teams.count }}</td>
-            </tr>
+                <td><a href="{{ event.website }}" title="{{ event.name }}">{{ event.website }}</a></td>
+            </tr>{% endif %}
         </table>
     </div>
     <div id="matches" class="contentBlock">
         <div class="contentBlockTopper">
-            <h2>Matches</h2>
+            <h2>{% if matches.num %}{{matches.num}} {% endif %}Match{{matches.num|pluralize:"es"}}</h2>
         </div>
+        {% if matches.num %}
         <table class="matchTable">
             <tr class="key">
                 <th>Match Number</th>
@@ -107,11 +89,15 @@
                 {% endfor %}
             {% endif %}
         </table>
+        {% else %}
+        <p>No matches yet.</p>
+        {% endif %}
     </div>
     <div id="teams" class="contentBlock">
         <div class="contentBlockTopper">
-            <h2>Teams</h2>
+            <h2>{% if teams %}{{ teams|length}} {% endif %}Team{{teams|length|pluralize}}</h2>
         </div>
+        {% if teams %}
         <ul class="infoList">
         {% for team in teams %}
             <li>
@@ -120,6 +106,9 @@
             </li>
         {% endfor %}
         </ul>
+        {% else %}
+        <p>No teams yet.</p>
+        {% endif %}
     </div>
 </div>
 

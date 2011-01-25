@@ -1,24 +1,26 @@
 {% extends "../base.html" %}
 
-{% block title %}{{team.nickname}} - FIRST Team {{team.team_number}} - The Blue Alliance{% endblock %}
+{% block title %}{% if team.nickname %}{{team.nickname}} - {% endif %}Team {{team.team_number}} - The Blue Alliance{% endblock %}
 
-{% block meta_description %}{{team.nickname}} from {{team.address}}. Team information, match results, and match videos from {{year}}.{% endblock %}
+{% block meta_description %}{% if team.nickname %}{{team.nickname}}{% else %}Team {{team.team_number}}{% endif %} from {{team.address}}. Team information, match results, and match videos from {{year}}.{% endblock %}
 
 
 {% block leftCol %}
-    <img src="/images/logo_square_200.png" width="200" class="profileImg" />
     <ul class="leftNav">
         <li class="info"><a href="#info">Information</a></li>
-        <li class="event"><a href="#events">Events</a></li>
+        <li class="event"><a href="#events">Events in {{year}}</a></li>
     </ul>
     <div class="divider"></div>
 {% endblock %}
 
 {% block content %}
-
 <div id="contentTop">
-    <h1>{{ team.nickname }} <span class="annotation">team {{ team.team_number }}</span></h1>
-    <p><a href="{{ team.website }}" title="{{ team.nicknam }}">{{ team.website }}</a></p>
+    {% if team.nickname %}
+        <h1>{{ team.nickname }} <span class="annotation">team {{ team.team_number }}</span></h1>
+    {% else %}
+        <h1>Team {{ team.team_number }}</h1>
+    {% endif %}
+    {% if team.website %}<p><a href="{{ team.website }}" title="{{ team.nickname }}">{{ team.website }}</a></p>{% endif %}
 </div>
 <div id="contentRight">
     <div class="contentBlock">
@@ -35,25 +37,23 @@
             <h2>Information</h2>
         </div>
         <table class="infoTable">
-            <tr>
+            {% if team.address %}<tr>
                 <th>Location</th>
-                <td>{{ team.address }}</th>
-            </tr>
-            <tr>
+                <td><a href="http://maps.google.com/maps?q={{ team.address }}">{{ team.address }}</a></td>
+            </tr>{% endif %}
+            {% if team.name %}<tr>
                 <th>Full Name</th>
                 <td>{{ team.name }}</td>
-            </tr>
-            {% if team.rookie_year %}
-            <tr>
+            </tr>{% endif %}
+            {% if team.rookie_year %}<tr>
                 <th>Rookie Year</th>
                 <td>{{ team.rookie_year }}</td>
-            </tr>
-            {% endif %}
+            </tr>{% endif %}
         </table>
     </div>
     <div id="events" class="contentBlock">
         <div class="contentBlockTopper">
-            <h2>Events in {{year}}</h2>
+            <h2>{{ participation|length }} Event{{participation|length|pluralize}} in {{year}}</h2>
             <p>
                 {% for a_year in years %}<a href="/team/{{team.team_number}}/{{a_year}}">{{a_year}}</a>{% if not forloop.last %} - {% endif %}{% endfor %}
             </p>
@@ -65,7 +65,7 @@
                     <p>{{ event.start_date|date:"M d, Y" }}</p>
                 </li>
             </ul>
-            <!-- TODO: Handle Events with 0 Matches more gracefully -gregmarra 17 oct 2010-->
+            {% if comp.matches.num %}
             <table class="matchTable">
                 <tr class="key">
                     <th>Match Number</th>
@@ -109,6 +109,9 @@
                     {% endfor %}
                 {% endif %}
             </table>
+            {% else %}
+            <p>No matches yet.</p>
+            {% endif %}
         {% endfor %}
     </div>
 </div>
