@@ -26,7 +26,8 @@ class EventTeamUpdate(webapp.RequestHandler):
         
         # Add teams from existing EventTeams
         for a in event.teams:
-            teams.add("frc%s" % a.team.team_number)
+            if a.team:
+                teams.add("frc%s" % a.team.team_number)
         
         eventteams_count = 0
         for team in teams:
