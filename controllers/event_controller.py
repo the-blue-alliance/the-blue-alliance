@@ -1,4 +1,6 @@
-import os, logging
+import datetime
+import os
+import logging
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
@@ -12,7 +14,10 @@ class EventList(webapp.RequestHandler):
     List all Events.
     """
     def get(self, year=None):
-        if not year: year = 2010 #fixme -gregmarra 17 Oct 2010
+        if year:
+            year = int(year)
+        else:
+            year = datetime.datetime.now().year
         
         events = Event.all().filter("year =", int(year)).order('start_date').fetch(1000)
         
