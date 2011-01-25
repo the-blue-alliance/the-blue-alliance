@@ -5,7 +5,7 @@
 {% block leftCol %}
 <img src="/images/logo_square_200.png" width="200" class="profileImg" />
 <ul class="leftNav">
-    <li class="event"><strong>Events</strong></li>
+    <li class="event"><a href="/events"><strong>Events</strong></a></li>
     <li><a href="/events/2002">2002</a></li>
     <li><a href="/events/2006">2006</a></li>
     <li><a href="/events/2007">2007</a></li>
@@ -24,12 +24,6 @@
     <p>{{ events|length }} events</p>
 </div>
 <div id="contentRight">
-    <div class="contentBlock">
-        <div class="contentBlockTopper">
-            <h2>Related Events</h2>
-        </div>
-        <p>There are all kinds of related events!</p>
-    </div>
     {% include "../base_partials/right_col.html" %}
 </div>
 
