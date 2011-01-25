@@ -3,7 +3,6 @@
 {% block title %}{{event.year}} {{event.name}} - The Blue Alliance{% endblock %}
 
 {% block leftCol %}
-    <img src="/images/logo_square_200" width="200" class="profileImg" />
     <ul class="leftNav">
         <li class="info"><a href="#info">Information</a></li>
         <li class="match"><a href="#matches">Matches{% if matches.num %} ({{ matches.num }}){% endif %}</a></li>
@@ -29,7 +28,11 @@
         <table class="infoTable">
             <tr>
                 <th>Dates</th>
-                <td>{{ event.start_date|date:"M d, Y" }} to {{ event.end_date|date:"M d, Y" }}</th>
+                {% if event.start_date %}
+                    <td>{{ event.start_date|date:"M d, Y" }} to {{ event.end_date|date:"M d, Y" }}</th>
+                {% else %}
+                    <td>Unknown</td>
+                {% endif %}
             </tr>
             {% if event.location %}<tr>
                 <th>Location</th>
@@ -101,8 +104,8 @@
         <ul class="infoList">
         {% for team in teams %}
             <li>
-                <h3><a href="/team/{{team.team_number}}">{{ team.team_number }} <span class="annotation">{{ team.nickname }}</span></a></h3>
-                <p>{{ team.address }}</p>
+                <h3><a href="/team/{{team.team_number}}">{{ team.team_number }}{% if team.nickname %} <span class="annotation">{{ team.nickname }}</span>{% endif %}</a></h3>
+                {% if team.address %}<p>{{ team.address }}</p>{% endif %}
             </li>
         {% endfor %}
         </ul>

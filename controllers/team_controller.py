@@ -36,9 +36,12 @@ class TeamDetail(webapp.RequestHandler):
             self.redirect("/")
         
         events = [a.event for a in team.events if a.year == year]
+        events = sorted(events, key=lambda event: event.start_date)
+        
         years = sorted(set([a.year for a in team.events if a.year != None]))
         
         participation = list()
+        
         
         # Return an array of event names and a list of matches from that event that the
         # team was a participant in.
