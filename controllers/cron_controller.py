@@ -17,13 +17,16 @@ class EventTeamUpdate(webapp.RequestHandler):
     """
     def get(self, event_key):
         event = Event.get_by_key_name(event_key)
-        matches = event.match_set
         teams = set()
         
         # Add teams from Matches
-        for m in matches:
+        for m in event.match_set:
             for team in m.team_key_names:
                 teams.add(team)
+        
+        # Add teams from existing EventTeams
+        for a in event.teams:
+            teams.add("frc%s" % a.team.team_number)
         
         eventteams_count = 0
         for team in teams:
@@ -36,7 +39,19 @@ class EventTeamUpdate(webapp.RequestHandler):
                 key_name = event_key + "_" + team,
                 event = event,
                 team = team_object,
-                year = year)
+                year = event.year)
+            
+            # Update if needed
+            reput = False
+            if et.team.key().name != team_object.key().name:
+                reput = True
+                et.team = team_object
+            if et.year != event.year:
+                reput = True
+                et.year = event.year
+            if reput:
+                logging.info("Had to re-put %s" % et.key().name)
+                et.put()
             
             eventteams_count = eventteams_count + 1
         
