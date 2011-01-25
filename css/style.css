@@ -27,10 +27,10 @@ span.annotation {
 }
 
 #header {
-    background-color: #666666;
+    background-color: #999999;
     border-bottom: 2px solid #003399;
     color: #000000;
-    height: 56px;
+    height: 44px;
     margin: 0;
     padding: 0;
     width: 100%;
@@ -53,14 +53,14 @@ span.annotation {
     width: 200px;
 }
 #headerTitle img {
-    height: 48px;
-    margin: 0;
-    width: 320px;
+    height: 24px;
+    margin: 10px 0 0 0;
+    width: 180px;
 }
 
 #headerRight {
     float: right;
-    height: 48px;
+    height: 36px;
     margin: 0 0 0 0;
     padding: 0 0 2px 0;
     width: 778px;
@@ -68,7 +68,7 @@ span.annotation {
 
 #headerSearch {
     float: right;
-    margin: 20px 0 0 4px;
+    margin: 12px 0 0 4px;
     width: 250px;
 }
 
