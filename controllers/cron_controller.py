@@ -44,7 +44,10 @@ class EventTeamUpdate(webapp.RequestHandler):
             
             # Update if needed
             reput = False
-            if et.team.key().name != team_object.key().name:
+            if not et.team:
+                reput = True
+                et.team = team_object
+            elif et.team.key().name != team_object.key().name:
                 reput = True
                 et.team = team_object
             if et.year != event.year:
