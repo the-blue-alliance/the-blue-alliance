@@ -36,7 +36,10 @@ class TeamDetail(webapp.RequestHandler):
             self.redirect("/")
         
         events = [a.event for a in team.events if a.year == year]
-        #events = sorted(events, key=lambda event: event.start_date)
+        for event in events:
+            if not event.start_date:
+                event.start_date = datetime.datetime(year, 12, 31) #unknown goes last
+        events = sorted(events, key=lambda event: event.start_date)
         
         years = sorted(set([a.year for a in team.events if a.year != None]))
         
