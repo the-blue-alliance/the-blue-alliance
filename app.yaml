@@ -20,6 +20,8 @@ handlers:
 - url: /admin/.*
   script: admin_main.py
   login: required
+- url: /api/.*
+  script: api_main.py
 - url: .*
   script: main.py
 
