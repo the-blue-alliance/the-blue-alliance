@@ -165,8 +165,8 @@ class Match(db.Model):
         highest_score = 0
         winner = ""
         for alliance in self.alliances:
-            if self.alliances[alliance]["score"] > highest_score:
-                highest_score = self.alliances[alliance]["score"]
+            if int(self.alliances[alliance]["score"]) > highest_score:
+                highest_score = int(self.alliances[alliance]["score"])
                 winner = alliance
         return winner
     
