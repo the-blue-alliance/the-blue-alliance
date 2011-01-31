@@ -50,7 +50,7 @@ class ApiEventsShow(webapp.RequestHandler):
         event_keys = self.request.get('events').split(',')
 
         for event_key in event_keys:
-            memcache_key = "api_event_show_%s" % team_key
+            memcache_key = "api_event_show_%s" % event_key
             event_dict = memcache.get(memcache_key)
             if event_dict is None:
                 event = Event.get_by_key_name(event_key)

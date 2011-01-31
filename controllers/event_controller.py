@@ -2,6 +2,7 @@ import datetime
 import os
 import logging
 
+from google.appengine.api import memcache
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
 
@@ -19,15 +20,22 @@ class EventList(webapp.RequestHandler):
         else:
             year = datetime.datetime.now().year
         
-        events = Event.all().filter("year =", int(year)).order('start_date').fetch(1000)
+        memcache_key = "event_list_%s" % year
+        html = memcache.get(memcache_key)
         
-        template_values = {
-            "year": year,
-            "events": events,
-        }
+        if html is None:
+            events = Event.all().filter("year =", int(year)).order('start_date').fetch(1000)
         
-        path = os.path.join(os.path.dirname(__file__), '../templates/events/list.html')
-        self.response.out.write(template.render(path, template_values))
+            template_values = {
+                "year": year,
+                "events": events,
+            }
+        
+            path = os.path.join(os.path.dirname(__file__), '../templates/events/list.html')
+            html = template.render(path, template_values)
+            memcache.set(memcache_key, html, 3600)
+        
+        self.response.out.write(html)
         
 class EventDetail(webapp.RequestHandler):
     """
