@@ -1,6 +1,7 @@
 import os
 import logging
 
+from google.appengine.api import memcache
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
 
@@ -26,23 +27,30 @@ class MatchDetail(webapp.RequestHandler):
     """
     def get(self, key_name):
         
-        match = Match.get_by_key_name(key_name)
-        if not match:
-            # TODO: Add real "match not found" template
-            self.response.out.write("404.")
-            return None
+        memcache_key = "match_detail_%s" % key_name
+        html = memcache.get(memcache_key)
         
-        match.unpack_json()
+        if html is None:
+            match = Match.get_by_key_name(key_name)
+            if not match:
+                # TODO: Add real "match not found" template
+                self.response.out.write("404.")
+                return None
+            
+            match.unpack_json()
+            
+            tbavideo = None
+            if match.tbavideo_set.count() > 0:
+                tbavideo = match.tbavideo_set[0]
+            
+            template_values = {
+                "match": match,
+                "tbavideo": tbavideo,
+            }
+            
+            path = os.path.join(os.path.dirname(__file__), '../templates/matches/details.html')
+            html = template.render(path, template_values)
+            memcache.add(memcache_key, html, 600)
         
-        tbavideo = None
-        if match.tbavideo_set.count() > 0:
-            tbavideo = match.tbavideo_set[0]
-        
-        template_values = {
-            "match": match,
-            "tbavideo": tbavideo,
-        }
-        
-        path = os.path.join(os.path.dirname(__file__), '../templates/matches/details.html')
-        self.response.out.write(template.render(path, template_values))
+        self.response.out.write(html)
         

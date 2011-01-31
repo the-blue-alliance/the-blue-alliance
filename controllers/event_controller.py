@@ -44,18 +44,25 @@ class EventDetail(webapp.RequestHandler):
     """
     def get(self, event_code):
         
-        year = event_code[0:4]
-        event_short = event_code[4:]
+        memcache_key = "event_detail_%s" % event_code
+        html = memcache.get(memcache_key)
         
-        event = Event.get_by_key_name(year + event_short)
-        matches = MatchHelper.organizeMatches(event.match_set)
-        teams = TeamHelper.sortTeams([a.team for a in event.teams])
+        if html is None:
+            year = event_code[0:4]
+            event_short = event_code[4:]
         
-        template_values = {
-            "event": event,
-            "matches": matches,
-            "teams": teams,
-        }
+            event = Event.get_by_key_name(year + event_short)
+            matches = MatchHelper.organizeMatches(event.match_set)
+            teams = TeamHelper.sortTeams([a.team for a in event.teams])
+        
+            template_values = {
+                "event": event,
+                "matches": matches,
+                "teams": teams,
+            }
                 
-        path = os.path.join(os.path.dirname(__file__), '../templates/events/details.html')
-        self.response.out.write(template.render(path, template_values))
+            path = os.path.join(os.path.dirname(__file__), '../templates/events/details.html')
+            html = template.render(path, template_values)
+            memcache.set(memcache_key, html, 300)
+        
+        self.response.out.write(html)
