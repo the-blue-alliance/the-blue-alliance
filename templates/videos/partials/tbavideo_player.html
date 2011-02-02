@@ -9,12 +9,12 @@
 <script type="text/javascript">
     jwplayer("tbavideo_container").setup({
         players: [
-            { type: "html5" },
-            { type: "flash", src: "/jwplayer/player.swf" }
+            { type: "flash", src: "/jwplayer/player.swf" },
+            { type: "html5" }
         ],
         provider: "http",
         controlbar: "bottom",
     });
 </script>
 <br /><br />
-<p>TODO: Fix buffering issues where mp4's take too long to start playback.</p>
+<p><a href="{{tbavideo.getDownloadablePath}}" title="Video of {{match.verbose_name}} - {{match.event.year}} {{match.event.name}}">Download this video.</a></p>

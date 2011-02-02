@@ -191,7 +191,7 @@ class TBAVideo(db.Model):
     
     THUMBNAIL_FILETYPES = ["jpg", "jpeg"]
     STREAMABLE_FILETYPES = ["mp4", "flv"]
-    DOWNLOADABLE_FILETYPES = ["mp4", "mov", "avi", "wmv"]
+    DOWNLOADABLE_FILETYPES = ["mp4", "mov", "avi", "wmv", "flv"]
     
     def getThumbnailPath(self):
         logging.info("thumbnail: " + self.getBestPathOf(self.THUMBNAIL_FILETYPES))
