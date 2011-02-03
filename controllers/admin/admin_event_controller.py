@@ -53,8 +53,6 @@ class AdminEventEdit(webapp.RequestHandler):
     def post(self, event_key):
         # Note, we don't actually use event_key.
         
-        logging.info(self.request)
-        
         event = Event(
             end_date = None, #TODO
             event_short = self.request.get("event_short"),
