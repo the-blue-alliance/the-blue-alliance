@@ -43,6 +43,12 @@ class Event(db.Model):
         Returns the string of the key_name of the Event object before writing it.
         """
         return str(self.year) + self.event_short
+    
+    def getFacebookEventUrl(self):
+        """
+        Return a string of the Facebook Event URL.
+        """
+        return "http://www.facebook.com/event.php?eid=%s" % self.facebook_eid
 
 
 class EventTeam(db.Model):
