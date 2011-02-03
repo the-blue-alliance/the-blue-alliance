@@ -69,6 +69,7 @@ class ApiEventsShow(webapp.RequestHandler):
                     event_dict["short_name"] = event.short_name
                     event_dict["location"] = event.location
                     event_dict["official"] = event.official
+                    event_dict["facebook_eid"] = event.facebook_eid
 
                     if event.start_date:
                         event_dict["start_date"] = event.start_date.isoformat()
