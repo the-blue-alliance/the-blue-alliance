@@ -7,6 +7,7 @@ from google.appengine.api import memcache
 from google.appengine.ext import db, webapp
 from google.appengine.ext.webapp import template, util
 
+from helpers.api_helper import ApiHelper
 from models import Event, EventTeam, Match, TBAVideo, Team
 
 class ApiTeamsShow(webapp.RequestHandler):
@@ -14,41 +15,46 @@ class ApiTeamsShow(webapp.RequestHandler):
     Information about teams.
     """
     def get(self):
-        
         teams = list()
         team_keys = self.request.get('teams').split(',')
         
         for team_key in team_keys:
-            memcache_key = "api_team_show_%s" % team_key
-            team_dict = memcache.get(memcache_key)
-            if team_dict is None:
-                team = Team.get_by_key_name(team_key)
-                if Team is not None:
-                    team_dict = dict()
-                    team_dict["key"] = team.key().name()
-                    team_dict["team_number"] = team.team_number
-                    team_dict["name"] = team.name
-                    team_dict["nickname"] = team.nickname
-                    team_dict["location"] = team.address
-                    team_dict["website"] = team.website
-                    team_dict["events"] = [a.event.key().name() for a in team.events]
-                
-                    memcache.set(memcache_key, team_dict, 3600)
-                    teams.append(team_dict)
-            else:
-                teams.append(team_dict)
+            teams.append(ApiHelper.getTeamInfo(team_key))
         
         self.response.out.write(simplejson.dumps(teams))
+
+class ApiTeamDetails(webapp.RequestHandler):
+    """
+    Information about a Team in a particular year, including full Event and Match objects
+    """
+    def get(self):
+        team_key = self.request.get('team')
+        year = self.request.get('year')
+        
+        team_dict = ApiHelper.getTeamInfo(team_key)
+        team_dict = ApiHelper.addTeamMatches(team_dict, year)
+        #TODO: Event objects
+        #team_dict = ApiHelper.addTeamEvents(team_dict, year)
+        
+        self.response.out.write(simplejson.dumps(team_dict))
 
 class ApiEventsShow(webapp.RequestHandler):
     """
     Information about events.
     """
     def get(self):
-
+        
+        event_keys = set()
+        
+        if self.request.get("year"):
+            events = Event.all().filter("year =", int(self.request.get("year"))).fetch(500)
+            event_keys = event_keys.union(set([event.key().name() for event in events]))
+            
+        event_keys = event_keys.union(set(self.request.get("events").split(',')))
+        event_keys = filter(None, event_keys)
+        
         events = list()
-        event_keys = self.request.get('events').split(',')
-
+        
         for event_key in event_keys:
             memcache_key = "api_event_show_%s" % event_key
             event_dict = memcache.get(memcache_key)

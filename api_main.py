@@ -4,11 +4,12 @@ import os
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import util
 
-from controllers.api_controller import ApiEventsShow, ApiTeamsShow
+from controllers.api_controller import ApiEventsShow, ApiTeamDetails, ApiTeamsShow
 
 
 def main():
-    application = webapp.WSGIApplication([('/api/v1/teams/show', ApiTeamsShow),
+    application = webapp.WSGIApplication([('/api/v1/team/details', ApiTeamDetails),
+                                          ('/api/v1/teams/show', ApiTeamsShow),
                                           ('/api/v1/events/show', ApiEventsShow),
                                           ],
                                          debug=True)
