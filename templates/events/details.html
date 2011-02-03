@@ -42,6 +42,10 @@
                 <th>Website</th>
                 <td><a href="{{ event.website }}" title="{{ event.name }}">{{ event.website }}</a></td>
             </tr>{% endif %}
+            {% if event.facebook_eid %}<tr>
+                <th>Facebook</th>
+                <td><a href="{{ event.getFacebookEventUrl }}" title="Facebook Event">RSVP</td>
+            </tr>{% endif %}
         </table>
     </div>
     <div id="matches" class="contentBlock">

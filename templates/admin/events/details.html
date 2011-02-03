@@ -50,6 +50,10 @@
         <td>{{ event.first_eid }}</td>
     </tr>
     <tr>
+        <td>Facebook Event ID</td>
+        <td><a href="http://graph.facebook.com/{{event.facebook_eid}}">{{event.facebook_eid}}</a></td>
+    </tr>
+    <tr>
         <td>Teams Attending</td>
         <td>{{ event.teams.count }}</td>
     </tr>

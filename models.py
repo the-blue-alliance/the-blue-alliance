@@ -35,6 +35,7 @@ class Event(db.Model):
     location = db.StringProperty()
     official = db.BooleanProperty(default=False) # Is the event FIRST-official?
     first_eid = db.StringProperty() #from USFIRST
+    facebook_eid = db.StringProperty() #from Facebook
     website = db.StringProperty()
     
     def get_key_name(self):

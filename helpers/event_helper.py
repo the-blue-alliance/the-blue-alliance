@@ -74,6 +74,8 @@ class EventUpdater(object):
             old_event.official = new_event.official
         if new_event.first_eid is not None:
             old_event.first_eid = new_event.first_eid
+        if new_event.facebook_eid is not None:
+            old_event.facebook_eid = new_event.facebook_eid
         
         old_event.put()
         return old_event
