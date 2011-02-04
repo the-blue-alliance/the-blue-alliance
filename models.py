@@ -175,6 +175,8 @@ class Match(db.Model):
             if int(self.alliances[alliance]["score"]) > highest_score:
                 highest_score = int(self.alliances[alliance]["score"])
                 winner = alliance
+            elif int(self.alliances[alliance]["score"]) == highest_score:
+                winner = ""
         return winner
     
     def verbose_name(self):
