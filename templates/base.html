@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>{% block title %}The Blue Alliance{% endblock %}</title>
-    <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.2.0/build/cssreset/reset-min.css">
     <link rel="stylesheet" href="/css/style.css" type="text/css" />
     <script type="text/javascript" src="/jwplayer/jwplayer.js"></script>
@@ -34,8 +34,16 @@
                     <div id="headerSearch">
                         <form>
                             <span class="textInput">
-                                <input id="search_query" name="search_query" />
-                                <button id="search_submit" name="search_submit" type="submit" />
+                                <form action="http://www.thebluealliance.com/search" id="cse-search-box">
+                                  <div>
+                                      <input type="hidden" name="cx" value="017956276086362105630:99ctqytcokm" />
+                                      <input type="hidden" name="cof" value="FORID:11" />
+                                      <input type="hidden" name="ie" value="UTF-8" />
+                                      <input type="text" id="q" name="q" />
+                                      <button id="sa" name="sa" type="submit" value="Search"/>
+                                  </div>
+                                </form>
+                                <script type="text/javascript" src="http://www.google.com/cse/brand?form=cse-search-box&lang=en"></script>
                             </span>
                         </form>
                     </div>

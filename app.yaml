@@ -9,11 +9,18 @@ builtins:
 
 handlers:
 - url: /css
-  static_dir: css
+  static_dir: static/css
 - url: /images
-  static_dir: images
+  static_dir: static/images
 - url: /jwplayer
-  static_dir: jwplayer
+  static_dir: static/jwplayer
+- url: /favicon.ico
+  static_files: static/favicon.ico
+  upload: static/favicon.ico
+- url: /favicon.ico
+  static_files: static/robots.txt
+  upload: static/robots.txt
+
 
 - url: /tasks/.*
   script: cron_main.py
