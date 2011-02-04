@@ -1,6 +1,8 @@
 {% extends "../base.html" %}
 
-{% block title %}{{event.year}} {{event.name}} - The Blue Alliance{% endblock %}
+{% block title %}{{event.name}} ({{event.year}}) - The Blue Alliance{% endblock %}
+
+{% block meta_description %}Match results and for the {{event.year}} {{event.name}} FIRST Robotics Competition in {{event.location}}.{% endblock %}
 
 {% block leftCol %}
     <ul class="leftNav">

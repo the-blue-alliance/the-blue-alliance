@@ -2,6 +2,8 @@
 
 {% block title %}{{match.verbose_name}} - {{match.event.year}} {{match.event.name}} - The Blue Alliance{% endblock %}
 
+{% block meta_description %}Match results and video for {{match.verbose_name}} at the {{match.event.year}} {{match.event.name}} FIRST Robotics Competition in {{match.event.location}}.{% endblock %}
+
 {% block leftCol %}
     <ul class="leftNav">
         <li class="info"><a href="#info">Information</a></li>

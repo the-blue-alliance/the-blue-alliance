@@ -34,8 +34,10 @@ class TeamDetail(webapp.RequestHandler):
     def get(self, team_number, year=None):
         if type(year) == str: 
             year = int(year)
+            explicit_year = True
         else:
             year = datetime.datetime.now().year
+            explicit_year = False
         
         memcache_key = "team_detail_%s_%s" % ("frc" + team_number, year)
         html = memcache.get(memcache_key)
@@ -65,7 +67,8 @@ class TeamDetail(webapp.RequestHandler):
                 participation.append({ 'event' : e,
                                        'matches' : matches })
             
-            template_values = { "team": team,
+            template_values = { "explicit_year": explicit_year,
+                                "team": team,
                                 "participation": participation,
                                 "year": year,
                                 "years": years, }

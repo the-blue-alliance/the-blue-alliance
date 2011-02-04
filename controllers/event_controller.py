@@ -17,8 +17,10 @@ class EventList(webapp.RequestHandler):
     def get(self, year=None):
         if year:
             year = int(year)
+            explicit_year = True
         else:
             year = datetime.datetime.now().year
+            explicit_year = False
         
         memcache_key = "event_list_%s" % year
         html = memcache.get(memcache_key)
@@ -27,6 +29,7 @@ class EventList(webapp.RequestHandler):
             events = Event.all().filter("year =", int(year)).order('start_date').fetch(1000)
         
             template_values = {
+                "explicit_year": explicit_year,
                 "year": year,
                 "events": events,
             }
