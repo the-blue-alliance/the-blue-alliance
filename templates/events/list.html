@@ -35,9 +35,9 @@
         </div>
         <ul class="infoList">
         {% for event in events %}
-            <li>
-                <h3><a href="/event/{{event.key.name}}">{{ event.name }}{%if event.location  %} <span class="annotation">{{ event.location }}</span>{% endif %}</a></h3>
-                <p>{% if event.start_date %}{{ event.start_date|date:"M d, Y" }} - {% endif %}{{ event.teams.count }} teams</p>
+            <li xmlns:v="http://rdf.data-vocabulary.org/#" typeof="v:Event">
+                <h3><a href="/event/{{event.key.name}}" rel="v:url"><span property="v:summary">{{ event.name }}</span>{%if event.location  %} <span class="annotation">{{ event.location }}</span>{% endif %}</a></h3>
+                <p>{% if event.start_date %}<span property="v:startDate" content="{{event.start_date|date:"Y-m-d"}}">{{ event.start_date|date:"M d, Y" }}</span> - {% endif %}{{ event.teams.count }} teams</p>
             </li>
         {% endfor %}
         </ul>
