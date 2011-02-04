@@ -6,7 +6,7 @@ import os
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
 
-from controllers.main_controller import MainHandler, ThanksHandler
+from controllers.main_controller import MainHandler, ThanksHandler, SearchHandler
 
 from controllers.event_controller import EventList, EventDetail
 from controllers.match_controller import MatchList, MatchDetail
@@ -19,6 +19,7 @@ def main():
                                           ('/event/(.*)', EventDetail),
                                           ('/match/list', MatchList),
                                           ('/match/(.*)', MatchDetail),
+                                          ('/search', SearchHandler),
                                           ('/teams', TeamList),
                                           ('/team/([0-9]*)', TeamDetail),
                                           ('/team/([0-9]*)/(.*)', TeamDetail),

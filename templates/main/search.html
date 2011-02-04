@@ -1,0 +1,36 @@
+{% extends "../base.html" %}
+
+{% block title %}The Blue Alliance - Search{% endblock %}
+
+{% block leftCol %}
+<img src="/images/logo_square_200.png" width="200" class="profileImg" />
+<ul class="leftNav">
+    <li class="event"><a href="/events/">Events</a></li>
+    <li class="robot"><a href="/teams/">Teams</a></li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div id="contentTop">
+    <h1>Search</h1>
+</div>
+<div id="contentRight">
+    {% include "../base_partials/right_col.html" %}
+</div>
+<div id="contentCenter">
+    <div class="contentBlock">
+        <div class="contentBlockTopper">
+            <h2>Search Results</h2>
+        </div>
+        <div id="cse-search-results"></div>
+        <script type="text/javascript">
+          var googleSearchIframeName = "cse-search-results";
+          var googleSearchFormName = "cse-search-box";
+          var googleSearchFrameWidth = 500;
+          var googleSearchDomain = "www.google.com";
+          var googleSearchPath = "/cse";
+        </script>
+        <script type="text/javascript" src="http://www.google.com/afsonline/show_afs_search.js"></script>
+    </div>
+</div>
+{% endblock %}

@@ -28,3 +28,15 @@ class ThanksHandler(webapp.RequestHandler):
             memcache.set(memcache_key, html, 3600)
         
         self.response.out.write(html)
+
+class SearchHandler(webapp.RequestHandler):
+    def get(self):
+        memcache_key = "main_search"
+        html = memcache.get(memcache_key)
+
+        if html is None:
+            path = os.path.join(os.path.dirname(__file__), '../templates/main/search.html')
+            html = template.render(path, {})
+            memcache.set(memcache_key, html, 3600)
+
+        self.response.out.write(html)
