@@ -6,7 +6,7 @@ import os
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
 
-from controllers.main_controller import MainHandler, ThanksHandler, SearchHandler
+from controllers.main_controller import MainHandler, ContactHandler, ThanksHandler, SearchHandler
 
 from controllers.event_controller import EventList, EventDetail
 from controllers.match_controller import MatchList, MatchDetail
@@ -14,6 +14,7 @@ from controllers.team_controller import TeamList, TeamDetail
 
 def main():
     application = webapp.WSGIApplication([('/', MainHandler),
+                                          ('/contact', ContactHandler),
                                           ('/events', EventList),
                                           ('/events/(.*)', EventList),
                                           ('/event/(.*)', EventDetail),

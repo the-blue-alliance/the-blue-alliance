@@ -1,6 +1,7 @@
 body {
     font-family: arial, helvetica, sans-serif;
     font-size: 12px;
+    overflow-y: scroll;
 }
 
 a {
@@ -39,6 +40,7 @@ span.annotation {
 #headerSpacer{
     margin: 0 auto;
     width: 1000px;
+    padding: 0 15px;
 }
 
 #headerContent {
@@ -77,14 +79,15 @@ span.annotation {
     border: 1px solid gray;
     display: inline-block;
     height: 20px;
-    padding: 1px 2px 1px 6px;
+    padding: 4px 2px 0px 6px;
     width: 240px;
 }
 .textInput input {
     border: 0;
-    font-size: 16px;
+    font-size: 13px;
     font-weight: normal;
-    width: 216px;
+    outline: 0;
+    width: 214px;
 }
 .textInput button {
     background-color: #ffffff;
@@ -97,7 +100,7 @@ span.annotation {
     display: block;
     float: right;
     height: 16px;
-    margin: 2px 0 3px 0;
+    margin: 0px 0 3px 0;
     width: 20px;
 }
 
