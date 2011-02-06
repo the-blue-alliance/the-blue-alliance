@@ -6,13 +6,15 @@
 
 {% block more_head_tags %}
     <meta property="og:title" content="{{event.year}} {{event.name}}" />
-    <meta property="og:type" content="event" />
+    <meta property="og:type" content="article" />
     <meta property="og:url" content="http://thebluealliance.com/event/{{event.key.name}}" />
     <meta property="og:image" content="http://www.thebluealliance.com/images/logo_square_200.png" />
     <meta property="og:description" content="The {{event.year}} {{event.name}} FIRST Robotics Competition in {{event.location}}."/>
     <meta property="og:site_name" content="The Blue Alliance" />
-    {% if event.start_date %}<meta property="og:start-time" content="{{event.start_date|date:"Y-m-d"}}" />{% endif %}
-    {% if event.end_date %}<meta property="og:end-time" content="{{event.end_date|date:"Y-m-d"}}" />{% endif %}
+    <meta property="og:location" content="{{event.location}}" />
+    {% if event.start_date %}<meta property="og:start_time" content="{{event.start_date|date:"Y-m-d"}}" />
+    {% else %}<meta property="og:start_time" content="{{event.year}}" />{% endif %}
+    {% if event.end_date %}<meta property="og:end_time" content="{{event.end_date|date:"Y-m-d"}}" />{% endif %}
     {% if event.venue %}<meta property="og:fn" content="{{event.venue}}" />{% endif %}
 {% endblock %}
 
