@@ -206,6 +206,12 @@ class Match(db.Model):
             return "%s %s" % (self.COMP_LEVELS_VERBOSE[self.comp_level], self.match_number)
         else:
             return "%s %s Match %s" % (self.COMP_LEVELS_VERBOSE[self.comp_level], self.set_number, self.match_number)
+    
+    def has_video(self):
+        if self.tbavideo_set.count() > 0:
+            return True
+        else:
+            return False
 
 
 class TBAVideo(db.Model):

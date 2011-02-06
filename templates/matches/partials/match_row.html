@@ -1,5 +1,6 @@
 {{ match.unpack_json }}
 <tr>
+    <td class="icon">{% if match.has_video %}<img src="/images/icons/video.png" />{% endif %}</td>
     <td><a href="/match/{{match.key.name}}">{{match.verbose_name}}</td>
     <td class="red{% ifequal match.winning_alliance 'red' %} winner{% endifequal %}"><a href="/team/{{ match.alliances.red.teams.0|slice:"3:" }}">{{ match.alliances.red.teams.0|slice:"3:" }}</a></td>
     <td class="red{% ifequal match.winning_alliance 'red' %} winner{% endifequal %}"><a href="/team/{{ match.alliances.red.teams.1|slice:"3:" }}">{{ match.alliances.red.teams.1|slice:"3:" }}</a></td>

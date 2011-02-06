@@ -266,6 +266,11 @@ table.matchTable td.blueScore {
 table.matchTable td.winner {
     font-weight: bold;
 }
+table.matchTable td.icon, table.matchTable th.icon {
+    margin: 0;
+    padding: 3px 0 0 0;
+    font-size: .5em;
+}
 
 ul.infoList {
     
