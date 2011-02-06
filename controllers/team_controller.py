@@ -67,6 +67,8 @@ class TeamDetail(webapp.RequestHandler):
                 participation.append({ 'event' : e,
                                        'matches' : matches })
             
+            team.do_split_address()
+            
             template_values = { "explicit_year": explicit_year,
                                 "team": team,
                                 "participation": participation,

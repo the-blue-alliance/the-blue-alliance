@@ -1,0 +1,48 @@
+{% extends "../base.html" %}
+
+{% block title %}The Blue Alliance - Contact{% endblock %}
+
+{% block meta_description %}How to get in touch with The Blue Alliance.{% endblock %}
+
+{% block leftCol %}
+<img src="/images/logo_square_200.png" width="200" class="profileImg" />
+<ul class="leftNav">
+    <li class="event"><a href="/events/">Events</a></li>
+    <li class="robot"><a href="/teams/">Teams</a></li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div id="contentTop">
+    <h1>Contact Us</h1>
+</div>
+<div id="contentRight">
+    {% include "../base_partials/right_col.html" %}
+</div>
+<div id="contentCenter">
+    <div class="contentBlock">
+        <div class="contentBlockTopper">
+            <h2>Team Name Wrong?</h2>
+        </div>
+        <p>If your team's name or other information is incorrect on The Blue Alliance, please check if it is correct <a href="http://www.usfirst.org/whatsgoingon.aspx">on FIRST's website</a>. We update our records from <a href="https://my.usfirst.org/frc/tims/site.lasso\">FIRST's TIMS system</a> twice per month, and are unable to change your team name to anything other than what is listed there.</p>
+    </div>
+    <div class="contentBlock">
+        <div class="contentBlockTopper">
+            <h2>API Access</h2>
+        </div>
+        <p>The new "dotcom" website brings a new API that doesn't require an API key to use. We're not quite ready to launch it, but please contact us if you are interested in using it.</p>
+    </div>
+    <div class="contentBlock">
+        <div class="contentBlockTopper">
+            <h2>Problem with the site?</h2>
+        </div>
+        <p>Does the site not look quite right in your browser? <a href="https://spreadsheets.google.com/viewform?formkey=dGJFZWRPVV9OX2p0cXVqbWVQSW5UUlE6MQ">Please let us know!</a></p>
+    </div>
+    <div class="contentBlock">
+        <div class="contentBlockTopper">
+            <h2>By email</h2>
+        </div>
+        <p>We can be reached by email at <a href="mailto:contact@thebluealliance.com">contact@thebluealliance.com<a/>.</p>
+    </div>
+</div>
+{% endblock %}
