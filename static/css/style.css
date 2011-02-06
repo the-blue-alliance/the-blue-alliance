@@ -209,6 +209,12 @@ span.annotation {
     margin: .5em 8px .25em 8px;
 }
 
+#fb_like {
+    margin-top: .5em;
+    margin-left: 8px;
+    height: 35px;
+}
+
 table.infoTable {
     margin-left: 8px;
 }

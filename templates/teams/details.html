@@ -2,7 +2,19 @@
 
 {% block title %}{% if team.nickname %}{{team.nickname}} - {% endif %}Team {{team.team_number}}{% if explicit_year %} ({{year}}){% endif %} - The Blue Alliance{% endblock %}
 
-{% block meta_description %}{% if team.address %}From {{team.address}}{% endif %}. Team information, match results, and match videos from the{% if explicit_year %} {{year}}{% endif %} FIRST Robotics Competition.{% endblock %}
+{% block meta_description %}{% if team.address %}From {{team.split_address.full_address}}{% endif %}. Team information, match results, and match videos from the{% if explicit_year %} {{year}}{% endif %} FIRST Robotics Competition.{% endblock %}
+
+{% block more_head_tags %}
+<meta property="og:title" content="Team {{team.team_number}}" />
+<meta property="og:type" content="sports_team" />
+<meta property="og:url" content="http://thebluealliance.com/team/{{team.team_number}}" />
+<meta property="og:image" content="http://www.thebluealliance.com/images/first_logo.png" />
+<meta property="og:description" content="FIRST Robotics Competition team{% if team.address %} from {{team.split_address.full_address}}{% endif %}."/>
+<meta property="og:site_name" content="The Blue Alliance" />
+{% if team.split_address.locality %}<meta property="og:locality" content="{{team.split_address.locality}}" />{% endif %}
+{% if team.split_address.region %}<meta property="og:region" content="{{team.split_address.region}}" />{% endif %}
+{% if team.split_address.country_name %}<meta property="og:country-name" content="{{team.split_address.country_name}}" />{% endif %}
+{% endblock %}
 
 {% block leftCol %}
     <ul class="leftNav">
@@ -32,7 +44,7 @@
         <table class="infoTable">
             {% if team.address %}<tr>
                 <th>Location</th>
-                <td><a href="http://maps.google.com/maps?q={{ team.address }}">{{ team.address }}</a></td>
+                <td><a href="http://maps.google.com/maps?q={{ team.address.pretty }}">{{ team.address.pretty }}</a></td>
             </tr>{% endif %}
             {% if team.name %}<tr>
                 <th>Full Name</th>
@@ -43,6 +55,7 @@
                 <td>{{ team.rookie_year }}</td>
             </tr>{% endif %}
         </table>
+        <div id="fb_like"><fb:like href="http://www.thebluealliance.com/team/{{team.team_number}}" show_faces="false" width="450" ref="team_details"></fb:like></p>
     </div>
     <div id="events" class="contentBlock">
         <div class="contentBlockTopper">
