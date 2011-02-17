@@ -5,7 +5,7 @@ from django.utils import simplejson
 from google.appengine.api import memcache
 from google.appengine.ext import db
 
-from models import Team, Match
+from models import Team, Match, Event
 from helpers.match_helper import MatchHelper
 
 class ApiHelper(object):
@@ -13,7 +13,7 @@ class ApiHelper(object):
     @classmethod
     def getTeamInfo(self, team_key):
         """
-        Return a Team object with basic information.
+        Return a Team dict with basic information.
         """
         memcache_key = "api_team_info_%s" % team_key
         team_dict = memcache.get(memcache_key)
@@ -25,13 +25,76 @@ class ApiHelper(object):
                 team_dict["team_number"] = team.team_number
                 team_dict["name"] = team.name
                 team_dict["nickname"] = team.nickname
-                team_dict["location"] = team.address
                 team_dict["website"] = team.website
-                team_dict["events"] = [a.event.key().name() for a in team.events]
+                team_dict["event_keys"] = [a.event.key().name() for a in team.events]
+                team_dict["location"] = team.address
+                
+                try:
+                    team.do_split_address()
+                    team_dict["location"] = team.split_address["full_address"]
+                    team_dict["locality"] = team.split_address["locality"]
+                    team_dict["region"] = team.split_address["region"]
+                    team_dict["country"] = team.split_address["country"]
+                except Exception, e:
+                    logging.error("Failed to include Address for api_team_info_%s" % team_key)
                 
                 memcache.set(memcache_key, team_dict, 3600)
             else:
                 return None
+        return team_dict
+    
+    
+    @classmethod
+    def getEventInfo(self, event_key):
+        """
+        Return an Event dict with basic information
+        """
+        
+        memcache_key = "api_event_info_%s" % event_key
+        event_dict = memcache.get(memcache_key)
+        if event_dict is None:
+            event = Event.get_by_key_name(event_key)
+            if event is not None:
+                event_dict = dict()
+                event_dict["key"] = event.key().name()
+                event_dict["year"] = event.year
+                event_dict["event_code"] = event.event_short
+                event_dict["name"] = event.name
+                event_dict["short_name"] = event.short_name
+                event_dict["location"] = event.location
+                event_dict["official"] = event.official
+                event_dict["facebook_eid"] = event.facebook_eid
+
+                if event.start_date:
+                    event_dict["start_date"] = event.start_date.isoformat()
+                else:
+                    event_dict["start_date"] = None
+                if event.end_date:
+                    event_dict["end_date"] = event.end_date.isoformat()
+                else:
+                    event_dict["end_date"] = None
+                
+                event_dict["teams"] = [a.team.key().name() for a in event.teams]
+                event_dict["matches"] = [a.key().name() for a in event.match_set]
+                
+                memcache.set(memcache_key, event_dict, 300)
+        return event_dict
+    
+    
+    @classmethod
+    def addTeamEvents(self, team_dict, year):
+        """
+        Consume a Team dict, and return it with a year's Events.
+        """
+        memcache_key = "api_team_events_%s_%s" % (team_dict["key"], year)
+        event_list = memcache.get(memcache_key)
+        
+        if event_list is None:
+            team = Team.get_by_key_name(team_dict["key"])
+            event_list = [self.getEventInfo(e.key().name()) for e in [a.event for a in team.events if a.year == int(year)]]
+            memcache.set(memcache_key, event_list, 600)
+        
+        team_dict["events"] = event_list
         return team_dict
 
     @classmethod

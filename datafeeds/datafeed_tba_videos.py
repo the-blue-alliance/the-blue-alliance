@@ -41,8 +41,12 @@ class DatafeedTbaVideos(object):
         matches = event.match_set
         match_dict = dict()
         match_filetypes = dict()
-        for match in matches:
-            match_dict.setdefault(match.key().name()[4:], match)
+        
+        try:
+            for match in matches:
+                match_dict.setdefault(match.key().name()[4:], match)
+        except Exception, e:
+            logging.error("Malformed match in Event %s" % event.key().name())
         
         for a in soup.findAll("a", href=True):
             parts = a["href"].split(".")
