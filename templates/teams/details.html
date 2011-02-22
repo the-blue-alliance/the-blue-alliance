@@ -44,7 +44,7 @@
         <table class="infoTable">
             {% if team.address %}<tr>
                 <th>Location</th>
-                <td><a href="http://maps.google.com/maps?q={{ team.address.pretty }}">{{ team.address.pretty }}</a></td>
+                <td><a href="http://maps.google.com/maps?q={{ team.split_address.full_address }}">{{ team.split_address.full_address }}</a></td>
             </tr>{% endif %}
             {% if team.name %}<tr>
                 <th>Full Name</th>
@@ -53,6 +53,10 @@
             {% if team.rookie_year %}<tr>
                 <th>Rookie Year</th>
                 <td>{{ team.rookie_year }}</td>
+            </tr>{% endif %}
+            {% if year_wlt %}<tr>
+                <th>{{year}} Record</th>
+                <td>({{year_wlt.win}}-{{year_wlt.loss}}-{{year_wlt.tie}})</td>
             </tr>{% endif %}
         </table>
         <div id="fb_like"><fb:like href="http://www.thebluealliance.com/team/{{team.team_number}}" show_faces="false" width="450" ref="team_details"></fb:like></p>
@@ -68,7 +72,7 @@
             <ul class="infoList">
                 <li>
                     <h3><a href="/event/{{comp.event.key.name}}">{{ comp.event.name }} <span class="annotation">{{ comp.event.location }}</span></a></h3>
-                    <p>{{ event.start_date|date:"M d, Y" }}</p>
+                    {% if comp.wlt %}<p>Team {{team.team_number}} was ({{comp.wlt.win}}-{{comp.wlt.loss}}-{{comp.wlt.tie}}).{{ comp.event.start_date|date:"M d, Y" }}.</p>{% endif %}
                 </li>
             </ul>
             {% if comp.matches.num %}
@@ -117,7 +121,7 @@
                 {% endif %}
             </table>
             {% else %}
-            <p>No matches yet.</p>
+            <p>No matches yet. Check back after {{ comp.event.start_date|date:"M d, Y" }}.</p>
             {% endif %}
         {% endfor %}
     </div>

@@ -2,7 +2,38 @@ import logging
 
 from google.appengine.ext import db
 
-from models import Event
+from models import Event, Match
+
+class EventHelper(object):
+    """
+    Helper class for Events.
+    """
+    
+    @classmethod
+    def getTeamWLTFromMatches(self, team_key, matches):
+        """
+        Given a team_key and some matches, find the Win Loss Tie.
+        """
+        wlt = {"win": 0, "loss": 0, "tie": 0}
+        for match in matches:
+            match.unpack_json()
+            if match.has_been_played():
+                if match.winning_alliance == "":
+                    wlt["tie"] += 1
+                elif team_key in match.alliances[match.winning_alliance]["teams"]:
+                    wlt["win"] += 1
+                else:
+                    wlt["loss"] += 1
+        return wlt
+    
+    @classmethod
+    def getTeamWLT(self, team_key, event_key):
+        """
+        Given a team_key, and an event_key, find the Win Loss Tie.
+        """
+        event = Event.get_by_key_name(event_key)
+        matches = event.match_set.filter("team_key_names =", team_key)
+        return self.getTeamWLTFromMatches(team_key, matches)
 
 class EventUpdater(object):
     """

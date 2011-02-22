@@ -83,10 +83,11 @@ span.annotation {
     width: 240px;
 }
 .textInput input {
-    border: 0;
+    border: 0 !important;
     font-size: 13px;
     font-weight: normal;
     outline: 0;
+    padding: 0 !important;
     width: 214px;
 }
 .textInput button {
@@ -224,6 +225,7 @@ table.infoTable tr {
 table.infoTable th {
     font-weight: bold;
     padding-right: 1em;
+    min-width: 75px;
 }
 
 table.matchTable {

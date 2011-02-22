@@ -190,6 +190,13 @@ class Match(db.Model):
         # something under .alliances., right? -gregmarra 17 Oct 2010
         return ""
     
+    def has_been_played(self):
+        """If there are scores, it's been played"""
+        for alliance in self.alliances:
+            if self.alliances[alliance]["score"] is not None:
+                return True
+        return False
+    
     def get_winning_alliance(self):
         highest_score = 0
         winner = ""

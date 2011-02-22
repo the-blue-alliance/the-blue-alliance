@@ -6,6 +6,7 @@ from google.appengine.api import memcache
 from google.appengine.ext import db
 
 from models import Team, Match, Event
+from helpers.event_helper import EventHelper
 from helpers.match_helper import MatchHelper
 
 class ApiHelper(object):
@@ -92,6 +93,8 @@ class ApiHelper(object):
         if event_list is None:
             team = Team.get_by_key_name(team_dict["key"])
             event_list = [self.getEventInfo(e.key().name()) for e in [a.event for a in team.events if a.year == int(year)]]
+            for event_dict in event_list:
+                event_dict["team_wlt"] = EventHelper.getTeamWLT(team_dict["key"], event_dict["key"])
             memcache.set(memcache_key, event_list, 600)
         
         team_dict["events"] = event_list

@@ -6,6 +6,7 @@ from google.appengine.api import memcache
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
 
+from helpers.event_helper import EventHelper
 from helpers.match_helper import MatchHelper
 from models import EventTeam, Team
 
@@ -61,19 +62,36 @@ class TeamDetail(webapp.RequestHandler):
             
             # Return an array of event names and a list of matches from that event that the
             # team was a participant in.
+            year_wlt_list = list()
             for e in events:
                 match_list = e.match_set.filter("team_key_names =", team.key().name())
                 matches = MatchHelper.organizeMatches(match_list)
+                wlt = EventHelper.getTeamWLTFromMatches(team.key().name(), match_list)
+                year_wlt_list.append(wlt)
+                if wlt["win"] + wlt["loss"] + wlt["tie"] == 0:
+                    display_wlt = None
+                else:
+                    display_wlt = wlt
                 participation.append({ 'event' : e,
-                                       'matches' : matches })
+                                       'matches' : matches,
+                                       'wlt': display_wlt })
             
             team.do_split_address()
+            
+            year_wlt = {"win": 0, "loss": 0, "tie": 0}
+            for wlt in year_wlt_list:
+                year_wlt["win"] += wlt["win"]
+                year_wlt["loss"] += wlt["loss"]
+                year_wlt["tie"] += wlt["tie"]
+            if year_wlt["win"] + year_wlt["loss"] + year_wlt["tie"] == 0:
+                year_wlt = None
             
             template_values = { "explicit_year": explicit_year,
                                 "team": team,
                                 "participation": participation,
                                 "year": year,
-                                "years": years, }
+                                "years": years,
+                                "year_wlt": year_wlt }
             
             path = os.path.join(os.path.dirname(__file__), '../templates/teams/details.html')
             html = template.render(path, template_values)
