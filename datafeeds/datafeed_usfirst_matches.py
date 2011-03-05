@@ -75,9 +75,16 @@ class DatafeedUsfirstMatches(object):
                     red_teams = ["frc" + tds[2].string, "frc" + tds[3].string, "frc" + tds[4].string]
                     blue_teams = ["frc" + tds[5].string, "frc" + tds[6].string, "frc" + tds[7].string]
                     
-                    red_score = int(tds[8].string)
-                    blue_score = int(tds[9].string)
+                    if tds[8].string == None:
+                        red_score = -1
+                    else:
+                        red_score = int(tds[8].string)
                     
+                    if tds[9].string == None:
+                        blue_score = -1
+                    else:
+                        blue_score = int(tds[9].string)
+
                     try:
                         comp_level = "qm"
                         set_number = 1
