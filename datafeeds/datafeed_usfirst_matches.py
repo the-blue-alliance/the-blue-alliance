@@ -126,8 +126,15 @@ class DatafeedUsfirstMatches(object):
                     red_teams = ["frc" + tds[3].string, "frc" + tds[4].string, "frc" + tds[5].string]
                     blue_teams = ["frc" + tds[6].string, "frc" + tds[7].string, "frc" + tds[8].string]
                     
-                    red_score = int(tds[9].string)
-                    blue_score = int(tds[10].string)
+                    if tds[9].string == None:
+                        red_score = -1
+                    else:
+                        red_score = int(tds[9].string)
+                    
+                    if tds[10].string == None:
+                        blue_score = -1
+                    else:
+                        blue_score = int(tds[10].string)
                     
                     try:
                         match_number_info = self.parseElimMatchNumberInfo(tds[1].string)
