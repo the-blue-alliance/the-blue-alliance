@@ -72,7 +72,7 @@
             <ul class="infoList">
                 <li>
                     <h3><a href="/event/{{comp.event.key.name}}">{{ comp.event.name }} <span class="annotation">{{ comp.event.location }}</span></a></h3>
-                    {% if comp.wlt %}<p>Team {{team.team_number}} was ({{comp.wlt.win}}-{{comp.wlt.loss}}-{{comp.wlt.tie}}).{{ comp.event.start_date|date:"M d, Y" }}.</p>{% endif %}
+                    {% if comp.wlt %}<p>Team {{team.team_number}} was ({{comp.wlt.win}}-{{comp.wlt.loss}}-{{comp.wlt.tie}}). {{ comp.event.start_date|date:"M d, Y" }}.</p>{% endif %}
                 </li>
             </ul>
             {% if comp.matches.num %}
