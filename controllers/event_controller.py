@@ -76,43 +76,37 @@ class EventDetail(webapp.RequestHandler):
 
 class EventRss(webapp.RequestHandler):
     """
-    Feed!
+    Generates a RSS feed for the matches in a event
+    Created by: @brandondean, github.com/brandondean
     """
-    def get(self, event_code):
-          year = event_code[0:4]
-          event_short = event_code[4:]
-
-          event = Event.get_by_key_name(year + event_short)
+    def get(self, event_key):
+          event = Event.get_by_key_name(event_key)
           matches = MatchHelper.organizeMatches(event.match_set)
           
-          ["qm", "ef", "qf", "sf", "f"]
           rss_items = []
-          for match in matches['qm'] + matches['ef'] + matches['qf'] + matches['sf'] + matches['f']:
+          
+          # Loop through and generate RSS items for each match
+          for match in matches['f'] + matches['sf'] + matches['qf'] + matches['ef'] + matches['qm']:
               match.unpack_json()
               new_item = PyRSS2Gen.RSSItem(
                   title = str(match.verbose_name()),
                   link = 'http://www.thebluealliance.com/match/' + match.get_key_name() + '',
                   
-                  # This seems really sad to me. There has to be a better way of doing this, but I no idea what that
-                  # might look like. Please, if you know, make the changes ASAP.
-                  # FIXME: meh. -- @brandondean 10 March 2011
-                  description = "Red Alliance: " + str().join(match.alliances["red"]["teams"][0]) + " "
-                                + str().join(match.alliances["red"]["teams"][1]) + " "
-                                + str().join(match.alliances["red"]["teams"][2]) + " "
+                  # List the red and blue alliance teams and their score
+                  description = "Red Alliance: " + ' '.join(match.alliances["red"]["teams"]) + " "
                                 + "Score: " + str(match.alliances["red"]["score"]) + " "
-                                + "Blue Alliance: " + str().join(match.alliances["blue"]["teams"][0]) + " " 
-                                + str().join(match.alliances["blue"]["teams"][1]) + " "
-                                + str().join(match.alliances["blue"]["teams"][2]) + " "
-                                + "Score: " + str(match.alliances["blue"]["score"]) + " "
+                                + "Blue Alliance: " + ' '.join(match.alliances["blue"]["teams"]) + " "
+                                + "Score: " + str(match.alliances["blue"]["score"])
 
               )
           
               rss_items.append(new_item)
           
+          # Create finale rss document
           rss = PyRSS2Gen.RSS2(
-              title = event.name + "-- " + str(event.short_name),
+              title = event.name + "-- " + str(event.year),
               link = 'http://www.thebluealliance.com/event/' + str(event.get_key_name()) + '',
-              description = "RSS feed provided by " + event.name + " by The Blue Alliance." ,
+              description = "RSS feed for the " + event.name + " provided by The Blue Alliance." ,
 
               lastBuildDate = datetime.datetime.now(),
               
