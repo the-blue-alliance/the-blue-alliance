@@ -168,6 +168,7 @@ class UsfirstMatchesGetEnqueue(webapp.RequestHandler):
         events = Event.all()
         events.filter('official =', True)
         events.filter('year =', int(self.request.get('year')))
+        # TODO: Filter for "currently happening" -gregmarra 11 Mar 2011
         
         try:
             if self.request.get('year') is not None:
@@ -175,11 +176,19 @@ class UsfirstMatchesGetEnqueue(webapp.RequestHandler):
         except Exception, detail:
             logging.error('Getting Year Failed: ' + str(detail))
             
-        for event in events.fetch(100):
+        events = events.fetch(500)
+        for event in events:
             logging.info(event)
             taskqueue.add(
                 url='/tasks/usfirst_matches_get/' + event.key().name(),
                 method='GET')
+        
+        template_values = {
+            'event_count': len(events),
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_matches_get_enqueue.html')
+        self.response.out.write(template.render(path, template_values))
 
 
 class UsfirstMatchesGet(webapp.RequestHandler):
