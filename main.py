@@ -8,7 +8,7 @@ from google.appengine.ext.webapp import template, util
 
 from controllers.main_controller import MainHandler, ContactHandler, ThanksHandler, SearchHandler
 
-from controllers.event_controller import EventList, EventDetail
+from controllers.event_controller import EventList, EventDetail, EventRss
 from controllers.match_controller import MatchList, MatchDetail
 from controllers.team_controller import TeamList, TeamDetail
 
@@ -17,6 +17,7 @@ def main():
                                           ('/contact', ContactHandler),
                                           ('/events', EventList),
                                           ('/events/(.*)', EventList),
+                                          ('/event/feed/(.*)', EventRss),
                                           ('/event/(.*)', EventDetail),
                                           ('/match/list', MatchList),
                                           ('/match/(.*)', MatchDetail),
