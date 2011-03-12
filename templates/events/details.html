@@ -66,7 +66,7 @@
     </div>
     <div id="matches" class="contentBlock">
         <div class="contentBlockTopper">
-            <h2>{% if matches.num %}{{matches.num}} {% endif %}Match{{matches.num|pluralize:"es"}}  <a href="http://www.thebluealliance.com/event/feed/{{ event.get_key_name }}">RSS</a></h2>
+            <h2>{% if matches.num %}{{matches.num}} {% endif %}Match{{matches.num|pluralize:"es"}} - (<a href="http://www.thebluealliance.com/event/{{ event.get_key_name }}/feed">rss</a>)</h2>
         </div>
         {% if matches.num %}
         <table class="matchTable">

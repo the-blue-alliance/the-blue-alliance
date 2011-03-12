@@ -49,16 +49,12 @@ class EventDetail(webapp.RequestHandler):
     Show an Event.
     event_code like "2010ct"
     """
-    def get(self, event_code):
-        
-        memcache_key = "event_detail_%s" % event_code
+    def get(self, event_key):
+        memcache_key = "event_detail_%s" % event_key
         html = memcache.get(memcache_key)
         
         if html is None:
-            year = event_code[0:4]
-            event_short = event_code[4:]
-        
-            event = Event.get_by_key_name(year + event_short)
+            event = Event.get_by_key_name(event_key)
             matches = MatchHelper.organizeMatches(event.match_set)
             teams = TeamHelper.sortTeams([a.team for a in event.teams])
         
@@ -80,38 +76,40 @@ class EventRss(webapp.RequestHandler):
     Created by: @brandondean, github.com/brandondean
     """
     def get(self, event_key):
-          event = Event.get_by_key_name(event_key)
-          matches = MatchHelper.organizeMatches(event.match_set)
-          
-          rss_items = []
-          
-          # Loop through and generate RSS items for each match
-          for match in matches['f'] + matches['sf'] + matches['qf'] + matches['ef'] + matches['qm']:
-              match.unpack_json()
-              new_item = PyRSS2Gen.RSSItem(
-                  title = str(match.verbose_name()),
-                  link = 'http://www.thebluealliance.com/match/' + match.get_key_name() + '',
-                  
-                  # List the red and blue alliance teams and their score
-                  description = "Red Alliance: " + ' '.join(match.alliances["red"]["teams"]) + " "
-                                + "Score: " + str(match.alliances["red"]["score"]) + " "
-                                + "Blue Alliance: " + ' '.join(match.alliances["blue"]["teams"]) + " "
-                                + "Score: " + str(match.alliances["blue"]["score"])
-
-              )
-          
-              rss_items.append(new_item)
-          
-          # Create finale rss document
-          rss = PyRSS2Gen.RSS2(
-              title = event.name + "-- " + str(event.year),
-              link = 'http://www.thebluealliance.com/event/' + str(event.get_key_name()) + '',
-              description = "RSS feed for the " + event.name + " provided by The Blue Alliance." ,
-
-              lastBuildDate = datetime.datetime.now(),
-              
-              items = rss_items
-          )
-          
-          
-          self.response.out.write(rss.to_xml())
+        memcache_key = "event_rss_%s" % event_key
+        html = memcache.get(memcache_key)
+        
+        if html is None:
+            event = Event.get_by_key_name(event_key)
+            matches = MatchHelper.organizeMatches(event.match_set)
+            
+            rss_items = []
+            # Loop through and generate RSS items for each match
+            for match in matches['f'] + matches['sf'] + matches['qf'] + matches['ef'] + matches['qm']:
+                match.unpack_json()
+                new_item = PyRSS2Gen.RSSItem(
+                    title = str(match.verbose_name()),
+                    link = 'http://www.thebluealliance.com/match/' + match.get_key_name() + '',
+                    
+                    # List the red and blue alliance teams and their score
+                    # TODO: Make this generic in case there's ever not just red/blue -gregmarra 12 Mar 2011
+                    description = "Red Alliance: " + ' '.join(match.alliances["red"]["teams"]) + " "
+                                  + "Score: " + str(match.alliances["red"]["score"]) + " "
+                                  + "Blue Alliance: " + ' '.join(match.alliances["blue"]["teams"]) + " "
+                                  + "Score: " + str(match.alliances["blue"]["score"])
+         
+                )
+                rss_items.append(new_item)
+            
+            # Create final rss document
+            rss = PyRSS2Gen.RSS2(
+                title = event.name + "-- " + str(event.year),
+                link = 'http://www.thebluealliance.com/event/' + str(event.get_key_name()) + '',
+                description = "RSS feed for the " + event.name + " provided by The Blue Alliance." ,
+                lastBuildDate = datetime.datetime.now(),
+                items = rss_items
+            )
+            html = rss.to_xml()
+            memcache.set(memcache_key, html, 300)
+        
+        self.response.out.write(html)
