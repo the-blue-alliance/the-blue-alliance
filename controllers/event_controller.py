@@ -93,6 +93,8 @@ class EventRss(webapp.RequestHandler):
                     
                     # List the red and blue alliance teams and their score
                     # TODO: Make this generic in case there's ever not just red/blue -gregmarra 12 Mar 2011
+                    # TODO: Make this output format something either very machine or very human readable.
+                    # Probably opt for human, since machines should be using the API. -gregmarra 12 Mar 2011
                     description = "Red Alliance: " + ' '.join(match.alliances["red"]["teams"]) + " "
                                   + "Score: " + str(match.alliances["red"]["score"]) + " "
                                   + "Blue Alliance: " + ' '.join(match.alliances["blue"]["teams"]) + " "
