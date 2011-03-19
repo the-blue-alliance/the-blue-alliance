@@ -1,8 +1,11 @@
 import os
+import logging
 
 from google.appengine.api import memcache
-from google.appengine.ext import webapp
+from google.appengine.ext import db, webapp
 from google.appengine.ext.webapp import template, util
+
+from models import Team
 
 def render_static(page):
     memcache_key = "main_%s" % page
@@ -29,4 +32,18 @@ class ThanksHandler(webapp.RequestHandler):
 
 class SearchHandler(webapp.RequestHandler):
     def get(self):
-        self.response.out.write(render_static("search"))
+        try:
+            q = self.request.get("q")
+            logging.info("search query: %s" % q)
+            if q.isdigit():
+                team_key_name = "frc%s" % q
+                team = Team.get_by_key_name(team_key_name)
+                if team:
+                    self.redirect(team.details_url())
+                    return None
+        except Exception, e:
+            logging.warning("warning: %s" % e)
+        finally:
+            self.response.out.write(render_static("search"))
+
+

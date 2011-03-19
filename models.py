@@ -39,6 +39,9 @@ class Team(db.Model):
             self.split_address = address_dict
         except Exception, e:
             logging.warning("Error on team.do_split_address: %s", e)
+     
+    def details_url(self):
+        return "/team/%s" % self.team_number
 
 class Event(db.Model):
     """
@@ -71,6 +74,9 @@ class Event(db.Model):
         Return a string of the Facebook Event URL.
         """
         return "http://www.facebook.com/event.php?eid=%s" % self.facebook_eid
+    
+    def details_url(self):
+        return "/event/%s" % self.get_key_name()
 
 
 class EventTeam(db.Model):
@@ -219,6 +225,9 @@ class Match(db.Model):
             return True
         else:
             return False
+    
+    def details_url(self):
+        return "/match/%s" % self.get_key_name()
 
 
 class TBAVideo(db.Model):
