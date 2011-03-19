@@ -231,7 +231,7 @@ class TBAVideo(db.Model):
     match = db.ReferenceProperty(Match, required=True)
     filetypes = db.StringListProperty() # ["mp4", "flv", "wmv"] etc
     
-    TBA_NET_VID_PATTERN = "http://www.thebluealliance.net/tbatv/vids/%s/%s.%s"
+    TBA_NET_VID_PATTERN = "http://videos.thebluealliance.com/%s/%s.%s"
     
     THUMBNAIL_FILETYPES = ["jpg", "jpeg"]
     STREAMABLE_FILETYPES = ["mp4", "flv"]
@@ -250,7 +250,7 @@ class TBAVideo(db.Model):
     def getBestPathOf(self, consider_filetypes):
         for filetype in consider_filetypes:
             if filetype in self.filetypes:
-                return self.TBA_NET_VID_PATTERN % (self.match.event.key().name()[2:], self.match.key().name()[4:], filetype)
+                return self.TBA_NET_VID_PATTERN % (self.match.event.key().name(), self.match.key().name(), filetype)
         return None
 
 
