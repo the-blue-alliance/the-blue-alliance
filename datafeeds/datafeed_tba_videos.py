@@ -14,7 +14,7 @@ class DatafeedTbaVideos(object):
     Facilitates building TBAVideos store from TBA.
     """
     
-    TBA_VIDS_DIR_URL_PATTERN = "http://thebluealliance.net/tbatv/vids/%s/"
+    TBA_VIDS_DIR_URL_PATTERN = "http://videos.thebluealliance.com/%s/"
     
     def getEventVideosList(self, event):
         """
@@ -22,7 +22,7 @@ class DatafeedTbaVideos(object):
         """
         
         logging.info("Retreiving Videos for " + event.key().name())
-        url = self.TBA_VIDS_DIR_URL_PATTERN % (event.key().name()[2:])
+        url = self.TBA_VIDS_DIR_URL_PATTERN % (event.key().name())
         result = urlfetch.fetch(url)
         if result.status_code == 200:
             return self.parseEventVideos(result.content, event)
@@ -44,7 +44,7 @@ class DatafeedTbaVideos(object):
         
         try:
             for match in matches:
-                match_dict.setdefault(match.key().name()[4:], match)
+                match_dict.setdefault(match.key().name(), match)
         except Exception, e:
             logging.error("Malformed match in Event %s" % event.key().name())
         
@@ -60,7 +60,7 @@ class DatafeedTbaVideos(object):
                 match_filetypes.setdefault(key, list())
                 match_filetypes[key].append(filetype)
             else:
-                logging.info("Unexpected match: " + a["href"])
+                logging.info("Unexpected match: " + key)
         
         tbavideos = list()
         
