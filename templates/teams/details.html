@@ -1,4 +1,4 @@
-{% extends "../base.html" %}
+{% extends "base.html" %}
 
 {% block title %}{% if team.nickname %}{{team.nickname}} - {% endif %}Team {{team.team_number}}{% if explicit_year %} ({{year}}){% endif %} - The Blue Alliance{% endblock %}
 
@@ -34,7 +34,7 @@
     {% if team.website %}<p><a href="{{ team.website }}" title="{{ team.nickname }}">{{ team.website }}</a></p>{% endif %}
 </div>
 <div id="contentRight">
-    {% include "../base_partials/right_col.html" %}
+    {% include "base_partials/right_col.html" %}
 </div>
 <div id="contentCenter">
     <div id="info" class="contentBlock">
@@ -88,35 +88,35 @@
                 {% if comp.matches.qm %}
                     <tr class="key"><th colspan="10">Qualifications</th></tr>
                     {% for match in comp.matches.qm %}
-                        {% include "../matches/partials/match_row.html" %}
+                        {% include "matches/partials/match_row.html" %}
                     {% endfor %}
                 {% endif %}
 
                 {% if comp.matches.ef %}
                     <tr class="key"><th colspan="10">Eighth Finals</th></tr>
                     {% for match in comp.matches.ef %}
-                        {% include "../matches/partials/match_row.html" %}
+                        {% include "matches/partials/match_row.html" %}
                     {% endfor %}
                 {% endif %}
 
                 {% if comp.matches.qf %}
                     <tr class="key"><th colspan="10">Quarterfinals</th></tr>
                     {% for match in comp.matches.qf %}
-                        {% include "../matches/partials/match_row.html" %}
+                        {% include "matches/partials/match_row.html" %}
                     {% endfor %}
                 {% endif %}
 
                 {% if comp.matches.sf %}
                     <tr class="key"><th colspan="10">Semifinals</th></tr>
                     {% for match in comp.matches.sf %}
-                        {% include "../matches/partials/match_row.html" %}
+                        {% include "matches/partials/match_row.html" %}
                     {% endfor %}
                 {% endif %}
 
                 {% if comp.matches.f %}
                     <tr class="key"><th colspan="10">Finals</th></tr>
                     {% for match in comp.matches.f %}
-                        {% include "../matches/partials/match_row.html" %}
+                        {% include "matches/partials/match_row.html" %}
                     {% endfor %}
                 {% endif %}
             </table>

@@ -1,4 +1,4 @@
-{% extends "../base.html" %}
+{% extends "base.html" %}
 
 {% block title %}{{match.verbose_name}} - {{match.event.year}} {{match.event.name}} - The Blue Alliance{% endblock %}
 
@@ -28,7 +28,7 @@
     <h1>{{match.verbose_name}} <span class="annotation"><a href="/event/{{match.event.key.name}}">{{ match.event.year }} {{ match.event.name }}</span></a></h1>
 </div>
 <div id="contentRight">
-    {% include "../base_partials/right_col.html" %}
+    {% include "base_partials/right_col.html" %}
 </div>
 <div id="contentCenter">
     <div id="info" class="contentBlock">
@@ -55,7 +55,7 @@
             <h2>Video</h2>
         </div>
         {% if tbavideo %}
-            {% include "../videos/partials/tbavideo_player.html" %}
+            {% include "videos/partials/tbavideo_player.html" %}
         {% else %}
             <h4>No Video Available.</h4>
         {% endif %}
