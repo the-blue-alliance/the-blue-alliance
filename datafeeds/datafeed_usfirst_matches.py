@@ -168,11 +168,13 @@ class DatafeedUsfirstMatches(object):
                             alliances_json = simplejson.dumps(alliances)
                         )
                         
-                        matches.append(match)
+                        # Don't write down uncompleted elimination matches
+                        if (red_score > -1 and blue_score > -1):
+                            matches.append(match)
                         
                     except Exception, detail:
                         logging.error('Match Parse Failed: ' + str(detail))
-            
+        
         return matches
     
     

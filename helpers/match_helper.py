@@ -16,6 +16,11 @@ class MatchHelper(object):
         # todo: abstract this so we can use it in the team view.
         # todo: figure out how slow this is
         [match.unpack_json() for match in match_list]
+        
+        # Cleanup invalid. This does database calls. This is a wildly inappropriate place
+        # to be doing this. -gregmarra
+        match_list = filter(None, [MatchHelper.cleanUpIfInvalidMatch(match) for match in match_list])
+        
         matches = dict([(comp_level, list()) for comp_level in Match.COMP_LEVELS])
         matches["num"] = len(match_list)
         while len(match_list) > 0:
@@ -23,6 +28,28 @@ class MatchHelper(object):
             matches[match.comp_level].append(match)
         
         return matches
+    
+    @classmethod
+    def cleanUpIfInvalidMatch(self, match):
+        invalid = MatchHelper.isIncompleteElim(match)
+        if invalid:
+            #MatchUpdater.delete(match)
+            logging.warning("Deleting invalid match: %s" % match.key().name())
+            return None
+        else:
+            return match
+    
+    @classmethod
+    def isIncompleteElim(self, match):
+        if match.comp_level not in set(["ef", "qf", "sf", "f"]):
+            return False
+        
+        for alliance in match.alliances:
+            if match.alliances[alliance]["score"] > -1:
+                return False
+        
+        # No alliances had non-zero scores
+        return True
 
 class MatchUpdater(object):
     """
