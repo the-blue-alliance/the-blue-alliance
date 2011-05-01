@@ -8,10 +8,14 @@
     <meta property="og:title" content="{{match.verbose_name}} - {{match.event.year}} {{match.event.name}}" />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="http://thebluealliance.com/match/{{match.key.name}}" />
-    <meta property="og:image" content="http://www.thebluealliance.com/images/logo_square_200.png" />
+    {% if tbavideo.getThumbnailPath %}
+        <meta property="og:image" content="{{tbavideo.getThumbnailPath}}" />
+    {% else %}
+        <meta property="og:image" content="http://www.thebluealliance.com/images/logo_square_200.png" />
+    {% endif %}
     <meta property="og:description" content="{{match.verbose_name}} at the {{match.event.year}} {{match.event.name}} FIRST Robotics Competition in {{match.event.location}}."/>
     <meta property="og:site_name" content="The Blue Alliance" />
-    {% if tbavideo.getStreamablePath %}<meta property="og:video" content="{{ tbavideo.getStreamablePath }}">{% endif %}
+    {% if tbavideo.getStreamablePath %}<meta property="og:video" content="{{ tbavideo.getStreamablePath }}" />{% endif %}
 {% endblock %}
 
 {% block leftCol %}
