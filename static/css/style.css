@@ -185,7 +185,7 @@ span.annotation {
 
 .contentBlock {
     display: block;
-    margin-bottom: 1.5em;
+    margin-bottom: .5em;
 }
 .contentBlock .contentBlockTopper {
     border-top: 2px solid #cccccc;

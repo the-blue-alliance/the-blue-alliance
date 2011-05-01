@@ -53,12 +53,20 @@
     <div id="video" class="contentBlock">
         <div class="contentBlockTopper">
             <h2>Video</h2>
+            {% if tbavideo %}<p><a href="{{tbavideo.getDownloadablePath}}" title="Video of {{match.verbose_name}} - {{match.event.year}} {{match.event.name}}">Download</a></p>{% endif %}
         </div>
         {% if tbavideo %}
             {% include "videos/partials/tbavideo_player.html" %}
         {% else %}
-            <h4>No Video Available.</h4>
+            <p>No video available. Have one? <a href="/contact">Contact us!</a></p>
         {% endif %}
+        <p style="margin-top: .5em"><fb:like href="http://www.thebluealliance.com/event/{{event.key.name}}" show_faces="false" width="450" ref="match_details"></fb:like></p>
+    </div>
+    <div id="comments" class="contentBlock">
+        <div class="contentBlockTopper">
+            <h2>Comments</h2>
+        </div>
+        <fb:comments href="www.thebluealliance.com/match/{{match.key.name}}" num_posts="4" width="500"></fb:comments>
     </div>
     <!--<div id="debug" class="contentBlock">
         <div class="contentBlockTopper">
