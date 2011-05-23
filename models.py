@@ -259,7 +259,9 @@ class TBAVideo(db.Model):
     def getBestPathOf(self, consider_filetypes):
         for filetype in consider_filetypes:
             if filetype in self.filetypes:
-                return self.TBA_NET_VID_PATTERN % (self.match.event.key().name(), self.match.key().name(), filetype)
+                # Note: match.get_key_name() doesn't always return the match.key().name()
+                # because of things like malformed Championship Field names. -gregmarra 22 May 2011
+                return self.TBA_NET_VID_PATTERN % (self.match.event.key().name(), self.match.get_key_name(), filetype)
         return None
 
 
