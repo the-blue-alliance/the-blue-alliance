@@ -110,14 +110,25 @@ class UsfirstEventGetEnqueue(webapp.RequestHandler):
     Handles enqueing updates to individual USFIRST events.
     """
     def get(self):
+        year = 2011 #Just this year #FIXME: Do this right
         events = Event.all()
         events.filter('first_eid != ', None) # Official events with EIDs
-        events.filter('year =', 2010) #Just this year #FIXME: Do this right
+        events.filter('year =', year) 
         
+        count = 0
         for event in events.fetch(100):
             taskqueue.add(
                 url='/tasks/usfirst_event_get/' + event.first_eid, 
                 method='GET')
+            count += 1
+        
+        template_values = {
+            'event_count': count,
+            'year': year,
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_events_get_enqueue.html')
+        self.response.out.write(template.render(path, template_values))
 
 
 class UsfirstEventGet(webapp.RequestHandler):
@@ -286,9 +297,8 @@ class UsfirstTeamGet(webapp.RequestHandler):
         df = DatafeedUsfirstTeams()
         
         old_team = Team.get_by_key_name(key_name)
-        
-        logging.info("Updating team " + str(old_team.team_number))
-        new_team = df.getTeamDetails(old_team.team_number)
+        logging.info("Updating team %s" % key_name)
+        new_team = df.getTeamDetails(old_team.team_number) #TODO old team can be null -gregmarra 21 mar 2011
         team = TeamUpdater.createOrUpdate(new_team)
         
         template_values = {

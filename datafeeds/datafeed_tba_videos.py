@@ -44,7 +44,9 @@ class DatafeedTbaVideos(object):
         
         try:
             for match in matches:
-                match_dict.setdefault(match.key().name(), match)
+                # Note: get_key_name() doesn't always return the key().name()
+                # because of things like malformed Championship Field names. -gregmarra
+                match_dict.setdefault(match.get_key_name(), match)
         except Exception, e:
             logging.error("Malformed match in Event %s" % event.key().name())
         
