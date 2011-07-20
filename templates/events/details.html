@@ -62,6 +62,10 @@
                 <th>Facebook</th>
                 <td><a href="{{ event.getFacebookEventUrl }}" title="Facebook Event">RSVP</td>
             </tr>{% endif %}
+            {% if event.webcast_url %}<tr>
+                <th>Live Webcast</th>
+                <td><a href="{{ event.webcast_url }}" title=" ">{{ event.webcast_url }}</td>
+            </tr>{% endif %}
         </table>
     </div>
     <div id="matches" class="contentBlock">

@@ -65,6 +65,7 @@ class AdminEventEdit(webapp.RequestHandler):
             year = int(self.request.get("year")),
             official = {"true": True, "false": False}.get(self.request.get("official").lower()),
             facebook_eid = self.request.get("facebook_eid"),
+            webcast_url = self.request.get("webcast_url"),
         )
         event = EventUpdater.createOrUpdate(event)
         

@@ -107,6 +107,8 @@ class EventUpdater(object):
             old_event.first_eid = new_event.first_eid
         if new_event.facebook_eid is not None:
             old_event.facebook_eid = new_event.facebook_eid
+        if new_event.webcast_url is not None:
+            old_event.webcast_url = new_event.webcast_url
         
         old_event.put()
         return old_event
