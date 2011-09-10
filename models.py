@@ -62,6 +62,7 @@ class Event(db.Model):
     first_eid = db.StringProperty() #from USFIRST
     facebook_eid = db.StringProperty() #from Facebook
     website = db.StringProperty()
+    webcast_url = db.StringProperty()
     
     def get_key_name(self):
         """
