@@ -77,36 +77,11 @@ class EventUpdater(object):
         "old" event that are present in the "new" event, but keep fields from
         the "old" event that are null in the "new" event.
         """
-        #FIXME: There must be a way to do this elegantly. -greg 5/12/2010
         
-        if new_event.name is not None:
-            old_event.name = new_event.name
-        if new_event.event_type is not None:
-            old_event.event_type = new_event.event_type
-        if new_event.short_name is not None:
-            old_event.short_name = new_event.short_name
-        if new_event.event_short is not None:
-            old_event.event_short = new_event.event_short
-        if new_event.year is not None:
-            old_event.year = new_event.year
-        if new_event.start_date is not None:
-            old_event.start_date = new_event.start_date
-        if new_event.end_date is not None:
-            old_event.end_date = new_event.end_date
-        if new_event.venue is not None:
-            old_event.venue = new_event.venue
-        if new_event.venue_address is not None:
-            old_event.venue_address = new_event.venue_address
-        if new_event.website is not None:
-            old_event.website = new_event.website
-        if new_event.location is not None:
-            old_event.location = new_event.location
-        if new_event.official is not None:
-            old_event.official = new_event.official
-        if new_event.first_eid is not None:
-            old_event.first_eid = new_event.first_eid
-        if new_event.facebook_eid is not None:
-            old_event.facebook_eid = new_event.facebook_eid
-        
+        for attr, value in new_event.__dict__.iteritems():
+          if value is not None:
+            old_event.__dict__[attr] = value
+
+
         old_event.put()
         return old_event
