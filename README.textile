@@ -13,8 +13,10 @@ h2. Setup
 3. Run!
 
 h2. Paver Commands
-Paver is an easy way automate repetive tasks. These tasks are stored in pavement.py. Download and install paver from http://pypi.python.org/pypi/Paver/
+
+Paver is an easy way automate repetitive tasks. These tasks are stored in pavement.py. Download and install paver from http://pypi.python.org/pypi/Paver/
 
 h3. Simple Commands
+
 * paver clean - Deletes artifacts that the app creates that you don't need.
 
