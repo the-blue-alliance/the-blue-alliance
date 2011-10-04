@@ -46,4 +46,7 @@ class SearchHandler(webapp.RequestHandler):
         finally:
             self.response.out.write(render_static("search"))
 
-
+class PageNotFoundHandler(webapp.RequestHandler):
+    def get(self):
+        self.error(404)
+        self.response.out.write(render_static("404"))

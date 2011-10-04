@@ -1,0 +1,22 @@
+The Blue Alliance is a FIRST Robotics tool to help teams scout for,
+compete at, and relive competitions.
+
+http://www.thebluealliance.com
+
+
+h2. Setup
+
+1. Download Google App engine launcher(http://code.google.com/appengine/downloads.html).
+
+2. Import project file into Google App Engine Launcher.
+
+3. Run!
+
+h2. Paver Commands
+
+Paver is an easy way automate repetitive tasks. These tasks are stored in pavement.py. Download and install paver from http://pypi.python.org/pypi/Paver/
+
+h3. Simple Commands
+
+* paver clean - Deletes artifacts that the app creates that you don't need.
+

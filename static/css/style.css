@@ -210,6 +210,10 @@ span.annotation {
     margin: .5em 8px .25em 8px;
 }
 
+#centeredContent {
+    text-align: center;
+}
+
 #fb_like {
     margin-top: .5em;
     margin-left: 8px;
