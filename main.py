@@ -15,11 +15,13 @@ except Exception, e:
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
 
-from controllers.main_controller import MainHandler, ContactHandler, ThanksHandler, SearchHandler
+from controllers.main_controller import MainHandler, ContactHandler, ThanksHandler, SearchHandler, PageNotFoundHandler
 
 from controllers.event_controller import EventList, EventDetail, EventRss
 from controllers.match_controller import MatchList, MatchDetail
 from controllers.team_controller import TeamList, TeamDetail
+
+
 
 def main():
     application = webapp.WSGIApplication([('/', MainHandler),
@@ -34,7 +36,8 @@ def main():
                                           ('/teams', TeamList),
                                           ('/team/([0-9]*)', TeamDetail),
                                           ('/team/([0-9]*)/(.*)', TeamDetail),
-                                          ('/thanks', ThanksHandler)
+                                          ('/thanks', ThanksHandler),
+                                          ('/.*', PageNotFoundHandler)
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)
