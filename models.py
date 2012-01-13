@@ -111,6 +111,7 @@ class Match(db.Model):
     }
         
     FRC_GAMES = [
+        "frc_2012_rebr",
         "frc_2011_logo",
         "frc_2010_bkwy",
         "frc_2009_lncy",
