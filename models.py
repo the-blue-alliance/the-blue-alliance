@@ -111,6 +111,7 @@ class Match(db.Model):
     }
         
     FRC_GAMES = [
+        "frc_2012_rebr",
         "frc_2011_logo",
         "frc_2010_bkwy",
         "frc_2009_lncy",
@@ -135,6 +136,7 @@ class Match(db.Model):
     ]
     
     FRC_GAMES_BY_YEAR = {
+        2012: "frc_2012_rebr",
         2011: "frc_2011_logo",
         2010: "frc_2010_bkwy",
         2009: "frc_2009_lncy",
