@@ -26,7 +26,7 @@ class DatafeedUsfirstEvents(object):
     # The URL pattern for team registration information, based on USFIRST event id.
     EVENT_REGISTRATION_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=event_teamlist&results_size=250&eid=%s&-session=myarea:%s"
     # A URL that gives us session keyed URLs.
-    SESSION_KEY_GENERATING_URL = "https://my.usfirst.org/myarea/index.lasso?page=searchresults&programs=FRC&reports=teams&omit_searchform=1&season_FRC=2011"
+    SESSION_KEY_GENERATING_URL = "https://my.usfirst.org/myarea/index.lasso?page=searchresults&programs=FRC&reports=teams&omit_searchform=1&season_FRC=2012"
     
     def getSessionKey(self):
         """

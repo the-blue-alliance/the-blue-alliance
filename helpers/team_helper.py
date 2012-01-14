@@ -33,7 +33,7 @@ class TeamTpidHelper(object):
     lastPageRe = re.compile(r'Next ->')
     
     @classmethod
-    def scrapeTpid(self, number, skip=0, year=2011):
+    def scrapeTpid(self, number, skip=0, year=2012):
       """
       Searches the FIRST list of all teams for the requested team's tpid, caching
       all it encounters in the datastore. This has the side effect of creating Team

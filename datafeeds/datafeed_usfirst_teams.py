@@ -23,7 +23,7 @@ class DatafeedUsfirstTeams(object):
     # It appears the Season we retreive from impacts the session key's working or not. 
     # "2010" keys did not work. -gregmarra 5 Dec 2010
     
-    def getSessionKey(self, year=2011):
+    def getSessionKey(self, year=2012):
         """
         Grab a page from FIRST so we can get a session key out of URLs on it. This session
         key is needed to construct working event detail information URLs.
@@ -42,7 +42,7 @@ class DatafeedUsfirstTeams(object):
         else:
             logging.error('Unable to retreive url: ' + self.SESSION_KEY_GENERATING_URL)
     
-    def instantiateTeams(self, skip=0, year=2011):
+    def instantiateTeams(self, skip=0, year=2012):
         """
         Calling this function once establishes all of the Team objects in the Datastore.
         It does this by calling up USFIRST to search for Tpids. We have to do this in

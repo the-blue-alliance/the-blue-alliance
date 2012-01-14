@@ -82,7 +82,7 @@ class UsfirstEventsInstantiate(webapp.RequestHandler):
         try:
             year = self.request.get("year")
             if year == '':
-                year = 2011
+                year = 2012
         except Exception, detail:
             logging.error('Failed to get year value')
         
@@ -110,7 +110,7 @@ class UsfirstEventGetEnqueue(webapp.RequestHandler):
     Handles enqueing updates to individual USFIRST events.
     """
     def get(self):
-        year = 2011 #Just this year #FIXME: Do this right
+        year = 2012 #Just this year #FIXME: Do this right
         events = Event.all()
         events.filter('first_eid != ', None) # Official events with EIDs
         events.filter('year =', year) 
@@ -239,7 +239,7 @@ class UsfirstTeamsInstantiate(webapp.RequestHandler):
     def get(self):
         df = DatafeedUsfirstTeams()
         skip = 0
-        year = 2011
+        year = 2012
         
         try:
             skip = self.request.get("skip")
