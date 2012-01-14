@@ -17,7 +17,7 @@ class DatafeedUsfirstEvents(object):
     """
     
     # The types of events listed in the event list:
-    REGIONAL_EVENT_TYPES = ["Regional", "MI FRC State Championship", "MI District"]
+    REGIONAL_EVENT_TYPES = ["Regional", "MI FRC State Championship", "MI District", "Qualifying Event", "Qualifying Championship"]
     
     # The URL for the event list:
     REGIONAL_EVENTS_URL = "https://my.usfirst.org/myarea/index.lasso?event_type=FRC&season_FRC=%s"
@@ -35,7 +35,7 @@ class DatafeedUsfirstEvents(object):
         """
         sessionRe = re.compile(r'myarea:([A-Za-z0-9]*)')
         
-        result = urlfetch.fetch(self.SESSION_KEY_GENERATING_URL)
+        result = urlfetch.fetch(self.SESSION_KEY_GENERATING_URL, deadline=60)
         if result.status_code == 200:
             regex_results = re.search(sessionRe, result.content)
             if regex_results is not None:
