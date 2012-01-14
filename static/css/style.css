@@ -282,6 +282,10 @@ ul.infoList {
     
 }
 
+ol li {
+  list-style: decimal inside;
+}
+
 #footer {
     color: #999999;
     margin: 1em auto 0 auto;
