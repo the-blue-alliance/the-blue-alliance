@@ -36,9 +36,16 @@
     </div>
     <div class="contentBlock">
         <div class="contentBlockTopper">
-            <h2>This Week's Events</h2>
+            <h2>Upcoming Events</h2>
         </div>
-        <p><i>coming soon.</i></p>
+        <ul class="infoList">
+        {% for event in upcoming_events %}
+            <li>
+                <h3><a href="/event/{{event.key.name}}">{{ event.name }}{%if event.location  %} <span class="annotation">{{ event.location }}</span>{% endif %}</a></h3>
+                <p>{% if event.start_date %}{{ event.start_date|date:"M d, Y" }} - {% endif %}{{ event.teams.count }} teams</p>
+            </li>
+        {% endfor %}
+        </ul>
     </div>
 </div>
 {% endblock %}

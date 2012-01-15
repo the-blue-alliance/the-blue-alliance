@@ -11,6 +11,11 @@ indexes:
 
 - kind: Event
   properties:
+  - name: end_date
+  - name: start_date
+
+- kind: Event
+  properties:
   - name: event_short
   - name: year
   - name: event_short

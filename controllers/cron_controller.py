@@ -56,6 +56,7 @@ class EventTeamUpdate(webapp.RequestHandler):
             if reput:
                 logging.info("Had to re-put %s" % et.key().name)
                 et.put()
+                # TODO: This could be made MUCH more efficient with batching (gregmarra 14 Jan 2011)
             
             eventteams_count = eventteams_count + 1
         
