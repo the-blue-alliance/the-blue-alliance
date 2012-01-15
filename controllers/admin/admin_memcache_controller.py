@@ -6,7 +6,7 @@ from google.appengine.ext.webapp import template, util
 
 from models import Team
 
-# The view of a list of teams.
+# Main memcache view.
 class AdminMemcacheMain(webapp.RequestHandler):
     def get(self):
         
@@ -17,7 +17,7 @@ class AdminMemcacheMain(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/memcache/index.html')
         self.response.out.write(template.render(path, template_values))
         
-# The view of a single Team.
+# Memcache flush result.
 class AdminMemcacheFlush(webapp.RequestHandler):
     def get(self):
         flushed = list()
@@ -25,6 +25,10 @@ class AdminMemcacheFlush(webapp.RequestHandler):
         if self.request.get('all') == "true":
             memcache.flush_all()
             flushed.append("all memcache values")
+        
+        if self.request.get('key') is not None:
+            memcache.delete(self.request.get('key'))
+            flushed.append(self.request.get('key'))
         
         template_values = { 
             'flushed' : flushed,
