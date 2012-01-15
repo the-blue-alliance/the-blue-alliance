@@ -21,7 +21,7 @@ def render_static(page):
 
 class MainHandler(webapp.RequestHandler):
     def get(self):
-        memcache_key = "team_list"
+        memcache_key = "main_index"
         html = memcache.get(memcache_key)
         
         if html is None:
