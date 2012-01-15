@@ -20,3 +20,20 @@ h3. Simple Commands
 
 * paver clean - Deletes artifacts that the app creates that you don't need.
 
+h2. Testing
+
+Testing is implemented using a combination of unittest2 and the Google App Engine testbed framework. Test coverage is a work in progress, and focuses on maintaining datafeed integrity in the face of optimizations and changes to FIRST's data formats.
+
+To run the tests:
+python run_tests.py <app_engine_sdk_path> tests/
+
+On a Mac, the symlinks created by GoogleAppEngineLauncher allow you to use /usr/local/bin as the App Engine SDK path, so:
+python run_tests.py <app_engine_sdk_path> tests/
+
+h3. Fixing SSLCertificate Errors
+
+You will get an SSLCertificate error due to differences in the implementation of the App Engine urlfetch and urlfetch_stub. To fix the error, find the file google/appengine/api/urlfetch_stub.py in your App Engine SDK and modify line 77 to be "_API_CALL_VALIDATE_CERTIFICATE_DEFAULT = False" instead of "True".
+
+On a Mac, your App Engine SDK might live at /Applications/GoogleAppEngineLauncher.app/Contents/Resources/GoogleAppEngine-default.bundle/Contents/Resources/google_appengine
+
+A bug tracks this App Engine issue: http://code.google.com/p/googleappengine/issues/detail?id=6736

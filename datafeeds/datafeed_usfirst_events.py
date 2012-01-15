@@ -26,16 +26,27 @@ class DatafeedUsfirstEvents(object):
     # The URL pattern for team registration information, based on USFIRST event id.
     EVENT_REGISTRATION_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=event_teamlist&results_size=250&eid=%s&-session=myarea:%s"
     # A URL that gives us session keyed URLs.
-    SESSION_KEY_GENERATING_URL = "https://my.usfirst.org/myarea/index.lasso?page=searchresults&programs=FRC&reports=teams&omit_searchform=1&season_FRC=2012"
+    SESSION_KEY_GENERATING_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=searchresults&programs=FRC&reports=teams&omit_searchform=1&season_FRC=%s"
     
-    def getSessionKey(self):
+    # MASSIVE FIXME:
+    # Just discovered that FIRST session keys are season-dependent. A session key you retreived from a 2011
+    # page does not work to get information about 2012 events. Therefore every request must also know what year
+    # it is for. Have not fully made changes to be aware of this, as it ripples very far downstream in terms of
+    # changing the API to require (eid, year) and not just eid. Right now, this means updating data on any event
+    # prior to 2012 will fail. Need to ripple these changes through everything that gets data from my.usfirst.org
+    #
+    # Every function call with year=2012 should change to year required.
+    #
+    # -gregmarra 15 Jan 2012
+    
+    def getSessionKey(self, year=2012):
         """
         Grab a page from FIRST so we can get a session key out of URLs on it. This session
         key is needed to construct working event detail information URLs.
         """
         sessionRe = re.compile(r'myarea:([A-Za-z0-9]*)')
         
-        result = urlfetch.fetch(self.SESSION_KEY_GENERATING_URL, deadline=60)
+        result = urlfetch.fetch(self.SESSION_KEY_GENERATING_PATTERN % year, deadline=60)
         if result.status_code == 200:
             regex_results = re.search(sessionRe, result.content)
             if regex_results is not None:
@@ -57,11 +68,11 @@ class DatafeedUsfirstEvents(object):
         else:
             logging.error('Unable to retreive url: ' + (self.REGIONAL_EVENTS_URL % year))
     
-    def getEvent(self, eid):
+    def getEvent(self, eid, year=2012):
         """
         Return an Event object for a particular FIRST "event id" aka "eid"
         """
-        session_key = self.getSessionKey()
+        session_key = self.getSessionKey(year)
         url = self.EVENT_URL_PATTERN % (eid, session_key)
         result = urlfetch.fetch(url)
         if result.status_code == 200:
@@ -72,11 +83,11 @@ class DatafeedUsfirstEvents(object):
         else:
             logging.error('Unable to retreive url: ' + url)
     
-    def getEventRegistration(self, eid):
+    def getEventRegistration(self, eid, year=2012):
         """
         Returns a list of team_numbers attending a particular Event
         """
-        session_key = self.getSessionKey()
+        session_key = self.getSessionKey(year)
         url = self.EVENT_REGISTRATION_URL_PATTERN % (eid, session_key)
         result = urlfetch.fetch(url)
         if result.status_code == 200:
@@ -118,7 +129,7 @@ class DatafeedUsfirstEvents(object):
                     events.append(event)
 
             except Exception, detail:
-                logging.error('Event parsing failed: ' + str(detail))  
+                logging.info('Event parsing failed: ' + str(detail))  
             
         return events
     
@@ -137,7 +148,7 @@ class DatafeedUsfirstEvents(object):
             if len(tds) > 1:
                 field = str(tds[0].string)
                 if field == "Event":
-                    event_dict["name"] = unicode(''.join(tds[1].findAll(text=True)))
+                    event_dict["name"] = unicode(''.join(tds[1].findAll(text=True))).strip()
                 if field == "Event Subtype":
                     event_dict["event_type"] = unicode(tds[1].string)
                 if field == "When":
@@ -150,7 +161,7 @@ class DatafeedUsfirstEvents(object):
                 if field == "Where":
                     # TODO: This next line is awful. Make this suck less.
                     # I think \t tabs mess it up or something. -greg 5/20/2010
-                    event_dict["venue_address"] = unicode(''.join(tds[1].findAll(text=True))).encode('ascii', 'ignore')
+                    event_dict["venue_address"] = unicode(''.join(tds[1].findAll(text=True))).encode('ascii', 'ignore').strip().replace("\t","").replace("\r\n\r\n", "\r\n")
                 if field == "Event Info":
                     event_dict["website"] = unicode(tds[1].a['href'])
                 if field == "Match Results":
