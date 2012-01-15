@@ -19,9 +19,7 @@ class DatafeedUsfirstTeams(object):
     TEAM_DETAILS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=team_details&tpid=%s&-session=myarea:%s"
     IMPOSSIBLY_HIGH_TEAM_NUMBER = 9999
     
-    SESSION_KEY_GENERATING_URL = "https://my.usfirst.org/myarea/index.lasso?page=searchresults&programs=FRC&reports=teams&omit_searchform=1&season_FRC=%s"
-    # It appears the Season we retreive from impacts the session key's working or not. 
-    # "2010" keys did not work. -gregmarra 5 Dec 2010
+    SESSION_KEY_GENERATING_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=searchresults&programs=FRC&reports=teams&omit_searchform=1&season_FRC=%s"
     
     def getSessionKey(self, year=2012):
         """
@@ -30,7 +28,7 @@ class DatafeedUsfirstTeams(object):
         """
         sessionRe = re.compile(r'myarea:([A-Za-z0-9]*)')
         
-        result = urlfetch.fetch(self.SESSION_KEY_GENERATING_URL % year)
+        result = urlfetch.fetch(self.SESSION_KEY_GENERATING_PATTERN % year)
         if result.status_code == 200:
             regex_results = re.search(sessionRe, result.content)
             if regex_results is not None:
