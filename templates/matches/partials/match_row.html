@@ -8,6 +8,6 @@
     <td class="blue{% ifequal match.winning_alliance 'blue' %} winner{% endifequal %}"><a href="/team/{{ match.alliances.blue.teams.0|slice:"3:" }}">{{ match.alliances.blue.teams.0|slice:"3:" }}</a></td>
     <td class="blue{% ifequal match.winning_alliance 'blue' %} winner{% endifequal %}"><a href="/team/{{ match.alliances.blue.teams.1|slice:"3:" }}">{{ match.alliances.blue.teams.1|slice:"3:" }}</a></td>
     <td class="blue{% ifequal match.winning_alliance 'blue' %} winner{% endifequal %}"><a href="/team/{{ match.alliances.blue.teams.2|slice:"3:" }}">{{ match.alliances.blue.teams.2|slice:"3:" }}</a></td>
-    <td class="redScore{% ifequal match.winning_alliance 'red' %} winner{% endifequal %}">{{ match.alliances.red.score }}</td>
-    <td class="blueScore{% ifequal match.winning_alliance 'blue' %} winner{% endifequal %}">{{ match.alliances.blue.score }}</td>
+    <td class="redScore{% ifequal match.winning_alliance 'red' %} winner{% endifequal %}">{% ifequal match.alliances.red.score "-1" %}?{% else %}{{ match.alliances.red.score }}{% endifequal %}</td>
+    <td class="blueScore{% ifequal match.winning_alliance 'blue' %} winner{% endifequal %}">{% ifequal match.alliances.blue.score "-1" %}?{% else %}{{ match.alliances.blue.score }}{% endifequal %}</td>
 </tr>
