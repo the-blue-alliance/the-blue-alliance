@@ -15,7 +15,10 @@ class TestDatafeedUsfirstMatches(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         
         self.datafeed = DatafeedUsfirstMatches()
-        
+    
+    def tearDown(self):
+        self.testbed.deactivate()
+    
     def test_getMatchResultsList(self):
         event = Event(
           key_name = "2011ct",

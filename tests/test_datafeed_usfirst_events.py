@@ -13,6 +13,9 @@ class TestDatafeedUsfirstEvents(unittest2.TestCase):
         
         self.datafeed = DatafeedUsfirstEvents()
     
+    def tearDown(self):
+        self.testbed.deactivate()
+    
     def test_getEvent(self):
         # test with 2011ct
         event = self.datafeed.getEvent("5561", 2011)

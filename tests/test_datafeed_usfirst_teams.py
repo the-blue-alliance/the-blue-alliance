@@ -22,7 +22,9 @@ class TestDatafeedUsfirstTeams(unittest2.TestCase):
             first_tpid = 61771,
             first_tpid_year = 2012
         ).put()
-        
+    
+    def tearDown(self):
+        self.testbed.deactivate()
     
     def test_getTeamDetails(self):
         team = self.datafeed.getTeamDetails(177)
