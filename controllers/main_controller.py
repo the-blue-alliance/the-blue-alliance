@@ -29,8 +29,9 @@ class MainHandler(webapp.RequestHandler):
             upcoming_events.order('start_date').fetch(20)
             
             # Only show events that are happening "the same week" as the first one
-            first_start_date = upcoming_events[0].start_date            
-            upcoming_events = [e for e in upcoming_events if ((e.start_date - datetime.timedelta(days=6)) < first_start_date)]
+            if upcoming_events.count() > 0:
+              first_start_date = upcoming_events[0].start_date            
+              upcoming_events = [e for e in upcoming_events if ((e.start_date - datetime.timedelta(days=6)) < first_start_date)]
             
             template_values = {
                 "upcoming_events": upcoming_events,
