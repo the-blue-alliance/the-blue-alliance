@@ -6,15 +6,17 @@ http://www.thebluealliance.com
 
 h2. Setup
 
-1. Download Google App engine launcher(http://code.google.com/appengine/downloads.html).
+1. Download Google App engine launcher (http://code.google.com/appengine/downloads.html)
 
-2. Import project file into Google App Engine Launcher.
+2. Import project file into Google App Engine Launcher
 
 3. Run!
 
+4. Visit /admin/debug to set up your local development version with data
+
 h2. Paver Commands
 
-Paver is an easy way automate repetitive tasks. These tasks are stored in pavement.py. Download and install paver from http://pypi.python.org/pypi/Paver/
+Paver is an easy way automate repetitive tasks. These tasks are stored in pavement.py. Download and install paver from http://pypi.python.org/pypi/Paver/ or use easy_install to install it.
 
 h3. Simple Commands
 
@@ -28,7 +30,7 @@ To run the tests:
 python run_tests.py &lt;app_engine_sdk_path&gt; tests/
 
 On a Mac, the symlinks created by GoogleAppEngineLauncher allow you to use /usr/local/bin as the App Engine SDK path, so:
-python run_tests.py &lt;app_engine_sdk_path&gt; tests/
+python run_tests.py /usr/local/bin tests/
 
 h3. Fixing SSLCertificate Errors
 
