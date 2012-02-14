@@ -92,7 +92,9 @@ class ApiHelper(object):
         
         if event_list is None:
             team = Team.get_by_key_name(team_dict["key"])
-            event_list = [self.getEventInfo(e.key().name()) for e in [a.event for a in team.events if a.year == int(year)]]
+            events = [a.event for a in team.events if a.year == int(year)]
+            sorted_events = sorted(events, key=lambda a: a.start_date)
+            event_list = [self.getEventInfo(e.key().name()) for e in sorted_events]
             for event_dict in event_list:
                 event_dict["team_wlt"] = EventHelper.getTeamWLT(team_dict["key"], event_dict["key"])
             memcache.set(memcache_key, event_list, 600)
