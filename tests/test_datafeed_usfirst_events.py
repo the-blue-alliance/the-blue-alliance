@@ -2,6 +2,7 @@ import unittest2
 import datetime
 
 from google.appengine.ext import testbed
+from google.appengine.api import urlfetch
 
 from datafeeds.datafeed_usfirst_events import DatafeedUsfirstEvents
 
