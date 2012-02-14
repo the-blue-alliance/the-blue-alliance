@@ -25,10 +25,10 @@ h2. Testing
 Testing is implemented using a combination of unittest2 and the Google App Engine testbed framework. Test coverage is a work in progress, and focuses on maintaining datafeed integrity in the face of optimizations and changes to FIRST's data formats.
 
 To run the tests:
-python run_tests.py <app_engine_sdk_path> tests/
+python run_tests.py &lt;app_engine_sdk_path&gt; tests/
 
 On a Mac, the symlinks created by GoogleAppEngineLauncher allow you to use /usr/local/bin as the App Engine SDK path, so:
-python run_tests.py <app_engine_sdk_path> tests/
+python run_tests.py &lt;app_engine_sdk_path&gt; tests/
 
 h3. Fixing SSLCertificate Errors
 
