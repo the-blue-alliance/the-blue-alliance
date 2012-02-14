@@ -33,3 +33,15 @@ class TestDatafeedUsfirstTeams(unittest2.TestCase):
         self.assertEqual(team.address, u"South Windsor, CT\xa0 USA")
         self.assertEqual(team.nickname, "Bobcat Robotics")
         self.assertEqual(team.website, "http://www.bobcatrobotics.org")
+    
+    def test_instantiateTeams(self):
+        # We can skip 2250 records and still get the highest team in 2012
+        self.datafeed.instantiateTeams(skip=2250, year=2012)
+        
+        team = Team.get_by_key_name("frc4410")
+        
+        self.assertEqual(team.team_number, 4410)
+        self.assertEqual(team.first_tpid, 74193)
+        self.assertEqual(team.first_tpid_year, 2012)
+
+      
