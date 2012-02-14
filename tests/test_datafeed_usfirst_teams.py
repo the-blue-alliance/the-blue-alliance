@@ -35,13 +35,27 @@ class TestDatafeedUsfirstTeams(unittest2.TestCase):
         self.assertEqual(team.website, "http://www.bobcatrobotics.org")
     
     def test_instantiateTeams(self):
-        # We can skip 2250 records and still get the highest team in 2012
-        self.datafeed.instantiateTeams(skip=2250, year=2012)
+        Team(
+          key_name = "frc4409",
+          team_number = 4409,
+          first_tpid = 0, #should be 74735
+          first_tpid_year = 2011
+        ).put()
         
-        team = Team.get_by_key_name("frc4410")
+        # We can skip 2000 records, paginate, and still get frc4409 and frc4410 in 2012
+        self.datafeed.instantiateTeams(skip=2000, year=2012)
         
-        self.assertEqual(team.team_number, 4410)
-        self.assertEqual(team.first_tpid, 74193)
-        self.assertEqual(team.first_tpid_year, 2012)
+        # Check new team insertion
+        frc4410 = Team.get_by_key_name("frc4410")
+        self.assertEqual(frc4410.team_number, 4410)
+        self.assertEqual(frc4410.first_tpid, 74193)
+        self.assertEqual(frc4410.first_tpid_year, 2012)
+        
+        # Check old team updating
+        frc4409 = Team.get_by_key_name("frc4409")
+        self.assertEqual(frc4409.team_number, 4409)
+        self.assertEqual(frc4409.first_tpid, 74735)
+        self.assertEqual(frc4409.first_tpid_year, 2012)
+        
 
       

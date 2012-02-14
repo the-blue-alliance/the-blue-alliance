@@ -32,6 +32,8 @@ class TeamTpidHelper(object):
     # Extracts the link to the next page of results on the FIRST list of all teams.
     lastPageRe = re.compile(r'Next ->')
     
+    TPID_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=searchresults&programs=FRC&reports=teams&sort_teams=number&results_size=250&omit_searchform=1&season_FRC=%s&skip_teams=%s"
+    
     @classmethod
     def scrapeTpid(self, number, skip=0, year=2012):
       """
@@ -39,47 +41,52 @@ class TeamTpidHelper(object):
       all it encounters in the datastore. This has the side effect of creating Team
       objects along the way.
       
-      This code is taken directly from Pat Fairbank's frclinks source and modified
-      slightly to fit in the TBA framework. He has given us permission to borrow
-      his code directly.
+      This code is modified from Pat Fairbank's frclinks source and modified
+      to fit in the TBA framework. He has given us permission to borrow
+      his code.
       """
-      teams_to_put = list()
       while 1:
         logging.info("Fetching 250 teams based on %s data, skipping %s" % (year, skip))
-        # TODO: Make this robust to season changes. -gregmarra 9 Jan 2011
-        teamList = urlfetch.fetch(
-            'https://my.usfirst.org/myarea/index.lasso?page=searchresults&' +
-            'programs=FRC&reports=teams&sort_teams=number&results_size=250&' +
-            'omit_searchform=1&season_FRC=%s&skip_teams=%s' % (year, skip),
-            deadline=10)
-        teamResults = self.teamRe.findall(teamList.content)
+        
         tpid = None
+        tpids_dict = dict()
+        
+        teamList = urlfetch.fetch(self.TPID_URL_PATTERN % (year, skip), deadline=10)
+        teamResults = self.teamRe.findall(teamList.content)
         
         for teamResult in teamResults:
           teamNumber = self.teamNumberRe.findall(teamResult)[0]
           teamTpid = self.tpidRe.findall(teamResult)[0]
-          if teamNumber == number:
-            tpid = teamTpid
           
           logging.info("Team %s TPID was %s in year %s." % (teamNumber, teamTpid, year))
+          tpids_dict[teamNumber] = teamTpid
           
-          team = Team.get_by_key_name('frc' + str(teamNumber))
+          # If this was the team we were looking for, write it down so we can return it
+          if teamNumber == number:
+            tpid = teamTpid
+        
+        # Bulk fetching teams is much more efficient.
+        teams = Team.get([db.Key.from_path("Team", "frc" + str(a)) for a in tpids_dict.keys()])
+        team_dict = dict([[team.team_number, team] for team in teams if team])
+        
+        teams_to_put = list()
+        for team_number in tpids_dict.keys():
           new_team = Team(
-            team_number = int(teamNumber),
-            first_tpid = int(teamTpid),
-            first_tpid_year = int(year),
-            key_name = "frc" + str(teamNumber)
-          )
-          if team is None:
+              team_number = int(team_number),
+              first_tpid = int(tpids_dict[team_number]),
+              first_tpid_year = int(year),
+              key_name = "frc" + str(team_number)
+            )
+          
+          if team_dict.get(team_number, None) is None:
             teams_to_put.append(new_team)
           else:
-            team = TeamUpdater.updateMerge(new_team, team)
-            teams_to_put.append(team)
+            teams_to_put.append(TeamUpdater.updateMerge(new_team, team_dict[team_number]))
         
-        skip = int(skip) + 250
         db.put(teams_to_put)
-        teams_to_put = list()
+        skip = int(skip) + 250
         
+        # Return if we found the TPID we wanted, or we're out of teams
         if tpid:
           return tpid
         
