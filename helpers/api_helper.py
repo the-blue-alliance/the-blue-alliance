@@ -19,8 +19,10 @@ class ApiHelper(object):
         memcache_key = "api_team_info_%s" % team_key
         team_dict = memcache.get(memcache_key)
         if team_dict is None:
+            logging.info(team_key)
             team = Team.get_by_key_name(team_key)
-            if Team is not None:
+            logging.info(team)
+            if team is not None:
                 team_dict = dict()
                 team_dict["key"] = team.key().name()
                 team_dict["team_number"] = team.team_number
@@ -93,8 +95,8 @@ class ApiHelper(object):
         if event_list is None:
             team = Team.get_by_key_name(team_dict["key"])
             events = [a.event for a in team.events if a.year == int(year)]
-            sorted_events = sorted(events, key=lambda a: a.start_date)
-            event_list = [self.getEventInfo(e.key().name()) for e in sorted_events]
+            events = sorted(events, key=lambda event: event.start_date)
+            event_list = [self.getEventInfo(e.key().name()) for e in events]
             for event_dict in event_list:
                 event_dict["team_wlt"] = EventHelper.getTeamWLT(team_dict["key"], event_dict["key"])
             memcache.set(memcache_key, event_list, 600)
