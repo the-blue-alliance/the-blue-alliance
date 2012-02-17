@@ -18,7 +18,6 @@
             <li><input type="text" name="disabled_set_number" value="{{match.set_number}}" disabled="disabled" /><input type="hidden" name="set_number" value="{{match.set_number}}" /><label for="set_number">Set Number</label></li>
             <li><input type="text" name="disabled_match_number" value="{{match.match_number}}" disabled="disabled" /><input type="hidden" name="match_number" value="{{match.match_number}}" /><label for="match_number">Match Number</label></li>
             
-            
             <li><textarea type="text" name="alliances_json" rows="6" cols="60">{{match.alliances_json}}</textarea><label for="alliances_json">Alliances JSON</label></li>
             
             <li><input type="checkbox" name="no_auto_update" value="True" {% if match.no_auto_update %}checked="checked"{% endif %} /><label for="no_auto_update">no_auto_update</label></li>

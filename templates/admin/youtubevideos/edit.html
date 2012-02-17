@@ -1,0 +1,31 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Edit YoutubeVideo {{youtubevideo.key.id_or_name}} - TBA Admin{% endblock %}
+
+{% block content %}
+
+<h1>Edit YoutubeVideo {{ youtubevideo.key.id_or_name }}</h1>
+
+<form action="/admin/video/edit/{{youtubevideo.key.id_or_name}}" method="post">
+    <fieldset>
+        <legend>Edit YoutubeVideo {{ youtubevideo.key.id_or_name }}</legend>
+        <ul>
+            
+            <li><input type="text" name="disabled_youtubevideo_key_name" value="{{youtubevideo.key.id_or_name}}" disabled="disabled" /><input type="hidden" name="youtubevideo_key_name" value="{{youtubevideo.key.id_or_name}}" /><label for="youtubevideo_key_name">YoutubeVideo</label></li>            
+            <li><input type="text" name="disabled_match_key_name" value="{{youtubevideo.match.key.name}}" disabled="disabled" /><input type="hidden" name="match_key_name" value="{{youtubevideo.match.key.name}}" /><label for="disabled_match_key_name">Match</label></li>
+            <li><input type="text" name="youtube_id" value="{{youtubevideo.youtube_id}}" /><label for="youtube_id">Youtube ID</label></li>
+            
+            <li><input type="submit" id="submit" name="submit" value="Save"></li>
+        </ul>
+    </fieldset>
+</form>
+
+<h2>Delete?</h2>
+<form action="/admin/video/edit/{{youtubevideo.key.id_orname}}" method="post">
+    <fieldset>
+        <legend>Delete YoutubeVideo {{ youtubevideo.key.id_or_name }}?</legend>
+        <input type="submit" id="delete" name="delete" value="Delete">
+    </fieldset>
+</form>
+
+{% endblock %}

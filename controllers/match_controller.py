@@ -46,6 +46,7 @@ class MatchDetail(webapp.RequestHandler):
             template_values = {
                 "match": match,
                 "tbavideo": tbavideo,
+                "youtubevideos": match.youtubevideo_set,
             }
             
             path = os.path.join(os.path.dirname(__file__), '../templates/matches/details.html')

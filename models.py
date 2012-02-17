@@ -224,10 +224,7 @@ class Match(db.Model):
             return "%s %s Match %s" % (self.COMP_LEVELS_VERBOSE[self.comp_level], self.set_number, self.match_number)
     
     def has_video(self):
-        if self.tbavideo_set.count() > 0:
-            return True
-        else:
-            return False
+        return self.tbavideo_set.count() + self.youtubevideo_set.count() > 0
     
     def details_url(self):
         return "/match/%s" % self.get_key_name()
@@ -273,5 +270,5 @@ class YoutubeVideo(db.Model):
     Store information related to videos of Matches hosted on YouTube.
     """
     match = db.ReferenceProperty(Match, required=True)
-    youtube_id = db.StringProperty()
+    youtube_id = db.StringProperty(required=True)
 
