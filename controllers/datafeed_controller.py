@@ -17,6 +17,8 @@ from helpers.match_helper import MatchUpdater
 from helpers.team_helper import TeamTpidHelper, TeamUpdater
 from helpers.tbavideo_helper import TBAVideoUpdater
 
+from helpers.datafeed_helper import DatafeedHelper
+
 from models import Event
 from models import EventTeam
 from models import Team
@@ -137,22 +139,24 @@ class UsfirstEventGet(webapp.RequestHandler):
     Includes registered Teams.
     """
     def get(self, first_eid):
-        df = DatafeedUsfirstEvents()
+        datafeed = DatafeedUsfirstEvents()
         
-        event = df.getEvent(first_eid)
+        event = datafeed.getEvent(first_eid)
         event = EventUpdater.createOrUpdate(event)
         
-        teams = df.getEventRegistration(first_eid)
         eventteams_count = 0
-        for team_dict in teams:
-            # This could be refactored to do a lot fewer DB requests by batching the Team and EventTeam gets.
-            # -gregmarra 5 Dec 2010
-            team = Team.get_by_key_name("frc" + str(team_dict["number"]))
-            if team is None:
+
+        team_list = datafeed.getEventRegistration(first_eid)
+        team_keys = DatafeedHelper.getTeamKeyNames(team_list)
+        teams = Team.get_by_key_name(team_keys)
+        
+
+        for index, x in enumerate(teams):
+            if x is None:
                 team = Team(
-                    team_number = int(team_dict["number"]),
-                    first_tpid = int(team_dict["tpid"]),
-                    key_name = "frc" + str(team_dict["number"])
+                    team_number = int(team_list[index]["number"]),
+                    first_tpid = int(team_list[index]["tpid"]),
+                    key_name = "frc" + str(team_list[index]["number"])
                 )
                 team.put()
             
