@@ -33,6 +33,10 @@ class TeamList(webapp.RequestHandler):
 # The view of a single Team.
 class TeamDetail(webapp.RequestHandler):
     def get(self, team_number, year=None):
+
+        if year is '':
+            return self.redirect("/team/" + team_number)
+
         if type(year) == str: 
             year = int(year)
             explicit_year = True
