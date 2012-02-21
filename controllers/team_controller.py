@@ -33,10 +33,17 @@ class TeamList(webapp.RequestHandler):
 # The view of a single Team.
 class TeamDetail(webapp.RequestHandler):
     def get(self, team_number, year=None):
-
+        
+        # /team/0201 should redirect to /team/201
+        if str(int(team_number)) != team_number:
+            if year is None:
+                return self.redirect("/team/%s" % int(team_number))
+            else:
+                return self.redirect("/team/%s/%s" % (int(team_number), year))
+        
         if year is '':
-            return self.redirect("/team/" + team_number)
-
+            return self.redirect("/team/%s" % team_number)
+        
         if type(year) == str: 
             year = int(year)
             explicit_year = True
