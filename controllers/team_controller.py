@@ -59,7 +59,7 @@ class TeamDetail(webapp.RequestHandler):
             
             #todo better 404 handling
             if not team:
-                self.redirect("/")
+                return self.redirect("/")
             
             events = [a.event for a in team.events if a.year == year]
             for event in events:
