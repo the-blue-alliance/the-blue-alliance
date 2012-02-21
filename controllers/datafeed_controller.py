@@ -17,8 +17,6 @@ from helpers.match_helper import MatchUpdater
 from helpers.team_helper import TeamTpidHelper, TeamUpdater
 from helpers.tbavideo_helper import TBAVideoUpdater
 
-from helpers.datafeed_helper import DatafeedHelper
-
 from models import Event
 from models import EventTeam
 from models import Team
@@ -138,37 +136,33 @@ class UsfirstEventGet(webapp.RequestHandler):
     Handles reading a USFIRST event page and creating or updating the model as needed.
     Includes registered Teams.
     """
-    def get(self, first_eid):
+    def get(self, first_eid, year=2012):
         datafeed = DatafeedUsfirstEvents()
         
-        event = datafeed.getEvent(first_eid)
+        event = datafeed.getEvent(first_eid, year)
         event = EventUpdater.createOrUpdate(event)
         
-        eventteams_count = 0
-
-        team_list = datafeed.getEventRegistration(first_eid)
-        team_keys = DatafeedHelper.getTeamKeyNames(team_list)
-        teams = Team.get_by_key_name(team_keys)
+        team_dicts = datafeed.getEventRegistration(first_eid, year)
+        teams = Team.get_by_key_name(["frc" + team_dict["number"] for team_dict in team_dicts])
         
-
-        for index, x in enumerate(teams):
-            if x is None:
+        for team_dict, team in zip(team_dicts, teams):
+            if team is None:
                 team = Team(
-                    team_number = int(team_list[index]["number"]),
-                    first_tpid = int(team_list[index]["tpid"]),
-                    key_name = "frc" + str(team_list[index]["number"])
+                    team_number = int(team_dict["number"]),
+                    first_tpid = int(team_dict["tpid"]),
+                    key_name = "frc" + str(team_dict["number"])
                 )
                 team.put()
             
             et = EventTeam.get_or_insert(
                 key_name = event.key().name() + "_" + team.key().name(),
                 event = event,
-                team = team)
-            eventteams_count = eventteams_count + 1
+                team = team
+            )
         
         template_values = {
             'event': event,
-            'eventteams_count': eventteams_count,
+            'eventteams_count': len(team_dicts),
         }
         
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_get.html')

@@ -6,6 +6,8 @@ from google.appengine.api import urlfetch
 
 from datafeeds.datafeed_usfirst_events import DatafeedUsfirstEvents
 
+from models import Team
+
 class TestDatafeedUsfirstEvents(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()
