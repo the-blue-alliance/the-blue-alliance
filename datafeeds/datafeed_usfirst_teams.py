@@ -69,21 +69,21 @@ class DatafeedUsfirstTeams(object):
         Return a Team object for the requested team_number
         """
         
-        team = Team.all().filter('team_number =', team_number).get()
+        team = Team.get_by_key_name("frc" + str(team_number))
         
-        if team.first_tpid is not None:
-            session_key = self.getSessionKey(team.first_tpid_year)
-            url = self.TEAM_DETAILS_URL_PATTERN % (team.first_tpid, session_key)
-            logging.info("Fetch url: %s" % url)
-            result = urlfetch.fetch(url)
-            if result.status_code == 200:
-                return self.parseTeamDetails(result.content)
-            else:
-                logging.error('Unable to retreive url: %s' % url)
-                return None
-        else:
-            logging.error('Do not know Tpid for team %s' % team_number)
-            return None
+        if hasattr(team, 'first_tpid'):
+            if team.first_tpid:
+                session_key = self.getSessionKey(team.first_tpid_year)
+                url = self.TEAM_DETAILS_URL_PATTERN % (team.first_tpid, session_key)
+                logging.info("Fetch url: %s" % url)
+                result = urlfetch.fetch(url)
+                if result.status_code == 200:
+                    return self.parseTeamDetails(result.content)
+                else:
+                    logging.error('Unable to retreive url: %s' % url)
+                    return None
+        logging.warning('Null TPID for team %s' % team_number)
+        return None
     
     def parseTeamDetails(self, html):
         """
@@ -93,6 +93,10 @@ class DatafeedUsfirstTeams(object):
         team_info = dict()
         soup = BeautifulSoup(html,
                 convertEntities=BeautifulSoup.HTML_ENTITIES)
+        
+        if soup.find(text='No team found.') is not None:
+            logging.warning('FIRST lacks team.')
+            return None
         
         for tr in soup.findAll('tr'):
             tds = tr.findAll('td')

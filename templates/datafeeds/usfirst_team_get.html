@@ -1,6 +1,10 @@
+{% if success %}
 <h2>Team {{team.team_number}}</h2>
 <ul>
     <li>Name: {{team.name}}</li>
     <li>Nickname: {{team.nickname}}</li>
     <li>Location: {{team.address}}</li>
 </ul>
+{% else %}
+<h2>Team fetch failed.</h2>
+{% endif %}

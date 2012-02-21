@@ -294,16 +294,21 @@ class UsfirstTeamGet(webapp.RequestHandler):
     def get(self, key_name):
         df = DatafeedUsfirstTeams()
         
-        old_team = Team.get_by_key_name(key_name)
         logging.info("Updating team %s" % key_name)
-        new_team = df.getTeamDetails(old_team.team_number) #TODO old team can be null -gregmarra 21 mar 2011
-        team = TeamUpdater.createOrUpdate(new_team)
+        team = df.getTeamDetails(key_name[3:])
+        logging.info(team)
+        if team:
+            team = TeamUpdater.createOrUpdate(team)
+            success = True
+        else:
+            success = False
         
         template_values = {
             'team': team,
+            'success': success,
         }
         
-        path = os.path.join(os.path.dirname(__file__), '../templates/team.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_team_get.html')
         self.response.out.write(template.render(path, template_values))
         
     def post(self, key_name):
