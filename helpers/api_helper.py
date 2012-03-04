@@ -19,9 +19,7 @@ class ApiHelper(object):
         memcache_key = "api_team_info_%s" % team_key
         team_dict = memcache.get(memcache_key)
         if team_dict is None:
-            logging.info(team_key)
             team = Team.get_by_key_name(team_key)
-            logging.info(team)
             if team is not None:
                 team_dict = dict()
                 team_dict["key"] = team.key().name()
@@ -39,7 +37,7 @@ class ApiHelper(object):
                     team_dict["region"] = team.split_address["region"]
                     team_dict["country"] = team.split_address["country"]
                 except Exception, e:
-                    logging.error("Failed to include Address for api_team_info_%s" % team_key)
+                    logging.info("Failed to include Address for api_team_info_%s" % team_key)
                 
                 memcache.set(memcache_key, team_dict, 3600)
             else:
