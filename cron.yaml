@@ -11,6 +11,6 @@ cron:
   url: /tasks/usfirst_team_get_enqueue
   schedule: 1,15 of month 00:00
 
-# - description: FIRST match detail scraping
-#  url: /tasks/usfirst_matches_get_enqueue?year=2012
-#  schedule: every 60 minutes
+- description: FIRST match detail scraping for current events
+  url: /tasks/usfirst_matches_get_enqueue?now=true
+  schedule: every 5 minutes
