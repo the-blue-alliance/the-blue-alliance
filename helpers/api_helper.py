@@ -32,10 +32,10 @@ class ApiHelper(object):
                 
                 try:
                     team.do_split_address()
-                    team_dict["location"] = team.split_address["full_address"]
-                    team_dict["locality"] = team.split_address["locality"]
-                    team_dict["region"] = team.split_address["region"]
-                    team_dict["country"] = team.split_address["country"]
+                    team_dict["location"] = team.split_address.get("full_address", None)
+                    team_dict["locality"] = team.split_address.get("locality", None)
+                    team_dict["region"] = team.split_address.get("region", None)
+                    team_dict["country"] = team.split_address.get("country", None)
                 except Exception, e:
                     logging.info("Failed to include Address for api_team_info_%s" % team_key)
                 
