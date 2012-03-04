@@ -8,8 +8,7 @@ USAGE = """%prog SDK_PATH
 Run unit tests for App Engine apps.
 The SDK Path is probably /usr/local/google_appengine on Mac OS
 
-SDK_PATH    Path to the SDK installation
-TEST_PATH   Path to package containing test modules"""
+SDK_PATH    Path to the SDK installation"""
 
 
 def main(sdk_path, test_path):
@@ -23,8 +22,8 @@ def main(sdk_path, test_path):
 if __name__ == '__main__':
     parser = optparse.OptionParser(USAGE)
     options, args = parser.parse_args()
-    if len(args) != 2:
-        print 'Error: Exactly 2 arguments required.'
+    if len(args) != 1:
+        print 'Error: Exactly 1 argument required.'
         parser.print_help()
         sys.exit(1)
     SDK_PATH = args[0]
