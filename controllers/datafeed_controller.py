@@ -1,5 +1,6 @@
 import logging
 import os
+import datetime
 
 from django.utils import simplejson
 
@@ -98,8 +99,8 @@ class UsfirstEventsInstantiate(webapp.RequestHandler):
                 method='GET')
         
         template_values = {
-            'event_count': len(events),
-            'year': year,
+            'events': events,
+            'year': 2010
         }
         
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_events_instantiate.html')
@@ -175,25 +176,22 @@ class UsfirstMatchesGetEnqueue(webapp.RequestHandler):
     """
     def get(self):
         events = Event.all()
-        events.filter('official =', True)
-        events.filter('year =', int(self.request.get('year')))
-        # TODO: Filter for "currently happening" -gregmarra 11 Mar 2011
+        events = events.filter('official =', True)
         
-        try:
-            if self.request.get('year') is not None:
-                events.filter('year =', int(self.request.get('year')))
-        except Exception, detail:
-            logging.error('Getting Year Failed: ' + str(detail))
-            
+        if self.request.get('now', None) is not None:
+            events = events.filter('end_date <=', datetime.date.today() + datetime.timedelta(days=4))
+            events = events.filter('end_date >=', datetime.date.today() - datetime.timedelta(days=1))
+        else:
+            events = events.filter('year =', int(self.request.get('year')))
+        
         events = events.fetch(500)
         for event in events:
-            logging.info(event)
             taskqueue.add(
                 url='/tasks/usfirst_matches_get/' + event.key().name(),
                 method='GET')
         
         template_values = {
-            'event_count': len(events),
+            'events': events,
         }
 
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_matches_get_enqueue.html')
@@ -272,18 +270,15 @@ class UsfirstTeamGetEnqueue(webapp.RequestHandler):
     """
     def get(self):
         
-        offset = self.request.get("offset")
-        if (offset is None):
-            offset = 0
-            
-        counter = 0
-        for team_key in Team.all(keys_only=True).fetch(1000, int(offset)):
-            counter += 1
+        offset = int(self.request.get("offset", 0))
+        
+        teams = Team.all(keys_only=True).fetch(1000, int(offset))
+        for team_key in teams:
             taskqueue.add(url='/tasks/usfirst_team_get/' + team_key.name(),
                           method='POST')
                           
-        self.response.out.write(str(counter) + " team gets have been enqueued.<br />")
-        self.response.out.write("Reload with ?offset=n+1000 to enqueue more.")
+        self.response.out.write("%s team gets have been enqueued offset from %s.<br />" %(len(teams), offset))
+        self.response.out.write("Reload with ?offset=%s to enqueue more." % (offset + len(teams)))
 
 
 class UsfirstTeamGet(webapp.RequestHandler):

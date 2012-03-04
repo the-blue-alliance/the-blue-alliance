@@ -22,6 +22,11 @@ indexes:
 
 - kind: Event
   properties:
+  - name: official
+  - name: end_date
+
+- kind: Event
+  properties:
   - name: year
   - name: first_eid
 
