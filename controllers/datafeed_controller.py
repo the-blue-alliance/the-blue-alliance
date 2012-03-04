@@ -204,20 +204,21 @@ class UsfirstMatchesGet(webapp.RequestHandler):
     """
     def get(self, event_key):
         df = DatafeedUsfirstMatches()
+        mu = MatchUpdater()
         
         event = Event.get_by_key_name(event_key)
         matches = df.getMatchResultsList(event)
         
         new_matches = list()
-        
-        if matches is None:
-            logging.info("No matches found for event " + str(event.year) + " " + str(event.name))
-        else:
+        if matches is not None:
+            mu.bulkRead(matches)
             for match in matches:
-                new_match = MatchUpdater.findOrSpawn(match) # findOrSpawn doesn't put() things.
+                new_match = mu.findOrSpawnWithCache(match) # findOrSpawn doesn't put() things.
                 new_matches.append(new_match)
             
             keys = db.put(new_matches) # Doing a bulk put() is faster than individually.
+        else:
+            logging.info("No matches found for event " + str(event.year) + " " + str(event.name))
         
         template_values = {
             'matches': new_matches,

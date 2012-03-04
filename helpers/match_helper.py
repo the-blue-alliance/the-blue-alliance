@@ -56,6 +56,19 @@ class MatchUpdater(object):
     Helper class to handle Match objects when we are not sure whether they
     already exist or not.
     """
+    
+    def __init__(self):
+        self.cached_matches = dict() # a dictionary to cache DB reads
+    
+    def bulkRead(self, match_list):
+        """
+        Take a list of matches, bulk read them to reduce DB reads.
+        """
+        keys = [match.key().name() for match in match_list]
+        for match in Match.get_by_key_name(keys):
+            if match is not None:
+                self.cached_matches.setdefault(match.key().name(), match)
+    
     @classmethod
     def createOrUpdate(self, new_match):
         """
@@ -63,6 +76,19 @@ class MatchUpdater(object):
         """
         new_match = self.findOrSpawn(new_match)
         new_match.put()
+        return new_match
+    
+    # There must be a more elegant way to do this -gregmarra 4 Mar 2012
+    def findOrSpawnWithCache(self, new_match):
+        """
+        A version of findOrSpawn that can use the cache.
+        """
+        match = self.cached_matches.get(new_match.get_key_name(), None)
+        if match is not None:
+            new_match = self.updateMerge(new_match, match)
+        else:
+            new_match = self.findOrSpawn(new_match)
+        
         return new_match
     
     @classmethod

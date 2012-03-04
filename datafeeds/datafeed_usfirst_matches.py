@@ -32,8 +32,7 @@ class DatafeedUsfirstMatches(object):
     
     def getMatchResultsList(self, event):
         """
-        Return a list of dicts based on the FIRST match results page.
-        {"match": Match, "teams": {"red": list(), "blue": list()}, "scores": {"red": int, "blue": int}}
+        Return a list of Matches based on the FIRST match results page.
         """
         url = self.MATCH_RESULTS_URL_PATTERN % (event.year, event.event_short)
         result = urlfetch.fetch(url)
