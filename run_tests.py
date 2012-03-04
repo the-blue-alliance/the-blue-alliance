@@ -4,8 +4,9 @@ import sys
 # Install the Python unittest2 package before you run this script.
 import unittest2
 
-USAGE = """%prog SDK_PATH TEST_PATH
+USAGE = """%prog SDK_PATH
 Run unit tests for App Engine apps.
+The SDK Path is probably /usr/local/google_appengine on Mac OS
 
 SDK_PATH    Path to the SDK installation
 TEST_PATH   Path to package containing test modules"""
@@ -27,5 +28,5 @@ if __name__ == '__main__':
         parser.print_help()
         sys.exit(1)
     SDK_PATH = args[0]
-    TEST_PATH = args[1]
+    TEST_PATH = "tests"
     main(SDK_PATH, TEST_PATH)
