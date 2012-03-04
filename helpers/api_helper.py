@@ -21,6 +21,7 @@ class ApiHelper(object):
         if team_dict is None:
             logging.info(team_key)
             team = Team.get_by_key_name(team_key)
+            team.event_keys.sort(reverse=True)
             logging.info(team)
             if team is not None:
                 team_dict = dict()
