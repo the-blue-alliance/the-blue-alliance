@@ -184,11 +184,14 @@ class Match(db.Model):
     # }
     # }
     
+    def event_key_name(self):
+        return Match.event.get_value_for_datastore(self).name()
+    
     def get_key_name(self):
         if self.comp_level == "qm":
-            return self.event.get_key_name() + '_qm' + str(self.match_number)
+            return self.event_key_name() + '_qm' + str(self.match_number)
         else:
-            return (self.event.get_key_name() + '_' + self.comp_level +
+            return (self.event_key_name() + '_' + self.comp_level +
                 str(self.set_number) + 'm' + str(self.match_number))
     
     def unpack_json(self):
@@ -261,7 +264,7 @@ class TBAVideo(db.Model):
             if filetype in self.filetypes:
                 # Note: match.get_key_name() doesn't always return the match.key().name()
                 # because of things like malformed Championship Field names. -gregmarra 22 May 2011
-                return self.TBA_NET_VID_PATTERN % (self.match.event.key().name(), self.match.get_key_name(), filetype)
+                return self.TBA_NET_VID_PATTERN % (self.match.event_key_name(), self.match.get_key_name(), filetype)
         return None
 
 
