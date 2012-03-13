@@ -18,18 +18,26 @@ client.ProgrammaticLogin()
 
 feed = client.GetListFeed(key, worksheet_id)
 
-# The following is from SpreadSheetExample.py that came with the gdata python client
+# The following is based upon SpreadSheetExample.py that came with the gdata python client
 # Modify this so that YoutubeVideo objects are made instead of printing the data
+
+# Get rid of rows without an event code
+for i, entry in enumerate(list(feed.entry)):
+  for key in entry.custom:
+    if (key=="event") and (entry.custom[key].text is None):
+      feed.entry.remove(entry)
+      
 for i, entry in enumerate(feed.entry):
   if isinstance(feed, gdata.spreadsheet.SpreadsheetsCellsFeed):
     print '%s %s\n' % (entry.title.text, entry.content.text)
   elif isinstance(feed, gdata.spreadsheet.SpreadsheetsListFeed):
     print '%s %s %s' % (i, entry.title.text, entry.content.text)
-    # Print this row's value for each column (the custom dictionary is
-    # built using the gsx: elements in the entry.)
+     #Print this row's value for each column (the custom dictionary is
+     #built using the gsx: elements in the entry.)
     print 'Contents:'
-    for key in entry.custom:  
-      print '  %s: %s' % (key, entry.custom[key].text) 
+    for key in entry.custom:
+      print '  %s: %s' % (key, entry.custom[key].text) # here is the data we want
     print '\n',
   else:
     print '%s %s\n' % (i, entry.title.text)
+
