@@ -54,15 +54,21 @@ class AdminMatchAddVideos(webapp.RequestHandler):
         matches = Match.get_by_key_name(match_keys)
         
         matches_to_put = []
-        for (match, youtube_video) in zip(matches, youtube_videos):
+        results = {"existing": [], "bad_match": [], "added": []}
+        for (match, match_key, youtube_video) in zip(matches, match_keys, youtube_videos):
             if match:
                 if youtube_video not in match.youtube_videos:
                     match.youtube_videos.append(youtube_video)
                     matches_to_put.append(match)
+                    results["added"].append(match_key)
+                else:
+                    results["existing"].append(match_key)
+            else:
+                results["bad_match"].append(match_key)
         db.put(matches_to_put)
         
         template_values = {
-            "youtube_videos_added": len(matches_to_put),
+            "results": results,
         }
         
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/matches/videosadd.html')

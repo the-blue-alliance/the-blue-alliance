@@ -6,7 +6,13 @@
 
 <h1>Add lots of Videos</h1>
 
-{% if youtube_videos_added %}<p>Added {{ youtube_videos_added }} YouTube videos!</p>{% endif %}
+{% if results %}
+<ul>Results:
+    <li>Bad Match: {{ results.bad_match }}</li>
+    <li>Added: {{ results.added }}</li>
+    <li>Existing: {{ results.existing }}</li>
+<ul>
+{% endif %}
 
 <form action="/admin/match/addvideos" method="post">
     <fieldset>
