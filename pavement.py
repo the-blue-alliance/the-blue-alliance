@@ -31,8 +31,6 @@ def dev_data_setup():
   sh("appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/events.csv --kind=Event --url=http://localhost:8088/_ah/remote_api")
   print("Importing test Match data")
   sh("appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/matches_2010cmp.csv --kind=Match --url=http://localhost:8088/_ah/remote_api")
-  print("Importing test YoutubeVideo data")
-  sh("appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/youtubevideos_2010cmp.csv --kind=YoutubeVideo --url=http://localhost:8088/_ah/remote_api")
   print("Updating EventTeams")
   sh("wget --delete-after --quiet http://localhost:8088/tasks/eventteam_update_enqueue")
   print("Scraping TBAVideos")

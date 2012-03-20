@@ -63,10 +63,10 @@
         {% if tbavideo %}
             {% include "videos/partials/tbavideo_player.html" %}
         {% endif %}
-        {% for youtubevideo in youtubevideos %}
+        {% for youtube_video in match.youtube_videos %}
           {% include "videos/partials/youtubevideo_player.html" %}
         {% endfor %}
-        {% if not tbavideo and not youtube_ids %}
+        {% if not tbavideo and not match.youtube_videos %}
           <p>No video available. Have one? <a href="/contact">Contact us!</a></p>
         {% endif %}
     </div>

@@ -159,19 +159,7 @@ class Match(db.Model):
         1992: "frc_1992_maiz",
     }
     
-    game = db.StringProperty(required=True,choices=set(FRC_GAMES))
-    
-    event = db.ReferenceProperty(Event, required=True)
-    time = db.DateTimeProperty()
-    
-    comp_level = db.StringProperty(required=True,choices=set(COMP_LEVELS))
-    set_number = db.IntegerProperty(required=True)
-    match_number = db.IntegerProperty(required=True)
-    
-    team_key_names = db.StringListProperty(required=True) #list of teams in Match, for indexing.
     alliances_json = db.StringProperty(required=True) #JSON dictionary with alliances and scores.
-    
-    no_auto_update = db.BooleanProperty(default=False) #Set to True after manual update
     
     # {
     # "red": {
@@ -183,6 +171,16 @@ class Match(db.Model):
     #    "score": 12
     # }
     # }
+    
+    comp_level = db.StringProperty(required=True,choices=set(COMP_LEVELS))
+    event = db.ReferenceProperty(Event, required=True)
+    game = db.StringProperty(required=True,choices=set(FRC_GAMES))
+    match_number = db.IntegerProperty(required=True)
+    no_auto_update = db.BooleanProperty(default=False) #Set to True after manual update
+    set_number = db.IntegerProperty(required=True)
+    team_key_names = db.StringListProperty(required=True) #list of teams in Match, for indexing.
+    time = db.DateTimeProperty()
+    youtube_videos = db.StringListProperty() #list of Youtube IDs
     
     def event_key_name(self):
         return Match.event.get_value_for_datastore(self).name()
@@ -227,7 +225,10 @@ class Match(db.Model):
             return "%s %s Match %s" % (self.COMP_LEVELS_VERBOSE[self.comp_level], self.set_number, self.match_number)
     
     def has_video(self):
-        return self.tbavideo_set.count() + self.youtubevideo_set.count() > 0
+        if len(self.youtube_videos) > 0:
+            return True
+        else:
+            return self.tbavideo_set.count() > 0
     
     def details_url(self):
         return "/match/%s" % self.get_key_name()
@@ -271,6 +272,7 @@ class TBAVideo(db.Model):
 class YoutubeVideo(db.Model):
     """
     Store information related to videos of Matches hosted on YouTube.
+    DEPRECATED DO NOT USE
     """
     match = db.ReferenceProperty(Match, required=True)
     youtube_id = db.StringProperty(required=True)

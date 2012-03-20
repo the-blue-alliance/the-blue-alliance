@@ -24,13 +24,12 @@
         <td>Alliances JSON</td>
         <td>{{ match.alliances_json }}</td>
     </tr>
+    
+    <tr>
+        <td>Youtube Videos</td>
+        <td>{{ match.youtube_videos }}</td>
+    </tr>
+    
 </table>
-
-<h2>YoutubeVideos</h2>
-<ul>
-  {% for youtubevideo in match.youtubevideo_set %}
-  <li><a href="/admin/youtubevideo/edit/{{youtubevideo.key.id_or_name}}">YoutubeVideo {{youtubevideo.key.id_or_name}}</a> (watch <a href="www.youtube.com/watch?v={{youtubevideo.youtubeid}}">{{youtubevideo.youtubeid}} on Youtube</a>)</li>
-  {% endfor %}
-</ul>
 
 {% endblock %}

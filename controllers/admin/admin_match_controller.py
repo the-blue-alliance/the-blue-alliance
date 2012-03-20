@@ -1,7 +1,7 @@
 import os
 import logging
 
-from google.appengine.ext import webapp
+from google.appengine.ext import webapp, db
 from google.appengine.ext.webapp import template, util
 
 from django.utils import simplejson
@@ -38,6 +38,36 @@ class AdminMatchDetail(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/matches/details.html')
         self.response.out.write(template.render(path, template_values))
         
+class AdminMatchAddVideos(webapp.RequestHandler):
+    """
+    Add a lot of youtube_videos to Matches at once.
+    """
+    def get(self):
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/matches/videosadd.html')
+        self.response.out.write(template.render(path, {}))
+        
+    def post(self):
+        logging.info(self.request)
+        
+        additions = simplejson.loads(self.request.get("youtube_additions_json"))
+        match_keys, youtube_videos = zip(*additions["videos"])
+        matches = Match.get_by_key_name(match_keys)
+        
+        matches_to_put = []
+        for (match, youtube_video) in zip(matches, youtube_videos):
+            if match:
+                if youtube_video not in match.youtube_videos:
+                    match.youtube_videos.append(youtube_video)
+                    matches_to_put.append(match)
+        db.put(matches_to_put)
+        
+        template_values = {
+            "youtube_videos_added": len(matches_to_put),
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/matches/videosadd.html')
+        self.response.out.write(template.render(path, template_values))
+
 class AdminMatchEdit(webapp.RequestHandler):
     """
     Edit a Match.

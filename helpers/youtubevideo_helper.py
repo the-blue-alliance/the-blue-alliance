@@ -8,6 +8,7 @@ class YoutubeVideoUpdater(object):
     """
     Helper class to handle YoutubeVideo objects when we are not sure whether they
     already exist or not.
+    DEPRECATED, since the YoutubeVideo class is deprecated.
     """
     
     @classmethod
