@@ -41,24 +41,43 @@
         document.getElementById('fb-root').appendChild(e);
       }());
     </script>
-    <div id="header">
-        <div id="headerSpacer">
+    <div id="topHeader">
+        <div id="header">
             <div id="headerContent">
-                <div id="headerRight">
-                    <div id="headerTitle">
-                        <a href="/"><img src="/images/header_logo.png" height="36" width="240" alt="The Blue Alliance" /></a>
-                    </div>
-                    <div id="headerSearch">
-                        <form action="http://www.thebluealliance.com/search" id="cse-search-box" class="textInput">
-                            <input type="hidden" name="cx" value="017956276086362105630:99ctqytcokm" />
-                            <input type="hidden" name="cof" value="FORID:11" />
-                            <input type="hidden" name="ie" value="UTF-8" />
-                            <input type="text" id="q" name="q" />
-                            <button id="sa" name="sa" type="submit" value="Search" ></button>
-                        </form>
-                        <script type="text/javascript" src="http://www.google.com/cse/brand?form=cse-search-box&lang=en"></script>
-                    </div>
-                </div>
+              <ul class="headerNav">
+                  <li id="navLogo">
+                    <a href="/" id="tbaLogo"></a>
+                  </li>
+                  <li class="navButton">
+                      <a href="/teams">Teams</a>
+                  </li>
+                  <li class="navButton">
+                      <a href="/events">Events</a>
+                  </li>
+                  <li class="rightNav">
+                           <div id="headerSearch">
+                          <form action="http://www.thebluealliance.com/search" id="cse-search-box" class="textInput">
+                              <input type="hidden" name="cx" value="017956276086362105630:99ctqytcokm" />
+                              <input type="hidden" name="cof" value="FORID:11" />
+                              <input type="hidden" name="ie" value="UTF-8" />
+                              <input type="text" id="q" name="q" />
+                              <button id="sa" name="sa" type="submit" value="Search" ></button>
+                          </form>
+                          <script type="text/javascript" src="http://www.google.com/cse/brand?form=cse-search-box&lang=en"></script>
+                          </div>
+                  </li> 
+                  <li class="rightNav socialIcon">
+                      <a href="http://facebook.com/thebluealliance" title="Like us on Facebook"><img src="/images/icons/facebook-24x24.png" /></a>
+                  </li>
+                  <li class="rightNav socialIcon">
+                      <a href="http://twitter.com/thebluealliance" title="Follow us on Twitter"><img src="/images/icons/twitter-24x24.png" /></a>
+                  </li>
+                  <li class="rightNav socialIcon">
+                      <a href="http://thebluealliance.tumblr.com" title="Read our Blog"><img src="/images/icons/tumblr-24x24.png" /></a>
+                  </li>
+
+
+              </ul>
             </div>
         </div>
     </div>

@@ -27,6 +27,14 @@ span.annotation {
 #main {
 }
 
+#topHeader {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 500;
+}
+
 #header {
     background-color: #999999;
     border-bottom: 2px solid #003399;
@@ -37,40 +45,67 @@ span.annotation {
     width: 100%;
 }
 
-#headerSpacer{
-    margin: 0 auto;
-    width: 1000px;
-    padding: 0 15px;
-}
 
 #headerContent {
     margin: 0 auto;
-    padding: 0;
-    width: 980px;
+    padding: 7px 0 0 0;
+    width: 1000px;
+    display: block;
+    position: relative;
 }
 
-#headerTitle {
-    display: inline;
+
+#navLogo { 
     float: left;
-    width: 200px;
+    display: inline;
+    margin: 0 31px 0 0;
+
 }
-#headerTitle img {
+#tbaLogo {
+    display: block;
+    background-image: url("../images/header_logo.png");
     height: 24px;
-    margin: 10px 0 0 0;
     width: 180px;
 }
-
-#headerRight {
-    float: right;
-    height: 36px;
-    margin: 0 0 0 0;
-    padding: 0 0 2px 0;
-    width: 778px;
+ul.headerNav { 
+  display: inline-block;
+  list-style: none;
+  padding: 3px 0 0 0;
+  margin: 0px;
+  width: 100%;
 }
 
+.headerNav li {
+  display: inline-block;
+}
+
+.headerNav li a {
+  color: #fffff3; 
+}
+
+.headerNav li.rightNav {
+  float: right;
+}
+
+
+li.navButton {
+  margin: 0 10px 0 0;
+  font-family: "Helvetica", Helvetica;
+  font-size: 15px;
+  padding: 6px 10px 6px 10px;
+  background-color: #164673;
+  -webkit-border-radius: 15px;
+}
+
+li.socialIcon {
+  margin: 0 7px 0 0;
+}
+
+
+
 #headerSearch {
+    display: block;
     float: right;
-    margin: 12px 0 0 4px;
     width: 250px;
 }
 
@@ -106,6 +141,7 @@ span.annotation {
 }
 
 #main {
+    padding-top: 60px;
     margin: 0 auto;
     width: 980px;
 }
