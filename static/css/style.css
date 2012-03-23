@@ -95,6 +95,8 @@ li.navButton {
   padding: 6px 10px 6px 10px;
   background-color: #164673;
   -webkit-border-radius: 15px;
+  -moz-border-radius: 15px;
+  border-radius: 15px;
 }
 
 li.socialIcon {
