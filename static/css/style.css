@@ -49,7 +49,7 @@ span.annotation {
 #headerContent {
     margin: 0 auto;
     padding: 7px 0 0 0;
-    width: 1000px;
+    width: 980px;
     display: block;
     position: relative;
 }
@@ -58,7 +58,7 @@ span.annotation {
 #navLogo { 
     float: left;
     display: inline;
-    margin: 0 31px 0 0;
+    margin: 0 22px 0 0;
 
 }
 #tbaLogo {
@@ -95,6 +95,8 @@ li.navButton {
   padding: 6px 10px 6px 10px;
   background-color: #164673;
   -webkit-border-radius: 15px;
+  -moz-border-radius: 15px;
+  border-radius: 15px;
 }
 
 li.socialIcon {
