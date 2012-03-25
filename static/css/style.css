@@ -237,7 +237,7 @@ li.socialIcon {
 }
 .contentBlock .contentBlockTopper p {
     float: right;
-    margin-right: 8px;
+    margin: 0 8px 0 0;
 }
 .contentBlock p {
     margin: 1em 0 1em 8px;

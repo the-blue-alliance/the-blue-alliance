@@ -20,6 +20,10 @@
     <ul class="leftNav">
         <li class="info"><a href="#info">Information</a></li>
         <li class="event"><a href="#events">Events in {{year}}</a></li>
+        {% for a_year in years %}
+        <li><a href="/team/{{team.team_number}}/{{a_year}}">{{a_year}}</a></li>
+        {% endfor %}
+        </p>
     </ul>
     <div class="divider"></div>
 {% endblock %}
@@ -65,9 +69,6 @@
     <div id="events" class="contentBlock">
         <div class="contentBlockTopper">
             <h2>{{ participation|length }} Event{{participation|length|pluralize}} in {{year}}</h2>
-            <p>
-                {% for a_year in years %}<a href="/team/{{team.team_number}}/{{a_year}}">{{a_year}}</a>{% if not forloop.last %} - {% endif %}{% endfor %}
-            </p>
         </div>
         {% for comp in participation %}
             <ul class="infoList">
