@@ -12,6 +12,8 @@ handlers:
   static_dir: static/css
 - url: /images
   static_dir: static/images
+- url: /javascript
+  static_dir: static/javascript
 - url: /jwplayer
   static_dir: static/jwplayer
 - url: /favicon.ico
