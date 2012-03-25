@@ -259,7 +259,7 @@ class TBAVideo(db.Model):
     
     def getDownloadablePath(self):
         return self.getBestPathOf(self.DOWNLOADABLE_FILETYPES)
-
+    
     def getBestPathOf(self, consider_filetypes):
         for filetype in consider_filetypes:
             if filetype in self.filetypes:
@@ -267,6 +267,12 @@ class TBAVideo(db.Model):
                 # because of things like malformed Championship Field names. -gregmarra 22 May 2011
                 return self.TBA_NET_VID_PATTERN % (self.match.event_key_name(), self.match.get_key_name(), filetype)
         return None
+
+    def getPathsOf(self):
+        paths = {}
+        for filetype in self.filetypes:
+            paths[filetype] = (self.TBA_NET_VID_PATTERN % (self.match.event_key_name(), self.match.get_key_name(), filetype))
+        return paths
 
 
 class YoutubeVideo(db.Model):

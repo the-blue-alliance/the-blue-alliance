@@ -335,3 +335,26 @@ ol li {
     text-align: center;
     width: 980px;
 }
+
+@media (max-device-width: 500px) {
+
+	#leftCol, #contentTop, #contentRight, #comments {
+		display: none;
+	}
+	#content {
+		border: none;
+		margin: 0;
+		width: auto;
+	}
+	#headerRight {
+		float: none;
+		width: auto;
+	}
+	#headerSpacer, #headerContent, #contentCenter, #main, #footer {
+		width: auto;
+	}
+	table.matchTable, object {
+		width: 100%;
+	}
+
+}

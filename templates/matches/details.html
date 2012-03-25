@@ -59,7 +59,7 @@
     <div id="video" class="contentBlock">
         <div class="contentBlockTopper">
             <h2>Video</h2>
-            {% if tbavideo %}<p><a href="{{tbavideo.getDownloadablePath}}" title="Video of {{match.verbose_name}} - {{match.event.year}} {{match.event.name}}">Download</a></p>{% endif %}
+            {% if tbavideo %}<p>{% for type, path in tbavideo.getPathsOf.items %}<a href="{{path}}" title="Video of {{match.verbose_name}} - {{match.event.year}} {{match.event.name}}">Download {{type}}</a>{% if not forloop.last %} - {% endif %}{% endfor %}</p>{% endif %}
         </div>
         {% if tbavideo %}
             {% include "videos/partials/tbavideo_player.html" %}
