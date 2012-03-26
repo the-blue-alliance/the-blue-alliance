@@ -267,13 +267,3 @@ class TBAVideo(db.Model):
                 # because of things like malformed Championship Field names. -gregmarra 22 May 2011
                 return self.TBA_NET_VID_PATTERN % (self.match.event_key_name(), self.match.get_key_name(), filetype)
         return None
-
-
-class YoutubeVideo(db.Model):
-    """
-    Store information related to videos of Matches hosted on YouTube.
-    DEPRECATED DO NOT USE
-    """
-    match = db.ReferenceProperty(Match, required=True)
-    youtube_id = db.StringProperty(required=True)
-

@@ -144,14 +144,3 @@ transformers:
     - property: website
       external_name: website
       import_transform: db.Link
-
-- kind: YoutubeVideo
-  connector: csv
-  property_map:
-    - property: match
-      external_name: match
-      import_transform: transform.create_foreign_key('Match')
-      export_transform: transform.key_id_or_name_as_string
-
-    - property: youtube_id
-      external_name: youtube_id
