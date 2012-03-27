@@ -121,6 +121,23 @@
         <p>No matches yet.</p>
         {% endif %}
     </div>
+    <div id="opr" class="contentBlock">
+        <div class="contentBlockTopper">
+            <h2>OPR</h2>
+        </div>
+        <table class="oprTable">
+            <tr class="key">
+                <th>Team</th>
+                <th>OPR</th>
+            </tr>
+            {% for opr,oprteams in oprs %}
+            <tr>
+                <td>{{oprteams}}</td>
+                <td>{{opr}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
     <div id="teams" class="contentBlock">
         <div class="contentBlockTopper">
             <h2>{% if teams %}{{ teams|length}} {% endif %}Team{{teams|length|pluralize}}</h2>

@@ -17,6 +17,7 @@ from helpers.event_helper import EventUpdater
 from helpers.match_helper import MatchUpdater
 from helpers.team_helper import TeamTpidHelper, TeamUpdater
 from helpers.tbavideo_helper import TBAVideoUpdater
+from helpers.opr_helper import OprHelper
 
 from models import Event
 from models import EventTeam
@@ -367,5 +368,34 @@ class FlushEvents(webapp.RequestHandler):
         event_count = Event.all().count()
         
         self.response.out.write("Events flushed. " + str(event_count) + " teams remain. What have we done?!")
+
+class OprGet(webapp.RequestHandler):
+    """
+    Calculates the opr for a regional
+    """
+    def get(self):
+        event_key = '2012wor'
+        opr,teams = OprHelper.opr(event_key)
+        logging.debug(opr)
+        #events = Event.all()
+        #for event in events:
+        #    if event.get_key_name()==event_key:
+        #        event = event
+        event = Event.get_by_key_name(event_key)
+        event.oprs = opr
+        event.oprteams = teams
+        event.put()
+
+        template_values = {
+            'opr': opr,
+            'teams': teams,
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/opr_get.html')
+        self.response.out.write(template.render(path, template_values))
+
+    def post(self):
+        logging.debug("post")
+        self.get()
 
         

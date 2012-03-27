@@ -63,6 +63,8 @@ class Event(db.Model):
     facebook_eid = db.StringProperty() #from Facebook
     website = db.StringProperty()
     webcast_url = db.StringProperty()
+    oprs = db.ListProperty(float)
+    oprteams = db.ListProperty(int)
     
     def get_key_name(self):
         """
