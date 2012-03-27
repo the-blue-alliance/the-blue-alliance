@@ -123,8 +123,9 @@
     </div>
     <div id="opr" class="contentBlock">
         <div class="contentBlockTopper">
-            <h2>OPR</h2>
+            <h2>OPR - (<a href="http://www.thebluealliance.com/opr">what's this?</a>)</h2>
         </div>
+	{% if oprs|length != 0 %}
         <table class="oprTable">
             <tr class="key">
                 <th>Team</th>
@@ -137,6 +138,9 @@
             </tr>
             {% endfor %}
         </table>
+	{% else %}
+	<p>Check back later for OPR.</p>
+	{% endif %}
     </div>
     <div id="teams" class="contentBlock">
         <div class="contentBlockTopper">

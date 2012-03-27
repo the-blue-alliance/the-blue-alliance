@@ -58,15 +58,17 @@ class EventDetail(webapp.RequestHandler):
             matches = MatchHelper.organizeMatches(event.match_set)
             teams = TeamHelper.sortTeams([a.team for a in event.teams])
             oprs = event.oprs
+            for i, opr in enumerate(oprs):
+                oprs[i] = round(opr,2) # round OPRs to 2 decimal places
             oprteams = event.oprteams
             oprs = zip(oprs,oprteams)
+            oprs = sorted(oprs, reverse=True) # sort by OPR
         
             template_values = {
                 "event": event,
                 "matches": matches,
                 "teams": teams,
                 "oprs": oprs,
-                #"oprteams": oprteams,
             }
                 
             path = os.path.join(os.path.dirname(__file__), '../templates/events/details.html')
