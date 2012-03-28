@@ -270,27 +270,27 @@ table.infoTable th {
     min-width: 75px;
 }
 
-table.matchTable {
+table.matchTable, table.oprTable {
     border-bottom: 1px solid #cccccc;
     padding: 3px 0;
     margin: 1em 0 1em 8px;
     width: 492px;
 }
-table.matchTable tr {
+table.matchTable tr, table.oprTable tr {
     border-top: 1px solid #cccccc;
     border-left: 1px solid #cccccc;
     padding: 3px 0;
 }
-table.matchTable tr.key {
+table.matchTable tr.key, table.oprTable tr.key {
     background-color: #f0f0f0;
 }
-table.matchTable th {
+table.matchTable th, table.oprTable th {
     border-right: 1px solid #cccccc;
     font-weight: bold;
     text-align: center;
     padding: 3px;
 }
-table.matchTable td {
+table.matchTable td, table.oprTable td {
     border-right: 1px solid #cccccc;
     text-align: center;
     padding: 3px;
@@ -314,6 +314,10 @@ table.matchTable td.icon, table.matchTable th.icon {
     margin: 0;
     padding: 3px 0 0 0;
     font-size: .5em;
+}
+
+table.oprTable tr.even {
+    background-color: #F9F9F9;
 }
 
 ul.infoList {

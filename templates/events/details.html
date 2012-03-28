@@ -121,6 +121,27 @@
         <p>No matches yet.</p>
         {% endif %}
     </div>
+    <div id="opr" class="contentBlock">
+        <div class="contentBlockTopper">
+            <h2>OPR - (<a href="http://www.thebluealliance.com/opr">what's this?</a>)</h2>
+        </div>
+	{% if oprs|length != 0 %}
+        <table class="oprTable">
+            <tr class="key">
+                <th>Team</th>
+                <th>OPR</th>
+            </tr>
+            {% for opr,opr_teams in oprs %}
+            <tr class="{% cycle 'odd' 'even' %}">
+                <td>{{opr_teams}}</td>
+                <td>{{opr}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+	{% else %}
+	<p>Check back later for OPR.</p>
+	{% endif %}
+    </div>
     <div id="teams" class="contentBlock">
         <div class="contentBlockTopper">
             <h2>{% if teams %}{{ teams|length}} {% endif %}Team{{teams|length|pluralize}}</h2>

@@ -1,0 +1,8 @@
+<h2>Got {{oprs|length}} OPRs</h2>
+{{teams}}
+{% for opr,team in oprs %}
+    <ul>
+        <li>{{opr}}</li>
+	<li>{{team}}</li>
+    </ul>
+{% endfor %}

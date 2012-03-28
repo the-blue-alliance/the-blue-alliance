@@ -14,3 +14,7 @@ cron:
 - description: FIRST match detail scraping for current events
   url: /tasks/usfirst_matches_get_enqueue?now=true
   schedule: every 5 minutes
+
+- description: OPR Calculation
+  url: /tasks/event_opr_get_enqueue
+  schedule: every day 22:00

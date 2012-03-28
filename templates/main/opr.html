@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance - OPR{% endblock %}
+
+{% block meta_description %}What is OPR?{% endblock %}
+
+{% block leftCol %}
+<img src="/images/logo_square_200.png" width="200" class="profileImg" />
+<ul class="leftNav">
+    <li class="event"><a href="/events/">Events</a></li>
+    <li class="robot"><a href="/teams/">Teams</a></li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div id="contentTop">
+    <h1>What is OPR?</h1>
+</div>
+<div id="contentRight">
+    {% include "base_partials/right_col.html" %}
+</div>
+<div id="contentCenter">
+    <div class="contentBlock">
+        <div class="contentBlockTopper">
+            <h2>What is OPR?</h2>
+        </div>
+        <p>Put a good description of OPR.</p>
+    </div>
+</div>
+{% endblock %}

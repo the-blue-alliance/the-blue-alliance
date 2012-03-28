@@ -51,6 +51,10 @@ class ThanksHandler(webapp.RequestHandler):
     def get(self):
         self.response.out.write(render_static("thanks"))
 
+class OprHandler(webapp.RequestHandler):
+    def get(self):
+        self.response.out.write(render_static("opr"))
+
 class SearchHandler(webapp.RequestHandler):
     def get(self):
         try:

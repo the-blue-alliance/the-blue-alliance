@@ -15,7 +15,7 @@ except Exception, e:
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
 
-from controllers.main_controller import MainHandler, ContactHandler, ThanksHandler, SearchHandler, PageNotFoundHandler
+from controllers.main_controller import MainHandler, ContactHandler, ThanksHandler, SearchHandler, PageNotFoundHandler, OprHandler
 
 from controllers.event_controller import EventList, EventDetail, EventRss
 from controllers.match_controller import MatchList, MatchDetail
@@ -37,6 +37,7 @@ def main():
                                           ('/team/([0-9]*)', TeamDetail),
                                           ('/team/([0-9]*)/(.*)', TeamDetail),
                                           ('/thanks', ThanksHandler),
+                                          ('/opr', OprHandler),
                                           ('/.*', PageNotFoundHandler)
                                           ],
                                          debug=True)
