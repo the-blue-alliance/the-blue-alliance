@@ -60,8 +60,8 @@ class EventDetail(webapp.RequestHandler):
             oprs = event.oprs
             for i, opr in enumerate(oprs):
                 oprs[i] = round(opr,2) # round OPRs to 2 decimal places
-            oprteams = event.oprteams
-            oprs = zip(oprs,oprteams)
+            opr_teams = event.opr_teams
+            oprs = zip(oprs,opr_teams)
             oprs = sorted(oprs, reverse=True) # sort by OPR
         
             template_values = {

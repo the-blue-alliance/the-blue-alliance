@@ -15,6 +15,6 @@ cron:
   url: /tasks/usfirst_matches_get_enqueue?now=true
   schedule: every 5 minutes
 
-- description: OPR Calculation for WPI
-  url: /tasks/event_opr_get
-  schedule: 1,15 of month 00:00
+- description: OPR Calculation
+  url: /tasks/event_opr_get_enqueue
+  schedule: every day 22:00

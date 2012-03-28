@@ -316,6 +316,10 @@ table.matchTable td.icon, table.matchTable th.icon {
     font-size: .5em;
 }
 
+table.oprTable tr.even {
+    background-color: #F9F9F9;
+}
+
 ul.infoList {
     
 }

@@ -1,7 +1,8 @@
-<h2>Got {{opr|length}} OPRs</h2>
+<h2>Got {{oprs|length}} OPRs</h2>
 {{teams}}
-{% for anopr in opr %}
+{% for opr,team in oprs %}
     <ul>
-        <li>{{anopr}}</li>
+        <li>{{opr}}</li>
+	<li>{{team}}</li>
     </ul>
 {% endfor %}

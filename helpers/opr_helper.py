@@ -24,8 +24,17 @@ class OprHelper:
     M = []
 
     @classmethod
-    def _init_():
+    def _init_(cls):
+        OprHelper.data = []
+        OprHelper.teamdata = []
+        OprHelper.M = []
         return 0
+
+    @classmethod
+    def reset(cls):
+        OprHelper.data = []
+        OprHelper.teamdata = []
+        OprHelper.M = []
 
     @classmethod
     def zeros(cls,m,n):
@@ -83,6 +92,30 @@ class OprHelper:
             OprHelper.teamdata.append([])
             OprHelper.teamdata[num].append(num) #teamid
             OprHelper.teamdata[num].append(int(team.team.team_number)) #teamnumber
+
+    @classmethod
+    def teamsPlayed(cls):
+        played = []
+        counter = 0
+        for team_id,team_number in OprHelper.teamdata:
+            if OprHelper.teamPlayed(team_number):
+                played.append([])
+                played[counter].append(team_id)
+                played[counter].append(team_number)
+                counter += 1
+        return played
+
+    @classmethod
+    def teamPlayed(cls,team):
+        """
+        Returns True if the team played at least one match (was present at regional)
+        Returns False if the team has not played any matches (was absent from regional)
+        """
+        for i,row in enumerate(OprHelper.data):
+            for j in range(2,7):
+                if OprHelper.data[i][j]==team:
+                    return True
+        return False
 
     @classmethod
     def getTeamID(cls,num):
@@ -193,8 +226,10 @@ class OprHelper:
 
     @classmethod
     def opr(OprHelper,event_key):
+        OprHelper.reset()
         OprHelper.getTeamData(event_key)
         OprHelper.getData(event_key)
+        OprHelper.teamdata = OprHelper.teamsPlayed()
         OprHelper.getM()
         s = OprHelper.gets()
         Mtrans = OprHelper.mTranspose(OprHelper.M)

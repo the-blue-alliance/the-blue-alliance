@@ -131,9 +131,9 @@
                 <th>Team</th>
                 <th>OPR</th>
             </tr>
-            {% for opr,oprteams in oprs %}
-            <tr>
-                <td>{{oprteams}}</td>
+            {% for opr,opr_teams in oprs %}
+            <tr class="{% cycle 'odd' 'even' %}">
+                <td>{{opr_teams}}</td>
                 <td>{{opr}}</td>
             </tr>
             {% endfor %}

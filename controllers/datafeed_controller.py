@@ -369,33 +369,50 @@ class FlushEvents(webapp.RequestHandler):
         
         self.response.out.write("Events flushed. " + str(event_count) + " teams remain. What have we done?!")
 
+class OprGetEnqueue(webapp.RequestHandler):
+    """
+    Enqueues OPR calculation
+    """
+    def get(self):
+        events = Event.all()
+        count = 0
+        for event in events:
+            taskqueue.add(
+                url='/tasks/event_opr_get/' + event.get_key_name(),
+                method='GET')
+            count = count + 1
+            
+        template_values = {
+            'event_count': count,
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/opr_get_enqueue.html')
+        self.response.out.write(template.render(path, template_values))
+
 class OprGet(webapp.RequestHandler):
     """
     Calculates the opr for a regional
     """
-    def get(self):
-        event_key = '2012wor'
-        opr,teams = OprHelper.opr(event_key)
-        logging.debug(opr)
-        #events = Event.all()
-        #for event in events:
-        #    if event.get_key_name()==event_key:
-        #        event = event
+    def get(self,event_key):
+        opr = []
+        teams = []
+        oprs = []
         event = Event.get_by_key_name(event_key)
-        event.oprs = opr
-        event.oprteams = teams
-        event.put()
+        if event.match_set.count()>0:
+            opr,teams = OprHelper.opr(event_key)
+            oprs.append((opr,teams))
+            event.oprs = opr
+            event.opr_teams = teams
+            event.put()
 
         template_values = {
-            'opr': opr,
-            'teams': teams,
+            'oprs': oprs,
         }
         
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/opr_get.html')
         self.response.out.write(template.render(path, template_values))
 
     def post(self):
-        logging.debug("post")
         self.get()
 
         

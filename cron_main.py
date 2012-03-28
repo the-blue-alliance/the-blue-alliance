@@ -19,7 +19,7 @@ from controllers.datafeed_controller import UsfirstMatchesGetEnqueue, UsfirstMat
 from controllers.datafeed_controller import UsfirstTeamGetEnqueue, UsfirstTeamGet, UsfirstTeamsInstantiate
 from controllers.datafeed_controller import FlushTeams, FlushMatches, FlushEvents, FlushEventTeams
 
-from controllers.datafeed_controller import OprGet
+from controllers.datafeed_controller import OprGet, OprGetEnqueue
 
 from controllers.cron_controller import EventTeamUpdate, EventTeamUpdateEnqueue
 
@@ -40,7 +40,8 @@ def main():
                                           ('/tasks/flush/matches', FlushMatches), # Danger!
                                           ('/tasks/flush/teams', FlushTeams), # Danger!
                                           ('/tasks/flush/eventteams', FlushEventTeams), # Danger!
-                                          ('/tasks/event_opr_get', OprGet)
+                                          ('/tasks/event_opr_get_enqueue', OprGetEnqueue),
+                                          ('/tasks/event_opr_get/(.*)', OprGet)
                                           ],
                                          debug=True)
     util.run_wsgi_app(application)

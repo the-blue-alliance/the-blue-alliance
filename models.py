@@ -64,7 +64,7 @@ class Event(db.Model):
     website = db.StringProperty()
     webcast_url = db.StringProperty()
     oprs = db.ListProperty(float)
-    oprteams = db.ListProperty(int)
+    opr_teams = db.ListProperty(int)
     
     def get_key_name(self):
         """
