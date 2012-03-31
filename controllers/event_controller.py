@@ -10,7 +10,7 @@ from google.appengine.ext.webapp import template, util
 from django.utils import simplejson
 
 
-from models import Event, Match
+from models import Event, Match, EventTeam, Team
 from helpers.match_helper import MatchHelper
 from helpers.team_helper import TeamHelper
 
@@ -56,7 +56,11 @@ class EventDetail(webapp.RequestHandler):
         if html is None:
             event = Event.get_by_key_name(event_key)
             matches = MatchHelper.organizeMatches(event.match_set)
-            teams = TeamHelper.sortTeams([a.team for a in event.teams])
+            
+            team_keys = [EventTeam.team.get_value_for_datastore(event_team).name() for event_team in event.teams.fetch(500)]
+            teams = Team.get_by_key_name(team_keys)
+            teams = TeamHelper.sortTeams(teams)
+            
             oprs = sorted(zip(event.oprs,event.opr_teams), reverse=True) # sort by OPR
             oprs = oprs[:14] # get the top 15 OPRs
         
