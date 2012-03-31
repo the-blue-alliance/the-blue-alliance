@@ -414,7 +414,7 @@ class OprGet(webapp.RequestHandler):
                 event.oprs = opr
                 event.opr_teams = teams
                 event.put()
-            except Exception as e:
+            except Exception, e:
                 logging.error("OPR error on event %s. %s" % (event_key, e))
 
         template_values = {
