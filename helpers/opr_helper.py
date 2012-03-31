@@ -9,13 +9,16 @@
 # A should end up being n x n an b should end up being n x 1
 # x is OPR and should be n x 1
 
-import sys
-from time import *
-import csv
-from math import sqrt
+# TODO: This library should be broken out to be completely abstracted from the datastore
+# then a layer should wrap it to fetch data from the datastore, plumb it in, and get the
+# results back out. -gregmarra 31 Mar 2012
 
-from models import Event
-from models import Team
+import csv
+import sys
+from math import sqrt
+from time import *
+
+from models import Event, EventTeam, Team
 
 class OprHelper:
 
@@ -66,32 +69,35 @@ class OprHelper:
             return result
 
     @classmethod
-    def getData(self,event_key):
+    def getData(self,event):
         #reader = csv.reader(open(file,"rb"))
         # TODO: This doesn't seem like it would support older matches with 2v2 games -gregmarra 8 Mar 2012 
         num = 0
-        for match in Event.get_by_key_name(event_key).match_set:
+        for match in event.match_set:
             match.unpack_json()
             if hasattr(match, 'alliances'):
                 if (match.comp_level == "qm" and match.alliances['red']['score'] > -1 and match.alliances['blue']['score'] > -1):
                     OprHelper.data.append([])
                     OprHelper.data[num].append(int(match.alliances['red']['score'])) #redscore
                     OprHelper.data[num].append(int(match.alliances['blue']['score'])) #bluescore
-                    OprHelper.data[num].append(int(Team.get_by_key_name(match.alliances['red']['teams'][0]).team_number)) #red1
-                    OprHelper.data[num].append(int(Team.get_by_key_name(match.alliances['red']['teams'][1]).team_number)) #red2
-                    OprHelper.data[num].append(int(Team.get_by_key_name(match.alliances['red']['teams'][2]).team_number)) #red3
-                    OprHelper.data[num].append(int(Team.get_by_key_name(match.alliances['blue']['teams'][0]).team_number)) #blue1
-                    OprHelper.data[num].append(int(Team.get_by_key_name(match.alliances['blue']['teams'][1]).team_number)) #blue2
-                    OprHelper.data[num].append(int(Team.get_by_key_name(match.alliances['blue']['teams'][2]).team_number)) #blue3
+                    OprHelper.data[num].append(int(match.alliances['red']['teams'][0][3:])) #red1
+                    OprHelper.data[num].append(int(match.alliances['red']['teams'][1][3:])) #red2
+                    OprHelper.data[num].append(int(match.alliances['red']['teams'][2][3:])) #red3
+                    OprHelper.data[num].append(int(match.alliances['blue']['teams'][0][3:])) #blue1
+                    OprHelper.data[num].append(int(match.alliances['blue']['teams'][1][3:])) #blue2
+                    OprHelper.data[num].append(int(match.alliances['blue']['teams'][2][3:])) #blue3
                     num += 1
 
     @classmethod
-    def getTeamData(self,event_key):
+    def getTeamData(self,event):
         #reader = csv.reader(open(file,"rb"))
-        for num, team in enumerate(Event.get_by_key_name(event_key).teams):
+        event_teams = event.teams.fetch(500)
+        team_keys = [EventTeam.team.get_value_for_datastore(event_team).name() for event_team in event_teams]
+        
+        for num, team_key in enumerate(team_keys):
             OprHelper.teamdata.append([])
             OprHelper.teamdata[num].append(num) #teamid
-            OprHelper.teamdata[num].append(int(team.team.team_number)) #teamnumber
+            OprHelper.teamdata[num].append(int(team_key[3:])) #teamnumber
 
     @classmethod
     def teamsPlayed(self):
@@ -224,8 +230,11 @@ class OprHelper:
     @classmethod
     def opr(self,event_key):
         OprHelper.reset()
-        OprHelper.getTeamData(event_key)
-        OprHelper.getData(event_key)
+        
+        event = Event.get_by_key_name(event_key)
+        OprHelper.getTeamData(event)
+        OprHelper.getData(event)
+        
         OprHelper.teamdata = OprHelper.teamsPlayed()
         OprHelper.getM()
         s = OprHelper.gets()
@@ -241,6 +250,7 @@ class OprHelper:
         teams = OprHelper.zeros(len(OprHelper.teamdata),1)
         for num, blah in enumerate(list(temp)):
             teams[num] = temp[num][1]
+        
         return OPR, teams
         
 #if __name__ == "__main__":
