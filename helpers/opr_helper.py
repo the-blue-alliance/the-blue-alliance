@@ -24,36 +24,36 @@ class OprHelper:
     M = []
 
     @classmethod
-    def _init_(cls):
+    def _init_(self):
         OprHelper.data = []
         OprHelper.teamdata = []
         OprHelper.M = []
         return 0
 
     @classmethod
-    def reset(cls):
+    def reset(self):
         OprHelper.data = []
         OprHelper.teamdata = []
         OprHelper.M = []
 
     @classmethod
-    def zeros(cls,m,n):
+    def zeros(self,m,n):
         # returns the zero matrix for the supplied dimensions
         return [[0 for row in range(n)] for col in range(m)]
 
     @classmethod
-    def mTranspose(cls,matrix):
+    def mTranspose(self,matrix):
         # returns the transpose of a matrix
         return map(lambda *row: list(row), *matrix)
 
     @classmethod
-    def mInverse(cls,matrix):
+    def mInverse(self,matrix):
         # TODO: implement matrix inversion
         # not nescessary for anything we have done thus far
         return -1
 
     @classmethod
-    def mMult(cls,matrixA,matrixB):
+    def mMult(self,matrixA,matrixB):
         # returns result of multiplying A by B
         if len(matrixA[0]) != len(matrixB):
             print "Matrix dimension error!"
@@ -66,27 +66,27 @@ class OprHelper:
             return result
 
     @classmethod
-    def getData(cls,event_key):
+    def getData(self,event_key):
         #reader = csv.reader(open(file,"rb"))
-        error = 0
-        for num, match in enumerate(Event.get_by_key_name(event_key).match_set):
-            if match.comp_level == "qm":
-                num = num-error
-                match.unpack_json()
-                OprHelper.data.append([])
-                OprHelper.data[num].append(int(match.alliances['red']['score'])) #redscore
-                OprHelper.data[num].append(int(match.alliances['blue']['score'])) #bluescore
-                OprHelper.data[num].append(int(Team.get_by_key_name(match.alliances['red']['teams'][0]).team_number)) #red1
-                OprHelper.data[num].append(int(Team.get_by_key_name(match.alliances['red']['teams'][1]).team_number)) #red2
-                OprHelper.data[num].append(int(Team.get_by_key_name(match.alliances['red']['teams'][2]).team_number)) #red3
-                OprHelper.data[num].append(int(Team.get_by_key_name(match.alliances['blue']['teams'][0]).team_number)) #blue1
-                OprHelper.data[num].append(int(Team.get_by_key_name(match.alliances['blue']['teams'][1]).team_number)) #blue2
-                OprHelper.data[num].append(int(Team.get_by_key_name(match.alliances['blue']['teams'][2]).team_number)) #blue3
-            else:
-                error = error+1
+        # TODO: This doesn't seem like it would support older matches with 2v2 games -gregmarra 8 Mar 2012 
+        num = 0
+        for match in Event.get_by_key_name(event_key).match_set:
+            match.unpack_json()
+            if hasattr(match, 'alliances'):
+                if (match.comp_level == "qm" and match.alliances['red']['score'] > -1 and match.alliances['blue']['score'] > -1):
+                    OprHelper.data.append([])
+                    OprHelper.data[num].append(int(match.alliances['red']['score'])) #redscore
+                    OprHelper.data[num].append(int(match.alliances['blue']['score'])) #bluescore
+                    OprHelper.data[num].append(int(Team.get_by_key_name(match.alliances['red']['teams'][0]).team_number)) #red1
+                    OprHelper.data[num].append(int(Team.get_by_key_name(match.alliances['red']['teams'][1]).team_number)) #red2
+                    OprHelper.data[num].append(int(Team.get_by_key_name(match.alliances['red']['teams'][2]).team_number)) #red3
+                    OprHelper.data[num].append(int(Team.get_by_key_name(match.alliances['blue']['teams'][0]).team_number)) #blue1
+                    OprHelper.data[num].append(int(Team.get_by_key_name(match.alliances['blue']['teams'][1]).team_number)) #blue2
+                    OprHelper.data[num].append(int(Team.get_by_key_name(match.alliances['blue']['teams'][2]).team_number)) #blue3
+                    num += 1
 
     @classmethod
-    def getTeamData(cls,event_key):
+    def getTeamData(self,event_key):
         #reader = csv.reader(open(file,"rb"))
         for num, team in enumerate(Event.get_by_key_name(event_key).teams):
             OprHelper.teamdata.append([])
@@ -94,7 +94,7 @@ class OprHelper:
             OprHelper.teamdata[num].append(int(team.team.team_number)) #teamnumber
 
     @classmethod
-    def teamsPlayed(cls):
+    def teamsPlayed(self):
         played = []
         counter = 0
         for team_id,team_number in OprHelper.teamdata:
@@ -106,7 +106,7 @@ class OprHelper:
         return played
 
     @classmethod
-    def teamPlayed(cls,team):
+    def teamPlayed(self,team):
         """
         Returns True if the team played at least one match (was present at regional)
         Returns False if the team has not played any matches (was absent from regional)
@@ -118,18 +118,15 @@ class OprHelper:
         return False
 
     @classmethod
-    def getTeamID(cls,num):
+    def getTeamID(self,num):
         # returns the matrix column index associated with a team number
         for ident, row in enumerate(OprHelper.teamdata):
             if(row[1]==num):
                 return ident
 
     @classmethod
-    def getM(cls):
+    def getM(self):
         # puts a 1 in a row of M for each team on an alliance
-        print OprHelper.data
-        print "-------------"
-        print OprHelper.teamdata
         i = 0
         OprHelper.M = OprHelper.zeros(2*len(OprHelper.data),len(OprHelper.teamdata))
         while (i)<2*len(OprHelper.data):
@@ -145,7 +142,7 @@ class OprHelper:
             i += 1
 
     @classmethod
-    def gets(cls):
+    def gets(self):
         # gets each alliance's score for each match
         i = 0
         s = [[0] for row in range(2*len(OprHelper.data))]
@@ -157,7 +154,7 @@ class OprHelper:
         return s
 
     @classmethod
-    def decompose(cls,A,ztol=1.0e-3):
+    def decompose(self,A,ztol=1.0e-3):
         # Algorithm for upper triangular Cholesky factorization
         # gives U
         # NOT USED!!! SEE decomposeDoolittle below
@@ -184,7 +181,7 @@ class OprHelper:
         return(t)
 
     @classmethod
-    def decomposeDoolittle(cls,A):
+    def decomposeDoolittle(self,A):
         # Algorithm for upper and lower triangular factorization
         # gives U and L; uses Doolittle factorization
         # http://math.fullerton.edu/mathews/n2003/CholeskyMod.html
@@ -201,7 +198,7 @@ class OprHelper:
         return U,L
 
     @classmethod
-    def solve(cls,L,U,b):
+    def solve(self,L,U,b):
         # Algorithm from http://en.wikipedia.org/wiki/Triangular_matrix
         # Ax = b -> LUx = b. Then y is defined to be Ux
         # http://math.fullerton.edu/mathews/n2003/BackSubstitutionMod.html
@@ -225,7 +222,7 @@ class OprHelper:
         return x
 
     @classmethod
-    def opr(OprHelper,event_key):
+    def opr(self,event_key):
         OprHelper.reset()
         OprHelper.getTeamData(event_key)
         OprHelper.getData(event_key)

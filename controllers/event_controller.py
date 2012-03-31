@@ -57,12 +57,8 @@ class EventDetail(webapp.RequestHandler):
             event = Event.get_by_key_name(event_key)
             matches = MatchHelper.organizeMatches(event.match_set)
             teams = TeamHelper.sortTeams([a.team for a in event.teams])
-            oprs = event.oprs
-            for i, opr in enumerate(oprs):
-                oprs[i] = round(opr,2) # round OPRs to 2 decimal places
-            opr_teams = event.opr_teams
-            oprs = zip(oprs,opr_teams)
-            oprs = sorted(oprs, reverse=True) # sort by OPR
+            oprs = sorted(zip(event.oprs,event.opr_teams), reverse=True) # sort by OPR
+            oprs = oprs[:14] # get the top 15 OPRs
         
             template_values = {
                 "event": event,

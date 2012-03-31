@@ -101,7 +101,7 @@ class UsfirstEventsInstantiate(webapp.RequestHandler):
         
         template_values = {
             'events': events,
-            'year': 2010
+            'year': year
         }
         
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_events_instantiate.html')
@@ -115,7 +115,7 @@ class UsfirstEventGetEnqueue(webapp.RequestHandler):
         year = 2012 #Just this year #FIXME: Do this right
         events = Event.all()
         events.filter('first_eid != ', None) # Official events with EIDs
-        events.filter('year =', year) 
+        events.filter('year =', year)
         
         count = 0
         for event in events.fetch(100):
@@ -249,7 +249,7 @@ class UsfirstTeamsInstantiate(webapp.RequestHandler):
         try:
             year = self.request.get("year")
             if year == '':
-                year = 2011
+                year = 2012
         except Exception, detail:
             logging.error('Failed to get year value')
         
@@ -374,16 +374,25 @@ class OprGetEnqueue(webapp.RequestHandler):
     Enqueues OPR calculation
     """
     def get(self):
-        events = Event.all()
-        count = 0
+        try:
+            year = self.request.get("year")
+            if year == '' or year is None:
+                year = 2012
+        except Exception, detail:
+            logging.error('Failed to get year value')
+        
+        events = Event.all()#.filter('year =', int(year))
+        
+        logging.info(events.count())
+        
         for event in events:
             taskqueue.add(
                 url='/tasks/event_opr_get/' + event.get_key_name(),
                 method='GET')
-            count = count + 1
-            
+        
         template_values = {
-            'event_count': count,
+            'event_count': events.count(),
+            'year': year
         }
         
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/opr_get_enqueue.html')
@@ -391,19 +400,22 @@ class OprGetEnqueue(webapp.RequestHandler):
 
 class OprGet(webapp.RequestHandler):
     """
-    Calculates the opr for a regional
+    Calculates the opr for an event
     """
     def get(self,event_key):
         opr = []
         teams = []
         oprs = []
         event = Event.get_by_key_name(event_key)
-        if event.match_set.count()>0:
-            opr,teams = OprHelper.opr(event_key)
-            oprs.append((opr,teams))
-            event.oprs = opr
-            event.opr_teams = teams
-            event.put()
+        if event.match_set.count() > 0:
+            try:
+                opr,teams = OprHelper.opr(event_key)
+                oprs.append((opr,teams))
+                event.oprs = opr
+                event.opr_teams = teams
+                event.put()
+            except Exception as e:
+                logging.error("OPR error on event %s. %s" % (event_key, e))
 
         template_values = {
             'oprs': oprs,
@@ -414,5 +426,3 @@ class OprGet(webapp.RequestHandler):
 
     def post(self):
         self.get()
-
-        
