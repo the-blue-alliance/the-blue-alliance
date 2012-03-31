@@ -381,7 +381,7 @@ class OprGetEnqueue(webapp.RequestHandler):
         except Exception, detail:
             logging.error('Failed to get year value')
         
-        events = Event.all()#.filter('year =', int(year))
+        events = Event.all().filter('year =', int(year))
         
         logging.info(events.count())
         
