@@ -176,7 +176,7 @@ class OprHelper:
                   S = 0.0
                try:
                    t[j][i] = (A[j][i] - S)/t[i][i]
-               except ZeroDivisionError as e:
+               except ZeroDivisionError, e:
                    print e
         return(t)
 
