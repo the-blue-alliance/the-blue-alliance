@@ -17,7 +17,7 @@ from controllers.datafeed_controller import TbaVideosGet, TbaVideosGetEnqueue
 from controllers.datafeed_controller import UsfirstEventGetEnqueue, UsfirstEventGet, UsfirstEventsInstantiate
 from controllers.datafeed_controller import UsfirstMatchesGetEnqueue, UsfirstMatchesGet
 from controllers.datafeed_controller import UsfirstTeamGetEnqueue, UsfirstTeamGet, UsfirstTeamsInstantiate
-from controllers.datafeed_controller import FlushTeams, FlushMatches, FlushEvents, FlushEventTeams
+from controllers.datafeed_controller import FlushTeams, FlushMatches, FlushEvents, FlushEventTeams, FlushTBAVideos
 
 from controllers.datafeed_controller import OprGet, OprGetEnqueue
 
@@ -40,6 +40,7 @@ def main():
                                           ('/tasks/flush/matches', FlushMatches), # Danger!
                                           ('/tasks/flush/teams', FlushTeams), # Danger!
                                           ('/tasks/flush/eventteams', FlushEventTeams), # Danger!
+                                          ('/tasks/flush/tbavideos', FlushTBAVideos), # Danger!
                                           ('/tasks/event_opr_get_enqueue', OprGetEnqueue),
                                           ('/tasks/event_opr_get/(.*)', OprGet)
                                           ],

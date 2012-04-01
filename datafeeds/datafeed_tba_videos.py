@@ -21,8 +21,8 @@ class DatafeedTbaVideos(object):
         Scrape all Videos for a given Event.
         """
         
-        logging.info("Retreiving Videos for " + event.key().name())
-        url = self.TBA_VIDS_DIR_URL_PATTERN % (event.key().name())
+        logging.info("Retreiving Videos for " + event.get_key_name())
+        url = self.TBA_VIDS_DIR_URL_PATTERN % (event.get_key_name())
         result = urlfetch.fetch(url)
         if result.status_code == 200:
             return self.parseEventVideos(result.content, event)
@@ -65,6 +65,8 @@ class DatafeedTbaVideos(object):
                 logging.info("Unexpected match: " + key)
         
         tbavideos = list()
+        
+        return match_filetypes
         
         for match_key in match_filetypes.keys():
             tbavideo = TBAVideo(

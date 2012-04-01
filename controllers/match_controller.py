@@ -6,6 +6,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
 
 from models import Match
+from helpers.tbavideo_helper import TBAVideoHelper
 
 class MatchList(webapp.RequestHandler):
     """
@@ -40,8 +41,16 @@ class MatchDetail(webapp.RequestHandler):
             match.unpack_json()
             
             tbavideo = None
-            if match.tbavideo_set.count() > 0:
-                tbavideo = match.tbavideo_set[0]
+            if len(match.tba_videos) > 0:
+                tbavideo = TBAVideoHelper(match)
+            
+            #TODO: Remove this entirely, since the tbavideo class is being deprecated -gregmarra 31 Mar 2012
+            try:
+                if tbavideo is None:
+                    if match.tbavideo_set.count() > 0:
+                        tbavideo = match.tbavideo_set[0]
+            except Exception, e:
+                logging.error("Match didn't have tbavideo_set")
             
             template_values = {
                 "match": match,

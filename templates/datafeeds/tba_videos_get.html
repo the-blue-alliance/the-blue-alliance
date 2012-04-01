@@ -1,7 +1,7 @@
-<h2>Got some tbavideos</h2>
+<h2>Got some tbavideos, and wrote some Match models!</h2>
 {% for tbavideo in tbavideos %}
     <ul>
-        <li>Match: {{tbavideo.match.key.name}}</li>
-        <li>Filetypes: {{tbavideo.filetypes}}</li>
+        <li>Match: {{tbavideo.0}}</li>
+        <li>Filetypes: {{tbavideo.1}}</li>
     </ul>
 {% endfor %}

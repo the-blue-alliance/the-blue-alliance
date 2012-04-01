@@ -182,7 +182,8 @@ class Match(db.Model):
     set_number = db.IntegerProperty(required=True)
     team_key_names = db.StringListProperty(required=True) #list of teams in Match, for indexing.
     time = db.DateTimeProperty()
-    youtube_videos = db.StringListProperty() #list of Youtube IDs
+    youtube_videos = db.StringListProperty() # list of Youtube IDs
+    tba_videos = db.StringListProperty() # list of filetypes a TBA video exists for
     
     def event_key_name(self):
         return Match.event.get_value_for_datastore(self).name()
@@ -227,20 +228,24 @@ class Match(db.Model):
             return "%s %s Match %s" % (self.COMP_LEVELS_VERBOSE[self.comp_level], self.set_number, self.match_number)
     
     def has_video(self):
-        if len(self.youtube_videos) > 0:
+        if (len(self.youtube_videos) + len(self.tba_videos)) > 0:
             return True
         else:
+            # TODO: Deprecate tbavideo class entirely: return False
             return self.tbavideo_set.count() > 0
     
     def details_url(self):
         return "/match/%s" % self.get_key_name()
 
 
+#TODO: Remove this class -gregmarra 31 Mar 2012
 class TBAVideo(db.Model):
     """
     Store information related to videos of Matches hosted on 
     videos.thebluealliance.net. Generally, there should only be one
     TBAVideo per match
+    
+    THIS CLASS IS DEPRECATED. -gregmarra 31 Mar 2012
     """
     
     match = db.ReferenceProperty(Match, required=True)

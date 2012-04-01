@@ -19,36 +19,31 @@ from helpers.team_helper import TeamTpidHelper, TeamUpdater
 from helpers.tbavideo_helper import TBAVideoUpdater
 from helpers.opr_helper import OprHelper
 
-from models import Event
-from models import EventTeam
-from models import Team
-from models import Match
+from models import Event, EventTeam, Match, TBAVideo, Team
 
 
 class TbaVideosGet(webapp.RequestHandler):
     """
     Handles reading a TBA video listing page and updating the datastore as needed.
-    TODO: We never deal with TBAVideos going away.
+    Now updates Match objects instead of creating TBAVideo objects. -gregmarra 31 Mar 2012
     """
     def get(self, event_key):
         df = DatafeedTbaVideos()
         
         event = Event.get_by_key_name(event_key)
-        tbavideos = df.getEventVideosList(event)
+        match_filetypes = df.getEventVideosList(event)
+        matches = Match.get_by_key_name(match_filetypes.keys())
         
-        new_tbavideos = list()
-        
-        if len(tbavideos) < 1:
+        if len(matches) < 1:
             logging.info("No tbavideos found for event " + event.key().name())
         else:
-            for tbavideo in tbavideos:
-                new_tbavideo = TBAVideoUpdater.findOrSpawn(tbavideo) # findOrSpawn doesn't put() things.
-                new_tbavideos.append(new_tbavideo)
+            for match in matches:
+                match.tba_videos = match_filetypes.get(match.get_key_name(), None)
             
-            keys = db.put(new_tbavideos) # Doing a bulk put() is faster than individually.
+            db.put(matches)
         
         template_values = {
-            'tbavideos': new_tbavideos,
+            'tbavideos': match_filetypes.items(),
         }
         
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/tba_videos_get.html')
@@ -368,6 +363,19 @@ class FlushEvents(webapp.RequestHandler):
         event_count = Event.all().count()
         
         self.response.out.write("Events flushed. " + str(event_count) + " teams remain. What have we done?!")
+        
+        
+class FlushTBAVideos(webapp.RequestHandler):
+    """
+    NEVER CALL THIS FUNCTION.
+    
+    This helps deprecated TBAVideos. -gregmarra 31 Mar 2012
+    """
+    def get(self):
+        db.delete(TBAVideo.all().fetch(500))
+        db.delete(TBAVideo.all().fetch(500))
+        remaining_count = TBAVideo.all().count()
+        self.response.out.write("TBAVideos flushed. " + str(remaining_count) +" or more remain. What have we done?!")
 
 class OprGetEnqueue(webapp.RequestHandler):
     """
