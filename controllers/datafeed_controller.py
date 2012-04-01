@@ -32,18 +32,21 @@ class TbaVideosGet(webapp.RequestHandler):
         
         event = Event.get_by_key_name(event_key)
         match_filetypes = df.getEventVideosList(event)
-        matches = Match.get_by_key_name(match_filetypes.keys())
-        
-        if len(matches) < 1:
-            logging.info("No tbavideos found for event " + event.key().name())
-        else:
+        if match_filetypes:
+            matches = Match.get_by_key_name(match_filetypes.keys())
+            
             for match in matches:
                 match.tba_videos = match_filetypes.get(match.get_key_name(), None)
             
             db.put(matches)
+            
+            tbavideos = match_filetypes.items()
+        else:
+            logging.info("No tbavideos found for event " + event.key().name())
+            tbavideos = []
         
         template_values = {
-            'tbavideos': match_filetypes.items(),
+            'tbavideos': tbavideos,
         }
         
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/tba_videos_get.html')
