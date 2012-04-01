@@ -35,8 +35,8 @@ class TbaVideosGet(webapp.RequestHandler):
         if match_filetypes:
             matches_to_put = []
             for match in event.match_set:
-                if match.tba_videos != match_filetypes.get(match.get_key_name(), None):
-                    match.tba_videos = match_filetypes.get(match.get_key_name(), None)
+                if match.tba_videos != match_filetypes.get(match.get_key_name(), []):
+                    match.tba_videos = match_filetypes.get(match.get_key_name(), [])
                     matches_to_put.append(match)
             
             db.put(matches_to_put)
