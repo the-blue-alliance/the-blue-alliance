@@ -33,7 +33,7 @@ def dev_data_setup():
   sh("appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/matches_2010cmp.csv --kind=Match --url=http://localhost:8088/_ah/remote_api")
   print("Updating EventTeams")
   sh("wget --delete-after --quiet http://localhost:8088/tasks/eventteam_update_enqueue")
-  print("Scraping TBAVideos")
+  print("Scraping tba_videos")
   sh("wget --delete-after --quiet http://localhost:8088/tasks/tba_videos_get/2010cmp")
   
   clean()

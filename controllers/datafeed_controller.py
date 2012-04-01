@@ -16,7 +16,6 @@ from datafeeds.datafeed_tba_videos import DatafeedTbaVideos
 from helpers.event_helper import EventUpdater
 from helpers.match_helper import MatchUpdater
 from helpers.team_helper import TeamTpidHelper, TeamUpdater
-from helpers.tbavideo_helper import TBAVideoUpdater
 from helpers.opr_helper import OprHelper
 
 from models import Event, EventTeam, Match, TBAVideo, Team
@@ -24,8 +23,7 @@ from models import Event, EventTeam, Match, TBAVideo, Team
 
 class TbaVideosGet(webapp.RequestHandler):
     """
-    Handles reading a TBA video listing page and updating the datastore as needed.
-    Now updates Match objects instead of creating TBAVideo objects. -gregmarra 31 Mar 2012
+    Handles reading a TBA video listing page and updating the match objects in the datastore as needed.
     """
     def get(self, event_key):
         df = DatafeedTbaVideos()
@@ -55,7 +53,7 @@ class TbaVideosGet(webapp.RequestHandler):
 
 class TbaVideosGetEnqueue(webapp.RequestHandler):
     """
-    Handles enqueing grabing TBAVideos for individual Events.
+    Handles enqueing grabing tba_videos for Matches at individual Events.
     """
     def get(self):
         events = Event.all()

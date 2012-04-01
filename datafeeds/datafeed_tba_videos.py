@@ -6,9 +6,6 @@ from google.appengine.ext import db
 
 from BeautifulSoup import BeautifulSoup
 
-from models import TBAVideo
-
-
 class DatafeedTbaVideos(object):
     """
     Facilitates building TBAVideos store from TBA.
@@ -67,13 +64,3 @@ class DatafeedTbaVideos(object):
         tbavideos = list()
         
         return match_filetypes
-        
-        for match_key in match_filetypes.keys():
-            tbavideo = TBAVideo(
-                match = match_dict[match_key],
-                filetypes = match_filetypes[match_key],
-            )
-            tbavideos.append(tbavideo)            
-        
-        return tbavideos
-

@@ -8,7 +8,7 @@ from google.appengine.ext import db, webapp
 from google.appengine.ext.webapp import template, util
 
 from helpers.api_helper import ApiHelper
-from models import Event, EventTeam, Match, TBAVideo, Team
+from models import Event, EventTeam, Match, Team
 
 class ApiTeamsShow(webapp.RequestHandler):
     """

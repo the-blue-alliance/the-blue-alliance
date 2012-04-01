@@ -228,17 +228,14 @@ class Match(db.Model):
             return "%s %s Match %s" % (self.COMP_LEVELS_VERBOSE[self.comp_level], self.set_number, self.match_number)
     
     def has_video(self):
-        if (len(self.youtube_videos) + len(self.tba_videos)) > 0:
-            return True
-        else:
-            # TODO: Deprecate tbavideo class entirely: return False
-            return self.tbavideo_set.count() > 0
+        return (len(self.youtube_videos) + len(self.tba_videos)) > 0
     
     def details_url(self):
         return "/match/%s" % self.get_key_name()
 
 
-#TODO: Remove this class -gregmarra 31 Mar 2012
+# TODO: Remove this class -gregmarra 31 Mar 2012
+# Can remove once flushed these from dev server
 class TBAVideo(db.Model):
     """
     Store information related to videos of Matches hosted on 
@@ -250,27 +247,4 @@ class TBAVideo(db.Model):
     
     match = db.ReferenceProperty(Match, required=True)
     filetypes = db.StringListProperty() # ["mp4", "flv", "wmv"] etc
-    
-    TBA_NET_VID_PATTERN = "http://videos.thebluealliance.com/%s/%s.%s"
-    
-    THUMBNAIL_FILETYPES = ["jpg", "jpeg"]
-    STREAMABLE_FILETYPES = ["mp4", "flv"]
-    DOWNLOADABLE_FILETYPES = ["mp4", "mov", "avi", "wmv", "flv"]
-    
-    def getThumbnailPath(self):
-        logging.info("thumbnail: " + self.getBestPathOf(self.THUMBNAIL_FILETYPES))
-        return self.getBestPathOf(self.THUMBNAIL_FILETYPES)
 
-    def getStreamablePath(self):
-        return self.getBestPathOf(self.STREAMABLE_FILETYPES)
-    
-    def getDownloadablePath(self):
-        return self.getBestPathOf(self.DOWNLOADABLE_FILETYPES)
-
-    def getBestPathOf(self, consider_filetypes):
-        for filetype in consider_filetypes:
-            if filetype in self.filetypes:
-                # Note: match.get_key_name() doesn't always return the match.key().name()
-                # because of things like malformed Championship Field names. -gregmarra 22 May 2011
-                return self.TBA_NET_VID_PATTERN % (self.match.event_key_name(), self.match.get_key_name(), filetype)
-        return None
