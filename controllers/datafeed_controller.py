@@ -33,12 +33,13 @@ class TbaVideosGet(webapp.RequestHandler):
         event = Event.get_by_key_name(event_key)
         match_filetypes = df.getEventVideosList(event)
         if match_filetypes:
-            matches = Match.get_by_key_name(match_filetypes.keys())
+            matches_to_put = []
+            for match in event.match_set:
+                if match.tba_videos != match_filetypes.get(match.get_key_name(), None):
+                    match.tba_videos = match_filetypes.get(match.get_key_name(), None)
+                    matches_to_put.append(match)
             
-            for match in matches:
-                match.tba_videos = match_filetypes.get(match.get_key_name(), None)
-            
-            db.put(matches)
+            db.put(matches_to_put)
             
             tbavideos = match_filetypes.items()
         else:
