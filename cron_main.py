@@ -17,7 +17,6 @@ from controllers.datafeed_controller import TbaVideosGet, TbaVideosGetEnqueue
 from controllers.datafeed_controller import UsfirstEventGetEnqueue, UsfirstEventGet, UsfirstEventsInstantiate
 from controllers.datafeed_controller import UsfirstMatchesGetEnqueue, UsfirstMatchesGet
 from controllers.datafeed_controller import UsfirstTeamGetEnqueue, UsfirstTeamGet, UsfirstTeamsInstantiate
-from controllers.datafeed_controller import FlushTeams, FlushMatches, FlushEvents, FlushEventTeams, FlushTBAVideos
 
 from controllers.datafeed_controller import OprGet, OprGetEnqueue
 
