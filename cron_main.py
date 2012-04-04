@@ -36,11 +36,6 @@ def main():
                                           ('/tasks/usfirst_team_get_enqueue', UsfirstTeamGetEnqueue),
                                           ('/tasks/usfirst_team_get/(.*)', UsfirstTeamGet),
                                           ('/tasks/usfirst_teams_instantiate', UsfirstTeamsInstantiate),
-                                          ('/tasks/flush/events', FlushEvents), # Danger!
-                                          ('/tasks/flush/matches', FlushMatches), # Danger!
-                                          ('/tasks/flush/teams', FlushTeams), # Danger!
-                                          ('/tasks/flush/eventteams', FlushEventTeams), # Danger!
-                                          ('/tasks/flush/tbavideos', FlushTBAVideos), # Danger!
                                           ('/tasks/event_opr_get_enqueue', OprGetEnqueue),
                                           ('/tasks/event_opr_get/(.*)', OprGet)
                                           ],

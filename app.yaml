@@ -26,6 +26,7 @@ handlers:
 
 - url: /tasks/.*
   script: cron_main.py
+  login: admin
 - url: /admin/.*
   script: admin_main.py
   login: admin
