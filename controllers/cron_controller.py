@@ -7,9 +7,7 @@ from google.appengine.api import taskqueue
 from google.appengine.ext import db, webapp
 from google.appengine.ext.webapp import template, util
 
-from models import Event
-from models import Team
-from models import EventTeam
+from models import Event, EventTeam, Team
 
 class EventTeamUpdate(webapp.RequestHandler):
     """
@@ -25,9 +23,7 @@ class EventTeamUpdate(webapp.RequestHandler):
                 teams.add(team)
         
         # Add teams from existing EventTeams
-        for a in event.teams:
-            if a.team:
-                teams.add("frc%s" % a.team.team_number)
+        [teams.add(EventTeam.team.get_value_for_datastore(event_team).name()) for event_team in event.teams.fetch(5000)]
         
         eventteams_count = 0
         for team in teams:
