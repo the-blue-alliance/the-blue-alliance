@@ -109,7 +109,13 @@ class UsfirstEventGetEnqueue(webapp.RequestHandler):
     Handles enqueing updates to individual USFIRST events.
     """
     def get(self):
-        year = 2012 #Just this year #FIXME: Do this right
+        try:
+            year = self.request.get("year")
+            if year == '':
+                year = 2012
+        except Exception, detail:
+            logging.error('Failed to get year value')
+        
         events = Event.all()
         events.filter('first_eid != ', None) # Official events with EIDs
         events.filter('year =', year)
