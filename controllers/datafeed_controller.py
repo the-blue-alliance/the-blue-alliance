@@ -93,7 +93,7 @@ class UsfirstEventsInstantiate(webapp.RequestHandler):
         for event in events:
             logging.info("Event with eid: " + str(event.get("first_eid", 0)))
             taskqueue.add(
-                url='/tasks/usfirst_event_get/' + event.get("first_eid", 0),
+                url='/tasks/usfirst_event_get/%s/%s' % (event.get("first_eid", 0), year),
                 method='GET')
         
         template_values = {
@@ -120,15 +120,13 @@ class UsfirstEventGetEnqueue(webapp.RequestHandler):
         events.filter('first_eid != ', None) # Official events with EIDs
         events.filter('year =', year)
         
-        count = 0
         for event in events.fetch(100):
             taskqueue.add(
-                url='/tasks/usfirst_event_get/' + event.first_eid, 
+                url='/tasks/usfirst_event_get/%s/%s' % (event.first_eid, year),
                 method='GET')
-            count += 1
         
         template_values = {
-            'event_count': count,
+            'event_count': events.count(),
             'year': year,
         }
 
@@ -141,7 +139,7 @@ class UsfirstEventGet(webapp.RequestHandler):
     Handles reading a USFIRST event page and creating or updating the model as needed.
     Includes registered Teams.
     """
-    def get(self, first_eid, year=2012):
+    def get(self, first_eid, year):
         datafeed = DatafeedUsfirstEvents()
         
         event = datafeed.getEvent(first_eid, year)

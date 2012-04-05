@@ -28,7 +28,7 @@ def main():
                                           ('/tasks/tba_videos_get/(.*)', TbaVideosGet),
                                           ('/tasks/tba_videos_get_enqueue', TbaVideosGetEnqueue),
                                           ('/tasks/usfirst_event_get_enqueue', UsfirstEventGetEnqueue),
-                                          ('/tasks/usfirst_event_get/(.*)', UsfirstEventGet),
+                                          ('/tasks/usfirst_event_get/(.*)/(.*)', UsfirstEventGet),
                                           ('/tasks/usfirst_events_instantiate', UsfirstEventsInstantiate),
                                           ('/tasks/usfirst_matches_get_enqueue', UsfirstMatchesGetEnqueue),
                                           ('/tasks/usfirst_matches_get/(.*)', UsfirstMatchesGet),
