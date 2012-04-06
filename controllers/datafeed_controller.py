@@ -93,6 +93,7 @@ class UsfirstEventsInstantiate(webapp.RequestHandler):
         for event in events:
             logging.info("Event with eid: " + str(event.get("first_eid", 0)))
             taskqueue.add(
+                queue_name='usfirst',
                 url='/tasks/usfirst_event_get/%s/%s' % (event.get("first_eid", 0), year),
                 method='GET')
         
