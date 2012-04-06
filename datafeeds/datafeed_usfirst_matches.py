@@ -18,6 +18,13 @@ class DatafeedUsfirstMatches(object):
     It returns Match model objects, but does no database IO itself.
     """
     
+    EVENT_SHORT_EXCEPTIONS = {
+        "arc": "Archimedes",
+        "cur": "Curie",
+        "gal": "Galileo",
+        "new": "Newton",
+    }
+    
     MATCH_RESULTS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/matchresults.html" # % (year, event_short)
     MATCH_SCHEDULE_QUAL_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/schedulequal.html"
     MATCH_SCHEDULE_ELIMS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/scheduleelim.html"
@@ -34,7 +41,9 @@ class DatafeedUsfirstMatches(object):
         """
         Return a list of Matches based on the FIRST match results page.
         """
-        url = self.MATCH_RESULTS_URL_PATTERN % (event.year, event.event_short)
+        
+        url = self.MATCH_RESULTS_URL_PATTERN % (event.year,
+            self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
         result = urlfetch.fetch(url)
         if result.status_code == 200:
             return self.parseMatchResultsList(event, result.content)
