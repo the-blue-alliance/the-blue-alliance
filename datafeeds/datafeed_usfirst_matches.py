@@ -65,8 +65,8 @@ class DatafeedUsfirstMatches(object):
         tables = soup.findAll('table')
         
         matches.extend(self.parseQualMatchResultList(event, tables[2]))
+        matches.extend(self.parseElimMatchResultList(event, tables[2]))
         matches.extend(self.parseElimMatchResultList(event, tables[3]))
-        
         
         return matches
     
@@ -78,7 +78,7 @@ class DatafeedUsfirstMatches(object):
         
         for tr in table.findAll('tr'):
             tds = tr.findAll('td')
-            if not len(tds) < 9:
+            if len(tds) == 10:
                 if tds[1].string is not None:
                     red_teams = ["frc" + tds[2].string, "frc" + tds[3].string, "frc" + tds[4].string]
                     blue_teams = ["frc" + tds[5].string, "frc" + tds[6].string, "frc" + tds[7].string]
@@ -135,7 +135,7 @@ class DatafeedUsfirstMatches(object):
         matches = list()
         for tr in table.findAll('tr'):
             tds = tr.findAll('td')
-            if not len(tds) < 10:
+            if len(tds) == 11:
                 if tds[1].string is not None:
 
                     red_teams = ["frc" + tds[3].string, "frc" + tds[4].string, "frc" + tds[5].string]
