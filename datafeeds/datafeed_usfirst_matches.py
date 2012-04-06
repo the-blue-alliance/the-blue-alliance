@@ -7,7 +7,7 @@ from google.appengine.ext import db
 
 from django.utils import simplejson
 
-from BeautifulSoup import BeautifulSoup
+from BeautifulSoup import BeautifulSoup, NavigableString
 
 from models import Match
 
@@ -76,27 +76,27 @@ class DatafeedUsfirstMatches(object):
         """
         matches = list()
         
-        for tr in table.findAll('tr'):
+        for tr in table.findAll('tr')[2:]:
             tds = tr.findAll('td')
             if len(tds) == 10:
-                if tds[1].string is not None:
-                    red_teams = ["frc" + tds[2].string, "frc" + tds[3].string, "frc" + tds[4].string]
-                    blue_teams = ["frc" + tds[5].string, "frc" + tds[6].string, "frc" + tds[7].string]
+                if self._recurseUntilString(tds[1]) is not None:
+                    red_teams = ["frc" + self._recurseUntilString(tds[2]), "frc" + self._recurseUntilString(tds[3]), "frc" + self._recurseUntilString(tds[4])]
+                    blue_teams = ["frc" + self._recurseUntilString(tds[5]), "frc" + self._recurseUntilString(tds[6]), "frc" + self._recurseUntilString(tds[7])]
                     
                     if tds[8].string == None:
                         red_score = -1
                     else:
-                        red_score = int(tds[8].string)
+                        red_score = int(self._recurseUntilString(tds[8]))
                     
                     if tds[9].string == None:
                         blue_score = -1
                     else:
-                        blue_score = int(tds[9].string)
+                        blue_score = int(self._recurseUntilString(tds[9]))
 
                     try:
                         comp_level = "qm"
                         set_number = 1
-                        match_number = int(tds[1].string)
+                        match_number = int(self._recurseUntilString(tds[1]))
                         
                         alliances = {
                             "red": {
@@ -133,26 +133,25 @@ class DatafeedUsfirstMatches(object):
         Parse the table that contains elimination match results.
         """
         matches = list()
-        for tr in table.findAll('tr'):
+        for tr in table.findAll('tr')[2:]:
             tds = tr.findAll('td')
             if len(tds) == 11:
-                if tds[1].string is not None:
-
-                    red_teams = ["frc" + tds[3].string, "frc" + tds[4].string, "frc" + tds[5].string]
-                    blue_teams = ["frc" + tds[6].string, "frc" + tds[7].string, "frc" + tds[8].string]
+                if self._recurseUntilString(tds[1]) is not None:
+                    red_teams = ["frc" + self._recurseUntilString(tds[3]), "frc" + self._recurseUntilString(tds[4]), "frc" + self._recurseUntilString(tds[5])]
+                    blue_teams = ["frc" + self._recurseUntilString(tds[6]), "frc" + self._recurseUntilString(tds[7]), "frc" + self._recurseUntilString(tds[8])]
                     
                     if tds[9].string == None:
                         red_score = -1
                     else:
-                        red_score = int(tds[9].string)
+                        red_score = int(self._recurseUntilString(tds[9]))
                     
                     if tds[10].string == None:
                         blue_score = -1
                     else:
-                        blue_score = int(tds[10].string)
+                        blue_score = int(self._recurseUntilString(tds[10]))
                     
                     try:
-                        match_number_info = self.parseElimMatchNumberInfo(tds[1].string)
+                        match_number_info = self.parseElimMatchNumberInfo(self._recurseUntilString(tds[1]))
                     
                         alliances = {
                             "red": {
@@ -181,7 +180,7 @@ class DatafeedUsfirstMatches(object):
                             matches.append(match)
                         
                     except Exception, detail:
-                        logging.error('Match Parse Failed: ' + str(detail))
+                        logging.warning('Match Parse Failed: ' + str(detail))
         
         return matches
     
@@ -213,3 +212,20 @@ class DatafeedUsfirstMatches(object):
         }
         
         return results
+
+    def _recurseUntilString(self, node):
+        """
+        Digs through HTML that Word made worse.
+        Written to deal with http://www2.usfirst.org/2011comp/Events/cmp/matchresults.html
+        """
+        if node.string is not None:
+            return node.string
+        if isinstance(node, NavigableString):
+            return node
+        if hasattr(node, 'contents'):
+            for content in node.contents:
+                result = self._recurseUntilString(content)
+                result = result.strip().replace('\r', '').replace('\n', '').replace('  ', ' ')
+                if result is not None and result != "":
+                    return result
+        return None
