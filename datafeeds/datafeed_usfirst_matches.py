@@ -83,17 +83,17 @@ class DatafeedUsfirstMatches(object):
                     red_teams = ["frc" + self._recurseUntilString(tds[2]), "frc" + self._recurseUntilString(tds[3]), "frc" + self._recurseUntilString(tds[4])]
                     blue_teams = ["frc" + self._recurseUntilString(tds[5]), "frc" + self._recurseUntilString(tds[6]), "frc" + self._recurseUntilString(tds[7])]
                     
-                    if tds[8].string == None:
-                        red_score = -1
-                    else:
-                        red_score = int(self._recurseUntilString(tds[8]))
-                    
-                    if tds[9].string == None:
-                        blue_score = -1
-                    else:
-                        blue_score = int(self._recurseUntilString(tds[9]))
-
                     try:
+                        if tds[8].string == None:
+                            red_score = -1
+                        else:
+                            red_score = int(self._recurseUntilString(tds[8]))
+                    
+                        if tds[9].string == None:
+                            blue_score = -1
+                        else:
+                            blue_score = int(self._recurseUntilString(tds[9]))
+                        
                         comp_level = "qm"
                         set_number = 1
                         match_number = int(self._recurseUntilString(tds[1]))
@@ -140,19 +140,19 @@ class DatafeedUsfirstMatches(object):
                     red_teams = ["frc" + self._recurseUntilString(tds[3]), "frc" + self._recurseUntilString(tds[4]), "frc" + self._recurseUntilString(tds[5])]
                     blue_teams = ["frc" + self._recurseUntilString(tds[6]), "frc" + self._recurseUntilString(tds[7]), "frc" + self._recurseUntilString(tds[8])]
                     
-                    if self._recurseUntilString(tds[9]) == None:
-                        red_score = -1
-                    else:
-                        red_score = int(self._recurseUntilString(tds[9]))
-                    
-                    if self._recurseUntilString(tds[10]) == None:
-                        blue_score = -1
-                    else:
-                        blue_score = int(self._recurseUntilString(tds[10]))
-                    
                     try:
+                        if self._recurseUntilString(tds[9]) == None:
+                            red_score = -1
+                        else:
+                            red_score = int(self._recurseUntilString(tds[9]))
+                        
+                        if self._recurseUntilString(tds[10]) == None:
+                            blue_score = -1
+                        else:
+                            blue_score = int(self._recurseUntilString(tds[10]))
+                        
                         match_number_info = self.parseElimMatchNumberInfo(self._recurseUntilString(tds[1]))
-                    
+                        
                         alliances = {
                             "red": {
                                 "teams": red_teams,
@@ -163,7 +163,7 @@ class DatafeedUsfirstMatches(object):
                                 "score": blue_score
                             }
                         }
-                    
+                        
                         match = Match(
                             key_name = self.getKeyName(event, match_number_info["comp_level"], match_number_info["set_number"], match_number_info["match_number"]),
                             event = event.key(),
