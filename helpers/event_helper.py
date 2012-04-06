@@ -78,10 +78,13 @@ class EventUpdater(object):
         the "old" event that are null in the "new" event.
         """
         
-        for attr, value in new_event.__dict__.iteritems():
-          if value is not None:
-            old_event.__dict__[attr] = value
+        for attr, value in vars(new_event).iteritems():
+            try:
+                if len(value)>0:
+                    setattr(old_event,attr,value)
+            except Exception, e:
+                if value is not None:
+                    setattr(old_event,attr,value)
 
 
-        old_event.put()
         return old_event
