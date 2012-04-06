@@ -17,7 +17,14 @@ class DatafeedUsfirstEvents(object):
     """
     
     # The types of events listed in the event list:
-    REGIONAL_EVENT_TYPES = ["Regional", "MI FRC State Championship", "MI District", "Qualifying Event", "Qualifying Championship"]
+    REGIONAL_EVENT_TYPES = [
+        "Regional",
+        "MI FRC State Championship",
+        "MI District",
+        "Qualifying Event",
+        "Qualifying Championship",
+        "District Event",
+        "District Championship"]
     
     # The URL for the event list:
     REGIONAL_EVENTS_URL = "https://my.usfirst.org/myarea/index.lasso?event_type=FRC&season_FRC=%s"
