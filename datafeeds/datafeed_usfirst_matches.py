@@ -124,7 +124,7 @@ class DatafeedUsfirstMatches(object):
                         matches.append(match)
                         
                     except Exception, detail:
-                        logging.error('Match Parse Failed: ' + str(detail))
+                        logging.warning('Match Parse Failed: ' + str(detail))
                     
         return matches
     
@@ -140,12 +140,12 @@ class DatafeedUsfirstMatches(object):
                     red_teams = ["frc" + self._recurseUntilString(tds[3]), "frc" + self._recurseUntilString(tds[4]), "frc" + self._recurseUntilString(tds[5])]
                     blue_teams = ["frc" + self._recurseUntilString(tds[6]), "frc" + self._recurseUntilString(tds[7]), "frc" + self._recurseUntilString(tds[8])]
                     
-                    if tds[9].string == None:
+                    if self._recurseUntilString(tds[9]) == None:
                         red_score = -1
                     else:
                         red_score = int(self._recurseUntilString(tds[9]))
                     
-                    if tds[10].string == None:
+                    if self._recurseUntilString(tds[10]) == None:
                         blue_score = -1
                     else:
                         blue_score = int(self._recurseUntilString(tds[10]))
