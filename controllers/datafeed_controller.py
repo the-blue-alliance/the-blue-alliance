@@ -122,6 +122,7 @@ class UsfirstEventGetEnqueue(webapp.RequestHandler):
         
         for event in events.fetch(100):
             taskqueue.add(
+                queue_name='usfirst',
                 url='/tasks/usfirst_event_get/%s/%s' % (event.first_eid, year),
                 method='GET')
         
@@ -189,6 +190,7 @@ class UsfirstMatchesGetEnqueue(webapp.RequestHandler):
         events = events.fetch(500)
         for event in events:
             taskqueue.add(
+                queue_name='usfirst',
                 url='/tasks/usfirst_matches_get/' + event.key().name(),
                 method='GET')
         
@@ -277,8 +279,10 @@ class UsfirstTeamGetEnqueue(webapp.RequestHandler):
         
         teams = Team.all(keys_only=True).fetch(1000, int(offset))
         for team_key in teams:
-            taskqueue.add(url='/tasks/usfirst_team_get/' + team_key.name(),
-                          method='POST')
+            taskqueue.add(
+                queue_name='usfirst',
+                url='/tasks/usfirst_team_get/' + team_key.name(),
+                method='GET')
                           
         self.response.out.write("%s team gets have been enqueued offset from %s.<br />" %(len(teams), offset))
         self.response.out.write("Reload with ?offset=%s to enqueue more." % (offset + len(teams)))
@@ -308,10 +312,6 @@ class UsfirstTeamGet(webapp.RequestHandler):
         
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_team_get.html')
         self.response.out.write(template.render(path, template_values))
-        
-    def post(self, key_name):
-        self.get(key_name)
-        
 
 
 class OprGetEnqueue(webapp.RequestHandler):

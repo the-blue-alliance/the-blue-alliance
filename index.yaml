@@ -11,6 +11,11 @@ indexes:
 
 - kind: Event
   properties:
+  - name: __key__
+    direction: desc
+
+- kind: Event
+  properties:
   - name: end_date
   - name: start_date
 
