@@ -18,7 +18,7 @@ from helpers.match_helper import MatchUpdater
 from helpers.team_helper import TeamTpidHelper, TeamUpdater
 from helpers.opr_helper import OprHelper
 
-from models import Event, EventTeam, Match, TBAVideo, Team
+from models import Event, EventTeam, Match, Team
 
 
 class TbaVideosGet(webapp.RequestHandler):

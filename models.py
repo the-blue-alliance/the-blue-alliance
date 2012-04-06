@@ -232,19 +232,3 @@ class Match(db.Model):
     
     def details_url(self):
         return "/match/%s" % self.get_key_name()
-
-
-# TODO: Remove this class -gregmarra 31 Mar 2012
-# Can remove once flushed these from dev server
-class TBAVideo(db.Model):
-    """
-    Store information related to videos of Matches hosted on 
-    videos.thebluealliance.net. Generally, there should only be one
-    TBAVideo per match
-    
-    THIS CLASS IS DEPRECATED. -gregmarra 31 Mar 2012
-    """
-    
-    match = db.ReferenceProperty(Match, required=True)
-    filetypes = db.StringListProperty() # ["mp4", "flv", "wmv"] etc
-

@@ -3,6 +3,9 @@ import logging
 from google.appengine.ext import db
 
 class TBAVideoHelper(object):
+    """
+    Same interface as the retired TBAVideo class.
+    """
     TBA_NET_VID_PATTERN = "http://videos.thebluealliance.com/%s/%s.%s"
     
     THUMBNAIL_FILETYPES = ["jpg", "jpeg"]
