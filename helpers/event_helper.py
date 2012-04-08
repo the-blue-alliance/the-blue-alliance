@@ -75,13 +75,20 @@ class EventUpdater(object):
         """
         Given an "old" and a "new" Event object, replace the fields in the
         "old" event that are present in the "new" event, but keep fields from
-        the "old" event that are null in the "new" event.
+        the "old" event that are null or the empty list in the "new" event.
+        We need to be careful, because ListProperty defaults to [] instead of
+        None.
         """
         
-        for attr, value in new_event.__dict__.iteritems():
-          if value is not None:
-            old_event.__dict__[attr] = value
+        for attr, value in vars(new_event).iteritems():
+            try:
+                # If value is a non-empty list or string set it in old_event.
+                if len(value)>0:
+                    setattr(old_event,attr,value)
+            except Exception:
+                # An exception was raised because value is None. We don't do
+                # anything so that old_event retains whatever value it had.
+                pass
 
 
-        old_event.put()
         return old_event
