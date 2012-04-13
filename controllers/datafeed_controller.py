@@ -11,11 +11,12 @@ from google.appengine.ext.webapp import template, util
 from datafeeds.datafeed_usfirst_events import DatafeedUsfirstEvents
 from datafeeds.datafeed_usfirst_matches import DatafeedUsfirstMatches
 from datafeeds.datafeed_usfirst_teams import DatafeedUsfirstTeams
+from datafeeds.datafeed_usfirst_teams2 import DatafeedUsfirstTeams2
 from datafeeds.datafeed_tba_videos import DatafeedTbaVideos
 
 from helpers.event_helper import EventUpdater
 from helpers.match_helper import MatchUpdater
-from helpers.team_helper import TeamTpidHelper, TeamUpdater
+from helpers.team_helper import TeamHelper, TeamTpidHelper, TeamUpdater
 from helpers.opr_helper import OprHelper
 
 from models import Event, EventTeam, Match, Team
@@ -314,6 +315,24 @@ class UsfirstTeamGet(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_team_get.html')
         self.response.out.write(template.render(path, template_values))
 
+
+class UsfirstTeamsFastGet(webapp.RequestHandler):
+    """
+    Fetch basic data about all current season teams at once.
+    Doesn't get tpids or full data.
+    """
+    def get(self):
+        df = DatafeedUsfirstTeams2()
+        teams = TeamHelper.convertDictsToModels(df.getAllCurrentSeasonTeams())
+        teams = TeamUpdater.bulkCreateOrUpdate(teams)
+        
+        template_values = {
+            "teams": teams
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_teams_get.html')
+        self.response.out.write(template.render(path, template_values))
+        
 
 class OprGetEnqueue(webapp.RequestHandler):
     """

@@ -125,7 +125,7 @@ class DatafeedUsfirstTeams(object):
                 address = team_info.get("address", None),
                 nickname = team_info.get("nickname", None),
                 website = team_info.get("website", None)
-            )        
+            )
             return team
         
         except Exception, e:

@@ -11,6 +11,20 @@ class TeamHelper(object):
     Helper to sort teams and stuff
     """
     @classmethod
+    def convertDictsToModels(self, team_dicts):
+        team_models = []
+        for team_dict in team_dicts:
+            team_models.append(Team(
+                key_name = "frc%s" % team_dict["team_number"],
+                team_number = team_dict["team_number"],
+                name = _getStringForDatabase(team_dict, "name"),
+                address = _getStringForDatabase(team_dict, "address"),
+                nickname = _getStringForDatabase(team_dict, "nickname"),
+                website = _getStringForDatabase(team_dict, "website")
+            ))
+        return team_models
+
+    @classmethod
     def sortTeams(self, team_list):
         """
         Takes a list of Teams (not a Query object).
@@ -18,8 +32,9 @@ class TeamHelper(object):
         # Sometimes there are None objects in the list.
         team_list = filter(None, team_list)
         team_list = sorted(team_list, key=lambda team: team.team_number)
-        
+
         return team_list
+
 
 class TeamTpidHelper(object):
     
@@ -99,6 +114,19 @@ class TeamUpdater(object):
     Helper class to handle Team objects when we are not sure whether they
     already exist or not.
     """
+    
+    @classmethod
+    def bulkCreateOrUpdate(self, new_teams):
+        put_teams = []
+        while len(new_teams) > 0:
+            team_batch = new_teams[-500:] # the last 500 items (or all of them)
+            new_teams = new_teams[:-500] # everything but the last 500 items (or nothing)
+            
+            old_teams = Team.get_by_key_name([team.key().name() for team in team_batch])
+            teams_to_put = [self.updateMerge(new_team, old_team) for (new_team, old_team) in zip(team_batch, old_teams)]
+            db.put(teams_to_put)
+            put_teams.append(teams_to_put)
+        return put_teams
 
     @classmethod
     def createOrUpdate(self, new_team):
@@ -128,6 +156,9 @@ class TeamUpdater(object):
         the "old" team that are null in the "new" team.
         """
         #FIXME: There must be a way to do this elegantly. -greg 5/12/2010
+        
+        if old_team is None:
+            return new_team
 
         if new_team.name is not None:
             old_team.name = new_team.name
@@ -144,3 +175,12 @@ class TeamUpdater(object):
             old_team.first_tpid = new_team.first_tpid
         
         return old_team
+
+
+def _getStringForDatabase(team_dict, prop):
+    MAX_DB_LENGTH = 500
+    string = team_dict.get(prop, None)
+    if string:
+        return string[:MAX_DB_LENGTH]
+    else:
+        return string
