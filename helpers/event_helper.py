@@ -85,6 +85,10 @@ class EventUpdater(object):
                 # If value is a non-empty list or string set it in old_event.
                 if len(value)>0:
                     setattr(old_event,attr,value)
+                
+                # If the string is "None", write None
+                if value == "None":
+                    setattr(old_event,attr,None)
             except Exception:
                 # An exception was raised because value is None. We don't do
                 # anything so that old_event retains whatever value it had.
