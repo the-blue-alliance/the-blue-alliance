@@ -160,13 +160,13 @@ class TeamUpdater(object):
         if old_team is None:
             return new_team
 
-        if new_team.name is not None:
+        if new_team.name:
             old_team.name = new_team.name
-        if new_team.nickname is not None:
+        if new_team.nickname:
             old_team.nickname = new_team.nickname
-        if new_team.website is not None:
+        if new_team.website:
             old_team.website = new_team.website
-        if new_team.address is not None:
+        if new_team.address:
             old_team.address = new_team.address
         
         # Take the new tpid and tpid_year iff the year is newer than the old one
