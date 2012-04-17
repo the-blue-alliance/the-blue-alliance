@@ -40,7 +40,7 @@
                 <h3><a href="/event/{{event.key.name}}">{{ event.name }}{%if event.location  %} <span class="annotation">{{ event.location }}</span>{% endif %}</a></h3>
                 <p>
                   {% if event.start_date %}{{ event.start_date|date:"M d, Y" }}{% endif %}
-                  {% if event.end_date %}{{ event.end_date|date:"M d, Y" }}{% endif %}
+                  {% if event.end_date %}- {{ event.end_date|date:"M d, Y" }}{% endif %}
                 </p>
             </li>
         {% endfor %}
