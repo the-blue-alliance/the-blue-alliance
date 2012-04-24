@@ -9,6 +9,34 @@ from django.utils import simplejson
 from models import Match, Event
 from helpers.match_helper import MatchUpdater
 
+class AdminMatchCleanup(webapp.RequestHandler):
+    """
+    Given an Event, clean up all Matches that don't have the Event's key as their key prefix.
+    Used to clean up 2011 Matches, where we had dupes of "2011new_qm1" and "2011newton_qm1".
+    """
+    def get(self):
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/matches/cleanup.html')
+        self.response.out.write(template.render(path, {}))
+    
+    def post(self):
+        event = Event.get_by_key_name(self.request.get("event_key_name"))
+        matches_to_delete = list()
+        match_keys_to_delete = list()
+        for match in event.match_set:
+            if match.key().name() != match.get_key_name():
+                matches_to_delete.append(match)
+                match_keys_to_delete.append(match.key().name())
+        
+        db.delete(matches_to_delete)
+        
+        template_values = {
+            "match_keys_deleted": match_keys_to_delete,
+            "tried_delete": True
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/matches/cleanup.html')
+        self.response.out.write(template.render(path, template_values))
+
 class AdminMatchDashboard(webapp.RequestHandler):
     """
     Show stats about Matches
