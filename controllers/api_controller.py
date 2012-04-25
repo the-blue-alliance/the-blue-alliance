@@ -87,3 +87,20 @@ class ApiEventList(webapp.RequestHandler):
             memcache.set(memcache_key, event_list, 600)
 
         self.response.out.write(simplejson.dumps(event_list))
+
+class ApiEventDetails(webapp.RequestHandler):
+    """
+    Return a specifc event with details.
+    """
+
+    def get(self):
+        event_key = str(self.request.get("event"))
+        if event_key is "" or event_key is None:
+            error_message = {"Parameter Error": "'event' is a required parameter."}
+            self.response.out.write(simplejson.dumps(error_message))
+            return False
+
+
+        event_dict = ApiHelper.getEventInfo(event_key)
+
+        self.response.out.write(simplejson.dumps(event_dict))
