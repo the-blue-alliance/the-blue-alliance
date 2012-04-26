@@ -83,6 +83,16 @@ class ApiEventList(webapp.RequestHandler):
                 event_dict["name"] = event.name
                 event_dict["event_code"] = event.short_name
                 event_dict["official"] = event.official
+                
+                if event.start_date:
+                    event_dict["start_date"] = event.start_date.isoformat()
+                else:
+                    event_dict["start_date"] = None
+                if event.end_date:
+                    event_dict["end_date"] = event.end_date.isoformat()
+                else:
+                    event_dict["end_date"] = None
+
                 event_list.append(event_dict)
             memcache.set(memcache_key, event_list, 600)
 
@@ -100,6 +110,7 @@ class ApiEventDetails(webapp.RequestHandler):
             self.response.out.write(simplejson.dumps(error_message))
             return False
 
+        
 
         event_dict = ApiHelper.getEventInfo(event_key)
 
