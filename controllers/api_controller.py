@@ -42,8 +42,11 @@ class ApiTeamDetails(webapp.RequestHandler):
 class ApiEventsShow(webapp.RequestHandler):
     """
     Information about events.
+    Deprecation notice. Please use ApiEventList, or ApiEventDetails.
     """
     def get(self):
+        logging.warning("Deprecation notice: ApiEventsShow.")
+
         event_keys = set()
         
         if self.request.get("year"):
@@ -54,3 +57,61 @@ class ApiEventsShow(webapp.RequestHandler):
         events = [ApiHelper.getEventInfo(event_key) for event_key in event_keys]
         
         self.response.out.write(simplejson.dumps(events))
+
+class ApiEventList(webapp.RequestHandler):
+    """
+    List of teams for a year with key_name, team number, and name.
+    """
+
+    def get(self):
+        try:
+            year = int(self.request.get("year"))
+        except ValueError:
+            error_message = {"Parameter Error": "'year' is a required parameter."}
+            self.response.out.write(simplejson.dumps(error_message))
+            return False
+
+        memcache_key = "api_event_list_%s" % year
+        event_list = memcache.get(memcache_key)
+
+        if event_list is None:
+            event_list = []
+            events = Event.all().filter("year =", year).fetch(500)
+            for event in events:
+                event_dict = dict()
+                event_dict["key"] = event.key().name()
+                event_dict["name"] = event.name
+                event_dict["event_code"] = event.short_name
+                event_dict["official"] = event.official
+                
+                if event.start_date:
+                    event_dict["start_date"] = event.start_date.isoformat()
+                else:
+                    event_dict["start_date"] = None
+                if event.end_date:
+                    event_dict["end_date"] = event.end_date.isoformat()
+                else:
+                    event_dict["end_date"] = None
+
+                event_list.append(event_dict)
+            memcache.set(memcache_key, event_list, 600)
+
+        self.response.out.write(simplejson.dumps(event_list))
+
+class ApiEventDetails(webapp.RequestHandler):
+    """
+    Return a specifc event with details.
+    """
+
+    def get(self):
+        event_key = str(self.request.get("event"))
+        if event_key is "" or event_key is None:
+            error_message = {"Parameter Error": "'event' is a required parameter."}
+            self.response.out.write(simplejson.dumps(error_message))
+            return False
+
+        
+
+        event_dict = ApiHelper.getEventInfo(event_key)
+
+        self.response.out.write(simplejson.dumps(event_dict))
