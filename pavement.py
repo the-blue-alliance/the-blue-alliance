@@ -15,13 +15,6 @@ def clean():
     print("Nothing to clean! :)")
 
 @task
-def dev_teams_setup():
-  """Set up team data for development environments."""
-  
-  print("Grabbing current season teams.")
-  sh("wget --delete-after --quiet http://localhost:8088/tasks/usfirst_teams_fast_get")
-
-@task
 def dev_data_setup():
   """Set up data for development environments."""
   
@@ -31,10 +24,6 @@ def dev_data_setup():
   sh("appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/events.csv --kind=Event --url=http://localhost:8088/_ah/remote_api")
   print("Importing test Match data")
   sh("appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/matches_2010cmp.csv --kind=Match --url=http://localhost:8088/_ah/remote_api")
-  print("Updating EventTeams")
-  sh("wget --delete-after --quiet http://localhost:8088/tasks/eventteam_update_enqueue")
-  print("Scraping tba_videos")
-  sh("wget --delete-after --quiet http://localhost:8088/tasks/tba_videos_get/2010cmp")
   
   clean()
   print("Done setting up!")

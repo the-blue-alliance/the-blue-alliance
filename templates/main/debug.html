@@ -32,11 +32,12 @@
         <p>To get started, you have to set up some initial test data for your local copy of TBA. We use <a href="http://paver.github.com/paver/">paver</a> scripts in pavement.py to set up this test data in your dev environment. <a href="http://packages.python.org/distribute/easy_install.html">easy_install</a> paver if you don't have it.</p>
         <p>Run these on the command line in the folder you have the-blue-alliance project in:</p>
         <ol>
-            <li>paver dev_teams_setup</li>
-            <li>paver dev_data_setup</li>
             <li><a href="/tasks/usfirst_teams_fast_get">/tasks/usfirst_teams_fast_get</a> : Sets up all 2012 teams, fast.</li>
+            <li>$ paver dev_data_setup</li>
+            <li><a href="/tasks/eventteam_update_enqueue">/tasks/eventteam_update_enqueue</a> : Build event attendance information.</li>
+            <li><a href="/tasks/tba_videos_get/2010cmp">/tasks/tba_videos_get/2010cmp</a> : Grab videos for 2010cmp</li>
         </ol>
-        <p>This test data gives you the 2010 Championship Einstein Field as your main test data.</p>
+        <p>This test data gives you the <a href="/event/2010cmp">2010 Championship Einstein Field</a> as your main test data.</p>
     </div>
     <div id="moreSetup" class="contentBlock">
         <div class="contentBlockTopper">
@@ -49,8 +50,8 @@
             <li>Instantiate 2011 Teams: <a href="/tasks/usfirst_teams_instantiate?year=2011&amp;skip=0">UsfirstTeamsInstantiate @0</a> <a href="/tasks/usfirst_teams_instantiate?year=2011&amp;skip=1000">@1000</a> <a href="/tasks/usfirst_teams_instantiate?year=2011&amp;skip=2000">@2000</a></li>
             <li>Instantiate 2010 Teams: <a href="/tasks/usfirst_teams_instantiate?year=2010&amp;skip=0">UsfirstTeamsInstantiate @0</a> <a href="/tasks/usfirst_teams_instantiate?year=2010&amp;skip=1000">@1000</a> <a href="/tasks/usfirst_teams_instantiate?year=2010&amp;skip=2000">@2000</a></li>
             <li>Instantiate 2009 Teams: <a href="/tasks/usfirst_teams_instantiate?year=2009&amp;skip=0">UsfirstTeamsInstantiate @0</a> <a href="/tasks/usfirst_teams_instantiate?year=2009&amp;skip=1000">@1000</a> <a href="/tasks/usfirst_teams_instantiate?year=2009&amp;skip=2000">@2000</a></li>
-            <li>Bulkload Events:<br />appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/events.csv --kind=Event --url=http://tbatv-prod.appspot.com/_ah/remote_api</li>
-            <li>Bulkload Matches: <br />appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/matches.csv --kind=Match --url=http://tbatv-prod.appspot.com/_ah/remote_api</li>
+            <li>Bulkload Old Events:<br />appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/events.csv --kind=Event --url=http://tbatv-prod.appspot.com/_ah/remote_api</li>
+            <li>Bulkload Old Matches: <br />appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/matches.csv --kind=Match --url=http://tbatv-prod.appspot.com/_ah/remote_api</li>
             <li><a href="/tasks/eventteam_update_enqueue">Update EventTeams</a>, to build all the event attendance information.</li>
         </ol>
     </div>
