@@ -18,8 +18,8 @@ def clean():
 def dev_teams_setup():
   """Set up team data for development environments."""
   
-  print("Instantiating Teams. This will take a few minutes. Watch the app log console for progress.")
-  sh("wget --delete-after --quiet http://localhost:8088/tasks/usfirst_teams_instantiate?year=2012&skip=0")
+  print("Grabbing current season teams.")
+  sh("wget --delete-after --quiet http://localhost:8088/tasks/usfirst_teams_fast_get")
 
 @task
 def dev_data_setup():
