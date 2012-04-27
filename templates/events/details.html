@@ -58,8 +58,8 @@
                 <th>Website</th>
                 <td><a href="{{ event.website }}" title="{{ event.name }}">{{ event.website }}</a></td>
             </tr>{% endif %}
-            {% if event.name %}<tr>
-                <th>USFIRST Page</th>
+            {% if event.official %}<tr>
+                <th>Details on FIRST</th>
                 <td><a href="https://my.usfirst.org/myarea/index.lasso?page=teamlist&event_type=FRC&sort_teams=number&year={{ event.year }}&event={{ event.event_short }}">{{ event.name }} on usfirst.org</a></td>
             </tr>{% endif %}
             {% if event.facebook_eid %}<tr>
