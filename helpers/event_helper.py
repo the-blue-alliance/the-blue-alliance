@@ -27,11 +27,10 @@ class EventHelper(object):
         return wlt
     
     @classmethod
-    def getTeamWLT(self, team_key, event_key):
+    def getTeamWLT(self, team_key, event):
         """
-        Given a team_key, and an event_key, find the Win Loss Tie.
+        Given a team_key, and an event, find the team's Win Loss Tie.
         """
-        event = Event.get_by_key_name(event_key)
         matches = event.match_set.filter("team_key_names =", team_key)
         return self.getTeamWLTFromMatches(team_key, matches)
 

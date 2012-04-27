@@ -5,7 +5,7 @@ from django.utils import simplejson
 from google.appengine.api import memcache
 from google.appengine.ext import db
 
-from models import Team, Match, Event
+from models import Event, EventTeam, Match, Team
 from helpers.event_helper import EventHelper
 from helpers.match_helper import MatchHelper
 
@@ -75,8 +75,8 @@ class ApiHelper(object):
                 else:
                     event_dict["end_date"] = None
                 
-                event_dict["teams"] = [a.team.key().name() for a in event.teams]
-                event_dict["matches"] = [a.key().name() for a in event.match_set]
+                event_dict["teams"] = [EventTeam.team.get_value_for_datastore(event_team).name() for event_team in event.teams.fetch(500)]
+                event_dict["matches"] = [a.key().name() for a in event.match_set.fetch(500)]
                 
                 memcache.set(memcache_key, event_dict, 300)
         return event_dict
@@ -95,8 +95,8 @@ class ApiHelper(object):
             events = [a.event for a in team.events if a.year == int(year)]
             events = sorted(events, key=lambda event: event.start_date)
             event_list = [self.getEventInfo(e.key().name()) for e in events]
-            for event_dict in event_list:
-                event_dict["team_wlt"] = EventHelper.getTeamWLT(team_dict["key"], event_dict["key"])
+            for event_dict, event in zip(event_list, events):
+                event_dict["team_wlt"] = EventHelper.getTeamWLT(team_dict["key"], event)
             memcache.set(memcache_key, event_list, 600)
         
         team_dict["events"] = event_list
