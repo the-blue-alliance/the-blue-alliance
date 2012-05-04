@@ -80,8 +80,9 @@ class DatafeedUsfirstMatches(object):
             tds = tr.findAll('td')
             if len(tds) == 10:
                 if self._recurseUntilString(tds[1]) is not None:
-                    red_teams = ["frc" + self._recurseUntilString(tds[2]), "frc" + self._recurseUntilString(tds[3]), "frc" + self._recurseUntilString(tds[4])]
-                    blue_teams = ["frc" + self._recurseUntilString(tds[5]), "frc" + self._recurseUntilString(tds[6]), "frc" + self._recurseUntilString(tds[7])]
+                    # get list of red and blue teams sorted in ascending numberical order - joseph
+                    red_teams = sorted(["frc" + self._recurseUntilString(tds[2]), "frc" + self._recurseUntilString(tds[3]), "frc" + self._recurseUntilString(tds[4])], key=lambda item: (int(item.lstrip("frc"))))
+                    blue_teams = sorted(["frc" + self._recurseUntilString(tds[5]), "frc" + self._recurseUntilString(tds[6]), "frc" + self._recurseUntilString(tds[7])], key=lambda item: (int(item.lstrip("frc"))))
                     
                     try:
                         if tds[8].string == None:
@@ -137,8 +138,9 @@ class DatafeedUsfirstMatches(object):
             tds = tr.findAll('td')
             if len(tds) == 11:
                 if self._recurseUntilString(tds[1]) is not None:
-                    red_teams = ["frc" + self._recurseUntilString(tds[3]), "frc" + self._recurseUntilString(tds[4]), "frc" + self._recurseUntilString(tds[5])]
-                    blue_teams = ["frc" + self._recurseUntilString(tds[6]), "frc" + self._recurseUntilString(tds[7]), "frc" + self._recurseUntilString(tds[8])]
+                    # get list of red and blue teams in ascending numberical order
+                    red_teams = sorted(["frc" + self._recurseUntilString(tds[3]), "frc" + self._recurseUntilString(tds[4]), "frc" + self._recurseUntilString(tds[5])], key=lambda item: (int(item.lstrip("frc"))))
+                    blue_teams = sorted(["frc" + self._recurseUntilString(tds[6]), "frc" + self._recurseUntilString(tds[7]), "frc" + self._recurseUntilString(tds[8])], key=lambda item: (int(item.lstrip("frc"))))
                     
                     try:
                         if self._recurseUntilString(tds[9]) == None:
