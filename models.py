@@ -43,6 +43,29 @@ class Team(db.Model):
     def details_url(self):
         return "/team/%s" % self.team_number
 
+class Award(db.Model):
+    """
+    Awards represent FIRST Robotics Competition awards.
+    name is a general name like 'quality' or 'industrial_design'
+    key_name is like '2010quality'
+    """
+    name = db.StringProperty() #general name used for sorting
+    year = db.IntegerProperty() #year it was aawarded
+    current_name = db.StringProperty() #current name FIRST awards it under
+    former_names = db.ListProperty(str) #A list of any former names it may have been awarded under
+    cmp_only = db.BooleanProperty(default=False) #Whether the award is only awarded at championships
+    multiple_winners = db.BooleanProperty(default=False) #Whether an award can be won by multiple teams
+    
+    def get_key_name(self):
+        """
+        Returns the string of the key_name of the Award object before writing it.
+        """
+        return str(self.year) + self.name
+    
+    def details_url(self):
+        return "/award/%s" % self.get_key_name()
+  
+
 class Event(db.Model):
     """
     Events represent FIRST Robotics Competition events, both official and unofficial.
