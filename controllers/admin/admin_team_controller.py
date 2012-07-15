@@ -15,7 +15,7 @@ class AdminTeamList(webapp.RequestHandler):
             "teams": teams,
         }
         
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/teams/list.html')
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/team_list.html')
         self.response.out.write(template.render(path, template_values))
         
 # The view of a single Team.
@@ -28,6 +28,6 @@ class AdminTeamDetail(webapp.RequestHandler):
             'team' : team,
         }
         
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/teams/details.html')
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/team_details.html')
         self.response.out.write(template.render(path, template_values))
 

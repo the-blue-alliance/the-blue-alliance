@@ -1,0 +1,84 @@
+th.videoIcon{
+  background-image: url('/images/icons/video.png');
+  background-repeat: no-repeat;
+  background-position: center center;
+  min-width: 12px;
+}
+
+table.matchTable, table.oprTable {
+  border-bottom: 1px solid #cccccc;
+  padding: 3px 0;
+  margin: 0 0 1em 0;
+  width: 100%;
+  margin-left:auto;
+  
+  @media (min-width: 768px) {
+    tbody tr:hover td,
+    tbody tr:hover th {
+      background-color: @tableBackgroundHover;
+    }
+  }
+}
+
+table.matchTable tr, table.oprTable tr {
+  border-top: 1px solid #cccccc;
+  border-left: 1px solid #cccccc;
+  padding: 3px 0;
+}
+
+table.matchTable tr.key, table.oprTable tr.key {
+  background-color: #f0f0f0;
+}
+
+table.matchTable th, table.oprTable th {
+  border-right: 1px solid #cccccc;
+  font-weight: bold;
+  text-align: center;
+  vertical-align: middle;
+  padding: 3px;
+}
+
+table.matchTable td, table.oprTable td {
+  border-right: 1px solid #cccccc;
+  text-align: center;
+  vertical-align: middle;
+  padding: 3px;
+}
+
+table.matchTable td.red {
+  background-color: #ffeeee;
+}
+
+table.matchTable td.blue {
+  background-color: #eeeeff;
+}
+
+table.matchTable td.redScore {
+  background-color: #ffdddd;
+}
+
+table.matchTable td.blueScore {
+  background-color: #ddddff;
+}
+
+table.matchTable td.winner {
+  font-weight: bold;
+}
+
+table.matchTable td.icon, table.matchTable th.icon {
+  margin: 0;
+  padding: 3px 0 0 0;
+  font-size: .5em;
+}
+
+table.matchTable td.win{
+  background-color: #90ee90;
+}
+
+table.matchTable td.lose{
+  background-color: #f08080;
+}
+
+table.matchTable td.tie{
+  background-color: #d3d3d3;
+}

@@ -19,12 +19,20 @@ class TeamList(webapp.RequestHandler):
         
         if html is None:
             teams = Team.all().order('team_number').fetch(10000)        
-        
+
+            num_teams = len(teams)
+            middle_value = num_teams/2
+            if num_teams%2 != 0:
+                middle_value += 1
+            teams_a, teams_b = teams[:middle_value], teams[middle_value:]
+
             template_values = {
-                "teams": teams,
+                "teams_a": teams_a,
+                "teams_b": teams_b,
+                "num_teams": num_teams,
             }
         
-            path = os.path.join(os.path.dirname(__file__), '../templates/teams/list.html')
+            path = os.path.join(os.path.dirname(__file__), '../templates/team_list.html')
             html = template.render(path, template_values)
             memcache.set(memcache_key, html, 3600)
         
@@ -104,7 +112,7 @@ class TeamDetail(webapp.RequestHandler):
                                 "years": years,
                                 "year_wlt": year_wlt }
             
-            path = os.path.join(os.path.dirname(__file__), '../templates/teams/details.html')
+            path = os.path.join(os.path.dirname(__file__), '../templates/team_details.html')
             html = template.render(path, template_values)
             memcache.set(memcache_key, html, 300)
         

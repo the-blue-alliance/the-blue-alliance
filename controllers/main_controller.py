@@ -13,7 +13,7 @@ def render_static(page):
     html = memcache.get(memcache_key)
     
     if html is None:
-        path = os.path.join(os.path.dirname(__file__), "../templates/main/%s.html" % page)
+        path = os.path.join(os.path.dirname(__file__), "../templates/%s.html" % page)
         html = template.render(path, {})
         memcache.set(memcache_key, html, 86400)
     
@@ -37,7 +37,7 @@ class MainHandler(webapp.RequestHandler):
                 "upcoming_events": upcoming_events,
             }
             
-            path = os.path.join(os.path.dirname(__file__), '../templates/main/index.html')
+            path = os.path.join(os.path.dirname(__file__), '../templates/index.html')
             html = template.render(path, template_values)
             memcache.set(memcache_key, html, 86400)
         

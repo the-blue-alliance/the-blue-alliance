@@ -14,7 +14,7 @@ class AdminMemcacheMain(webapp.RequestHandler):
             "memcache_stats": memcache.get_stats(),
         }
         
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/memcache/index.html')
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/memcache_index.html')
         self.response.out.write(template.render(path, template_values))
         
 # Memcache flush result.
@@ -34,6 +34,6 @@ class AdminMemcacheFlush(webapp.RequestHandler):
             'flushed' : flushed,
         }
         
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/memcache/flush.html')
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/memcache_flush.html')
         self.response.out.write(template.render(path, template_values))
 

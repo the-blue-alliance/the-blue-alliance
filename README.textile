@@ -22,6 +22,12 @@ h3. Simple Commands
 
 * paver clean - Deletes artifacts that the app creates that you don't need.
 
+h2. LESS
+
+The CSS files are compiled from LESS to ease in development. Use a program such as http://wearekiss.com/simpless that automatically compiles
+the LESS files into CSS. Just drag static/css into SimpLESS, and whenever you edit and save a LESS file, the CSS will be compiled! Make sure 
+"minify" is enabled in order to minimize the final CSS file size.
+
 h2. Testing
 
 Testing is implemented using a combination of unittest2 and the Google App Engine testbed framework. Test coverage is a work in progress, and focuses on maintaining datafeed integrity in the face of optimizations and changes to FIRST's data formats.

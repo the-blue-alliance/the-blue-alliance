@@ -5,3 +5,7 @@ function scrollheader() {
     var header = document.getElementById('topHeader')
     header.style.left = 0-scrollx+'px'
 }
+
+$(document).ready(function() {
+	$(".fancybox").fancybox();
+});
