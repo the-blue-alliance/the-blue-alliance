@@ -38,7 +38,7 @@ class EventList(webapp.RequestHandler):
                 "events": events,
             }
         
-            path = os.path.join(os.path.dirname(__file__), '../templates/events/list.html')
+            path = os.path.join(os.path.dirname(__file__), '../templates/event_list.html')
             html = template.render(path, template_values)
             memcache.set(memcache_key, html, 3600)
         
@@ -60,6 +60,12 @@ class EventDetail(webapp.RequestHandler):
             team_keys = [EventTeam.team.get_value_for_datastore(event_team).name() for event_team in event.teams.fetch(500)]
             teams = Team.get_by_key_name(team_keys)
             teams = TeamHelper.sortTeams(teams)
+
+            num_teams = len(teams)
+            middle_value = num_teams/2
+            if num_teams%2 != 0:
+                middle_value += 1
+            teams_a, teams_b = teams[:middle_value], teams[middle_value:]
             
             oprs = sorted(zip(event.oprs,event.opr_teams), reverse=True) # sort by OPR
             oprs = oprs[:14] # get the top 15 OPRs
@@ -67,11 +73,13 @@ class EventDetail(webapp.RequestHandler):
             template_values = {
                 "event": event,
                 "matches": matches,
-                "teams": teams,
+                "teams_a": teams_a,
+                "teams_b": teams_b,
+                "num_teams": num_teams,
                 "oprs": oprs,
             }
                 
-            path = os.path.join(os.path.dirname(__file__), '../templates/events/details.html')
+            path = os.path.join(os.path.dirname(__file__), '../templates/event_details.html')
             html = template.render(path, template_values)
             memcache.set(memcache_key, html, 300)
         

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance - Search{% endblock %}
+
+{% block meta_description %}Search for FIRST Robotics Competition teams, events, and matches.{% endblock %}
+
+{% block content %}
+<div class="container">
+	<h1 class="end_header">Search Results</h1>
+	<div class="row">
+		<div id="resultsBox" class="span8 offset2">
+	        <div id="cse-search-results"></div>
+	        <script type="text/javascript">
+	          var googleSearchIframeName = "cse-search-results";
+	          var googleSearchFormName = "cse-search-box";
+	          var googleSearchFrameWidth = 500;
+	          var googleSearchDomain = "www.google.com";
+	          var googleSearchPath = "/cse";
+	        </script>
+	        <script type="text/javascript" src="http://www.google.com/afsonline/show_afs_search.js"></script>
+		</div>
+	</div>
+</div>
+{% endblock %}

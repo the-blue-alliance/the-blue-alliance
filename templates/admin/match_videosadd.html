@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Add Videos - TBA Admin{% endblock %}
+
+{% block content %}
+
+<h1>Add lots of Videos</h1>
+
+{% if results %}
+<ul>Results:
+    <li>Bad Match: {{ results.bad_match }}</li>
+    <li>Added: {{ results.added }}</li>
+    <li>Existing: {{ results.existing }}</li>
+<ul>
+{% endif %}
+
+<form action="/admin/match/addvideos" method="post">
+    <fieldset>
+        <legend>Add youtube videos</legend>
+        <ul>
+            <li><textarea type="text" name="youtube_additions_json" rows="6" cols="60"></textarea><label for="additions_json">Additions JSON. Should be like {"videos":[[match_key, youtube],[match_key,youtube]]}</label></li>
+            <li><input type="submit" id="submit" name="submit" value="Go Go Go!"></li>
+        </ul>
+    </fieldset>
+</form>
+
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}{{match.verbose_name}} - {{match.event.year}} {{match.event.name}} - The Blue Alliance{% endblock %}
+
+{% block meta_description %}Match results and video for {{match.verbose_name}} at the {{match.event.year}} {{match.event.name}} FIRST Robotics Competition in {{match.event.location}}.{% endblock %}
+
+{% block more_head_tags %}
+    <meta property="og:title" content="{{match.verbose_name}} - {{match.event.year}} {{match.event.name}}" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="http://thebluealliance.com/match/{{match.key.name}}" />
+    {% if tbavideo.getThumbnailPath %}
+        <meta property="og:image" content="{{tbavideo.getThumbnailPath}}" />
+    {% else %}
+        <meta property="og:image" content="http://www.thebluealliance.com/images/logo_square_200.png" />
+    {% endif %}
+    <meta property="og:description" content="{{match.verbose_name}} at the {{match.event.year}} {{match.event.name}} FIRST Robotics Competition in {{match.event.location}}."/>
+    <meta property="og:site_name" content="The Blue Alliance" />
+    {% if tbavideo.getStreamablePath %}<meta property="og:video" content="{{ tbavideo.getStreamablePath }}" />{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+	<h1>{{match.verbose_name}}</h1>
+	<h3 class="end_header">{{ match.event.year }} {{ match.event.name }}</h3>
+	<p><a href="/event/{{match.event.key.name}}"><i class="icon-chevron-left"></i> Back to Event Page</a></p>
+
+	<div class="row">
+		<div class="span6 offset3">
+			<table class="matchTable">
+	            <tr class="key">
+	                <th colspan="{{match.alliances.items.0.1.teams|length}}">Teams</th>
+	                <th>Score</th>
+	            </tr>
+	            {% for items in match.alliances.items reversed %}
+	            <tr>
+	                {% for team in items.1.teams %}
+	                    <td class="{{ items.0 }}{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}"><a href="/team/{{ team|slice:"3:" }}">{{ team|slice:"3:" }}</a></td>
+	                {% endfor %}
+	                <td class="{{items.0}}Score{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}">{% ifequal items.1.score "-1" %}?{% else %}{{ items.1.score }}{% endifequal %}</td>
+	            </tr>
+	            {% endfor %}
+			</table>
+		</div>
+	</div>
+	<div class="row">
+		<div class="span6 offset3">
+        {% if tbavideo %}
+            {% include "videos/partials/tbavideo_player.html" %}
+        {% endif %}
+        {% for youtube_video in match.youtube_videos %}
+          {% include "videos/partials/youtube_video_player.html" %}
+        {% endfor %}
+        {% if not tbavideo and not match.youtube_videos %}
+          <p>No video available. Have one? <a href="/contact">Contact us!</a></p>
+        {% endif %}
+		</div>	
+	</div>
+</div>
+{% endblock %}

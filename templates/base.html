@@ -1,12 +1,17 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>{% block title %}The Blue Alliance{% endblock %}</title>
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.2.0/build/cssreset/reset-min.css">
+
     <link rel="stylesheet" href="/css/style.css" type="text/css" />
+    <link rel="stylesheet" href="/css/jquery-ui-1.8.13.custom.css" type="text/css" />
+    <link rel="stylesheet" href="/css/jquery.fancybox.css" type="text/css" />
+
+	<script type="text/javascript" src="/javascript/jquery.min.js"></script>
     <script type="text/javascript" src="/javascript/tba.js"></script>
+    <script type="text/javascript" src="/javascript/bootstrap.js"></script>
+	<script type="text/javascript" src="/javascript/jquery.fancybox.pack.js"></script>
     <script type="text/javascript" src="/jwplayer/jwplayer.js"></script>
     <script type="text/javascript">
 
@@ -26,82 +31,91 @@
     <meta property="fb:page_id" content="29895192027" />
     <meta property="fb:admins" content="1086840001" />
     <meta property="fb:app_id" content="31893535040" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     {% block more_head_tags %}{% endblock %}
 </head>
 <body>
-    <div id="fb-root"></div>
-    <script>
-      window.fbAsyncInit = function() {
-        FB.init({appId: '29895192027', status: true, cookie: true,
-                 xfbml: true});
-      };
-      (function() {
-        var e = document.createElement('script'); e.async = true;
-        e.src = document.location.protocol +
-          '//connect.facebook.net/en_US/all.js';
-        document.getElementById('fb-root').appendChild(e);
-      }());
-    </script>
-    <script type="text/javascript">
-      (function() {
-        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-        po.src = 'https://apis.google.com/js/plusone.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-      })();
-    </script>
-    <div id="topHeader">
-        <div id="header">
-            <div id="headerContent">
-              <ul class="headerNav">
-                  <li id="navLogo">
-                    <a href="/" id="tbaLogo"></a>
-                  </li>
-                  <li class="navButton">
-                      <a href="/teams">Teams</a>
-                  </li>
-                  <li class="navButton">
-                      <a href="/events">Events</a>
-                  </li>
-                  <li class="rightNav">
-                           <div id="headerSearch">
-                          <form action="http://www.thebluealliance.com/search" id="cse-search-box" class="textInput">
-                              <input type="hidden" name="cx" value="017956276086362105630:99ctqytcokm" />
-                              <input type="hidden" name="cof" value="FORID:11" />
-                              <input type="hidden" name="ie" value="UTF-8" />
-                              <input type="text" id="q" name="q" />
-                              <button id="sa" name="sa" type="submit" value="Search" ></button>
-                          </form>
-                          <script type="text/javascript" src="http://www.google.com/cse/brand?form=cse-search-box&lang=en"></script>
-                          </div>
-                  </li> 
-                  <li class="rightNav socialIcon">
-                      <a href="http://facebook.com/thebluealliance" title="Like us on Facebook"><img src="/images/icons/facebook-24x24.png" /></a>
-                  </li>
-                  <li class="rightNav socialIcon">
-                      <a href="http://twitter.com/thebluealliance" title="Follow us on Twitter"><img src="/images/icons/twitter-24x24.png" /></a>
-                  </li>
-                  <li class="rightNav socialIcon">
-                      <a href="http://thebluealliance.tumblr.com" title="Read our Blog"><img src="/images/icons/tumblr-24x24.png" /></a>
-                  </li>
 
+<div id="fb-root"></div>
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({appId: '29895192027', status: true, cookie: true,
+             xfbml: true});
+  };
+  (function() {
+    var e = document.createElement('script'); e.async = true;
+    e.src = document.location.protocol +
+      '//connect.facebook.net/en_US/all.js';
+    document.getElementById('fb-root').appendChild(e);
+  }());
+</script>
+<script type="text/javascript">
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
 
-              </ul>
-            </div>
-        </div>
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container">
+		<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+		</a>
+		<a id="navTitle" class="brand" href="/">The Blue Alliance</a>
+        <div class="nav-collapse">
+			<ul id="subnav" class="nav">
+			  <li class=" {% block teams_active %}{% endblock %}"><a href="/teams">Teams</a></li>
+			  <li class=" {% block events_active %}{% endblock %}"><a href="/events">Events</a></li>
+			</ul>
+
+			<form id="cse-search-box" class="navbar-search pull-right" action="http://www.thebluealliance.com/search" >
+			    <input type="hidden" name="cx" value="017956276086362105630:99ctqytcokm" />
+			    <input type="hidden" name="cof" value="FORID:11" />
+			    <input type="hidden" name="ie" value="UTF-8" />
+			    <input type="text" id="q" class="search-query" placeholder="Search" name="q"/>
+			</form>			
+
+			<div class="social-icons">
+				<a id="facebook" class="socialIcon" href="http://facebook.com/thebluealliance" title="Like us on Facebook"></a>
+				<a id="twitter" class="socialIcon" href=" http://twitter.com/thebluealliance" title="Follow us on Twitter"></a>
+				<a id="tumblr" class="socialIcon" href="http://thebluealliance.tumblr.com" title="Read our Blog"></a>
+			</div>
+		</div>
+	</div>
+  </div>
+</div>
+
+{% block content %}
+{% endblock %}
+
+<div id="footer" class="container">
+  <div class="row">
+    <div class="span6 offset3">
+      <div>
+        <span class="sponsor">Brought to you by: </span>
+        <a id="appengine" class="sponsor sponsorImage" href="http://www.appspot.com" title="Powered by Google App Engine"></a>
+        <a id="dotblock" class="sponsor sponsorImage" href="http://www.dotblock.com" title="Dotblock VPS Hosting"></a>
+        <a class="sponsor" href="/thanks" title="Thanks">and others...</a>
+      </div>
+      
+      <hr />
+      
+      <div>The Blue Alliance | <a href="/admin/debug/">admin</a></div>
+      <div>
+        <a href="/contact">contact</a> - 
+        <a href="http://thebluealliance.tumblr.com/">blog</a> - 
+        <a href="http://thebluealliance.tumblr.com/post/1066946079/tba-on-github">code</a> - 
+        <a href="/contact">report issue</a> - 
+        <a href="/thanks">sponsors</a>
+      </div>
     </div>
-    <div id="main">
-        <div id="leftCol">
-            {% block leftCol %}
-            {% endblock %}
-        </div>
-        <div id="content">
-            {% block content %}
-            {% endblock %}
-        </div>
-    </div>
-    <div id="footer">
-        <p class="left">The Blue Alliance. <a href="/admin/debug/">admin</a></p>
-        <p class="right"><a href="/contact">contact</a> - <a href="http://thebluealliance.tumblr.com/">blog</a> - <a href="http://thebluealliance.tumblr.com/post/1066946079/tba-on-github">code</a> - <a href="/contact">report issue</a> - <a href="/thanks">sponsors</a></p>
-    </div>
+  </div>
+</div>
+
 </body>
 </html>
