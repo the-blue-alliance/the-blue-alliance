@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}TBA Admin - Memcache Flush Results{% endblock %}
+
+{% block content %}
+
+<p>Flushed {{ flushed }}</p>
+
+<p><strong>Memcache Stats:</strong></p>
+<p>{{ memcache_stats }}</p>
+
+{% endblock %}

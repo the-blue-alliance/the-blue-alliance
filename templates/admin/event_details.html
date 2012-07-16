@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}{{event.year}}{{event.event_short}} - Event - TBA Admin{% endblock %}
+
+{% block content %}
+
+<h1>Details for {{ event.year }} {{ event.name }}</h1>
+
+<p><a href="/admin/event/edit/{{event.year}}{{event.event_short}}" title="Edit {{event.year}}{{event.name}}">Edit {{event.year}} {{event.name}}</a></p>
+
+<table>
+    <tr>
+        <td>Name</td>
+        <td>{{ event.name }}</td>
+    </tr>
+    <tr>
+        <td>Dates</td>
+        <td>{{ event.start_date|date:"M d, Y" }} to {{ event.end_date|date:"M d, Y" }}</td>
+    </tr>
+    <tr>
+        <td>Short Name</td>
+        <td>{{ event.short_name }}</td>
+    </tr>
+    <tr>
+        <td>Website</td>
+        <td>{{ event.website }}</td>
+    </tr>
+    <tr>
+        <td>Year</td>
+        <td>{{ event.year }}</td>
+    </tr>
+    <tr>
+        <td>Event Short</td>
+        <td>{{ event.event_short }}</td>
+    </tr>
+    <tr>
+        <td>Event Type</td>
+        <td>{{ event.event_type }}</td>
+    </tr>
+    <tr>
+        <td>Event Location</td>
+        <td><a href="http://maps.google.com/maps?q={{ event.location }}">{{ event.location }}</a></td>
+    </tr>
+    <tr>
+        <td>Official</td>
+        <td>{{ event.official }}</td>
+    </tr>
+    <tr>
+        <td>FIRST Event ID</td>
+        <td>{{ event.first_eid }}</td>
+    </tr>
+    <tr>
+        <td>Facebook Event ID</td>
+        <td><a href="http://graph.facebook.com/{{event.facebook_eid}}">{{event.facebook_eid}}</a></td>
+    </tr>
+    <tr>
+        <td>Webcast URL</td>
+        <td><a href="{{event.webcast_url}}">{{event.webcast_url}}</a></td>
+    </tr>
+    <tr>
+        <td>Teams Attending</td>
+        <td>{{ event.teams.count }}</td>
+    </tr>
+</table>
+
+<h2>Match Listing</h2>
+
+<table>
+    <tr>
+        <th>Match Key</th>
+        <th>Alliances JSON</th>
+    </tr>
+    {% for match in event.match_set %}
+    <tr>
+        <td><a href="/admin/match/{{match.key.name}}">{{ match.key.name }}</a></td>
+        <td>{{ match.alliances_json }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

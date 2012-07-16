@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}TBA Admin - Memcache Management{% endblock %}
+
+{% block content %}
+
+<p><strong>Memcache Stats:</strong></p>
+<p>{{ memcache_stats }}</p>
+
+<ul><strong>Admin Memcache</strong>:
+    <li><a href="/admin/memcache/flush?all=true">Flush All Memcache</a></li>
+</ul>
+
+<p>flush?key=keyname to flush a single key</p>
+
+{% endblock %}

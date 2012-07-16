@@ -39,7 +39,7 @@ class MatchDetail(webapp.RequestHandler):
                 return None
             
             match.unpack_json()
-            
+
             tbavideo = None
             if len(match.tba_videos) > 0:
                 tbavideo = TBAVideoHelper(match)
@@ -49,7 +49,7 @@ class MatchDetail(webapp.RequestHandler):
                 "tbavideo": tbavideo,
             }
             
-            path = os.path.join(os.path.dirname(__file__), '../templates/matches/details.html')
+            path = os.path.join(os.path.dirname(__file__), '../templates/match_details.html')
             html = template.render(path, template_values)
             memcache.add(memcache_key, html, 600)
         
