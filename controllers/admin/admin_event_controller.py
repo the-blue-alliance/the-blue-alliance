@@ -19,7 +19,7 @@ class AdminEventList(webapp.RequestHandler):
             "events": events,
         }
         
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/events/list.html')
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_list.html')
         self.response.out.write(template.render(path, template_values))
         
 class AdminEventDetail(webapp.RequestHandler):
@@ -33,7 +33,7 @@ class AdminEventDetail(webapp.RequestHandler):
             "event": event,
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/events/details.html')
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_details.html')
         self.response.out.write(template.render(path, template_values))
         
 class AdminEventEdit(webapp.RequestHandler):
@@ -47,7 +47,7 @@ class AdminEventEdit(webapp.RequestHandler):
             "event": event
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/events/edit.html')
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_edit.html')
         self.response.out.write(template.render(path, template_values))
     
     def post(self, event_key):

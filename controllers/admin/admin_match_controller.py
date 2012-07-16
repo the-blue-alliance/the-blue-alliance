@@ -15,7 +15,7 @@ class AdminMatchCleanup(webapp.RequestHandler):
     Used to clean up 2011 Matches, where we had dupes of "2011new_qm1" and "2011newton_qm1".
     """
     def get(self):
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/matches/cleanup.html')
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/matches_cleanup.html')
         self.response.out.write(template.render(path, {}))
     
     def post(self):
@@ -34,7 +34,7 @@ class AdminMatchCleanup(webapp.RequestHandler):
             "tried_delete": True
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/matches/cleanup.html')
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/matches_cleanup.html')
         self.response.out.write(template.render(path, template_values))
 
 class AdminMatchDashboard(webapp.RequestHandler):
@@ -48,7 +48,7 @@ class AdminMatchDashboard(webapp.RequestHandler):
             "match_count": match_count
         }
         
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/matches/dashboard.html')
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_dashboard.html')
         self.response.out.write(template.render(path, template_values))
         
 
@@ -63,7 +63,7 @@ class AdminMatchDetail(webapp.RequestHandler):
             "match": match
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/matches/details.html')
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_details.html')
         self.response.out.write(template.render(path, template_values))
         
 class AdminMatchAddVideos(webapp.RequestHandler):
@@ -71,7 +71,7 @@ class AdminMatchAddVideos(webapp.RequestHandler):
     Add a lot of youtube_videos to Matches at once.
     """
     def get(self):
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/matches/videosadd.html')
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_videosadd.html')
         self.response.out.write(template.render(path, {}))
         
     def post(self):
@@ -99,7 +99,7 @@ class AdminMatchAddVideos(webapp.RequestHandler):
             "results": results,
         }
         
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/matches/videosadd.html')
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_videosadd.html')
         self.response.out.write(template.render(path, template_values))
 
 class AdminMatchEdit(webapp.RequestHandler):
@@ -113,7 +113,7 @@ class AdminMatchEdit(webapp.RequestHandler):
             "match": match
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/matches/edit.html')
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_edit.html')
         self.response.out.write(template.render(path, template_values))
     
     def post(self, match_key):        

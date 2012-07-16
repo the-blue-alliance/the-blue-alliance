@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Match Dashboard - TBA Admin{% endblock %}
+
+{% block content %}
+
+<h1>Matches</h1>
+<p>{{ match_count }} total matches</p>
+<p>Edit with: <strong>admin/match/edit/{match_key}</strong></p>
+
+<p><a href="/admin/match/cleanup">Match Cleanup</a></p>
+
+
+{% endblock %}

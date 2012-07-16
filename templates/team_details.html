@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}{% if team.nickname %}{{team.nickname}} - {% endif %}Team {{team.team_number}}{% if explicit_year %} ({{year}}){% endif %} - The Blue Alliance{% endblock %}
+
+{% block meta_description %}{% if team.address %}From {{team.split_address.full_address}}{% endif %}. Team information, match results, and match videos from the{% if explicit_year %} {{year}}{% endif %} FIRST Robotics Competition.{% endblock %}
+
+{% block more_head_tags %}
+    <meta property="og:title" content="Team {{team.team_number}}" />
+    <meta property="og:type" content="sports_team" />
+    <meta property="og:url" content="http://thebluealliance.com/team/{{team.team_number}}" />
+    <meta property="og:image" content="http://www.thebluealliance.com/images/first_logo.png" />
+    <meta property="og:description" content="FIRST Robotics Competition team{% if team.address %} from {{team.split_address.full_address}}{% endif %}."/>
+    <meta property="og:site_name" content="The Blue Alliance" />
+    {% if team.split_address.locality %}<meta property="og:locality" content="{{team.split_address.locality}}" />{% endif %}
+    {% if team.split_address.region %}<meta property="og:region" content="{{team.split_address.region}}" />{% endif %}
+    {% if team.split_address.country_name %}<meta property="og:country-name" content="{{team.split_address.country_name}}" />{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+	{% if team.nickname %}
+	  <h1 class="team-nick">{{team.nickname}}</h1><h3 class="end_header">FRC Team {{team.team_number}}</h3>
+	{% else %}
+	  <h1 class="end_header">FRC Team {{team.team_number}}</h1>
+	{% endif %}
+	<p><a href="/teams"><i class="icon-chevron-left"></i> Team List</a></p>
+	<div class="row">
+		<div class="span8">
+			<table class="table table-striped table-condensed">
+		  		<tbody>
+		            {% if team.name %}<tr>
+		                <th>Full Name</th>
+		                <td>{{ team.name }}</td>
+		            </tr>{% endif %}
+	            	{% if team.address %}<tr>
+		                <th>Location</th>
+		                <td><a href="http://maps.google.com/maps?q={{ team.split_address.full_address|urlencode }}">{{ team.split_address.full_address }}</a></td>
+		            </tr>{% endif %}
+		            {% if team.rookie_year %}<tr>
+		                <th>Rookie Year</th>
+		                <td>{{ team.rookie_year }}</td>
+		            </tr>{% endif %}
+		  		</tbody>
+		  	</table>
+	        <div id="fblike"><fb:like href="http://www.thebluealliance.com/team/{{team.team_number}}" show_faces="false" width="75" ref="team_details"></fb:like></div>
+	        <div id="gplus"><g:plusone annotation="inline" href="http://www.thebluealliance.com/team/{{team.team_number}}" width="75"></g:plusone></div>
+			</div>
+		<div class="span2">
+			<h2>Year:</h2>
+
+			<div class="btn-group">
+			  <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+			    {{year}}
+			    <span class="caret"></span>
+			  </a>
+			  <ul class="dropdown-menu">
+		        {% for a_year in years %}
+		        <li><a href="/team/{{team.team_number}}/{{a_year}}">{{a_year}}</a></li>
+		        {% empty %}
+		        <li>No data from other years</li>
+		        {% endfor %}
+			  </ul>
+			</div>
+				
+			<br />
+				
+			<h3>{{year}} Record:</h3>
+            {% if year_wlt %}
+              <p>{{year_wlt.win}}-{{year_wlt.loss}}-{{year_wlt.tie}}</p>
+            {% else %}
+              <p>No Matches Played</p>
+            {% endif %}
+		</div>
+		<div class="span2">
+			<a href="/images/no_robot_image.png" class="thumbnail fancybox no-robot-image">
+				<img src="/images/no_robot_image.png" alt="No Robot Image">
+			</a>
+		</div>
+	</div>
+
+	<ul class="nav nav-tabs nav-stacked-phone">
+    {% for comp in participation %}
+	  <li {% if forloop.first %}class="active"{% endif %}><a href="#{{ comp.event.key.name }}" data-toggle="tab">{{ comp.event.name }}</a></li>
+	{% endfor %}
+	</ul>
+	<div class="tab-content">
+	
+    {% for comp in participation %}
+	  <div class="tab-pane{% if forloop.first %} active{% endif %}" id="{{ comp.event.key.name }}">
+			<div class="row">
+				<div class="span8 offset2">
+					<div class="row well">
+						<p class="pull-right event-link"><a href="/event/{{ comp.event.key.name }}">Event Page <i class="icon-chevron-right"></i></a></p>
+						
+						<h2>{{ comp.event.name }}</h2>
+						<p>{{ comp.event.start_date|date:"M d, Y" }} - {{ comp.event.end_date|date:"M d, Y" }}</p>
+
+						<h3>Event Record</h3>
+						<ul>
+						<li>{{comp.wlt.win}}-{{comp.wlt.loss}}-{{comp.wlt.tie}}</li>
+						</ul>
+					</div>
+				</div>
+
+			<div class="span6 offset3">
+            {% if comp.matches.num %}
+            	{% with comp.matches as matches %}
+	        	{% include "match_partials/full_match_table.html" %}
+	        	{% endwith %}
+            {% else %}
+            <p>No matches yet. Check back after {{ comp.event.start_date|date:"M d, Y" }}.</p>
+            {% endif %}
+			</div>
+			</div>
+	  </div>
+	{% endfor %}			
+	</div>
+</div>
+{% endblock %}

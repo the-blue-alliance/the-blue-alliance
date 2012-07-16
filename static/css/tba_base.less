@@ -1,0 +1,126 @@
+#navTitle {
+  background-image: url('/images/tba_blue_lamp_navbar.png');
+  background-repeat: no-repeat;
+  background-position: left center;
+  padding-left: 30px;
+  margin-left: 10px;
+  padding-right: 0;
+}
+
+#subnav {
+  margin-left: 15px;
+}
+
+
+.social-icons {
+  padding: 0;
+  margin: 9px 0 0 0;
+  float: right;
+
+  @media (max-width: 980px) and (min-width: 768px) {
+    float: left;
+    margin: 0 0 0 11px;
+  }
+
+  @media (max-width: 767px) {
+    margin: 0;
+    text-align: center;
+    float: none;
+
+    .socialIcon {
+      margin: 0 4px;
+    }
+  }
+}
+
+.socialIcon {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  margin: 0 4px 0px 4px;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+#facebook {
+  background-image: url('/images/icons/facebook-24x24.png');
+}
+
+#twitter {
+  background-image: url('/images/icons/twitter-24x24.png');
+}
+
+#tumblr {
+  background-image: url('/images/icons/tumblr-24x24.png');
+}
+
+#footer {
+  margin-top: 50px;
+  text-align: center;
+}
+
+.sponsorImage {
+  width: 130px;
+  height: 30px;
+  text-align: center;
+  display: inline-block;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.sponsor{
+  vertical-align: middle;
+  margin: 0px 3px;
+  display: inline-block;
+}
+
+#dotblock {
+  background-image: url('/images/dotblock.png');
+}
+
+#appengine {
+  background-image: url('/images/appengine.png');
+}
+
+.container > .end_header {
+  margin-bottom: 15px;
+}
+
+// Inheritance doesn't seme to be working. Copied from navs.less
+@media (max-width: 767px) {
+  // Stacked tabs and pills
+  .nav-stacked-phone > li {
+    float: none;
+  }
+  .nav-stacked-phone > li > a {
+    margin-right: 0; // no need for the gap between nav items
+    margin-top: 0;
+  }
+  
+  // Tabs
+  .nav-tabs.nav-stacked-phone {
+    border-bottom: 0;
+  }
+  .nav-tabs.nav-stacked-phone > li > a {
+    border: 1px solid #ddd;
+    .border-radius(0);
+  }
+  .nav-tabs.nav-stacked-phone > li:first-child > a {
+    .border-radius(4px 4px 0 0);
+  }
+  .nav-tabs.nav-stacked-phone > li:last-child > a {
+    .border-radius(0 0 4px 4px);
+  }
+  .nav-tabs.nav-stacked-phone > li > a:hover {
+    border-color: #ddd;
+    z-index: 2;
+  }
+  
+  // Pills
+  .nav-pills.nav-stacked-phone > li > a {
+    margin-bottom: 3px;
+  }
+  .nav-pills.nav-stacked-phone > li:last-child > a {
+    margin-bottom: 1px; // decrease margin to match sizing of stacked tabs
+  }
+}

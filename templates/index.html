@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance{% endblock %}
+
+{% block content %}
+
+<div class="container">
+	<div class="hero-unit landing-hero-unit">
+		<div class="row-fluid">
+			<div class="span7 landing">
+				<img class="landing-logo landing-logo-phone visible-phone" src="images/logo_square_200.png" alt="tbalogo" />
+		
+				<h1>The Blue Alliance</h1>
+				<p>The one-stop place for <em>FIRST</em> Robotics Competition team information, event results, and video archives</p>
+				<div>
+					<a class="btn btn-large btn-primary" href="/teams">Teams</a>
+					<a class="btn btn-large btn-primary" href="/events">Events</a>
+				</div>
+			</div>
+			<div class="span5 hidden-phone">
+				<img class="landing-logo" src="images/logo_square_200.png" alt="tbalogo" />
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container">
+	<div class="row">
+		<div class="span5 offset2">
+			<h2>This Week's Events</h2>
+	        {% for event in upcoming_events %}
+				<a href="/event/{{event.key.name}}">
+				<div class="event_block">
+					<div class="event_info">
+	                <h3>{{ event.name }}</h3>
+	                <p><em>
+              			{% if event.start_date %}{{ event.start_date|date:"M d, Y" }}{% endif %}
+						{% if event.end_date %}- {{ event.end_date|date:"M d, Y" }}{% endif %}</em>
+					</p>
+					</div>
+				</div>
+				</a>
+	        {% empty %}
+		        <div class="no_events">
+		        	<p>There are no upcoming events.</p>
+		        	<p>If you have an offseason event, <a href="/contact">tell us about it</a>!</p>
+		        </div>
+	        {% endfor %}	
+		</div>
+	</div>
+</div>
+{% endblock %}

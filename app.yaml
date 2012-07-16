@@ -1,11 +1,16 @@
-application: tbatv-dev
-version: 1
-runtime: python
+application: tbatv-dev-hrd
+version: 1-1
+runtime: python27
 api_version: 1
+threadsafe: no
 
 builtins:
 - appstats: on
 - remote_api: on
+
+libraries:
+- name: django
+  version: "1.2"
 
 handlers:
 - url: /css
@@ -22,7 +27,9 @@ handlers:
 - url: /robots.txt
   static_files: static/robots.txt
   upload: static/robots.txt
-
+- url: /apple-touch-icon.png
+  static_files: static/apple-touch-icon.png
+  upload: static/apple-touch-icon.png
 
 - url: /tasks/.*
   script: cron_main.py
@@ -35,3 +42,10 @@ handlers:
 - url: .*
   script: main.py
 
+skip_files:
+- ^(.*/)?.*\.less.*
+- /test_data/*
+- /tests/*
+- /utils/*
+- run_tests.py
+- pavement.py
