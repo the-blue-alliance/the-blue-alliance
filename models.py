@@ -65,7 +65,7 @@ class Award(db.Model):
     def details_url(self):
         return "/award/%s" % self.get_key_name()
   
-Class EventAward(db.Model):
+class EventAward(db.Model):
     """
     EventAwards serves as a join model between Events and Awards, indicating that
     an award will be given out at that event.
