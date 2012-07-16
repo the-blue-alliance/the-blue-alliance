@@ -45,10 +45,10 @@
 	<div class="row">
 		<div class="span6 offset3">
         {% if tbavideo %}
-            {% include "videos/partials/tbavideo_player.html" %}
+            {% include "video_partials/tbavideo_player.html" %}
         {% endif %}
         {% for youtube_video in match.youtube_videos %}
-          {% include "videos/partials/youtube_video_player.html" %}
+          {% include "video_partials/youtube_video_player.html" %}
         {% endfor %}
         {% if not tbavideo and not match.youtube_videos %}
           <p>No video available. Have one? <a href="/contact">Contact us!</a></p>
