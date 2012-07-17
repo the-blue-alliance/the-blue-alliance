@@ -44,8 +44,10 @@
 		            </tr>{% endif %}
 		  		</tbody>
 		  	</table>
-	        <div id="fblike"><fb:like href="http://www.thebluealliance.com/team/{{team.team_number}}" show_faces="false" width="75" ref="team_details"></fb:like></div>
-	        <div id="gplus"><g:plusone annotation="inline" href="http://www.thebluealliance.com/team/{{team.team_number}}" width="75"></g:plusone></div>
+		  	<div style="max-width: 100%; overflow: hidden">
+		  	  <div class="fb-like" data-href="http://www.thebluealliance.com/team/{{team.team_number}}" data-send="false" data-width="450" data-show-faces="false"></div>
+	        <div id="gplus"><g:plusone annotation="inline" href="http://www.thebluealliance.com/team/{{team.team_number}}" width="450"></g:plusone></div>
+	      </div>
 			</div>
 		<div class="span2">
 			<h2>Year:</h2>
