@@ -18,12 +18,12 @@ def clean():
 def dev_data_setup():
   """Set up data for development environments."""
   
-  print("Setting up dev data. Just hit enter when prompted for credentials.")
+  print("Setting up dev data.")
   
   print("Importing test Event data")
-  sh("appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/events.csv --kind=Event --url=http://localhost:8088/_ah/remote_api")
+  sh("echo \"omgrobots\" | appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/events.csv --kind=Event --url=http://localhost:8088/_ah/remote_api --email=admin@localhost --passin")
   print("Importing test Match data")
-  sh("appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/matches_2010cmp.csv --kind=Match --url=http://localhost:8088/_ah/remote_api")
+  sh("echo \"omgrobots\" | appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/matches_2010cmp.csv --kind=Match --url=http://localhost:8088/_ah/remote_api --email=admin@localhost --passin")
   
   clean()
   print("Done setting up!")
