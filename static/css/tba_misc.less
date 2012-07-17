@@ -1,0 +1,32 @@
+// Prevent bootstrap from messing up Google Custom Search input
+#resultsBox {
+  .gsib_a {
+    padding-top: 2px;
+  }
+
+  input {
+    box-shadow: none;
+    color: @black;
+  }
+    
+  td > .gsc-search-button {
+    margin: 0;
+  }
+}
+
+// Landing/404 page search
+#cse-search-box.not-nav {
+  padding-left: 0;
+
+  @media (min-width: 768px) { 
+    padding-right: 0;
+  }
+  
+  .search-query {
+    width: 220px;
+    
+    @media (max-width: 767px) {
+      width: 100%;
+    }
+  }
+}
