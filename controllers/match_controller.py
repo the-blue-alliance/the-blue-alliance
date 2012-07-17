@@ -5,6 +5,7 @@ from google.appengine.api import memcache
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
 
+import tba_config
 from models import Match
 from helpers.tbavideo_helper import TBAVideoHelper
 
@@ -51,7 +52,7 @@ class MatchDetail(webapp.RequestHandler):
             
             path = os.path.join(os.path.dirname(__file__), '../templates/match_details.html')
             html = template.render(path, template_values)
-            memcache.add(memcache_key, html, 600)
+            if tba_config.CONFIG["memcache"]: memcache.add(memcache_key, html, 600)
         
         self.response.out.write(html)
         

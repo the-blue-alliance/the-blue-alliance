@@ -12,10 +12,16 @@
 		
 				<h1>The Blue Alliance</h1>
 				<p>The one-stop place for <em>FIRST</em> Robotics Competition team information, event results, and video archives</p>
-				<div>
+				<div id="landing-buttons">
 					<a class="btn btn-large btn-primary" href="/teams">Teams</a>
 					<a class="btn btn-large btn-primary" href="/events">Events</a>
 				</div>
+				<form id="cse-search-box" class="search-query not-nav" action="http://www.thebluealliance.com/search">
+				    <input type="hidden" name="cx" value="017956276086362105630:99ctqytcokm"/>
+				    <input type="hidden" name="cof" value="FORID:11" />
+				    <input type="hidden" name="ie" value="UTF-8" />
+				    <input type="text" id="q" class="search-query" placeholder="Search" name="q"/>
+				</form>
 			</div>
 			<div class="span5 hidden-phone">
 				<img class="landing-logo" src="images/logo_square_200.png" alt="tbalogo" />

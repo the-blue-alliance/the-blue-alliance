@@ -7,6 +7,7 @@ from google.appengine.api import memcache
 from google.appengine.ext import db, webapp
 from google.appengine.ext.webapp import template, util
 
+import tba_config
 from helpers.api_helper import ApiHelper
 from models import Event, EventTeam, Match, Team
 
@@ -94,7 +95,7 @@ class ApiEventList(webapp.RequestHandler):
                     event_dict["end_date"] = None
 
                 event_list.append(event_dict)
-            memcache.set(memcache_key, event_list, 600)
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, event_list, 600)
 
         self.response.out.write(simplejson.dumps(event_list))
 
