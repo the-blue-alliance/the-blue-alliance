@@ -86,16 +86,19 @@
 	  <div class="tab-pane active" id="results">
 			
 		<div class="row">
+		{% if matches.qm %}
 		<div class="span6">
 			<h3>Qualification Match Results</h3>
 	        	{% include "match_partials/qual_match_table.html" %}
 		</div>
-			
+		{% endif %}
+		
+		{% if matches.ef or matches.qf or matches.sf or matches.f %}
 		<div class="span6">
 			<h3>Elimination Match Results</h3>
 	        	{% include "match_partials/elim_match_table.html" %}
 		  	
-		    {% if oprs|length > 0 %}
+		    {% if oprs|length > 0 and matches.qm %}
             <h3>OPRs - Top 15 (<a href="/opr">?</a>)</h3>
 	        <table class="table table-condensed table-striped table-center">
 	            <tr>
@@ -110,9 +113,28 @@
 	            {% endfor %}
 	        </table>
 		    {% endif %}
-			</div>
 		</div>
-			
+		{% endif %}
+		
+		{% if oprs|length > 0 and not matches.qm %}
+		<div class="span6">
+            <h3>OPRs - Top 15 (<a href="/opr">?</a>)</h3>
+	        <table class="table table-condensed table-striped table-center">
+	            <tr>
+	                <th>Team</th>
+	                <th>OPR</th>
+	            </tr>
+	            {% for opr,opr_team in oprs %}
+	            <tr>
+	                <td><a href="/team/{{ opr_team }}">{{ opr_team }}</a></td>
+	                <td>{{ opr|floatformat:2 }}</td>
+	            </tr>
+	            {% endfor %}
+	        </table>
+		</div>
+		{% endif %}
+	</div>
+
 					
 	  </div>
 	  <div class="tab-pane" id="teams">

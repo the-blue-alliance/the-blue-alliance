@@ -56,7 +56,7 @@
 			    <span class="caret"></span>
 			  </a>
 			  <ul class="dropdown-menu">
-		        {% for a_year in years %}
+		        {% for a_year in years reversed %}
 		        <li><a href="/team/{{team.team_number}}/{{a_year}}">{{a_year}}</a></li>
 		        {% empty %}
 		        <li>No data from other years</li>
