@@ -9,7 +9,7 @@ from google.appengine.ext.webapp import template, util
 
 from django.utils import simplejson
 
-
+import tba_config
 from models import Event, Match, EventTeam, Team
 from helpers.match_helper import MatchHelper
 from helpers.team_helper import TeamHelper
@@ -40,7 +40,7 @@ class EventList(webapp.RequestHandler):
         
             path = os.path.join(os.path.dirname(__file__), '../templates/event_list.html')
             html = template.render(path, template_values)
-            memcache.set(memcache_key, html, 3600)
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 3600) 
         
         self.response.out.write(html)
         
@@ -81,7 +81,7 @@ class EventDetail(webapp.RequestHandler):
                 
             path = os.path.join(os.path.dirname(__file__), '../templates/event_details.html')
             html = template.render(path, template_values)
-            memcache.set(memcache_key, html, 300)
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 300)
         
         self.response.out.write(html)
 
@@ -127,6 +127,6 @@ class EventRss(webapp.RequestHandler):
                 items = rss_items
             )
             html = rss.to_xml()
-            memcache.set(memcache_key, html, 300)
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 300)
         
         self.response.out.write(html)

@@ -6,6 +6,7 @@ from google.appengine.api import memcache
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
 
+import tba_config
 from helpers.event_helper import EventHelper
 from helpers.match_helper import MatchHelper
 from models import EventTeam, Team
@@ -34,7 +35,7 @@ class TeamList(webapp.RequestHandler):
         
             path = os.path.join(os.path.dirname(__file__), '../templates/team_list.html')
             html = template.render(path, template_values)
-            memcache.set(memcache_key, html, 3600)
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 3600)
         
         self.response.out.write(html)
         
@@ -114,7 +115,7 @@ class TeamDetail(webapp.RequestHandler):
             
             path = os.path.join(os.path.dirname(__file__), '../templates/team_details.html')
             html = template.render(path, template_values)
-            memcache.set(memcache_key, html, 300)
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 300)
         
         self.response.out.write(html)
 

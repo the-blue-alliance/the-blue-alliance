@@ -6,6 +6,7 @@ from google.appengine.api import memcache
 from google.appengine.ext import db, webapp
 from google.appengine.ext.webapp import template, util
 
+import tba_config
 from models import Team, Event
 
 def render_static(page):
@@ -15,7 +16,7 @@ def render_static(page):
     if html is None:
         path = os.path.join(os.path.dirname(__file__), "../templates/%s.html" % page)
         html = template.render(path, {})
-        memcache.set(memcache_key, html, 86400)
+        if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
     
     return html
 
@@ -39,7 +40,7 @@ class MainHandler(webapp.RequestHandler):
             
             path = os.path.join(os.path.dirname(__file__), '../templates/index.html')
             html = template.render(path, template_values)
-            memcache.set(memcache_key, html, 86400)
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
         
         self.response.out.write(html)
 
