@@ -6,11 +6,11 @@ DEBUG = os.environ['SERVER_SOFTWARE'].startswith('Dev')
 # Eventually a test environment should be added. -gregmarra 17 Jul 2012
 if DEBUG:
 	CONFIG = {
-		"env": "dev"
-		"memcache": False
+		"env": "dev",
+		"memcache": False,
 	}
 else:
 	CONFIG = {
-		"env": "prod"
-		"memcache": True
+		"env": "prod",
+		"memcache": True,
 	}
