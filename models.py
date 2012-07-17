@@ -1,8 +1,7 @@
+import json
 import logging
 
 from google.appengine.ext import db
-
-from django.utils import simplejson
 
 class Team(db.Model):
     """
@@ -197,7 +196,7 @@ class Match(db.Model):
     
     def unpack_json(self):
         """Turn that JSON into a dict."""
-        self.alliances = simplejson.loads(self.alliances_json)
+        self.alliances = json.loads(self.alliances_json)
         self.winning_alliance = self.get_winning_alliance()
         # TODO: there's a way to do this lazily as soon as we try to access 
         # something under .alliances., right? -gregmarra 17 Oct 2010

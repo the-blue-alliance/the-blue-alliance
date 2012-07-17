@@ -1,11 +1,10 @@
+import json
 import logging
 import re
 from datetime import datetime
 
 from google.appengine.api import urlfetch
 from google.appengine.ext import db
-
-from django.utils import simplejson
 
 from BeautifulSoup import BeautifulSoup, NavigableString
 
@@ -118,7 +117,7 @@ class DatafeedUsfirstMatches(object):
                             match_number = match_number,
                             comp_level = "qm",
                             team_key_names = red_teams + blue_teams,
-                            alliances_json = simplejson.dumps(alliances)
+                            alliances_json = json.dumps(alliances)
                         )
                         
                         matches.append(match)
@@ -172,7 +171,7 @@ class DatafeedUsfirstMatches(object):
                             match_number = match_number_info["match_number"],
                             comp_level = match_number_info["comp_level"],
                             team_key_names = red_teams + blue_teams,
-                            alliances_json = simplejson.dumps(alliances)
+                            alliances_json = json.dumps(alliances)
                         )
                         
                         # Don't write down uncompleted elimination matches

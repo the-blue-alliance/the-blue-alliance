@@ -7,8 +7,6 @@ from google.appengine.api import memcache
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
 
-from django.utils import simplejson
-
 import tba_config
 from models import Event, Match, EventTeam, Team
 from helpers.match_helper import MatchHelper

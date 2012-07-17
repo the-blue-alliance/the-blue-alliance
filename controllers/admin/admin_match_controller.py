@@ -1,10 +1,9 @@
-import os
+import json
 import logging
+import os
 
 from google.appengine.ext import webapp, db
 from google.appengine.ext.webapp import template, util
-
-from django.utils import simplejson
 
 from models import Match, Event
 from helpers.match_helper import MatchUpdater
@@ -77,7 +76,7 @@ class AdminMatchAddVideos(webapp.RequestHandler):
     def post(self):
         logging.info(self.request)
         
-        additions = simplejson.loads(self.request.get("youtube_additions_json"))
+        additions = json.loads(self.request.get("youtube_additions_json"))
         match_keys, youtube_videos = zip(*additions["videos"])
         matches = Match.get_by_key_name(match_keys)
         
@@ -120,7 +119,7 @@ class AdminMatchEdit(webapp.RequestHandler):
         logging.info(self.request)
         
         alliances_json = self.request.get("alliances_json")
-        alliances = simplejson.loads(alliances_json)
+        alliances = json.loads(alliances_json)
         team_key_names = list()
         
         for alliance in alliances:
