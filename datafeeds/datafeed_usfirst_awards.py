@@ -1,12 +1,10 @@
 import json
 import logging
-import re
-from datetime import datetime
 
 from google.appengine.api import urlfetch
 from google.appengine.ext import db
 
-from BeautifulSoup import BeautifulSoup, NavigableString
+from BeautifulSoup import BeautifulSoup
 
 from models import Award
 
