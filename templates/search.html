@@ -17,6 +17,7 @@
 			    var customSearchOptions = {};  var customSearchControl = new google.search.CustomSearchControl(
 			      '017956276086362105630:99ctqytcokm', customSearchOptions);
 			    customSearchControl.setResultSetSize(google.search.Search.FILTERED_CSE_RESULTSET);
+			    customSearchControl.setLinkTarget(google.search.Search.LINK_TARGET_SELF);
 			    customSearchControl.draw('cse');
 			    function parseParamsFromUrl() {
 			      var params = {};
