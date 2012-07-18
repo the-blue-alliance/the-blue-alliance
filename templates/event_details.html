@@ -48,11 +48,11 @@
 		            </tr>{% endif %}
 		            {% if event.facebook_eid %}<tr>
 		                <th>Facebook</th>
-		                <td><a href="{{ event.getFacebookEventUrl }}" title="Facebook Event">RSVP</td>
+		                <td><a href="{{ event.getFacebookEventUrl }}" title="Facebook Event">RSVP</a></td>
 		            </tr>{% endif %}
 		            {% if event.webcast_url %}<tr>
 		                <th>Live Webcast</th>
-		                <td><a href="{{ event.webcast_url }}" title="">{{ event.webcast_url }}</td>
+		                <td><a href="{{ event.webcast_url }}" title="">{{ event.webcast_url }}</a></td>
 		            </tr>{% endif %}
 					{% if num_teams %}<tr>
 						<th>Teams</th>
