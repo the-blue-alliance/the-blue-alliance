@@ -37,3 +37,7 @@ Thumbs.db
 ###########
 *.project
 *.pydevproject
+
+# CSS #
+#######
+*.css
