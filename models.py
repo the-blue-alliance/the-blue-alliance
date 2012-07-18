@@ -49,11 +49,8 @@ class Award(db.Model):
     key_name is like '2010quality'
     """
     name = db.StringProperty() #general name used for sorting
-    year = db.IntegerProperty() #year it was aawarded
-    current_name = db.StringProperty() #current name FIRST awards it under
-    former_names = db.ListProperty(str) #A list of any former names it may have been awarded under
-    cmp_only = db.BooleanProperty(default=False) #Whether the award is only awarded at championships
-    multiple_winners = db.BooleanProperty(default=False) #Whether an award can be won by multiple teams
+    year = db.IntegerProperty() #year it was awarded
+    winner = db.IntegerProperty() #who won the award
     
     def get_key_name(self):
         """
