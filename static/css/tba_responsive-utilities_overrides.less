@@ -1,0 +1,55 @@
+// responsive-utilities.less
+.visible-phone     { }
+.visible-tablet    { }
+.visible-desktop   { }
+.hidden-phone      { }
+.hidden-tablet     { }
+.hidden-desktop    { }
+.visible-phone, th.visible-phone, td.visible-phone     { display: none !important; }
+.visible-tablet, th.visible-tablet, td.visible-tablet    { display: none !important; }
+.visible-desktop   { display: block !important; }
+th.visible-desktop, td.visible-desktop   { display: table-cell !important; }
+tr.visible-desktop { display: table-row !important; }
+.hidden-phone      { display: block !important; }
+th.hidden-phone, td.hidden-phone      { display: table-cell !important; }
+tr.hidden-phone    { display: table-row !important; }
+.hidden-tablet     { display: block !important; }
+th.hidden-tablet, td.hidden-tablet     { display: table-cell !important; }
+tr.hidden-tablet { display: table-row !important; }
+.hidden-desktop, th.hidden-desktop, td.hidden-desktop    { display: none !important; }
+
+@media (max-width: 767px) {
+  // Show
+  .visible-phone     { }
+  .visible-phone     { display: block !important; }
+  th.visible-phone, td.visible-phone	{ display: table-cell !important; }
+  tr.visible-phone    { display: table-row !important; }
+  // Hide
+  .hidden-phone      { }
+  .hidden-phone, th.hidden-phone, td.hidden-phone, tr.hidden-phone      { display: none !important; }
+  // Hide everything else
+  .hidden-desktop    { }
+  .visible-desktop   { }
+  .hidden-desktop    { display: block !important; }
+  th.hidden-desktop, td.hidden-desktop	{ display: table-cell !important; }
+  tr.hidden-desktop { display: table-row !important; }
+  .visible-desktop, th.visible-desktop, td.visible-desktop, tr.visible-desktop   { display: none !important; }
+}
+ 
+@media (min-width: 768px) and (max-width: 979px) {
+  // Show
+  .visible-tablet    { }
+  .visible-tablet    { display: block !important; }
+  th.visible-tablet, td.visible-tablet	{ display: table-cell !important; }
+  tr.visible-tablet {display: table-row !important; }
+  // Hide
+  .hidden-tablet     { }
+  .hidden-tablet, th.hidden-tablet, td.hidden-tablet, tr.hidden-tablet     { display: none !important; }
+  // Hide everything else
+  .hidden-desktop    { }
+  .visible-desktop   { }
+  .hidden-desktop    { display: block !important; }
+  th.hidden-desktop, td.hidden-desktop	{ display: table-cell !important; }
+  tr.hidden-desktop { display: table-row !important; }
+  .visible-desktop, th.visible-desktop, td.visible-desktop, tr.visible-desktop   { display: none !important; }
+}
