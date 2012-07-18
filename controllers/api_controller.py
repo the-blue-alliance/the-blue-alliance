@@ -1,7 +1,6 @@
+import json
 import logging
 import os
-
-from django.utils import simplejson
 
 from google.appengine.api import memcache
 from google.appengine.ext import db, webapp
@@ -22,7 +21,7 @@ class ApiTeamsShow(webapp.RequestHandler):
         for team_key in team_keys:
             teams.append(ApiHelper.getTeamInfo(team_key))
         
-        self.response.out.write(simplejson.dumps(teams))
+        self.response.out.write(json.dumps(teams))
 
 class ApiTeamDetails(webapp.RequestHandler):
     """
@@ -38,7 +37,7 @@ class ApiTeamDetails(webapp.RequestHandler):
         
         #TODO: matches
         
-        self.response.out.write(simplejson.dumps(team_dict))
+        self.response.out.write(json.dumps(team_dict))
 
 class ApiEventsShow(webapp.RequestHandler):
     """
@@ -57,7 +56,7 @@ class ApiEventsShow(webapp.RequestHandler):
         event_keys = filter(None, event_keys.union(set(self.request.get("events").split(','))))        
         events = [ApiHelper.getEventInfo(event_key) for event_key in event_keys]
         
-        self.response.out.write(simplejson.dumps(events))
+        self.response.out.write(json.dumps(events))
 
 class ApiEventList(webapp.RequestHandler):
     """
@@ -69,7 +68,7 @@ class ApiEventList(webapp.RequestHandler):
             year = int(self.request.get("year"))
         except ValueError:
             error_message = {"Parameter Error": "'year' is a required parameter."}
-            self.response.out.write(simplejson.dumps(error_message))
+            self.response.out.write(json.dumps(error_message))
             return False
 
         memcache_key = "api_event_list_%s" % year
@@ -97,7 +96,7 @@ class ApiEventList(webapp.RequestHandler):
                 event_list.append(event_dict)
             if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, event_list, 600)
 
-        self.response.out.write(simplejson.dumps(event_list))
+        self.response.out.write(json.dumps(event_list))
 
 class ApiEventDetails(webapp.RequestHandler):
     """
@@ -108,11 +107,11 @@ class ApiEventDetails(webapp.RequestHandler):
         event_key = str(self.request.get("event"))
         if event_key is "" or event_key is None:
             error_message = {"Parameter Error": "'event' is a required parameter."}
-            self.response.out.write(simplejson.dumps(error_message))
+            self.response.out.write(json.dumps(error_message))
             return False
 
         
 
         event_dict = ApiHelper.getEventInfo(event_key)
 
-        self.response.out.write(simplejson.dumps(event_dict))
+        self.response.out.write(json.dumps(event_dict))

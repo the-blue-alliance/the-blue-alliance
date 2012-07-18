@@ -1,6 +1,5 @@
+import json
 import logging
-
-from django.utils import simplejson
 
 from google.appengine.api import memcache
 from google.appengine.ext import db
@@ -128,7 +127,7 @@ class ApiHelper(object):
                 match_dict["set_number"] = match.set_number
                 match_dict["match_number"] = match.match_number
                 match_dict["team_keys"] = match.team_key_names
-                match_dict["alliances"] = simplejson.loads(match.alliances_json)
+                match_dict["alliances"] = json.loads(match.alliances_json)
                 matches_list.append(match_dict)
             
             memcache.set(memcache_key, matches_list, 600)

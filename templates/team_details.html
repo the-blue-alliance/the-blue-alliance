@@ -36,7 +36,7 @@
 		            </tr>{% endif %}
 	            	{% if team.address %}<tr>
 		                <th>Location</th>
-		                <td><a href="http://maps.google.com/maps?q={{ team.split_address.full_address|urlencode }}">{{ team.split_address.full_address }}</a></td>
+		                <td><a href="http://maps.google.com/maps?q={{ team.address }}">{{ team.address }}</a></td>
 		            </tr>{% endif %}
 		            {% if team.rookie_year %}<tr>
 		                <th>Rookie Year</th>
