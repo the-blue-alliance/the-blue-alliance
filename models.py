@@ -60,18 +60,7 @@ class Award(db.Model):
     
     def details_url(self):
         return "/award/%s" % self.get_key_name()
-  
-class EventAward(db.Model):
-    """
-    EventAwards serves as a join model between Events and Awards, indicating that
-    an award will be given out at that event.
-    key_name is like 2012sj_rca
-    """
-    event = db.ReferenceProperty(Event,
-                                 collection_name='awards')
-    award = db.ReferenceProperty(Award,
-                                collection_name='events')
-    year = db.IntegerProperty()
+
     
 
 class Event(db.Model):
