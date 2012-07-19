@@ -51,6 +51,7 @@ class Award(db.Model):
     name = db.StringProperty() #general name used for sorting
     year = db.IntegerProperty() #year it was awarded
     winner = db.IntegerProperty() #who won the award
+    awardee = db.StringProperty() #who won it
     
     def get_key_name(self):
         """
