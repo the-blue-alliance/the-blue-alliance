@@ -1,0 +1,10 @@
+<h2>Got {{awards|length}} Awards</h2>
+{% for award in awards %}
+    <ul>
+        <li>Name: {{award.official_name}}</li>
+        <li>Team: {{award.winner}}</li>
+        {% if award.awardee %}
+        <li>Individual: {{award.awardee}}</li>
+        {% endif %}
+    </ul>
+{% endfor %}
