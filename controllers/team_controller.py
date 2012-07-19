@@ -44,11 +44,15 @@ class TeamDetail(webapp.RequestHandler):
     def get(self, team_number, year=None):
         
         # /team/0201 should redirect to /team/201
-        if str(int(team_number)) != team_number:
-            if year is None:
-                return self.redirect("/team/%s" % int(team_number))
-            else:
-                return self.redirect("/team/%s/%s" % (int(team_number), year))
+        try:
+            if str(int(team_number)) != team_number:
+                if year is None:
+                    return self.redirect("/team/%s" % int(team_number))
+                else:
+                    return self.redirect("/team/%s/%s" % (int(team_number), year))
+        except ValueError, e:
+            logging.info("%s", e)
+            return self.redirect("/error/404")
         
         if year is '':
             return self.redirect("/team/%s" % team_number)
@@ -66,9 +70,8 @@ class TeamDetail(webapp.RequestHandler):
         if html is None:
             team = Team.get_by_key_name("frc" + team_number)
             
-            #todo better 404 handling
             if not team:
-                return self.redirect("/")
+                return self.redirect("/error/404")
             
             events = [a.event for a in team.events if a.year == year]
             for event in events:
