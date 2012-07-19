@@ -243,6 +243,7 @@ class Award(db.Model):
     key_name is like '2012sj_rca'
     """
     name = db.StringProperty() #general name used for sorting
+    official_name = db.StringProperty() #the official name used by first
     year = db.IntegerProperty() #year it was awarded
     winner = db.IntegerProperty() #who won the award
     awardee = db.StringProperty() #who won it

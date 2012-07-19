@@ -76,20 +76,20 @@ class DatafeedUsfirstAwards(object):
         table = soup.findAll('table')[2]
         awards = list()
         for tr in table.findAll('tr')[1:]:
-            award_name = tr[0].p.span.contents[0]
+            offical_name = tr[0].p.span.contents[0]
             team_number = tr[1].p.span.contents[0]
             award_key = None
             for key in self.AWARD_NAMES:
-                if award_name in self.AWARD_NAMES[key]:
+                if offical_name in self.AWARD_NAMES[key]:
                   award_key = key
                   break
             if not award_key:
                 #award doesn't exist?
-                logging.error('Found an award that isn\'t in the dictionary: ' + award_name)
+                logging.error('Found an award that isn\'t in the dictionary: ' + official_name)
             if award_key in self.INDIVIDUAL_AWARDS:
                 awardee = tr[3].p.span.contents[0]
             else:
                 awardee = ''
-            object = Award(name = award_key, winner = team_number, awardee = awardee, year = event.year, event = event)
+            object = Award(name = award_key, winner = team_number, awardee = awardee, year = event.year, event = event, official_name = official_name)
             awards.append(object)
         return awards
