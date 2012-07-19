@@ -27,17 +27,19 @@ class MatchDetail(webapp.RequestHandler):
     """
     Display a Match.
     """
-    def get(self, key_name):
+    def get(self, match_key):
         
-        memcache_key = "match_detail_%s" % key_name
+        if not match_key:
+            return self.redirect("/")
+        
+        memcache_key = "match_detail_%s" % match_key
         html = memcache.get(memcache_key)
         
         if html is None:
-            match = Match.get_by_key_name(key_name)
+            match = Match.get_by_key_name(match_key)
+            
             if not match:
-                # TODO: Add real "match not found" template
-                self.response.out.write("404.")
-                return None
+                return self.redirect("/error/404")
             
             match.unpack_json()
 
