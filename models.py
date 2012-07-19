@@ -44,9 +44,9 @@ class Team(db.Model):
 
 class Award(db.Model):
     """
-    Awards represent FIRST Robotics Competition awards.
-    name is a general name like 'quality' or 'industrial_design'
-    key_name is like '2010quality'
+    Awards represent FIRST Robotics Competition awards given out at an event.
+    name is a general name and can be seen in /datafeeds/datafeed_usfirst_awards.py
+    key_name is like '2012sj_rca'
     """
     name = db.StringProperty() #general name used for sorting
     year = db.IntegerProperty() #year it was awarded
