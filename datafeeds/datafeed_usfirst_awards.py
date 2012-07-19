@@ -57,13 +57,6 @@ class DatafeedUsfirstAwards(object):
     
     AWARDS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/awards.html" # % (year, event_short)
     
-    def getKeyName(self, event, comp_level, set_number, match_number):
-        event_part = str(event.year) + str(event.event_short)
-        if comp_level == "qm":
-            match_part = comp_level + str(match_number)
-        else:
-            match_part = comp_level + str(set_number) + "m" + str(match_number)
-        return event_part + "_" + match_part
     
     def getAwardResultsList(self, event):
         """
