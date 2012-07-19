@@ -96,6 +96,7 @@ class DatafeedUsfirstAwards(object):
             if award_key in self.INDIVIDUAL_AWARDS:
                 awardee = tr[3].p.span.contents[0]
             else:
-                awardee = None
-            awards.append((award_key, team_number, awardee))
+                awardee = ''
+            object = Award(name = award_key, winner = team_number, awardee = awardee, year = event.year)
+            awards.append(object)
         return awards
