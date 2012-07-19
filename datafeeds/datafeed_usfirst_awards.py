@@ -92,7 +92,7 @@ class DatafeedUsfirstAwards(object):
                   break
             if not award_key:
                 #award doesn't exist?
-                raise
+                logging.error('Found an award that isn\'t in the dictionary: ' + award_name)
             if award_key in self.INDIVIDUAL_AWARDS:
                 awardee = tr[3].p.span.contents[0]
             else:
