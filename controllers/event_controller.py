@@ -48,11 +48,19 @@ class EventDetail(webapp.RequestHandler):
     event_code like "2010ct"
     """
     def get(self, event_key):
+        
+        if not event_key:
+            return self.redirect("/events")
+        
         memcache_key = "event_detail_%s" % event_key
         html = memcache.get(memcache_key)
         
         if html is None:
             event = Event.get_by_key_name(event_key)
+            
+            if not event:
+                return self.redirect("/error/404")
+            
             matches = MatchHelper.organizeMatches(event.match_set)
             
             team_keys = [EventTeam.team.get_value_for_datastore(event_team).name() for event_team in event.teams.fetch(500)]

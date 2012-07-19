@@ -54,11 +54,12 @@ class TeamDetail(webapp.RequestHandler):
             logging.info("%s", e)
             return self.redirect("/error/404")
         
-        if year is '':
-            return self.redirect("/team/%s" % team_number)
-        
         if type(year) == str: 
-            year = int(year)
+            try:
+                year = int(year)
+            except ValueError, e:
+                logging.info("%s", e)
+                return self.redirect("/team/%s" % team_number)
             explicit_year = True
         else:
             year = datetime.datetime.now().year
