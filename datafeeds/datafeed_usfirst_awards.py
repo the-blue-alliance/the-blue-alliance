@@ -67,7 +67,7 @@ class DatafeedUsfirstAwards(object):
     
     def getAwardResultsList(self, event):
         """
-        Return a list of Matches based on the FIRST match results page.
+        Return a list of Awards based on the FIRST award results page.
         """
         
         url = self.AWARDS_URL_PATTERN % (event.year,
