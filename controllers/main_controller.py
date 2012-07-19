@@ -76,7 +76,9 @@ class SearchHandler(webapp.RequestHandler):
 class TypeaheadHandler(webapp.RequestHandler):
     def get(self):
         # Currently just returns a list of all teams and events
-        # Needs to be optimized at some point. Maybe?
+        # Needs to be optimized at some point.
+        # Tried a trie but the datastructure was too big to
+        # fit into memcache efficiently
         q = self.request.get_all('q')
         entries = typeahead_entries()
 
