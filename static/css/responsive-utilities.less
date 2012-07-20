@@ -11,45 +11,31 @@
 // Visibility utilities
 
 // For desktops
-.visible-phone, th.visible-phone, td.visible-phone     { display: none !important; }
-.visible-tablet, th.visible-tablet, td.visible-tablet    { display: none !important; }
-.visible-desktop   { display: block !important; }
-th.visible-desktop, td.visible-desktop   { display: table-cell !important; }
-tr.visible-desktop { display: table-row !important; }
-.hidden-phone      { display: block !important; }
-th.hidden-phone, td.hidden-phone      { display: table-cell !important; }
-tr.hidden-phone    { display: table-row !important; }
-.hidden-tablet     { display: block !important; }
-th.hidden-tablet, td.hidden-tablet     { display: table-cell !important; }
-tr.hidden-tablet { display: table-row !important; }
-.hidden-desktop, th.hidden-desktop, td.hidden-desktop    { display: none !important; }
+.visible-phone     { display: none !important; }
+.visible-tablet    { display: none !important; }
+.visible-desktop   { } // Don't set initially
+.hidden-phone      { }
+.hidden-tablet     { }
+.hidden-desktop    { display: none !important; }
 
 // Phones only
 @media (max-width: 767px) {
   // Show
-  .visible-phone     { display: block !important; }
-  th.visible-phone, td.visible-phone	{ display: table-cell !important; }
-  tr.visible-phone    { display: table-row !important; }
+  .visible-phone     { display: inherit !important; } // Use inherit to restore previous behavior
   // Hide
-  .hidden-phone, th.hidden-phone, td.hidden-phone, tr.hidden-phone      { display: none !important; }
+  .hidden-phone      { display: none !important; }
   // Hide everything else
-  .hidden-desktop    { display: block !important; }
-  th.hidden-desktop, td.hidden-desktop	{ display: table-cell !important; }
-  tr.hidden-desktop { display: table-row !important; }
-  .visible-desktop, th.visible-desktop, td.visible-desktop, tr.visible-desktop   { display: none !important; }
+  .hidden-desktop    { display: inherit !important; }
+  .visible-desktop   { display: none !important; }
 }
 
 // Tablets & small desktops only
 @media (min-width: 768px) and (max-width: 979px) {
   // Show
-  .visible-tablet    { display: block !important; }
-  th.visible-tablet, td.visible-tablet	{ display: table-cell !important; }
-  tr.visible-tablet {display: table-row !important; }
+  .visible-tablet    { display: inherit !important; }
   // Hide
-  .hidden-tablet, th.hidden-tablet, td.hidden-tablet, tr.hidden-tablet     { display: none !important; }
+  .hidden-tablet     { display: none !important; }
   // Hide everything else
-  .hidden-desktop    { display: block !important; }
-  th.hidden-desktop, td.hidden-desktop	{ display: table-cell !important; }
-  tr.hidden-desktop { display: table-row !important; }
-  .visible-desktop, th.visible-desktop, td.visible-desktop, tr.visible-desktop   { display: none !important; }
+  .hidden-desktop    { display: inherit !important; }
+  .visible-desktop   { display: none !important ; }
 }
