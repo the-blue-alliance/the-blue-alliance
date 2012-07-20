@@ -1,0 +1,32 @@
+// navbar.less
+.navbar {
+  .brand {
+    @elementHeight: 20px;
+    padding: ((@navbarHeight - @elementHeight) / 2) 20px ((@navbarHeight - @elementHeight) / 2 + 2);
+    font-weight: 600;
+  }
+}
+
+.navbar-search {
+  padding-left: 10px;
+  .search-query {
+    margin: 0;
+    color: @black;
+  
+    &:focus,
+    &.focused {
+      text-shadow: none;
+    }
+  }
+}
+
+.navbar .nav > li > a {
+  @elementHeight: 20px;
+  padding: ((@navbarHeight - @elementHeight) / 2 + 2) 10px ((@navbarHeight - @elementHeight) / 2 + 1);
+  font-size: 14px;
+  margin: 0;
+}
+
+.navbar .btn-navbar {
+  padding: 8px 10px;
+}
