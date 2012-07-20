@@ -90,6 +90,13 @@ class DatafeedUsfirstAwards(object):
                 awardee = tr[3].p.span.contents[0]
             else:
                 awardee = ''
-            object = Award(name = award_key, winner = team_number, awardee = awardee, year = event.year, event = event, official_name = official_name)
+            object = Award(
+                name = award_key,
+                winner = team_number,
+                awardee = awardee,
+                year = event.year,
+                event = event,
+                official_name = official_name
+            )
             awards.append(object)
         return awards
