@@ -3,7 +3,7 @@ import os
 
 from google.appengine.api import taskqueue
 from google.appengine.ext import db, webapp
-from google.appengine.ext.webapp import template, util
+from google.appengine.ext.webapp import template
 
 from models.event import Event
 from models.event_team import EventTeam

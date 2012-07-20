@@ -4,7 +4,7 @@ import datetime
 
 from google.appengine.api import memcache
 from google.appengine.ext import db, webapp
-from google.appengine.ext.webapp import template, util
+from google.appengine.ext.webapp import template
 
 import tba_config
 
