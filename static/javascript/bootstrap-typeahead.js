@@ -247,7 +247,21 @@ function ($) {
         //  Looks for a match in the source
         //
         matcher: function (item) {
-            return ~item.toLowerCase().indexOf(this.query.toLowerCase());
+            function cleanUnicode(s){
+                var a = s.toLowerCase();
+                a = a.replace(/[àáâãäå]/g, "a");
+                a = a.replace(/æ/g, "ae");
+                a = a.replace(/ç/g, "c");
+                a = a.replace(/[èéêë]/g, "e");
+                a = a.replace(/[ìíîï]/g, "i");
+                a = a.replace(/ñ/g, "n");                
+                a = a.replace(/[òóôõö]/g, "o");
+                a = a.replace(/œ/g, "oe");
+                a = a.replace(/[ùúûü]/g, "u");
+                a = a.replace(/[ýÿ]/g, "y");
+                return a;
+            };            
+            return ~cleanUnicode(item).indexOf(cleanUnicode(this.query));
         },
 
         //------------------------------------------------------------------

@@ -87,7 +87,7 @@ class TypeaheadHandler(webapp.RequestHandler):
         self.response.out.write(typeahead_list)
         
 def typeahead_entries():
-    typeahead_key = "typeahead_key"
+    typeahead_key = "typeahead_entries"
     results = memcache.get(typeahead_key)
     
     if results is None:
