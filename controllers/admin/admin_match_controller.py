@@ -3,9 +3,10 @@ import logging
 import os
 
 from google.appengine.ext import webapp, db
-from google.appengine.ext.webapp import template, util
+from google.appengine.ext.webapp import template
 
-from models import Match, Event
+from models.event import Event
+from models.match import Match
 from helpers.match_helper import MatchUpdater
 
 class AdminMatchCleanup(webapp.RequestHandler):

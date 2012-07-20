@@ -4,7 +4,7 @@ import datetime
 
 from google.appengine.api import taskqueue
 from google.appengine.ext import db, webapp
-from google.appengine.ext.webapp import template, util
+from google.appengine.ext.webapp import template
 
 from datafeeds.datafeed_usfirst_events import DatafeedUsfirstEvents
 from datafeeds.datafeed_usfirst_matches import DatafeedUsfirstMatches
@@ -17,8 +17,10 @@ from helpers.match_helper import MatchUpdater
 from helpers.team_helper import TeamHelper, TeamTpidHelper, TeamUpdater
 from helpers.opr_helper import OprHelper
 
-from models import Event, EventTeam, Match, Team
-
+from models.event import Event
+from models.event_team import EventTeam
+from models.match import Match
+from models.team import Team
 
 class TbaVideosGet(webapp.RequestHandler):
     """

@@ -7,7 +7,7 @@ from google.appengine.ext import db
 
 from BeautifulSoup import BeautifulSoup
 
-from models import Event
+from models.event import Event
 
 class DatafeedUsfirstEvents(object):
     """

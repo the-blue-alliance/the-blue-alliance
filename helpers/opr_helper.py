@@ -18,7 +18,9 @@ import sys
 from math import sqrt
 from time import *
 
-from models import Event, EventTeam, Team
+from models.event import Event
+from models.event_team import EventTeam
+from models.team import Team
 
 class OprHelper:
 

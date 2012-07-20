@@ -3,11 +3,11 @@ import logging
 
 from google.appengine.api import memcache
 from google.appengine.ext import webapp
-from google.appengine.ext.webapp import template, util
+from google.appengine.ext.webapp import template
 
 import tba_config
-from models import Match
 from helpers.tbavideo_helper import TBAVideoHelper
+from models.match import Match
 
 class MatchList(webapp.RequestHandler):
     """
@@ -54,7 +54,6 @@ class MatchDetail(webapp.RequestHandler):
             
             path = os.path.join(os.path.dirname(__file__), '../templates/match_details.html')
             html = template.render(path, template_values)
-            if tba_config.CONFIG["memcache"]: memcache.add(memcache_key, html, 600)
+            if tba_config.CONFIG["memcache"]: memcache.add(memcache_key, html, 86400)
         
         self.response.out.write(html)
-        

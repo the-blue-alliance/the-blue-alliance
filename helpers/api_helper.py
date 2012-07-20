@@ -4,9 +4,12 @@ import logging
 from google.appengine.api import memcache
 from google.appengine.ext import db
 
-from models import Event, EventTeam, Match, Team
 from helpers.event_helper import EventHelper
 from helpers.match_helper import MatchHelper
+from models.event import Event
+from models.event_team import EventTeam
+from models.match import Match
+from models.team import Team
 
 class ApiHelper(object):
     """Helper for api_controller."""

@@ -5,12 +5,15 @@ import PyRSS2Gen
 
 from google.appengine.api import memcache
 from google.appengine.ext import webapp
-from google.appengine.ext.webapp import template, util
+from google.appengine.ext.webapp import template
 
 import tba_config
-from models import Event, Match, EventTeam, Team
 from helpers.match_helper import MatchHelper
 from helpers.team_helper import TeamHelper
+from models.event import Event
+from models.event_team import EventTeam
+from models.match import Match
+from models.team import Team
 
 class EventList(webapp.RequestHandler):
     """
@@ -38,7 +41,7 @@ class EventList(webapp.RequestHandler):
         
             path = os.path.join(os.path.dirname(__file__), '../templates/event_list.html')
             html = template.render(path, template_values)
-            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 3600) 
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400) 
         
         self.response.out.write(html)
         
@@ -87,7 +90,7 @@ class EventDetail(webapp.RequestHandler):
                 
             path = os.path.join(os.path.dirname(__file__), '../templates/event_details.html')
             html = template.render(path, template_values)
-            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 300)
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
         
         self.response.out.write(html)
 
@@ -133,6 +136,6 @@ class EventRss(webapp.RequestHandler):
                 items = rss_items
             )
             html = rss.to_xml()
-            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 300)
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
         
         self.response.out.write(html)
