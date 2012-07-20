@@ -2,7 +2,7 @@ application: tbatv-dev-hrd
 version: 1-1
 runtime: python27
 api_version: 1
-threadsafe: no
+threadsafe: true
 
 builtins:
 - appstats: on
@@ -32,15 +32,15 @@ handlers:
   upload: static/apple-touch-icon.png
 
 - url: /tasks/.*
-  script: cron_main.py
+  script: cron_main.app
   login: admin
 - url: /admin/.*
-  script: admin_main.py
+  script: admin_main.app
   login: admin
 - url: /api/.*
-  script: api_main.py
+  script: api_main.app
 - url: .*
-  script: main.py
+  script: main.app
 
 skip_files:
 - ^(.*/)?.*\.less.*
