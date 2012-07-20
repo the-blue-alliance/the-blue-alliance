@@ -6,7 +6,7 @@ from google.appengine.ext import db
 
 from BeautifulSoup import BeautifulSoup
 
-from models import Award
+from models.award import Award
 
 class DatafeedUsfirstAwards(object):
     """
