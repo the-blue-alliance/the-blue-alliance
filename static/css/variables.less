@@ -18,12 +18,6 @@
 @grayLighter:           #eee;
 @white:                 #fff;
 
-// TBA Blues
-// -------------------------
-@TBAblueDarker:			#000044;
-@TBAblueDark:			#000088;
-@TBAblueLight:			#223366;
-
 
 // Accent colors
 // -------------------------
@@ -41,7 +35,7 @@
 // -------------------------
 @bodyBackground:        @white;
 @textColor:             @grayDark;
-@bodyPadding:			60px;
+
 
 // Links
 // -------------------------
@@ -135,8 +129,8 @@
 
 // Sprite icons path
 // -------------------------
-@iconSpritePath:          "/images/icons/glyphicons-halflings.png";
-@iconWhiteSpritePath:     "/images/icons/glyphicons-halflings-white.png";
+@iconSpritePath:          "../img/glyphicons-halflings.png";
+@iconWhiteSpritePath:     "../img/glyphicons-halflings-white.png";
 
 
 // Input placeholder text color
@@ -152,20 +146,20 @@
 // Navbar
 // -------------------------
 @navbarHeight:                    40px;
-@navbarBackground:                @TBAblueLight;
-@navbarBackgroundHighlight:       @TBAblueDark;
+@navbarBackground:                @grayDarker;
+@navbarBackgroundHighlight:       @grayDark;
 
 @navbarText:                      @grayLight;
-@navbarLinkColor:                 @white;
-@navbarLinkColorHover:            @grayLight;
-@navbarLinkColorActive:           @white;
+@navbarLinkColor:                 @grayLight;
+@navbarLinkColorHover:            @white;
+@navbarLinkColorActive:           @navbarLinkColorHover;
 @navbarLinkBackgroundHover:       transparent;
-@navbarLinkBackgroundActive:      @TBAblueDarker;
+@navbarLinkBackgroundActive:      @navbarBackground;
 
-@navbarSearchBackground:          @grayLighter;
+@navbarSearchBackground:          lighten(@navbarBackground, 25%);
 @navbarSearchBackgroundFocus:     @white;
-@navbarSearchBorder:              @grayDarker;
-@navbarSearchPlaceholderColor:    @grayDark;
+@navbarSearchBorder:              darken(@navbarSearchBackground, 30%);
+@navbarSearchPlaceholderColor:    #ccc;
 @navbarBrandColor:                @navbarLinkColor;
 
 
