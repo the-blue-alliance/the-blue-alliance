@@ -16,7 +16,7 @@ class Award(db.Model):
     event = db.ReferenceProperty(Event, required=True)
     
     def event_key_name(self):
-        return Match.event.get_value_for_datastore(self).name()
+        return Award.event.get_value_for_datastore(self).name()
 
 
     def get_key_name(self):
