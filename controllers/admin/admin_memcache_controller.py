@@ -4,8 +4,6 @@ from google.appengine.api import memcache
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
 
-from models import Team
-
 # Main memcache view.
 class AdminMemcacheMain(webapp.RequestHandler):
     def get(self):

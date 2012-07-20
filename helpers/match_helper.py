@@ -2,7 +2,8 @@ import logging
 
 from google.appengine.ext import db
 
-from models import Match, Team
+from models.match import Match
+from models.team import Team
 
 class MatchHelper(object):
     """

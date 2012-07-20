@@ -5,7 +5,9 @@ from google.appengine.api import taskqueue
 from google.appengine.ext import db, webapp
 from google.appengine.ext.webapp import template, util
 
-from models import Event, EventTeam, Team
+from models.event import Event
+from models.event_team import EventTeam
+from models.team import Team
 
 class EventTeamUpdate(webapp.RequestHandler):
     """

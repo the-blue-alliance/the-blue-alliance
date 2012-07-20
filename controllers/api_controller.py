@@ -10,6 +10,11 @@ import tba_config
 from helpers.api_helper import ApiHelper
 from models import Event, EventTeam, Match, Team
 
+from models.event import Event
+from models.event_team import EventTeam
+from models.match import Match
+from models.team import Team
+
 class ApiTeamsShow(webapp.RequestHandler):
     """
     Information about teams.

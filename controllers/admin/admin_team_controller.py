@@ -3,7 +3,7 @@ import os
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
 
-from models import Team
+from models.team import Team
 
 # The view of a list of teams.
 class AdminTeamList(webapp.RequestHandler):

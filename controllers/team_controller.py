@@ -9,7 +9,10 @@ from google.appengine.ext.webapp import template, util
 import tba_config
 from helpers.event_helper import EventHelper
 from helpers.match_helper import MatchHelper
-from models import EventTeam, Team
+from models.event import Event
+from models.event_team import EventTeam
+from models.match import Match
+from models.team import Team
 
 # The view of a list of teams.
 class TeamList(webapp.RequestHandler):

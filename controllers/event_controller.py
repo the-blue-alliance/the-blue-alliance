@@ -8,9 +8,12 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
 
 import tba_config
-from models import Event, Match, EventTeam, Team
 from helpers.match_helper import MatchHelper
 from helpers.team_helper import TeamHelper
+from models.event import Event
+from models.event_team import EventTeam
+from models.match import Match
+from models.team import Team
 
 class EventList(webapp.RequestHandler):
     """

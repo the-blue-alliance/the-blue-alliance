@@ -8,7 +8,7 @@ from google.appengine.ext import db
 
 from BeautifulSoup import BeautifulSoup, NavigableString
 
-from models import Match
+from models.match import Match
 
 class DatafeedUsfirstMatches(object):
     """
