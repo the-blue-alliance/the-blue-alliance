@@ -67,11 +67,21 @@
 		</div>
 		<div class="span6">
 			<h2>Awards Overview:</h2>
-			<p>Regional Chairman's Award:</p>
-			<p>Engineering Inspiration Award:</p>
-			<p>Rookie All-Star Award:</p>
-			<p>Regional Winners:<p>
-			<p>Regional Finalists:</p>
+			<p>Regional Chairman's Award: {% if awards.rca %} <a href="/team/{{awards.rca.winner}}">{{awards.rca.winner}}</a> {% endif %}</p>
+			<p>Engineering Inspiration Award: {% if awards.ei %} <a href="/team/{{awards.ei.winner}}">{{awards.ei.winner}}</a> {% endif %}</p>
+			<p>Rookie All-Star Award: {% if awards.ras %} <a href="/team/{{awards.ras.winner}}">{{awards.ras.winner}}</a> {% endif %}</p>
+			<p>Regional Winners:
+			 {% if awards.win1 %} <a href="/team/{{awards.win1.winner}}">{{awards.win1.winner}}</a>, {% endif %}
+			 {% if awards.win2 %} <a href="/team/{{awards.win2.winner}}">{{awards.win2.winner}}</a>, {% endif %}
+			 {% if awards.win3 %} <a href="/team/{{awards.win3.winner}}">{{awards.win3.winner}}</a>, {% endif %}
+			 {% if awards.win4 %} <a href="/team/{{awards.win4.winner}}">{{awards.win4.winner}}</a>, {% endif %}			 
+			</p>
+			<p>Regional Finalists:
+			 {% if awards.fin1 %} <a href="/team/{{awards.fin1.winner}}">{{awards.fin1.winner}}</a>, {% endif %}
+			 {% if awards.fin2 %} <a href="/team/{{awards.fin2.winner}}">{{awards.fin2.winner}}</a>, {% endif %}
+			 {% if awards.fin3 %} <a href="/team/{{awards.fin3.winner}}">{{awards.fin3.winner}}</a>, {% endif %}
+			 {% if awards.fin3 %} <a href="/team/{{awards.fin4.winner}}">{{awards.fin4.winner}}</a>, {% endif %}			 
+			</p>
 		</div>
 	</div>
 	
