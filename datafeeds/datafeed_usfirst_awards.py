@@ -74,32 +74,37 @@ class DatafeedUsfirstAwards(object):
         else:
             logging.error('Unable to retreive url: ' + url)
     
-    def parseAwardResultsList(self, event, html):
+    def parseAwardsResultsList(self, event, html):
         soup = BeautifulSoup(html, convertEntities=BeautifulSoup.HTML_ENTITIES)
         table = soup.findAll('table')[2]
         awards = list()
         for tr in table.findAll('tr')[1:]:
-            offical_name = tr[0].p.span.contents[0]
-            team_number = tr[1].p.span.contents[0]
+            tds = tr.findAll('td')
+            official_name = tds[0].p.span.contents[0]
+            team_number = tds[1].p.span.contents[0]
             award_key = None
             for key in self.AWARD_NAMES:
-                if offical_name in self.AWARD_NAMES[key]:
+                if official_name in self.AWARD_NAMES[key]:
                   award_key = key
                   break
             if not award_key:
                 #award doesn't exist?
                 logging.error('Found an award that isn\'t in the dictionary: ' + official_name)
             if award_key in self.INDIVIDUAL_AWARDS:
-                awardee = tr[3].p.span.contents[0]
+                awardee = tds[3].p.span.contents[0]
             else:
                 awardee = ''
+            try:
+                team_number = int(str(team_number))
+            except ValueError:
+                team_number = 0
             object = Award(
                 name = award_key,
                 winner = team_number,
                 awardee = awardee,
                 year = event.year,
+                official_name = official_name,
                 event = event,
-                official_name = official_name
             )
             awards.append(object)
         return awards
