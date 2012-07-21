@@ -195,7 +195,7 @@ class UsfirstAwardsGetEnqueue(webapp.RequestHandler):
         for event in events.fetch(100):
             taskqueue.add(
                 queue_name='usfirst',
-                url='/tasks/usfirst_award_get/%s/%s' % (event.first_eid, year),
+                url='/tasks/usfirst_awards_get/%s' % (event.key().name()),
                 method='GET')
         
         template_values = {
