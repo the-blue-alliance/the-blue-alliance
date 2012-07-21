@@ -78,14 +78,35 @@ class DatafeedUsfirstAwards(object):
         else:
             logging.error('Unable to retreive url: ' + url)
     
+    def sanitize(self, text):
+        #because for some reason the first website is dumb
+        #see http://www2.usfirst.org/2012comp/Events/gl/awards.html for an example
+        return text.replace('\r\n ', '')
+    
+    def fixAwardee(self, text):
+        #because for some reason the first website is dumb
+        if len(text) != 2:
+            return text.span.contents[0]
+        spans = text.findAll('span')
+        try:
+            f_name = spans[1].contents[0]
+            l_name = spans[3].contents[0]
+        except:
+            return text.span.contents[0]
+        return f_name + ' ' + l_name
+    
     def parseAwardsResultsList(self, event, html):
         soup = BeautifulSoup(html, convertEntities=BeautifulSoup.HTML_ENTITIES)
         table = soup.findAll('table')[2]
+        already_parsed = list()
         awards = list()
         for tr in table.findAll('tr')[1:]:
             tds = tr.findAll('td')
-            official_name = tds[0].p.span.contents[0]
-            team_number = tds[1].p.span.contents[0]
+            official_name = self.sanitize(tds[0].p.span.contents[0])
+            try:
+                team_number = tds[1].p.span.contents[0]
+            except AttributeError:
+                team_number = 0
             award_key = None
             for key in self.AWARD_NAMES:
                 if official_name in self.AWARD_NAMES[key]:
@@ -94,21 +115,32 @@ class DatafeedUsfirstAwards(object):
             if not award_key:
                 #award doesn't exist?
                 logging.error('Found an award that isn\'t in the dictionary: ' + official_name)
+                continue #silently ignore
             if award_key in self.INDIVIDUAL_AWARDS:
-                awardee = tds[3].p.span.contents[0]
+                try:
+                    awardee = self.fixAwardee(tds[3].p)
+                except TypeError:
+                    #they didn't award it but still listed it?
+                    continue
             else:
                 awardee = ''
+            awardee = self.sanitize(awardee)
             try:
                 team_number = int(str(team_number))
             except ValueError:
                 team_number = 0
+            key_number = 1
+            while award_key in already_parsed:
+                award_key += str(key_number)
+                key_number += 1
             object = Award(
                 name = award_key,
                 winner = team_number,
-                awardee = str(awardee),
+                awardee = unicode(awardee),
                 year = event.year,
                 official_name = str(official_name),
                 event = event,
             )
             awards.append(object)
+            already_parsed.append(award_key)
         return awards
