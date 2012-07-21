@@ -60,7 +60,7 @@ class DatafeedUsfirstAwards(object):
         "judge2": ["Judges' Award #2"],
     }
     INDIVIDUAL_AWARDS = ["dlf", "dlf2", "dlf3", "dlf4", "dlf5", "dlf6", "vol", "wfa"]    
-        
+    NO_TEAM_AWARDS = ["vol"] #awards which don't have to be associated with a team    
     
     AWARDS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/awards.html" # % (year, event_short)
     
@@ -116,6 +116,9 @@ class DatafeedUsfirstAwards(object):
                 #award doesn't exist?
                 logging.error('Found an award that isn\'t in the dictionary: ' + official_name)
                 continue #silently ignore
+            if (award_key in self.NO_TEAM_AWARDS) and (team_number == 0):
+                #award doesn't have a team set, probably wasn't given
+                continue #skip
             if award_key in self.INDIVIDUAL_AWARDS:
                 try:
                     awardee = self.fixAwardee(tds[3].p)
