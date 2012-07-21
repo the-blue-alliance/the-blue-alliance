@@ -219,7 +219,7 @@ class UsfirstAwardsGet(webapp.RequestHandler):
         
         new_awards = list()
         if awards is not None:
-            au.bulkRead(awards)
+            #au.bulkRead(awards)
             for award in awards:
                 new_award = au.findOrSpawnWithCache(award) # findOrSpawn doesn't put() things.
                 new_awards.append(new_award)    
