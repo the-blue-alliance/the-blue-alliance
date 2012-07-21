@@ -39,6 +39,10 @@ class DatafeedUsfirstAwards(object):
         "entre": ["Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers"],
         "dlf": ["FIRST Dean's List Finalist Award #1"],
         "dlf2": ["FIRST Dean's List Finalist Award #2"],
+        "dlf3": ["FIRST Dean's List Finalist Award #3"],
+        "dlf4": ["FIRST Dean's List Finalist Award #4"],
+        "dlf5": ["FIRST Dean's List Finalist Award #5"],
+        "dlf6": ["FIRST Dean's List Finalist Award #6"],
         "gp": ["Gracious Professionalism Award sponsored by Johnson & Johnson"],
         "hrs": ["Highest Rookie Seed"],
         "image": ["Imagery Award in honor of Jack Kamen"],
@@ -55,7 +59,7 @@ class DatafeedUsfirstAwards(object):
         "judge": ["Judges' Award #1"],
         "judge2": ["Judges' Award #2"],
     }
-    INDIVIDUAL_AWARDS = ["dlf", "dlf2", "vol", "wfa"]    
+    INDIVIDUAL_AWARDS = ["dlf", "dlf2", "dlf3", "dlf4", "dlf5", "dlf6", "vol", "wfa"]    
         
     
     AWARDS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/awards.html" # % (year, event_short)
