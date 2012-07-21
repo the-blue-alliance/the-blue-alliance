@@ -101,9 +101,9 @@ class DatafeedUsfirstAwards(object):
             object = Award(
                 name = award_key,
                 winner = team_number,
-                awardee = awardee,
+                awardee = str(awardee),
                 year = event.year,
-                official_name = official_name,
+                official_name = str(official_name),
                 event = event,
             )
             awards.append(object)
