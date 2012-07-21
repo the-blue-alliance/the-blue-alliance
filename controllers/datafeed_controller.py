@@ -10,7 +10,7 @@ from datafeeds.datafeed_usfirst_events import DatafeedUsfirstEvents
 from datafeeds.datafeed_usfirst_matches import DatafeedUsfirstMatches
 from datafeeds.datafeed_usfirst_teams import DatafeedUsfirstTeams
 from datafeeds.datafeed_usfirst_teams2 import DatafeedUsfirstTeams2
-from datafeeds.datafeed_usfrist_awards import DatafeedUsfirstAwards
+from datafeeds.datafeed_usfirst_awards import DatafeedUsfirstAwards
 from datafeeds.datafeed_tba_videos import DatafeedTbaVideos
 
 from helpers.event_helper import EventUpdater
