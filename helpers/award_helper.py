@@ -4,6 +4,15 @@ from google.appengine.ext import db
 
 from models.award import Award
 
+class AwardHelper(object):
+    """
+    Helper to prepare awards for being used in a template
+    """
+    @classmethod
+    def organizeAwards(self, award_list):
+        awards = dict([(award.name, award) for award in award_list])
+        return awards
+    
 
 class AwardUpdater(object):
     """
