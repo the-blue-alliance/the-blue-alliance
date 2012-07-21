@@ -16,14 +16,14 @@ class Award(db.Model):
     event = db.ReferenceProperty(Event, required=True)
     
     def event_key_name(self):
-        return Award.event.get_value_for_datastore(self).name()
+        return self.event.get_key_name()
 
 
     def get_key_name(self):
         """
         Returns the string of the key_name of the Award object before writing it.
         """
-        return str(self.year) + self.event_key_name() + '_' + self.name
+        return str(self.year) + str(self.event_key_name()) + '_' + str(self.name)
     
     def details_url(self):
         return "/award/%s" % self.get_key_name()
