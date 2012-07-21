@@ -2,7 +2,7 @@ import logging
 
 from google.appengine.ext import db
 
-from models.Award import Award
+from models.award import Award
 
 
 class AwardUpdater(object):
@@ -14,7 +14,7 @@ class AwardUpdater(object):
     def __init__(self):
         self.cached_awards = dict() # a dictionary to cache DB reads
     
-    def bulkRead(self, match_list):
+    def bulkRead(self, award_list):
         """
         Take a list of awards, bulk read them to reduce DB reads.
         """

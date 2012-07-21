@@ -176,7 +176,7 @@ class UsfirstEventGet(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_get.html')
         self.response.out.write(template.render(path, template_values))
 
-class UsfirstAwardGetEnqueue(webapp.RequestHandler):
+class UsfirstAwardsGetEnqueue(webapp.RequestHandler):
     """
     Handles enqueing updates to individual USFIRST events.
     """
@@ -221,9 +221,8 @@ class UsfirstAwardsGet(webapp.RequestHandler):
         if awards is not None:
             au.bulkRead(awards)
             for award in awards:
-                new_award = mu.findOrSpawnWithCache(award) # findOrSpawn doesn't put() things.
-                new_awards.append(new_awards)
-            
+                new_award = au.findOrSpawnWithCache(award) # findOrSpawn doesn't put() things.
+                new_awards.append(new_awards)    
             keys = db.put(new_awards) # Doing a bulk put() is faster than individually.
         else:
             logging.info("No awards found for event " + str(event.year) + " " + str(event.name))

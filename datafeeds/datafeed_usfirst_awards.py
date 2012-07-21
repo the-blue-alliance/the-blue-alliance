@@ -22,35 +22,38 @@ class DatafeedUsfirstAwards(object):
         "new": "Newton",
     }
     AWARD_NAMES = {
-        "rca": ["Regional Chairman's Award"]
-        "ei": ["Engineering Inspriation Award"]
-        "win1": ["Regional Winners #1"]
-        "win2": ["Regional Winners #2"]
-        "win3": ["Regional Winners #3"]
-        "fin1": ["Regional Finalists #1"]
-        "fin2": ["Regional Finalists #2"]
-        "fin3": ["Regional Finalists #3"]
-        "coop": ["Coopertition Award"]
-        "create": ["Creativity Award sponsored by Xerox"] 
-        "eng": ["Engineering Excellence Award sponsored by Delphi"]
-        "entre": ["Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers"]
-        "dlf": ["Dean's List Finalist #1"]
-        "dlf2": ["Dean's List Finalist #2"]
-        "gp": ["Gracious Professionalism Award sponsored by Johnson & Johnson"]
-        "hrs": ["Highest Rookie Seed"]
-        "image": ["Imagery Award in honor of Jack Kamen"]
-        "ind": ["Industrial Design Award sponsored by General Motors"]
-        "safe": ["Industrial Safety Award sponsored by Underwriters Laboratories"]
-        "control": ["Innovation in Control Award sponsored by Rockwell Automation"]
-        "quality": ["Quality Award sponsored by Motorola"]
-        "ras": ["Rookie All Star Award"]
-        "rinspire": ["Rookie Inspiration Award"]
-        "spirit": ["Team Spirit Award sponsored by Chrysler"]
-        "web": ["Website Award"]
-        "vol": ["Volunteer of the Year"]
-        "wfa": ["Woodie Flowers Finalist Award"]
-        "judge": ["Judges' Award #1"]
-        "judge2": ["Judges' Award #2"]
+        "rca": ["Regional Chairman's Award"],
+        "ei": ["Engineering Inspiration Award"],
+        "win1": ["Regional Winners #1"],
+        "win2": ["Regional Winners #2"],
+        "win3": ["Regional Winners #3"],
+        "win4": ["Regional Winners #4"],
+
+        "fin1": ["Regional Finalists #1"],
+        "fin2": ["Regional Finalists #2"],
+        "fin3": ["Regional Finalists #3"],
+        "fin4": ["Regional Finalists #4"],
+        "coop": ["Coopertition Award"],
+        "create": ["Creativity Award sponsored by Xerox"],
+        "eng": ["Engineering Excellence Award sponsored by Delphi"],
+        "entre": ["Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers"],
+        "dlf": ["FIRST Dean's List Finalist Award #1"],
+        "dlf2": ["FIRST Dean's List Finalist Award #2"],
+        "gp": ["Gracious Professionalism Award sponsored by Johnson & Johnson"],
+        "hrs": ["Highest Rookie Seed"],
+        "image": ["Imagery Award in honor of Jack Kamen"],
+        "ind": ["Industrial Design Award sponsored by General Motors"],
+        "safe": ["Industrial Safety Award sponsored by Underwriters Laboratories"],
+        "control": ["Innovation in Control Award sponsored by Rockwell Automation"],
+        "quality": ["Quality Award sponsored by Motorola"],
+        "ras": ["Rookie All Star Award"],
+        "rinspire": ["Rookie Inspiration Award"],
+        "spirit": ["Team Spirit Award sponsored by Chrysler"],
+        "web": ["Website Award"],
+        "vol": ["Volunteer of the Year"],
+        "wfa": ["Woodie Flowers Finalist Award"],
+        "judge": ["Judges' Award #1"],
+        "judge2": ["Judges' Award #2"],
     }
     INDIVIDUAL_AWARDS = ["dlf", "dlf2", "vol", "wfa"]    
         

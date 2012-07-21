@@ -23,8 +23,8 @@ app = webapp2.WSGIApplication([('/tasks/eventteam_update_enqueue', EventTeamUpda
                                ('/tasks/usfirst_events_instantiate', UsfirstEventsInstantiate),
                                ('/tasks/usfirst_matches_get_enqueue', UsfirstMatchesGetEnqueue),
                                ('/tasks/usfirst_matches_get/(.*)', UsfirstMatchesGet),
-                               ('/tasks/usfirst_awards_get_enqueue', UsfirstAwardsGetEnqueue)
-                               ('/tasks/usfirst_awards_get/(.*)', UsFirstAwardsGet),
+                               ('/tasks/usfirst_awards_get_enqueue', UsfirstAwardsGetEnqueue),
+                               ('/tasks/usfirst_awards_get/(.*)', UsfirstAwardsGet),
                                ('/tasks/usfirst_teams_fast_get', UsfirstTeamsFastGet),
                                ('/tasks/usfirst_team_get_enqueue', UsfirstTeamGetEnqueue),
                                ('/tasks/usfirst_team_get/(.*)', UsfirstTeamGet),
