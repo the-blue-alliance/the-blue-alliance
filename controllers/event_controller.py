@@ -9,6 +9,7 @@ from google.appengine.ext.webapp import template
 
 import tba_config
 from helpers.match_helper import MatchHelper
+from helpers.award_helper import AwardHelper
 from helpers.team_helper import TeamHelper
 from models.event import Event
 from models.event_team import EventTeam
@@ -65,7 +66,7 @@ class EventDetail(webapp.RequestHandler):
                 return self.redirect("/error/404")
             
             matches = MatchHelper.organizeMatches(event.match_set)
-            
+            awards = AwardHelper.organizeAwards(event.award_set)
             team_keys = [EventTeam.team.get_value_for_datastore(event_team).name() for event_team in event.teams.fetch(500)]
             teams = Team.get_by_key_name(team_keys)
             teams = TeamHelper.sortTeams(teams)
@@ -82,6 +83,7 @@ class EventDetail(webapp.RequestHandler):
             template_values = {
                 "event": event,
                 "matches": matches,
+                "awards": awards,
                 "teams_a": teams_a,
                 "teams_b": teams_b,
                 "num_teams": num_teams,
