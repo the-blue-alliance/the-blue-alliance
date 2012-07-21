@@ -1,7 +1,5 @@
 import logging
 
-from google.appengine.ext import db
-
 class TBAVideoHelper(object):
     """
     Same interface as the retired TBAVideo class.

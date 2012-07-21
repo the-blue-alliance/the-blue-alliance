@@ -8,7 +8,8 @@ from google.appengine.ext.webapp import Response
 
 from controllers.datafeed_controller import UsfirstEventGet
 
-from models import Event, Team
+from models.event import Event
+from models.team import Team
 
 class TestUsfirstEventGet(unittest2.TestCase):
     def setUp(self):

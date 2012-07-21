@@ -5,7 +5,7 @@ from google.appengine.ext import db
 from google.appengine.ext import testbed
 
 from datafeeds.datafeed_usfirst_matches import DatafeedUsfirstMatches
-from models import Event
+from models.event import Event
 
 class TestDatafeedUsfirstMatches(unittest2.TestCase):
     def setUp(self):

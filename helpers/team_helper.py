@@ -4,7 +4,7 @@ import logging
 from google.appengine.api import urlfetch
 from google.appengine.ext import db
 
-from models import Team
+from models.team import Team
 
 class TeamHelper(object):
     """

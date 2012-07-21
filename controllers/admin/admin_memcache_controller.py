@@ -2,9 +2,7 @@ import os
 
 from google.appengine.api import memcache
 from google.appengine.ext import webapp
-from google.appengine.ext.webapp import template, util
-
-from models import Team
+from google.appengine.ext.webapp import template
 
 # Main memcache view.
 class AdminMemcacheMain(webapp.RequestHandler):

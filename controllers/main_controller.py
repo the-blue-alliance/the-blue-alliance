@@ -5,10 +5,12 @@ import json
 
 from google.appengine.api import memcache
 from google.appengine.ext import db, webapp
-from google.appengine.ext.webapp import template, util
+from google.appengine.ext.webapp import template
 
 import tba_config
-from models import Team, Event
+
+from models.event import Event
+from models.team import Team
 
 def render_static(page):
     memcache_key = "main_%s" % page

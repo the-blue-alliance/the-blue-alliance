@@ -8,8 +8,7 @@ from BeautifulSoup import BeautifulSoup
 
 from helpers.team_helper import TeamTpidHelper
 
-from models import Team
-
+from models.team import Team
 
 class DatafeedUsfirstTeams(object):
     """
