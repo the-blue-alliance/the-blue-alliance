@@ -195,7 +195,7 @@
 			  			{% for award in awards.list %}
 			  			<tr>
 			  				<td>{{award.official_name}}</td>
-		  				<td>{% if award.winner != 0 %}<a href="/team/{{award.winner}}">{{award.winner}}</a>{% endif %}</td>
+		  				<td>{% if award.winner != 0 %}<a href="/team/{{award.winner}}">{{award.winner}}</a>{% else %}--{% endif %}</td>
 			  				<td>{% if award.awardee %}{{ award.awardee }}{% else %}--{% endif %}</td>
 			  			</tr>
 	      			    {% endfor %}
