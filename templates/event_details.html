@@ -73,14 +73,14 @@
 			<p>Regional Winners:
 			 {% if awards.win1 %} <a href="/team/{{awards.win1.winner}}">{{awards.win1.winner}}</a>, {% endif %}
 			 {% if awards.win2 %} <a href="/team/{{awards.win2.winner}}">{{awards.win2.winner}}</a>, {% endif %}
-			 {% if awards.win3 %} <a href="/team/{{awards.win3.winner}}">{{awards.win3.winner}}</a>, {% endif %}
-			 {% if awards.win4 %} <a href="/team/{{awards.win4.winner}}">{{awards.win4.winner}}</a>, {% endif %}			 
+			 {% if awards.win3 %} <a href="/team/{{awards.win3.winner}}">{{awards.win3.winner}}</a>{% endif %}
+			 {% if awards.win4 %}, <a href="/team/{{awards.win4.winner}}">{{awards.win4.winner}}</a> {% endif %}			 
 			</p>
 			<p>Regional Finalists:
 			 {% if awards.fin1 %} <a href="/team/{{awards.fin1.winner}}">{{awards.fin1.winner}}</a>, {% endif %}
 			 {% if awards.fin2 %} <a href="/team/{{awards.fin2.winner}}">{{awards.fin2.winner}}</a>, {% endif %}
-			 {% if awards.fin3 %} <a href="/team/{{awards.fin3.winner}}">{{awards.fin3.winner}}</a>, {% endif %}
-			 {% if awards.fin4 %} <a href="/team/{{awards.fin4.winner}}">{{awards.fin4.winner}}</a>, {% endif %}			 
+			 {% if awards.fin3 %} <a href="/team/{{awards.fin3.winner}}">{{awards.fin3.winner}}</a>{% endif %}
+			 {% if awards.fin4 %}, <a href="/team/{{awards.fin4.winner}}">{{awards.fin4.winner}}</a> {% endif %}			 
 			</p>
 		</div>
 	</div>
