@@ -3,6 +3,47 @@ import logging
 from google.appengine.ext import db
 
 from models.award import Award
+#global sort order
+sortOrder = [
+    'rca',
+    'rca1',
+    'rca12',
+    'ei',
+    'win1',
+    'win2',
+    'win3',
+    'win4',
+    'fin1',
+    'fin2',
+    'fin3',
+    'fin4',
+    'coop',
+    'create',
+    'eng',
+    'entre',
+    'dlf',
+    'dlf2',
+    'dlf3',
+    'dlf4',
+    'dlf5',
+    'dlf6',
+    'gp',
+    'hrs',
+    'image',
+    'ind',
+    'safe',
+    'control',
+    'quality',
+    'ras',
+    'rinspire',
+    'spirit',
+    'vol',
+    'web',
+    'wfa',
+    'judge',
+    'judge2',
+]
+
 
 class AwardHelper(object):
     """
@@ -11,9 +52,11 @@ class AwardHelper(object):
     @classmethod
     def organizeAwards(self, award_list):
         awards = dict([(award.name, award) for award in award_list])
-        awards['list'] = award_list
+        awards['list'] = list()
+        for item in sortOrder:
+            if awards.has_key(item):
+                awards['list'].append(awards[item])
         return awards
-    
 
 class AwardUpdater(object):
     """
