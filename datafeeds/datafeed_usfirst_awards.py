@@ -104,8 +104,10 @@ class DatafeedUsfirstAwards(object):
             tds = tr.findAll('td')
             official_name = self.sanitize(tds[0].p.span.contents[0])
             try:
-                team_number = tds[1].p.span.contents[0]
+                team_number = int(unicode(tds[1].p.span.contents[0]))
             except AttributeError:
+                team_number = 0
+            except ValueError:
                 team_number = 0
             award_key = None
             for key in self.AWARD_NAMES:
@@ -128,20 +130,16 @@ class DatafeedUsfirstAwards(object):
             else:
                 awardee = ''
             awardee = self.sanitize(awardee)
-            try:
-                team_number = int(str(team_number))
-            except ValueError:
-                team_number = 0
             key_number = 1
             while award_key in already_parsed:
-                award_key += str(key_number)
+                award_key += unicode(key_number)
                 key_number += 1
             object = Award(
                 name = award_key,
                 winner = team_number,
                 awardee = unicode(awardee),
                 year = event.year,
-                official_name = str(official_name),
+                official_name = unicode(official_name),
                 event = event,
             )
             awards.append(object)
