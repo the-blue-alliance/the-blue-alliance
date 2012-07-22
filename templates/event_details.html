@@ -67,7 +67,7 @@
 		</div>
 		<div class="span6">
 			<h2>Awards Overview:</h2>
-			<p>Regional Chairman's Award: {% if awards.rca %} <a href="/team/{{awards.rca.winner}}">{{awards.rca.winner}}</a> {% endif %}</p>
+			<p>Regional Chairman's Award: {% if awards.rca %} <a href="/team/{{awards.rca.winner}}">{{awards.rca.winner}}</a>{% endif %}{% if awards.rca1 %}, <a href="/team/{{awards.rca1.winner}}">{{awards.rca1.winner}}</a>{% endif %}{% if awards.rca12 %}, <a href="/team/{{awards.rca12.winner}}">{{awards.rca12.winner}}</a>{% endif %}</p>
 			<p>Engineering Inspiration Award: {% if awards.ei %} <a href="/team/{{awards.ei.winner}}">{{awards.ei.winner}}</a> {% endif %}</p>
 			<p>Rookie All-Star Award: {% if awards.ras %} <a href="/team/{{awards.ras.winner}}">{{awards.ras.winner}}</a> {% endif %}</p>
 			<p>Regional Winners:
