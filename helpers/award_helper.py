@@ -11,6 +11,7 @@ class AwardHelper(object):
     @classmethod
     def organizeAwards(self, award_list):
         awards = dict([(award.name, award) for award in award_list])
+        awards['list'] = award_list
         return awards
     
 
