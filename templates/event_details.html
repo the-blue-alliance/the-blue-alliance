@@ -200,7 +200,11 @@
 							  {{ award.awardee }}
 							  {% if award.winner != 0 %}(<a href="/team/{{award.winner}}">{{award.winner}}</a>){% endif %}
 							{% else %}
-							  {% if award.winner != 0 %}<a href="/team/{{award.winner}}">{{award.winner}}</a>{% endif %}
+							  {% if award.winner != 0 %}
+							    <a href="/team/{{award.winner}}">{{award.winner}}</a>
+							  {% else %}
+							    --
+						      {% endif %}
 							{% endif %}
 							</td>
 			  			</tr>
