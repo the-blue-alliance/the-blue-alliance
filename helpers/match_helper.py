@@ -5,14 +5,18 @@ from google.appengine.ext import db
 from models.match import Match
 from models.team import Team
 
+import utils
+
 class MatchHelper(object):
     """
     Helper to put matches into sub-dictionaries for the way we render match tables
     """
+
     @classmethod
     def organizeMatches(self, match_list):
-        match_list = match_list.order("set_number").order("match_number").fetch(500)
-        
+        match_list = match_list.fetch(500)
+        match_list = utils.natural_sort_matches(match_list)
+
         # Eh, this could be better. -gregmarra 17 oct 2010
         # todo: abstract this so we can use it in the team view.
         # todo: figure out how slow this is
