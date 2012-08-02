@@ -19,16 +19,18 @@ $(function() {
 	// Currently does a one-time JSON get that returns
 	// the entire list of teams and events.
 	// Can be optimized.
-	$.getJSON('/_/typeahead', function(data) {
-		$('.search-query').typeahead({
-			// Used for when we implement a better typeahead solution
-	    	/*ajax: {
-		    	    url: '/typeahead',
-		    	    method: 'get',
-		    	    triggerLength: 3,
-		    },*/
-			source: data,
-	    	itemSelected: selectResult
-	    });
-	});	
+	$('.search-query').focus(function() {
+		$.getJSON('/_/typeahead', function(data) {
+			$('.search-query').typeahead({
+				// Used for when we implement a better typeahead solution
+		    	/*ajax: {
+			    	    url: '/typeahead',
+			    	    method: 'get',
+			    	    triggerLength: 3,
+			    },*/
+				source: data,
+		    	itemSelected: selectResult
+		    });
+		});	
+	});
 });
