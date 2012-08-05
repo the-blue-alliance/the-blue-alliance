@@ -4,6 +4,7 @@ import logging
 from google.appengine.api import memcache
 from google.appengine.ext import db
 
+import tba_config
 from helpers.event_helper import EventHelper
 from helpers.match_helper import MatchHelper
 from models.event import Event
@@ -41,7 +42,8 @@ class ApiHelper(object):
                 except Exception, e:
                     logging.info("Failed to include Address for api_team_info_%s" % team_key)
                 
-                memcache.set(memcache_key, team_dict, 3600)
+                #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra 
+                if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, team_dict, 2592000)
             else:
                 return None
         return team_dict
@@ -80,7 +82,8 @@ class ApiHelper(object):
                 event_dict["teams"] = [EventTeam.team.get_value_for_datastore(event_team).name() for event_team in event.teams.fetch(500)]
                 event_dict["matches"] = [a.key().name() for a in event.match_set.fetch(500)]
                 
-                memcache.set(memcache_key, event_dict, 300)
+                #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
+                if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, event_dict, 2592000)
         return event_dict
     
     
@@ -99,7 +102,9 @@ class ApiHelper(object):
             event_list = [self.getEventInfo(e.key().name()) for e in events]
             for event_dict, event in zip(event_list, events):
                 event_dict["team_wlt"] = EventHelper.getTeamWLT(team_dict["key"], event)
-            memcache.set(memcache_key, event_list, 600)
+
+            #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, event_list, 2592000)
         
         team_dict["events"] = event_list
         return team_dict
@@ -133,7 +138,8 @@ class ApiHelper(object):
                 match_dict["alliances"] = json.loads(match.alliances_json)
                 matches_list.append(match_dict)
             
-            memcache.set(memcache_key, matches_list, 600)
+            #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, matches_list, 2592000)
         
         team_dict["matches"] = matches_list
         return team_dict

@@ -8,12 +8,13 @@ from google.appengine.ext.webapp import template
 
 import tba_config
 from helpers.api_helper import ApiHelper
-from models import Event, EventTeam, Match, Team
 
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
+
+#Note: generally caching for the API happens in ApiHelper
 
 class ApiTeamsShow(webapp.RequestHandler):
     """
