@@ -83,7 +83,7 @@ class Match(db.Model):
     # }
     # }
     
-    comp_level = db.StringProperty(required=True, choices=set(COMP_LEVELS), indexed=False)
+    comp_level = db.StringProperty(required=True, choices=set(COMP_LEVELS))
     event = db.ReferenceProperty(Event, required=True)
     game = db.StringProperty(required=True,choices=set(FRC_GAMES), indexed=False)
     match_number = db.IntegerProperty(required=True, indexed=False)
@@ -91,8 +91,8 @@ class Match(db.Model):
     set_number = db.IntegerProperty(required=True, indexed=False)
     team_key_names = db.StringListProperty(required=True) #list of teams in Match, for indexing.
     time = db.DateTimeProperty(indexed=False)
-    youtube_videos = db.StringListProperty(indexed=False) # list of Youtube IDs
-    tba_videos = db.StringListProperty(indexed=False) # list of filetypes a TBA video exists for
+    youtube_videos = db.StringListProperty() # list of Youtube IDs
+    tba_videos = db.StringListProperty() # list of filetypes a TBA video exists for
     
     def event_key_name(self):
         return Match.event.get_value_for_datastore(self).name()

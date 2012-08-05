@@ -12,8 +12,8 @@ class Team(db.Model):
     nickname = db.StringProperty(indexed=False)
     address = db.PostalAddressProperty(indexed=False)
     website = db.LinkProperty(indexed=False)
-    first_tpid = db.IntegerProperty(indexed=False) #from USFIRST. FIRST team ID number. -greg 5/20/2010
-    first_tpid_year = db.IntegerProperty(indexed=False) # from USFIRST. Year tpid is applicable for. -greg 9 Jan 2011
+    first_tpid = db.IntegerProperty() #from USFIRST. FIRST team ID number. -greg 5/20/2010
+    first_tpid_year = db.IntegerProperty() # from USFIRST. Year tpid is applicable for. -greg 9 Jan 2011
     
     def do_split_address(self):
         """
