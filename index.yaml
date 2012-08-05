@@ -38,12 +38,13 @@ indexes:
 - kind: Event
   properties:
   - name: year
-  - name: name
+  - name: start_date
 
 - kind: Event
   properties:
   - name: year
-  - name: start_date
+    direction: desc
+  - name: name
 
 - kind: Event
   properties:

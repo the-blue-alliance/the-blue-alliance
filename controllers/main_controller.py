@@ -82,28 +82,28 @@ class TypeaheadHandler(webapp.RequestHandler):
         # Tried a trie but the datastructure was too big to
         # fit into memcache efficiently
         q = self.request.get_all('q')
-        entries = typeahead_entries()
+        entries = self.typeahead_entries()
 
         self.response.headers.add_header('content-type', 'application/json', charset='utf-8')        
         typeahead_list = json.dumps(entries)
         self.response.out.write(typeahead_list)
         
-def typeahead_entries():
-    typeahead_key = "typeahead_entries"
-    results = memcache.get(typeahead_key)
-    
-    if results is None:
-        events = Event.all().order('year').order('name')       
-        teams = Team.all().order('team_number')
+    def typeahead_entries(self):
+        typeahead_key = "typeahead_entries"
+        results = memcache.get(typeahead_key)
+        
+        if results is None:
+            events = Event.all().order('-year').order('name')       
+            teams = Team.all().order('team_number')
 
-        results = []
-        for event in events:
-            results.append({'id': event.details_url(), 'name': '%s %s [%s]' % (event.year, event.name, event.event_short.upper())})
-        for team in teams:
-            results.append({'id': team.details_url(), 'name': 'FRC %s | %s' % (team.team_number, team.nickname)})
+            results = []
+            for event in events:
+                results.append({'id': event.details_url(), 'name': '%s %s [%s]' % (event.year, event.name, event.event_short.upper())})
+            for team in teams:
+                results.append({'id': team.details_url(), 'name': '%s | %s' % (team.team_number, team.nickname)})
 
-        if tba_config.CONFIG["memcache"]: memcache.set(typeahead_key, results, 86400)
-    return results
+            if tba_config.CONFIG["memcache"]: memcache.set(typeahead_key, results, 86400)
+        return results
 
 class PageNotFoundHandler(webapp.RequestHandler):
     def get(self):
