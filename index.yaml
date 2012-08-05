@@ -46,11 +46,6 @@ indexes:
     direction: desc
   - name: name
 
-- kind: Event
-  properties:
-  - name: year=
-  - name: first_eid
-
 - kind: Match
   properties:
   - name: event
