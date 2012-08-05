@@ -20,12 +20,11 @@
 
 {% block content %}
 <div class="container">
-	<h1>{{match.verbose_name}}</h1>
-	<h3 class="end_header">{{ match.event.year }} {{ match.event.name }}</h3>
-	<p><a href="/event/{{match.event.key.name}}"><i class="icon-chevron-left"></i> Back to Event Page</a></p>
-
 	<div class="row">
 		<div class="span6 offset3">
+			<h1>{{match.verbose_name}}</h1>
+			<h3 class="end_header">{{ match.event.year }} {{ match.event.name }}</h3>
+			<p><a href="/event/{{match.event.key.name}}"><i class="icon-chevron-left"></i> Back to Event Page</a></p>
 			<table class="matchTable">
 	            <tr class="key">
 	                <th colspan="{{match.alliances.items.0.1.teams|length}}">Teams</th>

@@ -38,6 +38,11 @@ indexes:
 - kind: Event
   properties:
   - name: year
+  - name: name
+
+- kind: Event
+  properties:
+  - name: year
   - name: start_date
 
 - kind: Event
