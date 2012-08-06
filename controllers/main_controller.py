@@ -1,6 +1,7 @@
 import os
 import logging
 import datetime
+import json
 
 from google.appengine.api import memcache
 from google.appengine.ext import db, webapp
@@ -79,6 +80,36 @@ class SearchHandler(webapp.RequestHandler):
             logging.warning("warning: %s" % e)
         finally:
             self.response.out.write(render_static("search"))
+            
+class TypeaheadHandler(webapp.RequestHandler):
+    def get(self):
+        # Currently just returns a list of all teams and events
+        # Needs to be optimized at some point.
+        # Tried a trie but the datastructure was too big to
+        # fit into memcache efficiently
+        q = self.request.get_all('q')
+        entries = self.typeahead_entries()
+
+        self.response.headers.add_header('content-type', 'application/json', charset='utf-8')        
+        typeahead_list = json.dumps(entries)
+        self.response.out.write(typeahead_list)
+        
+    def typeahead_entries(self):
+        typeahead_key = "typeahead_entries"
+        results = memcache.get(typeahead_key)
+        
+        if results is None:
+            events = Event.all().order('-year').order('name')       
+            teams = Team.all().order('team_number')
+
+            results = []
+            for event in events:
+                results.append({'id': event.details_url(), 'name': '%s %s [%s]' % (event.year, event.name, event.event_short.upper())})
+            for team in teams:
+                results.append({'id': team.details_url(), 'name': '%s | %s' % (team.team_number, team.nickname)})
+
+            if tba_config.CONFIG["memcache"]: memcache.set(typeahead_key, results, 86400)
+        return results
 
 class PageNotFoundHandler(webapp.RequestHandler):
     def get(self):
