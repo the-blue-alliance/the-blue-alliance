@@ -10,6 +10,7 @@ import tba_config
 
 from models.event import Event
 from models.team import Team
+from models.award import Award
 
 def render_static(page):
     memcache_key = "main_%s" % page
@@ -21,6 +22,11 @@ def render_static(page):
         if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
     
     return html
+
+class ClearAwards(webapp.RequestHandler):
+    def get(self):
+        query = Award.all()
+        db.delete(query)
 
 class MainHandler(webapp.RequestHandler):
     def get(self):

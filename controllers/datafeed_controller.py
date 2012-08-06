@@ -187,7 +187,8 @@ class UsfirstAwardsGetEnqueue(webapp.RequestHandler):
                 year = 2012
         except Exception, detail:
             logging.error('Failed to get year value')
-        
+            year = 2012
+
         events = Event.all()
         events.filter('first_eid != ', None) # Official events with EIDs
         events.filter('year =', year)
@@ -197,9 +198,8 @@ class UsfirstAwardsGetEnqueue(webapp.RequestHandler):
                 queue_name='usfirst',
                 url='/tasks/usfirst_awards_get/%s' % (event.key().name()),
                 method='GET')
-        
         template_values = {
-            'event_count': events.count(),
+            'events': events,
             'year': year,
         }
 

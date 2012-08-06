@@ -5,7 +5,7 @@ import webapp2
 import tba_config
 
 from controllers.event_controller import EventList, EventDetail, EventRss
-from controllers.main_controller import MainHandler, ContactHandler, ThanksHandler, SearchHandler, PageNotFoundHandler, OprHandler
+from controllers.main_controller import MainHandler, ContactHandler, ThanksHandler, SearchHandler, PageNotFoundHandler, OprHandler, ClearAwards
 from controllers.match_controller import MatchList, MatchDetail
 from controllers.team_controller import TeamList, TeamDetail
 
@@ -22,6 +22,7 @@ app = webapp2.WSGIApplication([('/', MainHandler),
                                ('/team/([0-9]*)', TeamDetail),
                                ('/team/([0-9]*)/(.*)', TeamDetail),
                                ('/thanks', ThanksHandler),
+                               ('/clear', ClearAwards),
                                ('/opr', OprHandler),
                                ('/.*', PageNotFoundHandler)
                                ],
