@@ -8,10 +8,10 @@ class Team(db.Model):
     key_name is like 'frc177'
     """
     team_number = db.IntegerProperty(required=True)
-    name = db.StringProperty()
-    nickname = db.StringProperty()
-    address = db.PostalAddressProperty()
-    website = db.LinkProperty()
+    name = db.StringProperty(indexed=False)
+    nickname = db.StringProperty(indexed=False)
+    address = db.PostalAddressProperty(indexed=False)
+    website = db.LinkProperty(indexed=False)
     first_tpid = db.IntegerProperty() #from USFIRST. FIRST team ID number. -greg 5/20/2010
     first_tpid_year = db.IntegerProperty() # from USFIRST. Year tpid is applicable for. -greg 9 Jan 2011
     
