@@ -4,23 +4,25 @@
 
 {% block content %}
 <div class="container">
-  <h1 class="end_header">The Blue Alliance <span class="annotation">Debug and Setup</span></h1>
   <div class="row">
     <div class="span8 offset2">
+    	<h1 class="end_header">The Blue Alliance <span class="annotation">Developer Page</span></h1>
 		<div>
 	        <div>
-	            <h2>The Blue Alliance Developer Page</h2>
+	            <h2>Development Setup</h2>
 	        </div>
 	        <p>Hello developer! Welcome to the debug page for The Blue Alliance. This page is full of useful pointers to help you locally develop TBA. It is different from <a href="/admin/">the admin console</a>, which is designed to help fix data in production.</p>
 	        <p>To get started, you have to set up some initial test data for your local copy of TBA. We use <a href="http://paver.github.com/paver/">paver</a> scripts in pavement.py to set up this test data in your dev environment. <a href="http://packages.python.org/distribute/easy_install.html">easy_install</a> paver if you don't have it.</p>
-	        <p>Run these on the command line in the folder you have the-blue-alliance project in:</p>
+	        <p>Now run this on the command line in your the-blue-alliance folder:</p>
+	        <pre>$ paver dev_data_setup</pre>
+	        <p>This test data gives you the <a href="/event/2010cmp">2010 Championship Einstein Field</a> as your main test data.</p>
+	        <p>It does the following:</p>
 	        <ol>
 	            <li><a href="/tasks/usfirst_teams_fast_get">/tasks/usfirst_teams_fast_get</a> : Sets up all 2012 teams, fast.</li>
-	            <li>$ paver dev_data_setup</li>
-	            <li><a href="/tasks/eventteam_update_enqueue">/tasks/eventteam_update_enqueue</a> : Build event attendance information.</li>
-	            <li><a href="/tasks/tba_videos_get/2010cmp">/tasks/tba_videos_get/2010cmp</a> : Grab videos for 2010cmp</li>
+	            <li>Imports some pre-2011 events. Imports 2010cmp matches.</li>
+	            <li><a href="/tasks/eventteam_update_enqueue">/tasks/eventteam_update_enqueue</a> : Builds event attendance information.</li>
+	            <li><a href="/tasks/tba_videos_get/2010cmp">/tasks/tba_videos_get/2010cmp</a> : Grabs videos for 2010cmp</li>
 	        </ol>
-	        <p>This test data gives you the <a href="/event/2010cmp">2010 Championship Einstein Field</a> as your main test data.</p>
 	    </div>
 	    <div>
 	        <div>

@@ -20,10 +20,16 @@ def dev_data_setup():
   
   print("Setting up dev data.")
   
+  print("Getting Teams")
+  sh("curl -s http://localhost:8088/tasks/usfirst_teams_fast_get")
   print("Importing test Event data")
   sh("echo \"omgrobots\" | appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/events.csv --kind=Event --url=http://localhost:8088/_ah/remote_api --num_threads=1 --email=admin@localhost --passin")
   print("Importing test Match data")
   sh("echo \"omgrobots\" | appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/matches_2010cmp.csv --kind=Match --url=http://localhost:8088/_ah/remote_api --num_threads=1 --email=admin@localhost --passin")
-  
+  print("Enqueuing building EventTeams")
+  sh("curl -s http://localhost:8088/tasks/eventteam_update_enqueue")
+  print("Getting 2010cmp videos from TBA")
+  sh("curl -s http://localhost:8088/tasks/tba_videos_get/2010cmp")
+
   clean()
-  print("Done setting up!")
+  print("Done setting up! 2010cmp is now ready for testing.")
