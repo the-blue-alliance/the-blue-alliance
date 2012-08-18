@@ -9,10 +9,22 @@ class MatchHelper(object):
     """
     Helper to put matches into sub-dictionaries for the way we render match tables
     """
+    
+    # Allows us to sort matches by key name.
+    # Note: Matches within a comp_level (qual, qf, sf, f, etc.) will be in order,
+    # but the comp levels themselves may not be in order. Doesn't matter because
+    # XXX_match_table.html checks for comp_level when rendering the page
+    def natural_sort_matches(self, matches):
+        import re
+        convert = lambda text: int(text) if text.isdigit() else text.lower() 
+        alphanum_key = lambda match: [ convert(c) for c in re.split('([0-9]+)', str(match.get_key_name())) ] 
+        return sorted(matches, key = alphanum_key)
+
     @classmethod
     def organizeMatches(self, match_list):
-        match_list = match_list.order("set_number").order("match_number").fetch(500)
-        
+        match_list = match_list.fetch(500)
+        match_list = self.natural_sort_matches(match_list)
+
         # Eh, this could be better. -gregmarra 17 oct 2010
         # todo: abstract this so we can use it in the team view.
         # todo: figure out how slow this is

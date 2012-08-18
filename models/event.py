@@ -5,23 +5,23 @@ class Event(db.Model):
     Events represent FIRST Robotics Competition events, both official and unofficial.
     key_name is like '2010ct'
     """
-    name = db.StringProperty()
-    event_type = db.StringProperty() # From USFIRST
-    short_name = db.StringProperty() # Should not contain "Regional" or "Division", like "Hartford"
-    event_short = db.StringProperty(required=True) # Smaller abbreviation like "CT"
+    name = db.StringProperty(indexed=False)
+    event_type = db.StringProperty(indexed=False) # From USFIRST
+    short_name = db.StringProperty(indexed=False) # Should not contain "Regional" or "Division", like "Hartford"
+    event_short = db.StringProperty(required=True, indexed=False) # Smaller abbreviation like "CT"
     year = db.IntegerProperty(required=True)
     start_date = db.DateTimeProperty()
     end_date = db.DateTimeProperty()
-    venue = db.StringProperty()
-    venue_address = db.PostalAddressProperty() # We can scrape this.
-    location = db.StringProperty()
+    venue = db.StringProperty(indexed=False)
+    venue_address = db.PostalAddressProperty(indexed=False) # We can scrape this.
+    location = db.StringProperty(indexed=False)
     official = db.BooleanProperty(default=False) # Is the event FIRST-official?
-    first_eid = db.StringProperty() #from USFIRST
-    facebook_eid = db.StringProperty() #from Facebook
-    website = db.StringProperty()
-    webcast_url = db.StringProperty()
-    oprs = db.ListProperty(float)
-    opr_teams = db.ListProperty(int)
+    first_eid = db.StringProperty(indexed=False) #from USFIRST
+    facebook_eid = db.StringProperty(indexed=False) #from Facebook
+    website = db.StringProperty(indexed=False)
+    webcast_url = db.StringProperty(indexed=False)
+    oprs = db.ListProperty(float, indexed=False)
+    opr_teams = db.ListProperty(int, indexed=False)
     
     def get_key_name(self):
         """
