@@ -50,7 +50,11 @@ class MainHandler(webapp.RequestHandler):
 class ContactHandler(webapp.RequestHandler):
     def get(self):
         self.response.out.write(render_static("contact"))
-        
+
+class HashtagsHandler(webapp.RequestHandler):
+    def get(self):
+        self.response.out.write(render_static("hashtags"))
+
 class ThanksHandler(webapp.RequestHandler):
     def get(self):
         self.response.out.write(render_static("thanks"))
