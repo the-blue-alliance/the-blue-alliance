@@ -14,6 +14,7 @@ class MatchHelper(object):
     # Note: Matches within a comp_level (qual, qf, sf, f, etc.) will be in order,
     # but the comp levels themselves may not be in order. Doesn't matter because
     # XXX_match_table.html checks for comp_level when rendering the page
+    @classmethod
     def natural_sort_matches(self, matches):
         import re
         convert = lambda text: int(text) if text.isdigit() else text.lower() 
@@ -23,7 +24,7 @@ class MatchHelper(object):
     @classmethod
     def organizeMatches(self, match_list):
         match_list = match_list.fetch(500)
-        match_list = self.natural_sort_matches(match_list)
+        match_list = MatchHelper.natural_sort_matches(match_list)
 
         # Eh, this could be better. -gregmarra 17 oct 2010
         # todo: abstract this so we can use it in the team view.
