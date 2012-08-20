@@ -16,7 +16,7 @@ class Event(db.Model):
     venue_address = db.PostalAddressProperty(indexed=False) # We can scrape this.
     location = db.StringProperty(indexed=False)
     official = db.BooleanProperty(default=False) # Is the event FIRST-official?
-    first_eid = db.StringProperty(indexed=False) #from USFIRST
+    first_eid = db.StringProperty() #from USFIRST
     facebook_eid = db.StringProperty(indexed=False) #from Facebook
     website = db.StringProperty(indexed=False)
     webcast_url = db.StringProperty(indexed=False)
