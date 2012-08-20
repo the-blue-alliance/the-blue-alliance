@@ -38,7 +38,7 @@ class MainHandler(webapp.RequestHandler):
                 upcoming_events = [e for e in upcoming_events if ((e.start_date - datetime.timedelta(days=6)) < first_start_date)]
                 event_type = "Upcoming Events"
             else:
-                year = 2010#datetime.date.today().year
+                year = datetime.date.today().year
                 upcoming_events = Event.all().filter("year =", year)
                 upcoming_events.order('start_date').fetch(100)
                 event_type = "Events from %s" % year
