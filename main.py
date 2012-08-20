@@ -27,7 +27,7 @@ app = webapp2.WSGIApplication([('/', MainHandler),
                                ('/team/([0-9]*)/(.*)', TeamDetail),
                                ('/thanks', ThanksHandler),
                                ('/opr', OprHandler),
-                               ('/.*', PageNotFoundHandler),
                                ('/_/typeahead', TypeaheadHandler),
+                               ('/.*', PageNotFoundHandler),
                                ],
                               debug=tba_config.DEBUG)
