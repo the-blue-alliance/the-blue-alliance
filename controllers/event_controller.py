@@ -2,7 +2,6 @@ import datetime
 import os
 import logging
 import PyRSS2Gen
-import json
 
 from google.appengine.api import memcache
 from google.appengine.ext import webapp
