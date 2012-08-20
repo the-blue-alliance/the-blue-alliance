@@ -23,8 +23,7 @@
 	<div class="row">
 		<div class="span6 offset3">
 			<h1>{{match.verbose_name}}</h1>
-			<h3 class="end_header">{{ match.event.year }} {{ match.event.name }}</h3>
-			<p><a href="/event/{{match.event.key.name}}"><i class="icon-chevron-left"></i> Back to Event Page</a></p>
+			<h3 class="end_header"><a href="/event/{{match.event.key.name}}">{{ match.event.year }} {{ match.event.name }}</a></h3>
 			<table class="matchTable">
 	            <tr class="key">
 	                <th colspan="{{match.alliances.items.0.1.teams|length}}">Teams</th>
@@ -47,12 +46,17 @@
             {% include "video_partials/tbavideo_player.html" %}
         {% endif %}
         {% for youtube_video in match.youtube_videos %}
-          {% include "video_partials/youtube_video_player.html" %}
+            {% include "video_partials/youtube_video_player.html" %}
         {% endfor %}
         {% if not tbavideo and not match.youtube_videos %}
-          <p>No video available. Have one? <a href="/contact">Contact us!</a></p>
+            <h3>Video</h3>
+            <p>We don't know about any videos for this match yet. :(</p>
         {% endif %}
-		</div>	
+        <p>
+            <a class="btn btn-primary" href="http://www.youtube.com/results?search_query={{match.verbose_name}}+{{match.event.year}}+{{match.event.name}}" target="_blank"><i class="icon-search icon-white"></i> Search YouTube</a> 
+            <a class="btn" href="/contact"><i class="icon-plus"></i> Tell us about a video</a>
+        </p>
+		</div>
 	</div>
 </div>
 {% endblock %}

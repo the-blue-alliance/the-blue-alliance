@@ -62,6 +62,15 @@
 						<th>Matches</th>
 						<td>{{matches.num}} Match{{matches.num|pluralize:"es"}} - (<a href="http://www.thebluealliance.com/event/{{ event.get_key_name }}/feed">rss</a>)</td>
 					</tr>{% endif %}
+					<tr>
+		            	<th>Hashtag <a href="/hashtags" class="help-link" title="What are hashtags?">?</a></th>
+		            	<td><strong>#frc{{ event.event_short }}</strong> - Search
+		            		<a href="https://twitter.com/search/%23frc{{ event.event_short }}" target="_blank" title="Search Twitter"><img src="/images/icons/twitter-16x16.png" class="hashtag-icon" /> Twitter</a>,
+		            		<a href="http://www.youtube.com/results?search_query=%23frc{{ event.event_short }}+OR+%22{{ event.name }}%22" target="_blank" title="Search YouTube"><img src="/images/icons/youtube-16x16.png" class="hashtag-icon" /> YouTube</a>,
+		            		<a href="http://www.chiefdelphi.com/media/photos/tags/frc{{ event.event_short }}" target="_blank" title="Search Chief Delphi"><img src="/images/icons/chiefdelphi-16x16.png" class="hashtag-icon" /> Chief Delphi</a>,
+		            		<a href="http://www.flickr.com/search/?q=%23frc{{ event.event_short }}" target="_blank" title="Search Flickr"><img src="/images/icons/flickr-16x16.png" class="hashtag-icon" /> Flickr</a>
+		            	</td>
+		            </tr>
 				</tbody>
 			</table>
 		</div>

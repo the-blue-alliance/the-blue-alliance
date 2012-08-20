@@ -40,11 +40,18 @@ class MainHandler(webapp.RequestHandler):
             
             # Only show events that are happening "the same week" as the first one
             if upcoming_events.count() > 0:
-              first_start_date = upcoming_events[0].start_date            
-              upcoming_events = [e for e in upcoming_events if ((e.start_date - datetime.timedelta(days=6)) < first_start_date)]
-            
+                first_start_date = upcoming_events[0].start_date            
+                upcoming_events = [e for e in upcoming_events if ((e.start_date - datetime.timedelta(days=6)) < first_start_date)]
+                event_type = "Upcoming Events"
+            else:
+                year = datetime.date.today().year
+                upcoming_events = Event.all().filter("year =", year)
+                upcoming_events.order('start_date').fetch(100)
+                event_type = "Events from %s" % year
+
             template_values = {
-                "upcoming_events": upcoming_events,
+                "event_type": event_type,
+                "events": upcoming_events,
             }
             
             path = os.path.join(os.path.dirname(__file__), '../templates/index.html')
@@ -56,7 +63,11 @@ class MainHandler(webapp.RequestHandler):
 class ContactHandler(webapp.RequestHandler):
     def get(self):
         self.response.out.write(render_static("contact"))
-        
+
+class HashtagsHandler(webapp.RequestHandler):
+    def get(self):
+        self.response.out.write(render_static("hashtags"))
+
 class ThanksHandler(webapp.RequestHandler):
     def get(self):
         self.response.out.write(render_static("thanks"))

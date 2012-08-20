@@ -8,13 +8,11 @@
 	<div class="hero-unit landing-hero-unit">
 		<div class="row-fluid">
 			<div class="span7 landing">
-				<img class="landing-logo landing-logo-phone visible-phone" src="/images/logo_square_200.png" alt="tbalogo" />
-		
 				<h1>The Blue Alliance</h1>
-				<p>The one-stop place for <em>FIRST</em> Robotics Competition team information, event results, and video archives</p>
+				<p><em>FIRST</em> Robotics Competition team information, event results, and videos</p>
 				<div id="landing-buttons">
-					<a class="btn btn-large btn-primary" href="/teams">Teams</a>
-					<a class="btn btn-large btn-primary" href="/events">Events</a>
+					<a class="btn btn-large btn-primary" href="/teams"><i class="icon-user icon-white"></i> Teams</a>
+					<a class="btn btn-large btn-primary" href="/events"><i class="icon-calendar icon-white"></i> Events</a>
 				</div>
 				<form id="cse-search-box" class="search-query not-nav" action="http://www.thebluealliance.com/search">
 				    <input type="hidden" name="cx" value="017956276086362105630:99ctqytcokm"/>
@@ -32,18 +30,18 @@
 
 <div class="container">
 	<div class="row">
-		<div class="span5 offset2">
-			<h2>This Week's Events</h2>
-	        {% for event in upcoming_events %}
+		<div class="span10 offset1">
+			<h2>{{ event_type }}</h2>
+	        {% for event in events %}
 				<a href="/event/{{event.key.name}}">
 				<div class="event_block">
 					<div class="event_info">
-	                <h3>{{ event.name }}</h3>
-	                <p><em>
-              			{% if event.start_date %}{{ event.start_date|date:"M d, Y" }}{% endif %}
-						{% if event.end_date %}- {{ event.end_date|date:"M d, Y" }}{% endif %}</em>
-					</p>
-					</div>
+                        <h3>{{ event.name }}</h3>
+                        <p><em>
+                            {% if event.start_date %}{{ event.start_date|date:"M j" }}{% endif %}
+                            {% if event.end_date %}- {{ event.end_date|date:"M j" }}{% endif %}</em>
+                        </p>
+                    </div>
 				</div>
 				</a>
 	        {% empty %}

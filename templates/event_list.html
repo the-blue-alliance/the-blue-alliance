@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Events - The Blue Alliance{% endblock %}
+{% block title %}{% if explicit_year %}{{year}} {% endif %}FIRST Robotics Events - The Blue Alliance{% endblock %}
 
 {% block meta_description %}FIRST Robotics Competition events{% if explicit_year %} from {{year}}{% endif %}.{% endblock %}
 
