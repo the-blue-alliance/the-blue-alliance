@@ -2,6 +2,7 @@ import datetime
 import os
 import logging
 import PyRSS2Gen
+import json
 
 from google.appengine.api import memcache
 from google.appengine.ext import webapp
@@ -78,7 +79,18 @@ class EventDetail(webapp.RequestHandler):
             
             oprs = sorted(zip(event.oprs,event.opr_teams), reverse=True) # sort by OPR
             oprs = oprs[:14] # get the top 15 OPRs
-        
+
+            bracket_table = {}
+            qf_matches = matches['qf']
+            sf_matches = matches['sf']
+            f_matches = matches['f']
+            if qf_matches:
+                bracket_table['qf'] = MatchHelper.generateBracket(qf_matches)
+            if sf_matches:
+                bracket_table['sf'] = MatchHelper.generateBracket(sf_matches)
+            if f_matches:
+                bracket_table['f'] = MatchHelper.generateBracket(f_matches)
+    
             template_values = {
                 "event": event,
                 "matches": matches,
@@ -86,6 +98,7 @@ class EventDetail(webapp.RequestHandler):
                 "teams_b": teams_b,
                 "num_teams": num_teams,
                 "oprs": oprs,
+                "bracket_table": bracket_table,
             }
                 
             path = os.path.join(os.path.dirname(__file__), '../templates/event_details.html')
