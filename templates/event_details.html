@@ -98,43 +98,58 @@
 		<div class="span6">
 			<h3>Elimination Match Results</h3>
 	        	{% include "match_partials/elim_match_table.html" %}
-		  	
-		    {% if oprs|length > 0 and matches.qm %}
-            <h3>OPRs - Top 15 (<a href="/opr">?</a>)</h3>
-	        <table class="table table-condensed table-striped table-center">
-	            <tr>
-	                <th>Team</th>
-	                <th>OPR</th>
-	            </tr>
-	            {% for opr,opr_team in oprs %}
-	            <tr>
-	                <td><a href="/team/{{ opr_team }}">{{ opr_team }}</a></td>
-	                <td>{{ opr|floatformat:2 }}</td>
-	            </tr>
-	            {% endfor %}
-	        </table>
+
+			{% if matches.qm %}
+				{% if matches.qf or matches.sf or matches.f %}
+				<h3>Elimination Bracket</h3>	
+				{% include "bracket_partials/bracket_table.html" %}
+				{% endif %}
+	
+			    {% if oprs|length > 0 %}
+	            <h3>OPRs - Top 15 (<a href="/opr">?</a>)</h3>
+		        <table class="table table-condensed table-striped table-center">
+		            <tr>
+		                <th>Team</th>
+		                <th>OPR</th>
+		            </tr>
+		            {% for opr,opr_team in oprs %}
+		            <tr>
+		                <td><a href="/team/{{ opr_team }}">{{ opr_team }}</a></td>
+		                <td>{{ opr|floatformat:2 }}</td>
+		            </tr>
+		            {% endfor %}
+		        </table>
+			    {% endif %}
 		    {% endif %}
 		</div>
 		{% endif %}
 		
-		{% if oprs|length > 0 and not matches.qm %}
-		<div class="span6">
-            <h3>OPRs - Top 15 (<a href="/opr">?</a>)</h3>
-	        <table class="table table-condensed table-striped table-center">
-	            <tr>
-	                <th>Team</th>
-	                <th>OPR</th>
-	            </tr>
-	            {% for opr,opr_team in oprs %}
-	            <tr>
-	                <td><a href="/team/{{ opr_team }}">{{ opr_team }}</a></td>
-	                <td>{{ opr|floatformat:2 }}</td>
-	            </tr>
-	            {% endfor %}
-	        </table>
-		</div>
+		{% if not matches.qm %}
+		    <div class="span6">
+				{% if matches.qf or matches.sf or matches.f %}
+				<h3>Elimination Bracket</h3>	
+				{% include "bracket_partials/bracket_table.html" %}
+				{% endif %}
+					
+				{% if oprs|length > 0 %}
+	            <h3>OPRs - Top 15 (<a href="/opr">?</a>)</h3>
+		        <table class="table table-condensed table-striped table-center">
+		            <tr>
+		                <th>Team</th>
+		                <th>OPR</th>
+		            </tr>
+		            {% for opr,opr_team in oprs %}
+		            <tr>
+		                <td><a href="/team/{{ opr_team }}">{{ opr_team }}</a></td>
+		                <td>{{ opr|floatformat:2 }}</td>
+		            </tr>
+		            {% endfor %}
+		        </table>
+			</div>
+			{% endif %}
 		{% endif %}
 	</div>
+    </div>
 
 					
 	  </div>
@@ -176,9 +191,7 @@
 			</div>
 	        {% endif %}
 		  </div>
-			<div class="tab-pane" id="awards"><h2>Awards</h2>
-				
-			</div>
+
 		</div>
 	</div>
 </div>
