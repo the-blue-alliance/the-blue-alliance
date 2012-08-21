@@ -51,7 +51,7 @@
 				<a href="/event/{{event.key.name}}">
 				<div class="event_block">
 					<div class="event_info">
-	                <h3>{{ event.name }}</h3>
+	                <h4>{{ event.name }}</h4>
 	                <p><em>
 	               		{% if event.start_date %}{{ event.start_date|date:"M d, Y" }}{% endif %}
 						{% if event.end_date %}- {{ event.end_date|date:"M d, Y" }}{% endif %}</em>
@@ -70,7 +70,7 @@
 				<a href="/event/{{event.key.name}}">
 				<div class="event_block">
 					<div class="event_info">
-	                <h3>{{ event.name }}</h3>
+	                <h4>{{ event.name }}</h4>
 	                <p><em>{% if event.start_date %}{{ event.start_date|date:"M d, Y" }}{% endif %}
 							{% if event.end_date %}- {{ event.end_date|date:"M d, Y" }}{% endif %}</em>
 					</p>
