@@ -110,9 +110,6 @@ class EventRss(webapp.RequestHandler):
                     "matches": matches,
                     "datetime": datetime.datetime.now()
             }
-            for match in matches:
-                logging.warning("*"*4 + match)
-
 
             path = os.path.join(os.path.dirname(__file__),
                 '../templates/event_rss.xml')
