@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
-<?xml-stylesheet type="text/css" href="/css/style.css"?>
 <rss version="2.0">
   <channel>
     <title>{{ event.name }} {{ event.year }}</title>
