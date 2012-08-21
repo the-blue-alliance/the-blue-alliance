@@ -8,7 +8,6 @@
     <language>en-us</language>
     <pubDate>{{ datetime }}</pubDate>
     <lastBuildDate>{{ datetime }}</lastBuildDate>
-    <docs>http://blogs.law.harvard.edu/tech/rss</docs>
     <generator>The Blue Alliance</generator>
     <managingEditor>contact@thebluealliance.com</managingEditor>
     <webMaster>contact@thebluealliance.com</webMaster>
