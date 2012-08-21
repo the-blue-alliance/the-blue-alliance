@@ -86,6 +86,20 @@ class SearchHandler(webapp.RequestHandler):
         finally:
             self.response.out.write(render_static("search"))
             
+class KickoffHandler(webapp.RequestHandler):
+    def get(self):
+        memcache_key = "main_kickoff"
+        html = memcache.get(memcache_key)
+        
+        if html is None:
+            template_values = {}
+            
+            path = os.path.join(os.path.dirname(__file__), '../templates/kickoff.html')
+            html = template.render(path, template_values)
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
+        
+        self.response.out.write(html)        
+            
 class TypeaheadHandler(webapp.RequestHandler):
     def get(self):
         # Currently just returns a list of all teams and events
