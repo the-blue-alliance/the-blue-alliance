@@ -65,10 +65,10 @@
 					<tr>
 		            	<th>Hashtag <a href="/hashtags" class="help-link" title="What are hashtags?">?</a></th>
 		            	<td><strong>#frc{{ event.event_short }}</strong> - Search
-		            		<a href="https://twitter.com/search/%23frc{{ event.event_short }}" target="_blank" title="Search Twitter"><img src="/images/icons/twitter-16x16.png" class="hashtag-icon" /> Twitter</a>,
-		            		<a href="http://www.youtube.com/results?search_query=%23frc{{ event.event_short }}+OR+%22{{ event.name }}%22" target="_blank" title="Search YouTube"><img src="/images/icons/youtube-16x16.png" class="hashtag-icon" /> YouTube</a>,
-		            		<a href="http://www.chiefdelphi.com/media/photos/tags/frc{{ event.event_short }}" target="_blank" title="Search Chief Delphi"><img src="/images/icons/chiefdelphi-16x16.png" class="hashtag-icon" /> Chief Delphi</a>,
-		            		<a href="http://www.flickr.com/search/?q=%23frc{{ event.event_short }}" target="_blank" title="Search Flickr"><img src="/images/icons/flickr-16x16.png" class="hashtag-icon" /> Flickr</a>
+		            		<a class="hashtag-link hashtag-twitter" href="https://twitter.com/search/%23frc{{ event.event_short }}" target="_blank" title="Search Twitter">Twitter</a>,
+		            		<a class="hashtag-link hashtag-youtube" href="http://www.youtube.com/results?search_query=%23frc{{ event.event_short }}+OR+%22{{ event.name }}%22" target="_blank" title="Search YouTube">YouTube</a>,
+		            		<a class="hashtag-link hashtag-cd" href="http://www.chiefdelphi.com/media/photos/tags/frc{{ event.event_short }}" target="_blank" title="Search Chief Delphi">Chief Delphi</a>,
+		            		<a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23frc{{ event.event_short }}" target="_blank" title="Search Flickr">Flickr</a>
 		            	</td>
 		            </tr>
 				</tbody>
@@ -116,43 +116,58 @@
 		<div class="span6">
 			<h3>Elimination Match Results</h3>
 	        	{% include "match_partials/elim_match_table.html" %}
-		  	
-		    {% if oprs|length > 0 and matches.qm %}
-            <h3>OPRs - Top 15 (<a href="/opr">?</a>)</h3>
-	        <table class="table table-condensed table-striped table-center">
-	            <tr>
-	                <th>Team</th>
-	                <th>OPR</th>
-	            </tr>
-	            {% for opr,opr_team in oprs %}
-	            <tr>
-	                <td><a href="/team/{{ opr_team }}">{{ opr_team }}</a></td>
-	                <td>{{ opr|floatformat:2 }}</td>
-	            </tr>
-	            {% endfor %}
-	        </table>
+
+			{% if matches.qm %}
+				{% if matches.qf or matches.sf or matches.f %}
+				<h3>Elimination Bracket</h3>	
+				{% include "bracket_partials/bracket_table.html" %}
+				{% endif %}
+	
+			    {% if oprs|length > 0 %}
+	            <h3>OPRs - Top 15 (<a href="/opr">?</a>)</h3>
+		        <table class="table table-condensed table-striped table-center">
+		            <tr>
+		                <th>Team</th>
+		                <th>OPR</th>
+		            </tr>
+		            {% for opr,opr_team in oprs %}
+		            <tr>
+		                <td><a href="/team/{{ opr_team }}">{{ opr_team }}</a></td>
+		                <td>{{ opr|floatformat:2 }}</td>
+		            </tr>
+		            {% endfor %}
+		        </table>
+			    {% endif %}
 		    {% endif %}
 		</div>
 		{% endif %}
 		
-		{% if oprs|length > 0 and not matches.qm %}
-		<div class="span6">
-            <h3>OPRs - Top 15 (<a href="/opr">?</a>)</h3>
-	        <table class="table table-condensed table-striped table-center">
-	            <tr>
-	                <th>Team</th>
-	                <th>OPR</th>
-	            </tr>
-	            {% for opr,opr_team in oprs %}
-	            <tr>
-	                <td><a href="/team/{{ opr_team }}">{{ opr_team }}</a></td>
-	                <td>{{ opr|floatformat:2 }}</td>
-	            </tr>
-	            {% endfor %}
-	        </table>
-		</div>
+		{% if not matches.qm %}
+		    <div class="span6">
+				{% if matches.qf or matches.sf or matches.f %}
+				<h3>Elimination Bracket</h3>	
+				{% include "bracket_partials/bracket_table.html" %}
+				{% endif %}
+					
+				{% if oprs|length > 0 %}
+	            <h3>OPRs - Top 15 (<a href="/opr">?</a>)</h3>
+		        <table class="table table-condensed table-striped table-center">
+		            <tr>
+		                <th>Team</th>
+		                <th>OPR</th>
+		            </tr>
+		            {% for opr,opr_team in oprs %}
+		            <tr>
+		                <td><a href="/team/{{ opr_team }}">{{ opr_team }}</a></td>
+		                <td>{{ opr|floatformat:2 }}</td>
+		            </tr>
+		            {% endfor %}
+		        </table>
+			</div>
+			{% endif %}
 		{% endif %}
 	</div>
+    </div>
 
 					
 	  </div>

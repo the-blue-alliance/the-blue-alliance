@@ -14,7 +14,7 @@
 					<a class="btn btn-large btn-primary" href="/teams"><i class="icon-user icon-white"></i> Teams</a>
 					<a class="btn btn-large btn-primary" href="/events"><i class="icon-calendar icon-white"></i> Events</a>
 				</div>
-				<form id="cse-search-box" class="search-query not-nav" action="http://www.thebluealliance.com/search">
+				<form id="cse-search-box" class="main-search" action="http://www.thebluealliance.com/search">
 				    <input type="hidden" name="cx" value="017956276086362105630:99ctqytcokm"/>
 				    <input type="hidden" name="cof" value="FORID:11" />
 				    <input type="hidden" name="ie" value="UTF-8" />
@@ -36,7 +36,7 @@
 				<a href="/event/{{event.key.name}}">
 				<div class="event_block">
 					<div class="event_info">
-                        <h3>{{ event.name }}</h3>
+                        <h4>{{ event.name }}</h4>
                         <p><em>
                             {% if event.start_date %}{{ event.start_date|date:"M j" }}{% endif %}
                             {% if event.end_date %}- {{ event.end_date|date:"M j" }}{% endif %}</em>
