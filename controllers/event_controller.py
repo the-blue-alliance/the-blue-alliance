@@ -1,7 +1,6 @@
 import datetime
 import os
 import logging
-import PyRSS2Gen
 
 from google.appengine.api import memcache
 from google.appengine.ext import webapp
@@ -97,45 +96,27 @@ class EventDetail(webapp.RequestHandler):
 class EventRss(webapp.RequestHandler):
     """
     Generates a RSS feed for the matches in a event
-    Created by: @brandondean, github.com/brandondean
     """
     def get(self, event_key):
         memcache_key = "event_rss_%s" % event_key
-        html = memcache.get(memcache_key)
+        xml = memcache.get(memcache_key)
         
-        if html is None:
+        if xml is None:
             event = Event.get_by_key_name(event_key)
             matches = MatchHelper.organizeMatches(event.match_set)
-            
-            rss_items = []
-            # Loop through and generate RSS items for each match
-            for match in matches['f'] + matches['sf'] + matches['qf'] + matches['ef'] + matches['qm']:
-                match.unpack_json()
-                new_item = PyRSS2Gen.RSSItem(
-                    title = str(match.verbose_name()),
-                    link = 'http://www.thebluealliance.com/match/' + match.get_key_name() + '',
-                    
-                    # List the red and blue alliance teams and their score
-                    # TODO: Make this generic in case there's ever not just red/blue -gregmarra 12 Mar 2011
-                    # TODO: Make this output format something either very machine or very human readable.
-                    # Probably opt for human, since machines should be using the API. -gregmarra 12 Mar 2011
-                    description = "Red Alliance: " + ' '.join(match.alliances["red"]["teams"]) + " "
-                                  + "Score: " + str(match.alliances["red"]["score"]) + " "
-                                  + "Blue Alliance: " + ' '.join(match.alliances["blue"]["teams"]) + " "
-                                  + "Score: " + str(match.alliances["blue"]["score"])
-         
-                )
-                rss_items.append(new_item)
-            
-            # Create final rss document
-            rss = PyRSS2Gen.RSS2(
-                title = event.name + "-- " + str(event.year),
-                link = 'http://www.thebluealliance.com/event/' + str(event.get_key_name()) + '',
-                description = "RSS feed for the " + event.name + " provided by The Blue Alliance." ,
-                lastBuildDate = datetime.datetime.now(),
-                items = rss_items
-            )
-            html = rss.to_xml()
-            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
         
-        self.response.out.write(html)
+            template_values = {
+                    "event": event,
+                    "matches": matches,
+                    "datetime": datetime.datetime.now()
+            }
+
+            path = os.path.join(os.path.dirname(__file__),
+                '../templates/event_rss.xml')
+            xml = template.render(path, template_values)
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, 
+                                                            xml,
+                                                            86500)
+
+        self.response.headers.add_header('content-type', 'application/xml', charset='utf-8')        
+        self.response.out.write(xml)
