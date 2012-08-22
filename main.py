@@ -12,7 +12,9 @@ from controllers.match_controller import MatchList, MatchDetail
 from controllers.team_controller import TeamList, TeamDetail
 
 
-app = webapp2.WSGIApplication([('/', MainHandler),
+landing_handler = {False: MainHandler,
+                   True: KickoffHandler}
+app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['kickoff']]),
                                ('/contact', ContactHandler),
                                ('/events', EventList),
                                ('/event/(.*)/feed', EventRss),
@@ -27,7 +29,6 @@ app = webapp2.WSGIApplication([('/', MainHandler),
                                ('/team/([0-9]*)/(.*)', TeamDetail),
                                ('/thanks', ThanksHandler),
                                ('/opr', OprHandler),
-                               ('/kickoff', KickoffHandler),
                                ('/_/typeahead', TypeaheadHandler),
                                ('/.*', PageNotFoundHandler),
                                ],
