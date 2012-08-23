@@ -29,9 +29,10 @@
 </div>
 
 <div class="container">
-	<div class="row">
+	<div class="row-fluid">
+        {% if not kickoff_countdown %}
 		<div class="span10 offset1">
-			<h2>{{ event_type }}</h2>
+			<h2>Upcoming Events</h2>
 	        {% for event in events %}
 				<a href="/event/{{event.key.name}}">
 				<div class="event_block">
@@ -44,13 +45,20 @@
                     </div>
 				</div>
 				</a>
-	        {% empty %}
-		        <div class="no_events">
-		        	<p>There are no upcoming events.</p>
-		        	<p>If you have an offseason event, <a href="/contact">tell us about it</a>!</p>
-		        </div>
-	        {% endfor %}	
+			{% endfor %}
 		</div>
+		{% else %}
+		<div class="span12 kickoff">
+            <h1>Tune in for the 2013 FRC Kickoff</h1>
+            <h2>10 A.M. EST on January 5, 2013</h2>
+            <div class="kickoff-countdown">
+                <span class="countdown-number kickoff-countdown-days">--</span><span class="countdown-label day-label">D, </span>
+                <span class="countdown-number kickoff-countdown-hours">--</span><span class="countdown-label">H, </span>
+                <span class="countdown-number kickoff-countdown-minutes">--</span><span class="countdown-label">M, </span>
+                <span class="countdown-number kickoff-countdown-seconds">--</span><span class="countdown-label">S</span>
+            </div>
+        </div>
+		{% endif %}
 	</div>
 </div>
 {% endblock %}

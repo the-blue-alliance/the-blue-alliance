@@ -14,3 +14,5 @@ else:
         "env": "prod",
         "memcache": True,
     }
+
+CONFIG['kickoff'] = False
