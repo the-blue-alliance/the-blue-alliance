@@ -60,9 +60,9 @@ function update_kickoff_countdown() {
         $('.kickoff-countdown').remove();
     }
 
-    $('.days').text(days);
-    $('.hours').text(hours);
-    $('.minutes').text(minutes);
-    $('.seconds').text(seconds);
+    $('.kickoff-countdown-days').text(days);
+    $('.kickoff-countdown-hours').text(hours);
+    $('.kickoff-countdown-minutes').text(minutes);
+    $('.kickoff-countdown-seconds').text(seconds);
     setTimeout('update_kickoff_countdown()', 1000);
 }
