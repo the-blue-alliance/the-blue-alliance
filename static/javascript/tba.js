@@ -6,9 +6,13 @@ function scrollheader() {
     header.style.left = 0-scrollx+'px'
 }
 
-function selectResult(item, val, text) {
-	window.location.href = ("http://www.thebluealliance.com" + val);
-
+function selectTypeaheadResult(item, val, text) {
+	if (!isNaN(val)) {
+		url = "http://www.thebluealliance.com/team/" + val;
+	} else {
+		url = "http://www.thebluealliance.com/event/" + val;
+	}
+	window.location.href = url;
 }
 
 $(function() {
@@ -33,7 +37,7 @@ $(function() {
 				    	    triggerLength: 3,
 				    },*/
 					source: data,
-			    	itemSelected: selectResult
+			    	itemSelected: selectTypeaheadResult
 			    });
 			});
 		};

@@ -120,9 +120,9 @@ class TypeaheadHandler(webapp.RequestHandler):
 
             results = []
             for event in events:
-                results.append({'id': event.details_url(), 'name': '%s %s [%s]' % (event.year, event.name, event.event_short.upper())})
+                results.append({'id': event.key().name(), 'name': '%s %s [%s]' % (event.year, event.name, event.event_short.upper())})
             for team in teams:
-                results.append({'id': team.details_url(), 'name': '%s | %s' % (team.team_number, team.nickname)})
+                results.append({'id': team.team_number, 'name': '%s | %s' % (team.team_number, team.nickname)})
 
             if tba_config.CONFIG["memcache"]: memcache.set(typeahead_key, results, 86400)
         return results
