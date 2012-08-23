@@ -33,3 +33,16 @@ def dev_data_setup():
 
   clean()
   print("Done setting up! 2010cmp is now ready for testing.")
+
+@task
+def test():
+  """Run tests."""
+  print("Running Tests")
+  sh("python run_tests.py")
+
+@task
+def preflight():
+  """Run tests, then compile CSS."""
+  test()
+  print("Building CSS")
+  sh("lessc static/css/style.less static/css/style.css --yui-compress")

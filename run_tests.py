@@ -24,11 +24,10 @@ if __name__ == '__main__':
     parser = optparse.OptionParser(USAGE)
     options, args = parser.parse_args()
     if len(args) < 1:
-        print 'Error: Must provide SDK path.'
-        parser.print_help()
-        sys.exit(1)
-    
-    sdk_path = args[0]
+        print 'Warning: Trying default SDK path.'
+        sdk_path = "/usr/local/google_appengine"
+    else:
+        sdk_path = args[0]
     
     test_pattern = "test*.py"
     if len(args) > 1:
