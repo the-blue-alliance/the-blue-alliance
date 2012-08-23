@@ -40,9 +40,13 @@ def test():
   print("Running Tests")
   sh("python run_tests.py")
 
-@task
-def preflight():
-  """Run tests, then compile CSS."""
-  test()
+@task less():
+  """Build CSS."""
   print("Building CSS")
   sh("lessc static/css/style.less static/css/style.css --yui-compress")
+
+@task
+def preflight():
+  """Prep a prod push"""
+  test()
+  less()
