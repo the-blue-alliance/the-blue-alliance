@@ -85,6 +85,10 @@ class MatchHelper(object):
                                        'red_wins': 0,
                                        'blue_wins': 0}
             winner = match.winning_alliance
+            if winner == '':
+                # if the match is a tie
+                continue
+                
             results[set_number]['{}_wins'.format(winner)] = \
                 results[set_number]['{}_wins'.format(winner)] + 1
             if results[set_number]['red_wins'] == 2:
