@@ -19,12 +19,18 @@ class EventList(webapp.RequestHandler):
     List all Events.
     """
     def get(self, year=None):
+        
+        show_upcoming = False
+
         if year:
             year = int(year)
             explicit_year = True
+            if year == datetime.datetime.now().year:
+                show_upcoming = True
         else:
             year = datetime.datetime.now().year
             explicit_year = False
+            show_upcoming = True
         
         memcache_key = "event_list_%s" % year
         html = memcache.get(memcache_key)
@@ -33,9 +39,10 @@ class EventList(webapp.RequestHandler):
             events = Event.all().filter("year =", int(year)).order('start_date').fetch(1000)
         
             template_values = {
+                "show_upcoming": show_upcoming,
+                "events": events,
                 "explicit_year": explicit_year,
                 "year": year,
-                "events": events,
             }
         
             path = os.path.join(os.path.dirname(__file__), '../templates/event_list.html')

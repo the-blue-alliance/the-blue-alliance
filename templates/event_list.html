@@ -8,10 +8,9 @@
 
 {% block content %}
 <div class="container">
-	<h1 class="end_header">Events in {{year}}</h1>
+	<h1 class="end_header">{{ events|length }} Events in {{year}}</h1>
 	  <div class="row">
 	  	<div class="span2 year_list">
-	  		<h2>Year</h2>
 			<div class="btn-group visible-phone">
 			  <a class="btn btn-large dropdown-toggle" data-toggle="dropdown" href="#">
 			    {{year}}
@@ -46,7 +45,8 @@
 			</ul>
 	  	</div>
 		<div class="span10">
-			<h2>This Week's Events</h2>
+			{% if show_upcoming %}
+			<h2>Upcoming Events</h2>
 	        {% for event in upcoming_events %}
 				<a href="/event/{{event.key.name}}">
 				<div class="event_block">
@@ -65,7 +65,8 @@
 		        	<p>If you have an offseason event, <a href="/contact">tell us about it</a>!</p>
 	        	</div>
 	        {% endfor %}
-			<h2>Full Event List ({{ events|length }} Events)</h2>
+	        <h2>All Events</h2>
+	        {% endif %}
 			{% for event in events %}
 				<a href="/event/{{event.key.name}}">
 				<div class="event_block">
