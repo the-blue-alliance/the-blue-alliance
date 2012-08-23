@@ -85,7 +85,7 @@
   margin-bottom: 15px;
 }
 
-// Inheritance doesn't seme to be working. Copied from navs.less
+// Copied from navs.less
 @media (max-width: 767px) {
   // Stacked tabs and pills
   .nav-stacked-phone > li {
@@ -93,9 +93,8 @@
   }
   .nav-stacked-phone > li > a {
     margin-right: 0; // no need for the gap between nav items
-    margin-top: 0;
   }
-  
+
   // Tabs
   .nav-tabs.nav-stacked-phone {
     border-bottom: 0;
@@ -105,16 +104,16 @@
     .border-radius(0);
   }
   .nav-tabs.nav-stacked-phone > li:first-child > a {
-    .border-radius(4px 4px 0 0);
+    .border-top-radius(4px);
   }
   .nav-tabs.nav-stacked-phone > li:last-child > a {
-    .border-radius(0 0 4px 4px);
+    .border-bottom-radius(4px);
   }
   .nav-tabs.nav-stacked-phone > li > a:hover {
     border-color: #ddd;
     z-index: 2;
   }
-  
+
   // Pills
   .nav-pills.nav-stacked-phone > li > a {
     margin-bottom: 3px;

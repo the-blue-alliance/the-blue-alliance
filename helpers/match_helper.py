@@ -64,6 +64,39 @@ class MatchHelper(object):
         
         # No alliances had non-zero scores
         return True
+    
+    @classmethod
+    def generateBracket(self, matches):
+        results = {}
+        for match in matches:
+            set_number = str(match.set_number)
+            
+            if set_number not in results:
+                red_alliance = []
+                for team in match.alliances['red']['teams']:
+                    red_alliance.append(team[3:])
+                blue_alliance = []
+                for team in match.alliances['blue']['teams']:
+                    blue_alliance.append(team[3:])
+
+                results[set_number] = {'red_alliance': red_alliance,
+                                       'blue_alliance': blue_alliance,
+                                       'winning_alliance': None,
+                                       'red_wins': 0,
+                                       'blue_wins': 0}
+            winner = match.winning_alliance
+            if winner == '':
+                # if the match is a tie
+                continue
+                
+            results[set_number]['{}_wins'.format(winner)] = \
+                results[set_number]['{}_wins'.format(winner)] + 1
+            if results[set_number]['red_wins'] == 2:
+                results[set_number]['winning_alliance'] = 'red'
+            if results[set_number]['blue_wins'] == 2:
+                results[set_number]['winning_alliance'] = 'blue'
+
+        return results
 
 class MatchUpdater(object):
     """
