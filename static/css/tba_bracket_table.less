@@ -1,22 +1,26 @@
 .brackettable {
   border: 1px solid black;
-  margin: 0 auto 0 auto;
+  margin: 0 auto;
   width: 75%;
-}
-
-.brackettable .header {
-  background: #999;
-  color: black;
-  font-size: 18px;
-  font-weight: bold;
-  padding: 4px;
+  @media(max-width: 979px) {
+    width: 100%;
+  }
 }
 
 .brackettable tr td {
-  padding: 3px 10px;
+  padding: 3px 15px;
   border: 1px solid black;
   text-align: center;
   background-color: #eee;
+  padding: 0 5px;
+}
+
+.brackettable .leftAlliance {
+  padding: 0 13px 0 3px;
+}
+
+.brackettable .rightAlliance {
+  padding: 0 3px 0 13px;
 }
 
 .brackettable .winnerL {
@@ -25,7 +29,6 @@
   background-repeat: no-repeat;
   background-color: #fff;
   font-weight: bold;
-  padding-right: 15px;
 }
 
 .brackettable .winnerR {
@@ -34,7 +37,6 @@
   background-repeat: no-repeat;
   background-color: #fff;
   font-weight: bold;
-  padding-left: 15px;
 }
 
 .brackettable .winnerC {
@@ -43,7 +45,6 @@
   background-repeat: no-repeat;
   background-color: #fff;
   font-weight: bold;
-  padding-top: 25px;
 }
 
 .brackettable .secondC {
@@ -51,5 +52,8 @@
   background-position: center 15px;
   background-repeat: no-repeat;
   background-color: #eee;
-  padding-top: 25px;
+}
+
+.brackettable .alliance_number {
+  font-weight: bold;
 }
