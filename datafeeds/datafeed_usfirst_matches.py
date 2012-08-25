@@ -6,9 +6,10 @@ from datetime import datetime
 from google.appengine.api import urlfetch
 from google.appengine.ext import db
 
-from BeautifulSoup import BeautifulSoup, NavigableString
+from BeautifulSoup import BeautifulSoup
 
 from models.match import Match
+from datafeeds.datafeed_helper import recurseUntilString
 
 class DatafeedUsfirstMatches(object):
     """
@@ -78,24 +79,24 @@ class DatafeedUsfirstMatches(object):
         for tr in table.findAll('tr')[2:]:
             tds = tr.findAll('td')
             if len(tds) == 10:
-                if self._recurseUntilString(tds[1]) is not None:
-                    red_teams = ["frc" + self._recurseUntilString(tds[2]), "frc" + self._recurseUntilString(tds[3]), "frc" + self._recurseUntilString(tds[4])]
-                    blue_teams = ["frc" + self._recurseUntilString(tds[5]), "frc" + self._recurseUntilString(tds[6]), "frc" + self._recurseUntilString(tds[7])]
+                if recurseUntilString(tds[1]) is not None:
+                    red_teams = ["frc" + recurseUntilString(tds[2]), "frc" + recurseUntilString(tds[3]), "frc" + recurseUntilString(tds[4])]
+                    blue_teams = ["frc" + recurseUntilString(tds[5]), "frc" + recurseUntilString(tds[6]), "frc" + recurseUntilString(tds[7])]
                     
                     try:
                         if tds[8].string == None:
                             red_score = -1
                         else:
-                            red_score = int(self._recurseUntilString(tds[8]))
+                            red_score = int(recurseUntilString(tds[8]))
                     
                         if tds[9].string == None:
                             blue_score = -1
                         else:
-                            blue_score = int(self._recurseUntilString(tds[9]))
+                            blue_score = int(recurseUntilString(tds[9]))
                         
                         comp_level = "qm"
                         set_number = 1
-                        match_number = int(self._recurseUntilString(tds[1]))
+                        match_number = int(recurseUntilString(tds[1]))
                         
                         alliances = {
                             "red": {
@@ -135,22 +136,22 @@ class DatafeedUsfirstMatches(object):
         for tr in table.findAll('tr')[2:]:
             tds = tr.findAll('td')
             if len(tds) == 11:
-                if self._recurseUntilString(tds[1]) is not None:
-                    red_teams = ["frc" + self._recurseUntilString(tds[3]), "frc" + self._recurseUntilString(tds[4]), "frc" + self._recurseUntilString(tds[5])]
-                    blue_teams = ["frc" + self._recurseUntilString(tds[6]), "frc" + self._recurseUntilString(tds[7]), "frc" + self._recurseUntilString(tds[8])]
+                if recurseUntilString(tds[1]) is not None:
+                    red_teams = ["frc" + recurseUntilString(tds[3]), "frc" + recurseUntilString(tds[4]), "frc" + recurseUntilString(tds[5])]
+                    blue_teams = ["frc" + recurseUntilString(tds[6]), "frc" + recurseUntilString(tds[7]), "frc" + recurseUntilString(tds[8])]
                     
                     try:
-                        if self._recurseUntilString(tds[9]) == None:
+                        if recurseUntilString(tds[9]) == None:
                             red_score = -1
                         else:
-                            red_score = int(self._recurseUntilString(tds[9]))
+                            red_score = int(recurseUntilString(tds[9]))
                         
-                        if self._recurseUntilString(tds[10]) == None:
+                        if recurseUntilString(tds[10]) == None:
                             blue_score = -1
                         else:
-                            blue_score = int(self._recurseUntilString(tds[10]))
+                            blue_score = int(recurseUntilString(tds[10]))
                         
-                        match_number_info = self.parseElimMatchNumberInfo(self._recurseUntilString(tds[1]))
+                        match_number_info = self.parseElimMatchNumberInfo(recurseUntilString(tds[1]))
                         
                         alliances = {
                             "red": {
@@ -211,20 +212,3 @@ class DatafeedUsfirstMatches(object):
         }
         
         return results
-
-    def _recurseUntilString(self, node):
-        """
-        Digs through HTML that Word made worse.
-        Written to deal with http://www2.usfirst.org/2011comp/Events/cmp/matchresults.html
-        """
-        if node.string is not None:
-            return node.string
-        if isinstance(node, NavigableString):
-            return node
-        if hasattr(node, 'contents'):
-            for content in node.contents:
-                result = self._recurseUntilString(content)
-                result = result.strip().replace('\r', '').replace('\n', '').replace('  ', ' ')
-                if result is not None and result != "":
-                    return result
-        return None

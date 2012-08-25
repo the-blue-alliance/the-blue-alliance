@@ -1,6 +1,7 @@
 import datetime
 import os
 import logging
+import json
 
 from google.appengine.api import memcache
 from google.appengine.ext import webapp
@@ -95,7 +96,9 @@ class EventDetail(webapp.RequestHandler):
                 bracket_table['sf'] = MatchHelper.generateBracket(sf_matches)
             if f_matches:
                 bracket_table['f'] = MatchHelper.generateBracket(f_matches)
-    
+
+            event.unpack_json()
+
             template_values = {
                 "event": event,
                 "matches": matches,

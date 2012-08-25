@@ -1,4 +1,5 @@
 from google.appengine.ext import db
+import json
 
 class Event(db.Model):
     """
@@ -22,6 +23,7 @@ class Event(db.Model):
     webcast_url = db.StringProperty(indexed=False)
     oprs = db.ListProperty(float, indexed=False)
     opr_teams = db.ListProperty(int, indexed=False)
+    rankings_json = db.TextProperty(indexed=False)
     
     def get_key_name(self):
         """
@@ -37,3 +39,10 @@ class Event(db.Model):
     
     def details_url(self):
         return "/event/%s" % self.get_key_name()
+    
+    def unpack_json(self):
+        """Turn that JSON into a dict."""
+        if self.rankings_json:
+            self.rankings = json.loads(self.rankings_json)
+        else:
+            self.rankings = None
