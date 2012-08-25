@@ -22,6 +22,7 @@ class Event(db.Model):
     webcast_url = db.StringProperty(indexed=False)
     oprs = db.ListProperty(float, indexed=False)
     opr_teams = db.ListProperty(int, indexed=False)
+    rankings = db.TextProperty(indexed=False)
     
     def get_key_name(self):
         """

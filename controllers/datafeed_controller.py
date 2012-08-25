@@ -1,6 +1,7 @@
 import logging
 import os
 import datetime
+import json
 
 from google.appengine.api import taskqueue
 from google.appengine.ext import db, webapp
@@ -8,6 +9,7 @@ from google.appengine.ext.webapp import template
 
 from datafeeds.datafeed_usfirst_events import DatafeedUsfirstEvents
 from datafeeds.datafeed_usfirst_matches import DatafeedUsfirstMatches
+from datafeeds.datafeed_usfirst_rankings import DatafeedUsfirstRankings
 from datafeeds.datafeed_usfirst_teams import DatafeedUsfirstTeams
 from datafeeds.datafeed_usfirst_teams2 import DatafeedUsfirstTeams2
 from datafeeds.datafeed_tba_videos import DatafeedTbaVideos
@@ -231,6 +233,54 @@ class UsfirstMatchesGet(webapp.RequestHandler):
         }
         
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_matches_get.html')
+        self.response.out.write(template.render(path, template_values))
+        
+        
+class UsfirstRankingsGetEnqueue(webapp.RequestHandler):
+    """
+    Handles enqueing getting rankings for USFIRST events.
+    """
+    def get(self):
+        events = Event.all()
+        events = events.filter('official =', True)
+        
+        if self.request.get('now', None) is not None:
+            events = events.filter('end_date <=', datetime.date.today() + datetime.timedelta(days=4))
+            events = events.filter('end_date >=', datetime.date.today() - datetime.timedelta(days=1))
+        else:
+            events = events.filter('year =', int(self.request.get('year')))
+        
+        events = events.fetch(500)
+        for event in events:
+            taskqueue.add(
+                queue_name='usfirst',
+                url='/tasks/usfirst_rankings_get/' + event.key().name(),
+                method='GET')
+        
+        template_values = {
+            'events': events,
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_rankings_get_enqueue.html')
+        self.response.out.write(template.render(path, template_values))
+
+
+class UsfirstRankingsGet(webapp.RequestHandler):
+    """
+    Handles reading a USFIRST ranking page and updating the datastore as needed.
+    """
+    def get(self, event_key):
+        df = DatafeedUsfirstRankings()
+        
+        event = Event.get_by_key_name(event_key)
+        rankings = df.getRankings(event)
+        event.rankings = json.dumps(rankings)
+        db.put(event)
+
+        template_values = {'rankings': rankings,
+                           'event_name': event.get_key_name()}
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_rankings_get.html')
         self.response.out.write(template.render(path, template_values))
 
 
