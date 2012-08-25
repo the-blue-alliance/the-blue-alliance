@@ -40,7 +40,8 @@ def test():
   print("Running Tests")
   sh("python run_tests.py")
 
-@task less():
+@task
+def less():
   """Build CSS."""
   print("Building CSS")
   sh("lessc static/css/style.less static/css/style.css --yui-compress")
