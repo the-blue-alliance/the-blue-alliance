@@ -25,5 +25,5 @@ class TBAVideoHelper(object):
     def _getBestPathOf(self, consider_filetypes):
         for filetype in consider_filetypes:
             if filetype in self.match.tba_videos:
-                return self.TBA_NET_VID_PATTERN % (self.match.event_key_name(), self.match.get_key_name(), filetype)
+                return self.TBA_NET_VID_PATTERN % (self.match.event_key_name, self.match.key_name, filetype)
         return None

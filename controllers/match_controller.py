@@ -41,8 +41,6 @@ class MatchDetail(webapp.RequestHandler):
             if not match:
                 return self.redirect("/error/404")
             
-            match.unpack_json()
-
             tbavideo = None
             if len(match.tba_videos) > 0:
                 tbavideo = TBAVideoHelper(match)

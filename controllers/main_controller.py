@@ -76,7 +76,7 @@ class SearchHandler(webapp.RequestHandler):
                 team_key_name = "frc%s" % q
                 team = Team.get_by_key_name(team_key_name)
                 if team:
-                    self.redirect(team.details_url())
+                    self.redirect(team.details_url)
                     return None
         except Exception, e:
             logging.warning("warning: %s" % e)

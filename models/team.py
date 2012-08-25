@@ -37,6 +37,7 @@ class Team(db.Model):
             self.split_address = address_dict
         except Exception, e:
             logging.warning("Error on team.do_split_address: %s", e)
-     
+    
+    @property 
     def details_url(self):
         return "/team/%s" % self.team_number

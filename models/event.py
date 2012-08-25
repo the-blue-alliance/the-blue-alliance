@@ -24,25 +24,37 @@ class Event(db.Model):
     oprs = db.ListProperty(float, indexed=False)
     opr_teams = db.ListProperty(int, indexed=False)
     rankings_json = db.TextProperty(indexed=False)
+
+    def __init__(self, *args, **kw):
+        self._rankings = None
+        super(Event, self).__init__(*args, **kw)
     
-    def get_key_name(self):
+    @property
+    def rankings(self):
+        """
+        Lazy load parsing rankings JSON
+        """
+        if self._rankings is None:
+          self._rankings = json.loads(self.rankings_json)
+        return self._rankings
+
+    @property
+    def key_name(self):
         """
         Returns the string of the key_name of the Event object before writing it.
         """
         return str(self.year) + self.event_short
     
-    def getFacebookEventUrl(self):
+    @property 
+    def facebook_event_url(self):
         """
         Return a string of the Facebook Event URL.
         """
         return "http://www.facebook.com/event.php?eid=%s" % self.facebook_eid
     
+    @property
     def details_url(self):
-        return "/event/%s" % self.get_key_name()
-    
-    def unpack_json(self):
-        """Turn that JSON into a dict."""
-        if self.rankings_json:
-            self.rankings = json.loads(self.rankings_json)
-        else:
-            self.rankings = None
+        """
+        Returns the URL pattern for the link to this Event on TBA
+        """
+        return "/event/%s" % self.key_name

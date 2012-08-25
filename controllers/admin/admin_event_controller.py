@@ -69,5 +69,5 @@ class AdminEventEdit(webapp.RequestHandler):
         )
         event = EventUpdater.createOrUpdate(event)
         
-        self.redirect("/admin/event/" + event.get_key_name())
+        self.redirect("/admin/event/" + event.key_name)
         

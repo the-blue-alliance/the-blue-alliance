@@ -23,7 +23,7 @@ class AdminMatchCleanup(webapp.RequestHandler):
         matches_to_delete = list()
         match_keys_to_delete = list()
         for match in event.match_set:
-            if match.key().name() != match.get_key_name():
+            if match.key().name() != match.key_name:
                 matches_to_delete.append(match)
                 match_keys_to_delete.append(match.key().name())
         
@@ -139,4 +139,4 @@ class AdminMatchEdit(webapp.RequestHandler):
         )
         match = MatchUpdater.createOrUpdate(match)
         
-        self.redirect("/admin/match/" + match.get_key_name())
+        self.redirect("/admin/match/" + match.key_name())

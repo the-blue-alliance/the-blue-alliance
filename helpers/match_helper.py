@@ -18,7 +18,7 @@ class MatchHelper(object):
     def natural_sort_matches(self, matches):
         import re
         convert = lambda text: int(text) if text.isdigit() else text.lower() 
-        alphanum_key = lambda match: [ convert(c) for c in re.split('([0-9]+)', str(match.get_key_name())) ] 
+        alphanum_key = lambda match: [ convert(c) for c in re.split('([0-9]+)', str(match.key_name)) ] 
         return sorted(matches, key = alphanum_key)
 
     @classmethod
@@ -26,11 +26,6 @@ class MatchHelper(object):
         match_list = match_list.fetch(500)
         match_list = MatchHelper.natural_sort_matches(match_list)
 
-        # Eh, this could be better. -gregmarra 17 oct 2010
-        # todo: abstract this so we can use it in the team view.
-        # todo: figure out how slow this is
-        [match.unpack_json() for match in match_list]
-        
         # Cleanup invalid. This does database calls. This is a wildly inappropriate place
         # to be doing this. -gregmarra
         match_list = filter(None, [MatchHelper.cleanUpIfInvalidMatch(match) for match in match_list])
@@ -130,7 +125,7 @@ class MatchUpdater(object):
         """
         A version of findOrSpawn that can use the cache.
         """
-        match = self.cached_matches.get(new_match.get_key_name(), None)
+        match = self.cached_matches.get(new_match.key_name, None)
         if match is not None:
             new_match = self.updateMerge(new_match, match)
         else:
@@ -145,7 +140,7 @@ class MatchUpdater(object):
         If it does, update the data, and send it back.
         If it doesn't, send it back.
         """
-        match = Match.get_by_key_name(new_match.get_key_name())
+        match = Match.get_by_key_name(new_match.key_name)
         if match is not None:
             new_match = self.updateMerge(new_match, match)
         

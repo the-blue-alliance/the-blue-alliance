@@ -18,8 +18,8 @@ class DatafeedTbaVideos(object):
         Scrape all Videos for a given Event.
         """
         
-        logging.info("Retreiving Videos for " + event.get_key_name())
-        url = self.TBA_VIDS_DIR_URL_PATTERN % (event.get_key_name())
+        logging.info("Retreiving Videos for " + event.key_name)
+        url = self.TBA_VIDS_DIR_URL_PATTERN % (event.key_name)
         result = urlfetch.fetch(url)
         if result.status_code == 200:
             return self.parseEventVideos(result.content, event)
@@ -41,11 +41,11 @@ class DatafeedTbaVideos(object):
         
         try:
             for match in matches:
-                # Note: get_key_name() doesn't always return the key().name()
+                # Note: key_name isn't always return the key().name()
                 # because of things like malformed Championship Field names. -gregmarra
-                match_dict.setdefault(match.get_key_name(), match)
+                match_dict.setdefault(match.key_name, match)
         except Exception, e:
-            logging.error("Malformed match in Event %s" % event.key().name())
+            logging.error("Malformed match in Event %s" % event.key_name)
         
         for a in soup.findAll("a", href=True):
             parts = a["href"].split(".")

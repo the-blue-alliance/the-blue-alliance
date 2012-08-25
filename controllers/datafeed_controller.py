@@ -36,15 +36,15 @@ class TbaVideosGet(webapp.RequestHandler):
         if match_filetypes:
             matches_to_put = []
             for match in event.match_set:
-                if match.tba_videos != match_filetypes.get(match.get_key_name(), []):
-                    match.tba_videos = match_filetypes.get(match.get_key_name(), [])
+                if match.tba_videos != match_filetypes.get(match.key_name, []):
+                    match.tba_videos = match_filetypes.get(match.key_name, [])
                     matches_to_put.append(match)
             
             db.put(matches_to_put)
             
             tbavideos = match_filetypes.items()
         else:
-            logging.info("No tbavideos found for event " + event.key().name())
+            logging.info("No tbavideos found for event " + event.key_name)
             tbavideos = []
         
         template_values = {
@@ -63,7 +63,7 @@ class TbaVideosGetEnqueue(webapp.RequestHandler):
 
         for event in events.fetch(5000):
             taskqueue.add(
-                url='/tasks/tba_videos_get/' + event.key().name(), 
+                url='/tasks/tba_videos_get/' + event.key_name, 
                 method='GET')
         
         template_values = {
@@ -163,7 +163,7 @@ class UsfirstEventGet(webapp.RequestHandler):
                 team.put()
             
             et = EventTeam.get_or_insert(
-                key_name = event.key().name() + "_" + team.key().name(),
+                key_name = event.key_name + "_" + team.key().name(),
                 event = event,
                 team = team
             )
@@ -278,7 +278,7 @@ class UsfirstRankingsGet(webapp.RequestHandler):
         db.put(event)
 
         template_values = {'rankings': rankings,
-                           'event_name': event.get_key_name()}
+                           'event_name': event.key_name}
         
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_rankings_get.html')
         self.response.out.write(template.render(path, template_values))
@@ -402,7 +402,7 @@ class OprGetEnqueue(webapp.RequestHandler):
         
         for event in events:
             taskqueue.add(
-                url='/tasks/event_opr_get/' + event.get_key_name(),
+                url='/tasks/event_opr_get/' + event.key_name,
                 method='GET')
         
         template_values = {

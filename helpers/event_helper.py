@@ -17,8 +17,7 @@ class EventHelper(object):
         """
         wlt = {"win": 0, "loss": 0, "tie": 0}
         for match in matches:
-            match.unpack_json()
-            if match.has_been_played():
+            if match.has_been_played:
                 if match.winning_alliance == "":
                     wlt["tie"] += 1
                 elif team_key in match.alliances[match.winning_alliance]["teams"]:
@@ -62,7 +61,7 @@ class EventUpdater(object):
         query = Event.all()
         
         # First, look for a key_name collision.
-        event = Event.get_by_key_name(new_event.get_key_name())
+        event = Event.get_by_key_name(new_event.key_name)
         if event is not None:
             event = self.updateMerge(new_event, event)
             return event
