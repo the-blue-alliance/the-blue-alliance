@@ -6,9 +6,10 @@ from datetime import datetime
 from google.appengine.api import urlfetch
 from google.appengine.ext import db
 
-from BeautifulSoup import BeautifulSoup, NavigableString
+from BeautifulSoup import BeautifulSoup
 
 from models.match import Match
+from datafeeds.datafeed_helper import recurseUntilString
 
 class DatafeedUsfirstMatches(object):
     """
@@ -211,20 +212,3 @@ class DatafeedUsfirstMatches(object):
         }
         
         return results
-
-def recurseUntilString(node):
-    """
-    Digs through HTML that Word made worse.
-    Written to deal with http://www2.usfirst.org/2011comp/Events/cmp/matchresults.html
-    """
-    if node.string is not None:
-        return node.string
-    if isinstance(node, NavigableString):
-        return node
-    if hasattr(node, 'contents'):
-        for content in node.contents:
-            result = recurseUntilString(content)
-            result = result.strip().replace('\r', '').replace('\n', '').replace('  ', ' ')
-            if result is not None and result != "":
-                return result
-    return None

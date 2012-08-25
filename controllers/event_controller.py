@@ -96,14 +96,11 @@ class EventDetail(webapp.RequestHandler):
                 bracket_table['sf'] = MatchHelper.generateBracket(sf_matches)
             if f_matches:
                 bracket_table['f'] = MatchHelper.generateBracket(f_matches)
-            
-            rankings = None
-            if event.rankings:
-                rankings = json.loads(event.rankings)
-    
+
+            event.unpack_json()
+
             template_values = {
                 "event": event,
-                "rankings": rankings,
                 "matches": matches,
                 "teams_a": teams_a,
                 "teams_b": teams_b,

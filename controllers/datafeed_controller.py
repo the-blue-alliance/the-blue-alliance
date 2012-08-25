@@ -274,7 +274,7 @@ class UsfirstRankingsGet(webapp.RequestHandler):
         
         event = Event.get_by_key_name(event_key)
         rankings = df.getRankings(event)
-        event.rankings = json.dumps(rankings)
+        event.rankings_json = json.dumps(rankings)
         db.put(event)
 
         template_values = {'rankings': rankings,

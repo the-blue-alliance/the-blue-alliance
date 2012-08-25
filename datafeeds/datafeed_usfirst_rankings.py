@@ -1,9 +1,9 @@
 import logging
 
 from google.appengine.api import urlfetch
-from datafeeds.datafeed_usfirst_matches import recurseUntilString
+from datafeeds.datafeed_helper import recurseUntilString
 
-from BeautifulSoup import BeautifulSoup, NavigableString
+from BeautifulSoup import BeautifulSoup
 
 class DatafeedUsfirstRankings(object):
     """
