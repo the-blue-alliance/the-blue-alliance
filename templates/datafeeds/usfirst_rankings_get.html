@@ -1,0 +1,16 @@
+<h2>Got Rankings for {{event_name}}</h2>
+<table>
+{% for row in rankings %}
+    <tr>
+    {% if forloop.first %}
+        {% for element in row %}
+            <th>{{ element }}</th>
+        {% endfor %}
+    {% else %}
+        {% for element in row %}
+            <td>{{ element }}</td>
+        {% endfor %}
+    {% endif %}
+    </tr>
+{% endfor %}
+</table>
