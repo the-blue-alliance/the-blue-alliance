@@ -16,3 +16,7 @@ else:
     }
 
 CONFIG['kickoff'] = False
+
+# Add your FB app info here
+CONFIG['FACEBOOK_APP_ID'] = "YOUR_APP_ID"
+CONFIG['FACEBOOK_APP_SECRET'] = "YOUR_SECRET"

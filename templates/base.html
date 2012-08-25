@@ -8,11 +8,11 @@
     <link rel="stylesheet" href="/css/jquery-ui-1.8.13.custom.css" type="text/css" />
     <link rel="stylesheet" href="/css/jquery.fancybox.css" type="text/css" />
 
-	<script type="text/javascript" src="/javascript/jquery.min.js"></script>
+	  <script type="text/javascript" src="/javascript/jquery.min.js"></script>
     <script type="text/javascript" src="/javascript/tba.js"></script>
     <script type="text/javascript" src="/javascript/bootstrap.js"></script>
     <script type="text/javascript" src="/javascript/bootstrap-typeahead.js"></script>
-	<script type="text/javascript" src="/javascript/jquery.fancybox.pack.js"></script>
+    <script type="text/javascript" src="/javascript/jquery.fancybox.pack.js"></script>
     <script type="text/javascript" src="/jwplayer/jwplayer.js"></script>
     <script type="text/javascript">
 
@@ -39,18 +39,7 @@
 <body>
 
 <div id="fb-root"></div>
-<script>
-  window.fbAsyncInit = function() {
-    FB.init({appId: '29895192027', status: true, cookie: true,
-             xfbml: true});
-  };
-  (function() {
-    var e = document.createElement('script'); e.async = true;
-    e.src = document.location.protocol +
-      '//connect.facebook.net/en_US/all.js';
-    document.getElementById('fb-root').appendChild(e);
-  }());
-</script>
+
 <script type="text/javascript">
   (function() {
     var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
@@ -79,13 +68,14 @@
 			    <input type="hidden" name="cof" value="FORID:11" />
 			    <input type="hidden" name="ie" value="UTF-8" />
 			    <input type="text" id="q" class="search-query" placeholder="Search" name="q"/>
-			</form>			
+			</form>
 
 			<div class="social-icons">
 				<a id="facebook" class="socialIcon" href="http://facebook.com/thebluealliance" title="Like us on Facebook"></a>
 				<a id="twitter" class="socialIcon" href=" http://twitter.com/thebluealliance" title="Follow us on Twitter"></a>
 				<a id="tumblr" class="socialIcon" href="http://thebluealliance.tumblr.com" title="Read our Blog"></a>
 			</div>
+
 		</div>
 	</div>
   </div>
@@ -105,7 +95,14 @@
       </div>
       
       <hr />
-      
+
+      <div id="auth-status" class="user-status">
+        <div id="auth-loggedout">
+          <a href="#" id="auth-loginlink">Login</a>
+        </div>
+        <div id="auth-loggedin" style="display:none">
+          Logged in as: <span id="auth-displayname"></span>  | <a href="#" id="auth-logoutlink">logout</a>
+      </div>
       <div>The Blue Alliance | <a href="/admin/debug/">admin</a></div>
       <div>
         <a href="/contact">contact</a> - 

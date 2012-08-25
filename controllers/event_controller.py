@@ -7,6 +7,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
 import tba_config
+from base_controller import BaseHandler
 from helpers.match_helper import MatchHelper
 from helpers.team_helper import TeamHelper
 from models.event import Event
@@ -14,7 +15,7 @@ from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
 
-class EventList(webapp.RequestHandler):
+class EventList(BaseHandler):
     """
     List all Events.
     """
@@ -51,7 +52,7 @@ class EventList(webapp.RequestHandler):
         
         self.response.out.write(html)
         
-class EventDetail(webapp.RequestHandler):
+class EventDetail(BaseHandler):
     """
     Show an Event.
     event_code like "2010ct"
@@ -112,7 +113,7 @@ class EventDetail(webapp.RequestHandler):
         
         self.response.out.write(html)
 
-class EventRss(webapp.RequestHandler):
+class EventRss(BaseHandler):
     """
     Generates a RSS feed for the matches in a event
     """
