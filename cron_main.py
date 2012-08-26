@@ -14,7 +14,7 @@ from controllers.datafeed_controller import OprGet, OprGetEnqueue
 from controllers.cron_controller import EventTeamUpdate, EventTeamUpdateEnqueue
 
 app = webapp2.WSGIApplication([('/tasks/enqueue/usfirst_event_details/([0-9]*)', UsfirstEventDetailsEnqueue),
-                               ('/tasks/enqueue/usfirst_matches/([0-9]*)', UsfirstMatchesEnqueue),
+                               ('/tasks/enqueue/usfirst_matches/(.*)', UsfirstMatchesEnqueue),
                                ('/tasks/get/usfirst_event_list/([0-9]*)', UsfirstEventListGet),
                                ('/tasks/get/usfirst_event_details/([0-9]*)/([0-9]*)', UsfirstEventDetailsGet),
                                ('/tasks/get/usfirst_matches/(.*)', UsfirstMatchesGet),
