@@ -18,7 +18,7 @@
 		  			<tr><th>Team Number</th><th>Team Name</th><th>Location</th></tr>
 		  			{% for team in teams_a %}
 		  			<tr>
-		  				<td><a class="team_table" href="/team/{{ team.team_number }}">{{ team.team_number }}</a></td>
+		  				<td><a href="/team/{{ team.team_number }}">{{ team.team_number }}</a></td>
 		  				<td><a href="/team/{{ team.team_number }}">{% if team.nickname %}{{ team.nickname }}{% else %}--{% endif %}</a></td>
 		  				<td>{% if team.address %}{{ team.address }}{% else %}--{% endif %}</td>
 		  			</tr>
@@ -35,7 +35,7 @@
 		  			<tr><th>Team Number</th><th>Team Name</th><th>Location</th></tr>
 		  			{% for team in teams_b %}
 		  			<tr>
-		  				<td><a class="team_table" href="/team/{{ team.team_number }}">{{ team.team_number }}</a></td>
+		  				<td><a href="/team/{{ team.team_number }}">{{ team.team_number }}</a></td>
 		  				<td><a href="/team/{{ team.team_number }}">{% if team.nickname %}{{ team.nickname }}{% else %}--{% endif %}</a></td>
 		  				<td>{% if team.address %}{{ team.address }}{% else %}--{% endif %}</td>
 		  			</tr>
