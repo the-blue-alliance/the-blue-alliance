@@ -8,7 +8,6 @@ from google.appengine.ext import db, webapp
 from google.appengine.ext.webapp import template
 
 from datafeeds.datafeed_tba_videos import DatafeedTbaVideos
-from datafeeds.datafeed_usfirst_matches import DatafeedUsfirstMatches
 from datafeeds.datafeed_usfirst_rankings import DatafeedUsfirstRankings
 from datafeeds.datafeed_usfirst_teams import DatafeedUsfirstTeams
 from datafeeds.datafeed_usfirst_teams2 import DatafeedUsfirstTeams2
