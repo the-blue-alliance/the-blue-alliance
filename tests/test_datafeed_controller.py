@@ -6,12 +6,12 @@ from google.appengine.ext import db
 from google.appengine.ext import testbed
 from google.appengine.ext.webapp import Response
 
-from controllers.datafeed_controller import UsfirstEventGet
+from controllers.datafeed_controller import UsfirstEventDetailsGet
 
 from models.event import Event
 from models.team import Team
 
-class TestUsfirstEventGet(unittest2.TestCase):
+class TestUsfirstEventDetailsGet(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
@@ -23,9 +23,9 @@ class TestUsfirstEventGet(unittest2.TestCase):
     
     def test_get(self):
         # test with 2011ct
-        usfirsteventget = UsfirstEventGet()
+        usfirsteventget = UsfirstEventDetailsGet()
         usfirsteventget.response = Response()
-        usfirsteventget.get("5561", 2011)
+        usfirsteventget.get(2011, "5561")
         
         # check event object got created
         event = Event.get_by_key_name("2011ct")

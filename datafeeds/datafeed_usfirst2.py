@@ -1,16 +1,30 @@
 from datafeeds.datafeed_usfirst_base import DatafeedUsfirstBase
+
 from datafeeds.usfirst_event_details_parser import UsfirstEventDetailsParser
 from datafeeds.usfirst_event_list_parser import UsfirstEventListParser
 from datafeeds.usfirst_event_teams_parser import UsfirstEventTeamsParser
 
+from datafeeds.usfirst_matches_parser import UsfirstMatchesParser
+
 from models.event import Event
+from models.match import Match
 from models.team import Team
 
 class DatafeedUsfirst2(DatafeedUsfirstBase):
 
     EVENT_DETAILS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=event_details&eid=%s&-session=myarea:%s"
-    EVENT_LIST_REGIONALS_URL = "https://my.usfirst.org/myarea/index.lasso?event_type=FRC&season_FRC=%s"
+    EVENT_LIST_REGIONALS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?event_type=FRC&season_FRC=%s"
     EVENT_TEAMS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=event_teamlist&results_size=250&eid=%s&-session=myarea:%s"
+    EVENT_SHORT_EXCEPTIONS = {
+        "arc": "Archimedes",
+        "cur": "Curie",
+        "gal": "Galileo",
+        "new": "Newton",
+    }
+
+    MATCH_RESULTS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/matchresults.html" # % (year, event_short)
+    MATCH_SCHEDULE_QUAL_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/schedulequal.html"
+    MATCH_SCHEDULE_ELIMS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/scheduleelim.html"
 
     def getEventDetails(self, year, first_eid):
         if type(year) is not int: raise TypeError("year must be an integer")
@@ -33,7 +47,7 @@ class DatafeedUsfirst2(DatafeedUsfirstBase):
 
     def getEventList(self, year):
         if type(year) is not int: raise TypeError("year must be an integer")
-        url = self.EVENT_LIST_REGIONALS_URL % year
+        url = self.EVENT_LIST_REGIONALS_URL_PATTERN % year
         events = self.parse(url, UsfirstEventListParser)
 
         return [Event(
@@ -60,3 +74,24 @@ class DatafeedUsfirst2(DatafeedUsfirstBase):
             team_number = team.get("team_number", None)
             )
             for team in teams]
+
+    def getMatches(self, event):
+        url = self.MATCH_RESULTS_URL_PATTERN % (event.year,
+            self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
+        matches = self.parse(url, UsfirstMatchesParser)
+
+        return [Match(
+            key_name = Match.getKeyName(
+                event, 
+                match.get("comp_level", None), 
+                match.get("set_number", 0), 
+                match.get("match_number", 0)),
+            event = event.key(),
+            game = Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
+            set_number = match.get("set_number", 0),
+            match_number = match.get("match_number", 0),
+            comp_level = match.get("comp_level", None),
+            team_key_names = match.get("team_key_names", None),
+            alliances_json = match.get("alliances_json", None)
+            )
+            for match in matches]

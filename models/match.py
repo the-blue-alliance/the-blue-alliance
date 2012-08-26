@@ -154,3 +154,10 @@ class Match(db.Model):
     @property
     def details_url(self):
         return "/match/%s" % self.key_name
+
+    @classmethod
+    def getKeyName(self, event, comp_level, set_number, match_number):
+        if comp_level == "qm":
+            return "%s_qm%s" % (event.key_name, match_number)
+        else:
+            return "%s_%s%sm%s" % (event.key_name, comp_level, set_number, match_number)

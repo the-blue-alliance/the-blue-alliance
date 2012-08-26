@@ -154,32 +154,31 @@ class UsfirstEventDetailsGet(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
 
 
-class UsfirstMatchesGetEnqueue(webapp.RequestHandler):
+class UsfirstMatchesEnqueue(webapp.RequestHandler):
     """
     Handles enqueing getting match results for USFIRST events.
     """
-    def get(self):
-        events = Event.all()
-        events = events.filter('official =', True)
+    def get(self, when):
+        events = Event.all().filter('official =', True)
         
-        if self.request.get('now', None) is not None:
+        if when == "now":
             events = events.filter('end_date <=', datetime.date.today() + datetime.timedelta(days=4))
             events = events.filter('end_date >=', datetime.date.today() - datetime.timedelta(days=1))
         else:
-            events = events.filter('year =', int(self.request.get('year')))
+            events = events.filter('year =', int(when))
         
         events = events.fetch(500)
         for event in events:
             taskqueue.add(
                 queue_name='usfirst',
-                url='/tasks/usfirst_matches_get/' + event.key().name(),
+                url='/tasks/get/usfirst_matches/' + event.key().name(),
                 method='GET')
         
         template_values = {
             'events': events,
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_matches_get_enqueue.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_matches_enqueue.html')
         self.response.out.write(template.render(path, template_values))
 
 
@@ -188,11 +187,11 @@ class UsfirstMatchesGet(webapp.RequestHandler):
     Handles reading a USFIRST match results page and updating the datastore as needed.
     """
     def get(self, event_key):
-        df = DatafeedUsfirstMatches()
+        df = DatafeedUsfirst2()
         mu = MatchUpdater()
         
         event = Event.get_by_key_name(event_key)
-        matches = df.getMatchResultsList(event)
+        matches = df.getMatches(event)
         
         new_matches = list()
         if matches is not None:
