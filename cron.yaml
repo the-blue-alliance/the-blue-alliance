@@ -1,6 +1,6 @@
 cron:
 - description: FIRST event detail scraping
-  url: /tasks/usfirst_event_get_enqueue
+  url: /tasks/enqueue/usfirst_event_get
   schedule: every 24 hours
 
 - description: FIRST team detail scraping

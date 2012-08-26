@@ -5,7 +5,7 @@ import webapp2
 import tba_config
 
 from controllers.datafeed_controller import TbaVideosGet, TbaVideosGetEnqueue
-from controllers.datafeed_controller import UsfirstEventGetEnqueue, UsfirstEventGet, UsfirstEventsInstantiate
+from controllers.datafeed_controller import UsfirstEventDetailsEnqueue, UsfirstEventDetailsGet, UsfirstEventListGet
 from controllers.datafeed_controller import UsfirstMatchesGetEnqueue, UsfirstMatchesGet, UsfirstRankingsGetEnqueue, UsfirstRankingsGet
 from controllers.datafeed_controller import UsfirstTeamsFastGet, UsfirstTeamGetEnqueue, UsfirstTeamGet, UsfirstTeamsInstantiate
 
@@ -13,13 +13,13 @@ from controllers.datafeed_controller import OprGet, OprGetEnqueue
 
 from controllers.cron_controller import EventTeamUpdate, EventTeamUpdateEnqueue
 
-app = webapp2.WSGIApplication([('/tasks/eventteam_update_enqueue', EventTeamUpdateEnqueue),
+app = webapp2.WSGIApplication([('/tasks/enqueue/usfirst_event_details/([0-9]*)', UsfirstEventDetailsEnqueue),
+                               ('/tasks/get/usfirst_event_list/([0-9]*)', UsfirstEventListGet),
+                               ('/tasks/get/usfirst_event_details/([0-9]*)/([0-9]*)', UsfirstEventDetailsGet),
+                               ('/tasks/eventteam_update_enqueue', EventTeamUpdateEnqueue),
                                ('/tasks/eventteam_update/(.*)', EventTeamUpdate),
                                ('/tasks/tba_videos_get/(.*)', TbaVideosGet),
                                ('/tasks/tba_videos_get_enqueue', TbaVideosGetEnqueue),
-                               ('/tasks/usfirst_event_get_enqueue', UsfirstEventGetEnqueue),
-                               ('/tasks/usfirst_event_get/(.*)/(.*)', UsfirstEventGet),
-                               ('/tasks/usfirst_events_instantiate', UsfirstEventsInstantiate),
                                ('/tasks/usfirst_matches_get_enqueue', UsfirstMatchesGetEnqueue),
                                ('/tasks/usfirst_matches_get/(.*)', UsfirstMatchesGet),
                                ('/tasks/usfirst_rankings_get_enqueue', UsfirstRankingsGetEnqueue),
