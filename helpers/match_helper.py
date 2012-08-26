@@ -42,7 +42,7 @@ class MatchHelper(object):
     def cleanUpIfInvalidMatch(self, match):
         invalid = MatchHelper.isIncompleteElim(match)
         if invalid:
-            #MatchUpdater.delete(match)
+            match.delete()
             logging.warning("Deleting invalid match: %s" % match.key().name())
             return None
         else:
@@ -80,7 +80,7 @@ class MatchHelper(object):
                                        'red_wins': 0,
                                        'blue_wins': 0}
             winner = match.winning_alliance
-            if winner == '':
+            if not winner or winner == '':
                 # if the match is a tie
                 continue
                 
