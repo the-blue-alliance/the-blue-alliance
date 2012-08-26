@@ -46,7 +46,7 @@ class MatchHelper(object):
             logging.warning("Deleting invalid match: %s" % match.key().name())
             return None
         else:
-            return match        
+            return match
     
     @classmethod
     def isIncompleteElim(self, match):
