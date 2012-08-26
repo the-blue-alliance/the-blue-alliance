@@ -7,12 +7,12 @@ from google.appengine.api import taskqueue
 from google.appengine.ext import db, webapp
 from google.appengine.ext.webapp import template
 
-from datafeeds.datafeed_usfirst_events import DatafeedUsfirstEvents
+from datafeeds.datafeed_tba_videos import DatafeedTbaVideos
 from datafeeds.datafeed_usfirst_matches import DatafeedUsfirstMatches
 from datafeeds.datafeed_usfirst_rankings import DatafeedUsfirstRankings
 from datafeeds.datafeed_usfirst_teams import DatafeedUsfirstTeams
 from datafeeds.datafeed_usfirst_teams2 import DatafeedUsfirstTeams2
-from datafeeds.datafeed_tba_videos import DatafeedTbaVideos
+from datafeeds.datafeed_usfirst2 import DatafeedUsfirst2
 
 from helpers.event_helper import EventUpdater
 from helpers.match_helper import MatchUpdater
@@ -79,25 +79,19 @@ class UsfirstEventsInstantiate(webapp.RequestHandler):
     Enqueues a bunch of detailed reads that actually establish Event objects.
     """
     def get(self):
-        df = DatafeedUsfirstEvents()
+        df = DatafeedUsfirst2()
         
         try:
-            year = self.request.get("year")
-            if year == '':
-                year = 2012
+            year = int(self.request.get("year"))
         except Exception, detail:
             logging.error('Failed to get year value')
         
-        # These are dicts with a first_eid
         events = df.getEventList(year)
         
-        #TODO: This is only doing Regional events, not Nats -gregmarra 4 Dec 2010
-        
         for event in events:
-            logging.info("Event with eid: " + str(event.get("first_eid", 0)))
             taskqueue.add(
                 queue_name='usfirst',
-                url='/tasks/usfirst_event_get/%s/%s' % (event.get("first_eid", 0), year),
+                url='/tasks/usfirst_event_get/%s/%s' % (event.first_eid, year),
                 method='GET')
         
         template_values = {
@@ -114,9 +108,7 @@ class UsfirstEventGetEnqueue(webapp.RequestHandler):
     """
     def get(self):
         try:
-            year = self.request.get("year")
-            if year == '':
-                year = 2012
+            year = int(self.request.get("year"))
         except Exception, detail:
             logging.error('Failed to get year value')
         
@@ -145,21 +137,18 @@ class UsfirstEventGet(webapp.RequestHandler):
     Includes registered Teams.
     """
     def get(self, first_eid, year):
-        datafeed = DatafeedUsfirstEvents()
-        
-        event = datafeed.getEvent(first_eid, year)
+        datafeed = DatafeedUsfirst2()
+
+        # DatafeedUsfirst2 always puts year as first param when required.
+        event = datafeed.getEventDetails(int(year), first_eid)
         event = EventUpdater.createOrUpdate(event)
         
-        team_dicts = datafeed.getEventRegistration(first_eid, year)
-        teams = Team.get_by_key_name(["frc" + team_dict["number"] for team_dict in team_dicts])
+        new_teams = datafeed.getEventTeams(int(year), first_eid)
+        old_teams = Team.get_by_key_name([new_team.key().name() for new_team in new_teams])
         
-        for team_dict, team in zip(team_dicts, teams):
+        for new_team, team in zip(new_teams, old_teams):
             if team is None:
-                team = Team(
-                    team_number = int(team_dict["number"]),
-                    first_tpid = int(team_dict["tpid"]),
-                    key_name = "frc" + str(team_dict["number"])
-                )
+                team = new_team
                 team.put()
             
             et = EventTeam.get_or_insert(
@@ -170,7 +159,7 @@ class UsfirstEventGet(webapp.RequestHandler):
         
         template_values = {
             'event': event,
-            'eventteams_count': len(team_dicts),
+            'eventteams_count': len(new_teams),
         }
         
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_get.html')

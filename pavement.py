@@ -41,6 +41,12 @@ def test():
   sh("python run_tests.py")
 
 @task
+def test_fast():
+  """Run tests that don't require HTTP"""
+  print("Running Fast Tests")
+  sh("python run_tests.py /usr/local/google_appengine test_*parser.py")
+
+@task
 def less():
   """Build CSS."""
   print("Building CSS")
