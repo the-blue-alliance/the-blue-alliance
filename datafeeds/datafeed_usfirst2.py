@@ -1,6 +1,9 @@
+import logging
 import re
 
 from google.appengine.api import urlfetch
+
+from helpers.team_helper import TeamTpidHelper
 
 from datafeeds.datafeed_base import DatafeedBase
 from datafeeds.fms_team_list_parser import FmsTeamListParser
@@ -9,6 +12,7 @@ from datafeeds.usfirst_event_list_parser import UsfirstEventListParser
 from datafeeds.usfirst_event_rankings_parser import UsfirstEventRankingsParser
 from datafeeds.usfirst_event_teams_parser import UsfirstEventTeamsParser
 from datafeeds.usfirst_matches_parser import UsfirstMatchesParser
+from datafeeds.usfirst_team_details_parser import UsfirstTeamDetailsParser
 
 from models.event import Event
 from models.match import Match
@@ -27,14 +31,17 @@ class DatafeedUsfirst2(DatafeedBase):
         "new": "Newton",
     }
 
+    # Raw fast teamlist, no tpids
+    FMS_TEAM_LIST_URL = "https://my.usfirst.org/frc/scoring/index.lasso?page=teamlist"
+
     MATCH_RESULTS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/matchresults.html" # % (year, event_short)
     MATCH_SCHEDULE_QUAL_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/schedulequal.html"
     MATCH_SCHEDULE_ELIMS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/scheduleelim.html"
 
-    # Raw fast teamlist, no tpids
-    FMS_TEAM_LIST_URL = "https://my.usfirst.org/frc/scoring/index.lasso?page=teamlist"
-
     SESSION_KEY_GENERATING_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=searchresults&programs=FRC&reports=teams&omit_searchform=1&season_FRC=%s"
+
+    TEAM_DETAILS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=team_details&tpid=%s&-session=myarea:%s"
+    TEAM_NUMBER_IMPOSSIBLY_HIGH = 9999
 
     def __init__(self, *args, **kw):
         self._session_key = dict()
@@ -139,22 +146,43 @@ class DatafeedUsfirst2(DatafeedBase):
             )
             for match in matches]
 
+    def getTeamDetails(self, team):
+        if hasattr(team, 'first_tpid'):
+            if team.first_tpid:
+                session_key = self.getSessionKey(team.first_tpid_year)
+                url = self.TEAM_DETAILS_URL_PATTERN % (team.first_tpid, session_key)
+                team_dict = self.parse(url, UsfirstTeamDetailsParser)
+                
+                return Team(
+                    team_number = team_dict.get("team_number", None),
+                    name = self._shorten(team_dict.get("name", None)),
+                    address = team_dict.get("address", None),
+                    nickname = team_dict.get("nickname", None),
+                    website = team_dict.get("website", None)
+                )
+
+        logging.warning('Null TPID for team %s' % team.team_number)
+        return None
+
+    def getTeamsTpids(self, year, skip=0):
+        """
+        Calling this function once establishes all of the Team objects in the Datastore.
+        It does this by calling up USFIRST to search for Tpids. We have to do this in
+        waves to avoid going over the GAE timeout.
+        """
+        # FIXME: This is not proper Datafeed form. -gregmarra 2012 Aug 26
+        # TeamTpidHelper actually creates Team objects.
+        TeamTpidHelper.scrapeTpid(self.TEAM_NUMBER_IMPOSSIBLY_HIGH, skip, year)
+
     def getFmsTeamList(self):
         teams = self.parse(self.FMS_TEAM_LIST_URL, FmsTeamListParser)
 
         return [Team(
             key_name = "frc%s" % team.get("team_number", None),
             address = team.get("address", None),
-            name = self._strForDb(team.get("name", None)),
-            nickname = self._strForDb(team.get("nickname", None)),
-            short_name = self._strForDb(team.get("short_name", None)),
+            name = self._shorten(team.get("name", None)),
+            nickname = self._shorten(team.get("nickname", None)),
+            short_name = self._shorten(team.get("short_name", None)),
             team_number = team.get("team_number", None)
             )
             for team in teams]
-
-    def _strForDb(self, string):
-        MAX_DB_LENGTH = 500
-        if string:
-            return string[:MAX_DB_LENGTH]
-        else:
-            return string

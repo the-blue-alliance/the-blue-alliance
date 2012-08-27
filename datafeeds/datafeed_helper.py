@@ -1,6 +1,5 @@
 from BeautifulSoup import NavigableString
 
-
 def recurseUntilString(node):
     """
     Digs through HTML that Word made worse.

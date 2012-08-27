@@ -7,10 +7,16 @@ class DatafeedBase(object):
     Provides structure for fetching and parsing pages from websites.
     Other Datafeeds inherit from here.
     """
-
     def parse(self, url, parser):
         result = urlfetch.fetch(url)
         if result.status_code == 200:
             return parser.parse(result.content)
         else:
             logging.error('Unable to retreive url: ' + (url))
+
+    def _shorten(self, string):
+        MAX_DB_LENGTH = 500
+        if string:
+            return string[:MAX_DB_LENGTH]
+        else:
+            return string

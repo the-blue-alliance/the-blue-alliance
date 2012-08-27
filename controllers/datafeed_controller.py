@@ -31,7 +31,6 @@ class TbaVideosGet(webapp.RequestHandler):
         
         event = Event.get_by_key_name(event_key)
         match_filetypes = df.getVideos(event)
-        logging.info(match_filetypes)
         if match_filetypes:
             matches_to_put = []
             for match in event.match_set:
@@ -259,15 +258,14 @@ class UsfirstEventRankingsGet(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
 
 
-class UsfirstTeamsInstantiate(webapp.RequestHandler):
+class UsfirstTeamsTpidsGet(webapp.RequestHandler):
     """
     A run-as-needed function that instantiates new Team objects based on 
     FIRST's full team list.
     """
-    def get(self):
+    def get(self, year):
         df = DatafeedUsfirstTeams()
         skip = 0
-        year = 2012
         
         try:
             skip = self.request.get("skip")
@@ -276,15 +274,8 @@ class UsfirstTeamsInstantiate(webapp.RequestHandler):
         except Exception, detail:
             logging.error('Failed to get skip value')
         
-        try:
-            year = self.request.get("year")
-            if year == '':
-                year = 2012
-        except Exception, detail:
-            logging.error('Failed to get year value')
-        
         logging.info("YEAR: %s", year)
-        df.instantiateTeams(skip, year)
+        df.getTeamsTpids(int(year), skip)
         
         team_count = Team.all().count()
         
@@ -292,40 +283,39 @@ class UsfirstTeamsInstantiate(webapp.RequestHandler):
             'team_count': team_count
         }
         
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_teams_instantiate.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/get/usfirst_teams_tpids.html')
         self.response.out.write(template.render(path, template_values))
 
 
-class UsfirstTeamGetEnqueue(webapp.RequestHandler):
+class UsfirstTeamDetailsEnqueue(webapp.RequestHandler):
     """
     Handles enqueing updates to individual USFIRST teams.
     """
     def get(self):
-        
         offset = int(self.request.get("offset", 0))
         
         teams = Team.all(keys_only=True).fetch(1000, int(offset))
         for team_key in teams:
             taskqueue.add(
                 queue_name='usfirst',
-                url='/tasks/usfirst_team_get/' + team_key.name(),
+                url='/tasks/get/usfirst_team_details/' + team_key.name(),
                 method='GET')
-                          
+        
+        # FIXME omg we're just writing out? -gregmarra 2012 Aug 26
         self.response.out.write("%s team gets have been enqueued offset from %s.<br />" %(len(teams), offset))
         self.response.out.write("Reload with ?offset=%s to enqueue more." % (offset + len(teams)))
 
 
-class UsfirstTeamGet(webapp.RequestHandler):
+class UsfirstTeamDetailsGet(webapp.RequestHandler):
     """
     Handles reading a USFIRST team information page and updating the
     model accordingly.
     """
     def get(self, key_name):
-        df = DatafeedUsfirstTeams()
+        df = DatafeedUsfirst2()
         
         logging.info("Updating team %s" % key_name)
         team = df.getTeamDetails(key_name[3:])
-        logging.info(team)
         if team:
             team = TeamUpdater.createOrUpdate(team)
             success = True
@@ -337,7 +327,7 @@ class UsfirstTeamGet(webapp.RequestHandler):
             'success': success,
         }
         
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_team_get.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_team_details_get.html')
         self.response.out.write(template.render(path, template_values))
 
 
