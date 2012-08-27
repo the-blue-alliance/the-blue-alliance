@@ -4,9 +4,9 @@ import logging
 from BeautifulSoup import BeautifulSoup
 
 from datafeeds.datafeed_helper import recurseUntilString
-from datafeeds.datafeed_parser_base import DatafeedParserBase
+from datafeeds.parser_base import ParserBase
 
-class UsfirstMatchesParser(DatafeedParserBase):
+class UsfirstMatchesParser(ParserBase):
     @classmethod
     def parse(self, html):
         """

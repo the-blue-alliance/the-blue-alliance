@@ -3,9 +3,9 @@ import logging
 
 from BeautifulSoup import BeautifulSoup
 
-from datafeeds.datafeed_parser_base import DatafeedParserBase
+from datafeeds.parser_base import ParserBase
 
-class UsfirstEventListParser(DatafeedParserBase):
+class UsfirstEventListParser(ParserBase):
 
     REGIONAL_EVENT_TYPES = [
         "Regional",

@@ -1,4 +1,4 @@
-class DatafeedParserBase(object):
+class ParserBase(object):
 	"""
 	Provides a basic structure for parsing pages.
 	Parsers are not allowed to return Model objects, only dictionaries.

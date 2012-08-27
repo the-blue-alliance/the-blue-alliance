@@ -2,9 +2,9 @@ from datafeeds.datafeed_helper import recurseUntilString
 
 from BeautifulSoup import BeautifulSoup
 
-from datafeeds.datafeed_parser_base import DatafeedParserBase
+from datafeeds.parser_base import ParserBase
 
-class UsfirstEventRankingsParser(DatafeedParserBase):
+class UsfirstEventRankingsParser(ParserBase):
     """
     Works for official events from 2007-2012
     """

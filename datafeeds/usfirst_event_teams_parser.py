@@ -1,8 +1,8 @@
 import re
 
-from datafeeds.datafeed_parser_base import DatafeedParserBase
+from datafeeds.parser_base import ParserBase
 
-class UsfirstEventTeamsParser(DatafeedParserBase):
+class UsfirstEventTeamsParser(ParserBase):
     @classmethod
     def parse(self, html):
         """

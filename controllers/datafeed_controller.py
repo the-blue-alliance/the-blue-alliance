@@ -7,7 +7,7 @@ from google.appengine.api import taskqueue
 from google.appengine.ext import db, webapp
 from google.appengine.ext.webapp import template
 
-from datafeeds.datafeed_tba_videos import DatafeedTbaVideos
+from datafeeds.datafeed_tba import DatafeedTba
 from datafeeds.datafeed_usfirst_teams import DatafeedUsfirstTeams
 from datafeeds.datafeed_usfirst_teams2 import DatafeedUsfirstTeams2
 from datafeeds.datafeed_usfirst2 import DatafeedUsfirst2
@@ -27,10 +27,11 @@ class TbaVideosGet(webapp.RequestHandler):
     Handles reading a TBA video listing page and updating the match objects in the datastore as needed.
     """
     def get(self, event_key):
-        df = DatafeedTbaVideos()
+        df = DatafeedTba()
         
         event = Event.get_by_key_name(event_key)
-        match_filetypes = df.getEventVideosList(event)
+        match_filetypes = df.getVideos(event)
+        logging.info(match_filetypes)
         if match_filetypes:
             matches_to_put = []
             for match in event.match_set:
@@ -52,7 +53,7 @@ class TbaVideosGet(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/tba_videos_get.html')
         self.response.out.write(template.render(path, template_values))
 
-class TbaVideosGetEnqueue(webapp.RequestHandler):
+class TbaVideosEnqueue(webapp.RequestHandler):
     """
     Handles enqueing grabing tba_videos for Matches at individual Events.
     """
@@ -61,14 +62,14 @@ class TbaVideosGetEnqueue(webapp.RequestHandler):
 
         for event in events.fetch(5000):
             taskqueue.add(
-                url='/tasks/tba_videos_get/' + event.key_name, 
+                url='/tasks/get/tba_videos/' + event.key_name, 
                 method='GET')
         
         template_values = {
             'event_count': Event.all().count(),
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/tba_videos_update_enqueue.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/tba_videos_enqueue.html')
         self.response.out.write(template.render(path, template_values))
 
 class UsfirstEventListGet(webapp.RequestHandler):

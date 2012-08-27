@@ -2,9 +2,9 @@ import logging
 
 from BeautifulSoup import BeautifulSoup
 
-from datafeeds.datafeed_parser_base import DatafeedParserBase
+from datafeeds.parser_base import ParserBase
 
-class FmsTeamListParser(DatafeedParserBase):
+class FmsTeamListParser(ParserBase):
     """
     Facilitates getting information about Teams from USFIRST.
     Reads from FMS data pages, which are mostly tab delimited files wrapped in some HTML.

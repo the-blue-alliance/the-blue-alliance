@@ -1,5 +1,8 @@
-from datafeeds.datafeed_usfirst_base import DatafeedUsfirstBase
+import re
 
+from google.appengine.api import urlfetch
+
+from datafeeds.datafeed_base import DatafeedBase
 from datafeeds.fms_team_list_parser import FmsTeamListParser
 from datafeeds.usfirst_event_details_parser import UsfirstEventDetailsParser
 from datafeeds.usfirst_event_list_parser import UsfirstEventListParser
@@ -11,7 +14,7 @@ from models.event import Event
 from models.match import Match
 from models.team import Team
 
-class DatafeedUsfirst2(DatafeedUsfirstBase):
+class DatafeedUsfirst2(DatafeedBase):
 
     EVENT_DETAILS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=event_details&eid=%s&-session=myarea:%s"
     EVENT_LIST_REGIONALS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?event_type=FRC&season_FRC=%s"
@@ -30,6 +33,36 @@ class DatafeedUsfirst2(DatafeedUsfirstBase):
 
     # Raw fast teamlist, no tpids
     FMS_TEAM_LIST_URL = "https://my.usfirst.org/frc/scoring/index.lasso?page=teamlist"
+
+    SESSION_KEY_GENERATING_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=searchresults&programs=FRC&reports=teams&omit_searchform=1&season_FRC=%s"
+
+    def __init__(self, *args, **kw):
+        self._session_key = dict()
+        super(DatafeedUsfirst2, self).__init__(*args, **kw)
+
+    def getSessionKey(self, year):
+        """
+        Grab a page from FIRST so we can get a session key out of URLs on it. This session
+        key is needed to construct working event detail information URLs.
+        """
+        if self._session_key.get(year, False):
+            return self._session_key.get(year)
+
+        sessionRe = re.compile(r'myarea:([A-Za-z0-9]*)')
+        
+        result = urlfetch.fetch(self.SESSION_KEY_GENERATING_PATTERN % year, deadline=60)
+        if result.status_code == 200:
+            regex_results = re.search(sessionRe, result.content)
+            if regex_results is not None:
+                session_key = regex_results.group(1) #first parenthetical group
+                if session_key is not None:
+                    self._session_key[year] = session_key
+                    return self._session_key[year]
+            logging.error('Unable to get USFIRST session key for %s.' % year)
+            return None
+        else:
+            logging.error('HTTP code %s. Unable to retreive url: %s' % 
+                (result.status_code, self.SESSION_KEY_GENERATING_URL))
 
     def getEventDetails(self, year, first_eid):
         if type(year) is not int: raise TypeError("year must be an integer")
