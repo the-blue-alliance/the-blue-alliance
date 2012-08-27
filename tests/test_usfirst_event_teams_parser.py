@@ -2,7 +2,7 @@ import unittest2
 
 from datafeeds.usfirst_event_teams_parser import UsfirstEventTeamsParser
 
-class TestUsfirstEventDetailsParser(unittest2.TestCase):
+class TestUsfirstEventTeamsParser(unittest2.TestCase):
     def test_parse(self):
         with open('test_data/usfirst_html/usfirst_event_teams_2012ct.html', 'r') as f:
             teams = UsfirstEventTeamsParser.parse(f.read())

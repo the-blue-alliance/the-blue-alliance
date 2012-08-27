@@ -3,7 +3,7 @@ import datetime
 
 from datafeeds.usfirst_event_list_parser import UsfirstEventListParser
 
-class TestUsfirstEventDetailsParser(unittest2.TestCase):
+class TestUsfirstEventListParser(unittest2.TestCase):
     def test_parse(self):
         with open('test_data/usfirst_html/usfirst_event_list_2012.html', 'r') as f: 
             events = UsfirstEventListParser.parse(f.read())

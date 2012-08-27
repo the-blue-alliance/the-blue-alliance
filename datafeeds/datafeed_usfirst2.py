@@ -3,6 +3,7 @@ from datafeeds.datafeed_usfirst_base import DatafeedUsfirstBase
 from datafeeds.fms_team_list_parser import FmsTeamListParser
 from datafeeds.usfirst_event_details_parser import UsfirstEventDetailsParser
 from datafeeds.usfirst_event_list_parser import UsfirstEventListParser
+from datafeeds.usfirst_event_rankings_parser import UsfirstEventRankingsParser
 from datafeeds.usfirst_event_teams_parser import UsfirstEventTeamsParser
 from datafeeds.usfirst_matches_parser import UsfirstMatchesParser
 
@@ -14,6 +15,7 @@ class DatafeedUsfirst2(DatafeedUsfirstBase):
 
     EVENT_DETAILS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=event_details&eid=%s&-session=myarea:%s"
     EVENT_LIST_REGIONALS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?event_type=FRC&season_FRC=%s"
+    EVENT_RANKINGS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/rankings.html" # % (year, event_short)
     EVENT_TEAMS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=event_teamlist&results_size=250&eid=%s&-session=myarea:%s"
     EVENT_SHORT_EXCEPTIONS = {
         "arc": "Archimedes",
@@ -61,6 +63,11 @@ class DatafeedUsfirst2(DatafeedUsfirstBase):
             year = int(year)
             )
             for event in events]
+
+    def getEventRankings(self, event):
+        url = self.EVENT_RANKINGS_URL_PATTERN % (event.year,
+            self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
+        return self.parse(url, UsfirstEventRankingsParser)
 
     def getEventTeams(self, year, first_eid):
         """
