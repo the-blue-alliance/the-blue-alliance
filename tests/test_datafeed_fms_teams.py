@@ -5,7 +5,7 @@ from google.appengine.ext import testbed
 
 from datafeeds.datafeed_usfirst2 import DatafeedUsfirst2
 
-class TestDatafeedUsfirstTeams2(unittest2.TestCase):
+class TestDatafeedFmsTeams(unittest2.TestCase):
     
     def setUp(self):
         self.testbed = testbed.Testbed()
