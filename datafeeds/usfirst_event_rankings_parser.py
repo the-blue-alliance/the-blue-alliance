@@ -1,5 +1,3 @@
-from datafeeds.datafeed_helper import recurseUntilString
-
 from BeautifulSoup import BeautifulSoup
 
 from datafeeds.parser_base import ParserBase
@@ -25,6 +23,6 @@ class UsfirstEventRankingsParser(ParserBase):
             if len(tds) > 1:
                 row = []
                 for td in tds:
-                    row.append(str(recurseUntilString(td)))
+                    row.append(str(self._recurseUntilString(td)))
                 rankings.append(row)
         return rankings
