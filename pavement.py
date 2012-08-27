@@ -15,7 +15,7 @@ def clean():
     print("Nothing to clean! :)")
 
 @task
-def dev_data_setup():
+def setup():
   """Set up data for development environments."""
   
   print("Setting up dev data.")
