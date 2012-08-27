@@ -341,21 +341,21 @@ class UsfirstTeamGet(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
 
 
-class UsfirstTeamsFastGet(webapp.RequestHandler):
+class FmsTeamListGet(webapp.RequestHandler):
     """
     Fetch basic data about all current season teams at once.
     Doesn't get tpids or full data.
     """
     def get(self):
-        df = DatafeedUsfirstTeams2()
-        teams = TeamHelper.convertDictsToModels(df.getAllCurrentSeasonTeams())
-        teams = TeamUpdater.bulkCreateOrUpdate(teams)
+        df = DatafeedUsfirst2()
+        teams = df.getFmsTeamList()
+        TeamUpdater.bulkCreateOrUpdate(teams)
         
         template_values = {
             "teams": teams
         }
         
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_teams_get.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fms_team_list_get.html')
         self.response.out.write(template.render(path, template_values))
         
 

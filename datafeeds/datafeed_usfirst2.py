@@ -1,9 +1,9 @@
 from datafeeds.datafeed_usfirst_base import DatafeedUsfirstBase
 
+from datafeeds.fms_team_list_parser import FmsTeamListParser
 from datafeeds.usfirst_event_details_parser import UsfirstEventDetailsParser
 from datafeeds.usfirst_event_list_parser import UsfirstEventListParser
 from datafeeds.usfirst_event_teams_parser import UsfirstEventTeamsParser
-
 from datafeeds.usfirst_matches_parser import UsfirstMatchesParser
 
 from models.event import Event
@@ -25,6 +25,9 @@ class DatafeedUsfirst2(DatafeedUsfirstBase):
     MATCH_RESULTS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/matchresults.html" # % (year, event_short)
     MATCH_SCHEDULE_QUAL_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/schedulequal.html"
     MATCH_SCHEDULE_ELIMS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/scheduleelim.html"
+
+    # Raw fast teamlist, no tpids
+    FMS_TEAM_LIST_URL = "https://my.usfirst.org/frc/scoring/index.lasso?page=teamlist"
 
     def getEventDetails(self, year, first_eid):
         if type(year) is not int: raise TypeError("year must be an integer")
@@ -95,3 +98,23 @@ class DatafeedUsfirst2(DatafeedUsfirstBase):
             alliances_json = match.get("alliances_json", None)
             )
             for match in matches]
+
+    def getFmsTeamList(self):
+        teams = self.parse(self.FMS_TEAM_LIST_URL, FmsTeamListParser)
+
+        return [Team(
+            key_name = "frc%s" % team.get("team_number", None),
+            address = team.get("address", None),
+            name = self._strForDb(team.get("name", None)),
+            nickname = self._strForDb(team.get("nickname", None)),
+            short_name = self._strForDb(team.get("short_name", None)),
+            team_number = team.get("team_number", None)
+            )
+            for team in teams]
+
+    def _strForDb(self, string):
+        MAX_DB_LENGTH = 500
+        if string:
+            return string[:MAX_DB_LENGTH]
+        else:
+            return string

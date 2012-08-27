@@ -11,20 +11,6 @@ class TeamHelper(object):
     Helper to sort teams and stuff
     """
     @classmethod
-    def convertDictsToModels(self, team_dicts):
-        team_models = []
-        for team_dict in team_dicts:
-            team_models.append(Team(
-                key_name = "frc%s" % team_dict["team_number"],
-                team_number = team_dict["team_number"],
-                name = _getStringForDatabase(team_dict, "name"),
-                address = _getStringForDatabase(team_dict, "address"),
-                nickname = _getStringForDatabase(team_dict, "nickname"),
-                website = _getStringForDatabase(team_dict, "website")
-            ))
-        return team_models
-
-    @classmethod
     def sortTeams(self, team_list):
         """
         Takes a list of Teams (not a Query object).
@@ -175,12 +161,3 @@ class TeamUpdater(object):
             old_team.first_tpid = new_team.first_tpid
         
         return old_team
-
-
-def _getStringForDatabase(team_dict, prop):
-    MAX_DB_LENGTH = 500
-    string = team_dict.get(prop, None)
-    if string:
-        return string[:MAX_DB_LENGTH]
-    else:
-        return string

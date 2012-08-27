@@ -1,0 +1,6 @@
+<h1>Got some teams</h1>
+<ul>
+{% for team in teams %}
+<li>{{team.team_number}},{{team.name}},{{team.nickname}},{{team.address}}</li>
+{% endfor %}
+</ul>
