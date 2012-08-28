@@ -81,6 +81,9 @@ $(function() {
 			});
 		};
 	});
+	
+	// Tooltips
+	$("[rel=tooltip]").tooltip();
 });
 
 // Kickoff Countdown
