@@ -7,7 +7,7 @@
 <div class="container">
 	<div class="hero-unit landing-hero-unit">
 		<div class="row-fluid">
-			<div class="span7 landing">
+			<div class="span6 landing">
 				<h1>The Blue Alliance</h1>
 				<p><em>FIRST</em> Robotics Competition team information, event results, and videos</p>
 				<div id="landing-buttons">
@@ -18,11 +18,19 @@
 				    <input type="hidden" name="cx" value="017956276086362105630:99ctqytcokm"/>
 				    <input type="hidden" name="cof" value="FORID:11" />
 				    <input type="hidden" name="ie" value="UTF-8" />
-				    <input type="text" id="q" class="search-query" placeholder="Search" name="q"/>
+				    <input type="text" id="q" class="search-query" placeholder="Search for teams and events" name="q"/>
 				</form>
 			</div>
-			<div class="span5 hidden-phone">
-				<img class="landing-logo" src="/images/logo_square_200.png" alt="tbalogo" />
+            <div class="span6 hidden-phone kickoff landing">
+                <div class="kickoff-countdown">
+                    <span class="countdown-number kickoff-countdown-days">--</span><span class="countdown-label day-label">D, </span>
+                    <span class="countdown-number kickoff-countdown-hours">--</span><span class="countdown-label">H, </span>
+                    <span class="countdown-number kickoff-countdown-minutes">--</span><span class="countdown-label">M, </span>
+                    <span class="countdown-number kickoff-countdown-seconds">--</span><span class="countdown-label">S</span>
+                </div>
+                <p class="kickoff-subheader">until the <strong>2013 <em>FIRST</em> Kickoff</strong></p>
+                <p>10 A.M. EST on January 5, 2013</p>
+                <p><a class="btn btn-large btn-primary" href="https://www.facebook.com/events/236917836430446/"><i class="icon-calendar icon-white"></i> RSVP on Facebook</a></p>
 			</div>
 		</div>
 	</div>
@@ -49,14 +57,7 @@
 		</div>
 		{% else %}
 		<div class="span12 kickoff">
-            <h1>Tune in for the 2013 FRC Kickoff</h1>
-            <h2>10 A.M. EST on January 5, 2013</h2>
-            <div class="kickoff-countdown">
-                <span class="countdown-number kickoff-countdown-days">--</span><span class="countdown-label day-label">D, </span>
-                <span class="countdown-number kickoff-countdown-hours">--</span><span class="countdown-label">H, </span>
-                <span class="countdown-number kickoff-countdown-minutes">--</span><span class="countdown-label">M, </span>
-                <span class="countdown-number kickoff-countdown-seconds">--</span><span class="countdown-label">S</span>
-            </div>
+            
         </div>
 		{% endif %}
 	</div>
