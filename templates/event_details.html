@@ -63,7 +63,7 @@
 						<td>{{matches.num}} Match{{matches.num|pluralize:"es"}} - (<a href="http://www.thebluealliance.com/event/{{ event.key_name }}/feed">rss</a>)</td>
 					</tr>{% endif %}
 					<tr>
-		            	<th>Hashtag <a href="/hashtags" class="help-link" title="What are hashtags?">?</a></th>
+		            	<th>Hashtag <a href="/hashtags" class="help-link" rel="tooltip" title="What are hashtags?">?</a></th>
 		            	<td><strong>#frc{{ event.event_short }}</strong> - Search
 		            		<a class="hashtag-link hashtag-twitter" href="https://twitter.com/search/%23frc{{ event.event_short }}" target="_blank" title="Search Twitter">Twitter</a>,
 		            		<a class="hashtag-link hashtag-youtube" href="http://www.youtube.com/results?search_query=%23frc{{ event.event_short }}+OR+%22{{ event.name }}%22" target="_blank" title="Search YouTube">YouTube</a>,
@@ -124,7 +124,7 @@
 		    {% endif %}
 		</div>
 		{% endif %}
-		
+
 		{% if not matches.qm %}
 		    <div class="span6">
 		        {% if matches.qf or matches.sf or matches.f %}
@@ -133,7 +133,7 @@
                 {% endif %}
 					
 				{% if oprs|length > 0 %}
-	            <h3>OPRs - Top 15 (<a href="/opr">?</a>)</h3>
+                <h3>OPRs - Top 15 (<a href="/opr" rel="tooltip" title="What are Offensive Power Rankings?">?</a>)</h3>
 		        <table class="table table-condensed table-striped table-center">
 		            <tr>
 		                <th>Team</th>
