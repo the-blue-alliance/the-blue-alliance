@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 
-{% block title %}{% if explicit_year %}{{current_year}} {% endif %}FIRST Robotics Events - The Blue Alliance{% endblock %}
+{% block title %}{% if explicit_year %}{{selected_year}} {% endif %}FIRST Robotics Events - The Blue Alliance{% endblock %}
 
-{% block meta_description %}FIRST Robotics Competition events{% if explicit_year %} from {{current_year}}{% endif %}.{% endblock %}
+{% block meta_description %}FIRST Robotics Competition events{% if explicit_year %} from {{selected_year}}{% endif %}.{% endblock %}
 
 {% block events_active %}active{% endblock %}
 
 {% block content %}
 <div class="container">
-	<h1 class="end_header">{{ events|length }} Events in {{current_year}}</h1>
+	<h1 class="end_header">{{ events|length }} Events in {{selected_year}}</h1>
 	  <div class="row">
 	  	<div class="span2 year_list">
 			<div class="btn-group visible-phone">
 			  <a class="btn btn-large dropdown-toggle" data-toggle="dropdown" href="#">
-			    {{current_year}}
+			    {{selected_year}}
 			    <span class="caret"></span>
 			  </a>
 			  <ul class="dropdown-menu">
@@ -24,7 +24,7 @@
 			</div>
 	  		<ul class="nav nav-tabs nav-stacked hidden-phone">
 	            {% for year in valid_years %}
-                <li {% if current_year == year %}class="active"{% endif %}><a href="/events/{{year}}">{{year}}</a></li>
+                <li {% if selected_year == year %}class="active"{% endif %}><a href="/events/{{year}}">{{year}}</a></li>
                 {% endfor %}
 			</ul>
 	  	</div>

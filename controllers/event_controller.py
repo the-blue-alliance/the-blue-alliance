@@ -48,7 +48,7 @@ class EventList(BaseHandler):
                 "show_upcoming": show_upcoming,
                 "events": events,
                 "explicit_year": explicit_year,
-                "current_year": year,
+                "selected_year": year,
                 "valid_years": valid_years,
             }
         
