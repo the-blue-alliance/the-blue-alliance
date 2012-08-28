@@ -60,6 +60,10 @@ class ContactHandler(BaseHandler):
 class HashtagsHandler(BaseHandler):
     def get(self):
         self.response.out.write(render_static("hashtags"))
+        
+class AboutHandler(BaseHandler):
+    def get(self):
+        self.response.out.write(render_static("about"))
 
 class ThanksHandler(BaseHandler):
     def get(self):
