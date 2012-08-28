@@ -22,9 +22,14 @@ class EventList(BaseHandler):
     def get(self, year=None):
         
         show_upcoming = False
+        valid_years = [2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 2004, 2003, 2002]
 
         if year:
+            if not year.isdigit():
+                return self.redirect("/error/404")
             year = int(year)
+            if year not in valid_years:
+                return self.redirect("/error/404")
             explicit_year = True
             if year == datetime.datetime.now().year:
                 show_upcoming = True
@@ -43,7 +48,8 @@ class EventList(BaseHandler):
                 "show_upcoming": show_upcoming,
                 "events": events,
                 "explicit_year": explicit_year,
-                "year": year,
+                "current_year": year,
+                "valid_years": valid_years,
             }
         
             path = os.path.join(os.path.dirname(__file__), '../templates/event_list.html')
