@@ -72,12 +72,10 @@ class OprHelper:
 
     @classmethod
     def getData(self,event):
-        #reader = csv.reader(open(file,"rb"))
         # TODO: This doesn't seem like it would support older matches with 2v2 games -gregmarra 8 Mar 2012 
         num = 0
         for match in event.match_set:
-            match.unpack_json()
-            if hasattr(match, 'alliances'):
+            if len(match.alliances > 0):
                 if (match.comp_level == "qm" and match.alliances['red']['score'] > -1 and match.alliances['blue']['score'] > -1):
                     OprHelper.data.append([])
                     OprHelper.data[num].append(int(match.alliances['red']['score'])) #redscore

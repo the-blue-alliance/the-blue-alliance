@@ -6,10 +6,11 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
 import tba_config
+from base_controller import BaseHandler
 from helpers.tbavideo_helper import TBAVideoHelper
 from models.match import Match
 
-class MatchList(webapp.RequestHandler):
+class MatchList(BaseHandler):
     """
     Display all Matches.
     """
@@ -23,7 +24,7 @@ class MatchList(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), '../templates/matches/list.html')
         self.response.out.write(template.render(path, template_values))
         
-class MatchDetail(webapp.RequestHandler):
+class MatchDetail(BaseHandler):
     """
     Display a Match.
     """
@@ -41,8 +42,6 @@ class MatchDetail(webapp.RequestHandler):
             if not match:
                 return self.redirect("/error/404")
             
-            match.unpack_json()
-
             tbavideo = None
             if len(match.tba_videos) > 0:
                 tbavideo = TBAVideoHelper(match)

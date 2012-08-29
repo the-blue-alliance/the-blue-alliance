@@ -4,7 +4,7 @@ import datetime
 from google.appengine.ext import db
 from google.appengine.ext import testbed
 
-from datafeeds.datafeed_usfirst_matches import DatafeedUsfirstMatches
+from datafeeds.datafeed_usfirst2 import DatafeedUsfirst2
 from models.event import Event
 
 class TestDatafeedUsfirstMatches(unittest2.TestCase):
@@ -14,7 +14,7 @@ class TestDatafeedUsfirstMatches(unittest2.TestCase):
         self.testbed.init_urlfetch_stub()
         self.testbed.init_datastore_v3_stub()
         
-        self.datafeed = DatafeedUsfirstMatches()
+        self.datafeed = DatafeedUsfirst2()
     
     def tearDown(self):
         self.testbed.deactivate()
@@ -26,12 +26,10 @@ class TestDatafeedUsfirstMatches(unittest2.TestCase):
           year = 2011
         )
         
-        matches = self.datafeed.getMatchResultsList(event)
+        matches = self.datafeed.getMatches(event)
         
         # Test 2011ct_qm1
         match = matches[0]
-        self.assertEqual(match.key().name(), "2011ct_qm1")
-        self.assertEqual(match.game, "frc_2011_logo")
         self.assertEqual(match.comp_level, "qm")
         self.assertEqual(match.set_number, 1)
         self.assertEqual(match.match_number, 1)
@@ -40,8 +38,6 @@ class TestDatafeedUsfirstMatches(unittest2.TestCase):
         
         # Test 2011ct_qf2m3
         match = matches[-7]
-        self.assertEqual(match.key().name(), "2011ct_qf2m3")
-        self.assertEqual(match.game, "frc_2011_logo")
         self.assertEqual(match.comp_level, "qf")
         self.assertEqual(match.set_number, 2)
         self.assertEqual(match.match_number, 3)
@@ -50,8 +46,6 @@ class TestDatafeedUsfirstMatches(unittest2.TestCase):
         
         # Test 2011ct_f1m2
         match = matches[-1]
-        self.assertEqual(match.key().name(), "2011ct_f1m2")
-        self.assertEqual(match.game, "frc_2011_logo")
         self.assertEqual(match.comp_level, "f")
         self.assertEqual(match.set_number, 1)
         self.assertEqual(match.match_number, 2)

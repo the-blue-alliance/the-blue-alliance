@@ -15,13 +15,13 @@ def clean():
     print("Nothing to clean! :)")
 
 @task
-def dev_data_setup():
+def setup():
   """Set up data for development environments."""
   
   print("Setting up dev data.")
   
   print("Getting Teams")
-  sh("curl -s http://localhost:8088/tasks/usfirst_teams_fast_get")
+  sh("curl -s http://localhost:8088/tasks/get/fms_team_list")
   print("Importing test Event data")
   sh("echo \"omgrobots\" | appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/events.csv --kind=Event --url=http://localhost:8088/_ah/remote_api --num_threads=1 --email=admin@localhost --passin")
   print("Importing test Match data")
@@ -33,3 +33,27 @@ def dev_data_setup():
 
   clean()
   print("Done setting up! 2010cmp is now ready for testing.")
+
+@task
+def test():
+  """Run tests."""
+  print("Running Tests")
+  sh("python run_tests.py")
+
+@task
+def test_fast():
+  """Run tests that don't require HTTP"""
+  print("Running Fast Tests")
+  sh("python run_tests.py /usr/local/google_appengine test_*parser.py")
+
+@task
+def less():
+  """Build CSS."""
+  print("Building CSS")
+  sh("lessc static/css/style.less static/css/style.css --yui-compress")
+
+@task
+def preflight():
+  """Prep a prod push"""
+  test()
+  less()

@@ -7,6 +7,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
 import tba_config
+from base_controller import BaseHandler
 from helpers.event_helper import EventHelper
 from helpers.match_helper import MatchHelper
 from models.event import Event
@@ -15,7 +16,7 @@ from models.match import Match
 from models.team import Team
 
 # The view of a list of teams.
-class TeamList(webapp.RequestHandler):
+class TeamList(BaseHandler):
     def get(self):
         
         memcache_key = "team_list"
@@ -43,7 +44,7 @@ class TeamList(webapp.RequestHandler):
         self.response.out.write(html)
         
 # The view of a single Team.
-class TeamDetail(webapp.RequestHandler):
+class TeamDetail(BaseHandler):
     def get(self, team_number, year=None):
         
         # /team/0201 should redirect to /team/201

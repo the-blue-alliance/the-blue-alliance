@@ -7,6 +7,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
 import tba_config
+from base_controller import BaseHandler
 from helpers.match_helper import MatchHelper
 from helpers.award_helper import AwardHelper
 from helpers.team_helper import TeamHelper
@@ -15,17 +16,28 @@ from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
 
-class EventList(webapp.RequestHandler):
+class EventList(BaseHandler):
     """
     List all Events.
     """
     def get(self, year=None):
+        
+        show_upcoming = False
+        valid_years = [2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 2004, 2003, 2002]
+
         if year:
+            if not year.isdigit():
+                return self.redirect("/error/404")
             year = int(year)
+            if year not in valid_years:
+                return self.redirect("/error/404")
             explicit_year = True
+            if year == datetime.datetime.now().year:
+                show_upcoming = True
         else:
             year = datetime.datetime.now().year
             explicit_year = False
+            show_upcoming = True
         
         memcache_key = "event_list_%s" % year
         html = memcache.get(memcache_key)
@@ -34,9 +46,11 @@ class EventList(webapp.RequestHandler):
             events = Event.all().filter("year =", int(year)).order('start_date').fetch(1000)
         
             template_values = {
-                "explicit_year": explicit_year,
-                "year": year,
+                "show_upcoming": show_upcoming,
                 "events": events,
+                "explicit_year": explicit_year,
+                "selected_year": year,
+                "valid_years": valid_years,
             }
         
             path = os.path.join(os.path.dirname(__file__), '../templates/event_list.html')
@@ -45,7 +59,7 @@ class EventList(webapp.RequestHandler):
         
         self.response.out.write(html)
         
-class EventDetail(webapp.RequestHandler):
+class EventDetail(BaseHandler):
     """
     Show an Event.
     event_code like "2010ct"
@@ -89,7 +103,7 @@ class EventDetail(webapp.RequestHandler):
                 bracket_table['sf'] = MatchHelper.generateBracket(sf_matches)
             if f_matches:
                 bracket_table['f'] = MatchHelper.generateBracket(f_matches)
-    
+
             template_values = {
                 "event": event,
                 "matches": matches,
@@ -107,7 +121,7 @@ class EventDetail(webapp.RequestHandler):
         
         self.response.out.write(html)
 
-class EventRss(webapp.RequestHandler):
+class EventRss(BaseHandler):
     """
     Generates a RSS feed for the matches in a event
     """

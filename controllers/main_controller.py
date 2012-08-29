@@ -1,6 +1,7 @@
 import os
 import logging
 import datetime
+import time
 import json
 
 from google.appengine.api import memcache
@@ -8,6 +9,8 @@ from google.appengine.ext import db, webapp
 from google.appengine.ext.webapp import template
 
 import tba_config
+
+from base_controller import BaseHandler
 
 from models.event import Event
 from models.team import Team
@@ -24,16 +27,10 @@ def render_static(page):
     
     return html
 
-class ClearAwards(webapp.RequestHandler):
-    def get(self):
-        query = Award.all()
-        db.delete(query)
-
-class MainHandler(webapp.RequestHandler):
+class MainHandler(BaseHandler):
     def get(self):
         memcache_key = "main_index"
         html = memcache.get(memcache_key)
-        
         if html is None:
             upcoming_events = Event.all().filter("start_date >=", datetime.date.today() - datetime.timedelta(days=4))
             upcoming_events.order('start_date').fetch(20)
@@ -42,15 +39,12 @@ class MainHandler(webapp.RequestHandler):
             if upcoming_events.count() > 0:
                 first_start_date = upcoming_events[0].start_date            
                 upcoming_events = [e for e in upcoming_events if ((e.start_date - datetime.timedelta(days=6)) < first_start_date)]
-                event_type = "Upcoming Events"
+                kickoff_countdown = False
             else:
-                year = datetime.date.today().year
-                upcoming_events = Event.all().filter("year =", year)
-                upcoming_events.order('start_date').fetch(100)
-                event_type = "Events from %s" % year
+                kickoff_countdown = True
 
             template_values = {
-                "event_type": event_type,
+                "kickoff_countdown": kickoff_countdown,
                 "events": upcoming_events,
             }
             
@@ -60,23 +54,27 @@ class MainHandler(webapp.RequestHandler):
         
         self.response.out.write(html)
 
-class ContactHandler(webapp.RequestHandler):
+class ContactHandler(BaseHandler):
     def get(self):
         self.response.out.write(render_static("contact"))
 
-class HashtagsHandler(webapp.RequestHandler):
+class HashtagsHandler(BaseHandler):
     def get(self):
         self.response.out.write(render_static("hashtags"))
+        
+class AboutHandler(BaseHandler):
+    def get(self):
+        self.response.out.write(render_static("about"))
 
-class ThanksHandler(webapp.RequestHandler):
+class ThanksHandler(BaseHandler):
     def get(self):
         self.response.out.write(render_static("thanks"))
 
-class OprHandler(webapp.RequestHandler):
+class OprHandler(BaseHandler):
     def get(self):
         self.response.out.write(render_static("opr"))
 
-class SearchHandler(webapp.RequestHandler):
+class SearchHandler(BaseHandler):
     def get(self):
         try:
             q = self.request.get("q")
@@ -85,14 +83,28 @@ class SearchHandler(webapp.RequestHandler):
                 team_key_name = "frc%s" % q
                 team = Team.get_by_key_name(team_key_name)
                 if team:
-                    self.redirect(team.details_url())
+                    self.redirect(team.details_url)
                     return None
         except Exception, e:
             logging.warning("warning: %s" % e)
         finally:
             self.response.out.write(render_static("search"))
             
-class TypeaheadHandler(webapp.RequestHandler):
+class KickoffHandler(BaseHandler):
+    def get(self):
+        memcache_key = "main_kickoff"
+        html = memcache.get(memcache_key)
+        
+        if html is None:
+            template_values = {}
+            
+            path = os.path.join(os.path.dirname(__file__), '../templates/kickoff.html')
+            html = template.render(path, template_values)
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
+        
+        self.response.out.write(html)        
+            
+class TypeaheadHandler(BaseHandler):
     def get(self):
         # Currently just returns a list of all teams and events
         # Needs to be optimized at some point.
@@ -115,14 +127,24 @@ class TypeaheadHandler(webapp.RequestHandler):
 
             results = []
             for event in events:
-                results.append({'id': event.details_url(), 'name': '%s %s [%s]' % (event.year, event.name, event.event_short.upper())})
+                results.append({'id': event.key().name(), 'name': '%s %s [%s]' % (event.year, event.name, event.event_short.upper())})
             for team in teams:
-                results.append({'id': team.details_url(), 'name': '%s | %s' % (team.team_number, team.nickname)})
+                results.append({'id': team.team_number, 'name': '%s | %s' % (team.team_number, team.nickname)})
 
             if tba_config.CONFIG["memcache"]: memcache.set(typeahead_key, results, 86400)
         return results
 
-class PageNotFoundHandler(webapp.RequestHandler):
+class ChannelHandler(BaseHandler):
+    # This is required for the FB JSSDK
+    def get(self):
+        expires = 60*60*24*365
+        self.response.headers.add_header("Pragma", "public")
+        self.response.headers.add_header("Cache-Control", "max-age="+str(expires))
+        expires_date = time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(expires + time.time()))
+        self.response.headers.add_header("Expires", expires_date)
+        self.response.out.write('<script src="//connect.facebook.net/en_US/all.js"></script>')
+
+class PageNotFoundHandler(BaseHandler):
     def get(self):
         self.error(404)
         self.response.out.write(render_static("404"))

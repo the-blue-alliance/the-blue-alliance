@@ -94,24 +94,45 @@ class Match(db.Model):
     youtube_videos = db.StringListProperty() # list of Youtube IDs
     tba_videos = db.StringListProperty() # list of filetypes a TBA video exists for
     
+    def __init__(self, *args, **kw):
+        self._alliances = None
+        self._winning_alliance = None
+        super(Match, self).__init__(*args, **kw)
+    
+    @property
+    def alliances(self):
+        """
+        Lazy load alliances_json
+        """
+        if self._alliances is None:
+            self._alliances = json.loads(self.alliances_json)
+        return self._alliances
+
+    @property
+    def winning_alliance(self):
+        if self._winning_alliance is None:
+            highest_score = 0
+            for alliance in self.alliances:
+                if int(self.alliances[alliance]["score"]) > highest_score:
+                    highest_score = int(self.alliances[alliance]["score"])
+                    self._winning_alliance = alliance
+                elif int(self.alliances[alliance]["score"]) == highest_score:
+                    self._winning_alliance = ""
+        return self._winning_alliance
+
+    @property
     def event_key_name(self):
         return Match.event.get_value_for_datastore(self).name()
     
-    def get_key_name(self):
+    @property
+    def key_name(self):
         if self.comp_level == "qm":
-            return self.event_key_name() + '_qm' + str(self.match_number)
+            return self.event_key_name + '_qm' + str(self.match_number)
         else:
-            return (self.event_key_name() + '_' + self.comp_level +
+            return (self.event_key_name + '_' + self.comp_level +
                 str(self.set_number) + 'm' + str(self.match_number))
-    
-    def unpack_json(self):
-        """Turn that JSON into a dict."""
-        self.alliances = json.loads(self.alliances_json)
-        self.winning_alliance = self.get_winning_alliance()
-        # TODO: there's a way to do this lazily as soon as we try to access 
-        # something under .alliances., right? -gregmarra 17 Oct 2010
-        return ""
-    
+
+    @property
     def has_been_played(self):
         """If there are scores, it's been played"""
         for alliance in self.alliances:
@@ -119,26 +140,24 @@ class Match(db.Model):
                 return True
         return False
     
-    def get_winning_alliance(self):
-        highest_score = 0
-        winner = ""
-        for alliance in self.alliances:
-            if int(self.alliances[alliance]["score"]) > highest_score:
-                highest_score = int(self.alliances[alliance]["score"])
-                winner = alliance
-            elif int(self.alliances[alliance]["score"]) == highest_score:
-                winner = ""
-        return winner
-    
+    @property
     def verbose_name(self):
         if self.comp_level == "qm" or self.comp_level == "f":
             return "%s %s" % (self.COMP_LEVELS_VERBOSE[self.comp_level], self.match_number)
         else:
             return "%s %s Match %s" % (self.COMP_LEVELS_VERBOSE[self.comp_level], self.set_number, self.match_number)
     
+    @property
     def has_video(self):
         return (len(self.youtube_videos) + len(self.tba_videos)) > 0
     
+    @property
     def details_url(self):
-        return "/match/%s" % self.get_key_name()
+        return "/match/%s" % self.key_name
 
+    @classmethod
+    def getKeyName(self, event, comp_level, set_number, match_number):
+        if comp_level == "qm":
+            return "%s_qm%s" % (event.key_name, match_number)
+        else:
+            return "%s_%s%sm%s" % (event.key_name, comp_level, set_number, match_number)

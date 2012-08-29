@@ -1,52 +1,36 @@
 {% extends "base.html" %}
 
-{% block title %}{% if explicit_year %}{{year}} {% endif %}FIRST Robotics Events - The Blue Alliance{% endblock %}
+{% block title %}{% if explicit_year %}{{selected_year}} {% endif %}FIRST Robotics Events - The Blue Alliance{% endblock %}
 
-{% block meta_description %}FIRST Robotics Competition events{% if explicit_year %} from {{year}}{% endif %}.{% endblock %}
+{% block meta_description %}FIRST Robotics Competition events{% if explicit_year %} from {{selected_year}}{% endif %}.{% endblock %}
 
 {% block events_active %}active{% endblock %}
 
 {% block content %}
 <div class="container">
-	<h1 class="end_header">Events in {{year}}</h1>
+	<h1 class="end_header">{{ events|length }} Events in {{selected_year}}</h1>
 	  <div class="row">
 	  	<div class="span2 year_list">
-	  		<h2>Year</h2>
 			<div class="btn-group visible-phone">
 			  <a class="btn btn-large dropdown-toggle" data-toggle="dropdown" href="#">
-			    {{year}}
+			    {{selected_year}}
 			    <span class="caret"></span>
 			  </a>
 			  <ul class="dropdown-menu">
-			      <li><a href="/events/2012">2012</a></li>
-			      <li><a href="/events/2011">2011</a></li>
-			      <li><a href="/events/2010">2010</a></li>
-			      <li><a href="/events/2009">2009</a></li>
-			      <li><a href="/events/2008">2008</a></li>
-			      <li><a href="/events/2007">2007</a></li>
-			      <li><a href="/events/2006">2006</a></li>
-			      <li><a href="/events/2005">2005</a></li>
-			      <li><a href="/events/2004">2004</a></li>
-			      <li><a href="/events/2003">2003</a></li>
-			      <li><a href="/events/2002">2002</a></li>
+			      {% for year in valid_years %}
+                  <li><a href="/events/{{year}}">{{year}}</a></li>
+			      {% endfor %}
 			  </ul>
 			</div>
 	  		<ul class="nav nav-tabs nav-stacked hidden-phone">
-		      <li {% if year == 2012 %}class="active"{% endif %}><a href="/events/2012">2012</a></li>
-		      <li {% if year == 2011 %}class="active"{% endif %}><a href="/events/2011">2011</a></li>
-		      <li {% if year == 2010 %}class="active"{% endif %}><a href="/events/2010">2010</a></li>
-		      <li {% if year == 2009 %}class="active"{% endif %}><a href="/events/2009">2009</a></li>
-		      <li {% if year == 2008 %}class="active"{% endif %}><a href="/events/2008">2008</a></li>
-		      <li {% if year == 2007 %}class="active"{% endif %}><a href="/events/2007">2007</a></li>
-		      <li {% if year == 2006 %}class="active"{% endif %}><a href="/events/2006">2006</a></li>
-		      <li {% if year == 2005 %}class="active"{% endif %}><a href="/events/2005">2005</a></li>
-		      <li {% if year == 2004 %}class="active"{% endif %}><a href="/events/2004">2004</a></li>
-		      <li {% if year == 2003 %}class="active"{% endif %}><a href="/events/2003">2003</a></li>
-		      <li {% if year == 2002 %}class="active"{% endif %}><a href="/events/2002">2002</a></li>
+	            {% for year in valid_years %}
+                <li {% if selected_year == year %}class="active"{% endif %}><a href="/events/{{year}}">{{year}}</a></li>
+                {% endfor %}
 			</ul>
 	  	</div>
 		<div class="span10">
-			<h2>This Week's Events</h2>
+			{% if show_upcoming %}
+			<h2>Upcoming Events</h2>
 	        {% for event in upcoming_events %}
 				<a href="/event/{{event.key.name}}">
 				<div class="event_block">
@@ -65,7 +49,8 @@
 		        	<p>If you have an offseason event, <a href="/contact">tell us about it</a>!</p>
 	        	</div>
 	        {% endfor %}
-			<h2>Full Event List ({{ events|length }} Events)</h2>
+	        <h2>All Events</h2>
+	        {% endif %}
 			{% for event in events %}
 				<a href="/event/{{event.key.name}}">
 				<div class="event_block">

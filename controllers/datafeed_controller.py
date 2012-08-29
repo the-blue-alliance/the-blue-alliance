@@ -1,17 +1,18 @@
 import logging
 import os
 import datetime
+import json
 
 from google.appengine.api import taskqueue
 from google.appengine.ext import db, webapp
 from google.appengine.ext.webapp import template
 
-from datafeeds.datafeed_usfirst_events import DatafeedUsfirstEvents
-from datafeeds.datafeed_usfirst_matches import DatafeedUsfirstMatches
+from datafeeds.datafeed_tba import DatafeedTba
 from datafeeds.datafeed_usfirst_teams import DatafeedUsfirstTeams
 from datafeeds.datafeed_usfirst_teams2 import DatafeedUsfirstTeams2
 from datafeeds.datafeed_usfirst_awards import DatafeedUsfirstAwards
 from datafeeds.datafeed_tba_videos import DatafeedTbaVideos
+from datafeeds.datafeed_usfirst2 import DatafeedUsfirst2
 
 from helpers.event_helper import EventUpdater
 from helpers.match_helper import MatchUpdater
@@ -29,22 +30,22 @@ class TbaVideosGet(webapp.RequestHandler):
     Handles reading a TBA video listing page and updating the match objects in the datastore as needed.
     """
     def get(self, event_key):
-        df = DatafeedTbaVideos()
+        df = DatafeedTba()
         
         event = Event.get_by_key_name(event_key)
-        match_filetypes = df.getEventVideosList(event)
+        match_filetypes = df.getVideos(event)
         if match_filetypes:
             matches_to_put = []
             for match in event.match_set:
-                if match.tba_videos != match_filetypes.get(match.get_key_name(), []):
-                    match.tba_videos = match_filetypes.get(match.get_key_name(), [])
+                if match.tba_videos != match_filetypes.get(match.key_name, []):
+                    match.tba_videos = match_filetypes.get(match.key_name, [])
                     matches_to_put.append(match)
             
             db.put(matches_to_put)
             
             tbavideos = match_filetypes.items()
         else:
-            logging.info("No tbavideos found for event " + event.key().name())
+            logging.info("No tbavideos found for event " + event.key_name)
             tbavideos = []
         
         template_values = {
@@ -54,7 +55,7 @@ class TbaVideosGet(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/tba_videos_get.html')
         self.response.out.write(template.render(path, template_values))
 
-class TbaVideosGetEnqueue(webapp.RequestHandler):
+class TbaVideosEnqueue(webapp.RequestHandler):
     """
     Handles enqueing grabing tba_videos for Matches at individual Events.
     """
@@ -63,41 +64,29 @@ class TbaVideosGetEnqueue(webapp.RequestHandler):
 
         for event in events.fetch(5000):
             taskqueue.add(
-                url='/tasks/tba_videos_get/' + event.key().name(), 
+                url='/tasks/get/tba_videos/' + event.key_name, 
                 method='GET')
         
         template_values = {
             'event_count': Event.all().count(),
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/tba_videos_update_enqueue.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/tba_videos_enqueue.html')
         self.response.out.write(template.render(path, template_values))
 
-class UsfirstEventsInstantiate(webapp.RequestHandler):
+class UsfirstEventListGet(webapp.RequestHandler):
     """
     Handles reading the USFIRST event list.
     Enqueues a bunch of detailed reads that actually establish Event objects.
     """
-    def get(self):
-        df = DatafeedUsfirstEvents()
-        
-        try:
-            year = self.request.get("year")
-            if year == '':
-                year = 2012
-        except Exception, detail:
-            logging.error('Failed to get year value')
-        
-        # These are dicts with a first_eid
-        events = df.getEventList(year)
-        
-        #TODO: This is only doing Regional events, not Nats -gregmarra 4 Dec 2010
+    def get(self, year):
+        df = DatafeedUsfirst2()
+        events = df.getEventList(int(year))
         
         for event in events:
-            logging.info("Event with eid: " + str(event.get("first_eid", 0)))
             taskqueue.add(
                 queue_name='usfirst',
-                url='/tasks/usfirst_event_get/%s/%s' % (event.get("first_eid", 0), year),
+                url='/tasks/get/usfirst_event_details/%s/%s' % (year, event.first_eid),
                 method='GET')
         
         template_values = {
@@ -105,29 +94,22 @@ class UsfirstEventsInstantiate(webapp.RequestHandler):
             'year': year
         }
         
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_events_instantiate.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_list_get.html')
         self.response.out.write(template.render(path, template_values))
 
-class UsfirstEventGetEnqueue(webapp.RequestHandler):
+class UsfirstEventDetailsEnqueue(webapp.RequestHandler):
     """
     Handles enqueing updates to individual USFIRST events.
     """
-    def get(self):
-        try:
-            year = self.request.get("year")
-            if year == '':
-                year = 2012
-        except Exception, detail:
-            logging.error('Failed to get year value')
-        
+    def get(self, year):
         events = Event.all()
         events.filter('first_eid != ', None) # Official events with EIDs
-        events.filter('year =', year)
+        events.filter('year =', int(year))
         
         for event in events.fetch(100):
             taskqueue.add(
                 queue_name='usfirst',
-                url='/tasks/usfirst_event_get/%s/%s' % (event.first_eid, year),
+                url='/tasks/get/usfirst_event_details/%s/%s' % (year, event.first_eid),
                 method='GET')
         
         template_values = {
@@ -135,45 +117,41 @@ class UsfirstEventGetEnqueue(webapp.RequestHandler):
             'year': year,
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_events_get_enqueue.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_events_details_enqueue.html')
         self.response.out.write(template.render(path, template_values))
 
 
-class UsfirstEventGet(webapp.RequestHandler):
+class UsfirstEventDetailsGet(webapp.RequestHandler):
     """
     Handles reading a USFIRST event page and creating or updating the model as needed.
     Includes registered Teams.
     """
-    def get(self, first_eid, year):
-        datafeed = DatafeedUsfirstEvents()
-        
-        event = datafeed.getEvent(first_eid, year)
+    def get(self, year, first_eid):
+        datafeed = DatafeedUsfirst2()
+
+        event = datafeed.getEventDetails(int(year), first_eid)
         event = EventUpdater.createOrUpdate(event)
         
-        team_dicts = datafeed.getEventRegistration(first_eid, year)
-        teams = Team.get_by_key_name(["frc" + team_dict["number"] for team_dict in team_dicts])
+        new_teams = datafeed.getEventTeams(int(year), first_eid)
+        old_teams = Team.get_by_key_name([new_team.key().name() for new_team in new_teams])
         
-        for team_dict, team in zip(team_dicts, teams):
+        for new_team, team in zip(new_teams, old_teams):
             if team is None:
-                team = Team(
-                    team_number = int(team_dict["number"]),
-                    first_tpid = int(team_dict["tpid"]),
-                    key_name = "frc" + str(team_dict["number"])
-                )
+                team = new_team
                 team.put()
             
             et = EventTeam.get_or_insert(
-                key_name = event.key().name() + "_" + team.key().name(),
+                key_name = event.key_name + "_" + team.key().name(),
                 event = event,
                 team = team
             )
         
         template_values = {
             'event': event,
-            'eventteams_count': len(team_dicts),
+            'eventteams_count': len(new_teams),
         }
         
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_get.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_details_get.html')
         self.response.out.write(template.render(path, template_values))
 
 class UsfirstAwardsGetEnqueue(webapp.RequestHandler):
@@ -235,32 +213,31 @@ class UsfirstAwardsGet(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
 
 
-class UsfirstMatchesGetEnqueue(webapp.RequestHandler):
+class UsfirstMatchesEnqueue(webapp.RequestHandler):
     """
     Handles enqueing getting match results for USFIRST events.
     """
-    def get(self):
-        events = Event.all()
-        events = events.filter('official =', True)
+    def get(self, when):
+        events = Event.all().filter('official =', True)
         
-        if self.request.get('now', None) is not None:
+        if when == "now":
             events = events.filter('end_date <=', datetime.date.today() + datetime.timedelta(days=4))
             events = events.filter('end_date >=', datetime.date.today() - datetime.timedelta(days=1))
         else:
-            events = events.filter('year =', int(self.request.get('year')))
+            events = events.filter('year =', int(when))
         
         events = events.fetch(500)
         for event in events:
             taskqueue.add(
                 queue_name='usfirst',
-                url='/tasks/usfirst_matches_get/' + event.key().name(),
+                url='/tasks/get/usfirst_matches/' + event.key().name(),
                 method='GET')
         
         template_values = {
             'events': events,
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_matches_get_enqueue.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_matches_enqueue.html')
         self.response.out.write(template.render(path, template_values))
 
 
@@ -269,11 +246,11 @@ class UsfirstMatchesGet(webapp.RequestHandler):
     Handles reading a USFIRST match results page and updating the datastore as needed.
     """
     def get(self, event_key):
-        df = DatafeedUsfirstMatches()
+        df = DatafeedUsfirst2()
         mu = MatchUpdater()
         
         event = Event.get_by_key_name(event_key)
-        matches = df.getMatchResultsList(event)
+        matches = df.getMatches(event)
         
         new_matches = list()
         if matches is not None:
@@ -292,17 +269,64 @@ class UsfirstMatchesGet(webapp.RequestHandler):
         
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_matches_get.html')
         self.response.out.write(template.render(path, template_values))
+        
+        
+class UsfirstEventRankingsEnqueue(webapp.RequestHandler):
+    """
+    Handles enqueing getting rankings for USFIRST events.
+    """
+    def get(self, when):
+        events = Event.all()
+        events = events.filter('official =', True)
+        
+        if when == "now":
+            events = events.filter('end_date <=', datetime.date.today() + datetime.timedelta(days=4))
+            events = events.filter('end_date >=', datetime.date.today() - datetime.timedelta(days=1))
+        else:
+            events = events.filter('year =', int(when))
+        
+        events = events.fetch(500)
+        for event in events:
+            taskqueue.add(
+                queue_name='usfirst',
+                url='/tasks/get/usfirst_event_rankings/' + event.key().name(),
+                method='GET')
+        
+        template_values = {
+            'events': events,
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_rankings_enqueue.html')
+        self.response.out.write(template.render(path, template_values))
 
 
-class UsfirstTeamsInstantiate(webapp.RequestHandler):
+class UsfirstEventRankingsGet(webapp.RequestHandler):
+    """
+    Handles reading a USFIRST ranking page and updating the datastore as needed.
+    """
+    def get(self, event_key):
+        df = DatafeedUsfirst2()
+        
+        event = Event.get_by_key_name(event_key)
+        rankings = df.getEventRankings(event)
+        event.rankings_json = json.dumps(rankings)
+        db.put(event)
+
+        template_values = {'rankings': rankings,
+                           'event_name': event.key_name}
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_rankings_get.html')
+        self.response.out.write(template.render(path, template_values))
+
+
+class UsfirstTeamsTpidsGet(webapp.RequestHandler):
     """
     A run-as-needed function that instantiates new Team objects based on 
     FIRST's full team list.
     """
-    def get(self):
+    def get(self, year):
         df = DatafeedUsfirstTeams()
         skip = 0
-        year = 2012
         
         try:
             skip = self.request.get("skip")
@@ -311,15 +335,8 @@ class UsfirstTeamsInstantiate(webapp.RequestHandler):
         except Exception, detail:
             logging.error('Failed to get skip value')
         
-        try:
-            year = self.request.get("year")
-            if year == '':
-                year = 2012
-        except Exception, detail:
-            logging.error('Failed to get year value')
-        
         logging.info("YEAR: %s", year)
-        df.instantiateTeams(skip, year)
+        df.getTeamsTpids(int(year), skip)
         
         team_count = Team.all().count()
         
@@ -327,40 +344,39 @@ class UsfirstTeamsInstantiate(webapp.RequestHandler):
             'team_count': team_count
         }
         
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_teams_instantiate.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/get/usfirst_teams_tpids.html')
         self.response.out.write(template.render(path, template_values))
 
 
-class UsfirstTeamGetEnqueue(webapp.RequestHandler):
+class UsfirstTeamDetailsEnqueue(webapp.RequestHandler):
     """
     Handles enqueing updates to individual USFIRST teams.
     """
     def get(self):
-        
         offset = int(self.request.get("offset", 0))
         
         teams = Team.all(keys_only=True).fetch(1000, int(offset))
         for team_key in teams:
             taskqueue.add(
                 queue_name='usfirst',
-                url='/tasks/usfirst_team_get/' + team_key.name(),
+                url='/tasks/get/usfirst_team_details/' + team_key.name(),
                 method='GET')
-                          
+        
+        # FIXME omg we're just writing out? -gregmarra 2012 Aug 26
         self.response.out.write("%s team gets have been enqueued offset from %s.<br />" %(len(teams), offset))
         self.response.out.write("Reload with ?offset=%s to enqueue more." % (offset + len(teams)))
 
 
-class UsfirstTeamGet(webapp.RequestHandler):
+class UsfirstTeamDetailsGet(webapp.RequestHandler):
     """
     Handles reading a USFIRST team information page and updating the
     model accordingly.
     """
     def get(self, key_name):
-        df = DatafeedUsfirstTeams()
+        df = DatafeedUsfirst2()
         
         logging.info("Updating team %s" % key_name)
         team = df.getTeamDetails(key_name[3:])
-        logging.info(team)
         if team:
             team = TeamUpdater.createOrUpdate(team)
             success = True
@@ -372,25 +388,25 @@ class UsfirstTeamGet(webapp.RequestHandler):
             'success': success,
         }
         
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_team_get.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_team_details_get.html')
         self.response.out.write(template.render(path, template_values))
 
 
-class UsfirstTeamsFastGet(webapp.RequestHandler):
+class FmsTeamListGet(webapp.RequestHandler):
     """
     Fetch basic data about all current season teams at once.
     Doesn't get tpids or full data.
     """
     def get(self):
-        df = DatafeedUsfirstTeams2()
-        teams = TeamHelper.convertDictsToModels(df.getAllCurrentSeasonTeams())
-        teams = TeamUpdater.bulkCreateOrUpdate(teams)
+        df = DatafeedUsfirst2()
+        teams = df.getFmsTeamList()
+        TeamUpdater.bulkCreateOrUpdate(teams)
         
         template_values = {
             "teams": teams
         }
         
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_teams_get.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fms_team_list_get.html')
         self.response.out.write(template.render(path, template_values))
         
 
@@ -412,7 +428,7 @@ class OprGetEnqueue(webapp.RequestHandler):
         
         for event in events:
             taskqueue.add(
-                url='/tasks/event_opr_get/' + event.get_key_name(),
+                url='/tasks/event_opr_get/' + event.key_name,
                 method='GET')
         
         template_values = {

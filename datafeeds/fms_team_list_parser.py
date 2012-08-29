@@ -1,28 +1,18 @@
 import logging
 
-from google.appengine.api import urlfetch
-
 from BeautifulSoup import BeautifulSoup
 
-class DatafeedUsfirstTeams2(object):
+from datafeeds.parser_base import ParserBase
+
+class FmsTeamListParser(ParserBase):
     """
     Facilitates getting information about Teams from USFIRST.
     Reads from FMS data pages, which are mostly tab delimited files wrapped in some HTML.
     Note, this doesn't get team websites.
     """
     
-    TEAMLIST_URL = "https://my.usfirst.org/frc/scoring/index.lasso?page=teamlist"
-    
-    def getAllCurrentSeasonTeams(self):
-        result = urlfetch.fetch(self.TEAMLIST_URL)
-        if result.status_code == 200:
-            return self._parseHtml(result.content)
-        else:
-            logging.error('Unable to retreive url: %s' % url)
-            return None
-    
-    
-    def _parseHtml(self, html):
+    @classmethod
+    def parse(self, html):
         """
         Parse the information table on USFIRSTs site to extract team information.
         Return a list of dictionaries of team data.

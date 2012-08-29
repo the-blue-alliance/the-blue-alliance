@@ -28,7 +28,7 @@
 	<p><a href="/teams"><i class="icon-chevron-left"></i> Team List</a></p>
 	<div class="row">
 		<div class="span8">
-			<table class="table table-striped table-condensed">
+			<table class="info-table table table-striped table-condensed">
 		  		<tbody>
 		            {% if team.name %}<tr>
 		                <th>Full Name</th>
@@ -43,7 +43,7 @@
 		                <td>{{ team.rookie_year }}</td>
 		            </tr>{% endif %}
 		            <tr>
-		            	<th>Hashtag <a href="/hashtags" class="help-link" title="What are hashtags?">?</a></th>
+		            	<th>Hashtag <a href="/hashtags" class="help-link" rel="tooltip" title="Learn more about hashtags">?</a></th>
 		            	<td><strong>#frc{{ team.team_number }}</strong> - Search
 		            		<a class="hashtag-link hashtag-twitter" href="https://twitter.com/search/%23frc{{ team.team_number }}" target="_blank" title="Search Twitter">Twitter</a>,
 		            		<a class="hashtag-link hashtag-youtube" href="http://www.youtube.com/results?search_query=%23frc{{ team.team_number }}+OR+%22team+{{ team.team_number }}%22" target="_blank" title="Search YouTube">YouTube</a>,
