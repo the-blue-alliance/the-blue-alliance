@@ -44,6 +44,7 @@ handlers:
 
 skip_files:
 - ^(.*/)?.*\.less.*
+- /.git/*
 - /test_data/*
 - /tests/*
 - /utils/*
