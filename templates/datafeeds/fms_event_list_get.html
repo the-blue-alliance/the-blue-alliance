@@ -1,0 +1,6 @@
+<h1>Got some events</h1>
+<ul>
+{% for event in events %}
+<li>{{event.first_eid}}, {{event.name}}, {{event.location}}, {{event.start_date}}</li>
+{% endfor %}
+</ul>
