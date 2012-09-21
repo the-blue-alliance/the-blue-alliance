@@ -10,11 +10,12 @@ from controllers.datafeed_controller import UsfirstEventDetailsEnqueue, UsfirstE
 from controllers.datafeed_controller import UsfirstMatchesEnqueue, UsfirstMatchesGet, UsfirstEventRankingsEnqueue, UsfirstEventRankingsGet
 from controllers.datafeed_controller import UsfirstTeamGetEnqueue, UsfirstTeamGet, UsfirstTeamsInstantiate
 
-from controllers.datafeed_controller import OprGet, OprGetEnqueue
-
 from controllers.cron_controller import EventTeamUpdate, EventTeamUpdateEnqueue
+from controllers.cron_controller import EventOprDo, EventOprEnqueue
 
-app = webapp2.WSGIApplication([('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
+app = webapp2.WSGIApplication([('/math/enqueue/event_opr/(.*)', EventOprEnqueue),
+                               ('/math/do/event_opr/(.*)', EventOprDo),
+                               ('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
                                ('/tasks/enqueue/usfirst_event_details/([0-9]*)', UsfirstEventDetailsEnqueue),
                                ('/tasks/enqueue/usfirst_event_rankings/(.*)', UsfirstEventRankingsEnqueue),
                                ('/tasks/enqueue/usfirst_matches/(.*)', UsfirstMatchesEnqueue),
@@ -29,7 +30,5 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
                                ('/tasks/get/usfirst_teams_tpids/([0-9]*)', UsfirstTeamsTpidsGet),
                                ('/tasks/eventteam_update_enqueue', EventTeamUpdateEnqueue),
                                ('/tasks/eventteam_update/(.*)', EventTeamUpdate),
-                               ('/tasks/event_opr_get_enqueue', OprGetEnqueue),
-                               ('/tasks/event_opr_get/(.*)', OprGet)
                                ],
                               debug=tba_config.DEBUG)

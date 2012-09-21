@@ -80,3 +80,58 @@ class EventTeamUpdateEnqueue(webapp.RequestHandler):
         
         path = os.path.join(os.path.dirname(__file__), '../templates/cron/eventteam_update_enqueue.html')
         self.response.out.write(template.render(path, template_values))
+
+class EventOprDo(webapp.RequestHandler):
+    """
+    Calculates the opr for an event
+    """
+    def get(self, event_key):
+        opr = []
+        teams = []
+        oprs = []
+        event = Event.get_by_key_name(event_key)
+        if event.match_set.count() > 0:
+            try:
+                opr,teams = OprHelper.opr(event_key)
+                oprs.append((opr,teams))
+                event.oprs = opr
+                event.opr_teams = teams
+                event.put()
+            except Exception, e:
+                logging.error("OPR error on event %s. %s" % (event_key, e))
+
+        template_values = {
+            'oprs': oprs,
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/math/event_opr_do.html')
+        self.response.out.write(template.render(path, template_values))
+
+    def post(self):
+        self.get()
+
+class EventOprEnqueue(webapp.RequestHandler):
+    """
+    Enqueues OPR calculation
+    """
+    def get(self, when):
+        if when == "now":
+            events = events.filter('end_date <=', datetime.date.today() + datetime.timedelta(days=4))
+            events = events.filter('end_date >=', datetime.date.today() - datetime.timedelta(days=1))
+        else:
+            events = events.filter('year =', int(when))
+        
+        events = events.fetch(500)
+        
+        for event in events:
+            taskqueue.add(
+                url='/math/do/event_opr/' + event.key_name,
+                method='GET')
+        
+        template_values = {
+            'event_count': events.count(),
+            'year': year
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/math/event_opr_enqueue.html')
+        self.response.out.write(template.render(path, template_values))
