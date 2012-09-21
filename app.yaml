@@ -44,9 +44,9 @@ handlers:
 
 skip_files:
 - ^(.*/)?.*\.less.*
-- /.git/*
-- /test_data/*
-- /tests/*
-- /utils/*
+- .git/*
+- test_data/*
+- tests/*
+- utils/*
 - run_tests.py
 - pavement.py
