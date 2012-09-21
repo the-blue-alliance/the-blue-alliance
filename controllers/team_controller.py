@@ -78,13 +78,15 @@ class TeamDetail(BaseHandler):
             if not team:
                 return self.redirect("/error/404")
             
-            events = [a.event for a in team.events if a.year == year]
+            team_events = [e for e in team.events]
+
+            events = [a.event for a in team_events if a.year == year]
             for event in events:
                 if not event.start_date:
                     event.start_date = datetime.datetime(year, 12, 31) #unknown goes last
             events = sorted(events, key=lambda event: event.start_date)
             
-            years = sorted(set([a.year for a in team.events if a.year != None]))
+            years = sorted(set([a.year for a in team_events if a.year != None]))
             
             participation = list()
             
