@@ -39,6 +39,20 @@ class EventUpdater(object):
     Helper class to handle Event objects when we are not sure whether they
     already exist or not.
     """
+
+    @classmethod
+    def bulkCreateOrUpdate(self, new_events):
+        put_events = []
+
+        while len(new_events) > 0:
+            event_batch = new_events[-500:] # the last 500 items (or all of them)
+            new_events = new_events[:-500] # everything but the last 500 items (or nothing)
+
+            old_events = Event.get_by_key_name([event.key().name() for event in event_batch])
+            events_to_put = [self.updateMerge(new_event, old_event) for (new_event, old_event) in zip(event_batch, old_events)]
+            db.put(events_to_put)
+            put_events.extend(events_to_put)
+        return put_events
     
     @classmethod
     def createOrUpdate(self, new_event):

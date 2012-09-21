@@ -7,6 +7,7 @@ from google.appengine.api import taskqueue
 from google.appengine.ext import db, webapp
 from google.appengine.ext.webapp import template
 
+from datafeeds.datafeed_fms import DatafeedFms
 from datafeeds.datafeed_tba import DatafeedTba
 from datafeeds.datafeed_usfirst_teams import DatafeedUsfirstTeams
 from datafeeds.datafeed_usfirst_teams2 import DatafeedUsfirstTeams2
@@ -337,7 +338,7 @@ class FmsTeamListGet(webapp.RequestHandler):
     Doesn't get tpids or full data.
     """
     def get(self):
-        df = DatafeedUsfirst2()
+        df = DatafeedFms()
         teams = df.getFmsTeamList()
         TeamUpdater.bulkCreateOrUpdate(teams)
         
@@ -347,4 +348,27 @@ class FmsTeamListGet(webapp.RequestHandler):
         
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fms_team_list_get.html')
         self.response.out.write(template.render(path, template_values))
+
+
+class FmsEventListGet(webapp.RequestHandler):
+    """
+    Fetch basic data about all current season events at once.
+    """
+    def get(self):
+        df = DatafeedFms()
+        events = df.getFmsEventList()
+
+        # filter if first_eid is too high, meaning its a Championship Division
+        # (we manually add these due to naming issues)
+        events = filter(lambda e: int(e.first_eid) < 100000, events)
+        
+        events = EventUpdater.bulkCreateOrUpdate(events)
+
+        template_values = {
+            "events": events
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fms_event_list_get.html')
+        self.response.out.write(template.render(path, template_values))
+
         

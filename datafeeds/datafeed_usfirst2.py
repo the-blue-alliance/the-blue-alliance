@@ -6,7 +6,6 @@ from google.appengine.api import urlfetch
 from helpers.team_helper import TeamTpidHelper
 
 from datafeeds.datafeed_base import DatafeedBase
-from datafeeds.fms_team_list_parser import FmsTeamListParser
 from datafeeds.usfirst_event_details_parser import UsfirstEventDetailsParser
 from datafeeds.usfirst_event_list_parser import UsfirstEventListParser
 from datafeeds.usfirst_event_rankings_parser import UsfirstEventRankingsParser
@@ -30,9 +29,6 @@ class DatafeedUsfirst2(DatafeedBase):
         "gal": "Galileo",
         "new": "Newton",
     }
-
-    # Raw fast teamlist, no tpids
-    FMS_TEAM_LIST_URL = "https://my.usfirst.org/frc/scoring/index.lasso?page=teamlist"
 
     MATCH_RESULTS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/matchresults.html" # % (year, event_short)
     MATCH_SCHEDULE_QUAL_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/schedulequal.html"
@@ -173,16 +169,3 @@ class DatafeedUsfirst2(DatafeedBase):
         # FIXME: This is not proper Datafeed form. -gregmarra 2012 Aug 26
         # TeamTpidHelper actually creates Team objects.
         TeamTpidHelper.scrapeTpid(self.TEAM_NUMBER_IMPOSSIBLY_HIGH, skip, year)
-
-    def getFmsTeamList(self):
-        teams = self.parse(self.FMS_TEAM_LIST_URL, FmsTeamListParser)
-
-        return [Team(
-            key_name = "frc%s" % team.get("team_number", None),
-            address = team.get("address", None),
-            name = self._shorten(team.get("name", None)),
-            nickname = self._shorten(team.get("nickname", None)),
-            short_name = self._shorten(team.get("short_name", None)),
-            team_number = team.get("team_number", None)
-            )
-            for team in teams]

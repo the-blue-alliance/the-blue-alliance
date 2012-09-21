@@ -111,7 +111,7 @@ class TeamUpdater(object):
             old_teams = Team.get_by_key_name([team.key().name() for team in team_batch])
             teams_to_put = [self.updateMerge(new_team, old_team) for (new_team, old_team) in zip(team_batch, old_teams)]
             db.put(teams_to_put)
-            put_teams.append(teams_to_put)
+            put_teams.extend(teams_to_put)
         return put_teams
 
     @classmethod
