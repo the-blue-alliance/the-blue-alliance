@@ -7,7 +7,7 @@ from google.appengine.ext.webapp import template
 
 from models.event import Event
 from models.match import Match
-from helpers.match_helper import MatchUpdater
+from helpers.match_manipulator import MatchManipulator
 
 class AdminMatchCleanup(webapp.RequestHandler):
     """
@@ -117,8 +117,6 @@ class AdminMatchEdit(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
     
     def post(self, match_key):        
-        logging.info(self.request)
-        
         alliances_json = self.request.get("alliances_json")
         alliances = json.loads(alliances_json)
         team_key_names = list()
@@ -137,6 +135,6 @@ class AdminMatchEdit(webapp.RequestHandler):
             alliances_json = alliances_json,
             #no_auto_update = str(self.request.get("no_auto_update")).lower() == "true", #TODO
         )
-        match = MatchUpdater.createOrUpdate(match)
+        match = MatchManipulator.createOrUpdate(match)
         
         self.redirect("/admin/match/" + match.key_name())

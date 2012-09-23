@@ -12,7 +12,7 @@ from datafeeds.datafeed_tba import DatafeedTba
 from datafeeds.datafeed_usfirst import DatafeedUsfirst
 
 from helpers.event_helper import EventUpdater
-from helpers.match_helper import MatchUpdater
+from helpers.match_manipulator import MatchManipulator
 from helpers.team_helper import TeamHelper, TeamTpidHelper
 from helpers.team_manipulator import TeamManipulator
 from helpers.opr_helper import OprHelper
@@ -229,22 +229,10 @@ class UsfirstMatchesGet(webapp.RequestHandler):
     """
     def get(self, event_key):
         df = DatafeedUsfirst()
-        mu = MatchUpdater()
         
         event = Event.get_by_key_name(event_key)
-        matches = df.getMatches(event)
-        
-        new_matches = list()
-        if matches is not None:
-            mu.bulkRead(matches)
-            for match in matches:
-                new_match = mu.findOrSpawnWithCache(match) # findOrSpawn doesn't put() things.
-                new_matches.append(new_match)
-            
-            keys = db.put(new_matches) # Doing a bulk put() is faster than individually.
-        else:
-            logging.info("No matches found for event " + str(event.year) + " " + str(event.name))
-        
+        new_matches = MatchManipulator.createOrUpdate(df.getMatches(event))
+
         template_values = {
             'matches': new_matches,
         }
