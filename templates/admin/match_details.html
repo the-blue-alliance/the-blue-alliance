@@ -1,12 +1,16 @@
 {% extends "base.html" %}
 
-{% block title %}{{match.key.name}} - TBA Admin{% endblock %}
+{% block title %}{{match.key_name}}{% endblock %}
 
 {% block content %}
 
 <h1>{{match.key.name}}</h1>
-<p><a href="/admin/match/edit/{{match.key.name}}">edit</a></p>
-<table>
+
+<p>
+    <a href="/admin/match/edit/{{match.key_name}}" class="btn btn-primary"><i class="icon-edit icon-white"></i> Edit Match</a>
+</p>
+
+<table class="table table-striped table-hover">
     <tr>
         <td>Event</td>
         <td><a href="/event/{{match.event.key.name}}">{{ match.event.year }} {{ match.event.name }}</a></td>
@@ -19,17 +23,18 @@
         <td>Team Key Names</td>
         <td>{{ match.team_key_names }}</td>
     </tr>
-    
     <tr>
         <td>Alliances JSON</td>
         <td>{{ match.alliances_json }}</td>
     </tr>
-    
+    <tr>
+        <td>TBA Videos</td>
+        <td>{{ match.tba_videos }}</td>
+    </tr>
     <tr>
         <td>Youtube Videos</td>
         <td>{{ match.youtube_videos }}</td>
     </tr>
-    
 </table>
 
 {% endblock %}

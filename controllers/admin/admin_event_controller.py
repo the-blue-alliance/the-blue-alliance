@@ -4,7 +4,7 @@ import logging
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
-from helpers.event_helper import EventManipulator
+from helpers.event_manipulator import EventManipulator
 from models.event import Event
 
 class AdminEventList(webapp.RequestHandler):

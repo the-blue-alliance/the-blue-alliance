@@ -1,43 +1,88 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <title>{% block title %}The Blue Alliance Admin{% endblock %}</title>
-    <link rel="icon" href="/images/admin_favicon.ico" type="image/x-icon" />
-    <link rel="stylesheet" href="/css/admin.css" type="text/css" />
-    <!-- TODO: ga.js -->
-</head>
-<body>
-    <div id="wrapper">
-        <div id="header">
-            <div id="login">
-                {% if user %}
-                    {{user.email}} | <a href="/admin/logout">log out</a>
-                {% else %}
-                    <a href="/admin/login">log in</a>
-                {% endif %}
-            </div>
-            <div id="titles">
-                <h1><a href="/admin/">TBA Admin</a></h1>
-                <h2>Like the WWF, but for smart people.</h2>
-            </div>
-            <div id="nav">
-                <ul>
-                    <li><a href="/admin/">Home</a></li>
-                    <li><a href="/admin/team/">Teams</a></li>
-                    <li><a href="/admin/event/">Events</a></li>
-                    <li><a href="/admin/match/">Matches</a></li>
-                    <li><a href="/admin/video/">Videos</a></li>
-                    <li><a href="/admin/memcache/">Memcache</a></li>
-                </ul>
-            </div>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}Somewhere!{% endblock %} - TBA Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Admin Console for The Blue Alliance">
+
+    <!-- Le styles -->
+    <link href="/css/style.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+      .sidebar-nav {
+        padding: 9px 0;
+      }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="/images/admin_favicon.ico">
+
+    <!-- Le javascript
+    ================================================== -->
+    <script src="/javascript/jquery.min.js"></script>
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/admin/">TBA Admin</a>
+          <div class="nav-collapse collapse">
+            <p class="navbar-text pull-right">
+              Logged in as <a href="#" class="navbar-link">{{ user.nickname }}</a>
+            </p>
+            <ul class="nav">
+              <li class="active"><a href="/admin/">Home</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
         </div>
-        <div id="content">
-            {% block content %}{% endblock %}
-        </div>
-        <div id="footer">
-            <p>TBA Admin Console.</p>
-        </div>
+      </div>
     </div>
-</body>
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span3">
+          <div class="well sidebar-nav">
+            <ul class="nav nav-list">
+              <li class="nav-header">Events</li>
+              <li><a href="/admin/events">View all</a></li>
+              <li class="nav-header">Matches</li>
+              <li><a href="/admin/matches">Edit</a></li>
+              <li><a href="/admin/match/cleanup">Cleanup</a></li>
+              <li class="nav-header">Videos</li>
+              <li><a href="/admin/videos/add">Add YouTube Videos</a></li>
+              <li class="nav-header">Teams</li>
+              <li><a href="/admin/teams">View all (slowwww)</a></li>
+              <li class="nav-header">Memcache</li>
+              <li><a href="/admin/memcache">Stats + Flushing</a></li>
+            </ul>
+          </div><!--/.well -->
+        </div><!--/span-->
+        <div class="span9">
+          {% block content %}{% endblock %}
+        </div>
+      </div>
+
+      <hr>
+
+      <footer>
+        <p>Go back to <a href="/">The Blue Alliance</a>. Like the WWF, but for smart people.</p>
+      </footer>
+
+    </div><!--/.fluid-container-->
+  </body>
 </html>

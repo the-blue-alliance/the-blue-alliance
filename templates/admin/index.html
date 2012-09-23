@@ -1,9 +1,27 @@
 {% extends "base.html" %}
 
-{% block title %}TBA Admin - Home{% endblock %}
+{% block title %}Home{% endblock %}
 
 {% block content %}
 
-<p>Hey, what's up?</p>
+<div class="hero-unit">
+    <h1>Hello, admin!</h1>
+    <p>Welcome to the administrative area of The Blue Alliance</p>
+    <p>Don't forget about the <a href="/admin/debug">debug page</a> for simpler tasks</p>
+</div>
+<div class="row-fluid">
+    <div class="span4">
+        <h2>Data Mutation</h2>
+        <p>Generally speaking, you can mutate data here. Be careful, it's all live!</p>
+    </div><!--/span-->
+    <div class="span4">
+        <h2>Stats</h2>
+        <p>It'd be nice if there were some stats, eh?</p>
+    </div><!--/span-->
+    <div class="span4">
+        <h2>Users</h2>
+        <p>Eventually this will support Facebook login, and dishing out user roles will be easy. Not yet!</p>
+    </div>
+</div>
 
 {% endblock %}

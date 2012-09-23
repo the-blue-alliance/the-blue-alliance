@@ -1,16 +1,35 @@
 {% extends "base.html" %}
 
-{% block title %}TBA Admin - Memcache Management{% endblock %}
+{% block title %}Memcache{% endblock %}
 
 {% block content %}
 
-<p><strong>Memcache Stats:</strong></p>
+<h1>Memcache</h1>
+
+{% if flushed %}
+<div class="alert">
+    <strong>Flushed:</strong> {{ flushed }}
+</div>
+{% endif %}
+
+<h2>Stats</h2>
 <p>{{ memcache_stats }}</p>
 
-<ul><strong>Admin Memcache</strong>:
-    <li><a href="/admin/memcache/flush?all=true">Flush All Memcache</a></li>
-</ul>
+<h2>Flush Memcache</h2>
 
-<p>flush?key=keyname to flush a single key</p>
+<form class="form-inline" action="/admin/memcache" method="post">
+    <legend>Flush one key</legend>
+    <div class="input-append">
+        <input class="span12" size="16" name="memcache_key" type="text" placeholder="memcache_key" />
+        <button class="btn btn-danger" type="submit"><i class="icon-trash icon-white"></i> Flush</button>
+    </div>
+</form>
+
+<h3>Scary!!!</h3>
+<form action="/admin/memcache" method="post">
+    <legend>Flush all memcache</legend>
+    <input name="all_keys" value="all_keys" type="hidden" />
+    <button class="btn btn-danger" type="submit"><i class="icon-trash icon-white"></i> Flush All Memcache</button>
+</form>
 
 {% endblock %}

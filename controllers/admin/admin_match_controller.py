@@ -65,42 +65,7 @@ class AdminMatchDetail(webapp.RequestHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_details.html')
         self.response.out.write(template.render(path, template_values))
-        
-class AdminMatchAddVideos(webapp.RequestHandler):
-    """
-    Add a lot of youtube_videos to Matches at once.
-    """
-    def get(self):
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_videosadd.html')
-        self.response.out.write(template.render(path, {}))
-        
-    def post(self):
-        logging.info(self.request)
-        
-        additions = json.loads(self.request.get("youtube_additions_json"))
-        match_keys, youtube_videos = zip(*additions["videos"])
-        matches = Match.get_by_key_name(match_keys)
-        
-        matches_to_put = []
-        results = {"existing": [], "bad_match": [], "added": []}
-        for (match, match_key, youtube_video) in zip(matches, match_keys, youtube_videos):
-            if match:
-                if youtube_video not in match.youtube_videos:
-                    match.youtube_videos.append(youtube_video)
-                    matches_to_put.append(match)
-                    results["added"].append(match_key)
-                else:
-                    results["existing"].append(match_key)
-            else:
-                results["bad_match"].append(match_key)
-        db.put(matches_to_put)
-        
-        template_values = {
-            "results": results,
-        }
-        
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_videosadd.html')
-        self.response.out.write(template.render(path, template_values))
+
 
 class AdminMatchEdit(webapp.RequestHandler):
     """
@@ -138,3 +103,39 @@ class AdminMatchEdit(webapp.RequestHandler):
         match = MatchManipulator.createOrUpdate(match)
         
         self.redirect("/admin/match/" + match.key_name())
+
+class AdminVideosAdd(webapp.RequestHandler):
+    """
+    Add a lot of youtube_videos to Matches at once.
+    """
+    def get(self):
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/videos_add.html')
+        self.response.out.write(template.render(path, {}))
+        
+    def post(self):
+        logging.info(self.request)
+        
+        additions = json.loads(self.request.get("youtube_additions_json"))
+        match_keys, youtube_videos = zip(*additions["videos"])
+        matches = Match.get_by_key_name(match_keys)
+        
+        matches_to_put = []
+        results = {"existing": [], "bad_match": [], "added": []}
+        for (match, match_key, youtube_video) in zip(matches, match_keys, youtube_videos):
+            if match:
+                if youtube_video not in match.youtube_videos:
+                    match.youtube_videos.append(youtube_video)
+                    matches_to_put.append(match)
+                    results["added"].append(match_key)
+                else:
+                    results["existing"].append(match_key)
+            else:
+                results["bad_match"].append(match_key)
+        db.put(matches_to_put)
+        
+        template_values = {
+            "results": results,
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/videos_add.html')
+        self.response.out.write(template.render(path, template_values))
