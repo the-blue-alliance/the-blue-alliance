@@ -12,5 +12,5 @@ cron:
   schedule: every 5 minutes
 
 - description: OPR Calculation
-  url: /math/enqueue/event_opr/now
+  url: /tasks/math/enqueue/event_opr/now
   schedule: every day 22:00

@@ -71,7 +71,7 @@ class EventTeamUpdateEnqueue(webapp.RequestHandler):
         for event in Event.all().fetch(1000):
             logging.info(event.name)
             taskqueue.add(
-                url='/math/do/eventteam_update/' + event.key().name(),
+                url='/tasks/math/do/eventteam_update/' + event.key().name(),
                 method='GET')
         
         template_values = {
@@ -125,7 +125,7 @@ class EventOprEnqueue(webapp.RequestHandler):
         
         for event in events:
             taskqueue.add(
-                url='/math/do/event_opr/' + event.key_name,
+                url='/tasks/math/do/event_opr/' + event.key_name,
                 method='GET')
         
         template_values = {

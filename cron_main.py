@@ -13,9 +13,7 @@ from controllers.datafeed_controller import UsfirstTeamDetailsEnqueue, UsfirstTe
 from controllers.cron_controller import EventTeamUpdate, EventTeamUpdateEnqueue
 from controllers.cron_controller import EventOprDo, EventOprEnqueue
 
-app = webapp2.WSGIApplication([('/math/enqueue/event_opr/(.*)', EventOprEnqueue),
-                               ('/math/do/event_opr/(.*)', EventOprDo),
-                               ('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
+app = webapp2.WSGIApplication([('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
                                ('/tasks/enqueue/usfirst_event_details/([0-9]*)', UsfirstEventDetailsEnqueue),
                                ('/tasks/enqueue/usfirst_event_rankings/(.*)', UsfirstEventRankingsEnqueue),
                                ('/tasks/enqueue/usfirst_matches/(.*)', UsfirstMatchesEnqueue),
@@ -29,7 +27,9 @@ app = webapp2.WSGIApplication([('/math/enqueue/event_opr/(.*)', EventOprEnqueue)
                                ('/tasks/get/usfirst_matches/(.*)', UsfirstMatchesGet),
                                ('/tasks/get/usfirst_team_details/(.*)', UsfirstTeamDetailsGet),
                                ('/tasks/get/usfirst_teams_tpids/([0-9]*)', UsfirstTeamsTpidsGet),
-                               ('/math/enqueue/eventteam_update', EventTeamUpdateEnqueue),
-                               ('/math/do/eventteam_update/(.*)', EventTeamUpdate),
+                               ('/tasks/math/enqueue/event_opr/(.*)', EventOprEnqueue),
+                               ('/tasks/math/enqueue/eventteam_update', EventTeamUpdateEnqueue),
+                               ('/tasks/math/do/event_opr/(.*)', EventOprDo),
+                               ('/tasks/math/do/eventteam_update/(.*)', EventTeamUpdate),
                                ],
                               debug=tba_config.DEBUG)
