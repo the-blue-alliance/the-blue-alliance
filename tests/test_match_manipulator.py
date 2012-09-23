@@ -7,7 +7,7 @@ from helpers.match_manipulator import MatchManipulator
 from models.event import Event
 from models.match import Match
 
-class TestTeamManipulator(unittest2.TestCase):
+class TestMatchManipulator(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
