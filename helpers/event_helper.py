@@ -92,6 +92,10 @@ class EventUpdater(object):
         We need to be careful, because ListProperty defaults to [] instead of
         None.
         """
+        if old_event is None:
+            return new_event
+        if new_event is None:
+            return old_event
         
         for attr, value in vars(new_event).iteritems():
             try:
