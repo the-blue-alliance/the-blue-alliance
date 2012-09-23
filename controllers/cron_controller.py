@@ -60,7 +60,7 @@ class EventTeamUpdate(webapp.RequestHandler):
             'eventteams_count': eventteams_count,
         }
         
-        path = os.path.join(os.path.dirname(__file__), '../templates/cron/eventteam_update.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/math/eventteam_update_do.html')
         self.response.out.write(template.render(path, template_values))
         
 class EventTeamUpdateEnqueue(webapp.RequestHandler):
@@ -71,14 +71,14 @@ class EventTeamUpdateEnqueue(webapp.RequestHandler):
         for event in Event.all().fetch(1000):
             logging.info(event.name)
             taskqueue.add(
-                url='/tasks/eventteam_update/' + event.key().name(),
+                url='/math/do/eventteam_update/' + event.key().name(),
                 method='GET')
         
         template_values = {
             'event_count': Event.all().count(),
         }
         
-        path = os.path.join(os.path.dirname(__file__), '../templates/cron/eventteam_update_enqueue.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/math/eventteam_update_enqueue.html')
         self.response.out.write(template.render(path, template_values))
 
 class EventOprDo(webapp.RequestHandler):

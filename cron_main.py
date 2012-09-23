@@ -29,7 +29,7 @@ app = webapp2.WSGIApplication([('/math/enqueue/event_opr/(.*)', EventOprEnqueue)
                                ('/tasks/get/usfirst_matches/(.*)', UsfirstMatchesGet),
                                ('/tasks/get/usfirst_team_details/(.*)', UsfirstTeamDetailsGet),
                                ('/tasks/get/usfirst_teams_tpids/([0-9]*)', UsfirstTeamsTpidsGet),
-                               ('/tasks/eventteam_update_enqueue', EventTeamUpdateEnqueue),
-                               ('/tasks/eventteam_update/(.*)', EventTeamUpdate),
+                               ('/math/enqueue/eventteam_update', EventTeamUpdateEnqueue),
+                               ('/math/do/eventteam_update/(.*)', EventTeamUpdate),
                                ],
                               debug=tba_config.DEBUG)
