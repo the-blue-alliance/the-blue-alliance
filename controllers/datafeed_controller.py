@@ -327,8 +327,10 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
     def get(self, key_name):
         df = DatafeedUsfirst()
         
+        old_team = Team.get_by_key_name(key_name)
+
         logging.info("Updating team %s" % key_name)
-        team = df.getTeamDetails(key_name[3:])
+        team = df.getTeamDetails(old_team)
         if team:
             team = TeamUpdater.createOrUpdate(team)
             success = True
@@ -369,5 +371,5 @@ class UsfirstTeamsTpidsGet(webapp.RequestHandler):
             'team_count': team_count
         }
         
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/get/usfirst_teams_tpids.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_teams_tpids.html')
         self.response.out.write(template.render(path, template_values))

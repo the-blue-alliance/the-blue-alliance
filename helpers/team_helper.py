@@ -60,7 +60,7 @@ class TeamTpidHelper(object):
           teamTpid = self.tpidRe.findall(teamResult)[0]
           
           logging.info("Team %s TPID was %s in year %s." % (teamNumber, teamTpid, year))
-          tpids_dict[teamNumber] = teamTpid
+          tpids_dict[int(teamNumber)] = teamTpid
           
           # If this was the team we were looking for, write it down so we can return it
           if teamNumber == number:
@@ -68,10 +68,10 @@ class TeamTpidHelper(object):
         
         # Bulk fetching teams is much more efficient.
         teams = Team.get([db.Key.from_path("Team", "frc" + str(a)) for a in tpids_dict.keys()])
-        team_dict = dict([[team.team_number, team] for team in teams if team])
+        team_dict = dict([[int(team.team_number), team] for team in teams if team])
         
         teams_to_put = list()
-        for team_number in tpids_dict.keys():
+        for team_number in tpids_dict:
           new_team = Team(
               team_number = int(team_number),
               first_tpid = int(tpids_dict[team_number]),
@@ -79,7 +79,7 @@ class TeamTpidHelper(object):
               key_name = "frc" + str(team_number)
             )
           
-          if team_dict.get(team_number, None) is None:
+          if team_number not in team_dict:
             teams_to_put.append(new_team)
           else:
             teams_to_put.append(TeamUpdater.updateMerge(new_team, team_dict[team_number]))
