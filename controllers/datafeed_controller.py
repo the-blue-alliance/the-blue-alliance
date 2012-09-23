@@ -9,7 +9,7 @@ from google.appengine.ext.webapp import template
 
 from datafeeds.datafeed_fms import DatafeedFms
 from datafeeds.datafeed_tba import DatafeedTba
-from datafeeds.datafeed_usfirst2 import DatafeedUsfirst2
+from datafeeds.datafeed_usfirst import DatafeedUsfirst
 
 from helpers.event_helper import EventUpdater
 from helpers.match_helper import MatchUpdater
@@ -142,7 +142,7 @@ class UsfirstEventDetailsGet(webapp.RequestHandler):
     Includes registered Teams.
     """
     def get(self, year, first_eid):
-        datafeed = DatafeedUsfirst2()
+        datafeed = DatafeedUsfirst()
 
         event = datafeed.getEventDetails(int(year), first_eid)
         event = EventUpdater.createOrUpdate(event)
@@ -176,7 +176,7 @@ class UsfirstEventListGet(webapp.RequestHandler):
     Enqueues a bunch of detailed reads that actually establish Event objects.
     """
     def get(self, year):
-        df = DatafeedUsfirst2()
+        df = DatafeedUsfirst()
         events = df.getEventList(int(year))
         
         for event in events:
@@ -227,7 +227,7 @@ class UsfirstMatchesGet(webapp.RequestHandler):
     Handles reading a USFIRST match results page and updating the datastore as needed.
     """
     def get(self, event_key):
-        df = DatafeedUsfirst2()
+        df = DatafeedUsfirst()
         mu = MatchUpdater()
         
         event = Event.get_by_key_name(event_key)
@@ -286,7 +286,7 @@ class UsfirstEventRankingsGet(webapp.RequestHandler):
     Handles reading a USFIRST ranking page and updating the datastore as needed.
     """
     def get(self, event_key):
-        df = DatafeedUsfirst2()
+        df = DatafeedUsfirst()
         
         event = Event.get_by_key_name(event_key)
         rankings = df.getEventRankings(event)
@@ -325,7 +325,7 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
     model accordingly.
     """
     def get(self, key_name):
-        df = DatafeedUsfirst2()
+        df = DatafeedUsfirst()
         
         logging.info("Updating team %s" % key_name)
         team = df.getTeamDetails(key_name[3:])
@@ -350,7 +350,7 @@ class UsfirstTeamsTpidsGet(webapp.RequestHandler):
     FIRST's full team list.
     """
     def get(self, year):
-        df = DatafeedUsfirst2()
+        df = DatafeedUsfirst()
         skip = 0
         
         try:

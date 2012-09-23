@@ -17,7 +17,7 @@ from models.event import Event
 from models.match import Match
 from models.team import Team
 
-class DatafeedUsfirst2(DatafeedBase):
+class DatafeedUsfirst(DatafeedBase):
 
     EVENT_DETAILS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=event_details&eid=%s&-session=myarea:%s"
     EVENT_LIST_REGIONALS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?event_type=FRC&season_FRC=%s"
@@ -41,7 +41,7 @@ class DatafeedUsfirst2(DatafeedBase):
 
     def __init__(self, *args, **kw):
         self._session_key = dict()
-        super(DatafeedUsfirst2, self).__init__(*args, **kw)
+        super(DatafeedUsfirst, self).__init__(*args, **kw)
 
     def getSessionKey(self, year):
         """
