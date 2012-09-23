@@ -37,11 +37,10 @@ class TeamTpidHelper(object):
     TPID_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=searchresults&programs=FRC&reports=teams&sort_teams=number&results_size=250&omit_searchform=1&season_FRC=%s&skip_teams=%s"
     
     @classmethod
-    def scrapeTpid(self, number, skip=0, year=2012):
+    def scrapeTpids(self, skip, year):
       """
-      Searches the FIRST list of all teams for the requested team's tpid, caching
-      all it encounters in the datastore. This has the side effect of creating Team
-      objects along the way.
+      Searches the FIRST list of all teams for tpids, writing in the datastore.
+      Also creates new Team objects.
       
       This code is modified from Pat Fairbank's frclinks source and modified
       to fit in the TBA framework. He has given us permission to borrow
@@ -50,7 +49,6 @@ class TeamTpidHelper(object):
       while 1:
         logging.info("Fetching 250 teams based on %s data, skipping %s" % (year, skip))
         
-        tpid = None
         tpids_dict = dict()
         
         teamList = urlfetch.fetch(self.TPID_URL_PATTERN % (year, skip), deadline=10)
@@ -62,11 +60,7 @@ class TeamTpidHelper(object):
           
           logging.info("Team %s TPID was %s in year %s." % (teamNumber, teamTpid, year))
           tpids_dict[teamNumber] = teamTpid
-          
-          # If this was the team we were looking for, write it down so we can return it
-          if teamNumber == number:
-            tpid = teamTpid
-        
+
         teams = [Team(
               team_number = int(team_number),
               first_tpid = int(tpids_dict[team_number]),
@@ -78,9 +72,9 @@ class TeamTpidHelper(object):
         TeamManipulator.createOrUpdate(teams)
         skip = int(skip) + 250
         
-        # Return if we found the TPID we wanted, or we're out of teams
-        if tpid:
-          return tpid
+        # Handle degenerate cases.
+        if skip > 10000:
+          return None
         
         if len(self.lastPageRe.findall(teamList.content)) == 0:
           return None

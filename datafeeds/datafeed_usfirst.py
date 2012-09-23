@@ -37,8 +37,7 @@ class DatafeedUsfirst(DatafeedBase):
     SESSION_KEY_GENERATING_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=searchresults&programs=FRC&reports=teams&omit_searchform=1&season_FRC=%s"
 
     TEAM_DETAILS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=team_details&tpid=%s&-session=myarea:%s"
-    TEAM_NUMBER_IMPOSSIBLY_HIGH = 9999
-
+    
     def __init__(self, *args, **kw):
         self._session_key = dict()
         super(DatafeedUsfirst, self).__init__(*args, **kw)
@@ -168,4 +167,4 @@ class DatafeedUsfirst(DatafeedBase):
         """
         # FIXME: This is not proper Datafeed form. -gregmarra 2012 Aug 26
         # TeamTpidHelper actually creates Team objects.
-        TeamTpidHelper.scrapeTpid(self.TEAM_NUMBER_IMPOSSIBLY_HIGH, skip, year)
+        TeamTpidHelper.scrapeTpids(skip, year)
