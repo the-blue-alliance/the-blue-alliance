@@ -4,7 +4,7 @@ import logging
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
-from helpers.event_helper import EventUpdater
+from helpers.event_helper import EventManipulator
 from models.event import Event
 
 class AdminEventList(webapp.RequestHandler):
@@ -67,7 +67,7 @@ class AdminEventEdit(webapp.RequestHandler):
             facebook_eid = self.request.get("facebook_eid"),
             webcast_url = self.request.get("webcast_url"),
         )
-        event = EventUpdater.createOrUpdate(event)
+        event = EventManipulator.createOrUpdate(event)
         
         self.redirect("/admin/event/" + event.key_name)
         

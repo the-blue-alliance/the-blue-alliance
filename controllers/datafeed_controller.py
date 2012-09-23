@@ -11,7 +11,7 @@ from datafeeds.datafeed_fms import DatafeedFms
 from datafeeds.datafeed_tba import DatafeedTba
 from datafeeds.datafeed_usfirst import DatafeedUsfirst
 
-from helpers.event_helper import EventUpdater
+from helpers.event_manipulator import EventManipulator
 from helpers.match_manipulator import MatchManipulator
 from helpers.team_helper import TeamHelper, TeamTpidHelper
 from helpers.team_manipulator import TeamManipulator
@@ -34,7 +34,7 @@ class FmsEventListGet(webapp.RequestHandler):
         # (we manually add these due to naming issues)
         events = filter(lambda e: int(e.first_eid) < 100000, events)
         
-        events = EventUpdater.bulkCreateOrUpdate(events)
+        events = EventManipulator.createOrUpdate(events)
 
         template_values = {
             "events": events
@@ -146,7 +146,7 @@ class UsfirstEventDetailsGet(webapp.RequestHandler):
         datafeed = DatafeedUsfirst()
 
         event = datafeed.getEventDetails(int(year), first_eid)
-        event = EventUpdater.createOrUpdate(event)
+        event = EventManipulator.createOrUpdate(event)
         
         new_teams = datafeed.getEventTeams(int(year), first_eid)
         old_teams = Team.get_by_key_name([new_team.key().name() for new_team in new_teams])
