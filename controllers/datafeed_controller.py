@@ -13,7 +13,8 @@ from datafeeds.datafeed_usfirst import DatafeedUsfirst
 
 from helpers.event_helper import EventUpdater
 from helpers.match_helper import MatchUpdater
-from helpers.team_helper import TeamHelper, TeamTpidHelper, TeamUpdater
+from helpers.team_helper import TeamHelper, TeamTpidHelper
+from helpers.team_manipulator import TeamManipulator
 from helpers.opr_helper import OprHelper
 
 from models.event import Event
@@ -51,7 +52,7 @@ class FmsTeamListGet(webapp.RequestHandler):
     def get(self):
         df = DatafeedFms()
         teams = df.getFmsTeamList()
-        TeamUpdater.bulkCreateOrUpdate(teams)
+        TeamManipulator.createOrUpdate(teams)
         
         template_values = {
             "teams": teams
@@ -326,13 +327,9 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
     """
     def get(self, key_name):
         df = DatafeedUsfirst()
-        
-        old_team = Team.get_by_key_name(key_name)
-
-        logging.info("Updating team %s" % key_name)
-        team = df.getTeamDetails(old_team)
+        team = df.getTeamDetails(Team.get_by_key_name(key_name))
         if team:
-            team = TeamUpdater.createOrUpdate(team)
+            team = TeamManipulator.createOrUpdate(team)
             success = True
         else:
             success = False
