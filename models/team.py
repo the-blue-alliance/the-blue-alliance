@@ -41,3 +41,7 @@ class Team(db.Model):
     @property 
     def details_url(self):
         return "/team/%s" % self.team_number
+
+    @property
+    def key_name(self):
+        return "frc%s" % self.team_number

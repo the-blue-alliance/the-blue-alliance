@@ -97,6 +97,8 @@ class TeamTpidHelper(object):
 
 class TeamUpdater(object):
     """
+    DEPRECATED for TeamManipulator. -gregmarra 20120921
+
     Helper class to handle Team objects when we are not sure whether they
     already exist or not.
     """
