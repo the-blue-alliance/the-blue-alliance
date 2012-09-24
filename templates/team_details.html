@@ -46,7 +46,7 @@
 		</div>
 	</div>
 
-    <hr></hr>
+    <hr>
 
     <div class="row">
         <div class="span12">
@@ -71,11 +71,14 @@
             {% endif %}
 
             {% if participation|length > 1 %}
-                {% for comp in participation %}
-                    <a class="btn" href="#{{ comp.event.key_name}}">{{ comp.event.name }}</a>
-                {% endfor %}
+            <ul class="nav nav-pills nav-stacked-phone">
+              {% for comp in participation %}
+                <li><a class="btn smooth-scroll" href="#{{ comp.event.key_name}}">{{ comp.event.name }}</a></li>
+              {% endfor %}
+            </ul>
             {% endif %}
-		</div>
+
+    </div>
 		<!--<div class="span2">
 			<a href="/images/no_robot_image.png" class="thumbnail fancybox no-robot-image">
 				<img src="/images/no_robot_image.png" alt="No Robot Image">
@@ -83,7 +86,7 @@
 		</div>-->
 	</div>
 
-    <hr></hr>
+    <hr>
 
     {% for comp in participation %}
         <div class="row" id="{{ comp.event.key_name }}">
@@ -91,7 +94,7 @@
                 <h2><a href="/event/{{ comp.event.key_name }}">{{ comp.event.name }}</a></h2>
                 <p>
                     <i class="icon-map-marker"></i> in <a href="http://maps.google.com/maps?q={{ comp.event.location }}">{{ comp.event.location }}</a><br />
-                    <i class="icon-calendar"></i> {{ comp.event.start_date|date:"M d, Y" }} - {{ comp.event.end_date|date:"M d, Y" }}</p>
+                    <i class="icon-calendar"></i> {{ comp.event.start_date|date:"M d, Y" }} - {{ comp.event.end_date|date:"M d, Y" }}
                 </p>
                 <p>Team {{ team.team_number }} was ({{comp.wlt.win}}-{{comp.wlt.loss}}-{{comp.wlt.tie}})</p>
             </div>
@@ -105,7 +108,7 @@
                 {% endif %}
             </div>
         </div>
-        <hr></hr>
+        <hr>
     {% endfor %}
 </div>
 {% endblock %}
