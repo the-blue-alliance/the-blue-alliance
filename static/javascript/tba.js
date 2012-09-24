@@ -54,7 +54,26 @@ function selectTypeaheadResult(item, val, text) {
 	window.location.href = url;
 }
 
+// General JS for all pages
 $(function() {
+	// Jumping to page section
+    $('.smooth-scroll').bind('click',function(event){
+        var $anchor = $(this);
+        var $navbar_position = $('.navbar').css('top');
+        var $navbar_height = parseInt($('.navbar').css('height'));
+        var $offset = 0;
+        
+        // Takes care of changing navbar size/position due to @media width
+        if ($navbar_position == '0px') {
+          $offset = $navbar_height;
+        }
+ 
+        $('html, body').stop().animate({
+            scrollTop: $($anchor.attr('href')).offset().top - $offset
+        }, 250);
+        event.preventDefault();
+    });
+	
 	// Fancybox
 	$(".fancybox").fancybox();
 
