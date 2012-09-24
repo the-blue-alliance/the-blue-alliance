@@ -19,114 +19,93 @@
 {% block content %}
 
 <div class="container">
+    <p><a href="/teams"><i class="icon-chevron-left"></i> All Teams</a></p>
 
-	{% if team.nickname %}
-	  <h1 class="team-nick">{{team.nickname}}</h1><h3 class="end_header">FRC Team {{team.team_number}}</h3>
-	{% else %}
-	  <h1 class="end_header">FRC Team {{team.team_number}}</h1>
-	{% endif %}
-	<p><a href="/teams"><i class="icon-chevron-left"></i> Team List</a></p>
-	<div class="row">
-		<div class="span8">
-			<table class="info-table table table-striped table-condensed">
-		  		<tbody>
-		            {% if team.name %}<tr>
-		                <th>Full Name</th>
-		                <td>{{ team.name }}</td>
-		            </tr>{% endif %}
-	            	{% if team.address %}<tr>
-		                <th>Location</th>
-		                <td><a href="http://maps.google.com/maps?q={{ team.address }}">{{ team.address }}</a></td>
-		            </tr>{% endif %}
-		            {% if team.rookie_year %}<tr>
-		                <th>Rookie Year</th>
-		                <td>{{ team.rookie_year }}</td>
-		            </tr>{% endif %}
-		            <tr>
-		            	<th>Hashtag <a href="/hashtags" class="help-link" rel="tooltip" title="Learn more about hashtags">?</a></th>
-		            	<td><strong>#frc{{ team.team_number }}</strong> - Search
-		            		<a class="hashtag-link hashtag-twitter" href="https://twitter.com/search/%23frc{{ team.team_number }}" target="_blank" title="Search Twitter">Twitter</a>,
-		            		<a class="hashtag-link hashtag-youtube" href="http://www.youtube.com/results?search_query=%23frc{{ team.team_number }}+OR+%22team+{{ team.team_number }}%22" target="_blank" title="Search YouTube">YouTube</a>,
-		            		<a class="hashtag-link hashtag-cd" href="http://www.chiefdelphi.com/media/photos/tags/frc{{ team.team_number }}" target="_blank" title="Search Chief Delphi">Chief Delphi</a>,
-		            		<a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23frc{{ team.team_number }}" target="_blank" title="Search Flickr">Flickr</a>
-		            	</td>
-		            </tr>
-		  		</tbody>
-		  	</table>
+    <h1>Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h1>
+    
+    <div class="row">
+        <div class="span8">
+            <p>
+                {% if team.address %}<i class="icon-map-marker"></i> from <a href="http://maps.google.com/maps?q={{ team.address }}">{{ team.address }}</a><br />{% endif %}
+                {% if team.name %}<i class="icon-info-sign"></i> aka <em>{{ team.name }}</em><br />{% endif %}
+                {% if team.rookie_year %}<i class="icon-calendar"></i>first competed in {{ team.rookie_year }}{% endif %}
+            </p>
+
+            <p><strong>#frc{{ team.team_number }}</strong> <small><a href="/hashtags" rel="tooltip" title="Learn more about hashtags">?</a></small> - Search
+                <a class="hashtag-link hashtag-twitter" href="https://twitter.com/search/%23frc{{ team.team_number }}" target="_blank" title="Search Twitter">Twitter</a>,
+                <a class="hashtag-link hashtag-youtube" href="http://www.youtube.com/results?search_query=%23frc{{ team.team_number }}+OR+%22team+{{ team.team_number }}%22" target="_blank" title="Search YouTube">YouTube</a>,
+                <a class="hashtag-link hashtag-cd" href="http://www.chiefdelphi.com/media/photos/tags/frc{{ team.team_number }}" target="_blank" title="Search Chief Delphi">Chief Delphi</a>,
+                <a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23frc{{ team.team_number }}" target="_blank" title="Search Flickr">Flickr</a>
+            </p>
+        </div>
+        <div class="span4 hidden-phone">
 		  	<div style="max-width: 100%; overflow: hidden">
 		  	  <div class="fb-like" data-href="http://www.thebluealliance.com/team/{{team.team_number}}" data-send="false" data-width="450" data-show-faces="false"></div>
 	        <div id="gplus"><g:plusone annotation="inline" href="http://www.thebluealliance.com/team/{{team.team_number}}" width="450"></g:plusone></div>
 	      </div>
-			</div>
-		<div class="span2">
-			<h2>Year:</h2>
+		</div>
+	</div>
 
-			<div class="btn-group">
-			  <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-			    {{year}}
-			    <span class="caret"></span>
-			  </a>
-			  <ul class="dropdown-menu">
-		        {% for a_year in years reversed %}
-		        <li><a href="/team/{{team.team_number}}/{{a_year}}">{{a_year}}</a></li>
-		        {% empty %}
-		        <li>No data from other years</li>
-		        {% endfor %}
-			  </ul>
-			</div>
-				
-			<br />
-				
-			<h3>{{year}} Record:</h3>
+    <hr></hr>
+
+    <div class="row">
+        <div class="span12">
+            <h3 class="clearfix">
+                <div class="btn-group inline pull-left" style="margin-top: 3px">
+                    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                        {{year}}
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        {% for a_year in years reversed %}
+                            <li><a href="/team/{{team.team_number}}/{{a_year}}">{{a_year}}</a></li>
+                        {% empty %}
+                            <li>No other info</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <span class="inline">&nbsp;Season</span>
+            </h3>
             {% if year_wlt %}
-              <p>{{year_wlt.win}}-{{year_wlt.loss}}-{{year_wlt.tie}}</p>
-            {% else %}
-              <p>No Matches Played</p>
+                <p>Overall, team {{team.team_number}} was ({{year_wlt.win}}-{{year_wlt.loss}}-{{year_wlt.tie}}) in {{year}}.</p>
+            {% endif %}
+
+            {% if participation|length > 1 %}
+                {% for comp in participation %}
+                    <a class="btn" href="#{{ comp.event.key_name}}">{{ comp.event.name }}</a>
+                {% endfor %}
             {% endif %}
 		</div>
-		<div class="span2">
+		<!--<div class="span2">
 			<a href="/images/no_robot_image.png" class="thumbnail fancybox no-robot-image">
 				<img src="/images/no_robot_image.png" alt="No Robot Image">
 			</a>
-		</div>
+		</div>-->
 	</div>
 
-	<ul class="nav nav-tabs nav-stacked-phone">
-    {% for comp in participation %}
-	  <li {% if forloop.first %}class="active"{% endif %}><a href="#{{ comp.event.key.name }}" data-toggle="tab">{{ comp.event.name }}</a></li>
-	{% endfor %}
-	</ul>
-	<div class="tab-content">
-	
-    {% for comp in participation %}
-	  <div class="tab-pane{% if forloop.first %} active{% endif %}" id="{{ comp.event.key.name }}">
-			<div class="row">
-				<div class="span8 offset2">
-					<div class="row well">
-						<p class="pull-right event-link"><a href="/event/{{ comp.event.key.name }}">Event Page <i class="icon-chevron-right"></i></a></p>
-						
-						<h2>{{ comp.event.name }}</h2>
-						<p>{{ comp.event.start_date|date:"M d, Y" }} - {{ comp.event.end_date|date:"M d, Y" }}</p>
+    <hr></hr>
 
-						<h3>Event Record</h3>
-						<ul>
-						<li>{{comp.wlt.win}}-{{comp.wlt.loss}}-{{comp.wlt.tie}}</li>
-						</ul>
-					</div>
-				</div>
-
-			<div class="span6 offset3">
-            {% if comp.matches.num %}
-            	{% with comp.matches as matches %}
-	        	{% include "match_partials/full_match_table.html" %}
-	        	{% endwith %}
-            {% else %}
-            <p>No matches yet. Check back after {{ comp.event.start_date|date:"M d, Y" }}.</p>
-            {% endif %}
-			</div>
-			</div>
-	  </div>
-	{% endfor %}			
-	</div>
+    {% for comp in participation %}
+        <div class="row" id="{{ comp.event.key_name }}">
+            <div class="span4">
+                <h2><a href="/event/{{ comp.event.key_name }}">{{ comp.event.name }}</a></h2>
+                <p>
+                    <i class="icon-map-marker"></i> in <a href="http://maps.google.com/maps?q={{ comp.event.location }}">{{ comp.event.location }}</a><br />
+                    <i class="icon-calendar"></i> {{ comp.event.start_date|date:"M d, Y" }} - {{ comp.event.end_date|date:"M d, Y" }}</p>
+                </p>
+                <p>Team {{ team.team_number }} was ({{comp.wlt.win}}-{{comp.wlt.loss}}-{{comp.wlt.tie}})</p>
+            </div>
+            <div class="span8" style="margin-top: 1em">
+                {% if comp.matches.num %}
+                    {% with comp.matches as matches %}
+                        {% include "match_partials/full_match_table.html" %}
+                    {% endwith %}
+                {% else %}
+                    <p class="muted">No matches yet. Check back after {{ comp.event.start_date|date:"M d, Y" }}.</p>
+                {% endif %}
+            </div>
+        </div>
+        <hr></hr>
+    {% endfor %}
 </div>
 {% endblock %}
