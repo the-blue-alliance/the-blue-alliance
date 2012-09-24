@@ -71,11 +71,14 @@
             {% endif %}
 
             {% if participation|length > 1 %}
-                {% for comp in participation %}
-                    <a class="btn smooth-scroll" href="#{{ comp.event.key_name}}">{{ comp.event.name }}</a>
-                {% endfor %}
+            <ul class="nav nav-pills nav-stacked-phone">
+              {% for comp in participation %}
+                <li><a class="btn smooth-scroll" href="#{{ comp.event.key_name}}">{{ comp.event.name }}</a></li>
+              {% endfor %}
+            </ul>
             {% endif %}
-		</div>
+
+    </div>
 		<!--<div class="span2">
 			<a href="/images/no_robot_image.png" class="thumbnail fancybox no-robot-image">
 				<img src="/images/no_robot_image.png" alt="No Robot Image">
