@@ -72,7 +72,7 @@
 
             {% if participation|length > 1 %}
                 {% for comp in participation %}
-                    <a class="btn" href="#{{ comp.event.key_name}}">{{ comp.event.name }}</a>
+                    <a class="btn smooth-scroll" href="#{{ comp.event.key_name}}">{{ comp.event.name }}</a>
                 {% endfor %}
             {% endif %}
 		</div>
