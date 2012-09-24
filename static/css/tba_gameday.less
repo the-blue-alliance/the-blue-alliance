@@ -1,0 +1,128 @@
+.gameday {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: @black;
+}
+
+.gameday-navbar {
+  #gradient > .vertical(@navbarBackgroundHighlight, @navbarBackground);
+  color: @white;
+  height: 30px;
+  
+  a {
+    color: @white;
+  }
+  
+  .gameday-navbar-logo {
+    height: 100%;
+    margin-left: 15px;
+    background-image: url('/images/tba_blue_lamp_navbar.png');
+    background-repeat: no-repeat;
+    background-position: left center;
+    width: 325px;
+    float: left;
+    
+    .gameday-navbar-inner {
+      padding-top: 5px;
+    
+      a {
+        font-size: 14px;
+        position: relative;
+        top: -3px;
+      }
+      
+      .gameday-title {
+        height: 100%;
+        margin-left: 30px;
+        margin-right: 15px;
+        font-weight: bold;
+        font-size: 24px;
+      }
+    }
+  }
+
+  .menu {
+    font-size: 13px;
+    margin-left: 12px;
+    width: auto;
+    float:right;
+    
+    ul {
+      list-style: none;
+      margin: 0;
+      
+      ul {
+        display: none;
+        position: absolute;
+        top: 28px;
+        left: 0px;
+        float: left;
+        width: 180px;
+        z-index: 99999;
+        
+        a {
+          background: #333;
+          line-height: 1em;
+          padding: 10px;
+          width: 275px;
+          height: auto;
+          padding-bottom:11px;
+          padding-top:9px;
+          text-align:left;
+          position:relative;
+          right:225px;
+          top:2px;
+        }
+      }
+    }
+    
+    li {
+      float: left;
+      position: relative;
+    }
+    a {
+      color: white;
+      display: block;
+      line-height: 30px;
+      padding: 0 10px;
+      text-decoration: none;
+    }
+  }
+
+  .menu ul ul 
+  .menu ul #webcasts_hide a{
+    width: 275px;
+    right: 125px;
+  }
+  .menu ul #layouts_tab a{
+    width:150px;
+    right:100px;
+  }
+  .menu li:hover > a,
+  .menu ul ul :hover > a {
+    background: #555;
+  }
+  .menu ul li:hover > ul {
+    display: block;
+  }
+}
+
+#webcasts_panel {
+  overflow: hidden;
+  position: absolute;
+  top: 30px;
+  bottom: 30px;
+  right: 0px;
+  left: 0px;
+  z-index: 105;
+}
+
+#video_container {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  z-index:0;
+}

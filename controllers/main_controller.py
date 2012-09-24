@@ -102,7 +102,20 @@ class KickoffHandler(BaseHandler):
             if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
         
         self.response.out.write(html)        
+
+class GamedayHandler(BaseHandler):
+    def get(self):
+        memcache_key = "main_gameday"
+        html = memcache.get(memcache_key)
+        if html is None:
+            template_values = {'enable': tba_config.CONFIG['gameday']}
             
+            path = os.path.join(os.path.dirname(__file__), '../templates/gameday.html')
+            html = template.render(path, template_values)
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
+        
+        self.response.out.write(html)   
+
 class TypeaheadHandler(BaseHandler):
     def get(self):
         # Currently just returns a list of all teams and events

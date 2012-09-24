@@ -16,6 +16,7 @@ else:
     }
 
 CONFIG['kickoff'] = False
+CONFIG['gameday'] = True
 
 # Add your FB app info here
 CONFIG['FACEBOOK_APP_ID'] = "YOUR_APP_ID"
