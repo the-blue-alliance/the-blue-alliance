@@ -37,12 +37,18 @@ class EventManipulator(ManipulatorBase):
 
         for attr in attrs:
             if getattr(new_event, attr) is not None:
-                setattr(old_event, attr, getattr(new_event, attr))
+                if getattr(new_event, attr) != getattr(old_event, attr):
+                    setattr(old_event, attr, getattr(new_event, attr))
+                    old_event.dirty = True
             if getattr(new_event, attr) == "None":
-                setattr(old_event, attr, None)
+                if getattr(old_event, attr, None) != None:
+                    setattr(old_event, attr, None)
+                    old_event.dirty = True
 
         for attr in list_attrs:
             if len(getattr(new_event, attr)) > 0:
-                setattr(old_event, attr, getattr(new_event, attr))
+                if getattr(new_event, attr) != getattr(old_event, attr):
+                    setattr(old_event, attr, getattr(new_event, attr))
+                    old_event.dirty = True
 
         return old_event

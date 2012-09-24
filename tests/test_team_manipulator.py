@@ -41,7 +41,8 @@ class TestTeamManipulator(unittest2.TestCase):
     def test_createOrUpdate(self):
         TeamManipulator.createOrUpdate(self.old_team)
         self.assertOldTeam(Team.get_by_key_name("frc177"))
-        self.assertMergedTeam(TeamManipulator.createOrUpdate(self.new_team))
+        TeamManipulator.createOrUpdate(self.new_team)
+        self.assertMergedTeam(Team.get_by_key_name("frc177"))
 
     def test_findOrSpawn(self):
         db.put(self.old_team)

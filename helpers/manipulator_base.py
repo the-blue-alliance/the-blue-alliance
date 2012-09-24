@@ -35,20 +35,24 @@ class ManipulatorBase(object):
         """
         new_models = self.listify(new_models)
 
-        put_models = []
+        return_models = []
         async_puts = []
 
         while len(new_models) > 0:
             model_batch = new_models[-self.BATCH_SIZE:] # the last BATCH_SIZE items (or all of them)
             new_models = new_models[:-self.BATCH_SIZE] # everything but the last BATCH_SIZE items (or nothing)
 
-            models_to_put = self.listify(self.findOrSpawn(model_batch))
+            # Get the full list of db-merged models
+            model_batch = self.listify(self.findOrSpawn(model_batch))
+            return_models.extend(model_batch)
+
+            # Write back the models that had updates
+            models_to_put = [model for model in model_batch if getattr(model, "dirty", False)]
             async_puts.append(db.put_async(models_to_put))
-            put_models.extend(models_to_put)
 
         # Block on the entire batch to ensure consistency
         [async_put.get_result() for async_put in async_puts]
-        return self.delistify(put_models)
+        return self.delistify(return_models)
     
     @classmethod
     def findOrSpawn(self, new_models):
@@ -72,6 +76,7 @@ class ManipulatorBase(object):
         the "old" one that are null or the empty list in the "new" one.
         """
         if old_model is None:
+            new_model.dirty = True
             return new_model
 
         return self.updateMerge(new_model, old_model)

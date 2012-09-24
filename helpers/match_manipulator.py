@@ -12,14 +12,17 @@ class MatchManipulator(ManipulatorBase):
         "old" team that are present in the "new" team, but keep fields from
         the "old" team that are null in the "new" team.
         """
-        attrs = [
-            "alliances_json",
+        immutable_attrs = [
             "comp_level",
             "event",
-            "game",
-            "match_number",
-            "no_auto_update",
             "set_number",
+            "match_number",
+        ] # These build key_name, and cannot be changed without deleting the model.
+
+        attrs = [
+            "alliances_json",
+            "game",
+            "no_auto_update",
             "team_key_names",
             "tba_videos",
             "time",
@@ -28,6 +31,8 @@ class MatchManipulator(ManipulatorBase):
 
         for attr in attrs:
             if getattr(new_match, attr) is not None:
-                setattr(old_match, attr, getattr(new_match, attr))
+                if getattr(new_match, attr) != getattr(old_match, attr):
+                    setattr(old_match, attr, getattr(new_match, attr))
+                    old_match.dirty = True
         
         return old_match

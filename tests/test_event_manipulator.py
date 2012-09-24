@@ -68,7 +68,8 @@ class TestEventManipulator(unittest2.TestCase):
     def test_createOrUpdate(self):
         EventManipulator.createOrUpdate(self.old_event)
         self.assertOldEvent(Event.get_by_key_name("2011ct"))
-        self.assertMergedEvent(EventManipulator.createOrUpdate(self.new_event))
+        EventManipulator.createOrUpdate(self.new_event)
+        self.assertMergedEvent(Event.get_by_key_name("2011ct"))
 
     def test_findOrSpawn(self):
         db.put(self.old_event)
