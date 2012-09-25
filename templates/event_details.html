@@ -21,66 +21,38 @@
 {% block content %}
 
 <div class="container">
-	<h1 class="end_header">{{event.name}} {{event.year}}</h1>
-	<p><a href="/events/{{event.year}}"><i class="icon-chevron-left"></i> Back to {{event.year}} Events</a></p>
+	<p><a href="/events/{{event.year}}"><i class="icon-chevron-left"></i> {{event.year}} Events</a></p>
 
+	<h1>{{event.name}} {{event.year}}</h1>
+	
 	<div class="row">
-		<div class="span6">
-			<table class="info-table table table-striped table-condensed">
-				<tbody>
-					<tr><th>Dates</th>
-					{% if event.start_date %}
-                    	<td>{{ event.start_date|date:"M d, Y" }} to {{ event.end_date|date:"M d, Y" }}</td>
-	                {% else %}
-	                    <td>Unknown</td>
-	                {% endif %}</tr>
-		            {% if event.location %}<tr>
-		                <th>Location</th>
-		                <td><a href="http://maps.google.com/maps?q={{ event.location }}">{{ event.location }}</a></td>
-		            </tr>{% endif %}
-		            {% if event.website %}<tr>
-		                <th>Website</th>
-		                <td><a href="{{ event.website }}" title="{{ event.name }}">{{ event.website }}</a></td>
-		            </tr>{% endif %}
-		            {% if event.official %}<tr>
-		                <th>Details on <em>FIRST</em></th>
-		                <td><a href="https://my.usfirst.org/myarea/index.lasso?page=teamlist&event_type=FRC&sort_teams=number&year={{ event.year }}&event={{ event.event_short }}">{{ event.name }} on usfirst.org</a></td>
-		            </tr>{% endif %}
-		            {% if event.facebook_eid %}<tr>
-		                <th>Facebook</th>
-		                <td><a href="{{ event.facebook_event_url }}" title="Facebook Event">RSVP</a></td>
-		            </tr>{% endif %}
-		            {% if event.webcast_url %}<tr>
-		                <th>Live Webcast</th>
-		                <td><a href="{{ event.webcast_url }}" title="">{{ event.webcast_url }}</a></td>
-		            </tr>{% endif %}
-					{% if num_teams %}<tr>
-						<th>Teams</th>
-						<td>{{num_teams}} Team{{num_teams|pluralize}}</td>
-		            </tr>{% endif %}
-					{% if matches.num %}<tr>
-						<th>Matches</th>
-						<td>{{matches.num}} Match{{matches.num|pluralize:"es"}} - (<a href="http://www.thebluealliance.com/event/{{ event.key_name }}/feed">rss</a>)</td>
-					</tr>{% endif %}
-					<tr>
-		            	<th>Hashtag <a href="/hashtags" class="help-link" rel="tooltip" title="What are hashtags?">?</a></th>
-		            	<td><strong>#frc{{ event.event_short }}</strong> - Search
-		            		<a class="hashtag-link hashtag-twitter" href="https://twitter.com/search/%23frc{{ event.event_short }}" target="_blank" title="Search Twitter">Twitter</a>,
-		            		<a class="hashtag-link hashtag-youtube" href="http://www.youtube.com/results?search_query=%23frc{{ event.event_short }}+OR+%22{{ event.name }}%22" target="_blank" title="Search YouTube">YouTube</a>,
-		            		<a class="hashtag-link hashtag-cd" href="http://www.chiefdelphi.com/media/photos/tags/frc{{ event.event_short }}" target="_blank" title="Search Chief Delphi">Chief Delphi</a>,
-		            		<a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23frc{{ event.event_short }}" target="_blank" title="Search Flickr">Flickr</a>
-		            	</td>
-		            </tr>
-				</tbody>
-			</table>
+		<div class="span8">
+			<p>
+				{% if event.start_date %}<i class="icon-calendar"></i> {{ event.start_date|date:"M jS" }} to {{ event.end_date|date:"M jS, Y" }}<br />{% endif %}
+				{% if event.location %}<i class="icon-map-marker"></i> in <a href="http://maps.google.com/maps?q={{ event.location }}">{{ event.location }}</a><br />{% endif %}
+				{% if event.website %}<i class="icon-globe"></i> <a href="{{ event.website }}" title="{{ event.name }}">{{ event.website }}</a><br />{% endif %}
+				{% if event.official %}<i class="icon-info-sign"></i> <a href="https://my.usfirst.org/myarea/index.lasso?page=teamlist&event_type=FRC&sort_teams=number&year={{ event.year }}&event={{ event.event_short }}">details on usfirst.org</a><br />{% endif %}
+				{% if event.webcast_url %}<i class="icon-film"></i> <a href="{{ event.webcast_url }}" title="">live webcast</a><br />{% endif %}
+				{% if event.facebook_eid %}<i class="icon-thumbs-up"></i> <a href="{{ event.facebook_event_url }}" title="Facebook Event">RSVP on Facebook</a><br />{% endif %}
+				<i class="icon-barcode"></i> <a href="http://www.thebluealliance.com/event/{{ event.key_name }}/feed"> matches in rss</a>
+			</p>
+
+			
+
+			<p><strong>#frc{{ event.event_short }}</strong> <small><a href="/hashtags" rel="tooltip" title="What are hashtags?">?</a></small> - Search
+		        <a class="hashtag-link hashtag-twitter" href="https://twitter.com/search/%23frc{{ event.event_short }}" target="_blank" title="Search Twitter">Twitter</a> &middot;
+		        <a class="hashtag-link hashtag-youtube" href="http://www.youtube.com/results?search_query=%23frc{{ event.event_short }}+OR+%22{{ event.name }}%22" target="_blank" title="Search YouTube">YouTube</a> &middot;
+		        <a class="hashtag-link hashtag-cd" href="http://www.chiefdelphi.com/media/photos/tags/frc{{ event.event_short }}" target="_blank" title="Search Chief Delphi">Chief Delphi</a> &middot;
+		        <a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23frc{{ event.event_short }}" target="_blank" title="Search Flickr">Flickr</a>
+		    </p>
 		</div>
 	</div>
 	
 	<ul class="nav nav-tabs nav-stacked-phone">
-	  <li class="active"><a href="#results" data-toggle="tab">Results</a></li>
-      {% if event.rankings %}<li><a href="#rankings" data-toggle="tab">Rankings</a></li>{% endif %}
-      <li><a href="#teams" data-toggle="tab">Teams</a></li>
-	  <!-- <li><a href="#awards" data-toggle="tab">Awards</a></li>-->
+	    <li class="active"><a href="#results" data-toggle="tab">Results</a></li>
+        {% if event.rankings %}<li><a href="#rankings" data-toggle="tab">Rankings</a></li>{% endif %}
+        <li><a href="#teams" data-toggle="tab">Teams</a></li>
+	    <!-- <li><a href="#awards" data-toggle="tab">Awards</a></li>-->
 	</ul>
 	
 	<div class="tab-content">

@@ -32,17 +32,17 @@
             </p>
 
             <p><strong>#frc{{ team.team_number }}</strong> <small><a href="/hashtags" rel="tooltip" title="Learn more about hashtags">?</a></small> - Search
-                <a class="hashtag-link hashtag-twitter" href="https://twitter.com/search/%23frc{{ team.team_number }}" target="_blank" title="Search Twitter">Twitter</a>,
-                <a class="hashtag-link hashtag-youtube" href="http://www.youtube.com/results?search_query=%23frc{{ team.team_number }}+OR+%22team+{{ team.team_number }}%22" target="_blank" title="Search YouTube">YouTube</a>,
-                <a class="hashtag-link hashtag-cd" href="http://www.chiefdelphi.com/media/photos/tags/frc{{ team.team_number }}" target="_blank" title="Search Chief Delphi">Chief Delphi</a>,
+                <a class="hashtag-link hashtag-twitter" href="https://twitter.com/search/%23frc{{ team.team_number }}" target="_blank" title="Search Twitter">Twitter</a> &middot;
+                <a class="hashtag-link hashtag-youtube" href="http://www.youtube.com/results?search_query=%23frc{{ team.team_number }}+OR+%22team+{{ team.team_number }}%22" target="_blank" title="Search YouTube">YouTube</a> &middot;
+                <a class="hashtag-link hashtag-cd" href="http://www.chiefdelphi.com/media/photos/tags/frc{{ team.team_number }}" target="_blank" title="Search Chief Delphi">Chief Delphi</a> &middot;
                 <a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23frc{{ team.team_number }}" target="_blank" title="Search Flickr">Flickr</a>
             </p>
         </div>
         <div class="span4 hidden-phone">
 		  	<div style="max-width: 100%; overflow: hidden">
 		  	  <div class="fb-like" data-href="http://www.thebluealliance.com/team/{{team.team_number}}" data-send="false" data-width="450" data-show-faces="false"></div>
-	        <div id="gplus"><g:plusone annotation="inline" href="http://www.thebluealliance.com/team/{{team.team_number}}" width="450"></g:plusone></div>
-	      </div>
+	           <div id="gplus"><g:plusone annotation="inline" href="http://www.thebluealliance.com/team/{{team.team_number}}" width="450"></g:plusone></div>
+	        </div>
 		</div>
 	</div>
 
@@ -94,7 +94,7 @@
                 <h2><a href="/event/{{ comp.event.key_name }}">{{ comp.event.name }}</a></h2>
                 <p>
                     <i class="icon-map-marker"></i> in <a href="http://maps.google.com/maps?q={{ comp.event.location }}">{{ comp.event.location }}</a><br />
-                    <i class="icon-calendar"></i> {{ comp.event.start_date|date:"M d, Y" }} - {{ comp.event.end_date|date:"M d, Y" }}
+                    <i class="icon-calendar"></i> {{ comp.event.start_date|date:"M jS" }} - {{ comp.event.end_date|date:"M jS, Y" }}
                 </p>
                 <p>Team {{ team.team_number }} was ({{comp.wlt.win}}-{{comp.wlt.loss}}-{{comp.wlt.tie}})</p>
             </div>
