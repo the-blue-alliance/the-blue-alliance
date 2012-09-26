@@ -9,8 +9,10 @@ from controllers.admin.admin_main_controller import AdminDebugHandler, AdminMain
 from controllers.admin.admin_match_controller import AdminVideosAdd, AdminMatchCleanup, AdminMatchDashboard, AdminMatchDetail, AdminMatchEdit
 from controllers.admin.admin_memcache_controller import AdminMemcacheMain
 from controllers.admin.admin_team_controller import AdminTeamDetail, AdminTeamList
+from controllers.admin.admin_config_controller import AdminConfigHandler
 
 app = webapp2.WSGIApplication([('/admin/', AdminMain),
+                               ('/admin/config', AdminConfigHandler),
                                ('/admin/debug', AdminDebugHandler),
                                ('/admin/events', AdminEventList),
                                ('/admin/event/edit/(.*)', AdminEventEdit),
