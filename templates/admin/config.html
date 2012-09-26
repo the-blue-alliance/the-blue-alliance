@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Tasks{% endblock %}
+
+{% block content %}
+
+<h1>Configuration</h1>
+
+<p>The Blue Alliance has settings that control how site-wide features behave.</p>
+
+<hr>
+{% for var_name, current_value, legal_values in var_list %}
+<form class="form-inline" action="/admin/config" method="post">
+  <h4>{{ var_name }}</h4>
+  <p>Legal Values:</p>
+  <ul>
+    {% for value in legal_values %}
+    <li>{{ value }}</li>
+    {% endfor %}
+  </ul>
+  <div class="input-append">
+    <input class="span12" size="16" name="value" type="text" value="{{current_value}}" />
+    <input name="var_name" type="hidden" value="{{var_name}}" />
+    <button type="submit" class="btn btn-primary"><i class="icon-thumbs-up icon-white"></i> Set and flush memcache!</button>
+  </div>
+</form>
+{% endfor %}
+{% endblock %}

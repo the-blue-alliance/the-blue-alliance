@@ -14,6 +14,7 @@ from base_controller import BaseHandler
 
 from models.event import Event
 from models.team import Team
+from models.vars import Vars
 
 def render_static(page):
     memcache_key = "main_%s" % page
@@ -26,8 +27,7 @@ def render_static(page):
     
     return html
 
-class MainHandler(BaseHandler):
-    def get(self):
+def render_main():
         memcache_key = "main_index"
         html = memcache.get(memcache_key)
         if html is None:
@@ -51,7 +51,27 @@ class MainHandler(BaseHandler):
             html = template.render(path, template_values)
             if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
         
-        self.response.out.write(html)
+        return html
+        
+def render_kickoff():
+    memcache_key = "main_kickoff"
+    html = memcache.get(memcache_key)
+    
+    if html is None:
+        template_values = {}
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/kickoff.html')
+        html = template.render(path, template_values)
+        if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
+    
+    return html
+
+class MainHandler(BaseHandler):
+    MAIN_RENDERER = {'main': render_main(),
+                     'kickoff': render_kickoff()}
+
+    def get(self):
+        self.response.out.write(self.MAIN_RENDERER[Vars.get_or_insert_cached('landing', value='main').value])
 
 class ContactHandler(BaseHandler):
     def get(self):
@@ -89,20 +109,7 @@ class SearchHandler(BaseHandler):
         finally:
             self.response.out.write(render_static("search"))
             
-class KickoffHandler(BaseHandler):
-    def get(self):
-        memcache_key = "main_kickoff"
-        html = memcache.get(memcache_key)
-        
-        if html is None:
-            template_values = {}
-            
-            path = os.path.join(os.path.dirname(__file__), '../templates/kickoff.html')
-            html = template.render(path, template_values)
-            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
-        
-        self.response.out.write(html)        
-            
+
 class TypeaheadHandler(BaseHandler):
     def get(self):
         # Currently just returns a list of all teams and events
