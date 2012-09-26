@@ -211,23 +211,6 @@ class UsfirstAwardsGet(webapp.RequestHandler):
         event = Event.get_by_key_name(event_key)
         new_awards = AwardManipulator.createOrUpdate(datafeed.getEventAwards(event))
         
-        '''
-        df = DatafeedUsfirstAwards()
-        au = AwardUpdater()
-        
-        event = Event.get_by_key_name(event_key)
-        awards = df.getAwardResultsList(event)
-        
-        new_awards = list()
-        if awards is not None:
-            #au.bulkRead(awards)
-            for award in awards:
-                new_award = au.findOrSpawnWithCache(award) # findOrSpawn doesn't put() things.
-                new_awards.append(new_award)    
-            keys = db.put(new_awards) # Doing a bulk put() is faster than individually.
-        else:
-            logging.info("No awards found for event " + str(event.year) + " " + str(event.name))
-        '''
         template_values = {
             'awards': new_awards,
         }

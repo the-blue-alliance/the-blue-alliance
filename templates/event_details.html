@@ -37,8 +37,6 @@
 				<i class="icon-barcode"></i> <a href="http://www.thebluealliance.com/event/{{ event.key_name }}/feed"> matches in rss</a>
 			</p>
 
-			
-
 			<p><strong>#frc{{ event.event_short }}</strong> <small><a href="/hashtags" rel="tooltip" title="What are hashtags?">?</a></small> - Search
 		        <a class="hashtag-link hashtag-twitter" href="https://twitter.com/search/%23frc{{ event.event_short }}" target="_blank" title="Search Twitter">Twitter</a> &middot;
 		        <a class="hashtag-link hashtag-youtube" href="http://www.youtube.com/results?search_query=%23frc{{ event.event_short }}+OR+%22{{ event.name }}%22" target="_blank" title="Search YouTube">YouTube</a> &middot;
@@ -46,31 +44,12 @@
 		        <a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23frc{{ event.event_short }}" target="_blank" title="Search Flickr">Flickr</a>
 		    </p>
 		</div>
-		<div class="span6">
-			<h2>Awards Overview:</h2>
-			<p>Regional Chairman's Award: {% if awards.rca %}<a href="/team/{{awards.rca.winner}}">{{awards.rca.winner}}</a>{% endif %}{% if awards.rca1 %}, <a href="/team/{{awards.rca1.winner}}">{{awards.rca1.winner}}</a>{% endif %}{% if awards.rca12 %}, <a href="/team/{{awards.rca12.winner}}">{{awards.rca12.winner}}</a>{% endif %}</p>
-			<p>Engineering Inspiration Award: {% if awards.ei %}<a href="/team/{{awards.ei.winner}}">{{awards.ei.winner}}</a> {% endif %}</p>
-			<p>Rookie All-Star Award: {% if awards.ras %}<a href="/team/{{awards.ras.winner}}">{{awards.ras.winner}}</a> {% endif %}</p>
-			<p>Regional Winners:
-			 {% if awards.win1 %}<a href="/team/{{awards.win1.winner}}">{{awards.win1.winner}}</a>{% endif %}{% if awards.win2 %},
-			 <a href="/team/{{awards.win2.winner}}">{{awards.win2.winner}}</a>{% endif %}{% if awards.win3 %},
-			 <a href="/team/{{awards.win3.winner}}">{{awards.win3.winner}}</a>{% endif %}{% if awards.win4 %},
-			 <a href="/team/{{awards.win4.winner}}">{{awards.win4.winner}}</a>{% endif %}
-			</p>
-			<p>Regional Finalists:
-			 {% if awards.fin1 %}<a href="/team/{{awards.fin1.winner}}">{{awards.fin1.winner}}</a>{% endif %}{% if awards.fin2 %},
-			 <a href="/team/{{awards.fin2.winner}}">{{awards.fin2.winner}}</a>{% endif %}{% if awards.fin3 %},
-			 <a href="/team/{{awards.fin3.winner}}">{{awards.fin3.winner}}</a>{% endif %}{% if awards.fin4 %},
-			 <a href="/team/{{awards.fin4.winner}}">{{awards.fin4.winner}}</a>{% endif %}			 
-			</p>
-		</div>
 	</div>
 	
 	<ul class="nav nav-tabs nav-stacked-phone">
 	  <li class="active"><a href="#results" data-toggle="tab">Results</a></li>
-      {% if event.rankings %}<li><a href="#rankings" data-toggle="tab">Rankings</a></li>{% endif %}
-	  <li><a href="#teams" data-toggle="tab">Teams</a></li>
-	  <li><a href="#awards" data-toggle="tab">Awards</a></li>
+    {% if event.rankings %}<li><a href="#rankings" data-toggle="tab">Rankings</a></li>{% endif %}
+	  {% if awards.list %}<li><a href="#awards" data-toggle="tab">Awards</a></li>{% endif %}
     <li><a href="#teams" data-toggle="tab">Teams</a></li>
 	</ul>
 	
@@ -214,6 +193,7 @@
 	        {% endif %}
 		  </div>
 		  </div>
+		  {% if awards.list %}
 			<div class="tab-pane" id="awards">
 				<div class="row">
 				<div class="span8 offset2">
@@ -242,6 +222,7 @@
 				</div>
 				</div>			
 			</div>
+			{% endif %}
 		</div>
 	</div>
 </div>
