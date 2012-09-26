@@ -36,14 +36,17 @@ class ApiTeamDetails(webapp.RequestHandler):
     def get(self):
         team_key = self.request.get('team')
         year = self.request.get('year')
-        
-        team_dict = ApiHelper.getTeamInfo(team_key)
-        if self.request.get('events'):
-            team_dict = ApiHelper.addTeamEvents(team_dict, year)
-        
-        #TODO: matches
-        
-        self.response.out.write(json.dumps(team_dict))
+
+        try:
+            team_dict = ApiHelper.getTeamInfo(team_key)
+            if self.request.get('events'):
+                team_dict = ApiHelper.addTeamEvents(team_dict, year)
+            
+            #TODO: matches
+            
+            self.response.out.write(json.dumps(team_dict))
+        except Exception:
+            return False
 
 class ApiEventsShow(webapp.RequestHandler):
     """

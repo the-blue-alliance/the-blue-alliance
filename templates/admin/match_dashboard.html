@@ -1,14 +1,28 @@
 {% extends "base.html" %}
 
-{% block title %}Match Dashboard - TBA Admin{% endblock %}
+{% block title %}Matches{% endblock %}
 
 {% block content %}
 
 <h1>Matches</h1>
 <p>{{ match_count }} total matches</p>
-<p>Edit with: <strong>admin/match/edit/{match_key}</strong></p>
 
-<p><a href="/admin/match/cleanup">Match Cleanup</a></p>
+<form class="form-inline">
+    <legend>Edit a Match</legend>
+    <div class="input-append">
+        <input class="span8" size="16" id="match_key" type="text" placeholder="match_key">
+        <a class="btn" id="edit_button"><i class="icon-edit"></i> Edit</a>
+    </div>
+</form>
 
+<script>
+$("#edit_button").click(function() {
+    if ($("#match_key").val() !== "") {
+        window.location = "/admin/match/edit/" + $("#match_key").val();
+    } else {
+        alert("Please enter a match key.");
+    }
+});
+</script>
 
 {% endblock %}

@@ -20,8 +20,8 @@
 	        <ol>
 	            <li><a href="/tasks/get/fms_team_list">/tasks/get/fms_team_list</a> : Sets up all 2012 teams, fast.</li>
 	            <li>Imports some pre-2011 events. Imports 2010cmp matches.</li>
-	            <li><a href="/tasks/eventteam_update_enqueue">/tasks/eventteam_update_enqueue</a> : Builds event attendance information.</li>
-	            <li><a href="/tasks/tba_videos_get/2010cmp">/tasks/get/tba_videos/2010cmp</a> : Grabs videos for 2010cmp</li>
+	            <li><a href="/tasks/math/enqueue/eventteam_update">/math/enqueue/eventteam_update</a> : Builds event attendance information.</li>
+	            <li><a href="/tasks/get/tba_videos/2010cmp">/tasks/get/tba_videos/2010cmp</a> : Grabs videos for 2010cmp</li>
 	        </ol>
 	    </div>
 	    <div>
@@ -37,7 +37,7 @@
 	            <li>Initiate 2009 Teams: <a href="/tasks/get/usfirst_teams_tpids/2009?skip=0">UsfirstTeamsTpidsGet @0</a> <a href="/tasks/get/usfirst_teams_tpids/2009?skip=1000">@1000</a> <a href="/tasks/get/usfirst_teams_tpids/2009?skip=2000">@2000</a></li>
 	            <li>Bulkload Old Events:<br />appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/events.csv --kind=Event --url=http://tbatv-prod.appspot.com/_ah/remote_api</li>
 	            <li>Bulkload Old Matches: <br />appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/matches.csv --kind=Match --url=http://tbatv-prod.appspot.com/_ah/remote_api</li>
-	            <li><a href="/tasks/eventteam_update_enqueue">Update EventTeams</a>, to build all the event attendance information.</li>
+	            <li><a href="/tasks/math/enqueue/eventteam_update">Update EventTeams</a>, to build all the event attendance information.</li>
 	        </ol>
 	    </div>
 	    
@@ -51,8 +51,8 @@
                 <li><a href="/tasks/enqueue/usfirst_event_rankings/2012">UsfirstRankingsEnqueue</a>, enqueue tasks to update rankings for 2012 Events</li>
 	            <li><a href="/tasks/enqueue/usfirst_team_details?offset=0">UsfirstTeamDetailsEnqueue @ 0</a>, <a href="/tasks/enqueue/usfirst_team_details?offset=1000">@ 1000</a>, <a href="/tasks/enqueue/usfirst_team_details?offset=2000">@ 2000</a>, <a href="/tasks/enqueue/usfirst_team_details?offset=3000">@ 3000</a>, enqueue tasks to update Team details</li>
 	            <li><a href="/tasks/get/tba_videos/2010cmp">TBAVideosGet</a> with an Event key to scrape <a href="http://videos.thebluealliance.net">http://videos.thebluealliance.net</a> for TBAVideos.</li>
-	            <li><a href="/tasks/eventteam_update_enqueue">Update EventTeams</a>, to build all the event attendance information.</li>
-	            <li><a href="/tasks/event_opr_get_enqueue/2012">Update OPRs</a> or <a href="/tasks/event_opr_get/2010cmp">Update One Event's OPRs</a>, to recalculate OPRs.</li>
+	            <li><a href="/tasks/math/enqueue/eventteam_update">Update EventTeams</a>, to build all the event attendance information.</li>
+	            <li><a href="/tasks/math/enqueue/event_opr/2012">Update OPRs</a> or <a href="/tasks/math/do/event_opr/2010cmp">Update One Event's OPRs</a>, to recalculate OPRs.</li>
 	        </ol>
 	    </div>
 	    

@@ -1,30 +1,70 @@
 {% extends "base.html" %}
 
-{% block title %}{{event.year}}{{event.event_short}} - Edit Event - TBA Admin{% endblock %}
+{% block title %}{{event.key_name}} - Edit{% endblock %}
 
 {% block content %}
 
-<h1>Edit {{ event.year }} {{ event.name }}</h1>
+<h1>Edit {{ event.key_name }}</h1>
 
-<form action="/admin/event/edit/{{event.year}}{{event.event_short}}" method="post">
-    <fieldset>
-        <legend>Edit {{ event.year }} {{ event.name }}</legend>
-        <ul>
-            <li><input type="text" name="disabled_event_short" value="{{event.event_short}}" disabled="disabled" /><input type="hidden" name="event_short" value="{{event.event_short}}" /><label for="name">Event Short</label></li>
-            <li><input type="text" name="disabled_year" value="{{event.year}}" disabled="disabled" /><input type="hidden" name="year" value="{{event.year}}" /><label for="year">Year</label></li>
-            <li><input type="text" name="name" value="{{event.name}}" /><label for="name">Name</label></li>
-            <li><input type="text" name="short_name" value="{{event.short_name}}" /><label for="short_name">Short Name</label></li>
-            <li><input type="text" name="website" value="{{event.website}}" /><label for="website">Website</label></li>
-            <li><input type="text" name="event_type" value="{{event.event_type}}" /><label for="event_type">Event Type</label></li>
-            <li><input type="text" name="location" value="{{event.location}}" /><label for="location">Location</label></li>
-            <li><input type="text" name="official" value="{{event.official}}" /><label for="official">Official</label></li>
-            <li><input type="text" name="first_eid" value="{{event.first_eid}}" /><label for="first_eid">FIRST eid</label></li>
-            <li><input type="text" name="facebook_eid" value="{{event.facebook_eid}}" /><label for="facebook_eid">Facebook eid</label></li>
-            <li><input type="text" name="webcast_url" value="{{event.webcast_url}}" /><label for="webcast_url">Webcast URL</label></li>
-            
-            <li><input type="submit" id="submit" name="submit" value="Save"></li>
-        </ul>
-    </fieldset>
+<form action="/admin/event/edit/{{event.key_name}}" method="post">
+    <legend>Edit {{ event.year }} {{ event.name }}</legend>
+    <table class="table table-striped table-hover table-condensed">
+        <tr>
+            <td>Name</td>
+            <td><input type="text" name="name" value="{{event.name}}" /></td>
+        </tr>
+        <tr>
+            <td>Dates</td>
+            <td>{{ event.start_date|date:"M d, Y" }} to {{ event.end_date|date:"M d, Y" }}</td>
+        </tr>
+        <tr>
+            <td>Short Name</td>
+            <td><input type="text" name="short_name" value="{{event.short_name}}" /></td>
+        </tr>
+        <tr>
+            <td>Website</td>
+            <td><input type="text" name="website" value="{{event.website}}" /></td>
+        </tr>
+        <tr>
+            <td>Year</td>
+            <td><input type="text" name="disabled_year" value="{{event.year}}" disabled="disabled" /><input type="hidden" name="year" value="{{event.year}}" /></td>
+        </tr>
+        <tr>
+            <td>Event Short</td>
+            <td><input type="text" name="disabled_event_short" value="{{event.event_short}}" disabled="disabled" /><input type="hidden" name="event_short" value="{{event.event_short}}" /></td>
+        </tr>
+        <tr>
+            <td>Event Type</td>
+            <td><input type="text" name="event_type" value="{{event.event_type}}" /></td>
+        </tr>
+        <tr>
+            <td>Event Location</td>
+            <td><input type="text" name="location" value="{{event.location}}" /></td>
+        </tr>
+        <tr>
+            <td>Official</td>
+            <td><input type="text" name="official" value="{{event.official}}" /></td>
+        </tr>
+        <tr>
+            <td>FIRST Event ID</td>
+            <td><input type="text" name="first_eid" value="{{event.first_eid}}" /></td>
+        </tr>
+        <tr>
+            <td>Facebook Event ID</td>
+            <td><input type="text" name="facebook_eid" value="{{event.facebook_eid}}" /></td>
+        </tr>
+        <tr>
+            <td>Webcast URL</td>
+            <td><input type="text" name="webcast_url" value="{{event.webcast_url}}" /></td>
+        </tr>
+        <tr>
+            <td>Rankings</td>
+            <td><textarea name="rankings_json" >{{event.rankings_json}}</textarea></td>
+        </tr>
+    </table>
+
+    <button type="submit" class="btn btn-primary"><i class="icon-thumbs-up icon-white"></i> Save Event</button>
+    <a href="/admin/event/{{event.key_name}}" class="btn"><i class="icon-thumbs-down"></i> Cancel Edit</a>
 </form>
 
 {% endblock %}

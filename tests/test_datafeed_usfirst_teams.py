@@ -4,7 +4,7 @@ import datetime
 from google.appengine.ext import db
 from google.appengine.ext import testbed
 
-from datafeeds.datafeed_usfirst2 import DatafeedUsfirst2
+from datafeeds.datafeed_usfirst import DatafeedUsfirst
 from models.team import Team
 
 class TestDatafeedUsfirstTeams(unittest2.TestCase):
@@ -14,7 +14,7 @@ class TestDatafeedUsfirstTeams(unittest2.TestCase):
         self.testbed.init_urlfetch_stub()
         self.testbed.init_datastore_v3_stub()
         
-        self.datafeed = DatafeedUsfirst2()
+        self.datafeed = DatafeedUsfirst()
         
         self.team177 = Team(
             key_name = "frc177",

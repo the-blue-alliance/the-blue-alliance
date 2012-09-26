@@ -1,4 +1,4 @@
-application: tba-dev-km
+application: tbatv-dev-hrd
 version: 1-1-1
 runtime: python27
 api_version: 1
@@ -44,8 +44,9 @@ handlers:
 
 skip_files:
 - ^(.*/)?.*\.less.*
-- /test_data/*
-- /tests/*
-- /utils/*
+- .git/*
+- test_data/*
+- tests/*
+- utils/*
 - run_tests.py
 - pavement.py

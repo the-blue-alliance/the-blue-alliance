@@ -7,7 +7,7 @@ from google.appengine.ext.webapp import template
 
 from models.event import Event
 from models.match import Match
-from helpers.match_helper import MatchUpdater
+from helpers.match_manipulator import MatchManipulator
 
 class AdminMatchCleanup(webapp.RequestHandler):
     """
@@ -65,13 +65,51 @@ class AdminMatchDetail(webapp.RequestHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_details.html')
         self.response.out.write(template.render(path, template_values))
+
+
+class AdminMatchEdit(webapp.RequestHandler):
+    """
+    Edit a Match.
+    """
+    def get(self, match_key):
+        match = Match.get_by_key_name(match_key)
         
-class AdminMatchAddVideos(webapp.RequestHandler):
+        template_values = {
+            "match": match
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_edit.html')
+        self.response.out.write(template.render(path, template_values))
+    
+    def post(self, match_key):        
+        alliances_json = self.request.get("alliances_json")
+        alliances = json.loads(alliances_json)
+        team_key_names = list()
+        
+        for alliance in alliances:
+            team_key_names.extend(alliances[alliance].get('teams', None))
+        
+        match = Match(
+            key_name = match_key,
+            event = Event.get_by_key_name(self.request.get("event_key_name")),
+            game = self.request.get("game"),
+            set_number = int(self.request.get("set_number")),
+            match_number = int(self.request.get("match_number")),
+            comp_level = self.request.get("comp_level"),
+            team_key_names = team_key_names,
+            alliances_json = alliances_json,
+            #no_auto_update = str(self.request.get("no_auto_update")).lower() == "true", #TODO
+        )
+        match = MatchManipulator.createOrUpdate(match)
+        
+        self.redirect("/admin/match/" + match.key_name())
+
+class AdminVideosAdd(webapp.RequestHandler):
     """
     Add a lot of youtube_videos to Matches at once.
     """
     def get(self):
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_videosadd.html')
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/videos_add.html')
         self.response.out.write(template.render(path, {}))
         
     def post(self):
@@ -99,44 +137,5 @@ class AdminMatchAddVideos(webapp.RequestHandler):
             "results": results,
         }
         
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_videosadd.html')
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/videos_add.html')
         self.response.out.write(template.render(path, template_values))
-
-class AdminMatchEdit(webapp.RequestHandler):
-    """
-    Edit a Match.
-    """
-    def get(self, match_key):
-        match = Match.get_by_key_name(match_key)
-        
-        template_values = {
-            "match": match
-        }
-
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_edit.html')
-        self.response.out.write(template.render(path, template_values))
-    
-    def post(self, match_key):        
-        logging.info(self.request)
-        
-        alliances_json = self.request.get("alliances_json")
-        alliances = json.loads(alliances_json)
-        team_key_names = list()
-        
-        for alliance in alliances:
-            team_key_names.extend(alliances[alliance].get('teams', None))
-        
-        match = Match(
-            key_name = match_key,
-            event = Event.get_by_key_name(self.request.get("event_key_name")),
-            game = self.request.get("game"),
-            set_number = int(self.request.get("set_number")),
-            match_number = int(self.request.get("match_number")),
-            comp_level = self.request.get("comp_level"),
-            team_key_names = team_key_names,
-            alliances_json = alliances_json,
-            #no_auto_update = str(self.request.get("no_auto_update")).lower() == "true", #TODO
-        )
-        match = MatchUpdater.createOrUpdate(match)
-        
-        self.redirect("/admin/match/" + match.key_name())

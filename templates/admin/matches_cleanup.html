@@ -1,25 +1,25 @@
 {% extends "base.html" %}
 
-{% block title %}Match Dashboard - TBA Admin{% endblock %}
+{% block title %}Match Cleanup{% endblock %}
 
 {% block content %}
 
 <h1>Clean up Matches</h1>
 
 {% if tried_delete %}
-<p><strong>Deleted {{ match_keys_deleted|length }} malformed matches:</strong> {{ match_keys_deleted }}</p>
+<div class="alert alert-success">
+    <strong>Deleted {{ match_keys_deleted|length }} malformed matches:</strong> {{ match_keys_deleted }}
+</div>
 {% endif %}
 
 <p>This page deletes all Matches belonging to an Event where the Match key names don't correspond to the Event key name. This will delete ("Match", "2011newton_f1m1") from ("Event", "2011new"), but will leave ("Match", "2011new_f1m1").</p>
 
-<form action="/admin/match/cleanup" method="post">
-    <fieldset>
-        <legend>Clean up what Event? (like 2011new)</legend>
-        <ul>
-            <li><input type="text" name="event_key_name" /><label for="event_key_name">Event Key</label></li>
-            <li><input type="submit" id="submit" name="submit" value="Clean Up"></li>
-        </ul>
-    </fieldset>
+<form action="/admin/match/cleanup" method="post" class="form-inline">
+    <legend>Cleanup Event</legend>
+    <div class="input-append">
+        <input class="span8" size="16" name="event_key_name" type="text" placeholder="event_key">
+        <button class="btn" id="edit_button" type="submit"><i class="icon-wrench"></i> Clean</button>
+    </div>
 </form>
 
 

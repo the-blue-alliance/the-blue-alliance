@@ -4,7 +4,7 @@ import datetime
 from google.appengine.ext import testbed
 from google.appengine.api import urlfetch
 
-from datafeeds.datafeed_usfirst2 import DatafeedUsfirst2
+from datafeeds.datafeed_usfirst import DatafeedUsfirst
 
 from models.team import Team
 
@@ -14,7 +14,7 @@ class TestDatafeedUsfirstEvents(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_urlfetch_stub()
         
-        self.datafeed = DatafeedUsfirst2()
+        self.datafeed = DatafeedUsfirst()
     
     def tearDown(self):
         self.testbed.deactivate()

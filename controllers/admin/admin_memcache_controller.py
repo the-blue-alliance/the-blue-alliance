@@ -6,6 +6,25 @@ from google.appengine.ext.webapp import template
 
 # Main memcache view.
 class AdminMemcacheMain(webapp.RequestHandler):
+    def post(self):
+        flushed = list()
+        
+        if self.request.get("all_keys") == "all_keys":
+            memcache.flush_all()
+            flushed.append("all memcache values")
+        
+        if self.request.get('memcache_key') is not "":
+            memcache.delete(self.request.get("memcache_key"))
+            flushed.append(self.request.get("memcache_key"))
+        
+        template_values = { 
+            "flushed" : flushed,
+            "memcache_stats": memcache.get_stats(),
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/memcache_index.html')
+        self.response.out.write(template.render(path, template_values))
+
     def get(self):
         
         template_values = {
@@ -14,24 +33,3 @@ class AdminMemcacheMain(webapp.RequestHandler):
         
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/memcache_index.html')
         self.response.out.write(template.render(path, template_values))
-        
-# Memcache flush result.
-class AdminMemcacheFlush(webapp.RequestHandler):
-    def get(self):
-        flushed = list()
-        
-        if self.request.get('all') == "true":
-            memcache.flush_all()
-            flushed.append("all memcache values")
-        
-        if self.request.get('key') is not None:
-            memcache.delete(self.request.get('key'))
-            flushed.append(self.request.get('key'))
-        
-        template_values = { 
-            'flushed' : flushed,
-        }
-        
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/memcache_flush.html')
-        self.response.out.write(template.render(path, template_values))
-

@@ -1,21 +1,23 @@
 {% extends "base.html" %}
 
-{% block title %}frc{{team.team_number}} - TBA Admin{% endblock %}
+{% block title %}Event List{% endblock %}
 
 {% block content %}
 
-<h1>All Events</h1>
-<p>{{ events|length }} total events</p>
-<table>
-    <tr>
+<h1>All {{ events|length }} Events</h1>
+<table class="table table-striped table-hover">
+    <caption>{{ events|length }} total events</caption>
+    <thead>
+        <th>Key</th>
         <th>Name</th>
         <th>Year</th>
         <th>Event Short</th>
         <th>EID</th>
-    </tr>
+    </thead>
     
     {% for event in events %}
     <tr>
+        <td>{{ event.key_name }}</td>
         <td><a href="/admin/event/{{event.key.name}}">{{ event.name }}</td>
         <td>{{ event.year }}</td>
         <td>{{ event.event_short }}</td>

@@ -1,13 +1,14 @@
 import os
 
-from google.appengine.api.users import User
+from helpers.admin_helper import AdminHelper
+
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
 class AdminMain(webapp.RequestHandler):
     def get(self):
         
-        user = User()
+        user = AdminHelper.getCurrentUser()
         
         template_values = {
             "user": user,
@@ -19,4 +20,9 @@ class AdminMain(webapp.RequestHandler):
 class AdminDebugHandler(webapp.RequestHandler):
     def get(self):
         path = os.path.join(os.path.dirname(__file__), '../../templates/debug.html')
+        self.response.out.write(template.render(path, {}))
+
+class AdminTasksHandler(webapp.RequestHandler):
+    def get(self):
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/tasks.html')
         self.response.out.write(template.render(path, {}))

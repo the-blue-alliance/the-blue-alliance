@@ -1,12 +1,22 @@
-"""
-Contains functions helpful for /admin/.
-"""
+from google.appengine.api.users import User
 
-def checkPermission(user, action):
+class AdminHelper(object):
     """
-    Check if the current user has permission to undertake some action.
+    Contains functions helpful for /admin/.
     """
-    
-    # TODO: Implement me. -gregmarra 12 Sep 2010
-    
-    return True
+
+    @classmethod
+    def checkPermission(self, user, action):
+        """
+        Check if a user has permission to undertake some action.
+        """
+        
+        # TODO: Implement me. -gregmarra 12 Sep 2010
+        
+        return True
+
+    @classmethod
+    def getCurrentUser(self):
+        """
+        Get the current user.
+        """

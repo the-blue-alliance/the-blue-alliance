@@ -1,6 +1,6 @@
 cron:
 - description: FIRST event detail scraping
-  url: /tasks/enqueue/usfirst_event_get
+  url: /tasks/enqueue/usfirst_event_details/2013
   schedule: every 24 hours
 
 - description: FIRST team detail scraping
@@ -12,5 +12,5 @@ cron:
   schedule: every 5 minutes
 
 - description: OPR Calculation
-  url: /tasks/event_opr_get_enqueue
+  url: /tasks/math/enqueue/event_opr/now
   schedule: every day 22:00
