@@ -10,10 +10,12 @@ import tba_config
 from base_controller import BaseHandler
 from helpers.event_helper import EventHelper
 from helpers.match_helper import MatchHelper
+from helpers.award_helper import AwardHelper
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
+from models.award import Award
 
 # The view of a list of teams.
 class TeamList(BaseHandler):
@@ -109,10 +111,13 @@ class TeamDetail(BaseHandler):
                         team_rank = element[0]
                         break
                     
+                awards = AwardHelper.organizeAwards(e.award_set.filter('team = ', team))
+                    
                 participation.append({ 'event' : e,
                                        'matches' : matches,
                                        'wlt': display_wlt,
-                                       'rank': team_rank })
+                                       'rank': team_rank,
+                                       'awards': awards })
             
             team.do_split_address()
             

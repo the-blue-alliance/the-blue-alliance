@@ -99,7 +99,7 @@ class UsfirstEventAwardsParser(ParserBase):
                 award_key += unicode(key_number)
                 key_number += 1
             award = {'name': award_key,
-                     'winner': team_number,
+                     'team_number': team_number,
                      'awardee': unicode(awardee),
                      'official_name': unicode(official_name)}
             awards.append(award)

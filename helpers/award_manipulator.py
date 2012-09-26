@@ -16,7 +16,7 @@ class AwardManipulator(ManipulatorBase):
             'name',
             'official_name',
             'year',
-            'winner',
+            'team',
             'awardee',
             'event',
         ]

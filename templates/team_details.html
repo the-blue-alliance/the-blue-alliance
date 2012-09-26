@@ -98,7 +98,17 @@
                     <i class="icon-calendar"></i> {{ comp.event.start_date|date:"M jS" }} - {{ comp.event.end_date|date:"M jS, Y" }}
                 </p>
                 <p>Team {{ team.team_number }}{% if comp.rank %} was <strong>Rank {{ comp.rank }}</strong> with a record of
-                {% else %} had a record of {% endif %}<strong>{{comp.wlt.win}}-{{comp.wlt.loss}}-{{comp.wlt.tie}}</strong></p>
+                {% else %} had a record of {% endif %}<strong>{{comp.wlt.win}}-{{comp.wlt.loss}}-{{comp.wlt.tie}}</strong>
+
+                {% if comp.awards.list %}
+                  and won the following awards:
+	                <ul>
+	                {% for award in comp.awards.list %}
+	                  <li>{{ award.official_name }}</li>
+	                {% endfor %}
+	                </ul>
+                {% endif %}
+                </p>
             </div>
             <div class="span8" style="margin-top: 1em">
                 {% if comp.matches.num %}

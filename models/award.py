@@ -1,6 +1,7 @@
 from google.appengine.ext import db
 
 from models.event import Event
+from models.team import Team
 
 class Award(db.Model):
     """
@@ -11,8 +12,8 @@ class Award(db.Model):
     name = db.StringProperty() #general name used for sorting
     official_name = db.StringProperty(indexed=False) #the official name used by first
     year = db.IntegerProperty() #year it was awarded
-    winner = db.IntegerProperty() #who won the award
-    awardee = db.StringProperty(indexed=False) #who won it
+    team = db.ReferenceProperty(Team) #team that won the award (if applicable)
+    awardee = db.StringProperty(indexed=False) #person who won the award (if applicable)
     event = db.ReferenceProperty(Event, required=True)
     
     @property

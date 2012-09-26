@@ -115,7 +115,7 @@ class DatafeedUsfirst(DatafeedBase):
         return [Award(
             key_name = Award.getKeyName(event, award.get('name', None)),
             name = award.get('name', None),
-            winner = award.get('winner', None),
+            team = Team.get_by_key_name('frc' + str(award.get('team_number', None))),
             awardee = award.get('awardee', None),
             year = event.year,
             official_name = award.get('official_name', None),
