@@ -17,7 +17,7 @@ from controllers.cron_controller import EventOprDo, EventOprEnqueue
 app = webapp2.WSGIApplication([('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
                                ('/tasks/enqueue/usfirst_event_details/([0-9]*)', UsfirstEventDetailsEnqueue),
                                ('/tasks/enqueue/usfirst_event_rankings/(.*)', UsfirstEventRankingsEnqueue),
-                               ('/tasks/enqueue/usfirst_awards', UsfirstAwardsEnqueue),
+                               ('/tasks/enqueue/usfirst_awards/(.*)', UsfirstAwardsEnqueue),
                                ('/tasks/enqueue/usfirst_matches/(.*)', UsfirstMatchesEnqueue),
                                ('/tasks/enqueue/usfirst_team_details', UsfirstTeamDetailsEnqueue),
                                ('/tasks/get/fms_event_list', FmsEventListGet),

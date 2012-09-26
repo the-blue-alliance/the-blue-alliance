@@ -56,18 +56,21 @@ class UsfirstEventAwardsParser(ParserBase):
         """
         soup = BeautifulSoup(html,
                 convertEntities=BeautifulSoup.HTML_ENTITIES)
-        
+
         table = soup.findAll('table')[2]
         already_parsed = set()
         awards = list()
         for tr in table.findAll('tr')[1:]:
             tds = tr.findAll('td')
+
             official_name = str(self._recurseUntilString(tds[0]))
             try:
                 team_number = int(self._recurseUntilString(tds[1]))
             except AttributeError:
                 team_number = 0
             except ValueError:
+                team_number = 0
+            except TypeError:
                 team_number = 0
             award_key = None
             for key in self.AWARD_NAMES:
@@ -84,7 +87,9 @@ class UsfirstEventAwardsParser(ParserBase):
             if award_key in self.INDIVIDUAL_AWARDS:
                 try:
                     awardee = str(self._recurseUntilString(tds[3]))
-                except TypeError:
+                except AttributeError:
+                    continue
+                if not awardee:
                     #they didn't award it but still listed it?
                     continue
             else:

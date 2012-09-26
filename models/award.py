@@ -9,10 +9,10 @@ class Award(db.Model):
     key_name is like '2012sj_rca'
     """
     name = db.StringProperty() #general name used for sorting
-    official_name = db.StringProperty() #the official name used by first
+    official_name = db.StringProperty(indexed=False) #the official name used by first
     year = db.IntegerProperty() #year it was awarded
     winner = db.IntegerProperty() #who won the award
-    awardee = db.StringProperty() #who won it
+    awardee = db.StringProperty(indexed=False) #who won it
     event = db.ReferenceProperty(Event, required=True)
     
     @property
@@ -20,7 +20,7 @@ class Award(db.Model):
         """
         Returns the string of the key_name of the Award object before writing it.
         """
-        return str(self.year) + str(self.event.key_name) + '_' + str(self.name)
+        return str(self.event.key_name) + '_' + str(self.name)
     
     @property
     def details_url(self):
@@ -28,5 +28,5 @@ class Award(db.Model):
 
     @classmethod
     def getKeyName(self, event, name):
-        return str(event.year) + str(event.key_name) + '_' + str(name)
+        return str(event.key_name) + '_' + str(name)
         

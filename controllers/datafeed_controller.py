@@ -10,7 +10,6 @@ from google.appengine.ext.webapp import template
 from datafeeds.datafeed_fms import DatafeedFms
 from datafeeds.datafeed_tba import DatafeedTba
 from datafeeds.datafeed_usfirst import DatafeedUsfirst
-from datafeeds.datafeed_usfirst_awards import DatafeedUsfirstAwards
 
 from helpers.event_manipulator import EventManipulator
 from helpers.match_manipulator import MatchManipulator
