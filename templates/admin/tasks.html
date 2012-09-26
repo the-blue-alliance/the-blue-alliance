@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Tasks{% endblock %}
+
+{% block content %}
+
+<h1>Task Launcher</h1>
+
+<p>The Blue Alliance has many tasks that are usually executed by cron jobs, but you can manually launch them from here.</p>
+
+<hr>
+<h4>UsfirstEventDetails</h4>
+<div class="row-fluid">
+    <div class="span4">
+        <form class="form-inline">
+            <span class="help-block">Enqueue</span>
+            <div class="input-append">
+                <input class="span8" size="16" id="enqueue_usfirst_event_details_year" type="text" placeholder="year">
+                <a class="btn" id="enqueue_usfirst_event_details_submit">Go <i class="icon-fast-forward"></i></a>
+            </div>
+        </form>
+        <script>
+        $("#enqueue_usfirst_event_details_submit").click(function() {
+            window.location = "/tasks/enqueue/usfirst_event_details/" + $("#enqueue_usfirst_event_details_year").val();
+        });
+        </script>
+    </div>
+    <div class="span4">
+        <form class="form-inline">
+            <span class="help-block">Get</span>
+            <input class="span4" id="enqueue_usfirst_event_details_year" type="text" placeholder="year">
+            <input class="span4" id="enqueue_usfirst_event_details_first_eid" type="text" placeholder="first_eid">
+            <a class="btn" id="get_usfirst_event_details_submit">Go <i class="icon-fast-forward"></i></a>
+        </form>
+        <script>
+        $("#get_usfirst_event_details_submit").click(function() {
+            window.location = "/tasks/get/usfirst_team_details/" + $("#enqueue_usfirst_event_details_year").val() 
+                + "/" + $("enqueue_usfirst_event_details_first_eid").val();
+        });
+        </script>
+    </div>
+</div>
+
+<hr>
+<h4>UsfirstTeamDetails</h4>
+<div class="row-fluid">
+    <div class="span4">
+        <span class="help-block">Enqueue</span>
+        <div class="btn-group">
+            <a class="btn" href="/tasks/enqueue/usfirst_team_details?offset=0">@0</a>
+            <a class="btn" href="/tasks/enqueue/usfirst_team_details?offset=1000">@1000</a>
+            <a class="btn" href="/tasks/enqueue/usfirst_team_details?offset=2000">@2000</a>
+            <a class="btn" href="/tasks/enqueue/usfirst_team_details?offset=3000">@3000</a>
+        </div>
+    </div>
+    <div class="span4">
+        <form class="form-inline">
+            <span class="help-block">Get</span>
+            <div class="input-prepend input-append">
+                <span class="add-on">frc</span>
+                <input class="span4" size="6" id="get_usfirst_team_details_team_number" type="text" placeholder="177">
+                <a class="btn" id="get_usfirst_team_details_submit">Go <i class="icon-fast-forward"></i></a>
+            </div>
+        </form>
+        <script>
+        $("#get_usfirst_team_details_submit").click(function() {
+            window.location = "/tasks/get/usfirst_team_details/frc" + $("#get_usfirst_team_details_team_number").val();
+        });
+        </script>
+    </div>
+</div>
+
+<hr>
+<h4>TbaVideos</h4>
+<div class="row-fluid">
+    <div class="span4">
+        <span class="help-block">Enqueue</span>
+        <a class="btn" href="/tasks/enqueue/tba_videos">Enqueue all Events</a>
+    </div>
+    <div class="span4">
+        <form class="form-inline">
+            <span class="help-block">Get</span>
+            <div class="input-prepend input-append">
+                <input class="span6" id="get_tba_videos_event_key" type="text" placeholder="2010cmp">
+                <a class="btn" id="get_tba_videos_submit">Go <i class="icon-fast-forward"></i></a>
+            </div>
+        </form>
+        <script>
+        $("#get_tba_videos_submit").click(function() {
+            window.location = "/tasks/get/tba_videos/" + $("#get_tba_videos_event_key").val();
+        });
+        </script>
+    </div>
+</div>
+<hr>
+
+<h2>Not added yet:</h2>
+<pre>
+('/tasks/enqueue/usfirst_event_rankings/(.*)', UsfirstEventRankingsEnqueue),
+('/tasks/enqueue/usfirst_matches/(.*)', UsfirstMatchesEnqueue),
+('/tasks/get/fms_event_list', FmsEventListGet),
+('/tasks/get/fms_team_list', FmsTeamListGet),
+('/tasks/get/usfirst_event_list/([0-9]*)', UsfirstEventListGet),
+('/tasks/get/usfirst_event_rankings/(.*)', UsfirstEventRankingsGet),
+('/tasks/get/usfirst_matches/(.*)', UsfirstMatchesGet),
+('/tasks/get/usfirst_teams_tpids/([0-9]*)', UsfirstTeamsTpidsGet),
+('/tasks/math/enqueue/event_opr/(.*)', EventOprEnqueue),
+('/tasks/math/enqueue/eventteam_update', EventTeamUpdateEnqueue),
+('/tasks/math/do/event_opr/(.*)', EventOprDo),
+('/tasks/math/do/eventteam_update/(.*)', EventTeamUpdate),
+</pre>
+
+{% endblock %}
