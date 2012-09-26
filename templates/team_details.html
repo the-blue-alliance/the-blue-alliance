@@ -97,7 +97,8 @@
                     <i class="icon-map-marker"></i> in <a href="http://maps.google.com/maps?q={{ comp.event.location }}">{{ comp.event.location }}</a><br />
                     <i class="icon-calendar"></i> {{ comp.event.start_date|date:"M jS" }} - {{ comp.event.end_date|date:"M jS, Y" }}
                 </p>
-                <p>Team {{ team.team_number }} was ({{comp.wlt.win}}-{{comp.wlt.loss}}-{{comp.wlt.tie}})</p>
+                <p>Team {{ team.team_number }}{% if comp.rank %} was <strong>Rank {{ comp.rank }}</strong> with a record of
+                {% else %} had a record of {% endif %}<strong>{{comp.wlt.win}}-{{comp.wlt.loss}}-{{comp.wlt.tie}}</strong></p>
             </div>
             <div class="span8" style="margin-top: 1em">
                 {% if comp.matches.num %}
