@@ -206,9 +206,9 @@
 							<td>
 							{% if award.awardee %}
 							  {{ award.awardee }}
-							  {% if award.team != 0 %}(<a href="/team/{{award.team.team_number}}">{{award.team.team_number}}</a>){% endif %}
+							  {% if award.team.team_number %}(<a href="/team/{{award.team.team_number}}">{{award.team.team_number}}</a>){% endif %}
 							{% else %}
-							  {% if award.team != 0 %}
+							  {% if award.team.team_number %}
 							    <a href="/team/{{award.team.team_number}}">{{award.team.team_number}}</a>
 							  {% else %}
 							    --

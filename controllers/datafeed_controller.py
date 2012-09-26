@@ -14,7 +14,6 @@ from datafeeds.datafeed_usfirst import DatafeedUsfirst
 from helpers.event_manipulator import EventManipulator
 from helpers.match_manipulator import MatchManipulator
 from helpers.award_manipulator import AwardManipulator
-from helpers.award_helper import AwardUpdater
 from helpers.team_helper import TeamHelper, TeamTpidHelper
 from helpers.team_manipulator import TeamManipulator
 from helpers.opr_helper import OprHelper

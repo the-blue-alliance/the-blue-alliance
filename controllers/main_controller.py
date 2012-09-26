@@ -14,7 +14,6 @@ from base_controller import BaseHandler
 
 from models.event import Event
 from models.team import Team
-from models.award import Award
 
 def render_static(page):
     memcache_key = "main_%s" % page
