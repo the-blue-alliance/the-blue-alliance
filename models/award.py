@@ -15,17 +15,18 @@ class Award(db.Model):
     awardee = db.StringProperty() #who won it
     event = db.ReferenceProperty(Event, required=True)
     
-    def event_key_name(self):
-        return self.event.get_key_name()
-
-
-    def get_key_name(self):
+    @property
+    def key_name(self):
         """
         Returns the string of the key_name of the Award object before writing it.
         """
-        return str(self.year) + str(self.event_key_name()) + '_' + str(self.name)
+        return str(self.year) + str(self.event.key_name) + '_' + str(self.name)
     
+    @property
     def details_url(self):
         return "/award/%s" % self.get_key_name()
 
-
+    @classmethod
+    def getKeyName(self, event, name):
+        return str(event.year) + str(event.key_name) + '_' + str(name)
+        

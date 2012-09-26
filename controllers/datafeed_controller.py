@@ -14,6 +14,7 @@ from datafeeds.datafeed_usfirst_awards import DatafeedUsfirstAwards
 
 from helpers.event_manipulator import EventManipulator
 from helpers.match_manipulator import MatchManipulator
+from helpers.award_manipulator import AwardManipulator
 from helpers.award_helper import AwardUpdater
 from helpers.team_helper import TeamHelper, TeamTpidHelper
 from helpers.team_manipulator import TeamManipulator
@@ -174,29 +175,27 @@ class UsfirstEventDetailsGet(webapp.RequestHandler):
 
 class UsfirstAwardsEnqueue(webapp.RequestHandler):
     """
-    Handles enqueing updates to individual USFIRST events.
+    Handles enqueing getting awards for USFIRST events.
     """
-    def get(self):
-        try:
-            year = self.request.get("year")
-            if year == '':
-                year = 2012
-        except Exception, detail:
-            logging.error('Failed to get year value')
-            year = 2012
-
+    def get(self, when):
         events = Event.all()
-        events.filter('first_eid != ', None) # Official events with EIDs
-        events.filter('year =', year)
+        events = events.filter('official =', True)
         
-        for event in events.fetch(100):
+        if when == "now":
+            events = events.filter('end_date <=', datetime.date.today() + datetime.timedelta(days=4))
+            events = events.filter('end_date >=', datetime.date.today() - datetime.timedelta(days=1))
+        else:
+            events = events.filter('year =', int(when))
+        
+        events = events.fetch(500)
+        
+        for event in events:
             taskqueue.add(
                 queue_name='usfirst',
                 url='/tasks/get/usfirst_awards/%s' % (event.key().name()),
                 method='GET')
         template_values = {
             'events': events,
-            'year': year,
         }
 
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_awards_enqueue.html')
@@ -206,7 +205,13 @@ class UsfirstAwardsGet(webapp.RequestHandler):
     """
     Handles reading a USFIRST match results page and updating the datastore as needed.
     """
-    def get(self, event_key):
+    def get(self, event_key):   
+        datafeed = DatafeedUsfirst()
+        
+        event = Event.get_by_key_name(event_key)
+        new_awards = AwardManipulator.createOrUpdate(datafeed.getEventAwards(event))
+        
+        '''
         df = DatafeedUsfirstAwards()
         au = AwardUpdater()
         
@@ -222,7 +227,7 @@ class UsfirstAwardsGet(webapp.RequestHandler):
             keys = db.put(new_awards) # Doing a bulk put() is faster than individually.
         else:
             logging.info("No awards found for event " + str(event.year) + " " + str(event.name))
-        
+        '''
         template_values = {
             'awards': new_awards,
         }
