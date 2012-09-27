@@ -121,9 +121,11 @@ class UsfirstEventAwardsParser(ParserBase):
                 awardee = ''
 
             key_number = 1
-            while award_key in already_parsed:
-                award_key += unicode(key_number)
+            test_key = award_key
+            while test_key in already_parsed:
+                test_key = award_key + str(key_number)
                 key_number += 1
+            award_key = test_key
             award = {'name': award_key,
                      'team_number': team_number,
                      'awardee': unicode(awardee),
