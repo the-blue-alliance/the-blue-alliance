@@ -82,6 +82,28 @@
   {% endfor %}
 </table>
 
+<h2>Awards</h2>
+<table class="table table-striped table-condensed">
+    <tbody>
+      <tr><th>Award</th><th>Team</th><th>Person</th></tr>
+      {% for award in event.award_set %}
+      <tr>
+        <td><a href="/admin/award/edit/{{award.key_name}}">{{award.official_name}}</a></td>
+      <td>
+        {% if award.team.team_number %}
+          {{award.team.team_number}}
+        {% endif %}
+      </td>
+      <td>
+        {% if award.awardee %}
+	        {{ award.awardee }}
+	      {% endif %}
+      </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
 <h2>Match Listing</h2>
 
 <table class="table table-striped table-condensed table-center">

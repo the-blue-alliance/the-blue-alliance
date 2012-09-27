@@ -14,7 +14,7 @@ class Award(db.Model):
     year = db.IntegerProperty() #year it was awarded
     team = db.ReferenceProperty(Team) #team that won the award (if applicable)
     awardee = db.StringProperty(indexed=False) #person who won the award (if applicable)
-    event = db.ReferenceProperty(Event, required=True)
+    event = db.ReferenceProperty(Event)
     
     @property
     def key_name(self):

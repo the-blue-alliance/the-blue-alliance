@@ -9,48 +9,49 @@ class UsfirstEventAwardsParser(ParserBase):
     Works for official events from 2007-2012
     Note: awards are matched by award names below, but the award names
     displayed will be the award names listed on the USFIRST event pages.
-    Awards must contain every string in the list
+    Awards must contain every string in the the first list of the tuple
+    and must NOT contain any string in the second list of the tuple
     """
     AWARD_NAMES = {
-        "rca": ["chairman"],
-        "ei": ["engineering inspiration"],
-        "win1": ["winner", "1"],
-        "win2": ["winner", "2"],
-        "win3": ["winner", "3"],
-        "win4": ["winner", "4"],
-        "fin1": ["finalist", "1"],
-        "fin2": ["finalist", "2"],
-        "fin3": ["finalist", "3"],
-        "fin4": ["finalist", "4"],
-        "coop": ["coopertition"],
-        "create": ["creativity"],
-        "eng": ["engineering excellence"],
-        "entre": ["entrepreneurship"],
-        "exdes": ["excellence in design"],
-        "dlf1": ["dean's list finalist", "1"],
-        "dlf2": ["dean's list finalist", "2"],
-        "dlf3": ["dean's list finalist", "3"],
-        "dlf4": ["dean's list finalist", "4"],
-        "dlf5": ["dean's list finalist", "5"],
-        "dlf6": ["dean's list finalist", "6"],
-        "driv": ["driving", "tomorrow", "technology"],
-        "gp": ["gracious professionalism"],
-        "hrs": ["highest rookie seed"],
-        "image": ["imagery"],
-        "ind": ["industrial design"],
-        "safe": ["safety"],
-        "control": ["innovation in control"],
-        "quality": ["quality"],
-        "ras": ["rookie", "all", "star"],
-        "rinspire": ["rookie inspiration"],
-        "spirit": ["spirit"],
-        "web": ["website"],
-        "vis": ["visualization"],
-        "vol": ["volunteer"],
-        "wfa": ["woodie flowers"],
-        "judge": ["judge"],
+        "rca": (["chairman"], []),
+        "ei": (["engineering inspiration"], []),
+        "win1": (["winner", "1"], []),
+        "win2": (["winner", "2"], []),
+        "win3": (["winner", "3"], []),
+        "win4": (["winner", "4"], []),
+        "fin1": (["finalist", "1"], ["dean"]),
+        "fin2": (["finalist", "2"], ["dean"]),
+        "fin3": (["finalist", "3"], ["dean"]),
+        "fin4": (["finalist", "4"], ["dean"]),
+        "coop": (["coopertition"], []),
+        "create": (["creativity"], []),
+        "eng": (["engineering excellence"], []),
+        "entre": (["entrepreneurship"], []),
+        "exdes": (["excellence in design"], []),
+        "dlf1": (["dean's list finalist", "1"], []),
+        "dlf2": (["dean's list finalist", "2"], []),
+        "dlf3": (["dean's list finalist", "3"], []),
+        "dlf4": (["dean's list finalist", "4"], []),
+        "dlf5": (["dean's list finalist", "5"], []),
+        "dlf6": (["dean's list finalist", "6"], []),
+        "driv": (["driving", "tomorrow", "technology"], []),
+        "gp": (["gracious professionalism"], []),
+        "hrs": (["highest rookie seed"], []),
+        "image": (["imagery"], []),
+        "ind": (["industrial design"], []),
+        "safe": (["safety"], []),
+        "control": (["innovation in control"], []),
+        "quality": (["quality"], []),
+        "ras": (["rookie", "all", "star"], []),
+        "rinspire": (["rookie inspiration"], []),
+        "spirit": (["spirit"], []),
+        "web": (["website"], []),
+        "vis": (["visualization"], []),
+        "vol": (["volunteer"], []),
+        "wfa": (["woodie flowers"], []),
+        "judge": (["judge"], []),
     }
-    INDIVIDUAL_AWARDS = ["dlf", "dlf2", "dlf3", "dlf4", "dlf5", "dlf6", "vol", "wfa"]    
+    INDIVIDUAL_AWARDS = ["dlf1", "dlf2", "dlf3", "dlf4", "dlf5", "dlf6", "vol", "wfa"]    
     NO_TEAM_AWARDS = ["vol"] #awards which don't have to be associated with a team
     YEAR_SPECIFIC = {'2012': {'official': 0,
                               'team_number': 1,
@@ -87,11 +88,18 @@ class UsfirstEventAwardsParser(ParserBase):
             except TypeError:
                 team_number = 0
             award_key = None
-            for key, strings in self.AWARD_NAMES.items():
-                for string in strings:
-                    if string not in official_name.lower():
+            official_name_lower = official_name.lower()
+            for key, (yes_strings, no_strings) in self.AWARD_NAMES.items():
+                for string in yes_strings:
+                    if string not in official_name_lower:
                         break
-                    award_key = key
+                else:
+                    for string in no_strings:
+                        if string in official_name_lower:
+                            break
+                    else:
+                        award_key = key
+                        break
             if not award_key:
                 #award doesn't exist?
                 logging.error('Found an award that isn\'t in the dictionary: ' + official_name)
@@ -116,7 +124,6 @@ class UsfirstEventAwardsParser(ParserBase):
             while award_key in already_parsed:
                 award_key += unicode(key_number)
                 key_number += 1
-            logging.info(award_key)
             award = {'name': award_key,
                      'team_number': team_number,
                      'awardee': unicode(awardee),
