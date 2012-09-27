@@ -8,45 +8,47 @@ class UsfirstEventAwardsParser(ParserBase):
     """
     Works for official events from 2007-2012
     Note: awards are matched by award names below, but the award names
-    displayed will be the award names listed on the USFIRST event pages
+    displayed will be the award names listed on the USFIRST event pages.
+    Awards must contain every string in the list
     """
     AWARD_NAMES = {
-        "rca": ["Regional Chairman's Award"],
-        "ei": ["Engineering Inspiration Award"],
-        "win1": ["Regional Winners #1", "Winner #1"],
-        "win2": ["Regional Winners #2", "Winner #2"],
-        "win3": ["Regional Winners #3", "Winner #3"],
-        "win4": ["Regional Winners #4", "Winner #4"],
-        "fin1": ["Regional Finalists #1", "Finalist #1"],
-        "fin2": ["Regional Finalists #2", "Finalist #2"],
-        "fin3": ["Regional Finalists #3", "Finalist #3"],
-        "fin4": ["Regional Finalists #4", "Finalist #4"],
-        "coop": ["Coopertition Award"],
-        "create": ["Creativity Award sponsored by Xerox"],
-        "eng": ["Engineering Excellence Award sponsored by Delphi"],
-        "entre": ["Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers"],
-        "exdes": ["Excellence in Design Award sponsored by Autodesk"],
-        "dlf": ["FIRST Dean's List Finalist Award #1"],
-        "dlf2": ["FIRST Dean's List Finalist Award #2"],
-        "dlf3": ["FIRST Dean's List Finalist Award #3"],
-        "dlf4": ["FIRST Dean's List Finalist Award #4"],
-        "dlf5": ["FIRST Dean's List Finalist Award #5"],
-        "dlf6": ["FIRST Dean's List Finalist Award #6"],
-        "gp": ["Gracious Professionalism Award sponsored by Johnson & Johnson"],
-        "hrs": ["Highest Rookie Seed"],
-        "image": ["Imagery Award in honor of Jack Kamen"],
-        "ind": ["Industrial Design Award sponsored by General Motors", "Industrial Design sponsored by General Motors"],
-        "safe": ["Industrial Safety Award sponsored by Underwriters Laboratories"],
-        "control": ["Innovation in Control Award sponsored by Rockwell Automation"],
-        "quality": ["Quality Award sponsored by Motorola"],
-        "ras": ["Rookie All Star Award"],
-        "rinspire": ["Rookie Inspiration Award"],
-        "spirit": ["Team Spirit Award sponsored by Chrysler"],
-        "web": ["Website Award"],
-        "vol": ["Volunteer of the Year", "Outstanding Volunteer of the Year"],
-        "wfa": ["Woodie Flowers Finalist Award", "Woodie Flowers Award"],
-        "judge": ["Judges' Award #1", "Judges Award #1"],
-        "judge2": ["Judges' Award #2", "Judges Award #2"],
+        "rca": ["chairman"],
+        "ei": ["engineering inspiration"],
+        "win1": ["winner", "1"],
+        "win2": ["winner", "2"],
+        "win3": ["winner", "3"],
+        "win4": ["winner", "4"],
+        "fin1": ["finalist", "1"],
+        "fin2": ["finalist", "2"],
+        "fin3": ["finalist", "3"],
+        "fin4": ["finalist", "4"],
+        "coop": ["coopertition"],
+        "create": ["creativity"],
+        "eng": ["engineering excellence"],
+        "entre": ["entrepreneurship"],
+        "exdes": ["excellence in design"],
+        "dlf1": ["dean's list finalist", "1"],
+        "dlf2": ["dean's list finalist", "2"],
+        "dlf3": ["dean's list finalist", "3"],
+        "dlf4": ["dean's list finalist", "4"],
+        "dlf5": ["dean's list finalist", "5"],
+        "dlf6": ["dean's list finalist", "6"],
+        "driv": ["driving", "tomorrow", "technology"],
+        "gp": ["gracious professionalism"],
+        "hrs": ["highest rookie seed"],
+        "image": ["imagery"],
+        "ind": ["industrial design"],
+        "safe": ["safety"],
+        "control": ["innovation in control"],
+        "quality": ["quality"],
+        "ras": ["rookie", "all", "star"],
+        "rinspire": ["rookie inspiration"],
+        "spirit": ["spirit"],
+        "web": ["website"],
+        "vis": ["visualization"],
+        "vol": ["volunteer"],
+        "wfa": ["woodie flowers"],
+        "judge": ["judge"],
     }
     INDIVIDUAL_AWARDS = ["dlf", "dlf2", "dlf3", "dlf4", "dlf5", "dlf6", "vol", "wfa"]    
     NO_TEAM_AWARDS = ["vol"] #awards which don't have to be associated with a team
@@ -85,12 +87,11 @@ class UsfirstEventAwardsParser(ParserBase):
             except TypeError:
                 team_number = 0
             award_key = None
-            for key in self.AWARD_NAMES:
-                possible_names = self.AWARD_NAMES[key]
-                for name in possible_names:
-                    if official_name in name:
-                        award_key = key
+            for key, strings in self.AWARD_NAMES.items():
+                for string in strings:
+                    if string not in official_name.lower():
                         break
+                    award_key = key
             if not award_key:
                 #award doesn't exist?
                 logging.error('Found an award that isn\'t in the dictionary: ' + official_name)
@@ -125,13 +126,17 @@ class UsfirstEventAwardsParser(ParserBase):
         return awards
 
 def fixAwardee(text):
-    logging.info(text)
+    # Fix funny formatting with USFIRST's awards page
     spans = text.findAll('span')
-    name = ''
+    full_name = []
     for span in spans:
-        partial = ParserBase._recurseUntilString(span)
-        name += ' ' + partial
-    return name
+        try:
+            partial = ParserBase._recurseUntilString(span)
+            if partial not in full_name:
+                full_name.append(partial)
+        except AttributeError:
+            continue
+    return ' '.join(full_name)
 
 def sanitize(text):
     return text.replace('\r\n ', '')

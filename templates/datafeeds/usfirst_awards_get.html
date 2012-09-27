@@ -2,7 +2,9 @@
 {% for award in awards %}
     <ul>
         <li>Name: {{award.official_name}}</li>
+        {% if award.team.team_number %}
         <li>Team: {{award.team.team_number}}</li>
+        {% endif %}
         {% if award.awardee %}
         <li>Individual: {{award.awardee}}</li>
         {% endif %}
