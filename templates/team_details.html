@@ -104,7 +104,7 @@
                   and won the following awards:
 	                <ul>
 	                {% for award in comp.awards.list %}
-	                  <li>{{ award.official_name }}</li>
+	                  <li>{{ award.official_name }}{% if award.awardee %} ({{ award.awardee }}){% endif %}</li>
 	                {% endfor %}
 	                </ul>
                 {% endif %}
