@@ -49,14 +49,14 @@
 	</div>
 	
 	<ul class="nav nav-tabs nav-stacked-phone">
-	    <li class="active"><a href="#results" data-toggle="tab">Results</a></li>
+	    {% if matches.num > 0 %}<li class="active"><a href="#results" data-toggle="tab">Results</a></li>{% endif %}
         {% if event.rankings %}<li><a href="#rankings" data-toggle="tab">Rankings</a></li>{% endif %}
-        <li><a href="#teams" data-toggle="tab">Teams</a></li>
+        <li class="{% if matches.num == 0 %}active{% endif %}"><a href="#teams" data-toggle="tab">Teams</a></li>
 	    <!-- <li><a href="#awards" data-toggle="tab">Awards</a></li>-->
 	</ul>
 	
 	<div class="tab-content">
-
+    {% if matches.num > 0 %}
 	  <div class="tab-pane active" id="results">
 			
 		<div class="row">
@@ -123,6 +123,7 @@
 		{% endif %}
 	  </div>
     </div>
+    {% endif %}
 
     {% if event.rankings %}
     <div class="tab-pane" id="rankings">
@@ -156,7 +157,7 @@
     </div>
     {% endif %}
 
-	  <div class="tab-pane" id="teams">
+	  <div class="tab-pane {% if matches.num == 0 %}active{% endif %}" id="teams">
 		  <div class="row">
 	        {% if teams_a %}
 	        <div class="span6">
