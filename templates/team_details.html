@@ -68,7 +68,7 @@
                 <span class="inline">&nbsp;Season</span>
             </h3>
             {% if year_wlt %}
-                <p>Overall, team {{team.team_number}} was ({{year_wlt.win}}-{{year_wlt.loss}}-{{year_wlt.tie}}) in {{year}}.</p>
+                <p>Overall, team {{team.team_number}} was <strong>{{year_wlt.win}}-{{year_wlt.loss}}-{{year_wlt.tie}}</strong> in {{year}}.</p>
             {% endif %}
 
             {% if participation|length > 1 %}
