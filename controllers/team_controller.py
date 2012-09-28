@@ -102,9 +102,17 @@ class TeamDetail(BaseHandler):
                     display_wlt = None
                 else:
                     display_wlt = wlt
+                    
+                team_rank = None
+                for element in e.rankings:
+                    if element[1] == team_number:
+                        team_rank = element[0]
+                        break
+                    
                 participation.append({ 'event' : e,
                                        'matches' : matches,
-                                       'wlt': display_wlt })
+                                       'wlt': display_wlt,
+                                       'rank': team_rank })
             
             team.do_split_address()
             
