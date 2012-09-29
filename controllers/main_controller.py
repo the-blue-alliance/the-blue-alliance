@@ -120,8 +120,7 @@ class GamedayHandler(BaseHandler):
                 if event.start_date.date() < datetime.date.today() + datetime.timedelta(days=4):
                     ongoing_events.append(event)
             
-            template_values = {'enable': tba_config.CONFIG['gameday'],
-                               'ongoing_events': ongoing_events}
+            template_values = {'ongoing_events': ongoing_events}
             
             path = os.path.join(os.path.dirname(__file__), '../templates/gameday.html')
             html = template.render(path, template_values)
