@@ -2,7 +2,7 @@
 
 {% block title %}GameDay - The Blue Alliance{% endblock %}
 
-{% block meta_description %}FIRST Robotics Competition events{% if explicit_year %} from {{selected_year}}{% endif %}.{% endblock %}
+{% block meta_description %}Live competition page for the FIRST Robotics Competition.{% endblock %}
 
 {% block styles %}
     <link rel="stylesheet" href="/css/style.css" type="text/css" />
@@ -27,22 +27,25 @@
       
   <div class="menu">
     <ul>
-	    <li><a id="about_tab" href="#about_overlay">About</a></li>
+	    <li><a>About</a></li>
 	     
 	    <li><a>Layouts</a>
-		    <ul id="layouts_tab">
-			    <li><a href="javascript:layout_1()">Single View</a></li>
-			    <li><a href="javascript:layout_2()">Split View</a></li>
-			    <li><a href="javascript:layout_3()">"1+2" View</a></li>
-			    <li><a href="javascript:layout_4()">Quad View</a></li>
-			    <li><a href="javascript:layout_7()">"1+3" View</a></li>
-			    <li><a href="javascript:layout_5()">"1+4" View</a></li>
-			    <li><a href="javascript:layout_6()">Hex View</a></li>
+		    <ul class="layouts">
+			    <li><a class="layout-choice" href="javascript:layout_0()">Single View</a>
+			    <li><a class="layout-choice" href="javascript:layout_1()">Split View</a></li>
+			    <li><a class="layout-choice" href="javascript:layout_2()">"1+2" View</a></li>
+			    <li><a class="layout-choice" href="javascript:layout_3()">Quad View</a></li>
+			    <li><a class="layout-choice" href="javascript:layout_6()">"1+3" View</a></li>
+			    <li><a class="layout-choice" href="javascript:layout_4()">"1+4" View</a></li>
+			    <li><a class="layout-choice" href="javascript:layout_5()">Hex View</a></li>
 		    </ul>
 	    </li>
 	    
-	    <li id="webcasts_tab"><a>Webcasts</a>
-				<ul id="webcasts_hide">           
+	    <li><a>Webcasts</a>
+				<ul id="webcasts_hide" class="webcasts">
+					{% for event in ongoing_events %}
+            <li><a id='{{event.event_short}}' class='video_buttons other_vids' alt='{{event.name}} [{{event.event_short}}]'>{{event.name}} [{{event.event_short}}]</a></li>
+					{% endfor %}
 					<li><a id='arc' class='video_buttons other_vids' alt='Championship: Archimedes Field [ARC]'>Championship: Archimedes Field [ARC]</a></li>
 					<li><a id='cur' class='video_buttons other_vids' alt='Championship: Curie Field [CUR]'>Championship: Curie Field [CUR]</a></li>
 					<li><a id='gal' class='video_buttons other_vids' alt='Championship: Galileo Field [GAL]'>Championship: Galileo Field [GAL]</a></li>
@@ -61,8 +64,8 @@
 {% endblock %}
 
 {% block content %}
-<div id="webcasts_panel">
-	<div id="video_container"></div>
+<div class="webcasts_panel">
+	<div class="video_container"></div>
 </div>
 {% endblock %}
 

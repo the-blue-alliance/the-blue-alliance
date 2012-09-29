@@ -13,7 +13,7 @@
   a {
     color: @white;
   }
-  
+   
   .gameday-navbar-logo {
     height: 100%;
     margin-left: 15px;
@@ -27,7 +27,6 @@
       padding-top: 5px;
     
       a {
-        font-size: 14px;
         position: relative;
         top: -3px;
       }
@@ -43,10 +42,26 @@
   }
 
   .menu {
-    font-size: 13px;
     margin-left: 12px;
     width: auto;
-    float:right;
+    position: absolute;
+    right: 0;
+    
+    a {
+      display: block;
+      line-height: 30px;
+      padding: 0 10px;
+      text-decoration: none;
+    }
+    
+    i {
+      background-color: red;
+    }
+    
+    li {
+      float: left;
+      position: relative;
+    }
     
     ul {
       list-style: none;
@@ -62,53 +77,35 @@
         z-index: 99999;
         
         a {
-          background: #333;
-          line-height: 1em;
-          padding: 10px;
+          background: @grayDark;
           width: 275px;
-          height: auto;
-          padding-bottom:11px;
-          padding-top:9px;
-          text-align:left;
-          position:relative;
-          right:225px;
-          top:2px;
+          position: relative;
+          top: 2px;
         }
       }
     }
     
-    li {
-      float: left;
-      position: relative;
-    }
-    a {
-      color: white;
+    ul li:hover > ul {
       display: block;
-      line-height: 30px;
-      padding: 0 10px;
-      text-decoration: none;
     }
-  }
-
-  .menu ul ul 
-  .menu ul #webcasts_hide a{
-    width: 275px;
-    right: 125px;
-  }
-  .menu ul #layouts_tab a{
-    width:150px;
-    right:100px;
-  }
-  .menu li:hover > a,
-  .menu ul ul :hover > a {
-    background: #555;
-  }
-  .menu ul li:hover > ul {
-    display: block;
+    
+    li:hover > a,
+    ul ul:hover >a {
+      background: @gray;
+    }
+    
+    .layouts a{
+      width: 150px;
+    }
+    
+    .webcasts a{
+      width: 275px;
+      right: 175px;
+    }
   }
 }
 
-#webcasts_panel {
+.webcasts_panel {
   overflow: hidden;
   position: absolute;
   top: 30px;
@@ -118,11 +115,62 @@
   z-index: 105;
 }
 
-#video_container {
+.video_container {
   position: absolute;
   top: 0px;
   bottom: 0px;
   left: 0px;
   right: 0px;
   z-index:0;
+}
+
+.view {
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  background: @grayDarker;
+  outline: @black 1px solid;
+  visibility: visible;
+  color: @white;
+  position: absolute;
+}
+
+.ui-widget-header {
+  width:150px;
+  text-align:center;
+  z-index:100000
+}
+
+.overlay {
+  background: -moz-linear-gradient(top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0) 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,1)), color-stop(40%,rgba(0,0,0,0)), color-stop(100%,rgba(0,0,0,0)));
+  background: -webkit-linear-gradient(top, rgba(0,0,0,1) 0%,rgba(0,0,0,0) 40%,rgba(0,0,0,0) 100%);
+  background: -o-linear-gradient(top, rgba(0,0,0,1) 0%,rgba(0,0,0,0) 40%,rgba(0,0,0,0) 100%);
+  background: -ms-linear-gradient(top, rgba(0,0,0,1) 0%,rgba(0,0,0,0) 40%,rgba(0,0,0,0) 100%);
+  background: linear-gradient(top, rgba(0,0,0,1) 0%,rgba(0,0,0,0) 40%,rgba(0,0,0,0) 100%);
+  z-index: 5000;
+  width: 100%;
+  height: 65%;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  text-align: right;
+  pointer-events: none;
+  
+  .overlay-title {
+    font-size: 24px;
+    color: white;
+    float: left;
+    margin: 15px;
+  }
+  
+  .view-close {
+    margin: 15px;
+    pointer-events: all;
+  }
+  
+  .swap {
+    margin: 15px;
+    pointer-events: all;
+  }
 }

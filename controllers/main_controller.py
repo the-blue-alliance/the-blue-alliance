@@ -108,7 +108,16 @@ class GamedayHandler(BaseHandler):
         memcache_key = "main_gameday"
         html = memcache.get(memcache_key)
         if html is None:
-            template_values = {'enable': tba_config.CONFIG['gameday']}
+            next_events = Event.all().filter("start_date >=", datetime.date.today() - datetime.timedelta(days=4))
+            next_events.order('start_date').fetch(20)
+            
+            ongoing_events = []
+            for event in next_events:
+                if event.start_date.date() < datetime.date.today() + datetime.timedelta(days=4):
+                    ongoing_events.append(event)
+            
+            template_values = {'enable': tba_config.CONFIG['gameday'],
+                               'ongoing_events': ongoing_events}
             
             path = os.path.join(os.path.dirname(__file__), '../templates/gameday.html')
             html = template.render(path, template_values)
