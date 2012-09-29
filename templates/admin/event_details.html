@@ -6,9 +6,11 @@
 
 <h1>{{event.key_name}} - {{ event.name }}</h1>
 
-<p>
-    <a href="/admin/event/edit/{{event.year}}{{event.event_short}}" class="btn btn-primary"><i class="icon-edit icon-white"></i> Edit Event</a>
-</p>
+<div class="btn-group">
+    <a href="/event/{{event.key_name}}" class="btn"><i class="icon-eye-open"></i> View on TBA</a>
+    <a href="/admin/event/edit/{{event.key_name}}" class="btn btn-primary"><i class="icon-edit icon-white"></i> Edit</a>
+</div>
+<br />
 
 <table class="table table-striped table-hover">
     <tr>
@@ -65,9 +67,26 @@
     </tr>
 </table>
 
+<h2>Rankings</h2>
+<table class="table table-striped table-condensed table-center">
+  {% for row in event.rankings %}
+      <tr>
+      {% if forloop.first %}
+            {% for element in row %}
+                <th>{{ element }}</th>
+            {% endfor %}
+      {% else %}
+        {% for element in row %}
+            <td>{{ element }}</td>
+        {% endfor %}
+    {% endif %}
+    </tr>
+  {% endfor %}
+</table>
+
 <h2>Match Listing</h2>
 
-<table class="table table-striped table-hover">
+<table class="table table-striped table-condensed table-center">
     <thead>
         <th>Match Key</th>
         <th>Alliances JSON</th>

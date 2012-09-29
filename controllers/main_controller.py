@@ -31,11 +31,15 @@ class MainHandler(BaseHandler):
         memcache_key = "main_index"
         html = memcache.get(memcache_key)
         if html is None:
-            upcoming_events = Event.all().filter("start_date >=", datetime.date.today() - datetime.timedelta(days=4))
-            upcoming_events.order('start_date').fetch(20)
+            next_events = Event.all().filter("start_date >=", datetime.date.today() - datetime.timedelta(days=4))
+            next_events.order('start_date').fetch(20)
             
+            upcoming_events = []
+            for event in next_events:
+                if event.start_date.date() < datetime.date.today() + datetime.timedelta(days=4):
+                    upcoming_events.append(event)
             # Only show events that are happening "the same week" as the first one
-            if upcoming_events.count() > 0:
+            if len(upcoming_events) > 0:
                 first_start_date = upcoming_events[0].start_date            
                 upcoming_events = [e for e in upcoming_events if ((e.start_date - datetime.timedelta(days=6)) < first_start_date)]
                 kickoff_countdown = False

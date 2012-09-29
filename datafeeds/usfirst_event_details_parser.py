@@ -40,6 +40,9 @@ class UsfirstEventDetailsParser(ParserBase):
                 if field == "Match Results":
                     #http://www2.usfirst.org/2010comp/Events/SDC/matchresults.html
                     m = re.match(r"http://www2\.usfirst\.org/%scomp/Events/([a-zA-Z0-9]*)/matchresults\.html" % result["year"], tds[1].a["href"])
+                    if m is None:
+                        # Some 2013 events are beautiful-souping tds[1].a["href"] to "http://www2.usfirst.org/2013comp/Events/FLBR" inexplicbly
+                        m = re.match(r"http://www2\.usfirst\.org/%scomp/Events/([a-zA-Z0-9]*)" % result["year"], tds[1].a["href"])
                     result["event_short"] = m.group(1).lower()
         
         return result

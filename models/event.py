@@ -35,7 +35,10 @@ class Event(db.Model):
         Lazy load parsing rankings JSON
         """
         if self._rankings is None:
-          self._rankings = json.loads(self.rankings_json)
+            if type(self.rankings_json) == db.Text:
+                self._rankings = json.loads(self.rankings_json)
+            else:
+                self._rankings = None
         return self._rankings
 
     @property
