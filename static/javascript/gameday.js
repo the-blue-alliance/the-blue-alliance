@@ -39,18 +39,10 @@ function returnFormat($item, viewNum) {
 	overlay = "<div id='overlay_" + viewNum + "' class='overlay' alt='" + $item.attr("alt") + "'>" +
 		"<div class='overlay-title'>" + $item.attr("alt") + "</div>" +
 		"<a id='close_" + viewNum + "' class='view-close' href='#'>" +
-		"<img src='Images/video_close.png' title='Close' style='margin:10px 0 5px 0; border:none;'></img></a><br />" +
-		"<a id='swap_" + viewNum + "' class='swap' href='#' style='margin:15px; pointer-events:all;'>" +
-		"<img src='Images/video_swap.png' title='Drag to another scren to swap' style='margin:5px 0 10px 0; border:none;'></img></a></div>";
-	
-	overlay = "<div id='overlay_" + viewNum + "' class='overlay' alt='" + $item.attr("alt") + "'>" +
-		"<div class='overlay-title'>" + $item.attr("alt") + "</div>" +
-		"<a id='close_" + viewNum + "' class='view-close' href='#'>" +
 		"<i class='icon-remove icon-white' title='Close'></i></a><br />" +
 		"<a id='swap_" + viewNum + "' class='swap' href='#'>" +
 		"<i class='icon-move icon-white' title='Drag to another screen to swap'></i></a></div>";
 	// Combines the proper video player with overlay
-	//return temp + "<div id='overlay_"+viewNum+"' alt='"+ $item.attr("alt") +"' style='background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,1)), color-stop(100%,rgba(0,0,0,0))); z-index:5000; width: 100%; height: 65%; position:absolute; top:0px; left:0px; text-align:right; pointer-events:none;'><h2 style='color:white; float:left; margin:15px;'>" + $item.attr("alt") + "</h2><a id='close_"+viewNum+"' href='#' style='margin:15px; pointer-events:all;'><img src='Images/video_close.png' title='Close' style='margin:10px 0 5px 0;'></img></a><br /><a id='swap_"+viewNum+"' class='swap' href='#' style='margin:15px; pointer-events:all;'><img src='Images/video_swap.png' title='Drag to another screen to swap' style='margin:5px 0 10px 0;'></img></a></div>";
 	return temp + overlay;
 }
 
