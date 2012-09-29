@@ -5,6 +5,25 @@
   background-color: @black;
 }
 
+.empty_info {
+  display: inline-block;
+  vertical-align: middle;
+  background-color: @gray;
+  margin: 8px;
+  padding: 8px;
+  color: @white;  
+  border: 1px solid @black;
+  .border-radius(4px);
+  .box-shadow(0 1px 1px rgba(0,0,0,.075));
+  text-align: center;
+}
+
+.div_helper {
+    display: inline-block;
+    vertical-align: middle;
+    height: 100%;
+}
+
 .gameday-navbar {
   #gradient > .vertical(@navbarBackgroundHighlight, @navbarBackground);
   color: @white;
@@ -181,12 +200,11 @@
 }
 
 .overlay {
-  background: -moz-linear-gradient(top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0) 100%);
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,1)), color-stop(40%,rgba(0,0,0,0)), color-stop(100%,rgba(0,0,0,0)));
-  background: -webkit-linear-gradient(top, rgba(0,0,0,1) 0%,rgba(0,0,0,0) 40%,rgba(0,0,0,0) 100%);
-  background: -o-linear-gradient(top, rgba(0,0,0,1) 0%,rgba(0,0,0,0) 40%,rgba(0,0,0,0) 100%);
-  background: -ms-linear-gradient(top, rgba(0,0,0,1) 0%,rgba(0,0,0,0) 40%,rgba(0,0,0,0) 100%);
-  background: linear-gradient(top, rgba(0,0,0,1) 0%,rgba(0,0,0,0) 40%,rgba(0,0,0,0) 100%);
+  background-image: -moz-linear-gradient(top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 60px, rgba(0,0,0,0) 100px);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0.8)), color-stop(60px,rgba(0,0,0,0.6)), color-stop(100px,rgba(0,0,0,0)));
+  background-image: -webkit-linear-gradient(top, rgba(0,0,0,0.8) 0%,rgba(0,0,0,0.6) 60px,rgba(0,0,0,0) 100px);
+  background-image: -o-linear-gradient(top, rgba(0,0,0,0.8) 0%,rgba(0,0,0,0.6) 60px,rgba(0,0,0,0) 100px);
+  background-image: linear-gradient(top, rgba(0,0,0,0.8) 0%,rgba(0,0,0,0.6) 60px,rgba(0,0,0,0) 100px);
   z-index: 5000;
   width: 100%;
   height: 50%;

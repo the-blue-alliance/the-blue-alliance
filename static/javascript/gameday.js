@@ -36,6 +36,7 @@ function returnFormat($item, viewNum) {
 		temp = "<iframe width='100%' height='100%' src='/other_vids/" + $item.attr("id") + ".php' scrolling='no' style='border:none; margin:0; padding:0; wmode='transparent''></iframe>";
 	}
 	temp = 'hello'
+	temp = "<iframe width='100%' height='100%' src='http://www.chiefdelphi.com' scrolling='no' style='border:none; margin:0; padding:0; wmode='transparent''></iframe>";
 	overlay = "<div id='overlay_" + viewNum + "' class='overlay' alt='" + $item.attr("alt") + "'>" +
 		"<div class='overlay-title'>" + $item.attr("alt") + "</div>" +
 		"<div id='close_" + viewNum + "' class='view-close'>" +
@@ -47,7 +48,7 @@ function returnFormat($item, viewNum) {
 }
 
 //Create Views
-var default_view = "INFOHERE";
+var default_view = "<div class='empty_info'>Drag and drop an event from the 'Webcasts' menu to assign it to this screen.</div><div class='div_helper'></div>";
 
 function createViews(){
   var maxViews = 6;
@@ -71,7 +72,7 @@ function setupDragDrop() {
 		revert: "invalid",
 		helper: "clone",
 		cursor: "move",
-		containment: "#drag_contain",
+		containment: ".webcasts_panel",
 	});
 	
 	// Let the views be droppable, accepting the video items OR drag handles
