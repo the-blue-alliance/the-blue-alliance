@@ -38,10 +38,10 @@ function returnFormat($item, viewNum) {
 	temp = 'hello'
 	overlay = "<div id='overlay_" + viewNum + "' class='overlay' alt='" + $item.attr("alt") + "'>" +
 		"<div class='overlay-title'>" + $item.attr("alt") + "</div>" +
-		"<a id='close_" + viewNum + "' class='view-close' href='#'>" +
-		"<i class='icon-remove icon-white' title='Close'></i></a><br />" +
-		"<a id='swap_" + viewNum + "' class='swap' href='#'>" +
-		"<i class='icon-move icon-white' title='Drag to another screen to swap'></i></a></div>";
+		"<div id='close_" + viewNum + "' class='view-close'>" +
+		"<i class='icon-remove icon-white' rel='tooltip' data-placement='left' title='Close'></i></div>" +
+		"<div id='swap_" + viewNum + "' class='swap'>" +
+		"<i class='icon-move icon-white' rel='tooltip' data-placement='left' title='Drag to another screen to swap'></i></div></div>";
 	// Combines the proper video player with overlay
 	return temp + overlay;
 }
@@ -66,11 +66,12 @@ function setupDragDrop() {
 				
 	// Let the video items be draggable
 	$( ".video_buttons" ).draggable({
+		drag: function() {$('.webcasts').addClass('webcasts-show');},
+		stop: function() {$('.webcasts').removeClass('webcasts-show');},
 		revert: "invalid",
 		helper: "clone",
 		cursor: "move",
 		containment: "#drag_contain",
-		//stop: function() {document.getElementById('webcasts_hide').style.display="none"; click = false;}
 	});
 	
 	// Let the views be droppable, accepting the video items OR drag handles
@@ -88,6 +89,7 @@ function setupDragDrop() {
 	function setupView(view_num, $item) {
 		hiddenviews[view_num] = returnFormat($item, view_num);
 		document.getElementById('view_' + view_num).innerHTML = hiddenviews[view_num];
+		$("[rel=tooltip]").tooltip();
 		setupCloseSwap(view_num);
 	}
 }
