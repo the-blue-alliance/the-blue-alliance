@@ -116,6 +116,7 @@ class GamedayHandler(BaseHandler):
             
             ongoing_events = []
             for event in next_events:
+                ongoing_events.append(event)
                 if event.start_date.date() < datetime.date.today() + datetime.timedelta(days=4):
                     ongoing_events.append(event)
             

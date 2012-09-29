@@ -19,34 +19,6 @@ $(function() {
 });
 
 
-//Return proper player for a given video
-function returnFormat($item, viewNum) {
-	var temp, overlay;
-	if ($item.hasClass('justin')) {
-		temp = "<object type='application/x-shockwave-flash' height='100%' width='100%' id='live_embed_player_flash' data='http://www.justin.tv/widgets/live_embed_player.swf?channel=" + $item.attr("id") + "' bgcolor='#000000'><param name='allowFullScreen' value='true' /><param name='allowScriptAccess' value='always' /><param name='allowNetworking' value='all' /><param name='movie' value='http://www.justin.tv/widgets/live_embed_player.swf' /><param name='flashvars' value='hostname=www.justin.tv&channel=" + $item.attr("id") + "&auto_play=true&start_volume=25&enable_javascript=true' /><param name='wmode' value='transparent' /></object>";
-	} else if ($item.hasClass('ustream')) {
-		temp = "<object id='utv_o_322919' height='100%' width='100%' classid='clsid:D27CDB6E-AE6D-11cf-96B8-444553540000'><param value='http://www.ustream.tv/flash/live/" + $item.attr("id") + "' name='movie' /><param value='true' name='allowFullScreen' /><param value='always' name='allowScriptAccess' /><param value='transparent' name='wmode' /><param value='viewcount=true&autoplay=true&brand=embed&' name='flashvars' /><embed name='utv_e_218829' id='utv_e_209572' flashvars='viewcount=true&autoplay=true&brand=embed&' height='100%' width='100%' allowfullscreen='true' allowscriptaccess='always' wmode='transparent' src='http://www.ustream.tv/flash/live/" + $item.attr("id") + "' type='application/x-shockwave-flash' /></object>";
-	} else if ($item.hasClass('livestream')) {
-		temp = "<object width='100%' height='100%' id='lsplayer' classid='clsid:D27CDB6E-AE6D-11cf-96B8-444553540000'><param name='movie' value='http://cdn.livestream.com/grid/LSPlayer.swf?channel=" + $item.attr("id") + "&amp;color=0xe7e7e7&amp;autoPlay=true&amp;mute=false&amp;iconColorOver=0x888888&amp;iconColor=0x777777'></param><param name='allowScriptAccess' value='always'></param><param name='allowFullScreen' value='true'></param><param value='transparent' name='wmode' /><embed name='lsplayer' wmode='transparent' src='http://cdn.livestream.com/grid/LSPlayer.swf?channel=" + $item.attr("id") + "&amp;color=0xe7e7e7&amp;autoPlay=true&amp;mute=false&amp;iconColorOver=0x888888&amp;iconColor=0x777777' width='100%' height='100%' allowScriptAccess='always' allowFullScreen='true' type='application/x-shockwave-flash'></embed></object>";
-	} else if ($item.hasClass('wmv')) {
-		temp = "<iframe width='100%' height='100%' src='/wmv/" + $item.attr("id") + ".php' scrolling='no' style='border:none; margin:0; padding:0; wmode='transparent''></iframe>";
-	} else if ($item.hasClass('wmv2')) {
-		temp = "<object id='mediaplayer' classid='clsid:22d6f312-b0f6-11d0-94ab-0080c74c7e95' codebase='http://activex.microsoft.com/activex/controls/mplayer/en/nsmp2inf.cab#version=5,1,52,701' standby='loading microsoft windows media player components...' type='application/x-oleobject' width='100%' height='100%'><param name='filename' value='" + $item.attr("id") + "'><param name='animationatstart' value='true'><param name='transparentatstart' value='true'><param name='autostart' value='true'><param name='showcontrols' value='true'><param name='ShowStatusBar' value='true'><param name='windowlessvideo' value='true'><embed src='" + $item.attr("id") + "' autostart='true' showcontrols='true' showstatusbar='1' bgcolor='black' width='100%' height='100%'></object>";
-	} else if ($item.hasClass('other_vids')) {
-		temp = "<iframe width='100%' height='100%' src='/other_vids/" + $item.attr("id") + ".php' scrolling='no' style='border:none; margin:0; padding:0; wmode='transparent''></iframe>";
-	}
-	temp = 'hello'
-	temp = "<iframe width='100%' height='100%' src='http://www.chiefdelphi.com' scrolling='no' style='border:none; margin:0; padding:0; wmode='transparent''></iframe>";
-	overlay = "<div id='overlay_" + viewNum + "' class='overlay' alt='" + $item.attr("alt") + "'>" +
-		"<div class='overlay-title'>" + $item.attr("alt") + "</div>" +
-		"<div id='close_" + viewNum + "' class='view-close'>" +
-		"<i class='icon-remove icon-white' rel='tooltip' data-placement='left' title='Close'></i></div>" +
-		"<div id='swap_" + viewNum + "' class='swap'>" +
-		"<i class='icon-move icon-white' rel='tooltip' data-placement='left' title='Drag to another screen to swap'></i></div></div>";
-	// Combines the proper video player with overlay
-	return temp + overlay;
-}
-
 //Create Views
 var default_view = "<div class='empty_info'>Drag and drop an event from the 'Webcasts' menu to assign it to this screen.</div><div class='div_helper'></div>";
 
@@ -87,11 +59,29 @@ function setupDragDrop() {
 		}
 	});
 
-	function setupView(view_num, $item) {
-		hiddenviews[view_num] = returnFormat($item, view_num);
-		document.getElementById('view_' + view_num).innerHTML = hiddenviews[view_num];
-		$("[rel=tooltip]").tooltip();
-		setupCloseSwap(view_num);
+	function setupView(viewNum, $item) {
+		eventKey = $item.attr('id');
+		eventName = $item.attr('alt');
+		
+		$.getJSON('/_/webcast?event=' + eventKey, function(data) {
+			player = data.player;
+			if (player == undefined) {
+				player = "No webcast available"
+			}
+			
+			// Combines the video player with overlay
+			var viewContents = player + "<div id='overlay_" + viewNum + "' class='overlay' alt='" + eventName + "'>" +
+			"<div class='overlay-title'>" + eventName + "</div>" +
+			"<div id='close_" + viewNum + "' class='view-close'>" +
+			"<i class='icon-remove icon-white' rel='tooltip' data-placement='left' title='Close'></i></div>" +
+			"<div id='swap_" + viewNum + "' class='swap'>" +
+			"<i class='icon-move icon-white' rel='tooltip' data-placement='left' title='Drag to another screen to swap'></i></div></div>";
+			
+			hiddenviews[viewNum] = viewContents;
+			document.getElementById('view_' + viewNum).innerHTML = hiddenviews[viewNum];
+			$("[rel=tooltip]").tooltip();
+			setupCloseSwap(viewNum);
+		});
 	}
 }
 

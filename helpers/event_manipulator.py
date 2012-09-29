@@ -26,6 +26,7 @@ class EventManipulator(ManipulatorBase):
             "venue",
             "venue_address",
             "webcast_url",
+            "webcast_json",
             "website",
             "year"
         ]

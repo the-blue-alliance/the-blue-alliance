@@ -66,6 +66,7 @@ class AdminEventEdit(webapp.RequestHandler):
             official = {"true": True, "false": False}.get(self.request.get("official").lower()),
             facebook_eid = self.request.get("facebook_eid"),
             webcast_url = self.request.get("webcast_url"),
+            webcast_json = self.request.get("webcast_json"),
             rankings_json = self.request.get("rankings_json"),
         )
         event = EventManipulator.createOrUpdate(event)

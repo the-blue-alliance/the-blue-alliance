@@ -21,12 +21,14 @@ class Event(db.Model):
     facebook_eid = db.StringProperty(indexed=False) #from Facebook
     website = db.StringProperty(indexed=False)
     webcast_url = db.StringProperty(indexed=False)
+    webcast_json = db.TextProperty(indexed=False)
     oprs = db.ListProperty(float, indexed=False)
     opr_teams = db.ListProperty(int, indexed=False)
     rankings_json = db.TextProperty(indexed=False)
 
     def __init__(self, *args, **kw):
         self._rankings = None
+        self._webcast = None
         super(Event, self).__init__(*args, **kw)
     
     @property
@@ -40,6 +42,18 @@ class Event(db.Model):
             else:
                 self._rankings = None
         return self._rankings
+    
+    @property
+    def webcast(self):
+        """
+        Lazy load parsing webcast JSON
+        """
+        if self._webcast is None:
+            if type(self.webcast_json) == db.Text:
+                self._webcast = json.loads(self.webcast_json)
+            else:
+                self._webcast = None
+        return self._webcast
 
     @property
     def key_name(self):

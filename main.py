@@ -10,7 +10,7 @@ from controllers.main_controller import ContactHandler, HashtagsHandler, \
       PageNotFoundHandler, KickoffHandler, ChannelHandler, GamedayHandler
 from controllers.match_controller import MatchList, MatchDetail
 from controllers.team_controller import TeamList, TeamDetail
-from controllers.ajax_controller import TypeaheadHandler
+from controllers.ajax_controller import TypeaheadHandler, WebcastHandler
 
 
 landing_handler = {False: MainHandler,
@@ -34,6 +34,7 @@ app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['kickoff'
                                ('/opr', OprHandler),
                                ('/channel', ChannelHandler),
                                ('/_/typeahead', TypeaheadHandler),
+                               ('/_/webcast', WebcastHandler),
                                ('/.*', PageNotFoundHandler),
                                ],
                               debug=tba_config.DEBUG)

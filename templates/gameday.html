@@ -35,15 +35,15 @@
 	    <li><a>Webcasts</a>
 				<ul id="webcasts_hide" class="webcasts">
 					{% for event in ongoing_events %}
-            <li><a id='{{event.event_short}}' class='video_buttons other_vids' alt='{{event.name}} [{{event.event_short}}]'>{{event.name}} [{{event.event_short}}]</a></li>
+            <li><a id='{{event.key_name}}' class='video_buttons' alt='{{event.name}} [{{event.event_short|upper}}]'>{{event.name}} [{{event.event_short|upper}}]</a></li>
 					{% endfor %}
-					<li><a id='arc' class='video_buttons other_vids' alt='Championship: Archimedes Field [ARC]'>Championship: Archimedes Field [ARC]</a></li>
-					<li><a id='cur' class='video_buttons other_vids' alt='Championship: Curie Field [CUR]'>Championship: Curie Field [CUR]</a></li>
-					<li><a id='gal' class='video_buttons other_vids' alt='Championship: Galileo Field [GAL]'>Championship: Galileo Field [GAL]</a></li>
-					<li><a id='new' class='video_buttons other_vids' alt='Championship: Newton Field [NEW]'>Championship: Newton Field [NEW]</a></li>
-					<li><a id='ein' class='video_buttons other_vids' alt='Championship: Einstein Field [EIN]'>Championship: Einstein Field [EIN]</a></li>
-					<li><a id='edi' class='video_buttons other_vids' alt='FTC: Edison Field'>FTC: Edison Field</a></li>
-					<li><a id='fra' class='video_buttons other_vids' alt='FTC: Franklin Field'>FTC: Franklin Field</a></li>
+					<li><a id='2012arc' class='video_buttons other_vids' alt='Championship: Archimedes Field [ARC]'>Championship: Archimedes Field [ARC]</a></li>
+					<li><a id='2012cur' class='video_buttons other_vids' alt='Championship: Curie Field [CUR]'>Championship: Curie Field [CUR]</a></li>
+					<li><a id='2012gal' class='video_buttons other_vids' alt='Championship: Galileo Field [GAL]'>Championship: Galileo Field [GAL]</a></li>
+					<li><a id='2012new' class='video_buttons other_vids' alt='Championship: Newton Field [NEW]'>Championship: Newton Field [NEW]</a></li>
+					<li><a id='2012ein' class='video_buttons other_vids' alt='Championship: Einstein Field [EIN]'>Championship: Einstein Field [EIN]</a></li>
+					<li><a id='2012edi' class='video_buttons other_vids' alt='FTC: Edison Field'>FTC: Edison Field</a></li>
+					<li><a id='2012fra' class='video_buttons other_vids' alt='FTC: Franklin Field'>FTC: Franklin Field</a></li>
 				</ul>
 			</li>
 			
