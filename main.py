@@ -7,10 +7,10 @@ import tba_config
 from controllers.event_controller import EventList, EventDetail, EventRss
 from controllers.main_controller import ContactHandler, HashtagsHandler, \
       MainHandler, OprHandler, SearchHandler, AboutHandler, ThanksHandler, \
-      TypeaheadHandler, PageNotFoundHandler, KickoffHandler, ChannelHandler, \
-      GamedayHandler
+      PageNotFoundHandler, KickoffHandler, ChannelHandler, GamedayHandler
 from controllers.match_controller import MatchList, MatchDetail
 from controllers.team_controller import TeamList, TeamDetail
+from controllers.ajax_controller import TypeaheadHandler
 
 
 landing_handler = {False: MainHandler,
