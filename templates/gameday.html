@@ -34,18 +34,23 @@
 	    
 	    <li><a>Webcasts</a>
 				<ul id="webcasts_hide" class="webcasts">
-					{% for event in ongoing_events %}
+					{% for event in ongoing_webcasts %}
             <li><a id='{{event.key_name}}' class='video_buttons' alt='{{event.name}} [{{event.event_short|upper}}]'>{{event.name}} [{{event.event_short|upper}}]</a></li>
+					{% empty %}
+					  <li><a>No webcasts</a></li>
 					{% endfor %}
-					<li><a id='2012arc' class='video_buttons other_vids' alt='Championship: Archimedes Field [ARC]'>Championship: Archimedes Field [ARC]</a></li>
-					<li><a id='2012cur' class='video_buttons other_vids' alt='Championship: Curie Field [CUR]'>Championship: Curie Field [CUR]</a></li>
-					<li><a id='2012gal' class='video_buttons other_vids' alt='Championship: Galileo Field [GAL]'>Championship: Galileo Field [GAL]</a></li>
-					<li><a id='2012new' class='video_buttons other_vids' alt='Championship: Newton Field [NEW]'>Championship: Newton Field [NEW]</a></li>
-					<li><a id='2012ein' class='video_buttons other_vids' alt='Championship: Einstein Field [EIN]'>Championship: Einstein Field [EIN]</a></li>
-					<li><a id='2012edi' class='video_buttons other_vids' alt='FTC: Edison Field'>FTC: Edison Field</a></li>
-					<li><a id='2012fra' class='video_buttons other_vids' alt='FTC: Franklin Field'>FTC: Franklin Field</a></li>
 				</ul>
 			</li>
+			
+      <li><a>Results</a>
+        <ul class="results">
+          {% for event in ongoing_events %}
+            <li><a class="event_results" href="/event/{{event.key_name}}">{{event.name}} [{{event.event_short|upper}}]</a></li>
+          {% empty %}
+            <li><a>No events</a></li>
+          {% endfor %}
+        </ul>
+      </li>
 			
 			<li><a id="chat_tab" href="#">Chat</a></li>
     </ul>

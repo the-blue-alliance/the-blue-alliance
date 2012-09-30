@@ -18,6 +18,16 @@ $(function() {
   });
 });
 
+$(document).ready(function() {
+	$(".event_results").fancybox({
+		'overlayColor'  :	'#333',
+		'overlayShow'	:	true,
+		'autoDimensions':	false,
+		'width'			: 	0.9*width,
+		'height'		:	0.9*height,
+		'type'			:	'iframe',
+	});
+});
 
 //Create Views
 var default_view = "<div class='empty_info'>Drag and drop an event from the 'Webcasts' menu to assign it to this screen.</div><div class='div_helper'></div>";

@@ -115,12 +115,15 @@ class GamedayHandler(BaseHandler):
             next_events.order('start_date').fetch(20)
             
             ongoing_events = []
+            ongoing_webcasts = []
             for event in next_events:
-                ongoing_events.append(event)
                 if event.start_date.date() < datetime.date.today() + datetime.timedelta(days=4):
                     ongoing_events.append(event)
+                    if event.webcast and 'type' in event.webcast:
+                        ongoing_webcasts.append(event)
             
-            template_values = {'ongoing_events': ongoing_events}
+            template_values = {'ongoing_events': ongoing_events,
+                               'ongoing_webcasts': ongoing_webcasts}
             
             path = os.path.join(os.path.dirname(__file__), '../templates/gameday.html')
             html = template.render(path, template_values)
