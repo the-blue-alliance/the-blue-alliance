@@ -19,6 +19,13 @@ $(function() {
 });
 
 $(document).ready(function() {
+	
+	// Bootstrap is stopping propagation of event
+	$('body').on('click', '.event_results', function(e) {
+		e.preventDefault();
+		$(document).trigger(e);
+	});
+	
 	$(".event_results").fancybox({
 		'overlayColor'  :	'#333',
 		'overlayShow'	:	true,
@@ -52,9 +59,12 @@ function setupDragDrop() {
 		drag: function() {$('.webcasts').addClass('webcasts-show');},
 		stop: function() {$('.webcasts').removeClass('webcasts-show');},
 		revert: "invalid",
-		helper: "clone",
 		cursor: "move",
 		containment: ".webcasts_panel",
+		helper: function(event) {
+			return $("<div class='drag-helper'>" + $(this).attr("alt") + "</div>");
+		},
+		cursorAt: {left: 15, top: 15},
 	});
 	
 	// Let the views be droppable, accepting the video items OR drag handles
@@ -112,9 +122,9 @@ function setupCloseSwap(viewNum) {
 			cursor: "move",
 			containment: "#drag_contain",
 			stop: function() {/*$("#overlay_"+viewNum).fadeOut(50); */swapping = false; },
-			cursorAt: { top: 10, left: 20 },
+			cursorAt: { top: 15, left: 15 },
 			helper: function(event) {
-				return $("<div class='ui-widget-header'>" + $("#overlay_"+viewNum).attr("alt") + "</div>");
+				return $("<div class='drag-helper'>" + $("#overlay_"+viewNum).attr("alt") + "</div>");
 			}
 		});
 	});

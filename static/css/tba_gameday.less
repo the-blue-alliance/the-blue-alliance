@@ -3,6 +3,85 @@
   padding: 0;
   overflow: hidden;
   background-color: @black;
+  
+  .nav, .navbar, .navbar-inner,
+  .container, .brand,
+  .dropdown, .dropdown-toggle,
+  .chat, .chat-toggle {
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 30px !important;
+    min-height: auto !important;
+    color: @white !important;
+  }
+  
+  .container {
+    width: auto;
+    margin-left: 10px !important;
+  }
+  
+  .gameday-title {
+    vertical-align: middle;
+    padding-left: 25px;
+  }
+  
+  .main-site {
+    color: @white;
+    font-size: 14px;
+    font-weight: normal;
+    margin-left: 10px;
+  }
+  
+  .dropdown-toggle, .chat-toggle {
+    padding: 6px 8px !important;
+    height: 18px !important;
+  }
+  
+  .dropdown:hover, .chat:hover {
+    background-color: @gray;
+  }
+  
+  .dropdown-menu {
+    margin: 0;
+  
+    a, a:hover {
+      background-repeat: no-repeat;
+      background-position: 95% center;
+    }
+  
+    .layout_0 {
+      background-image: url('/images/icons/layout_0.png');
+    }
+    
+    .layout_1 {
+      background-image: url('/images/icons/layout_1.png');
+    }
+
+    .layout_2 {
+      background-image: url('/images/icons/layout_2.png');
+    }
+
+    .layout_3 {
+      background-image: url('/images/icons/layout_3.png');
+    }
+
+    .layout_4 {
+      background-image: url('/images/icons/layout_4.png');
+    }
+
+    .layout_5 {
+      background-image: url('/images/icons/layout_5.png');
+    }
+
+    .layout_6 {
+      background-image: url('/images/icons/layout_6.png');
+    }
+  }
+  
+  ul.nav li.dropdown:hover ul.dropdown-menu{
+    display: block;    
+  }
+
 }
 
 .empty_info {
@@ -22,147 +101,6 @@
     display: inline-block;
     vertical-align: middle;
     height: 100%;
-}
-
-.gameday-navbar {
-  #gradient > .vertical(@navbarBackgroundHighlight, @navbarBackground);
-  color: @white;
-  height: 30px;
-  
-  a {
-    color: @white;
-  }
-   
-  .gameday-navbar-logo {
-    height: 100%;
-    margin-left: 15px;
-    background-image: url('/images/tba_blue_lamp_navbar.png');
-    background-repeat: no-repeat;
-    background-position: left center;
-    width: 325px;
-    float: left;
-    
-    .gameday-navbar-inner {
-      padding-top: 5px;
-    
-      a {
-        position: relative;
-        top: -3px;
-      }
-      
-      .gameday-title {
-        height: 100%;
-        margin-left: 30px;
-        margin-right: 15px;
-        font-weight: bold;
-        font-size: 24px;
-      }
-    }
-  }
-
-  .menu {
-    margin-left: 12px;
-    width: auto;
-    position: absolute;
-    right: 0;
-    
-    a {
-      display: block;
-      line-height: 30px;
-      padding: 0 10px;
-      text-decoration: none;
-    }
-    
-    i {
-      background-color: red;
-    }
-    
-    li {
-      float: left;
-      position: relative;
-      cursor: default;
-    }
-    
-    ul {
-      list-style: none;
-      margin: 0;
-      
-      ul {
-        display: none;
-        position: absolute;
-        top: 28px;
-        left: 0px;
-        float: left;
-        width: 180px;
-        z-index: 99999;
-        
-        a {
-          background-color: @grayDark;
-          width: 275px;
-          position: relative;
-          top: 2px;
-          background-repeat: no-repeat;
-          background-position: 95% center;
-        }
-        
-        .layout_0 {
-          background-image: url('/images/icons/layout_0.png');
-        }
-        
-        .layout_1 {
-          background-image: url('/images/icons/layout_1.png');
-        }
-
-        .layout_2 {
-          background-image: url('/images/icons/layout_2.png');
-        }
-
-        .layout_3 {
-          background-image: url('/images/icons/layout_3.png');
-        }
-
-        .layout_4 {
-          background-image: url('/images/icons/layout_4.png');
-        }
-
-        .layout_5 {
-          background-image: url('/images/icons/layout_5.png');
-        }
-
-        .layout_6 {
-          background-image: url('/images/icons/layout_6.png');
-        }   
-      }
-    }
-    
-    ul li:hover > ul {
-      display: block;
-    }
-    
-    li:hover > a,
-    ul ul:hover > a {
-      background-color: @gray;
-    }
-    
-    .layouts a {
-      width: 150px;
-      right: 50px;
-    }
-    
-    .webcasts a {
-      width: 475px;
-      right: 325px;
-    }
-    
-    .results a {
-      width: 475px;
-      right: 400px;
-    }
-    
-    .webcasts-show {
-      display: block;
-    }
-  }
 }
 
 .video_buttons {
@@ -199,10 +137,17 @@
   position: absolute;
 }
 
-.ui-widget-header {
-  width:150px;
-  text-align:center;
-  z-index:100000;
+.drag-helper {
+  width: 150px;
+  text-align: center;
+  z-index: 100000;
+  background: @grayLighter;
+  color: @black;
+  .border-radius(4px);
+}
+
+.webcasts-show {
+  display: block;
 }
 
 .overlay {

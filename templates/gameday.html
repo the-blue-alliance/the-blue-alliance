@@ -9,53 +9,58 @@
 {% block body_class %}gameday{% endblock %}
 
 {% block navbar %}
-<div class="gameday-navbar">
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container">
+      <div id="navTitle" class="brand">
+        <span class="gameday-title">TBA Gameday</span>
+        <a class="main-site" href="/">To main site &raquo;</a>
+        <div class="div_helper"></div>
+      </div>
 
-  <div class="gameday-navbar-logo">
-    <div class="gameday-navbar-inner">
-      <span class="gameday-title">TBA GameDay</span>
-      <a href="/">To main site &raquo;</a>
-    </div>
-  </div>
-      
-  <div class="menu">
-    <ul>
-	    <li><a>Layouts</a>
-		    <ul class="layouts">
-			    <li><a class="layout-choice layout_0" href="javascript:layout_0()">Single View</a>
-			    <li><a class="layout-choice layout_1" href="javascript:layout_1()">Split View</a></li>
-			    <li><a class="layout-choice layout_2" href="javascript:layout_2()">"1+2" View</a></li>
-			    <li><a class="layout-choice layout_3" href="javascript:layout_3()">Quad View</a></li>
-			    <li><a class="layout-choice layout_6" href="javascript:layout_6()">"1+3" View</a></li>
-			    <li><a class="layout-choice layout_4" href="javascript:layout_4()">"1+4" View</a></li>
-			    <li><a class="layout-choice layout_5" href="javascript:layout_5()">Hex View</a></li>
-		    </ul>
-	    </li>
-	    
-	    <li><a>Webcasts</a>
-				<ul id="webcasts_hide" class="webcasts">
-					{% for event in ongoing_webcasts %}
+      <ul class="nav pull-right">
+        <li class="dropdown">
+          <a class="dropdown-toggle" href="#">Layouts</a>
+          <ul class="dropdown-menu">
+	          <li><a class="layout-choice layout_0" href="javascript:layout_0()">Single View</a>
+	          <li><a class="layout-choice layout_1" href="javascript:layout_1()">Split View</a></li>
+	          <li><a class="layout-choice layout_2" href="javascript:layout_2()">"1+2" View</a></li>
+	          <li><a class="layout-choice layout_3" href="javascript:layout_3()">Quad View</a></li>
+	          <li><a class="layout-choice layout_6" href="javascript:layout_6()">"1+3" View</a></li>
+	          <li><a class="layout-choice layout_4" href="javascript:layout_4()">"1+4" View</a></li>
+	          <li><a class="layout-choice layout_5" href="javascript:layout_5()">Hex View</a></li>
+          </ul>
+        </li>
+        
+        <li class="dropdown">
+          <a class="dropdown-toggle" href="#">Webcasts</a>
+          <ul class="dropdown-menu webcasts">
+          {% for event in ongoing_webcasts %}
             <li><a id='{{event.key_name}}' class='video_buttons' alt='{{event.name}} [{{event.event_short|upper}}]'>{{event.name}} [{{event.event_short|upper}}]</a></li>
-					{% empty %}
-					  <li><a>No webcasts</a></li>
-					{% endfor %}
-				</ul>
-			</li>
-			
-      <li><a>Results</a>
-        <ul class="results">
+          {% empty %}
+            <li><a>No webcasts</a></li>
+          {% endfor %}
+          </ul>
+        </li>
+        
+        <li class="dropdown">
+          <a class="dropdown-toggle" href="#">Results</a>
+          <ul class="dropdown-menu results">
           {% for event in ongoing_events %}
             <li><a class="event_results" href="/event/{{event.key_name}}">{{event.name}} [{{event.event_short|upper}}]</a></li>
           {% empty %}
             <li><a>No events</a></li>
           {% endfor %}
-        </ul>
-      </li>
-			
-			<li><a id="chat_tab" href="#">Chat</a></li>
-    </ul>
+          </ul>
+        </li>
+        
+        <li class="chat"><a class="chat-toggle" href="#">Chat</a></li>
+      </ul>
+    </div>
   </div>
 </div>
+
+
 {% endblock %}
 
 {% block content %}
