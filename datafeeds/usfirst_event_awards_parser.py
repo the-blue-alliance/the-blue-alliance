@@ -12,8 +12,8 @@ class UsfirstEventAwardsParser(ParserBase):
     Awards must contain every string in the the first list of the tuple
     and must NOT contain any string in the second list of the tuple
     """
-    AWARD_NAMES = {
-        "rca": (["chairman"], []),
+    AWARD_NAMES = {   
+        "ca": (["chairman"], []),
         "ei": (["engineering inspiration"], []),
         "win1": (["winner", "1"], []),
         "win2": (["winner", "2"], []),
@@ -24,16 +24,12 @@ class UsfirstEventAwardsParser(ParserBase):
         "fin3": (["finalist", "3"], ["dean"]),
         "fin4": (["finalist", "4"], ["dean"]),
         "coop": (["coopertition"], []),
+        "sports": (["sportsmanship"], []),
         "create": (["creativity"], []),
         "eng": (["engineering excellence"], []),
         "entre": (["entrepreneurship"], []),
         "exdes": (["excellence in design"], []),
-        "dlf1": (["dean's list finalist", "1"], []),
-        "dlf2": (["dean's list finalist", "2"], []),
-        "dlf3": (["dean's list finalist", "3"], []),
-        "dlf4": (["dean's list finalist", "4"], []),
-        "dlf5": (["dean's list finalist", "5"], []),
-        "dlf6": (["dean's list finalist", "6"], []),
+        "dl": (["dean's list"], []),
         "driv": (["driving", "tomorrow", "technology"], []),
         "gp": (["gracious professionalism"], []),
         "hrs": (["highest rookie seed"], []),
@@ -50,9 +46,11 @@ class UsfirstEventAwardsParser(ParserBase):
         "vol": (["volunteer"], []),
         "wfa": (["woodie flowers"], []),
         "judge": (["judge"], []),
+        "founders": (["founder"], []),
+        "inventor": (["autodesk inventor"], []),
+        "innovator": (["future innovator"], []),
     }
-    INDIVIDUAL_AWARDS = ["dlf1", "dlf2", "dlf3", "dlf4", "dlf5", "dlf6", "vol", "wfa"]    
-    NO_TEAM_AWARDS = ["vol"] #awards which don't have to be associated with a team
+    INDIVIDUAL_AWARDS = ["dl", "dl1", "dl2", "dl3", "dl4", "dl5", "dl6", "dl7", "dl8", "dl9", "vol", "wfa", "founders"]    
     YEAR_SPECIFIC = {'2012': {'official': 0,
                               'team_number': 1,
                               'individual': 3},
@@ -65,8 +63,15 @@ class UsfirstEventAwardsParser(ParserBase):
         """
         Parse the awards from USFIRST.
         """
-        soup = BeautifulSoup(html,
-                convertEntities=BeautifulSoup.HTML_ENTITIES)
+        soup = BeautifulSoup(html, convertEntities=BeautifulSoup.HTML_ENTITIES)
+
+        title = self._recurseUntilString(soup.findAll('title')[0])
+        
+        is_championship = title.find('FIRST Championship') >= 0
+        if is_championship and title.find('Division') >= 0:
+            is_division = True
+        else:
+            is_division = False
 
         table = soup.findAll('table')[2]
         already_parsed = set()
@@ -78,15 +83,7 @@ class UsfirstEventAwardsParser(ParserBase):
             else:
                 year = '2007-11'
 
-            official_name = str(self._recurseUntilString(tds[self.YEAR_SPECIFIC[year]['official']]))
-            try:
-                team_number = int(self._recurseUntilString(tds[self.YEAR_SPECIFIC[year]['team_number']]))
-            except AttributeError:
-                team_number = 0
-            except ValueError:
-                team_number = 0
-            except TypeError:
-                team_number = 0
+            official_name = unicode(self._recurseUntilString(tds[self.YEAR_SPECIFIC[year]['official']]))
             award_key = None
             official_name_lower = official_name.lower()
             for key, (yes_strings, no_strings) in self.AWARD_NAMES.items():
@@ -101,24 +98,33 @@ class UsfirstEventAwardsParser(ParserBase):
                         award_key = key
                         break
             if not award_key:
-                #award doesn't exist?
-                logging.error('Found an award that isn\'t in the dictionary: ' + official_name)
-                continue #silently ignore
-            if (not award_key in self.NO_TEAM_AWARDS) and (team_number == 0):
-                #award doesn't have a team set, probably wasn't given
-                continue #skip
+                logging.warning('Found an award that isn\'t in the dictionary: ' + official_name)
+                continue
+
+            team_number = None
+            try:
+                team_number = self._recurseUntilString(tds[self.YEAR_SPECIFIC[year]['team_number']])
+            except AttributeError:
+                team_number = None
+            if team_number and team_number.isdigit():
+                team_number = int(team_number)
+            else:
+                team_number = None
+
+            awardee = None
             if award_key in self.INDIVIDUAL_AWARDS:
                 try:
                     awardee = fixAwardee(tds[self.YEAR_SPECIFIC[year]['individual']])
-                    awardee = sanitize(awardee)
+                    if awardee:
+                        awardee = unicode(sanitize(awardee))
                 except TypeError:
-                    #they didn't award it but still listed it?
-                    continue
+                    awardee = None
                 if not awardee:
-                    #they didn't award it but still listed it?
-                    continue
-            else:
-                awardee = ''
+                    # Turns '' into None
+                    awardee = None
+
+            if (awardee == None) and (team_number == None):
+                continue
 
             key_number = 1
             test_key = award_key
@@ -126,17 +132,26 @@ class UsfirstEventAwardsParser(ParserBase):
                 test_key = award_key + str(key_number)
                 key_number += 1
             award_key = test_key
+            already_parsed.add(award_key)
+            
+            if is_championship:
+                if is_division:
+                    award_key = 'div_' + award_key
+                else:
+                    award_key = 'cmp_' + award_key
+                    
             award = {'name': award_key,
                      'team_number': team_number,
-                     'awardee': unicode(awardee),
-                     'official_name': unicode(official_name)}
+                     'awardee': awardee,
+                     'official_name': official_name}
             awards.append(award)
-            already_parsed.add(award_key)
         return awards
 
 def fixAwardee(text):
     # Fix funny formatting with USFIRST's awards page
     spans = text.findAll('span')
+    if not spans:
+        return ParserBase._recurseUntilString(text)
     full_name = []
     for span in spans:
         try:
