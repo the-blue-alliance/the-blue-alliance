@@ -119,7 +119,7 @@ class GamedayHandler(BaseHandler):
             for event in next_events:
                 if event.start_date.date() < datetime.date.today() + datetime.timedelta(days=4):
                     ongoing_events.append(event)
-                    if event.webcast and 'type' in event.webcast:
+                    if event.webcast and 'type' in event.webcast and 'channel' in event.webcast:
                         ongoing_webcasts.append(event)
             
             template_values = {'ongoing_events': ongoing_events,

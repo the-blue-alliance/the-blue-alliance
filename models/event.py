@@ -20,8 +20,7 @@ class Event(db.Model):
     first_eid = db.StringProperty() #from USFIRST
     facebook_eid = db.StringProperty(indexed=False) #from Facebook
     website = db.StringProperty(indexed=False)
-    webcast_url = db.StringProperty(indexed=False)
-    webcast_json = db.TextProperty(indexed=False)
+    webcast_json = db.TextProperty(indexed=False) # valid keys include 'type' and 'channel'
     oprs = db.ListProperty(float, indexed=False)
     opr_teams = db.ListProperty(int, indexed=False)
     rankings_json = db.TextProperty(indexed=False)

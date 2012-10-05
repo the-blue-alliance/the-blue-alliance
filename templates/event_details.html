@@ -32,7 +32,6 @@
 				{% if event.location %}<i class="icon-map-marker"></i> in <a href="http://maps.google.com/maps?q={{ event.location }}">{{ event.location }}</a><br />{% endif %}
 				{% if event.website %}<i class="icon-globe"></i> <a href="{{ event.website }}" title="{{ event.name }}">{{ event.website }}</a><br />{% endif %}
 				{% if event.official %}<i class="icon-info-sign"></i> <a href="https://my.usfirst.org/myarea/index.lasso?page=teamlist&event_type=FRC&sort_teams=number&year={{ event.year }}&event={{ event.event_short }}">details on usfirst.org</a><br />{% endif %}
-				{% if event.webcast_url %}<i class="icon-film"></i> <a href="{{ event.webcast_url }}" title="">live webcast</a><br />{% endif %}
 				{% if event.facebook_eid %}<i class="icon-thumbs-up"></i> <a href="{{ event.facebook_event_url }}" title="Facebook Event">RSVP on Facebook</a><br />{% endif %}
 				<i class="icon-barcode"></i> <a href="http://www.thebluealliance.com/event/{{ event.key_name }}/feed"> matches in rss</a>
 			</p>
