@@ -16,7 +16,7 @@
 	position: relative;
 	padding: 0;
 	margin: 0;
-	background: #f9f9f9;
+	background: #111;
 	color: #444;
 	text-shadow: none;
 	-webkit-border-radius: 4px;
@@ -165,7 +165,7 @@
 	overflow: hidden;
 	display: none;
 	z-index: 8010;
-	background: #000;
+	background: #222;
 }
 
 #fancybox-overlay.overlay-fixed {
