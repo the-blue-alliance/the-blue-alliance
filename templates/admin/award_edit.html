@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}{{award.key_name}} - Edit{% endblock %}
+
+{% block content %}
+
+<h1>Edit {{ award.key_name }}</h1>
+
+<form action="/admin/award/edit/{{award.key_name}}" method="post">
+    <legend>Edit {{ award.key_name }}</legend>
+    <table class="table table-striped table-hover table-condensed">
+        <tr>
+            <td>Name</td>
+            <td><input type="text" name="official_name" value="{{award.official_name}}" /></td>
+        </tr>
+        <tr>
+            <td>Team</td>
+            <td><input type="text" name="team_number" value="{{award.team.team_number}}" /></td>
+        </tr>
+        <tr>
+            <td>Person</td>
+            <td><input type="text" name="awardee" value="{{award.awardee}}" /></td>
+        </tr>
+    </table>
+    <input name="event_key_name" type="hidden" value="{{award.event.key_name}}" />
+    <input name="award_name" type="hidden" value="{{award.name}}" />
+    <button type="submit" class="btn btn-primary"><i class="icon-thumbs-up icon-white"></i> Save Event</button>
+    <a href="/admin/event/{{award.event.key_name}}" class="btn"><i class="icon-thumbs-down"></i> Cancel Edit</a>
+</form>
+
+{% endblock %}

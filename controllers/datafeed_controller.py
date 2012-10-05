@@ -13,6 +13,7 @@ from datafeeds.datafeed_usfirst import DatafeedUsfirst
 
 from helpers.event_manipulator import EventManipulator
 from helpers.match_manipulator import MatchManipulator
+from helpers.award_manipulator import AwardManipulator
 from helpers.team_helper import TeamHelper, TeamTpidHelper
 from helpers.team_manipulator import TeamManipulator
 from helpers.opr_helper import OprHelper
@@ -168,6 +169,51 @@ class UsfirstEventDetailsGet(webapp.RequestHandler):
         }
         
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_details_get.html')
+        self.response.out.write(template.render(path, template_values))
+
+class UsfirstAwardsEnqueue(webapp.RequestHandler):
+    """
+    Handles enqueing getting awards for USFIRST events.
+    """
+    def get(self, when):
+        events = Event.all()
+        events = events.filter('official =', True)
+        
+        if when == "now":
+            events = events.filter('end_date <=', datetime.date.today() + datetime.timedelta(days=4))
+            events = events.filter('end_date >=', datetime.date.today() - datetime.timedelta(days=1))
+        else:
+            events = events.filter('year =', int(when))
+        
+        events = events.fetch(500)
+        
+        for event in events:
+            taskqueue.add(
+                queue_name='usfirst',
+                url='/tasks/get/usfirst_awards/%s' % (event.key().name()),
+                method='GET')
+        template_values = {
+            'events': events,
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_awards_enqueue.html')
+        self.response.out.write(template.render(path, template_values))
+
+class UsfirstAwardsGet(webapp.RequestHandler):
+    """
+    Handles reading a USFIRST match results page and updating the datastore as needed.
+    """
+    def get(self, event_key):   
+        datafeed = DatafeedUsfirst()
+        
+        event = Event.get_by_key_name(event_key)
+        new_awards = AwardManipulator.createOrUpdate(datafeed.getEventAwards(event))
+        
+        template_values = {
+            'awards': new_awards,
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_awards_get.html')
         self.response.out.write(template.render(path, template_values))
 
 

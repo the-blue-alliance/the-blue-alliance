@@ -97,13 +97,23 @@
                     <i class="icon-map-marker"></i> in <a href="http://maps.google.com/maps?q={{ comp.event.location }}">{{ comp.event.location }}</a><br />
                     <i class="icon-calendar"></i> {{ comp.event.start_date|date:"M jS" }} - {{ comp.event.end_date|date:"M jS, Y" }}
                 </p>
-                {% if comp.wlt or comp.rank %}
+
+                {% if comp.wlt or comp.rank or comp.awards.list %}
                 <p>Team {{ team.team_number }}
                   {% if comp.rank %}was <strong>Rank {{ comp.rank }}</strong>{% endif %}
                   {% if comp.wlt %}
                     {% if comp.rank %}with a record of{% else %}had a record of{% endif %}
                     <strong>{{comp.wlt.win}}-{{comp.wlt.loss}}-{{comp.wlt.tie}}</strong>
                   {% endif %}
+                  
+                  {% if comp.awards.list %}
+                    {% if comp.rank or comp.wlt %}and{% endif %} won the following awards:
+	                  <ul>
+	                  {% for award in comp.awards.list %}
+	                    <li>{{ award.official_name }}{% if award.awardee %} ({{ award.awardee }}){% endif %}</li>
+	                  {% endfor %}
+	                  </ul>
+	                {% endif %}
                 </p>
                 {% endif %}
             </div>
