@@ -2,7 +2,7 @@ import unittest2
 
 from datafeeds.usfirst_event_awards_parser import UsfirstEventAwardsParser
 
-class TestUsfirstMatchesParser(unittest2.TestCase):
+class TestUsfirstEventAwardsParser(unittest2.TestCase):
     def test_parse_regional_2007(self):
         with open('test_data/usfirst_html/usfirst_event_awards_2007sj.html', 'r') as f:
             awards = UsfirstEventAwardsParser.parse(f.read())
