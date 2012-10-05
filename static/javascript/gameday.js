@@ -139,7 +139,7 @@ function setupCloseSwap(viewNum) {
 			start: function() {swapping = true;},
 			revert: "invalid",
 			cursor: "move",
-			containment: "#drag_contain",
+			containment: ".webcasts_panel",
 			stop: function() {/*$("#overlay_"+viewNum).fadeOut(50); */swapping = false; },
 			cursorAt: { top: 15, left: 15 },
 			helper: function(event) {
