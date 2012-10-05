@@ -19,9 +19,8 @@ class TestUsfirstMatchesParser(unittest2.TestCase):
         # Test Individual Award
         self.assertEqual(awards[7]['official_name'], "Woodie Flowers Award")
         self.assertEqual(awards[7]['team_number'], None)
-        self.assertEqual(unicode(awards[7]['awardee']), unicode("Yang Xie - Team 846"))
+        self.assertEqual(awards[7]['awardee'], u"Yang Xie \u2013 Team 846")
         self.assertEqual(awards[7]['name'], 'wfa')
-
         
     def test_parse_regional_2010(self):
         with open('test_data/usfirst_html/usfirst_event_awards_2010sac.html', 'r') as f:
