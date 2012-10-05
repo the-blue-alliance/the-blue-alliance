@@ -53,7 +53,7 @@ class WebcastHandler(BaseHandler):
             if event:
                 webcast = event.webcast
                 output = {}
-                if webcast and 'type' in webcast:
+                if webcast and 'type' in webcast and 'channel' in webcast:
                     webcast_type = webcast['type']
                     template_values = {'channel': webcast['channel']}
                     path = os.path.join(os.path.dirname(__file__), '../templates/webcast/' + webcast_type + '.html')

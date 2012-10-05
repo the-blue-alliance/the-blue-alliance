@@ -16,12 +16,12 @@ from controllers.ajax_controller import TypeaheadHandler, WebcastHandler
 landing_handler = {False: MainHandler,
                    True: KickoffHandler}
 app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['kickoff']]),
-                               ('/gameday', GamedayHandler),
                                ('/contact', ContactHandler),
                                ('/events', EventList),
                                ('/event/(.*)/feed', EventRss),
                                ('/events/(.*)', EventList),
                                ('/event/(.*)', EventDetail),
+                               ('/gameday', GamedayHandler),
                                ('/hashtags', HashtagsHandler),
                                ('/match/list', MatchList),
                                ('/match/(.*)', MatchDetail),
