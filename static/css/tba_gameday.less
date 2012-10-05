@@ -15,6 +15,24 @@
     color: @white !important;
   }
   
+  .chat_active {
+    background: @gray !important;
+  }
+  
+  .chat_panel {
+    position: fixed;
+    top: 30px;
+    right: 0px;
+    bottom: 30px;
+    width: 300px;
+    background-color: @grayLighter;
+    visibility: hidden;
+  }
+  
+  .chat_panel_active {
+    visibility: visible;
+  }
+  
   .container {
     width: auto;
     margin-left: 10px !important;
@@ -115,6 +133,10 @@
   right: 0px;
   left: 0px;
   z-index: 105;
+}
+
+.webcasts_panel_active {
+  right: 300px;
 }
 
 .video_container {

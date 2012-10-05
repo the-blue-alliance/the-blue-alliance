@@ -36,7 +36,26 @@ $(document).ready(function() {
 	});
 });
 
-//Create Views
+// Chat Toggle
+function chat_tab() {
+	var chat = $(".chat-toggle");
+	var chat_panel = $(".chat_panel");
+	var webcasts_panel = $('.webcasts_panel');
+
+	if(chat.hasClass("chat_active")) {
+		chat.removeClass("chat_active");
+		chat_panel.removeClass("chat_panel_active");
+		webcasts_panel.removeClass("webcasts_panel_active");
+		fixLayout();
+	} else {
+		chat.addClass("chat_active")
+		chat_panel.addClass("chat_panel_active");
+		webcasts_panel.addClass("webcasts_panel_active");
+		fixLayout();
+	}
+} 	
+
+// Create Views
 var default_view = "<div class='empty_info'>Drag and drop an event from the 'Webcasts' menu to assign it to this screen.</div><div class='div_helper'></div>";
 
 function createViews(){
