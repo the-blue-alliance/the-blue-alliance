@@ -4,10 +4,10 @@ import logging
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
-from helpers.event_manipulator import EventManipulator
 from helpers.award_manipulator import AwardManipulator
-from models.event import Event
+from helpers.event_manipulator import EventManipulator
 from models.award import Award
+from models.event import Event
 from models.team import Team
 
 class AdminEventList(webapp.RequestHandler):

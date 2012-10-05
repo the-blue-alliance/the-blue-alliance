@@ -21,10 +21,10 @@ from models.team import Team
 
 class DatafeedUsfirst(DatafeedBase):
 
+    EVENT_AWARDS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/awards.html" # % (year, event_short)
     EVENT_DETAILS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=event_details&eid=%s&-session=myarea:%s"
     EVENT_LIST_REGIONALS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?event_type=FRC&season_FRC=%s"
     EVENT_RANKINGS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/rankings.html" # % (year, event_short)
-    EVENT_AWARDS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/awards.html" # % (year, event_short)
     EVENT_TEAMS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=event_teamlist&results_size=250&eid=%s&-session=myarea:%s"
     EVENT_SHORT_EXCEPTIONS = {
         "arc": "Archimedes",
@@ -113,9 +113,9 @@ class DatafeedUsfirst(DatafeedBase):
         awards = self.parse(url, UsfirstEventAwardsParser)
         
         return [Award(
-            key_name = Award.getKeyName(event, award.get('name', None)),
+            key_name = Award.getKeyName(event, award.get('name')),
             name = award.get('name', None),
-            team = Team.get_by_key_name('frc' + str(award.get('team_number', 0))),
+            team = Team.get_by_key_name('frc' + str(award.get('team_number', None))),
             awardee = award.get('awardee', None),
             year = event.year,
             official_name = award.get('official_name', None),

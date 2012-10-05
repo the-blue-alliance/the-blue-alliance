@@ -148,7 +148,8 @@ class UsfirstEventAwardsParser(ParserBase):
         return awards
 
 def fixAwardee(text):
-    # Fix funny formatting with USFIRST's awards page
+    # Example: http://www2.usfirst.org/2012comp/Events/gl/awards.html
+    # Some names have <span></span> around names, but not others.
     spans = text.findAll('span')
     if not spans:
         return ParserBase._recurseUntilString(text)
