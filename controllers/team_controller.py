@@ -106,10 +106,11 @@ class TeamDetail(BaseHandler):
                     display_wlt = wlt
                     
                 team_rank = None
-                for element in e.rankings:
-                    if element[1] == team_number:
-                        team_rank = element[0]
-                        break
+                if e.rankings:
+                    for element in e.rankings:
+                        if element[1] == team_number:
+                            team_rank = element[0]
+                            break
                     
                 awards = AwardHelper.organizeAwards(e.award_set.filter('team = ', team))
                     

@@ -23,7 +23,7 @@ class EventList(BaseHandler):
     def get(self, year=None):
         
         show_upcoming = False
-        valid_years = [2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 2004, 2003, 2002]
+        valid_years = [2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 2004, 2003, 2002]
 
         if year:
             if not year.isdigit():
