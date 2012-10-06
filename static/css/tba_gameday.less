@@ -2,7 +2,6 @@
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: @black;
   
   .nav, .navbar, .navbar-inner,
   .container, .brand,
@@ -17,20 +16,6 @@
   
   .chat_active {
     background: @gray !important;
-  }
-  
-  .chat_panel {
-    position: fixed;
-    top: 30px;
-    right: 0px;
-    bottom: 30px;
-    width: 300px;
-    background-color: @grayLighter;
-    visibility: hidden;
-  }
-  
-  .chat_panel_active {
-    visibility: visible;
   }
   
   .container {
@@ -100,6 +85,29 @@
     display: block;    
   }
 
+}
+
+.chat_panel {
+  position: fixed;
+  top: 30px;
+  right: 0px;
+  bottom: 30px;
+  width: 300px;
+  background-color: @grayLighter;
+  visibility: hidden;
+}
+
+.chat_panel_active {
+  visibility: visible;
+}
+
+.feed_bar {
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  height: 30px;
+  background-color: @black;
 }
 
 .empty_info {

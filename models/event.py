@@ -20,7 +20,7 @@ class Event(db.Model):
     first_eid = db.StringProperty() #from USFIRST
     facebook_eid = db.StringProperty(indexed=False) #from Facebook
     website = db.StringProperty(indexed=False)
-    webcast_json = db.TextProperty(indexed=False) # valid keys include 'type' and 'channel'
+    webcast_json = db.TextProperty(indexed=False) #  list of dicts, valid keys include 'type' and 'channel'
     oprs = db.ListProperty(float, indexed=False)
     opr_teams = db.ListProperty(int, indexed=False)
     rankings_json = db.TextProperty(indexed=False)
@@ -74,3 +74,6 @@ class Event(db.Model):
         Returns the URL pattern for the link to this Event on TBA
         """
         return "/event/%s" % self.key_name
+
+    # Depreciated, still here to keep GAE clean.
+    webcast_url = db.StringProperty(indexed=False)

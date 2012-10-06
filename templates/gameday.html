@@ -6,9 +6,8 @@
 
 {% block more_head_tags %}<script type="text/javascript" src="/javascript/gameday.js"></script>{% endblock %}
 
-{% block body_class %}gameday{% endblock %}
-
 {% block navbar %}
+<div class="gameday">
 <div class="navbar navbar-fixed-top">
   <div class="navbar-inner">
     <div class="container">
@@ -59,8 +58,7 @@
     </div>
   </div>
 </div>
-
-
+</div>
 {% endblock %}
 
 {% block content %}
@@ -68,8 +66,7 @@
 	<div class="video_container"></div>
 </div>
 <div class="chat_panel"></div>
-
+<div class="feed_bar"></div>
 {% endblock %}
-
 
 {% block footer %}{% endblock %}

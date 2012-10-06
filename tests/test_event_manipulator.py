@@ -42,7 +42,7 @@ class TestEventManipulator(unittest2.TestCase):
             oprs = [1.0, 2.0, 3.0],
             opr_teams = [177, 195, 233], # are these really stored as ints or strings? -gregmarra 20120922
             facebook_eid = "7",
-            webcast_json = json.dumps({'type': 'ustream', 'channel': 'foo'})
+            webcast_json = json.dumps([{'type': 'ustream', 'channel': 'foo'}])
         )
         
     def tearDown(self):
@@ -53,8 +53,8 @@ class TestEventManipulator(unittest2.TestCase):
         self.assertEqual(event.oprs, [1, 2, 3])
         self.assertEqual(event.opr_teams, [177, 195, 233])
         self.assertEqual(event.facebook_eid, "7")
-        self.assertEqual(event.webcast['type'], 'ustream')
-        self.assertEqual(event.webcast['channel'], 'foo')
+        self.assertEqual(event.webcast[0]['type'], 'ustream')
+        self.assertEqual(event.webcast[0]['channel'], 'foo')
 
     def assertOldEvent(self, event):
         self.assertEqual(event.key().name(), "2011ct")
