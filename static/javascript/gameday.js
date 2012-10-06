@@ -99,10 +99,11 @@ function setupDragDrop() {
 	});
 
 	function setupView(viewNum, $item) {
-		eventKey = $item.attr('id');
+		eventKey = $item.attr('event');
+		webcastNumber = $item.attr('num')
 		eventName = $item.attr('alt');
 		
-		$.getJSON('/_/webcast?event=' + eventKey, function(data) {
+		$.getJSON('/_/webcast?event=' + eventKey + '&num=' + webcastNumber, function(data) {
 			player = data.player;
 			if (player == undefined) {
 				player = "No webcast available"
