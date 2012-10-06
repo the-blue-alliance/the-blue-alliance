@@ -45,13 +45,14 @@ class WebcastHandler(BaseHandler):
     def get(self):
         # Returns the HTML necessary to generate the webcast embed for a given event
         event_key = self.request.get_all('event')[0]
+        webcast_number = int(self.request.get_all('num')[0]) - 1
         webcast_key = "webcast_" + event_key
         output_json = memcache.get(webcast_key)
         
         if output_json is None:
             event = Event.get_by_key_name(event_key)
             if event:
-                webcast = event.webcast
+                webcast = event.webcast[webcast_number]
                 output = {}
                 if webcast and 'type' in webcast and 'channel' in webcast:
                     webcast_type = webcast['type']
