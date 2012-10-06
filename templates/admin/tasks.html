@@ -9,7 +9,90 @@
 <p>The Blue Alliance has many tasks that are usually executed by cron jobs, but you can manually launch them from here.</p>
 
 <hr>
+<h4>EventTeams</h4>
+<p>Rebuild EventTeam join models to build (Team, Event) pairs</p>
+<div class="row-fluid">
+    <div class="span4">
+        <span class="help-block">Enqueue</span>
+        <a class="btn" href="/tasks/math/enqueue/eventteam_update">Enqueue all Events</a>
+    </div>
+    <div class="span4">
+        <form class="form-inline">
+            <span class="help-block">Do</span>
+            <div class="input-prepend input-append">
+                <input class="span6" id="do_eventteam_update_event_key" type="text" placeholder="2010cmp">
+                <a class="btn" id="do_eventteam_update_submit">Go <i class="icon-fast-forward"></i></a>
+            </div>
+        </form>
+        <script>
+        $("#do_eventteam_update_submit").click(function() {
+            window.location = "/tasks/math/do/eventteam_update/" + $("#do_eventteam_update_event_key").val();
+        });
+        </script>
+    </div>
+</div>
+
+<hr>
+<h4>TbaVideos</h4>
+<p>Scrape videos.thebluealliance.com to update hosted video file index</p>
+<div class="row-fluid">
+    <div class="span4">
+        <span class="help-block">Enqueue</span>
+        <a class="btn" href="/tasks/enqueue/tba_videos">Enqueue all Events</a>
+    </div>
+    <div class="span4">
+        <form class="form-inline">
+            <span class="help-block">Get</span>
+            <div class="input-prepend input-append">
+                <input class="span6" id="get_tba_videos_event_key" type="text" placeholder="2010cmp">
+                <a class="btn" id="get_tba_videos_submit">Go <i class="icon-fast-forward"></i></a>
+            </div>
+        </form>
+        <script>
+        $("#get_tba_videos_submit").click(function() {
+            window.location = "/tasks/get/tba_videos/" + $("#get_tba_videos_event_key").val();
+        });
+        </script>
+    </div>
+</div>
+
+<hr>
+<h4>UsfirstAwards</h4>
+<p>Scrape Usfirst to get Awards from Events</p> 
+<div class="row-fluid">
+    <div class="span4">
+        <span class="help-block">Enqueue</span>
+        <form class="form-inline">
+            <div class="input-prepend input-append">
+                <input class="span6" id="enqueue_usfirst_awards_year" type="text" placeholder="2013">
+                <a class="btn" id="enqueue_usfirst_awards_submit">Go <i class="icon-fast-forward"></i></a>
+            </div>
+        </form>
+        <script>
+        $("#enqueue_usfirst_awards_submit").click(function() {
+            window.location = "/tasks/enqueue/usfirst_awards/" + $("#enqueue_usfirst_awards_year").val();
+        });
+        </script>
+    </div>
+    <div class="span4">
+        <span class="help-block">Get</span>
+        <form class="form-inline">
+            <div class="input-prepend input-append">
+                <input class="span6" id="get_usfirst_awards_event_key" type="text" placeholder="2012cmp">
+                <a class="btn" id="get_usfirst_awards_submit">Go <i class="icon-fast-forward"></i></a>
+            </div>
+        </form>
+        <script>
+        $("#get_usfirst_awards_submit").click(function() {
+            window.location = "/tasks/get/usfirst_awards/" + $("#get_usfirst_awards_event_key").val();
+        });
+        </script>
+    </div>
+</div>
+<hr>
+
 <h4>UsfirstEventDetails</h4>
+<p>Scrape Usfirst to update Event details</p>
 <div class="row-fluid">
     <div class="span4">
         <form class="form-inline">
@@ -43,6 +126,7 @@
 
 <hr>
 <h4>UsfirstTeamDetails</h4>
+<p>Scrape Usfirst to update Team details</p>
 <div class="row-fluid">
     <div class="span4">
         <span class="help-block">Enqueue</span>
@@ -71,51 +155,6 @@
 </div>
 
 <hr>
-<h4>TbaVideos</h4>
-<div class="row-fluid">
-    <div class="span4">
-        <span class="help-block">Enqueue</span>
-        <a class="btn" href="/tasks/enqueue/tba_videos">Enqueue all Events</a>
-    </div>
-    <div class="span4">
-        <form class="form-inline">
-            <span class="help-block">Get</span>
-            <div class="input-prepend input-append">
-                <input class="span6" id="get_tba_videos_event_key" type="text" placeholder="2010cmp">
-                <a class="btn" id="get_tba_videos_submit">Go <i class="icon-fast-forward"></i></a>
-            </div>
-        </form>
-        <script>
-        $("#get_tba_videos_submit").click(function() {
-            window.location = "/tasks/get/tba_videos/" + $("#get_tba_videos_event_key").val();
-        });
-        </script>
-    </div>
-</div>
-<hr>
-
-<h4>EventTeams</h4>
-<div class="row-fluid">
-    <div class="span4">
-        <span class="help-block">Enqueue</span>
-        <a class="btn" href="/tasks/math/enqueue/eventteam_update">Enqueue all Events</a>
-    </div>
-    <div class="span4">
-        <form class="form-inline">
-            <span class="help-block">Get</span>
-            <div class="input-prepend input-append">
-                <input class="span6" id="do_eventteam_update_event_key" type="text" placeholder="2010cmp">
-                <a class="btn" id="do_eventteam_update_submit">Go <i class="icon-fast-forward"></i></a>
-            </div>
-        </form>
-        <script>
-        $("#do_eventteam_update_submit").click(function() {
-            window.location = "/tasks/math/do/eventteam_update/" + $("#do_eventteam_update_event_key").val();
-        });
-        </script>
-    </div>
-</div>
-
 <h2>Not added yet:</h2>
 <pre>
 ('/tasks/enqueue/usfirst_event_rankings/(.*)', UsfirstEventRankingsEnqueue),
@@ -127,9 +166,7 @@
 ('/tasks/get/usfirst_matches/(.*)', UsfirstMatchesGet),
 ('/tasks/get/usfirst_teams_tpids/([0-9]*)', UsfirstTeamsTpidsGet),
 ('/tasks/math/enqueue/event_opr/(.*)', EventOprEnqueue),
-('', EventTeamUpdateEnqueue),
 ('/tasks/math/do/event_opr/(.*)', EventOprDo),
-('(.*)', EventTeamUpdate),
 </pre>
 
 {% endblock %}
