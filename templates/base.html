@@ -4,7 +4,7 @@
     <title>{% block title %}The Blue Alliance{% endblock %}</title>
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
     
-    <link rel="stylesheet" href="/css/style.css" type="text/css" />
+    {% block main_style %}<link rel="stylesheet" href="/css/style.css" type="text/css" />{% endblock %}
     <link rel="stylesheet" href="/css/jquery-ui-1.8.13.custom.css" type="text/css" />
     <link rel="stylesheet" href="/css/jquery.fancybox.css" type="text/css" />
 
