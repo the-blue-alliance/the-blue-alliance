@@ -7,9 +7,10 @@ import tba_config
 from controllers.event_controller import EventList, EventDetail, EventRss
 from controllers.main_controller import ContactHandler, HashtagsHandler, \
       MainHandler, OprHandler, SearchHandler, AboutHandler, ThanksHandler, \
-      TypeaheadHandler, PageNotFoundHandler, KickoffHandler, ChannelHandler
+      PageNotFoundHandler, KickoffHandler, ChannelHandler, GamedayHandler
 from controllers.match_controller import MatchList, MatchDetail
 from controllers.team_controller import TeamList, TeamDetail
+from controllers.ajax_controller import TypeaheadHandler, WebcastHandler
 
 
 landing_handler = {False: MainHandler,
@@ -20,6 +21,7 @@ app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['kickoff'
                                ('/event/(.*)/feed', EventRss),
                                ('/events/(.*)', EventList),
                                ('/event/(.*)', EventDetail),
+                               ('/gameday', GamedayHandler),
                                ('/hashtags', HashtagsHandler),
                                ('/match/list', MatchList),
                                ('/match/(.*)', MatchDetail),
@@ -32,6 +34,7 @@ app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['kickoff'
                                ('/opr', OprHandler),
                                ('/channel', ChannelHandler),
                                ('/_/typeahead', TypeaheadHandler),
+                               ('/_/webcast', WebcastHandler),
                                ('/.*', PageNotFoundHandler),
                                ],
                               debug=tba_config.DEBUG)
