@@ -3,17 +3,20 @@
 <head>
     <title>{% block title %}The Blue Alliance{% endblock %}</title>
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-
+    
     <link rel="stylesheet" href="/css/style.css" type="text/css" />
     <link rel="stylesheet" href="/css/jquery-ui-1.8.13.custom.css" type="text/css" />
     <link rel="stylesheet" href="/css/jquery.fancybox.css" type="text/css" />
 
 	  <script type="text/javascript" src="/javascript/jquery.min.js"></script>
+    <script type="text/javascript" src="/javascript/jquery-ui-1.8.13.custom.min.js"></script>
+    <script type="text/javascript" src="/javascript/jquery.ui.touch-punch.min.js"></script>
     <script type="text/javascript" src="/javascript/tba.js"></script>
     <script type="text/javascript" src="/javascript/bootstrap.js"></script>
     <script type="text/javascript" src="/javascript/bootstrap-typeahead.js"></script>
     <script type="text/javascript" src="/javascript/jquery.fancybox.pack.js"></script>
     <script type="text/javascript" src="/jwplayer/jwplayer.js"></script>
+
     <script type="text/javascript">
 
       var _gaq = _gaq || [];
@@ -32,7 +35,7 @@
     <meta property="fb:page_id" content="29895192027" />
     <meta property="fb:admins" content="1086840001" />
     <meta property="fb:app_id" content="31893535040" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     {% block more_head_tags %}{% endblock %}
 </head>
@@ -47,7 +50,8 @@
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
   })();
 </script>
-
+    
+{% block navbar %}
 <div class="navbar navbar-fixed-top">
   <div class="navbar-inner">
     <div class="container">
@@ -60,9 +64,10 @@
         <div class="nav-collapse">
 			<ul id="subnav" class="nav">
 			  <li class=" {% block teams_active %}{% endblock %}"><a href="/teams">Teams</a></li>
-			  <li class=" {% block events_active %}{% endblock %}"><a href="/events">Events</a></li>
+              <li class=" {% block events_active %}{% endblock %}"><a href="/events">Events</a></li>
+              <li><a href="/gameday">GameDay</a></li>
 			</ul>
-
+            
 			<form id="cse-search-box" class="navbar-search pull-right" action="http://www.thebluealliance.com/search" >
 			    <input type="hidden" name="cx" value="017956276086362105630:99ctqytcokm" />
 			    <input type="hidden" name="cof" value="FORID:11" />
@@ -75,15 +80,16 @@
 				<a id="twitter" class="socialIcon" href=" http://twitter.com/thebluealliance" title="Follow us on Twitter"></a>
 				<a id="tumblr" class="socialIcon" href="http://thebluealliance.tumblr.com" title="Read our Blog"></a>
 			</div>
-
 		</div>
 	</div>
   </div>
 </div>
+{% endblock %}
 
 {% block content %}
 {% endblock %}
 
+{% block footer %}
 <div id="footer" class="container">
   <div class="row">
     <div class="span6 offset3">
@@ -115,6 +121,7 @@
 	  </div>
 	</div>
 </div>
+{% endblock %}
 
 </body>
 </html>

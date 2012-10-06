@@ -2,7 +2,6 @@ import os
 import logging
 import datetime
 import time
-import json
 
 from google.appengine.api import memcache
 from google.appengine.ext import db, webapp
@@ -106,36 +105,31 @@ class KickoffHandler(BaseHandler):
             if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
         
         self.response.out.write(html)        
-            
-class TypeaheadHandler(BaseHandler):
+
+class GamedayHandler(BaseHandler):
     def get(self):
-        # Currently just returns a list of all teams and events
-        # Needs to be optimized at some point.
-        # Tried a trie but the datastructure was too big to
-        # fit into memcache efficiently
-        q = self.request.get_all('q')
-        entries = self.typeahead_entries()
-
-        self.response.headers.add_header('content-type', 'application/json', charset='utf-8')        
-        typeahead_list = json.dumps(entries)
-        self.response.out.write(typeahead_list)
+        memcache_key = "main_gameday"
+        html = memcache.get(memcache_key)
+        if html is None:
+            next_events = Event.all().filter("start_date >=", datetime.date.today() - datetime.timedelta(days=4))
+            next_events.order('start_date').fetch(20)
+            
+            ongoing_events = []
+            ongoing_webcasts = []
+            for event in next_events:
+                if event.start_date.date() < datetime.date.today() + datetime.timedelta(days=4):
+                    ongoing_events.append(event)
+                    if event.webcast and 'type' in event.webcast and 'channel' in event.webcast:
+                        ongoing_webcasts.append(event)
+            
+            template_values = {'ongoing_events': ongoing_events,
+                               'ongoing_webcasts': ongoing_webcasts}
+            
+            path = os.path.join(os.path.dirname(__file__), '../templates/gameday.html')
+            html = template.render(path, template_values)
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
         
-    def typeahead_entries(self):
-        typeahead_key = "typeahead_entries"
-        results = memcache.get(typeahead_key)
-        
-        if results is None:
-            events = Event.all().order('-year').order('name')       
-            teams = Team.all().order('team_number')
-
-            results = []
-            for event in events:
-                results.append({'id': event.key().name(), 'name': '%s %s [%s]' % (event.year, event.name, event.event_short.upper())})
-            for team in teams:
-                results.append({'id': team.team_number, 'name': '%s | %s' % (team.team_number, team.nickname)})
-
-            if tba_config.CONFIG["memcache"]: memcache.set(typeahead_key, results, 86400)
-        return results
+        self.response.out.write(html)   
 
 class ChannelHandler(BaseHandler):
     # This is required for the FB JSSDK

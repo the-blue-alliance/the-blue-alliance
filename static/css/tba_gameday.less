@@ -1,0 +1,221 @@
+.gameday {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  
+  .nav, .navbar, .navbar-inner,
+  .container, .brand,
+  .dropdown, .dropdown-toggle,
+  .chat, .chat-toggle {
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 30px !important;
+    min-height: auto !important;
+    color: @white !important;
+  }
+  
+  .chat_active {
+    background: @gray !important;
+  }
+  
+  .container {
+    width: auto;
+    margin-left: 10px !important;
+  }
+  
+  .gameday-title {
+    vertical-align: middle;
+    padding-left: 25px;
+  }
+  
+  .main-site {
+    color: @white;
+    font-size: 14px;
+    font-weight: normal;
+    margin-left: 10px;
+  }
+  
+  .dropdown-toggle, .chat-toggle {
+    padding: 6px 8px !important;
+    height: 18px !important;
+  }
+  
+  .dropdown:hover, .chat:hover {
+    background-color: @gray;
+  }
+  
+  .dropdown-menu {
+    margin: 0;
+  
+    a, a:hover {
+      background-repeat: no-repeat;
+      background-position: 95% center;
+    }
+  
+    .layout_0 {
+      background-image: url('/images/icons/layout_0.png');
+    }
+    
+    .layout_1 {
+      background-image: url('/images/icons/layout_1.png');
+    }
+
+    .layout_2 {
+      background-image: url('/images/icons/layout_2.png');
+    }
+
+    .layout_3 {
+      background-image: url('/images/icons/layout_3.png');
+    }
+
+    .layout_4 {
+      background-image: url('/images/icons/layout_4.png');
+    }
+
+    .layout_5 {
+      background-image: url('/images/icons/layout_5.png');
+    }
+
+    .layout_6 {
+      background-image: url('/images/icons/layout_6.png');
+    }
+  }
+  
+  ul.nav li.dropdown:hover ul.dropdown-menu{
+    display: block;    
+  }
+
+}
+
+.chat_panel {
+  position: fixed;
+  top: 30px;
+  right: 0px;
+  bottom: 30px;
+  width: 300px;
+  background-color: @grayLighter;
+  visibility: hidden;
+}
+
+.chat_panel_active {
+  visibility: visible;
+}
+
+.feed_bar {
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  height: 30px;
+  background-color: @black;
+}
+
+.empty_info {
+  display: inline-block;
+  vertical-align: middle;
+  background-color: @gray;
+  margin: 8px;
+  padding: 8px;
+  color: @white;  
+  border: 1px solid @black;
+  .border-radius(4px);
+  .box-shadow(0 1px 1px rgba(0,0,0,.075));
+  text-align: center;
+}
+
+.div_helper {
+    display: inline-block;
+    vertical-align: middle;
+    height: 100%;
+}
+
+.video_buttons {
+  cursor: move;
+}
+
+.webcasts_panel {
+  overflow: hidden;
+  position: absolute;
+  top: 30px;
+  bottom: 30px;
+  right: 0px;
+  left: 0px;
+  z-index: 105;
+}
+
+.webcasts_panel_active {
+  right: 300px;
+}
+
+.video_container {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  z-index:0;
+}
+
+.view {
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  background: @grayDarker;
+  outline: @black 1px solid;
+  visibility: visible;
+  color: @white;
+  position: absolute;
+}
+
+.drag-helper {
+  width: 150px;
+  text-align: center;
+  z-index: 100000;
+  background: @grayLighter;
+  color: @black;
+  .border-radius(4px);
+}
+
+.webcasts-show {
+  display: block;
+}
+
+.overlay {
+  background-image: -moz-linear-gradient(top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 60px, rgba(0,0,0,0) 100px);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0.8)), color-stop(60px,rgba(0,0,0,0.6)), color-stop(100px,rgba(0,0,0,0)));
+  background-image: -webkit-linear-gradient(top, rgba(0,0,0,0.8) 0%,rgba(0,0,0,0.6) 60px,rgba(0,0,0,0) 100px);
+  background-image: -o-linear-gradient(top, rgba(0,0,0,0.8) 0%,rgba(0,0,0,0.6) 60px,rgba(0,0,0,0) 100px);
+  background-image: linear-gradient(top, rgba(0,0,0,0.8) 0%,rgba(0,0,0,0.6) 60px,rgba(0,0,0,0) 100px);
+  z-index: 5000;
+  width: 100%;
+  height: 50%;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  pointer-events: none;
+  
+  .overlay-title {
+    font-size: 24px;
+    color: white;
+    float: left;
+    margin: 15px;
+  }
+  
+  .view-close, .swap {
+    padding: 3px;
+    margin: 2px;
+    pointer-events: all;
+    cursor: pointer;
+    position: absolute;
+  }
+  
+  .view-close {
+    top: 0;
+    right: 0;
+  }
+  
+  .swap {
+    top: 25px;
+    right: 0;
+  }
+}
