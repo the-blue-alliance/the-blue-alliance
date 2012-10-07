@@ -2,7 +2,8 @@ import json
 import logging
 import os
 
-from google.appengine.ext import webapp, db
+from google.appengine.ext import ndb
+from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
 from models.event import Event
@@ -19,15 +20,16 @@ class AdminMatchCleanup(webapp.RequestHandler):
         self.response.out.write(template.render(path, {}))
     
     def post(self):
-        event = Event.get_by_key_name(self.request.get("event_key_name"))
+        event = Event.get_by_id(self.request.get("event_key_name"))
         matches_to_delete = list()
         match_keys_to_delete = list()
-        for match in event.match_set:
-            if match.key().name() != match.key_name:
-                matches_to_delete.append(match)
-                match_keys_to_delete.append(match.key().name())
-        
-        db.delete(matches_to_delete)
+        if event is not None:
+            for match in Match.query(Match.event == event.key):
+                if match.key.id() != match.key_name:
+                    matches_to_delete.append(match)
+                    match_keys_to_delete.append(match.key_name)
+            
+            ndb.delete_multi(matches_to_delete)
         
         template_values = {
             "match_keys_deleted": match_keys_to_delete,
@@ -42,7 +44,7 @@ class AdminMatchDashboard(webapp.RequestHandler):
     Show stats about Matches
     """
     def get(self):
-        match_count = Match.all().count()
+        match_count = Match.query().count()
         
         template_values = {
             "match_count": match_count
@@ -57,7 +59,7 @@ class AdminMatchDetail(webapp.RequestHandler):
     Show a Match.
     """
     def get(self, match_key):
-        match = Match.get_by_key_name(match_key)
+        match = Match.get_by_id(match_key)
         
         template_values = {
             "match": match
@@ -72,7 +74,7 @@ class AdminMatchEdit(webapp.RequestHandler):
     Edit a Match.
     """
     def get(self, match_key):
-        match = Match.get_by_key_name(match_key)
+        match = Match.get_by_id(match_key)
         
         template_values = {
             "match": match
@@ -90,8 +92,8 @@ class AdminMatchEdit(webapp.RequestHandler):
             team_key_names.extend(alliances[alliance].get('teams', None))
         
         match = Match(
-            key_name = match_key,
-            event = Event.get_by_key_name(self.request.get("event_key_name")),
+            id = match_key,
+            event = Event.get_by_id(self.request.get("event_key_name")).key,
             game = self.request.get("game"),
             set_number = int(self.request.get("set_number")),
             match_number = int(self.request.get("match_number")),
@@ -102,7 +104,7 @@ class AdminMatchEdit(webapp.RequestHandler):
         )
         match = MatchManipulator.createOrUpdate(match)
         
-        self.redirect("/admin/match/" + match.key_name())
+        self.redirect("/admin/match/" + match.key_name)
 
 class AdminVideosAdd(webapp.RequestHandler):
     """
@@ -117,7 +119,7 @@ class AdminVideosAdd(webapp.RequestHandler):
         
         additions = json.loads(self.request.get("youtube_additions_json"))
         match_keys, youtube_videos = zip(*additions["videos"])
-        matches = Match.get_by_key_name(match_keys)
+        matches = ndb.get_multi([ndb.Key(Match, match_key) for match_key in match_keys])
         
         matches_to_put = []
         results = {"existing": [], "bad_match": [], "added": []}
@@ -131,7 +133,9 @@ class AdminVideosAdd(webapp.RequestHandler):
                     results["existing"].append(match_key)
             else:
                 results["bad_match"].append(match_key)
-        db.put(matches_to_put)
+        ndb.put_multi(matches_to_put)
+
+        # TODO use Manipulators -gregmarra 20121006
         
         template_values = {
             "results": results,

@@ -1,6 +1,6 @@
 import unittest2
 
-from google.appengine.ext import db
+from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from helpers.team_manipulator import TeamManipulator
@@ -11,16 +11,17 @@ class TestTeamManipulator(unittest2.TestCase):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
 
         self.old_team = Team(
-            key_name = "frc177",
+            id = "frc177",
             team_number = 177,
             first_tpid = 61771,
             first_tpid_year = 2012
         )
 
         self.new_team = Team(
-            key_name = "frc177",
+            id = "frc177",
             team_number = 177,
             website = "http://www.bobcatrobotics.org"
         )
@@ -40,12 +41,12 @@ class TestTeamManipulator(unittest2.TestCase):
 
     def test_createOrUpdate(self):
         TeamManipulator.createOrUpdate(self.old_team)
-        self.assertOldTeam(Team.get_by_key_name("frc177"))
+        self.assertOldTeam(Team.get_by_id("frc177"))
         TeamManipulator.createOrUpdate(self.new_team)
-        self.assertMergedTeam(Team.get_by_key_name("frc177"))
+        self.assertMergedTeam(Team.get_by_id("frc177"))
 
     def test_findOrSpawn(self):
-        db.put(self.old_team)
+        self.old_team.put()
         self.assertMergedTeam(TeamManipulator.findOrSpawn(self.new_team))
 
     def test_updateMerge(self):

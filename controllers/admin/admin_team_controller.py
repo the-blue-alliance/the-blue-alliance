@@ -9,7 +9,7 @@ from models.team import Team
 class AdminTeamList(webapp.RequestHandler):
     def get(self):
         
-        teams = Team.all().order('team_number').fetch(10000)
+        teams = Team.query().order(Team.team_number)
         
         template_values = {
             "teams": teams,
@@ -22,7 +22,7 @@ class AdminTeamList(webapp.RequestHandler):
 class AdminTeamDetail(webapp.RequestHandler):
     def get(self, team_number):
         
-        team = Team.get_by_key_name("frc" + team_number)                
+        team = Team.get_by_id("frc" + team_number)                
         
         template_values = { 
             'team' : team,

@@ -30,8 +30,8 @@ class MainHandler(BaseHandler):
         memcache_key = "main_index"
         html = memcache.get(memcache_key)
         if html is None:
-            next_events = Event.all().filter("start_date >=", datetime.date.today() - datetime.timedelta(days=4))
-            next_events.order('start_date').fetch(20)
+            next_events = Event.query(Event.start_date >= (datetime.datetime.today()  - datetime.timedelta(days=4)))
+            next_events.order(Event.start_date).fetch(20)
             
             upcoming_events = []
             for event in next_events:
@@ -82,8 +82,8 @@ class SearchHandler(BaseHandler):
             q = self.request.get("q")
             logging.info("search query: %s" % q)
             if q.isdigit():
-                team_key_name = "frc%s" % q
-                team = Team.get_by_key_name(team_key_name)
+                team_id = "frc%s" % q
+                team = Team.get_by_id(team_id)
                 if team:
                     self.redirect(team.details_url)
                     return None
@@ -111,8 +111,8 @@ class GamedayHandler(BaseHandler):
         memcache_key = "main_gameday"
         html = memcache.get(memcache_key)
         if html is None:
-            next_events = Event.all().filter("start_date >=", datetime.date.today() - datetime.timedelta(days=4))
-            next_events.order('start_date').fetch(20)
+            next_events = Event.query(Event.start_date >= (datetime.datetime.today() - datetime.timedelta(days=4)))
+            next_events.order(Event.start_date).fetch(20)
             
             ongoing_events = []
             ongoing_events_w_webcasts = []

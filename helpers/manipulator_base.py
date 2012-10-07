@@ -1,7 +1,6 @@
 import logging
 
-from google.appengine.ext import db
-from google.appengine.ext.db import Key
+from google.appengine.ext import ndb
 
 class ManipulatorBase(object):
     """
@@ -48,10 +47,10 @@ class ManipulatorBase(object):
 
             # Write back the models that had updates
             models_to_put = [model for model in model_batch if getattr(model, "dirty", False)]
-            async_puts.append(db.put_async(models_to_put))
+            async_puts.extend(ndb.put_multi_async(models_to_put))
 
         # Block on the entire batch to ensure consistency
-        [async_put.get_result() for async_put in async_puts]
+        ndb.Future.wait_all(async_puts)
         return self.delistify(return_models)
     
     @classmethod
@@ -63,7 +62,7 @@ class ManipulatorBase(object):
         """
         new_models = self.listify(new_models)
 
-        old_models = db.get([Key.from_path(type(model).__name__, model.key_name) for model in new_models])
+        old_models = ndb.get_multi([ndb.Key(type(model).__name__, model.key_name) for model in new_models])
         new_models = [self.updateMergeBase(new_model, old_model) for (new_model, old_model) in zip(new_models, old_models)]
 
         return self.delistify(new_models)
