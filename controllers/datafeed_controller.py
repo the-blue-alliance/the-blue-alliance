@@ -248,7 +248,7 @@ class UsfirstMatchesEnqueue(webapp.RequestHandler):
         
         if when == "now":
             events = events.filter(Event.end_date <= datetime.datetime.today() + datetime.timedelta(days=4))
-            events = events.filter(Event.end_date >= datetime.date.today() - datetime.timedelta(days=1))
+            events = events.filter(Event.end_date >= datetime.datetime.today() - datetime.timedelta(days=1))
         else:
             events = events.filter(Event.year == int(when))
         

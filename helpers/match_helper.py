@@ -40,7 +40,7 @@ class MatchHelper(object):
     def cleanUpIfInvalidMatch(self, match):
         invalid = MatchHelper.isIncompleteElim(match)
         if invalid:
-            match.delete()
+            match.key.delete()
             logging.warning("Deleting invalid match: %s" % match.key_name)
             return None
         else:
