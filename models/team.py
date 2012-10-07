@@ -2,9 +2,6 @@ import logging
 
 from google.appengine.ext import ndb
 
-class Team(db.Model):
-    pass
-
 class Team(ndb.Model):
     """
     Teams represent FIRST Robotics Competition teams.
