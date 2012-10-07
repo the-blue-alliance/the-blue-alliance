@@ -13,6 +13,7 @@ class TestDatafeedUsfirstMatches(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
         
         self.datafeed = DatafeedUsfirst()
     
@@ -21,7 +22,7 @@ class TestDatafeedUsfirstMatches(unittest2.TestCase):
     
     def test_getMatchResultsList(self):
         event = Event(
-          key_name = "2011ct",
+          id = "2011ct",
           event_short = "ct",
           year = 2011
         )

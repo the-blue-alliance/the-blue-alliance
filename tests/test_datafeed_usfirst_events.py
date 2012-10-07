@@ -13,6 +13,7 @@ class TestDatafeedUsfirstEvents(unittest2.TestCase):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
         self.testbed.init_urlfetch_stub()
+        self.testbed.init_memcache_stub()
         
         self.datafeed = DatafeedUsfirst()
     
@@ -23,7 +24,7 @@ class TestDatafeedUsfirstEvents(unittest2.TestCase):
         # test with 2011ct
         event = self.datafeed.getEventDetails(2011, "5561")
         
-        self.assertEqual(event.key().name(), "2011ct")
+        self.assertEqual(event.key.id(), "2011ct")
         self.assertEqual(event.name, "Northeast Utilities FIRST Connecticut Regional")
         self.assertEqual(event.event_type, "Regional")
         self.assertEqual(event.start_date, datetime.datetime(2011, 3, 31, 0, 0))

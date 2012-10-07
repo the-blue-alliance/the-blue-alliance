@@ -1,7 +1,5 @@
 import logging
 
-from google.appengine.ext import db
-
 from models.match import Match
 from models.team import Team
 
@@ -43,7 +41,7 @@ class MatchHelper(object):
         invalid = MatchHelper.isIncompleteElim(match)
         if invalid:
             match.delete()
-            logging.warning("Deleting invalid match: %s" % match.key().name())
+            logging.warning("Deleting invalid match: %s" % match.key_name)
             return None
         else:
             return match

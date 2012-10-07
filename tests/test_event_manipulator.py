@@ -2,7 +2,7 @@ import datetime
 import unittest2
 import json
 
-from google.appengine.ext import db
+from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from helpers.event_manipulator import EventManipulator
@@ -13,9 +13,10 @@ class TestEventManipulator(unittest2.TestCase):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
 
         self.old_event = Event(
-            key_name = "2011ct",
+            id = "2011ct",
             end_date = datetime.datetime(2011, 4, 2, 0, 0),
             event_short = "ct",
             event_type = "Regional",
@@ -28,7 +29,7 @@ class TestEventManipulator(unittest2.TestCase):
         )
 
         self.new_event = Event(
-            key_name = "2011ct",
+            id = "2011ct",
             end_date = datetime.datetime(2011, 4, 2, 0, 0),
             event_short = "ct",
             event_type = "Regional",
@@ -57,7 +58,7 @@ class TestEventManipulator(unittest2.TestCase):
         self.assertEqual(event.webcast[0]['channel'], 'foo')
 
     def assertOldEvent(self, event):
-        self.assertEqual(event.key().name(), "2011ct")
+        self.assertEqual(event.key.id(), "2011ct")
         self.assertEqual(event.name, "Northeast Utilities FIRST Connecticut Regional")
         self.assertEqual(event.event_type, "Regional")
         self.assertEqual(event.start_date, datetime.datetime(2011, 3, 31, 0, 0))
@@ -69,12 +70,12 @@ class TestEventManipulator(unittest2.TestCase):
 
     def test_createOrUpdate(self):
         EventManipulator.createOrUpdate(self.old_event)
-        self.assertOldEvent(Event.get_by_key_name("2011ct"))
+        self.assertOldEvent(Event.get_by_id("2011ct"))
         EventManipulator.createOrUpdate(self.new_event)
-        self.assertMergedEvent(Event.get_by_key_name("2011ct"))
+        self.assertMergedEvent(Event.get_by_id("2011ct"))
 
     def test_findOrSpawn(self):
-        db.put(self.old_event)
+        self.old_event.put()
         self.assertMergedEvent(EventManipulator.findOrSpawn(self.new_event))
 
     def test_updateMerge(self):

@@ -22,7 +22,7 @@ from models.event import Event
 from models.event_team import EventTeam
 from models.team import Team
 
-class OprHelper:
+class OprHelper(object):
 
     data = []
     teamdata = []
@@ -74,7 +74,7 @@ class OprHelper:
     def getData(self,event):
         # TODO: This doesn't seem like it would support older matches with 2v2 games -gregmarra 8 Mar 2012 
         num = 0
-        for match in event.match_set:
+        for match in Match.query(Match.event == event.key).fetch(500):
             if len(match.alliances > 0):
                 if (match.comp_level == "qm" and match.alliances['red']['score'] > -1 and match.alliances['blue']['score'] > -1):
                     OprHelper.data.append([])
@@ -91,8 +91,8 @@ class OprHelper:
     @classmethod
     def getTeamData(self,event):
         #reader = csv.reader(open(file,"rb"))
-        event_teams = event.teams.fetch(500)
-        team_keys = [EventTeam.team.get_value_for_datastore(event_team).name() for event_team in event_teams]
+        event_teams = EventTeam.query(EventTeam.event == event.key).fetch(500)
+        team_keys = [event_team.team for event_team in event_teams]
         
         for num, team_key in enumerate(team_keys):
             OprHelper.teamdata.append([])
