@@ -97,7 +97,7 @@ class TeamDetail(BaseHandler):
             
             # Prepare the data to batch it with ndb
             for e in events:
-                e.prepMatches()
+                e.team_matches_future = Match.query(Match.event == e.key, Match.team_key_names == team.key_name).fetch_async(500)
                 e.team_awards_future = Award.query(Award.event == e.key, Award.team == team.key).fetch_async(500)
 
             # Return an array of event names and a list of matches from that event that the
@@ -107,7 +107,7 @@ class TeamDetail(BaseHandler):
 
             for e in events:
                 awards = AwardHelper.organizeAwards(e.team_awards_future.get_result())
-                matches = MatchHelper.organizeMatches(e.matches)
+                matches = MatchHelper.organizeMatches(e.team_matches_future.get_result())
 
                 wlt = EventHelper.getTeamWLTFromMatches(team.key_name, e.matches)
                 year_wlt_list.append(wlt)
