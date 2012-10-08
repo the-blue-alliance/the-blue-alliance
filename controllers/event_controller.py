@@ -81,7 +81,7 @@ class EventDetail(BaseHandler):
             if not event:
                 return self.redirect("/error/404")
             
-            matches = MatchHelper.organizeMatches(Match.query(Match.event == event.key))
+            matches = MatchHelper.organizeMatches(Match.query(Match.event == event.key).fetch(500))
             awards = AwardHelper.organizeAwards(Award.query(Award.event == event.key))
             team_keys = [event_team.team for event_team in EventTeam.query(EventTeam.event == event.key).fetch(500)]
             teams = ndb.get_multi(team_keys)
@@ -134,7 +134,7 @@ class EventRss(BaseHandler):
         
         if xml is None:
             event = Event.get_by_id(event_key)
-            matches = MatchHelper.organizeMatches(Match.query(Match.event == event.key))
+            matches = MatchHelper.organizeMatches(Match.query(Match.event == event.key).fetch(500))
         
             template_values = {
                     "event": event,

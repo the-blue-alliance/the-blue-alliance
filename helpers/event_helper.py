@@ -1,7 +1,5 @@
 import logging
 
-from google.appengine.ext import db
-
 from models.event import Event
 from models.match import Match
 from models.team import Team
@@ -17,6 +15,7 @@ class EventHelper(object):
         Given a team_key and some matches, find the Win Loss Tie.
         """
         wlt = {"win": 0, "loss": 0, "tie": 0}
+        
         for match in matches:
             if match.has_been_played and match.winning_alliance:
                 if match.winning_alliance == "":

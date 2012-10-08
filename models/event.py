@@ -26,34 +26,59 @@ class Event(ndb.Model):
     rankings_json = ndb.TextProperty(indexed=False)
 
     def __init__(self, *args, **kw):
+        self._awards = None
+        self._awards_future = None
         self._matches = None
+        self._matches_future = None
         self._rankings = None
+        self._teams_future = None
         self._teams = None
         self._webcast = None
         super(Event, self).__init__(*args, **kw)
     
+    def prepAwards(self):
+        from models.award import Award
+        if self._awards_future is None:
+            self._awards_future = Award.query(Award.event == self.key).fetch_async(500)
+
     @property
     def awards(self):
         # This import is ugly, and maybe all the models should be in one file again -gregmarra 20121006
         from models.award import Award
         if self._awards is None:
-            self._awards = Award.query(Award.event == self.key).fetch(500)
+            self.prepAwards()
+            self._awards = self._awards_future.get_result()
         return self._awards
+
+    def prepMatches(self):
+        from models.match import Match
+        if self._matches_future is None:
+            self._matches_future = Match.query(Match.event == self.key).fetch_async(500)
 
     @property
     def matches(self):
         # This import is ugly, and maybe all the models should be in one file again -gregmarra 20121006
         from models.match import Match
         if self._matches is None:
-            self._matches = Match.query(Match.event == self.key).fetch(500)
+            self.prepMatches()
+            self._matches = self._matches_future.get_result()
         return self._matches
+
+    def prepTeams(self):
+        # TODO there is a way to do this with yields such that this would be a
+        # generator function that would yield, and if two sets of ndb fetches
+        # went by would cleanly do itself without forcing a fetch.
+        # -gregmarra 20121007
+        from models.event_team import EventTeam
+        if self._teams_future is None:
+            self._event_teams_future = EventTeam.query(EventTeam.event == self.key).fetch_async(500)
 
     @property
     def teams(self):
         # This import is ugly, and maybe all the models should be in one file again -gregmarra 20121006
         from models.event_team import EventTeam
         if self._teams is None:
-            team_keys = [event_team.team for event_team in EventTeam.query(EventTeam.event == self.key).fetch(500)]
+            team_keys = [event_team.team for event_team in self._event_teams_future.get_result()]
             teams = ndb.get_multi(team_keys)
             self._teams = sorted(teams, key = lambda team: team.team_number) 
         return self._teams

@@ -21,7 +21,6 @@ class MatchHelper(object):
 
     @classmethod
     def organizeMatches(self, match_list):
-        match_list = match_list.fetch(500)
         match_list = MatchHelper.natural_sort_matches(match_list)
 
         # Cleanup invalid. This does database calls. This is a wildly inappropriate place

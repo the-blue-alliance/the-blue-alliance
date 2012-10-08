@@ -3,6 +3,7 @@ import os
 import logging
 
 from google.appengine.api import memcache
+from google.appengine.ext import ndb
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
@@ -80,26 +81,35 @@ class TeamDetail(BaseHandler):
             if not team:
                 return self.redirect("/error/404")
             
-            team_event_teams = EventTeam.query(EventTeam.team == team.key).fetch(1000)
+            # TODO this function is a hack, remove it. -gregmarra 20121007
+            team.do_split_address()
 
-            events = [a.event.get() for a in team_event_teams if a.year == year]
+            event_teams = EventTeam.query(EventTeam.team == team.key).fetch(1000)
+            event_keys = [event_team.event for event_team in event_teams if event_team.year == year]
+            events = ndb.get_multi(event_keys)
 
             for event in events:
                 if not event.start_date:
                     event.start_date = datetime.datetime(year, 12, 31) #unknown goes last
             events = sorted(events, key=lambda event: event.start_date)
             
-            years = sorted(set([a.year for a in team_event_teams if a.year != None]))
+            years = sorted(set([a.year for a in event_teams if a.year != None]))
             
-            participation = list()
-            
+            # Prepare the data to batch it with ndb
+            for e in events:
+                e.prepMatches()
+                e.team_awards_future = Award.query(Award.event == e.key, Award.team == team.key).fetch_async(500)
+
             # Return an array of event names and a list of matches from that event that the
             # team was a participant in.
+            participation = list()
             year_wlt_list = list()
+
             for e in events:
-                match_list = Match.query(Match.event == e.key, Match.team_key_names == team.key_name)
-                matches = MatchHelper.organizeMatches(match_list)
-                wlt = EventHelper.getTeamWLTFromMatches(team.key_name, match_list)
+                awards = AwardHelper.organizeAwards(e.team_awards_future.get_result())
+                matches = MatchHelper.organizeMatches(e.matches)
+
+                wlt = EventHelper.getTeamWLTFromMatches(team.key_name, e.matches)
                 year_wlt_list.append(wlt)
                 if wlt["win"] + wlt["loss"] + wlt["tie"] == 0:
                     display_wlt = None
@@ -113,15 +123,12 @@ class TeamDetail(BaseHandler):
                             team_rank = element[0]
                             break
                     
-                awards = AwardHelper.organizeAwards(Award.query(Award.event == e.key, Award.team == team.key))
                     
                 participation.append({ 'event' : e,
                                        'matches' : matches,
                                        'wlt': display_wlt,
                                        'rank': team_rank,
                                        'awards': awards })
-            
-            team.do_split_address()
             
             year_wlt = {"win": 0, "loss": 0, "tie": 0}
             for wlt in year_wlt_list:
