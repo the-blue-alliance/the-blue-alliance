@@ -1,6 +1,6 @@
-from helpers.ndb_manipulator_base import NdbManipulatorBase
+from helpers.manipulator_base import ManipulatorBase
 
-class TeamManipulator(NdbManipulatorBase):
+class TeamManipulator(ManipulatorBase):
     """
     Handle Team database writes.
     """
