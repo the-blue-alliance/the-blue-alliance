@@ -32,26 +32,10 @@ class ManipulatorBase(object):
         Given a model or list of models, either insert them into the database, or update
         existing models with the same key.
         """
-        new_models = self.listify(new_models)
-
-        return_models = []
-        async_puts = []
-
-        while len(new_models) > 0:
-            model_batch = new_models[-self.BATCH_SIZE:] # the last BATCH_SIZE items (or all of them)
-            new_models = new_models[:-self.BATCH_SIZE] # everything but the last BATCH_SIZE items (or nothing)
-
-            # Get the full list of db-merged models
-            model_batch = self.listify(self.findOrSpawn(model_batch))
-            return_models.extend(model_batch)
-
-            # Write back the models that had updates
-            models_to_put = [model for model in model_batch if getattr(model, "dirty", False)]
-            async_puts.extend(ndb.put_multi_async(models_to_put))
-
-        # Block on the entire batch to ensure consistency
-        ndb.Future.wait_all(async_puts)
-        return self.delistify(return_models)
+        models = self.listify(self.findOrSpawn(self.listify(new_models)))
+        models_to_put = [model for model in models if getattr(model, "dirty", False)]
+        ndb.put_multi(models_to_put)
+        return self.delistify(models)
     
     @classmethod
     def findOrSpawn(self, new_models):
@@ -61,10 +45,8 @@ class ManipulatorBase(object):
         If it does, update it and give it back. If it does not, give it back.
         """
         new_models = self.listify(new_models)
-
         old_models = ndb.get_multi([ndb.Key(type(model).__name__, model.key_name) for model in new_models])
         new_models = [self.updateMergeBase(new_model, old_model) for (new_model, old_model) in zip(new_models, old_models)]
-
         return self.delistify(new_models)
     
     @classmethod

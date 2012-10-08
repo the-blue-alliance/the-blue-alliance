@@ -51,3 +51,19 @@ class TestTeamManipulator(unittest2.TestCase):
 
     def test_updateMerge(self):
         self.assertMergedTeam(TeamManipulator.updateMerge(self.new_team, self.old_team))
+
+    def test_create_lots_of_teams(self):
+        number = 500
+        teams = [Team(
+            id = "frc%s" % team_number,
+            team_number = team_number)
+            for team_number in range(number)]
+        TeamManipulator.createOrUpdate(teams)
+
+        team = Team.get_by_id("frc177")
+        self.assertEqual(team.key_name, "frc177")
+        self.assertEqual(team.team_number, 177)
+
+        team = Team.get_by_id("frc%s" % (number - 1))
+        self.assertEqual(team.key_name, "frc%s" % (number - 1))
+        self.assertEqual(team.team_number, number - 1)
