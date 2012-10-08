@@ -46,7 +46,7 @@ class EventList(BaseHandler):
         html = memcache.get(memcache_key)
         
         if html is None:
-            events = Event.query(Event.year == int(year)).order(Event.start_date).fetch(1000)
+            events = Event.query(Event.year == year).order(Event.start_date).fetch(1000)
         
             template_values = {
                 "show_upcoming": show_upcoming,
@@ -81,12 +81,14 @@ class EventDetail(BaseHandler):
             if not event:
                 return self.redirect("/error/404")
             
-            matches = MatchHelper.organizeMatches(Match.query(Match.event == event.key).fetch(500))
-            awards = AwardHelper.organizeAwards(Award.query(Award.event == event.key))
-            team_keys = [event_team.team for event_team in EventTeam.query(EventTeam.event == event.key).fetch(500)]
-            teams = ndb.get_multi(team_keys)
-            teams = TeamHelper.sortTeams(teams)
+            event.prepAwards()
+            event.prepMatches()
+            event.prepTeams()
 
+            awards = AwardHelper.organizeAwards(event.awards)
+            matches = MatchHelper.organizeMatches(event.matches)
+            teams = TeamHelper.sortTeams(event.teams)
+            
             num_teams = len(teams)
             middle_value = num_teams/2
             if num_teams%2 != 0:
@@ -134,7 +136,7 @@ class EventRss(BaseHandler):
         
         if xml is None:
             event = Event.get_by_id(event_key)
-            matches = MatchHelper.organizeMatches(Match.query(Match.event == event.key).fetch(500))
+            matches = MatchHelper.organizeMatches(event.matches)
         
             template_values = {
                     "event": event,
