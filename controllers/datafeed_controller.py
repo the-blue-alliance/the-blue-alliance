@@ -94,7 +94,7 @@ class TbaVideosGet(webapp.RequestHandler):
         match_filetypes = df.getVideos(event)
         if match_filetypes:
             matches_to_put = []
-            for match in Match.query(Match.event == event.key).fetch(500):
+            for match in event.matches:
                 if match.tba_videos != match_filetypes.get(match.key_name, []):
                     match.tba_videos = match_filetypes.get(match.key_name, [])
                     matches_to_put.append(match)
@@ -149,17 +149,20 @@ class UsfirstEventDetailsGet(webapp.RequestHandler):
         
         new_teams = datafeed.getEventTeams(int(year), first_eid)
         old_teams = ndb.get_multi([new_team.key for new_team in new_teams])
-        
+
+        futures = []
         for new_team, team in zip(new_teams, old_teams):
             if team is None:
                 team = new_team
-                team.put()
+                futures.append(team.put_async())
             
-            et = EventTeam.get_or_insert(
+            futures.append(EventTeam.get_or_insert_async(
                 event.key_name + "_" + team.key_name,
                 event = event.key,
                 team = team.key
-            )
+            ))
+
+        ndb.Future.wait_all(futures)
         
         template_values = {
             'event': event,
@@ -174,8 +177,7 @@ class UsfirstAwardsEnqueue(webapp.RequestHandler):
     Handles enqueing getting awards for USFIRST events.
     """
     def get(self, when):
-        events = Event.query()
-        events = events.filter(Event.official == True)
+        events = Event.query(Event.official == True)
         
         if when == "now":
             events = events.filter(Event.end_date <= datetime.datetime.today() + datetime.timedelta(days=4))
@@ -290,8 +292,7 @@ class UsfirstEventRankingsEnqueue(webapp.RequestHandler):
     Handles enqueing getting rankings for USFIRST events.
     """
     def get(self, when):
-        events = Event.query()
-        events = events.filter(Event.official == True)
+        events = Event.query(Event.official == True)
         
         if when == "now":
             events = events.filter(Event.end_date <= datetime.datetime.today() + datetime.timedelta(days=4))
@@ -324,9 +325,8 @@ class UsfirstEventRankingsGet(webapp.RequestHandler):
         event = Event.get_by_id(event_key)
         rankings = df.getEventRankings(event)
         event.rankings_json = json.dumps(rankings)
-        event.put()
 
-        # TODO update to use Manipulators -gregmarra 20121006
+        EventManipulator.createOrUpdate(event)
 
         template_values = {'rankings': rankings,
                            'event_name': event.key_name}
