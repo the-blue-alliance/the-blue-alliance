@@ -26,7 +26,8 @@ class ParserBase(object):
 	    if hasattr(node, 'contents'):
 	        for content in node.contents:
 	            result = self._recurseUntilString(content)
-	            result = result.strip().replace('\r', '').replace('\n', '').replace('  ', ' ')
+	            if result is not None:
+	            	result = result.strip().replace('\r', '').replace('\n', '').replace('  ', ' ')
 	            if result is not None and result != "":
 	                return result
 	    return None
