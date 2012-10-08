@@ -15,7 +15,6 @@ class AdminEventList(webapp.RequestHandler):
     List all Events.
     """
     def get(self):
-        
         events = Event.query().order(Event.year).order(Event.start_date).fetch(10000)
         
         template_values = {
@@ -31,6 +30,9 @@ class AdminEventDetail(webapp.RequestHandler):
     """
     def get(self, event_key):
         event = Event.get_by_id(event_key)
+        event.prepAwards()
+        event.prepMatches()
+        event.prepTeams()
 
         template_values = {
             "event": event

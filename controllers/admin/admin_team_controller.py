@@ -8,7 +8,6 @@ from models.team import Team
 # The view of a list of teams.
 class AdminTeamList(webapp.RequestHandler):
     def get(self):
-        
         teams = Team.query().order(Team.team_number)
         
         template_values = {
@@ -21,7 +20,6 @@ class AdminTeamList(webapp.RequestHandler):
 # The view of a single Team.
 class AdminTeamDetail(webapp.RequestHandler):
     def get(self, team_number):
-        
         team = Team.get_by_id("frc" + team_number)                
         
         template_values = { 
