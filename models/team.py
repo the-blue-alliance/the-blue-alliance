@@ -1,19 +1,19 @@
 import logging
 
-from google.appengine.ext import db
+from google.appengine.ext import ndb
 
-class Team(db.Model):
+class Team(ndb.Model):
     """
     Teams represent FIRST Robotics Competition teams.
     key_name is like 'frc177'
     """
-    team_number = db.IntegerProperty(required=True)
-    name = db.StringProperty(indexed=False)
-    nickname = db.StringProperty(indexed=False)
-    address = db.PostalAddressProperty(indexed=False)
-    website = db.LinkProperty(indexed=False)
-    first_tpid = db.IntegerProperty() #from USFIRST. FIRST team ID number. -greg 5/20/2010
-    first_tpid_year = db.IntegerProperty() # from USFIRST. Year tpid is applicable for. -greg 9 Jan 2011
+    team_number = ndb.IntegerProperty(required=True)
+    name = ndb.StringProperty(indexed=False)
+    nickname = ndb.StringProperty(indexed=False)
+    address = ndb.StringProperty(indexed=False)
+    website = ndb.StringProperty(indexed=False)
+    first_tpid = ndb.IntegerProperty() #from USFIRST. FIRST team ID number. -greg 5/20/2010
+    first_tpid_year = ndb.IntegerProperty() # from USFIRST. Year tpid is applicable for. -greg 9 Jan 2011
     
     def do_split_address(self):
         """

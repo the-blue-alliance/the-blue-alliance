@@ -22,15 +22,16 @@ class ApiHelper(object):
         memcache_key = "api_team_info_%s" % team_key
         team_dict = memcache.get(memcache_key)
         if team_dict is None:
-            team = Team.get_by_key_name(team_key)
+            team = Team.get_by_id(team_key)
             if team is not None:
                 team_dict = dict()
-                team_dict["key"] = team.key().name()
+                team_dict["key"] = team.key_name
                 team_dict["team_number"] = team.team_number
                 team_dict["name"] = team.name
                 team_dict["nickname"] = team.nickname
                 team_dict["website"] = team.website
-                team_dict["event_keys"] = [a.event.key().name() for a in team.events]
+                # TODO reenable this in ndb style -gregmarra 20121006
+                #team_dict["event_keys"] = [a.event.key().name() for a in team.events]
                 team_dict["location"] = team.address
                 
                 try:
@@ -58,10 +59,10 @@ class ApiHelper(object):
         memcache_key = "api_event_info_%s" % event_key
         event_dict = memcache.get(memcache_key)
         if event_dict is None:
-            event = Event.get_by_key_name(event_key)
+            event = Event.get_by_id(event_key)
             if event is not None:
                 event_dict = dict()
-                event_dict["key"] = event.key().name()
+                event_dict["key"] = event.key_name
                 event_dict["year"] = event.year
                 event_dict["event_code"] = event.event_short
                 event_dict["name"] = event.name
@@ -79,8 +80,8 @@ class ApiHelper(object):
                 else:
                     event_dict["end_date"] = None
                 
-                event_dict["teams"] = [EventTeam.team.get_value_for_datastore(event_team).name() for event_team in event.teams.fetch(500)]
-                event_dict["matches"] = [a.key().name() for a in event.match_set.fetch(500)]
+                event_dict["teams"] = [event_team.team for event_team in EventTeam.query(EventTeam.event = event.key).fetch(500)]
+                event_dict["matches"] = [match.key_name for match in Match.query(Match.event = event.key).fetch(500)]
                 
                 #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
                 if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, event_dict, 2592000)
@@ -96,10 +97,10 @@ class ApiHelper(object):
         event_list = memcache.get(memcache_key)
         
         if event_list is None:
-            team = Team.get_by_key_name(team_dict["key"])
-            events = [a.event for a in team.events if a.year == int(year)]
+            team = Team.get_by_id(team_dict["key"])
+            events = [a.event.get() for a in EventTeam.query(EventTeam.team == team.key).fetch(1000) if a.year == year]
             events = sorted(events, key=lambda event: event.start_date)
-            event_list = [self.getEventInfo(e.key().name()) for e in events]
+            event_list = [self.getEventInfo(e.key_name) for e in events]
             for event_dict, event in zip(event_list, events):
                 event_dict["team_wlt"] = EventHelper.getTeamWLT(team_dict["key"], event)
 
@@ -122,15 +123,15 @@ class ApiHelper(object):
         matches_list = memcache.get(memcache_key)
         if matches_list is None:
             matches = list()
-            team = Team.get_by_key_name(team_dict["key"])
-            for e in [a.event for a in team.events]:
-                match_list = e.match_set.filter("team_key_names =", team.key().name()).fetch(500)
+            team = Team.get_by_id(team_dict["key"])
+            for e in [a.event.get() for a in EventTeam.query(EventTeam.team == team.key).fetch(1000) if a.year == year]:
+                match_list = Match.query(Match.event == event.key, Match.team_key_names == team.key_name).fetch(500)
                 matches.extend(match_list)
             matches_list = list()
             for match in matches:
                 match_dict = dict()
-                match_dict["key"] = match.key().name()
-                match_dict["event"] = match.event.key().name()
+                match_dict["key"] = match.key_name
+                match_dict["event"] = match.event
                 match_dict["comp_level"] = match.comp_level
                 match_dict["set_number"] = match.set_number
                 match_dict["match_number"] = match.match_number

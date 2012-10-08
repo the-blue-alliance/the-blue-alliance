@@ -20,7 +20,7 @@ class DatafeedFms(DatafeedBase):
     	events = self.parse(self.FMS_EVENT_LIST_URL, FmsEventListParser)
 
     	return [Event(
-    		key_name = "%s%s" % (event.get("year", None), event.get("event_short", None)),
+    		id = "%s%s" % (event.get("year", None), event.get("event_short", None)),
     		end_date = event.get("end_date", None),
     		event_short = event.get("event_short", None),
     		first_eid = event.get("first_eid", None),
@@ -37,11 +37,10 @@ class DatafeedFms(DatafeedBase):
         teams = self.parse(self.FMS_TEAM_LIST_URL, FmsTeamListParser)
 
         return [Team(
-            key_name = "frc%s" % team.get("team_number", None),
+            id = "frc%s" % team.get("team_number", None),
             address = team.get("address", None),
             name = self._shorten(team.get("name", None)),
             nickname = self._shorten(team.get("nickname", None)),
-            short_name = self._shorten(team.get("short_name", None)),
             team_number = team.get("team_number", None)
             )
             for team in teams]

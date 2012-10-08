@@ -26,7 +26,7 @@ class TestDatafeedFmsEvents(unittest2.TestCase):
         for event in events:
             if event.event_short == "ct":
                 found_ct = True
-                self.assertEqual(event.key_name, "2012ct")
+                self.assertEqual(event.key.id(), "2012ct")
                 self.assertEqual(event.end_date, datetime.datetime(2012, 03, 31))
                 self.assertEqual(event.event_short, "ct")
                 self.assertEqual(event.first_eid, "7627")

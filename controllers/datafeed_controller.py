@@ -4,7 +4,8 @@ import datetime
 import json
 
 from google.appengine.api import taskqueue
-from google.appengine.ext import db, webapp
+from google.appengine.ext import ndb
+from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
 from datafeeds.datafeed_fms import DatafeedFms
@@ -16,7 +17,6 @@ from helpers.match_manipulator import MatchManipulator
 from helpers.award_manipulator import AwardManipulator
 from helpers.team_helper import TeamHelper, TeamTpidHelper
 from helpers.team_manipulator import TeamManipulator
-from helpers.opr_helper import OprHelper
 
 from models.event import Event
 from models.event_team import EventTeam
@@ -68,15 +68,15 @@ class TbaVideosEnqueue(webapp.RequestHandler):
     Handles enqueing grabing tba_videos for Matches at individual Events.
     """
     def get(self):
-        events = Event.all()
+        events = Event.query()
 
-        for event in events.fetch(5000):
+        for event in events:
             taskqueue.add(
                 url='/tasks/get/tba_videos/' + event.key_name, 
                 method='GET')
         
         template_values = {
-            'event_count': Event.all().count(),
+            'event_count': Event.query().count(),
         }
 
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/tba_videos_enqueue.html')
@@ -90,16 +90,16 @@ class TbaVideosGet(webapp.RequestHandler):
     def get(self, event_key):
         df = DatafeedTba()
         
-        event = Event.get_by_key_name(event_key)
+        event = Event.get_by_id(event_key)
         match_filetypes = df.getVideos(event)
         if match_filetypes:
             matches_to_put = []
-            for match in event.match_set:
+            for match in Match.query(Match.event == event.key).fetch(500):
                 if match.tba_videos != match_filetypes.get(match.key_name, []):
                     match.tba_videos = match_filetypes.get(match.key_name, [])
                     matches_to_put.append(match)
             
-            db.put(matches_to_put)
+            MatchManipulator.createOrUpdate(matches_to_put)
             
             tbavideos = match_filetypes.items()
         else:
@@ -119,11 +119,9 @@ class UsfirstEventDetailsEnqueue(webapp.RequestHandler):
     Handles enqueing updates to individual USFIRST events.
     """
     def get(self, year):
-        events = Event.all()
-        events.filter('first_eid != ', None) # Official events with EIDs
-        events.filter('year =', int(year))
+        events = Event.query(Event.first_eid != None, Event.year == int(year))
         
-        for event in events.fetch(100):
+        for event in events.fetch(200):
             taskqueue.add(
                 queue_name='usfirst',
                 url='/tasks/get/usfirst_event_details/%s/%s' % (year, event.first_eid),
@@ -150,7 +148,7 @@ class UsfirstEventDetailsGet(webapp.RequestHandler):
         event = EventManipulator.createOrUpdate(event)
         
         new_teams = datafeed.getEventTeams(int(year), first_eid)
-        old_teams = Team.get_by_key_name([new_team.key().name() for new_team in new_teams])
+        old_teams = ndb.get_multi([new_team.key for new_team in new_teams])
         
         for new_team, team in zip(new_teams, old_teams):
             if team is None:
@@ -158,9 +156,9 @@ class UsfirstEventDetailsGet(webapp.RequestHandler):
                 team.put()
             
             et = EventTeam.get_or_insert(
-                key_name = event.key_name + "_" + team.key().name(),
-                event = event,
-                team = team
+                event.key_name + "_" + team.key_name,
+                event = event.key,
+                team = team.key
             )
         
         template_values = {
@@ -176,21 +174,21 @@ class UsfirstAwardsEnqueue(webapp.RequestHandler):
     Handles enqueing getting awards for USFIRST events.
     """
     def get(self, when):
-        events = Event.all()
-        events = events.filter('official =', True)
+        events = Event.query()
+        events = events.filter(Event.official == True)
         
         if when == "now":
-            events = events.filter('end_date <=', datetime.date.today() + datetime.timedelta(days=4))
-            events = events.filter('end_date >=', datetime.date.today() - datetime.timedelta(days=1))
+            events = events.filter(Event.end_date <= datetime.datetime.today() + datetime.timedelta(days=4))
+            events = events.filter(Event.end_date >= datetime.datetime.today() - datetime.timedelta(days=1))
         else:
-            events = events.filter('year =', int(when))
+            events = events.filter(Event.year == int(when))
         
         events = events.fetch(500)
         
         for event in events:
             taskqueue.add(
                 queue_name='usfirst',
-                url='/tasks/get/usfirst_awards/%s' % (event.key().name()),
+                url='/tasks/get/usfirst_awards/%s' % (event.key_name),
                 method='GET')
         template_values = {
             'events': events,
@@ -206,7 +204,7 @@ class UsfirstAwardsGet(webapp.RequestHandler):
     def get(self, event_key):   
         datafeed = DatafeedUsfirst()
         
-        event = Event.get_by_key_name(event_key)
+        event = Event.get_by_id(event_key)
         new_awards = AwardManipulator.createOrUpdate(datafeed.getEventAwards(event))
         
         template_values = {
@@ -246,19 +244,19 @@ class UsfirstMatchesEnqueue(webapp.RequestHandler):
     Handles enqueing getting match results for USFIRST events.
     """
     def get(self, when):
-        events = Event.all().filter('official =', True)
+        events = Event.query(Event.official == True)
         
         if when == "now":
-            events = events.filter('end_date <=', datetime.date.today() + datetime.timedelta(days=4))
-            events = events.filter('end_date >=', datetime.date.today() - datetime.timedelta(days=1))
+            events = events.filter(Event.end_date <= datetime.datetime.today() + datetime.timedelta(days=4))
+            events = events.filter(Event.end_date >= datetime.datetime.today() - datetime.timedelta(days=1))
         else:
-            events = events.filter('year =', int(when))
+            events = events.filter(Event.year == int(when))
         
         events = events.fetch(500)
         for event in events:
             taskqueue.add(
                 queue_name='usfirst',
-                url='/tasks/get/usfirst_matches/' + event.key().name(),
+                url='/tasks/get/usfirst_matches/' + event.key_name,
                 method='GET')
         
         template_values = {
@@ -276,7 +274,7 @@ class UsfirstMatchesGet(webapp.RequestHandler):
     def get(self, event_key):
         df = DatafeedUsfirst()
         
-        event = Event.get_by_key_name(event_key)
+        event = Event.get_by_id(event_key)
         new_matches = MatchManipulator.createOrUpdate(df.getMatches(event))
 
         template_values = {
@@ -292,20 +290,20 @@ class UsfirstEventRankingsEnqueue(webapp.RequestHandler):
     Handles enqueing getting rankings for USFIRST events.
     """
     def get(self, when):
-        events = Event.all()
-        events = events.filter('official =', True)
+        events = Event.query()
+        events = events.filter(Event.official == True)
         
         if when == "now":
-            events = events.filter('end_date <=', datetime.date.today() + datetime.timedelta(days=4))
-            events = events.filter('end_date >=', datetime.date.today() - datetime.timedelta(days=1))
+            events = events.filter(Event.end_date <= datetime.datetime.today() + datetime.timedelta(days=4))
+            events = events.filter(Event.end_date >= datetime.datetime.today() - datetime.timedelta(days=1))
         else:
-            events = events.filter('year =', int(when))
+            events = events.filter(Event.year == int(when))
         
         events = events.fetch(500)
         for event in events:
             taskqueue.add(
                 queue_name='usfirst',
-                url='/tasks/get/usfirst_event_rankings/' + event.key().name(),
+                url='/tasks/get/usfirst_event_rankings/' + event.key_name,
                 method='GET')
         
         template_values = {
@@ -323,10 +321,12 @@ class UsfirstEventRankingsGet(webapp.RequestHandler):
     def get(self, event_key):
         df = DatafeedUsfirst()
         
-        event = Event.get_by_key_name(event_key)
+        event = Event.get_by_id(event_key)
         rankings = df.getEventRankings(event)
         event.rankings_json = json.dumps(rankings)
-        db.put(event)
+        event.put()
+
+        # TODO update to use Manipulators -gregmarra 20121006
 
         template_values = {'rankings': rankings,
                            'event_name': event.key_name}
@@ -342,11 +342,11 @@ class UsfirstTeamDetailsEnqueue(webapp.RequestHandler):
     def get(self):
         offset = int(self.request.get("offset", 0))
         
-        teams = Team.all(keys_only=True).fetch(1000, int(offset))
+        teams = Team.query().fetch(1000, offset=int(offset))
         for team_key in teams:
             taskqueue.add(
                 queue_name='usfirst',
-                url='/tasks/get/usfirst_team_details/' + team_key.name(),
+                url='/tasks/get/usfirst_team_details/' + team_key.id(),
                 method='GET')
         
         # FIXME omg we're just writing out? -gregmarra 2012 Aug 26
@@ -361,7 +361,7 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
     """
     def get(self, key_name):
         df = DatafeedUsfirst()
-        team = df.getTeamDetails(Team.get_by_key_name(key_name))
+        team = df.getTeamDetails(Team.get_by_id(key_name))
         if team:
             team = TeamManipulator.createOrUpdate(team)
             success = True
@@ -396,7 +396,7 @@ class UsfirstTeamsTpidsGet(webapp.RequestHandler):
         logging.info("YEAR: %s", year)
         df.getTeamsTpids(int(year), skip)
         
-        team_count = Team.all().count()
+        team_count = Team.query().count()
         
         template_values = {
             'team_count': team_count

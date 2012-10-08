@@ -1,44 +1,72 @@
-from google.appengine.ext import db
+from google.appengine.ext import ndb
 import json
 
-class Event(db.Model):
+class Event(ndb.Model):
     """
     Events represent FIRST Robotics Competition events, both official and unofficial.
     key_name is like '2010ct'
     """
-    name = db.StringProperty()
-    event_type = db.StringProperty(indexed=False) # From USFIRST
-    short_name = db.StringProperty(indexed=False) # Should not contain "Regional" or "Division", like "Hartford"
-    event_short = db.StringProperty(required=True, indexed=False) # Smaller abbreviation like "CT"
-    year = db.IntegerProperty(required=True)
-    start_date = db.DateTimeProperty()
-    end_date = db.DateTimeProperty()
-    venue = db.StringProperty(indexed=False)
-    venue_address = db.PostalAddressProperty(indexed=False) # We can scrape this.
-    location = db.StringProperty(indexed=False)
-    official = db.BooleanProperty(default=False) # Is the event FIRST-official?
-    first_eid = db.StringProperty() #from USFIRST
-    facebook_eid = db.StringProperty(indexed=False) #from Facebook
-    website = db.StringProperty(indexed=False)
-    webcast_json = db.TextProperty(indexed=False) #  list of dicts, valid keys include 'type' and 'channel'
-    oprs = db.ListProperty(float, indexed=False)
-    opr_teams = db.ListProperty(int, indexed=False)
-    rankings_json = db.TextProperty(indexed=False)
+    name = ndb.StringProperty()
+    event_type = ndb.StringProperty(indexed=False) # From USFIRST
+    short_name = ndb.StringProperty(indexed=False) # Should not contain "Regional" or "Division", like "Hartford"
+    event_short = ndb.StringProperty(required=True, indexed=False) # Smaller abbreviation like "CT"
+    year = ndb.IntegerProperty(required=True)
+    start_date = ndb.DateTimeProperty()
+    end_date = ndb.DateTimeProperty()
+    venue = ndb.StringProperty(indexed=False)
+    venue_address = ndb.StringProperty(indexed=False) # We can scrape this.
+    location = ndb.StringProperty(indexed=False)
+    official = ndb.BooleanProperty(default=False) # Is the event FIRST-official?
+    first_eid = ndb.StringProperty() #from USFIRST
+    facebook_eid = ndb.StringProperty(indexed=False) #from Facebook
+    website = ndb.StringProperty(indexed=False)
+    webcast_json = ndb.TextProperty(indexed=False) #  list of dicts, valid keys include 'type' and 'channel'
+    oprs = ndb.FloatProperty(indexed=False, repeated=True)
+    opr_teams = ndb.IntegerProperty(indexed=False, repeated=True)
+    rankings_json = ndb.TextProperty(indexed=False)
 
     def __init__(self, *args, **kw):
+        self._matches = None
         self._rankings = None
+        self._teams = None
         self._webcast = None
         super(Event, self).__init__(*args, **kw)
     
+    @property
+    def awards(self):
+        # This import is ugly, and maybe all the models should be in one file again -gregmarra 20121006
+        from models.award import Award
+        if self._awards is None:
+            self._awards = Award.query(Award.event == self.key).fetch(500)
+        return self._awards
+
+    @property
+    def matches(self):
+        # This import is ugly, and maybe all the models should be in one file again -gregmarra 20121006
+        from models.match import Match
+        if self._matches is None:
+            self._matches = Match.query(Match.event == self.key).fetch(500)
+        return self._matches
+
+    @property
+    def teams(self):
+        # This import is ugly, and maybe all the models should be in one file again -gregmarra 20121006
+        from models.event_team import EventTeam
+        if self._teams is None:
+            team_keys = [event_team.team for event_team in EventTeam.query(EventTeam.event == self.key).fetch(500)]
+            teams = ndb.get_multi(team_keys)
+            self._teams = sorted(teams, key = lambda team: team.team_number) 
+        return self._teams
+
     @property
     def rankings(self):
         """
         Lazy load parsing rankings JSON
         """
         if self._rankings is None:
-            if type(self.rankings_json) == db.Text:
+            try:
                 self._rankings = json.loads(self.rankings_json)
-            else:
+            except Exception, e:
                 self._rankings = None
         return self._rankings
     
@@ -48,9 +76,9 @@ class Event(db.Model):
         Lazy load parsing webcast JSON
         """
         if self._webcast is None:
-            if type(self.webcast_json) == db.Text:
+            try:
                 self._webcast = json.loads(self.webcast_json)
-            else:
+            except Exception, e:
                 self._webcast = None
         return self._webcast
 
@@ -76,4 +104,4 @@ class Event(db.Model):
         return "/event/%s" % self.key_name
 
     # Depreciated, still here to keep GAE clean.
-    webcast_url = db.StringProperty(indexed=False)
+    webcast_url = ndb.StringProperty(indexed=False)

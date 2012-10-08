@@ -63,7 +63,7 @@
     </tr>
     <tr>
         <td>Teams Attending</td>
-        <td>{{ event.teams.count }}</td>
+        <td>{{ event.teams|length }} teams - {% for team in event.teams %}<a href="/admin/team/{{team.team_number}}">{{team.team_number}}</a>, {% endfor %}</td>
     </tr>
 </table>
 
@@ -88,7 +88,7 @@
 <table class="table table-striped table-condensed">
     <tbody>
       <tr><th>Award</th><th>Team</th><th>Person</th></tr>
-      {% for award in event.award_set %}
+      {% for award in event.awards %}
       <tr>
         <td><a href="/admin/award/edit/{{award.key_name}}">{{award.official_name}}</a></td>
       <td>
@@ -113,7 +113,7 @@
         <th>Match Key</th>
         <th>Alliances JSON</th>
     </thead>
-    {% for match in event.match_set %}
+    {% for match in event.matches %}
     <tr>
         <td><a href="/admin/match/{{match.key_name}}">{{ match.key_name }}</a></td>
         <td>{{ match.alliances_json }}</td>

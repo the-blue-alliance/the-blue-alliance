@@ -15,7 +15,7 @@ class MatchList(BaseHandler):
     Display all Matches.
     """
     def get(self):
-        matches = Match.all().order('event').fetch(100)
+        matches = Match.query().order('event').fetch(100)
         
         template_values = {
             "matches": matches,
@@ -37,7 +37,7 @@ class MatchDetail(BaseHandler):
         html = memcache.get(memcache_key)
         
         if html is None:
-            match = Match.get_by_key_name(match_key)
+            match = Match.get_by_id(match_key)
             
             if not match:
                 return self.redirect("/error/404")

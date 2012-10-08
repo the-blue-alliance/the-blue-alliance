@@ -1,6 +1,6 @@
 import unittest2
 
-from google.appengine.ext import db
+from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from helpers.match_manipulator import MatchManipulator
@@ -12,18 +12,19 @@ class TestMatchManipulator(unittest2.TestCase):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
 
         self.event = Event(
-          key_name = "2012ct",
+          id = "2012ct",
           event_short = "ct",
           year = 2012
         )
 
         self.old_match = Match(
-            key_name = "2012ct_qm1",
+            id = "2012ct_qm1",
             alliances_json = """{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""",
             comp_level = "qm",
-            event = self.event,
+            event = self.event.key,
             game = "frc_2012_rebr",
             set_number = 1,
             match_number = 1,
@@ -31,10 +32,10 @@ class TestMatchManipulator(unittest2.TestCase):
         )
 
         self.new_match = Match(
-            key_name = "2012ct_qm1",
+            id = "2012ct_qm1",
             alliances_json = """{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
             comp_level = "qm",
-            event = self.event,
+            event = self.event.key,
             game = "frc_2012_rebr",
             set_number = 1,
             match_number = 1,
@@ -57,14 +58,14 @@ class TestMatchManipulator(unittest2.TestCase):
     def test_createOrUpdate(self):
         MatchManipulator.createOrUpdate(self.old_match)
         
-        self.assertOldMatch(Match.get_by_key_name("2012ct_qm1"))
-        self.assertEqual(Match.get_by_key_name("2012ct_qm1").alliances_json, """{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""")
+        self.assertOldMatch(Match.get_by_id("2012ct_qm1"))
+        self.assertEqual(Match.get_by_id("2012ct_qm1").alliances_json, """{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""")
         
         MatchManipulator.createOrUpdate(self.new_match)
-        self.assertMergedMatch(Match.get_by_key_name("2012ct_qm1"))
+        self.assertMergedMatch(Match.get_by_id("2012ct_qm1"))
 
     def test_findOrSpawn(self):
-        db.put(self.old_match)
+        self.old_match.put()
         self.assertMergedMatch(MatchManipulator.findOrSpawn(self.new_match))
 
     def test_updateMerge(self):

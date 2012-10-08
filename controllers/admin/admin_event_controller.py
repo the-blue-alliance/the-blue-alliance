@@ -16,7 +16,7 @@ class AdminEventList(webapp.RequestHandler):
     """
     def get(self):
         
-        events = Event.all().order('year').order('start_date').fetch(10000)
+        events = Event.query().order(Event.year).order(Event.start_date).fetch(10000)
         
         template_values = {
             "events": events,
@@ -30,10 +30,10 @@ class AdminEventDetail(webapp.RequestHandler):
     Show an Event.
     """
     def get(self, event_key):
-        event = Event.get_by_key_name(event_key)
-        
+        event = Event.get_by_id(event_key)
+
         template_values = {
-            "event": event,
+            "event": event
         }
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_details.html')
@@ -44,7 +44,7 @@ class AdminEventEdit(webapp.RequestHandler):
     Edit an Event.
     """
     def get(self, event_key):
-        event = Event.get_by_key_name(event_key)
+        event = Event.get_by_id(event_key)
         
         template_values = {
             "event": event
@@ -80,7 +80,7 @@ class AdminAwardEdit(webapp.RequestHandler):
     Edit an Award.
     """
     def get(self, award_key):
-        award = Award.get_by_key_name(award_key)
+        award = Award.get_by_id(award_key)
                 
         template_values = {
             "award": award
@@ -92,11 +92,11 @@ class AdminAwardEdit(webapp.RequestHandler):
     def post(self, award_key):
         event_key_name = self.request.get('event_key_name')
         award = Award(
-            key_name = award_key,
+            id = award_key,
             name = self.request.get('award_name'),
-            event = Event.get_by_key_name(event_key_name),
+            event = Event.get_by_id(event_key_name),
             official_name = self.request.get('official_name'),
-            team = Team.get_by_key_name('frc' + str(self.request.get('team_number', 0))),
+            team = Team.get_by_id('frc' + str(self.request.get('team_number', 0))),
             awardee = self.request.get('awardee'),
         )
         award = AwardManipulator.createOrUpdate(award)

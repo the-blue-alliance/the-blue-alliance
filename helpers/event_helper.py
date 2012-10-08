@@ -3,6 +3,7 @@ import logging
 from google.appengine.ext import db
 
 from models.event import Event
+from models.match import Match
 from models.team import Team
 
 class EventHelper(object):
@@ -31,5 +32,5 @@ class EventHelper(object):
         """
         Given a team_key, and an event, find the team's Win Loss Tie.
         """
-        matches = event.match_set.filter("team_key_names =", team_key)
+        matches = Match.query(Match.event == event.key, Match.team_key_names == team_key).fetch(500)
         return self.getTeamWLTFromMatches(team_key, matches)
