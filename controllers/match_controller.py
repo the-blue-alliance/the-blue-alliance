@@ -10,20 +10,6 @@ from base_controller import BaseHandler
 from helpers.tbavideo_helper import TBAVideoHelper
 from models.match import Match
 
-class MatchList(BaseHandler):
-    """
-    Display all Matches.
-    """
-    def get(self):
-        matches = Match.query().order('event').fetch(100)
-        
-        template_values = {
-            "matches": matches,
-        }
-        
-        path = os.path.join(os.path.dirname(__file__), '../templates/matches/list.html')
-        self.response.out.write(template.render(path, template_values))
-        
 class MatchDetail(BaseHandler):
     """
     Display a Match.

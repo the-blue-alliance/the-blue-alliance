@@ -8,7 +8,7 @@ from controllers.event_controller import EventList, EventDetail, EventRss
 from controllers.main_controller import ContactHandler, HashtagsHandler, \
       MainHandler, OprHandler, SearchHandler, AboutHandler, ThanksHandler, \
       PageNotFoundHandler, KickoffHandler, ChannelHandler, GamedayHandler
-from controllers.match_controller import MatchList, MatchDetail
+from controllers.match_controller import MatchDetail
 from controllers.team_controller import TeamList, TeamDetail
 from controllers.ajax_controller import TypeaheadHandler, WebcastHandler
 
@@ -23,7 +23,6 @@ app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['kickoff'
                                ('/event/(.*)', EventDetail),
                                ('/gameday', GamedayHandler),
                                ('/hashtags', HashtagsHandler),
-                               ('/match/list', MatchList),
                                ('/match/(.*)', MatchDetail),
                                ('/search', SearchHandler),
                                ('/teams', TeamList),
