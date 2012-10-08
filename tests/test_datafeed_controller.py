@@ -17,6 +17,7 @@ class TestUsfirstEventDetailsGet(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
         
     def tearDown(self):
         self.testbed.deactivate()
@@ -28,7 +29,7 @@ class TestUsfirstEventDetailsGet(unittest2.TestCase):
         usfirsteventget.get(2011, "5561")
         
         # check event object got created
-        event = Event.get_by_key_name("2011ct")
+        event = Event.get_by_id("2011ct")
         self.assertEqual(event.name, "Northeast Utilities FIRST Connecticut Regional")
         self.assertEqual(event.event_type, "Regional")
         self.assertEqual(event.start_date, datetime.datetime(2011, 3, 31, 0, 0))
@@ -39,7 +40,7 @@ class TestUsfirstEventDetailsGet(unittest2.TestCase):
         self.assertEqual(event.event_short, "ct")
         
         # check team objects get created for missing teams
-        frc177 = Team.get_by_key_name("frc177")
+        frc177 = Team.get_by_id("frc177")
         self.assertEqual(frc177.team_number, 177)
         self.assertEqual(frc177.first_tpid, 41633)
 

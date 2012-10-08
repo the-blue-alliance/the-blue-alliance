@@ -75,7 +75,7 @@ class DatafeedUsfirst(DatafeedBase):
         event = self.parse(url, UsfirstEventDetailsParser)
 
         return Event(
-            key_name = str(event["year"]) + str.lower(str(event["event_short"])),
+            id = str(event["year"]) + str.lower(str(event["event_short"])),
             end_date = event.get("end_date", None),
             event_short = event.get("event_short", None),
             event_type = event.get("event_type", None),
@@ -108,18 +108,26 @@ class DatafeedUsfirst(DatafeedBase):
         return self.parse(url, UsfirstEventRankingsParser)
     
     def getEventAwards(self, event):
+
+        def _getTeamKey(award):
+            team = Team.get_by_id('frc' + str(award.get('team_number', None)))
+            if team is not None:
+                return team.key
+            else:
+                return None
+
         url = self.EVENT_AWARDS_URL_PATTERN % (event.year,
             self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
         awards = self.parse(url, UsfirstEventAwardsParser)
         
         return [Award(
-            key_name = Award.getKeyName(event, award.get('name')),
+            id = Award.getKeyName(event, award.get('name')),
             name = award.get('name', None),
-            team = Team.get_by_key_name('frc' + str(award.get('team_number', None))),
+            team = _getTeamKey(award),
             awardee = award.get('awardee', None),
             year = event.year,
             official_name = award.get('official_name', None),
-            event = event)
+            event = event.key)
             for award in awards]
 
     def getEventTeams(self, year, first_eid):
@@ -131,7 +139,7 @@ class DatafeedUsfirst(DatafeedBase):
         teams = self.parse(url, UsfirstEventTeamsParser)
         
         return [Team(
-            key_name = "frc%s" % team.get("team_number", None),
+            id = "frc%s" % team.get("team_number", None),
             first_tpid = team.get("first_tpid", None),
             first_tpid_year = year,
             team_number = team.get("team_number", None)
@@ -144,12 +152,12 @@ class DatafeedUsfirst(DatafeedBase):
         matches = self.parse(url, UsfirstMatchesParser)
 
         return [Match(
-            key_name = Match.getKeyName(
+            id = Match.getKeyName(
                 event, 
                 match.get("comp_level", None), 
                 match.get("set_number", 0), 
                 match.get("match_number", 0)),
-            event = event.key(),
+            event = event.key,
             game = Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
             set_number = match.get("set_number", 0),
             match_number = match.get("match_number", 0),

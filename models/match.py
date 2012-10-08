@@ -1,10 +1,10 @@
 import json
 
-from google.appengine.ext import db
+from google.appengine.ext import ndb
 
 from models.event import Event
 
-class Match(db.Model):
+class Match(ndb.Model):
     """
     Matches represent individual matches at Events.
     Matches have many Videos.
@@ -70,7 +70,7 @@ class Match(db.Model):
         1992: "frc_1992_maiz",
     }
     
-    alliances_json = db.StringProperty(required=True, indexed=False) #JSON dictionary with alliances and scores.
+    alliances_json = ndb.StringProperty(required=True, indexed=False) #JSON dictionary with alliances and scores.
     
     # {
     # "red": {
@@ -83,16 +83,16 @@ class Match(db.Model):
     # }
     # }
     
-    comp_level = db.StringProperty(required=True, choices=set(COMP_LEVELS))
-    event = db.ReferenceProperty(Event, required=True)
-    game = db.StringProperty(required=True,choices=set(FRC_GAMES), indexed=False)
-    match_number = db.IntegerProperty(required=True, indexed=False)
-    no_auto_update = db.BooleanProperty(default=False, indexed=False) #Set to True after manual update
-    set_number = db.IntegerProperty(required=True, indexed=False)
-    team_key_names = db.StringListProperty(required=True) #list of teams in Match, for indexing.
-    time = db.DateTimeProperty(indexed=False)
-    youtube_videos = db.StringListProperty() # list of Youtube IDs
-    tba_videos = db.StringListProperty() # list of filetypes a TBA video exists for
+    comp_level = ndb.StringProperty(required=True, choices=set(COMP_LEVELS))
+    event = ndb.KeyProperty(kind=Event, required=True)
+    game = ndb.StringProperty(required=True,choices=set(FRC_GAMES), indexed=False)
+    match_number = ndb.IntegerProperty(required=True, indexed=False)
+    no_auto_update = ndb.BooleanProperty(default=False, indexed=False) #Set to True after manual update
+    set_number = ndb.IntegerProperty(required=True, indexed=False)
+    team_key_names = ndb.StringProperty(repeated=True) #list of teams in Match, for indexing.
+    time = ndb.DateTimeProperty(indexed=False)
+    youtube_videos = ndb.StringProperty(repeated=True) # list of Youtube IDs
+    tba_videos = ndb.StringProperty(repeated=True) # list of filetypes a TBA video exists for
     
     def __init__(self, *args, **kw):
         self._alliances = None
@@ -122,7 +122,7 @@ class Match(db.Model):
 
     @property
     def event_key_name(self):
-        return Match.event.get_value_for_datastore(self).name()
+        return self.event.id()
     
     @property
     def key_name(self):

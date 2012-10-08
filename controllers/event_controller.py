@@ -3,6 +3,7 @@ import os
 import logging
 
 from google.appengine.api import memcache
+from google.appengine.ext import ndb
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
@@ -11,6 +12,8 @@ from base_controller import BaseHandler
 from helpers.match_helper import MatchHelper
 from helpers.award_helper import AwardHelper
 from helpers.team_helper import TeamHelper
+
+from models.award import Award
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
@@ -43,7 +46,7 @@ class EventList(BaseHandler):
         html = memcache.get(memcache_key)
         
         if html is None:
-            events = Event.all().filter("year =", int(year)).order('start_date').fetch(1000)
+            events = Event.query(Event.year == int(year)).order(Event.start_date).fetch(1000)
         
             template_values = {
                 "show_upcoming": show_upcoming,
@@ -73,15 +76,15 @@ class EventDetail(BaseHandler):
         html = memcache.get(memcache_key)
         
         if html is None:
-            event = Event.get_by_key_name(event_key)
+            event = Event.get_by_id(event_key)
             
             if not event:
                 return self.redirect("/error/404")
             
-            matches = MatchHelper.organizeMatches(event.match_set)
-            awards = AwardHelper.organizeAwards(event.award_set)
-            team_keys = [EventTeam.team.get_value_for_datastore(event_team).name() for event_team in event.teams.fetch(500)]
-            teams = Team.get_by_key_name(team_keys)
+            matches = MatchHelper.organizeMatches(Match.query(Match.event == event.key))
+            awards = AwardHelper.organizeAwards(Award.query(Award.event == event.key))
+            team_keys = [event_team.team for event_team in EventTeam.query(EventTeam.event == event.key).fetch(500)]
+            teams = ndb.get_multi(team_keys)
             teams = TeamHelper.sortTeams(teams)
 
             num_teams = len(teams)
@@ -130,8 +133,8 @@ class EventRss(BaseHandler):
         xml = memcache.get(memcache_key)
         
         if xml is None:
-            event = Event.get_by_key_name(event_key)
-            matches = MatchHelper.organizeMatches(event.match_set)
+            event = Event.get_by_id(event_key)
+            matches = MatchHelper.organizeMatches(Match.query(Match.event == event.key))
         
             template_values = {
                     "event": event,

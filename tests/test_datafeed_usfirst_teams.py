@@ -13,11 +13,12 @@ class TestDatafeedUsfirstTeams(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
         
         self.datafeed = DatafeedUsfirst()
         
         self.team177 = Team(
-            key_name = "frc177",
+            id = "frc177",
             team_number = 177,
             first_tpid = 61771,
             first_tpid_year = 2012
@@ -37,7 +38,7 @@ class TestDatafeedUsfirstTeams(unittest2.TestCase):
     
     def test_getTeamsTpids(self):
         Team(
-          key_name = "frc4409",
+          id = "frc4409",
           team_number = 4409,
           first_tpid = 0, #should be 74735
           first_tpid_year = 2011
@@ -47,13 +48,13 @@ class TestDatafeedUsfirstTeams(unittest2.TestCase):
         self.datafeed.getTeamsTpids(2012, skip=2000)
         
         # Check new team insertion
-        frc4410 = Team.get_by_key_name("frc4410")
+        frc4410 = Team.get_by_id("frc4410")
         self.assertEqual(frc4410.team_number, 4410)
         self.assertEqual(frc4410.first_tpid, 74193)
         self.assertEqual(frc4410.first_tpid_year, 2012)
         
         # Check old team updating
-        frc4409 = Team.get_by_key_name("frc4409")
+        frc4409 = Team.get_by_id("frc4409")
         self.assertEqual(frc4409.team_number, 4409)
         self.assertEqual(frc4409.first_tpid, 74735)
         self.assertEqual(frc4409.first_tpid_year, 2012)

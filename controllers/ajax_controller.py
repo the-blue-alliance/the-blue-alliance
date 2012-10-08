@@ -29,12 +29,12 @@ class TypeaheadHandler(BaseHandler):
         results = memcache.get(typeahead_key)
         
         if results is None:
-            events = Event.all().order('-year').order('name')       
-            teams = Team.all().order('team_number')
+            events = Event.query().order(-Event.year).order(Event.name)       
+            teams = Team.query().order(Team.team_number)
 
             results = []
             for event in events:
-                results.append({'id': event.key().name(), 'name': '%s %s [%s]' % (event.year, event.name, event.event_short.upper())})
+                results.append({'id': event.key_name, 'name': '%s %s [%s]' % (event.year, event.name, event.event_short.upper())})
             for team in teams:
                 results.append({'id': team.team_number, 'name': '%s | %s' % (team.team_number, team.nickname)})
 

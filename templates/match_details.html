@@ -7,7 +7,7 @@
 {% block more_head_tags %}
     <meta property="og:title" content="{{match.verbose_name}} - {{match.event.year}} {{match.event.name}}" />
     <meta property="og:type" content="article" />
-    <meta property="og:url" content="http://thebluealliance.com/match/{{match.key.name}}" />
+    <meta property="og:url" content="http://thebluealliance.com/match/{{match.key_name}}" />
     {% if tbavideo.getThumbnailPath %}
         <meta property="og:image" content="{{tbavideo.getThumbnailPath}}" />
     {% else %}
@@ -23,7 +23,7 @@
 	<div class="row">
 		<div class="span6 offset3">
 			<h1>{{match.verbose_name}}</h1>
-			<h3 class="end_header"><a href="/event/{{match.event.key.name}}">{{ match.event.year }} {{ match.event.name }}</a></h3>
+			<h3 class="end_header"><a href="/event/{{match.event}}">{{ match.event.year }} {{ match.event.name }}</a></h3>
 			<table class="matchTable">
 	            <tr class="key">
 	                <th colspan="{{match.alliances.items.0.1.teams|length}}">Teams</th>

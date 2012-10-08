@@ -11,6 +11,7 @@ class TestDatafeedFmsTeams(unittest2.TestCase):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
         self.testbed.init_urlfetch_stub()
+        self.testbed.init_memcache_stub()
         
         self.datafeed = DatafeedFms()
     
