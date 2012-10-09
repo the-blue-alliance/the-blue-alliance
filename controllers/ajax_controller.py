@@ -50,7 +50,7 @@ class WebcastHandler(BaseHandler):
         output_json = memcache.get(webcast_key)
         
         if output_json is None:
-            event = Event.get_by_key_name(event_key)
+            event = Event.get_by_id(event_key)
             if event:
                 webcast = event.webcast[webcast_number]
                 output = {}

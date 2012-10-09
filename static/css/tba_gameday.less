@@ -11,6 +11,7 @@ body {
   .chat, .chat-toggle {
     padding: 0 !important;
     margin: 0 !important;
+    min-height: 30px !important;
     height: 30px !important;
     min-height: auto !important;
     color: @white !important;
@@ -49,9 +50,10 @@ body {
   .dropdown-menu {
     margin: 0;
   
-    a, a:hover {
+    .layout-choice, .layout-choice:hover {
       background-repeat: no-repeat;
       background-position: 95% center;
+      filter: none;
     }
   
     .layout_0 {
