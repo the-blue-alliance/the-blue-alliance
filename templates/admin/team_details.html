@@ -28,6 +28,10 @@
         <td>Website</td>
         <td>{{ team.website }}</td>
     </tr>
+    <tr>
+        <td>Events</td>
+        <td>{{event_teams|length}} Events - {% for event_team in event_teams %}<a href="/admin/event/{{event_team.event.id}}">{{event_team.event.id}}</a>, {% endfor %}</td>
+    </tr>
 </table>
 
 <p>Teams are currently uneditable. They are updated via TIMS scraping.</p>
