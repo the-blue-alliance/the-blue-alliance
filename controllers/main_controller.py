@@ -156,3 +156,21 @@ class PageNotFoundHandler(BaseHandler):
     def get(self):
         self.error(404)
         self.response.out.write(render_static("404"))
+
+class WebcastsHandler(BaseHandler):
+    def get(self):
+        memcache_key = "main_webcasts"
+        html = memcache.get(memcache_key)
+        if html is None:
+            events = Event.query(Event.year == 2010).order(Event.start_date).fetch(500)
+
+            template_values = {
+                'events': events,
+            }
+            
+            path = os.path.join(os.path.dirname(__file__), '../templates/webcasts.html')
+            html = template.render(path, template_values)
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
+
+        self.response.out.write(html)
+
