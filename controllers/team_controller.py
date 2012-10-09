@@ -107,9 +107,10 @@ class TeamDetail(BaseHandler):
 
             for e in events:
                 awards = AwardHelper.organizeAwards(e.team_awards_future.get_result())
-                matches = MatchHelper.organizeMatches(e.team_matches_future.get_result())
+                matches = e.team_matches_future.get_result()
+                matches_organized = MatchHelper.organizeMatches(matches)
 
-                wlt = EventHelper.getTeamWLTFromMatches(team.key_name, e.matches)
+                wlt = EventHelper.getTeamWLTFromMatches(team.key_name, matches)
                 year_wlt_list.append(wlt)
                 if wlt["win"] + wlt["loss"] + wlt["tie"] == 0:
                     display_wlt = None
@@ -125,7 +126,7 @@ class TeamDetail(BaseHandler):
                     
                     
                 participation.append({ 'event' : e,
-                                       'matches' : matches,
+                                       'matches' : matches_organized,
                                        'wlt': display_wlt,
                                        'rank': team_rank,
                                        'awards': awards })
