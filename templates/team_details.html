@@ -94,8 +94,8 @@
             <div class="span4">
                 <h2><a href="/event/{{ comp.event.key_name }}">{{ comp.event.name }}</a></h2>
                 <p>
-                    <i class="icon-map-marker"></i> in <a href="http://maps.google.com/maps?q={{ comp.event.location }}">{{ comp.event.location }}</a><br />
-                    <i class="icon-calendar"></i> {{ comp.event.start_date|date:"M jS" }} - {{ comp.event.end_date|date:"M jS, Y" }}
+                    {% if comp.event.location %}<i class="icon-map-marker"></i> in <a href="http://maps.google.com/maps?q={{ comp.event.location }}">{{ comp.event.location }}</a><br />{% endif %}
+                    {% if comp.event.start_date %}<i class="icon-calendar"></i> {{ comp.event.start_date|date:"M jS" }} - {{ comp.event.end_date|date:"M jS, Y" }}{% endif %}
                 </p>
 
                 {% if comp.wlt or comp.rank or comp.awards.list %}
