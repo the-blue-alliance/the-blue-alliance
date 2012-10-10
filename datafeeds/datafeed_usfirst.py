@@ -31,7 +31,6 @@ class DatafeedUsfirst(DatafeedBase):
         "cur": "Curie",
         "gal": "Galileo",
         "new": "Newton",
-        "ein": "Einstein",  # Weird, seems like only 2008 follows this format
     }
 
     MATCH_RESULTS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/matchresults.html" # % (year, event_short)
