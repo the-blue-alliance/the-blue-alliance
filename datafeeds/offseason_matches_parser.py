@@ -81,7 +81,7 @@ class OffseasonMatchesParser(ParserBase):
     
     @classmethod
     def parseQualMatchNumberInfo(self, string):
-        match_number = int(string[-1:])
+        match_number = int(re.sub('\D', '', string))
         return match_number, 1
     
     @classmethod
