@@ -1,0 +1,8 @@
+<h2>Got {{matches|length}} Matches</h2>
+{% for match in matches %}
+    <ul>
+        <li>{{match.key_name}}</li>
+        <li>Teams: {{match.team_key_names}}</li>
+        <li>Alliances: {{match.alliances_json}}</li>
+    </ul>
+{% endfor %}
