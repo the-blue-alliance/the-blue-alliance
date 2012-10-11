@@ -170,7 +170,7 @@ class WebcastsHandler(BaseHandler):
             
             path = os.path.join(os.path.dirname(__file__), '../templates/webcasts.html')
             html = template.render(path, template_values)
-            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 300)
 
         self.response.out.write(html)
 

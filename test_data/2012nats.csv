@@ -1,6 +1,2 @@
 key,name,short_name,event_short,year,location,website,official,week * 10 (obselete),start_date,end_date,event_type,venue,first_eid
-2012new,Newton Division,Newton,new,2012,"St. Louis, MO",http://www.usfirst.org,TRUE,90,2012-04-25T00:00:00,2012-04-28T00:00:00,Championship Division,Edward Jones Dome
-2012gal,Galileo Division,Galileo,gal,2012,"St. Louis, MO",http://www.usfirst.org,TRUE,90,2012-04-25T00:00:00,2012-04-28T00:00:00,Championship Division,Edward Jones Dome
-2012cur,Curie Division,Curie,cur,2012,"St. Louis, MO",http://www.usfirst.org,TRUE,90,2012-04-25T00:00:00,2012-04-28T00:00:00,Championship Division,Edward Jones Dome
-2012arc,Archimedes Division,Archimedes,arc,2012,"St. Louis, MO",http://www.usfirst.org,TRUE,90,2012-04-25T00:00:00,2012-04-28T00:00:00,Championship Division,Edward Jones Dome
-2012cmp,Einstein Field,Einstein,cmp,2012,"St. Louis, MO",http://www.usfirst.org,TRUE,91,2012-04-28T00:00:00,2012-04-28T00:00:00,Championship Finals,Edward Jones Dome
+2012cg,CalGames,CalGames,cg,2012,"Woodside, CA",http://wrrf.org/events/calgames-2012/,FALSE,90,2012-10-12T00:00:00,2012-10-13T00:00:00,Offseason,Woodside High School
