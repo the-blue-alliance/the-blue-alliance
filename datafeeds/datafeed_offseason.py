@@ -7,7 +7,6 @@ from models.match import Match
 
 class DatafeedOffseason(DatafeedBase):
     def __init__(self, *args, **kw):
-        self._session_key = dict()
         super(DatafeedOffseason, self).__init__(*args, **kw)
 
     def getMatches(self, event, url):

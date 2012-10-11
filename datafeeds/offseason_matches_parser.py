@@ -15,7 +15,7 @@ class OffseasonMatchesParser(ParserBase):
         match_id, red1, red2, red3, blue1, blue2, blue3, red score, blue score
         
         Example formats of match_id:
-        qm1, sf2-1, f1-1
+        qm1, sf2m1, f1m1
         """
         matches = list()
         
@@ -28,6 +28,8 @@ class OffseasonMatchesParser(ParserBase):
     @classmethod
     def parseCSVMatch(self, row):
         match_id, red_1, red_2, red_3, blue_1, blue_2, blue_3, red_score, blue_score = row
+        for i in range(len(row)):
+            row[i] = row[i].strip()
         
         red_teams = ["frc" + red_1, "frc" + red_2, "frc" + red_3]
         blue_teams = ["frc" + blue_1, "frc" + blue_2, "frc" + blue_3]
@@ -61,13 +63,18 @@ class OffseasonMatchesParser(ParserBase):
     @classmethod
     def parseMatchNumberInfo(self, string):
         string = string.strip()
-        pattern = re.compile('[0123456789-]')
-        comp_level = pattern.sub('', string)
+        COMP_LEVEL_MAP = {'qm': 'qm',
+                          'qfm': 'qf',
+                          'sfm': 'sf',
+                          'fm': 'f',}
         
         MATCH_PARSE_STYLE = {'qm': self.parseQualMatchNumberInfo,
                              'qf': self.parseElimMatchNumberInfo,
                              'sf': self.parseElimMatchNumberInfo,
                              'f': self.parseElimMatchNumberInfo,}
+        
+        pattern = re.compile('[0-9]')
+        comp_level = COMP_LEVEL_MAP[pattern.sub('', string)]
 
         match_number, set_number = MATCH_PARSE_STYLE[comp_level](string)
         return comp_level, match_number, set_number
