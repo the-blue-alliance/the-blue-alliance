@@ -11,6 +11,7 @@ from google.appengine.ext.webapp import template
 from datafeeds.datafeed_fms import DatafeedFms
 from datafeeds.datafeed_tba import DatafeedTba
 from datafeeds.datafeed_usfirst import DatafeedUsfirst
+from datafeeds.datafeed_offseason import DatafeedOffseason
 
 from helpers.event_manipulator import EventManipulator
 from helpers.match_manipulator import MatchManipulator
@@ -403,4 +404,24 @@ class UsfirstTeamsTpidsGet(webapp.RequestHandler):
         }
         
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_teams_tpids.html')
+        self.response.out.write(template.render(path, template_values))
+
+
+class OffseasonMatchesGet(webapp.RequestHandler):
+    """
+    Handles reading an offseason match results page and updating the datastore as needed.
+    """
+    def get(self, event_key):
+        df = DatafeedOffseason()
+             
+        event = Event.get_by_id(event_key)
+        url = self.request.get('url')
+
+        new_matches = MatchManipulator.createOrUpdate(df.getMatches(event, url))
+
+        template_values = {
+            'matches': new_matches,
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/offseason_matches_get.html')
         self.response.out.write(template.render(path, template_values))

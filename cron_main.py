@@ -6,6 +6,7 @@ import tba_config
 
 from controllers.datafeed_controller import TbaVideosGet, TbaVideosEnqueue
 from controllers.datafeed_controller import FmsEventListGet, FmsTeamListGet
+from controllers.datafeed_controller import OffseasonMatchesGet
 from controllers.datafeed_controller import UsfirstEventDetailsEnqueue, UsfirstEventDetailsGet, UsfirstEventListGet
 from controllers.datafeed_controller import UsfirstAwardsEnqueue, UsfirstAwardsGet
 from controllers.datafeed_controller import UsfirstMatchesEnqueue, UsfirstMatchesGet, UsfirstEventRankingsEnqueue, UsfirstEventRankingsGet
@@ -22,6 +23,7 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
                                ('/tasks/enqueue/usfirst_team_details', UsfirstTeamDetailsEnqueue),
                                ('/tasks/get/fms_event_list', FmsEventListGet),
                                ('/tasks/get/fms_team_list', FmsTeamListGet),
+                               ('/tasks/get/offseason_matches/(.*)', OffseasonMatchesGet),
                                ('/tasks/get/tba_videos/(.*)', TbaVideosGet),
                                ('/tasks/get/usfirst_event_list/([0-9]*)', UsfirstEventListGet),
                                ('/tasks/get/usfirst_event_details/([0-9]*)/([0-9]*)', UsfirstEventDetailsGet),
