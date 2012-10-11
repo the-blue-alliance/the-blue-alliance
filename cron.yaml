@@ -16,5 +16,5 @@ cron:
   schedule: every day 22:00
 
 - description: CalGames match detail scraping
-  url: /tasks/get/offseason_event/2012cal?url=http://604robotics.com/2012cal.csv
+  url: /tasks/get/offseason_matches/2012cal?url=http://604robotics.com/2012cal.csv
   schedule: every 3 minutes
