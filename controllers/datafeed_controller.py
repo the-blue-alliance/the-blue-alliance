@@ -344,10 +344,10 @@ class UsfirstTeamDetailsEnqueue(webapp.RequestHandler):
         offset = int(self.request.get("offset", 0))
         
         teams = Team.query().fetch(1000, offset=int(offset))
-        for team_key in teams:
+        for team in teams:
             taskqueue.add(
                 queue_name='usfirst',
-                url='/tasks/get/usfirst_team_details/' + team_key.id(),
+                url='/tasks/get/usfirst_team_details/' + team.key_name,
                 method='GET')
         
         # FIXME omg we're just writing out? -gregmarra 2012 Aug 26
