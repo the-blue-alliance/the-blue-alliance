@@ -1,7 +1,17 @@
-<h2>Got some tbavideos, and wrote some Match models!</h2>
-{% for tbavideo in tbavideos %}
+{% extends "base.html" %}
+
+{% block title %}TbaVideosGet{% endblock %}
+
+{% block content %}
+<div class="row-fluid">
+    <div class="alert alert-block alert-success">
+        <h4>Got {{tbavideos|lenth}} videos from TBA, and updated some Matches!</h4>
+    </div>
+    {% for tbavideo in tbavideos %}
     <ul>
         <li>Match: {{tbavideo.0}}</li>
         <li>Filetypes: {{tbavideo.1}}</li>
     </ul>
 {% endfor %}
+</div>
+{% endblock %}

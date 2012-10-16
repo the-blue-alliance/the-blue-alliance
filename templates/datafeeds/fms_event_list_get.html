@@ -1,6 +1,27 @@
-<h1>Got some events</h1>
-<ul>
-{% for event in events %}
-<li>{{event.first_eid}}, {{event.name}}, {{event.location}}, {{event.start_date}}</li>
-{% endfor %}
-</ul>
+{% extends "base.html" %}
+
+{% block title %}FmsEventListGet{% endblock %}
+
+{% block content %}
+<div class="row-fluid">
+    <div class="alert alert-block alert-success">
+        <h4>Got {{events|length}} events</h4>
+    </div>
+    <table class="table table-condensed table-hover table-striped">
+        <thead>
+            <th>first_eid</th>
+            <th>name</th>
+            <th>location</th>
+            <th>start_date</th>
+        </thead>
+        {% for event in events %}
+        <tr>
+            <td>{{event.first_eid}}</td>
+            <td>{{event.name}}</td>
+            <td>{{event.location}}</td>
+            <td>{{event.start_date}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

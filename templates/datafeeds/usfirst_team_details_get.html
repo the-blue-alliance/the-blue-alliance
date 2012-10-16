@@ -1,11 +1,24 @@
-{% if success %}
-<h2>Team {{team.team_number}}</h2>
-<ul>
-    <li>Name: {{team.name}}</li>
-    <li>Nickname: {{team.nickname}}</li>
-    <li>Location: {{team.address}}</li>
-    <li>Website: {{team.website}}</li>
-</ul>
-{% else %}
-<h2>Team fetch failed.</h2>
-{% endif %}
+{% extends "base.html" %}
+
+{% block title %}FmsEventListGet{% endblock %}
+
+{% block content %}
+<div class="row-fluid">
+    {% if success %}
+    <div class="alert alert-block alert-success">
+        <h4>Got {{events|length}} events</h4>
+    </div>
+    <h2>Team {{team.team_number}}</h2>
+    <ul>
+        <li>Name: {{team.name}}</li>
+        <li>Nickname: {{team.nickname}}</li>
+        <li>Location: {{team.address}}</li>
+        <li>Website: {{team.website}}</li>
+    </ul>
+    {% else %}
+    <div class="alert alert-block alert-error">
+        <h4>Team Fetch failed.</h4>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

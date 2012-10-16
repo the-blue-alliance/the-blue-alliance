@@ -1,1 +1,11 @@
-<h2>Enqueued for {{event_count}} events!</h2>
+{% extends "base.html" %}
+
+{% block title %}TbaVideosEnqueue{% endblock %}
+
+{% block content %}
+<div class="row-fluid">
+    <div class="alert alert-block alert-success">
+        <h4>Enqueued for {{event_count}} events!</h4>
+    </div>
+</div>
+{% endblock %}
