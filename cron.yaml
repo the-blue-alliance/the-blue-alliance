@@ -14,7 +14,3 @@ cron:
 - description: OPR Calculation
   url: /tasks/math/enqueue/event_opr/now
   schedule: every day 22:00
-
-- description: CalGames match detail scraping
-  url: /tasks/get/offseason_matches/2012cal?url=http://604robotics.com/2012cal.csv
-  schedule: every 3 minutes
