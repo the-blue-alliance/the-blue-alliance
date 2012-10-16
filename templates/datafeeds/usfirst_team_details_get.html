@@ -1,14 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}FmsEventListGet{% endblock %}
+{% block title %}UsfirstTeamDetailsGet{% endblock %}
 
 {% block content %}
 <div class="row-fluid">
     {% if success %}
     <div class="alert alert-block alert-success">
-        <h4>Got {{events|length}} events</h4>
+        <h4>Got team {{team.team_number}}</h4>
     </div>
     <h2>Team {{team.team_number}}</h2>
+    <div class="btn-group">
+        <a href="/team/{{team.team_number}}" class="btn btn-primary" /><i class="icon-eye-open icon-white"></i> View on TBA</a>
+        <a href="/admin/team/{{team.team_number}}" class="btn" /><i class="icon-edit"></i> View in Admin</a>
+    </div>
     <ul>
         <li>Name: {{team.name}}</li>
         <li>Nickname: {{team.nickname}}</li>
