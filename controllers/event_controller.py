@@ -122,7 +122,7 @@ class EventDetail(BaseHandler):
                 
             path = os.path.join(os.path.dirname(__file__), '../templates/event_details.html')
             html = template.render(path, template_values)
-            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 300)
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
         
         self.response.out.write(html)
 
@@ -149,7 +149,7 @@ class EventRss(BaseHandler):
             xml = template.render(path, template_values)
             if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, 
                                                             xml,
-                                                            300)
+                                                            86400)
 
         self.response.headers.add_header('content-type', 'application/xml', charset='utf-8')        
         self.response.out.write(xml)
