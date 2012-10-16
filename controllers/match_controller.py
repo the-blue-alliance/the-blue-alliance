@@ -47,6 +47,6 @@ class MatchDetail(BaseHandler):
             
             path = os.path.join(os.path.dirname(__file__), '../templates/match_details.html')
             html = template.render(path, template_values)
-            if tba_config.CONFIG["memcache"]: memcache.add(memcache_key, html, 300)
+            if tba_config.CONFIG["memcache"]: memcache.add(memcache_key, html, 86400)
         
         self.response.out.write(html)
