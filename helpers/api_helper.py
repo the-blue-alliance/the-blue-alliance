@@ -2,11 +2,13 @@ import json
 import logging
 
 from google.appengine.api import memcache
-from google.appengine.ext import db
+from google.appengine.ext import ndb
 
 import tba_config
 from helpers.event_helper import EventHelper
 from helpers.match_helper import MatchHelper
+from helpers.team_helper import TeamHelper
+
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
@@ -79,10 +81,10 @@ class ApiHelper(object):
                     event_dict["end_date"] = event.end_date.isoformat()
                 else:
                     event_dict["end_date"] = None
-                
-                event_dict["teams"] = [event_team.team for event_team in EventTeam.query(EventTeam.event = event.key).fetch(500)]
-                event_dict["matches"] = [match.key_name for match in Match.query(Match.event = event.key).fetch(500)]
-                
+
+                event.prepTeams()
+                event_dict["teams"] = [team.key_name for team in event.teams]
+
                 #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
                 if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, event_dict, 2592000)
         return event_dict
