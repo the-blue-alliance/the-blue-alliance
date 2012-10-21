@@ -2,6 +2,8 @@ import unittest2
 import webtest
 import json
 
+from datetime import datetime
+
 from google.appengine.ext import webapp
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
@@ -9,6 +11,8 @@ from google.appengine.ext import testbed
 from controllers.api_controller import ApiTeamsShow
 
 from models.team import Team
+from models.event import Event
+from models.event_team import EventTeam
 
 class TestApiTeamShow(unittest2.TestCase):
 
@@ -37,6 +41,29 @@ class TestApiTeamShow(unittest2.TestCase):
 
         self.team.put()
 
+        self.event = Event(
+                id = "2010sc",
+                name = "Palmetto Regional",
+                event_type = "Regional",
+                short_name = "Palmetto",
+                event_short = "sc",
+                year = 2010,
+                end_date = datetime(2010, 03, 27),
+                official = True,
+                location = 'Clemson, SC',
+                start_date = datetime(2010, 03, 24),
+        )
+
+        self.event.put()
+
+        self.event_team = EventTeam(
+                team = self.team.key,
+                event = self.event.key,
+                year = datetime.now().year
+        )
+
+        self.event_team.put()
+
     def tearDown(self):
         self.testbed.deactivate()
 
@@ -46,8 +73,9 @@ class TestApiTeamShow(unittest2.TestCase):
         self.assertEqual(team_dict["nickname"], self.team.nickname)
         self.assertEqual(team_dict["location"], self.team.address)
         self.assertEqual(team_dict["country"], None)
-        self.assertEqual(team_dict["region"], None)
+        self.assertEqual(team_dict["region"], '')
         self.assertEqual(team_dict["website"], self.team.website)
+        self.assertEqual(team_dict["events"][0], self.event.key_name)
 
     def testTeamShow(self):
         response = self.testapp.get('/?teams=frc281')

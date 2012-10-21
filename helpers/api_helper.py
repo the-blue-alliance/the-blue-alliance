@@ -1,5 +1,6 @@
 import json
 import logging
+from datetime import datetime
 
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
@@ -32,10 +33,13 @@ class ApiHelper(object):
                 team_dict["name"] = team.name
                 team_dict["nickname"] = team.nickname
                 team_dict["website"] = team.website
-                # TODO reenable this in ndb style -gregmarra 20121006
-                #team_dict["event_keys"] = [a.event.key().name() for a in team.events]
                 team_dict["location"] = team.address
-                
+
+                event_teams = EventTeam.query(EventTeam.team == team.key,\
+                                              EventTeam.year == datetime.now().year)\
+                                              .fetch(1000, projection=[EventTeam.event])
+                team_dict["events"] = [event_team.event.id() for event_team in event_teams]
+
                 try:
                     team.do_split_address()
                     team_dict["location"] = team.split_address.get("full_address", None)
