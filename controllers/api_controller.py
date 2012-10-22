@@ -85,14 +85,14 @@ class ApiEventList(webapp.RequestHandler):
 
         if event_list is None:
             event_list = []
-            events = Event.all().filter("year =", year).fetch(500)
+            events = Event.query(Event.year == year).fetch(500)
             for event in events:
                 event_dict = dict()
-                event_dict["key"] = event.key().name()
+                event_dict["key"] = event.key_name
                 event_dict["name"] = event.name
-                event_dict["event_code"] = event.short_name
+                event_dict["event_short"] = event.short_name
                 event_dict["official"] = event.official
-                
+
                 if event.start_date:
                     event_dict["start_date"] = event.start_date.isoformat()
                 else:
@@ -109,7 +109,7 @@ class ApiEventList(webapp.RequestHandler):
 
 class ApiEventDetails(webapp.RequestHandler):
     """
-    Return a specifc event with details.
+    Return a specific event with details.
     """
 
     def get(self):
@@ -124,3 +124,21 @@ class ApiEventDetails(webapp.RequestHandler):
         event_dict = ApiHelper.getEventInfo(event_key)
 
         self.response.out.write(json.dumps(event_dict))
+
+class ApiMatchDetails(webapp.RequestHandler):
+    """
+    Returns a specific match with details.
+    """
+
+    def get(self):
+        match_key = str(self.request.get("match"))
+        if match_key is None or match_key is "":
+            error = {'Error': "'match' is a required parameter."}
+            self.response.headers.add_header('content-type', 'application/json')
+            self.response.out.write(json.dumps(error))
+
+        else:
+            match_dict = ApiHelper.getMatchDetails(match_key)
+
+            self.response.headers.add_header('content-type', 'application/json')
+            self.response.out.write(json.dumps(match_dict))

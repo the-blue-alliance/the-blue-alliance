@@ -150,3 +150,29 @@ class ApiHelper(object):
         
         team_dict["matches"] = matches_list
         return team_dict
+
+    @classmethod
+    def getMatchDetails(self, match_key):
+        """
+        Takes a match key and returns a detailed match dictionary
+        """
+
+        memcache_key = "api_match_details_%s" % match_key
+        match_dict = memcache.get(memcache_key)
+
+        if match_dict is None:
+            match = Match.get_by_id(match_key)
+            match_dict = {}
+            match_dict["key"] = match.key_name
+            match_dict["event"] = match.event.id()
+            match_dict["comp_level"] = match.name
+            match_dict["set_number"] = match.set_number
+            match_dict["match_number"] = match.match_number
+            match_dict["team_keys"] = match.team_key_names
+            match_dict["alliances"] = json.loads(match.alliances_json)
+
+            # I can only imagine matches being hit hard only shortly after they have
+            # been played. -- brandondean 10.21.2012
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, (60 * 10))
+
+        return match_dict
