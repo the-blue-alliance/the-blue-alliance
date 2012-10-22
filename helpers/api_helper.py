@@ -1,12 +1,15 @@
 import json
 import logging
+from datetime import datetime
 
 from google.appengine.api import memcache
-from google.appengine.ext import db
+from google.appengine.ext import ndb
 
 import tba_config
 from helpers.event_helper import EventHelper
 from helpers.match_helper import MatchHelper
+from helpers.team_helper import TeamHelper
+
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
@@ -30,10 +33,13 @@ class ApiHelper(object):
                 team_dict["name"] = team.name
                 team_dict["nickname"] = team.nickname
                 team_dict["website"] = team.website
-                # TODO reenable this in ndb style -gregmarra 20121006
-                #team_dict["event_keys"] = [a.event.key().name() for a in team.events]
                 team_dict["location"] = team.address
-                
+
+                event_teams = EventTeam.query(EventTeam.team == team.key,\
+                                              EventTeam.year == datetime.now().year)\
+                                              .fetch(1000, projection=[EventTeam.event])
+                team_dict["events"] = [event_team.event.id() for event_team in event_teams]
+
                 try:
                     team.do_split_address()
                     team_dict["location"] = team.split_address.get("full_address", None)
@@ -79,10 +85,10 @@ class ApiHelper(object):
                     event_dict["end_date"] = event.end_date.isoformat()
                 else:
                     event_dict["end_date"] = None
-                
-                event_dict["teams"] = [event_team.team for event_team in EventTeam.query(EventTeam.event = event.key).fetch(500)]
-                event_dict["matches"] = [match.key_name for match in Match.query(Match.event = event.key).fetch(500)]
-                
+
+                event.prepTeams()
+                event_dict["teams"] = [team.key_name for team in event.teams]
+
                 #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
                 if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, event_dict, 2592000)
         return event_dict
