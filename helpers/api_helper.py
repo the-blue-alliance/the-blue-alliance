@@ -149,7 +149,7 @@ class ApiHelper(object):
             if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, matches_list, 2592000)
         
         team_dict["matches"] = matches_list
-        return team_dict        return team_dict
+        return team_dict
 
     @classmethod
     def getMatchDetails(self, match_key):

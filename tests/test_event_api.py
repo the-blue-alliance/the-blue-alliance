@@ -7,7 +7,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
-from controllers.api_controller import ApiEventsShow, ApiMatchDetails
+from controllers.api_controller import ApiEventsShow, ApiMatchDetails, ApiEventList
 
 from models.event import Event
 from models.team import Team
@@ -147,3 +147,48 @@ class TestApiMatchDetails(unittest2.TestCase):
         match_dict = json.loads(response.body)
         match_dict["alliances"] = str(match_dict["alliances"])
         self.assertMatch(match_dict)
+
+class TestApiEventList(unittest2.TestCase):
+
+    def setUp(self):
+        app = webapp.WSGIApplication([(r'/', ApiEventList)], debug=True)
+        self.testapp = webtest.TestApp(app)
+
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_urlfetch_stub()
+        self.testbed.init_memcache_stub()
+
+        self.event = Event(
+                id = "2010sc",
+                name = "Palmetto Regional",
+                event_type = "Regional",
+                short_name = "Palmetto",
+                event_short = "sc",
+                year = 2010,
+                end_date = datetime(2010, 03, 27),
+                official = True,
+                location = 'Clemson, SC',
+                start_date = datetime(2010, 03, 24),
+        )
+        self.event.put()
+
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def assertEventJson(self, event_dict):
+        self.assertEqual(event_dict["key"], self.event.key_name)
+        self.assertEqual(event_dict["name"], self.event.name)
+        self.assertEqual(event_dict["event_short"], self.event.short_name)
+        self.assertEqual(event_dict["official"], self.event.official)
+        self.assertEqual(event_dict["start_date"], self.event.start_date.isoformat())
+        self.assertEqual(event_dict["end_date"], self.event.end_date.isoformat())
+
+    def testEventShow(self):
+        response = self.testapp.get('/?year=2010')
+
+        event_dict = json.loads(response.body)
+        self.assertEventJson(event_dict[0])
+

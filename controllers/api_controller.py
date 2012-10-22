@@ -85,14 +85,14 @@ class ApiEventList(webapp.RequestHandler):
 
         if event_list is None:
             event_list = []
-            events = Event.all().filter("year =", year).fetch(500)
+            events = Event.query(Event.year == year).fetch(500)
             for event in events:
                 event_dict = dict()
-                event_dict["key"] = event.key().name()
+                event_dict["key"] = event.key_name
                 event_dict["name"] = event.name
-                event_dict["event_code"] = event.short_name
+                event_dict["event_short"] = event.short_name
                 event_dict["official"] = event.official
-                
+
                 if event.start_date:
                     event_dict["start_date"] = event.start_date.isoformat()
                 else:
