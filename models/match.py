@@ -155,6 +155,13 @@ class Match(ndb.Model):
     def details_url(self):
         return "/match/%s" % self.key_name
 
+    @property
+    def name(self):
+        if self.comp_level == "qm" or self.comp_level == "f":
+            return "%s" % (self.COMP_LEVELS_VERBOSE[self.comp_level])
+        else:
+            return "%s" % (self.COMP_LEVELS_VERBOSE[self.comp_level])
+
     @classmethod
     def getKeyName(self, event, comp_level, set_number, match_number):
         if comp_level == "qm":
