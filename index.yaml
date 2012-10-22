@@ -62,6 +62,12 @@ indexes:
   - name: team
     direction: desc
 
+- kind: EventTeam
+  properties:
+  - name: team
+  - name: year
+  - name: event
+
 - kind: Match
   properties:
   - name: event
