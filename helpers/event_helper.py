@@ -47,7 +47,7 @@ class EventHelper(object):
                     diff_from_thurs = start.weekday() - 3   # 3 is Thursday
                     week_start = start + datetime.timedelta(days=diff_from_thurs)
 
-                if start > week_start + datetime.timedelta(days=6):
+                if start >= week_start + datetime.timedelta(days=6):
                     current_week += 1
                     week_start += datetime.timedelta(days=7)
                     
