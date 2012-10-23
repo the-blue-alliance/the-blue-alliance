@@ -24,7 +24,7 @@ class EventHelper(object):
         """
         toReturn = collections.OrderedDict()  # key: week_label, value: list of events
         
-        current_week = 0
+        current_week = 1
         week_start = None
         for event in events:
             start = event.start_date
@@ -43,9 +43,13 @@ class EventHelper(object):
                     toReturn[label] = [event]
                 continue
             else:
-                if (week_start == None) or (start > week_start + datetime.timedelta(days=6)):
+                if week_start == None:
+                    diff_from_thurs = start.weekday() - 3   # 3 is Thursday
+                    week_start = start + datetime.timedelta(days=diff_from_thurs)
+
+                if start > week_start + datetime.timedelta(days=6):
                     current_week += 1
-                    week_start = start
+                    week_start += datetime.timedelta(days=7)
                     
                 label = REGIONAL_EVENTS_LABEL.format(current_week)
                 if label in toReturn:
