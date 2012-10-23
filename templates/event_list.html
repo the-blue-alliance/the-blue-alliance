@@ -53,6 +53,7 @@
 	        {% endif %}
 	        
 	    {% if week_events %}
+	      <h3>Jump To:</h3>
         <ul class="nav nav-pills nav-stacked-phone">
 	        {% for label, events in week_events.items %}
 	          <li><a class="btn smooth-scroll" href="#{{label|slugify}}">{{ label }}</a></li>
