@@ -12,6 +12,7 @@ from base_controller import BaseHandler
 from helpers.match_helper import MatchHelper
 from helpers.award_helper import AwardHelper
 from helpers.team_helper import TeamHelper
+from helpers.event_helper import EventHelper
 
 from models.award import Award
 from models.event import Event
@@ -47,10 +48,15 @@ class EventList(BaseHandler):
         
         if html is None:
             events = Event.query(Event.year == year).order(Event.start_date).fetch(1000)
+            
+            week_events = None
+            if year >= 2005:
+                week_events = EventHelper.groupByWeek(events)
         
             template_values = {
                 "show_upcoming": show_upcoming,
                 "events": events,
+                "week_events": week_events,
                 "explicit_year": explicit_year,
                 "selected_year": year,
                 "valid_years": valid_years,
