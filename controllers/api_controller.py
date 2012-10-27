@@ -126,3 +126,24 @@ class ApiEventDetails(webapp.RequestHandler):
         event_dict = ApiHelper.getEventInfo(event_key)
 
         self.response.out.write(json.dumps(event_dict))
+
+class ApiMatchDetails(webapp.RequestHandler):
+    """
+    Returns a specifc
+    """
+    def get(self):
+        if self.request.get('match') is not '':
+            match_key = self.request.get('match')
+
+        if self.request.get('matches') is not '':
+            match_keys = self.request.get('matches').split(',')
+
+        if 'match_keys' in locals():
+            match_json = list()
+            for match in match_keys:
+                match_json.append(ApiHelper.getMatchDetails(match))
+        else:
+            match_json = ApiHelper.getMatchDetails(match_key)
+
+        self.response.headers.add_header("content-type", "application/json")
+        self.response.out.write(json.dumps(match_json))
