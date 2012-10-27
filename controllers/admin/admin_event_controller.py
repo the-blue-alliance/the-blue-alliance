@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 import logging
 
@@ -40,7 +41,15 @@ class AdminEventDetail(webapp.RequestHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_details.html')
         self.response.out.write(template.render(path, template_values))
-        
+
+class AdminEventCreate(webapp.RequestHandler):
+    """
+    Create an Event. POSTs to AdminEventEdit.
+    """
+    def get(self):
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_create.html')
+        self.response.out.write(template.render(path, {}))
+
 class AdminEventEdit(webapp.RequestHandler):
     """
     Edit an Event.
@@ -57,15 +66,24 @@ class AdminEventEdit(webapp.RequestHandler):
     
     def post(self, event_key):
         # Note, we don't actually use event_key.
+
+        start_date = None        
+        if self.request.get("start_date"):
+            start_date = datetime.strptime(self.request.get("start_date"), "%Y-%m-%d")
+        
+        end_date = None
+        if self.request.get("end_date"):
+            end_date = datetime.strptime(self.request.get("end_date"), "%Y-%m-%d")
         
         event = Event(
-            end_date = None, #TODO
+            id = str(self.request.get("year")) + str.lower(str(self.request.get("event_short"))),
+            end_date = end_date,
             event_short = self.request.get("event_short"),
             event_type = self.request.get("event_type"),
             location = self.request.get("location"),
             name = self.request.get("name"),
             short_name = self.request.get("short_name"),
-            start_date = None, #TODO
+            start_date = start_date,
             website = self.request.get("website"),
             year = int(self.request.get("year")),
             official = {"true": True, "false": False}.get(self.request.get("official").lower()),

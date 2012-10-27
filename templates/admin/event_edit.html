@@ -15,6 +15,13 @@
         </tr>
         <tr>
             <td>Dates</td>
+            <td>
+                <input type="text" name="start_date" value="{{ event.start_date|date:"Y-m-d" }}" placeholder="2012-04-04"/> to <input type="text" name="end_date" value="{{ event.end_date|date:"Y-m-d" }}" placeholder="2012-04-06" />
+            </td>
+        </tr>
+
+        <tr>
+            <td>Dates</td>
             <td>{{ event.start_date|date:"M d, Y" }} to {{ event.end_date|date:"M d, Y" }}</td>
         </tr>
         <tr>
@@ -55,7 +62,9 @@
         </tr>
         <tr>
             <td>Webcast JSON</td>
-            <td><input type="text" name="webcast_json" value="{{event.webcast_json}}" /></td>
+            <td>
+                <input type="text" name="webcast_json" value="{{event.webcast_json}}" placeholder="[{&quot;type&quot;: &quot;ustream&quot;, &quot;channel&quot;: &quot;rah-cha-cha-ruckus&quot;}]" />
+            </td>
         </tr>
         <tr>
             <td>Rankings</td>
