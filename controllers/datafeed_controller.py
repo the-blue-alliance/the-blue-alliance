@@ -433,17 +433,14 @@ class TwitterFrcfmsMatchesGet(webapp.RequestHandler):
     Handles getting matches from @FRCFMS on Twitter, and returns a table of
     matches that can be manually manipulated and added
     """
-    def get(self, event_key):
+    def get(self):
         df = DatafeedTwitter()
-             
-        event = Event.get_by_id(event_key)
-        url = self.request.get('url')
 
-        new_matches = MatchManipulator.createOrUpdate(df.getMatches(event, url))
+        event_matches = df.getMatches()
 
         template_values = {
-            'matches': new_matches,
+            'event_matches': event_matches,
         }
         
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/offseason_matches_get.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/twitter_frcfms_matches_get.html')
         self.response.out.write(template.render(path, template_values))
