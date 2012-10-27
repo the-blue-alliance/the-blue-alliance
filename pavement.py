@@ -17,10 +17,7 @@ def clean():
 @task 
 def secrets():
   """Copy prod secrets over repository secrets."""
-  print("Copying secrets.")
-  print("Facebook")
   sh("cat secrets/facebook_prod.json > secrets/facebook.json")
-  print("Twitter")
   sh("cat secrets/twitter_prod.json > secrets/twitter.json")
 
 @task
