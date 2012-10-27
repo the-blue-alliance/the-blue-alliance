@@ -144,9 +144,33 @@ class ApiHelper(object):
                 match_dict["team_keys"] = match.team_key_names
                 match_dict["alliances"] = json.loads(match.alliances_json)
                 matches_list.append(match_dict)
-            
+
             #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
             if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, matches_list, 2592000)
-        
+
         team_dict["matches"] = matches_list
         return team_dict
+
+    @classmethod
+    def getMatchDetails(self, match_key):
+        """
+        Returns match details
+        """
+        memcache_key = "api_match_details_%s" % match_key
+        match_dict = memcache.get(memcache_key)
+
+        if match_dict is None:
+            match = Match.get_by_id(match_key)
+
+            match_dict = {}
+            match_dict["key"] = match.key_name
+            match_dict["event"] = match.event.id()
+            match_dict["competition_level"] = match.name
+            match_dict["set_number"] = match.set_number
+            match_dict["match_number"] = match.match_number
+            match_dict["team_keys"] = match.team_key_names
+            match_dict["alliances"] = json.loads(match.alliances_json)
+
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, match_dict, (2 * (60 * 60)) )
+
+        return match_dict
