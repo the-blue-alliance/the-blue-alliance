@@ -2,6 +2,8 @@ import json
 import logging
 import os
 
+from datetime import datetime
+
 from google.appengine.api import memcache
 from google.appengine.ext import db, webapp
 from google.appengine.ext.webapp import template
@@ -69,26 +71,24 @@ class ApiEventsShow(webapp.RequestHandler):
 
 class ApiEventList(webapp.RequestHandler):
     """
-    List of teams for a year with key_name, team number, and name.
+    Returns a list of events for a year with top level information
     """
 
     def get(self):
-        try:
+        if self.request.get("year") is '':
+            year = datetime.now().year
+        else:
             year = int(self.request.get("year"))
-        except ValueError:
-            error_message = {"Parameter Error": "'year' is a required parameter."}
-            self.response.out.write(json.dumps(error_message))
-            return False
 
         memcache_key = "api_event_list_%s" % year
         event_list = memcache.get(memcache_key)
 
         if event_list is None:
             event_list = []
-            events = Event.all().filter("year =", year).fetch(500)
+            events = Event.query(Event.year == year).fetch(500)
             for event in events:
                 event_dict = dict()
-                event_dict["key"] = event.key().name()
+                event_dict["key"] = event.key_name
                 event_dict["name"] = event.name
                 event_dict["event_code"] = event.short_name
                 event_dict["official"] = event.official
@@ -103,8 +103,10 @@ class ApiEventList(webapp.RequestHandler):
                     event_dict["end_date"] = None
 
                 event_list.append(event_dict)
-            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, event_list, 600)
 
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, event_list, (30 * ((60 * 60) * 24)))
+
+        self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(event_list))
 
 class ApiEventDetails(webapp.RequestHandler):
