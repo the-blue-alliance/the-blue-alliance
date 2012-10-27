@@ -1,3 +1,4 @@
+import json
 import os
 
 DEBUG = os.environ.get('SERVER_SOFTWARE', '').startswith('Dev')
@@ -17,11 +18,12 @@ else:
 
 CONFIG['kickoff'] = False
 
-# Add your FB app info here
-CONFIG['FACEBOOK_APP_ID'] = "YOUR_APP_ID"
-CONFIG['FACEBOOK_APP_SECRET'] = "YOUR_SECRET"
+def load_secrets(secret_type):
+    global CONFIG
+    with open("secrets/%s.json" % secret_type, "r") as f:
+        secrets = json.loads(f.read())
+        for (secret_key, secret_value) in secrets.items():
+            CONFIG[secret_key] = secret_value
 
-CONFIG['TWITTER_CONSUMER_KEY'] = ''
-CONFIG['TWITTER_CONSUMER_SECRET'] = ''
-CONFIG['TWITTER_ACCESS_TOKEN'] = ''
-CONFIG['TWITTER_ACCESS_TOKEN_SECRET'] = ''
+load_secrets("facebook")
+load_secrets("twitter")
