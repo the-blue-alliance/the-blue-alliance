@@ -12,6 +12,7 @@ from datafeeds.datafeed_fms import DatafeedFms
 from datafeeds.datafeed_tba import DatafeedTba
 from datafeeds.datafeed_usfirst import DatafeedUsfirst
 from datafeeds.datafeed_offseason import DatafeedOffseason
+from datafeeds.datafeed_twitter import DatafeedTwitter
 
 from helpers.event_manipulator import EventManipulator
 from helpers.match_manipulator import MatchManipulator
@@ -424,4 +425,22 @@ class OffseasonMatchesGet(webapp.RequestHandler):
         }
         
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/offseason_matches_get.html')
+        self.response.out.write(template.render(path, template_values))
+
+
+class TwitterFrcfmsMatchesGet(webapp.RequestHandler):
+    """
+    Handles getting matches from @FRCFMS on Twitter, and returns a table of
+    matches that can be manually manipulated and added
+    """
+    def get(self):
+        df = DatafeedTwitter()
+
+        event_matches = df.getMatches()
+
+        template_values = {
+            'event_matches': event_matches,
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/twitter_frcfms_matches_get.html')
         self.response.out.write(template.render(path, template_values))

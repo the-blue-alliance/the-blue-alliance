@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}OffseasonMatchesGet{% endblock %}
+
+{% block content %}
+<div class="row-fluid">
+    <div class="alert alert-block alert-success">
+        <h4>Got matches for {{event_matches|length}} events</h4>
+    </div>
+    {% for event, matches in event_matches.items %}
+    <h3>Got {{matches|length}} matches for {{event}}</h3>
+      {% for match in matches %}
+        {{match}}
+        <br>
+      {% endfor %}
+    {% endfor %}
+</div>
+{% endblock %}
