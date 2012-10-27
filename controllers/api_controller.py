@@ -90,7 +90,7 @@ class ApiEventList(webapp.RequestHandler):
                 event_dict = dict()
                 event_dict["key"] = event.key_name
                 event_dict["name"] = event.name
-                event_dict["event_code"] = event.short_name
+                event_dict["short_name"] = event.short_name
                 event_dict["official"] = event.official
                 
                 if event.start_date:
