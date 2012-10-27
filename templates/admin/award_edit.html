@@ -15,17 +15,17 @@
         </tr>
         <tr>
             <td>Team</td>
-            <td><input type="text" name="team_number" value="{{award.team.team_number}}" /></td>
+            <td><input type="text" name="team_key" value="{{award.team.id}}" /></td>
         </tr>
         <tr>
             <td>Person</td>
             <td><input type="text" name="awardee" value="{{award.awardee}}" /></td>
         </tr>
     </table>
-    <input name="event_key_name" type="hidden" value="{{award.event.key_name}}" />
+    <input name="event_key_name" type="hidden" value="{{award.event.id}}" />
     <input name="award_name" type="hidden" value="{{award.name}}" />
-    <button type="submit" class="btn btn-primary"><i class="icon-thumbs-up icon-white"></i> Save Event</button>
-    <a href="/admin/event/{{award.event.key_name}}" class="btn"><i class="icon-thumbs-down"></i> Cancel Edit</a>
+    <button type="submit" class="btn btn-primary"><i class="icon-thumbs-up icon-white"></i> Save Award</button>
+    <a href="/admin/event/{{award.event.id}}" class="btn"><i class="icon-thumbs-down"></i> Cancel Edit</a>
 </form>
 
 {% endblock %}

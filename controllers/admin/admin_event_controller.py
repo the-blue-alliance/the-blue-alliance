@@ -114,9 +114,9 @@ class AdminAwardEdit(webapp.RequestHandler):
         award = Award(
             id = award_key,
             name = self.request.get('award_name'),
-            event = Event.get_by_id(event_key_name),
+            event = Event.get_by_id(event_key_name).key,
             official_name = self.request.get('official_name'),
-            team = Team.get_by_id('frc' + str(self.request.get('team_number', 0))),
+            team = Team.get_by_id(self.request.get('team_key')).key,
             awardee = self.request.get('awardee'),
         )
         award = AwardManipulator.createOrUpdate(award)

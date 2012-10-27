@@ -92,8 +92,8 @@
       <tr>
         <td><a href="/admin/award/edit/{{award.key_name}}">{{award.official_name}}</a></td>
       <td>
-        {% if award.team.team_number %}
-          {{award.team.team_number}}
+        {% if award.team.id %}
+          {{award.team.id}}
         {% endif %}
       </td>
       <td>
