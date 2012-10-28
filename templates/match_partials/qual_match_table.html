@@ -2,25 +2,25 @@
     <tr class="key hidden-phone">
         <th class="videoIcon"></th>
         <th>Match Num.</th>
-        <th colspan="3">Red Alliance</th>
-        <th colspan="3">Blue Alliance</th>
+        <th colspan="6">Red Alliance</th>
+        <th colspan="6">Blue Alliance</th>
         <th colspan="2">Scores</th>
     </tr>
 
 	<tr class="key visible-phone">
         <th class="videoIcon" rowspan="2"></th>
         <th rowspan="2">Match Num.</th>
-        <th colspan="6">Red Alliance</th>
+        <th colspan="12">Red Alliance</th>
         <th colspan="2">Red Score</th>
     </tr>
 	<tr class="key visible-phone">
-        <th colspan="6">Blue Alliance</th>
+        <th colspan="12">Blue Alliance</th>
         <th colspan="2">Blue Score</th>
     </tr>
 
     {% if matches.qm %}
         <tr class="key">
-        	<th colspan="10">Qualifications</th>
+        	<th colspan="16">Qualifications</th>
         </tr>
         {% for match in matches.qm %}
             {% include "match_partials/match_row.html" %}

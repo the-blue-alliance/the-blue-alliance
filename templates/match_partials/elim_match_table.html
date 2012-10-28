@@ -2,45 +2,45 @@
     <tr class="key hidden-phone">
         <th class="videoIcon"></th>
         <th>Match Num.</th>
-        <th colspan="3">Red Alliance</th>
-        <th colspan="3">Blue Alliance</th>
+        <th colspan="6">Red Alliance</th>
+        <th colspan="6">Blue Alliance</th>
         <th colspan="2">Scores</th>
     </tr>
     
     <tr class="key visible-phone">
         <th class="videoIcon" rowspan="2"></th>
         <th rowspan="2">Match Num.</th>
-        <th colspan="6">Red Alliance</th>
+        <th colspan="12">Red Alliance</th>
         <th colspan="2">Red Score</th>
     </tr>
 	<tr class="key visible-phone">
-        <th colspan="6">Blue Alliance</th>
+        <th colspan="12">Blue Alliance</th>
         <th colspan="2">Blue Score</th>
     </tr>
 
     {% if matches.ef %}
-        <tr class="key"><th colspan="10">Eighth Finals</th></tr>
+        <tr class="key"><th colspan="16">Eighth Finals</th></tr>
         {% for match in matches.ef %}
             {% include "match_partials/match_row.html" %}
         {% endfor %}
     {% endif %}
 
     {% if matches.qf %}
-        <tr class="key"><th colspan="10">Quarterfinals</th></tr>
+        <tr class="key"><th colspan="16">Quarterfinals</th></tr>
         {% for match in matches.qf %}
             {% include "match_partials/match_row.html" %}
         {% endfor %}
     {% endif %}
 
     {% if matches.sf %}
-        <tr class="key"><th colspan="10">Semifinals</th></tr>
+        <tr class="key"><th colspan="16">Semifinals</th></tr>
         {% for match in matches.sf %}
             {% include "match_partials/match_row.html" %}
         {% endfor %}
     {% endif %}
 
     {% if matches.f %}
-        <tr class="key"><th colspan="10">Finals</th></tr>
+        <tr class="key"><th colspan="16">Finals</th></tr>
         {% for match in matches.f %}
             {% include "match_partials/match_row.html" %}
         {% endfor %}
