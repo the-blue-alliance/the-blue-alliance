@@ -35,7 +35,7 @@ class EventHelper(object):
                 else:
                     toReturn[CHAMPIONSHIP_EVENTS_LABEL] = [event]
                 continue
-            elif (start == None) or (start.month > 4):
+            elif not event.official:
                 label = OFFSEASON_EVENTS_LABEL
                 if label in toReturn:
                     toReturn[label].append(event)
