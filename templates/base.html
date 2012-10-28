@@ -4,9 +4,7 @@
     <title>{% block title %}The Blue Alliance{% endblock %}</title>
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
     
-    {% block main_style %}<link rel="stylesheet" href="/css/style.css" type="text/css" />{% endblock %}
-    <link rel="stylesheet" href="/css/jquery-ui-1.8.13.custom.css" type="text/css" />
-    <link rel="stylesheet" href="/css/jquery.fancybox.css" type="text/css" />
+    {% block main_style %}<link rel="stylesheet" href="/css/style.min.css" type="text/css" />{% endblock %}
 
     <meta name="description" content="{% block meta_description %}Team information and match videos and results from the FIRST Robotics Competition{% endblock %}">
     <meta name="keywords" content="FIRST Robotics, FIRST Robotics Competition, robotics, first, firstrobotics, competition, team, regionals, matches, videos">
@@ -91,9 +89,7 @@
 </div>
 {% endblock %}
 
-<script type="text/javascript" src="/javascript/tba_combined.min.js"></script>
-
-{% block more_javascript %}{% endblock %}
+{% block main_javascript %}<script type="text/javascript" src="/javascript/tba_combined.min.js"></script>{% endblock %}
 
 <script type="text/javascript">
 

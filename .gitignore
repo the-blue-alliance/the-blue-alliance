@@ -37,3 +37,7 @@ Thumbs.db
 ###########
 *.project
 *.pydevproject
+
+# Temp files #
+##############
+*.temp
