@@ -30,11 +30,24 @@ Paver is an easy way automate repetitive tasks. These tasks are stored in paveme
 ## Simple Commands
 - `paver clean` - Deletes artifacts that the app creates that you don't need.
 
+CSS Icon Sprites
+-----------
+If possible, icons are combined into single files called sprites to reduce the number of requests needed to render a page.
+To simplify development, we add icons normally (not to the sprite), and every so often we will combine them all into a sprite and fix all necessary CSS.
+Potentially useful: http://spriteme.org/
+
 LESS
 ----
 The CSS files are compiled from LESS to ease in development. Use a program such as [http://wearekiss.com/simpless](http://wearekiss.com/simpless "Simpless") that automatically compiles
 the LESS files into CSS. Just drag static/css into SimpLESS, and whenever you edit and save a LESS file, the CSS will be compiled! Make sure 
 "minify" is enabled in order to minimize the final CSS file size.
+
+CSS/Javascript Combination and Compression
+------------------------------------------
+Once the LESS files are compressed into CSS, we combine the resulting file with other CSS files, such as 'jquery-ui-1.8.13.custom.css.' Similarly, we combine all relevant Javascript files into a single file and compress them.
+This means that whenever changes are made to CSS or Javascript, you must run of the following:
+- `paver less`
+- `paver javascript`
 
 Facebook
 --------

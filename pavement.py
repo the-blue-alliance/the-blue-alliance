@@ -56,13 +56,22 @@ def test_fast():
 
 @task
 def less():
-  """Build CSS."""
-  print("Building CSS")
+  """Build and Combine CSS"""
+  print("Building and Combining CSS")
   sh("lessc static/css/style.less static/css/style.css --yui-compress")
+  sh("python do_compress.py css")
+
+@task
+def javascript():
+    """Combine Compress Javascript"""
+    print("Combining and Compressing Javascript")
+    sh("python do_compress.py js")
 
 @task
 def preflight():
   """Prep a prod push"""
   test()
   less()
+  javascript()
   secrets()
+
