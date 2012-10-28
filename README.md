@@ -36,6 +36,13 @@ The CSS files are compiled from LESS to ease in development. Use a program such 
 the LESS files into CSS. Just drag static/css into SimpLESS, and whenever you edit and save a LESS file, the CSS will be compiled! Make sure 
 "minify" is enabled in order to minimize the final CSS file size.
 
+CSS/Javascript Combination and Compression
+------------------------------------------
+Once the LESS files are compressed into CSS, we combine the resulting file with other CSS files, such as 'jquery-ui-1.8.13.custom.css.' Similarly, we combine all relevant Javascript files into a single file and compress them.
+This means that whenever changes are made to CSS or Javascript, you must run the following:
+- `paver less`
+- `paver compress`
+
 Facebook
 --------
 We use the Facebook SDK to allow users to log in to The Blue Alliance using their pre-existing Facebook account. The Javascript
