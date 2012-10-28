@@ -26,6 +26,7 @@ class EventHelper(object):
         
         current_week = 1
         week_start = None
+        offseason_events = []
         for event in events:
             start = event.start_date
 
@@ -36,12 +37,7 @@ class EventHelper(object):
                     toReturn[CHAMPIONSHIP_EVENTS_LABEL] = [event]
                 continue
             elif not event.official:
-                label = OFFSEASON_EVENTS_LABEL
-                if label in toReturn:
-                    toReturn[label].append(event)
-                else:
-                    toReturn[label] = [event]
-                continue
+                offseason_events.append(event)
             else:
                 if week_start == None:
                     diff_from_thurs = start.weekday() - 3   # 3 is Thursday
@@ -56,6 +52,10 @@ class EventHelper(object):
                     toReturn[label].append(event)
                 else:
                     toReturn[label] = [event]
+        
+        # Add Offseason events last
+        if offseason_events:
+            toReturn[OFFSEASON_EVENTS_LABEL] = offseason_events
         
         return toReturn
     
