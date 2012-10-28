@@ -37,7 +37,8 @@
           <a class="dropdown-toggle" href="#">Webcasts</a>
           <ul class="dropdown-menu webcasts">
           {% for event in ongoing_events_w_webcasts %}
-            <li><a event='{{event.event.key_name}}' num='{% if event.count %}{{event.count}}{% else %}1{% endif %}'
+            <li><a id='{{event.event.key_name}}-{% if event.count %}{{event.count}}{% else %}1{% endif %}'
+            event='{{event.event.key_name}}' num='{% if event.count %}{{event.count}}{% else %}1{% endif %}'
             class='video_buttons' alt='{{event.event.name}} [{{event.event.event_short|upper}}]{% if event.count %} {{event.count}}{% endif %}'>
             {{event.event.name}} [{{event.event.event_short|upper}}]{% if event.count %} {{event.count}}{% endif %}</a></li>
           {% empty %}

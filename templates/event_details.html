@@ -41,7 +41,12 @@
 		        <a class="hashtag-link hashtag-youtube" href="http://www.youtube.com/results?search_query=%23frc{{ event.event_short }}+OR+%22{{ event.name }}%22" target="_blank" title="Search YouTube">YouTube</a> &middot;
 		        <a class="hashtag-link hashtag-cd" href="http://www.chiefdelphi.com/media/photos/tags/frc{{ event.event_short }}" target="_blank" title="Search Chief Delphi">Chief Delphi</a> &middot;
 		        <a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23frc{{ event.event_short }}" target="_blank" title="Search Flickr">Flickr</a>
-		    </p>
+		  </p>
+		</div>
+		<div class="span4">
+		  {% if gameday_link %}
+		  <a class="btn btn-large btn-success hidden-phone" href="{{gameday_link}}"><i class="icon-facetime-video icon-white"></i> Watch now on GameDay!</a>
+		  {% endif %}
 		</div>
 	</div>
 	
