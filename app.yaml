@@ -50,3 +50,5 @@ skip_files:
 - utils/*
 - run_tests.py
 - pavement.py
+- do_compress.py
+- ^(.*/)?.*\.jar.*
