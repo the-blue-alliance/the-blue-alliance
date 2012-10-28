@@ -51,8 +51,10 @@ class TwitterMatchesParser(ParserBase):
         
         if kind == 'E':
             match_id = ELIM_MAPPING[number]
-        else:
+        elif kind =='Q':
             match_id = 'qm' + number
+        else:
+            match_id = '???' + number
             
         match_csv_row = match_id + ',' + red_teams + ',' + blue_teams + ',' + red_final + ',' + blue_final
         
