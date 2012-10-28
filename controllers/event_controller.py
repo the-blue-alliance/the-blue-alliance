@@ -114,7 +114,21 @@ class EventDetail(BaseHandler):
                 bracket_table['sf'] = MatchHelper.generateBracket(sf_matches)
             if f_matches:
                 bracket_table['f'] = MatchHelper.generateBracket(f_matches)
-
+                
+            gameday_link = None
+            if event.webcast:
+                gameday_link = '/gameday'
+                view_num = 0
+                for webcast in event.webcast:
+                    if view_num == 0:
+                        gameday_link += '#'
+                    else:
+                        gameday_link += '&'
+                    if 'type' in webcast and 'channel' in webcast:
+                        gameday_link += 'view_' + str(view_num) + '=' + event.key_name + '-' + str(view_num + 1)
+                    view_num += 1
+                        
+                        
             template_values = {
                 "event": event,
                 "matches": matches,
@@ -124,6 +138,7 @@ class EventDetail(BaseHandler):
                 "num_teams": num_teams,
                 "oprs": oprs,
                 "bracket_table": bracket_table,
+                "gameday_link": gameday_link,
             }
                 
             path = os.path.join(os.path.dirname(__file__), '../templates/event_details.html')

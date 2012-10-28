@@ -9,15 +9,6 @@ var views = new Array();
 // hiddenviews are the contents views that are not supported by the chosen layout
 var hiddenviews = new Array();
 
-$(function() {
-  createViews();
-  layout_2();
-
-  $(window).resize(function(){
-	fixLayout();
-  });
-});
-
 $(document).ready(function() {
 	
 	// Bootstrap is stopping propagation of event
@@ -34,7 +25,52 @@ $(document).ready(function() {
 		'height'		:	0.9*height,
 		'type'			:	'iframe',
 	});
+	
+	setupViews();
+
+    $(window).resize(function(){
+	  fixLayout();
+    });
 });
+
+function setupViews() {
+  createViews();
+  
+  var layout = getUrlVars()['layout'];
+  if (layout == null) {
+	// Default layout
+	layout = 2;
+  }
+  eval('layout_' + layout + '()');
+  
+  
+  for (var n=0; n < 6; n++) {
+	  var view = getUrlVars()['view_' + n];
+	  if (view != null) {
+		var $item = $('#' + view);
+		if ($item[0] != null) {
+			setupView(n, $item);
+		}
+	  }
+  }
+}
+
+// Url vars for setting up GameDay with certain videos loaded
+// Valid key, values include:
+// key: 'view_0' ... 'view_5'; value: '<event_key>-<webcast_num>'
+// key: 'layout'; value: '0' ... '5'
+function getUrlVars()
+{
+    var vars = [], hash;
+    var hashes = window.location.href.slice(window.location.href.indexOf('#') + 1).split('&');
+    for(var i = 0; i < hashes.length; i++)
+    {
+        hash = hashes[i].split('=');
+        vars.push(hash[0]);
+        vars[hash[0]] = hash[1];
+    }
+    return vars;
+}
 
 // Chat Toggle
 function chat_tab() {
@@ -97,32 +133,32 @@ function setupDragDrop() {
 			}
 		}
 	});
+}
 
-	function setupView(viewNum, $item) {
-		eventKey = $item.attr('event');
-		webcastNumber = $item.attr('num')
-		eventName = $item.attr('alt');
+function setupView(viewNum, $item) {
+	var eventKey = $item.attr('event');
+	var webcastNumber = $item.attr('num')
+	var eventName = $item.attr('alt');
+	
+	$.getJSON('/_/webcast?event=' + eventKey + '&num=' + webcastNumber, function(data) {
+		player = data.player;
+		if (player == undefined) {
+			player = "No webcast available"
+		}
 		
-		$.getJSON('/_/webcast?event=' + eventKey + '&num=' + webcastNumber, function(data) {
-			player = data.player;
-			if (player == undefined) {
-				player = "No webcast available"
-			}
-			
-			// Combines the video player with overlay
-			var viewContents = player + "<div id='overlay_" + viewNum + "' class='overlay' alt='" + eventName + "'>" +
-			"<div class='overlay-title'>" + eventName + "</div>" +
-			"<div id='close_" + viewNum + "' class='view-close'>" +
-			"<i class='icon-remove icon-white' rel='tooltip' data-placement='left' title='Close'></i></div>" +
-			"<div id='swap_" + viewNum + "' class='swap'>" +
-			"<i class='icon-move icon-white' rel='tooltip' data-placement='left' title='Drag to another screen to swap'></i></div></div>";
-			
-			hiddenviews[viewNum] = viewContents;
-			document.getElementById('view_' + viewNum).innerHTML = hiddenviews[viewNum];
-			$("[rel=tooltip]").tooltip();
-			setupCloseSwap(viewNum);
-		});
-	}
+		// Combines the video player with overlay
+		var viewContents = player + "<div id='overlay_" + viewNum + "' class='overlay' alt='" + eventName + "'>" +
+		"<div class='overlay-title'>" + eventName + "</div>" +
+		"<div id='close_" + viewNum + "' class='view-close'>" +
+		"<i class='icon-remove icon-white' rel='tooltip' data-placement='left' title='Close'></i></div>" +
+		"<div id='swap_" + viewNum + "' class='swap'>" +
+		"<i class='icon-move icon-white' rel='tooltip' data-placement='left' title='Drag to another screen to swap'></i></div></div>";
+		
+		hiddenviews[viewNum] = viewContents;
+		document.getElementById('view_' + viewNum).innerHTML = hiddenviews[viewNum];
+		$("[rel=tooltip]").tooltip();
+		setupCloseSwap(viewNum);
+	});
 }
 
 //Setup Close and Swap
