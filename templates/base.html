@@ -8,28 +8,6 @@
     <link rel="stylesheet" href="/css/jquery-ui-1.8.13.custom.css" type="text/css" />
     <link rel="stylesheet" href="/css/jquery.fancybox.css" type="text/css" />
 
-	  <script type="text/javascript" src="/javascript/jquery.min.js"></script>
-    <script type="text/javascript" src="/javascript/jquery-ui-1.8.13.custom.min.js"></script>
-    <script type="text/javascript" src="/javascript/jquery.ui.touch-punch.min.js"></script>
-    <script type="text/javascript" src="/javascript/tba.js"></script>
-    <script type="text/javascript" src="/javascript/bootstrap.js"></script>
-    <script type="text/javascript" src="/javascript/bootstrap-typeahead.js"></script>
-    <script type="text/javascript" src="/javascript/jquery.fancybox.pack.js"></script>
-    <script type="text/javascript" src="/jwplayer/jwplayer.js"></script>
-
-    <script type="text/javascript">
-
-      var _gaq = _gaq || [];
-      _gaq.push(['_setAccount', 'UA-1090782-5']);
-      _gaq.push(['_trackPageview']);
-
-      (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-      })();
-
-    </script>
     <meta name="description" content="{% block meta_description %}Team information and match videos and results from the FIRST Robotics Competition{% endblock %}">
     <meta name="keywords" content="FIRST Robotics, FIRST Robotics Competition, robotics, first, firstrobotics, competition, team, regionals, matches, videos">
     <meta property="fb:page_id" content="29895192027" />
@@ -42,14 +20,6 @@
 <body>
 
 <div id="fb-root"></div>
-
-<script type="text/javascript">
-  (function() {
-    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-    po.src = 'https://apis.google.com/js/plusone.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-  })();
-</script>
     
 {% block navbar %}
 <div class="navbar navbar-fixed-top">
@@ -120,6 +90,39 @@
 	</div>
 </div>
 {% endblock %}
+
+<script type="text/javascript" src="/javascript/jquery.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery-ui-1.8.13.custom.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.ui.touch-punch.min.js"></script>
+<script type="text/javascript" src="/javascript/tba.js"></script>
+<script type="text/javascript" src="/javascript/bootstrap.js"></script>
+<script type="text/javascript" src="/javascript/bootstrap-typeahead.js"></script>
+<script type="text/javascript" src="/javascript/jquery.fancybox.pack.js"></script>
+<script type="text/javascript" src="/jwplayer/jwplayer.js"></script>
+
+{% block more_javascript %}{% endblock %}
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-1090782-5']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<script type="text/javascript">
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
 
 </body>
 </html>
