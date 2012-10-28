@@ -9,7 +9,7 @@ from google.appengine.ext import db, webapp
 from google.appengine.ext.webapp import template
 
 import tba_config
-from helpers.api_helper import ApiHelper
+from helpers.api_helper import ApiHelper, DataHelper
 
 from models.event import Event
 from models.event_team import EventTeam
@@ -147,3 +147,29 @@ class ApiMatchDetails(webapp.RequestHandler):
 
         self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(match_json))
+
+class ApiListTeams(webapp.RequestHandler):
+    """
+    Returns a list of team
+    """
+    def get(self):
+        try:
+            query_offset = int(self.request.get('offset'))
+        except ValueError:
+            query_offset = 0
+
+        memcache_key = "api_team_list_offset%s" % query_offset
+        list_json = memcache.get(memcache_key)
+
+        if list_json is None:
+            teams = Team.query().order(Team.team_number).fetch(50, offset=query_offset)
+
+            list_json = list()
+            for team in teams:
+                team_dict = DataHelper.thinTeam(team)
+                list_json.append(team_dict)
+
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, list_json, (1 * (24 * (60 * 60))) )
+
+        self.response.headers.add_header("content-type", "application/json")
+        self.response.out.write(json.dumps(list_json))
