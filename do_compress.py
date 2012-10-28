@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import os.path
+import optparse
 
 YUI_COMPRESSOR = 'yuicompressor-2.4.7.jar'
 
@@ -65,18 +66,25 @@ def compress(in_files, out_file, in_type='js', verbose=False,
     print ''
 
 
-def main():
-    print 'Compressing Main JavaScript...'
-    compress(SCRIPTS_MAIN, SCRIPTS_MAIN_OUT, 'js', False, SCRIPTS_MAIN_OUT_DEBUG)
-
-    print 'Compressing GameDay JavaScript...'
-    compress(SCRIPTS_GAMEDAY, SCRIPTS_GAMEDAY_OUT, 'js', False, SCRIPTS_GAMEDAY_OUT_DEBUG)
-
-    print 'Compressing Main CSS...'
-    compress(STYLESHEETS_MAIN, STYLESHEETS_MAIN_OUT, 'css')
+def main(kind=None):
+    if kind == 'js' or kind == None:
+        print 'Compressing Main JavaScript...'
+        compress(SCRIPTS_MAIN, SCRIPTS_MAIN_OUT, 'js', False, SCRIPTS_MAIN_OUT_DEBUG)
     
-    print 'Compressing GameDay CSS...'
-    compress(STYLESHEETS_GAMEDAY, STYLESHEETS_GAMEDAY_OUT, 'css')
+        print 'Compressing GameDay JavaScript...'
+        compress(SCRIPTS_GAMEDAY, SCRIPTS_GAMEDAY_OUT, 'js', False, SCRIPTS_GAMEDAY_OUT_DEBUG)
+
+    if kind == 'css' or kind == None:
+        print 'Compressing Main CSS...'
+        compress(STYLESHEETS_MAIN, STYLESHEETS_MAIN_OUT, 'css')
+        
+        print 'Compressing GameDay CSS...'
+        compress(STYLESHEETS_GAMEDAY, STYLESHEETS_GAMEDAY_OUT, 'css')
 
 if __name__ == '__main__':
-    main()
+    parser = optparse.OptionParser()
+    options, args = parser.parse_args()
+    if len(args) < 1:
+        main()
+    else:
+        main(args[0])
