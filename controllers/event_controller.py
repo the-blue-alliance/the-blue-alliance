@@ -121,7 +121,7 @@ class EventDetail(BaseHandler):
                 view_num = 0
                 for webcast in event.webcast:
                     if view_num == 0:
-                        gameday_link += '?'
+                        gameday_link += '#'
                     else:
                         gameday_link += '&'
                     if 'type' in webcast and 'channel' in webcast:
