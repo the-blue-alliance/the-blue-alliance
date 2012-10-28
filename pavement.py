@@ -61,8 +61,16 @@ def less():
   sh("lessc static/css/style.less static/css/style.css --yui-compress")
 
 @task
+def javascript():
+    """Combine/Compress Javascript"""
+    print("Combining/Compressing Javascript")
+    sh("python do_javascript.py")
+
+@task
 def preflight():
   """Prep a prod push"""
   test()
   less()
+  javascript()
   secrets()
+
