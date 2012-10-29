@@ -4,6 +4,8 @@ runtime: python27
 api_version: 1
 threadsafe: true
 
+default_expiration: "4d"
+
 builtins:
 - appstats: on
 - remote_api: on
@@ -50,3 +52,5 @@ skip_files:
 - utils/*
 - run_tests.py
 - pavement.py
+- do_compress.py
+- ^(.*/)?.*\.jar.*
