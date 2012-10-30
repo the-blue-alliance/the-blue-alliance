@@ -174,3 +174,17 @@ class ApiHelper(object):
             if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, match_dict, (2 * (60 * 60)) )
 
         return match_dict
+
+class DataHelper(object):
+
+    @classmethod
+    def thinTeam(self, team=None, team_key=None):
+        if team_key:
+            team = Team.get_by_id(team_key)
+
+        team_dict = dict()
+        team_dict["key"] = team.key_name
+        team_dict["team_number"] = team.team_number
+        team_dict["name"] = team.nickname
+
+        return team_dict
