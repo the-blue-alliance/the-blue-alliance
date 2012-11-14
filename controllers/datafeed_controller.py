@@ -99,10 +99,11 @@ class TbaVideosGet(webapp.RequestHandler):
             for match in event.matches:
                 if match.tba_videos != match_filetypes.get(match.key_name, []):
                     match.tba_videos = match_filetypes.get(match.key_name, [])
+                    match.dirty = True
                     matches_to_put.append(match)
             
             MatchManipulator.createOrUpdate(matches_to_put)
-            
+
             tbavideos = match_filetypes.items()
         else:
             logging.info("No tbavideos found for event " + event.key_name)
