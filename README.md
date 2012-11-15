@@ -12,7 +12,7 @@ Contributing
 4. Send pull request from your fork.
 5. We'll review it, and push your changes to the site!
 
-If you've having trouble getting set up, reach out to us at [https://groups.google.com/forum/?fromgroups#!forum/thebluealliance-developers](our mailing list) and we'll help you through it!
+If you've having trouble getting set up, reach out to us at [our mailing list](https://groups.google.com/forum/?fromgroups#!forum/thebluealliance-developers) and we'll help you through it!
 
 Setup
 -----
