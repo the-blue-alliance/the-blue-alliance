@@ -231,7 +231,7 @@ class OprHelper(object):
     def opr(self,event_key):
         OprHelper.reset()
         
-        event = Event.get_by_key_name(event_key)
+        event = Event.get_by_id(event_key)
         OprHelper.getTeamData(event)
         OprHelper.getData(event)
         
