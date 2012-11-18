@@ -137,5 +137,26 @@ class Event(ndb.Model):
         """
         return "/event/%s" % self.key_name
 
+    @property
+    def gameday_url(self):
+        """
+        Returns the URL pattern for the link to watch webcasts in Gameday
+        """
+        logging.info('hi')
+        if self.webcast:
+            gameday_link = '/gameday'
+            view_num = 0
+            for webcast in self.webcast:
+                if view_num == 0:
+                    gameday_link += '#'
+                else:
+                    gameday_link += '&'
+                if 'type' in webcast and 'channel' in webcast:
+                    gameday_link += 'view_' + str(view_num) + '=' + self.key_name + '-' + str(view_num + 1)
+                view_num += 1
+            return gameday_link
+        else:
+            return None
+
     # Depreciated, still here to keep GAE clean.
     webcast_url = ndb.StringProperty(indexed=False)
