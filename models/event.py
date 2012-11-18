@@ -1,5 +1,7 @@
 from google.appengine.ext import ndb
+import datetime
 import json
+import logging
 
 class Event(ndb.Model):
     """
@@ -63,6 +65,13 @@ class Event(ndb.Model):
             self.prepMatches()
             self._matches = self._matches_future.get_result()
         return self._matches
+
+    @property
+    def now(self):
+        if datetime.datetime.today().date() >= self.start_date.date()and datetime.datetime.today().date() <= self.end_date.date():
+            return True
+        else:
+            return False
 
     def prepTeams(self):
         # TODO there is a way to do this with yields such that this would be a
