@@ -1,11 +1,12 @@
 import json
 import logging
 import os
+import webapp2
 
 from datetime import datetime
 
 from google.appengine.api import memcache
-from google.appengine.ext import db, webapp
+from google.appengine.ext import db
 from google.appengine.ext.webapp import template
 
 import tba_config
@@ -18,7 +19,14 @@ from models.team import Team
 
 #Note: generally caching for the API happens in ApiHelper
 
-class ApiTeamsShow(webapp.RequestHandler):
+class MainApiHandler(webapp2.RequestHandler):
+
+    def __init__(self, request, response):
+        # Need to initialize a webapp2 instance
+        self.initialize(request, response)
+        logging.info(request)
+
+class ApiTeamsShow(MainApiHandler):
     """
     Information about teams.
     """
@@ -31,7 +39,7 @@ class ApiTeamsShow(webapp.RequestHandler):
         
         self.response.out.write(json.dumps(teams))
 
-class ApiTeamDetails(webapp.RequestHandler):
+class ApiTeamDetails(MainApiHandler):
     """
     Information about a Team in a particular year, including full Event and Match objects
     """
@@ -50,7 +58,7 @@ class ApiTeamDetails(webapp.RequestHandler):
         except Exception:
             return False
 
-class ApiEventsShow(webapp.RequestHandler):
+class ApiEventsShow(MainApiHandler):
     """
     Information about events.
     Deprecation notice. Please use ApiEventList, or ApiEventDetails.
@@ -69,7 +77,7 @@ class ApiEventsShow(webapp.RequestHandler):
         
         self.response.out.write(json.dumps(events))
 
-class ApiEventList(webapp.RequestHandler):
+class ApiEventList(MainApiHandler):
     """
     Returns a list of events for a year with top level information
     """
@@ -109,7 +117,7 @@ class ApiEventList(webapp.RequestHandler):
         self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(event_list))
 
-class ApiEventDetails(webapp.RequestHandler):
+class ApiEventDetails(MainApiHandler):
     """
     Return a specifc event with details.
     """
@@ -127,7 +135,7 @@ class ApiEventDetails(webapp.RequestHandler):
 
         self.response.out.write(json.dumps(event_dict))
 
-class ApiMatchDetails(webapp.RequestHandler):
+class ApiMatchDetails(MainApiHandler):
     """
     Returns a specifc
     """
