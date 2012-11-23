@@ -44,19 +44,23 @@ class ApiTeamDetails(MainApiHandler):
     Information about a Team in a particular year, including full Event and Match objects
     """
     def get(self):
+
         team_key = self.request.get('team')
         year = self.request.get('year')
 
+        response_json = dict()
         try:
-            team_dict = ApiHelper.getTeamInfo(team_key)
+            response_json = ApiHelper.getTeamInfo(team_key)
             if self.request.get('events'):
-                team_dict = ApiHelper.addTeamEvents(team_dict, year)
+                reponse_json = ApiHelper.addTeamEvents(response_json, year)
             
             #TODO: matches
             
-            self.response.out.write(json.dumps(team_dict))
-        except Exception:
-            return False
+            self.response.out.write(json.dumps(response_json))
+
+        except IndexError:
+            response_json = { "Property Error": "No team found for the key given" }
+            self.response.out.write(json.dumps(response_json))
 
 class ApiEventsShow(MainApiHandler):
     """
