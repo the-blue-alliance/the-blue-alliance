@@ -1,10 +1,10 @@
 import unittest2
 import webtest
 import json
+import webapp2
 
 from datetime import datetime
 
-from google.appengine.ext import webapp
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
@@ -18,7 +18,7 @@ from models.team import Team
 class TestApiEventShow(unittest2.TestCase):
 
     def setUp(self):
-        app = webapp.WSGIApplication([(r'/', ApiEventsShow)], debug=True)
+        app = webapp2.WSGIApplication([(r'/', ApiEventsShow)], debug=True)
         self.testapp = webtest.TestApp(app)
 
         self.testbed = testbed.Testbed()
@@ -89,7 +89,7 @@ class TestApiEventShow(unittest2.TestCase):
 class TestApiEventList(unittest2.TestCase):
 
     def setUp(self):
-        app = webapp.WSGIApplication([(r'/', ApiEventList)], debug=True)
+        app = webapp2.WSGIApplication([(r'/', ApiEventList)], debug=True)
         self.testapp = webtest.TestApp(app)
 
         self.testbed = testbed.Testbed()
@@ -133,7 +133,7 @@ class TestApiEventList(unittest2.TestCase):
 class TestApiMatchDetails(unittest2.TestCase):
 
     def setUp(self):
-        app = webapp.WSGIApplication([(r'/', ApiMatchDetails)], debug=True)
+        app = webapp2.WSGIApplication([(r'/', ApiMatchDetails)], debug=True)
         self.testapp = webtest.TestApp(app)
 
         self.testbed = testbed.Testbed()
