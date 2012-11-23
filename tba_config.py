@@ -16,7 +16,7 @@ else:
         "memcache": True,
     }
 
-CONFIG['kickoff'] = False
+CONFIG['kickoff'] = True
 
 def load_secrets(secret_type):
     global CONFIG
