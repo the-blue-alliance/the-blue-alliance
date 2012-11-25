@@ -19,7 +19,8 @@
 {% endblock %}
 
 {% block content %}
-
+<!-- Tablecloth CSS file to make the sortable Rankings table look Bootstrap-esque -->
+<link href="/css/tablecloth.css" rel="stylesheet">
 <div class="container">
 	<p><a href="/events/{{event.year}}"><i class="icon-chevron-left"></i> {{event.year}} Events</a></p>
 
@@ -133,14 +134,22 @@
             <div class="span8 offset2">
             <p>Data from <a href="http://www2.usfirst.org/{{event.year}}comp/events/{{event.event_short}}/rankings.html" target="_blank">
                 <em>FIRST</em>'s event page</a>.</p>
-            <table class="table table-striped table-condensed table-center">
+			<table class="table table-striped table-condensed table-center tablesorter" id="rankingsTable">
+			<thead>
 	        {% for row in event.rankings %}
 	            <tr>
 	            {% if forloop.first %}
                     {% for element in row %}
                         <th>{{ element }}</th>
                     {% endfor %}
-	            {% else %}
+	            {% endif %}
+	        	</tr>
+	        {% endfor %}
+			</thead>
+			<tbody>
+	        {% for row in event.rankings %}
+	            <tr>
+	            {% if not forloop.first %}
 		            {% for element in row %}
 		                <td>
 		                {% if forloop.counter0 == 1 %}
@@ -153,7 +162,8 @@
 		        {% endif %}
 		        </tr>
 	        {% endfor %}
-	        </table>
+			</tbody>
+			</table>
 	        </div>
         </div>
     </div>
@@ -231,5 +241,12 @@
 		</div>
 	</div>
 </div>
+<!-- Javascript call when the page is ready to make the Rankings table sortable -->
+<script src="/javascript/jquery.tablesorter.min.js"></script>
+<script>
+	$(document).ready(function(){
+		$("#rankingsTable").tablesorter( {sortList: [[0,0], [1,0]]} );
+	});
+</script>
 {% endblock %}
 
