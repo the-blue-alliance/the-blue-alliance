@@ -94,7 +94,7 @@ class EventDetail(BaseHandler):
             awards = AwardHelper.organizeAwards(event.awards)
             matches = MatchHelper.organizeMatches(event.matches)
             teams = TeamHelper.sortTeams(event.teams)
-            
+
             num_teams = len(teams)
             middle_value = num_teams/2
             if num_teams%2 != 0:
@@ -125,7 +125,7 @@ class EventDetail(BaseHandler):
                 "oprs": oprs,
                 "bracket_table": bracket_table,
             }
-                
+
             path = os.path.join(os.path.dirname(__file__), '../templates/event_details.html')
             html = template.render(path, template_values)
             if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)

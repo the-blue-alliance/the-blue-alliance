@@ -38,7 +38,6 @@ class AdminEventDetail(webapp.RequestHandler):
         template_values = {
             "event": event
         }
-
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_details.html')
         self.response.out.write(template.render(path, template_values))
 

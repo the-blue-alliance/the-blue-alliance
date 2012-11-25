@@ -19,6 +19,7 @@
 {% endblock %}
 
 {% block content %}
+<!-- Tablecloth CSS file to make the sortable Rankings table look Bootstrap-esque -->
 <link href="/css/tablecloth.css" rel="stylesheet">
 <div class="container">
 	<p><a href="/events/{{event.year}}"><i class="icon-chevron-left"></i> {{event.year}} Events</a></p>
@@ -240,6 +241,7 @@
 		</div>
 	</div>
 </div>
+<!-- Javascript call when the page is ready to make the Rankings table sortable -->
 <script src="/javascript/jquery.tablesorter.min.js"></script>
 <script>
 	$(document).ready(function(){
