@@ -52,7 +52,8 @@ class ApiHelper(object):
                 #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra 
                 if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, team_dict, 2592000)
             else:
-                return None
+                raise IndexError
+
         return team_dict
     
     

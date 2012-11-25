@@ -1,11 +1,12 @@
 import json
 import logging
 import os
+import webapp2
 
 from datetime import datetime
 
 from google.appengine.api import memcache
-from google.appengine.ext import db, webapp
+from google.appengine.ext import db
 from google.appengine.ext.webapp import template
 
 import tba_config
@@ -18,7 +19,14 @@ from models.team import Team
 
 #Note: generally caching for the API happens in ApiHelper
 
-class ApiTeamsShow(webapp.RequestHandler):
+class MainApiHandler(webapp2.RequestHandler):
+
+    def __init__(self, request, response):
+        # Need to initialize a webapp2 instance
+        self.initialize(request, response)
+        logging.info(request)
+
+class ApiTeamsShow(MainApiHandler):
     """
     Information about teams.
     """
@@ -31,26 +39,30 @@ class ApiTeamsShow(webapp.RequestHandler):
         
         self.response.out.write(json.dumps(teams))
 
-class ApiTeamDetails(webapp.RequestHandler):
+class ApiTeamDetails(MainApiHandler):
     """
     Information about a Team in a particular year, including full Event and Match objects
     """
     def get(self):
+
         team_key = self.request.get('team')
         year = self.request.get('year')
 
+        response_json = dict()
         try:
-            team_dict = ApiHelper.getTeamInfo(team_key)
+            response_json = ApiHelper.getTeamInfo(team_key)
             if self.request.get('events'):
-                team_dict = ApiHelper.addTeamEvents(team_dict, year)
+                reponse_json = ApiHelper.addTeamEvents(response_json, year)
             
             #TODO: matches
             
-            self.response.out.write(json.dumps(team_dict))
-        except Exception:
-            return False
+            self.response.out.write(json.dumps(response_json))
 
-class ApiEventsShow(webapp.RequestHandler):
+        except IndexError:
+            response_json = { "Property Error": "No team found for the key given" }
+            self.response.out.write(json.dumps(response_json))
+
+class ApiEventsShow(MainApiHandler):
     """
     Information about events.
     Deprecation notice. Please use ApiEventList, or ApiEventDetails.
@@ -69,7 +81,7 @@ class ApiEventsShow(webapp.RequestHandler):
         
         self.response.out.write(json.dumps(events))
 
-class ApiEventList(webapp.RequestHandler):
+class ApiEventList(MainApiHandler):
     """
     Returns a list of events for a year with top level information
     """
@@ -109,7 +121,7 @@ class ApiEventList(webapp.RequestHandler):
         self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(event_list))
 
-class ApiEventDetails(webapp.RequestHandler):
+class ApiEventDetails(MainApiHandler):
     """
     Return a specifc event with details.
     """
@@ -127,7 +139,7 @@ class ApiEventDetails(webapp.RequestHandler):
 
         self.response.out.write(json.dumps(event_dict))
 
-class ApiMatchDetails(webapp.RequestHandler):
+class ApiMatchDetails(MainApiHandler):
     """
     Returns a specifc
     """
