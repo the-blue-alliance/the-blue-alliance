@@ -19,7 +19,7 @@ class AdminMain(webapp.RequestHandler):
 
 class AdminDebugHandler(webapp.RequestHandler):
     def get(self):
-        path = os.path.join(os.path.dirname(__file__), '../../templates/debug.html')
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/debug.html')
         self.response.out.write(template.render(path, {}))
 
 class AdminTasksHandler(webapp.RequestHandler):
