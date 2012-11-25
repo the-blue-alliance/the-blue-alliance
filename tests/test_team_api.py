@@ -1,10 +1,10 @@
 import unittest2
 import webtest
 import json
+import webapp2
 
 from datetime import datetime
 
-from google.appengine.ext import webapp
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
@@ -18,7 +18,7 @@ class TestApiTeamShow(unittest2.TestCase):
 
     #TODO: Add event_keys testing. -brandondean 10/21/2012
     def setUp(self):
-        app = webapp.WSGIApplication([(r'/', ApiTeamsShow)], debug=True)
+        app = webapp2.WSGIApplication([(r'/', ApiTeamsShow)], debug=True)
         self.testapp = webtest.TestApp(app)
 
         self.testbed = testbed.Testbed()
