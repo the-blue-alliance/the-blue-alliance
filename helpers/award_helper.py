@@ -5,7 +5,7 @@ from google.appengine.ext import db
 # Prioritized sort order for certain awards
 sortOrder = [
     'cmp_ca',
-    'cmp_founders'
+    'cmp_founders',
     'cmp_ei',
     'cmp_ras',
     'cmp_wfa',
