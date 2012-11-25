@@ -133,7 +133,7 @@
             <div class="span8 offset2">
             <p>Data from <a href="http://www2.usfirst.org/{{event.year}}comp/events/{{event.event_short}}/rankings.html" target="_blank">
                 <em>FIRST</em>'s event page</a>.</p>
-            <table class="table table-striped table-condensed table-center" id="rankingsTable">
+            <table class="table table-striped table-condensed table-center">
 	        {% for row in event.rankings %}
 	            <tr>
 	            {% if forloop.first %}
@@ -231,10 +231,5 @@
 		</div>
 	</div>
 </div>
-<script src="javascript/jquery.tablesorter.min.js"></script>
-<script>
-  $(document).ready(function(){
-    $("#rankingsTable").tablesorter();
-  });
-</script>
 {% endblock %}
+
