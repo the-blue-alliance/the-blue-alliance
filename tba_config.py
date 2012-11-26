@@ -17,13 +17,3 @@ else:
     }
 
 CONFIG['kickoff'] = True
-
-def load_secrets(secret_type):
-    global CONFIG
-    with open("secrets/%s.json" % secret_type, "r") as f:
-        secrets = json.loads(f.read())
-        for (secret_key, secret_value) in secrets.items():
-            CONFIG[secret_key] = secret_value
-
-load_secrets("facebook")
-load_secrets("twitter")

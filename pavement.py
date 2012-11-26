@@ -14,12 +14,6 @@ def clean():
   else:
     print("Nothing to clean! :)")
 
-@task 
-def secrets():
-  """Copy prod secrets over repository secrets."""
-  sh("cat secrets/facebook_prod.json > secrets/facebook.json")
-  sh("cat secrets/twitter_prod.json > secrets/twitter.json")
-
 @task
 def setup():
   """Set up data for development environments."""
@@ -73,5 +67,4 @@ def preflight():
   test()
   less()
   javascript()
-  secrets()
-
+  
