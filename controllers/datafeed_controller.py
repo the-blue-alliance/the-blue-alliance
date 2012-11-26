@@ -327,7 +327,9 @@ class UsfirstEventRankingsGet(webapp.RequestHandler):
         
         event = Event.get_by_id(event_key)
         rankings = df.getEventRankings(event)
-        event.rankings_json = json.dumps(rankings)
+        if event.rankings_json != json.dumps(rankings):
+            event.rankings_json = json.dumps(rankings)
+            event.dirty = True
 
         EventManipulator.createOrUpdate(event)
 
