@@ -6,7 +6,9 @@
 
 {% block more_head_tags %}
     <!-- Tablecloth CSS file to make the sortable Rankings table look Bootstrap-esque -->
-    <link href="/css/tablecloth.css" rel="stylesheet">
+    <!-- http://tableclothjs.com/ -->
+    <!-- Sorts using http://tablesorter.com/ -->
+    <link href="/css/tablesorter.css" rel="stylesheet">
 
     <meta property="og:title" content="{{event.year}} {{event.name}}" />
     <meta property="og:type" content="article" />
@@ -136,7 +138,7 @@
             <div class="span8 offset2">
             <p>Data from <a href="http://www2.usfirst.org/{{event.year}}comp/events/{{event.event_short}}/rankings.html" target="_blank">
                 <em>FIRST</em>'s event page</a>.</p>
-            <table class="table table-striped table-condensed table-center" id="rankingsTable">
+            <table class="table table-striped table-condensed table-center tablesorter" id="rankingsTable">
             <thead>
                 {% for row in event.rankings %}
                     {% if forloop.first %}
