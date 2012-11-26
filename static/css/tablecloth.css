@@ -5,14 +5,14 @@
   cursor:pointer;
 }
 .table th.headerSortDown {
-  background-image: url('../img/asc.gif');
+  background-image: url('/images/icons/asc.gif');
   cursor: pointer;
   background-repeat: no-repeat;
   background-position: center right;
   padding-right:16px !important;
 }
 .table th.headerSortUp {
-  background-image: url('../img/desc.gif');
+  background-image: url('/images/icons/asc.gif');
   cursor: pointer;
   background-repeat: no-repeat;
   background-position: center right;
