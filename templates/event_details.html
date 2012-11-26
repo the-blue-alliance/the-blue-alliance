@@ -140,11 +140,11 @@
                 <em>FIRST</em>'s event page</a>.</p>
             <table class="table table-striped table-condensed table-center tablesorter" id="rankingsTable">
             <thead>
+            	<tr>
                 {% for element in event.rankings.0 %}
-                <tr>
-                    <th>{{ element }}</th>
-                </tr>
+                        <th>{{ element }}</th>
                 {% endfor %}
+                </tr>
             </thead>
             <tbody>
             {% for row in event.rankings %}
