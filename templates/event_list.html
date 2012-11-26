@@ -30,68 +30,38 @@
 	  	</div>
 		<div class="span10">
 			{% if show_upcoming %}
-			<h2>Upcoming Events</h2>
-	        {% for event in upcoming_events %}
-				<a href="/event/{{event.key_name}}">
-				<div class="event_block">
-					<div class="event_info">
-	                <h4>{{ event.name }}</h4>
-	                <p><em>
-	               		{% if event.start_date %}{{ event.start_date|date:"M d, Y" }}{% endif %}
-						{% if event.end_date %}- {{ event.end_date|date:"M d, Y" }}{% endif %}</em>
-					</p>
-					</div>
-				</div>
-				</a>
-	        {% empty %}
-	        	<div class="no_events">
-		        	<p>There are no upcoming events.</p>
-		        	<p>If you have an offseason event, <a href="/contact">tell us about it</a>!</p>
-	        	</div>
-	        {% endfor %}
-	        <h2>All Events</h2>
+				<h2>Upcoming Events</h2>
+	        	{% for event in upcoming_events %}
+					{% include "event_partials/event_block.html" %}
+	        	{% empty %}
+	        		<div class="no_events">
+		    	    	<p>There are no upcoming events.</p>
+		    	    	<p>If you have an offseason event, <a href="/contact">tell us about it</a>!</p>
+	        		</div>
+	        	{% endfor %}
+	        	<h2>All Events</h2>
 	        {% endif %}
 	        
-	    {% if week_events %}
-	      <h3>Jump To:</h3>
-        <ul class="nav nav-pills nav-stacked-phone">
-	        {% for label, events in week_events.items %}
-	          <li><a class="btn smooth-scroll" href="#{{label|slugify}}">{{ label }}</a></li>
-	        {% endfor %}
-	      </ul>
-	      
-				{% for label, events in week_events.items %}
-				  <h3 id="{{label|slugify}}">{{ label }}:</h3>
-				  <div class="clearfix"></div>
-				  {% for event in events %}
-					<a href="/event/{{event.key_name}}">
-					<div class="event_block">
-						<div class="event_info">
-		                <h4>{{ event.name }}</h4>
-		                <p><em>{% if event.start_date %}{{ event.start_date|date:"M d, Y" }}{% endif %}
-								{% if event.end_date %}- {{ event.end_date|date:"M d, Y" }}{% endif %}</em>
-						</p>
-						</div>
-					</div>
-					</a>
-					{% endfor %}
-					<div class="clearfix"></div>
-				{% endfor %}
-		  {% else %}
-        {% for event in events %}
-        <a href="/event/{{event.key_name}}">
-        <div class="event_block">
-          <div class="event_info">
-                  <h4>{{ event.name }}</h4>
-                  <p><em>{% if event.start_date %}{{ event.start_date|date:"M d, Y" }}{% endif %}
-              {% if event.end_date %}- {{ event.end_date|date:"M d, Y" }}{% endif %}</em>
-          </p>
-          </div>
-        </div>
-        </a>
-        {% endfor %}
-		  {% endif %}
-			
+	    	{% if week_events %}
+	    	    <h3>Jump</h3>
+        	    <ul class="nav nav-pills nav-stacked-phone">
+	    	        {% for label, events in week_events.items %}
+	    	            <li><a class="btn smooth-scroll" href="#{{label|slugify}}">{{ label }}</a></li>
+	    	        {% endfor %}
+	    	    </ul>
+			    {% for label, events in week_events.items %}
+			        <h3 id="{{label|slugify}}">{{ label }}</h3>
+			        <div class="clearfix"></div>
+			        {% for event in events %}
+			    		{% include "event_partials/event_block.html" %}
+			        {% endfor %}
+			        <div class="clearfix"></div>
+			    {% endfor %}
+			{% else %}
+        	    {% for event in events %}
+        	        {% include "event_partials/event_block.html" %}
+        	    {% endfor %}
+			{% endif %}
 		</div>	
 	</div>
 </div>

@@ -42,18 +42,7 @@
 		<div class="span10 offset1">
 			<h2>Upcoming Events</h2>
 	        {% for event in events %}
-				<a href="/event/{{event.key_name}}">
-				<div class="event_block">
-					<div class="event_info">
-                        <h4>{{ event.name }}{% if event.now %} <small><em>now!</em></small>{% endif %}</h4>
-                        {% if event.now and event.webcast %}<p><em>live webcast!</em></p>{% endif %}
-                        <p>
-                            {% if event.start_date %}{{ event.start_date|date:"M j" }}{% endif %}
-                            {% if event.end_date %}- {{ event.end_date|date:"M j" }}{% endif %}
-                        </p>
-                    </div>
-				</div>
-				</a>
+				{% include "event_partials/event_block.html" %}
 			{% endfor %}
 		</div>
 		{% else %}
