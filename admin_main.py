@@ -8,6 +8,7 @@ from controllers.admin.admin_event_controller import AdminEventCreate, AdminEven
 from controllers.admin.admin_main_controller import AdminDebugHandler, AdminMain, AdminTasksHandler
 from controllers.admin.admin_match_controller import AdminVideosAdd, AdminMatchCleanup, AdminMatchDashboard, AdminMatchDetail, AdminMatchEdit
 from controllers.admin.admin_memcache_controller import AdminMemcacheMain
+from controllers.admin.admin_sitevar_controller import AdminSitevarCreate, AdminSitevarEdit, AdminSitevarList
 from controllers.admin.admin_team_controller import AdminTeamDetail, AdminTeamList
 
 app = webapp2.WSGIApplication([('/admin/', AdminMain),
@@ -22,6 +23,9 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/match/edit/(.*)', AdminMatchEdit),
                                ('/admin/match/(.*)', AdminMatchDetail),
                                ('/admin/memcache', AdminMemcacheMain),
+                               ('/admin/sitevars', AdminSitevarList),
+                               ('/admin/sitevar/create', AdminSitevarCreate),
+                               ('/admin/sitevar/edit/(.*)', AdminSitevarEdit),
                                ('/admin/tasks', AdminTasksHandler),
                                ('/admin/teams', AdminTeamList),
                                ('/admin/team/(.*)', AdminTeamDetail),
