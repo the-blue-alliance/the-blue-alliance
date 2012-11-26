@@ -27,7 +27,7 @@
 	<p><a href="/events/{{event.year}}"><i class="icon-chevron-left"></i> {{event.year}} Events</a></p>
 
 	<h1>{{event.name}} {{event.year}}</h1>
-	
+
 	<div class="row">
 		<div class="span8">
 			<p>
@@ -52,18 +52,18 @@
 		  {% endif %}
 		</div>
 	</div>
-	
+
 	<ul class="nav nav-tabs nav-stacked-phone">
 	    {% if matches.num > 0 %}<li class="active"><a href="#results" data-toggle="tab">Results</a></li>{% endif %}
         {% if event.rankings %}<li><a href="#rankings" data-toggle="tab">Rankings</a></li>{% endif %}
          {% if awards.list %}<li><a href="#awards" data-toggle="tab">Awards</a></li>{% endif %}
         <li class="{% if matches.num == 0 %}active{% endif %}"><a href="#teams" data-toggle="tab">Teams</a></li>
 	</ul>
-	
+
 	<div class="tab-content">
     {% if matches.num > 0 %}
 	  <div class="tab-pane active" id="results">
-			
+
 		<div class="row">
 		{% if matches.qm %}
 		<div class="span6">
@@ -71,7 +71,7 @@
 	        	{% include "match_partials/qual_match_table.html" %}
 		</div>
 		{% endif %}
-		
+
 		{% if matches.ef or matches.qf or matches.sf or matches.f %}
 		<div class="span6">
 			<h3>Elimination Match Results</h3>
@@ -79,10 +79,10 @@
 
 			{% if matches.qm %}
 				{% if matches.qf or matches.sf or matches.f %}
-				<h3>Elimination Bracket</h3>	
+				<h3>Elimination Bracket</h3>
 				{% include "bracket_partials/bracket_table.html" %}
 				{% endif %}
-	
+
 			    {% if oprs|length > 0 %}
 	            <h3>OPRs - Top 15 (<a href="/opr">?</a>)</h3>
 		        <table class="table table-condensed table-striped table-center">
@@ -105,10 +105,10 @@
 		{% if not matches.qm %}
 		    <div class="span6">
 		        {% if matches.qf or matches.sf or matches.f %}
-	                <h3>Elimination Bracket</h3>	
+	                <h3>Elimination Bracket</h3>
 	                {% include "bracket_partials/bracket_table.html" %}
                 {% endif %}
-					
+
 				{% if oprs|length > 0 %}
                 <h3>OPRs - Top 15 (<a href="/opr" rel="tooltip" title="What are Offensive Power Rankings?">?</a>)</h3>
 		        <table class="table table-condensed table-striped table-center">
@@ -136,37 +136,33 @@
             <div class="span8 offset2">
             <p>Data from <a href="http://www2.usfirst.org/{{event.year}}comp/events/{{event.event_short}}/rankings.html" target="_blank">
                 <em>FIRST</em>'s event page</a>.</p>
-			<table class="table table-striped table-condensed table-center" id="rankingsTable">
-			<thead>
-	        {% for row in event.rankings %}
-	            {% if forloop.first %}
-					<tr>
-                    {% for element in row %}
+            <table class="table table-striped table-condensed table-center" id="rankingsTable">
+            <thead>
+                {% for row in event.rankings %}
+                    {% if forloop.first %}
+                    <tr>
+                        {% for element in row %}
                         <th>{{ element }}</th>
-                    {% endfor %}
-					</tr>
-	            {% endif %}
-	        {% endfor %}
-			</thead>
-			<tbody>
-	        {% for row in event.rankings %}
-	            {% if not forloop.first %}
-	            <tr>
-		            {% for element in row %}
-		                <td>
-		                {% if forloop.counter0 == 1 %}
-		                    <a href="/team/{{ element }}">{{ element }}</a>
-		                {% else %}
-		                    {{ element }}
-		                {% endif %}
-		                </td>
-		            {% endfor %}
-		        </tr>
-		        {% endif %}
-	        {% endfor %}
-			</tbody>
-			</table>
-	        </div>
+                        {% endfor %}
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </thead>
+            <tbody>
+            {% for row in event.rankings %}
+                {% if not forloop.first %}
+                <tr>
+                {% for element in row %}
+                    <td>
+                        {{ element }}
+                    </td>
+                {% endfor %}
+                </tr>
+                {% endif %}
+            {% endfor %}
+            </tbody>
+            </table>
+			</div>
         </div>
     </div>
     {% endif %}
@@ -237,7 +233,7 @@
 			  		</tbody>
 			  	</table>
 				</div>
-				</div>			
+				</div>
 			</div>
 			{% endif %}
 		</div>
@@ -251,7 +247,7 @@
 			headers: {
 				7: { sorter:false }
 			},
-			sortList: [[0,0], [1,0]],
+			sortList: [[0,0]],
 			textExtraction:'complex'
 		});
 	});
