@@ -1,1 +1,11 @@
-<h2>Got some {{eventteam_count}} eventteams written!</h2>
+{% extends "base.html" %}
+
+{% block title %}EvenTeamUpdateDo{% endblock %}
+
+{% block content %}
+<div class="row-fluid">
+    <div class="alert alert-block alert-success">
+        Got some {{eventteam_count}} eventteams written!
+    </div>
+</div>
+{% endblock %}
