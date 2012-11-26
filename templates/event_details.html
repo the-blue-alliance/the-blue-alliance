@@ -140,14 +140,10 @@
                 <em>FIRST</em>'s event page</a>.</p>
             <table class="table table-striped table-condensed table-center tablesorter" id="rankingsTable">
             <thead>
-                {% for row in event.rankings %}
-                    {% if forloop.first %}
-                    <tr>
-                        {% for element in row %}
-                        <th>{{ element }}</th>
-                        {% endfor %}
-                    </tr>
-                    {% endif %}
+                {% for element in event.rankings.0 %}
+                <tr>
+                    <th>{{ element }}</th>
+                </tr>
                 {% endfor %}
             </thead>
             <tbody>
