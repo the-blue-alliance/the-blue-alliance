@@ -105,7 +105,7 @@ class ApiHelper(object):
         
         if event_list is None:
             team = Team.get_by_id(team_dict["key"])
-            events = [a.event.get() for a in EventTeam.query(EventTeam.team == team.key).fetch(1000) if a.year == year]
+            events = [a.event.get() for a in EventTeam.query(EventTeam.team == team.key, EventTeam.year == int(year)).fetch(1000)]
             events = sorted(events, key=lambda event: event.start_date)
             event_list = [self.getEventInfo(e.key_name) for e in events]
             for event_dict, event in zip(event_list, events):
