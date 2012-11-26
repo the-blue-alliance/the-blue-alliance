@@ -6,10 +6,7 @@ from datafeeds.datafeed_base import DatafeedBase
 from datafeeds.twitter_matches_parser import TwitterMatchesParser
 import tba_config
 
-TWITTER_CONSUMER_KEY = tba_config.CONFIG['TWITTER_CONSUMER_KEY']
-TWITTER_CONSUMER_SECRET = tba_config.CONFIG['TWITTER_CONSUMER_SECRET']
-TWITTER_ACCESS_TOKEN = tba_config.CONFIG['TWITTER_ACCESS_TOKEN']
-TWITTER_ACCESS_TOKEN_SECRET = tba_config.CONFIG['TWITTER_ACCESS_TOKEN_SECRET']
+from models.sitevar import Sitevar
 
 
 class DatafeedTwitter(DatafeedBase):
@@ -49,6 +46,16 @@ class DatafeedTwitter(DatafeedBase):
         
     def oauth_req(self, url, http_method="GET", post_body=None,
                   http_headers=None):
+
+        twitter_secrets = Sitevar.get_by_id("twitter.secrets")
+        if not twitter_secrets:
+            raise Exception("Missing sitevar: twitter.secrets. Cant scrape twitter.")
+
+        TWITTER_CONSUMER_KEY = twitter_secrets.values['TWITTER_CONSUMER_KEY']
+        TWITTER_CONSUMER_SECRET = twitter_secrets.values['TWITTER_CONSUMER_SECRET']
+        TWITTER_ACCESS_TOKEN = twitter_secrets.values['TWITTER_ACCESS_TOKEN']
+        TWITTER_ACCESS_TOKEN_SECRET = twitter_secrets.values['TWITTER_ACCESS_TOKEN_SECRET']
+
         consumer = oauth2.Consumer(key=TWITTER_CONSUMER_KEY, secret=TWITTER_CONSUMER_SECRET)
         token = oauth2.Token(key=TWITTER_ACCESS_TOKEN, secret=TWITTER_ACCESS_TOKEN_SECRET)
         client = oauth2.Client(consumer, token)
