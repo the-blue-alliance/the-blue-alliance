@@ -5,6 +5,9 @@
 {% block meta_description %}Match results and for the {{event.year}} {{event.name}} FIRST Robotics Competition in {{event.location}}.{% endblock %}
 
 {% block more_head_tags %}
+	<!-- Tablecloth CSS file to make the sortable Rankings table look Bootstrap-esque -->
+	<link href="/css/tablecloth.css" rel="stylesheet">
+
     <meta property="og:title" content="{{event.year}} {{event.name}}" />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="http://thebluealliance.com/event/{{event.key_name}}" />
@@ -19,8 +22,7 @@
 {% endblock %}
 
 {% block content %}
-<!-- Tablecloth CSS file to make the sortable Rankings table look Bootstrap-esque -->
-<link href="/css/tablecloth.css" rel="stylesheet">
+
 <div class="container">
 	<p><a href="/events/{{event.year}}"><i class="icon-chevron-left"></i> {{event.year}} Events</a></p>
 
@@ -246,7 +248,11 @@
 <script>
 	$(document).ready(function(){
 		$("#rankingsTable").tablesorter({
-			sortList: [[0,0], [1,0]]
+			headers: {
+				7: { sorter:false }
+			},
+			sortList: [[0,0], [1,0]],
+			textExtraction:'complex'
 		});
 	});
 </script>
