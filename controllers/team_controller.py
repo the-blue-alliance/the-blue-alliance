@@ -81,9 +81,6 @@ class TeamDetail(BaseHandler):
             if not team:
                 return self.redirect("/error/404")
             
-            # TODO this function is a hack, remove it. -gregmarra 20121007
-            team.do_split_address()
-
             event_teams = EventTeam.query(EventTeam.team == team.key).fetch(1000)
             event_keys = [event_team.event for event_team in event_teams if event_team.year == year]
             events = ndb.get_multi(event_keys)

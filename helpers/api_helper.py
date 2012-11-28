@@ -41,13 +41,12 @@ class ApiHelper(object):
                 team_dict["events"] = [event_team.event.id() for event_team in event_teams]
 
                 try:
-                    team.do_split_address()
-                    team_dict["location"] = team.split_address.get("full_address", None)
-                    team_dict["locality"] = team.split_address.get("locality", None)
-                    team_dict["region"] = team.split_address.get("region", None)
-                    team_dict["country"] = team.split_address.get("country", None)
+                    team_dict["location"] = team.address
+                    team_dict["locality"] = team.locality
+                    team_dict["region"] = team.region
+                    team_dict["country_name"] = team.country_name
                 except Exception, e:
-                    logging.info("Failed to include Address for api_team_info_%s" % team_key)
+                    logging.warning("Failed to include Address for api_team_info_%s: %s" % (team_key, e))
                 
                 #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra 
                 if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, team_dict, 2592000)

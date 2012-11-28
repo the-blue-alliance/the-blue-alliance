@@ -35,7 +35,7 @@ class TestApiTeamShow(unittest2.TestCase):
                 Technical Charter High School",
                 team_number = 281,
                 nickname = "EnTech GreenVillians",
-                address = "Greenville, SC",
+                address = "Greenville, SC, USA",
                 website = "www.entech.org",
         )
 
@@ -72,8 +72,9 @@ class TestApiTeamShow(unittest2.TestCase):
         self.assertEqual(team_dict["team_number"], self.team.team_number)
         self.assertEqual(team_dict["nickname"], self.team.nickname)
         self.assertEqual(team_dict["location"], self.team.address)
-        self.assertEqual(team_dict["country"], None)
-        self.assertEqual(team_dict["region"], '')
+        self.assertEqual(team_dict["locality"], "Greenville")
+        self.assertEqual(team_dict["country_name"], "USA")
+        self.assertEqual(team_dict["region"], "SC")
         self.assertEqual(team_dict["website"], self.team.website)
         self.assertEqual(team_dict["events"][0], self.event.key_name)
 
