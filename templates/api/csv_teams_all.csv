@@ -1,0 +1,2 @@
+team_number,name,nickname,location,website{% for team in teams %}
+{{team.team_number}},{{team.name}},{{team.nickname}},"{{team.address}}",{{team.website}}{% endfor %}

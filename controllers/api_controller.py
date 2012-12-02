@@ -159,3 +159,24 @@ class ApiMatchDetails(MainApiHandler):
 
         self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(match_json))
+
+class CsvTeamsAll(MainApiHandler):
+    """
+    Outputs a CSV of all team information in the database, designed for other apps to bulk-import data.
+    """
+    def get(self):
+        memcache_key = "csv_teams_all"
+        output = memcache.get(memcache_key)
+    
+        if output is None:
+            teams = Team.query().order(Team.team_number).fetch(10000)        
+
+            template_values = {
+                "teams": teams
+            }
+        
+            path = os.path.join(os.path.dirname(__file__), '../templates/api/csv_teams_all.csv')
+            output = template.render(path, template_values)
+            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
+        
+        self.response.out.write(output)
