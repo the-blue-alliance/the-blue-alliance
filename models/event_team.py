@@ -12,3 +12,7 @@ class EventTeam(ndb.Model):
     event = ndb.KeyProperty(kind=Event)
     team = ndb.KeyProperty(kind=Team)
     year = ndb.IntegerProperty()
+
+    @property
+    def key_name(self):
+        return self.event.id() + "_" + self.team.id()

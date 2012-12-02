@@ -1,11 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}EvenTeamUpdateDo{% endblock %}
+{% block title %}EventTeamUpdateDo{% endblock %}
 
 {% block content %}
 <div class="row-fluid">
+    <h2>EventTeamUpdateDo</h2>
     <div class="alert alert-block alert-success">
-        Got some {{eventteam_count}} eventteams written!
+        Got {{event_teams|length}} EventTeams written!
     </div>
+    <ul>
+        {% for event_team in event_teams %}
+        <li>{{event_team.key.id}}</li>
+        {% endfor %}
+    </ul>
 </div>
 {% endblock %}

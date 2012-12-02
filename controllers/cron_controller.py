@@ -6,6 +6,8 @@ from google.appengine.api import taskqueue
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
+from helpers.event_team_manipulator import EventTeamManipulator
+from helpers.team_manipulator import TeamManipulator
 from helpers.opr_helper import OprHelper
 
 from models.event import Event
@@ -15,53 +17,32 @@ from models.team import Team
 
 class EventTeamUpdate(webapp.RequestHandler):
     """
-    Task that updates the EventTeam index for an Event.
+    Task that adds to the EventTeam index for an Event.
+    Can only update or delete EventTeams for unregistered teams. 
     """
     def get(self, event_key):
         event = Event.get_by_id(event_key)
-        teams = set()
+        team_ids = set()
         
         # Add teams from Matches
-        for m in Match.query(Match.event == event.key).fetch(1000):
-            for team in m.team_key_names:
-                teams.add(team)
+        for match in Match.query(Match.event == event.key).fetch(1000):
+            for team in match.team_key_names:
+                team_ids.add(team)
         
-        # Add teams from existing EventTeams
-        [teams.add(event_team.team.id()) for event_team in EventTeam.query(EventTeam.event == event.key).fetch(5000)]
-        
-        eventteams_count = 0
-        for team in teams:
-            team_object = Team.get_or_insert(
-                team,
-                team_number = int(team[3:]), #"frc177"->"177"
-                )
-            
-            et = EventTeam.get_or_insert(
-                event_key + "_" + team,
-                event = event.key,
-                team = team_object.key,
-                year = event.year)
-            
-            # Update if needed
-            reput = False
-            if not et.team:
-                reput = True
-                et.team = team_object.key
-            elif et.team != team_object.key:
-                reput = True
-                et.team = team_object.key
-            if et.year != event.year:
-                reput = True
-                et.year = event.year
-            if reput:
-                logging.info("Had to re-put %s" % et.key().name)
-                et.put()
-                # TODO: This could be made MUCH more efficient with batching (gregmarra 14 Jan 2011)
-            
-            eventteams_count = eventteams_count + 1
+        teams = TeamManipulator.createOrUpdate([Team(
+            id = team_id,
+            team_number = int(team_id[3:]))
+            for team_id in team_ids])
+
+        event_teams = EventTeamManipulator.createOrUpdate([EventTeam(
+            id = event_key + "_" + team.key.id(),
+            event = event.key,
+            team = team.key,
+            year = event.year)
+            for team in teams])
         
         template_values = {
-            'eventteams_count': eventteams_count,
+            'event_teams': event_teams,
         }
         
         path = os.path.join(os.path.dirname(__file__), '../templates/math/eventteam_update_do.html')
