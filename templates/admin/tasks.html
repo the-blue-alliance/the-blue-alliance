@@ -13,8 +13,22 @@
 <p>Rebuild EventTeam join models to build (Team, Event) pairs</p>
 <div class="row-fluid">
     <div class="span4">
-        <span class="help-block">Enqueue</span>
-        <a class="btn" href="/tasks/math/enqueue/eventteam_update">Enqueue all Events</a>
+        <span class="help-block">Enqueue All</span>
+        <a class="btn" href="/tasks/math/enqueue/eventteam_update/all">Enqueue all Events</a>
+    </div>
+    <div class="span4">
+        <span class="help-block">Enqueue Year</span>
+        <form class="form-inline">
+            <div class="input-prepend input-append">
+                <input class="span6" id="enqueue_eventteam_update_year" type="text" placeholder="2012">
+                <a class="btn" id="enqueue_eventteam_update_submit">Go <i class="icon-fast-forward"></i></a>
+            </div>
+        </form>
+        <script>
+        $("#enqueue_eventteam_update_submit").click(function() {
+            window.location = "/tasks/math/enqueue/eventteam_update/" + $("#enqueue_eventteam_update_year").val();
+        });
+        </script>
     </div>
     <div class="span4">
         <form class="form-inline">

@@ -3,7 +3,7 @@ import logging
 import os
 
 from google.appengine.api import taskqueue
-from google.appengine.ext import db, webapp
+from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
 from helpers.opr_helper import OprHelper
@@ -71,16 +71,19 @@ class EventTeamUpdateEnqueue(webapp.RequestHandler):
     """
     Handles enqueing building attendance for Events.
     """
-    def get(self):
-        events = Event.query().fetch(1000)
-        for event in events:
-            logging.info(event.name)
+    def get(self, when):
+        if when == "all":
+            event_keys = Event.query().fetch(10000, keys_only=True)
+        else:
+            event_keys = Event.query(Event.year == int(when)).fetch(10000, keys_only=True)
+        
+        for event_key in event_keys:
             taskqueue.add(
-                url='/tasks/math/do/eventteam_update/' + event.key.id(),
+                url='/tasks/math/do/eventteam_update/' + event_key.id(),
                 method='GET')
         
         template_values = {
-            'event_count': len(events),
+            'event_keys': event_keys,
         }
         
         path = os.path.join(os.path.dirname(__file__), '../templates/math/eventteam_update_enqueue.html')
