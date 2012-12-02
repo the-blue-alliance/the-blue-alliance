@@ -15,6 +15,7 @@ from datafeeds.datafeed_offseason import DatafeedOffseason
 from datafeeds.datafeed_twitter import DatafeedTwitter
 
 from helpers.event_manipulator import EventManipulator
+from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.match_manipulator import MatchManipulator
 from helpers.award_manipulator import AwardManipulator
 from helpers.team_helper import TeamHelper, TeamTpidHelper
@@ -150,26 +151,20 @@ class UsfirstEventDetailsGet(webapp.RequestHandler):
         event = datafeed.getEventDetails(int(year), first_eid)
         event = EventManipulator.createOrUpdate(event)
         
-        new_teams = datafeed.getEventTeams(int(year), first_eid)
-        old_teams = ndb.get_multi([new_team.key for new_team in new_teams])
+        teams = datafeed.getEventTeams(int(year), first_eid)
+        teams = TeamManipulator.createOrUpdate(teams)
 
-        futures = []
-        for new_team, team in zip(new_teams, old_teams):
-            if team is None:
-                team = new_team
-                futures.append(team.put_async())
-            
-            futures.append(EventTeam.get_or_insert_async(
-                event.key_name + "_" + team.key_name,
-                event = event.key,
-                team = team.key
-            ))
+        event_teams = [EventTeam(
+            id = event.key.id() + "_" + team.key.id(),
+            event = event.key,
+            team = team.key,
+            year = event.year)
+            for team in teams]
+        event_teams = EventTeamManipulator.createOrUpdate(event_teams)
 
-        ndb.Future.wait_all(futures)
-        
         template_values = {
             'event': event,
-            'eventteams_count': len(new_teams),
+            'event_teams': event_teams,
         }
         
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_details_get.html')

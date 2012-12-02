@@ -11,5 +11,5 @@
     <li>Starts on: {{event.start_date}}</li>
     <li>Ends on: {{event.end_date}}</li>
     <li>Website: {{event.website}}</li>
-    <li>Teams: {{eventteams_count}} registered</li>
+    <li>Teams: {{event_teams|length}} registered - {% for event_team in event_teams %}{{event_team.team.id}} {% endfor %}</li>
 </ul>
