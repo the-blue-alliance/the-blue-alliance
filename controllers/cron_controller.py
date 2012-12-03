@@ -41,6 +41,8 @@ class EventTeamUpdate(webapp.RequestHandler):
                 team = team.key,
                 year = event.year)
                 for team in teams])
+        else:
+            event_teams = None
         
         template_values = {
             'event_teams': event_teams,
