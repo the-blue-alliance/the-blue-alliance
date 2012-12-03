@@ -36,7 +36,11 @@ class TypeaheadHandler(BaseHandler):
             for event in events:
                 results.append({'id': event.key_name, 'name': '%s %s [%s]' % (event.year, event.name, event.event_short.upper())})
             for team in teams:
-                results.append({'id': team.team_number, 'name': '%s | %s' % (team.team_number, team.nickname)})
+                if not team.nickname:
+                    nickname = "Team %s" % team.team_number
+                else:
+                    nickname = team.nickname
+                results.append({'id': team.team_number, 'name': '%s | %s' % (team.team_number, nickname)})
 
             if tba_config.CONFIG["memcache"]: memcache.set(typeahead_key, results, 86400)
         return results
