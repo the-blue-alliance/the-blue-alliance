@@ -34,12 +34,13 @@ class EventTeamUpdate(webapp.RequestHandler):
             team_number = int(team_id[3:]))
             for team_id in team_ids])
 
-        event_teams = EventTeamManipulator.createOrUpdate([EventTeam(
-            id = event_key + "_" + team.key.id(),
-            event = event.key,
-            team = team.key,
-            year = event.year)
-            for team in teams])
+        if teams:
+            event_teams = EventTeamManipulator.createOrUpdate([EventTeam(
+                id = event_key + "_" + team.key.id(),
+                event = event.key,
+                team = team.key,
+                year = event.year)
+                for team in teams])
         
         template_values = {
             'event_teams': event_teams,
