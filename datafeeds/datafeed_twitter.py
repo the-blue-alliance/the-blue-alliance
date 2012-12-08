@@ -51,10 +51,10 @@ class DatafeedTwitter(DatafeedBase):
         if not twitter_secrets:
             raise Exception("Missing sitevar: twitter.secrets. Cant scrape twitter.")
 
-        TWITTER_CONSUMER_KEY = twitter_secrets.values['TWITTER_CONSUMER_KEY']
-        TWITTER_CONSUMER_SECRET = twitter_secrets.values['TWITTER_CONSUMER_SECRET']
-        TWITTER_ACCESS_TOKEN = twitter_secrets.values['TWITTER_ACCESS_TOKEN']
-        TWITTER_ACCESS_TOKEN_SECRET = twitter_secrets.values['TWITTER_ACCESS_TOKEN_SECRET']
+        TWITTER_CONSUMER_KEY = twitter_secrets.contents['TWITTER_CONSUMER_KEY']
+        TWITTER_CONSUMER_SECRET = twitter_secrets.contents['TWITTER_CONSUMER_SECRET']
+        TWITTER_ACCESS_TOKEN = twitter_secrets.contents['TWITTER_ACCESS_TOKEN']
+        TWITTER_ACCESS_TOKEN_SECRET = twitter_secrets.contents['TWITTER_ACCESS_TOKEN_SECRET']
 
         consumer = oauth2.Consumer(key=TWITTER_CONSUMER_KEY, secret=TWITTER_CONSUMER_SECRET)
         token = oauth2.Token(key=TWITTER_ACCESS_TOKEN, secret=TWITTER_ACCESS_TOKEN_SECRET)
