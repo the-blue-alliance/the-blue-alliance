@@ -1,3 +1,5 @@
+import json
+
 from google.appengine.ext import ndb
 
 class Sitevar(ndb.Model):
@@ -16,19 +18,19 @@ class Sitevar(ndb.Model):
     values_json = ndb.StringProperty(indexed=False) #a json blob
     
     def __init__(self, *args, **kw):
-        self._values = None
+        self._contents = None
         super(Sitevar, self).__init__(*args, **kw)
     
     @property
-    def values(self):
+    def contents(self):
         """
         Lazy load values_json
         """
-        if self._values is None:
-            self._values = json.loads(self.values_json)
-        return self._values
+        if self._contents is None:
+            self._contents = json.loads(self.values_json)
+        return self._contents
 
-    @values.setter
-    def values(self, value):
-        self._values = value
-        self.values_json = json.puts(self._values)
+    @contents.setter
+    def contents(self, contents):
+        self._contents = contents
+        self.values_json = json.puts(self._contents)
