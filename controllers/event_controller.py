@@ -104,6 +104,11 @@ class EventDetail(BaseHandler):
             oprs = sorted(zip(event.oprs,event.opr_teams), reverse=True) # sort by OPR
             oprs = oprs[:14] # get the top 15 OPRs
 
+            if event.now:
+                matches_recent = MatchHelper.recentMatches(event.matches)
+            else:
+                matches_recent = None
+
             bracket_table = {}
             qf_matches = matches['qf']
             sf_matches = matches['sf']
@@ -118,6 +123,7 @@ class EventDetail(BaseHandler):
             template_values = {
                 "event": event,
                 "matches": matches,
+                "matches_recent": matches_recent,
                 "awards": awards,
                 "teams_a": teams_a,
                 "teams_b": teams_b,

@@ -34,6 +34,20 @@ class MatchHelper(object):
             matches[match.comp_level].append(match)
         
         return matches
+
+    @classmethod
+    def recentMatches(self, matches, num=3):
+        def cmp_matches(x, y):
+            if x.updated is None:
+                return False
+            if y.updated is None:
+                return True
+            else:
+                cmp(x.updated, y.updated)
+
+        matches = filter(lambda x: x.has_been_played, matches)
+        matches = sorted(matches, cmp=cmp_matches)
+        return matches[:num]
     
     @classmethod
     def cleanUpIfInvalidMatch(self, match):

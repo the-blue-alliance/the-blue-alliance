@@ -26,14 +26,15 @@
 {% block content %}
 
 <div class="container">
-    <p><a href="/events/{{event.year}}"><i class="icon-chevron-left"></i> {{event.year}} Events</a></p>
+    <p class="pull-right"><a class="btn" href="/events/{{event.key_name}}"><i class="icon-refresh"></i></a></p>
+    <p><a class="btn" href="/events/{{event.year}}"><i class="icon-chevron-left"></i> {{event.year}} Events</a></p>
 
     <h1>{{event.name}} {{event.year}}</h1>
 
     <div class="row">
         <div class="span8">
             <p>
-                {% if event.start_date %}<i class="icon-calendar"></i> {{ event.start_date|date:"M jS" }} to {{ event.end_date|date:"M jS, Y" }}{% endif %}
+                {% if event.start_date %}<i class="icon-calendar"></i> {{ event.start_date|date:"M jS" }} {% if event.start_date != event.end_date %} to {{ event.end_date|date:"M jS, Y" }}{% endif %}{% endif %}
                 {% if event.location %}{% if not event.start_date %}<br /><i class="icon-map-marker"></i>{% endif %} in <a href="http://maps.google.com/maps?q={{ event.location|urlencode }}">{{ event.location }}</a>{% endif %}
                 {% if event.website %}<br /><i class="icon-globe"></i> <a href="{{ event.website }}" title="{{ event.name }}">{{ event.website }}</a>{% endif %}
                 {% if event.official %}{% if not event.website %}<br /><i class="icon-info-sign"></i>{% else %} - {% endif %} details on <a href="https://my.usfirst.org/myarea/index.lasso?page=teamlist&amp;event_type=FRC&amp;sort_teams=number&amp;year={{ event.year }}&amp;event={{ event.event_short }}">usfirst.org</a>{% endif %}
@@ -45,7 +46,13 @@
                 <a class="hashtag-link hashtag-youtube" href="http://www.youtube.com/results?search_query=%23frc{{ event.event_short }}+OR+%22{{ event.name|urlencode }}%22" target="_blank" title="Search YouTube">YouTube</a> &middot;
                 <a class="hashtag-link hashtag-cd" href="http://www.chiefdelphi.com/media/photos/tags/frc{{ event.event_short }}" target="_blank" title="Search Chief Delphi">Chief Delphi</a> &middot;
                 <a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23frc{{ event.event_short }}" target="_blank" title="Search Flickr">Flickr</a>
-          </p>
+            </p>
+            {% if matches_recent %}
+                <h4>Recent Matches</h4>
+                {% with matches_recent as matches %}
+                    {% include "match_partials/recent_match_table.html" %}
+                {% endwith %}
+            {% endif %}
         </div>
         <div class="span4">
           {% if event.now and event.webcast%}
