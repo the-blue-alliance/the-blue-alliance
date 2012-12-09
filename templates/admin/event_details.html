@@ -65,6 +65,10 @@
         <td>Teams Attending</td>
         <td>{{ event.teams|length }} teams - {% for team in event.teams %}<a href="/admin/team/{{team.team_number}}">{{team.team_number}}</a>, {% endfor %}</td>
     </tr>
+    <tr>
+        <td>Created - Updated</td>
+        <td>{{ event.created }} - {{ event.updated }}</td>
+    </tr>
 </table>
 
 <h2>Rankings</h2>

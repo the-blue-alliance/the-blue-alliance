@@ -15,6 +15,9 @@ class Award(ndb.Model):
     team = ndb.KeyProperty(kind=Team) #team that won the award (if applicable)
     awardee = ndb.StringProperty() #person who won the award (if applicable)
     event = ndb.KeyProperty(kind=Event, required=True)
+
+    created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
+    updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
     
     @property
     def key_name(self):

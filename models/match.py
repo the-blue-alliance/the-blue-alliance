@@ -82,7 +82,7 @@ class Match(ndb.Model):
     #    "score": 12
     # }
     # }
-    
+
     comp_level = ndb.StringProperty(required=True, choices=set(COMP_LEVELS))
     event = ndb.KeyProperty(kind=Event, required=True)
     game = ndb.StringProperty(required=True,choices=set(FRC_GAMES), indexed=False)
@@ -93,6 +93,9 @@ class Match(ndb.Model):
     time = ndb.DateTimeProperty(indexed=False)
     youtube_videos = ndb.StringProperty(repeated=True) # list of Youtube IDs
     tba_videos = ndb.StringProperty(repeated=True) # list of filetypes a TBA video exists for
+
+    created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
+    updated = ndb.DateTimeProperty(auto_now=True)
     
     def __init__(self, *args, **kw):
         self._alliances = None

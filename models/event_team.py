@@ -13,6 +13,9 @@ class EventTeam(ndb.Model):
     team = ndb.KeyProperty(kind=Team)
     year = ndb.IntegerProperty()
 
+    created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
+    updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+
     @property
     def key_name(self):
         return self.event.id() + "_" + self.team.id()

@@ -27,6 +27,9 @@ class Event(ndb.Model):
     opr_teams = ndb.IntegerProperty(indexed=False, repeated=True)
     rankings_json = ndb.TextProperty(indexed=False)
 
+    created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
+    updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+
     def __init__(self, *args, **kw):
         self._awards = None
         self._awards_future = None

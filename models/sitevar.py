@@ -14,9 +14,11 @@ class Sitevar(ndb.Model):
     manually edited by site administrators in the admin console.
     """
     description = ndb.StringProperty(indexed=False)
-    updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
     values_json = ndb.StringProperty(indexed=False) #a json blob
     
+    created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
+    updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+
     def __init__(self, *args, **kw):
         self._contents = None
         super(Sitevar, self).__init__(*args, **kw)
