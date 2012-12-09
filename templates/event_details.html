@@ -34,10 +34,10 @@
         <div class="span8">
             <p>
                 {% if event.start_date %}<i class="icon-calendar"></i> {{ event.start_date|date:"M jS" }} to {{ event.end_date|date:"M jS, Y" }}{% endif %}
-                {% if event.location %}{% if not event.start_date %}<i class="icon-map-marker"></i>{% endif %} in <a href="http://maps.google.com/maps?q={{ event.location|urlencode }}">{{ event.location }}</a><br />{% endif %}
-                {% if event.website %}<i class="icon-globe"></i> <a href="{{ event.website }}" title="{{ event.name }}">{{ event.website }}</a>{% endif %}
-                {% if event.official %}{% if not event.website %}<i class="icon-info-sign"></i>{% else %} - {% endif %} details on <a href="https://my.usfirst.org/myarea/index.lasso?page=teamlist&amp;event_type=FRC&amp;sort_teams=number&amp;year={{ event.year }}&amp;event={{ event.event_short }}">usfirst.org</a><br />{% endif %}
-                {% if event.facebook_eid %}<i class="icon-thumbs-up"></i> <a href="{{ event.facebook_event_url }}" title="Facebook Event">RSVP on Facebook</a><br />{% endif %}
+                {% if event.location %}{% if not event.start_date %}<br /><i class="icon-map-marker"></i>{% endif %} in <a href="http://maps.google.com/maps?q={{ event.location|urlencode }}">{{ event.location }}</a>{% endif %}
+                {% if event.website %}<br /><i class="icon-globe"></i> <a href="{{ event.website }}" title="{{ event.name }}">{{ event.website }}</a>{% endif %}
+                {% if event.official %}{% if not event.website %}<br /><i class="icon-info-sign"></i>{% else %} - {% endif %} details on <a href="https://my.usfirst.org/myarea/index.lasso?page=teamlist&amp;event_type=FRC&amp;sort_teams=number&amp;year={{ event.year }}&amp;event={{ event.event_short }}">usfirst.org</a>{% endif %}
+                {% if event.facebook_eid %}<br /><i class="icon-thumbs-up"></i> <a href="{{ event.facebook_event_url }}" title="Facebook Event">RSVP on Facebook</a><br />{% endif %}
             </p>
 
             <p><strong>#frc{{ event.event_short }}</strong> <small><a href="/hashtags" rel="tooltip" title="What are hashtags?">?</a></small> - Search
