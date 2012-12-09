@@ -36,7 +36,8 @@ class TestDatafeedUsfirstMatches(unittest2.TestCase):
         self.assertEqual(match.match_number, 1)
         self.assertEqual(match.team_key_names, [u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073'])
         self.assertEqual(match.alliances_json, """{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""")
-        
+        self.assertEqual(match.time_string, "9:29 AM")
+
         # Test 2011ct_qf2m3
         match = matches[-7]
         self.assertEqual(match.comp_level, "qf")
@@ -44,7 +45,8 @@ class TestDatafeedUsfirstMatches(unittest2.TestCase):
         self.assertEqual(match.match_number, 3)
         self.assertEqual(match.team_key_names, [u'frc716', u'frc3125', u'frc181', u'frc1699', u'frc1124', u'frc714'])
         self.assertEqual(match.alliances_json, """{"blue": {"score": 74, "teams": ["frc1699", "frc1124", "frc714"]}, "red": {"score": 90, "teams": ["frc716", "frc3125", "frc181"]}}""")
-        
+        self.assertEqual(match.time_string, "2:05 PM")
+
         # Test 2011ct_f1m2
         match = matches[-1]
         self.assertEqual(match.comp_level, "f")
@@ -52,3 +54,4 @@ class TestDatafeedUsfirstMatches(unittest2.TestCase):
         self.assertEqual(match.match_number, 2)
         self.assertEqual(match.team_key_names, [u'frc195', u'frc1923', u'frc155', u'frc177', u'frc175', u'frc1073'])
         self.assertEqual(match.alliances_json, """{"blue": {"score": 65, "teams": ["frc177", "frc175", "frc1073"]}, "red": {"score": 97, "teams": ["frc195", "frc1923", "frc155"]}}""")
+        self.assertEqual(match.time_string, "3:23 PM")

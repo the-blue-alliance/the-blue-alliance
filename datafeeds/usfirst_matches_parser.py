@@ -30,6 +30,7 @@ class UsfirstMatchesParser(ParserBase):
             tds = tr.findAll('td')
             if len(tds) == 10:
                 if self._recurseUntilString(tds[1]) is not None:
+                    time_string = self._recurseUntilString(tds[0])
                     red_teams = ["frc" + self._recurseUntilString(tds[2]), "frc" + self._recurseUntilString(tds[3]), "frc" + self._recurseUntilString(tds[4])]
                     blue_teams = ["frc" + self._recurseUntilString(tds[5]), "frc" + self._recurseUntilString(tds[6]), "frc" + self._recurseUntilString(tds[7])]
                     
@@ -56,13 +57,14 @@ class UsfirstMatchesParser(ParserBase):
                                 "score": blue_score
                             }
                         }
-                        
+
                         matches.append({
                             "alliances_json": json.dumps(alliances),
                             "comp_level": "qm",
                             "match_number": match_number,
                             "set_number": 1,
                             "team_key_names": red_teams + blue_teams,
+                            "time_string": time_string
                             })
 
                     except Exception, detail:
@@ -80,6 +82,7 @@ class UsfirstMatchesParser(ParserBase):
             tds = tr.findAll('td')
             if len(tds) == 11:
                 if self._recurseUntilString(tds[1]) is not None:
+                    time_string = self._recurseUntilString(tds[0])
                     red_teams = ["frc" + self._recurseUntilString(tds[3]), "frc" + self._recurseUntilString(tds[4]), "frc" + self._recurseUntilString(tds[5])]
                     blue_teams = ["frc" + self._recurseUntilString(tds[6]), "frc" + self._recurseUntilString(tds[7]), "frc" + self._recurseUntilString(tds[8])]
                     
@@ -106,7 +109,7 @@ class UsfirstMatchesParser(ParserBase):
                                 "score": blue_score
                             }
                         }
-                        
+
                         # Don't write down uncompleted elimination matches
                         if (red_score > -1 and blue_score > -1):
                             matches.append({
@@ -115,6 +118,7 @@ class UsfirstMatchesParser(ParserBase):
                                 "match_number": match_number_info["match_number"],
                                 "set_number": match_number_info["set_number"],
                                 "team_key_names": red_teams + blue_teams,
+                                "time_string": time_string
                             })
 
                     except Exception, detail:
