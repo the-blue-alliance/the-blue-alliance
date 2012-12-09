@@ -2,7 +2,7 @@
 
 {% block title %}{{event.name}} ({{event.year}}) - The Blue Alliance{% endblock %}
 
-{% block meta_description %}Match results and for the {{event.year}} {{event.name}} FIRST Robotics Competition in {{event.location}}.{% endblock %}
+{% block meta_description %}Videos and match results for the {{event.year}} {{event.name}} FIRST Robotics Competition in {{event.location}}.{% endblock %}
 
 {% block more_head_tags %}
     <!-- Tablecloth CSS file to make the sortable Rankings table look Bootstrap-esque -->
@@ -14,7 +14,7 @@
     <meta property="og:type" content="article" />
     <meta property="og:url" content="http://thebluealliance.com/event/{{event.key_name}}" />
     <meta property="og:image" content="http://www.thebluealliance.com/images/logo_square_200.png" />
-    <meta property="og:description" content="The {{event.year}} {{event.name}} FIRST Robotics Competition in {{event.location}}."/>
+    <meta property="og:description" content="Videos and match results for the {{event.year}} {{event.name}} FIRST Robotics Competition in {{event.location}}."/>
     <meta property="og:site_name" content="The Blue Alliance" />
     <meta property="og:location" content="{{event.location}}" />
     {% if event.start_date %}<meta property="og:start_time" content="{{event.start_date|date:"Y-m-d"}}" />
@@ -26,108 +26,108 @@
 {% block content %}
 
 <div class="container">
-	<p><a href="/events/{{event.year}}"><i class="icon-chevron-left"></i> {{event.year}} Events</a></p>
+    <p><a href="/events/{{event.year}}"><i class="icon-chevron-left"></i> {{event.year}} Events</a></p>
 
-	<h1>{{event.name}} {{event.year}}</h1>
+    <h1>{{event.name}} {{event.year}}</h1>
 
-	<div class="row">
-		<div class="span8">
-			<p>
-				{% if event.start_date %}<i class="icon-calendar"></i> {{ event.start_date|date:"M jS" }} to {{ event.end_date|date:"M jS, Y" }}{% endif %}
-				{% if event.location %}{% if not event.start_date %}<i class="icon-map-marker"></i>{% endif %} in <a href="http://maps.google.com/maps?q={{ event.location }}">{{ event.location }}</a><br />{% endif %}
-				{% if event.website %}<i class="icon-globe"></i> <a href="{{ event.website }}" title="{{ event.name }}">{{ event.website }}</a>{% endif %}
-				{% if event.official %}{% if not event.website %}<i class="icon-info-sign"></i>{% else %} - {% endif %} details on <a href="https://my.usfirst.org/myarea/index.lasso?page=teamlist&event_type=FRC&sort_teams=number&year={{ event.year }}&event={{ event.event_short }}">usfirst.org</a><br />{% endif %}
-				{% if event.facebook_eid %}<i class="icon-thumbs-up"></i> <a href="{{ event.facebook_event_url }}" title="Facebook Event">RSVP on Facebook</a><br />{% endif %}
-			</p>
+    <div class="row">
+        <div class="span8">
+            <p>
+                {% if event.start_date %}<i class="icon-calendar"></i> {{ event.start_date|date:"M jS" }} to {{ event.end_date|date:"M jS, Y" }}{% endif %}
+                {% if event.location %}{% if not event.start_date %}<i class="icon-map-marker"></i>{% endif %} in <a href="http://maps.google.com/maps?q={{ event.location|urlencode }}">{{ event.location }}</a><br />{% endif %}
+                {% if event.website %}<i class="icon-globe"></i> <a href="{{ event.website }}" title="{{ event.name }}">{{ event.website }}</a>{% endif %}
+                {% if event.official %}{% if not event.website %}<i class="icon-info-sign"></i>{% else %} - {% endif %} details on <a href="https://my.usfirst.org/myarea/index.lasso?page=teamlist&amp;event_type=FRC&amp;sort_teams=number&amp;year={{ event.year }}&amp;event={{ event.event_short }}">usfirst.org</a><br />{% endif %}
+                {% if event.facebook_eid %}<i class="icon-thumbs-up"></i> <a href="{{ event.facebook_event_url }}" title="Facebook Event">RSVP on Facebook</a><br />{% endif %}
+            </p>
 
-			<p><strong>#frc{{ event.event_short }}</strong> <small><a href="/hashtags" rel="tooltip" title="What are hashtags?">?</a></small> - Search
-		        <a class="hashtag-link hashtag-twitter" href="https://twitter.com/search/%23frc{{ event.event_short }}" target="_blank" title="Search Twitter">Twitter</a> &middot;
-		        <a class="hashtag-link hashtag-youtube" href="http://www.youtube.com/results?search_query=%23frc{{ event.event_short }}+OR+%22{{ event.name }}%22" target="_blank" title="Search YouTube">YouTube</a> &middot;
-		        <a class="hashtag-link hashtag-cd" href="http://www.chiefdelphi.com/media/photos/tags/frc{{ event.event_short }}" target="_blank" title="Search Chief Delphi">Chief Delphi</a> &middot;
-		        <a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23frc{{ event.event_short }}" target="_blank" title="Search Flickr">Flickr</a>
-		  </p>
-		</div>
-		<div class="span4">
-		  {% if event.now and event.webcast%}
-		  <a class="btn btn-large btn-success hidden-phone" href="{{event.gameday_url}}"><i class="icon-facetime-video icon-white"></i> Watch now on GameDay!</a>
-		  {% endif %}
-		</div>
-	</div>
+            <p><strong>#frc{{ event.event_short }}</strong> <small><a href="/hashtags" rel="tooltip" title="What are hashtags?">?</a></small> - Search
+                <a class="hashtag-link hashtag-twitter" href="https://twitter.com/search/%23frc{{ event.event_short }}" target="_blank" title="Search Twitter">Twitter</a> &middot;
+                <a class="hashtag-link hashtag-youtube" href="http://www.youtube.com/results?search_query=%23frc{{ event.event_short }}+OR+%22{{ event.name|urlencode }}%22" target="_blank" title="Search YouTube">YouTube</a> &middot;
+                <a class="hashtag-link hashtag-cd" href="http://www.chiefdelphi.com/media/photos/tags/frc{{ event.event_short }}" target="_blank" title="Search Chief Delphi">Chief Delphi</a> &middot;
+                <a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23frc{{ event.event_short }}" target="_blank" title="Search Flickr">Flickr</a>
+          </p>
+        </div>
+        <div class="span4">
+          {% if event.now and event.webcast%}
+          <a class="btn btn-large btn-success hidden-phone" href="{{event.gameday_url}}"><i class="icon-facetime-video icon-white"></i> Watch now on GameDay!</a>
+          {% endif %}
+        </div>
+    </div>
 
-	<ul class="nav nav-tabs nav-stacked-phone">
-	    {% if matches.num > 0 %}<li class="active"><a href="#results" data-toggle="tab">Results</a></li>{% endif %}
+    <ul class="nav nav-tabs nav-stacked-phone">
+        {% if matches.num > 0 %}<li class="active"><a href="#results" data-toggle="tab">Results</a></li>{% endif %}
         {% if event.rankings %}<li><a href="#rankings" data-toggle="tab">Rankings</a></li>{% endif %}
          {% if awards.list %}<li><a href="#awards" data-toggle="tab">Awards</a></li>{% endif %}
         <li class="{% if matches.num == 0 %}active{% endif %}"><a href="#teams" data-toggle="tab">Teams</a></li>
-	</ul>
+    </ul>
 
-	<div class="tab-content">
+    <div class="tab-content">
         {% if matches.num > 0 %}
-	    <div class="tab-pane active" id="results">
+        <div class="tab-pane active" id="results">
             <div class="row">
-    		    {% if matches.qm %}
-    	        <div class="span6">
-        			<h3>Qualification Match Results</h3>
-        	        {% include "match_partials/qual_match_table.html" %}
-    	        </div>
-    		    {% endif %}
+                {% if matches.qm %}
+                <div class="span6">
+                    <h3>Qualification Match Results</h3>
+                    {% include "match_partials/qual_match_table.html" %}
+                </div>
+                {% endif %}
 
-    		    {% if matches.ef or matches.qf or matches.sf or matches.f %}
-    		    <div class="span6">
-    			    <h3>Elimination Match Results</h3>
-    	        	{% include "match_partials/elim_match_table.html" %}
+                {% if matches.ef or matches.qf or matches.sf or matches.f %}
+                <div class="span6">
+                    <h3>Elimination Match Results</h3>
+                    {% include "match_partials/elim_match_table.html" %}
 
-    			    {% if matches.qm %}
-    				    {% if matches.qf or matches.sf or matches.f %}
-    				        <h3>Elimination Bracket</h3>
-    				        {% include "bracket_partials/bracket_table.html" %}
-    				    {% endif %}
+                    {% if matches.qm %}
+                        {% if matches.qf or matches.sf or matches.f %}
+                            <h3>Elimination Bracket</h3>
+                            {% include "bracket_partials/bracket_table.html" %}
+                        {% endif %}
 
-    			        {% if oprs|length > 0 %}
-    	                <h3>OPRs - Top 15 (<a href="/opr">?</a>)</h3>
-    		            <table class="table table-condensed table-striped table-center">
-    		                <tr>
-    		                    <th>Team</th>
-    		                    <th>OPR</th>
-    		                </tr>
-    		                {% for opr,opr_team in oprs %}
-    		                <tr>
-    		                    <td><a href="/team/{{ opr_team }}">{{ opr_team }}</a></td>
-    		                    <td>{{ opr|floatformat:2 }}</td>
-    		                </tr>
-    		                {% endfor %}
-    		            </table>
-    			        {% endif %}
-    		        {% endif %}
-    	    	</div>
-    		    {% endif %}
+                        {% if oprs|length > 0 %}
+                        <h3>OPRs - Top 15 (<a href="/opr">?</a>)</h3>
+                        <table class="table table-condensed table-striped table-center">
+                            <tr>
+                                <th>Team</th>
+                                <th>OPR</th>
+                            </tr>
+                            {% for opr,opr_team in oprs %}
+                            <tr>
+                                <td><a href="/team/{{ opr_team }}">{{ opr_team }}</a></td>
+                                <td>{{ opr|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                {% endif %}
 
-    		    {% if not matches.qm %}
-    		    <div class="span6">
-    		        {% if matches.qf or matches.sf or matches.f %}
+                {% if not matches.qm %}
+                <div class="span6">
+                    {% if matches.qf or matches.sf or matches.f %}
                     <h3>Elimination Bracket</h3>
                     {% include "bracket_partials/bracket_table.html" %}
                     {% endif %}
 
-    				{% if oprs|length > 0 %}
+                    {% if oprs|length > 0 %}
                     <h3>OPRs - Top 15 (<a href="/opr" rel="tooltip" title="What are Offensive Power Rankings?">?</a>)</h3>
-    		        <table class="table table-condensed table-striped table-center">
-    		            <tr>
-    		                <th>Team</th>
-    		                <th>OPR</th>
-    		            </tr>
-    		            {% for opr,opr_team in oprs %}
-    		            <tr>
-    		                <td><a href="/team/{{ opr_team }}">{{ opr_team }}</a></td>
-    		                <td>{{ opr|floatformat:2 }}</td>
-    		            </tr>
-    		            {% endfor %}
-    		        </table>
-    		        {% endif %}
-    			</div>
-    		    {% endif %}
-    	    </div>
-        <i class="icon-barcode"></i> <a href="http://www.thebluealliance.com/event/{{ event.key_name }}/feed"> matches in rss</a>
+                    <table class="table table-condensed table-striped table-center">
+                        <tr>
+                            <th>Team</th>
+                            <th>OPR</th>
+                        </tr>
+                        {% for opr,opr_team in oprs %}
+                        <tr>
+                            <td><a href="/team/{{ opr_team }}">{{ opr_team }}</a></td>
+                            <td>{{ opr|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            <i class="icon-barcode"></i> <a href="http://www.thebluealliance.com/event/{{ event.key_name }}/feed"> matches in rss</a>
         </div>
         {% endif %}
 
@@ -135,136 +135,137 @@
         <div class="tab-pane" id="rankings">
             <div class="row">
                 <div class="span8 offset2">
-                <p>Data from <a href="http://www2.usfirst.org/{{event.year}}comp/events/{{event.event_short}}/rankings.html" target="_blank">
-                    <em>FIRST</em>'s event page</a>.</p>
-                <table class="table table-striped table-condensed table-center tablesorter" id="rankingsTable">
-                <thead>
-                	<tr>
-                    {% for element in event.rankings.0 %}
-                            <th>{{ element }}</th>
-                    {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
-                {% for row in event.rankings %}
-                    {% if not forloop.first %}
-                    <tr>
-                    {% for element in row %}
-                        <td>
-                            {{ element }}
-                        </td>
-                    {% endfor %}
-                    </tr>
-                    {% endif %}
-                {% endfor %}
-                </tbody>
-                </table>
-    			</div>
+                    <p>Data from <a href="http://www2.usfirst.org/{{event.year}}comp/events/{{event.event_short}}/rankings.html" target="_blank"> <em>FIRST</em>'s event page</a>.</p>
+                    <table class="table table-striped table-condensed table-center tablesorter" id="rankingsTable">
+                        <thead>
+                            <tr>
+                            {% for element in event.rankings.0 %}
+                                    <th>{{ element }}</th>
+                            {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in event.rankings %}
+                            {% if not forloop.first %}
+                            <tr>
+                                {% for element in row %}
+                                <td>
+                                    {{ element }}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
         {% endif %}
 
-	    <div class="tab-pane {% if matches.num == 0 %}active{% endif %}" id="teams">
-		  <div class="row-fluid">
-	        {% if teams_a %}
-	        <div class="span6">
-				<table class="table table-striped table-condensed table-center team-table">
-			  		<tbody>
-			  			<tr><th>Team Number</th><th>Team Name</th><th>Location</th></tr>
-			  			{% for team in teams_a %}
-			  			<tr>
-			  				<td><a class="team_table" href="/team/{{ team.team_number }}">{{ team.team_number }}</a></td>
-			  				<td><a href="/team/{{ team.team_number }}">{% if team.nickname %}{{ team.nickname }}{% else %}--{% endif %}</a></td>
-			  				<td>{% if team.address %}{{ team.address }}{% else %}--{% endif %}</td>
-			  			</tr>
-	      			    {% endfor %}
-			  		</tbody>
-			  	</table>
-			</div>
-	        {% else %}
-	        <p>No teams yet.</p>
-	        {% endif %}
-
-	        {% if teams_b %}
-	        <div class="span6">
-				<table class="table table-striped table-condensed table-center team-table">
-			  		<tbody>
-			  			<tr><th>Team Number</th><th>Team Name</th><th>Location</th></tr>
-			  			{% for team in teams_b %}
-			  			<tr>
-			  				<td><a class="team_table" href="/team/{{ team.team_number }}">{{ team.team_number }}</a></td>
-			  				<td><a href="/team/{{ team.team_number }}">{% if team.nickname %}{{ team.nickname }}{% else %}--{% endif %}</a></td>
-			  				<td>{% if team.address %}{{ team.address }}{% else %}--{% endif %}</td>
-			  			</tr>
-	      			    {% endfor %}
-			  		</tbody>
-			  	</table>
-			</div>
-	        {% endif %}
-		  </div>
-		  </div>
-		  {% if awards.list %}
-			<div class="tab-pane" id="awards">
-				<div class="row">
-				<div class="span8 offset2">
-				<table class="table table-striped table-condensed table-hover">
-			  		<tbody>
-			  			<tr><th>Award</th><th>Winner</th></tr>
-			  			{% for award in awards.list %}
-			  			<tr>
-			  				<td>{{award.official_name}}</td>
-							<td>
-							{% if award.awardee %}
-							  {{ award.awardee }}
-							  {% if award.team %}(<a href="/team/{{award.team.id|slice:"3:"}}">{{award.team.id|slice:"3:"}}</a>){% endif %}
-							{% else %}
-							  {% if award.team %}
-							    <a href="/team/{{award.team.id|slice:"3:"}}">{{award.team.id|slice:"3:"}}</a>
-							  {% else %}
-							    --
-						      {% endif %}
-							{% endif %}
-							</td>
-			  			</tr>
-	      			{% endfor %}
-			  		</tbody>
-			  	</table>
-				</div>
-				</div>
-			</div>
-			{% endif %}
-		</div>
-	</div> <!-- end tab-content -->
-</div><!-- end container -->
+        <div class="tab-pane {% if matches.num == 0 %}active{% endif %}" id="teams">
+            <div class="row-fluid">
+                {% if teams_a %}
+                <div class="span6">
+                    <table class="table table-striped table-condensed table-center team-table">
+                        <tbody>
+                            <tr><th>Team Number</th><th>Team Name</th><th>Location</th></tr>
+                            {% for team in teams_a %}
+                            <tr>
+                                <td><a class="team_table" href="/team/{{ team.team_number }}">{{ team.team_number }}</a></td>
+                                <td><a href="/team/{{ team.team_number }}">{% if team.nickname %}{{ team.nickname }}{% else %}--{% endif %}</a></td>
+                                <td>{% if team.address %}{{ team.address }}{% else %}--{% endif %}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p>No teams yet.</p>
+                {% endif %}
+                {% if teams_b %}
+                <div class="span6">
+                    <table class="table table-striped table-condensed table-center team-table">
+                        <tbody>
+                            <tr><th>Team Number</th><th>Team Name</th><th>Location</th></tr>
+                            {% for team in teams_b %}
+                            <tr>
+                                <td><a class="team_table" href="/team/{{ team.team_number }}">{{ team.team_number }}</a></td>
+                                <td><a href="/team/{{ team.team_number }}">{% if team.nickname %}{{ team.nickname }}{% else %}--{% endif %}</a></td>
+                                <td>{% if team.address %}{{ team.address }}{% else %}--{% endif %}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if awards.list %}
+        <div class="tab-pane" id="awards">
+            <div class="row">
+                <div class="span8 offset2">
+                    <table class="table table-striped table-condensed table-hover">
+                        <tbody>
+                            <tr>
+                                <th>Award</th>
+                                <th>Winner</th>
+                            </tr>
+                            {% for award in awards.list %}
+                            <tr>
+                                <td>{{award.official_name}}</td>
+                                <td>
+                                {% if award.awardee %}
+                                    {{ award.awardee }}
+                                    {% if award.team %}(<a href="/team/{{award.team.id|slice:"3:"}}">{{award.team.id|slice:"3:"}}</a>){% endif %}
+                                {% else %}
+                                    {% if award.team %}
+                                    <a href="/team/{{award.team.id|slice:"3:"}}">{{award.team.id|slice:"3:"}}</a>
+                                    {% else %}
+                                    --
+                                    {% endif %}
+                                {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
 
 <!-- Javascript call when the page is ready to make the Rankings table sortable -->
 <script src="/javascript/jquery.tablesorter.min.js"></script>
 <script>
-	$(document).ready(function(){
+    $(document).ready(function(){
         // add parser through the tablesorter addParser method
         $.tablesorter.addParser({
-	        // set a unique id
-	        id: 'wlt',
-	        is: function(s) {
-	        // return false so this parser is not auto detected
-	            return false;
-	        },
-	        format: function(s) {
-	            // format your data for normalization
-	            s = parseFloat(s);
-	        return s;
-	        },
-	        // set type, either numeric or text
-	        type: 'numeric'
+            // set a unique id
+            id: 'wlt',
+            is: function(s) {
+            // return false so this parser is not auto detected
+                return false;
+            },
+            format: function(s) {
+                // format your data for normalization
+                s = parseFloat(s);
+            return s;
+            },
+            // set type, either numeric or text
+            type: 'numeric'
         });
-		$("#rankingsTable").tablesorter({
-			headers: {
-				7: { sorter:'wlt' }
-			},
-			sortList: [[0,0]],
-			textExtraction:'complex'
-		});
-	});
+        $("#rankingsTable").tablesorter({
+            headers: {
+                7: { sorter:'wlt' }
+            },
+            sortList: [[0,0]],
+            textExtraction:'complex'
+        });
+    });
 </script>
 {% endblock %}
 
