@@ -8,8 +8,8 @@ from models.team import Team
 
 CHAMPIONSHIP_EVENTS = set(['arc', 'cur', 'gal', 'new', 'ein', 'cmp'])
 CHAMPIONSHIP_EVENTS_LABEL = 'Championship Event'
-REGIONAL_EVENTS_LABEL = 'Week {} Events'
-OFFSEASON_EVENTS_LABEL = 'Offseason Events'
+REGIONAL_EVENTS_LABEL = 'Week {}'
+OFFSEASON_EVENTS_LABEL = 'Offseason'
 
 
 class EventHelper(object):

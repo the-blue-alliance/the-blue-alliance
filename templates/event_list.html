@@ -8,7 +8,6 @@
 
 {% block content %}
 <div class="container">
-	<h1 class="end_header">{{ events|length }} Events in {{selected_year}}</h1>
 	  <div class="row">
 	  	<div class="span2 year_list">
 			<div class="btn-group visible-phone">
@@ -29,28 +28,25 @@
 			</ul>
 	  	</div>
 		<div class="span10">
+			<h1 class="end_header">{{selected_year}} FIRST Robotics Competition Events {% if events|length > 0 %}<small>{{ events|length }} Events</small>{% endif %}</h1>
 			{% if show_upcoming %}
 				<h2>Upcoming Events</h2>
 	        	{% for event in upcoming_events %}
 					{% include "event_partials/event_block.html" %}
 	        	{% empty %}
-	        		<div class="no_events">
-		    	    	<p>There are no upcoming events.</p>
-		    	    	<p>If you have an offseason event, <a href="/contact">tell us about it</a>!</p>
-	        		</div>
+		    	    <p>There are no upcoming events.</p>
+		    	    <p>If you have an offseason event, <a href="/contact">tell us about it</a>!</p>
 	        	{% endfor %}
-	        	<h2>All Events</h2>
 	        {% endif %}
 	        
 	    	{% if week_events %}
-	    	    <h3>Jump</h3>
-        	    <ul class="nav nav-pills nav-stacked-phone">
+	    	    <ul class="nav nav-pills nav-stacked-phone">
 	    	        {% for label, events in week_events.items %}
 	    	            <li><a class="btn smooth-scroll" href="#{{label|slugify}}">{{ label }}</a></li>
 	    	        {% endfor %}
 	    	    </ul>
 			    {% for label, events in week_events.items %}
-			        <h3 id="{{label|slugify}}">{{ label }}</h3>
+			        <h2 id="{{label|slugify}}">{{ label }} <small>{{events|length}} Events</small></h2>
 			        <div class="clearfix"></div>
 			        {% for event in events %}
 			    		{% include "event_partials/event_block.html" %}
