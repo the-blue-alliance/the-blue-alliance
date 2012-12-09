@@ -33,12 +33,11 @@
 	<div class="row">
 		<div class="span8">
 			<p>
-				{% if event.start_date %}<i class="icon-calendar"></i> {{ event.start_date|date:"M jS" }} to {{ event.end_date|date:"M jS, Y" }}<br />{% endif %}
-				{% if event.location %}<i class="icon-map-marker"></i> in <a href="http://maps.google.com/maps?q={{ event.location }}">{{ event.location }}</a><br />{% endif %}
-				{% if event.website %}<i class="icon-globe"></i> <a href="{{ event.website }}" title="{{ event.name }}">{{ event.website }}</a><br />{% endif %}
-				{% if event.official %}<i class="icon-info-sign"></i> <a href="https://my.usfirst.org/myarea/index.lasso?page=teamlist&event_type=FRC&sort_teams=number&year={{ event.year }}&event={{ event.event_short }}">details on usfirst.org</a><br />{% endif %}
+				{% if event.start_date %}<i class="icon-calendar"></i> {{ event.start_date|date:"M jS" }} to {{ event.end_date|date:"M jS, Y" }}{% endif %}
+				{% if event.location %}{% if not event.start_date %}<i class="icon-map-marker"></i>{% endif %} in <a href="http://maps.google.com/maps?q={{ event.location }}">{{ event.location }}</a><br />{% endif %}
+				{% if event.website %}<i class="icon-globe"></i> <a href="{{ event.website }}" title="{{ event.name }}">{{ event.website }}</a>{% endif %}
+				{% if event.official %}{% if not event.website %}<i class="icon-info-sign"></i>{% else %} - {% endif %} details on <a href="https://my.usfirst.org/myarea/index.lasso?page=teamlist&event_type=FRC&sort_teams=number&year={{ event.year }}&event={{ event.event_short }}">usfirst.org</a><br />{% endif %}
 				{% if event.facebook_eid %}<i class="icon-thumbs-up"></i> <a href="{{ event.facebook_event_url }}" title="Facebook Event">RSVP on Facebook</a><br />{% endif %}
-				<i class="icon-barcode"></i> <a href="http://www.thebluealliance.com/event/{{ event.key_name }}/feed"> matches in rss</a>
 			</p>
 
 			<p><strong>#frc{{ event.event_short }}</strong> <small><a href="/hashtags" rel="tooltip" title="What are hashtags?">?</a></small> - Search
@@ -63,109 +62,109 @@
 	</ul>
 
 	<div class="tab-content">
-    {% if matches.num > 0 %}
-	  <div class="tab-pane active" id="results">
+        {% if matches.num > 0 %}
+	    <div class="tab-pane active" id="results">
+            <div class="row">
+    		    {% if matches.qm %}
+    	        <div class="span6">
+        			<h3>Qualification Match Results</h3>
+        	        {% include "match_partials/qual_match_table.html" %}
+    	        </div>
+    		    {% endif %}
 
-		<div class="row">
-		{% if matches.qm %}
-		<div class="span6">
-			<h3>Qualification Match Results</h3>
-	        	{% include "match_partials/qual_match_table.html" %}
-		</div>
-		{% endif %}
+    		    {% if matches.ef or matches.qf or matches.sf or matches.f %}
+    		    <div class="span6">
+    			    <h3>Elimination Match Results</h3>
+    	        	{% include "match_partials/elim_match_table.html" %}
 
-		{% if matches.ef or matches.qf or matches.sf or matches.f %}
-		<div class="span6">
-			<h3>Elimination Match Results</h3>
-	        	{% include "match_partials/elim_match_table.html" %}
+    			    {% if matches.qm %}
+    				    {% if matches.qf or matches.sf or matches.f %}
+    				        <h3>Elimination Bracket</h3>
+    				        {% include "bracket_partials/bracket_table.html" %}
+    				    {% endif %}
 
-			{% if matches.qm %}
-				{% if matches.qf or matches.sf or matches.f %}
-				<h3>Elimination Bracket</h3>
-				{% include "bracket_partials/bracket_table.html" %}
-				{% endif %}
+    			        {% if oprs|length > 0 %}
+    	                <h3>OPRs - Top 15 (<a href="/opr">?</a>)</h3>
+    		            <table class="table table-condensed table-striped table-center">
+    		                <tr>
+    		                    <th>Team</th>
+    		                    <th>OPR</th>
+    		                </tr>
+    		                {% for opr,opr_team in oprs %}
+    		                <tr>
+    		                    <td><a href="/team/{{ opr_team }}">{{ opr_team }}</a></td>
+    		                    <td>{{ opr|floatformat:2 }}</td>
+    		                </tr>
+    		                {% endfor %}
+    		            </table>
+    			        {% endif %}
+    		        {% endif %}
+    	    	</div>
+    		    {% endif %}
 
-			    {% if oprs|length > 0 %}
-	            <h3>OPRs - Top 15 (<a href="/opr">?</a>)</h3>
-		        <table class="table table-condensed table-striped table-center">
-		            <tr>
-		                <th>Team</th>
-		                <th>OPR</th>
-		            </tr>
-		            {% for opr,opr_team in oprs %}
-		            <tr>
-		                <td><a href="/team/{{ opr_team }}">{{ opr_team }}</a></td>
-		                <td>{{ opr|floatformat:2 }}</td>
-		            </tr>
-		            {% endfor %}
-		        </table>
-			    {% endif %}
-		    {% endif %}
-		</div>
-		{% endif %}
+    		    {% if not matches.qm %}
+    		    <div class="span6">
+    		        {% if matches.qf or matches.sf or matches.f %}
+                    <h3>Elimination Bracket</h3>
+                    {% include "bracket_partials/bracket_table.html" %}
+                    {% endif %}
 
-		{% if not matches.qm %}
-		    <div class="span6">
-		        {% if matches.qf or matches.sf or matches.f %}
-	                <h3>Elimination Bracket</h3>
-	                {% include "bracket_partials/bracket_table.html" %}
-                {% endif %}
-
-				{% if oprs|length > 0 %}
-                <h3>OPRs - Top 15 (<a href="/opr" rel="tooltip" title="What are Offensive Power Rankings?">?</a>)</h3>
-		        <table class="table table-condensed table-striped table-center">
-		            <tr>
-		                <th>Team</th>
-		                <th>OPR</th>
-		            </tr>
-		            {% for opr,opr_team in oprs %}
-		            <tr>
-		                <td><a href="/team/{{ opr_team }}">{{ opr_team }}</a></td>
-		                <td>{{ opr|floatformat:2 }}</td>
-		            </tr>
-		            {% endfor %}
-		        </table>
-		        {% endif %}
-			</div>
-		{% endif %}
-	  </div>
-    </div>
-    {% endif %}
-
-    {% if event.rankings %}
-    <div class="tab-pane" id="rankings">
-        <div class="row">
-            <div class="span8 offset2">
-            <p>Data from <a href="http://www2.usfirst.org/{{event.year}}comp/events/{{event.event_short}}/rankings.html" target="_blank">
-                <em>FIRST</em>'s event page</a>.</p>
-            <table class="table table-striped table-condensed table-center tablesorter" id="rankingsTable">
-            <thead>
-            	<tr>
-                {% for element in event.rankings.0 %}
-                        <th>{{ element }}</th>
-                {% endfor %}
-                </tr>
-            </thead>
-            <tbody>
-            {% for row in event.rankings %}
-                {% if not forloop.first %}
-                <tr>
-                {% for element in row %}
-                    <td>
-                        {{ element }}
-                    </td>
-                {% endfor %}
-                </tr>
-                {% endif %}
-            {% endfor %}
-            </tbody>
-            </table>
-			</div>
+    				{% if oprs|length > 0 %}
+                    <h3>OPRs - Top 15 (<a href="/opr" rel="tooltip" title="What are Offensive Power Rankings?">?</a>)</h3>
+    		        <table class="table table-condensed table-striped table-center">
+    		            <tr>
+    		                <th>Team</th>
+    		                <th>OPR</th>
+    		            </tr>
+    		            {% for opr,opr_team in oprs %}
+    		            <tr>
+    		                <td><a href="/team/{{ opr_team }}">{{ opr_team }}</a></td>
+    		                <td>{{ opr|floatformat:2 }}</td>
+    		            </tr>
+    		            {% endfor %}
+    		        </table>
+    		        {% endif %}
+    			</div>
+    		    {% endif %}
+    	    </div>
+        <i class="icon-barcode"></i> <a href="http://www.thebluealliance.com/event/{{ event.key_name }}/feed"> matches in rss</a>
         </div>
-    </div>
-    {% endif %}
+        {% endif %}
 
-	  <div class="tab-pane {% if matches.num == 0 %}active{% endif %}" id="teams">
+        {% if event.rankings %}
+        <div class="tab-pane" id="rankings">
+            <div class="row">
+                <div class="span8 offset2">
+                <p>Data from <a href="http://www2.usfirst.org/{{event.year}}comp/events/{{event.event_short}}/rankings.html" target="_blank">
+                    <em>FIRST</em>'s event page</a>.</p>
+                <table class="table table-striped table-condensed table-center tablesorter" id="rankingsTable">
+                <thead>
+                	<tr>
+                    {% for element in event.rankings.0 %}
+                            <th>{{ element }}</th>
+                    {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                {% for row in event.rankings %}
+                    {% if not forloop.first %}
+                    <tr>
+                    {% for element in row %}
+                        <td>
+                            {{ element }}
+                        </td>
+                    {% endfor %}
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+                </tbody>
+                </table>
+    			</div>
+            </div>
+        </div>
+        {% endif %}
+
+	    <div class="tab-pane {% if matches.num == 0 %}active{% endif %}" id="teams">
 		  <div class="row-fluid">
 	        {% if teams_a %}
 	        <div class="span6">
@@ -235,8 +234,9 @@
 			</div>
 			{% endif %}
 		</div>
-	</div>
-</div>
+	</div> <!-- end tab-content -->
+</div><!-- end container -->
+
 <!-- Javascript call when the page is ready to make the Rankings table sortable -->
 <script src="/javascript/jquery.tablesorter.min.js"></script>
 <script>
