@@ -60,7 +60,7 @@ class EventHelper(object):
         return toReturn
     
     @classmethod
-    def getTeamWLTFromMatches(self, team_key, matches):
+    def calculateTeamWLTFromMatches(self, team_key, matches):
         """
         Given a team_key and some matches, find the Win Loss Tie.
         """
@@ -82,4 +82,4 @@ class EventHelper(object):
         Given a team_key, and an event, find the team's Win Loss Tie.
         """
         matches = Match.query(Match.event == event.key, Match.team_key_names == team_key).fetch(500)
-        return self.getTeamWLTFromMatches(team_key, matches)
+        return self.calculateTeamWLTFromMatches(team_key, matches)

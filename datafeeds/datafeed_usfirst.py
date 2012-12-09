@@ -121,7 +121,7 @@ class DatafeedUsfirst(DatafeedBase):
         awards = self.parse(url, UsfirstEventAwardsParser)
         
         return [Award(
-            id = Award.getKeyName(event.key_name, award.get('name')),
+            id = Award.renderKeyName(event.key_name, award.get('name')),
             name = award.get('name', None),
             team = _getTeamKey(award),
             awardee = award.get('awardee', None),
@@ -152,7 +152,7 @@ class DatafeedUsfirst(DatafeedBase):
         matches = self.parse(url, UsfirstMatchesParser)
 
         return [Match(
-            id = Match.getKeyName(
+            id = Match.renderKeyName(
                 event, 
                 match.get("comp_level", None), 
                 match.get("set_number", 0), 

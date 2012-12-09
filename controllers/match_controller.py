@@ -7,7 +7,6 @@ from google.appengine.ext.webapp import template
 
 import tba_config
 from base_controller import BaseHandler
-from helpers.tbavideo_helper import TBAVideoHelper
 from models.event import Event
 from models.match import Match
 
@@ -35,14 +34,9 @@ class MatchDetail(BaseHandler):
             if not match:
                 return self.redirect("/error/404")
             
-            tbavideo = None
-            if len(match.tba_videos) > 0:
-                tbavideo = TBAVideoHelper(match)
-            
             template_values = {
                 "event": event,
                 "match": match,
-                "tbavideo": tbavideo,
             }
             
             path = os.path.join(os.path.dirname(__file__), '../templates/match_details.html')

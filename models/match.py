@@ -2,6 +2,7 @@ import json
 
 from google.appengine.ext import ndb
 
+from helpers.tbavideo_helper import TBAVideoHelper
 from models.event import Event
 
 class Match(ndb.Model):
@@ -100,6 +101,7 @@ class Match(ndb.Model):
     
     def __init__(self, *args, **kw):
         self._alliances = None
+        self._tba_video = None
         self._winning_alliance = None
         super(Match, self).__init__(*args, **kw)
     
@@ -160,11 +162,18 @@ class Match(ndb.Model):
         return "/match/%s" % self.key_name
 
     @property
+    def tba_video(self):
+        if len(self.tba_videos) > 0:
+            if self._tba_video is None:
+                self._tba_video = TBAVideoHelper(self)
+        return self._tba_video
+
+    @property
     def name(self):
         return "%s" % (self.COMP_LEVELS_VERBOSE[self.comp_level])
 
     @classmethod
-    def getKeyName(self, event, comp_level, set_number, match_number):
+    def renderKeyName(self, event, comp_level, set_number, match_number):
         if comp_level == "qm":
             return "%s_qm%s" % (event.key_name, match_number)
         else:

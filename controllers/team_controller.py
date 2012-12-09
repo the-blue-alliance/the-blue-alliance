@@ -107,7 +107,7 @@ class TeamDetail(BaseHandler):
                 matches = e.team_matches_future.get_result()
                 matches_organized = MatchHelper.organizeMatches(matches)
 
-                wlt = EventHelper.getTeamWLTFromMatches(team.key_name, matches)
+                wlt = EventHelper.calculateTeamWLTFromMatches(team.key_name, matches)
                 year_wlt_list.append(wlt)
                 if wlt["win"] + wlt["loss"] + wlt["tie"] == 0:
                     display_wlt = None

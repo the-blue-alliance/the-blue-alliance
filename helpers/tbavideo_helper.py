@@ -1,5 +1,3 @@
-import logging
-
 class TBAVideoHelper(object):
     """
     Same interface as the retired TBAVideo class.
@@ -13,16 +11,19 @@ class TBAVideoHelper(object):
     def __init__(self, match):
         self.match = match
     
-    def getThumbnailPath(self):
-        return self._getBestPathOf(self.THUMBNAIL_FILETYPES)
+    @property
+    def thumbnail_path(self):
+        return self._best_path_of(self.THUMBNAIL_FILETYPES)
 
-    def getStreamablePath(self):
-        return self._getBestPathOf(self.STREAMABLE_FILETYPES)
+    @property
+    def streamable_path(self):
+        return self._best_path_of(self.STREAMABLE_FILETYPES)
     
-    def getDownloadablePath(self):
-        return self._getBestPathOf(self.DOWNLOADABLE_FILETYPES)
+    @property
+    def downloadable_path(self):
+        return self._best_path_of(self.DOWNLOADABLE_FILETYPES)
 
-    def _getBestPathOf(self, consider_filetypes):
+    def _best_path_of(self, consider_filetypes):
         for filetype in consider_filetypes:
             if filetype in self.match.tba_videos:
                 return self.TBA_NET_VID_PATTERN % (self.match.event_key_name, self.match.key_name, filetype)

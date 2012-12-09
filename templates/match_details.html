@@ -8,14 +8,14 @@
     <meta property="og:title" content="{{match.verbose_name}} - {{event.year}} {{event.name}}" />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="http://thebluealliance.com/match/{{match.key_name}}" />
-    {% if tbavideo.getThumbnailPath %}
-        <meta property="og:image" content="{{tbavideo.getThumbnailPath}}" />
+    {% if match.tba_video.thumbnail_path %}
+        <meta property="og:image" content="{{match.tba_video.thumbnail_path}}" />
     {% else %}
         <meta property="og:image" content="http://www.thebluealliance.com/images/logo_square_200.png" />
     {% endif %}
     <meta property="og:description" content="{{match.verbose_name}} at the {{event.year}} {{event.name}} FIRST Robotics Competition in {{event.location}}."/>
     <meta property="og:site_name" content="The Blue Alliance" />
-    {% if tbavideo.getStreamablePath %}<meta property="og:video" content="{{ tbavideo.getStreamablePath }}" />{% endif %}
+    {% if match.tba_video.streamable_path %}<meta property="og:video" content="{{ match.tba_video.steamable_path }}" />{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -41,13 +41,13 @@
 	</div>
 	<div class="row">
 		<div class="span6 offset3">
-        {% if tbavideo %}
+        {% if match.tba_video %}
             {% include "video_partials/tbavideo_player.html" %}
         {% endif %}
         {% for youtube_video in match.youtube_videos %}
             {% include "video_partials/youtube_video_player.html" %}
         {% endfor %}
-        {% if not tbavideo and not match.youtube_videos %}
+        {% if not match.tba_video and not match.youtube_videos %}
             <h3>Video</h3>
             <p>We don't know about any videos for this match yet. :(</p>
         {% endif %}

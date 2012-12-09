@@ -24,8 +24,8 @@ class Award(ndb.Model):
         """
         Returns the string of the key_name of the Award object before writing it.
         """
-        return self.getKeyName(self.event.id(), self.name)
+        return self.renderKeyName(self.event.id(), self.name)
 
     @classmethod
-    def getKeyName(self, event_id, name):
+    def renderKeyName(self, event_id, name):
         return str(event_id) + '_' + str(name)
