@@ -2,6 +2,7 @@ from datetime import datetime
 import logging
 import os
 
+from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
@@ -65,6 +66,11 @@ class AdminEventDelete(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
 
     def post(self, event_key_id):
+        logging.warning("Deleting %s at the request of %s / %s" % (
+            event_key_id,
+            users.get_current_user().user_id(),
+            users.get_current_user().email()))
+
         event = Event.get_by_id(event_key_id)
         
         matches = Match.query(Match.event == event.key).fetch(5000)
