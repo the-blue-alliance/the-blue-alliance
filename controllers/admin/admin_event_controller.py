@@ -1,6 +1,6 @@
 from datetime import datetime
-import os
 import logging
+import os
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
@@ -10,21 +10,42 @@ from helpers.event_manipulator import EventManipulator
 from models.award import Award
 from models.event import Event
 from models.team import Team
-
-class AdminEventList(webapp.RequestHandler):
+ 
+class AdminAwardEdit(webapp.RequestHandler):
     """
-    List all Events.
+    Edit an Award.
+    """
+    def get(self, award_key):
+        award = Award.get_by_id(award_key)
+                
+        template_values = {
+            "award": award
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/award_edit.html')
+        self.response.out.write(template.render(path, template_values))
+    
+    def post(self, award_key):
+        event_key_name = self.request.get('event_key_name')
+        award = Award(
+            id = award_key,
+            name = self.request.get('award_name'),
+            event = Event.get_by_id(event_key_name).key,
+            official_name = self.request.get('official_name'),
+            team = Team.get_by_id(self.request.get('team_key')).key,
+            awardee = self.request.get('awardee'),
+        )
+        award = AwardManipulator.createOrUpdate(award)
+        self.redirect("/admin/event/" + event_key_name)
+ 
+class AdminEventCreate(webapp.RequestHandler):
+    """
+    Create an Event. POSTs to AdminEventEdit.
     """
     def get(self):
-        events = Event.query().order(Event.year).order(Event.start_date).fetch(10000)
-        
-        template_values = {
-            "events": events,
-        }
-        
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_list.html')
-        self.response.out.write(template.render(path, template_values))
-        
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_create.html')
+        self.response.out.write(template.render(path, {}))
+
 class AdminEventDetail(webapp.RequestHandler):
     """
     Show an Event.
@@ -41,14 +62,6 @@ class AdminEventDetail(webapp.RequestHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_details.html')
         self.response.out.write(template.render(path, template_values))
-
-class AdminEventCreate(webapp.RequestHandler):
-    """
-    Create an Event. POSTs to AdminEventEdit.
-    """
-    def get(self):
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_create.html')
-        self.response.out.write(template.render(path, {}))
 
 class AdminEventEdit(webapp.RequestHandler):
     """
@@ -94,30 +107,17 @@ class AdminEventEdit(webapp.RequestHandler):
         event = EventManipulator.createOrUpdate(event)
         
         self.redirect("/admin/event/" + event.key_name)
-        
-class AdminAwardEdit(webapp.RequestHandler):
-    """
-    Edit an Award.
-    """
-    def get(self, award_key):
-        award = Award.get_by_id(award_key)
-                
-        template_values = {
-            "award": award
-        }
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/award_edit.html')
+class AdminEventList(webapp.RequestHandler):
+    """
+    List all Events.
+    """
+    def get(self):
+        events = Event.query().order(Event.year).order(Event.start_date).fetch(10000)
+        
+        template_values = {
+            "events": events,
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_list.html')
         self.response.out.write(template.render(path, template_values))
-    
-    def post(self, award_key):
-        event_key_name = self.request.get('event_key_name')
-        award = Award(
-            id = award_key,
-            name = self.request.get('award_name'),
-            event = Event.get_by_id(event_key_name).key,
-            official_name = self.request.get('official_name'),
-            team = Team.get_by_id(self.request.get('team_key')).key,
-            awardee = self.request.get('awardee'),
-        )
-        award = AwardManipulator.createOrUpdate(award)
-        self.redirect("/admin/event/" + event_key_name)
