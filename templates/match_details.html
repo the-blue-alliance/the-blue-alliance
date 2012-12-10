@@ -20,27 +20,28 @@
 
 {% block content %}
 <div class="container">
-	<div class="row">
-		<div class="span6 offset3">
-			<h1>{{match.verbose_name}} <small><a href="/event/{{event.key_name}}">{{ event.year }} {{ event.name }}</a></small></h1>
-			<table class="matchTable">
-	            <tr class="key">
-	                <th colspan="{{match.alliances.items.0.1.teams|length}}">Teams</th>
-	                <th>Score</th>
-	            </tr>
-	            {% for items in match.alliances.items reversed %}
-	            <tr>
-	                {% for team in items.1.teams %}
-	                    <td class="{{ items.0 }}{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}"><a href="/team/{{ team|slice:"3:" }}">{{ team|slice:"3:" }}</a></td>
-	                {% endfor %}
-	                <td class="{{items.0}}Score{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}">{% ifequal items.1.score "-1" %}?{% else %}{{ items.1.score }}{% endifequal %}</td>
-	            </tr>
-	            {% endfor %}
-			</table>
-		</div>
-	</div>
-	<div class="row">
-		<div class="span6 offset3">
+    <div class="row">
+        <div class="span6 offset3">
+            <p><a class="btn" href="/event/{{event.key_name}}"><i class="icon-chevron-left"></i> {{ event.year }} {{ event.name }}</a></p>
+            <h1>{{match.verbose_name}} <small><a href="/event/{{event.key_name}}">{{ event.year }} {{ event.name }}</a></small></h1>
+            <table class="matchTable">
+                <tr class="key">
+                    <th colspan="{{match.alliances.items.0.1.teams|length}}">Teams</th>
+                    <th>Score</th>
+                </tr>
+                {% for items in match.alliances.items reversed %}
+                <tr>
+                    {% for team in items.1.teams %}
+                        <td class="{{ items.0 }}{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}"><a href="/team/{{ team|slice:"3:" }}">{{ team|slice:"3:" }}</a></td>
+                    {% endfor %}
+                    <td class="{{items.0}}Score{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}">{% ifequal items.1.score "-1" %}?{% else %}{{ items.1.score }}{% endifequal %}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="span6 offset3">
         {% if match.tba_video %}
             {% include "video_partials/tbavideo_player.html" %}
         {% endif %}
@@ -55,8 +56,8 @@
             <a class="btn btn-primary" href="http://www.youtube.com/results?search_query={{match.verbose_name}}+{{event.year}}+{{event.name}}" target="_blank"><i class="icon-search icon-white"></i> Search YouTube</a> 
             <a class="btn" href="/contact"><i class="icon-plus"></i> Tell us about a video</a>
         </p>
-		</div>
-	</div>
+        </div>
+    </div>
 
     <div class="row">
         <div class="span6 offset3">
