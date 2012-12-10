@@ -31,21 +31,21 @@ class OffseasonMatchesParser(ParserBase):
         for i in range(len(row)):
             row[i] = row[i].strip()
         
+        team_key_names = []
+        
         red_teams = [red_1, red_2, red_3]
-        red_team_keys = []
         red_team_strings = []
         for team in red_teams:
             red_team_strings.append('frc' + team.upper())
             if team.isdigit():
-                red_team_keys.append('frc' + team.upper())
+                team_key_names.append('frc' + team.upper())
                 
         blue_teams = [blue_1, blue_2, blue_3]
-        blue_team_keys = []
         blue_team_strings = []
         for team in blue_teams:
             blue_team_strings.append('frc' + team.upper())
             if team.isdigit():
-                blue_team_keys.append('frc' + team.upper())
+                team_key_names.append('frc' + team.upper())
                         
         if not red_score:
             red_score = -1
@@ -68,7 +68,7 @@ class OffseasonMatchesParser(ParserBase):
                  "comp_level": comp_level,
                  "match_number": match_number,
                  "set_number": set_number,
-                 "team_key_names": red_team_keys + blue_team_keys}
+                 "team_key_names": team_key_names}
                             
         return match
     
