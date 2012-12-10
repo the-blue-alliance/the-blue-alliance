@@ -71,7 +71,9 @@ class Event(ndb.Model):
 
     @property
     def now(self):
-        if datetime.datetime.today().date() >= self.start_date.date()and datetime.datetime.today().date() <= self.end_date.date():
+        if not self.start_date or not self.end_date:
+            return False
+        if datetime.datetime.today().date() >= self.start_date.date() and datetime.datetime.today().date() <= self.end_date.date():
             return True
         else:
             return False
