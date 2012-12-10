@@ -13,6 +13,9 @@ from controllers.match_controller import MatchDetail
 from controllers.team_controller import TeamList, TeamDetail
 from controllers.ajax_controller import TypeaheadHandler, WebcastHandler
 
+from google.appengine.ext.webapp import template
+template.register_template_library('common.my_filters')
+
 
 landing_handler = {False: MainHandler,
                    True: KickoffHandler}
