@@ -31,9 +31,22 @@ class OffseasonMatchesParser(ParserBase):
         for i in range(len(row)):
             row[i] = row[i].strip()
         
-        red_teams = ["frc" + red_1, "frc" + red_2, "frc" + red_3]
-        blue_teams = ["frc" + blue_1, "frc" + blue_2, "frc" + blue_3]
-        
+        red_teams = [red_1, red_2, red_3]
+        red_team_keys = []
+        red_team_strings = []
+        for team in red_teams:
+            red_team_strings.append('frc' + team.upper())
+            if team.isdigit():
+                red_team_keys.append('frc' + team.upper())
+                
+        blue_teams = [blue_1, blue_2, blue_3]
+        blue_team_keys = []
+        blue_team_strings = []
+        for team in blue_teams:
+            blue_team_strings.append('frc' + team.upper())
+            if team.isdigit():
+                blue_team_keys.append('frc' + team.upper())
+                        
         if not red_score:
             red_score = -1
         else:
@@ -46,16 +59,16 @@ class OffseasonMatchesParser(ParserBase):
             
         comp_level, match_number, set_number = self.parseMatchNumberInfo(match_id)
             
-        alliances = {"red": {"teams": red_teams,
+        alliances = {"red": {"teams": red_team_strings,
                              "score": red_score},
-                     "blue": {"teams": blue_teams,
+                     "blue": {"teams": blue_team_strings,
                               "score": blue_score}}
         
         match = {"alliances_json": json.dumps(alliances),
                  "comp_level": comp_level,
                  "match_number": match_number,
                  "set_number": set_number,
-                 "team_key_names": red_teams + blue_teams}
+                 "team_key_names": red_team_keys + blue_team_keys}
                             
         return match
     
