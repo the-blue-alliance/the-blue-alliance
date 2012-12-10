@@ -68,8 +68,6 @@ class EventHelper(object):
         
         for match in matches:
             if match.has_been_played and match.winning_alliance != None:
-                logging.info(match)
-                logging.info(match.winning_alliance)
                 if match.winning_alliance == "":
                     wlt["tie"] += 1
                 elif team_key in match.alliances[match.winning_alliance]["teams"]:
