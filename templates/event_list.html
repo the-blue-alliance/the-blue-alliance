@@ -28,7 +28,7 @@
 			</ul>
 	  	</div>
 		<div class="span10">
-			<h1 class="end_header">{{selected_year}} FIRST Robotics Competition Events {% if events|length > 0 %}<small>{{ events|length }} Events</small>{% endif %}</h1>
+			<h1 class="end_header">{{selected_year}} <em>FIRST</em> Robotics Competition Events {% if events|length > 0 %}<small>{{ events|length }} Events</small>{% endif %}</h1>
 			{% if show_upcoming %}
 				<h2>Upcoming Events</h2>
 	        	{% for event in upcoming_events %}
