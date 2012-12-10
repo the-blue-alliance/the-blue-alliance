@@ -4,6 +4,8 @@
 
 {% block content %}
 
+<p class="pull-right"><a class="btn btn-danger btn-mini" href="/admin/event/delete/{{event.key_name}}"><i class="icon-trash icon-white"></i> Delete</a></p>
+
 <h1>Edit {{ event.key_name }}</h1>
 
 <form action="/admin/event/edit/{{event.key_name}}" method="post">

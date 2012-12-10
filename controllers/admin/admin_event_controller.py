@@ -7,8 +7,12 @@ from google.appengine.ext.webapp import template
 
 from helpers.award_manipulator import AwardManipulator
 from helpers.event_manipulator import EventManipulator
+from helpers.event_team_manipulator import EventTeamManipulator
+from helpers.match_manipulator import MatchManipulator
 from models.award import Award
 from models.event import Event
+from models.event_team import EventTeam
+from models.match import Match
 from models.team import Team
  
 class AdminAwardEdit(webapp.RequestHandler):
@@ -37,7 +41,7 @@ class AdminAwardEdit(webapp.RequestHandler):
         )
         award = AwardManipulator.createOrUpdate(award)
         self.redirect("/admin/event/" + event_key_name)
- 
+
 class AdminEventCreate(webapp.RequestHandler):
     """
     Create an Event. POSTs to AdminEventEdit.
@@ -45,6 +49,33 @@ class AdminEventCreate(webapp.RequestHandler):
     def get(self):
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_create.html')
         self.response.out.write(template.render(path, {}))
+
+class AdminEventDelete(webapp.RequestHandler):
+    """
+    Delete an Event.
+    """
+    def get(self, event_key_id):
+        event = Event.get_by_id(event_key_id)
+
+        template_values = {
+            "event": event
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_delete.html')
+        self.response.out.write(template.render(path, template_values))
+
+    def post(self, event_key_id):
+        event = Event.get_by_id(event_key_id)
+        
+        matches = Match.query(Match.event == event.key).fetch(5000)
+        MatchManipulator.delete(matches)
+
+        event_teams = EventTeam.query(EventTeam.event == event.key).fetch(5000)
+        EventTeamManipulator.delete(event_teams)
+
+        EventManipulator.delete(event)
+
+        self.redirect("/admin/events?deleted=%s" % event_key_id)
 
 class AdminEventDetail(webapp.RequestHandler):
     """
