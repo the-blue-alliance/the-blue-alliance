@@ -33,6 +33,7 @@ app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['kickoff'
                                ('/opr', OprHandler),
                                ('/search', SearchHandler),
                                ('/teams', TeamList),
+                               ('/teams/([0-9]*)', TeamList),
                                ('/team/([0-9]*)', TeamDetail),
                                ('/team/([0-9]*)/([0-9]*)', TeamDetail),
                                ('/thanks', ThanksHandler),
