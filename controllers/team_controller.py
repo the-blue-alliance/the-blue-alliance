@@ -20,13 +20,33 @@ from models.award import Award
 
 # The view of a list of teams.
 class TeamList(BaseHandler):
-    def get(self):
+    def get(self, page='0'):
+        if page.isdigit():
+            page = int(page)
+        if page == '':
+            page = 0
         
-        memcache_key = "team_list"
+        VALID_PAGES = [0, 1, 2, 3, 4]
+        if page not in VALID_PAGES:
+            return self.redirect("/error/404")
+        
+        memcache_key = "team_list_%s" % page
         html = memcache.get(memcache_key)
         
         if html is None:
-            teams = Team.query().order(Team.team_number).fetch(10000)        
+            page_labels = []
+            for curPage in VALID_PAGES:
+                if curPage == 0:
+                    label = '1-999'
+                else:
+                    label = "{}'s".format(curPage*1000)
+                page_labels.append(label)
+                if curPage == page:
+                    cur_page_label = label
+                                       
+            start = page * 1000
+            stop = start + 999
+            teams = Team.query().order(Team.team_number).filter(Team.team_number >= start).filter(Team.team_number < stop).fetch(10000)        
 
             num_teams = len(teams)
             middle_value = num_teams/2
@@ -38,6 +58,9 @@ class TeamList(BaseHandler):
                 "teams_a": teams_a,
                 "teams_b": teams_b,
                 "num_teams": num_teams,
+                "page_labels": page_labels,
+                "cur_page_label": cur_page_label,
+                "current_page": page
             }
         
             path = os.path.join(os.path.dirname(__file__), '../templates/team_list.html')
