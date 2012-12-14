@@ -1,27 +1,37 @@
 @insightsBlockHeight: 300px;
+@insightsBlockPadding: 8px;
 
 .insights_block {
     display: table;
     float: left;
-    padding: 8px;
+    padding: @insightsBlockPadding;
     .box-sizing(border-box);
 }
 
 .insights_content {
   height: @insightsBlockHeight;
   background-color: @grayLighter;
-  padding: 8px;
+  padding: @insightsBlockPadding;
   color: @textColor;
   border: 1px solid #ddd;
   .border-radius(4px);
   .box-shadow(0 1px 1px rgba(0,0,0,.075));
-  display: table-cell; 
   vertical-align: middle; 
   text-align: center; 
 }
 
 .insights_content_half {
   height: @insightsBlockHeight/2 - 17;
+  margin-bottom: @insightsBlockPadding*2;
+}
+
+.insights_content_third {
+  height: @insightsBlockHeight/3 - 23;
+  margin-bottom: @insightsBlockPadding*2;
+}
+
+.insights_content_last {
+  margin-bottom: 0;
 }
 
 @media (min-width: 1200px) {

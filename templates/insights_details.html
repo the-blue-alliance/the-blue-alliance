@@ -12,6 +12,28 @@
       <h4>Chairman's Award Winner</h4>
       <p>{{ ca_winner|slice:'3:' }}</p>
     </div>
+
+    <div class="insights_content insights_content_half insights_content_last">
+      <h4>Chairman's Award Winner</h4>
+      <p>{{ ca_winner|slice:'3:' }}</p>
+    </div>
+  </div>
+  
+  <div class="insights_block">
+    <div class="insights_content insights_content_third">
+      <h4>Chairman's Award Winner</h4>
+      <p>{{ ca_winner|slice:'3:' }}</p>
+    </div>
+
+    <div class="insights_content insights_content_third">
+      <h4>Chairman's Award Winner</h4>
+      <p>{{ ca_winner|slice:'3:' }}</p>
+    </div>
+
+    <div class="insights_content insights_content_third insights_content_last">
+      <h4>Chairman's Award Winner</h4>
+      <p>{{ ca_winner|slice:'3:' }}</p>
+    </div>
   </div>
   
   <div class="insights_block">
@@ -26,8 +48,20 @@
   </div>
   
   <div class="insights_block">
+    <div class="insights_content">
+      <h4>Top Regional/District Winners</h4>
+      {% for num_wins, team_list in regional_winners %}
+        {% if num_wins > 1 %}
+          <p>{{num_wins}}, {{team_list}}</p>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  
+  <div class="insights_block">
     <div class="insights_content insights_content_half">
-      <p>Hello4</p>
+      <h4>Highest Scoring Match</h4>
+      <p>--</p>
     </div>
   </div>
   
