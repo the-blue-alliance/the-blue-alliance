@@ -6,16 +6,64 @@
 
 {% block detailed_content %}
   <h1 class="end_header">{{selected_year}} Insights</h1>
+
+  <div class="insights_block">
+    <div class="insights_content insights_content_half">
+      <h4>Chairman's Award Winner</h4>
+      <p>{{ ca_winner|slice:'3:' }}</p>
+    </div>
+  </div>
   
-  <h2>Top Regional/District Winners</h2>
-  {{ regional_winners }}
+  <div class="insights_block">
+    <div class="insights_content">
+      <h4>Top Blue Banner Winners</h4>
+      {% for num_wins, team_list in blue_banners %}
+        {% if num_wins > 1 %}
+          <p>{{num_wins}}, {{team_list}}</p>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
   
+  <div class="insights_block">
+    <div class="insights_content insights_content_half">
+      <p>Hello4</p>
+    </div>
+  </div>
+  
+  <!-- 
+  <div class="row-fluid">
+    <div class="span4 well">
+      <h4>Chairman's Award Winner</h4>
+      <p>{{ ca_winner|slice:'3:' }}</p>
+    </div>
+  
+    <div class="span4 well">
+      <h4>Top Blue Banner Winners</h4>
+      {% for num_wins, team_list in blue_banners %}
+        {% if num_wins > 1 %}
+          <p>{{num_wins}}, {{team_list}}</p>
+        {% endif %}
+      {% endfor %}
+    </div>
+  
+    <div class="span4 well">
+      <h4>Top Regional/District Winners</h4>
+      {% for num_wins, team_list in regional_winners %}
+        {% if num_wins > 1 %}
+          <p>{{num_wins}}, {{team_list}}</p>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  -->
+
+  <!-- 
   <h2>Division Winners</h2>
   {{ division_winners }}
   
   <h2>Division Finalists</h2>
   {{ division_finalists }}
-  
   
   <h2>World Champions</h2>
   {{ world_champions }}
@@ -30,6 +78,10 @@
   {{ ca_winner }}
   
   <h2>Blue Banners</h2>
-  {{ blue_banners }}
-  
+  {% for num_wins, team_list in blue_banners %}
+    {% if num_wins > 1 %}
+      <p>{{num_wins}}, {{team_list}}</p>
+    {% endif %}
+  {% endfor %}
+   -->
 {% endblock %}

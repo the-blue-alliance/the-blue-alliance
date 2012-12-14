@@ -184,19 +184,29 @@ class InsightsDetail(BaseHandler):
                         blue_banners[teamKey] = 1
                     
             # Sorting
-            regional_winners = regional_winners.items()
-            regional_winners = sorted(regional_winners, key=lambda pair: int(pair[0][3:]))   # Sort by team number
-            regional_winners = sorted(regional_winners, key=lambda pair: pair[1], reverse=True) # Sort by wins; sort is stable, so order from previous sort is preserved
-            
+            regional_winners = sorted(regional_winners.items(), key=lambda pair: int(pair[0][3:]))   # Sort by team number
+            temp = {}
+            for team, numWins in regional_winners:
+                if numWins in temp:
+                    temp[numWins] += [team]
+                else:
+                    temp[numWins] = [team]
+            regional_winners = sorted(temp.items(), key=lambda pair: int(pair[0]), reverse=True)  # Sort by win number
+
             division_winners = sorted(division_winners, key=lambda team: int(team[3:]))
             division_finalists = sorted(division_finalists, key=lambda team: int(team[3:]))
             world_champions = sorted(world_champions, key=lambda team: int(team[3:]))
             world_finalists = sorted(world_finalists, key=lambda team: int(team[3:]))
             rca_winners = sorted(rca_winners, key=lambda team: int(team[3:]))
             
-            blue_banners = blue_banners.items()
-            blue_banners = sorted(blue_banners, key=lambda pair: int(pair[0][3:]))
-            blue_banners = sorted(blue_banners, key=lambda pair: pair[1], reverse=True)            
+            blue_banners = sorted(blue_banners.items(), key=lambda pair: int(pair[0][3:]))   # Sort by team number
+            temp = {}
+            for team, numWins in blue_banners:
+                if numWins in temp:
+                    temp[numWins].append(team)
+                else:
+                    temp[numWins] = [team]
+            blue_banners = sorted(temp.items(), key=lambda pair: int(pair[0]), reverse=True)  # Sort by banner number          
             
             template_values = {
                 'valid_years': VALID_YEARS,
