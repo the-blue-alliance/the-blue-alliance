@@ -1,0 +1,35 @@
+{% extends "insights_base.html" %}
+
+{% block title %}Insights - The Blue Alliance{% endblock %}
+
+{% block meta_description %}FIRST Robotics Competition insights overview.{% endblock %}
+
+{% block detailed_content %}
+  <h1 class="end_header">Insights <small>2007 to Present</small></h1>
+  
+  <h2>Regional/District Winners</h2>
+  {{ regional_winners }}
+  
+  <h2>Division Winners</h2>
+  {{ division_winners }}
+  
+  <h2>Division Finalists</h2>
+  {{ division_finalists }}
+  
+  
+  <h2>World Champions</h2>
+  {{ world_champions }}
+  
+  <h2>World Finalists</h2>
+  {{ world_finalists }}
+  
+  <h2>RCA Winners</h2>
+  {{ rca_winners }}
+  
+  <h2>CA Winner</h2>
+  {{ ca_winner }}
+  
+  <h2>Blue Banners</h2>
+  {{ blue_banners }}
+  
+{% endblock %}

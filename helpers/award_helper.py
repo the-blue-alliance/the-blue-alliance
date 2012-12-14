@@ -1,4 +1,5 @@
 import logging
+from models.award import Award
 
 from google.appengine.ext import db
 
@@ -66,6 +67,16 @@ class AwardHelper(object):
     awards['list'] is sorted by sortOrder and then the rest
     in alphabetical order by official name
     """
+    
+    REGIONAL_WIN_KEYS = set(['win1', 'win2', 'win3', 'win4'])
+    REGIONAL_CA_KEYS = set(['ca', 'ca1', 'ca2'])
+    DIVISION_WIN_KEYS = set(['div_win1', 'div_win2', 'div_win3', 'div_win4'])
+    DIVISION_FIN_KEYS = set(['div_fin1', 'div_fin2', 'div_fin3', 'div_fin'])
+    CHAMPIONSHIP_WIN_KEYS = set(['cmp_win1', 'cmp_win2', 'cmp_win3', 'cmp_win4'])
+    CHAMPIONSHIP_FIN_KEYS = set(['cmp_fin1', 'cmp_fin2', 'cmp_fin3', 'cmp_fin4'])
+    CHAMPIONSHIP_CA_KEYS = set(['cmp_ca'])
+    BLUE_BANNER_KEYS = set(REGIONAL_WIN_KEYS.union(REGIONAL_CA_KEYS).union(DIVISION_WIN_KEYS).union(CHAMPIONSHIP_WIN_KEYS).union(CHAMPIONSHIP_CA_KEYS))
+    
     @classmethod
     def organizeAwards(self, award_list):
         awards = dict([(award.name, award) for award in award_list])
@@ -85,4 +96,14 @@ class AwardHelper(object):
         remaining_awards = sorted(remaining_awards, key=lambda award: award.official_name)
         
         awards['list'] += remaining_awards
+        return awards
+    
+    @classmethod
+    def getAwards(self, keys, year=None):
+        awards = []
+        for key in keys:
+            if year == None:
+                awards += Award.query(Award.name == key)
+            else:
+                awards += Award.query(Award.name == key, Award.year == year)
         return awards
