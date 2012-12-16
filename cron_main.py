@@ -15,6 +15,7 @@ from controllers.datafeed_controller import UsfirstTeamDetailsEnqueue, UsfirstTe
 
 from controllers.cron_controller import EventTeamUpdate, EventTeamUpdateEnqueue
 from controllers.cron_controller import EventOprDo, EventOprEnqueue
+from controllers.cron_controller import YearInsightsEnqueue, YearInsightsDo
 
 app = webapp2.WSGIApplication([('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
                                ('/tasks/enqueue/usfirst_event_details/([0-9]*)', UsfirstEventDetailsEnqueue),
@@ -38,5 +39,7 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
                                ('/tasks/math/enqueue/eventteam_update/(.*)', EventTeamUpdateEnqueue),
                                ('/tasks/math/do/event_opr/(.*)', EventOprDo),
                                ('/tasks/math/do/eventteam_update/(.*)', EventTeamUpdate),
+                               ('/tasks/math/enqueue/insights/(.*)/([0-9]*)', YearInsightsEnqueue),
+                               ('/tasks/math/do/insights/(.*)/([0-9]*)', YearInsightsDo),
                                ],
                               debug=tba_config.DEBUG)

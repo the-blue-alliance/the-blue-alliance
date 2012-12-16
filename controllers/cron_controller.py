@@ -7,13 +7,16 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
 from helpers.event_team_manipulator import EventTeamManipulator
+from helpers.insight_manipulator import InsightManipulator
 from helpers.team_manipulator import TeamManipulator
 from helpers.opr_helper import OprHelper
+from helpers.insights_helper import InsightsHelper
 
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
+from models.insight import Insight
 
 class EventTeamUpdate(webapp.RequestHandler):
     """
@@ -129,3 +132,48 @@ class EventOprEnqueue(webapp.RequestHandler):
         
         path = os.path.join(os.path.dirname(__file__), '../templates/math/event_opr_enqueue.html')
         self.response.out.write(template.render(path, template_values))
+
+class YearInsightsEnqueue(webapp.RequestHandler):
+    """
+    Enqueues Insights calculation
+    """
+    def get(self, kind, year):
+        taskqueue.add(
+            url='/tasks/math/do/insights/{}/{}'.format(kind, year),
+            method='GET')
+        
+        template_values = {
+            'kind': kind,
+            'year': year
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/math/year_insights_enqueue.html')
+        self.response.out.write(template.render(path, template_values))
+
+class YearInsightsDo(webapp.RequestHandler):
+    """
+    Calculates insights of a given kind for a given year.
+    Calculations of a given kind should reuse items fetched from the datastore.
+    """
+        
+    def get(self, kind, year):
+        year = int(year)
+
+        if kind == 'matches':
+            insights = InsightsHelper.doMatchInsights(year)
+        elif kind == 'awards':
+            insights = InsightsHelper.doAwardInsights(year)
+        
+        InsightManipulator.createOrUpdate(insights)
+
+        template_values = {
+            'insights': insights,
+            'year': year,
+            'kind': kind,
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/math/year_insights_do.html')
+        self.response.out.write(template.render(path, template_values))
+
+    def post(self):
+        self.get()
