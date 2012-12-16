@@ -37,7 +37,7 @@ class Insight(ndb.Model):
 
     @classmethod
     def renderKeyName(self, year, name):
-        if year == 0:
+        if year == None:
             return 'insights' + '_' + str(name)
         else:
             return str(year) + 'insights' + '_' + str(name)
