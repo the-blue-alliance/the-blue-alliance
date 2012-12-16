@@ -35,7 +35,7 @@ class InsightsHelper(object):
     def doMatchInsights(self, year):
         insights = []
         
-        events = Event.query(Event.year == year).order(Event.start_date).fetch(1000)
+        events = Event.query(Event.year == year, Event.official == True).order(Event.start_date).fetch(1000)
         week_events = EventHelper.groupByWeek(events)
         
         highscore_matches_by_week = {}  # grouped by week
@@ -46,36 +46,50 @@ class InsightsHelper(object):
             week_highscore_matches = []
             week_match_highscore = 0
             for event in events:
-                if event.official != True:
-                    continue
                 matches = event.matches
                 for match in matches:
                     alliances = match.alliances
                     redScore = alliances['red']['score']
                     blueScore = alliances['blue']['score']
-                    
+                    logging.info(match)
                     # High scores grouped by week
                     if redScore >= week_match_highscore:
                         if redScore > week_match_highscore:
                             week_highscore_matches = []
-                        week_highscore_matches.append((match.key_name, alliances))
+                        week_highscore_matches.append({'key_name': match.key_name,
+                                                       'verbose_name': match.verbose_name,
+                                                       'event_name': event.name,
+                                                       'alliances': alliances,
+                                                       })
                         week_match_highscore = redScore
                     if blueScore >= week_match_highscore:
                         if blueScore > week_match_highscore:
                             week_highscore_matches = []
-                        week_highscore_matches.append((match.key_name, alliances))
+                        week_highscore_matches.append({'key_name': match.key_name,
+                                                       'verbose_name': match.verbose_name,
+                                                       'event_name': event.name,
+                                                       'alliances': alliances,
+                                                       })
                         week_match_highscore = blueScore
                     
                     # Overall high scores
                     if redScore >= overall_match_highscore:
                         if redScore > overall_match_highscore:
                             overall_highscore_matches = []
-                        overall_highscore_matches.append((match.key_name, alliances))
+                        overall_highscore_matches.append({'key_name': match.key_name,
+                                                          'verbose_name': match.verbose_name,
+                                                          'event_name': event.name,
+                                                          'alliances': alliances,
+                                                          })
                         overall_match_highscore = redScore
                     if blueScore >= overall_match_highscore:
                         if blueScore > overall_match_highscore:
                             overall_highscore_matches = []
-                        overall_highscore_matches.append((match.key_name, alliances))
+                        overall_highscore_matches.append({'key_name': match.key_name,
+                                                          'verbose_name': match.verbose_name,
+                                                          'event_name': event.name,
+                                                          'alliances': alliances,
+                                                          })
                         overall_match_highscore = blueScore
                         
                     # Bucketed scores

@@ -6,7 +6,17 @@
 
 {% block detailed_content %}
   <h1 class="end_header">{{selected_year}} Insights</h1>
-  {{ match_highscore }}
+  <h2>Awards</h2>
+  <h2>Matches</h2>
+    {% if match_highscore %}
+    <h3>Highest Scoring Match{% if match_highscore.0|length > 1 %}es{% endif %}</h3>
+      {% for match in  match_highscore.0 %}
+        <a href="/match/{{match.key_name}}">{{ match.event_name }} {{ match.verbose_name }}</a>
+      {% endfor %}
+    {% endif %}
+    <h3>Match Distribution</h3>
+    <div>{{ bucketed_scores }}</div>
+  <!-- 
   {% if blue_banners %}  
   <div class="insights_block">
     <div class="insights_content">
@@ -19,6 +29,7 @@
     </div>
   </div>
   {% endif %}
+   -->
 <!-- 
   <div class="insights_block">
     <div class="insights_content insights_content_half">
