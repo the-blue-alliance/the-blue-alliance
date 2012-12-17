@@ -318,6 +318,15 @@ class InsightsHelper(object):
                     rca_winners[team] += 1
                 else:
                     rca_winners[team] = 1
+                    
+        year_world_champions = Insight.query(Insight.name == self.INSIGHT_NAMES[self.WORLD_CHAMPIONS], Insight.year != 0).fetch(1000)
+        world_champions = {}
+        for insight in year_world_champions:
+            for team in insight.data:
+                if team in world_champions:
+                    world_champions[team] += 1
+                else:
+                    world_champions[team] = 1
         
         # Sorting
         regional_winners = sorted(regional_winners.items(), key=lambda pair: int(pair[0][3:]))   # Sort by team number
@@ -347,6 +356,15 @@ class InsightsHelper(object):
                 temp[numWins] = [team]
         rca_winners = sorted(temp.items(), key=lambda pair: int(pair[0]), reverse=True)  # Sort by win number
         
+        world_champions = sorted(world_champions.items(), key=lambda pair: int(pair[0][3:]))   # Sort by team number
+        temp = {}
+        for team, numWins in world_champions:
+            if numWins in temp:
+                temp[numWins] += [team]
+            else:
+                temp[numWins] = [team]
+        world_champions = sorted(temp.items(), key=lambda pair: int(pair[0]), reverse=True)  # Sort by win number
+        
         # Creating Insights
         if regional_winners:
             insights.append(Insight(
@@ -368,5 +386,12 @@ class InsightsHelper(object):
             name = self.INSIGHT_NAMES[self.RCA_WINNERS],
             year = 0,
             data_json = json.dumps(rca_winners)))
+            
+        if world_champions:
+            insights.append(Insight(
+            id = Insight.renderKeyName(None, self.INSIGHT_NAMES[self.WORLD_CHAMPIONS]),
+            name = self.INSIGHT_NAMES[self.WORLD_CHAMPIONS],
+            year = 0,
+            data_json = json.dumps(world_champions)))
             
         return insights
