@@ -281,3 +281,92 @@ class InsightsHelper(object):
             data_json = json.dumps(blue_banners)))
 
         return insights
+
+    @classmethod
+    def doOverallMatchInsights(self):
+        return
+    
+    @classmethod
+    def doOverallAwardInsights(self):
+        insights = []
+        
+        year_regional_winners = Insight.query(Insight.name == self.INSIGHT_NAMES[self.REGIONAL_DISTRICT_WINNERS], Insight.year != 0).fetch(1000)
+        regional_winners = {}
+        for insight in year_regional_winners:
+            for number, team_list in insight.data:
+                for team in team_list:
+                    if team in regional_winners:
+                        regional_winners[team] += number
+                    else:
+                        regional_winners[team] = number
+        
+        year_blue_banners = Insight.query(Insight.name == self.INSIGHT_NAMES[self.BLUE_BANNERS], Insight.year != 0).fetch(1000)
+        blue_banners = {}
+        for insight in year_blue_banners:
+            for number, team_list in insight.data:
+                for team in team_list:
+                    if team in blue_banners:
+                        blue_banners[team] += number
+                    else:
+                        blue_banners[team] = number
+                        
+        year_rca_winners = Insight.query(Insight.name == self.INSIGHT_NAMES[self.RCA_WINNERS], Insight.year != 0).fetch(1000)
+        rca_winners = {}
+        for insight in year_rca_winners:
+            for team in insight.data:
+                if team in rca_winners:
+                    rca_winners[team] += 1
+                else:
+                    rca_winners[team] = 1
+        
+        # Sorting
+        regional_winners = sorted(regional_winners.items(), key=lambda pair: int(pair[0][3:]))   # Sort by team number
+        temp = {}
+        for team, numWins in regional_winners:
+            if numWins in temp:
+                temp[numWins] += [team]
+            else:
+                temp[numWins] = [team]
+        regional_winners = sorted(temp.items(), key=lambda pair: int(pair[0]), reverse=True)  # Sort by win number
+        
+        blue_banners = sorted(blue_banners.items(), key=lambda pair: int(pair[0][3:]))   # Sort by team number
+        temp = {}
+        for team, numWins in blue_banners:
+            if numWins in temp:
+                temp[numWins].append(team)
+            else:
+                temp[numWins] = [team]
+        blue_banners = sorted(temp.items(), key=lambda pair: int(pair[0]), reverse=True)  # Sort by banner number
+        
+        rca_winners = sorted(rca_winners.items(), key=lambda pair: int(pair[0][3:]))   # Sort by team number
+        temp = {}
+        for team, numWins in rca_winners:
+            if numWins in temp:
+                temp[numWins] += [team]
+            else:
+                temp[numWins] = [team]
+        rca_winners = sorted(temp.items(), key=lambda pair: int(pair[0]), reverse=True)  # Sort by win number
+        
+        # Creating Insights
+        if regional_winners:
+            insights.append(Insight(
+            id = Insight.renderKeyName(None, self.INSIGHT_NAMES[self.REGIONAL_DISTRICT_WINNERS]),
+            name = self.INSIGHT_NAMES[self.REGIONAL_DISTRICT_WINNERS],
+            year = 0,
+            data_json = json.dumps(regional_winners)))
+            
+        if blue_banners:
+            insights.append(Insight(
+            id = Insight.renderKeyName(None, self.INSIGHT_NAMES[self.BLUE_BANNERS]),
+            name = self.INSIGHT_NAMES[self.BLUE_BANNERS],
+            year = 0,
+            data_json = json.dumps(blue_banners)))
+            
+        if rca_winners:
+            insights.append(Insight(
+            id = Insight.renderKeyName(None, self.INSIGHT_NAMES[self.RCA_WINNERS]),
+            name = self.INSIGHT_NAMES[self.RCA_WINNERS],
+            year = 0,
+            data_json = json.dumps(rca_winners)))
+            
+        return insights

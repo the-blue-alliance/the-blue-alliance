@@ -41,8 +41,9 @@ class InsightsOverview(BaseHandler):
                 insight_key = Insight.renderKeyName(None, insight_name)
                 insight = Insight.get_by_id_async(insight_key).get_result()
                 if insight:
-                    template_values[insight_name] = insight.data
-        
+                    template_values[insight_name] = {'data': insight.data,
+                                                     'data_json': insight.data_json}
+                            
             path = os.path.join(os.path.dirname(__file__), '../templates/insights.html')
             html = template.render(path, template_values)
             if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400) 

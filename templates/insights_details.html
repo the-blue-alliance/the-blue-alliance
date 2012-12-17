@@ -16,7 +16,7 @@
 	        <tbody>
 	          <tr><th>Number</th><th>Teams</th></tr>
 		        {% for number, team_list in blue_banners.data %}
-		          {% if number > 1 or blue_banners.data|length == 1 %}
+              {% if team_list|length < 50 %}
 		          <tr>
 		            <td>{{number}}</td>
 		            <td>
@@ -40,7 +40,7 @@
           <tbody>
             <tr><th>Number</th><th>Teams</th></tr>
             {% for number, team_list in regional_district_winners.data %}
-              {% if number > 1 or regional_district_winners.data|length == 1 %}
+              {% if team_list|length < 50 %}
               <tr>
                 <td>{{number}}</td>
                 <td>
@@ -81,7 +81,7 @@
 	      {% endfor %}
 		  </div>
 		</div>
-		
+		<!-- 
     <div class="row-fluid">
       <h3>Highest Scoring Matches By Week</h3>
       <div class="span8 offset2">
@@ -107,8 +107,9 @@
       {% endfor %}
       </div>
     </div>
+    -->
     {% endif %}
-
+    
     {% if match_averages %}
     <h3>Average Match Score By Week</h3>
       <figure style="width: 90%; height: 300px;" id="match-average-chart"></figure>

@@ -135,7 +135,7 @@ class EventOprEnqueue(webapp.RequestHandler):
 
 class YearInsightsEnqueue(webapp.RequestHandler):
     """
-    Enqueues Insights calculation
+    Enqueues Insights calculation of a given kind for a given year
     """
     def get(self, kind, year):
         taskqueue.add(
@@ -173,6 +173,48 @@ class YearInsightsDo(webapp.RequestHandler):
         }
         
         path = os.path.join(os.path.dirname(__file__), '../templates/math/year_insights_do.html')
+        self.response.out.write(template.render(path, template_values))
+
+    def post(self):
+        self.get()
+
+class OverallInsightsEnqueue(webapp.RequestHandler):
+    """
+    Enqueues Overall Insights calculation for a given kind.
+    """
+    def get(self, kind):
+        taskqueue.add(
+            url='/tasks/math/do/insights/{}'.format(kind),
+            method='GET')
+        
+        template_values = {
+            'kind': kind,
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/math/overall_insights_enqueue.html')
+        self.response.out.write(template.render(path, template_values))
+
+class OverallInsightsDo(webapp.RequestHandler):
+    """
+    Calculates overall insights of a given kind.
+    Calculations of a given kind should reuse items fetched from the datastore.
+    """
+        
+    def get(self, kind):
+
+        if kind == 'matches':
+            insights = InsightsHelper.doOverallMatchInsights()
+        elif kind == 'awards':
+            insights = InsightsHelper.doOverallAwardInsights()
+        
+        InsightManipulator.createOrUpdate(insights)
+
+        template_values = {
+            'insights': insights,
+            'kind': kind,
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/math/overall_insights_do.html')
         self.response.out.write(template.render(path, template_values))
 
     def post(self):
