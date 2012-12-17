@@ -77,46 +77,37 @@ class InsightsHelper(object):
                     redScore = alliances['red']['score']
                     blueScore = alliances['blue']['score']
 
+                    match_data = {'key_name': match.key_name,
+                                 'verbose_name': match.verbose_name,
+                                 'event_name': event.name,
+                                 'alliances': alliances,
+                                 'winning_alliance': match.winning_alliance
+                                 }
+
                     # High scores grouped by week
                     if redScore >= week_match_highscore:
                         if redScore > week_match_highscore:
                             week_highscore_matches = []
-                        week_highscore_matches.append({'key_name': match.key_name,
-                                                       'verbose_name': match.verbose_name,
-                                                       'event_name': event.name,
-                                                       'alliances': alliances,
-                                                       })
+                        week_highscore_matches.append(match_data)
                         week_match_highscore = redScore
                     if blueScore >= week_match_highscore:
                         if blueScore > week_match_highscore:
                             week_highscore_matches = []
-                        week_highscore_matches.append({'key_name': match.key_name,
-                                                       'verbose_name': match.verbose_name,
-                                                       'event_name': event.name,
-                                                       'alliances': alliances,
-                                                       })
+                        week_highscore_matches.append(match_data)
                         week_match_highscore = blueScore
                     
                     # Overall high scores
                     if redScore >= overall_match_highscore:
                         if redScore > overall_match_highscore:
                             overall_highscore_matches = []
-                        overall_highscore_matches.append({'key_name': match.key_name,
-                                                          'verbose_name': match.verbose_name,
-                                                          'event_name': event.name,
-                                                          'alliances': alliances,
-                                                          })
+                        overall_highscore_matches.append(match_data)
                         overall_match_highscore = redScore
                         if match.comp_level in self.ELIM_LEVELS:
                             overall_elim_match_highscore = redScore
                     if blueScore >= overall_match_highscore:
                         if blueScore > overall_match_highscore:
                             overall_highscore_matches = []
-                        overall_highscore_matches.append({'key_name': match.key_name,
-                                                          'verbose_name': match.verbose_name,
-                                                          'event_name': event.name,
-                                                          'alliances': alliances,
-                                                          })
+                        overall_highscore_matches.append(match_data)
                         overall_match_highscore = blueScore
                         if match.comp_level in self.ELIM_LEVELS:
                             overall_elim_match_highscore = blueScore
