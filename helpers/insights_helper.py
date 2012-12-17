@@ -188,7 +188,9 @@ class InsightsHelper(object):
         if elim_bucketed_scores:
             totalCount = float(sum(elim_bucketed_scores.values()))
             elim_bucketed_scores_normalized = {}
-            binAmount = math.ceil(float(overall_elim_match_highscore) / 20)
+            # Tries to use same bucket size as bucketed_scores
+            if binAmount == None:
+                binAmount = math.ceil(float(overall_elim_match_highscore) / 20)
             for score, amount in elim_bucketed_scores.items():
                 score -= (score % binAmount) + binAmount/2
                 score = int(score)
