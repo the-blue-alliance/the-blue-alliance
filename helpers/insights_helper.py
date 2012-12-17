@@ -112,11 +112,15 @@ class InsightsHelper(object):
                 data_json = json.dumps((overall_highscore_matches, highscore_matches_by_week))))
         
         if bucketed_scores:
+            totalCount = float(sum(bucketed_scores.values()))
+            bucketed_scores_normalized = {}
+            for score, amount in bucketed_scores.items():
+                bucketed_scores_normalized[score] = float(amount)*100/totalCount
             insights.append(Insight(
                 id = Insight.renderKeyName(year, self.INSIGHT_NAMES[self.BUCKETED_SCORES]),
                 name = self.INSIGHT_NAMES[self.BUCKETED_SCORES],
                 year = year,
-                data_json = json.dumps(bucketed_scores)))
+                data_json = json.dumps(bucketed_scores_normalized)))
 
         return insights
 

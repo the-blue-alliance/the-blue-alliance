@@ -9,13 +9,14 @@
   <h2>Awards</h2>
   <h2>Matches</h2>
     {% if match_highscore %}
-    <h3>Highest Scoring Match{% if match_highscore.0|length > 1 %}es{% endif %}</h3>
-      {% for match in  match_highscore.0 %}
+    <h3>Highest Scoring Match{% if match_highscore.data.0|length > 1 %}es{% endif %}</h3>
+      {% for match in  match_highscore.data.0 %}
         <a href="/match/{{match.key_name}}">{{ match.event_name }} {{ match.verbose_name }}</a>
       {% endfor %}
     {% endif %}
-    <h3>Match Distribution</h3>
-    <div>{{ bucketed_scores }}</div>
+    <h3>Match Distribution <small>Percent of Matches vs. Match Score</small></h3>
+      <figure style="width: 80%; height: 300px;" id="match-distribution-chart"></figure>
+      <div id="match-distribution" class="xcharts-data">{{ bucketed_scores.data_json }}</div>
   <!-- 
   {% if blue_banners %}  
   <div class="insights_block">

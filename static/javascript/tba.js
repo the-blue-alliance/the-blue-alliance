@@ -103,6 +103,26 @@ $(function() {
 	
 	// Tooltips
 	$("[rel=tooltip]").tooltip();
+	
+	// Charts
+	var chartsData = $(".xcharts-data");
+	for (var i=0; i < chartsData.length; i++) {
+		var chartId = chartsData[i].id;
+		var raw = JSON.parse($('#' + chartId).html())
+		data = []
+		for (var key in raw) {
+			var value = raw[key]
+			data = data.concat([{"x": parseInt(key), "y": value}])
+		}
+	
+		var chartData = {"xScale": "linear",
+						 "yScale": "linear",
+						 "type": "line",
+						 "main": [{"className": "." + chartId + '-elements',
+							 	   "data": data}],
+						 }
+		var myChart = new xChart('line', chartData, '#' + chartId + '-chart');
+	}
 });
 
 // Kickoff Countdown

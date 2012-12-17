@@ -12,6 +12,8 @@ SCRIPTS_MAIN = ['static/javascript/jquery.min.js',
                 'static/javascript/bootstrap-typeahead.js',
                 'static/javascript/jquery.fancybox.pack.js',
                 'static/jwplayer/jwplayer.js',
+                'static/xcharts/d3.v2.min.js',
+                'static/xcharts/xcharts.min.js',
                 ]
 SCRIPTS_MAIN_OUT_DEBUG = 'static/javascript/tba_combined.js'
 SCRIPTS_MAIN_OUT = 'static/javascript/tba_combined.min.js'
@@ -23,6 +25,7 @@ SCRIPTS_GAMEDAY_OUT = 'static/javascript/gameday_combined.min.js'
 STYLESHEETS_MAIN = ['static/css/style.css',
                     'static/css/jquery-ui-1.8.13.custom.css',
                     'static/css/jquery.fancybox.css',
+                    'static/xcharts/xcharts.min.css'
                     ]
 STYLESHEETS_MAIN_OUT = 'static/css/style.min.css'
 
