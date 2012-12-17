@@ -919,7 +919,8 @@ $(function() {
 						 "main": [{"className": "." + chartId + '-elements',
 							 	   "data": data}],
 						 }
-		var myChart = new xChart('line', chartData, '#' + chartId + '-chart');
+		var opts = {"tickFormatY": function(y){ return y + "%"; },}
+		var myChart = new xChart('line', chartData, '#' + chartId + '-chart', opts);
 	}
 	
 	var chartsData = $(".xcharts-line-data-2");
