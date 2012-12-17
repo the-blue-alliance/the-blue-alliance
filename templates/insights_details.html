@@ -6,8 +6,10 @@
 
 {% block detailed_content %}
   <h1 class="end_header">{{selected_year}} Insights</h1>
-
+  
+  {% if blue_banners or regional_district_winners %}
   <h2>Awards</h2>
+  {% endif %}
     {% if blue_banners %}
     <div class="row-fluid">
       <h3>Top Blue Banner Winners</h3>
@@ -56,8 +58,13 @@
     </div>
     {% endif %}
   
+  {% if blue_banners or regional_district_winners or match_highscore or match_averages or bucketed_scores %}
   <hr>
+  {% endif %}
+  
+  {% if match_highscore or match_averages or bucketed_scores %}
   <h2>Matches</h2>
+  {% endif %}
     {% if match_highscore %}
     <div class="row-fluid">
       <h3>Highest Scoring Match{% if match_highscore.data.0|length > 1 %}es{% endif %}</h3>
@@ -120,6 +127,11 @@
     <h3>Match Score Distribution <small>Percent of Matches vs. Match Score</small></h3>
       <figure style="width: 90%; height: 300px;" id="match-distribution-chart"></figure>
       <div id="match-distribution" class="xcharts-data xcharts-line-data-1">{{ bucketed_scores.data_json }}</div>
+    {% endif %}
+    
+    {% if blue_banners or regional_district_winners or match_highscore or match_averages or bucketed_scores %}
+    {% else %}
+    <p>No insights are currently available for {{selected_year}}.</p>
     {% endif %}
 
 {% endblock %}
