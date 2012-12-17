@@ -63,7 +63,7 @@
   {% endif %}
   
   {% if match_highscore or match_averages or bucketed_scores %}
-  <h2>Matches</h2>
+  <h2>Matches{% if num_matches %} <small>{{num_matches.data}} Matches Played</small>{% endif %}</h2>
   {% endif %}
     {% if match_highscore %}
     <div class="row-fluid">

@@ -20,6 +20,7 @@ class InsightsHelper(object):
     RCA_WINNERS = 8
     CA_WINNER = 9
     BLUE_BANNERS = 10
+    NUM_MATCHES = 11
     
     # Used for datastore keys! Don't change unless you know what you're doing.
     INSIGHT_NAMES = {MATCH_HIGHSCORE: 'match_highscore',
@@ -33,6 +34,7 @@ class InsightsHelper(object):
                      CA_WINNER: 'ca_winner',
                      BLUE_BANNERS: 'blue_banners',
                      MATCH_AVERAGES: 'match_averages',
+                     NUM_MATCHES: 'num_matches'
                      }
 
     @classmethod
@@ -47,14 +49,16 @@ class InsightsHelper(object):
         overall_match_highscore = 0
         overall_highscore_matches = []
         bucketed_scores = {}
+        num_matches = 0
         for week, events in week_events.items():
             week_highscore_matches = []
             week_match_highscore = 0
             week_match_sum = 0
-            num_matches = 0
+            num_matches_by_week = 0
             for event in events:
                 matches = event.matches
                 for match in matches:
+                    num_matches_by_week += 1
                     num_matches += 1
                     alliances = match.alliances
                     redScore = alliances['red']['score']
@@ -114,10 +118,10 @@ class InsightsHelper(object):
                     week_match_sum += redScore + blueScore
                     
             highscore_matches_by_week.append((week, week_highscore_matches))
-            if num_matches == 0:
+            if num_matches_by_week == 0:
                 week_average = 0
             else:
-                week_average = float(week_match_sum)/num_matches
+                week_average = float(week_match_sum)/num_matches_by_week
             match_averages_by_week.append((week, week_average))
           
         if overall_highscore_matches or highscore_matches_by_week:
@@ -151,6 +155,13 @@ class InsightsHelper(object):
                 name = self.INSIGHT_NAMES[self.MATCH_AVERAGES],
                 year = year,
                 data_json = json.dumps(match_averages_by_week)))
+
+        if num_matches:
+            insights.append(Insight(
+                id = Insight.renderKeyName(year, self.INSIGHT_NAMES[self.NUM_MATCHES]),
+                name = self.INSIGHT_NAMES[self.NUM_MATCHES],
+                year = year,
+                data_json = json.dumps(num_matches)))
             
         return insights
 
@@ -296,7 +307,22 @@ class InsightsHelper(object):
 
     @classmethod
     def doOverallMatchInsights(self):
-        return
+        insights = []
+        
+        year_num_matches = Insight.query(Insight.name == self.INSIGHT_NAMES[self.NUM_MATCHES], Insight.year != 0).fetch(1000)
+        num_matches = []
+        for insight in year_num_matches:
+            num_matches.append((insight.year, insight.data))
+        
+        # Creating Insights
+        if num_matches:
+            insights.append(Insight(
+            id = Insight.renderKeyName(None, self.INSIGHT_NAMES[self.NUM_MATCHES]),
+            name = self.INSIGHT_NAMES[self.NUM_MATCHES],
+            year = 0,
+            data_json = json.dumps(num_matches)))
+        
+        return insights
     
     @classmethod
     def doOverallAwardInsights(self):
