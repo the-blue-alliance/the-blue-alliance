@@ -1,5 +1,6 @@
 import json
 import logging
+import math
 
 from models.insight import Insight
 from models.event import Event
@@ -113,7 +114,11 @@ class InsightsHelper(object):
                     week_match_sum += redScore + blueScore
                     
             highscore_matches_by_week.append((week, week_highscore_matches))
-            match_averages_by_week.append((week, float(week_match_sum)/num_matches))
+            if num_matches == 0:
+                week_average = 0
+            else:
+                week_average = float(week_match_sum)/num_matches
+            match_averages_by_week.append((week, week_average))
           
         if overall_highscore_matches or highscore_matches_by_week:
             insights.append(Insight(
@@ -125,8 +130,15 @@ class InsightsHelper(object):
         if bucketed_scores:
             totalCount = float(sum(bucketed_scores.values()))
             bucketed_scores_normalized = {}
+            binAmount = math.ceil(float(overall_match_highscore) / 20)
             for score, amount in bucketed_scores.items():
-                bucketed_scores_normalized[score] = float(amount)*100/totalCount
+                score -= (score % binAmount) + binAmount/2
+                score = int(score)
+                contribution = float(amount)*100/totalCount
+                if score in bucketed_scores_normalized:
+                    bucketed_scores_normalized[score] += contribution
+                else:
+                    bucketed_scores_normalized[score] = contribution
             insights.append(Insight(
                 id = Insight.renderKeyName(year, self.INSIGHT_NAMES[self.BUCKETED_SCORES]),
                 name = self.INSIGHT_NAMES[self.BUCKETED_SCORES],

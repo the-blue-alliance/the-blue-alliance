@@ -913,14 +913,14 @@ $(function() {
 			var value = raw[key]
 			data = data.concat([{"x": parseInt(key), "y": value}])
 		}
-		var chartData = {"xScale": "linear",
+		var chartData = {"xScale": "ordinal",
 						 "yScale": "linear",
-						 "type": "line",
+						 "type": "bar",
 						 "main": [{"className": "." + chartId + '-elements',
 							 	   "data": data}],
 						 }
 		var opts = {"tickFormatY": function(y){ return y + "%"; },}
-		var myChart = new xChart('line', chartData, '#' + chartId + '-chart', opts);
+		var myChart = new xChart('bar', chartData, '#' + chartId + '-chart', opts);
 	}
 	
 	var chartsData = $(".xcharts-line-data-2");
