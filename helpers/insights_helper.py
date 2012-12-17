@@ -21,6 +21,8 @@ class InsightsHelper(object):
     CA_WINNER = 9
     BLUE_BANNERS = 10
     NUM_MATCHES = 11
+    ELIM_MATCH_AVERAGES = 12
+    ELIM_BUCKETED_SCORES = 13
     
     # Used for datastore keys! Don't change unless you know what you're doing.
     INSIGHT_NAMES = {MATCH_HIGHSCORE: 'match_highscore',
@@ -34,8 +36,12 @@ class InsightsHelper(object):
                      CA_WINNER: 'ca_winner',
                      BLUE_BANNERS: 'blue_banners',
                      MATCH_AVERAGES: 'match_averages',
-                     NUM_MATCHES: 'num_matches'
+                     NUM_MATCHES: 'num_matches',
+                     ELIM_MATCH_AVERAGES: 'elim_match_averages',
+                     ELIM_BUCKETED_SCORES: 'elim_bucketed_scores',
                      }
+
+    ELIM_LEVELS = set(['ef', 'qf', 'sf', 'f'])
 
     @classmethod
     def doMatchInsights(self, year):
@@ -46,19 +52,26 @@ class InsightsHelper(object):
         
         highscore_matches_by_week = []  # tuples: week, matches
         match_averages_by_week = [] #tuples: week, average score
+        elim_match_averages_by_week = []  #tuples: week, average score
         overall_match_highscore = 0
+        overall_elim_match_highscore = 0
         overall_highscore_matches = []
         bucketed_scores = {}
+        elim_bucketed_scores = {}
         num_matches = 0
         for week, events in week_events.items():
             week_highscore_matches = []
             week_match_highscore = 0
             week_match_sum = 0
+            elim_week_match_sum = 0
             num_matches_by_week = 0
+            num_elim_matches_by_week = 0
             for event in events:
                 matches = event.matches
                 for match in matches:
                     num_matches_by_week += 1
+                    if match.comp_level in self.ELIM_LEVELS:
+                        num_elim_matches_by_week += 1
                     num_matches += 1
                     alliances = match.alliances
                     redScore = alliances['red']['score']
@@ -94,6 +107,8 @@ class InsightsHelper(object):
                                                           'alliances': alliances,
                                                           })
                         overall_match_highscore = redScore
+                        if match.comp_level in self.ELIM_LEVELS:
+                            overall_elim_match_highscore = redScore
                     if blueScore >= overall_match_highscore:
                         if blueScore > overall_match_highscore:
                             overall_highscore_matches = []
@@ -103,7 +118,9 @@ class InsightsHelper(object):
                                                           'alliances': alliances,
                                                           })
                         overall_match_highscore = blueScore
-                        
+                        if match.comp_level in self.ELIM_LEVELS:
+                            overall_elim_match_highscore = blueScore
+
                     # Bucketed scores
                     if redScore in bucketed_scores:
                         bucketed_scores[redScore] += 1
@@ -113,16 +130,35 @@ class InsightsHelper(object):
                         bucketed_scores[blueScore] += 1
                     else:
                         bucketed_scores[blueScore] = 1
-                        
+                            
+                    if match.comp_level in self.ELIM_LEVELS:
+                        if redScore in elim_bucketed_scores:
+                            elim_bucketed_scores[redScore] += 1
+                        else:
+                            elim_bucketed_scores[redScore] = 1
+                        if blueScore in elim_bucketed_scores:
+                            elim_bucketed_scores[blueScore] += 1
+                        else:
+                            elim_bucketed_scores[blueScore] = 1
+
                     # Match score sums
                     week_match_sum += redScore + blueScore
+                    if match.comp_level in self.ELIM_LEVELS:
+                        elim_week_match_sum += redScore + blueScore
                     
             highscore_matches_by_week.append((week, week_highscore_matches))
+            
             if num_matches_by_week == 0:
                 week_average = 0
             else:
                 week_average = float(week_match_sum)/num_matches_by_week
             match_averages_by_week.append((week, week_average))
+            
+            if num_elim_matches_by_week == 0:
+                week_elim_average = 0
+            else:
+                week_elim_average = float(elim_week_match_sum)/num_elim_matches_by_week
+            elim_match_averages_by_week.append((week, week_elim_average))
           
         if overall_highscore_matches or highscore_matches_by_week:
             insights.append(Insight(
@@ -149,12 +185,37 @@ class InsightsHelper(object):
                 year = year,
                 data_json = json.dumps(bucketed_scores_normalized)))
             
+        if elim_bucketed_scores:
+            totalCount = float(sum(elim_bucketed_scores.values()))
+            elim_bucketed_scores_normalized = {}
+            binAmount = math.ceil(float(overall_elim_match_highscore) / 20)
+            for score, amount in elim_bucketed_scores.items():
+                score -= (score % binAmount) + binAmount/2
+                score = int(score)
+                contribution = float(amount)*100/totalCount
+                if score in elim_bucketed_scores_normalized:
+                    elim_bucketed_scores_normalized[score] += contribution
+                else:
+                    elim_bucketed_scores_normalized[score] = contribution
+            insights.append(Insight(
+                id = Insight.renderKeyName(year, self.INSIGHT_NAMES[self.ELIM_BUCKETED_SCORES]),
+                name = self.INSIGHT_NAMES[self.ELIM_BUCKETED_SCORES],
+                year = year,
+                data_json = json.dumps(elim_bucketed_scores_normalized)))
+            
         if match_averages_by_week:
             insights.append(Insight(
                 id = Insight.renderKeyName(year, self.INSIGHT_NAMES[self.MATCH_AVERAGES]),
                 name = self.INSIGHT_NAMES[self.MATCH_AVERAGES],
                 year = year,
                 data_json = json.dumps(match_averages_by_week)))
+            
+        if elim_match_averages_by_week:
+            insights.append(Insight(
+                id = Insight.renderKeyName(year, self.INSIGHT_NAMES[self.ELIM_MATCH_AVERAGES]),
+                name = self.INSIGHT_NAMES[self.ELIM_MATCH_AVERAGES],
+                year = year,
+                data_json = json.dumps(elim_match_averages_by_week)))
 
         if num_matches:
             insights.append(Insight(

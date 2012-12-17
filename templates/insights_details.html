@@ -119,14 +119,24 @@
     
     {% if match_averages %}
     <h3>Average Match Score By Week</h3>
+      {% if elim_match_averages %}
+      <figure style="width: 90%; height: 300px;" id="elim-match-average-chart"></figure>
+      <div id="elim-match-average" class="xcharts-data xcharts-line-data-3">[{{ match_averages.data_json }}, {{ elim_match_averages.data_json }}]</div>
+      {% else %}
       <figure style="width: 90%; height: 300px;" id="match-average-chart"></figure>
       <div id="match-average" class="xcharts-data xcharts-line-data-2">{{ match_averages.data_json }}</div>
+      {% endif %}
     {% endif %}
     
     {% if bucketed_scores %}
     <h3>Match Score Distribution <small>Percent of Matches vs. Match Score</small></h3>
+      {% if elim_bucketed_scores %}
+      <figure style="width: 90%; height: 300px;" id="elim-match-distribution-chart"></figure>
+      <div id="elim-match-distribution" class="xcharts-data xcharts-line-data-4">[{{ bucketed_scores.data_json }}, {{ elim_bucketed_scores.data_json }}]</div>
+      {% else %}
       <figure style="width: 90%; height: 300px;" id="match-distribution-chart"></figure>
       <div id="match-distribution" class="xcharts-data xcharts-line-data-1">{{ bucketed_scores.data_json }}</div>
+      {% endif %}
     {% endif %}
     
     {% if blue_banners or regional_district_winners or match_highscore or match_averages or bucketed_scores %}
