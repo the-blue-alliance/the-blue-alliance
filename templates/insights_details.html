@@ -121,10 +121,10 @@
     <h3>Average Match Score By Week</h3>
       {% if elim_match_averages %}
       <figure style="width: 90%; height: 300px;" id="elim-match-average-chart"></figure>
-      <div id="elim-match-average" class="xcharts-data xcharts-line-data-3">[{{ match_averages.data_json }}, {{ elim_match_averages.data_json }}]</div>
+      <div id="elim-match-average" class="xcharts-data xcharts-line-double-data">[{{ match_averages.data_json }}, {{ elim_match_averages.data_json }}]</div>
       {% else %}
       <figure style="width: 90%; height: 300px;" id="match-average-chart"></figure>
-      <div id="match-average" class="xcharts-data xcharts-line-data-2">{{ match_averages.data_json }}</div>
+      <div id="match-average" class="xcharts-data xcharts-line-single-data">{{ match_averages.data_json }}</div>
       {% endif %}
     {% endif %}
     
@@ -132,10 +132,10 @@
     <h3>Match Score Distribution <small>Percent of Matches vs. Match Score</small></h3>
       {% if elim_bucketed_scores %}
       <figure style="width: 90%; height: 300px;" id="elim-match-distribution-chart"></figure>
-      <div id="elim-match-distribution" class="xcharts-data xcharts-line-data-4">[{{ bucketed_scores.data_json }}, {{ elim_bucketed_scores.data_json }}]</div>
+      <div id="elim-match-distribution" class="xcharts-data xcharts-bar-double-data">[{{ bucketed_scores.data_json }}, {{ elim_bucketed_scores.data_json }}]</div>
       {% else %}
       <figure style="width: 90%; height: 300px;" id="match-distribution-chart"></figure>
-      <div id="match-distribution" class="xcharts-data xcharts-line-data-1">{{ bucketed_scores.data_json }}</div>
+      <div id="match-distribution" class="xcharts-data xcharts-bar-single-data">{{ bucketed_scores.data_json }}</div>
       {% endif %}
     {% endif %}
     
