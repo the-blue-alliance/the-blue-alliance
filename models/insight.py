@@ -22,7 +22,7 @@ class Insight(ndb.Model):
     @property
     def data(self):
         """
-        Lazy load data_json
+        Lazy load data_json as an OrderedDict
         """
         if self._data is None:
             self._data = json.loads(self.data_json)

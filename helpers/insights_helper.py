@@ -9,16 +9,18 @@ from helpers.award_helper import AwardHelper
 
 class InsightsHelper(object):
     MATCH_HIGHSCORE = 0
-    BUCKETED_SCORES = 1
-    REGIONAL_DISTRICT_WINNERS = 2
-    DIVISION_FINALISTS = 3
-    DIVISION_WINNERS = 4
-    WORLD_FINALISTS = 5
-    WORLD_CHAMPIONS = 6
-    RCA_WINNERS = 7
-    CA_WINNER = 8
-    BLUE_BANNERS = 9
+    MATCH_AVERAGES = 1
+    BUCKETED_SCORES = 2
+    REGIONAL_DISTRICT_WINNERS = 3
+    DIVISION_FINALISTS = 4
+    DIVISION_WINNERS = 5
+    WORLD_FINALISTS = 6
+    WORLD_CHAMPIONS = 7
+    RCA_WINNERS = 8
+    CA_WINNER = 9
+    BLUE_BANNERS = 10
     
+    # Used for datastore keys! Don't change unless you know what you're doing.
     INSIGHT_NAMES = {MATCH_HIGHSCORE: 'match_highscore',
                      BUCKETED_SCORES: 'bucketed_scores',
                      REGIONAL_DISTRICT_WINNERS: 'regional_district_winners',
@@ -29,6 +31,7 @@ class InsightsHelper(object):
                      RCA_WINNERS: 'rca_winners',
                      CA_WINNER: 'ca_winner',
                      BLUE_BANNERS: 'blue_banners',
+                     MATCH_AVERAGES: 'match_averages',
                      }
 
     @classmethod
@@ -38,20 +41,24 @@ class InsightsHelper(object):
         events = Event.query(Event.year == year, Event.official == True).order(Event.start_date).fetch(1000)
         week_events = EventHelper.groupByWeek(events)
         
-        highscore_matches_by_week = {}  # grouped by week
+        highscore_matches_by_week = []  # tuples: week, matches
+        match_averages_by_week = [] #tuples: week, average score
         overall_match_highscore = 0
         overall_highscore_matches = []
         bucketed_scores = {}
         for week, events in week_events.items():
             week_highscore_matches = []
             week_match_highscore = 0
+            week_match_sum = 0
+            num_matches = 0
             for event in events:
                 matches = event.matches
                 for match in matches:
+                    num_matches += 1
                     alliances = match.alliances
                     redScore = alliances['red']['score']
                     blueScore = alliances['blue']['score']
-                    logging.info(match)
+
                     # High scores grouped by week
                     if redScore >= week_match_highscore:
                         if redScore > week_match_highscore:
@@ -101,9 +108,13 @@ class InsightsHelper(object):
                         bucketed_scores[blueScore] += 1
                     else:
                         bucketed_scores[blueScore] = 1
+                        
+                    # Match score sums
+                    week_match_sum += redScore + blueScore
                     
-            highscore_matches_by_week[week] = week_highscore_matches
-        
+            highscore_matches_by_week.append((week, week_highscore_matches))
+            match_averages_by_week.append((week, float(week_match_sum)/num_matches))
+          
         if overall_highscore_matches or highscore_matches_by_week:
             insights.append(Insight(
                 id = Insight.renderKeyName(year, self.INSIGHT_NAMES[self.MATCH_HIGHSCORE]),
@@ -121,7 +132,14 @@ class InsightsHelper(object):
                 name = self.INSIGHT_NAMES[self.BUCKETED_SCORES],
                 year = year,
                 data_json = json.dumps(bucketed_scores_normalized)))
-
+            
+        if match_averages_by_week:
+            insights.append(Insight(
+                id = Insight.renderKeyName(year, self.INSIGHT_NAMES[self.MATCH_AVERAGES]),
+                name = self.INSIGHT_NAMES[self.MATCH_AVERAGES],
+                year = year,
+                data_json = json.dumps(match_averages_by_week)))
+            
         return insights
 
     @classmethod
