@@ -15,7 +15,8 @@
         <tbody>
           <tr><th>Number</th><th>Teams</th></tr>
           {% for number, team_list in blue_banners.data %}
-            {% if forloop.revcounter > 6 or blue_banners.data|length <= 6 and team_list|length < 50 %}
+            {% if forloop.counter <= 8 %}
+            {% if team_list|length < 50 %}
             <tr>
               <td>{{number}}</td>
               <td>
@@ -24,6 +25,7 @@
                 {% endfor %}
               </td>
             </tr>
+            {% endif %}
             {% endif %}
           {% endfor %}
       </table>
@@ -63,7 +65,7 @@
         <tbody>
           <tr><th>Number</th><th>Teams</th></tr>
           {% for number, team_list in rca_winners.data %}
-            {% if forloop.revcounter >= 4 or rca_winners.data|length < 4 %}
+            {% if forloop.counter <= 4 %}
             {% if team_list|length < 15 %}
             <tr>
               <td>{{number}}</td>
@@ -89,7 +91,8 @@
         <tbody>
           <tr><th>Number</th><th>Teams</th></tr>
           {% for number, team_list in regional_district_winners.data %}
-            {% if forloop.revcounter > 6 or regional_district_winners.data|length <= 6 and team_list|length < 15 %}
+            {% if forloop.counter <= 6 %}
+            {% if team_list|length < 15 %}
             <tr>
               <td>{{number}}</td>
               <td>
@@ -98,6 +101,7 @@
                 {% endfor %}
               </td>
             </tr>
+            {% endif %}
             {% endif %}
           {% endfor %}
       </table>
