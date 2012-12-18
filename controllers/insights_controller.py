@@ -37,7 +37,7 @@ class InsightsOverview(BaseHandler):
                 'valid_years': VALID_YEARS,
             }
             
-            insight_futures = [Insight.get_by_id_async(Insight.renderKeyName(None, insight_name)) for insight_name in InsightsHelper.INSIGHT_NAMES.values()]
+            insight_futures = [Insight.get_by_id_async(Insight.renderKeyName(None, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()]
             for insight_future in insight_futures:
                 insight = insight_future.get_result()
                 if insight:
@@ -69,7 +69,7 @@ class InsightsDetail(BaseHandler):
                 'selected_year': year,
             }
             
-            insight_futures = [Insight.get_by_id_async(Insight.renderKeyName(year, insight_name)) for insight_name in InsightsHelper.INSIGHT_NAMES.values()]
+            insight_futures = [Insight.get_by_id_async(Insight.renderKeyName(year, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()]
             for insight_future in insight_futures:
                 insight = insight_future.get_result()
                 if insight:
