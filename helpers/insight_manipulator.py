@@ -18,8 +18,6 @@ class InsightManipulator(ManipulatorBase):
             'data_json',
         ]
 
-        list_attrs = []
-
         for attr in attrs:
             if getattr(new_insight, attr) is not None:
                 if getattr(new_insight, attr) != getattr(old_insight, attr):
@@ -28,12 +26,6 @@ class InsightManipulator(ManipulatorBase):
             if getattr(new_insight, attr) == "None":
                 if getattr(old_insight, attr, None) != None:
                     setattr(old_insight, attr, None)
-                    old_insight.dirty = True
-
-        for attr in list_attrs:
-            if len(getattr(new_insight, attr)) > 0:
-                if getattr(new_insight, attr) != getattr(old_insight, attr):
-                    setattr(old_insight, attr, getattr(new_insight, attr))
                     old_insight.dirty = True
 
         return old_insight
