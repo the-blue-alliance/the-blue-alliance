@@ -17,11 +17,11 @@ class CacheableHandler(webapp2.RequestHandler):
         super(CacheableHandler, self).__init__(*args, **kw)
         self._cache_expiration = 0
         self._cache_key = ""
-        self._cache_key_version = 0
+        self._cache_version = 0
 
     @property
     def cache_key(self):
-        return "{}:{}".format(self._cache_key, self._cache_key_version)
+        return "{}:{}".format(self._cache_key, self._cache_version)
 
     def get(self, *args, **kw):
         content = self._read_cache()
