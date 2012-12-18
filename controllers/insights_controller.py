@@ -37,12 +37,11 @@ class InsightsOverview(BaseHandler):
                 'valid_years': VALID_YEARS,
             }
             
-            for insight_name in InsightsHelper.INSIGHT_NAMES.values():
-                insight_key = Insight.renderKeyName(None, insight_name)
-                insight = Insight.get_by_id_async(insight_key).get_result()
+            insight_futures = [Insight.get_by_id_async(Insight.renderKeyName(None, insight_name)) for insight_name in InsightsHelper.INSIGHT_NAMES.values()]
+            for insight_future in insight_futures:
+                insight = insight_future.get_result()
                 if insight:
-                    template_values[insight_name] = {'data': insight.data,
-                                                     'data_json': insight.data_json}
+                    template_values[insight.name] = insight
                             
             path = os.path.join(os.path.dirname(__file__), '../templates/insights.html')
             html = template.render(path, template_values)
@@ -70,12 +69,11 @@ class InsightsDetail(BaseHandler):
                 'selected_year': year,
             }
             
-            for insight_name in InsightsHelper.INSIGHT_NAMES.values():
-                insight_key = Insight.renderKeyName(year, insight_name)
-                insight = Insight.get_by_id_async(insight_key).get_result()
+            insight_futures = [Insight.get_by_id_async(Insight.renderKeyName(year, insight_name)) for insight_name in InsightsHelper.INSIGHT_NAMES.values()]
+            for insight_future in insight_futures:
+                insight = insight_future.get_result()
                 if insight:
-                    template_values[insight_name] = {'data': insight.data,
-                                                     'data_json': insight.data_json}
+                    template_values[insight.name] = insight
             
             path = os.path.join(os.path.dirname(__file__), '../templates/insights_details.html')
             html = template.render(path, template_values)
