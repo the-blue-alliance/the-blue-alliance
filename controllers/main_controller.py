@@ -9,7 +9,7 @@ from google.appengine.ext.webapp import template
 
 import tba_config
 
-from base_controller import BaseHandler
+from base_controller import BaseHandler, CacheableHandler
 
 from models.event import Event
 from models.team import Team
@@ -25,56 +25,91 @@ def render_static(page):
     
     return html
 
-class MainHandler(BaseHandler):
-    def get(self):
-        memcache_key = "main_index"
-        html = memcache.get(memcache_key)
-        if html is None:
-            next_events = Event.query(Event.start_date >= (datetime.datetime.today()  - datetime.timedelta(days=4)))
-            next_events.order(Event.start_date).fetch(20)
-            
-            upcoming_events = []
-            for event in next_events:
-                if event.start_date.date() < datetime.date.today() + datetime.timedelta(days=4):
-                    upcoming_events.append(event)
-            # Only show events that are happening "the same week" as the first one
-            if len(upcoming_events) > 0:
-                first_start_date = upcoming_events[0].start_date            
-                upcoming_events = [e for e in upcoming_events if ((e.start_date - datetime.timedelta(days=6)) < first_start_date)]
-                kickoff_countdown = False
-            else:
-                kickoff_countdown = True
+class MainHandler(CacheableHandler):
+    def __init__(self, *args, **kw):
+        super(CacheableHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+        self._cache_key = "main_index"
+        self._cache_key_version = 1
 
-            template_values = {
-                "kickoff_countdown": kickoff_countdown,
-                "events": upcoming_events,
-            }
-            
-            path = os.path.join(os.path.dirname(__file__), '../templates/index.html')
-            html = template.render(path, template_values)
-            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
+    def _render(self, *args, **kw):
+        next_events = Event.query(Event.start_date >= (datetime.datetime.today()  - datetime.timedelta(days=4)))
+        next_events.order(Event.start_date).fetch(20)
         
-        self.response.out.write(html)
+        upcoming_events = []
+        for event in next_events:
+            if event.start_date.date() < datetime.date.today() + datetime.timedelta(days=4):
+                upcoming_events.append(event)
+        # Only show events that are happening "the same week" as the first one
+        if len(upcoming_events) > 0:
+            first_start_date = upcoming_events[0].start_date            
+            upcoming_events = [e for e in upcoming_events if ((e.start_date - datetime.timedelta(days=6)) < first_start_date)]
+            kickoff_countdown = False
+        else:
+            kickoff_countdown = True
 
-class ContactHandler(BaseHandler):
-    def get(self):
-        self.response.out.write(render_static("contact"))
-
-class HashtagsHandler(BaseHandler):
-    def get(self):
-        self.response.out.write(render_static("hashtags"))
+        template_values = {
+            "kickoff_countdown": kickoff_countdown,
+            "events": upcoming_events,
+        }
         
-class AboutHandler(BaseHandler):
-    def get(self):
-        self.response.out.write(render_static("about"))
+        path = os.path.join(os.path.dirname(__file__), '../templates/index.html')
+        return template.render(path, template_values)
 
-class ThanksHandler(BaseHandler):
-    def get(self):
-        self.response.out.write(render_static("thanks"))
+class ContactHandler(CacheableHandler):
+    def __init__(self, *args, **kw):
+        super(CacheableHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+        self._cache_key = "main_contact"
+        self._cache_key_version = 1
 
-class OprHandler(BaseHandler):
-    def get(self):
-        self.response.out.write(render_static("opr"))
+    def _render(self, *args, **kw):
+        path = os.path.join(os.path.dirname(__file__), "../templates/contact.html")
+        return template.render(path, {})
+
+class HashtagsHandler(CacheableHandler):
+    def __init__(self, *args, **kw):
+        super(CacheableHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+        self._cache_key = "main_hashtags"
+        self._cache_key_version = 1
+
+    def _render(self, *args, **kw):
+        path = os.path.join(os.path.dirname(__file__), "../templates/hashtags.html")
+        return template.render(path, {})
+        
+class AboutHandler(CacheableHandler):
+    def __init__(self, *args, **kw):
+        super(CacheableHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+        self._cache_key = "main_about"
+        self._cache_key_version = 1
+
+    def _render(self, *args, **kw):
+        path = os.path.join(os.path.dirname(__file__), "../templates/about.html")
+        return template.render(path, {})
+
+class ThanksHandler(CacheableHandler):
+    def __init__(self, *args, **kw):
+        super(CacheableHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+        self._cache_key = "main_thanks"
+        self._cache_key_version = 1
+
+    def _render(self, *args, **kw):
+        path = os.path.join(os.path.dirname(__file__), "../templates/thanks.html")
+        return template.render(path, {})
+
+class OprHandler(CacheableHandler):
+    def __init__(self, *args, **kw):
+        super(CacheableHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+        self._cache_key = "main_opr"
+        self._cache_key_version = 1
+
+    def _render(self, *args, **kw):
+        path = os.path.join(os.path.dirname(__file__), "../templates/opr.html")
+        return template.render(path, {})
 
 class SearchHandler(BaseHandler):
     def get(self):
@@ -92,55 +127,53 @@ class SearchHandler(BaseHandler):
         finally:
             self.response.out.write(render_static("search"))
             
-class KickoffHandler(BaseHandler):
-    def get(self):
-        memcache_key = "main_kickoff"
-        html = memcache.get(memcache_key)
-        
-        if html is None:
-            template_values = {}
-            
-            path = os.path.join(os.path.dirname(__file__), '../templates/kickoff.html')
-            html = template.render(path, template_values)
-            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
-        
-        self.response.out.write(html)        
+class KickoffHandler(CacheableHandler):
+    def __init__(self, *args, **kw):
+        super(CacheableHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+        self._cache_key = "main_kickoff"
+        self._cache_key_version = 1
 
-class GamedayHandler(BaseHandler):
-    def get(self):
-        memcache_key = "main_gameday"
-        html = memcache.get(memcache_key)
-        if html is None:
-            next_events = Event.query(Event.start_date >= (datetime.datetime.today() - datetime.timedelta(days=4)))
-            next_events.order(Event.start_date).fetch(20)
-            
-            ongoing_events = []
-            ongoing_events_w_webcasts = []
-            for event in next_events:
-                if event.start_date.date() < datetime.date.today() + datetime.timedelta(days=4):
-                    ongoing_events.append(event)
-                    if event.webcast:
-                        valid = []
-                        for webcast in event.webcast:
-                            if 'type' in webcast and 'channel' in webcast:
-                                event_webcast = {'event': event}
-                                valid.append(event_webcast)
-                        # Add webcast numbers if more than one for an event
-                        if len(valid) > 1:
-                            count = 1
-                            for event in valid:
-                                event['count'] = count
-                                count += 1
-                        ongoing_events_w_webcasts += valid
-            
-            template_values = {'ongoing_events': ongoing_events,
-                               'ongoing_events_w_webcasts': ongoing_events_w_webcasts}
-            
-            path = os.path.join(os.path.dirname(__file__), '../templates/gameday.html')
-            html = template.render(path, template_values)
-            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
+    def _render(self, *args, **kw):
+        path = os.path.join(os.path.dirname(__file__), "../templates/kickoff.html")
+        return template.render(path, {})
+
+class GamedayHandler(CacheableHandler):
+    def __init__(self, *args, **kw):
+        super(CacheableHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+        self._cache_key = "main_gameday"
+        self._cache_key_version = 1
+
+    def _render(self, *args, **kw):
+        next_events = Event.query(Event.start_date >= (datetime.datetime.today() - datetime.timedelta(days=4)))
+        next_events.order(Event.start_date).fetch(20)
         
-        self.response.out.write(html)   
+        ongoing_events = []
+        ongoing_events_w_webcasts = []
+        for event in next_events:
+            if event.start_date.date() < datetime.date.today() + datetime.timedelta(days=4):
+                ongoing_events.append(event)
+                if event.webcast:
+                    valid = []
+                    for webcast in event.webcast:
+                        if 'type' in webcast and 'channel' in webcast:
+                            event_webcast = {'event': event}
+                            valid.append(event_webcast)
+                    # Add webcast numbers if more than one for an event
+                    if len(valid) > 1:
+                        count = 1
+                        for event in valid:
+                            event['count'] = count
+                            count += 1
+                    ongoing_events_w_webcasts += valid
+        
+        template_values = {'ongoing_events': ongoing_events,
+                           'ongoing_events_w_webcasts': ongoing_events_w_webcasts}
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/gameday.html')
+        return template.render(path, template_values)
+
 
 class ChannelHandler(BaseHandler):
     # This is required for the FB JSSDK
@@ -157,20 +190,19 @@ class PageNotFoundHandler(BaseHandler):
         self.error(404)
         self.response.out.write(render_static("404"))
 
-class WebcastsHandler(BaseHandler):
-    def get(self):
-        memcache_key = "main_webcasts"
-        html = memcache.get(memcache_key)
-        if html is None:
-            events = Event.query(Event.year == 2010).order(Event.start_date).fetch(500)
+class WebcastsHandler(CacheableHandler):
+    def __init__(self, *args, **kw):
+        super(CacheableHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+        self._cache_key = "main_webcasts"
+        self._cache_key_version = 1
 
-            template_values = {
-                'events': events,
-            }
-            
-            path = os.path.join(os.path.dirname(__file__), '../templates/webcasts.html')
-            html = template.render(path, template_values)
-            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
+    def _render(self, *args, **kw):
+        events = Event.query(Event.year == 2010).order(Event.start_date).fetch(500)
 
-        self.response.out.write(html)
-
+        template_values = {
+            'events': events,
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/webcasts.html')
+        return template.render(path, template_values)
