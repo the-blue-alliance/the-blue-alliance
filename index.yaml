@@ -32,12 +32,6 @@ indexes:
 
 - kind: Event
   properties:
-  - name: official
-  - name: year
-  - name: start_date
-
-- kind: Event
-  properties:
   - name: year
   - name: first_eid
 
@@ -73,11 +67,6 @@ indexes:
   - name: team
   - name: year
   - name: event
-
-- kind: Insight
-  properties:
-  - name: name
-  - name: year
 
 - kind: Match
   properties:
