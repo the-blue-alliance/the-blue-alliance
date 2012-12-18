@@ -68,6 +68,7 @@ class AwardHelper(object):
     in alphabetical order by official name
     """
     
+    # For checking if an award falls in one of the following categories
     REGIONAL_WIN_KEYS = set(['win1', 'win2', 'win3', 'win4'])
     REGIONAL_CA_KEYS = set(['ca', 'ca1', 'ca2'])
     DIVISION_WIN_KEYS = set(['div_win1', 'div_win2', 'div_win3', 'div_win4'])
