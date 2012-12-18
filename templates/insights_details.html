@@ -58,8 +58,10 @@
     </div>
     {% endif %}
   
-  {% if blue_banners or regional_district_winners or match_highscore or match_averages or bucketed_scores %}
+  {% if blue_banners or regional_district_winners %}
+  {% if match_highscore or match_averages or bucketed_scores %}
   <hr>
+  {% endif %}
   {% endif %}
   
   {% if match_highscore or match_averages or bucketed_scores %}
