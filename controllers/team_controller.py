@@ -20,13 +20,15 @@ from models.award import Award
 
 # The view of a list of teams.
 class TeamList(BaseHandler):
-    def get(self, page='0'):
+    def get(self, page=''):
         if page.isdigit():
             page = int(page)
+        if page == 1:
+            return self.redirect("/teams")
         if page == '':
-            page = 0
+            page = 1
         
-        VALID_PAGES = [0, 1, 2, 3, 4]
+        VALID_PAGES = [1, 2, 3, 4, 5]
         if page not in VALID_PAGES:
             return self.redirect("/error/404")
         
@@ -36,15 +38,15 @@ class TeamList(BaseHandler):
         if html is None:
             page_labels = []
             for curPage in VALID_PAGES:
-                if curPage == 0:
+                if curPage == 1:
                     label = '1-999'
                 else:
-                    label = "{}'s".format(curPage*1000)
+                    label = "{}'s".format((curPage - 1)*1000)
                 page_labels.append(label)
                 if curPage == page:
                     cur_page_label = label
                                        
-            start = page * 1000
+            start = (page - 1) * 1000
             stop = start + 999
             teams = Team.query().order(Team.team_number).filter(Team.team_number >= start).filter(Team.team_number < stop).fetch(10000)        
 
