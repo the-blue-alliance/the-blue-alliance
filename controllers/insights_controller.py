@@ -9,17 +9,7 @@ from google.appengine.ext.webapp import template
 
 import tba_config
 from base_controller import BaseHandler
-from helpers.match_helper import MatchHelper
-from helpers.award_helper import AwardHelper
-from helpers.team_helper import TeamHelper
-from helpers.event_helper import EventHelper
-from helpers.insights_helper import InsightsHelper
 
-from models.award import Award
-from models.event import Event
-from models.event_team import EventTeam
-from models.match import Match
-from models.team import Team
 from models.insight import Insight
 
 VALID_YEARS = [2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 2004, 2003, 2002]
