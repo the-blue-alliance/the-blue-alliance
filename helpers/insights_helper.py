@@ -4,45 +4,13 @@ import math
 
 from models.insight import Insight
 from models.event import Event
+from models.award import Award
+from models.match import Match
 
 from helpers.event_helper import EventHelper
 from helpers.award_helper import AwardHelper
 
 class InsightsHelper(object):
-    MATCH_HIGHSCORE = 0
-    MATCH_AVERAGES = 1
-    BUCKETED_SCORES = 2
-    REGIONAL_DISTRICT_WINNERS = 3
-    DIVISION_FINALISTS = 4
-    DIVISION_WINNERS = 5
-    WORLD_FINALISTS = 6
-    WORLD_CHAMPIONS = 7
-    RCA_WINNERS = 8
-    CA_WINNER = 9
-    BLUE_BANNERS = 10
-    NUM_MATCHES = 11
-    ELIM_MATCH_AVERAGES = 12
-    ELIM_BUCKETED_SCORES = 13
-    
-    # Used for datastore keys! Don't change unless you know what you're doing.
-    INSIGHT_NAMES = {MATCH_HIGHSCORE: 'match_highscore',
-                     BUCKETED_SCORES: 'bucketed_scores',
-                     REGIONAL_DISTRICT_WINNERS: 'regional_district_winners',
-                     DIVISION_FINALISTS: 'division_finalists',
-                     DIVISION_WINNERS: 'division_winners',
-                     WORLD_FINALISTS: 'world_finalists',
-                     WORLD_CHAMPIONS: 'world_champions',
-                     RCA_WINNERS: 'rca_winners',
-                     CA_WINNER: 'ca_winner',
-                     BLUE_BANNERS: 'blue_banners',
-                     MATCH_AVERAGES: 'match_averages',
-                     NUM_MATCHES: 'num_matches',
-                     ELIM_MATCH_AVERAGES: 'elim_match_averages',
-                     ELIM_BUCKETED_SCORES: 'elim_bucketed_scores',
-                     }
-
-    ELIM_LEVELS = set(['ef', 'qf', 'sf', 'f'])
-
     @classmethod
     def doMatchInsights(self, year):
         insights = []
@@ -70,7 +38,7 @@ class InsightsHelper(object):
                 matches = event.matches
                 for match in matches:
                     num_matches_by_week += 1
-                    if match.comp_level in self.ELIM_LEVELS:
+                    if match.comp_level in Match.ELIM_LEVELS:
                         num_elim_matches_by_week += 1
                     num_matches += 1
                     alliances = match.alliances
@@ -102,14 +70,14 @@ class InsightsHelper(object):
                             overall_highscore_matches = []
                         overall_highscore_matches.append(match_data)
                         overall_match_highscore = redScore
-                        if match.comp_level in self.ELIM_LEVELS:
+                        if match.comp_level in match.ELIM_LEVELS:
                             overall_elim_match_highscore = redScore
                     if blueScore >= overall_match_highscore:
                         if blueScore > overall_match_highscore:
                             overall_highscore_matches = []
                         overall_highscore_matches.append(match_data)
                         overall_match_highscore = blueScore
-                        if match.comp_level in self.ELIM_LEVELS:
+                        if match.comp_level in match.ELIM_LEVELS:
                             overall_elim_match_highscore = blueScore
 
                     # Bucketed scores
@@ -122,7 +90,7 @@ class InsightsHelper(object):
                     else:
                         bucketed_scores[blueScore] = 1
                             
-                    if match.comp_level in self.ELIM_LEVELS:
+                    if match.comp_level in match.ELIM_LEVELS:
                         if redScore in elim_bucketed_scores:
                             elim_bucketed_scores[redScore] += 1
                         else:
@@ -134,7 +102,7 @@ class InsightsHelper(object):
 
                     # Match score sums
                     week_match_sum += redScore + blueScore
-                    if match.comp_level in self.ELIM_LEVELS:
+                    if match.comp_level in match.ELIM_LEVELS:
                         elim_week_match_sum += redScore + blueScore
                     
             highscore_matches_by_week.append((week, week_highscore_matches))
@@ -153,8 +121,8 @@ class InsightsHelper(object):
           
         if overall_highscore_matches or highscore_matches_by_week:
             insights.append(Insight(
-                id = Insight.renderKeyName(year, self.INSIGHT_NAMES[self.MATCH_HIGHSCORE]),
-                name = self.INSIGHT_NAMES[self.MATCH_HIGHSCORE],
+                id = Insight.renderKeyName(year, Insight.INSIGHT_NAMES[Insight.MATCH_HIGHSCORE]),
+                name = Insight.INSIGHT_NAMES[Insight.MATCH_HIGHSCORE],
                 year = year,
                 data_json = json.dumps((overall_highscore_matches, highscore_matches_by_week))))
         
@@ -171,8 +139,8 @@ class InsightsHelper(object):
                 else:
                     bucketed_scores_normalized[score] = contribution
             insights.append(Insight(
-                id = Insight.renderKeyName(year, self.INSIGHT_NAMES[self.BUCKETED_SCORES]),
-                name = self.INSIGHT_NAMES[self.BUCKETED_SCORES],
+                id = Insight.renderKeyName(year, Insight.INSIGHT_NAMES[Insight.BUCKETED_SCORES]),
+                name = Insight.INSIGHT_NAMES[Insight.BUCKETED_SCORES],
                 year = year,
                 data_json = json.dumps(bucketed_scores_normalized)))
             
@@ -191,29 +159,29 @@ class InsightsHelper(object):
                 else:
                     elim_bucketed_scores_normalized[score] = contribution
             insights.append(Insight(
-                id = Insight.renderKeyName(year, self.INSIGHT_NAMES[self.ELIM_BUCKETED_SCORES]),
-                name = self.INSIGHT_NAMES[self.ELIM_BUCKETED_SCORES],
+                id = Insight.renderKeyName(year, Insight.INSIGHT_NAMES[Insight.ELIM_BUCKETED_SCORES]),
+                name = Insight.INSIGHT_NAMES[Insight.ELIM_BUCKETED_SCORES],
                 year = year,
                 data_json = json.dumps(elim_bucketed_scores_normalized)))
             
         if match_averages_by_week:
             insights.append(Insight(
-                id = Insight.renderKeyName(year, self.INSIGHT_NAMES[self.MATCH_AVERAGES]),
-                name = self.INSIGHT_NAMES[self.MATCH_AVERAGES],
+                id = Insight.renderKeyName(year, Insight.INSIGHT_NAMES[Insight.MATCH_AVERAGES]),
+                name = Insight.INSIGHT_NAMES[Insight.MATCH_AVERAGES],
                 year = year,
                 data_json = json.dumps(match_averages_by_week)))
             
         if elim_match_averages_by_week:
             insights.append(Insight(
-                id = Insight.renderKeyName(year, self.INSIGHT_NAMES[self.ELIM_MATCH_AVERAGES]),
-                name = self.INSIGHT_NAMES[self.ELIM_MATCH_AVERAGES],
+                id = Insight.renderKeyName(year, Insight.INSIGHT_NAMES[Insight.ELIM_MATCH_AVERAGES]),
+                name = Insight.INSIGHT_NAMES[Insight.ELIM_MATCH_AVERAGES],
                 year = year,
                 data_json = json.dumps(elim_match_averages_by_week)))
 
         if num_matches:
             insights.append(Insight(
-                id = Insight.renderKeyName(year, self.INSIGHT_NAMES[self.NUM_MATCHES]),
-                name = self.INSIGHT_NAMES[self.NUM_MATCHES],
+                id = Insight.renderKeyName(year, Insight.INSIGHT_NAMES[Insight.NUM_MATCHES]),
+                name = Insight.INSIGHT_NAMES[Insight.NUM_MATCHES],
                 year = year,
                 data_json = json.dumps(num_matches)))
             
@@ -223,7 +191,7 @@ class InsightsHelper(object):
     def doAwardInsights(self, year):
         insights = []
         
-        keysToQuery = AwardHelper.BLUE_BANNER_KEYS.union(AwardHelper.DIVISION_FIN_KEYS).union(AwardHelper.CHAMPIONSHIP_FIN_KEYS)
+        keysToQuery = Award.BLUE_BANNER_KEYS.union(Award.DIVISION_FIN_KEYS).union(Award.CHAMPIONSHIP_FIN_KEYS)
         awards = AwardHelper.getAwards(keysToQuery, year)
         
         regional_winners = {}
@@ -238,38 +206,38 @@ class InsightsHelper(object):
             teamKey = award.team.id()
 
             # Regional Winners
-            if award.name in AwardHelper.REGIONAL_WIN_KEYS:
+            if award.name in Award.REGIONAL_WIN_KEYS:
                 if teamKey in regional_winners:
                     regional_winners[teamKey] += 1
                 else:
                     regional_winners[teamKey] = 1
                     
             # Division Winners
-            if award.name in AwardHelper.DIVISION_WIN_KEYS:
+            if award.name in Award.DIVISION_WIN_KEYS:
                 division_winners.append(teamKey)
                 
             # Divison Finalists
-            if award.name in AwardHelper.DIVISION_FIN_KEYS:
+            if award.name in Award.DIVISION_FIN_KEYS:
                 division_finalists.append(teamKey)
                                 
             # World Champions
-            if award.name in AwardHelper.CHAMPIONSHIP_WIN_KEYS:
+            if award.name in Award.CHAMPIONSHIP_WIN_KEYS:
                 world_champions.append(teamKey)
                 
             # World Finalists
-            if award.name in AwardHelper.CHAMPIONSHIP_FIN_KEYS:
+            if award.name in Award.CHAMPIONSHIP_FIN_KEYS:
                 world_finalists.append(teamKey)
 
             # RCA Winners
-            if award.name in AwardHelper.REGIONAL_CA_KEYS:
+            if award.name in Award.REGIONAL_CA_KEYS:
                 rca_winners.append(teamKey)
                 
             # CA Winner
-            if award.name in AwardHelper.CHAMPIONSHIP_CA_KEYS:
+            if award.name in Award.CHAMPIONSHIP_CA_KEYS:
                 ca_winner = teamKey
             
             # Blue Banner Winners
-            if award.name in AwardHelper.BLUE_BANNER_KEYS:
+            if award.name in Award.BLUE_BANNER_KEYS:
                 if teamKey in blue_banners:
                     blue_banners[teamKey] += 1
                 else:
@@ -303,57 +271,57 @@ class InsightsHelper(object):
         # Creating Insights
         if regional_winners:
             insights.append(Insight(
-            id = Insight.renderKeyName(year, self.INSIGHT_NAMES[self.REGIONAL_DISTRICT_WINNERS]),
-            name = self.INSIGHT_NAMES[self.REGIONAL_DISTRICT_WINNERS],
+            id = Insight.renderKeyName(year, Insight.INSIGHT_NAMES[Insight.REGIONAL_DISTRICT_WINNERS]),
+            name = Insight.INSIGHT_NAMES[Insight.REGIONAL_DISTRICT_WINNERS],
             year = year,
             data_json = json.dumps(regional_winners)))
         
         if division_finalists:
             insights.append(Insight(
-            id = Insight.renderKeyName(year, self.INSIGHT_NAMES[self.DIVISION_FINALISTS]),
-            name = self.INSIGHT_NAMES[self.DIVISION_FINALISTS],
+            id = Insight.renderKeyName(year, Insight.INSIGHT_NAMES[Insight.DIVISION_FINALISTS]),
+            name = Insight.INSIGHT_NAMES[Insight.DIVISION_FINALISTS],
             year = year,
             data_json = json.dumps(division_finalists)))
         
         if division_winners:
             insights.append(Insight(
-            id = Insight.renderKeyName(year, self.INSIGHT_NAMES[self.DIVISION_WINNERS]),
-            name = self.INSIGHT_NAMES[self.DIVISION_WINNERS],
+            id = Insight.renderKeyName(year, Insight.INSIGHT_NAMES[Insight.DIVISION_WINNERS]),
+            name = Insight.INSIGHT_NAMES[Insight.DIVISION_WINNERS],
             year = year,
             data_json = json.dumps(division_winners)))
         
         if world_finalists:
             insights.append(Insight(
-            id = Insight.renderKeyName(year, self.INSIGHT_NAMES[self.WORLD_FINALISTS]),
-            name = self.INSIGHT_NAMES[self.WORLD_FINALISTS],
+            id = Insight.renderKeyName(year, Insight.INSIGHT_NAMES[Insight.WORLD_FINALISTS]),
+            name = Insight.INSIGHT_NAMES[Insight.WORLD_FINALISTS],
             year = year,
             data_json = json.dumps(world_finalists)))
         
         if world_champions:
             insights.append(Insight(
-            id = Insight.renderKeyName(year, self.INSIGHT_NAMES[self.WORLD_CHAMPIONS]),
-            name = self.INSIGHT_NAMES[self.WORLD_CHAMPIONS],
+            id = Insight.renderKeyName(year, Insight.INSIGHT_NAMES[Insight.WORLD_CHAMPIONS]),
+            name = Insight.INSIGHT_NAMES[Insight.WORLD_CHAMPIONS],
             year = year,
             data_json = json.dumps(world_champions)))
         
         if rca_winners:
             insights.append(Insight(
-            id = Insight.renderKeyName(year, self.INSIGHT_NAMES[self.RCA_WINNERS]),
-            name = self.INSIGHT_NAMES[self.RCA_WINNERS],
+            id = Insight.renderKeyName(year, Insight.INSIGHT_NAMES[Insight.RCA_WINNERS]),
+            name = Insight.INSIGHT_NAMES[Insight.RCA_WINNERS],
             year = year,
             data_json = json.dumps(rca_winners)))
         
         if ca_winner:
             insights.append(Insight(
-            id = Insight.renderKeyName(year, self.INSIGHT_NAMES[self.CA_WINNER]),
-            name = self.INSIGHT_NAMES[self.CA_WINNER],
+            id = Insight.renderKeyName(year, Insight.INSIGHT_NAMES[Insight.CA_WINNER]),
+            name = Insight.INSIGHT_NAMES[Insight.CA_WINNER],
             year = year,
             data_json = json.dumps(ca_winner)))
         
         if blue_banners:
             insights.append(Insight(
-            id = Insight.renderKeyName(year, self.INSIGHT_NAMES[self.BLUE_BANNERS]),
-            name = self.INSIGHT_NAMES[self.BLUE_BANNERS],
+            id = Insight.renderKeyName(year, Insight.INSIGHT_NAMES[Insight.BLUE_BANNERS]),
+            name = Insight.INSIGHT_NAMES[Insight.BLUE_BANNERS],
             year = year,
             data_json = json.dumps(blue_banners)))
 
@@ -363,7 +331,7 @@ class InsightsHelper(object):
     def doOverallMatchInsights(self):
         insights = []
         
-        year_num_matches = Insight.query(Insight.name == self.INSIGHT_NAMES[self.NUM_MATCHES], Insight.year != 0).fetch(1000)
+        year_num_matches = Insight.query(Insight.name == Insight.INSIGHT_NAMES[Insight.NUM_MATCHES], Insight.year != 0).fetch(1000)
         num_matches = []
         for insight in year_num_matches:
             num_matches.append((insight.year, insight.data))
@@ -371,8 +339,8 @@ class InsightsHelper(object):
         # Creating Insights
         if num_matches:
             insights.append(Insight(
-            id = Insight.renderKeyName(None, self.INSIGHT_NAMES[self.NUM_MATCHES]),
-            name = self.INSIGHT_NAMES[self.NUM_MATCHES],
+            id = Insight.renderKeyName(None, Insight.INSIGHT_NAMES[Insight.NUM_MATCHES]),
+            name = Insight.INSIGHT_NAMES[Insight.NUM_MATCHES],
             year = 0,
             data_json = json.dumps(num_matches)))
         
@@ -382,7 +350,7 @@ class InsightsHelper(object):
     def doOverallAwardInsights(self):
         insights = []
         
-        year_regional_winners = Insight.query(Insight.name == self.INSIGHT_NAMES[self.REGIONAL_DISTRICT_WINNERS], Insight.year != 0).fetch(1000)
+        year_regional_winners = Insight.query(Insight.name == Insight.INSIGHT_NAMES[Insight.REGIONAL_DISTRICT_WINNERS], Insight.year != 0).fetch(1000)
         regional_winners = {}
         for insight in year_regional_winners:
             for number, team_list in insight.data:
@@ -392,7 +360,7 @@ class InsightsHelper(object):
                     else:
                         regional_winners[team] = number
         
-        year_blue_banners = Insight.query(Insight.name == self.INSIGHT_NAMES[self.BLUE_BANNERS], Insight.year != 0).fetch(1000)
+        year_blue_banners = Insight.query(Insight.name == Insight.INSIGHT_NAMES[Insight.BLUE_BANNERS], Insight.year != 0).fetch(1000)
         blue_banners = {}
         for insight in year_blue_banners:
             for number, team_list in insight.data:
@@ -402,7 +370,7 @@ class InsightsHelper(object):
                     else:
                         blue_banners[team] = number
                         
-        year_rca_winners = Insight.query(Insight.name == self.INSIGHT_NAMES[self.RCA_WINNERS], Insight.year != 0).fetch(1000)
+        year_rca_winners = Insight.query(Insight.name == Insight.INSIGHT_NAMES[Insight.RCA_WINNERS], Insight.year != 0).fetch(1000)
         rca_winners = {}
         for insight in year_rca_winners:
             for team in insight.data:
@@ -411,7 +379,7 @@ class InsightsHelper(object):
                 else:
                     rca_winners[team] = 1
                     
-        year_world_champions = Insight.query(Insight.name == self.INSIGHT_NAMES[self.WORLD_CHAMPIONS], Insight.year != 0).fetch(1000)
+        year_world_champions = Insight.query(Insight.name == Insight.INSIGHT_NAMES[Insight.WORLD_CHAMPIONS], Insight.year != 0).fetch(1000)
         world_champions = {}
         for insight in year_world_champions:
             for team in insight.data:
@@ -460,29 +428,29 @@ class InsightsHelper(object):
         # Creating Insights
         if regional_winners:
             insights.append(Insight(
-            id = Insight.renderKeyName(None, self.INSIGHT_NAMES[self.REGIONAL_DISTRICT_WINNERS]),
-            name = self.INSIGHT_NAMES[self.REGIONAL_DISTRICT_WINNERS],
+            id = Insight.renderKeyName(None, Insight.INSIGHT_NAMES[Insight.REGIONAL_DISTRICT_WINNERS]),
+            name = Insight.INSIGHT_NAMES[Insight.REGIONAL_DISTRICT_WINNERS],
             year = 0,
             data_json = json.dumps(regional_winners)))
             
         if blue_banners:
             insights.append(Insight(
-            id = Insight.renderKeyName(None, self.INSIGHT_NAMES[self.BLUE_BANNERS]),
-            name = self.INSIGHT_NAMES[self.BLUE_BANNERS],
+            id = Insight.renderKeyName(None, Insight.INSIGHT_NAMES[Insight.BLUE_BANNERS]),
+            name = Insight.INSIGHT_NAMES[Insight.BLUE_BANNERS],
             year = 0,
             data_json = json.dumps(blue_banners)))
             
         if rca_winners:
             insights.append(Insight(
-            id = Insight.renderKeyName(None, self.INSIGHT_NAMES[self.RCA_WINNERS]),
-            name = self.INSIGHT_NAMES[self.RCA_WINNERS],
+            id = Insight.renderKeyName(None, Insight.INSIGHT_NAMES[Insight.RCA_WINNERS]),
+            name = Insight.INSIGHT_NAMES[Insight.RCA_WINNERS],
             year = 0,
             data_json = json.dumps(rca_winners)))
             
         if world_champions:
             insights.append(Insight(
-            id = Insight.renderKeyName(None, self.INSIGHT_NAMES[self.WORLD_CHAMPIONS]),
-            name = self.INSIGHT_NAMES[self.WORLD_CHAMPIONS],
+            id = Insight.renderKeyName(None, Insight.INSIGHT_NAMES[Insight.WORLD_CHAMPIONS]),
+            name = Insight.INSIGHT_NAMES[Insight.WORLD_CHAMPIONS],
             year = 0,
             data_json = json.dumps(world_champions)))
             
