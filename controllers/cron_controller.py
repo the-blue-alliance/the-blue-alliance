@@ -184,7 +184,7 @@ class OverallInsightsEnqueue(webapp.RequestHandler):
     """
     def get(self, kind):
         taskqueue.add(
-            url='/tasks/math/do/insights/{}'.format(kind),
+            url='/tasks/math/do/overallinsights/{}'.format(kind),
             method='GET')
         
         template_values = {
