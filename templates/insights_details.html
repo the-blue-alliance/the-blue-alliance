@@ -59,19 +59,19 @@
     {% endif %}
   
   {% if blue_banners or regional_district_winners %}
-  {% if match_highscore or match_averages or bucketed_scores %}
+  {% if match_highscore or match_averages_by_week or score_distribution %}
   <hr>
   {% endif %}
   {% endif %}
   
-  {% if match_highscore or match_averages or bucketed_scores %}
+  {% if match_highscore or match_averages_by_week or score_distribution %}
   <h2>Matches{% if num_matches %} <small>{{num_matches.data}} Matches Played</small>{% endif %}</h2>
   {% endif %}
     {% if match_highscore %}
     <div class="row-fluid">
-      <h3>Highest Scoring Match{% if match_highscore.data.0|length > 1 %}es{% endif %}</h3>
+      <h3>Highest Scoring Match{% if match_highscore.data|length > 1 %}es{% endif %}</h3>
       <div class="span8 offset2">
-	      {% for match in  match_highscore.data.0 %}
+	      {% for match in  match_highscore.data %}
 	      <h4><a href="/match/{{match.key_name}}">{{ match.event_name }} <small>{{ match.verbose_name }}</small></a></h4>
         <table class="matchTable">
           <tr class="key">
@@ -94,7 +94,7 @@
     <div class="row-fluid">
       <h3>Highest Scoring Matches By Week</h3>
       <div class="span8 offset2">
-      {% for week, matches in match_highscore.data.1 %}
+      {% for week, matches in match_highscore_by_week.data %}
         <h3>{{week}}</h3>
         {% for match in matches %}
         <h4><a href="/match/{{match.key_name}}">{{ match.event_name }} <small>{{ match.verbose_name }}</small></a></h4>
@@ -116,36 +116,36 @@
       {% endfor %}
       </div>
     </div>
-    -->
+     -->
     {% endif %}
     
-    {% if match_averages %}
+    {% if match_averages_by_week %}
     <h3>Average Match Score By Week</h3>
-      {% if elim_match_averages %}
+      {% if elim_match_averages_by_week %}
       <div class="chart-key"><div class="color-key blue-color-key"></div><div class="chart-key-text">All Match Averages</div></div>
       <div class="chart-key"><div class="color-key green-color-key"></div><div class="chart-key-text">Elim Match Averages</div></div>
       <figure style="width: 90%; height: 300px;" id="elim-match-average-chart"></figure>
-      <div id="elim-match-average" class="xcharts-data xcharts-line-double-data">[{{ match_averages.data_json }}, {{ elim_match_averages.data_json }}]</div>
+      <div id="elim-match-average" class="xcharts-data xcharts-line-double-data">[{{ match_averages_by_week.data_json }}, {{ elim_match_averages_by_week.data_json }}]</div>
       {% else %}
       <figure style="width: 90%; height: 300px;" id="match-average-chart"></figure>
-      <div id="match-average" class="xcharts-data xcharts-line-single-data">{{ match_averages.data_json }}</div>
+      <div id="match-average" class="xcharts-data xcharts-line-single-data">{{ match_averages_by_week.data_json }}</div>
       {% endif %}
     {% endif %}
     
-    {% if bucketed_scores %}
+    {% if score_distribution %}
     <h3>Match Score Distribution <small>Percent of Matches vs. Match Score</small></h3>
-      {% if elim_bucketed_scores %}
+      {% if elim_score_distribution %}
       <div class="chart-key"><div class="color-key blue-color-key"></div><div class="chart-key-text">All Match Scores</div></div>
       <div class="chart-key"><div class="color-key green-color-key"></div><div class="chart-key-text">Elim Match Scores</div></div>
       <figure style="width: 90%; height: 300px;" id="elim-match-distribution-chart"></figure>
-      <div id="elim-match-distribution" class="xcharts-data xcharts-bar-double-data">[{{ bucketed_scores.data_json }}, {{ elim_bucketed_scores.data_json }}]</div>
+      <div id="elim-match-distribution" class="xcharts-data xcharts-bar-double-data">[{{ score_distribution.data_json }}, {{ elim_score_distribution.data_json }}]</div>
       {% else %}
       <figure style="width: 90%; height: 300px;" id="match-distribution-chart"></figure>
-      <div id="match-distribution" class="xcharts-data xcharts-bar-single-data">{{ bucketed_scores.data_json }}</div>
+      <div id="match-distribution" class="xcharts-data xcharts-bar-single-data">{{ score_distribution.data_json }}</div>
       {% endif %}
     {% endif %}
     
-    {% if blue_banners or regional_district_winners or match_highscore or match_averages or bucketed_scores %}
+    {% if blue_banners or regional_district_winners or match_highscore or match_averages_by_week or score_distribution %}
     {% else %}
     <p>No insights are currently available for {{selected_year}}.</p>
     {% endif %}

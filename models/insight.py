@@ -9,8 +9,13 @@ class Insight(ndb.Model):
     """
     
     MATCH_HIGHSCORE = 0
-    MATCH_AVERAGES = 1
-    BUCKETED_SCORES = 2
+    MATCH_HIGHSCORE_BY_WEEK = 14
+    MATCH_AVERAGES_BY_WEEK = 1
+    ELIM_MATCH_AVERAGES_BY_WEEK = 12
+    SCORE_DISTRIBUTION = 2
+    ELIM_SCORE_DISTRIBUTION = 13
+    NUM_MATCHES = 11
+
     REGIONAL_DISTRICT_WINNERS = 3
     DIVISION_FINALISTS = 4
     DIVISION_WINNERS = 5
@@ -19,13 +24,18 @@ class Insight(ndb.Model):
     RCA_WINNERS = 8
     CA_WINNER = 9
     BLUE_BANNERS = 10
-    NUM_MATCHES = 11
-    ELIM_MATCH_AVERAGES = 12
-    ELIM_BUCKETED_SCORES = 13
+
     
     # Used for datastore keys! Don't change unless you know what you're doing.
     INSIGHT_NAMES = {MATCH_HIGHSCORE: 'match_highscore',
-                     BUCKETED_SCORES: 'bucketed_scores',
+                     MATCH_HIGHSCORE_BY_WEEK: 'match_highscore_by_week',
+                     MATCH_AVERAGES_BY_WEEK: 'match_averages_by_week',
+                     ELIM_MATCH_AVERAGES_BY_WEEK: 'elim_match_averages_by_week',
+                     SCORE_DISTRIBUTION: 'score_distribution',
+                     ELIM_SCORE_DISTRIBUTION: 'elim_score_distribution',
+                     NUM_MATCHES: 'num_matches',
+
+                     
                      REGIONAL_DISTRICT_WINNERS: 'regional_district_winners',
                      DIVISION_FINALISTS: 'division_finalists',
                      DIVISION_WINNERS: 'division_winners',
@@ -34,10 +44,6 @@ class Insight(ndb.Model):
                      RCA_WINNERS: 'rca_winners',
                      CA_WINNER: 'ca_winner',
                      BLUE_BANNERS: 'blue_banners',
-                     MATCH_AVERAGES: 'match_averages',
-                     NUM_MATCHES: 'num_matches',
-                     ELIM_MATCH_AVERAGES: 'elim_match_averages',
-                     ELIM_BUCKETED_SCORES: 'elim_bucketed_scores',
                      }
         
     name = ndb.StringProperty(required=True)  # general name used for sorting
@@ -69,7 +75,7 @@ class Insight(ndb.Model):
 
     @classmethod
     def renderKeyName(self, year, name):
-        if year == None:
+        if year == 0:
             return 'insights' + '_' + str(name)
         else:
             return str(year) + 'insights' + '_' + str(name)
