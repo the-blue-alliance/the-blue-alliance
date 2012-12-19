@@ -9,22 +9,20 @@ class Insight(ndb.Model):
     """
     
     MATCH_HIGHSCORE = 0
-    MATCH_HIGHSCORE_BY_WEEK = 14
-    MATCH_AVERAGES_BY_WEEK = 1
-    ELIM_MATCH_AVERAGES_BY_WEEK = 12
-    SCORE_DISTRIBUTION = 2
-    ELIM_SCORE_DISTRIBUTION = 13
-    NUM_MATCHES = 11
-
-    REGIONAL_DISTRICT_WINNERS = 3
-    DIVISION_FINALISTS = 4
-    DIVISION_WINNERS = 5
-    WORLD_FINALISTS = 6
-    WORLD_CHAMPIONS = 7
-    RCA_WINNERS = 8
-    CA_WINNER = 9
-    BLUE_BANNERS = 10
-
+    MATCH_HIGHSCORE_BY_WEEK = 1
+    MATCH_AVERAGES_BY_WEEK = 2
+    ELIM_MATCH_AVERAGES_BY_WEEK = 3
+    SCORE_DISTRIBUTION = 4
+    ELIM_SCORE_DISTRIBUTION = 5
+    NUM_MATCHES = 6
+    BLUE_BANNERS = 7
+    CA_WINNER = 8
+    RCA_WINNERS = 9
+    WORLD_CHAMPIONS = 10
+    WORLD_FINALISTS = 11
+    DIVISION_WINNERS = 12
+    DIVISION_FINALISTS = 13
+    REGIONAL_DISTRICT_WINNERS = 14
     
     # Used for datastore keys! Don't change unless you know what you're doing.
     INSIGHT_NAMES = {MATCH_HIGHSCORE: 'match_highscore',
@@ -34,16 +32,14 @@ class Insight(ndb.Model):
                      SCORE_DISTRIBUTION: 'score_distribution',
                      ELIM_SCORE_DISTRIBUTION: 'elim_score_distribution',
                      NUM_MATCHES: 'num_matches',
-
-                     
-                     REGIONAL_DISTRICT_WINNERS: 'regional_district_winners',
-                     DIVISION_FINALISTS: 'division_finalists',
-                     DIVISION_WINNERS: 'division_winners',
-                     WORLD_FINALISTS: 'world_finalists',
-                     WORLD_CHAMPIONS: 'world_champions',
-                     RCA_WINNERS: 'rca_winners',
-                     CA_WINNER: 'ca_winner',
                      BLUE_BANNERS: 'blue_banners',
+                     CA_WINNER: 'ca_winner',
+                     RCA_WINNERS: 'rca_winners',
+                     WORLD_CHAMPIONS: 'world_champions',
+                     WORLD_FINALISTS: 'world_finalists',
+                     DIVISION_WINNERS: 'division_winners',
+                     DIVISION_FINALISTS: 'division_finalists',
+                     REGIONAL_DISTRICT_WINNERS: 'regional_district_winners',
                      }
         
     name = ndb.StringProperty(required=True)  # general name used for sorting
