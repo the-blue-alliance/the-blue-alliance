@@ -1604,7 +1604,6 @@ function setupViews() {
   }
   eval('layout_' + layout + '()');
   
-  
   for (var n=0; n < 6; n++) {
 	  var view = getUrlVars()['view_' + n];
 	  if (view != null) {
@@ -1613,6 +1612,11 @@ function setupViews() {
 			setupView(n, $item);
 		}
 	  }
+  }
+  
+  var chatOpen = getUrlVars()['chat']
+  if (chatOpen != null) {
+    chat_tab();
   }
 }
 
@@ -1628,7 +1632,11 @@ function getUrlVars()
     {
         hash = hashes[i].split('=');
         vars.push(hash[0]);
-        vars[hash[0]] = hash[1];
+        if (hash[1] != null) {
+        	vars[hash[0]] = hash[1];
+        } else {
+    		vars[hash[0]] = '';
+    	}
     }
     return vars;
 }

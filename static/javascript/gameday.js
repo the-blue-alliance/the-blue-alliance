@@ -36,6 +36,7 @@ $(document).ready(function() {
 function setupViews() {
   createViews();
   
+  // Choosing layout
   var layout = getUrlVars()['layout'];
   if (layout == null) {
 	// Default layout
@@ -43,7 +44,7 @@ function setupViews() {
   }
   eval('layout_' + layout + '()');
   
-  
+  // Choosing which views to populate
   for (var n=0; n < 6; n++) {
 	  var view = getUrlVars()['view_' + n];
 	  if (view != null) {
@@ -52,6 +53,12 @@ function setupViews() {
 			setupView(n, $item);
 		}
 	  }
+  }
+  
+  // Choosing to start chat opened or closed
+  var chatOpen = getUrlVars()['chat']
+  if (chatOpen != null) {
+    chat_tab();
   }
 }
 
@@ -67,7 +74,11 @@ function getUrlVars()
     {
         hash = hashes[i].split('=');
         vars.push(hash[0]);
-        vars[hash[0]] = hash[1];
+        if (hash[1] != null) {
+        	vars[hash[0]] = hash[1];
+        } else {
+    		vars[hash[0]] = '';
+    	}
     }
     return vars;
 }
