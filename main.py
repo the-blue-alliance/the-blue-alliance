@@ -31,7 +31,6 @@ app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['kickoff'
                                ('/gameday', GamedayHandler),
                                ('/hashtags', HashtagsHandler),
                                ('/insights', InsightsOverview),
-                               ('/insights/', InsightsOverview),
                                ('/insights/(.*)', InsightsDetail),
                                ('/match/(.*)', MatchDetail),
                                ('/opr', OprHandler),

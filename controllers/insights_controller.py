@@ -44,6 +44,8 @@ class InsightsDetail(BaseHandler):
     Show Insights for a particular year
     """
     def get(self, year):
+        if year == '':
+            return self.redirect("/insights")
         if not year.isdigit():
             return self.redirect("/error/404")
         year = int(year)
