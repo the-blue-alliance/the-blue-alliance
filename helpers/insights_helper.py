@@ -11,8 +11,15 @@ from helpers.event_helper import EventHelper
 from helpers.award_helper import AwardHelper
 
 class InsightsHelper(object):
+    """
+    Helper for calculating insights and generating Insight objects
+    """
+  
     @classmethod
     def doMatchInsights(self, year):
+        """
+        Calculate match insights for a given year. Returns a list of Insights.
+        """
         # Only fetch from DB once
         official_events = Event.query(Event.year == year, Event.official == True).order(Event.start_date).fetch(1000)
         events_by_week = EventHelper.groupByWeek(official_events)        
@@ -25,21 +32,24 @@ class InsightsHelper(object):
             week_event_matches.append((week, week_events))
         
         insights = []
-        insights += self._calculateHighscoreMatchesByWeek(week_event_matches, year)
-        insights += self._calculateHighscoreMatches(week_event_matches, year)
+        insights += [self._calculateHighscoreMatchesByWeek(week_event_matches, year)]
+        insights += [self._calculateHighscoreMatches(week_event_matches, year)]
         insights += self._calculateMatchAveragesByWeek(week_event_matches, year)
         insights += self._calculateScoreDistribution(week_event_matches, year)
-        insights += self._calculateNumMatches(week_event_matches, year)
+        insights += [self._calculateNumMatches(week_event_matches, year)]
         return insights
       
     @classmethod
     def doAwardInsights(self, year):
+        """
+        Calculate award insights for a given year. Returns a list of Insights.
+        """
         # Only fetch from DB once
         keysToQuery = Award.BLUE_BANNER_KEYS.union(Award.DIVISION_FIN_KEYS).union(Award.CHAMPIONSHIP_FIN_KEYS)
         awards = AwardHelper.getAwards(keysToQuery, year)
         
         insights = []
-        insights += self._calculateBlueBanners(awards, year)
+        insights += [self._calculateBlueBanners(awards, year)]
         insights += self._calculateChampionshipStats(awards, year)
         insights += self._calculateRegionalStats(awards, year)
 
@@ -47,6 +57,9 @@ class InsightsHelper(object):
       
     @classmethod
     def _createInsight(self, data, name, year):
+        """
+        Create Insight object given data, name, and year
+        """
         return Insight(id = Insight.renderKeyName(year, name),
                        name = name,
                        year = year,
@@ -54,15 +67,44 @@ class InsightsHelper(object):
             
     @classmethod
     def _generateMatchData(self, match, event):
+        """
+        A dict of any data needed for front-end rendering
+        """
         return {'key_name': match.key_name,
                 'verbose_name': match.verbose_name,
                 'event_name': event.name,
                 'alliances': match.alliances,
                 'winning_alliance': match.winning_alliance
                 }
+                    
+    @classmethod
+    def _sortTeamWinsDict(self, wins_dict):
+        """
+        Sorts dicts with key: number of wins, value: list of teams
+        by number of wins and by team number
+        """
+        wins_dict = sorted(wins_dict.items(), key=lambda pair: int(pair[0][3:]))   # Sort by team number
+        temp = {}
+        for team, numWins in wins_dict:
+            if numWins in temp:
+                temp[numWins] += [team]
+            else:
+                temp[numWins] = [team]
+        return sorted(temp.items(), key=lambda pair: int(pair[0]), reverse=True)  # Sort by win number
+
+    @classmethod
+    def _sortTeamList(self, team_list):
+        """
+        Sorts list of teams
+        """
+        return sorted(team_list, key=lambda team: int(team[3:]))   # Sort by team number
       
     @classmethod
     def _calculateHighscoreMatchesByWeek(self, week_event_matches, year):
+        """
+        Returns an Insight where the data is a list of tuples:
+        (week string, list of highest scoring matches)
+        """
         highscore_matches_by_week = []  # tuples: week, list of matches (if there are ties)
         for week, week_events in week_event_matches:
             week_highscore_matches = []
@@ -80,10 +122,13 @@ class InsightsHelper(object):
             highscore_matches_by_week.append((week, week_highscore_matches))
 
         if highscore_matches_by_week != []:
-            return [self._createInsight(highscore_matches_by_week, Insight.INSIGHT_NAMES[Insight.MATCH_HIGHSCORE_BY_WEEK], year)]
+            return self._createInsight(highscore_matches_by_week, Insight.INSIGHT_NAMES[Insight.MATCH_HIGHSCORE_BY_WEEK], year)
           
     @classmethod
     def _calculateHighscoreMatches(self, week_event_matches, year):
+        """
+        Returns an Insight where the data is list of highest scoring matches
+        """
         highscore_matches = []  #list of matches (if there are ties)
         highscore = 0
         for _, week_events in week_event_matches:
@@ -99,10 +144,15 @@ class InsightsHelper(object):
                         highscore = maxScore
 
         if highscore_matches != []:
-            return [self._createInsight(highscore_matches, Insight.INSIGHT_NAMES[Insight.MATCH_HIGHSCORE], year)]
+            return self._createInsight(highscore_matches, Insight.INSIGHT_NAMES[Insight.MATCH_HIGHSCORE], year)
 
     @classmethod
     def _calculateMatchAveragesByWeek(self, week_event_matches, year):
+        """
+        Returns a list of Insights, one for all data and one for elim data
+        The data for each Insight is a list of tuples:
+        (week string, match averages)
+        """
         match_averages_by_week = []  # tuples: week, average score
         elim_match_averages_by_week = []  # tuples: week, average score
         for week, week_events in week_event_matches:
@@ -141,6 +191,11 @@ class InsightsHelper(object):
           
     @classmethod
     def _calculateScoreDistribution(self, week_event_matches, year):
+        """
+        Returns a list of Insights, one for all data and one for elim data
+        The data for each Insight is a dict:
+        Key: Middle score of a bucketed range of scores, Value: % occurrence
+        """
         score_distribution = {}
         elim_score_distribution = {}
         overall_highscore = 0
@@ -202,38 +257,23 @@ class InsightsHelper(object):
       
     @classmethod
     def _calculateNumMatches(self, week_event_matches, year):
+        """
+        Returns an Insight where the data is the number of matches
+        """
         numMatches = 0
         for _, week_events in week_event_matches:
             for _, matches in week_events:
                 numMatches += len(matches)
             
         if numMatches != 0:
-            return [self._createInsight(numMatches, Insight.INSIGHT_NAMES[Insight.NUM_MATCHES], year)]
-            
-    @classmethod
-    def _sortTeamWinsDict(self, wins_dict):
-        """
-        Sorts dicts with key: number of wins, value: list of teams
-        by number of wins and by team number
-        """
-        wins_dict = sorted(wins_dict.items(), key=lambda pair: int(pair[0][3:]))   # Sort by team number
-        temp = {}
-        for team, numWins in wins_dict:
-            if numWins in temp:
-                temp[numWins] += [team]
-            else:
-                temp[numWins] = [team]
-        return sorted(temp.items(), key=lambda pair: int(pair[0]), reverse=True)  # Sort by win number
-
-    @classmethod
-    def _sortTeamList(self, team_list):
-        """
-        Sorts list of teams
-        """
-        return sorted(team_list, key=lambda team: int(team[3:]))   # Sort by team number
+            return self._createInsight(numMatches, Insight.INSIGHT_NAMES[Insight.NUM_MATCHES], year)
 
     @classmethod
     def _calculateBlueBanners(self, awards, year):
+        """
+        Returns an Insight where the data is a dict:
+        Key: number of blue banners, Value: list of teams with that number of blue banners
+        """
         blue_banner_winners = {}
         for award in awards:
             if award.name in Award.BLUE_BANNER_KEYS:
@@ -245,10 +285,14 @@ class InsightsHelper(object):
         blue_banner_winners = self._sortTeamWinsDict(blue_banner_winners)
         
         if blue_banner_winners != {}:
-            return [self._createInsight(blue_banner_winners, Insight.INSIGHT_NAMES[Insight.BLUE_BANNERS], year)]
+            return self._createInsight(blue_banner_winners, Insight.INSIGHT_NAMES[Insight.BLUE_BANNERS], year)
 
     @classmethod
     def _calculateChampionshipStats(self, awards, year):
+        """
+        Returns a list of Insights where, depending on the Insight, the data
+        is either a team or a list of teams
+        """
         ca_winner = None
         world_champions = []
         world_finalists = []
@@ -287,6 +331,11 @@ class InsightsHelper(object):
       
     @classmethod
     def _calculateRegionalStats(self, awards, year):
+        """
+        Returns a list of Insights where, depending on the Insight, the data
+        is either a list of teams or a dict:
+        Key: number of wins, Value: list of teams with that number of wins
+        """
         rca_winners = []
         regional_winners = {}
         for award in awards:
@@ -311,6 +360,9 @@ class InsightsHelper(object):
       
     @classmethod
     def doOverallMatchInsights(self):
+        """
+        Calculate match insights across all years. Returns a list of Insights.
+        """
         insights = []
         
         year_num_matches = Insight.query(Insight.name == Insight.INSIGHT_NAMES[Insight.NUM_MATCHES], Insight.year != 0).fetch(1000)
@@ -326,6 +378,9 @@ class InsightsHelper(object):
     
     @classmethod
     def doOverallAwardInsights(self):
+        """
+        Calculate award insights across all years. Returns a list of Insights.
+        """
         insights = []
         
         year_regional_winners = Insight.query(Insight.name == Insight.INSIGHT_NAMES[Insight.REGIONAL_DISTRICT_WINNERS], Insight.year != 0).fetch(1000)
