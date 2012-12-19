@@ -25,6 +25,8 @@ class EventList(BaseHandler):
     List all Events.
     """
     def get(self, year=None):
+        if year == '':
+            return self.redirect("/events")
         
         show_upcoming = False
         valid_years = [2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 2004, 2003, 2002]
