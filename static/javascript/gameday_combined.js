@@ -902,9 +902,37 @@ $(function() {
 	
 	// Tooltips
 	$("[rel=tooltip]").tooltip();
-	
-	// Charts
-	
+});
+
+// Kickoff Countdown
+update_kickoff_countdown();
+function update_kickoff_countdown() {
+	var kickoff_utc = new Date(Date.UTC(2013,0,5,14,0,0));
+	var current_utc = new Date().getTime();
+	var time_diff = kickoff_utc - current_utc;
+	var seconds = Math.floor(time_diff / 1000);
+	var minutes = Math.floor(seconds / 60);
+	var hours = Math.floor(minutes / 60);
+	var days = Math.floor(hours / 24);
+	var content;
+
+	hours %= 24;
+    minutes %= 60;
+    seconds %= 60;
+    
+    if (time_diff < 0) {
+        $('.kickoff-countdown').remove();
+    }
+
+    $('.kickoff-countdown-days').text(days);
+    $('.kickoff-countdown-hours').text(hours);
+    $('.kickoff-countdown-minutes').text(minutes);
+    $('.kickoff-countdown-seconds').text(seconds);
+    setTimeout('update_kickoff_countdown()', 1000);
+}
+
+// Charts
+$(function() {
 	// Single Bar Graph
 	var chartsData = $(".xcharts-bar-single-data");
 	for (var i=0; i < chartsData.length; i++) {
@@ -943,7 +971,7 @@ $(function() {
 						 }
 		var myChart = new xChart('line', chartData, '#' + chartId + '-chart');
 	}
-
+	
 	// Double Line Graph
 	var chartsData = $(".xcharts-line-double-data");
 	for (var i=0; i < chartsData.length; i++) {
@@ -970,7 +998,7 @@ $(function() {
 		var myChart = new xChart('line', chartData, '#' + chartId + '-chart');
 	}
 	
-
+	
 	// Double Bar Graph
 	var chartsData = $(".xcharts-bar-double-data");
 	for (var i=0; i < chartsData.length; i++) {
@@ -998,33 +1026,6 @@ $(function() {
 		var myChart = new xChart('bar', chartData, '#' + chartId + '-chart', opts);
 	}
 });
-
-// Kickoff Countdown
-update_kickoff_countdown();
-function update_kickoff_countdown() {
-	var kickoff_utc = new Date(Date.UTC(2013,0,5,14,0,0));
-	var current_utc = new Date().getTime();
-	var time_diff = kickoff_utc - current_utc;
-	var seconds = Math.floor(time_diff / 1000);
-	var minutes = Math.floor(seconds / 60);
-	var hours = Math.floor(minutes / 60);
-	var days = Math.floor(hours / 24);
-	var content;
-
-	hours %= 24;
-    minutes %= 60;
-    seconds %= 60;
-    
-    if (time_diff < 0) {
-        $('.kickoff-countdown').remove();
-    }
-
-    $('.kickoff-countdown-days').text(days);
-    $('.kickoff-countdown-hours').text(hours);
-    $('.kickoff-countdown-minutes').text(minutes);
-    $('.kickoff-countdown-seconds').text(seconds);
-    setTimeout('update_kickoff_countdown()', 1000);
-}
 
 /*!
 * Bootstrap.js by @fat & @mdo
