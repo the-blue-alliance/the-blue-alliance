@@ -34,14 +34,21 @@
         <li class="dropdown">
           <a class="dropdown-toggle" href="#">Webcasts</a>
           <ul class="dropdown-menu webcasts">
+          {% for webcast in special_webcasts %}
+            <li><a id='{{webcast.key_name}}-1'
+            event='{{webcast.key_name}}' num='1'
+            class='video_buttons' alt='{{webcast.name}}'>
+            {{webcast.name}}</a></li>
+          {% endfor %}
           {% for event in ongoing_events_w_webcasts %}
             <li><a id='{{event.event.key_name}}-{% if event.count %}{{event.count}}{% else %}1{% endif %}'
             event='{{event.event.key_name}}' num='{% if event.count %}{{event.count}}{% else %}1{% endif %}'
             class='video_buttons' alt='{{event.event.name}} [{{event.event.event_short|upper}}]{% if event.count %} {{event.count}}{% endif %}'>
             {{event.event.name}} [{{event.event.event_short|upper}}]{% if event.count %} {{event.count}}{% endif %}</a></li>
-          {% empty %}
-            <li><a>No webcasts</a></li>
           {% endfor %}
+          {% if not special_webcasts and not ongoing_events_w_webcasts %}
+            <li><a>No webcasts</a></li>
+          {% endif %}
           </ul>
         </li>
         
