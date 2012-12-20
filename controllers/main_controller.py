@@ -13,6 +13,7 @@ from base_controller import BaseHandler
 
 from models.event import Event
 from models.team import Team
+from models.sitevar import Sitevar
 
 def render_static(page):
     memcache_key = "main_%s" % page
@@ -114,6 +115,19 @@ class GamedayHandler(BaseHandler):
             next_events = Event.query(Event.start_date >= (datetime.datetime.today() - datetime.timedelta(days=4)))
             next_events.order(Event.start_date).fetch(20)
             
+            special_webcasts_future = Sitevar.get_by_id_async('gameday.special_webcasts')
+            special_webcasts_temp = special_webcasts_future.get_result()
+            if special_webcasts_temp:
+                special_webcasts_temp = special_webcasts_temp.contents
+            else:
+                special_webcasts_temp = {}
+            special_webcasts =  []
+            for webcast in special_webcasts_temp.values():
+                toAppend = {}
+                for key, value in webcast.items():
+                    toAppend[str(key)] = str(value)
+                special_webcasts.append(toAppend)
+
             ongoing_events = []
             ongoing_events_w_webcasts = []
             for event in next_events:
@@ -133,7 +147,8 @@ class GamedayHandler(BaseHandler):
                                 count += 1
                         ongoing_events_w_webcasts += valid
             
-            template_values = {'ongoing_events': ongoing_events,
+            template_values = {'special_webcasts': special_webcasts,
+                               'ongoing_events': ongoing_events,
                                'ongoing_events_w_webcasts': ongoing_events_w_webcasts}
             
             path = os.path.join(os.path.dirname(__file__), '../templates/gameday.html')

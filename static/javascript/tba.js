@@ -55,7 +55,7 @@ function selectTypeaheadResult(item, val, text) {
 }
 
 // General JS for all pages
-$(function() {
+$(document).ready(function(){
 	// Jumping to page section
     $('.smooth-scroll').bind('click',function(event){
         var $anchor = $(this);
@@ -103,6 +103,9 @@ $(function() {
 	
 	// Tooltips
 	$("[rel=tooltip]").tooltip();
+	
+	// Fitvids
+	$('.fitvids').fitVids();
 });
 
 // Kickoff Countdown
