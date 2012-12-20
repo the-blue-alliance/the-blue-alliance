@@ -56,21 +56,24 @@ class WebcastHandler(BaseHandler):
         
         if output_json is None:
             event = Event.get_by_id(event_key)
-            if event:
+            output = {}
+            if event and event.webcast:
                 webcast = event.webcast[webcast_number]
-                output = {}
-                if webcast and 'type' in webcast and 'channel' in webcast:
+                if 'type' in webcast and 'channel' in webcast:
                     output['player'] = self._renderPlayer(webcast)
             else:
                 special_webcasts_future = Sitevar.get_by_id_async('gameday.special_webcasts')
-                special_webcasts = special_webcasts_future.get_result().contents
+                special_webcasts = special_webcasts_future.get_result()
+                if special_webcasts:
+                    special_webcasts = special_webcasts.contents
+                else:
+                    special_webcasts = {}
                 if event_key in special_webcasts:
                     webcast = special_webcasts[event_key]
-                    output = {}
-                    if webcast and 'type' in webcast and 'channel' in webcast:
+                    if 'type' in webcast and 'channel' in webcast:
                         output['player'] = self._renderPlayer(webcast)                   
                     
-                output_json = json.dumps(output)
+            output_json = json.dumps(output)
             if tba_config.CONFIG["memcache"]: memcache.set(webcast_key, output_json, 86400)
         
         self.response.headers.add_header('content-type', 'application/json', charset='utf-8')        

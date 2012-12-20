@@ -1629,6 +1629,7 @@ function setupViews() {
   if (isKickoff != null) {
 	  layout_0();
 	  setChat(true);
+	  setupView(0, $("#2013kickoff-1"));
   }
 }
 
