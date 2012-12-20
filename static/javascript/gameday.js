@@ -69,6 +69,7 @@ function setupViews() {
 	  layout_0();
 	  setChat(true);
 	  setupView(0, $("#2013kickoff-1"));
+	  $("#nav-alert-container").html('<div class="alert alert-success nav-alert"><button type="button" class="close" data-dismiss="alert">&times;</button><strong>Welcome!</strong> Remember to come back during the competition season for webcasts, scores, and more!</div>');
   }
 }
 
