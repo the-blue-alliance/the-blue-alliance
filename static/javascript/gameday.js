@@ -36,7 +36,7 @@ $(document).ready(function() {
 function setupViews() {
   createViews();
   
-  var urlVars = getUrlVars();
+  var urlvars = getUrlVars();
   
   // Choosing layout
   var layout = urlvars['layout'];
@@ -58,9 +58,9 @@ function setupViews() {
   }
   
   // Choosing to start chat opened or closed
-  var chatOpen = urlvars['chat']
+  var chatOpen = urlvars['chat'];
   if (chatOpen != null) {
-    chat_tab();
+	  setChat(true);
   }
 }
 
@@ -86,21 +86,30 @@ function getUrlVars()
 }
 
 // Chat Toggle
-function chat_tab() {
+function setChat(open) {
 	var chat = $(".chat-toggle");
 	var chat_panel = $(".chat_panel");
 	var webcasts_panel = $('.webcasts_panel');
-
-	if(chat.hasClass("chat_active")) {
-		chat.removeClass("chat_active");
-		chat_panel.removeClass("chat_panel_active");
-		webcasts_panel.removeClass("webcasts_panel_active");
-		fixLayout();
-	} else {
+	if (open) {
 		chat.addClass("chat_active")
 		chat_panel.addClass("chat_panel_active");
 		webcasts_panel.addClass("webcasts_panel_active");
 		fixLayout();
+	} else {
+		chat.removeClass("chat_active");
+		chat_panel.removeClass("chat_panel_active");
+		webcasts_panel.removeClass("webcasts_panel_active");
+		fixLayout();
+	}
+}
+
+function chat_tab() {
+	var chat = $(".chat-toggle");
+
+	if(chat.hasClass("chat_active")) {
+		setChat(false);
+	} else {
+		setChat(true);
 	}
 } 	
 
