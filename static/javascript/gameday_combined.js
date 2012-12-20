@@ -1623,6 +1623,13 @@ function setupViews() {
   if (chatOpen != null) {
 	  setChat(true);
   }
+  
+  // Special Kickoff Mode
+  var isKickoff = urlvars['kickoff'];
+  if (isKickoff != null) {
+	  layout_0();
+	  setChat(true);
+  }
 }
 
 // Url vars for setting up GameDay with certain videos loaded
