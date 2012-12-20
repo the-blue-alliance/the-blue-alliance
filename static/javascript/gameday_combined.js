@@ -1597,22 +1597,40 @@ $(document).ready(function() {
 function setupViews() {
   createViews();
   
-  var layout = getUrlVars()['layout'];
+  var urlvars = getUrlVars();
+  
+  // Choosing layout
+  var layout = urlvars['layout'];
   if (layout == null) {
 	// Default layout
 	layout = 2;
   }
   eval('layout_' + layout + '()');
   
-  
+  // Choosing which views to populate
   for (var n=0; n < 6; n++) {
-	  var view = getUrlVars()['view_' + n];
+	  var view = urlvars['view_' + n];
 	  if (view != null) {
 		var $item = $('#' + view);
 		if ($item[0] != null) {
 			setupView(n, $item);
 		}
 	  }
+  }
+  
+  // Choosing to start chat opened or closed
+  var chatOpen = urlvars['chat'];
+  if (chatOpen != null) {
+	  setChat(true);
+  }
+  
+  // Special Kickoff Mode
+  var isKickoff = urlvars['kickoff'];
+  if (isKickoff != null) {
+	  layout_0();
+	  setChat(true);
+	  setupView(0, $("#2013kickoff-1"));
+	  $("#nav-alert-container").html('<div class="alert alert-success nav-alert"><button type="button" class="close" data-dismiss="alert">&times;</button><strong>Welcome!</strong> Remember to come back during the competition season for webcasts, scores, and more!</div>');
   }
 }
 
@@ -1628,27 +1646,40 @@ function getUrlVars()
     {
         hash = hashes[i].split('=');
         vars.push(hash[0]);
-        vars[hash[0]] = hash[1];
+        if (hash[1] != null) {
+        	vars[hash[0]] = hash[1];
+        } else {
+    		vars[hash[0]] = '';
+    	}
     }
     return vars;
 }
 
 // Chat Toggle
-function chat_tab() {
+function setChat(open) {
 	var chat = $(".chat-toggle");
 	var chat_panel = $(".chat_panel");
 	var webcasts_panel = $('.webcasts_panel');
-
-	if(chat.hasClass("chat_active")) {
-		chat.removeClass("chat_active");
-		chat_panel.removeClass("chat_panel_active");
-		webcasts_panel.removeClass("webcasts_panel_active");
-		fixLayout();
-	} else {
+	if (open) {
 		chat.addClass("chat_active")
 		chat_panel.addClass("chat_panel_active");
 		webcasts_panel.addClass("webcasts_panel_active");
 		fixLayout();
+	} else {
+		chat.removeClass("chat_active");
+		chat_panel.removeClass("chat_panel_active");
+		webcasts_panel.removeClass("webcasts_panel_active");
+		fixLayout();
+	}
+}
+
+function chat_tab() {
+	var chat = $(".chat-toggle");
+
+	if(chat.hasClass("chat_active")) {
+		setChat(false);
+	} else {
+		setChat(true);
 	}
 } 	
 

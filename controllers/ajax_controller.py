@@ -8,6 +8,7 @@ from base_controller import BaseHandler
 
 from models.event import Event
 from models.team import Team
+from models.sitevar import Sitevar
 import tba_config
 
 
@@ -55,18 +56,31 @@ class WebcastHandler(BaseHandler):
         
         if output_json is None:
             event = Event.get_by_id(event_key)
-            if event:
+            output = {}
+            if event and event.webcast:
                 webcast = event.webcast[webcast_number]
-                output = {}
-                if webcast and 'type' in webcast and 'channel' in webcast:
-                    webcast_type = webcast['type']
-                    template_values = {'channel': webcast['channel']}
-                    path = os.path.join(os.path.dirname(__file__), '../templates/webcast/' + webcast_type + '.html')
-                    player = template.render(path, template_values)
-                    output['player'] = player
+                if 'type' in webcast and 'channel' in webcast:
+                    output['player'] = self._renderPlayer(webcast)
+            else:
+                special_webcasts_future = Sitevar.get_by_id_async('gameday.special_webcasts')
+                special_webcasts = special_webcasts_future.get_result()
+                if special_webcasts:
+                    special_webcasts = special_webcasts.contents
+                else:
+                    special_webcasts = {}
+                if event_key in special_webcasts:
+                    webcast = special_webcasts[event_key]
+                    if 'type' in webcast and 'channel' in webcast:
+                        output['player'] = self._renderPlayer(webcast)                   
                     
-                output_json = json.dumps(output)
+            output_json = json.dumps(output)
             if tba_config.CONFIG["memcache"]: memcache.set(webcast_key, output_json, 86400)
         
         self.response.headers.add_header('content-type', 'application/json', charset='utf-8')        
         self.response.out.write(output_json)
+        
+    def _renderPlayer(self, webcast):
+        webcast_type = webcast['type']
+        template_values = {'channel': webcast['channel']}
+        path = os.path.join(os.path.dirname(__file__), '../templates/webcast/' + webcast_type + '.html')
+        return template.render(path, template_values)
