@@ -7,11 +7,12 @@ YUI_COMPRESSOR = 'yuicompressor-2.4.7.jar'
 SCRIPTS_MAIN = ['static/javascript/jquery.min.js',
                 'static/javascript/jquery-ui-1.8.13.custom.min.js',
                 'static/javascript/jquery.ui.touch-punch.min.js',
-                'static/javascript/tba.js',
                 'static/javascript/bootstrap.js',
                 'static/javascript/bootstrap-typeahead.js',
                 'static/javascript/jquery.fancybox.pack.js',
                 'static/jwplayer/jwplayer.js',
+                'static/javascript/jquery.fitvids.js',
+                'static/javascript/tba.js',
                 ]
 SCRIPTS_MAIN_OUT_DEBUG = 'static/javascript/tba_combined.js'
 SCRIPTS_MAIN_OUT = 'static/javascript/tba_combined.min.js'
