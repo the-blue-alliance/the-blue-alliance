@@ -36,8 +36,10 @@ $(document).ready(function() {
 function setupViews() {
   createViews();
   
+  var urlVars = getUrlVars();
+  
   // Choosing layout
-  var layout = getUrlVars()['layout'];
+  var layout = urlvars['layout'];
   if (layout == null) {
 	// Default layout
 	layout = 2;
@@ -46,7 +48,7 @@ function setupViews() {
   
   // Choosing which views to populate
   for (var n=0; n < 6; n++) {
-	  var view = getUrlVars()['view_' + n];
+	  var view = urlvars['view_' + n];
 	  if (view != null) {
 		var $item = $('#' + view);
 		if ($item[0] != null) {
@@ -56,7 +58,7 @@ function setupViews() {
   }
   
   // Choosing to start chat opened or closed
-  var chatOpen = getUrlVars()['chat']
+  var chatOpen = urlvars['chat']
   if (chatOpen != null) {
     chat_tab();
   }
