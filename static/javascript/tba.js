@@ -105,7 +105,7 @@ $(document).ready(function(){
 	$("[rel=tooltip]").tooltip();
 	
 	// Fitvids
-	$("[rel=fitvids]").fitVids();
+	$('.fitvids').fitVids();
 });
 
 // Kickoff Countdown
