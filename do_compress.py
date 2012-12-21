@@ -16,11 +16,9 @@ SCRIPTS_MAIN = ['static/javascript/jquery_js/jquery.min.js',
                 'static/javascript/tba_js/tablesorter.js',
                 'static/javascript/tba_js/tba.js',
                 ]
-SCRIPTS_MAIN_OUT_DEBUG = 'static/javascript/debug/tba_combined.main.js'
 SCRIPTS_MAIN_OUT = 'static/javascript/tba_combined.main.min.js'
 
 SCRIPTS_GAMEDAY = SCRIPTS_MAIN + ['static/javascript/tba_js/gameday.js']
-SCRIPTS_GAMEDAY_OUT_DEBUG = 'static/javascript/debug/tba_combined.gameday.js'
 SCRIPTS_GAMEDAY_OUT = 'static/javascript/tba_combined.gameday.min.js'
 
 STYLESHEETS_MAIN = ['static/css/precompiled_css/jquery-ui-1.8.13.custom.css',
@@ -74,10 +72,10 @@ def compress(in_files, out_file, in_type='js', verbose=False,
 def main(kind=None):
     if kind == 'js' or kind == None:
         print 'Compressing Main JavaScript...'
-        compress(SCRIPTS_MAIN, SCRIPTS_MAIN_OUT, 'js', False, SCRIPTS_MAIN_OUT_DEBUG)
+        compress(SCRIPTS_MAIN, SCRIPTS_MAIN_OUT, 'js')
     
         print 'Compressing GameDay JavaScript...'
-        compress(SCRIPTS_GAMEDAY, SCRIPTS_GAMEDAY_OUT, 'js', False, SCRIPTS_GAMEDAY_OUT_DEBUG)
+        compress(SCRIPTS_GAMEDAY, SCRIPTS_GAMEDAY_OUT, 'js')
 
     if kind == 'css' or kind == None:
         print 'Compressing Main CSS...'
