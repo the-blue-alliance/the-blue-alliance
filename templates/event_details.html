@@ -5,11 +5,6 @@
 {% block meta_description %}Videos and match results for the {{event.year}} {{event.name}} FIRST Robotics Competition in {{event.location}}.{% endblock %}
 
 {% block more_head_tags %}
-    <!-- Tablecloth CSS file to make the sortable Rankings table look Bootstrap-esque -->
-    <!-- http://tableclothjs.com/ -->
-    <!-- Sorts using http://tablesorter.com/ -->
-    <link href="/css/tablesorter.css" rel="stylesheet">
-
     <meta property="og:title" content="{{event.year}} {{event.name}}" />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="http://thebluealliance.com/event/{{event.key_name}}" />
@@ -246,7 +241,7 @@
 </div>
 
 <!-- Javascript call when the page is ready to make the Rankings table sortable -->
-<script src="/javascript/jquery.tablesorter.min.js"></script>
+<script src="/javascript/jquery_js/jquery.tablesorter.min.js"></script>
 <script>
     $(document).ready(function(){
         // add parser through the tablesorter addParser method

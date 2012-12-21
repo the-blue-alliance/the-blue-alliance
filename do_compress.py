@@ -21,17 +21,19 @@ SCRIPTS_GAMEDAY = SCRIPTS_MAIN + ['static/javascript/tba_js/gameday.js']
 SCRIPTS_GAMEDAY_OUT_DEBUG = 'static/javascript/debug/tba_combined.gameday.js'
 SCRIPTS_GAMEDAY_OUT = 'static/javascript/tba_combined.gameday.min.js'
 
-STYLESHEETS_MAIN = ['static/css/style.css',
-                    'static/css/jquery-ui-1.8.13.custom.css',
-                    'static/css/jquery.fancybox.css',
+STYLESHEETS_MAIN = ['static/css/precompiled_css/jquery-ui-1.8.13.custom.css',
+                    'static/css/precompiled_css/jquery.fancybox.css',
+                    'static/css/precompiled_css/tablesorter.css',
+                    'static/css/less_css/tba_style.main.css',
                     ]
-STYLESHEETS_MAIN_OUT = 'static/css/style.min.css'
+STYLESHEETS_MAIN_OUT = 'static/css/tba_style.main.min.css'
 
-STYLESHEETS_GAMEDAY = ['static/css/style_gameday.css',
-                       'static/css/jquery-ui-1.8.13.custom.css',
-                       'static/css/jquery.fancybox.css',
+STYLESHEETS_GAMEDAY = ['static/css/precompiled_css/jquery-ui-1.8.13.custom.css',
+                       'static/css/precompiled_css/jquery.fancybox.css',
+                       'static/css/precompiled_css/tablesorter.css',
+                       'static/css/less_css/tba_style.gameday.css',
                        ]
-STYLESHEETS_GAMEDAY_OUT = 'static/css/style_gameday.min.css'
+STYLESHEETS_GAMEDAY_OUT = 'static/css/tba_style.gameday.min.css'
 
 
 def compress(in_files, out_file, in_type='js', verbose=False,
