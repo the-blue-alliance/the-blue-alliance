@@ -13,6 +13,7 @@ from helpers.match_helper import MatchHelper
 from helpers.award_helper import AwardHelper
 from helpers.team_helper import TeamHelper
 from helpers.event_helper import EventHelper
+from helpers.template_wrapper import TemplateWrapper
 
 from models.award import Award
 from models.event import Event
@@ -65,7 +66,7 @@ class EventList(BaseHandler):
             }
         
             path = os.path.join(os.path.dirname(__file__), '../templates/event_list.html')
-            html = template.render(path, template_values)
+            html = TemplateWrapper.renderBasePage(path, template_values)
             if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400) 
         
         self.response.out.write(html)
@@ -135,7 +136,7 @@ class EventDetail(BaseHandler):
             }
                 
             path = os.path.join(os.path.dirname(__file__), '../templates/event_details.html')
-            html = template.render(path, template_values)
+            html = TemplateWrapper.renderBasePage(path, template_values)
             if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
         
         self.response.out.write(html)

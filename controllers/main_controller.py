@@ -5,7 +5,6 @@ import time
 
 from google.appengine.api import memcache
 from google.appengine.ext import db, webapp
-from google.appengine.ext.webapp import template
 
 import tba_config
 
@@ -15,13 +14,15 @@ from models.event import Event
 from models.team import Team
 from models.sitevar import Sitevar
 
+from helpers.template_wrapper import TemplateWrapper
+
 def render_static(page):
     memcache_key = "main_%s" % page
     html = memcache.get(memcache_key)
     
     if html is None:
         path = os.path.join(os.path.dirname(__file__), "../templates/%s.html" % page)
-        html = template.render(path, {})
+        html = TemplateWrapper.renderBasePage(path, {})
         if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
     
     return html
@@ -52,7 +53,7 @@ class MainHandler(BaseHandler):
             }
             
             path = os.path.join(os.path.dirname(__file__), '../templates/index.html')
-            html = template.render(path, template_values)
+            html = TemplateWrapper.renderBasePage(path, template_values)
             if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
         
         self.response.out.write(html)
@@ -102,7 +103,7 @@ class KickoffHandler(BaseHandler):
             template_values = {}
             
             path = os.path.join(os.path.dirname(__file__), '../templates/kickoff.html')
-            html = template.render(path, template_values)
+            html = TemplateWrapper.renderBasePage(path, template_values)
             if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
         
         self.response.out.write(html)        
@@ -152,7 +153,7 @@ class GamedayHandler(BaseHandler):
                                'ongoing_events_w_webcasts': ongoing_events_w_webcasts}
             
             path = os.path.join(os.path.dirname(__file__), '../templates/gameday.html')
-            html = template.render(path, template_values)
+            html = TemplateWrapper.renderGamedayPage(path, template_values)
             if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
         
         self.response.out.write(html)   
@@ -184,7 +185,7 @@ class WebcastsHandler(BaseHandler):
             }
             
             path = os.path.join(os.path.dirname(__file__), '../templates/webcasts.html')
-            html = template.render(path, template_values)
+            html = TemplateWrapper.renderBasePage(path, template_values)
             if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
 
         self.response.out.write(html)

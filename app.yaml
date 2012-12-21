@@ -4,7 +4,7 @@ runtime: python27
 api_version: 1
 threadsafe: true
 
-default_expiration: "4d"
+default_expiration: "1d"
 
 builtins:
 - appstats: on
@@ -17,10 +17,12 @@ libraries:
 handlers:
 - url: /css
   static_dir: static/css
+  expiration: "7d"
 - url: /images
   static_dir: static/images
 - url: /javascript
   static_dir: static/javascript
+  expiration: "7d"
 - url: /jwplayer
   static_dir: static/jwplayer
 - url: /favicon.ico
@@ -57,3 +59,9 @@ skip_files:
 - pavement.py
 - do_compress.py
 - ^(.*/)?.*\.jar.*
+- static/css/less_css/*
+- static/css/precompiled_css/*
+- static/css/less_css/*
+- static/javascript/bootstrap_js/*
+- static/javascript/jquery_js/*
+- static/javascript/tba_js/*
