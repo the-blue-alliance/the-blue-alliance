@@ -4,22 +4,22 @@ import optparse
 
 YUI_COMPRESSOR = 'yuicompressor-2.4.7.jar'
 
-SCRIPTS_MAIN = ['static/javascript/jquery.min.js',
-                'static/javascript/jquery-ui-1.8.13.custom.min.js',
-                'static/javascript/jquery.ui.touch-punch.min.js',
-                'static/javascript/bootstrap.js',
-                'static/javascript/bootstrap-typeahead.js',
-                'static/javascript/jquery.fancybox.pack.js',
+SCRIPTS_MAIN = ['static/javascript/jquery_js/jquery.min.js',
+                'static/javascript/jquery_js/jquery-ui-1.8.13.custom.min.js',
+                'static/javascript/jquery_js/jquery.ui.touch-punch.min.js',
+                'static/javascript/bootstrap_js/bootstrap.js',
+                'static/javascript/bootstrap_js/bootstrap-typeahead.js',
+                'static/javascript/jquery_js/jquery.fancybox.pack.js',
                 'static/jwplayer/jwplayer.js',
-                'static/javascript/jquery.fitvids.js',
-                'static/javascript/tba.js',
+                'static/javascript/jquery_js/jquery.fitvids.js',
+                'static/javascript/tba_js/tba.js',
                 ]
-SCRIPTS_MAIN_OUT_DEBUG = 'static/javascript/tba_combined.js'
-SCRIPTS_MAIN_OUT = 'static/javascript/tba_combined.min.js'
+SCRIPTS_MAIN_OUT_DEBUG = 'static/javascript/debug/tba_combined.main.js'
+SCRIPTS_MAIN_OUT = 'static/javascript/tba_combined.main.min.js'
 
-SCRIPTS_GAMEDAY = SCRIPTS_MAIN + ['static/javascript/gameday.js']
-SCRIPTS_GAMEDAY_OUT_DEBUG = 'static/javascript/gameday_combined.js'
-SCRIPTS_GAMEDAY_OUT = 'static/javascript/gameday_combined.min.js'
+SCRIPTS_GAMEDAY = SCRIPTS_MAIN + ['static/javascript/tba_js/gameday.js']
+SCRIPTS_GAMEDAY_OUT_DEBUG = 'static/javascript/debug/tba_combined.gameday.js'
+SCRIPTS_GAMEDAY_OUT = 'static/javascript/tba_combined.gameday.min.js'
 
 STYLESHEETS_MAIN = ['static/css/style.css',
                     'static/css/jquery-ui-1.8.13.custom.css',
