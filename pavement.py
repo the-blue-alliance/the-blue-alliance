@@ -53,8 +53,8 @@ def test_fast():
 def less():
   """Build and Combine CSS"""
   print("Building and Combining CSS")
-  sh("lessc static/css/style.less static/css/style.css --yui-compress")
-  sh("lessc static/css/style_gameday.less static/css/style_gameday.css --yui-compress")
+  sh("lessc static/css/less_css/tba_style.main.less static/css/less_css/tba_style.main.css")
+  sh("lessc static/css/less_css/tba_style.gameday.less static/css/less_css/tba_style.gameday.css")
   sh("python do_compress.py css")
 
 @task
