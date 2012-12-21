@@ -5,13 +5,14 @@ import logging
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
 from google.appengine.ext import webapp
-from google.appengine.ext.webapp import template
 
 import tba_config
 from base_controller import BaseHandler
 from helpers.event_helper import EventHelper
 from helpers.match_helper import MatchHelper
 from helpers.award_helper import AwardHelper
+from helpers.template_wrapper import TemplateWrapper
+
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
@@ -66,7 +67,7 @@ class TeamList(BaseHandler):
             }
         
             path = os.path.join(os.path.dirname(__file__), '../templates/team_list.html')
-            html = template.render(path, template_values)
+            html = TemplateWrapper.renderBasePage(path, template_values)
             if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
         
         self.response.out.write(html)
@@ -169,7 +170,7 @@ class TeamDetail(BaseHandler):
                                 "year_wlt": year_wlt }
             
             path = os.path.join(os.path.dirname(__file__), '../templates/team_details.html')
-            html = template.render(path, template_values)
+            html = TemplateWrapper.renderBasePage(path, template_values)
             if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 300)
         
         self.response.out.write(html)
