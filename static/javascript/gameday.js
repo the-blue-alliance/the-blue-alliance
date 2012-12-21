@@ -120,7 +120,14 @@ function chat_tab() {
 	} else {
 		setChat(true);
 	}
-} 	
+}
+
+// Remove Chat Alert
+$(document).ready(function() {
+	$('#chat-info').bind('close', function () {
+		$('#chat-info-background').remove();
+	})
+});
 
 // Create Views
 var default_view = "<div class='empty_info'>Drag and drop an event from the 'Webcasts' menu to assign it to this screen.</div><div class='div_helper'></div>";
