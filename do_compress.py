@@ -7,11 +7,13 @@ YUI_COMPRESSOR = 'yuicompressor-2.4.7.jar'
 SCRIPTS_MAIN = ['static/javascript/jquery_js/jquery.min.js',
                 'static/javascript/jquery_js/jquery-ui-1.8.13.custom.min.js',
                 'static/javascript/jquery_js/jquery.ui.touch-punch.min.js',
+                'static/javascript/jquery_js/jquery.tablesorter.min.js',
                 'static/javascript/bootstrap_js/bootstrap.js',
                 'static/javascript/bootstrap_js/bootstrap-typeahead.js',
                 'static/javascript/jquery_js/jquery.fancybox.pack.js',
                 'static/jwplayer/jwplayer.js',
                 'static/javascript/jquery_js/jquery.fitvids.js',
+                'static/javascript/tba_js/tablesorter.js',
                 'static/javascript/tba_js/tba.js',
                 ]
 SCRIPTS_MAIN_OUT_DEBUG = 'static/javascript/debug/tba_combined.main.js'
