@@ -21,6 +21,8 @@ class TypeaheadHandler(BaseHandler):
         q = self.request.get_all('q')
         entries = self.typeahead_entries()
 
+        self.response.headers['Cache-Control'] = "public, max-age=%d" % (6*60*60)
+        self.response.headers['Pragma'] = 'Public'
         self.response.headers.add_header('content-type', 'application/json', charset='utf-8')        
         typeahead_list = json.dumps(entries)
         self.response.out.write(typeahead_list)
@@ -76,6 +78,8 @@ class WebcastHandler(BaseHandler):
             output_json = json.dumps(output)
             if tba_config.CONFIG["memcache"]: memcache.set(webcast_key, output_json, 86400)
         
+        self.response.headers['Cache-Control'] = "public, max-age=%d" % (5*60)
+        self.response.headers['Pragma'] = 'Public'
         self.response.headers.add_header('content-type', 'application/json', charset='utf-8')        
         self.response.out.write(output_json)
         
