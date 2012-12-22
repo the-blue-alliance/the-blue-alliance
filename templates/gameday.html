@@ -64,6 +64,7 @@
           </ul>
         </li>
         
+        <li class="social"><a class="social-toggle" href="javascript:social_tab();">Social Feed</a></li>
         <li class="chat"><a class="chat-toggle" href="javascript:chat_tab();">Chat</a></li>
       </ul>
     </div>
@@ -73,6 +74,10 @@
 {% endblock %}
 
 {% block content %}
+<div class="social_panel">
+  <div id="twitter-widget"><a class="twitter-timeline" href="https://twitter.com/search?q=%23omgrobots" data-widget-id="282256949859454976">Tweets about "#omgrobots"</a></div>
+</div>
+
 <div class="webcasts_panel">
 	<div class="video_container"></div>
 </div>

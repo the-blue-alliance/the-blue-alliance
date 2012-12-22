@@ -1,3 +1,6 @@
+@chatWidth: 300px;
+@socialWidth: 250px;
+
 body {
   margin: 0;
   padding: 0;
@@ -9,7 +12,7 @@ body {
   .nav, .navbar, .navbar-inner,
   .container, .brand,
   .dropdown, .dropdown-toggle,
-  .chat, .chat-toggle {
+  .chat, .chat-toggle, .social, .social-toggle {
     padding: 0 !important;
     margin: 0 !important;
     min-height: 30px !important;
@@ -18,7 +21,7 @@ body {
     color: @white !important;
   }
   
-  .chat_active {
+  .chat_active, .social_active {
     background: @gray !important;
   }
   
@@ -39,12 +42,12 @@ body {
     margin-left: 10px;
   }
   
-  .dropdown-toggle, .chat-toggle {
+  .dropdown-toggle, .chat-toggle, .social-toggle {
     padding: 6px 8px !important;
     height: 18px !important;
   }
   
-  .dropdown:hover, .chat:hover {
+  .dropdown:hover, .chat:hover, .social:hover {
     background-color: @gray;
   }
   
@@ -98,12 +101,32 @@ body {
 
 }
 
+.social_panel {
+  position: fixed;
+  top: 30px;
+  left: 0px;
+  bottom: 0px;
+  width: @socialWidth;
+  background-color: @grayLighter;
+  visibility: hidden;
+  
+  #twitter-widget {
+    background-color: @black;
+    height: 100%;
+    width: 100%;
+  }
+}
+
+.social_panel_active {
+  visibility: visible;
+}
+
 .chat_panel {
   position: fixed;
   top: 30px;
   right: 0px;
   bottom: 0px;
-  width: 300px;
+  width: @chatWidth;
   background-color: @grayLighter;
   visibility: hidden;
   
@@ -167,8 +190,12 @@ body {
   z-index: 105;
 }
 
-.webcasts_panel_active {
-  right: 300px;
+.webcasts_panel_social_active {
+  left: @socialWidth;
+}
+
+.webcasts_panel_chat_active {
+  right: @chatWidth;
 }
 
 .video_container {

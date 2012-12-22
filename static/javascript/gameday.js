@@ -94,7 +94,46 @@ function getUrlVars()
     return vars;
 }
 
-// Chat Toggle
+// Social Toggle
+function social_tab() {
+	var social = $(".social-toggle");
+
+	if(social.hasClass("social_active")) {
+		setSocial(false);
+	} else {
+		setSocial(true);
+	}
+}
+
+function setSocial(open) {
+	var social = $(".social-toggle");
+	var social_panel = $(".social_panel");
+	var webcasts_panel = $('.webcasts_panel');
+	if (open) {
+		social.addClass("social_active")
+		social_panel.addClass("social_panel_active");
+		webcasts_panel.addClass("webcasts_panel_social_active");
+		fixLayout();
+	} else {
+		social.removeClass("social_active");
+		social_panel.removeClass("social_panel_active");
+		webcasts_panel.removeClass("webcasts_panel_social_active");
+		fixLayout();
+	}
+}
+
+//Chat Toggle
+
+function chat_tab() {
+	var chat = $(".chat-toggle");
+
+	if(chat.hasClass("chat_active")) {
+		setChat(false);
+	} else {
+		setChat(true);
+	}
+}
+
 function setChat(open) {
 	var chat = $(".chat-toggle");
 	var chat_panel = $(".chat_panel");
@@ -102,12 +141,12 @@ function setChat(open) {
 	if (open) {
 		chat.addClass("chat_active")
 		chat_panel.addClass("chat_panel_active");
-		webcasts_panel.addClass("webcasts_panel_active");
+		webcasts_panel.addClass("webcasts_panel_chat_active");
 		fixLayout();
 	} else {
 		chat.removeClass("chat_active");
 		chat_panel.removeClass("chat_panel_active");
-		webcasts_panel.removeClass("webcasts_panel_active");
+		webcasts_panel.removeClass("webcasts_panel_chat_active");
 		fixLayout();
 	}
 }
