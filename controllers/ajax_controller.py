@@ -18,6 +18,11 @@ class TypeaheadHandler(BaseHandler):
         # Needs to be optimized at some point.
         # Tried a trie but the datastructure was too big to
         # fit into memcache efficiently
+        
+        # Only allow AJAX requests
+        if (('x-requested-with' not in self.request.headers) or (self.request.headers['x-requested-with' ]!= 'XMLHttpRequest')):
+            return self.redirect("/error/404")
+        
         q = self.request.get_all('q')
         entries = self.typeahead_entries()
 
@@ -50,6 +55,10 @@ class TypeaheadHandler(BaseHandler):
     
 class WebcastHandler(BaseHandler):
     def get(self):
+        # Only allow AJAX requests
+        if (('x-requested-with' not in self.request.headers) or (self.request.headers['x-requested-with' ]!= 'XMLHttpRequest')):
+            return self.redirect("/error/404")
+      
         # Returns the HTML necessary to generate the webcast embed for a given event
         event_key = self.request.get_all('event')[0]
         webcast_number = int(self.request.get_all('num')[0]) - 1
