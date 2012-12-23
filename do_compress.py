@@ -17,7 +17,8 @@ SCRIPTS_MAIN = ['static/javascript/jquery.min.js',
 SCRIPTS_MAIN_OUT_DEBUG = 'static/javascript/tba_combined.js'
 SCRIPTS_MAIN_OUT = 'static/javascript/tba_combined.min.js'
 
-SCRIPTS_GAMEDAY = SCRIPTS_MAIN + ['static/javascript/gameday.js']
+SCRIPTS_GAMEDAY = SCRIPTS_MAIN + ['static/javascript/gameday.js',
+                                  'static/javascript/gameday_twitter.js']
 SCRIPTS_GAMEDAY_OUT_DEBUG = 'static/javascript/gameday_combined.js'
 SCRIPTS_GAMEDAY_OUT = 'static/javascript/gameday_combined.min.js'
 

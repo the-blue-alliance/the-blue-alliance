@@ -54,6 +54,7 @@ def less():
   """Build and Combine CSS"""
   print("Building and Combining CSS")
   sh("lessc static/css/style.less static/css/style.css --yui-compress")
+  sh("lessc static/css/style_gameday.less static/css/style_gameday.css --yui-compress")
   sh("python do_compress.py css")
 
 @task
