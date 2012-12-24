@@ -1,5 +1,6 @@
 @chatWidth: 300px;
 @socialWidth: 250px;
+@feedBarHeight: 30px;
 
 body {
   margin: 0;
@@ -105,7 +106,7 @@ body {
   position: fixed;
   top: 30px;
   left: 0px;
-  bottom: 0px;
+  bottom: @feedBarHeight;
   width: @socialWidth;
   background-color: @grayLighter;
   visibility: hidden;
@@ -125,7 +126,7 @@ body {
   position: fixed;
   top: 30px;
   right: 0px;
-  bottom: 0px;
+  bottom: @feedBarHeight;
   width: @chatWidth;
   background-color: @grayLighter;
   visibility: hidden;
@@ -153,8 +154,45 @@ body {
   left: 0px;
   right: 0px;
   height: 30px;
-  background-color: @black;
-  visibility: hidden;
+  background-color: @grayDarker * 0.5;
+  
+  .scores{
+    width: 250px;
+    height: 100%;
+    padding-left: 10px;
+    border-right:1px @white solid;
+    float: left;
+    position: relative;
+  }
+  
+  .match-number{
+    color: @white;
+    font-size: 19px;
+    width: auto;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  
+  .red {
+    color: #FF0000;
+    top: -2px;
+  }
+  
+  .blue {
+    color: #0066FF;
+    bottom: -2px;
+  }
+  
+  .red, .blue {
+    font-size: 13px;
+    width: 175px;
+    position: absolute;
+    left: 100px;
+  }
+  
+  .win {
+    font-weight: bold;
+  }
 }
 
 .empty_info {
@@ -184,7 +222,7 @@ body {
   overflow: hidden;
   position: absolute;
   top: 30px;
-  bottom: 0px;
+  bottom: @feedBarHeight;
   right: 0px;
   left: 0px;
   z-index: 105;

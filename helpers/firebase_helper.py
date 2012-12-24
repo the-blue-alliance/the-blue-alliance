@@ -8,6 +8,9 @@ class FirebaseHelper(object):
     @classmethod
     def pushMatch(self, match):
         payload = {'key_name': match.key_name,
+                   'comp_level': match.comp_level,
+                   'match_number': match.match_number,
+                   'set_number': match.set_number,
                    'alliances': match.alliances,
                    'winning_alliance': match.winning_alliance}
         payload_json = json.dumps(payload)
