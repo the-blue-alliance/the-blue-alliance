@@ -1,6 +1,5 @@
 import datetime
 import logging
-import json
 import os
 
 from google.appengine.api import taskqueue
@@ -138,11 +137,11 @@ class FirebasePushDo(webapp.RequestHandler):
     """
     Pushes data to Firebase
     """
-    FIREBASE_URL = 'https://thebluealliance.firebaseio.com/{}.json?auth{}'
+    FIREBASE_URL = 'https://thebluealliance.firebaseio.com/{}.json?auth={}'
 
     def get(self):
         key = self.request.get('key')
-        payload = self.request.get('payload')
+        payload_json = self.request.get('payload_json')
         
         firebase_secrets = Sitevar.get_by_id("firebase.secrets")
         if firebase_secrets == None:
@@ -150,9 +149,8 @@ class FirebasePushDo(webapp.RequestHandler):
         FIREBASE_SECRET = firebase_secrets.contents['FIREBASE_SECRET']
         
         url = self.FIREBASE_URL.format(key, FIREBASE_SECRET)
-        payload = json.dumps(payload)
-        result = urlfetch.fetch(url, payload, 'PUT')
+        result = urlfetch.fetch(url, payload_json, 'PUT')
         if result.status_code == 200:
-            logging.info("Sucessfully pushed data to Firebase. {}: {}".format(key, payload))
+            logging.info("Sucessfully pushed data to Firebase. {}".format(key))
         else:
-            logging.warning("Error pushing the a match to Firebase: {}: {}. ERROR {}: {}").format(key, payload, result.status_code, result.content)
+            logging.warning("Error pushing the a match to Firebase: {}. ERROR {}: {}".format(key, result.status_code, result.content))
