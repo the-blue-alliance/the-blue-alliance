@@ -1,10 +1,12 @@
 import datetime
 import logging
+import json
 import os
 
 from google.appengine.api import taskqueue
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
+from google.appengine.api import urlfetch
 
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.team_manipulator import TeamManipulator
@@ -14,6 +16,8 @@ from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
+from models.sitevar import Sitevar
+
 
 class EventTeamUpdate(webapp.RequestHandler):
     """
@@ -129,3 +133,26 @@ class EventOprEnqueue(webapp.RequestHandler):
         
         path = os.path.join(os.path.dirname(__file__), '../templates/math/event_opr_enqueue.html')
         self.response.out.write(template.render(path, template_values))
+
+class FirebasePushDo(webapp.RequestHandler):
+    """
+    Pushes data to Firebase
+    """
+    FIREBASE_URL = 'https://thebluealliance.firebaseio.com/{}.json?auth{}'
+
+    def get(self):
+        key = self.request.get('key')
+        payload = self.request.get('payload')
+        
+        firebase_secrets = Sitevar.get_by_id("firebase.secrets")
+        if firebase_secrets == None:
+            raise Exception("Missing sitevar: firebase.secrets. Can't write to Firebase.")
+        FIREBASE_SECRET = firebase_secrets.contents['FIREBASE_SECRET']
+        
+        url = self.FIREBASE_URL.format(key, FIREBASE_SECRET)
+        payload = json.dumps(payload)
+        result = urlfetch.fetch(url, payload, 'PUT')
+        if result.status_code == 200:
+            logging.info("Sucessfully pushed data to Firebase. {}: {}".format(key, payload))
+        else:
+            logging.warning("Error pushing the a match to Firebase: {}: {}. ERROR {}: {}").format(key, payload, result.status_code, result.content)

@@ -15,6 +15,7 @@ from controllers.datafeed_controller import UsfirstTeamDetailsEnqueue, UsfirstTe
 
 from controllers.cron_controller import EventTeamUpdate, EventTeamUpdateEnqueue
 from controllers.cron_controller import EventOprDo, EventOprEnqueue
+from controllers.cron_controller import FirebasePushDo
 
 app = webapp2.WSGIApplication([('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
                                ('/tasks/enqueue/usfirst_event_details/([0-9]*)', UsfirstEventDetailsEnqueue),
@@ -22,6 +23,7 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
                                ('/tasks/enqueue/usfirst_awards/(.*)', UsfirstAwardsEnqueue),
                                ('/tasks/enqueue/usfirst_matches/(.*)', UsfirstMatchesEnqueue),
                                ('/tasks/enqueue/usfirst_team_details', UsfirstTeamDetailsEnqueue),
+                               ('/tasks/do/firebase_push', FirebasePushDo),
                                ('/tasks/get/fms_event_list', FmsEventListGet),
                                ('/tasks/get/fms_team_list', FmsTeamListGet),
                                ('/tasks/get/offseason_matches/(.*)', OffseasonMatchesGet),

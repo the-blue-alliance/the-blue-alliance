@@ -1,6 +1,5 @@
 var myDataRef = new Firebase('https://thebluealliance.firebaseio.com/matches');
 
-
 $(document).ready(function(){
   
 });
