@@ -1,13 +1,13 @@
-var myDataRef = new Firebase('https://thebluealliance.firebaseio.com/matches');
+var lastMatchesRef = new Firebase('https://thebluealliance.firebaseio.com/last_matches');
+var lastMatchesQuery = lastMatchesRef.limit(10);
 
 $(document).ready(function(){
   
 });
 
 
-myDataRef.on('child_added', function(snapshot) {
+lastMatchesQuery.on('child_added', function(snapshot) {
   var key = snapshot.name();
   var message = snapshot.val();
-  console.log(key);
   console.log(message);
 });

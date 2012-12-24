@@ -150,8 +150,6 @@ class FirebasePushDo(webapp.RequestHandler):
         FIREBASE_SECRET = firebase_secrets.contents['FIREBASE_SECRET']
         
         url = self.FIREBASE_URL.format(key, FIREBASE_SECRET)
-        result = urlfetch.fetch(url, payload_json, 'PUT')
-        if result.status_code in self.SUCCESS_STATUS_CODES:
-            logging.info("Sucessfully pushed data to Firebase. {}".format(key))
-        else:
-            logging.warning("Error pushing the a match to Firebase: {}. ERROR {}: {}".format(key, result.status_code, result.content))
+        result = urlfetch.fetch(url, payload_json, 'POST')
+        if result.status_code not in self.SUCCESS_STATUS_CODES:
+            logging.warning("Error pushing data to Firebase: {}. ERROR {}: {}".format(payload_json, result.status_code, result.content))

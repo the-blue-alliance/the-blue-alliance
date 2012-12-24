@@ -14,5 +14,5 @@ class FirebaseHelper(object):
 
         taskqueue.add(url='/tasks/do/firebase_push', 
                       method='GET',
-                      params={'key': 'matches/{}'.format(match.key_name),
+                      params={'key': 'last_matches',
                               'payload_json': payload_json})
