@@ -162,8 +162,8 @@ class InsightsHelper(object):
             elim_num_matches_by_week = 0
             for _, matches in week_events:
                 for match in matches:
-                    redScore = match.alliances['red']['score']
-                    blueScore = match.alliances['blue']['score']
+                    redScore = int(match.alliances['red']['score'])
+                    blueScore = int(match.alliances['blue']['score'])
                     week_match_sum += redScore + blueScore
                     num_matches_by_week += 1
                     if match.comp_level in Match.ELIM_LEVELS:
