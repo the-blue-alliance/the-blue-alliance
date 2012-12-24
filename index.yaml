@@ -32,12 +32,6 @@ indexes:
 
 - kind: Event
   properties:
-  - name: official
-  - name: year
-  - name: start_date
-
-- kind: Event
-  properties:
   - name: year
   - name: first_eid
 

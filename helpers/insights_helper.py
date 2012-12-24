@@ -21,12 +21,14 @@ class InsightsHelper(object):
         Calculate match insights for a given year. Returns a list of Insights.
         """
         # Only fetch from DB once
-        official_events = Event.query(Event.year == year, Event.official == True).order(Event.start_date).fetch(1000)
+        official_events = Event.query(Event.year == year).order(Event.start_date).fetch(1000)
         events_by_week = EventHelper.groupByWeek(official_events)        
         week_event_matches = []  # Tuples of: (week, events) where events are tuples of (event, matches)
         for week, events in events_by_week.items():
             week_events = []
             for event in events:
+                if not event.official:
+                    continue
                 matches = event.matches
                 week_events.append((event, matches))
             week_event_matches.append((week, week_events))
