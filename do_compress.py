@@ -19,12 +19,9 @@ SCRIPTS_MAIN = ['static/javascript/jquery_js/jquery.min.js',
                 'static/javascript/tba_js/tba_charts.js',
                 'static/javascript/tba_js/tba.js',
                 ]
-SCRIPTS_MAIN_OUT = 'static/javascript/tba_combined_js.main.min.js'
 
 SCRIPTS_GAMEDAY = SCRIPTS_MAIN + ['static/javascript/tba_js/gameday.js',
                                   'static/javascript/tba_js/gameday_twitter.js']
-
-SCRIPTS_GAMEDAY_OUT = 'static/javascript/tba_combined_js.gameday.min.js'
 
 STYLESHEETS_MAIN = ['static/css/precompiled_css/jquery-ui-1.8.13.custom.css',
                     'static/css/precompiled_css/jquery.fancybox.css',
@@ -33,13 +30,15 @@ STYLESHEETS_MAIN = ['static/css/precompiled_css/jquery-ui-1.8.13.custom.css',
                     'static/css/less_css/tba_style.main.css',
                     ]
 
-STYLESHEETS_MAIN_OUT = 'static/css/tba_combined_style.main.min.css'
-
 STYLESHEETS_GAMEDAY = ['static/css/precompiled_css/jquery-ui-1.8.13.custom.css',
                        'static/css/precompiled_css/jquery.fancybox.css',
                        'static/css/precompiled_css/tablesorter.css',
                        'static/css/less_css/tba_style.gameday.css',
                        ]
+
+SCRIPTS_MAIN_OUT = 'static/javascript/tba_combined_js.main.min.js'
+SCRIPTS_GAMEDAY_OUT = 'static/javascript/tba_combined_js.gameday.min.js'
+STYLESHEETS_MAIN_OUT = 'static/css/tba_combined_style.main.min.css'
 STYLESHEETS_GAMEDAY_OUT = 'static/css/tba_combined_style.gameday.min.css'
 
 
