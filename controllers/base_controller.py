@@ -1,9 +1,48 @@
 import webapp2
 from webapp2_extras import sessions
 
+from google.appengine.api import memcache
+
 import facebook
 import tba_config
+
 from models.user import User
+
+class CacheableHandler(webapp2.RequestHandler):
+    """
+    Provides a standard way of caching the output of pages.
+    """
+
+    def __init__(self, *args, **kw):
+        super(CacheableHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 0
+        self._cache_key = ""
+        self._cache_version = 0
+
+    @property
+    def cache_key(self):
+        return "{}:{}:{}".format(
+            self._cache_key,
+            self._cache_version,
+            tba_config.CONFIG["static_resource_version"])
+
+    def get(self, *args, **kw):
+        content = self._read_cache()
+        if not content:
+            content = self._render(*args, **kw)
+            self._write_cache(content)
+        self.response.out.write(content)
+
+    def _read_cache(self):
+        return memcache.get(self.cache_key)
+
+    def _render(self):
+        raise NotImplementedError("No _render method.")
+
+    def _write_cache(self, content):
+        if tba_config.CONFIG["memcache"]: memcache.set(self.cache_key, content, self._cache_expiration)
+
+
 
 class BaseHandler(webapp2.RequestHandler):
     """Provides access to the active Facebook user in self.current_user
