@@ -17,6 +17,8 @@ from models.match import Match
 from models.team import Team
 from models.sitevar import Sitevar
 
+import tba_config
+
 
 class EventTeamUpdate(webapp.RequestHandler):
     """
@@ -137,7 +139,6 @@ class FirebasePushDo(webapp.RequestHandler):
     """
     Pushes data to Firebase
     """
-    FIREBASE_URL = 'https://thebluealliance.firebaseio.com/{}.json?print=silent&auth={}'
     SUCCESS_STATUS_CODES = set([200, 204])
 
     def get(self):
@@ -149,7 +150,7 @@ class FirebasePushDo(webapp.RequestHandler):
             raise Exception("Missing sitevar: firebase.secrets. Can't write to Firebase.")
         FIREBASE_SECRET = firebase_secrets.contents['FIREBASE_SECRET']
         
-        url = self.FIREBASE_URL.format(key, FIREBASE_SECRET)
+        url = tba_config.CONFIG['firebase-url'].format(key, FIREBASE_SECRET)
         result = urlfetch.fetch(url, payload_json, 'POST')
         if result.status_code not in self.SUCCESS_STATUS_CODES:
             logging.warning("Error pushing data to Firebase: {}. ERROR {}: {}".format(payload_json, result.status_code, result.content))
