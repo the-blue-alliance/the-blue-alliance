@@ -21,7 +21,10 @@ class CacheableHandler(webapp2.RequestHandler):
 
     @property
     def cache_key(self):
-        return "{}:{}".format(self._cache_key, self._cache_version)
+        return "{}:{}:{}".format(
+            self._cache_key,
+            self._cache_version,
+            tba_config.CONFIG["static_resource_version"])
 
     def get(self, *args, **kw):
         content = self._read_cache()
