@@ -8,18 +8,18 @@ SCRIPTS_MAIN = ['static/javascript/jquery_js/jquery.min.js',
                 'static/javascript/jquery_js/jquery-ui-1.8.13.custom.min.js',
                 'static/javascript/jquery_js/jquery.ui.touch-punch.min.js',
                 'static/javascript/jquery_js/jquery.tablesorter.min.js',
+                'static/javascript/jquery_js/jquery.fancybox.pack.js',
+                'static/javascript/jquery_js/jquery.fitvids.js',
+                'static/jwplayer/jwplayer.js',
                 'static/javascript/bootstrap_js/bootstrap.js',
                 'static/javascript/bootstrap_js/bootstrap-typeahead.js',
-                'static/javascript/jquery_js/jquery.fancybox.pack.js',
-                'static/jwplayer/jwplayer.js',
-                'static/javascript/jquery_js/jquery.fitvids.js',
                 'static/javascript/tba_js/tablesorter.js',
                 'static/javascript/tba_js/tba.js',
                 ]
 SCRIPTS_MAIN_OUT = 'static/javascript/tba_combined.main.min.js'
 
 SCRIPTS_GAMEDAY = SCRIPTS_MAIN + ['static/javascript/tba_js/gameday.js',
-                                  'static/javascript/gameday_twitter.js']
+                                  'static/javascript/tba_js/gameday_twitter.js']
 
 SCRIPTS_GAMEDAY_OUT = 'static/javascript/tba_combined.gameday.min.js'
 
