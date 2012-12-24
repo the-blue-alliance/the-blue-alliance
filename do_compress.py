@@ -12,6 +12,7 @@ SCRIPTS_MAIN = ['static/javascript/jquery.min.js',
                 'static/javascript/jquery.fancybox.pack.js',
                 'static/jwplayer/jwplayer.js',
                 'static/javascript/jquery.fitvids.js',
+                'static/javascript/tba_firebase.js',
                 'static/javascript/tba.js',
                 ]
 SCRIPTS_MAIN_OUT_DEBUG = 'static/javascript/tba_combined.js'
