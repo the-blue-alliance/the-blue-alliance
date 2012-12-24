@@ -159,12 +159,14 @@ class YearInsightsDo(webapp.RequestHandler):
     def get(self, kind, year):
         year = int(year)
 
+        insights = None
         if kind == 'matches':
             insights = InsightsHelper.doMatchInsights(year)
         elif kind == 'awards':
             insights = InsightsHelper.doAwardInsights(year)
-        
-        InsightManipulator.createOrUpdate(insights)
+      
+        if insights != None:
+            InsightManipulator.createOrUpdate(insights)
 
         template_values = {
             'insights': insights,
@@ -201,13 +203,14 @@ class OverallInsightsDo(webapp.RequestHandler):
     """
         
     def get(self, kind):
-
+        insights = None
         if kind == 'matches':
             insights = InsightsHelper.doOverallMatchInsights()
         elif kind == 'awards':
             insights = InsightsHelper.doOverallAwardInsights()
         
-        InsightManipulator.createOrUpdate(insights)
+        if insights != None:
+            InsightManipulator.createOrUpdate(insights)
 
         template_values = {
             'insights': insights,
