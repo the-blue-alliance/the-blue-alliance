@@ -2,7 +2,7 @@
 
 {% block title %}GameDay - The Blue Alliance{% endblock %}
 
-{% block main_style %}<link rel="stylesheet" href="/css/style_gameday.min.css" type="text/css" />{% endblock %}
+{% block main_style %}<link rel="stylesheet" href="/css/tba_combined_style.gameday.min.css" type="text/css" />{% endblock %}
 
 {% block meta_description %}Live competition page for the FIRST Robotics Competition.{% endblock %}
 
@@ -64,6 +64,7 @@
           </ul>
         </li>
         
+        <li class="social"><a class="social-toggle" href="javascript:social_tab();">Social Feed</a></li>
         <li class="chat"><a class="chat-toggle" href="javascript:chat_tab();">Chat</a></li>
       </ul>
     </div>
@@ -73,13 +74,22 @@
 {% endblock %}
 
 {% block content %}
+<div class="social_panel">
+  <div id="twitter-widget"><a class="twitter-timeline" href="https://twitter.com/search?q=%23omgrobots" data-widget-id="282256949859454976">Tweets about "#omgrobots"</a></div>
+</div>
+
 <div class="webcasts_panel">
 	<div class="video_container"></div>
 </div>
-<div class="chat_panel"><iframe frameborder="0" scrolling="no" id="chat_embed" src="http://twitch.tv/chat/embed?channel=tbagameday&amp;popout_chat=true" height="100%" width="100%"></iframe></div>
+<div class="chat_panel">
+  <div id="chat-info-background">
+    <div id="chat-info" class="alert"><button type="button" class="close" data-dismiss="alert">&times;</button><strong>Reminder:</strong> You need to log into a <a href="http://www.justin.tv" target="_blank">Justin.tv</a> or <a href="http://www.twitch.tv" target="_blank">Twitch.tv</a> account in order to chat.</div>
+  </div>
+  <iframe frameborder="0" scrolling="no" id="chat_embed" src="http://twitch.tv/chat/embed?channel=tbagameday&amp;popout_chat=true" height="100%" width="100%"></iframe>
+</div>
 <div class="feed_bar"></div>
 {% endblock %}
 
 {% block footer %}{% endblock %}
 
-{% block main_javascript %}<script type="text/javascript" src="/javascript/gameday_combined.min.js"></script>{% endblock %}
+{% block main_javascript %}<script type="text/javascript" src="/javascript/tba_combined_js.gameday.min.js"></script>{% endblock %}
