@@ -4,35 +4,38 @@ import optparse
 
 YUI_COMPRESSOR = 'yuicompressor-2.4.7.jar'
 
-SCRIPTS_MAIN = ['static/javascript/jquery.min.js',
-                'static/javascript/jquery-ui-1.8.13.custom.min.js',
-                'static/javascript/jquery.ui.touch-punch.min.js',
-                'static/javascript/bootstrap.js',
-                'static/javascript/bootstrap-typeahead.js',
-                'static/javascript/jquery.fancybox.pack.js',
+SCRIPTS_MAIN = ['static/javascript/jquery_js/jquery.min.js',
+                'static/javascript/jquery_js/jquery-ui-1.8.13.custom.min.js',
+                'static/javascript/jquery_js/jquery.ui.touch-punch.min.js',
+                'static/javascript/jquery_js/jquery.tablesorter.min.js',
+                'static/javascript/jquery_js/jquery.fancybox.pack.js',
+                'static/javascript/jquery_js/jquery.fitvids.js',
                 'static/jwplayer/jwplayer.js',
-                'static/javascript/jquery.fitvids.js',
-                'static/javascript/tba.js',
+                'static/javascript/bootstrap_js/bootstrap.js',
+                'static/javascript/bootstrap_js/bootstrap-typeahead.js',
+                'static/javascript/tba_js/tablesorter.js',
+                'static/javascript/tba_js/tba.js',
                 ]
-SCRIPTS_MAIN_OUT_DEBUG = 'static/javascript/tba_combined.js'
-SCRIPTS_MAIN_OUT = 'static/javascript/tba_combined.min.js'
+SCRIPTS_MAIN_OUT = 'static/javascript/tba_combined_js.main.min.js'
 
-SCRIPTS_GAMEDAY = SCRIPTS_MAIN + ['static/javascript/gameday.js',
-                                  'static/javascript/gameday_twitter.js']
-SCRIPTS_GAMEDAY_OUT_DEBUG = 'static/javascript/gameday_combined.js'
-SCRIPTS_GAMEDAY_OUT = 'static/javascript/gameday_combined.min.js'
+SCRIPTS_GAMEDAY = SCRIPTS_MAIN + ['static/javascript/tba_js/gameday.js',
+                                  'static/javascript/tba_js/gameday_twitter.js']
 
-STYLESHEETS_MAIN = ['static/css/style.css',
-                    'static/css/jquery-ui-1.8.13.custom.css',
-                    'static/css/jquery.fancybox.css',
+SCRIPTS_GAMEDAY_OUT = 'static/javascript/tba_combined_js.gameday.min.js'
+
+STYLESHEETS_MAIN = ['static/css/precompiled_css/jquery-ui-1.8.13.custom.css',
+                    'static/css/precompiled_css/jquery.fancybox.css',
+                    'static/css/precompiled_css/tablesorter.css',
+                    'static/css/less_css/tba_style.main.css',
                     ]
-STYLESHEETS_MAIN_OUT = 'static/css/style.min.css'
+STYLESHEETS_MAIN_OUT = 'static/css/tba_combined_style.main.min.css'
 
-STYLESHEETS_GAMEDAY = ['static/css/style_gameday.css',
-                       'static/css/jquery-ui-1.8.13.custom.css',
-                       'static/css/jquery.fancybox.css',
+STYLESHEETS_GAMEDAY = ['static/css/precompiled_css/jquery-ui-1.8.13.custom.css',
+                       'static/css/precompiled_css/jquery.fancybox.css',
+                       'static/css/precompiled_css/tablesorter.css',
+                       'static/css/less_css/tba_style.gameday.css',
                        ]
-STYLESHEETS_GAMEDAY_OUT = 'static/css/style_gameday.min.css'
+STYLESHEETS_GAMEDAY_OUT = 'static/css/tba_combined_style.gameday.min.css'
 
 
 def compress(in_files, out_file, in_type='js', verbose=False,
@@ -71,10 +74,10 @@ def compress(in_files, out_file, in_type='js', verbose=False,
 def main(kind=None):
     if kind == 'js' or kind == None:
         print 'Compressing Main JavaScript...'
-        compress(SCRIPTS_MAIN, SCRIPTS_MAIN_OUT, 'js', False, SCRIPTS_MAIN_OUT_DEBUG)
+        compress(SCRIPTS_MAIN, SCRIPTS_MAIN_OUT, 'js')
     
         print 'Compressing GameDay JavaScript...'
-        compress(SCRIPTS_GAMEDAY, SCRIPTS_GAMEDAY_OUT, 'js', False, SCRIPTS_GAMEDAY_OUT_DEBUG)
+        compress(SCRIPTS_GAMEDAY, SCRIPTS_GAMEDAY_OUT, 'js')
 
     if kind == 'css' or kind == None:
         print 'Compressing Main CSS...'
