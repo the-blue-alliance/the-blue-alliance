@@ -34,11 +34,11 @@ class InsightsHelper(object):
             week_event_matches.append((week, week_events))
         
         insights = []
-        insights += [self._calculateHighscoreMatchesByWeek(week_event_matches, year)]
-        insights += [self._calculateHighscoreMatches(week_event_matches, year)]
+        insights += self._calculateHighscoreMatchesByWeek(week_event_matches, year)
+        insights += self._calculateHighscoreMatches(week_event_matches, year)
         insights += self._calculateMatchAveragesByWeek(week_event_matches, year)
         insights += self._calculateScoreDistribution(week_event_matches, year)
-        insights += [self._calculateNumMatches(week_event_matches, year)]
+        insights += self._calculateNumMatches(week_event_matches, year)
         return insights
       
     @classmethod
@@ -51,7 +51,7 @@ class InsightsHelper(object):
         awards = AwardHelper.getAwards(keysToQuery, year)
         
         insights = []
-        insights += [self._calculateBlueBanners(awards, year)]
+        insights += self._calculateBlueBanners(awards, year)
         insights += self._calculateChampionshipStats(awards, year)
         insights += self._calculateRegionalStats(awards, year)
 
@@ -123,8 +123,13 @@ class InsightsHelper(object):
                         highscore = maxScore
             highscore_matches_by_week.append((week, week_highscore_matches))
 
+        insight = None
         if highscore_matches_by_week != []:
-            return self._createInsight(highscore_matches_by_week, Insight.INSIGHT_NAMES[Insight.MATCH_HIGHSCORE_BY_WEEK], year)
+            insight = self._createInsight(highscore_matches_by_week, Insight.INSIGHT_NAMES[Insight.MATCH_HIGHSCORE_BY_WEEK], year)
+        if insight != None:
+            return [insight]
+        else:
+            return []
           
     @classmethod
     def _calculateHighscoreMatches(self, week_event_matches, year):
@@ -145,8 +150,13 @@ class InsightsHelper(object):
                         highscore_matches.append(self._generateMatchData(match, event))
                         highscore = maxScore
 
+        insight = None
         if highscore_matches != []:
-            return self._createInsight(highscore_matches, Insight.INSIGHT_NAMES[Insight.MATCH_HIGHSCORE], year)
+            insight = self._createInsight(highscore_matches, Insight.INSIGHT_NAMES[Insight.MATCH_HIGHSCORE], year)
+        if insight != None:
+            return [insight]
+        else:
+            return []
 
     @classmethod
     def _calculateMatchAveragesByWeek(self, week_event_matches, year):
@@ -267,8 +277,13 @@ class InsightsHelper(object):
             for _, matches in week_events:
                 numMatches += len(matches)
             
+        insight = None
         if numMatches != 0:
-            return self._createInsight(numMatches, Insight.INSIGHT_NAMES[Insight.NUM_MATCHES], year)
+            insight = self._createInsight(numMatches, Insight.INSIGHT_NAMES[Insight.NUM_MATCHES], year)
+        if insight != None:
+            return [insight]
+        else:
+            return []
 
     @classmethod
     def _calculateBlueBanners(self, awards, year):
@@ -286,8 +301,13 @@ class InsightsHelper(object):
                     blue_banner_winners[teamKey] = 1
         blue_banner_winners = self._sortTeamWinsDict(blue_banner_winners)
         
+        insight = None
         if blue_banner_winners != {}:
-            return self._createInsight(blue_banner_winners, Insight.INSIGHT_NAMES[Insight.BLUE_BANNERS], year)
+            insight = self._createInsight(blue_banner_winners, Insight.INSIGHT_NAMES[Insight.BLUE_BANNERS], year)
+        if insight != None:
+            return [insight]
+        else:
+            return []
 
     @classmethod
     def _calculateChampionshipStats(self, awards, year):
