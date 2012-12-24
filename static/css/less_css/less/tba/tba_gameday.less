@@ -1,5 +1,6 @@
 @chatWidth: 300px;
 @socialWidth: 250px;
+@videoContainerTopOffset: 1px;
 
 body {
   margin: 0;
@@ -19,6 +20,10 @@ body {
     height: 30px !important;
     min-height: auto !important;
     color: @white !important;
+  }
+  
+  .navbar-fixed-top {
+    position: static;
   }
   
   .chat_active, .social_active {
@@ -103,7 +108,7 @@ body {
 
 .social_panel {
   position: fixed;
-  top: 30px;
+  top: 30px + @videoContainerTopOffset;
   left: 0px;
   bottom: 0px;
   width: @socialWidth;
@@ -123,7 +128,7 @@ body {
 
 .chat_panel {
   position: fixed;
-  top: 30px;
+  top: 30px + @videoContainerTopOffset;
   right: 0px;
   bottom: 0px;
   width: @chatWidth;
@@ -200,7 +205,7 @@ body {
 
 .video_container {
   position: absolute;
-  top: 0px;
+  top: @videoContainerTopOffset;
   bottom: 0px;
   left: 0px;
   right: 0px;
