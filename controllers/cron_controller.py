@@ -137,7 +137,8 @@ class FirebasePushDo(webapp.RequestHandler):
     """
     Pushes data to Firebase
     """
-    FIREBASE_URL = 'https://thebluealliance.firebaseio.com/{}.json?auth={}'
+    FIREBASE_URL = 'https://thebluealliance.firebaseio.com/{}.json?print=silent&auth={}'
+    SUCCESS_STATUS_CODES = set([200, 204])
 
     def get(self):
         key = self.request.get('key')
@@ -150,7 +151,7 @@ class FirebasePushDo(webapp.RequestHandler):
         
         url = self.FIREBASE_URL.format(key, FIREBASE_SECRET)
         result = urlfetch.fetch(url, payload_json, 'PUT')
-        if result.status_code == 200:
+        if result.status_code in self.SUCCESS_STATUS_CODES:
             logging.info("Sucessfully pushed data to Firebase. {}".format(key))
         else:
             logging.warning("Error pushing the a match to Firebase: {}. ERROR {}: {}".format(key, result.status_code, result.content))
