@@ -96,7 +96,7 @@ function getUrlVars()
 
 // Social Toggle
 function social_tab() {
-	var social = $(".social-toggle");
+	var social = $(".social");
 
 	if(social.hasClass("social_active")) {
 		setSocial(false);
@@ -106,7 +106,7 @@ function social_tab() {
 }
 
 function setSocial(open) {
-	var social = $(".social-toggle");
+	var social = $(".social");
 	var social_panel = $(".social_panel");
 	var webcasts_panel = $('.webcasts_panel');
 	if (open) {
@@ -125,7 +125,7 @@ function setSocial(open) {
 //Chat Toggle
 
 function chat_tab() {
-	var chat = $(".chat-toggle");
+	var chat = $(".chat");
 
 	if(chat.hasClass("chat_active")) {
 		setChat(false);
@@ -135,7 +135,7 @@ function chat_tab() {
 }
 
 function setChat(open) {
-	var chat = $(".chat-toggle");
+	var chat = $(".chat");
 	var chat_panel = $(".chat_panel");
 	var webcasts_panel = $('.webcasts_panel');
 	if (open) {
@@ -152,7 +152,7 @@ function setChat(open) {
 }
 
 function chat_tab() {
-	var chat = $(".chat-toggle");
+	var chat = $(".chat");
 
 	if(chat.hasClass("chat_active")) {
 		setChat(false);
