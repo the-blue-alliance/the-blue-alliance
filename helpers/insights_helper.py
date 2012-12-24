@@ -111,8 +111,8 @@ class InsightsHelper(object):
             highscore = 0
             for event, matches in week_events:
                 for match in matches:
-                    redScore = match.alliances['red']['score']
-                    blueScore = match.alliances['blue']['score']
+                    redScore = int(match.alliances['red']['score'])
+                    blueScore = int(match.alliances['blue']['score'])
                     maxScore = max(redScore, blueScore)
                     if maxScore >= highscore:
                         if maxScore > highscore:
@@ -134,8 +134,8 @@ class InsightsHelper(object):
         for _, week_events in week_event_matches:
             for event, matches in week_events:
                 for match in matches:
-                    redScore = match.alliances['red']['score']
-                    blueScore = match.alliances['blue']['score']
+                    redScore = int(match.alliances['red']['score'])
+                    blueScore = int(match.alliances['blue']['score'])
                     maxScore = max(redScore, blueScore)
                     if maxScore >= highscore:
                         if maxScore > highscore:
@@ -202,8 +202,8 @@ class InsightsHelper(object):
         for _, week_events in week_event_matches:
             for _, matches in week_events:
                 for match in matches:
-                    redScore = match.alliances['red']['score']
-                    blueScore = match.alliances['blue']['score']
+                    redScore = int(match.alliances['red']['score'])
+                    blueScore = int(match.alliances['blue']['score'])
                     
                     overall_highscore = max(overall_highscore, redScore, blueScore)
                     
