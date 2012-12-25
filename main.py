@@ -5,6 +5,7 @@ import webapp2
 import tba_config
 
 from controllers.event_controller import EventList, EventDetail, EventRss
+from controllers.insights_controller import InsightsOverview, InsightsDetail
 from controllers.main_controller import ContactHandler, HashtagsHandler, \
       MainHandler, OprHandler, SearchHandler, AboutHandler, ThanksHandler, \
       PageNotFoundHandler, KickoffHandler, ChannelHandler, GamedayHandler, \
@@ -29,6 +30,8 @@ app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['kickoff'
                                ('/event/(.*)', EventDetail),
                                ('/gameday', GamedayHandler),
                                ('/hashtags', HashtagsHandler),
+                               ('/insights', InsightsOverview),
+                               ('/insights/(.*)', InsightsDetail),
                                ('/match/(.*)', MatchDetail),
                                ('/opr', OprHandler),
                                ('/search', SearchHandler),
