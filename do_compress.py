@@ -11,9 +11,12 @@ SCRIPTS_MAIN = ['static/javascript/jquery_js/jquery.min.js',
                 'static/javascript/jquery_js/jquery.fancybox.pack.js',
                 'static/javascript/jquery_js/jquery.fitvids.js',
                 'static/jwplayer/jwplayer.js',
+                'static/xcharts/d3.v2.min.js',
+                'static/xcharts/xcharts.min.js',
                 'static/javascript/bootstrap_js/bootstrap.js',
                 'static/javascript/bootstrap_js/bootstrap-typeahead.js',
                 'static/javascript/tba_js/tablesorter.js',
+                'static/javascript/tba_js/tba_charts.js',
                 'static/javascript/tba_js/tba.js',
                 ]
 
@@ -23,6 +26,7 @@ SCRIPTS_GAMEDAY = SCRIPTS_MAIN + ['static/javascript/tba_js/gameday.js',
 STYLESHEETS_MAIN = ['static/css/precompiled_css/jquery-ui-1.8.13.custom.css',
                     'static/css/precompiled_css/jquery.fancybox.css',
                     'static/css/precompiled_css/tablesorter.css',
+                    'static/xcharts/xcharts.min.css',
                     'static/css/less_css/tba_style.main.css',
                     ]
 

@@ -81,8 +81,8 @@ class TeamDetail(CacheableHandler):
     def __init__(self, *args, **kw):
         super(TeamDetail, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 5
-        self._cache_key = "team_detail_{}_{}" # (team_number, year)
-        self._cache_version = 1
+        self._cache_key = "team_detail_{}_{}_{}" # (team_number, year, explicit_year)
+        self._cache_version = 2
 
     def get(self, team_number, year=None, explicit_year=False):
         
@@ -108,7 +108,7 @@ class TeamDetail(CacheableHandler):
             year = datetime.datetime.now().year
             explicit_year = False
         
-        self._cache_key = self._cache_key.format("frc" + team_number, year)
+        self._cache_key = self._cache_key.format("frc" + team_number, year, explicit_year)
         super(TeamDetail, self).get(team_number, year, explicit_year)
 
     def _render(self, team_number, year=None, explicit_year=False):

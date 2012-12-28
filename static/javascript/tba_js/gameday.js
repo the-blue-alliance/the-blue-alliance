@@ -217,7 +217,7 @@ function setupView(viewNum, $item) {
 	var webcastNumber = $item.attr('num')
 	var eventName = $item.attr('alt');
 	
-	$.getJSON('/_/webcast?event=' + eventKey + '&num=' + webcastNumber, function(data) {
+	$.getJSON('/_/webcast/' + eventKey + '/' + webcastNumber, function(data) {
 		player = data.player;
 		if (player == undefined) {
 			player = "No webcast available"
