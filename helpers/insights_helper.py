@@ -8,6 +8,7 @@ from models.award import Award
 from models.match import Match
 
 from helpers.event_helper import EventHelper
+from helpers.event_helper import OFFSEASON_EVENTS_LABEL
 from helpers.award_helper import AwardHelper
 
 class InsightsHelper(object):
@@ -25,6 +26,8 @@ class InsightsHelper(object):
         events_by_week = EventHelper.groupByWeek(official_events)        
         week_event_matches = []  # Tuples of: (week, events) where events are tuples of (event, matches)
         for week, events in events_by_week.items():
+            if week == OFFSEASON_EVENTS_LABEL:
+                continue
             week_events = []
             for event in events:
                 if not event.official:
