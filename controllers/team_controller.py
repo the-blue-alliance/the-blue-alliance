@@ -29,13 +29,10 @@ class TeamList(CacheableHandler):
         self._cache_key = "team_list_{}" # (page)
         self._cache_version = 1
 
-    def get(self, page=''):
-        if page.isdigit():
-            page = int(page)
-        if page == 1:
-            return self.redirect("/teams")
+    def get(self, page='1'):
         if page == '':
-            page = 1
+            return self.redirect("/teams")
+        page = int(page)
         if page not in self.VALID_PAGES:
             return self.redirect("/error/404")
 
