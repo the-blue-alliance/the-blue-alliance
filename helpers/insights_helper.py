@@ -302,7 +302,7 @@ class InsightsHelper(object):
         blue_banner_winners = self._sortTeamWinsDict(blue_banner_winners)
         
         insight = None
-        if blue_banner_winners != {}:
+        if blue_banner_winners != []:
             insight = self._createInsight(blue_banner_winners, Insight.INSIGHT_NAMES[Insight.BLUE_BANNERS], year)
         if insight != None:
             return [insight]
@@ -376,7 +376,7 @@ class InsightsHelper(object):
         insights = []
         if rca_winners != []:
             insights += [self._createInsight(rca_winners, Insight.INSIGHT_NAMES[Insight.RCA_WINNERS], year)]
-        if regional_winners != {}:
+        if regional_winners != []:
             insights += [self._createInsight(regional_winners, Insight.INSIGHT_NAMES[Insight.REGIONAL_DISTRICT_WINNERS], year)]
         return insights
       
