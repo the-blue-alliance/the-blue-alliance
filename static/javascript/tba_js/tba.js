@@ -111,7 +111,7 @@ $(document).ready(function(){
 // Kickoff Countdown
 update_kickoff_countdown();
 function update_kickoff_countdown() {
-	var kickoff_utc = new Date(Date.UTC(2013,0,5,14,0,0));
+	var kickoff_utc = new Date(Date.UTC(2013,0,5,15,0,0));
 	var current_utc = new Date().getTime();
 	var time_diff = kickoff_utc - current_utc;
 	var seconds = Math.floor(time_diff / 1000);
