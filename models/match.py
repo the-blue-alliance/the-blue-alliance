@@ -14,6 +14,7 @@ class Match(ndb.Model):
     """
     
     COMP_LEVELS = ["qm", "ef", "qf", "sf", "f"]
+    ELIM_LEVELS = set(['ef', 'qf', 'sf', 'f'])
     COMP_LEVELS_VERBOSE = {
         "qm": "Quals",
         "ef": "Eighths",
