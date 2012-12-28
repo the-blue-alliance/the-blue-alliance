@@ -58,10 +58,8 @@ class WebcastHandler(CacheableHandler):
         self._cache_key = "webcast_{}_{}" # (event_key)
         self._cache_version = 1
 
-    def get(self):
-        event_key = self.request.get_all('event')[0]
-        webcast_number = int(self.request.get_all('num')[0]) - 1
-
+    def get(self, event_key, webcast_number):
+        webcast_number = int(webcast_number) - 1
         self._cache_key = self._cache_key.format(event_key, webcast_number)
 
         self.response.headers['Cache-Control'] = "public, max-age=%d" % (5*60)
