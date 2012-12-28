@@ -8,6 +8,7 @@ from models.award import Award
 from models.match import Match
 
 from helpers.event_helper import EventHelper
+from helpers.event_helper import OFFSEASON_EVENTS_LABEL
 from helpers.award_helper import AwardHelper
 
 class InsightsHelper(object):
@@ -25,6 +26,8 @@ class InsightsHelper(object):
         events_by_week = EventHelper.groupByWeek(official_events)        
         week_event_matches = []  # Tuples of: (week, events) where events are tuples of (event, matches)
         for week, events in events_by_week.items():
+            if week == OFFSEASON_EVENTS_LABEL:
+                continue
             week_events = []
             for event in events:
                 if not event.official:
@@ -302,7 +305,7 @@ class InsightsHelper(object):
         blue_banner_winners = self._sortTeamWinsDict(blue_banner_winners)
         
         insight = None
-        if blue_banner_winners != {}:
+        if blue_banner_winners != []:
             insight = self._createInsight(blue_banner_winners, Insight.INSIGHT_NAMES[Insight.BLUE_BANNERS], year)
         if insight != None:
             return [insight]
@@ -376,7 +379,7 @@ class InsightsHelper(object):
         insights = []
         if rca_winners != []:
             insights += [self._createInsight(rca_winners, Insight.INSIGHT_NAMES[Insight.RCA_WINNERS], year)]
-        if regional_winners != {}:
+        if regional_winners != []:
             insights += [self._createInsight(regional_winners, Insight.INSIGHT_NAMES[Insight.REGIONAL_DISTRICT_WINNERS], year)]
         return insights
       
