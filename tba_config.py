@@ -17,4 +17,4 @@ else:
     }
 
 CONFIG['kickoff'] = True
-CONFIG["static_resource_version"] = 1
+CONFIG["static_resource_version"] = 2
