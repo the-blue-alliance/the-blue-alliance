@@ -4,7 +4,7 @@ runtime: python27
 api_version: 1
 threadsafe: true
 
-default_expiration: "4d"
+default_expiration: "12h"
 
 builtins:
 - appstats: on
