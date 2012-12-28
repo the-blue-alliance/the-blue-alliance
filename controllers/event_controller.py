@@ -147,9 +147,15 @@ class EventRss(BaseHandler):
     def get(self, event_key):
         memcache_key = "event_rss_%s" % event_key
         xml = memcache.get(memcache_key)
-        
+
+        if not event_key:
+            return self.redirect("/events")
+                
         if xml is None:
             event = Event.get_by_id(event_key)
+            if not event:
+                return self.redirect("/error/404")
+
             matches = MatchHelper.organizeMatches(event.matches)
         
             template_values = {
