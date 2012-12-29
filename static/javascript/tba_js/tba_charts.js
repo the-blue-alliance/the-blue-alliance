@@ -46,13 +46,19 @@ $(function() {
 		var raw = JSON.parse($('#' + chartId).html());
 		var dataA = [];
 		var dataB = [];
+		var xLabels = []
+		var indexA = 0;
 		for (var key in raw[0]) {
 			var tuple = raw[0][key];
-			dataA = dataA.concat([{"x": tuple[0], "y": tuple[1]}]);
+			dataA = dataA.concat([{"x": indexA, "y": tuple[1]}]);
+			xLabels = xLabels.concat([tuple[0]]);
+			indexA += 1;
 		}
+		var indexB = 0;
 		for (var key in raw[1]) {
 			var tuple = raw[1][key];
-			dataB = dataB.concat([{"x": tuple[0], "y": tuple[1]}]);
+			dataB = dataB.concat([{"x": indexB, "y": tuple[1]}]);
+			indexB += 1;
 		}
 		var chartData = {"xScale": "ordinal",
 						 "yScale": "linear",
@@ -62,7 +68,10 @@ $(function() {
 							 	  {"className": "." + chartId + '-elements',
 								   "data": dataB}],
 						 }
-		var myChart = new xChart('line', chartData, '#' + chartId + '-chart');
+		var opts = {
+		  "tickFormatX": function (x) { return xLabels[x]; }
+		}
+		var myChart = new xChart('line', chartData, '#' + chartId + '-chart', opts);
 	}
 	
 	
