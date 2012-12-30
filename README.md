@@ -16,12 +16,22 @@ If you've having trouble getting set up, reach out to us at [our mailing list](h
 
 Setup
 -----
-0. Learn a bit about Git and Github: https://help.github.com/
-1. Download Google App engine launcher ([http://code.google.com/appengine/downloads.html](http://code.google.com/appengine/downloads.html "AppEngine"))
-2. Import project file into Google App Engine Launcher
-3. Run the app in AppEngine
-4. Get some test data: In the console, run `paver setup`
-5. Visit /admin/debug to set up your local development version with data
+0. Learn a bit about Git and Github:
+	* https://help.github.com/
+	* http://learn.github.com/
+1. Install [App Engine](http://code.google.com/intl/en/appengine/)
+	* Specifically use the [Python SDK](http://code.google.com/intl/en/appengine/downloads.html#Google_App_Engine_SDK_for_Python)2.
+	* Run it and allow it make symbolic links (you will be asked to enter your root password)
+2. Get the latest version of The Blue Alliance
+	* Run `git clone git://github.com/gregmarra/the-blue-alliance.git`
+3. Import the project into Google App Engine Launcher
+	* By default TBA uses port **8088**, make sure your local setup is consistent with this
+4. Run the app in AppEngine
+5. Get some test data: In your terminal console,
+	* Run `cd the-blue-alliance`
+	* Run `paver setup`
+6. Visit [localhost:8088](localhost:8088) to see your local version of The Blue Alliance
+7. Visit [localhost:8088/admin/debug](localhost:8088/admin/debug) to run more commands to populate your install with more data
 
 Paver Commands
 --------------
