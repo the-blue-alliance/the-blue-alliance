@@ -42,6 +42,8 @@ Thumbs.db
 ##############
 *.temp
 
-# Intermediate Files #
+# Compiled/Intermediate Files #
 ######################
 static/css/less_css/*.css
+static/css/*.css
+static/javascript/*.js

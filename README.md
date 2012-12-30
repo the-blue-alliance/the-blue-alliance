@@ -20,7 +20,7 @@ Setup
 1. Download Google App engine launcher ([http://code.google.com/appengine/downloads.html](http://code.google.com/appengine/downloads.html "AppEngine"))
 2. Import project file into Google App Engine Launcher
 3. Run the app in AppEngine
-4. Get some test data: In the console, run `paver setup`
+4. Compile CSS/JS and get some test data: In the console, run `paver setup`
 5. Visit /admin/debug to set up your local development version with data
 
 Paver Commands
