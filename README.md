@@ -33,7 +33,7 @@ Setup
 
 Paver Commands
 --------------
-Paver is an easy way automate repetitive tasks. For The Blue Alliance, these tasks are stored in pavement.py. 
+Paver is an easy way automate repetitive tasks. For The Blue Alliance, these tasks are stored in _pavement.py_. 
 To install paver, use one of the methods below:
 * Download and install paver from [http://pypi.python.org/pypi/Paver/](http://pypi.python.org/pypi/Paver/ "Paver") 
 * Run `easy_install Paver`
@@ -63,7 +63,9 @@ Facebook
 --------
 We use the Facebook SDK to allow users to log in to The Blue Alliance using their pre-existing Facebook account. The Javascript
 portion of this is loaded dynamically and the backend portion is kept in facebook.py, provided by [https://github.com/pythonforfacebook/facebook-sdk](https://github.com/pythonforfacebook/facebook-sdk "Facebook on Github"). To enable your development
-environment, you must register an app at the [https://developers.facebook.com/apps](https://developers.facebook.com/apps "Facebook Developer Center"). Once you register an app (named tbatv-dev-YOURNAME), you can import the App ID and secret into the tba_config. Each developer should have their own App ID and secret.
+environment, you must register an app at the [https://developers.facebook.com/apps](https://developers.facebook.com/apps "Facebook Developer Center"). 
+
+Once you register an app (named tbatv-dev-YOURNAME), you can configure The Blue Alliance to use the App ID and secret by adding them to your [Sitevars](http://localhost:8088/admin/sitevar) (/admin/sitevar/create). _Each developer should have their own App ID and secret_.
 
 Testing
 -------
