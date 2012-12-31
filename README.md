@@ -18,23 +18,22 @@ Setup
 	* http://help.github.com
 	* http://learn.github.com
 1. Install [App Engine](http://code.google.com/intl/en/appengine/)
-	* Specifically use the [Python SDK](http://code.google.com/intl/en/appengine/downloads.html#Google_App_Engine_SDK_for_Python)2.
-	* Run it and allow it make symbolic links (you will be asked to enter your root password)
+	* Specifically use the [Python SDK](http://code.google.com/intl/en/appengine/downloads.html#Google_App_Engine_SDK_for_Python)
+	* Run installer and allow it make symbolic links (you will be asked to enter your root password)
 2. Get the latest version of The Blue Alliance
 	* Run `git clone git://github.com/gregmarra/the-blue-alliance.git`
 3. Import the project into Google App Engine Launcher
 	* By default TBA uses port **8088**, make sure your local setup is consistent with this
 4. Run the app in App Engine
-5. Get some test data: In your terminal console,
-	* Run `cd the-blue-alliance`
-	* Run `paver setup` (Make sure that you already have [Paver installed](#paver-commands))
-6. You should now have a basic development setup of The Blue Alliance!
-	* Visit [localhost:8088](localhost:8088) to see your local version of The Blue Alliance
-	* Visit [localhost:8088/admin/debug](localhost:8088/admin/debug) to run more commands and populate your install with extra data
+5. Get some test data: In your terminal console, from the `the-blue-alliance` directory, run the following command
+	* `paver setup` (Make sure that you already have [Paver installed](#paver-commands))
+6. You should now have a basic development installation!
+	* Visit [localhost:8088](http://localhost:8088) to see your local version of The Blue Alliance
+	* Visit [localhost:8088/admin/debug](http://localhost:8088/admin/debug) to run more commands and populate your install with extra data
 
 Paver Commands
 --------------
-Paver is an easy way automate repetitive tasks. These tasks are stored in pavement.py. 
+Paver is an easy way automate repetitive tasks. For The Blue Alliance, these tasks are stored in pavement.py. 
 To install paver, use one of the methods below:
 * Download and install paver from [http://pypi.python.org/pypi/Paver/](http://pypi.python.org/pypi/Paver/ "Paver") 
 * Run `easy_install Paver`
