@@ -65,7 +65,7 @@ We use the Facebook SDK to allow users to log in to The Blue Alliance using thei
 portion of this is loaded dynamically and the backend portion is kept in facebook.py, provided by [https://github.com/pythonforfacebook/facebook-sdk](https://github.com/pythonforfacebook/facebook-sdk "Facebook on Github"). To enable your development
 environment, you must register an app at the [https://developers.facebook.com/apps](https://developers.facebook.com/apps "Facebook Developer Center"). 
 
-Once you register an app (named tbatv-dev-YOURNAME), you can configure The Blue Alliance to use the App ID and secret by adding them to your [Sitevars](http://localhost:8088/admin/sitevar) (/admin/sitevar/create). _Each developer should have their own App ID and secret_.
+Once you register an app (named tbatv-dev-YOURNAME), you can configure The Blue Alliance to use the App ID and secret by adding them to your [Sitevars](http://localhost:8088/admin/sitevars) (/admin/sitevars/create). _Each developer should have their own App ID and secret_.
 
 Testing
 -------
