@@ -2,7 +2,7 @@
 import os.path
 import optparse
 
-YUI_COMPRESSOR = 'yuicompressor-2.4.7.jar'
+YUI_COMPRESSOR = 'utils/yuicompressor-2.4.7.jar'
 
 SCRIPTS_MAIN = ['static/javascript/jquery_js/jquery.min.js',
                 'static/javascript/jquery_js/jquery-ui-1.8.13.custom.min.js',
