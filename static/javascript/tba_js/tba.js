@@ -55,7 +55,6 @@ function selectTypeaheadResult(item, val, text) {
 }
 
 // General JS for all pages
-var finish_utc;
 $(document).ready(function(){
 	// Jumping to page section
     $('.smooth-scroll').bind('click',function(event){
