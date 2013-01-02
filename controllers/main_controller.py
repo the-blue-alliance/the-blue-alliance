@@ -25,12 +25,34 @@ def render_static(page):
         if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
     
     return html
-
-class MainHandler(CacheableHandler):
+            
+class MainKickoffHandler(CacheableHandler):
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
-        self._cache_key = "main_index"
+        self._cache_key = "main_kickoff"
+        self._cache_version = 2
+
+    def _render(self, *args, **kw):
+        path = os.path.join(os.path.dirname(__file__), "../templates/index_kickoff.html")
+        return template.render(path, {})
+                  
+class MainBuildseasonHandler(CacheableHandler):
+    def __init__(self, *args, **kw):
+        super(CacheableHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+        self._cache_key = "main_buildseason"
+        self._cache_version = 1
+
+    def _render(self, *args, **kw):
+        path = os.path.join(os.path.dirname(__file__), "../templates/index_buildseason.html")
+        return template.render(path, {})
+
+class MainCompetitionseasonHandler(CacheableHandler):
+    def __init__(self, *args, **kw):
+        super(CacheableHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+        self._cache_key = "main_competitionseason"
         self._cache_version = 1
 
     def _render(self, *args, **kw):
@@ -54,7 +76,7 @@ class MainHandler(CacheableHandler):
             "events": upcoming_events,
         }
         
-        path = os.path.join(os.path.dirname(__file__), '../templates/index.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/index_competitionseason.html')
         return template.render(path, template_values)
 
 class ContactHandler(CacheableHandler):
@@ -127,17 +149,6 @@ class SearchHandler(BaseHandler):
             logging.warning("warning: %s" % e)
         finally:
             self.response.out.write(render_static("search"))
-            
-class KickoffHandler(CacheableHandler):
-    def __init__(self, *args, **kw):
-        super(CacheableHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24 * 7
-        self._cache_key = "main_kickoff"
-        self._cache_version = 2
-
-    def _render(self, *args, **kw):
-        path = os.path.join(os.path.dirname(__file__), "../templates/kickoff.html")
-        return template.render(path, {})
 
 class GamedayHandler(CacheableHandler):
     def __init__(self, *args, **kw):

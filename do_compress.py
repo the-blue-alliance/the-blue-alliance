@@ -17,6 +17,7 @@ SCRIPTS_MAIN = ['static/javascript/jquery_js/jquery.min.js',
                 'static/javascript/bootstrap_js/bootstrap-typeahead.js',
                 'static/javascript/tba_js/tablesorter.js',
                 'static/javascript/tba_js/tba_charts.js',
+                'static/javascript/tba_js/tba_countdown.js',
                 'static/javascript/tba_js/tba.js',
                 ]
 
