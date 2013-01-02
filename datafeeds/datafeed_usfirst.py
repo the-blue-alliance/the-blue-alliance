@@ -174,14 +174,18 @@ class DatafeedUsfirst(DatafeedBase):
                 session_key = self.getSessionKey(team.first_tpid_year)
                 url = self.TEAM_DETAILS_URL_PATTERN % (team.first_tpid, session_key)
                 team_dict = self.parse(url, UsfirstTeamDetailsParser)
-                
-                return Team(
-                    team_number = team_dict.get("team_number", None),
-                    name = self._shorten(team_dict.get("name", None)),
-                    address = team_dict.get("address", None),
-                    nickname = team_dict.get("nickname", None),
-                    website = team_dict.get("website", None)
-                )
+
+                if "team_number" in team_dict:
+                    return Team(
+                        team_number = team_dict.get("team_number", None),
+                        name = self._shorten(team_dict.get("name", None)),
+                        address = team_dict.get("address", None),
+                        nickname = team_dict.get("nickname", None),
+                        website = team_dict.get("website", None)
+                    )
+                else:
+                    logging.warning("No team_number found scraping %s, probably retired team" % team.team_number)
+                    return None
 
         logging.warning('Null TPID for team %s' % team.team_number)
         return None
