@@ -34,14 +34,18 @@
     <a id="navTitle" class="brand visible-phone" href="/">TBA</a>
     <div class="nav">
 			<ul id="subnav" class="nav">
-			  <li class="navbar-button {% block teams_active %}{% endblock %}"><a href="/teams"><span><i class="icon-user icon-white"></i> <span class="hidden-phone">Teams</span></span></a></li>
-        <li class="navbar-button {% block events_active %}{% endblock %}"><a href="/events"><span><i class="icon-calendar icon-white"></i> <span class="hidden-phone">Events</span></span></a></li>
-        <li class="navbar-button {% block insights_active %}{% endblock %}"><a href="/insights"><span><i class="icon-align-left icon-white"></i> <span class="hidden-phone">Insights</span></span></a></li>
-        <li class="navbar-button"><a href="/gameday"><span><i class="icon-facetime-video icon-white"></i> <span class="hidden-phone">GameDay</span></span></a></li>
+			  <li class="navbar-button {% block teams_active %}{% endblock %}"><a href="/teams"><span><i class="icon-user icon-white"></i> Teams</span></a></li>
+        <li class="navbar-button {% block events_active %}{% endblock %}"><a href="/events"><span><i class="icon-calendar icon-white"></i> Events</span></a></li>
+        <li class="navbar-button hidden-phone {% block insights_active %}{% endblock %}"><a href="/insights"><span><i class="icon-align-left icon-white"></i> Insights</span></a></li>
+        <li class="navbar-button hidden-phone"><a href="/gameday"><span><i class="icon-facetime-video icon-white"></i> GameDay</span></a></li>
 			</ul>
 	  </div>
 	  <div class="nav-collapse">
-			<form id="cse-search-box" class="navbar-search pull-right" action="http://www.thebluealliance.com/search" >
+      <ul class="nav">
+			  <li class="navbar-button visible-phone"><a href="/insights"><span><i class="icon-align-left icon-white"></i> Insights</span></a></li>
+        <li class="navbar-button visible-phone"><a href="/gameday"><span><i class="icon-facetime-video icon-white"></i> GameDay</span></a></li>
+      </ul>
+      <form id="cse-search-box" class="navbar-search pull-right" action="http://www.thebluealliance.com/search" >
 			    <input type="hidden" name="cx" value="017956276086362105630:99ctqytcokm" />
 			    <input type="hidden" name="cof" value="FORID:11" />
 			    <input type="hidden" name="ie" value="UTF-8" />
