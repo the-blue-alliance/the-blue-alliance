@@ -1,13 +1,15 @@
 var finish_utc;
 $(document).ready(function(){
-  var finish_utc_args = JSON.parse($('#countdown-finish-time').html());
-  finish_utc = new Date(Date.UTC(finish_utc_args[0],
-                                 finish_utc_args[1],
-                                 finish_utc_args[2],
-                                 finish_utc_args[3],
-                                 finish_utc_args[4],
-                                 finish_utc_args[5]));
-  update_countdown();
+	if ($('#countdown-finish-time').length != 0) {
+	  var finish_utc_args = JSON.parse($('#countdown-finish-time').html());
+	  finish_utc = new Date(Date.UTC(finish_utc_args[0],
+	                                 finish_utc_args[1],
+	                                 finish_utc_args[2],
+	                                 finish_utc_args[3],
+	                                 finish_utc_args[4],
+	                                 finish_utc_args[5]));
+	  update_countdown();
+	}
 });
 
 function update_countdown() {
