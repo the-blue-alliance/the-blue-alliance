@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="span4">
+            <h2 class="hidden-phone">The Blue Alliance</h1>
+            <p class="hidden-phone"><em>FIRST</em> Robotics Competition team information, event results, and videos</p>
+            <form id="cse-search-box" class="main-search" action="http://www.thebluealliance.com/search">
+                <input type="hidden" name="cx" value="017956276086362105630:99ctqytcokm"/>
+                <input type="hidden" name="cof" value="FORID:11" />
+                <input type="hidden" name="ie" value="UTF-8" />
+                <input type="text" id="q" class="search-query" placeholder="Search for teams and events" name="q"/>
+            </form>
+            <div class="btn-group">
+                <a class="btn btn-large" href="/teams"><i class="icon-user"></i> Teams</a>
+                <a class="btn btn-large" href="/events"><i class="icon-calendar"></i> Events</a>
+            </div>
+            <div class="hidden-phone">
+                <br />
+                <h4>Help other <em>FIRST</em> teams!</h4>
+                <p><small>KNOW VIDEOS WE'RE MISSING?</small><br /><a class="btn" href="https://docs.google.com/spreadsheet/ccc?key=0ApRO2Yzh2z01dExFZEdieV9WdTJsZ25HSWI3VUxsWGc" target="_blank"><i class="icon-upload"></i> Add YouTube Videos</a></p>
+                <p><small>LIKE CODING?</SMALL><br /><a class="btn" href="https://github.com/gregmarra/the-blue-alliance/" target="_blank"><i class="icon-wrench"></i> Hack on The Blue Alliance</a></p>
+            </div>
+        </div>
+        <div class="span4">
+            <h2>Build Season <small>ends on 2/19/13</small></h2>
+            <div id="countdown-finish-time">[2013, 1, 20, 12, 0, 0]</div>
+            <h3 class="countdown">
+                <span class="countdown-number countdown-days">--</span><span class="countdown-label day-label"> Days</span>
+                <small> left in the 2013 build season</small>
+            </h3>
+        </div>
+        <div class="span4">
+            <h2>2013 Game Info</h2>
+            <p><a class="btn" href="#"><i class="icon-film"></i> 2013 Game Video</a></p>
+            <p><a class="btn" href="http://frc-manual.usfirst.org/" target="_blank"><i class="icon-download"></i> 2013 Game Manual</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
