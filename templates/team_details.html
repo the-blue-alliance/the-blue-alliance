@@ -26,7 +26,7 @@
     <div class="row">
         <div class="span8">
             <p>
-                {% if team.address %}<i class="icon-map-marker"></i> from <a href="http://maps.google.com/maps?q={{ team.address }}">{{ team.address }}</a><br />{% endif %}
+                {% if team.address %}<i class="icon-map-marker"></i> from <a href="http://maps.google.com/maps?q={{ team.address|urlencode }}">{{ team.address }}</a><br />{% endif %}
                 {% if team.name %}<i class="icon-info-sign"></i> aka <em>{{ team.name }}</em><br />{% endif %}
                 {% if team.rookie_year %}<i class="icon-calendar"></i> first competed in {{ team.rookie_year }}{% endif %}
                 {% if team.website %}<i class="icon-globe"></i> <a href="{{team.website}}" target="_blank">{{ team.website }}</a>{% endif %}
