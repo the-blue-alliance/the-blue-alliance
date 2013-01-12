@@ -7,6 +7,8 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
 from helpers.event_team_manipulator import EventTeamManipulator
+from helpers.event_team_repairer import EventTeamRepairer
+
 from helpers.insight_manipulator import InsightManipulator
 from helpers.team_manipulator import TeamManipulator
 from helpers.opr_helper import OprHelper
@@ -17,6 +19,23 @@ from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
 from models.insight import Insight
+
+class EventTeamRepairDo(webapp.RequestHandler):
+    """
+    Repair broken EventTeams.
+    """
+    def get(self):
+        event_teams = EventTeam.query(EventTeam.year == None).fetch()
+
+        event_teams = EventTeamRepairer.repair(event_teams)
+        event_teams = EventTeamManipulator.createOrUpdate(event_teams)
+        
+        template_values = {
+            'event_teams': [event_teams],
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/math/eventteam_repair_do.html')
+        self.response.out.write(template.render(path, template_values))
 
 class EventTeamUpdate(webapp.RequestHandler):
     """
