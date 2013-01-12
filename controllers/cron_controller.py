@@ -29,9 +29,13 @@ class EventTeamRepairDo(webapp.RequestHandler):
 
         event_teams = EventTeamRepairer.repair(event_teams)
         event_teams = EventTeamManipulator.createOrUpdate(event_teams)
+
+        # sigh. -gregmarra
+        if type(event_teams) == EventTeam:
+            event_teams = [event_teams]
         
         template_values = {
-            'event_teams': [event_teams],
+            'event_teams': event_teams,
         }
         
         path = os.path.join(os.path.dirname(__file__), '../templates/math/eventteam_repair_do.html')
