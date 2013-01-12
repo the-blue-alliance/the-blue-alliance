@@ -20,7 +20,7 @@ from models.insight import Insight
 
 class EventTeamUpdate(webapp.RequestHandler):
     """
-    Task that adds to the EventTeam index for an Event.
+    Task that adds to the EventTeam index for an Event from Matches.
     Can only update or delete EventTeams for unregistered teams. 
     """
     def get(self, event_key):

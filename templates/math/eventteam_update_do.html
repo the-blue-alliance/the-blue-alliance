@@ -6,8 +6,9 @@
 <div class="row-fluid">
     <h2>EventTeamUpdateDo</h2>
     <div class="alert alert-block alert-success">
-        Got {{event_teams|length}} EventTeams written!
+        Got [ {{event_teams|length}} ] EventTeams written!
     </div>
+    <h3>EventTeams written:</h3>
     <ul>
         {% for event_team in event_teams %}
         <li>{{event_team.key.id}}</li>
