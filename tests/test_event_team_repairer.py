@@ -50,6 +50,9 @@ class TestEventTeamRepairer(unittest2.TestCase):
         self.testbed.deactivate()
 
     def testRepair(self):
+        event_team = EventTeam.get_by_id("2011ct_frc177")
+        self.assertEqual(event_team.year, None)
+
         broken_event_teams = EventTeam.query(EventTeam.year == None).fetch()
         self.assertGreater(len(broken_event_teams), 0)
 

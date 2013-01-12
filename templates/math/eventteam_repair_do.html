@@ -11,7 +11,7 @@
     <h3>EventTeams re-written:</h3>
     <ul>
         {% for event_team in event_teams %}
-        <li>{{event_team.key.id}} ({{event_team.year}})</li>
+        <li>{{event_team.key.id}} ({{event_team.year}}) - Dirtied: {{event_team.dirty}}</li>
         {% endfor %}
     </ul>
 </div>

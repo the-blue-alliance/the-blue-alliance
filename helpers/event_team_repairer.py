@@ -1,4 +1,4 @@
-import logging
+from models.event_team import EventTeam
 
 class EventTeamRepairer(object):
     """
@@ -10,9 +10,14 @@ class EventTeamRepairer(object):
         """
         Repair missing year attributes by rebuilding from Event key value.
         """
+        new_event_teams = list()
+
         for event_team in event_teams:
             if event_team.year == None:
                 # Note, y10k bug. -gregmarra
-                event_team.year = int(event_team.event.id()[:4])
+                new_event_teams.append(EventTeam(
+                    event = event_team.event,
+                    team = event_team.team,
+                    year = int(event_team.event.id()[:4])))
 
-        return event_teams
+        return new_event_teams
