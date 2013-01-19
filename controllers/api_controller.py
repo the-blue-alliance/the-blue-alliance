@@ -68,18 +68,9 @@ class ApiEventsShow(MainApiHandler):
     Deprecation notice. Please use ApiEventList, or ApiEventDetails.
     """
     def get(self):
-        logging.warning("Deprecation notice: ApiEventsShow.")
-
-        event_keys = set()
-        
-        if self.request.get("year"):
-            events = Event.all().filter("year =", int(self.request.get("year"))).fetch(500)
-            event_keys = event_keys.union(set([event.key().name() for event in events]))
-            
-        event_keys = filter(None, event_keys.union(set(self.request.get("events").split(','))))        
-        events = [ApiHelper.getEventInfo(event_key) for event_key in event_keys]
-        
-        self.response.out.write(json.dumps(events))
+        response = { "API Method Removed": "ApiEventsShow is no longer available. Please use ApiEvenDetails, and ApiEventList instead." }
+        self.response.set_status(410)
+        self.response.out.write(json.dumps(response))
 
 class ApiEventList(MainApiHandler):
     """
