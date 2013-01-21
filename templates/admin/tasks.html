@@ -45,6 +45,12 @@
         </script>
     </div>
 </div>
+<div class="row-fluid">
+    <div class="span4">
+        <span class="help-block">Repair corrupt EventTeams</span>
+        <a class="btn" href="/tasks/math/do/eventteam_repair">Repair EventTeams</a>
+    </div>
+</div>
 
 <hr>
 <h4>TbaVideos</h4>
@@ -175,6 +181,46 @@
 <div class="row-fluid">
     <div class="span4">
         <a class="btn" href="/tasks/get/twitter_frcfms_matches">Get last 3200 Matches</a>
+    </div>
+</div>
+
+<hr>
+<h4>Calculate Insights</h4>
+<p>Generate Insights by year or overall</p>
+<div class="row-fluid">
+    <div class="span3">
+        <span class="help-block">Enqueue Award Insights</span>
+        <form class="form-inline">
+            <div class="input-prepend input-append">
+                <input class="span6" id="enqueue_award_insights_year" type="text" placeholder="2012">
+                <a class="btn" id="enqueue_award_insights_year_submit">Go <i class="icon-fast-forward"></i></a>
+            </div>
+        </form>
+        <script>
+        $("#enqueue_award_insights_year_submit").click(function() {
+            window.location = "/tasks/math/enqueue/insights/awards/" + $("#enqueue_award_insights_year").val();
+        });
+        </script>
+    </div>
+    <div class="span3">
+        <span class="help-block">Enqueue Match Insights</span>
+        <form class="form-inline">
+            <div class="input-prepend input-append">
+                <input class="span6" id="enqueue_match_insights_year" type="text" placeholder="2012">
+                <a class="btn" id="enqueue_match_insights_year_submit">Go <i class="icon-fast-forward"></i></a>
+            </div>
+        </form>
+        <script>
+        $("#enqueue_match_insights_year_submit").click(function() {
+            window.location = "/tasks/math/enqueue/insights/matches/" + $("#enqueue_match_insights_year").val();
+        });
+        </script>
+    </div>
+    <div class="span3">
+        <a class="btn" href="/tasks/math/enqueue/overallinsights/awards">Enqueue Overall Award Insights</a>
+    </div>
+    <div class="span3">
+        <a class="btn" href="/tasks/math/enqueue/overallinsights/matches">Enqueue Overall Match Insights</a>
     </div>
 </div>
 

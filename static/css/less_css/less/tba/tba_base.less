@@ -1,14 +1,32 @@
-#navTitle {
+.navbar .brand {
   background-image: url('/images/tba_blue_lamp_navbar.png');
   background-repeat: no-repeat;
   background-position: left center;
   padding-left: 30px;
-  margin-left: 10px;
+  margin-left: 0px;
   padding-right: 0;
+
+  @media (max-width: 979px) {
+    margin-left: 20px;
+  }
+}
+
+.full-width-search {
+  width: 100%;
+  padding: 14px;
+  box-sizing: border-box;
+  -webkit-box-sizing:border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
 }
 
 #subnav {
   margin-left: 15px;
+  margin-right: 0px;
+}
+
+.xcharts-data {
+  display: none;
 }
 
 #nav-alert-container {

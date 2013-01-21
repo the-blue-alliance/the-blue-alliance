@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block insights_active %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+      <div class="span2 year_list">
+      <div class="btn-group visible-phone">
+        <a class="btn btn-large dropdown-toggle" data-toggle="dropdown" href="#">
+        {% if selected_year %}{{selected_year}}{% else %}Overview{% endif %}
+        <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+          {% for year in valid_years %}
+            <li><a href="/insights/{{year}}">{{year}}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+        <ul class="nav nav-tabs nav-stacked hidden-phone">
+          <li {% if selected_year == year %}class="active"{% endif %}><a href="/insights">Overview</a></li>
+          {% for year in valid_years %}
+            <li {% if selected_year == year %}class="active"{% endif %}><a href="/insights/{{year}}">{{year}}</a></li>
+          {% endfor %}
+      </ul>
+      </div>
+    <div class="span10">
+      {% block detailed_content %}
+      {% endblock %}
+    </div>  
+  </div>
+</div>
+{% endblock %}

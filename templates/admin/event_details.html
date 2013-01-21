@@ -7,8 +7,11 @@
 <h1>{{event.key_name}} - {{ event.name }}</h1>
 
 <div class="btn-group">
-    <a href="/event/{{event.key_name}}" class="btn"><i class="icon-eye-open"></i> View on TBA</a>
     <a href="/admin/event/edit/{{event.key_name}}" class="btn btn-primary"><i class="icon-edit icon-white"></i> Edit</a>
+    <a href="/event/{{event.key_name}}" class="btn"><i class="icon-eye-open"></i> View on TBA</a>
+    <a href="/tasks/math/do/eventteam_update/{{event.key_name}}" class="btn"><i class="icon-user"></i> Rebuilt EventTeams</a>
+    <a href="/tasks/math/do/eventteam_update/{{event.key_name}}" class="btn"><i class="icon-user"></i> Rebuilt EventTeams</a>
+    <a href="/tasks/get/usfirst_event_details/{{event.year}}/{{event.first_eid}}" class="btn"><i class="icon-refresh"></i> Refresh from FIRST</a>
 </div>
 <br />
 

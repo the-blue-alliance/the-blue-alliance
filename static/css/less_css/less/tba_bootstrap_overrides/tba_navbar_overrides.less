@@ -5,12 +5,6 @@
     padding: ((@navbarHeight - @elementHeight) / 2) 20px ((@navbarHeight - @elementHeight) / 2 + 2);
     font-weight: 600;
   }
-  // Phones only
-  @media (max-width: 767px) {
-    .brand {
-      font-size: 16px;
-    }
-  }
 }
 
 .navbar-search {
@@ -28,19 +22,14 @@
     
     // Phones only
     @media (max-width: 767px) {
-      width: 100%;
-      padding: 14px;
-      box-sizing: border-box;
-      -webkit-box-sizing:border-box;
-      -moz-box-sizing: border-box;
-      -ms-box-sizing: border-box;
+      .full-width-search();
     }
   }
 }
 
 .navbar .nav > li > a {
   @elementHeight: 20px;
-  padding: ((@navbarHeight - @elementHeight) / 2 + 2) 10px ((@navbarHeight - @elementHeight) / 2 + 1);
+  padding: ((@navbarHeight - @elementHeight) / 2 + 2) 8px ((@navbarHeight - @elementHeight) / 2 + 1);
   font-size: 14px;
   margin: 0;
 }

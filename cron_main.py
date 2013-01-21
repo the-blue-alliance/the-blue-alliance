@@ -13,9 +13,11 @@ from controllers.datafeed_controller import UsfirstAwardsEnqueue, UsfirstAwardsG
 from controllers.datafeed_controller import UsfirstMatchesEnqueue, UsfirstMatchesGet, UsfirstEventRankingsEnqueue, UsfirstEventRankingsGet
 from controllers.datafeed_controller import UsfirstTeamDetailsEnqueue, UsfirstTeamDetailsGet, UsfirstTeamsTpidsGet
 
-from controllers.cron_controller import EventTeamUpdate, EventTeamUpdateEnqueue
+from controllers.cron_controller import EventTeamRepairDo, EventTeamUpdate, EventTeamUpdateEnqueue
 from controllers.cron_controller import EventOprDo, EventOprEnqueue
+from controllers.cron_controller import YearInsightsEnqueue, YearInsightsDo, OverallInsightsEnqueue, OverallInsightsDo
 from controllers.cron_controller import FirebasePushDo
+
 
 app = webapp2.WSGIApplication([('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
                                ('/tasks/enqueue/usfirst_event_details/([0-9]*)', UsfirstEventDetailsEnqueue),
@@ -39,6 +41,11 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
                                ('/tasks/math/enqueue/event_opr/(.*)', EventOprEnqueue),
                                ('/tasks/math/enqueue/eventteam_update/(.*)', EventTeamUpdateEnqueue),
                                ('/tasks/math/do/event_opr/(.*)', EventOprDo),
+                               ('/tasks/math/do/eventteam_repair', EventTeamRepairDo),
                                ('/tasks/math/do/eventteam_update/(.*)', EventTeamUpdate),
+                               ('/tasks/math/enqueue/overallinsights/(.*)', OverallInsightsEnqueue),
+                               ('/tasks/math/do/overallinsights/(.*)', OverallInsightsDo),
+                               ('/tasks/math/enqueue/insights/(.*)/([0-9]*)', YearInsightsEnqueue),
+                               ('/tasks/math/do/insights/(.*)/([0-9]*)', YearInsightsDo),
                                ],
                               debug=tba_config.DEBUG)

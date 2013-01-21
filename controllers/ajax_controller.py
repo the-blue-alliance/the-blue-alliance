@@ -4,7 +4,7 @@ import json
 from google.appengine.api import memcache
 from google.appengine.ext.webapp import template
 
-from base_controller import BaseHandler
+from base_controller import BaseHandler, CacheableHandler
 
 from models.event import Event
 from models.team import Team
@@ -12,76 +12,82 @@ from models.sitevar import Sitevar
 import tba_config
 
 
-class TypeaheadHandler(BaseHandler):
-    def get(self):
-        # Currently just returns a list of all teams and events
-        # Needs to be optimized at some point.
-        # Tried a trie but the datastructure was too big to
-        # fit into memcache efficiently
-        q = self.request.get_all('q')
-        entries = self.typeahead_entries()
+class TypeaheadHandler(CacheableHandler):
+    """
+    Currently just returns a list of all teams and events
+    Needs to be optimized at some point.
+    Tried a trie but the datastructure was too big to
+    fit into memcache efficiently
+    """
+    def __init__(self, *args, **kw):
+        super(TypeaheadHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24
+        self._cache_key = "typeahead_entries"
+        self._cache_version = 1
 
+    def get(self):
         self.response.headers['Cache-Control'] = "public, max-age=%d" % (6*60*60)
         self.response.headers['Pragma'] = 'Public'
         self.response.headers.add_header('content-type', 'application/json', charset='utf-8')        
-        typeahead_list = json.dumps(entries)
-        self.response.out.write(typeahead_list)
-        
-    def typeahead_entries(self):
-        typeahead_key = "typeahead_entries"
-        results = memcache.get(typeahead_key)
-        
-        if results is None:
-            events = Event.query().order(-Event.year).order(Event.name)       
-            teams = Team.query().order(Team.team_number)
+        super(TypeaheadHandler, self).get()
 
-            results = []
-            for event in events:
-                results.append({'id': event.key_name, 'name': '%s %s [%s]' % (event.year, event.name, event.event_short.upper())})
-            for team in teams:
-                if not team.nickname:
-                    nickname = "Team %s" % team.team_number
-                else:
-                    nickname = team.nickname
-                results.append({'id': team.team_number, 'name': '%s | %s' % (team.team_number, nickname)})
+    def _render(self):
+        events = Event.query().order(-Event.year).order(Event.name)       
+        teams = Team.query().order(Team.team_number)
 
-            if tba_config.CONFIG["memcache"]: memcache.set(typeahead_key, results, 86400)
-        return results
-    
-class WebcastHandler(BaseHandler):
-    def get(self):
-        # Returns the HTML necessary to generate the webcast embed for a given event
-        event_key = self.request.get_all('event')[0]
-        webcast_number = int(self.request.get_all('num')[0]) - 1
-        webcast_key = "webcast_" + event_key
-        output_json = memcache.get(webcast_key)
-        
-        if output_json is None:
-            event = Event.get_by_id(event_key)
-            output = {}
-            if event and event.webcast:
-                webcast = event.webcast[webcast_number]
-                if 'type' in webcast and 'channel' in webcast:
-                    output['player'] = self._renderPlayer(webcast)
+        results = []
+        for event in events:
+            results.append({'id': event.key_name, 'name': '%s %s [%s]' % (event.year, event.name, event.event_short.upper())})
+        for team in teams:
+            if not team.nickname:
+                nickname = "Team %s" % team.team_number
             else:
-                special_webcasts_future = Sitevar.get_by_id_async('gameday.special_webcasts')
-                special_webcasts = special_webcasts_future.get_result()
-                if special_webcasts:
-                    special_webcasts = special_webcasts.contents
-                else:
-                    special_webcasts = {}
-                if event_key in special_webcasts:
-                    webcast = special_webcasts[event_key]
-                    if 'type' in webcast and 'channel' in webcast:
-                        output['player'] = self._renderPlayer(webcast)                   
-                    
-            output_json = json.dumps(output)
-            if tba_config.CONFIG["memcache"]: memcache.set(webcast_key, output_json, 86400)
-        
+                nickname = team.nickname
+            results.append({'id': team.team_number, 'name': '%s | %s' % (team.team_number, nickname)})
+
+        return json.dumps(results)
+
+    
+class WebcastHandler(CacheableHandler):
+    """
+    Returns the HTML necessary to generate the webcast embed for a given event
+    """
+    def __init__(self, *args, **kw):
+        super(WebcastHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24
+        self._cache_key = "webcast_{}_{}" # (event_key)
+        self._cache_version = 1
+
+    def get(self, event_key, webcast_number):
+        webcast_number = int(webcast_number) - 1
+        self._cache_key = self._cache_key.format(event_key, webcast_number)
+
         self.response.headers['Cache-Control'] = "public, max-age=%d" % (5*60)
         self.response.headers['Pragma'] = 'Public'
-        self.response.headers.add_header('content-type', 'application/json', charset='utf-8')        
-        self.response.out.write(output_json)
+        self.response.headers.add_header('content-type', 'application/json', charset='utf-8')  
+
+        super(WebcastHandler, self).get(event_key, webcast_number)
+        
+    def _render(self, event_key, webcast_number):
+        event = Event.get_by_id(event_key)
+        output = {}
+        if event and event.webcast:
+            webcast = event.webcast[webcast_number]
+            if 'type' in webcast and 'channel' in webcast:
+                output['player'] = self._renderPlayer(webcast)
+        else:
+            special_webcasts_future = Sitevar.get_by_id_async('gameday.special_webcasts')
+            special_webcasts = special_webcasts_future.get_result()
+            if special_webcasts:
+                special_webcasts = special_webcasts.contents
+            else:
+                special_webcasts = {}
+            if event_key in special_webcasts:
+                webcast = special_webcasts[event_key]
+                if 'type' in webcast and 'channel' in webcast:
+                    output['player'] = self._renderPlayer(webcast)                   
+                
+        return json.dumps(output)
         
     def _renderPlayer(self, webcast):
         webcast_type = webcast['type']

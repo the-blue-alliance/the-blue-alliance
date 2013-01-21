@@ -3,13 +3,20 @@ import logging
 import os
 
 from google.appengine.api import taskqueue
+
+from google.appengine.ext import ndb
+
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.api import urlfetch
 
 from helpers.event_team_manipulator import EventTeamManipulator
+from helpers.event_team_repairer import EventTeamRepairer
+
+from helpers.insight_manipulator import InsightManipulator
 from helpers.team_manipulator import TeamManipulator
 from helpers.opr_helper import OprHelper
+from helpers.insights_helper import InsightsHelper
 
 from models.event import Event
 from models.event_team import EventTeam
@@ -19,10 +26,32 @@ from models.sitevar import Sitevar
 
 import tba_config
 
+from models.insight import Insight
+
+class EventTeamRepairDo(webapp.RequestHandler):
+    """
+    Repair broken EventTeams.
+    """
+    def get(self):
+        event_teams = EventTeam.query(EventTeam.year == None).fetch()
+
+        event_teams = EventTeamRepairer.repair(event_teams)
+        event_teams = EventTeamManipulator.createOrUpdate(event_teams)
+
+        # sigh. -gregmarra
+        if type(event_teams) == EventTeam:
+            event_teams = [event_teams]
+        
+        template_values = {
+            'event_teams': event_teams,
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/math/eventteam_repair_do.html')
+        self.response.out.write(template.render(path, template_values))
 
 class EventTeamUpdate(webapp.RequestHandler):
     """
-    Task that adds to the EventTeam index for an Event.
+    Task that adds to the EventTeam index for an Event from Matches.
     Can only update or delete EventTeams for unregistered teams. 
     """
     def get(self, event_key):
@@ -154,3 +183,93 @@ class FirebasePushDo(webapp.RequestHandler):
         result = urlfetch.fetch(url, payload_json, 'POST')
         if result.status_code not in self.SUCCESS_STATUS_CODES:
             logging.warning("Error pushing data to Firebase: {}. ERROR {}: {}".format(payload_json, result.status_code, result.content))
+
+class YearInsightsEnqueue(webapp.RequestHandler):
+    """
+    Enqueues Insights calculation of a given kind for a given year
+    """
+    def get(self, kind, year):
+        taskqueue.add(
+            url='/tasks/math/do/insights/{}/{}'.format(kind, year),
+            method='GET')
+        
+        template_values = {
+            'kind': kind,
+            'year': year
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/math/year_insights_enqueue.html')
+        self.response.out.write(template.render(path, template_values))
+
+class YearInsightsDo(webapp.RequestHandler):
+    """
+    Calculates insights of a given kind for a given year.
+    Calculations of a given kind should reuse items fetched from the datastore.
+    """
+        
+    def get(self, kind, year):
+        year = int(year)
+
+        insights = None
+        if kind == 'matches':
+            insights = InsightsHelper.doMatchInsights(year)
+        elif kind == 'awards':
+            insights = InsightsHelper.doAwardInsights(year)
+      
+        if insights != None:
+            InsightManipulator.createOrUpdate(insights)
+
+        template_values = {
+            'insights': insights,
+            'year': year,
+            'kind': kind,
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/math/year_insights_do.html')
+        self.response.out.write(template.render(path, template_values))
+
+    def post(self):
+        self.get()
+
+class OverallInsightsEnqueue(webapp.RequestHandler):
+    """
+    Enqueues Overall Insights calculation for a given kind.
+    """
+    def get(self, kind):
+        taskqueue.add(
+            url='/tasks/math/do/overallinsights/{}'.format(kind),
+            method='GET')
+        
+        template_values = {
+            'kind': kind,
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/math/overall_insights_enqueue.html')
+        self.response.out.write(template.render(path, template_values))
+
+class OverallInsightsDo(webapp.RequestHandler):
+    """
+    Calculates overall insights of a given kind.
+    Calculations of a given kind should reuse items fetched from the datastore.
+    """
+        
+    def get(self, kind):
+        insights = None
+        if kind == 'matches':
+            insights = InsightsHelper.doOverallMatchInsights()
+        elif kind == 'awards':
+            insights = InsightsHelper.doOverallAwardInsights()
+        
+        if insights != None:
+            InsightManipulator.createOrUpdate(insights)
+
+        template_values = {
+            'insights': insights,
+            'kind': kind,
+        }
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/math/overall_insights_do.html')
+        self.response.out.write(template.render(path, template_values))
+
+    def post(self):
+        self.get()

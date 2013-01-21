@@ -68,6 +68,11 @@ indexes:
   - name: year
   - name: event
 
+- kind: Insight
+  properties:
+  - name: name
+  - name: year
+
 - kind: Match
   properties:
   - name: event

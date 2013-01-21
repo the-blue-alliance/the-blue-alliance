@@ -1,4 +1,5 @@
 import logging
+from models.award import Award
 
 from google.appengine.ext import db
 
@@ -66,6 +67,7 @@ class AwardHelper(object):
     awards['list'] is sorted by sortOrder and then the rest
     in alphabetical order by official name
     """
+    
     @classmethod
     def organizeAwards(self, award_list):
         awards = dict([(award.name, award) for award in award_list])
@@ -85,4 +87,14 @@ class AwardHelper(object):
         remaining_awards = sorted(remaining_awards, key=lambda award: award.official_name)
         
         awards['list'] += remaining_awards
+        return awards
+    
+    @classmethod
+    def getAwards(self, keys, year=None):
+        awards = []
+        for key in keys:
+            if year == None:
+                awards += Award.query(Award.name == key)
+            else:
+                awards += Award.query(Award.name == key, Award.year == year)
         return awards

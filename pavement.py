@@ -18,6 +18,10 @@ def clean():
 def setup():
   """Set up data for development environments."""
   
+  print("Building CSS/JS...")
+  less()
+  javascript()
+  
   print("Setting up dev data.")
   
   print("Getting Teams")
