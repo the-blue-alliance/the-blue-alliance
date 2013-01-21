@@ -16,7 +16,6 @@ SCRIPTS_MAIN = ['static/javascript/jquery_js/jquery.min.js',
                 'static/javascript/bootstrap_js/bootstrap.js',
                 'static/javascript/bootstrap_js/bootstrap-typeahead.js',
                 'static/javascript/tba_js/tablesorter.js',
-                'static/javascript/tba_js/tba_firebase.js',
                 'static/javascript/tba_js/tba_charts.js',
                 'static/javascript/tba_js/tba_countdown.js',
                 'static/javascript/tba_js/tba.js',
@@ -24,6 +23,7 @@ SCRIPTS_MAIN = ['static/javascript/jquery_js/jquery.min.js',
 
 SCRIPTS_GAMEDAY = SCRIPTS_MAIN + ['static/javascript/tba_js/gameday.js',
                                   'static/javascript/tba_js/gameday_twitter.js',
+                                  'static/javascript/tba_js/gameday_firebase.js',
                                   'static/javascript/tba_js/gameday_feedbar.js']
 
 STYLESHEETS_MAIN = ['static/css/precompiled_css/jquery-ui-1.8.13.custom.css',

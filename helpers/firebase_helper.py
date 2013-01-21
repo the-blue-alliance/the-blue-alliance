@@ -4,7 +4,7 @@ import json
 from google.appengine.api import taskqueue
 
 
-class FirebaseHelper(object):
+class FirebasePusher(object):
     @classmethod
     def pushMatch(self, match):
         payload = {'key_name': match.key_name,
@@ -15,7 +15,7 @@ class FirebaseHelper(object):
                    'winning_alliance': match.winning_alliance}
         payload_json = json.dumps(payload)
 
-        taskqueue.add(url='/tasks/do/firebase_push', 
+        taskqueue.add(url='/tasks/posts/firebase_push', 
                       method='GET',
                       params={'key': 'last_matches',
                               'payload_json': payload_json})
