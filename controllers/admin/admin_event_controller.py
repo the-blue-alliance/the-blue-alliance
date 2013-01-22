@@ -6,7 +6,6 @@ from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
-from helpers.award_manipulator import AwardManipulator
 from helpers.event_manipulator import EventManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.match_manipulator import MatchManipulator
@@ -15,33 +14,7 @@ from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
- 
-class AdminAwardEdit(webapp.RequestHandler):
-    """
-    Edit an Award.
-    """
-    def get(self, award_key):
-        award = Award.get_by_id(award_key)
-                
-        template_values = {
-            "award": award
-        }
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/award_edit.html')
-        self.response.out.write(template.render(path, template_values))
-    
-    def post(self, award_key):
-        event_key_name = self.request.get('event_key_name')
-        award = Award(
-            id = award_key,
-            name = self.request.get('award_name'),
-            event = Event.get_by_id(event_key_name).key,
-            official_name = self.request.get('official_name'),
-            team = Team.get_by_id(self.request.get('team_key')).key,
-            awardee = self.request.get('awardee'),
-        )
-        award = AwardManipulator.createOrUpdate(award)
-        self.redirect("/admin/event/" + event_key_name)
 
 class AdminEventCreate(webapp.RequestHandler):
     """

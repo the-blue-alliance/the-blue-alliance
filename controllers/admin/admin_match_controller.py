@@ -96,7 +96,6 @@ class AdminMatchAdd(webapp.RequestHandler):
             )
             for match in matches]
         
-        logging.info(matches)
         MatchManipulator.createOrUpdate(matches)
         
         self.redirect('/admin/event/{}'.format(event_key))
