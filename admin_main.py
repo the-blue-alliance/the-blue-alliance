@@ -4,9 +4,10 @@ import webapp2
 
 import tba_config
 
-from controllers.admin.admin_event_controller import AdminEventCreate, AdminEventDelete, AdminEventDetail, AdminEventEdit, AdminEventList, AdminAwardEdit
+from controllers.admin.admin_event_controller import AdminEventCreate, AdminEventDelete, AdminEventDetail, AdminEventEdit, AdminEventList
 from controllers.admin.admin_main_controller import AdminDebugHandler, AdminMain, AdminTasksHandler
-from controllers.admin.admin_match_controller import AdminVideosAdd, AdminMatchCleanup, AdminMatchDashboard, AdminMatchDetail, AdminMatchEdit
+from controllers.admin.admin_award_controller import AdminAwardDashboard, AdminAwardEdit, AdminAwardAdd
+from controllers.admin.admin_match_controller import AdminVideosAdd, AdminMatchCleanup, AdminMatchDashboard, AdminMatchDetail, AdminMatchAdd, AdminMatchEdit
 from controllers.admin.admin_memcache_controller import AdminMemcacheMain
 from controllers.admin.admin_sitevar_controller import AdminSitevarCreate, AdminSitevarEdit, AdminSitevarList
 from controllers.admin.admin_team_controller import AdminTeamDetail, AdminTeamList
@@ -18,8 +19,11 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/event/delete/(.*)', AdminEventDelete),
                                ('/admin/event/edit/(.*)', AdminEventEdit),
                                ('/admin/event/(.*)', AdminEventDetail),
+                               ('/admin/awards', AdminAwardDashboard),
+                               ('/admin/award/add', AdminAwardAdd),
                                ('/admin/award/edit/(.*)', AdminAwardEdit),
                                ('/admin/matches', AdminMatchDashboard),
+                               ('/admin/match/add', AdminMatchAdd),
                                ('/admin/match/cleanup', AdminMatchCleanup),
                                ('/admin/match/edit/(.*)', AdminMatchEdit),
                                ('/admin/match/(.*)', AdminMatchDetail),
