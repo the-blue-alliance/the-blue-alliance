@@ -7,64 +7,6 @@
 {% block detailed_content %}
   <h1 class="end_header">{{selected_year}} Insights</h1>
   
-  {% if blue_banners or regional_district_winners %}
-  <h2>Awards</h2>
-  {% endif %}
-
-  {% if blue_banners %}
-  <div class="row-fluid">
-    <h3>Top Blue Banner Winners</h3>
-    <div class="span8 offset2">
-      <table class="table table-striped table-condensed table-center">
-        <tbody>
-          <tr><th>Number</th><th>Teams</th></tr>
-	        {% for number, team_list in blue_banners.data %}
-            {% if team_list|length < 50 %}
-	          <tr>
-	            <td>{{number}}</td>
-	            <td>
-	              {% for team in team_list %}
-	              <a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a>{% if not forloop.last %},{% endif %}
-	              {% endfor %}
-	            </td>
-	          </tr>
-	          {% endif %}
-          {% endfor %}
-      </table>
-    </div>
-  </div>
-  {% endif %}
-  
-  {% if regional_district_winners %}
-  <div class="row-fluid">
-    <h3>Top Regional & District Winners</h3>
-    <div class="span8 offset2">
-      <table class="table table-striped table-condensed table-center">
-        <tbody>
-          <tr><th>Number</th><th>Teams</th></tr>
-          {% for number, team_list in regional_district_winners.data %}
-            {% if team_list|length < 50 %}
-            <tr>
-              <td>{{number}}</td>
-              <td>
-                {% for team in team_list %}
-                <a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a>{% if not forloop.last %},{% endif %}
-                {% endfor %}
-              </td>
-            </tr>
-            {% endif %}
-          {% endfor %}
-      </table>
-    </div>
-  </div>
-  {% endif %}
-  
-  {% if blue_banners or regional_district_winners %}
-  {% if match_highscore or match_averages_by_week or score_distribution %}
-  <hr>
-  {% endif %}
-  {% endif %}
-  
   {% if match_highscore or match_averages_by_week or score_distribution %}
   <h2>Matches{% if num_matches %} <small>{{num_matches.data}} Matches Played</small>{% endif %}</h2>
   {% endif %}
@@ -145,6 +87,64 @@
     <figure style="width: 90%; height: 300px;" id="match-distribution-chart"></figure>
     <div id="match-distribution" class="xcharts-data xcharts-bar-single-data">{{ score_distribution.data_json|safe }}</div>
     {% endif %}
+  {% endif %}
+
+  {% if blue_banners or regional_district_winners %}
+  {% if match_highscore or match_averages_by_week or score_distribution %}
+  <hr>
+  {% endif %}
+  {% endif %}
+
+  {% if blue_banners or regional_district_winners %}
+  <h2>Awards</h2>
+  {% endif %}
+
+  {% if blue_banners %}
+  <div class="row-fluid">
+    <h3>Top Blue Banner Winners</h3>
+    <div class="span8 offset2">
+      <table class="table table-striped table-condensed table-center">
+        <tbody>
+          <tr><th>Number</th><th>Teams</th></tr>
+          {% for number, team_list in blue_banners.data %}
+            {% if team_list|length < 50 %}
+            <tr>
+              <td>{{number}}</td>
+              <td>
+                {% for team in team_list %}
+                <a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a>{% if not forloop.last %},{% endif %}
+                {% endfor %}
+              </td>
+            </tr>
+            {% endif %}
+          {% endfor %}
+      </table>
+    </div>
+  </div>
+  {% endif %}
+  
+  {% if regional_district_winners %}
+  <div class="row-fluid">
+    <h3>Top Regional & District Winners</h3>
+    <div class="span8 offset2">
+      <table class="table table-striped table-condensed table-center">
+        <tbody>
+          <tr><th>Number</th><th>Teams</th></tr>
+          {% for number, team_list in regional_district_winners.data %}
+            {% if team_list|length < 50 %}
+            <tr>
+              <td>{{number}}</td>
+              <td>
+                {% for team in team_list %}
+                <a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a>{% if not forloop.last %},{% endif %}
+                {% endfor %}
+              </td>
+            </tr>
+            {% endif %}
+          {% endfor %}
+      </table>
+    </div>
+  </div>
   {% endif %}
   
   {% if blue_banners or regional_district_winners or match_highscore or match_averages_by_week or score_distribution %}
