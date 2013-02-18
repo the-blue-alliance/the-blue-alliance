@@ -6,6 +6,14 @@
 
 {% block detailed_content %}
   <h1 class="end_header">Insights Overview <small>2007 to Present</small></h1>
+
+  {% if num_matches %}
+  <div class="row-fluid">
+    <h3>Number of Matches by Year</h3>
+    <figure style="width: 90%; height: 300px;" id="num-matches-chart"></figure>
+    <div id="num-matches" class="xcharts-data xcharts-line-single-data">{{ num_matches.data_json|safe }}</div>
+  </div>
+  {% endif %}
   
   {% if blue_banners %}
   <div class="row-fluid">
@@ -131,12 +139,6 @@
       </table>
     </div>
   </div>
-  {% endif %}
-  
-  {% if num_matches %}
-  <h3>Number of Matches by Year</h3>
-  <figure style="width: 90%; height: 300px;" id="num-matches-chart"></figure>
-  <div id="num-matches" class="xcharts-data xcharts-line-single-data">{{ num_matches.data_json|safe }}</div>
   {% endif %}
   
 {% endblock %}
