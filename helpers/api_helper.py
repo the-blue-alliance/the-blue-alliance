@@ -33,7 +33,7 @@ class ApiHelper(object):
                 team_dict["name"] = team.name
                 team_dict["nickname"] = team.nickname
                 team_dict["website"] = team.website
-                team_dict["location"] = team.address
+                team_dict["location"] = team.location
 
                 event_teams = EventTeam.query(EventTeam.team == team.key,\
                                               EventTeam.year == datetime.now().year)\
@@ -41,7 +41,7 @@ class ApiHelper(object):
                 team_dict["events"] = [event_team.event.id() for event_team in event_teams]
 
                 try:
-                    team_dict["location"] = team.address
+                    team_dict["location"] = team.location
                     team_dict["locality"] = team.locality
                     team_dict["region"] = team.region
                     team_dict["country_name"] = team.country_name
