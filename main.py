@@ -10,7 +10,7 @@ from controllers.main_controller import ContactHandler, HashtagsHandler, \
       MainKickoffHandler, MainBuildseasonHandler, MainCompetitionseasonHandler, \
       OprHandler, SearchHandler, AboutHandler, ThanksHandler, \
       PageNotFoundHandler, ChannelHandler, GamedayHandler, \
-      WebcastsHandler, HowToRecordHandler
+      WebcastsHandler, RecordHandler
 from controllers.match_controller import MatchDetail
 from controllers.team_controller import TeamList, TeamDetail
 from controllers.ajax_controller import TypeaheadHandler, WebcastHandler
@@ -43,7 +43,7 @@ app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['landing_
                                ('/team/([0-9]*)/([0-9]*)', TeamDetail),
                                ('/thanks', ThanksHandler),
                                ('/webcasts', WebcastsHandler),
-                               ('/howto_record', HowToRecordHandler),
+                               ('/record', RecordHandler),
                                ('/_/typeahead', TypeaheadHandler),
                                ('/_/webcast/(.*)/(.*)', WebcastHandler),
                                ('/.*', PageNotFoundHandler),
