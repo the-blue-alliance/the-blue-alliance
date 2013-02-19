@@ -5,51 +5,37 @@
 {% block content %}
 
 <div class="container">
-	<div class="hero-unit landing-hero-unit">
-		<div class="row-fluid">
-			<div class="span6 landing">
-				<h2 class="hidden-phone">The Blue Alliance</h2>
-				<p class="hidden-phone"><em>FIRST</em> Robotics Competition team information, event results, and videos</p>
-				<div id="landing-buttons">
-					<a class="btn btn-large btn-primary" href="/teams"><i class="icon-user icon-white"></i> Teams</a>
-					<a class="btn btn-large btn-primary" href="/events"><i class="icon-calendar icon-white"></i> Events</a>
-				</div>
-				<form class="main-search" action="http://www.thebluealliance.com/search">
-				    <input type="hidden" name="cx" value="017956276086362105630:99ctqytcokm"/>
-				    <input type="hidden" name="cof" value="FORID:11" />
-				    <input type="hidden" name="ie" value="UTF-8" />
-				    <input type="text" class="search-query" placeholder="Search for teams and events" name="q"/>
-				</form>
-			</div>
-            <div class="span6 kickoff landing">
-                <div class="kickoff-countdown">
-                    <span class="countdown-number kickoff-countdown-days">--</span><span class="countdown-label day-label">D, </span>
-                    <span class="countdown-number kickoff-countdown-hours">--</span><span class="countdown-label">H, </span>
-                    <span class="countdown-number kickoff-countdown-minutes">--</span><span class="countdown-label">M, </span>
-                    <span class="countdown-number kickoff-countdown-seconds">--</span><span class="countdown-label">S</span>
-                </div>
-                <p class="kickoff-subheader">until the <strong>2013 <em>FIRST</em> Kickoff</strong></p>
-                <p>10 A.M. EST on January 5, 2013</p>
-                <p><a class="btn btn-large btn-primary" href="https://www.facebook.com/events/236917836430446/"><i class="icon-calendar icon-white"></i> RSVP on Facebook</a></p>
-			</div>
-		</div>
-	</div>
+    <div class="row">
+        <div class="span4">
+            <h2 class="hidden-phone">The Blue Alliance</h2>
+            <p class="hidden-phone"><em>FIRST</em> Robotics Competition team information, event results, and videos</p>
+            <form class="main-search" action="http://www.thebluealliance.com/search">
+                <input type="hidden" name="cx" value="017956276086362105630:99ctqytcokm"/>
+                <input type="hidden" name="cof" value="FORID:11" />
+                <input type="hidden" name="ie" value="UTF-8" />
+                <input type="text" class="search-query" placeholder="Search for teams and events" name="q"/>
+            </form>
+            <div class="btn-group">
+                <a class="btn btn-large" href="/teams"><i class="icon-user"></i> Teams</a>
+                <a class="btn btn-large" href="/events"><i class="icon-calendar"></i> Events</a>
+            </div>
+            <div class="hidden-phone">
+                <br />
+                <h4>Help other <em>FIRST</em> teams!</h4>
+                <p><small>KNOW OF WEBCASTS?</small><br /><a class="btn" href="/webcasts" target="_blank"><i class="icon-info-sign"></i> Add Webcast Info</a></p>
+                <p><small>KNOW VIDEOS WE'RE MISSING?</small><br /><a class="btn" href="https://docs.google.com/spreadsheet/ccc?key=0ApRO2Yzh2z01dExFZEdieV9WdTJsZ25HSWI3VUxsWGc" target="_blank"><i class="icon-upload"></i> Add YouTube Videos</a></p>
+                <p><small>LIKE CODING?</SMALL><br /><a class="btn" href="https://github.com/gregmarra/the-blue-alliance/" target="_blank"><i class="icon-wrench"></i> Hack on The Blue Alliance</a></p>
+            </div>
+        </div>
+        <div class="span8">
+            <h2>Upcoming Events</h2>
+            <a class="btn btn-large btn-primary" href="/gameday"><i class="icon-facetime-video icon-white"></i> Watch Webcasts</a>
+            <a class="btn" href="/webcasts"><i class="icon-info-sign"></i> Add Webcasts</a>
+            {% for event in events %}
+                {% include "event_partials/event_block.html" %}
+            {% endfor %}
+        </div>
+    </div>
 </div>
 
-<div class="container">
-	<div class="row">
-        {% if not kickoff_countdown %}
-		<div class="span10 offset1">
-			<h2>Upcoming Events</h2>
-	        {% for event in events %}
-				{% include "event_partials/event_block.html" %}
-			{% endfor %}
-		</div>
-		{% else %}
-		<div class="span12 kickoff">
-            
-        </div>
-		{% endif %}
-	</div>
-</div>
 {% endblock %}
