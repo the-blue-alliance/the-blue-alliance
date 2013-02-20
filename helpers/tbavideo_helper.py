@@ -2,7 +2,7 @@ class TBAVideoHelper(object):
     """
     Same interface as the retired TBAVideo class.
     """
-    TBA_NET_VID_PATTERN = "http://videos.thebluealliance.net/%s/%s.%s"
+    TBA_NET_VID_PATTERN = "http://videos.thebluealliance.com/%s/%s.%s"
     
     THUMBNAIL_FILETYPES = ["jpg", "jpeg"]
     STREAMABLE_FILETYPES = ["mp4", "flv"]
