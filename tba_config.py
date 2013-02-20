@@ -22,5 +22,5 @@ else:
         "memcache": True,
     }
 
-CONFIG['landing_handler'] = BUILDSEASON
+CONFIG['landing_handler'] = COMPETITIONSEASON
 CONFIG["static_resource_version"] = 2
