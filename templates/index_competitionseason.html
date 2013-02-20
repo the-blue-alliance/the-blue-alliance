@@ -29,8 +29,10 @@
         </div>
         <div class="span8">
             <h2>Upcoming Events</h2>
-            <a class="btn btn-large btn-primary" href="/gameday"><i class="icon-facetime-video icon-white"></i> Watch Webcasts</a>
-            <a class="btn" href="/webcasts"><i class="icon-info-sign"></i> Add Webcasts</a>
+            <div>
+                <a class="btn btn-large btn-primary" href="/gameday"><i class="icon-facetime-video icon-white"></i> Watch Webcasts</a>
+                <a class="btn" href="/webcasts"><i class="icon-info-sign"></i> Add Webcasts</a>
+            </div>
             {% for event in events %}
                 {% include "event_partials/event_block.html" %}
             {% endfor %}

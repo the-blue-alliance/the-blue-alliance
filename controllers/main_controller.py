@@ -53,7 +53,7 @@ class MainCompetitionseasonHandler(CacheableHandler):
         super(CacheableHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
         self._cache_key = "main_competitionseason"
-        self._cache_version = 2
+        self._cache_version = 3
 
     def _render(self, *args, **kw):
         next_events = Event.query(Event.start_date >= (datetime.datetime.today()  - datetime.timedelta(days=12)))
