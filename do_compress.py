@@ -4,8 +4,7 @@ import optparse
 
 YUI_COMPRESSOR = 'utils/yuicompressor-2.4.7.jar'
 
-SCRIPTS_MAIN = ['static/javascript/jquery_js/jquery-ui-1.8.13.custom.min.js',
-                'static/jwplayer/jwplayer.js',
+SCRIPTS_MAIN = ['static/jwplayer/jwplayer.js',
                 'static/xcharts/d3.v2.min.js',
                 'static/xcharts/xcharts.min.js',
                 'static/javascript/tba_js/tablesorter.js',
