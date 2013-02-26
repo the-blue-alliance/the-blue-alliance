@@ -22,7 +22,7 @@ class FmsTeamListParser(ParserBase):
                 convertEntities=BeautifulSoup.HTML_ENTITIES)
         
         for title in soup.findAll('title'):
-            if title.string != "2012 FRC Team/Event List":
+            if "FRC Team/Event List" not in title.string:
                 return None
         
         team_rows = soup.findAll("pre")[0].string.split("\n")

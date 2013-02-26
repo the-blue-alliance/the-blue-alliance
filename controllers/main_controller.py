@@ -53,15 +53,15 @@ class MainCompetitionseasonHandler(CacheableHandler):
         super(CacheableHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
         self._cache_key = "main_competitionseason"
-        self._cache_version = 1
+        self._cache_version = 3
 
     def _render(self, *args, **kw):
-        next_events = Event.query(Event.start_date >= (datetime.datetime.today()  - datetime.timedelta(days=4)))
+        next_events = Event.query(Event.start_date >= (datetime.datetime.today()  - datetime.timedelta(days=12)))
         next_events.order(Event.start_date).fetch(20)
         
         upcoming_events = []
         for event in next_events:
-            if event.start_date.date() < datetime.date.today() + datetime.timedelta(days=4):
+            if event.start_date.date() < datetime.date.today() + datetime.timedelta(days=12):
                 upcoming_events.append(event)
         # Only show events that are happening "the same week" as the first one
         if len(upcoming_events) > 0:
@@ -231,3 +231,14 @@ class WebcastsHandler(CacheableHandler):
         
         path = os.path.join(os.path.dirname(__file__), '../templates/webcasts.html')
         return template.render(path, template_values)
+
+class RecordHandler(CacheableHandler):
+    def __init__(self, *args, **kw):
+        super(CacheableHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+        self._cache_key = "main_record"
+        self._cache_version = 1
+
+    def _render(self, *args, **kw):
+        path = os.path.join(os.path.dirname(__file__), "../templates/record.html")
+        return template.render(path, {})

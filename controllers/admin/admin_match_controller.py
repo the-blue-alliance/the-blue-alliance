@@ -9,6 +9,7 @@ from google.appengine.ext.webapp import template
 from models.event import Event
 from models.match import Match
 from helpers.match_manipulator import MatchManipulator
+from datafeeds.offseason_matches_parser import OffseasonMatchesParser
 
 class AdminMatchCleanup(webapp.RequestHandler):
     """
@@ -67,6 +68,37 @@ class AdminMatchDetail(webapp.RequestHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_details.html')
         self.response.out.write(template.render(path, template_values))
+
+
+class AdminMatchAdd(webapp.RequestHandler):
+    """
+    Add Matches from CSV.
+    """
+    def post(self):
+        event_key = self.request.get('event_key')
+        matches_csv = self.request.get('matches_csv')
+        matches = OffseasonMatchesParser.parse(matches_csv)
+        
+        event = Event.get_by_id(event_key)
+        matches = [Match(
+            id = Match.renderKeyName(
+                event, 
+                match.get("comp_level", None), 
+                match.get("set_number", 0), 
+                match.get("match_number", 0)),
+            event = event.key,
+            game = Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
+            set_number = match.get("set_number", 0),
+            match_number = match.get("match_number", 0),
+            comp_level = match.get("comp_level", None),
+            team_key_names = match.get("team_key_names", None),
+            alliances_json = match.get("alliances_json", None)
+            )
+            for match in matches]
+        
+        MatchManipulator.createOrUpdate(matches)
+        
+        self.redirect('/admin/event/{}'.format(event_key))
 
 
 class AdminMatchEdit(webapp.RequestHandler):

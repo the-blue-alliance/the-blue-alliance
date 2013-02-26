@@ -21,6 +21,7 @@ class Team(ndb.Model):
     def __init__(self, *args, **kw):
         self._country_name = None
         self._locality = None
+        self._location = None
         self._region = None
         super(Team, self).__init__(*args, **kw)
 
@@ -61,6 +62,22 @@ class Team(ndb.Model):
                 self._locality = address_parts.pop().strip()
         except Exception, e:
             logging.warning("Error on team.split_address: %s", e)
+
+    @property
+    def location(self):
+        if not self._location:
+            location_parts = list()
+            if self.locality:
+                location_parts.append(self.locality)
+            if self.region:
+                location_parts.append(self.region)
+            if self.country_name:
+                location_parts.append(self.country_name)
+            if len(location_parts) > 0:
+                self._location = ", ".join(location_parts)
+            else:
+                self._location = None
+        return self._location
     
     @property 
     def details_url(self):

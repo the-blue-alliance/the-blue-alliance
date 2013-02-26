@@ -176,7 +176,7 @@
                             <tr>
                                 <td><a class="team_table" href="/team/{{ team.team_number }}">{{ team.team_number }}</a></td>
                                 <td><a href="/team/{{ team.team_number }}">{% if team.nickname %}{{ team.nickname }}{% else %}--{% endif %}</a></td>
-                                <td>{% if team.address %}{{ team.address }}{% else %}--{% endif %}</td>
+                                <td>{% if team.location %}{{ team.location }}{% else %}--{% endif %}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -194,7 +194,7 @@
                             <tr>
                                 <td><a class="team_table" href="/team/{{ team.team_number }}">{{ team.team_number }}</a></td>
                                 <td><a href="/team/{{ team.team_number }}">{% if team.nickname %}{{ team.nickname }}{% else %}--{% endif %}</a></td>
-                                <td>{% if team.address %}{{ team.address }}{% else %}--{% endif %}</td>
+                                <td>{% if team.location %}{{ team.location }}{% else %}--{% endif %}</td>
                             </tr>
                             {% endfor %}
                         </tbody>

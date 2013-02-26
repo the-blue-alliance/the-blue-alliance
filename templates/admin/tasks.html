@@ -131,14 +131,14 @@
     <div class="span4">
         <form class="form-inline">
             <span class="help-block">Get</span>
-            <input class="span4" id="enqueue_usfirst_event_details_year" type="text" placeholder="year">
+            <input class="span4" id="enqueue_usfirst_event_details_year2" type="text" placeholder="year">
             <input class="span4" id="enqueue_usfirst_event_details_first_eid" type="text" placeholder="first_eid">
             <a class="btn" id="get_usfirst_event_details_submit">Go <i class="icon-fast-forward"></i></a>
         </form>
         <script>
         $("#get_usfirst_event_details_submit").click(function() {
-            window.location = "/tasks/get/usfirst_event_details/" + $("#enqueue_usfirst_event_details_year").val() 
-                + "/" + $("enqueue_usfirst_event_details_first_eid").val();
+            window.location = "/tasks/get/usfirst_event_details/" + $("#enqueue_usfirst_event_details_year2").val() 
+                + "/" + $("#enqueue_usfirst_event_details_first_eid").val();
         });
         </script>
     </div>

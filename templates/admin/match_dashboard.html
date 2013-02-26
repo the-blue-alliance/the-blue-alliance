@@ -15,6 +15,20 @@
     </div>
 </form>
 
+    <legend>Add Matches</legend>
+    <p>Add matches formatted as CSV.</p>
+    <p class="text-error">Warning! Will overwrite any existing matches!</p>
+    <p>Example:</p>
+    <div class="well">
+      <p>qm1, 342, 401, 296, 1592, 71, 335, 17, 41</p>
+      <p>f1m1, 245, 217, 766, 191, 179, 494, 65, 28</p>
+    </div>
+    <form action="/admin/match/add" method="post">
+      <input name="event_key" type="text" placeholder="event_key"><br>
+      <textarea name="matches_csv"></textarea><br>
+      <button type="submit" class="btn btn-primary"><i class="icon-plus-sign icon-white"></i> Add Matches</button>
+    </form>
+
 <script>
 $("#edit_button").click(function() {
     if ($("#match_key").val() !== "") {

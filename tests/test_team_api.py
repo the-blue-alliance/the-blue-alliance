@@ -71,7 +71,7 @@ class TestApiTeamShow(unittest2.TestCase):
         self.assertEqual(team_dict["key"], self.team.key_name)
         self.assertEqual(team_dict["team_number"], self.team.team_number)
         self.assertEqual(team_dict["nickname"], self.team.nickname)
-        self.assertEqual(team_dict["location"], self.team.address)
+        self.assertEqual(team_dict["location"], self.team.location)
         self.assertEqual(team_dict["locality"], "Greenville")
         self.assertEqual(team_dict["country_name"], "USA")
         self.assertEqual(team_dict["region"], "SC")
