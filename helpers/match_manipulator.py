@@ -1,5 +1,5 @@
 from helpers.manipulator_base import ManipulatorBase
-from helpers.firebase_helper import FirebasePusher
+from helpers.firebase.firebase_pusher import FirebasePusher
 
 class MatchManipulator(ManipulatorBase):
     """
