@@ -15,13 +15,14 @@ function updateFeedbar(match) {
     match.alliances.blue.teams[2].substring(3)
   
   var red_score = match.alliances.red.score;
-    var blue_score = match.alliances.blue.score;
+  var blue_score = match.alliances.blue.score;
 
-  var new_match = '<div class="scores">' +
-    '<div class="match-number">' + match_label + '</div>' +
-    '<div class="red ' + red_win + '">' + red_teams + ' - ' + red_score + '</div>' +
-    '<div class="blue ' + blue_win + '">' + blue_teams + ' - ' + blue_score + '</div>' +
-    '<div class="div_helper"></div></div>';
+  var match_number = $('<div>', {'class': 'match-number', text: match_label});
+  var red_score = $('<div>', {'class': 'red ' + red_win, text: red_teams + ' - ' + red_score});
+  var blue_score = $('<div>', {'class': 'blue ' + blue_win, text: blue_teams + ' - ' + blue_score});
+  var div_helper = $('<div>', {'class': 'div_helper'});
+  
+  var new_match = $('<div>', {'class': 'scores'}).append(match_number).append(red_score).append(blue_score).append(div_helper);
   $('.feed_bar').prepend(new_match);
 }
 
