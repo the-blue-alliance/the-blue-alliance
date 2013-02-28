@@ -1,4 +1,5 @@
 from helpers.manipulator_base import ManipulatorBase
+from helpers.firebase.firebase_pusher import FirebasePusher
 
 class MatchManipulator(ManipulatorBase):
     """
@@ -34,5 +35,6 @@ class MatchManipulator(ManipulatorBase):
                 if getattr(new_match, attr) != getattr(old_match, attr):
                     setattr(old_match, attr, getattr(new_match, attr))
                     old_match.dirty = True
+                    FirebasePusher.pushMatch(old_match)
         
         return old_match

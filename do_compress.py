@@ -16,7 +16,9 @@ SCRIPTS_MAIN = ['static/jwplayer/jwplayer.js',
 SCRIPTS_GAMEDAY = SCRIPTS_MAIN + ['static/javascript/tba_js/gameday.js',
                                   'static/javascript/tba_js/gameday_twitter.js',
                                   'static/jwplayer/silverlight.js',
-                                  'static/jwplayer/wmvplayer.js']
+                                  'static/jwplayer/wmvplayer.js',
+                                  'static/javascript/tba_js/gameday_firebase.js',
+                                  'static/javascript/tba_js/gameday_feedbar.js']
 
 STYLESHEETS_MAIN = ['static/css/precompiled_css/jquery-ui-1.8.13.custom.css',
                     'static/css/precompiled_css/jquery.fancybox.css',

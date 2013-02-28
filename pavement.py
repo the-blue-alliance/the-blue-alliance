@@ -34,9 +34,11 @@ def setup():
   sh("curl -s http://localhost:8088/tasks/math/enqueue/eventteam_update")
   print("Getting 2010cmp videos from TBA")
   sh("curl -s http://localhost:8088/tasks/math/do/tba_videos/2010cmp")
+  print("Getting 2013 Event List")
+  sh("curl -s http://localhost:8088/tasks/get/usfirst_event_list/2013")
 
   clean()
-  print("Done setting up! 2010cmp is now ready for testing.")
+  print("Done setting up! 2013 events loaded and 2010cmp is now ready for testing.")
 
 @task
 def test():
