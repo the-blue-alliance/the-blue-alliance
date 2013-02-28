@@ -1,0 +1,40 @@
+<tr class="visible-desktop">
+    <td>{% if match.time_string %}{{match.time_string}}{% endif %}</td>
+    <td><a href="/match/{{match.key_name}}">{{match.verbose_name}}</a></td>
+    {% if match.alliances.red.teams.2 or match.alliances.red.teams.2 %}
+    <td colspan="2" class="red{% ifequal match.winning_alliance 'red' %} winner{% endifequal %}"><a href="/team/{{ match.alliances.red.teams.0|digits }}">{{ match.alliances.red.teams.0|slice:'3:' }}</a></td>
+    <td colspan="2" class="red{% ifequal match.winning_alliance 'red' %} winner{% endifequal %}"><a href="/team/{{ match.alliances.red.teams.1|digits }}">{{ match.alliances.red.teams.1|slice:'3:' }}</a></td>
+    <td colspan="2" class="red{% ifequal match.winning_alliance 'red' %} winner{% endifequal %}"><a href="/team/{{ match.alliances.red.teams.2|digits }}">{{ match.alliances.red.teams.2|slice:'3:' }}</a></td>
+    <td colspan="2" class="blue{% ifequal match.winning_alliance 'blue' %} winner{% endifequal %}"><a href="/team/{{ match.alliances.blue.teams.0|digits }}">{{ match.alliances.blue.teams.0|slice:'3:' }}</a></td>
+    <td colspan="2" class="blue{% ifequal match.winning_alliance 'blue' %} winner{% endifequal %}"><a href="/team/{{ match.alliances.blue.teams.1|digits }}">{{ match.alliances.blue.teams.1|slice:'3:' }}</a></td>
+    <td colspan="2" class="blue{% ifequal match.winning_alliance 'blue' %} winner{% endifequal %}"><a href="/team/{{ match.alliances.blue.teams.2|digits }}">{{ match.alliances.blue.teams.2|slice:'3:' }}</a></td>
+    {% else %}
+    <td colspan="3" class="red{% ifequal match.winning_alliance 'red' %} winner{% endifequal %}"><a href="/team/{{ match.alliances.red.teams.0|digits }}">{{ match.alliances.red.teams.0|slice:'3:' }}</a></td>
+    <td colspan="3" class="red{% ifequal match.winning_alliance 'red' %} winner{% endifequal %}"><a href="/team/{{ match.alliances.red.teams.1|digits }}">{{ match.alliances.red.teams.1|slice:'3:' }}</a></td>
+    <td colspan="3" class="blue{% ifequal match.winning_alliance 'blue' %} winner{% endifequal %}"><a href="/team/{{ match.alliances.blue.teams.0|digits }}">{{ match.alliances.blue.teams.0|slice:'3:' }}</a></td>
+    <td colspan="3" class="blue{% ifequal match.winning_alliance 'blue' %} winner{% endifequal %}"><a href="/team/{{ match.alliances.blue.teams.1|digits }}">{{ match.alliances.blue.teams.1|slice:'3:' }}</a></td>
+    {% endif %}
+</tr>
+
+<tr class="hidden-desktop">
+    <td rowspan="2">{% if match.time_string %}{{match.time_string}}{% endif %}</td>
+    <td rowspan="2"><a href="/match/{{match.key_name}}">{{match.verbose_name}}</a></td>
+    {% if match.alliances.red.teams.2 or match.alliances.red.teams.2 %}
+    <td class="red{% ifequal match.winning_alliance 'red' %} winner{% endifequal %}" colspan="4"><a href="/team/{{ match.alliances.red.teams.0|digits }}">{{ match.alliances.red.teams.0|slice:'3:' }}</a></td>
+    <td class="red{% ifequal match.winning_alliance 'red' %} winner{% endifequal %}" colspan="4"><a href="/team/{{ match.alliances.red.teams.1|digits }}">{{ match.alliances.red.teams.1|slice:'3:' }}</a></td>
+    <td class="red{% ifequal match.winning_alliance 'red' %} winner{% endifequal %}" colspan="4"><a href="/team/{{ match.alliances.red.teams.2|digits }}">{{ match.alliances.red.teams.2|slice:'3:' }}</a></td>
+    {% else %}
+    <td class="red{% ifequal match.winning_alliance 'red' %} winner{% endifequal %}" colspan="6"><a href="/team/{{ match.alliances.red.teams.0|digits }}">{{ match.alliances.red.teams.0|slice:'3:' }}</a></td>
+    <td class="red{% ifequal match.winning_alliance 'red' %} winner{% endifequal %}" colspan="6"><a href="/team/{{ match.alliances.red.teams.1|digits }}">{{ match.alliances.red.teams.1|slice:'3:' }}</a></td>   
+    {% endif %}    
+</tr>
+<tr class="hidden-desktop">
+    {% if match.alliances.red.teams.2 or match.alliances.red.teams.2 %}
+    <td class="blue{% ifequal match.winning_alliance 'blue' %} winner{% endifequal %}" colspan="4"><a href="/team/{{ match.alliances.blue.teams.0|digits }}">{{ match.alliances.blue.teams.0|slice:'3:' }}</a></td>
+    <td class="blue{% ifequal match.winning_alliance 'blue' %} winner{% endifequal %}" colspan="4"><a href="/team/{{ match.alliances.blue.teams.1|digits }}">{{ match.alliances.blue.teams.1|slice:'3:' }}</a></td>
+    <td class="blue{% ifequal match.winning_alliance 'blue' %} winner{% endifequal %}" colspan="4"><a href="/team/{{ match.alliances.blue.teams.2|digits }}">{{ match.alliances.blue.teams.2|slice:'3:' }}</a></td>
+    {% else %}
+    <td class="blue{% ifequal match.winning_alliance 'blue' %} winner{% endifequal %}" colspan="6"><a href="/team/{{ match.alliances.blue.teams.0|digits }}">{{ match.alliances.blue.teams.0|slice:'3:' }}</a></td>
+    <td class="blue{% ifequal match.winning_alliance 'blue' %} winner{% endifequal %}" colspan="6"><a href="/team/{{ match.alliances.blue.teams.1|digits }}">{{ match.alliances.blue.teams.1|slice:'3:' }}</a></td>   
+    {% endif %}    
+</tr>

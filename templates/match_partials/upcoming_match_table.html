@@ -1,0 +1,6 @@
+<table class="table-condensed matchTable">
+    {% include "match_partials/match_table_upcoming_header.html" %}
+    {% for match in matches %}
+        {% include "match_partials/match_upcoming_row.html" %}
+    {% endfor %}
+</table>

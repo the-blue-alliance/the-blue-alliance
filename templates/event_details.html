@@ -42,6 +42,12 @@
                 <a class="hashtag-link hashtag-cd" href="http://www.chiefdelphi.com/media/photos/tags/frc{{ event.event_short }}" target="_blank" title="Search Chief Delphi">Chief Delphi</a> &middot;
                 <a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23frc{{ event.event_short }}" target="_blank" title="Search Flickr">Flickr</a>
             </p>
+            {% if matches_upcoming %}
+                <h4>Upcoming Matches</h4>
+                {% with matches_upcoming as matches %}
+                    {% include "match_partials/upcoming_match_table.html" %}
+                {% endwith %}
+            {% endif %}
             {% if matches_recent %}
                 <h4>Recent Matches</h4>
                 {% with matches_recent as matches %}

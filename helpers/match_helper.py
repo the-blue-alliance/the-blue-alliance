@@ -53,6 +53,18 @@ class MatchHelper(object):
             if comp_level in matches:
                 all_matches += matches[comp_level]
         return all_matches[-num:]
+      
+    @classmethod
+    def upcomingMatches(self, matches, num=3):
+        matches = filter(lambda x: not x.has_been_played, matches)
+        matches = MatchHelper.organizeMatches(matches)
+        
+        unplayed_matches = []
+        for comp_level in Match.COMP_LEVELS:
+            if comp_level in matches:
+                for match in matches[comp_level]:
+                    unplayed_matches.append(match)
+        return unplayed_matches[:num]
     
     @classmethod
     def cleanUpIfInvalidMatch(self, match):
