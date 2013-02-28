@@ -35,6 +35,6 @@ class MatchManipulator(ManipulatorBase):
                 if getattr(new_match, attr) != getattr(old_match, attr):
                     setattr(old_match, attr, getattr(new_match, attr))
                     old_match.dirty = True
+                    FirebasePusher.pushMatch(old_match)
         
-        FirebasePusher.pushMatch(old_match)
         return old_match
