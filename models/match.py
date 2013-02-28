@@ -104,7 +104,6 @@ class Match(ndb.Model):
         self._alliances = None
         self._tba_video = None
         self._winning_alliance = None
-        self.dirty = False
         super(Match, self).__init__(*args, **kw)
     
     @property
@@ -112,7 +111,7 @@ class Match(ndb.Model):
         """
         Lazy load alliances_json
         """
-        if self._alliances is None or self.dirty:
+        if self._alliances is None:
             self._alliances = json.loads(self.alliances_json)
         return self._alliances
 
@@ -180,3 +179,7 @@ class Match(ndb.Model):
             return "%s_qm%s" % (event.key_name, match_number)
         else:
             return "%s_%s%sm%s" % (event.key_name, comp_level, set_number, match_number)
+
+    @classmethod
+    def clearAlliances(self):
+        self._alliances = None
