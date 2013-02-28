@@ -7,6 +7,6 @@ queue:
   max_concurrent_requests: 1
 
 - name: firebase
-  rate 5/s
-  retry_paramters:
+  rate: 5/s
+  retry_parameters:
     task_retry_limit: 1
