@@ -31,7 +31,7 @@ class EventList(CacheableHandler):
         super(EventList, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
         self._cache_key = "event_list_{}_{}" # (year, explicit_year)
-        self._cache_version = 2
+        self._cache_version = 3
 
     def get(self, year=None, explicit_year=False):
         if year == '':

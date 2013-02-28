@@ -1,0 +1,16 @@
+<table class="table table-striped event-table">
+    <thead>
+        <th>Event</th>
+        <th class="hidden-phone">Webcast</th>
+        <th>Dates</th>
+    </thead>
+    <tbody>
+    {% for event in events %}
+        <tr>
+            <td><a href="/event/{{event.key_name}}" title="{{event.name}}">{{event.name}}</a></td>
+            <td class="hidden-phone">{% if event.webcast %}{% if event.now %}<a class="btn btn-success" href="{{event.gameday_url}}"><i class="icon-facetime-video icon-white"></i> Watch Now</a>{% else %}<a class="btn" href="{{event.gameday_url}}">Watch</a>{% endif %}{% endif %}</td>
+            <td>{% if event.start_date %}{{ event.start_date|date:"M j" }}{% endif %}{% if event.end_date %} - {{ event.end_date|date:"M j" }}{% endif %}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
