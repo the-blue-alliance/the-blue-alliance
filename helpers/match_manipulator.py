@@ -27,6 +27,7 @@ class MatchManipulator(ManipulatorBase):
             "team_key_names",
             "tba_videos",
             "time",
+            "time_string",
             "youtube_videos"
         ]
 
