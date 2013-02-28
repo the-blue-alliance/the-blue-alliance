@@ -103,3 +103,19 @@
 <script type='text/javascript' src='https://cdn.firebase.com/v0/firebase.js'></script>
 <script type="text/javascript" src="/javascript/tba_combined_js.gameday.min.js"></script>
 {% endblock %}
+
+
+{% block ganalytics_timer %}
+<script type="text/javascript">
+(function (tos) {
+  window.setInterval(function () {
+    // Calculate time every 60,000 milliseconds (60 seconds)
+    tos = (function (t) {
+      return t[0] == 50 ? (parseInt(t[1]) + 1) + ':00' : (t[1] || '0') + ':' + (parseInt(t[0]) + 10);
+    })(tos.split(':').reverse());
+          // Collect and send the time to Google Analytics
+    window.pageTracker ? pageTracker._trackEvent('Time', 'Log', tos) : _gaq.push(['_trackEvent', 'Time', 'Log', tos]);
+    }, 60000);
+  })('00');
+</script>
+{% endblock %}
