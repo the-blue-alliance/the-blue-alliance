@@ -29,13 +29,26 @@
         </div>
         <div class="span8">
             <h2>Upcoming Events</h2>
+            <table class="table table-striped upcoming-events-table">
+                <thead>
+                    <th>Event</th>
+                    <th class="hidden-phone">Webcast</th>
+                    <th>Dates</th>
+                </thead>
+                <tbody>
+                {% for event in events %}
+                    <tr>
+                        <td><a href="/event/{{event.key_name}}" title="{{event.name}}">{{event.name}}</a></td>
+                        <td class="hidden-phone">{% if event.now and event.webcast %}<a class="btn btn-success" href="{{event.gameday_url}}"><i class="icon-facetime-video icon-white"></i> Watch</a>{% endif %}</td>
+                        <td>{% if event.start_date %}{{ event.start_date|date:"M j" }}{% endif %}{% if event.end_date %} - {{ event.end_date|date:"M j" }}{% endif %}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
             <div>
-                <a class="btn btn-large btn-primary" href="/gameday"><i class="icon-facetime-video icon-white"></i> Watch Webcasts</a>
                 <a class="btn" href="/webcasts"><i class="icon-info-sign"></i> Add Webcasts</a>
             </div>
-            {% for event in events %}
-                {% include "event_partials/event_block.html" %}
-            {% endfor %}
+
         </div>
     </div>
 </div>
