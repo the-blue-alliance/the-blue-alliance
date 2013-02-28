@@ -116,8 +116,10 @@ class EventDetail(CacheableHandler):
 
         if event.now:
             matches_recent = MatchHelper.recentMatches(event.matches)
+            matches_upcoming = MatchHelper.upcomingMatches(event.matches)
         else:
             matches_recent = None
+            matches_upcoming = None
 
         bracket_table = {}
         qf_matches = matches['qf']
@@ -134,6 +136,7 @@ class EventDetail(CacheableHandler):
             "event": event,
             "matches": matches,
             "matches_recent": matches_recent,
+            "matches_upcoming": matches_upcoming,
             "awards": awards,
             "teams_a": teams_a,
             "teams_b": teams_b,

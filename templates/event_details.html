@@ -42,18 +42,31 @@
                 <a class="hashtag-link hashtag-cd" href="http://www.chiefdelphi.com/media/photos/tags/frc{{ event.event_short }}" target="_blank" title="Search Chief Delphi">Chief Delphi</a> &middot;
                 <a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23frc{{ event.event_short }}" target="_blank" title="Search Flickr">Flickr</a>
             </p>
-            {% if matches_recent %}
-                <h4>Recent Matches</h4>
-                {% with matches_recent as matches %}
-                    {% include "match_partials/recent_match_table.html" %}
-                {% endwith %}
-            {% endif %}
         </div>
         <div class="span4">
           {% if event.now and event.webcast%}
           <a class="btn btn-large btn-success hidden-phone" href="{{event.gameday_url}}"><i class="icon-facetime-video icon-white"></i> Watch now on GameDay!</a>
           {% endif %}
         </div>
+    </div>
+    
+    <div class="row">
+        {% if matches_upcoming %}
+        <div class="span6">
+            <h4>Upcoming Matches</h4>
+            {% with matches_upcoming as matches %}
+                {% include "match_partials/upcoming_match_table.html" %}
+            {% endwith %}
+        </div>
+        {% endif %}
+        {% if matches_recent %}
+        <div class="span6">
+            <h4>Recent Matches</h4>
+            {% with matches_recent as matches %}
+                {% include "match_partials/recent_match_table.html" %}
+            {% endwith %}
+        </div>
+        {% endif %}
     </div>
 
     <ul class="nav nav-tabs nav-stacked-phone">
