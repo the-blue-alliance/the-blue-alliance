@@ -31,12 +31,15 @@
 			<h1 class="end_header">{% if explicit_year %}{{selected_year}} {% endif %}<em>FIRST</em> Robotics Competition Events {% if events|length > 0 %}<small>{{ events|length }} Events</small>{% endif %}</h1>
 			{% if show_upcoming %}
 				<h2>Upcoming Events</h2>
-	        	{% for event in upcoming_events %}
-					{% include "event_partials/event_block.html" %}
-	        	{% empty %}
+				{% if upcoming_events %}
+					{% with upcoming_events as events %}
+		                {% include "event_partials/event_table.html" %}
+		            {% endwith %}
+		        {% endif %}
+	        	{% if not upcoming_events %}
 		    	    <p>There are no upcoming events.</p>
 		    	    <p>If you have an offseason event, <a href="/contact">tell us about it</a>!</p>
-	        	{% endfor %}
+	        	{% endif %}
 	        {% endif %}
 	        
 	    	{% if week_events %}
@@ -47,16 +50,12 @@
 	    	    </ul>
 			    {% for label, events in week_events.items %}
 			        <h2 id="{{label|slugify}}">{{ label }} <small>{{events|length}} Events</small></h2>
-			        <div class="clearfix"></div>
-			        {% for event in events %}
-			    		{% include "event_partials/event_block.html" %}
-			        {% endfor %}
-			        <div class="clearfix"></div>
+			        {% include "event_partials/event_table.html" %}
 			    {% endfor %}
 			{% else %}
-        	    {% for event in events %}
-        	        {% include "event_partials/event_block.html" %}
-        	    {% endfor %}
+        	    {% with events as events %}
+	                {% include "event_partials/event_table.html" %}
+	            {% endwith %}
 			{% endif %}
 		</div>	
 	</div>

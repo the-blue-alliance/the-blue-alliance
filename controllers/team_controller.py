@@ -125,20 +125,25 @@ class TeamDetail(CacheableHandler):
         
         years = sorted(set([a.year for a in event_teams if a.year != None]))
         
-        # Prepare the data to batch it with ndb
+        awards_future = Award.query(Award.year == year, Award.team == team.key).fetch_async(500)
         for e in events:
             e.team_matches_future = Match.query(Match.event == e.key, Match.team_key_names == team.key_name).fetch_async(500)
-            e.team_awards_future = Award.query(Award.event == e.key, Award.team == team.key).fetch_async(500)
 
         # Return an array of event names and a list of matches from that event that the
         # team was a participant in.
         participation = list()
         year_wlt_list = list()
 
+        current_event = None
+        matches_upcoming = None
         for e in events:
-            awards = AwardHelper.organizeAwards(e.team_awards_future.get_result())
+            awards = AwardHelper.organizeAwards([award for award in awards_future.get_result() if award.event == e.key])
             matches = e.team_matches_future.get_result()
             matches_organized = MatchHelper.organizeMatches(matches)
+            
+            if e.now:
+                current_event = e
+                matches_upcoming = MatchHelper.upcomingMatches(matches)
 
             wlt = EventHelper.calculateTeamWLTFromMatches(team.key_name, matches)
             year_wlt_list.append(wlt)
@@ -154,7 +159,6 @@ class TeamDetail(CacheableHandler):
                         team_rank = element[0]
                         break
                 
-                
             participation.append({ 'event' : e,
                                    'matches' : matches_organized,
                                    'wlt': display_wlt,
@@ -167,14 +171,16 @@ class TeamDetail(CacheableHandler):
             year_wlt["loss"] += wlt["loss"]
             year_wlt["tie"] += wlt["tie"]
         if year_wlt["win"] + year_wlt["loss"] + year_wlt["tie"] == 0:
-            year_wlt = None
+            year_wlt = None                
         
         template_values = { "explicit_year": explicit_year,
                             "team": team,
                             "participation": participation,
                             "year": year,
                             "years": years,
-                            "year_wlt": year_wlt }
+                            "year_wlt": year_wlt,
+                            "current_event": current_event,
+                            "matches_upcoming": matches_upcoming }
         
         path = os.path.join(os.path.dirname(__file__), '../templates/team_details.html')
         return template.render(path, template_values)

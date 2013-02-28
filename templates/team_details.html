@@ -22,9 +22,9 @@
     <p><a class="btn" href="/teams"><i class="icon-chevron-left"></i> All Teams</a></p>
 
     <h1>Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h1>
-    
+
     <div class="row">
-        <div class="span8">
+        <div class="span7">
             <p>
                 {% if team.location %}<i class="icon-map-marker"></i> from <a href="http://maps.google.com/maps?q={{ team.location|urlencode }}">{{ team.location }}</a><br />{% endif %}
                 {% if team.name %}<i class="icon-info-sign"></i> aka <em>{{ team.name }}</em><br />{% endif %}
@@ -38,13 +38,33 @@
                 <a class="hashtag-link hashtag-cd" href="http://www.chiefdelphi.com/media/photos/tags/frc{{ team.team_number }}" target="_blank" title="Search Chief Delphi">Chief Delphi</a> &middot;
                 <a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23frc{{ team.team_number }}" target="_blank" title="Search Flickr">Flickr</a>
             </p>
+            
+            {% if current_event %}
+            <div style="max-width: 100%; overflow: hidden">
+              <div class="fb-like" data-href="http://www.thebluealliance.com/team/{{team.team_number}}" data-send="false" data-width="450" data-show-faces="false"></div>
+              <div id="gplus"><g:plusone annotation="inline" href="http://www.thebluealliance.com/team/{{team.team_number}}" width="450"></g:plusone></div>
+            </div>
+            {% endif %}
         </div>
-        <div class="span4 hidden-phone">
-		  	<div style="max-width: 100%; overflow: hidden">
-		  	  <div class="fb-like" data-href="http://www.thebluealliance.com/team/{{team.team_number}}" data-send="false" data-width="450" data-show-faces="false"></div>
-	           <div id="gplus"><g:plusone annotation="inline" href="http://www.thebluealliance.com/team/{{team.team_number}}" width="450"></g:plusone></div>
-	        </div>
-		</div>
+        {% if current_event %}
+        <div class="span5">
+            <h2>Currently competing at:
+            <br><a href="/event/{{ current_event.key_name }}">{{ current_event.name }}</a></h2>
+            {% if matches_upcoming %}
+                <h4>Upcoming Matches</h4>
+                {% with matches_upcoming as matches %}
+                    {% include "match_partials/upcoming_match_table.html" %}
+                {% endwith %}
+            {% endif %}       
+        </div>
+        {% else %}
+        <div class="span5 hidden-phone">
+    		  	<div style="max-width: 100%; overflow: hidden">
+    		  	  <div class="fb-like" data-href="http://www.thebluealliance.com/team/{{team.team_number}}" data-send="false" data-width="450" data-show-faces="false"></div>
+    	        <div id="gplus"><g:plusone annotation="inline" href="http://www.thebluealliance.com/team/{{team.team_number}}" width="450"></g:plusone></div>
+    	      </div>
+        </div>
+        {% endif %}
 	</div>
 
     <hr>

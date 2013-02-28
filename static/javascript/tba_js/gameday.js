@@ -21,8 +21,8 @@ $(document).ready(function() {
 		'overlayColor'  :	'#333',
 		'overlayShow'	:	true,
 		'autoDimensions':	false,
-		'width'			: 	0.9*width,
-		'height'		:	0.9*height,
+		'width'			: 	0.9*$(".video_container").width(),
+		'height'		:	0.9*$(".video_container").height(),
 		'type'			:	'iframe',
 	});
 	
