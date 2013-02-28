@@ -55,18 +55,24 @@ class EventList(CacheableHandler):
         show_upcoming = (year == datetime.datetime.now().year)
 
         events = Event.query(Event.year == year).order(Event.start_date).fetch(1000)
+
+        upcoming_events = []
+        for event in events:
+            if event.start_date.date() < datetime.date.today() + datetime.timedelta(days=4):
+                upcoming_events.append(event)
         
         week_events = None
         if year >= 2005:
             week_events = EventHelper.groupByWeek(events)
     
         template_values = {
-            "show_upcoming": show_upcoming,
             "events": events,
-            "week_events": week_events,
             "explicit_year": explicit_year,
             "selected_year": year,
+            "show_upcoming": show_upcoming,
+            "upcoming_events": upcoming_events,
             "valid_years": self.VALID_YEARS,
+            "week_events": week_events,
         }
     
         path = os.path.join(os.path.dirname(__file__), '../templates/event_list.html')
