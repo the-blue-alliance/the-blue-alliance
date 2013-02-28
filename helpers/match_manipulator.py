@@ -1,3 +1,5 @@
+import logging
+
 from helpers.manipulator_base import ManipulatorBase
 from helpers.firebase.firebase_pusher import FirebasePusher
 
@@ -31,11 +33,13 @@ class MatchManipulator(ManipulatorBase):
             "youtube_videos"
         ]
 
+        push_match = not old_match.has_been_played and new_match.has_been_played
         for attr in attrs:
             if getattr(new_match, attr) is not None:
                 if getattr(new_match, attr) != getattr(old_match, attr):
                     setattr(old_match, attr, getattr(new_match, attr))
                     old_match.dirty = True
-                    FirebasePusher.pushMatch(old_match)
-        
+                    
+        if push_match:
+            FirebasePusher.pushMatch(old_match)
         return old_match
