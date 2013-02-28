@@ -8,6 +8,7 @@ from google.appengine.ext import ndb
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
+from google.appengine.api import urlfetch
 
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.event_team_repairer import EventTeamRepairer
@@ -21,6 +22,10 @@ from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
+from models.sitevar import Sitevar
+
+import tba_config
+
 from models.insight import Insight
 
 class EventTeamRepairDo(webapp.RequestHandler):
