@@ -15,12 +15,14 @@ if DEBUG:
     CONFIG = {
         "env": "dev",
         "memcache": False,
+        "firebase-url": "https://thebluealliance-dev.firebaseio.com/{}.json?print=silent&auth={}"
     }
 else:
     CONFIG = {
         "env": "prod",
         "memcache": True,
+        "firebase-url": "https://thebluealliance.firebaseio.com/{}.json?print=silent&auth={}"
     }
 
 CONFIG['landing_handler'] = COMPETITIONSEASON
-CONFIG["static_resource_version"] = 3
+CONFIG["static_resource_version"] = 4
