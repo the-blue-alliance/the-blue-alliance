@@ -1,4 +1,4 @@
-application: tbatv-dev-hrd
+application: tbatv-prod-hrd
 version: 1-2
 runtime: python27
 api_version: 1
