@@ -17,5 +17,6 @@ class FirebasePusher(object):
 
         taskqueue.add(url='/tasks/posts/firebase_push', 
                       method='GET',
+                      queue_name='firebase',
                       params={'key': 'last_matches',
                               'payload_json': payload_json})

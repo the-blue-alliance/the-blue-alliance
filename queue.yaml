@@ -5,3 +5,8 @@ queue:
     task_retry_limit: 7
     task_age_limit: 1d
   max_concurrent_requests: 1
+
+- name: firebase
+  rate 5/s
+  retry_paramters:
+    task_retry_limit: 1
