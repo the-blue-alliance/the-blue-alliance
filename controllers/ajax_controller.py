@@ -91,6 +91,11 @@ class WebcastHandler(CacheableHandler):
         
     def _renderPlayer(self, webcast):
         webcast_type = webcast['type']
-        template_values = {'channel': webcast['channel']}
+        if webcast_type == 'rtmp':
+            template_values = {'channel': webcast['channel'],
+                               'file': webcast['file']}
+        else:
+            template_values = {'channel': webcast['channel']}
+
         path = os.path.join(os.path.dirname(__file__), '../templates/webcast/' + webcast_type + '.html')
         return template.render(path, template_values)
