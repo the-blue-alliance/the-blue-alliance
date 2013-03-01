@@ -32,6 +32,10 @@ class CacheableHandler(webapp2.RequestHandler):
             content = self._render(*args, **kw)
             self._write_cache(content)
         self.response.out.write(content)
+        
+    def memcacheFlush(self):
+        memcache.delete(self.cache_key)
+        return self.cache_key
 
     def _read_cache(self):
         return memcache.get(self.cache_key)

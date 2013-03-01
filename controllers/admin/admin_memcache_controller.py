@@ -4,6 +4,8 @@ from google.appengine.api import memcache
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
+from controllers.main_controller import MainCompetitionseasonHandler, GamedayHandler, WebcastsHandler
+
 # Main memcache view.
 class AdminMemcacheMain(webapp.RequestHandler):
     def post(self):
@@ -12,7 +14,12 @@ class AdminMemcacheMain(webapp.RequestHandler):
         if self.request.get("all_keys") == "all_keys":
             memcache.flush_all()
             flushed.append("all memcache values")
-        
+            
+        if self.request.get("webcast_keys") == "webcast_keys":
+            flushed.append(MainCompetitionseasonHandler().memcacheFlush())
+            flushed.append(GamedayHandler().memcacheFlush())
+            flushed.append(WebcastsHandler().memcacheFlush())
+                    
         if self.request.get('memcache_key') is not "":
             memcache.delete(self.request.get("memcache_key"))
             flushed.append(self.request.get("memcache_key"))
