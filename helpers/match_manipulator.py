@@ -45,5 +45,5 @@ class MatchManipulator(ManipulatorBase):
             try:
                 FirebasePusher.pushMatch(old_match)
             except:
-                logging.warning("Enquing Firebase push failed!")
+                logging.warning("Enqueuing Firebase push failed!")
         return old_match
