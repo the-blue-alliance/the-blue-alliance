@@ -38,6 +38,8 @@ class MatchManipulator(ManipulatorBase):
                 if getattr(new_match, attr) != getattr(old_match, attr):
                     setattr(old_match, attr, getattr(new_match, attr))
                     if attr == 'alliances_json':
+                        # Necessary since 'alliances' doesn't get changed
+                        # when mutating 'alliances_json'
                         old_match.clearAlliances()
                     old_match.dirty = True
                     
