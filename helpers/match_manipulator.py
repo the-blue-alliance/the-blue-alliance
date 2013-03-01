@@ -1,3 +1,4 @@
+import logging
 from helpers.manipulator_base import ManipulatorBase
 from helpers.firebase.firebase_pusher import FirebasePusher
 
@@ -37,9 +38,14 @@ class MatchManipulator(ManipulatorBase):
                 if getattr(new_match, attr) != getattr(old_match, attr):
                     setattr(old_match, attr, getattr(new_match, attr))
                     if attr == 'alliances_json':
+                        # Necessary since 'alliances' doesn't get changed
+                        # when mutating 'alliances_json'
                         old_match.clearAlliances()
                     old_match.dirty = True
                     
         if push_match:
-            FirebasePusher.pushMatch(old_match)
+            try:
+                FirebasePusher.pushMatch(old_match)
+            except:
+                logging.warning("Enqueuing Firebase push failed!")
         return old_match

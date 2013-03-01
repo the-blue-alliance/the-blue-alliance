@@ -143,9 +143,10 @@ class Match(ndb.Model):
     def has_been_played(self):
         """If there are scores, it's been played"""
         for alliance in self.alliances:
-            if self.alliances[alliance]["score"] is not None:
-                return True
-        return False
+            if (self.alliances[alliance]["score"] == None) or \
+            (self.alliances[alliance]["score"] == -1):
+                return False
+        return True
     
     @property
     def verbose_name(self):
@@ -180,6 +181,5 @@ class Match(ndb.Model):
         else:
             return "%s_%s%sm%s" % (event.key_name, comp_level, set_number, match_number)
 
-    @classmethod
     def clearAlliances(self):
         self._alliances = None

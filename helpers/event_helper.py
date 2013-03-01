@@ -10,6 +10,7 @@ CHAMPIONSHIP_EVENTS = set(['arc', 'cur', 'gal', 'new', 'ein', 'cmp'])
 CHAMPIONSHIP_EVENTS_LABEL = 'Championship Event'
 REGIONAL_EVENTS_LABEL = 'Week {}'
 OFFSEASON_EVENTS_LABEL = 'Offseason'
+WEEKLESS_EVENTS_LABEL = 'Other Official Events'
 
 
 class EventHelper(object):
@@ -27,7 +28,12 @@ class EventHelper(object):
         current_week = 1
         week_start = None
         offseason_events = []
+        weekless_events = []
         for event in events:
+            if not event.start_date:
+                weekless_events.append(event)
+                break
+
             start = event.start_date
 
             if event.event_short in CHAMPIONSHIP_EVENTS:
@@ -53,11 +59,20 @@ class EventHelper(object):
                 else:
                     toReturn[label] = [event]
         
-        # Add Offseason events last
+        # Add weekless + other events last
+        if weekless_events:
+            toReturn[WEEKLESS_EVENTS_LABEL] = weekless_events
         if offseason_events:
             toReturn[OFFSEASON_EVENTS_LABEL] = offseason_events
         
         return toReturn
+
+    @classmethod
+    def distantFutureIfNoStartDate(self, event):
+        if not event.start_date:
+            return datetime.datetime(2177, 1, 1, 1, 1, 1)
+        else:
+            return event.start_date
     
     @classmethod
     def calculateTeamWLTFromMatches(self, team_key, matches):
