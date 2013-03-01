@@ -52,15 +52,9 @@ class EventList(CacheableHandler):
         super(EventList, self).get(year, explicit_year)
         
     def _render(self, year=None, explicit_year=False):
-        show_upcoming = (year == datetime.datetime.now().year)
+        events = Event.query(Event.year == year).fetch(1000)
+        events.sort(key=EventHelper.distantFutureIfNoStartDate)
 
-        events = Event.query(Event.year == year).order(Event.start_date).fetch(1000)
-
-        upcoming_events = []
-        for event in events:
-            if event.start_date.date() < datetime.date.today() + datetime.timedelta(days=4):
-                upcoming_events.append(event)
-        
         week_events = None
         if year >= 2005:
             week_events = EventHelper.groupByWeek(events)
@@ -69,8 +63,6 @@ class EventList(CacheableHandler):
             "events": events,
             "explicit_year": explicit_year,
             "selected_year": year,
-            "show_upcoming": show_upcoming,
-            "upcoming_events": upcoming_events,
             "valid_years": self.VALID_YEARS,
             "week_events": week_events,
         }
