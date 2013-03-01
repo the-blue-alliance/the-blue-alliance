@@ -174,7 +174,11 @@
                             <tr>
                                 {% for element in row %}
                                 <td>
-                                    {{ element }}
+                                    {% if forloop.counter == 2 %}
+                                        <a href="/team/{{ element }}">{{ element }}</a>
+                                    {% else %}
+                                        {{ element }}
+                                    {% endif %}
                                 </td>
                                 {% endfor %}
                             </tr>
