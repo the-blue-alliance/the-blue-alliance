@@ -25,6 +25,13 @@
     </div>
 </form>
 
+<form class="form-inline" action="/admin/memcache" method="post">
+    <legend>Flush Webcasts</legend>
+    <p>Flushes all pages that depend on the list of webcasts (/, /gameday, /webcasts)</p>
+    <input name="webcast_keys" value="webcast_keys" type="hidden" />
+    <button class="btn btn-danger" type="submit"><i class="icon-trash icon-white"></i> Flush</button>
+</form>
+
 <h3>Scary!!!</h3>
 <form action="/admin/memcache" method="post">
     <legend>Flush all memcache</legend>

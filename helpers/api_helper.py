@@ -87,10 +87,11 @@ class ApiHelper(object):
                     event_dict["end_date"] = None
 
                 event.prepTeams()
+                event.prepMatches()
                 event_dict["teams"] = [team.key_name for team in event.teams]
+                event_dict["matches"] = [match.key_name for match in event.matches]
 
-                #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
-                if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, event_dict, 2592000)
+                if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, event_dict, 60 * 60)
         return event_dict
     
     
