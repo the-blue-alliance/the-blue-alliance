@@ -48,14 +48,27 @@
         </div>
         {% if current_event %}
         <div class="span5">
-            <h2>Currently competing at:
-            <br><a href="/event/{{ current_event.key_name }}">{{ current_event.name }}</a></h2>
-            {% if matches_upcoming %}
-                <h4>Upcoming Matches</h4>
-                {% with matches_upcoming as matches %}
-                    {% include "match_partials/upcoming_match_table.html" %}
-                {% endwith %}
-            {% endif %}       
+            <div class="well">
+                {% if current_event.webcast %}
+                    <div class="hidden-phone pull-right">
+                    {% if current_event.now %}
+                        <a class="btn btn-success" href="{{current_event.gameday_url}}" target="_blank"><i class="icon-facetime-video icon-white"></i> Watch Now</a>
+                    {% else %}
+                        <a class="btn disabled">Watch</a>
+                    {% endif %}
+                    </div>
+                {% endif %}
+                <span class="lead">Currently competing at:
+                <br>
+                <a href="/event/{{ current_event.key_name }}"><strong>{{ current_event.name }}</strong></a>
+                </span>
+                {% if matches_upcoming %}
+                    <h4>Upcoming Matches</h4>
+                    {% with matches_upcoming as matches %}
+                        {% include "match_partials/upcoming_match_table.html" %}
+                    {% endwith %}
+                {% endif %}
+            </div>
         </div>
         {% else %}
         <div class="span5 hidden-phone">
