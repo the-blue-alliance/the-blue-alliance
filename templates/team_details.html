@@ -51,11 +51,7 @@
             <div class="well">
                 {% if current_event.webcast %}
                     <div class="hidden-phone pull-right">
-                    {% if current_event.now %}
-                        <a class="btn btn-success" href="{{current_event.gameday_url}}" target="_blank"><i class="icon-facetime-video icon-white"></i> Watch Now</a>
-                    {% else %}
-                        <a class="btn disabled">Watch</a>
-                    {% endif %}
+                    <a class="btn btn-success" href="{{current_event.gameday_url}}" target="_blank"><i class="icon-facetime-video icon-white"></i> Watch Now</a>
                     </div>
                 {% endif %}
                 <span class="lead">Currently competing at:
