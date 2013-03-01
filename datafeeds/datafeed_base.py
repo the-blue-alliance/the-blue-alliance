@@ -12,7 +12,8 @@ class DatafeedBase(object):
         if result.status_code == 200:
             return parser.parse(result.content)
         else:
-            logging.error('Unable to retreive url: ' + (url))
+            logging.warning('Unable to retreive url: ' + (url))
+            return list()
 
     def _shorten(self, string):
         MAX_DB_LENGTH = 500
