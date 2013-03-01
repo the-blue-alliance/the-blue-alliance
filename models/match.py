@@ -180,6 +180,5 @@ class Match(ndb.Model):
         else:
             return "%s_%s%sm%s" % (event.key_name, comp_level, set_number, match_number)
 
-    @classmethod
     def clearAlliances(self):
         self._alliances = None
