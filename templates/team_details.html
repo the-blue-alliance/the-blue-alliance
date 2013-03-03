@@ -19,9 +19,7 @@
 {% block content %}
 
 <div class="container">
-    <p><a class="btn" href="/teams"><i class="icon-chevron-left"></i> All Teams</a></p>
-
-    <h1>Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h1>
+    <h2>Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h2>
 
     <div class="row">
         <div class="span7">
@@ -32,11 +30,12 @@
                 {% if team.website %}<i class="icon-globe"></i> <a href="{{team.website}}" target="_blank">{{ team.website }}</a>{% endif %}
             </p>
 
-            <p><strong>#frc{{ team.team_number }}</strong> <small><a href="/hashtags" rel="tooltip" title="Learn more about hashtags">?</a></small> - Search
+            <p><i class="icon-search"></i> <strong>#frc{{ team.team_number }}</strong> <small><a href="/hashtags" rel="tooltip" title="Learn more about hashtags">?</a></small> - Search
                 <a class="hashtag-link hashtag-twitter" href="https://twitter.com/search/%23frc{{ team.team_number }}" target="_blank" title="Search Twitter">Twitter</a> &middot;
                 <a class="hashtag-link hashtag-youtube" href="http://www.youtube.com/results?search_query=%23frc{{ team.team_number }}+OR+%22team+{{ team.team_number }}%22" target="_blank" title="Search YouTube">YouTube</a> &middot;
                 <a class="hashtag-link hashtag-cd" href="http://www.chiefdelphi.com/media/photos/tags/frc{{ team.team_number }}" target="_blank" title="Search Chief Delphi">Chief Delphi</a> &middot;
-                <a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23frc{{ team.team_number }}" target="_blank" title="Search Flickr">Flickr</a>
+                <a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23frc{{ team.team_number }}" target="_blank" title="Search Flickr">Flickr</a><br />
+                <i class="icon-bullhorn"></i> <a href="http://www.frcmega.com/register/{{team.team_number}}">Subscribe to notifications on FRC Megaphone</a>
             </p>
             
             {% if current_event %}
@@ -107,13 +106,7 @@
               {% endfor %}
             </ul>
             {% endif %}
-
-    </div>
-		<!--<div class="span2">
-			<a href="/images/no_robot_image.png" class="thumbnail fancybox no-robot-image">
-				<img src="/images/no_robot_image.png" alt="No Robot Image">
-			</a>
-		</div>-->
+        </div>
 	</div>
 
     <hr>
@@ -121,7 +114,7 @@
     {% for comp in participation %}
         <div class="row" id="{{ comp.event.key_name }}">
             <div class="span4">
-                <h2><a href="/event/{{ comp.event.key_name }}">{{ comp.event.name }}</a></h2>
+                <h3><a href="/event/{{ comp.event.key_name }}">{{ comp.event.name }}</a></h3>
                 <p>
                     {% if comp.event.location %}<i class="icon-map-marker"></i> in <a href="http://maps.google.com/maps?q={{ comp.event.location }}">{{ comp.event.location }}</a><br />{% endif %}
                     {% if comp.event.start_date %}<i class="icon-calendar"></i> {{ comp.event.start_date|date:"M jS" }} - {{ comp.event.end_date|date:"M jS, Y" }}{% endif %}
