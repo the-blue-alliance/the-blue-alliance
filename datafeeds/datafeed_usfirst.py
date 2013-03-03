@@ -1,7 +1,10 @@
 import logging
 import re
 
+from google.appengine.api import memcache
 from google.appengine.api import urlfetch
+
+import tba_config
 
 from helpers.team_helper import TeamTpidHelper
 
@@ -50,7 +53,14 @@ class DatafeedUsfirst(DatafeedBase):
         Grab a page from FIRST so we can get a session key out of URLs on it. This session
         key is needed to construct working event detail information URLs.
         """
+
         if self._session_key.get(year, False):
+            return self._session_key.get(year)
+
+        memcache_key = "usfirst_session_key_%s" % year
+        session_key = memcache.get(memcache_key)
+        if session_key is not None:
+            self._session_key[year] = session_key
             return self._session_key.get(year)
 
         sessionRe = re.compile(r'myarea:([A-Za-z0-9]*)')
@@ -61,6 +71,7 @@ class DatafeedUsfirst(DatafeedBase):
             if regex_results is not None:
                 session_key = regex_results.group(1) #first parenthetical group
                 if session_key is not None:
+                    if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, session_key, 60 * 5)
                     self._session_key[year] = session_key
                     return self._session_key[year]
             logging.error('Unable to get USFIRST session key for %s.' % year)
