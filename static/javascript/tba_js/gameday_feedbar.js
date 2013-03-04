@@ -22,8 +22,10 @@ function updateFeedbar(match) {
   var blue_score = $('<div>', {'class': 'blue ' + blue_win, text: blue_teams + ' - ' + blue_score});
   var div_helper = $('<div>', {'class': 'div_helper'});
   
-  var new_match = $('<div>', {'class': 'scores'}).append(match_number).append(red_score).append(blue_score).append(div_helper);
+  var new_match = $('<div class="new">', {'class': 'scores'}).append(match_number).append(red_score).append(blue_score).append(div_helper);
   $('.feed_bar').prepend(new_match);
+  new_match.focus();
+  new_match.removeClass('new');
 }
 
 function getEventKey(match) {
