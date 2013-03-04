@@ -30,7 +30,7 @@ class UsfirstEventAwardsParser(ParserBase):
         ("coop", (["coopertition"], [])),
         ("sports", (["sportsmanship"], [])),
         ("create", (["creativity"], [])),
-        ("eng", (["engineering excellence"], [])),
+        ("eng", (["engineering", "excellence"], [])),
         ("entre", (["entrepreneurship"], [])),
         ("exdes", (["excellence in design"], [])),
         ("dl", (["dean's list"], [])),
