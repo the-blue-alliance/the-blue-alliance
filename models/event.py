@@ -147,7 +147,6 @@ class Event(ndb.Model):
         """
         Returns the URL pattern for the link to watch webcasts in Gameday
         """
-        logging.info('hi')
         if self.webcast:
             gameday_link = '/gameday'
             view_num = 0

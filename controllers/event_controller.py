@@ -29,7 +29,7 @@ class EventList(CacheableHandler):
 
     def __init__(self, *args, **kw):
         super(EventList, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24 * 7
+        self._cache_expiration = 60 * 60 * 24
         self._cache_key = "event_list_{}_{}" # (year, explicit_year)
         self._cache_version = 4
 
@@ -52,15 +52,9 @@ class EventList(CacheableHandler):
         super(EventList, self).get(year, explicit_year)
         
     def _render(self, year=None, explicit_year=False):
-        show_upcoming = (year == datetime.datetime.now().year)
+        events = Event.query(Event.year == year).fetch(1000)
+        events.sort(key=EventHelper.distantFutureIfNoStartDate)
 
-        events = Event.query(Event.year == year).order(Event.start_date).fetch(1000)
-
-        upcoming_events = []
-        for event in events:
-            if event.start_date.date() < datetime.date.today() + datetime.timedelta(days=4):
-                upcoming_events.append(event)
-        
         week_events = None
         if year >= 2005:
             week_events = EventHelper.groupByWeek(events)
@@ -69,8 +63,6 @@ class EventList(CacheableHandler):
             "events": events,
             "explicit_year": explicit_year,
             "selected_year": year,
-            "show_upcoming": show_upcoming,
-            "upcoming_events": upcoming_events,
             "valid_years": self.VALID_YEARS,
             "week_events": week_events,
         }
@@ -86,9 +78,9 @@ class EventDetail(CacheableHandler):
     """
     def __init__(self, *args, **kw):
         super(EventDetail, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24
+        self._cache_expiration = 60 * 5
         self._cache_key = "event_detail_{}" # (event_key)
-        self._cache_version = 1
+        self._cache_version = 2
 
     def get(self, event_key):
         if not event_key:
@@ -161,9 +153,9 @@ class EventRss(CacheableHandler):
     """
     def __init__(self, *args, **kw):
         super(EventRss, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24
+        self._cache_expiration = 60 * 5
         self._cache_key = "event_rss_{}" # (event_key)
-        self._cache_version = 1
+        self._cache_version = 2
 
     def get(self, event_key):
         if not event_key:
