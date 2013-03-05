@@ -161,10 +161,6 @@ body {
   height: 30px;
   background-color: @grayDarker * 0.5;
 
-  .new{
-    color: #4F4F2F;
-  }
-  
   .scores{
     width: 250px;
     height: 100%;
@@ -172,6 +168,12 @@ body {
     border-right:1px @white solid;
     float: left;
     position: relative;
+    background-color:transparent;
+    .transition(background-color 2s);
+  }
+
+  .new{
+    background-color: #000033;
   }
   
   .match-number{
