@@ -24,6 +24,17 @@ function updateFeedbar(match) {
   
   var new_match = $('<div>', {'class': 'scores new'}).append(match_number).append(red_score).append(blue_score).append(div_helper);
   $('.feed_bar').prepend(new_match);
+  $('.scores').click(function(){
+    $(".scores").fancybox({
+      'overlayColor'  : '#333',
+      'overlayShow' : true,
+      'autoDimensions': false,
+      'width'     :   0.9*$(".video_container").width(),
+      'height'    : 0.9*$(".video_container").height(),
+      'type'      : 'iframe',
+      'href'      : '/event/' + getEventKey(match)
+    });
+  });
   new_match.focus();
   new_match.removeClass('new');
 }
