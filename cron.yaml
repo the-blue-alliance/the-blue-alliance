@@ -15,6 +15,10 @@ cron:
   url: /tasks/enqueue/usfirst_event_rankings/now
   schedule: every 5 minutes
 
+- description: FIRST awards scraping
+  url: /tasks/enqueue/usfirst_awards/now
+  schedule: every 24 hours
+
 - description: OPR Calculation
   url: /tasks/math/enqueue/event_opr/now
   schedule: every day 22:00
