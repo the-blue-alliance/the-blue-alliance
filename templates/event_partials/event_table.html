@@ -12,7 +12,11 @@
                 {% if event.now %}
                     <a class="btn btn-success" href="{{event.gameday_url}}" target="_blank"><i class="icon-facetime-video icon-white"></i> Watch Now</a>
                 {% else %}
-                    <a class="btn disabled">Starts {% if event.start_date %}{{ event.start_date|date:"M j" }}{% endif %}</a>
+                    {% if event.past == True %}
+                        <a class="btn disabled">Ended {{ event.end_date|date:"M j" }}</a>
+                    {% else %}
+                        <a class="btn disabled">Starts {{ event.start_date|date:"M j" }}</a>
+                    {% endif %}
                 {% endif %}
             {% endif %}</td>
             <td>{% if event.start_date %}{{ event.start_date|date:"M j" }}{% endif %}{% if event.end_date %} - {{ event.end_date|date:"M j, Y" }}{% endif %}</td>
