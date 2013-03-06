@@ -22,21 +22,21 @@ function updateFeedbar(match) {
   var blue_score = $('<div>', {'class': 'blue ' + blue_win, text: blue_teams + ' - ' + blue_score});
   var div_helper = $('<div>', {'class': 'div_helper'});
   
-  var new_match = $('<div>', {'class': 'scores new'}).append(match_number).append(red_score).append(blue_score).append(div_helper);
+  var new_match = $('<div>', {'class': 'scores new_scores'}).append(match_number).append(red_score).append(blue_score).append(div_helper);
   $('.feed_bar').prepend(new_match);
   $('.scores').click(function(){
     $(".scores").fancybox({
       'overlayColor'  : '#333',
-      'overlayShow' : true,
+      'overlayShow'   : true,
       'autoDimensions': false,
-      'width'     :   0.9*$(".video_container").width(),
-      'height'    : 0.9*$(".video_container").height(),
-      'type'      : 'iframe',
-      'href'      : '/event/' + getEventKey(match)
+      'width'         : 0.9*$(".video_container").width(),
+      'height'        : 0.9*$(".video_container").height(),
+      'type'          : 'iframe',
+      'href'          : '/event/' + getEventKey(match)
     });
   });
   new_match.focus();
-  new_match.removeClass('new');
+  new_match.removeClass('new_scores');
 }
 
 function getEventKey(match) {
