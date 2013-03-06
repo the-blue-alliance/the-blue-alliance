@@ -78,6 +78,13 @@ class Event(ndb.Model):
         else:
             return False
 
+    @property
+    def past(self):
+        if datetime.datetime.today().date() > self.end_date.date():
+            return True
+        else:
+            return False
+
     def prepTeams(self):
         # TODO there is a way to do this with yields such that this would be a
         # generator function that would yield, and if two sets of ndb fetches
