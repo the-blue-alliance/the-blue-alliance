@@ -73,7 +73,7 @@ class Event(ndb.Model):
     def now(self):
         if not self.start_date or not self.end_date:
             return False
-        if datetime.datetime.today().date() >= self.start_date.date() and datetime.datetime.today().date() <= self.end_date.date():
+        if datetime.datetime.today().date() >= self.start_date.date() and datetime.datetime.today().date() <= self.end_date.date() + datetime.timedelta(hours=12):
             return True
         else:
             return False
