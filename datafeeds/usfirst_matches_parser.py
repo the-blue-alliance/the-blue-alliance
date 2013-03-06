@@ -35,12 +35,12 @@ class UsfirstMatchesParser(ParserBase):
                     blue_teams = ["frc" + self._recurseUntilString(tds[5]), "frc" + self._recurseUntilString(tds[6]), "frc" + self._recurseUntilString(tds[7])]
                     
                     try:
-                        if tds[8].string == None:
+                        if self._recurseUntilString(tds[8]) == None:
                             red_score = -1
                         else:
                             red_score = int(self._recurseUntilString(tds[8]))
                     
-                        if tds[9].string == None:
+                        if self._recurseUntilString(tds[9]) == None:
                             blue_score = -1
                         else:
                             blue_score = int(self._recurseUntilString(tds[9]))
