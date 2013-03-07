@@ -57,8 +57,6 @@ class MainCompetitionseasonHandler(CacheableHandler):
         self._cache_version = 5
 
     def _render(self, *args, **kw):
-        
-        # Only show events that are happening "the same week" as the first one
         upcoming_events = EventHelper.getUpcomingEvents()
         template_values = {
             "events": upcoming_events,
