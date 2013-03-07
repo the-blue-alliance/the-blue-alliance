@@ -25,14 +25,18 @@ class MatchManipulator(ManipulatorBase):
             "alliances_json",
             "game",
             "no_auto_update",
-            "team_key_names",
-            "tba_videos",
             "time",
             "time_string",
+        ]
+
+        list_attrs = [
+            "team_key_names",
+            "tba_videos",
             "youtube_videos"
         ]
 
         push_match = not old_match.has_been_played and new_match.has_been_played
+
         for attr in attrs:
             if getattr(new_match, attr) is not None:
                 if getattr(new_match, attr) != getattr(old_match, attr):
@@ -41,6 +45,12 @@ class MatchManipulator(ManipulatorBase):
                         # Necessary since 'alliances' doesn't get changed
                         # when mutating 'alliances_json'
                         old_match.clearAlliances()
+                    old_match.dirty = True
+
+        for attr in list_attrs:
+            if len(getattr(new_match, attr)) > 0:
+                if getattr(new_match, attr) != getattr(old_match, attr):
+                    setattr(new_match, attr, getattr(new_match, attr))
                     old_match.dirty = True
                     
         if push_match:
