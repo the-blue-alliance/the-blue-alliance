@@ -10,6 +10,7 @@ from google.appengine.ext.webapp import template
 import tba_config
 
 from base_controller import BaseHandler, CacheableHandler
+from helpers.event_helper import EventHelper
 
 from models.event import Event
 from models.team import Team
@@ -56,23 +57,8 @@ class MainCompetitionseasonHandler(CacheableHandler):
         self._cache_version = 5
 
     def _render(self, *args, **kw):
-        next_events = Event.query(Event.start_date >= (datetime.datetime.today()  - datetime.timedelta(days=12)))
-        next_events.order(Event.start_date).fetch(20)
-        
-        upcoming_events = []
-        for event in next_events:
-            if event.start_date.date() < datetime.date.today() + datetime.timedelta(days=12):
-                upcoming_events.append(event)
-        # Only show events that are happening "the same week" as the first one
-        if len(upcoming_events) > 0:
-            first_start_date = upcoming_events[0].start_date            
-            upcoming_events = [e for e in upcoming_events if ((e.start_date - datetime.timedelta(days=6)) < first_start_date)]
-            kickoff_countdown = False
-        else:
-            kickoff_countdown = True
-
+        upcoming_events = EventHelper.getUpcomingEvents()
         template_values = {
-            "kickoff_countdown": kickoff_countdown,
             "events": upcoming_events,
         }
         
@@ -158,9 +144,6 @@ class GamedayHandler(CacheableHandler):
         self._cache_version = 1
 
     def _render(self, *args, **kw):
-        next_events = Event.query(Event.start_date >= (datetime.datetime.today() - datetime.timedelta(days=4)))
-        next_events.order(Event.start_date).fetch(20)
-        
         special_webcasts_future = Sitevar.get_by_id_async('gameday.special_webcasts')
         special_webcasts_temp = special_webcasts_future.get_result()
         if special_webcasts_temp:
@@ -176,7 +159,8 @@ class GamedayHandler(CacheableHandler):
 
         ongoing_events = []
         ongoing_events_w_webcasts = []
-        for event in next_events:
+        upcoming_events = EventHelper.getUpcomingEvents()
+        for event in upcoming_events:
             if event.now:
                 ongoing_events.append(event)
                 if event.webcast:
