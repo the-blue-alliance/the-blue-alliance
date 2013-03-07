@@ -16,9 +16,9 @@ class MatchDetail(CacheableHandler):
     """
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24
+        self._cache_expiration = 60 * 5
         self._cache_key = "match_detail_{}" # (match_key)
-        self._cache_version = 2
+        self._cache_version = 3
 
     def get(self, match_key):
         if not match_key:
