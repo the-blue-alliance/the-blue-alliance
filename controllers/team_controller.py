@@ -52,6 +52,10 @@ class TeamList(CacheableHandler):
                                    
         start = (page - 1) * 1000
         stop = start + 999
+
+        if start == 0:
+            start = 1
+
         teams = Team.query().order(Team.team_number).filter(Team.team_number >= start).filter(Team.team_number < stop).fetch(10000)        
 
         num_teams = len(teams)
