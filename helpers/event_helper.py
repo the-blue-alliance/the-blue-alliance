@@ -111,6 +111,7 @@ class EventHelper(object):
         for event in next_events:
             if event.end_date.date() >= datetime.date.today():
                 upcoming_events.append(event)
-        first_start_date = upcoming_events[0].start_date     
+        if len(upcoming_events) > 0:
+            first_start_date = upcoming_events[0].start_date     
         upcoming_events = [e for e in upcoming_events if ((e.start_date - datetime.timedelta(days=6)) < first_start_date)]
         return upcoming_events
