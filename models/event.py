@@ -69,14 +69,22 @@ class Event(ndb.Model):
             self._matches = self._matches_future.get_result()
         return self._matches
 
-    @property
-    def now(self):
+    def withinDays(self, negative_days_before, days_after):
         if not self.start_date or not self.end_date:
             return False
-        if datetime.datetime.today().date() >= self.start_date.date() and datetime.datetime.today().date() <= self.end_date.date() + datetime.timedelta(hours=12):
-            return True
-        else:
-            return False
+
+        after_start = self.start_date.date() + datetime.timedelta(days=negative_days_before) <= datetime.datetime.today().date()
+        before_end = self.end_date.date() + datetime.timedelta(days=days_after) >= datetime.datetime.today().date()
+
+        return (after_start and before_end)
+
+    @property
+    def now(self):
+        return self.withinDays(0, 0)
+
+    @property
+    def within_a_day(self):
+        return self.withinDays(-1, 1)
 
     def prepTeams(self):
         # TODO there is a way to do this with yields such that this would be a

@@ -112,7 +112,7 @@ class EventDetail(CacheableHandler):
         oprs = sorted(zip(event.oprs,event.opr_teams), reverse=True) # sort by OPR
         oprs = oprs[:14] # get the top 15 OPRs
 
-        if event.now:
+        if event.within_a_day:
             matches_recent = MatchHelper.recentMatches(event.matches)
             matches_upcoming = MatchHelper.upcomingMatches(event.matches)
         else:

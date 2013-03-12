@@ -9,7 +9,7 @@
         <tr>
             <td><a href="/event/{{event.key_name}}" title="{{event.name}}">{{event.name}}</a></td>
             <td class="hidden-phone">{% if event.webcast %}
-                {% if event.now %}
+                {% if event.within_a_day %}
                     <a class="btn btn-success" href="{{event.gameday_url}}" target="_blank"><i class="icon-facetime-video icon-white"></i> Watch Now</a>
                 {% else %}
                     <a class="btn disabled">Watch</a>
