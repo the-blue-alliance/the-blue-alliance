@@ -70,6 +70,12 @@ class EventList(CacheableHandler):
         path = os.path.join(os.path.dirname(__file__), '../templates/event_list.html')
         return template.render(path, template_values)
 
+    def memcacheFlush(self):
+        year = datetime.datetime.now().year
+        keys = [self.cache_key.format(year, True), self.cache_key.format(year, False)]
+        memcache.delete_multi(keys)
+        return keys
+
 
 class EventDetail(CacheableHandler):
     """
