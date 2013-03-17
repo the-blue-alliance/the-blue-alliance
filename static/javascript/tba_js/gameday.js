@@ -151,16 +151,6 @@ function setChat(open) {
 	}
 }
 
-function chat_tab() {
-	var chat = $(".chat");
-
-	if(chat.hasClass("chat_active")) {
-		setChat(false);
-	} else {
-		setChat(true);
-	}
-}
-
 // Remove Chat Alert
 $(document).ready(function() {
 	$('#chat-info').bind('close', function () {
