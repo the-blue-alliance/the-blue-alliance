@@ -188,13 +188,13 @@ class InsightsHelper(object):
             if num_matches_by_week == 0:
                 week_average = 0
             else:
-                week_average = float(week_match_sum)/num_matches_by_week
+                week_average = float(week_match_sum)/num_matches_by_week/2
             match_averages_by_week.append((week, week_average))
             
             if elim_num_matches_by_week == 0:
                 elim_week_average = 0
             else:
-                elim_week_average = float(elim_week_match_sum)/elim_num_matches_by_week
+                elim_week_average = float(elim_week_match_sum)/elim_num_matches_by_week/2
             elim_match_averages_by_week.append((week, elim_week_average))
             
         insights = []
