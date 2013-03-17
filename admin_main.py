@@ -4,7 +4,7 @@ import webapp2
 
 import tba_config
 
-from controllers.admin.admin_event_controller import AdminEventCreate, AdminEventDelete, AdminEventDetail, AdminEventEdit, AdminEventList
+from controllers.admin.admin_event_controller import AdminEventAddWebcast, AdminEventCreate, AdminEventDelete, AdminEventDetail, AdminEventEdit, AdminEventList
 from controllers.admin.admin_main_controller import AdminDebugHandler, AdminMain, AdminTasksHandler
 from controllers.admin.admin_award_controller import AdminAwardDashboard, AdminAwardEdit, AdminAwardAdd
 from controllers.admin.admin_match_controller import AdminVideosAdd, AdminMatchCleanup, AdminMatchDashboard, AdminMatchDetail, AdminMatchAdd, AdminMatchEdit
@@ -15,6 +15,7 @@ from controllers.admin.admin_team_controller import AdminTeamDetail, AdminTeamLi
 app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/debug', AdminDebugHandler),
                                ('/admin/events', AdminEventList),
+                               ('/admin/event/add_webcast/(.*)', AdminEventAddWebcast),
                                ('/admin/event/create', AdminEventCreate),
                                ('/admin/event/delete/(.*)', AdminEventDelete),
                                ('/admin/event/edit/(.*)', AdminEventEdit),
