@@ -10,6 +10,7 @@ from google.appengine.ext.webapp import template
 from helpers.event_manipulator import EventManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.match_manipulator import MatchManipulator
+from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
 from models.award import Award
 from models.event import Event
 from models.event_team import EventTeam
@@ -140,6 +141,8 @@ class AdminEventAddWebcast(webapp.RequestHandler):
             event.webcast_json = json.dumps([webcast])
         event.dirty = True
         EventManipulator.createOrUpdate(event)
+
+        MemcacheWebcastFlusher.flush()
 
         self.redirect("/admin/event/" + event.key_name)
 
