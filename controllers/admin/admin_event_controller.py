@@ -18,6 +18,8 @@ from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
 
+import tba_config
+
 class AdminEventAddWebcast(webapp.RequestHandler):
     """
     Add a webcast to an Event.
@@ -59,10 +61,15 @@ class AdminEventCreateTest(webapp.RequestHandler):
     Create a test event that is happening now.
     """
     def get(self):
-        EventTestCreator.createPastEvent()
-        EventTestCreator.createFutureEvent()
-        EventTestCreator.createPresentEvent()
-        self.redirect("/events/")
+        if tba_config.CONFIG["env"] != "prod":
+            EventTestCreator.createPastEvent()
+            EventTestCreator.createFutureEvent()
+            EventTestCreator.createPresentEvent()
+            self.redirect("/events/")
+        else:
+            logging.error("{} tried to create test events in prod! No can do.".format(
+                users.get_current_user().email()))
+            self.redirect("/admin/")
 
 
 class AdminEventDelete(webapp.RequestHandler):
