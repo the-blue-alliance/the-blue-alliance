@@ -62,13 +62,13 @@ class MatchTestCreator(object):
         comp_level = "qm"
         set_number = 1
         complete = True
-        matches = [self.buildTestMatch(comp_level, set_number, match_number, complete) for match_number in range(1,10)]
+        matches = [self.buildTestMatch(comp_level, set_number, match_number, complete) for match_number in range(1,11)]
         MatchManipulator.createOrUpdate(matches)
 
     def createIncompleteQuals(self):
         comp_level = "qm"
         set_number = 1
         complete = False
-        matches = [self.buildTestMatch(comp_level, set_number, match_number, complete) for match_number in range(11,20)]
+        matches = [self.buildTestMatch(comp_level, set_number, match_number, complete) for match_number in range(11,21)]
         MatchManipulator.createOrUpdate(matches)
 
