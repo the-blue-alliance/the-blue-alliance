@@ -7,6 +7,7 @@ from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
+from helpers.event.event_test_creator import EventTestCreator
 from helpers.event_manipulator import EventManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.match_manipulator import MatchManipulator
@@ -51,6 +52,17 @@ class AdminEventCreate(webapp.RequestHandler):
     def get(self):
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_create.html')
         self.response.out.write(template.render(path, {}))
+
+
+class AdminEventCreateTest(webapp.RequestHandler):
+    """
+    Create a test event that is happening now.
+    """
+    def get(self):
+        EventTestCreator.createPastEvent()
+        EventTestCreator.createFutureEvent()
+        EventTestCreator.createPresentEvent()
+        self.redirect("/events/")
 
 
 class AdminEventDelete(webapp.RequestHandler):

@@ -5,8 +5,7 @@ import json
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
-from helpers.event_manipulator import EventManipulator
-from models.event import Event
+from helpers.event.event_test_creator import EventTestCreator
 
 class TestEventManipulator(unittest2.TestCase):
     def setUp(self):
@@ -15,44 +14,9 @@ class TestEventManipulator(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
 
-        self.future_event = Event(
-            id = "2011ct",
-            end_date = datetime.datetime.today() + datetime.timedelta(days=5),
-            event_short = "ct",
-            event_type = "Regional",
-            first_eid = "5561",
-            name = "Northeast Utilities FIRST Connecticut Regional",
-            start_date = datetime.datetime.today() + datetime.timedelta(days=1),
-            year = 2011,
-            venue_address = "Connecticut Convention Center\r\n100 Columbus Blvd\r\nHartford, CT 06103\r\nUSA",
-            website = "http://www.ctfirst.org/ctr"
-        )
-
-        self.present_event = Event(
-            id = "2011ct",
-            end_date = datetime.datetime.today() + datetime.timedelta(days=1),
-            event_short = "ct",
-            event_type = "Regional",
-            first_eid = "5561",
-            name = "Northeast Utilities FIRST Connecticut Regional",
-            start_date = datetime.datetime.today() - datetime.timedelta(days=2),
-            year = 2011,
-            venue_address = "Connecticut Convention Center\r\n100 Columbus Blvd\r\nHartford, CT 06103\r\nUSA",
-            website = "http://www.ctfirst.org/ctr"
-        )
-
-        self.past_event = Event(
-            id = "2011ct",
-            end_date = datetime.datetime.today() - datetime.timedelta(days=1),
-            event_short = "ct",
-            event_type = "Regional",
-            first_eid = "5561",
-            name = "Northeast Utilities FIRST Connecticut Regional",
-            start_date = datetime.datetime.today() - datetime.timedelta(days=5),
-            year = 2011,
-            venue_address = "Connecticut Convention Center\r\n100 Columbus Blvd\r\nHartford, CT 06103\r\nUSA",
-            website = "http://www.ctfirst.org/ctr"
-        )
+        self.future_event = EventTestCreator.createFutureEvent()
+        self.present_event = EventTestCreator.createPresentEvent()
+        self.past_event = EventTestCreator.createPastEvent()
         
     def tearDown(self):
         self.testbed.deactivate()
