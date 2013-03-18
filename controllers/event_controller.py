@@ -154,7 +154,7 @@ class EventDetail(CacheableHandler):
         }
 
         if event.within_a_day:
-            self._cache_expiration = SHORT_CACHE_EXPIRATION
+            self._cache_expiration = self.SHORT_CACHE_EXPIRATION
             
         path = os.path.join(os.path.dirname(__file__), '../templates/event_details.html')
         return template.render(path, template_values)
