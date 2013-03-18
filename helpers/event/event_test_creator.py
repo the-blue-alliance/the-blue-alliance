@@ -45,9 +45,6 @@ class EventTestCreator(object):
         event = EventManipulator.createOrUpdate(event)
         if not only_event:
             EventTeamTestCreator.createEventTeams(event)
-
-            event.prepTeams()
-
             mtc = MatchTestCreator(event)
             mtc.createCompleteQuals()
             mtc.createIncompleteQuals()
@@ -70,9 +67,6 @@ class EventTestCreator(object):
         event =  EventManipulator.createOrUpdate(event)
         if not only_event:
             EventTeamTestCreator.createEventTeams(event)
-
-            event.prepTeams()
-
             mtc = MatchTestCreator(event)
             mtc.createCompleteQuals()
         return event
