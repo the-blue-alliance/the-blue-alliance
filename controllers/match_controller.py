@@ -14,11 +14,15 @@ class MatchDetail(CacheableHandler):
     """
     Display a Match.
     """
+
+    LONG_CACHE_EXPIRATION = 60 * 60 * 24
+    SHORT_CACHE_EXPIRATION = 60 * 5
+
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 5
+        self._cache_expiration = LONG_CACHE_EXPIRATION
         self._cache_key = "match_detail_{}" # (match_key)
-        self._cache_version = 3
+        self._cache_version = 4
 
     def get(self, match_key):
         if not match_key:
@@ -43,6 +47,9 @@ class MatchDetail(CacheableHandler):
             "event": event,
             "match": match,
         }
+
+        if event.within_a_day:
+            self._cache_expiration = SHORT_CACHE_EXPIRATION
         
         path = os.path.join(os.path.dirname(__file__), '../templates/match_details.html')
         return template.render(path, template_values)
