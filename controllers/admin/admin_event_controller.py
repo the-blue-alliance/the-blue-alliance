@@ -17,6 +17,32 @@ from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
 
+class AdminEventAddWebcast(webapp.RequestHandler):
+    """
+    Add a webcast to an Event.
+    """
+    def post(self, event_key_id):
+
+        webcast = dict()
+        webcast["type"] = self.request.get("webcast_type")
+        webcast["channel"] = self.request.get("webcast_channel")
+        if self.request.get("webcast_file"):
+            webcast["file"] = self.request.get("webcast_channel")
+
+        event = Event.get_by_id(event_key_id)
+        if event.webcast:
+            webcasts = event.webcast
+            webcasts.append(webcast)
+            event.webcast_json = json.dumps(webcasts)
+        else:
+            event.webcast_json = json.dumps([webcast])
+        event.dirty = True
+        EventManipulator.createOrUpdate(event)
+
+        MemcacheWebcastFlusher.flush()
+
+        self.redirect("/admin/event/" + event.key_name)
+
 
 class AdminEventCreate(webapp.RequestHandler):
     """
@@ -25,6 +51,7 @@ class AdminEventCreate(webapp.RequestHandler):
     def get(self):
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_create.html')
         self.response.out.write(template.render(path, {}))
+
 
 class AdminEventDelete(webapp.RequestHandler):
     """
@@ -58,6 +85,7 @@ class AdminEventDelete(webapp.RequestHandler):
 
         self.redirect("/admin/events?deleted=%s" % event_key_id)
 
+
 class AdminEventDetail(webapp.RequestHandler):
     """
     Show an Event.
@@ -74,6 +102,7 @@ class AdminEventDetail(webapp.RequestHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_details.html')
         self.response.out.write(template.render(path, template_values))
+
 
 class AdminEventEdit(webapp.RequestHandler):
     """
@@ -120,31 +149,6 @@ class AdminEventEdit(webapp.RequestHandler):
         
         self.redirect("/admin/event/" + event.key_name)
 
-class AdminEventAddWebcast(webapp.RequestHandler):
-    """
-    Add a webcast to an Event.
-    """
-    def post(self, event_key_id):
-
-        webcast = dict()
-        webcast["type"] = self.request.get("webcast_type")
-        webcast["channel"] = self.request.get("webcast_channel")
-        if self.request.get("webcast_file"):
-            webcast["file"] = self.request.get("webcast_channel")
-
-        event = Event.get_by_id(event_key_id)
-        if event.webcast:
-            webcasts = event.webcast
-            webcasts.append(webcast)
-            event.webcast_json = json.dumps(webcasts)
-        else:
-            event.webcast_json = json.dumps([webcast])
-        event.dirty = True
-        EventManipulator.createOrUpdate(event)
-
-        MemcacheWebcastFlusher.flush()
-
-        self.redirect("/admin/event/" + event.key_name)
 
 class AdminEventList(webapp.RequestHandler):
     """
