@@ -82,11 +82,15 @@ class EventDetail(CacheableHandler):
     Show an Event.
     event_code like "2010ct"
     """
+
+    LONG_CACHE_EXPIRATION = 60 * 60 * 24
+    SHORT_CACHE_EXPIRATION = 60 * 5
+
     def __init__(self, *args, **kw):
         super(EventDetail, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 5
+        self._cache_expiration = self.LONG_CACHE_EXPIRATION
         self._cache_key = "event_detail_{}" # (event_key)
-        self._cache_version = 2
+        self._cache_version = 3
 
     def get(self, event_key):
         if not event_key:
@@ -148,6 +152,9 @@ class EventDetail(CacheableHandler):
             "oprs": oprs,
             "bracket_table": bracket_table,
         }
+
+        if event.within_a_day:
+            self._cache_expiration = SHORT_CACHE_EXPIRATION
             
         path = os.path.join(os.path.dirname(__file__), '../templates/event_details.html')
         return template.render(path, template_values)
