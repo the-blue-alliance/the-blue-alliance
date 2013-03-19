@@ -100,18 +100,19 @@ class EventHelper(object):
         return self.calculateTeamWLTFromMatches(team_key, matches)
       
     @classmethod
-    def getUpcomingEvents(self):
+    def getWeekEvents(self):
         """
-        Get upcoming events this week
+        Get events this week
         """
         next_events = Event.query(Event.start_date >= (datetime.datetime.today() - datetime.timedelta(days=12)))
         next_events.order(Event.start_date).fetch(20)
         
-        upcoming_events = []
+        events = []
         for event in next_events:
             if event.end_date.date() >= datetime.date.today():
-                upcoming_events.append(event)
-        if len(upcoming_events) > 0:
-            first_start_date = upcoming_events[0].start_date     
-        upcoming_events = [e for e in upcoming_events if ((e.start_date - datetime.timedelta(days=6)) < first_start_date)]
-        return upcoming_events
+                events.append(event)
+        # Only show events that are happening "the same week" as the first one
+        if len(events) > 0:
+            first_start_date = events[0].start_date     
+        events = [e for e in events if ((e.start_date - datetime.timedelta(days=6)) < first_start_date)]
+        return events

@@ -57,11 +57,9 @@ class MainCompetitionseasonHandler(CacheableHandler):
         self._cache_version = 5
 
     def _render(self, *args, **kw):
-        
-        # Only show events that are happening "the same week" as the first one
-        upcoming_events = EventHelper.getUpcomingEvents()
+        week_events = EventHelper.getWeekEvents()
         template_values = {
-            "events": upcoming_events,
+            "events": week_events,
         }
         
         path = os.path.join(os.path.dirname(__file__), '../templates/index_competitionseason.html')
@@ -161,8 +159,8 @@ class GamedayHandler(CacheableHandler):
 
         ongoing_events = []
         ongoing_events_w_webcasts = []
-        upcoming_events = EventHelper.getUpcomingEvents()
-        for event in upcoming_events:
+        week_events = EventHelper.getWeekEvents()
+        for event in week_events:
             if event.within_a_day:
                 ongoing_events.append(event)
                 if event.webcast:
