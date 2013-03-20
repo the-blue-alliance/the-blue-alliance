@@ -128,14 +128,5 @@ class EventHelper(object):
                 offset = event.start_date.date() - closest_thursday.date()
                 if (offset == datetime.timedelta(0)) or (offset > datetime.timedelta(0) and offset < datetime.timedelta(4)):
                     events.append(event)
-        
-        """
-        for event in next_events:
-            if event.end_date.date() >= datetime.date.today():
-                events.append(event)
-        # Only show events that are happening "the same week" as the first one
-        if len(events) > 0:
-            first_start_date = events[0].start_date     
-        events = [e for e in events if ((e.start_date - datetime.timedelta(days=6)) < first_start_date)]
-        """
+                    
         return events
