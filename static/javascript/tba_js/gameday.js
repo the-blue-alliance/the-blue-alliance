@@ -216,10 +216,10 @@ function setupView(viewNum, $item) {
 		// Combines the video player with overlay
 		var viewContents = player + "<div id='overlay_" + viewNum + "' class='overlay' alt='" + eventName + "'>" +
 		"<div class='overlay-title'>" + eventName + "</div>" +
-		"<div id='close_" + viewNum + "' class='view-close'>" +
-		"<i class='icon-remove icon-white' rel='tooltip' data-placement='left' title='Close'></i></div>" +
-		"<div id='swap_" + viewNum + "' class='swap'>" +
-		"<i class='icon-move icon-white' rel='tooltip' data-placement='left' title='Drag to another screen to swap'></i></div></div>";
+		"<div id='close_" + viewNum + "' class='view-close' rel='tooltip' data-placement='left' title='Close'>" +
+		"<i class='icon-remove icon-white'></i></div>" +
+		"<div id='swap_" + viewNum + "' class='swap' rel='tooltip' data-placement='left' title='Drag to another screen to swap'>" +
+		"<i class='icon-move icon-white'></i></div></div>";
 		
 		hiddenviews[viewNum] = viewContents;
 		document.getElementById('view_' + viewNum).innerHTML = hiddenviews[viewNum];
