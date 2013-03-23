@@ -2,8 +2,10 @@ import logging
 
 from google.appengine.api import memcache
 
-from controllers.main_controller import MainCompetitionseasonHandler, GamedayHandler, WebcastsHandler
+
+from controllers.ajax_controller import WebcastHandler
 from controllers.event_controller import EventList
+from controllers.main_controller import MainCompetitionseasonHandler, GamedayHandler, WebcastsHandler
 
 class MemcacheWebcastFlusher(object):
     @classmethod
@@ -15,4 +17,10 @@ class MemcacheWebcastFlusher(object):
         flushed.append(WebcastsHandler().memcacheFlush())
         flushed.append(EventList().memcacheFlush())
 
+        return flushed
+
+    @classmethod
+    def flushEvent(self, event_key):
+        flushed = self.flush()
+        flushed.append(WebcastHandler().memcacheFlush(event_key))
         return flushed

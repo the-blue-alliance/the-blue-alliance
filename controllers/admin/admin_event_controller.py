@@ -42,7 +42,7 @@ class AdminEventAddWebcast(webapp.RequestHandler):
         event.dirty = True
         EventManipulator.createOrUpdate(event)
 
-        MemcacheWebcastFlusher.flush()
+        MemcacheWebcastFlusher.flushEvent(event.key_name)
 
         self.redirect("/admin/event/" + event.key_name)
 

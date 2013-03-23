@@ -95,3 +95,9 @@ class WebcastHandler(CacheableHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../templates/webcast/' + webcast_type + '.html')
         return template.render(path, template_values)
+
+    def memcacheFlush(self, event_key):
+        keys = [self.cache_key.format(event_key, n) for n in range(10)]
+        memcache.delete_multi(keys)
+        return keys
+
