@@ -72,9 +72,9 @@ class Event(ndb.Model):
     def withinDays(self, negative_days_before, days_after):
         if not self.start_date or not self.end_date:
             return False
-
-        after_start = self.start_date.date() + datetime.timedelta(days=negative_days_before) <= datetime.datetime.today().date()
-        before_end = self.end_date.date() + datetime.timedelta(days=days_after) >= datetime.datetime.today().date()
+        today = datetime.datetime.today()
+        after_start = self.start_date.date() + datetime.timedelta(days=negative_days_before) <= today.date()
+        before_end = self.end_date.date() + datetime.timedelta(days=days_after) >= today.date()
 
         return (after_start and before_end)
 

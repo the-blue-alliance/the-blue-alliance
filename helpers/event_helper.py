@@ -100,18 +100,33 @@ class EventHelper(object):
         return self.calculateTeamWLTFromMatches(team_key, matches)
       
     @classmethod
-    def getUpcomingEvents(self):
+    def getWeekEvents(self):
         """
-        Get upcoming events this week
+        Get events this week
+        In general, if an event is currently going on, it shows up in this query 
+        An event shows up in this query iff:
+        a) The event is within_a_day
+        OR
+        b) The event.start_date is on or within 4 days after the closest Thursday
         """
-        next_events = Event.query(Event.start_date >= (datetime.datetime.today() - datetime.timedelta(days=12)))
-        next_events.order(Event.start_date).fetch(20)
+        today = datetime.datetime.today()
         
-        upcoming_events = []
-        for event in next_events:
-            if event.end_date.date() >= datetime.date.today():
-                upcoming_events.append(event)
-        if len(upcoming_events) > 0:
-            first_start_date = upcoming_events[0].start_date     
-        upcoming_events = [e for e in upcoming_events if ((e.start_date - datetime.timedelta(days=6)) < first_start_date)]
-        return upcoming_events
+        two_weeks_of_events = Event.query() # Make sure all events to be returned are within range
+        two_weeks_of_events = two_weeks_of_events.filter(Event.start_date >= (today - datetime.timedelta(days=7)))
+        two_weeks_of_events = two_weeks_of_events.filter(Event.start_date <= (today + datetime.timedelta(days=7)))
+        two_weeks_of_events = two_weeks_of_events.order(Event.start_date)
+        two_weeks_of_events = two_weeks_of_events.fetch(50)
+        
+        events = []
+        diff_from_thurs = 3 - today.weekday() # 3 is Thursday. diff_from_thurs ranges from 3 to -3 (Monday thru Sunday)
+        closest_thursday = today + datetime.timedelta(days=diff_from_thurs)
+        
+        for event in two_weeks_of_events:
+            if event.within_a_day:
+                events.append(event)
+            else:
+                offset = event.start_date.date() - closest_thursday.date()
+                if (offset == datetime.timedelta(0)) or (offset > datetime.timedelta(0) and offset < datetime.timedelta(4)):
+                    events.append(event)
+                    
+        return events
