@@ -30,7 +30,7 @@ class AdminEventAddWebcast(webapp.RequestHandler):
         webcast["type"] = self.request.get("webcast_type")
         webcast["channel"] = self.request.get("webcast_channel")
         if self.request.get("webcast_file"):
-            webcast["file"] = self.request.get("webcast_channel")
+            webcast["file"] = self.request.get("webcast_file")
 
         event = Event.get_by_id(event_key_id)
         if event.webcast:
