@@ -50,7 +50,7 @@ class MatchManipulator(ManipulatorBase):
         for attr in list_attrs:
             if len(getattr(new_match, attr)) > 0:
                 if getattr(new_match, attr) != getattr(old_match, attr):
-                    setattr(new_match, attr, getattr(new_match, attr))
+                    setattr(old_match, attr, getattr(new_match, attr))
                     old_match.dirty = True
                     
         if push_match:
