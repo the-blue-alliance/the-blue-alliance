@@ -130,3 +130,12 @@ class EventHelper(object):
                     events.append(event)
                     
         return events
+
+    @classmethod
+    def getEventsWithinADay(self):
+        week_events = self.getWeekEvents()
+        ret = []
+        for event in week_events:
+            if event.within_a_day:
+                ret.append(event)
+        return ret

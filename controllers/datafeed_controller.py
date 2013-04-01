@@ -14,6 +14,7 @@ from datafeeds.datafeed_usfirst import DatafeedUsfirst
 from datafeeds.datafeed_offseason import DatafeedOffseason
 from datafeeds.datafeed_twitter import DatafeedTwitter
 
+from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.match_manipulator import MatchManipulator
@@ -178,15 +179,12 @@ class UsfirstAwardsEnqueue(webapp.RequestHandler):
     Handles enqueing getting awards for USFIRST events.
     """
     def get(self, when):
-        events = Event.query(Event.official == True)
-        
         if when == "now":
-            events = events.filter(Event.end_date <= datetime.datetime.today() + datetime.timedelta(days=4))
-            events = events.filter(Event.end_date >= datetime.datetime.today() - datetime.timedelta(days=1))
+            events = EventHelper.getEventsWithinADay()
         else:
+            events = Event.query(Event.official == True)
             events = events.filter(Event.year == int(when))
-        
-        events = events.fetch(500)
+            events = events.fetch(500)
         
         for event in events:
             taskqueue.add(
@@ -247,15 +245,13 @@ class UsfirstMatchesEnqueue(webapp.RequestHandler):
     Handles enqueing getting match results for USFIRST events.
     """
     def get(self, when):
-        events = Event.query(Event.official == True)
-        
         if when == "now":
-            events = events.filter(Event.end_date <= datetime.datetime.today() + datetime.timedelta(days=4))
-            events = events.filter(Event.end_date >= datetime.datetime.today() - datetime.timedelta(days=1))
+            events = EventHelper.getEventsWithinADay()
         else:
+            events = Event.query(Event.official == True)
             events = events.filter(Event.year == int(when))
+            events = events.fetch(500)
         
-        events = events.fetch(500)
         for event in events:
             taskqueue.add(
                 queue_name='usfirst',
@@ -293,15 +289,13 @@ class UsfirstEventRankingsEnqueue(webapp.RequestHandler):
     Handles enqueing getting rankings for USFIRST events.
     """
     def get(self, when):
-        events = Event.query(Event.official == True)
-        
         if when == "now":
-            events = events.filter(Event.end_date <= datetime.datetime.today() + datetime.timedelta(days=4))
-            events = events.filter(Event.end_date >= datetime.datetime.today() - datetime.timedelta(days=1))
+            events = EventHelper.getEventsWithinADay()
         else:
+            events = Event.query(Event.official == True)
             events = events.filter(Event.year == int(when))
-        
-        events = events.fetch(500)
+            events = events.fetch(500)
+            
         for event in events:
             taskqueue.add(
                 queue_name='usfirst',
