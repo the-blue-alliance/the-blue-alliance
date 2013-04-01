@@ -78,10 +78,12 @@ class TeamList(CacheableHandler):
         
 # The view of a single Team.
 class TeamDetail(CacheableHandler):
+    LONG_CACHE_EXPIRATION = 60 * 60 * 24
+    SHORT_CACHE_EXPIRATION = 60 * 5
 
     def __init__(self, *args, **kw):
         super(TeamDetail, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 5
+        self._cache_expiration = self.LONG_CACHE_EXPIRATION
         self._cache_key = "team_detail_{}_{}_{}" # (team_number, year, explicit_year)
         self._cache_version = 2
 
@@ -140,6 +142,7 @@ class TeamDetail(CacheableHandler):
 
         current_event = None
         matches_upcoming = None
+        short_cache = False
         for e in events:
             awards = AwardHelper.organizeAwards([award for award in awards_future.get_result() if award.event == e.key])
             matches = e.team_matches_future.get_result()
@@ -148,6 +151,10 @@ class TeamDetail(CacheableHandler):
             if e.now:
                 current_event = e
                 matches_upcoming = MatchHelper.upcomingMatches(matches)
+                
+            if event.within_a_day:
+                short_cache = True
+                
 
             wlt = EventHelper.calculateTeamWLTFromMatches(team.key_name, matches)
             year_wlt_list.append(wlt)
@@ -185,6 +192,9 @@ class TeamDetail(CacheableHandler):
                             "year_wlt": year_wlt,
                             "current_event": current_event,
                             "matches_upcoming": matches_upcoming }
+        
+        if short_cache:
+            self._cache_expiration = self.SHORT_CACHE_EXPIRATION
         
         path = os.path.join(os.path.dirname(__file__), '../templates/team_details.html')
         return template.render(path, template_values)
