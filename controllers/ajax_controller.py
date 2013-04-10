@@ -33,10 +33,11 @@ class TypeaheadHandler(CacheableHandler):
         super(TypeaheadHandler, self).get()
 
     def _render(self):
-        event_keys = Event.query().order(-Event.year).order(Event.name).fetch(keys_only=True)
-        events = ndb.get_multi(event_keys)
-        team_keys = Team.query().order(Team.team_number).fetch(keys_only=True)
-        teams = ndb.get_multi(team_keys)
+        event_keys_future = Event.query().order(-Event.year).order(Event.name).fetch_async(keys_only=True)
+        team_keys_future = Team.query().order(Team.team_number).fetch_async(keys_only=True)
+        
+        events = ndb.get_multi(event_keys_future.get_result())
+        teams = ndb.get_multi(team_keys_future.get_result())
 
         results = []
         for event in events:

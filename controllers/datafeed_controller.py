@@ -183,9 +183,9 @@ class UsfirstAwardsEnqueue(webapp.RequestHandler):
         if when == "now":
             events = EventHelper.getEventsWithinADay()
         else:
-            event_keys = Event.query(Event.official == True)
-            event_keys = event_keys.filter(Event.year == int(when))
-            event_keys = event_keys.fetch(500, keys_only=True)
+            event_keys = Event.query(Event.official == True)\
+              .filter(Event.year == int(when))\
+              .fetch(500, keys_only=True)
             events = ndb.get_multi(event_keys)
         
         for event in events:
@@ -250,9 +250,9 @@ class UsfirstMatchesEnqueue(webapp.RequestHandler):
         if when == "now":
             events = EventHelper.getEventsWithinADay()
         else:
-            event_keys = Event.query(Event.official == True)
-            event_keys = event_keys.filter(Event.year == int(when))
-            event_keys = event_keys.fetch(500, keys_only=True)
+            event_keys = Event.query(Event.official == True)\
+              .filter(Event.year == int(when))\
+              .fetch(500, keys_only=True)
             events = ndb.get_multi(event_keys)
         
         for event in events:
@@ -295,9 +295,9 @@ class UsfirstEventRankingsEnqueue(webapp.RequestHandler):
         if when == "now":
             events = EventHelper.getEventsWithinADay()
         else:
-            event_keys = Event.query(Event.official == True)
-            event_keys = event_keys.filter(Event.year == int(when))
-            event_keys = event_keys.fetch(500, keys_only=True)
+            event_keys = Event.query(Event.official == True)\
+              .filter(Event.year == int(when))\
+              .fetch(500, keys_only=True)
             events = ndb.get_multi(event_keys)
             
         for event in events:

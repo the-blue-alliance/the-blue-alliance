@@ -114,17 +114,18 @@ class EventHelper(object):
         """
         today = datetime.datetime.today()
         
-        two_weeks_of_events_keys = Event.query() # Make sure all events to be returned are within range
-        two_weeks_of_events_keys = two_weeks_of_events_keys.filter(Event.start_date >= (today - datetime.timedelta(days=7)))
-        two_weeks_of_events_keys = two_weeks_of_events_keys.filter(Event.start_date <= (today + datetime.timedelta(days=7)))
-        two_weeks_of_events_keys = two_weeks_of_events_keys.order(Event.start_date)
-        two_weeks_of_events_keys = two_weeks_of_events_keys.fetch(50, keys_only=True)
-        two_weeks_of_events = ndb.get_multi(two_weeks_of_events_keys)
+        # Make sure all events to be returned are within range
+        two_weeks_of_events_keys_future = Event.query()\
+          .filter(Event.start_date >= (today - datetime.timedelta(days=7)))\
+          .filter(Event.start_date <= (today + datetime.timedelta(days=7)))\
+          .order(Event.start_date)\
+          .fetch_async(50, keys_only=True)
         
         events = []
         diff_from_thurs = 3 - today.weekday() # 3 is Thursday. diff_from_thurs ranges from 3 to -3 (Monday thru Sunday)
         closest_thursday = today + datetime.timedelta(days=diff_from_thurs)
         
+        two_weeks_of_events = ndb.get_multi(two_weeks_of_events_keys_future.get_result())
         for event in two_weeks_of_events:
             if event.within_a_day:
                 events.append(event)
