@@ -2,6 +2,8 @@ import logging
 import collections
 import datetime
 
+from google.appengine.ext import ndb
+
 from models.event import Event
 from models.match import Match
 from models.team import Team
@@ -96,8 +98,9 @@ class EventHelper(object):
         """
         Given a team_key, and an event, find the team's Win Loss Tie.
         """
-        matches = Match.query(Match.event == event.key, Match.team_key_names == team_key).fetch(500)
-        return self.calculateTeamWLTFromMatches(team_key, matches)
+        match_keys = Match.query(Match.event == event.key, Match.team_key_names == team_key)\
+          .fetch(500, keys_only=True)
+        return self.calculateTeamWLTFromMatches(team_key, ndb.get_multi(match_keys))
       
     @classmethod
     def getWeekEvents(self):
@@ -111,11 +114,12 @@ class EventHelper(object):
         """
         today = datetime.datetime.today()
         
-        two_weeks_of_events = Event.query() # Make sure all events to be returned are within range
-        two_weeks_of_events = two_weeks_of_events.filter(Event.start_date >= (today - datetime.timedelta(days=7)))
-        two_weeks_of_events = two_weeks_of_events.filter(Event.start_date <= (today + datetime.timedelta(days=7)))
-        two_weeks_of_events = two_weeks_of_events.order(Event.start_date)
-        two_weeks_of_events = two_weeks_of_events.fetch(50)
+        two_weeks_of_events_keys = Event.query() # Make sure all events to be returned are within range
+        two_weeks_of_events_keys = two_weeks_of_events_keys.filter(Event.start_date >= (today - datetime.timedelta(days=7)))
+        two_weeks_of_events_keys = two_weeks_of_events_keys.filter(Event.start_date <= (today + datetime.timedelta(days=7)))
+        two_weeks_of_events_keys = two_weeks_of_events_keys.order(Event.start_date)
+        two_weeks_of_events_keys = two_weeks_of_events_keys.fetch(50, keys_only=True)
+        two_weeks_of_events = ndb.get_multi(two_weeks_of_events_keys)
         
         events = []
         diff_from_thurs = 3 - today.weekday() # 3 is Thursday. diff_from_thurs ranges from 3 to -3 (Monday thru Sunday)

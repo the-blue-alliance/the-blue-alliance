@@ -56,7 +56,11 @@ class TeamList(CacheableHandler):
         if start == 0:
             start = 1
 
-        teams = Team.query().order(Team.team_number).filter(Team.team_number >= start).filter(Team.team_number < stop).fetch(10000)        
+        team_keys = Team.query().order(Team.team_number)\
+          .filter(Team.team_number >= start)\
+          .filter(Team.team_number < stop)\
+          .fetch(10000, keys_only=True)
+        teams = ndb.get_multi(team_keys)        
 
         num_teams = len(teams)
         middle_value = num_teams/2
@@ -120,7 +124,9 @@ class TeamDetail(CacheableHandler):
         if not team:
             return self.redirect("/error/404")
         
-        event_teams = EventTeam.query(EventTeam.team == team.key).fetch(1000)
+        event_teams_keys = EventTeam.query(EventTeam.team == team.key)\
+          .fetch(1000, keys_only=True)
+        event_teams = ndb.get_multi(event_teams_keys)
         event_keys = [event_team.event for event_team in event_teams if event_team.year == year]
         events = ndb.get_multi(event_keys)
 
@@ -131,9 +137,11 @@ class TeamDetail(CacheableHandler):
         
         years = sorted(set([a.year for a in event_teams if a.year != None]))
         
-        awards_future = Award.query(Award.year == year, Award.team == team.key).fetch_async(500)
+        award_keys_future = Award.query(Award.year == year, Award.team == team.key)\
+          .fetch_async(500, keys_only=True)
         for e in events:
-            e.team_matches_future = Match.query(Match.event == e.key, Match.team_key_names == team.key_name).fetch_async(500)
+            e.team_matches_keys_future = Match.query(Match.event == e.key, Match.team_key_names == team.key_name)\
+              .fetch_async(500, keys_only=True)
 
         # Return an array of event names and a list of matches from that event that the
         # team was a participant in.
@@ -144,8 +152,10 @@ class TeamDetail(CacheableHandler):
         matches_upcoming = None
         short_cache = False
         for e in events:
-            awards = AwardHelper.organizeAwards([award for award in awards_future.get_result() if award.event == e.key])
-            matches = e.team_matches_future.get_result()
+            award_keys = award_keys_future.get_result()
+            awards = AwardHelper.organizeAwards([award for award in ndb.get_multi(award_keys)() if award.event == e.key])
+            match_keys = e.team_matches_keys_future.get_result()
+            matches = ndb.get_multi(match_keys)
             matches_organized = MatchHelper.organizeMatches(matches)
             
             if e.now:

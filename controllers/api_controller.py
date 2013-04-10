@@ -6,7 +6,7 @@ import webapp2
 from datetime import datetime
 
 from google.appengine.api import memcache
-from google.appengine.ext import db
+from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 import tba_config
@@ -88,7 +88,8 @@ class ApiEventList(MainApiHandler):
 
         if event_list is None:
             event_list = []
-            events = Event.query(Event.year == year).fetch(500)
+            event_keys = Event.query(Event.year == year).fetch(500, keys_only=True)
+            events = ndb.get_multi(event_keys)
             for event in events:
                 event_dict = dict()
                 event_dict["key"] = event.key_name
@@ -160,7 +161,8 @@ class CsvTeamsAll(MainApiHandler):
         output = memcache.get(memcache_key)
     
         if output is None:
-            teams = Team.query().order(Team.team_number).fetch(10000)        
+            team_keys = Team.query().order(Team.team_number).fetch(10000, keys_only=True)
+            teams = ndb.get_multi(team_keys)
 
             template_values = {
                 "teams": teams

@@ -44,7 +44,8 @@ class Event(ndb.Model):
     def prepAwards(self):
         from models.award import Award
         if self._awards_future is None:
-            self._awards_future = Award.query(Award.event == self.key).fetch_async(500)
+            awards_future_keys = Award.query(Award.event == self.key).fetch(500, keys_only=True)
+            self._awards_future = ndb.get_multi_async(awards_future_keys)
 
     @property
     def awards(self):
@@ -58,7 +59,8 @@ class Event(ndb.Model):
     def prepMatches(self):
         from models.match import Match
         if self._matches_future is None:
-            self._matches_future = Match.query(Match.event == self.key).fetch_async(500)
+            matches_future_keys = Match.query(Match.event == self.key).fetch(500, keys_only=True)
+            self._matches_future = ndb.get_multi_async(matches_future_keys)
 
     @property
     def matches(self):
@@ -93,7 +95,8 @@ class Event(ndb.Model):
         # -gregmarra 20121007
         from models.event_team import EventTeam
         if self._teams_future is None:
-            self._event_teams_future = EventTeam.query(EventTeam.event == self.key).fetch_async(500)
+            event_teams_keys = EventTeam.query(EventTeam.event == self.key).fetch(500, keys_only=True)
+            self._event_teams_future = ndb.get_multi_async(event_teams_keys)
 
     @property
     def teams(self):
