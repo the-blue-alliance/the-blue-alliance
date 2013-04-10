@@ -153,7 +153,7 @@ class TeamDetail(CacheableHandler):
         short_cache = False
         for e in events:
             award_keys = award_keys_future.get_result()
-            awards = AwardHelper.organizeAwards([award for award in ndb.get_multi(award_keys)() if award.event == e.key])
+            awards = AwardHelper.organizeAwards([award for award in ndb.get_multi(award_keys) if award.event == e.key])
             match_keys = e.team_matches_keys_future.get_result()
             matches = ndb.get_multi(match_keys)
             matches_organized = MatchHelper.organizeMatches(matches)

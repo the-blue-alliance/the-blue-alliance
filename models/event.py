@@ -50,10 +50,10 @@ class Event(ndb.Model):
     @property
     def awards(self):
         # This import is ugly, and maybe all the models should be in one file again -gregmarra 20121006
-        from models.award import Award
         if self._awards is None:
-            self.prepAwards()
-            self._awards = self._awards_future.get_result()
+            if self._awards_future is None:
+                self.prepAwards()
+            self._awards = [award.get_result() for award in self._awards_future]
         return self._awards
 
     def prepMatches(self):
@@ -65,10 +65,10 @@ class Event(ndb.Model):
     @property
     def matches(self):
         # This import is ugly, and maybe all the models should be in one file again -gregmarra 20121006
-        from models.match import Match
         if self._matches is None:
-            self.prepMatches()
-            self._matches = self._matches_future.get_result()
+            if self._matches_future is None:
+                self.prepMatches()
+            self._matches = [match.get_result() for match in self._matches_future]
         return self._matches
 
     def withinDays(self, negative_days_before, days_after):
@@ -101,9 +101,10 @@ class Event(ndb.Model):
     @property
     def teams(self):
         # This import is ugly, and maybe all the models should be in one file again -gregmarra 20121006
-        from models.event_team import EventTeam
         if self._teams is None:
-            team_keys = [event_team.team for event_team in self._event_teams_future.get_result()]
+            if self._event_teams_future is None:
+                self.prepTeams()
+            team_keys = [event_team.get_result().team for event_team in self._event_teams_future]
             teams = ndb.get_multi(team_keys)
             self._teams = sorted(teams, key = lambda team: team.team_number) 
         return self._teams
