@@ -27,27 +27,14 @@ class ApiHelper(object):
         if team_dict is None:
             team = Team.get_by_id(team_key)
             if team is not None:
-                team_dict = dict()
-                team_dict["key"] = team.key_name
-                team_dict["team_number"] = team.team_number
-                team_dict["name"] = team.name
-                team_dict["nickname"] = team.nickname
-                team_dict["website"] = team.website
-                team_dict["location"] = team.location
+                team_dict = ApiTemplate.team(team)
 
                 event_teams = EventTeam.query(EventTeam.team == team.key,\
                                               EventTeam.year == datetime.now().year)\
                                               .fetch(1000, projection=[EventTeam.event])
                 team_dict["events"] = [event_team.event.id() for event_team in event_teams]
 
-                try:
-                    team_dict["location"] = team.location
-                    team_dict["locality"] = team.locality
-                    team_dict["region"] = team.region
-                    team_dict["country_name"] = team.country_name
-                except Exception, e:
-                    logging.warning("Failed to include Address for api_team_info_%s: %s" % (team_key, e))
-                
+
                 #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra 
                 if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, team_dict, 2592000)
             else:
@@ -175,3 +162,28 @@ class ApiHelper(object):
             if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, match_dict, (2 * (60 * 60)) )
 
         return match_dict
+
+class ApiTemplate(object):
+
+    @classmethod
+    def team(self, team):
+        """
+        return top level team dictionary
+        """
+        team_dict = dict()
+        team_dict["key"] = team.key_name
+        team_dict["team_number"] = team.team_number
+        team_dict["name"] = team.name
+        team_dict["nickname"] = team.nickname
+        team_dict["website"] = team.website
+        team_dict["location"] = team.location
+
+        try:
+            team_dict["location"] = team.location
+            team_dict["locality"] = team.locality
+            team_dict["region"] = team.region
+            team_dict["country_name"] = team.country_name
+        except Exception, e:
+            logging.warning("Failed to include Address for api_team_info_%s: %s" % (team_key, e))
+
+        return team_dict
