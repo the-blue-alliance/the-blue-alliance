@@ -76,7 +76,18 @@ class TestApiTeamShow(unittest2.TestCase):
         self.assertEqual(team_dict["country_name"], "USA")
         self.assertEqual(team_dict["region"], "SC")
         self.assertEqual(team_dict["website"], self.team.website)
-        self.assertEqual(team_dict["events"][0], self.event.key_name)
+
+        event = team_dict["events"][0]
+        self.assertEqual(event["key"], self.event.key_name)
+        self.assertEqual(event["name"], self.event.name)
+        self.assertEqual(event["short_name"], self.event.short_name)
+        self.assertEqual(event["event_code"], self.event.event_short)
+        self.assertEqual(event["event_type"], self.event.event_type)
+        self.assertEqual(event["year"], self.event.year)
+        self.assertEqual(event["start_date"], self.event.start_date.isoformat())
+        self.assertEqual(event["end_date"], self.event.end_date.isoformat())
+        self.assertEqual(event["official"], self.event.official)
+        self.assertEqual(event["location"], self.event.location)
 
     def testTeamShow(self):
         response = self.testapp.get('/?teams=frc281')

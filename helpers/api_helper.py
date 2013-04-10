@@ -32,7 +32,12 @@ class ApiHelper(object):
                 event_teams = EventTeam.query(EventTeam.team == team.key,\
                                               EventTeam.year == datetime.now().year)\
                                               .fetch(1000, projection=[EventTeam.event])
-                team_dict["events"] = [event_team.event.id() for event_team in event_teams]
+                event_ids = [event_team.event for event_team in event_teams]
+                events = ndb.get_multi(event_ids)
+
+                team_dict["events"] = list()
+                for event in events:
+                    team_dict["events"].append(ApiTemplate.event(event))
 
 
                 #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra 
@@ -187,3 +192,30 @@ class ApiTemplate(object):
             logging.warning("Failed to include Address for api_team_info_%s: %s" % (team_key, e))
 
         return team_dict
+
+    @classmethod
+    def event(self, event):
+        """
+        return top level event dictionary
+        """
+        event_dict = dict()
+        event_dict["key"] = event.key_name
+        event_dict["name"] = event.name
+        event_dict["short_name"] = event.short_name
+        event_dict["event_code"] = event.event_short
+        event_dict["event_type"] = event.event_type
+        event_dict["year"] = event.year
+        event_dict["location"] = event.location
+        event_dict["official"] = event.official
+        event_dict["facebook_eid"] = event.facebook_eid
+
+        if event.start_date:
+            event_dict["start_date"] = event.start_date.isoformat()
+        else:
+            event_dict["start_date"] = None
+        if event.end_date:
+            event_dict["end_date"] = event.end_date.isoformat()
+        else:
+            event_dict["end_date"] = None
+
+        return event_dict
