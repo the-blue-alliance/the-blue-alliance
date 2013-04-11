@@ -32,7 +32,7 @@
                 {% for items in match.alliances.items reversed %}
                 <tr>
                     {% for team in items.1.teams %}
-                        <td class="{{ items.0 }}{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}"><a href="/team/{{ team|slice:"3:" }}">{{ team|slice:"3:" }}</a></td>
+                        <td class="{{ items.0 }}{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}"><a href="/team/{{ team|slice:"3:" }}/{{match.year}}">{{ team|slice:"3:" }}</a></td>
                     {% endfor %}
                     <td class="{{items.0}}Score{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}">{% if items.1.score < 0 %}?{% else %}{{ items.1.score }}{% endif %}</td>
                 </tr>

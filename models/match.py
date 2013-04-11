@@ -130,6 +130,10 @@ class Match(ndb.Model):
     @property
     def event_key_name(self):
         return self.event.id()
+      
+    @property
+    def year(self):
+        return self.event.id()[:4]
     
     @property
     def key_name(self):
