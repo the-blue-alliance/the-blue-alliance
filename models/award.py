@@ -11,14 +11,14 @@ class Award(ndb.Model):
     """
 
     # For checking if an award falls in one of the following categories
-    REGIONAL_WIN_KEYS = set(['win1', 'win2', 'win3', 'win4'])
-    REGIONAL_CA_KEYS = set(['ca', 'ca1', 'ca2'])
-    DIVISION_WIN_KEYS = set(['div_win1', 'div_win2', 'div_win3', 'div_win4'])
-    DIVISION_FIN_KEYS = set(['div_fin1', 'div_fin2', 'div_fin3', 'div_fin'])
-    CHAMPIONSHIP_WIN_KEYS = set(['cmp_win1', 'cmp_win2', 'cmp_win3', 'cmp_win4'])
-    CHAMPIONSHIP_FIN_KEYS = set(['cmp_fin1', 'cmp_fin2', 'cmp_fin3', 'cmp_fin4'])
-    CHAMPIONSHIP_CA_KEYS = set(['cmp_ca'])
-    BLUE_BANNER_KEYS = set(REGIONAL_WIN_KEYS.union(REGIONAL_CA_KEYS).union(DIVISION_WIN_KEYS).union(CHAMPIONSHIP_WIN_KEYS).union(CHAMPIONSHIP_CA_KEYS))
+    REGIONAL_WIN_KEYS = {'win1', 'win2', 'win3', 'win4'}
+    REGIONAL_CA_KEYS = {'ca', 'ca1', 'ca2'}
+    DIVISION_WIN_KEYS = {'div_win1', 'div_win2', 'div_win3', 'div_win4'}
+    DIVISION_FIN_KEYS = {'div_fin1', 'div_fin2', 'div_fin3', 'div_fin'}
+    CHAMPIONSHIP_WIN_KEYS = {'cmp_win1', 'cmp_win2', 'cmp_win3', 'cmp_win4'}
+    CHAMPIONSHIP_FIN_KEYS = {'cmp_fin1', 'cmp_fin2', 'cmp_fin3', 'cmp_fin4'}
+    CHAMPIONSHIP_CA_KEYS = {'cmp_ca'}
+    BLUE_BANNER_KEYS = REGIONAL_WIN_KEYS.union(REGIONAL_CA_KEYS).union(DIVISION_WIN_KEYS).union(CHAMPIONSHIP_WIN_KEYS).union(CHAMPIONSHIP_CA_KEYS)
     
     name = ndb.StringProperty(required=True) #general name used for sorting
     official_name = ndb.StringProperty(indexed=False) #the official name used by first
