@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
@@ -31,14 +32,27 @@ class TypeaheadHandler(CacheableHandler):
         self.response.headers['Pragma'] = 'Public'
         self.response.headers.add_header('content-type', 'application/json', charset='utf-8')        
         super(TypeaheadHandler, self).get()
+        
+    @ndb.tasklet
+    def get_events_async(self):
+        event_keys = yield Event.query().order(-Event.year).order(Event.name).fetch_async(keys_only=True)
+        events = yield ndb.get_multi_async(event_keys)
+        raise ndb.Return(events)
+        
+    @ndb.tasklet
+    def get_teams_async(self):
+        team_keys = yield Team.query().order(Team.team_number).fetch_async(keys_only=True)
+        teams = yield ndb.get_multi_async(team_keys)
+        raise ndb.Return(teams)
+        
+    @ndb.toplevel
+    def get_events_and_teams(self):
+        events, teams = yield self.get_events_async(), self.get_teams_async()
+        raise ndb.Return((events, teams))
 
     def _render(self):
-        event_keys_future = Event.query().order(-Event.year).order(Event.name).fetch_async(keys_only=True)
-        team_keys_future = Team.query().order(Team.team_number).fetch_async(keys_only=True)
+        events, teams = self.get_events_and_teams()
         
-        events = ndb.get_multi(event_keys_future.get_result())
-        teams = ndb.get_multi(team_keys_future.get_result())
-
         results = []
         for event in events:
             results.append({'id': event.key_name, 'name': '%s %s [%s]' % (event.year, event.name, event.event_short.upper())})
@@ -48,7 +62,7 @@ class TypeaheadHandler(CacheableHandler):
             else:
                 nickname = team.nickname
             results.append({'id': team.team_number, 'name': '%s | %s' % (team.team_number, nickname)})
-
+            
         return json.dumps(results)
 
     

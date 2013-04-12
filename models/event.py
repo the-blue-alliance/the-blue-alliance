@@ -32,43 +32,37 @@ class Event(ndb.Model):
 
     def __init__(self, *args, **kw):
         self._awards = None
-        self._awards_future = None
         self._matches = None
-        self._matches_future = None
         self._rankings = None
-        self._teams_future = None
         self._teams = None
         self._webcast = None
         super(Event, self).__init__(*args, **kw)
     
-    def prepAwards(self):
+    @ndb.tasklet
+    def get_awards_async(self):
         from models.award import Award
-        if self._awards_future is None:
-            awards_future_keys = Award.query(Award.event == self.key).fetch(500, keys_only=True)
-            self._awards_future = ndb.get_multi_async(awards_future_keys)
+        award_keys = yield Award.query(Award.event == self.key).fetch_async(500, keys_only=True)
+        self._awards = yield ndb.get_multi_async(award_keys)
 
     @property
     def awards(self):
         # This import is ugly, and maybe all the models should be in one file again -gregmarra 20121006
         if self._awards is None:
-            if self._awards_future is None:
-                self.prepAwards()
-            self._awards = [award.get_result() for award in self._awards_future]
+            self.get_awards_async().wait()
         return self._awards
 
-    def prepMatches(self):
+    @ndb.tasklet
+    def get_matches_async(self):
         from models.match import Match
-        if self._matches_future is None:
-            matches_future_keys = Match.query(Match.event == self.key).fetch(500, keys_only=True)
-            self._matches_future = ndb.get_multi_async(matches_future_keys)
+        match_keys = yield Match.query(Match.event == self.key).fetch_async(500, keys_only=True)
+        self._matches = yield ndb.get_multi_async(match_keys)
 
     @property
     def matches(self):
         # This import is ugly, and maybe all the models should be in one file again -gregmarra 20121006
         if self._matches is None:
-            if self._matches_future is None:
-                self.prepMatches()
-            self._matches = [match.get_result() for match in self._matches_future]
+            if self._matches is None:
+                self.get_matches_async().wait()
         return self._matches
 
     def withinDays(self, negative_days_before, days_after):
@@ -88,25 +82,18 @@ class Event(ndb.Model):
     def within_a_day(self):
         return self.withinDays(-1, 1)
 
-    def prepTeams(self):
-        # TODO there is a way to do this with yields such that this would be a
-        # generator function that would yield, and if two sets of ndb fetches
-        # went by would cleanly do itself without forcing a fetch.
-        # -gregmarra 20121007
+    @ndb.tasklet
+    def get_teams_async(self):
         from models.event_team import EventTeam
-        if self._teams_future is None:
-            event_teams_keys = EventTeam.query(EventTeam.event == self.key).fetch(500, keys_only=True)
-            self._event_teams_future = ndb.get_multi_async(event_teams_keys)
+        event_team_keys = yield EventTeam.query(EventTeam.event == self.key).fetch_async(500, keys_only=True)
+        event_teams = yield ndb.get_multi_async(event_team_keys)
+        team_keys = map(lambda event_team: event_team.team, event_teams)
+        self._teams = yield ndb.get_multi_async(team_keys)
 
     @property
     def teams(self):
-        # This import is ugly, and maybe all the models should be in one file again -gregmarra 20121006
         if self._teams is None:
-            if self._event_teams_future is None:
-                self.prepTeams()
-            team_keys = [event_team.get_result().team for event_team in self._event_teams_future]
-            teams = ndb.get_multi(team_keys)
-            self._teams = sorted(teams, key = lambda team: team.team_number) 
+            self.get_teams_async().wait()
         return self._teams
 
     @property
