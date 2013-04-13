@@ -152,7 +152,7 @@ class TeamDetail(CacheableHandler):
                 current_event = e
                 matches_upcoming = MatchHelper.upcomingMatches(matches)
                 
-            if event.within_a_day:
+            if e.within_a_day:
                 short_cache = True
                 
 
