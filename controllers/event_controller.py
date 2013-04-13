@@ -101,16 +101,12 @@ class EventDetail(CacheableHandler):
         super(EventDetail, self).get(event_key)
 
     def _render(self, event_key):
-        @ndb.toplevel
-        def prepAwardsMatchesTeams():
-            yield event.get_awards_async(), event.get_matches_async(), event.get_teams_async()
-      
         event = Event.get_by_id(event_key)
         
         if not event:
             return self.redirect("/error/404")
           
-        prepAwardsMatchesTeams()
+        event.prepAwardsMatchesTeams()
         awards = AwardHelper.organizeAwards(event.awards)
         matches = MatchHelper.organizeMatches(event.matches)
         teams = TeamHelper.sortTeams(event.teams)

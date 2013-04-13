@@ -95,6 +95,10 @@ class Event(ndb.Model):
         if self._teams is None:
             self.get_teams_async().wait()
         return self._teams
+      
+    @ndb.toplevel
+    def prepAwardsMatchesTeams(self):
+        yield self.get_awards_async(), self.get_matches_async(), self.get_teams_async()
 
     @property
     def rankings(self):
