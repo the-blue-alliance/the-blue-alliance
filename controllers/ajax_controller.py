@@ -61,7 +61,7 @@ class TypeaheadHandler(CacheableHandler):
             else:
                 nickname = team.nickname
             results.append({'id': team.team_number, 'name': '%s | %s' % (team.team_number, nickname)})
-            
+
         return json.dumps(results)
 
     

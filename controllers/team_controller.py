@@ -56,10 +56,8 @@ class TeamList(CacheableHandler):
         if start == 0:
             start = 1
 
-        team_keys = Team.query().order(Team.team_number)\
-          .filter(Team.team_number >= start)\
-          .filter(Team.team_number < stop)\
-          .fetch(10000, keys_only=True)
+        team_keys = Team.query().order(Team.team_number).filter(
+          Team.team_number >= start).filter(Team.team_number < stop).fetch(10000, keys_only=True)
         teams = ndb.get_multi(team_keys)        
 
         num_teams = len(teams)
@@ -127,7 +125,8 @@ class TeamDetail(CacheableHandler):
                 event = yield event_team.event.get_async()
                 if not event.start_date:
                     event.start_date = datetime.datetime(year, 12, 31) #unknown goes last
-                matches_keys = yield Match.query(Match.event == event.key, Match.team_key_names == team.key_name).fetch_async(500, keys_only=True)
+                matches_keys = yield Match.query(
+                  Match.event == event.key, Match.team_key_names == team.key_name).fetch_async(500, keys_only=True)
                 matches = yield ndb.get_multi_async(matches_keys)
                 raise ndb.Return((event, matches))
             raise ndb.Return(None)

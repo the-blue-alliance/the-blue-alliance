@@ -98,8 +98,7 @@ class EventHelper(object):
         """
         Given a team_key, and an event, find the team's Win Loss Tie.
         """
-        match_keys = Match.query(Match.event == event.key, Match.team_key_names == team_key)\
-          .fetch(500, keys_only=True)
+        match_keys = Match.query(Match.event == event.key, Match.team_key_names == team_key).fetch(500, keys_only=True)
         return self.calculateTeamWLTFromMatches(team_key, ndb.get_multi(match_keys))
       
     @classmethod
@@ -115,11 +114,10 @@ class EventHelper(object):
         today = datetime.datetime.today()
         
         # Make sure all events to be returned are within range
-        two_weeks_of_events_keys_future = Event.query()\
-          .filter(Event.start_date >= (today - datetime.timedelta(days=7)))\
-          .filter(Event.start_date <= (today + datetime.timedelta(days=7)))\
-          .order(Event.start_date)\
-          .fetch_async(50, keys_only=True)
+        two_weeks_of_events_keys_future = Event.query().filter(
+          Event.start_date >= (today - datetime.timedelta(days=7))).filter(
+          Event.start_date <= (today + datetime.timedelta(days=7))).order(
+          Event.start_date).fetch_async(50, keys_only=True)
         
         events = []
         diff_from_thurs = 3 - today.weekday() # 3 is Thursday. diff_from_thurs ranges from 3 to -3 (Monday thru Sunday)
