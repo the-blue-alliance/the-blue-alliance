@@ -6,11 +6,12 @@ import webapp2
 from datetime import datetime
 
 from google.appengine.api import memcache
-from google.appengine.ext import db
+from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 import tba_config
 from helpers.api_helper import ApiHelper
+from helpers.api.api_model_to_dict import ApiModelToDict
 
 from models.event import Event
 from models.event_team import EventTeam
@@ -33,11 +34,44 @@ class ApiTeamsShow(MainApiHandler):
     def get(self):
         teams = list()
         team_keys = self.request.get('teams').split(',')
-        
+
         for team_key in team_keys:
-            teams.append(ApiHelper.getTeamInfo(team_key))
-        
+            memcache_key = "api_%s" % team_key
+            team_dict = memcache.get(team_key)
+
+            if team_dict is None:
+                team = Team.get_by_id(team_key)
+                if team is not None:
+                    team_dict = ApiModelToDict.teamConverter(team)
+
+                    event_teams = EventTeam.query(EventTeam.team == team.key,\
+                                                  EventTeam.year == datetime.now().year)\
+                                                  .fetch(1000, projection=[EventTeam.event])
+                    event_ids = [event_team.event for event_team in event_teams]
+                    events = ndb.get_multi(event_ids)
+
+                    game = Match.FRC_GAMES_BY_YEAR[2010]
+                    matches = Match.query(Match.team_key_names == team.key_name,\
+                                          Match.game == game).fetch(1000)
+
+                    team_dict["events"] = list()
+                    for event in events:
+                        event_dict = ApiModelToDict.eventConverter(event)
+
+                        event_dict["matches"] = [ApiTemplate.match(match) for match in matches if match.event is event]
+
+                        team_dict["events"].append(event_dict)
+
+
+                    #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra 
+                    if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, team_dict, 2592000)
+                    teams.append(team_dict)
+                else:
+                    raise IndexError
+
+
         self.response.out.write(json.dumps(teams))
+
 
 class ApiTeamDetails(MainApiHandler):
     """
