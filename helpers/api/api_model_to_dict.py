@@ -1,4 +1,5 @@
 import logging
+import json
 from datetime import datetime
 
 from  models.event import Event
@@ -57,16 +58,18 @@ class ApiModelToDict(object):
         return event_dict
 
     @classmethod
-    def match(self, match):
+    def matchConverter(self, match):
         """
         return top level match dictionary
         """
+        match_dict = dict()
         match_dict["key"] = match.key_name
-        match_dict["event"] = match.event
-        match_dict["comp_level"] = match.comp_level
-        match_dict["set_number"] = match.set_number
-        match_dict["match_number"] = match.match_number
-        match_dict["team_keys"] = match.team_key_names
+        match_dict["event"] = match.event.id()
         match_dict["alliances"] = json.loads(match.alliances_json)
+        match_dict["team_keys"] = match.team_key_names
+        match_dict["game"] = match.game
+        match_dict["comp_level"] = match.comp_level
+        match_dict["match_number"] = match.match_number
+        match_dict["set_number"] = match.set_number
 
         return match_dict

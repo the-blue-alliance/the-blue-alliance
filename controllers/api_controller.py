@@ -58,7 +58,7 @@ class ApiTeamsShow(MainApiHandler):
                     for event in events:
                         event_dict = ApiModelToDict.eventConverter(event)
 
-                        event_dict["matches"] = [ApiTemplate.match(match) for match in matches if match.event is event]
+                        event_dict["matches"] = [ApiModelToDict.matchConverter(match) for match in matches if match.event is event.key]
 
                         team_dict["events"].append(event_dict)
 

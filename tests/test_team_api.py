@@ -10,6 +10,7 @@ from google.appengine.ext import testbed
 
 from controllers.api_controller import ApiTeamsShow
 
+from models.match import Match
 from models.team import Team
 from models.event import Event
 from models.event_team import EventTeam
@@ -64,6 +65,19 @@ class TestApiTeamShow(unittest2.TestCase):
 
         self.event_team.put()
 
+        self.match = Match(
+            id = "2010sc_qm1",
+            alliances_json = """{"blue": {"score": 57, "teams": ["frc3464", "frc281", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
+            comp_level = "qm",
+            event = self.event.key,
+            game = "frc_2010_bkwy",
+            set_number = 1,
+            match_number = 1,
+            team_key_names = [u'frc69', u'frc571', u'frc176', u'frc3464', u'frc281', u'frc1073']
+        )
+
+        self.match.put()
+
     def tearDown(self):
         self.testbed.deactivate()
 
@@ -88,6 +102,17 @@ class TestApiTeamShow(unittest2.TestCase):
         self.assertEqual(event["end_date"], self.event.end_date.isoformat())
         self.assertEqual(event["official"], self.event.official)
         self.assertEqual(event["location"], self.event.location)
+
+        match = team_dict["events"][0]["matches"][0]
+        self.assertEqual(match["key"], self.match.key_name)
+        self.assertEqual(match["alliances"], json.loads(self.match.alliances_json))
+        self.assertEqual(match["team_keys"], self.match.team_key_names)
+        self.assertEqual(match["event"], self.event.key_name)
+        self.assertEqual(match["game"], self.match.game)
+        self.assertEqual(match["comp_level"], self.match.comp_level)
+        self.assertEqual(match["set_number"], self.match.set_number)
+        self.assertEqual(match["match_number"], self.match.match_number)
+
 
     def testTeamShow(self):
         response = self.testapp.get('/?teams=frc281')
