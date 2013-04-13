@@ -118,14 +118,9 @@ class TeamDetail(CacheableHandler):
         self._cache_key = self._cache_key.format("frc" + team_number, year, explicit_year)
         super(TeamDetail, self).get(team_number, year, explicit_year)
 
-    def _render(self, team_number, year=None, explicit_year=False):
+    def _render(self, team_number, year=None, explicit_year=False):        
         @ndb.tasklet
-        def get_match(match_key):
-            match = yield match_key.get_async()
-            raise ndb.Return(match)
-        
-        @ndb.tasklet
-        def get_event_matches(event_team_key):
+        def get_event_matches_async(event_team_key):
             event_team = yield event_team_key.get_async()
             years.add(event_team.year)
             if (event_team.year == year):
@@ -133,31 +128,26 @@ class TeamDetail(CacheableHandler):
                 if not event.start_date:
                     event.start_date = datetime.datetime(year, 12, 31) #unknown goes last
                 matches_keys = yield Match.query(Match.event == event.key, Match.team_key_names == team.key_name).fetch_async(500, keys_only=True)
-                matches = yield map(get_match, matches_keys)
+                matches = yield ndb.get_multi_async(matches_keys)
                 raise ndb.Return((event, matches))
             raise ndb.Return(None)
           
         @ndb.tasklet
-        def get_events_matches():
+        def get_events_matches_async():
             event_team_keys = yield EventTeam.query(EventTeam.team == team.key).fetch_async(1000, keys_only=True)
-            events_matches = yield map(get_event_matches, event_team_keys)
+            events_matches = yield map(get_event_matches_async, event_team_keys)
             events_matches = filter(None, events_matches)
             raise ndb.Return(events_matches)
         
-        @ndb.tasklet
-        def get_award(award_key):
-            award = yield award_key.get_async()
-            raise ndb.Return(award)
-        
         @ndb.tasklet  
-        def get_awards():
+        def get_awards_async():
             award_keys = yield Award.query(Award.year == year, Award.team == team.key).fetch_async(500, keys_only=True)
-            awards = yield map(get_award, award_keys)
+            awards = yield ndb.get_multi_async(award_keys)
             raise ndb.Return(awards)
           
         @ndb.toplevel
         def get_events_matches_awards():
-            events_matches, awards = yield get_events_matches(), get_awards()
+            events_matches, awards = yield get_events_matches_async(), get_awards_async()
             raise ndb.Return(events_matches, awards)
           
         team = Team.get_by_id("frc" + team_number)
