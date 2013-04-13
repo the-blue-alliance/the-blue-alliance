@@ -1,6 +1,5 @@
 import os
 import json
-import logging
 
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
