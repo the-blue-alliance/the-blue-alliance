@@ -31,26 +31,26 @@ class TypeaheadHandler(CacheableHandler):
         self.response.headers['Pragma'] = 'Public'
         self.response.headers.add_header('content-type', 'application/json', charset='utf-8')        
         super(TypeaheadHandler, self).get()
-        
-    @ndb.tasklet
-    def get_events_async(self):
-        event_keys = yield Event.query().order(-Event.year).order(Event.name).fetch_async(keys_only=True)
-        events = yield ndb.get_multi_async(event_keys)
-        raise ndb.Return(events)
-        
-    @ndb.tasklet
-    def get_teams_async(self):
-        team_keys = yield Team.query().order(Team.team_number).fetch_async(keys_only=True)
-        teams = yield ndb.get_multi_async(team_keys)
-        raise ndb.Return(teams)
-        
-    @ndb.toplevel
-    def get_events_and_teams(self):
-        events, teams = yield self.get_events_async(), self.get_teams_async()
-        raise ndb.Return((events, teams))
 
     def _render(self):
-        events, teams = self.get_events_and_teams()
+        @ndb.tasklet
+        def get_events_async():
+            event_keys = yield Event.query().order(-Event.year).order(Event.name).fetch_async(keys_only=True)
+            events = yield ndb.get_multi_async(event_keys)
+            raise ndb.Return(events)
+            
+        @ndb.tasklet
+        def get_teams_async():
+            team_keys = yield Team.query().order(Team.team_number).fetch_async(keys_only=True)
+            teams = yield ndb.get_multi_async(team_keys)
+            raise ndb.Return(teams)
+            
+        @ndb.toplevel
+        def get_events_and_teams():
+            events, teams = yield get_events_async(), get_teams_async()
+            raise ndb.Return((events, teams))
+      
+        events, teams = get_events_and_teams()
         
         results = []
         for event in events:
