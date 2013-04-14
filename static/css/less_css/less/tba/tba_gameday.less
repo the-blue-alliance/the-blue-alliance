@@ -2,6 +2,7 @@
 @socialWidth: 250px;
 @feedBarHeight: 30px;
 @videoContainerTopOffset: 1px;
+@matchBarHeight: 36px;
 
 body {
   margin: 0;
@@ -280,6 +281,76 @@ body {
 
 .webcasts-show {
   display: block;
+}
+
+.match_info {
+  background-color: @grayDarker * 0.5;
+  z-index: 4999;
+  width: 200%;
+  height: @matchBarHeight;
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  text-align: left;
+  overflow: hidden;
+  
+  .matches {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .last_match {
+    background-color: @TBAblueDarker;
+  }
+  
+  .upcoming_match {
+    background-color: transparent;
+  }
+  
+  .match {
+    height: 100%;
+    width: auto;
+    border-right: 1px @white solid;
+    display: inline-block;
+  }
+  
+  .match-number {
+    color: @white;
+    font-size: 19px;
+    width: auto;
+    display: inline-block;
+    line-height: @matchBarHeight;
+    margin: 0 10px 0 10px;
+    float: left;
+  }
+  
+  .alliances {
+    display: inline-block;
+    height: 100%;
+    width: auto;
+    float: left;
+    margin: 0 10px 0 0;
+  }
+  
+  .red {
+    color: #FF0000;
+  }
+  
+  .blue {
+    color: #0066FF;
+    //bottom: 0px;
+  }
+  
+  .red, .blue {
+    font-size: 13px;
+    width: auto;
+    height: 50%;
+    display: block;
+  }
+  
+  .win {
+    font-weight: bold;
+  }
 }
 
 .overlay {

@@ -214,7 +214,14 @@ function setupView(viewNum, $item) {
 		}
 		
 		// Combines the video player with overlay
-		var viewContents = player + "<div id='overlay_" + viewNum + "' class='overlay' alt='" + eventName + "'>" +
+		var viewContents = player + "<div id='match_info_" + viewNum + "' class='match_info'>" + 
+		"<div class='matches'>" + 
+		"<div class='match last_match'><div class='match-number'>SF2-2</div><div class='alliances'><div class='red '>2819, 3373, 4511 - 270</div><div class='blue win'>2377, 4122, 2338 - 110</div></div></div>" +
+		"<div class='match upcoming_match'><div class='match-number'>SF2-2</div><div class='alliances'><div class='red '>2819, 3373, 4511</div><div class='blue win'>2377, 4122, 2338</div></div></div>" +
+		"<div class='match upcoming_match'><div class='match-number'>Q2</div><div class='alliances'><div class='red '>2819, 3373, 4511</div><div class='blue win'>2377, 4122, 2338</div></div></div>" +
+		"<div class='match upcoming_match'><div class='match-number'>F1-1</div><div class='alliances'><div class='red '>289, 373, 511</div><div class='blue win'>377, 122, 38</div></div></div>" +
+		"</div></div>" +
+		"<div id='overlay_"+ viewNum + "' class='overlay' alt='" + eventName + "'>" +
 		"<div class='overlay-title'>" + eventName + "</div>" +
 		"<div id='close_" + viewNum + "' class='view-close' rel='tooltip' data-placement='left' title='Close'>" +
 		"<i class='icon-remove icon-white'></i></div>" +
@@ -254,10 +261,12 @@ function setupCloseSwap(viewNum) {
 	
 	$("#view_" + viewNum).mouseover(function() {
 		$("#overlay_"+viewNum).fadeIn(0);
+		$("#match_info_"+viewNum).slideUp(75);
 	});
 	$("#view_" + viewNum).mouseleave(function() {
 		if (!swapping) {
 			$("#overlay_"+viewNum).fadeOut(0);
+			$("#match_info_"+viewNum).slideDown(75);
 		}
 	});
 }
