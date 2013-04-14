@@ -214,7 +214,7 @@ function setupView(viewNum, $item) {
 		}
 		
 		// Combines the video player with overlay
-		var viewContents = player + "<div id='match_info_" + viewNum + "' class='match_info'>" + 
+		var viewContents = player + "<div id='match_bar_" + viewNum + "' class='match_bar'>" + 
 		"<div class='matches'>" + 
 		"<div class='match last_match'><div class='match-number'>SF2-2</div><div class='alliances'><div class='red '>2819, 3373, 4511 - 270</div><div class='blue win'>2377, 4122, 2338 - 110</div></div></div>" +
 		"<div class='match upcoming_match'><div class='match-number'>SF2-2</div><div class='alliances'><div class='red '>2819, 3373, 4511</div><div class='blue win'>2377, 4122, 2338</div></div></div>" +
@@ -261,12 +261,12 @@ function setupCloseSwap(viewNum) {
 	
 	$("#view_" + viewNum).mouseover(function() {
 		$("#overlay_"+viewNum).fadeIn(0);
-		$("#match_info_"+viewNum).slideUp(75);
+		$("#match_bar_"+viewNum).slideUp(75);
 	});
 	$("#view_" + viewNum).mouseleave(function() {
 		if (!swapping) {
 			$("#overlay_"+viewNum).fadeOut(0);
-			$("#match_info_"+viewNum).slideDown(75);
+			$("#match_bar_"+viewNum).slideDown(75);
 		}
 	});
 }
