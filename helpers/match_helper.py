@@ -20,8 +20,7 @@ class MatchHelper(object):
         alphanum_key = lambda match: [ convert(c) for c in re.split('([0-9]+)', str(match.key_name)) ] 
         return sorted(matches, key = alphanum_key)
       
-    # Note: Matches within a comp_level (qual, qf, sf, f, etc.) will be in order,
-    # but the comp levels themselves may not be in order. See natural_sort_matches().
+    # Note: Only works for a list of matches in the same comp level
     @classmethod
     def play_order_sort_matches(self, matches):
         sort_key = lambda match: match.play_order
