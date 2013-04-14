@@ -173,6 +173,10 @@ class Match(ndb.Model):
             if self._tba_video is None:
                 self._tba_video = TBAVideoHelper(self)
         return self._tba_video
+      
+    @property
+    def play_order(self):
+        return self.match_number * 1000 + self.set_number
 
     @property
     def name(self):

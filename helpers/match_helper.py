@@ -19,6 +19,13 @@ class MatchHelper(object):
         convert = lambda text: int(text) if text.isdigit() else text.lower() 
         alphanum_key = lambda match: [ convert(c) for c in re.split('([0-9]+)', str(match.key_name)) ] 
         return sorted(matches, key = alphanum_key)
+      
+    # Note: Matches within a comp_level (qual, qf, sf, f, etc.) will be in order,
+    # but the comp levels themselves may not be in order. See natural_sort_matches().
+    @classmethod
+    def play_order_sort_matches(self, matches):
+        sort_key = lambda match: match.play_order
+        return sorted(matches, key=sort_key)
 
     @classmethod
     def organizeMatches(self, match_list):
@@ -47,7 +54,8 @@ class MatchHelper(object):
         all_matches = []
         for comp_level in Match.COMP_LEVELS:
             if comp_level in matches:
-                all_matches += matches[comp_level]
+                play_order_sorted = self.play_order_sort_matches(matches[comp_level])
+                all_matches += play_order_sorted
         return all_matches[-num:]
       
     @classmethod
@@ -58,7 +66,8 @@ class MatchHelper(object):
         unplayed_matches = []
         for comp_level in Match.COMP_LEVELS:
             if comp_level in matches:
-                for match in matches[comp_level]:
+                play_order_sorted = self.play_order_sort_matches(matches[comp_level])
+                for match in play_order_sorted:
                     unplayed_matches.append(match)
         return unplayed_matches[:num]
     
