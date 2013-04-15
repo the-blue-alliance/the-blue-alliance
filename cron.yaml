@@ -17,7 +17,7 @@ cron:
 
 - description: FIRST awards scraping
   url: /tasks/enqueue/usfirst_awards/now
-  schedule: every 24 hours
+  schedule: every day 04:00
 
 #- description: OPR Calculation
 #  url: /tasks/math/enqueue/event_opr/now
