@@ -191,11 +191,15 @@ class ApiMatchDetails(MainApiHandler):
             match_keys = self.request.get('matches').split(',')
 
         if 'match_keys' in locals():
+            match_keys = [ndb.Key(Match, match_key) for match_key in match_keys]
+            matches = ndb.get_multi(match_keys)
+
             match_json = list()
-            for match in match_keys:
-                match_json.append(ApiHelper.getMatchDetails(match))
+            for match in matches:
+                match_json.append(ApiModelToDict.matchConverter(match))
         else:
-            match_json = ApiHelper.getMatchDetails(match_key)
+            match = Match.get_by_id(match_key)
+            match_json = ApiModelToDict.matchConverter(match)
 
         self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(match_json))
