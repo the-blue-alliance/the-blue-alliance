@@ -90,8 +90,11 @@ class MatchHelper(object):
                 if match_1 != None and match_2 != None and\
                     match_1.has_been_played and match_2.has_been_played and\
                     match_1.winning_alliance == match_2.winning_alliance:
-                        match.key.delete()
-                        logging.warning("Deleting invalid match: %s" % match.key_name)
+                        try:
+                            match.key.delete()
+                            logging.warning("Deleting invalid match: %s" % match.key_name)
+                        except:
+                            logging.warning("Tried to delete invalid match, but failed: %s" % match.key_name)
                         continue
             return_list.append(match)
         return return_list
