@@ -1,4 +1,4 @@
-/* This code is based on MadStream, an FRC webcast portal
+/*! This code is based on MadStream, an FRC webcast portal
  * built in collaboration by FRC Teams 604 and 1323.
  */
 
@@ -216,10 +216,10 @@ function setupView(viewNum, $item) {
 		// Combines the video player with overlay
 		var viewContents = player + "<div id='match_bar_" + viewNum + "' class='match_bar'>" + 
 		"<div class='matches'>" + 
-		"<div class='match last_match'><div class='match-number'>SF2-2</div><div class='alliances'><div class='red '>2819, 3373, 4511 - 270</div><div class='blue win'>2377, 4122, 2338 - 110</div></div></div>" +
-		"<div class='match upcoming_match'><div class='match-number'>SF2-2</div><div class='alliances'><div class='red '>2819, 3373, 4511</div><div class='blue win'>2377, 4122, 2338</div></div></div>" +
-		"<div class='match upcoming_match'><div class='match-number'>Q2</div><div class='alliances'><div class='red '>2819, 3373, 4511</div><div class='blue win'>2377, 4122, 2338</div></div></div>" +
-		"<div class='match upcoming_match'><div class='match-number'>F1-1</div><div class='alliances'><div class='red '>289, 373, 511</div><div class='blue win'>377, 122, 38</div></div></div>" +
+		"<div class='match finished_match_blue'><div class='match-number'>SF2-2</div><div class='alliances'><div class='red '>2819, 3373, 4511 - 270</div><div class='blue '>2377, 4122, 2338 - 110</div></div></div>" +
+		"<div class='match upcoming_match'><div class='match-number'>SF2-2</div><div class='alliances'><div class='red '>2819, 3373, 4511</div><div class='blue'>2377, 4122, 2338</div></div></div>" +
+		"<div class='match upcoming_match'><div class='match-number'>Q2</div><div class='alliances'><div class='red '>2819, 3373, 4511</div><div class='blue'>2377, 4122, 2338</div></div></div>" +
+		"<div class='match upcoming_match'><div class='match-number'>F1-1</div><div class='alliances'><div class='red '>289, 373, 511</div><div class='blue'>377, 122, 38</div></div></div>" +
 		"</div></div>" +
 		"<div id='overlay_"+ viewNum + "' class='overlay' alt='" + eventName + "'>" +
 		"<div class='overlay-title'>" + eventName + "</div>" +

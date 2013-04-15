@@ -231,8 +231,18 @@ body {
     height: 100%;
   }
   
-  .last_match {
-    background-color: @TBAblueDarker;
+  .finished_match_red {
+    background-color: @TBAredSubtle;
+  }
+  
+  .finished_match_blue {
+    background-color: @TBAblueSubtle;
+  }
+  
+  .finished_match_red, .finished_match_blue {
+    .red, .blue {
+      font-weight: bold;
+    }
   }
   
   .upcoming_match {
@@ -277,10 +287,6 @@ body {
     width: auto;
     height: 50%;
     display: block;
-  }
-  
-  .win {
-    font-weight: bold;
   }
 }
 
