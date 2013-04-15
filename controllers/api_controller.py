@@ -13,6 +13,7 @@ import tba_config
 from helpers.api_helper import ApiHelper
 from helpers.api.api_model_to_dict import ApiModelToDict
 
+from models.award import Award
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
@@ -38,6 +39,7 @@ class ApiTeamsShow(MainApiHandler):
         for team_key in team_keys:
             memcache_key = "api_%s" % team_key
             team_dict = memcache.get(team_key)
+            current_year = datetime.now().year
 
             if team_dict is None:
                 team = Team.get_by_id(team_key)
@@ -45,20 +47,22 @@ class ApiTeamsShow(MainApiHandler):
                     team_dict = ApiModelToDict.teamConverter(team)
 
                     event_teams = EventTeam.query(EventTeam.team == team.key,\
-                                                  EventTeam.year == datetime.now().year)\
+                                                  EventTeam.year == current_year)\
                                                   .fetch(1000, projection=[EventTeam.event])
                     event_ids = [event_team.event for event_team in event_teams]
                     events = ndb.get_multi(event_ids)
 
-                    game = Match.FRC_GAMES_BY_YEAR[2010]
+                    game = Match.FRC_GAMES_BY_YEAR[current_year]
                     matches = Match.query(Match.team_key_names == team.key_name,\
                                           Match.game == game).fetch(1000)
 
+                    awards = Award.query(Award.team == team.key, Award.year == current_year).fetch(1000)
                     team_dict["events"] = list()
                     for event in events:
                         event_dict = ApiModelToDict.eventConverter(event)
 
                         event_dict["matches"] = [ApiModelToDict.matchConverter(match) for match in matches if match.event is event.key]
+                        event_dict["awards"] = [ApiModelToDict.awardConverter(award) for award in awards if award.event is event.key]
 
                         team_dict["events"].append(event_dict)
 

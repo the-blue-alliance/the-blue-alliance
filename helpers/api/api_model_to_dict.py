@@ -2,6 +2,7 @@ import logging
 import json
 from datetime import datetime
 
+from  models.award import Award
 from  models.event import Event
 from  models.team import Team
 
@@ -73,3 +74,21 @@ class ApiModelToDict(object):
         match_dict["set_number"] = match.set_number
 
         return match_dict
+
+    @classmethod
+    def awardConverter(self, award):
+        """
+        return top level award dictionary
+        """
+        award_dict = dict()
+        award_dict["key"] = award.key_name
+        award_dict["name"] = award.name
+        award_dict["official_name"] = award.official_name
+        award_dict["year"] = award.year
+        award_dict["team"] = award.team.id()
+        award_dict["awardee"] = award.awardee
+        award_dict["event"] = award.event.id()
+
+        return award_dict
+
+
