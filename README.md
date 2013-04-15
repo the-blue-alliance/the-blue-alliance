@@ -69,6 +69,8 @@ Once you register an app (named tbatv-dev-YOURNAME), you can configure The Blue 
 
 Testing
 -------
+[![Build Status](https://travis-ci.org/gregmarra/the-blue-alliance.png?branch=master)](https://travis-ci.org/gregmarra/the-blue-alliance)
+
 Testing is implemented using a combination of [unittest2](http://pypi.python.org/pypi/unittest2 "Uniter Test 2") and the Google App Engine testbed framework. Test coverage is a work in progress, and focuses on maintaining datafeed integrity in the face of optimizations and changes to FIRST's data formats.
 
 To run the tests, or just the offline (fast) tests:
