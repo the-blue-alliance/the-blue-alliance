@@ -162,9 +162,20 @@ class ApiEventDetails(MainApiHandler):
             self.response.out.write(json.dumps(error_message))
             return False
 
-        
+        memcache_key = "api_event_%s", event_key
+        event_dict = memcache.get(memcache_key)
+        if event_dict is None:
+            event = Event.get_by_id(event_key)
+            event.prepMatches()
+            event.prepTeams()
+            event.prepAwards()
 
-        event_dict = ApiHelper.getEventInfo(event_key)
+            event_dict = ApiModelToDict.eventConverter(event)
+            event_dict["matches"] = [ApiModelToDict.matchConverter(match) for match in event.matches]
+            event_dict["teams"] = [ApiModelToDict.teamConverter(team) for team in event.teams]
+            event_dict["awards"] = [ApiModelToDict.awardConverter(award) for award in event.awards]
+
+            memcache.set(memcache_key, event_dict, (30 * ((60 * 60) * 24)))
 
         self.response.out.write(json.dumps(event_dict))
 
