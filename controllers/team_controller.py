@@ -120,7 +120,7 @@ class TeamDetail(CacheableHandler):
         @ndb.tasklet
         def get_event_matches_async(event_team_key):
             event_team = yield event_team_key.get_async()
-            years.add(event_team.year)
+            years.add(event_team.year)  # years is a "global" variable (defined below). Doing this removes the complexity of having to propagate the years up through the tasklet call chain.
             if (event_team.year == year):
                 event = yield event_team.event.get_async()
                 if not event.start_date:
