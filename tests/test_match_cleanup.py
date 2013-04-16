@@ -1,5 +1,9 @@
 import unittest2
 
+from google.appengine.ext import db
+from google.appengine.ext import testbed
+
+from controllers.datafeed_controller import UsfirstEventDetailsGet
 from helpers.match_helper import MatchHelper
 from datafeeds.offseason_matches_parser import OffseasonMatchesParser
 from models.event import Event
@@ -32,6 +36,12 @@ def setupMatches(csv):
         return matches
 
 class TestMatchCleanup(unittest2.TestCase):
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+
     def test_cleanup(self):
         matches = setupMatches('test_data/cleanup_matches.csv')
         cleaned_matches = MatchHelper.deleteInvalidMatches(matches)
