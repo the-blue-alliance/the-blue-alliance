@@ -3,7 +3,6 @@ import unittest2
 from google.appengine.ext import db
 from google.appengine.ext import testbed
 
-from controllers.datafeed_controller import UsfirstEventDetailsGet
 from helpers.match_helper import MatchHelper
 from datafeeds.offseason_matches_parser import OffseasonMatchesParser
 from models.event import Event
