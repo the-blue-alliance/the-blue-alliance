@@ -1,41 +1,52 @@
+var eventsRef = new Firebase('https://thebluealliance-dev.firebaseio.com/events/');
+
+eventsRef.on('child_changed', function(snapshot) {
+  updateMatchbar(snapshot);
+});
+
+eventsRef.on('child_added', function(snapshot) {
+  updateMatchbar(snapshot);
+});
+
 function updateMatchbar(snapshot) {
   var event_key = snapshot.name();
   var event_data = snapshot.val();
   var upcoming_matches = event_data.upcoming_matches;
   var last_matches = event_data.last_matches;
-
-  // Render upcoming matches
-  if (upcoming_matches != null) {
-    for (var i=0; i<upcoming_matches.length; i++) {
-      var upcoming_match = renderMatch(upcoming_matches[i]).addClass('upcoming_match');
-      $('.' + event_key + '_matches').append(upcoming_match);
+  var match_bar = $('.' + event_key + '_matches');
+  
+  match_bar.each(function() { // Because the user might have more than 1 view of a given event open
+    var matches = $(this)[0].children;
+    
+    if (last_matches != null && last_matches[0] != null) {
+      var last_match = last_matches[0];
+      // Remove old matches up to the last played match
+      while (matches.length > 0) {
+        if (last_match.id != matches[0].id) {
+          matches[0].remove();
+        } else {
+          matches[0].remove();
+          break;
+        }
+      }
+      
+      // Render last played match
+      var winning_alliance = (last_matches[0].winning_alliance == '') ? 'tie' : last_matches[0].winning_alliance;
+      var rendered_match = renderMatch(last_matches[0]).addClass('finished_match_' + winning_alliance);
+      $(this).prepend(rendered_match);
     }
-  }
-  
-  // Render last played match
-  if (last_matches != null) {
-    var winning_alliance = (last_matches[0].winning_alliance == '') ? 'tie' : last_matches[0].winning_alliance;
-    var last_match = renderMatch(last_matches[0]).addClass('finished_match_' + winning_alliance);
-    $('.' + event_key + '_matches').prepend(last_match);
-  }
-  
-  /*
- 
-  $('.feed_bar').prepend(new_match);
-  $('.scores').click(function(){
-    $(".scores").fancybox({
-      'overlayColor'  : '#333',
-      'overlayShow'   : true,
-      'autoDimensions': false,
-      'width'         : 0.9*$(".video_container").width(),
-      'height'        : 0.9*$(".video_container").height(),
-      'type'          : 'iframe',
-      'href'          : '/event/' + getEventKey(match)
-    });
+    
+    if (upcoming_matches != null) {
+      for (var i=0; i<upcoming_matches.length; i++) {
+        // Render match if not already present in matchar
+        var upcoming_match = upcoming_matches[i];
+        if ($(this).children('div[id="' + upcoming_match.key_name + '"').length == 0) {
+          var rendered_match = renderMatch(upcoming_match).addClass('upcoming_match');
+          $(this).append(rendered_match);
+        }
+      }
+    }
   });
-  new_match.focus();
-  new_match.removeClass('new_scores');
-  */
 }
 
 function renderMatch(match) {

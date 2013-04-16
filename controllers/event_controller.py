@@ -121,11 +121,6 @@ class EventDetail(CacheableHandler):
         
         oprs = sorted(zip(event.oprs,event.opr_teams), reverse=True) # sort by OPR
         oprs = oprs[:14] # get the top 15 OPRs
-        
-        from helpers.firebase.firebase_pusher import FirebasePusher
-        last_matches = MatchHelper.recentMatches(event.matches, 1)
-        upcoming_matches = MatchHelper.upcomingMatches(event.matches, 2)
-        FirebasePusher.updateEvent(event, last_matches, upcoming_matches)
 
         if event.within_a_day:
             matches_recent = MatchHelper.recentMatches(event.matches)

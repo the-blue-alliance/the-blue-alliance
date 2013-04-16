@@ -215,13 +215,7 @@ function setupView(viewNum, $item) {
 		
 		// Combines the video player with overlay
 		var viewContents = player + "<div id='match_bar_" + viewNum + "' class='match_bar'>" + 
-		"<div class='matches " + eventKey + "_matches'>" + 
-		/*"<div class='match finished_match_blue'><div class='match-number'>SF2-2</div><div class='alliances'><div class='red '>2819, 3373, 4511 - 270</div><div class='blue '>2377, 4122, 2338 - 110</div></div></div>" +
-		"<div class='match upcoming_match'><div class='match-number'>SF2-2</div><div class='alliances'><div class='red '>2819, 3373, 4511</div><div class='blue'>2377, 4122, 2338</div></div></div>" +
-		"<div class='match upcoming_match'><div class='match-number'>Q2</div><div class='alliances'><div class='red '>2819, 3373, 4511</div><div class='blue'>2377, 4122, 2338</div></div></div>" +
-		"<div class='match upcoming_match'><div class='match-number'>F1-1</div><div class='alliances'><div class='red '>289, 373, 511</div><div class='blue'>377, 122, 38</div></div></div>" +
-		*/
-		"</div></div>" +
+		"<div class='matches " + eventKey + "_matches'></div></div>" +
 		"<div id='overlay_"+ viewNum + "' class='overlay' alt='" + eventName + "'>" +
 		"<div class='overlay-title'>" + eventName + "</div>" +
 		"<div id='close_" + viewNum + "' class='view-close' rel='tooltip' data-placement='left' title='Close'>" +
@@ -233,6 +227,12 @@ function setupView(viewNum, $item) {
 		document.getElementById('view_' + viewNum).innerHTML = hiddenviews[viewNum];
 		$("[rel=tooltip]").tooltip();
 		setupCloseSwap(viewNum);
+		
+		// Update matchbar on init
+		var eventsRef = new Firebase('https://thebluealliance-dev.firebaseio.com/events/' + eventKey);
+		eventsRef.on('value', function(snapshot) {
+		  updateMatchbar(snapshot);
+		});
 	});
 }
 
@@ -262,12 +262,12 @@ function setupCloseSwap(viewNum) {
 	
 	$("#view_" + viewNum).mouseover(function() {
 		$("#overlay_"+viewNum).fadeIn(0);
-		//$("#match_bar_"+viewNum).slideUp(75);
+		$("#match_bar_"+viewNum).slideUp(75);
 	});
 	$("#view_" + viewNum).mouseleave(function() {
 		if (!swapping) {
 			$("#overlay_"+viewNum).fadeOut(0);
-			//$("#match_bar_"+viewNum).slideDown(75);
+			$("#match_bar_"+viewNum).slideDown(75);
 		}
 	});
 }
