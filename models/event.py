@@ -3,6 +3,15 @@ import datetime
 import json
 import logging
 
+#note about these imports: match.py, event_team.py, and award.py all import event.py.
+#using from import results in a namespacing issue due to python's import mechanism, and so a direct
+#import statement is needed to circumvent this issue.
+#-pyprogrammer 2013 20130415
+import models.match as match
+import models.event_team as event_team
+import models.award as award
+
+
 class Event(ndb.Model):
     """
     Events represent FIRST Robotics Competition events, both official and unofficial.
@@ -46,7 +55,6 @@ class Event(ndb.Model):
 
     @property
     def awards(self):
-        # This import is ugly, and maybe all the models should be in one file again -gregmarra 20121006
         if self._awards is None:
             self.get_awards_async().wait()
         return self._awards
@@ -59,7 +67,6 @@ class Event(ndb.Model):
 
     @property
     def matches(self):
-        # This import is ugly, and maybe all the models should be in one file again -gregmarra 20121006
         if self._matches is None:
             if self._matches is None:
                 self.get_matches_async().wait()

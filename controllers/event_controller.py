@@ -107,8 +107,10 @@ class EventDetail(CacheableHandler):
             return self.redirect("/error/404")
           
         event.prepAwardsMatchesTeams()
+
         awards = AwardHelper.organizeAwards(event.awards)
-        matches = MatchHelper.organizeMatches(event.matches)
+        cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
+        matches = MatchHelper.organizeMatches(cleaned_matches)
         teams = TeamHelper.sortTeams(event.teams)
         
         num_teams = len(teams)
@@ -121,8 +123,8 @@ class EventDetail(CacheableHandler):
         oprs = oprs[:14] # get the top 15 OPRs
 
         if event.within_a_day:
-            matches_recent = MatchHelper.recentMatches(event.matches)
-            matches_upcoming = MatchHelper.upcomingMatches(event.matches)
+            matches_recent = MatchHelper.recentMatches(cleaned_matches)
+            matches_upcoming = MatchHelper.upcomingMatches(cleaned_matches)
         else:
             matches_recent = None
             matches_upcoming = None
