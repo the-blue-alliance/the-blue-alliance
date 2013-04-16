@@ -55,6 +55,7 @@ def test_fast():
   sh("python run_tests.py /usr/local/google_appengine test_*manipulator.py")
   sh("python run_tests.py /usr/local/google_appengine test_*api.py")
   sh("python run_tests.py /usr/local/google_appengine test_event.py")
+  sh("python run_tests.py /usr/local/google_appengine test_match_cleanup.py")
 
 @task
 def less():
