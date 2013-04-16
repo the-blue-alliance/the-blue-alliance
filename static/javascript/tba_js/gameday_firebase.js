@@ -1,7 +1,10 @@
-var lastMatchesRef = new Firebase('https://thebluealliance.firebaseio.com/last_matches');
-var lastMatchesQuery = lastMatchesRef.limit(10);
+var eventsRef = new Firebase('https://thebluealliance-dev.firebaseio.com/events');
+var eventsQuery = eventsRef.limit(10);
 
-lastMatchesQuery.on('child_added', function(snapshot) {
-  var match = snapshot.val();
-  updateFeedbar(match);
+eventsQuery.on('child_changed', function(snapshot) {
+	updateMatchbar(snapshot)
+});
+
+eventsQuery.on('child_added', function(snapshot) {
+	updateMatchbar(snapshot);
 });

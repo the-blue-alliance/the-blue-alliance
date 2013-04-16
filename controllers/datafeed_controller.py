@@ -279,8 +279,8 @@ class UsfirstMatchesGet(webapp.RequestHandler):
         event = Event.get_by_id(event_key)
         new_matches = MatchManipulator.createOrUpdate(df.getMatches(event))
         
-        last_matches = MatchHelper.recentMatches(new_matches)
-        upcoming_matches = MatchHelper.upcomingMatches(new_matches)
+        last_matches = MatchHelper.recentMatches(new_matches, 1)
+        upcoming_matches = MatchHelper.upcomingMatches(new_matches, 2)
         try:
             FirebasePusher.updateEvent(event, last_matches, upcoming_matches)
         except:
