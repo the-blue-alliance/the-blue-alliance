@@ -2,6 +2,7 @@ import os
 import json
 
 from google.appengine.api import memcache
+from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from base_controller import BaseHandler, CacheableHandler
@@ -32,9 +33,25 @@ class TypeaheadHandler(CacheableHandler):
         super(TypeaheadHandler, self).get()
 
     def _render(self):
-        events = Event.query().order(-Event.year).order(Event.name)       
-        teams = Team.query().order(Team.team_number)
-
+        @ndb.tasklet
+        def get_events_async():
+            event_keys = yield Event.query().order(-Event.year).order(Event.name).fetch_async(keys_only=True)
+            events = yield ndb.get_multi_async(event_keys)
+            raise ndb.Return(events)
+            
+        @ndb.tasklet
+        def get_teams_async():
+            team_keys = yield Team.query().order(Team.team_number).fetch_async(keys_only=True)
+            teams = yield ndb.get_multi_async(team_keys)
+            raise ndb.Return(teams)
+            
+        @ndb.toplevel
+        def get_events_and_teams():
+            events, teams = yield get_events_async(), get_teams_async()
+            raise ndb.Return((events, teams))
+      
+        events, teams = get_events_and_teams()
+        
         results = []
         for event in events:
             results.append({'id': event.key_name, 'name': '%s %s [%s]' % (event.year, event.name, event.event_short.upper())})
