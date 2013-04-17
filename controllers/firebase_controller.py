@@ -12,7 +12,7 @@ class FirebasePushDo(webapp.RequestHandler):
     """
     Pushes data to Firebase
     """
-    SUCCESS_STATUS_CODES = set([200, 204])
+    SUCCESS_STATUS_CODES = {200, 204}
 
     def get(self):
         key = self.request.get('key')
@@ -24,6 +24,6 @@ class FirebasePushDo(webapp.RequestHandler):
         FIREBASE_SECRET = firebase_secrets.contents['FIREBASE_SECRET']
         
         url = tba_config.CONFIG['firebase-url'].format(key, FIREBASE_SECRET)
-        result = urlfetch.fetch(url, payload_json, 'POST')
+        result = urlfetch.fetch(url, payload_json, 'PUT')
         if result.status_code not in self.SUCCESS_STATUS_CODES:
             logging.warning("Error pushing data to Firebase: {}. ERROR {}: {}".format(payload_json, result.status_code, result.content))

@@ -18,6 +18,7 @@ from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.match_manipulator import MatchManipulator
+from helpers.match_helper import MatchHelper
 from helpers.award_manipulator import AwardManipulator
 from helpers.team_helper import TeamHelper, TeamTpidHelper
 from helpers.team_manipulator import TeamManipulator
@@ -26,6 +27,8 @@ from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
+
+from helpers.firebase.firebase_pusher import FirebasePusher
 
 class FmsEventListGet(webapp.RequestHandler):
     """
@@ -274,6 +277,16 @@ class UsfirstMatchesGet(webapp.RequestHandler):
         
         event = Event.get_by_id(event_key)
         new_matches = MatchManipulator.createOrUpdate(df.getMatches(event))
+        
+        try:
+            last_matches = MatchHelper.recentMatches(new_matches, 1)
+            upcoming_matches = MatchHelper.upcomingMatches(new_matches, 8)
+        except:
+            logging.warning("Computing last/upcoming matches for Firebase failed!")
+        try:
+            FirebasePusher.updateEvent(event, last_matches, upcoming_matches)
+        except:
+            logging.warning("Enqueuing Firebase push failed!")
 
         template_values = {
             'matches': new_matches,
