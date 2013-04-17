@@ -6,7 +6,7 @@ from  models.award import Award
 from  models.event import Event
 from  models.team import Team
 
-class ApiModelToDict(object):
+class ModelToDict(object):
 
     @classmethod
     def teamConverter(self, team):

@@ -11,7 +11,7 @@ from google.appengine.ext.webapp import template
 
 import tba_config
 from helpers.api_helper import ApiHelper
-from helpers.api.api_model_to_dict import ApiModelToDict
+from helpers.api.model_to_dict import ModelToDict
 
 from models.award import Award
 from models.event import Event
@@ -44,7 +44,7 @@ class ApiTeamsShow(MainApiHandler):
             if team_dict is None:
                 team = Team.get_by_id(team_key)
                 if team is not None:
-                    team_dict = ApiModelToDict.teamConverter(team)
+                    team_dict = ModelToDict.teamConverter(team)
 
                     event_teams = EventTeam.query(EventTeam.team == team.key,\
                                                   EventTeam.year == current_year)\
@@ -59,10 +59,10 @@ class ApiTeamsShow(MainApiHandler):
                     awards = Award.query(Award.team == team.key, Award.year == current_year).fetch(1000)
                     team_dict["events"] = list()
                     for event in events:
-                        event_dict = ApiModelToDict.eventConverter(event)
+                        event_dict = ModelToDict.eventConverter(event)
 
-                        event_dict["matches"] = [ApiModelToDict.matchConverter(match) for match in matches if match.event is event.key]
-                        event_dict["awards"] = [ApiModelToDict.awardConverter(award) for award in awards if award.event is event.key]
+                        event_dict["matches"] = [ModelToDict.matchConverter(match) for match in matches if match.event is event.key]
+                        event_dict["awards"] = [ModelToDict.awardConverter(award) for award in awards if award.event is event.key]
 
                         team_dict["events"].append(event_dict)
 
@@ -170,10 +170,10 @@ class ApiEventDetails(MainApiHandler):
             event.prepTeams()
             event.prepAwards()
 
-            event_dict = ApiModelToDict.eventConverter(event)
-            event_dict["matches"] = [ApiModelToDict.matchConverter(match) for match in event.matches]
-            event_dict["teams"] = [ApiModelToDict.teamConverter(team) for team in event.teams]
-            event_dict["awards"] = [ApiModelToDict.awardConverter(award) for award in event.awards]
+            event_dict = ModelToDict.eventConverter(event)
+            event_dict["matches"] = [ModelToDict.matchConverter(match) for match in event.matches]
+            event_dict["teams"] = [ModelToDict.teamConverter(team) for team in event.teams]
+            event_dict["awards"] = [ModelToDict.awardConverter(award) for award in event.awards]
 
             memcache.set(memcache_key, event_dict, (30 * ((60 * 60) * 24)))
 
@@ -196,10 +196,10 @@ class ApiMatchDetails(MainApiHandler):
 
             match_json = list()
             for match in matches:
-                match_json.append(ApiModelToDict.matchConverter(match))
+                match_json.append(ModelToDict.matchConverter(match))
         else:
             match = Match.get_by_id(match_key)
-            match_json = ApiModelToDict.matchConverter(match)
+            match_json = ModelToDict.matchConverter(match)
 
         self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(match_json))
