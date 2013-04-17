@@ -4,7 +4,7 @@ import datetime
 import time
 
 from google.appengine.api import memcache
-from google.appengine.ext import db, webapp
+from google.appengine.ext import ndb, webapp
 from google.appengine.ext.webapp import template
 
 import tba_config
@@ -207,7 +207,8 @@ class WebcastsHandler(CacheableHandler):
         self._cache_version = 2
 
     def _render(self, *args, **kw):
-        events = Event.query(Event.year == 2013).order(Event.start_date).fetch(500)
+        event_keys = Event.query(Event.year == 2013).order(Event.start_date).fetch(500, keys_only=True)
+        events = ndb.get_multi(event_keys)
 
         template_values = {
             'events': events,

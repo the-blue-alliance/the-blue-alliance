@@ -127,9 +127,10 @@ class UsfirstEventDetailsEnqueue(webapp.RequestHandler):
     Handles enqueing updates to individual USFIRST events.
     """
     def get(self, year):
-        events = Event.query(Event.first_eid != None, Event.year == int(year))
+        event_keys = Event.query(Event.first_eid != None, Event.year == int(year)).fetch(200, keys_only=True)
+        events = ndb.get_multi(event_keys)
         
-        for event in events.fetch(200):
+        for event in events:
             taskqueue.add(
                 queue_name='usfirst',
                 url='/tasks/get/usfirst_event_details/%s/%s' % (year, event.first_eid),
@@ -185,9 +186,8 @@ class UsfirstAwardsEnqueue(webapp.RequestHandler):
         if when == "now":
             events = EventHelper.getEventsWithinADay()
         else:
-            events = Event.query(Event.official == True)
-            events = events.filter(Event.year == int(when))
-            events = events.fetch(500)
+            event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
+            events = ndb.get_multi(event_keys)
         
         for event in events:
             taskqueue.add(
@@ -251,9 +251,8 @@ class UsfirstMatchesEnqueue(webapp.RequestHandler):
         if when == "now":
             events = EventHelper.getEventsWithinADay()
         else:
-            events = Event.query(Event.official == True)
-            events = events.filter(Event.year == int(when))
-            events = events.fetch(500)
+            event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
+            events = ndb.get_multi(event_keys)
         
         for event in events:
             taskqueue.add(
@@ -305,9 +304,8 @@ class UsfirstEventRankingsEnqueue(webapp.RequestHandler):
         if when == "now":
             events = EventHelper.getEventsWithinADay()
         else:
-            events = Event.query(Event.official == True)
-            events = events.filter(Event.year == int(when))
-            events = events.fetch(500)
+            event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
+            events = ndb.get_multi(event_keys)
             
         for event in events:
             taskqueue.add(
@@ -352,7 +350,8 @@ class UsfirstTeamDetailsEnqueue(webapp.RequestHandler):
     def get(self):
         offset = int(self.request.get("offset", 0))
         
-        teams = Team.query().fetch(1000, offset=int(offset))
+        team_keys = Team.query().fetch(1000, offset=int(offset), keys_only=True)
+        teams = ndb.get_multi(team_keys)
         for team in teams:
             taskqueue.add(
                 queue_name='usfirst',

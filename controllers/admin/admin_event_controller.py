@@ -111,9 +111,7 @@ class AdminEventDetail(webapp.RequestHandler):
     """
     def get(self, event_key):
         event = Event.get_by_id(event_key)
-        event.prepAwards()
-        event.prepMatches()
-        event.prepTeams()
+        event.prepAwardsMatchesTeams()
 
         template_values = {
             "event": event

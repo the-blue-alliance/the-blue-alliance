@@ -29,9 +29,8 @@ class InsightsOverview(CacheableHandler):
             'valid_years': VALID_YEARS,
         }
         
-        insight_futures = [Insight.get_by_id_async(Insight.renderKeyName(0, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()]
-        for insight_future in insight_futures:
-            insight = insight_future.get_result()
+        insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(0, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
+        for insight in insights:
             if insight:
                 template_values[insight.name] = insight
                         
@@ -67,12 +66,10 @@ class InsightsDetail(CacheableHandler):
             'selected_year': year,
         }
         
-        insight_futures = [Insight.get_by_id_async(Insight.renderKeyName(year, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()]
-        for insight_future in insight_futures:
-            insight = insight_future.get_result()
+        insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(year, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
+        for insight in insights:
             if insight:
                 template_values[insight.name] = insight
         
         path = os.path.join(os.path.dirname(__file__), '../templates/insights_details.html')
         return template.render(path, template_values)
-        if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400) 

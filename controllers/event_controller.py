@@ -52,7 +52,8 @@ class EventList(CacheableHandler):
         super(EventList, self).get(year, explicit_year)
         
     def _render(self, year=None, explicit_year=False):
-        events = Event.query(Event.year == year).fetch(1000)
+        event_keys = Event.query(Event.year == year).fetch(1000, keys_only=True)
+        events = ndb.get_multi(event_keys)
         events.sort(key=EventHelper.distantFutureIfNoStartDate)
 
         week_events = None
@@ -104,14 +105,11 @@ class EventDetail(CacheableHandler):
         
         if not event:
             return self.redirect("/error/404")
-        
-        event.prepAwards()
-        event.prepMatches()
-        event.prepTeams()
-        
-        cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
+          
+        event.prepAwardsMatchesTeams()
 
         awards = AwardHelper.organizeAwards(event.awards)
+        cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
         matches = MatchHelper.organizeMatches(cleaned_matches)
         teams = TeamHelper.sortTeams(event.teams)
         

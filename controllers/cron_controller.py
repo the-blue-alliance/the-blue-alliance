@@ -33,7 +33,8 @@ class EventTeamRepairDo(webapp.RequestHandler):
     Repair broken EventTeams.
     """
     def get(self):
-        event_teams = EventTeam.query(EventTeam.year == None).fetch()
+        event_teams_keys = EventTeam.query(EventTeam.year == None).fetch(keys_only=True)
+        event_teams = ndb.get_multi(event_teams_keys)
 
         event_teams = EventTeamRepairer.repair(event_teams)
         event_teams = EventTeamManipulator.createOrUpdate(event_teams)
@@ -59,7 +60,9 @@ class EventTeamUpdate(webapp.RequestHandler):
         team_ids = set()
         
         # Add teams from Matches
-        for match in Match.query(Match.event == event.key).fetch(1000):
+        match_keys = Match.query(Match.event == event.key).fetch(1000, keys_only=True)
+        matches = ndb.get_multi(match_keys)
+        for match in matches:
             for team in match.team_key_names:
                 team_ids.add(team)
         
@@ -116,7 +119,7 @@ class EventOprDo(webapp.RequestHandler):
         teams = []
         oprs = []
         event = Event.get_by_id(event_key)
-        if Match.query(Match.event == event.key).count() > 0:
+        if Match.query(Match.event == event.key).fetch(keys_only=True).count() > 0:
             try:
                 opr,teams = OprHelper.opr(event_key)
                 oprs.append((opr,teams))
