@@ -1,7 +1,7 @@
 @chatWidth: 300px;
 @socialWidth: 250px;
-@feedBarHeight: 30px;
 @videoContainerTopOffset: 1px;
+@matchBarHeight: 36px;
 
 body {
   margin: 0;
@@ -111,7 +111,7 @@ body {
   position: fixed;
   top: 30px + @videoContainerTopOffset;
   left: 0px;
-  bottom: @feedBarHeight;
+  bottom: 0px;
   width: @socialWidth;
   background-color: @grayLighter;
   visibility: hidden;
@@ -131,7 +131,7 @@ body {
   position: fixed;
   top: 30px + @videoContainerTopOffset;
   right: 0px;
-  bottom: @feedBarHeight;
+  bottom: 0px;
   width: @chatWidth;
   background-color: @grayLighter;
   visibility: hidden;
@@ -153,73 +153,6 @@ body {
   visibility: visible;
 }
 
-.feed_bar {
-  position: fixed;
-  bottom: 0px;
-  left: 0px;
-  right: 0px;
-  height: 30px;
-  background-color: @grayDarker * 0.5;
-  
-  .scores{
-    width: 250px;
-    height: 100%;
-    padding-left: 10px;
-    border-right:1px @white solid;
-    float: left;
-    position: relative;
-    background-color:transparent;
-    .transition(background-color 2s);
-    cursor: pointer;
-  }
-
-  .new_scores{
-    background-color: #000033;
-  }
-  
-  .match-number{
-    color: @white;
-    font-size: 19px;
-    width: auto;
-    display: inline-block;
-    vertical-align: middle;
-  }
-  
-  .red {
-    color: #FF0000;
-    top: -2px;
-  }
-  
-  .blue {
-    color: #0066FF;
-    bottom: -2px;
-  }
-  
-  .red, .blue {
-    font-size: 13px;
-    width: 180px;
-    position: absolute;
-    left: 125px;
-  }
-  
-  .win {
-    font-weight: bold;
-  }
-}
-
-.empty_info {
-  display: inline-block;
-  vertical-align: middle;
-  background-color: @gray;
-  margin: 8px;
-  padding: 8px;
-  color: @white;  
-  border: 1px solid @black;
-  .border-radius(4px);
-  .box-shadow(0 1px 1px rgba(0,0,0,.075));
-  text-align: center;
-}
-
 .div_helper {
     display: inline-block;
     vertical-align: middle;
@@ -234,7 +167,7 @@ body {
   overflow: hidden;
   position: absolute;
   top: 30px;
-  bottom: @feedBarHeight;
+  bottom: 0px;
   right: 0px;
   left: 0px;
   z-index: 105;
@@ -280,6 +213,82 @@ body {
 
 .webcasts-show {
   display: block;
+}
+
+.match_bar {
+  background-color: @grayDarker * 0.5;
+  z-index: 4999;
+  width: 100%;
+  height: @matchBarHeight;
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  text-align: left;
+  overflow: hidden;
+  
+  .matches {
+    width: 200%;
+    height: 100%;
+  }
+  
+  .finished_match_red {
+    background-color: @TBAredSubtle;
+  }
+  
+  .finished_match_blue {
+    background-color: @TBAblueSubtle;
+  }
+  
+  .finished_match_tie {
+    background-color: @TBApurpleSubtle;
+  }
+  
+  .upcoming_match {
+    background-color: transparent;
+  }
+  
+  .match {
+    height: 100%;
+    width: auto;
+    border-right: 1px @white solid;
+    display: inline-block;
+    .alliances {
+      font-weight: bold;
+    }
+  }
+  
+  .match-number {
+    color: @white;
+    font-size: 19px;
+    width: auto;
+    display: inline-block;
+    line-height: @matchBarHeight;
+    margin: 0 10px 0 10px;
+    float: left;
+  }
+  
+  .alliances {
+    display: inline-block;
+    height: 100%;
+    width: auto;
+    float: left;
+    margin: 0 10px 0 0;
+  }
+  
+  .red {
+    color: #FF0000;
+  }
+  
+  .blue {
+    color: #0066FF;
+  }
+  
+  .red, .blue {
+    font-size: 13px;
+    width: auto;
+    height: 50%;
+    display: block;
+  }
 }
 
 .overlay {

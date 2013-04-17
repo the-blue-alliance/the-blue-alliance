@@ -1,4 +1,4 @@
-/* This code is based on MadStream, an FRC webcast portal
+/*! This code is based on MadStream, an FRC webcast portal
  * built in collaboration by FRC Teams 604 and 1323.
  */
 
@@ -214,7 +214,9 @@ function setupView(viewNum, $item) {
 		}
 		
 		// Combines the video player with overlay
-		var viewContents = player + "<div id='overlay_" + viewNum + "' class='overlay' alt='" + eventName + "'>" +
+		var viewContents = player + "<div id='match_bar_" + viewNum + "' class='match_bar'>" + 
+		"<div class='matches " + eventKey + "_matches'></div></div>" +
+		"<div id='overlay_"+ viewNum + "' class='overlay' alt='" + eventName + "'>" +
 		"<div class='overlay-title'>" + eventName + "</div>" +
 		"<div id='close_" + viewNum + "' class='view-close' rel='tooltip' data-placement='left' title='Close'>" +
 		"<i class='icon-remove icon-white'></i></div>" +
@@ -225,6 +227,12 @@ function setupView(viewNum, $item) {
 		document.getElementById('view_' + viewNum).innerHTML = hiddenviews[viewNum];
 		$("[rel=tooltip]").tooltip();
 		setupCloseSwap(viewNum);
+		
+		// Update matchbar on init
+		var eventsRef = new Firebase('https://thebluealliance.firebaseio.com/events/' + eventKey);
+		eventsRef.on('value', function(snapshot) {
+		  updateMatchbar(snapshot);
+		});
 	});
 }
 
@@ -254,10 +262,12 @@ function setupCloseSwap(viewNum) {
 	
 	$("#view_" + viewNum).mouseover(function() {
 		$("#overlay_"+viewNum).fadeIn(0);
+		$("#match_bar_"+viewNum).slideUp(75);
 	});
 	$("#view_" + viewNum).mouseleave(function() {
 		if (!swapping) {
 			$("#overlay_"+viewNum).fadeOut(0);
+			$("#match_bar_"+viewNum).slideDown(75);
 		}
 	});
 }
