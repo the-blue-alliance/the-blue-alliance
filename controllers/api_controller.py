@@ -6,12 +6,14 @@ import webapp2
 from datetime import datetime
 
 from google.appengine.api import memcache
-from google.appengine.ext import db
+from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 import tba_config
 from helpers.api_helper import ApiHelper
+from helpers.api.model_to_dict import ModelToDict
 
+from models.award import Award
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
@@ -33,11 +35,47 @@ class ApiTeamsShow(MainApiHandler):
     def get(self):
         teams = list()
         team_keys = self.request.get('teams').split(',')
-        
+
         for team_key in team_keys:
-            teams.append(ApiHelper.getTeamInfo(team_key))
-        
+            memcache_key = "api_%s" % team_key
+            team_dict = memcache.get(team_key)
+            current_year = datetime.now().year
+
+            if team_dict is None:
+                team = Team.get_by_id(team_key)
+                if team is not None:
+                    team_dict = ModelToDict.teamConverter(team)
+
+                    event_teams = EventTeam.query(EventTeam.team == team.key,\
+                                                  EventTeam.year == current_year)\
+                                                  .fetch(1000, projection=[EventTeam.event])
+                    event_ids = [event_team.event for event_team in event_teams]
+                    events = ndb.get_multi(event_ids)
+
+                    game = Match.FRC_GAMES_BY_YEAR[current_year]
+                    matches = Match.query(Match.team_key_names == team.key_name,\
+                                          Match.game == game).fetch(1000)
+
+                    awards = Award.query(Award.team == team.key, Award.year == current_year).fetch(1000)
+                    team_dict["events"] = list()
+                    for event in events:
+                        event_dict = ModelToDict.eventConverter(event)
+
+                        event_dict["matches"] = [ModelToDict.matchConverter(match) for match in matches if match.event is event.key]
+                        event_dict["awards"] = [ModelToDict.awardConverter(award) for award in awards if award.event is event.key]
+
+                        team_dict["events"].append(event_dict)
+
+
+                    #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra 
+                    if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, team_dict, 2592000)
+                    teams.append(team_dict)
+                else:
+                    raise IndexError
+
+
         self.response.out.write(json.dumps(teams))
+
 
 class ApiTeamDetails(MainApiHandler):
     """
@@ -124,9 +162,20 @@ class ApiEventDetails(MainApiHandler):
             self.response.out.write(json.dumps(error_message))
             return False
 
-        
+        memcache_key = "api_event_%s", event_key
+        event_dict = memcache.get(memcache_key)
+        if event_dict is None:
+            event = Event.get_by_id(event_key)
+            event.prepMatches()
+            event.prepTeams()
+            event.prepAwards()
 
-        event_dict = ApiHelper.getEventInfo(event_key)
+            event_dict = ModelToDict.eventConverter(event)
+            event_dict["matches"] = [ModelToDict.matchConverter(match) for match in event.matches]
+            event_dict["teams"] = [ModelToDict.teamConverter(team) for team in event.teams]
+            event_dict["awards"] = [ModelToDict.awardConverter(award) for award in event.awards]
+
+            memcache.set(memcache_key, event_dict, (30 * ((60 * 60) * 24)))
 
         self.response.out.write(json.dumps(event_dict))
 
@@ -142,11 +191,15 @@ class ApiMatchDetails(MainApiHandler):
             match_keys = self.request.get('matches').split(',')
 
         if 'match_keys' in locals():
+            match_keys = [ndb.Key(Match, match_key) for match_key in match_keys]
+            matches = ndb.get_multi(match_keys)
+
             match_json = list()
-            for match in match_keys:
-                match_json.append(ApiHelper.getMatchDetails(match))
+            for match in matches:
+                match_json.append(ModelToDict.matchConverter(match))
         else:
-            match_json = ApiHelper.getMatchDetails(match_key)
+            match = Match.get_by_id(match_key)
+            match_json = ModelToDict.matchConverter(match)
 
         self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(match_json))

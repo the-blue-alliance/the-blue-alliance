@@ -24,6 +24,7 @@ class Match(ndb.Model):
     }
         
     FRC_GAMES = [
+        "frc_2013_alta",
         "frc_2012_rebr",
         "frc_2011_logo",
         "frc_2010_bkwy",
@@ -49,6 +50,7 @@ class Match(ndb.Model):
     ]
     
     FRC_GAMES_BY_YEAR = {
+        2013: "frc_2013_alta",
         2012: "frc_2012_rebr",
         2011: "frc_2011_logo",
         2010: "frc_2010_bkwy",
@@ -87,7 +89,7 @@ class Match(ndb.Model):
 
     comp_level = ndb.StringProperty(required=True, choices=set(COMP_LEVELS))
     event = ndb.KeyProperty(kind=Event, required=True)
-    game = ndb.StringProperty(required=True,choices=set(FRC_GAMES), indexed=False)
+    game = ndb.StringProperty(required=True,choices=set(FRC_GAMES), indexed=True)
     match_number = ndb.IntegerProperty(required=True, indexed=False)
     no_auto_update = ndb.BooleanProperty(default=False, indexed=False) #Set to True after manual update
     set_number = ndb.IntegerProperty(required=True, indexed=False)
