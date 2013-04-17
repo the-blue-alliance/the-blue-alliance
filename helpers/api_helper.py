@@ -86,8 +86,7 @@ class ApiHelper(object):
                 else:
                     event_dict["end_date"] = None
 
-                event.prepTeams()
-                event.prepMatches()
+                event.prepTeamsMatches()
                 event_dict["teams"] = [team.key_name for team in event.teams]
                 event_dict["matches"] = [match.key_name for match in event.matches]
 

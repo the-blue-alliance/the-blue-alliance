@@ -101,7 +101,15 @@ class Event(ndb.Model):
     @ndb.toplevel
     def prepAwardsMatchesTeams(self):
         yield self.get_awards_async(), self.get_matches_async(), self.get_teams_async()
-
+        
+    @ndb.toplevel
+    def prepTeams(self):
+        yield self.get_teams_async()
+        
+    @ndb.toplevel
+    def prepTeamsMatches(self):
+        yield self.get_matches_async(), self.get_teams_async()
+        
     @property
     def rankings(self):
         """
