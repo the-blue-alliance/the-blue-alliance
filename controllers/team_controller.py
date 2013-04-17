@@ -155,6 +155,7 @@ class TeamDetail(CacheableHandler):
         
         years = set()
         events_matches, awards = get_events_matches_awards()
+        events_matches = sorted(events_matches, key=lambda (e, _): e.start_date)
         years = sorted(years)
         
         participation = list()
