@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance - Account{% endblock %}
+
+{% block meta_description %}Log in to your TBA account or register a new account.{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="span8 offset2">
+    {% for k, v in msg %}
+        <pre>{{ k }}</pre>
+    {% endfor %}
+    {% if not user %}
+        <a href="/auth/facebook" class="btn btn-info">Login</a>
+    {% endif %}
+    {% if user %}
+        <h2>My Account</h2>
+        <div class="media">
+         <div class="img avatar">
+           <img src="{{ user.avatar_url }}">
+         </div>
+          <div class="body">
+            <h1 style="margin-top: 0; padding-top: 0">{{ user.name }}</h1>
+          </div>
+        </div>
+      <pre>{{user}}</pre>
+  
+        <p style="margin-top: 2em;">
+          <a href="/logout" class="btn">logout</a>
+        </p>    
+    {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

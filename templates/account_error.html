@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Auth Error!{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="hero-unit landing-hero-unit">
+    <div class="row-fluid">
+      <div class="span7 landing">
+          <h2>Error</h2>
+          <p>Error messages are displayed here for development purposes.</p>
+          <pre>{{ exception_name }}: {{ exception }}</pre>
+      </div>
+      <div class="span5 hidden-phone">
+        <img class="landing-logo" src="/images/logo_square_200.png" alt="tbalogo" />
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
