@@ -137,7 +137,7 @@ class UsfirstEventDetailsEnqueue(webapp.RequestHandler):
                 method='GET')
         
         template_values = {
-            'event_count': events.count(),
+            'event_count': len(events),
             'year': year,
         }
 
