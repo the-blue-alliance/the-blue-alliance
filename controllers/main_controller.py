@@ -8,7 +8,7 @@ import sys
 
 from google.appengine.api import memcache
 from google.appengine.ext import ndb, webapp
-#sys.modules['ndb'] = ndb
+sys.modules['ndb'] = ndb
 from google.appengine.ext.webapp import template
 
 import tba_config
@@ -303,9 +303,7 @@ class AuthHandler(BaseHandler, SimpleAuthHandler):
          auth_info contains access token or oauth token and secret.
         """
         auth_whitelist = Sitevar.get_by_id("auth.whitelist")
-        whitelist = json.loads(auth_whitelist.values_json)
-        test_id = data['id']
-        if test_id in whitelist[0]:
+        if data['id'] in auth_whitelist.values_json:
             auth_id = '%s:%s' % (provider, data['id'])
             logging.info('Looking for a user with id %s', auth_id)
     
