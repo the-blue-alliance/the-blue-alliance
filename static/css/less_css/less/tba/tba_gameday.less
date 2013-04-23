@@ -14,7 +14,8 @@ body {
   .nav, .navbar, .navbar-inner,
   .container, .brand,
   .dropdown, .dropdown-toggle,
-  .chat, .chat-toggle, .social, .social-toggle {
+  .chat, .chat-toggle, .social, .social-toggle,
+  .settings, .settings-button {
     padding: 0 !important;
     margin: 0 !important;
     min-height: 30px !important;
@@ -48,12 +49,12 @@ body {
     margin-left: 10px;
   }
   
-  .dropdown-toggle, .chat-toggle, .social-toggle {
+  .dropdown-toggle, .chat-toggle, .social-toggle, .settings-button {
     padding: 6px 8px !important;
     height: 18px !important;
   }
   
-  .dropdown:hover, .chat:hover, .social:hover {
+  .dropdown:hover, .chat:hover, .social:hover, .settings:hover {
     background-color: @gray;
   }
   
@@ -159,6 +160,10 @@ body {
     height: 100%;
 }
 
+.remove-following {
+  cursor: pointer;
+}
+
 .video_buttons {
   cursor: move;
 }
@@ -245,6 +250,10 @@ body {
   
   .upcoming_match {
     background-color: transparent;
+  }
+  
+  .followed_match {
+    background-color: @yellow * 0.25;
   }
   
   .match {
