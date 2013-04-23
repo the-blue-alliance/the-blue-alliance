@@ -71,6 +71,17 @@ function setupViews() {
 	  setupView(0, $("#2013kickoff-1"));
 	  $("#nav-alert-container").html('<div class="alert alert-success nav-alert"><button type="button" class="close" data-dismiss="alert">&times;</button><strong>Welcome!</strong> Remember to come back during the competition season for webcasts, scores, and more!</div>');
   }
+  
+  // Special Champs Mode
+  var isChamps = urlvars['champs'];
+  if (isChamps != null) {
+    layout_3();
+    setChat(true);
+    setupView(0, $("#2013arc-1"));
+    setupView(1, $("#2013cur-1"));
+    setupView(2, $("#2013gal-1"));
+    setupView(3, $("#2013new-1"));
+  }
 }
 
 // Url vars for setting up GameDay with certain videos loaded
