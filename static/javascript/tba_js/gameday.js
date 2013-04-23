@@ -240,7 +240,7 @@ function setupView(viewNum, $item) {
 		setupCloseSwap(viewNum);
 		
 		// Update matchbar on init
-		var eventsRef = new Firebase('https://thebluealliance.firebaseio.com/events/' + eventKey);
+		var eventsRef = new Firebase('https://thebluealliance-dev.firebaseio.com/events/' + eventKey);
 		eventsRef.on('value', function(snapshot) {
 		  updateMatchbar(snapshot);
 		});

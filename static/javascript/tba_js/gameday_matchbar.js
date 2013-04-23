@@ -1,4 +1,4 @@
-var eventsRef = new Firebase('https://thebluealliance.firebaseio.com/events/');
+var eventsRef = new Firebase('https://thebluealliance-dev.firebaseio.com/events/');
 
 eventsRef.on('child_changed', function(snapshot) {
   updateMatchbar(snapshot);
@@ -11,6 +11,9 @@ eventsRef.on('child_added', function(snapshot) {
 function updateMatchbar(snapshot) {
   var event_key = snapshot.name();
   var event_data = snapshot.val();
+  if (event_data == null) {
+    return;
+  }
   var upcoming_matches = event_data.upcoming_matches;
   var last_matches = event_data.last_matches;
   var match_bar = $('.' + event_key + '_matches');
@@ -45,6 +48,13 @@ function updateMatchbar(snapshot) {
           $(this).append(rendered_match);
         }
       }
+    }
+    
+    // Add event code to first match
+    var event_code = event_key.replace(/[0-9]/g, '').toUpperCase();
+    var match_num = $(this)[0].firstChild.firstChild.innerHTML
+    if (match_num.indexOf(event_code) == -1) {  // Make sure not to add twice
+      $(this)[0].firstChild.firstChild.innerHTML = event_code + " " + match_num;
     }
   });
 }
