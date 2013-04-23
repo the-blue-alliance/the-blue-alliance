@@ -8,6 +8,12 @@ eventsRef.on('child_added', function(snapshot) {
   updateMatchbar(snapshot);
 });
 
+// Handle matchbar "Follow" settings
+var following_set = JSON.parse($.cookie("tba-gameday-following"));
+if (following_set == null) {
+  following_set = {};
+}
+
 function updateMatchbar(snapshot) {
   var event_key = snapshot.name();
   var event_data = snapshot.val();
@@ -41,10 +47,19 @@ function updateMatchbar(snapshot) {
     
     if (upcoming_matches != null) {
       for (var i=0; i<upcoming_matches.length; i++) {
-        // Render match if not already present in matchar
+        // Render match if not already present in matchbar
         var upcoming_match = upcoming_matches[i];
         if ($(this).children('div[id="' + upcoming_match.key_name + '"').length == 0) {
           var rendered_match = renderMatch(upcoming_match).addClass('upcoming_match');
+          // Color followed matches a different color
+          var teams = upcoming_match.alliances.red.teams.concat(upcoming_match.alliances.blue.teams);
+          for (var n=0; n<teams.length; n++) {
+            var number = teams[n].substring(3);
+            if (following_set[number]) {
+              rendered_match.addClass('followed_match');
+              break;
+            }
+          }
           $(this).append(rendered_match);
         }
       }
@@ -86,3 +101,59 @@ function renderMatch(match) {
   var new_match = $('<div>', {'class': 'match', 'id': match.key_name}).append(match_number).append(alliances);
   return new_match;
 }
+
+$(document).ready(function() {
+  // Helper to insert teams in order
+  function insertTeam(number) {
+    var followed_teams = $("#followed-teams")[0].children;
+    var added = false;
+    var element = $("<li id=following-" + number + " class='followed-team'>" + number + " <a team-num='" + number + "' class='remove-following' title='Remove'><i class='icon-remove'></i></a></li>");
+    for (var i=0; i<followed_teams.length; i++) {
+      if (parseInt(followed_teams[i].id.replace(/[A-Za-z$-]/g, "")) > number) {
+        element.insertBefore($("#" + followed_teams[i].id));
+        added = true;
+        break;
+      }
+    }
+    if (!added) {
+      $("#followed-teams").append(element);
+    }
+    
+    // Attach deletion callback
+    $(".remove-following").click(function() {
+      var num = $(this).attr("team-num");
+      delete following_set[num];
+      $("#following-" + num).remove();
+      // Set cookie
+      $.cookie("tba-gameday-following", JSON.stringify(following_set));
+    });
+  }
+  
+  // Init
+  for (var key in following_set) {
+    insertTeam(key);
+  }
+
+  // Handle form to follow teams
+  $("#follow-form").submit(function() {
+    var number = $("#add-team-number").val();
+    if (!$.isNumeric(number)) {
+     // Reset form
+      $("#follow-form")[0].reset();
+      return false;
+    }
+    
+    // Add to list if not already present
+    if (!following_set[number]) {
+      following_set[number] = true;
+      insertTeam(number);
+    }
+    
+    // Set cookie
+    $.cookie("tba-gameday-following", JSON.stringify(following_set));
+    
+    // Reset form
+    $("#follow-form")[0].reset();
+    return false;
+  });
+});
