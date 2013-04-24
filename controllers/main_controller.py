@@ -357,9 +357,8 @@ class AuthHandler(BaseHandler, SimpleAuthHandler):
 
     def handle_exception(self, exception, debug):
         logging.error(exception)
-        template_values = {'exception': exception, 'exception_name': exception.__class__.__name__}
-        path = os.path.join(os.path.dirname(__file__), '../templates/account_error.html')
-        self.response.out.write(template.render(path, template_values))
+        self.session.add_flash('Error. Please try again later.', key='msg')
+        self.redirect('/account')
 
     def _callback_uri_for(self, provider):
         return self.uri_for('auth_callback', provider=provider, _full=True)
