@@ -10,7 +10,7 @@ from controllers.main_controller import ContactHandler, HashtagsHandler, \
       MainKickoffHandler, MainBuildseasonHandler, MainCompetitionseasonHandler, \
       OprHandler, SearchHandler, AboutHandler, ThanksHandler, \
       PageNotFoundHandler, ChannelHandler, GamedayHandler, \
-      WebcastsHandler, RecordHandler
+      WebcastsHandler, RecordHandler, AuthHandler, AccountHandler
 from controllers.match_controller import MatchDetail
 from controllers.team_controller import TeamList, TeamDetail
 from controllers.ajax_controller import TypeaheadHandler, WebcastHandler
@@ -24,6 +24,10 @@ landing_handler = {tba_config.KICKOFF: MainKickoffHandler,
 
 app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['landing_handler']]),
                                ('/about', AboutHandler),
+                               ('/account', AccountHandler),
+                               webapp2.Route('/logout', handler='controllers.main_controller.AuthHandler:logout', name='logout'),
+                               webapp2.Route('/auth/<provider>/callback', handler='controllers.main_controller.AuthHandler:_auth_callback', name='auth_callback'),
+                               webapp2.Route('/auth/<provider>', handler='controllers.main_controller.AuthHandler:_simple_auth', name='auth_login'),
                                ('/channel', ChannelHandler),
                                ('/contact', ContactHandler),
                                ('/events', EventList),
@@ -48,4 +52,5 @@ app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['landing_
                                ('/_/webcast/(.*)/(.*)', WebcastHandler),
                                ('/.*', PageNotFoundHandler),
                                ],
-                              debug=tba_config.DEBUG)
+                              debug=tba_config.DEBUG,
+                              config=tba_config.CONFIG)
