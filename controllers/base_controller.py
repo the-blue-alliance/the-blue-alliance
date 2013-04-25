@@ -1,12 +1,20 @@
 import webapp2
-from webapp2_extras import sessions
+import email.utils
+import hashlib
+import hmac
+import base64
+import time
+from webapp2_extras import auth, sessions
+
+import cgi
+import urllib
+from django.utils import simplejson as json
 
 from google.appengine.api import memcache
 
-import facebook
 import tba_config
 
-from models.user import User
+from models.sitevar import Sitevar
 
 class CacheableHandler(webapp2.RequestHandler):
     """
@@ -47,36 +55,36 @@ class CacheableHandler(webapp2.RequestHandler):
         if tba_config.CONFIG["memcache"]: memcache.set(self.cache_key, content, self._cache_expiration)
 
 
-
 class BaseHandler(webapp2.RequestHandler):
-    """Provides access to the active Facebook user in self.current_user
 
-    The property is lazy-loaded on first access, using the cookie saved
-    by the Facebook JavaScript SDK to determine the user ID of the active
-    user. See http://developers.facebook.com/docs/authentication/ for
-    more information.
-    """
-    @property
+    @webapp2.cached_property
+    def session(self):
+        """Returns a session using the default cookie key"""
+        return self.session_store.get_session()
+
+    @webapp2.cached_property
+    def auth(self):
+            return auth.get_auth()
+  
+    @webapp2.cached_property
     def current_user(self):
-        if not hasattr(self, "_current_user"):
-            self._current_user = None
-            cookie = facebook.get_user_from_cookie(
-                self.request.cookies, tba_config.CONFIG['FACEBOOK_APP_ID'], tba_config.CONFIG['FACEBOOK_APP_SECRET'])
-            if cookie:
-                # Store a local instance of the user data so we don't need
-                # a round-trip to Facebook on every request
-                user = User.get_by_key_name(cookie["uid"])
-                if not user:
-                    graph = facebook.GraphAPI(cookie["access_token"])
-                    profile = graph.get_object("me")
-                    user = User(key_name=str(profile["id"]),
-                                id=str(profile["id"]),
-                                name=profile["name"],
-                                profile_url=profile["link"],
-                                access_token=cookie["access_token"])
-                    user.put()
-                elif user.access_token != cookie["access_token"]:
-                    user.access_token = cookie["access_token"]
-                    user.put()
-                self._current_user = user
-        return self._current_user
+        """Returns currently logged in user"""
+        user_dict = self.auth.get_user_by_session()
+        return self.auth.store.user_model.get_by_id(user_dict['user_id'])
+      
+    @webapp2.cached_property
+    def logged_in(self):
+        """Returns true if a user is currently logged in, false otherwise"""
+        return self.auth.get_user_by_session() is not None
+
+    def dispatch(self):
+        # Get a session store for this request.
+        self.session_store = sessions.get_store(request=self.request)
+
+        try:
+            # Dispatch the request.
+            webapp2.RequestHandler.dispatch(self)
+        finally:
+            # Save all sessions.
+            self.session_store.save_sessions(self.response)
+
