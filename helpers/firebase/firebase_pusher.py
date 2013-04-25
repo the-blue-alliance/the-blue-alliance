@@ -24,12 +24,12 @@ class FirebasePusher(object):
         for match in upcoming_matches:
             upcoming_matches_payload.append(self.match_to_payload_dict(match))
             
-        payload = {'last_matches': last_matches_payload,
-                   'upcoming_matches': upcoming_matches_payload}
-        payload_json = json.dumps(payload)
+        data = {'last_matches': last_matches_payload,
+                'upcoming_matches': upcoming_matches_payload}
+        payload_data = json.dumps(data)
         
         taskqueue.add(url='/tasks/posts/firebase_push', 
-                      method='GET',
+                      method='POST',
                       queue_name='firebase',
-                      params={'key': 'events/{}'.format(event.key_name),
-                              'payload_json': payload_json})
+                      payload=json.dumps({'key': 'events/{}'.format(event.key_name),
+                              'data': payload_data}))

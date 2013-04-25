@@ -6,6 +6,7 @@ from google.appengine.api import urlfetch
 from models.sitevar import Sitevar
 
 import tba_config
+import json
 
 
 class FirebasePushDo(webapp.RequestHandler):
@@ -14,9 +15,10 @@ class FirebasePushDo(webapp.RequestHandler):
     """
     SUCCESS_STATUS_CODES = {200, 204}
 
-    def get(self):
-        key = self.request.get('key')
-        payload_json = self.request.get('payload_json')
+    def post(self):
+        payload = json.loads(self.request.body)
+        key = payload['key']
+        payload_json = payload['data']
         
         firebase_secrets = Sitevar.get_by_id("firebase.secrets")
         if firebase_secrets == None:
