@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="span4">
+            <h2 class="hidden-phone">The Blue Alliance</h2>
+            <p class="hidden-phone"><em>FIRST</em> Robotics Competition team information, event results, and videos</p>
+            <form class="main-search" action="http://www.thebluealliance.com/search">
+                <input type="hidden" name="cx" value="017956276086362105630:99ctqytcokm"/>
+                <input type="hidden" name="cof" value="FORID:11" />
+                <input type="hidden" name="ie" value="UTF-8" />
+                <input type="text" class="search-query" placeholder="Search for teams and events" name="q"/>
+            </form>
+            <div class="btn-group">
+                <a class="btn btn-large" href="/teams"><i class="icon-user"></i> Teams</a>
+                <a class="btn btn-large" href="/events"><i class="icon-calendar"></i> Events</a>
+            </div>
+            <div class="hidden-phone">
+                <br />
+                <h4>Help other <em>FIRST</em> teams!</h4>
+                <p><small>KNOW VIDEOS WE'RE MISSING?</small><br /><a class="btn" href="https://docs.google.com/spreadsheet/ccc?key=0ApRO2Yzh2z01dExFZEdieV9WdTJsZ25HSWI3VUxsWGc" target="_blank"><i class="icon-upload"></i> Add YouTube Videos</a></p>
+                <p><small>LIKE CODING?</SMALL><br /><a class="btn" href="https://github.com/gregmarra/the-blue-alliance/" target="_blank"><i class="icon-wrench"></i> Hack on The Blue Alliance</a></p>
+            </div>
+        </div>
+        <div class="span8">
+            <h2><span class="countdown-number countdown-days">--</span><span class="countdown-label day-label"> Days</span> until 2014! <small>Water Game?</small></h2>
+            <div id="countdown-finish-time">[2014, 1, 1, 0, 0, 0]</div>
+            <br /><br />
+            <div class="fitvids">
+                <iframe width="560" height="315" src="http://www.youtube.com/embed/MQ0VNzIvHx0?rel=0&amp;start=107" frameborder="0" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

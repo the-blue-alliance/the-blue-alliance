@@ -8,7 +8,7 @@ from controllers.event_controller import EventList, EventDetail, EventRss
 from controllers.insights_controller import InsightsOverview, InsightsDetail
 from controllers.main_controller import ContactHandler, HashtagsHandler, \
       MainKickoffHandler, MainBuildseasonHandler, MainCompetitionseasonHandler, \
-      OprHandler, SearchHandler, AboutHandler, ThanksHandler, \
+      MainOffseasonHandler, OprHandler, SearchHandler, AboutHandler, ThanksHandler, \
       PageNotFoundHandler, ChannelHandler, GamedayHandler, \
       WebcastsHandler, RecordHandler
 from controllers.match_controller import MatchDetail
@@ -20,7 +20,9 @@ template.register_template_library('common.my_filters')
 
 landing_handler = {tba_config.KICKOFF: MainKickoffHandler,
                    tba_config.BUILDSEASON: MainBuildseasonHandler,
-                   tba_config.COMPETITIONSEASON: MainCompetitionseasonHandler}
+                   tba_config.COMPETITIONSEASON: MainCompetitionseasonHandler,
+                   tba_config.OFFSEASON: MainOffseasonHandler,
+                   }
 
 app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['landing_handler']]),
                                ('/about', AboutHandler),

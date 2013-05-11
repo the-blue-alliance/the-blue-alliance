@@ -65,6 +65,17 @@ class MainCompetitionseasonHandler(CacheableHandler):
         path = os.path.join(os.path.dirname(__file__), '../templates/index_competitionseason.html')
         return template.render(path, template_values)
 
+class MainOffseasonHandler(CacheableHandler):
+    def __init__(self, *args, **kw):
+        super(CacheableHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24
+        self._cache_key = "main_offseason"
+        self._cache_version = 1
+
+    def _render(self, *args, **kw):
+        path = os.path.join(os.path.dirname(__file__), '../templates/index_offseason.html')
+        return template.render(path, {})
+
 class ContactHandler(CacheableHandler):
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
