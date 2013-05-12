@@ -19,6 +19,7 @@ class EventManipulator(ManipulatorBase):
             "facebook_eid",
             "first_eid",
             "location",
+            "name",
             "official",
             "rankings_json",
             "short_name",
