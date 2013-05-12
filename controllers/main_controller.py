@@ -70,11 +70,16 @@ class MainOffseasonHandler(CacheableHandler):
         super(CacheableHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
         self._cache_key = "main_offseason"
-        self._cache_version = 1
+        self._cache_version = 2
 
     def _render(self, *args, **kw):
+        week_events = EventHelper.getWeekEvents()
+        template_values = {
+            "events": week_events,
+        }
+
         path = os.path.join(os.path.dirname(__file__), '../templates/index_offseason.html')
-        return template.render(path, {})
+        return template.render(path, template_values)
 
 class ContactHandler(CacheableHandler):
     def __init__(self, *args, **kw):

@@ -29,6 +29,11 @@
         <div class="span8">
             <h2><span class="countdown-number countdown-days">--</span><span class="countdown-label day-label"> Days</span> until 2014! <small>Water Game?</small></h2>
             <div id="countdown-finish-time">[2014, 1, 1, 0, 0, 0]</div>
+            {% if events and events|length > 0%}
+                {% with events as events %}
+                    {% include "event_partials/event_table.html" %}
+                {% endwith %}
+            {% endif %}
             <br /><br />
             <div class="fitvids">
                 <iframe width="560" height="315" src="http://www.youtube.com/embed/MQ0VNzIvHx0?rel=0&amp;start=107" frameborder="0" allowfullscreen></iframe>
