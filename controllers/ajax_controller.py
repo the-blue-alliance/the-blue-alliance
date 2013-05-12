@@ -33,6 +33,13 @@ class TypeaheadHandler(CacheableHandler):
         super(TypeaheadHandler, self).get()
 
     def _render(self):
+        # The typeahead times out a lot and causes instances to go over memory limits
+        # Disabled until we fix it.
+        # todo: make this work again -gregmarra 20130511
+        return "{}"
+
+        # \/ \/ never runs \/ \/ 
+
         @ndb.tasklet
         def get_events_async():
             event_keys = yield Event.query().order(-Event.year).order(Event.name).fetch_async(keys_only=True)
