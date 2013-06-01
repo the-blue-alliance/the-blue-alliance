@@ -49,7 +49,7 @@
     <div class="row">
         <div class="span12 well">
             <div class="row-fluid">
-                <span class="lead"><strong>Event currently in progress</strong></span>
+                <span class="lead"><strong>Event in progress</strong></span>
                 <div class="hidden-phone pull-right">
                   {% if event.webcast%}
                       <a class="btn btn-large btn-success" href="{{event.gameday_url}}" target="_blank"><i class="icon-facetime-video icon-white"></i> Watch now</a>
@@ -91,14 +91,14 @@
             <div class="row">
                 {% if matches.qm %}
                 <div class="span6">
-                    <h3>Qualification Match Results</h3>
+                    <h3>Qualification Results</h3>
                     {% include "match_partials/qual_match_table.html" %}
                 </div>
                 {% endif %}
 
                 {% if matches.ef or matches.qf or matches.sf or matches.f %}
                 <div class="span6">
-                    <h3>Elimination Match Results</h3>
+                    <h3>Elimination Results</h3>
                     {% include "match_partials/elim_match_table.html" %}
 
                     {% if matches.qm %}
