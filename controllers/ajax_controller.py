@@ -5,7 +5,7 @@ from google.appengine.api import memcache
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
-from base_controller import BaseHandler, CacheableHandler
+from base_controller import BaseHandlerFB, CacheableHandler
 
 from models.event import Event
 from models.team import Team

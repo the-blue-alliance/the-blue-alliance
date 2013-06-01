@@ -48,7 +48,7 @@ class CacheableHandler(webapp2.RequestHandler):
 
 
 
-class BaseHandler(webapp2.RequestHandler):
+class BaseHandlerFB(webapp2.RequestHandler):
     """Provides access to the active Facebook user in self.current_user
 
     The property is lazy-loaded on first access, using the cookie saved

@@ -8,7 +8,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
 import tba_config
-from base_controller import BaseHandler, CacheableHandler
+from base_controller import BaseHandlerFB, CacheableHandler
 
 from models.insight import Insight
 

@@ -9,7 +9,7 @@ from google.appengine.ext.webapp import template
 
 import tba_config
 
-from base_controller import BaseHandler, CacheableHandler
+from base_controller import BaseHandlerFB, CacheableHandler
 from helpers.event_helper import EventHelper
 
 from models.event import Event
@@ -136,7 +136,7 @@ class OprHandler(CacheableHandler):
         path = os.path.join(os.path.dirname(__file__), "../templates/opr.html")
         return template.render(path, {})
 
-class SearchHandler(BaseHandler):
+class SearchHandler(BaseHandlerFB):
     def get(self):
         try:
             q = self.request.get("q")
@@ -200,7 +200,7 @@ class GamedayHandler(CacheableHandler):
         path = os.path.join(os.path.dirname(__file__), '../templates/gameday.html')
         return template.render(path, template_values)
 
-class ChannelHandler(BaseHandler):
+class ChannelHandler(BaseHandlerFB):
     # This is required for the FB JSSDK
     def get(self):
         expires = 60*60*24*365
@@ -210,7 +210,7 @@ class ChannelHandler(BaseHandler):
         self.response.headers.add_header("Expires", expires_date)
         self.response.out.write('<script src="//connect.facebook.net/en_US/all.js"></script>')
 
-class PageNotFoundHandler(BaseHandler):
+class PageNotFoundHandler(BaseHandlerFB):
     def get(self):
         self.error(404)
         self.response.out.write(render_static("404"))
