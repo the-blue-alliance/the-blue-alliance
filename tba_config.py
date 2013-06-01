@@ -26,3 +26,4 @@ else:
 
 CONFIG['landing_handler'] = OFFSEASON
 CONFIG["static_resource_version"] = 5
+CONFIG['webapp2_extras.sessions'] = {'secret_key': '7674B2D97DEA0AC5DA452389BDD41E0DAB9B'}
