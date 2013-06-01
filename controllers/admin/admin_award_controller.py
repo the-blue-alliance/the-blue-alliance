@@ -2,36 +2,37 @@ import json
 import logging
 import os
 
-from google.appengine.ext import ndb
-from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
-from models.event import Event
-from models.award import Award
-from models.team import Team
+from controllers.base_controller import LoggedInHandler
 from helpers.award_manipulator import AwardManipulator
+from models.award import Award
+from models.event import Event
+from models.team import Team
 
 
-class AdminAwardDashboard(webapp.RequestHandler):
+class AdminAwardDashboard(LoggedInHandler):
     """
     Show stats about Awards
     """
     def get(self):
+        self._require_admin()
         award_count = Award.query().count()
         
-        template_values = {
+        self.template_values.update({
             "award_count": award_count
-        }
+        })
         
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/award_dashboard.html')
-        self.response.out.write(template.render(path, template_values))
+        self.response.out.write(template.render(path, self.template_values))
 
 
-class AdminAwardAdd(webapp.RequestHandler):
+class AdminAwardAdd(LoggedInHandler):
     """
     Add Award from JSON.
     """
     def post(self):
+        self._require_admin()
         event_key = self.request.get('event_key')
         awards_json = self.request.get('awards_json')
         awards = json.loads(awards_json)
@@ -59,21 +60,23 @@ class AdminAwardAdd(webapp.RequestHandler):
         self.redirect('/admin/event/{}'.format(event_key))
 
 
-class AdminAwardEdit(webapp.RequestHandler):
+class AdminAwardEdit(LoggedInHandler):
     """
     Edit an Award.
     """
     def get(self, award_key):
+        self._require_admin()
         award = Award.get_by_id(award_key)
                 
-        template_values = {
+        self.template_values.update({
             "award": award
-        }
+        })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/award_edit.html')
         self.response.out.write(template.render(path, template_values))
     
     def post(self, award_key):
+        self._require_admin()
         event_key_name = self.request.get('event_key_name')
         award = Award(
             id = award_key,

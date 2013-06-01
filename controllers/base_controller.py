@@ -6,11 +6,13 @@ from google.appengine.api import memcache
 import facebook
 import tba_config
 
+from helpers.user_bundle import UserBundle
 from models.user import User
 
 class CacheableHandler(webapp2.RequestHandler):
     """
     Provides a standard way of caching the output of pages.
+    Currently only supports logged-out pages.
     """
 
     def __init__(self, *args, **kw):
@@ -46,6 +48,28 @@ class CacheableHandler(webapp2.RequestHandler):
     def _write_cache(self, content):
         if tba_config.CONFIG["memcache"]: memcache.set(self.cache_key, content, self._cache_expiration)
 
+
+class LoggedInHandler(webapp2.RequestHandler):
+    """
+    Provides a base set of functionality for pages that need logins.
+    Currently does not support caching as easily as CacheableHandler.
+    """
+
+    def __init__(self, *args, **kw):
+        super(LoggedInHandler, self).__init__(*args, **kw)
+        self.user_bundle = UserBundle()
+        self.template_values = {
+            "user_bundle": self.user_bundle
+        }
+
+    def _require_admin(self):
+        self._require_login()
+        if not self.user_bundle.is_current_user_admin:
+            return self.redirect(self.user_bundle.login_url, abort=True)
+
+    def _require_login(self):
+        if not self.user_bundle.user:
+            return self.redirect(self.user_bundle.login_url, abort=True)
 
 
 class BaseHandlerFB(webapp2.RequestHandler):

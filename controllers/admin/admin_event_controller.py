@@ -3,10 +3,9 @@ import json
 import logging
 import os
 
-from google.appengine.api import users
-from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
+from controllers.base_controller import LoggedInHandler
 from helpers.event.event_test_creator import EventTestCreator
 from helpers.event_manipulator import EventManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
@@ -20,12 +19,13 @@ from models.team import Team
 
 import tba_config
 
-class AdminEventAddWebcast(webapp.RequestHandler):
+class AdminEventAddWebcast(LoggedInHandler):
     """
     Add a webcast to an Event.
     """
     def post(self, event_key_id):
-
+        self._require_admin()
+        
         webcast = dict()
         webcast["type"] = self.request.get("webcast_type")
         webcast["channel"] = self.request.get("webcast_channel")
@@ -47,20 +47,24 @@ class AdminEventAddWebcast(webapp.RequestHandler):
         self.redirect("/admin/event/" + event.key_name)
 
 
-class AdminEventCreate(webapp.RequestHandler):
+class AdminEventCreate(LoggedInHandler):
     """
     Create an Event. POSTs to AdminEventEdit.
     """
     def get(self):
+        self._require_admin()
+        
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_create.html')
-        self.response.out.write(template.render(path, {}))
+        self.response.out.write(template.render(path, self.template_values))
 
 
-class AdminEventCreateTest(webapp.RequestHandler):
+class AdminEventCreateTest(LoggedInHandler):
     """
     Create a test event that is happening now.
     """
     def get(self):
+        self._require_admin()
+        
         if tba_config.CONFIG["env"] != "prod":
             EventTestCreator.createPastEvent()
             EventTestCreator.createFutureEvent()
@@ -68,29 +72,33 @@ class AdminEventCreateTest(webapp.RequestHandler):
             self.redirect("/events/")
         else:
             logging.error("{} tried to create test events in prod! No can do.".format(
-                users.get_current_user().email()))
+                self.user_bundle.user.email()))
             self.redirect("/admin/")
 
 
-class AdminEventDelete(webapp.RequestHandler):
+class AdminEventDelete(LoggedInHandler):
     """
     Delete an Event.
     """
     def get(self, event_key_id):
+        self._require_admin()
+        
         event = Event.get_by_id(event_key_id)
 
-        template_values = {
+        self.template_values.update({
             "event": event
-        }
+        })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_delete.html')
-        self.response.out.write(template.render(path, template_values))
+        self.response.out.write(template.render(path, self.template_values))
 
     def post(self, event_key_id):
+        self._require_admin()
+        
         logging.warning("Deleting %s at the request of %s / %s" % (
             event_key_id,
-            users.get_current_user().user_id(),
-            users.get_current_user().email()))
+            self.user_bundle.user.user_id(),
+            self.user_bundle.user.email()))
 
         event = Event.get_by_id(event_key_id)
         
@@ -105,37 +113,43 @@ class AdminEventDelete(webapp.RequestHandler):
         self.redirect("/admin/events?deleted=%s" % event_key_id)
 
 
-class AdminEventDetail(webapp.RequestHandler):
+class AdminEventDetail(LoggedInHandler):
     """
     Show an Event.
     """
     def get(self, event_key):
+        self._require_admin()
+        
         event = Event.get_by_id(event_key)
         event.prepAwardsMatchesTeams()
 
-        template_values = {
+        self.template_values.update({
             "event": event
-        }
+        })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_details.html')
-        self.response.out.write(template.render(path, template_values))
+        self.response.out.write(template.render(path, self.template_values))
 
 
-class AdminEventEdit(webapp.RequestHandler):
+class AdminEventEdit(LoggedInHandler):
     """
     Edit an Event.
     """
     def get(self, event_key):
+        self._require_admin()
+        
         event = Event.get_by_id(event_key)
         
-        template_values = {
+        self.template_values.update({
             "event": event
-        }
+        })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_edit.html')
-        self.response.out.write(template.render(path, template_values))
+        self.response.out.write(template.render(path, self.template_values))
     
     def post(self, event_key):
+        self._require_admin()
+        
         # Note, we don't actually use event_key.
 
         start_date = None        
@@ -167,16 +181,18 @@ class AdminEventEdit(webapp.RequestHandler):
         self.redirect("/admin/event/" + event.key_name)
 
 
-class AdminEventList(webapp.RequestHandler):
+class AdminEventList(LoggedInHandler):
     """
     List all Events.
     """
     def get(self):
+        self._require_admin()
+        
         events = Event.query().order(Event.year).order(Event.start_date).fetch(10000)
         
-        template_values = {
+        self.template_values.update({
             "events": events,
-        }
+        })
         
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_list.html')
-        self.response.out.write(template.render(path, template_values))
+        self.response.out.write(template.render(path, self.template_values))

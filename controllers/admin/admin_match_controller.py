@@ -3,24 +3,26 @@ import logging
 import os
 
 from google.appengine.ext import ndb
-from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
+from controllers.base_controller import LoggedInHandler
+from datafeeds.offseason_matches_parser import OffseasonMatchesParser
+from helpers.match_manipulator import MatchManipulator
 from models.event import Event
 from models.match import Match
-from helpers.match_manipulator import MatchManipulator
-from datafeeds.offseason_matches_parser import OffseasonMatchesParser
 
-class AdminMatchCleanup(webapp.RequestHandler):
+class AdminMatchCleanup(LoggedInHandler):
     """
     Given an Event, clean up all Matches that don't have the Event's key as their key prefix.
     Used to clean up 2011 Matches, where we had dupes of "2011new_qm1" and "2011newton_qm1".
     """
     def get(self):
+        self._require_admin()
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/matches_cleanup.html')
-        self.response.out.write(template.render(path, {}))
+        self.response.out.write(template.render(path, self.template_values))
     
     def post(self):
+        self._require_admin()
         event = Event.get_by_id(self.request.get("event_key_name"))
         matches_to_delete = list()
         match_keys_to_delete = list()
@@ -32,49 +34,52 @@ class AdminMatchCleanup(webapp.RequestHandler):
             
             ndb.delete_multi(matches_to_delete)
         
-        template_values = {
+        self.template_values.update({
             "match_keys_deleted": match_keys_to_delete,
             "tried_delete": True
-        }
+        })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/matches_cleanup.html')
-        self.response.out.write(template.render(path, template_values))
+        self.response.out.write(template.render(path, self.template_values))
 
-class AdminMatchDashboard(webapp.RequestHandler):
+class AdminMatchDashboard(LoggedInHandler):
     """
     Show stats about Matches
     """
     def get(self):
+        self._require_admin()
         match_count = Match.query().count()
         
-        template_values = {
+        self.template_values.update({
             "match_count": match_count
-        }
+        })
         
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_dashboard.html')
-        self.response.out.write(template.render(path, template_values))
+        self.response.out.write(template.render(path, self.template_values))
         
 
-class AdminMatchDetail(webapp.RequestHandler):
+class AdminMatchDetail(LoggedInHandler):
     """
     Show a Match.
     """
     def get(self, match_key):
+        self._require_admin()
         match = Match.get_by_id(match_key)
         
-        template_values = {
+        self.template_values.update({
             "match": match
-        }
+        })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_details.html')
-        self.response.out.write(template.render(path, template_values))
+        self.response.out.write(template.render(path, self.template_values))
 
 
-class AdminMatchAdd(webapp.RequestHandler):
+class AdminMatchAdd(LoggedInHandler):
     """
     Add Matches from CSV.
     """
     def post(self):
+        self._require_admin()
         event_key = self.request.get('event_key')
         matches_csv = self.request.get('matches_csv')
         matches = OffseasonMatchesParser.parse(matches_csv)
@@ -101,21 +106,23 @@ class AdminMatchAdd(webapp.RequestHandler):
         self.redirect('/admin/event/{}'.format(event_key))
 
 
-class AdminMatchEdit(webapp.RequestHandler):
+class AdminMatchEdit(LoggedInHandler):
     """
     Edit a Match.
     """
     def get(self, match_key):
+        self._require_admin()
         match = Match.get_by_id(match_key)
         
-        template_values = {
+        self.template_values.update({
             "match": match
-        }
+        })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_edit.html')
-        self.response.out.write(template.render(path, template_values))
+        self.response.out.write(template.render(path, self.template_values))
     
     def post(self, match_key):        
+        self._require_admin()
         alliances_json = self.request.get("alliances_json")
         alliances = json.loads(alliances_json)
         team_key_names = list()
@@ -138,16 +145,17 @@ class AdminMatchEdit(webapp.RequestHandler):
         
         self.redirect("/admin/match/" + match.key_name)
 
-class AdminVideosAdd(webapp.RequestHandler):
+class AdminVideosAdd(LoggedInHandler):
     """
     Add a lot of youtube_videos to Matches at once.
     """
     def get(self):
+        self._require_admin()
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/videos_add.html')
-        self.response.out.write(template.render(path, {}))
+        self.response.out.write(template.render(path, self.template_values))
         
     def post(self):
-        logging.info(self.request)
+        self._require_admin()
         
         additions = json.loads(self.request.get("youtube_additions_json"))
         match_keys, youtube_videos = zip(*additions["videos"])
@@ -169,9 +177,9 @@ class AdminVideosAdd(webapp.RequestHandler):
 
         # TODO use Manipulators -gregmarra 20121006
         
-        template_values = {
+        self.template_values.update({
             "results": results,
-        }
+        })
         
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/videos_add.html')
-        self.response.out.write(template.render(path, template_values))
+        self.response.out.write(template.render(path, self.template_values))

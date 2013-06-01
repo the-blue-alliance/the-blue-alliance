@@ -1,14 +1,15 @@
 import os
 
 from google.appengine.api import memcache
-from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
+from controllers.base_controller import LoggedInHandler
 from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
 
 # Main memcache view.
-class AdminMemcacheMain(webapp.RequestHandler):
+class AdminMemcacheMain(LoggedInHandler):
     def post(self):
+        self._require_admin()
         flushed = list()
         
         if self.request.get("all_keys") == "all_keys":
@@ -22,19 +23,20 @@ class AdminMemcacheMain(webapp.RequestHandler):
             memcache.delete(self.request.get("memcache_key"))
             flushed.append(self.request.get("memcache_key"))
         
-        template_values = { 
+        self.template_values.update({ 
             "flushed" : flushed,
             "memcache_stats": memcache.get_stats(),
-        }
+        })
         
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/memcache_index.html')
-        self.response.out.write(template.render(path, template_values))
+        self.response.out.write(template.render(path, self.template_values))
 
     def get(self):
+        self._require_admin()
         
-        template_values = {
+        self.template_values.update({
             "memcache_stats": memcache.get_stats(),
-        }
+        })
         
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/memcache_index.html')
-        self.response.out.write(template.render(path, template_values))
+        self.response.out.write(template.render(path, self.template_values))

@@ -1,28 +1,23 @@
 import os
 
-from helpers.admin_helper import AdminHelper
-
-from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
-class AdminMain(webapp.RequestHandler):
+from controllers.base_controller import LoggedInHandler
+
+class AdminMain(LoggedInHandler):
     def get(self):
-        
-        user = AdminHelper.getCurrentUser()
-        
-        template_values = {
-            "user": user,
-        }
-        
+        self._require_admin()
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/index.html')
-        self.response.out.write(template.render(path, template_values))
+        self.response.out.write(template.render(path, self.template_values))
 
-class AdminDebugHandler(webapp.RequestHandler):
+class AdminDebugHandler(LoggedInHandler):
     def get(self):
+        self._require_admin()
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/debug.html')
-        self.response.out.write(template.render(path, {}))
+        self.response.out.write(template.render(path, self.template_values))
 
-class AdminTasksHandler(webapp.RequestHandler):
+class AdminTasksHandler(LoggedInHandler):
     def get(self):
+        self._require_admin()
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/tasks.html')
-        self.response.out.write(template.render(path, {}))
+        self.response.out.write(template.render(path, self.template_values))
