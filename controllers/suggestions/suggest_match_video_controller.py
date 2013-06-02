@@ -25,6 +25,7 @@ class SuggestMatchVideoController(LoggedInHandler):
         event = event_future.get_result()
         
         self.template_values.update({
+            "success": self.request.get("success"),
             "event": event,
             "match": match,
         })
@@ -56,4 +57,4 @@ class SuggestMatchVideoController(LoggedInHandler):
             suggestion.contents = {"youtube_videos": [youtube_id]}
             suggestion.put()
 
-        self.redirect('/match/%s' % match_key)
+        self.redirect('/suggest/match/video?match_key=%s&success=1' % match_key)
