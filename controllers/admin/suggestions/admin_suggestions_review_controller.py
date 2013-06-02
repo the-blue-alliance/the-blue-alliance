@@ -35,7 +35,7 @@ class AdminSuggestionsReviewController(LoggedInHandler):
         accepted_suggestions = map(lambda a: a.get_result(), accepted_suggestion_futures)
         rejected_suggestions = map(lambda a: a.get_result(), rejected_suggestion_futures)
 
-        MatchSuggestionAccepter.acceptSuggestions(accepted_suggestions)
+        MatchSuggestionAccepter.accept_suggestions(accepted_suggestions)
 
         all_suggestions = accepted_suggestions
         all_suggestions.extend(rejected_suggestions)

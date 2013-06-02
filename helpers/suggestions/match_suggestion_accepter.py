@@ -7,14 +7,14 @@ class MatchSuggestionAccepter(object):
     """
     
     @classmethod
-    def acceptSuggestions(self, suggestions):
+    def accept_suggestions(self, suggestions):
         matches = map(lambda match_future: match_future.get_result(),
             [Match.get_by_id_async(suggestion.target_key) for suggestion in suggestions])
 
         pairs = zip(matches, suggestions)
 
         for match, suggestion in pairs:
-            self._acceptSuggestion(match, suggestion)
+            self._accept_suggestion(match, suggestion)
 
         matches, suggestions = zip(*pairs)
         
@@ -23,14 +23,14 @@ class MatchSuggestionAccepter(object):
         return matches
 
     @classmethod
-    def _acceptSuggestion(self, match, suggestion):
+    def _accept_suggestion(self, match, suggestion):
         if "youtube_videos" in suggestion.contents:
-            match = self._mergeYouTubeVideos(match, suggestion.contents["youtube_videos"])
+            match = self._merge_youtube_videos(match, suggestion.contents["youtube_videos"])
 
         return match
 
     @classmethod
-    def _mergeYouTubeVideos(self, match, youtube_videos):
+    def _merge_youtube_videos(self, match, youtube_videos):
         for youtube_video in youtube_videos:
             if youtube_video not in match.youtube_videos:
                 match.youtube_videos.append(youtube_video)
