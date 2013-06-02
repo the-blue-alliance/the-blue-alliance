@@ -8,6 +8,13 @@
 <div class="container">
     <div class="row">
         <div class="span8 offset2">
+            {% if success %}
+            <div class="alert alert-success">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <h4>Thanks!</h4>
+                <p>We'll review your suggestion and get it added to the site soon!</p>
+            </div>
+            {% endif %}
             <h1>Help others by adding videos</h1>
             <p>Thanks for helping make The Blue Alliance better! Let us know about videos so we can add them to the site!</p>
             <ul>
