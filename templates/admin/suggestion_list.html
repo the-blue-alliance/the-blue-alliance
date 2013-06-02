@@ -6,23 +6,49 @@
 
 <h1>{{ suggestions|length }} Pending Suggestions</h1>
 
+<div class="control-group">
+    <div class="controls">
+        <button id="accept_all_button" class="btn btn-success">Select All Accepts</button>
+        <button id="reject_all_button" class="btn btn-danger">Select All Rejects</button>
+        <button id="deselect_all_button" class="btn">Deselect All</button>
+    </div>
+</div>
+
+
+<script>
+$("#accept_all_button").click(function() {
+    $('.accept').prop('checked', true);
+    $('.reject').prop('checked', false);
+});
+$("#reject_all_button").click(function() {
+    $('.accept').prop('checked', false);
+    $('.reject').prop('checked', true);
+});
+$("#deselect_all_button").click(function() {
+    $('.accept').prop('checked', false);
+    $('.reject').prop('checked', false);
+});
+</script>
+
 <form action="/admin/suggestions/review" method="post">
     {% for suggestion in suggestions %}
-    <div class="row-fluid" style="background:#ccc; margin: 15px 0;">
-        <div class="span4">
-            <p><strong>{{ suggestion.target_key }}</strong></p>
-            <iframe width="240" height="180" src="http://www.youtube.com/embed/{{suggestion.youtube_video}}?rel=0" frameborder="0" allowfullscreen></iframe>
+    <div class="row-fluid">
+        <div class="well" style="height:200px">
+            <div class="span1"><span class="label label-success"><label class="checkbox" for="accept_{{suggestion.key.id}}"><input class="accept" type="checkbox" name="accept_keys[]" id="accept_{{suggestion.key.id}}" value="{{suggestion.key.id}}"> Accept</label></span></div>
+            <div class="span1"><span class="label label-important"><label class="checkbox" for="reject_{{suggestion.key.id}}"><input class="reject" type="checkbox" name="reject_keys[]" id="reject_{{suggestion.key.id}}" value="{{suggestion.key.id}}"> Reject</label></span></div>
+            <div class="span4">
+                <p><strong>{{ suggestion.target_key }}</strong></p>
+                <iframe width="240" height="180" src="http://www.youtube.com/embed/{{suggestion.youtube_video}}?rel=0" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <div class="span4">
+                <ul>
+                    <li>{{ suggestion.author.get.email }}</a></li>
+                    <li>{{ suggestion.author.get.nickname }}</a></li>
+                    <li>{{ suggestion.target_model }}:{{ suggestion.target_key }}</li>
+                    <li>{{ suggestion.contents_json }}</li>
+                </ul>
+            </div>
         </div>
-        <div class="span4">
-            <ul>
-                <li>{{ suggestion.author.get.email }}</a></li>
-                <li>{{ suggestion.author.get.nickname }}</a></li>
-                <li>{{ suggestion.target_model }}:{{ suggestion.target_key }}</li>
-                <li>{{ suggestion.contents_json }}</li>
-            </ul>
-        </div>
-        <div class="span1"><input class="accept" type="checkbox" name="accept_keys[]" id="accept_{{suggestion.key.id}}" value="{{suggestion.key.id}}" style="background:green"><label for="accept_{{suggestion.key.id}}">accept</label></div>
-        <div class="span1"><input class="reject" type="checkbox" name="reject_keys[]" id="reject_{{suggestion.key.id}}" value="{{suggestion.key.id}}" style="background:red"><label for="reject_{{suggestion.key.id}}">reject</label></div>
     </div>
     {% endfor %}
     <button class="btn btn-primary" type="submit"><i class="icon-pencil icon-white"></i> Act On Selected</button>
