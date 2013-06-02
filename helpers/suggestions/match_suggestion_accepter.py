@@ -8,6 +8,9 @@ class MatchSuggestionAccepter(object):
     
     @classmethod
     def accept_suggestions(self, suggestions):
+        if (len(suggestions) < 1):
+            return None
+
         matches = map(lambda match_future: match_future.get_result(),
             [Match.get_by_id_async(suggestion.target_key) for suggestion in suggestions])
 
