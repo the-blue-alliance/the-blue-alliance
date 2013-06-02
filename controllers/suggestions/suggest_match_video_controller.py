@@ -1,8 +1,6 @@
 import os
 import re
 
-import logging
-
 from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
@@ -48,9 +46,6 @@ class SuggestMatchVideoController(LoggedInHandler):
             regex2 = re.match(r".*v=([a-zA-Z0-9_-]*)", youtube_url)
             if regex2 is not None:
                 youtube_id = regex2.group(1)
-
-        logging.info(youtube_url)
-        logging.info(youtube_id)
 
         if youtube_id is not None:
             suggestion = Suggestion(

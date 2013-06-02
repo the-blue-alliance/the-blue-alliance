@@ -6,26 +6,29 @@
 
 <h1>{{ suggestions|length }} Pending Suggestions</h1>
 
-<table class="table table-striped table-hover">
-    <thead>
-        <th>Suggestion</th>
-        <th>Model</th>
-        <th>Key</th>
-        <th>Contents</th>
-        <th>Suggester</th>
-        <th>Accept</th>
-    </thead>
-    
-    {% for suggestion in suggestions %}
-    <tr>
-        <td>{{ suggestion.key.id }}</a></td>
-        <td>{{ suggestion.target_model }}</td>
-        <td>{{ suggestion.target_key }}</td>
-        <td>{{ suggestion.contents_json }}</td>
-        <td>{{ suggestion.author.get.nickname }}</a></td>
-        <td>Go</td>
-    </tr>
-    {% endfor %}
-</table>
+<form action="/admin/suggestions/review" method="post">
+    <table class="table table-striped table-hover">
+        <thead>
+            <th>Suggestion</th>
+            <th>Object</th>
+            <th>Contents</th>
+            <th>Suggester</th>
+            <th>Accept</th>
+            <th>Reject</th>
+        </thead>
+        
+        {% for suggestion in suggestions %}
+        <tr>
+            <td>{{ suggestion.key.id }}</a></td>
+            <td>{{ suggestion.target_model }}:{{ suggestion.target_key }}</td>
+            <td>{{ suggestion.contents_json }}</td>
+            <td>{{ suggestion.author.get.nickname }}</a></td>
+            <td><input type="checkbox" name="accept_keys[]" value="{{suggestion.key.id}}"></td>
+            <td><input type="checkbox" name="reject_keys[]" value="{{suggestion.key.id}}"></td>
+        </tr>
+        {% endfor %}
+    </table>
+    <button class="btn btn-success" type="submit"><i class="icon-plus-sign icon-white"></i> Act On Selected</button>
+</form>
 
 {% endblock %}
