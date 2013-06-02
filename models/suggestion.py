@@ -6,20 +6,18 @@ from models.account import Account
 
 class Suggestion(ndb.Model):
     """
-    Sitevars represent site configuration parameters that should be adjustable
-    without requiring a code push. They may be used to store secret information
-    such as API keys and secrets since only app admins can read them.
-
-    Code should assume sitevars may not come back from the datastore, in which
-    case their value should be treated as dict(). Otherwise, sitevar should
-    contain a json blob that contain one or more keys with values. They are
-    manually edited by site administrators in the admin console.
+    Suggestions are generic containers for user-submitted data corrections to
+    the site. The generally store a model, a key, and then a json blob of
+    fields to append or ammend in the model.
     """
     MODELS = set(["event", "match"])
+    REVIEW_ACCEPTED = 1
+    REVIEW_PENDING = 0
+    REVIEW_REJECTED = -1
     
-    accepted = ndb.BooleanProperty(default=False)
-    accepted_at = ndb.DateTimeProperty()
-    accepter = ndb.KeyProperty(kind=Account)
+    review_state = ndb.IntegerProperty(default=0)
+    reviewed_at = ndb.DateTimeProperty()
+    reviewer = ndb.KeyProperty(kind=Account)
     author = ndb.KeyProperty(kind=Account, required=True)
     contents_json = ndb.StringProperty(indexed=False) #a json blob
     target_key = ndb.StringProperty(required=True) # "2012cmp"
