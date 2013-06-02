@@ -43,3 +43,9 @@ class Suggestion(ndb.Model):
     def contents(self, contents):
         self._contents = contents
         self.contents_json = json.dumps(self._contents)
+
+    @property
+    def youtube_video(self):
+        if "youtube_videos" in self.contents:
+            return self.contents["youtube_videos"][0]
+

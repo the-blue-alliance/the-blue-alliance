@@ -7,27 +7,24 @@
 <h1>{{ suggestions|length }} Pending Suggestions</h1>
 
 <form action="/admin/suggestions/review" method="post">
-    <table class="table table-striped table-hover">
-        <thead>
-            <th>Suggestion</th>
-            <th>Object</th>
-            <th>Contents</th>
-            <th>Suggester</th>
-            <th>Accept</th>
-            <th>Reject</th>
-        </thead>
-        
-        {% for suggestion in suggestions %}
-        <tr>
-            <td>{{ suggestion.key.id }}</a></td>
-            <td>{{ suggestion.target_model }}:{{ suggestion.target_key }}</td>
-            <td>{{ suggestion.contents_json }}</td>
-            <td>{{ suggestion.author.get.nickname }}</a></td>
-            <td><input type="checkbox" name="accept_keys[]" value="{{suggestion.key.id}}"></td>
-            <td><input type="checkbox" name="reject_keys[]" value="{{suggestion.key.id}}"></td>
-        </tr>
-        {% endfor %}
-    </table>
+    {% for suggestion in suggestions %}
+    <div class="row-fluid" style="background:#ccc; margin: 15px 0;">
+        <div class="span4">
+            <p><strong>{{ suggestion.target_key }}</strong></p>
+            <iframe width="240" height="180" src="http://www.youtube.com/embed/{{suggestion.youtube_video}}?rel=0" frameborder="0" allowfullscreen></iframe>
+        </div>
+        <div class="span4">
+            <ul>
+                <li>{{ suggestion.author.get.email }}</a></li>
+                <li>{{ suggestion.author.get.nickname }}</a></li>
+                <li>{{ suggestion.target_model }}:{{ suggestion.target_key }}</li>
+                <li>{{ suggestion.contents_json }}</li>
+            </ul>
+        </div>
+        <div class="span1"><input class="accept" type="checkbox" name="accept_keys[]" id="accept_{{suggestion.key.id}}" value="{{suggestion.key.id}}" style="background:green"><label for="accept_{{suggestion.key.id}}">accept</label></div>
+        <div class="span1"><input class="reject" type="checkbox" name="reject_keys[]" id="reject_{{suggestion.key.id}}" value="{{suggestion.key.id}}" style="background:red"><label for="reject_{{suggestion.key.id}}">reject</label></div>
+    </div>
+    {% endfor %}
     <button class="btn btn-primary" type="submit"><i class="icon-pencil icon-white"></i> Act On Selected</button>
 </form>
 

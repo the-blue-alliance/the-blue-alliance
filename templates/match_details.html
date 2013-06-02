@@ -51,11 +51,11 @@
         {% if not match.tba_video and not match.youtube_videos %}
             <h3>Video</h3>
             <p>We don't know about any videos for this match yet. :(</p>
+            <p>Help us out by searching YouTube and adding videos!</p>
         {% endif %}
-        <br>
         <p>
-            <a class="btn btn-primary" href="http://www.youtube.com/results?search_query={{match.verbose_name|urlencode}}+{{event.year|urlencode}}+{{event.name|urlencode}}" target="_blank"><i class="icon-search icon-white"></i> Search YouTube</a> 
-            <a class="btn" href="/contact"><i class="icon-plus"></i> Tell us about a video</a>
+            <a class="btn btn-success" href="/suggest/match/video?match_key={{match.key_name}}"><i class="icon-white icon-plus"></i> Add videos</a>
+            <a class="btn btn-primary" href="http://www.youtube.com/results?search_query={{match.verbose_name|urlencode}}+{{event.year|urlencode}}+{{event.name|urlencode}}" target="_blank"><i class="icon-search icon-white"></i> Search YouTube</a>
         </p>
         </div>
     </div>

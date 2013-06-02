@@ -29,8 +29,11 @@ class UserBundle(object):
 
     @property
     def login_url(self):
-        return users.create_login_url("/dashboard")
+        return users.create_login_url("/")
 
     @property
     def logout_url(self):
         return users.create_logout_url("/")
+
+    def create_login_url(self, target_url="/"):
+        return users.create_login_url(target_url)

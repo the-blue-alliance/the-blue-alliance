@@ -12,9 +12,9 @@
             <p>Thanks for helping make The Blue Alliance better! Let us know about videos so we can add them to the site!</p>
             <ul>
                 <li>Your suggestion will be reviewed by a moderator</li>
-                <li>Your account info (like {{user_bundle.user.email}} and {{user_bundle.user.nickname}}) will also be submitted</li>
+                <li>Your account info (like {{user_bundle.user.email}} and {{user_bundle.user.nickname}}) will also be submitted. <a href="{{user_bundle.logout_url}}">log in as a different user</a></li>
             </ul>
-            <h2>Videos for {{event.year}} {{event.name}} {{match.verbose_name}}</h2>
+            <h2>Videos for {{match.verbose_name}} - {{event.year}} {{event.name}}</h2>
             <ul>
             {% for youtube_video in event.youtube_videos %}
                 <li><a href="http://youtube.com?v={{youtube_video}}" target="_blank">http://www.youtube.com?v={{youtube_video}} <i class="icon-share-alt"></i></a></li>
@@ -29,7 +29,7 @@
                     </form>
                 </li>
             </ul>
-            
+            </p><a class="btn btn-primary" href="http://www.youtube.com/results?search_query={{match.verbose_name|urlencode}}+{{event.year|urlencode}}+{{event.name|urlencode}}" target="_blank"><i class="icon-search icon-white"></i> Search YouTube :: {{match.verbose_name}} - {{event.year}} {{event.name}}</a><p>
         </div>
     </div>
 </div>

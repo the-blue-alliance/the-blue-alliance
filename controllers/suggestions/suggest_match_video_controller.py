@@ -14,7 +14,7 @@ class SuggestMatchVideoController(LoggedInHandler):
     """
 
     def get(self):
-        self._require_login()
+        self._require_login("/suggest/match/video?match=%s" % self.request.get("match_key"))
 
         if not self.request.get("match_key"):
             self.redirect("/", abort=True)
