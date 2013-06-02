@@ -4,6 +4,7 @@ import webapp2
 
 import tba_config
 
+from controllers.ajax_controller import TypeaheadHandler, WebcastHandler
 from controllers.event_controller import EventList, EventDetail, EventRss
 from controllers.insights_controller import InsightsOverview, InsightsDetail
 from controllers.main_controller import ContactHandler, HashtagsHandler, \
@@ -12,8 +13,8 @@ from controllers.main_controller import ContactHandler, HashtagsHandler, \
       PageNotFoundHandler, ChannelHandler, GamedayHandler, \
       WebcastsHandler, RecordHandler
 from controllers.match_controller import MatchDetail
+from controllers.suggestions.suggest_match_video_controller import SuggestMatchVideoController
 from controllers.team_controller import TeamList, TeamDetail
-from controllers.ajax_controller import TypeaheadHandler, WebcastHandler
 
 from google.appengine.ext.webapp import template
 template.register_template_library('common.my_filters')
@@ -39,6 +40,7 @@ app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['landing_
                                ('/match/(.*)', MatchDetail),
                                ('/opr', OprHandler),
                                ('/search', SearchHandler),
+                               ('/suggest/match/video', SuggestMatchVideoController),
                                ('/teams', TeamList),
                                ('/teams/([0-9]*)', TeamList),
                                ('/team/([0-9]*)', TeamDetail),

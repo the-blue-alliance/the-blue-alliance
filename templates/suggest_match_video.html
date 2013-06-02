@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance - Add Match Video{% endblock %}
+
+{% block meta_description %}Add match videos to The Blue Alliance.{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="span8 offset2">
+            <h1>Help others by adding videos</h1>
+            <p>Thanks for helping make The Blue Alliance better! Let us know about videos so we can add them to the site!</p>
+            <ul>
+                <li>Your suggestion will be reviewed by a moderator</li>
+                <li>Your account info (like {{user_bundle.user.email}} and {{user_bundle.user.nickname}}) will also be submitted</li>
+            </ul>
+            <h2>Videos for {{event.year}} {{event.name}} {{match.verbose_name}}</h2>
+            <ul>
+            {% for youtube_video in event.youtube_videos %}
+                <li><a href="http://youtube.com?v={{youtube_video}}" target="_blank">http://www.youtube.com?v={{youtube_video}} <i class="icon-share-alt"></i></a></li>
+            {% endfor %}
+                <li>
+                    <form action="/suggest/match/video" method="post">
+                        <input name="match_key" type="hidden" value="{{match.key.id}}" />
+                        <div class="input-append">
+                            <input class="span4" type="text" name="youtube_url" placeholder="http://www.youtube.com/watch?v=MQ0VNzIvHx0" value="" />
+                            <button class="btn btn-success" type="submit"><i class="icon-plus-sign icon-white"></i> Add</button>
+                        </div>
+                    </form>
+                </li>
+            </ul>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
