@@ -67,9 +67,12 @@ class LoggedInHandler(webapp2.RequestHandler):
         if not self.user_bundle.is_current_user_admin:
             return self.redirect(self.user_bundle.login_url, abort=True)
 
-    def _require_login(self):
+    def _require_login(self, target_url="/"):
         if not self.user_bundle.user:
-            return self.redirect(self.user_bundle.login_url, abort=True)
+            return self.redirect(
+                self.user_bundle.create_login_url(target_url),
+                abort=True
+            )
 
 
 class BaseHandlerFB(webapp2.RequestHandler):
