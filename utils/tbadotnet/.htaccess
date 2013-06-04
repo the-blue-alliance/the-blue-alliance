@@ -1,0 +1,13 @@
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+RewriteRule teambadge/gen/([^/]*)/([^/]*)/([^/]*)/teambadge.png http://www.thebluealliance.net/tbatv/teambadge/teambadge_gen.php?team=$1&start=$2&stop=$3 [L]
+
+RewriteRule events/([^/]*) eventlist.php?year=$1 [NC]
+RewriteRule events/ eventlist.php [NC]
+RewriteRule event/([^/]*)/([^/]*) event.php?event=$1&mode=$2 [NC]
+RewriteRule event/([^/]*) event.php?event=$1 [NC]
+RewriteRule match/([^/]*) match.php?match=$1 [NC]
+RewriteRule team/([^/]*)/([^/]*) team.php?team=$1&year=$2 [NC]
+RewriteRule team/([^/]*) team.php?team=$1 [NC]
+</IfModule>
