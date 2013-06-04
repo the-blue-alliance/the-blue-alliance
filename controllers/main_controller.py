@@ -4,14 +4,17 @@ import datetime
 import time
 
 from google.appengine.api import memcache
+from google.appengine.api import users
 from google.appengine.ext import ndb, webapp
 from google.appengine.ext.webapp import template
 
 import tba_config
 
-from base_controller import BaseHandlerFB, CacheableHandler
+from base_controller import BaseHandlerFB, CacheableHandler, LoggedInHandler
 from helpers.event_helper import EventHelper
+from helpers.user_bundle import UserBundle
 
+from models.account import Account
 from models.event import Event
 from models.team import Team
 from models.sitevar import Sitevar
@@ -243,3 +246,28 @@ class RecordHandler(CacheableHandler):
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/record.html")
         return template.render(path, {})
+
+class AccountDetail(LoggedInHandler):
+    def get(self):
+        self._require_login()
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/account.html')
+        self.response.out.write(template.render(path, self.template_values))
+
+class AccountEdit(LoggedInHandler):
+    def get(self):
+        self._require_login()
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/account_edit.html')
+        self.response.out.write(template.render(path, self.template_values))
+
+    def post(self):
+        self._require_login()
+        real_account_id = self.user_bundle.account.key.id()
+        check_account_id = self.request.get('account_id')
+
+        # Check to make sure that they aren't trying to edit another user
+        if check_account_id == real_account_id:
+            self.redirect("/account")
+        else:
+            self.redirect('/account/error')
