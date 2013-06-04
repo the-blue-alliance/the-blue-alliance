@@ -19,4 +19,4 @@ class UserBundle(object):
 
     @property
     def logout_url(self):
-        return users.create_login_url("/")
+        return users.create_logout_url("/")
