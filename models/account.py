@@ -7,6 +7,7 @@ class Account(ndb.Model):
     email = ndb.StringProperty()
     nickname = ndb.StringProperty()
     name = ndb.StringProperty()
+    registered = ndb.BooleanProperty()
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
