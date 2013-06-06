@@ -45,8 +45,17 @@ class DatastoreCache(object):
     ndb.delete_multi(entry_keys)
     
   @classmethod
-  def cleanup(self, datetime):
+  def cleanup(self, cutoff_datetime=None):
     """
-    Delete all entries that were last updated before a certain datetime
+    Delete all entries that are expired
+    or were last updated before a certain cutoff_datetime
     """
-    pass  # TODO: implement
+    entry_keys = DatastoreCacheEntry.query(
+      DatastoreCacheEntry.expiration_datetime < datetime.datetime.now()).fetch(
+      1000, keys_only=True)
+    if cutoff_datetime:
+      entry_keys += DatastoreCacheEntry.query(
+        DatastoreCacheEntry.updated < cutoff_datetime).fetch(
+        1000, keys_only=True)
+    ndb.delete_multi(entry_keys)
+    return entry_keys
