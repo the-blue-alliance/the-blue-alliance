@@ -12,15 +12,15 @@ class MemcacheWebcastFlusher(object):
     def flush(self):
         flushed = []
 
-        flushed.append(MainCompetitionseasonHandler().memcacheFlush())
-        flushed.append(GamedayHandler().memcacheFlush())
-        flushed.append(WebcastsHandler().memcacheFlush())
-        flushed.append(EventList().memcacheFlush())
+        flushed.append(MainCompetitionseasonHandler().cacheFlush())
+        flushed.append(GamedayHandler().cacheFlush())
+        flushed.append(WebcastsHandler().cacheFlush())
+        flushed.append(EventList().cacheFlush())
 
         return flushed
 
     @classmethod
     def flushEvent(self, event_key):
         flushed = self.flush()
-        flushed.append(WebcastHandler().memcacheFlush(event_key))
+        flushed.append(WebcastHandler().cacheFlush(event_key))
         return flushed

@@ -11,6 +11,7 @@ import tba_config
 from base_controller import BaseHandlerFB, CacheableHandler
 from helpers.match_helper import MatchHelper
 from helpers.award_helper import AwardHelper
+from helpers.datastore_cache_helper import DatastoreCache
 from helpers.team_helper import TeamHelper
 from helpers.event_helper import EventHelper
 
@@ -71,10 +72,11 @@ class EventList(CacheableHandler):
         path = os.path.join(os.path.dirname(__file__), '../templates/event_list.html')
         return template.render(path, template_values)
 
-    def memcacheFlush(self):
+    def cacheFlush(self):
         year = datetime.datetime.now().year
         keys = [self.cache_key.format(year, True), self.cache_key.format(year, False)]
         memcache.delete_multi(keys)
+        DatastoreCache.delete_multi(keys)
         return keys
 
 
