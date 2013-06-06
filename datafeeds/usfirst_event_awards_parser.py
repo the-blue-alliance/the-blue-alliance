@@ -34,11 +34,16 @@ class UsfirstEventAwardsParser(ParserBase):
         ("entre", (["entrepreneurship"], [])),
         ("exdes", (["excellence in design"], [])),
         ("dl", (["dean's list"], [])),
+        ("bkm1", (["bart", "kamen", "memorial", "1"], [])),
+        ("bkm2", (["bart", "kamen", "memorial", "2"], [])),
+        ("bkm3", (["bart", "kamen", "memorial", "3"], [])),
         ("driv", (["driving", "tomorrow", "technology"], [])),
         ("gp", (["gracious professionalism"], [])),
         ("hrs", (["highest rookie seed"], [])),
         ("image", (["imagery"], [])),
         ("ind", (["industrial design"], [])),
+        ("mediatech", (["media", "technology"], [])),
+        ("mil", (["make", "loud"], [])),
         ("safe", (["safety"], [])),
         ("control", (["innovation in control"], [])),
         ("quality", (["quality"], [])),
@@ -54,7 +59,9 @@ class UsfirstEventAwardsParser(ParserBase):
         ("inventor", (["autodesk inventor"], [])),
         ("innovator", (["future innovator"], []))
     ]
-    INDIVIDUAL_AWARDS = ["dl", "dl1", "dl2", "dl3", "dl4", "dl5", "dl6", "dl7", "dl8", "dl9", "vol", "wfa", "founders"]    
+    INDIVIDUAL_AWARDS = ["dl", "dl1", "dl2", "dl3", "dl4", "dl5", "dl6", "dl7",
+                         "dl8", "dl9", "vol", "wfa", "founders", "bkm1", "bkm2",
+                         "bkm3", "mil"]
     YEAR_SPECIFIC = {'2012': {'official': 0,
                               'team_number': 1,
                               'individual': 3},
