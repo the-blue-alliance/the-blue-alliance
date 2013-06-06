@@ -4,7 +4,7 @@ import webapp2
 
 import tba_config
 
-from controllers.account_controller import AccountEdit, AccountOverview, AccountRegister
+from controllers.account_controller import AccountEdit, AccountLogout, AccountOverview, AccountRegister
 from controllers.ajax_controller import TypeaheadHandler, WebcastHandler
 from controllers.event_controller import EventList, EventDetail, EventRss
 from controllers.insights_controller import InsightsOverview, InsightsDetail
@@ -30,6 +30,7 @@ app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['landing_
                                ('/about', AboutHandler),
                                ('/account', AccountOverview),
                                ('/account/edit', AccountEdit),
+                               ('/account/logout', AccountLogout),
                                ('/account/register', AccountRegister),
                                ('/channel', ChannelHandler),
                                ('/contact', ContactHandler),

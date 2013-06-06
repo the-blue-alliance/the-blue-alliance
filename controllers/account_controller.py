@@ -1,3 +1,4 @@
+import Cookie
 import os
 
 from google.appengine.api import users
@@ -76,3 +77,16 @@ class AccountRegister(LoggedInHandler):
             self.redirect('/account')
         else:
             self.redirect('/')
+
+class AccountLogout(LoggedInHandler):
+  def get(self):
+    if os.environ.get('SERVER_SOFTWARE', '').startswith('Development/'):
+      self.redirect(self.user_bundle.logout_url)
+      return
+
+    # Deletes the session cookies pertinent to TBA without touching Google session(s)
+    response = self.redirect('/') 
+    response.delete_cookie('ACSID')
+    response.delete_cookie('SACSID')
+
+    return response
