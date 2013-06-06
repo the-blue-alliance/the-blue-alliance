@@ -12,6 +12,7 @@ from controllers.admin.admin_memcache_controller import AdminMemcacheMain
 from controllers.admin.admin_sitevar_controller import AdminSitevarCreate, AdminSitevarEdit, AdminSitevarList
 from controllers.admin.suggestions.admin_suggestions_review_controller import AdminSuggestionsReviewController
 from controllers.admin.admin_team_controller import AdminTeamDetail, AdminTeamList
+from controllers.admin.admin_user_controller import AdminUserList, AdminUserDelete, AdminUserEdit, AdminUserDetail
 
 app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/debug', AdminDebugHandler),
@@ -38,6 +39,10 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/tasks', AdminTasksHandler),
                                ('/admin/teams', AdminTeamList),
                                ('/admin/team/(.*)', AdminTeamDetail),
+                               ('/admin/users', AdminUserList),
+                               ('/admin/user/delete/(.*)', AdminUserDelete),
+                               ('/admin/user/edit/(.*)', AdminUserEdit),
+                               ('/admin/user/(.*)', AdminUserDetail),
                                ('/admin/videos/add', AdminVideosAdd),
                                ],
                               debug=tba_config.DEBUG)

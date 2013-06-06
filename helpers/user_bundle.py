@@ -16,7 +16,8 @@ class UserBundle(object):
             self._account = Account.get_or_insert(
                 self.user.user_id(),
                 email = self.user.email(),
-                nickname = self.user.nickname())
+                nickname = self.user.nickname(),
+                registered = False)
         return self._account
 
     @property

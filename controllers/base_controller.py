@@ -1,5 +1,4 @@
 import webapp2
-from webapp2_extras import sessions
 
 from google.appengine.api import memcache
 
@@ -58,8 +57,15 @@ class LoggedInHandler(webapp2.RequestHandler):
     def __init__(self, *args, **kw):
         super(LoggedInHandler, self).__init__(*args, **kw)
         self.user_bundle = UserBundle()
+        greeting = None
+        if self.user_bundle.user:
+            if self.user_bundle.account.name:
+                greeting = self.user_bundle.account.name
+            else:
+                greeting = self.user_bundle.account.nickname
         self.template_values = {
-            "user_bundle": self.user_bundle
+            "user_bundle": self.user_bundle,
+            "greeting": greeting
         }
 
     def _require_admin(self):
