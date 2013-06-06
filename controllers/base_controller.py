@@ -52,7 +52,7 @@ class CacheableHandler(webapp2.RequestHandler):
 
     def _write_cache(self, content):
         if tba_config.CONFIG["memcache"]: memcache.set(self.cache_key, content, self._cache_expiration)
-        if tba_config.CONFIG["datastore_cache"]: DatastoreCache.set(self.cache_key, content)
+        if tba_config.CONFIG["datastore_cache"]: DatastoreCache.set(self.cache_key, content, self._cache_expiration)
 
 
 class LoggedInHandler(webapp2.RequestHandler):
