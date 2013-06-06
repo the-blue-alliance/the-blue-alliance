@@ -220,3 +220,26 @@ class TestUsfirstEventAwardsParser(unittest2.TestCase):
         self.assertEqual(awards[36]['team_number'], 2614)
         self.assertEqual(awards[36]['awardee'], "Earl Scime")
         self.assertEqual(awards[36]['name'], 'cmp_wfa')
+        
+    def test_parse_championship_2013(self):
+        with open('test_data/usfirst_html/usfirst_event_awards_2013cmp.html', 'r') as f:
+            awards = UsfirstEventAwardsParser.parse(f.read())
+
+        # Check number of parsed awards
+        self.assertEqual(len(awards), 37)
+        
+        # Test New Awards
+        self.assertEqual(awards[20]['official_name'], 'Make It Loud Award')
+        self.assertEqual(awards[20]['team_number'], None)
+        self.assertEqual(awards[20]['awardee'], 'will.i.am')
+        self.assertEqual(awards[20]['name'], 'cmp_mil')
+        
+        self.assertEqual(awards[28]['official_name'], 'Media and Technology Award sponsored by Comcast')
+        self.assertEqual(awards[28]['team_number'], 2283)
+        self.assertEqual(awards[28]['awardee'], None)
+        self.assertEqual(awards[28]['name'], 'cmp_mediatech')
+
+        self.assertEqual(awards[35]['official_name'], 'Dr. Bart Kamen Memorial Scholarship #2')
+        self.assertEqual(awards[35]['team_number'], None)
+        self.assertEqual(awards[35]['awardee'], 'Sarah Rudasill')
+        self.assertEqual(awards[35]['name'], 'cmp_bkm2')
