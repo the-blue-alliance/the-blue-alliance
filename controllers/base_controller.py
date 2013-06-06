@@ -7,6 +7,7 @@ import facebook
 import tba_config
 
 from helpers.user_bundle import UserBundle
+from helpers.datastore_cache_helper import DatastoreCache
 from models.user import User
 
 class CacheableHandler(webapp2.RequestHandler):
@@ -40,13 +41,17 @@ class CacheableHandler(webapp2.RequestHandler):
         return self.cache_key
 
     def _read_cache(self):
-        return memcache.get(self.cache_key)
+        data = memcache.get(self.cache_key)
+        if not data:
+            data = DatastoreCache.get(self.cache_key)
+        return data
 
     def _render(self):
         raise NotImplementedError("No _render method.")
 
     def _write_cache(self, content):
         if tba_config.CONFIG["memcache"]: memcache.set(self.cache_key, content, self._cache_expiration)
+        if tba_config.CONFIG["datastore_cache"]: DatastoreCache.set(self.cache_key, content)
 
 
 class LoggedInHandler(webapp2.RequestHandler):

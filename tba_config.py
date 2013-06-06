@@ -14,12 +14,14 @@ OFFSEASON = 4
 if DEBUG:
     CONFIG = {
         "env": "dev",
+        "datastore_cache": True,
         "memcache": False,
         "firebase-url": "https://thebluealliance-dev.firebaseio.com/{}.json?auth={}"
     }
 else:
     CONFIG = {
         "env": "prod",
+        "datastore_cache": True,
         "memcache": True,
         "firebase-url": "https://thebluealliance.firebaseio.com/{}.json?auth={}"
     }
