@@ -37,6 +37,10 @@ class EventManipulator(ManipulatorBase):
         ]
 
         for attr in attrs:
+            # Special case for rankings. Don't merge bad data.
+            if attr == 'rankings_json':
+                if new_event.rankings and len(new_event.rankings) <= 1:
+                    continue
             if getattr(new_event, attr) is not None:
                 if getattr(new_event, attr) != getattr(old_event, attr):
                     setattr(old_event, attr, getattr(new_event, attr))
