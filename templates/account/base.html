@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>{% block title %}The Blue Alliance{% endblock %}</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    
+    {% block main_style %}<link rel="stylesheet" href="/css/tba_combined_style.main.min.css" type="text/css" />{% endblock %}
+
+    <meta name="description" content="{% block meta_description %}Team information and match videos and results from the FIRST Robotics Competition{% endblock %}">
+    <meta name="keywords" content="FIRST Robotics, FIRST Robotics Competition, robotics, first, firstrobotics, competition, team, regionals, matches, videos">
+    <meta property="fb:page_id" content="29895192027" />
+    <meta property="fb:admins" content="1086840001" />
+    <meta property="fb:app_id" content="117484816504" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    {% block more_head_tags %}{% endblock %}
+
+    {% block main_javascript %}
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.0/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.0.6/jquery.fancybox.pack.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.5.2/jquery.tablesorter.min.js"></script>
+    <script src="//code.jquery.com/ui/1.8.13/jquery-ui.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.2/jquery.ui.touch-punch.min.js"></script>
+    <script src="/javascript/tba_combined_js.main.min.js"></script>
+    {% endblock %}
+</head>
+<body>
+
+<div id="fb-root"></div>
+    
+{% block navbar %}
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container">
+		<a class="btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+		</a>
+    <a class="brand hidden-phone" href="/">The Blue Alliance</a>
+    <a class="brand visible-phone" href="/">TBA</a>
+    <div class="nav">
+			<ul id="subnav" class="nav">
+			  <li class="navbar-button {% block teams_active %}{% endblock %}"><a href="/teams"><span><i class="icon-user icon-white"></i> Teams</span></a></li>
+        <li class="navbar-button {% block events_active %}{% endblock %}"><a href="/events"><span><i class="icon-calendar icon-white"></i> Events</span></a></li>
+        <li class="navbar-button hidden-phone {% block insights_active %}{% endblock %}"><a href="/insights"><span><i class="icon-align-left icon-white"></i> Insights</span></a></li>
+        <li class="navbar-button hidden-phone"><a href="/gameday"><span><i class="icon-facetime-video icon-white"></i> GameDay</span></a></li>
+			</ul>
+	  </div>
+	  <div class="nav-collapse">
+      <ul class="nav">
+			  <li class="navbar-button visible-phone"><a href="/insights"><span><i class="icon-align-left icon-white"></i> Insights</span></a></li>
+        <li class="navbar-button visible-phone"><a href="/gameday"><span><i class="icon-facetime-video icon-white"></i> GameDay</span></a></li>
+      </ul>
+      <form class="navbar-search pull-right" action="http://www.thebluealliance.com/search" >
+			    <input type="hidden" name="cx" value="017956276086362105630:99ctqytcokm" />
+			    <input type="hidden" name="cof" value="FORID:11" />
+			    <input type="hidden" name="ie" value="UTF-8" />
+			    <input type="text" class="search-query" placeholder="Search for teams and events" name="q"/>
+			</form>
+
+			<div class="social-icons">
+				<a id="facebook" class="socialIcon" href="http://facebook.com/thebluealliance" title="Like us on Facebook"></a>
+				<a id="twitter" class="socialIcon" href=" http://twitter.com/thebluealliance" title="Follow us on Twitter"></a>
+				<a id="tumblr" class="socialIcon" href="http://thebluealliance.tumblr.com" title="Read our Blog"></a>
+			</div>
+		</div>
+	</div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+{% endblock %}
+
+{% block footer %}
+<div id="footer" class="container">
+  <div class="row">
+    <div class="span12">
+      <hr>
+    </div>
+    <div class="span6 offset3">
+      <div style="overflow: hidden;">
+          <div class="fb-like" data-href="http://facebook.com/thebluealliance" data-send="true" data-width="450px" data-show-faces="true"></div>
+      </div>
+
+      <hr>
+
+      <div>The Blue Alliance is <a href="https://github.com/gregmarra/the-blue-alliance/">open source</a>. Help improve it!</div>
+      <div>
+        <a href="/about">about</a> - 
+        <a href="/contact">contact</a> - 
+        <a href="/thanks">thanks</a> - 
+        <a href="/account">account</a> - 
+        <a href="/admin/">admin</a>  
+      </div>
+      <!--
+      <div id="auth-status" class="user-status">
+        <div id="auth-loggedout">
+          <a href="#" id="auth-loginlink">login</a>
+        </div>
+        <div id="auth-loggedin" style="display:none">
+          Logged in as: <span id="auth-displayname"></span> | <a href="#" id="auth-logoutlink">logout</a>
+        </div>
+      </div>
+      -->
+	  </div>
+	</div>
+</div>
+{% endblock %}
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-1090782-5']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<script type="text/javascript">
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
+
+{% block ganalytics_timer %}{% endblock %}
+
+</body>
+</html>

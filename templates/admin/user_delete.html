@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}{{user.name}} - Delete{% endblock %}
+
+{% block content %}
+
+<h1>Delete {{ user.name }}?</h1>
+
+<form action="/admin/user/delete/{{user.key.id}}" method="post">
+    <legend>Delete {{ user.name }} ({{ user.key.id }})?</legend>
+
+    <a href="/admin/user/{{user.key.id}}" class="btn btn-large"><i class="icon-ban-circle"></i> Cancel Delete</a>
+
+    <button type="submit" class="btn btn-danger btn-mini pull-right"><i class="icon-trash icon-white"></i> Delete User</button>
+</form>
+
+{% endblock %}
