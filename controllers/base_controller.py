@@ -37,8 +37,8 @@ class CacheableHandler(webapp2.RequestHandler):
         self.response.out.write(content)
         
     def cacheFlush(self):
-        memcache.delete(self.cache_key)
-        DatastoreCache.delete(self.cache_key)
+        memcache.delete_async(self.cache_key)
+        DatastoreCache.delete_async(self.cache_key)
         return self.cache_key
 
     def _read_cache(self):

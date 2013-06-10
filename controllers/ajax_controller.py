@@ -123,7 +123,7 @@ class WebcastHandler(CacheableHandler):
 
     def cacheFlush(self, event_key):
         keys = [self.cache_key.format(event_key, n) for n in range(10)]
-        memcache.delete_multi(keys)
-        DatastoreCache.delete_multi(keys)
+        memcache.delete_multi_async(keys)
+        DatastoreCache.delete_multi_async(keys)
         return keys
 

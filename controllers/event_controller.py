@@ -75,8 +75,8 @@ class EventList(CacheableHandler):
     def cacheFlush(self):
         year = datetime.datetime.now().year
         keys = [self.cache_key.format(year, True), self.cache_key.format(year, False)]
-        memcache.delete_multi(keys)
-        DatastoreCache.delete_multi(keys)
+        memcache.delete_multi_async(keys)
+        DatastoreCache.delete_multi_async(keys)
         return keys
 
 

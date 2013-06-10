@@ -38,11 +38,22 @@ class DatastoreCache(object):
     self.delete_multi([key])
     
   @classmethod
+  def delete_async(self, key):
+    self.delete_multi_async([key])  
+      
+  @classmethod
   def delete_multi(self, keys):
     entry_keys = []
     for key in keys:
       entry_keys.append(ndb.Key(DatastoreCacheEntry, key))
     ndb.delete_multi(entry_keys)
+    
+  @classmethod
+  def delete_multi_async(self, keys):
+    entry_keys = []
+    for key in keys:
+      entry_keys.append(ndb.Key(DatastoreCacheEntry, key))
+    ndb.delete_multi_async(entry_keys)
     
   @classmethod
   def cleanup(self, cutoff_datetime=None):
