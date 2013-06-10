@@ -6,6 +6,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from base_controller import BaseHandlerFB, CacheableHandler
+from helpers.datastore_cache_helper import DatastoreCache
 
 from models.event import Event
 from models.team import Team
@@ -120,8 +121,9 @@ class WebcastHandler(CacheableHandler):
         path = os.path.join(os.path.dirname(__file__), '../templates/webcast/' + webcast_type + '.html')
         return template.render(path, template_values)
 
-    def memcacheFlush(self, event_key):
+    def cacheFlush(self, event_key):
         keys = [self.cache_key.format(event_key, n) for n in range(10)]
-        memcache.delete_multi(keys)
+        memcache.delete_multi_async(keys)
+        DatastoreCache.delete_multi_async(keys)
         return keys
 
