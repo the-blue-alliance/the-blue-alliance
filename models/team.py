@@ -1,4 +1,5 @@
 import logging
+import re
 
 from google.appengine.ext import ndb
 
@@ -86,3 +87,9 @@ class Team(ndb.Model):
     @property
     def key_name(self):
         return "frc%s" % self.team_number
+
+    @classmethod
+    def validate_key_name(self, team_key):
+        key_name_regex = re.compile(r'^frc[1-9]\d+$')
+        match = re.match(key_name_regex, team_key)
+        return True if match else False
