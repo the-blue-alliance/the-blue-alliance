@@ -2,6 +2,7 @@ from google.appengine.ext import ndb
 import datetime
 import json
 import logging
+import re
 
 class Event(ndb.Model):
     """
@@ -177,3 +178,9 @@ class Event(ndb.Model):
 
     # Depreciated, still here to keep GAE clean.
     webcast_url = ndb.StringProperty(indexed=False)
+
+    @classmethod
+    def validate_key_name(self, event_key):
+        key_name_regex = re.compile(r'^[1-9]\d{3}[a-z]+$')
+        match = re.match(key_name_regex, event_key)
+        return True if match else False
