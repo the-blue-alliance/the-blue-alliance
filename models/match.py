@@ -1,4 +1,5 @@
 import json
+import re
 
 from google.appengine.ext import ndb
 
@@ -188,6 +189,12 @@ class Match(ndb.Model):
             return "%s_qm%s" % (event.key_name, match_number)
         else:
             return "%s_%s%sm%s" % (event.key_name, comp_level, set_number, match_number)
+
+    @classmethod
+    def validate_key_name(self, match_key):
+        key_name_regex = re.compile(r'^[1-9]\d{3}[a-z]+\_(?:qm|ef|qf\dm|sf\dm|f\dm)\d+$')
+        match = re.match(key_name_regex, match_key)
+        return True if match else False
 
     def clearAlliances(self):
         self._alliances = None
