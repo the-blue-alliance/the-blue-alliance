@@ -247,15 +247,14 @@ class TeamHistory(CacheableHandler):
         
         if not team:
             return self.redirect("/error/404")
-          
-        event_team_keys = EventTeam.query(EventTeam.team == team.key).fetch_async(1000, keys_only=True)
-        award_keys = Award.query(Award.team == team.key).fetch_async(1000, keys_only=True)
 
+        award_keys = Award.query(Award.team == team.key).fetch_async(1000, keys_only=True)
+        event_team_keys = EventTeam.query(EventTeam.team == team.key).fetch_async(1000, keys_only=True)
+
+        awards = ndb.get_multi(award_keys.get_result())
         event_teams = ndb.get_multi(event_team_keys.get_result())
         event_keys = [event_team.event for event_team in event_teams]
         events = ndb.get_multi(event_keys)
-        
-        awards = ndb.get_multi(award_keys.get_result())
         
         awards_by_event = {}
         for award in awards:
