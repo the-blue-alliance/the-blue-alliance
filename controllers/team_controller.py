@@ -248,16 +248,18 @@ class TeamHistory(CacheableHandler):
         if not team:
             return self.redirect("/error/404")
 
-        award_keys = Award.query(Award.team == team.key).fetch_async(1000, keys_only=True)
-        event_team_keys = EventTeam.query(EventTeam.team == team.key).fetch_async(1000, keys_only=True)
+        event_team_keys_future = EventTeam.query(EventTeam.team == team.key).fetch_async(1000, keys_only=True)
+        award_keys_future = Award.query(Award.team == team.key).fetch_async(1000, keys_only=True)
 
-        awards = ndb.get_multi(award_keys.get_result())
-        event_teams = ndb.get_multi(event_team_keys.get_result())
-        event_keys = [event_team.event for event_team in event_teams]
-        events = ndb.get_multi(event_keys)
+        event_teams_futures = ndb.get_multi_async(event_team_keys_future.get_result())
+        awards_futures = ndb.get_multi_async(award_keys_future.get_result())
+
+        event_keys = [event_team_future.get_result().event for event_team_future in event_teams_futures]
+        events_futures = ndb.get_multi_async(event_keys)
         
         awards_by_event = {}
-        for award in awards:
+        for award_future in awards_futures:
+            award = award_future.get_result()
             if award.event.id() not in awards_by_event:
                 awards_by_event[award.event.id()] = [award]
             else:
@@ -267,7 +269,8 @@ class TeamHistory(CacheableHandler):
         current_event = None
         matches_upcoming = None
         short_cache = False
-        for event in events:
+        for event_future in events_futures:
+            event = event_future.get_result()
             if event.now:
                 current_event = event
                 
@@ -285,7 +288,7 @@ class TeamHistory(CacheableHandler):
                 sorted_awards = []
             event_awards.append((event, sorted_awards))
             
-        years = sorted(set([a.year for a in event_teams if a.year != None]))
+        years = sorted(set([et.get_result().year for et in event_teams_futures if et.get_result().year != None]))
             
         template_values = {'team': team,
                            'event_awards': event_awards,
