@@ -1,26 +1,37 @@
-{% extends "team_base.html" %}
+{% extends "base.html" %}
 
 {% block title %}{% if team.nickname %}{{team.nickname}} - {% endif %}Team {{team.team_number}}{% if explicit_year %} ({{year}}){% endif %} - The Blue Alliance{% endblock %}
 
 {% block meta_description %}{% if team.location %}From {{team.location}}{% endif %}. Team information, match results, and match videos from the{% if explicit_year %} {{year}}{% endif %} FIRST Robotics Competition.{% endblock %}
 
-{% block team_dropdown_label %}{{year}} Season{% endblock %}
-
-{% block year_content %}
-  {% if year_wlt %}
-      <p>Overall, team {{team.team_number}} was <strong>{{year_wlt.win}}-{{year_wlt.loss}}-{{year_wlt.tie}}</strong> in {{year}}.</p>
-  {% endif %}
-  
-  {% if participation|length > 1 %}
-  <ul class="nav nav-pills nav-stacked-phone">
-    {% for comp in participation %}
-      <li><a class="btn smooth-scroll" href="#{{ comp.event.key_name}}">{{ comp.event.name }}</a></li>
-    {% endfor %}
-  </ul>
-  {% endif %}
+{% block more_head_tags %}
+{% include "team_partials/team_head_tags.html" %}
 {% endblock %}
 
-{% block team_content %}
+{% block content %}
+<div class="container">
+    {% include "team_partials/team_info.html" %}
+    <hr>
+    <div class="row">
+        <div class="span12">
+            {% with year|slugify|add:" Season" as dropdown_label %}
+            {% include "team_partials/team_year_dropdown.html" %}
+            {% endwith %}
+            
+            {% if year_wlt %}
+                <p>Overall, team {{team.team_number}} was <strong>{{year_wlt.win}}-{{year_wlt.loss}}-{{year_wlt.tie}}</strong> in {{year}}.</p>
+            {% endif %}
+            
+            {% if participation|length > 1 %}
+            <ul class="nav nav-pills nav-stacked-phone">
+              {% for comp in participation %}
+                <li><a class="btn smooth-scroll" href="#{{ comp.event.key_name}}">{{ comp.event.name }}</a></li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+    <hr>
     {% for comp in participation %}
         <div class="row" id="{{ comp.event.key_name }}">
             <div class="span4">
@@ -40,12 +51,12 @@
                   
                   {% if comp.awards.list %}
                     {% if comp.rank or comp.wlt %}and{% endif %} won the following awards:
-	                  <ul>
-	                  {% for award in comp.awards.list %}
-	                    <li>{{ award.official_name }}{% if award.awardee %} ({{ award.awardee }}){% endif %}</li>
-	                  {% endfor %}
-	                  </ul>
-	                {% endif %}
+                    <ul>
+                    {% for award in comp.awards.list %}
+                      <li>{{ award.official_name }}{% if award.awardee %} ({{ award.awardee }}){% endif %}</li>
+                    {% endfor %}
+                    </ul>
+                  {% endif %}
                 </p>
                 {% endif %}
             </div>
@@ -61,4 +72,5 @@
         </div>
         {% if not forloop.last %}<hr>{% endif %}
     {% endfor %}
+</div>
 {% endblock %}

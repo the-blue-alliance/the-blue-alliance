@@ -1,12 +1,25 @@
-{% extends "team_base.html" %}
+{% extends "base.html" %}
 
 {% block title %}{% if team.nickname %}{{team.nickname}} - {% endif %}Team {{team.team_number}} (History) - The Blue Alliance{% endblock %}
 
 {% block meta_description %}{% if team.location %}From {{team.location}}{% endif %}. Team history from the FIRST Robotics Competition.{% endblock %}
 
-{% block team_dropdown_label %}History{% endblock %}
+{% block more_head_tags %}
+{% include "team_partials/team_head_tags.html" %}
+{% endblock %}
 
-{% block team_content %}
+{% block content %}
+<div class="container">
+    {% include "team_partials/team_info.html" %}
+    <hr>
+    <div class="row">
+        <div class="span12">
+            {% with "History" as dropdown_label %}
+            {% include "team_partials/team_year_dropdown.html" %}
+            {% endwith %}
+        </div>
+    </div>
+    <hr>
     <div class="row">
         <div class="span8 offset2">
         {% if event_awards %}
