@@ -12,6 +12,7 @@ from controllers.admin.admin_memcache_controller import AdminMemcacheMain
 from controllers.admin.admin_sitevar_controller import AdminSitevarCreate, AdminSitevarEdit, AdminSitevarList
 from controllers.admin.suggestions.admin_suggestions_review_controller import AdminSuggestionsReviewController
 from controllers.admin.admin_team_controller import AdminTeamDetail, AdminTeamList
+from controllers.admin.admin_migration_controller import AdminMigration, AdminMigrationUpdateEventType, AdminMigrationUpdateEventTypeAccept
 
 app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/debug', AdminDebugHandler),
@@ -31,6 +32,9 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/match/edit/(.*)', AdminMatchEdit),
                                ('/admin/match/(.*)', AdminMatchDetail),
                                ('/admin/memcache', AdminMemcacheMain),
+                               ('/admin/migration', AdminMigration),
+                               ('/admin/migration/update_event_types', AdminMigrationUpdateEventType),
+                               ('/admin/migration/update_event_types_accept', AdminMigrationUpdateEventTypeAccept),
                                ('/admin/sitevars', AdminSitevarList),
                                ('/admin/sitevar/create', AdminSitevarCreate),
                                ('/admin/sitevar/edit/(.*)', AdminSitevarEdit),
