@@ -70,7 +70,7 @@ class TestEventManipulator(unittest2.TestCase):
     def assertOldEvent(self, event):
         self.assertEqual(event.key.id(), "2011ct")
         self.assertEqual(event.name, "Northeast Utilities FIRST Connecticut Regional")
-        self.assertEqual(event.event_type, "Regional")
+        self.assertEqual(event.event_type, Event.REGIONAL)
         self.assertEqual(event.start_date, datetime.datetime(2011, 3, 31, 0, 0))
         self.assertEqual(event.end_date, datetime.datetime(2011, 4, 2, 0, 0))
         self.assertEqual(event.year, 2011)

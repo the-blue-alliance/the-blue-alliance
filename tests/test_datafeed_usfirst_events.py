@@ -7,6 +7,7 @@ from google.appengine.api import urlfetch
 from datafeeds.datafeed_usfirst import DatafeedUsfirst
 
 from models.team import Team
+from models.event import Event
 
 class TestDatafeedUsfirstEvents(unittest2.TestCase):
     def setUp(self):
@@ -26,7 +27,7 @@ class TestDatafeedUsfirstEvents(unittest2.TestCase):
         
         self.assertEqual(event.key.id(), "2011ct")
         self.assertEqual(event.name, "Northeast Utilities FIRST Connecticut Regional")
-        self.assertEqual(event.event_type, "Regional")
+        self.assertEqual(event.event_type, Event.REGIONAL)
         self.assertEqual(event.start_date, datetime.datetime(2011, 3, 31, 0, 0))
         self.assertEqual(event.end_date, datetime.datetime(2011, 4, 2, 0, 0))
         self.assertEqual(event.year, 2011)
@@ -49,9 +50,9 @@ class TestDatafeedUsfirstEvents(unittest2.TestCase):
         self.assertEqual(len(events), 58) #58 events expected
         
         self.assertEqual(events[0].first_eid, "5519")
-        self.assertEqual(events[0].event_type, "Regional")
+        self.assertEqual(events[0].event_type, Event.REGIONAL)
         self.assertEqual(events[0].name, "BAE Systems/Granite State Regional")
         
         self.assertEqual(events[1].first_eid, "5523")
-        self.assertEqual(events[1].event_type, "Regional")
+        self.assertEqual(events[1].event_type, Event.REGIONAL)
         self.assertEqual(events[1].name, "New Jersey Regional")
