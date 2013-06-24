@@ -142,3 +142,40 @@ class EventHelper(object):
             if event.within_a_day:
                 ret.append(event)
         return ret
+
+    @classmethod
+    def parseEventType(self, event_type_str):
+      """
+      Given an event_type_str from USFIRST, return the proper event type
+      Examples:
+      'Regional' -> Event.REGIONAL
+      'District' -> Event.DISTRICT
+      'District Championship' -> Event.DISTRICT_CMP
+      'MI FRC State Championship' -> Event.DISTRICT_CMP
+      'Championship Finals' -> Event.CMP_FINALS
+      'Championship' -> Event.CMP_FINALS
+      """
+      event_type_str = event_type_str.lower()
+      
+      # Easy to parse
+      if 'regional' in event_type_str:
+        return Event.REGIONAL
+      elif 'offseason' in event_type_str:
+        return Event.OFFSEASON
+      
+      # Districts have multiple names
+      if ('district' in event_type_str) or ('state' in event_type_str)\
+        or ('region' in event_type_str):
+        if 'championship' in event_type_str:
+          return Event.DISTRICT_CMP
+        else:
+          return Event.DISTRICT
+      
+      # Everything else should be a Championship event
+      if 'division' in event_type_str:
+        return Event.CMP_DIVISION
+      else:
+        return Event.CMP_FINALS
+      
+      # An event slipped through!
+      raise Exception("Event type {} not recognized!".format(event_type_str))
