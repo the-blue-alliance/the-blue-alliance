@@ -19,7 +19,7 @@ class Event(ndb.Model):
     OFFSEASON = 'Offseason'
 
     name = ndb.StringProperty()
-    event_type = ndb.StringProperty(indexed=False) # From USFIRST
+    event_type = ndb.StringProperty() # From USFIRST
     short_name = ndb.StringProperty(indexed=False) # Should not contain "Regional" or "Division", like "Hartford"
     event_short = ndb.StringProperty(required=True, indexed=False) # Smaller abbreviation like "CT"
     year = ndb.IntegerProperty(required=True)
