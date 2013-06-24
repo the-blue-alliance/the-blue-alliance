@@ -9,6 +9,15 @@ class Event(ndb.Model):
     Events represent FIRST Robotics Competition events, both official and unofficial.
     key_name is like '2010ct'
     """
+
+    # Event Types
+    REGIONAL = 'Regional'
+    DISTRICT = 'District'
+    DISTRICT_CMP = 'District Championship'
+    CMP_DIVISION = 'Championship Division'
+    CMP_FINALS = 'Championship Finals'
+    OFFSEASON = 'Offseason'
+
     name = ndb.StringProperty()
     event_type = ndb.StringProperty(indexed=False) # From USFIRST
     short_name = ndb.StringProperty(indexed=False) # Should not contain "Regional" or "Division", like "Hartford"
