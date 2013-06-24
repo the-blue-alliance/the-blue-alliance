@@ -18,3 +18,7 @@ class TestUsfirstEventListParser(unittest2.TestCase):
         self.assertEqual(events[1]["first_eid"], "7585")
         self.assertEqual(events[1]["event_type"], Event.REGIONAL)
         self.assertEqual(events[1]["name"], "BAE Systems Granite State Regional")
+
+        self.assertEqual(events[51]["event_type"], Event.REGIONAL)
+        self.assertEqual(events[52]["event_type"], Event.DISTRICT_CMP)
+        self.assertEqual(events[54]["event_type"], Event.DISTRICT)
