@@ -178,4 +178,4 @@ class EventHelper(object):
         return Event.CMP_FINALS
       
       # An event slipped through!
-      raise Exception("Event type {} not recognized!".format(event_type_str))
+      logging.error("Event type {} not recognized!".format(event_type_str))
