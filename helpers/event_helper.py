@@ -165,7 +165,7 @@ class EventHelper(object):
       
       # Districts have multiple names
       if ('district' in event_type_str) or ('state' in event_type_str)\
-        or ('region' in event_type_str):
+        or ('region' in event_type_str) or ('qualif' in event_type_str):
         if 'championship' in event_type_str:
           return Event.DISTRICT_CMP
         else:
