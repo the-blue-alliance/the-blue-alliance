@@ -2,7 +2,7 @@ import os
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 from controllers.base_controller import LoggedInHandler
-from models.event import Event
+from models.event import Event, EventType
 from helpers.event_helper import EventHelper
 
 
@@ -18,7 +18,7 @@ class AdminMigrationUpdateEventType(LoggedInHandler):
     
     events = Event.query().order(Event.year).order(Event.start_date).fetch(10000)
     for event in events:
-      event.new_event_type = EventHelper.parseEventType(event.event_type)
+      event.new_event_type = EventType.type_names[EventHelper.parseEventType(event.event_type)]
     
     self.template_values.update({"events": events})
     path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_type_migration.html')
@@ -30,7 +30,7 @@ class AdminMigrationUpdateEventTypeAccept(LoggedInHandler):
     
     events = Event.query().order(Event.year).order(Event.start_date).fetch(10000)
     for event in events:
-      event.event_type = EventHelper.parseEventType(event.event_type)
+      event.type = EventType.type_names[EventHelper.parseEventType(event.event_type)]
     ndb.put_multi(events)
     
     self.redirect("/admin/events")
