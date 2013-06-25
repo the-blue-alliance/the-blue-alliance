@@ -4,7 +4,9 @@ import datetime
 
 from google.appengine.ext import ndb
 
-from models.event import Event, EventType
+from consts.event_type import EventType
+
+from models.event import Event
 from models.match import Match
 from models.team import Team
 
