@@ -287,9 +287,10 @@ class TeamHistory(CacheableHandler):
             else:
                 sorted_awards = []
             event_awards.append((event, sorted_awards))
-            
+        event_awards = sorted(event_awards, key=lambda (e, _): e.start_date)
+        
         years = sorted(set([et.get_result().year for et in event_teams_futures if et.get_result().year != None]))
-            
+        
         template_values = {'team': team,
                            'event_awards': event_awards,
                            'years': years,
