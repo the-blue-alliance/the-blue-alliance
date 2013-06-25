@@ -30,7 +30,7 @@ class AdminMigrationUpdateEventTypeAccept(LoggedInHandler):
     
     events = Event.query().order(Event.year).order(Event.start_date).fetch(10000)
     for event in events:
-      event.type = EventType.type_names[EventHelper.parseEventType(event.event_type)]
+      event.type = EventHelper.parseEventType(event.event_type)
     ndb.put_multi(events)
     
     self.redirect("/admin/events")

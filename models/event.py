@@ -205,3 +205,7 @@ class Event(ndb.Model):
         key_name_regex = re.compile(r'^[1-9]\d{3}[a-z]+$')
         match = re.match(key_name_regex, event_key)
         return True if match else False
+      
+    @property
+    def type_str(self):
+        return EventType.type_names[self.type]
