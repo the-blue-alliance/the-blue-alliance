@@ -4,10 +4,11 @@ import datetime
 from google.appengine.ext import testbed
 from google.appengine.api import urlfetch
 
+from consts.event_type import EventType
+
 from datafeeds.datafeed_usfirst import DatafeedUsfirst
 
 from models.team import Team
-from models.event import EventType
 
 class TestDatafeedUsfirstEvents(unittest2.TestCase):
     def setUp(self):

@@ -3,7 +3,7 @@ import logging
 
 from BeautifulSoup import BeautifulSoup
 
-from models.event import EventType
+from consts.event_type import EventType
 from datafeeds.parser_base import ParserBase
 from helpers.event_helper import EventHelper
 

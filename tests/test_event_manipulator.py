@@ -5,9 +5,10 @@ import json
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
+from consts.event_type import EventType
 from datafeeds.usfirst_event_rankings_parser import UsfirstEventRankingsParser
 from helpers.event_manipulator import EventManipulator
-from models.event import Event, EventType
+from models.event import Event
 
 class TestEventManipulator(unittest2.TestCase):
     def setUp(self):

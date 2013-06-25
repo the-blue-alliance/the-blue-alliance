@@ -1,13 +1,15 @@
 import datetime
 import unittest2
 
+from consts.event_type import EventType
+
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.event_team_repairer import EventTeamRepairer
 
-from models.event import Event, EventType
+from models.event import Event
 from models.event_team import EventTeam
 from models.team import Team
 

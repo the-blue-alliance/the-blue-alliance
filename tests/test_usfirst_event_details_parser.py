@@ -1,8 +1,8 @@
 import unittest2
 import datetime
 
+from consts.event_type import EventType
 from datafeeds.usfirst_event_details_parser import UsfirstEventDetailsParser
-from models.event import Event, EventType
 
 class TestUsfirstEventDetailsParser(unittest2.TestCase):
     def test_parse2012ct(self):

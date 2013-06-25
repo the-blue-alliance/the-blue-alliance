@@ -1,10 +1,11 @@
 import datetime
 import logging
 
+from consts.event_type import EventType
 from helpers.event_manipulator import EventManipulator
 from helpers.event_team.event_team_test_creator import EventTeamTestCreator
 from helpers.match.match_test_creator import MatchTestCreator
-from models.event import Event, EventType
+from models.event import Event
 
 class EventTestCreator(object):
     @classmethod

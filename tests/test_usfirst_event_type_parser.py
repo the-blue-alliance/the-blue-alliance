@@ -1,6 +1,6 @@
 import unittest2
 
-from models.event import EventType
+from consts.event_type import EventType
 from helpers.event_helper import EventHelper
 
 class TestUsfirstEventTypeParser(unittest2.TestCase):

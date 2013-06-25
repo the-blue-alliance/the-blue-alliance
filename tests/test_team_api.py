@@ -8,10 +8,12 @@ from datetime import datetime
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
+from consts.event_type import EventType
+
 from controllers.api_controller import ApiTeamsShow
 
 from models.team import Team
-from models.event import Event, EventType
+from models.event import Event
 from models.event_team import EventTeam
 
 class TestApiTeamShow(unittest2.TestCase):
