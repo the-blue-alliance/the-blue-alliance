@@ -31,7 +31,7 @@ class Event(ndb.Model):
     """
     name = ndb.StringProperty()
     event_type = ndb.StringProperty(indexed=False) # From USFIRST, depreciated
-    type = ndb.IntegerProperty()
+    event_type_enum = ndb.IntegerProperty()
     short_name = ndb.StringProperty(indexed=False) # Should not contain "Regional" or "Division", like "Hartford"
     event_short = ndb.StringProperty(required=True, indexed=False) # Smaller abbreviation like "CT"
     year = ndb.IntegerProperty(required=True)
@@ -207,5 +207,5 @@ class Event(ndb.Model):
         return True if match else False
       
     @property
-    def type_str(self):
-        return EventType.type_names[self.type]
+    def event_type_str(self):
+        return EventType.type_names[self.event_type_enum]
