@@ -7,12 +7,13 @@ from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
 from helpers.event.event_test_creator import EventTestCreator
+from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.match_manipulator import MatchManipulator
 from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
 from models.award import Award
-from models.event import Event
+from models.event import Event, EventType
 from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
@@ -164,7 +165,7 @@ class AdminEventEdit(LoggedInHandler):
             id = str(self.request.get("year")) + str.lower(str(self.request.get("event_short"))),
             end_date = end_date,
             event_short = self.request.get("event_short"),
-            event_type = self.request.get("event_type"),
+            event_type_enum = EventHelper.parseEventType(self.request.get("event_type_str")),
             location = self.request.get("location"),
             name = self.request.get("name"),
             short_name = self.request.get("short_name"),
