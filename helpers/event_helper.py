@@ -148,12 +148,12 @@ class EventHelper(object):
       """
       Given an event_type_str from USFIRST, return the proper event type
       Examples:
-      'Regional' -> Event.REGIONAL
-      'District' -> Event.DISTRICT
-      'District Championship' -> Event.DISTRICT_CMP
-      'MI FRC State Championship' -> Event.DISTRICT_CMP
-      'Championship Finals' -> Event.CMP_FINALS
-      'Championship' -> Event.CMP_FINALS
+      'Regional' -> EventType.REGIONAL
+      'District' -> EventType.DISTRICT
+      'District Championship' -> EventType.DISTRICT_CMP
+      'MI FRC State Championship' -> EventType.DISTRICT_CMP
+      'Championship Finals' -> EventType.CMP_FINALS
+      'Championship' -> EventType.CMP_FINALS
       """
       event_type_str = event_type_str.lower()
       
