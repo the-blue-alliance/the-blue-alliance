@@ -4,7 +4,7 @@ import datetime
 
 from google.appengine.ext import ndb
 
-from models.event import Event
+from models.event import Event, EventType
 from models.match import Match
 from models.team import Team
 
@@ -148,34 +148,36 @@ class EventHelper(object):
       """
       Given an event_type_str from USFIRST, return the proper event type
       Examples:
-      'Regional' -> Event.REGIONAL
-      'District' -> Event.DISTRICT
-      'District Championship' -> Event.DISTRICT_CMP
-      'MI FRC State Championship' -> Event.DISTRICT_CMP
-      'Championship Finals' -> Event.CMP_FINALS
-      'Championship' -> Event.CMP_FINALS
+      'Regional' -> EventType.REGIONAL
+      'District' -> EventType.DISTRICT
+      'District Championship' -> EventType.DISTRICT_CMP
+      'MI FRC State Championship' -> EventType.DISTRICT_CMP
+      'Championship Finals' -> EventType.CMP_FINALS
+      'Championship' -> EventType.CMP_FINALS
       """
       event_type_str = event_type_str.lower()
       
       # Easy to parse
       if 'regional' in event_type_str:
-        return Event.REGIONAL
+        return EventType.REGIONAL
       elif 'offseason' in event_type_str:
-        return Event.OFFSEASON
+        return EventType.OFFSEASON
       
       # Districts have multiple names
       if ('district' in event_type_str) or ('state' in event_type_str)\
         or ('region' in event_type_str) or ('qualif' in event_type_str):
         if 'championship' in event_type_str:
-          return Event.DISTRICT_CMP
+          return EventType.DISTRICT_CMP
         else:
-          return Event.DISTRICT
+          return EventType.DISTRICT
       
-      # Everything else should be a Championship event
-      if 'division' in event_type_str:
-        return Event.CMP_DIVISION
-      else:
-        return Event.CMP_FINALS
+      # Everything else with 'champ' should be a Championship event
+      if 'champ' in event_type_str:
+        if 'division' in event_type_str:
+          return EventType.CMP_DIVISION
+        else:
+          return EventType.CMP_FINALS
       
       # An event slipped through!
       logging.error("Event type {} not recognized!".format(event_type_str))
+      return EventType.UNLABLED

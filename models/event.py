@@ -4,22 +4,34 @@ import json
 import logging
 import re
 
+class EventType(object):
+    REGIONAL = 0
+    DISTRICT = 1
+    DISTRICT_CMP = 2
+    CMP_DIVISION = 3
+    CMP_FINALS = 4
+    OFFSEASON = 99
+    UNLABLED = -1
+
+    type_names = {    
+        REGIONAL: 'Regional',
+        DISTRICT: 'District',
+        DISTRICT_CMP: 'District Championship',
+        CMP_DIVISION: 'Championship Division',
+        CMP_FINALS: 'Championship Finals',
+        OFFSEASON: 'Offseason',
+        UNLABLED: '',
+    }
+
+
 class Event(ndb.Model):
     """
     Events represent FIRST Robotics Competition events, both official and unofficial.
     key_name is like '2010ct'
     """
-
-    # Event Types
-    REGIONAL = 'Regional'
-    DISTRICT = 'District'
-    DISTRICT_CMP = 'District Championship'
-    CMP_DIVISION = 'Championship Division'
-    CMP_FINALS = 'Championship Finals'
-    OFFSEASON = 'Offseason'
-
     name = ndb.StringProperty()
-    event_type = ndb.StringProperty() # From USFIRST
+    event_type = ndb.StringProperty(indexed=False) # From USFIRST, depreciated
+    event_type_enum = ndb.IntegerProperty()
     short_name = ndb.StringProperty(indexed=False) # Should not contain "Regional" or "Division", like "Hartford"
     event_short = ndb.StringProperty(required=True, indexed=False) # Smaller abbreviation like "CT"
     year = ndb.IntegerProperty(required=True)
@@ -193,3 +205,7 @@ class Event(ndb.Model):
         key_name_regex = re.compile(r'^[1-9]\d{3}[a-z]+$')
         match = re.match(key_name_regex, event_key)
         return True if match else False
+      
+    @property
+    def event_type_str(self):
+        return EventType.type_names[self.event_type_enum]
