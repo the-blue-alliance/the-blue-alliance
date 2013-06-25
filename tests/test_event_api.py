@@ -10,7 +10,7 @@ from google.appengine.ext import testbed
 
 from controllers.api_controller import ApiEventsShow, ApiEventList, ApiMatchDetails
 
-from models.event import Event
+from models.event import Event, EventType
 from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
@@ -30,7 +30,7 @@ class TestApiEventList(unittest2.TestCase):
         self.event = Event(
                 id = "2010sc",
                 name = "Palmetto Regional",
-                event_type = "Regional",
+                event_type_enum = EventType.REGIONAL,
                 short_name = "Palmetto",
                 event_short = "sc",
                 year = 2010,
@@ -74,7 +74,7 @@ class TestApiMatchDetails(unittest2.TestCase):
         self.event = Event(
                 id = "2010sc",
                 name = "Palmetto Regional",
-                event_type = "Regional",
+                event_type_enum = EventType.REGIONAL,
                 short_name = "Palmetto",
                 event_short = "sc",
                 year = 2010,
