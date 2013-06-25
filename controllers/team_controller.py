@@ -217,3 +217,88 @@ class TeamDetail(CacheableHandler):
         
         path = os.path.join(os.path.dirname(__file__), '../templates/team_details.html')
         return template.render(path, template_values)
+
+
+class TeamHistory(CacheableHandler):
+    LONG_CACHE_EXPIRATION = 60 * 60 * 24
+    SHORT_CACHE_EXPIRATION = 60 * 5
+
+    def __init__(self, *args, **kw):
+        super(TeamHistory, self).__init__(*args, **kw)
+        self._cache_expiration = self.LONG_CACHE_EXPIRATION
+        self._cache_key = "team_history_{}" # (team_number)
+        self._cache_version = 2
+
+    def get(self, team_number):
+        # /team/0604/history should redirect to /team/604/history
+        try:
+            if str(int(team_number)) != team_number:
+                return self.redirect("/team/%s/history" % int(team_number))
+
+        except ValueError, e:
+            logging.info("%s", e)
+            return self.redirect("/error/404")
+        
+        self._cache_key = self._cache_key.format("frc" + team_number)
+        super(TeamHistory, self).get(team_number)
+
+    def _render(self, team_number):
+        team = Team.get_by_id("frc" + team_number)
+        
+        if not team:
+            return self.redirect("/error/404")
+
+        event_team_keys_future = EventTeam.query(EventTeam.team == team.key).fetch_async(1000, keys_only=True)
+        award_keys_future = Award.query(Award.team == team.key).fetch_async(1000, keys_only=True)
+
+        event_teams_futures = ndb.get_multi_async(event_team_keys_future.get_result())
+        awards_futures = ndb.get_multi_async(award_keys_future.get_result())
+
+        event_keys = [event_team_future.get_result().event for event_team_future in event_teams_futures]
+        events_futures = ndb.get_multi_async(event_keys)
+        
+        awards_by_event = {}
+        for award_future in awards_futures:
+            award = award_future.get_result()
+            if award.event.id() not in awards_by_event:
+                awards_by_event[award.event.id()] = [award]
+            else:
+                awards_by_event[award.event.id()].append(award)
+        
+        event_awards = []
+        current_event = None
+        matches_upcoming = None
+        short_cache = False
+        for event_future in events_futures:
+            event = event_future.get_result()
+            if event.now:
+                current_event = event
+                
+                team_matches_future = Match.query(Match.event == event.key, Match.team_key_names == team.key_name)\
+                  .fetch_async(500, keys_only=True)
+                matches = ndb.get_multi(team_matches_future.get_result())
+                matches_upcoming = MatchHelper.upcomingMatches(matches)
+                
+            if event.within_a_day:
+                short_cache = True
+          
+            if event.key_name in awards_by_event:
+                sorted_awards = AwardHelper.organizeAwards(awards_by_event[event.key_name])['list']
+            else:
+                sorted_awards = []
+            event_awards.append((event, sorted_awards))
+        event_awards = sorted(event_awards, key=lambda (e, _): e.start_date)
+        
+        years = sorted(set([et.get_result().year for et in event_teams_futures if et.get_result().year != None]))
+        
+        template_values = {'team': team,
+                           'event_awards': event_awards,
+                           'years': years,
+                           'current_event': current_event,
+                           'matches_upcoming': matches_upcoming}
+        
+        if short_cache:
+            self._cache_expiration = self.SHORT_CACHE_EXPIRATION
+        
+        path = os.path.join(os.path.dirname(__file__), '../templates/team_history.html')
+        return template.render(path, template_values)

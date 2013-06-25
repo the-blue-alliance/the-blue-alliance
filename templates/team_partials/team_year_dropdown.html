@@ -1,0 +1,14 @@
+<h3 class="clearfix">
+  <div class="btn-group inline pull-left" style="margin-top: 3px">
+    <a class="btn btn-large dropdown-toggle" data-toggle="dropdown" href="#">
+      {{ dropdown_label }}
+      <span class="caret"></span>
+    </a>
+    <ul class="dropdown-menu">
+      <li><a href="/team/{{team.team_number}}/history">History</a></li>
+      {% for a_year in years reversed %}
+        <li><a href="/team/{{team.team_number}}/{{a_year}}">{{a_year}} Season</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+</h3>
