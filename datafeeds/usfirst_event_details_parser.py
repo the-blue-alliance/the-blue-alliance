@@ -24,7 +24,7 @@ class UsfirstEventDetailsParser(ParserBase):
                 if field == "Event":
                     result["name"] = unicode(''.join(tds[1].findAll(text=True))).strip()
                 if field == "Event Subtype":
-                    result["event_type"] = EventHelper.parseEventType(unicode(tds[1].string))
+                    result["event_type_enum"] = EventHelper.parseEventType(unicode(tds[1].string))
                 if field == "When":
                     try:
                         event_dates = str(tds[1].string).strip()
