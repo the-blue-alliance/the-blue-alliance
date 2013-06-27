@@ -28,9 +28,12 @@ class UsfirstEventDetailsParser(ParserBase):
         
         # TODO: This next line is awful. Make this suck less.
         address = soup.find('div', {'class': 'event-address'})
-        result['venue_address'] = unicode('\r\n'.join(line.strip() for line in address.findAll(text=True))).encode('ascii', 'ignore').strip().replace("\t","").replace("\r\n\r\n", "\r\n")
+        if address is not None:
+            result['venue_address'] = unicode('\r\n'.join(line.strip() for line in address.findAll(text=True))).encode('ascii', 'ignore').strip().replace("\t","").replace("\r\n\r\n", "\r\n")
         
-        result['website'] = unicode(soup.find('div', {'class': 'event-info-link'}).find('a')['href'])
+        website_tag = soup.find('div', {'class': 'event-info-link'})
+        if website_tag is not None:
+            result['website'] = unicode(website_tag.find('a')['href'])
         
         # http://www2.usfirst.org/2010comp/Events/SDC/matchresults.html
         match_results_url = soup.find('div', {'class': 'event-match-results'}).find('a')['href']
