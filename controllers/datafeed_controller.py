@@ -153,7 +153,7 @@ class UsfirstEventDetailsGet(webapp.RequestHandler):
     def get(self, year, first_eid):
         datafeed = DatafeedUsfirst()
 
-        event = datafeed.getEventDetails(int(year), first_eid)
+        event = datafeed.getEventDetails(first_eid)
         event = EventManipulator.createOrUpdate(event)
         
         teams = datafeed.getEventTeams(int(year), first_eid)
