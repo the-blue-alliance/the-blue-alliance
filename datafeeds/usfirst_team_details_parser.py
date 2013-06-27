@@ -23,7 +23,7 @@ class UsfirstTeamDetailsParser(ParserBase):
                 convertEntities=BeautifulSoup.HTML_ENTITIES)
         
         page_title = soup.find('h1', {'id': 'thepagetitle'}).text
-        team['team_number'] = int(re.search(r'Team Number(.+)\-', page_title).group(1).strip())
+        team['team_number'] = int(re.search(r'Team Number ([0-9]+) \-', page_title).group(1).strip())
         team['nickname'] = unicode(re.search(r'"(.+)\"', page_title).group(1).strip())
         
         team['address'] = unicode(soup.find('div', {'class': 'team-address'}).find('div', {'class': 'content'}).text)
