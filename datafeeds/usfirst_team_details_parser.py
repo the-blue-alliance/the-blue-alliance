@@ -1,4 +1,5 @@
 import logging
+import re
 
 # for db.link
 from google.appengine.ext import db
@@ -21,28 +22,17 @@ class UsfirstTeamDetailsParser(ParserBase):
         soup = BeautifulSoup(html,
                 convertEntities=BeautifulSoup.HTML_ENTITIES)
         
-        if soup.find(text='No team found.') is not None:
-            logging.error('FIRST lacks team.')
-            return None
+        page_title = soup.find('h1', {'id': 'thepagetitle'}).text
+        team['team_number'] = int(re.search(r'Team Number(.+)\-', page_title).group(1).strip())
+        team['nickname'] = unicode(re.search(r'"(.+)\"', page_title).group(1).strip())
         
-        for tr in soup.findAll('tr'):
-            tds = tr.findAll('td')
-            if len(tds) > 1:
-                field = str(tds[0].string)
-                if field == "Team Number":
-                    team["team_number"] = int(tds[1].b.string)
-                if field == "Team Name":
-                    team["name"] = unicode(tds[1].string)
-                if field == "Team Location":
-                    #TODO: Filter out &nbsp;'s and stuff -greg 5/21/2010
-                    team["address"] = unicode(tds[1].string)
-                #if field == "Rookie Season": #Unused
-                #    team["rookie_season"] = int(tds[1].string)
-                if field == "Team Nickname":
-                    team["nickname"] = unicode(tds[1].string)
-                if field == "Team Website":
-                    try:
-                        team["website"] = db.Link(unicode(tds[1].a["href"]))
-                    except Exception, details:
-                        logging.info("Team website is invalid for team %s." % team["team_number"])
+        team['address'] = unicode(soup.find('div', {'class': 'team-address'}).find('div', {'class': 'content'}).text)
+        
+        team['name'] = unicode(soup.find('div', {'class': 'team-name'}).text)
+        
+        try:
+            team['website'] = db.Link(unicode(soup.find('div', {'class': 'team-website'}).find('a')['href']))
+        except Exception, details:
+            logging.info("Team website is invalid for team %s." % team['team_number'])        
+        
         return team
