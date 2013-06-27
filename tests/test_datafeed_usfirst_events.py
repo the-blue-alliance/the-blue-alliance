@@ -22,7 +22,7 @@ class TestDatafeedUsfirstEvents(unittest2.TestCase):
     
     def test_getEvent(self):
         # test with 2011ct
-        event = self.datafeed.getEventDetails(2011, "5561")
+        event = self.datafeed.getEventDetails("5561")
         
         self.assertEqual(event.key.id(), "2011ct")
         self.assertEqual(event.name, "Northeast Utilities FIRST Connecticut Regional")
