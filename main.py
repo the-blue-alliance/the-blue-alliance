@@ -14,7 +14,7 @@ from controllers.main_controller import ContactHandler, HashtagsHandler, \
       WebcastsHandler, RecordHandler
 from controllers.match_controller import MatchDetail
 from controllers.suggestions.suggest_match_video_controller import SuggestMatchVideoController
-from controllers.team_controller import TeamList, TeamDetail
+from controllers.team_controller import TeamList, TeamDetail, TeamHistory
 
 from google.appengine.ext.webapp import template
 template.register_template_library('common.my_filters')
@@ -44,6 +44,7 @@ app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['landing_
                                ('/teams', TeamList),
                                ('/teams/([0-9]*)', TeamList),
                                ('/team/([0-9]*)', TeamDetail),
+                               ('/team/([0-9]*)/history', TeamHistory),
                                ('/team/([0-9]*)/([0-9]*)', TeamDetail),
                                ('/thanks', ThanksHandler),
                                ('/webcasts', WebcastsHandler),
