@@ -25,5 +25,6 @@ class TestUsfirstEventTypeParser(unittest2.TestCase):
         self.assertEqual(EventHelper.parseEventType("Championship"), EventType.CMP_FINALS)
         
         self.assertEqual(EventHelper.parseEventType("Offseason"), EventType.OFFSEASON)
+        self.assertEqual(EventHelper.parseEventType("Preseason"), EventType.PRESEASON)
 
         self.assertEqual(EventHelper.parseEventType("Division"), EventType.UNLABLED)

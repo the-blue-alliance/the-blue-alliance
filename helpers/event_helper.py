@@ -164,6 +164,8 @@ class EventHelper(object):
         return EventType.REGIONAL
       elif 'offseason' in event_type_str:
         return EventType.OFFSEASON
+      elif 'preseason' in event_type_str:
+        return EventType.PRESEASON
       
       # Districts have multiple names
       if ('district' in event_type_str) or ('state' in event_type_str)\
