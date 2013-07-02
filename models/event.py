@@ -3,6 +3,8 @@ import datetime
 import json
 import logging
 import re
+from consts.event_type import EventType
+
 
 class Event(ndb.Model):
     """
@@ -10,7 +12,8 @@ class Event(ndb.Model):
     key_name is like '2010ct'
     """
     name = ndb.StringProperty()
-    event_type = ndb.StringProperty(indexed=False) # From USFIRST
+    event_type = ndb.StringProperty(indexed=False) # From USFIRST, depreciated
+    event_type_enum = ndb.IntegerProperty()
     short_name = ndb.StringProperty(indexed=False) # Should not contain "Regional" or "Division", like "Hartford"
     event_short = ndb.StringProperty(required=True, indexed=False) # Smaller abbreviation like "CT"
     year = ndb.IntegerProperty(required=True)
@@ -184,3 +187,7 @@ class Event(ndb.Model):
         key_name_regex = re.compile(r'^[1-9]\d{3}[a-z]+$')
         match = re.match(key_name_regex, event_key)
         return True if match else False
+      
+    @property
+    def event_type_str(self):
+        return EventType.type_names[self.event_type_enum]

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Event Type Migration{% endblock %}
+
+{% block content %}
+
+<h1>Event Type Migration</h1>
+<form action="/admin/migration/update_event_types_accept" method="post">
+  <table class="table table-striped table-hover">
+    <caption>{{ events|length }} total events</caption>
+    <thead>
+      <th>Key</th>
+      <th>Name</th>
+      <th>Old Event Type</th>
+      <th>New Event Type</th>
+    </thead>
+    
+    {% for event in events %}
+    <tr>
+      <td>{{ event.key_name }}</td>
+      <td><a href="/admin/event/{{event.key_name}}">{{ event.name }}</td>
+      <td>{{ event.event_type }}</td>
+      <td>{{ event.new_event_type }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <button class="btn btn-danger" type="submit">Accept All! (Writes to datastore)</button>
+</form>
+
+{% endblock %}
