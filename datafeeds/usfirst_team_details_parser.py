@@ -35,4 +35,4 @@ class UsfirstTeamDetailsParser(ParserBase):
         except Exception, details:
             logging.info("Team website is invalid for team %s." % team['team_number'])        
         
-        return team
+        return team, False

@@ -40,7 +40,7 @@ class UsfirstEventDetailsParser(ParserBase):
         m = re.match(r"http://www2\.usfirst\.org/%scomp/Events/([a-zA-Z0-9]*)/matchresults\.html" % result["year"], match_results_url)
         result['event_short'] = unicode(m.group(1).lower())
         
-        return result
+        return result, False
 
     @classmethod
     def _parseEventDates(self, datestring):

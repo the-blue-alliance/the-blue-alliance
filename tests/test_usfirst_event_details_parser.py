@@ -6,7 +6,7 @@ from datafeeds.usfirst_event_details_parser import UsfirstEventDetailsParser
 class TestUsfirstEventDetailsParser(unittest2.TestCase):
     def test_parse2012ct(self):
         with open('test_data/usfirst_html/usfirst_event_details_2012ct-2.html', 'r') as f: 
-            event = UsfirstEventDetailsParser.parse(f.read())
+            event, _ = UsfirstEventDetailsParser.parse(f.read())
         
         self.assertEqual(event["name"], "Northeast Utilities FIRST Connecticut Regional")
         self.assertEqual(event["event_type"], "Regional")
@@ -19,7 +19,7 @@ class TestUsfirstEventDetailsParser(unittest2.TestCase):
 
     def test_parse2013flbr(self):
         with open('test_data/usfirst_html/usfirst_event_details_2013flbr-2.html', 'r') as f:
-            event = UsfirstEventDetailsParser.parse(f.read())
+            event, _ = UsfirstEventDetailsParser.parse(f.read())
 
         self.assertEqual(event["name"], "South Florida Regional")
         self.assertEqual(event["event_type"], "Regional")

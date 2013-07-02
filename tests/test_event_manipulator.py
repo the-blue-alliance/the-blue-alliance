@@ -17,10 +17,10 @@ class TestEventManipulator(unittest2.TestCase):
         self.testbed.init_memcache_stub()
         
         f1 = open('test_data/usfirst_html/usfirst_event_rankings_2012ct.html', 'r')
-        good_rankings = UsfirstEventRankingsParser.parse(f1.read())
+        good_rankings, _ = UsfirstEventRankingsParser.parse(f1.read())
         
         f2 = open('test_data/usfirst_html/usfirst_event_rankings_2012ct_bad.html', 'r')
-        bad_rankings = UsfirstEventRankingsParser.parse(f2.read())
+        bad_rankings, _ = UsfirstEventRankingsParser.parse(f2.read())
 
         self.old_event = Event(
             id = "2011ct",

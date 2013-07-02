@@ -13,7 +13,7 @@ class DatafeedBase(object):
             return parser.parse(result.content)
         else:
             logging.warning('Unable to retreive url: ' + (url))
-            return list()
+            return list(), False
 
     def _shorten(self, string):
         MAX_DB_LENGTH = 500

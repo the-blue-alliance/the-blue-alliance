@@ -49,4 +49,4 @@ class UsfirstEventListParser(ParserBase):
             except Exception, detail:
                 logging.info('Event parsing failed: ' + str(detail))
             
-        return events
+        return events, False

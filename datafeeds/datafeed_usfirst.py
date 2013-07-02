@@ -47,7 +47,7 @@ class DatafeedUsfirst(DatafeedBase):
 
     def getEventDetails(self, first_eid):
         url = self.EVENT_DETAILS_URL_PATTERN % (first_eid)
-        event = self.parse(url, UsfirstEventDetailsParser)
+        event, _ = self.parse(url, UsfirstEventDetailsParser)
 
         return Event(
             id = str(event["year"]) + str.lower(str(event["event_short"])),
@@ -66,7 +66,7 @@ class DatafeedUsfirst(DatafeedBase):
     def getEventList(self, year):
         if type(year) is not int: raise TypeError("year must be an integer")
         url = self.EVENT_LIST_REGIONALS_URL_PATTERN % year
-        events = self.parse(url, UsfirstEventListParser)
+        events, _ = self.parse(url, UsfirstEventListParser)
 
         return [Event(
             event_type = event.get("event_type", None),
@@ -93,7 +93,7 @@ class DatafeedUsfirst(DatafeedBase):
 
         url = self.EVENT_AWARDS_URL_PATTERN % (event.year,
             self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
-        awards = self.parse(url, UsfirstEventAwardsParser)
+        awards, _ = self.parse(url, UsfirstEventAwardsParser)
         
         return [Award(
             id = Award.renderKeyName(event.key_name, award.get('name')),
@@ -134,7 +134,7 @@ class DatafeedUsfirst(DatafeedBase):
     def getMatches(self, event):
         url = self.MATCH_RESULTS_URL_PATTERN % (event.year,
             self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
-        matches = self.parse(url, UsfirstMatchesParser)
+        matches, _ = self.parse(url, UsfirstMatchesParser)
 
         return [Match(
             id = Match.renderKeyName(
@@ -157,7 +157,7 @@ class DatafeedUsfirst(DatafeedBase):
         if hasattr(team, 'first_tpid'):
             if team.first_tpid:
                 url = self.TEAM_DETAILS_URL_PATTERN % (team.first_tpid)
-                team_dict = self.parse(url, UsfirstTeamDetailsParser)
+                team_dict, _ = self.parse(url, UsfirstTeamDetailsParser)
 
                 if "team_number" in team_dict:
                     return Team(
