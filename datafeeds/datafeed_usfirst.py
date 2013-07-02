@@ -114,14 +114,14 @@ class DatafeedUsfirst(DatafeedBase):
         teams = []
         page = 0
         while True:
-          url = self.EVENT_TEAMS_URL_PATTERN % (first_eid)
-          if page != 0:
-            url += '&page=%s' % page
-          partial_teams, more_pages = self.parse(url, UsfirstEventTeamsParser)
-          teams.extend(partial_teams)
-          if not more_pages:
-            break
-          page += 1
+            url = self.EVENT_TEAMS_URL_PATTERN % (first_eid)
+            if page != 0:
+                url += '&page=%s' % page
+            partial_teams, more_pages = self.parse(url, UsfirstEventTeamsParser)
+            teams.extend(partial_teams)
+            if not more_pages:
+                break
+            page += 1
         
         return [Team(
             id = "frc%s" % team.get("team_number", None),
