@@ -112,16 +112,20 @@ class DatafeedUsfirst(DatafeedBase):
         if type(year) is not int: raise TypeError("year must be an integer")
         
         teams = []
-        page = 0
-        while True:
+        seen_teams = set()
+        for page in range(8):  # Ensures this won't loop forever. 8 pages should be plenty.
             url = self.EVENT_TEAMS_URL_PATTERN % (first_eid)
             if page != 0:
                 url += '&page=%s' % page
             partial_teams, more_pages = self.parse(url, UsfirstEventTeamsParser)
             teams.extend(partial_teams)
-            if not more_pages:
+            
+            partial_seen_teams = set([team['team_number'] for team in partial_teams])
+            new_teams = partial_seen_teams.difference(seen_teams)
+            if (not more_pages) or (new_teams == set()):
                 break
-            page += 1
+
+            seen_teams = seen_teams.union(partial_seen_teams)
         
         return [Team(
             id = "frc%s" % team.get("team_number", None),
