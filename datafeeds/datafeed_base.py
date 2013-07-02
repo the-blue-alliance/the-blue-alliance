@@ -8,7 +8,7 @@ class DatafeedBase(object):
     Other Datafeeds inherit from here.
     """
     def parse(self, url, parser):
-        result = urlfetch.fetch(url)
+        result = urlfetch.fetch(url, deadline=10)
         if result.status_code == 200:
             return parser.parse(result.content)
         else:
