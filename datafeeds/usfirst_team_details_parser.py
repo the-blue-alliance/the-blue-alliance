@@ -18,13 +18,18 @@ class UsfirstTeamDetailsParser(ParserBase):
         Parse the information table on USFIRSTs site to extract relevant team
         information. Return a dictionary.
         """
+        # page_titles look like this:
+        # Team Number <NUM> - "<NICK>"
+        team_num_re = r'Team Number ([0-9]+) \-'
+        team_nick_re = r'"(.*)\"'
+        
         team = dict()
         soup = BeautifulSoup(html,
                 convertEntities=BeautifulSoup.HTML_ENTITIES)
         
         page_title = soup.find('h1', {'id': 'thepagetitle'}).text
-        team['team_number'] = int(re.search(r'Team Number ([0-9]+) \-', page_title).group(1).strip())
-        team['nickname'] = unicode(re.search(r'"(.*)\"', page_title).group(1).strip())
+        team['team_number'] = int(re.search(team_num_re, page_title).group(1).strip())
+        team['nickname'] = unicode(re.search(team_nick_re, page_title).group(1).strip())
         
         team['address'] = unicode(soup.find('div', {'class': 'team-address'}).find('div', {'class': 'content'}).text)
         

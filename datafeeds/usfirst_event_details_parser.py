@@ -12,12 +12,16 @@ class UsfirstEventDetailsParser(ParserBase):
         """
         Parse an event's details page from USFIRST.
         """
+        # page_titles look like this:
+        # <YEAR> <EVENT_NAME> (<EVENT_TYPE>)
+        event_type_re = r'\((.+)\)'
+        
         result = dict()
         soup = BeautifulSoup(html, convertEntities=BeautifulSoup.HTML_ENTITIES)
         
         page_title = soup.find('h1', {'id': 'thepagetitle'}).text
         result['name'] = unicode(re.sub(r'\([^)]*\)', '', page_title[4:]).strip())
-        result['event_type'] = unicode(re.search(r'\((.+)\)', page_title).group(1).strip())
+        result['event_type'] = unicode(re.search(event_type_re, page_title).group(1).strip())
         
         try:
             event_dates = soup.find('div', {'class': 'event-dates'}).text
