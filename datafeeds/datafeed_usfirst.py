@@ -117,9 +117,9 @@ class DatafeedUsfirst(DatafeedBase):
           url = self.EVENT_TEAMS_URL_PATTERN % (first_eid)
           if page != 0:
             url += '&page=%s' % page
-          partial_teams, last_page = self.parse(url, UsfirstEventTeamsParser)
+          partial_teams, more_pages = self.parse(url, UsfirstEventTeamsParser)
           teams.extend(partial_teams)
-          if last_page:
+          if not more_pages:
             break
           page += 1
         
