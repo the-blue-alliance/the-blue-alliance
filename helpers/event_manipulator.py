@@ -15,7 +15,7 @@ class EventManipulator(ManipulatorBase):
         attrs = [
             "end_date",
             "event_short",
-            "event_type",
+            "event_type_enum",
             "facebook_eid",
             "first_eid",
             "location",

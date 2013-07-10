@@ -8,6 +8,8 @@ from datetime import datetime
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
+from consts.event_type import EventType
+
 from controllers.api_controller import ApiEventsShow, ApiEventList, ApiMatchDetails
 
 from models.event import Event
@@ -30,7 +32,7 @@ class TestApiEventList(unittest2.TestCase):
         self.event = Event(
                 id = "2010sc",
                 name = "Palmetto Regional",
-                event_type = "Regional",
+                event_type_enum = EventType.REGIONAL,
                 short_name = "Palmetto",
                 event_short = "sc",
                 year = 2010,
@@ -74,7 +76,7 @@ class TestApiMatchDetails(unittest2.TestCase):
         self.event = Event(
                 id = "2010sc",
                 name = "Palmetto Regional",
-                event_type = "Regional",
+                event_type_enum = EventType.REGIONAL,
                 short_name = "Palmetto",
                 event_short = "sc",
                 year = 2010,
