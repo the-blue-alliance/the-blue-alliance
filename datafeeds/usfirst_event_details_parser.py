@@ -5,6 +5,7 @@ import re
 from BeautifulSoup import BeautifulSoup
 
 from datafeeds.parser_base import ParserBase
+from helpers.event_helper import EventHelper
 
 class UsfirstEventDetailsParser(ParserBase):
     @classmethod
@@ -21,7 +22,7 @@ class UsfirstEventDetailsParser(ParserBase):
         
         page_title = soup.find('h1', {'id': 'thepagetitle'}).text
         result['name'] = unicode(re.sub(r'\([^)]*\)', '', page_title[4:]).strip())
-        result['event_type'] = unicode(re.search(event_type_re, page_title).group(1).strip())
+        result['event_type_enum'] = EventHelper.parseEventType(unicode(re.search(event_type_re, page_title).group(1).strip()))
         
         try:
             event_dates = soup.find('div', {'class': 'event-dates'}).text

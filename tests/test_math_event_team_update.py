@@ -5,6 +5,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 from google.appengine.ext.webapp import Response
 
+from consts.event_type import EventType
 from controllers.cron_controller import EventTeamUpdate
 from datafeeds.datafeed_usfirst import DatafeedUsfirst
 from models.event import Event
@@ -22,7 +23,7 @@ class TestDatafeedUsfirstTeams(unittest2.TestCase):
         self.event = Event(
                 id = "2010sc",
                 name = "Palmetto Regional",
-                event_type = "Regional",
+                event_type_enum = EventType.REGIONAL,
                 short_name = "Palmetto",
                 event_short = "sc",
                 year = 2010,

@@ -53,7 +53,7 @@ class DatafeedUsfirst(DatafeedBase):
             id = str(event["year"]) + str.lower(str(event["event_short"])),
             end_date = event.get("end_date", None),
             event_short = event.get("event_short", None),
-            event_type = event.get("event_type", None),
+            event_type_enum = event.get("event_type_enum", None),
             first_eid = first_eid,
             name = event.get("name", None),
             official = True,
@@ -69,7 +69,7 @@ class DatafeedUsfirst(DatafeedBase):
         events, _ = self.parse(url, UsfirstEventListParser)
 
         return [Event(
-            event_type = event.get("event_type", None),
+            event_type_enum = event.get("event_type_enum", None),
             event_short = "???",
             first_eid = event.get("first_eid", None),
             name = event.get("name", None),

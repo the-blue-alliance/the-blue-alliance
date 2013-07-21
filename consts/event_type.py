@@ -5,6 +5,7 @@ class EventType(object):
     CMP_DIVISION = 3
     CMP_FINALS = 4
     OFFSEASON = 99
+    PRESEASON = 100
     UNLABLED = -1
 
     type_names = {    
@@ -14,5 +15,6 @@ class EventType(object):
         CMP_DIVISION: 'Championship Division',
         CMP_FINALS: 'Championship Finals',
         OFFSEASON: 'Offseason',
+        PRESEASON: 'Preseason',
         UNLABLED: '',
     }

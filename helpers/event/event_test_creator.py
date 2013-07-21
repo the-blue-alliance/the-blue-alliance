@@ -1,6 +1,7 @@
 import datetime
 import logging
 
+from consts.event_type import EventType
 from helpers.event_manipulator import EventManipulator
 from helpers.event_team.event_team_test_creator import EventTeamTestCreator
 from helpers.match.match_test_creator import MatchTestCreator
@@ -13,7 +14,7 @@ class EventTestCreator(object):
             id = "{}testfuture".format(datetime.datetime.now().year),
             end_date = datetime.datetime.today() + datetime.timedelta(days=12),
             event_short = "testfuture",
-            event_type = "Regional",
+            event_type_enum = EventType.REGIONAL,
             first_eid = "5561",
             name = "Future Test Event",
             start_date = datetime.datetime.today() + datetime.timedelta(days=8),
@@ -33,7 +34,7 @@ class EventTestCreator(object):
             id = id_string,
             end_date = datetime.datetime.today() + datetime.timedelta(days=1),
             event_short = "testpresent",
-            event_type = "Regional",
+            event_type_enum = EventType.REGIONAL,
             first_eid = "5561",
             name = "Present Test Event",
             start_date = datetime.datetime.today() - datetime.timedelta(days=2),
@@ -56,7 +57,7 @@ class EventTestCreator(object):
             id = "{}testpast".format(datetime.datetime.now().year),
             end_date = datetime.datetime.today() - datetime.timedelta(days=8),
             event_short = "testpast",
-            event_type = "Regional",
+            event_type_enum = EventType.REGIONAL,
             first_eid = "5561",
             name = "Past Test Event",
             start_date = datetime.datetime.today() - datetime.timedelta(days=12),

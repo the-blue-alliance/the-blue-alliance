@@ -3,18 +3,17 @@ import logging
 
 from BeautifulSoup import BeautifulSoup
 
+from consts.event_type import EventType
 from datafeeds.parser_base import ParserBase
+from helpers.event_helper import EventHelper
 
 class UsfirstEventListParser(ParserBase):
 
-    REGIONAL_EVENT_TYPES = [
-        "Regional",
-        "MI FRC State Championship",
-        "MI District",
-        "Qualifying Event",
-        "Qualifying Championship",
-        "District Event",
-        "District Championship"]
+    REGIONAL_EVENT_TYPES = {
+        EventType.REGIONAL,
+        EventType.DISTRICT,
+        EventType.DISTRICT_CMP,
+    }
 
     @classmethod
     def parse(self, html):
@@ -30,7 +29,7 @@ class UsfirstEventListParser(ParserBase):
             event = dict()
             try:
                 tds = tr.findAll('td')
-                event["event_type"] = unicode(tds[0].string)
+                event["event_type_enum"] = EventHelper.parseEventType(unicode(tds[0].string))
                 event["first_eid"] = tds[1].a["href"][24:28]
                 event["name"] = ''.join(tds[1].a.findAll(text=True)).strip() #<em>s in event names fix
                 #event.venue = unicode(tds[2].string)
@@ -43,7 +42,7 @@ class UsfirstEventListParser(ParserBase):
                 #except Exception, detail:
                 #    logging.error('Date Parse Failed: ' + str(detail))
 
-                if event.get("event_type", None) in self.REGIONAL_EVENT_TYPES:
+                if event.get("event_type_enum", None) in self.REGIONAL_EVENT_TYPES:
                     events.append(event)
 
             except Exception, detail:

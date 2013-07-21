@@ -5,6 +5,7 @@ import json
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
+from consts.event_type import EventType
 from datafeeds.usfirst_event_rankings_parser import UsfirstEventRankingsParser
 from helpers.event_manipulator import EventManipulator
 from models.event import Event
@@ -26,7 +27,7 @@ class TestEventManipulator(unittest2.TestCase):
             id = "2011ct",
             end_date = datetime.datetime(2011, 4, 2, 0, 0),
             event_short = "ct",
-            event_type = "Regional",
+            event_type_enum = EventType.REGIONAL,
             first_eid = "5561",
             name = "Northeast Utilities FIRST Connecticut Regional",
             start_date = datetime.datetime(2011, 3, 31, 0, 0),
@@ -40,7 +41,7 @@ class TestEventManipulator(unittest2.TestCase):
             id = "2011ct",
             end_date = datetime.datetime(2011, 4, 2, 0, 0),
             event_short = "ct",
-            event_type = "Regional",
+            event_type_enum = EventType.REGIONAL,
             first_eid = "5561",
             name = "Northeast Utilities FIRST Connecticut Regional",
             start_date = datetime.datetime(2011, 3, 31, 0, 0),
@@ -70,7 +71,7 @@ class TestEventManipulator(unittest2.TestCase):
     def assertOldEvent(self, event):
         self.assertEqual(event.key.id(), "2011ct")
         self.assertEqual(event.name, "Northeast Utilities FIRST Connecticut Regional")
-        self.assertEqual(event.event_type, "Regional")
+        self.assertEqual(event.event_type_enum, EventType.REGIONAL)
         self.assertEqual(event.start_date, datetime.datetime(2011, 3, 31, 0, 0))
         self.assertEqual(event.end_date, datetime.datetime(2011, 4, 2, 0, 0))
         self.assertEqual(event.year, 2011)
