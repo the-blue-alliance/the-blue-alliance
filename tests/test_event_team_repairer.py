@@ -1,6 +1,8 @@
 import datetime
 import unittest2
 
+from consts.event_type import EventType
+
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
@@ -22,7 +24,7 @@ class TestEventTeamRepairer(unittest2.TestCase):
             id = "2011ct",
             end_date = datetime.datetime(2011, 4, 2, 0, 0),
             event_short = "ct",
-            event_type = "Regional",
+            event_type_enum = EventType.REGIONAL,
             first_eid = "5561",
             name = "Northeast Utilities FIRST Connecticut Regional",
             start_date = datetime.datetime(2011, 3, 31, 0, 0),
