@@ -204,12 +204,32 @@ class UsfirstAwardsEnqueue(webapp.RequestHandler):
 class UsfirstAwardsGet(webapp.RequestHandler):
     """
     Handles reading a USFIRST match results page and updating the datastore as needed.
+    Also creates EventTeams.
     """
     def get(self, event_key):   
         datafeed = DatafeedUsfirst()
         
         event = Event.get_by_id(event_key)
         new_awards = AwardManipulator.createOrUpdate(datafeed.getEventAwards(event))
+        
+        # create EventTeams. borrowed from EventTeamUpdate in cron_controller.py
+        team_ids = set()
+        for award in new_awards:
+            if award.team is not None:
+                team_ids.add(award.team.id())
+        
+        teams = TeamManipulator.createOrUpdate([Team(
+            id = team_id,
+            team_number = int(team_id[3:]))
+            for team_id in team_ids])
+        
+        if teams:
+            event_teams = EventTeamManipulator.createOrUpdate([EventTeam(
+                id = event_key + "_" + team.key.id(),
+                event = event.key,
+                team = team.key,
+                year = event.year)
+                for team in teams])
         
         template_values = {
             'awards': new_awards,
