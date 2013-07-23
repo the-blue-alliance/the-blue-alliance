@@ -18,6 +18,7 @@ from helpers.team_manipulator import TeamManipulator
 from helpers.opr_helper import OprHelper
 from helpers.insights_helper import InsightsHelper
 
+from models.award import Award
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
@@ -52,7 +53,7 @@ class EventTeamRepairDo(webapp.RequestHandler):
 
 class EventTeamUpdate(webapp.RequestHandler):
     """
-    Task that adds to the EventTeam index for an Event from Matches.
+    Task that adds to the EventTeam index for an Event from Matches and Awards.
     Can only update or delete EventTeams for unregistered teams. 
     """
     def get(self, event_key):
@@ -65,6 +66,13 @@ class EventTeamUpdate(webapp.RequestHandler):
         for match in matches:
             for team in match.team_key_names:
                 team_ids.add(team)
+        
+        # Add teams from Awards
+        award_keys = Award.query(Award.event == event.key).fetch(1000, keys_only=True)
+        awards = ndb.get_multi(award_keys)
+        for award in awards:
+            if award.team is not None:
+                team_ids.add(award.team.id())
         
         teams = TeamManipulator.createOrUpdate([Team(
             id = team_id,
