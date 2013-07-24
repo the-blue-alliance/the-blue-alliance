@@ -12,7 +12,6 @@ class Event(ndb.Model):
     key_name is like '2010ct'
     """
     name = ndb.StringProperty()
-    event_type = ndb.StringProperty(indexed=False) # From USFIRST, depreciated
     event_type_enum = ndb.IntegerProperty()
     short_name = ndb.StringProperty(indexed=False) # Should not contain "Regional" or "Division", like "Hartford"
     event_short = ndb.StringProperty(required=True, indexed=False) # Smaller abbreviation like "CT"
