@@ -7,7 +7,7 @@ class TestUsfirstTeamDetailsParser(unittest2.TestCase):
         with open('test_data/usfirst_html/usfirst_team_details_frc177_2012-2.html', 'r') as f: 
             team, _ = UsfirstTeamDetailsParser.parse(f.read())
         
-        self.assertEqual(team["address"], u"South Windsor, CT 06074 USA")
+        self.assertEqual(team["address"], u"South Windsor, CT, USA")
         self.assertEqual(team["name"], "UTC Power/Ensign Bickford Aerospace & Defense & South Windsor High School")
         self.assertEqual(team["nickname"], "Bobcat Robotics")
         self.assertEqual(team["team_number"], 177)

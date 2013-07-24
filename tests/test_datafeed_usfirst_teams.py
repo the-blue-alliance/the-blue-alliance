@@ -32,7 +32,7 @@ class TestDatafeedUsfirstTeams(unittest2.TestCase):
         team = self.datafeed.getTeamDetails(self.team177)
         
         self.assertEqual(team.name, "UTC Power/Ensign Bickford Aerospace & Defense & South Windsor High School")
-        self.assertEqual(team.address, u"South Windsor, CT 06074 USA")
+        self.assertEqual(team.address, u"South Windsor, CT, USA")
         self.assertEqual(team.nickname, "Bobcat Robotics")
         self.assertEqual(team.website, "http://www.bobcatrobotics.org")
     
