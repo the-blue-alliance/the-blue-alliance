@@ -35,7 +35,7 @@ class FmsEventListParser(ParserBase):
                         "first_eid": data[0],
                         "name": data[1].strip(),
                         "venue": data[2],
-                        "location": "%s, %s" % (data[3], data[4]),
+                        "location": "%s, %s, %s" % (data[3], data[4], data[5]),
                         "start_date": self.splitDate(data[6]),
                         "end_date": self.splitDate(data[7]),
                         "year": int(data[8]),

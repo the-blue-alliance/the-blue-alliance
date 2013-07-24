@@ -35,7 +35,7 @@ class FmsTeamListParser(ParserBase):
                         "team_number": int(data[1]),
                         "name": data[2],
                         "short_name": data[3],
-                        "address": "{}, {}, {}".format(data[4], data[5], data[6]),
+                        "address": "%s, %s, %s" % (data[4], data[5], data[6]),
                         "nickname": data[7]
                     })
                 except Exception, e:

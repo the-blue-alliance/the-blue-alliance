@@ -59,6 +59,8 @@ class DatafeedUsfirst(DatafeedBase):
             official = True,
             start_date = event.get("start_date", None),
             venue_address = event.get("venue_address", None),
+            venue = event.get("venue", None),
+            location = event.get("location", None),
             website = event.get("website", None),
             year = event.get("year", None)
         )
