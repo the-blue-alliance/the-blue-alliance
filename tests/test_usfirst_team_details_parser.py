@@ -4,7 +4,7 @@ from datafeeds.usfirst_team_details_parser import UsfirstTeamDetailsParser
 
 class TestUsfirstTeamDetailsParser(unittest2.TestCase):
     def test_parse(self):
-        with open('test_data/usfirst_html/usfirst_team_details_frc177_2012-2.html', 'r') as f: 
+        with open('test_data/usfirst_html/usfirst_team_details_frc177_2013.html', 'r') as f: 
             team, _ = UsfirstTeamDetailsParser.parse(f.read())
         
         self.assertEqual(team["address"], u"South Windsor, CT, USA")

@@ -5,13 +5,13 @@ from datafeeds.usfirst_event_teams_parser import UsfirstEventTeamsParser
 class TestUsfirstEventTeamsParser(unittest2.TestCase):
     def test_parse(self):
         teams = []
-        with open('test_data/usfirst_html/usfirst_event_teams_2012ct-2-1.html', 'r') as f:
+        with open('test_data/usfirst_html/usfirst_event_teams_2012ct-1.html', 'r') as f:
             partial_teams, more_pages1 = UsfirstEventTeamsParser.parse(f.read())
             teams.extend(partial_teams)
-        with open('test_data/usfirst_html/usfirst_event_teams_2012ct-2-2.html', 'r') as f:
+        with open('test_data/usfirst_html/usfirst_event_teams_2012ct-2.html', 'r') as f:
             partial_teams, more_pages2 = UsfirstEventTeamsParser.parse(f.read())
             teams.extend(partial_teams)
-        with open('test_data/usfirst_html/usfirst_event_teams_2012ct-2-3.html', 'r') as f:
+        with open('test_data/usfirst_html/usfirst_event_teams_2012ct-3.html', 'r') as f:
             partial_teams, more_pages3 = UsfirstEventTeamsParser.parse(f.read())
             teams.extend(partial_teams)
 
