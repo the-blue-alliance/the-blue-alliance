@@ -45,7 +45,7 @@ class UsfirstEventDetailsParser(ParserBase):
                 match = re.match(event_locality_region_re, address_lines_stripped[-2])
                 locality, region = match.group(1), match.group(2)
                 country = address_lines_stripped[-1]
-                result['location'] = '{}, {}, {}'.format(locality, region, country)
+                result['location'] = '%s, %s, %s' % (locality, region, country)
             if len(address_lines_stripped) >= 3:
                 result['venue'] = address_lines_stripped[0]
         

@@ -38,7 +38,7 @@ class UsfirstTeamDetailsParser(ParserBase):
         full_address = unicode(soup.find('div', {'class': 'team-address'}).find('div', {'class': 'content'}).text)
         match = re.match(team_address_re, full_address)
         locality, region, country = match.group(1), match.group(2), match.group(3)
-        team['address'] = "{}, {}, {}".format(locality, region, country)
+        team['address'] = '%s, %s, %s' % (locality, region, country)
         
         team['name'] = unicode(soup.find('div', {'class': 'team-name'}).text)
         
