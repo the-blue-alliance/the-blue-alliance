@@ -19,7 +19,7 @@ class UsfirstEventDetailsParser(ParserBase):
         
         # locality_regions look like this:
         # <locality>, <region> <random string can have spaces>
-        event_locality_region_re = r'(.*?), (.*?) .*'
+        event_locality_region_re = r'(.*?), ([^ ]*)'
         
         result = dict()
         soup = BeautifulSoup(html, convertEntities=BeautifulSoup.HTML_ENTITIES)
@@ -35,17 +35,19 @@ class UsfirstEventDetailsParser(ParserBase):
         except Exception, detail:
             logging.error('Date Parse Failed: ' + str(detail))
         
-        # TODO: This next line is awful. Make this suck less.
         address = soup.find('div', {'class': 'event-address'})
         if address is not None:
             address_lines_stripped = [line.strip() for line in address.findAll(text=True)]
+            # TODO: This next line is awful. Make this suck less.
             result['venue_address'] = unicode('\r\n'.join(address_lines_stripped)).encode('ascii', 'ignore').strip().replace("\t","").replace("\r\n\r\n", "\r\n")
-            logging.info(address_lines_stripped)
-            result['venue'] = address_lines_stripped[0]
-            match = re.match(event_locality_region_re, address_lines_stripped[2])
-            locality, region = match.group(1), match.group(2)
-            country = address_lines_stripped[3]
-            result['location'] = '{}, {}, {}'.format(locality, region, country)
+            
+            if len(address_lines_stripped) >= 2:
+                match = re.match(event_locality_region_re, address_lines_stripped[-2])
+                locality, region = match.group(1), match.group(2)
+                country = address_lines_stripped[-1]
+                result['location'] = '{}, {}, {}'.format(locality, region, country)
+            if len(address_lines_stripped) >= 3:
+                result['venue'] = address_lines_stripped[0]
         
         website_tag = soup.find('div', {'class': 'event-info-link'})
         if website_tag is not None:
