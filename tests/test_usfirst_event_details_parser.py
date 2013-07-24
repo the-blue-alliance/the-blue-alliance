@@ -15,6 +15,8 @@ class TestUsfirstEventDetailsParser(unittest2.TestCase):
         self.assertEqual(event["end_date"], datetime.datetime(2012, 3, 31, 0, 0))
         self.assertEqual(event["year"], 2012)
         self.assertEqual(event["venue_address"], "Connecticut Convention Center\r\n100 Columbus Blvd\r\nHartford, CT 06103\r\nUSA")
+        self.assertEqual(event["venue"], "Connecticut Convention Center")
+        self.assertEqual(event["location"], "Hartford, CT, USA")
         self.assertEqual(event["website"], "http://www.ctfirst.org/ctr")
         self.assertEqual(event["event_short"], "ct")
 
@@ -28,5 +30,49 @@ class TestUsfirstEventDetailsParser(unittest2.TestCase):
         self.assertEqual(event["end_date"], datetime.datetime(2013, 3, 30, 0, 0))
         self.assertEqual(event["year"], 2013)
         self.assertEqual(event["venue_address"], "Great Fort Lauderdale & Broward County Convention Center\r\n1950 Eisenhower Boulevard\r\nFort Lauderdale, FL 33316\r\nUSA")
+        self.assertEqual(event["venue"], "Great Fort Lauderdale & Broward County Convention Center")
+        self.assertEqual(event["location"], "Fort Lauderdale, FL, USA")
         self.assertEqual(event["website"], "http://firstinflorida.org")
         self.assertEqual(event["event_short"], "flbr")
+
+    def test_parse2013casj(self):
+        with open('test_data/usfirst_html/usfirst_event_details_2013casj.html', 'r') as f:
+            event, _ = UsfirstEventDetailsParser.parse(f.read())
+
+        self.assertEqual(event["name"], "Silicon Valley Regional")
+        self.assertEqual(event["event_type_enum"], EventType.REGIONAL)
+        self.assertEqual(event["start_date"], datetime.datetime(2013, 4, 4, 0, 0))
+        self.assertEqual(event["end_date"], datetime.datetime(2013, 4, 6, 0, 0))
+        self.assertEqual(event["year"], 2013)
+        self.assertEqual(event["venue_address"], "San Jose State University\r\nThe Event Center\r\nSan Jose, CA 95192\r\nUSA")
+        self.assertEqual(event["venue"], "San Jose State University")
+        self.assertEqual(event["location"], "San Jose, CA, USA")
+        self.assertEqual(event["website"], "http://www.firstsv.org")
+        self.assertEqual(event["event_short"], "casj")
+
+    def test_parse2001sj(self):
+        with open('test_data/usfirst_html/usfirst_event_details_2001sj.html', 'r') as f:
+            event, _ = UsfirstEventDetailsParser.parse(f.read())
+
+        self.assertEqual(event["name"], "Silicon Valley Regional")
+        self.assertEqual(event["event_type_enum"], EventType.REGIONAL)
+        self.assertEqual(event["start_date"], datetime.datetime(2001, 3, 22, 0, 0))
+        self.assertEqual(event["end_date"], datetime.datetime(2001, 3, 24, 0, 0))
+        self.assertEqual(event["year"], 2001)
+        self.assertEqual(event["venue_address"], "San Jose, CA\r\nUSA")
+        self.assertEqual(event["location"], "San Jose, CA, USA")
+        self.assertEqual(event["event_short"], "sj")
+        
+    def test_parse2005or(self):
+        with open('test_data/usfirst_html/usfirst_event_details_2005or.html', 'r') as f:
+            event, _ = UsfirstEventDetailsParser.parse(f.read())
+
+        self.assertEqual(event["name"], "Pacific Northwest Regional")
+        self.assertEqual(event["event_type_enum"], EventType.REGIONAL)
+        self.assertEqual(event["start_date"], datetime.datetime(2005, 3, 10, 0, 0))
+        self.assertEqual(event["end_date"], datetime.datetime(2005, 3, 12, 0, 0))
+        self.assertEqual(event["year"], 2005)
+        self.assertEqual(event["venue_address"], "Memorial Coliseum\r\nPortland, OR 97201\r\nUSA")
+        self.assertEqual(event["venue"], "Memorial Coliseum")
+        self.assertEqual(event["location"], "Portland, OR, USA")
+        self.assertEqual(event["event_short"], "or")
