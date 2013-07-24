@@ -24,7 +24,6 @@ class DatafeedFms(DatafeedBase):
     		end_date = event.get("end_date", None),
     		event_short = event.get("event_short", None),
     		first_eid = event.get("first_eid", None),
-    		location = event.get("location", None),
     		name = event.get("name", None),
     		official = True,
     		start_date = event.get("start_date", None),
@@ -38,7 +37,6 @@ class DatafeedFms(DatafeedBase):
 
         return [Team(
             id = "frc%s" % team.get("team_number", None),
-            address = team.get("address", None),
             name = self._shorten(team.get("name", None)),
             nickname = self._shorten(team.get("nickname", None)),
             team_number = team.get("team_number", None)
