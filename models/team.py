@@ -50,17 +50,18 @@ class Team(ndb.Model):
         Start like, 'South Windsor, CT USA'
         """
         try:
-            address_parts = self.address.split(",")
-            if len(address_parts) == 3:
-                self._country_name = address_parts.pop().strip()
-                self._region = address_parts.pop().strip()
-                self._locality = address_parts.pop().strip()
-            if len(address_parts) == 2:
-                region_country = address_parts.pop().strip().split(" ")
-                if len(region_country) == 2:
-                    self._country_name = region_country.pop().strip()
-                self._region = region_country.pop().strip()
-                self._locality = address_parts.pop().strip()
+            if self.address is not None:
+                address_parts = self.address.split(",")
+                if len(address_parts) == 3:
+                    self._country_name = address_parts.pop().strip()
+                    self._region = address_parts.pop().strip()
+                    self._locality = address_parts.pop().strip()
+                if len(address_parts) == 2:
+                    region_country = address_parts.pop().strip().split(" ")
+                    if len(region_country) == 2:
+                        self._country_name = region_country.pop().strip()
+                    self._region = region_country.pop().strip()
+                    self._locality = address_parts.pop().strip()
         except Exception, e:
             logging.warning("Error on team.split_address: %s", e)
 
