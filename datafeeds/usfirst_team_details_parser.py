@@ -36,7 +36,6 @@ class UsfirstTeamDetailsParser(ParserBase):
         team['nickname'] = unicode(re.search(team_nick_re, page_title).group(1).strip())
         
         full_address = unicode(soup.find('div', {'class': 'team-address'}).find('div', {'class': 'content'}).text)
-        logging.info(full_address)
         match = re.match(team_address_re, full_address)
         locality, region, country = match.group(1), match.group(2), match.group(3)
         team['address'] = "{}, {}, {}".format(locality, region, country)
