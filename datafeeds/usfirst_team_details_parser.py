@@ -25,7 +25,7 @@ class UsfirstTeamDetailsParser(ParserBase):
         
         # team addresses look like tihs:
         # <locality>, <region> <random string can have spaces> <country>
-        team_address_re = r'(.*?), (.*?) .* (.*)'
+        team_address_re = r'(.*?), ([^ ]*) *.* (.*)'
         
         team = dict()
         soup = BeautifulSoup(html,
