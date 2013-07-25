@@ -31,3 +31,12 @@ class TestUsfirstTeamDetailsParser(unittest2.TestCase):
         self.assertEqual(team["name"], "Hakfar Hayarok")
         self.assertEqual(team["nickname"], "Greenblitz")
         self.assertEqual(team["team_number"], 4590)
+
+    def test_parse_frc1309_2004(self):
+        with open('test_data/usfirst_html/usfirst_team_details_frc1309_2004.html', 'r') as f: 
+            team, _ = UsfirstTeamDetailsParser.parse(f.read())
+        
+        self.assertEqual(team["address"], u"Toronto, ON, Canada")
+        self.assertEqual(team["name"], "Toronto District School Board & Emery Collegiate Institute")
+        self.assertEqual(team["nickname"], "Diamond Eagles")
+        self.assertEqual(team["team_number"], 1309)
