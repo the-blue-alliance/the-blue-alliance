@@ -64,21 +64,30 @@ class UsfirstEventDetailsParser(ParserBase):
     def _parseEventDates(self, datestring):
         """
         Parses the date string provided by USFirst into actual event start and stop DateTimes.
-        FIRST date strings look like "01-Apr to 03-Apr-2010".
+        FIRST date strings look like "01-Apr to 03-Apr-2010" or "09-Mar-2005".
         """
         month_dict = {"Jan":1,"Feb":2,"Mar":3,"Apr":4, "May":5, "Jun":6,
             "Jul":7,"Aug":8,"Sep":9,"Oct":10,"Nov":11,"Dec":12}
         
         # "01-Apr to 03-Apr-2010"
-        start_day = int(datestring[0:2])
-        start_month = month_dict[datestring[3:6]]
-        start_year = int(datestring[-4:])
-        
-        stop_day = int(datestring[10:12])
-        stop_month = month_dict[datestring[13:16]]
-        stop_year = int(datestring[-4:])
-        
-        start_date = datetime.datetime(start_year, start_month, start_day)
-        stop_date = datetime.datetime(stop_year, stop_month, stop_day)
+        # or "09-Mar-2005"
+        if "to" in datestring:
+            start_day = int(datestring[0:2])
+            start_month = month_dict[datestring[3:6]]
+            start_year = int(datestring[-4:])
+            
+            stop_day = int(datestring[10:12])
+            stop_month = month_dict[datestring[13:16]]
+            stop_year = int(datestring[-4:])
+            
+            start_date = datetime.datetime(start_year, start_month, start_day)
+            stop_date = datetime.datetime(stop_year, stop_month, stop_day)
+        else:
+            day = int(datestring[0:2])
+            month = month_dict[datestring[3:6]]
+            year = int(datestring[-4:])
+            
+            start_date = datetime.datetime(year, month, day)
+            stop_date = datetime.datetime(year, month, day)
         
         return (start_date, stop_date)
