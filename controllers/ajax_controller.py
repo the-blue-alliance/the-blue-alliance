@@ -1,5 +1,6 @@
 import os
 import json
+import urllib2
 
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
@@ -10,6 +11,7 @@ from base_controller import BaseHandlerFB, CacheableHandler
 from models.event import Event
 from models.team import Team
 from models.sitevar import Sitevar
+from models.typeahead_entry import TypeaheadEntry
 import tba_config
 
 
@@ -23,55 +25,27 @@ class TypeaheadHandler(CacheableHandler):
     def __init__(self, *args, **kw):
         super(TypeaheadHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
-        self._cache_key = "typeahead_entries"
+        self._cache_key = "typeahead_entries:{}"
         self._cache_version = 1
 
-    def get(self):
-        self.response.headers['Cache-Control'] = "public, max-age=%d" % (6*60*60)
+    def get(self, search_key):
+        search_key = urllib2.unquote(search_key)
+        self._cache_key = self._cache_key.format(search_key)
+        self.response.headers['Cache-Control'] = "public, max-age=%d" % (24*60*60)
         self.response.headers['Pragma'] = 'Public'
-        self.response.headers.add_header('content-type', 'application/json', charset='utf-8')        
-        super(TypeaheadHandler, self).get()
+        self.response.headers.add_header('content-type', 'application/json', charset='utf-8')
+        super(TypeaheadHandler, self).get(search_key)
 
-    def _render(self):
-        # The typeahead times out a lot and causes instances to go over memory limits
-        # Disabled until we fix it.
-        # todo: make this work again -gregmarra 20130511
-        return "{}"
+    def _render(self, search_key):
+        import logging
+        logging.info(len(search_key))
+        entry = TypeaheadEntry.get_by_id(search_key)
+        if entry is None:
+            return '[]'
+        else:
+            return entry.data_json
 
-        # \/ \/ never runs \/ \/ 
 
-        @ndb.tasklet
-        def get_events_async():
-            event_keys = yield Event.query().order(-Event.year).order(Event.name).fetch_async(keys_only=True)
-            events = yield ndb.get_multi_async(event_keys)
-            raise ndb.Return(events)
-            
-        @ndb.tasklet
-        def get_teams_async():
-            team_keys = yield Team.query().order(Team.team_number).fetch_async(keys_only=True)
-            teams = yield ndb.get_multi_async(team_keys)
-            raise ndb.Return(teams)
-            
-        @ndb.toplevel
-        def get_events_and_teams():
-            events, teams = yield get_events_async(), get_teams_async()
-            raise ndb.Return((events, teams))
-      
-        events, teams = get_events_and_teams()
-        
-        results = []
-        for event in events:
-            results.append({'id': event.key_name, 'name': '%s %s [%s]' % (event.year, event.name, event.event_short.upper())})
-        for team in teams:
-            if not team.nickname:
-                nickname = "Team %s" % team.team_number
-            else:
-                nickname = team.nickname
-            results.append({'id': team.team_number, 'name': '%s | %s' % (team.team_number, nickname)})
-
-        return json.dumps(results)
-
-    
 class WebcastHandler(CacheableHandler):
     """
     Returns the HTML necessary to generate the webcast embed for a given event
