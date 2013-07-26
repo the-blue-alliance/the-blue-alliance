@@ -90,25 +90,7 @@ $(document).ready(function(){
       }
     };
 	})();
-	function fixedHex(number, length){
-    var str = number.toString(16).toUpperCase();
-    while(str.length < length)
-        str = "0" + str;
-    return str;
-}
-	function unicodeLiteral(str){
-    var i;
-    var result = "";
-    for( i = 0; i < str.length; ++i){
-        /* You should probably replace this by an isASCII test */
-        if(str.charCodeAt(i) > 126 || str.charCodeAt(i) < 32)
-            result += "\\u" + fixedHex(str.charCodeAt(i),4);
-        else
-            result += str[i];
-    }
-
-    return result;
-	}
+	
 	$('.search-query').typeahead({
     source: cachedsource,
     updater: function(label) {
