@@ -37,8 +37,6 @@ class TypeaheadHandler(CacheableHandler):
         super(TypeaheadHandler, self).get(search_key)
 
     def _render(self, search_key):
-        import logging
-        logging.info(len(search_key))
         entry = TypeaheadEntry.get_by_id(search_key)
         if entry is None:
             return '[]'
