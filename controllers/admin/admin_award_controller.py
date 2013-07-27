@@ -73,7 +73,7 @@ class AdminAwardEdit(LoggedInHandler):
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/award_edit.html')
-        self.response.out.write(template.render(path, template_values))
+        self.response.out.write(template.render(path, self.template_values))
     
     def post(self, award_key):
         self._require_admin()
