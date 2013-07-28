@@ -48,12 +48,7 @@ class AdminMatchDashboard(LoggedInHandler):
     """
     def get(self):
         self._require_admin()
-        match_count = Match.query().count()
-        
-        self.template_values.update({
-            "match_count": match_count
-        })
-        
+
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_dashboard.html')
         self.response.out.write(template.render(path, self.template_values))
         
