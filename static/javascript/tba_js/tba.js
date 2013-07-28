@@ -91,6 +91,22 @@ $(document).ready(function(){
     };
 	})();
 	
+	// helper function to match standard characters
+  function cleanUnicode(s){
+    var a = s.toLowerCase();
+    a = a.replace(/[àáâãäå]/g, "a");
+    a = a.replace(/æ/g, "ae");
+    a = a.replace(/ç/g, "c");
+    a = a.replace(/[èéêë]/g, "e");
+    a = a.replace(/[ìíîï]/g, "i");
+    a = a.replace(/ñ/g, "n");
+    a = a.replace(/[òóôõö]/g, "o");
+    a = a.replace(/œ/g, "oe");
+    a = a.replace(/[ùúûü]/g, "u");
+    a = a.replace(/[ýÿ]/g, "y");
+    return a;
+  };
+	
 	$('.search-query').typeahead({
     source: cachedsource,
     updater: function(label) {
@@ -111,21 +127,16 @@ $(document).ready(function(){
       return label;
     },
     matcher: function (item) {
-      function cleanUnicode(s){;
-        var a = s.toLowerCase();
-        a = a.replace(/[àáâãäå]/g, "a");
-        a = a.replace(/æ/g, "ae");
-        a = a.replace(/ç/g, "c");
-        a = a.replace(/[èéêë]/g, "e");
-        a = a.replace(/[ìíîï]/g, "i");
-        a = a.replace(/ñ/g, "n");                
-        a = a.replace(/[òóôõö]/g, "o");
-        a = a.replace(/œ/g, "oe");
-        a = a.replace(/[ùúûü]/g, "u");
-        a = a.replace(/[ýÿ]/g, "y");
-        return a;
-      };            
       return ~cleanUnicode(item).indexOf(cleanUnicode(this.query));
+    },
+    highlighter: function (item) {
+      var cleaned_item = cleanUnicode(item);
+      var query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&');
+      var match_index = cleaned_item.search(new RegExp('(' + query + ')', 'ig'));
+      var match_len = query.length;
+      return item.substring(0, match_index) + '<strong>' +
+        item.substring(match_index, match_index + match_len) + '</strong>' +
+        item.substring(match_index + match_len);
     }
   });
 	
