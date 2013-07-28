@@ -15,7 +15,7 @@ from controllers.datafeed_controller import UsfirstTeamDetailsEnqueue, UsfirstTe
 
 from controllers.cron_controller import EventTeamRepairDo, EventTeamUpdate, EventTeamUpdateEnqueue
 from controllers.cron_controller import EventOprDo, EventOprEnqueue
-from controllers.cron_controller import YearInsightsEnqueue, YearInsightsDo, OverallInsightsEnqueue, OverallInsightsDo
+from controllers.cron_controller import YearInsightsEnqueue, YearInsightsDo, OverallInsightsEnqueue, OverallInsightsDo, TypeaheadCalcEnqueue, TypeaheadCalcDo
 from controllers.firebase_controller import FirebasePushDo
 
 
@@ -46,6 +46,8 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
                                ('/tasks/math/do/overallinsights/(.*)', OverallInsightsDo),
                                ('/tasks/math/enqueue/insights/(.*)/([0-9]*)', YearInsightsEnqueue),
                                ('/tasks/math/do/insights/(.*)/([0-9]*)', YearInsightsDo),
+                               ('/tasks/math/enqueue/typeaheadcalc', TypeaheadCalcEnqueue),
+                               ('/tasks/math/do/typeaheadcalc', TypeaheadCalcDo),
                                ('/tasks/posts/firebase_push', FirebasePushDo),
                                ],
                               debug=tba_config.DEBUG)
