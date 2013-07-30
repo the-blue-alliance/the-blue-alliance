@@ -53,11 +53,21 @@ class EventTeamRepairDo(webapp.RequestHandler):
 class EventTeamUpdate(webapp.RequestHandler):
     """
     Task that adds to the EventTeam index for an Event from Matches.
-    Can only update or delete EventTeams for unregistered teams. 
+    Can only update or delete EventTeams for unregistered teams. <-- Does it actually do this? Eugene -- 2013/07/30
+    Removes EventTeams for teams that haven't played any matches.
     """
     def get(self, event_key):
         event = Event.get_by_id(event_key)
         team_ids = set()
+        
+        # Existing EventTeams
+        existing_event_teams_keys = EventTeam.query(EventTeam.event == event.key).fetch(1000, keys_only=True)
+        existing_event_teams = ndb.get_multi(existing_event_teams_keys)
+        existing_team_ids = set()
+        for et in existing_event_teams:
+            existing_team_ids.add(et.team.id())
+        
+        participating_team_ids = set()
         
         # Add teams from Matches
         match_keys = Match.query(Match.event == event.key).fetch(1000, keys_only=True)
@@ -65,7 +75,16 @@ class EventTeamUpdate(webapp.RequestHandler):
         for match in matches:
             for team in match.team_key_names:
                 team_ids.add(team)
+                participating_team_ids.add(str(team))
         
+        # Delete EventTeams for teams who did not participate in the event
+        et_keys_to_delete = set()
+        for team_id in existing_team_ids.difference(participating_team_ids):
+            et_key_name = "{}_{}".format(event.key_name, team_id)
+            et_keys_to_delete.add(ndb.Key(EventTeam, et_key_name))
+        ndb.delete_multi(et_keys_to_delete)
+        
+        # Create or update EventTeams
         teams = TeamManipulator.createOrUpdate([Team(
             id = team_id,
             team_number = int(team_id[3:]))
@@ -83,6 +102,7 @@ class EventTeamUpdate(webapp.RequestHandler):
         
         template_values = {
             'event_teams': event_teams,
+            'deleted_event_teams_keys': et_keys_to_delete
         }
         
         path = os.path.join(os.path.dirname(__file__), '../templates/math/eventteam_update_do.html')
