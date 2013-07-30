@@ -14,9 +14,9 @@ class AdminMain(LoggedInHandler):
         try:
             fname = os.path.join(os.path.dirname(__file__), '../../version_info.json')
             with open(fname, 'r') as f:
-                data = json.loads(f.read())
+                data = json.loads(f.read().replace('\r\n', '\n'))
             self.template_values['git_branch_name'] = data['git_branch_name']
-            commit_hash, commit_author, commit_date, commit_msg, _ = re.split("[\r\n]+", data['git_last_commit'])
+            commit_hash, commit_author, commit_date, commit_msg, _ = re.split("[\n]+", data['git_last_commit'])
             self.template_values['commit_hash'] = commit_hash
             self.template_values['commit_author'] = commit_author
             self.template_values['commit_date'] = commit_date
