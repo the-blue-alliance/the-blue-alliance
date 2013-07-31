@@ -36,9 +36,9 @@ class ApiTeamsShow(MainApiHandler):
 
         try:
             teams = [ApiHelper.getTeamInfo(team_key) for team_key in team_keys]
-        except IndexError as e:
+        except IndexError:
             self.response.set_status(404)
-            response_json = { "Property Error": "No team found for key %s" % e.args[0] }
+            response_json = { "Property Error": "No team found for key in %s" % str(teams) }
 
         self.response.out.write(json.dumps(teams))
 
