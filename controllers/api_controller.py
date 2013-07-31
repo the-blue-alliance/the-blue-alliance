@@ -60,6 +60,7 @@ class ApiTeamDetails(MainApiHandler):
 
         except IndexError:
             response_json = { "Property Error": "No team found for the key given" }
+            self.response.set_status(404)
             self.response.out.write(json.dumps(response_json))
 
 class ApiEventsShow(MainApiHandler):
