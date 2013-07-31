@@ -87,6 +87,6 @@ class TestApiTeamShow(unittest2.TestCase):
         self.assertTeamJson(team_dict[0])
 
     def testNonexistentTeam(self):
-        response = self.testapp.get('/?teams=frc3141579265')
+	response = self.testapp.get('/?teams=frc3141579265', status=404)
 
         self.assertEqual(response.status_int, 404)
