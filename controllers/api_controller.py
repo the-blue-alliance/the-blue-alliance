@@ -1,3 +1,4 @@
+
 import json
 import logging
 import os
@@ -31,7 +32,7 @@ class ApiTeamsShow(MainApiHandler):
     Information about teams.
     """
     def get(self):
-        teams = list()
+        teams = []
         team_keys = self.request.get('teams').split(',')
 
         try:
@@ -51,7 +52,7 @@ class ApiTeamDetails(MainApiHandler):
         team_key = self.request.get('team')
         year = self.request.get('year')
 
-        response_json = dict()
+        response_json = {}
         try:
             response_json = ApiHelper.getTeamInfo(team_key)
             if self.request.get('events'):
@@ -95,7 +96,7 @@ class ApiEventList(MainApiHandler):
             event_keys = Event.query(Event.year == year).fetch(500, keys_only=True)
             events = ndb.get_multi(event_keys)
             for event in events:
-                event_dict = dict()
+                event_dict = {}
                 event_dict["key"] = event.key_name
                 event_dict["name"] = event.name
                 event_dict["short_name"] = event.short_name
@@ -147,7 +148,7 @@ class ApiMatchDetails(MainApiHandler):
             match_keys = self.request.get('matches').split(',')
 
         if 'match_keys' in locals():
-            match_json = list()
+            match_json = []
             for match in match_keys:
                 match_json.append(ApiHelper.getMatchDetails(match))
         else:
