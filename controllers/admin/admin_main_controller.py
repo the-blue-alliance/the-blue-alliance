@@ -1,6 +1,7 @@
 import os
 import json
 import re
+import logging
 
 from google.appengine.ext.webapp import template
 
@@ -13,16 +14,21 @@ class AdminMain(LoggedInHandler):
         # version info
         try:
             fname = os.path.join(os.path.dirname(__file__), '../../version_info.json')
+
             with open(fname, 'r') as f:
                 data = json.loads(f.read().replace('\r\n', '\n'))
+
             self.template_values['git_branch_name'] = data['git_branch_name']
-            commit_hash, commit_author, commit_date, commit_msg, _ = re.split("[\n]+", data['git_last_commit'])
-            self.template_values['commit_hash'] = commit_hash
-            self.template_values['commit_author'] = commit_author
-            self.template_values['commit_date'] = commit_date
-            self.template_values['commit_msg'] = commit_msg
             self.template_values['build_time'] = data['build_time']
-        except:
+
+            commit_parts = re.split("[\n]+", data['git_last_commit'])
+            self.template_values['commit_hash'] = commit_parts[0]
+            self.template_values['commit_author'] = commit_parts[1]
+            self.template_values['commit_date'] = commit_parts[2]
+            self.template_values['commit_msg'] = commit_parts[3]
+            
+        except Exception, e:
+            logging.warning("version_info.json parsing failed: %s" % e)
             pass
         
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/index.html')
