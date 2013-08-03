@@ -4,6 +4,8 @@
 
 {% block content %}
 
+<p class="pull-right"><a class="btn btn-danger btn-mini" href="/admin/match/delete/{{match.key_name}}"><i class="icon-trash icon-white"></i> Delete</a></p>
+
 <h1>Edit {{ match.key_name }}</h1>
 
 <form action="/admin/match/edit/{{match.key_name}}" method="post">
