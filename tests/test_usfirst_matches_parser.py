@@ -5,7 +5,7 @@ from datafeeds.usfirst_matches_parser import UsfirstMatchesParser
 class TestUsfirstMatchesParser(unittest2.TestCase):
     def test_parse_2012ct(self):
         with open('test_data/usfirst_html/usfirst_event_matches_2012ct.html', 'r') as f:
-            matches = UsfirstMatchesParser.parse(f.read())
+            matches, _ = UsfirstMatchesParser.parse(f.read())
 
         # Test 2012ct_qm1
         match = matches[0]
@@ -36,7 +36,7 @@ class TestUsfirstMatchesParser(unittest2.TestCase):
         
     def test_parse_2013cama(self):
         with open('test_data/usfirst_html/usfirst_event_matches_2013cama.html', 'r') as f:
-            matches = UsfirstMatchesParser.parse(f.read())
+            matches, _ = UsfirstMatchesParser.parse(f.read())
 
         # Test 2013cama_qm1
         match = matches[0]
@@ -58,7 +58,7 @@ class TestUsfirstMatchesParser(unittest2.TestCase):
                 
     def test_parse_2013casd(self):
         with open('test_data/usfirst_html/usfirst_event_matches_2013casd.html', 'r') as f:
-            matches = UsfirstMatchesParser.parse(f.read())
+            matches, _ = UsfirstMatchesParser.parse(f.read())
 
         # Test 2013casd_qm1
         match = matches[0]
@@ -71,7 +71,7 @@ class TestUsfirstMatchesParser(unittest2.TestCase):
 
     def test_parse_2013pahat_incomplete(self):
         with open('test_data/usfirst_html/usfirst_event_matches_2013pahat_incomplete.html', 'r') as f:
-            matches = UsfirstMatchesParser.parse(f.read())
+            matches, _ = UsfirstMatchesParser.parse(f.read())
 
         # Test 2013pahat_qm1, played match
         match = matches[0]

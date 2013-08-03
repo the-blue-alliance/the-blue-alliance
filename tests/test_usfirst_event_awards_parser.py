@@ -5,7 +5,7 @@ from datafeeds.usfirst_event_awards_parser import UsfirstEventAwardsParser
 class TestUsfirstEventAwardsParser(unittest2.TestCase):
     def test_parse_regional_2007(self):
         with open('test_data/usfirst_html/usfirst_event_awards_2007sj.html', 'r') as f:
-            awards = UsfirstEventAwardsParser.parse(f.read())
+            awards, _ = UsfirstEventAwardsParser.parse(f.read())
 
         # Check number of parsed awards
         self.assertEqual(len(awards), 26)
@@ -24,7 +24,7 @@ class TestUsfirstEventAwardsParser(unittest2.TestCase):
         
     def test_parse_regional_2010(self):
         with open('test_data/usfirst_html/usfirst_event_awards_2010sac.html', 'r') as f:
-            awards = UsfirstEventAwardsParser.parse(f.read())
+            awards, _ = UsfirstEventAwardsParser.parse(f.read())
 
         # Check number of parsed awards
         self.assertEqual(len(awards), 29)
@@ -49,7 +49,7 @@ class TestUsfirstEventAwardsParser(unittest2.TestCase):
 
     def test_parse_regional_2012(self):
         with open('test_data/usfirst_html/usfirst_event_awards_2012sj.html', 'r') as f:
-            awards = UsfirstEventAwardsParser.parse(f.read())
+            awards, _ = UsfirstEventAwardsParser.parse(f.read())
             
         # Check number of parsed awards
         self.assertEqual(len(awards), 28)
@@ -73,7 +73,7 @@ class TestUsfirstEventAwardsParser(unittest2.TestCase):
 
     def test_parse_district_championship_2009(self):
         with open('test_data/usfirst_html/usfirst_event_awards_2009gl.html', 'r') as f:
-            awards = UsfirstEventAwardsParser.parse(f.read())
+            awards, _ = UsfirstEventAwardsParser.parse(f.read())
             
         # Check number of parsed awards
         self.assertEqual(len(awards), 30)
@@ -103,7 +103,7 @@ class TestUsfirstEventAwardsParser(unittest2.TestCase):
 
     def test_parse_district_championship_2012(self):
         with open('test_data/usfirst_html/usfirst_event_awards_2012gl.html', 'r') as f:
-            awards = UsfirstEventAwardsParser.parse(f.read())
+            awards, _ = UsfirstEventAwardsParser.parse(f.read())
             
         # Check number of parsed awards
         self.assertEqual(len(awards), 34)
@@ -138,7 +138,7 @@ class TestUsfirstEventAwardsParser(unittest2.TestCase):
         
     def test_parse_championship_divison_2007(self):
         with open('test_data/usfirst_html/usfirst_event_awards_2007galileo.html', 'r') as f:
-            awards = UsfirstEventAwardsParser.parse(f.read())
+            awards, _ = UsfirstEventAwardsParser.parse(f.read())
             
         # Check number of parsed awards
         self.assertEqual(len(awards), 7)
@@ -156,7 +156,7 @@ class TestUsfirstEventAwardsParser(unittest2.TestCase):
         
     def test_parse_championship_2007(self):
         with open('test_data/usfirst_html/usfirst_event_awards_2007cmp.html', 'r') as f:
-            awards = UsfirstEventAwardsParser.parse(f.read())
+            awards, _ = UsfirstEventAwardsParser.parse(f.read())
             
         # Check number of parsed awards
         self.assertEqual(len(awards), 29)
@@ -175,7 +175,7 @@ class TestUsfirstEventAwardsParser(unittest2.TestCase):
 
     def test_parse_championship_divison_2012(self):
         with open('test_data/usfirst_html/usfirst_event_awards_2012galileo.html', 'r') as f:
-            awards = UsfirstEventAwardsParser.parse(f.read())
+            awards, _ = UsfirstEventAwardsParser.parse(f.read())
             
         # Check number of parsed awards
         self.assertEqual(len(awards), 7)
@@ -193,7 +193,7 @@ class TestUsfirstEventAwardsParser(unittest2.TestCase):
         
     def test_parse_championship_2012(self):
         with open('test_data/usfirst_html/usfirst_event_awards_2012cmp.html', 'r') as f:
-            awards = UsfirstEventAwardsParser.parse(f.read())
+            awards, _ = UsfirstEventAwardsParser.parse(f.read())
 
         # Check number of parsed awards
         self.assertEqual(len(awards), 39)
@@ -223,7 +223,7 @@ class TestUsfirstEventAwardsParser(unittest2.TestCase):
         
     def test_parse_championship_2013(self):
         with open('test_data/usfirst_html/usfirst_event_awards_2013cmp.html', 'r') as f:
-            awards = UsfirstEventAwardsParser.parse(f.read())
+            awards, _ = UsfirstEventAwardsParser.parse(f.read())
 
         # Check number of parsed awards
         self.assertEqual(len(awards), 37)

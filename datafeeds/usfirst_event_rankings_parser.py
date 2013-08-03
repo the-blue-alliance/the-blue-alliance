@@ -25,4 +25,4 @@ class UsfirstEventRankingsParser(ParserBase):
                 for td in tds:
                     row.append(str(self._recurseUntilString(td)))
                 rankings.append(row)
-        return rankings
+        return rankings, False

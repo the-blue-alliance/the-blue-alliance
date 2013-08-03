@@ -157,7 +157,7 @@ class UsfirstEventAwardsParser(ParserBase):
                      'awardee': awardee,
                      'official_name': official_name}
             awards.append(award)
-        return awards
+        return awards, False
 
 def fixAwardee(text):
     # Example: http://www2.usfirst.org/2012comp/Events/gl/awards.html
