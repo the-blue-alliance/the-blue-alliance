@@ -10,7 +10,7 @@ from google.appengine.ext import testbed
 
 from consts.event_type import EventType
 
-from controllers.api_controller import ApiTeamsShow
+from controllers.api_controller import ApiTeamDetails, ApiTeamsShow
 
 from models.team import Team
 from models.event import Event
@@ -85,3 +85,29 @@ class TestApiTeamShow(unittest2.TestCase):
 
         team_dict = json.loads(response.body)
         self.assertTeamJson(team_dict[0])
+
+    def testNonexistentTeam(self):
+        response = self.testapp.get('/?teams=frc3141579265', status=404)
+
+        self.assertEqual(response.status_int, 404)
+
+
+class TestApiTeamDetails(unittest2.TestCase):
+
+    def setUp(self):
+        app = webapp2.WSGIApplication([(r'/', ApiTeamDetails)], debug=True)
+        self.testapp = webtest.TestApp(app)
+
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_urlfetch_stub()
+        self.testbed.init_memcache_stub()
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def testNonexistentTeam(self):
+        response = self.testapp.get('/?team=frc3141579265', status=404)
+
+        self.assertEqual(response.status_int, 404)
