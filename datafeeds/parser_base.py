@@ -9,7 +9,7 @@ class ParserBase(object):
 	@classmethod
 	def parse(self, html):
 		"""
-		Given a chunk of HTML, return a result dictionary.
+		Given a chunk of HTML, return a (result dictionary, more_pages) tuple
 		"""
 		raise NotImplementedError("No parse method!")
 

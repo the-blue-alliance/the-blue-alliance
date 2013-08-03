@@ -11,7 +11,7 @@ class Team(ndb.Model):
     team_number = ndb.IntegerProperty(required=True)
     name = ndb.StringProperty(indexed=False)
     nickname = ndb.StringProperty(indexed=False)
-    address = ndb.StringProperty(indexed=False)
+    address = ndb.StringProperty(indexed=False)  # in the format "locality, region, country". similar to Event.location
     website = ndb.StringProperty(indexed=False)
     first_tpid = ndb.IntegerProperty() #from USFIRST. FIRST team ID number. -greg 5/20/2010
     first_tpid_year = ndb.IntegerProperty() # from USFIRST. Year tpid is applicable for. -greg 9 Jan 2011
@@ -50,17 +50,18 @@ class Team(ndb.Model):
         Start like, 'South Windsor, CT USA'
         """
         try:
-            address_parts = self.address.split(",")
-            if len(address_parts) == 3:
-                self._country_name = address_parts.pop().strip()
-                self._region = address_parts.pop().strip()
-                self._locality = address_parts.pop().strip()
-            if len(address_parts) == 2:
-                region_country = address_parts.pop().strip().split(" ")
-                if len(region_country) == 2:
-                    self._country_name = region_country.pop().strip()
-                self._region = region_country.pop().strip()
-                self._locality = address_parts.pop().strip()
+            if self.address is not None:
+                address_parts = self.address.split(",")
+                if len(address_parts) == 3:
+                    self._country_name = address_parts.pop().strip()
+                    self._region = address_parts.pop().strip()
+                    self._locality = address_parts.pop().strip()
+                if len(address_parts) == 2:
+                    region_country = address_parts.pop().strip().split(" ")
+                    if len(region_country) == 2:
+                        self._country_name = region_country.pop().strip()
+                    self._region = region_country.pop().strip()
+                    self._locality = address_parts.pop().strip()
         except Exception, e:
             logging.warning("Error on team.split_address: %s", e)
 

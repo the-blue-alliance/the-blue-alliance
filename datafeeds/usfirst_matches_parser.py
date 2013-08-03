@@ -21,7 +21,7 @@ class UsfirstMatchesParser(ParserBase):
         matches.extend(self.parseElimMatchResultList(tables[2]))
         matches.extend(self.parseElimMatchResultList(tables[3]))
 
-        return matches
+        return matches, False
 
     @classmethod
     def parseQualMatchResultList(self, table):
