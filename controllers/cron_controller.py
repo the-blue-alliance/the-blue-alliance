@@ -1,6 +1,7 @@
 import datetime
 import logging
 import os
+import json
 
 from google.appengine.api import taskqueue
 
@@ -17,12 +18,14 @@ from helpers.insight_manipulator import InsightManipulator
 from helpers.team_manipulator import TeamManipulator
 from helpers.opr_helper import OprHelper
 from helpers.insights_helper import InsightsHelper
+from helpers.typeahead_helper import TypeaheadHelper
 
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
 from models.sitevar import Sitevar
+from models.typeahead_entry import TypeaheadEntry
 
 import tba_config
 
@@ -256,3 +259,77 @@ class OverallInsightsDo(webapp.RequestHandler):
 
     def post(self):
         self.get()
+
+
+class TypeaheadCalcEnqueue(webapp.RequestHandler):
+    """
+    Enqueues typeahead calculations
+    """
+    def get(self):
+        taskqueue.add(url='/tasks/math/do/typeaheadcalc', method='GET')
+        template_values = {}
+        path = os.path.join(os.path.dirname(__file__), '../templates/math/typeaheadcalc_enqueue.html')
+        self.response.out.write(template.render(path, template_values))
+
+
+class TypeaheadCalcDo(webapp.RequestHandler):
+    """
+    Calculates typeahead entries
+    """
+    def get(self):
+        @ndb.tasklet
+        def get_events_async():
+            event_keys = yield Event.query().order(-Event.year).order(Event.name).fetch_async(keys_only=True)
+            events = yield ndb.get_multi_async(event_keys)
+            raise ndb.Return(events)
+
+        @ndb.tasklet
+        def get_teams_async():
+            team_keys = yield Team.query().order(Team.team_number).fetch_async(keys_only=True)
+            teams = yield ndb.get_multi_async(team_keys)
+            raise ndb.Return(teams)
+
+        @ndb.toplevel
+        def get_events_and_teams():
+            events, teams = yield get_events_async(), get_teams_async()
+            raise ndb.Return((events, teams))
+
+        events, teams = get_events_and_teams()
+
+        results = {}
+        for team in teams:
+            keys = set()
+            keys.add(str(team.team_number)[0])
+            if not team.nickname:
+                nickname = "Team %s" % team.team_number
+            else:
+                nickname = team.nickname
+                keys = keys.union(TypeaheadHelper.get_search_keys(nickname))
+            entry = '%s | %s' % (team.team_number, nickname)
+            for key in keys:
+                if key in results:
+                    results[key].append(entry)
+                else:
+                    results[key] = [entry]
+
+        for event in events:
+            keys = set()
+            keys.add(str(event.year)[0])
+            keys.add(event.event_short[0])
+            keys = keys.union(TypeaheadHelper.get_search_keys(event.name))
+            entry = '%s %s [%s]' % (event.year, event.name, event.event_short.upper())
+            for key in keys:
+                if key in results:
+                    results[key].append(entry)
+                else:
+                    results[key] = [entry]
+
+        entries = []
+        for key, data in results.items():
+            entries.append(TypeaheadEntry(id = key,
+                                          data_json = json.dumps(data)))
+        ndb.put_multi(entries)
+
+        template_values = {'results': results}
+        path = os.path.join(os.path.dirname(__file__), '../templates/math/typeaheadcalc_do.html')
+        self.response.out.write(template.render(path, template_values))
