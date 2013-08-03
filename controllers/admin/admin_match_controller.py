@@ -51,7 +51,39 @@ class AdminMatchDashboard(LoggedInHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_dashboard.html')
         self.response.out.write(template.render(path, self.template_values))
+
+
+class AdminMatchDelete(LoggedInHandler):
+    """
+    Delete a Match.
+    """
+    def get(self, event_key_id):
+        self._require_admin()
         
+        match = Match.get_by_id(event_key_id)
+
+        self.template_values.update({
+            "match": match
+        })
+
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_delete.html')
+        self.response.out.write(template.render(path, self.template_values))
+
+    def post(self, match_key_id):
+        self._require_admin()
+        
+        logging.warning("Deleting %s at the request of %s / %s" % (
+            match_key_id,
+            self.user_bundle.user.user_id(),
+            self.user_bundle.user.email()))
+
+        match = Match.get_by_id(match_key_id)
+        event_key_id = match.event.id()
+        
+        MatchManipulator.delete(match)
+
+        self.redirect("/admin/event/%s?deleted=%s" % (event_key_id, match_key_id))
+
 
 class AdminMatchDetail(LoggedInHandler):
     """
