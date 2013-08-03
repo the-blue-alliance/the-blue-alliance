@@ -1,3 +1,4 @@
+
 import json
 import logging
 import os
@@ -31,12 +32,15 @@ class ApiTeamsShow(MainApiHandler):
     Information about teams.
     """
     def get(self):
-        teams = list()
+        teams = []
         team_keys = self.request.get('teams').split(',')
-        
-        for team_key in team_keys:
-            teams.append(ApiHelper.getTeamInfo(team_key))
-        
+
+        try:
+            teams = [ApiHelper.getTeamInfo(team_key) for team_key in team_keys]
+        except IndexError:
+            self.response.set_status(404)
+            response_json = { "Property Error": "No team found for key in %s" % str(teams) }
+
         self.response.out.write(json.dumps(teams))
 
 class ApiTeamDetails(MainApiHandler):
@@ -48,18 +52,19 @@ class ApiTeamDetails(MainApiHandler):
         team_key = self.request.get('team')
         year = self.request.get('year')
 
-        response_json = dict()
+        response_json = {}
         try:
             response_json = ApiHelper.getTeamInfo(team_key)
             if self.request.get('events'):
                 reponse_json = ApiHelper.addTeamEvents(response_json, year)
-            
+
             #TODO: matches
-            
+
             self.response.out.write(json.dumps(response_json))
 
         except IndexError:
             response_json = { "Property Error": "No team found for the key given" }
+            self.response.set_status(404)
             self.response.out.write(json.dumps(response_json))
 
 class ApiEventsShow(MainApiHandler):
@@ -91,12 +96,12 @@ class ApiEventList(MainApiHandler):
             event_keys = Event.query(Event.year == year).fetch(500, keys_only=True)
             events = ndb.get_multi(event_keys)
             for event in events:
-                event_dict = dict()
+                event_dict = {}
                 event_dict["key"] = event.key_name
                 event_dict["name"] = event.name
                 event_dict["short_name"] = event.short_name
                 event_dict["official"] = event.official
-                
+
                 if event.start_date:
                     event_dict["start_date"] = event.start_date.isoformat()
                 else:
@@ -125,7 +130,7 @@ class ApiEventDetails(MainApiHandler):
             self.response.out.write(json.dumps(error_message))
             return False
 
-        
+
 
         event_dict = ApiHelper.getEventInfo(event_key)
 
@@ -143,7 +148,7 @@ class ApiMatchDetails(MainApiHandler):
             match_keys = self.request.get('matches').split(',')
 
         if 'match_keys' in locals():
-            match_json = list()
+            match_json = []
             for match in match_keys:
                 match_json.append(ApiHelper.getMatchDetails(match))
         else:
@@ -159,7 +164,7 @@ class CsvTeamsAll(MainApiHandler):
     def get(self):
         memcache_key = "csv_teams_all"
         output = memcache.get(memcache_key)
-    
+
         if output is None:
             team_keys = Team.query().order(Team.team_number).fetch(10000, keys_only=True)
             teams = ndb.get_multi(team_keys)
@@ -167,9 +172,9 @@ class CsvTeamsAll(MainApiHandler):
             template_values = {
                 "teams": teams
             }
-        
+
             path = os.path.join(os.path.dirname(__file__), '../templates/api/csv_teams_all.csv')
             output = template.render(path, template_values)
             if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, output, 86400)
-        
+
         self.response.out.write(output)
