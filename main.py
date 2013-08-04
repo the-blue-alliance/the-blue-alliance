@@ -49,7 +49,7 @@ app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['landing_
                                ('/thanks', ThanksHandler),
                                ('/webcasts', WebcastsHandler),
                                ('/record', RecordHandler),
-                               ('/_/typeahead', TypeaheadHandler),
+                               ('/_/typeahead/(.+)', TypeaheadHandler),
                                ('/_/webcast/(.*)/(.*)', WebcastHandler),
                                ('/.*', PageNotFoundHandler),
                                ],

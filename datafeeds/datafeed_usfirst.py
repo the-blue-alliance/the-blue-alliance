@@ -23,67 +23,31 @@ from models.match import Match
 from models.team import Team
 
 class DatafeedUsfirst(DatafeedBase):
-
+    EVENT_LIST_REGIONALS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?event_type=FRC&season_FRC=%s" # % (year)
+    
+    EVENT_DETAILS_URL_PATTERN = "http://www.usfirst.org/whats-going-on/event/%s" # % (eid)
+    EVENT_TEAMS_URL_PATTERN = "http://www.usfirst.org/whats-going-on/event/%s/teams?sort=asc&order=Team%%20Number" # % (eid)
+    TEAM_DETAILS_URL_PATTERN = "http://www.usfirst.org/whats-going-on/team/FRC/%s" # % (tpid)
+    
     EVENT_AWARDS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/awards.html" # % (year, event_short)
-    EVENT_DETAILS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=event_details&eid=%s&-session=myarea:%s"
-    EVENT_LIST_REGIONALS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?event_type=FRC&season_FRC=%s"
     EVENT_RANKINGS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/rankings.html" # % (year, event_short)
-    EVENT_TEAMS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=event_teamlist&results_size=250&eid=%s&-session=myarea:%s"
+    MATCH_RESULTS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/matchresults.html" # % (year, event_short)
+    MATCH_SCHEDULE_QUAL_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/schedulequal.html" # % (year, event_short)
+    MATCH_SCHEDULE_ELIMS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/scheduleelim.html" # % (year, event_short)
     EVENT_SHORT_EXCEPTIONS = {
         "arc": "Archimedes",
         "cur": "Curie",
         "gal": "Galileo",
         "new": "Newton",
     }
-
-    MATCH_RESULTS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/matchresults.html" # % (year, event_short)
-    MATCH_SCHEDULE_QUAL_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/schedulequal.html"
-    MATCH_SCHEDULE_ELIMS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/scheduleelim.html"
-
-    SESSION_KEY_GENERATING_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=searchresults&programs=FRC&reports=teams&omit_searchform=1&season_FRC=%s"
-
-    TEAM_DETAILS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=team_details&tpid=%s&-session=myarea:%s"
     
     def __init__(self, *args, **kw):
         self._session_key = dict()
         super(DatafeedUsfirst, self).__init__(*args, **kw)
 
-    def getSessionKey(self, year):
-        """
-        Grab a page from FIRST so we can get a session key out of URLs on it. This session
-        key is needed to construct working event detail information URLs.
-        """
-
-        if self._session_key.get(year, False):
-            return self._session_key.get(year)
-
-        memcache_key = "usfirst_session_key_%s" % year
-        session_key = memcache.get(memcache_key)
-        if session_key is not None:
-            self._session_key[year] = session_key
-            return self._session_key.get(year)
-
-        sessionRe = re.compile(r'myarea:([A-Za-z0-9]*)')
-        
-        result = urlfetch.fetch(self.SESSION_KEY_GENERATING_PATTERN % year, deadline=60)
-        if result.status_code == 200:
-            regex_results = re.search(sessionRe, result.content)
-            if regex_results is not None:
-                session_key = regex_results.group(1) #first parenthetical group
-                if session_key is not None:
-                    if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, session_key, 60 * 5)
-                    self._session_key[year] = session_key
-                    return self._session_key[year]
-            logging.error('Unable to get USFIRST session key for %s.' % year)
-            return None
-        else:
-            logging.error('HTTP code %s. Unable to retreive url: %s' % 
-                (result.status_code, self.SESSION_KEY_GENERATING_URL))
-
-    def getEventDetails(self, year, first_eid):
-        if type(year) is not int: raise TypeError("year must be an integer")
-        url = self.EVENT_DETAILS_URL_PATTERN % (first_eid, self.getSessionKey(year))
-        event = self.parse(url, UsfirstEventDetailsParser)
+    def getEventDetails(self, first_eid):
+        url = self.EVENT_DETAILS_URL_PATTERN % (first_eid)
+        event, _ = self.parse(url, UsfirstEventDetailsParser)
 
         return Event(
             id = str(event["year"]) + str.lower(str(event["event_short"])),
@@ -95,6 +59,8 @@ class DatafeedUsfirst(DatafeedBase):
             official = True,
             start_date = event.get("start_date", None),
             venue_address = event.get("venue_address", None),
+            venue = event.get("venue", None),
+            location = event.get("location", None),
             website = event.get("website", None),
             year = event.get("year", None)
         )
@@ -102,7 +68,7 @@ class DatafeedUsfirst(DatafeedBase):
     def getEventList(self, year):
         if type(year) is not int: raise TypeError("year must be an integer")
         url = self.EVENT_LIST_REGIONALS_URL_PATTERN % year
-        events = self.parse(url, UsfirstEventListParser)
+        events, _ = self.parse(url, UsfirstEventListParser)
 
         return [Event(
             event_type_enum = event.get("event_type_enum", None),
@@ -129,7 +95,7 @@ class DatafeedUsfirst(DatafeedBase):
 
         url = self.EVENT_AWARDS_URL_PATTERN % (event.year,
             self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
-        awards = self.parse(url, UsfirstEventAwardsParser)
+        awards, _ = self.parse(url, UsfirstEventAwardsParser)
         
         return [Award(
             id = Award.renderKeyName(event.key_name, award.get('name')),
@@ -146,8 +112,22 @@ class DatafeedUsfirst(DatafeedBase):
         Returns a list of team_numbers attending a particular Event
         """
         if type(year) is not int: raise TypeError("year must be an integer")
-        url = self.EVENT_TEAMS_URL_PATTERN % (first_eid, self.getSessionKey(year))
-        teams = self.parse(url, UsfirstEventTeamsParser)
+        
+        teams = []
+        seen_teams = set()
+        for page in range(8):  # Ensures this won't loop forever. 8 pages should be plenty.
+            url = self.EVENT_TEAMS_URL_PATTERN % (first_eid)
+            if page != 0:
+                url += '&page=%s' % page
+            partial_teams, more_pages = self.parse(url, UsfirstEventTeamsParser)
+            teams.extend(partial_teams)
+            
+            partial_seen_teams = set([team['team_number'] for team in partial_teams])
+            new_teams = partial_seen_teams.difference(seen_teams)
+            if (not more_pages) or (new_teams == set()):
+                break
+
+            seen_teams = seen_teams.union(partial_seen_teams)
         
         return [Team(
             id = "frc%s" % team.get("team_number", None),
@@ -160,7 +140,7 @@ class DatafeedUsfirst(DatafeedBase):
     def getMatches(self, event):
         url = self.MATCH_RESULTS_URL_PATTERN % (event.year,
             self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
-        matches = self.parse(url, UsfirstMatchesParser)
+        matches, _ = self.parse(url, UsfirstMatchesParser)
 
         return [Match(
             id = Match.renderKeyName(
@@ -182,9 +162,8 @@ class DatafeedUsfirst(DatafeedBase):
     def getTeamDetails(self, team):
         if hasattr(team, 'first_tpid'):
             if team.first_tpid:
-                session_key = self.getSessionKey(team.first_tpid_year)
-                url = self.TEAM_DETAILS_URL_PATTERN % (team.first_tpid, session_key)
-                team_dict = self.parse(url, UsfirstTeamDetailsParser)
+                url = self.TEAM_DETAILS_URL_PATTERN % (team.first_tpid)
+                team_dict, _ = self.parse(url, UsfirstTeamDetailsParser)
 
                 if "team_number" in team_dict:
                     return Team(
