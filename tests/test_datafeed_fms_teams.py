@@ -28,7 +28,7 @@ class TestDatafeedFmsTeams(unittest2.TestCase):
             if team.team_number == 177:
                 found_177 = True
                 self.assertEqual(team.name, "UTC / Ensign Bickford Aerospace & Defense & South Windsor High School")
-                self.assertEqual(team.address, u"South Windsor, CT, USA")
+                #self.assertEqual(team.address, u"South Windsor, CT, USA")
                 self.assertEqual(team.nickname, "Bobcat Robotics")
         
         self.assertTrue(found_177)

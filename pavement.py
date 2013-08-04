@@ -1,5 +1,8 @@
 # Easy paver commands for less command typing and more coding.
 # Visit http://paver.github.com/paver/ to get started. - @brandondean Sept. 30
+import subprocess
+import json
+import time
 from paver.easy import *
 
 path = path("./")
@@ -77,7 +80,16 @@ def preflight():
   test()
   less()
   javascript()
-  
+
+  git_branch_name = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
+  git_last_commit = subprocess.check_output(["git", "log", "-1"])
+  build_time = time.ctime()
+  data = {'git_branch_name': git_branch_name,
+          'git_last_commit': git_last_commit,
+          'build_time': build_time}
+  with open('version_info.json', 'w') as f:
+      f.write(json.dumps(data))
+
 @task
 def lint():
   sh("python linter.py")

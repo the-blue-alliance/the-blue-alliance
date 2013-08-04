@@ -45,15 +45,6 @@ $('#auth-logoutlink').click(function(){
 	ref.parentNode.insertBefore(js, ref);
 }(document));
 
-function selectTypeaheadResult(item, val, text) {
-	if (!isNaN(val)) {
-		url = "http://www.thebluealliance.com/team/" + val;
-	} else {
-		url = "http://www.thebluealliance.com/event/" + val;
-	}
-	window.location.href = url;
-}
-
 // General JS for all pages
 $(document).ready(function(){
 	// Jumping to page section
@@ -81,25 +72,73 @@ $(document).ready(function(){
 	$('.search-query').attr('autocomplete', 'off');
 	
 	// Typeahead for search
-	// Currently does a one-time JSON get that returns
-	// the entire list of teams and events.
-	// Can be optimized.
-	$('.search-query').focus(function() {
-		if (!$('.search-query').data('typeahead')) {
-			$.getJSON('/_/typeahead', function(data) {
-				$('.search-query').typeahead({
-					// Used for when we implement a better typeahead solution
-			    	/*ajax: {
-				    	    url: '/_/typeahead',
-				    	    method: 'get',
-				    	    triggerLength: 3,
-				    },*/
-					source: data,
-			    	itemSelected: selectTypeaheadResult
-			    });
-			});
-		};
-	});
+  // Makes an AJAX call with the first character of the input.
+	var cachedsource = (function() {
+	  var datasource = {};
+    return function(query, process){
+      var first_letter = encodeURIComponent(query.charAt(0));
+      if ((first_letter == '') || (first_letter == ' ')) {
+    	  return [];
+    	}
+      if (datasource[first_letter] != null) {
+        return datasource[first_letter];
+      } else {
+        $.getJSON('/_/typeahead/' + first_letter, function(data) {
+          datasource[first_letter] = data;
+          process(datasource[first_letter]);
+        });
+      }
+    };
+	})();
+	
+	// helper function to match standard characters
+  function cleanUnicode(s){
+    var a = s.toLowerCase();
+    a = a.replace(/[àáâãäå]/g, "a");
+    a = a.replace(/æ/g, "ae");
+    a = a.replace(/ç/g, "c");
+    a = a.replace(/[èéêë]/g, "e");
+    a = a.replace(/[ìíîï]/g, "i");
+    a = a.replace(/ñ/g, "n");
+    a = a.replace(/[òóôõö]/g, "o");
+    a = a.replace(/œ/g, "oe");
+    a = a.replace(/[ùúûü]/g, "u");
+    a = a.replace(/[ýÿ]/g, "y");
+    return a;
+  };
+	
+	$('.search-query').typeahead({
+    source: cachedsource,
+    updater: function(label) {
+      var event_re = label.match(/(\d*)(.*)\[(.*?)\]/);
+      if (event_re != null) {
+        event_key = (event_re[1] + event_re[3]).toLowerCase();
+        url = "http://www.thebluealliance.com/event/" + event_key;
+        window.location.href = url;
+        return label;
+      }
+      var team_re = label.match(/(\d*) |.*/);
+      if (team_re != null) {
+        team_key = team_re[1];
+        url = "http://www.thebluealliance.com/team/" + team_key;
+        window.location.href = url;
+        return label;
+      }
+      return label;
+    },
+    matcher: function (item) {
+      return ~cleanUnicode(item).indexOf(cleanUnicode(this.query));
+    },
+    highlighter: function (item) {
+      var cleaned_item = cleanUnicode(item);
+      var query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&');
+      var match_index = cleaned_item.search(new RegExp('(' + query + ')', 'ig'));
+      var match_len = query.length;
+      return item.substring(0, match_index) + '<strong>' +
+        item.substring(match_index, match_index + match_len) + '</strong>' +
+        item.substring(match_index + match_len);
+    }
+  });
 	
 	// Tooltips
 	$("[rel=tooltip]").tooltip();
