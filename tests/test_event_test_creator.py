@@ -18,14 +18,19 @@ class TestEventTeamCreator(unittest2.TestCase):
         for team_number in range(7):
             Team(id = "frc%s" % team_number,
                  team_number = team_number).put()
+
+        self.events = []
         
     def tearDown(self):
+        for event in self.events:
+            event.key.delete()
+
         self.testbed.deactivate()
 
     def testCreates(self):
-        EventTestCreator.createPastEvent()
-        EventTestCreator.createFutureEvent()
-        EventTestCreator.createPresentEvent()
+        self.events.append(EventTestCreator.createPastEvent())
+        self.events.append(EventTestCreator.createFutureEvent())
+        self.events.append(EventTestCreator.createPresentEvent())
 
         #TODO: assert the events got created properly -gregmarra 20130416
 
