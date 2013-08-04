@@ -78,3 +78,6 @@ def preflight():
   less()
   javascript()
   
+@task
+def lint():
+  sh("python linter.py")
