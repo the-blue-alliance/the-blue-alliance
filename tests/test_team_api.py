@@ -78,7 +78,7 @@ class TestApiTeamShow(unittest2.TestCase):
         self.assertEqual(team_dict["country_name"], "USA")
         self.assertEqual(team_dict["region"], "SC")
         self.assertEqual(team_dict["website"], self.team.website)
-        self.assertEqual(team_dict["events"][0], self.event.key_name)
+        self.assertTrue(self.event.key.id() in team_dict["events"])
 
     def testTeamShow(self):
         response = self.testapp.get('/?teams=frc281')

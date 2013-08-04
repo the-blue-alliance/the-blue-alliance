@@ -19,6 +19,10 @@ class TestEventManipulator(unittest2.TestCase):
         self.past_event = EventTestCreator.createPastEvent(only_event=True)
         
     def tearDown(self):
+        self.future_event.key.delete()
+        self.present_event.key.delete()
+        self.past_event.key.delete()
+
         self.testbed.deactivate()
 
     def test_datesFuture(self):
