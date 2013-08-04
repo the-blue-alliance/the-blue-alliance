@@ -59,31 +59,28 @@ class EventTeamUpdate(webapp.RequestHandler):
     def get(self, event_key):
         event = Event.get_by_id(event_key)
         team_ids = set()
-        
+
         # Existing EventTeams
         existing_event_teams_keys = EventTeam.query(EventTeam.event == event.key).fetch(1000, keys_only=True)
         existing_event_teams = ndb.get_multi(existing_event_teams_keys)
         existing_team_ids = set()
         for et in existing_event_teams:
             existing_team_ids.add(et.team.id())
-        
-        participating_team_ids = set()
-        
+
         # Add teams from Matches
         match_keys = Match.query(Match.event == event.key).fetch(1000, keys_only=True)
         matches = ndb.get_multi(match_keys)
         for match in matches:
             for team in match.team_key_names:
                 team_ids.add(team)
-                participating_team_ids.add(str(team))
-        
+
         # Delete EventTeams for teams who did not participate in the event
         et_keys_to_delete = set()
-        for team_id in existing_team_ids.difference(participating_team_ids):
+        for team_id in existing_team_ids.difference(team_ids):
             et_key_name = "{}_{}".format(event.key_name, team_id)
             et_keys_to_delete.add(ndb.Key(EventTeam, et_key_name))
         ndb.delete_multi(et_keys_to_delete)
-        
+
         # Create or update EventTeams
         teams = TeamManipulator.createOrUpdate([Team(
             id = team_id,
