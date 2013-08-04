@@ -22,7 +22,7 @@ class AdminMain(LoggedInHandler):
             self.template_values['build_time'] = data['build_time']
 
             commit_parts = re.split("[\n]+", data['git_last_commit'])
-            self.template_values['commit_hash'] = commit_parts[0]
+            self.template_values['commit_hash'] = commit_parts[0].split(" ")
             self.template_values['commit_author'] = commit_parts[1]
             self.template_values['commit_date'] = commit_parts[2]
             self.template_values['commit_msg'] = commit_parts[3]
