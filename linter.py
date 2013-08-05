@@ -40,15 +40,21 @@ def main():
         with file(filename, 'w') as f:
             system('git', 'show', ':' + name, stdout=f)
 
-    if select_codes and ignore_codes:
-        print "Error: select and ignore codes are mutually exclusive"
+    try:
+        if select_codes and ignore_codes:
+            print "Error: select and ignore codes are mutually exclusive"
+            sys.exit(1)
+        elif select_codes:
+            output = system('pep8', '--select', ','.join(select_codes), '.', cwd=tempdir)
+        elif ignore_codes:
+            output = system('pep8', '--ignore', ','.join(ignore_codes), '.', cwd=tempdir)
+        else:
+            output = system('pep8', '.', cwd=tempdir)
+    except OSError:
+        print "ERROR: PEP8 needs to be installed!"
+        print "You can install it by running: easy_install pep8"
         sys.exit(1)
-    elif select_codes:
-        output = system('pep8', '--select', ','.join(select_codes), '.', cwd=tempdir)
-    elif ignore_codes:
-        output = system('pep8', '--ignore', ','.join(ignore_codes), '.', cwd=tempdir)
-    else:
-        output = system('pep8', '.', cwd=tempdir)
+
     shutil.rmtree(tempdir)
     if output:
         print 'PEP8 style violations have been detected.  Please fix them\n' \
