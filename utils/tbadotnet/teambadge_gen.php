@@ -1,7 +1,7 @@
 <?PHP
 
 include("tba_gd_lib.php");
-error_reporting(E_ALL ^ E_NOTICE ^ E_STRICT);
+error_reporting(E_ALL ^ E_NOTICE);
 
 function sanatizeGet($value) {
 	$output = htmlentities(stripslashes($value));
