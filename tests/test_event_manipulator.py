@@ -16,6 +16,7 @@ class TestEventManipulator(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        self.maxDiff = None
         
         f1 = open('test_data/usfirst_html/usfirst_event_rankings_2012ct.html', 'r')
         good_rankings, _ = UsfirstEventRankingsParser.parse(f1.read())
