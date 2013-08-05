@@ -1,5 +1,4 @@
 import webapp2
-from webapp2_extras import sessions
 
 from google.appengine.api import memcache
 
