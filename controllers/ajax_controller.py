@@ -101,4 +101,3 @@ class WebcastHandler(CacheableHandler):
         keys = [self.cache_key.format(event_key, n) for n in range(10)]
         memcache.delete_multi(keys)
         return keys
-

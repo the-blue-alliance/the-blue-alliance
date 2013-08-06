@@ -21,4 +21,3 @@ def fix_list(x):
             return y
 
     return None
-

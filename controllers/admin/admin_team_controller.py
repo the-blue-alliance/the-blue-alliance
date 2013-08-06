@@ -39,4 +39,3 @@ class AdminTeamDetail(LoggedInHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/team_details.html')
         self.response.out.write(template.render(path, self.template_values))
-

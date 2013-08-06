@@ -33,4 +33,3 @@ class TestDatafeedFmsTeams(unittest2.TestCase):
 
         self.assertTrue(found_177)
         self.assertTrue(len(teams) > 0)
-

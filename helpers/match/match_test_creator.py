@@ -71,4 +71,3 @@ class MatchTestCreator(object):
         complete = False
         matches = [self.buildTestMatch(comp_level, set_number, match_number, complete) for match_number in range(11,21)]
         MatchManipulator.createOrUpdate(matches)
-

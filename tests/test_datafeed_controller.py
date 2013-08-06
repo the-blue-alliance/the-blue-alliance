@@ -43,4 +43,3 @@ class TestUsfirstEventDetailsGet(unittest2.TestCase):
     #    frc177 = Team.get_by_id("frc177")
     #    self.assertEqual(frc177.team_number, 177)
     #    self.assertEqual(frc177.first_tpid, 41633)
-

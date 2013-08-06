@@ -48,4 +48,3 @@ class Suggestion(ndb.Model):
     def youtube_video(self):
         if "youtube_videos" in self.contents:
             return self.contents["youtube_videos"][0]
-
