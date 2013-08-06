@@ -139,7 +139,7 @@ class InsightsHelper(object):
         """
         Returns an Insight where the data is list of highest scoring matches
         """
-        highscore_matches = []  #list of matches (if there are ties)
+        highscore_matches = []  # list of matches (if there are ties)
         highscore = 0
         for _, week_events in week_event_matches:
             for event, matches in week_events:
