@@ -20,12 +20,14 @@ from models.team import Team
 
 # Note: generally caching for the API happens in ApiHelper
 
+
 class MainApiHandler(webapp2.RequestHandler):
 
     def __init__(self, request, response):
         # Need to initialize a webapp2 instance
         self.initialize(request, response)
         logging.info(request)
+
 
 class ApiTeamsShow(MainApiHandler):
     """
@@ -42,6 +44,7 @@ class ApiTeamsShow(MainApiHandler):
             response_json = {"Property Error": "No team found for key in %s" % str(teams)}
 
         self.response.out.write(json.dumps(teams))
+
 
 class ApiTeamDetails(MainApiHandler):
     """
@@ -67,6 +70,7 @@ class ApiTeamDetails(MainApiHandler):
             self.response.set_status(404)
             self.response.out.write(json.dumps(response_json))
 
+
 class ApiEventsShow(MainApiHandler):
     """
     Information about events.
@@ -76,6 +80,7 @@ class ApiEventsShow(MainApiHandler):
         response = {"API Method Removed": "ApiEventsShow is no longer available. Please use ApiEvenDetails, and ApiEventList instead."}
         self.response.set_status(410)
         self.response.out.write(json.dumps(response))
+
 
 class ApiEventList(MainApiHandler):
     """
@@ -119,6 +124,7 @@ class ApiEventList(MainApiHandler):
         self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(event_list))
 
+
 class ApiEventDetails(MainApiHandler):
     """
     Return a specifc event with details.
@@ -134,6 +140,7 @@ class ApiEventDetails(MainApiHandler):
         event_dict = ApiHelper.getEventInfo(event_key)
 
         self.response.out.write(json.dumps(event_dict))
+
 
 class ApiMatchDetails(MainApiHandler):
     """
@@ -155,6 +162,7 @@ class ApiMatchDetails(MainApiHandler):
 
         self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(match_json))
+
 
 class CsvTeamsAll(MainApiHandler):
     """

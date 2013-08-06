@@ -7,6 +7,7 @@ from controllers.ajax_controller import WebcastHandler
 from controllers.event_controller import EventList
 from controllers.main_controller import MainCompetitionseasonHandler, GamedayHandler, WebcastsHandler
 
+
 class MemcacheWebcastFlusher(object):
     @classmethod
     def flush(self):

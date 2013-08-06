@@ -5,6 +5,7 @@ import random
 from helpers.match_manipulator import MatchManipulator
 from models.match import Match
 
+
 class MatchTestCreator(object):
 
     def __init__(self, event):

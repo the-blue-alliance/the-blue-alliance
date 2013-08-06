@@ -11,6 +11,7 @@ from helpers.event_helper import EventHelper
 from helpers.event_helper import OFFSEASON_EVENTS_LABEL
 from helpers.award_helper import AwardHelper
 
+
 class InsightsHelper(object):
     """
     Helper for calculating insights and generating Insight objects

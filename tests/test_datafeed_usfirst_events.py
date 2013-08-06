@@ -10,6 +10,7 @@ from datafeeds.datafeed_usfirst import DatafeedUsfirst
 
 from models.team import Team
 
+
 class TestDatafeedUsfirstEvents(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()

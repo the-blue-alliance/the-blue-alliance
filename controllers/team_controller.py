@@ -19,6 +19,8 @@ from models.team import Team
 from models.award import Award
 
 # The view of a list of teams.
+
+
 class TeamList(CacheableHandler):
 
     VALID_PAGES = [1, 2, 3, 4, 5]
@@ -79,6 +81,8 @@ class TeamList(CacheableHandler):
         return template.render(path, template_values)
 
 # The view of a single Team.
+
+
 class TeamDetail(CacheableHandler):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5

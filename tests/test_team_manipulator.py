@@ -6,6 +6,7 @@ from google.appengine.ext import testbed
 from helpers.team_manipulator import TeamManipulator
 from models.team import Team
 
+
 class TestTeamManipulator(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()

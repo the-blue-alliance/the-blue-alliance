@@ -5,6 +5,7 @@ from helpers.event_team_manipulator import EventTeamManipulator
 from models.event_team import EventTeam
 from models.team import Team
 
+
 class EventTeamTestCreator(object):
     @classmethod
     def createEventTeams(self, event):

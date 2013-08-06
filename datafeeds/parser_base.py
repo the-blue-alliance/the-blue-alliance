@@ -1,5 +1,6 @@
 from BeautifulSoup import NavigableString
 
+
 class ParserBase(object):
     """
     Provides a basic structure for parsing pages.

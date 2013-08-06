@@ -4,6 +4,7 @@ from models.match import Match
 from models.team import Team
 from models.event import Event
 
+
 class MatchHelper(object):
     """
     Helper to put matches into sub-dictionaries for the way we render match tables

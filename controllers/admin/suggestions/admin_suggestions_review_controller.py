@@ -8,6 +8,7 @@ from controllers.base_controller import LoggedInHandler
 from helpers.suggestions.match_suggestion_accepter import MatchSuggestionAccepter
 from models.suggestion import Suggestion
 
+
 class AdminSuggestionsReviewController(LoggedInHandler):
     """
     View the list of suggestions.

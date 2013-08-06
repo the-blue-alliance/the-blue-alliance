@@ -2,6 +2,7 @@ from BeautifulSoup import BeautifulSoup
 
 from datafeeds.parser_base import ParserBase
 
+
 class UsfirstEventRankingsParser(ParserBase):
     """
     Works for official events from 2007-2012

@@ -5,6 +5,7 @@ from datafeeds.offseason_matches_parser import OffseasonMatchesParser
 
 from models.match import Match
 
+
 class DatafeedOffseason(DatafeedBase):
     def __init__(self, *args, **kw):
         super(DatafeedOffseason, self).__init__(*args, **kw)

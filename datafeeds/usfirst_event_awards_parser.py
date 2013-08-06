@@ -4,6 +4,7 @@ from BeautifulSoup import BeautifulSoup
 
 from datafeeds.parser_base import ParserBase
 
+
 class UsfirstEventAwardsParser(ParserBase):
     """
     Works for official events from 2007-2012
@@ -159,6 +160,7 @@ class UsfirstEventAwardsParser(ParserBase):
             awards.append(award)
         return awards, False
 
+
 def fixAwardee(text):
     # Example: http://www2.usfirst.org/2012comp/Events/gl/awards.html
     # Some names have <span></span> around names, but not others.
@@ -174,6 +176,7 @@ def fixAwardee(text):
         except AttributeError:
             continue
     return ' '.join(full_name)
+
 
 def sanitize(text):
     return text.replace('\r\n ', '')

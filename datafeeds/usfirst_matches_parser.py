@@ -5,6 +5,7 @@ from BeautifulSoup import BeautifulSoup
 
 from datafeeds.parser_base import ParserBase
 
+
 class UsfirstMatchesParser(ParserBase):
     @classmethod
     def parse(self, html):

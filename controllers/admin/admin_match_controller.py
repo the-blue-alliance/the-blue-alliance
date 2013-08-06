@@ -11,6 +11,7 @@ from helpers.match_manipulator import MatchManipulator
 from models.event import Event
 from models.match import Match
 
+
 class AdminMatchCleanup(LoggedInHandler):
     """
     Given an Event, clean up all Matches that don't have the Event's key as their key prefix.
@@ -41,6 +42,7 @@ class AdminMatchCleanup(LoggedInHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/matches_cleanup.html')
         self.response.out.write(template.render(path, self.template_values))
+
 
 class AdminMatchDashboard(LoggedInHandler):
     """
@@ -171,6 +173,7 @@ class AdminMatchEdit(LoggedInHandler):
         match = MatchManipulator.createOrUpdate(match)
 
         self.redirect("/admin/match/" + match.key_name)
+
 
 class AdminVideosAdd(LoggedInHandler):
     """

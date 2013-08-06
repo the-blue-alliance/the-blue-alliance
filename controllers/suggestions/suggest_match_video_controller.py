@@ -8,6 +8,7 @@ from models.event import Event
 from models.match import Match
 from models.suggestion import Suggestion
 
+
 class SuggestMatchVideoController(LoggedInHandler):
     """
     Allow users to suggest videos for TBA to add to matches.

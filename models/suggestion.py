@@ -4,6 +4,7 @@ from google.appengine.ext import ndb
 
 from models.account import Account
 
+
 class Suggestion(ndb.Model):
     """
     Suggestions are generic containers for user-submitted data corrections to

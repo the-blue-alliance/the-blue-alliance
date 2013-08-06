@@ -20,6 +20,7 @@ from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
 
+
 class EventList(CacheableHandler):
     """
     List all Events.

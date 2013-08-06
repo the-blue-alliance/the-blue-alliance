@@ -3,6 +3,7 @@ from google.appengine.ext import ndb
 from models.event import Event
 from models.team import Team
 
+
 class Award(ndb.Model):
     """
     Awards represent FIRST Robotics Competition awards given out at an event.

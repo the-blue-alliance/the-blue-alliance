@@ -2,6 +2,7 @@ import unittest2
 
 from datafeeds.offseason_matches_parser import OffseasonMatchesParser
 
+
 class TestUsfirstMatchesParser(unittest2.TestCase):
     def test_parse(self):
         with open('test_data/offseason_matches.csv', 'r') as f:

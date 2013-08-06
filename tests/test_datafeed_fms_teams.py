@@ -5,6 +5,7 @@ from google.appengine.ext import testbed
 
 from datafeeds.datafeed_fms import DatafeedFms
 
+
 class TestDatafeedFmsTeams(unittest2.TestCase):
 
     def setUp(self):

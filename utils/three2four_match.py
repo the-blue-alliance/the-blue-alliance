@@ -45,6 +45,7 @@ FRC_GAMES_BY_YEAR = {
     1992: "frc_1992_maiz"
 }
 
+
 def parse_row(row):
     """Parse a row into a nice dictionary."""
     old_match = dict()
@@ -62,6 +63,7 @@ def parse_row(row):
     old_match["bluescore"] = row[11]
     return old_match
 
+
 def legal_teams(teams):
     """Return a list of teams that are possible."""
     good_teams = list()
@@ -75,6 +77,7 @@ def legal_teams(teams):
 
     good_teams = ["frc" + str(team) for team in good_teams]
     return good_teams
+
 
 def build_new_match(old_match):
     """Build a new match."""
@@ -114,6 +117,7 @@ def build_new_match(old_match):
     match["no_auto_update"] = "TRUE"
 
     return match
+
 
 def main():
     parser = OptionParser()

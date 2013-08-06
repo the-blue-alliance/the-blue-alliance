@@ -2,6 +2,7 @@ import logging
 
 from google.appengine.api import urlfetch
 
+
 class DatafeedBase(object):
     """
     Provides structure for fetching and parsing pages from websites.

@@ -61,6 +61,7 @@ sortOrder = [
     'fin4',
     ]
 
+
 class AwardHelper(object):
     """
     Helper to prepare awards for being used in a template

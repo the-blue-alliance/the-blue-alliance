@@ -11,6 +11,7 @@ from controllers.datafeed_controller import UsfirstEventDetailsGet
 from models.event import Event
 from models.team import Team
 
+
 class TestUsfirstEventDetailsGet(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()

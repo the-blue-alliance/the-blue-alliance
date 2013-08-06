@@ -1,5 +1,6 @@
 from helpers.manipulator_base import ManipulatorBase
 
+
 class EventTeamManipulator(ManipulatorBase):
     """
     Handle EventTeam database writes.

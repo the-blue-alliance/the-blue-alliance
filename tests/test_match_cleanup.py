@@ -8,6 +8,7 @@ from datafeeds.offseason_matches_parser import OffseasonMatchesParser
 from models.event import Event
 from models.match import Match
 
+
 def setupMatches(csv):
     with open(csv, 'r') as f:
         event = Event(
@@ -33,6 +34,7 @@ def setupMatches(csv):
             )
             for match in parsed_matches]
         return matches
+
 
 class TestMatchCleanup(unittest2.TestCase):
     def setUp(self):

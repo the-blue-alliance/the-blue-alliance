@@ -10,6 +10,7 @@ from base_controller import BaseHandlerFB, CacheableHandler
 from models.event import Event
 from models.match import Match
 
+
 class MatchDetail(CacheableHandler):
     """
     Display a Match.

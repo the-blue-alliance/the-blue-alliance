@@ -6,6 +6,7 @@ from google.appengine.ext import ndb
 from helpers.tbavideo_helper import TBAVideoHelper
 from models.event import Event
 
+
 class Match(ndb.Model):
     """
     Matches represent individual matches at Events.

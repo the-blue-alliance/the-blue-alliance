@@ -7,6 +7,7 @@ from datafeeds.fms_team_list_parser import FmsTeamListParser
 from models.event import Event
 from models.team import Team
 
+
 class DatafeedFms(DatafeedBase):
 
     FMS_EVENT_LIST_URL = "https://my.usfirst.org/frc/scoring/index.lasso?page=eventlist"

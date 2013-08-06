@@ -2,6 +2,7 @@ import unittest2
 
 from datafeeds.fms_event_list_parser import FmsEventListParser
 
+
 class TestFmsEventListParser(unittest2.TestCase):
     def test_parse(self):
         with open('test_data/usfirst_html/fms_event_list_2012.html', 'r') as f:

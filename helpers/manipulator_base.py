@@ -2,6 +2,7 @@ import logging
 
 from google.appengine.ext import ndb
 
+
 class ManipulatorBase(object):
     """
     Provides a basic framework for manipulating db models.

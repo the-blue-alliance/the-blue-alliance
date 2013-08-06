@@ -7,6 +7,7 @@ from consts.event_type import EventType
 from datafeeds.parser_base import ParserBase
 from helpers.event_helper import EventHelper
 
+
 class UsfirstEventListParser(ParserBase):
 
     REGIONAL_EVENT_TYPES = {

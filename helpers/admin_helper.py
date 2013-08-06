@@ -1,5 +1,6 @@
 from google.appengine.api.users import User
 
+
 class AdminHelper(object):
     """
     Contains functions helpful for /admin/.

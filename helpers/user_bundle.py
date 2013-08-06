@@ -2,6 +2,7 @@ from google.appengine.api import users
 
 from models.account import Account
 
+
 class UserBundle(object):
     """
     UserBundle encapsulates a bunch of Google AppEngine user management stuff

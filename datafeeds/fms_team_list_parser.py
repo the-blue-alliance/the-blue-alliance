@@ -4,6 +4,7 @@ from BeautifulSoup import BeautifulSoup
 
 from datafeeds.parser_base import ParserBase
 
+
 class FmsTeamListParser(ParserBase):
     """
     Facilitates getting information about Teams from USFIRST.

@@ -1,6 +1,7 @@
 import logging
 from helpers.manipulator_base import ManipulatorBase
 
+
 class MatchManipulator(ManipulatorBase):
     """
     Handle Match database writes.

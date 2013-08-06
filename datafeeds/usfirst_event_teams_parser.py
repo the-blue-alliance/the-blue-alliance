@@ -4,6 +4,7 @@ from BeautifulSoup import BeautifulSoup
 
 from datafeeds.parser_base import ParserBase
 
+
 class UsfirstEventTeamsParser(ParserBase):
     @classmethod
     def parse(self, html):

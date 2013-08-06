@@ -2,6 +2,7 @@
 Provides helper functions to assist with bulkloader.yaml
 """
 
+
 def fix_json(x):
     """
     Replace single quotes in JSON with double quotes.
@@ -10,6 +11,7 @@ def fix_json(x):
         return str(x).replace("\'", "\"")
     else:
         return None
+
 
 def fix_list(x):
     """

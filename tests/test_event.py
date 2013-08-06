@@ -7,6 +7,7 @@ from google.appengine.ext import testbed
 
 from helpers.event.event_test_creator import EventTestCreator
 
+
 class TestEventManipulator(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()

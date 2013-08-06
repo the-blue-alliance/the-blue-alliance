@@ -6,6 +6,7 @@ import re
 
 from datafeeds.parser_base import ParserBase
 
+
 class OffseasonMatchesParser(ParserBase):
     @classmethod
     def parse(self, data):

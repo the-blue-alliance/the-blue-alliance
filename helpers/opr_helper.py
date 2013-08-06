@@ -22,6 +22,7 @@ from models.event import Event
 from models.event_team import EventTeam
 from models.team import Team
 
+
 class OprHelper(object):
 
     data = []

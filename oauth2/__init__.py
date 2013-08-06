@@ -55,8 +55,10 @@ class Error(RuntimeError):
     def __str__(self):
         return self._message
 
+
 class MissingSignature(Error):
     pass
+
 
 def build_authenticate_header(realm=''):
     """Optional WWW-Authenticate header (401 error)"""
@@ -685,6 +687,7 @@ class SignatureMethod_HMAC_SHA1(SignatureMethod):
 
         # Calculate the digest base 64.
         return binascii.b2a_base64(hashed.digest())[:-1]
+
 
 class SignatureMethod_PLAINTEXT(SignatureMethod):
 

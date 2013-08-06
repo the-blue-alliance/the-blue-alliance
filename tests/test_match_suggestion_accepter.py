@@ -9,6 +9,7 @@ from models.event import Event
 from models.match import Match
 from models.suggestion import Suggestion
 
+
 class TestMatchSuggestionAccepter(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()

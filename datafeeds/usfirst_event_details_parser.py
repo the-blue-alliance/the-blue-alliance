@@ -7,6 +7,7 @@ from BeautifulSoup import BeautifulSoup
 from datafeeds.parser_base import ParserBase
 from helpers.event_helper import EventHelper
 
+
 class UsfirstEventDetailsParser(ParserBase):
     @classmethod
     def parse(self, html):

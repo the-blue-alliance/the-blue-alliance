@@ -1,6 +1,7 @@
 from helpers.match_manipulator import MatchManipulator
 from models.match import Match
 
+
 class MatchSuggestionAccepter(object):
     """
     Handle accepting Match suggestions.

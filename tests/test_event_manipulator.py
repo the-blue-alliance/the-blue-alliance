@@ -10,6 +10,7 @@ from datafeeds.usfirst_event_rankings_parser import UsfirstEventRankingsParser
 from helpers.event_manipulator import EventManipulator
 from models.event import Event
 
+
 class TestEventManipulator(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()

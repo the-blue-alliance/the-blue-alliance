@@ -15,6 +15,7 @@ from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
 
+
 class ApiHelper(object):
     """Helper for api_controller."""
     @classmethod

@@ -16,6 +16,7 @@ from models.team import Team
 from models.event import Event
 from models.event_team import EventTeam
 
+
 class TestApiTeamShow(unittest2.TestCase):
 
     # TODO: Add event_keys testing. -brandondean 10/21/2012

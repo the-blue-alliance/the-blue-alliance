@@ -8,6 +8,7 @@ from BeautifulSoup import BeautifulSoup
 
 from datafeeds.parser_base import ParserBase
 
+
 class UsfirstTeamDetailsParser(ParserBase):
     """
     Facilitates building TBAVideos store from TBA.

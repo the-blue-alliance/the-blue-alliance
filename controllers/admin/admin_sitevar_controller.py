@@ -6,6 +6,7 @@ from google.appengine.ext.webapp import template
 from controllers.base_controller import LoggedInHandler
 from models.sitevar import Sitevar
 
+
 class AdminSitevarList(LoggedInHandler):
     """
     List all Sitevars.
@@ -21,6 +22,7 @@ class AdminSitevarList(LoggedInHandler):
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/sitevar_list.html')
         self.response.out.write(template.render(path, self.template_values))
 
+
 class AdminSitevarCreate(LoggedInHandler):
     """
     Create an Sitevar. POSTs to AdminSitevarEdit.
@@ -30,6 +32,7 @@ class AdminSitevarCreate(LoggedInHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/sitevar_create.html')
         self.response.out.write(template.render(path, self.template_values))
+
 
 class AdminSitevarEdit(LoggedInHandler):
     """

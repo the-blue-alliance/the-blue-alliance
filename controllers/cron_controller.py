@@ -31,6 +31,7 @@ import tba_config
 
 from models.insight import Insight
 
+
 class EventTeamRepairDo(webapp.RequestHandler):
     """
     Repair broken EventTeams.
@@ -52,6 +53,7 @@ class EventTeamRepairDo(webapp.RequestHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../templates/math/eventteam_repair_do.html')
         self.response.out.write(template.render(path, template_values))
+
 
 class EventTeamUpdate(webapp.RequestHandler):
     """
@@ -91,6 +93,7 @@ class EventTeamUpdate(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), '../templates/math/eventteam_update_do.html')
         self.response.out.write(template.render(path, template_values))
 
+
 class EventTeamUpdateEnqueue(webapp.RequestHandler):
     """
     Handles enqueing building attendance for Events.
@@ -112,6 +115,7 @@ class EventTeamUpdateEnqueue(webapp.RequestHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../templates/math/eventteam_update_enqueue.html')
         self.response.out.write(template.render(path, template_values))
+
 
 class EventOprDo(webapp.RequestHandler):
     """
@@ -144,6 +148,7 @@ class EventOprDo(webapp.RequestHandler):
     def post(self):
         self.get()
 
+
 class EventOprEnqueue(webapp.RequestHandler):
     """
     Enqueues OPR calculation
@@ -170,6 +175,7 @@ class EventOprEnqueue(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), '../templates/math/event_opr_enqueue.html')
         self.response.out.write(template.render(path, template_values))
 
+
 class YearInsightsEnqueue(webapp.RequestHandler):
     """
     Enqueues Insights calculation of a given kind for a given year
@@ -186,6 +192,7 @@ class YearInsightsEnqueue(webapp.RequestHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../templates/math/year_insights_enqueue.html')
         self.response.out.write(template.render(path, template_values))
+
 
 class YearInsightsDo(webapp.RequestHandler):
     """
@@ -217,6 +224,7 @@ class YearInsightsDo(webapp.RequestHandler):
     def post(self):
         self.get()
 
+
 class OverallInsightsEnqueue(webapp.RequestHandler):
     """
     Enqueues Overall Insights calculation for a given kind.
@@ -232,6 +240,7 @@ class OverallInsightsEnqueue(webapp.RequestHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../templates/math/overall_insights_enqueue.html')
         self.response.out.write(template.render(path, template_values))
+
 
 class OverallInsightsDo(webapp.RequestHandler):
     """

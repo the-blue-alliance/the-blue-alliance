@@ -1,5 +1,6 @@
 from models.event_team import EventTeam
 
+
 class EventTeamRepairer(object):
     """
     Repair corrupt EventTeam objects.

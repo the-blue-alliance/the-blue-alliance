@@ -6,6 +6,7 @@ from controllers.base_controller import LoggedInHandler
 from models.event_team import EventTeam
 from models.team import Team
 
+
 class AdminTeamList(LoggedInHandler):
     """
     The view of a list of teams.
@@ -21,6 +22,7 @@ class AdminTeamList(LoggedInHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/team_list.html')
         self.response.out.write(template.render(path, self.template_values))
+
 
 class AdminTeamDetail(LoggedInHandler):
     """

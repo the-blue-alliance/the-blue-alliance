@@ -17,6 +17,7 @@ from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
 
+
 class TestApiEventList(unittest2.TestCase):
 
     def setUp(self):
@@ -59,6 +60,7 @@ class TestApiEventList(unittest2.TestCase):
 
         event_dict = json.loads(response.body)
         self.assertEventJson(event_dict[0])
+
 
 class TestApiMatchDetails(unittest2.TestCase):
 

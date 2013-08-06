@@ -7,6 +7,7 @@ from paver.easy import *
 
 path = path("./")
 
+
 @task
 def clean():
   """Get rid of junk files."""
@@ -16,6 +17,7 @@ def clean():
     print("All cleaned up!")
   else:
     print("Nothing to clean! :)")
+
 
 @task
 def setup():
@@ -43,11 +45,13 @@ def setup():
   clean()
   print("Done setting up! 2013 events loaded and 2010cmp is now ready for testing.")
 
+
 @task
 def test():
   """Run tests."""
   print("Running Tests")
   sh("python run_tests.py")
+
 
 @task
 def test_fast():
@@ -60,6 +64,7 @@ def test_fast():
   sh("python run_tests.py /usr/local/google_appengine test_event.py")
   sh("python run_tests.py /usr/local/google_appengine test_match_cleanup.py")
 
+
 @task
 def less():
   """Build and Combine CSS"""
@@ -68,11 +73,13 @@ def less():
   sh("lessc static/css/less_css/tba_style.gameday.less static/css/less_css/tba_style.gameday.css")
   sh("python do_compress.py css")
 
+
 @task
 def javascript():
     """Combine Compress Javascript"""
     print("Combining and Compressing Javascript")
     sh("python do_compress.py js")
+
 
 @task
 def preflight():
@@ -89,6 +96,7 @@ def preflight():
           'build_time': build_time}
   with open('version_info.json', 'w') as f:
       f.write(json.dumps(data))
+
 
 @task
 def lint():

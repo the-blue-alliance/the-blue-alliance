@@ -3,6 +3,7 @@ import re
 
 from google.appengine.ext import ndb
 
+
 class Team(ndb.Model):
     """
     Teams represent FIRST Robotics Competition teams.

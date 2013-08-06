@@ -7,6 +7,7 @@ from helpers.event_team.event_team_test_creator import EventTeamTestCreator
 from helpers.match.match_test_creator import MatchTestCreator
 from models.event import Event
 
+
 class EventTestCreator(object):
     @classmethod
     def createFutureEvent(self, only_event=False):

@@ -7,6 +7,7 @@ from google.appengine.ext import db
 from helpers.team_manipulator import TeamManipulator
 from models.team import Team
 
+
 class TeamHelper(object):
     """
     Helper to sort teams and stuff

@@ -5,6 +5,7 @@ from BeautifulSoup import BeautifulSoup
 
 from datafeeds.parser_base import ParserBase
 
+
 class FmsEventListParser(ParserBase):
     """
     Facilitates getting information about Events from USFIRST.

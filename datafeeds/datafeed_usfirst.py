@@ -22,6 +22,7 @@ from models.award import Award
 from models.match import Match
 from models.team import Team
 
+
 class DatafeedUsfirst(DatafeedBase):
     EVENT_LIST_REGIONALS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?event_type=FRC&season_FRC=%s"  # % (year)
 

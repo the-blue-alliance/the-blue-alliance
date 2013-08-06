@@ -20,6 +20,7 @@ from models.team import Team
 
 import tba_config
 
+
 class AdminEventAddWebcast(LoggedInHandler):
     """
     Add a webcast to an Event.

@@ -1,5 +1,6 @@
 from google.appengine.ext import ndb
 
+
 class Account(ndb.Model):
     """
     Accounts represent accounts people use on TBA.

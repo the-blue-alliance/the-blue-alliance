@@ -2,6 +2,7 @@ import json
 
 from google.appengine.ext import ndb
 
+
 class Sitevar(ndb.Model):
     """
     Sitevars represent site configuration parameters that should be adjustable

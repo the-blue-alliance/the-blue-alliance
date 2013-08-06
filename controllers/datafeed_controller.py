@@ -30,6 +30,7 @@ from models.team import Team
 
 from helpers.firebase.firebase_pusher import FirebasePusher
 
+
 class FmsEventListGet(webapp.RequestHandler):
     """
     Fetch basic data about all current season events at once.
@@ -178,6 +179,7 @@ class UsfirstEventDetailsGet(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_details_get.html')
         self.response.out.write(template.render(path, template_values))
 
+
 class UsfirstAwardsEnqueue(webapp.RequestHandler):
     """
     Handles enqueing getting awards for USFIRST events.
@@ -200,6 +202,7 @@ class UsfirstAwardsEnqueue(webapp.RequestHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_awards_enqueue.html')
         self.response.out.write(template.render(path, template_values))
+
 
 class UsfirstAwardsGet(webapp.RequestHandler):
     """

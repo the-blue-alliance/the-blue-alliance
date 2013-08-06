@@ -4,6 +4,7 @@ import datetime
 from consts.event_type import EventType
 from datafeeds.usfirst_event_list_parser import UsfirstEventListParser
 
+
 class TestUsfirstEventListParser(unittest2.TestCase):
     def test_parse(self):
         with open('test_data/usfirst_html/usfirst_event_list_2012.html', 'r') as f:

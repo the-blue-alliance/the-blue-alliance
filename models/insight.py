@@ -1,6 +1,7 @@
 import json
 from google.appengine.ext import ndb
 
+
 class Insight(ndb.Model):
     """
     Insights are the end result of analyzing a batch of data, such as the
