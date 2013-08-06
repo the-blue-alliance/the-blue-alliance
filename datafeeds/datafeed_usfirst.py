@@ -66,7 +66,8 @@ class DatafeedUsfirst(DatafeedBase):
         )
 
     def getEventList(self, year):
-        if type(year) is not int: raise TypeError("year must be an integer")
+        if type(year) is not int:
+            raise TypeError("year must be an integer")
         url = self.EVENT_LIST_REGIONALS_URL_PATTERN % year
         events, _ = self.parse(url, UsfirstEventListParser)
 
@@ -111,7 +112,8 @@ class DatafeedUsfirst(DatafeedBase):
         """
         Returns a list of team_numbers attending a particular Event
         """
-        if type(year) is not int: raise TypeError("year must be an integer")
+        if type(year) is not int:
+            raise TypeError("year must be an integer")
 
         teams = []
         seen_teams = set()

@@ -49,7 +49,8 @@ class ApiHelper(object):
                     logging.warning("Failed to include Address for api_team_info_%s: %s" % (team_key, e))
 
                 #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
-                if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, team_dict, 2592000)
+                if tba_config.CONFIG["memcache"]:
+                    memcache.set(memcache_key, team_dict, 2592000)
             else:
                 raise IndexError
 
@@ -90,7 +91,8 @@ class ApiHelper(object):
                 event_dict["teams"] = [team.key_name for team in event.teams]
                 event_dict["matches"] = [match.key_name for match in event.matches]
 
-                if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, event_dict, 60 * 60)
+                if tba_config.CONFIG["memcache"]:
+                    memcache.set(memcache_key, event_dict, 60 * 60)
         return event_dict
 
 
@@ -111,7 +113,8 @@ class ApiHelper(object):
                 event_dict["team_wlt"] = EventHelper.getTeamWLT(team_dict["key"], event)
 
             #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
-            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, event_list, 2592000)
+            if tba_config.CONFIG["memcache"]:
+                memcache.set(memcache_key, event_list, 2592000)
 
         team_dict["events"] = event_list
         return team_dict
@@ -146,7 +149,8 @@ class ApiHelper(object):
                 matches_list.append(match_dict)
 
             #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
-            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, matches_list, 2592000)
+            if tba_config.CONFIG["memcache"]:
+                memcache.set(memcache_key, matches_list, 2592000)
 
         team_dict["matches"] = matches_list
         return team_dict
@@ -171,6 +175,7 @@ class ApiHelper(object):
             match_dict["team_keys"] = match.team_key_names
             match_dict["alliances"] = json.loads(match.alliances_json)
 
-            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, match_dict, (2 * (60 * 60)) )
+            if tba_config.CONFIG["memcache"]:
+                memcache.set(memcache_key, match_dict, (2 * (60 * 60)) )
 
         return match_dict

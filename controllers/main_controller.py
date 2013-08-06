@@ -23,7 +23,8 @@ def render_static(page):
     if html is None:
         path = os.path.join(os.path.dirname(__file__), "../templates/%s.html" % page)
         html = template.render(path, {})
-        if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
+        if tba_config.CONFIG["memcache"]:
+            memcache.set(memcache_key, html, 86400)
 
     return html
 

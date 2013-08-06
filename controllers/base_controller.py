@@ -46,7 +46,8 @@ class CacheableHandler(webapp2.RequestHandler):
         raise NotImplementedError("No _render method.")
 
     def _write_cache(self, content):
-        if tba_config.CONFIG["memcache"]: memcache.set(self.cache_key, content, self._cache_expiration)
+        if tba_config.CONFIG["memcache"]:
+            memcache.set(self.cache_key, content, self._cache_expiration)
 
 
 class LoggedInHandler(webapp2.RequestHandler):
