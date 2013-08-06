@@ -13,6 +13,7 @@ from google.appengine.api import urlfetch
 
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.event_team_repairer import EventTeamRepairer
+from helpers.event_team_updater import EventTeamUpdater
 
 from helpers.insight_manipulator import InsightManipulator
 from helpers.team_manipulator import TeamManipulator
@@ -53,63 +54,35 @@ class EventTeamRepairDo(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), '../templates/math/eventteam_repair_do.html')
         self.response.out.write(template.render(path, template_values))
 
+
 class EventTeamUpdate(webapp.RequestHandler):
     """
     Task that adds to the EventTeam index for an Event from Matches.
-    Can only update or delete EventTeams for unregistered teams. <-- Does it actually do this? Eugene -- 2013/07/30
+    Can only update or delete EventTeams for unregistered teams.
+    ^^^ Does it actually do this? Eugene -- 2013/07/30
     Removes EventTeams for teams that haven't played any matches.
     """
     def get(self, event_key):
-        event = Event.get_by_id(event_key)
-        team_ids = set()
+        teams, event_teams, et_keys_to_del = EventTeamUpdater.update(event_key)
 
-        # Existing EventTeams
-        existing_event_teams_keys = EventTeam.query(EventTeam.event == event.key).fetch(1000, keys_only=True)
-        existing_event_teams = ndb.get_multi(existing_event_teams_keys)
-        existing_team_ids = set()
-        for et in existing_event_teams:
-            existing_team_ids.add(et.team.id())
-
-        # Add teams from Matches
-        match_keys = Match.query(Match.event == event.key).fetch(1000, keys_only=True)
-        matches = ndb.get_multi(match_keys)
-        for match in matches:
-            for team in match.team_key_names:
-                team_ids.add(team)
-
-        # Delete EventTeams for teams who did not participate in the event
-        # Only runs if event is over
-        et_keys_to_delete = set()
-        if event.end_date < datetime.datetime.now():
-            for team_id in existing_team_ids.difference(team_ids):
-                et_key_name = "{}_{}".format(event.key_name, team_id)
-                et_keys_to_delete.add(ndb.Key(EventTeam, et_key_name))
-            ndb.delete_multi(et_keys_to_delete)
-
-        # Create or update EventTeams
-        teams = TeamManipulator.createOrUpdate([Team(
-            id = team_id,
-            team_number = int(team_id[3:]))
-            for team_id in team_ids])
+        teams = TeamManipulator.createOrUpdate(teams)
 
         if teams:
-            event_teams = EventTeamManipulator.createOrUpdate([EventTeam(
-                id = event_key + "_" + team.key.id(),
-                event = event.key,
-                team = team.key,
-                year = event.year)
-                for team in teams])
-        else:
-            event_teams = None
-        
+            event_teams = EventTeamManipulator.createOrUpdate(event_teams)
+
+        if et_keys_to_del:
+            ndb.delete_multi(et_keys_to_del)
+
         template_values = {
             'event_teams': event_teams,
-            'deleted_event_teams_keys': et_keys_to_delete
+            'deleted_event_teams_keys': et_keys_to_del
         }
-        
-        path = os.path.join(os.path.dirname(__file__), '../templates/math/eventteam_update_do.html')
+
+        path = os.path.join(os.path.dirname(__file__),
+                            '../templates/math/eventteam_update_do.html')
         self.response.out.write(template.render(path, template_values))
-        
+
+
 class EventTeamUpdateEnqueue(webapp.RequestHandler):
     """
     Handles enqueing building attendance for Events.
