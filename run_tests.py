@@ -1,6 +1,8 @@
 #!/usr/bin/python
 import optparse
 import sys
+import warnings
+
 # Install the Python unittest2 package before you run this script.
 import unittest2
 
@@ -29,7 +31,7 @@ if __name__ == '__main__':
     parser = optparse.OptionParser(USAGE)
     options, args = parser.parse_args()
     if len(args) < 1:
-        print 'Warning: Trying default SDK path.'
+        warnings.warn('Trying default SDK path.', RuntimeWarning)
         sdk_path = "/usr/local/google_appengine"
     else:
         sdk_path = args[0]
