@@ -76,7 +76,7 @@ class AwardHelper(object):
         awards['list'] = list()
         defined_set = set()
         for item in sortOrder:
-            if awards.has_key(item):
+            if item in awards:
                 awards['list'].append(awards[item])
                 defined_set.add(item)
 
