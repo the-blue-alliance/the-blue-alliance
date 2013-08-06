@@ -68,7 +68,7 @@ class UsfirstEventDetailsParser(ParserBase):
         FIRST date strings look like "01-Apr to 03-Apr-2010" or "09-Mar-2005".
         """
         month_dict = {"Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6,
-            "Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12}
+                      "Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12}
 
         # "01-Apr to 03-Apr-2010"
         # or "09-Mar-2005"

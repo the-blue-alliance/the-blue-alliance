@@ -17,7 +17,7 @@ class TbaVideosParser(ParserBase):
         information. Returns a list of TBAVideos
         """
         soup = BeautifulSoup(html,
-                convertEntities=BeautifulSoup.HTML_ENTITIES)
+                             convertEntities=BeautifulSoup.HTML_ENTITIES)
 
         videos = dict()
 

@@ -137,7 +137,7 @@ def main():
             matches.append(new_match)
 
     matchWriter = csv.writer(open(options.output_file, 'wb'), delimiter=',',
-        quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                             quotechar='"', quoting=csv.QUOTE_MINIMAL)
     matchWriter.writerow(["key", "event", "game", "comp_level", "set_number", "match_number", "team_key_names", "alliances_json", "no_auto_update"])
     for match in matches:
         matchWriter.writerow([match["key"], match["event"], match["game"], match["comp_level"], match["set_number"], match["match_number"], match["team_key_names"], match["alliances_json"], match["no_auto_update"]])

@@ -14,7 +14,7 @@ class UsfirstMatchesParser(ParserBase):
         """
         matches = list()
         soup = BeautifulSoup(html,
-                convertEntities=BeautifulSoup.HTML_ENTITIES)
+                             convertEntities=BeautifulSoup.HTML_ENTITIES)
 
         tables = soup.findAll('table')
 

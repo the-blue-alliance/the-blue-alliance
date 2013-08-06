@@ -24,7 +24,7 @@ class UsfirstEventListParser(ParserBase):
         """
         events = list()
         soup = BeautifulSoup(html,
-                convertEntities=BeautifulSoup.HTML_ENTITIES)
+                             convertEntities=BeautifulSoup.HTML_ENTITIES)
 
         for tr in soup.findAll('tr'):  # Events are in table rows
             event = dict()

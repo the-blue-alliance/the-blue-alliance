@@ -143,7 +143,7 @@ class Match(ndb.Model):
             return self.event_key_name + '_qm' + str(self.match_number)
         else:
             return (self.event_key_name + '_' + self.comp_level +
-                str(self.set_number) + 'm' + str(self.match_number))
+                    str(self.set_number) + 'm' + str(self.match_number))
 
     @property
     def has_been_played(self):

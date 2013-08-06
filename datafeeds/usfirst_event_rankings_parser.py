@@ -13,7 +13,7 @@ class UsfirstEventRankingsParser(ParserBase):
         Parse the rankings from USFIRST.
         """
         soup = BeautifulSoup(html,
-                convertEntities=BeautifulSoup.HTML_ENTITIES)
+                             convertEntities=BeautifulSoup.HTML_ENTITIES)
 
         rankings = []
         tables = soup.findAll('table')

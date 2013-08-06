@@ -20,7 +20,7 @@ class FmsEventListParser(ParserBase):
         """
         events = list()
         soup = BeautifulSoup(html,
-                convertEntities=BeautifulSoup.HTML_ENTITIES)
+                             convertEntities=BeautifulSoup.HTML_ENTITIES)
 
         for title in soup.findAll('title'):
             if "FRC Team/Event List" not in title.string:

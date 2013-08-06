@@ -32,4 +32,4 @@ class FirebasePusher(object):
                       method='POST',
                       queue_name='firebase',
                       payload=json.dumps({'key': 'events/{}'.format(event.key_name),
-                              'data': payload_data}))
+                                          'data': payload_data}))

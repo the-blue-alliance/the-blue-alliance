@@ -83,7 +83,7 @@ class DatafeedUsfirst(DatafeedBase):
 
     def getEventRankings(self, event):
         url = self.EVENT_RANKINGS_URL_PATTERN % (event.year,
-            self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
+                                                 self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
         return self.parse(url, UsfirstEventRankingsParser)
 
     def getEventAwards(self, event):
@@ -96,7 +96,7 @@ class DatafeedUsfirst(DatafeedBase):
                 return None
 
         url = self.EVENT_AWARDS_URL_PATTERN % (event.year,
-            self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
+                                               self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
         awards, _ = self.parse(url, UsfirstEventAwardsParser)
 
         return [Award(
@@ -142,7 +142,7 @@ class DatafeedUsfirst(DatafeedBase):
 
     def getMatches(self, event):
         url = self.MATCH_RESULTS_URL_PATTERN % (event.year,
-            self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
+                                                self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
         matches, _ = self.parse(url, UsfirstMatchesParser)
 
         return [Match(

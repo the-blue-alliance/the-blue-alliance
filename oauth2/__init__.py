@@ -172,7 +172,7 @@ class Token(object):
             else:
                 query = 'oauth_verifier=%s' % self.verifier
             return urlparse.urlunparse((scheme, netloc, path, params,
-                query, fragment))
+                                        query, fragment))
         return self.callback
 
     def to_string(self):
@@ -212,7 +212,7 @@ class Token(object):
             secret = params['oauth_token_secret'][0]
         except Exception:
             raise ValueError("'oauth_token_secret' not found in "
-                "OAuth request.")
+                             "OAuth request.")
 
         token = Token(key, secret)
         try:
@@ -364,7 +364,7 @@ class Request(dict):
 
     @classmethod
     def from_request(cls, http_method, http_url, headers=None, parameters=None,
-            query_string=None):
+                     query_string=None):
         """Combines multiple parameter sources."""
         if parameters is None:
             parameters = {}
@@ -381,7 +381,7 @@ class Request(dict):
                     parameters.update(header_params)
                 except:
                     raise Error('Unable to parse OAuth parameters from '
-                        'Authorization header.')
+                                'Authorization header.')
 
         # GET or POST query string.
         if query_string:
@@ -400,7 +400,7 @@ class Request(dict):
 
     @classmethod
     def from_consumer_and_token(cls, consumer, token=None,
-            http_method=HTTP_METHOD, http_url=None, parameters=None):
+                                http_method=HTTP_METHOD, http_url=None, parameters=None):
         if not parameters:
             parameters = {}
 
@@ -421,7 +421,7 @@ class Request(dict):
 
     @classmethod
     def from_token_and_callback(cls, token, callback=None,
-        http_method=HTTP_METHOD, http_url=None, parameters=None):
+                                http_method=HTTP_METHOD, http_url=None, parameters=None):
 
         if not parameters:
             parameters = {}
@@ -539,7 +539,7 @@ class Server(object):
             key, base = signature_method.signing_base(request, consumer, token)
 
             raise Error('Invalid signature. Expected signature base '
-                'string: %s' % base)
+                        'string: %s' % base)
 
         built = signature_method.sign(request, consumer, token)
 
@@ -550,14 +550,14 @@ class Server(object):
         lapsed = now - timestamp
         if lapsed > self.timestamp_threshold:
             raise Error('Expired timestamp: given %d and now %s has a '
-                'greater difference than threshold %d' % (timestamp, now, self.timestamp_threshold))
+                        'greater difference than threshold %d' % (timestamp, now, self.timestamp_threshold))
 
 
 class Client(httplib2.Http):
     """OAuthClient is a worker to attempt to execute a request."""
 
     def __init__(self, consumer, token=None, cache=None, timeout=None,
-        proxy_info=None):
+                 proxy_info=None):
 
         if consumer is not None and not isinstance(consumer, Consumer):
             raise ValueError("Invalid consumer.")
@@ -570,7 +570,7 @@ class Client(httplib2.Http):
         self.method = SignatureMethod_HMAC_SHA1()
 
         httplib2.Http.__init__(self, cache=cache, timeout=timeout,
-            proxy_info=proxy_info)
+                               proxy_info=proxy_info)
 
     def set_signature_method(self, method):
         if not isinstance(method, SignatureMethod):
@@ -579,8 +579,8 @@ class Client(httplib2.Http):
         self.method = method
 
     def request(self, uri, method="GET", body=None, headers=None,
-        redirections=httplib2.DEFAULT_MAX_REDIRECTS, connection_type=None,
-        force_auth_header=False):
+                redirections=httplib2.DEFAULT_MAX_REDIRECTS, connection_type=None,
+                force_auth_header=False):
 
         if not isinstance(headers, dict):
             headers = {}
@@ -594,7 +594,7 @@ class Client(httplib2.Http):
             parameters = None
 
         req = Request.from_consumer_and_token(self.consumer, token=self.token,
-            http_method=method, http_url=uri, parameters=parameters)
+                                              http_method=method, http_url=uri, parameters=parameters)
 
         req.sign_request(self.method, self.consumer, self.token)
 
@@ -617,8 +617,8 @@ class Client(httplib2.Http):
                 headers.update(req.to_header())
 
         return httplib2.Http.request(self, uri, method=method, body=body,
-            headers=headers, redirections=redirections,
-            connection_type=connection_type)
+                                     headers=headers, redirections=redirections,
+                                     connection_type=connection_type)
 
 
 class SignatureMethod(object):

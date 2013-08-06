@@ -13,7 +13,7 @@ class MatchSuggestionAccepter(object):
             return None
 
         matches = map(lambda match_future: match_future.get_result(),
-            [Match.get_by_id_async(suggestion.target_key) for suggestion in suggestions])
+                      [Match.get_by_id_async(suggestion.target_key) for suggestion in suggestions])
 
         pairs = zip(matches, suggestions)
 

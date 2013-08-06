@@ -30,7 +30,7 @@ class UsfirstTeamDetailsParser(ParserBase):
 
         team = dict()
         soup = BeautifulSoup(html,
-                convertEntities=BeautifulSoup.HTML_ENTITIES)
+                             convertEntities=BeautifulSoup.HTML_ENTITIES)
 
         page_title = soup.find('h1', {'id': 'thepagetitle'}).text
         team['team_number'] = int(re.search(team_num_re, page_title).group(1).strip())
