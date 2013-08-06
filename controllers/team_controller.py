@@ -193,7 +193,7 @@ class TeamDetail(CacheableHandler):
                         team_rank = element[0]
                         break
 
-            participation.append({ 'event': e,
+            participation.append({'event': e,
                                    'matches': matches_organized,
                                    'wlt': display_wlt,
                                    'rank': team_rank,
@@ -207,7 +207,7 @@ class TeamDetail(CacheableHandler):
         if year_wlt["win"] + year_wlt["loss"] + year_wlt["tie"] == 0:
             year_wlt = None
 
-        template_values = { "explicit_year": explicit_year,
+        template_values = {"explicit_year": explicit_year,
                             "team": team,
                             "participation": participation,
                             "year": year,
