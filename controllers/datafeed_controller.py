@@ -359,7 +359,7 @@ class UsfirstTeamDetailsEnqueue(webapp.RequestHandler):
                 method='GET')
 
         # FIXME omg we're just writing out? -gregmarra 2012 Aug 26
-        self.response.out.write("%s team gets have been enqueued offset from %s.<br />" %(len(teams), offset))
+        self.response.out.write("%s team gets have been enqueued offset from %s.<br />" % (len(teams), offset))
         self.response.out.write("Reload with ?offset=%s to enqueue more." % (offset + len(teams)))
 
 

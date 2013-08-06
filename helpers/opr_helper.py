@@ -119,7 +119,7 @@ class OprHelper(object):
         """
         for i,row in enumerate(OprHelper.data):
             for j in range(2,7):
-                if OprHelper.data[i][j]==team:
+                if OprHelper.data[i][j] == team:
                     return True
         return False
 
@@ -127,7 +127,7 @@ class OprHelper(object):
     def getTeamID(self,num):
         # returns the matrix column index associated with a team number
         for ident, row in enumerate(OprHelper.teamdata):
-            if(row[1]==num):
+            if(row[1] == num):
                 return ident
 
     @classmethod
@@ -135,7 +135,7 @@ class OprHelper(object):
         # puts a 1 in a row of M for each team on an alliance
         i = 0
         OprHelper.M = OprHelper.zeros(2*len(OprHelper.data),len(OprHelper.teamdata))
-        while (i)<2*len(OprHelper.data):
+        while (i) < 2*len(OprHelper.data):
             OprHelper.M[i][OprHelper.getTeamID(OprHelper.data[i/2][2])] = 1
             OprHelper.M[i][OprHelper.getTeamID(OprHelper.data[i/2][3])] = 1
             OprHelper.M[i][OprHelper.getTeamID(OprHelper.data[i/2][4])] = 1
@@ -152,7 +152,7 @@ class OprHelper(object):
         # gets each alliance's score for each match
         i = 0
         s = [[0] for row in range(2*len(OprHelper.data))]
-        while i<2*len(OprHelper.data):
+        while i < 2*len(OprHelper.data):
             s[i][0] = (OprHelper.data[i/2][0])
             i += 1
             s[i][0] = (OprHelper.data[i/2][1])
@@ -169,7 +169,7 @@ class OprHelper(object):
         t = OprHelper.zeros(num, num)
         for i in range(num):
             S = sum([(t[i][k])**2 for k in range(1,i-1)])
-            d = A[i][i] -S
+            d = A[i][i] - S
             if abs(d) < ztol:
                t[i][i] = 0.0
             else:
