@@ -21,7 +21,7 @@ def main(sdk_path, test_pattern):
     suite = unittest2.loader.TestLoader().discover("tests", test_pattern)
     tests = unittest2.TextTestRunner(verbosity=2).run(suite)
 
-    if tests.wasSuccessful() == True:
+    if tests.wasSuccessful() is True:
         sys.exit(0)
     else:
         sys.exit(1)
