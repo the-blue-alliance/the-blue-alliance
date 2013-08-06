@@ -79,7 +79,7 @@ def legal_teams(teams):
 def build_new_match(old_match):
     """Build a new match."""
     match = dict()
-    match["event"] =  old_match["year"] + old_match["eventshort"]
+    match["event"] = old_match["year"] + old_match["eventshort"]
     try:
         match["comp_level"] = COMPLEVELS[int(old_match["complevel"])]
     except Exception as e:

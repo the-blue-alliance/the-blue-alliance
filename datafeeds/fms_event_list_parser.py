@@ -50,7 +50,7 @@ class FmsEventListParser(ParserBase):
     def splitDate(self, date):
         try:
             (year, month, day) = date.split("-")
-            date =  datetime.datetime(int(year), int(month), int(day))
+            date = datetime.datetime(int(year), int(month), int(day))
             return date
         except Exception, e:
             return None

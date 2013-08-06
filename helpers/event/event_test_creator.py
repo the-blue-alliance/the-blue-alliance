@@ -65,7 +65,7 @@ class EventTestCreator(object):
             venue_address = "123 Fake Street, California, USA",
             website = "http://www.google.com"
         )
-        event =  EventManipulator.createOrUpdate(event)
+        event = EventManipulator.createOrUpdate(event)
         if not only_event:
             EventTeamTestCreator.createEventTeams(event)
             mtc = MatchTestCreator(event)
