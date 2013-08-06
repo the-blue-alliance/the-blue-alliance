@@ -189,8 +189,8 @@ class TeamDetail(CacheableHandler):
                         team_rank = element[0]
                         break
 
-            participation.append({ 'event' : e,
-                                   'matches' : matches_organized,
+            participation.append({ 'event': e,
+                                   'matches': matches_organized,
                                    'wlt': display_wlt,
                                    'rank': team_rank,
                                    'awards': event_awards })

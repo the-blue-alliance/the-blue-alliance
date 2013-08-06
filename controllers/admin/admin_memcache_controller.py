@@ -24,7 +24,7 @@ class AdminMemcacheMain(LoggedInHandler):
             flushed.append(self.request.get("memcache_key"))
 
         self.template_values.update({
-            "flushed" : flushed,
+            "flushed": flushed,
             "memcache_stats": memcache.get_stats(),
         })
 
