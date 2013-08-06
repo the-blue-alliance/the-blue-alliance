@@ -28,7 +28,6 @@ class TestUsfirstMatchesParser(unittest2.TestCase):
         self.assertEqual(match["team_key_names"], ['frc1', 'frc2', 'frc3', 'frc4', 'frc5', 'frc6'])
         self.assertEqual(match["alliances_json"], """{"blue": {"score": 8, "teams": ["frc4", "frc5", "frc6"]}, "red": {"score": 7, "teams": ["frc1", "frc2", "frc3"]}}""")
 
-
         match = matches[3]
         self.assertEqual(match["comp_level"], "sf")
         self.assertEqual(match["set_number"], 2)

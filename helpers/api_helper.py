@@ -56,7 +56,6 @@ class ApiHelper(object):
 
         return team_dict
 
-
     @classmethod
     def getEventInfo(self, event_key):
         """
@@ -94,7 +93,6 @@ class ApiHelper(object):
                 if tba_config.CONFIG["memcache"]:
                     memcache.set(memcache_key, event_dict, 60 * 60)
         return event_dict
-
 
     @classmethod
     def addTeamEvents(self, team_dict, year):

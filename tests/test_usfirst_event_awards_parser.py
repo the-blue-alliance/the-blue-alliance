@@ -89,7 +89,6 @@ class TestUsfirstEventAwardsParser(unittest2.TestCase):
         self.assertEqual(awards[28]['awardee'], None)
         self.assertEqual(awards[28]['name'], 'ca1')
 
-
         self.assertEqual(awards[27]['official_name'], "State Championship Chairman's Award")
         self.assertEqual(awards[27]['team_number'], 27)
         self.assertEqual(awards[27]['awardee'], None)
@@ -118,7 +117,6 @@ class TestUsfirstEventAwardsParser(unittest2.TestCase):
         self.assertEqual(awards[1]['team_number'], 503)
         self.assertEqual(awards[1]['awardee'], None)
         self.assertEqual(awards[1]['name'], 'ca1')
-
 
         self.assertEqual(awards[2]['official_name'], "Regional Chairman's Award")
         self.assertEqual(awards[2]['team_number'], 27)

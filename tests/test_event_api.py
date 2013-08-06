@@ -43,7 +43,6 @@ class TestApiEventList(unittest2.TestCase):
         )
         self.event.put()
 
-
     def tearDown(self):
         self.testbed.deactivate()
 
@@ -115,7 +114,6 @@ class TestApiMatchDetails(unittest2.TestCase):
 
         #FIXME: urgh. strings. - brandondean 10/21/2012
         #self.assertEqual(match_dict["alliances"], self.match_json)
-
 
     def testMatchDetails(self):
         response = self.testapp.get("/?match=2010cmp_f1m1")

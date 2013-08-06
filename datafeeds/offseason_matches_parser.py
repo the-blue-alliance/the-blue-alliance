@@ -72,7 +72,6 @@ class OffseasonMatchesParser(ParserBase):
 
         return match
 
-
     @classmethod
     def parseMatchNumberInfo(self, string):
         string = string.strip()

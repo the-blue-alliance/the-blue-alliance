@@ -131,8 +131,6 @@ class ApiEventDetails(MainApiHandler):
             self.response.out.write(json.dumps(error_message))
             return False
 
-
-
         event_dict = ApiHelper.getEventInfo(event_key)
 
         self.response.out.write(json.dumps(event_dict))
