@@ -35,7 +35,7 @@ class ApiHelper(object):
                 team_dict["website"] = team.website
                 team_dict["location"] = team.location
 
-                event_teams = EventTeam.query(EventTeam.team == team.key,\
+                event_teams = EventTeam.query(EventTeam.team == team.key,
                                               EventTeam.year == datetime.now().year)\
                                               .fetch(1000, projection=[EventTeam.event])
                 team_dict["events"] = [event_team.event.id() for event_team in event_teams]
