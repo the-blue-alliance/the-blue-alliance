@@ -48,7 +48,7 @@ class TestMatchSuggestionAccepter(unittest2.TestCase):
             youtube_videos = ["abcdef"]
         )
         self.match.put()
-        
+
     def tearDown(self):
         self.testbed.deactivate()
 

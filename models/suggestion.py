@@ -14,7 +14,7 @@ class Suggestion(ndb.Model):
     REVIEW_ACCEPTED = 1
     REVIEW_PENDING = 0
     REVIEW_REJECTED = -1
-    
+
     review_state = ndb.IntegerProperty(default=0)
     reviewed_at = ndb.DateTimeProperty()
     reviewer = ndb.KeyProperty(kind=Account)
@@ -22,7 +22,7 @@ class Suggestion(ndb.Model):
     contents_json = ndb.StringProperty(indexed=False) #a json blob
     target_key = ndb.StringProperty(required=True) # "2012cmp"
     target_model = ndb.StringProperty(choices=MODELS, required=True) # "event"
-    
+
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 

@@ -24,7 +24,7 @@ class TeamHelper(object):
 
 
 class TeamTpidHelper(object):
-    
+
     # Separates tpids on the FIRST list of all teams.
     teamRe = re.compile(r'tpid=[A-Za-z0-9=&;\-:]*?"><b>\d+')
     # Extracts the team number from the team result.
@@ -33,31 +33,31 @@ class TeamTpidHelper(object):
     tpidRe = re.compile(r'\d+')
     # Extracts the link to the next page of results on the FIRST list of all teams.
     lastPageRe = re.compile(r'Next ->')
-    
+
     TPID_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=searchresults&programs=FRC&reports=teams&sort_teams=number&results_size=250&omit_searchform=1&season_FRC=%s&skip_teams=%s"
-    
+
     @classmethod
     def scrapeTpids(self, skip, year):
       """
       Searches the FIRST list of all teams for tpids, writing in the datastore.
       Also creates new Team objects.
-      
+
       This code is modified from Pat Fairbank's frclinks source and modified
       to fit in the TBA framework. He has given us permission to borrow
       his code.
       """
       while 1:
         logging.info("Fetching 250 teams based on %s data, skipping %s" % (year, skip))
-        
+
         tpids_dict = dict()
-        
+
         teamList = urlfetch.fetch(self.TPID_URL_PATTERN % (year, skip), deadline=10)
         teamResults = self.teamRe.findall(teamList.content)
-        
+
         for teamResult in teamResults:
           teamNumber = self.teamNumberRe.findall(teamResult)[0]
           teamTpid = self.tpidRe.findall(teamResult)[0]
-          
+
           logging.info("Team %s TPID was %s in year %s." % (teamNumber, teamTpid, year))
           tpids_dict[teamNumber] = teamTpid
 
@@ -68,13 +68,13 @@ class TeamTpidHelper(object):
               id = "frc" + str(team_number)
             )
         for team_number in tpids_dict]
-        
+
         TeamManipulator.createOrUpdate(teams)
         skip = int(skip) + 250
-        
+
         # Handle degenerate cases.
         if skip > 10000:
           return None
-        
+
         if len(self.lastPageRe.findall(teamList.content)) == 0:
           return None

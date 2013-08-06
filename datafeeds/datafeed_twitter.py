@@ -19,12 +19,12 @@ class DatafeedTwitter(DatafeedBase):
         the key is the event_short and the value is a list of strings
         in the following CSV format:
         match_id, red1, red2, red3, blue1, blue2, blue3, red score, blue score
-        
+
         """
         toReturn = {}
-        
+
         max_id = None
-        
+
         tweets = self.getSomeTweets(max_id)
         while tweets:
             for tweet in tweets:
@@ -36,14 +36,14 @@ class DatafeedTwitter(DatafeedBase):
                 max_id = tweet['id'] - 1
             tweets = self.getSomeTweets(max_id)
         return toReturn
-        
+
     def getSomeTweets(self, max_id=None):
         URL = 'https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=frcfms&count=200'
         if max_id:
             return json.loads(self.oauth_req(URL + '&max_id=' + str(max_id)))
         else:
             return json.loads(self.oauth_req(URL))
-        
+
     def oauth_req(self, url, http_method="GET", post_body=None,
                   http_headers=None):
 
@@ -59,7 +59,7 @@ class DatafeedTwitter(DatafeedBase):
         consumer = oauth2.Consumer(key=TWITTER_CONSUMER_KEY, secret=TWITTER_CONSUMER_SECRET)
         token = oauth2.Token(key=TWITTER_ACCESS_TOKEN, secret=TWITTER_ACCESS_TOKEN_SECRET)
         client = oauth2.Client(consumer, token)
-     
+
         resp, content = client.request(
             url,
             method=http_method,
@@ -68,4 +68,3 @@ class DatafeedTwitter(DatafeedBase):
             force_auth_header=True
         )
         return content
-        

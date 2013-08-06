@@ -14,16 +14,16 @@ class AdminSuggestionsReviewController(LoggedInHandler):
     """
     def get(self):
         self._require_admin()
-        
+
         suggestions = Suggestion.query().filter(Suggestion.review_state == Suggestion.REVIEW_PENDING)
 
         self.template_values.update({
             "suggestions": suggestions,
         })
-        
+
         path = os.path.join(os.path.dirname(__file__), '../../../templates/admin/suggestion_list.html')
         self.response.out.write(template.render(path, self.template_values))
-        
+
     def post(self):
         self._require_admin()
 

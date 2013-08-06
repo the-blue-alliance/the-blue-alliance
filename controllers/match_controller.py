@@ -30,7 +30,7 @@ class MatchDetail(CacheableHandler):
 
         self._cache_key = self._cache_key.format(match_key)
         super(MatchDetail, self).get(match_key)
-    
+
     def _render(self, match_key):
         try:
             match_future = Match.get_by_id_async(match_key)
@@ -42,7 +42,7 @@ class MatchDetail(CacheableHandler):
 
         if not match:
             return self.redirect("/error/404")
-        
+
         template_values = {
             "event": event,
             "match": match,
@@ -50,6 +50,6 @@ class MatchDetail(CacheableHandler):
 
         if event.within_a_day:
             self._cache_expiration = self.SHORT_CACHE_EXPIRATION
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/match_details.html')
         return template.render(path, template_values)

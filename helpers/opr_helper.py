@@ -72,7 +72,7 @@ class OprHelper(object):
 
     @classmethod
     def getData(self,event):
-        # TODO: This doesn't seem like it would support older matches with 2v2 games -gregmarra 8 Mar 2012 
+        # TODO: This doesn't seem like it would support older matches with 2v2 games -gregmarra 8 Mar 2012
         num = 0
         for match in Match.query(Match.event == event.key).fetch(500):
             if len(match.alliances > 0):
@@ -93,7 +93,7 @@ class OprHelper(object):
         #reader = csv.reader(open(file,"rb"))
         event_teams = EventTeam.query(EventTeam.event == event.key).fetch(500)
         team_keys = [event_team.team for event_team in event_teams]
-        
+
         for num, team_key in enumerate(team_keys):
             OprHelper.teamdata.append([])
             OprHelper.teamdata[num].append(num) #teamid
@@ -141,7 +141,7 @@ class OprHelper(object):
             OprHelper.M[i][OprHelper.getTeamID(OprHelper.data[i/2][4])] = 1
 
             i += 1
-                
+
             OprHelper.M[i][OprHelper.getTeamID(OprHelper.data[i/2][5])] = 1
             OprHelper.M[i][OprHelper.getTeamID(OprHelper.data[i/2][6])] = 1
             OprHelper.M[i][OprHelper.getTeamID(OprHelper.data[i/2][7])] = 1
@@ -172,7 +172,7 @@ class OprHelper(object):
             d = A[i][i] -S
             if abs(d) < ztol:
                t[i][i] = 0.0
-            else: 
+            else:
                if d < 0.0:
                   raise ValueError, "Matrix not positive-definite"
                t[i][i] = sqrt(d)
@@ -211,14 +211,14 @@ class OprHelper(object):
 
         y = [[0] for row in range(len(b))]
         x = [[0] for row in range(len(b))]
-        
+
         # Forward elimination Ly = b
         for i in range(len(b)):
             y[i][0] = b[i][0]
             for j in range(i):
                 y[i][0] -= L[i][j]*y[j][0]
             y[i][0] /= float(L[i][i])
-            
+
         # Backward substitution Ux = y
         for i in range(len(y)-1,-1,-1):
             x[i][0] = y[i][0]
@@ -230,11 +230,11 @@ class OprHelper(object):
     @classmethod
     def opr(self,event_key):
         OprHelper.reset()
-        
+
         event = Event.get_by_id(event_key)
         OprHelper.getTeamData(event)
         OprHelper.getData(event)
-        
+
         OprHelper.teamdata = OprHelper.teamsPlayed()
         OprHelper.getM()
         s = OprHelper.gets()
@@ -250,9 +250,9 @@ class OprHelper(object):
         teams = OprHelper.zeros(len(OprHelper.teamdata),1)
         for num, blah in enumerate(list(temp)):
             teams[num] = temp[num][1]
-        
+
         return OPR, teams
-        
+
 #if __name__ == "__main__":
 #    start = clock()
 #    instance = opr()

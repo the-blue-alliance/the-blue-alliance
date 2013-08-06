@@ -24,7 +24,7 @@ class UsfirstEventListParser(ParserBase):
         events = list()
         soup = BeautifulSoup(html,
                 convertEntities=BeautifulSoup.HTML_ENTITIES)
-        
+
         for tr in soup.findAll('tr'): #Events are in table rows
             event = dict()
             try:
@@ -34,7 +34,7 @@ class UsfirstEventListParser(ParserBase):
                 event["name"] = ''.join(tds[1].a.findAll(text=True)).strip() #<em>s in event names fix
                 #event.venue = unicode(tds[2].string)
                 #event.location = unicode(tds[3].string)
-                
+
                 #try:
                 #    event_dates = str(tds[4].string).strip()
                 #    event.start_date, event.stop_date = self.parseEventDates(event_dates)
@@ -47,5 +47,5 @@ class UsfirstEventListParser(ParserBase):
 
             except Exception, detail:
                 logging.info('Event parsing failed: ' + str(detail))
-            
+
         return events, False

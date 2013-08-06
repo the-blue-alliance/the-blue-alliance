@@ -42,12 +42,12 @@ class TestEventTeamRepairer(unittest2.TestCase):
         team.put()
 
         event_team = EventTeam(
-            id = "%s_%s" % (event.key.id(), team.key.id()), 
+            id = "%s_%s" % (event.key.id(), team.key.id()),
             event = event.key,
             team = team.key,
             year = None)
         event_team.put()
-        
+
     def tearDown(self):
         self.testbed.deactivate()
 

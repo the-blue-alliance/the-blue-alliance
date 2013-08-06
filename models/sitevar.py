@@ -15,14 +15,14 @@ class Sitevar(ndb.Model):
     """
     description = ndb.StringProperty(indexed=False)
     values_json = ndb.StringProperty(indexed=False) #a json blob
-    
+
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
     def __init__(self, *args, **kw):
         self._contents = None
         super(Sitevar, self).__init__(*args, **kw)
-    
+
     @property
     def contents(self):
         """

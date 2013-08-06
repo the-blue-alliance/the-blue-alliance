@@ -13,7 +13,7 @@ class FirebasePusher(object):
                 'set_number': match.set_number,
                 'alliances': match.alliances,
                 'winning_alliance': match.winning_alliance}
-         
+
     @classmethod
     def updateEvent(self, event, last_matches, upcoming_matches):
         last_matches_payload = []
@@ -23,12 +23,12 @@ class FirebasePusher(object):
         upcoming_matches_payload = []
         for match in upcoming_matches:
             upcoming_matches_payload.append(self.match_to_payload_dict(match))
-            
+
         data = {'last_matches': last_matches_payload,
                 'upcoming_matches': upcoming_matches_payload}
         payload_data = json.dumps(data)
-        
-        taskqueue.add(url='/tasks/posts/firebase_push', 
+
+        taskqueue.add(url='/tasks/posts/firebase_push',
                       method='POST',
                       queue_name='firebase',
                       payload=json.dumps({'key': 'events/{}'.format(event.key_name),

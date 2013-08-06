@@ -10,7 +10,7 @@ from controllers.base_controller import LoggedInHandler
 class AdminMain(LoggedInHandler):
     def get(self):
         self._require_admin()
-        
+
         # version info
         try:
             fname = os.path.join(os.path.dirname(__file__), '../../version_info.json')
@@ -26,11 +26,11 @@ class AdminMain(LoggedInHandler):
             self.template_values['commit_author'] = commit_parts[1]
             self.template_values['commit_date'] = commit_parts[2]
             self.template_values['commit_msg'] = commit_parts[3]
-            
+
         except Exception, e:
             logging.warning("version_info.json parsing failed: %s" % e)
             pass
-        
+
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/index.html')
         self.response.out.write(template.render(path, self.template_values))
 

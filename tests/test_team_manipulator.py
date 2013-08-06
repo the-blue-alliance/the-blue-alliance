@@ -25,7 +25,7 @@ class TestTeamManipulator(unittest2.TestCase):
             team_number = 177,
             website = "http://www.bobcatrobotics.org"
         )
-        
+
     def tearDown(self):
         self.testbed.deactivate()
 

@@ -26,7 +26,7 @@ class AdminEventAddWebcast(LoggedInHandler):
     """
     def post(self, event_key_id):
         self._require_admin()
-        
+
         webcast = dict()
         webcast["type"] = self.request.get("webcast_type")
         webcast["channel"] = self.request.get("webcast_channel")
@@ -54,7 +54,7 @@ class AdminEventCreate(LoggedInHandler):
     """
     def get(self):
         self._require_admin()
-        
+
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_create.html')
         self.response.out.write(template.render(path, self.template_values))
 
@@ -65,7 +65,7 @@ class AdminEventCreateTest(LoggedInHandler):
     """
     def get(self):
         self._require_admin()
-        
+
         if tba_config.CONFIG["env"] != "prod":
             EventTestCreator.createPastEvent()
             EventTestCreator.createFutureEvent()
@@ -83,7 +83,7 @@ class AdminEventDelete(LoggedInHandler):
     """
     def get(self, event_key_id):
         self._require_admin()
-        
+
         event = Event.get_by_id(event_key_id)
 
         self.template_values.update({
@@ -95,14 +95,14 @@ class AdminEventDelete(LoggedInHandler):
 
     def post(self, event_key_id):
         self._require_admin()
-        
+
         logging.warning("Deleting %s at the request of %s / %s" % (
             event_key_id,
             self.user_bundle.user.user_id(),
             self.user_bundle.user.email()))
 
         event = Event.get_by_id(event_key_id)
-        
+
         matches = Match.query(Match.event == event.key).fetch(5000)
         MatchManipulator.delete(matches)
 
@@ -120,7 +120,7 @@ class AdminEventDetail(LoggedInHandler):
     """
     def get(self, event_key):
         self._require_admin()
-        
+
         event = Event.get_by_id(event_key)
         event.prepAwardsMatchesTeams()
 
@@ -138,29 +138,29 @@ class AdminEventEdit(LoggedInHandler):
     """
     def get(self, event_key):
         self._require_admin()
-        
+
         event = Event.get_by_id(event_key)
-        
+
         self.template_values.update({
             "event": event
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_edit.html')
         self.response.out.write(template.render(path, self.template_values))
-    
+
     def post(self, event_key):
         self._require_admin()
-        
+
         # Note, we don't actually use event_key.
 
-        start_date = None        
+        start_date = None
         if self.request.get("start_date"):
             start_date = datetime.strptime(self.request.get("start_date"), "%Y-%m-%d")
-        
+
         end_date = None
         if self.request.get("end_date"):
             end_date = datetime.strptime(self.request.get("end_date"), "%Y-%m-%d")
-        
+
         event = Event(
             id = str(self.request.get("year")) + str.lower(str(self.request.get("event_short"))),
             end_date = end_date,
@@ -178,7 +178,7 @@ class AdminEventEdit(LoggedInHandler):
             rankings_json = self.request.get("rankings_json"),
         )
         event = EventManipulator.createOrUpdate(event)
-        
+
         self.redirect("/admin/event/" + event.key_name)
 
 
@@ -188,12 +188,12 @@ class AdminEventList(LoggedInHandler):
     """
     def get(self):
         self._require_admin()
-        
+
         events = Event.query().order(Event.year).order(Event.start_date).fetch(10000)
-        
+
         self.template_values.update({
             "events": events,
         })
-        
+
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_list.html')
         self.response.out.write(template.render(path, self.template_values))

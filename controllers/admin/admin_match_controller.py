@@ -20,7 +20,7 @@ class AdminMatchCleanup(LoggedInHandler):
         self._require_admin()
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/matches_cleanup.html')
         self.response.out.write(template.render(path, self.template_values))
-    
+
     def post(self):
         self._require_admin()
         event = Event.get_by_id(self.request.get("event_key_name"))
@@ -31,9 +31,9 @@ class AdminMatchCleanup(LoggedInHandler):
                 if match.key.id() != match.key_name:
                     matches_to_delete.append(match)
                     match_keys_to_delete.append(match.key_name)
-            
+
             ndb.delete_multi(matches_to_delete)
-        
+
         self.template_values.update({
             "match_keys_deleted": match_keys_to_delete,
             "tried_delete": True
@@ -59,7 +59,7 @@ class AdminMatchDelete(LoggedInHandler):
     """
     def get(self, event_key_id):
         self._require_admin()
-        
+
         match = Match.get_by_id(event_key_id)
 
         self.template_values.update({
@@ -71,7 +71,7 @@ class AdminMatchDelete(LoggedInHandler):
 
     def post(self, match_key_id):
         self._require_admin()
-        
+
         logging.warning("Deleting %s at the request of %s / %s" % (
             match_key_id,
             self.user_bundle.user.user_id(),
@@ -79,7 +79,7 @@ class AdminMatchDelete(LoggedInHandler):
 
         match = Match.get_by_id(match_key_id)
         event_key_id = match.event.id()
-        
+
         MatchManipulator.delete(match)
 
         self.redirect("/admin/event/%s?deleted=%s" % (event_key_id, match_key_id))
@@ -92,7 +92,7 @@ class AdminMatchDetail(LoggedInHandler):
     def get(self, match_key):
         self._require_admin()
         match = Match.get_by_id(match_key)
-        
+
         self.template_values.update({
             "match": match
         })
@@ -110,13 +110,13 @@ class AdminMatchAdd(LoggedInHandler):
         event_key = self.request.get('event_key')
         matches_csv = self.request.get('matches_csv')
         matches = OffseasonMatchesParser.parse(matches_csv)
-        
+
         event = Event.get_by_id(event_key)
         matches = [Match(
             id = Match.renderKeyName(
-                event, 
-                match.get("comp_level", None), 
-                match.get("set_number", 0), 
+                event,
+                match.get("comp_level", None),
+                match.get("set_number", 0),
                 match.get("match_number", 0)),
             event = event.key,
             game = Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
@@ -127,9 +127,9 @@ class AdminMatchAdd(LoggedInHandler):
             alliances_json = match.get("alliances_json", None)
             )
             for match in matches]
-        
+
         MatchManipulator.createOrUpdate(matches)
-        
+
         self.redirect('/admin/event/{}'.format(event_key))
 
 
@@ -140,23 +140,23 @@ class AdminMatchEdit(LoggedInHandler):
     def get(self, match_key):
         self._require_admin()
         match = Match.get_by_id(match_key)
-        
+
         self.template_values.update({
             "match": match
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/match_edit.html')
         self.response.out.write(template.render(path, self.template_values))
-    
-    def post(self, match_key):        
+
+    def post(self, match_key):
         self._require_admin()
         alliances_json = self.request.get("alliances_json")
         alliances = json.loads(alliances_json)
         team_key_names = list()
-        
+
         for alliance in alliances:
             team_key_names.extend(alliances[alliance].get('teams', None))
-        
+
         match = Match(
             id = match_key,
             event = Event.get_by_id(self.request.get("event_key_name")).key,
@@ -169,7 +169,7 @@ class AdminMatchEdit(LoggedInHandler):
             #no_auto_update = str(self.request.get("no_auto_update")).lower() == "true", #TODO
         )
         match = MatchManipulator.createOrUpdate(match)
-        
+
         self.redirect("/admin/match/" + match.key_name)
 
 class AdminVideosAdd(LoggedInHandler):
@@ -180,14 +180,14 @@ class AdminVideosAdd(LoggedInHandler):
         self._require_admin()
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/videos_add.html')
         self.response.out.write(template.render(path, self.template_values))
-        
+
     def post(self):
         self._require_admin()
-        
+
         additions = json.loads(self.request.get("youtube_additions_json"))
         match_keys, youtube_videos = zip(*additions["videos"])
         matches = ndb.get_multi([ndb.Key(Match, match_key) for match_key in match_keys])
-        
+
         matches_to_put = []
         results = {"existing": [], "bad_match": [], "added": []}
         for (match, match_key, youtube_video) in zip(matches, match_keys, youtube_videos):
@@ -203,10 +203,10 @@ class AdminVideosAdd(LoggedInHandler):
         ndb.put_multi(matches_to_put)
 
         # TODO use Manipulators -gregmarra 20121006
-        
+
         self.template_values.update({
             "results": results,
         })
-        
+
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/videos_add.html')
         self.response.out.write(template.render(path, self.template_values))

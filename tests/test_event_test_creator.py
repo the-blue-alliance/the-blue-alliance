@@ -20,7 +20,7 @@ class TestEventTeamCreator(unittest2.TestCase):
                  team_number = team_number).put()
 
         self.events = []
-        
+
     def tearDown(self):
         for event in self.events:
             event.key.delete()

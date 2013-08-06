@@ -18,7 +18,7 @@ class Team(ndb.Model):
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
-    
+
     def __init__(self, *args, **kw):
         self._country_name = None
         self._locality = None
@@ -80,8 +80,8 @@ class Team(ndb.Model):
             else:
                 self._location = None
         return self._location
-    
-    @property 
+
+    @property
     def details_url(self):
         return "/team/%s" % self.team_number
 

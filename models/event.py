@@ -40,7 +40,7 @@ class Event(ndb.Model):
         self._teams = None
         self._webcast = None
         super(Event, self).__init__(*args, **kw)
-    
+
     @ndb.tasklet
     def get_awards_async(self):
         from models.award import Award
@@ -100,19 +100,19 @@ class Event(ndb.Model):
         if self._teams is None:
             self.get_teams_async().wait()
         return self._teams
-      
+
     @ndb.toplevel
     def prepAwardsMatchesTeams(self):
         yield self.get_awards_async(), self.get_matches_async(), self.get_teams_async()
-        
+
     @ndb.toplevel
     def prepTeams(self):
         yield self.get_teams_async()
-        
+
     @ndb.toplevel
     def prepTeamsMatches(self):
         yield self.get_matches_async(), self.get_teams_async()
-        
+
     @property
     def rankings(self):
         """
@@ -124,7 +124,7 @@ class Event(ndb.Model):
             except Exception, e:
                 self._rankings = None
         return self._rankings
-    
+
     @property
     def webcast(self):
         """
@@ -143,14 +143,14 @@ class Event(ndb.Model):
         Returns the string of the key_name of the Event object before writing it.
         """
         return str(self.year) + self.event_short
-    
-    @property 
+
+    @property
     def facebook_event_url(self):
         """
         Return a string of the Facebook Event URL.
         """
         return "http://www.facebook.com/event.php?eid=%s" % self.facebook_eid
-    
+
     @property
     def details_url(self):
         """
@@ -186,7 +186,7 @@ class Event(ndb.Model):
         key_name_regex = re.compile(r'^[1-9]\d{3}[a-z]+$')
         match = re.match(key_name_regex, event_key)
         return True if match else False
-      
+
     @property
     def event_type_str(self):
         return EventType.type_names[self.event_type_enum]

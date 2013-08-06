@@ -19,7 +19,7 @@ class TestDatafeedUsfirstTeams(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
-        
+
         self.event = Event(
                 id = "2010sc",
                 name = "Palmetto Regional",
@@ -45,10 +45,10 @@ class TestDatafeedUsfirstTeams(unittest2.TestCase):
             team_key_names = [u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073']
         )
         self.match.put()
-    
+
     def tearDown(self):
         self.testbed.deactivate()
-    
+
     #def test_doEventTeamUpdate(self):
     #    # call EventTeamUpdate with 2010sc
     #    eventteamupdate = EventTeamUpdate()

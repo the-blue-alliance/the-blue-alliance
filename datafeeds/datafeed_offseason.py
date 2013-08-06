@@ -15,9 +15,9 @@ class DatafeedOffseason(DatafeedBase):
 
         return [Match(
             id = Match.renderKeyName(
-                event, 
-                match.get("comp_level", None), 
-                match.get("set_number", 0), 
+                event,
+                match.get("comp_level", None),
+                match.get("set_number", 0),
                 match.get("match_number", 0)),
             event = event.key,
             game = Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),

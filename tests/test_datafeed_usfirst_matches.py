@@ -14,21 +14,21 @@ class TestDatafeedUsfirstMatches(unittest2.TestCase):
         self.testbed.init_urlfetch_stub()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
-        
+
         self.datafeed = DatafeedUsfirst()
-    
+
     def tearDown(self):
         self.testbed.deactivate()
-    
+
     def test_getMatchResultsList(self):
         event = Event(
           id = "2011ct",
           event_short = "ct",
           year = 2011
         )
-        
+
         matches = self.datafeed.getMatches(event)
-        
+
         # Test 2011ct_qm1
         match = matches[0]
         self.assertEqual(match.comp_level, "qm")

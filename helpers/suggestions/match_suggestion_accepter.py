@@ -5,7 +5,7 @@ class MatchSuggestionAccepter(object):
     """
     Handle accepting Match suggestions.
     """
-    
+
     @classmethod
     def accept_suggestions(self, suggestions):
         if (len(suggestions) < 1):
@@ -20,7 +20,7 @@ class MatchSuggestionAccepter(object):
             self._accept_suggestion(match, suggestion)
 
         matches, suggestions = zip(*pairs)
-        
+
         matches = MatchManipulator.createOrUpdate(list(matches))
 
         return matches

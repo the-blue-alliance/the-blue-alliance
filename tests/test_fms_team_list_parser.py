@@ -14,7 +14,7 @@ class TestFmsTeamListParser(unittest2.TestCase):
         self.assertEqual(team["nickname"], u'The Juggernauts')
         self.assertEqual(team["short_name"], u'ChryslerOSTCNE')
         self.assertEqual(team["team_number"], 1)
-        
+
         # Test frc4403
         team = teams[-7]
         #self.assertEqual(team["address"], u'Torreon, CU, Mexico')

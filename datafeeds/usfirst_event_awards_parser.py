@@ -68,8 +68,8 @@ class UsfirstEventAwardsParser(ParserBase):
                      '2007-11': {'official': 0,
                                  'team_number': 1,
                                  'individual': 2}}
-    
-    @classmethod    
+
+    @classmethod
     def parse(self, html):
         """
         Parse the awards from USFIRST.
@@ -78,7 +78,7 @@ class UsfirstEventAwardsParser(ParserBase):
         soup = BeautifulSoup(html, convertEntities=BeautifulSoup.HTML_ENTITIES)
 
         title = self._recurseUntilString(soup.findAll('title')[0])
-        
+
         is_championship = title.find('FIRST Championship') >= 0
         if is_championship and title.find('Division') >= 0:
             is_division = True
@@ -145,13 +145,13 @@ class UsfirstEventAwardsParser(ParserBase):
                 key_number += 1
             award_key = test_key
             already_parsed.add(award_key)
-            
+
             if is_championship:
                 if is_division:
                     award_key = 'div_' + award_key
                 else:
                     award_key = 'cmp_' + award_key
-                    
+
             award = {'name': award_key,
                      'team_number': team_number,
                      'awardee': awardee,

@@ -24,11 +24,11 @@ from models.team import Team
 
 class DatafeedUsfirst(DatafeedBase):
     EVENT_LIST_REGIONALS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?event_type=FRC&season_FRC=%s" # % (year)
-    
+
     EVENT_DETAILS_URL_PATTERN = "http://www.usfirst.org/whats-going-on/event/%s" # % (eid)
     EVENT_TEAMS_URL_PATTERN = "http://www.usfirst.org/whats-going-on/event/%s/teams?sort=asc&order=Team%%20Number" # % (eid)
     TEAM_DETAILS_URL_PATTERN = "http://www.usfirst.org/whats-going-on/team/FRC/%s" # % (tpid)
-    
+
     EVENT_AWARDS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/awards.html" # % (year, event_short)
     EVENT_RANKINGS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/rankings.html" # % (year, event_short)
     MATCH_RESULTS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/matchresults.html" # % (year, event_short)
@@ -40,7 +40,7 @@ class DatafeedUsfirst(DatafeedBase):
         "gal": "Galileo",
         "new": "Newton",
     }
-    
+
     def __init__(self, *args, **kw):
         self._session_key = dict()
         super(DatafeedUsfirst, self).__init__(*args, **kw)
@@ -83,7 +83,7 @@ class DatafeedUsfirst(DatafeedBase):
         url = self.EVENT_RANKINGS_URL_PATTERN % (event.year,
             self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
         return self.parse(url, UsfirstEventRankingsParser)
-    
+
     def getEventAwards(self, event):
 
         def _getTeamKey(award):
@@ -96,7 +96,7 @@ class DatafeedUsfirst(DatafeedBase):
         url = self.EVENT_AWARDS_URL_PATTERN % (event.year,
             self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
         awards, _ = self.parse(url, UsfirstEventAwardsParser)
-        
+
         return [Award(
             id = Award.renderKeyName(event.key_name, award.get('name')),
             name = award.get('name', None),
@@ -112,7 +112,7 @@ class DatafeedUsfirst(DatafeedBase):
         Returns a list of team_numbers attending a particular Event
         """
         if type(year) is not int: raise TypeError("year must be an integer")
-        
+
         teams = []
         seen_teams = set()
         for page in range(8):  # Ensures this won't loop forever. 8 pages should be plenty.
@@ -121,14 +121,14 @@ class DatafeedUsfirst(DatafeedBase):
                 url += '&page=%s' % page
             partial_teams, more_pages = self.parse(url, UsfirstEventTeamsParser)
             teams.extend(partial_teams)
-            
+
             partial_seen_teams = set([team['team_number'] for team in partial_teams])
             new_teams = partial_seen_teams.difference(seen_teams)
             if (not more_pages) or (new_teams == set()):
                 break
 
             seen_teams = seen_teams.union(partial_seen_teams)
-        
+
         return [Team(
             id = "frc%s" % team.get("team_number", None),
             first_tpid = team.get("first_tpid", None),
@@ -144,9 +144,9 @@ class DatafeedUsfirst(DatafeedBase):
 
         return [Match(
             id = Match.renderKeyName(
-                event, 
-                match.get("comp_level", None), 
-                match.get("set_number", 0), 
+                event,
+                match.get("comp_level", None),
+                match.get("set_number", 0),
                 match.get("match_number", 0)),
             event = event.key,
             game = Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),

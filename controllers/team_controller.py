@@ -49,7 +49,7 @@ class TeamList(CacheableHandler):
             page_labels.append(label)
             if curPage == page:
                 cur_page_label = label
-                                   
+
         start = (page - 1) * 1000
         stop = start + 999
 
@@ -58,7 +58,7 @@ class TeamList(CacheableHandler):
 
         team_keys = Team.query().order(Team.team_number).filter(
           Team.team_number >= start).filter(Team.team_number < stop).fetch(10000, keys_only=True)
-        teams = ndb.get_multi(team_keys)        
+        teams = ndb.get_multi(team_keys)
 
         num_teams = len(teams)
         middle_value = num_teams/2
@@ -74,10 +74,10 @@ class TeamList(CacheableHandler):
             "cur_page_label": cur_page_label,
             "current_page": page
         }
-    
+
         path = os.path.join(os.path.dirname(__file__), '../templates/team_list.html')
         return template.render(path, template_values)
-        
+
 # The view of a single Team.
 class TeamDetail(CacheableHandler):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
@@ -90,7 +90,7 @@ class TeamDetail(CacheableHandler):
         self._cache_version = 2
 
     def get(self, team_number, year=None, explicit_year=False):
-        
+
         # /team/0201 should redirect to /team/201
         try:
             if str(int(team_number)) != team_number:
@@ -101,8 +101,8 @@ class TeamDetail(CacheableHandler):
         except ValueError, e:
             logging.info("%s", e)
             return self.redirect("/error/404")
-        
-        if type(year) == str: 
+
+        if type(year) == str:
             try:
                 year = int(year)
             except ValueError, e:
@@ -112,11 +112,11 @@ class TeamDetail(CacheableHandler):
         else:
             year = datetime.datetime.now().year
             explicit_year = False
-        
+
         self._cache_key = self._cache_key.format("frc" + team_number, year, explicit_year)
         super(TeamDetail, self).get(team_number, year, explicit_year)
 
-    def _render(self, team_number, year=None, explicit_year=False):        
+    def _render(self, team_number, year=None, explicit_year=False):
         @ndb.tasklet
         def get_event_matches_async(event_team_key):
             event_team = yield event_team_key.get_async()
@@ -130,34 +130,34 @@ class TeamDetail(CacheableHandler):
                 matches = yield ndb.get_multi_async(matches_keys)
                 raise ndb.Return((event, matches))
             raise ndb.Return(None)
-          
+
         @ndb.tasklet
         def get_events_matches_async():
             event_team_keys = yield EventTeam.query(EventTeam.team == team.key).fetch_async(1000, keys_only=True)
             events_matches = yield map(get_event_matches_async, event_team_keys)
             events_matches = filter(None, events_matches)
             raise ndb.Return(events_matches)
-        
-        @ndb.tasklet  
+
+        @ndb.tasklet
         def get_awards_async():
             award_keys = yield Award.query(Award.year == year, Award.team == team.key).fetch_async(500, keys_only=True)
             awards = yield ndb.get_multi_async(award_keys)
             raise ndb.Return(awards)
-          
+
         @ndb.toplevel
         def get_events_matches_awards():
             events_matches, awards = yield get_events_matches_async(), get_awards_async()
             raise ndb.Return(events_matches, awards)
-          
+
         team = Team.get_by_id("frc" + team_number)
         if not team:
             return self.redirect("/error/404")
-        
+
         years = set()
         events_matches, awards = get_events_matches_awards()
         events_matches = sorted(events_matches, key=lambda (e, _): e.start_date)
         years = sorted(years)
-        
+
         participation = list()
         year_wlt_list = list()
 
@@ -167,11 +167,11 @@ class TeamDetail(CacheableHandler):
         for e, matches in events_matches:
             event_awards = AwardHelper.organizeAwards([award for award in awards if award.event == e.key])
             matches_organized = MatchHelper.organizeMatches(matches)
-            
+
             if e.now:
                 current_event = e
                 matches_upcoming = MatchHelper.upcomingMatches(matches)
-                
+
             if e.within_a_day:
                 short_cache = True
 
@@ -181,28 +181,28 @@ class TeamDetail(CacheableHandler):
                 display_wlt = None
             else:
                 display_wlt = wlt
-                
+
             team_rank = None
             if e.rankings:
                 for element in e.rankings:
                     if element[1] == team_number:
                         team_rank = element[0]
                         break
-                
+
             participation.append({ 'event' : e,
                                    'matches' : matches_organized,
                                    'wlt': display_wlt,
                                    'rank': team_rank,
                                    'awards': event_awards })
-        
+
         year_wlt = {"win": 0, "loss": 0, "tie": 0}
         for wlt in year_wlt_list:
             year_wlt["win"] += wlt["win"]
             year_wlt["loss"] += wlt["loss"]
             year_wlt["tie"] += wlt["tie"]
         if year_wlt["win"] + year_wlt["loss"] + year_wlt["tie"] == 0:
-            year_wlt = None                
-        
+            year_wlt = None
+
         template_values = { "explicit_year": explicit_year,
                             "team": team,
                             "participation": participation,
@@ -211,10 +211,10 @@ class TeamDetail(CacheableHandler):
                             "year_wlt": year_wlt,
                             "current_event": current_event,
                             "matches_upcoming": matches_upcoming }
-        
+
         if short_cache:
             self._cache_expiration = self.SHORT_CACHE_EXPIRATION
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/team_details.html')
         return template.render(path, template_values)
 
@@ -238,13 +238,13 @@ class TeamHistory(CacheableHandler):
         except ValueError, e:
             logging.info("%s", e)
             return self.redirect("/error/404")
-        
+
         self._cache_key = self._cache_key.format("frc" + team_number)
         super(TeamHistory, self).get(team_number)
 
     def _render(self, team_number):
         team = Team.get_by_id("frc" + team_number)
-        
+
         if not team:
             return self.redirect("/error/404")
 
@@ -256,7 +256,7 @@ class TeamHistory(CacheableHandler):
 
         event_keys = [event_team_future.get_result().event for event_team_future in event_teams_futures]
         events_futures = ndb.get_multi_async(event_keys)
-        
+
         awards_by_event = {}
         for award_future in awards_futures:
             award = award_future.get_result()
@@ -264,7 +264,7 @@ class TeamHistory(CacheableHandler):
                 awards_by_event[award.event.id()] = [award]
             else:
                 awards_by_event[award.event.id()].append(award)
-        
+
         event_awards = []
         current_event = None
         matches_upcoming = None
@@ -273,32 +273,32 @@ class TeamHistory(CacheableHandler):
             event = event_future.get_result()
             if event.now:
                 current_event = event
-                
+
                 team_matches_future = Match.query(Match.event == event.key, Match.team_key_names == team.key_name)\
                   .fetch_async(500, keys_only=True)
                 matches = ndb.get_multi(team_matches_future.get_result())
                 matches_upcoming = MatchHelper.upcomingMatches(matches)
-                
+
             if event.within_a_day:
                 short_cache = True
-          
+
             if event.key_name in awards_by_event:
                 sorted_awards = AwardHelper.organizeAwards(awards_by_event[event.key_name])['list']
             else:
                 sorted_awards = []
             event_awards.append((event, sorted_awards))
         event_awards = sorted(event_awards, key=lambda (e, _): e.start_date if e.start_date else datetime.datetime(e.year, 12, 31))
-        
+
         years = sorted(set([et.get_result().year for et in event_teams_futures if et.get_result().year != None]))
-        
+
         template_values = {'team': team,
                            'event_awards': event_awards,
                            'years': years,
                            'current_event': current_event,
                            'matches_upcoming': matches_upcoming}
-        
+
         if short_cache:
             self._cache_expiration = self.SHORT_CACHE_EXPIRATION
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/team_history.html')
         return template.render(path, template_values)

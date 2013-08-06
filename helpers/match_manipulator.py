@@ -5,7 +5,7 @@ class MatchManipulator(ManipulatorBase):
     """
     Handle Match database writes.
     """
-    
+
     @classmethod
     def updateMerge(self, new_match, old_match):
         """

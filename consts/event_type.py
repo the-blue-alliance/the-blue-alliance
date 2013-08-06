@@ -8,7 +8,7 @@ class EventType(object):
     PRESEASON = 100
     UNLABLED = -1
 
-    type_names = {    
+    type_names = {
         REGIONAL: 'Regional',
         DISTRICT: 'District',
         DISTRICT_CMP: 'District Championship',

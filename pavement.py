@@ -20,13 +20,13 @@ def clean():
 @task
 def setup():
   """Set up data for development environments."""
-  
+
   print("Building CSS/JS...")
   less()
   javascript()
-  
+
   print("Setting up dev data.")
-  
+
   print("Getting Teams")
   sh("curl -s http://localhost:8088/tasks/get/fms_team_list")
   print("Importing test Event data")

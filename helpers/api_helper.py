@@ -47,21 +47,21 @@ class ApiHelper(object):
                     team_dict["country_name"] = team.country_name
                 except Exception, e:
                     logging.warning("Failed to include Address for api_team_info_%s: %s" % (team_key, e))
-                
-                #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra 
+
+                #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
                 if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, team_dict, 2592000)
             else:
                 raise IndexError
 
         return team_dict
-    
-    
+
+
     @classmethod
     def getEventInfo(self, event_key):
         """
         Return an Event dict with basic information
         """
-        
+
         memcache_key = "api_event_info_%s" % event_key
         event_dict = memcache.get(memcache_key)
         if event_dict is None:
@@ -92,8 +92,8 @@ class ApiHelper(object):
 
                 if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, event_dict, 60 * 60)
         return event_dict
-    
-    
+
+
     @classmethod
     def addTeamEvents(self, team_dict, year):
         """
@@ -101,7 +101,7 @@ class ApiHelper(object):
         """
         memcache_key = "api_team_events_%s_%s" % (team_dict["key"], year)
         event_list = memcache.get(memcache_key)
-        
+
         if event_list is None:
             team = Team.get_by_id(team_dict["key"])
             events = [a.event.get() for a in EventTeam.query(EventTeam.team == team.key, EventTeam.year == int(year)).fetch(1000)]
@@ -112,7 +112,7 @@ class ApiHelper(object):
 
             #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
             if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, event_list, 2592000)
-        
+
         team_dict["events"] = event_list
         return team_dict
 
@@ -121,10 +121,10 @@ class ApiHelper(object):
         """
         Consume a Team dict, and return it with a year's Events filtered and Matches added
         """
-        
+
         # TODO Matches should live under Events - gregmarra 1 feb 2011
         # TODO Filter Events by year - gregmarra 1 feb 2011
-        
+
         memcache_key = "api_team_details_%s_%s" % (team_dict["key"], year)
         matches_list = memcache.get(memcache_key)
         if matches_list is None:

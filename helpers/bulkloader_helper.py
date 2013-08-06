@@ -10,7 +10,7 @@ def fix_json(x):
         return str(x).replace("\'", "\"")
     else:
         return None
-    
+
 def fix_list(x):
     """
     Turn a string of a list into a Python list.
@@ -19,6 +19,6 @@ def fix_list(x):
         y = eval(x)
         if len(y) > 0:
             return y
-    
+
     return None
 

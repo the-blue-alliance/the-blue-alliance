@@ -7,7 +7,7 @@ class Insight(ndb.Model):
     average score for all matches in a year.
     key_name is like '2012insights_matchavg'
     """
-    
+
     MATCH_HIGHSCORE = 0
     MATCH_HIGHSCORE_BY_WEEK = 1
     MATCH_AVERAGES_BY_WEEK = 2
@@ -23,7 +23,7 @@ class Insight(ndb.Model):
     DIVISION_WINNERS = 12
     DIVISION_FINALISTS = 13
     REGIONAL_DISTRICT_WINNERS = 14
-    
+
     # Used for datastore keys! Don't change unless you know what you're doing.
     INSIGHT_NAMES = {MATCH_HIGHSCORE: 'match_highscore',
                      MATCH_HIGHSCORE_BY_WEEK: 'match_highscore_by_week',
@@ -41,14 +41,14 @@ class Insight(ndb.Model):
                      DIVISION_FINALISTS: 'division_finalists',
                      REGIONAL_DISTRICT_WINNERS: 'regional_district_winners',
                      }
-        
+
     name = ndb.StringProperty(required=True)  # general name used for sorting
     year = ndb.IntegerProperty(required=True) # year this insight pertains to. year = 0 for overall insights
     data_json = ndb.StringProperty(required=True, indexed=False)  # JSON dictionary of the data of the insight
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
-    
+
     def __init__(self, *args, **kw):
       self._data = None
       super(Insight, self).__init__(*args, **kw)
@@ -61,7 +61,7 @@ class Insight(ndb.Model):
         if self._data is None:
             self._data = json.loads(self.data_json)
         return self._data
-    
+
     @property
     def key_name(self):
         """

@@ -19,14 +19,14 @@ from models.sitevar import Sitevar
 def render_static(page):
     memcache_key = "main_%s" % page
     html = memcache.get(memcache_key)
-    
+
     if html is None:
         path = os.path.join(os.path.dirname(__file__), "../templates/%s.html" % page)
         html = template.render(path, {})
         if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
-    
+
     return html
-            
+
 class MainKickoffHandler(CacheableHandler):
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
@@ -37,7 +37,7 @@ class MainKickoffHandler(CacheableHandler):
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/index_kickoff.html")
         return template.render(path, {})
-                  
+
 class MainBuildseasonHandler(CacheableHandler):
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
@@ -61,7 +61,7 @@ class MainCompetitionseasonHandler(CacheableHandler):
         template_values = {
             "events": week_events,
         }
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/index_competitionseason.html')
         return template.render(path, template_values)
 
@@ -102,7 +102,7 @@ class HashtagsHandler(CacheableHandler):
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/hashtags.html")
         return template.render(path, {})
-        
+
 class AboutHandler(CacheableHandler):
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
@@ -192,11 +192,11 @@ class GamedayHandler(CacheableHandler):
                             event['count'] = count
                             count += 1
                     ongoing_events_w_webcasts += valid
-        
+
         template_values = {'special_webcasts': special_webcasts,
                            'ongoing_events': ongoing_events,
                            'ongoing_events_w_webcasts': ongoing_events_w_webcasts}
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/gameday.html')
         return template.render(path, template_values)
 
@@ -229,7 +229,7 @@ class WebcastsHandler(CacheableHandler):
         template_values = {
             'events': events,
         }
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/webcasts.html')
         return template.render(path, template_values)
 

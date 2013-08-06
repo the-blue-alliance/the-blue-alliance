@@ -42,7 +42,7 @@ class TestMatchManipulator(unittest2.TestCase):
             match_number = 1,
             team_key_names = [u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073']
         )
-        
+
     def tearDown(self):
         self.testbed.deactivate()
 
@@ -58,10 +58,10 @@ class TestMatchManipulator(unittest2.TestCase):
 
     def test_createOrUpdate(self):
         MatchManipulator.createOrUpdate(self.old_match)
-        
+
         self.assertOldMatch(Match.get_by_id("2012ct_qm1"))
         self.assertEqual(Match.get_by_id("2012ct_qm1").alliances_json, """{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""")
-        
+
         MatchManipulator.createOrUpdate(self.new_match)
         self.assertMergedMatch(Match.get_by_id("2012ct_qm1"))
 

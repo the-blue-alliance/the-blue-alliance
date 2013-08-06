@@ -17,10 +17,10 @@ class TestEventManipulator(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
         self.maxDiff = None
-        
+
         f1 = open('test_data/usfirst_html/usfirst_event_rankings_2012ct.html', 'r')
         good_rankings, _ = UsfirstEventRankingsParser.parse(f1.read())
-        
+
         f2 = open('test_data/usfirst_html/usfirst_event_rankings_2012ct_bad.html', 'r')
         bad_rankings, _ = UsfirstEventRankingsParser.parse(f2.read())
 
@@ -56,7 +56,7 @@ class TestEventManipulator(unittest2.TestCase):
             webcast_json = json.dumps([{'type': 'ustream', 'channel': 'foo'}]),
             rankings_json = json.dumps(bad_rankings)
         )
-        
+
     def tearDown(self):
         self.testbed.deactivate()
 

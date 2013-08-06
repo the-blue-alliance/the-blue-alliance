@@ -65,10 +65,10 @@ class WebcastHandler(CacheableHandler):
 
         self.response.headers['Cache-Control'] = "public, max-age=%d" % (5*60)
         self.response.headers['Pragma'] = 'Public'
-        self.response.headers.add_header('content-type', 'application/json', charset='utf-8')  
+        self.response.headers.add_header('content-type', 'application/json', charset='utf-8')
 
         super(WebcastHandler, self).get(event_key, webcast_number)
-        
+
     def _render(self, event_key, webcast_number):
         event = Event.get_by_id(event_key)
         output = {}
@@ -86,10 +86,10 @@ class WebcastHandler(CacheableHandler):
             if event_key in special_webcasts:
                 webcast = special_webcasts[event_key]
                 if 'type' in webcast and 'channel' in webcast:
-                    output['player'] = self._renderPlayer(webcast)                   
-                
+                    output['player'] = self._renderPlayer(webcast)
+
         return json.dumps(output)
-        
+
     def _renderPlayer(self, webcast):
         webcast_type = webcast['type']
         template_values = {'webcast': webcast}

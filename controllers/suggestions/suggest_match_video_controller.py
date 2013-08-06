@@ -18,12 +18,12 @@ class SuggestMatchVideoController(LoggedInHandler):
 
         if not self.request.get("match_key"):
             self.redirect("/", abort=True)
-        
+
         match_future = Match.get_by_id_async(self.request.get("match_key"))
         event_future = Event.get_by_id_async(self.request.get("match_key").split("_")[0])
         match = match_future.get_result()
         event = event_future.get_result()
-        
+
         self.template_values.update({
             "success": self.request.get("success"),
             "event": event,
