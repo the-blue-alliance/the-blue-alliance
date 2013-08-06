@@ -174,7 +174,7 @@ class OprHelper(object):
                t[i][i] = 0.0
             else:
                if d < 0.0:
-                  raise ValueError, "Matrix not positive-definite"
+                  raise ValueError("Matrix not positive-definite")
                t[i][i] = sqrt(d)
             for j in range(i+1, num):
                S = sum([t[j][k] * t[i][k] for k in range(1,i-1)])
