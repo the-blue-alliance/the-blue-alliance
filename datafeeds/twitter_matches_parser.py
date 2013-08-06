@@ -33,31 +33,33 @@ class TwitterMatchesParser(ParserBase):
         Parse a tweet from FRCFMS.
         Returns a tuple in the following form:
         event_short, match result in CSV format
-        
+
         Match CSV format is as follows:
         match_id, red1, red2, red3, blue1, blue2, blue3, red score, blue score
-        
+
         Example formats of match_id:
         qm1, sf2m1, f1m1
         """
         i = tweet.split()
-        event_short = str(i[0][4:].lower())
-        kind = str(i[2])
-        number = str(i[4])
-        red_final = str(i[6])
-        blue_final = str(i[8])
-        red_teams = str(i[10]) + ',' + str(i[11]) + ',' + str(i[12])
-        blue_teams = str(i[14]) + ',' + str(i[15]) + ',' + str(i[16])
-        
+        try:
+            event_short = str(i[0][4:].lower())
+            kind = str(i[2])
+            number = str(i[4])
+            red_final = str(i[6])
+            blue_final = str(i[8])
+            red_teams = str(i[10]) + ',' + str(i[11]) + ',' + str(i[12])
+            blue_teams = str(i[14]) + ',' + str(i[15]) + ',' + str(i[16])
+        except IndexError:
+            logging.warning("Failed to parse tweet: {}".format(tweet))
+            return None, tweet
+
         if kind == 'E':
             match_id = ELIM_MAPPING[number]
-        elif kind =='Q':
+        elif kind == 'Q':
             match_id = 'qm' + number
         else:
             match_id = '???' + number
-            
+
         match_csv_row = match_id + ',' + red_teams + ',' + blue_teams + ',' + red_final + ',' + blue_final
-        
+
         return event_short, match_csv_row
-    
-    
