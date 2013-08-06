@@ -78,12 +78,12 @@ class OffseasonMatchesParser(ParserBase):
         COMP_LEVEL_MAP = {'qm': 'qm',
                           'qfm': 'qf',
                           'sfm': 'sf',
-                          'fm': 'f',}
+                          'fm': 'f', }
 
         MATCH_PARSE_STYLE = {'qm': self.parseQualMatchNumberInfo,
                              'qf': self.parseElimMatchNumberInfo,
                              'sf': self.parseElimMatchNumberInfo,
-                             'f': self.parseElimMatchNumberInfo,}
+                             'f': self.parseElimMatchNumberInfo, }
 
         pattern = re.compile('[0-9]')
         comp_level = COMP_LEVEL_MAP[pattern.sub('', string)]

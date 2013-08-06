@@ -124,8 +124,8 @@ class EventOprDo(webapp.RequestHandler):
         event = Event.get_by_id(event_key)
         if Match.query(Match.event == event.key).fetch(keys_only=True).count() > 0:
             try:
-                opr,teams = OprHelper.opr(event_key)
-                oprs.append((opr,teams))
+                opr, teams = OprHelper.opr(event_key)
+                oprs.append((opr, teams))
                 event.oprs = opr
                 event.opr_teams = teams
                 event.put()

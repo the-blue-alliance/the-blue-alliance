@@ -88,7 +88,7 @@ class Match(ndb.Model):
 
     comp_level = ndb.StringProperty(required=True, choices=set(COMP_LEVELS))
     event = ndb.KeyProperty(kind=Event, required=True)
-    game = ndb.StringProperty(required=True,choices=set(FRC_GAMES), indexed=False)
+    game = ndb.StringProperty(required=True, choices=set(FRC_GAMES), indexed=False)
     match_number = ndb.IntegerProperty(required=True, indexed=False)
     no_auto_update = ndb.BooleanProperty(default=False, indexed=False)  # Set to True after manual update
     set_number = ndb.IntegerProperty(required=True, indexed=False)

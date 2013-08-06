@@ -42,28 +42,28 @@ class OprHelper(object):
         OprHelper.M = []
 
     @classmethod
-    def zeros(self,m,n):
+    def zeros(self, m, n):
         # returns the zero matrix for the supplied dimensions
         return [[0 for row in range(n)] for col in range(m)]
 
     @classmethod
-    def mTranspose(self,matrix):
+    def mTranspose(self, matrix):
         # returns the transpose of a matrix
         return map(lambda *row: list(row), *matrix)
 
     @classmethod
-    def mInverse(self,matrix):
+    def mInverse(self, matrix):
         # TODO: implement matrix inversion
         # not nescessary for anything we have done thus far
         return -1
 
     @classmethod
-    def mMult(self,matrixA,matrixB):
+    def mMult(self, matrixA, matrixB):
         # returns result of multiplying A by B
         if len(matrixA[0]) != len(matrixB):
             print "Matrix dimension error!"
         else:
-            result = OprHelper.zeros(len(matrixA),len(matrixB[0]))
+            result = OprHelper.zeros(len(matrixA), len(matrixB[0]))
             for i in range(len(matrixA)):
                  for j in range(len(matrixB[0])):
                     for k in range(len(matrixB)):
@@ -71,7 +71,7 @@ class OprHelper(object):
             return result
 
     @classmethod
-    def getData(self,event):
+    def getData(self, event):
         # TODO: This doesn't seem like it would support older matches with 2v2 games -gregmarra 8 Mar 2012
         num = 0
         for match in Match.query(Match.event == event.key).fetch(500):
@@ -89,7 +89,7 @@ class OprHelper(object):
                     num += 1
 
     @classmethod
-    def getTeamData(self,event):
+    def getTeamData(self, event):
         #reader = csv.reader(open(file,"rb"))
         event_teams = EventTeam.query(EventTeam.event == event.key).fetch(500)
         team_keys = [event_team.team for event_team in event_teams]
@@ -103,7 +103,7 @@ class OprHelper(object):
     def teamsPlayed(self):
         played = []
         counter = 0
-        for team_id,team_number in OprHelper.teamdata:
+        for team_id, team_number in OprHelper.teamdata:
             if OprHelper.teamPlayed(team_number):
                 played.append([])
                 played[counter].append(team_id)
@@ -112,19 +112,19 @@ class OprHelper(object):
         return played
 
     @classmethod
-    def teamPlayed(self,team):
+    def teamPlayed(self, team):
         """
         Returns True if the team played at least one match (was present at regional)
         Returns False if the team has not played any matches (was absent from regional)
         """
-        for i,row in enumerate(OprHelper.data):
-            for j in range(2,7):
+        for i, row in enumerate(OprHelper.data):
+            for j in range(2, 7):
                 if OprHelper.data[i][j] == team:
                     return True
         return False
 
     @classmethod
-    def getTeamID(self,num):
+    def getTeamID(self, num):
         # returns the matrix column index associated with a team number
         for ident, row in enumerate(OprHelper.teamdata):
             if(row[1] == num):
@@ -134,7 +134,7 @@ class OprHelper(object):
     def getM(self):
         # puts a 1 in a row of M for each team on an alliance
         i = 0
-        OprHelper.M = OprHelper.zeros(2 * len(OprHelper.data),len(OprHelper.teamdata))
+        OprHelper.M = OprHelper.zeros(2 * len(OprHelper.data), len(OprHelper.teamdata))
         while (i) < 2 * len(OprHelper.data):
             OprHelper.M[i][OprHelper.getTeamID(OprHelper.data[i / 2][2])] = 1
             OprHelper.M[i][OprHelper.getTeamID(OprHelper.data[i / 2][3])] = 1
@@ -187,7 +187,7 @@ class OprHelper(object):
         return(t)
 
     @classmethod
-    def decomposeDoolittle(self,A):
+    def decomposeDoolittle(self, A):
         # Algorithm for upper and lower triangular factorization
         # gives U and L; uses Doolittle factorization
         # http://math.fullerton.edu/mathews/n2003/CholeskyMod.html
@@ -199,12 +199,12 @@ class OprHelper(object):
             L[k][k] = 1
             for j in range(k, n):
                 U[k][j] = A[k][j] - sum(L[k][m] * U[m][j] for m in range(k))
-            for i in range(k + 1,n):
+            for i in range(k + 1, n):
                 L[i][k] = (A[i][k] - sum(L[i][m] * U[m][k] for m in range(k))) / float(U[k][k])
-        return U,L
+        return U, L
 
     @classmethod
-    def solve(self,L,U,b):
+    def solve(self, L, U, b):
         # Algorithm from http://en.wikipedia.org/wiki/Triangular_matrix
         # Ax = b -> LUx = b. Then y is defined to be Ux
         # http://math.fullerton.edu/mathews/n2003/BackSubstitutionMod.html
@@ -228,7 +228,7 @@ class OprHelper(object):
         return x
 
     @classmethod
-    def opr(self,event_key):
+    def opr(self, event_key):
         OprHelper.reset()
 
         event = Event.get_by_id(event_key)
@@ -239,15 +239,15 @@ class OprHelper(object):
         OprHelper.getM()
         s = OprHelper.gets()
         Mtrans = OprHelper.mTranspose(OprHelper.M)
-        A = OprHelper.mMult(Mtrans,OprHelper.M)  # multiply M' times M to get A
-        b = OprHelper.mMult(Mtrans,s)  # multiply M' times s to get b
-        U,L = OprHelper.decomposeDoolittle(A)
-        temp = OprHelper.solve(L,U,b)
-        OPR = OprHelper.zeros(len(temp),1)
+        A = OprHelper.mMult(Mtrans, OprHelper.M)  # multiply M' times M to get A
+        b = OprHelper.mMult(Mtrans, s)  # multiply M' times s to get b
+        U, L = OprHelper.decomposeDoolittle(A)
+        temp = OprHelper.solve(L, U, b)
+        OPR = OprHelper.zeros(len(temp), 1)
         for num, blah in enumerate(list(temp)):
             OPR[num] = temp[num][0]
         temp = OprHelper.teamdata
-        teams = OprHelper.zeros(len(OprHelper.teamdata),1)
+        teams = OprHelper.zeros(len(OprHelper.teamdata), 1)
         for num, blah in enumerate(list(temp)):
             teams[num] = temp[num][1]
 

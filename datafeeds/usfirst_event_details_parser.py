@@ -39,7 +39,7 @@ class UsfirstEventDetailsParser(ParserBase):
         if address is not None:
             address_lines_stripped = [line.strip() for line in address.findAll(text=True)]
             # TODO: This next line is awful. Make this suck less.
-            result['venue_address'] = unicode('\r\n'.join(address_lines_stripped)).encode('ascii', 'ignore').strip().replace("\t","").replace("\r\n\r\n", "\r\n")
+            result['venue_address'] = unicode('\r\n'.join(address_lines_stripped)).encode('ascii', 'ignore').strip().replace("\t", "").replace("\r\n\r\n", "\r\n")
 
             if len(address_lines_stripped) >= 2:
                 match = re.match(event_locality_region_re, address_lines_stripped[-2])
@@ -66,8 +66,8 @@ class UsfirstEventDetailsParser(ParserBase):
         Parses the date string provided by USFirst into actual event start and stop DateTimes.
         FIRST date strings look like "01-Apr to 03-Apr-2010" or "09-Mar-2005".
         """
-        month_dict = {"Jan":1,"Feb":2,"Mar":3,"Apr":4, "May":5, "Jun":6,
-            "Jul":7,"Aug":8,"Sep":9,"Oct":10,"Nov":11,"Dec":12}
+        month_dict = {"Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6,
+            "Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12}
 
         # "01-Apr to 03-Apr-2010"
         # or "09-Mar-2005"
