@@ -139,7 +139,7 @@ class UsfirstMatchesParser(ParserBase):
             "Final": "f",
         }
 
-        #string comes in as unicode.
+        # string comes in as unicode.
         string = str(string).strip()
 
         match_number = int(string[-1:])

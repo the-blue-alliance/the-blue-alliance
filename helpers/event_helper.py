@@ -122,7 +122,7 @@ class EventHelper(object):
           Event.start_date).fetch_async(50, keys_only=True)
 
         events = []
-        diff_from_thurs = 3 - today.weekday() # 3 is Thursday. diff_from_thurs ranges from 3 to -3 (Monday thru Sunday)
+        diff_from_thurs = 3 - today.weekday()  # 3 is Thursday. diff_from_thurs ranges from 3 to -3 (Monday thru Sunday)
         closest_thursday = today + datetime.timedelta(days=diff_from_thurs)
 
         two_weeks_of_events = ndb.get_multi(two_weeks_of_events_keys_future.get_result())

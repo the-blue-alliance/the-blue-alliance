@@ -13,8 +13,8 @@ class Team(ndb.Model):
     nickname = ndb.StringProperty(indexed=False)
     address = ndb.StringProperty(indexed=False)  # in the format "locality, region, country". similar to Event.location
     website = ndb.StringProperty(indexed=False)
-    first_tpid = ndb.IntegerProperty() #from USFIRST. FIRST team ID number. -greg 5/20/2010
-    first_tpid_year = ndb.IntegerProperty() # from USFIRST. Year tpid is applicable for. -greg 9 Jan 2011
+    first_tpid = ndb.IntegerProperty()  # from USFIRST. FIRST team ID number. -greg 5/20/2010
+    first_tpid_year = ndb.IntegerProperty()  # from USFIRST. Year tpid is applicable for. -greg 9 Jan 2011
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)

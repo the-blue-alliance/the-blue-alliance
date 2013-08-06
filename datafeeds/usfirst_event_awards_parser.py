@@ -74,7 +74,7 @@ class UsfirstEventAwardsParser(ParserBase):
         """
         Parse the awards from USFIRST.
         """
-        html = html.decode('utf-8', 'ignore') # Clean html before feeding itno BeautifulSoup
+        html = html.decode('utf-8', 'ignore')  # Clean html before feeding itno BeautifulSoup
         soup = BeautifulSoup(html, convertEntities=BeautifulSoup.HTML_ENTITIES)
 
         title = self._recurseUntilString(soup.findAll('title')[0])

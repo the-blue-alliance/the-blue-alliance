@@ -56,7 +56,7 @@ class WebcastHandler(CacheableHandler):
     def __init__(self, *args, **kw):
         super(WebcastHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
-        self._cache_key = "webcast_{}_{}" # (event_key)
+        self._cache_key = "webcast_{}_{}"  # (event_key)
         self._cache_version = 1
 
     def get(self, event_key, webcast_number):

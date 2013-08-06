@@ -14,10 +14,10 @@ class EventTeamManipulator(ManipulatorBase):
         immutable_attrs = [
             "event",
             "team",
-        ] # These build key_name, and cannot be changed without deleting the model.
+        ]  # These build key_name, and cannot be changed without deleting the model.
 
         attrs = [
-            "year", # technically immutable, but corruptable and needs repair. See github issue #409
+            "year",  # technically immutable, but corruptable and needs repair. See github issue #409
         ]
 
         for attr in attrs:

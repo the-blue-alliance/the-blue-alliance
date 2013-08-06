@@ -202,8 +202,8 @@ class GraphAPI(object):
 
         """
         object_id = album_id or "me"
-        #it would have been nice to reuse self.request;
-        #but multipart is messy in urllib
+        # it would have been nice to reuse self.request;
+        # but multipart is messy in urllib
         post_args = {
                   'access_token': self.access_token,
                   'source': image,
@@ -217,8 +217,8 @@ class GraphAPI(object):
         req.add_header('Content-Type', content_type)
         try:
             data = urllib2.urlopen(req).read()
-        #For Python 3 use this:
-        #except urllib2.HTTPError as e:
+        # For Python 3 use this:
+        # except urllib2.HTTPError as e:
         except urllib2.HTTPError, e:
             data = e.read()  # Facebook sends OAuth errors as 400, and urllib2
                              # throws an exception, we want a GraphAPIError
@@ -407,7 +407,7 @@ class GraphAPI(object):
         try:
             content = file.read()
             response = _parse_json(content)
-            #Return a list if success, return a dictionary if failed
+            # Return a list if success, return a dictionary if failed
             if type(response) is dict and "error_code" in response:
                 raise GraphAPIError(response)
         except Exception, e:

@@ -18,7 +18,7 @@ from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
 
-#Note: generally caching for the API happens in ApiHelper
+# Note: generally caching for the API happens in ApiHelper
 
 class MainApiHandler(webapp2.RequestHandler):
 
@@ -58,7 +58,7 @@ class ApiTeamDetails(MainApiHandler):
             if self.request.get('events'):
                 reponse_json = ApiHelper.addTeamEvents(response_json, year)
 
-            #TODO: matches
+            # TODO: matches
 
             self.response.out.write(json.dumps(response_json))
 

@@ -166,7 +166,7 @@ class AdminMatchEdit(LoggedInHandler):
             comp_level = self.request.get("comp_level"),
             team_key_names = team_key_names,
             alliances_json = alliances_json,
-            #no_auto_update = str(self.request.get("no_auto_update")).lower() == "true", #TODO
+            # no_auto_update = str(self.request.get("no_auto_update")).lower() == "true", #TODO
         )
         match = MatchManipulator.createOrUpdate(match)
 

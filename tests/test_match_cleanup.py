@@ -45,6 +45,6 @@ class TestMatchCleanup(unittest2.TestCase):
         matches = setupMatches('test_data/cleanup_matches.csv')
         cleaned_matches = MatchHelper.deleteInvalidMatches(matches)
         indices = [9, 12, 26]
-        for index in sorted(indices, reverse=True): #need to delete in reverse order so indices don't get messed up
+        for index in sorted(indices, reverse=True):  # need to delete in reverse order so indices don't get messed up
             del matches[index]
         self.assertEqual(matches, cleaned_matches)

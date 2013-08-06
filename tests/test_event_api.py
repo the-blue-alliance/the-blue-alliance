@@ -112,7 +112,7 @@ class TestApiMatchDetails(unittest2.TestCase):
         self.assertEqual(match_dict["match_number"], self.match.match_number)
         self.assertEqual(match_dict["team_keys"], self.match.team_key_names)
 
-        #FIXME: urgh. strings. - brandondean 10/21/2012
+        # FIXME: urgh. strings. - brandondean 10/21/2012
         #self.assertEqual(match_dict["alliances"], self.match_json)
 
     def testMatchDetails(self):

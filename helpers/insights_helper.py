@@ -255,7 +255,7 @@ class InsightsHelper(object):
                     score_distribution_normalized[roundedScore] = contribution
             insights.append(self._createInsight(score_distribution_normalized, Insight.INSIGHT_NAMES[Insight.SCORE_DISTRIBUTION], year))
         if elim_score_distribution != {}:
-            if binAmount == None: # Use same binAmount from above if possible
+            if binAmount == None:  # Use same binAmount from above if possible
                 binAmount = math.ceil(float(overall_highscore) / 20)
             totalCount = float(sum(elim_score_distribution.values()))
             elim_score_distribution_normalized = {}

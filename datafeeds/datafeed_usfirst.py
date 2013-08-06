@@ -23,17 +23,17 @@ from models.match import Match
 from models.team import Team
 
 class DatafeedUsfirst(DatafeedBase):
-    EVENT_LIST_REGIONALS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?event_type=FRC&season_FRC=%s" # % (year)
+    EVENT_LIST_REGIONALS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?event_type=FRC&season_FRC=%s"  # % (year)
 
-    EVENT_DETAILS_URL_PATTERN = "http://www.usfirst.org/whats-going-on/event/%s" # % (eid)
-    EVENT_TEAMS_URL_PATTERN = "http://www.usfirst.org/whats-going-on/event/%s/teams?sort=asc&order=Team%%20Number" # % (eid)
-    TEAM_DETAILS_URL_PATTERN = "http://www.usfirst.org/whats-going-on/team/FRC/%s" # % (tpid)
+    EVENT_DETAILS_URL_PATTERN = "http://www.usfirst.org/whats-going-on/event/%s"  # % (eid)
+    EVENT_TEAMS_URL_PATTERN = "http://www.usfirst.org/whats-going-on/event/%s/teams?sort=asc&order=Team%%20Number"  # % (eid)
+    TEAM_DETAILS_URL_PATTERN = "http://www.usfirst.org/whats-going-on/team/FRC/%s"  # % (tpid)
 
-    EVENT_AWARDS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/awards.html" # % (year, event_short)
-    EVENT_RANKINGS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/rankings.html" # % (year, event_short)
-    MATCH_RESULTS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/matchresults.html" # % (year, event_short)
-    MATCH_SCHEDULE_QUAL_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/schedulequal.html" # % (year, event_short)
-    MATCH_SCHEDULE_ELIMS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/scheduleelim.html" # % (year, event_short)
+    EVENT_AWARDS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/awards.html"  # % (year, event_short)
+    EVENT_RANKINGS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/rankings.html"  # % (year, event_short)
+    MATCH_RESULTS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/matchresults.html"  # % (year, event_short)
+    MATCH_SCHEDULE_QUAL_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/schedulequal.html"  # % (year, event_short)
+    MATCH_SCHEDULE_ELIMS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/scheduleelim.html"  # % (year, event_short)
     EVENT_SHORT_EXCEPTIONS = {
         "arc": "Archimedes",
         "cur": "Curie",

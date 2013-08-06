@@ -65,7 +65,7 @@ except ImportError:
 
 # Build the appropriate socket wrapper for ssl
 try:
-    import ssl # python 2.6
+    import ssl  # python 2.6
     ssl_SSLError = ssl.SSLError
     def _ssl_wrap_socket(sock, key_file, cert_file,
                          disable_validation, ca_certs):
@@ -97,7 +97,7 @@ else:
     def iri2uri(uri):
         return uri
 
-def has_timeout(timeout): # python 2.6
+def has_timeout(timeout):  # python 2.6
     if hasattr(socket, '_GLOBAL_DEFAULT_TIMEOUT'):
         return (timeout is not None and timeout is not socket._GLOBAL_DEFAULT_TIMEOUT)
     return (timeout is not None)
@@ -299,7 +299,7 @@ def _parse_www_authenticate(headers, headername='www-authenticate'):
               while match:
                   if match and len(match.groups()) == 3:
                       (key, value, the_rest) = match.groups()
-                      auth_params[key.lower()] = UNQUOTE_PAIRS.sub(r'\1', value) # '\\'.join([x.replace('\\', '') for x in value.split('\\\\')])
+                      auth_params[key.lower()] = UNQUOTE_PAIRS.sub(r'\1', value)  # '\\'.join([x.replace('\\', '') for x in value.split('\\\\')])
                   match = www_auth.search(the_rest)
               retval[auth_scheme.lower()] = auth_params
               authenticate = the_rest.strip()
@@ -653,7 +653,7 @@ class GoogleLoginAuthentication(Authentication):
         if service == 'xapi' and  request_uri.find("calendar") > 0:
             service = "cl"
         # No point in guessing Base or Spreadsheet
-        #elif request_uri.find("spreadsheets") > 0:
+        # elif request_uri.find("spreadsheets") > 0:
         #    service = "wise"
 
         auth = dict(Email=credentials[0], Passwd=credentials[1], service=service, source=headers['user-agent'])
@@ -686,7 +686,7 @@ class FileCache(object):
     Not really safe to use if multiple threads or processes are going to
     be running on the same cache.
     """
-    def __init__(self, cache, safe=safename): # use safe=lambda x: md5.new(x).hexdigest() for the old behavior
+    def __init__(self, cache, safe=safename):  # use safe=lambda x: md5.new(x).hexdigest() for the old behavior
         self.cache = cache
         self.safe = safe
         if not os.path.exists(cache):
@@ -815,7 +815,7 @@ class ProxyInfo(object):
         else:
             port = dict(https=443, http=80)[method]
 
-        proxy_type = 3 # socks.PROXY_TYPE_HTTP
+        proxy_type = 3  # socks.PROXY_TYPE_HTTP
         return cls(
             proxy_type = proxy_type,
             proxy_host = host,
@@ -1102,7 +1102,7 @@ try:
         netloc = '%s:%s' % (self.host, self.port)
       absolute_uri = '%s://%s%s' % (self.scheme, netloc, url)
       try:
-        try: # 'body' can be a stream.
+        try:  # 'body' can be a stream.
           body = body.read()
         except AttributeError:
           pass
@@ -1285,7 +1285,7 @@ and more.
                     err = getattr(e, 'args')[0]
                 else:
                     err = e.errno
-                if err == errno.ECONNREFUSED: # Connection refused
+                if err == errno.ECONNREFUSED:  # Connection refused
                     raise
             except httplib.HTTPException:
                 # Just because the server closed the connection doesn't apparently mean

@@ -36,7 +36,7 @@ except ImportError:
     from cgi import parse_qs, parse_qsl
 
 
-VERSION = '1.0' # Hi Blaine!
+VERSION = '1.0'  # Hi Blaine!
 HTTP_METHOD = 'GET'
 SIGNATURE_METHOD = 'PLAINTEXT'
 
@@ -216,7 +216,7 @@ class Token(object):
         try:
             token.callback_confirmed = params['oauth_callback_confirmed'][0]
         except KeyError:
-            pass # 1.0, no callback confirmed.
+            pass  # 1.0, no callback confirmed.
         return token
 
     def __str__(self):
@@ -387,7 +387,7 @@ class Request(dict):
             parameters.update(query_params)
 
         # URL parameters.
-        param_str = urlparse.urlparse(http_url)[4] # query
+        param_str = urlparse.urlparse(http_url)[4]  # query
         url_params = cls._split_url_string(param_str)
         parameters.update(url_params)
 
@@ -466,7 +466,7 @@ class Server(object):
     resources with OAuth.
     """
 
-    timestamp_threshold = 300 # In seconds, five minutes.
+    timestamp_threshold = 300  # In seconds, five minutes.
     version = VERSION
     signature_methods = None
 
@@ -677,10 +677,10 @@ class SignatureMethod_HMAC_SHA1(SignatureMethod):
 
         # HMAC object.
         try:
-            import hashlib # 2.5
+            import hashlib  # 2.5
             hashed = hmac.new(key, raw, hashlib.sha1)
         except ImportError:
-            import sha # Deprecated
+            import sha  # Deprecated
             hashed = hmac.new(key, raw, sha)
 
         # Calculate the digest base 64.

@@ -22,13 +22,13 @@ class TestUsfirstEventDetailsGet(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    #def test_get(self):
-    #    # test with 2011ct
+    # def test_get(self):
+    # test with 2011ct
     #    usfirsteventget = UsfirstEventDetailsGet()
     #    usfirsteventget.response = Response()
     #    usfirsteventget.get(2011, "5561")
     #
-    #    # check event object got created
+    # check event object got created
     #    event = Event.get_by_id("2011ct")
     #    self.assertEqual(event.name, "Northeast Utilities FIRST Connecticut Regional")
     #    self.assertEqual(event.event_type, "Regional")
@@ -39,7 +39,7 @@ class TestUsfirstEventDetailsGet(unittest2.TestCase):
     #    self.assertEqual(event.website, "http://www.ctfirst.org/ctr")
     #    self.assertEqual(event.event_short, "ct")
     #
-    #    # check team objects get created for missing teams
+    # check team objects get created for missing teams
     #    frc177 = Team.get_by_id("frc177")
     #    self.assertEqual(frc177.team_number, 177)
     #    self.assertEqual(frc177.first_tpid, 41633)

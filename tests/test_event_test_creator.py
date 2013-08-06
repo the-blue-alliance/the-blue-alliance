@@ -32,4 +32,4 @@ class TestEventTeamCreator(unittest2.TestCase):
         self.events.append(EventTestCreator.createFutureEvent())
         self.events.append(EventTestCreator.createPresentEvent())
 
-        #TODO: assert the events got created properly -gregmarra 20130416
+        # TODO: assert the events got created properly -gregmarra 20130416

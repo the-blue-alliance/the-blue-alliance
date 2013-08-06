@@ -20,11 +20,11 @@ class Award(ndb.Model):
     CHAMPIONSHIP_CA_KEYS = {'cmp_ca'}
     BLUE_BANNER_KEYS = REGIONAL_WIN_KEYS.union(REGIONAL_CA_KEYS).union(DIVISION_WIN_KEYS).union(CHAMPIONSHIP_WIN_KEYS).union(CHAMPIONSHIP_CA_KEYS)
 
-    name = ndb.StringProperty(required=True) #general name used for sorting
-    official_name = ndb.StringProperty(indexed=False) #the official name used by first
-    year = ndb.IntegerProperty() #year it was awarded
-    team = ndb.KeyProperty(kind=Team) #team that won the award (if applicable)
-    awardee = ndb.StringProperty() #person who won the award (if applicable)
+    name = ndb.StringProperty(required=True)  # general name used for sorting
+    official_name = ndb.StringProperty(indexed=False)  # the official name used by first
+    year = ndb.IntegerProperty()  # year it was awarded
+    team = ndb.KeyProperty(kind=Team)  # team that won the award (if applicable)
+    awardee = ndb.StringProperty()  # person who won the award (if applicable)
     event = ndb.KeyProperty(kind=Event, required=True)
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)

@@ -18,7 +18,7 @@ from models.event_team import EventTeam
 
 class TestApiTeamShow(unittest2.TestCase):
 
-    #TODO: Add event_keys testing. -brandondean 10/21/2012
+    # TODO: Add event_keys testing. -brandondean 10/21/2012
     def setUp(self):
         app = webapp2.WSGIApplication([(r'/', ApiTeamsShow)], debug=True)
         self.testapp = webtest.TestApp(app)

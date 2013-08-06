@@ -52,7 +52,7 @@ class AdminSitevarEdit(LoggedInHandler):
     def post(self, sitevar_key):
         self._require_admin()
 
-        #note, we don't use sitevar_key
+        # note, we don't use sitevar_key
 
         sitevar = Sitevar(
             id = self.request.get("key"),

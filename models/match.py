@@ -73,11 +73,11 @@ class Match(ndb.Model):
         1992: "frc_1992_maiz",
     }
 
-    alliances_json = ndb.StringProperty(required=True, indexed=False) #JSON dictionary with alliances and scores.
+    alliances_json = ndb.StringProperty(required=True, indexed=False)  # JSON dictionary with alliances and scores.
 
     # {
     # "red": {
-    #    "teams": ["frc177", "frc195", "frc125"], # These are Team keys
+    # "teams": ["frc177", "frc195", "frc125"], # These are Team keys
     #    "score": 25
     # },
     # "blue": {
@@ -90,13 +90,13 @@ class Match(ndb.Model):
     event = ndb.KeyProperty(kind=Event, required=True)
     game = ndb.StringProperty(required=True,choices=set(FRC_GAMES), indexed=False)
     match_number = ndb.IntegerProperty(required=True, indexed=False)
-    no_auto_update = ndb.BooleanProperty(default=False, indexed=False) #Set to True after manual update
+    no_auto_update = ndb.BooleanProperty(default=False, indexed=False)  # Set to True after manual update
     set_number = ndb.IntegerProperty(required=True, indexed=False)
-    team_key_names = ndb.StringProperty(repeated=True) #list of teams in Match, for indexing.
+    team_key_names = ndb.StringProperty(repeated=True)  # list of teams in Match, for indexing.
     time = ndb.DateTimeProperty(indexed=False)
-    time_string = ndb.StringProperty(indexed=False) # the time as displayed on FIRST's site
-    youtube_videos = ndb.StringProperty(repeated=True) # list of Youtube IDs
-    tba_videos = ndb.StringProperty(repeated=True) # list of filetypes a TBA video exists for
+    time_string = ndb.StringProperty(indexed=False)  # the time as displayed on FIRST's site
+    youtube_videos = ndb.StringProperty(repeated=True)  # list of Youtube IDs
+    tba_videos = ndb.StringProperty(repeated=True)  # list of filetypes a TBA video exists for
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True)

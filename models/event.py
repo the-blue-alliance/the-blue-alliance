@@ -13,19 +13,19 @@ class Event(ndb.Model):
     """
     name = ndb.StringProperty()
     event_type_enum = ndb.IntegerProperty()
-    short_name = ndb.StringProperty(indexed=False) # Should not contain "Regional" or "Division", like "Hartford"
-    event_short = ndb.StringProperty(required=True, indexed=False) # Smaller abbreviation like "CT"
+    short_name = ndb.StringProperty(indexed=False)  # Should not contain "Regional" or "Division", like "Hartford"
+    event_short = ndb.StringProperty(required=True, indexed=False)  # Smaller abbreviation like "CT"
     year = ndb.IntegerProperty(required=True)
     start_date = ndb.DateTimeProperty()
     end_date = ndb.DateTimeProperty()
     venue = ndb.StringProperty(indexed=False)
-    venue_address = ndb.StringProperty(indexed=False) # We can scrape this.
+    venue_address = ndb.StringProperty(indexed=False)  # We can scrape this.
     location = ndb.StringProperty(indexed=False)  # in the format "locality, region, country". similar to Team.address
-    official = ndb.BooleanProperty(default=False) # Is the event FIRST-official?
-    first_eid = ndb.StringProperty() #from USFIRST
-    facebook_eid = ndb.StringProperty(indexed=False) #from Facebook
+    official = ndb.BooleanProperty(default=False)  # Is the event FIRST-official?
+    first_eid = ndb.StringProperty()  # from USFIRST
+    facebook_eid = ndb.StringProperty(indexed=False)  # from Facebook
     website = ndb.StringProperty(indexed=False)
-    webcast_json = ndb.TextProperty(indexed=False) #  list of dicts, valid keys include 'type' and 'channel'
+    webcast_json = ndb.TextProperty(indexed=False)  # list of dicts, valid keys include 'type' and 'channel'
     oprs = ndb.FloatProperty(indexed=False, repeated=True)
     opr_teams = ndb.IntegerProperty(indexed=False, repeated=True)
     rankings_json = ndb.TextProperty(indexed=False)

@@ -40,7 +40,7 @@ class TestDatafeedUsfirstTeams(unittest2.TestCase):
         Team(
           id = "frc4409",
           team_number = 4409,
-          first_tpid = 0, #should be 74735
+          first_tpid = 0,  # should be 74735
           first_tpid_year = 2011
         ).put()
 

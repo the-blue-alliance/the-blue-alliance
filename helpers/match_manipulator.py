@@ -18,7 +18,7 @@ class MatchManipulator(ManipulatorBase):
             "event",
             "set_number",
             "match_number",
-        ] # These build key_name, and cannot be changed without deleting the model.
+        ]  # These build key_name, and cannot be changed without deleting the model.
 
         attrs = [
             "alliances_json",

@@ -26,7 +26,7 @@ class TeamList(CacheableHandler):
     def __init__(self, *args, **kw):
         super(TeamList, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
-        self._cache_key = "team_list_{}" # (page)
+        self._cache_key = "team_list_{}"  # (page)
         self._cache_version = 1
 
     def get(self, page='1'):
@@ -86,7 +86,7 @@ class TeamDetail(CacheableHandler):
     def __init__(self, *args, **kw):
         super(TeamDetail, self).__init__(*args, **kw)
         self._cache_expiration = self.LONG_CACHE_EXPIRATION
-        self._cache_key = "team_detail_{}_{}_{}" # (team_number, year, explicit_year)
+        self._cache_key = "team_detail_{}_{}_{}"  # (team_number, year, explicit_year)
         self._cache_version = 2
 
     def get(self, team_number, year=None, explicit_year=False):
@@ -124,7 +124,7 @@ class TeamDetail(CacheableHandler):
             if (event_team.year == year):
                 event = yield event_team.event.get_async()
                 if not event.start_date:
-                    event.start_date = datetime.datetime(year, 12, 31) #unknown goes last
+                    event.start_date = datetime.datetime(year, 12, 31)  # unknown goes last
                 matches_keys = yield Match.query(
                   Match.event == event.key, Match.team_key_names == team.key_name).fetch_async(500, keys_only=True)
                 matches = yield ndb.get_multi_async(matches_keys)
@@ -226,7 +226,7 @@ class TeamHistory(CacheableHandler):
     def __init__(self, *args, **kw):
         super(TeamHistory, self).__init__(*args, **kw)
         self._cache_expiration = self.LONG_CACHE_EXPIRATION
-        self._cache_key = "team_history_{}" # (team_number)
+        self._cache_key = "team_history_{}"  # (team_number)
         self._cache_version = 2
 
     def get(self, team_number):

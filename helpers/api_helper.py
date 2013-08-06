@@ -48,7 +48,7 @@ class ApiHelper(object):
                 except Exception, e:
                     logging.warning("Failed to include Address for api_team_info_%s: %s" % (team_key, e))
 
-                #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
+                # TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
                 if tba_config.CONFIG["memcache"]:
                     memcache.set(memcache_key, team_dict, 2592000)
             else:
@@ -110,7 +110,7 @@ class ApiHelper(object):
             for event_dict, event in zip(event_list, events):
                 event_dict["team_wlt"] = EventHelper.getTeamWLT(team_dict["key"], event)
 
-            #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
+            # TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
             if tba_config.CONFIG["memcache"]:
                 memcache.set(memcache_key, event_list, 2592000)
 
@@ -146,7 +146,7 @@ class ApiHelper(object):
                 match_dict["alliances"] = json.loads(match.alliances_json)
                 matches_list.append(match_dict)
 
-            #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
+            # TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
             if tba_config.CONFIG["memcache"]:
                 memcache.set(memcache_key, matches_list, 2592000)
 

@@ -51,7 +51,7 @@ class TestEventManipulator(unittest2.TestCase):
             website = "http://www.ctfirst.org/ctr",
 
             oprs = [1.0, 2.0, 3.0],
-            opr_teams = [177, 195, 233], # are these really stored as ints or strings? -gregmarra 20120922
+            opr_teams = [177, 195, 233],  # are these really stored as ints or strings? -gregmarra 20120922
             facebook_eid = "7",
             webcast_json = json.dumps([{'type': 'ustream', 'channel': 'foo'}]),
             rankings_json = json.dumps(bad_rankings)

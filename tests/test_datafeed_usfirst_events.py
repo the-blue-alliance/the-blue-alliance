@@ -49,7 +49,7 @@ class TestDatafeedUsfirstEvents(unittest2.TestCase):
     def test_getEventList(self):
         events = self.datafeed.getEventList(2011)
 
-        self.assertEqual(len(events), 58) #58 events expected
+        self.assertEqual(len(events), 58)  # 58 events expected
 
         self.assertEqual(events[0].first_eid, "5519")
         self.assertEqual(events[0].event_type_enum, EventType.REGIONAL)

@@ -78,14 +78,14 @@ class OprHelper(object):
             if len(match.alliances > 0):
                 if (match.comp_level == "qm" and match.alliances['red']['score'] > -1 and match.alliances['blue']['score'] > -1):
                     OprHelper.data.append([])
-                    OprHelper.data[num].append(int(match.alliances['red']['score'])) #redscore
-                    OprHelper.data[num].append(int(match.alliances['blue']['score'])) #bluescore
-                    OprHelper.data[num].append(int(match.alliances['red']['teams'][0][3:])) #red1
-                    OprHelper.data[num].append(int(match.alliances['red']['teams'][1][3:])) #red2
-                    OprHelper.data[num].append(int(match.alliances['red']['teams'][2][3:])) #red3
-                    OprHelper.data[num].append(int(match.alliances['blue']['teams'][0][3:])) #blue1
-                    OprHelper.data[num].append(int(match.alliances['blue']['teams'][1][3:])) #blue2
-                    OprHelper.data[num].append(int(match.alliances['blue']['teams'][2][3:])) #blue3
+                    OprHelper.data[num].append(int(match.alliances['red']['score']))  # redscore
+                    OprHelper.data[num].append(int(match.alliances['blue']['score']))  # bluescore
+                    OprHelper.data[num].append(int(match.alliances['red']['teams'][0][3:]))  # red1
+                    OprHelper.data[num].append(int(match.alliances['red']['teams'][1][3:]))  # red2
+                    OprHelper.data[num].append(int(match.alliances['red']['teams'][2][3:]))  # red3
+                    OprHelper.data[num].append(int(match.alliances['blue']['teams'][0][3:]))  # blue1
+                    OprHelper.data[num].append(int(match.alliances['blue']['teams'][1][3:]))  # blue2
+                    OprHelper.data[num].append(int(match.alliances['blue']['teams'][2][3:]))  # blue3
                     num += 1
 
     @classmethod
@@ -96,8 +96,8 @@ class OprHelper(object):
 
         for num, team_key in enumerate(team_keys):
             OprHelper.teamdata.append([])
-            OprHelper.teamdata[num].append(num) #teamid
-            OprHelper.teamdata[num].append(int(team_key[3:])) #teamnumber
+            OprHelper.teamdata[num].append(num)  # teamid
+            OprHelper.teamdata[num].append(int(team_key[3:]))  # teamnumber
 
     @classmethod
     def teamsPlayed(self):
@@ -239,8 +239,8 @@ class OprHelper(object):
         OprHelper.getM()
         s = OprHelper.gets()
         Mtrans = OprHelper.mTranspose(OprHelper.M)
-        A = OprHelper.mMult(Mtrans,OprHelper.M) # multiply M' times M to get A
-        b = OprHelper.mMult(Mtrans,s) # multiply M' times s to get b
+        A = OprHelper.mMult(Mtrans,OprHelper.M)  # multiply M' times M to get A
+        b = OprHelper.mMult(Mtrans,s)  # multiply M' times s to get b
         U,L = OprHelper.decomposeDoolittle(A)
         temp = OprHelper.solve(L,U,b)
         OPR = OprHelper.zeros(len(temp),1)
@@ -253,7 +253,7 @@ class OprHelper(object):
 
         return OPR, teams
 
-#if __name__ == "__main__":
+# if __name__ == "__main__":
 #    start = clock()
 #    instance = opr()
 #    instance.getTeamData("worteam.csv")

@@ -27,7 +27,7 @@ class FmsEventListParser(ParserBase):
 
         event_rows = soup.findAll("pre")[0].string.split("\n")
 
-        for line in event_rows[2:]: #first is blank, second is headers.
+        for line in event_rows[2:]:  # first is blank, second is headers.
             data = line.split("\t")
             if len(data) > 1:
                 try:
