@@ -16,8 +16,8 @@ class TestEventTeamCreator(unittest2.TestCase):
         self.testbed.init_memcache_stub()
 
         for team_number in range(7):
-            Team(id = "frc%s" % team_number,
-                 team_number = team_number).put()
+            Team(id="frc%s" % team_number,
+                 team_number=team_number).put()
 
         self.events = []
 

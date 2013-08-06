@@ -16,31 +16,31 @@ class TestMatchManipulator(unittest2.TestCase):
         self.testbed.init_taskqueue_stub()
 
         self.event = Event(
-          id = "2012ct",
-          event_short = "ct",
-          year = 2012
+          id="2012ct",
+          event_short="ct",
+          year=2012
         )
 
         self.old_match = Match(
-            id = "2012ct_qm1",
-            alliances_json = """{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""",
-            comp_level = "qm",
-            event = self.event.key,
-            game = "frc_2012_rebr",
-            set_number = 1,
-            match_number = 1,
-            team_key_names = [u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073']
+            id="2012ct_qm1",
+            alliances_json="""{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""",
+            comp_level="qm",
+            event=self.event.key,
+            game="frc_2012_rebr",
+            set_number=1,
+            match_number=1,
+            team_key_names=[u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073']
         )
 
         self.new_match = Match(
-            id = "2012ct_qm1",
-            alliances_json = """{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
-            comp_level = "qm",
-            event = self.event.key,
-            game = "frc_2012_rebr",
-            set_number = 1,
-            match_number = 1,
-            team_key_names = [u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073']
+            id="2012ct_qm1",
+            alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
+            comp_level="qm",
+            event=self.event.key,
+            game="frc_2012_rebr",
+            set_number=1,
+            match_number=1,
+            team_key_names=[u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073']
         )
 
     def tearDown(self):

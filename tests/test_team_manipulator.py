@@ -14,16 +14,16 @@ class TestTeamManipulator(unittest2.TestCase):
         self.testbed.init_memcache_stub()
 
         self.old_team = Team(
-            id = "frc177",
-            team_number = 177,
-            first_tpid = 61771,
-            first_tpid_year = 2012
+            id="frc177",
+            team_number=177,
+            first_tpid=61771,
+            first_tpid_year=2012
         )
 
         self.new_team = Team(
-            id = "frc177",
-            team_number = 177,
-            website = "http://www.bobcatrobotics.org"
+            id="frc177",
+            team_number=177,
+            website="http://www.bobcatrobotics.org"
         )
 
     def tearDown(self):
@@ -55,8 +55,8 @@ class TestTeamManipulator(unittest2.TestCase):
     def test_create_lots_of_teams(self):
         number = 500
         teams = [Team(
-            id = "frc%s" % team_number,
-            team_number = team_number)
+            id="frc%s" % team_number,
+            team_number=team_number)
             for team_number in range(number)]
         TeamManipulator.createOrUpdate(teams)
 

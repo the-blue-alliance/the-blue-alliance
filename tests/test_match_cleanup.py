@@ -11,25 +11,25 @@ from models.match import Match
 def setupMatches(csv):
     with open(csv, 'r') as f:
         event = Event(
-          id = "2013test",
-          event_short = "test",
-          year = 2013
+          id="2013test",
+          event_short="test",
+          year=2013
         )
 
         parsed_matches = OffseasonMatchesParser.parse(f.read())
         matches = [Match(
-            id = Match.renderKeyName(
+            id=Match.renderKeyName(
                 event,
                 match.get("comp_level", None),
                 match.get("set_number", 0),
                 match.get("match_number", 0)),
-            event = event.key,
-            game = Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
-            set_number = match.get("set_number", 0),
-            match_number = match.get("match_number", 0),
-            comp_level = match.get("comp_level", None),
-            team_key_names = match.get("team_key_names", None),
-            alliances_json = match.get("alliances_json", None)
+            event=event.key,
+            game=Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
+            set_number=match.get("set_number", 0),
+            match_number=match.get("match_number", 0),
+            comp_level=match.get("comp_level", None),
+            team_key_names=match.get("team_key_names", None),
+            alliances_json=match.get("alliances_json", None)
             )
             for match in parsed_matches]
         return matches

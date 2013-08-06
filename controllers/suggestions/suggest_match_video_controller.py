@@ -50,9 +50,9 @@ class SuggestMatchVideoController(LoggedInHandler):
 
         if youtube_id is not None:
             suggestion = Suggestion(
-                author = self.user_bundle.account.key,
-                target_key = match_key,
-                target_model = "match",
+                author=self.user_bundle.account.key,
+                target_key=match_key,
+                target_model="match",
                 )
             suggestion.contents = {"youtube_videos": [youtube_id]}
             suggestion.put()

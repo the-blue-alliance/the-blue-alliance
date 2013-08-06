@@ -50,19 +50,19 @@ class DatafeedUsfirst(DatafeedBase):
         event, _ = self.parse(url, UsfirstEventDetailsParser)
 
         return Event(
-            id = str(event["year"]) + str.lower(str(event["event_short"])),
-            end_date = event.get("end_date", None),
-            event_short = event.get("event_short", None),
-            event_type_enum = event.get("event_type_enum", None),
-            first_eid = first_eid,
-            name = event.get("name", None),
-            official = True,
-            start_date = event.get("start_date", None),
-            venue_address = event.get("venue_address", None),
-            venue = event.get("venue", None),
-            location = event.get("location", None),
-            website = event.get("website", None),
-            year = event.get("year", None)
+            id=str(event["year"]) + str.lower(str(event["event_short"])),
+            end_date=event.get("end_date", None),
+            event_short=event.get("event_short", None),
+            event_type_enum=event.get("event_type_enum", None),
+            first_eid=first_eid,
+            name=event.get("name", None),
+            official=True,
+            start_date=event.get("start_date", None),
+            venue_address=event.get("venue_address", None),
+            venue=event.get("venue", None),
+            location=event.get("location", None),
+            website=event.get("website", None),
+            year=event.get("year", None)
         )
 
     def getEventList(self, year):
@@ -72,11 +72,11 @@ class DatafeedUsfirst(DatafeedBase):
         events, _ = self.parse(url, UsfirstEventListParser)
 
         return [Event(
-            event_type_enum = event.get("event_type_enum", None),
-            event_short = "???",
-            first_eid = event.get("first_eid", None),
-            name = event.get("name", None),
-            year = int(year)
+            event_type_enum=event.get("event_type_enum", None),
+            event_short="???",
+            first_eid=event.get("first_eid", None),
+            name=event.get("name", None),
+            year=int(year)
             )
             for event in events]
 
@@ -99,13 +99,13 @@ class DatafeedUsfirst(DatafeedBase):
         awards, _ = self.parse(url, UsfirstEventAwardsParser)
 
         return [Award(
-            id = Award.renderKeyName(event.key_name, award.get('name')),
-            name = award.get('name', None),
-            team = _getTeamKey(award),
-            awardee = award.get('awardee', None),
-            year = event.year,
-            official_name = award.get('official_name', None),
-            event = event.key)
+            id=Award.renderKeyName(event.key_name, award.get('name')),
+            name=award.get('name', None),
+            team=_getTeamKey(award),
+            awardee=award.get('awardee', None),
+            year=event.year,
+            official_name=award.get('official_name', None),
+            event=event.key)
             for award in awards]
 
     def getEventTeams(self, year, first_eid):
@@ -132,10 +132,10 @@ class DatafeedUsfirst(DatafeedBase):
             seen_teams = seen_teams.union(partial_seen_teams)
 
         return [Team(
-            id = "frc%s" % team.get("team_number", None),
-            first_tpid = team.get("first_tpid", None),
-            first_tpid_year = year,
-            team_number = team.get("team_number", None)
+            id="frc%s" % team.get("team_number", None),
+            first_tpid=team.get("first_tpid", None),
+            first_tpid_year=year,
+            team_number=team.get("team_number", None)
             )
             for team in teams]
 
@@ -145,19 +145,19 @@ class DatafeedUsfirst(DatafeedBase):
         matches, _ = self.parse(url, UsfirstMatchesParser)
 
         return [Match(
-            id = Match.renderKeyName(
+            id=Match.renderKeyName(
                 event,
                 match.get("comp_level", None),
                 match.get("set_number", 0),
                 match.get("match_number", 0)),
-            event = event.key,
-            game = Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
-            set_number = match.get("set_number", 0),
-            match_number = match.get("match_number", 0),
-            comp_level = match.get("comp_level", None),
-            team_key_names = match.get("team_key_names", None),
-            time_string = match.get("time_string", None),
-            alliances_json = match.get("alliances_json", None)
+            event=event.key,
+            game=Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
+            set_number=match.get("set_number", 0),
+            match_number=match.get("match_number", 0),
+            comp_level=match.get("comp_level", None),
+            team_key_names=match.get("team_key_names", None),
+            time_string=match.get("time_string", None),
+            alliances_json=match.get("alliances_json", None)
             )
             for match in matches]
 
@@ -169,11 +169,11 @@ class DatafeedUsfirst(DatafeedBase):
 
                 if "team_number" in team_dict:
                     return Team(
-                        team_number = team_dict.get("team_number", None),
-                        name = self._shorten(team_dict.get("name", None)),
-                        address = team_dict.get("address", None),
-                        nickname = team_dict.get("nickname", None),
-                        website = team_dict.get("website", None)
+                        team_number=team_dict.get("team_number", None),
+                        name=self._shorten(team_dict.get("name", None)),
+                        address=team_dict.get("address", None),
+                        nickname=team_dict.get("nickname", None),
+                        website=team_dict.get("website", None)
                     )
                 else:
                     logging.warning("No team_number found scraping %s, probably retired team" % team.team_number)

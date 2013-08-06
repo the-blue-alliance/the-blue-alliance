@@ -65,10 +65,10 @@ class InsightsHelper(object):
         """
         Create Insight object given data, name, and year
         """
-        return Insight(id = Insight.renderKeyName(year, name),
-                       name = name,
-                       year = year,
-                       data_json = json.dumps(data))
+        return Insight(id=Insight.renderKeyName(year, name),
+                       name=name,
+                       year=year,
+                       data_json=json.dumps(data))
 
     @classmethod
     def _generateMatchData(self, match, event):

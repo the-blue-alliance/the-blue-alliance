@@ -17,35 +17,35 @@ class TestMatchSuggestionAccepter(unittest2.TestCase):
         self.testbed.init_memcache_stub()
 
         self.account = Account(
-            email = "tba@thebluealliance.com",
+            email="tba@thebluealliance.com",
         )
         self.account.put()
 
         self.suggestion = Suggestion(
-            author = self.account.key,
-            contents_json = "{\"youtube_videos\":[\"123456\"]}",
-            target_key = "2012ct_qm1",
-            target_model = "match"
+            author=self.account.key,
+            contents_json="{\"youtube_videos\":[\"123456\"]}",
+            target_key="2012ct_qm1",
+            target_model="match"
         )
         self.suggestion.put()
 
         self.event = Event(
-          id = "2012ct",
-          event_short = "ct",
-          year = 2012
+          id="2012ct",
+          event_short="ct",
+          year=2012
         )
         self.event.put()
 
         self.match = Match(
-            id = "2012ct_qm1",
-            alliances_json = """{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""",
-            comp_level = "qm",
-            event = self.event.key,
-            game = "frc_2012_rebr",
-            set_number = 1,
-            match_number = 1,
-            team_key_names = [u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073'],
-            youtube_videos = ["abcdef"]
+            id="2012ct_qm1",
+            alliances_json="""{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""",
+            comp_level="qm",
+            event=self.event.key,
+            game="frc_2012_rebr",
+            set_number=1,
+            match_number=1,
+            team_key_names=[u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073'],
+            youtube_videos=["abcdef"]
         )
         self.match.put()
 

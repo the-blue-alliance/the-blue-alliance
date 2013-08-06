@@ -30,38 +30,38 @@ class TestApiTeamShow(unittest2.TestCase):
         self.testbed.init_memcache_stub()
 
         self.team = Team(
-                id = "frc281",
-                name = "Michelin / Caterpillar / Greenville Technical College /\
+                id="frc281",
+                name="Michelin / Caterpillar / Greenville Technical College /\
                 jcpenney / Baldor / ASME / Gastroenterology Associates /\
                 Laserflex South & Greenville County Schools & Greenville\
                 Technical Charter High School",
-                team_number = 281,
-                nickname = "EnTech GreenVillians",
-                address = "Greenville, SC, USA",
-                website = "www.entech.org",
+                team_number=281,
+                nickname="EnTech GreenVillians",
+                address="Greenville, SC, USA",
+                website="www.entech.org",
         )
 
         self.team.put()
 
         self.event = Event(
-                id = "2010sc",
-                name = "Palmetto Regional",
-                event_type_enum = EventType.REGIONAL,
-                short_name = "Palmetto",
-                event_short = "sc",
-                year = 2010,
-                end_date = datetime(2010, 03, 27),
-                official = True,
-                location = 'Clemson, SC',
-                start_date = datetime(2010, 03, 24),
+                id="2010sc",
+                name="Palmetto Regional",
+                event_type_enum=EventType.REGIONAL,
+                short_name="Palmetto",
+                event_short="sc",
+                year=2010,
+                end_date=datetime(2010, 03, 27),
+                official=True,
+                location='Clemson, SC',
+                start_date=datetime(2010, 03, 24),
         )
 
         self.event.put()
 
         self.event_team = EventTeam(
-                team = self.team.key,
-                event = self.event.key,
-                year = datetime.now().year
+                team=self.team.key,
+                event=self.event.key,
+                year=datetime.now().year
         )
 
         self.event_team.put()

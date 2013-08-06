@@ -55,9 +55,9 @@ class AdminSitevarEdit(LoggedInHandler):
         # note, we don't use sitevar_key
 
         sitevar = Sitevar(
-            id = self.request.get("key"),
-            description = self.request.get("description"),
-            values_json = self.request.get("values_json"),
+            id=self.request.get("key"),
+            description=self.request.get("description"),
+            values_json=self.request.get("values_json"),
         )
         sitevar.put()
 

@@ -25,36 +25,36 @@ class TestEventManipulator(unittest2.TestCase):
         bad_rankings, _ = UsfirstEventRankingsParser.parse(f2.read())
 
         self.old_event = Event(
-            id = "2011ct",
-            end_date = datetime.datetime(2011, 4, 2, 0, 0),
-            event_short = "ct",
-            event_type_enum = EventType.REGIONAL,
-            first_eid = "5561",
-            name = "Northeast Utilities FIRST Connecticut Regional",
-            start_date = datetime.datetime(2011, 3, 31, 0, 0),
-            year = 2011,
-            venue_address = "Connecticut Convention Center\r\n100 Columbus Blvd\r\nHartford, CT 06103\r\nUSA",
-            website = "http://www.ctfirst.org/ctr",
-            rankings_json = json.dumps(good_rankings)
+            id="2011ct",
+            end_date=datetime.datetime(2011, 4, 2, 0, 0),
+            event_short="ct",
+            event_type_enum=EventType.REGIONAL,
+            first_eid="5561",
+            name="Northeast Utilities FIRST Connecticut Regional",
+            start_date=datetime.datetime(2011, 3, 31, 0, 0),
+            year=2011,
+            venue_address="Connecticut Convention Center\r\n100 Columbus Blvd\r\nHartford, CT 06103\r\nUSA",
+            website="http://www.ctfirst.org/ctr",
+            rankings_json=json.dumps(good_rankings)
         )
 
         self.new_event = Event(
-            id = "2011ct",
-            end_date = datetime.datetime(2011, 4, 2, 0, 0),
-            event_short = "ct",
-            event_type_enum = EventType.REGIONAL,
-            first_eid = "5561",
-            name = "Northeast Utilities FIRST Connecticut Regional",
-            start_date = datetime.datetime(2011, 3, 31, 0, 0),
-            year = 2011,
-            venue_address = "Connecticut Convention Center\r\n100 Columbus Blvd\r\nHartford, CT 06103\r\nUSA",
-            website = "http://www.ctfirst.org/ctr",
+            id="2011ct",
+            end_date=datetime.datetime(2011, 4, 2, 0, 0),
+            event_short="ct",
+            event_type_enum=EventType.REGIONAL,
+            first_eid="5561",
+            name="Northeast Utilities FIRST Connecticut Regional",
+            start_date=datetime.datetime(2011, 3, 31, 0, 0),
+            year=2011,
+            venue_address="Connecticut Convention Center\r\n100 Columbus Blvd\r\nHartford, CT 06103\r\nUSA",
+            website="http://www.ctfirst.org/ctr",
 
-            oprs = [1.0, 2.0, 3.0],
-            opr_teams = [177, 195, 233],  # are these really stored as ints or strings? -gregmarra 20120922
-            facebook_eid = "7",
-            webcast_json = json.dumps([{'type': 'ustream', 'channel': 'foo'}]),
-            rankings_json = json.dumps(bad_rankings)
+            oprs=[1.0, 2.0, 3.0],
+            opr_teams=[177, 195, 233],  # are these really stored as ints or strings? -gregmarra 20120922
+            facebook_eid="7",
+            webcast_json=json.dumps([{'type': 'ustream', 'channel': 'foo'}]),
+            rankings_json=json.dumps(bad_rankings)
         )
 
     def tearDown(self):

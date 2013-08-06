@@ -113,18 +113,18 @@ class AdminMatchAdd(LoggedInHandler):
 
         event = Event.get_by_id(event_key)
         matches = [Match(
-            id = Match.renderKeyName(
+            id=Match.renderKeyName(
                 event,
                 match.get("comp_level", None),
                 match.get("set_number", 0),
                 match.get("match_number", 0)),
-            event = event.key,
-            game = Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
-            set_number = match.get("set_number", 0),
-            match_number = match.get("match_number", 0),
-            comp_level = match.get("comp_level", None),
-            team_key_names = match.get("team_key_names", None),
-            alliances_json = match.get("alliances_json", None)
+            event=event.key,
+            game=Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
+            set_number=match.get("set_number", 0),
+            match_number=match.get("match_number", 0),
+            comp_level=match.get("comp_level", None),
+            team_key_names=match.get("team_key_names", None),
+            alliances_json=match.get("alliances_json", None)
             )
             for match in matches]
 
@@ -158,14 +158,14 @@ class AdminMatchEdit(LoggedInHandler):
             team_key_names.extend(alliances[alliance].get('teams', None))
 
         match = Match(
-            id = match_key,
-            event = Event.get_by_id(self.request.get("event_key_name")).key,
-            game = self.request.get("game"),
-            set_number = int(self.request.get("set_number")),
-            match_number = int(self.request.get("match_number")),
-            comp_level = self.request.get("comp_level"),
-            team_key_names = team_key_names,
-            alliances_json = alliances_json,
+            id=match_key,
+            event=Event.get_by_id(self.request.get("event_key_name")).key,
+            game=self.request.get("game"),
+            set_number=int(self.request.get("set_number")),
+            match_number=int(self.request.get("match_number")),
+            comp_level=self.request.get("comp_level"),
+            team_key_names=team_key_names,
+            alliances_json=alliances_json,
             # no_auto_update = str(self.request.get("no_auto_update")).lower() == "true", #TODO
         )
         match = MatchManipulator.createOrUpdate(match)

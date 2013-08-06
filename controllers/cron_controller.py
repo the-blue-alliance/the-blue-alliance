@@ -70,16 +70,16 @@ class EventTeamUpdate(webapp.RequestHandler):
                 team_ids.add(team)
 
         teams = TeamManipulator.createOrUpdate([Team(
-            id = team_id,
-            team_number = int(team_id[3:]))
+            id=team_id,
+            team_number=int(team_id[3:]))
             for team_id in team_ids])
 
         if teams:
             event_teams = EventTeamManipulator.createOrUpdate([EventTeam(
-                id = event_key + "_" + team.key.id(),
-                event = event.key,
-                team = team.key,
-                year = event.year)
+                id=event_key + "_" + team.key.id(),
+                event=event.key,
+                team=team.key,
+                year=event.year)
                 for team in teams])
         else:
             event_teams = None
@@ -326,8 +326,8 @@ class TypeaheadCalcDo(webapp.RequestHandler):
 
         entries = []
         for key, data in results.items():
-            entries.append(TypeaheadEntry(id = key,
-                                          data_json = json.dumps(data)))
+            entries.append(TypeaheadEntry(id=key,
+                                          data_json=json.dumps(data)))
         ndb.put_multi(entries)
 
         template_values = {'results': results}

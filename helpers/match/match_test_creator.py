@@ -47,15 +47,15 @@ class MatchTestCreator(object):
                 match_number)
 
         return Match(
-            id = id_string,
-            alliances_json = json.dumps(alliances),
-            comp_level = comp_level,
-            event = self.event.key,
-            game = "frc_2012_rebr",
-            set_number = set_number,
-            match_number = match_number,
-            team_key_names = [team.key_name for team in teams],
-            youtube_videos = youtube_videos,
+            id=id_string,
+            alliances_json=json.dumps(alliances),
+            comp_level=comp_level,
+            event=self.event.key,
+            game="frc_2012_rebr",
+            set_number=set_number,
+            match_number=match_number,
+            team_key_names=[team.key_name for team in teams],
+            youtube_videos=youtube_videos,
         )
 
     def createCompleteQuals(self):

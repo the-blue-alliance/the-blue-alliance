@@ -21,28 +21,28 @@ class TestDatafeedUsfirstTeams(unittest2.TestCase):
         self.testbed.init_memcache_stub()
 
         self.event = Event(
-                id = "2010sc",
-                name = "Palmetto Regional",
-                event_type_enum = EventType.REGIONAL,
-                short_name = "Palmetto",
-                event_short = "sc",
-                year = 2010,
-                end_date = datetime.datetime(2010, 03, 27),
-                official = True,
-                location = 'Clemson, SC',
-                start_date = datetime.datetime(2010, 03, 24),
+                id="2010sc",
+                name="Palmetto Regional",
+                event_type_enum=EventType.REGIONAL,
+                short_name="Palmetto",
+                event_short="sc",
+                year=2010,
+                end_date=datetime.datetime(2010, 03, 27),
+                official=True,
+                location='Clemson, SC',
+                start_date=datetime.datetime(2010, 03, 24),
         )
         self.event.put()
 
         self.match = Match(
-            id = "2010sc_qm1",
-            alliances_json = """{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""",
-            comp_level = "qm",
-            event = self.event.key,
-            game = "frc_2010_bkwy",
-            set_number = 1,
-            match_number = 1,
-            team_key_names = [u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073']
+            id="2010sc_qm1",
+            alliances_json="""{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""",
+            comp_level="qm",
+            event=self.event.key,
+            game="frc_2010_bkwy",
+            set_number=1,
+            match_number=1,
+            team_key_names=[u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073']
         )
         self.match.put()
 

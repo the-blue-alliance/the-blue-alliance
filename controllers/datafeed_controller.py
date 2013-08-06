@@ -161,10 +161,10 @@ class UsfirstEventDetailsGet(webapp.RequestHandler):
 
         if teams:
             event_teams = [EventTeam(
-                id = event.key.id() + "_" + team.key.id(),
-                event = event.key,
-                team = team.key,
-                year = event.year)
+                id=event.key.id() + "_" + team.key.id(),
+                event=event.key,
+                team=team.key,
+                year=event.year)
                 for team in teams]
             event_teams = EventTeamManipulator.createOrUpdate(event_teams)
         else:

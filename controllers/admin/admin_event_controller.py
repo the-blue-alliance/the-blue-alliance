@@ -162,20 +162,20 @@ class AdminEventEdit(LoggedInHandler):
             end_date = datetime.strptime(self.request.get("end_date"), "%Y-%m-%d")
 
         event = Event(
-            id = str(self.request.get("year")) + str.lower(str(self.request.get("event_short"))),
-            end_date = end_date,
-            event_short = self.request.get("event_short"),
-            event_type_enum = EventHelper.parseEventType(self.request.get("event_type_str")),
-            location = self.request.get("location"),
-            name = self.request.get("name"),
-            short_name = self.request.get("short_name"),
-            start_date = start_date,
-            website = self.request.get("website"),
-            year = int(self.request.get("year")),
-            official = {"true": True, "false": False}.get(self.request.get("official").lower()),
-            facebook_eid = self.request.get("facebook_eid"),
-            webcast_json = self.request.get("webcast_json"),
-            rankings_json = self.request.get("rankings_json"),
+            id=str(self.request.get("year")) + str.lower(str(self.request.get("event_short"))),
+            end_date=end_date,
+            event_short=self.request.get("event_short"),
+            event_type_enum=EventHelper.parseEventType(self.request.get("event_type_str")),
+            location=self.request.get("location"),
+            name=self.request.get("name"),
+            short_name=self.request.get("short_name"),
+            start_date=start_date,
+            website=self.request.get("website"),
+            year=int(self.request.get("year")),
+            official={"true": True, "false": False}.get(self.request.get("official").lower()),
+            facebook_eid=self.request.get("facebook_eid"),
+            webcast_json=self.request.get("webcast_json"),
+            rankings_json=self.request.get("rankings_json"),
         )
         event = EventManipulator.createOrUpdate(event)
 

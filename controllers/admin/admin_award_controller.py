@@ -47,13 +47,13 @@ class AdminAwardAdd(LoggedInHandler):
                 return None
 
         awards = [Award(
-            id = Award.renderKeyName(event.key_name, award.get('name')),
-            name = award.get('name', None),
-            team = _getTeamKey(award),
-            awardee = award.get('awardee', None),
-            year = event.year,
-            official_name = award.get('official_name', None),
-            event = event.key)
+            id=Award.renderKeyName(event.key_name, award.get('name')),
+            name=award.get('name', None),
+            team=_getTeamKey(award),
+            awardee=award.get('awardee', None),
+            year=event.year,
+            official_name=award.get('official_name', None),
+            event=event.key)
             for award in awards]
 
         AwardManipulator.createOrUpdate(awards)
@@ -79,12 +79,12 @@ class AdminAwardEdit(LoggedInHandler):
         self._require_admin()
         event_key_name = self.request.get('event_key_name')
         award = Award(
-            id = award_key,
-            name = self.request.get('award_name'),
-            event = Event.get_by_id(event_key_name).key,
-            official_name = self.request.get('official_name'),
-            team = Team.get_by_id(self.request.get('team_key')).key,
-            awardee = self.request.get('awardee'),
+            id=award_key,
+            name=self.request.get('award_name'),
+            event=Event.get_by_id(event_key_name).key,
+            official_name=self.request.get('official_name'),
+            team=Team.get_by_id(self.request.get('team_key')).key,
+            awardee=self.request.get('awardee'),
         )
         award = AwardManipulator.createOrUpdate(award)
         self.redirect("/admin/event/" + event_key_name)

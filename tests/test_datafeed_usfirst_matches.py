@@ -22,9 +22,9 @@ class TestDatafeedUsfirstMatches(unittest2.TestCase):
 
     def test_getMatchResultsList(self):
         event = Event(
-          id = "2011ct",
-          event_short = "ct",
-          year = 2011
+          id="2011ct",
+          event_short="ct",
+          year=2011
         )
 
         matches = self.datafeed.getMatches(event)

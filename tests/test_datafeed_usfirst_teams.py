@@ -18,10 +18,10 @@ class TestDatafeedUsfirstTeams(unittest2.TestCase):
         self.datafeed = DatafeedUsfirst()
 
         self.team177 = Team(
-            id = "frc177",
-            team_number = 177,
-            first_tpid = 61771,
-            first_tpid_year = 2012
+            id="frc177",
+            team_number=177,
+            first_tpid=61771,
+            first_tpid_year=2012
         )
         self.team177.put()
 
@@ -38,10 +38,10 @@ class TestDatafeedUsfirstTeams(unittest2.TestCase):
 
     def test_getTeamsTpids(self):
         Team(
-          id = "frc4409",
-          team_number = 4409,
-          first_tpid = 0,  # should be 74735
-          first_tpid_year = 2011
+          id="frc4409",
+          team_number=4409,
+          first_tpid=0,  # should be 74735
+          first_tpid_year=2011
         ).put()
 
         # We can skip 2000 records, paginate, and still get frc4409 and frc4410 in 2012

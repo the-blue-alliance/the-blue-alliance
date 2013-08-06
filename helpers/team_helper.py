@@ -62,10 +62,10 @@ class TeamTpidHelper(object):
           tpids_dict[teamNumber] = teamTpid
 
         teams = [Team(
-              team_number = int(team_number),
-              first_tpid = int(tpids_dict[team_number]),
-              first_tpid_year = int(year),
-              id = "frc" + str(team_number)
+              team_number=int(team_number),
+              first_tpid=int(tpids_dict[team_number]),
+              first_tpid_year=int(year),
+              id="frc" + str(team_number)
             )
         for team_number in tpids_dict]
 

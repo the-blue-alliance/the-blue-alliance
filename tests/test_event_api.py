@@ -30,16 +30,16 @@ class TestApiEventList(unittest2.TestCase):
         self.testbed.init_memcache_stub()
 
         self.event = Event(
-                id = "2010sc",
-                name = "Palmetto Regional",
-                event_type_enum = EventType.REGIONAL,
-                short_name = "Palmetto",
-                event_short = "sc",
-                year = 2010,
-                end_date = datetime(2010, 03, 27),
-                official = True,
-                location = 'Clemson, SC',
-                start_date = datetime(2010, 03, 24),
+                id="2010sc",
+                name="Palmetto Regional",
+                event_type_enum=EventType.REGIONAL,
+                short_name="Palmetto",
+                event_short="sc",
+                year=2010,
+                end_date=datetime(2010, 03, 27),
+                official=True,
+                location='Clemson, SC',
+                start_date=datetime(2010, 03, 24),
         )
         self.event.put()
 
@@ -73,16 +73,16 @@ class TestApiMatchDetails(unittest2.TestCase):
         self.testbed.init_memcache_stub()
 
         self.event = Event(
-                id = "2010sc",
-                name = "Palmetto Regional",
-                event_type_enum = EventType.REGIONAL,
-                short_name = "Palmetto",
-                event_short = "sc",
-                year = 2010,
-                end_date = datetime(2010, 03, 27),
-                official = True,
-                location = 'Clemson, SC',
-                start_date = datetime(2010, 03, 24),
+                id="2010sc",
+                name="Palmetto Regional",
+                event_type_enum=EventType.REGIONAL,
+                short_name="Palmetto",
+                event_short="sc",
+                year=2010,
+                end_date=datetime(2010, 03, 27),
+                official=True,
+                location='Clemson, SC',
+                start_date=datetime(2010, 03, 24),
         )
         self.event.put()
 
@@ -90,14 +90,14 @@ class TestApiMatchDetails(unittest2.TestCase):
         match_team_key_names = ["frc177", "frc67", "frc294", "frc469", "frc1114", "frc2041"]
 
         self.match = Match(
-                id = '2010cmp_f1m1',
-                comp_level = 'f',
-                match_number = 1,
-                team_key_names = match_team_key_names,
-                alliances_json = self.match_json,
-                set_number = 1,
-                game = 'frc_2010_bkwy',
-                event = self.event.key
+                id='2010cmp_f1m1',
+                comp_level='f',
+                match_number=1,
+                team_key_names=match_team_key_names,
+                alliances_json=self.match_json,
+                set_number=1,
+                game='frc_2010_bkwy',
+                event=self.event.key
         )
         self.match.put()
 
