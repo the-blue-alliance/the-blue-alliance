@@ -174,6 +174,6 @@ class ApiHelper(object):
             match_dict["alliances"] = json.loads(match.alliances_json)
 
             if tba_config.CONFIG["memcache"]:
-                memcache.set(memcache_key, match_dict, (2 * (60 * 60)) )
+                memcache.set(memcache_key, match_dict, (2 * (60 * 60)))
 
         return match_dict

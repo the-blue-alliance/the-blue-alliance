@@ -193,7 +193,7 @@ class TeamDetail(CacheableHandler):
                                    'matches': matches_organized,
                                    'wlt': display_wlt,
                                    'rank': team_rank,
-                                   'awards': event_awards })
+                                   'awards': event_awards})
 
         year_wlt = {"win": 0, "loss": 0, "tie": 0}
         for wlt in year_wlt_list:
@@ -210,7 +210,7 @@ class TeamDetail(CacheableHandler):
                             "years": years,
                             "year_wlt": year_wlt,
                             "current_event": current_event,
-                            "matches_upcoming": matches_upcoming }
+                            "matches_upcoming": matches_upcoming}
 
         if short_cache:
             self._cache_expiration = self.SHORT_CACHE_EXPIRATION

@@ -39,7 +39,7 @@ class ApiTeamsShow(MainApiHandler):
             teams = [ApiHelper.getTeamInfo(team_key) for team_key in team_keys]
         except IndexError:
             self.response.set_status(404)
-            response_json = { "Property Error": "No team found for key in %s" % str(teams) }
+            response_json = {"Property Error": "No team found for key in %s" % str(teams)}
 
         self.response.out.write(json.dumps(teams))
 
@@ -63,7 +63,7 @@ class ApiTeamDetails(MainApiHandler):
             self.response.out.write(json.dumps(response_json))
 
         except IndexError:
-            response_json = { "Property Error": "No team found for the key given" }
+            response_json = {"Property Error": "No team found for the key given"}
             self.response.set_status(404)
             self.response.out.write(json.dumps(response_json))
 
@@ -73,7 +73,7 @@ class ApiEventsShow(MainApiHandler):
     Deprecation notice. Please use ApiEventList, or ApiEventDetails.
     """
     def get(self):
-        response = { "API Method Removed": "ApiEventsShow is no longer available. Please use ApiEvenDetails, and ApiEventList instead." }
+        response = {"API Method Removed": "ApiEventsShow is no longer available. Please use ApiEvenDetails, and ApiEventList instead."}
         self.response.set_status(410)
         self.response.out.write(json.dumps(response))
 

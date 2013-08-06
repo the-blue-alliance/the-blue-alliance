@@ -17,7 +17,7 @@ class MatchHelper(object):
     def natural_sort_matches(self, matches):
         import re
         convert = lambda text: int(text) if text.isdigit() else text.lower()
-        alphanum_key = lambda match: [ convert(c) for c in re.split('([0-9]+)', str(match.key_name)) ]
+        alphanum_key = lambda match: [convert(c) for c in re.split('([0-9]+)', str(match.key_name))]
         return sorted(matches, key = alphanum_key)
 
     # Note: Only works for a list of matches in the same comp level
