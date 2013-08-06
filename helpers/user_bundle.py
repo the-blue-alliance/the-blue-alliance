@@ -18,7 +18,7 @@ class UserBundle(object):
                 email = self.user.email(),
                 nickname = self.user.nickname(),
                 registered = False,
-                greeting = self.user.nickname())
+                display_name = self.user.nickname())
         return self._account
 
     @property

@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<h1>{{ user.greeting }} </h1>
+<h1>{{ user.display_name }} </h1>
 
 <form action="/admin/user/edit/{{user.key.id}}" method="post">
     <legend>Edit {{ user.key.id }}</legend>

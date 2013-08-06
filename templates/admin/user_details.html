@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}{{user.greeting}}{% endblock %}
+{% block title %}{{user.display_name}}{% endblock %}
 
 {% block content %}
 
-<h1>{{ user.greeting }}</h1>
+<h1>{{ user.display_name }}</h1>
 
 <div class="btn-group">
     <a href="/admin/user/edit/{{user.key.id}}" class="btn btn-primary"><i class="icon-edit icon-white"></i> Edit</a>
