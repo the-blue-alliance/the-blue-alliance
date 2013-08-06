@@ -188,13 +188,13 @@ class InsightsHelper(object):
             if num_matches_by_week == 0:
                 week_average = 0
             else:
-                week_average = float(week_match_sum)/num_matches_by_week/2
+                week_average = float(week_match_sum) / num_matches_by_week / 2
             match_averages_by_week.append((week, week_average))
 
             if elim_num_matches_by_week == 0:
                 elim_week_average = 0
             else:
-                elim_week_average = float(elim_week_match_sum)/elim_num_matches_by_week/2
+                elim_week_average = float(elim_week_match_sum) / elim_num_matches_by_week / 2
             elim_match_averages_by_week.append((week, elim_week_average))
 
         insights = []
@@ -247,8 +247,8 @@ class InsightsHelper(object):
             totalCount = float(sum(score_distribution.values()))
             score_distribution_normalized = {}
             for score, amount in score_distribution.items():
-                roundedScore = score - int((score % binAmount) + binAmount/2)
-                contribution = float(amount)*100/totalCount
+                roundedScore = score - int((score % binAmount) + binAmount / 2)
+                contribution = float(amount) * 100 / totalCount
                 if roundedScore in score_distribution_normalized:
                     score_distribution_normalized[roundedScore] += contribution
                 else:
@@ -260,8 +260,8 @@ class InsightsHelper(object):
             totalCount = float(sum(elim_score_distribution.values()))
             elim_score_distribution_normalized = {}
             for score, amount in elim_score_distribution.items():
-                roundedScore = score - int((score % binAmount) + binAmount/2)
-                contribution = float(amount)*100/totalCount
+                roundedScore = score - int((score % binAmount) + binAmount / 2)
+                contribution = float(amount) * 100 / totalCount
                 if roundedScore in elim_score_distribution_normalized:
                     elim_score_distribution_normalized[roundedScore] += contribution
                 else:

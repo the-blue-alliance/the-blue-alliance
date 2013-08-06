@@ -204,9 +204,9 @@ class GamedayHandler(CacheableHandler):
 class ChannelHandler(BaseHandlerFB):
     # This is required for the FB JSSDK
     def get(self):
-        expires = 60*60*24*365
+        expires = 60 * 60 * 24 * 365
         self.response.headers.add_header("Pragma", "public")
-        self.response.headers.add_header("Cache-Control", "max-age="+str(expires))
+        self.response.headers.add_header("Cache-Control", "max-age=" + str(expires))
         expires_date = time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(expires + time.time()))
         self.response.headers.add_header("Expires", expires_date)
         self.response.out.write('<script src="//connect.facebook.net/en_US/all.js"></script>')

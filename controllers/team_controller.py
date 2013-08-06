@@ -45,7 +45,7 @@ class TeamList(CacheableHandler):
             if curPage == 1:
                 label = '1-999'
             else:
-                label = "{}'s".format((curPage - 1)*1000)
+                label = "{}'s".format((curPage - 1) * 1000)
             page_labels.append(label)
             if curPage == page:
                 cur_page_label = label
@@ -61,7 +61,7 @@ class TeamList(CacheableHandler):
         teams = ndb.get_multi(team_keys)
 
         num_teams = len(teams)
-        middle_value = num_teams/2
+        middle_value = num_teams / 2
         if num_teams % 2 != 0:
             middle_value += 1
         teams_a, teams_b = teams[:middle_value], teams[middle_value:]

@@ -114,7 +114,7 @@ class EventDetail(CacheableHandler):
         teams = TeamHelper.sortTeams(event.teams)
 
         num_teams = len(teams)
-        middle_value = num_teams/2
+        middle_value = num_teams / 2
         if num_teams % 2 != 0:
             middle_value += 1
         teams_a, teams_b = teams[:middle_value], teams[middle_value:]

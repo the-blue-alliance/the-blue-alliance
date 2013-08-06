@@ -67,7 +67,7 @@ class OprHelper(object):
             for i in range(len(matrixA)):
                  for j in range(len(matrixB[0])):
                     for k in range(len(matrixB)):
-                        result[i][j] += matrixA[i][k]*matrixB[k][j]
+                        result[i][j] += matrixA[i][k] * matrixB[k][j]
             return result
 
     @classmethod
@@ -134,33 +134,33 @@ class OprHelper(object):
     def getM(self):
         # puts a 1 in a row of M for each team on an alliance
         i = 0
-        OprHelper.M = OprHelper.zeros(2*len(OprHelper.data),len(OprHelper.teamdata))
-        while (i) < 2*len(OprHelper.data):
-            OprHelper.M[i][OprHelper.getTeamID(OprHelper.data[i/2][2])] = 1
-            OprHelper.M[i][OprHelper.getTeamID(OprHelper.data[i/2][3])] = 1
-            OprHelper.M[i][OprHelper.getTeamID(OprHelper.data[i/2][4])] = 1
+        OprHelper.M = OprHelper.zeros(2 * len(OprHelper.data),len(OprHelper.teamdata))
+        while (i) < 2 * len(OprHelper.data):
+            OprHelper.M[i][OprHelper.getTeamID(OprHelper.data[i / 2][2])] = 1
+            OprHelper.M[i][OprHelper.getTeamID(OprHelper.data[i / 2][3])] = 1
+            OprHelper.M[i][OprHelper.getTeamID(OprHelper.data[i / 2][4])] = 1
 
             i += 1
 
-            OprHelper.M[i][OprHelper.getTeamID(OprHelper.data[i/2][5])] = 1
-            OprHelper.M[i][OprHelper.getTeamID(OprHelper.data[i/2][6])] = 1
-            OprHelper.M[i][OprHelper.getTeamID(OprHelper.data[i/2][7])] = 1
+            OprHelper.M[i][OprHelper.getTeamID(OprHelper.data[i / 2][5])] = 1
+            OprHelper.M[i][OprHelper.getTeamID(OprHelper.data[i / 2][6])] = 1
+            OprHelper.M[i][OprHelper.getTeamID(OprHelper.data[i / 2][7])] = 1
             i += 1
 
     @classmethod
     def gets(self):
         # gets each alliance's score for each match
         i = 0
-        s = [[0] for row in range(2*len(OprHelper.data))]
-        while i < 2*len(OprHelper.data):
-            s[i][0] = (OprHelper.data[i/2][0])
+        s = [[0] for row in range(2 * len(OprHelper.data))]
+        while i < 2 * len(OprHelper.data):
+            s[i][0] = (OprHelper.data[i / 2][0])
             i += 1
-            s[i][0] = (OprHelper.data[i/2][1])
+            s[i][0] = (OprHelper.data[i/  2][1])
             i += 1
         return s
 
     @classmethod
-    def decompose(self,A,ztol=1.0e-3):
+    def decompose(self, A, ztol=1.0e-3):
         # Algorithm for upper triangular Cholesky factorization
         # gives U
         # NOT USED!!! SEE decomposeDoolittle below
@@ -168,7 +168,7 @@ class OprHelper(object):
         num = len(A)
         t = OprHelper.zeros(num, num)
         for i in range(num):
-            S = sum([(t[i][k])**2 for k in range(1,i-1)])
+            S = sum([(t[i][k]) ** 2 for k in range(1, i - 1)])
             d = A[i][i] - S
             if abs(d) < ztol:
                t[i][i] = 0.0
@@ -176,12 +176,12 @@ class OprHelper(object):
                if d < 0.0:
                   raise ValueError("Matrix not positive-definite")
                t[i][i] = sqrt(d)
-            for j in range(i+1, num):
-               S = sum([t[j][k] * t[i][k] for k in range(1,i-1)])
+            for j in range(i + 1, num):
+               S = sum([t[j][k] * t[i][k] for k in range(1, i - 1)])
                if abs(S) < ztol:
                   S = 0.0
                try:
-                   t[j][i] = (A[j][i] - S)/t[i][i]
+                   t[j][i] = (A[j][i] - S) / t[i][i]
                except ZeroDivisionError, e:
                    print e
         return(t)
@@ -197,10 +197,10 @@ class OprHelper(object):
         U = OprHelper.zeros(n, n)
         for k in range(n):
             L[k][k] = 1
-            for j in range(k,n):
-                U[k][j] = A[k][j]-sum(L[k][m]*U[m][j] for m in range(k))
-            for i in range(k+1,n):
-                L[i][k] = (A[i][k]-sum(L[i][m]*U[m][k] for m in range(k)))/float(U[k][k])
+            for j in range(k, n):
+                U[k][j] = A[k][j] - sum(L[k][m] * U[m][j] for m in range(k))
+            for i in range(k + 1,n):
+                L[i][k] = (A[i][k] - sum(L[i][m] * U[m][k] for m in range(k))) / float(U[k][k])
         return U,L
 
     @classmethod
@@ -216,14 +216,14 @@ class OprHelper(object):
         for i in range(len(b)):
             y[i][0] = b[i][0]
             for j in range(i):
-                y[i][0] -= L[i][j]*y[j][0]
+                y[i][0] -= L[i][j] * y[j][0]
             y[i][0] /= float(L[i][i])
 
         # Backward substitution Ux = y
-        for i in range(len(y)-1,-1,-1):
+        for i in range(len(y) - 1, -1, -1):
             x[i][0] = y[i][0]
-            for j in range(i+1,len(y)):
-                x[i][0] -= U[i][j]*x[j][0]
+            for j in range(i + 1, len(y)):
+                x[i][0] -= U[i][j] * x[j][0]
             x[i][0] /= float(U[i][i])
         return x
 
