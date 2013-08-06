@@ -80,6 +80,7 @@ def preflight():
   test()
   less()
   javascript()
+
   git_branch_name = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
   git_last_commit = subprocess.check_output(["git", "log", "-1"])
   build_time = time.ctime()
@@ -88,3 +89,7 @@ def preflight():
           'build_time': build_time}
   with open('version_info.json', 'w') as f:
       f.write(json.dumps(data))
+
+@task
+def lint():
+  sh("python linter.py")
