@@ -73,14 +73,14 @@ def main(kind=None):
     if kind == 'js' or kind == None:
         print 'Compressing Main JavaScript...'
         compress(SCRIPTS_MAIN, SCRIPTS_MAIN_OUT, 'js')
-    
+
         print 'Compressing GameDay JavaScript...'
         compress(SCRIPTS_GAMEDAY, SCRIPTS_GAMEDAY_OUT, 'js')
 
     if kind == 'css' or kind == None:
         print 'Compressing Main CSS...'
         compress(STYLESHEETS_MAIN, STYLESHEETS_MAIN_OUT, 'css')
-        
+
         print 'Compressing GameDay CSS...'
         compress(STYLESHEETS_GAMEDAY, STYLESHEETS_GAMEDAY_OUT, 'css')
 

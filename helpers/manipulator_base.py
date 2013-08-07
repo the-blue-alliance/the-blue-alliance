@@ -2,6 +2,7 @@ import logging
 
 from google.appengine.ext import ndb
 
+
 class ManipulatorBase(object):
     """
     Provides a basic framework for manipulating db models.
@@ -41,7 +42,7 @@ class ManipulatorBase(object):
         models_to_put = [model for model in models if getattr(model, "dirty", False)]
         ndb.put_multi(models_to_put)
         return self.delistify(models)
-    
+
     @classmethod
     def findOrSpawn(self, new_models):
         """"
@@ -53,7 +54,7 @@ class ManipulatorBase(object):
         old_models = ndb.get_multi([ndb.Key(type(model).__name__, model.key_name) for model in new_models])
         new_models = [self.updateMergeBase(new_model, old_model) for (new_model, old_model) in zip(new_models, old_models)]
         return self.delistify(new_models)
-    
+
     @classmethod
     def updateMergeBase(self, new_model, old_model):
         """

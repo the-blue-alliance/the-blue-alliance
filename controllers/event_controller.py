@@ -20,6 +20,7 @@ from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
 
+
 class EventList(CacheableHandler):
     """
     List all Events.
@@ -30,7 +31,7 @@ class EventList(CacheableHandler):
     def __init__(self, *args, **kw):
         super(EventList, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
-        self._cache_key = "event_list_{}_{}" # (year, explicit_year)
+        self._cache_key = "event_list_{}_{}"  # (year, explicit_year)
         self._cache_version = 4
 
     def get(self, year=None, explicit_year=False):
@@ -50,7 +51,7 @@ class EventList(CacheableHandler):
 
         self._cache_key = self._cache_key.format(year, explicit_year)
         super(EventList, self).get(year, explicit_year)
-        
+
     def _render(self, year=None, explicit_year=False):
         event_keys = Event.query(Event.year == year).fetch(1000, keys_only=True)
         events = ndb.get_multi(event_keys)
@@ -59,7 +60,7 @@ class EventList(CacheableHandler):
         week_events = None
         if year >= 2005:
             week_events = EventHelper.groupByWeek(events)
-    
+
         template_values = {
             "events": events,
             "explicit_year": explicit_year,
@@ -67,7 +68,7 @@ class EventList(CacheableHandler):
             "valid_years": self.VALID_YEARS,
             "week_events": week_events,
         }
-    
+
         path = os.path.join(os.path.dirname(__file__), '../templates/event_list.html')
         return template.render(path, template_values)
 
@@ -90,7 +91,7 @@ class EventDetail(CacheableHandler):
     def __init__(self, *args, **kw):
         super(EventDetail, self).__init__(*args, **kw)
         self._cache_expiration = self.LONG_CACHE_EXPIRATION
-        self._cache_key = "event_detail_{}" # (event_key)
+        self._cache_key = "event_detail_{}"  # (event_key)
         self._cache_version = 3
 
     def get(self, event_key):
@@ -102,25 +103,25 @@ class EventDetail(CacheableHandler):
 
     def _render(self, event_key):
         event = Event.get_by_id(event_key)
-        
+
         if not event:
             return self.redirect("/error/404")
-          
+
         event.prepAwardsMatchesTeams()
 
         awards = AwardHelper.organizeAwards(event.awards)
         cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
         matches = MatchHelper.organizeMatches(cleaned_matches)
         teams = TeamHelper.sortTeams(event.teams)
-        
+
         num_teams = len(teams)
-        middle_value = num_teams/2
-        if num_teams%2 != 0:
+        middle_value = num_teams / 2
+        if num_teams % 2 != 0:
             middle_value += 1
         teams_a, teams_b = teams[:middle_value], teams[middle_value:]
-        
-        oprs = sorted(zip(event.oprs,event.opr_teams), reverse=True) # sort by OPR
-        oprs = oprs[:14] # get the top 15 OPRs
+
+        oprs = sorted(zip(event.oprs, event.opr_teams), reverse=True)  # sort by OPR
+        oprs = oprs[:14]  # get the top 15 OPRs
 
         if event.within_a_day:
             matches_recent = MatchHelper.recentMatches(cleaned_matches)
@@ -139,7 +140,7 @@ class EventDetail(CacheableHandler):
             bracket_table['sf'] = MatchHelper.generateBracket(sf_matches)
         if f_matches:
             bracket_table['f'] = MatchHelper.generateBracket(f_matches)
-            
+
         template_values = {
             "event": event,
             "matches": matches,
@@ -155,7 +156,7 @@ class EventDetail(CacheableHandler):
 
         if event.within_a_day:
             self._cache_expiration = self.SHORT_CACHE_EXPIRATION
-            
+
         path = os.path.join(os.path.dirname(__file__), '../templates/event_details.html')
         return template.render(path, template_values)
 
@@ -167,7 +168,7 @@ class EventRss(CacheableHandler):
     def __init__(self, *args, **kw):
         super(EventRss, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 5
-        self._cache_key = "event_rss_{}" # (event_key)
+        self._cache_key = "event_rss_{}"  # (event_key)
         self._cache_version = 2
 
     def get(self, event_key):
@@ -183,7 +184,7 @@ class EventRss(CacheableHandler):
             return self.redirect("/error/404")
 
         matches = MatchHelper.organizeMatches(event.matches)
-    
+
         template_values = {
                 "event": event,
                 "matches": matches,

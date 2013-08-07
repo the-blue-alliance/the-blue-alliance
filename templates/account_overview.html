@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance - Account Overview{% endblock %}
+
+{% block meta_description %}Overview of your TBA account.{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="span8 offset2">
+      <p class="pull-right">
+        <a class="btn btn-info" href="/account/logout"><i class="icon-remove icon-white"></i> Logout</a>
+      </p>
+      <p>
+        <a class="btn" href="/account/edit"><i class="icon-remove icon-pencil"></i> Edit Profile</a> 
+      </p>
+      <div class="pull-left">
+        <h1>Welcome back, {{user_bundle.account.display_name}}!</h1>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="span8 offset2">
+      {{user_bundle.account2}}
+      <table class="table table-striped">
+        <tr>
+          <td>Name: </td>
+          <td>{{user_bundle.account.display_name}}</td>
+        </tr>
+        <tr>
+          <td>Email: </td>
+          <td>{{user_bundle.account.email}}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

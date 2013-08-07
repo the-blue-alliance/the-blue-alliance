@@ -7,6 +7,7 @@ from google.appengine.ext import testbed
 
 from helpers.event.event_test_creator import EventTestCreator
 
+
 class TestEventManipulator(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()
@@ -17,7 +18,7 @@ class TestEventManipulator(unittest2.TestCase):
         self.future_event = EventTestCreator.createFutureEvent(only_event=True)
         self.present_event = EventTestCreator.createPresentEvent(only_event=True)
         self.past_event = EventTestCreator.createPastEvent(only_event=True)
-        
+
     def tearDown(self):
         self.future_event.key.delete()
         self.present_event.key.delete()
@@ -27,14 +28,14 @@ class TestEventManipulator(unittest2.TestCase):
 
     def test_datesFuture(self):
         self.assertFalse(self.future_event.now)
-        self.assertFalse(self.future_event.withinDays(0,8))
-        self.assertTrue(self.future_event.withinDays(-8,0))
+        self.assertFalse(self.future_event.withinDays(0, 8))
+        self.assertTrue(self.future_event.withinDays(-8, 0))
 
     def test_datesPast(self):
         self.assertFalse(self.past_event.now)
-        self.assertTrue(self.past_event.withinDays(0,8))
-        self.assertFalse(self.past_event.withinDays(-8,0))
+        self.assertTrue(self.past_event.withinDays(0, 8))
+        self.assertFalse(self.past_event.withinDays(-8, 0))
 
     def test_datesPresent(self):
         self.assertTrue(self.present_event.now)
-        self.assertTrue(self.present_event.withinDays(-1,1))
+        self.assertTrue(self.present_event.withinDays(-1, 1))

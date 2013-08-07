@@ -2,6 +2,7 @@ import unittest2
 
 from datafeeds.tba_videos_parser import TbaVideosParser
 
+
 class TestTbaVideosParser(unittest2.TestCase):
     def test_parse(self):
         with open('test_data/usfirst_html/tba_videos_2006gal.html', 'r') as f:

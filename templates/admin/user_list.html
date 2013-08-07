@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}User List{% endblock %}
+
+{% block content %}
+
+<h1>All {{ users|length }} Users</h1>
+<table class="table table-striped table-hover">
+    <caption>{{ users|length }} total users</caption>
+    <thead>
+        <th>Display Name</th>
+        <th>Email</th>
+        <th>ID</th>
+	   <th>Created</th>
+    </thead>
+    
+    {% for user in users %}
+    <tr>
+        <td><a href="/admin/user/{{ user.key.id }}">{{ user.display_name }}</a></td>
+        <td>{{ user.email }}</td>
+        <td><a href="/admin/user/{{ user.key.id }}">{{ user.key.id }}</a></td>
+	    <td>{{ user.created|date:"M d, Y" }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

@@ -1,5 +1,6 @@
 from helpers.manipulator_base import ManipulatorBase
 
+
 class AwardManipulator(ManipulatorBase):
     """
     Handle Award database writes.

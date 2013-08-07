@@ -18,7 +18,8 @@ from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
 
-#Note: generally caching for the API happens in ApiHelper
+# Note: generally caching for the API happens in ApiHelper
+
 
 class MainApiHandler(webapp2.RequestHandler):
 
@@ -26,6 +27,7 @@ class MainApiHandler(webapp2.RequestHandler):
         # Need to initialize a webapp2 instance
         self.initialize(request, response)
         logging.info(request)
+
 
 class ApiTeamsShow(MainApiHandler):
     """
@@ -39,9 +41,10 @@ class ApiTeamsShow(MainApiHandler):
             teams = [ApiHelper.getTeamInfo(team_key) for team_key in team_keys]
         except IndexError:
             self.response.set_status(404)
-            response_json = { "Property Error": "No team found for key in %s" % str(teams) }
+            response_json = {"Property Error": "No team found for key in %s" % str(teams)}
 
         self.response.out.write(json.dumps(teams))
+
 
 class ApiTeamDetails(MainApiHandler):
     """
@@ -58,14 +61,15 @@ class ApiTeamDetails(MainApiHandler):
             if self.request.get('events'):
                 reponse_json = ApiHelper.addTeamEvents(response_json, year)
 
-            #TODO: matches
+            # TODO: matches
 
             self.response.out.write(json.dumps(response_json))
 
         except IndexError:
-            response_json = { "Property Error": "No team found for the key given" }
+            response_json = {"Property Error": "No team found for the key given"}
             self.response.set_status(404)
             self.response.out.write(json.dumps(response_json))
+
 
 class ApiEventsShow(MainApiHandler):
     """
@@ -73,9 +77,10 @@ class ApiEventsShow(MainApiHandler):
     Deprecation notice. Please use ApiEventList, or ApiEventDetails.
     """
     def get(self):
-        response = { "API Method Removed": "ApiEventsShow is no longer available. Please use ApiEvenDetails, and ApiEventList instead." }
+        response = {"API Method Removed": "ApiEventsShow is no longer available. Please use ApiEvenDetails, and ApiEventList instead."}
         self.response.set_status(410)
         self.response.out.write(json.dumps(response))
+
 
 class ApiEventList(MainApiHandler):
     """
@@ -113,10 +118,12 @@ class ApiEventList(MainApiHandler):
 
                 event_list.append(event_dict)
 
-            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, event_list, (30 * ((60 * 60) * 24)))
+            if tba_config.CONFIG["memcache"]:
+                memcache.set(memcache_key, event_list, (30 * ((60 * 60) * 24)))
 
         self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(event_list))
+
 
 class ApiEventDetails(MainApiHandler):
     """
@@ -130,11 +137,10 @@ class ApiEventDetails(MainApiHandler):
             self.response.out.write(json.dumps(error_message))
             return False
 
-
-
         event_dict = ApiHelper.getEventInfo(event_key)
 
         self.response.out.write(json.dumps(event_dict))
+
 
 class ApiMatchDetails(MainApiHandler):
     """
@@ -157,6 +163,7 @@ class ApiMatchDetails(MainApiHandler):
         self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(match_json))
 
+
 class CsvTeamsAll(MainApiHandler):
     """
     Outputs a CSV of all team information in the database, designed for other apps to bulk-import data.
@@ -175,6 +182,7 @@ class CsvTeamsAll(MainApiHandler):
 
             path = os.path.join(os.path.dirname(__file__), '../templates/api/csv_teams_all.csv')
             output = template.render(path, template_values)
-            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, output, 86400)
+            if tba_config.CONFIG["memcache"]:
+                memcache.set(memcache_key, output, 86400)
 
         self.response.out.write(output)

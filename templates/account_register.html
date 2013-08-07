@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance - Account Registration{% endblock %}
+
+{% block meta_description %}Register your TBA account to personalize your experience.{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="span8 offset2">
+      <h1>display_names, {{user_bundle.user.nickname}}!</h1>
+      <p>Fill out this short form to finish signing up for a TBA account.</p>
+      <form class="account_signup_form" action="/account/register" method="post">
+        <table class="table table-striped">
+          <tr>
+            <td>Name</td>
+            <td><input type="text" name="display_name" placeholder="Woodie Flowers"/></td>
+          </tr>
+        </table>
+        <input name="account_id" type="hidden" value="{{user_bundle.account.key.id}}" />
+        <button type="submit" class="btn btn-primary"><i class="icon-thumbs-up icon-white"></i> Create Account</button>
+        <a class="btn" href="{{user_bundle.logout_url}}"><i class="icon-remove"></i> Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -10,6 +10,7 @@ from base_controller import BaseHandlerFB, CacheableHandler
 from models.event import Event
 from models.match import Match
 
+
 class MatchDetail(CacheableHandler):
     """
     Display a Match.
@@ -21,7 +22,7 @@ class MatchDetail(CacheableHandler):
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
         self._cache_expiration = self.LONG_CACHE_EXPIRATION
-        self._cache_key = "match_detail_{}" # (match_key)
+        self._cache_key = "match_detail_{}"  # (match_key)
         self._cache_version = 4
 
     def get(self, match_key):
@@ -30,7 +31,7 @@ class MatchDetail(CacheableHandler):
 
         self._cache_key = self._cache_key.format(match_key)
         super(MatchDetail, self).get(match_key)
-    
+
     def _render(self, match_key):
         try:
             match_future = Match.get_by_id_async(match_key)
@@ -42,7 +43,7 @@ class MatchDetail(CacheableHandler):
 
         if not match:
             return self.redirect("/error/404")
-        
+
         template_values = {
             "event": event,
             "match": match,
@@ -50,6 +51,6 @@ class MatchDetail(CacheableHandler):
 
         if event.within_a_day:
             self._cache_expiration = self.SHORT_CACHE_EXPIRATION
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/match_details.html')
         return template.render(path, template_values)

@@ -13,6 +13,7 @@ from models.event import Event
 from models.event_team import EventTeam
 from models.team import Team
 
+
 class TestEventTeamRepairer(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()
@@ -21,33 +22,33 @@ class TestEventTeamRepairer(unittest2.TestCase):
         self.testbed.init_memcache_stub()
 
         event = Event(
-            id = "2011ct",
-            end_date = datetime.datetime(2011, 4, 2, 0, 0),
-            event_short = "ct",
-            event_type_enum = EventType.REGIONAL,
-            first_eid = "5561",
-            name = "Northeast Utilities FIRST Connecticut Regional",
-            start_date = datetime.datetime(2011, 3, 31, 0, 0),
-            year = 2011,
-            venue_address = "Connecticut Convention Center\r\n100 Columbus Blvd\r\nHartford, CT 06103\r\nUSA",
-            website = "http://www.ctfirst.org/ctr"
+            id="2011ct",
+            end_date=datetime.datetime(2011, 4, 2, 0, 0),
+            event_short="ct",
+            event_type_enum=EventType.REGIONAL,
+            first_eid="5561",
+            name="Northeast Utilities FIRST Connecticut Regional",
+            start_date=datetime.datetime(2011, 3, 31, 0, 0),
+            year=2011,
+            venue_address="Connecticut Convention Center\r\n100 Columbus Blvd\r\nHartford, CT 06103\r\nUSA",
+            website="http://www.ctfirst.org/ctr"
         )
         event.put()
 
         team = Team(
-            id = "frc177",
-            team_number = 177,
-            website = "http://www.bobcatrobotics.org"
+            id="frc177",
+            team_number=177,
+            website="http://www.bobcatrobotics.org"
         )
         team.put()
 
         event_team = EventTeam(
-            id = "%s_%s" % (event.key.id(), team.key.id()), 
-            event = event.key,
-            team = team.key,
-            year = None)
+            id="%s_%s" % (event.key.id(), team.key.id()),
+            event=event.key,
+            team=team.key,
+            year=None)
         event_team.put()
-        
+
     def tearDown(self):
         self.testbed.deactivate()
 

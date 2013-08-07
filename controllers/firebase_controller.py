@@ -19,12 +19,12 @@ class FirebasePushDo(webapp.RequestHandler):
         payload = json.loads(self.request.body)
         key = payload['key']
         payload_json = payload['data']
-        
+
         firebase_secrets = Sitevar.get_by_id("firebase.secrets")
         if firebase_secrets == None:
             raise Exception("Missing sitevar: firebase.secrets. Can't write to Firebase.")
         FIREBASE_SECRET = firebase_secrets.contents['FIREBASE_SECRET']
-        
+
         url = tba_config.CONFIG['firebase-url'].format(key, FIREBASE_SECRET)
         result = urlfetch.fetch(url, payload_json, 'PUT')
         if result.status_code not in self.SUCCESS_STATUS_CODES:

@@ -51,7 +51,7 @@
           <a class="brand" href="/admin/">TBA Admin</a>
           <div class="nav-collapse collapse">
             <p class="navbar-text pull-right">
-              Logged in as <a href="#" class="navbar-link">{{ user_bundle.user.email }}</a> || <a href="{{user_bundle.logout_url}}">log out</a>
+              Logged in as <a href="#" class="navbar-link">{{ user_bundle.account.display_name }}</a> || <a href="/account/logout">log out</a>
             </p>
             <ul class="nav">
               <li class="active"><a href="/admin/">Home</a></li>
@@ -79,6 +79,8 @@
               <li><a href="/admin/teams">View all (slowwww)</a></li>
               <li class="nav-header">Suggestions</li>
               <li><a href="/admin/suggestions/review">Review Suggestions</a></li>
+              <li class="nav-header">Users</li>
+              <li><a href="/admin/users">View all</a></li>
               <li class="nav-header">Migration</li>
               <li><a href="/admin/migration">Migration Utils</a></li>
               <li class="nav-header">Memcache</li>

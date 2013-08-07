@@ -9,24 +9,29 @@ from google.appengine.ext.webapp import template
 
 import tba_config
 
-from base_controller import BaseHandlerFB, CacheableHandler
+from base_controller import BaseHandlerFB, CacheableHandler, LoggedInHandler
 from helpers.event_helper import EventHelper
+from helpers.user_bundle import UserBundle
 
+from models.account import Account
 from models.event import Event
 from models.team import Team
 from models.sitevar import Sitevar
 
+
 def render_static(page):
     memcache_key = "main_%s" % page
     html = memcache.get(memcache_key)
-    
+
     if html is None:
         path = os.path.join(os.path.dirname(__file__), "../templates/%s.html" % page)
         html = template.render(path, {})
-        if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, html, 86400)
-    
+        if tba_config.CONFIG["memcache"]:
+            memcache.set(memcache_key, html, 86400)
+
     return html
-            
+
+
 class MainKickoffHandler(CacheableHandler):
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
@@ -37,7 +42,8 @@ class MainKickoffHandler(CacheableHandler):
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/index_kickoff.html")
         return template.render(path, {})
-                  
+
+
 class MainBuildseasonHandler(CacheableHandler):
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
@@ -48,6 +54,7 @@ class MainBuildseasonHandler(CacheableHandler):
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/index_buildseason.html")
         return template.render(path, {})
+
 
 class MainCompetitionseasonHandler(CacheableHandler):
     def __init__(self, *args, **kw):
@@ -61,9 +68,10 @@ class MainCompetitionseasonHandler(CacheableHandler):
         template_values = {
             "events": week_events,
         }
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/index_competitionseason.html')
         return template.render(path, template_values)
+
 
 class MainOffseasonHandler(CacheableHandler):
     def __init__(self, *args, **kw):
@@ -81,6 +89,7 @@ class MainOffseasonHandler(CacheableHandler):
         path = os.path.join(os.path.dirname(__file__), '../templates/index_offseason.html')
         return template.render(path, template_values)
 
+
 class ContactHandler(CacheableHandler):
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
@@ -92,6 +101,7 @@ class ContactHandler(CacheableHandler):
         path = os.path.join(os.path.dirname(__file__), "../templates/contact.html")
         return template.render(path, {})
 
+
 class HashtagsHandler(CacheableHandler):
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
@@ -102,7 +112,8 @@ class HashtagsHandler(CacheableHandler):
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/hashtags.html")
         return template.render(path, {})
-        
+
+
 class AboutHandler(CacheableHandler):
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
@@ -113,6 +124,7 @@ class AboutHandler(CacheableHandler):
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/about.html")
         return template.render(path, {})
+
 
 class ThanksHandler(CacheableHandler):
     def __init__(self, *args, **kw):
@@ -125,6 +137,7 @@ class ThanksHandler(CacheableHandler):
         path = os.path.join(os.path.dirname(__file__), "../templates/thanks.html")
         return template.render(path, {})
 
+
 class OprHandler(CacheableHandler):
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
@@ -135,6 +148,7 @@ class OprHandler(CacheableHandler):
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/opr.html")
         return template.render(path, {})
+
 
 class SearchHandler(BaseHandlerFB):
     def get(self):
@@ -152,6 +166,7 @@ class SearchHandler(BaseHandlerFB):
         finally:
             self.response.out.write(render_static("search"))
 
+
 class GamedayHandler(CacheableHandler):
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
@@ -166,7 +181,7 @@ class GamedayHandler(CacheableHandler):
             special_webcasts_temp = special_webcasts_temp.contents
         else:
             special_webcasts_temp = {}
-        special_webcasts =  []
+        special_webcasts = []
         for webcast in special_webcasts_temp.values():
             toAppend = {}
             for key, value in webcast.items():
@@ -192,28 +207,31 @@ class GamedayHandler(CacheableHandler):
                             event['count'] = count
                             count += 1
                     ongoing_events_w_webcasts += valid
-        
+
         template_values = {'special_webcasts': special_webcasts,
                            'ongoing_events': ongoing_events,
                            'ongoing_events_w_webcasts': ongoing_events_w_webcasts}
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/gameday.html')
         return template.render(path, template_values)
+
 
 class ChannelHandler(BaseHandlerFB):
     # This is required for the FB JSSDK
     def get(self):
-        expires = 60*60*24*365
+        expires = 60 * 60 * 24 * 365
         self.response.headers.add_header("Pragma", "public")
-        self.response.headers.add_header("Cache-Control", "max-age="+str(expires))
+        self.response.headers.add_header("Cache-Control", "max-age=" + str(expires))
         expires_date = time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(expires + time.time()))
         self.response.headers.add_header("Expires", expires_date)
         self.response.out.write('<script src="//connect.facebook.net/en_US/all.js"></script>')
+
 
 class PageNotFoundHandler(BaseHandlerFB):
     def get(self):
         self.error(404)
         self.response.out.write(render_static("404"))
+
 
 class WebcastsHandler(CacheableHandler):
     def __init__(self, *args, **kw):
@@ -229,9 +247,10 @@ class WebcastsHandler(CacheableHandler):
         template_values = {
             'events': events,
         }
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/webcasts.html')
         return template.render(path, template_values)
+
 
 class RecordHandler(CacheableHandler):
     def __init__(self, *args, **kw):

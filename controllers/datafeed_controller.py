@@ -30,6 +30,7 @@ from models.team import Team
 
 from helpers.firebase.firebase_pusher import FirebasePusher
 
+
 class FmsEventListGet(webapp.RequestHandler):
     """
     Fetch basic data about all current season events at once.
@@ -41,13 +42,13 @@ class FmsEventListGet(webapp.RequestHandler):
         # filter if first_eid is too high, meaning its a Championship Division
         # (we manually add these due to naming issues)
         events = filter(lambda e: int(e.first_eid) < 100000, events)
-        
+
         events = EventManipulator.createOrUpdate(events)
 
         template_values = {
             "events": events
         }
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fms_event_list_get.html')
         self.response.out.write(template.render(path, template_values))
 
@@ -61,11 +62,11 @@ class FmsTeamListGet(webapp.RequestHandler):
         df = DatafeedFms()
         teams = df.getFmsTeamList()
         TeamManipulator.createOrUpdate(teams)
-        
+
         template_values = {
             "teams": teams
         }
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fms_team_list_get.html')
         self.response.out.write(template.render(path, template_values))
 
@@ -79,9 +80,9 @@ class TbaVideosEnqueue(webapp.RequestHandler):
 
         for event in events:
             taskqueue.add(
-                url='/tasks/get/tba_videos/' + event.key_name, 
+                url='/tasks/get/tba_videos/' + event.key_name,
                 method='GET')
-        
+
         template_values = {
             'event_count': Event.query().count(),
         }
@@ -96,7 +97,7 @@ class TbaVideosGet(webapp.RequestHandler):
     """
     def get(self, event_key):
         df = DatafeedTba()
-        
+
         event = Event.get_by_id(event_key)
         match_filetypes = df.getVideos(event)
         if match_filetypes:
@@ -106,18 +107,18 @@ class TbaVideosGet(webapp.RequestHandler):
                     match.tba_videos = match_filetypes.get(match.key_name, [])
                     match.dirty = True
                     matches_to_put.append(match)
-            
+
             MatchManipulator.createOrUpdate(matches_to_put)
 
             tbavideos = match_filetypes.items()
         else:
             logging.info("No tbavideos found for event " + event.key_name)
             tbavideos = []
-        
+
         template_values = {
             'tbavideos': tbavideos,
         }
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/tba_videos_get.html')
         self.response.out.write(template.render(path, template_values))
 
@@ -129,13 +130,13 @@ class UsfirstEventDetailsEnqueue(webapp.RequestHandler):
     def get(self, year):
         event_keys = Event.query(Event.first_eid != None, Event.year == int(year)).fetch(200, keys_only=True)
         events = ndb.get_multi(event_keys)
-        
+
         for event in events:
             taskqueue.add(
                 queue_name='usfirst',
                 url='/tasks/get/usfirst_event_details/%s/%s' % (year, event.first_eid),
                 method='GET')
-        
+
         template_values = {
             'event_count': len(events),
             'year': year,
@@ -155,16 +156,16 @@ class UsfirstEventDetailsGet(webapp.RequestHandler):
 
         event = datafeed.getEventDetails(first_eid)
         event = EventManipulator.createOrUpdate(event)
-        
+
         teams = datafeed.getEventTeams(int(year), first_eid)
         teams = TeamManipulator.createOrUpdate(teams)
 
         if teams:
             event_teams = [EventTeam(
-                id = event.key.id() + "_" + team.key.id(),
-                event = event.key,
-                team = team.key,
-                year = event.year)
+                id=event.key.id() + "_" + team.key.id(),
+                event=event.key,
+                team=team.key,
+                year=event.year)
                 for team in teams]
             event_teams = EventTeamManipulator.createOrUpdate(event_teams)
         else:
@@ -174,9 +175,10 @@ class UsfirstEventDetailsGet(webapp.RequestHandler):
             'event': event,
             'event_teams': event_teams,
         }
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_details_get.html')
         self.response.out.write(template.render(path, template_values))
+
 
 class UsfirstAwardsEnqueue(webapp.RequestHandler):
     """
@@ -186,9 +188,9 @@ class UsfirstAwardsEnqueue(webapp.RequestHandler):
         if when == "now":
             events = EventHelper.getEventsWithinADay()
         else:
-            event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
+            event_keys = Event.query(Event.official is True).filter(Event.year == int(when)).fetch(500, keys_only=True)
             events = ndb.get_multi(event_keys)
-        
+
         for event in events:
             taskqueue.add(
                 queue_name='usfirst',
@@ -201,20 +203,21 @@ class UsfirstAwardsEnqueue(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_awards_enqueue.html')
         self.response.out.write(template.render(path, template_values))
 
+
 class UsfirstAwardsGet(webapp.RequestHandler):
     """
     Handles reading a USFIRST match results page and updating the datastore as needed.
     """
-    def get(self, event_key):   
+    def get(self, event_key):
         datafeed = DatafeedUsfirst()
-        
+
         event = Event.get_by_id(event_key)
         new_awards = AwardManipulator.createOrUpdate(datafeed.getEventAwards(event))
-        
+
         template_values = {
             'awards': new_awards,
         }
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_awards_get.html')
         self.response.out.write(template.render(path, template_values))
 
@@ -227,18 +230,18 @@ class UsfirstEventListGet(webapp.RequestHandler):
     def get(self, year):
         df = DatafeedUsfirst()
         events = df.getEventList(int(year))
-        
+
         for event in events:
             taskqueue.add(
                 queue_name='usfirst',
                 url='/tasks/get/usfirst_event_details/%s/%s' % (year, event.first_eid),
                 method='GET')
-        
+
         template_values = {
             'events': events,
             'year': year
         }
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_list_get.html')
         self.response.out.write(template.render(path, template_values))
 
@@ -251,15 +254,15 @@ class UsfirstMatchesEnqueue(webapp.RequestHandler):
         if when == "now":
             events = EventHelper.getEventsWithinADay()
         else:
-            event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
+            event_keys = Event.query(Event.official is True).filter(Event.year == int(when)).fetch(500, keys_only=True)
             events = ndb.get_multi(event_keys)
-        
+
         for event in events:
             taskqueue.add(
                 queue_name='usfirst',
                 url='/tasks/get/usfirst_matches/' + event.key_name,
                 method='GET')
-        
+
         template_values = {
             'events': events,
         }
@@ -274,10 +277,10 @@ class UsfirstMatchesGet(webapp.RequestHandler):
     """
     def get(self, event_key):
         df = DatafeedUsfirst()
-        
+
         event = Event.get_by_id(event_key)
         new_matches = MatchManipulator.createOrUpdate(df.getMatches(event))
-        
+
         try:
             last_matches = MatchHelper.recentMatches(new_matches, 1)
             upcoming_matches = MatchHelper.upcomingMatches(new_matches, 8)
@@ -291,11 +294,11 @@ class UsfirstMatchesGet(webapp.RequestHandler):
         template_values = {
             'matches': new_matches,
         }
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_matches_get.html')
         self.response.out.write(template.render(path, template_values))
-        
-        
+
+
 class UsfirstEventRankingsEnqueue(webapp.RequestHandler):
     """
     Handles enqueing getting rankings for USFIRST events.
@@ -304,15 +307,15 @@ class UsfirstEventRankingsEnqueue(webapp.RequestHandler):
         if when == "now":
             events = EventHelper.getEventsWithinADay()
         else:
-            event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
+            event_keys = Event.query(Event.official is True).filter(Event.year == int(when)).fetch(500, keys_only=True)
             events = ndb.get_multi(event_keys)
-            
+
         for event in events:
             taskqueue.add(
                 queue_name='usfirst',
                 url='/tasks/get/usfirst_event_rankings/' + event.key_name,
                 method='GET')
-        
+
         template_values = {
             'events': events,
         }
@@ -327,7 +330,7 @@ class UsfirstEventRankingsGet(webapp.RequestHandler):
     """
     def get(self, event_key):
         df = DatafeedUsfirst()
-        
+
         event = Event.get_by_id(event_key)
         rankings = df.getEventRankings(event)
         if event.rankings_json != json.dumps(rankings):
@@ -338,7 +341,7 @@ class UsfirstEventRankingsGet(webapp.RequestHandler):
 
         template_values = {'rankings': rankings,
                            'event_name': event.key_name}
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_rankings_get.html')
         self.response.out.write(template.render(path, template_values))
 
@@ -349,7 +352,7 @@ class UsfirstTeamDetailsEnqueue(webapp.RequestHandler):
     """
     def get(self):
         offset = int(self.request.get("offset", 0))
-        
+
         team_keys = Team.query().fetch(1000, offset=int(offset), keys_only=True)
         teams = ndb.get_multi(team_keys)
         for team in teams:
@@ -357,9 +360,9 @@ class UsfirstTeamDetailsEnqueue(webapp.RequestHandler):
                 queue_name='usfirst',
                 url='/tasks/get/usfirst_team_details/' + team.key_name,
                 method='GET')
-        
+
         # FIXME omg we're just writing out? -gregmarra 2012 Aug 26
-        self.response.out.write("%s team gets have been enqueued offset from %s.<br />" %(len(teams), offset))
+        self.response.out.write("%s team gets have been enqueued offset from %s.<br />" % (len(teams), offset))
         self.response.out.write("Reload with ?offset=%s to enqueue more." % (offset + len(teams)))
 
 
@@ -376,41 +379,41 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
             success = True
         else:
             success = False
-        
+
         template_values = {
             'team': team,
             'success': success,
         }
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_team_details_get.html')
         self.response.out.write(template.render(path, template_values))
 
 
 class UsfirstTeamsTpidsGet(webapp.RequestHandler):
     """
-    A run-as-needed function that instantiates new Team objects based on 
+    A run-as-needed function that instantiates new Team objects based on
     FIRST's full team list.
     """
     def get(self, year):
         df = DatafeedUsfirst()
         skip = 0
-        
+
         try:
             skip = self.request.get("skip")
             if skip == '':
                 skip = 0
         except Exception, detail:
             logging.error('Failed to get skip value')
-        
+
         logging.info("YEAR: %s", year)
         df.getTeamsTpids(int(year), skip)
-        
+
         team_count = Team.query().count()
-        
+
         template_values = {
             'team_count': team_count
         }
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_teams_tpids.html')
         self.response.out.write(template.render(path, template_values))
 
@@ -421,7 +424,7 @@ class OffseasonMatchesGet(webapp.RequestHandler):
     """
     def get(self, event_key):
         df = DatafeedOffseason()
-             
+
         event = Event.get_by_id(event_key)
         url = self.request.get('url')
 
@@ -430,7 +433,7 @@ class OffseasonMatchesGet(webapp.RequestHandler):
         template_values = {
             'matches': new_matches,
         }
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/offseason_matches_get.html')
         self.response.out.write(template.render(path, template_values))
 
@@ -448,6 +451,6 @@ class TwitterFrcfmsMatchesGet(webapp.RequestHandler):
         template_values = {
             'event_matches': event_matches,
         }
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/twitter_frcfms_matches_get.html')
         self.response.out.write(template.render(path, template_values))
