@@ -8,6 +8,7 @@ from models.event import Event
 from models.match import Match
 from models.suggestion import Suggestion
 
+
 class SuggestMatchVideoController(LoggedInHandler):
     """
     Allow users to suggest videos for TBA to add to matches.
@@ -18,12 +19,12 @@ class SuggestMatchVideoController(LoggedInHandler):
 
         if not self.request.get("match_key"):
             self.redirect("/", abort=True)
-        
+
         match_future = Match.get_by_id_async(self.request.get("match_key"))
         event_future = Event.get_by_id_async(self.request.get("match_key").split("_")[0])
         match = match_future.get_result()
         event = event_future.get_result()
-        
+
         self.template_values.update({
             "success": self.request.get("success"),
             "event": event,
@@ -50,9 +51,9 @@ class SuggestMatchVideoController(LoggedInHandler):
 
         if youtube_id is not None:
             suggestion = Suggestion(
-                author = self.user_bundle.account.key,
-                target_key = match_key,
-                target_model = "match",
+                author=self.user_bundle.account.key,
+                target_key=match_key,
+                target_model="match",
                 )
             suggestion.contents = {"youtube_videos": [youtube_id]}
             suggestion.put()

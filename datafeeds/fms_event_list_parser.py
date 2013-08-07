@@ -5,12 +5,13 @@ from BeautifulSoup import BeautifulSoup
 
 from datafeeds.parser_base import ParserBase
 
+
 class FmsEventListParser(ParserBase):
     """
     Facilitates getting information about Events from USFIRST.
     Reads from FMS data pages, which are mostly tab delimited files wrapped in some HTML.
     """
-    
+
     @classmethod
     def parse(self, html):
         """
@@ -19,15 +20,15 @@ class FmsEventListParser(ParserBase):
         """
         events = list()
         soup = BeautifulSoup(html,
-                convertEntities=BeautifulSoup.HTML_ENTITIES)
-        
+                             convertEntities=BeautifulSoup.HTML_ENTITIES)
+
         for title in soup.findAll('title'):
             if "FRC Team/Event List" not in title.string:
                 return None
-        
+
         event_rows = soup.findAll("pre")[0].string.split("\n")
-        
-        for line in event_rows[2:]: #first is blank, second is headers.
+
+        for line in event_rows[2:]:  # first is blank, second is headers.
             data = line.split("\t")
             if len(data) > 1:
                 try:
@@ -43,14 +44,14 @@ class FmsEventListParser(ParserBase):
                 except Exception, e:
                     logging.warning("Failed to parse event row: %s" % data)
                     logging.warning(e)
-        
+
         return events
 
     @classmethod
     def splitDate(self, date):
         try:
             (year, month, day) = date.split("-")
-            date =  datetime.datetime(int(year), int(month), int(day))
+            date = datetime.datetime(int(year), int(month), int(day))
             return date
         except Exception, e:
             return None

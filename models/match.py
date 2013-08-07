@@ -6,6 +6,7 @@ from google.appengine.ext import ndb
 from helpers.tbavideo_helper import TBAVideoHelper
 from models.event import Event
 
+
 class Match(ndb.Model):
     """
     Matches represent individual matches at Events.
@@ -13,7 +14,7 @@ class Match(ndb.Model):
     Matches have many Alliances.
     key_name is like 2010ct_qm10 or 2010ct_sf1m2
     """
-    
+
     COMP_LEVELS = ["qm", "ef", "qf", "sf", "f"]
     ELIM_LEVELS = {'ef', 'qf', 'sf', 'f'}
     COMP_LEVELS_VERBOSE = {
@@ -23,7 +24,7 @@ class Match(ndb.Model):
         "sf": "Semis",
         "f": "Finals",
     }
-        
+
     FRC_GAMES = [
         "frc_2012_rebr",
         "frc_2011_logo",
@@ -48,7 +49,7 @@ class Match(ndb.Model):
         "frc_1992_maiz",
         "frc_unknown",
     ]
-    
+
     FRC_GAMES_BY_YEAR = {
         2012: "frc_2012_rebr",
         2011: "frc_2011_logo",
@@ -72,12 +73,12 @@ class Match(ndb.Model):
         1993: "frc_1993_rgrg",
         1992: "frc_1992_maiz",
     }
-    
-    alliances_json = ndb.StringProperty(required=True, indexed=False) #JSON dictionary with alliances and scores.
-    
+
+    alliances_json = ndb.StringProperty(required=True, indexed=False)  # JSON dictionary with alliances and scores.
+
     # {
     # "red": {
-    #    "teams": ["frc177", "frc195", "frc125"], # These are Team keys
+    # "teams": ["frc177", "frc195", "frc125"], # These are Team keys
     #    "score": 25
     # },
     # "blue": {
@@ -88,25 +89,25 @@ class Match(ndb.Model):
 
     comp_level = ndb.StringProperty(required=True, choices=set(COMP_LEVELS))
     event = ndb.KeyProperty(kind=Event, required=True)
-    game = ndb.StringProperty(required=True,choices=set(FRC_GAMES), indexed=False)
+    game = ndb.StringProperty(required=True, choices=set(FRC_GAMES), indexed=False)
     match_number = ndb.IntegerProperty(required=True, indexed=False)
-    no_auto_update = ndb.BooleanProperty(default=False, indexed=False) #Set to True after manual update
+    no_auto_update = ndb.BooleanProperty(default=False, indexed=False)  # Set to True after manual update
     set_number = ndb.IntegerProperty(required=True, indexed=False)
-    team_key_names = ndb.StringProperty(repeated=True) #list of teams in Match, for indexing.
+    team_key_names = ndb.StringProperty(repeated=True)  # list of teams in Match, for indexing.
     time = ndb.DateTimeProperty(indexed=False)
-    time_string = ndb.StringProperty(indexed=False) # the time as displayed on FIRST's site
-    youtube_videos = ndb.StringProperty(repeated=True) # list of Youtube IDs
-    tba_videos = ndb.StringProperty(repeated=True) # list of filetypes a TBA video exists for
+    time_string = ndb.StringProperty(indexed=False)  # the time as displayed on FIRST's site
+    youtube_videos = ndb.StringProperty(repeated=True)  # list of Youtube IDs
+    tba_videos = ndb.StringProperty(repeated=True)  # list of filetypes a TBA video exists for
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True)
-    
+
     def __init__(self, *args, **kw):
         self._alliances = None
         self._tba_video = None
         self._winning_alliance = None
         super(Match, self).__init__(*args, **kw)
-    
+
     @property
     def alliances(self):
         """
@@ -131,18 +132,18 @@ class Match(ndb.Model):
     @property
     def event_key_name(self):
         return self.event.id()
-      
+
     @property
     def year(self):
         return self.event.id()[:4]
-    
+
     @property
     def key_name(self):
         if self.comp_level == "qm":
             return self.event_key_name + '_qm' + str(self.match_number)
         else:
             return (self.event_key_name + '_' + self.comp_level +
-                str(self.set_number) + 'm' + str(self.match_number))
+                    str(self.set_number) + 'm' + str(self.match_number))
 
     @property
     def has_been_played(self):
@@ -152,18 +153,18 @@ class Match(ndb.Model):
             (self.alliances[alliance]["score"] == -1):
                 return False
         return True
-    
+
     @property
     def verbose_name(self):
         if self.comp_level == "qm" or self.comp_level == "f":
             return "%s %s" % (self.COMP_LEVELS_VERBOSE[self.comp_level], self.match_number)
         else:
             return "%s %s Match %s" % (self.COMP_LEVELS_VERBOSE[self.comp_level], self.set_number, self.match_number)
-    
+
     @property
     def has_video(self):
         return (len(self.youtube_videos) + len(self.tba_videos)) > 0
-    
+
     @property
     def details_url(self):
         return "/match/%s" % self.key_name
@@ -174,7 +175,7 @@ class Match(ndb.Model):
             if self._tba_video is None:
                 self._tba_video = TBAVideoHelper(self)
         return self._tba_video
-      
+
     @property
     def play_order(self):
         return self.match_number * 1000 + self.set_number

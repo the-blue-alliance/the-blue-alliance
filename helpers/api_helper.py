@@ -15,6 +15,7 @@ from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
 
+
 class ApiHelper(object):
     """Helper for api_controller."""
     @classmethod
@@ -35,7 +36,7 @@ class ApiHelper(object):
                 team_dict["website"] = team.website
                 team_dict["location"] = team.location
 
-                event_teams = EventTeam.query(EventTeam.team == team.key,\
+                event_teams = EventTeam.query(EventTeam.team == team.key,
                                               EventTeam.year == datetime.now().year)\
                                               .fetch(1000, projection=[EventTeam.event])
                 team_dict["events"] = [event_team.event.id() for event_team in event_teams]
@@ -47,21 +48,21 @@ class ApiHelper(object):
                     team_dict["country_name"] = team.country_name
                 except Exception, e:
                     logging.warning("Failed to include Address for api_team_info_%s: %s" % (team_key, e))
-                
-                #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra 
-                if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, team_dict, 2592000)
+
+                # TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
+                if tba_config.CONFIG["memcache"]:
+                    memcache.set(memcache_key, team_dict, 2592000)
             else:
                 raise IndexError
 
         return team_dict
-    
-    
+
     @classmethod
     def getEventInfo(self, event_key):
         """
         Return an Event dict with basic information
         """
-        
+
         memcache_key = "api_event_info_%s" % event_key
         event_dict = memcache.get(memcache_key)
         if event_dict is None:
@@ -90,10 +91,10 @@ class ApiHelper(object):
                 event_dict["teams"] = [team.key_name for team in event.teams]
                 event_dict["matches"] = [match.key_name for match in event.matches]
 
-                if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, event_dict, 60 * 60)
+                if tba_config.CONFIG["memcache"]:
+                    memcache.set(memcache_key, event_dict, 60 * 60)
         return event_dict
-    
-    
+
     @classmethod
     def addTeamEvents(self, team_dict, year):
         """
@@ -101,7 +102,7 @@ class ApiHelper(object):
         """
         memcache_key = "api_team_events_%s_%s" % (team_dict["key"], year)
         event_list = memcache.get(memcache_key)
-        
+
         if event_list is None:
             team = Team.get_by_id(team_dict["key"])
             events = [a.event.get() for a in EventTeam.query(EventTeam.team == team.key, EventTeam.year == int(year)).fetch(1000)]
@@ -110,9 +111,10 @@ class ApiHelper(object):
             for event_dict, event in zip(event_list, events):
                 event_dict["team_wlt"] = EventHelper.getTeamWLT(team_dict["key"], event)
 
-            #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
-            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, event_list, 2592000)
-        
+            # TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
+            if tba_config.CONFIG["memcache"]:
+                memcache.set(memcache_key, event_list, 2592000)
+
         team_dict["events"] = event_list
         return team_dict
 
@@ -121,10 +123,10 @@ class ApiHelper(object):
         """
         Consume a Team dict, and return it with a year's Events filtered and Matches added
         """
-        
+
         # TODO Matches should live under Events - gregmarra 1 feb 2011
         # TODO Filter Events by year - gregmarra 1 feb 2011
-        
+
         memcache_key = "api_team_details_%s_%s" % (team_dict["key"], year)
         matches_list = memcache.get(memcache_key)
         if matches_list is None:
@@ -145,8 +147,9 @@ class ApiHelper(object):
                 match_dict["alliances"] = json.loads(match.alliances_json)
                 matches_list.append(match_dict)
 
-            #TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
-            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, matches_list, 2592000)
+            # TODO: Reduce caching time before 2013 season. 2592000 is one month -gregmarra
+            if tba_config.CONFIG["memcache"]:
+                memcache.set(memcache_key, matches_list, 2592000)
 
         team_dict["matches"] = matches_list
         return team_dict
@@ -171,6 +174,7 @@ class ApiHelper(object):
             match_dict["team_keys"] = match.team_key_names
             match_dict["alliances"] = json.loads(match.alliances_json)
 
-            if tba_config.CONFIG["memcache"]: memcache.set(memcache_key, match_dict, (2 * (60 * 60)) )
+            if tba_config.CONFIG["memcache"]:
+                memcache.set(memcache_key, match_dict, (2 * (60 * 60)))
 
         return match_dict

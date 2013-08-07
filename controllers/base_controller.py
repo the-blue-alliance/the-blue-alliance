@@ -8,6 +8,7 @@ import tba_config
 from helpers.user_bundle import UserBundle
 from models.user import User
 
+
 class CacheableHandler(webapp2.RequestHandler):
     """
     Provides a standard way of caching the output of pages.
@@ -33,7 +34,7 @@ class CacheableHandler(webapp2.RequestHandler):
             content = self._render(*args, **kw)
             self._write_cache(content)
         self.response.out.write(content)
-        
+
     def memcacheFlush(self):
         memcache.delete(self.cache_key)
         return self.cache_key
@@ -45,7 +46,8 @@ class CacheableHandler(webapp2.RequestHandler):
         raise NotImplementedError("No _render method.")
 
     def _write_cache(self, content):
-        if tba_config.CONFIG["memcache"]: memcache.set(self.cache_key, content, self._cache_expiration)
+        if tba_config.CONFIG["memcache"]:
+            memcache.set(self.cache_key, content, self._cache_expiration)
 
 
 class LoggedInHandler(webapp2.RequestHandler):

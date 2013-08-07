@@ -1,5 +1,6 @@
 from models.event_team import EventTeam
 
+
 class EventTeamRepairer(object):
     """
     Repair corrupt EventTeam objects.
@@ -16,8 +17,8 @@ class EventTeamRepairer(object):
             if event_team.year == None:
                 # Note, y10k bug. -gregmarra
                 new_event_teams.append(EventTeam(
-                    event = event_team.event,
-                    team = event_team.team,
-                    year = int(event_team.event.id()[:4])))
+                    event=event_team.event,
+                    team=event_team.team,
+                    year=int(event_team.event.id()[:4])))
 
         return new_event_teams

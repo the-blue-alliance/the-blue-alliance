@@ -61,22 +61,23 @@ sortOrder = [
     'fin4',
     ]
 
+
 class AwardHelper(object):
     """
     Helper to prepare awards for being used in a template
     awards['list'] is sorted by sortOrder and then the rest
     in alphabetical order by official name
     """
-    
+
     @classmethod
     def organizeAwards(self, award_list):
         awards = dict([(award.name, award) for award in award_list])
         awards_set = set(awards)
-        
+
         awards['list'] = list()
         defined_set = set()
         for item in sortOrder:
-            if awards.has_key(item):
+            if item in awards:
                 awards['list'].append(awards[item])
                 defined_set.add(item)
 
@@ -85,10 +86,10 @@ class AwardHelper(object):
         for item in difference:
             remaining_awards.append(awards[item])
         remaining_awards = sorted(remaining_awards, key=lambda award: award.official_name)
-        
+
         awards['list'] += remaining_awards
         return awards
-    
+
     @classmethod
     def getAwards(self, keys, year=None):
         awards = []

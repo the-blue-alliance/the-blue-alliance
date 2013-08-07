@@ -1,6 +1,6 @@
 # three2four_match.py
 #
-# Converts a CSV export of TBAv3 SQL Matches into the read CSV format for 
+# Converts a CSV export of TBAv3 SQL Matches into the read CSV format for
 # TBAv4 on Google App Engine. Sets no_auto_update to true.
 #
 # Incoming CSV format:
@@ -45,6 +45,7 @@ FRC_GAMES_BY_YEAR = {
     1992: "frc_1992_maiz"
 }
 
+
 def parse_row(row):
     """Parse a row into a nice dictionary."""
     old_match = dict()
@@ -62,6 +63,7 @@ def parse_row(row):
     old_match["bluescore"] = row[11]
     return old_match
 
+
 def legal_teams(teams):
     """Return a list of teams that are possible."""
     good_teams = list()
@@ -72,24 +74,25 @@ def legal_teams(teams):
                 good_teams.append(team_number)
         except ValueError:
             logging.warning(str(team) + " is not a valid team number.")
-    
+
     good_teams = ["frc" + str(team) for team in good_teams]
     return good_teams
+
 
 def build_new_match(old_match):
     """Build a new match."""
     match = dict()
-    match["event"] =  old_match["year"] + old_match["eventshort"]
+    match["event"] = old_match["year"] + old_match["eventshort"]
     try:
         match["comp_level"] = COMPLEVELS[int(old_match["complevel"])]
     except Exception as e:
         logging.error("Bad comp_level: " + str(old_match["complevel"]))
         return None
     match["game"] = FRC_GAMES_BY_YEAR[int(old_match["year"])]
-    
+
     red_teams = legal_teams([old_match["red1"], old_match["red2"], old_match["red3"]])
     blue_teams = legal_teams([old_match["blue1"], old_match["blue2"], old_match["blue3"]])
-    
+
     match["alliances_json"] = {
         "red": {
             "teams": red_teams,
@@ -101,7 +104,7 @@ def build_new_match(old_match):
         }
     }
     match["team_key_names"] = red_teams + blue_teams
-        
+
     if match["comp_level"] == "qm":
         match["match_number"] = old_match["matchnumber"]
         match["set_number"] = 1
@@ -110,10 +113,11 @@ def build_new_match(old_match):
         match["match_number"] = str(int(old_match["matchnumber"]) % 10)
         match["set_number"] = str(int(math.floor(int(old_match["matchnumber"]) / 10.0)))
         match["key"] = match["event"] + "_" + match["comp_level"] + match["set_number"] + "m" + match["match_number"]
-    
+
     match["no_auto_update"] = "TRUE"
-    
+
     return match
+
 
 def main():
     parser = OptionParser()
@@ -124,16 +128,16 @@ def main():
     options, args = parser.parse_args()
 
     matches = list()
-    
+
     matchReader = csv.reader(open(options.input_file, 'rb'), delimiter=',')
     for row in matchReader:
         old_match = parse_row(row)
         new_match = build_new_match(old_match)
         if new_match:
             matches.append(new_match)
-    
+
     matchWriter = csv.writer(open(options.output_file, 'wb'), delimiter=',',
-        quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                             quotechar='"', quoting=csv.QUOTE_MINIMAL)
     matchWriter.writerow(["key", "event", "game", "comp_level", "set_number", "match_number", "team_key_names", "alliances_json", "no_auto_update"])
     for match in matches:
         matchWriter.writerow([match["key"], match["event"], match["game"], match["comp_level"], match["set_number"], match["match_number"], match["team_key_names"], match["alliances_json"], match["no_auto_update"]])

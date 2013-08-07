@@ -4,6 +4,7 @@ from models.event import Event
 from models.match import Match
 from models.team import Team
 
+
 class TestKeyNameValidators(unittest2.TestCase):
 
     def setUp(self):

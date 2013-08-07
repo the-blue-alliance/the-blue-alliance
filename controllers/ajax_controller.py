@@ -56,19 +56,19 @@ class WebcastHandler(CacheableHandler):
     def __init__(self, *args, **kw):
         super(WebcastHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
-        self._cache_key = "webcast_{}_{}" # (event_key)
+        self._cache_key = "webcast_{}_{}"  # (event_key)
         self._cache_version = 1
 
     def get(self, event_key, webcast_number):
         webcast_number = int(webcast_number) - 1
         self._cache_key = self._cache_key.format(event_key, webcast_number)
 
-        self.response.headers['Cache-Control'] = "public, max-age=%d" % (5*60)
+        self.response.headers['Cache-Control'] = "public, max-age=%d" % (5 * 60)
         self.response.headers['Pragma'] = 'Public'
-        self.response.headers.add_header('content-type', 'application/json', charset='utf-8')  
+        self.response.headers.add_header('content-type', 'application/json', charset='utf-8')
 
         super(WebcastHandler, self).get(event_key, webcast_number)
-        
+
     def _render(self, event_key, webcast_number):
         event = Event.get_by_id(event_key)
         output = {}
@@ -86,10 +86,10 @@ class WebcastHandler(CacheableHandler):
             if event_key in special_webcasts:
                 webcast = special_webcasts[event_key]
                 if 'type' in webcast and 'channel' in webcast:
-                    output['player'] = self._renderPlayer(webcast)                   
-                
+                    output['player'] = self._renderPlayer(webcast)
+
         return json.dumps(output)
-        
+
     def _renderPlayer(self, webcast):
         webcast_type = webcast['type']
         template_values = {'webcast': webcast}
@@ -101,4 +101,3 @@ class WebcastHandler(CacheableHandler):
         keys = [self.cache_key.format(event_key, n) for n in range(10)]
         memcache.delete_multi(keys)
         return keys
-

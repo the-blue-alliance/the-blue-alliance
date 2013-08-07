@@ -3,6 +3,7 @@ from google.appengine.ext import ndb
 from models.event import Event
 from models.team import Team
 
+
 class EventTeam(ndb.Model):
     """
     EventTeam serves as a join model between Events and Teams, indicating that

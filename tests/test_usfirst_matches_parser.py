@@ -2,6 +2,7 @@ import unittest2
 
 from datafeeds.usfirst_matches_parser import UsfirstMatchesParser
 
+
 class TestUsfirstMatchesParser(unittest2.TestCase):
     def test_parse_2012ct(self):
         with open('test_data/usfirst_html/usfirst_event_matches_2012ct.html', 'r') as f:
@@ -33,7 +34,7 @@ class TestUsfirstMatchesParser(unittest2.TestCase):
         self.assertEqual(match["team_key_names"], [u'frc1071', u'frc558', u'frc2067', u'frc195', u'frc181', u'frc20'])
         self.assertEqual(match["alliances_json"], """{"blue": {"score": 62, "teams": ["frc195", "frc181", "frc20"]}, "red": {"score": 39, "teams": ["frc1071", "frc558", "frc2067"]}}""")
         self.assertEqual(match["time_string"], "4:05 PM")
-        
+
     def test_parse_2013cama(self):
         with open('test_data/usfirst_html/usfirst_event_matches_2013cama.html', 'r') as f:
             matches, _ = UsfirstMatchesParser.parse(f.read())
@@ -55,7 +56,7 @@ class TestUsfirstMatchesParser(unittest2.TestCase):
         self.assertEqual(match["team_key_names"], [u'frc2643', u'frc3501', u'frc3970', u'frc295', u'frc840', u'frc1678'])
         self.assertEqual(match["alliances_json"], """{"blue": {"score": 110, "teams": ["frc295", "frc840", "frc1678"]}, "red": {"score": 74, "teams": ["frc2643", "frc3501", "frc3970"]}}""")
         self.assertEqual(match["time_string"], "4:04 PM")
-                
+
     def test_parse_2013casd(self):
         with open('test_data/usfirst_html/usfirst_event_matches_2013casd.html', 'r') as f:
             matches, _ = UsfirstMatchesParser.parse(f.read())

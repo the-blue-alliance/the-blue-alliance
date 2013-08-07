@@ -4,11 +4,12 @@ from models.match import Match
 from models.team import Team
 from models.event import Event
 
+
 class MatchHelper(object):
     """
     Helper to put matches into sub-dictionaries for the way we render match tables
     """
-    
+
     # Allows us to sort matches by key name.
     # Note: Matches within a comp_level (qual, qf, sf, f, etc.) will be in order,
     # but the comp levels themselves may not be in order. Doesn't matter because
@@ -16,10 +17,10 @@ class MatchHelper(object):
     @classmethod
     def natural_sort_matches(self, matches):
         import re
-        convert = lambda text: int(text) if text.isdigit() else text.lower() 
-        alphanum_key = lambda match: [ convert(c) for c in re.split('([0-9]+)', str(match.key_name)) ] 
-        return sorted(matches, key = alphanum_key)
-      
+        convert = lambda text: int(text) if text.isdigit() else text.lower()
+        alphanum_key = lambda match: [convert(c) for c in re.split('([0-9]+)', str(match.key_name))]
+        return sorted(matches, key=alphanum_key)
+
     # Note: Only works for a list of matches in the same comp level
     @classmethod
     def play_order_sort_matches(self, matches):
@@ -34,7 +35,7 @@ class MatchHelper(object):
         while len(match_list) > 0:
             match = match_list.pop(0)
             matches[match.comp_level].append(match)
-        
+
         return matches
 
     @classmethod
@@ -56,12 +57,12 @@ class MatchHelper(object):
                 play_order_sorted = self.play_order_sort_matches(matches[comp_level])
                 all_matches += play_order_sorted
         return all_matches[-num:]
-      
+
     @classmethod
     def upcomingMatches(self, matches, num=3):
         matches = filter(lambda x: not x.has_been_played, matches)
         matches = MatchHelper.organizeMatches(matches)
-        
+
         unplayed_matches = []
         for comp_level in Match.COMP_LEVELS:
             if comp_level in matches:
@@ -69,7 +70,7 @@ class MatchHelper(object):
                 for match in play_order_sorted:
                     unplayed_matches.append(match)
         return unplayed_matches[:num]
-    
+
     @classmethod
     def deleteInvalidMatches(self, match_list):
         """
@@ -79,12 +80,12 @@ class MatchHelper(object):
         matches_by_key = {}
         for match in match_list:
             matches_by_key[match.key_name] = match
-      
+
         return_list = []
         for match in match_list:
             if match.comp_level in Match.ELIM_LEVELS and match.match_number == 3 and (not match.has_been_played):
                 event = Event
-                event.key_name = match.event.id() # slightly hackish, but reduces db calls
+                event.key_name = match.event.id()  # slightly hackish, but reduces db calls
                 match_1 = matches_by_key.get(Match.renderKeyName(event, match.comp_level, match.set_number, 1))
                 match_2 = matches_by_key.get(Match.renderKeyName(event, match.comp_level, match.set_number, 2))
                 if match_1 != None and match_2 != None and\
@@ -98,13 +99,13 @@ class MatchHelper(object):
                         continue
             return_list.append(match)
         return return_list
-    
+
     @classmethod
     def generateBracket(self, matches):
         results = {}
         for match in matches:
             set_number = str(match.set_number)
-            
+
             if set_number not in results:
                 red_alliance = []
                 for team in match.alliances['red']['teams']:
@@ -122,7 +123,7 @@ class MatchHelper(object):
             if not winner or winner == '':
                 # if the match is a tie
                 continue
-                
+
             results[set_number]['{}_wins'.format(winner)] = \
                 results[set_number]['{}_wins'.format(winner)] + 1
             if results[set_number]['red_wins'] == 2:

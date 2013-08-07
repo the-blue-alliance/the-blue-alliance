@@ -4,11 +4,12 @@ import datetime
 from consts.event_type import EventType
 from datafeeds.usfirst_event_details_parser import UsfirstEventDetailsParser
 
+
 class TestUsfirstEventDetailsParser(unittest2.TestCase):
     def test_parse2012ct(self):
-        with open('test_data/usfirst_html/usfirst_event_details_2012ct.html', 'r') as f: 
+        with open('test_data/usfirst_html/usfirst_event_details_2012ct.html', 'r') as f:
             event, _ = UsfirstEventDetailsParser.parse(f.read())
-        
+
         self.assertEqual(event["name"], "Northeast Utilities FIRST Connecticut Regional")
         self.assertEqual(event["event_type_enum"], EventType.REGIONAL)
         self.assertEqual(event["start_date"], datetime.datetime(2012, 3, 29, 0, 0))
@@ -62,7 +63,7 @@ class TestUsfirstEventDetailsParser(unittest2.TestCase):
         self.assertEqual(event["venue_address"], "San Jose, CA\r\nUSA")
         self.assertEqual(event["location"], "San Jose, CA, USA")
         self.assertEqual(event["event_short"], "ca2")
-        
+
     def test_parse2005is(self):
         with open('test_data/usfirst_html/usfirst_event_details_2005is.html', 'r') as f:
             event, _ = UsfirstEventDetailsParser.parse(f.read())
@@ -76,7 +77,7 @@ class TestUsfirstEventDetailsParser(unittest2.TestCase):
         self.assertEqual(event["venue"], "Haifa Sports Coliseum")
         self.assertEqual(event["location"], "Haifa, Haifa, Israel")
         self.assertEqual(event["event_short"], "is")
-        
+
     def test_parse2005or(self):
         with open('test_data/usfirst_html/usfirst_event_details_2005or.html', 'r') as f:
             event, _ = UsfirstEventDetailsParser.parse(f.read())
@@ -90,7 +91,7 @@ class TestUsfirstEventDetailsParser(unittest2.TestCase):
         self.assertEqual(event["venue"], "Memorial Coliseum")
         self.assertEqual(event["location"], "Portland, OR, USA")
         self.assertEqual(event["event_short"], "or")
-        
+
     def test_parse_1997il(self):
         with open('test_data/usfirst_html/usfirst_event_details_1997il.html', 'r') as f:
             event, _ = UsfirstEventDetailsParser.parse(f.read())

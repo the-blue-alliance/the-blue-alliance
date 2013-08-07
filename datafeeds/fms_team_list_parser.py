@@ -4,13 +4,14 @@ from BeautifulSoup import BeautifulSoup
 
 from datafeeds.parser_base import ParserBase
 
+
 class FmsTeamListParser(ParserBase):
     """
     Facilitates getting information about Teams from USFIRST.
     Reads from FMS data pages, which are mostly tab delimited files wrapped in some HTML.
     Note, this doesn't get team websites.
     """
-    
+
     @classmethod
     def parse(self, html):
         """
@@ -19,15 +20,15 @@ class FmsTeamListParser(ParserBase):
         """
         teams = list()
         soup = BeautifulSoup(html,
-                convertEntities=BeautifulSoup.HTML_ENTITIES)
-        
+                             convertEntities=BeautifulSoup.HTML_ENTITIES)
+
         for title in soup.findAll('title'):
             if "FRC Team/Event List" not in title.string:
                 return None
-        
+
         team_rows = soup.findAll("pre")[0].string.split("\n")
-        
-        for line in team_rows[2:]: #first is blank, second is headers.
+
+        for line in team_rows[2:]:  # first is blank, second is headers.
             data = line.split("\t")
             if len(data) > 1:
                 try:
@@ -39,5 +40,5 @@ class FmsTeamListParser(ParserBase):
                     })
                 except Exception, e:
                     logging.warning("Failed to parse team row: %s" % data)
-        
+
         return teams
