@@ -58,7 +58,6 @@ class AdminUserEdit(LoggedInHandler):
         user = Account.get_by_id(user_id)
 
         user.display_name = self.request.get("display_name")
-        user.email = self.request.get("email")
         user.put()
 
         self.redirect("/admin/user/" + user_id)
