@@ -16,8 +16,10 @@ class UserBundle(object):
         if self._account is None:
             self._account = Account.get_or_insert(
                 self.user.user_id(),
-                email=self.user.email(),
-                nickname=self.user.nickname())
+                email = self.user.email(),
+                nickname = self.user.nickname(),
+                registered = False,
+                display_name = self.user.nickname())
         return self._account
 
     @property
