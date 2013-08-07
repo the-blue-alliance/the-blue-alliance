@@ -4,6 +4,7 @@ import webapp2
 
 import tba_config
 
+from controllers.account_controller import AccountEdit, AccountLogout, AccountOverview, AccountRegister
 from controllers.ajax_controller import TypeaheadHandler, WebcastHandler
 from controllers.event_controller import EventList, EventDetail, EventRss
 from controllers.insights_controller import InsightsOverview, InsightsDetail
@@ -27,6 +28,9 @@ landing_handler = {tba_config.KICKOFF: MainKickoffHandler,
 
 app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['landing_handler']]),
                                ('/about', AboutHandler),
+                               ('/account', AccountOverview),
+                               ('/account/edit', AccountEdit),
+                               ('/account/register', AccountRegister),
                                ('/channel', ChannelHandler),
                                ('/contact', ContactHandler),
                                ('/events', EventList),
@@ -37,6 +41,7 @@ app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['landing_
                                ('/hashtags', HashtagsHandler),
                                ('/insights', InsightsOverview),
                                ('/insights/(.*)', InsightsDetail),
+                               ('/logout', AccountLogout),
                                ('/match/(.*)', MatchDetail),
                                ('/opr', OprHandler),
                                ('/search', SearchHandler),
