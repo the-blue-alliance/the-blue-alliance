@@ -13,6 +13,7 @@ from google.appengine.api import urlfetch
 
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.event_team_repairer import EventTeamRepairer
+from helpers.event_team_updater import EventTeamUpdater
 
 from helpers.insight_manipulator import InsightManipulator
 from helpers.team_manipulator import TeamManipulator
@@ -59,38 +60,27 @@ class EventTeamUpdate(webapp.RequestHandler):
     """
     Task that adds to the EventTeam index for an Event from Matches.
     Can only update or delete EventTeams for unregistered teams.
+    ^^^ Does it actually do this? Eugene -- 2013/07/30
+    Removes EventTeams for teams that haven't played any matches.
     """
     def get(self, event_key):
-        event = Event.get_by_id(event_key)
-        team_ids = set()
+        teams, event_teams, et_keys_to_del = EventTeamUpdater.update(event_key)
 
-        # Add teams from Matches
-        match_keys = Match.query(Match.event == event.key).fetch(1000, keys_only=True)
-        matches = ndb.get_multi(match_keys)
-        for match in matches:
-            for team in match.team_key_names:
-                team_ids.add(team)
-
-        teams = TeamManipulator.createOrUpdate([Team(
-            id=team_id,
-            team_number=int(team_id[3:]))
-            for team_id in team_ids])
+        teams = TeamManipulator.createOrUpdate(teams)
 
         if teams:
-            event_teams = EventTeamManipulator.createOrUpdate([EventTeam(
-                id=event_key + "_" + team.key.id(),
-                event=event.key,
-                team=team.key,
-                year=event.year)
-                for team in teams])
-        else:
-            event_teams = None
+            event_teams = EventTeamManipulator.createOrUpdate(event_teams)
+
+        if et_keys_to_del:
+            ndb.delete_multi(et_keys_to_del)
 
         template_values = {
             'event_teams': event_teams,
+            'deleted_event_teams_keys': et_keys_to_del
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/math/eventteam_update_do.html')
+        path = os.path.join(os.path.dirname(__file__),
+                            '../templates/math/eventteam_update_do.html')
         self.response.out.write(template.render(path, template_values))
 
 
