@@ -43,7 +43,7 @@ class AccountEdit(LoggedInHandler):
         check_account_id = self.request.get('account_id')
         if check_account_id == real_account_id:
             user = Account.get_by_id(self.user_bundle.account.key.id())
-            user.name = self.request.get('name')
+            user.display_name = self.request.get('display_name')
             user.put()
             self.redirect('/account')
         else:
@@ -71,7 +71,7 @@ class AccountRegister(LoggedInHandler):
         check_account_id = self.request.get('account_id')
         if check_account_id == real_account_id:
             account = Account.get_by_id(self.user_bundle.account.key.id())
-            account.name = self.request.get('name')
+            account.display_name = self.request.get('display_name')
             account.registered = True
             account.put()
             self.redirect('/account')

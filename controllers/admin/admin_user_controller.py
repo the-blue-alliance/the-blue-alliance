@@ -57,7 +57,7 @@ class AdminUserEdit(LoggedInHandler):
         self._require_admin()
         user = Account.get_by_id(user_id)
 
-        user.name = self.request.get("name")
+        user.display_name = self.request.get("display_name")
         user.email = self.request.get("email")
         user.put()
 

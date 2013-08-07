@@ -11,7 +11,7 @@
     <table class="table table-striped table-hover table-condensed">
         <tr>
             <td>Name</td>
-            <td><input type="text" name="name" {% if user.name != None %}value="{{user.name}}"{% endif %} /></td>
+            <td><input type="text" name="name" value="{{user.display_name}}" /></td>
         </tr>
         <tr>
             <td>Email</td>
