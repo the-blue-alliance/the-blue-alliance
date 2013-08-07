@@ -2,18 +2,19 @@ from BeautifulSoup import BeautifulSoup
 
 from datafeeds.parser_base import ParserBase
 
+
 class UsfirstEventRankingsParser(ParserBase):
     """
     Works for official events from 2007-2012
     """
-    @classmethod    
+    @classmethod
     def parse(self, html):
         """
         Parse the rankings from USFIRST.
         """
         soup = BeautifulSoup(html,
-                convertEntities=BeautifulSoup.HTML_ENTITIES)
-        
+                             convertEntities=BeautifulSoup.HTML_ENTITIES)
+
         rankings = []
         tables = soup.findAll('table')
         rankings_table = tables[2]

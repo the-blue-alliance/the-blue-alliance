@@ -3,6 +3,7 @@ from google.appengine.ext import ndb
 from models.event import Event
 from models.team import Team
 
+
 class Award(ndb.Model):
     """
     Awards represent FIRST Robotics Competition awards given out at an event.
@@ -19,17 +20,17 @@ class Award(ndb.Model):
     CHAMPIONSHIP_FIN_KEYS = {'cmp_fin1', 'cmp_fin2', 'cmp_fin3', 'cmp_fin4'}
     CHAMPIONSHIP_CA_KEYS = {'cmp_ca'}
     BLUE_BANNER_KEYS = REGIONAL_WIN_KEYS.union(REGIONAL_CA_KEYS).union(DIVISION_WIN_KEYS).union(CHAMPIONSHIP_WIN_KEYS).union(CHAMPIONSHIP_CA_KEYS)
-    
-    name = ndb.StringProperty(required=True) #general name used for sorting
-    official_name = ndb.StringProperty(indexed=False) #the official name used by first
-    year = ndb.IntegerProperty() #year it was awarded
-    team = ndb.KeyProperty(kind=Team) #team that won the award (if applicable)
-    awardee = ndb.StringProperty() #person who won the award (if applicable)
+
+    name = ndb.StringProperty(required=True)  # general name used for sorting
+    official_name = ndb.StringProperty(indexed=False)  # the official name used by first
+    year = ndb.IntegerProperty()  # year it was awarded
+    team = ndb.KeyProperty(kind=Team)  # team that won the award (if applicable)
+    awardee = ndb.StringProperty()  # person who won the award (if applicable)
     event = ndb.KeyProperty(kind=Event, required=True)
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
-    
+
     @property
     def key_name(self):
         """

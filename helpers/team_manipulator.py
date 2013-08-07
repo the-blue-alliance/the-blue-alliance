@@ -1,10 +1,11 @@
 from helpers.manipulator_base import ManipulatorBase
 
+
 class TeamManipulator(ManipulatorBase):
     """
     Handle Team database writes.
     """
-    
+
     @classmethod
     def updateMerge(self, new_team, old_team):
         """
@@ -24,11 +25,11 @@ class TeamManipulator(ManipulatorBase):
                 if getattr(new_team, attr) != getattr(old_team, attr):
                     setattr(old_team, attr, getattr(new_team, attr))
                     old_team.dirty = True
-                
+
         # Take the new tpid and tpid_year iff the year is newer than the old one
         if (new_team.first_tpid_year > old_team.first_tpid_year):
             old_team.first_tpid_year = new_team.first_tpid_year
             old_team.first_tpid = new_team.first_tpid
             old_team.dirty = True
-        
+
         return old_team

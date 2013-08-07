@@ -1,5 +1,6 @@
 from helpers.manipulator_base import ManipulatorBase
 
+
 class InsightManipulator(ManipulatorBase):
     """
     Handle Insight database writes.

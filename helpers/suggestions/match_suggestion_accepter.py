@@ -1,18 +1,19 @@
 from helpers.match_manipulator import MatchManipulator
 from models.match import Match
 
+
 class MatchSuggestionAccepter(object):
     """
     Handle accepting Match suggestions.
     """
-    
+
     @classmethod
     def accept_suggestions(self, suggestions):
         if (len(suggestions) < 1):
             return None
 
         matches = map(lambda match_future: match_future.get_result(),
-            [Match.get_by_id_async(suggestion.target_key) for suggestion in suggestions])
+                      [Match.get_by_id_async(suggestion.target_key) for suggestion in suggestions])
 
         pairs = zip(matches, suggestions)
 
@@ -20,7 +21,7 @@ class MatchSuggestionAccepter(object):
             self._accept_suggestion(match, suggestion)
 
         matches, suggestions = zip(*pairs)
-        
+
         matches = MatchManipulator.createOrUpdate(list(matches))
 
         return matches
@@ -37,6 +38,6 @@ class MatchSuggestionAccepter(object):
         for youtube_video in youtube_videos:
             if youtube_video not in match.youtube_videos:
                 match.youtube_videos.append(youtube_video)
-                match.dirty = True # This is so hacky. -gregmarra 20130601
+                match.dirty = True  # This is so hacky. -gregmarra 20130601
 
         return match

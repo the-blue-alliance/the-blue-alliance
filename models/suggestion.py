@@ -4,6 +4,7 @@ from google.appengine.ext import ndb
 
 from models.account import Account
 
+
 class Suggestion(ndb.Model):
     """
     Suggestions are generic containers for user-submitted data corrections to
@@ -14,15 +15,15 @@ class Suggestion(ndb.Model):
     REVIEW_ACCEPTED = 1
     REVIEW_PENDING = 0
     REVIEW_REJECTED = -1
-    
+
     review_state = ndb.IntegerProperty(default=0)
     reviewed_at = ndb.DateTimeProperty()
     reviewer = ndb.KeyProperty(kind=Account)
     author = ndb.KeyProperty(kind=Account, required=True)
-    contents_json = ndb.StringProperty(indexed=False) #a json blob
-    target_key = ndb.StringProperty(required=True) # "2012cmp"
-    target_model = ndb.StringProperty(choices=MODELS, required=True) # "event"
-    
+    contents_json = ndb.StringProperty(indexed=False)  # a json blob
+    target_key = ndb.StringProperty(required=True)  # "2012cmp"
+    target_model = ndb.StringProperty(choices=MODELS, required=True)  # "event"
+
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
@@ -48,4 +49,3 @@ class Suggestion(ndb.Model):
     def youtube_video(self):
         if "youtube_videos" in self.contents:
             return self.contents["youtube_videos"][0]
-

@@ -31,6 +31,7 @@ import tba_config
 
 from models.insight import Insight
 
+
 class EventTeamRepairDo(webapp.RequestHandler):
     """
     Repair broken EventTeams.
@@ -45,52 +46,54 @@ class EventTeamRepairDo(webapp.RequestHandler):
         # sigh. -gregmarra
         if type(event_teams) == EventTeam:
             event_teams = [event_teams]
-        
+
         template_values = {
             'event_teams': event_teams,
         }
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/math/eventteam_repair_do.html')
         self.response.out.write(template.render(path, template_values))
+
 
 class EventTeamUpdate(webapp.RequestHandler):
     """
     Task that adds to the EventTeam index for an Event from Matches.
-    Can only update or delete EventTeams for unregistered teams. 
+    Can only update or delete EventTeams for unregistered teams.
     """
     def get(self, event_key):
         event = Event.get_by_id(event_key)
         team_ids = set()
-        
+
         # Add teams from Matches
         match_keys = Match.query(Match.event == event.key).fetch(1000, keys_only=True)
         matches = ndb.get_multi(match_keys)
         for match in matches:
             for team in match.team_key_names:
                 team_ids.add(team)
-        
+
         teams = TeamManipulator.createOrUpdate([Team(
-            id = team_id,
-            team_number = int(team_id[3:]))
+            id=team_id,
+            team_number=int(team_id[3:]))
             for team_id in team_ids])
 
         if teams:
             event_teams = EventTeamManipulator.createOrUpdate([EventTeam(
-                id = event_key + "_" + team.key.id(),
-                event = event.key,
-                team = team.key,
-                year = event.year)
+                id=event_key + "_" + team.key.id(),
+                event=event.key,
+                team=team.key,
+                year=event.year)
                 for team in teams])
         else:
             event_teams = None
-        
+
         template_values = {
             'event_teams': event_teams,
         }
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/math/eventteam_update_do.html')
         self.response.out.write(template.render(path, template_values))
-        
+
+
 class EventTeamUpdateEnqueue(webapp.RequestHandler):
     """
     Handles enqueing building attendance for Events.
@@ -100,18 +103,19 @@ class EventTeamUpdateEnqueue(webapp.RequestHandler):
             event_keys = Event.query().fetch(10000, keys_only=True)
         else:
             event_keys = Event.query(Event.year == int(when)).fetch(10000, keys_only=True)
-        
+
         for event_key in event_keys:
             taskqueue.add(
                 url='/tasks/math/do/eventteam_update/' + event_key.id(),
                 method='GET')
-        
+
         template_values = {
             'event_keys': event_keys,
         }
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/math/eventteam_update_enqueue.html')
         self.response.out.write(template.render(path, template_values))
+
 
 class EventOprDo(webapp.RequestHandler):
     """
@@ -124,8 +128,8 @@ class EventOprDo(webapp.RequestHandler):
         event = Event.get_by_id(event_key)
         if Match.query(Match.event == event.key).fetch(keys_only=True).count() > 0:
             try:
-                opr,teams = OprHelper.opr(event_key)
-                oprs.append((opr,teams))
+                opr, teams = OprHelper.opr(event_key)
+                oprs.append((opr, teams))
                 event.oprs = opr
                 event.opr_teams = teams
                 event.put()
@@ -137,12 +141,13 @@ class EventOprDo(webapp.RequestHandler):
         template_values = {
             'oprs': oprs,
         }
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/math/event_opr_do.html')
         self.response.out.write(template.render(path, template_values))
 
     def post(self):
         self.get()
+
 
 class EventOprEnqueue(webapp.RequestHandler):
     """
@@ -154,21 +159,22 @@ class EventOprEnqueue(webapp.RequestHandler):
             events = Event.query(Event.end_date >= datetime.datetime.today() - datetime.timedelta(days=1))
         else:
             events = Event.query(Event.year == int(when))
-        
+
         events = events.fetch(500)
-        
+
         for event in events:
             taskqueue.add(
                 url='/tasks/math/do/event_opr/' + event.key_name,
                 method='GET')
-        
+
         template_values = {
             'event_count': len(events),
             'year': when
         }
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/math/event_opr_enqueue.html')
         self.response.out.write(template.render(path, template_values))
+
 
 class YearInsightsEnqueue(webapp.RequestHandler):
     """
@@ -178,21 +184,22 @@ class YearInsightsEnqueue(webapp.RequestHandler):
         taskqueue.add(
             url='/tasks/math/do/insights/{}/{}'.format(kind, year),
             method='GET')
-        
+
         template_values = {
             'kind': kind,
             'year': year
         }
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/math/year_insights_enqueue.html')
         self.response.out.write(template.render(path, template_values))
+
 
 class YearInsightsDo(webapp.RequestHandler):
     """
     Calculates insights of a given kind for a given year.
     Calculations of a given kind should reuse items fetched from the datastore.
     """
-        
+
     def get(self, kind, year):
         year = int(year)
 
@@ -201,7 +208,7 @@ class YearInsightsDo(webapp.RequestHandler):
             insights = InsightsHelper.doMatchInsights(year)
         elif kind == 'awards':
             insights = InsightsHelper.doAwardInsights(year)
-      
+
         if insights != None:
             InsightManipulator.createOrUpdate(insights)
 
@@ -210,12 +217,13 @@ class YearInsightsDo(webapp.RequestHandler):
             'year': year,
             'kind': kind,
         }
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/math/year_insights_do.html')
         self.response.out.write(template.render(path, template_values))
 
     def post(self):
         self.get()
+
 
 class OverallInsightsEnqueue(webapp.RequestHandler):
     """
@@ -225,27 +233,28 @@ class OverallInsightsEnqueue(webapp.RequestHandler):
         taskqueue.add(
             url='/tasks/math/do/overallinsights/{}'.format(kind),
             method='GET')
-        
+
         template_values = {
             'kind': kind,
         }
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/math/overall_insights_enqueue.html')
         self.response.out.write(template.render(path, template_values))
+
 
 class OverallInsightsDo(webapp.RequestHandler):
     """
     Calculates overall insights of a given kind.
     Calculations of a given kind should reuse items fetched from the datastore.
     """
-        
+
     def get(self, kind):
         insights = None
         if kind == 'matches':
             insights = InsightsHelper.doOverallMatchInsights()
         elif kind == 'awards':
             insights = InsightsHelper.doOverallAwardInsights()
-        
+
         if insights != None:
             InsightManipulator.createOrUpdate(insights)
 
@@ -253,7 +262,7 @@ class OverallInsightsDo(webapp.RequestHandler):
             'insights': insights,
             'kind': kind,
         }
-        
+
         path = os.path.join(os.path.dirname(__file__), '../templates/math/overall_insights_do.html')
         self.response.out.write(template.render(path, template_values))
 
@@ -326,8 +335,8 @@ class TypeaheadCalcDo(webapp.RequestHandler):
 
         entries = []
         for key, data in results.items():
-            entries.append(TypeaheadEntry(id = key,
-                                          data_json = json.dumps(data)))
+            entries.append(TypeaheadEntry(id=key,
+                                          data_json=json.dumps(data)))
         ndb.put_multi(entries)
 
         template_values = {'results': results}

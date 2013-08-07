@@ -3,14 +3,14 @@ class TBAVideoHelper(object):
     Same interface as the retired TBAVideo class.
     """
     TBA_NET_VID_PATTERN = "http://videos.thebluealliance.net/%s/%s.%s"
-    
+
     THUMBNAIL_FILETYPES = ["jpg", "jpeg"]
     STREAMABLE_FILETYPES = ["mp4", "flv"]
     DOWNLOADABLE_FILETYPES = ["mp4", "mov", "avi", "wmv", "flv"]
-    
+
     def __init__(self, match):
         self.match = match
-    
+
     @property
     def thumbnail_path(self):
         return self._best_path_of(self.THUMBNAIL_FILETYPES)
@@ -18,7 +18,7 @@ class TBAVideoHelper(object):
     @property
     def streamable_path(self):
         return self._best_path_of(self.STREAMABLE_FILETYPES)
-    
+
     @property
     def downloadable_path(self):
         return self._best_path_of(self.DOWNLOADABLE_FILETYPES)
