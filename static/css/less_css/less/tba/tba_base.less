@@ -1,32 +1,35 @@
-.navbar .brand {
-  background-image: url('/images/tba_blue_lamp_navbar.png');
-  background-repeat: no-repeat;
-  background-position: left center;
-  padding-left: 30px;
-  margin-left: 0px;
-  padding-right: 0;
+body {
+  padding-top: 70px;  // due to fixed navbar
+}
 
-  @media (max-width: 979px) {
-    margin-left: 20px;
+@logo-width: 43px;
+@logo-height: 70px;
+.navbar-tba-logo {
+  width: @logo-width;
+  height: @logo-height;
+}
+
+.navbar-tba-logo-link {
+  @minus-amt: (@logo-height - @navbar-height) / 2;
+  float: left;
+  overflow: visible;
+  height: @navbar-height + @minus-amt;
+  margin: -@minus-amt 15px 0 0;
+}
+
+.nav-persistent {
+  float: left;
+  > a {
+    border-radius: 0 !important;
   }
 }
 
 .full-width-search {
   width: 100%;
-  padding: 14px;
   box-sizing: border-box;
   -webkit-box-sizing:border-box;
   -moz-box-sizing: border-box;
   -ms-box-sizing: border-box;
-}
-
-#subnav {
-  margin-left: 15px;
-  margin-right: 0px;
-}
-
-.xcharts-data {
-  display: none;
 }
 
 #nav-alert-container {
@@ -43,35 +46,38 @@
   pointer-events: auto;
 }
 
+@social-icon-size: 24px;
 .social-icons {
+  max-height: @social-icon-size;
   padding: 0;
-  margin: 9px 0 0 0;
+  margin: (@navbar-height - @social-icon-size)/2 15px 0 0;
   float: right;
 
   @media (max-width: 979px) and (min-width: 768px) {
     float: left;
-    margin: 0 0 0 11px;
-    padding-bottom: 3px;
+    margin: 13px 0 13px 15px;
   }
 
   @media (max-width: 767px) {
-    margin: 0 0 5px 0;
+    margin: 15px 0 15px 0;
     text-align: center;
     float: none;
-
-    .socialIcon {
-      margin: 0 4px;
-    }
   }
 }
 
 .socialIcon {
-  width: 24px;
-  height: 24px;
+  width: @social-icon-size;
+  height: @social-icon-size;
   display: inline-block;
   margin: 0 4px 0px 4px;
   background-repeat: no-repeat;
   background-position: center center;
+  
+  @media (max-width: 767px) {
+    margin: 0 15px;
+    text-align: center;
+    float: none;
+  }
 }
 
 #facebook {
@@ -91,6 +97,7 @@
 
 #footer {
   text-align: center;
+  margin-bottom: 25px;
 }
 
 .sponsorImage {
@@ -120,44 +127,11 @@
   margin-bottom: 15px;
 }
 
-.info-table th {
-  min-width: 80px
-}
-
-// Copied from navs.less
-@media (max-width: 767px) {
-  // Stacked tabs and pills
-  .nav-stacked-phone > li {
-    float: none;
-  }
-  .nav-stacked-phone > li > a {
-    margin-right: 0; // no need for the gap between nav items
-  }
-
-  // Tabs
-  .nav-tabs.nav-stacked-phone {
-    border-bottom: 0;
-  }
-  .nav-tabs.nav-stacked-phone > li > a {
-    border: 1px solid #ddd;
-    .border-radius(0);
-  }
-  .nav-tabs.nav-stacked-phone > li:first-child > a {
-    .border-top-radius(4px);
-  }
-  .nav-tabs.nav-stacked-phone > li:last-child > a {
-    .border-bottom-radius(4px);
-  }
-  .nav-tabs.nav-stacked-phone > li > a:hover {
-    border-color: #ddd;
-    z-index: 2;
-  }
-
-  // Pills
-  .nav-pills.nav-stacked-phone > li > a {
-    margin-bottom: 3px;
-  }
-  .nav-pills.nav-stacked-phone > li:last-child > a {
-    margin-bottom: 1px; // decrease margin to match sizing of stacked tabs
-  }
+.scroll-up {
+  .btn();
+  .btn-default();
+  font-size: 12px;
+  position: fixed;
+  right: 10px;
+  bottom: 10px;
 }

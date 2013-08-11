@@ -4,29 +4,29 @@
 
 {% block content %}
 
-<div class="hero-unit">
+<div class="jumbotron">
     <h1>Hello, {{ user_bundle.account.display_name }}!</h1>
     <p>Welcome to the administrative area of The Blue Alliance</p>
     <p>If you're setting up your TBA Development instance for the first time, you probably want the <strong><a href="/admin/debug">debug panel</a></strong> for simpler tasks</p>
 </div>
-<div class="row-fluid">
-    <div class="span4">
+<div class="row">
+    <div class="col-4">
         <h2>Create Test Data</h2>
         <p>Run <code>paver test</code> to set up test data.</p>
-        <div><a class="btn" href="/tasks/get/fms_team_list">Get Teams</a></div><br />
-        <div><a class="btn" href="/admin/event/create/test">Create Test Events</a></div>
+        <div><a class="btn btn-default" href="/tasks/get/fms_team_list">Get Teams</a></div><br />
+        <div><a class="btn btn-default" href="/admin/event/create/test">Create Test Events</a></div>
     </div><!--/span-->
-    <div class="span4">
+    <div class="col-4">
         <h2>Stats</h2>
         <p>It'd be nice if there were some stats, eh?</p>
     </div><!--/span-->
-    <div class="span4">
+    <div class="col-4">
         <h2>Users</h2>
         <p>Eventually this will support Facebook login, and dishing out user roles will be easy. Not yet!</p>
     </div>
 </div>
-<div class="row-fluid">
-    <div class="span4">
+<div class="row">
+    <div class="col-4">
         <h2>Version Info:</h2>
         <p>Build time: {{build_time}}</p>
         <br>

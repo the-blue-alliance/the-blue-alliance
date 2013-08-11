@@ -17,7 +17,7 @@
 
     {% block main_javascript %}
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.0/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.0-rc1/js/bootstrap.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.0.6/jquery.fancybox.pack.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.5.2/jquery.tablesorter.min.js"></script>
@@ -32,33 +32,38 @@
     
 {% block navbar %}
 <div class="navbar navbar-fixed-top">
-  <div class="navbar-inner">
-    <div class="container">
-		<a class="btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+  <div class="container">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
-		</a>
-    <a class="brand hidden-phone" href="/">The Blue Alliance</a>
-    <a class="brand visible-phone" href="/">TBA</a>
-    <div class="nav">
-			<ul id="subnav" class="nav">
-			  <li class="navbar-button {% block teams_active %}{% endblock %}"><a href="/teams"><span><i class="icon-user icon-white"></i> Teams</span></a></li>
-        <li class="navbar-button {% block events_active %}{% endblock %}"><a href="/events"><span><i class="icon-calendar icon-white"></i> Events</span></a></li>
-        <li class="navbar-button hidden-phone {% block insights_active %}{% endblock %}"><a href="/insights"><span><i class="icon-align-left icon-white"></i> Insights</span></a></li>
-        <li class="navbar-button hidden-phone"><a href="/gameday"><span><i class="icon-facetime-video icon-white"></i> GameDay</span></a></li>
-			</ul>
-	  </div>
-	  <div class="nav-collapse">
-      <ul class="nav">
-			  <li class="navbar-button visible-phone"><a href="/insights"><span><i class="icon-align-left icon-white"></i> Insights</span></a></li>
-        <li class="navbar-button visible-phone"><a href="/gameday"><span><i class="icon-facetime-video icon-white"></i> GameDay</span></a></li>
+		</button>
+
+    <a class="navbar-tba-logo-link" href="/">
+      <img class="navbar-tba-logo" src="/images/tba_blue_lamp_navbar_large.png" alt="tba logo">
+    </a>
+    <a class="navbar-brand hidden-sm" href="/">The Blue Alliance</a>
+    <a class="navbar-brand visible-sm" href="/">TBA</a>
+
+    <ul class="nav navbar-nav">
+		  <li class="nav-persistent {% block teams_active %}{% endblock %}"><a href="/teams"><span><span class="glyphicon glyphicon-user icon-white"></span> Teams</span></a></li>
+      <li class="nav-persistent {% block events_active %}{% endblock %}"><a href="/events"><span><span class="glyphicon glyphicon-calendar icon-white"></span> Events</span></a></li>
+      <li class="nav-persistent hidden-sm {% block insights_active %}{% endblock %}"><a href="/insights"><span><span class="glyphicon glyphicon-align-left icon-white"></span> Insights</span></a></li>
+      <li class="nav-persistent hidden-sm"><a href="/gameday"><span><span class="glyphicon glyphicon-facetime-video icon-white"></span> GameDay</span></a></li>
+	   </ul>
+
+	  <div class="nav-collapse collapse navbar-responsive-collapse">
+      <br class="hidden-lg">
+      <ul class="nav navbar-nav">
+			  <li class="visible-sm {% block insights_active_collapsed %}{% endblock %}"><a href="/insights"><span><span class="glyphicon glyphicon-align-left icon-white"></span> Insights</span></a></li>
+        <li class="visible-sm"><a href="/gameday"><span><span class="glyphicon glyphicon-facetime-video icon-white"></span> GameDay</span></a></li>
       </ul>
-      <form class="navbar-search pull-right" action="http://www.thebluealliance.com/search" >
+
+      <form class="navbar-form" action="http://www.thebluealliance.com/search" >
 			    <input type="hidden" name="cx" value="017956276086362105630:99ctqytcokm" />
 			    <input type="hidden" name="cof" value="FORID:11" />
 			    <input type="hidden" name="ie" value="UTF-8" />
-			    <input type="text" class="search-query" placeholder="Search for teams and events" name="q"/>
+			    <input type="text" class="form-control" placeholder="Search for teams and events" name="q"/>
 			</form>
 
 			<div class="social-icons">
@@ -68,7 +73,6 @@
 			</div>
 		</div>
 	</div>
-  </div>
 </div>
 {% endblock %}
 
@@ -78,10 +82,10 @@
 {% block footer %}
 <div id="footer" class="container">
   <div class="row">
-    <div class="span12">
+    <div class="col-sm-12 col-lg-12">
       <hr>
     </div>
-    <div class="span6 offset3">
+    <div class="col-sm-6 col-lg-6 col-sm-offset-3 col-lg-offset-3">
       <div style="overflow: hidden;">
           <div class="fb-like" data-href="http://facebook.com/thebluealliance" data-send="true" data-width="450px" data-show-faces="true"></div>
       </div>
@@ -109,6 +113,8 @@
 	</div>
 </div>
 {% endblock %}
+
+<a class="scroll-up visible-sm smooth-scroll" href="#"><span class="glyphicon glyphicon-arrow-up"></span></a>
 
 <script type="text/javascript">
 

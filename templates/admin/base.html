@@ -8,20 +8,6 @@
 
     <!-- Le styles -->
     <link href="/css/tba_combined_style.main.min.css" rel="stylesheet">
-    <style type="text/css">
-      body {
-        padding-top: 60px;
-        padding-bottom: 40px;
-      }
-      .sidebar-nav {
-        padding: 9px 0;
-      }
-    </style>
-
-    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
 
     <!-- Le fav and touch icons -->
     <link rel="shortcut icon" href="/images/admin_favicon.ico">
@@ -29,7 +15,7 @@
     <!-- Le javascript
     ================================================== -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.0/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.0-rc1/js/bootstrap.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.0.6/jquery.fancybox.pack.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.5.2/jquery.tablesorter.min.js"></script>
@@ -39,71 +25,80 @@
   </head>
 
   <body>
-
     <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container-fluid">
-          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </a>
-          <a class="brand" href="/admin/">TBA Admin</a>
-          <div class="nav-collapse collapse">
-            <p class="navbar-text pull-right">
-              Logged in as <a href="#" class="navbar-link">{{ user_bundle.account.display_name }}</a> || <a href="/logout">log out</a>
-            </p>
-            <ul class="nav">
-              <li class="active"><a href="/admin/">Home</a></li>
-            </ul>
-          </div><!--/.nav-collapse -->
+      <div class="container">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+    
+        <a class="navbar-tba-logo-link" href="/admin/">
+          <img class="navbar-tba-logo" src="/images/tba_red_lamp_navbar_large.png" alt="tba logo">
+        </a>
+        <a class="navbar-brand hidden-sm" href="/admin/">The Blue Alliance Admin</a>
+        <a class="navbar-brand visible-sm" href="/admin/">TBA Admin</a>
+    
+        <ul class="nav navbar-nav">
+          <!-- Nothing here yet -->
+        </ul>
+    
+        <div class="nav-collapse collapse navbar-responsive-collapse">
+          <br class="hidden-lg">
+          <p class="navbar-text pull-right">
+            Logged in as <a href="#" class="navbar-link">{{ user_bundle.account.display_name }}</a> || <a href="/logout">log out</a>
+          </p>
+          <ul class="nav navbar-nav">
+            <!-- Nothing here yet -->
+          </ul>
         </div>
       </div>
     </div>
-    <div class="container-fluid">
-      <div class="row-fluid">
-        <div class="span3">
-          <div class="well sidebar-nav">
-            <ul class="nav nav-list">
-              <li class="nav-header">Events</li>
+    
+    <div class="container">
+      <div class="row">
+        <div class="col-3">
+          <div class="well">
+            <ul class="nav">
+              <li>Events</li>
               <li><a href="/admin/events">View all</a></li>
               <li><a href="/admin/event/create">Create</a></li>
-              <li class="nav-header">Matches</li>
+              <li>Matches</li>
               <li><a href="/admin/matches">Edit</a></li>
               <li><a href="/admin/match/cleanup">Cleanup</a></li>
-              <li class="nav-header">Awards</li>
+              <li>Awards</li>
               <li><a href="/admin/awards">Edit</a></li>
-              <li class="nav-header">Videos</li>
+              <li>Videos</li>
               <li><a href="/admin/videos/add">Add YouTube Videos</a></li>
-              <li class="nav-header">Teams</li>
+              <li>Teams</li>
               <li><a href="/admin/teams">View all (slowwww)</a></li>
-              <li class="nav-header">Suggestions</li>
+              <li>Suggestions</li>
               <li><a href="/admin/suggestions/review">Review Suggestions</a></li>
-              <li class="nav-header">Users</li>
+              <li>Users</li>
               <li><a href="/admin/users">View all</a></li>
-              <li class="nav-header">Migration</li>
+              <li>Migration</li>
               <li><a href="/admin/migration">Migration Utils</a></li>
-              <li class="nav-header">Memcache</li>
+              <li>Memcache</li>
               <li><a href="/admin/memcache">Stats + Flushing</a></li>
-              <li class="nav-header">Misc</li>
+              <li>Misc</li>
               <li><a href="/admin/debug">Debug Panel</a></li>
               <li><a href="/admin/sitevars">Sitevars</a></li>
               <li><a href="/admin/tasks">Task Launcher</a></li>
             </ul>
-          </div><!--/.well -->
-        </div><!--/span-->
-        <div class="span9">
+          </div>
+        </div>
+        <div class="col-9">
           {% block content %}{% endblock %}
         </div>
       </div>
 
       <hr>
 
-      <footer>
+      <footer id="footer">
         <p>Go back to <a href="/">The Blue Alliance</a>. Like the WWF, but for smart people.</p>
       </footer>
 
-    </div><!--/.fluid-container-->
+    </div>
 
     <script type="text/javascript">
 

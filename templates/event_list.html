@@ -8,10 +8,10 @@
 
 {% block content %}
 <div class="container">
-	  <div class="row">
-	  	<div class="span2 year_list">
-			<div class="btn-group visible-phone">
-			  <a class="btn btn-large dropdown-toggle" data-toggle="dropdown" href="#">
+  <div class="row">
+  	<div class="col-sm-2 col-lg-2 year_list">
+			<div class="btn-group visible-sm">
+			  <a class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" href="#">
 			    {{selected_year}}
 			    <span class="caret"></span>
 			  </a>
@@ -21,18 +21,18 @@
 			      {% endfor %}
 			  </ul>
 			</div>
-	  		<ul class="nav nav-tabs nav-stacked hidden-phone">
-	            {% for year in valid_years %}
-                <li {% if selected_year == year %}class="active"{% endif %}><a href="/events/{{year}}">{{year}}</a></li>
-                {% endfor %}
+  		<ul class="nav nav-pills nav-stacked hidden-sm" data-spy="affix">
+            {% for year in valid_years %}
+              <li {% if selected_year == year %}class="active"{% endif %}><a href="/events/{{year}}">{{year}}</a></li>
+              {% endfor %}
 			</ul>
-	  	</div>
-		<div class="span10">
+  	</div>
+		<div class="col-12 col-sm-10 col-lg-10">
 			<h1 class="end_header">{% if explicit_year %}{{selected_year}} {% endif %}<em>FIRST</em> Robotics Competition Events {% if events|length > 0 %}<small>{{ events|length }} Events</small>{% endif %}</h1>
 			{% if week_events %}
-	    	    <ul class="nav nav-pills nav-stacked-phone">
+	    	    <ul class="nav nav-pills">
 	    	        {% for label, events in week_events.items %}
-	    	            <li><a class="btn smooth-scroll" href="#{{label|slugify}}">{{ label }}</a></li>
+	    	            <li><a class="btn btn-default smooth-scroll" href="#{{label|slugify}}">{{ label }}</a></li>
 	    	        {% endfor %}
 	    	    </ul>
 			    {% for label, events in week_events.items %}

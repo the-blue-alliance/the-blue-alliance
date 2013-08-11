@@ -8,9 +8,11 @@
 
 <form class="form-inline">
     <legend>Edit a Match</legend>
-    <div class="input-append">
-        <input class="span8" size="16" id="match_key" type="text" placeholder="match_key">
-        <a class="btn" id="edit_button"><i class="icon-edit"></i> Edit</a>
+    <div class="input-group">
+        <input class="form-control" size="16" id="match_key" type="text" placeholder="match_key">
+        <span class="input-group-btn">
+            <a class="btn btn-warning" id="edit_button"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+        </span>
     </div>
 </form>
 
@@ -23,9 +25,9 @@
       <p>f1m1, 245, 217, 766, 191, 179, 494, 65, 28</p>
     </div>
     <form action="/admin/match/add" method="post">
-      <input name="event_key" type="text" placeholder="event_key"><br>
-      <textarea name="matches_csv"></textarea><br>
-      <button type="submit" class="btn btn-primary"><i class="icon-plus-sign icon-white"></i> Add Matches</button>
+      <input class="form-control" name="event_key" type="text" placeholder="event_key"><br>
+      <textarea class="form-control" name="matches_csv"></textarea><br>
+      <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign icon-white"></span> Add Matches</button>
     </form>
 
 <script>

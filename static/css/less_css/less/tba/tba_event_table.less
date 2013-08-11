@@ -1,5 +1,14 @@
-.event-table {  
-  td {
-    vertical-align: middle;
+.event-table {
+  .table();
+  .table-striped();
+  thead,
+  tbody,
+  tfoot {
+    > tr {
+      > th,
+      > td {
+        vertical-align: middle;
+      }
+    }
   }
 }

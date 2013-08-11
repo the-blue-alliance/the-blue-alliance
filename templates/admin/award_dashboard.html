@@ -9,9 +9,11 @@
 
 <form class="form-inline">
     <legend>Edit an Award</legend>
-    <div class="input-append">
-        <input class="span8" size="16" id="award_key" type="text" placeholder="award_key">
-        <a class="btn" id="edit_button"><i class="icon-edit"></i> Edit</a>
+    <div class="input-group">
+        <input class="form-control" size="16" id="award_key" type="text" placeholder="award_key">
+        <span class="input-group-btn">
+            <a class="btn btn-warning" id="edit_button"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+        </span>
     </div>
 </form>
 
@@ -24,9 +26,9 @@
        {"name": "ras", "official_name": "Rookie All Star Award", "team_number": "3256"}]
     </div>
     <form action="/admin/award/add" method="post">
-      <input name="event_key" type="text" placeholder="event_key"><br>
-      <textarea name="awards_json"></textarea><br>
-      <button type="submit" class="btn btn-primary"><i class="icon-plus-sign icon-white"></i> Add awards</button>
+      <input class="form-control" name="event_key" type="text" placeholder="event_key"><br>
+      <textarea class="form-control" name="awards_json"></textarea><br>
+      <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign icon-white"></span> Add awards</button>
     </form>
 
 <script>

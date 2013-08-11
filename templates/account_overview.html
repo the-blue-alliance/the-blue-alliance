@@ -7,12 +7,12 @@
 {% block content %}
 <div class="container">
   <div class="row">
-    <div class="span8 offset2">
+    <div class="col-sm-8 col-lg-8 col-sm-offset-2 col-lg-offset-2">
       <p class="pull-right">
-        <a class="btn btn-info" href="/logout"><i class="icon-remove icon-white"></i> Logout</a>
+        <a class="btn btn-info" href="/logout"><span class="glyphicon glyphicon-remove"></span> Logout</a>
       </p>
       <p>
-        <a class="btn" href="/account/edit"><i class="icon-remove icon-pencil"></i> Edit Profile</a> 
+        <a class="btn btn-default" href="/account/edit"><span class="glyphicon glyphicon-pencil"></span> Edit Profile</a> 
       </p>
       <div class="pull-left">
         <h1>Welcome back, {{user_bundle.account.display_name}}!</h1>
@@ -20,7 +20,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="span8 offset2">
+    <div class="col-sm-8 col-lg-8 col-sm-offset-2 col-lg-offset-2">
       {{user_bundle.account2}}
       <table class="table table-striped">
         <tr>
