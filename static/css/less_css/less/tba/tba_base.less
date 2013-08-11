@@ -2,28 +2,6 @@ body {
   padding-top: 70px;  // due to fixed navbar
 }
 
-@logo-width: 43px;
-@logo-height: 70px;
-.navbar-tba-logo {
-  width: @logo-width;
-  height: @logo-height;
-}
-
-.navbar-tba-logo-link {
-  @minus-amt: (@logo-height - @navbar-height) / 2;
-  float: left;
-  overflow: visible;
-  height: @navbar-height + @minus-amt;
-  margin: -@minus-amt 15px 0 0;
-}
-
-.nav-persistent {
-  float: left;
-  > a {
-    border-radius: 0 !important;
-  }
-}
-
 .full-width-search {
   width: 100%;
   box-sizing: border-box;
