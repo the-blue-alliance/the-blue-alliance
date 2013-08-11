@@ -230,9 +230,9 @@ function setupView(viewNum, $item) {
 		"<div id='overlay_"+ viewNum + "' class='overlay' alt='" + eventName + "'>" +
 		"<div class='overlay-title'>" + eventName + "</div>" +
 		"<div id='close_" + viewNum + "' class='view-close' rel='tooltip' data-placement='left' title='Close'>" +
-		"<i class='icon-remove icon-white'></i></div>" +
+		"<span class='glyphicon glyphicon-remove'></span></div>" +
 		"<div id='swap_" + viewNum + "' class='swap' rel='tooltip' data-placement='left' title='Drag to another screen to swap'>" +
-		"<i class='icon-move icon-white'></i></div></div>";
+		"<span class='glyphicon glyphicon-move'></span></div></div>";
 		
 		hiddenviews[viewNum] = viewContents;
 		document.getElementById('view_' + viewNum).innerHTML = hiddenviews[viewNum];
