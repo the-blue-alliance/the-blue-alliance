@@ -24,55 +24,6 @@ body {
   pointer-events: auto;
 }
 
-@social-icon-size: 24px;
-.social-icons {
-  max-height: @social-icon-size;
-  padding: 0;
-  margin: (@navbar-height - @social-icon-size)/2 15px 0 0;
-  float: right;
-
-  @media (max-width: 979px) and (min-width: 768px) {
-    float: left;
-    margin: 13px 0 13px 15px;
-  }
-
-  @media (max-width: 767px) {
-    margin: 15px 0 15px 0;
-    text-align: center;
-    float: none;
-  }
-}
-
-.socialIcon {
-  width: @social-icon-size;
-  height: @social-icon-size;
-  display: inline-block;
-  margin: 0 4px 0px 4px;
-  background-repeat: no-repeat;
-  background-position: center center;
-  
-  @media (max-width: 767px) {
-    margin: 0 15px;
-    text-align: center;
-    float: none;
-  }
-}
-
-#facebook {
-  background-image: url('/images/icons/tba-sprite.png');
-  background-position: -10px -10px;
-}
-
-#twitter {
-  background-image: url('/images/icons/tba-sprite.png');
-  background-position: -10px -54px;
-}
-
-#tumblr {
-  background-image: url('/images/icons/tba-sprite.png');
-  background-position: -10px -98px;
-}
-
 #footer {
   text-align: center;
   margin-bottom: 25px;

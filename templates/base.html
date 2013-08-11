@@ -42,24 +42,24 @@
     <a class="tba-navbar-logo-link" href="/">
       <img class="tba-navbar-logo" src="/images/tba_blue_lamp_navbar_large.png" alt="tba logo">
     </a>
-    <a class="navbar-brand hidden-sm" href="/">The Blue Alliance</a>
-    <a class="navbar-brand visible-sm" href="/">TBA</a>
+    <a class="navbar-brand tba-navbar-brand hidden-sm" href="/">The Blue Alliance</a>
+    <a class="navbar-brand tba-navbar-brand visible-sm" href="/">TBA</a>
 
-    <ul class="nav navbar-nav">
+    <ul class="nav navbar-nav tba-navbar-nav">
 		  <li class="tba-nav-persistent {% block teams_active %}{% endblock %}"><a href="/teams"><span><span class="glyphicon glyphicon-user icon-white"></span> Teams</span></a></li>
       <li class="tba-nav-persistent {% block events_active %}{% endblock %}"><a href="/events"><span><span class="glyphicon glyphicon-calendar icon-white"></span> Events</span></a></li>
       <li class="tba-nav-persistent hidden-sm {% block insights_active %}{% endblock %}"><a href="/insights"><span><span class="glyphicon glyphicon-align-left icon-white"></span> Insights</span></a></li>
       <li class="tba-nav-persistent hidden-sm"><a href="/gameday"><span><span class="glyphicon glyphicon-facetime-video icon-white"></span> GameDay</span></a></li>
 	   </ul>
 
-	  <div class="nav-collapse collapse navbar-responsive-collapse">
+	  <div class="nav-collapse collapse tba-nav-collapse tba-collapse navbar-responsive-collapse">
       <br class="hidden-lg">
-      <ul class="nav navbar-nav">
+      <ul class="nav navbar-nav tba-navbar-nav">
 			  <li class="visible-sm {% block insights_active_collapsed %}{% endblock %}"><a href="/insights"><span><span class="glyphicon glyphicon-align-left icon-white"></span> Insights</span></a></li>
         <li class="visible-sm"><a href="/gameday"><span><span class="glyphicon glyphicon-facetime-video icon-white"></span> GameDay</span></a></li>
       </ul>
 
-      <form class="navbar-form" action="http://www.thebluealliance.com/search" >
+      <form class="navbar-form tba-navbar-form" action="http://www.thebluealliance.com/search" >
 			    <input type="hidden" name="cx" value="017956276086362105630:99ctqytcokm" />
 			    <input type="hidden" name="cof" value="FORID:11" />
 			    <input type="hidden" name="ie" value="UTF-8" />

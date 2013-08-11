@@ -1,0 +1,107 @@
+@logo-width: 43px;
+@logo-height: 70px;
+
+.tba-navbar-brand {
+  max-width: 250px;
+  margin-left: -(@navbar-padding-horizontal);
+  margin-right: 5px;
+  float: left;
+}
+
+.tba-navbar-nav {
+  margin-bottom: 0;
+  > li > a {
+    @media (max-width: @screen-large-desktop) {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+  }
+}
+
+@media screen and (min-width: @grid-float-breakpoint) {
+  .tba-nav-collapse.tba-collapse {
+    padding-bottom: 0;
+  }
+}
+
+.tba-navbar-logo {
+  width: @logo-width;
+  height: @logo-height;
+}
+
+.tba-navbar-logo-link {
+  @minus-amt: (@logo-height - @navbar-height) / 2;
+  float: left;
+  overflow: visible;
+  height: @navbar-height + @minus-amt;
+  margin: -@minus-amt 15px 0 0;
+}
+
+.tba-nav-persistent {
+  float: left;
+  > a {
+    border-radius: 0 !important;
+  }
+}
+
+.tba-navbar-form {
+  width: 220px;
+  @media (min-width: @screen-small) {
+    .pull-right();
+  }
+  @media (min-width: @screen-phone) and (max-width: @screen-small-max) {
+    .pull-left();
+  }
+  @media (max-width: @screen-phone) {
+    .full-width-search();
+  }
+}
+
+@social-icon-size: 24px;
+.social-icons {
+  max-height: @social-icon-size;
+  padding: 0;
+  margin: (@navbar-height - @social-icon-size)/2 15px 0 0;
+  float: right;
+
+  @media (min-width: @screen-small) and (max-width: @screen-small-max) {
+    float: left;
+    margin: 13px 0 13px 15px;
+  }
+
+  @media (max-width: 767px) {
+    margin: 15px 0 15px 0;
+    text-align: center;
+    float: none;
+  }
+}
+
+.socialIcon {
+  width: @social-icon-size;
+  height: @social-icon-size;
+  display: inline-block;
+  margin: 0 4px 0px 4px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  
+  @media (max-width: @screen-small) {
+    margin: 0 15px;
+    text-align: center;
+    float: none;
+  }
+}
+
+#facebook {
+  background-image: url('/images/icons/tba-sprite.png');
+  background-position: -10px -10px;
+}
+
+#twitter {
+  background-image: url('/images/icons/tba-sprite.png');
+  background-position: -10px -54px;
+}
+
+#tumblr {
+  background-image: url('/images/icons/tba-sprite.png');
+  background-position: -10px -98px;
+}
