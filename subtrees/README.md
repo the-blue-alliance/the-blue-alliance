@@ -5,11 +5,13 @@ Subtrees allow us to include source code from other projects within our own. Thi
 To add a subtree:
 -----------------
 `git subtree add --prefix subtrees/<folder name> <URL> <branch> --squash`
+
 Example: `git subtree add --prefix subtrees/bootstrap git@github.com:twbs/bootstrap.git 3.0.0-wip --squash`
 
 To update a subtree:
 --------------------
 `git subtree pull --prefix subtrees/<folder name> <URL> <branch> --squash`
+
 Example: `git subtree add --prefix subtrees/typeahead git@github.com:twitter/typeahead.js.git master --squash`
 
 More information about subtrees:
