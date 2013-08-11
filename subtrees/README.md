@@ -12,7 +12,7 @@ To update a subtree:
 --------------------
 `git subtree pull --prefix subtrees/<folder name> <URL> <branch> --squash`
 
-Example: `git subtree add --prefix subtrees/typeahead git@github.com:twitter/typeahead.js.git master --squash`
+Example: `git subtree pull --prefix subtrees/typeahead git@github.com:twitter/typeahead.js.git master --squash`
 
 More information about subtrees:
 --------------------------------
