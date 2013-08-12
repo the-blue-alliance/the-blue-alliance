@@ -12,11 +12,11 @@
 <h4>EventTeams</h4>
 <p>Rebuild EventTeam join models to build (Team, Event) pairs</p>
 <div class="row">
-    <div class="col-4">
+    <div class="col-xs-4">
         <span class="help-block">Enqueue All</span>
         <a class="btn btn-warning" href="/tasks/math/enqueue/eventteam_update/all">Enqueue all Events</a>
     </div>
-    <div class="col-4">
+    <div class="col-xs-4">
         <span class="help-block">Enqueue Year</span>
         <form class="form-inline">
             <div class="input-group">
@@ -32,7 +32,7 @@
         });
         </script>
     </div>
-    <div class="col-4">
+    <div class="col-xs-4">
         <form class="form-inline">
             <span class="help-block">Do</span>
             <div class="input-group">
@@ -50,7 +50,7 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-4">
+    <div class="col-xs-4">
         <span class="help-block">Repair corrupt EventTeams</span>
         <a class="btn btn-warning" href="/tasks/math/do/eventteam_repair">Repair EventTeams</a>
     </div>
@@ -60,11 +60,11 @@
 <h4>TbaVideos</h4>
 <p>Scrape videos.thebluealliance.com to update hosted video file index</p>
 <div class="row">
-    <div class="col-4">
+    <div class="col-xs-4">
         <span class="help-block">Enqueue</span>
         <a class="btn btn-warning" href="/tasks/enqueue/tba_videos">Enqueue all Events</a>
     </div>
-    <div class="col-4">
+    <div class="col-xs-4">
         <form class="form-inline">
             <span class="help-block">Get</span>
             <div class="input-group">
@@ -86,7 +86,7 @@
 <h4>UsfirstAwards</h4>
 <p>Scrape Usfirst to get Awards from Events</p> 
 <div class="row">
-    <div class="col-4">
+    <div class="col-xs-4">
         <span class="help-block">Enqueue</span>
         <form class="form-inline">
             <div class="input-group">
@@ -102,7 +102,7 @@
         });
         </script>
     </div>
-    <div class="col-4">
+    <div class="col-xs-4">
         <span class="help-block">Get</span>
         <form class="form-inline">
             <div class="input-group">
@@ -124,7 +124,7 @@
 <h4>UsfirstEventDetails</h4>
 <p>Scrape Usfirst to update Event details</p>
 <div class="row">
-    <div class="col-4">
+    <div class="col-xs-4">
         <form class="form-inline">
             <span class="help-block">Enqueue</span>
             <div class="input-group">
@@ -140,7 +140,7 @@
         });
         </script>
     </div>
-    <div class="col-4">
+    <div class="col-xs-4">
         <form class="form-inline">
             <span class="help-block">Get</span>
             <input class="form-control" id="enqueue_usfirst_event_details_year2" type="text" placeholder="year">
@@ -162,7 +162,7 @@
 <h4>UsfirstTeamDetails</h4>
 <p>Scrape Usfirst to update Team details</p>
 <div class="row">
-    <div class="col-4">
+    <div class="col-xs-4">
         <span class="help-block">Enqueue</span>
         <div class="input-group btn-group">
             <a class="btn btn-warning" href="/tasks/enqueue/usfirst_team_details?offset=0">@0</a>
@@ -171,7 +171,7 @@
             <a class="btn btn-warning" href="/tasks/enqueue/usfirst_team_details?offset=3000">@3000</a>
         </div>
     </div>
-    <div class="col-4">
+    <div class="col-xs-4">
         <form class="form-inline">
             <span class="help-block">Get</span>
             <div class="input-group">
@@ -195,7 +195,7 @@
 <p>Scrape @FRCFMS to get matches in CSV format.</p>
 <p>Matches must be manually added using offseason_matches_get</p>
 <div class="row">
-    <div class="col-4">
+    <div class="col-xs-4">
         <a class="btn btn-warning" href="/tasks/get/twitter_frcfms_matches">Get last 3200 Matches</a>
     </div>
 </div>
@@ -204,7 +204,7 @@
 <h4>Calculate Insights</h4>
 <p>Generate Insights by year or overall</p>
 <div class="row">
-    <div class="col-3">
+    <div class="col-xs-3">
         <span class="help-block">Enqueue Award Insights</span>
         <form class="form-inline">
             <div class="input-group">
@@ -220,7 +220,7 @@
         });
         </script>
     </div>
-    <div class="col-3">
+    <div class="col-xs-3">
         <span class="help-block">Enqueue Match Insights</span>
         <form class="form-inline">
             <div class="input-group">
@@ -236,10 +236,10 @@
         });
         </script>
     </div>
-    <div class="col-3">
+    <div class="col-xs-3">
         <a class="btn btn-warning" href="/tasks/math/enqueue/overallinsights/awards">Enqueue Overall Award Insights</a>
     </div>
-    <div class="col-3">
+    <div class="col-xs-3">
         <a class="btn btn-warning" href="/tasks/math/enqueue/overallinsights/matches">Enqueue Overall Match Insights</a>
     </div>
 </div>
@@ -249,7 +249,7 @@
 <h4>Calculate Typeahead</h4>
 <p>Generate TypeaheadEntries</p>
 <div class="row">
-    <div class="col-3">
+    <div class="col-xs-3">
         <a class="btn btn-warning" href="/tasks/math/enqueue/typeaheadcalc">Calc Typeahead!</a>
     </div>
 </div>
