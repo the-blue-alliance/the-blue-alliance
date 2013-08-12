@@ -13,7 +13,7 @@
     {% include "team_partials/team_info.html" %}
     <hr>
     <div class="row">
-        <div class="col-sm-12 col-lg-12">
+        <div class="col-sm-12">
             {% with year|slugify|add:" Season" as dropdown_label %}
             {% include "team_partials/team_year_dropdown.html" %}
             {% endwith %}
@@ -34,7 +34,7 @@
     <hr>
     {% for comp in participation %}
         <div class="row" id="{{ comp.event.key_name }}">
-            <div class="col-sm-4 col-lg-4">
+            <div class="col-sm-4">
                 <h3><a href="/event/{{ comp.event.key_name }}">{{ comp.event.name }}</a></h3>
                 <p>
                     {% if comp.event.location %}<span class="glyphicon glyphicon-map-marker"></span> in <a href="http://maps.google.com/maps?q={{ comp.event.location }}">{{ comp.event.location }}</a><br />{% endif %}
@@ -60,7 +60,7 @@
                 </p>
                 {% endif %}
             </div>
-            <div class="col-sm-8 col-lg-8" style="margin-top: 1em">
+            <div class="col-sm-8" style="margin-top: 1em">
                 {% if comp.matches.num %}
                     {% with comp.matches as matches %}
                         {% include "match_partials/full_match_table.html" %}

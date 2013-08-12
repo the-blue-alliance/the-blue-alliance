@@ -21,7 +21,7 @@
 {% block content %}
 <div class="container">
     <div class="row">
-        <div class="col-sm-6 col-lg-6 col-sm-offset-3 col-lg-offset-3">
+        <div class="col-sm-6 col-sm-offset-3 col-md-offset-3 col-lg-offset-3">
             <p><a class="btn btn-default" href="/event/{{event.key_name}}"><span class="glyphicon glyphicon-chevron-left"></span> {{ event.year }} {{ event.name }}</a></p>
             <h1>{{match.verbose_name}} <small><a href="/event/{{event.key_name}}">{{ event.year }} {{ event.name }}</a></small></h1>
             <table class="match-table">
@@ -41,7 +41,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-6 col-lg-6 col-sm-offset-3 col-lg-offset-3 fitvids">
+        <div class="col-sm-6 col-sm-offset-3 col-md-offset-3 col-lg-offset-3 fitvids">
         {% if match.tba_video %}
             {% include "video_partials/tbavideo_player.html" %}
         {% endif %}
@@ -62,7 +62,7 @@
     </div>
 
     <div class="row">
-        <div class="col-sm-6 col-lg-6 col-sm-offset-3 col-lg-offset-3">
+        <div class="col-sm-6 col-sm-offset-3 col-md-offset-3 col-lg-offset-3">
             <hr>
             <div class="fb-comments" data-href="http://www.thebluealliance.com/match/{{match.key_name}}" data-num-posts="3" data-width="470"></div>
         </div>
