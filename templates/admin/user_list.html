@@ -13,7 +13,7 @@
         <th>ID</th>
 	   <th>Created</th>
     </thead>
-    
+
     {% for user in users %}
     <tr>
         <td><a href="/admin/user/{{ user.key.id }}">{{ user.display_name }}</a></td>
