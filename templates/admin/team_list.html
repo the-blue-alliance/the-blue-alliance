@@ -33,7 +33,7 @@ $("#go_button").click(function() {
         <th>Name</th>
         <th>Nickname</th>
     </thead>
-    
+
     {% for team in teams %}
     <tr>
         <td><a href="/admin/team/{{team.team_number}}">{{ team.team_number }}</a></td>

@@ -25,8 +25,8 @@
     <td class="red{% ifequal match.winning_alliance 'red' %} winner{% endifequal %}" colspan="4"><a href="/team/{{ match.alliances.red.teams.2|digits }}">{{ match.alliances.red.teams.2|slice:'3:' }}</a></td>
     {% else %}
     <td class="red{% ifequal match.winning_alliance 'red' %} winner{% endifequal %}" colspan="6"><a href="/team/{{ match.alliances.red.teams.0|digits }}">{{ match.alliances.red.teams.0|slice:'3:' }}</a></td>
-    <td class="red{% ifequal match.winning_alliance 'red' %} winner{% endifequal %}" colspan="6"><a href="/team/{{ match.alliances.red.teams.1|digits }}">{{ match.alliances.red.teams.1|slice:'3:' }}</a></td>   
-    {% endif %}    
+    <td class="red{% ifequal match.winning_alliance 'red' %} winner{% endifequal %}" colspan="6"><a href="/team/{{ match.alliances.red.teams.1|digits }}">{{ match.alliances.red.teams.1|slice:'3:' }}</a></td>
+    {% endif %}
 </tr>
 <tr class="hidden-lg">
     {% if match.alliances.red.teams.2 or match.alliances.red.teams.2 %}
@@ -35,6 +35,6 @@
     <td class="blue{% ifequal match.winning_alliance 'blue' %} winner{% endifequal %}" colspan="4"><a href="/team/{{ match.alliances.blue.teams.2|digits }}">{{ match.alliances.blue.teams.2|slice:'3:' }}</a></td>
     {% else %}
     <td class="blue{% ifequal match.winning_alliance 'blue' %} winner{% endifequal %}" colspan="6"><a href="/team/{{ match.alliances.blue.teams.0|digits }}">{{ match.alliances.blue.teams.0|slice:'3:' }}</a></td>
-    <td class="blue{% ifequal match.winning_alliance 'blue' %} winner{% endifequal %}" colspan="6"><a href="/team/{{ match.alliances.blue.teams.1|digits }}">{{ match.alliances.blue.teams.1|slice:'3:' }}</a></td>   
-    {% endif %}    
+    <td class="blue{% ifequal match.winning_alliance 'blue' %} winner{% endifequal %}" colspan="6"><a href="/team/{{ match.alliances.blue.teams.1|digits }}">{{ match.alliances.blue.teams.1|slice:'3:' }}</a></td>
+    {% endif %}
 </tr>

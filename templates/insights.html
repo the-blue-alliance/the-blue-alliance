@@ -16,7 +16,7 @@
     </div>
   </div>
   {% endif %}
-  
+
   {% if blue_banners %}
   <div class="row">
     <div class="col-12">
@@ -48,7 +48,7 @@
     </div>
   </div>
   {% endif %}
-  
+
   {% if world_champions %}
   <div class="row">
     <div class="col-12">
@@ -78,7 +78,7 @@
     </div>
   </div>
   {% endif %}
-  
+
   {% if rca_winners %}
   <div class="row">
     <div class="col-12">
@@ -110,7 +110,7 @@
     </div>
   </div>
   {% endif %}
-      
+
   {% if regional_district_winners %}
   <div class="row">
     <div class="col-12">
@@ -121,7 +121,7 @@
             <th>Number</th>
             <th>Teams</th>
           </tr>
-        </thdead>
+        </thead>
         <tbody>
           {% for number, team_list in regional_district_winners.data %}
           {% if forloop.counter <= 6 %}
@@ -142,5 +142,5 @@
     </div>
   </div>
   {% endif %}
-  
+
 {% endblock %}
