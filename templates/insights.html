@@ -14,7 +14,7 @@
     <div id="num-matches" class="xcharts-data xcharts-line-single-data">{{ num_matches.data_json|safe }}</div>
   </div>
   {% endif %}
-  
+
   {% if blue_banners %}
   <div class="row-fluid">
     <h3>Most Blue Banners</h3>
@@ -46,7 +46,7 @@
     </div>
   </div>
   {% endif %}
-  
+
   {% if world_champions %}
   <div class="row-fluid">
     <h3>Most World Championship Wins</h3>
@@ -76,7 +76,7 @@
     </div>
   </div>
   {% endif %}
-  
+
   {% if rca_winners %}
   <div class="row-fluid">
     <h3>Most Regional Chairman's Award Wins</h3>
@@ -108,7 +108,7 @@
     </div>
   </div>
   {% endif %}
-      
+
   {% if regional_district_winners %}
   <div class="row-fluid">
     <h3>Most Regional & District Wins</h3>
@@ -119,7 +119,7 @@
             <th>Number</th>
             <th>Teams</th>
           </tr>
-        </thdead>
+        </thead>
         <tbody>
           {% for number, team_list in regional_district_winners.data %}
           {% if forloop.counter <= 6 %}
@@ -140,5 +140,5 @@
     </div>
   </div>
   {% endif %}
-  
+
 {% endblock %}

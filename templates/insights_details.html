@@ -6,11 +6,11 @@
 
 {% block detailed_content %}
   <h1 class="end_header">{{selected_year}} Insights</h1>
-  
+
   {% if match_highscore or match_averages_by_week or score_distribution %}
   <h2>Matches{% if num_matches %} <small>{{num_matches.data}} Matches Played</small>{% endif %}</h2>
   {% endif %}
-  
+
   {% if match_highscore %}
   <div class="row-fluid">
     <h3>Highest Scoring Match{% if match_highscore.data|length > 1 %}es{% endif %}</h3>
@@ -34,7 +34,7 @@
       {% endfor %}
 	  </div>
 	</div>
-	<!-- 
+	<!--
   <div class="row-fluid">
     <h3>Highest Scoring Matches By Week</h3>
     <div class="span8 offset2">
@@ -62,7 +62,7 @@
   </div>
    -->
   {% endif %}
-  
+
   {% if match_averages_by_week %}
   <h3>Average Match Score By Week</h3>
     {% if elim_match_averages_by_week %}
@@ -75,7 +75,7 @@
     <div id="match-average" class="xcharts-data xcharts-line-single-data">{{ match_averages_by_week.data_json|safe }}</div>
     {% endif %}
   {% endif %}
-  
+
   {% if score_distribution %}
   <h3>Match Score Distribution <small>Percent of Matches vs. Match Score</small></h3>
     {% if elim_score_distribution %}
@@ -122,7 +122,7 @@
     </div>
   </div>
   {% endif %}
-  
+
   {% if regional_district_winners %}
   <div class="row-fluid">
     <h3>Top Regional & District Winners</h3>
@@ -146,7 +146,7 @@
     </div>
   </div>
   {% endif %}
-  
+
   {% if blue_banners or regional_district_winners or match_highscore or match_averages_by_week or score_distribution %}
   {% else %}
   <p>No insights are currently available for {{selected_year}}.</p>

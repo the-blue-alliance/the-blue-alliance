@@ -17,7 +17,7 @@
             {% with year|slugify|add:" Season" as dropdown_label %}
             {% include "team_partials/team_year_dropdown.html" %}
             {% endwith %}
-            
+
             {% if year_wlt %}
                 <p>Overall, team {{team.team_number}} was <strong>{{year_wlt.win}}-{{year_wlt.loss}}-{{year_wlt.tie}}</strong> in {{year}}.</p>
             {% endif %}
@@ -48,7 +48,7 @@
                     {% if comp.rank %}with a record of{% else %}had a record of{% endif %}
                     <strong>{{comp.wlt.win}}-{{comp.wlt.loss}}-{{comp.wlt.tie}}</strong>
                   {% endif %}
-                  
+
                   {% if comp.awards.list %}
                     {% if comp.rank or comp.wlt %}and{% endif %} won the following awards:
                     <ul>
