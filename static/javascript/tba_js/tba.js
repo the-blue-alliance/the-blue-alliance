@@ -46,7 +46,7 @@ $('#auth-logoutlink').click(function(){
 }(document));
 
 // General JS for all pages
-$(document).ready(function(){
+$(document).ready(function(){  
 	// Jumping to page section
   $('.smooth-scroll').bind('click',function(event){
     var $anchor = $(this);

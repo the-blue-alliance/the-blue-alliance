@@ -10,6 +10,7 @@ SCRIPTS_MAIN = ['static/jwplayer/jwplayer.js',
                 'static/javascript/tba_js/tablesorter.js',
                 'static/javascript/tba_js/tba_charts.js',
                 'static/javascript/tba_js/tba_countdown.js',
+                'static/javascript/tba_js/tba_sidebar.js',
                 'static/javascript/tba_js/tba.js',
                 ]
 
@@ -70,14 +71,14 @@ def compress(in_files, out_file, in_type='js', verbose=False,
 
 
 def main(kind=None):
-    if kind == 'js' or kind == None:
+    if kind == 'js' or kind is None:
         print 'Compressing Main JavaScript...'
         compress(SCRIPTS_MAIN, SCRIPTS_MAIN_OUT, 'js')
 
         print 'Compressing GameDay JavaScript...'
         compress(SCRIPTS_GAMEDAY, SCRIPTS_GAMEDAY_OUT, 'js')
 
-    if kind == 'css' or kind == None:
+    if kind == 'css' or kind is None:
         print 'Compressing Main CSS...'
         compress(STYLESHEETS_MAIN, STYLESHEETS_MAIN_OUT, 'css')
 
