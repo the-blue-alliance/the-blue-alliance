@@ -1,20 +1,5 @@
 <table class="match-table">
-    <tr class="key hidden-xs">
-        <th><span class="glyphicon glyphicon-film"></span></th>
-        <th>Match Num.</th>
-        <th colspan="6">Red Alliance</th>
-        <th colspan="6">Blue Alliance</th>
-        <th colspan="2">Scores</th>
-    </tr>
-        <th rowspan="2"><span class="glyphicon glyphicon-film"></span></th>
-        <th rowspan="2">Match Num.</th>
-        <th colspan="12">Red Alliance</th>
-        <th colspan="2">Red Score</th>
-    </tr>
-	<tr class="key visible-xs">
-        <th colspan="12">Blue Alliance</th>
-        <th colspan="2">Blue Score</th>
-    </tr>
+    {% include "match_partials/match_table_header.html" %}
 
     {% if matches.qm %}
         <tr class="key"><th colspan="16">Qualifications</th></tr>
