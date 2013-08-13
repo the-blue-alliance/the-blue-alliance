@@ -107,7 +107,7 @@ $(document).ready(function() {
   function insertTeam(number) {
     var followed_teams = $("#followed-teams")[0].children;
     var added = false;
-    var element = $("<li id=following-" + number + " class='followed-team'>" + number + " <a team-num='" + number + "' class='remove-following' title='Remove'><i class='icon-remove'></i></a></li>");
+    var element = $("<li id=following-" + number + " class='followed-team'>" + number + " <a team-num='" + number + "' class='remove-following' title='Remove'><span class='glyphicon glyphicon-remove'></span></a></li>");
     for (var i=0; i<followed_teams.length; i++) {
       if (parseInt(followed_teams[i].id.replace(/[A-Za-z$-]/g, "")) > number) {
         element.insertBefore($("#" + followed_teams[i].id));

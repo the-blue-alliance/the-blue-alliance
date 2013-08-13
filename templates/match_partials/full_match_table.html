@@ -1,22 +1,5 @@
-<table class="table-condensed matchTable">
-    <tr class="key hidden-phone">
-        <th><i class="icon-film"></i></th>
-        <th>Match Num.</th>
-        <th colspan="6">Red Alliance</th>
-        <th colspan="6">Blue Alliance</th>
-        <th colspan="2">Scores</th>
-    </tr>
-
-    <tr class="key visible-phone">
-        <th rowspan="2"><i class="icon-film"></i></th>
-        <th rowspan="2">Match Num.</th>
-        <th colspan="12">Red Alliance</th>
-        <th colspan="2">Red Score</th>
-    </tr>
-	<tr class="key visible-phone">
-        <th colspan="12">Blue Alliance</th>
-        <th colspan="2">Blue Score</th>
-    </tr>
+<table class="match-table">
+    {% include "match_partials/match_table_header.html" %}
 
     {% if matches.qm %}
         <tr class="key"><th colspan="16">Qualifications</th></tr>

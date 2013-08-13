@@ -7,7 +7,7 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background: @black;
+  background: #000000;
 }
 
 .gameday { 
@@ -21,7 +21,7 @@ body {
     min-height: 30px !important;
     height: 30px !important;
     min-height: auto !important;
-    color: @white !important;
+    color: #ffffff !important;
   }
   
   .navbar-fixed-top {
@@ -32,18 +32,27 @@ body {
     background: @gray !important;
   }
   
-  .container {
+  .gameday-container {
     width: auto;
     margin-left: 10px !important;
+  }
+  
+  .gameday-brand {
+    background-image: url('/images/tba_blue_lamp_navbar.png');
+    background-repeat: no-repeat;
+    background-position: left center;
+    width: 500px;
   }
   
   .gameday-title {
     vertical-align: middle;
     padding-left: 25px;
+    font-size: 20px;
+    font-weight: 600;
   }
   
   .main-site {
-    color: @white;
+    color: #ffffff;
     font-size: 14px;
     font-weight: normal;
     margin-left: 10px;
@@ -114,11 +123,11 @@ body {
   left: 0px;
   bottom: 0px;
   width: @socialWidth;
-  background-color: @grayLighter;
+  background-color: @gray-lighter;
   visibility: hidden;
   
   #twitter-widget {
-    background-color: @black;
+    background-color: #000000;
     height: 100%;
     width: 100%;
   }
@@ -134,12 +143,12 @@ body {
   right: 0px;
   bottom: 0px;
   width: @chatWidth;
-  background-color: @grayLighter;
+  background-color: @gray-lighter;
   visibility: hidden;
   
   #chat-info-background {
     position: absolute;
-    background-color: @black;
+    background-color: #000000;
     background: rgba(0, 0, 0, 0.7);
     height: 100%;
     width: 100%;
@@ -199,10 +208,10 @@ body {
   text-align: center;
   margin: 0;
   padding: 0;
-  background: @grayDarker;
-  outline: @black 1px solid;
+  background: @gray-darker;
+  outline: #000000 1px solid;
   visibility: visible;
-  color: @white;
+  color: #ffffff;
   position: absolute;
 }
 
@@ -210,9 +219,9 @@ body {
   width: 150px;
   text-align: center;
   z-index: 100000;
-  background: @grayLighter;
-  color: @black;
-  .border-radius(4px);
+  background: @gray-lighter;
+  color: #000000;
+  border-radius: 4px;
   position: fixed;
 }
 
@@ -221,7 +230,7 @@ body {
 }
 
 .match_bar {
-  background-color: @grayDarker * 0.5;
+  background-color: @gray-darker * 0.5;
   z-index: 4999;
   width: 100%;
   height: @matchBarHeight;
@@ -237,15 +246,15 @@ body {
   }
   
   .finished_match_red {
-    background-color: @TBAredSubtle;
+    background-color: @TBAredDarker;
   }
   
   .finished_match_blue {
-    background-color: @TBAblueSubtle;
+    background-color: @TBAblueDarker;
   }
   
   .finished_match_tie {
-    background-color: @TBApurpleSubtle;
+    background-color: @TBApurpleDarker;
   }
   
   .upcoming_match {
@@ -253,10 +262,10 @@ body {
   }
   
   .followed_match {
-    background-color: @yellow * 0.8;
+    background-color: #ffc40d * 0.8;
     
     .match-number {
-      color: @grayLighter;
+      color: @gray-lighter;
     }
     
     .red {
@@ -271,7 +280,7 @@ body {
   .match {
     height: 100%;
     width: auto;
-    border-right: 1px @white solid;
+    border-right: 1px #ffffff solid;
     display: inline-block;
     .alliances {
       font-weight: bold;
@@ -279,7 +288,7 @@ body {
   }
   
   .match-number {
-    color: @white;
+    color: #ffffff;
     font-size: 19px;
     width: auto;
     display: inline-block;

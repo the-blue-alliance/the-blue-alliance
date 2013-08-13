@@ -7,7 +7,7 @@
 {% block content %}
 <div class="container">
     <div class="row">
-        <div class="span8 offset2">
+        <div class="col-xs-8 col-sm-offset-2 col-lg-offset-2">
             {% if success %}
             <div class="alert alert-success">
                 <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -24,19 +24,21 @@
             <h2>Videos for {{match.verbose_name}} - {{event.year}} {{event.name}}</h2>
             <ul>
             {% for youtube_video in event.youtube_videos %}
-                <li><a href="http://youtube.com?v={{youtube_video}}" target="_blank">http://www.youtube.com?v={{youtube_video}} <i class="icon-share-alt"></i></a></li>
+                <li><a href="http://youtube.com?v={{youtube_video}}" target="_blank">http://www.youtube.com?v={{youtube_video}} <span class="glyphicon glyphicon-share-alt"></span></a></li>
             {% endfor %}
                 <li>
                     <form action="/suggest/match/video" method="post">
                         <input name="match_key" type="hidden" value="{{match.key.id}}" />
-                        <div class="input-append">
-                            <input class="span4" type="text" name="youtube_url" placeholder="http://www.youtube.com/watch?v=MQ0VNzIvHx0" value="" />
-                            <button class="btn btn-success" type="submit"><i class="icon-plus-sign icon-white"></i> Add</button>
+                        <div class="input-group">
+                            <input class="form-control" type="text" name="youtube_url" placeholder="http://www.youtube.com/watch?v=MQ0VNzIvHx0" value="" />
+                            <span class="input-group-btn">
+                                <button class="btn btn-success" type="submit"><span class="glyphicon glyphicon-plus-sign icon-white"></span> Add</button>
+                            </span>
                         </div>
                     </form>
                 </li>
             </ul>
-            </p><a class="btn btn-primary" href="http://www.youtube.com/results?search_query={{match.verbose_name|urlencode}}+{{event.year|urlencode}}+{{event.name|urlencode}}" target="_blank"><i class="icon-search icon-white"></i> Search YouTube :: {{match.verbose_name}} - {{event.year}} {{event.name}}</a><p>
+            </p><a class="btn btn-primary" href="http://www.youtube.com/results?search_query={{match.verbose_name|urlencode}}+{{event.year|urlencode}}+{{event.name|urlencode}}" target="_blank"><span class="glyphicon glyphicon-search icon-white"></span> Search YouTube :: {{match.verbose_name}} - {{event.year}} {{event.name}}</a><p>
         </div>
     </div>
 </div>

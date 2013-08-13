@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<p class="pull-right"><a class="btn btn-danger btn-mini" href="/admin/match/delete/{{match.key_name}}"><i class="icon-trash icon-white"></i> Delete</a></p>
+<p class="pull-right"><a class="btn btn-danger btn-small" href="/admin/match/delete/{{match.key_name}}"><i class="icon-trash icon-white"></i> Delete</a></p>
 
 <h1>Edit {{ match.key_name }}</h1>
 
@@ -42,8 +42,8 @@
         </tr>
     </table>
 
-    <button type="submit" class="btn btn-primary"><i class="icon-thumbs-up icon-white"></i> Save Match</button>
-    <a href="/admin/match/{{match.key_name}}" class="btn"><i class="icon-thumbs-down"></i> Cancel Edit</a>
+    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up icon-white"></span> Save Match</button>
+    <a href="/admin/match/{{match.key_name}}" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-down"></span> Cancel Edit</a>
 </form>
 
 {% endblock %}

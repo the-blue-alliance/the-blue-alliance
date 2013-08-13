@@ -10,7 +10,7 @@
     <div class="controls">
         <button id="accept_all_button" class="btn btn-success">Select All Accepts</button>
         <button id="reject_all_button" class="btn btn-danger">Select All Rejects</button>
-        <button id="deselect_all_button" class="btn">Deselect All</button>
+        <button id="deselect_all_button" class="btn btn-default">Deselect All</button>
     </div>
 </div>
 
@@ -32,15 +32,15 @@ $("#deselect_all_button").click(function() {
 
 <form action="/admin/suggestions/review" method="post">
     {% for suggestion in suggestions %}
-    <div class="row-fluid">
+    <div class="row">
         <div class="well" style="height:200px">
-            <div class="span1"><span class="label label-success"><label class="checkbox" for="accept_{{suggestion.key.id}}"><input class="accept" type="checkbox" name="accept_keys[]" id="accept_{{suggestion.key.id}}" value="{{suggestion.key.id}}"> Accept</label></span></div>
-            <div class="span1"><span class="label label-important"><label class="checkbox" for="reject_{{suggestion.key.id}}"><input class="reject" type="checkbox" name="reject_keys[]" id="reject_{{suggestion.key.id}}" value="{{suggestion.key.id}}"> Reject</label></span></div>
-            <div class="span4">
+            <div class="col-1"><span class="label label-success"><label class="checkbox" for="accept_{{suggestion.key.id}}"><input class="accept" type="checkbox" name="accept_keys[]" id="accept_{{suggestion.key.id}}" value="{{suggestion.key.id}}"> Accept</label></span></div>
+            <div class="col-1"><span class="label label-important"><label class="checkbox" for="reject_{{suggestion.key.id}}"><input class="reject" type="checkbox" name="reject_keys[]" id="reject_{{suggestion.key.id}}" value="{{suggestion.key.id}}"> Reject</label></span></div>
+            <div class="col-xs-4">
                 <p><strong>{{ suggestion.target_key }}</strong></p>
                 <iframe width="240" height="180" src="http://www.youtube.com/embed/{{suggestion.youtube_video}}?rel=0" frameborder="0" allowfullscreen></iframe>
             </div>
-            <div class="span4">
+            <div class="col-xs-4">
                 <ul>
                     <li>{{ suggestion.author.get.email }}</a></li>
                     <li>{{ suggestion.author.get.nickname }}</a></li>
@@ -51,7 +51,7 @@ $("#deselect_all_button").click(function() {
         </div>
     </div>
     {% endfor %}
-    <button class="btn btn-primary" type="submit"><i class="icon-pencil icon-white"></i> Act On Selected</button>
+    <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-pencil icon-white"></span> Act On Selected</button>
 </form>
 
 {% endblock %}

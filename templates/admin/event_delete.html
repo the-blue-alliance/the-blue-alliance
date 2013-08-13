@@ -10,9 +10,9 @@
     <legend>Delete {{ event.year }} {{ event.name }}?</legend>
     <p>This will also delete it&rsquo;s EventTeams and Matches.</p>
 
-    <a href="/admin/event/{{event.key_name}}" class="btn btn-large"><i class="icon-ban-circle"></i> Cancel Delete</a>
+    <a href="/admin/event/{{event.key_name}}" class="btn btn-default btn-lg"><span class="glyphicon glyphicon-ban-circle"></span> Cancel Delete</a>
 
-    <button type="submit" class="btn btn-danger btn-mini pull-right"><i class="icon-trash icon-white"></i> Delete Event</button>
+    <button type="submit" class="btn btn-danger btn-small pull-right"><span class="glyphicon glyphicon-trash icon-white"></span> Delete Event</button>
 </form>
 
 {% endblock %}

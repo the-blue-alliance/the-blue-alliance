@@ -21,10 +21,10 @@
 {% block content %}
 <div class="container">
     <div class="row">
-        <div class="span6 offset3">
-            <p><a class="btn" href="/event/{{event.key_name}}"><i class="icon-chevron-left"></i> {{ event.year }} {{ event.name }}</a></p>
+        <div class="col-sm-6 col-sm-offset-3 col-md-offset-3 col-lg-offset-3">
+            <p><a class="btn btn-default" href="/event/{{event.key_name}}"><span class="glyphicon glyphicon-chevron-left"></span> {{ event.year }} {{ event.name }}</a></p>
             <h1>{{match.verbose_name}} <small><a href="/event/{{event.key_name}}">{{ event.year }} {{ event.name }}</a></small></h1>
-            <table class="matchTable">
+            <table class="match-table">
                 <tr class="key">
                     <th colspan="{{match.alliances.items.0.1.teams|length}}">Teams</th>
                     <th>Score</th>
@@ -41,7 +41,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="span6 offset3 fitvids">
+        <div class="col-sm-6 col-sm-offset-3 col-md-offset-3 col-lg-offset-3 fitvids">
         {% if match.tba_video %}
             {% include "video_partials/tbavideo_player.html" %}
         {% endif %}
@@ -55,14 +55,14 @@
         {% endif %}
         <br />
         <p>
-            <a class="btn btn-success" href="/suggest/match/video?match_key={{match.key_name}}" target="_blank"><i class="icon-white icon-plus"></i> Add videos</a>
-            <a class="btn btn-primary" href="http://www.youtube.com/results?search_query={{match.verbose_name|urlencode}}+{{event.year|urlencode}}+{{event.name|urlencode}}" target="_blank"><i class="icon-search icon-white"></i> Search YouTube</a>
+            <a class="btn btn-success" href="/suggest/match/video?match_key={{match.key_name}}" target="_blank"><span class="glyphicon glyphicon-white icon-plus"></span> Add videos</a>
+            <a class="btn btn-primary" href="http://www.youtube.com/results?search_query={{match.verbose_name|urlencode}}+{{event.year|urlencode}}+{{event.name|urlencode}}" target="_blank"><span class="glyphicon glyphicon-search icon-white"></span> Search YouTube</a>
         </p>
         </div>
     </div>
 
     <div class="row">
-        <div class="span6 offset3">
+        <div class="col-sm-6 col-sm-offset-3 col-md-offset-3 col-lg-offset-3">
             <hr>
             <div class="fb-comments" data-href="http://www.thebluealliance.com/match/{{match.key_name}}" data-num-posts="3" data-width="470"></div>
         </div>

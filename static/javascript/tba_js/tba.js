@@ -46,24 +46,31 @@ $('#auth-logoutlink').click(function(){
 }(document));
 
 // General JS for all pages
-$(document).ready(function(){
+$(document).ready(function(){  
 	// Jumping to page section
-    $('.smooth-scroll').bind('click',function(event){
-        var $anchor = $(this);
-        var $navbar_position = $('.navbar').css('top');
-        var $navbar_height = parseInt($('.navbar').css('height'));
-        var $offset = 0;
-        
-        // Takes care of changing navbar size/position due to @media width
-        if ($navbar_position == '0px') {
-          $offset = $navbar_height;
-        }
- 
-        $('html, body').stop().animate({
-            scrollTop: $($anchor.attr('href')).offset().top - $offset
-        }, 250);
-        event.preventDefault();
-    });
+  $('.smooth-scroll').bind('click',function(event){
+    var $anchor = $(this);
+    var $navbar_position = $('.navbar').css('top');
+    var $navbar_height = parseInt($('.navbar').css('height'));
+    var $offset = 0;
+    
+    // Takes care of changing navbar size/position due to @media width
+    if ($navbar_position == '0px') {
+      $offset = $navbar_height + 10;
+    }
+    
+    var target_offset = $($anchor.attr('href')).offset();
+    if (target_offset == null) {
+      var pixels = 0;
+    } else {
+      var pixels = target_offset.top - $offset;
+    }
+  
+    $('html, body').stop().animate({
+        scrollTop: pixels
+    }, 250);
+    event.preventDefault();
+  });
 	
 	// Fancybox
 	$(".fancybox").fancybox();
@@ -71,74 +78,74 @@ $(document).ready(function(){
 	// Disable browser autocompletes
 	$('.search-query').attr('autocomplete', 'off');
 	
-	// Typeahead for search
-  // Makes an AJAX call with the first character of the input.
-	var cachedsource = (function() {
-	  var datasource = {};
-    return function(query, process){
-      var first_letter = encodeURIComponent(query.charAt(0));
-      if ((first_letter == '') || (first_letter == ' ')) {
-    	  return [];
-    	}
-      if (datasource[first_letter] != null) {
-        return datasource[first_letter];
-      } else {
-        $.getJSON('/_/typeahead/' + first_letter, function(data) {
-          datasource[first_letter] = data;
-          process(datasource[first_letter]);
-        });
-      }
-    };
-	})();
-	
-	// helper function to match standard characters
-  function cleanUnicode(s){
-    var a = s.toLowerCase();
-    a = a.replace(/[àáâãäå]/g, "a");
-    a = a.replace(/æ/g, "ae");
-    a = a.replace(/ç/g, "c");
-    a = a.replace(/[èéêë]/g, "e");
-    a = a.replace(/[ìíîï]/g, "i");
-    a = a.replace(/ñ/g, "n");
-    a = a.replace(/[òóôõö]/g, "o");
-    a = a.replace(/œ/g, "oe");
-    a = a.replace(/[ùúûü]/g, "u");
-    a = a.replace(/[ýÿ]/g, "y");
-    return a;
-  };
-	
-	$('.search-query').typeahead({
-    source: cachedsource,
-    updater: function(label) {
-      var event_re = label.match(/(\d*)(.*)\[(.*?)\]/);
-      if (event_re != null) {
-        event_key = (event_re[1] + event_re[3]).toLowerCase();
-        url = "http://www.thebluealliance.com/event/" + event_key;
-        window.location.href = url;
-        return label;
-      }
-      var team_re = label.match(/(\d*) |.*/);
-      if (team_re != null) {
-        team_key = team_re[1];
-        url = "http://www.thebluealliance.com/team/" + team_key;
-        window.location.href = url;
-        return label;
-      }
-      return label;
-    },
-    matcher: function (item) {
-      return ~cleanUnicode(item).indexOf(cleanUnicode(this.query));
-    },
-    highlighter: function (item) {
-      var cleaned_item = cleanUnicode(item);
-      var query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&');
-      var match_index = cleaned_item.search(new RegExp('(' + query + ')', 'ig'));
-      var match_len = query.length;
-      return item.substring(0, match_index) + '<strong>' +
-        item.substring(match_index, match_index + match_len) + '</strong>' +
-        item.substring(match_index + match_len);
-    }
-  });
+//	// Typeahead for search
+//  // Makes an AJAX call with the first character of the input.
+//	var cachedsource = (function() {
+//	  var datasource = {};
+//    return function(query, process){
+//      var first_letter = encodeURIComponent(query.charAt(0));
+//      if ((first_letter == '') || (first_letter == ' ')) {
+//    	  return [];
+//    	}
+//      if (datasource[first_letter] != null) {
+//        return datasource[first_letter];
+//      } else {
+//        $.getJSON('/_/typeahead/' + first_letter, function(data) {
+//          datasource[first_letter] = data;
+//          process(datasource[first_letter]);
+//        });
+//      }
+//    };
+//	})();
+//	
+//	// helper function to match standard characters
+//  function cleanUnicode(s){
+//    var a = s.toLowerCase();
+//    a = a.replace(/[àáâãäå]/g, "a");
+//    a = a.replace(/æ/g, "ae");
+//    a = a.replace(/ç/g, "c");
+//    a = a.replace(/[èéêë]/g, "e");
+//    a = a.replace(/[ìíîï]/g, "i");
+//    a = a.replace(/ñ/g, "n");
+//    a = a.replace(/[òóôõö]/g, "o");
+//    a = a.replace(/œ/g, "oe");
+//    a = a.replace(/[ùúûü]/g, "u");
+//    a = a.replace(/[ýÿ]/g, "y");
+//    return a;
+//  };
+//	
+//	$('.search-query').typeahead({
+//    source: cachedsource,
+//    updater: function(label) {
+//      var event_re = label.match(/(\d*)(.*)\[(.*?)\]/);
+//      if (event_re != null) {
+//        event_key = (event_re[1] + event_re[3]).toLowerCase();
+//        url = "http://www.thebluealliance.com/event/" + event_key;
+//        window.location.href = url;
+//        return label;
+//      }
+//      var team_re = label.match(/(\d*) |.*/);
+//      if (team_re != null) {
+//        team_key = team_re[1];
+//        url = "http://www.thebluealliance.com/team/" + team_key;
+//        window.location.href = url;
+//        return label;
+//      }
+//      return label;
+//    },
+//    matcher: function (item) {
+//      return ~cleanUnicode(item).indexOf(cleanUnicode(this.query));
+//    },
+//    highlighter: function (item) {
+//      var cleaned_item = cleanUnicode(item);
+//      var query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&');
+//      var match_index = cleaned_item.search(new RegExp('(' + query + ')', 'ig'));
+//      var match_len = query.length;
+//      return item.substring(0, match_index) + '<strong>' +
+//        item.substring(match_index, match_index + match_len) + '</strong>' +
+//        item.substring(match_index + match_len);
+//    }
+//  });
 	
 	// Tooltips
 	$("[rel=tooltip]").tooltip();
