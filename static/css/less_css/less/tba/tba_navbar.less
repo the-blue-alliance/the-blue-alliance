@@ -11,9 +11,15 @@
 .tba-navbar-nav {
   margin-bottom: 0;
   > li > a {
-    @media (max-width: @screen-large-desktop) {
+    padding-left: 5px;
+    padding-right: 5px;
+    @media (min-width: @screen-tablet) and (max-width: @screen-tablet-max) {
       padding-left: 10px;
       padding-right: 10px;
+    }
+    @media (min-width: @screen-desktop) {
+      padding-left: 15px;
+      padding-right: 15px;
     }
   }
 }
@@ -35,6 +41,9 @@
   overflow: visible;
   height: @navbar-height + @minus-amt;
   margin: -@minus-amt 15px 0 0;
+  @media (max-width: @screen-phone-max) {
+    margin-right: 5px;
+  }
 }
 
 .tba-nav-persistent {
