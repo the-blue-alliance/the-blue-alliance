@@ -16,9 +16,11 @@
 
 <form action="/admin/match/cleanup" method="post" class="form-inline">
     <legend>Cleanup Event</legend>
-    <div class="input-append">
-        <input class="span8" size="16" name="event_key_name" type="text" placeholder="event_key">
-        <button class="btn" id="edit_button" type="submit"><i class="icon-wrench"></i> Clean</button>
+    <div class="input-group">
+        <input class="form-control" size="16" name="event_key_name" type="text" placeholder="event_key">
+        <span class="input-group-btn">
+            <button class="btn btn-danger" id="edit_button" type="submit"><span class="glyphicon glyphicon-wrench"></span> Clean</button>
+        </span>
     </div>
 </form>
 

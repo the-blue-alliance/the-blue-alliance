@@ -13,7 +13,7 @@
     {% include "team_partials/team_info.html" %}
     <hr>
     <div class="row">
-        <div class="span12">
+        <div class="col-sm-12">
             {% with year|slugify|add:" Season" as dropdown_label %}
             {% include "team_partials/team_year_dropdown.html" %}
             {% endwith %}
@@ -23,9 +23,9 @@
             {% endif %}
 
             {% if participation|length > 1 %}
-            <ul class="nav nav-pills nav-stacked-phone">
+            <ul class="nav nav-pills">
               {% for comp in participation %}
-                <li><a class="btn smooth-scroll" href="#{{ comp.event.key_name}}">{{ comp.event.name }}</a></li>
+                <li><a class="btn btn-default smooth-scroll" href="#{{ comp.event.key_name}}">{{ comp.event.name }}</a></li>
               {% endfor %}
             </ul>
             {% endif %}
@@ -34,11 +34,11 @@
     <hr>
     {% for comp in participation %}
         <div class="row" id="{{ comp.event.key_name }}">
-            <div class="span4">
+            <div class="col-sm-4">
                 <h3><a href="/event/{{ comp.event.key_name }}">{{ comp.event.name }}</a></h3>
                 <p>
-                    {% if comp.event.location %}<i class="icon-map-marker"></i> in <a href="http://maps.google.com/maps?q={{ comp.event.location }}">{{ comp.event.location }}</a><br />{% endif %}
-                    {% if comp.event.start_date %}<i class="icon-calendar"></i> {{ comp.event.start_date|date:"M jS" }} - {{ comp.event.end_date|date:"M jS, Y" }}{% endif %}
+                    {% if comp.event.location %}<span class="glyphicon glyphicon-map-marker"></span> in <a href="http://maps.google.com/maps?q={{ comp.event.location }}">{{ comp.event.location }}</a><br />{% endif %}
+                    {% if comp.event.start_date %}<span class="glyphicon glyphicon-calendar"></span> {{ comp.event.start_date|date:"M jS" }} - {{ comp.event.end_date|date:"M jS, Y" }}{% endif %}
                 </p>
 
                 {% if comp.wlt or comp.rank or comp.awards.list %}
@@ -60,7 +60,7 @@
                 </p>
                 {% endif %}
             </div>
-            <div class="span8" style="margin-top: 1em">
+            <div class="col-sm-8" style="margin-top: 1em">
                 {% if comp.matches.num %}
                     {% with comp.matches as matches %}
                         {% include "match_partials/full_match_table.html" %}

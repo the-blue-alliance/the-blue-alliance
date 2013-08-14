@@ -1,18 +1,18 @@
-<table class="table table-striped event-table">
+<table class="event-table">
     <thead>
         <th>Event</th>
-        <th class="hidden-phone">Webcast</th>
+        <th class="hidden-xs">Webcast</th>
         <th>Dates</th>
     </thead>
     <tbody>
     {% for event in events %}
         <tr itemscope itemtype="http://data-vocabulary.org/Event">
             <td><a href="/event/{{event.key_name}}" title="{{event.name}}" itemprop="url"><span itemprop="summary">{{event.name}}</span></a></td>
-            <td class="hidden-phone">{% if event.webcast %}
+            <td class="hidden-xs">{% if event.webcast %}
                 {% if event.within_a_day %}
-                    <a class="btn btn-success" href="{{event.gameday_url}}" target="_blank"><i class="icon-facetime-video icon-white"></i> Watch Now</a>
+                    <a class="btn btn-success btn-small" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video icon-white"></span> Watch Now</a>
                 {% else %}
-                    <a class="btn disabled">Watch</a>
+                    <a class="btn btn-default btn-small disabled">Watch</a>
                 {% endif %}
             {% endif %}</td>
             <td>{% if event.start_date %}<time itemprop="startDate" datetime="{{event.start_date|date:"c"}}">{{ event.start_date|date:"M jS" }}</time>{% endif %}{% if event.end_date %} - <time itemprop="endDate" datetime="{{event.end_date|date:"c"}}">{{ event.end_date|date:"M jS, Y" }}</time>{% endif %}</td>

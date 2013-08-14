@@ -1,131 +1,26 @@
-/*!
- * Bootstrap v2.1.0
- *
- * Copyright 2012 Twitter, Inc
- * Licensed under the Apache License v2.0
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Designed and built with all the love in the world @twitter by @mdo and @fat.
- */
-
-// CSS Reset
-@import "less/bootstrap/reset.less";
-
-// Core variables and mixins
-@import "less/bootstrap/variables.less"; // Modify this for custom colors, font-sizes, etc
-@import "less/tba/tba_variables.less";
-@import "less/tba_bootstrap_overrides/tba_variables_overrides.less";
-@import "less/bootstrap/mixins.less";
-
-// Grid system and page structure
-@import "less/bootstrap/scaffolding.less";
-@import "less/tba_bootstrap_overrides/tba_scaffolding_overrides.less";
-@import "less/bootstrap/grid.less";
-@import "less/bootstrap/layouts.less";
-
-// Base CSS
-@import "less/bootstrap/type.less";
-@import "less/bootstrap/code.less";
-@import "less/bootstrap/forms.less";
-@import "less/tba_bootstrap_overrides/tba_forms_overrides.less";
-@import "less/bootstrap/tables.less";
-
-// Components: common
-@import "less/bootstrap/sprites.less";
-@import "less/bootstrap/dropdowns.less";
-@import "less/tba_bootstrap_overrides/tba_dropdowns_overrides.less";
-@import "less/bootstrap/wells.less";
-@import "less/bootstrap/component-animations.less";
-@import "less/bootstrap/close.less";
-
-// Components: Buttons & Alerts
-@import "less/bootstrap/buttons.less";
-@import "less/bootstrap/button-groups.less";
-@import "less/bootstrap/alerts.less"; // Note: alerts share common CSS with buttons and thus have styles in buttons.less
-
-// Components: Nav
-@import "less/bootstrap/navs.less";
-@import "less/tba_bootstrap_overrides/tba_navs_overrides.less";
-@import "less/bootstrap/navbar.less";
-@import "less/bootstrap/breadcrumbs.less";
-@import "less/bootstrap/pagination.less";
-@import "less/bootstrap/pager.less";
-
-// Components: Popovers
-@import "less/bootstrap/modals.less";
-@import "less/bootstrap/tooltip.less";
-@import "less/bootstrap/popovers.less";
-
-// Components: Misc
-@import "less/bootstrap/thumbnails.less";
-@import "less/bootstrap/media.less";
-@import "less/bootstrap/labels-badges.less";
-@import "less/bootstrap/progress-bars.less";
-@import "less/bootstrap/accordion.less";
-@import "less/bootstrap/carousel.less";
-@import "less/bootstrap/hero-unit.less";
-
-// Utility classes
-@import "less/bootstrap/utilities.less"; // Has to be last to override when necessary
-
-/*!
- * Bootstrap Responsive v2.0.4
- *
- * Copyright 2012 Twitter, Inc
- * Licensed under the Apache License v2.0
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Designed and built with all the love in the world @twitter by @mdo and @fat.
- */
-
-
-// Responsive.less
-// For phone and tablet devices
-// -------------------------------------------------------------
-
-
-// RESPONSIVE CLASSES
-// ------------------
-
-@import "less/bootstrap/responsive-utilities.less";
-@import "less/tba_bootstrap_overrides/tba_responsive-utilities_overrides.less";
-
-
-// MEDIA QUERIES
-// ------------------
-
-// Phones to portrait tablets and narrow desktops
-@import "less/bootstrap/responsive-767px-max.less";
-
-// Tablets to regular desktops
-@import "less/bootstrap/responsive-768px-979px.less";
-
-// Large desktops
-@import "less/bootstrap/responsive-1200px-min.less";
-
-
-// RESPONSIVE NAVBAR
-// ------------------
-
-// From 979px and below, show a button to toggle navbar contents
-@import "less/bootstrap/responsive-navbar.less";
-@import "less/tba_bootstrap_overrides/tba_navbar_overrides.less";
+@import "./subtrees/bootstrap/less/bootstrap.less";
+@import "./subtrees/bootstrap-glyphicons/less/bootstrap-glyphicons.less";
 
 /*!
  * The Blue Alliance
  * Built on top of the Twitter Bootstrap Framework
  */
 
+@import "less/tba/tba_variables.less";
+@import "less/tba/tba_mixins.less";
 @import "less/tba/tba_base.less";
+@import "less/tba/tba_navbar.less";
+@import "less/tba/tba_sidebar_nav.less";
+
 @import "less/tba/tba_about.less";
 @import "less/tba/tba_bracket_table.less";
-@import "less/tba/tba_event_list.less";
 @import "less/tba/tba_event_page.less";
 @import "less/tba/tba_facebook.less";
 @import "less/tba/tba_gameday.less";
 @import "less/tba/tba_insights.less";
 @import "less/tba/tba_countdown.less";
-@import "less/tba/tba_landing.less";
+@import "less/tba/tba_404.less";
 @import "less/tba/tba_match_table.less";
 @import "less/tba/tba_misc.less";
 @import "less/tba/tba_team_table.less";
+@import "less/tba/tba_xcharts.less";

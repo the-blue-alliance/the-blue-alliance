@@ -1,32 +1,13 @@
-.navbar .brand {
-  background-image: url('/images/tba_blue_lamp_navbar.png');
-  background-repeat: no-repeat;
-  background-position: left center;
-  padding-left: 30px;
-  margin-left: 0px;
-  padding-right: 0;
-
-  @media (max-width: 979px) {
-    margin-left: 20px;
-  }
+body {
+  padding-top: 70px;  // due to fixed navbar
 }
 
 .full-width-search {
   width: 100%;
-  padding: 14px;
   box-sizing: border-box;
   -webkit-box-sizing:border-box;
   -moz-box-sizing: border-box;
   -ms-box-sizing: border-box;
-}
-
-#subnav {
-  margin-left: 15px;
-  margin-right: 0px;
-}
-
-.xcharts-data {
-  display: none;
 }
 
 #nav-alert-container {
@@ -43,54 +24,9 @@
   pointer-events: auto;
 }
 
-.social-icons {
-  padding: 0;
-  margin: 9px 0 0 0;
-  float: right;
-
-  @media (max-width: 979px) and (min-width: 768px) {
-    float: left;
-    margin: 0 0 0 11px;
-    padding-bottom: 3px;
-  }
-
-  @media (max-width: 767px) {
-    margin: 0 0 5px 0;
-    text-align: center;
-    float: none;
-
-    .socialIcon {
-      margin: 0 4px;
-    }
-  }
-}
-
-.socialIcon {
-  width: 24px;
-  height: 24px;
-  display: inline-block;
-  margin: 0 4px 0px 4px;
-  background-repeat: no-repeat;
-  background-position: center center;
-}
-
-#facebook {
-  background-image: url('/images/icons/tba-sprite.png');
-  background-position: -10px -10px;
-}
-
-#twitter {
-  background-image: url('/images/icons/tba-sprite.png');
-  background-position: -10px -54px;
-}
-
-#tumblr {
-  background-image: url('/images/icons/tba-sprite.png');
-  background-position: -10px -98px;
-}
-
 #footer {
   text-align: center;
+  margin-bottom: 25px;
 }
 
 .sponsorImage {
@@ -120,44 +56,11 @@
   margin-bottom: 15px;
 }
 
-.info-table th {
-  min-width: 80px
-}
-
-// Copied from navs.less
-@media (max-width: 767px) {
-  // Stacked tabs and pills
-  .nav-stacked-phone > li {
-    float: none;
-  }
-  .nav-stacked-phone > li > a {
-    margin-right: 0; // no need for the gap between nav items
-  }
-
-  // Tabs
-  .nav-tabs.nav-stacked-phone {
-    border-bottom: 0;
-  }
-  .nav-tabs.nav-stacked-phone > li > a {
-    border: 1px solid #ddd;
-    .border-radius(0);
-  }
-  .nav-tabs.nav-stacked-phone > li:first-child > a {
-    .border-top-radius(4px);
-  }
-  .nav-tabs.nav-stacked-phone > li:last-child > a {
-    .border-bottom-radius(4px);
-  }
-  .nav-tabs.nav-stacked-phone > li > a:hover {
-    border-color: #ddd;
-    z-index: 2;
-  }
-
-  // Pills
-  .nav-pills.nav-stacked-phone > li > a {
-    margin-bottom: 3px;
-  }
-  .nav-pills.nav-stacked-phone > li:last-child > a {
-    margin-bottom: 1px; // decrease margin to match sizing of stacked tabs
-  }
+.scroll-up {
+  .btn();
+  .btn-default();
+  font-size: 12px;
+  position: fixed;
+  right: 10px;
+  bottom: 10px;
 }

@@ -1,0 +1,35 @@
+.tba-sidenav-affixed {
+  @media (min-width: @screen-tablet) {
+    position: fixed;
+  }
+}
+
+.tba-sidenav {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  padding-top:    10px;
+  padding-bottom: 10px;
+  text-shadow: 0 1px 0 #fff;
+  background-color: #f7f7f7;
+  border-radius: 5px;
+}
+
+.tba-sidebar .nav > li > a {
+  display: block;
+  color: @TBAblueLight;
+  padding: 5px 20px;
+}
+.tba-sidebar .nav > li > a:hover,
+.tba-sidebar .nav > li > a:focus {
+  text-decoration: none;
+  background-color: @TBAblueFaint;
+  border-right: 1px solid @TBAblueLight;
+}
+.tba-sidebar .nav > .active > a,
+.tba-sidebar .nav > .active:hover > a,
+.tba-sidebar .nav > .active:focus > a {
+  font-weight: bold;
+  color: @TBAblueLight;
+  background-color: transparent;
+  border-right: 1px solid @TBAblueLight;
+}
