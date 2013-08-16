@@ -6,7 +6,7 @@ from datafeeds.usfirst_event_list_parser import UsfirstEventListParser
 
 
 class TestUsfirstEventListParser(unittest2.TestCase):
-    def test_parse(self):
+    def test_parse_2012(self):
         with open('test_data/usfirst_html/usfirst_event_list_2012.html', 'r') as f:
             events, _ = UsfirstEventListParser.parse(f.read())
 
@@ -23,3 +23,20 @@ class TestUsfirstEventListParser(unittest2.TestCase):
         self.assertEqual(events[51]["event_type_enum"], EventType.REGIONAL)
         self.assertEqual(events[52]["event_type_enum"], EventType.DISTRICT_CMP)
         self.assertEqual(events[54]["event_type_enum"], EventType.DISTRICT)
+
+    def test_parse_2014(self):
+        with open('test_data/usfirst_html/usfirst_event_list_2014.html', 'r') as f:
+            events, _ = UsfirstEventListParser.parse(f.read())
+
+        self.assertEqual(len(events), 94)
+
+        self.assertEqual(events[0]["first_eid"], "10851")
+        self.assertEqual(events[0]["event_type_enum"], EventType.REGIONAL)
+        self.assertEqual(events[0]["name"], "Alamo Regional sponsored by Rackspace Hosting")
+
+        self.assertEqual(events[1]["first_eid"], "10807")
+        self.assertEqual(events[1]["event_type_enum"], EventType.REGIONAL)
+        self.assertEqual(events[1]["name"], "Israel Regional")
+
+        self.assertEqual(events[56]["event_type_enum"], EventType.DISTRICT_CMP)
+        self.assertEqual(events[93]["event_type_enum"], EventType.DISTRICT)

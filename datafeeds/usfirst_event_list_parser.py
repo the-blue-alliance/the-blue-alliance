@@ -1,4 +1,5 @@
 from datetime import datetime
+import urlparse
 import logging
 
 from BeautifulSoup import BeautifulSoup
@@ -31,7 +32,10 @@ class UsfirstEventListParser(ParserBase):
             try:
                 tds = tr.findAll('td')
                 event["event_type_enum"] = EventHelper.parseEventType(unicode(tds[0].string))
-                event["first_eid"] = tds[1].a["href"][24:28]
+                
+                url_get_params = urlparse.parse_qs(urlparse.urlparse(tds[1].a["href"]).query)
+                event["first_eid"] = url_get_params["eid"][0]
+
                 event["name"] = ''.join(tds[1].a.findAll(text=True)).strip()  # <em>s in event names fix
                 #event.venue = unicode(tds[2].string)
                 #event.location = unicode(tds[3].string)
