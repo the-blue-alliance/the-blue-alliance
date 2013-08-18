@@ -33,7 +33,7 @@ class TestUsfirstLegacyEventDetailsParser(unittest2.TestCase):
         self.assertEqual(event["event_short"], "flbr")
 
     def test_parse2014nvlv(self):
-        with open('test_data/usfirst_legacy_html/usfirst_event_details_2014nvlv.html', 'r') as f:
+        with open('test_data/usfirst_legacy_html/usfirst_event_details_2014nvlv_preliminary.html', 'r') as f:
             event, _ = UsfirstLegacyEventDetailsParser.parse(f.read())
 
         self.assertEqual(event["name"], "Las Vegas Regional - Preliminary")
