@@ -13,8 +13,8 @@ from models.team import Team
 CHAMPIONSHIP_EVENTS = set(['arc', 'cur', 'gal', 'new', 'ein', 'cmp'])
 CHAMPIONSHIP_EVENTS_LABEL = 'Championship Event'
 REGIONAL_EVENTS_LABEL = 'Week {}'
-OFFSEASON_EVENTS_LABEL = 'Offseason'
 WEEKLESS_EVENTS_LABEL = 'Other Official Events'
+OFFSEASON_EVENTS_LABEL = 'Offseason'
 
 
 class EventHelper(object):
@@ -34,10 +34,6 @@ class EventHelper(object):
         offseason_events = []
         weekless_events = []
         for event in events:
-            if not event.start_date:
-                weekless_events.append(event)
-                break
-
             start = event.start_date
 
             if event.event_short in CHAMPIONSHIP_EVENTS:
@@ -48,7 +44,7 @@ class EventHelper(object):
                 continue
             elif not event.official:
                 offseason_events.append(event)
-            else:
+            elif start.month != 12 or start.day != 31:
                 if week_start == None:
                     diff_from_thurs = start.weekday() - 3   # 3 is Thursday
                     week_start = start + datetime.timedelta(days=diff_from_thurs)
@@ -62,6 +58,8 @@ class EventHelper(object):
                     toReturn[label].append(event)
                 else:
                     toReturn[label] = [event]
+            else:
+                weekless_events.append(event)
 
         # Add weekless + other events last
         if weekless_events:
