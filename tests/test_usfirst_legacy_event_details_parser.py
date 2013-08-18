@@ -31,3 +31,15 @@ class TestUsfirstLegacyEventDetailsParser(unittest2.TestCase):
         self.assertEqual(event["venue_address"], "Great Fort Lauderdale & Broward County Convention Center\r\n1950 Eisenhower Boulevard\r\nFort Lauderdale, FL 33316\r\nUSA")
         self.assertEqual(event["website"], "http://firstinflorida.org")
         self.assertEqual(event["event_short"], "flbr")
+
+    def test_parse2014nvlv(self):
+        with open('test_data/usfirst_legacy_html/usfirst_event_details_2014nvlv.html', 'r') as f:
+            event, _ = UsfirstLegacyEventDetailsParser.parse(f.read())
+
+        self.assertEqual(event["name"], "Las Vegas Regional - Preliminary")
+        self.assertEqual(event["event_type_enum"], EventType.REGIONAL)
+        self.assertEqual(event["start_date"], datetime.datetime(2014, 12, 31, 0, 0))
+        self.assertEqual(event["end_date"], datetime.datetime(2014, 12, 31, 0, 0))
+        self.assertEqual(event["year"], 2014)
+        self.assertEqual(event["website"], "http://www.firstnv.org")
+        self.assertEqual(event["event_short"], "nvlv")
