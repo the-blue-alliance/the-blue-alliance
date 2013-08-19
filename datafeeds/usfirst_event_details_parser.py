@@ -56,7 +56,7 @@ class UsfirstEventDetailsParser(ParserBase):
 
         # http://www2.usfirst.org/2010comp/Events/SDC/matchresults.html
         match_results_url = soup.find('div', {'class': 'event-match-results'}).find('a')['href']
-        m = re.match(r"http://www2\.usfirst\.org/%scomp/Events/([a-zA-Z0-9]*)/match" % result["year"], match_results_url)
+        m = re.match(r"http://www2\.usfirst\.org/%scomp/Events/([a-zA-Z0-9]*)/" % result["year"], match_results_url)
         result['event_short'] = unicode(m.group(1).lower())
 
         return result, False
