@@ -391,7 +391,7 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
 
 
-class UsfirstTeamEventsEnqueue(webapp.RequestHandler):
+class UsfirstPre2003TeamEventsEnqueue(webapp.RequestHandler):
     def get(self):
         """
         Enqueues TeamEventsGet for teams numbers <= 999 (these teams participated
@@ -402,13 +402,13 @@ class UsfirstTeamEventsEnqueue(webapp.RequestHandler):
         for team in teams:
             taskqueue.add(
                 queue_name='usfirst',
-                url='/tasks/get/usfirst_team_events/{}'.format(team.key_name),
+                url='/tasks/get/usfirst_pre2003_team_events/{}'.format(team.key_name),
                 method='GET')
 
-        self.response.out.write("%s team event gets have been enqueued." % (len(teams)))
+        self.response.out.write("Pre 2003 event gets have been enqueued for %s teams." % (len(teams)))
 
 
-class UsfirstTeamEventsGet(webapp.RequestHandler):
+class UsfirstPre2003TeamEventsGet(webapp.RequestHandler):
     """
     Handles reading a USFIRST team information page and enqueues tasks to
     create events that the team has attended if the event does not exist in the db.
@@ -419,7 +419,7 @@ class UsfirstTeamEventsGet(webapp.RequestHandler):
         team_key = ndb.Key(Team, key_name)
 
         df = DatafeedUsfirst()
-        first_eids = df.getTeamEvents(Team.get_by_id(key_name))
+        first_eids = df.getPre2003TeamEvents(Team.get_by_id(key_name))
 
         new_eids = []
         for eid in first_eids:

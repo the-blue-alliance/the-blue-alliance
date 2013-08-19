@@ -5,7 +5,7 @@ from BeautifulSoup import BeautifulSoup
 from datafeeds.parser_base import ParserBase
 
 
-class UsfirstTeamEventsParser(ParserBase):
+class UsfirstPre2003TeamEventsParser(ParserBase):
     @classmethod
     def parse(self, html):
         """
@@ -14,18 +14,15 @@ class UsfirstTeamEventsParser(ParserBase):
         """
         team_event_re = r'/whats-going-on/event/([0-9]+)'
 
-        soup = BeautifulSoup(html,
-                             convertEntities=BeautifulSoup.HTML_ENTITIES)
+        soup = BeautifulSoup(html, convertEntities=BeautifulSoup.HTML_ENTITIES)
 
         first_eids = []
-
         history_table = soup.find('div', {'class': 'team-history-wrapper'}).findAll('table')[0]
-        for tr in history_table.findAll('tr'):
-            try:
-                trs = tr.findAll('td')
+        for tr in history_table.findAll('tr')[1:]:  # skip table title row
+            trs = tr.findAll('td')
+            year = int(trs[0].text)
+            if year < 2003:
                 eid = re.findall(team_event_re, str(trs[1]))[0]
                 first_eids.append(eid)
-            except:
-                continue
 
         return first_eids, False
