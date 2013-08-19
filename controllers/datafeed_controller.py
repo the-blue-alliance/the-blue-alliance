@@ -391,6 +391,19 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
 
 
+class UsfirstTeamEventsEnqueue(webapp.RequestHandler):
+    def get(self):
+        team_keys = Team.query().fetch(10000, keys_only=True)
+        teams = ndb.get_multi(team_keys)
+        for team in teams:
+            taskqueue.add(
+                queue_name='usfirst',
+                url='/tasks/get/usfirst_team_events/{}'.format(team.key_name),
+                method='GET')
+
+        self.response.out.write("%s team event gets have been enqueued." % (len(teams)))
+
+
 class UsfirstTeamEventsGet(webapp.RequestHandler):
     """
     Handles reading a USFIRST team information page and enqueues tasks to
