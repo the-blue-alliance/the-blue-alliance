@@ -393,7 +393,11 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
 
 class UsfirstTeamEventsEnqueue(webapp.RequestHandler):
     def get(self):
-        team_keys = Team.query().fetch(10000, keys_only=True)
+        """
+        Enqueues TeamEventsGet for teams numbers <= 999 (these teams participated
+        in events from 2002 and prior, which we can't scrape normally)
+        """
+        team_keys = Team.query(Team.team_number <= 999).fetch(10000, keys_only=True)
         teams = ndb.get_multi(team_keys)
         for team in teams:
             taskqueue.add(
