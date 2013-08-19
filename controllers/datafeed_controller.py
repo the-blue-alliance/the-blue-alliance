@@ -431,14 +431,17 @@ class UsfirstTeamEventsGet(webapp.RequestHandler):
                 event = EventManipulator.createOrUpdate(event)
                 new_eids.append(eid)
             else:
-                event = ndb.get_multi(event_keys)[0]
+                event = event_keys[0].get()
 
-            event_team = EventTeam(
-                id=event.key.id() + "_" + team_key.id(),
-                event=event.key,
-                team=team_key,
-                year=event.year)
-            event_team = EventTeamManipulator.createOrUpdate(event_team)
+            event_team_key_name = event.key.id() + "_" + team_key.id()
+            existing_event_team = ndb.Key(EventTeam, event_team_key_name).get()
+            if existing_event_team is None:
+                event_team = EventTeam(
+                    id=event_team_key_name,
+                    event=event.key,
+                    team=team_key,
+                    year=event.year)
+                EventTeamManipulator.createOrUpdate(event_team)
 
         template_values = {'first_eids': first_eids,
                            'new_eids': new_eids}
