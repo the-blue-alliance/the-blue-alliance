@@ -389,6 +389,27 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
 
 
+class UsfirstTeamEventsGetAndEnqueue(webapp.RequestHandler):
+    """
+    Handles reading a USFIRST team information page and enqueues tasks to
+    create events that the team has attended if it does not exist in the db.
+    """
+    def get(self, key_name):
+        df = DatafeedUsfirst()
+        first_eids = df.getTeamEvents(Team.get_by_id(key_name))
+
+        for first_eid in first_eids:
+            taskqueue.add(
+                queue_name='usfirst',
+                url='/tasks/get/usfirst_event_details/{}'.format(first_eid),
+                method='GET')
+
+        template_values = {'first_eids': first_eids}
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_team_events_get_and_enqueue.html')
+        self.response.out.write(template.render(path, template_values))
+
+
 class UsfirstTeamsTpidsGet(webapp.RequestHandler):
     """
     A run-as-needed function that instantiates new Team objects based on
