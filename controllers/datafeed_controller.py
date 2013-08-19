@@ -430,11 +430,8 @@ class UsfirstTeamEventsGet(webapp.RequestHandler):
                     continue
                 event = EventManipulator.createOrUpdate(event)
                 new_eids.append(eid)
-            elif len(event_keys) == 1:
-                event = ndb.get_multi(event_keys)[0]
             else:
-                logging.warning("Multiple events with eid: {}".format(eid))
-                continue
+                event = ndb.get_multi(event_keys)[0]
 
             event_team = EventTeam(
                 id=event.key.id() + "_" + team_key.id(),
