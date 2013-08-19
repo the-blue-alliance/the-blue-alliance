@@ -11,7 +11,7 @@ from controllers.datafeed_controller import TwitterFrcfmsMatchesGet
 from controllers.datafeed_controller import UsfirstEventDetailsEnqueue, UsfirstEventDetailsGet, UsfirstEventListGet
 from controllers.datafeed_controller import UsfirstAwardsEnqueue, UsfirstAwardsGet
 from controllers.datafeed_controller import UsfirstMatchesEnqueue, UsfirstMatchesGet, UsfirstEventRankingsEnqueue, UsfirstEventRankingsGet
-from controllers.datafeed_controller import UsfirstTeamDetailsEnqueue, UsfirstTeamDetailsGet, UsfirstTeamEventsGetAndEnqueue, UsfirstTeamsTpidsGet
+from controllers.datafeed_controller import UsfirstTeamDetailsEnqueue, UsfirstTeamDetailsGet, UsfirstTeamEventsGet, UsfirstTeamsTpidsGet
 
 from controllers.cron_controller import EventTeamRepairDo, EventTeamUpdate, EventTeamUpdateEnqueue
 from controllers.cron_controller import EventOprDo, EventOprEnqueue
@@ -36,8 +36,8 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
                                ('/tasks/get/usfirst_awards/(.*)', UsfirstAwardsGet),
                                ('/tasks/get/usfirst_matches/(.*)', UsfirstMatchesGet),
                                ('/tasks/get/usfirst_team_details/(.*)', UsfirstTeamDetailsGet),
+                               ('/tasks/get/usfirst_team_events/(.*)', UsfirstTeamEventsGet),
                                ('/tasks/get/usfirst_teams_tpids/([0-9]*)', UsfirstTeamsTpidsGet),
-                               ('/tasks/get_and_enqueue/usfirst_team_events/(.*)', UsfirstTeamEventsGetAndEnqueue),
                                ('/tasks/math/enqueue/event_opr/(.*)', EventOprEnqueue),
                                ('/tasks/math/enqueue/eventteam_update/(.*)', EventTeamUpdateEnqueue),
                                ('/tasks/math/do/event_opr/(.*)', EventOprDo),

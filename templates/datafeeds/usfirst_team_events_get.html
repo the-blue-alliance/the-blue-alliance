@@ -4,11 +4,15 @@
 
 {% block content %}
 <div class="row">
-    <h4>Got and enqueued the following Event IDs:</h4>
-    <ul>
+    <h4>Got the following Event IDs:</h4>
     {% for first_eid in first_eids %}
-        <li>{{ first_eid }}</li>
+        {{ first_eid }}
     {% endfor %}
-    </ul>
+</div>
+<div class="row">
+    <h4>Added new Event IDs:</h4>
+    {% for first_eid in new_eids %}
+        {{ first_eid }}
+    {% endfor %}
 </div>
 {% endblock %}

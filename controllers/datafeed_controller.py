@@ -8,6 +8,8 @@ from google.appengine.ext import ndb
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
+from consts.event_type import EventType
+
 from datafeeds.datafeed_fms import DatafeedFms
 from datafeeds.datafeed_tba import DatafeedTba
 from datafeeds.datafeed_usfirst import DatafeedUsfirst
@@ -389,24 +391,49 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
 
 
-class UsfirstTeamEventsGetAndEnqueue(webapp.RequestHandler):
+class UsfirstTeamEventsGet(webapp.RequestHandler):
     """
     Handles reading a USFIRST team information page and enqueues tasks to
-    create events that the team has attended if it does not exist in the db.
+    create events that the team has attended if the event does not exist in the db.
+    Also creates appropriate eventteams.
+    Doesn't create Championship Event or Championship Divisions
     """
     def get(self, key_name):
+        team_key = ndb.Key(Team, key_name)
+
         df = DatafeedUsfirst()
         first_eids = df.getTeamEvents(Team.get_by_id(key_name))
 
-        for first_eid in first_eids:
-            taskqueue.add(
-                queue_name='usfirst',
-                url='/tasks/get/usfirst_event_details/{}'.format(first_eid),
-                method='GET')
+        new_eids = []
+        for eid in first_eids:
+            event_keys = Event.query(Event.first_eid == eid).fetch(10, keys_only=True)
+            if len(event_keys) == 0:  # only create events if event not already in db
+                try:
+                    event = df.getEventDetails(eid)
+                except:
+                    logging.warning("getEventDetails for eid {} failed.".format(eid))
+                    continue
+                if event.event_type_enum in {EventType.CMP_DIVISION, EventType.CMP_FINALS}:
+                    continue
+                event = EventManipulator.createOrUpdate(event)
+                new_eids.append(eid)
+            elif len(event_keys) == 1:
+                event = ndb.get_multi(event_keys)[0]
+            else:
+                logging.warning("Multiple events with eid: {}".format(eid))
+                continue
 
-        template_values = {'first_eids': first_eids}
+            event_team = EventTeam(
+                id=event.key.id() + "_" + team_key.id(),
+                event=event.key,
+                team=team_key,
+                year=event.year)
+            event_team = EventTeamManipulator.createOrUpdate(event_team)
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_team_events_get_and_enqueue.html')
+        template_values = {'first_eids': first_eids,
+                           'new_eids': new_eids}
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_team_events_get.html')
         self.response.out.write(template.render(path, template_values))
 
 
