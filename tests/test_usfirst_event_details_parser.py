@@ -105,3 +105,16 @@ class TestUsfirstEventDetailsParser(unittest2.TestCase):
         self.assertEqual(event["venue"], "William Rainey Harper College")
         self.assertEqual(event["location"], "Chicago, IL, USA")
         self.assertEqual(event["event_short"], "il")
+
+    def test_parse_2002sj(self):
+        with open('test_data/usfirst_html/usfirst_event_details_2002sj.html', 'r') as f:
+            event, _ = UsfirstEventDetailsParser.parse(f.read())
+
+        self.assertEqual(event["name"], "Silicon Valley Regional")
+        self.assertEqual(event["event_type_enum"], EventType.REGIONAL)
+        self.assertEqual(event["start_date"], datetime.datetime(2002, 3, 28, 0, 0))
+        self.assertEqual(event["end_date"], datetime.datetime(2002, 3, 30, 0, 0))
+        self.assertEqual(event["year"], 2002)
+        self.assertEqual(event["venue_address"], "San Jose, CA\r\nUSA")
+        self.assertEqual(event["location"], "San Jose, CA, USA")
+        self.assertEqual(event["event_short"], "sj")
