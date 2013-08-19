@@ -3,14 +3,20 @@ import json
 import re
 import logging
 
+from google.appengine.api import memcache
 from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
+from models.account import Account
 
 
 class AdminMain(LoggedInHandler):
     def get(self):
         self._require_admin()
+
+        self.template_values['memcache_stats'] = memcache.get_stats()
+        users = Account.query().order(-Account.created).fetch(5)
+        self.template_values['users'] = users
 
         # version info
         try:
