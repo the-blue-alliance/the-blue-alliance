@@ -3,14 +3,27 @@ import json
 import re
 import logging
 
+from google.appengine.api import memcache
 from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
+from models.account import Account
+from models.suggestion import Suggestion
 
 
 class AdminMain(LoggedInHandler):
     def get(self):
         self._require_admin()
+
+        self.template_values['memcache_stats'] = memcache.get_stats()
+
+        # Gets the 5 recently created users
+        users = Account.query().order(-Account.created).fetch(5)
+        self.template_values['users'] = users
+
+        # Retrieves the number of pending suggestions
+        video_suggestions = Suggestion.query().filter(Suggestion.review_state == Suggestion.REVIEW_PENDING).count()
+        self.template_values['video_suggestions'] = video_suggestions
 
         # version info
         try:

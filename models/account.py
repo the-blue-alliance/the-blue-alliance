@@ -11,7 +11,7 @@ class Account(ndb.Model):
     nickname = ndb.StringProperty()
     registered = ndb.BooleanProperty()
 
-    created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
+    created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
     # These optional properties are editable by the user
