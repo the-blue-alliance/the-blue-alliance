@@ -3,11 +3,11 @@
  */
 
 // For keeping track of view order
-var order = new Array();
+var order = [];
 // views contain webcasts that are supported by the chosen layout
-var views = new Array();
+var views = [];
 // hiddenviews are the contents views that are not supported by the chosen layout
-var hiddenviews = new Array();
+var hiddenviews = [];
 
 $(document).ready(function() {
 	
@@ -121,7 +121,7 @@ function setSocial(open) {
 	var social_panel = $(".social_panel");
 	var webcasts_panel = $('.webcasts_panel');
 	if (open) {
-		social.addClass("social_active")
+		social.addClass("social_active");
 		social_panel.addClass("social_panel_active");
 		webcasts_panel.addClass("webcasts_panel_social_active");
 		fixLayout();
@@ -150,7 +150,7 @@ function setChat(open) {
 	var chat_panel = $(".chat_panel");
 	var webcasts_panel = $('.webcasts_panel');
 	if (open) {
-		chat.addClass("chat_active")
+		chat.addClass("chat_active");
 		chat_panel.addClass("chat_panel_active");
 		webcasts_panel.addClass("webcasts_panel_chat_active");
 		fixLayout();
@@ -166,7 +166,7 @@ function setChat(open) {
 $(document).ready(function() {
 	$('#chat-info').bind('close', function () {
 		$('#chat-info-background').remove();
-	})
+	});
 });
 
 // Create Views
@@ -215,7 +215,7 @@ function setupDragDrop() {
 
 function setupView(viewNum, $item) {
 	var eventKey = $item.attr('event');
-	var webcastNumber = $item.attr('num')
+	var webcastNumber = $item.attr('num');
 	var eventName = $item.attr('alt');
 	
 	$.getJSON('/_/webcast/' + eventKey + '/' + webcastNumber, function(data) {
@@ -301,7 +301,7 @@ function swap(dragged, target) {
 //Layout Changing Control
 var height, width, current_layout, last_layout, num_views;
 // num_views[layout_number] = number of views provided by that layout
-num_views = [1, 2, 3, 4, 5, 6, 4]
+num_views = [1, 2, 3, 4, 5, 6, 4];
 
 // Fixes layout. Call this if window resized, etc.
 function fixLayout() {

@@ -4,7 +4,7 @@ $(function() {
 	var chartsData = $(".xcharts-bar-single-data");
 	for (var i=0; i < chartsData.length; i++) {
 		var chartId = chartsData[i].id;
-		var raw = JSON.parse($('#' + chartId).html())
+		var raw = JSON.parse($('#' + chartId).html());
 		var data = [];
 		for (var key in raw) {
 			var value = raw[key];
@@ -14,8 +14,8 @@ $(function() {
 						 "yScale": "linear",
 						 "type": "bar",
 						 "main": [{"className": "." + chartId + '-elements',
-							 	   "data": data}],
-						 }
+							 	   "data": data}]
+						 };
 		var opts = {"tickFormatY": function(y){ return y + "%"; }};
 		var myChart = new xChart('bar', chartData, '#' + chartId + '-chart', opts);
 	}
@@ -34,8 +34,8 @@ $(function() {
 						 "yScale": "linear",
 						 "type": "line-dotted",
 						 "main": [{"className": "." + chartId + '-elements',
-							 	   "data": data}],
-						 }
+							 	   "data": data}]
+						 };
 		var myChart = new xChart('line', chartData, '#' + chartId + '-chart');
 	}
 	
@@ -46,7 +46,7 @@ $(function() {
 		var raw = JSON.parse($('#' + chartId).html());
 		var dataA = [];
 		var dataB = [];
-		var xLabels = []
+		var xLabels = [];
 		var indexA = 0;
 		for (var key in raw[0]) {
 			var tuple = raw[0][key];
@@ -66,11 +66,11 @@ $(function() {
 						 "main": [{"className": "." + chartId + '-elements',
 							 	   "data": dataA},
 							 	  {"className": "." + chartId + '-elements',
-								   "data": dataB}],
-						 }
+								   "data": dataB}]
+						 };
 		var opts = {
 		  "tickFormatX": function (x) { return xLabels[x]; }
-		}
+		};
 		var myChart = new xChart('line', chartData, '#' + chartId + '-chart', opts);
 	}
 	
@@ -79,7 +79,7 @@ $(function() {
 	var chartsData = $(".xcharts-bar-double-data");
 	for (var i=0; i < chartsData.length; i++) {
 		var chartId = chartsData[i].id;
-		var raw = JSON.parse($('#' + chartId).html())
+		var raw = JSON.parse($('#' + chartId).html());
 		var dataA = [];
 		var dataB = [];
 		for (var key in raw[0]) {
@@ -96,8 +96,8 @@ $(function() {
 						 "main": [{"className": "." + chartId + '-elements',
 							 	   "data": dataA},
 							 	  {"className": "." + chartId + '-elements',
-								   "data": dataB}],
-						 }
+								   "data": dataB}]
+						 };
 		var opts = {"tickFormatY": function(y){ return y + "%"; }};
 		var myChart = new xChart('bar', chartData, '#' + chartId + '-chart', opts);
 	}
