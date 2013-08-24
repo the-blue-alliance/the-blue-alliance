@@ -30,7 +30,7 @@
 # OS generated files #
 ######################
 # OS X
-.DS_Store
+.DS_Store*
 .AppleDouble
 .LSOverride
 Icon
