@@ -26,7 +26,7 @@ class EventList(CacheableHandler):
     List all Events.
     """
 
-    VALID_YEARS = [2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 2004, 2003, 2002]
+    VALID_YEARS = [2014, 2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 2004, 2003, 2002]
 
     def __init__(self, *args, **kw):
         super(EventList, self).__init__(*args, **kw)
