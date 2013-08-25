@@ -69,8 +69,24 @@
 }
 
 // CSS image replacement
+//
+// Heads up! v3 launched with with only `.hide-text()`, but per our pattern for
+// mixins being reused as classes with the same name, this doesn't hold up. As
+// of v3.0.1 we have added `.text-hide()` and deprecated `.hide-text()`. Note
+// that we cannot chain the mixins together in Less, so they are repeated.
+//
 // Source: https://github.com/h5bp/html5-boilerplate/commit/aa0396eae757
+
+// Deprecated as of v3.0.1 (will be removed in v4)
 .hide-text() {
+  font: ~"0/0" a;
+  color: transparent;
+  text-shadow: none;
+  background-color: transparent;
+  border: 0;
+}
+// New mixin to use as of v3.0.1
+.text-hide() {
   font: ~"0/0" a;
   color: transparent;
   text-shadow: none;
@@ -111,6 +127,10 @@
 .transition(@transition) {
   -webkit-transition: @transition;
           transition: @transition;
+}
+.transition-property(@transition-property) {
+  -webkit-transition-property: @transition-property;
+          transition-property: @transition-property;
 }
 .transition-delay(@transition-delay) {
   -webkit-transition-delay: @transition-delay;
@@ -161,16 +181,6 @@
   -webkit-backface-visibility: @visibility;
      -moz-backface-visibility: @visibility;
           backface-visibility: @visibility;
-}
-
-// Background clipping
-.background-clip(@clip) {
-  background-clip: @clip;
-}
-
-// Background sizing
-.background-size(@size) {
-  background-size: @size;
 }
 
 // Box sizing
@@ -296,7 +306,7 @@
 
 // Reset filters for IE
 //
-// When you need to remove a gradient background, don't forget to use this to reset
+// When you need to remove a gradient background, do not forget to use this to reset
 // the IE filter for IE9 and below.
 .reset-filter() {
   filter: e(%("progid:DXImageTransform.Microsoft.gradient(enabled = false)"));
@@ -304,10 +314,10 @@
 
 
 
-// RETINA IMAGE SUPPORT
-// --------------------------------------------------
-
+// Retina images
+//
 // Short retina mixin for setting background-image and -size
+
 .img-retina(@file-1x; @file-2x; @width-1x; @height-1x) {
   background-image: url("@{file-1x}");
 
@@ -321,6 +331,17 @@
     background-image: url("@{file-2x}");
     background-size: @width-1x @height-1x;
   }
+}
+
+
+// Responsive image
+//
+// Keep images from scaling beyond the width of their parents.
+
+.img-responsive(@display: block;) {
+  display: @display;
+  max-width: 100%; // Part 1: Set a maximum relative to the parent
+  height: auto; // Part 2: Scale the height according to the width, otherwise you get stretching
 }
 
 
@@ -339,12 +360,20 @@
 
 // Panels
 // -------------------------
-.panel-variant(@border; @heading-text-color; @heading-bg-color; @heading-border) {
+.panel-variant(@border; @heading-text-color; @heading-bg-color; @heading-border;) {
   border-color: @border;
-  .panel-heading {
+  & > .panel-heading {
     color: @heading-text-color;
     background-color: @heading-bg-color;
     border-color: @heading-border;
+    + .panel-collapse .panel-body {
+      border-top-color: @border;
+    }
+  }
+  & > .panel-footer {
+    + .panel-collapse .panel-body {
+      border-bottom-color: @border;
+    }
   }
 }
 
@@ -362,11 +391,41 @@
   }
 }
 
-// Button pseudo states
+// Tables
+// -------------------------
+.table-row-variant(@state; @background; @border) {
+  // Exact selectors below required to override `.table-striped` and prevent
+  // inheritance to nested tables.
+  .table > thead > tr,
+  .table > tbody > tr,
+  .table > tfoot > tr {
+    > td.@{state},
+    > th.@{state},
+    &.@{state} > td,
+    &.@{state} > th {
+      background-color: @background;
+      border-color: @border;
+    }
+  }
+
+  // Hover states for `.table-hover`
+  // Note: this is not available for cells or rows within `thead` or `tfoot`.
+  .table-hover > tbody > tr {
+    > td.@{state}:hover,
+    > th.@{state}:hover,
+    &.@{state}:hover > td,
+    &.@{state}:hover > th {
+      background-color: darken(@background, 5%);
+      border-color: darken(@border, 5%);
+    }
+  }
+}
+
+// Button variants
 // -------------------------
 // Easily pump out default styles, as well as :hover, :focus, :active,
 // and disabled options for all buttons
-.btn-pseudo-states(@color; @background; @border) {
+.button-variant(@color; @background; @border) {
   color: @color;
   background-color: @background;
   border-color: @border;
@@ -374,12 +433,17 @@
   &:hover,
   &:focus,
   &:active,
-  &.active {
+  &.active,
+  .open .dropdown-toggle& {
     color: @color;
     background-color: darken(@background, 8%);
         border-color: darken(@border, 12%);
   }
-
+  &:active,
+  &.active,
+  .open .dropdown-toggle& {
+    background-image: none;
+  }
   &.disabled,
   &[disabled],
   fieldset[disabled] & {
@@ -390,6 +454,39 @@
     &.active {
       background-color: @background;
           border-color: @border
+    }
+  }
+}
+
+// Button sizes
+// -------------------------
+.button-size(@padding-vertical; @padding-horizontal; @font-size; @line-height; @border-radius) {
+  padding: @padding-vertical @padding-horizontal;
+  font-size: @font-size;
+  line-height: @line-height;
+  border-radius: @border-radius;
+}
+
+// Pagination
+// -------------------------
+.pagination-size(@padding-vertical; @padding-horizontal; @font-size; @border-radius) {
+  > li {
+    > a,
+    > span {
+      padding: @padding-vertical @padding-horizontal;
+      font-size: @font-size;
+    }
+    &:first-child {
+      > a,
+      > span {
+        .border-left-radius(@border-radius);
+      }
+    }
+    &:last-child {
+      > a,
+      > span {
+        .border-right-radius(@border-radius);
+      }
     }
   }
 }
@@ -448,43 +545,28 @@
 .container-fixed() {
   margin-right: auto;
   margin-left: auto;
+  padding-left:  (@grid-gutter-width / 2);
+  padding-right: (@grid-gutter-width / 2);
   .clearfix();
 }
 
 // Creates a wrapper for a series of columns
 .make-row(@gutter: @grid-gutter-width) {
-  // Then clear the floated columns
+  margin-left:  (@gutter / -2);
+  margin-right: (@gutter / -2);
   .clearfix();
-
-  .container & {
-    @media (min-width: @screen-small) {
-      margin-left:  (@gutter / -2);
-      margin-right: (@gutter / -2);
-    }
-  }
-
-  // Negative margin nested rows out to align the content of columns
-  .row {
-    margin-left:  (@gutter / -2);
-    margin-right: (@gutter / -2);
-  }
 }
 
-// Generate the default columns
-.make-column(@columns; @gutter: @grid-gutter-width) {
+// Generate the extra small columns
+.make-xs-column(@columns; @gutter: @grid-gutter-width) {
   position: relative;
   float: left;
+  width: percentage((@columns / @grid-columns));
   // Prevent columns from collapsing when empty
   min-height: 1px;
   // Inner gutter via padding
   padding-left:  (@gutter / 2);
   padding-right: (@gutter / 2);
-  @max-width: (@screen-small - 1);
-
-  // Calculate width based on number of columns available
-  @media (max-width: @max-width) {
-    width: percentage((@columns / @grid-columns));
-  }
 }
 
 // Generate the small columns
@@ -497,7 +579,7 @@
   padding-right: (@gutter / 2);
 
   // Calculate width based on number of columns available
-  @media (min-width: @screen-small) {
+  @media (min-width: @screen-sm-min) {
     float: left;
     width: percentage((@columns / @grid-columns));
   }
@@ -505,17 +587,17 @@
 
 // Generate the small column offsets
 .make-sm-column-offset(@columns) {
-  @media (min-width: @screen-small) {
+  @media (min-width: @screen-sm-min) {
     margin-left: percentage((@columns / @grid-columns));
   }
 }
 .make-sm-column-push(@columns) {
-  @media (min-width: @screen-small) {
+  @media (min-width: @screen-sm-min) {
     left: percentage((@columns / @grid-columns));
   }
 }
 .make-sm-column-pull(@columns) {
-  @media (min-width: @screen-small) {
+  @media (min-width: @screen-sm-min) {
     right: percentage((@columns / @grid-columns));
   }
 }
@@ -530,7 +612,7 @@
   padding-right: (@gutter / 2);
 
   // Calculate width based on number of columns available
-  @media (min-width: @screen-medium) {
+  @media (min-width: @screen-md-min) {
     float: left;
     width: percentage((@columns / @grid-columns));
   }
@@ -538,17 +620,17 @@
 
 // Generate the large column offsets
 .make-md-column-offset(@columns) {
-  @media (min-width: @screen-medium) {
+  @media (min-width: @screen-md-min) {
     margin-left: percentage((@columns / @grid-columns));
   }
 }
 .make-md-column-push(@columns) {
-  @media (min-width: @screen-medium) {
+  @media (min-width: @screen-md) {
     left: percentage((@columns / @grid-columns));
   }
 }
 .make-md-column-pull(@columns) {
-  @media (min-width: @screen-medium) {
+  @media (min-width: @screen-md-min) {
     right: percentage((@columns / @grid-columns));
   }
 }
@@ -563,7 +645,7 @@
   padding-right: (@gutter / 2);
 
   // Calculate width based on number of columns available
-  @media (min-width: @screen-large) {
+  @media (min-width: @screen-lg-min) {
     float: left;
     width: percentage((@columns / @grid-columns));
   }
@@ -571,17 +653,17 @@
 
 // Generate the large column offsets
 .make-lg-column-offset(@columns) {
-  @media (min-width: @screen-large) {
+  @media (min-width: @screen-lg-min) {
     margin-left: percentage((@columns / @grid-columns));
   }
 }
 .make-lg-column-push(@columns) {
-  @media (min-width: @screen-large) {
+  @media (min-width: @screen-lg-min) {
     left: percentage((@columns / @grid-columns));
   }
 }
 .make-lg-column-pull(@columns) {
-  @media (min-width: @screen-large) {
+  @media (min-width: @screen-lg-min) {
     right: percentage((@columns / @grid-columns));
   }
 }
@@ -635,5 +717,28 @@
     border-color: @color;
     outline: 0;
     .box-shadow(~"inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px @{color-rgba}");
+  }
+}
+
+// Form control sizing
+//
+// Relative text size, padding, and border-radii changes for form controls. For
+// horizontal sizing, wrap controls in the predefined grid classes. `<select>`
+// element gets special love because it's special, and that's a fact!
+
+.input-size(@input-height; @padding-vertical; @padding-horizontal; @font-size; @line-height; @border-radius) {
+  height: @input-height;
+  padding: @padding-vertical @padding-horizontal;
+  font-size: @font-size;
+  line-height: @line-height;
+  border-radius: @border-radius;
+
+  select& {
+    height: @input-height;
+    line-height: @input-height;
+  }
+
+  textarea& {
+    height: auto;
   }
 }

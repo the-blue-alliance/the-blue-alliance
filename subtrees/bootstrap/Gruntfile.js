@@ -9,9 +9,11 @@ module.exports = function(grunt) {
     // Metadata.
     pkg: grunt.file.readJSON('package.json'),
     banner: '/**\n' +
-              '* <%= pkg.name %>.js v<%= pkg.version %> by @fat and @mdo\n' +
+              '* Bootstrap v<%= pkg.version %> by @fat and @mdo\n' +
               '* Copyright <%= grunt.template.today("yyyy") %> <%= pkg.author %>\n' +
-              '* <%= _.pluck(pkg.licenses, "url").join(", ") %>\n' +
+              '* Licensed under <%= _.pluck(pkg.licenses, "url").join(", ") %>.\n' +
+              '*\n' +
+              '* Designed and built with all the love in the world by @mdo and @fat.\n' +
               '*/\n',
     jqueryCheck: 'if (!jQuery) { throw new Error(\"Bootstrap requires jQuery\") }\n\n',
 
@@ -83,6 +85,25 @@ module.exports = function(grunt) {
         },
         src: ['less/bootstrap.less'],
         dest: 'dist/css/<%= pkg.name %>.min.css'
+      },
+      theme: {
+        src: ['less/theme.less'],
+        dest: 'dist/css/<%= pkg.name %>-theme.css'
+      },
+      theme_min: {
+        options: {
+          compress: true
+        },
+        src: ['less/theme.less'],
+        dest: 'dist/css/<%= pkg.name %>-theme.min.css'
+      }
+    },
+
+    copy: {
+      fonts: {
+        expand: true,
+        src: ["fonts/*"],
+        dest: 'dist/'
       }
     },
 
@@ -99,6 +120,19 @@ module.exports = function(grunt) {
           port: 3000,
           base: '.'
         }
+      }
+    },
+
+    jekyll: {
+      docs: {}
+    },
+
+    validation: {
+      options: {
+        reset: true
+      },
+      files: {
+        src: ["_gh_pages/**/*.html"]
       }
     },
 
@@ -123,16 +157,21 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-connect');
+  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-qunit');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-html-validation');
+  grunt.loadNpmTasks('grunt-jekyll');
   grunt.loadNpmTasks('grunt-recess');
   grunt.loadNpmTasks('browserstack-runner');
 
+  // Docs HTML validation task
+  grunt.registerTask('validate-html', ['jekyll', 'validation']);
 
   // Test task.
-  var testSubtasks = ['jshint', 'qunit'];
+  var testSubtasks = ['dist-css', 'jshint', 'qunit', 'validate-html'];
   // Only run BrowserStack tests under Travis
   if (process.env.TRAVIS) {
     // Only run BrowserStack tests if this is a mainline commit in twbs/bootstrap, or you have your own BrowserStack key
@@ -148,11 +187,14 @@ module.exports = function(grunt) {
   // CSS distribution task.
   grunt.registerTask('dist-css', ['recess']);
 
+  // Fonts distribution task.
+  grunt.registerTask('dist-fonts', ['copy']);
+
   // Full distribution task.
-  grunt.registerTask('dist', ['clean', 'dist-css', 'dist-js']);
+  grunt.registerTask('dist', ['clean', 'dist-css', 'dist-fonts', 'dist-js']);
 
   // Default task.
-  grunt.registerTask('default', ['test', 'dist']);
+  grunt.registerTask('default', ['test', 'dist', 'build-customizer']);
 
   // task for building customizer
   grunt.registerTask('build-customizer', 'Add scripts/less files to customizer.', function () {
@@ -162,7 +204,7 @@ module.exports = function(grunt) {
       var files = {}
       fs.readdirSync(type)
         .filter(function (path) {
-          return new RegExp('\\.' + type + '$').test(path)
+          return type == 'fonts' ? true : new RegExp('\\.' + type + '$').test(path)
         })
         .forEach(function (path) {
           return files[path] = fs.readFileSync(type + '/' + path, 'utf8')
@@ -171,7 +213,7 @@ module.exports = function(grunt) {
     }
 
     var customize = fs.readFileSync('customize.html', 'utf-8')
-    var files = '<!-- generated -->\n<script id="files">\n' + getFiles('js') + getFiles('less') + '<\/script>\n<!-- /generated -->'
-    fs.writeFileSync('customize.html', customize.replace(/<!-- generated -->(.|[\n\r])*<!-- \/generated -->/, files))
+    var files = getFiles('js') + getFiles('less') + getFiles('fonts')
+    fs.writeFileSync('assets/js/raw-files.js', files)
   });
 };

@@ -13,11 +13,11 @@
   > li > a {
     padding-left: 5px;
     padding-right: 5px;
-    @media (min-width: @screen-tablet) and (max-width: @screen-tablet-max) {
+    @media (min-width: @screen-sm-min) and (max-width: @screen-sm-max) {
       padding-left: 10px;
       padding-right: 10px;
     }
-    @media (min-width: @screen-desktop) {
+    @media (min-width: @screen-lg-min) {
       padding-left: 15px;
       padding-right: 15px;
     }
@@ -41,7 +41,7 @@
   overflow: visible;
   height: @navbar-height + @minus-amt;
   margin: -@minus-amt 15px 0 0;
-  @media (max-width: @screen-phone-max) {
+  @media (max-width: @screen-xs-max) {
     margin-right: 5px;
   }
 }
@@ -55,13 +55,13 @@
 
 .tba-navbar-form {
   width: 220px;
-  @media (min-width: @screen-small) {
+  @media (min-width: @screen-md-min) {
     .pull-right();
   }
-  @media (min-width: @screen-phone) and (max-width: @screen-small-max) {
+  @media (min-width: @screen-sm-min) and (max-width: @screen-sm-max) {
     .pull-left();
   }
-  @media (max-width: @screen-phone) {
+  @media (max-width: @screen-xs-max) {
     .full-width-search();
   }
 }
@@ -73,12 +73,12 @@
   margin: (@navbar-height - @social-icon-size)/2 15px 0 0;
   float: right;
 
-  @media (min-width: @screen-small) and (max-width: @screen-small-max) {
+  @media (min-width: @screen-sm-min) and (max-width: @screen-sm-max) {
     float: left;
     margin: 13px 0 13px 15px;
   }
 
-  @media (max-width: @screen-phone-max) {
+  @media (max-width: @screen-xs-max) {
     margin: 15px 0 15px 0;
     text-align: center;
     float: none;
@@ -93,7 +93,7 @@
   background-repeat: no-repeat;
   background-position: center center;
   
-  @media (max-width: @screen-small) {
+  @media (max-width: @screen-sm-max) {
     margin: 0 15px;
     text-align: center;
     float: none;
