@@ -209,6 +209,8 @@ class ApiMatchDetails(MainApiHandler):
 
         self._track_call('matches', 'details', track_matches)
 
+        self._track_call('matches', 'details', track_matches)
+
         self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(match_json))
 
