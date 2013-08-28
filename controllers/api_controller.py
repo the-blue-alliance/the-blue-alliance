@@ -3,10 +3,11 @@ import json
 import logging
 import os
 import webapp2
+import urllib
 
 from datetime import datetime
 
-from google.appengine.api import memcache
+from google.appengine.api import memcache, urlfetch
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
@@ -17,6 +18,7 @@ from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
+from models.sitevar import Sitevar
 
 # Note: generally caching for the API happens in ApiHelper
 
@@ -27,6 +29,40 @@ class MainApiHandler(webapp2.RequestHandler):
         # Need to initialize a webapp2 instance
         self.initialize(request, response)
         logging.info(request)
+
+    def _track_call(self, api_category, api_type, api_details=''):
+        # Creates asynchronous call
+        rpc = urlfetch.create_rpc()
+
+        analytics_id = Sitevar.get_by_id("analytics.id")
+        if analytics_id == None:
+            raise Exception("Missing sitevar: analytics.id. Can't track API usage.")
+        ANALYTICS_ID = analytics_id.contents['ANALYTICS_ID']
+
+        params = urllib.urlencode({
+            'v': 1,
+            'tid': ANALYTICS_ID,
+            'cid': '1',
+            't': 'event',
+            'ec': 'api_' + api_category,
+            'ea': api_type,
+            'el': api_details,
+            'ev': 1,
+            'ni': 1
+        })
+
+        # Sets up the call
+        analytics_url = 'http://www.google-analytics.com/collect'
+        urlfetch.make_fetch_call(rpc=rpc,
+            url=analytics_url,
+            payload=params,
+            method=urlfetch.POST,
+            headers={'Content-Type': 'application/x-www-form-urlencoded'})
+
+        try:
+            result = rpc.get_result()
+        except urlfetch.DownloadError:
+            logging.error('API tracking error')
 
 
 class ApiTeamsShow(MainApiHandler):
@@ -42,6 +78,9 @@ class ApiTeamsShow(MainApiHandler):
         except IndexError:
             self.response.set_status(404)
             response_json = {"Property Error": "No team found for key in %s" % str(teams)}
+
+        track_team_keys = ",".join(team_keys)
+        self._track_call('teams', 'show', track_team_keys)
 
         self.response.out.write(json.dumps(teams))
 
@@ -62,6 +101,11 @@ class ApiTeamDetails(MainApiHandler):
                 reponse_json = ApiHelper.addTeamEvents(response_json, year)
 
             # TODO: matches
+
+            track_team_key = team_key
+            if year:
+                track_team_key = track_team_key + ' (' + year + ')'
+            self._track_call('teams', 'details', track_team_key)
 
             self.response.out.write(json.dumps(response_json))
 
@@ -121,6 +165,8 @@ class ApiEventList(MainApiHandler):
             if tba_config.CONFIG["memcache"]:
                 memcache.set(memcache_key, event_list, (30 * ((60 * 60) * 24)))
 
+        self._track_call('events', 'list')
+
         self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(event_list))
 
@@ -140,6 +186,7 @@ class ApiEventDetails(MainApiHandler):
         event_dict = ApiHelper.getEventInfo(event_key)
 
         self.response.headers.add_header("content-type", "application/json")
+        self._track_call('events', 'details', event_key)
         self.response.out.write(json.dumps(event_dict))
 
 
@@ -150,13 +197,17 @@ class ApiMatchDetails(MainApiHandler):
     def get(self):
         if self.request.get('match') is not '':
             match_keys = self.request.get('match').split(',')
+            track_matches = self.request.get('match')
 
         if self.request.get('matches') is not '':
             match_keys = self.request.get('matches').split(',')
+            track_matches = self.request.get('matches')
 
         match_json = []
         for match in match_keys:
             match_json.append(ApiHelper.getMatchDetails(match))
+
+        self._track_call('matches', 'details', track_matches)
 
         self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(match_json))
@@ -182,5 +233,7 @@ class CsvTeamsAll(MainApiHandler):
             output = template.render(path, template_values)
             if tba_config.CONFIG["memcache"]:
                 memcache.set(memcache_key, output, 86400)
+
+        self._track_call('teams', 'list')
 
         self.response.out.write(output)
