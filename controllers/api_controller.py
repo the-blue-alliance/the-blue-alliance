@@ -77,7 +77,7 @@ class ApiEventsShow(MainApiHandler):
     Deprecation notice. Please use ApiEventList, or ApiEventDetails.
     """
     def get(self):
-        response = {"API Method Removed": "ApiEventsShow is no longer available. Please use ApiEvenDetails, and ApiEventList instead."}
+        response = {"API Method Removed": "ApiEventsShow is no longer available. Please use ApiEventDetails, and ApiEventList instead."}
         self.response.set_status(410)
         self.response.out.write(json.dumps(response))
 
@@ -127,7 +127,7 @@ class ApiEventList(MainApiHandler):
 
 class ApiEventDetails(MainApiHandler):
     """
-    Return a specifc event with details.
+    Return a specific event with details.
     """
 
     def get(self):
@@ -144,21 +144,18 @@ class ApiEventDetails(MainApiHandler):
 
 class ApiMatchDetails(MainApiHandler):
     """
-    Returns a specifc
+    Returns specific matches with details.
     """
     def get(self):
         if self.request.get('match') is not '':
-            match_key = self.request.get('match')
+            match_keys = self.request.get('match').split(',')
 
         if self.request.get('matches') is not '':
             match_keys = self.request.get('matches').split(',')
 
-        if 'match_keys' in locals():
-            match_json = []
-            for match in match_keys:
-                match_json.append(ApiHelper.getMatchDetails(match))
-        else:
-            match_json = ApiHelper.getMatchDetails(match_key)
+        match_json = []
+        for match in match_keys:
+            match_json.append(ApiHelper.getMatchDetails(match))
 
         self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(match_json))
