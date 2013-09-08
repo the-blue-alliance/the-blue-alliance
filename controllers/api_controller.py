@@ -139,6 +139,7 @@ class ApiEventDetails(MainApiHandler):
 
         event_dict = ApiHelper.getEventInfo(event_key)
 
+        self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(event_dict))
 
 

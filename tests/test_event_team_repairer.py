@@ -52,7 +52,7 @@ class TestEventTeamRepairer(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def testRepair(self):
+    def test_repair(self):
         event_team = EventTeam.get_by_id("2011ct_frc177")
         self.assertEqual(event_team.year, None)
 
