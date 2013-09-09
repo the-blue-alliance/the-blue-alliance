@@ -28,7 +28,7 @@ class TestEventTeamCreator(unittest2.TestCase):
 
         self.testbed.deactivate()
 
-    def testCreates(self):
+    def test_creates(self):
         self.events.append(EventTestCreator.createPastEvent())
         self.events.append(EventTestCreator.createFutureEvent())
         self.events.append(EventTestCreator.createPresentEvent())
