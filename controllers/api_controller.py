@@ -199,9 +199,6 @@ class ApiMatchDetails(MainApiHandler):
 
         if self.request.get('matches') is not '':
             match_keys = self.request.get('matches').split(',')
-            match_keys_sorted = sorted(self.request.get('matches').split(','))
-            track_matches_keys = ",".join(match_keys_sorted)
-            track_matches = self.request.get('matches')
 
         match_json = []
         for match in match_keys:
@@ -209,8 +206,6 @@ class ApiMatchDetails(MainApiHandler):
 
         self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(match_json))
-
-        self._track_call('matches/details', track_matches)
 
 
 class CsvTeamsAll(MainApiHandler):
