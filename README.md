@@ -4,6 +4,7 @@ The Blue Alliance is a FIRST Robotics tool to help teams scout for, compete at, 
 
 Contributing
 ------------
+0. Join https://groups.google.com/forum/#!forum/thebluealliance-developers to stay up to date with development
 1. Fork this project!
 2. Make your changes on a branch.
 3. Make changes!
