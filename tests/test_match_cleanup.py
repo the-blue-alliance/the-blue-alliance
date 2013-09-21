@@ -21,6 +21,7 @@ class TestMatchCleanup(unittest2.TestCase):
         self.testbed.init_memcache_stub()
 
     def tearDown(self):
+        del self.event
         self.testbed.deactivate()
 
     def setupMatches(self, csv):
