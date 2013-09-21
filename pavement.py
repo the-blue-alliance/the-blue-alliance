@@ -9,41 +9,9 @@ path = path("./")
 
 
 @task
-def clean():
-  """Get rid of junk files."""
-
-  if path.files("bulkloader-*"):
-    sh("rm bulkloader-*")
-    print("All cleaned up!")
-  else:
-    print("Nothing to clean! :)")
-
-
-@task
 def setup():
-  """Set up data for development environments."""
-
-  print("Building CSS/JS...")
-  less()
-  javascript()
-
-  print("Setting up dev data.")
-
-  print("Getting Teams")
-  sh("curl -s http://localhost:8088/tasks/get/fms_team_list")
-  print("Importing test Event data")
-  sh("echo \"omgrobots\" | appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/events.csv --kind=Event --url=http://localhost:8088/_ah/remote_api --num_threads=1 --email=admin@localhost --passin")
-  print("Importing test Match data")
-  sh("echo \"omgrobots\" | appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/matches_2010cmp.csv --kind=Match --url=http://localhost:8088/_ah/remote_api --num_threads=1 --email=admin@localhost --passin")
-  print("Enqueuing building EventTeams")
-  sh("curl -s http://localhost:8088/tasks/math/enqueue/eventteam_update")
-  print("Getting 2010cmp videos from TBA")
-  sh("curl -s http://localhost:8088/tasks/math/do/tba_videos/2010cmp")
-  print("Getting 2013 Event List")
-  sh("curl -s http://localhost:8088/tasks/get/usfirst_event_list/2013")
-
-  clean()
-  print("Done setting up! 2013 events loaded and 2010cmp is now ready for testing.")
+  """Set up for development environments."""
+  setup_function()
 
 
 @task
@@ -101,6 +69,16 @@ def preflight():
 @task
 def lint():
   sh("python linter.py")
+
+
+def setup_function():
+  print("Building CSS/JS...")
+  less()
+  javascript()
+
+  print("Set up test data at http://localhost:8088/admin")
+  print("1/ Click 'Get Teams' and 'Create Test Events'")
+  print("2/ Click 'Create Test Events'")
 
 
 def test_function(args):
