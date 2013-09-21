@@ -7,62 +7,11 @@ from paver.easy import *
 
 path = path("./")
 
-
 @task
-def clean():
-  """Get rid of junk files."""
-
-  if path.files("bulkloader-*"):
-    sh("rm bulkloader-*")
-    print("All cleaned up!")
-  else:
-    print("Nothing to clean! :)")
-
-
-@task
-def setup():
-  """Set up data for development environments."""
-
-  print("Building CSS/JS...")
-  less()
-  javascript()
-
-  print("Setting up dev data.")
-
-  print("Getting Teams")
-  sh("curl -s http://localhost:8088/tasks/get/fms_team_list")
-  print("Importing test Event data")
-  sh("echo \"omgrobots\" | appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/events.csv --kind=Event --url=http://localhost:8088/_ah/remote_api --num_threads=1 --email=admin@localhost --passin")
-  print("Importing test Match data")
-  sh("echo \"omgrobots\" | appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/matches_2010cmp.csv --kind=Match --url=http://localhost:8088/_ah/remote_api --num_threads=1 --email=admin@localhost --passin")
-  print("Enqueuing building EventTeams")
-  sh("curl -s http://localhost:8088/tasks/math/enqueue/eventteam_update")
-  print("Getting 2010cmp videos from TBA")
-  sh("curl -s http://localhost:8088/tasks/math/do/tba_videos/2010cmp")
-  print("Getting 2013 Event List")
-  sh("curl -s http://localhost:8088/tasks/get/usfirst_event_list/2013")
-
-  clean()
-  print("Done setting up! 2013 events loaded and 2010cmp is now ready for testing.")
-
-
-@task
-def test():
-  """Run tests."""
-  print("Running Tests")
-  sh("python run_tests.py")
-
-
-@task
-def test_fast():
-  """Run tests that don't require HTTP"""
-  print("Running Fast Tests")
-  sh("python run_tests.py /usr/local/google_appengine test_math_*.py")
-  sh("python run_tests.py /usr/local/google_appengine test_*parser*.py")
-  sh("python run_tests.py /usr/local/google_appengine test_*manipulator.py")
-  sh("python run_tests.py /usr/local/google_appengine test_*api.py")
-  sh("python run_tests.py /usr/local/google_appengine test_event.py")
-  sh("python run_tests.py /usr/local/google_appengine test_match_cleanup.py")
+def javascript():
+    """Combine Compress Javascript"""
+    print("Combining and Compressing Javascript")
+    sh("python do_compress.py js")
 
 
 @task
@@ -75,18 +24,14 @@ def less():
 
 
 @task
-def javascript():
-    """Combine Compress Javascript"""
-    print("Combining and Compressing Javascript")
-    sh("python do_compress.py js")
+def lint():
+  sh("python linter.py")
 
 
 @task
-def preflight():
-  """Prep a prod push"""
-  test()
-  less()
+def make():
   javascript()
+  less()
 
   git_branch_name = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
   git_last_commit = subprocess.check_output(["git", "log", "-1"])
@@ -99,5 +44,50 @@ def preflight():
 
 
 @task
-def lint():
-  sh("python linter.py")
+def preflight():
+  """Prep a prod push"""
+  test_function([])
+  make()
+
+
+@task
+def setup():
+  """Set up for development environments."""
+  setup_function()
+
+
+@task
+@consume_args
+def test(args):
+  """Run tests. Accepts an argument to match subnames of tests"""
+  test_function(args)
+
+
+@task
+def test_fast():
+  """Run tests that don't require HTTP"""
+  print("Running Fast Tests")
+  sh("python run_tests.py --test_pattern=test_math_*.py")
+  sh("python run_tests.py --test_pattern=test_*parser*.py")
+  sh("python run_tests.py --test_pattern=test_*manipulator.py")
+  sh("python run_tests.py --test_pattern=test_*api.py")
+  sh("python run_tests.py --test_pattern=test_event.py")
+  sh("python run_tests.py --test_pattern=test_match_cleanup.py")
+
+
+def setup_function():
+  make()
+
+  print("Set up test data at http://localhost:8088/admin")
+  print("1/ Click 'Get Teams' and 'Create Test Events'")
+  print("2/ Click 'Create Test Events'")
+
+
+def test_function(args):
+  print("Running Tests")
+
+  test_pattern = ""
+  if len(args) > 0:
+    test_pattern = " --test_pattern=*%s*" % args[0]
+
+  sh("python run_tests.py%s" % test_pattern)

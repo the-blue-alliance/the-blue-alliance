@@ -24,4 +24,4 @@ else:
     }
 
 CONFIG['landing_handler'] = OFFSEASON
-CONFIG["static_resource_version"] = 6
+CONFIG["static_resource_version"] = 7

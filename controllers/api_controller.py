@@ -2,11 +2,12 @@
 import json
 import logging
 import os
+import urllib
 import webapp2
 
 from datetime import datetime
 
-from google.appengine.api import memcache
+from google.appengine.api import memcache, urlfetch
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
@@ -16,6 +17,7 @@ from helpers.api_helper import ApiHelper
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
+from models.sitevar import Sitevar
 from models.team import Team
 
 # Note: generally caching for the API happens in ApiHelper
@@ -27,6 +29,35 @@ class MainApiHandler(webapp2.RequestHandler):
         # Need to initialize a webapp2 instance
         self.initialize(request, response)
         logging.info(request)
+
+    def _track_call(self, api_action, api_details=''):
+        # Creates asynchronous call
+        rpc = urlfetch.create_rpc()
+
+        analytics_id = Sitevar.get_by_id("google_analytics.id")
+        if analytics_id is None:
+            logging.warning("Missing sitevar: google_analytics.id. Can't track API usage.")
+        else:
+            GOOGLE_ANALYTICS_ID = analytics_id.contents['GOOGLE_ANALYTICS_ID']
+            params = urllib.urlencode({
+                'v': 1,
+                'tid': GOOGLE_ANALYTICS_ID,
+                'cid': '1',
+                't': 'event',
+                'ec': 'api',
+                'ea': api_action,
+                'el': api_details,
+                'ev': 1,
+                'ni': 1
+            })
+
+            # Sets up the call
+            analytics_url = 'http://www.google-analytics.com/collect'
+            urlfetch.make_fetch_call(rpc=rpc,
+                url=analytics_url,
+                payload=params,
+                method=urlfetch.POST,
+                headers={'Content-Type': 'application/x-www-form-urlencoded'})
 
 
 class ApiTeamsShow(MainApiHandler):
@@ -44,6 +75,10 @@ class ApiTeamsShow(MainApiHandler):
             response_json = {"Property Error": "No team found for key in %s" % str(teams)}
 
         self.response.out.write(json.dumps(teams))
+
+        team_keys_sorted = sorted(team_keys)
+        track_team_keys = ",".join(team_keys_sorted)
+        self._track_call('teams/show', track_team_keys)
 
 
 class ApiTeamDetails(MainApiHandler):
@@ -64,6 +99,11 @@ class ApiTeamDetails(MainApiHandler):
             # TODO: matches
 
             self.response.out.write(json.dumps(response_json))
+
+            track_team_key = team_key
+            if year:
+                track_team_key = track_team_key + ' (' + year + ')'
+            self._track_call('teams/details', track_team_key)
 
         except IndexError:
             response_json = {"Property Error": "No team found for the key given"}
@@ -124,6 +164,8 @@ class ApiEventList(MainApiHandler):
         self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(event_list))
 
+        self._track_call('events/list')
+
 
 class ApiEventDetails(MainApiHandler):
     """
@@ -142,24 +184,31 @@ class ApiEventDetails(MainApiHandler):
         self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(event_dict))
 
+        self._track_call('events/details', event_key)
+
 
 class ApiMatchDetails(MainApiHandler):
     """
     Returns specific matches with details.
     """
     def get(self):
-        if self.request.get('match') is not '':
-            match_keys = self.request.get('match').split(',')
-
-        if self.request.get('matches') is not '':
-            match_keys = self.request.get('matches').split(',')
-
-        match_json = []
-        for match in match_keys:
-            match_json.append(ApiHelper.getMatchDetails(match))
+        value = self.request.get('match') or self.request.get('matches')
+        if value is not '':
+            match_keys = value.split(',')
+            match_keys_sorted = sorted(value.split(','))
+            track_matches_keys = ",".join(match_keys_sorted)
+            track_matches = value
+            match_json = []
+            for match in match_keys:
+                match_json.append(ApiHelper.getMatchDetails(match))
+        else:
+            match_json = {'error': 'The "match" parameter is missing'}
+            track_matches = 'error'
 
         self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(match_json))
+
+        self._track_call('matches/details', track_matches)
 
 
 class CsvTeamsAll(MainApiHandler):
@@ -184,3 +233,5 @@ class CsvTeamsAll(MainApiHandler):
                 memcache.set(memcache_key, output, 86400)
 
         self.response.out.write(output)
+
+        self._track_call('teams/list')
