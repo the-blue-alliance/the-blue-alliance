@@ -58,7 +58,7 @@ def test_fast():
   """Run tests that don't require HTTP"""
   print("Running Fast Tests")
   sh("python run_tests.py /usr/local/google_appengine test_math_*.py")
-  sh("python run_tests.py /usr/local/google_appengine test_*parser.py")
+  sh("python run_tests.py /usr/local/google_appengine test_*parser*.py")
   sh("python run_tests.py /usr/local/google_appengine test_*manipulator.py")
   sh("python run_tests.py /usr/local/google_appengine test_*api.py")
   sh("python run_tests.py /usr/local/google_appengine test_event.py")
