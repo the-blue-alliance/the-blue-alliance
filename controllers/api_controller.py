@@ -36,29 +36,28 @@ class MainApiHandler(webapp2.RequestHandler):
 
         analytics_id = Sitevar.get_by_id("google_analytics.id")
         if analytics_id == None:
-            log.warning("Missing sitevar: google_analytics.id. Can't track API usage.")
-        GOOGLE_ANALYTICS_ID = analytics_id.contents['GOOGLE_ANALYTICS_ID']
-        params = urllib.urlencode({
-            'v': 1,
-            'tid': GOOGLE_ANALYTICS_ID,
-            'cid': '1',
-            't': 'event',
-            'ec': 'api',
-            'ea': api_action,
-            'el': api_details,
-            'ev': 1,
-            'ni': 1
-        })
+            logging.warning("Missing sitevar: google_analytics.id. Can't track API usage.")
+        else:
+            GOOGLE_ANALYTICS_ID = analytics_id.contents['GOOGLE_ANALYTICS_ID']
+            params = urllib.urlencode({
+                'v': 1,
+                'tid': GOOGLE_ANALYTICS_ID,
+                'cid': '1',
+                't': 'event',
+                'ec': 'api',
+                'ea': api_action,
+                'el': api_details,
+                'ev': 1,
+                'ni': 1
+            })
 
-        # Sets up the call
-        analytics_url = 'http://www.google-analytics.com/collect'
-        urlfetch.make_fetch_call(rpc=rpc,
-            url=analytics_url,
-            payload=params,
-            method=urlfetch.POST,
-            headers={'Content-Type': 'application/x-www-form-urlencoded'})
-
-        rpc.get_result()
+            # Sets up the call
+            analytics_url = 'http://www.google-analytics.com/collect'
+            urlfetch.make_fetch_call(rpc=rpc,
+                url=analytics_url,
+                payload=params,
+                method=urlfetch.POST,
+                headers={'Content-Type': 'application/x-www-form-urlencoded'})
 
 
 class ApiTeamsShow(MainApiHandler):
