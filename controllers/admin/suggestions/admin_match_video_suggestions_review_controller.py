@@ -9,20 +9,22 @@ from helpers.suggestions.match_suggestion_accepter import MatchSuggestionAccepte
 from models.suggestion import Suggestion
 
 
-class AdminSuggestionsReviewController(LoggedInHandler):
+class AdminMatchVideoSuggestionsReviewController(LoggedInHandler):
     """
     View the list of suggestions.
     """
     def get(self):
         self._require_admin()
 
-        suggestions = Suggestion.query().filter(Suggestion.review_state == Suggestion.REVIEW_PENDING)
+        suggestions = Suggestion.query().filter(
+            Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
+            Suggestion.target_model == "match")
 
         self.template_values.update({
             "suggestions": suggestions,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../../templates/admin/suggestion_list.html')
+        path = os.path.join(os.path.dirname(__file__), '../../../templates/admin/match_video_suggestion_list.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self):
@@ -51,4 +53,4 @@ class AdminSuggestionsReviewController(LoggedInHandler):
 
         ndb.put_multi(all_suggestions)
 
-        self.redirect("/admin/suggestions/review")
+        self.redirect("/admin/suggestions/match/video/review")
