@@ -9,7 +9,7 @@
 <form action="/admin/suggestions/event/webcast/review" method="post">
     <div class="col-xs-12">
 
-        {% if success %}
+        {% if success == "accept" %}
         <div class="row">
             <div class="alert alert-success">
                 <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -18,6 +18,14 @@
                     <a href="/event/{{event_key}}" class="btn btn-default">View on TBA</a>
                     <a href="/admin/event/{{event_key}}" class="btn btn-default">View in Admin</a>
                 </div>
+            </div>
+        </div>
+        {% endif %}
+        {% if success == "reject" %}
+        <div class="row">
+            <div class="alert alert-warning">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <h4>Rejected webcast!</h4>
             </div>
         </div>
         {% endif %}
@@ -32,7 +40,7 @@
                         {% include "partials/webcast_add_form_partial.html" %}
                         <input type="hidden" name="suggestion_key" value="{{suggestion.key.id}}" />
                         <input type="hidden" name="event_key" value="{{suggestion.target_key}}" />
-                        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Add Webcast</button>
+                        <button type="submit" class="btn btn-primary" name="verdict" value="accept"><span class="glyphicon glyphicon-thumbs-up"></span> Add Webcast</button> <button type="submit" class="btn btn-error" name="verdict" value="reject"><span class="glyphicon glyphicon-thumbs-down"></span> Reject</button>
                     </form>
                 </div>
                 <div class="col-xs-6">

@@ -35,22 +35,38 @@ class AdminEventWebcastSuggestionsReviewController(LoggedInHandler):
     def post(self):
         self._require_admin()
 
-        webcast = dict()
-        webcast["type"] = self.request.get("webcast_type")
-        webcast["channel"] = self.request.get("webcast_channel")
-        if self.request.get("webcast_file"):
-            webcast["file"] = self.request.get("webcast_file")
+        if self.request.get("verdict") == "accept":
+            webcast = dict()
+            webcast["type"] = self.request.get("webcast_type")
+            webcast["channel"] = self.request.get("webcast_channel")
+            if self.request.get("webcast_file"):
+                webcast["file"] = self.request.get("webcast_file")
 
-        event = Event.get_by_id(self.request.get("event_key"))
-        suggestion = Suggestion.get_by_id(int(self.request.get("suggestion_key")))
+            event = Event.get_by_id(self.request.get("event_key"))
+            suggestion = Suggestion.get_by_id(int(self.request.get("suggestion_key")))
 
-        EventWebcastAdder.add_webcast(event, webcast)
+            EventWebcastAdder.add_webcast(event, webcast)
 
-        suggestion.review_state = Suggestion.REVIEW_ACCEPTED
-        suggestion.reviewer = self.user_bundle.account.key
-        suggestion.reviewer_at = datetime.datetime.now()
-        suggestion.put()
+            suggestion.review_state = Suggestion.REVIEW_ACCEPTED
+            suggestion.reviewer = self.user_bundle.account.key
+            suggestion.reviewer_at = datetime.datetime.now()
+            suggestion.put()
 
-        # TODO: Allow rejecting suggestions -gregmarra 20130921
+            self.redirect("/admin/suggestions/event/webcast/review?success=accept&event_key=%s" % event.key.id())
+            return
 
-        self.redirect("/admin/suggestions/event/webcast/review?success=1&event_key=%s" % event.key.id())
+        elif self.request.get("verdict") == "reject":
+            suggestion = Suggestion.get_by_id(int(self.request.get("suggestion_key")))
+
+            suggestion.review_state = Suggestion.REVIEW_REJECTED
+            suggestion.reviewer = self.user_bundle.account.key
+            suggestion.reviewer_at = datetime.datetime.now()
+            suggestion.put()
+
+            self.redirect("/admin/suggestions/event/webcast/review?success=reject")
+            return
+
+        self.redirect("/admin/suggestions/event/webcast/review")
+
+
+
