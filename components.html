@@ -15,7 +15,7 @@ base_url: "../"
     </div>
 
     <h2 id="glyphicons-glyphs">Available glyphs</h2>
-    <p>Includes 180 glyphs in font format from the Glyphicon Halflings set. <a href="http://glyphicons.com/">Glyphicons</a> Halflings are normally not available for free, but their creator has made them available for Bootstrap free of cost. As a thank you, we only ask that you to include a link back to <a href="http://glyphicons.com/">Glyphicons</a> whenever possible.</p>
+    <p>Includes 200 glyphs in font format from the Glyphicon Halflings set. <a href="http://glyphicons.com/">Glyphicons</a> Halflings are normally not available for free, but their creator has made them available for Bootstrap free of cost. As a thank you, we only ask that you to include a link back to <a href="http://glyphicons.com/">Glyphicons</a> whenever possible.</p>
     <ul class="bs-glyphicons">
       <li><span class="glyphicon glyphicon-adjust"></span> .glyphicon .glyphicon-adjust</li>
       <li><span class="glyphicon glyphicon-align-center"></span> .glyphicon .glyphicon-align-center</li>
@@ -558,9 +558,9 @@ base_url: "../"
 
     <div class="bs-example">
       <div class="btn-group btn-group-justified">
-        <button type="button" class="btn btn-default">Left</button>
-        <button type="button" class="btn btn-default">Middle</button>
-        <button type="button" class="btn btn-default">Right</button>
+        <a class="btn btn-default" role="button">Left</a>
+        <a class="btn btn-default" role="button">Middle</a>
+        <a class="btn btn-default" role="button">Right</a>
       </div>
     </div>
 {% highlight html %}
@@ -671,7 +671,10 @@ base_url: "../"
     <div class="bs-example">
       <div class="btn-group">
         <button type="button" class="btn btn-default">Default</button>
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+          <span class="caret"></span>
+          <span class="sr-only">Toggle Dropdown</span>
+        </button>
         <ul class="dropdown-menu" role="menu">
           <li><a href="#">Action</a></li>
           <li><a href="#">Another action</a></li>
@@ -682,7 +685,10 @@ base_url: "../"
       </div><!-- /btn-group -->
       <div class="btn-group">
         <button type="button" class="btn btn-primary">Primary</button>
-        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+          <span class="caret"></span>
+          <span class="sr-only">Toggle Dropdown</span>
+        </button>
         <ul class="dropdown-menu" role="menu">
           <li><a href="#">Action</a></li>
           <li><a href="#">Another action</a></li>
@@ -693,7 +699,10 @@ base_url: "../"
       </div><!-- /btn-group -->
       <div class="btn-group">
         <button type="button" class="btn btn-success">Success</button>
-        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+          <span class="caret"></span>
+          <span class="sr-only">Toggle Dropdown</span>
+        </button>
         <ul class="dropdown-menu" role="menu">
           <li><a href="#">Action</a></li>
           <li><a href="#">Another action</a></li>
@@ -704,7 +713,10 @@ base_url: "../"
       </div><!-- /btn-group -->
       <div class="btn-group">
         <button type="button" class="btn btn-info">Info</button>
-        <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+        <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+          <span class="caret"></span>
+          <span class="sr-only">Toggle Dropdown</span>
+        </button>
         <ul class="dropdown-menu" role="menu">
           <li><a href="#">Action</a></li>
           <li><a href="#">Another action</a></li>
@@ -715,7 +727,10 @@ base_url: "../"
       </div><!-- /btn-group -->
       <div class="btn-group">
         <button type="button" class="btn btn-warning">Warning</button>
-        <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+        <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
+          <span class="caret"></span>
+          <span class="sr-only">Toggle Dropdown</span>
+        </button>
         <ul class="dropdown-menu" role="menu">
           <li><a href="#">Action</a></li>
           <li><a href="#">Another action</a></li>
@@ -726,7 +741,10 @@ base_url: "../"
       </div><!-- /btn-group -->
       <div class="btn-group">
         <button type="button" class="btn btn-danger">Danger</button>
-        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+          <span class="caret"></span>
+          <span class="sr-only">Toggle Dropdown</span>
+        </button>
         <ul class="dropdown-menu" role="menu">
           <li><a href="#">Action</a></li>
           <li><a href="#">Another action</a></li>
@@ -742,6 +760,7 @@ base_url: "../"
   <button type="button" class="btn btn-danger">Action</button>
   <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
     <span class="caret"></span>
+    <span class="sr-only">Toggle Dropdown</span>
   </button>
   <ul class="dropdown-menu" role="menu">
     <li><a href="#">Action</a></li>
@@ -837,7 +856,10 @@ base_url: "../"
       <div class="btn-toolbar" role="toolbar">
         <div class="btn-group dropup">
           <button type="button" class="btn btn-default">Dropup</button>
-          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <span class="caret"></span>
+            <span class="sr-only">Toggle Dropdown</span>
+          </button>
           <ul class="dropdown-menu" role="menu">
             <li><a href="#">Action</a></li>
             <li><a href="#">Another action</a></li>
@@ -848,7 +870,10 @@ base_url: "../"
         </div><!-- /btn-group -->
         <div class="btn-group dropup">
           <button type="button" class="btn btn-primary">Right dropup</button>
-          <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+          <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+            <span class="caret"></span>
+            <span class="sr-only">Toggle Dropdown</span>
+          </button>
           <ul class="dropdown-menu pull-right" role="menu">
             <li><a href="#">Action</a></li>
             <li><a href="#">Another action</a></li>
@@ -864,6 +889,7 @@ base_url: "../"
   <button type="button" class="btn btn-default">Dropup</button>
   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
     <span class="caret"></span>
+    <span class="sr-only">Toggle Dropdown</span>
   </button>
   <ul class="dropdown-menu">
     <!-- Dropdown menu links -->
@@ -951,7 +977,7 @@ base_url: "../"
 {% highlight html %}
 <div class="input-group input-group-lg">
   <span class="input-group-addon">@</span>
-  <input type="text" class="form-control input-lg" placeholder="Username">
+  <input type="text" class="form-control" placeholder="Username">
 </div>
 
 <div class="input-group">
@@ -1133,6 +1159,7 @@ base_url: "../"
               <button type="button" class="btn btn-default" tabindex="-1">Action</button>
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" tabindex="-1">
                 <span class="caret"></span>
+                <span class="sr-only">Toggle Dropdown</span>
               </button>
               <ul class="dropdown-menu" role="menu">
                 <li><a href="#">Action</a></li>
@@ -1152,6 +1179,7 @@ base_url: "../"
               <button type="button" class="btn btn-default" tabindex="-1">Action</button>
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" tabindex="-1">
                 <span class="caret"></span>
+                <span class="sr-only">Toggle Dropdown</span>
               </button>
               <ul class="dropdown-menu pull-right" role="menu">
                 <li><a href="#">Action</a></li>
@@ -1210,6 +1238,10 @@ base_url: "../"
   <li><a href="#">Messages</a></li>
 </ul>
 {% endhighlight %}
+    <div class="bs-callout bs-callout-info">
+      <h4>Requires JavaScript tabs plugin</h4>
+      <p>For tabs with tabbable areas, you must use the <a href="../javascript/#tabs">tabs JavaScript plugin</a>.</p>
+    </div>
 
     <h2 id="nav-pills">Pills</h2>
     <p>Take that same HTML, but use <code>.nav-pills</code> instead:</p>
@@ -1243,7 +1275,11 @@ base_url: "../"
 
 
     <h2 id="nav-justified">Justified</h2>
-    <p>Easily make tabs or pills equal widths of their parent with <code>.nav-justified</code>.</p>
+    <p>Easily make tabs or pills equal widths of their parent at screens wider than 768px with <code>.nav-justified</code>. On smaller screens, the nav links are stacked.</p>
+    <div class="bs-callout bs-callout-warning">
+      <h4>WebKit and responsive justified navs</h4>
+      <p>Chrome and Safari both exhibit a bug in which resizing your browser horizontally causes rendering errors in the justified nav that are cleared upon refreshing. This bug is also shown in the <a href="../examples/justified-nav/">justified nav example</a>.</p>
+    </div>
     <div class="bs-example">
       <ul class="nav nav-tabs nav-justified">
         <li class="active"><a href="#">Home</a></li>
@@ -1405,7 +1441,9 @@ base_url: "../"
                 <li><a href="#">Action</a></li>
                 <li><a href="#">Another action</a></li>
                 <li><a href="#">Something else here</a></li>
+                <li class="divider"></li>
                 <li><a href="#">Separated link</a></li>
+                <li class="divider"></li>
                 <li><a href="#">One more separated link</a></li>
               </ul>
             </li>
@@ -1424,6 +1462,7 @@ base_url: "../"
                 <li><a href="#">Action</a></li>
                 <li><a href="#">Another action</a></li>
                 <li><a href="#">Something else here</a></li>
+                <li class="divider"></li>
                 <li><a href="#">Separated link</a></li>
               </ul>
             </li>
@@ -1455,7 +1494,9 @@ base_url: "../"
           <li><a href="#">Action</a></li>
           <li><a href="#">Another action</a></li>
           <li><a href="#">Something else here</a></li>
+          <li class="divider"></li>
           <li><a href="#">Separated link</a></li>
+          <li class="divider"></li>
           <li><a href="#">One more separated link</a></li>
         </ul>
       </li>
@@ -1474,6 +1515,7 @@ base_url: "../"
           <li><a href="#">Action</a></li>
           <li><a href="#">Another action</a></li>
           <li><a href="#">Something else here</a></li>
+          <li class="divider"></li>
           <li><a href="#">Separated link</a></li>
         </ul>
       </li>
@@ -1493,8 +1535,9 @@ base_url: "../"
 </div>
 
 
-    <h2 id="navbar-buttons">Buttons</h2>
-    <p>For buttons not residing in a <code>&lt;form&gt;</code>, add this class to vertically center buttons within a navbar.</p>
+    <h2 id="navbar-forms">Forms</h2>
+    <p>Place form content within <code>.navbar-form</code> for proper vertical alignment and collapsed behavior in narrow viewports. Use the alignment options to decide where it resides within the navbar content.</p>
+    <p>As a heads up, <code>.navbar-form</code> shares much of its code with <code>.form-inline</code> via mixin.</p>
     <div class="bs-example">
       <nav class="navbar navbar-default" role="navigation">
         <div class="navbar-header">
@@ -1507,6 +1550,44 @@ base_url: "../"
           <a class="navbar-brand" href="#">Brand</a>
         </div>
         <div class="collapse navbar-collapse navbar-ex2-collapse">
+          <form class="navbar-form navbar-left" role="search">
+            <div class="form-group">
+              <input type="text" class="form-control" placeholder="Search">
+            </div>
+            <button type="submit" class="btn btn-default">Submit</button>
+          </form>
+        </div>
+      </nav>
+    </div>
+{% highlight html %}
+<form class="navbar-form navbar-left" role="search">
+  <div class="form-group">
+    <input type="text" class="form-control" placeholder="Search">
+  </div>
+  <button type="submit" class="btn btn-default">Submit</button>
+</form>
+{% endhighlight %}
+
+<div class="bs-callout bs-callout-danger">
+  <h4>Always add labels</h4>
+  <p>Screen readers will have trouble with your forms if you don't include a label for every input. For these inline navbar forms, you can hide the labels using the <code>.sr-only</code> class.</p>
+</div>
+
+
+    <h2 id="navbar-buttons">Buttons</h2>
+    <p>For buttons not residing in a <code>&lt;form&gt;</code>, add this class to vertically center buttons within a navbar.</p>
+    <div class="bs-example">
+      <nav class="navbar navbar-default" role="navigation">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex3-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Brand</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex3-collapse">
           <button type="button" class="btn btn-default navbar-btn">Sign in</button>
         </div>
       </nav>
@@ -1521,7 +1602,7 @@ base_url: "../"
     <div class="bs-example">
       <nav class="navbar navbar-default" role="navigation">
         <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex3-collapse">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex4-collapse">
             <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
@@ -1529,7 +1610,7 @@ base_url: "../"
           </button>
           <a class="navbar-brand" href="#">Brand</a>
         </div>
-        <div class="collapse navbar-collapse navbar-ex3-collapse">
+        <div class="collapse navbar-collapse navbar-ex4-collapse">
           <p class="navbar-text">Signed in as Mark Otto</p>
         </div>
       </nav>
@@ -1544,7 +1625,7 @@ base_url: "../"
     <div class="bs-example">
       <nav class="navbar navbar-default" role="navigation">
         <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex4-collapse">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex5-collapse">
             <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
@@ -1552,7 +1633,7 @@ base_url: "../"
           </button>
           <a class="navbar-brand" href="#">Brand</a>
         </div>
-        <div class="collapse navbar-collapse navbar-ex4-collapse">
+        <div class="collapse navbar-collapse navbar-ex5-collapse">
           <p class="navbar-text pull-right">Signed in as <a href="#" class="navbar-link">Mark Otto</a></p>
         </div>
       </nav>
@@ -1573,7 +1654,7 @@ base_url: "../"
       <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex5-collapse">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex6-collapse">
             <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
@@ -1583,7 +1664,7 @@ base_url: "../"
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse navbar-ex5-collapse">
+        <div class="collapse navbar-collapse navbar-ex6-collapse">
           <ul class="nav navbar-nav">
             <li class="active"><a href="#">Home</a></li>
             <li><a href="#">Link</a></li>
@@ -1614,7 +1695,7 @@ body { padding-top: 70px; }
       <nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex6-collapse">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex7-collapse">
             <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
@@ -1624,7 +1705,7 @@ body { padding-top: 70px; }
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse navbar-ex6-collapse">
+        <div class="collapse navbar-collapse navbar-ex7-collapse">
           <ul class="nav navbar-nav">
             <li class="active"><a href="#">Home</a></li>
             <li><a href="#">Link</a></li>
@@ -1655,7 +1736,7 @@ body { padding-bottom: 70px; }
       <nav class="navbar navbar-default navbar-static-top" role="navigation">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex7-collapse">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex8-collapse">
             <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
@@ -1665,7 +1746,7 @@ body { padding-bottom: 70px; }
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse navbar-ex7-collapse">
+        <div class="collapse navbar-collapse navbar-ex8-collapse">
           <ul class="nav navbar-nav">
             <li class="active"><a href="#">Home</a></li>
             <li><a href="#">Link</a></li>
@@ -1687,7 +1768,7 @@ body { padding-bottom: 70px; }
       <nav class="navbar navbar-inverse" role="navigation">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex8-collapse">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex9-collapse">
             <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
@@ -1697,7 +1778,7 @@ body { padding-bottom: 70px; }
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse navbar-ex8-collapse">
+        <div class="collapse navbar-collapse navbar-ex9-collapse">
           <ul class="nav navbar-nav">
             <li class="active"><a href="#">Home</a></li>
             <li><a href="#">Link</a></li>
@@ -2021,7 +2102,7 @@ body { padding-bottom: 70px; }
     <div class="page-header">
       <h1 id="jumbotron">Jumbotron</h1>
     </div>
-    <p>A lightweight, flexible component that can optional extend the entire viewport to showcase key content on your site. To make the jumbotron full width, don't include it within a <code>.container</code>. Placing it within a container will keep it at the width of the rest of your content and provide rounded corners.</p>
+    <p>A lightweight, flexible component that can optionally extend the entire viewport to showcase key content on your site. To make the jumbotron full width, don't include it within a <code>.container</code>. Placing it within a container will keep it at the width of the rest of your content and provide rounded corners.</p>
     <div class="bs-example">
       <div class="jumbotron">
         <div class="container">
@@ -2114,7 +2195,7 @@ body { padding-bottom: 70px; }
     <p>With a bit of extra markup, it's possible to add any kind of HTML content like headings, paragraphs, or buttons into thumbnails.</p>
     <div class="bs-example">
       <div class="row">
-        <div class="col-sm-6 col-md-3">
+        <div class="col-sm-6 col-md-4">
           <div class="thumbnail">
             <img data-src="holder.js/300x200" alt="Generic placeholder thumbnail" src="data:image/png;base64,">
             <div class="caption">
@@ -2124,7 +2205,7 @@ body { padding-bottom: 70px; }
             </div>
           </div>
         </div>
-        <div class="col-sm-6 col-md-3">
+        <div class="col-sm-6 col-md-4">
           <div class="thumbnail">
             <img data-src="holder.js/300x200" alt="Generic placeholder thumbnail" src="data:image/png;base64,">
             <div class="caption">
@@ -2134,7 +2215,7 @@ body { padding-bottom: 70px; }
             </div>
           </div>
         </div>
-        <div class="col-sm-6 col-md-3">
+        <div class="col-sm-6 col-md-4">
           <div class="thumbnail">
             <img data-src="holder.js/300x200" alt="Generic placeholder thumbnail" src="data:image/png;base64,">
             <div class="caption">
@@ -2148,7 +2229,7 @@ body { padding-bottom: 70px; }
     </div><!-- /.bs-example -->
 {% highlight html %}
 <div class="row">
-  <div class="col-sm-6 col-md-3">
+  <div class="col-sm-6 col-md-4">
     <div class="thumbnail">
       <img data-src="holder.js/300x200" alt="...">
       <div class="caption">
@@ -2171,7 +2252,7 @@ body { padding-bottom: 70px; }
     <div class="page-header">
       <h1 id="alerts">Alerts</h1>
     </div>
-    <p class="lead">Provide contextual feedback messages for typical user actions with the handful of available and flexible alert messages. For inline dismissal, use the <a href="../javascript/#js-alerts">alerts jQuery plugin</a>.</p>
+    <p class="lead">Provide contextual feedback messages for typical user actions with the handful of available and flexible alert messages. For inline dismissal, use the <a href="../javascript/#alerts">alerts jQuery plugin</a>.</p>
 
     <h2 id="alerts-examples">Examples</h2>
     <p>Wrap any text and an optional dismiss button in <code>.alert</code> and one of the four contextual classes (e.g., <code>.alert-success</code>) for basic alert messages.</p>
@@ -2205,13 +2286,13 @@ body { padding-bottom: 70px; }
     <h2 id="alerts-dismissable">Dismissable alerts</h2>
     <p>Build on any alert by adding an optional <code>.alert-dismissable</code> and close button.</p>
     <div class="bs-example">
-      <div class="alert alert-dismissable">
+      <div class="alert alert-warning alert-dismissable">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
         <strong>Warning!</strong> Best check yo self, you're not looking too good.
       </div>
     </div>
 {% highlight html %}
-<div class="alert alert-dismissable">
+<div class="alert alert-warning alert-dismissable">
   <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
   <strong>Warning!</strong> Best check yo self, you're not looking too good.
 </div>
