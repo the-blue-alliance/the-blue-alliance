@@ -180,7 +180,7 @@ class FinalMatchesRepairDo(webapp.RequestHandler):
         match_keys_to_repair = []
         for match_key in final_match_keys:
             key_name = match_key.id()
-            if '_f0' in key_name:
+            if '_f0m' in key_name:
                 match_keys_to_repair.append(match_key)
 
         deleted_keys = []
