@@ -19,7 +19,7 @@ from models.team import Team
 class ApiHelper(object):
     """Helper for api_controller."""
     @classmethod
-    def getTeamInfo(self, team_key):
+    def getTeamInfo(cls, team_key):
         """
         Return a Team dict with basic information.
         """
@@ -58,7 +58,7 @@ class ApiHelper(object):
         return team_dict
 
     @classmethod
-    def getEventInfo(self, event_key):
+    def getEventInfo(cls, event_key):
         """
         Return an Event dict with basic information
         """
@@ -96,7 +96,7 @@ class ApiHelper(object):
         return event_dict
 
     @classmethod
-    def addTeamEvents(self, team_dict, year):
+    def addTeamEvents(cls, team_dict, year):
         """
         Consume a Team dict, and return it with a year's Events.
         """
@@ -107,7 +107,7 @@ class ApiHelper(object):
             team = Team.get_by_id(team_dict["key"])
             events = [a.event.get() for a in EventTeam.query(EventTeam.team == team.key, EventTeam.year == int(year)).fetch(1000)]
             events = sorted(events, key=lambda event: event.start_date)
-            event_list = [self.getEventInfo(e.key_name) for e in events]
+            event_list = [cls.getEventInfo(e.key_name) for e in events]
             for event_dict, event in zip(event_list, events):
                 event_dict["team_wlt"] = EventHelper.getTeamWLT(team_dict["key"], event)
 
@@ -119,7 +119,7 @@ class ApiHelper(object):
         return team_dict
 
     @classmethod
-    def addTeamDetails(self, team_dict, year):
+    def addTeamDetails(cls, team_dict, year):
         """
         Consume a Team dict, and return it with a year's Events filtered and Matches added
         """
@@ -155,7 +155,7 @@ class ApiHelper(object):
         return team_dict
 
     @classmethod
-    def getMatchDetails(self, match_key):
+    def getMatchDetails(cls, match_key):
         """
         Returns match details
         """
