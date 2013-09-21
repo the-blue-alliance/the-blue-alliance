@@ -7,6 +7,48 @@ from paver.easy import *
 
 path = path("./")
 
+@task
+def javascript():
+    """Combine Compress Javascript"""
+    print("Combining and Compressing Javascript")
+    sh("python do_compress.py js")
+
+
+@task
+def less():
+  """Build and Combine CSS"""
+  print("Building and Combining CSS")
+  sh("lessc static/css/less_css/tba_style.main.less static/css/less_css/tba_style.main.css")
+  sh("lessc static/css/less_css/tba_style.gameday.less static/css/less_css/tba_style.gameday.css")
+  sh("python do_compress.py css")
+
+
+@task
+def lint():
+  sh("python linter.py")
+
+
+@task
+def make():
+  javascript()
+  less()
+
+  git_branch_name = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
+  git_last_commit = subprocess.check_output(["git", "log", "-1"])
+  build_time = time.ctime()
+  data = {'git_branch_name': git_branch_name,
+          'git_last_commit': git_last_commit,
+          'build_time': build_time}
+  with open('version_info.json', 'w') as f:
+      f.write(json.dumps(data))
+
+
+@task
+def preflight():
+  """Prep a prod push"""
+  test_function([])
+  make()
+
 
 @task
 def setup():
@@ -33,48 +75,8 @@ def test_fast():
   sh("python run_tests.py --test_pattern=test_match_cleanup.py")
 
 
-@task
-def less():
-  """Build and Combine CSS"""
-  print("Building and Combining CSS")
-  sh("lessc static/css/less_css/tba_style.main.less static/css/less_css/tba_style.main.css")
-  sh("lessc static/css/less_css/tba_style.gameday.less static/css/less_css/tba_style.gameday.css")
-  sh("python do_compress.py css")
-
-
-@task
-def javascript():
-    """Combine Compress Javascript"""
-    print("Combining and Compressing Javascript")
-    sh("python do_compress.py js")
-
-
-@task
-def preflight():
-  """Prep a prod push"""
-  test_function([])
-  less()
-  javascript()
-
-  git_branch_name = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
-  git_last_commit = subprocess.check_output(["git", "log", "-1"])
-  build_time = time.ctime()
-  data = {'git_branch_name': git_branch_name,
-          'git_last_commit': git_last_commit,
-          'build_time': build_time}
-  with open('version_info.json', 'w') as f:
-      f.write(json.dumps(data))
-
-
-@task
-def lint():
-  sh("python linter.py")
-
-
 def setup_function():
-  print("Building CSS/JS...")
-  less()
-  javascript()
+  make()
 
   print("Set up test data at http://localhost:8088/admin")
   print("1/ Click 'Get Teams' and 'Create Test Events'")
