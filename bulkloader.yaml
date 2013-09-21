@@ -38,22 +38,22 @@ transformers:
 
     - property: event_short
       external_name: event_short
-      
+
     - property: event_type
       external_name: event_type
-      
+
     - property: first_eid
       external_name: first_eid
-      
+
     - property: location
       external_name: location
-      
+
     - property: name
       external_name: name
-      
+
     - property: short_name
       external_name: short_name
-      
+
     - property: official
       external_name: official
       import_transform: transform.regexp_bool('true', re.IGNORECASE)
@@ -68,7 +68,7 @@ transformers:
 
     - property: website
       external_name: website
-      
+
     - property: year
       external_name: year
       import_transform: transform.none_if_empty(int)
@@ -86,10 +86,10 @@ transformers:
       import_transform: bulkloader_helper.fix_json
       #TODO: Make this work
       # JSON gets enclosed by ", but only " is allowed in JSON. -gregmarra 26 Sept 2010.
-      
+
     - property: comp_level
       external_name: comp_level
-      
+
     - property: event
       external_name: event
       import_transform: transform.create_foreign_key('Event')
@@ -97,7 +97,7 @@ transformers:
 
     - property: game
       external_name: game
-      
+
     - property: match_number
       external_name: match_number
       import_transform: transform.none_if_empty(int)
@@ -110,7 +110,7 @@ transformers:
       external_name: team_key_names
       import_transform: bulkloader_helper.fix_list
       #This is such a dirty hack. It should be replaced with a better function. -gregmarra 26 Sept 2010.
-      
+
     - property: no_auto_update
       external_name: no_auto_update
       import_transform: transform.regexp_bool('true', re.IGNORECASE)
@@ -133,10 +133,10 @@ transformers:
 
     - property: name
       external_name: name
-      
+
     - property: nickname
       external_name: nickname
-      
+
     - property: team_number
       external_name: team_number
       import_transform: transform.none_if_empty(int)
