@@ -47,22 +47,28 @@ def setup():
 
 
 @task
-def test():
-  """Run tests."""
+@consume_args
+def test(args):
+  """Run tests. Accepts an argument to match subnames of tests"""
   print("Running Tests")
-  sh("python run_tests.py")
+
+  test_pattern = ""
+  if len(args) > 0:
+    test_pattern = " --test_pattern=*%s*" % args[0]
+
+  sh("python run_tests.py%s" % test_pattern)
 
 
 @task
 def test_fast():
   """Run tests that don't require HTTP"""
   print("Running Fast Tests")
-  sh("python run_tests.py /usr/local/google_appengine test_math_*.py")
-  sh("python run_tests.py /usr/local/google_appengine test_*parser.py")
-  sh("python run_tests.py /usr/local/google_appengine test_*manipulator.py")
-  sh("python run_tests.py /usr/local/google_appengine test_*api.py")
-  sh("python run_tests.py /usr/local/google_appengine test_event.py")
-  sh("python run_tests.py /usr/local/google_appengine test_match_cleanup.py")
+  sh("python run_tests.py --test_pattern=test_math_*.py")
+  sh("python run_tests.py --test_pattern=test_*parser.py")
+  sh("python run_tests.py --test_pattern=test_*manipulator.py")
+  sh("python run_tests.py --test_pattern=test_*api.py")
+  sh("python run_tests.py --test_pattern=test_event.py")
+  sh("python run_tests.py --test_pattern=test_match_cleanup.py")
 
 
 @task

@@ -29,15 +29,11 @@ def main(sdk_path, test_pattern):
 
 if __name__ == '__main__':
     parser = optparse.OptionParser(USAGE)
+
+    parser.add_option("-s", "--sdk_path", type="string", default="/usr/local/google_appengine",
+                      help="path to load Google Appengine SDK from")
+    parser.add_option("-t", "--test_pattern", type="string", default="test*.py",
+                      help="pattern for tests to run")
     options, args = parser.parse_args()
-    if len(args) < 1:
-        warnings.warn('Trying default SDK path.', RuntimeWarning)
-        sdk_path = "/usr/local/google_appengine"
-    else:
-        sdk_path = args[0]
-
-    test_pattern = "test*.py"
-    if len(args) > 1:
-        test_pattern = args[1]
-
-    main(sdk_path, test_pattern)
+    
+    main(options.sdk_path, options.test_pattern)
