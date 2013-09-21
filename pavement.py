@@ -50,13 +50,7 @@ def setup():
 @consume_args
 def test(args):
   """Run tests. Accepts an argument to match subnames of tests"""
-  print("Running Tests")
-
-  test_pattern = ""
-  if len(args) > 0:
-    test_pattern = " --test_pattern=*%s*" % args[0]
-
-  sh("python run_tests.py%s" % test_pattern)
+  test_function(args)
 
 
 @task
@@ -90,7 +84,7 @@ def javascript():
 @task
 def preflight():
   """Prep a prod push"""
-  test()
+  test_function([])
   less()
   javascript()
 
@@ -107,3 +101,13 @@ def preflight():
 @task
 def lint():
   sh("python linter.py")
+
+
+def test_function(args):
+  print("Running Tests")
+
+  test_pattern = ""
+  if len(args) > 0:
+    test_pattern = " --test_pattern=*%s*" % args[0]
+
+  sh("python run_tests.py%s" % test_pattern)
