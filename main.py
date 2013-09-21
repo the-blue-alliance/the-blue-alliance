@@ -15,6 +15,7 @@ from controllers.main_controller import ContactHandler, HashtagsHandler, \
       WebcastsHandler, RecordHandler
 from controllers.match_controller import MatchDetail
 from controllers.suggestions.suggest_match_video_controller import SuggestMatchVideoController
+from controllers.suggestions.suggest_event_webcast_controller import SuggestEventWebcastController
 from controllers.team_controller import TeamList, TeamDetail, TeamHistory
 
 from google.appengine.ext.webapp import template
@@ -45,6 +46,7 @@ app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['landing_
                                ('/match/(.*)', MatchDetail),
                                ('/opr', OprHandler),
                                ('/search', SearchHandler),
+                               ('/suggest/event/webcast', SuggestEventWebcastController),
                                ('/suggest/match/video', SuggestMatchVideoController),
                                ('/teams', TeamList),
                                ('/teams/([0-9]*)', TeamList),
