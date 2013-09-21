@@ -166,6 +166,46 @@ class EventOprEnqueue(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
 
 
+class FinalMatchesRepairDo(webapp.RequestHandler):
+    """
+    Repairs zero-indexed final matches
+    """
+    def get(self, year):
+        year_event_keys = Event.query(Event.year == int(year)).fetch(100, keys_only=True)
+
+        final_match_keys = []
+        for event_key in year_event_keys:
+            final_match_keys.extend(Match.query(Match.event == event_key, Match.comp_level == 'f').fetch(100, keys_only=True))
+
+        match_keys_to_repair = []
+        for match_key in final_match_keys:
+            key_name = match_key.id()
+            if '_f0' in key_name:
+                match_keys_to_repair.append(match_key)
+
+        deleted_keys = []
+        matches_to_repair = ndb.get_multi(match_keys_to_repair)
+        for match in matches_to_repair:
+            deleted_keys.append(match.key)
+
+            event = ndb.get_multi([match.event])[0]
+            match.set_number = 1
+            match.key = ndb.Key(Match, Match.renderKeyName(
+                event,
+                match.comp_level,
+                match.set_number,
+                match.match_number))
+
+        ndb.put_multi(matches_to_repair)
+        ndb.delete_multi(deleted_keys)
+
+        template_values = {'deleted_keys': deleted_keys,
+                           'new_matches': matches_to_repair}
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/math/final_matches_repair_do.html')
+        self.response.out.write(template.render(path, template_values))
+
+
 class YearInsightsEnqueue(webapp.RequestHandler):
     """
     Enqueues Insights calculation of a given kind for a given year
