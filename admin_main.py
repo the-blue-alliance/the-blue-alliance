@@ -10,6 +10,7 @@ from controllers.admin.admin_award_controller import AdminAwardDashboard, AdminA
 from controllers.admin.admin_match_controller import AdminVideosAdd, AdminMatchCleanup, AdminMatchDashboard, AdminMatchDelete, AdminMatchDetail, AdminMatchAdd, AdminMatchEdit
 from controllers.admin.admin_memcache_controller import AdminMemcacheMain
 from controllers.admin.admin_sitevar_controller import AdminSitevarCreate, AdminSitevarEdit, AdminSitevarList
+from controllers.admin.suggestions.admin_event_webcast_suggestions_review_controller import AdminEventWebcastSuggestionsReviewController
 from controllers.admin.suggestions.admin_match_video_suggestions_review_controller import AdminMatchVideoSuggestionsReviewController
 from controllers.admin.admin_team_controller import AdminTeamDetail, AdminTeamList
 from controllers.admin.admin_migration_controller import AdminMigration
@@ -38,6 +39,7 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/sitevars', AdminSitevarList),
                                ('/admin/sitevar/create', AdminSitevarCreate),
                                ('/admin/sitevar/edit/(.*)', AdminSitevarEdit),
+                               ('/admin/suggestions/event/webcast/review', AdminEventWebcastSuggestionsReviewController),
                                ('/admin/suggestions/match/video/review', AdminMatchVideoSuggestionsReviewController),
                                ('/admin/tasks', AdminTasksHandler),
                                ('/admin/teams', AdminTeamList),
