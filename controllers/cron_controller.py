@@ -171,7 +171,7 @@ class FinalMatchesRepairDo(webapp.RequestHandler):
     Repairs zero-indexed final matches
     """
     def get(self, year):
-        year_event_keys = Event.query(Event.year == int(year)).fetch(100, keys_only=True)
+        year_event_keys = Event.query(Event.year == int(year)).fetch(1000, keys_only=True)
 
         final_match_keys = []
         for event_key in year_event_keys:
