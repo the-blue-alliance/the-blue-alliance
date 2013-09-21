@@ -4,23 +4,6 @@
 
 {% block meta_description %}Add match videos to The Blue Alliance.{% endblock %}
 
-<div class="col-xs-6">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">Version Info</h3>
-        </div>
-        <div class="panel-body">
-            <p>Build time: {{build_time}}</p>
-            <br>
-            <p>Branch: <strong>{{git_branch_name}}</strong></p>
-            <p class="text-warning">Commit: <a href="https://github.com/gregmarra/the-blue-alliance/commit/{{commit_hash.1}}">{{commit_hash.1}}</a></p>
-            <p>{{commit_author}}</p>
-            <p>{{commit_date}}</p>
-            <p>{{commit_msg}}</p>
-        </div>
-    </div>
-</div>
-
 {% block content %}
 <div class="container">
     {% if success %}
