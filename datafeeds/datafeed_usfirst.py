@@ -33,7 +33,12 @@ class DatafeedUsfirst(DatafeedBase):
 
     EVENT_AWARDS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/awards.html"  # % (year, event_short)
     EVENT_RANKINGS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/rankings.html"  # % (year, event_short)
-    MATCH_RESULTS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/matchresults.html"  # % (year, event_short)
+
+    YEAR_MATCH_RESULTS_URL_PATTERN = {
+        2003: "http://www2.usfirst.org/%scomp/events/%s/matchsum.html",  # % (year, event_short)
+    }
+    DEFAULT_MATCH_RESULTS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/matchresults.html"  # % (year, event_short)
+
     MATCH_SCHEDULE_QUAL_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/schedulequal.html"  # % (year, event_short)
     MATCH_SCHEDULE_ELIMS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/scheduleelim.html"  # % (year, event_short)
     EVENT_SHORT_EXCEPTIONS = {
@@ -42,6 +47,11 @@ class DatafeedUsfirst(DatafeedBase):
         "gal": "Galileo",
         "new": "Newton",
     }
+
+    YEAR_MATCH_PARSER = {
+        2002: UsfirstMatchesParser2002,
+    }
+    DEFAULT_MATCH_PARSER = UsfirstMatchesParser
 
     def __init__(self, *args, **kw):
         self._session_key = dict()
@@ -142,13 +152,12 @@ class DatafeedUsfirst(DatafeedBase):
             for team in teams]
 
     def getMatches(self, event):
-        url = self.MATCH_RESULTS_URL_PATTERN % (event.year,
-                                                self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
-        if event.year == 2002:
-            parser = UsfirstMatchesParser2002
-        else:
-            parser = UsfirstMatchesParser
-        matches, _ = self.parse(url, parser)
+        url = self.YEAR_MATCH_RESULTS_URL_PATTERN.get(
+            event.year, self.DEFAULT_MATCH_RESULTS_URL_PATTERN) % (
+                event.year, self.EVENT_SHORT_EXCEPTIONS.get(event.event_short,
+                                                            event.event_short))
+
+        matches, _ = self.parse(url, self.YEAR_MATCH_PARSER.get(event.year, self.DEFAULT_MATCH_PARSER))
 
         return [Match(
             id=Match.renderKeyName(
