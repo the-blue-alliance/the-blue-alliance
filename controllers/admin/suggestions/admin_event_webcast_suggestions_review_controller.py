@@ -24,6 +24,8 @@ class AdminEventWebcastSuggestionsReviewController(LoggedInHandler):
             Suggestion.target_model == "event")
 
         self.template_values.update({
+            "event_key": self.request.get("event_key"),
+            "success": self.request.get("success"),
             "suggestions": suggestions,
         })
 
@@ -39,13 +41,8 @@ class AdminEventWebcastSuggestionsReviewController(LoggedInHandler):
         if self.request.get("webcast_file"):
             webcast["file"] = self.request.get("webcast_file")
 
-        suggestion_future = Suggestion.get_by_id_async(self.request.get("suggestion_key"))
-        event_future = Event.get_by_id_async(self.request.get("event_key"))
-        suggestion = suggestion_future.get_result()
-        event = event_future.get_result()
-
-        logging.info(self.request.get("suggestion_key"))
-        logging.info(suggestion)
+        event = Event.get_by_id(self.request.get("event_key"))
+        suggestion = Suggestion.get_by_id(int(self.request.get("suggestion_key")))
 
         EventWebcastAdder.add_webcast(event, webcast)
 
@@ -56,4 +53,4 @@ class AdminEventWebcastSuggestionsReviewController(LoggedInHandler):
 
         # TODO: Allow rejecting suggestions -gregmarra 20130921
 
-        self.redirect("/admin/suggestions/event/webcast/review")
+        self.redirect("/admin/suggestions/event/webcast/review?success=1&event_key=%s" % event.key.id())

@@ -9,6 +9,19 @@
 <form action="/admin/suggestions/event/webcast/review" method="post">
     <div class="col-xs-12">
 
+        {% if success %}
+        <div class="row">
+            <div class="alert alert-success">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <h4>Added webcast to {{event_key}}!</h4>
+                <div class="btn-group">
+                    <a href="/event/{{event_key}}" class="btn btn-default">View on TBA</a>
+                    <a href="/admin/event/{{event_key}}" class="btn btn-default">View in Admin</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         {% for suggestion in suggestions %}
         <div class="row">
             <div class="well">
