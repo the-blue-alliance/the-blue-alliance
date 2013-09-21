@@ -447,9 +447,13 @@ class UsfirstPre2003TeamEventsGet(webapp.RequestHandler):
                     logging.warning("getEventDetails for eid {} failed.".format(eid))
                     continue
 
-                if (event.year >= 2001) and (event.event_type_enum in {EventType.CMP_DIVISION, EventType.CMP_FINALS}):
-                    # Divisions started in 2001; need to manually create championship events
-                    continue
+                if event.event_type_enum in {EventType.CMP_DIVISION, EventType.CMP_FINALS}:
+                    if event.year >= 2001:
+                        # Divisions started in 2001; need to manually create championship events
+                        continue
+                    else:
+                        # No divisions; force event type to be finals
+                        event.event_type_enum = EventType.CMP_FINALS
 
                 event = EventManipulator.createOrUpdate(event)
                 new_eids.append(eid)
