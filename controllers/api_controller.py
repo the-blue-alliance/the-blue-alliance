@@ -34,9 +34,9 @@ class MainApiHandler(webapp2.RequestHandler):
         # Creates asynchronous call
         rpc = urlfetch.create_rpc()
 
-        analytics_id = Sitevar.get_by_id("analytics.id")
+        analytics_id = Sitevar.get_by_id("google_analytics.id")
         if analytics_id == None:
-            raise Exception("Missing sitevar: analytics.id. Can't track API usage.")
+            log.warning("Missing sitevar: google_analytics.id. Can't track API usage.")
         GOOGLE_ANALYTICS_ID = analytics_id.contents['GOOGLE_ANALYTICS_ID']
         params = urllib.urlencode({
             'v': 1,
