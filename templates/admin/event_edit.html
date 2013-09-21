@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<p class="pull-right"><a class="btn btn-danger btn-small" href="/admin/event/delete/{{event.key_name}}"><span class="glyphicon glyphicon-trash icon-white"></span> Delete</a></p>
+<p class="pull-right"><a class="btn btn-danger btn-small" href="/admin/event/delete/{{event.key_name}}"><span class="glyphicon glyphicon-trash"></span> Delete</a></p>
 
 <h1>Edit {{ event.key_name }}</h1>
 
@@ -74,7 +74,7 @@
         </tr>
     </table>
 
-    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up icon-white"></span> Save Event</button>
+    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Save Event</button>
     <a href="/admin/event/{{event.key_name}}" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-down"></span> Cancel Edit</a>
 </form>
 

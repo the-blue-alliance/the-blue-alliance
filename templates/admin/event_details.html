@@ -7,7 +7,7 @@
 <h1>{{event.key_name}} - {{ event.name }}</h1>
 
 <div class="btn-group">
-    <a href="/admin/event/edit/{{event.key_name}}" class="btn btn-primary"><span class="glyphicon glyphicon-edit icon-white"></span> Edit</a>
+    <a href="/admin/event/edit/{{event.key_name}}" class="btn btn-primary"><span class="glyphicon glyphicon-edit"></span> Edit</a>
     <a href="/event/{{event.key_name}}" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> View on TBA</a>
     <a href="/tasks/math/do/eventteam_update/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-user"></span> Rebuild EventTeams</a>
     <a href="/tasks/get/usfirst_event_details/{{event.year}}/{{event.first_eid}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Refresh from FIRST</a>
@@ -97,7 +97,7 @@
             <td><input type="text" name="webcast_file" value="" /></td>
         </tr>
     </table>
-    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up icon-white"></span> Add Webcast</button>
+    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Add Webcast</button>
 </form>
 
 <h2>Rankings</h2>
