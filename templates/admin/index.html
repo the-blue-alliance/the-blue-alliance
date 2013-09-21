@@ -57,19 +57,30 @@ $(function () {
 
 {% block content %}
 
-<div class="jumbotron">
-    <h1>Hello, {{ user_bundle.account.display_name }}!</h1>
-    <p>Welcome to the administrative area of The Blue Alliance</p>
-    <p>If you're setting up your TBA Development instance for the first time, you probably want the <strong><a href="/admin/debug">debug panel</a></strong> for simpler tasks</p>
-</div>
 <div class="row">
+    <div class="col-xs-6">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Version Info</h3>
+			</div>
+			<div class="panel-body">
+		        <p>Build time: {{build_time}}</p>
+		        <br>
+		        <p>Branch: <strong>{{git_branch_name}}</strong></p>
+		        <p class="text-warning">Commit: <a href="https://github.com/gregmarra/the-blue-alliance/commit/{{commit_hash.1}}">{{commit_hash.1}}</a></p>
+		        <p>{{commit_author}}</p>
+		        <p>{{commit_date}}</p>
+		        <p>{{commit_msg}}</p>
+			</div>
+		</div>
+    </div>
     <div class="col-xs-6">
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h3 class="panel-title">Common Tasks</h3>
 			</div>
 			<div class="panel-body">
-		        <div class="alert alert-info">Run <code>paver test</code> to set up test data.</div>
+		        <div class="alert alert-info">Run <code>paver setup</code> to set up test data.</div>
 		        <div class="btn-group">
 		        	<a class="btn btn-default" href="/tasks/get/fms_team_list">Get Teams</a>
 		        	<a class="btn btn-default" href="/admin/event/create/test">Create Test Events</a>
@@ -81,7 +92,37 @@ $(function () {
 				</form>
 	        </div>
 		</div>
-    </div><!--/span-->
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-6">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Stats</h3>
+			</div>
+			<div class="panel-body">
+				<div class="row">
+					<ul class="nav nav-pills nav-stacked">
+						<li>
+							<a href="/admin/suggestions/review">
+								<span class="badge pull-right">{{video_suggestions}}</span>
+								Video Suggestions
+							</a>
+						</li>
+						<li>
+							<a href="#">
+								<span class="badge pull-right">0</span>
+								Webcast Suggestions
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="row">
+        			<div id="graphmemcache" style="width: 100%; height: 400px;"></div>
+	        	</div>
+			</div>
+		</div>
+    </div>
     <div class="col-xs-6">
 		<div class="panel panel-default">
 			<div class="panel-heading">
@@ -106,54 +147,7 @@ $(function () {
     </div>
 </div>
 <div class="row">
-    <div class="col-xs-12">
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h3 class="panel-title">Stats</h3>
-			</div>
-			<div class="panel-body">
-				<div class="row">
-					<div class="col-xs-6">
-	        			<div id="graphmemcache" style="width: 100%; height: 400px;"></div>
-	        		</div>
-	        		<div class="col-xs-6">
-						<ul class="nav nav-pills nav-stacked">
-							<li>
-								<a href="/admin/suggestions/review">
-									<span class="badge pull-right">{{video_suggestions}}</span>
-									Video Suggestions
-								</a>
-							</li>
-							<li>
-								<a href="#">
-									<span class="badge pull-right">0</span>
-									Webcast Suggestions
-								</a>
-							</li>
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
-    </div><!--/span-->
-</div>
-<div class="row">
-    <div class="col-xs-6">
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h3 class="panel-title">Version Info</h3>
-			</div>
-			<div class="panel-body">
-		        <p>Build time: {{build_time}}</p>
-		        <br>
-		        <p>Branch: <strong>{{git_branch_name}}</strong></p>
-		        <p class="text-warning">Commit: <a href="https://github.com/gregmarra/the-blue-alliance/commit/{{commit_hash.1}}">{{commit_hash.1}}</a></p>
-		        <p>{{commit_author}}</p>
-		        <p>{{commit_date}}</p>
-		        <p>{{commit_msg}}</p>
-			</div>
-		</div>
-    </div>
+    
 </div>
 
 {% endblock %}
