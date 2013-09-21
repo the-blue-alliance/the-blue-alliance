@@ -60,6 +60,8 @@ class Event(ndb.Model):
         from models.match import Match
         match_keys = yield Match.query(Match.event == self.key).fetch_async(500, keys_only=True)
         self._matches = yield ndb.get_multi_async(match_keys)
+    
+
 
     @property
     def matches(self):
@@ -86,6 +88,14 @@ class Event(ndb.Model):
     @property
     def within_a_day(self):
         return self.withinDays(-1, 1)
+
+    @property
+    def past(self):
+        return self.end_date.date() < datetime.date.today()
+
+    @property
+    def future(self):
+        return self.start_date.date() > datetime.date.today()
 
     @ndb.tasklet
     def get_teams_async(self):

@@ -28,14 +28,20 @@ class TestEventManipulator(unittest2.TestCase):
 
     def test_datesFuture(self):
         self.assertFalse(self.future_event.now)
+        self.assertTrue(self.future_event.future)
+        self.assertFalse(self.future_event.past)
         self.assertFalse(self.future_event.withinDays(0, 8))
         self.assertTrue(self.future_event.withinDays(-8, 0))
 
     def test_datesPast(self):
         self.assertFalse(self.past_event.now)
+        self.assertFalse(self.past_event.future)
+        self.assertTrue(self.past_event.past)
         self.assertTrue(self.past_event.withinDays(0, 8))
         self.assertFalse(self.past_event.withinDays(-8, 0))
 
     def test_datesPresent(self):
         self.assertTrue(self.present_event.now)
         self.assertTrue(self.present_event.withinDays(-1, 1))
+        self.assertFalse(self.present_event.future)
+        self.assertFalse(self.present_event.past)
