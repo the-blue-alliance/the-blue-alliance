@@ -164,7 +164,7 @@ function setChat(open) {
 
 // Remove Chat Alert
 $(document).ready(function() {
-	$('#chat-info').bind('close', function () {
+	$('#chat-info .close').bind('click', function () {
 		$('#chat-info-background').remove();
 	});
 });
