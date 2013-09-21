@@ -28,7 +28,7 @@
   </div>
   <div class="col-sm-5">
   {% if current_event %}
-    <div class="panel">
+    <div class="panel panel-default">
       <div class="panel-heading">
         {% if current_event.webcast%}
           <div class="hidden-xs pull-right">
@@ -41,7 +41,7 @@
         </h3>
       </div>
       <div class="clearfix"></div>
-      
+      <div class="panel-body">
       {% if matches_upcoming %}
         <h4>Upcoming Matches</h4>
         {% with matches_upcoming as matches %}
@@ -50,6 +50,7 @@
       {% else %}
         No upcoming matches.
       {% endif %}
+      </div>
     </div>
   {% else %}
     {% include "team_partials/team_social_media.html" %}
