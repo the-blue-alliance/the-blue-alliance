@@ -7,11 +7,11 @@ from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
 from helpers.event.event_test_creator import EventTestCreator
+from helpers.event.event_webcast_adder import EventWebcastAdder
 from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.match_manipulator import MatchManipulator
-from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
 from models.award import Award
 from models.event import Event
 from models.event_team import EventTeam
@@ -35,16 +35,7 @@ class AdminEventAddWebcast(LoggedInHandler):
             webcast["file"] = self.request.get("webcast_file")
 
         event = Event.get_by_id(event_key_id)
-        if event.webcast:
-            webcasts = event.webcast
-            webcasts.append(webcast)
-            event.webcast_json = json.dumps(webcasts)
-        else:
-            event.webcast_json = json.dumps([webcast])
-        event.dirty = True
-        EventManipulator.createOrUpdate(event)
-
-        MemcacheWebcastFlusher.flushEvent(event.key_name)
+        EventWebcastAdder.add_webcast(event, webcast)
 
         self.redirect("/admin/event/" + event.key_name)
 

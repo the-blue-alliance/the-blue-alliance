@@ -1,25 +1,22 @@
-<form action="/admin/event/add_webcast/{{event.key_name}}" method="post">
-    <table class="table table-striped table-hover table-condensed">
-        <tr>
-            <td>Type</td>
-            <td><select name="webcast_type">
-                <option value="livestream">livestream</option>
-                <option value="justin">justin</option>
-                <option value="mms">mms</option>
-                <option value="rtmp">rtmp</option>
-                <option value="twitch">twitch</option>
-                <option value="ustream">ustream</option>
-                <option value="youtube">youtube</option>
-            </select></td>
-        </tr>
-        <tr>
-            <td>Channel</td>
-            <td><input type="text" name="webcast_channel" value="" /></td>
-        </tr>
-        <tr>
-            <td>File (rtmp only)</td>
-            <td><input type="text" name="webcast_file" value="" /></td>
-        </tr>
-    </table>
-    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Add Webcast</button>
-</form>
+<table class="table table-striped table-hover table-condensed">
+    <tr>
+        <td>Type</td>
+        <td><select name="webcast_type">
+            <option value="livestream">livestream</option>
+            <option value="justin">justin</option>
+            <option value="mms">mms</option>
+            <option value="rtmp">rtmp</option>
+            <option value="twitch">twitch</option>
+            <option value="ustream">ustream</option>
+            <option value="youtube">youtube</option>
+        </select></td>
+    </tr>
+    <tr>
+        <td>Channel</td>
+        <td><input type="text" name="webcast_channel" value="" /></td>
+    </tr>
+    <tr>
+        <td>File (rtmp only)</td>
+        <td><input type="text" name="webcast_file" value="" /></td>
+    </tr>
+</table>

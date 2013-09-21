@@ -1,11 +1,14 @@
 import datetime
 import os
+import logging
 
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
-from helpers.suggestions.match_suggestion_accepter import MatchSuggestionAccepter
+from helpers.event.event_webcast_adder import EventWebcastAdder
+
+from models.event import Event
 from models.suggestion import Suggestion
 
 
@@ -30,10 +33,27 @@ class AdminEventWebcastSuggestionsReviewController(LoggedInHandler):
     def post(self):
         self._require_admin()
 
-        # get the suggestion
+        webcast = dict()
+        webcast["type"] = self.request.get("webcast_type")
+        webcast["channel"] = self.request.get("webcast_channel")
+        if self.request.get("webcast_file"):
+            webcast["file"] = self.request.get("webcast_file")
 
-        # maybe give it to an accepter
+        suggestion_future = Suggestion.get_by_id_async(self.request.get("suggestion_key"))
+        event_future = Event.get_by_id_async(self.request.get("event_key"))
+        suggestion = suggestion_future.get_result()
+        event = event_future.get_result()
 
-        # mark it accepted or rejected
+        logging.info(self.request.get("suggestion_key"))
+        logging.info(suggestion)
+
+        EventWebcastAdder.add_webcast(event, webcast)
+
+        suggestion.review_state = Suggestion.REVIEW_ACCEPTED
+        suggestion.reviewer = self.user_bundle.account.key
+        suggestion.reviewer_at = datetime.datetime.now()
+        suggestion.put()
+
+        # TODO: Allow rejecting suggestions -gregmarra 20130921
 
         self.redirect("/admin/suggestions/event/webcast/review")
