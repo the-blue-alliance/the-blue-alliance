@@ -183,9 +183,9 @@ class ApiEventDetails(MainApiHandler):
         event_dict = ApiHelper.getEventInfo(event_key)
 
         self.response.headers.add_header("content-type", "application/json")
-        self._track_call('events/details', event_key)
-
         self.response.out.write(json.dumps(event_dict))
+
+        self._track_call('events/details', event_key)
 
 
 class ApiMatchDetails(MainApiHandler):
