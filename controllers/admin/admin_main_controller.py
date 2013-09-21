@@ -22,8 +22,15 @@ class AdminMain(LoggedInHandler):
         self.template_values['users'] = users
 
         # Retrieves the number of pending suggestions
-        video_suggestions = Suggestion.query().filter(Suggestion.review_state == Suggestion.REVIEW_PENDING).count()
+        video_suggestions = Suggestion.query().filter(
+            Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
+            Suggestion.target_model == "match").count()
         self.template_values['video_suggestions'] = video_suggestions
+
+        webcast_suggestions = Suggestion.query().filter(
+            Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
+            Suggestion.target_model == "event").count()
+        self.template_values['webcast_suggestions'] = webcast_suggestions
 
         # version info
         try:
