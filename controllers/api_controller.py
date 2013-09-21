@@ -192,22 +192,18 @@ class ApiMatchDetails(MainApiHandler):
     Returns specific matches with details.
     """
     def get(self):
-        if self.request.get('match') is not '':
-            match_keys = self.request.get('match').split(',')
-            match_keys_sorted = sorted(self.request.get('match').split(','))
+        value = self.request.get('match') or self.request.get('matches')
+        if value is not '':
+            match_keys = value.split(',')
+            match_keys_sorted = sorted(value.split(','))
             track_matches_keys = ",".join(match_keys_sorted)
-            track_matches = self.request.get('match')
-
-        if self.request.get('matches') is not '':
-            match_keys = self.request.get('matches').split(',')
-            match_keys_sorted = sorted(self.request.get('matches').split(','))
-            track_matches_keys = ",".join(match_keys_sorted)
-            track_matches = self.request.get('matches')
-
-
-        match_json = []
-        for match in match_keys:
-            match_json.append(ApiHelper.getMatchDetails(match))
+            track_matches = value
+            match_json = []
+            for match in match_keys:
+                match_json.append(ApiHelper.getMatchDetails(match))
+        else:
+            match_json = {'error': 'The "match" parameter is missing'}
+            track_matches = 'error'
 
         self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(match_json))
