@@ -15,6 +15,7 @@ from datafeeds.usfirst_event_rankings_parser import UsfirstEventRankingsParser
 from datafeeds.usfirst_event_awards_parser import UsfirstEventAwardsParser
 from datafeeds.usfirst_event_teams_parser import UsfirstEventTeamsParser
 from datafeeds.usfirst_matches_parser import UsfirstMatchesParser
+from datafeeds.usfirst_matches_parser_2002 import UsfirstMatchesParser2002
 from datafeeds.usfirst_team_details_parser import UsfirstTeamDetailsParser
 
 from models.event import Event
@@ -143,7 +144,11 @@ class DatafeedUsfirst(DatafeedBase):
     def getMatches(self, event):
         url = self.MATCH_RESULTS_URL_PATTERN % (event.year,
                                                 self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
-        matches, _ = self.parse(url, UsfirstMatchesParser)
+        if event.year == 2002:
+            parser = UsfirstMatchesParser2002
+        else:
+            parser = UsfirstMatchesParser
+        matches, _ = self.parse(url, parser)
 
         return [Match(
             id=Match.renderKeyName(
