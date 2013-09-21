@@ -35,7 +35,7 @@ class MainApiHandler(webapp2.RequestHandler):
         rpc = urlfetch.create_rpc()
 
         analytics_id = Sitevar.get_by_id("google_analytics.id")
-        if analytics_id == None:
+        if analytics_id is None:
             logging.warning("Missing sitevar: google_analytics.id. Can't track API usage.")
         else:
             GOOGLE_ANALYTICS_ID = analytics_id.contents['GOOGLE_ANALYTICS_ID']
