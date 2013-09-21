@@ -6,14 +6,27 @@
   margin-left: 0;
   margin-right: 5px;
   float: left;
+  
+  @media (max-width: @screen-xs-min) {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+.tba-navbar-toggle {
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .tba-navbar-nav {
-  margin-bottom: 0;
+  margin: 0;
   > li > a {
+    padding-top: ((@navbar-height - @line-height-computed) / 2);
+    padding-bottom: ((@navbar-height - @line-height-computed) / 2);
+  
     padding-left: 5px;
     padding-right: 5px;
-    @media (min-width: @screen-sm-min) and (max-width: @screen-sm-max) {
+    @media (min-width: @screen-xs-min) and (max-width: @screen-sm-max) {
       padding-left: 10px;
       padding-right: 10px;
     }
@@ -55,11 +68,14 @@
 
 .tba-navbar-form {
   width: 250px;
+    
   @media (min-width: @screen-md-min) {
     .pull-right();
   }
   @media (min-width: @screen-sm-min) and (max-width: @screen-sm-max) {
     .pull-left();
+    margin-top: 0;
+    margin-bottom: 0;
   }
   @media (max-width: @screen-xs-max) {
     .full-width-search();
