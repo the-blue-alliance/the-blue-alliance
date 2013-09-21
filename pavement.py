@@ -68,7 +68,7 @@ def test_fast():
   """Run tests that don't require HTTP"""
   print("Running Fast Tests")
   sh("python run_tests.py --test_pattern=test_math_*.py")
-  sh("python run_tests.py --test_pattern=test_*parser.py")
+  sh("python run_tests.py --test_pattern=test_*parser*.py")
   sh("python run_tests.py --test_pattern=test_*manipulator.py")
   sh("python run_tests.py --test_pattern=test_*api.py")
   sh("python run_tests.py --test_pattern=test_event.py")
