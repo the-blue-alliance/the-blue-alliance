@@ -1,11 +1,12 @@
-<video
+<div>
+    <video
     src="{{ match.tba_video.streamable_path }}"
     height="315"
     id="tbavideo_container"
     poster="{{ match.tba_video.thumbnail_path }}"
-    width="560">
-</video>
-<br><br>
+    width="100%"></video>
+</div>
+<br>
 
 <script type="text/javascript">
     jwplayer("tbavideo_container").setup({
