@@ -31,6 +31,7 @@ class UsfirstMatchesParser2002(ParserBase):
         """
         matches = []
         mid_match = False  # Matches are split across rows. This keeps track of whether or not we are parsing the same match.
+        ignore_match = False  # Parsing failed. Ignore this match
         mid_match_comp_level = None
         mid_match_number = None
         mid_match_set_number = None
@@ -43,30 +44,32 @@ class UsfirstMatchesParser2002(ParserBase):
 
             # End of a match or start of a new match. Combine info and reset mid_match info.
             if mid_match and (col1 is None or 'match' in col1.lower()):
-                if len(mid_match_teams) == len(mid_match_scores):
-                    red_teams = mid_match_teams[:len(mid_match_teams) / 2]
-                    blue_teams = mid_match_teams[len(mid_match_teams) / 2:]
-                    red_score = mid_match_scores[0]
-                    blue_score = mid_match_scores[len(mid_match_scores) / 2]
-                    alliances = {"red": {
-                                    "teams": red_teams,
-                                    "score": red_score
-                                },
-                                "blue": {
-                                    "teams": blue_teams,
-                                    "score": blue_score
-                                }
-                    }
-                    matches.append({"alliances_json": json.dumps(alliances),
-                                    "comp_level": mid_match_comp_level,
-                                    "match_number": mid_match_number,
-                                    "set_number": mid_match_set_number,
-                                    "team_key_names": red_teams + blue_teams,
-                    })
-                else:
-                    logging.warning("Lengths of mid_match_teams ({}) and mid_match_scores ({}) aren't the same!".format(mid_match_teams, mid_match_scores))
+                if not ignore_match:
+                    if len(mid_match_teams) == len(mid_match_scores):
+                        red_teams = mid_match_teams[:len(mid_match_teams) / 2]
+                        blue_teams = mid_match_teams[len(mid_match_teams) / 2:]
+                        red_score = mid_match_scores[0]
+                        blue_score = mid_match_scores[len(mid_match_scores) / 2]
+                        alliances = {"red": {
+                                        "teams": red_teams,
+                                        "score": red_score
+                                    },
+                                    "blue": {
+                                        "teams": blue_teams,
+                                        "score": blue_score
+                                    }
+                        }
+                        matches.append({"alliances_json": json.dumps(alliances),
+                                        "comp_level": mid_match_comp_level,
+                                        "match_number": mid_match_number,
+                                        "set_number": mid_match_set_number,
+                                        "team_key_names": red_teams + blue_teams,
+                        })
+                    else:
+                        logging.warning("Lengths of mid_match_teams ({}) and mid_match_scores ({}) aren't the same!".format(mid_match_teams, mid_match_scores))
 
                 mid_match = False
+                ignore_match = False
                 mid_match_comp_level = None
                 mid_match_number = None
                 mid_match_set_number = None
@@ -80,6 +83,8 @@ class UsfirstMatchesParser2002(ParserBase):
                     match_or_set_number = int(re.findall(r'\d+', col1)[0])
                 except:
                     logging.warning("Match/Set number parse for '{}' failed!".format(col1))
+                    ignore_match = True
+                    continue
 
                 col1_lower = col1.lower()
                 if (('final' in col1_lower) or ('quarter' in col1_lower) or
@@ -106,9 +111,11 @@ class UsfirstMatchesParser2002(ParserBase):
 
             else:
                 try:
-                    team_key = 'frc{}'.format(re.findall(r'\d+', col1)[0])
+                    team_key = 'frc{}'.format(int(re.findall(r'\d+', col1)[0]))
                 except:
                     logging.warning("Team number parse for '{}' failed!".format(col1))
+                    ignore_match = True
+                    continue
 
                 score_col = self._recurseUntilString(tds[1])
                 try:
@@ -117,6 +124,8 @@ class UsfirstMatchesParser2002(ParserBase):
                         match_score = -1
                 except:
                     logging.warning("Score parse for '{}' failed!".format(score_col))
+                    ignore_match = True
+                    continue
 
                 mid_match_teams.append(team_key)
                 mid_match_scores.append(match_score)
