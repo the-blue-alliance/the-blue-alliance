@@ -41,7 +41,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-6 col-sm-offset-3 col-md-offset-3 col-lg-offset-3 fitvids">
+        <div class="col-sm-6 col-sm-offset-3 col-md-offset-3 col-lg-offset-3">
         {% if match.tba_video %}
             {% include "video_partials/tbavideo_player.html" %}
         {% endif %}
@@ -51,7 +51,7 @@
         {% if not match.tba_video and not match.youtube_videos %}
             <h3>Video</h3>
             <p>We don't know about any videos for this match yet. :(</p>
-            <p>Help us out by searching YouTube and adding videos!</p>
+            <p>Help others out by searching YouTube and adding videos!</p>
         {% endif %}
         <br />
         <p>
