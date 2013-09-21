@@ -41,7 +41,8 @@ class UsfirstMatchesParser2002(ParserBase):
             tds = tr.findAll('td')
             col1 = self._recurseUntilString(tds[0])
 
-            if col1 is None:  # End of a match. Combine info and reset mid_match info.
+            # End of a match or start of a new match. Combine info and reset mid_match info.
+            if mid_match and (col1 is None or 'match' in col1.lower()):
                 if len(mid_match_teams) == len(mid_match_scores):
                     red_teams = mid_match_teams[:len(mid_match_teams) / 2]
                     blue_teams = mid_match_teams[len(mid_match_teams) / 2:]
