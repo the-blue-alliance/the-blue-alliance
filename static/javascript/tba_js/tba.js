@@ -17,7 +17,7 @@ FB.Event.subscribe('auth.statusChange', function(response) {
       if (me.name) {
         $('#auth-displayname').html(me.name);
       }
-    })
+    });
     $('#auth-loggedout').hide();
     $('#auth-loggedin').show();
   } else {
@@ -46,7 +46,7 @@ $('#auth-logoutlink').click(function(){
 }(document));
 
 // General JS for all pages
-$(document).ready(function(){  
+$(document).ready(function(){
 	// Jumping to page section
   $('.smooth-scroll').bind('click',function(event){
     var $anchor = $(this);

@@ -98,19 +98,31 @@
 
   // Toggles
   .icon-prev,
-  .icon-next {
+  .icon-next,
+  .glyphicon-chevron-left,
+  .glyphicon-chevron-right {
     position: absolute;
     top: 50%;
-    left: 50%;
     z-index: 5;
     display: inline-block;
+  }
+  .icon-prev,
+  .glyphicon-chevron-left {
+    left: 50%;
+  }
+  .icon-next,
+  .glyphicon-chevron-right {
+    right: 50%;
+  }
+  .icon-prev,
+  .icon-next {
     width:  20px;
     height: 20px;
     margin-top: -10px;
     margin-left: -10px;
     font-family: serif;
   }
-  // Non-glyphicon toggles
+
   .icon-prev {
     &:before {
       content: '\2039';// SINGLE LEFT-POINTING ANGLE QUOTATION MARK (U+2039)
@@ -178,17 +190,20 @@
 
 
 // Scale up controls for tablets and up
-@media screen and (min-width: @screen-tablet) {
+@media screen and (min-width: @screen-sm-min) {
 
   // Scale up the controls a smidge
-  .carousel-control .glyphicon,
-  .carousel-control .icon-prev,
-  .carousel-control .icon-next {
-    width: 30px;
-    height: 30px;
-    margin-top: -15px;
-    margin-left: -15px;
-    font-size: 30px;
+  .carousel-control {
+    .glyphicons-chevron-left,
+    .glyphicons-chevron-right,
+    .icon-prev,
+    .icon-next {
+      width: 30px;
+      height: 30px;
+      margin-top: -15px;
+      margin-left: -15px;
+      font-size: 30px;
+    }
   }
 
   // Show and left align the captions

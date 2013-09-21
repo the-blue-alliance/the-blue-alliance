@@ -13,6 +13,7 @@ from consts.event_type import EventType
 from datafeeds.datafeed_fms import DatafeedFms
 from datafeeds.datafeed_tba import DatafeedTba
 from datafeeds.datafeed_usfirst import DatafeedUsfirst
+from datafeeds.datafeed_usfirst_legacy import DatafeedUsfirstLegacy
 from datafeeds.datafeed_offseason import DatafeedOffseason
 from datafeeds.datafeed_twitter import DatafeedTwitter
 
@@ -130,7 +131,7 @@ class UsfirstEventDetailsEnqueue(webapp.RequestHandler):
     Handles enqueing updates to individual USFIRST events.
     """
     def get(self, year):
-        event_keys = Event.query(Event.first_eid != None, Event.year == int(year)).fetch(200, keys_only=True)
+        event_keys = Event.query(Event.first_eid is not None, Event.year == int(year)).fetch(200, keys_only=True)
         events = ndb.get_multi(event_keys)
 
         for event in events:
@@ -154,12 +155,21 @@ class UsfirstEventDetailsGet(webapp.RequestHandler):
     Includes registered Teams.
     """
     def get(self, year, first_eid):
-        datafeed = DatafeedUsfirst()
+        df = DatafeedUsfirst()
+        df_legacy = DatafeedUsfirstLegacy()
 
-        event = datafeed.getEventDetails(first_eid)
+        try:
+            event = df.getEventDetails(first_eid)
+        except:
+            logging.warning("getEventDetails with DatafeedUsfirst for event id {} failed. Retrying with DatafeedUsfirstLegacy.".format(first_eid))
+            event = df_legacy.getEventDetails(int(year), first_eid)
         event = EventManipulator.createOrUpdate(event)
 
-        teams = datafeed.getEventTeams(int(year), first_eid)
+        try:
+            teams = df.getEventTeams(int(year), first_eid)
+        except:
+            logging.warning("getEventTeams with DatafeedUsfirst for event id {} failed. Retrying with DatafeedUsfirstLegacy.".format(first_eid))
+            teams = df_legacy.getEventTeams(int(year), first_eid)
         teams = TeamManipulator.createOrUpdate(teams)
 
         if teams:
@@ -374,8 +384,14 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
     model accordingly.
     """
     def get(self, key_name):
-        df = DatafeedUsfirst()
-        team = df.getTeamDetails(Team.get_by_id(key_name))
+        try:
+            df = DatafeedUsfirst()
+            team = df.getTeamDetails(Team.get_by_id(key_name))
+        except:
+            logging.warning("getTeamDetails with DatafeedUsfirst for event id {} failed. Retrying with DatafeedUsfirstLegacy.".format(key_name))
+            legacy_df = DatafeedUsfirstLegacy()
+            team = legacy_df.getTeamDetails(Team.get_by_id(key_name))
+
         if team:
             team = TeamManipulator.createOrUpdate(team)
             success = True

@@ -6,13 +6,13 @@ To add a subtree:
 -----------------
 `git subtree add --prefix subtrees/<folder name> <URL> <branch> --squash`
 
-Example: `git subtree add --prefix subtrees/bootstrap git@github.com:twbs/bootstrap.git 3.0.0-wip --squash`
+Example: `git subtree add --prefix subtrees/bootstrap git@github.com:twbs/bootstrap.git master --squash`
 
 To update a subtree:
 --------------------
 `git subtree pull --prefix subtrees/<folder name> <URL> <branch> --squash`
 
-Example: `git subtree pull --prefix subtrees/bootstrap git@github.com:twbs/bootstrap.git 3.0.0-wip --squash`
+Example: `git subtree pull --prefix subtrees/bootstrap git@github.com:twbs/bootstrap.git master --squash`
 
 More information about subtrees:
 --------------------------------

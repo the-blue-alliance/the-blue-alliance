@@ -67,7 +67,7 @@ function updateMatchbar(snapshot) {
     
     // Add event code to first match
     var event_code = event_key.replace(/[0-9]/g, '').toUpperCase();
-    var match_num = $(this)[0].firstChild.firstChild.innerHTML
+    var match_num = $(this)[0].firstChild.firstChild.innerHTML;
     if (match_num.indexOf(event_code) == -1) {  // Make sure not to add twice
       $(this)[0].firstChild.firstChild.innerHTML = event_code + " " + match_num;
     }
@@ -75,17 +75,17 @@ function updateMatchbar(snapshot) {
 }
 
 function renderMatch(match) {
-  var comp_level = match.comp_level.toUpperCase()
+  var comp_level = match.comp_level.toUpperCase();
   comp_level = (comp_level == 'QM') ? 'Q' : comp_level;
   var match_number = (comp_level == 'QF' || comp_level == 'SF' || comp_level == 'F') ? match.set_number + '-' + match.match_number : match.match_number;
   var match_label = comp_level + match_number;
   
   var red_teams = match.alliances.red.teams[0].substring(3) + ', ' +
     match.alliances.red.teams[1].substring(3) + ', ' +
-    match.alliances.red.teams[2].substring(3)
+    match.alliances.red.teams[2].substring(3);
   var blue_teams = match.alliances.blue.teams[0].substring(3) + ', ' +
     match.alliances.blue.teams[1].substring(3) + ', ' +
-    match.alliances.blue.teams[2].substring(3)
+    match.alliances.blue.teams[2].substring(3);
   
   var red_score = match.alliances.red.score;
   var blue_score = match.alliances.blue.score;
