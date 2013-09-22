@@ -144,41 +144,41 @@ class EventHelper(object):
 
     @classmethod
     def parseEventType(self, event_type_str):
-      """
-      Given an event_type_str from USFIRST, return the proper event type
-      Examples:
-      'Regional' -> EventType.REGIONAL
-      'District' -> EventType.DISTRICT
-      'District Championship' -> EventType.DISTRICT_CMP
-      'MI FRC State Championship' -> EventType.DISTRICT_CMP
-      'Championship Finals' -> EventType.CMP_FINALS
-      'Championship' -> EventType.CMP_FINALS
-      """
-      event_type_str = event_type_str.lower()
+        """
+        Given an event_type_str from USFIRST, return the proper event type
+        Examples:
+        'Regional' -> EventType.REGIONAL
+        'District' -> EventType.DISTRICT
+        'District Championship' -> EventType.DISTRICT_CMP
+        'MI FRC State Championship' -> EventType.DISTRICT_CMP
+        'Championship Finals' -> EventType.CMP_FINALS
+        'Championship' -> EventType.CMP_FINALS
+        """
+        event_type_str = event_type_str.lower()
 
-      # Easy to parse
-      if 'regional' in event_type_str:
-        return EventType.REGIONAL
-      elif 'offseason' in event_type_str:
-        return EventType.OFFSEASON
-      elif 'preseason' in event_type_str:
-        return EventType.PRESEASON
+        # Easy to parse
+        if 'regional' in event_type_str:
+            return EventType.REGIONAL
+        elif 'offseason' in event_type_str:
+            return EventType.OFFSEASON
+        elif 'preseason' in event_type_str:
+            return EventType.PRESEASON
 
-      # Districts have multiple names
-      if ('district' in event_type_str) or ('state' in event_type_str)\
-        or ('region' in event_type_str) or ('qualif' in event_type_str):
-        if 'championship' in event_type_str:
-          return EventType.DISTRICT_CMP
-        else:
-          return EventType.DISTRICT
+        # Districts have multiple names
+        if ('district' in event_type_str) or ('state' in event_type_str)\
+           or ('region' in event_type_str) or ('qualif' in event_type_str):
+            if 'championship' in event_type_str:
+                return EventType.DISTRICT_CMP
+            else:
+                return EventType.DISTRICT
 
-      # Everything else with 'champ' should be a Championship event
-      if 'champ' in event_type_str:
-        if 'division' in event_type_str:
-          return EventType.CMP_DIVISION
-        else:
-          return EventType.CMP_FINALS
+        # Everything else with 'champ' should be a Championship event
+        if 'champ' in event_type_str:
+            if 'division' in event_type_str:
+                return EventType.CMP_DIVISION
+            else:
+                return EventType.CMP_FINALS
 
-      # An event slipped through!
-      logging.warn("Event type '{}' not recognized!".format(event_type_str))
-      return EventType.UNLABLED
+        # An event slipped through!
+        logging.warn("Event type '{}' not recognized!".format(event_type_str))
+        return EventType.UNLABLED
