@@ -76,6 +76,7 @@
                 <figure style="width: 90%; height: 300px;" id="match-average-chart"></figure>
                 <div id="match-average" class="xcharts-data xcharts-line-single-data">{{ match_averages_by_week.data_json|safe }}</div>
                 {% endif %}
+                <br><br>
               {% endif %}
 
               {% if score_distribution %}
@@ -89,6 +90,7 @@
                 <figure style="width: 90%; height: 300px;" id="match-distribution-chart"></figure>
                 <div id="match-distribution" class="xcharts-data xcharts-bar-single-data">{{ score_distribution.data_json|safe }}</div>
                 {% endif %}
+                <br><br>
               {% endif %}
 
               {% if blue_banners or regional_district_winners %}
