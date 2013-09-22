@@ -1,6 +1,7 @@
 import unittest2
 import datetime
 import random
+import logging
 
 from consts.event_type import EventType
 from helpers.event_helper import EventHelper, REGIONAL_EVENTS_LABEL, CHAMPIONSHIP_EVENTS_LABEL,\
@@ -161,12 +162,7 @@ class TestEventGroupByWeek(unittest2.TestCase):
                 self.assertEqual(set([e.key.id() for e in events_by_week[key]]),
                                  set([e.key.id() for e in week_events[key]]))
             except AssertionError, e:
-                print '\r\n'
-                print key
-                print '\r\n'
-                print len(events_by_week[key])
-                print events_by_week[key]
-                print '\r\n'
-                print len(week_events[key])
-                print week_events[key]
+                logging.warning("\n\nkey: {}".format(key))
+                logging.warning("\n\nevents_by_week: {}".format(events_by_week[key]))
+                logging.warning("\n\nweek_events: {}".format(week_events[key]))
                 raise e
