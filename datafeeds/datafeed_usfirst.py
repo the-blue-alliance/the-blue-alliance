@@ -192,7 +192,7 @@ class DatafeedUsfirst(DatafeedBase):
                 return first_eids
 
         logging.warning('Null TPID for team %s' % team.team_number)
-        return None
+        return []
 
     def getTeamsTpids(self, year, skip=0):
         """
