@@ -8,6 +8,8 @@ from google.appengine.ext import ndb
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
+from consts.event_type import EventType
+
 from datafeeds.datafeed_fms import DatafeedFms
 from datafeeds.datafeed_tba import DatafeedTba
 from datafeeds.datafeed_usfirst import DatafeedUsfirst
@@ -402,6 +404,76 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
         }
 
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_team_details_get.html')
+        self.response.out.write(template.render(path, template_values))
+
+
+class UsfirstPre2003TeamEventsEnqueue(webapp.RequestHandler):
+    def get(self):
+        """
+        Enqueues TeamEventsGet for teams numbers <= 999 (these teams participated
+        in events from 2002 and prior, which we can't scrape normally)
+        """
+        team_keys = Team.query(Team.team_number <= 999).fetch(10000, keys_only=True)
+        teams = ndb.get_multi(team_keys)
+        for team in teams:
+            taskqueue.add(
+                queue_name='usfirst',
+                url='/tasks/get/usfirst_pre2003_team_events/{}'.format(team.key_name),
+                method='GET')
+
+        self.response.out.write("Pre 2003 event gets have been enqueued for %s teams." % (len(teams)))
+
+
+class UsfirstPre2003TeamEventsGet(webapp.RequestHandler):
+    """
+    Handles reading a USFIRST team information page and enqueues tasks to
+    create events that the team has attended if the event does not exist in the db.
+    Also creates appropriate eventteams.
+    Doesn't create Championship Event or Championship Divisions
+    """
+    def get(self, key_name):
+        team_key = ndb.Key(Team, key_name)
+
+        df = DatafeedUsfirst()
+        first_eids = df.getPre2003TeamEvents(Team.get_by_id(key_name))
+
+        new_eids = []
+        for eid in first_eids:
+            event_keys = Event.query(Event.first_eid == eid).fetch(10, keys_only=True)
+            if len(event_keys) == 0:  # only create events if event not already in db
+                try:
+                    event = df.getEventDetails(eid)
+                except:
+                    logging.warning("getEventDetails for eid {} failed.".format(eid))
+                    continue
+
+                if event.event_type_enum in {EventType.CMP_DIVISION, EventType.CMP_FINALS}:
+                    if event.year >= 2001:
+                        # Divisions started in 2001; need to manually create championship events
+                        continue
+                    else:
+                        # No divisions; force event type to be finals
+                        event.event_type_enum = EventType.CMP_FINALS
+
+                event = EventManipulator.createOrUpdate(event)
+                new_eids.append(eid)
+            else:
+                event = event_keys[0].get()
+
+            event_team_key_name = event.key.id() + "_" + team_key.id()
+            existing_event_team = ndb.Key(EventTeam, event_team_key_name).get()
+            if existing_event_team is None:
+                event_team = EventTeam(
+                    id=event_team_key_name,
+                    event=event.key,
+                    team=team_key,
+                    year=event.year)
+                EventTeamManipulator.createOrUpdate(event_team)
+
+        template_values = {'first_eids': first_eids,
+                           'new_eids': new_eids}
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_team_events_get.html')
         self.response.out.write(template.render(path, template_values))
 
 
