@@ -44,7 +44,7 @@ class EventHelper(object):
             elif not event.official:
                 offseason_events.append(event)
             elif start.month != 12 or start.day != 31:
-                if week_start == None:
+                if week_start is None:
                     diff_from_thurs = start.weekday() - 3   # 3 is Thursday
                     week_start = start + datetime.timedelta(days=diff_from_thurs)
 
@@ -83,7 +83,7 @@ class EventHelper(object):
         wlt = {"win": 0, "loss": 0, "tie": 0}
 
         for match in matches:
-            if match.has_been_played and match.winning_alliance != None:
+            if match.has_been_played and match.winning_alliance is not None:
                 if match.winning_alliance == "":
                     wlt["tie"] += 1
                 elif team_key in match.alliances[match.winning_alliance]["teams"]:
