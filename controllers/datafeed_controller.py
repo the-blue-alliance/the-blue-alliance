@@ -129,7 +129,7 @@ class UsfirstEventDetailsEnqueue(webapp.RequestHandler):
     Handles enqueing updates to individual USFIRST events.
     """
     def get(self, year):
-        event_keys = Event.query(Event.first_eid is not None, Event.year == int(year)).fetch(200, keys_only=True)
+        event_keys = Event.query(Event.first_eid != None, Event.year == int(year)).fetch(200, keys_only=True)
         events = ndb.get_multi(event_keys)
 
         for event in events:
