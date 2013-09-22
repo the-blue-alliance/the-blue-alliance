@@ -1,0 +1,71 @@
+#preferences {
+
+  .input_hidden {
+    position: absolute;
+    left: -9999px;
+  }
+
+  .selected {
+    background-color: #4CBB17;
+    &:hover {
+      background-color: #A6D785;
+    }
+  }
+
+  label {
+    margin: 0 10px 5px;
+
+    &:hover {
+      background-color: #ddd;
+    }
+
+    div {
+      background-image: url('/images/icons/tba-gameday-sprite.png');
+      background-repeat: no-repeat;
+      line-height: 1.428571429;
+      padding: 3px 40px;
+    }
+
+    &.layout_0 {
+      div {
+        background-position: 0% -5px;
+      }
+    }
+    
+    &.layout_1 {
+      div {
+        background-position: 0% -40px;
+      }
+    }
+
+    &.layout_2 {
+      div {
+        background-position: 0% -75px;
+      }
+    }
+
+    &.layout_3 {
+      div {
+        background-position: 0% -110px;
+      }
+    }
+
+    &.layout_4 {
+      div {
+        background-position: 0% -180px;
+      }
+    }
+
+    &.layout_5 {
+      div {
+        background-position: 0% -215px;
+      }
+    }
+
+    &.layout_6 {
+      div {
+        background-position: 0% -145px;
+      }
+    }
+  }
+}

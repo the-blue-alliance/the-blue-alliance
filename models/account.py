@@ -16,3 +16,10 @@ class Account(ndb.Model):
 
     # These optional properties are editable by the user
     display_name = ndb.StringProperty()
+    team_affiliation = ndb.IntegerProperty(default=0) #TODO: Check against current list of teams
+
+    # User preferences
+    # TODO: Add typeahead support for follow fields
+    follow_teams = ndb.StringProperty()
+    follow_events = ndb.StringProperty()
+    gameday_layout = ndb.IntegerProperty(default=2)
