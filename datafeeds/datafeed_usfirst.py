@@ -16,6 +16,7 @@ from datafeeds.usfirst_event_awards_parser import UsfirstEventAwardsParser
 from datafeeds.usfirst_event_teams_parser import UsfirstEventTeamsParser
 from datafeeds.usfirst_matches_parser import UsfirstMatchesParser
 from datafeeds.usfirst_matches_parser_2002 import UsfirstMatchesParser2002
+from datafeeds.usfirst_matches_parser_2003 import UsfirstMatchesParser2003
 from datafeeds.usfirst_team_details_parser import UsfirstTeamDetailsParser
 
 from models.event import Event
@@ -50,6 +51,7 @@ class DatafeedUsfirst(DatafeedBase):
 
     YEAR_MATCH_PARSER = {
         2002: UsfirstMatchesParser2002,
+        2003: UsfirstMatchesParser2003,
     }
     DEFAULT_MATCH_PARSER = UsfirstMatchesParser
 
