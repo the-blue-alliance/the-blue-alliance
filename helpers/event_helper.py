@@ -8,9 +8,7 @@ from consts.event_type import EventType
 
 from models.event import Event
 from models.match import Match
-from models.team import Team
 
-CHAMPIONSHIP_EVENTS = set(['arc', 'cur', 'gal', 'new', 'ein', 'cmp'])
 CHAMPIONSHIP_EVENTS_LABEL = 'Championship Event'
 REGIONAL_EVENTS_LABEL = 'Week {}'
 WEEKLESS_EVENTS_LABEL = 'Other Official Events'
@@ -27,47 +25,52 @@ class EventHelper(object):
         """
         Events should already be ordered by start_date
         """
-        toReturn = collections.OrderedDict()  # key: week_label, value: list of events
+        to_return = collections.OrderedDict()  # key: week_label, value: list of events
 
         current_week = 1
         week_start = None
-        offseason_events = []
         weekless_events = []
+        offseason_events = []
+        preseason_events = []
         for event in events:
-            start = event.start_date
-
-            if event.event_short in CHAMPIONSHIP_EVENTS:
-                if CHAMPIONSHIP_EVENTS_LABEL in toReturn:
-                    toReturn[CHAMPIONSHIP_EVENTS_LABEL].append(event)
+            if event.official and event.event_type_enum in {EventType.CMP_DIVISION, EventType.CMP_FINALS}:
+                if CHAMPIONSHIP_EVENTS_LABEL in to_return:
+                    to_return[CHAMPIONSHIP_EVENTS_LABEL].append(event)
                 else:
-                    toReturn[CHAMPIONSHIP_EVENTS_LABEL] = [event]
-                continue
-            elif not event.official:
+                    to_return[CHAMPIONSHIP_EVENTS_LABEL] = [event]
+            elif event.official and event.event_type_enum in {EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP}:
+                if event.start_date is None:
+                    weekless_events.append(event)
+                else:
+                    if week_start is None:
+                        diff_from_thurs = event.start_date.weekday() - 3   # 3 is Thursday
+                        week_start = event.start_date - datetime.timedelta(days=diff_from_thurs)
+
+                    if event.start_date >= week_start + datetime.timedelta(days=7):
+                        current_week += 1
+                        week_start += datetime.timedelta(days=7)
+
+                    label = REGIONAL_EVENTS_LABEL.format(current_week)
+                    if label in to_return:
+                        to_return[label].append(event)
+                    else:
+                        to_return[label] = [event]
+            elif event.event_type_enum == EventType.OFFSEASON:
                 offseason_events.append(event)
-            elif start.month != 12 or start.day != 31:
-                if week_start is None:
-                    diff_from_thurs = start.weekday() - 3   # 3 is Thursday
-                    week_start = start + datetime.timedelta(days=diff_from_thurs)
-
-                if start >= week_start + datetime.timedelta(days=7):
-                    current_week += 1
-                    week_start += datetime.timedelta(days=7)
-
-                label = REGIONAL_EVENTS_LABEL.format(current_week)
-                if label in toReturn:
-                    toReturn[label].append(event)
-                else:
-                    toReturn[label] = [event]
+            elif event.event_type_enum == EventType.PRESEASON:
+                preseason_events.append(event)
             else:
-                weekless_events.append(event)
+                logging.warning("Don't know what to do with event_type_enum {}!".format(event.event_type_enum))
 
         # Add weekless + other events last
         if weekless_events:
-            toReturn[WEEKLESS_EVENTS_LABEL] = weekless_events
+            to_return[WEEKLESS_EVENTS_LABEL] = weekless_events
         if offseason_events:
-            toReturn[OFFSEASON_EVENTS_LABEL] = offseason_events
+            to_return[OFFSEASON_EVENTS_LABEL] = offseason_events
+        if preseason_events:
+            to_return[PRESEASON_EVENTS_LABEL] = preseason_events
 
-        return toReturn
+        return to_return
 
     @classmethod
     def distantFutureIfNoStartDate(self, event):
