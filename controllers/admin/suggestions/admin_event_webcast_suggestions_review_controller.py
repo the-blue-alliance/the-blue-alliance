@@ -7,6 +7,8 @@ from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
 from helpers.event.event_webcast_adder import EventWebcastAdder
+from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
+
 
 from models.event import Event
 from models.suggestion import Suggestion
@@ -46,6 +48,7 @@ class AdminEventWebcastSuggestionsReviewController(LoggedInHandler):
             suggestion = Suggestion.get_by_id(int(self.request.get("suggestion_key")))
 
             EventWebcastAdder.add_webcast(event, webcast)
+            MemcacheWebcastFlusher.flush()
 
             suggestion.review_state = Suggestion.REVIEW_ACCEPTED
             suggestion.reviewer = self.user_bundle.account.key
