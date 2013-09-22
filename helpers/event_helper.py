@@ -25,7 +25,6 @@ class EventHelper(object):
     def groupByWeek(self, events):
         """
         Events should already be ordered by start_date
-        Works for years 2005 and above
         """
         toReturn = collections.OrderedDict()  # key: week_label, value: list of events
 

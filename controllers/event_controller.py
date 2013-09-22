@@ -57,9 +57,7 @@ class EventList(CacheableHandler):
         events = ndb.get_multi(event_keys)
         events.sort(key=EventHelper.distantFutureIfNoStartDate)
 
-        week_events = None
-        if year >= 2005:
-            week_events = EventHelper.groupByWeek(events)
+        week_events = EventHelper.groupByWeek(events)
 
         template_values = {
             "events": events,
