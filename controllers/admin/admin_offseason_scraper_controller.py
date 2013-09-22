@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 import os
 
@@ -8,6 +9,7 @@ from controllers.base_controller import LoggedInHandler
 from datafeeds.datafeed_usfirst_offseason import DatafeedUsfirstOffseason
 
 from consts.event_type import EventType
+from helpers.event_manipulator import EventManipulator
 from models.event import Event
 
 
@@ -48,4 +50,35 @@ class AdminOffseasonScraperController(LoggedInHandler):
             old_event.first_eid = self.request.get("event_first_eid")
             old_event.put()
 
-        self.redirect("/admin/offseasons?success=duplicate&event_key=%s" % self.request.get("duplicate_event_key"))
+            self.redirect("/admin/offseasons?success=duplicate&event_key=%s" % self.request.get("duplicate_event_key"))
+            return
+
+        if self.request.get("submit") == "create":
+
+            start_date = None
+            if self.request.get("event_start_date"):
+                start_date = datetime.strptime(self.request.get("event_start_date"), "%Y-%m-%d")
+
+            end_date = None
+            if self.request.get("event_end_date"):
+                end_date = datetime.strptime(self.request.get("event_end_date"), "%Y-%m-%d")
+
+            event_key = str(self.request.get("event_year")) + str.lower(str(self.request.get("event_short")))
+
+            event = Event(
+                id=event_key,
+                event_type_enum=int(self.request.get("event_type_enum")),
+                event_short=self.request.get("event_short"),
+                first_eid=self.request.get("event_first_eid"),
+                name=self.request.get("event_name"),
+                year=2013, #TODO: don't hardcode me -gregmarra 20130921
+                start_date=start_date,
+                end_date=end_date,
+                location=self.request.get("event_location"),
+                )
+            event = EventManipulator.createOrUpdate(event)
+
+            self.redirect("/admin/offseasons?success=create&event_key=%s" % event_key)
+            return
+
+        self.redirect("/admin/offseasons")

@@ -34,7 +34,7 @@
                     <table class="table table-striped table-hover table-condensed">
                         <tr>
                             <td>Name</td>
-                            <td><input type="text" name="name" value="{{event.name}}" /></td>
+                            <td><input type="text" name="event_name" value="{{event.name}}" /></td>
                         </tr>
                         <tr>
                             <td>Event Short</td>
@@ -43,12 +43,12 @@
                         <tr>
                             <td>Dates</td>
                             <td>
-                                <input type="text" name="start_date" value="{{ event.start_date|date:"Y-m-d" }}" placeholder="2012-04-04"/> to <input type="text" name="end_date" value="{{ event.end_date|date:"Y-m-d" }}" placeholder="2012-04-06" />
+                                <input type="text" name="event_start_date" value="{{ event.start_date|date:"Y-m-d" }}" placeholder="2012-04-04"/> to <input type="text" name="event_end_date" value="{{ event.end_date|date:"Y-m-d" }}" placeholder="2012-04-06" />
                             </td>
                         </tr>
                         <tr>
                             <td>Year</td>
-                            <td><input type="text" name="disabled_year" value="{{event.year}}" disabled="disabled" /><input type="hidden" name="year" value="{{event.year}}" /></td>
+                            <td><input type="text" name="disabled_year" value="{{event.year}}" disabled="disabled" /><input type="hidden" name="event_year" value="{{event.year}}" /></td>
                         </tr>
                         <tr>
                             <td>FIRST EID</td>
@@ -56,9 +56,10 @@
                         </tr>
                         <tr>
                             <td>Event Location</td>
-                            <td><input type="text" name="location" value="{{event.location}}" /></td>
+                            <td><input type="text" name="event_location" value="{{event.location}}" /></td>
                         </tr>
                     </table>
+                    <input type="hidden" name="event_type_enum" value="{{event.event_type_enum}}" />
                     <button type="submit" class="btn btn-success" name="submit" value="create"><span class="glyphicon glyphicon-thumbs-up"></span> Create Event</button>
                     
                     <h4>OR: Declare Duplicate</h4>
