@@ -8,7 +8,7 @@
     {% for event in events %}
         <tr itemscope itemtype="http://data-vocabulary.org/Event">
             <td><a href="/event/{{event.key_name}}" title="{{event.name}}" itemprop="url"><span itemprop="summary">{{event.name}}</span></a></td>
-            <td class="hidden-xs">{% if event.webcast %}
+            <td class="hidden-xs">{% if event.webcast and not event.past %}
                 {% if event.within_a_day %}
                     <a class="btn btn-success btn-small" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
                 {% else %}
