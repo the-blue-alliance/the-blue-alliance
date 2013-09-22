@@ -21,5 +21,7 @@ class DatafeedUsfirstOffseason(DatafeedBase):
             event_short="???",
             name=event.get("name", None),
             year=2013, #TODO: don't hardcode me -gregmarra 20130921
+            start_date=event.get("start_date", None),
+            end_date=event.get("end_date", None),
             )
             for event in events]
