@@ -95,32 +95,6 @@ class TestEventGroupByWeek(unittest2.TestCase):
             )
         ]
 
-        # Generate offseason events
-        events_by_week[OFFSEASON_EVENTS_LABEL] = [
-            Event(
-                id='2013offseason1'.format(event_id_counter),
-                event_short='offseason1',
-                official=False,
-                event_type_enum=EventType.OFFSEASON
-            ),
-            Event(
-                id='2013offseason2'.format(event_id_counter),
-                event_short='offseason2',
-                start_date=datetime.datetime(2013, 8, 18),
-                end_date=datetime.datetime(2013, 8, 20),
-                official=False,
-                event_type_enum=EventType.OFFSEASON
-            ),
-            Event(
-                id='2013offseason3'.format(event_id_counter),
-                event_short='offseason3',
-                start_date=datetime.datetime(2013, 10, 1),
-                end_date=datetime.datetime(2013, 10, 1),
-                official=False,
-                event_type_enum=EventType.OFFSEASON
-            )
-        ]
-
         # Generate preseason events
         events_by_week[PRESEASON_EVENTS_LABEL] = [
             Event(
@@ -144,6 +118,40 @@ class TestEventGroupByWeek(unittest2.TestCase):
                 end_date=datetime.datetime(2013, 7, 12),
                 official=False,
                 event_type_enum=EventType.PRESEASON
+            )
+        ]
+
+        # Generate offseason events. Offseason events are any event that doesn't fall under one of the above categories.
+        events_by_week[OFFSEASON_EVENTS_LABEL] = [
+            Event(
+                id='2013offseason1'.format(event_id_counter),
+                event_short='offseason1',
+                official=False,
+                event_type_enum=EventType.OFFSEASON
+            ),
+            Event(
+                id='2013offseason2'.format(event_id_counter),
+                event_short='offseason2',
+                start_date=datetime.datetime(2013, 8, 18),
+                end_date=datetime.datetime(2013, 8, 20),
+                official=False,
+                event_type_enum=EventType.OFFSEASON
+            ),
+            Event(
+                id='2013offseason3'.format(event_id_counter),
+                event_short='offseason3',
+                start_date=datetime.datetime(2013, 12, 30),
+                end_date=datetime.datetime(2013, 12, 31),
+                official=False,
+                event_type_enum=EventType.OFFSEASON
+            ),
+            Event(
+                id='2013offseason4'.format(event_id_counter),
+                event_short='offseason4',
+                start_date=datetime.datetime(2013, 11, 13),
+                end_date=datetime.datetime(2013, 11, 14),
+                official=False,
+                event_type_enum=EventType.REGIONAL
             )
         ]
 

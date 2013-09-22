@@ -55,12 +55,11 @@ class EventHelper(object):
                         to_return[label].append(event)
                     else:
                         to_return[label] = [event]
-            elif event.event_type_enum == EventType.OFFSEASON:
-                offseason_events.append(event)
             elif event.event_type_enum == EventType.PRESEASON:
                 preseason_events.append(event)
             else:
-                logging.warning("Don't know what to do with event_type_enum {}!".format(event.event_type_enum))
+                # everything else is an offseason event
+                offseason_events.append(event)
 
         # Add weekless + other events last
         if weekless_events:
