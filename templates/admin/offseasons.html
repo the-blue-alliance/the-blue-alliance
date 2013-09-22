@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Pending Suggestions{% endblock %}
+
+{% block content %}
+
+<h1>{{ events|length }} New Offseasons to add</h1>
+
+<form action="/admin/suggestions/event/webcast/review" method="post">
+    <div class="col-xs-12">
+
+        {% if success %}
+        <div class="row">
+            <div class="alert alert-success">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <h4>Added events!</h4>
+                <p>{{events}}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% for event in events %}
+        <div class="row">
+            <div class="well">
+                {{event}}
+            </div>
+        </div>                
+        {% empty %}
+        <div class="row">
+            <div class="well">
+                <p>No new offseasons!</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</form>
+
+{% endblock %}
