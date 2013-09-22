@@ -18,6 +18,7 @@ from datafeeds.usfirst_matches_parser import UsfirstMatchesParser
 from datafeeds.usfirst_matches_parser_2002 import UsfirstMatchesParser2002
 from datafeeds.usfirst_matches_parser_2003 import UsfirstMatchesParser2003
 from datafeeds.usfirst_team_details_parser import UsfirstTeamDetailsParser
+from datafeeds.usfirst_pre2003_team_events_parser import UsfirstPre2003TeamEventsParser
 
 from models.event import Event
 from models.award import Award
@@ -198,6 +199,16 @@ class DatafeedUsfirst(DatafeedBase):
 
         logging.warning('Null TPID for team %s' % team.team_number)
         return None
+
+    def getPre2003TeamEvents(self, team):
+        if hasattr(team, 'first_tpid'):
+            if team.first_tpid:
+                url = self.TEAM_DETAILS_URL_PATTERN % (team.first_tpid)
+                first_eids, _ = self.parse(url, UsfirstPre2003TeamEventsParser)
+                return first_eids
+
+        logging.warning('Null TPID for team %s' % team.team_number)
+        return []
 
     def getTeamsTpids(self, year, skip=0):
         """
