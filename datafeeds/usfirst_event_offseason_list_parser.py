@@ -1,4 +1,4 @@
-import dateutil.parser
+#import dateutil.parser
 import urlparse
 import logging
 
@@ -31,11 +31,11 @@ class UsfirstEventOffseasonListParser(ParserBase):
                         if td["class"].count('views-field-title') > 0:
                             event["url_slug"] = td.a["href"].split("/")[-1]
                             event["name"] = " ".join(td.a.text.split(" ")[:-1])
-                        for span in td.findAll('span'):
-                            if span["class"].count("date-display-start") > 0:
-                                event["start_date"] = dateutil.parser.parse(span["content"])
-                            if span["class"].count("date-display-end") > 0:
-                                event["end_date"] = dateutil.parser.parse(span["content"])
+                        #for span in td.findAll('span'):
+                            #if span["class"].count("date-display-start") > 0:
+                            #    event["start_date"] = dateutil.parser.parse(span["content"])
+                            #if span["class"].count("date-display-end") > 0:
+                            #    event["end_date"] = dateutil.parser.parse(span["content"])
                     event["event_type_enum"] = EventType.OFFSEASON
                     events.append(event)
 
