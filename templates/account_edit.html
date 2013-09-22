@@ -9,7 +9,7 @@
   <div class="row">
     <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
       <p class="pull-right">
-        <a class="btn btn-info" href="/account/logout"><span class="glyphicon glyphicon-remove"></span> Logout</a>
+        <a class="btn btn-info" href="/logout"><span class="glyphicon glyphicon-remove"></span> Logout</a>
       </p>
       <p>
         <a class="btn btn-default" href="/account"><span class="glyphicon glyphicon-chevron-left"></span> View Profile</a>
@@ -24,7 +24,7 @@
       <form class="account_edit_form" action="/account/edit" method="post">
         <ul class="nav nav-tabs">
           <li class="active"><a href="#details" data-toggle="tab">Account Details</a></li>
-          <li><a href="#preferences" data-toggle="tab">Gameday Preferences</a></li>
+          <li><a href="#preferences" data-toggle="tab">Site Preferences</a></li>
           <li><a href="#follow" data-toggle="tab">Follow Teams/Events</a></li>
         </ul>
 
@@ -33,15 +33,21 @@
     		    <table class="table table-striped table-hover table-condensed">
     		        <tr>
     	            <td>Name</td>
-    	            <td><input class="form-control" type="text" name="display_name" {% if user_bundle.account.display_name != None %}value="{{user_bundle.account.display_name}}"{% endif %} placeholder="Woodie FLowers"/></td>
+    	            <td><input class="form-control" type="text" name="display_name" {% if user_bundle.account.display_name != None %}value="{{user_bundle.account.display_name}}"{% endif %} placeholder="Woodie FLowers" /></td>
     		        </tr>
+                <tr>
+                  <td>Team Affiliation</td>
+                  <td><input class="form-control" type="text" name="team_affiliation" {% if user_bundle.account.team_affiliation != None %}value="{{user_bundle.account.team_affiliation}}"{% endif %} placeholder="341" /></td>
+                </tr>
     		    </table>
           </div>
           <div class="tab-pane" id="preferences">
+            <h3>Gameday Layout</h3>
     		    <table class="table table-striped table-hover table-condensed">
     		        <tr>
-    	            <td>Prefered Layout</td>
-    	            <td><input class="form-control" type="text" name="game_layout" placeholder="Blah"/></td>
+    	            <td colspan="2">
+                    {{layout_list|safe}}
+                  </td>
     		        </tr>
     		    </table>
           </div>
@@ -49,11 +55,11 @@
     		    <table class="table table-striped table-hover table-condensed">
     		        <tr>
     	            <td>Teams</td>
-    	            <td><input class="form-control" type="text" id="follow_teams" name="follow_teams" placeholder="48,964,1114"/></td>
+    	            <td><input type="text" id="follow_teams" name="follow_teams" data-role="tagsinput" {% if user_bundle.account.follow_teams != None %}value="{{teams_following}}"{% endif %}/></td>
     		        </tr>
                 <tr>
                   <td>Events</td>
-                  <td><input class="form-control" type="text" id="follow_events" name="follow_events" placeholder="2013ohcl"/></td>
+                  <td><input type="text" id="follow_events" name="follow_events" data-role="tagsinput" {% if user_bundle.account.follow_events != None %}value="{{events_following}}"{% endif %}/></td>
                 </tr>
     		    </table>
           </div>
