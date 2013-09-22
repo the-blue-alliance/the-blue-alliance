@@ -30,8 +30,6 @@ class AdminOffseasonScraperController(LoggedInHandler):
         old_first_eids = [event.first_eid for event in old_events]
         truly_new_events = [event for event in new_events if event.first_eid not in old_first_eids]
 
-        logging.info(old_events)
-
         self.template_values.update({
             "events": truly_new_events,
             "event_key": self.request.get("event_key"),
