@@ -15,6 +15,7 @@ from helpers.user_bundle import UserBundle
 
 from models.account import Account
 from models.event import Event
+from models.insight import Insight
 from models.team import Team
 from models.sitevar import Sitevar
 
@@ -70,6 +71,28 @@ class MainCompetitionseasonHandler(CacheableHandler):
         }
 
         path = os.path.join(os.path.dirname(__file__), '../templates/index_competitionseason.html')
+        return template.render(path, template_values)
+
+
+class MainInsightsHandler(CacheableHandler):
+    def __init__(self, *args, **kw):
+        super(CacheableHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24
+        self._cache_key = "main_insights"
+        self._cache_version = 1
+
+    def _render(self, *args, **kw):
+        week_events = EventHelper.getWeekEvents()
+        template_values = {
+            "events": week_events,
+        }
+
+        insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(2013, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
+        for insight in insights:
+            if insight:
+                template_values[insight.name] = insight
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/index_insights.html')
         return template.render(path, template_values)
 
 
