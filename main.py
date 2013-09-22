@@ -10,9 +10,9 @@ from controllers.event_controller import EventList, EventDetail, EventRss
 from controllers.insights_controller import InsightsOverview, InsightsDetail
 from controllers.main_controller import ContactHandler, HashtagsHandler, \
       MainKickoffHandler, MainBuildseasonHandler, MainCompetitionseasonHandler, \
-      MainOffseasonHandler, OprHandler, SearchHandler, AboutHandler, ThanksHandler, \
-      PageNotFoundHandler, ChannelHandler, GamedayHandler, \
-      WebcastsHandler, RecordHandler
+      MainInsightsHandler, MainOffseasonHandler, OprHandler, SearchHandler, \
+      AboutHandler, ThanksHandler, PageNotFoundHandler, ChannelHandler, \
+      GamedayHandler, WebcastsHandler, RecordHandler
 from controllers.match_controller import MatchDetail
 from controllers.suggestions.suggest_match_video_controller import SuggestMatchVideoController
 from controllers.suggestions.suggest_event_webcast_controller import SuggestEventWebcastController
@@ -25,6 +25,7 @@ landing_handler = {tba_config.KICKOFF: MainKickoffHandler,
                    tba_config.BUILDSEASON: MainBuildseasonHandler,
                    tba_config.COMPETITIONSEASON: MainCompetitionseasonHandler,
                    tba_config.OFFSEASON: MainOffseasonHandler,
+                   tba_config.INSIGHTS: MainInsightsHandler,
                    }
 
 app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['landing_handler']]),

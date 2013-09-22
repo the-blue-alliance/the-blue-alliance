@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12 col-sm-5 col-lg-4">
+            <h1 class="hidden-xs">The Blue Alliance</h1>
+            <p class="hidden-xs"><em>FIRST</em> Robotics Competition team information, event results, and videos</p>
+            <form action="http://www.thebluealliance.com/search">
+                <input type="hidden" name="cx" value="017956276086362105630:99ctqytcokm"/>
+                <input type="hidden" name="cof" value="FORID:11" />
+                <input type="hidden" name="ie" value="UTF-8" />
+                <input type="text" class="form-control" placeholder="Search for teams and events" name="q"/>
+            </form>
+            <br>
+            <div class="btn-group btn-group-block-2">
+                <a class="btn btn-primary btn-lg" href="/teams"><span class="glyphicon glyphicon-user"></span> Teams</a>
+                <a class="btn btn-primary btn-lg" href="/events"><span class="glyphicon glyphicon-calendar"></span> Events</a>
+            </div>
+            <div class="hidden-xs">
+                <br>
+                <h4>Help other <em>FIRST</em> teams!</h4>
+                <p><small>KNOW VIDEOS WE'RE MISSING?</small><br /><a class="btn btn-default" href="https://docs.google.com/spreadsheet/ccc?key=0ApRO2Yzh2z01dExFZEdieV9WdTJsZ25HSWI3VUxsWGc" target="_blank"><span class="glyphicon glyphicon-upload"></span> Add YouTube Videos</a></p>
+                <p><small>LIKE CODING?</SMALL><br /><a class="btn btn-default" href="https://github.com/gregmarra/the-blue-alliance/" target="_blank"><span class="glyphicon glyphicon-wrench"></span> Hack on The Blue Alliance</a></p>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-7 col-lg-8">
+            <h2>2014 Kickoff: <span class="countdown-number countdown-days">--</span><span class="countdown-label day-label"> Days!</span> <small>Water Game?</small></h2>
+            <div id="countdown-finish-time">[2014, 0, 4, 0, 0, 0]</div>
+            <p>Watch the 2014 Kickoff LIVE on GameDay on The Blue Alliance on January 4th!</p>
+            <p><a class="btn btn-primary" href="https://www.facebook.com/events/192845597552272/" target="_blank"><span class="glyphicon glyphicon-calendar"></span> RSVP on Facebook</a></p>
+            {% if events and events|length > 0%}
+                {% with events as events %}
+                    {% include "event_partials/event_table.html" %}
+                {% endwith %}
+            {% endif %}
+
+            <h2 class="end_header">2013 Insights{% if num_matches %} <small>{{num_matches.data}} Matches Played</small>{% endif %}</h2>
+
+              {% if match_highscore %}
+              <div class="row">
+                <div class="col-xs-12">
+                  <h3>Highest Scoring Match{% if match_highscore.data|length > 1 %}es{% endif %}</h3>
+                  {% for match in  match_highscore.data %}
+                  <h4><a href="/match/{{match.key_name}}">{{ match.event_name }} <small>{{ match.verbose_name }}</small></a></h4>
+                  <table class="match-table insights-table">
+                    <tr class="key">
+                      <th colspan="{{match.alliances.items.0.1.teams|length}}">Teams</th>
+                      <th>Score</th>
+                    </tr>
+                    {% for items in match.alliances.items reversed %}
+                    <tr>
+                       {% for team in items.1.teams %}
+                         <td class="{{items.0}}{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}"><a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a></td>
+                       {% endfor %}
+                       <td class="{{items.0}}Score{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}">{% ifequal items.1.score "-1" %}?{% else %}{{ items.1.score }}{% endifequal %}</td>
+                    </tr>
+                    {% endfor %}
+                  </table>
+                  {% endfor %}
+                  </div>
+                </div>
+              {% endif %}
+
+              {% if match_averages_by_week %}
+              <h3>Average Match Score By Week</h3>
+                {% if elim_match_averages_by_week %}
+                <div class="chart-key"><div class="color-key blue-color-key"></div><div class="chart-key-text">All Match Averages</div></div>
+                <div class="chart-key"><div class="color-key green-color-key"></div><div class="chart-key-text">Elim Match Averages</div></div>
+                <figure style="width: 90%; height: 300px;" id="elim-match-average-chart"></figure>
+                <div id="elim-match-average" class="xcharts-data xcharts-line-double-data">[{{ match_averages_by_week.data_json|safe }}, {{ elim_match_averages_by_week.data_json|safe }}]</div>
+                {% else %}
+                <figure style="width: 90%; height: 300px;" id="match-average-chart"></figure>
+                <div id="match-average" class="xcharts-data xcharts-line-single-data">{{ match_averages_by_week.data_json|safe }}</div>
+                {% endif %}
+              {% endif %}
+
+              {% if score_distribution %}
+              <h3>Match Score Distribution <small>Percent of Matches vs. Match Score</small></h3>
+                {% if elim_score_distribution %}
+                <div class="chart-key"><div class="color-key blue-color-key"></div><div class="chart-key-text">All Match Scores</div></div>
+                <div class="chart-key"><div class="color-key green-color-key"></div><div class="chart-key-text">Elim Match Scores</div></div>
+                <figure style="width: 90%; height: 300px;" id="elim-match-distribution-chart"></figure>
+                <div id="elim-match-distribution" class="xcharts-data xcharts-bar-double-data">[{{ score_distribution.data_json|safe }}, {{ elim_score_distribution.data_json|safe }}]</div>
+                {% else %}
+                <figure style="width: 90%; height: 300px;" id="match-distribution-chart"></figure>
+                <div id="match-distribution" class="xcharts-data xcharts-bar-single-data">{{ score_distribution.data_json|safe }}</div>
+                {% endif %}
+              {% endif %}
+
+              {% if blue_banners or regional_district_winners %}
+              {% if match_highscore or match_averages_by_week or score_distribution %}
+              <hr>
+              {% endif %}
+              {% endif %}
+
+              {% if blue_banners or regional_district_winners %}
+              <h2>Awards</h2>
+              {% endif %}
+
+
+
+        </div>
+    </div>
+</div>
+{% endblock %}
