@@ -39,7 +39,8 @@ class EventHelper(object):
                 else:
                     to_return[CHAMPIONSHIP_EVENTS_LABEL] = [event]
             elif event.official and event.event_type_enum in {EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP}:
-                if event.start_date is None:
+                if (event.start_date is None or
+                   (event.start_date.month == 12 and event.start_date.day == 31)):
                     weekless_events.append(event)
                 else:
                     if week_start is None:

@@ -92,6 +92,14 @@ class TestEventGroupByWeek(unittest2.TestCase):
                 event_short='weekless3',
                 official=True,
                 event_type_enum=random.choice([EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP])
+            ),
+            Event(
+                id='2013weekless4'.format(event_id_counter),
+                event_short='weekless4',
+                start_date=datetime.datetime(2013, 12, 31),
+                end_date=datetime.datetime(2013, 12, 31),
+                official=True,
+                event_type_enum=random.choice([EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP])
             )
         ]
 
