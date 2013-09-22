@@ -8,12 +8,20 @@
 
     <div class="col-xs-12">
 
-        {% if success %}
+        {% if success == "duplicate" %}
         <div class="row">
             <div class="alert alert-success">
                 <button type="button" class="close" data-dismiss="alert">&times;</button>
-                <h4>Added events!</h4>
-                <p>{{events}}</p>
+                <h4>Duped event into {{event_key}}!</h4>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if success == "create" %}
+        <div class="row">
+            <div class="alert alert-success">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <h4>Created {{event_key}}!</h4>
             </div>
         </div>
         {% endif %}
@@ -23,7 +31,6 @@
             <div class="well">
                 <form action="/admin/offseasons" method="post">
                     <legend>Add {{ event.year }} {{ event.name }}</legend>
-                    {{event}}
                     <table class="table table-striped table-hover table-condensed">
                         <tr>
                             <td>Name</td>
@@ -42,6 +49,10 @@
                         <tr>
                             <td>Year</td>
                             <td><input type="text" name="disabled_year" value="{{event.year}}" disabled="disabled" /><input type="hidden" name="year" value="{{event.year}}" /></td>
+                        </tr>
+                        <tr>
+                            <td>FIRST EID</td>
+                            <td><input type="text" name="event_first_eid" value="{{event.first_eid}}" /></td>
                         </tr>
                         <tr>
                             <td>Event Location</td>

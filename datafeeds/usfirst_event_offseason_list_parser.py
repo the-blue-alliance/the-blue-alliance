@@ -29,7 +29,7 @@ class UsfirstEventOffseasonListParser(ParserBase):
                     event = dict()
                     for td in tds:
                         if td["class"].count('views-field-title') > 0:
-                            event["url_slug"] = td.a["href"].split("/")[-1]
+                            event["first_eid"] = td.a["href"].split("/")[-1]
                             event["name"] = " ".join(td.a.text.split(" ")[:-1])
                             event["location"] = str(td.a.text.split(" ")[-1]).translate(None, "()")
                         for span in td.findAll('span'):

@@ -19,9 +19,11 @@ class DatafeedUsfirstOffseason(DatafeedBase):
         return [Event(
             event_type_enum=event.get("event_type_enum", None),
             event_short="???",
+            first_eid=event.get("first_eid", None),
             name=event.get("name", None),
             year=2013, #TODO: don't hardcode me -gregmarra 20130921
             start_date=event.get("start_date", None),
             end_date=event.get("end_date", None),
+            location=event.get("location", None),
             )
             for event in events]
