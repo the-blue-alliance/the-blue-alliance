@@ -37,6 +37,9 @@ class UsfirstEventOffseasonListParser(ParserBase):
                                 event["start_date"] = datetime.strptime(span["content"][:10], "%Y-%m-%d")
                             if span["class"].count("date-display-end") > 0:
                                 event["end_date"] = datetime.strptime(span["content"][:10], "%Y-%m-%d")
+                            if span["class"].count("date-display-single") > 0:
+                                event["start_date"] = datetime.strptime(span["content"][:10], "%Y-%m-%d")
+                                event["end_date"] = datetime.strptime(span["content"][:10], "%Y-%m-%d")
                     event["event_type_enum"] = EventType.OFFSEASON
                     events.append(event)
 

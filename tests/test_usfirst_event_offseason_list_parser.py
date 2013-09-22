@@ -25,3 +25,6 @@ class TestUsfirstEventOffseasonListParser(unittest2.TestCase):
         self.assertEqual(events[1]["start_date"], datetime.datetime(2013, 9, 13))
         self.assertEqual(events[1]["end_date"], datetime.datetime(2013, 9, 14))
         self.assertEqual(events[1]["location"], "CA")
+
+        self.assertEqual(events[4]["start_date"], datetime.datetime(2013, 9, 21))
+        self.assertEqual(events[4]["end_date"], datetime.datetime(2013, 9, 21))
