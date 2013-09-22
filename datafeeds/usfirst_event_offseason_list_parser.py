@@ -29,12 +29,16 @@ class UsfirstEventOffseasonListParser(ParserBase):
                     event = dict()
                     for td in tds:
                         if td["class"].count('views-field-title') > 0:
-                            event["url_slug"] = td.a["href"].split("/")[-1]
+                            event["first_eid"] = td.a["href"].split("/")[-1]
                             event["name"] = " ".join(td.a.text.split(" ")[:-1])
+                            event["location"] = str(td.a.text.split(" ")[-1]).translate(None, "()")
                         for span in td.findAll('span'):
                             if span["class"].count("date-display-start") > 0:
                                 event["start_date"] = datetime.strptime(span["content"][:10], "%Y-%m-%d")
                             if span["class"].count("date-display-end") > 0:
+                                event["end_date"] = datetime.strptime(span["content"][:10], "%Y-%m-%d")
+                            if span["class"].count("date-display-single") > 0:
+                                event["start_date"] = datetime.strptime(span["content"][:10], "%Y-%m-%d")
                                 event["end_date"] = datetime.strptime(span["content"][:10], "%Y-%m-%d")
                     event["event_type_enum"] = EventType.OFFSEASON
                     events.append(event)
