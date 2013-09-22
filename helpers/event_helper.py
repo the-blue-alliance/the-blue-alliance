@@ -15,6 +15,7 @@ CHAMPIONSHIP_EVENTS_LABEL = 'Championship Event'
 REGIONAL_EVENTS_LABEL = 'Week {}'
 WEEKLESS_EVENTS_LABEL = 'Other Official Events'
 OFFSEASON_EVENTS_LABEL = 'Offseason'
+PRESEASON_EVENTS_LABEL = 'Preseason'
 
 
 class EventHelper(object):

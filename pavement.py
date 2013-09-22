@@ -73,6 +73,7 @@ def test_fast():
   sh("python run_tests.py --test_pattern=test_*api.py")
   sh("python run_tests.py --test_pattern=test_event.py")
   sh("python run_tests.py --test_pattern=test_match_cleanup.py")
+  sh("python run_tests.py --test_pattern=test_event_group_by_week.py")
 
 
 def setup_function():
