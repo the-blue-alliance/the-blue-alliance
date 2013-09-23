@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /_
 Disallow: /admin/
-Disallow: /_/*
+Disallow: /api/
+Disallow: /tasks/
