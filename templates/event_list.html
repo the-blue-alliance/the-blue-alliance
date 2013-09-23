@@ -16,10 +16,10 @@
             {{selected_year}}
             <span class="caret"></span>
           </a>
-          <ul class="dropdown-menu">
-              {% for year in valid_years %}
-                    <li><a href="/events/{{year}}">{{year}}</a></li>
-              {% endfor %}
+          <ul class="dropdown-menu tba-dropdown-menu-limited">
+            {% for year in valid_years %}
+              <li><a href="/events/{{year}}">{{year}}</a></li>
+            {% endfor %}
           </ul>
         </div>
 
