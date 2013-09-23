@@ -30,7 +30,11 @@ class AdminMediaDashboard(LoggedInHandler):
 
 
 class AdminMediaAdd(LoggedInHandler):
-    def post(self, team_key):
+    REFERENCE_MAP = {
+        'team': Team
+    }
+
+    def post(self):
         self._require_admin()
 
         media_dict = MediaHelper.partial_media_dict_from_url(self.request.get('media_url').strip())
@@ -46,7 +50,8 @@ class AdminMediaAdd(LoggedInHandler):
             media_type_enum=media_dict['media_type_enum'],
             details_json=media_dict.get('details_json', None),
             year=year,
-            references=[ndb.Key(Team, team_key)],
+            references=[ndb.Key(self.REFERENCE_MAP[self.request.get('reference_type')],
+                                self.request.get('reference_key'))],
         )
         MediaManipulator.createOrUpdate(media)
 
