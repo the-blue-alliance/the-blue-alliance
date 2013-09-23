@@ -8,6 +8,9 @@ from controllers.admin.admin_event_controller import AdminEventAddTeams, AdminEv
 from controllers.admin.admin_main_controller import AdminDebugHandler, AdminMain, AdminTasksHandler
 from controllers.admin.admin_award_controller import AdminAwardDashboard, AdminAwardEdit, AdminAwardAdd
 from controllers.admin.admin_match_controller import AdminVideosAdd, AdminMatchCleanup, AdminMatchDashboard, AdminMatchDelete, AdminMatchDetail, AdminMatchAdd, AdminMatchEdit
+from controllers.admin.admin_media_controller import AdminMediaDashboard, AdminMediaAdd
+
+
 from controllers.admin.admin_memcache_controller import AdminMemcacheMain
 from controllers.admin.admin_offseason_scraper_controller import AdminOffseasonScraperController
 from controllers.admin.admin_sitevar_controller import AdminSitevarCreate, AdminSitevarEdit, AdminSitevarList
@@ -36,6 +39,8 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/match/delete/(.*)', AdminMatchDelete),
                                ('/admin/match/edit/(.*)', AdminMatchEdit),
                                ('/admin/match/(.*)', AdminMatchDetail),
+                               ('/admin/media', AdminMediaDashboard),
+                               ('/admin/media/add_media/(.*)', AdminMediaAdd),
                                ('/admin/memcache', AdminMemcacheMain),
                                ('/admin/migration', AdminMigration),
                                ('/admin/offseasons', AdminOffseasonScraperController),

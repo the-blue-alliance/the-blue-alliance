@@ -1,0 +1,9 @@
+{% if media.slugname == 'cdphoto' %}
+  <a href={{media.details.link_url}} target="_blank">
+    <img class="img-thumbnail" src="{{media.details.image_url}}" height="150" width="150">
+  </a>
+{% else %}
+  {% if media.slugname == 'youtube' %}
+    <iframe width="320" height="180" src="http://www.youtube.com/embed/{{media.media_id}}" frameborder="0" allowfullscreen></iframe>
+  {% endif %}
+{% endif %}
