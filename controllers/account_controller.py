@@ -11,7 +11,7 @@ import tba_config
 from base_controller import LoggedInHandler
 from helpers.user_bundle import UserBundle
 
-from consts.gameday_pref_types import GamedayLayoutType
+from consts.gameday_layout_type import GamedayLayoutType
 from models.account import Account
 
 class AccountOverview(LoggedInHandler):
