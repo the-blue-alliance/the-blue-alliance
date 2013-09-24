@@ -17,7 +17,7 @@ class MediaHelper(object):
         media_dict = {}
 
         if 'chiefdelphi.com/media/photos/' in url:
-            media_dict['media_type_enum'] = MediaType.CD_PHOTO
+            media_dict['media_type_enum'] = MediaType.CD_PHOTO_THREAD
             media_dict['media_id'] = re.match(r'.*chiefdelphi.com\/media\/photos\/(\d+)', url).group(1)
 
             urlfetch_result = urlfetch.fetch(url, deadline=10)
