@@ -44,7 +44,7 @@ class EventHelper(object):
                     weekless_events.append(event)
                 else:
                     if week_start is None:
-                        diff_from_thurs = event.start_date.weekday() - 3   # 3 is Thursday
+                        diff_from_thurs = (event.start_date.weekday() - 3) % 7   # 3 is Thursday
                         week_start = event.start_date - datetime.timedelta(days=diff_from_thurs)
 
                     if event.start_date >= week_start + datetime.timedelta(days=7):
