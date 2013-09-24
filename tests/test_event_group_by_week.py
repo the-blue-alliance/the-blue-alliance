@@ -1,4 +1,5 @@
 import unittest2
+import time
 import datetime
 import random
 import logging
@@ -18,14 +19,18 @@ class TestEventGroupByWeek(unittest2.TestCase):
         events_by_week = {}  # we will use this as the "answer key"
 
         # Generate random regional events
+        seed = int(time.time())
+        state = random.Random()
+        state.seed(seed)
+
         event_id_counter = 0
         week_start = datetime.datetime(2013, 2, 28)
         for i in range(1, 7):  # test for 6 weeks
-            for _ in range(random.randint(1, 15)):  # random number of events per week
+            for _ in range(state.randint(1, 15)):  # random number of events per week
                 week_label = REGIONAL_EVENTS_LABEL.format(i)
 
-                start_date = week_start + datetime.timedelta(days=random.randint(0, 6))
-                end_date = start_date + datetime.timedelta(days=random.randint(0, 3))
+                start_date = week_start + datetime.timedelta(days=state.randint(0, 6))
+                end_date = start_date + datetime.timedelta(days=state.randint(0, 3))
 
                 event = Event(
                     id='2013tst{}'.format(event_id_counter),
@@ -33,7 +38,7 @@ class TestEventGroupByWeek(unittest2.TestCase):
                     start_date=start_date,
                     end_date=end_date,
                     official=True,
-                    event_type_enum=random.choice([EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP])
+                    event_type_enum=state.choice([EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP])
                 )
 
                 if week_label in events_by_week:
@@ -79,19 +84,19 @@ class TestEventGroupByWeek(unittest2.TestCase):
                 id='2013weekless1'.format(event_id_counter),
                 event_short='weekless1',
                 official=True,
-                event_type_enum=random.choice([EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP])
+                event_type_enum=state.choice([EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP])
             ),
             Event(
                 id='2013weekless2'.format(event_id_counter),
                 event_short='weekless2',
                 official=True,
-                event_type_enum=random.choice([EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP])
+                event_type_enum=state.choice([EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP])
             ),
             Event(
                 id='2013weekless3'.format(event_id_counter),
                 event_short='weekless3',
                 official=True,
-                event_type_enum=random.choice([EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP])
+                event_type_enum=state.choice([EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP])
             ),
             Event(
                 id='2013weekless4'.format(event_id_counter),
@@ -99,7 +104,7 @@ class TestEventGroupByWeek(unittest2.TestCase):
                 start_date=datetime.datetime(2013, 12, 31),
                 end_date=datetime.datetime(2013, 12, 31),
                 official=True,
-                event_type_enum=random.choice([EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP])
+                event_type_enum=state.choice([EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP])
             )
         ]
 
@@ -167,7 +172,7 @@ class TestEventGroupByWeek(unittest2.TestCase):
         events = []
         for week_events in events_by_week.values():
             events.extend(week_events)
-        random.shuffle(events)
+        state.shuffle(events)
 
         # Begin testing
         events.sort(key=EventHelper.distantFutureIfNoStartDate)
@@ -178,6 +183,7 @@ class TestEventGroupByWeek(unittest2.TestCase):
                 self.assertEqual(set([e.key.id() for e in events_by_week[key]]),
                                  set([e.key.id() for e in week_events[key]]))
             except AssertionError, e:
+                logging.warning("\n\nseed: {}".format(seed))
                 logging.warning("\n\nkey: {}".format(key))
                 logging.warning("\n\nevents_by_week: {}".format(events_by_week[key]))
                 logging.warning("\n\nweek_events: {}".format(week_events[key]))
