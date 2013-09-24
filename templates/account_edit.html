@@ -26,6 +26,7 @@
           <li class="active"><a href="#details" data-toggle="tab">Account Details</a></li>
           <!--
           <li><a href="#preferences" data-toggle="tab">Gameday Preferences</a></li>
+          <li><a href="#preferences" data-toggle="tab">Site Preferences</a></li>
           <li><a href="#follow" data-toggle="tab">Follow Teams/Events</a></li>
           -->
         </ul>
@@ -60,7 +61,7 @@
                 </tr>
                 <tr>
                   <td>Events</td>
-                  <td><input class="form-control" type="text" id="follow_events" name="follow_events" placeholder="2013ohcl"/></td>
+                  <td><input type="text" id="follow_events" name="follow_events" data-role="tagsinput" {% if user_bundle.account.follow_events != None %}value="{{events_following}}"{% endif %}/></td>
                 </tr>
               </tbody>
             </table>
