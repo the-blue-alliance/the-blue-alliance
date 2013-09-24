@@ -41,7 +41,7 @@ class AccountEdit(LoggedInHandler):
             self.template_values['events_following'] = ",".join(json.loads(self.user_bundle.account.follow_events))
 
         # Generates form elements for all possible layouts based on the GamedayLayoutType... type
-        gameday_layout_names = [attr for attr in GamedayLayoutType.__type_names__]
+        gameday_layout_names = [attr for attr in GamedayLayoutType.type_names]
         layout_list = ''
         for value in gameday_layout_names:
             layout_list += '''<input type="radio" class="form-control" name="gameday_layout" id="gameday_layout_'''+str(value)+'''" value="'''+str(value)+'''"'''
@@ -54,7 +54,7 @@ class AccountEdit(LoggedInHandler):
             # If user's current setting, mark this option as selected by default
             if self.user_bundle.account.gameday_layout == value:
                 layout_list += ''' selected'''
-            layout_list += '''"><img src="http://placehold.it/350x150" width="350" height="150" /><div class="layout_name">'''+GamedayLayoutType.__type_names__[value]+'''</div></label>'''
+            layout_list += '''"><img src="http://placehold.it/350x150" width="350" height="150" /><div class="layout_name">'''+GamedayLayoutType.type_names[value]+'''</div></label>'''
 
         self.template_values['layout_list'] = layout_list
 

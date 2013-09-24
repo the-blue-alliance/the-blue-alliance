@@ -7,7 +7,7 @@ class GamedayLayoutType(object):
     ONE_FOUR = 5
     HEX = 6
 
-    __type_names__ = {
+    type_names = {
         SINGLE: 'Single',
         SPLIT: 'Split',
         ONE_TWO: '1+2',
