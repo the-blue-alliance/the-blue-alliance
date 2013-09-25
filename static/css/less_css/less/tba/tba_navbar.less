@@ -134,3 +134,24 @@
   background-image: url('/images/icons/tba-sprite.png');
   background-position: -10px -98px;
 }
+
+@login-icon-size: 18px;
+.tba-navbar-login {
+  padding: 0;
+  margin: 0;
+  height: @navbar-height;
+  line-height: @navbar-height;
+  display:inline-block;
+  a {
+    height: 100%;
+    color: #fff;
+    font-size: @login-icon-size;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  a:hover {
+    color: #ccc;
+  }
+  
+  float: right;
+}
