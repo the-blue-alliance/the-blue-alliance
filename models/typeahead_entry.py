@@ -7,6 +7,9 @@ class TypeaheadEntry(ndb.Model):
     TypeaheadEntry.id (set in cron_controller.TypeaheadCalcDo) is the key and
     TypeaheadEntry.data_json is the value.
     """
+    ALL_TEAMS_KEY = 'teams-all'
+    ALL_EVENTS_KEY = 'events-all'
+
     data_json = ndb.StringProperty(required=True, indexed=False)
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
