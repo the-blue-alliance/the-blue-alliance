@@ -181,6 +181,8 @@ class UsfirstEventDetailsGet(webapp.RequestHandler):
                 teams = []
 
         teams = TeamManipulator.createOrUpdate(teams)
+        if type(teams) is not list:
+            teams = [teams]
 
         if teams:
             event_teams = [EventTeam(
@@ -190,6 +192,8 @@ class UsfirstEventDetailsGet(webapp.RequestHandler):
                 year=event.year)
                 for team in teams]
             event_teams = EventTeamManipulator.createOrUpdate(event_teams)
+            if type(event_teams) is not list:
+                event_teams = [event_teams]
         else:
             event_teams = []
 
