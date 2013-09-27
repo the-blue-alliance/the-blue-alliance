@@ -349,10 +349,16 @@ class TypeaheadCalcDo(webapp.RequestHandler):
 
         for event in events:
             data = '%s %s [%s]' % (event.year, event.name, event.event_short.upper())
+            # all events
             if TypeaheadEntry.ALL_EVENTS_KEY in results:
                 results[TypeaheadEntry.ALL_EVENTS_KEY].append(data)
             else:
                 results[TypeaheadEntry.ALL_EVENTS_KEY] = [data]
+            # events by year
+            if TypeaheadEntry.YEAR_EVENTS_KEY.format(event.year) in results:
+                results[TypeaheadEntry.YEAR_EVENTS_KEY.format(event.year)].append(data)
+            else:
+                results[TypeaheadEntry.YEAR_EVENTS_KEY.format(event.year)] = [data]
 
         entries = []
         for key, data in results.items():

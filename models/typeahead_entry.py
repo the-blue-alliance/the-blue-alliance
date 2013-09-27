@@ -9,6 +9,7 @@ class TypeaheadEntry(ndb.Model):
     """
     ALL_TEAMS_KEY = 'teams-all'
     ALL_EVENTS_KEY = 'events-all'
+    YEAR_EVENTS_KEY = 'events-{}'
 
     data_json = ndb.StringProperty(required=True, indexed=False)
 
