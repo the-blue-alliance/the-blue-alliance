@@ -23,7 +23,7 @@ from models.award import Award
 
 class TeamList(CacheableHandler):
 
-    VALID_PAGES = [1, 2, 3, 4, 5]
+    VALID_PAGES = [1, 2, 3, 4, 5, 6]
 
     def __init__(self, *args, **kw):
         super(TeamList, self).__init__(*args, **kw)
