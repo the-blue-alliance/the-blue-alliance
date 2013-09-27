@@ -337,36 +337,32 @@ class TypeaheadCalcDo(webapp.RequestHandler):
 
         results = {}
         for team in teams:
-            keys = set()
-            keys.add(str(team.team_number)[0])
             if not team.nickname:
                 nickname = "Team %s" % team.team_number
             else:
                 nickname = team.nickname
-                keys = keys.union(TypeaheadHelper.get_search_keys(nickname))
-            entry = '%s | %s' % (team.team_number, nickname)
-            for key in keys:
-                if key in results:
-                    results[key].append(entry)
-                else:
-                    results[key] = [entry]
+            data = '%s | %s' % (team.team_number, nickname)
+            if TypeaheadEntry.ALL_TEAMS_KEY in results:
+                results[TypeaheadEntry.ALL_TEAMS_KEY].append(data)
+            else:
+                results[TypeaheadEntry.ALL_TEAMS_KEY] = [data]
 
         for event in events:
-            keys = set()
-            keys.add(str(event.year)[0])
-            keys.add(event.event_short[0])
-            keys = keys.union(TypeaheadHelper.get_search_keys(event.name))
-            entry = '%s %s [%s]' % (event.year, event.name, event.event_short.upper())
-            for key in keys:
-                if key in results:
-                    results[key].append(entry)
-                else:
-                    results[key] = [entry]
+            data = '%s %s [%s]' % (event.year, event.name, event.event_short.upper())
+            # all events
+            if TypeaheadEntry.ALL_EVENTS_KEY in results:
+                results[TypeaheadEntry.ALL_EVENTS_KEY].append(data)
+            else:
+                results[TypeaheadEntry.ALL_EVENTS_KEY] = [data]
+            # events by year
+            if TypeaheadEntry.YEAR_EVENTS_KEY.format(event.year) in results:
+                results[TypeaheadEntry.YEAR_EVENTS_KEY.format(event.year)].append(data)
+            else:
+                results[TypeaheadEntry.YEAR_EVENTS_KEY.format(event.year)] = [data]
 
         entries = []
         for key, data in results.items():
-            entries.append(TypeaheadEntry(id=key,
-                                          data_json=json.dumps(data)))
+            entries.append(TypeaheadEntry(id=key, data_json=json.dumps(data)))
         ndb.put_multi(entries)
 
         template_values = {'results': results}

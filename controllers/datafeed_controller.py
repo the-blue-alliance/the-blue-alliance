@@ -165,12 +165,24 @@ class UsfirstEventDetailsGet(webapp.RequestHandler):
             event = df_legacy.getEventDetails(int(year), first_eid)
         event = EventManipulator.createOrUpdate(event)
 
+        use_legacy_event_teams = False
         try:
             teams = df.getEventTeams(int(year), first_eid)
+            if not teams:
+                use_legacy_event_teams = True
         except:
+            use_legacy_event_teams = True
+        if use_legacy_event_teams:
             logging.warning("getEventTeams with DatafeedUsfirst for event id {} failed. Retrying with DatafeedUsfirstLegacy.".format(first_eid))
-            teams = df_legacy.getEventTeams(int(year), first_eid)
+            try:
+                teams = df_legacy.getEventTeams(int(year), first_eid)
+            except:
+                logging.warning("getEventTeams with DatafeedUsfirstLegacy for event id {} failed.".format(first_eid))
+                teams = []
+
         teams = TeamManipulator.createOrUpdate(teams)
+        if type(teams) is not list:
+            teams = [teams]
 
         if teams:
             event_teams = [EventTeam(
@@ -180,6 +192,8 @@ class UsfirstEventDetailsGet(webapp.RequestHandler):
                 year=event.year)
                 for team in teams]
             event_teams = EventTeamManipulator.createOrUpdate(event_teams)
+            if type(event_teams) is not list:
+                event_teams = [event_teams]
         else:
             event_teams = []
 

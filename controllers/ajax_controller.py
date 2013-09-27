@@ -1,5 +1,4 @@
 import os
-import json
 import urllib2
 
 from google.appengine.api import memcache
@@ -37,11 +36,6 @@ class TypeaheadHandler(CacheableHandler):
         super(TypeaheadHandler, self).get(search_key)
 
     def _render(self, search_key):
-        """
-        Currently, search_key is the first character in the search query
-        entered by the user. If desired, this could be the entire query, but
-        searching by the first letter seems to be good enough for us.
-        """
         entry = TypeaheadEntry.get_by_id(search_key)
         if entry is None:
             return '[]'
