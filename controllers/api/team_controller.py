@@ -1,20 +1,20 @@
-import logging
 import json
+import logging
 import webapp2
 
 from datetime import datetime
 
-from google.appengine.ext import ndb
 from google.appengine.api import memcache
+from google.appengine.ext import ndb
 
 import tba_config
 from controllers.api.api_controller import ApiController
 from helpers.model_to_dict import ModelToDict
 
-from models.team import Team
+from models.award import Award
 from models.event_team import EventTeam
 from models.match import Match
-from models.award import Award
+from models.team import Team
 
 class TeamController(ApiController):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24

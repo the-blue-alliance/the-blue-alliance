@@ -1,6 +1,6 @@
-import logging
-import json
 from datetime import datetime
+import json
+import logging
 
 from  models.award import Award
 from  models.event import Event
