@@ -9,7 +9,7 @@ from google.appengine.api import memcache
 
 import tba_config
 from controllers.api.api_controller import ApiController
-from helpers.api.model_to_dict import ModelToDict
+from helpers.model_to_dict import ModelToDict
 
 from models.team import Team
 from models.event_team import EventTeam
@@ -31,11 +31,6 @@ class TeamController(ApiController):
     @property
     def _validators(self):
         return [("team_id_validator", self.team_id)]
-
-    def set_team(self):
-        self.team = Team.get_by_id(self.team_id)
-        if self.team is None:
-            self.abort(404, "Team %s not found" % self.team_id)
 
     def _render(self, team_key, year=None):
 
@@ -70,7 +65,10 @@ class TeamController(ApiController):
             events_matches, awards = yield get_events_matches_async(), get_awards_async()
             raise ndb.Return(events_matches, awards)
 
-        self.set_team()
+        self.team = Team.get_by_id(self.team_id)
+        if self.team is None:
+            self._errors = json.dumps({"404": "%s team not found" % self.team_id})
+            self.abort(404)
         events_matches, awards = get_events_matches_awards()
         events_matches = sorted(events_matches, key=lambda (e, _): e.start_date)
         team_dict = ModelToDict.teamConverter(self.team)
