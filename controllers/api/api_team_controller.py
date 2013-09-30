@@ -23,10 +23,10 @@ class ApiTeamController(ApiBaseController):
 
     def __init__(self, *args, **kw):
         super(ApiTeamController, self).__init__(*args, **kw)
-        self.team_id = self.request.route_kwargs["team_key"]
+        self.team_key = self.request.route_kwargs["team_key"]
         self.year = int(self.request.route_kwargs.get("year") or datetime.now().year)
         self._cache_expiration = self.LONG_CACHE_EXPIRATION
-        self._cache_key = "team_detail_api_{}_{}".format(self.team_id, self.year)
+        self._cache_key = "apiv2_team_controller_{}_{}".format(self.team_id, self.year)
         self._cache_version = 2
 
     @property
