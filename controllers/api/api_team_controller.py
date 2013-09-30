@@ -26,12 +26,12 @@ class ApiTeamController(ApiBaseController):
         self.team_key = self.request.route_kwargs["team_key"]
         self.year = int(self.request.route_kwargs.get("year") or datetime.now().year)
         self._cache_expiration = self.LONG_CACHE_EXPIRATION
-        self._cache_key = "apiv2_team_controller_{}_{}".format(self.team_id, self.year)
+        self._cache_key = "apiv2_team_controller_{}_{}".format(self.team_key, self.year)
         self._cache_version = 2
 
     @property
     def _validators(self):
-        return [("team_id_validator", self.team_id)]
+        return [("team_id_validator", self.team_key)]
 
     def _render(self, team_key, year=None):
 
@@ -66,9 +66,9 @@ class ApiTeamController(ApiBaseController):
             events_matches, awards = yield get_events_matches_async(), get_awards_async()
             raise ndb.Return(events_matches, awards)
 
-        self.team = Team.get_by_id(self.team_id)
+        self.team = Team.get_by_id(self.team_key)
         if self.team is None:
-            self._errors = json.dumps({"404": "%s team not found" % self.team_id})
+            self._errors = json.dumps({"404": "%s team not found" % self.team_key})
             self.abort(404)
         events_matches, awards = get_events_matches_awards()
         events_matches = sorted(events_matches, key=lambda (e, _): e.start_date)

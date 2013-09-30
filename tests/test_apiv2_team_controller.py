@@ -10,7 +10,7 @@ from google.appengine.ext import testbed
 
 from consts.event_type import EventType
 
-from controllers.api.team_controller import TeamController
+from controllers.api.api_team_controller import ApiTeamController
 
 from models.event import Event
 from models.event_team import EventTeam
@@ -18,10 +18,10 @@ from models.match import Match
 from models.team import Team
 
 
-class TestTeamApi(unittest2.TestCase):
+class TestTeamApiController(unittest2.TestCase):
 
     def setUp(self):
-        app = webapp2.WSGIApplication([webapp2.Route(r'/<team_key:>', TeamController, methods=['GET'])], debug=True)
+        app = webapp2.WSGIApplication([webapp2.Route(r'/<team_key:>', ApiTeamController, methods=['GET'])], debug=True)
         self.testapp = webtest.TestApp(app)
 
         self.testbed = testbed.Testbed()
@@ -82,17 +82,17 @@ class TestTeamApi(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def assertTeamJson(self, team_dict):
-        self.assertEqual(team_dict["key"], self.team.key_name)
-        self.assertEqual(team_dict["team_number"], self.team.team_number)
-        self.assertEqual(team_dict["nickname"], self.team.nickname)
-        self.assertEqual(team_dict["location"], self.team.location)
-        self.assertEqual(team_dict["locality"], "Greenville")
-        self.assertEqual(team_dict["country_name"], "USA")
-        self.assertEqual(team_dict["region"], "SC")
-        self.assertEqual(team_dict["website"], self.team.website)
+    def assertTeamJson(self, team):
+        self.assertEqual(team["key"], self.team.key_name)
+        self.assertEqual(team["team_number"], self.team.team_number)
+        self.assertEqual(team["nickname"], self.team.nickname)
+        self.assertEqual(team["location"], self.team.location)
+        self.assertEqual(team["locality"], "Greenville")
+        self.assertEqual(team["country_name"], "USA")
+        self.assertEqual(team["region"], "SC")
+        self.assertEqual(team["website"], self.team.website)
 
-        event = team_dict["events"][0]
+    def assertEventJson(self, event):
         self.assertEqual(event["key"], self.event.key_name)
         self.assertEqual(event["name"], self.event.name)
         self.assertEqual(event["short_name"], self.event.short_name)
@@ -100,7 +100,7 @@ class TestTeamApi(unittest2.TestCase):
         self.assertEqual(event["start_date"], self.event.start_date.isoformat())
         self.assertEqual(event["end_date"], self.event.end_date.isoformat())
 
-        match = event["matches"][0]
+    def assertMatchJson(self, match):
         self.assertEqual(str(match["key"]), self.match.key.string_id())
         self.assertEqual(match["comp_level"], self.match.comp_level)
         self.assertEqual(match["event"], self.match.event.string_id())
@@ -109,9 +109,10 @@ class TestTeamApi(unittest2.TestCase):
         self.assertEqual(match["match_number"], self.match.match_number)
         self.assertEqual(match["team_keys"], self.match.team_key_names)
 
-
     def testTeamApi(self):
         response = self.testapp.get('/frc281')
 
         team_dict = json.loads(response.body)
         self.assertTeamJson(team_dict)
+        self.assertEventJson(team_dict["events"][0])
+        self.assertMatchJson(team_dict["events"][0]["matches"][0])

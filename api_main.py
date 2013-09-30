@@ -25,4 +25,3 @@ app = webapp2.WSGIApplication([
                                 webapp2.Route(r'/api/v2/team/<team_key:>/<year:([0-9]*)>', ApiTeamController, methods=['GET']),
                                ],
                                debug=tba_config.DEBUG)
-
