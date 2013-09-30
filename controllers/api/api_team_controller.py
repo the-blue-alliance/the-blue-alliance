@@ -8,7 +8,8 @@ from google.appengine.api import memcache
 from google.appengine.ext import ndb
 
 import tba_config
-from controllers.api.api_controller import ApiController
+from controllers.api.api_base_controller import ApiBaseController
+
 from helpers.model_to_dict import ModelToDict
 
 from models.award import Award
@@ -16,12 +17,12 @@ from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
 
-class TeamController(ApiController):
+class ApiTeamController(ApiBaseController):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
 
     def __init__(self, *args, **kw):
-        super(TeamController, self).__init__(*args, **kw)
+        super(ApiTeamController, self).__init__(*args, **kw)
         self.team_id = self.request.route_kwargs["team_key"]
         self.year = int(self.request.route_kwargs.get("year") or datetime.now().year)
         self._cache_expiration = self.LONG_CACHE_EXPIRATION

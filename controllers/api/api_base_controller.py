@@ -5,10 +5,10 @@ import webapp2
 from controllers.base_controller import CacheableHandler
 from helpers.validation_helper import ValidationHelper
 
-class ApiController(CacheableHandler):
+class ApiBaseController(CacheableHandler):
 
     def __init__(self, *args, **kw):
-        super(ApiController, self).__init__(*args, **kw)
+        super(ApiBaseController, self).__init__(*args, **kw)
         self.response.content_type = 'application/json'
 
     def handle_exception(self, exception, debug):
@@ -28,4 +28,4 @@ class ApiController(CacheableHandler):
         if self._errors:
             self.abort(400)
 
-        super(ApiController, self).get(*args, **kw)
+        super(ApiBaseController, self).get(*args, **kw)
