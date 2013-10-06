@@ -29,6 +29,7 @@ class ApiBaseController(CacheableHandler):
         self._errors = ValidationHelper.validate(self._validators)
         if self._errors:
             self.abort(400)
+        self._write_cache_headers()
 
         super(ApiBaseController, self).get(*args, **kw)
 
