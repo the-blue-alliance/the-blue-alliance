@@ -9,6 +9,7 @@ class TestKeyNameValidators(unittest2.TestCase):
 
     def setUp(self):
         self.valid_team_key = "frc177"
+        self.valid_team_key2 = "frc1"
         self.invalid_team_key = "bcr077"
         self.invalid_team_key2 = "frc 011"
         self.invalid_team_key3 = "frc711\\"
@@ -25,6 +26,7 @@ class TestKeyNameValidators(unittest2.TestCase):
 
     def test_valid_team_key(self):
         self.assertEqual(Team.validate_key_name(self.valid_team_key), True)
+        self.assertEqual(Team.validate_key_name(self.valid_team_key2), True)
 
     def test_invalid_team_key(self):
         self.assertEqual(Team.validate_key_name(self.invalid_team_key), False)
