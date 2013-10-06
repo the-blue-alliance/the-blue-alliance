@@ -15,6 +15,7 @@ class ApiBaseController(CacheableHandler):
         """
         Handle an HTTP exception and actually writeout a 
         response.
+        Called by webapp when abort() is called, stops code excution.
         """
         logging.info(exception)
         if isinstance(exception, webapp2.HTTPException):
@@ -24,8 +25,17 @@ class ApiBaseController(CacheableHandler):
             self.response.set_status(500)
 
     def get(self, *args, **kw):
+        self._validate_user_agent()
         self._errors = ValidationHelper.validate(self._validators)
         if self._errors:
             self.abort(400)
 
         super(ApiBaseController, self).get(*args, **kw)
+
+    def _validate_user_agent(self):
+        """
+        Tests the presence of a User-Agent header.
+        """
+        if self.request.headers.get("User-Agent") is None:
+            self._errors = json.dumps({"Error": "User-Agent is a required header."})
+            self.abort(400)
