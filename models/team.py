@@ -92,6 +92,6 @@ class Team(ndb.Model):
 
     @classmethod
     def validate_key_name(self, team_key):
-        key_name_regex = re.compile(r'^frc[1-9]\d+$')
+        key_name_regex = re.compile(r'^frc[1-9]\d*$')
         match = re.match(key_name_regex, team_key)
         return True if match else False

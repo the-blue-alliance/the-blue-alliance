@@ -16,3 +16,12 @@ app = webapp2.WSGIApplication([('/api/v1/team/details', ApiTeamDetails),
                                ('/api/csv/teams/all', CsvTeamsAll)
                                ],
                                debug=tba_config.DEBUG)
+
+from controllers.api.api_base_controller import ApiBaseController
+from controllers.api.api_team_controller import ApiTeamController
+
+app = webapp2.WSGIApplication([
+                                webapp2.Route(r'/api/v2/team/<team_key:>', ApiTeamController, methods=['GET']),
+                                webapp2.Route(r'/api/v2/team/<team_key:>/<year:([0-9]*)>', ApiTeamController, methods=['GET']),
+                               ],
+                               debug=tba_config.DEBUG)
