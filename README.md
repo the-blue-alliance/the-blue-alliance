@@ -60,14 +60,6 @@ This means that whenever changes are made to CSS or Javascript, you must run of 
 * `paver less`
 * `paver javascript`
 
-Facebook
---------
-We use the Facebook SDK to allow users to log in to The Blue Alliance using their pre-existing Facebook account. The Javascript
-portion of this is loaded dynamically and the backend portion is kept in facebook.py, provided by [https://github.com/pythonforfacebook/facebook-sdk](https://github.com/pythonforfacebook/facebook-sdk "Facebook on Github"). To enable your development
-environment, you must register an app at the [https://developers.facebook.com/apps](https://developers.facebook.com/apps "Facebook Developer Center"). 
-
-Once you register an app (named tbatv-dev-YOURNAME), you can configure The Blue Alliance to use the App ID and secret by adding them to your [Sitevars](http://localhost:8088/admin/sitevars) (/admin/sitevars/create). _Each developer should have their own App ID and secret_.
-
 Testing
 -------
 [![Build Status](https://travis-ci.org/gregmarra/the-blue-alliance.png?branch=master)](https://travis-ci.org/gregmarra/the-blue-alliance)
