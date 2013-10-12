@@ -8,7 +8,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
 import tba_config
-from base_controller import BaseHandlerFB, CacheableHandler
+from base_controller import CacheableHandler
 from helpers.event_helper import EventHelper
 from helpers.match_helper import MatchHelper
 from helpers.award_helper import AwardHelper

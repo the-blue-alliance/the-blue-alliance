@@ -6,7 +6,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
 import tba_config
-from base_controller import BaseHandlerFB, CacheableHandler
+from base_controller import CacheableHandler
 from models.event import Event
 from models.match import Match
 
