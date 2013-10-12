@@ -413,6 +413,7 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
             success = False
 
         template_values = {
+            'key_name': key_name,
             'team': team,
             'success': success,
         }

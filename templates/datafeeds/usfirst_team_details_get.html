@@ -20,8 +20,9 @@
         <li>Website: {{team.website}}</li>
     </ul>
     {% else %}
-    <div class="alert alert-block alert-error">
+    <div class="alert alert-block alert-danger">
         <h4>Team Fetch failed.</h4>
+        <p>{{key_name}} may lack a TPID, thus don't know how to scrape FIRST</p>
     </div>
     {% endif %}
 </div>
