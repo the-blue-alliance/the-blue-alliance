@@ -6,13 +6,24 @@
 
 {% block content %}
 <div class="container">
-    {% if success %}
+    {% if result = "success" %}
     <div class="row">
         <div class="col-xs-12 col-lg-6 col-lg-offset-3">
             <div class="alert alert-success">
                 <button type="button" class="close" data-dismiss="alert">&times;</button>
                 <h4>Thanks!</h4>
                 <p>We'll review your suggestion and get it added to the site soon!</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% if result == "blank_webcast" %}
+    <div class="row">
+        <div class="col-xs-12 col-lg-6 col-lg-offset-3">
+            <div class="alert alert-warning">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <h4>Oops!</h4>
+                <p>You have to let us know where there is a webcast online for this event. You submitted a blank field. Please find a webcast online and paste it's address below. Thanks!</p>
             </div>
         </div>
     </div>
@@ -37,11 +48,14 @@
                         {{webcast}}
                     {% endfor %}
                     <h4>Add another webcast</h4>
+                    {% else %}
+                    <h4>Add a webcast</h4>
                     {% endif %}
+                    <p>Find a webcast for {{event.name}} and paste it below so we can add it to the site :)</p>
                     <form action="/suggest/event/webcast" method="post">
                         <input name="event_key" type="hidden" value="{{event.key.id}}" />
                         <div class="input-group">
-                            <input class="form-control" type="text" name="webcast_url" placeholder="http://www.ustream.tv/nasa" value="" />
+                            <input class="form-control" type="text" name="webcast_url" placeholder="like http://www.ustream.tv/nasa" value="" />
                             <span class="input-group-btn">
                                 <button class="btn btn-success" type="submit"><span class="glyphicon glyphicon-plus-sign"></span> Add Webcast</button>
                             </span>
