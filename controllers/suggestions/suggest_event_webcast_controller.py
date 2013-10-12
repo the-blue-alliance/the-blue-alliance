@@ -22,7 +22,7 @@ class SuggestEventWebcastController(LoggedInHandler):
         event = Event.get_by_id(self.request.get("event_key"))
 
         self.template_values.update({
-            "success": self.request.get("success"),
+            "result": self.request.get("result"),
             "event": event,
         })
 
@@ -35,6 +35,9 @@ class SuggestEventWebcastController(LoggedInHandler):
         event_key = self.request.get("event_key")
         webcast_url = self.request.get("webcast_url")
 
+        if not webcast_url:
+            self.redirect('/suggest/event/webcast?event_key=%s&result=blank_webcast' % event_key, abort=True)
+
         suggestion = Suggestion(
             author=self.user_bundle.account.key,
             target_key=event_key,
@@ -43,4 +46,4 @@ class SuggestEventWebcastController(LoggedInHandler):
         suggestion.contents = {"webcast_url": webcast_url}
         suggestion.put()
 
-        self.redirect('/suggest/event/webcast?event_key=%s&success=1' % event_key)
+        self.redirect('/suggest/event/webcast?event_key=%s&result=success' % event_key)
