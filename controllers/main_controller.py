@@ -2,9 +2,10 @@ import os
 import logging
 import datetime
 import time
+import webapp2
 
 from google.appengine.api import memcache
-from google.appengine.ext import ndb, webapp
+from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 import tba_config
