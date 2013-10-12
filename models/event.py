@@ -91,11 +91,11 @@ class Event(ndb.Model):
 
     @property
     def past(self):
-        return self.end_date.date() < datetime.date.today() and not self.within_a_day()
+        return self.end_date.date() < datetime.date.today() and not self.within_a_day
 
     @property
     def future(self):
-        return self.start_date.date() > datetime.date.today() and not self.within_a_day()
+        return self.start_date.date() > datetime.date.today() and not self.within_a_day
 
     @ndb.tasklet
     def get_teams_async(self):
