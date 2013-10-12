@@ -19,7 +19,8 @@
                     {% if event.future or event.within_a_day %}
                         <a href="/suggest/event/webcast?event_key={{event.key_name}}" target="_blank">Add webcast</a>
                     {% endif %}
-                {% endif %}</td>
+                {% endif %}
+            </td>
             <td>{% if event.start_date %}<time itemprop="startDate" datetime="{{event.start_date|date:"c"}}">{{ event.start_date|date:"M jS" }}</time>{% endif %}{% if event.end_date %} - <time itemprop="endDate" datetime="{{event.end_date|date:"c"}}">{{ event.end_date|date:"M jS, Y" }}</time>{% endif %}</td>
         </tr>
     {% endfor %}
