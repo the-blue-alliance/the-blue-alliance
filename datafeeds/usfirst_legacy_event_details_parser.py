@@ -43,7 +43,7 @@ class UsfirstLegacyEventDetailsParser(ParserBase):
 
                     match = re.match(event_locality_region_re, address_lines_stripped[-2])
                     locality, region = match.group(1), match.group(2)
-                    country = address_lines_stripped[3]
+                    country = address_lines_stripped[-1]
                     result['location'] = '%s, %s, %s' % (locality, region, country)
                 if field == "Event Info":
                     result["website"] = unicode(tds[1].a['href'])
