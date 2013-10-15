@@ -16,6 +16,7 @@ class TestUsfirstLegacyEventDetailsParser(unittest2.TestCase):
         self.assertEqual(event["end_date"], datetime.datetime(2012, 3, 31, 0, 0))
         self.assertEqual(event["year"], 2012)
         self.assertEqual(event["venue_address"], "Connecticut Convention Center\r\n100 Columbus Blvd\r\nHartford, CT 06103\r\nUSA")
+        self.assertEqual(event["location"], "Hartford, CT, USA")
         self.assertEqual(event["website"], "http://www.ctfirst.org/ctr")
         self.assertEqual(event["event_short"], "ct")
 
@@ -29,6 +30,7 @@ class TestUsfirstLegacyEventDetailsParser(unittest2.TestCase):
         self.assertEqual(event["end_date"], datetime.datetime(2013, 3, 30, 0, 0))
         self.assertEqual(event["year"], 2013)
         self.assertEqual(event["venue_address"], "Great Fort Lauderdale & Broward County Convention Center\r\n1950 Eisenhower Boulevard\r\nFort Lauderdale, FL 33316\r\nUSA")
+        self.assertEqual(event["location"], "Fort Lauderdale, FL, USA")
         self.assertEqual(event["website"], "http://firstinflorida.org")
         self.assertEqual(event["event_short"], "flbr")
 

@@ -14,6 +14,10 @@ class UsfirstLegacyEventDetailsParser(ParserBase):
         """
         Parse an event's details page from USFIRST.
         """
+        # locality_regions look like this:
+        # <locality>, <region> <random string can have spaces>
+        event_locality_region_re = r'(.*?), ([^ ]*)'
+
         result = dict()
         soup = BeautifulSoup(html,
                 convertEntities=BeautifulSoup.HTML_ENTITIES)
@@ -34,9 +38,13 @@ class UsfirstLegacyEventDetailsParser(ParserBase):
                     except Exception, detail:
                         logging.error('Date Parse Failed: ' + str(detail))
                 if field == "Where":
-                    # TODO: This next line is awful. Make this suck less.
-                    # I think \t tabs mess it up or something. -greg 5/20/2010
-                    result["venue_address"] = unicode(''.join(tds[1].findAll(text=True))).encode('ascii', 'ignore').strip().replace("\t","").replace("\r\n\r\n", "\r\n")
+                    address_lines_stripped = [re.sub('\s+', ' ', line.replace(u'\xa0', ' ')).strip() for line in tds[1].findAll(text=True)]
+                    result["venue_address"] = unicode('\r\n'.join(address_lines_stripped)).encode('ascii', 'ignore')
+
+                    match = re.match(event_locality_region_re, address_lines_stripped[2])
+                    locality, region = match.group(1), match.group(2)
+                    country = address_lines_stripped[3]
+                    result['location'] = '%s, %s, %s' % (locality, region, country)
                 if field == "Event Info":
                     result["website"] = unicode(tds[1].a['href'])
                 if field == "Match Results":

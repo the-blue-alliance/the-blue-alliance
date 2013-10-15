@@ -38,9 +38,8 @@ class UsfirstEventDetailsParser(ParserBase):
 
         address = soup.find('div', {'class': 'event-address'})
         if address is not None:
-            address_lines_stripped = [line.strip() for line in address.findAll(text=True)]
-            # TODO: This next line is awful. Make this suck less.
-            result['venue_address'] = unicode('\r\n'.join(address_lines_stripped)).encode('ascii', 'ignore').strip().replace("\t", "").replace("\r\n\r\n", "\r\n")
+            address_lines_stripped = [re.sub('\s+', ' ', line.replace(u'\xa0', ' ')).strip() for line in address.findAll(text=True)]
+            result['venue_address'] = unicode('\r\n'.join(address_lines_stripped)).encode('ascii', 'ignore')
 
             if len(address_lines_stripped) >= 2:
                 match = re.match(event_locality_region_re, address_lines_stripped[-2])
