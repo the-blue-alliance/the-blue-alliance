@@ -181,10 +181,11 @@ class UsfirstEventDetailsGet(webapp.RequestHandler):
                 teams = []
 
         teams = TeamManipulator.createOrUpdate(teams)
-        if type(teams) is not list:
-            teams = [teams]
 
         if teams:
+            if type(teams) is not list:
+                teams = [teams]
+
             event_teams = [EventTeam(
                 id=event.key.id() + "_" + team.key.id(),
                 event=event.key,
