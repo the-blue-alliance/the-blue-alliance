@@ -34,7 +34,19 @@ class TestUsfirstLegacyEventDetailsParser(unittest2.TestCase):
         self.assertEqual(event["website"], "http://firstinflorida.org")
         self.assertEqual(event["event_short"], "flbr")
 
-    def test_parse2014nvlv(self):
+    def test_parse2014lake(self):
+        with open('test_data/usfirst_legacy_html/usfirst_event_details_2014lake.html', 'r') as f:
+            event, _ = UsfirstLegacyEventDetailsParser.parse(f.read())
+
+        self.assertEqual(event["name"], "Bayou Regional")
+        self.assertEqual(event["event_type_enum"], EventType.REGIONAL)
+        self.assertEqual(event["start_date"], datetime.datetime(2014, 4, 3, 0, 0))
+        self.assertEqual(event["end_date"], datetime.datetime(2014, 4, 5, 0, 0))
+        self.assertEqual(event["year"], 2014)
+        self.assertEqual(event["website"], "http://www.frcbayouregional.com")
+        self.assertEqual(event["event_short"], "lake")
+
+    def test_parse2014nvlv_preliminary(self):
         with open('test_data/usfirst_legacy_html/usfirst_event_details_2014nvlv_preliminary.html', 'r') as f:
             event, _ = UsfirstLegacyEventDetailsParser.parse(f.read())
 

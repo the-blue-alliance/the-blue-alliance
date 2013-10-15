@@ -41,7 +41,7 @@ class UsfirstLegacyEventDetailsParser(ParserBase):
                     address_lines_stripped = [re.sub('\s+', ' ', line.replace(u'\xa0', ' ')).strip() for line in tds[1].findAll(text=True)]
                     result["venue_address"] = unicode('\r\n'.join(address_lines_stripped)).encode('ascii', 'ignore')
 
-                    match = re.match(event_locality_region_re, address_lines_stripped[2])
+                    match = re.match(event_locality_region_re, address_lines_stripped[-2])
                     locality, region = match.group(1), match.group(2)
                     country = address_lines_stripped[3]
                     result['location'] = '%s, %s, %s' % (locality, region, country)
