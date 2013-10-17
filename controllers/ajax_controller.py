@@ -31,12 +31,13 @@ class TypeaheadHandler(CacheableHandler):
     def get(self, search_key):
         search_key = urllib2.unquote(search_key)
         self._cache_key = self._cache_key.format(search_key)
-        self.response.headers['Cache-Control'] = "public, max-age=%d" % self._cache_expiration
-        self.response.headers['Pragma'] = 'Public'
-        self.response.headers.add_header('content-type', 'application/json', charset='utf-8')
         super(TypeaheadHandler, self).get(search_key)
 
     def _render(self, search_key):
+        self.response.headers['Cache-Control'] = "public, max-age=%d" % self._cache_expiration
+        self.response.headers['Pragma'] = 'Public'
+        self.response.headers.add_header('content-type', 'application/json', charset='utf-8')
+
         entry = TypeaheadEntry.get_by_id(search_key)
         if entry is None:
             return '[]'
