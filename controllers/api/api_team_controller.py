@@ -35,7 +35,7 @@ class ApiTeamController(ApiBaseController):
 
     def _write_cache_headers(self):
         self.response.cache_control = 'public'
-        self.response.cache_control.max_age = self._cache_expiration
+        self.response.cache_control.max_age = 61
 
     def _render(self, team_key, year=None):
 
