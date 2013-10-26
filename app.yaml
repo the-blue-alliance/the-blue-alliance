@@ -61,6 +61,4 @@ skip_files:
 - ^(.*/)?.*\.jar.*
 - static/css/less_css/*
 - static/css/precompiled_css/*
-- static/javascript/bootstrap_js/*
-- static/javascript/jquery_js/*
 - static/javascript/tba_js/*
