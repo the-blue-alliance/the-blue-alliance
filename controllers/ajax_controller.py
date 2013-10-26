@@ -42,7 +42,10 @@ class TypeaheadHandler(CacheableHandler):
         if entry is None:
             return '[]'
         else:
-            return entry.data_json
+            if self._has_been_modified_since(entry.updated):
+                return entry.data_json
+            else:
+                return None
 
 
 class WebcastHandler(CacheableHandler):

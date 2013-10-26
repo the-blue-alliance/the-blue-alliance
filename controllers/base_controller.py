@@ -1,5 +1,8 @@
 import webapp2
 
+from time import mktime
+from wsgiref.handlers import format_date_time
+
 from google.appengine.api import memcache
 
 import tba_config
@@ -35,6 +38,16 @@ class CacheableHandler(webapp2.RequestHandler):
         else:
             self.response.out.write(self._render(*args, **kw))
             self._write_cache(self.response)
+
+    def _has_been_modified_since(self, datetime):
+        last_modified = format_date_time(mktime(datetime.timetuple()))
+        if_modified_since = self.request.headers.get('If-Modified-Since')
+        if if_modified_since and if_modified_since == last_modified:
+            self.response.set_status(304)
+            return False
+        else:
+            self.response.headers['Last-Modified'] = last_modified
+            return True
 
     def memcacheFlush(self):
         memcache.delete(self.cache_key)
