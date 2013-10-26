@@ -33,11 +33,8 @@ class ApiTeamController(ApiBaseController):
     def _validators(self):
         return [("team_id_validator", self.team_key)]
 
-    def _write_cache_headers(self):
-        self.response.headers['Cache-Control'] = "public, max-age=%d" % 61
-        self.response.headers['Pragma'] = 'Public'
-
     def _render(self, team_key, year=None):
+        self._write_cache_headers(61)
 
         @ndb.tasklet
         def get_event_matches_async(event_team_key):
