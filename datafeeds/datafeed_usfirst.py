@@ -98,7 +98,8 @@ class DatafeedUsfirst(DatafeedBase):
     def getEventRankings(self, event):
         url = self.EVENT_RANKINGS_URL_PATTERN % (event.year,
                                                  self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
-        return self.parse(url, UsfirstEventRankingsParser)
+        rankings, _ = self.parse(url, UsfirstEventRankingsParser)
+        return rankings
 
     def getEventAwards(self, event):
 
