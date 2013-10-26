@@ -3,8 +3,6 @@ import json
 from helpers.event_manipulator import EventManipulator
 from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
 
-from models.event import Event
-
 
 class EventWebcastAdder(object):
 
@@ -14,12 +12,15 @@ class EventWebcastAdder(object):
 
         if event.webcast:
             webcasts = event.webcast
-            webcasts.append(webcast)
-            event.webcast_json = json.dumps(webcasts)
+            if webcast in webcasts:
+                return event
+            else:
+                webcasts.append(webcast)
+                event.webcast_json = json.dumps(webcasts)
         else:
             event.webcast_json = json.dumps([webcast])
         event.dirty = True
         EventManipulator.createOrUpdate(event)
         MemcacheWebcastFlusher.flushEvent(event.key_name)
 
-        return Event
+        return event
