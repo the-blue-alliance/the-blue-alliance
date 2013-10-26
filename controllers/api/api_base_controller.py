@@ -9,7 +9,7 @@ class ApiBaseController(CacheableHandler):
 
     def __init__(self, *args, **kw):
         super(ApiBaseController, self).__init__(*args, **kw)
-        self.response.content_type = 'application/json'
+        self.response.headers['content-type'] = 'application/json; charset="utf-8"'
 
     def handle_exception(self, exception, debug):
         """
