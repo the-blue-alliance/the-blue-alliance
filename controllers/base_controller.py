@@ -28,11 +28,13 @@ class CacheableHandler(webapp2.RequestHandler):
             tba_config.CONFIG["static_resource_version"])
 
     def get(self, *args, **kw):
-        content = self._read_cache()
-        if not content:
-            content = self._render(*args, **kw)
-            self._write_cache(content)
-        self.response.out.write(content)
+        cached_response = self._read_cache()
+        if cached_response:
+            self.response.headers = cached_response.headers
+            self.response.out.write(cached_response.body)
+        else:
+            self.response.out.write(self._render(*args, **kw))
+            self._write_cache(self.response)
 
     def memcacheFlush(self):
         memcache.delete(self.cache_key)
@@ -44,9 +46,9 @@ class CacheableHandler(webapp2.RequestHandler):
     def _render(self):
         raise NotImplementedError("No _render method.")
 
-    def _write_cache(self, content):
+    def _write_cache(self, response):
         if tba_config.CONFIG["memcache"]:
-            memcache.set(self.cache_key, content, self._cache_expiration)
+            memcache.set(self.cache_key, response, self._cache_expiration)
 
 
 class LoggedInHandler(webapp2.RequestHandler):
