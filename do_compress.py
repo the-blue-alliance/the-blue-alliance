@@ -19,15 +19,13 @@ SCRIPTS_GAMEDAY = SCRIPTS_MAIN + ['static/javascript/tba_js/gameday.js',
                                   'static/javascript/tba_js/gameday_twitter.js',
                                   'static/javascript/tba_js/gameday_matchbar.js']
 
-STYLESHEETS_MAIN = ['static/css/precompiled_css/jquery-ui-1.8.13.custom.css',
-                    'static/css/precompiled_css/jquery.fancybox.css',
+STYLESHEETS_MAIN = ['static/css/precompiled_css/jquery.fancybox.css',
                     'static/css/precompiled_css/tablesorter.css',
                     'static/xcharts/xcharts.min.css',
                     'static/css/less_css/tba_style.main.css',
                     ]
 
-STYLESHEETS_GAMEDAY = ['static/css/precompiled_css/jquery-ui-1.8.13.custom.css',
-                       'static/css/precompiled_css/jquery.fancybox.css',
+STYLESHEETS_GAMEDAY = ['static/css/precompiled_css/jquery.fancybox.css',
                        'static/css/precompiled_css/tablesorter.css',
                        'static/css/less_css/tba_style.gameday.css',
                        ]

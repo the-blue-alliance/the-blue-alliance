@@ -55,7 +55,7 @@ the LESS files into CSS. Just drag static/css into SimpLESS, and whenever you ed
 
 CSS/Javascript Combination and Compression
 ------------------------------------------
-Once the LESS files are compressed into CSS, we combine the resulting file with other CSS files, such as 'jquery-ui-1.8.13.custom.css.' Similarly, we combine all relevant Javascript files into a single file and compress them.
+Once the LESS files are compressed into CSS, we combine the resulting file with other precompiled CSS files. Similarly, we combine all relevant Javascript files into a single file and compress them.
 This means that whenever changes are made to CSS or Javascript, you must run of the following:
 * `paver less`
 * `paver javascript`
