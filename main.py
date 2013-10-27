@@ -13,7 +13,9 @@ from controllers.main_controller import ContactHandler, HashtagsHandler, \
       MainKickoffHandler, MainBuildseasonHandler, MainCompetitionseasonHandler, \
       MainInsightsHandler, MainOffseasonHandler, OprHandler, SearchHandler, \
       AboutHandler, ThanksHandler, PageNotFoundHandler, \
-      GamedayHandler, WebcastsHandler, RecordHandler
+      GamedayHandler, WebcastsHandler, RecordHandler, \
+      AboutHandler, ThanksHandler, PageNotFoundHandler, \
+      GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler
 from controllers.match_controller import MatchDetail
 from controllers.suggestions.suggest_match_video_controller import SuggestMatchVideoController
 from controllers.suggestions.suggest_event_webcast_controller import SuggestEventWebcastController
@@ -34,6 +36,7 @@ app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['landing_
                                ('/account', AccountOverview),
                                ('/account/edit', AccountEdit),
                                ('/account/register', AccountRegister),
+                               ('/apidocs', ApiDocumentationHandler),
                                ('/contact', ContactHandler),
                                ('/events', EventList),
                                ('/event/(.*)/feed', EventRss),
