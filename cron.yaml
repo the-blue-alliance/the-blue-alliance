@@ -1,7 +1,7 @@
 cron:
-- description: FIRST event detail scraping
-  url: /tasks/enqueue/usfirst_event_details/2014
-  schedule: every day 04:00
+#- description: FIRST event detail scraping
+#  url: /tasks/enqueue/usfirst_event_details/2014
+#  schedule: every day 04:00
 
 - description: FIRST team detail scraping
   url: /tasks/enqueue/usfirst_team_details
