@@ -11,7 +11,8 @@
         <th>Display Name</th>
         <th>Email</th>
         <th>ID</th>
-	   <th>Created</th>
+	      <th>Created</th>
+        <th>Registered?</th>
     </thead>
 
     {% for user in users %}
@@ -19,7 +20,8 @@
         <td><a href="/admin/user/{{ user.key.id }}">{{ user.display_name }}</a></td>
         <td>{{ user.email }}</td>
         <td><a href="/admin/user/{{ user.key.id }}">{{ user.key.id }}</a></td>
-	    <td>{{ user.created|date:"M d, Y" }}</td>
+	      <td>{{ user.created|date:"M d, Y" }}</td>
+        <td>{% if user.registered %}<span class="glyphicon glyphicon-ok"></span>{% endif %}</td>
     </tr>
     {% endfor %}
 </table>
