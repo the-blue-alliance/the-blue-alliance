@@ -31,8 +31,16 @@ class UsfirstEventListParser(ParserBase):
             event = dict()
             try:
                 tds = tr.findAll('td')
-                event["event_type_enum"] = EventHelper.parseEventType(unicode(tds[0].string))
-                
+                if tds[0].string is None:
+                    # this may happen if this is a district event, in which case we can also extract the district name
+                    event_type_str = unicode(tds[0].findAll(text=True)[2].string)
+
+                    # for future use:
+                    # district_name_str = unicode(tds[0].findAll('em')[0].string)
+                else:
+                    event_type_str = unicode(tds[0].string)
+                event["event_type_enum"] = EventHelper.parseEventType(event_type_str)
+
                 url_get_params = urlparse.parse_qs(urlparse.urlparse(tds[1].a["href"]).query)
                 event["first_eid"] = url_get_params["eid"][0]
 
