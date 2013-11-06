@@ -64,6 +64,8 @@ class DatafeedUsfirstLegacy(DatafeedUsfirst):
             raise TypeError("year must be an integer")
         url = self.EVENT_DETAILS_URL_PATTERN % (first_eid, self.getSessionKey(year))
         event, _ = self.parse(url, UsfirstLegacyEventDetailsParser)
+        if event is None:
+            return None
 
         return Event(
             id=str(event["year"]) + str.lower(str(event["event_short"])),
@@ -88,6 +90,8 @@ class DatafeedUsfirstLegacy(DatafeedUsfirst):
             raise TypeError("year must be an integer")
         url = self.EVENT_TEAMS_URL_PATTERN % (first_eid, self.getSessionKey(year))
         teams, _ = self.parse(url, UsfirstLegacyEventTeamsParser)
+        if teams is None:
+            return None
 
         return [Team(
             id="frc%s" % team.get("team_number", None),
@@ -104,7 +108,7 @@ class DatafeedUsfirstLegacy(DatafeedUsfirst):
                 url = self.TEAM_DETAILS_URL_PATTERN % (team.first_tpid, session_key)
                 team_dict, _ = self.parse(url, UsfirstLegacyTeamDetailsParser)
 
-                if "team_number" in team_dict:
+                if team_dict is not None and "team_number" in team_dict:
                     return Team(
                         team_number=team_dict.get("team_number", None),
                         name=self._shorten(team_dict.get("name", None)),

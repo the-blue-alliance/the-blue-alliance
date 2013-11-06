@@ -63,6 +63,8 @@ class DatafeedUsfirst(DatafeedBase):
     def getEventDetails(self, first_eid):
         url = self.EVENT_DETAILS_URL_PATTERN % (first_eid)
         event, _ = self.parse(url, UsfirstEventDetailsParser)
+        if event is None:
+            return None
 
         return Event(
             id=str(event["year"]) + str.lower(str(event["event_short"])),
@@ -186,7 +188,7 @@ class DatafeedUsfirst(DatafeedBase):
                 url = self.TEAM_DETAILS_URL_PATTERN % (team.first_tpid)
                 team_dict, _ = self.parse(url, UsfirstTeamDetailsParser)
 
-                if "team_number" in team_dict:
+                if team_dict is not None and "team_number" in team_dict:
                     return Team(
                         team_number=team_dict.get("team_number", None),
                         name=self._shorten(team_dict.get("name", None)),

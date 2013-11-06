@@ -159,25 +159,17 @@ class UsfirstEventDetailsGet(webapp.RequestHandler):
         df = DatafeedUsfirst()
         df_legacy = DatafeedUsfirstLegacy()
 
-        try:
-            event = df.getEventDetails(first_eid)
-        except:
+        event = df.getEventDetails(first_eid)
+        if not event:
             logging.warning("getEventDetails with DatafeedUsfirst for event id {} failed. Retrying with DatafeedUsfirstLegacy.".format(first_eid))
             event = df_legacy.getEventDetails(int(year), first_eid)
         event = EventManipulator.createOrUpdate(event)
 
-        use_legacy_event_teams = False
-        try:
-            teams = df.getEventTeams(int(year), first_eid)
-            if not teams:
-                use_legacy_event_teams = True
-        except:
-            use_legacy_event_teams = True
-        if use_legacy_event_teams:
+        teams = df.getEventTeams(int(year), first_eid)
+        if not teams:
             logging.warning("getEventTeams with DatafeedUsfirst for event id {} failed. Retrying with DatafeedUsfirstLegacy.".format(first_eid))
-            try:
-                teams = df_legacy.getEventTeams(int(year), first_eid)
-            except:
+            teams = df_legacy.getEventTeams(int(year), first_eid)
+            if not teams:
                 logging.warning("getEventTeams with DatafeedUsfirstLegacy for event id {} failed.".format(first_eid))
                 teams = []
 
@@ -432,10 +424,9 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
     model accordingly.
     """
     def get(self, key_name):
-        try:
-            df = DatafeedUsfirst()
-            team = df.getTeamDetails(Team.get_by_id(key_name))
-        except:
+        df = DatafeedUsfirst()
+        team = df.getTeamDetails(Team.get_by_id(key_name))
+        if not team:
             logging.warning("getTeamDetails with DatafeedUsfirst for event id {} failed. Retrying with DatafeedUsfirstLegacy.".format(key_name))
             legacy_df = DatafeedUsfirstLegacy()
             team = legacy_df.getTeamDetails(Team.get_by_id(key_name))

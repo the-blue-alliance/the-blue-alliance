@@ -54,9 +54,13 @@ class UsfirstEventDetailsParser(ParserBase):
             result['website'] = unicode(website_tag.find('a')['href'])
 
         # http://www2.usfirst.org/2010comp/Events/SDC/matchresults.html
-        match_results_url = soup.find('div', {'class': 'event-match-results'}).find('a')['href']
-        m = re.match(r"http://www2\.usfirst\.org/%scomp/Events/([a-zA-Z0-9]*)/" % result["year"], match_results_url)
-        result['event_short'] = unicode(m.group(1).lower())
+        try:
+            match_results_url = soup.find('div', {'class': 'event-match-results'}).find('a')['href']
+            m = re.match(r"http://www2\.usfirst\.org/%scomp/Events/([a-zA-Z0-9]*)/" % result["year"], match_results_url)
+            result['event_short'] = unicode(m.group(1).lower())
+        except AttributeError, detail:
+            logging.warning("Event short parse failed: {}".format(detail))
+            return None, False
 
         return result, False
 
