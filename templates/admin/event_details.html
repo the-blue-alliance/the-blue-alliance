@@ -73,6 +73,15 @@
     </tr>
 </table>
 
+<h2>Add Teams</h2>
+<p>Add teams formatted as CSV.</p>
+<p>Example:</p>
+<div class="well">254, 1114, 100, 604, 148</div>
+<form action="/admin/event/add_teams/{{event.key_name}}" method="post">
+  <textarea class="form-control" name="teams_csv"></textarea><br>
+  <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Teams</button>
+</form>
+
 <h2>Add Webcast</h2>
 <form action="/admin/event/add_webcast/{{event.key_name}}" method="post">
     {% include "partials/webcast_add_form_partial.html" %}
