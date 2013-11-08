@@ -13,6 +13,7 @@ from helpers.event.event_webcast_adder import EventWebcastAdder
 from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
+from helpers.team_manipulator import TeamManipulator
 from helpers.match_manipulator import MatchManipulator
 from models.award import Award
 from models.event import Event
@@ -34,12 +35,18 @@ class AdminEventAddTeams(LoggedInHandler):
         teams_csv = self.request.get('teams_csv')
         team_numbers = CSVTeamsParser.parse(teams_csv)
 
-        event_teams = [EventTeam(id=event.key.id() + '_frc{}'.format(team_number),
-                                 event=event.key,
-                                 team=ndb.Key(Team, 'frc{}'.format(team_number)),
-                                 year=event.year)
-                       for team_number in team_numbers]
+        event_teams = []
+        teams = []
+        for team_number in team_numbers:
+            event_teams.append(EventTeam(id=event.key.id() + '_frc{}'.format(team_number),
+                                         event=event.key,
+                                         team=ndb.Key(Team, 'frc{}'.format(team_number)),
+                                         year=event.year))
+            teams.append(Team(id='frc{}'.format(team_number),
+                              team_number=int(team_number)))
+
         EventTeamManipulator.createOrUpdate(event_teams)
+        TeamManipulator.createOrUpdate(teams)
 
         self.redirect("/admin/event/" + event.key_name)
 
