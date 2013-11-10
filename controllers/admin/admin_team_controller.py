@@ -34,10 +34,10 @@ class AdminTeamDetail(LoggedInHandler):
 
         team = Team.get_by_id("frc" + team_number)
         event_teams = EventTeam.query(EventTeam.team == team.key).fetch(500)
-        team_media = Media.query(Media.references == team.key).fetch(500)
+        team_medias = Media.query(Media.references == team.key).fetch(500)
 
         team_media_by_year = {}
-        for media in team_media:
+        for media in team_medias:
             if media.year in team_media_by_year:
                 team_media_by_year[media.year].append(media)
             else:
