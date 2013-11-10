@@ -7,7 +7,7 @@ class EventTeamManipulator(ManipulatorBase):
     """
 
     @classmethod
-    def updateMerge(self, new_event_team, old_event_team):
+    def updateMerge(self, new_event_team, old_event_team, auto_union=True):
         """
         Update and return EventTeams.
         """

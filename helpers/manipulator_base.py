@@ -33,18 +33,18 @@ class ManipulatorBase(object):
             return things
 
     @classmethod
-    def createOrUpdate(self, new_models):
+    def createOrUpdate(self, new_models, auto_union=True):
         """
         Given a model or list of models, either insert them into the database, or update
         existing models with the same key.
         """
-        models = self.listify(self.findOrSpawn(self.listify(new_models)))
+        models = self.listify(self.findOrSpawn(self.listify(new_models), auto_union=auto_union))
         models_to_put = [model for model in models if getattr(model, "dirty", False)]
         ndb.put_multi(models_to_put)
         return self.delistify(models)
 
     @classmethod
-    def findOrSpawn(self, new_models):
+    def findOrSpawn(self, new_models, auto_union=True):
         """"
         Check if a model or models currently exists in the database based on
         key_name. Doesn't put models.
@@ -52,11 +52,11 @@ class ManipulatorBase(object):
         """
         new_models = self.listify(new_models)
         old_models = ndb.get_multi([ndb.Key(type(model).__name__, model.key_name) for model in new_models])
-        new_models = [self.updateMergeBase(new_model, old_model) for (new_model, old_model) in zip(new_models, old_models)]
+        new_models = [self.updateMergeBase(new_model, old_model, auto_union=auto_union) for (new_model, old_model) in zip(new_models, old_models)]
         return self.delistify(new_models)
 
     @classmethod
-    def updateMergeBase(self, new_model, old_model):
+    def updateMergeBase(self, new_model, old_model, auto_union=True):
         """
         Given an "old" and a "new" model object, replace the fields in the
         "old" one that are present in the "new" one, but keep fields from
@@ -66,10 +66,10 @@ class ManipulatorBase(object):
             new_model.dirty = True
             return new_model
 
-        return self.updateMerge(new_model, old_model)
+        return self.updateMerge(new_model, old_model, auto_union=auto_union)
 
     @classmethod
-    def updateMerge(self, new_model, old_model):
+    def updateMerge(self, new_model, old_model, auto_union=True):
         """
         Child classes should replace with method with specific merging logic
         """

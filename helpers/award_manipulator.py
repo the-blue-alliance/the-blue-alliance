@@ -7,7 +7,7 @@ class AwardManipulator(ManipulatorBase):
     """
 
     @classmethod
-    def updateMerge(self, new_award, old_award):
+    def updateMerge(self, new_award, old_award, auto_union=True):
         """
         Given an "old" and a "new" Award object, replace the fields in the
         "old" award that are present in the "new" award, but keep fields from
