@@ -18,11 +18,11 @@ class MediaParser(object):
 
         if 'chiefdelphi.com/media/photos/' in url:
             media_dict['media_type_enum'] = MediaType.CD_PHOTO_THREAD
-            media_id = cls._parse_cdphotothread_media_id(url)
-            if media_id is None:
-                logging.warning("Failed to determine media_id from url: {}".format(url))
+            foreign_key = cls._parse_cdphotothread_foreign_key(url)
+            if foreign_key is None:
+                logging.warning("Failed to determine foreign_key from url: {}".format(url))
                 return None
-            media_dict['media_id'] = media_id
+            media_dict['foreign_key'] = foreign_key
 
             urlfetch_result = urlfetch.fetch(url, deadline=10)
             if urlfetch_result.status_code != 200:
@@ -34,15 +34,15 @@ class MediaParser(object):
                 logging.warning("Failed to determine image_url from the page: {}".format(url))
                 return None
             details = {'image_url': image_url,
-                       'link_url': "http://www.chiefdelphi.com/media/photos/{}".format(media_dict['media_id'])}
+                       'link_url': "http://www.chiefdelphi.com/media/photos/{}".format(media_dict['foreign_key'])}
             media_dict['details_json'] = json.dumps(details)
         elif 'youtube.com' in url:
             media_dict['media_type_enum'] = MediaType.YOUTUBE
-            media_id = cls._parse_youtube_media_id(url)
-            if media_id is None:
-                logging.warning("Failed to determine media_id from url: {}".format(url))
+            foreign_key = cls._parse_youtube_foreign_key(url)
+            if foreign_key is None:
+                logging.warning("Failed to determine foreign_key from url: {}".format(url))
                 return None
-            media_dict['media_id'] = media_id
+            media_dict['foreign_key'] = foreign_key
         else:
             logging.warning("Failed to determine media type from url: {}".format(url))
             return None
@@ -50,7 +50,7 @@ class MediaParser(object):
         return media_dict
 
     @classmethod
-    def _parse_cdphotothread_media_id(cls, url):
+    def _parse_cdphotothread_foreign_key(cls, url):
         regex1 = re.match(r'.*chiefdelphi.com\/media\/photos\/(\d+)', url)
         if regex1 is not None:
             return regex1.group(1)
@@ -70,7 +70,7 @@ class MediaParser(object):
         return "http://www.chiefdelphi.com{}".format(partial_url)
 
     @classmethod
-    def _parse_youtube_media_id(cls, url):
+    def _parse_youtube_foreign_key(cls, url):
         youtube_id = None
         regex1 = re.match(r".*youtu\.be\/(.*)", url)
         if regex1 is not None:

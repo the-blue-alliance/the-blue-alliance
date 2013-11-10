@@ -16,7 +16,7 @@ class MediaManipulator(ManipulatorBase):
         """
         attrs = [
             'media_type_enum',
-            'media_id',
+            'foreign_key',
             'details_json',
             'year',
             'references',

@@ -45,8 +45,8 @@ class AdminMediaAdd(LoggedInHandler):
                 year = int(year_str.strip())
 
             media = Media(
-                id=Media.render_key_name(media_dict['media_type_enum'], media_dict['media_id']),
-                media_id=media_dict['media_id'],
+                id=Media.render_key_name(media_dict['media_type_enum'], media_dict['foreign_key']),
+                foreign_key=media_dict['foreign_key'],
                 media_type_enum=media_dict['media_type_enum'],
                 details_json=media_dict.get('details_json', None),
                 year=year,

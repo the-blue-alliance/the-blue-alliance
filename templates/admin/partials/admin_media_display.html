@@ -4,6 +4,6 @@
   </a>
 {% else %}
   {% if media.slugname == 'youtube' %}
-    <iframe width="320" height="180" src="http://www.youtube.com/embed/{{media.media_id}}" frameborder="0" allowfullscreen></iframe>
+    <iframe width="320" height="180" src="http://www.youtube.com/embed/{{media.foreign_key}}" frameborder="0" allowfullscreen></iframe>
   {% endif %}
 {% endif %}

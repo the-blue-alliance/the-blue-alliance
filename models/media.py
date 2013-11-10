@@ -15,9 +15,9 @@ class Media(ndb.Model):
         MediaType.CD_PHOTO_THREAD: 'cdphotothread',
     }
 
-    # media_type and media_id make up the key_name
+    # media_type and foreign_key make up the key_name
     media_type_enum = ndb.IntegerProperty(required=True)
-    media_id = ndb.StringProperty(required=True)  # Unique id for the particular media type. Ex: the "random" string at the end of a YouTube url
+    foreign_key = ndb.StringProperty(required=True)  # Unique id for the particular media type. Ex: the Youtube Video key at the end of a YouTube url
 
     details_json = ndb.StringProperty()  # Additional details required for rendering
     year = ndb.IntegerProperty()  # None if year is not relevant
@@ -32,7 +32,7 @@ class Media(ndb.Model):
 
     @property
     def key_name(self):
-        return self.render_key_name(self.media_type_enum, self.media_id)
+        return self.render_key_name(self.media_type_enum, self.foreign_key)
 
     @property
     def slugname(self):
@@ -45,5 +45,5 @@ class Media(ndb.Model):
         return self._details
 
     @classmethod
-    def render_key_name(self, media_type_enum, media_id):
-        return "{}_{}".format(self.SLUG_NAMES[media_type_enum], media_id)
+    def render_key_name(self, media_type_enum, foreign_key):
+        return "{}_{}".format(self.SLUG_NAMES[media_type_enum], foreign_key)
