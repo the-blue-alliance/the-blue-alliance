@@ -9,6 +9,9 @@ from consts.media_type import MediaType
 
 
 class MediaParser(object):
+    CD_PHOTO_THREAD_URL_PATTERN = 'chiefdelphi.com/media/photos/'
+    YOUTUBE_URL_PATTERN = 'youtube.com'
+
     @classmethod
     def partial_media_dict_from_url(cls, url):
         """
@@ -16,7 +19,7 @@ class MediaParser(object):
         """
         media_dict = {}
 
-        if 'chiefdelphi.com/media/photos/' in url:
+        if cls.CD_PHOTO_THREAD_URL_PATTERN in url:
             media_dict['media_type_enum'] = MediaType.CD_PHOTO_THREAD
             foreign_key = cls._parse_cdphotothread_foreign_key(url)
             if foreign_key is None:
@@ -34,7 +37,7 @@ class MediaParser(object):
                 logging.warning("Failed to determine image_partial from the page: {}".format(url))
                 return None
             media_dict['details_json'] = json.dumps({'image_partial': image_partial})
-        elif 'youtube.com' in url:
+        elif cls.YOUTUBE_URL_PATTERN in url:
             media_dict['media_type_enum'] = MediaType.YOUTUBE
             foreign_key = cls._parse_youtube_foreign_key(url)
             if foreign_key is None:
