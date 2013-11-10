@@ -60,8 +60,10 @@ class MatchManipulator(ManipulatorBase):
                     old_match.dirty = True
 
         for attr in auto_union_attrs:
-            unioned = set(getattr(new_match, attr)).union(set(getattr(old_match, attr)))
-            if unioned != set(getattr(old_match, attr)):
+            old_set = set(getattr(old_match, attr))
+            new_set = set(getattr(new_match, attr))
+            unioned = old_set.union(new_set)
+            if unioned != old_set:
                 setattr(old_match, attr, list(unioned))
                 old_match.dirty = True
 
