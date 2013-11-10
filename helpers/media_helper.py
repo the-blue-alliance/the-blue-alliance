@@ -29,13 +29,11 @@ class MediaParser(object):
                 logging.warning('Unable to retrieve url: {}'.format(url))
                 return None
 
-            image_url = cls._parse_cdphotothread_image_url(urlfetch_result.content)
-            if image_url is None:
-                logging.warning("Failed to determine image_url from the page: {}".format(url))
+            image_partial = cls._parse_cdphotothread_image_partial(urlfetch_result.content)
+            if image_partial is None:
+                logging.warning("Failed to determine image_partial from the page: {}".format(url))
                 return None
-            details = {'image_url': image_url,
-                       'link_url': "http://www.chiefdelphi.com/media/photos/{}".format(media_dict['foreign_key'])}
-            media_dict['details_json'] = json.dumps(details)
+            media_dict['details_json'] = json.dumps({'image_partial': image_partial})
         elif 'youtube.com' in url:
             media_dict['media_type_enum'] = MediaType.YOUTUBE
             foreign_key = cls._parse_youtube_foreign_key(url)
@@ -58,7 +56,7 @@ class MediaParser(object):
             return None
 
     @classmethod
-    def _parse_cdphotothread_image_url(cls, html):
+    def _parse_cdphotothread_image_partial(cls, html):
         # parse html for the image url
         soup = BeautifulSoup(html,
                              convertEntities=BeautifulSoup.HTML_ENTITIES)
@@ -67,7 +65,14 @@ class MediaParser(object):
             partial_url = element['href']
         else:
             return None
-        return "http://www.chiefdelphi.com{}".format(partial_url)
+
+        # partial_url looks something like: "/media/img/774/774d98c80dcf656f2431b2e9186f161a_l.jpg"
+        # we want "774/774d98c80dcf656f2431b2e9186f161a_l.jpg"
+        image_partial = re.match(r'\/media\/img\/(.*)', partial_url)
+        if image_partial is not None:
+            return image_partial.group(1)
+        else:
+            return None
 
     @classmethod
     def _parse_youtube_foreign_key(cls, url):

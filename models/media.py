@@ -31,6 +31,12 @@ class Media(ndb.Model):
         super(Media, self).__init__(*args, **kw)
 
     @property
+    def details(self):
+        if self._details is None:
+            self._details = json.loads(self.details_json)
+        return self._details
+
+    @property
     def key_name(self):
         return self.render_key_name(self.media_type_enum, self.foreign_key)
 
@@ -38,12 +44,19 @@ class Media(ndb.Model):
     def slugname(self):
         return self.SLUG_NAMES[self.media_type_enum]
 
-    @property
-    def details(self):
-        if self._details is None:
-            self._details = json.loads(self.details_json)
-        return self._details
-
     @classmethod
     def render_key_name(self, media_type_enum, foreign_key):
         return "{}_{}".format(self.SLUG_NAMES[media_type_enum], foreign_key)
+
+    # URL renderers
+    @property
+    def cdphotothread_image_url(self):
+        return 'http://www.chiefdelphi.com/media/img/{}'.format(self.details['image_partial'])
+
+    @property
+    def cdphotothread_thread_url(self):
+        return 'http://www.chiefdelphi.com/media/photos/{}'.format(self.foreign_key)
+
+    @property
+    def youtube_url(self):
+        return 'http://www.youtube.com/embed/{}'.format(self.foreign_key)
