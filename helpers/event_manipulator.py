@@ -7,7 +7,7 @@ class EventManipulator(ManipulatorBase):
     """
 
     @classmethod
-    def updateMerge(self, new_event, old_event):
+    def updateMerge(self, new_event, old_event, auto_union=True):
         """
         Given an "old" and a "new" Team object, replace the fields in the
         "old" team that are present in the "new" team, but keep fields from
