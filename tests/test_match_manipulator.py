@@ -53,7 +53,7 @@ class TestMatchManipulator(unittest2.TestCase):
         self.assertOldMatch(match)
         self.assertEqual(match.alliances_json, """{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""")
         if is_auto_union:
-            self.assertEqual(set(match.youtube_videos).symmetric_difference({u'P3C2BOtL7e8', u'TqY324xLU4s', u'tst1', u'tst2', u'tst3', u'tst4'}), set())
+            self.assertEqual(set(match.youtube_videos), {u'P3C2BOtL7e8', u'TqY324xLU4s', u'tst1', u'tst2', u'tst3', u'tst4'})
         else:
             self.assertEqual(match.youtube_videos, [u'TqY324xLU4s', u'tst1', u'tst3', u'tst4'])
 
