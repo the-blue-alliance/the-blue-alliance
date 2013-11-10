@@ -7,7 +7,7 @@ class MediaManipulator(ManipulatorBase):
     """
 
     @classmethod
-    def updateMerge(self, new_media, old_media):
+    def updateMerge(self, new_media, old_media, auto_union=True):
         """
         Given an "old" and a "new" Media object, replace the fields in the
         "old" object that are present in the "new" object, but keep fields from
@@ -19,18 +19,37 @@ class MediaManipulator(ManipulatorBase):
             'foreign_key',
             'details_json',
             'year',
+        ]
+
+        list_attrs = []
+
+        auto_union_attrs = [
             'references',
         ]
 
+        # if not auto_union, treat auto_union_attrs as list_attrs
+        if not auto_union:
+            list_attrs += auto_union_attrs
+            auto_union_attrs = []
+
         for attr in attrs:
             if getattr(new_media, attr) is not None:
-                if attr == 'references':
-                    combined_references = list(set(getattr(new_media, attr)).union(set(getattr(old_media, attr))))
-                    setattr(old_media, attr, combined_references)
+                if getattr(new_media, attr) != getattr(old_media, attr):
+                    setattr(old_media, attr, getattr(new_media, attr))
                     old_media.dirty = True
-                else:
-                    if getattr(new_media, attr) != getattr(old_media, attr):
-                        setattr(old_media, attr, getattr(new_media, attr))
-                        old_media.dirty = True
+
+        for attr in list_attrs:
+            if len(getattr(new_media, attr)) > 0:
+                if getattr(new_media, attr) != getattr(old_media, attr):
+                    setattr(old_media, attr, getattr(new_media, attr))
+                    old_media.dirty = True
+
+        for attr in auto_union_attrs:
+            old_set = set(getattr(old_media, attr))
+            new_set = set(getattr(new_media, attr))
+            unioned = old_set.union(new_set)
+            if unioned != old_set:
+                setattr(old_media, attr, list(unioned))
+                old_media.dirty = True
 
         return old_media
