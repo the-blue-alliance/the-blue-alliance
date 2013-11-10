@@ -41,7 +41,7 @@ class Media(ndb.Model):
         return self.render_key_name(self.media_type_enum, self.foreign_key)
 
     @property
-    def slugname(self):
+    def slug_name(self):
         return self.SLUG_NAMES[self.media_type_enum]
 
     @classmethod
