@@ -1,72 +1,72 @@
+import json
 import logging
+import re
 
 from BeautifulSoup import BeautifulSoup
 
+from consts.award_type import AwardType
 from datafeeds.parser_base import ParserBase
 
 
 class UsfirstEventAwardsParser(ParserBase):
     """
-    Works for official events from 2007-2012
+    Works for official events from 2007-present
     Note: awards are matched by award names below, but the award names
     displayed will be the award names listed on the USFIRST event pages.
     Awards must contain every string in the the first list of the tuple
     and must NOT contain any string in the second list of the tuple
     """
     AWARD_NAMES = [
-        ("ca", (["chairman"], [])),
-        ("ei", (["engineering inspiration"], [])),
-        ("win1", (["winner", "1"], [])),
-        ("win2", (["winner", "2"], [])),
-        ("win3", (["winner", "3"], [])),
-        ("win4", (["winner", "4"], [])),
-        ("win1", (["championship", "champion", "1"], ["finalist"])),
-        ("win2", (["championship", "champion", "2"], ["finalist"])),
-        ("win3", (["championship", "champion", "3"], ["finalist"])),
-        ("win4", (["championship", "champion", "4"], ["finalist"])),
-        ("fin1", (["finalist", "1"], ["dean"])),
-        ("fin2", (["finalist", "2"], ["dean"])),
-        ("fin3", (["finalist", "3"], ["dean"])),
-        ("fin4", (["finalist", "4"], ["dean"])),
-        ("coop", (["coopertition"], [])),
-        ("sports", (["sportsmanship"], [])),
-        ("create", (["creativity"], [])),
-        ("eng", (["engineering", "excellence"], [])),
-        ("entre", (["entrepreneurship"], [])),
-        ("exdes", (["excellence in design"], [])),
-        ("dl", (["dean's list"], [])),
-        ("bkm1", (["bart", "kamen", "memorial", "1"], [])),
-        ("bkm2", (["bart", "kamen", "memorial", "2"], [])),
-        ("bkm3", (["bart", "kamen", "memorial", "3"], [])),
-        ("driv", (["driving", "tomorrow", "technology"], [])),
-        ("gp", (["gracious professionalism"], [])),
-        ("hrs", (["highest rookie seed"], [])),
-        ("image", (["imagery"], [])),
-        ("ind", (["industrial design"], [])),
-        ("mediatech", (["media", "technology"], [])),
-        ("mil", (["make", "loud"], [])),
-        ("safe", (["safety"], [])),
-        ("control", (["innovation in control"], [])),
-        ("quality", (["quality"], [])),
-        ("ras", (["rookie", "all", "star"], [])),
-        ("rinspire", (["rookie inspiration"], [])),
-        ("spirit", (["spirit"], [])),
-        ("web", (["website"], [])),
-        ("vis", (["visualization"], [])),
-        ("vol", (["volunteer"], [])),
-        ("wfa", (["woodie flowers"], [])),
-        ("judge", (["judge"], [])),
-        ("founders", (["founder"], [])),
-        ("inventor", (["autodesk inventor"], [])),
-        ("innovator", (["future innovator"], []))
+        (AwardType.CHAIRMANS, (["chairman"], [])),
+        (AwardType.ENGINEERING_INSPIRATION, (["engineering inspiration"], [])),
+        (AwardType.WINNER, (["winner", "1"], [])),
+        (AwardType.WINNER, (["winner", "2"], [])),
+        (AwardType.WINNER, (["winner", "3"], [])),
+        (AwardType.WINNER, (["winner", "4"], [])),
+        (AwardType.WINNER, (["championship", "champion", "1"], ["finalist"])),
+        (AwardType.WINNER, (["championship", "champion", "2"], ["finalist"])),
+        (AwardType.WINNER, (["championship", "champion", "3"], ["finalist"])),
+        (AwardType.WINNER, (["championship", "champion", "4"], ["finalist"])),
+        (AwardType.FINALIST, (["finalist", "1"], ["dean"])),
+        (AwardType.FINALIST, (["finalist", "2"], ["dean"])),
+        (AwardType.FINALIST, (["finalist", "3"], ["dean"])),
+        (AwardType.FINALIST, (["finalist", "4"], ["dean"])),
+        (AwardType.COOPERTITION, (["coopertition"], [])),
+        (AwardType.SPORTSMANSHIP, (["sportsmanship"], [])),
+        (AwardType.CREATIVITY, (["creativity"], [])),
+        (AwardType.ENGINEERING_EXCELLENCE, (["engineering", "excellence"], [])),
+        (AwardType.ENTREPRENEURSHIP, (["entrepreneurship"], [])),
+        (AwardType.EXCELLENCE_IN_DESIGN, (["excellence in design"], ["cad", "animation"])),
+        (AwardType.EXCELLENCE_IN_DESIGN_CAD, (["excellence in design", "cad"], [])),
+        (AwardType.EXCELLENCE_IN_DESIGN_ANIMATION, (["excellence in design", "animation"], [])),
+        (AwardType.DEANS_LIST, (["dean", "list"], [])),
+        (AwardType.BART_KAMEN_MEMORIAL, (["bart", "kamen", "memorial"], [])),
+        (AwardType.DRIVING_TOMORROWS_TECHNOLOGY, (["driving", "tomorrow", "technology"], [])),
+        (AwardType.GRACIOUS_PROFESSIONALISM, (["gracious professionalism"], [])),
+        (AwardType.HIGHEST_ROOKIE_SEED, (["highest rookie seed"], [])),
+        (AwardType.IMAGERY, (["imagery"], [])),
+        (AwardType.INDUSTRIAL_DEESIGN, (["industrial design"], [])),
+        (AwardType.MEDIA_AND_TECHNOLOGY, (["media", "technology"], [])),
+        (AwardType.MAKE_IT_LOUD, (["make", "loud"], [])),
+        (AwardType.SAFETY, (["safety"], [])),
+        (AwardType.INNOVATION_IN_CONTROL, (["innovation in control"], [])),
+        (AwardType.QUALITY, (["quality"], [])),
+        (AwardType.ROOKIE_ALL_STAR, (["rookie", "all", "star"], [])),
+        (AwardType.ROOKIE_INSPIRATION, (["rookie inspiration"], [])),
+        (AwardType.SPIRIT, (["spirit"], [])),
+        (AwardType.WEBSITE, (["website"], [])),
+        (AwardType.VISUALIZATION, (["visualization"], [])),
+        (AwardType.VOLUNTEER, (["volunteer"], [])),
+        (AwardType.WOODIE_FLOWERS, (["woodie flowers"], [])),
+        (AwardType.JUDGES, (["judge"], [])),
+        (AwardType.FOUNDERS, (["founder"], [])),
+        (AwardType.AUTODESK_INVENTOR, (["autodesk inventor"], [])),
+        (AwardType.FUTURE_INNOVATOR, (["future innovator"], []))
     ]
-    INDIVIDUAL_AWARDS = ["dl", "dl1", "dl2", "dl3", "dl4", "dl5", "dl6", "dl7",
-                         "dl8", "dl9", "vol", "wfa", "founders", "bkm1", "bkm2",
-                         "bkm3", "mil"]
-    YEAR_SPECIFIC = {'2012': {'official': 0,
-                              'team_number': 1,
-                              'individual': 3},
-                     '2007-11': {'official': 0,
+    YEAR_SPECIFIC = {'2012-pres': {'name_str': 0,
+                                   'team_number': 1,
+                                   'individual': 3},
+                     '2007-11': {'name_str': 0,
                                  'team_number': 1,
                                  'individual': 2}}
 
@@ -77,42 +77,34 @@ class UsfirstEventAwardsParser(ParserBase):
         """
         html = html.decode('utf-8', 'ignore')  # Clean html before feeding itno BeautifulSoup
         soup = BeautifulSoup(html, convertEntities=BeautifulSoup.HTML_ENTITIES)
-
-        title = self._recurseUntilString(soup.findAll('title')[0])
-
-        is_championship = title.find('FIRST Championship') >= 0
-        if is_championship and title.find('Division') >= 0:
-            is_division = True
-        else:
-            is_division = False
-
         table = soup.findAll('table')[2]
-        already_parsed = set()
-        awards = list()
+
+        awards_by_type = {}
         for tr in table.findAll('tr')[1:]:
             tds = tr.findAll('td')
             if len(tds) == 5:
-                year = '2012'
+                year = '2012-pres'
             else:
                 year = '2007-11'
 
-            official_name = unicode(self._recurseUntilString(tds[self.YEAR_SPECIFIC[year]['official']]))
-            award_key = None
-            official_name_lower = official_name.lower()
-            for key, (yes_strings, no_strings) in self.AWARD_NAMES:
+            name_str = unicode(self._recurseUntilString(tds[self.YEAR_SPECIFIC[year]['name_str']]))
+            name_str_lower = name_str.lower()
+            award_type_enum = None
+            for type_enum, (yes_strings, no_strings) in self.AWARD_NAMES:
                 for string in yes_strings:
-                    if string not in official_name_lower:
+                    if string not in name_str_lower:
                         break
                 else:
                     for string in no_strings:
-                        if string in official_name_lower:
+                        if string in name_str_lower:
                             break
                     else:
-                        award_key = key
+                        # found a match
+                        award_type_enum = type_enum
                         break
-            if not award_key:
-                logging.warning('Found an award that isn\'t in the dictionary: ' + official_name)
-                continue
+            if award_type_enum is None:
+                logging.warning("Found an award without an associated type: " + name_str)
+                award_type_enum = AwardType.UNLABLED
 
             team_number = None
             try:
@@ -125,58 +117,50 @@ class UsfirstEventAwardsParser(ParserBase):
                 team_number = None
 
             awardee = None
-            if award_key in self.INDIVIDUAL_AWARDS:
+            if award_type_enum in AwardType.INDIVIDUAL_AWARDS:
                 try:
-                    awardee = fixAwardee(tds[self.YEAR_SPECIFIC[year]['individual']])
-                    if awardee:
-                        awardee = unicode(sanitize(awardee))
+                    awardee_str = self._recurseUntilString(tds[self.YEAR_SPECIFIC[year]['individual']])
+                    if awardee_str:
+                        awardee = unicode(sanitize(awardee_str))
                 except TypeError:
                     awardee = None
                 if not awardee:
                     # Turns '' into None
                     awardee = None
 
-            if (awardee == None) and (team_number == None):
+            # an award must have either an awardee or a team_number
+            if awardee is None and team_number is None:
                 continue
 
-            key_number = 1
-            test_key = award_key
-            while test_key in already_parsed:
-                test_key = award_key + str(key_number)
-                key_number += 1
-            award_key = test_key
-            already_parsed.add(award_key)
+            recipient_json = json.dumps({
+                'team_number': team_number,
+                'awardee': awardee,
+            })
 
-            if is_championship:
-                if is_division:
-                    award_key = 'div_' + award_key
-                else:
-                    award_key = 'cmp_' + award_key
+            if award_type_enum in awards_by_type:
+                if team_number is not None:
+                    awards_by_type[award_type_enum]['team_number_list'].append(team_number)
+                awards_by_type[award_type_enum]['recipient_json_list'].append(recipient_json)
+            else:
+                awards_by_type[award_type_enum] = {
+                    'name_str': strip_number(name_str),
+                    'award_type_enum': award_type_enum,
+                    'team_number_list': [team_number] if team_number is not None else [],
+                    'recipient_json_list': [recipient_json],
+                }
 
-            award = {'name': award_key,
-                     'team_number': team_number,
-                     'awardee': awardee,
-                     'official_name': official_name}
-            awards.append(award)
-        return awards, False
-
-
-def fixAwardee(text):
-    # Example: http://www2.usfirst.org/2012comp/Events/gl/awards.html
-    # Some names have <span></span> around names, but not others.
-    spans = text.findAll('span')
-    if not spans:
-        return ParserBase._recurseUntilString(text)
-    full_name = []
-    for span in spans:
-        try:
-            partial = ParserBase._recurseUntilString(span)
-            if partial not in full_name:
-                full_name.append(partial)
-        except AttributeError:
-            continue
-    return ' '.join(full_name)
+        return awards_by_type.values(), False
 
 
 def sanitize(text):
     return text.replace('\r\n ', '')
+
+
+def strip_number(text):
+    # Removes things like "#3" from an award name_str
+    # Example: "Regional Winners #2" becomes "Regional Winners"
+    m = re.match(r'(.*) #\d*(.*)', text)
+    if m is not None:
+        return m.group(1) + m.group(2)
+    else:
+        return text

@@ -25,10 +25,13 @@ class ParserBase(object):
         if isinstance(node, NavigableString):
             return node
         if hasattr(node, 'contents'):
+            results = []
             for content in node.contents:
                 result = self._recurseUntilString(content)
                 if result is not None:
                     result = result.strip().replace('\r', '').replace('\n', '').replace('  ', ' ')
                 if result is not None and result != "":
-                    return result
+                    results.append(result)
+            if results != []:
+                return ' '.join(results)
         return None

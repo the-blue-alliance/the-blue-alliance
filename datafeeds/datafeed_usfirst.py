@@ -3,6 +3,7 @@ import re
 
 from google.appengine.api import memcache
 from google.appengine.api import urlfetch
+from google.appengine.ext import ndb
 
 import tba_config
 
@@ -21,7 +22,7 @@ from datafeeds.usfirst_team_details_parser import UsfirstTeamDetailsParser
 from datafeeds.usfirst_pre2003_team_events_parser import UsfirstPre2003TeamEventsParser
 
 from models.event import Event
-from models.award import Award
+from models.award2 import Award2
 from models.match import Match
 from models.team import Team
 
@@ -116,14 +117,16 @@ class DatafeedUsfirst(DatafeedBase):
                                                self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
         awards, _ = self.parse(url, UsfirstEventAwardsParser)
 
-        return [Award(
-            id=Award.renderKeyName(event.key_name, award.get('name')),
-            name=award.get('name', None),
-            team=_getTeamKey(award),
-            awardee=award.get('awardee', None),
+        return [Award2(
+            id=Award2.render_key_name(event.key_name, award['award_type_enum']),
+            name_str=award['name_str'],
+            award_type_enum=award['award_type_enum'],
             year=event.year,
-            official_name=award.get('official_name', None),
-            event=event.key)
+            event=event.key,
+            event_type_enum=event.event_type_enum,
+            team_list=[ndb.Key(Team, 'frc{}'.format(team_number)) for team_number in award['team_number_list']],
+            recipient_json_list=award['recipient_json_list']
+            )
             for award in awards]
 
     def getEventTeams(self, year, first_eid):
