@@ -4,8 +4,6 @@ class AwardType(object):
     District Championship, Championship Division, Championship Finals, etc.)
     the award is from. In other words, RCA and CCA are of the same award type.
     """
-    UNLABLED = -1
-
     CHAIRMANS = 0
     WINNER = 1
     FINALIST = 2

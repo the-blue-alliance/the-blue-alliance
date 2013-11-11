@@ -104,7 +104,7 @@ class UsfirstEventAwardsParser(ParserBase):
                         break
             if award_type_enum is None:
                 logging.warning("Found an award without an associated type: " + name_str)
-                award_type_enum = AwardType.UNLABLED
+                continue
 
             team_number = None
             try:
