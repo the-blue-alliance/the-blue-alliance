@@ -32,7 +32,7 @@ class AwardManipulator(ManipulatorBase):
         ]
 
         json_attrs = {
-            'recipint_json_list'
+            'recipient_json_list'
         }
 
         # if not auto_union, treat auto_union_attrs as list_attrs
@@ -64,12 +64,18 @@ class AwardManipulator(ManipulatorBase):
             else:
                 old_list = getattr(old_award, attr)
                 new_list = getattr(new_award, attr)
-            old_set = set(old_list)
-            new_set = set(new_list)
 
-            unioned = old_set.union(new_set)
-            if unioned != old_set:
-                setattr(old_award, attr, list(unioned))
-                old_award.dirty = True
+            for item in new_list:
+                if item not in old_list:
+                    old_list.append(item)
+                    old_award.dirty = True
+
+            # Turn dicts back to JSON
+            if attr in json_attrs:
+                merged_list = [json.dumps(d) for d in old_list]
+            else:
+                merged_list = old_list
+
+            setattr(old_award, attr, merged_list)
 
         return old_award
