@@ -108,7 +108,7 @@ class EventDetail(CacheableHandler):
 
         event.prepAwardsMatchesTeams()
 
-        awards = AwardHelper.organizeAwards(event.awards)
+        awards = AwardHelper.organizeAwards(AwardHelper.split_awards(event.awards))
         cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
         matches = MatchHelper.organizeMatches(cleaned_matches)
         teams = TeamHelper.sortTeams(event.teams)

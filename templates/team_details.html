@@ -53,7 +53,13 @@
                     {% if comp.rank or comp.wlt %}and{% endif %} won the following awards:
                     <ul>
                     {% for award in comp.awards.list %}
-                      <li>{{ award.official_name }}{% if award.awardee %} ({{ award.awardee }}){% endif %}</li>
+                    {% for team_number, awardees in award.recipient_dict.items %}
+                    {% if team_number == team.team_number %}
+                      {% for awardee in awardees %}
+                        <li>{{ award.name_str }}{% if awardee %} ({{ awardee }}){% endif %}</li>
+                      {% endfor %}
+                    {% endif %}
+                    {% endfor %}
                     {% endfor %}
                     </ul>
                   {% endif %}

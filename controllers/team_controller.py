@@ -169,7 +169,7 @@ class TeamDetail(CacheableHandler):
         matches_upcoming = None
         short_cache = False
         for e, matches in events_matches:
-            event_awards = AwardHelper.organizeAwards([award for award in awards if award.event == e.key])
+            event_awards = AwardHelper.organizeAwards(AwardHelper.split_awards([award for award in awards if award.event == e.key]))
             matches_organized = MatchHelper.organizeMatches(matches)
 
             if e.now:

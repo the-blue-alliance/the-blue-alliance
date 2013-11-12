@@ -258,21 +258,25 @@
                                 <th>Winner</th>
                             </tr>
                             {% for award in awards.list %}
+                            {% for team_number, awardees in award.recipient_dict.items %}
+                            {% for awardee in awardees %}
                             <tr>
-                                <td>{{award.official_name}}</td>
+                                <td>{{award.name_str}}</td>
                                 <td>
-                                {% if award.awardee %}
-                                    {{ award.awardee }}
-                                    {% if award.team %}(<a href="/team/{{award.team.id|slice:"3:"}}/{{event.year}}">{{award.team.id|slice:"3:"}}</a>){% endif %}
+                                {% if awardee %}
+                                    {{ awardee }}
+                                    {% if team_number %}(<a href="/team/{{team_number}}/{{event.year}}">{{team_number}}</a>){% endif %}
                                 {% else %}
-                                    {% if award.team %}
-                                    <a href="/team/{{award.team.id|slice:"3:"}}/{{event.year}}">{{award.team.id|slice:"3:"}}</a>
+                                    {% if team_number %}
+                                    <a href="/team/{{team_number}}/{{event.year}}">{{team_number}}</a>
                                     {% else %}
                                     --
                                     {% endif %}
                                 {% endif %}
                                 </td>
                             </tr>
+                            {% endfor %}
+                            {% endfor %}
                             {% endfor %}
                         </tbody>
                     </table>
