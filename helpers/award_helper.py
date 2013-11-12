@@ -118,6 +118,7 @@ class AwardHelper(object):
         return awards
 
     @classmethod
+<<<<<<< HEAD
     def getAwards(self, keys, year=None):
         awards = []
         for key in keys:
