@@ -63,12 +63,15 @@ class UsfirstEventAwardsParser(ParserBase):
         (AwardType.AUTODESK_INVENTOR, (["autodesk inventor"], [])),
         (AwardType.FUTURE_INNOVATOR, (["future innovator"], []))
     ]
-    YEAR_SPECIFIC = {'2012-pres': {'name_str': 0,
-                                   'team_number': 1,
-                                   'individual': 3},
-                     '2007-11': {'name_str': 0,
-                                 'team_number': 1,
-                                 'individual': 2}}
+
+    # The format of USFIRST award pages is different for 2007-2011 and 2012-present
+    # This dict defines which columns of the USFIRST award table name_str, team_number, and individual are.
+    COL_NUM = {'2012-pres': {'name_str': 0,
+                             'team_number': 1,
+                             'individual': 3},
+               '2007-11': {'name_str': 0,
+                           'team_number': 1,
+                           'individual': 2}}
 
     @classmethod
     def parse(self, html):
@@ -83,11 +86,11 @@ class UsfirstEventAwardsParser(ParserBase):
         for tr in table.findAll('tr')[1:]:
             tds = tr.findAll('td')
             if len(tds) == 5:
-                year = '2012-pres'
+                parser_year = '2012-pres'
             else:
-                year = '2007-11'
+                parser_year = '2007-11'
 
-            name_str = unicode(self._recurseUntilString(tds[self.YEAR_SPECIFIC[year]['name_str']]))
+            name_str = unicode(self._recurseUntilString(tds[self.COL_NUM[parser_year]['name_str']]))
             name_str_lower = name_str.lower()
             award_type_enum = None
             for type_enum, (yes_strings, no_strings) in self.AWARD_NAMES:
@@ -108,7 +111,7 @@ class UsfirstEventAwardsParser(ParserBase):
 
             team_number = None
             try:
-                team_number = self._recurseUntilString(tds[self.YEAR_SPECIFIC[year]['team_number']])
+                team_number = self._recurseUntilString(tds[self.COL_NUM[parser_year]['team_number']])
             except AttributeError:
                 team_number = None
             if team_number and team_number.isdigit():
@@ -119,7 +122,7 @@ class UsfirstEventAwardsParser(ParserBase):
             awardee = None
             if award_type_enum in AwardType.INDIVIDUAL_AWARDS:
                 try:
-                    awardee_str = self._recurseUntilString(tds[self.YEAR_SPECIFIC[year]['individual']])
+                    awardee_str = self._recurseUntilString(tds[self.COL_NUM[parser_year]['individual']])
                     if awardee_str:
                         awardee = unicode(sanitize(awardee_str))
                 except TypeError:
