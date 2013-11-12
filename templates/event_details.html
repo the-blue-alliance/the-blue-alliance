@@ -89,7 +89,7 @@
             <ul class="nav nav-tabs">
                 {% if matches.num > 0 %}<li class="active"><a href="#results" data-toggle="tab">Results</a></li>{% endif %}
                 {% if event.rankings %}<li><a href="#rankings" data-toggle="tab">Rankings</a></li>{% endif %}
-                {% if awards.list %}<li><a href="#awards" data-toggle="tab">Awards</a></li>{% endif %}
+                {% if awards %}<li><a href="#awards" data-toggle="tab">Awards</a></li>{% endif %}
                 <li class="{% if matches.num == 0 %}active{% endif %}"><a href="#teams" data-toggle="tab">Teams</a></li>
             </ul>
         </div>
@@ -247,7 +247,7 @@
             </div>
         </div>
 
-        {% if awards.list %}
+        {% if awards %}
         <div class="tab-pane" id="awards">
             <div class="row">
                 <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
@@ -257,7 +257,7 @@
                                 <th>Award</th>
                                 <th>Winner</th>
                             </tr>
-                            {% for award in awards.list %}
+                            {% for award in awards %}
                             {% for team_number, awardees in award.recipient_dict.items %}
                             {% for awardee in awardees %}
                             <tr>

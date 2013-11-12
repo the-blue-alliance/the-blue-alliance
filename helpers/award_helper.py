@@ -1,20 +1,20 @@
 import logging
+
 from consts.award_type import AwardType
-from models.award import Award
 
 
 # Prioritized sort order for certain awards
-sortOrder = [
-    AwardType.CHAIRMANS,
-    AwardType.FOUNDERS,
-    AwardType.ENGINEERING_INSPIRATION,
-    AwardType.ROOKIE_ALL_STAR,
-    AwardType.WOODIE_FLOWERS,
-    AwardType.VOLUNTEER,
-    AwardType.DEANS_LIST,
-    AwardType.WINNER,
-    AwardType.FINALIST,
-]
+sort_order = {
+    AwardType.CHAIRMANS: 0,
+    AwardType.FOUNDERS: 1,
+    AwardType.ENGINEERING_INSPIRATION: 2,
+    AwardType.ROOKIE_ALL_STAR: 3,
+    AwardType.WOODIE_FLOWERS: 4,
+    AwardType.VOLUNTEER: 5,
+    AwardType.DEANS_LIST: 6,
+    AwardType.WINNER: 7,
+    AwardType.FINALIST: 8,
+}
 
 
 """
@@ -72,50 +72,13 @@ AWARD_MATCHING_STRINGS = [
 
 
 class AwardHelper(object):
-    """
-    Helper to prepare awards for being used in a template
-    awards['list'] is sorted by sortOrder and then the rest
-    in alphabetical order by name_str
-    """
-
     @classmethod
     def organizeAwards(self, award_list):
-        awards = dict([(award.award_type_enum, award) for award in award_list])
-        awards_set = set(awards)
-
-        awards['list'] = list()
-        defined_set = set()
-        for item in sortOrder:
-            if item in awards:
-                awards['list'].append(awards[item])
-                defined_set.add(item)
-
-        difference = awards_set.difference(defined_set)
-        remaining_awards = []
-        for item in difference:
-            remaining_awards.append(awards[item])
-        remaining_awards = sorted(remaining_awards, key=lambda award: award.name_str)
-
-        awards['list'] += remaining_awards
-        return awards
-
-    @classmethod
-    def split_awards(self, awards):
         """
-        For each award, uses recipient_list to add a recipient_dict property,
-        where the key is the team_number and the value is a list of awardees.
+        Sorts awards first by sort_order and then alphabetically by name_str
         """
-        for award in awards:
-            recipient_dict = {}
-            for recipient in award.recipient_list:
-                team_number = recipient['team_number']
-                awardee = recipient['awardee']
-                if team_number in recipient_dict:
-                    recipient_dict[team_number].append(awardee)
-                else:
-                    recipient_dict[team_number] = [awardee]
-            award.recipient_dict = recipient_dict
-        return awards
+        sorted_awards = sorted(award_list, key=lambda award: sort_order.get(award.award_type_enum, award.name_str))
+        return sorted_awards
 
     @classmethod
 <<<<<<< HEAD
