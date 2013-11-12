@@ -144,7 +144,7 @@ class TeamDetail(CacheableHandler):
 
         @ndb.tasklet
         def get_awards_async():
-            award_keys = yield Award.query(Award.year == year, Award.team == team.key).fetch_async(500, keys_only=True)
+            award_keys = yield Award.query(Award.year == year, Award.team_list == team.key).fetch_async(500, keys_only=True)
             awards = yield ndb.get_multi_async(award_keys)
             raise ndb.Return(awards)
 
@@ -253,7 +253,7 @@ class TeamHistory(CacheableHandler):
             return self.redirect("/error/404")
 
         event_team_keys_future = EventTeam.query(EventTeam.team == team.key).fetch_async(1000, keys_only=True)
-        award_keys_future = Award.query(Award.team == team.key).fetch_async(1000, keys_only=True)
+        award_keys_future = Award.query(Award.team_list == team.key).fetch_async(1000, keys_only=True)
 
         event_teams_futures = ndb.get_multi_async(event_team_keys_future.get_result())
         awards_futures = ndb.get_multi_async(award_keys_future.get_result())
