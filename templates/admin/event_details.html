@@ -108,19 +108,31 @@
 <h2>Awards</h2>
 <table class="table table-striped table-condensed">
     <tbody>
-      <tr><th>Award</th><th>Team</th><th>Person</th></tr>
+      <tr><th>Award</th><th>Team</th><th>Awardee</th></tr>
       {% for award in event.awards %}
       <tr>
-        <td><a href="/admin/award/edit/{{award.key_name}}">{{award.official_name}}</a></td>
+        <td><a href="/admin/award/edit/{{award.key_name}}">{{award.name_str}}</a></td>
       <td>
-        {% if award.team.id %}
-          {{award.team.id}}
-        {% endif %}
+        {% for team in award.recipient_dict.keys %}
+          {% if team %}
+            {{ team }}
+          {% else %}
+            --
+          {% endif %}
+          <br>
+        {% endfor %}
       </td>
       <td>
-        {% if award.awardee %}
-	        {{ award.awardee }}
-	      {% endif %}
+        {% for awardees in award.recipient_dict.values %}
+          {% for awardee in awardees %}
+            {% if awardee %}
+              {{ awardee }}
+            {% else %}
+              --
+            {% endif %}
+            <br>
+          {% endfor %}
+        {% endfor %}
       </td>
       </tr>
       {% endfor %}
