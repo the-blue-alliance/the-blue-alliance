@@ -30,7 +30,7 @@ class Award(ndb.Model):
 
     def __init__(self, *args, **kw):
         self._recipient_list = None
-        super(Award2, self).__init__(*args, **kw)
+        super(Award, self).__init__(*args, **kw)
 
     @property
     def recipient_list(self):

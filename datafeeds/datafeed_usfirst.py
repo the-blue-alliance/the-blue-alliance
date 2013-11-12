@@ -117,8 +117,8 @@ class DatafeedUsfirst(DatafeedBase):
                                                self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
         awards, _ = self.parse(url, UsfirstEventAwardsParser)
 
-        return [Award2(
-            id=Award2.render_key_name(event.key_name, award['award_type_enum']),
+        return [Award(
+            id=Award.render_key_name(event.key_name, award['award_type_enum']),
             name_str=award['name_str'],
             award_type_enum=award['award_type_enum'],
             year=event.year,

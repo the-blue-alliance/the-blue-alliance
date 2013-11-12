@@ -27,8 +27,8 @@ class TestAwardManipulator(unittest2.TestCase):
           event_type_enum=EventType.REGIONAL,
         )
 
-        self.old_award = Award2(
-            id=Award2.render_key_name(self.event.key_name, AwardType.WINNER),
+        self.old_award = Award(
+            id=Award.render_key_name(self.event.key_name, AwardType.WINNER),
             name_str="Regional Winner",
             award_type_enum=AwardType.WINNER,
             year=2013,
@@ -39,7 +39,7 @@ class TestAwardManipulator(unittest2.TestCase):
                                  json.dumps({'team_number': 234, 'awardee': None})],
         )
 
-        self.new_award = Award2(
+        self.new_award = Award(
             id="2013casj_1",
             name_str="Regional Champion",
             award_type_enum=AwardType.WINNER,
@@ -83,10 +83,10 @@ class TestAwardManipulator(unittest2.TestCase):
 
     def test_createOrUpdate(self):
         AwardManipulator.createOrUpdate(self.old_award)
-        self.assertOldAward(Award2.get_by_id("2013casj_1"))
+        self.assertOldAward(Award.get_by_id("2013casj_1"))
 
         AwardManipulator.createOrUpdate(self.new_award)
-        self.assertMergedAward(Award2.get_by_id("2013casj_1"), True)
+        self.assertMergedAward(Award.get_by_id("2013casj_1"), True)
 
     def test_findOrSpawn(self):
         self.old_award.put()
@@ -97,10 +97,10 @@ class TestAwardManipulator(unittest2.TestCase):
 
     def test_createOrUpdate_no_auto_union(self):
         AwardManipulator.createOrUpdate(self.old_award)
-        self.assertOldAward(Award2.get_by_id("2013casj_1"))
+        self.assertOldAward(Award.get_by_id("2013casj_1"))
 
         AwardManipulator.createOrUpdate(self.new_award, auto_union=False)
-        self.assertMergedAward(Award2.get_by_id("2013casj_1"), False)
+        self.assertMergedAward(Award.get_by_id("2013casj_1"), False)
 
     def test_findOrSpawn_no_auto_union(self):
         self.old_award.put()
