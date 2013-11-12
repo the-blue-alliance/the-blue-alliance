@@ -1,5 +1,13 @@
 class AwardType(object):
     """
+    An award type defines a logical type of award that an award falls into.
+    These types are the same across both years and competitions within a year.
+    In other words, an industrial design award from 2013casj and
+    2010cmp will be of award type AwardType.INDUSTRIAL_DESIGN.
+
+    An award type must be enumerated for every type of award ever awarded.
+    ONCE A TYPE IS ENUMERATED, IT MUST NOT BE CHANGED.
+
     Award types don't care about what type of event (Regional, District,
     District Championship, Championship Division, Championship Finals, etc.)
     the award is from. In other words, RCA and CCA are of the same award type.
