@@ -108,10 +108,11 @@
 <h2>Awards</h2>
 <table class="table table-striped table-condensed">
     <tbody>
-      <tr><th>Award</th><th>Team</th><th>Awardee</th></tr>
+      <tr><th>Award</th><th>Award Type</th><th>Team</th><th>Awardee</th></tr>
       {% for award in event.awards %}
       <tr>
         <td><a href="/admin/award/edit/{{award.key_name}}">{{award.name_str}}</a></td>
+        <td>{{award.award_type_enum}}</td>
       <td>
         {% for team in award.recipient_dict.keys %}
           {% if team %}

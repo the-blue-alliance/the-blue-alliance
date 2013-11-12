@@ -31,6 +31,7 @@ class Award(ndb.Model):
     def __init__(self, *args, **kw):
         self._recipient_list = None
         self._recipient_dict = None
+        self._recipient_list_json = None
         super(Award, self).__init__(*args, **kw)
 
     @property
@@ -57,6 +58,16 @@ class Award(ndb.Model):
             for recipient_json in self.recipient_json_list:
                 self._recipient_list.append(json.loads(recipient_json))
         return self._recipient_list
+
+    @property
+    def recipient_list_json(self):
+        """
+        A JSON version of the recipient_list
+        """
+        if self._recipient_list_json is None:
+            self._recipient_list_json = json.dumps(self.recipient_list)
+
+        return self._recipient_list_json
 
     @property
     def key_name(self):
