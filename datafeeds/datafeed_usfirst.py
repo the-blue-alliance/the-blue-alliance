@@ -22,7 +22,7 @@ from datafeeds.usfirst_team_details_parser import UsfirstTeamDetailsParser
 from datafeeds.usfirst_pre2003_team_events_parser import UsfirstPre2003TeamEventsParser
 
 from models.event import Event
-from models.award2 import Award2
+from models.award import Award
 from models.match import Match
 from models.team import Team
 

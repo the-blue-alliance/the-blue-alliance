@@ -7,7 +7,7 @@ from google.appengine.ext import testbed
 from consts.award_type import AwardType
 from consts.event_type import EventType
 from helpers.award_manipulator import AwardManipulator
-from models.award2 import Award2
+from models.award import Award
 from models.event import Event
 from models.team import Team
 
