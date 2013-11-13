@@ -39,6 +39,14 @@ class TestUsfirstTeamDetailsParser(unittest2.TestCase):
         self.assertEqual(team["nickname"], "Greenblitz")
         self.assertEqual(team["team_number"], 4590)
 
+    def test_parse_frc4756_2013(self):
+        with open('test_data/usfirst_html/usfirst_team_details_frc4756_2013.html', 'r') as f:
+            team, _ = UsfirstTeamDetailsParser.parse(f.read())
+
+        self.assertEqual(team["name"], "aaaaaa")
+        self.assertEqual(team["nickname"], "wgogfom3")
+        self.assertEqual(team["team_number"], 4756)
+
     def test_parse_frc1309_2004(self):
         with open('test_data/usfirst_html/usfirst_team_details_frc1309_2004.html', 'r') as f:
             team, _ = UsfirstTeamDetailsParser.parse(f.read())
