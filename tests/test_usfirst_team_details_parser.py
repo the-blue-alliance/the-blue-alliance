@@ -4,6 +4,12 @@ from datafeeds.usfirst_team_details_parser import UsfirstTeamDetailsParser
 
 
 class TestUsfirstTeamDetailsParser(unittest2.TestCase):
+    def test_parse_team_not_found(self):
+        with open('test_data/usfirst_html/usfirst_team_details_team_not_found.html', 'r') as f:
+            team, _ = UsfirstTeamDetailsParser.parse(f.read())
+
+        self.assertEqual(team, None)
+
     def test_parse_frc177_2013(self):
         with open('test_data/usfirst_html/usfirst_team_details_frc177_2013.html', 'r') as f:
             team, _ = UsfirstTeamDetailsParser.parse(f.read())

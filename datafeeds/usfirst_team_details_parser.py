@@ -33,7 +33,11 @@ class UsfirstTeamDetailsParser(ParserBase):
                              convertEntities=BeautifulSoup.HTML_ENTITIES)
 
         page_title = soup.find('h1', {'id': 'thepagetitle'}).text
-        team['team_number'] = int(re.search(team_num_re, page_title).group(1).strip())
+        try:
+            team['team_number'] = int(re.search(team_num_re, page_title).group(1).strip())
+        except AttributeError, details:
+            logging.warning("Team number could not be parsed: {}".format(details))
+            return None, False
         team['nickname'] = unicode(re.search(team_nick_re, page_title).group(1).strip())
 
         full_address = unicode(soup.find('div', {'class': 'team-address'}).find('div', {'class': 'content'}).text)
