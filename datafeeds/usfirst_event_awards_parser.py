@@ -6,64 +6,14 @@ from BeautifulSoup import BeautifulSoup
 
 from consts.award_type import AwardType
 from datafeeds.parser_base import ParserBase
+from helpers.award_helper import AwardHelper
 
 
 class UsfirstEventAwardsParser(ParserBase):
     """
-    Works for official events from 2007-present
-    Note: awards are matched by award names below, but the award names
-    displayed will be the award names listed on the USFIRST event pages.
-    Awards must contain every string in the the first list of the tuple
-    and must NOT contain any string in the second list of the tuple
+    Parses USFIRST event award pages for awards
+    Works for events 2007-present
     """
-    AWARD_NAMES = [
-        (AwardType.CHAIRMANS, (["chairman"], [])),
-        (AwardType.ENGINEERING_INSPIRATION, (["engineering inspiration"], [])),
-        (AwardType.WINNER, (["winner", "1"], [])),
-        (AwardType.WINNER, (["winner", "2"], [])),
-        (AwardType.WINNER, (["winner", "3"], [])),
-        (AwardType.WINNER, (["winner", "4"], [])),
-        (AwardType.WINNER, (["championship", "champion", "1"], ["finalist"])),
-        (AwardType.WINNER, (["championship", "champion", "2"], ["finalist"])),
-        (AwardType.WINNER, (["championship", "champion", "3"], ["finalist"])),
-        (AwardType.WINNER, (["championship", "champion", "4"], ["finalist"])),
-        (AwardType.FINALIST, (["finalist", "1"], ["dean"])),
-        (AwardType.FINALIST, (["finalist", "2"], ["dean"])),
-        (AwardType.FINALIST, (["finalist", "3"], ["dean"])),
-        (AwardType.FINALIST, (["finalist", "4"], ["dean"])),
-        (AwardType.COOPERTITION, (["coopertition"], [])),
-        (AwardType.SPORTSMANSHIP, (["sportsmanship"], [])),
-        (AwardType.CREATIVITY, (["creativity"], [])),
-        (AwardType.ENGINEERING_EXCELLENCE, (["engineering", "excellence"], [])),
-        (AwardType.ENTREPRENEURSHIP, (["entrepreneurship"], [])),
-        (AwardType.EXCELLENCE_IN_DESIGN, (["excellence in design"], ["cad", "animation"])),
-        (AwardType.EXCELLENCE_IN_DESIGN_CAD, (["excellence in design", "cad"], [])),
-        (AwardType.EXCELLENCE_IN_DESIGN_ANIMATION, (["excellence in design", "animation"], [])),
-        (AwardType.DEANS_LIST, (["dean", "list"], [])),
-        (AwardType.BART_KAMEN_MEMORIAL, (["bart", "kamen", "memorial"], [])),
-        (AwardType.DRIVING_TOMORROWS_TECHNOLOGY, (["driving", "tomorrow", "technology"], [])),
-        (AwardType.GRACIOUS_PROFESSIONALISM, (["gracious professionalism"], [])),
-        (AwardType.HIGHEST_ROOKIE_SEED, (["highest rookie seed"], [])),
-        (AwardType.IMAGERY, (["imagery"], [])),
-        (AwardType.INDUSTRIAL_DEESIGN, (["industrial design"], [])),
-        (AwardType.MEDIA_AND_TECHNOLOGY, (["media", "technology"], [])),
-        (AwardType.MAKE_IT_LOUD, (["make", "loud"], [])),
-        (AwardType.SAFETY, (["safety"], [])),
-        (AwardType.INNOVATION_IN_CONTROL, (["innovation in control"], [])),
-        (AwardType.QUALITY, (["quality"], [])),
-        (AwardType.ROOKIE_ALL_STAR, (["rookie", "all", "star"], [])),
-        (AwardType.ROOKIE_INSPIRATION, (["rookie inspiration"], [])),
-        (AwardType.SPIRIT, (["spirit"], [])),
-        (AwardType.WEBSITE, (["website"], [])),
-        (AwardType.VISUALIZATION, (["visualization"], [])),
-        (AwardType.VOLUNTEER, (["volunteer"], [])),
-        (AwardType.WOODIE_FLOWERS, (["woodie flowers"], [])),
-        (AwardType.JUDGES, (["judge"], [])),
-        (AwardType.FOUNDERS, (["founder"], [])),
-        (AwardType.AUTODESK_INVENTOR, (["autodesk inventor"], [])),
-        (AwardType.FUTURE_INNOVATOR, (["future innovator"], []))
-    ]
-
     # The format of USFIRST award pages is different for 2007-2011 and 2012-present
     # This dict defines which columns of the USFIRST award table name_str, team_number, and individual are.
     COL_NUM = {'2012-pres': {'name_str': 0,
@@ -91,22 +41,8 @@ class UsfirstEventAwardsParser(ParserBase):
                 parser_year = '2007-11'
 
             name_str = unicode(self._recurseUntilString(tds[self.COL_NUM[parser_year]['name_str']]))
-            name_str_lower = name_str.lower()
-            award_type_enum = None
-            for type_enum, (yes_strings, no_strings) in self.AWARD_NAMES:
-                for string in yes_strings:
-                    if string not in name_str_lower:
-                        break
-                else:
-                    for string in no_strings:
-                        if string in name_str_lower:
-                            break
-                    else:
-                        # found a match
-                        award_type_enum = type_enum
-                        break
+            award_type_enum = AwardHelper.parse_award_type(name_str)
             if award_type_enum is None:
-                logging.warning("Found an award without an associated type: " + name_str)
                 continue
 
             team_number = None
