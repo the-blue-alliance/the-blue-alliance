@@ -81,17 +81,6 @@ class AwardHelper(object):
         return sorted_awards
 
     @classmethod
-<<<<<<< HEAD
-    def getAwards(self, keys, year=None):
-        awards = []
-        for key in keys:
-            if year == None:
-                awards += Award.query(Award.name == key)
-            else:
-                awards += Award.query(Award.name == key, Award.year == year)
-        return awards
-
-    @classmethod
     def parse_award_type(self, name_str):
         """
         Returns the AwardType given a name_str, or None if there are no matches.
