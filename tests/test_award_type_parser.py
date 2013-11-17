@@ -1,0 +1,42 @@
+import unittest2
+
+from consts.award_type import AwardType
+from helpers.award_helper import AwardHelper
+
+
+class TestUsfirstEventTypeParser(unittest2.TestCase):
+    def test_parse(self):
+        """
+        Tests for a select subset of award types. Add more if desired.
+        """
+        self.assertEqual(AwardHelper.parse_award_type("Chairman's"), AwardType.CHAIRMANS)
+        self.assertEqual(AwardHelper.parse_award_type("Chairman"), AwardType.CHAIRMANS)
+
+        self.assertEqual(AwardHelper.parse_award_type("Winner #1"), AwardType.WINNER)
+        self.assertEqual(AwardHelper.parse_award_type("Division Winner #2"), AwardType.WINNER)
+        self.assertEqual(AwardHelper.parse_award_type("Championship Winner #3"), AwardType.WINNER)
+        self.assertEqual(AwardHelper.parse_award_type("Championship Champion #4"), AwardType.WINNER)
+        self.assertEqual(AwardHelper.parse_award_type("Winner"), None)
+        self.assertEqual(AwardHelper.parse_award_type("Championship Champion"), None)
+
+        self.assertEqual(AwardHelper.parse_award_type("Finalist #1"), AwardType.FINALIST)
+        self.assertEqual(AwardHelper.parse_award_type("Division Finalist #2"), AwardType.FINALIST)
+        self.assertEqual(AwardHelper.parse_award_type("Championship Finalist #3"), AwardType.FINALIST)
+        self.assertEqual(AwardHelper.parse_award_type("Championship Finalist #4"), AwardType.FINALIST)
+        self.assertEqual(AwardHelper.parse_award_type("Finalist"), None)
+        self.assertEqual(AwardHelper.parse_award_type("Championship Finalist"), None)
+
+        self.assertEqual(AwardHelper.parse_award_type("Dean's List Finalist #1"), AwardType.DEANS_LIST)
+        self.assertEqual(AwardHelper.parse_award_type("Dean's List Finalist"), AwardType.DEANS_LIST)
+        self.assertEqual(AwardHelper.parse_award_type("Dean's List Winner #9"), AwardType.DEANS_LIST)
+        self.assertEqual(AwardHelper.parse_award_type("Dean's List Winner"), AwardType.DEANS_LIST)
+        self.assertEqual(AwardHelper.parse_award_type("Dean's List"), AwardType.DEANS_LIST)
+
+        self.assertEqual(AwardHelper.parse_award_type("Excellence in Design Award sponsored by Autodesk (3D CAD)"), AwardType.EXCELLENCE_IN_DESIGN_CAD)
+        self.assertEqual(AwardHelper.parse_award_type("Excellence in Design Award sponsored by Autodesk (Animation)"), AwardType.EXCELLENCE_IN_DESIGN_ANIMATION)
+        self.assertEqual(AwardHelper.parse_award_type("Excellence in Design Award"), AwardType.EXCELLENCE_IN_DESIGN)
+
+        self.assertEqual(AwardHelper.parse_award_type("Dr. Bart Kamen Memorial Scholarship #1"), AwardType.BART_KAMEN_MEMORIAL)
+        self.assertEqual(AwardHelper.parse_award_type("Media and Technology Award sponsored by Comcast"), AwardType.MEDIA_AND_TECHNOLOGY)
+        self.assertEqual(AwardHelper.parse_award_type("Make It Loud Award"), AwardType.MAKE_IT_LOUD)
+        self.assertEqual(AwardHelper.parse_award_type("Founder's Award"), AwardType.FOUNDERS)

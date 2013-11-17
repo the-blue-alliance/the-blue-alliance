@@ -58,7 +58,7 @@ class ApiTeamController(ApiBaseController):
 
         @ndb.tasklet
         def get_awards_async():
-            award_keys = yield Award.query(Award.year == self.year, Award.team == self.team.key).fetch_async(500, keys_only=True)
+            award_keys = yield Award.query(Award.year == self.year, Award.team_list == self.team.key).fetch_async(500, keys_only=True)
             awards = yield ndb.get_multi_async(award_keys)
             raise ndb.Return(awards)
 

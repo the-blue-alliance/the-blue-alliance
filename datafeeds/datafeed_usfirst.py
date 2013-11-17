@@ -3,6 +3,7 @@ import re
 
 from google.appengine.api import memcache
 from google.appengine.api import urlfetch
+from google.appengine.ext import ndb
 
 import tba_config
 
@@ -117,13 +118,15 @@ class DatafeedUsfirst(DatafeedBase):
         awards, _ = self.parse(url, UsfirstEventAwardsParser)
 
         return [Award(
-            id=Award.renderKeyName(event.key_name, award.get('name')),
-            name=award.get('name', None),
-            team=_getTeamKey(award),
-            awardee=award.get('awardee', None),
+            id=Award.render_key_name(event.key_name, award['award_type_enum']),
+            name_str=award['name_str'],
+            award_type_enum=award['award_type_enum'],
             year=event.year,
-            official_name=award.get('official_name', None),
-            event=event.key)
+            event=event.key,
+            event_type_enum=event.event_type_enum,
+            team_list=[ndb.Key(Team, 'frc{}'.format(team_number)) for team_number in award['team_number_list']],
+            recipient_json_list=award['recipient_json_list']
+            )
             for award in awards]
 
     def getEventTeams(self, year, first_eid):
