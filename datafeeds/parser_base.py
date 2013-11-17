@@ -1,3 +1,4 @@
+import re
 from BeautifulSoup import NavigableString
 
 
@@ -21,7 +22,7 @@ class ParserBase(object):
         Written to deal with http://www2.usfirst.org/2011comp/Events/cmp/matchresults.html
         """
         if node.string is not None:
-            return node.string
+            return re.sub(' +', ' ', node.string)  # remove multiple spaces
         if isinstance(node, NavigableString):
             return node
         if hasattr(node, 'contents'):

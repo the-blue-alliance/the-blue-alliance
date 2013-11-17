@@ -14,6 +14,7 @@ from datafeeds.usfirst_event_details_parser import UsfirstEventDetailsParser
 from datafeeds.usfirst_event_list_parser import UsfirstEventListParser
 from datafeeds.usfirst_event_rankings_parser import UsfirstEventRankingsParser
 from datafeeds.usfirst_event_awards_parser import UsfirstEventAwardsParser
+from datafeeds.usfirst_event_awards_parser_05_06 import UsfirstEventAwardsParser_05_06
 from datafeeds.usfirst_event_teams_parser import UsfirstEventTeamsParser
 from datafeeds.usfirst_matches_parser import UsfirstMatchesParser
 from datafeeds.usfirst_matches_parser_2002 import UsfirstMatchesParser2002
@@ -56,6 +57,12 @@ class DatafeedUsfirst(DatafeedBase):
         2003: UsfirstMatchesParser2003,
     }
     DEFAULT_MATCH_PARSER = UsfirstMatchesParser
+
+    YEAR_AWARD_PARSER = {
+        2006: UsfirstEventAwardsParser_05_06,
+        2005: UsfirstEventAwardsParser_05_06,
+    }
+    DEFAULT_AWARD_PARSER = UsfirstEventAwardsParser
 
     def __init__(self, *args, **kw):
         self._session_key = dict()
@@ -115,7 +122,7 @@ class DatafeedUsfirst(DatafeedBase):
 
         url = self.EVENT_AWARDS_URL_PATTERN % (event.year,
                                                self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
-        awards, _ = self.parse(url, UsfirstEventAwardsParser)
+        awards, _ = self.parse(url, self.YEAR_AWARD_PARSER.get(event.year, self.DEFAULT_AWARD_PARSER))
 
         return [Award(
             id=Award.render_key_name(event.key_name, award['award_type_enum']),

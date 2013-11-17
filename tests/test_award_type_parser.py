@@ -45,3 +45,6 @@ class TestUsfirstEventTypeParser(unittest2.TestCase):
         self.assertEqual(AwardHelper.parse_award_type("Recognition of Extraordinary Service"), AwardType.RECOGNITION_OF_EXTRAORDINARY_SERVICE)
         self.assertEqual(AwardHelper.parse_award_type("Outstanding Cart Award"), AwardType.OUTSTANDING_CART)
         self.assertEqual(AwardHelper.parse_award_type("Wayne State University Aim Higher Award"), AwardType.WSU_AIM_HIGHER)
+        self.assertEqual(AwardHelper.parse_award_type("Delphi \"Driving Tommorow's Technology\" Award"), AwardType.DRIVING_TOMORROWS_TECHNOLOGY)
+        self.assertEqual(AwardHelper.parse_award_type("Delphi Drive Tommorows Technology"), AwardType.DRIVING_TOMORROWS_TECHNOLOGY)
+        self.assertEqual(AwardHelper.parse_award_type("Kleiner, Perkins, Caufield and Byers"), AwardType.ENTREPRENEURSHIP)
