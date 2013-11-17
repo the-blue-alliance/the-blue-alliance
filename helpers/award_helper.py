@@ -29,6 +29,10 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.WINNER, (["winner", "2"], [])),
     (AwardType.WINNER, (["winner", "3"], [])),
     (AwardType.WINNER, (["winner", "4"], [])),
+    (AwardType.WINNER, (["division", "champion", "1"], ["finalist"])),
+    (AwardType.WINNER, (["division", "champion", "2"], ["finalist"])),
+    (AwardType.WINNER, (["division", "champion", "3"], ["finalist"])),
+    (AwardType.WINNER, (["division", "champion", "4"], ["finalist"])),
     (AwardType.WINNER, (["championship", "champion", "1"], ["finalist"])),
     (AwardType.WINNER, (["championship", "champion", "2"], ["finalist"])),
     (AwardType.WINNER, (["championship", "champion", "3"], ["finalist"])),
@@ -61,13 +65,15 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.ROOKIE_INSPIRATION, (["rookie inspiration"], [])),
     (AwardType.SPIRIT, (["spirit"], [])),
     (AwardType.WEBSITE, (["website"], [])),
+    (AwardType.WEBSITE, (["web", "site"], [])),
     (AwardType.VISUALIZATION, (["visualization"], [])),
     (AwardType.VOLUNTEER, (["volunteer"], [])),
     (AwardType.WOODIE_FLOWERS, (["woodie flowers"], [])),
     (AwardType.JUDGES, (["judge"], [])),
     (AwardType.FOUNDERS, (["founder"], [])),
     (AwardType.AUTODESK_INVENTOR, (["autodesk inventor"], [])),
-    (AwardType.FUTURE_INNOVATOR, (["future innovator"], []))
+    (AwardType.FUTURE_INNOVATOR, (["future innovator"], [])),
+    (AwardType.RECOGNITION_OF_EXTRAORDINARY_SERVICE, (["recognition", "extraordinary", "service"], []))
 ]
 
 

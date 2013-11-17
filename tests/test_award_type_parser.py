@@ -14,6 +14,7 @@ class TestUsfirstEventTypeParser(unittest2.TestCase):
 
         self.assertEqual(AwardHelper.parse_award_type("Winner #1"), AwardType.WINNER)
         self.assertEqual(AwardHelper.parse_award_type("Division Winner #2"), AwardType.WINNER)
+        self.assertEqual(AwardHelper.parse_award_type("Newton - Division Champion #3"), AwardType.WINNER)
         self.assertEqual(AwardHelper.parse_award_type("Championship Winner #3"), AwardType.WINNER)
         self.assertEqual(AwardHelper.parse_award_type("Championship Champion #4"), AwardType.WINNER)
         self.assertEqual(AwardHelper.parse_award_type("Winner"), None)
@@ -40,3 +41,5 @@ class TestUsfirstEventTypeParser(unittest2.TestCase):
         self.assertEqual(AwardHelper.parse_award_type("Media and Technology Award sponsored by Comcast"), AwardType.MEDIA_AND_TECHNOLOGY)
         self.assertEqual(AwardHelper.parse_award_type("Make It Loud Award"), AwardType.MAKE_IT_LOUD)
         self.assertEqual(AwardHelper.parse_award_type("Founder's Award"), AwardType.FOUNDERS)
+        self.assertEqual(AwardHelper.parse_award_type("Championship - Web Site Award"), AwardType.WEBSITE)
+        self.assertEqual(AwardHelper.parse_award_type("Recognition of Extraordinary Service"), AwardType.RECOGNITION_OF_EXTRAORDINARY_SERVICE)
