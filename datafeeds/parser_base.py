@@ -22,7 +22,7 @@ class ParserBase(object):
         Written to deal with http://www2.usfirst.org/2011comp/Events/cmp/matchresults.html
         """
         if node.string is not None:
-            return re.sub(' +', ' ', node.string)  # remove multiple spaces
+            return re.sub('\s+', ' ', node.string.replace(u'\xa0', ' ')).strip()  # remove multiple whitespaces
         if isinstance(node, NavigableString):
             return node
         if hasattr(node, 'contents'):

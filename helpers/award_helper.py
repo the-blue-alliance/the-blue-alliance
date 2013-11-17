@@ -77,7 +77,8 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.FUTURE_INNOVATOR, (["future innovator"], [])),
     (AwardType.RECOGNITION_OF_EXTRAORDINARY_SERVICE, (["recognition", "extraordinary", "service"], [])),
     (AwardType.OUTSTANDING_CART, (["outstanding", "cart"], [])),
-    (AwardType.WSU_AIM_HIGHER, (["wayne", "state", "university", "aim", "higher"], []))
+    (AwardType.WSU_AIM_HIGHER, (["wayne", "state", "university", "aim", "higher"], [])),
+    (AwardType.LEADERSHIP_IN_CONTROL, (["leadership", "control"], [])),
 ]
 
 
