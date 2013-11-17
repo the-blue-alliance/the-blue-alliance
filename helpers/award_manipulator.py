@@ -17,11 +17,11 @@ class AwardManipulator(ManipulatorBase):
         immutable_attrs = [
             'event',
             'award_type_enum',
+            'year',
         ]  # These build key_name, and cannot be changed without deleting the model.
 
         attrs = [
             'name_str',
-            'year',
         ]
 
         list_attrs = []
@@ -51,7 +51,7 @@ class AwardManipulator(ManipulatorBase):
                     old_award.dirty = True
 
         for attr in list_attrs:
-            if len(getattr(new_award, attr)) > 0:
+            if len(getattr(new_award, attr)) > 0 or not auto_union:
                 if getattr(new_award, attr) != getattr(old_award, attr):
                     setattr(old_award, attr, getattr(new_award, attr))
                     old_award.dirty = True

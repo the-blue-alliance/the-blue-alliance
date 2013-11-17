@@ -34,12 +34,19 @@
             <tr>
               <td><a href="/team/{{team.team_number}}/{{event.year}}">{{event.year}}</a></td>
               <td><a href="/event/{{event.key_name}}">{{event.name}}</a></td>
-              <td>{% if awards %}
+              <td>
+              {% if awards %}
                 {% for award in awards %}
-                  {{ award.official_name }}
-                  {% if award.awardee %} ({{ award.awardee }}){% endif %}<br>
+                  {% for team_number, awardees in award.recipient_dict.items %}
+                  {% if team_number == team.team_number %}
+                    {% for awardee in awardees %}
+                      {{ award.name_str }}{% if awardee %} ({{ awardee }}){% endif %}<br>
+                    {% endfor %}
+                  {% endif %}
+                  {% endfor %}
                 {% endfor %}
-              {% endif %}</td>
+              {% endif %}
+              </td>
             </tr>
             {% endfor %}
           </table>

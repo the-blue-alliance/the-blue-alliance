@@ -287,13 +287,13 @@ class TeamHistory(CacheableHandler):
                 short_cache = True
 
             if event.key_name in awards_by_event:
-                sorted_awards = AwardHelper.organizeAwards(awards_by_event[event.key_name])['list']
+                sorted_awards = AwardHelper.organizeAwards(awards_by_event[event.key_name])
             else:
                 sorted_awards = []
             event_awards.append((event, sorted_awards))
         event_awards = sorted(event_awards, key=lambda (e, _): e.start_date if e.start_date else datetime.datetime(e.year, 12, 31))
 
-        years = sorted(set([et.get_result().year for et in event_teams_futures if et.get_result().year != None]))
+        years = sorted(set([et.get_result().year for et in event_teams_futures if et.get_result().year is not None]))
 
         template_values = {'team': team,
                            'event_awards': event_awards,

@@ -41,7 +41,7 @@
                     {% if comp.event.start_date %}<span class="glyphicon glyphicon-calendar"></span> {{ comp.event.start_date|date:"M jS" }}{% if comp.event.start_date != comp.event.end_date %} - {{ comp.event.end_date|date:"M jS" }}{% endif %}{{ comp.event.end_date|date:", Y" }}{% endif %}
                 </p>
 
-                {% if comp.wlt or comp.rank or comp.awards.list %}
+                {% if comp.wlt or comp.rank or comp.awards %}
                 <p>Team {{ team.team_number }}
                   {% if comp.rank %}was <strong>Rank {{ comp.rank }}</strong>{% endif %}
                   {% if comp.wlt %}
@@ -49,11 +49,17 @@
                     <strong>{{comp.wlt.win}}-{{comp.wlt.loss}}-{{comp.wlt.tie}}</strong>
                   {% endif %}
 
-                  {% if comp.awards.list %}
+                  {% if comp.awards %}
                     {% if comp.rank or comp.wlt %}and{% endif %} won the following awards:
                     <ul>
-                    {% for award in comp.awards.list %}
-                      <li>{{ award.official_name }}{% if award.awardee %} ({{ award.awardee }}){% endif %}</li>
+                    {% for award in comp.awards %}
+                    {% for team_number, awardees in award.recipient_dict.items %}
+                    {% if team_number == team.team_number %}
+                      {% for awardee in awardees %}
+                        <li>{{ award.name_str }}{% if awardee %} ({{ awardee }}){% endif %}</li>
+                      {% endfor %}
+                    {% endif %}
+                    {% endfor %}
                     {% endfor %}
                     </ul>
                   {% endif %}
