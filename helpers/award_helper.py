@@ -73,7 +73,9 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.FOUNDERS, (["founder"], [])),
     (AwardType.AUTODESK_INVENTOR, (["autodesk inventor"], [])),
     (AwardType.FUTURE_INNOVATOR, (["future innovator"], [])),
-    (AwardType.RECOGNITION_OF_EXTRAORDINARY_SERVICE, (["recognition", "extraordinary", "service"], []))
+    (AwardType.RECOGNITION_OF_EXTRAORDINARY_SERVICE, (["recognition", "extraordinary", "service"], [])),
+    (AwardType.OUTSTANDING_CART, (["outstanding", "cart"], [])),
+    (AwardType.WSU_AIM_HIGHER, (["wayne", "state", "university", "aim", "higher"], []))
 ]
 
 

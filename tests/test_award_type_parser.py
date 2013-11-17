@@ -43,3 +43,5 @@ class TestUsfirstEventTypeParser(unittest2.TestCase):
         self.assertEqual(AwardHelper.parse_award_type("Founder's Award"), AwardType.FOUNDERS)
         self.assertEqual(AwardHelper.parse_award_type("Championship - Web Site Award"), AwardType.WEBSITE)
         self.assertEqual(AwardHelper.parse_award_type("Recognition of Extraordinary Service"), AwardType.RECOGNITION_OF_EXTRAORDINARY_SERVICE)
+        self.assertEqual(AwardHelper.parse_award_type("Outstanding Cart Award"), AwardType.OUTSTANDING_CART)
+        self.assertEqual(AwardHelper.parse_award_type("Wayne State University Aim Higher Award"), AwardType.WSU_AIM_HIGHER)
