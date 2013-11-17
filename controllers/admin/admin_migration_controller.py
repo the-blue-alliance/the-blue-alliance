@@ -13,11 +13,3 @@ class AdminMigration(LoggedInHandler):
     self._require_admin()
     path = os.path.join(os.path.dirname(__file__), '../../templates/admin/migration.html')
     self.response.out.write(template.render(path, self.template_values))
-
-
-class AdminMigrationDeleteAwards(LoggedInHandler):
-  def get(self):
-    self._require_admin()
-    award_keys = Award.query().fetch(100000, keys_only=True)
-    ndb.delete_multi(award_keys)
-    self.response.out.write("Deleted {} awards!".format(len(award_keys)))
