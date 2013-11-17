@@ -49,3 +49,6 @@ class TestUsfirstEventTypeParser(unittest2.TestCase):
         self.assertEqual(AwardHelper.parse_award_type("Delphi Drive Tommorows Technology"), AwardType.DRIVING_TOMORROWS_TECHNOLOGY)
         self.assertEqual(AwardHelper.parse_award_type("Kleiner, Perkins, Caufield and Byers"), AwardType.ENTREPRENEURSHIP)
         self.assertEqual(AwardHelper.parse_award_type("Leadership in Control Award"), AwardType.LEADERSHIP_IN_CONTROL)
+        self.assertEqual(AwardHelper.parse_award_type("#1 Seed"), AwardType.NUM_1_SEED)
+        self.assertEqual(AwardHelper.parse_award_type("Incredible Play Award"), AwardType.INCREDIBLE_PLAY)
+        self.assertEqual(AwardHelper.parse_award_type("People's Choice Animation Award"), AwardType.PEOPLES_CHOICE_ANIMATION)

@@ -14,6 +14,7 @@ from datafeeds.usfirst_event_details_parser import UsfirstEventDetailsParser
 from datafeeds.usfirst_event_list_parser import UsfirstEventListParser
 from datafeeds.usfirst_event_rankings_parser import UsfirstEventRankingsParser
 from datafeeds.usfirst_event_awards_parser import UsfirstEventAwardsParser
+from datafeeds.usfirst_event_awards_parser_02 import UsfirstEventAwardsParser_02
 from datafeeds.usfirst_event_awards_parser_03_04 import UsfirstEventAwardsParser_03_04
 from datafeeds.usfirst_event_awards_parser_05_06 import UsfirstEventAwardsParser_05_06
 from datafeeds.usfirst_event_teams_parser import UsfirstEventTeamsParser
@@ -60,6 +61,7 @@ class DatafeedUsfirst(DatafeedBase):
     DEFAULT_MATCH_PARSER = UsfirstMatchesParser
 
     YEAR_AWARD_PARSER = {
+        2002: UsfirstEventAwardsParser_02,
         2003: UsfirstEventAwardsParser_03_04,
         2004: UsfirstEventAwardsParser_03_04,
         2005: UsfirstEventAwardsParser_05_06,

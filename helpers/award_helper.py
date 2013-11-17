@@ -79,6 +79,9 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.OUTSTANDING_CART, (["outstanding", "cart"], [])),
     (AwardType.WSU_AIM_HIGHER, (["wayne", "state", "university", "aim", "higher"], [])),
     (AwardType.LEADERSHIP_IN_CONTROL, (["leadership", "control"], [])),
+    (AwardType.NUM_1_SEED, (["#1", "seed"], [])),
+    (AwardType.INCREDIBLE_PLAY, (["incredible", "play"], [])),
+    (AwardType.PEOPLES_CHOICE_ANIMATION, (["people", "choice", "animation"], [])),
 ]
 
 
