@@ -26,6 +26,8 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.CHAIRMANS, (["chairman"], [])),
     (AwardType.ENGINEERING_INSPIRATION, (["engineering inspiration"], [])),
     (AwardType.WINNER, (["regional winner"], [])),
+    (AwardType.WINNER, (["championship winner"], [])),
+    (AwardType.WINNER, (["championship champion"], [])),
     (AwardType.WINNER, (["winner", "1"], [])),
     (AwardType.WINNER, (["winner", "2"], [])),
     (AwardType.WINNER, (["winner", "3"], [])),
@@ -39,6 +41,7 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.WINNER, (["championship", "champion", "3"], ["finalist"])),
     (AwardType.WINNER, (["championship", "champion", "4"], ["finalist"])),
     (AwardType.FINALIST, (["regional finalist"], ["dean"])),
+    (AwardType.FINALIST, (["championship finalist"], ["dean"])),
     (AwardType.FINALIST, (["finalist", "1"], ["dean"])),
     (AwardType.FINALIST, (["finalist", "2"], ["dean"])),
     (AwardType.FINALIST, (["finalist", "3"], ["dean"])),
@@ -85,6 +88,13 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.INCREDIBLE_PLAY, (["incredible", "play"], [])),
     (AwardType.PEOPLES_CHOICE_ANIMATION, (["people", "choice", "animation"], [])),
     (AwardType.VISUALIZATION_RISING_STAR, (["visualization", "rising"], [])),
+    (AwardType.BEST_OFFENSIVE_ROUND, (["best", "offensive", "round"], [])),
+    (AwardType.BEST_PLAY_OF_THE_DAY, (["best", "play"], [])),
+    (AwardType.FEATHERWEIGHT_IN_THE_FINALS, (["featherweight", "finals"], [])),
+    (AwardType.MOST_PHOTOGENIC, (["photogenic"], [])),
+    (AwardType.OUTSTANDING_DEFENSE, (["outstanding defense"], [])),
+    (AwardType.POWER_TO_SIMPLIFY, (["power to simplify"], [])),
+    (AwardType.AGAINST_ALL_ODDS, (["against all odds"], [])),
 ]
 
 

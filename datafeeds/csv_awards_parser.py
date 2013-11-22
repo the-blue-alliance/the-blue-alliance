@@ -28,6 +28,8 @@ class CSVAwardsParser(ParserBase):
 
             if team_number == '':
                 team_number = None
+            else:
+                team_number = int(team_number)
             if awardee == '':
                 awardee = None
             # an award must have either an awardee or a team_number
@@ -35,7 +37,7 @@ class CSVAwardsParser(ParserBase):
                 continue
 
             if team_number is not None:
-                team_number_list = [int(team_number)]
+                team_number_list = [team_number]
             else:
                 team_number_list = []
 
