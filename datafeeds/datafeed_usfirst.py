@@ -118,13 +118,6 @@ class DatafeedUsfirst(DatafeedBase):
 
     def getEventAwards(self, event):
 
-        def _getTeamKey(award):
-            team = Team.get_by_id('frc' + str(award.get('team_number', None)))
-            if team is not None:
-                return team.key
-            else:
-                return None
-
         url = self.EVENT_AWARDS_URL_PATTERN % (event.year,
                                                self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
         awards, _ = self.parse(url, self.YEAR_AWARD_PARSER.get(event.year, self.DEFAULT_AWARD_PARSER))
