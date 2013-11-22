@@ -89,7 +89,7 @@
             <ul class="nav nav-tabs">
                 {% if matches.num > 0 %}<li class="active"><a href="#results" data-toggle="tab">Results</a></li>{% endif %}
                 {% if event.rankings %}<li><a href="#rankings" data-toggle="tab">Rankings</a></li>{% endif %}
-                {% if awards.list %}<li><a href="#awards" data-toggle="tab">Awards</a></li>{% endif %}
+                {% if awards %}<li><a href="#awards" data-toggle="tab">Awards</a></li>{% endif %}
                 <li class="{% if matches.num == 0 %}active{% endif %}"><a href="#teams" data-toggle="tab">Teams</a></li>
             </ul>
         </div>
@@ -247,7 +247,7 @@
             </div>
         </div>
 
-        {% if awards.list %}
+        {% if awards %}
         <div class="tab-pane" id="awards">
             <div class="row">
                 <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
@@ -257,22 +257,26 @@
                                 <th>Award</th>
                                 <th>Winner</th>
                             </tr>
-                            {% for award in awards.list %}
+                            {% for award in awards %}
+                            {% for team_number, awardees in award.recipient_dict.items %}
+                            {% for awardee in awardees %}
                             <tr>
-                                <td>{{award.official_name}}</td>
+                                <td>{{award.name_str}}</td>
                                 <td>
-                                {% if award.awardee %}
-                                    {{ award.awardee }}
-                                    {% if award.team %}(<a href="/team/{{award.team.id|slice:"3:"}}/{{event.year}}">{{award.team.id|slice:"3:"}}</a>){% endif %}
+                                {% if awardee %}
+                                    {{ awardee }}
+                                    {% if team_number %}(<a href="/team/{{team_number}}/{{event.year}}">{{team_number}}</a>){% endif %}
                                 {% else %}
-                                    {% if award.team %}
-                                    <a href="/team/{{award.team.id|slice:"3:"}}/{{event.year}}">{{award.team.id|slice:"3:"}}</a>
+                                    {% if team_number %}
+                                    <a href="/team/{{team_number}}/{{event.year}}">{{team_number}}</a>
                                     {% else %}
                                     --
                                     {% endif %}
                                 {% endif %}
                                 </td>
                             </tr>
+                            {% endfor %}
+                            {% endfor %}
                             {% endfor %}
                         </tbody>
                     </table>

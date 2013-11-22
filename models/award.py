@@ -1,4 +1,8 @@
+import json
+
 from google.appengine.ext import ndb
+
+from consts.award_type import AwardType
 
 from models.event import Event
 from models.team import Team
@@ -7,37 +11,68 @@ from models.team import Team
 class Award(ndb.Model):
     """
     Awards represent FIRST Robotics Competition awards given out at an event.
-    name is a general name and can be seen in /datafeeds/datafeed_usfirst_awards.py
-    key_name is like '2012sj_rca'
+    key_name is formatted as: <event_key_name>_<award_type_enum>
+    If multiple recipients win the same award at the same event (such as
+    Winner or Dean's List), they show up under the repeated properties.
     """
 
-    # For checking if an award falls in one of the following categories
-    REGIONAL_WIN_KEYS = {'win1', 'win2', 'win3', 'win4'}
-    REGIONAL_CA_KEYS = {'ca', 'ca1', 'ca2'}
-    DIVISION_WIN_KEYS = {'div_win1', 'div_win2', 'div_win3', 'div_win4'}
-    DIVISION_FIN_KEYS = {'div_fin1', 'div_fin2', 'div_fin3', 'div_fin'}
-    CHAMPIONSHIP_WIN_KEYS = {'cmp_win1', 'cmp_win2', 'cmp_win3', 'cmp_win4'}
-    CHAMPIONSHIP_FIN_KEYS = {'cmp_fin1', 'cmp_fin2', 'cmp_fin3', 'cmp_fin4'}
-    CHAMPIONSHIP_CA_KEYS = {'cmp_ca'}
-    BLUE_BANNER_KEYS = REGIONAL_WIN_KEYS.union(REGIONAL_CA_KEYS).union(DIVISION_WIN_KEYS).union(CHAMPIONSHIP_WIN_KEYS).union(CHAMPIONSHIP_CA_KEYS)
+    name_str = ndb.StringProperty(required=True, indexed=False)  # award name that shows up on USFIRST Pages. May vary for the same award type.
+    award_type_enum = ndb.IntegerProperty(required=True)
+    year = ndb.IntegerProperty(required=True)  # year the award was awarded
+    event = ndb.KeyProperty(kind=Event, required=True)  # event at which the award was awarded
+    event_type_enum = ndb.IntegerProperty(required=True)  # needed to query for awards from events of a certain event type
 
-    name = ndb.StringProperty(required=True)  # general name used for sorting
-    official_name = ndb.StringProperty(indexed=False)  # the official name used by first
-    year = ndb.IntegerProperty()  # year it was awarded
-    team = ndb.KeyProperty(kind=Team)  # team that won the award (if applicable)
-    awardee = ndb.StringProperty()  # person who won the award (if applicable)
-    event = ndb.KeyProperty(kind=Event, required=True)
+    team_list = ndb.KeyProperty(kind=Team, repeated=True)  # key of team(s) that won the award (if applicable)
+    recipient_json_list = ndb.StringProperty(repeated=True)  # JSON dict(s) with team_number and/or awardee
 
-    created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
-    updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+    created = ndb.DateTimeProperty(auto_now_add=True)
+    updated = ndb.DateTimeProperty(auto_now=True)
+
+    def __init__(self, *args, **kw):
+        self._recipient_list = None
+        self._recipient_dict = None
+        self._recipient_list_json = None
+        super(Award, self).__init__(*args, **kw)
+
+    @property
+    def recipient_dict(self):
+        """
+        Uses recipient_list to add a recipient_dict property,
+        where the key is the team_number and the value is a list of awardees.
+        """
+        if self._recipient_dict is None:
+            self._recipient_dict = {}
+            for recipient in self.recipient_list:
+                team_number = recipient['team_number']
+                awardee = recipient['awardee']
+                if team_number in self._recipient_dict:
+                    self._recipient_dict[team_number].append(awardee)
+                else:
+                    self._recipient_dict[team_number] = [awardee]
+        return self._recipient_dict
+
+    @property
+    def recipient_list(self):
+        if self._recipient_list is None:
+            self._recipient_list = []
+            for recipient_json in self.recipient_json_list:
+                self._recipient_list.append(json.loads(recipient_json))
+        return self._recipient_list
+
+    @property
+    def recipient_list_json(self):
+        """
+        A JSON version of the recipient_list
+        """
+        if self._recipient_list_json is None:
+            self._recipient_list_json = json.dumps(self.recipient_list)
+
+        return self._recipient_list_json
 
     @property
     def key_name(self):
-        """
-        Returns the string of the key_name of the Award object before writing it.
-        """
-        return self.renderKeyName(self.event.id(), self.name)
+        return self.render_key_name(self.event.id(), self.award_type_enum)
 
     @classmethod
-    def renderKeyName(self, event_id, name):
-        return str(event_id) + '_' + str(name)
+    def render_key_name(self, event_key_name, award_type_enum):
+        return '{}_{}'.format(event_key_name, award_type_enum)

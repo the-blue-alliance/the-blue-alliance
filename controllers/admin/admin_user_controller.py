@@ -9,20 +9,22 @@ from google.appengine.ext.webapp import template
 from controllers.base_controller import LoggedInHandler
 from models.account import Account
 
+
 class AdminUserList(LoggedInHandler):
     """
     List all Users.
     """
     def get(self):
         self._require_admin()
-        users = Account.query().fetch(10000)
-        
+        users = Account.query().order(Account.created).fetch(10000)
+
         self.template_values.update({
             "users": users,
         })
-        
+
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/user_list.html')
         self.response.out.write(template.render(path, self.template_values))
+
 
 class AdminUserDetail(LoggedInHandler):
     """
@@ -38,6 +40,7 @@ class AdminUserDetail(LoggedInHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/user_details.html')
         self.response.out.write(template.render(path, self.template_values))
+
 
 class AdminUserEdit(LoggedInHandler):
     """

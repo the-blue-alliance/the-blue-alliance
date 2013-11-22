@@ -9,7 +9,7 @@ class ApiBaseController(CacheableHandler):
 
     def __init__(self, *args, **kw):
         super(ApiBaseController, self).__init__(*args, **kw)
-        self.response.content_type = 'application/json'
+        self.response.headers['content-type'] = 'application/json; charset="utf-8"'
 
     def handle_exception(self, exception, debug):
         """
@@ -29,7 +29,6 @@ class ApiBaseController(CacheableHandler):
         self._errors = ValidationHelper.validate(self._validators)
         if self._errors:
             self.abort(400)
-        self._write_cache_headers()
 
         super(ApiBaseController, self).get(*args, **kw)
 
@@ -40,3 +39,11 @@ class ApiBaseController(CacheableHandler):
         if self.request.headers.get("User-Agent") is None:
             self._errors = json.dumps({"Error": "User-Agent is a required header."})
             self.abort(400)
+
+    def _write_cache_headers(self, seconds):
+        if type(seconds) is not int:
+            logging.error("Cache-Control max-age is not integer: {}".format(seconds))
+            return
+
+        self.response.headers['Cache-Control'] = "public, max-age=%d" % seconds
+        self.response.headers['Pragma'] = 'Public'

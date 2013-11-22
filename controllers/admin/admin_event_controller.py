@@ -3,14 +3,17 @@ import json
 import logging
 import os
 
+from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
+from datafeeds.csv_teams_parser import CSVTeamsParser
 from helpers.event.event_test_creator import EventTestCreator
 from helpers.event.event_webcast_adder import EventWebcastAdder
 from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
+from helpers.team_manipulator import TeamManipulator
 from helpers.match_manipulator import MatchManipulator
 from models.award import Award
 from models.event import Event
@@ -19,6 +22,33 @@ from models.match import Match
 from models.team import Team
 
 import tba_config
+
+
+class AdminEventAddTeams(LoggedInHandler):
+    """
+    Add a teams to an Event. Useful for legacy and offseason events.
+    """
+    def post(self, event_key_id):
+        self._require_admin()
+        event = Event.get_by_id(event_key_id)
+
+        teams_csv = self.request.get('teams_csv')
+        team_numbers = CSVTeamsParser.parse(teams_csv)
+
+        event_teams = []
+        teams = []
+        for team_number in team_numbers:
+            event_teams.append(EventTeam(id=event.key.id() + '_frc{}'.format(team_number),
+                                         event=event.key,
+                                         team=ndb.Key(Team, 'frc{}'.format(team_number)),
+                                         year=event.year))
+            teams.append(Team(id='frc{}'.format(team_number),
+                              team_number=int(team_number)))
+
+        EventTeamManipulator.createOrUpdate(event_teams)
+        TeamManipulator.createOrUpdate(teams)
+
+        self.redirect("/admin/event/" + event.key_name)
 
 
 class AdminEventAddWebcast(LoggedInHandler):

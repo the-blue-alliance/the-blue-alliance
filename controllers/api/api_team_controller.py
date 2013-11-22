@@ -33,11 +33,8 @@ class ApiTeamController(ApiBaseController):
     def _validators(self):
         return [("team_id_validator", self.team_key)]
 
-    def _write_cache_headers(self):
-        self.response.headers['Cache-Control'] = "public, max-age=%d" % 61
-        self.response.headers['Pragma'] = 'Public'
-
     def _render(self, team_key, year=None):
+        self._write_cache_headers(61)
 
         @ndb.tasklet
         def get_event_matches_async(event_team_key):
@@ -61,7 +58,7 @@ class ApiTeamController(ApiBaseController):
 
         @ndb.tasklet
         def get_awards_async():
-            award_keys = yield Award.query(Award.year == self.year, Award.team == self.team.key).fetch_async(500, keys_only=True)
+            award_keys = yield Award.query(Award.year == self.year, Award.team_list == self.team.key).fetch_async(500, keys_only=True)
             awards = yield ndb.get_multi_async(award_keys)
             raise ndb.Return(awards)
 

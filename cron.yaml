@@ -1,11 +1,12 @@
 cron:
-- description: FIRST event detail scraping
-  url: /tasks/enqueue/usfirst_event_details/2014
-  schedule: every day 04:00
+#- description: FIRST event detail scraping
+#  url: /tasks/enqueue/usfirst_event_details/2014
+#  schedule: every day 04:00
 
 - description: FIRST team detail scraping
-  url: /tasks/enqueue/usfirst_team_details
-  schedule: 1,15 of month 04:00
+  url: /tasks/enqueue/usfirst_team_details_rolling
+  schedule: every day 02:00
+  timezone: America/Los_Angeles
 
 #- description: FIRST match detail scraping for current events
 #  url: /tasks/enqueue/usfirst_matches/now

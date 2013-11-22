@@ -15,8 +15,6 @@ libraries:
 handlers:
 - url: /css
   static_dir: static/css
-- url: /fonts
-  static_dir: subtrees/bootstrap/fonts
 - url: /images
   static_dir: static/images
 - url: /javascript

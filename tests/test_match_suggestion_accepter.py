@@ -3,6 +3,7 @@ import unittest2
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
+from consts.event_type import EventType
 from helpers.suggestions.match_suggestion_accepter import MatchSuggestionAccepter
 from models.account import Account
 from models.event import Event
@@ -33,7 +34,8 @@ class TestMatchSuggestionAccepter(unittest2.TestCase):
         self.event = Event(
           id="2012ct",
           event_short="ct",
-          year=2012
+          year=2012,
+          event_type_enum=EventType.REGIONAL,
         )
         self.event.put()
 

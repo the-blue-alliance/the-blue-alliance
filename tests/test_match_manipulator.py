@@ -30,7 +30,8 @@ class TestMatchManipulator(unittest2.TestCase):
             game="frc_2012_rebr",
             set_number=1,
             match_number=1,
-            team_key_names=[u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073']
+            team_key_names=[u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073'],
+            youtube_videos=[u'P3C2BOtL7e8', u'tst1', u'tst2', u'tst3']
         )
 
         self.new_match = Match(
@@ -41,15 +42,20 @@ class TestMatchManipulator(unittest2.TestCase):
             game="frc_2012_rebr",
             set_number=1,
             match_number=1,
-            team_key_names=[u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073']
+            team_key_names=[u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073'],
+            youtube_videos=[u'TqY324xLU4s', u'tst1', u'tst3', u'tst4']
         )
 
     def tearDown(self):
         self.testbed.deactivate()
 
-    def assertMergedMatch(self, match):
+    def assertMergedMatch(self, match, is_auto_union):
         self.assertOldMatch(match)
         self.assertEqual(match.alliances_json, """{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""")
+        if is_auto_union:
+            self.assertEqual(set(match.youtube_videos), {u'P3C2BOtL7e8', u'TqY324xLU4s', u'tst1', u'tst2', u'tst3', u'tst4'})
+        else:
+            self.assertEqual(match.youtube_videos, [u'TqY324xLU4s', u'tst1', u'tst3', u'tst4'])
 
     def assertOldMatch(self, match):
         self.assertEqual(match.comp_level, "qm")
@@ -64,11 +70,27 @@ class TestMatchManipulator(unittest2.TestCase):
         self.assertEqual(Match.get_by_id("2012ct_qm1").alliances_json, """{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""")
 
         MatchManipulator.createOrUpdate(self.new_match)
-        self.assertMergedMatch(Match.get_by_id("2012ct_qm1"))
+        self.assertMergedMatch(Match.get_by_id("2012ct_qm1"), True)
 
     def test_findOrSpawn(self):
         self.old_match.put()
-        self.assertMergedMatch(MatchManipulator.findOrSpawn(self.new_match))
+        self.assertMergedMatch(MatchManipulator.findOrSpawn(self.new_match), True)
 
     def test_updateMerge(self):
-        self.assertMergedMatch(MatchManipulator.updateMerge(self.new_match, self.old_match))
+        self.assertMergedMatch(MatchManipulator.updateMerge(self.new_match, self.old_match), True)
+
+    def test_createOrUpdate_no_auto_union(self):
+        MatchManipulator.createOrUpdate(self.old_match)
+
+        self.assertOldMatch(Match.get_by_id("2012ct_qm1"))
+        self.assertEqual(Match.get_by_id("2012ct_qm1").alliances_json, """{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""")
+
+        MatchManipulator.createOrUpdate(self.new_match, auto_union=False)
+        self.assertMergedMatch(Match.get_by_id("2012ct_qm1"), False)
+
+    def test_findOrSpawn_no_auto_union(self):
+        self.old_match.put()
+        self.assertMergedMatch(MatchManipulator.findOrSpawn(self.new_match, auto_union=False), False)
+
+    def test_updateMerge_no_auto_union(self):
+        self.assertMergedMatch(MatchManipulator.updateMerge(self.new_match, self.old_match, auto_union=False), False)

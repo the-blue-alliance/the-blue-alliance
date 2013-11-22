@@ -81,14 +81,10 @@ class ModelToDict(object):
         return top level award dictionary
         """
         award_dict = dict()
-        award_dict["key"] = award.key_name
-        award_dict["name"] = award.name
-        award_dict["official_name"] = award.official_name
+        award_dict["name_str"] = award.name_str
+        award_dict["award_type"] = award.award_type_enum
         award_dict["year"] = award.year
-        award_dict["team"] = award.team.id()
-        award_dict["awardee"] = award.awardee
-        award_dict["event"] = award.event.id()
+        award_dict["event_key"] = award.event.id()
+        award_dict["recipient_list"] = award.recipient_list
 
         return award_dict
-
-

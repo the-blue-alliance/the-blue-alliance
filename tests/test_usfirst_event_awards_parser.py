@@ -1,6 +1,28 @@
 import unittest2
+import json
 
+from consts.award_type import AwardType
 from datafeeds.usfirst_event_awards_parser import UsfirstEventAwardsParser
+
+
+def convert_to_comparable(data):
+    """
+    Converts jsons to dicts so that elements can be more easily compared
+    """
+    if type(data) == list:
+        return [convert_to_comparable(e) for e in data]
+    elif type(data) == dict:
+        to_return = {}
+        for key, value in data.items():
+            to_return[key] = convert_to_comparable(value)
+        return to_return
+    elif type(data) == str or type(data) == unicode:
+        try:
+            return json.loads(data)
+        except ValueError:
+            return data
+    else:
+        return data
 
 
 class TestUsfirstEventAwardsParser(unittest2.TestCase):
@@ -9,236 +31,401 @@ class TestUsfirstEventAwardsParser(unittest2.TestCase):
             awards, _ = UsfirstEventAwardsParser.parse(f.read())
 
         # Check number of parsed awards
-        self.assertEqual(len(awards), 26)
+        num_awards = 0
+        for award in awards:
+            num_awards += len(award['recipient_json_list'])
+        self.assertEqual(num_awards, 26)
+        self.assertEqual(len(awards), 21)
+
+        awards = convert_to_comparable(awards)
 
         # Test Team Award
-        self.assertEqual(awards[25]['official_name'], "Regional Chairman's Award")
-        self.assertEqual(awards[25]['team_number'], 604)
-        self.assertEqual(awards[25]['awardee'], None)
-        self.assertEqual(awards[25]['name'], 'ca')
+        team_award = {
+            'name_str': "Regional Chairman's Award",
+            'award_type_enum': AwardType.CHAIRMANS,
+            'team_number_list': [604],
+            'recipient_json_list': [{'team_number': 604, 'awardee': None}],
+        }
+        self.assertTrue(team_award in awards)
+
+        # Test Multi Team Award
+        multi_team_award = {
+            'name_str': "Regional Winner",
+            'award_type_enum': AwardType.WINNER,
+            'team_number_list': [1280, 1516, 190],
+            'recipient_json_list': [{'team_number': 1280, 'awardee': None},
+                                    {'team_number': 1516, 'awardee': None},
+                                    {'team_number': 190, 'awardee': None}],
+        }
+        self.assertTrue(multi_team_award in awards)
 
         # Test Individual Award
-        self.assertEqual(awards[7]['official_name'], "Woodie Flowers Award")
-        self.assertEqual(awards[7]['team_number'], None)
-        self.assertEqual(awards[7]['awardee'], u"Yang Xie \u2013 Team 846")
-        self.assertEqual(awards[7]['name'], 'wfa')
+        individual_award = {
+            'name_str': "Woodie Flowers Award",
+            'award_type_enum': AwardType.WOODIE_FLOWERS,
+            'team_number_list': [],
+            'recipient_json_list': [{'team_number': None, 'awardee': u"Yang Xie \u2013 Team 846"}],
+        }
+        self.assertTrue(individual_award in awards)
 
     def test_parse_regional_2010(self):
         with open('test_data/usfirst_html/usfirst_event_awards_2010sac.html', 'r') as f:
             awards, _ = UsfirstEventAwardsParser.parse(f.read())
 
         # Check number of parsed awards
-        self.assertEqual(len(awards), 29)
+        num_awards = 0
+        for award in awards:
+            num_awards += len(award['recipient_json_list'])
+        self.assertEqual(num_awards, 29)
+        self.assertEqual(len(awards), 24)
+
+        awards = convert_to_comparable(awards)
 
         # Test Team Award
-        self.assertEqual(awards[28]['official_name'], "Regional Chairman's Award")
-        self.assertEqual(awards[28]['team_number'], 604)
-        self.assertEqual(awards[28]['awardee'], None)
-        self.assertEqual(awards[28]['name'], 'ca')
+        team_award = {
+            'name_str': "Regional Chairman's Award",
+            'award_type_enum': AwardType.CHAIRMANS,
+            'team_number_list': [604],
+            'recipient_json_list': [{'team_number': 604, 'awardee': None}],
+        }
+        self.assertTrue(team_award in awards)
 
         # Test Individual Award
-        self.assertEqual(awards[0]['official_name'], "Outstanding Volunteer of the Year")
-        self.assertEqual(awards[0]['team_number'], None)
-        self.assertEqual(awards[0]['awardee'], "Gary Blakesley")
-        self.assertEqual(awards[0]['name'], 'vol')
+        individual_award = {
+            'name_str': "Outstanding Volunteer of the Year",
+            'award_type_enum': AwardType.VOLUNTEER,
+            'team_number_list': [],
+            'recipient_json_list': [{'team_number': None, 'awardee': u"Gary Blakesley"}],
+        }
+        self.assertTrue(individual_award in awards)
 
         # Test Team and Individual Award
-        self.assertEqual(awards[8]['official_name'], "Woodie Flowers Award")
-        self.assertEqual(awards[8]['team_number'], 604)
-        self.assertEqual(awards[8]['awardee'], "Helen Arrington")
-        self.assertEqual(awards[8]['name'], 'wfa')
+        team_and_individual_award = {
+            'name_str': "Woodie Flowers Award",
+            'award_type_enum': AwardType.WOODIE_FLOWERS,
+            'team_number_list': [604],
+            'recipient_json_list': [{'team_number': 604, 'awardee': u"Helen Arrington"}],
+        }
+        self.assertTrue(team_and_individual_award in awards)
 
     def test_parse_regional_2012(self):
         with open('test_data/usfirst_html/usfirst_event_awards_2012sj.html', 'r') as f:
             awards, _ = UsfirstEventAwardsParser.parse(f.read())
 
         # Check number of parsed awards
-        self.assertEqual(len(awards), 28)
+        num_awards = 0
+        for award in awards:
+            num_awards += len(award['recipient_json_list'])
+        self.assertEqual(num_awards, 28)
+        self.assertEqual(len(awards), 23)
+
+        awards = convert_to_comparable(awards)
+
         # Test Team Award
-        self.assertEqual(awards[0]['official_name'], "Regional Chairman's Award")
-        self.assertEqual(awards[0]['team_number'], 604)
-        self.assertEqual(awards[0]['awardee'], None)
-        self.assertEqual(awards[0]['name'], 'ca')
+        team_award = {
+            'name_str': "Regional Chairman's Award",
+            'award_type_enum': AwardType.CHAIRMANS,
+            'team_number_list': [604],
+            'recipient_json_list': [{'team_number': 604, 'awardee': None}],
+        }
+        self.assertTrue(team_award in awards)
 
         # Test Individual Award
-        self.assertEqual(awards[24]['official_name'], "Volunteer of the Year")
-        self.assertEqual(awards[24]['team_number'], None)
-        self.assertEqual(awards[24]['awardee'], "Joanne Heberer")
-        self.assertEqual(awards[24]['name'], 'vol')
+        individual_award = {
+            'name_str': "Volunteer of the Year",
+            'award_type_enum': AwardType.VOLUNTEER,
+            'team_number_list': [],
+            'recipient_json_list': [{'team_number': None, 'awardee': u"Joanne Heberer"}],
+        }
+        self.assertTrue(individual_award in awards)
 
         # Test Team and Individual Award
-        self.assertEqual(awards[26]['official_name'], "Woodie Flowers Finalist Award")
-        self.assertEqual(awards[26]['team_number'], 604)
-        self.assertEqual(awards[26]['awardee'], "Jim Mori")
-        self.assertEqual(awards[26]['name'], 'wfa')
+        team_and_individual_award = {
+            'name_str': "Woodie Flowers Finalist Award",
+            'award_type_enum': AwardType.WOODIE_FLOWERS,
+            'team_number_list': [604],
+            'recipient_json_list': [{'team_number': 604, 'awardee': u"Jim Mori"}],
+        }
+        self.assertTrue(team_and_individual_award in awards)
 
     def test_parse_district_championship_2009(self):
         with open('test_data/usfirst_html/usfirst_event_awards_2009gl.html', 'r') as f:
             awards, _ = UsfirstEventAwardsParser.parse(f.read())
 
         # Check number of parsed awards
-        self.assertEqual(len(awards), 30)
+        num_awards = 0
+        for award in awards:
+            num_awards += len(award['recipient_json_list'])
+        self.assertEqual(num_awards, 30)
+        self.assertEqual(len(awards), 21)
 
-        # Test Team Award
-        self.assertEqual(awards[29]['official_name'], "State Championship Chairman's Award")
-        self.assertEqual(awards[29]['team_number'], 217)
-        self.assertEqual(awards[29]['awardee'], None)
-        self.assertEqual(awards[29]['name'], 'ca2')
+        awards = convert_to_comparable(awards)
 
-        self.assertEqual(awards[28]['official_name'], "State Championship Chairman's Award")
-        self.assertEqual(awards[28]['team_number'], 33)
-        self.assertEqual(awards[28]['awardee'], None)
-        self.assertEqual(awards[28]['name'], 'ca1')
-
-        self.assertEqual(awards[27]['official_name'], "State Championship Chairman's Award")
-        self.assertEqual(awards[27]['team_number'], 27)
-        self.assertEqual(awards[27]['awardee'], None)
-        self.assertEqual(awards[27]['name'], 'ca')
+        # Test Multi Team Award
+        multi_team_award = {
+            'name_str': "State Championship Chairman's Award",
+            'award_type_enum': AwardType.CHAIRMANS,
+            'team_number_list': [27, 33, 217],
+            'recipient_json_list': [{'team_number': 27, 'awardee': None},
+                                    {'team_number': 33, 'awardee': None},
+                                    {'team_number': 217, 'awardee': None}],
+        }
+        self.assertTrue(multi_team_award in awards)
 
         # Test Individual Award
-        self.assertEqual(awards[7]['official_name'], "Woodie Flowers Award")
-        self.assertEqual(awards[7]['team_number'], None)
-        self.assertEqual(awards[7]['awardee'], "Jennifer Harvey of Team 503")
-        self.assertEqual(awards[7]['name'], 'wfa')
+        individual_award = {
+            'name_str': "Woodie Flowers Award",
+            'award_type_enum': AwardType.WOODIE_FLOWERS,
+            'team_number_list': [],
+            'recipient_json_list': [{'team_number': None, 'awardee': u"Jennifer Harvey of Team 503"}],
+        }
+        self.assertTrue(individual_award in awards)
 
     def test_parse_district_championship_2012(self):
         with open('test_data/usfirst_html/usfirst_event_awards_2012gl.html', 'r') as f:
             awards, _ = UsfirstEventAwardsParser.parse(f.read())
 
         # Check number of parsed awards
-        self.assertEqual(len(awards), 34)
+        num_awards = 0
+        for award in awards:
+            num_awards += len(award['recipient_json_list'])
+        self.assertEqual(num_awards, 34)
+        self.assertEqual(len(awards), 22)
 
-        # Test Team Award
-        self.assertEqual(awards[0]['official_name'], "Regional Chairman's Award")
-        self.assertEqual(awards[0]['team_number'], 33)
-        self.assertEqual(awards[0]['awardee'], None)
-        self.assertEqual(awards[0]['name'], 'ca')
+        awards = convert_to_comparable(awards)
 
-        self.assertEqual(awards[1]['official_name'], "Regional Chairman's Award")
-        self.assertEqual(awards[1]['team_number'], 503)
-        self.assertEqual(awards[1]['awardee'], None)
-        self.assertEqual(awards[1]['name'], 'ca1')
+        # Test Muti Team Award
+        multi_team_award = {
+            'name_str': "Regional Chairman's Award",
+            'award_type_enum': AwardType.CHAIRMANS,
+            'team_number_list': [33, 503, 27],
+            'recipient_json_list': [{'team_number': 33, 'awardee': None},
+                                    {'team_number': 503, 'awardee': None},
+                                    {'team_number': 27, 'awardee': None}],
+        }
+        self.assertTrue(multi_team_award in awards)
 
-        self.assertEqual(awards[2]['official_name'], "Regional Chairman's Award")
-        self.assertEqual(awards[2]['team_number'], 27)
-        self.assertEqual(awards[2]['awardee'], None)
-        self.assertEqual(awards[2]['name'], 'ca2')
-
-        # Test Team and Individual Award
-        self.assertEqual(awards[3]['official_name'], "FIRST Dean's List Finalist Award #1")
-        self.assertEqual(awards[3]['team_number'], 3538)
-        self.assertEqual(awards[3]['awardee'], 'Jaris Dingman')
-        self.assertEqual(awards[3]['name'], 'dl')
-
-        self.assertEqual(awards[8]['official_name'], "FIRST Dean's List Finalist Award #6")
-        self.assertEqual(awards[8]['team_number'], 1684)
-        self.assertEqual(awards[8]['awardee'], 'Matthew Wagner')
-        self.assertEqual(awards[8]['name'], 'dl5')
+        # Test Multi Team and Individual Award
+        multi_team_and_individual_award = {
+            'name_str': "FIRST Dean's List Finalist Award",
+            'award_type_enum': AwardType.DEANS_LIST,
+            'team_number_list': [3538, 548, 2834, 33, 862, 1684],
+            'recipient_json_list': [{'team_number': 3538, 'awardee': u"Jaris Dingman"},
+                                    {'team_number': 548, 'awardee': u"Claire Goolsby"},
+                                    {'team_number': 2834, 'awardee': u"Ryan Hoyt"},
+                                    {'team_number': 33, 'awardee': u"Andrew Palardy"},
+                                    {'team_number': 862, 'awardee': u"Ian Pudney"},
+                                    {'team_number': 1684, 'awardee': u"Matthew Wagner"}],
+        }
+        self.assertTrue(multi_team_and_individual_award in awards)
 
     def test_parse_championship_divison_2007(self):
         with open('test_data/usfirst_html/usfirst_event_awards_2007galileo.html', 'r') as f:
             awards, _ = UsfirstEventAwardsParser.parse(f.read())
 
         # Check number of parsed awards
-        self.assertEqual(len(awards), 7)
+        num_awards = 0
+        for award in awards:
+            num_awards += len(award['recipient_json_list'])
+        self.assertEqual(num_awards, 7)
+        self.assertEqual(len(awards), 3)
+
+        awards = convert_to_comparable(awards)
 
         # Test Team Award
-        self.assertEqual(awards[0]['official_name'], "Galileo - Highest Rookie Seed")
-        self.assertEqual(awards[0]['team_number'], 2272)
-        self.assertEqual(awards[0]['awardee'], None)
-        self.assertEqual(awards[0]['name'], 'div_hrs')
+        team_award = {
+            'name_str': "Galileo - Highest Rookie Seed",
+            'award_type_enum': AwardType.HIGHEST_ROOKIE_SEED,
+            'team_number_list': [2272],
+            'recipient_json_list': [{'team_number': 2272, 'awardee': None}],
+        }
+        self.assertTrue(team_award in awards)
 
-        self.assertEqual(awards[6]['official_name'], "Galileo - Division Winner #3")
-        self.assertEqual(awards[6]['team_number'], 1902)
-        self.assertEqual(awards[6]['awardee'], None)
-        self.assertEqual(awards[6]['name'], 'div_win3')
+        # Test Multi Team Award
+        multi_team_award = {
+            'name_str': "Galileo - Division Winner",
+            'award_type_enum': AwardType.WINNER,
+            'team_number_list': [173, 1319, 1902],
+            'recipient_json_list': [{'team_number': 173, 'awardee': None},
+                                    {'team_number': 1319, 'awardee': None},
+                                    {'team_number': 1902, 'awardee': None}],
+        }
+        self.assertTrue(multi_team_award in awards)
 
     def test_parse_championship_2007(self):
         with open('test_data/usfirst_html/usfirst_event_awards_2007cmp.html', 'r') as f:
             awards, _ = UsfirstEventAwardsParser.parse(f.read())
 
         # Check number of parsed awards
-        self.assertEqual(len(awards), 29)
+        num_awards = 0
+        for award in awards:
+            num_awards += len(award['recipient_json_list'])
+        self.assertEqual(num_awards, 29)
+        self.assertEqual(len(awards), 23)
+
+        awards = convert_to_comparable(awards)
 
         # Test Team Award
-        self.assertEqual(awards[28]['official_name'], "Championship - Chairman's Award")
-        self.assertEqual(awards[28]['team_number'], 365)
-        self.assertEqual(awards[28]['awardee'], None)
-        self.assertEqual(awards[28]['name'], 'cmp_ca')
+        team_award = {
+            'name_str': "Championship - Chairman's Award",
+            'award_type_enum': AwardType.CHAIRMANS,
+            'team_number_list': [365],
+            'recipient_json_list': [{'team_number': 365, 'awardee': None}],
+        }
+        self.assertTrue(team_award in awards)
 
         # Test Individual Award
-        self.assertEqual(awards[0]['official_name'], "Championship - FRC Outstanding Volunteer Award")
-        self.assertEqual(awards[0]['team_number'], None)
-        self.assertEqual(awards[0]['awardee'], "Mark Koors")
-        self.assertEqual(awards[0]['name'], 'cmp_vol')
+        individual_award = {
+            'name_str': "Championship - FRC Outstanding Volunteer Award",
+            'award_type_enum': AwardType.VOLUNTEER,
+            'team_number_list': [],
+            'recipient_json_list': [{'team_number': None, 'awardee': u"Mark Koors"}],
+        }
+        self.assertTrue(individual_award in awards)
 
     def test_parse_championship_divison_2012(self):
         with open('test_data/usfirst_html/usfirst_event_awards_2012galileo.html', 'r') as f:
             awards, _ = UsfirstEventAwardsParser.parse(f.read())
 
         # Check number of parsed awards
-        self.assertEqual(len(awards), 7)
+        num_awards = 0
+        for award in awards:
+            num_awards += len(award['recipient_json_list'])
+        self.assertEqual(num_awards, 7)
+        self.assertEqual(len(awards), 3)
+
+        awards = convert_to_comparable(awards)
 
         # Test Team Award
-        self.assertEqual(awards[0]['official_name'], "Championship Division Winners - Galileo #2")
-        self.assertEqual(awards[0]['team_number'], 25)
-        self.assertEqual(awards[0]['awardee'], None)
-        self.assertEqual(awards[0]['name'], 'div_win2')
+        team_award = {
+            'name_str': "Highest Rookie Seed - Galileo",
+            'award_type_enum': AwardType.HIGHEST_ROOKIE_SEED,
+            'team_number_list': [4394],
+            'recipient_json_list': [{'team_number': 4394, 'awardee': None}],
+        }
+        self.assertTrue(team_award in awards)
 
-        self.assertEqual(awards[6]['official_name'], "Highest Rookie Seed - Galileo")
-        self.assertEqual(awards[6]['team_number'], 4394)
-        self.assertEqual(awards[6]['awardee'], None)
-        self.assertEqual(awards[6]['name'], 'div_hrs')
+        # Test Multi Team Award
+        multi_team_award = {
+            'name_str': "Championship Division Winners - Galileo",
+            'award_type_enum': AwardType.WINNER,
+            'team_number_list': [25, 180, 16],
+            'recipient_json_list': [{'team_number': 25, 'awardee': None},
+                                    {'team_number': 180, 'awardee': None},
+                                    {'team_number': 16, 'awardee': None}],
+        }
+        self.assertTrue(multi_team_award in awards)
 
     def test_parse_championship_2012(self):
         with open('test_data/usfirst_html/usfirst_event_awards_2012cmp.html', 'r') as f:
             awards, _ = UsfirstEventAwardsParser.parse(f.read())
 
         # Check number of parsed awards
-        self.assertEqual(len(awards), 39)
+        num_awards = 0
+        for award in awards:
+            num_awards += len(award['recipient_json_list'])
+        self.assertEqual(num_awards, 39)
+        self.assertEqual(len(awards), 25)
+
+        awards = convert_to_comparable(awards)
 
         # Test Team Award
-        self.assertEqual(awards[0]['official_name'], "Chairman's Award")
-        self.assertEqual(awards[0]['team_number'], 1114)
-        self.assertEqual(awards[0]['awardee'], None)
-        self.assertEqual(awards[0]['name'], 'cmp_ca')
+        team_award = {
+            'name_str': "Excellence in Design Award sponsored by Autodesk (3D CAD)",
+            'award_type_enum': AwardType.EXCELLENCE_IN_DESIGN_CAD,
+            'team_number_list': [862],
+            'recipient_json_list': [{'team_number': 862, 'awardee': None}],
+        }
+        self.assertTrue(team_award in awards)
+
+        team_award = {
+            'name_str': "Excellence in Design Award sponsored by Autodesk (Animation)",
+            'award_type_enum': AwardType.EXCELLENCE_IN_DESIGN_ANIMATION,
+            'team_number_list': [192],
+            'recipient_json_list': [{'team_number': 192, 'awardee': None}],
+        }
+        self.assertTrue(team_award in awards)
+
+        team_award = {
+            'name_str': "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+            'award_type_enum': AwardType.ENTREPRENEURSHIP,
+            'team_number_list': [3132],
+            'recipient_json_list': [{'team_number': 3132, 'awardee': None}],
+        }
+        self.assertTrue(team_award in awards)
 
         # Test Individual Award
-        self.assertEqual(awards[1]['official_name'], "Founder's Award")
-        self.assertEqual(awards[1]['team_number'], None)
-        self.assertEqual(awards[1]['awardee'], "Google")
-        self.assertEqual(awards[1]['name'], 'cmp_founders')
+        individual_award = {
+            'name_str': "Founder's Award",
+            'award_type_enum': AwardType.FOUNDERS,
+            'team_number_list': [],
+            'recipient_json_list': [{'team_number': None, 'awardee': u"Google"}],
+        }
+        self.assertTrue(individual_award in awards)
+
+        # Test Multi Team and Individual Award
+        multi_team_and_individual_award = {
+            'name_str': "FIRST Dean's List Award",
+            'award_type_enum': AwardType.DEANS_LIST,
+            'team_number_list': [3059, 1540, 128, 1058, 3138, 3196, 1912, 2996, 842, 704],
+            'recipient_json_list': [{'team_number': 3059, 'awardee': u"Ikechukwa Chima"},
+                                    {'team_number': 1540, 'awardee': u"Marina Dimitrov"},
+                                    {'team_number': 128, 'awardee': u"Chase Douglas"},
+                                    {'team_number': 1058, 'awardee': u"Tristan Evarts"},
+                                    {'team_number': 3138, 'awardee': u"Danielle Gehron"},
+                                    {'team_number': 3196, 'awardee': u"David Gomez"},
+                                    {'team_number': 1912, 'awardee': u"Rachel Holladay"},
+                                    {'team_number': 2996, 'awardee': u"Jasmine Kemper"},
+                                    {'team_number': 842, 'awardee': u"John Rangel"},
+                                    {'team_number': 704, 'awardee': u"Matthew Ricks"}],
+        }
+        self.assertTrue(multi_team_and_individual_award in awards)
 
         # Test Team and Individual Award
-        self.assertEqual(awards[15]['official_name'], "FIRST Dean's List Award #2")
-        self.assertEqual(awards[15]['team_number'], 1540)
-        self.assertEqual(awards[15]['awardee'], "Marina Dimitrov")
-        self.assertEqual(awards[15]['name'], 'cmp_dl1')
-
-        self.assertEqual(awards[36]['official_name'], "Woodie Flowers Award")
-        self.assertEqual(awards[36]['team_number'], 2614)
-        self.assertEqual(awards[36]['awardee'], "Earl Scime")
-        self.assertEqual(awards[36]['name'], 'cmp_wfa')
+        team_and_individual_award = {
+            'name_str': "Woodie Flowers Award",
+            'award_type_enum': AwardType.WOODIE_FLOWERS,
+            'team_number_list': [2614],
+            'recipient_json_list': [{'team_number': 2614, 'awardee': u"Earl Scime"}],
+        }
+        self.assertTrue(team_and_individual_award in awards)
 
     def test_parse_championship_2013(self):
         with open('test_data/usfirst_html/usfirst_event_awards_2013cmp.html', 'r') as f:
             awards, _ = UsfirstEventAwardsParser.parse(f.read())
 
         # Check number of parsed awards
-        self.assertEqual(len(awards), 37)
+        num_awards = 0
+        for award in awards:
+            num_awards += len(award['recipient_json_list'])
+        self.assertEqual(num_awards, 37)
+        self.assertEqual(len(awards), 22)
+
+        awards = convert_to_comparable(awards)
 
         # Test New Awards
-        self.assertEqual(awards[20]['official_name'], 'Make It Loud Award')
-        self.assertEqual(awards[20]['team_number'], None)
-        self.assertEqual(awards[20]['awardee'], 'will.i.am')
-        self.assertEqual(awards[20]['name'], 'cmp_mil')
+        new_award = {
+            'name_str': "Make It Loud Award",
+            'award_type_enum': AwardType.MAKE_IT_LOUD,
+            'team_number_list': [],
+            'recipient_json_list': [{'team_number': None, 'awardee': "will.i.am"}],
+        }
+        self.assertTrue(new_award in awards)
 
-        self.assertEqual(awards[28]['official_name'], 'Media and Technology Award sponsored by Comcast')
-        self.assertEqual(awards[28]['team_number'], 2283)
-        self.assertEqual(awards[28]['awardee'], None)
-        self.assertEqual(awards[28]['name'], 'cmp_mediatech')
+        new_award = {
+            'name_str': "Media and Technology Award sponsored by Comcast",
+            'award_type_enum': AwardType.MEDIA_AND_TECHNOLOGY,
+            'team_number_list': [2283],
+            'recipient_json_list': [{'team_number': 2283, 'awardee': None}],
+        }
+        self.assertTrue(new_award in awards)
 
-        self.assertEqual(awards[35]['official_name'], 'Dr. Bart Kamen Memorial Scholarship #2')
-        self.assertEqual(awards[35]['team_number'], None)
-        self.assertEqual(awards[35]['awardee'], 'Sarah Rudasill')
-        self.assertEqual(awards[35]['name'], 'cmp_bkm2')
+        new_award = {
+            'name_str': "Dr. Bart Kamen Memorial Scholarship",
+            'award_type_enum': AwardType.BART_KAMEN_MEMORIAL,
+            'team_number_list': [],
+            'recipient_json_list': [{'team_number': None, 'awardee': "Sofia Dhanani"},
+                                    {'team_number': None, 'awardee': "Sarah Rudasill"},
+                                    {'team_number': None, 'awardee': "Pascale Wallace Patterson"}],
+        }
+        self.assertTrue(new_award in awards)

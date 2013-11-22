@@ -2,6 +2,11 @@ import json
 import logging
 import math
 
+from google.appengine.ext import ndb
+
+from consts.award_type import AwardType
+from consts.event_type import EventType
+
 from models.insight import Insight
 from models.event import Event
 from models.award import Award
@@ -50,14 +55,26 @@ class InsightsHelper(object):
         """
         Calculate award insights for a given year. Returns a list of Insights.
         """
-        # Only fetch from DB once
-        keysToQuery = Award.BLUE_BANNER_KEYS.union(Award.DIVISION_FIN_KEYS).union(Award.CHAMPIONSHIP_FIN_KEYS)
-        awards = AwardHelper.getAwards(keysToQuery, year)
+        # Get all Blue Banner, Division Finalist, and Championship Finalist awards
+        blue_banner_award_keys_future = Award.query(
+            Award.year == year,
+            Award.award_type_enum.IN(AwardType.BLUE_BANNER_AWARDS)
+        ).fetch_async(10000, keys_only=True)
+        cmp_finalist_award_keys_future = Award.query(
+            Award.year == year,
+            Award.award_type_enum == AwardType.FINALIST,
+            Award.event_type_enum.IN({EventType.CMP_DIVISION, EventType.CMP_FINALS})
+        ).fetch_async(10000, keys_only=True)
+
+        award_futures = ndb.get_multi_async(
+            set(blue_banner_award_keys_future.get_result()).union(
+            set(cmp_finalist_award_keys_future.get_result()))
+        )
 
         insights = []
-        insights += self._calculateBlueBanners(awards, year)
-        insights += self._calculateChampionshipStats(awards, year)
-        insights += self._calculateRegionalStats(awards, year)
+        insights += self._calculateBlueBanners(award_futures, year)
+        insights += self._calculateChampionshipStats(award_futures, year)
+        insights += self._calculateRegionalStats(award_futures, year)
 
         return insights
 
@@ -130,7 +147,7 @@ class InsightsHelper(object):
         insight = None
         if highscore_matches_by_week != []:
             insight = self._createInsight(highscore_matches_by_week, Insight.INSIGHT_NAMES[Insight.MATCH_HIGHSCORE_BY_WEEK], year)
-        if insight != None:
+        if insight is not None:
             return [insight]
         else:
             return []
@@ -157,7 +174,7 @@ class InsightsHelper(object):
         insight = None
         if highscore_matches != []:
             insight = self._createInsight(highscore_matches, Insight.INSIGHT_NAMES[Insight.MATCH_HIGHSCORE], year)
-        if insight != None:
+        if insight is not None:
             return [insight]
         else:
             return []
@@ -256,7 +273,7 @@ class InsightsHelper(object):
                     score_distribution_normalized[roundedScore] = contribution
             insights.append(self._createInsight(score_distribution_normalized, Insight.INSIGHT_NAMES[Insight.SCORE_DISTRIBUTION], year))
         if elim_score_distribution != {}:
-            if binAmount == None:  # Use same binAmount from above if possible
+            if binAmount is None:  # Use same binAmount from above if possible
                 binAmount = math.ceil(float(overall_highscore) / 20)
             totalCount = float(sum(elim_score_distribution.values()))
             elim_score_distribution_normalized = {}
@@ -284,37 +301,39 @@ class InsightsHelper(object):
         insight = None
         if numMatches != 0:
             insight = self._createInsight(numMatches, Insight.INSIGHT_NAMES[Insight.NUM_MATCHES], year)
-        if insight != None:
+        if insight is not None:
             return [insight]
         else:
             return []
 
     @classmethod
-    def _calculateBlueBanners(self, awards, year):
+    def _calculateBlueBanners(self, award_futures, year):
         """
         Returns an Insight where the data is a dict:
         Key: number of blue banners, Value: list of teams with that number of blue banners
         """
         blue_banner_winners = {}
-        for award in awards:
-            if award.name in Award.BLUE_BANNER_KEYS:
-                teamKey = award.team.id()
-                if teamKey in blue_banner_winners:
-                    blue_banner_winners[teamKey] += 1
-                else:
-                    blue_banner_winners[teamKey] = 1
+        for award_future in award_futures:
+            award = award_future.get_result()
+            if award.award_type_enum in AwardType.BLUE_BANNER_AWARDS:
+                for team_key in award.team_list:
+                    team_key_name = team_key.id()
+                    if team_key_name in blue_banner_winners:
+                        blue_banner_winners[team_key_name] += 1
+                    else:
+                        blue_banner_winners[team_key_name] = 1
         blue_banner_winners = self._sortTeamWinsDict(blue_banner_winners)
 
         insight = None
         if blue_banner_winners != []:
             insight = self._createInsight(blue_banner_winners, Insight.INSIGHT_NAMES[Insight.BLUE_BANNERS], year)
-        if insight != None:
+        if insight is not None:
             return [insight]
         else:
             return []
 
     @classmethod
-    def _calculateChampionshipStats(self, awards, year):
+    def _calculateChampionshipStats(self, award_futures, year):
         """
         Returns a list of Insights where, depending on the Insight, the data
         is either a team or a list of teams
@@ -324,18 +343,22 @@ class InsightsHelper(object):
         world_finalists = []
         division_winners = []
         division_finalists = []
-        for award in awards:
-            teamKey = award.team.id()
-            if award.name in Award.CHAMPIONSHIP_CA_KEYS:
-                ca_winner = teamKey
-            if award.name in Award.CHAMPIONSHIP_WIN_KEYS:
-                world_champions.append(teamKey)
-            if award.name in Award.CHAMPIONSHIP_FIN_KEYS:
-                world_finalists.append(teamKey)
-            if award.name in Award.DIVISION_WIN_KEYS:
-                division_winners.append(teamKey)
-            if award.name in Award.DIVISION_FIN_KEYS:
-                division_finalists.append(teamKey)
+        for award_future in award_futures:
+            award = award_future.get_result()
+            for team_key in award.team_list:
+                team_key_name = team_key.id()
+                if award.event_type_enum == EventType.CMP_FINALS:
+                    if award.award_type_enum == AwardType.CHAIRMANS:
+                        ca_winner = team_key_name
+                    elif award.award_type_enum == AwardType.WINNER:
+                        world_champions.append(team_key_name)
+                    elif award.award_type_enum == AwardType.FINALIST:
+                        world_finalists.append(team_key_name)
+                elif award.event_type_enum == EventType.CMP_DIVISION:
+                    if award.award_type_enum == AwardType.WINNER:
+                        division_winners.append(team_key_name)
+                    elif award.award_type_enum == AwardType.FINALIST:
+                        division_finalists.append(team_key_name)
 
         world_champions = self._sortTeamList(world_champions)
         world_finalists = self._sortTeamList(world_finalists)
@@ -343,7 +366,7 @@ class InsightsHelper(object):
         division_finalists = self._sortTeamList(division_finalists)
 
         insights = []
-        if ca_winner != None:
+        if ca_winner is not None:
             insights += [self._createInsight(ca_winner, Insight.INSIGHT_NAMES[Insight.CA_WINNER], year)]
         if world_champions != []:
             insights += [self._createInsight(world_champions, Insight.INSIGHT_NAMES[Insight.WORLD_CHAMPIONS], year)]
@@ -356,7 +379,7 @@ class InsightsHelper(object):
         return insights
 
     @classmethod
-    def _calculateRegionalStats(self, awards, year):
+    def _calculateRegionalStats(self, award_futures, year):
         """
         Returns a list of Insights where, depending on the Insight, the data
         is either a list of teams or a dict:
@@ -364,15 +387,17 @@ class InsightsHelper(object):
         """
         rca_winners = []
         regional_winners = {}
-        for award in awards:
-            teamKey = award.team.id()
-            if award.name in Award.REGIONAL_CA_KEYS:
-                rca_winners.append(teamKey)
-            if award.name in Award.REGIONAL_WIN_KEYS:
-                if teamKey in regional_winners:
-                    regional_winners[teamKey] += 1
-                else:
-                    regional_winners[teamKey] = 1
+        for award_future in award_futures:
+            award = award_future.get_result()
+            for team_key in award.team_list:
+                team_key_name = team_key.id()
+                if award.award_type_enum == AwardType.CHAIRMANS:
+                    rca_winners.append(team_key_name)
+                elif award.award_type_enum == AwardType.WINNER:
+                    if team_key_name in regional_winners:
+                        regional_winners[team_key_name] += 1
+                    else:
+                        regional_winners[team_key_name] = 1
 
         rca_winners = self._sortTeamList(rca_winners)
         regional_winners = self._sortTeamWinsDict(regional_winners)

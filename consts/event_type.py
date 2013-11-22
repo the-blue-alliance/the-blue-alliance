@@ -16,5 +16,5 @@ class EventType(object):
         CMP_FINALS: 'Championship Finals',
         OFFSEASON: 'Offseason',
         PRESEASON: 'Preseason',
-        UNLABLED: '',
+        UNLABLED: '--',
     }

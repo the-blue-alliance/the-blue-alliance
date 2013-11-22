@@ -3,6 +3,7 @@ import re
 
 from google.appengine.api import memcache
 from google.appengine.api import urlfetch
+from google.appengine.ext import ndb
 
 import tba_config
 
@@ -13,6 +14,9 @@ from datafeeds.usfirst_event_details_parser import UsfirstEventDetailsParser
 from datafeeds.usfirst_event_list_parser import UsfirstEventListParser
 from datafeeds.usfirst_event_rankings_parser import UsfirstEventRankingsParser
 from datafeeds.usfirst_event_awards_parser import UsfirstEventAwardsParser
+from datafeeds.usfirst_event_awards_parser_02 import UsfirstEventAwardsParser_02
+from datafeeds.usfirst_event_awards_parser_03_04 import UsfirstEventAwardsParser_03_04
+from datafeeds.usfirst_event_awards_parser_05_06 import UsfirstEventAwardsParser_05_06
 from datafeeds.usfirst_event_teams_parser import UsfirstEventTeamsParser
 from datafeeds.usfirst_matches_parser import UsfirstMatchesParser
 from datafeeds.usfirst_matches_parser_2002 import UsfirstMatchesParser2002
@@ -56,6 +60,15 @@ class DatafeedUsfirst(DatafeedBase):
     }
     DEFAULT_MATCH_PARSER = UsfirstMatchesParser
 
+    YEAR_AWARD_PARSER = {
+        2002: UsfirstEventAwardsParser_02,
+        2003: UsfirstEventAwardsParser_03_04,
+        2004: UsfirstEventAwardsParser_03_04,
+        2005: UsfirstEventAwardsParser_05_06,
+        2006: UsfirstEventAwardsParser_05_06,
+    }
+    DEFAULT_AWARD_PARSER = UsfirstEventAwardsParser
+
     def __init__(self, *args, **kw):
         self._session_key = dict()
         super(DatafeedUsfirst, self).__init__(*args, **kw)
@@ -63,6 +76,8 @@ class DatafeedUsfirst(DatafeedBase):
     def getEventDetails(self, first_eid):
         url = self.EVENT_DETAILS_URL_PATTERN % (first_eid)
         event, _ = self.parse(url, UsfirstEventDetailsParser)
+        if event is None:
+            return None
 
         return Event(
             id=str(event["year"]) + str.lower(str(event["event_short"])),
@@ -98,7 +113,8 @@ class DatafeedUsfirst(DatafeedBase):
     def getEventRankings(self, event):
         url = self.EVENT_RANKINGS_URL_PATTERN % (event.year,
                                                  self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
-        return self.parse(url, UsfirstEventRankingsParser)
+        rankings, _ = self.parse(url, UsfirstEventRankingsParser)
+        return rankings
 
     def getEventAwards(self, event):
 
@@ -111,16 +127,18 @@ class DatafeedUsfirst(DatafeedBase):
 
         url = self.EVENT_AWARDS_URL_PATTERN % (event.year,
                                                self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
-        awards, _ = self.parse(url, UsfirstEventAwardsParser)
+        awards, _ = self.parse(url, self.YEAR_AWARD_PARSER.get(event.year, self.DEFAULT_AWARD_PARSER))
 
         return [Award(
-            id=Award.renderKeyName(event.key_name, award.get('name')),
-            name=award.get('name', None),
-            team=_getTeamKey(award),
-            awardee=award.get('awardee', None),
+            id=Award.render_key_name(event.key_name, award['award_type_enum']),
+            name_str=award['name_str'],
+            award_type_enum=award['award_type_enum'],
             year=event.year,
-            official_name=award.get('official_name', None),
-            event=event.key)
+            event=event.key,
+            event_type_enum=event.event_type_enum,
+            team_list=[ndb.Key(Team, 'frc{}'.format(team_number)) for team_number in award['team_number_list']],
+            recipient_json_list=award['recipient_json_list']
+            )
             for award in awards]
 
     def getEventTeams(self, year, first_eid):
@@ -185,7 +203,7 @@ class DatafeedUsfirst(DatafeedBase):
                 url = self.TEAM_DETAILS_URL_PATTERN % (team.first_tpid)
                 team_dict, _ = self.parse(url, UsfirstTeamDetailsParser)
 
-                if "team_number" in team_dict:
+                if team_dict is not None and "team_number" in team_dict:
                     return Team(
                         team_number=team_dict.get("team_number", None),
                         name=self._shorten(team_dict.get("name", None)),

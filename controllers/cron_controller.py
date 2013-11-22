@@ -360,10 +360,21 @@ class TypeaheadCalcDo(webapp.RequestHandler):
             else:
                 results[TypeaheadEntry.YEAR_EVENTS_KEY.format(event.year)] = [data]
 
+        # Prepare to remove old entries
+        old_entry_keys_future = TypeaheadEntry.query().fetch_async(keys_only=True)
+
+        # Add new entries
         entries = []
-        for key, data in results.items():
-            entries.append(TypeaheadEntry(id=key, data_json=json.dumps(data)))
+        for key_name, data in results.items():
+            entries.append(TypeaheadEntry(id=key_name, data_json=json.dumps(data)))
         ndb.put_multi(entries)
+
+        # Remove old entries
+        old_entry_keys = set(old_entry_keys_future.get_result())
+        new_entry_keys = set([ndb.Key(TypeaheadEntry, key_name) for key_name in results.keys()])
+        keys_to_delete = old_entry_keys.difference(new_entry_keys)
+        logging.info("Removing the following unused TypeaheadEntries: {}".format([key.id() for key in keys_to_delete]))
+        ndb.delete_multi(keys_to_delete)
 
         template_values = {'results': results}
         path = os.path.join(os.path.dirname(__file__), '../templates/math/typeaheadcalc_do.html')

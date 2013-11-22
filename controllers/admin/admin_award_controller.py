@@ -2,6 +2,7 @@ import json
 import logging
 import os
 
+from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
@@ -77,14 +78,24 @@ class AdminAwardEdit(LoggedInHandler):
 
     def post(self, award_key):
         self._require_admin()
+
         event_key_name = self.request.get('event_key_name')
+
+        recipient_json_list = []
+        team_list = []
+        for recipient in json.loads(self.request.get('recipient_list_json')):
+            recipient_json_list.append(json.dumps(recipient))
+            if recipient['team_number'] is not None:
+                team_list.append(ndb.Key(Team, 'frc{}'.format(recipient['team_number'])))
+
         award = Award(
             id=award_key,
-            name=self.request.get('award_name'),
-            event=Event.get_by_id(event_key_name).key,
-            official_name=self.request.get('official_name'),
-            team=Team.get_by_id(self.request.get('team_key')).key,
-            awardee=self.request.get('awardee'),
+            name_str=self.request.get('name_str'),
+            award_type_enum=int(self.request.get('award_type_enum')),
+            event=ndb.Key(Event, event_key_name),
+            event_type_enum=int(self.request.get('event_type_enum')),
+            team_list=team_list,
+            recipient_json_list=recipient_json_list,
         )
-        award = AwardManipulator.createOrUpdate(award)
+        award = AwardManipulator.createOrUpdate(award, auto_union=False)
         self.redirect("/admin/event/" + event_key_name)
