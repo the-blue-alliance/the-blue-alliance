@@ -10,13 +10,6 @@ from helpers.event_helper import EventHelper
 
 
 class UsfirstEventListParser(ParserBase):
-
-    REGIONAL_EVENT_TYPES = {
-        EventType.REGIONAL,
-        EventType.DISTRICT,
-        EventType.DISTRICT_CMP,
-    }
-
     @classmethod
     def parse(self, html):
         """
@@ -55,7 +48,7 @@ class UsfirstEventListParser(ParserBase):
                 # except Exception, detail:
                 #    logging.error('Date Parse Failed: ' + str(detail))
 
-                if event.get("event_type_enum", None) in self.REGIONAL_EVENT_TYPES:
+                if event.get("event_type_enum", None) in EventType.NON_CMP_EVENT_TYPES:
                     events.append(event)
 
             except Exception, detail:

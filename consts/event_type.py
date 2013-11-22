@@ -18,3 +18,9 @@ class EventType(object):
         PRESEASON: 'Preseason',
         UNLABLED: '--',
     }
+
+    NON_CMP_EVENT_TYPES = {
+        REGIONAL,
+        DISTRICT,
+        DISTRICT_CMP,
+    }
