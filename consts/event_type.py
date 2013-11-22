@@ -24,3 +24,8 @@ class EventType(object):
         DISTRICT,
         DISTRICT_CMP,
     }
+
+    CMP_EVENT_TYPES = {
+        CMP_DIVISION,
+        CMP_FINALS,
+    }

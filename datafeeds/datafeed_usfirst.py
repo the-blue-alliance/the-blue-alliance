@@ -7,6 +7,8 @@ from google.appengine.ext import ndb
 
 import tba_config
 
+from consts.event_type import EventType
+
 from helpers.team_helper import TeamTpidHelper
 
 from datafeeds.datafeed_base import DatafeedBase
@@ -117,6 +119,10 @@ class DatafeedUsfirst(DatafeedBase):
         return rankings
 
     def getEventAwards(self, event):
+        if event.event_type_enum in EventType.CMP_EVENT_TYPES and event.year <= 2002:
+            # award pages malformatted
+            logging.warning("Skipping awards parsing for event: {}".format(event.key_name))
+            return []
 
         url = self.EVENT_AWARDS_URL_PATTERN % (event.year,
                                                self.EVENT_SHORT_EXCEPTIONS.get(event.event_short, event.event_short))
