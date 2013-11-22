@@ -17,21 +17,16 @@
     </div>
 </form>
 
-<!--
-    <legend>Add Awards</legend>
-    <p>Add awards formatted as a list of JSON dicts.</p>
-    <p class="text-error">Warning! Will overwrite any existing awards!</p>
-    <p>Example:</p>
-    <div class="well">
-      [{"name": "wfa", "official_name": "Regional Chairman's Award", "team_number": "604", "awardee": "Helen Arrington"},<br>
-       {"name": "ras", "official_name": "Rookie All Star Award", "team_number": "3256"}]
-    </div>
-    <form action="/admin/award/add" method="post">
-      <input class="form-control" name="event_key" type="text" placeholder="event_key"><br>
-      <textarea class="form-control" name="awards_json"></textarea><br>
-      <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add awards</button>
-    </form>
--->
+<legend>Add Awards</legend>
+<p>Add awards formatted as a CSV.</p>
+<p>Format:</p>
+<div class="well">
+  year, event_short, award_name_str, team_number, awardee
+</div>
+<form action="/admin/award/add" method="post">
+  <textarea class="form-control" name="awards_csv"></textarea><br>
+  <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add awards</button>
+</form>
 
 <script>
 $("#edit_button").click(function() {

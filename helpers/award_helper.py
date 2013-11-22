@@ -25,6 +25,7 @@ list of the tuple.
 AWARD_MATCHING_STRINGS = [
     (AwardType.CHAIRMANS, (["chairman"], [])),
     (AwardType.ENGINEERING_INSPIRATION, (["engineering inspiration"], [])),
+    (AwardType.WINNER, (["regional winner"], [])),
     (AwardType.WINNER, (["winner", "1"], [])),
     (AwardType.WINNER, (["winner", "2"], [])),
     (AwardType.WINNER, (["winner", "3"], [])),
@@ -37,6 +38,7 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.WINNER, (["championship", "champion", "2"], ["finalist"])),
     (AwardType.WINNER, (["championship", "champion", "3"], ["finalist"])),
     (AwardType.WINNER, (["championship", "champion", "4"], ["finalist"])),
+    (AwardType.FINALIST, (["regional finalist"], ["dean"])),
     (AwardType.FINALIST, (["finalist", "1"], ["dean"])),
     (AwardType.FINALIST, (["finalist", "2"], ["dean"])),
     (AwardType.FINALIST, (["finalist", "3"], ["dean"])),

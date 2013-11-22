@@ -6,6 +6,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
+from datafeeds.csv_awards_parser import CSVAwardsParser
 from helpers.award_manipulator import AwardManipulator
 from models.award import Award
 from models.event import Event
@@ -34,31 +35,39 @@ class AdminAwardAdd(LoggedInHandler):
     """
     def post(self):
         self._require_admin()
-        event_key = self.request.get('event_key')
-        awards_json = self.request.get('awards_json')
-        awards = json.loads(awards_json)
+        awards_csv = self.request.get('awards_csv')
 
-        event = Event.get_by_id(event_key)
-
-        def _getTeamKey(award):
-            team = Team.get_by_id('frc' + str(award.get('team_number', None)))
-            if team is not None:
-                return team.key
+        events = {}  # for reducing datastore fetches of events and teams
+        awards = []
+        for award in CSVAwardsParser.parse(awards_csv):
+            event_key_name = '{}{}'.format(award['year'], award['event_short'])
+            if event_key_name in events:
+                event = events[event_key_name]
             else:
-                return None
+                event = Event.get_by_id(event_key_name)
+                if event is None:
+                    logging.warning("Event: {} doesn't exist!".format(event_key_name))
+                    continue
+                events[event_key_name] = event
 
-        awards = [Award(
-            id=Award.renderKeyName(event.key_name, award.get('name')),
-            name=award.get('name', None),
-            team=_getTeamKey(award),
-            awardee=award.get('awardee', None),
-            year=event.year,
-            official_name=award.get('official_name', None),
-            event=event.key)
-            for award in awards]
+            awards.append(Award(
+                id=Award.render_key_name(event.key_name, award['award_type_enum']),
+                name_str=award['name_str'],
+                award_type_enum=award['award_type_enum'],
+                year=event.year,
+                event=event.key,
+                event_type_enum=event.event_type_enum,
+                team_list=[ndb.Key(Team, 'frc{}'.format(team_number)) for team_number in award['team_number_list']],
+                recipient_json_list=award['recipient_json_list']
+            ))
 
-        AwardManipulator.createOrUpdate(awards)
-        self.redirect('/admin/event/{}'.format(event_key))
+        new_awards = AwardManipulator.createOrUpdate(awards)
+
+        template_values = {
+            'awards': new_awards,
+        }
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/awards_add.html')
+        self.response.out.write(template.render(path, template_values))
 
 
 class AdminAwardEdit(LoggedInHandler):
