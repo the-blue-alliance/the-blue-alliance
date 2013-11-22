@@ -68,7 +68,7 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.SPIRIT, (["spirit"], [])),
     (AwardType.WEBSITE, (["website"], [])),
     (AwardType.WEBSITE, (["web", "site"], [])),
-    (AwardType.VISUALIZATION, (["visualization"], [])),
+    (AwardType.VISUALIZATION, (["visualization"], ["rising"])),
     (AwardType.VOLUNTEER, (["volunteer"], [])),
     (AwardType.WOODIE_FLOWERS, (["woodie flowers"], [])),
     (AwardType.JUDGES, (["judge"], [])),
@@ -82,6 +82,7 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.NUM_1_SEED, (["#1", "seed"], [])),
     (AwardType.INCREDIBLE_PLAY, (["incredible", "play"], [])),
     (AwardType.PEOPLES_CHOICE_ANIMATION, (["people", "choice", "animation"], [])),
+    (AwardType.VISUALIZATION_RISING_STAR, (["visualization", "rising"], [])),
 ]
 
 

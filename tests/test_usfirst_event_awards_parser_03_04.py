@@ -110,3 +110,25 @@ class TestUsfirstEventAwardsParser_03_04(unittest2.TestCase):
                                     {'team_number': None, 'awardee': u"Ken Leung"},],
         }
         self.assertTrue(individual_award in awards)
+
+    def test_parse_cmp_2003(self):
+        with open('test_data/usfirst_html/usfirst_event_awards_2003cmp.html', 'r') as f:
+            awards, _ = UsfirstEventAwardsParser_03_04.parse(f.read())
+
+        # Check number of parsed awards
+        num_awards = 0
+        for award in awards:
+            num_awards += len(award['recipient_json_list'])
+        self.assertEqual(num_awards, 26)
+        self.assertEqual(len(awards), 20)
+
+        awards = convert_to_comparable(awards)
+
+        team_award = {
+            'name_str': u"Rookie All Star Award",
+            'award_type_enum': AwardType.ROOKIE_ALL_STAR,
+            'team_number_list': [1108, 1023],
+            'recipient_json_list': [{'team_number': 1108, 'awardee': None},
+                                    {'team_number': 1023, 'awardee': None}],
+        }
+        self.assertTrue(team_award in awards)

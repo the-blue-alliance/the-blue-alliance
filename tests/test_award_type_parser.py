@@ -52,3 +52,5 @@ class TestUsfirstEventTypeParser(unittest2.TestCase):
         self.assertEqual(AwardHelper.parse_award_type("#1 Seed"), AwardType.NUM_1_SEED)
         self.assertEqual(AwardHelper.parse_award_type("Incredible Play Award"), AwardType.INCREDIBLE_PLAY)
         self.assertEqual(AwardHelper.parse_award_type("People's Choice Animation Award"), AwardType.PEOPLES_CHOICE_ANIMATION)
+        self.assertEqual(AwardHelper.parse_award_type("Autodesk Award for Visualization - Grand Prize"), AwardType.VISUALIZATION)
+        self.assertEqual(AwardHelper.parse_award_type("Autodesk Award for Visualization - Rising Star"), AwardType.VISUALIZATION_RISING_STAR)

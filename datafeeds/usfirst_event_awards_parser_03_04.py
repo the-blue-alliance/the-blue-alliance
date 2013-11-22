@@ -83,9 +83,11 @@ def sanitize(text):
 
 
 def strip_number(text):
-    # Removes things like "3" from the end an award name_str
-    # Example: "Regional Winner 3" becomes "Regional Winner"
-    m = re.match(r'(.*)\d$', text)
+    # Removes things like "3" or "#3" from the end an award name_str
+    # Example: "Regional Winner 3" or "Regional Winner #3" becomes "Regional Winner"
+    m = re.match(r'(.*) #\d*(.*)', text)
+    if m is None:
+        m = re.match(r'(.*)\d$', text)
     if m is not None:
         return m.group(1).strip()
     else:
