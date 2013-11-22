@@ -121,9 +121,9 @@ class DatafeedUsfirst(DatafeedBase):
     def getEventAwards(self, event):
         """
         Works reliably for regional events from 2002-present and
-        championship events from 2003 and 2007-present
+        championship events from 2007-present
         """
-        if event.event_type_enum in EventType.CMP_EVENT_TYPES and event.year <= 2002:
+        if event.year < 2002 or (event.event_type_enum in EventType.CMP_EVENT_TYPES and event.year < 2007):
             # award pages malformatted
             logging.warning("Skipping awards parsing for event: {}".format(event.key_name))
             return []
