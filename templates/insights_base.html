@@ -6,27 +6,23 @@
 {% block content %}
 <div class="container">
   <div class="row">
-    <div class="col-sm-2 col-lg-2 year_list">
-      <div class="btn-group visible-xs">
-        <a class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" href="#">
-        {% if selected_year %}{{selected_year}}{% else %}Overview{% endif %}
-        <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu">
-          <li><a href="/insights">Overview</a></li>
-          {% for year in valid_years %}
-            <li><a href="/insights/{{year}}">{{year}}</a></li>
-          {% endfor %}
-        </ul>
+    <div class="col-sm-2 col-lg-2">
+      <div class="tba-sidenav-affixed">
+        <div class="btn-group">
+          <a class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" href="#">
+            {% if selected_year %}{{selected_year}}{% else %}Overview{% endif %}
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu tba-dropdown-menu-limited">
+            <li><a href="/insights">Overview</a></li>
+            {% for year in valid_years %}
+              <li><a href="/insights/{{year}}">{{year}}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
       </div>
-      <ul class="nav nav-pills nav-stacked hidden-xs" data-spy="affix">
-        <li {% if selected_year == year %}class="active"{% endif %}><a href="/insights">Overview</a></li>
-        {% for year in valid_years %}
-          <li {% if selected_year == year %}class="active"{% endif %}><a href="/insights/{{year}}">{{year}}</a></li>
-        {% endfor %}
-      </ul>
     </div>
-    <div class="col-xs-12 col-sm-10 col-lg-10">
+     <div class="col-xs-12 col-sm-10 col-lg-10">
       {% block detailed_content %}
       {% endblock %}
     </div>
