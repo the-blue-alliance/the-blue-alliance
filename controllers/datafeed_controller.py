@@ -233,6 +233,8 @@ class UsfirstAwardsGet(webapp.RequestHandler):
 
         event = Event.get_by_id(event_key)
         new_awards = AwardManipulator.createOrUpdate(datafeed.getEventAwards(event))
+        if type(new_awards) != list:
+            new_awards = [new_awards]
 
         template_values = {
             'awards': new_awards,
