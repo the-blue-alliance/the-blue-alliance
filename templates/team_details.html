@@ -72,7 +72,11 @@
                         {% include "match_partials/full_match_table.html" %}
                     {% endwith %}
                 {% else %}
-                    <p class="muted">No matches yet. Check back after {{ comp.event.start_date|date:"M d, Y" }}.</p>
+                    {% if comp.event.past %}
+                        <p class="muted">No matches played.</p>
+                    {% else %}
+                        <p class="muted">No matches yet. Check back after {{ comp.event.start_date|date:"M d, Y" }}.</p>
+                    {% endif %}
                 {% endif %}
             </div>
         </div>
