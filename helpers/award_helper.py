@@ -23,11 +23,13 @@ the the first list of the tuple and does NOT contain any string in the second
 list of the tuple.
 """
 AWARD_MATCHING_STRINGS = [
-    (AwardType.CHAIRMANS, (["chairman"], [])),
+    (AwardType.CHAIRMANS, (["chairman"], ["hon"])),
+    (AwardType.CHAIRMANS_HONORABLE_MENTION, (["chairman", "hon", "mention"], [])),
     (AwardType.ENGINEERING_INSPIRATION, (["engineering inspiration"], [])),
     (AwardType.WINNER, (["regional winner"], [])),
     (AwardType.WINNER, (["championship winner"], [])),
     (AwardType.WINNER, (["championship champion"], [])),
+    (AwardType.WINNER, (["division champion"], [])),
     (AwardType.WINNER, (["winner", "1"], [])),
     (AwardType.WINNER, (["winner", "2"], [])),
     (AwardType.WINNER, (["winner", "3"], [])),
@@ -42,6 +44,7 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.WINNER, (["championship", "champion", "4"], ["finalist"])),
     (AwardType.FINALIST, (["regional finalist"], ["dean"])),
     (AwardType.FINALIST, (["championship finalist"], ["dean"])),
+    (AwardType.FINALIST, (["division finalist"], ["dean"])),
     (AwardType.FINALIST, (["finalist", "1"], ["dean"])),
     (AwardType.FINALIST, (["finalist", "2"], ["dean"])),
     (AwardType.FINALIST, (["finalist", "3"], ["dean"])),
@@ -95,6 +98,19 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.OUTSTANDING_DEFENSE, (["outstanding defense"], [])),
     (AwardType.POWER_TO_SIMPLIFY, (["power to simplify"], [])),
     (AwardType.AGAINST_ALL_ODDS, (["against all odds"], [])),
+    (AwardType.RISING_STAR, (["autodesk", "rising star"], ["hon", "mention"])),
+    (AwardType.CONTENT_COMMUNICATION_HONORABLE_MENTION, (["content communication", "hon", "mention"], [])),
+    (AwardType.TECHNICAL_EXECUTION_HONORABLE_MENTION, (["technical execution", "hon", "mention"], [])),
+    (AwardType.REALIZATION, (["autodesk", "realization"], ["hon", "mention"])),
+    (AwardType.REALIZATION_HONORABLE_MENTION, (["autodesk", "realization", "hon", "mention"], [])),
+    (AwardType.DESIGN_YOUR_FUTURE, (["autodesk", "design your future"], ["hon", "mention"])),
+    (AwardType.DESIGN_YOUR_FUTURE_HONORABLE_MENTION, (["autodesk", "design your future", "hon", "mention"], [])),
+    (AwardType.SPECIAL_RECOGNITION_CHARACTER_ANIMATION, (["autodesk", "special recognition", "character animation"], ["hon", "mention"])),
+    (AwardType.HIGH_SCORE, (["high score"], [])),
+    (AwardType.TEACHER_PIONEER, (["teacher pioneer"], [])),
+    (AwardType.BEST_CRAFTSMANSHIP, (["best craftsmanship"], [])),
+    (AwardType.BEST_DEFENSIVE_MATCH, (["best defensive match"], [])),
+    (AwardType.PLAY_OF_THE_DAY, (["play of the day"], [])),
 ]
 
 

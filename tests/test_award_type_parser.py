@@ -63,3 +63,9 @@ class TestUsfirstEventTypeParser(unittest2.TestCase):
             csv_data = list(csv.reader(StringIO.StringIO(f.read()), delimiter=',', skipinitialspace=True))
             for award in csv_data:
                 self.assertNotEqual(AwardHelper.parse_award_type(award[2]), None)
+
+        # Make sure all old regional awards have matching types
+        with open('test_data/pre_2007_cmp_awards.csv', 'r') as f:
+            csv_data = list(csv.reader(StringIO.StringIO(f.read()), delimiter=',', skipinitialspace=True))
+            for award in csv_data:
+                self.assertNotEqual(AwardHelper.parse_award_type(award[2]), None)
