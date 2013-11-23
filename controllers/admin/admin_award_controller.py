@@ -62,6 +62,8 @@ class AdminAwardAdd(LoggedInHandler):
             ))
 
         new_awards = AwardManipulator.createOrUpdate(awards)
+        if type(new_awards) != list:
+            new_awards = [new_awards]
 
         template_values = {
             'awards': new_awards,
