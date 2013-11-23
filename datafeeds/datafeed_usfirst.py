@@ -54,6 +54,7 @@ class DatafeedUsfirst(DatafeedBase):
         "cur": "Curie",
         "gal": "Galileo",
         "new": "Newton",
+        "ein": "Einstein",  # Only used for 2008ein due to FIRST's inconsistent naming
     }
 
     YEAR_MATCH_PARSER = {
