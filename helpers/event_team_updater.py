@@ -2,6 +2,7 @@ import datetime
 
 from google.appengine.ext import ndb
 
+from models.award import Award
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
@@ -14,19 +15,30 @@ class EventTeamUpdater(object):
         """
         Updates EventTeams for an event.
         Returns a tuple of (teams, event_teams, event_team_keys_to_delete)
-        An EventTeam is valid iff the team played a match at the event or
-        the event has not yet occurred.
+        An EventTeam is valid iff the team:
+        a) played a match at the event,
+        b) the team received an award at the event,
+        c) or the event has not yet occurred.
         """
         event = Event.get_by_id(event_key)
 
-        # Add teams from Matches
+        # Add teams from Matches and Awards
         team_ids = set()
-        match_keys = Match.query(
-            Match.event == event.key).fetch(1000, keys_only=True)
-        matches = ndb.get_multi(match_keys)
-        for match in matches:
+        match_key_futures = Match.query(
+            Match.event == event.key).fetch_async(1000, keys_only=True)
+        award_key_futures = Award.query(
+            Award.event == event.key).fetch_async(1000, keys_only=True)
+        match_futures = ndb.get_multi_async(match_key_futures.get_result())
+        award_futures = ndb.get_multi_async(award_key_futures.get_result())
+
+        for match_future in match_futures:
+            match = match_future.get_result()
             for team in match.team_key_names:
                 team_ids.add(team)
+        for award_future in award_futures:
+            award = award_future.get_result()
+            for team_key in award.team_list:
+                team_ids.add(team_key.id())
 
         # Create or update EventTeams
         teams = [Team(id=team_id,

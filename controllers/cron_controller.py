@@ -58,10 +58,9 @@ class EventTeamRepairDo(webapp.RequestHandler):
 
 class EventTeamUpdate(webapp.RequestHandler):
     """
-    Task that adds to the EventTeam index for an Event from Matches.
+    Task that updates the EventTeam index for an Event.
     Can only update or delete EventTeams for unregistered teams.
     ^^^ Does it actually do this? Eugene -- 2013/07/30
-    Removes EventTeams for teams that haven't played any matches.
     """
     def get(self, event_key):
         teams, event_teams, et_keys_to_del = EventTeamUpdater.update(event_key)
@@ -71,8 +70,10 @@ class EventTeamUpdate(webapp.RequestHandler):
         if teams:
             event_teams = EventTeamManipulator.createOrUpdate(event_teams)
 
-        if et_keys_to_del:
-            ndb.delete_multi(et_keys_to_del)
+        # Temporarily disable deleting of event_teams. Too fragile. -Eugene 2013/11/23
+        et_keys_to_del = set()
+#         if et_keys_to_del:
+#             ndb.delete_multi(et_keys_to_del)
 
         template_values = {
             'event_teams': event_teams,
