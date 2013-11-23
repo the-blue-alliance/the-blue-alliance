@@ -31,7 +31,7 @@ class AdminAwardDashboard(LoggedInHandler):
 
 class AdminAwardAdd(LoggedInHandler):
     """
-    Add Award from JSON.
+    Add Award from CSV.
     """
     def post(self):
         self._require_admin()
