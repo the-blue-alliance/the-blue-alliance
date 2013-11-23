@@ -389,9 +389,12 @@ class InsightsHelper(object):
         regional_winners = {}
         for award_future in award_futures:
             award = award_future.get_result()
+            if award.event_type_enum in EventType.CMP_EVENT_TYPES:
+                continue
             for team_key in award.team_list:
                 team_key_name = team_key.id()
-                if award.award_type_enum == AwardType.CHAIRMANS:
+                if award.award_type_enum == AwardType.CHAIRMANS and award.event_type_enum in {EventType.REGIONAL, EventType.DISTRICT_CMP}:
+                    # Only count Chairman's at regionals and district championships
                     rca_winners.append(team_key_name)
                 elif award.award_type_enum == AwardType.WINNER:
                     if team_key_name in regional_winners:
