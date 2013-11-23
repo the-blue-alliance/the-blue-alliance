@@ -64,7 +64,7 @@ class EventTeamUpdater(object):
             existing_team_ids.add(et.team.id())
 
         et_keys_to_delete = set()
-        if event.end_date < datetime.datetime.now():
+        if event.end_date is not None and event.end_date < datetime.datetime.now():
             for team_id in existing_team_ids.difference(team_ids):
                 et_key_name = "{}_{}".format(event.key_name, team_id)
                 et_keys_to_delete.add(ndb.Key(EventTeam, et_key_name))
