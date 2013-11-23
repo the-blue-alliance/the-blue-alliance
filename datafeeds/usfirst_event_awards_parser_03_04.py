@@ -26,6 +26,8 @@ class UsfirstEventAwardsParser_03_04(ParserBase):
         awards_by_type = {}
         for tr in table.findAll('tr')[2:]:
             tds = tr.findAll('td')
+            if tds == []:
+                continue
 
             name_str = unicode(self._recurseUntilString(tds[0]))
             award_type_enum = AwardHelper.parse_award_type(name_str)
