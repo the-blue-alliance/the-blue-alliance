@@ -69,7 +69,7 @@ class TestCSVAwardssParser(unittest2.TestCase):
         for award in awards:
             num_awards += len(award['recipient_json_list'])
         self.assertEqual(num_awards, 560)
-        self.assertEqual(len(awards), 315)
+        self.assertEqual(len(awards), 322)
 
         awards = convert_to_comparable(awards)
 

@@ -23,8 +23,9 @@ the the first list of the tuple and does NOT contain any string in the second
 list of the tuple.
 """
 AWARD_MATCHING_STRINGS = [
-    (AwardType.CHAIRMANS, (["chairman"], ["hon"])),
+    (AwardType.CHAIRMANS, (["chairman"], ["hon", "finalist"])),
     (AwardType.CHAIRMANS_HONORABLE_MENTION, (["chairman", "hon", "mention"], [])),
+    (AwardType.CHAIRMANS_HONORABLE_MENTION, (["chairman", "finalist"], [])),
     (AwardType.ENGINEERING_INSPIRATION, (["engineering inspiration"], [])),
     (AwardType.WINNER, (["regional winner"], [])),
     (AwardType.WINNER, (["championship winner"], [])),
