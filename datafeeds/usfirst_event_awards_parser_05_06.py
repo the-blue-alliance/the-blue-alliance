@@ -21,10 +21,14 @@ class UsfirstEventAwardsParser_05_06(ParserBase):
         """
         html = html.decode('utf-8', 'ignore')  # Clean html before feeding itno BeautifulSoup
         soup = BeautifulSoup(html, convertEntities=BeautifulSoup.HTML_ENTITIES)
-        table = soup.findAll('table')[6]
+
+        # Bad formatting on some pages makes this necessary
+        trs1 = soup.findAll('tr', {'style': 'background-color:#D2D2FF;'})
+        trs2 = soup.findAll('tr', {'style': 'background-color:#FFFFFF;'})
+        trs = trs1 + trs2
 
         awards_by_type = {}
-        for tr in table.findAll('tr')[1:]:
+        for tr in trs:
             tds = tr.findAll('td')
 
             name_str = unicode(self._recurseUntilString(tds[0]))

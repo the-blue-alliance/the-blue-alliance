@@ -26,7 +26,7 @@ def convert_to_comparable(data):
 
 
 class TestUsfirstEventAwardsParser_05_06(unittest2.TestCase):
-    def test_parse_regional_2006(self):
+    def test_parse_regional_2006sj(self):
         with open('test_data/usfirst_html/usfirst_event_awards_2006sj.html', 'r') as f:
             awards, _ = UsfirstEventAwardsParser_05_06.parse(f.read())
 
@@ -68,7 +68,29 @@ class TestUsfirstEventAwardsParser_05_06(unittest2.TestCase):
         }
         self.assertTrue(individual_award in awards)
 
-    def test_parse_regional_2005(self):
+    def test_parse_regional_2006or(self):
+        with open('test_data/usfirst_html/usfirst_event_awards_2006or.html', 'r') as f:
+            awards, _ = UsfirstEventAwardsParser_05_06.parse(f.read())
+
+        # Check number of parsed awards
+        num_awards = 0
+        for award in awards:
+            num_awards += len(award['recipient_json_list'])
+        self.assertEqual(num_awards, 28)
+        self.assertEqual(len(awards), 22)
+
+        awards = convert_to_comparable(awards)
+
+        # Test Team Award
+        team_award = {
+            'name_str': "Regional Chairman's Award",
+            'award_type_enum': AwardType.CHAIRMANS,
+            'team_number_list': [492],
+            'recipient_json_list': [{'team_number': 492, 'awardee': None}],
+        }
+        self.assertTrue(team_award in awards)
+
+    def test_parse_regional_2005sj(self):
         with open('test_data/usfirst_html/usfirst_event_awards_2005sj.html', 'r') as f:
             awards, _ = UsfirstEventAwardsParser_05_06.parse(f.read())
 
@@ -94,9 +116,9 @@ class TestUsfirstEventAwardsParser_05_06(unittest2.TestCase):
         multi_team_award = {
             'name_str': "Regional Winner",
             'award_type_enum': AwardType.WINNER,
-            'team_number_list': [254, 980, 22],
-            'recipient_json_list': [{'team_number': 254, 'awardee': None},
-                                    {'team_number': 980, 'awardee': None},
+            'team_number_list': [980, 254, 22],
+            'recipient_json_list': [{'team_number': 980, 'awardee': None},
+                                    {'team_number': 254, 'awardee': None},
                                     {'team_number': 22, 'awardee': None}],
         }
         self.assertTrue(multi_team_award in awards)
