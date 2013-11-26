@@ -122,7 +122,7 @@ class TeamDetail(CacheableHandler):
 
     def _render(self, team_number, year=None, explicit_year=False):
         @ndb.tasklet
-        def get_events_async():
+        def get_events_and_matches_async():
             event_team_keys = yield EventTeam.query(EventTeam.team == team.key).fetch_async(1000, keys_only=True)
             event_teams = yield ndb.get_multi_async(event_team_keys)
             event_keys = []
@@ -130,15 +130,15 @@ class TeamDetail(CacheableHandler):
                 years.add(event_team.year)  # years is a "global" variable (defined below). Doing this removes the complexity of having to propagate the years up through the tasklet call chain.
                 if event_team.year == year:
                     event_keys.append(event_team.event)
-            events = yield ndb.get_multi_async(event_keys)
-            raise ndb.Return(events)
+            events, matches = yield ndb.get_multi_async(event_keys), get_matches_async(event_keys)
+            raise ndb.Return((events, matches))
 
         @ndb.tasklet
-        def get_matches_async(events):
-            if events == []:
+        def get_matches_async(event_keys):
+            if event_keys == []:
                 raise ndb.Return([])
             match_keys = yield Match.query(
-                Match.event.IN([event.key for event in events]), Match.team_key_names == team.key_name).fetch_async(500, keys_only=True)
+                Match.event.IN(event_keys), Match.team_key_names == team.key_name).fetch_async(500, keys_only=True)
             matches = yield ndb.get_multi_async(match_keys)
             raise ndb.Return(matches)
 
@@ -150,8 +150,7 @@ class TeamDetail(CacheableHandler):
 
         @ndb.toplevel
         def get_events_matches_awards():
-            events, awards = yield get_events_async(), get_awards_async()
-            matches = yield get_matches_async(events)
+            (events, matches), awards = yield get_events_and_matches_async(), get_awards_async()
             raise ndb.Return(events, matches, awards)
 
         team = Team.get_by_id("frc" + team_number)
