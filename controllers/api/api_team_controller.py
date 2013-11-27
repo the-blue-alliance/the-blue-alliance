@@ -7,7 +7,7 @@ from datetime import datetime
 from controllers.api.api_base_controller import ApiBaseController
 
 from helpers.model_to_dict import ModelToDict
-from helpers.data_fetcher import DataFetcher
+from helpers.data_fetchers.team_details_data_fetcher import TeamDetailsDataFetcher
 
 from models.team import Team
 
@@ -36,7 +36,7 @@ class ApiTeamController(ApiBaseController):
             self._errors = json.dumps({"404": "%s team not found" % self.team_key})
             self.abort(404)
 
-        events_sorted, matches_by_event_key, awards_by_event_key, _ = DataFetcher.fetch_team_data(self.team, self.year)
+        events_sorted, matches_by_event_key, awards_by_event_key, _ = TeamDetailsDataFetcher.fetch(self.team, self.year)
         team_dict = ModelToDict.teamConverter(self.team)
 
         team_dict["events"] = list()

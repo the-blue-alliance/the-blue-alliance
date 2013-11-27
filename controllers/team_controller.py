@@ -12,7 +12,7 @@ from base_controller import CacheableHandler
 from helpers.event_helper import EventHelper
 from helpers.match_helper import MatchHelper
 from helpers.award_helper import AwardHelper
-from helpers.data_fetcher import DataFetcher
+from helpers.data_fetchers.team_details_data_fetcher import TeamDetailsDataFetcher
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
@@ -126,7 +126,7 @@ class TeamDetail(CacheableHandler):
         if not team:
             return self.redirect("/error/404")
 
-        events_sorted, matches_by_event_key, awards_by_event_key, valid_years = DataFetcher.fetch_team_data(team, year, return_valid_years=True)
+        events_sorted, matches_by_event_key, awards_by_event_key, valid_years = TeamDetailsDataFetcher.fetch(team, year, return_valid_years=True)
 
         participation = []
         year_wlt_list = []

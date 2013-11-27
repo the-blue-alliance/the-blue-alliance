@@ -1,16 +1,13 @@
-import logging
-
 from google.appengine.ext import ndb
 
 from  models.award import Award
-from  models.event import Event
 from  models.event_team import EventTeam
 from  models.match import Match
 
 
-class DataFetcher(object):
+class TeamDetailsDataFetcher(object):
     @classmethod
-    def fetch_team_data(self, team, year, return_valid_years=False):
+    def fetch(self, team, year, return_valid_years=False):
         """
         returns: events_sorted, matches_by_event_key, awards_by_event_key, valid_years
         of a team for a given year
