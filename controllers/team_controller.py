@@ -134,16 +134,16 @@ class TeamDetail(CacheableHandler):
         current_event = None
         matches_upcoming = None
         short_cache = False
-        for e in events_sorted:
-            event_matches = matches_by_event_key.get(e.key, [])
-            event_awards = AwardHelper.organizeAwards(awards_by_event_key.get(e.key, []))
+        for event in events_sorted:
+            event_matches = matches_by_event_key.get(event.key, [])
+            event_awards = AwardHelper.organizeAwards(awards_by_event_key.get(event.key, []))
             matches_organized = MatchHelper.organizeMatches(event_matches)
 
-            if e.now:
-                current_event = e
+            if event.now:
+                current_event = event
                 matches_upcoming = MatchHelper.upcomingMatches(event_matches)
 
-            if e.within_a_day:
+            if event.within_a_day:
                 short_cache = True
 
             wlt = EventHelper.calculateTeamWLTFromMatches(team.key_name, event_matches)
@@ -154,13 +154,13 @@ class TeamDetail(CacheableHandler):
                 display_wlt = wlt
 
             team_rank = None
-            if e.rankings:
-                for element in e.rankings:
+            if event.rankings:
+                for element in event.rankings:
                     if element[1] == team_number:
                         team_rank = element[0]
                         break
 
-            participation.append({'event': e,
+            participation.append({'event': event,
                                    'matches': matches_organized,
                                    'wlt': display_wlt,
                                    'rank': team_rank,

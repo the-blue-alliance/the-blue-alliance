@@ -40,10 +40,10 @@ class ApiTeamController(ApiBaseController):
         team_dict = ModelToDict.teamConverter(self.team)
 
         team_dict["events"] = list()
-        for e in events_sorted:
-            event_dict = ModelToDict.eventConverter(e)
-            event_dict["matches"] = [ModelToDict.matchConverter(match) for match in matches_by_event_key.get(e.key, [])]
-            event_dict["awards"] = [ModelToDict.awardConverter(award) for award in awards_by_event_key.get(e.key, [])]
+        for event in events_sorted:
+            event_dict = ModelToDict.eventConverter(event)
+            event_dict["matches"] = [ModelToDict.matchConverter(match) for match in matches_by_event_key.get(event.key, [])]
+            event_dict["awards"] = [ModelToDict.awardConverter(award) for award in awards_by_event_key.get(event.key, [])]
             team_dict["events"].append(event_dict)
 
         return json.dumps(team_dict, ensure_ascii=True)
