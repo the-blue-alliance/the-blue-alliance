@@ -32,8 +32,7 @@ var GamedayFrame = React.createClass({
   render: function() {
     return (
       <div className="gameday container">
-        <GamedayNavbar />
-        <WebcastAddButton onWebcastAdd={this.handleWebcastAdd} />
+        <GamedayNavbar onWebcastAdd={this.handleWebcastAdd} />
         <VideoGrid data={this.state.data} />
       </div>
     );
@@ -43,48 +42,46 @@ var GamedayFrame = React.createClass({
 var GamedayNavbar = React.createClass({
   render: function() {
     return (
-      <div className="navbar navbar-default navbar-fixed-top">
-        <div className="gameday-container">
-          <div className="brand gameday-brand pull-left">
-            <span className="gameday-title">TBA GameDay</span>
-            <a className="main-site" href="/">To main site &raquo;</a>
-            <div className="div_helper"></div>
-          </div>
+      <nav className="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div className="navbar-header">
+          <button type="button" className="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span className="sr-only">Toggle navigation</span>
+            <span className="icon-bar"></span>
+            <span className="icon-bar"></span>
+            <span className="icon-bar"></span>
+          </button>
+          <a className="navbar-brand" href="#">Gameday</a>
+        </div>
 
-          <ul className="nav navbar-nav pull-right">
+        <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul className="nav navbar-nav navbar-right">
+            <li><WebcastAddButton onWebcastAdd={this.props.onWebcastAdd} /></li>
             <li className="dropdown">
-              <a className="dropdown-toggle" href="#">Layouts</a>
+              <a href="#" className="dropdown-toggle" data-toggle="dropdown">Layouts <b className="caret"></b></a>
               <ul className="dropdown-menu">
-                <li><a className="layout-choice layout_0" href="javascript:layout_0()">Single View</a></li>
-                <li><a className="layout-choice layout_1" href="javascript:layout_1()">Split View</a></li>
-                <li><a className="layout-choice layout_2" href="javascript:layout_2()">1+2 View</a></li>
-                <li><a className="layout-choice layout_3" href="javascript:layout_3()">Quad View</a></li>
-                <li><a className="layout-choice layout_6" href="javascript:layout_6()">1+3 View</a></li>
-                <li><a className="layout-choice layout_4" href="javascript:layout_4()">1+4 View</a></li>
-                <li><a className="layout-choice layout_5" href="javascript:layout_5()">Hex View</a></li>
+                <li><a href="#">First</a></li>
+                <li><a href="#">Second</a></li>
+                <li><a href="#">Third</a></li>
+                <li className="divider"></li>
+                <li><a href="#">Separated link</a></li>
               </ul>
             </li>
-            
             <li className="dropdown">
-              <a className="dropdown-toggle" href="#">Webcasts</a>
-              <ul className="dropdown-menu webcasts">
-                <li><a>No webcasts</a></li>
+              <a href="#" className="dropdown-toggle" data-toggle="dropdown">Webcasts <b className="caret"></b></a>
+              <ul className="dropdown-menu">
+                <li><a href="#">First</a></li>
+                <li><a href="#">Second</a></li>
+                <li><a href="#">Third</a></li>
+                <li className="divider"></li>
+                <li><a href="#">Separated link</a></li>
               </ul>
             </li>
-            
-            <li className="dropdown">
-              <a className="dropdown-toggle" href="#">Results</a>
-              <ul className="dropdown-menu results">
-                <li><a>No events</a></li>
-              </ul>
-            </li>
-            
-            <li className="social"><a className="social-toggle" href="javascript:social_tab();">Social Feed</a></li>
-            <li className="chat"><a className="chat-toggle" href="javascript:chat_tab();">Chat</a></li>
-            <li className="settings"><a className="settings-button" href="#settings-modal" data-toggle="modal"><span className="glyphicon glyphicon-cog"></span></a></li>
+            <li><a href="#" className="btn btn-default">Chat</a></li>
+            <li><a href="#" className="btn btn-default">Hashtags</a></li>
+            <li><a href="#">Settings</a></li>
           </ul>
         </div>
-      </div>
+      </nav>
     );
   }
 });
@@ -105,7 +102,7 @@ var VideoGrid = React.createClass({
 var VideoCell = React.createClass({
   render: function() {
     return (
-      <div className="videoCell">
+      <div className="videoCell ui-droppable">
         <h3>{this.props.event_name}</h3>
         <iframe width="560" height="315" src={this.props.embed} frameBorder="0" allowFullScreen></iframe>
       </div>
@@ -122,7 +119,7 @@ var WebcastAddButton = React.createClass({
   },
   render: function() {
     return (
-      <a href="#" onClick={this.handleClick}>Add Webcast</a>
+      <a href="#" className="btn btn-default" onClick={this.handleClick}>Add Webcast</a>
     )
   }
 })
