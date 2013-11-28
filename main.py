@@ -7,6 +7,7 @@ import tba_config
 from controllers.account_controller import AccountEdit, AccountLogout, AccountOverview, AccountRegister
 from controllers.ajax_controller import TypeaheadHandler, WebcastHandler
 from controllers.event_controller import EventList, EventDetail, EventRss
+from controllers.gameday2_controller import Gameday2Controller
 from controllers.insights_controller import InsightsOverview, InsightsDetail
 from controllers.main_controller import ContactHandler, HashtagsHandler, \
       MainKickoffHandler, MainBuildseasonHandler, MainCompetitionseasonHandler, \
@@ -39,6 +40,7 @@ app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['landing_
                                ('/events/(.*)', EventList),
                                ('/event/(.*)', EventDetail),
                                ('/gameday', GamedayHandler),
+                               ('/gameday2', Gameday2Controller),
                                ('/hashtags', HashtagsHandler),
                                ('/insights', InsightsOverview),
                                ('/insights/(.*)', InsightsDetail),
