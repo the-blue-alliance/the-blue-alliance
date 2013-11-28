@@ -88,12 +88,20 @@ var GamedayNavbar = React.createClass({
 
 var VideoGrid = React.createClass({
   render: function() {
-    var videoCellNodes = this.props.data.map(function (eventModel) {
-      return <VideoCell eventModel={eventModel} />;
-    });
     return (
       <div className="videoGrid">
-        {videoCellNodes}
+        <table width="100%">
+          <tr>
+            <td>
+              <VideoCell eventModel={this.props.data[0]} />
+            </td>
+          </tr>
+          <tr>
+            <td><VideoCell eventModel={this.props.data[1]} /></td>
+            <td><VideoCell eventModel={this.props.data[2]} /></td>
+            <td><VideoCell eventModel={this.props.data[3]} /></td>
+          </tr>
+        </table>
       </div>
     );
   }
@@ -101,8 +109,10 @@ var VideoGrid = React.createClass({
 
 var VideoCell = React.createClass({
   render: function() {
-    if (this.props.eventModel.webcasts) {
-      var src = "//www.youtube.com/embed/" + this.props.eventModel.webcasts[0].channel;
+    if (this.props.eventModel) {
+      if (this.props.eventModel.webcasts) {
+        var src = "//www.youtube.com/embed/" + this.props.eventModel.webcasts[0].channel;
+      }
     } else {
       var src = "";
     }
