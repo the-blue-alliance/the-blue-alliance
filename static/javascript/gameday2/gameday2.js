@@ -32,7 +32,7 @@ var GamedayFrame = React.createClass({
   render: function() {
     return (
       <div className="gameday container">
-        <GamedayNavbar onWebcastAdd={this.handleWebcastAdd} />
+        <GamedayNavbar data={this.state.data} onWebcastAdd={this.handleWebcastAdd} />
         <VideoGrid data={this.state.data} />
       </div>
     );
@@ -41,6 +41,9 @@ var GamedayFrame = React.createClass({
 
 var GamedayNavbar = React.createClass({
   render: function() {
+    var webcastListItems = this.props.data.map(function (eventModel) {
+      return <WebcastListItem eventModel={eventModel} />
+    });
     return (
       <nav className="navbar navbar-default navbar-fixed-top" role="navigation">
         <div className="navbar-header">
@@ -69,9 +72,7 @@ var GamedayNavbar = React.createClass({
             <li className="dropdown">
               <a href="#" className="dropdown-toggle" data-toggle="dropdown">Webcasts <b className="caret"></b></a>
               <ul className="dropdown-menu">
-                <li><a href="#">First</a></li>
-                <li><a href="#">Second</a></li>
-                <li><a href="#">Third</a></li>
+                {webcastListItems}
                 <li className="divider"></li>
                 <li><a href="#">Separated link</a></li>
               </ul>
@@ -88,22 +89,21 @@ var GamedayNavbar = React.createClass({
 
 var VideoGrid = React.createClass({
   render: function() {
+    var videoCellNodes = this.props.data.map(function (eventModel) {
+      return (
+        <VideoCell
+          eventModel={eventModel}
+          onDrop={this.handleDrop} />
+        );
+    });
     return (
       <div className="videoGrid">
-        <table width="100%">
-          <tr>
-            <td>
-              <VideoCell eventModel={this.props.data[0]} />
-            </td>
-          </tr>
-          <tr>
-            <td><VideoCell eventModel={this.props.data[1]} /></td>
-            <td><VideoCell eventModel={this.props.data[2]} /></td>
-            <td><VideoCell eventModel={this.props.data[3]} /></td>
-          </tr>
-        </table>
+        {videoCellNodes}
       </div>
     );
+  },
+  handleDrop: function(ev) {
+    alert(ev);
   }
 });
 
@@ -138,6 +138,14 @@ var WebcastAddButton = React.createClass({
       <a href="#" className="btn btn-default" onClick={this.handleClick}>Add Webcast</a>
     )
   }
+})
+
+var WebcastListItem = React.createClass({
+  render: function() {
+    return (
+      <li><a href="#">{this.props.eventModel.name}</a></li>
+    )
+  },
 })
 
 var data = [
