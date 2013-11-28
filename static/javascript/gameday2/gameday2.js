@@ -31,10 +31,59 @@ var GamedayFrame = React.createClass({
   },
   render: function() {
     return (
-      <div className="gameday">
-        <h1>Gameday!</h1>
+      <div className="gameday container">
+        <GamedayNavbar />
         <WebcastAddButton onWebcastAdd={this.handleWebcastAdd} />
         <VideoGrid data={this.state.data} />
+      </div>
+    );
+  }
+});
+
+var GamedayNavbar = React.createClass({
+  render: function() {
+    return (
+      <div className="navbar navbar-default navbar-fixed-top">
+        <div className="gameday-container">
+          <div className="brand gameday-brand pull-left">
+            <span className="gameday-title">TBA GameDay</span>
+            <a className="main-site" href="/">To main site &raquo;</a>
+            <div className="div_helper"></div>
+          </div>
+
+          <ul className="nav navbar-nav pull-right">
+            <li className="dropdown">
+              <a className="dropdown-toggle" href="#">Layouts</a>
+              <ul className="dropdown-menu">
+                <li><a className="layout-choice layout_0" href="javascript:layout_0()">Single View</a></li>
+                <li><a className="layout-choice layout_1" href="javascript:layout_1()">Split View</a></li>
+                <li><a className="layout-choice layout_2" href="javascript:layout_2()">1+2 View</a></li>
+                <li><a className="layout-choice layout_3" href="javascript:layout_3()">Quad View</a></li>
+                <li><a className="layout-choice layout_6" href="javascript:layout_6()">1+3 View</a></li>
+                <li><a className="layout-choice layout_4" href="javascript:layout_4()">1+4 View</a></li>
+                <li><a className="layout-choice layout_5" href="javascript:layout_5()">Hex View</a></li>
+              </ul>
+            </li>
+            
+            <li className="dropdown">
+              <a className="dropdown-toggle" href="#">Webcasts</a>
+              <ul className="dropdown-menu webcasts">
+                <li><a>No webcasts</a></li>
+              </ul>
+            </li>
+            
+            <li className="dropdown">
+              <a className="dropdown-toggle" href="#">Results</a>
+              <ul className="dropdown-menu results">
+                <li><a>No events</a></li>
+              </ul>
+            </li>
+            
+            <li className="social"><a className="social-toggle" href="javascript:social_tab();">Social Feed</a></li>
+            <li className="chat"><a className="chat-toggle" href="javascript:chat_tab();">Chat</a></li>
+            <li className="settings"><a className="settings-button" href="#settings-modal" data-toggle="modal"><span className="glyphicon glyphicon-cog"></span></a></li>
+          </ul>
+        </div>
       </div>
     );
   }
