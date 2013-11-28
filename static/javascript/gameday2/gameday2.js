@@ -88,8 +88,8 @@ var GamedayNavbar = React.createClass({
 
 var VideoGrid = React.createClass({
   render: function() {
-    var videoCellNodes = this.props.data.map(function (video) {
-      return <VideoCell embed={video.embed} event_name={video.event_name} />;
+    var videoCellNodes = this.props.data.map(function (eventModel) {
+      return <VideoCell eventModel={eventModel} />;
     });
     return (
       <div className="videoGrid">
@@ -101,10 +101,15 @@ var VideoGrid = React.createClass({
 
 var VideoCell = React.createClass({
   render: function() {
+    if (this.props.eventModel.webcasts) {
+      var src = "//www.youtube.com/embed/" + this.props.eventModel.webcasts[0].channel;
+    } else {
+      var src = "";
+    }
     return (
-      <div className="videoCell ui-droppable">
-        <h3>{this.props.event_name}</h3>
-        <iframe width="560" height="315" src={this.props.embed} frameBorder="0" allowFullScreen></iframe>
+      <div className="videoCell">
+        <h3>{this.props.name}</h3>
+        <iframe width="560" height="315" src={src} frameBorder="0" allowFullScreen></iframe>
       </div>
     );
   }
@@ -112,9 +117,10 @@ var VideoCell = React.createClass({
 
 var WebcastAddButton = React.createClass({
   handleClick: function() {
-    var embed = "//www.youtube.com/embed/qwaptht9WYg?rel=0";
-    var event_name = "New Event!";
-    this.props.onWebcastAdd({embed: embed, event_name: event_name});
+    var key = "2014az";
+    var name = "Arizona!";
+    var webcasts = [{"type": "youtube", "channel": "QZv70PG9eXM"}];
+    this.props.onWebcastAdd({key: key, name: name, webcasts: webcasts});
     return false;
   },
   render: function() {
@@ -125,8 +131,8 @@ var WebcastAddButton = React.createClass({
 })
 
 var data = [
-  {"embed": "//www.youtube.com/embed/olhwB5grOtA?rel=0", "event_name": "BAE Granite State"},
-  {"embed": "//www.youtube.com/embed/OtAZ4_Nh3CY?rel=0", "event_name": "UTC Regional"}
+  {"key": "2014nh", "name": "BAE Granite State", "webcasts": [{"type": "youtube", "channel": "olhwB5grOtA"}]},
+  {"key": "2014ct", "name": "UTC Regional", "webcasts": [{"type": "youtube", "channel": "OtAZ4_Nh3CY"}]}
 ]
 
 React.renderComponent(
