@@ -3,47 +3,45 @@ var GamedayFrame = React.createClass({
   loadDataFromServer: function() {
     $.ajax({
       url: this.props.url,
-      success: function(data) {
-        this.setState({data: data});
-      }.bind(this)
-    });
-  },
-  handleWebcastAdd: function(webcast) {
-    var webcasts = this.state.data;
-    var newWebcasts = webcasts.concat([webcast]);
-    this.setState({data: newWebcasts});
-    $.ajax({
-      url: this.props.url,
-      type: 'POST',
-      data: webcast,
-      success: function(data) {
-        this.setState({data: data});
+      success: function(events) {
+        this.setState({events: events});
       }.bind(this)
     });
   },
   getInitialState: function() {
-    return {data: []};
+    return {
+      events: [],
+      displayedEvents: []
+    };
   },
   componentWillMount: function() {
     //this.loadDataFromServer();
     //setInterval(this.loadDataFromServer, this.props.pollInterval);
-    this.setState({data: this.props.data})
+    this.setState({events: this.props.events})
   },
   render: function() {
     return (
       <div className="gameday container">
-        <GamedayNavbar data={this.state.data} onWebcastAdd={this.handleWebcastAdd} />
-        <VideoGrid data={this.state.data} />
+        <GamedayNavbar 
+          events={this.state.events}
+          onWebcastAdd={this.handleWebcastAdd}
+          onWebcastReset={this.handleWebcastReset} />
+        <VideoGrid events={this.state.displayedEvents} />
       </div>
     );
+  },
+  handleWebcastAdd: function(eventModel) {
+    var displayedEvents = this.state.displayedEvents;
+    var newDisplayedEvents = displayedEvents.concat([eventModel]);
+    this.setState({displayedEvents: newDisplayedEvents});
+  },
+  handleWebcastReset: function() {
+    this.setState({displayedEvents: []});
   }
 });
 
 var GamedayNavbar = React.createClass({
   render: function() {
-    var webcastListItems = this.props.data.map(function (eventModel) {
-      return <WebcastListItem eventModel={eventModel} />
-    });
     return (
       <nav className="navbar navbar-default navbar-fixed-top" role="navigation">
         <div className="navbar-header">
@@ -58,7 +56,6 @@ var GamedayNavbar = React.createClass({
 
         <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul className="nav navbar-nav navbar-right">
-            <li><WebcastAddButton onWebcastAdd={this.props.onWebcastAdd} /></li>
             <li className="dropdown">
               <a href="#" className="dropdown-toggle" data-toggle="dropdown">Layouts <b className="caret"></b></a>
               <ul className="dropdown-menu">
@@ -69,14 +66,10 @@ var GamedayNavbar = React.createClass({
                 <li><a href="#">Separated link</a></li>
               </ul>
             </li>
-            <li className="dropdown">
-              <a href="#" className="dropdown-toggle" data-toggle="dropdown">Webcasts <b className="caret"></b></a>
-              <ul className="dropdown-menu">
-                {webcastListItems}
-                <li className="divider"></li>
-                <li><a href="#">Separated link</a></li>
-              </ul>
-            </li>
+            <WebcastDropdown
+              events={this.props.events}
+              onWebcastAdd={this.props.onWebcastAdd}
+              onWebcastReset={this.props.onWebcastReset} />
             <li><a href="#" className="btn btn-default">Chat</a></li>
             <li><a href="#" className="btn btn-default">Hashtags</a></li>
             <li><a href="#">Settings</a></li>
@@ -89,7 +82,7 @@ var GamedayNavbar = React.createClass({
 
 var VideoGrid = React.createClass({
   render: function() {
-    var videoCellNodes = this.props.data.map(function (eventModel) {
+    var videoCellNodes = this.props.events.map(function (eventModel) {
       return (
         <VideoCell
           eventModel={eventModel}
@@ -102,9 +95,6 @@ var VideoGrid = React.createClass({
       </div>
     );
   },
-  handleDrop: function(ev) {
-    alert(ev);
-  }
 });
 
 var VideoCell = React.createClass({
@@ -125,35 +115,60 @@ var VideoCell = React.createClass({
   }
 });
 
-var WebcastAddButton = React.createClass({
-  handleClick: function() {
-    var key = "2014az";
-    var name = "Arizona!";
-    var webcasts = [{"type": "youtube", "channel": "QZv70PG9eXM"}];
-    this.props.onWebcastAdd({key: key, name: name, webcasts: webcasts});
-    return false;
-  },
+var WebcastDropdown = React.createClass({
   render: function() {
+    var webcastListItems = [];
+    for (var index in this.props.events) {
+      webcastListItems.push(<WebcastListItem eventModel={this.props.events[index]} onWebcastAdd={this.props.onWebcastAdd} />)
+    };
     return (
-      <a href="#" className="btn btn-default" onClick={this.handleClick}>Add Webcast</a>
-    )
+      <li className="dropdown">
+        <a href="#" className="dropdown-toggle" data-toggle="dropdown">Webcasts <b className="caret"></b></a>
+        <ul className="dropdown-menu">
+          {webcastListItems}
+          <li className="divider"></li>
+          <BootstrapNavDropdownListItem handleClick={this.props.onWebcastReset}>Reset Webcasts</BootstrapNavDropdownListItem>
+        </ul>
+      </li>
+    );    
   }
 })
 
 var WebcastListItem = React.createClass({
+  handleClick: function() {
+    this.props.onWebcastAdd(this.props.eventModel);
+  },
+  render: function() {
+    return <BootstrapNavDropdownListItem handleClick={this.handleClick}>{this.props.eventModel.name}</BootstrapNavDropdownListItem>
+  },
+})
+
+var BootstrapNavDropdownListItem = React.createClass({
+  componentWillMount: function() {
+    if (!this.props.a) {
+      this.props.a = "#";
+    }
+  },
+  handleClick: function() {
+    if (this.props.handleClick) {
+      this.props.handleClick();
+      return false;
+    }
+  },
   render: function() {
     return (
-      <li><a href="#">{this.props.eventModel.name}</a></li>
+      <li><a href="{this.props.a}" onClick={this.handleClick}>{this.props.children}</a></li>
     )
   },
 })
 
-var data = [
+var events = [
   {"key": "2014nh", "name": "BAE Granite State", "webcasts": [{"type": "youtube", "channel": "olhwB5grOtA"}]},
-  {"key": "2014ct", "name": "UTC Regional", "webcasts": [{"type": "youtube", "channel": "OtAZ4_Nh3CY"}]}
+  {"key": "2014ct", "name": "UTC Regional", "webcasts": [{"type": "youtube", "channel": "FKpIWmsDPq4"}]},
+  {"key": "2014az", "name": "Arizona!", "webcasts": [{"type": "youtube", "channel": "QZv70PG9eXM"}]}
 ]
 
 React.renderComponent(
-  <GamedayFrame data={data} pollInterval={20000} />,
+  <GamedayFrame events={events} pollInterval={20000} />,
   document.getElementById('content')
 );
