@@ -21,7 +21,7 @@ var GamedayFrame = React.createClass({
   },
   render: function() {
     return (
-      <div className="gameday container">
+      <div className="gameday container-full">
         <GamedayNavbar 
           events={this.state.events}
           onWebcastAdd={this.handleWebcastAdd}
@@ -98,6 +98,9 @@ var VideoGrid = React.createClass({
 });
 
 var VideoCell = React.createClass({
+  componentDidMount: function () {
+    $(this.getDOMNode()).fitVids();
+  },
   render: function() {
     if (this.props.eventModel) {
       if (this.props.eventModel.webcasts) {
@@ -109,7 +112,9 @@ var VideoCell = React.createClass({
     return (
       <div className="videoCell">
         <h3>{this.props.name}</h3>
-        <iframe width="560" height="315" src={src} frameBorder="0" allowFullScreen></iframe>
+        <div className="fitvids">
+          <iframe width="560" height="315" src={src} frameBorder="0" allowFullScreen></iframe>
+        </div>
       </div>
     );
   }
