@@ -12,6 +12,7 @@ from base_controller import CacheableHandler
 from helpers.event_helper import EventHelper
 from helpers.match_helper import MatchHelper
 from helpers.award_helper import AwardHelper
+from helpers.data_fetchers.team_details_data_fetcher import TeamDetailsDataFetcher
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
@@ -121,59 +122,11 @@ class TeamDetail(CacheableHandler):
         super(TeamDetail, self).get(team_number, year, explicit_year)
 
     def _render(self, team_number, year=None, explicit_year=False):
-        @ndb.tasklet
-        def get_events_and_matches_async():
-            event_team_keys = yield EventTeam.query(EventTeam.team == team.key).fetch_async(1000, keys_only=True)
-            event_teams = yield ndb.get_multi_async(event_team_keys)
-            event_keys = []
-            for event_team in event_teams:
-                years.add(event_team.year)  # years is a "global" variable (defined below). Doing this removes the complexity of having to propagate the years up through the tasklet call chain.
-                if event_team.year == year:
-                    event_keys.append(event_team.event)
-            events, matches = yield ndb.get_multi_async(event_keys), get_matches_async(event_keys)
-            raise ndb.Return((events, matches))
-
-        @ndb.tasklet
-        def get_matches_async(event_keys):
-            if event_keys == []:
-                raise ndb.Return([])
-            match_keys = yield Match.query(
-                Match.event.IN(event_keys), Match.team_key_names == team.key_name).fetch_async(500, keys_only=True)
-            matches = yield ndb.get_multi_async(match_keys)
-            raise ndb.Return(matches)
-
-        @ndb.tasklet
-        def get_awards_async():
-            award_keys = yield Award.query(Award.year == year, Award.team_list == team.key).fetch_async(500, keys_only=True)
-            awards = yield ndb.get_multi_async(award_keys)
-            raise ndb.Return(awards)
-
-        @ndb.toplevel
-        def get_events_matches_awards():
-            (events, matches), awards = yield get_events_and_matches_async(), get_awards_async()
-            raise ndb.Return(events, matches, awards)
-
         team = Team.get_by_id("frc" + team_number)
         if not team:
             return self.redirect("/error/404")
 
-        years = set()
-        events, matches, awards = get_events_matches_awards()
-        years = sorted(years)
-        events = sorted(events, key=lambda e: e.start_date if e.start_date else datetime.datetime(year, 12, 31))  # unknown goes last
-
-        matches_by_event_key = {}
-        for match in matches:
-            if match.event in matches_by_event_key:
-                matches_by_event_key[match.event].append(match)
-            else:
-                matches_by_event_key[match.event] = [match]
-        awards_by_event_key = {}
-        for award in awards:
-            if award.event in awards_by_event_key:
-                awards_by_event_key[award.event].append(award)
-            else:
-                awards_by_event_key[award.event] = [award]
+        events_sorted, matches_by_event_key, awards_by_event_key, valid_years = TeamDetailsDataFetcher.fetch(team, year, return_valid_years=True)
 
         participation = []
         year_wlt_list = []
@@ -181,16 +134,16 @@ class TeamDetail(CacheableHandler):
         current_event = None
         matches_upcoming = None
         short_cache = False
-        for e in events:
-            event_matches = matches_by_event_key.get(e.key, [])
-            event_awards = AwardHelper.organizeAwards(awards_by_event_key.get(e.key, []))
+        for event in events_sorted:
+            event_matches = matches_by_event_key.get(event.key, [])
+            event_awards = AwardHelper.organizeAwards(awards_by_event_key.get(event.key, []))
             matches_organized = MatchHelper.organizeMatches(event_matches)
 
-            if e.now:
-                current_event = e
+            if event.now:
+                current_event = event
                 matches_upcoming = MatchHelper.upcomingMatches(event_matches)
 
-            if e.within_a_day:
+            if event.within_a_day:
                 short_cache = True
 
             wlt = EventHelper.calculateTeamWLTFromMatches(team.key_name, event_matches)
@@ -201,13 +154,13 @@ class TeamDetail(CacheableHandler):
                 display_wlt = wlt
 
             team_rank = None
-            if e.rankings:
-                for element in e.rankings:
+            if event.rankings:
+                for element in event.rankings:
                     if element[1] == team_number:
                         team_rank = element[0]
                         break
 
-            participation.append({'event': e,
+            participation.append({'event': event,
                                    'matches': matches_organized,
                                    'wlt': display_wlt,
                                    'rank': team_rank,
@@ -225,7 +178,7 @@ class TeamDetail(CacheableHandler):
                             "team": team,
                             "participation": participation,
                             "year": year,
-                            "years": years,
+                            "years": valid_years,
                             "year_wlt": year_wlt,
                             "current_event": current_event,
                             "matches_upcoming": matches_upcoming}
