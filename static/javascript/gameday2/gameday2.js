@@ -98,9 +98,6 @@ var VideoGrid = React.createClass({
 });
 
 var VideoCell = React.createClass({
-  componentDidMount: function () {
-    $(this.getDOMNode()).fitVids();
-  },
   render: function() {
     if (this.props.eventModel) {
       if (this.props.eventModel.webcasts) {
@@ -109,12 +106,10 @@ var VideoCell = React.createClass({
     } else {
       var src = "";
     }
+    var id = this.props.eventModel.name + "-1";
     return (
-      <div className="videoCell">
-        <h3>{this.props.name}</h3>
-        <div className="fitvids">
-          <iframe width="560" height="315" src={src} frameBorder="0" allowFullScreen></iframe>
-        </div>
+      <div className="videoCell" id="{id}">
+        <iframe width="100%" height="100%" src={src} frameBorder="0" allowFullScreen></iframe>
       </div>
     );
   }
