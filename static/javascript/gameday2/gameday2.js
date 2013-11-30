@@ -12,7 +12,8 @@ var GamedayFrame = React.createClass({
     return {
       chatEnabled: false,
       events: [],
-      displayedEvents: []
+      displayedEvents: [],
+      hashtagEnabled: false,
     };
   },
   componentWillMount: function() {
@@ -25,21 +26,26 @@ var GamedayFrame = React.createClass({
       <div className="gameday container-full">
         <GamedayNavbar 
           chatEnabled={this.state.chatEnabled}
+          hashtagEnabled={this.state.hashtagEnabled}
           events={this.state.events}
           onChatToggle={this.handleChatToggle}
+          onHashtagToggle={this.handleHashtagToggle}
           onWebcastAdd={this.handleWebcastAdd}
           onWebcastReset={this.handleWebcastReset} />
+        <HashtagPanel enabled={this.state.hashtagEnabled} />
         <VideoGrid 
           events={this.state.displayedEvents}
-          rightPanelEnabled={this.state.chatEnabled} />
+          rightPanelEnabled={this.state.chatEnabled}
+          leftPanelEnabled={this.state.hashtagEnabled} />
         <ChatPanel enabled={this.state.chatEnabled} />
       </div>
     );
   },
   handleChatToggle: function() {
     this.setState({chatEnabled: !this.state.chatEnabled});
-    console.log(this.state.chatEnabled);
-    console.log('click!');
+  },
+  handleHashtagToggle: function() {
+    this.setState({hashtagEnabled: !this.state.hashtagEnabled});
   },
   handleWebcastAdd: function(eventModel) {
     var displayedEvents = this.state.displayedEvents;
@@ -86,7 +92,10 @@ var GamedayNavbar = React.createClass({
                 active={this.props.chatEnabled}
                 handleClick={this.props.onChatToggle}>Chat</BootstrapButton>
             </li>
-            <li><a href="#" className="btn btn-default">Hashtags</a></li>
+            <li>
+              <BootstrapButton
+                active={this.props.hashtagEnabled}
+                handleClick={this.props.onHashtagToggle}>Hashtags</BootstrapButton></li>
             <li><a href="#">Settings</a></li>
           </ul>
         </div>
@@ -99,7 +108,7 @@ var ChatPanel = React.createClass({
   render: function() {
     var cx = React.addons.classSet;
     var classes = cx({
-      'chatPanel': true,
+      'sidebar': true,
       'hidden': !this.props.enabled,
     });
     return (
@@ -111,7 +120,33 @@ var ChatPanel = React.createClass({
       </div>
     );
   }
-})
+});
+
+var HashtagPanel = React.createClass({
+  componentDidMount: function() {
+    var height = $('#twitter-widget').css('height');
+    $('.twitter-timeline').attr('height', height);
+    $('#twitter-wjs').remove();
+    !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];
+      js=d.createElement(s);
+      js.id=id;
+      js.src="//platform.twitter.com/widgets.js";
+      fjs.parentNode.insertBefore(js,fjs);
+    }(document,"script","twitter-wjs");
+  },
+  render: function() {
+    var cx = React.addons.classSet;
+    var classes = cx({
+      'sidebar': true,
+      'hidden': !this.props.enabled,
+    });
+    return (
+      <div className={classes}>
+        <div id="twitter-widget"><a className="twitter-timeline" href="https://twitter.com/search?q=%23omgrobots" data-widget-id="282256949859454976">Tweets about "#omgrobots"</a></div>
+      </div>
+    );
+  }
+});
 
 var BootstrapButton = React.createClass({
   componentWillMount: function() {
@@ -143,6 +178,7 @@ var VideoGrid = React.createClass({
     var cx = React.addons.classSet;
     var classes = cx({
       'videoGrid': true,
+      'leaveLeftMargin': this.props.leftPanelEnabled,
       'leaveRightMargin': this.props.rightPanelEnabled,
     });
     switch (this.props.events.length) {
