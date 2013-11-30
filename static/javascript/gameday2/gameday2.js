@@ -82,11 +82,14 @@ var GamedayNavbar = React.createClass({
 
 var VideoGrid = React.createClass({
   render: function() {
-    var videoCellNodes = this.props.events.map(function (eventModel) {
+    var videoCellNodes = this.props.events.map(function (eventModel, idx, events) {
+      var vidHeight = (100/events.length).toString() + "%";
+      var vidWidth = "100%";
       return (
         <VideoCell
           eventModel={eventModel}
-          onDrop={this.handleDrop} />
+          vidHeight={vidHeight}
+          vidWidth={vidWidth} />
         );
     });
     return (
@@ -108,8 +111,8 @@ var VideoCell = React.createClass({
     }
     var id = this.props.eventModel.name + "-1";
     return (
-      <div className="videoCell" id="{id}">
-        <iframe width="100%" height="100%" src={src} frameBorder="0" allowFullScreen></iframe>
+      <div className="videoCell" idName={id}>
+        <iframe width={this.props.vidWidth} height={this.props.vidHeight} src={src} frameBorder="0" allowFullScreen></iframe>
       </div>
     );
   }
