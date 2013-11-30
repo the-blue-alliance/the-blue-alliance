@@ -29,7 +29,10 @@ var GamedayFrame = React.createClass({
           onChatToggle={this.handleChatToggle}
           onWebcastAdd={this.handleWebcastAdd}
           onWebcastReset={this.handleWebcastReset} />
-        <VideoGrid events={this.state.displayedEvents} />
+        <VideoGrid 
+          events={this.state.displayedEvents}
+          rightPanelEnabled={this.state.chatEnabled} />
+        <ChatPanel enabled={this.state.chatEnabled} />
       </div>
     );
   },
@@ -92,6 +95,24 @@ var GamedayNavbar = React.createClass({
   }
 });
 
+var ChatPanel = React.createClass({
+  render: function() {
+    var cx = React.addons.classSet;
+    var classes = cx({
+      'chatPanel': true,
+      'hidden': !this.props.enabled,
+    });
+    return (
+      <div className={classes}>
+        <div id="chat-info-background">
+          <div id="chat-info" className="alert alert-warning"><button type="button" className="close" data-dismiss="alert">&times;</button><strong>Reminder:</strong> You need to log into a <a href="http://www.justin.tv" target="_blank">Justin.tv</a> or <a href="http://www.twitch.tv" target="_blank">Twitch.tv</a> account in order to chat.</div>
+        </div>
+        <iframe frameBorder="0" scrolling="no" id="chat_embed" src="http://twitch.tv/chat/embed?channel=tbagameday&amp;popout_chat=true" height="100%" width="100%"></iframe>
+      </div>
+    );
+  }
+})
+
 var BootstrapButton = React.createClass({
   componentWillMount: function() {
     if (!this.props.a) {
@@ -119,15 +140,10 @@ var BootstrapButton = React.createClass({
 
 var VideoGrid = React.createClass({
   render: function() {
-    var videoCellNodes = this.props.events.map(function (eventModel, idx, events) {
-      var vidHeight = (100/events.length).toString() + "%";
-      var vidWidth = "100%";
-      return (
-        <VideoCell
-          eventModel={eventModel}
-          vidHeight={vidHeight}
-          vidWidth={vidWidth} />
-        );
+    var cx = React.addons.classSet;
+    var classes = cx({
+      'videoGrid': true,
+      'leaveRightMargin': this.props.rightPanelEnabled,
     });
     switch (this.props.events.length) {
       case 0:
@@ -144,7 +160,7 @@ var VideoGrid = React.createClass({
         break;
     }
     return (
-      <div className="videoGrid">
+      <div className={classes}>
         {layout}
       </div>
     );
