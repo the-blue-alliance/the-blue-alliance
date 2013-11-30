@@ -92,12 +92,112 @@ var VideoGrid = React.createClass({
           vidWidth={vidWidth} />
         );
     });
+    switch (this.props.events.length) {
+      case 0:
+        var layout = <VideoCellLayoutZero />
+        break;
+      case 1:
+        var layout = <VideoCellLayoutOne events={this.props.events} />
+        break;
+      case 2:
+        var layout = <VideoCellLayoutTwo events={this.props.events} />
+        break;
+      case 3:
+        var layout = <VideoCellLayoutThree events={this.props.events} />
+        break;
+    }
     return (
       <div className="videoGrid">
-        {videoCellNodes}
+        {layout}
       </div>
     );
   },
+});
+
+var VideoCellLayoutZero = React.createClass({
+  render: function() {
+    return (
+        <div className="row">
+          <div className="col-md-12">      
+            <p>No Videos!</p>
+          </div>
+        </div>
+      );
+  }
+});
+
+var VideoCellLayoutOne = React.createClass({
+  render: function() {
+    if (this.props.events) {
+      var eventModel = this.props.events[0];
+    } else {
+      var eventModel = null;
+    }
+    return (
+        <div className="row">
+          <div className="col-md-12">      
+            <VideoCell
+              eventModel={eventModel}
+              vidHeight="100%"
+              vidWidth="100%" />
+          </div>
+        </div>
+      );
+  }
+});
+
+var VideoCellLayoutTwo = React.createClass({
+  render: function() {
+    return (
+        <div className="row">
+          <div className="col-md-6">
+            <VideoCell
+              eventModel={this.props.events[0]}
+              vidHeight="100%"
+              vidWidth="100%" />
+          </div>
+          <div className="col-md-6">
+            <VideoCell
+              eventModel={this.props.events[1]}
+              vidHeight="100%"
+              vidWidth="100%" />
+          </div>
+        </div>
+      );
+  }
+});
+
+var VideoCellLayoutThree = React.createClass({
+  render: function() {
+    return (
+        <div className="row">
+          <div className="col-md-6">
+            <VideoCell
+              eventModel={this.props.events[0]}
+              vidHeight="100%"
+              vidWidth="100%" />
+          </div>
+          <div className="col-md-6">
+            <div className="row">
+              <div className="col-md-12">
+                <VideoCell
+                  eventModel={this.props.events[1]}
+                  vidHeight="50%"
+                  vidWidth="100%" />
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-md-12">
+                <VideoCell
+                  eventModel={this.props.events[2]}
+                  vidHeight="50%"
+                  vidWidth="100%" />
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+  }
 });
 
 var VideoCell = React.createClass({
@@ -105,11 +205,13 @@ var VideoCell = React.createClass({
     if (this.props.eventModel) {
       if (this.props.eventModel.webcasts) {
         var src = "//www.youtube.com/embed/" + this.props.eventModel.webcasts[0].channel;
+        var id = this.props.eventModel.name + "-1";
       }
     } else {
       var src = "";
+      var id = "blank";
     }
-    var id = this.props.eventModel.name + "-1";
+    
     return (
       <div className="videoCell" idName={id}>
         <iframe width={this.props.vidWidth} height={this.props.vidHeight} src={src} frameBorder="0" allowFullScreen></iframe>
