@@ -10,6 +10,7 @@ var GamedayFrame = React.createClass({
   },
   getInitialState: function() {
     return {
+      chatEnabled: false,
       events: [],
       displayedEvents: []
     };
@@ -23,12 +24,19 @@ var GamedayFrame = React.createClass({
     return (
       <div className="gameday container-full">
         <GamedayNavbar 
+          chatEnabled={this.state.chatEnabled}
           events={this.state.events}
+          onChatToggle={this.handleChatToggle}
           onWebcastAdd={this.handleWebcastAdd}
           onWebcastReset={this.handleWebcastReset} />
         <VideoGrid events={this.state.displayedEvents} />
       </div>
     );
+  },
+  handleChatToggle: function() {
+    this.setState({chatEnabled: !this.state.chatEnabled});
+    console.log(this.state.chatEnabled);
+    console.log('click!');
   },
   handleWebcastAdd: function(eventModel) {
     var displayedEvents = this.state.displayedEvents;
@@ -70,12 +78,41 @@ var GamedayNavbar = React.createClass({
               events={this.props.events}
               onWebcastAdd={this.props.onWebcastAdd}
               onWebcastReset={this.props.onWebcastReset} />
-            <li><a href="#" className="btn btn-default">Chat</a></li>
+            <li>
+              <BootstrapButton
+                active={this.props.chatEnabled}
+                handleClick={this.props.onChatToggle}>Chat</BootstrapButton>
+            </li>
             <li><a href="#" className="btn btn-default">Hashtags</a></li>
             <li><a href="#">Settings</a></li>
           </ul>
         </div>
       </nav>
+    );
+  }
+});
+
+var BootstrapButton = React.createClass({
+  componentWillMount: function() {
+    if (!this.props.a) {
+      this.props.a = "#";
+    }
+  },
+  handleClick: function() {
+    if (this.props.handleClick) {
+      this.props.handleClick();
+      return false;
+    }
+  },
+  render: function() {
+    var cx = React.addons.classSet;
+    var classes = cx({
+      'btn': true,
+      'btn-default': true,
+      'active': this.props.active,
+    });
+    return (
+      <a className={classes} href={this.props.a} onClick={this.handleClick}>{this.props.children}</a>
     );
   }
 });
