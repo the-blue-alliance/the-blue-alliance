@@ -1,0 +1,35 @@
+/* temp to make gameday2 development easier */
+html {
+    height: 100%;
+}
+
+body {
+    background: black;
+    height: 100%;
+    padding-top: 60px;
+}
+
+.container-full { 
+    padding: 0 15px;
+}
+
+.videoGrid {
+    height: 100%;
+    width: 100%;
+    display: inline-block
+}
+
+.sidebar {
+    width: 300px;
+    display: inline-block;
+}
+
+.leaveLeftMargin {
+    padding-left: 300px;
+    margin-left: -300px;
+}
+.leaveRightMargin {
+    padding-right: 300px;
+    margin-right: -300px;
+}
+
