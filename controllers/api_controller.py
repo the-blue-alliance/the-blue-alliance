@@ -30,6 +30,18 @@ class MainApiHandler(webapp2.RequestHandler):
         self.initialize(request, response)
         logging.info(request)
 
+    def handle_exception(self, exception, debug):
+        """
+        Handle an HTTP exception and actually write out a response.
+        Called by webapp when abort() is called, stops code excution.
+        """
+        logging.info(exception)
+        if isinstance(exception, webapp2.HTTPException):
+            self.response.set_status(exception.code)
+            self.response.out.write(self._errors)
+        else:
+            self.response.set_status(500)
+
     def _track_call(self, api_action, api_details=''):
         # Creates asynchronous call
         rpc = urlfetch.create_rpc()
@@ -59,12 +71,21 @@ class MainApiHandler(webapp2.RequestHandler):
                 method=urlfetch.POST,
                 headers={'Content-Type': 'application/x-www-form-urlencoded'})
 
+    def _validate_user_agent(self):
+        """
+        Tests the presence of a User-Agent header.
+        """
+        if self.request.headers.get("User-Agent") is None:
+            self._errors = json.dumps({"Error": "User-Agent is a required header."})
+            self.abort(400)
+
 
 class ApiTeamsShow(MainApiHandler):
     """
     Information about teams.
     """
     def get(self):
+        self._validate_user_agent()
         teams = []
         team_keys = self.request.get('teams').split(',')
 
@@ -86,7 +107,7 @@ class ApiTeamDetails(MainApiHandler):
     Information about a Team in a particular year, including full Event and Match objects
     """
     def get(self):
-
+        self._validate_user_agent()
         team_key = self.request.get('team')
         year = self.request.get('year')
 
@@ -117,6 +138,7 @@ class ApiEventsShow(MainApiHandler):
     Deprecation notice. Please use ApiEventList, or ApiEventDetails.
     """
     def get(self):
+        self._validate_user_agent()
         response = {"API Method Removed": "ApiEventsShow is no longer available. Please use ApiEventDetails, and ApiEventList instead."}
         self.response.set_status(410)
         self.response.out.write(json.dumps(response))
@@ -128,6 +150,7 @@ class ApiEventList(MainApiHandler):
     """
 
     def get(self):
+        self._validate_user_agent()
         if self.request.get("year") is '':
             year = datetime.now().year
         else:
@@ -173,6 +196,7 @@ class ApiEventDetails(MainApiHandler):
     """
 
     def get(self):
+        self._validate_user_agent()
         event_key = str(self.request.get("event"))
         if event_key is "" or event_key is None:
             error_message = {"Parameter Error": "'event' is a required parameter."}
@@ -192,6 +216,7 @@ class ApiMatchDetails(MainApiHandler):
     Returns specific matches with details.
     """
     def get(self):
+        self._validate_user_agent()
         value = self.request.get('match') or self.request.get('matches')
         if value is not '':
             match_keys = value.split(',')
@@ -216,6 +241,7 @@ class CsvTeamsAll(MainApiHandler):
     Outputs a CSV of all team information in the database, designed for other apps to bulk-import data.
     """
     def get(self):
+        self._validate_user_agent()
         memcache_key = "csv_teams_all"
         output = memcache.get(memcache_key)
 
