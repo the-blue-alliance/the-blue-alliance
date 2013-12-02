@@ -57,7 +57,7 @@ class TestApiEventList(unittest2.TestCase):
         self.assertEqual(event_dict["end_date"], self.event.end_date.isoformat())
 
     def test_event_show(self):
-        response = self.testapp.get('/?year=2010')
+        response = self.testapp.get('/?year=2010', headers={"User-Agent": "tests"})
 
         event_dict = json.loads(response.body)
         self.assertEventJson(event_dict[0])
@@ -169,13 +169,13 @@ class TestApiMatchDetails(unittest2.TestCase):
 
         # FIXME: urgh. strings. - brandondean 10/21/2012
         #self.assertEqual(match["alliances"], self.matches[match_id].alliances_json)
-    
+
     def assertMatchNames(self, match_list):
         match_names = ",".join(match_list)
         api_names = ["match", "matches"]
 
         for api_name in api_names:
-            response = self.testapp.get("/?" + api_name + "=" + match_names)
+            response = self.testapp.get("/?" + api_name + "=" + match_names, headers={"User-Agent": "tests"})
 
             matches = json.loads(response.body)
             for match in matches:
