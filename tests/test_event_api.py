@@ -62,6 +62,11 @@ class TestApiEventList(unittest2.TestCase):
         event_dict = json.loads(response.body)
         self.assertEventJson(event_dict[0])
 
+    def test_validate_user_agent(self):
+        response = self.testapp.get('/?year=2010', expect_errors=True)  # By default get() doesn't send a user agent
+        self.assertEqual(response.status, "400 Bad Request")
+        self.assertEqual(response.body, '{"Error": "User-Agent is a required header."}')
+
 
 class TestApiMatchDetails(unittest2.TestCase):
 
