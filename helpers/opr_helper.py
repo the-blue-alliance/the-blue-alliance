@@ -54,7 +54,7 @@ class OprHelper(object):
         team_list = set()
         parsed_matches = []
         for match in matches:
-            if match.comp_level != 'qm':  # only calculate OPRs for quals matches
+            if not match.has_been_played or match.comp_level != 'qm':  # only calculate OPRs for played quals matches
                 continue
             alliances = match.alliances
             for alliance_color in ['red', 'blue']:
