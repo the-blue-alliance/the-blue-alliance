@@ -37,7 +37,6 @@ class OprHelper(object):
 
         # Solving A*x = b for x
         x = np.linalg.solve(A, b)
-#         opr_list = x.transpose().tolist()[0]  # convert a numpy column vector into Python list
 
         oprs_dict = {}
         for team, opr in zip(team_list, x):
