@@ -20,7 +20,8 @@ class OprHelper(object):
         key: a string representing a team number (Example: "254", "254B", "1114")
         value: a float representing the OPR for that team
         """
-        n, parsed_matches, team_list, team_id_map = cls._parse_matches(matches)
+        parsed_matches, team_list, team_id_map = cls._parse_matches(matches)
+        n = len(team_list)
         M = np.zeros([n, n])
         s = np.zeros([n, 1])
 
@@ -48,7 +49,6 @@ class OprHelper(object):
     def _parse_matches(cls, matches):
         """
         Returns:
-        n: # of teams
         parsed_matches: list of matches as the tuple ([team, team, team], score)
         team_list: list of strings representing team numbers. Example: "254", "254B", "1114"
         team_id_map: dict that maps a team to a unique integer from 0 to n-1
@@ -73,5 +73,4 @@ class OprHelper(object):
         for i, team in enumerate(team_list):
             team_id_map[team] = i
 
-        n = len(team_list)
-        return n, parsed_matches, team_list, team_id_map
+        return parsed_matches, team_list, team_id_map
