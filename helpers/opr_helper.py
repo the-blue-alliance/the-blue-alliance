@@ -33,7 +33,10 @@ class OprHelper(object):
                 s[team1_id] += score
 
         # Solving M*x = s for x
-        x = np.linalg.solve(M, s)
+        try:
+            x = np.linalg.solve(M, s)
+        except np.linalg.LinAlgError:
+            return {}
 
         oprs_dict = {}
         for team, opr in zip(team_list, x):

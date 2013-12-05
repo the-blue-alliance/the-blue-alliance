@@ -118,6 +118,8 @@ class EventOprDo(webapp.RequestHandler):
         if oprs_dict != {}:
             event.oprs_json = json.dumps(oprs_dict)
             event.put()
+        else:
+            logging.warn("OPR calculation for {} failed!".format(event_key))
 
         template_values = {
             'oprs_dict': oprs_dict,
