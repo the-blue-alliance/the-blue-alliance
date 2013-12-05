@@ -95,6 +95,7 @@ class ApiTeamsShow(MainApiHandler):
             self.response.set_status(404)
             response_json = {"Property Error": "No team found for key in %s" % str(teams)}
 
+        self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(teams))
 
         team_keys_sorted = sorted(team_keys)
@@ -112,6 +113,9 @@ class ApiTeamDetails(MainApiHandler):
         year = self.request.get('year')
 
         response_json = {}
+
+        self.response.headers.add_header("content-type", "application/json")
+
         try:
             response_json = ApiHelper.getTeamInfo(team_key)
             if self.request.get('events'):
@@ -141,6 +145,7 @@ class ApiEventsShow(MainApiHandler):
         self._validate_user_agent()
         response = {"API Method Removed": "ApiEventsShow is no longer available. Please use ApiEventDetails, and ApiEventList instead."}
         self.response.set_status(410)
+        self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(response))
 
 
