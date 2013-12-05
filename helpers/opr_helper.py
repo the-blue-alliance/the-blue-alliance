@@ -49,7 +49,6 @@ class OprHelper(object):
         """
         Returns:
         n: # of teams
-        m: # of matches
         parsed_matches: list of matches as the tuple ([team, team, team], score)
         team_list: list of strings representing team numbers. Example: "254", "254B", "1114"
         team_id_map: dict that maps a team to a unique integer from 0 to n-1
