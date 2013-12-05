@@ -114,13 +114,13 @@ class EventOprDo(webapp.RequestHandler):
     """
     def get(self, event_key):
         event = Event.get_by_id(event_key)
-        opr_dict = OprHelper.calculate_oprs(event.matches)
-        if opr_dict != {}:
-            event.opr_json = json.dumps(opr_dict)
+        oprs_dict = OprHelper.calculate_oprs(event.matches)
+        if oprs_dict != {}:
+            event.oprs_json = json.dumps(oprs_dict)
             event.put()
 
         template_values = {
-            'opr_dict': opr_dict,
+            'oprs_dict': oprs_dict,
         }
 
         path = os.path.join(os.path.dirname(__file__), '../templates/math/event_opr_do.html')

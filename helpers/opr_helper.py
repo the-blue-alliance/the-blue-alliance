@@ -39,11 +39,11 @@ class OprHelper(object):
         x = np.linalg.solve(A, b)
 #         opr_list = x.transpose().tolist()[0]  # convert a numpy column vector into Python list
 
-        opr_dict = {}
+        oprs_dict = {}
         for team, opr in zip(team_list, x):
-            opr_dict[team] = opr[0]
+            oprs_dict[team] = opr[0]
 
-        return opr_dict
+        return oprs_dict
 
     @classmethod
     def _parse_matches(cls, matches):
