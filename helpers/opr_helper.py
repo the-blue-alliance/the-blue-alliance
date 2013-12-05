@@ -1,12 +1,11 @@
 # Calculates OPR
 # For implementation details, see
-# http://www.chiefdelphi.com/forums/showpost.php?p=1129108&postcount=55
+# http://www.chiefdelphi.com/forums/showpost.php?p=484220&postcount=19
 
-# M is 2m x n where m is # of matches and n is # of teams
-# s is 2m x 1 where m is # of matches
-# solve [M][x]=[s] for [x] by turning it into [A][x]=[b]
+# M is n x n where n is # of teams
+# s is n x 1 where n is # of teams
+# solve [M][x]=[s] for [x]
 
-# A should end up being n x n an b should end up being n x 1
 # x is OPR and should be n x 1
 
 import numpy as np
@@ -17,26 +16,24 @@ class OprHelper(object):
     @classmethod
     def calculate_oprs(cls, matches):
         """
-        Returns: a list of tuples (team, opr) where
-        team: a string representing a team number (Example: "254", "254B", "1114")
-        opr: a float representing the OPR for that team
+        Returns: a dict where
+        key: a string representing a team number (Example: "254", "254B", "1114")
+        value: a float representing the OPR for that team
         """
-        n, m, parsed_matches, team_list, team_id_map = cls._parse_matches(matches)
-        M = np.zeros([2 * m, n])
-        s = np.zeros([2 * m, 1])
+        n, parsed_matches, team_list, team_id_map = cls._parse_matches(matches)
+        M = np.zeros([n, n])
+        s = np.zeros([n, 1])
 
         # Constructing M and s
-        for row, (teams, score) in enumerate(parsed_matches):
-            for team in teams:
-                M[row, team_id_map[team]] = 1
-            s[row] = score
+        for teams, score in parsed_matches:
+            for team1 in teams:
+                team1_id = team_id_map[team1]
+                for team2 in teams:
+                    M[team1_id, team_id_map[team2]] += 1
+                s[team1_id] += score
 
-        # Calculating A and b
-        A = np.dot(M.transpose(), M)
-        b = np.dot(M.transpose(), s)
-
-        # Solving A*x = b for x
-        x = np.linalg.solve(A, b)
+        # Solving M*x = s for x
+        x = np.linalg.solve(M, s)
 
         oprs_dict = {}
         for team, opr in zip(team_list, x):
@@ -73,5 +70,4 @@ class OprHelper(object):
             team_id_map[team] = i
 
         n = len(team_list)
-        m = len(matches)
-        return n, m, parsed_matches, team_list, team_id_map
+        return n, parsed_matches, team_list, team_id_map
