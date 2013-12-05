@@ -113,24 +113,14 @@ class EventOprDo(webapp.RequestHandler):
     Calculates the opr for an event
     """
     def get(self, event_key):
-        opr = []
-        teams = []
-        oprs = []
         event = Event.get_by_id(event_key)
-        if Match.query(Match.event == event.key).fetch(keys_only=True).count() > 0:
-            try:
-                opr, teams = OprHelper.opr(event_key)
-                oprs.append((opr, teams))
-                event.oprs = opr
-                event.opr_teams = teams
-                event.put()
-            except Exception, e:
-                logging.error("OPR error on event %s. %s" % (event_key, e))
-
-        logging.info(oprs)
+        opr_dict = OprHelper.calculate_oprs(event.matches)
+        if opr_dict != {}:
+            event.opr_json = json.dumps(opr_dict)
+            event.put()
 
         template_values = {
-            'oprs': oprs,
+            'opr_dict': opr_dict,
         }
 
         path = os.path.join(os.path.dirname(__file__), '../templates/math/event_opr_do.html')

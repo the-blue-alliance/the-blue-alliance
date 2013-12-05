@@ -26,8 +26,7 @@ class Event(ndb.Model):
     facebook_eid = ndb.StringProperty(indexed=False)  # from Facebook
     website = ndb.StringProperty(indexed=False)
     webcast_json = ndb.TextProperty(indexed=False)  # list of dicts, valid keys include 'type' and 'channel'
-    oprs = ndb.FloatProperty(indexed=False, repeated=True)
-    opr_teams = ndb.IntegerProperty(indexed=False, repeated=True)
+    opr_json = ndb.TextProperty(indexed=False)
     rankings_json = ndb.TextProperty(indexed=False)
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)

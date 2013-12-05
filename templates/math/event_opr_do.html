@@ -1,8 +1,7 @@
-<h2>Got {{oprs|length}} OPRs</h2>
-{{teams}}
-{% for opr,team in oprs %}
+<h2>Got {{opr_dict|length}} OPRs</h2>
+{% for team, opr in opr_dict.items %}
     <ul>
-        <li>{{opr}}</li>
         <li>{{team}}</li>
+        <li>{{opr}}</li>
     </ul>
 {% endfor %}
