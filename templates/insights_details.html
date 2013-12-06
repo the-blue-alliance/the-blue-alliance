@@ -69,10 +69,10 @@
     <div class="chart-key"><div class="color-key blue-color-key"></div><div class="chart-key-text">All Match Averages</div></div>
     <div class="chart-key"><div class="color-key green-color-key"></div><div class="chart-key-text">Elim Match Averages</div></div>
     <figure style="width: 90%; height: 300px;" id="elim-match-average-chart"></figure>
-    <div id="elim-match-average" class="xcharts-data xcharts-line-double-data">[{{ match_averages_by_week.data_json|safe }}, {{ elim_match_averages_by_week.data_json|safe }}]</div>
+    <div id="elim-match-average" class="xcharts-data xcharts-line-data">[{{ match_averages_by_week.data_json|safe }}, {{ elim_match_averages_by_week.data_json|safe }}]</div>
     {% else %}
     <figure style="width: 90%; height: 300px;" id="match-average-chart"></figure>
-    <div id="match-average" class="xcharts-data xcharts-line-single-data">{{ match_averages_by_week.data_json|safe }}</div>
+    <div id="match-average" class="xcharts-data xcharts-line-data">{{ match_averages_by_week.data_json|safe }}</div>
     {% endif %}
   {% endif %}
 
@@ -82,10 +82,10 @@
     <div class="chart-key"><div class="color-key blue-color-key"></div><div class="chart-key-text">All Match Scores</div></div>
     <div class="chart-key"><div class="color-key green-color-key"></div><div class="chart-key-text">Elim Match Scores</div></div>
     <figure style="width: 90%; height: 300px;" id="elim-match-distribution-chart"></figure>
-    <div id="elim-match-distribution" class="xcharts-data xcharts-bar-double-data">[{{ score_distribution.data_json|safe }}, {{ elim_score_distribution.data_json|safe }}]</div>
+    <div id="elim-match-distribution" class="xcharts-data xcharts-bar-data">[{{ score_distribution.data_json|safe }}, {{ elim_score_distribution.data_json|safe }}]</div>
     {% else %}
     <figure style="width: 90%; height: 300px;" id="match-distribution-chart"></figure>
-    <div id="match-distribution" class="xcharts-data xcharts-bar-single-data">{{ score_distribution.data_json|safe }}</div>
+    <div id="match-distribution" class="xcharts-data xcharts-bar-data">{{ score_distribution.data_json|safe }}</div>
     {% endif %}
   {% endif %}
 

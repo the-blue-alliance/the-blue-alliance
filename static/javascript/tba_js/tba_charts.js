@@ -1,46 +1,7 @@
 // Charts
 $(function() {
-	// Single Bar Graph
-	var chartsData = $(".xcharts-bar-single-data");
-	for (var i=0; i < chartsData.length; i++) {
-		var chartId = chartsData[i].id;
-		var raw = JSON.parse($('#' + chartId).html());
-		var data = [];
-		for (var key in raw) {
-			var value = raw[key];
-			data = data.concat([{"x": parseInt(key), "y": value}]);
-		}
-		var chartData = {"xScale": "ordinal",
-						 "yScale": "linear",
-						 "type": "bar",
-						 "main": [{"className": "." + chartId + '-elements',
-							 	   "data": data}]
-						 };
-		var opts = {"tickFormatY": function(y){ return y + "%"; }};
-		var myChart = new xChart('bar', chartData, '#' + chartId + '-chart', opts);
-	}
-	
-	// Single Line Graph
-	var chartsData = $(".xcharts-line-single-data");
-	for (var i=0; i < chartsData.length; i++) {
-		var chartId = chartsData[i].id;
-		var raw = JSON.parse($('#' + chartId).html());
-		var data = [];
-		for (var key in raw) {
-			var tuple = raw[key];
-			data = data.concat([{"x": tuple[0], "y": tuple[1]}]);
-		}
-		var chartData = {"xScale": "ordinal",
-						 "yScale": "linear",
-						 "type": "line-dotted",
-						 "main": [{"className": "." + chartId + '-elements',
-							 	   "data": data}]
-						 };
-		var myChart = new xChart('line', chartData, '#' + chartId + '-chart');
-	}
-	
-	// Double Line Graph
-	var chartsData = $(".xcharts-line-double-data");
+	// Line Graph
+	var chartsData = $(".xcharts-line-data");
 	for (var i=0; i < chartsData.length; i++) {
 		var chartId = chartsData[i].id;
 		var raw_datasets = JSON.parse($('#' + chartId).html());
@@ -79,8 +40,8 @@ $(function() {
 	}
 	
 	
-	// Double Bar Graph
-	var chartsData = $(".xcharts-bar-double-data");
+	// Bar Graph
+	var chartsData = $(".xcharts-bar-data");
 	for (var i=0; i < chartsData.length; i++) {
 		var chartId = chartsData[i].id;
 		var raw_datasets = JSON.parse($('#' + chartId).html());
