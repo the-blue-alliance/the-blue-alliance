@@ -28,6 +28,7 @@ class MainApiHandler(webapp2.RequestHandler):
     def __init__(self, request, response):
         # Need to initialize a webapp2 instance
         self.initialize(request, response)
+        self.response.headers.add_header("content-type", "application/json")
         logging.info(request)
 
     def handle_exception(self, exception, debug):
@@ -95,7 +96,6 @@ class ApiTeamsShow(MainApiHandler):
             self.response.set_status(404)
             response_json = {"Property Error": "No team found for key in %s" % str(teams)}
 
-        self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(teams))
 
         team_keys_sorted = sorted(team_keys)
@@ -113,8 +113,6 @@ class ApiTeamDetails(MainApiHandler):
         year = self.request.get('year')
 
         response_json = {}
-
-        self.response.headers.add_header("content-type", "application/json")
 
         try:
             response_json = ApiHelper.getTeamInfo(team_key)
@@ -145,7 +143,6 @@ class ApiEventsShow(MainApiHandler):
         self._validate_user_agent()
         response = {"API Method Removed": "ApiEventsShow is no longer available. Please use ApiEventDetails, and ApiEventList instead."}
         self.response.set_status(410)
-        self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(response))
 
 
@@ -189,7 +186,6 @@ class ApiEventList(MainApiHandler):
             if tba_config.CONFIG["memcache"]:
                 memcache.set(memcache_key, event_list, (30 * ((60 * 60) * 24)))
 
-        self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(event_list))
 
         self._track_call('events/list')
@@ -210,7 +206,6 @@ class ApiEventDetails(MainApiHandler):
 
         event_dict = ApiHelper.getEventInfo(event_key)
 
-        self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(event_dict))
 
         self._track_call('events/details', event_key)
@@ -235,7 +230,6 @@ class ApiMatchDetails(MainApiHandler):
             match_json = {'error': 'The "match" parameter is missing'}
             track_matches = 'error'
 
-        self.response.headers.add_header("content-type", "application/json")
         self.response.out.write(json.dumps(match_json))
 
         self._track_call('matches/details', track_matches)
@@ -263,6 +257,7 @@ class CsvTeamsAll(MainApiHandler):
             if tba_config.CONFIG["memcache"]:
                 memcache.set(memcache_key, output, 86400)
 
+        self.response.headers["content-type"] = "text/csv"
         self.response.out.write(output)
 
         self._track_call('teams/list')
