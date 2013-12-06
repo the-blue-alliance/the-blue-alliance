@@ -92,11 +92,12 @@ class ApiTeamsShow(MainApiHandler):
 
         try:
             teams = [ApiHelper.getTeamInfo(team_key) for team_key in team_keys]
+            response_json = teams
         except IndexError:
             self.response.set_status(404)
             response_json = {"Property Error": "No team found for key in %s" % str(teams)}
 
-        self.response.out.write(json.dumps(teams))
+        self.response.out.write(json.dumps(response_json))
 
         team_keys_sorted = sorted(team_keys)
         track_team_keys = ",".join(team_keys_sorted)
@@ -117,7 +118,7 @@ class ApiTeamDetails(MainApiHandler):
         try:
             response_json = ApiHelper.getTeamInfo(team_key)
             if self.request.get('events'):
-                reponse_json = ApiHelper.addTeamEvents(response_json, year)
+                response_json = ApiHelper.addTeamEvents(response_json, year)
 
             # TODO: matches
 
