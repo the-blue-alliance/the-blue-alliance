@@ -56,7 +56,7 @@
                 <div id="elim-match-average" class="xcharts-data xcharts-line-data">[{{ match_averages_by_week.data_json|safe }}, {{ elim_match_averages_by_week.data_json|safe }}]</div>
                 {% else %}
                 <figure style="width: 90%; height: 300px;" id="match-average-chart"></figure>
-                <div id="match-average" class="xcharts-data xcharts-line-data">{{ match_averages_by_week.data_json|safe }}</div>
+                <div id="match-average" class="xcharts-data xcharts-line-data">[{{ match_averages_by_week.data_json|safe }}]</div>
                 {% endif %}
                 <br><br>
               {% endif %}
@@ -70,7 +70,7 @@
                 <div id="elim-match-distribution" class="xcharts-data xcharts-bar-data">[{{ score_distribution.data_json|safe }}, {{ elim_score_distribution.data_json|safe }}]</div>
                 {% else %}
                 <figure style="width: 90%; height: 300px;" id="match-distribution-chart"></figure>
-                <div id="match-distribution" class="xcharts-data xcharts-bar-data">{{ score_distribution.data_json|safe }}</div>
+                <div id="match-distribution" class="xcharts-data xcharts-bar-data">[{{ score_distribution.data_json|safe }}]</div>
                 {% endif %}
                 <br><br>
               {% endif %}
