@@ -184,13 +184,8 @@ class TeamHistory(CacheableHandler):
 
     def get(self, team_number):
         # /team/0604/history should redirect to /team/604/history
-        try:
-            if str(int(team_number)) != team_number:
-                return self.redirect("/team/%s/history" % int(team_number))
-
-        except ValueError, e:
-            logging.info("%s", e)
-            return self.redirect("/error/404")
+        if str(int(team_number)) != team_number:
+            return self.redirect("/team/%s/history" % int(team_number))
 
         self._cache_key = self._cache_key.format("frc" + team_number)
         super(TeamHistory, self).get(team_number)
