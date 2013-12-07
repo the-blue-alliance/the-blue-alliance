@@ -72,16 +72,13 @@ class MatchstatsHelper(object):
             if not match.has_been_played or match.comp_level != 'qm':  # only calculate OPRs for played quals matches
                 continue
             alliances = match.alliances
-            for alliance_color in ['red', 'blue']:
+            for alliance_color, opposing_color in zip(['red', 'blue'], ['blue', 'red']):
                 match_team_list = []
                 for team in alliances[alliance_color]['teams']:
                     team = team[3:]  # turns "frc254B" into "254B"
                     team_list.add(team)
                     match_team_list.append(team)
-                if alliance_color == 'red':
-                    opposing_color = 'blue'
-                else:
-                    opposing_color = 'red'
+
                 alliance_score = alliances[alliance_color]['score']
                 opposing_score = alliances[opposing_color]['score']
                 parsed_matches_by_type['opr'].append((match_team_list, alliance_score))
