@@ -26,7 +26,7 @@ class Event(ndb.Model):
     facebook_eid = ndb.StringProperty(indexed=False)  # from Facebook
     website = ndb.StringProperty(indexed=False)
     webcast_json = ndb.TextProperty(indexed=False)  # list of dicts, valid keys include 'type' and 'channel'
-    oprs_json = ndb.TextProperty(indexed=False)
+    matchstats_json = ndb.TextProperty(indexed=False)  # for OPR, DPR, CCWM, etc.
     rankings_json = ndb.TextProperty(indexed=False)
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
@@ -35,7 +35,7 @@ class Event(ndb.Model):
     def __init__(self, *args, **kw):
         self._awards = None
         self._matches = None
-        self._oprs = None
+        self._matchstats = None
         self._rankings = None
         self._teams = None
         self._webcast = None
@@ -124,16 +124,16 @@ class Event(ndb.Model):
         yield self.get_matches_async(), self.get_teams_async()
 
     @property
-    def oprs(self):
+    def matchstats(self):
         """
-        Lazy load parsing opr JSON
+        Lazy load parsing matchstats JSON
         """
-        if self._oprs is None:
+        if self._matchstats is None:
             try:
-                self._oprs = json.loads(self.oprs_json)
+                self._matchstats = json.loads(self.matchstats_json)
             except Exception, e:
-                self._oprs = None
-        return self._oprs
+                self._matchstats = None
+        return self._matchstats
 
     @property
     def rankings(self):

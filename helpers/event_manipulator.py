@@ -22,7 +22,7 @@ class EventManipulator(ManipulatorBase):
             "location",
             "name",
             "official",
-            "oprs_json",
+            "matchstats_json",
             "rankings_json",
             "short_name",
             "start_date",

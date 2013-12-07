@@ -116,7 +116,7 @@ class EventOprDo(webapp.RequestHandler):
         event = Event.get_by_id(event_key)
         oprs_dict = OprHelper.calculate_oprs(event.matches)
         if oprs_dict != {}:
-            event.oprs_json = json.dumps(oprs_dict)
+            event.matchstats_json = json.dumps({'oprs': oprs_dict})
             event.put()
         else:
             logging.warn("OPR calculation for {} failed!".format(event_key))
