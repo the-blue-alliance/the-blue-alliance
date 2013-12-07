@@ -169,7 +169,7 @@ class TestApiMatchDetails(unittest2.TestCase):
 
         # FIXME: urgh. strings. - brandondean 10/21/2012
         #self.assertEqual(match["alliances"], self.matches[match_id].alliances_json)
-    
+
     def assertMatchNames(self, match_list):
         match_names = ",".join(match_list)
         api_names = ["match", "matches"]
@@ -184,8 +184,5 @@ class TestApiMatchDetails(unittest2.TestCase):
                 self.assertMatch(match)
 
     def test_match_details(self):
-        if os.environ.get('TRAVIS', '') != 'true':
-            # These tests fail on Travis for an unknown reason. -gregmarra 20130921
-            # https://travis-ci.org/gregmarra/the-blue-alliance/builds/11643106
-            self.assertMatchNames(["2010cmp_f1m1"])
-            self.assertMatchNames(["2010cmp_f1m1", "2011cmp_f1m1", "2012cmp_f1m1"])
+        self.assertMatchNames(["2010cmp_f1m1"])
+        self.assertMatchNames(["2010cmp_f1m1", "2011cmp_f1m1", "2012cmp_f1m1"])
