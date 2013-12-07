@@ -19,7 +19,7 @@ def set_up_matches(html, event):
         parsed_matches, _ = UsfirstMatchesParser.parse(f.read())
         matches = [Match(
             id=Match.renderKeyName(
-                event,
+                event.key.id(),
                 match.get("comp_level", None),
                 match.get("set_number", 0),
                 match.get("match_number", 0)),

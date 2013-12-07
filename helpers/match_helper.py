@@ -84,10 +84,8 @@ class MatchHelper(object):
         return_list = []
         for match in match_list:
             if match.comp_level in Match.ELIM_LEVELS and match.match_number == 3 and (not match.has_been_played):
-                event = Event
-                event.key_name = match.event.id()  # slightly hackish, but reduces db calls
-                match_1 = matches_by_key.get(Match.renderKeyName(event, match.comp_level, match.set_number, 1))
-                match_2 = matches_by_key.get(Match.renderKeyName(event, match.comp_level, match.set_number, 2))
+                match_1 = matches_by_key.get(Match.renderKeyName(match.event.id(), match.comp_level, match.set_number, 1))
+                match_2 = matches_by_key.get(Match.renderKeyName(match.event.id(), match.comp_level, match.set_number, 2))
                 if match_1 != None and match_2 != None and\
                     match_1.has_been_played and match_2.has_been_played and\
                     match_1.winning_alliance == match_2.winning_alliance:

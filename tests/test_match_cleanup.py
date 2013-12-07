@@ -29,7 +29,7 @@ class TestMatchCleanup(unittest2.TestCase):
             parsed_matches = OffseasonMatchesParser.parse(f.read())
             matches = [Match(
                 id=Match.renderKeyName(
-                    self.event,
+                    self.event.key.id(),
                     match.get("comp_level", None),
                     match.get("set_number", 0),
                     match.get("match_number", 0)),
