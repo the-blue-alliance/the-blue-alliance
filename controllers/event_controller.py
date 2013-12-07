@@ -32,28 +32,24 @@ class EventList(CacheableHandler):
     def __init__(self, *args, **kw):
         super(EventList, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
-        self._cache_key = "event_list_{}_{}"  # (year, explicit_year)
-        self._cache_version = 4
+        self._cache_key = "event_list_{}"  # year
+        self._cache_version = 5
 
-    def get(self, year=None, explicit_year=False):
-        if year == '':
-            return self.redirect("/events")
-
-        if year:
-            if not year.isdigit():
+    def get(self, year_str=None):
+        if year_str is None or year_str == '':
+            cur_year = datetime.datetime.now().year
+            return self.redirect("/events/{}".format(cur_year))
+        else:
+            if not year_str.isdigit():
                 return self.redirect("/error/404")
-            year = int(year)
+            year = int(year_str)
             if year not in self.VALID_YEARS:
                 return self.redirect("/error/404")
-            explicit_year = True
-        else:
-            year = datetime.datetime.now().year
-            explicit_year = False
+            else:
+                self._cache_key = self._cache_key.format(year)
+                super(EventList, self).get(year)
 
-        self._cache_key = self._cache_key.format(year, explicit_year)
-        super(EventList, self).get(year, explicit_year)
-
-    def _render(self, year=None, explicit_year=False):
+    def _render(self, year=None):
         event_keys = Event.query(Event.year == year).fetch(1000, keys_only=True)
         events = ndb.get_multi(event_keys)
         events.sort(key=EventHelper.distantFutureIfNoStartDate)
@@ -62,7 +58,6 @@ class EventList(CacheableHandler):
 
         template_values = {
             "events": events,
-            "explicit_year": explicit_year,
             "selected_year": year,
             "valid_years": self.VALID_YEARS,
             "week_events": week_events,
