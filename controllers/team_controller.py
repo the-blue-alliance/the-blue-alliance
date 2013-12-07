@@ -91,37 +91,20 @@ class TeamDetail(CacheableHandler):
     def __init__(self, *args, **kw):
         super(TeamDetail, self).__init__(*args, **kw)
         self._cache_expiration = self.LONG_CACHE_EXPIRATION
-        self._cache_key = "team_detail_{}_{}_{}"  # (team_number, year, explicit_year)
-        self._cache_version = 2
+        self._cache_key = "team_detail_{}_{}"  # (team_number, year)
+        self._cache_version = 3
 
-    def get(self, team_number, year=None, explicit_year=False):
-
+    def get(self, team_number, year_str=None):
         # /team/0201 should redirect to /team/201
-        try:
-            if str(int(team_number)) != team_number:
-                if year is None:
-                    return self.redirect("/team/%s" % int(team_number))
-                else:
-                    return self.redirect("/team/%s/%s" % (int(team_number), year))
-        except ValueError, e:
-            logging.info("%s", e)
-            return self.redirect("/error/404")
-
-        if type(year) == str:
-            try:
-                year = int(year)
-            except ValueError, e:
-                logging.info("%s", e)
-                return self.redirect("/team/%s" % team_number)
-            explicit_year = True
+        if str(int(team_number)) != team_number or year_str is None or year_str == '':  # any of these require a redirect
+            if year_str is None or year_str == '':
+                year_str = str(datetime.datetime.now().year)
+            return self.redirect("/team/{}/{}".format(int(team_number), year_str))
         else:
-            year = datetime.datetime.now().year
-            explicit_year = False
+            self._cache_key = self._cache_key.format("frc" + team_number, year_str)
+            super(TeamDetail, self).get(team_number, int(year_str))
 
-        self._cache_key = self._cache_key.format("frc" + team_number, year, explicit_year)
-        super(TeamDetail, self).get(team_number, year, explicit_year)
-
-    def _render(self, team_number, year=None, explicit_year=False):
+    def _render(self, team_number, year=None):
         team = Team.get_by_id("frc" + team_number)
         if not team:
             return self.redirect("/error/404")
@@ -174,8 +157,7 @@ class TeamDetail(CacheableHandler):
         if year_wlt["win"] + year_wlt["loss"] + year_wlt["tie"] == 0:
             year_wlt = None
 
-        template_values = {"explicit_year": explicit_year,
-                            "team": team,
+        template_values = {"team": team,
                             "participation": participation,
                             "year": year,
                             "years": valid_years,
@@ -202,13 +184,8 @@ class TeamHistory(CacheableHandler):
 
     def get(self, team_number):
         # /team/0604/history should redirect to /team/604/history
-        try:
-            if str(int(team_number)) != team_number:
-                return self.redirect("/team/%s/history" % int(team_number))
-
-        except ValueError, e:
-            logging.info("%s", e)
-            return self.redirect("/error/404")
+        if str(int(team_number)) != team_number:
+            return self.redirect("/team/%s/history" % int(team_number))
 
         self._cache_key = self._cache_key.format("frc" + team_number)
         super(TeamHistory, self).get(team_number)

@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}{% if team.nickname %}{{team.nickname}} - {% endif %}Team {{team.team_number}}{% if explicit_year %} ({{year}}){% endif %} - The Blue Alliance{% endblock %}
+{% block title %}{% if team.nickname %}{{team.nickname}} - {% endif %}Team {{team.team_number}} ({{year}}) - The Blue Alliance{% endblock %}
 
-{% block meta_description %}{% if team.location %}From {{team.location}}{% endif %}. Team information, match results, and match videos from the{% if explicit_year %} {{year}}{% endif %} FIRST Robotics Competition.{% endblock %}
+{% block meta_description %}{% if team.location %}From {{team.location}}{% endif %}. Team information, match results, and match videos from the {{year}} FIRST Robotics Competition.{% endblock %}
 
 {% block more_head_tags %}
 {% include "team_partials/team_head_tags.html" %}
