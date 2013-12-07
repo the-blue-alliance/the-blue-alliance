@@ -14,7 +14,7 @@ from controllers.datafeed_controller import UsfirstTeamDetailsEnqueue, UsfirstTe
 from controllers.datafeed_controller import UsfirstPre2003TeamEventsEnqueue, UsfirstPre2003TeamEventsGet
 
 from controllers.cron_controller import EventTeamRepairDo, EventTeamUpdate, EventTeamUpdateEnqueue
-from controllers.cron_controller import EventOprDo, EventOprEnqueue
+from controllers.cron_controller import EventMatchstatsDo, EventMatchstatsEnqueue
 from controllers.cron_controller import FinalMatchesRepairDo
 from controllers.cron_controller import YearInsightsEnqueue, YearInsightsDo, OverallInsightsEnqueue, OverallInsightsDo, TypeaheadCalcEnqueue, TypeaheadCalcDo
 from controllers.firebase_controller import FirebasePushDo
@@ -41,9 +41,9 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
                                ('/tasks/get/usfirst_team_details/(.*)', UsfirstTeamDetailsGet),
                                ('/tasks/get/usfirst_teams_tpids/([0-9]*)', UsfirstTeamsTpidsGet),
                                ('/tasks/get/usfirst_pre2003_team_events/(.*)', UsfirstPre2003TeamEventsGet),
-                               ('/tasks/math/enqueue/event_opr/(.*)', EventOprEnqueue),
+                               ('/tasks/math/enqueue/event_matchstats/(.*)', EventMatchstatsEnqueue),
                                ('/tasks/math/enqueue/eventteam_update/(.*)', EventTeamUpdateEnqueue),
-                               ('/tasks/math/do/event_opr/(.*)', EventOprDo),
+                               ('/tasks/math/do/event_matchstats/(.*)', EventMatchstatsDo),
                                ('/tasks/math/do/eventteam_repair', EventTeamRepairDo),
                                ('/tasks/math/do/eventteam_update/(.*)', EventTeamUpdate),
                                ('/tasks/math/do/final_matches_repair/([0-9]*)', FinalMatchesRepairDo),

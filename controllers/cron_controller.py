@@ -17,7 +17,7 @@ from helpers.event_team_updater import EventTeamUpdater
 
 from helpers.insight_manipulator import InsightManipulator
 from helpers.team_manipulator import TeamManipulator
-from helpers.opr_helper import OprHelper
+from helpers.matchstats_helper import MatchstatsHelper
 from helpers.insights_helper import InsightsHelper
 from helpers.typeahead_helper import TypeaheadHelper
 
@@ -108,33 +108,33 @@ class EventTeamUpdateEnqueue(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
 
 
-class EventOprDo(webapp.RequestHandler):
+class EventMatchstatsDo(webapp.RequestHandler):
     """
-    Calculates the opr for an event
+    Calculates match stats (OPR/DPR/CCWM) for an event
     """
     def get(self, event_key):
         event = Event.get_by_id(event_key)
-        oprs_dict = OprHelper.calculate_oprs(event.matches)
-        if oprs_dict != {}:
-            event.matchstats_json = json.dumps({'oprs': oprs_dict})
+        matchstats_dict = MatchstatsHelper.calculate_matchstats(event.matches)
+        if matchstats_dict != {}:
+            event.matchstats_json = json.dumps(matchstats_dict)
             event.put()
         else:
-            logging.warn("OPR calculation for {} failed!".format(event_key))
+            logging.warn("Matchstat calculation for {} failed!".format(event_key))
 
         template_values = {
-            'oprs_dict': oprs_dict,
+            'matchstats_dict': matchstats_dict,
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/math/event_opr_do.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/math/event_matchstats_do.html')
         self.response.out.write(template.render(path, template_values))
 
     def post(self):
         self.get()
 
 
-class EventOprEnqueue(webapp.RequestHandler):
+class EventMatchstatsEnqueue(webapp.RequestHandler):
     """
-    Enqueues OPR calculation
+    Enqueues Matchstats calculation
     """
     def get(self, when):
         if when == "now":
@@ -147,7 +147,7 @@ class EventOprEnqueue(webapp.RequestHandler):
 
         for event in events:
             taskqueue.add(
-                url='/tasks/math/do/event_opr/' + event.key_name,
+                url='/tasks/math/do/event_matchstats/' + event.key_name,
                 method='GET')
 
         template_values = {
@@ -155,7 +155,7 @@ class EventOprEnqueue(webapp.RequestHandler):
             'year': when
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/math/event_opr_enqueue.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/math/event_matchstats_enqueue.html')
         self.response.out.write(template.render(path, template_values))
 
 
