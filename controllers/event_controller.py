@@ -40,8 +40,6 @@ class EventList(CacheableHandler):
             cur_year = datetime.datetime.now().year
             return self.redirect("/events/{}".format(cur_year))
         else:
-            if not year_str.isdigit():
-                return self.redirect("/error/404")
             year = int(year_str)
             if year not in self.VALID_YEARS:
                 return self.redirect("/error/404")

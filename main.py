@@ -35,7 +35,7 @@ app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['landing_
                                ('/account/register', AccountRegister),
                                ('/contact', ContactHandler),
                                ('/events', EventList),
-                               ('/events/(.*)', EventList),
+                               ('/events/([0-9]*)', EventList),
                                ('/event/(.*)/feed', EventRss),
                                ('/event/(.*)', EventDetail),
                                ('/gameday', GamedayHandler),
