@@ -45,7 +45,7 @@ class MatchstatsHelper(object):
         # Solving M*x = s for x
         try:
             x = np.linalg.solve(M, s)
-        except np.linalg.LinAlgError:
+        except (np.linalg.LinAlgError, ValueError):
             return {}
 
         stat_dict = {}
