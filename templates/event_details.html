@@ -124,9 +124,9 @@
                                 <th>Team</th>
                                 <th>OPR</th>
                             </tr>
-                            {% for opr,opr_team in oprs %}
+                            {% for team, opr in oprs %}
                             <tr>
-                                <td><a href="/team/{{ opr_team }}">{{ opr_team }}</a></td>
+                                <td><a href="/team/{{ team }}/{{ event.year }}">{{ team }}</a></td>
                                 <td>{{ opr|floatformat:2 }}</td>
                             </tr>
                             {% endfor %}

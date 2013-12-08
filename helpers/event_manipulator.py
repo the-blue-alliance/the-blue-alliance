@@ -22,6 +22,7 @@ class EventManipulator(ManipulatorBase):
             "location",
             "name",
             "official",
+            "matchstats_json",
             "rankings_json",
             "short_name",
             "start_date",
@@ -32,10 +33,7 @@ class EventManipulator(ManipulatorBase):
             "year"
         ]
 
-        list_attrs = [
-            "oprs",
-            "opr_teams"
-        ]
+        list_attrs = []
 
         for attr in attrs:
             # Special case for rankings. Don't merge bad data.

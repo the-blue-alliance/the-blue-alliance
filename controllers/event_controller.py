@@ -119,8 +119,9 @@ class EventDetail(CacheableHandler):
             middle_value += 1
         teams_a, teams_b = teams[:middle_value], teams[middle_value:]
 
-        oprs = sorted(zip(event.oprs, event.opr_teams), reverse=True)  # sort by OPR
-        oprs = oprs[:14]  # get the top 15 OPRs
+        oprs = [i for i in event.matchstats['oprs'].items()] if (event.matchstats is not None and 'oprs' in event.matchstats) else []
+        oprs = sorted(oprs, key=lambda t: t[1], reverse=True)  # sort by OPR
+        oprs = oprs[:15]  # get the top 15 OPRs
 
         if event.within_a_day:
             matches_recent = MatchHelper.recentMatches(cleaned_matches)

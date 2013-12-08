@@ -52,8 +52,7 @@ class TestEventManipulator(unittest2.TestCase):
             venue_address="Connecticut Convention Center\r\n100 Columbus Blvd\r\nHartford, CT 06103\r\nUSA",
             website="http://www.ctfirst.org/ctr",
 
-            oprs=[1.0, 2.0, 3.0],
-            opr_teams=[177, 195, 233],  # are these really stored as ints or strings? -gregmarra 20120922
+            matchstats_json=json.dumps({'oprs': {'4255': 7.4877151786460301, '2643': 27.285682906835952, '852': 10.452538750544525, '4159': 25.820137009871139, '581': 18.513816255143144}}),
             facebook_eid="7",
             webcast_json=json.dumps([{'type': 'ustream', 'channel': 'foo'}]),
             rankings_json=json.dumps(bad_rankings)
@@ -64,8 +63,7 @@ class TestEventManipulator(unittest2.TestCase):
 
     def assertMergedEvent(self, event):
         self.assertOldEvent(event)
-        self.assertEqual(event.oprs, [1, 2, 3])
-        self.assertEqual(event.opr_teams, [177, 195, 233])
+        self.assertEqual(event.matchstats, {'oprs': {'4255': 7.4877151786460301, '2643': 27.285682906835952, '852': 10.452538750544525, '4159': 25.820137009871139, '581': 18.513816255143144}})
         self.assertEqual(event.facebook_eid, "7")
         self.assertEqual(event.webcast[0]['type'], 'ustream')
         self.assertEqual(event.webcast[0]['channel'], 'foo')
