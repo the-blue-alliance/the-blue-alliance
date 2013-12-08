@@ -79,8 +79,8 @@ class MatchstatsHelper(object):
                     team_list.add(team)
                     match_team_list.append(team)
 
-                alliance_score = alliances[alliance_color]['score']
-                opposing_score = alliances[opposing_color]['score']
+                alliance_score = int(alliances[alliance_color]['score'])
+                opposing_score = int(alliances[opposing_color]['score'])
                 parsed_matches_by_type['opr'].append((match_team_list, alliance_score))
                 parsed_matches_by_type['dpr'].append((match_team_list, opposing_score))
                 parsed_matches_by_type['ccwm'].append((match_team_list, alliance_score - opposing_score))
