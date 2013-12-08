@@ -166,10 +166,8 @@ class TestApiMatchDetails(unittest2.TestCase):
         self.assertEqual(match["set_number"], self.matches[match_id].set_number)
         self.assertEqual(match["match_number"], self.matches[match_id].match_number)
         self.assertEqual(match["team_keys"], self.matches[match_id].team_key_names)
+        self.assertEqual(match["alliances"], self.matches[match_id].alliances)
 
-        # FIXME: urgh. strings. - brandondean 10/21/2012
-        #self.assertEqual(match["alliances"], self.matches[match_id].alliances_json)
-    
     def assertMatchNames(self, match_list):
         match_names = ",".join(match_list)
         api_names = ["match", "matches"]
@@ -179,13 +177,9 @@ class TestApiMatchDetails(unittest2.TestCase):
 
             matches = json.loads(response.body)
             for match in matches:
-                match["alliances"] = str(match["alliances"])
                 self.assertIn(match["key"], self.matches)
                 self.assertMatch(match)
 
     def test_match_details(self):
-        if os.environ.get('TRAVIS', '') != 'true':
-            # These tests fail on Travis for an unknown reason. -gregmarra 20130921
-            # https://travis-ci.org/gregmarra/the-blue-alliance/builds/11643106
-            self.assertMatchNames(["2010cmp_f1m1"])
-            self.assertMatchNames(["2010cmp_f1m1", "2011cmp_f1m1", "2012cmp_f1m1"])
+        self.assertMatchNames(["2010cmp_f1m1"])
+        self.assertMatchNames(["2010cmp_f1m1", "2011cmp_f1m1", "2012cmp_f1m1"])
