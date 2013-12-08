@@ -139,11 +139,7 @@ class Match(ndb.Model):
 
     @property
     def key_name(self):
-        if self.comp_level == "qm":
-            return self.event_key_name + '_qm' + str(self.match_number)
-        else:
-            return (self.event_key_name + '_' + self.comp_level +
-                    str(self.set_number) + 'm' + str(self.match_number))
+        return self.renderKeyName(self.event_key_name, self.comp_level, self.set_number, self.match_number)
 
     @property
     def has_been_played(self):
@@ -185,11 +181,11 @@ class Match(ndb.Model):
         return "%s" % (self.COMP_LEVELS_VERBOSE[self.comp_level])
 
     @classmethod
-    def renderKeyName(self, event, comp_level, set_number, match_number):
+    def renderKeyName(self, event_key_name, comp_level, set_number, match_number):
         if comp_level == "qm":
-            return "%s_qm%s" % (event.key_name, match_number)
+            return "%s_qm%s" % (event_key_name, match_number)
         else:
-            return "%s_%s%sm%s" % (event.key_name, comp_level, set_number, match_number)
+            return "%s_%s%sm%s" % (event_key_name, comp_level, set_number, match_number)
 
     @classmethod
     def validate_key_name(self, match_key):

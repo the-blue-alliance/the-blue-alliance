@@ -7,6 +7,7 @@ from datafeeds.offseason_matches_parser import OffseasonMatchesParser
 from models.event import Event
 from models.match import Match
 
+
 class TestMatchCleanup(unittest2.TestCase):
     def setUp(self):
         self.event = Event(
@@ -21,7 +22,6 @@ class TestMatchCleanup(unittest2.TestCase):
         self.testbed.init_memcache_stub()
 
     def tearDown(self):
-        del self.event
         self.testbed.deactivate()
 
     def setupMatches(self, csv):
@@ -29,7 +29,7 @@ class TestMatchCleanup(unittest2.TestCase):
             parsed_matches = OffseasonMatchesParser.parse(f.read())
             matches = [Match(
                 id=Match.renderKeyName(
-                    self.event,
+                    self.event.key.id(),
                     match.get("comp_level", None),
                     match.get("set_number", 0),
                     match.get("match_number", 0)),
@@ -47,7 +47,9 @@ class TestMatchCleanup(unittest2.TestCase):
     def test_cleanup(self):
         matches = self.setupMatches('test_data/cleanup_matches.csv')
         cleaned_matches = MatchHelper.deleteInvalidMatches(matches)
-        indices = [9, 12, 26]
-        for index in sorted(indices, reverse=True):  # need to delete in reverse order so indices don't get messed up
-            del matches[index]
-        self.assertEqual(matches, cleaned_matches)
+        indices = {9, 12, 26}
+        correct_matches = []
+        for i, match in enumerate(matches):
+            if i not in indices:
+                correct_matches.append(match)
+        self.assertEqual(correct_matches, cleaned_matches)

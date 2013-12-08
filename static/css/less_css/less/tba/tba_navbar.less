@@ -6,7 +6,7 @@
   margin-left: 0;
   margin-right: 5px;
   float: left;
-  
+
   @media (max-width: @screen-xs-min) {
     padding-left: 0;
     padding-right: 0;
@@ -23,7 +23,7 @@
   > li > a {
     padding-top: ((@navbar-height - @line-height-computed) / 2);
     padding-bottom: ((@navbar-height - @line-height-computed) / 2);
-  
+
     padding-left: 5px;
     padding-right: 5px;
     @media (min-width: @screen-xs-min) and (max-width: @screen-sm-max) {
@@ -68,7 +68,7 @@
 
 .tba-navbar-form {
   width: 250px;
-    
+
   @media (min-width: @screen-md-min) {
     .pull-right();
   }
@@ -86,7 +86,7 @@
 .social-icons {
   max-height: @social-icon-size;
   padding: 0;
-  margin: (@navbar-height - @social-icon-size)/2 15px 0 0;
+  margin-top: (@navbar-height - @social-icon-size)/2;
   float: right;
 
   @media (min-width: @screen-sm-min) and (max-width: @screen-sm-max) {
@@ -108,7 +108,7 @@
   margin: 0 4px 0px 4px;
   background-repeat: no-repeat;
   background-position: center center;
-  
+
   @media (max-width: @screen-sm-max) {
     margin: 0 15px;
     text-align: center;

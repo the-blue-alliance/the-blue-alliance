@@ -12,7 +12,7 @@
     <div class="col-xs-12">
       <h3>Number of Matches by Year</h3>
       <figure style="width: 90%; height: 300px;" id="num-matches-chart"></figure>
-      <div id="num-matches" class="xcharts-data xcharts-line-single-data">{{ num_matches.data_json|safe }}</div>
+      <div id="num-matches" class="xcharts-data xcharts-line-data">[{{ num_matches.data_json|safe }}]</div>
     </div>
   </div>
   {% endif %}
