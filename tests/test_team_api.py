@@ -82,15 +82,20 @@ class TestApiTeamShow(unittest2.TestCase):
         self.assertTrue(self.event.key.id() in team_dict["events"])
 
     def testTeamShow(self):
-        response = self.testapp.get('/?teams=frc281')
+        response = self.testapp.get('/?teams=frc281', headers={"User-Agent": "tests"})
 
         team_dict = json.loads(response.body)
         self.assertTeamJson(team_dict[0])
 
     def testNonexistentTeam(self):
-        response = self.testapp.get('/?teams=frc3141579265', status=404)
+        response = self.testapp.get('/?teams=frc3141579265', headers={"User-Agent": "tests"}, status=404)
 
         self.assertEqual(response.status_int, 404)
+
+    def test_validate_user_agent(self):
+        response = self.testapp.get('/?teams=frc254', expect_errors=True)  # By default get() doesn't send a user agent
+        self.assertEqual(response.status, "400 Bad Request")
+        self.assertEqual(response.body, '{"Error": "User-Agent is a required header."}')
 
 
 class TestApiTeamDetails(unittest2.TestCase):
@@ -109,6 +114,11 @@ class TestApiTeamDetails(unittest2.TestCase):
         self.testbed.deactivate()
 
     def testNonexistentTeam(self):
-        response = self.testapp.get('/?team=frc3141579265', status=404)
+        response = self.testapp.get('/?team=frc3141579265', headers={"User-Agent": "tests"}, status=404)
 
         self.assertEqual(response.status_int, 404)
+
+    def test_validate_user_agent(self):
+        response = self.testapp.get('/?team=frc3141579265', expect_errors=True)  # By default get() doesn't send a user agent
+        self.assertEqual(response.status, "400 Bad Request")
+        self.assertEqual(response.body, '{"Error": "User-Agent is a required header."}')

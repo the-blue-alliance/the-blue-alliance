@@ -57,10 +57,15 @@ class TestApiEventList(unittest2.TestCase):
         self.assertEqual(event_dict["end_date"], self.event.end_date.isoformat())
 
     def test_event_show(self):
-        response = self.testapp.get('/?year=2010')
+        response = self.testapp.get('/?year=2010', headers={"User-Agent": "tests"})
 
         event_dict = json.loads(response.body)
         self.assertEventJson(event_dict[0])
+
+    def test_validate_user_agent(self):
+        response = self.testapp.get('/?year=2010', expect_errors=True)  # By default get() doesn't send a user agent
+        self.assertEqual(response.status, "400 Bad Request")
+        self.assertEqual(response.body, '{"Error": "User-Agent is a required header."}')
 
 
 class TestApiMatchDetails(unittest2.TestCase):
@@ -173,7 +178,7 @@ class TestApiMatchDetails(unittest2.TestCase):
         api_names = ["match", "matches"]
 
         for api_name in api_names:
-            response = self.testapp.get("/?" + api_name + "=" + match_names)
+            response = self.testapp.get("/?" + api_name + "=" + match_names, headers={"User-Agent": "tests"})
 
             matches = json.loads(response.body)
             for match in matches:
