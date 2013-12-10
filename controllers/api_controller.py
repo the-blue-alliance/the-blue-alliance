@@ -75,7 +75,7 @@ class MainApiHandler(webapp2.RequestHandler):
         """
         Tests the presence of a User-Agent header.
         """
-        if self.request.headers.get("User-Agent") is None:
+        if not self.request.headers.get("User-Agent"):
             self._errors = json.dumps({"Error": "User-Agent is a required header."})
             self.abort(400)
 
