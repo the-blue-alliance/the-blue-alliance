@@ -5,6 +5,7 @@ import webapp2
 from controllers.base_controller import CacheableHandler
 from helpers.validation_helper import ValidationHelper
 
+
 class ApiBaseController(CacheableHandler):
 
     def __init__(self, *args, **kw):
@@ -13,7 +14,7 @@ class ApiBaseController(CacheableHandler):
 
     def handle_exception(self, exception, debug):
         """
-        Handle an HTTP exception and actually writeout a 
+        Handle an HTTP exception and actually writeout a
         response.
         Called by webapp when abort() is called, stops code excution.
         """
@@ -36,7 +37,7 @@ class ApiBaseController(CacheableHandler):
         """
         Tests the presence of a User-Agent header.
         """
-        if self.request.headers.get("User-Agent") is None:
+        if not self.request.headers.get("User-Agent"):
             self._errors = json.dumps({"Error": "User-Agent is a required header."})
             self.abort(400)
 
