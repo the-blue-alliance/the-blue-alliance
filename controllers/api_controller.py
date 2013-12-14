@@ -97,7 +97,11 @@ class ApiTeamsShow(MainApiHandler):
             except IndexError:
                 pass
 
-        response_json = teams
+        if teams:
+            response_json = teams
+        else:
+            response_json = {"Property Error": "No teams found for any key given"}
+            self.response.set_status(404)
 
         self.response.out.write(json.dumps(response_json))
 
