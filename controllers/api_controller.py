@@ -90,12 +90,14 @@ class ApiTeamsShow(MainApiHandler):
         teams = []
         team_keys = self.request.get('teams').split(',')
 
-        try:
-            teams = [ApiHelper.getTeamInfo(team_key) for team_key in team_keys]
-            response_json = teams
-        except IndexError:
-            response_json = {"Property Error": "No team found for a key given"}
-            self.response.set_status(404)
+        for team_key in team_keys:
+            try:
+                team_info = ApiHelper.getTeamInfo(team_key)
+                teams.append(team_info)
+            except IndexError:
+                pass
+
+        response_json = teams
 
         self.response.out.write(json.dumps(response_json))
 
