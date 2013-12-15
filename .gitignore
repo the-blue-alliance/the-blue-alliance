@@ -54,7 +54,7 @@ $RECYCLE.BIN/
 *.temp
 
 # Compiled/Intermediate Files #
-######################
+###############################
 static/css/less_css/*.css
 static/css/*.css
 static/javascript/*.js
