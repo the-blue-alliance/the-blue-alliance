@@ -15,26 +15,30 @@
   <div class="row">
     <div class="col-xs-12">
       <h3>Highest Scoring Match{% if match_highscore.data|length > 1 %}es{% endif %}</h3>
-      {% for match in  match_highscore.data %}
+      {% for match in match_highscore.data %}
       <h4><a href="/match/{{match.key_name}}">{{ match.event_name }} <small>{{ match.verbose_name }}</small></a></h4>
       <table class="match-table insights-table">
-        <tr class="key">
-          <th colspan="{{match.alliances.items.0.1.teams|length}}">Teams</th>
-          <th>Score</th>
-        </tr>
-        {% for items in match.alliances.items reversed %}
-        <tr>
-           {% for team in items.1.teams %}
-             <td class="{{items.0}}{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}"><a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a></td>
-           {% endfor %}
-           <td class="{{items.0}}Score{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}">{% ifequal items.1.score "-1" %}?{% else %}{{ items.1.score }}{% endifequal %}</td>
-        </tr>
-        {% endfor %}
+        <thead>
+          <tr class="key">
+            <th colspan="{{match.alliances.items.0.1.teams|length}}">Teams</th>
+            <th>Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for items in match.alliances.items reversed %}
+          <tr>
+            {% for team in items.1.teams %}
+              <td class="{{items.0}}{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}"><a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a></td>
+            {% endfor %}
+            <td class="{{items.0}}Score{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}">{% ifequal items.1.score "-1" %}?{% else %}{{ items.1.score }}{% endifequal %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
       </table>
       {% endfor %}
-	  </div>
-	</div>
-	<!--
+    </div>
+  </div>
+  <!--
   <div class="row">
     <h3>Highest Scoring Matches By Week</h3>
     <div class="col-xs-12">
@@ -43,24 +47,28 @@
       {% for match in matches %}
       <h4><a href="/match/{{match.key_name}}">{{ match.event_name }} <small>{{ match.verbose_name }}</small></a></h4>
       <table class="match-table">
-        <tr class="key">
-          <th colspan="{{match.alliances.items.0.1.teams|length}}">Teams</th>
-          <th>Score</th>
-        </tr>
-        {% for items in match.alliances.items reversed %}
-        <tr>
-           {% for team in items.1.teams %}
-             <td class="{{ items.0 }}{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}"><a href="/team/{{ team|slice:"3:" }}">{{ team|slice:"3:" }}</a></td>
-           {% endfor %}
-           <td class="{{items.0}}Score{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}">{% ifequal items.1.score "-1" %}?{% else %}{{ items.1.score }}{% endifequal %}</td>
-        </tr>
-        {% endfor %}
+        <thead>
+          <tr class="key">
+            <th colspan="{{match.alliances.items.0.1.teams|length}}">Teams</th>
+            <th>Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for items in match.alliances.items reversed %}
+          <tr>
+            {% for team in items.1.teams %}
+              <td class="{{ items.0 }}{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}"><a href="/team/{{ team|slice:"3:" }}">{{ team|slice:"3:" }}</a></td>
+            {% endfor %}
+            <td class="{{items.0}}Score{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}">{% ifequal items.1.score "-1" %}?{% else %}{{ items.1.score }}{% endifequal %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
       </table>
       {% endfor %}
     {% endfor %}
     </div>
   </div>
-   -->
+  -->
   {% endif %}
 
   {% if match_averages_by_week %}
@@ -104,8 +112,10 @@
     <div class="col-xs-12">
       <h3>Top Blue Banner Winners</h3>
       <table class="table table-striped table-condensed table-center insights-table">
-        <tbody>
+        <thead>
           <tr><th>Number</th><th>Teams</th></tr>
+        </thead>
+        <tbody>
           {% for number, team_list in blue_banners.data %}
             {% if team_list|length < 50 %}
             <tr>
@@ -118,6 +128,7 @@
             </tr>
             {% endif %}
           {% endfor %}
+        </tbody>
       </table>
     </div>
   </div>
@@ -128,8 +139,10 @@
     <div class="col-xs-12">
       <h3>Top Regional &amp; District Winners</h3>
       <table class="table table-striped table-condensed table-center insights-table">
-        <tbody>
+        <thead>
           <tr><th>Number</th><th>Teams</th></tr>
+        </thead>
+        <tbody>
           {% for number, team_list in regional_district_winners.data %}
             {% if team_list|length < 50 %}
             <tr>
@@ -142,6 +155,7 @@
             </tr>
             {% endif %}
           {% endfor %}
+        </tbody>
       </table>
     </div>
   </div>

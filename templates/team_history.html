@@ -10,47 +10,52 @@
 
 {% block content %}
 <div class="container">
-    {% include "team_partials/team_info.html" %}
-    <hr>
-    <div class="row">
-        <div class="col-xs-12">
-            {% with "History" as dropdown_label %}
-            {% include "team_partials/team_year_dropdown.html" %}
-            {% endwith %}
-        </div>
+  {% include "team_partials/team_info.html" %}
+  <hr>
+  <div class="row">
+    <div class="col-xs-12">
+      {% with "History" as dropdown_label %}
+      {% include "team_partials/team_year_dropdown.html" %}
+      {% endwith %}
     </div>
-    <hr>
-    <div class="row">
-        <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
-        {% if event_awards %}
-          <h3>Competition List:</h3>
-          <table class="table table-condensed table-striped">
-            <tr>
-              <th>Year</th>
-              <th>Event</th>
-              <th>Awards</th>
-            </tr>
-            {% for event, awards in event_awards reversed %}
-            <tr>
-              <td><a href="/team/{{team.team_number}}/{{event.year}}">{{event.year}}</a></td>
-              <td><a href="/event/{{event.key_name}}">{{event.name}}</a></td>
-              <td>
-              {% if awards %}
-                {% for award in awards %}
-                  {% for team_number, awardees in award.recipient_dict.items %}
-                  {% if team_number == team.team_number %}
-                    {% for awardee in awardees %}
-                      {{ award.name_str }}{% if awardee %} ({{ awardee }}){% endif %}<br>
-                    {% endfor %}
-                  {% endif %}
-                  {% endfor %}
-                {% endfor %}
+  </div>
+  <hr>
+  <div class="row">
+    <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
+      {% if event_awards %}
+      <h3>Competition List:</h3>
+      <table class="table table-condensed table-striped">
+        <thead>
+          <tr>
+            <th>Year</th>
+            <th>Event</th>
+            <th>Awards</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for event, awards in event_awards reversed %}
+          <tr>
+            <td><a href="/team/{{team.team_number}}/{{event.year}}">{{event.year}}</a></td>
+            <td><a href="/event/{{event.key_name}}">{{event.name}}</a></td>
+            <td>
+            {% if awards %}
+            {% for award in awards %}
+              {% for team_number, awardees in award.recipient_dict.items %}
+              {% if team_number == team.team_number %}
+              {% for awardee in awardees %}
+                {{ award.name_str }}{% if awardee %} ({{ awardee }}){% endif %}<br>
+              {% endfor %}
               {% endif %}
-              </td>
-            </tr>
+              {% endfor %}
             {% endfor %}
-          </table>
-        {% endif %}
-        </div>
+            {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
     </div>
+  </div>
+</div>
 {% endblock %}
