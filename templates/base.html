@@ -1,31 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>{% block title %}The Blue Alliance{% endblock %}</title>
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <meta charset="UTF-8">
+  <title>{% block title %}The Blue Alliance{% endblock %}</title>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
-    {% block main_style %}<link rel="stylesheet" href="/css/tba_combined_style.main.min.css">{% endblock %}
+  {% block main_style %}<link rel="stylesheet" href="/css/tba_combined_style.main.min.css">{% endblock %}
 
-    <meta name="description" content="{% block meta_description %}Team information and match videos and results from the FIRST Robotics Competition{% endblock %}">
-    <meta name="keywords" content="FIRST Robotics, FIRST Robotics Competition, robotics, first, firstrobotics, competition, team, regionals, matches, videos">
-    <meta property="fb:page_id" content="29895192027">
-    <meta property="fb:admins" content="1086840001">
-    <meta property="fb:app_id" content="117484816504">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="{% block meta_description %}Team information and match videos and results from the FIRST Robotics Competition{% endblock %}">
+  <meta name="keywords" content="FIRST Robotics, FIRST Robotics Competition, robotics, first, firstrobotics, competition, team, regionals, matches, videos">
+  <meta property="fb:page_id" content="29895192027">
+  <meta property="fb:admins" content="1086840001">
+  <meta property="fb:app_id" content="117484816504">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    {% block more_head_tags %}{% endblock %}
+  {% block more_head_tags %}{% endblock %}
 
-    {% block main_javascript %}
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.0/js/bootstrap.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.pack.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.5.2/jquery.tablesorter.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.9.3/typeahead.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/hogan.js/2.0.0/hogan.js"></script>
-    <script src="/javascript/tba_combined_js.main.min.js"></script>
-    {% endblock %}
+  {% block main_javascript %}
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.0/js/bootstrap.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.pack.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.5.2/jquery.tablesorter.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.9.3/typeahead.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/hogan.js/2.0.0/hogan.js"></script>
+  <script src="/javascript/tba_combined_js.main.min.js"></script>
+  {% endblock %}
 </head>
 <body>
 
@@ -42,10 +42,10 @@
 <div class="navbar navbar-default navbar-fixed-top">
   <div class="container">
     <button type="button" class="navbar-toggle tba-navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-		</button>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
 
     <a class="tba-navbar-logo-link" href="/">
       <img class="tba-navbar-logo" src="/images/tba_blue_lamp_navbar_large.png" alt="tba logo">
@@ -54,33 +54,33 @@
     <a class="navbar-brand tba-navbar-brand visible-xs" href="/">TBA</a>
 
     <ul class="nav navbar-nav tba-navbar-nav">
-		  <li class="tba-nav-persistent {% block teams_active %}{% endblock %}"><a href="/teams"><span><span class="glyphicon glyphicon-user"></span> Teams</span></a></li>
+      <li class="tba-nav-persistent {% block teams_active %}{% endblock %}"><a href="/teams"><span><span class="glyphicon glyphicon-user"></span> Teams</span></a></li>
       <li class="tba-nav-persistent {% block events_active %}{% endblock %}"><a href="/events"><span><span class="glyphicon glyphicon-calendar"></span> Events</span></a></li>
       <li class="tba-nav-persistent hidden-xs {% block insights_active %}{% endblock %}"><a href="/insights"><span><span class="glyphicon glyphicon-align-left"></span> Insights</span></a></li>
       <li class="tba-nav-persistent hidden-xs"><a href="/gameday"><span><span class="glyphicon glyphicon-facetime-video"></span> GameDay</span></a></li>
-	   </ul>
+    </ul>
 
-	  <div class="navbar-collapse collapse tba-navbar-collapse tba-collapse navbar-responsive-collapse">
+    <div class="navbar-collapse collapse tba-navbar-collapse tba-collapse navbar-responsive-collapse">
       <ul class="nav navbar-nav">
-			  <li class="visible-xs {% block insights_active_collapsed %}{% endblock %}"><a href="/insights"><span><span class="glyphicon glyphicon-align-left"></span> Insights</span></a></li>
+        <li class="visible-xs {% block insights_active_collapsed %}{% endblock %}"><a href="/insights"><span><span class="glyphicon glyphicon-align-left"></span> Insights</span></a></li>
         <li class="visible-xs"><a href="/gameday"><span><span class="glyphicon glyphicon-facetime-video"></span> GameDay</span></a></li>
       </ul>
 
       <form class="navbar-form tba-navbar-form" action="http://www.thebluealliance.com/search" >
-			    <input type="hidden" name="cx" value="017956276086362105630:99ctqytcokm" />
-			    <input type="hidden" name="cof" value="FORID:11" />
-			    <input type="hidden" name="ie" value="UTF-8" />
-			    <input type="text" class="form-control typeahead" placeholder="Search for teams and events" name="q"/>
-			</form>
+        <input type="hidden" name="cx" value="017956276086362105630:99ctqytcokm" />
+        <input type="hidden" name="cof" value="FORID:11" />
+        <input type="hidden" name="ie" value="UTF-8" />
+        <input type="text" class="form-control typeahead" placeholder="Search for teams and events" name="q"/>
+      </form>
 
-			<div class="social-icons">
-				<a id="facebook" class="socialIcon" href="https://www.facebook.com/thebluealliance" title="Like us on Facebook"></a>
+      <div class="social-icons">
+        <a id="facebook" class="socialIcon" href="https://www.facebook.com/thebluealliance" title="Like us on Facebook"></a>
         <a id="instagram" class="socialIcon" href="http://instagram.com/the_blue_alliance" title="Follow us on Instagram"></a>
-				<a id="twitter" class="socialIcon" href="https://twitter.com/thebluealliance" title="Follow us on Twitter"></a>
-				<a id="tumblr" class="socialIcon" href="http://thebluealliance.tumblr.com/" title="Read our Blog"></a>
-			</div>
-		</div>
-	</div>
+        <a id="twitter" class="socialIcon" href="https://twitter.com/thebluealliance" title="Follow us on Twitter"></a>
+        <a id="tumblr" class="socialIcon" href="http://thebluealliance.tumblr.com/" title="Read our Blog"></a>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
@@ -107,8 +107,8 @@
         <a href="/thanks">thanks</a> -
         <a href="/admin/">admin</a>
       </div>
-	  </div>
-	</div>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
