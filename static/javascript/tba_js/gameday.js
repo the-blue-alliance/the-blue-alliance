@@ -68,6 +68,7 @@ function setupViews() {
   if (isKickoff != null) {
 	  layout_0();
 	  setChat(true);
+	  setSocial(true);
 	  setupView(0, $("#kickoff-1"));
 	  $("#nav-alert-container").html('<div class="alert alert-success nav-alert"><button type="button" class="close" data-dismiss="alert">&times;</button><strong>Welcome!</strong> Remember to come back during the competition season for webcasts, scores, and more!</div>');
   }
