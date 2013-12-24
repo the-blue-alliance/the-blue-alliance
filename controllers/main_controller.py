@@ -43,12 +43,14 @@ class MainKickoffHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         kickoff_datetime_est = datetime.datetime(2014, 1, 4, 10, 30)
+        kickoff_datetime_utc = kickoff_datetime_est + datetime.timedelta(hours=5)
 
         is_kickoff = datetime.datetime.now() >= kickoff_datetime_est - datetime.timedelta(days=1)  # turn on 1 day before
 
         path = os.path.join(os.path.dirname(__file__), "../templates/index_kickoff.html")
         return template.render(path, {'is_kickoff': is_kickoff,
                                       'kickoff_datetime_est': kickoff_datetime_est,
+                                      'kickoff_datetime_utc': kickoff_datetime_utc,
                                       })
 
 
