@@ -37,13 +37,19 @@ def render_static(page):
 class MainKickoffHandler(CacheableHandler):
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24 * 7
+        self._cache_expiration = 60 * 60 * 24
         self._cache_key = "main_kickoff"
         self._cache_version = 3
 
     def _render(self, *args, **kw):
+        kickoff_datetime_est = datetime.datetime(2014, 1, 4, 10, 30)
+
+        is_kickoff = datetime.datetime.now() >= kickoff_datetime_est - datetime.timedelta(days=1)  # turn on 1 day before
+
         path = os.path.join(os.path.dirname(__file__), "../templates/index_kickoff.html")
-        return template.render(path, {})
+        return template.render(path, {'is_kickoff': is_kickoff,
+                                      'kickoff_datetime_est': kickoff_datetime_est,
+                                      })
 
 
 class MainBuildseasonHandler(CacheableHandler):
