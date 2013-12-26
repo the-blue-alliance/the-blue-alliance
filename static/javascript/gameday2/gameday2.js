@@ -113,9 +113,6 @@ var ChatPanel = React.createClass({
     });
     return (
       <div className={classes}>
-        <div id="chat-info-background">
-          <div id="chat-info" className="alert alert-warning"><button type="button" className="close" data-dismiss="alert">&times;</button><strong>Reminder:</strong> You need to log into a <a href="http://www.justin.tv" target="_blank">Justin.tv</a> or <a href="http://www.twitch.tv" target="_blank">Twitch.tv</a> account in order to chat.</div>
-        </div>
         <iframe frameBorder="0" scrolling="no" id="chat_embed" src="http://twitch.tv/chat/embed?channel=tbagameday&amp;popout_chat=true" height="100%" width="100%"></iframe>
       </div>
     );
@@ -124,15 +121,18 @@ var ChatPanel = React.createClass({
 
 var HashtagPanel = React.createClass({
   componentDidMount: function() {
-    var height = $('#twitter-widget').css('height');
-    $('.twitter-timeline').attr('height', height);
-    $('#twitter-wjs').remove();
-    !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];
-      js=d.createElement(s);
-      js.id=id;
-      js.src="//platform.twitter.com/widgets.js";
-      fjs.parentNode.insertBefore(js,fjs);
-    }(document,"script","twitter-wjs");
+    !function(d,s,id){
+      var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';
+      if(!d.getElementById(id)){
+        js=d.createElement(s);js.id=id;
+        js.src=p+"://platform.twitter.com/widgets.js";
+        fjs.parentNode.insertBefore(js,fjs);
+      }
+    }
+    (document,"script","twitter-wjs");
+  },
+  componentDidUpdate: function() {
+    $(".twitter-timeline").attr("height", "100%");
   },
   render: function() {
     var cx = React.addons.classSet;
@@ -142,7 +142,7 @@ var HashtagPanel = React.createClass({
     });
     return (
       <div className={classes}>
-        <div id="twitter-widget"><a className="twitter-timeline" href="https://twitter.com/search?q=%23omgrobots" data-widget-id="282256949859454976">Tweets about "#omgrobots"</a></div>
+        <div id="twitter-widget"><a className="twitter-timeline" href="https://twitter.com/search?q=%23omgrobots" data-widget-id="406597120632709121">Tweets about "#omgrobots"</a></div>
       </div>
     );
   }
