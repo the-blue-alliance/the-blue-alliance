@@ -1,11 +1,33 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Gameday2</title>
+{% extends "base.html" %}
 
+{% block title %}GameDay - The Blue Alliance{% endblock %}
+
+{% block main_style %}
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="/css/gameday2.css" type="text/css" />
+{% endblock %}
 
+{% block meta_description %}Watch live FIRST Robotics Competition events.{% endblock %}
+
+{% block more_head_tags %}
+  <meta property="og:title" content="Gameday - Live FIRST Robotics Video">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="http://www.thebluealliance.com/gameday">
+  <meta property="og:image" content="http://www.thebluealliance.com/images/first_logo.png">
+  <meta property="og:description" content="Watch live FIRST Robotics Competition events!">
+  <meta property="og:site_name" content="The Blue Alliance">
+{% endblock %}
+
+{% block navbar %}{% endblock %}
+
+{% block content %}
+  <div id="content"></div>
+  <div class="hidden" id="webcast_data">{{ special_webcasts }}</div>
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block main_javascript %}
     <script src="http://fb.me/react-with-addons-0.8.0.js"></script>
     <script src="http://fb.me/JSXTransformer-0.8.0.js"></script>
 
@@ -14,10 +36,21 @@
     <script src="http://codeorigin.jquery.com/jquery-2.0.3.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.0/js/bootstrap.min.js"></script>
-  </head>
-  <body>
-    <div id="content"></div>
-    <div class="hidden" id="webcast_data">{{ special_webcasts }}</div>
+
     <script type="text/jsx" src="javascript/gameday2/gameday2.js"></script>
-  </body>
-</html>
+{% endblock %}
+
+{% block ganalytics_timer %}
+<script>
+(function (tos) {
+  window.setInterval(function () {
+    // Calculate time every 60,000 milliseconds (60 seconds)
+    tos = (function (t) {
+      return ((parseInt(t[1]) || 0) + 1) + ':00';
+    })(tos.split(':').reverse());
+    // Collect and send the time to Google Analytics
+    window.pageTracker ? pageTracker._trackEvent('gameday_time', 'Log', tos) : _gaq.push(['_trackEvent', 'gameday_time', 'Log', tos]);
+    }, 60000);
+  })('00');
+</script>
+{% endblock %}
