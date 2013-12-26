@@ -75,10 +75,10 @@ var GamedayKickoffNavbar = React.createClass({
             <span className="icon-bar"></span>
             <span className="icon-bar"></span>
           </button>
-          <a className="navbar-brand" href="#">Gameday</a>
+          <a className="navbar-brand" href="#">GameDay</a>
         </div>
-
         <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <p className="navbar-text navbar-left"><small>by <a href="/" className="navbar-link">The Blue Alliance</a></small></p>
           <ul className="nav navbar-nav navbar-right">
             <li>
               <BootstrapButton
