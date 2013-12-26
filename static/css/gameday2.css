@@ -9,7 +9,12 @@ body {
     padding-top: 60px;
 }
 
+#content {
+    height:100%;
+}
+
 .container-full { 
+    height: 100%;
     padding: 0 15px;
 }
 
@@ -17,6 +22,14 @@ body {
     height: 100%;
     width: 100%;
     display: inline-block
+}
+
+.videoGrid .row {
+    height: 100%;
+}
+
+.videoGrid .row div {
+    height: 100%;
 }
 
 .sidebar {

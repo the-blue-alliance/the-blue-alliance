@@ -400,6 +400,7 @@ var BootstrapNavDropdownListItem = React.createClass({
 
 var kickoff_events = [
   {"key": "2014kickoff", "name": "Kickoff 2014", "webcasts": [{"type": "ustream", "channel": "710"}]},
+  {"key": "2014nh", "name": "BAE Granite State", "webcasts": [{"type": "youtube", "channel": "olhwB5grOtA"}]},
 ]
 
 var events = [
