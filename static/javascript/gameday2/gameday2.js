@@ -19,12 +19,20 @@ var GamedayFrame = React.createClass({
   componentWillMount: function() {
     //this.loadDataFromServer();
     //setInterval(this.loadDataFromServer, this.props.pollInterval);
-    this.setState({events: this.props.events})
+    this.setState({events: this.props.events});
+    this.setKickoffState();
+  },
+  setKickoffState: function() {
+    this.setState({
+      events: [{"key": "2014kickoff", "name": "Kickoff 2014", "webcasts": [{"type": "ustream", "channel": "710"}]}],
+      displayedEvents: [{"key": "2014kickoff", "name": "Kickoff 2014", "webcasts": [{"type": "ustream", "channel": "710"}]}],
+      hashtagEnabled: true,
+    });
   },
   render: function() {
     return (
       <div className="gameday container-full">
-        <GamedayNavbar 
+        <GamedayKickoffNavbar 
           chatEnabled={this.state.chatEnabled}
           hashtagEnabled={this.state.hashtagEnabled}
           events={this.state.events}
@@ -54,6 +62,38 @@ var GamedayFrame = React.createClass({
   },
   handleWebcastReset: function() {
     this.setState({displayedEvents: []});
+  }
+});
+
+var GamedayKickoffNavbar = React.createClass({
+  render: function() {
+    return (
+      <nav className="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div className="navbar-header">
+          <button type="button" className="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span className="sr-only">Toggle navigation</span>
+            <span className="icon-bar"></span>
+            <span className="icon-bar"></span>
+            <span className="icon-bar"></span>
+          </button>
+          <a className="navbar-brand" href="#">Gameday</a>
+        </div>
+
+        <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul className="nav navbar-nav navbar-right">
+            <li>
+              <BootstrapButton
+                active={this.props.chatEnabled}
+                handleClick={this.props.onChatToggle}>Chat</BootstrapButton>
+            </li>
+            <li>
+              <BootstrapButton
+                active={this.props.hashtagEnabled}
+                handleClick={this.props.onHashtagToggle}>#omgrobots</BootstrapButton></li>
+          </ul>
+        </div>
+      </nav>
+    );
   }
 });
 
@@ -130,6 +170,8 @@ var HashtagPanel = React.createClass({
       }
     }
     (document,"script","twitter-wjs");
+    setTimeout(function(){$(".twitter-timeline").attr("height", "100%");}, 3000);
+    // omg what a hack -gregmarra 20131226
   },
   componentDidUpdate: function() {
     $(".twitter-timeline").attr("height", "100%");
@@ -398,11 +440,6 @@ var BootstrapNavDropdownListItem = React.createClass({
   },
 })
 
-var kickoff_events = [
-  {"key": "2014kickoff", "name": "Kickoff 2014", "webcasts": [{"type": "ustream", "channel": "710"}]},
-  {"key": "2014nh", "name": "BAE Granite State", "webcasts": [{"type": "youtube", "channel": "olhwB5grOtA"}]},
-]
-
 var events = [
   {"key": "2014nh", "name": "BAE Granite State", "webcasts": [{"type": "youtube", "channel": "olhwB5grOtA"}]},
   {"key": "2014ct", "name": "UTC Regional", "webcasts": [{"type": "youtube", "channel": "FKpIWmsDPq4"}]},
@@ -410,6 +447,6 @@ var events = [
 ]
 
 React.renderComponent(
-  <GamedayFrame events={kickoff_events} pollInterval={20000} />,
+  <GamedayFrame events={events} pollInterval={20000} />,
   document.getElementById('content')
 );
