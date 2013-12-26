@@ -292,22 +292,64 @@ var VideoCellLayoutThree = React.createClass({
 var VideoCell = React.createClass({
   render: function() {
     if (this.props.eventModel) {
-      if (this.props.eventModel.webcasts) {
-        var src = "//www.youtube.com/embed/" + this.props.eventModel.webcasts[0].channel;
-        var id = this.props.eventModel.name + "-1";
+      var id = this.props.eventModel.name + "-1";
+      switch (this.props.eventModel.webcasts[0].type) {
+        case "ustream":
+          cellEmbed = <EmbedUstream
+            eventModel={this.props.eventModel}
+            vidHeight={this.props.vidHeight}
+            vidWidth={this.props.vidWidth} />;
+          break;
+        case "youtube":
+          cellEmbed = <EmbedYoutube
+            eventModel={this.props.eventModel}
+            vidHeight={this.props.vidHeight}
+            vidWidth={this.props.vidWidth} />;
+          break;
+        default:
+          cellEmbed = "";
+          break;
       }
+      return (
+        <div className="videoCell" idName={id}>
+          {cellEmbed}
+        </div>
+      )
     } else {
-      var src = "";
-      var id = "blank";
+      return <div className="videoCell" />
     }
-    
-    return (
-      <div className="videoCell" idName={id}>
-        <iframe width={this.props.vidWidth} height={this.props.vidHeight} src={src} frameBorder="0" allowFullScreen></iframe>
-      </div>
-    );
   }
 });
+
+var EmbedYoutube = React.createClass({
+  render: function() {
+    var src = "//www.youtube.com/embed/" + this.props.eventModel.webcasts[0].channel;
+    return (
+      <iframe
+        width={this.props.vidWidth}
+        height={this.props.vidHeight}
+        src={src}
+        frameBorder="0"
+        allowFullScreen>
+      </iframe>
+    );
+  }
+})
+
+var EmbedUstream = React.createClass({
+  render: function() {
+    var src = "http://www.ustream.tv/embed/schannel/" + this.props.eventModel.webcasts[0].channel;
+    return (
+      <iframe
+        width={this.props.vidWidth}
+        height={this.props.vidHeight}
+        src={src}
+        scrolling="no"
+        frameBorder="0">
+      </iframe>
+      )
+  }
+})
 
 var WebcastDropdown = React.createClass({
   render: function() {
@@ -356,6 +398,10 @@ var BootstrapNavDropdownListItem = React.createClass({
   },
 })
 
+var kickoff_events = [
+  {"key": "2014kickoff", "name": "Kickoff 2014", "webcasts": [{"type": "ustream", "channel": "710"}]},
+]
+
 var events = [
   {"key": "2014nh", "name": "BAE Granite State", "webcasts": [{"type": "youtube", "channel": "olhwB5grOtA"}]},
   {"key": "2014ct", "name": "UTC Regional", "webcasts": [{"type": "youtube", "channel": "FKpIWmsDPq4"}]},
@@ -363,6 +409,6 @@ var events = [
 ]
 
 React.renderComponent(
-  <GamedayFrame events={events} pollInterval={20000} />,
+  <GamedayFrame events={kickoff_events} pollInterval={20000} />,
   document.getElementById('content')
 );
