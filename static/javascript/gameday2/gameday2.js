@@ -24,8 +24,7 @@ var GamedayFrame = React.createClass({
   },
   setKickoffState: function() {
     this.setState({
-      events: [{"key": "2014kickoff", "name": "Kickoff 2014", "webcasts": [{"type": "ustream", "channel": "710"}]}],
-      displayedEvents: [{"key": "2014kickoff", "name": "Kickoff 2014", "webcasts": [{"type": "ustream", "channel": "710"}]}],
+      displayedEvents: this.props.events,
       hashtagEnabled: true,
     });
   },
@@ -380,15 +379,30 @@ var EmbedYoutube = React.createClass({
 
 var EmbedUstream = React.createClass({
   render: function() {
-    var src = "http://www.ustream.tv/embed/schannel/" + this.props.eventModel.webcasts[0].channel;
+    var src = "http://www.ustream.tv/flash/live/" + this.props.eventModel.webcasts[0].channel;
     return (
-      <iframe
-        width={this.props.vidWidth}
+      <object
+        id='utv_o_322919'
         height={this.props.vidHeight}
-        src={src}
-        scrolling="no"
-        frameBorder="0">
-      </iframe>
+        width={this.props.vidWidth}
+        classid='clsid:D27CDB6E-AE6D-11cf-96B8-444553540000'>
+        <param value={src} name='movie' />
+        <param value='true' name='allowFullScreen' />
+        <param value='always' name='allowScriptAccess' />
+        <param value='transparent' name='wmode' />
+        <param value='viewcount=true&autoplay=true&brand=embed&' name='flashvars' />
+        <embed
+          name='utv_e_218829'
+          id='utv_e_209572'
+          flashvars='viewcount=true&autoplay=true&brand=embed'
+          height={this.props.vidHeight}
+          width={this.props.vidWidth}
+          allowFullScreen='true'
+          allowScriptAccess='always'
+          wmode='transparent'
+          src={src}
+          type='application/x-shockwave-flash' />
+      </object>
       )
   }
 })
@@ -440,11 +454,25 @@ var BootstrapNavDropdownListItem = React.createClass({
   },
 })
 
-var events = [
-  {"key": "2014nh", "name": "BAE Granite State", "webcasts": [{"type": "youtube", "channel": "olhwB5grOtA"}]},
-  {"key": "2014ct", "name": "UTC Regional", "webcasts": [{"type": "youtube", "channel": "FKpIWmsDPq4"}]},
-  {"key": "2014az", "name": "Arizona!", "webcasts": [{"type": "youtube", "channel": "QZv70PG9eXM"}]}
-]
+//var events = [
+//  {"key": "2014nh", "name": "BAE Granite State", "webcasts": [{"type": "youtube", "channel": "olhwB5grOtA"}]},
+//  {"key": "2014ct", "name": "UTC Regional", "webcasts": [{"type": "youtube", "channel": "FKpIWmsDPq4"}]},
+//  {"key": "2014az", "name": "Arizona!", "webcasts": [{"type": "youtube", "channel": "QZv70PG9eXM"}]}
+//]
+
+var webcast_data = $.parseJSON($("#webcast_data").text().replace(/'/g,'"'));
+var events = []
+for (var index in webcast_data) {
+  single_event = webcast_data[index],
+  new_event = {
+    "key": single_event.key_name,
+    "name": single_event.name,
+    "webcasts": [{
+      "type": single_event.type,
+      "channel": single_event.channel,
+    }]}
+  events.push(new_event)
+}
 
 React.renderComponent(
   <GamedayFrame events={events} pollInterval={20000} />,
