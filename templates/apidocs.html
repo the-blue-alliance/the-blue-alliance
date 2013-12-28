@@ -13,6 +13,8 @@
          <li><a class="smooth-scroll" href="#overview">Overview</a></li>
          <li><a class="smooth-scroll" href="#team-model">Team Model</a></li>
          <li><a class="smooth-scroll" href="#event-model">Event Model</a></li>
+         <li><a class="smooth-scroll" href="#match-model">Match Model</a></li>
+         <li><a class="smooth-scroll" href="#award-model">Award Model</a></li>
          <li><a class="smooth-scroll" href="#team-request">Team Request</a></li>
         </ul>
       </div>
@@ -175,6 +177,104 @@
             <td>List of <a class="smooth-scroll" href="#award-model">award
             models</a> for the event.</td>
             <td></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 id="match-model">Match Model</h2>
+      <table class=table>
+        <caption>Response Data</caption>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>key</td>
+            <td>TBA event key with the format
+            <code>yyyy[EVENT_CODE]_[COMPETITION_LEVEL]m[MATCH_NUMBER]</code>,
+            where yyyy is the year, and EVENT_CODE is the
+            <a href="https://docs.google.com/spreadsheet/ccc?key=0ApRO2Yzh2z01dExFZEdieV9WdTJsZ25HSWI3VUxsWGc">event code</a>
+            of the event, MATCH_CODE is the match code (qm, ef, qf, ect…), and
+            MATCH_NUMBER is the match number in the competition level. A set number
+            may append the competition level if more than one match in required
+            per set .</td>
+            <td>2010sc_qm10, 2011nc_qf1m2</td>
+          </tr>
+          <tr>
+            <td>comp_level</td>
+            <td>The competition level the match was played at.</td>
+            <td>qm, ef, qf, sf, f</td>
+          </tr>
+          <tr>
+            <td>team_keys</td>
+            <td>A list team keys of teams who played in the match.</td>
+            <td>["frc449", "frc900"]</td>
+          </tr>
+          <tr>
+            <td>set_number</td>
+            <td>The set number in a series of matches where more than one
+            match is required in the match series.</td>
+            <td>2010sc_qf1m2, would be match 2 in quarter finals 1.</td>
+          </tr>
+          <tr>
+            <td>match_number</td>
+            <td>The match number of the match in the competition level.</td>
+            <td>2010sc_qm50</td>
+          </tr>
+          <tr>
+            <td>game</td>
+            <td>The game code for the game the match played.</td>
+            <td>frc_2010_logo, FRC's 2010 game Logomotion</td>
+          </tr>
+          <tr>
+            <td>alliances</td>
+            <td>A list of alliances, the teams on the alliances, and their score.</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>event</td>
+            <td>Event key of the event the match was played at.</td>
+            <td>2011sc</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 id="award-model">Award Model</h2>
+      <table class=table>
+        <caption>Model Data</caption>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>name_str</td>
+            <td>The name of the award from TIMS. May very for the same award
+            type.</td>
+            <td>Engineering Inspiration</td>
+          </tr>
+          <tr>
+            <td>event</td>
+            <td>The event_key of the event the award was won at.</td>
+            <td>2011sc</td>
+          </tr>
+          <tr>
+            <td>recipient_list</td>
+            <td>A list of recipients of the award at the event. Either
+            team_number or awardee for individual awards.</td>
+            <td>{"team_number": 281, "awardee": null}</td>
+          </tr>
+          <tr>
+            <td>year</td>
+            <td>The year this award was won.</td>
+            <td>2010</td>
           </tr>
         </tbody>
       </table>
