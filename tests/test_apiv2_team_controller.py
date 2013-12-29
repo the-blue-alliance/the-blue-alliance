@@ -103,7 +103,7 @@ class TestTeamApiController(unittest2.TestCase):
     def assertMatchJson(self, match):
         self.assertEqual(str(match["key"]), self.match.key.string_id())
         self.assertEqual(match["comp_level"], self.match.comp_level)
-        self.assertEqual(match["event"], self.match.event.string_id())
+        self.assertEqual(match["event_key"], self.match.event.string_id())
         self.assertEqual(match["game"], self.match.game)
         self.assertEqual(match["set_number"], self.match.set_number)
         self.assertEqual(match["match_number"], self.match.match_number)
