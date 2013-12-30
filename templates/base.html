@@ -13,30 +13,11 @@
   <meta property="fb:admins" content="1086840001">
   <meta property="fb:app_id" content="117484816504">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   {% block more_head_tags %}{% endblock %}
-
-  {% block main_javascript %}
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.0/js/bootstrap.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.pack.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.5.2/jquery.tablesorter.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.9.3/typeahead.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/hogan.js/2.0.0/hogan.min.js"></script>
-  <script src="/javascript/tba_combined_js.main.min.js"></script>
-  {% endblock %}
 </head>
 <body>
 
 <div id="fb-root"></div>
-<script>(function(d, s, id) {
-  var js, fjs = d.getElementsByTagName(s)[0];
-  if (d.getElementById(id)) return;
-  js = d.createElement(s); js.id = id;
-  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=117484816504";
-  fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script>
 
 {% block navbar %}
 <div class="navbar navbar-default navbar-fixed-top">
@@ -113,6 +94,25 @@
 {% endblock %}
 
 <a class="scroll-up visible-xs smooth-scroll" href="#"><span class="glyphicon glyphicon-arrow-up"></span></a>
+
+{% block main_javascript %}
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.0/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.pack.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.5.2/jquery.tablesorter.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.9.3/typeahead.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/hogan.js/2.0.0/hogan.min.js"></script>
+<script src="/javascript/tba_combined_js.main.min.js"></script>
+{% endblock %}
+
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=117484816504";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
 
 <script>
   var _gaq = _gaq || [];
