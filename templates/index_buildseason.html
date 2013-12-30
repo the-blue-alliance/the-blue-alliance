@@ -6,18 +6,18 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-xs-4">
+    <div class="col-sm-4">
       {% include "index_lhc.html" %}
     </div>
-    <div class="col-xs-8">
-      <h2><span class="countdown-number countdown-days">--</span><span class="countdown-label day-label"> Days</span> to Build! <small>Build Season ends February 19th</small></h2>
-      <div id="countdown-finish-time">[2013, 1, 20, 12, 0, 0]</div>
+    <div class="col-sm-8">
+      <h2><span class="countdown-number countdown-days">--</span><span class="countdown-label day-label"> Days</span> to Build! <small>Build Season ends {{endbuild_datetime_est|date:"F jS"}}</small></h2>
+      <div id="countdown-finish-time">{{endbuild_datetime_utc|date:"c"}}</div>
       <div class="btn-group">
-        <a class="btn" href="http://www.usfirst.org/roboticsprograms/frc/2013-game" target="_blank"><span class="glyphicon glyphicon-file"></span> Game Manual PDF</a>
-        <a class="btn" href="https://itunes.apple.com/us/app/frc-manual/id488793605"><span class="glyphicon glyphicon-download"></span> iPhone Manual </a>
-        <a class="btn" href="https://play.google.com/store/apps/details?id=org.usfirst.manual.frc"><span class="glyphicon glyphicon-download"></span> Android Manual</a>
+        <a class="btn btn-default" href="http://frc-manual.usfirst.org/" target="_blank"><span class="glyphicon glyphicon-file"></span> Game Manual PDF</a>
+        <a class="btn btn-default" href="https://itunes.apple.com/us/app/frc-manual/id488793605"><span class="glyphicon glyphicon-download"></span> iPhone Manual </a>
+        <a class="btn btn-default" href="https://play.google.com/store/apps/details?id=org.usfirst.manual.frc"><span class="glyphicon glyphicon-download"></span> Android Manual</a>
       </div>
-      <br /><br />
+      <br><br>
       <div class="fitvids">
         <iframe width="420" height="315" src="http://www.youtube.com/embed/wa5MGEZNrf0?rel=0" frameborder="0" allowfullscreen></iframe>
       </div>

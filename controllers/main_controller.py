@@ -62,8 +62,13 @@ class MainBuildseasonHandler(CacheableHandler):
         self._cache_version = 1
 
     def _render(self, *args, **kw):
+        endbuild_datetime_est = datetime.datetime(2014, 2, 18, 0, 0)
+        endbuild_datetime_utc = endbuild_datetime_est + datetime.timedelta(hours=5)
+
         path = os.path.join(os.path.dirname(__file__), "../templates/index_buildseason.html")
-        return template.render(path, {})
+        return template.render(path, {'endbuild_datetime_est': endbuild_datetime_est,
+                                      'endbuild_datetime_utc': endbuild_datetime_utc
+                                      })
 
 
 class MainCompetitionseasonHandler(CacheableHandler):
