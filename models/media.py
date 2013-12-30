@@ -7,6 +7,8 @@ from consts.media_type import MediaType
 
 class Media(ndb.Model):
     """
+    The Media model represents different forms of media, such as YouTube Videos
+    or ChiefDelphi photos, that are associated with other models, such as Teams.
     """
 
     # Do not change! key_names are generated based on this
