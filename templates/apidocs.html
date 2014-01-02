@@ -1,0 +1,331 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance - API Docs{% endblock %}
+
+{% block meta_description %}About The Blue Alliance and the FIRST Robotics Competition.{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+   <div class="tba-sidenav-affixed">
+     <div class="tba-sidebar">
+       <ul class="nav tba-sidenav">
+         <li><a class="smooth-scroll" href="#overview">Overview</a></li>
+         <li><a class="smooth-scroll" href="#team-model">Team Model</a></li>
+         <li><a class="smooth-scroll" href="#event-model">Event Model</a></li>
+         <li><a class="smooth-scroll" href="#match-model">Match Model</a></li>
+         <li><a class="smooth-scroll" href="#award-model">Award Model</a></li>
+         <li><a class="smooth-scroll" href="#team-request">Team Request</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
+      <h1 class="endheader">Public API</h1>
+      <h2 id="overview">Overview</h2>
+      <p>This is documentation on The Blue Alliance's public web API for
+      programmatically accessing and gathering data out of the TBA records.</p>
+      <p>The API and code are open source. If you find a bug, want a new
+      feature, or are interested in helping us improve it visit us on <a
+      href="http://www.github.com/gregmarra/the-blue-alliance">Github</a>
+      and file an issue, or send a pull request. If you have any questions
+      about this API, or would like to stay up-to-date on its development
+      you can join our <a href="http://groups.google.com">developer's mailing list.</a></p>
+      <h3>User-Agent Header</h3>
+      <p>Since this API is made public free-of-charge it is only fair for the
+      developers of TBA to know what kind of applications are using it. This
+      helps us to gauge its usage, and understand what future developments
+      need to be made. Because of this <strong>we require all API requests to include a
+        descriptive User-Agent header to identify the source
+        application.</strong></p>
+      <p>Many standard HTTP libraries supply their own
+      User-Agent header to identify themselves (such as python's httplib or
+      ruby's Httparty). If you are using one of these libraries please replace the default header with the name of your
+      application; such as, <code>User-Agent: 'frc281-scouting-system'</code> </p>
+      <hr />
+
+      <h2 id="team-model">Team Model</h2>
+      <h4>Related: <a class="smooth-scroll" href="#team-request">Team Request</a></h4>
+      <table class=table>
+        <caption>Response Data</caption>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Description</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>website</td>
+            <td>Official website associated with the team</td>
+            <td>http://www.entech281.com</td>
+          </tr>
+          <tr>
+            <td>name</td>
+            <td>Official long form name registered with <em>FIRST</em></td>
+            <td>Michelin/Caterpillar/Greenville Technical College/Greenville...</td>
+          </tr>
+          <tr>
+            <td>locality</td>
+            <td>City of team derived from parsing the address registered with <em>FIRST</em></td>
+            <td>Greenville</td>
+          </tr>
+          <tr>
+            <td>region</td>
+            <td>State of team derived from parsing the address registered with <em>FIRST</em></td>
+            <td>SC</td>
+          </tr>
+          <tr>
+            <td>country</td>
+            <td>Country of team derived from parsing the address registered with <em>FIRST</em></td>
+            <td>USA</td>
+          </tr>
+          <tr>
+            <td>location</td>
+            <td>Long form address that includes city, state, and country provided by <em>FIRST</em></td>
+            <td>Greenville, SC, USA</td>
+          </tr>
+          <tr>
+            <td>team_number</td>
+            <td>Official team number issued by <em>FIRST</em></td>
+            <td>281</td>
+          </tr>
+          <tr>
+            <td>key</td>
+            <td>TBA team key with the format frcyyyy</td>
+            <td>frc281</td>
+          </tr>
+          <tr>
+            <td>nickname</td>
+            <td>Team nickname provided by <em>FIRST</em></td>
+            <td>EnTech GreenVillians</td>
+          </tr>
+          <tr>
+            <td>events</td>
+            <td>List of <a class="smooth-scroll" href="#event-model">event
+            models</a> that the team attended for the year requested.</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 id="event-model">Event Model</h2>
+      <table class=table>
+        <caption>Response Data</caption>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Description</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>key</td>
+            <td>TBA event key with the format <code>yyyy[EVENT_CODE]</code>,
+            where yyyy is the year, and EVENT_CODE is the
+            <a href="https://docs.google.com/spreadsheet/ccc?key=0ApRO2Yzh2z01dExFZEdieV9WdTJsZ25HSWI3VUxsWGc">event code</a>
+            of the event.</td>
+            <td>2010sc</td>
+          </tr>
+          <tr>
+            <td>name</td>
+            <td>Official name of event on record either provided by <em>FIRST</em> or organizers of offseason event.</td>
+            <td>Palmetto Regional</td>
+          </tr>
+          <tr>
+            <td>short_name</td>
+            <td><code>name</code> but doesn't include event specifiers, such as
+            'Regional' or 'District'.</td>
+            <td>Palmetto</td>
+          </tr>
+          <tr>
+            <td>event_code</td>
+            <td>Event short code.</td>
+            <td>SC</td>
+          </tr>
+          <tr>
+            <td>year</td>
+            <td>Year the event data is for.</td>
+            <td>2010</td>
+          </tr>
+          <tr>
+            <td>location</td>
+            <td>Long form address that includes city, and state provided by <em>FIRST</em></td>
+            <td>Clemson, SC</td>
+          </tr>
+          <tr>
+            <td>official</td>
+            <td>Whether this is a <em>FIRST</em> official event, or an offseaon
+            event.</td>
+            <td>true</td>
+          </tr>
+          <tr>
+            <td>teams</td>
+            <td>List of <a class="smooth-scroll" href="#team-models">team
+            models</a> that attended the event</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>matches</td>
+            <td>List of <a class="smooth-scroll" href="#match-model">match
+            models</a> for the event.</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>awards</td>
+            <td>List of <a class="smooth-scroll" href="#award-model">award
+            models</a> for the event.</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 id="match-model">Match Model</h2>
+      <table class=table>
+        <caption>Response Data</caption>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Description</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>key</td>
+            <td>TBA event key with the format
+            <code>yyyy[EVENT_CODE]_[COMPETITION_LEVEL]m[MATCH_NUMBER]</code>,
+            where yyyy is the year, and EVENT_CODE is the
+            <a href="https://docs.google.com/spreadsheet/ccc?key=0ApRO2Yzh2z01dExFZEdieV9WdTJsZ25HSWI3VUxsWGc">event code</a>
+            of the event, MATCH_CODE is the match code (qm, ef, qf, ect…), and
+            MATCH_NUMBER is the match number in the competition level. A set number
+            may append the competition level if more than one match in required
+            per set .</td>
+            <td>2010sc_qm10, 2011nc_qf1m2</td>
+          </tr>
+          <tr>
+            <td>comp_level</td>
+            <td>The competition level the match was played at.</td>
+            <td>qm, ef, qf, sf, f</td>
+          </tr>
+          <tr>
+            <td>team_keys</td>
+            <td>A list team keys of teams who played in the match.</td>
+            <td>["frc449", "frc900"]</td>
+          </tr>
+          <tr>
+            <td>set_number</td>
+            <td>The set number in a series of matches where more than one
+            match is required in the match series.</td>
+            <td>2010sc_qf1m2, would be match 2 in quarter finals 1.</td>
+          </tr>
+          <tr>
+            <td>match_number</td>
+            <td>The match number of the match in the competition level.</td>
+            <td>2010sc_qm20</td>
+          </tr>
+          <tr>
+            <td>game</td>
+            <td>The game code for the game the match played.</td>
+            <td>frc_2010_logo, FRC's 2010 game Logomotion</td>
+          </tr>
+          <tr>
+            <td>alliances</td>
+            <td>A list of alliances, the teams on the alliances, and their score.</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>event_key</td>
+            <td>Event key of the event the match was played at.</td>
+            <td>2011sc</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 id="award-model">Award Model</h2>
+      <table class=table>
+        <caption>Model Data</caption>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Description</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>name_str</td>
+            <td>The name of the award from TIMS. May vary for the same award type.</td>
+            <td>Engineering Inspiration</td>
+          </tr>
+          <tr>
+            <td>event_key</td>
+            <td>The event_key of the event the award was won at.</td>
+            <td>2011sc</td>
+          </tr>
+          <tr>
+            <td>recipient_list</td>
+            <td>A list of recipients of the award at the event. Either
+            team_number or awardee for individual awards.</td>
+            <td>{"team_number": 281, "awardee": null}</td>
+          </tr>
+          <tr>
+            <td>year</td>
+            <td>The year this award was won.</td>
+            <td>2010</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 id="team-request">Team Request</h2>
+      <h4>Related: <a class="smooth-scroll" href="#team-model">Team Model</a></h4>
+      <table class=table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>team key</td>
+            <td>A team key name where the format is <code>frcyyyy</code> where yyyy is the a
+              valid, official team number issued by <em>FIRST</em></td>
+            <td>frc1, frc281, frc1114</td>
+          </tr>
+          <tr>
+            <td>year  </td>
+            <td>A specific year you would like to grab data for this team.
+              Defaults to current year if not provided. </td>
+            <td>2008, 2013</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">GET Request:
+          <code>thebluealliance.com/api/v2/team/frc281/2011</code></h3>
+          <a class="btn team-example" href="#team">request example</a>
+        </div>
+        <div class="panel-body">
+          <div class="panel-group" id="accordion">
+            <pre class="pre-scrollable team-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+<script>
+  $(".team-example").click(function(){
+    $.get("api/v2/team/frc281/2011", function(data){
+      $(".team-request-json").html(JSON.stringify(data, null, 2));
+    });
+  });
+</script>
+{% endblock %}

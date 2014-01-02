@@ -288,3 +288,14 @@ class RecordHandler(CacheableHandler):
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/record.html")
         return template.render(path, {})
+
+class ApiDocumentationHandler(CacheableHandler):
+    def __init__(self, *args, **kw):
+        super(CacheableHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+        self._cache_key = "api_docs"
+        self._cache_version = 1
+
+    def _render(self, *args, **kw):
+        path = os.path.join(os.path.dirname(__file__), "../templates/apidocs.html")
+        return template.render(path, {})
