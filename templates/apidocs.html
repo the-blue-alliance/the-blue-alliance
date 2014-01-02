@@ -39,11 +39,15 @@
       developers of TBA to know what kind of applications are using it. This
       helps us to gauge its usage and understand what future developments
       need to be made. Because of this <strong>we require all API requests to include a
-      descriptive User-Agent header to identify the source application.</strong></p>
-      <p>Many standard HTTP libraries supply their own
-      User-Agent header to identify themselves (such as python's httplib or
-      ruby's Httparty). If you are using one of these libraries please replace the default header with the name of your
-      application; such as, <code>User-Agent: 'frc281-scouting-system'</code> </p>
+      unique descriptive User-Agent header to identify the source application.</strong></p>
+      <p>The User-Agent needs to follow this format:
+      <code>&ltteam/person id&gt:&ltapp description&gt:&ltversion&gt</code> and
+      not use any colons except for the two already present.</p>
+      <h4>Examples of valid User-Agents:</h4>
+      <ul>
+        <li><code>frc281:scouting-system:v01</code></li>
+        <li><code>woodie_flowers:match_scraper:5</code></li>
+      </ul>
       <hr>
 
       <h2 id="team-model">Team Model</h2>
