@@ -2,7 +2,7 @@
 
 {% block title %}The Blue Alliance - API Docs{% endblock %}
 
-{% block meta_description %}About The Blue Alliance and the FIRST Robotics Competition.{% endblock %}
+{% block meta_description %}Documentation for The Blue Alliance's API.{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -20,7 +20,11 @@
       </div>
     </div>
     <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
-      <h1 class="endheader">Public API</h1>
+      <h1 class="endheader">Public API (v2)</h1>
+      <div class="alert alert-danger"><strong>Note:</strong> Version 2 of our
+      API is still under development. This means that we may make changes
+      to it that are not backwards compatible. We will try to finalize the API
+      as soon as possible.</div>
       <h2 id="overview">Overview</h2>
       <p>This is documentation on The Blue Alliance's public web API for
       programmatically accessing and gathering data out of the TBA records.</p>
@@ -29,19 +33,18 @@
       href="http://www.github.com/gregmarra/the-blue-alliance">Github</a>
       and file an issue, or send a pull request. If you have any questions
       about this API, or would like to stay up-to-date on its development
-      you can join our <a href="http://groups.google.com">developer's mailing list.</a></p>
+      you can join our <a href="http://groups.google.com">developer's mailing list</a>.</p>
       <h3>User-Agent Header</h3>
       <p>Since this API is made public free-of-charge it is only fair for the
       developers of TBA to know what kind of applications are using it. This
-      helps us to gauge its usage, and understand what future developments
+      helps us to gauge its usage and understand what future developments
       need to be made. Because of this <strong>we require all API requests to include a
-        descriptive User-Agent header to identify the source
-        application.</strong></p>
+      descriptive User-Agent header to identify the source application.</strong></p>
       <p>Many standard HTTP libraries supply their own
       User-Agent header to identify themselves (such as python's httplib or
       ruby's Httparty). If you are using one of these libraries please replace the default header with the name of your
       application; such as, <code>User-Agent: 'frc281-scouting-system'</code> </p>
-      <hr />
+      <hr>
 
       <h2 id="team-model">Team Model</h2>
       <h4>Related: <a class="smooth-scroll" href="#team-request">Team Request</a></h4>
