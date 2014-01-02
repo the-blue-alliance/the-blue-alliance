@@ -283,6 +283,10 @@
 
       <h2 id="team-request">Team Request</h2>
       <h4>Related: <a class="smooth-scroll" href="#team-model">Team Model</a></h4>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/team/&ltteam key&gt/(&ltyear&gt)</code>
+      </p>
       <table class=table>
         <thead>
           <tr>
@@ -308,11 +312,18 @@
       </table>
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h3 class="panel-title">GET Request:
-          <code>thebluealliance.com/api/v2/team/frc281/2011</code></h3>
-          <a class="btn team-example" href="#team">request example</a>
+          <h3 class="panel-title">Example GET Request:</h3>
         </div>
         <div class="panel-body">
+          <form class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="6" id="example_team_request" type="text" value="/api/v2/team/frc281/2011">
+              <span class="input-group-btn" id="example_team_request_submit">
+                <button class="btn btn-success" type="button">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
           <div class="panel-group" id="accordion">
             <pre class="pre-scrollable team-request-json">
             </pre>
@@ -328,9 +339,16 @@
 
 {% block inline_javascript %}
 <script>
-  $(".team-example").click(function(){
-    $.get("api/v2/team/frc281/2011", function(data){
-      $(".team-request-json").html(JSON.stringify(data, null, 2));
+  $("#example_team_request_submit").click(function() {
+    $.ajax({
+      url: $("#example_team_request").val(),
+      dataType: 'json',
+      success: function(data) {
+        $(".team-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".team-request-json").html('Something went wrong! Please check for correct request format.');
+      }
     });
   });
 </script>
