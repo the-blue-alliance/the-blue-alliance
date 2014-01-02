@@ -110,7 +110,7 @@ class TestTeamApiController(unittest2.TestCase):
         self.assertEqual(match["team_keys"], self.match.team_key_names)
 
     def testTeamApi(self):
-        response = self.testapp.get('/frc281', headers={"User-Agent": "tests"})
+        response = self.testapp.get('/frc281', headers={"X-TBA-App-Id": "tba-tests:team-controller-test:v01"})
 
         team_dict = json.loads(response.body)
         self.assertTeamJson(team_dict)
