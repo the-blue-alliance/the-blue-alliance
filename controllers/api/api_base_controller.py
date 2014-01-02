@@ -40,6 +40,10 @@ class ApiBaseController(CacheableHandler):
         if not self.request.headers.get("User-Agent"):
             self._errors = json.dumps({"Error": "User-Agent is a required header."})
             self.abort(400)
+        split_useragent = self.request.headers.get("User-Agent").split(':')
+        if len(split_useragent) != 3:
+            self._errors = json.dumps({"Error": "User-Agent must follow the following format: <team/person id>:<app description>:<version>"})
+            self.abort(400)
 
     def _write_cache_headers(self, seconds):
         if type(seconds) is not int:
