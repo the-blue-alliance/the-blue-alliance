@@ -324,6 +324,9 @@
   </div>
 
 </div>
+{% endblock %}
+
+{% block inline_javascript %}
 <script>
   $(".team-example").click(function(){
     $.get("api/v2/team/frc281/2011", function(data){
