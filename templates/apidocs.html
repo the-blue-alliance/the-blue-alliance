@@ -315,17 +315,17 @@
           <h3 class="panel-title">Example GET Request:</h3>
         </div>
         <div class="panel-body">
-          <form class="form-inline">
+          <form id="example_team_request_form" class="form-inline">
             <div class="input-group">
               <span class="input-group-addon">www.thebluealliance.com</span>
               <input class="form-control" size="6" id="example_team_request" type="text" value="/api/v2/team/frc281/2011">
-              <span class="input-group-btn" id="example_team_request_submit">
-                <button class="btn btn-success" type="button">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
               </span>
             </div>
           </form>
           <div class="panel-group" id="accordion">
-            <pre class="pre-scrollable team-request-json">
+            <pre class="team-request-json">
             </pre>
           </div>
         </div>
@@ -339,7 +339,9 @@
 
 {% block inline_javascript %}
 <script>
-  $("#example_team_request_submit").click(function() {
+  $("#example_team_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".team-request-json").html('Processing request...');
     $.ajax({
       url: $("#example_team_request").val(),
       dataType: 'json',
