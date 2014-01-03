@@ -67,7 +67,6 @@ class ModelToDict(object):
         match_dict["key"] = match.key_name
         match_dict["event_key"] = match.event.id()
         match_dict["alliances"] = json.loads(match.alliances_json)
-        match_dict["team_keys"] = match.team_key_names
         match_dict["game"] = match.game
         match_dict["comp_level"] = match.comp_level
         match_dict["match_number"] = match.match_number

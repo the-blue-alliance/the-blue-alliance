@@ -107,7 +107,6 @@ class TestTeamApiController(unittest2.TestCase):
         self.assertEqual(match["game"], self.match.game)
         self.assertEqual(match["set_number"], self.match.set_number)
         self.assertEqual(match["match_number"], self.match.match_number)
-        self.assertEqual(match["team_keys"], self.match.team_key_names)
 
     def testTeamApi(self):
         response = self.testapp.get('/frc281', headers={"X-TBA-App-Id": "tba-tests:team-controller-test:v01"})
