@@ -7,6 +7,7 @@ threadsafe: true
 builtins:
 - appstats: on
 - remote_api: on
+- deferred: on
 
 libraries:
 - name: django
