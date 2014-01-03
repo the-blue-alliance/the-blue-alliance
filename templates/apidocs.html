@@ -26,20 +26,16 @@
       to it that are not backwards compatible. We will try to finalize the API
       as soon as possible.</div>
       <h2 id="overview">Overview</h2>
-      <p>This is documentation on The Blue Alliance's public web API for
-      programmatically accessing and gathering data out of the TBA records.</p>
+      <p>This documentation is for The Blue Alliance's public web API for
+      programmatically accessing data.</p>
       <p>The API and code are open source. If you find a bug, want a new
-      feature, or are interested in helping us improve it visit us on <a
+      feature, or are interested in helping us improve it, visit us on <a
       href="http://www.github.com/gregmarra/the-blue-alliance">GitHub</a>
-      and file an issue, or send a pull request. If you have any questions
-      about this API, or would like to stay up-to-date on its development
-      you can join our <a href="http://groups.google.com">developer's mailing list</a>.</p>
+      and file an issue or send a pull request. If you have any questions
+      about this API or would like to stay up-to-date on its development,
+      you can join our <a href="https://groups.google.com/forum/#!forum/thebluealliance-developers">developer's mailing list</a>.</p>
       <h3>X-TBA-App-Id Header</h3>
-      <p>Since this API is made public free-of-charge it is only fair for the
-      developers of TBA to know what kind of applications are using it. This
-      helps us to gauge its usage and understand what future developments
-      need to be made. Because of this <strong>we require all API requests to include a
-      unique descriptive X-TBA-App-Id header to identify the source application.</strong></p>
+      <p>So we can know how the API is being used to prioritize future development, we require clients to identify themselves. All API requests <strong>must</strong> include a unique, descriptive X-TBA-App-Id header to identify the application.</strong></p>
       <p>The X-TBA-App-Id needs to follow this format:
       <code>&ltteam/person id&gt:&ltapp description&gt:&ltversion&gt</code> and
       not use any colons except for the two already present.</p>
@@ -334,10 +330,8 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
-
 </div>
 {% endblock %}
 
