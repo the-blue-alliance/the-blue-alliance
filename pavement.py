@@ -76,6 +76,7 @@ def test_fast():
   sh("python run_tests.py --test_pattern=test_event_group_by_week.py")
   sh("python run_tests.py --test_pattern=test_event_team_repairer.py")
   sh("python run_tests.py --test_pattern=test_event_team_updater.py")
+  sh("python run_tests.py --test_pattern=test_event_get_short_name.py")
 
 
 def setup_function():
