@@ -27,6 +27,7 @@ class UsfirstEventDetailsParser(ParserBase):
 
         page_title = soup.find('h1', {'id': 'thepagetitle'}).text
         result['name'] = unicode(re.sub(r'\([^)]*\)', '', page_title[4:]).strip())
+        result['short_name'] = EventHelper.getShortName(result['name'])
         result['event_type_enum'] = EventHelper.parseEventType(unicode(re.search(event_type_re, page_title).group(1).strip()))
 
         try:

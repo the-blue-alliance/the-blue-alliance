@@ -28,6 +28,7 @@ class UsfirstLegacyEventDetailsParser(ParserBase):
                 field = str(tds[0].string)
                 if field == "Event":
                     result["name"] = unicode(''.join(tds[1].findAll(text=True))).strip()
+                    result['short_name'] = EventHelper.getShortName(result['name'])
                 if field == "Event Subtype":
                     result["event_type_enum"] = EventHelper.parseEventType(unicode(tds[1].string))
                 if field == "When":

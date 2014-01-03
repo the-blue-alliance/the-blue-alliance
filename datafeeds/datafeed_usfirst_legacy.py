@@ -74,6 +74,7 @@ class DatafeedUsfirstLegacy(DatafeedUsfirst):
             event_type_enum=event.get("event_type_enum", None),
             first_eid=first_eid,
             name=event.get("name", None),
+            short_name=event.get("short_name", None),
             official=True,
             start_date=event.get("start_date", None),
             venue_address=event.get("venue_address", None),
