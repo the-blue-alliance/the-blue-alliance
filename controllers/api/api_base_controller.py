@@ -37,12 +37,14 @@ class ApiBaseController(CacheableHandler):
         """
         Tests the presence of a X-TBA-App-Id header.
         """
-        if not self.request.headers.get("X-TBA-App-Id"):
+        x_tba_app_id = self.request.headers.get("X-TBA-App-Id")
+        if not x_tba_app_id:
             self._errors = json.dumps({"Error": "X-TBA-App-Id is a required header."})
             self.abort(400)
-        if len(self.request.headers.get("X-TBA-App-Id").split(':')) != 3:
+        if len(x_tba_app_id.split(':')) != 3:
             self._errors = json.dumps({"Error": "X-TBA-App-Id must follow the following format: <team/person id>:<app description>:<version>"})
             self.abort(400)
+        logging.info("X-TBA-App-ID: {}".format(x_tba_app_id))
 
     def _write_cache_headers(self, seconds):
         if type(seconds) is not int:
