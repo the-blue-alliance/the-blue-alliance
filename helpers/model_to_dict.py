@@ -41,7 +41,7 @@ class ModelToDict(object):
         event_dict["name"] = event.name
         event_dict["short_name"] = event.short_name
         event_dict["event_code"] = event.event_short
-        event_dict["event_type"] = event.event_type_enum
+        event_dict["event_type"] = event.event_type_str
         event_dict["year"] = event.year
         event_dict["location"] = event.location
         event_dict["official"] = event.official
@@ -67,7 +67,6 @@ class ModelToDict(object):
         match_dict["key"] = match.key_name
         match_dict["event_key"] = match.event.id()
         match_dict["alliances"] = json.loads(match.alliances_json)
-        match_dict["game"] = match.game
         match_dict["comp_level"] = match.comp_level
         match_dict["match_number"] = match.match_number
         match_dict["set_number"] = match.set_number
