@@ -10,6 +10,7 @@
     <thead>
         <th>Key</th>
         <th>Name</th>
+        <th>Short Name</th>
         <th>Year</th>
         <th>Event Short</th>
         <th>Event Type</th>
@@ -20,6 +21,7 @@
     <tr>
         <td>{{ event.key_name }}</td>
         <td><a href="/admin/event/{{event.key_name}}">{{ event.name }}</td>
+        <td>{{ event.short_name }}</td>
         <td>{{ event.year }}</td>
         <td>{{ event.event_short }}</td>
         <td>{{ event.event_type_str }}</td>
