@@ -54,10 +54,10 @@ class InsightsDetail(CacheableHandler):
         if year == '':
             return self.redirect("/insights")
         if not year.isdigit():
-            return self.redirect("/error/404")
+            self.abort(404)
         year = int(year)
         if year not in VALID_YEARS:
-            return self.redirect("/error/404")
+            self.abort(404)
 
         self._cache_key = self._cache_key.format(year)
         super(InsightsDetail, self).get(year)
