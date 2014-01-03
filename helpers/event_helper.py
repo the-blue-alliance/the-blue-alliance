@@ -154,11 +154,11 @@ class EventHelper(object):
             short = match.group(3)
             match = re.match(r'(.*)(FIRST Robotics|FRC)', short)
             if match:
-                return match.group(1)
+                return match.group(1).strip()
             else:
-                return short
+                return short.strip()
 
-        return name_str
+        return name_str.strip()
 
     @classmethod
     def parseEventType(self, event_type_str):
