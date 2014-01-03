@@ -27,7 +27,7 @@
               <li>{{match.alliances.blue.teams.2|slice:"3:"}}</li>
           ]]>
           </description>
-          <guid>{{ match.verbose_url</guid>
+          <guid>{{ match.verbose_url }}</guid>
         </item>
       {% endfor %}
     {% endif %}
