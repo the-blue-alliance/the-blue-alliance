@@ -11,7 +11,7 @@
     <managingEditor>contact@thebluealliance.com</managingEditor>
     <webMaster>contact@thebluealliance.com</webMaster>
     {% if matches.qm %}
-      {% for matches in matches.qm %}
+      {% for match in matches.qm %}
         <item>
           <title>{{ match.verbose_name }}</title>
           <link>http://thebluealliance.com{{ match.details_url }}</link>
