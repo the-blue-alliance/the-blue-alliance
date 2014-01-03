@@ -37,7 +37,7 @@ class TeamList(CacheableHandler):
             return self.redirect("/teams")
         page = int(page)
         if page not in self.VALID_PAGES:
-            return self.redirect("/error/404")
+            self.abort(404)
 
         self._cache_key = self._cache_key.format(page)
         super(TeamList, self).get(page)
@@ -105,7 +105,7 @@ class TeamDetail(CacheableHandler):
                     return self.redirect("/team/%s/%s" % (int(team_number), year))
         except ValueError, e:
             logging.info("%s", e)
-            return self.redirect("/error/404")
+            self.abort(404)
 
         if type(year) == str:
             try:
@@ -124,7 +124,7 @@ class TeamDetail(CacheableHandler):
     def _render(self, team_number, year=None, explicit_year=False):
         team = Team.get_by_id("frc" + team_number)
         if not team:
-            return self.redirect("/error/404")
+            self.abort(404)
 
         events_sorted, matches_by_event_key, awards_by_event_key, valid_years = TeamDetailsDataFetcher.fetch(team, year, return_valid_years=True)
 
@@ -208,7 +208,7 @@ class TeamHistory(CacheableHandler):
 
         except ValueError, e:
             logging.info("%s", e)
-            return self.redirect("/error/404")
+            self.abort(404)
 
         self._cache_key = self._cache_key.format("frc" + team_number)
         super(TeamHistory, self).get(team_number)
@@ -217,7 +217,7 @@ class TeamHistory(CacheableHandler):
         team = Team.get_by_id("frc" + team_number)
 
         if not team:
-            return self.redirect("/error/404")
+            self.abort(404)
 
         event_team_keys_future = EventTeam.query(EventTeam.team == team.key).fetch_async(1000, keys_only=True)
         award_keys_future = Award.query(Award.team_list == team.key).fetch_async(1000, keys_only=True)

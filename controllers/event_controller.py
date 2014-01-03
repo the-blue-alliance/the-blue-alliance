@@ -41,10 +41,10 @@ class EventList(CacheableHandler):
 
         if year:
             if not year.isdigit():
-                return self.redirect("/error/404")
+                self.abort(404)
             year = int(year)
             if year not in self.VALID_YEARS:
-                return self.redirect("/error/404")
+                self.abort(404)
             explicit_year = True
         else:
             year = datetime.datetime.now().year
@@ -104,7 +104,7 @@ class EventDetail(CacheableHandler):
         event = Event.get_by_id(event_key)
 
         if not event:
-            return self.redirect("/error/404")
+            self.abort(404)
 
         event.prepAwardsMatchesTeams()
 

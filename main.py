@@ -31,6 +31,13 @@ landing_handler = {tba_config.KICKOFF: MainKickoffHandler,
                    tba_config.INSIGHTS: MainInsightsHandler,
                    }
 
+class Webapp2HandlerAdapter(webapp2.BaseHandlerAdapter):
+    def __call__(self, request, response, exception):
+        request.route_args = {}
+        request.route_args['exception'] = exception
+        handler = self.handler(request, response)
+        return handler.get()
+
 app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['landing_handler']]),
                                ('/about', AboutHandler),
                                ('/account', AccountOverview),
@@ -66,3 +73,4 @@ app = webapp2.WSGIApplication([('/', landing_handler[tba_config.CONFIG['landing_
                                ('/.*', PageNotFoundHandler),
                                ],
                               debug=tba_config.DEBUG)
+app.error_handlers[404] = Webapp2HandlerAdapter(PageNotFoundHandler)

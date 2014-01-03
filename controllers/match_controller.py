@@ -39,10 +39,10 @@ class MatchDetail(CacheableHandler):
             match = match_future.get_result()
             event = event_future.get_result()
         except Exception, e:
-            return self.redirect("/error/404")
+            self.abort(404)
 
         if not match:
-            return self.redirect("/error/404")
+            self.abort(404)
 
         template_values = {
             "event": event,
