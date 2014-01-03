@@ -254,7 +254,7 @@ class GamedayHandler(CacheableHandler):
 
 
 class PageNotFoundHandler(webapp2.RequestHandler):
-    def get(self):
+    def get(self, *args):
         self.error(404)
         self.response.out.write(render_static("404"))
 
