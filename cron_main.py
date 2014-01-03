@@ -13,6 +13,7 @@ from controllers.datafeed_controller import UsfirstMatchesEnqueue, UsfirstMatche
 from controllers.datafeed_controller import UsfirstTeamDetailsEnqueue, UsfirstTeamDetailsRollingEnqueue, UsfirstTeamDetailsGet, UsfirstTeamsTpidsGet
 from controllers.datafeed_controller import UsfirstPre2003TeamEventsEnqueue, UsfirstPre2003TeamEventsGet
 
+from controllers.cron_controller import EventShortNameCalcEnqueue, EventShortNameCalcDo
 from controllers.cron_controller import EventTeamRepairDo, EventTeamUpdate, EventTeamUpdateEnqueue
 from controllers.cron_controller import EventMatchstatsDo, EventMatchstatsEnqueue
 from controllers.cron_controller import FinalMatchesRepairDo
@@ -41,6 +42,8 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
                                ('/tasks/get/usfirst_team_details/(.*)', UsfirstTeamDetailsGet),
                                ('/tasks/get/usfirst_teams_tpids/([0-9]*)', UsfirstTeamsTpidsGet),
                                ('/tasks/get/usfirst_pre2003_team_events/(.*)', UsfirstPre2003TeamEventsGet),
+                               ('/tasks/math/enqueue/event_short_name_calc_enqueue/([0-9]*)', EventShortNameCalcEnqueue),
+                               ('/tasks/math/do/event_short_name_calc_do/(.*)', EventShortNameCalcDo),
                                ('/tasks/math/enqueue/event_matchstats/(.*)', EventMatchstatsEnqueue),
                                ('/tasks/math/enqueue/eventteam_update/(.*)', EventTeamUpdateEnqueue),
                                ('/tasks/math/do/event_matchstats/(.*)', EventMatchstatsDo),
