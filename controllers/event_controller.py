@@ -181,7 +181,7 @@ class EventRss(CacheableHandler):
     def _render(self, event_key):
         event = Event.get_by_id(event_key)
         if not event:
-            return self.redirect("/error/404")
+            self.abort(404)
 
         matches = MatchHelper.organizeMatches(event.matches)
 
