@@ -6,6 +6,7 @@ from google.appengine.ext import testbed
 
 from controllers.api.api_base_controller import ApiBaseController
 
+
 class TestTeamApi(unittest2.TestCase):
 
     def setUp(self):
@@ -19,7 +20,10 @@ class TestTeamApi(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def test_validate_user_agent(self):
-        response = self.testapp.get('/', expect_errors=True) # By default get() doesn't send a user agent
+    def test_validate_app_id(self):
+        response = self.testapp.get('/', expect_errors=True)  # By default get() doesn't send a X-TBA-App-ID
         self.assertEqual(response.status, "400 Bad Request")
-        self.assertEqual(response.body, '{"Error": "User-Agent is a required header."}')
+        self.assertEqual(response.body, '{"Error": "X-TBA-App-Id is a required header."}')
+
+        response = self.testapp.get('/', headers={"X-TBA-App-Id": "this:is:a:bad:id"}, expect_errors=True)
+        self.assertEqual(response.status, "400 Bad Request")

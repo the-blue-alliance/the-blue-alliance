@@ -26,19 +26,22 @@ class ApiBaseController(CacheableHandler):
             self.response.set_status(500)
 
     def get(self, *args, **kw):
-        self._validate_user_agent()
+        self._validate_tba_app_id()
         self._errors = ValidationHelper.validate(self._validators)
         if self._errors:
             self.abort(400)
 
         super(ApiBaseController, self).get(*args, **kw)
 
-    def _validate_user_agent(self):
+    def _validate_tba_app_id(self):
         """
-        Tests the presence of a User-Agent header.
+        Tests the presence of a X-TBA-App-Id header.
         """
-        if not self.request.headers.get("User-Agent"):
-            self._errors = json.dumps({"Error": "User-Agent is a required header."})
+        if not self.request.headers.get("X-TBA-App-Id"):
+            self._errors = json.dumps({"Error": "X-TBA-App-Id is a required header."})
+            self.abort(400)
+        if len(self.request.headers.get("X-TBA-App-Id").split(':')) != 3:
+            self._errors = json.dumps({"Error": "X-TBA-App-Id must follow the following format: <team/person id>:<app description>:<version>"})
             self.abort(400)
 
     def _write_cache_headers(self, seconds):
