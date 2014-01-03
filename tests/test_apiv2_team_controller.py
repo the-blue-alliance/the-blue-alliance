@@ -12,6 +12,10 @@ from consts.event_type import EventType
 
 from controllers.api.api_team_controller import ApiTeamController
 
+from consts.award_type import AwardType
+from consts.event_type import EventType
+
+from models.award import Award
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
@@ -50,7 +54,7 @@ class TestTeamApiController(unittest2.TestCase):
                 event_type_enum=EventType.REGIONAL,
                 short_name="Palmetto",
                 event_short="sc",
-                year=2010,
+                year=datetime.now().year,
                 end_date=datetime(2010, 03, 27),
                 official=True,
                 location='Clemson, SC',
@@ -78,6 +82,17 @@ class TestTeamApiController(unittest2.TestCase):
 
         )
         self.match.put()
+
+        self.award = Award(
+            name_str = "Engineering Inspiration",
+            award_type_enum = AwardType.ENGINEERING_INSPIRATION,
+            year=datetime.now().year,
+            event = self.event.key,
+            event_type_enum = EventType.REGIONAL,
+            team_list = [self.team.key],
+            recipient_json_list=[json.dumps({'team_number': 281, 'awardee': None})],
+        )
+        self.award.put()
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -108,6 +123,12 @@ class TestTeamApiController(unittest2.TestCase):
         self.assertEqual(match["set_number"], self.match.set_number)
         self.assertEqual(match["match_number"], self.match.match_number)
 
+    def assertAwardJson(self, award):
+        self.assertEqual(award["name"], self.award.name_str)
+        self.assertEqual(award["event_key"], self.award.event.string_id())
+        self.assertEqual(award["recipient_list"], self.award.recipient_list)
+        self.assertEqual(award["year"], self.award.year)
+
     def testTeamApi(self):
         response = self.testapp.get('/frc281', headers={"X-TBA-App-Id": "tba-tests:team-controller-test:v01"})
 
@@ -115,3 +136,4 @@ class TestTeamApiController(unittest2.TestCase):
         self.assertTeamJson(team_dict)
         self.assertEventJson(team_dict["events"][0])
         self.assertMatchJson(team_dict["events"][0]["matches"][0])
+        self.assertAwardJson(team_dict["events"][0]["awards"][0])
