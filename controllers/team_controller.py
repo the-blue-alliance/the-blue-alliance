@@ -127,6 +127,8 @@ class TeamDetail(CacheableHandler):
             self.abort(404)
 
         events_sorted, matches_by_event_key, awards_by_event_key, valid_years = TeamDetailsDataFetcher.fetch(team, year, return_valid_years=True)
+        if not events_sorted:
+            self.abort(404)
 
         participation = []
         year_wlt_list = []
