@@ -5,8 +5,8 @@
     <link>http://www.thebluealliance.com{{ event.details_url }}</link>
     <description>RSS feed for the {{ event.name }} provided by The Blue Alliance.</description>
     <language>en-us</language>
-    <pubDate>{{ datetime }}</pubDate>
-    <lastBuildDate>{{ datetime }}</lastBuildDate>
+    <pubDate>{{ datetime|date:"r" }}</pubDate>
+    <lastBuildDate>{{ datetime|date:"r" }}</lastBuildDate>
     <generator>The Blue Alliance</generator>
     <managingEditor>contact@thebluealliance.com</managingEditor>
     <webMaster>contact@thebluealliance.com</webMaster>
