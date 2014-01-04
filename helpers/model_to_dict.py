@@ -41,7 +41,8 @@ class ModelToDict(object):
         event_dict["name"] = event.name
         event_dict["short_name"] = event.short_name
         event_dict["event_code"] = event.event_short
-        event_dict["event_type"] = event.event_type_str
+        event_dict["event_type_string"] = event.event_type_str
+        event_dict["event_type_enum"] = event.event_type_enum
         event_dict["year"] = event.year
         event_dict["location"] = event.location
         event_dict["official"] = event.official
