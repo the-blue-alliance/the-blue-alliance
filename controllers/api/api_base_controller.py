@@ -13,6 +13,10 @@ from models.sitevar import Sitevar
 
 # used for deferred call
 def track_call(api_action, api_label, x_tba_app_id):
+    """
+    For more information about GAnalytics Protocol Parameters, visit
+    https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
+    """
     analytics_id = Sitevar.get_by_id("google_analytics.id")
     if analytics_id is None:
         logging.warning("Missing sitevar: google_analytics.id. Can't track API usage.")
