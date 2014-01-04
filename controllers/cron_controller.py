@@ -40,7 +40,7 @@ class EventShortNameCalcEnqueue(webapp.RequestHandler):
     Enqueues Event short_name computation for official events
     """
     def get(self, year):
-        event_keys = Event.query(Event.official == True).fetch(200, keys_only=True)
+        event_keys = Event.query(Event.official == True, Event.year == year).fetch(200, keys_only=True)
         events = ndb.get_multi(event_keys)
 
         for event in events:
