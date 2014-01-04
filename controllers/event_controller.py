@@ -186,11 +186,11 @@ class EventRss(CacheableHandler):
         matches = MatchHelper.organizeMatches(event.matches)
 
         template_values = {
-                "event": event,
-                "matches": matches,
-                "datetime": datetime.datetime.now()
+            "event": event,
+            "matches": matches,
+            "datetime": datetime.datetime.now()
         }
 
         path = os.path.join(os.path.dirname(__file__), '../templates/event_rss.xml')
-        self.response.headers.add_header('content-type', 'application/xml', charset='utf-8')
+        self.response.headers.add_header('content-type', 'application/xml; charset=UTF-8')
         return template.render(path, template_values)
