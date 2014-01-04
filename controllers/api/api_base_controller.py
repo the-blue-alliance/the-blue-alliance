@@ -3,7 +3,7 @@ import logging
 import urllib
 import webapp2
 
-from google.appengine.api import memcache, urlfetch
+from google.appengine.api import urlfetch
 from google.appengine.ext import deferred
 
 from controllers.base_controller import CacheableHandler
