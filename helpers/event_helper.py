@@ -1,6 +1,7 @@
 import logging
 import collections
 import datetime
+import re
 
 from google.appengine.ext import ndb
 
@@ -145,6 +146,19 @@ class EventHelper(object):
             if event.within_a_day:
                 ret.append(event)
         return ret
+
+    @classmethod
+    def getShortName(self, name_str):
+        match = re.match(r'(MAR |PNW )?(FIRST Robotics|FRC)?(.*)(FIRST Robotics|FRC)?(District|Regional|Region|State|Tournament|FRC|Field)( Competition| Event| Championship)?', name_str)
+        if match:
+            short = match.group(3)
+            match = re.match(r'(.*)(FIRST Robotics|FRC)', short)
+            if match:
+                return match.group(1).strip()
+            else:
+                return short.strip()
+
+        return name_str.strip()
 
     @classmethod
     def parseEventType(self, event_type_str):

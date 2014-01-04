@@ -11,6 +11,8 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.api import urlfetch
 
+from helpers.event_helper import EventHelper
+
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.event_team_repairer import EventTeamRepairer
 from helpers.event_team_updater import EventTeamUpdater
@@ -31,6 +33,38 @@ from models.typeahead_entry import TypeaheadEntry
 import tba_config
 
 from models.insight import Insight
+
+
+class EventShortNameCalcEnqueue(webapp.RequestHandler):
+    """
+    Enqueues Event short_name computation for official events
+    """
+    def get(self, year):
+        event_keys = Event.query(Event.official == True).fetch(200, keys_only=True)
+        events = ndb.get_multi(event_keys)
+
+        for event in events:
+            taskqueue.add(
+                url='/tasks/math/do/event_short_name_calc_do/{}'.format(event.key.id()),
+                method='GET')
+
+        template_values = {'events': events}
+        path = os.path.join(os.path.dirname(__file__), '../templates/math/event_short_name_calc_enqueue.html')
+        self.response.out.write(template.render(path, template_values))
+
+
+class EventShortNameCalcDo(webapp.RequestHandler):
+    """
+    Computes Event short_name
+    """
+    def get(self, event_key):
+        event = Event.get_by_id(event_key)
+        event.short_name = EventHelper.getShortName(event.name)
+        event.put()
+
+        template_values = {'event': event}
+        path = os.path.join(os.path.dirname(__file__), '../templates/math/event_short_name_calc_do.html')
+        self.response.out.write(template.render(path, template_values))
 
 
 class EventTeamRepairDo(webapp.RequestHandler):

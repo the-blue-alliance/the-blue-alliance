@@ -11,6 +11,7 @@ class TestUsfirstLegacyEventDetailsParser(unittest2.TestCase):
             event, _ = UsfirstLegacyEventDetailsParser.parse(f.read())
 
         self.assertEqual(event["name"], "Northeast Utilities FIRST Connecticut Regional")
+        self.assertEqual(event["short_name"], "Northeast Utilities FIRST Connecticut")
         self.assertEqual(event["event_type_enum"], EventType.REGIONAL)
         self.assertEqual(event["start_date"], datetime.datetime(2012, 3, 29, 0, 0))
         self.assertEqual(event["end_date"], datetime.datetime(2012, 3, 31, 0, 0))
@@ -25,6 +26,7 @@ class TestUsfirstLegacyEventDetailsParser(unittest2.TestCase):
             event, _ = UsfirstLegacyEventDetailsParser.parse(f.read())
 
         self.assertEqual(event["name"], "South Florida Regional")
+        self.assertEqual(event["short_name"], "South Florida")
         self.assertEqual(event["event_type_enum"], EventType.REGIONAL)
         self.assertEqual(event["start_date"], datetime.datetime(2013, 3, 28, 0, 0))
         self.assertEqual(event["end_date"], datetime.datetime(2013, 3, 30, 0, 0))
@@ -39,6 +41,7 @@ class TestUsfirstLegacyEventDetailsParser(unittest2.TestCase):
             event, _ = UsfirstLegacyEventDetailsParser.parse(f.read())
 
         self.assertEqual(event["name"], "Silicon Valley Regional")
+        self.assertEqual(event["short_name"], "Silicon Valley")
         self.assertEqual(event["event_type_enum"], EventType.REGIONAL)
         self.assertEqual(event["start_date"], datetime.datetime(2014, 4, 3, 0, 0))
         self.assertEqual(event["end_date"], datetime.datetime(2014, 4, 5, 0, 0))
@@ -53,6 +56,7 @@ class TestUsfirstLegacyEventDetailsParser(unittest2.TestCase):
             event, _ = UsfirstLegacyEventDetailsParser.parse(f.read())
 
         self.assertEqual(event["name"], "Bayou Regional")
+        self.assertEqual(event["short_name"], "Bayou")
         self.assertEqual(event["event_type_enum"], EventType.REGIONAL)
         self.assertEqual(event["start_date"], datetime.datetime(2014, 4, 3, 0, 0))
         self.assertEqual(event["end_date"], datetime.datetime(2014, 4, 5, 0, 0))
@@ -65,6 +69,7 @@ class TestUsfirstLegacyEventDetailsParser(unittest2.TestCase):
             event, _ = UsfirstLegacyEventDetailsParser.parse(f.read())
 
         self.assertEqual(event["name"], "Las Vegas Regional - Preliminary")
+        self.assertEqual(event["short_name"], "Las Vegas")
         self.assertEqual(event["event_type_enum"], EventType.REGIONAL)
         self.assertEqual(event["start_date"], datetime.datetime(2014, 12, 31, 0, 0))
         self.assertEqual(event["end_date"], datetime.datetime(2014, 12, 31, 0, 0))

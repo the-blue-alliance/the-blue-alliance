@@ -11,6 +11,7 @@ class TestUsfirstEventDetailsParser(unittest2.TestCase):
             event, _ = UsfirstEventDetailsParser.parse(f.read())
 
         self.assertEqual(event["name"], "Northeast Utilities FIRST Connecticut Regional")
+        self.assertEqual(event["short_name"], "Northeast Utilities FIRST Connecticut")
         self.assertEqual(event["event_type_enum"], EventType.REGIONAL)
         self.assertEqual(event["start_date"], datetime.datetime(2012, 3, 29, 0, 0))
         self.assertEqual(event["end_date"], datetime.datetime(2012, 3, 31, 0, 0))
@@ -26,6 +27,7 @@ class TestUsfirstEventDetailsParser(unittest2.TestCase):
             event, _ = UsfirstEventDetailsParser.parse(f.read())
 
         self.assertEqual(event["name"], "South Florida Regional")
+        self.assertEqual(event["short_name"], "South Florida")
         self.assertEqual(event["event_type_enum"], EventType.REGIONAL)
         self.assertEqual(event["start_date"], datetime.datetime(2013, 3, 28, 0, 0))
         self.assertEqual(event["end_date"], datetime.datetime(2013, 3, 30, 0, 0))
@@ -41,6 +43,7 @@ class TestUsfirstEventDetailsParser(unittest2.TestCase):
             event, _ = UsfirstEventDetailsParser.parse(f.read())
 
         self.assertEqual(event["name"], "Silicon Valley Regional")
+        self.assertEqual(event["short_name"], "Silicon Valley")
         self.assertEqual(event["event_type_enum"], EventType.REGIONAL)
         self.assertEqual(event["start_date"], datetime.datetime(2013, 4, 4, 0, 0))
         self.assertEqual(event["end_date"], datetime.datetime(2013, 4, 6, 0, 0))
@@ -56,6 +59,7 @@ class TestUsfirstEventDetailsParser(unittest2.TestCase):
             event, _ = UsfirstEventDetailsParser.parse(f.read())
 
         self.assertEqual(event["name"], "Silicon Valley Regional")
+        self.assertEqual(event["short_name"], "Silicon Valley")
         self.assertEqual(event["event_type_enum"], EventType.REGIONAL)
         self.assertEqual(event["start_date"], datetime.datetime(2001, 3, 22, 0, 0))
         self.assertEqual(event["end_date"], datetime.datetime(2001, 3, 24, 0, 0))
@@ -69,6 +73,7 @@ class TestUsfirstEventDetailsParser(unittest2.TestCase):
             event, _ = UsfirstEventDetailsParser.parse(f.read())
 
         self.assertEqual(event["name"], "GM/Technion University Israel Pilot Regional")
+        self.assertEqual(event["short_name"], "GM/Technion University Israel Pilot")
         self.assertEqual(event["event_type_enum"], EventType.REGIONAL)
         self.assertEqual(event["start_date"], datetime.datetime(2005, 3, 9, 0, 0))
         self.assertEqual(event["end_date"], datetime.datetime(2005, 3, 9, 0, 0))
@@ -83,6 +88,7 @@ class TestUsfirstEventDetailsParser(unittest2.TestCase):
             event, _ = UsfirstEventDetailsParser.parse(f.read())
 
         self.assertEqual(event["name"], "Pacific Northwest Regional")
+        self.assertEqual(event["short_name"], "Pacific Northwest")
         self.assertEqual(event["event_type_enum"], EventType.REGIONAL)
         self.assertEqual(event["start_date"], datetime.datetime(2005, 3, 10, 0, 0))
         self.assertEqual(event["end_date"], datetime.datetime(2005, 3, 12, 0, 0))
@@ -97,6 +103,7 @@ class TestUsfirstEventDetailsParser(unittest2.TestCase):
             event, _ = UsfirstEventDetailsParser.parse(f.read())
 
         self.assertEqual(event["name"], "Motorola Midwest Regional")
+        self.assertEqual(event["short_name"], "Motorola Midwest")
         self.assertEqual(event["event_type_enum"], EventType.REGIONAL)
         self.assertEqual(event["start_date"], datetime.datetime(1997, 3, 6, 0, 0))
         self.assertEqual(event["end_date"], datetime.datetime(1997, 3, 8, 0, 0))
@@ -111,6 +118,7 @@ class TestUsfirstEventDetailsParser(unittest2.TestCase):
             event, _ = UsfirstEventDetailsParser.parse(f.read())
 
         self.assertEqual(event["name"], "Silicon Valley Regional")
+        self.assertEqual(event["short_name"], "Silicon Valley")
         self.assertEqual(event["event_type_enum"], EventType.REGIONAL)
         self.assertEqual(event["start_date"], datetime.datetime(2002, 3, 28, 0, 0))
         self.assertEqual(event["end_date"], datetime.datetime(2002, 3, 30, 0, 0))
