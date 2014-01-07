@@ -115,7 +115,7 @@ class TestTeamApiController(unittest2.TestCase):
         self.assertEqual(event["start_date"], self.event.start_date.isoformat())
         self.assertEqual(event["end_date"], self.event.end_date.isoformat())
         self.assertEqual(event["event_type_string"], self.event.event_type_str)
-        self.assertEqual(event["event_type_enum"], self.event.event_type_enum)
+        self.assertEqual(event["event_type"], self.event.event_type_enum)
 
     def assertMatchJson(self, match):
         self.assertEqual(str(match["key"]), self.match.key.string_id())
