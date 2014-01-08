@@ -264,7 +264,7 @@ class CsvTeamsAll(MainApiHandler):
             if tba_config.CONFIG["memcache"]:
                 memcache.set(memcache_key, output, 86400)
 
-        self.response.headers.add_header("content-type", "text/csv")
+        self.response.headers["content-type"] = "text/csv"
         self.response.out.write(output)
 
         self._track_call('teams/list')

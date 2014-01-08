@@ -192,5 +192,5 @@ class EventRss(CacheableHandler):
         }
 
         path = os.path.join(os.path.dirname(__file__), '../templates/event_rss.xml')
-        self.response.headers.add_header('content-type', 'application/xml; charset=UTF-8')
+        self.response.headers['content-type'] = 'application/xml; charset=UTF-8'
         return template.render(path, template_values)
