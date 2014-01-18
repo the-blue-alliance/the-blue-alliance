@@ -41,6 +41,7 @@ class ModelToDict(object):
         event_dict["name"] = event.name
         event_dict["short_name"] = event.short_name
         event_dict["event_code"] = event.event_short
+        event_dict["event_type_string"] = event.event_type_str
         event_dict["event_type"] = event.event_type_enum
         event_dict["year"] = event.year
         event_dict["location"] = event.location
@@ -67,8 +68,6 @@ class ModelToDict(object):
         match_dict["key"] = match.key_name
         match_dict["event_key"] = match.event.id()
         match_dict["alliances"] = json.loads(match.alliances_json)
-        match_dict["team_keys"] = match.team_key_names
-        match_dict["game"] = match.game
         match_dict["comp_level"] = match.comp_level
         match_dict["match_number"] = match.match_number
         match_dict["set_number"] = match.set_number
@@ -81,8 +80,7 @@ class ModelToDict(object):
         return top level award dictionary
         """
         award_dict = dict()
-        award_dict["name_str"] = award.name_str
-        award_dict["award_type"] = award.award_type_enum
+        award_dict["name"] = award.name_str
         award_dict["year"] = award.year
         award_dict["event_key"] = award.event.id()
         award_dict["recipient_list"] = award.recipient_list
