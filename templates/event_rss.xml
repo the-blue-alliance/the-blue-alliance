@@ -1,12 +1,12 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
   <channel>
     <title>{{ event.name }} {{ event.year }}</title>
-    <link>{{ event.verbose_url }}</link>
+    <link>http://www.thebluealliance.com{{ event.details_url }}</link>
     <description>RSS feed for the {{ event.name }} provided by The Blue Alliance.</description>
     <language>en-us</language>
-    <pubDate>{{ datetime }}</pubDate>
-    <lastBuildDate>{{ datetime }}</lastBuildDate>
+    <pubDate>{{ datetime|date:"r" }}</pubDate>
+    <lastBuildDate>{{ datetime|date:"r" }}</lastBuildDate>
     <generator>The Blue Alliance</generator>
     <managingEditor>contact@thebluealliance.com</managingEditor>
     <webMaster>contact@thebluealliance.com</webMaster>
@@ -14,7 +14,8 @@
       {% for match in matches.qm %}
         <item>
           <title>{{ match.verbose_name }}</title>
-          <link>http://thebluealliance.com{{ match.details_url }}</link>
+          <link>http://www.thebluealliance.com{{ match.details_url }}</link>
+          <guid>http://www.thebluealliance.com{{ match.details_url }}</guid>
           <description><![CDATA[
             <h1>Red Alliance: {{match.alliances.red.score}}</h1>
               <li>{{match.alliances.red.teams.0|slice:"3:"}}</li>
@@ -27,7 +28,6 @@
               <li>{{match.alliances.blue.teams.2|slice:"3:"}}</li>
           ]]>
           </description>
-          <guid>{{ match.verbose_url }}</guid>
         </item>
       {% endfor %}
     {% endif %}
@@ -35,7 +35,8 @@
     {% for match in matches.sf %}
       <item>
         <title>{{ match.verbose_name }}</title>
-        <link>http://thebluealliance.com{{ match.details_url }}</link>
+        <link>http://www.thebluealliance.com{{ match.details_url }}</link>
+        <guid>http://www.thebluealliance.com{{ match.details_url }}</guid>
         <description><![CDATA[
           <h1>Red Alliance: {{match.alliances.red.score}}</h1>
               <li>{{match.alliances.red.teams.0|slice:"3:"}}</li>
@@ -54,7 +55,8 @@
     {% for match in matches.qf %}
       <item>
         <title>{{ match.verbose_name }}</title>
-        <link>http://thebluealliance.com{{ match.details_url }}</link>
+        <link>http://www.thebluealliance.com{{ match.details_url }}</link>
+        <guid>http://www.thebluealliance.com{{ match.details_url }}</guid>
         <description><![CDATA[
           <h1>Red Alliance: {{match.alliances.red.score}}</h1>
               <li>{{match.alliances.red.teams.0|slice:"3:"}}</li>
@@ -73,7 +75,8 @@
     {% for match in matches.ef %}
       <item>
         <title>{{ match.verbose_name }}</title>
-        <link>http://thebluealliance.com{{ match.details_url }}</link>
+        <link>http://www.thebluealliance.com{{ match.details_url }}</link>
+        <guid>http://www.thebluealliance.com{{ match.details_url }}</guid>
         <description><![CDATA[
           <h1>Red Alliance: {{match.alliances.red.score}}</h1>
               <li>{{match.alliances.red.teams.0|slice:"3:"}}</li>
@@ -92,7 +95,8 @@
     {% for match in matches.f %}
       <item>
         <title>{{ match.verbose_name }}</title>
-        <link>http://thebluealliance.com{{ match.details_url }}</link>
+        <link>http://www.thebluealliance.com{{ match.details_url }}</link>
+        <guid>http://www.thebluealliance.com{{ match.details_url }}</guid>
         <description><![CDATA[
           <h1>Red Alliance: {{match.alliances.red.score}}</h1>
               <li>{{match.alliances.red.teams.0|slice:"3:"}}</li>
