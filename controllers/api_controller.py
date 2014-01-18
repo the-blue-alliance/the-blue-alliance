@@ -8,8 +8,9 @@ import webapp2
 from datetime import datetime
 
 from google.appengine.api import memcache, urlfetch
-from google.appengine.ext import ndb
+from google.appengine.ext import deferred, ndb
 from google.appengine.ext.webapp import template
+
 
 import tba_config
 from helpers.api_helper import ApiHelper
@@ -20,16 +21,43 @@ from models.match import Match
 from models.sitevar import Sitevar
 from models.team import Team
 
+
+# used for deferred call
+def track_call(api_action, api_details):
+    analytics_id = Sitevar.get_by_id("google_analytics.id")
+    if analytics_id is None:
+        logging.warning("Missing sitevar: google_analytics.id. Can't track API usage.")
+    else:
+        GOOGLE_ANALYTICS_ID = analytics_id.contents['GOOGLE_ANALYTICS_ID']
+        params = urllib.urlencode({
+            'v': 1,
+            'tid': GOOGLE_ANALYTICS_ID,
+            'cid': '1',
+            't': 'event',
+            'ec': 'api',
+            'ea': api_action,
+            'el': api_details,
+            'ev': 1,
+            'ni': 1
+        })
+
+        # Sets up the call
+        analytics_url = 'http://www.google-analytics.com/collect'
+        urlfetch.fetch(
+            url=analytics_url,
+            payload=params,
+            method=urlfetch.POST,
+            headers={'Content-Type': 'application/x-www-form-urlencoded'}
+        )
+
+
 # Note: generally caching for the API happens in ApiHelper
-
-
 class MainApiHandler(webapp2.RequestHandler):
 
     def __init__(self, request, response):
         # Need to initialize a webapp2 instance
         self.initialize(request, response)
         self.response.headers.add_header("content-type", "application/json")
-        logging.info(request)
 
     def handle_exception(self, exception, debug):
         """
@@ -43,34 +71,8 @@ class MainApiHandler(webapp2.RequestHandler):
         else:
             self.response.set_status(500)
 
-    def _track_call(self, api_action, api_details=''):
-        # Creates asynchronous call
-        rpc = urlfetch.create_rpc()
-
-        analytics_id = Sitevar.get_by_id("google_analytics.id")
-        if analytics_id is None:
-            logging.warning("Missing sitevar: google_analytics.id. Can't track API usage.")
-        else:
-            GOOGLE_ANALYTICS_ID = analytics_id.contents['GOOGLE_ANALYTICS_ID']
-            params = urllib.urlencode({
-                'v': 1,
-                'tid': GOOGLE_ANALYTICS_ID,
-                'cid': '1',
-                't': 'event',
-                'ec': 'api',
-                'ea': api_action,
-                'el': api_details,
-                'ev': 1,
-                'ni': 1
-            })
-
-            # Sets up the call
-            analytics_url = 'http://www.google-analytics.com/collect'
-            urlfetch.make_fetch_call(rpc=rpc,
-                url=analytics_url,
-                payload=params,
-                method=urlfetch.POST,
-                headers={'Content-Type': 'application/x-www-form-urlencoded'})
+    def _track_call_defer(self, api_action, api_details=''):
+        deferred.defer(track_call, api_action, api_details)
 
     def _validate_user_agent(self):
         """
@@ -107,7 +109,7 @@ class ApiTeamsShow(MainApiHandler):
 
         team_keys_sorted = sorted(team_keys)
         track_team_keys = ",".join(team_keys_sorted)
-        self._track_call('teams/show', track_team_keys)
+        self._track_call_defer('teams/show', track_team_keys)
 
 
 class ApiTeamDetails(MainApiHandler):
@@ -133,7 +135,7 @@ class ApiTeamDetails(MainApiHandler):
             track_team_key = team_key
             if year:
                 track_team_key = track_team_key + ' (' + year + ')'
-            self._track_call('teams/details', track_team_key)
+            self._track_call_defer('teams/details', track_team_key)
 
         except IndexError:
             response_json = {"Property Error": "No team found for the key given"}
@@ -195,7 +197,7 @@ class ApiEventList(MainApiHandler):
 
         self.response.out.write(json.dumps(event_list))
 
-        self._track_call('events/list')
+        self._track_call_defer('events/list')
 
 
 class ApiEventDetails(MainApiHandler):
@@ -215,7 +217,7 @@ class ApiEventDetails(MainApiHandler):
 
         self.response.out.write(json.dumps(event_dict))
 
-        self._track_call('events/details', event_key)
+        self._track_call_defer('events/details', event_key)
 
 
 class ApiMatchDetails(MainApiHandler):
@@ -239,7 +241,7 @@ class ApiMatchDetails(MainApiHandler):
 
         self.response.out.write(json.dumps(match_json))
 
-        self._track_call('matches/details', track_matches)
+        self._track_call_defer('matches/details', track_matches)
 
 
 class CsvTeamsAll(MainApiHandler):
@@ -267,4 +269,4 @@ class CsvTeamsAll(MainApiHandler):
         self.response.headers["content-type"] = "text/csv"
         self.response.out.write(output)
 
-        self._track_call('teams/list')
+        self._track_call_defer('teams/list')
