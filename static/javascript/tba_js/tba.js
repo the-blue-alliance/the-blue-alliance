@@ -33,4 +33,14 @@ $(document).ready(function(){
 	
 	// Fitvids
 	$('.fitvids').fitVids();
+
+	// JWPlayer
+  jwplayer("tbavideo_container").setup({
+    players: [
+        { type: "flash", src: "/jwplayer/player.swf" },
+        { type: "html5" }
+    ],
+    provider: "http",
+    controlbar: "bottom",
+  });
 });
