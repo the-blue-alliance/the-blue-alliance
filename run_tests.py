@@ -19,7 +19,7 @@ def main(sdk_path, test_pattern):
     dev_appserver.fix_sys_path()
 
     suite = unittest2.loader.TestLoader().discover("tests", test_pattern)
-    tests = unittest2.TextTestRunner(verbosity=2).run(suite)
+    tests = unittest2.TextTestRunner(verbosity=1).run(suite)
 
     if tests.wasSuccessful() is True:
         sys.exit(0)

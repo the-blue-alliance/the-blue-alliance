@@ -82,7 +82,7 @@ class UsfirstMatchesParser2002(ParserBase):
                 try:
                     match_or_set_number = int(re.findall(r'\d+', col1)[0])
                 except:
-                    logging.warning("Match/Set number parse for '{}' failed!".format(col1))
+                    logging.info("Match/Set number parse for '{}' failed!".format(col1))
                     ignore_match = True
                     continue
 
@@ -113,7 +113,7 @@ class UsfirstMatchesParser2002(ParserBase):
                 try:
                     team_key = 'frc{}'.format(int(re.findall(r'\d+', col1)[0]))
                 except:
-                    logging.warning("Team number parse for '{}' failed!".format(col1))
+                    logging.info("Team number parse for '{}' failed!".format(col1))
                     ignore_match = True
                     continue
 
@@ -123,7 +123,7 @@ class UsfirstMatchesParser2002(ParserBase):
                     if match_score is None:
                         match_score = -1
                 except:
-                    logging.warning("Score parse for '{}' failed!".format(score_col))
+                    logging.info("Score parse for '{}' failed!".format(score_col))
                     ignore_match = True
                     continue
 

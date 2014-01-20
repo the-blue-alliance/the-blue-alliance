@@ -36,7 +36,7 @@ class UsfirstTeamDetailsParser(ParserBase):
         try:
             team['team_number'] = int(re.search(team_num_re, page_title).group(1).strip())
         except AttributeError, details:
-            logging.warning("Team number could not be parsed: {}".format(details))
+            logging.info("Team number could not be parsed: {}".format(details))
             return None, False
         team['nickname'] = unicode(re.search(team_nick_re, page_title).group(1).strip())
 

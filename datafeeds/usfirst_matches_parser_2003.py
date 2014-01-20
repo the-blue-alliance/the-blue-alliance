@@ -83,7 +83,7 @@ class UsfirstMatchesParser2003(ParserBase):
                         try:
                             mid_match_number = int(re.findall(r'\d+', match_name)[0])
                         except:
-                            logging.warning("Finals match number parse for '%s' failed!" % match_name)
+                            logging.info("Finals match number parse for '%s' failed!" % match_name)
                             ignore_match = True
                             continue
                     else:
@@ -92,7 +92,7 @@ class UsfirstMatchesParser2003(ParserBase):
                         elif 'sf' in match_name_lower:
                             mid_match_comp_level = 'sf'
                         else:
-                            logging.warning("Could not extract comp level from: {}".format(match_name))
+                            logging.info("Could not extract comp level from: {}".format(match_name))
                             ignore_match = True
                             continue
 
@@ -101,7 +101,7 @@ class UsfirstMatchesParser2003(ParserBase):
                             mid_match_set_number = int(prefix[-1])
                             mid_match_number = int(suffix[0])
                         except:
-                            logging.warning("Could not extract match set and number from: {}".format(match_name))
+                            logging.info("Could not extract match set and number from: {}".format(match_name))
                             ignore_match = True
                             continue
                 else:
@@ -110,7 +110,7 @@ class UsfirstMatchesParser2003(ParserBase):
                     try:
                         mid_match_number = int(re.findall(r'\d+', match_name)[0])
                     except:
-                        logging.warning("Qual match number parse for '%s' failed!" % match_name)
+                        logging.info("Qual match number parse for '%s' failed!" % match_name)
                         ignore_match = True
                         continue
             else:
@@ -118,7 +118,7 @@ class UsfirstMatchesParser2003(ParserBase):
                 try:
                     team_key = 'frc{}'.format(int(re.findall(r'\d+', team_col)[0]))
                 except:
-                    logging.warning("Team number parse for '%s' failed!" % team_col)
+                    logging.info("Team number parse for '%s' failed!" % team_col)
                     ignore_match = True
                     continue
 
@@ -128,7 +128,7 @@ class UsfirstMatchesParser2003(ParserBase):
                     if match_score is None:
                         match_score = -1
                 except:
-                    logging.warning("Score parse for '%s' failed!" % score_col)
+                    logging.info("Score parse for '%s' failed!" % score_col)
                     ignore_match = True
                     continue
 

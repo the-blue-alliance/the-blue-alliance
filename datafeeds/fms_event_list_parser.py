@@ -42,8 +42,8 @@ class FmsEventListParser(ParserBase):
                         "event_short": data[11].strip().lower()
                     })
                 except Exception, e:
-                    logging.warning("Failed to parse event row: %s" % data)
-                    logging.warning(e)
+                    logging.info("Failed to parse event row: %s" % data)
+                    logging.info(e)
 
         return events
 
