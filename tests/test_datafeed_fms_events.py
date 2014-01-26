@@ -20,7 +20,7 @@ class TestDatafeedFmsEvents(unittest2.TestCase):
 
     def test_getFmsEventList(self):
         events = self.datafeed.getFmsEventList()
-        self.assertTrue(self.find2012CT(events) or self.find2013CT(events))
+        self.assertTrue(self.find2014CT(events))
 
     def find2012CT(self, events):
         found_ct = False
@@ -55,5 +55,23 @@ class TestDatafeedFmsEvents(unittest2.TestCase):
                 self.assertEqual(event.start_date, datetime.datetime(2013, 03, 28))
                 self.assertEqual(event.venue, "Connecticut Convention Center")
                 self.assertEqual(event.year, 2013)
+
+        return found_ct
+
+    def find2014CT(self, events):
+        found_ct = False
+        for event in events:
+            if event.event_short == "cthar":
+                found_ct = True
+                self.assertEqual(event.key.id(), "2014cthar")
+                self.assertEqual(event.end_date, datetime.datetime(2014, 03, 30))
+                self.assertEqual(event.event_short, "cthar")
+                self.assertEqual(event.first_eid, "10893")
+                #self.assertEqual(event.location, "Hartford, CT")
+                self.assertEqual(event.name, "Hartford District Event")
+                self.assertEqual(event.official, True)
+                self.assertEqual(event.start_date, datetime.datetime(2014, 03, 29))
+                self.assertEqual(event.venue, "Hartford Public High School")
+                self.assertEqual(event.year, 2014)
 
         return found_ct
