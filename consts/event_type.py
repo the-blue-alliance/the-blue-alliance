@@ -4,8 +4,6 @@ class EventType(object):
     DISTRICT_CMP = 2
     CMP_DIVISION = 3
     CMP_FINALS = 4
-    QUALIFYING_EVENT = 5
-    QUALIFYING_CMP = 6
     OFFSEASON = 99
     PRESEASON = 100
     UNLABLED = -1
@@ -16,8 +14,6 @@ class EventType(object):
         DISTRICT_CMP: 'District Championship',
         CMP_DIVISION: 'Championship Division',
         CMP_FINALS: 'Championship Finals',
-        QUALIFYING_EVENT: 'Qualifying Event',
-        QUALIFYING_CMP: 'Qualifying Championship',
         OFFSEASON: 'Offseason',
         PRESEASON: 'Preseason',
         UNLABLED: '--',
@@ -27,8 +23,6 @@ class EventType(object):
         REGIONAL,
         DISTRICT,
         DISTRICT_CMP,
-        QUALIFYING_EVENT,
-        QUALIFYING_CMP,
     }
 
     CMP_EVENT_TYPES = {
