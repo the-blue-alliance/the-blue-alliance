@@ -2,14 +2,12 @@ import json
 import logging
 import os
 
-from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
 from helpers.media_helper import MediaParser
 from helpers.media_manipulator import MediaManipulator
 from models.media import Media
-from models.team import Team
 
 
 class AdminMediaDashboard(LoggedInHandler):
@@ -29,10 +27,6 @@ class AdminMediaDashboard(LoggedInHandler):
 
 
 class AdminMediaAdd(LoggedInHandler):
-    REFERENCE_MAP = {
-        'team': Team
-    }
-
     def post(self):
         self._require_admin()
 
@@ -50,8 +44,9 @@ class AdminMediaAdd(LoggedInHandler):
                 media_type_enum=media_dict['media_type_enum'],
                 details_json=media_dict.get('details_json', None),
                 year=year,
-                references=[ndb.Key(self.REFERENCE_MAP[self.request.get('reference_type')],
-                                    self.request.get('reference_key'))],
+                references=[Media.create_reference(
+                    self.request.get('reference_type'),
+                    self.request.get('reference_key'))],
             )
             MediaManipulator.createOrUpdate(media)
 

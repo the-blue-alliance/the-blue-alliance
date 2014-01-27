@@ -3,6 +3,7 @@ import json
 from google.appengine.ext import ndb
 
 from consts.media_type import MediaType
+from models.team import Team
 
 
 class Media(ndb.Model):
@@ -15,6 +16,10 @@ class Media(ndb.Model):
     SLUG_NAMES = {
         MediaType.YOUTUBE: 'youtube',
         MediaType.CD_PHOTO_THREAD: 'cdphotothread',
+    }
+
+    REFERENCE_MAP = {
+        'team': Team
     }
 
     # media_type and foreign_key make up the key_name
@@ -37,6 +42,10 @@ class Media(ndb.Model):
         if self._details is None:
             self._details = json.loads(self.details_json)
         return self._details
+
+    @classmethod
+    def create_reference(self, reference_type, reference_key):
+        return ndb.Key(self.REFERENCE_MAP[reference_type], reference_key)
 
     @property
     def key_name(self):
