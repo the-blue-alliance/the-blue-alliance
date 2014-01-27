@@ -36,17 +36,17 @@ class AdminTeamDetail(LoggedInHandler):
         event_teams = EventTeam.query(EventTeam.team == team.key).fetch(500)
         team_medias = Media.query(Media.references == team.key).fetch(500)
 
-        team_media_by_year = {}
+        team_medias_by_year = {}
         for media in team_medias:
-            if media.year in team_media_by_year:
-                team_media_by_year[media.year].append(media)
+            if media.year in team_medias_by_year:
+                team_medias_by_year[media.year].append(media)
             else:
-                team_media_by_year[media.year] = [media]
+                team_medias_by_year[media.year] = [media]
 
         self.template_values.update({
             'event_teams': event_teams,
             'team': team,
-            'team_media_by_year': team_media_by_year,
+            'team_medias_by_year': team_medias_by_year,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/team_details.html')
