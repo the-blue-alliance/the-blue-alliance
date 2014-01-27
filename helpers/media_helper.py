@@ -17,36 +17,46 @@ class MediaParser(object):
         """
         Takes a url, and turns it into a partial Media object dict
         """
-        media_dict = {}
-
         if cls.CD_PHOTO_THREAD_URL_PATTERN in url:
-            media_dict['media_type_enum'] = MediaType.CD_PHOTO_THREAD
-            foreign_key = cls._parse_cdphotothread_foreign_key(url)
-            if foreign_key is None:
-                logging.warning("Failed to determine foreign_key from url: {}".format(url))
-                return None
-            media_dict['foreign_key'] = foreign_key
-
-            urlfetch_result = urlfetch.fetch(url, deadline=10)
-            if urlfetch_result.status_code != 200:
-                logging.warning('Unable to retrieve url: {}'.format(url))
-                return None
-
-            image_partial = cls._parse_cdphotothread_image_partial(urlfetch_result.content)
-            if image_partial is None:
-                logging.warning("Failed to determine image_partial from the page: {}".format(url))
-                return None
-            media_dict['details_json'] = json.dumps({'image_partial': image_partial})
+            return cls._partial_media_dict_from_cd_photo_thread(url)
         elif cls.YOUTUBE_URL_PATTERN in url:
-            media_dict['media_type_enum'] = MediaType.YOUTUBE
-            foreign_key = cls._parse_youtube_foreign_key(url)
-            if foreign_key is None:
-                logging.warning("Failed to determine foreign_key from url: {}".format(url))
-                return None
-            media_dict['foreign_key'] = foreign_key
+            return cls._partial_media_dict_from_youtube(url)
         else:
             logging.warning("Failed to determine media type from url: {}".format(url))
             return None
+
+    @classmethod
+    def _partial_media_dict_from_cd_photo_thread(cls, url):
+        media_dict = {}
+        media_dict['media_type_enum'] = MediaType.CD_PHOTO_THREAD
+        foreign_key = cls._parse_cdphotothread_foreign_key(url)
+        if foreign_key is None:
+            logging.warning("Failed to determine foreign_key from url: {}".format(url))
+            return None
+        media_dict['foreign_key'] = foreign_key
+
+        urlfetch_result = urlfetch.fetch(url, deadline=10)
+        if urlfetch_result.status_code != 200:
+            logging.warning('Unable to retrieve url: {}'.format(url))
+            return None
+
+        image_partial = cls._parse_cdphotothread_image_partial(urlfetch_result.content)
+        if image_partial is None:
+            logging.warning("Failed to determine image_partial from the page: {}".format(url))
+            return None
+        media_dict['details_json'] = json.dumps({'image_partial': image_partial})
+
+        return media_dict
+
+    @classmethod
+    def _partial_media_dict_from_youtube(cls, url):
+        media_dict = {}
+        media_dict['media_type_enum'] = MediaType.YOUTUBE
+        foreign_key = cls._parse_youtube_foreign_key(url)
+        if foreign_key is None:
+            logging.warning("Failed to determine foreign_key from url: {}".format(url))
+            return None
+        media_dict['foreign_key'] = foreign_key
 
         return media_dict
 
