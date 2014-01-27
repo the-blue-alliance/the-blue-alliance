@@ -1,6 +1,6 @@
+import json
 import logging
 import re
-import json
 
 from google.appengine.api import urlfetch
 
