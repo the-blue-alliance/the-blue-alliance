@@ -23,7 +23,7 @@ from models.team import Team
 
 
 # used for deferred call
-def track_call(api_action, api_details):
+def track_call(api_action, api_details, x_tba_app_id):
     analytics_id = Sitevar.get_by_id("google_analytics.id")
     if analytics_id is None:
         logging.warning("Missing sitevar: google_analytics.id. Can't track API usage.")
@@ -37,8 +37,8 @@ def track_call(api_action, api_details):
             'ec': 'api',
             'ea': api_action,
             'el': api_details,
-            'ev': 1,
-            'ni': 1
+            'cd1': x_tba_app_id,  # custom dimension 1
+            'ni': 1,
         })
 
         # Sets up the call
@@ -72,7 +72,7 @@ class MainApiHandler(webapp2.RequestHandler):
             self.response.set_status(500)
 
     def _track_call_defer(self, api_action, api_details=''):
-        deferred.defer(track_call, api_action, api_details)
+        deferred.defer(track_call, api_action, api_details, self.x_tba_app_id)
 
     def _validate_tba_app_id(self):
         """
