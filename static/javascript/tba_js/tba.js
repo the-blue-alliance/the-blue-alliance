@@ -35,12 +35,14 @@ $(document).ready(function(){
 	$('.fitvids').fitVids();
 
 	// JWPlayer
-  jwplayer("tbavideo_container").setup({
-    players: [
-        { type: "flash", src: "/jwplayer/player.swf" },
-        { type: "html5" }
-    ],
-    provider: "http",
-    controlbar: "bottom",
-  });
+	if ($("#tbavideo_container").length != 0) {
+    jwplayer("tbavideo_container").setup({
+      players: [
+          { type: "flash", src: "/jwplayer/player.swf" },
+          { type: "html5" }
+      ],
+      provider: "http",
+      controlbar: "bottom",
+    });
+	}
 });
