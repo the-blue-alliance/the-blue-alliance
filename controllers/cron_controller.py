@@ -104,10 +104,8 @@ class EventTeamUpdate(webapp.RequestHandler):
         if teams:
             event_teams = EventTeamManipulator.createOrUpdate(event_teams)
 
-        # Temporarily disable deleting of event_teams. Too fragile. -Eugene 2013/11/23
-        et_keys_to_del = set()
-#         if et_keys_to_del:
-#             ndb.delete_multi(et_keys_to_del)
+        if et_keys_to_del:
+            ndb.delete_multi(et_keys_to_del)
 
         template_values = {
             'event_teams': event_teams,
