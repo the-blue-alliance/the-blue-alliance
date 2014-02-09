@@ -96,7 +96,7 @@ class TestApiTeamShow(unittest2.TestCase):
     def test_validate_tba_app_id(self):
         response = self.testapp.get('/?teams=frc254', expect_errors=True)  # By default get() doesn't send a user agent
         self.assertEqual(response.status, "400 Bad Request")
-        self.assertEqual(response.body, '{"Error": "X-TBA-App-Id is a required header."}')
+        self.assertTrue('Error' in json.loads(response.body).keys())
 
 
 class TestApiTeamDetails(unittest2.TestCase):
@@ -122,4 +122,4 @@ class TestApiTeamDetails(unittest2.TestCase):
     def test_validate_tba_app_id(self):
         response = self.testapp.get('/?team=frc3141579265', expect_errors=True)  # By default get() doesn't send a user agent
         self.assertEqual(response.status, "400 Bad Request")
-        self.assertEqual(response.body, '{"Error": "X-TBA-App-Id is a required header."}')
+        self.assertTrue('Error' in json.loads(response.body).keys())

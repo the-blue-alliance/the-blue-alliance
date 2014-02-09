@@ -81,10 +81,10 @@ class MainApiHandler(webapp2.RequestHandler):
         self.x_tba_app_id = self.request.headers.get("X-TBA-App-Id")
         logging.info("X-TBA-App-ID: {}".format(self.x_tba_app_id))
         if not self.x_tba_app_id:
-            self._errors = json.dumps({"Error": "X-TBA-App-Id is a required header."})
+            self._errors = json.dumps({"Error": "X-TBA-App-Id is a required header. Please see http://www.thebluealliance.com/apidocs for more info."})
             self.abort(400)
         if len(self.x_tba_app_id.split(':')) != 3:
-            self._errors = json.dumps({"Error": "X-TBA-App-Id must follow the following format: <team/person id>:<app description>:<version>"})
+            self._errors = json.dumps({"Error": "X-TBA-App-Id must follow a specific format. Please see http://www.thebluealliance.com/apidocs for more info."})
             self.abort(400)
 
 
