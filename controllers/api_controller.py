@@ -232,19 +232,26 @@ class ApiMatchDetails(MainApiHandler):
     def get(self):
         self._validate_tba_app_id()
         value = self.request.get('match') or self.request.get('matches')
+        matches = []
         if value is not '':
             match_keys = value.split(',')
             match_keys_sorted = sorted(value.split(','))
             track_matches_keys = ",".join(match_keys_sorted)
             track_matches = value
-            match_json = []
-            for match in match_keys:
-                match_json.append(ApiHelper.getMatchDetails(match))
-        else:
-            match_json = {'error': 'The "match" parameter is missing'}
-            track_matches = 'error'
+            for match_key in match_keys:
+                if match_key == '':
+                    continue
+                mjson = ApiHelper.getMatchDetails(match_key)
+                if mjson is not None:
+                    matches.append(mjson)
 
-        self.response.out.write(json.dumps(match_json))
+        if matches != []:
+            response = matches
+        else:
+            response = {"Property Error": "No matches found for any key given"}
+            self.response.set_status(404)
+
+        self.response.out.write(json.dumps(response))
 
         self._track_call_defer('matches/details', track_matches)
 

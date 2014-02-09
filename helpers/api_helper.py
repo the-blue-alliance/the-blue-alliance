@@ -164,6 +164,8 @@ class ApiHelper(object):
 
         if match_dict is None:
             match = Match.get_by_id(match_key)
+            if match is None:
+                return None
 
             match_dict = {}
             match_dict["key"] = match.key_name
