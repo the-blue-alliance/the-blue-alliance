@@ -59,7 +59,6 @@ class WebcastHandler(CacheableHandler):
         self._cache_version = 1
 
     def get(self, event_key, webcast_number):
-        webcast_number = int(webcast_number) - 1
         self._cache_key = self._cache_key.format(event_key, webcast_number)
         super(WebcastHandler, self).get(event_key, webcast_number)
 
@@ -68,8 +67,12 @@ class WebcastHandler(CacheableHandler):
         self.response.headers['Pragma'] = 'Public'
         self.response.headers.add_header('content-type', 'application/json', charset='utf-8')
 
-        event = Event.get_by_id(event_key)
         output = {}
+        if not webcast_number.isdigit():
+            return json.dumps(output)
+        webcast_number = int(webcast_number) - 1
+
+        event = Event.get_by_id(event_key)
         if event and event.webcast:
             webcast = event.webcast[webcast_number]
             if 'type' in webcast and 'channel' in webcast:
