@@ -74,12 +74,15 @@ class ApiBaseController(CacheableHandler):
 
     def _validate_tba_app_id(self):
         """
-        Tests the presence of a X-TBA-App-Id header.
+        Tests the presence of a X-TBA-App-Id header or URL param.
         """
         self.x_tba_app_id = self.request.headers.get("X-TBA-App-Id")
+        if self.x_tba_app_id is None:
+            self.x_tba_app_id = self.request.get('X-TBA-App-Id')
+
         logging.info("X-TBA-App-ID: {}".format(self.x_tba_app_id))
         if not self.x_tba_app_id:
-            self._errors = json.dumps({"Error": "X-TBA-App-Id is a required header. Please see http://www.thebluealliance.com/apidocs for more info."})
+            self._errors = json.dumps({"Error": "X-TBA-App-Id is a required header or URL param. Please see http://www.thebluealliance.com/apidocs for more info."})
             self.abort(400)
         if len(self.x_tba_app_id.split(':')) != 3:
             self._errors = json.dumps({"Error": "X-TBA-App-Id must follow a specific format. Please see http://www.thebluealliance.com/apidocs for more info."})
