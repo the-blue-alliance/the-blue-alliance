@@ -292,6 +292,11 @@ var VideoCellLayoutThree = React.createClass({
 });
 
 var VideoCell = React.createClass({
+  getInitialState: function() {
+    return {
+      showOverlay: false,
+    };
+  },
   render: function() {
     if (this.props.eventModel) {
       var id = this.props.eventModel.name + "-1";
@@ -314,6 +319,7 @@ var VideoCell = React.createClass({
       }
       return (
         <div className="videoCell" idName={id}>
+          <VideoCellOverlay eventModel={this.props.eventModel} enabled={this.state.showOverlay} />
           {cellEmbed}
         </div>
       )
@@ -322,6 +328,28 @@ var VideoCell = React.createClass({
     }
   }
 });
+
+var VideoCellOverlay = React.createClass({
+  render: function() {
+    var cx = React.addons.classSet;
+    var classes = cx({
+      'panel': true,
+      'panel-default': true,
+      'videoCellOverlay': true,
+      'hidden': !this.props.enabled,
+    });
+    if (this.props.eventModel) {
+      return (
+        <div className={classes}>
+          <div className="panel-heading">
+            <h3 className="panel-title">{this.props.eventModel.name}</h3>
+          </div>
+          <div className="panel-body"></div>
+        </div>
+      )
+    }
+  }
+})
 
 var EmbedYoutube = React.createClass({
   render: function() {
