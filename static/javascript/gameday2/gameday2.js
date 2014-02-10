@@ -306,6 +306,12 @@ var VideoCell = React.createClass({
       showOverlay: false,
     };
   },
+  onMouseEnter: function(event) {
+    this.setState({"showOverlay": true})
+  },
+  onMouseLeave: function(event) {
+    this.setState({"showOverlay": false})
+  },
   render: function() {
     if (this.props.eventModel) {
       var id = this.props.eventModel.name + "-1";
@@ -327,7 +333,11 @@ var VideoCell = React.createClass({
           break;
       }
       return (
-        <div className="videoCell" idName={id}>
+        <div className="videoCell" 
+          idName={id}
+          onMouseEnter={this.onMouseEnter}
+          onMouseLeave={this.onMouseLeave}>
+          
           <VideoCellOverlay eventModel={this.props.eventModel} enabled={this.state.showOverlay} />
           {cellEmbed}
         </div>
