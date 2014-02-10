@@ -18,17 +18,30 @@ body {
     height: 100%;
 }
 
+.videoCell {
+    height: 100%;
+    width: 100%;
+}
+
+.videoCellOverlay {
+    position: absolute;
+    top: 0;
+    left: 15px;
+    height: 100%;
+    width: 100%;
+}
+
+.videoCellOverlay.panel {
+    background-color: transparent;
+}
+
 .videoGrid {
     height: 100%;
     width: 100%;
-    display: inline-block
+    display: inline-block;
 }
 
 .videoGrid .row {
-    height: 100%;
-}
-
-.videoGrid .row div {
     height: 100%;
 }
 

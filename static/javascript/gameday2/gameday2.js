@@ -20,18 +20,11 @@ var GamedayFrame = React.createClass({
     //this.loadDataFromServer();
     //setInterval(this.loadDataFromServer, this.props.pollInterval);
     this.setState({events: this.props.events});
-    this.setKickoffState();
-  },
-  setKickoffState: function() {
-    this.setState({
-      displayedEvents: this.props.events,
-      hashtagEnabled: true,
-    });
   },
   render: function() {
     return (
       <div className="gameday container-full">
-        <GamedayKickoffNavbar 
+        <GamedayNavbar 
           chatEnabled={this.state.chatEnabled}
           hashtagEnabled={this.state.hashtagEnabled}
           events={this.state.events}
@@ -61,38 +54,6 @@ var GamedayFrame = React.createClass({
   },
   handleWebcastReset: function() {
     this.setState({displayedEvents: []});
-  }
-});
-
-var GamedayKickoffNavbar = React.createClass({
-  render: function() {
-    return (
-      <nav className="navbar navbar-default navbar-fixed-top" role="navigation">
-        <div className="navbar-header">
-          <button type="button" className="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-            <span className="sr-only">Toggle navigation</span>
-            <span className="icon-bar"></span>
-            <span className="icon-bar"></span>
-            <span className="icon-bar"></span>
-          </button>
-          <a className="navbar-brand" href="#">GameDay</a>
-        </div>
-        <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <p className="navbar-text navbar-left"><small>by <a href="/" className="navbar-link">The Blue Alliance</a></small></p>
-          <ul className="nav navbar-nav navbar-right">
-            <li>
-              <BootstrapButton
-                active={this.props.chatEnabled}
-                handleClick={this.props.onChatToggle}>Chat</BootstrapButton>
-            </li>
-            <li>
-              <BootstrapButton
-                active={this.props.hashtagEnabled}
-                handleClick={this.props.onHashtagToggle}>#omgrobots</BootstrapButton></li>
-          </ul>
-        </div>
-      </nav>
-    );
   }
 });
 
@@ -331,10 +292,15 @@ var VideoCellLayoutThree = React.createClass({
 });
 
 var VideoCell = React.createClass({
+  getInitialState: function() {
+    return {
+      showOverlay: false,
+    };
+  },
   render: function() {
     if (this.props.eventModel) {
       var id = this.props.eventModel.name + "-1";
-      switch (this.props.eventModel.webcasts[0].type) {
+      switch (this.props.eventModel.webcast[0].type) {
         case "ustream":
           cellEmbed = <EmbedUstream
             eventModel={this.props.eventModel}
@@ -353,6 +319,7 @@ var VideoCell = React.createClass({
       }
       return (
         <div className="videoCell" idName={id}>
+          <VideoCellOverlay eventModel={this.props.eventModel} enabled={this.state.showOverlay} />
           {cellEmbed}
         </div>
       )
@@ -362,9 +329,31 @@ var VideoCell = React.createClass({
   }
 });
 
+var VideoCellOverlay = React.createClass({
+  render: function() {
+    var cx = React.addons.classSet;
+    var classes = cx({
+      'panel': true,
+      'panel-default': true,
+      'videoCellOverlay': true,
+      'hidden': !this.props.enabled,
+    });
+    if (this.props.eventModel) {
+      return (
+        <div className={classes}>
+          <div className="panel-heading">
+            <h3 className="panel-title">{this.props.eventModel.name}</h3>
+          </div>
+          <div className="panel-body"></div>
+        </div>
+      )
+    }
+  }
+})
+
 var EmbedYoutube = React.createClass({
   render: function() {
-    var src = "//www.youtube.com/embed/" + this.props.eventModel.webcasts[0].channel;
+    var src = "//www.youtube.com/embed/" + this.props.eventModel.webcast[0].channel;
     return (
       <iframe
         width={this.props.vidWidth}
@@ -379,7 +368,7 @@ var EmbedYoutube = React.createClass({
 
 var EmbedUstream = React.createClass({
   render: function() {
-    var src = "http://www.ustream.tv/flash/live/" + this.props.eventModel.webcasts[0].channel;
+    var src = "http://www.ustream.tv/flash/live/" + this.props.eventModel.webcast[0].channel;
     return (
       <object
         id='utv_o_322919'
@@ -454,27 +443,15 @@ var BootstrapNavDropdownListItem = React.createClass({
   },
 })
 
-//var events = [
-//  {"key": "2014nh", "name": "BAE Granite State", "webcasts": [{"type": "youtube", "channel": "olhwB5grOtA"}]},
-//  {"key": "2014ct", "name": "UTC Regional", "webcasts": [{"type": "youtube", "channel": "FKpIWmsDPq4"}]},
-//  {"key": "2014az", "name": "Arizona!", "webcasts": [{"type": "youtube", "channel": "QZv70PG9eXM"}]}
-//]
+var events = [
+  {"key": "2014nh", "name": "BAE Granite State", "webcast": [{"type": "youtube", "channel": "olhwB5grOtA"}]},
+  {"key": "2014ct", "name": "UTC Regional", "webcast": [{"type": "youtube", "channel": "FKpIWmsDPq4"}]},
+  {"key": "2014az", "name": "Arizona!", "webcast": [{"type": "youtube", "channel": "QZv70PG9eXM"}]}
+]
 
-var webcast_data = $.parseJSON($("#webcast_data").text().replace(/'/g,'"'));
-var events = []
-for (var index in webcast_data) {
-  single_event = webcast_data[index],
-  new_event = {
-    "key": single_event.key_name,
-    "name": single_event.name,
-    "webcasts": [{
-      "type": single_event.type,
-      "channel": single_event.channel,
-    }]}
-  events.push(new_event)
-}
+var webcast_data = $.parseJSON($("#webcast_data").text().replace(/(u)*\'/g,'\"'));
 
 React.renderComponent(
-  <GamedayFrame events={events} pollInterval={20000} />,
+  <GamedayFrame events={webcast_data} pollInterval={20000} />,
   document.getElementById('content')
 );
