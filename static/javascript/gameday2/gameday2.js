@@ -334,7 +334,7 @@ var VideoCell = React.createClass({
   render: function() {
     if (this.props.eventModel) {
       var id = this.props.eventModel.name + "-1";
-      switch (this.props.eventModel.webcasts[0].type) {
+      switch (this.props.eventModel.webcast[0].type) {
         case "ustream":
           cellEmbed = <EmbedUstream
             eventModel={this.props.eventModel}
@@ -364,7 +364,7 @@ var VideoCell = React.createClass({
 
 var EmbedYoutube = React.createClass({
   render: function() {
-    var src = "//www.youtube.com/embed/" + this.props.eventModel.webcasts[0].channel;
+    var src = "//www.youtube.com/embed/" + this.props.eventModel.webcast[0].channel;
     return (
       <iframe
         width={this.props.vidWidth}
@@ -379,7 +379,7 @@ var EmbedYoutube = React.createClass({
 
 var EmbedUstream = React.createClass({
   render: function() {
-    var src = "http://www.ustream.tv/flash/live/" + this.props.eventModel.webcasts[0].channel;
+    var src = "http://www.ustream.tv/flash/live/" + this.props.eventModel.webcast[0].channel;
     return (
       <object
         id='utv_o_322919'
@@ -454,27 +454,15 @@ var BootstrapNavDropdownListItem = React.createClass({
   },
 })
 
-//var events = [
-//  {"key": "2014nh", "name": "BAE Granite State", "webcasts": [{"type": "youtube", "channel": "olhwB5grOtA"}]},
-//  {"key": "2014ct", "name": "UTC Regional", "webcasts": [{"type": "youtube", "channel": "FKpIWmsDPq4"}]},
-//  {"key": "2014az", "name": "Arizona!", "webcasts": [{"type": "youtube", "channel": "QZv70PG9eXM"}]}
-//]
+var events = [
+  {"key": "2014nh", "name": "BAE Granite State", "webcast": [{"type": "youtube", "channel": "olhwB5grOtA"}]},
+  {"key": "2014ct", "name": "UTC Regional", "webcast": [{"type": "youtube", "channel": "FKpIWmsDPq4"}]},
+  {"key": "2014az", "name": "Arizona!", "webcast": [{"type": "youtube", "channel": "QZv70PG9eXM"}]}
+]
 
-var webcast_data = $.parseJSON($("#webcast_data").text().replace(/'/g,'"'));
-var events = []
-for (var index in webcast_data) {
-  single_event = webcast_data[index],
-  new_event = {
-    "key": single_event.key_name,
-    "name": single_event.name,
-    "webcasts": [{
-      "type": single_event.type,
-      "channel": single_event.channel,
-    }]}
-  events.push(new_event)
-}
+var webcast_data = $.parseJSON($("#webcast_data").text().replace(/(u)*\'/g,'\"'));
 
 React.renderComponent(
-  <GamedayFrame events={events} pollInterval={20000} />,
+  <GamedayFrame events={webcast_data} pollInterval={20000} />,
   document.getElementById('content')
 );
