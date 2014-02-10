@@ -108,8 +108,9 @@ var ChatPanel = React.createClass({
   render: function() {
     var cx = React.addons.classSet;
     var classes = cx({
-      'sidebar': true,
       'hidden': !this.props.enabled,
+      'pull-right': true,
+      'sidebar': true,
     });
     return (
       <div className={classes}>
@@ -139,8 +140,9 @@ var HashtagPanel = React.createClass({
   render: function() {
     var cx = React.addons.classSet;
     var classes = cx({
-      'sidebar': true,
       'hidden': !this.props.enabled,
+      'pull-left': true,
+      'sidebar': true,
     });
     return (
       <div className={classes}>
@@ -209,8 +211,15 @@ var VideoCellLayoutZero = React.createClass({
   render: function() {
     return (
         <div className="row">
-          <div className="col-md-12">      
-            <p>No Videos!</p>
+          <div className="col-md-12">
+            <div className="panel panel-default">
+              <div className="panel-body">
+                <div className="jumbotron">
+                  <h2>GameDay &mdash; Watch FIRST Webcasts</h2>
+                  <p>To get started, pick some webcasts from the top menu.</p>
+                </div>
+              </div>
+            </div>   
           </div>
         </div>
       );
@@ -297,6 +306,12 @@ var VideoCell = React.createClass({
       showOverlay: false,
     };
   },
+  onMouseEnter: function(event) {
+    this.setState({"showOverlay": true})
+  },
+  onMouseLeave: function(event) {
+    this.setState({"showOverlay": false})
+  },
   render: function() {
     if (this.props.eventModel) {
       var id = this.props.eventModel.name + "-1";
@@ -318,7 +333,11 @@ var VideoCell = React.createClass({
           break;
       }
       return (
-        <div className="videoCell" idName={id}>
+        <div className="videoCell" 
+          idName={id}
+          onMouseEnter={this.onMouseEnter}
+          onMouseLeave={this.onMouseLeave}>
+          
           <VideoCellOverlay eventModel={this.props.eventModel} enabled={this.state.showOverlay} />
           {cellEmbed}
         </div>
@@ -333,10 +352,10 @@ var VideoCellOverlay = React.createClass({
   render: function() {
     var cx = React.addons.classSet;
     var classes = cx({
+      'hidden': !this.props.enabled,
       'panel': true,
       'panel-default': true,
       'videoCellOverlay': true,
-      'hidden': !this.props.enabled,
     });
     if (this.props.eventModel) {
       return (
