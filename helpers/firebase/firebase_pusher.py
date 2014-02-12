@@ -1,4 +1,3 @@
-import logging
 import json
 
 from google.appengine.api import taskqueue

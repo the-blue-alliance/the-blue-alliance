@@ -3,16 +3,13 @@ import urllib2
 import json
 
 from google.appengine.api import memcache
-from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from base_controller import CacheableHandler
 
 from models.event import Event
-from models.team import Team
 from models.sitevar import Sitevar
 from models.typeahead_entry import TypeaheadEntry
-import tba_config
 
 
 class TypeaheadHandler(CacheableHandler):

@@ -1,4 +1,3 @@
-import logging
 from helpers.manipulator_base import ManipulatorBase
 
 

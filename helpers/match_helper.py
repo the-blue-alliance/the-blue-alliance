@@ -1,8 +1,6 @@
 import logging
 
 from models.match import Match
-from models.team import Team
-from models.event import Event
 
 
 class MatchHelper(object):

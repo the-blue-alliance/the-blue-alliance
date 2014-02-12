@@ -1,5 +1,4 @@
 import json
-import logging
 import math
 
 from google.appengine.ext import ndb
@@ -14,7 +13,6 @@ from models.match import Match
 
 from helpers.event_helper import EventHelper
 from helpers.event_helper import OFFSEASON_EVENTS_LABEL
-from helpers.award_helper import AwardHelper
 
 
 class InsightsHelper(object):

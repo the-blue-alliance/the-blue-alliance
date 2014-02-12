@@ -1,4 +1,3 @@
-
 import json
 import logging
 import os
@@ -16,8 +15,6 @@ import tba_config
 from helpers.api_helper import ApiHelper
 
 from models.event import Event
-from models.event_team import EventTeam
-from models.match import Match
 from models.sitevar import Sitevar
 from models.team import Team
 

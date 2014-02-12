@@ -2,7 +2,6 @@ import re
 import logging
 
 from google.appengine.api import urlfetch
-from google.appengine.ext import db
 
 from helpers.team_manipulator import TeamManipulator
 from models.team import Team
