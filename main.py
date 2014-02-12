@@ -13,8 +13,6 @@ from controllers.main_controller import ContactHandler, HashtagsHandler, \
       MainKickoffHandler, MainBuildseasonHandler, MainCompetitionseasonHandler, \
       MainInsightsHandler, MainOffseasonHandler, OprHandler, SearchHandler, \
       AboutHandler, ThanksHandler, PageNotFoundHandler, \
-      GamedayHandler, WebcastsHandler, RecordHandler, \
-      AboutHandler, ThanksHandler, PageNotFoundHandler, \
       GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler
 from controllers.match_controller import MatchDetail
 from controllers.suggestions.suggest_match_video_controller import SuggestMatchVideoController
@@ -30,6 +28,7 @@ landing_handler = {tba_config.KICKOFF: MainKickoffHandler,
                    tba_config.OFFSEASON: MainOffseasonHandler,
                    tba_config.INSIGHTS: MainInsightsHandler,
                    }
+
 
 class Webapp2HandlerAdapter(webapp2.BaseHandlerAdapter):
     def __call__(self, request, response, exception):
