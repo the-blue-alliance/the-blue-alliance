@@ -8,7 +8,6 @@ from google.appengine.api import memcache
 import tba_config
 
 from helpers.user_bundle import UserBundle
-from models.user import User
 
 
 class CacheableHandler(webapp2.RequestHandler):
