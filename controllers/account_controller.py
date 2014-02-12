@@ -77,15 +77,15 @@ class AccountRegister(LoggedInHandler):
 
 
 class AccountLogout(LoggedInHandler):
-  def get(self):
-    if os.environ.get('SERVER_SOFTWARE', '').startswith('Development/'):
-      self.redirect(self.user_bundle.logout_url)
-      return
+    def get(self):
+        if os.environ.get('SERVER_SOFTWARE', '').startswith('Development/'):
+            self.redirect(self.user_bundle.logout_url)
+            return
 
-    # Deletes the session cookies pertinent to TBA without touching Google session(s)
-    # Reference: http://ptspts.blogspot.ca/2011/12/how-to-log-out-from-appengine-app-only.html
-    response = self.redirect('/') 
-    response.delete_cookie('ACSID')
-    response.delete_cookie('SACSID')
+        # Deletes the session cookies pertinent to TBA without touching Google session(s)
+        # Reference: http://ptspts.blogspot.ca/2011/12/how-to-log-out-from-appengine-app-only.html
+        response = self.redirect('/')
+        response.delete_cookie('ACSID')
+        response.delete_cookie('SACSID')
 
-    return response
+        return response
