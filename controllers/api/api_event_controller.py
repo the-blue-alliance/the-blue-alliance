@@ -22,7 +22,7 @@ class ApiEventController(ApiBaseController):
         super(ApiEventController, self).__init__(*args, **kw)
         self.event_key = self.request.route_kwargs["event_key"]
         self._cache_expiration = self.LONG_CACHE_EXPIRATION
-        self._cache_key = "apiv2_team_controller_{}".format(self.event_key)
+        self._cache_key = "apiv2_event_controller_{}".format(self.event_key)
         self._cache_version = 2
 
     @property
