@@ -16,6 +16,7 @@
          <li><a class="smooth-scroll" href="#match-model">Match Model</a></li>
          <li><a class="smooth-scroll" href="#award-model">Award Model</a></li>
          <li><a class="smooth-scroll" href="#team-request">Team Request</a></li>
+         <li><a class="smooth-scroll" href="#event-request">Event Request</a></li>
         </ul>
       </div>
     </div>
@@ -113,6 +114,7 @@
       </table>
 
       <h2 id="event-model">Event Model</h2>
+      <h4>Related: <a class="smooth-scroll" href="#event-request">Event Request</a></h4>
       <table class=table>
         <caption>Response Data</caption>
         <thead>
@@ -332,6 +334,53 @@
           </div>
         </div>
       </div>
+
+      <h2 id="event-request">Event Request</h2>
+      <h4>Related: <a class="smooth-scroll" href="#event-model">Event Model</a></h4>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/event/&ltevent key&gt</code>
+      </p>
+      <table class=table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>event key</td>
+            <td>TBA event key with the format <code>yyyy[EVENT_CODE]</code>,
+            where yyyy is the year, and EVENT_CODE is the
+            <a href="https://docs.google.com/spreadsheet/ccc?key=0ApRO2Yzh2z01dExFZEdieV9WdTJsZ25HSWI3VUxsWGc">event code</a>
+            of the event.</td>
+            <td>2010sc</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_event_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="6" id="example_event_request" type="text" value="/api/v2/event/2010sc">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group" id="accordion">
+            <pre class="event-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -351,6 +400,22 @@
       },
       error: function(data) {
         $(".team-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+  $("#example_event_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".event-request-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_event_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-event-request:v01'},
+      success: function(data) {
+        $(".event-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".event-request-json").html('Something went wrong! Please check for correct request format.');
       }
     });
   });
