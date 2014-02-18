@@ -30,11 +30,10 @@ class ApiEventController(ApiBaseController):
         return [("event_id_validator", self.event_key)]
 
     def _track_call(self, event_key):
-        api_label = event_key
-        self._track_call_defer('event', api_label)
+        self._track_call_defer('event', event_key)
 
     def _render(self, event_key):
-        self._write_cache_headers(61)
+        self._set_cache_header_length(61)
 
         self.event = Event.get_by_id(self.event_key)
         if self.event is None:

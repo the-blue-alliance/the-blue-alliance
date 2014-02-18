@@ -44,6 +44,7 @@ class TestEventApiController(unittest2.TestCase):
         )
 
         self.event.put()
+
     def tearDown(self):
         self.testbed.deactivate()
 
