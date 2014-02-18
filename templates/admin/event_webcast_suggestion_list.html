@@ -34,9 +34,9 @@
         <div class="row">
             <div class="well">
                 <div class="col-xs-6">
-                    <p><strong>{{ suggestion.target_key }}</strong></p>
-                    <p><a href="{{suggestion.contents.webcast_url}}">{{ suggestion.contents.webcast_url }}</a></p>
-                    <form action="/admin/event/add_webcast/{{event.key_name}}" method="post">
+                    <p><a href="/event/{{suggestion.target_key}}"><strong>{{suggestion.target_key}}</strong></a></p>
+                    <p><a href="{{suggestion.contents.webcast_url}}">{{suggestion.contents.webcast_url}}</a></p>
+                    <form action="/admin/event/add_webcast/{{suggestion.target_key}}" method="post">
                         {% include "partials/webcast_add_form_partial.html" %}
                         <input type="hidden" name="suggestion_key" value="{{suggestion.key.id}}" />
                         <input type="hidden" name="event_key" value="{{suggestion.target_key}}" />
