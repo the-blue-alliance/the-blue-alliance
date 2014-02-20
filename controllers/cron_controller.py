@@ -9,7 +9,6 @@ from google.appengine.ext import ndb
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
-from google.appengine.api import urlfetch
 
 from helpers.event_helper import EventHelper
 
@@ -21,18 +20,12 @@ from helpers.insight_manipulator import InsightManipulator
 from helpers.team_manipulator import TeamManipulator
 from helpers.matchstats_helper import MatchstatsHelper
 from helpers.insights_helper import InsightsHelper
-from helpers.typeahead_helper import TypeaheadHelper
 
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
-from models.sitevar import Sitevar
 from models.typeahead_entry import TypeaheadEntry
-
-import tba_config
-
-from models.insight import Insight
 
 
 class EventShortNameCalcEnqueue(webapp.RequestHandler):
@@ -104,10 +97,8 @@ class EventTeamUpdate(webapp.RequestHandler):
         if teams:
             event_teams = EventTeamManipulator.createOrUpdate(event_teams)
 
-        # Temporarily disable deleting of event_teams. Too fragile. -Eugene 2013/11/23
-        et_keys_to_del = set()
-#         if et_keys_to_del:
-#             ndb.delete_multi(et_keys_to_del)
+        if et_keys_to_del:
+            ndb.delete_multi(et_keys_to_del)
 
         template_values = {
             'event_teams': event_teams,

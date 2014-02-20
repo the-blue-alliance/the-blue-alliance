@@ -2,18 +2,14 @@ import datetime
 import os
 import logging
 
-from google.appengine.api import memcache
 from google.appengine.ext import ndb
-from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
-import tba_config
 from base_controller import CacheableHandler
 from helpers.event_helper import EventHelper
 from helpers.match_helper import MatchHelper
 from helpers.award_helper import AwardHelper
 from helpers.data_fetchers.team_details_data_fetcher import TeamDetailsDataFetcher
-from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team

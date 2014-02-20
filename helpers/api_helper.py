@@ -3,12 +3,9 @@ import logging
 from datetime import datetime
 
 from google.appengine.api import memcache
-from google.appengine.ext import ndb
 
 import tba_config
 from helpers.event_helper import EventHelper
-from helpers.match_helper import MatchHelper
-from helpers.team_helper import TeamHelper
 
 from models.event import Event
 from models.event_team import EventTeam
@@ -164,6 +161,8 @@ class ApiHelper(object):
 
         if match_dict is None:
             match = Match.get_by_id(match_key)
+            if match is None:
+                return None
 
             match_dict = {}
             match_dict["key"] = match.key_name

@@ -58,15 +58,15 @@ class TestApiEventList(unittest2.TestCase):
         self.assertEqual(event_dict["end_date"], self.event.end_date.isoformat())
 
     def test_event_show(self):
-        response = self.testapp.get('/?year=2010', headers={"User-Agent": "tests"})
+        response = self.testapp.get('/?year=2010', headers={"X-TBA-App-Id": "tba-tests:event-api-test:v01"})
 
         event_dict = json.loads(response.body)
         self.assertEventJson(event_dict[0])
 
-    def test_validate_user_agent(self):
+    def test_validate_tba_app_id(self):
         response = self.testapp.get('/?year=2010', expect_errors=True)  # By default get() doesn't send a user agent
         self.assertEqual(response.status, "400 Bad Request")
-        self.assertEqual(response.body, '{"Error": "User-Agent is a required header."}')
+        self.assertTrue('Error' in json.loads(response.body).keys())
 
 
 class TestApiMatchDetails(unittest2.TestCase):
@@ -180,7 +180,7 @@ class TestApiMatchDetails(unittest2.TestCase):
         api_names = ["match", "matches"]
 
         for api_name in api_names:
-            response = self.testapp.get("/?" + api_name + "=" + match_names, headers={"User-Agent": "tests"})
+            response = self.testapp.get("/?" + api_name + "=" + match_names, headers={"X-TBA-App-Id": "tba-tests:event-api-test:v01"})
 
             matches = json.loads(response.body)
             for match in matches:

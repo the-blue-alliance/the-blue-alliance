@@ -1,11 +1,7 @@
-import os
-import logging
-import re
-
 from models.event import Event
 from models.match import Match
 from models.team import Team
-from models.award import Award
+
 
 class ValidationHelper(object):
     """

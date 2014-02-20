@@ -22,7 +22,7 @@
 
 {% block content %}
   <div id="content"></div>
-  <div class="hidden" id="webcast_data">{{ special_webcasts }}</div>
+  <div class="hidden" id="webcast_data">{{ webcasts|safe }}</div>
 {% endblock %}
 
 {% block footer %}{% endblock %}

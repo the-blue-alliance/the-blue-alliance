@@ -9,7 +9,6 @@
 # x is OPR and should be n x 1
 
 import numpy as np
-import logging
 
 
 class MatchstatsHelper(object):

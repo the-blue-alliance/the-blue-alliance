@@ -1,4 +1,3 @@
-
 import json
 import logging
 import os
@@ -16,14 +15,12 @@ import tba_config
 from helpers.api_helper import ApiHelper
 
 from models.event import Event
-from models.event_team import EventTeam
-from models.match import Match
 from models.sitevar import Sitevar
 from models.team import Team
 
 
 # used for deferred call
-def track_call(api_action, api_details):
+def track_call(api_action, api_details, x_tba_app_id):
     analytics_id = Sitevar.get_by_id("google_analytics.id")
     if analytics_id is None:
         logging.warning("Missing sitevar: google_analytics.id. Can't track API usage.")
@@ -37,8 +34,8 @@ def track_call(api_action, api_details):
             'ec': 'api',
             'ea': api_action,
             'el': api_details,
-            'ev': 1,
-            'ni': 1
+            'cd1': x_tba_app_id,  # custom dimension 1
+            'ni': 1,
         })
 
         # Sets up the call
@@ -72,14 +69,22 @@ class MainApiHandler(webapp2.RequestHandler):
             self.response.set_status(500)
 
     def _track_call_defer(self, api_action, api_details=''):
-        deferred.defer(track_call, api_action, api_details)
+        deferred.defer(track_call, api_action, api_details, self.x_tba_app_id)
 
-    def _validate_user_agent(self):
+    def _validate_tba_app_id(self):
         """
-        Tests the presence of a User-Agent header.
+        Tests the presence of a X-TBA-App-Id header or URL param.
         """
-        if not self.request.headers.get("User-Agent"):
-            self._errors = json.dumps({"Error": "User-Agent is a required header."})
+        self.x_tba_app_id = self.request.headers.get("X-TBA-App-Id")
+        if self.x_tba_app_id is None:
+            self.x_tba_app_id = self.request.get('X-TBA-App-Id')
+
+        logging.info("X-TBA-App-ID: {}".format(self.x_tba_app_id))
+        if not self.x_tba_app_id:
+            self._errors = json.dumps({"Error": "X-TBA-App-Id is a required header or URL param. Please see http://www.thebluealliance.com/apidocs for more info."})
+            self.abort(400)
+        if len(self.x_tba_app_id.split(':')) != 3:
+            self._errors = json.dumps({"Error": "X-TBA-App-Id must follow a specific format. Please see http://www.thebluealliance.com/apidocs for more info."})
             self.abort(400)
 
 
@@ -88,7 +93,7 @@ class ApiTeamsShow(MainApiHandler):
     Information about teams.
     """
     def get(self):
-        self._validate_user_agent()
+        self._validate_tba_app_id()
         teams = []
         team_keys = self.request.get('teams').split(',')
 
@@ -117,7 +122,7 @@ class ApiTeamDetails(MainApiHandler):
     Information about a Team in a particular year, including full Event and Match objects
     """
     def get(self):
-        self._validate_user_agent()
+        self._validate_tba_app_id()
         team_key = self.request.get('team')
         year = self.request.get('year')
 
@@ -149,7 +154,7 @@ class ApiEventsShow(MainApiHandler):
     Deprecation notice. Please use ApiEventList, or ApiEventDetails.
     """
     def get(self):
-        self._validate_user_agent()
+        self._validate_tba_app_id()
         response = {"API Method Removed": "ApiEventsShow is no longer available. Please use ApiEventDetails, and ApiEventList instead."}
         self.response.set_status(410)
         self.response.out.write(json.dumps(response))
@@ -161,7 +166,7 @@ class ApiEventList(MainApiHandler):
     """
 
     def get(self):
-        self._validate_user_agent()
+        self._validate_tba_app_id()
         if self.request.get("year") is '':
             year = datetime.now().year
         else:
@@ -206,7 +211,7 @@ class ApiEventDetails(MainApiHandler):
     """
 
     def get(self):
-        self._validate_user_agent()
+        self._validate_tba_app_id()
         event_key = str(self.request.get("event"))
         if event_key is "" or event_key is None:
             error_message = {"Parameter Error": "'event' is a required parameter."}
@@ -225,21 +230,28 @@ class ApiMatchDetails(MainApiHandler):
     Returns specific matches with details.
     """
     def get(self):
-        self._validate_user_agent()
+        self._validate_tba_app_id()
         value = self.request.get('match') or self.request.get('matches')
+        matches = []
         if value is not '':
             match_keys = value.split(',')
             match_keys_sorted = sorted(value.split(','))
             track_matches_keys = ",".join(match_keys_sorted)
             track_matches = value
-            match_json = []
-            for match in match_keys:
-                match_json.append(ApiHelper.getMatchDetails(match))
-        else:
-            match_json = {'error': 'The "match" parameter is missing'}
-            track_matches = 'error'
+            for match_key in match_keys:
+                if match_key == '':
+                    continue
+                mjson = ApiHelper.getMatchDetails(match_key)
+                if mjson is not None:
+                    matches.append(mjson)
 
-        self.response.out.write(json.dumps(match_json))
+        if matches != []:
+            response = matches
+        else:
+            response = {"Property Error": "No matches found for any key given"}
+            self.response.set_status(404)
+
+        self.response.out.write(json.dumps(response))
 
         self._track_call_defer('matches/details', track_matches)
 
@@ -249,7 +261,7 @@ class CsvTeamsAll(MainApiHandler):
     Outputs a CSV of all team information in the database, designed for other apps to bulk-import data.
     """
     def get(self):
-        self._validate_user_agent()
+        self._validate_tba_app_id()
         memcache_key = "csv_teams_all"
         output = memcache.get(memcache_key)
 

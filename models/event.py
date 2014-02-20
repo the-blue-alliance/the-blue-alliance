@@ -1,7 +1,6 @@
 from google.appengine.ext import ndb
 import datetime
 import json
-import logging
 import re
 from consts.event_type import EventType
 

@@ -1,16 +1,11 @@
-import Cookie
 import os
 
-from google.appengine.api import users
-from google.appengine.ext import ndb, webapp
 from google.appengine.ext.webapp import template
 
-import tba_config
-
 from base_controller import LoggedInHandler
-from helpers.user_bundle import UserBundle
 
 from models.account import Account
+
 
 class AccountOverview(LoggedInHandler):
     def get(self):
@@ -21,6 +16,7 @@ class AccountOverview(LoggedInHandler):
             return None
         path = os.path.join(os.path.dirname(__file__), '../templates/account_overview.html')
         self.response.out.write(template.render(path, self.template_values))
+
 
 class AccountEdit(LoggedInHandler):
     def get(self):
@@ -48,6 +44,7 @@ class AccountEdit(LoggedInHandler):
             self.redirect('/account')
         else:
             self.redirect('/')
+
 
 class AccountRegister(LoggedInHandler):
     def get(self):
@@ -78,16 +75,17 @@ class AccountRegister(LoggedInHandler):
         else:
             self.redirect('/')
 
+
 class AccountLogout(LoggedInHandler):
-  def get(self):
-    if os.environ.get('SERVER_SOFTWARE', '').startswith('Development/'):
-      self.redirect(self.user_bundle.logout_url)
-      return
+    def get(self):
+        if os.environ.get('SERVER_SOFTWARE', '').startswith('Development/'):
+            self.redirect(self.user_bundle.logout_url)
+            return
 
-    # Deletes the session cookies pertinent to TBA without touching Google session(s)
-    # Reference: http://ptspts.blogspot.ca/2011/12/how-to-log-out-from-appengine-app-only.html
-    response = self.redirect('/') 
-    response.delete_cookie('ACSID')
-    response.delete_cookie('SACSID')
+        # Deletes the session cookies pertinent to TBA without touching Google session(s)
+        # Reference: http://ptspts.blogspot.ca/2011/12/how-to-log-out-from-appengine-app-only.html
+        response = self.redirect('/')
+        response.delete_cookie('ACSID')
+        response.delete_cookie('SACSID')
 
-    return response
+        return response

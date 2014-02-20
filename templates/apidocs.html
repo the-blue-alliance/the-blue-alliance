@@ -34,15 +34,15 @@
       and file an issue or send a pull request. If you have any questions
       about this API or would like to stay up-to-date on its development,
       you can join our <a href="https://groups.google.com/forum/#!forum/thebluealliance-developers">developer's mailing list</a>.</p>
-      <h3>X-TBA-App-Id Header</h3>
-      <p>So we can know how the API is being used to prioritize future development, we require clients to identify themselves. All API requests <strong>must</strong> include a unique, descriptive X-TBA-App-Id header to identify the application.</strong></p>
+      <h3>X-TBA-App-Id Header or URL Parameter</h3>
+      <p>So we can know how the API is being used to prioritize future development, we require clients to identify themselves. All API requests <strong>must</strong> include a unique, descriptive X-TBA-App-Id header or URL parameter to identify the application.</strong></p>
       <p>The X-TBA-App-Id needs to follow this format:
       <code>&ltteam/person id&gt:&ltapp description&gt:&ltversion&gt</code> and
       not use any colons except for the two already present.</p>
       <h4>Valid examples:</h4>
       <ul>
-        <li><code>X-TBA-App-Id: 'frc281:scouting-system:v01'</code></li>
-        <li><code>X-TBA-App-Id: 'woodie_flowers:match_scraper:5'</code></li>
+        <li><code>frc281:scouting-system:v01</code></li>
+        <li><code>woodie_flowers:match_scraper:5</code></li>
       </ul>
       <hr>
 

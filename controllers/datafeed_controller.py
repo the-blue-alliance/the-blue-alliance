@@ -24,12 +24,10 @@ from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.match_manipulator import MatchManipulator
 from helpers.match_helper import MatchHelper
 from helpers.award_manipulator import AwardManipulator
-from helpers.team_helper import TeamHelper, TeamTpidHelper
 from helpers.team_manipulator import TeamManipulator
 
 from models.event import Event
 from models.event_team import EventTeam
-from models.match import Match
 from models.team import Team
 
 from helpers.firebase.firebase_pusher import FirebasePusher
@@ -185,6 +183,14 @@ class UsfirstEventDetailsGet(webapp.RequestHandler):
                 team=team.key,
                 year=event.year)
                 for team in teams]
+
+            # Delete eventteams of teams that unregister from an event
+            if event.future:
+                existing_event_team_keys = set(EventTeam.query(EventTeam.event == event.key).fetch(1000, keys_only=True))
+                event_team_keys = set([et.key for et in event_teams])
+                et_keys_to_delete = existing_event_team_keys.difference(event_team_keys)
+                ndb.delete_multi(et_keys_to_delete)
+
             event_teams = EventTeamManipulator.createOrUpdate(event_teams)
             if type(event_teams) is not list:
                 event_teams = [event_teams]

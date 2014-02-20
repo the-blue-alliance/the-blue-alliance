@@ -18,9 +18,11 @@ class EventTeamUpdater(object):
         An EventTeam is valid iff the team:
         a) played a match at the event,
         b) the team received an award at the event,
-        c) or the event has not yet occurred.
+        c) the event has not yet occurred,
+        d) or the event is not from the current year. (This is to make sure we don't delete old data we may no longer be able to scrape)
         """
         event = Event.get_by_id(event_key)
+        cur_year = datetime.datetime.now().year
 
         # Add teams from Matches and Awards
         team_ids = set()
@@ -64,7 +66,7 @@ class EventTeamUpdater(object):
             existing_team_ids.add(et.team.id())
 
         et_keys_to_delete = set()
-        if event.end_date is not None and event.end_date < datetime.datetime.now():
+        if event.year == cur_year and event.end_date is not None and event.end_date < datetime.datetime.now():
             for team_id in existing_team_ids.difference(team_ids):
                 et_key_name = "{}_{}".format(event.key_name, team_id)
                 et_keys_to_delete.add(ndb.Key(EventTeam, et_key_name))

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import os
 import webapp2
 
 import tba_config
@@ -12,8 +11,6 @@ from controllers.insights_controller import InsightsOverview, InsightsDetail
 from controllers.main_controller import ContactHandler, HashtagsHandler, \
       MainKickoffHandler, MainBuildseasonHandler, MainCompetitionseasonHandler, \
       MainInsightsHandler, MainOffseasonHandler, OprHandler, SearchHandler, \
-      AboutHandler, ThanksHandler, PageNotFoundHandler, \
-      GamedayHandler, WebcastsHandler, RecordHandler, \
       AboutHandler, ThanksHandler, PageNotFoundHandler, \
       GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler
 from controllers.match_controller import MatchDetail
@@ -31,6 +28,7 @@ landing_handler = {tba_config.KICKOFF: MainKickoffHandler,
                    tba_config.INSIGHTS: MainInsightsHandler,
                    }
 
+
 class Webapp2HandlerAdapter(webapp2.BaseHandlerAdapter):
     def __call__(self, request, response, exception):
         request.route_args = {}
@@ -46,9 +44,9 @@ app = webapp2.WSGIApplication([
       webapp2.Route(r'/account/register', AccountRegister, 'account-register'),
       webapp2.Route(r'/apidocs', ApiDocumentationHandler, 'api-documentation'),
       webapp2.Route(r'/contact', ContactHandler, 'contact'),
-      webapp2.Route(r'/events', EventList, 'event-list'),
       webapp2.Route(r'/event/<event_key>', EventDetail, 'event-detail'),
       webapp2.Route(r'/event/<event_key>/feed', EventRss, 'event-rss'),
+      webapp2.Route(r'/events', EventList, 'event-list'),
       webapp2.Route(r'/events/<year:[0-9]+>', EventList, 'event-list'),
       webapp2.Route(r'/gameday', GamedayHandler, 'gameday'),
       webapp2.Route(r'/gameday2', Gameday2Controller, 'gameday2'),
