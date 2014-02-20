@@ -9,17 +9,17 @@ from consts.media_type import MediaType
 
 
 class MediaParser(object):
-    CD_PHOTO_THREAD_URL_PATTERN = 'chiefdelphi.com/media/photos/'
-    YOUTUBE_URL_PATTERN = 'youtube.com'
+    CD_PHOTO_THREAD_URL_PATTERNS = ['chiefdelphi.com/media/photos/']
+    YOUTUBE_URL_PATTERNS = ['youtube.com', 'youtu.be']
 
     @classmethod
     def partial_media_dict_from_url(cls, url):
         """
         Takes a url, and turns it into a partial Media object dict
         """
-        if cls.CD_PHOTO_THREAD_URL_PATTERN in url:
+        if any(s in url for s in cls.CD_PHOTO_THREAD_URL_PATTERNS):
             return cls._partial_media_dict_from_cd_photo_thread(url)
-        elif cls.YOUTUBE_URL_PATTERN in url:
+        elif any(s in url for s in cls.YOUTUBE_URL_PATTERNS):
             return cls._partial_media_dict_from_youtube(url)
         else:
             logging.warning("Failed to determine media type from url: {}".format(url))
