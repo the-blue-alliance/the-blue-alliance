@@ -4,7 +4,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
-from helpers.media_helper import MediaHelper
+from helpers.media_helper import MediaHelper, MediaParser
 from models.media import Media
 from models.suggestion import Suggestion
 from models.team import Team
@@ -46,17 +46,18 @@ class SuggestTeamMediaController(LoggedInHandler):
 
         team_key = self.request.get("team_key")
         year_str = self.request.get("year")
-        media_url = self.request.get("media_url")
 
-        suggestion = Suggestion(
-            author=self.user_bundle.account.key,
-            target_model="media",
-            )
-        suggestion.contents = {
-            'team_key': team_key,
-            'year': int(year_str),
-            'media_url': media_url,
-        }
-        suggestion.put()
+        media_dict = MediaParser.partial_media_dict_from_url(self.request.get('media_url').strip())
+        if media_dict is not None:
+            media_dict['year'] = int(year_str)
+            media_dict['reference_type'] = 'team'
+            media_dict['reference_key'] = team_key
+
+            suggestion = Suggestion(
+                author=self.user_bundle.account.key,
+                target_model="media",
+                )
+            suggestion.contents = media_dict
+            suggestion.put()
 
         self.redirect('/suggest/team/media?team_key=%s&year=%s&success=1' % (team_key, year_str))
