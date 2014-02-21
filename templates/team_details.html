@@ -19,7 +19,6 @@
 
         <h2 class="visible-xs end_header">Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h2>
 
-        {% if participation|length > 1 %}
         <div class="tba-sidebar">
           <ul class="nav tba-sidenav">
             <li><a class="smooth-scroll" href="#team-info">Team Info</a></li>
@@ -40,7 +39,6 @@
             </li>
           </ul>
         </div>
-        {% endif %}
       </div>
     </div>
     <div class="col-xs-12 col-sm-9 col-lg-10">
