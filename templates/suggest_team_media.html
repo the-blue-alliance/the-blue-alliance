@@ -53,7 +53,7 @@
           {% if medias_by_slugname.cdphotothread %}
           <div class="row">
             <div class="col-xs-12">
-              <h4>Chief Delphi Photos</h4>
+              <h4>Existing Chief Delphi Photos</h4>
               {% for media in medias_by_slugname.cdphotothread %}
                 <div class="col-xs-6 col-sm-4">
                 {% include "media_partials/cdphotothread_partial.html" %}
@@ -66,7 +66,7 @@
           {% if medias_by_slugname.cdphotothread %}
           <div class="row">
             <div class="col-xs-12">
-              <h4>Videos</h4>
+              <h4>Existing Videos</h4>
               {% for media in medias_by_slugname.youtube %}
                 <div class="col-xs-12 col-md-6 fitvids">
                 {% include "media_partials/youtube_partial.html" %}
@@ -75,7 +75,7 @@
             </div>
           </div>
           {% endif %}
-
+          <hr>
           <div class="row">
             <div class="col-xs-12">
               <h4>Add more media</h4>
@@ -83,6 +83,7 @@
                 <input name="team_key" type="hidden" value="{{team.key.id}}" />
                 <input name="year" type="hidden" value="{{year}}" />
                 <div class="input-group">
+                  <span class="input-group-addon">{{year}}</span>
                   <input class="form-control" type="text" name="media_url" placeholder="http://www.chiefdelphi.com/media/photos/36646" value="" />
                   <span class="input-group-btn">
                     <button class="btn btn-success" type="submit"><span class="glyphicon glyphicon-plus-sign"></span> Add Media</button>
