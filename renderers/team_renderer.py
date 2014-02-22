@@ -20,13 +20,12 @@ from models.media import Media
 class TeamRenderer(object):
     @classmethod
     def render_team_details(cls, handler, team, year, is_canonical):
+        media_key_futures = Media.query(Media.references == team.key, Media.year == year).fetch_async(500, keys_only=True)
         events_sorted, matches_by_event_key, awards_by_event_key, valid_years = TeamDetailsDataFetcher.fetch(team, year, return_valid_years=True)
         if not events_sorted:
             return None
 
-        media_key_futures = Media.query(Media.references == team.key, Media.year == year).fetch_async(500, keys_only=True)
         media_futures = ndb.get_multi_async(media_key_futures.get_result())
-        medias_by_slugname = MediaHelper.group_by_slugname([media_future.get_result() for media_future in media_futures])
 
         participation = []
         year_wlt_list = []
@@ -73,6 +72,8 @@ class TeamRenderer(object):
             year_wlt["tie"] += wlt["tie"]
         if year_wlt["win"] + year_wlt["loss"] + year_wlt["tie"] == 0:
             year_wlt = None
+
+        medias_by_slugname = MediaHelper.group_by_slugname([media_future.get_result() for media_future in media_futures])
 
         template_values = {"is_canonical": is_canonical,
                            "team": team,
