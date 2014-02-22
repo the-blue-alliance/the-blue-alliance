@@ -38,6 +38,7 @@ def track_call(api_action, api_label, x_tba_app_id):
         urlfetch.fetch(
             url=analytics_url,
             method=urlfetch.GET,
+            deadline=10,
         )
 
 
