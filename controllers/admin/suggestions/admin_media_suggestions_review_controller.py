@@ -22,12 +22,21 @@ class AdminMediaSuggestionsReviewController(LoggedInHandler):
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
             Suggestion.target_model == "media")
 
+        reference_keys = []
         for suggestion in suggestions:
+            reference_keys.append(Media.create_reference(
+                suggestion.contents['reference_type'],
+                suggestion.contents['reference_key']))
             if 'details_json' in suggestion.contents:
                 suggestion.details = json.loads(suggestion.contents['details_json'])
 
+        reference_futures = ndb.get_multi_async(reference_keys)
+        references = map(lambda r: r.get_result(), reference_futures)
+
+        suggestions_and_references = zip(suggestions, references)
+
         self.template_values.update({
-            "suggestions": suggestions,
+            "suggestions_and_references": suggestions_and_references,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../../templates/admin/media_suggestion_list.html')
