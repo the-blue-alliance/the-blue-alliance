@@ -11,7 +11,7 @@ class Suggestion(ndb.Model):
     the site. The generally store a model, a key, and then a json blob of
     fields to append or ammend in the model.
     """
-    MODELS = set(["event", "match"])
+    MODELS = set(["event", "match", "media"])
     REVIEW_ACCEPTED = 1
     REVIEW_PENDING = 0
     REVIEW_REJECTED = -1
@@ -21,7 +21,7 @@ class Suggestion(ndb.Model):
     reviewer = ndb.KeyProperty(kind=Account)
     author = ndb.KeyProperty(kind=Account, required=True)
     contents_json = ndb.StringProperty(indexed=False)  # a json blob
-    target_key = ndb.StringProperty(required=True)  # "2012cmp"
+    target_key = ndb.StringProperty()  # "2012cmp"
     target_model = ndb.StringProperty(choices=MODELS, required=True)  # "event"
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
