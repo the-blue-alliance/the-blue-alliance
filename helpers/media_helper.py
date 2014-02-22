@@ -8,6 +8,19 @@ from BeautifulSoup import BeautifulSoup
 from consts.media_type import MediaType
 
 
+class MediaHelper(object):
+    @classmethod
+    def group_by_slugname(cls, medias):
+        medias_by_slugname = {}
+        for media in medias:
+            slugname = media.slug_name
+            if slugname in medias_by_slugname:
+                medias_by_slugname[slugname].append(media)
+            else:
+                medias_by_slugname[slugname] = [media]
+        return medias_by_slugname
+
+
 class MediaParser(object):
     CD_PHOTO_THREAD_URL_PATTERNS = ['chiefdelphi.com/media/photos/']
     YOUTUBE_URL_PATTERNS = ['youtube.com', 'youtu.be']

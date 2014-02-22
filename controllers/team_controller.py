@@ -8,12 +8,14 @@ from google.appengine.ext.webapp import template
 from base_controller import CacheableHandler
 from helpers.event_helper import EventHelper
 from helpers.match_helper import MatchHelper
+from helpers.media_helper import MediaHelper
 from helpers.award_helper import AwardHelper
 from helpers.data_fetchers.team_details_data_fetcher import TeamDetailsDataFetcher
+from models.award import Award
 from models.event_team import EventTeam
 from models.match import Match
+from models.media import Media
 from models.team import Team
-from models.award import Award
 
 # The view of a list of teams.
 
@@ -126,6 +128,10 @@ class TeamDetail(CacheableHandler):
         if not events_sorted:
             self.abort(404)
 
+        media_key_futures = Media.query(Media.references == team.key, Media.year == year).fetch_async(500, keys_only=True)
+        media_futures = ndb.get_multi_async(media_key_futures.get_result())
+        medias_by_slugname = MediaHelper.group_by_slugname([media_future.get_result() for media_future in media_futures])
+
         participation = []
         year_wlt_list = []
 
@@ -179,7 +185,8 @@ class TeamDetail(CacheableHandler):
                             "years": valid_years,
                             "year_wlt": year_wlt,
                             "current_event": current_event,
-                            "matches_upcoming": matches_upcoming}
+                            "matches_upcoming": matches_upcoming,
+                            "medias_by_slugname": medias_by_slugname}
 
         if short_cache:
             self._cache_expiration = self.SHORT_CACHE_EXPIRATION
