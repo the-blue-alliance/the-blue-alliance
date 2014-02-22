@@ -11,12 +11,21 @@
      <div class="tba-sidebar">
        <ul class="nav tba-sidenav">
          <li><a class="smooth-scroll" href="#overview">Overview</a></li>
-         <li><a class="smooth-scroll" href="#team-model">Team Model</a></li>
-         <li><a class="smooth-scroll" href="#event-model">Event Model</a></li>
-         <li><a class="smooth-scroll" href="#match-model">Match Model</a></li>
-         <li><a class="smooth-scroll" href="#award-model">Award Model</a></li>
-         <li><a class="smooth-scroll" href="#team-request">Team Request</a></li>
-         <li><a class="smooth-scroll" href="#event-request">Event Request</a></li>
+         <li>
+           <a class="smooth-scroll" href="#models">Models</a>
+           <ul class="nav">
+             <li><a class="smooth-scroll" href="#team-model">Team Model</a></li>
+             <li><a class="smooth-scroll" href="#event-model">Event Model</a></li>
+             <li><a class="smooth-scroll" href="#match-model">Match Model</a></li>
+             <li><a class="smooth-scroll" href="#award-model">Award Model</a></li>
+           </ul>
+         </li>
+         <li>
+           <a class="smooth-scroll" href="#requests">Requests</a>
+           <ul class="nav">
+             <li><a class="smooth-scroll" href="#team-request">Team Request</a></li>
+             <li><a class="smooth-scroll" href="#event-request">Event Request</a></li>
+           </ul>
         </ul>
       </div>
     </div>
@@ -47,7 +56,8 @@
       </ul>
       <hr>
 
-      <h2 id="team-model">Team Model</h2>
+      <h2 id="models">Models</h2>
+      <h3 id="team-model">Team Model</h3>
       <h4>Related: <a class="smooth-scroll" href="#team-request">Team Request</a></h4>
       <table class=table>
         <caption>Response Data</caption>
@@ -113,7 +123,7 @@
         </tbody>
       </table>
 
-      <h2 id="event-model">Event Model</h2>
+      <h3 id="event-model">Event Model</h3>
       <h4>Related: <a class="smooth-scroll" href="#event-request">Event Request</a></h4>
       <table class=table>
         <caption>Response Data</caption>
@@ -198,7 +208,7 @@
         </tbody>
       </table>
 
-      <h2 id="match-model">Match Model</h2>
+      <h3 id="match-model">Match Model</h3>
       <table class=table>
         <caption>Response Data</caption>
         <thead>
@@ -250,7 +260,7 @@
         </tbody>
       </table>
 
-      <h2 id="award-model">Award Model</h2>
+      <h3 id="award-model">Award Model</h3>
       <table class=table>
         <caption>Model Data</caption>
         <thead>
@@ -284,8 +294,11 @@
           </tr>
         </tbody>
       </table>
+      
+      <hr>
 
-      <h2 id="team-request">Team Request</h2>
+      <h2 id="requests">Requests</h2>
+      <h3 id="team-request">Team Request</h3>
       <h4>Related: <a class="smooth-scroll" href="#team-model">Team Model</a></h4>
       <p>
         Request format:
@@ -335,7 +348,7 @@
         </div>
       </div>
 
-      <h2 id="event-request">Event Request</h2>
+      <h3 id="event-request">Event Request</h3>
       <h4>Related: <a class="smooth-scroll" href="#event-model">Event Model</a></h4>
       <p>
         Request format:
