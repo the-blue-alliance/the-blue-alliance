@@ -17,7 +17,7 @@ from controllers.match_controller import MatchDetail
 from controllers.suggestions.suggest_match_video_controller import SuggestMatchVideoController
 from controllers.suggestions.suggest_event_webcast_controller import SuggestEventWebcastController
 from controllers.suggestions.suggest_team_media_controller import SuggestTeamMediaController
-from controllers.team_controller import TeamList, TeamDetail, TeamHistory
+from controllers.team_controller import TeamList, TeamCanonical, TeamDetail, TeamHistory
 
 from google.appengine.ext.webapp import template
 template.register_template_library('common.my_filters')
@@ -62,7 +62,7 @@ app = webapp2.WSGIApplication([
       webapp2.Route(r'/suggest/event/webcast', SuggestEventWebcastController, 'suggest-event-webcast'),
       webapp2.Route(r'/suggest/match/video', SuggestMatchVideoController, 'suggest-match-video'),
       webapp2.Route(r'/suggest/team/media', SuggestTeamMediaController, 'suggest-team-media'),
-      webapp2.Route(r'/team/<team_number:[0-9]+>', TeamDetail, 'team-detail'),
+      webapp2.Route(r'/team/<team_number:[0-9]+>', TeamCanonical, 'team-canonical'),
       webapp2.Route(r'/team/<team_number:[0-9]+>/<year:[0-9]+>', TeamDetail, 'team-detail'),
       webapp2.Route(r'/team/<team_number:[0-9]+>/history', TeamHistory, 'team-history'),
       webapp2.Route(r'/teams', TeamList, 'team-list'),
