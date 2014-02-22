@@ -1,4 +1,5 @@
 import logging
+import re
 
 # for db.link
 from google.appengine.ext import db
@@ -43,7 +44,11 @@ class UsfirstLegacyTeamDetailsParser(ParserBase):
                     team["nickname"] = unicode(tds[1].string)
                 if field == "Team Website":
                     try:
-                        team["website"] = db.Link(unicode(tds[1].a["href"]))
+                        website_str = re.sub(r'^/|/$', '', unicode(tds[1].a["href"]))  # strip starting and trailing slashes
+                        if not website_str.startswith('http://'):
+                            website_str = 'http://%s' % website_str
+                        team['website'] = db.Link(website_str)
                     except Exception, details:
-                        logging.info("Team website is invalid for team %s." % team["team_number"])
+                        logging.info("Team website is invalid for team %s." % team['team_number'])
+                        logging.info(details)
         return team, False

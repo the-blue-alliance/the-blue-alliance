@@ -5,9 +5,10 @@ from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from base_controller import CacheableHandler
-from renderers.team_renderer import TeamRenderer
 
-# The view of a list of teams.
+from models.team import Team
+
+from renderers.team_renderer import TeamRenderer
 
 
 class TeamList(CacheableHandler):
@@ -125,7 +126,11 @@ class TeamDetail(CacheableHandler):
         if not team:
             self.abort(404)
 
-        return TeamRenderer.render_team_details(self, team, int(year), False)
+        rendered_result = TeamRenderer.render_team_details(self, team, int(year), False)
+        if rendered_result is None:
+            self.abort(404)
+        else:
+            return rendered_result
 
 
 class TeamHistory(CacheableHandler):

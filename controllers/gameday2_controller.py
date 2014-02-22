@@ -6,8 +6,6 @@ from base_controller import CacheableHandler
 
 from helpers.event_helper import EventHelper
 
-from models.sitevar import Sitevar
-
 
 class Gameday2Controller(CacheableHandler):
     def __init__(self, *args, **kw):

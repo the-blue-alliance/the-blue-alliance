@@ -1,4 +1,4 @@
-<div class="row">
+<div id="team-info" class="row hidden-xs">
   <div class="col-xs-12">
     <h2>Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h2>
   </div>
@@ -21,7 +21,7 @@
       <span class="image-atc"></span> <a href="http://atthecontrol.com/{{team.team_number}}">See live data on At The Control</a>
     </p>
 
-    {% if current_event %}
+    {% if current_event or medias_by_slugname.cdphotothread%}
       {% include "team_partials/team_social_media.html" %}
     {% endif %}
   </div>
@@ -52,7 +52,11 @@
       </div>
     </div>
   {% else %}
-    {% include "team_partials/team_social_media.html" %}
+    {% if medias_by_slugname.cdphotothread %}
+      {% include "media_partials/image_carousel_partial.html" %}
+    {% else %}
+      {% include "team_partials/team_social_media.html" %}
+    {% endif %}
   {% endif %}
   </div>
 </div>

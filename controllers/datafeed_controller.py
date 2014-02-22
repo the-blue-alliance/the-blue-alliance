@@ -24,12 +24,10 @@ from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.match_manipulator import MatchManipulator
 from helpers.match_helper import MatchHelper
 from helpers.award_manipulator import AwardManipulator
-from helpers.team_helper import TeamHelper, TeamTpidHelper
 from helpers.team_manipulator import TeamManipulator
 
 from models.event import Event
 from models.event_team import EventTeam
-from models.match import Match
 from models.team import Team
 
 from helpers.firebase.firebase_pusher import FirebasePusher

@@ -1,4 +1,3 @@
-
 import json
 import logging
 import os
@@ -16,8 +15,6 @@ import tba_config
 from helpers.api_helper import ApiHelper
 
 from models.event import Event
-from models.event_team import EventTeam
-from models.match import Match
 from models.sitevar import Sitevar
 from models.team import Team
 
@@ -42,12 +39,10 @@ def track_call(api_action, api_details, x_tba_app_id):
         })
 
         # Sets up the call
-        analytics_url = 'http://www.google-analytics.com/collect'
+        analytics_url = 'http://www.google-analytics.com/collect?%s' % params
         urlfetch.fetch(
             url=analytics_url,
-            payload=params,
-            method=urlfetch.POST,
-            headers={'Content-Type': 'application/x-www-form-urlencoded'}
+            method=urlfetch.GET,
         )
 
 

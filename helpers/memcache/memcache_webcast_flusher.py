@@ -1,8 +1,3 @@
-import logging
-
-from google.appengine.api import memcache
-
-
 from controllers.ajax_controller import WebcastHandler
 from controllers.event_controller import EventList
 from controllers.main_controller import MainCompetitionseasonHandler, MainOffseasonHandler, MainInsightsHandler, GamedayHandler, WebcastsHandler

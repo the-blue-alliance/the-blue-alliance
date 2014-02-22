@@ -1,5 +1,4 @@
 import datetime
-import logging
 
 from consts.event_type import EventType
 from helpers.event_manipulator import EventManipulator

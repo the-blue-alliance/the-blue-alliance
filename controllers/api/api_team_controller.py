@@ -1,5 +1,4 @@
 import json
-import logging
 import webapp2
 
 from datetime import datetime
@@ -35,7 +34,7 @@ class ApiTeamController(ApiBaseController):
         self._track_call_defer('team', api_label)
 
     def _render(self, team_key, year=None):
-        self._write_cache_headers(61)
+        self._set_cache_header_length(61)
 
         self.team = Team.get_by_id(self.team_key)
         if self.team is None:

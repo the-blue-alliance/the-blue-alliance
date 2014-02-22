@@ -49,8 +49,12 @@ class UsfirstTeamDetailsParser(ParserBase):
         team['name'] = unicode(soup.find('div', {'class': 'team-name'}).text)
 
         try:
-            team['website'] = db.Link(unicode(soup.find('div', {'class': 'team-website'}).find('a')['href']))
+            website_str = re.sub(r'^/|/$', '', unicode(soup.find('div', {'class': 'team-website'}).find('a')['href']))  # strip starting and trailing slashes
+            if not website_str.startswith('http://'):
+                website_str = 'http://%s' % website_str
+            team['website'] = db.Link(website_str)
         except Exception, details:
             logging.info("Team website is invalid for team %s." % team['team_number'])
+            logging.info(details)
 
         return team, False

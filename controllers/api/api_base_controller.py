@@ -88,7 +88,7 @@ class ApiBaseController(CacheableHandler):
             self._errors = json.dumps({"Error": "X-TBA-App-Id must follow a specific format. Please see http://www.thebluealliance.com/apidocs for more info."})
             self.abort(400)
 
-    def _write_cache_headers(self, seconds):
+    def _set_cache_header_length(self, seconds):
         if type(seconds) is not int:
             logging.error("Cache-Control max-age is not integer: {}".format(seconds))
             return

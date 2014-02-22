@@ -1,7 +1,6 @@
 import os
 import logging
 import datetime
-import time
 import webapp2
 
 from google.appengine.api import memcache
@@ -10,11 +9,9 @@ from google.appengine.ext.webapp import template
 
 import tba_config
 
-from base_controller import CacheableHandler, LoggedInHandler
+from base_controller import CacheableHandler
 from helpers.event_helper import EventHelper
-from helpers.user_bundle import UserBundle
 
-from models.account import Account
 from models.event import Event
 from models.insight import Insight
 from models.team import Team
@@ -62,7 +59,7 @@ class MainBuildseasonHandler(CacheableHandler):
         self._cache_version = 1
 
     def _render(self, *args, **kw):
-        endbuild_datetime_est = datetime.datetime(2014, 2, 18, 0, 0)
+        endbuild_datetime_est = datetime.datetime(2014, 2, 18, 23, 59)
         endbuild_datetime_utc = endbuild_datetime_est + datetime.timedelta(hours=5)
 
         path = os.path.join(os.path.dirname(__file__), "../templates/index_buildseason.html")
@@ -288,6 +285,7 @@ class RecordHandler(CacheableHandler):
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/record.html")
         return template.render(path, {})
+
 
 class ApiDocumentationHandler(CacheableHandler):
     def __init__(self, *args, **kw):

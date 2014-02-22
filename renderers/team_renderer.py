@@ -9,10 +9,12 @@ from helpers.data_fetchers.team_details_data_fetcher import TeamDetailsDataFetch
 from helpers.award_helper import AwardHelper
 from helpers.event_helper import EventHelper
 from helpers.match_helper import MatchHelper
+from helpers.media_helper import MediaHelper
 
 from models.award import Award
 from models.event_team import EventTeam
 from models.match import Match
+from models.media import Media
 
 
 class TeamRenderer(object):
@@ -21,6 +23,10 @@ class TeamRenderer(object):
         events_sorted, matches_by_event_key, awards_by_event_key, valid_years = TeamDetailsDataFetcher.fetch(team, year, return_valid_years=True)
         if not events_sorted:
             return None
+
+        media_key_futures = Media.query(Media.references == team.key, Media.year == year).fetch_async(500, keys_only=True)
+        media_futures = ndb.get_multi_async(media_key_futures.get_result())
+        medias_by_slugname = MediaHelper.group_by_slugname([media_future.get_result() for media_future in media_futures])
 
         participation = []
         year_wlt_list = []
@@ -75,7 +81,8 @@ class TeamRenderer(object):
                            "years": valid_years,
                            "year_wlt": year_wlt,
                            "current_event": current_event,
-                           "matches_upcoming": matches_upcoming}
+                           "matches_upcoming": matches_upcoming,
+                           "medias_by_slugname": medias_by_slugname}
 
         if short_cache:
             handler._cache_expiration = handler.SHORT_CACHE_EXPIRATION
