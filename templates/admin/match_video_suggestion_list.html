@@ -41,11 +41,11 @@
                   <label class="checkbox text-success" for="accept_{{suggestion.key.id}}"><input class="accept" type="checkbox" name="accept_keys[]" id="accept_{{suggestion.key.id}}" value="{{suggestion.key.id}}"> Accept</label>
                   <label class="checkbox text-danger" for="reject_{{suggestion.key.id}}"><input class="reject" type="checkbox" name="reject_keys[]" id="reject_{{suggestion.key.id}}" value="{{suggestion.key.id}}"> Reject</label>
                 </div>
-                <div class="col-xs-4 fitvids">
+                <div class="col-xs-7 fitvids">
                     <p><strong>{{ suggestion.target_key }}</strong></p>
                     <iframe width="240" height="180" src="http://www.youtube.com/embed/{{suggestion.youtube_video}}?rel=0" frameborder="0" allowfullscreen></iframe>
                 </div>
-                <div class="col-xs-6">
+                <div class="col-xs-3">
                     <ul>
                         <li>{{ suggestion.author.get.email }}</a></li>
                         <li>{{ suggestion.author.get.nickname }}</a></li>
