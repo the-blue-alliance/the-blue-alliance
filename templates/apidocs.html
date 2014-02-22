@@ -25,6 +25,8 @@
            <ul class="nav">
              <li><a class="smooth-scroll" href="#team-request">Team Request</a></li>
              <li><a class="smooth-scroll" href="#event-request">Event Request</a></li>
+             <li><a class="smooth-scroll" href="#event-teams-request">Event Teams Request</a></li>
+             <li><a class="smooth-scroll" href="#event-matches-request">Event Matches Request</a></li>
            </ul>
         </ul>
       </div>
@@ -394,6 +396,99 @@
         </div>
       </div>
 
+      <h3 id="event-teams-request">Event Teams Request</h3>
+      <h4>Related: <a class="smooth-scroll" href="#team-model">Team Model</a></h4>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/event/&ltevent key&gt/teams</code>
+      </p>
+      <table class=table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>event key</td>
+            <td>TBA event key with the format <code>yyyy[EVENT_CODE]</code>,
+            where yyyy is the year, and EVENT_CODE is the
+            <a href="https://docs.google.com/spreadsheet/ccc?key=0ApRO2Yzh2z01dExFZEdieV9WdTJsZ25HSWI3VUxsWGc">event code</a>
+            of the event.</td>
+            <td>2010sc</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_event_teams_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="6" id="example_event_teams_request" type="text" value="/api/v2/event/2010sc/teams">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group" id="accordion">
+            <pre class="event-teams-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 id="event-matches-request">Event Matches Request</h3>
+      <h4>Related: <a class="smooth-scroll" href="#match-model">Match Model</a></h4>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/event/&ltevent key&gt/matches</code>
+      </p>
+      <table class=table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>event key</td>
+            <td>TBA event key with the format <code>yyyy[EVENT_CODE]</code>,
+            where yyyy is the year, and EVENT_CODE is the
+            <a href="https://docs.google.com/spreadsheet/ccc?key=0ApRO2Yzh2z01dExFZEdieV9WdTJsZ25HSWI3VUxsWGc">event code</a>
+            of the event.</td>
+            <td>2010sc</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_event_matches_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="6"
+              id="example_event_matches_request" type="text" value="/api/v2/event/2010sc/matches">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group" id="accordion">
+            <pre class="event-matches-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -429,6 +524,38 @@
       },
       error: function(data) {
         $(".event-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+  $("#example_event_teams_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".event-teams-request-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_event_teams_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-event-teams-request:v01'},
+      success: function(data) {
+        $(".event-teams-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".event-teams-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+  $("#example_event_matches_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".event-matches-request-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_event_matches_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-event-matches-request:v01'},
+      success: function(data) {
+        $(".event-matches-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".event-matches-request-json").html('Something went wrong! Please check for correct request format.');
       }
     });
   });
