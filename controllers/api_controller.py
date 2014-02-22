@@ -39,12 +39,10 @@ def track_call(api_action, api_details, x_tba_app_id):
         })
 
         # Sets up the call
-        analytics_url = 'http://www.google-analytics.com/collect'
+        analytics_url = 'http://www.google-analytics.com/collect?%s' % params
         urlfetch.fetch(
             url=analytics_url,
-            payload=params,
-            method=urlfetch.POST,
-            headers={'Content-Type': 'application/x-www-form-urlencoded'}
+            method=urlfetch.GET,
         )
 
 
