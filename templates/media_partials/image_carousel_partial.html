@@ -1,0 +1,24 @@
+<div id="team-carousel" class="thumbnail carousel team-media-carousel slide" data-ride="carousel">
+  <!-- Wrapper for slides -->
+  <div class="carousel-inner">
+    {% for media in medias_by_slugname.cdphotothread %}
+    <div class="item{% if forloop.first %} active{% endif %}">
+      <div class="cdphotothread-thumbnail">
+        <a href="{{media.cdphotothread_image_url}}" target="_blank">
+          <span style="background-image:url('{{media.cdphotothread_image_url_med}}')"></span>
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if medias_by_slugname.cdphotothread|length > 1 %}
+  <!-- Controls -->
+  <a class="left carousel-control" href="#team-carousel" data-slide="prev">
+    <span class="glyphicon glyphicon-chevron-left"></span>
+  </a>
+  <a class="right carousel-control" href="#team-carousel" data-slide="next">
+    <span class="glyphicon glyphicon-chevron-right"></span>
+  </a>
+  {% endif %}
+</div>
