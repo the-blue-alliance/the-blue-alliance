@@ -64,6 +64,7 @@ class TestEventApiController(unittest2.TestCase):
         event_dict = json.loads(response.body)
         self.assertEventJson(event_dict)
 
+
 class TestEventTeamsApiController(unittest2.TestCase):
 
     def setUp(self):
@@ -188,4 +189,3 @@ class TestEventMatchApiController(unittest2.TestCase):
 
         match_json = json.loads(response.body)
         self.assertMatchJson(match_json)
-
