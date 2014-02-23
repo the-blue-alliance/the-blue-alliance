@@ -47,6 +47,7 @@ class SuggestTeamMediaController(LoggedInHandler):
         team_key = self.request.get("team_key")
         year_str = self.request.get("year")
 
+        success_code = 0
         media_dict = MediaParser.partial_media_dict_from_url(self.request.get('media_url').strip())
         if media_dict is not None:
             existing_media = Media.get_by_id(Media.render_key_name(media_dict['media_type_enum'], media_dict['foreign_key']))
@@ -61,5 +62,6 @@ class SuggestTeamMediaController(LoggedInHandler):
                     )
                 suggestion.contents = media_dict
                 suggestion.put()
+            success_code = 1
 
-        self.redirect('/suggest/team/media?team_key=%s&year=%s&success=1' % (team_key, year_str))
+        self.redirect('/suggest/team/media?team_key=%s&year=%s&success=%s' % (team_key, year_str, success_code))
