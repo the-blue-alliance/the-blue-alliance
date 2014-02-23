@@ -15,6 +15,7 @@ class TestKeyNameValidators(unittest2.TestCase):
         self.invalid_team_key3 = "frc711\\"
 
         self.valid_event_key = "2010ct"
+        self.valid_event_key2 = "2014onto2"
         self.invalid_event_key = "210c1"
         self.invalid_event_key2 = "frc2010ct"
         self.invalid_event_key3 = "2010 ct"
@@ -35,6 +36,7 @@ class TestKeyNameValidators(unittest2.TestCase):
 
     def test_valid_event_key(self):
         self.assertEqual(Event.validate_key_name(self.valid_event_key), True)
+        self.assertEqual(Event.validate_key_name(self.valid_event_key2), True)
 
     def test_invalid_event_key(self):
         self.assertEqual(Event.validate_key_name(self.invalid_event_key), False)
