@@ -105,9 +105,5 @@ def strip_number(text):
         return text
 
 def fix_unicode(text):
-    # Fixes bad characters after the "Gracious Professionalism" award in 2013
-    m = re.match(r'Gracious Professionalism.* Award(.*)', text)
-    if m is not None:
-        return 'Gracious Professionalism Award' + m.group(1)
-    else:
-        return text
+    # Fixes bad characters such as copyright after the "Gracious Professionalism" award in 2013
+    return text.encode('ascii', 'ignore')
