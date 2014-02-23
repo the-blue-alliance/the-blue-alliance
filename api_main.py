@@ -7,8 +7,8 @@ from controllers.api_controller import ApiEventsShow, ApiTeamDetails, ApiTeamsSh
                                        ApiEventList, ApiEventDetails, ApiMatchDetails,\
                                        CsvTeamsAll
 from controllers.api.api_team_controller import ApiTeamController
-from controllers.api.api_event_controller import ApiEventController, ApiEventTeamController,\
-                                                 ApiEventMatchController
+from controllers.api.api_event_controller import ApiEventController, ApiEventTeamsController,\
+                                                 ApiEventMatchesController
 
 
 app = webapp2.WSGIApplication([('/api/v1/team/details', ApiTeamDetails),
@@ -28,9 +28,9 @@ app = webapp2.WSGIApplication([('/api/v1/team/details', ApiTeamDetails),
                                              ApiEventController,
                                              methods=['GET']),
                                webapp2.Route(r'/api/v2/event/<event_key:>/teams',
-                                             ApiEventTeamController,
+                                             ApiEventTeamsController,
                                              methods=['GET']),
                                webapp2.Route(r'/api/v2/event/<event_key:>/matches',
-                                             ApiEventMatchController,
+                                             ApiEventMatchesController,
                                              methods=['GET']),
                                ], debug=tba_config.DEBUG)

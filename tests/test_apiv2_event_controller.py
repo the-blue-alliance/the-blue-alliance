@@ -11,8 +11,8 @@ from google.appengine.ext import testbed
 from consts.event_type import EventType
 
 from controllers.api.api_event_controller import ApiEventController
-from controllers.api.api_event_controller import ApiEventTeamController
-from controllers.api.api_event_controller import ApiEventMatchController
+from controllers.api.api_event_controller import ApiEventTeamsController
+from controllers.api.api_event_controller import ApiEventMatchesController
 
 from models.event import Event
 from models.event_team import EventTeam
@@ -64,10 +64,10 @@ class TestEventApiController(unittest2.TestCase):
         event_dict = json.loads(response.body)
         self.assertEventJson(event_dict)
 
-class TestEventTeamApiController(unittest2.TestCase):
+class TestEventTeamsApiController(unittest2.TestCase):
 
     def setUp(self):
-        app = webapp2.WSGIApplication([webapp2.Route(r'/<event_key:>', ApiEventTeamController, methods=['GET'])], debug=True)
+        app = webapp2.WSGIApplication([webapp2.Route(r'/<event_key:>', ApiEventTeamsController, methods=['GET'])], debug=True)
         self.testapp = webtest.TestApp(app)
 
         self.testbed = testbed.Testbed()
@@ -125,17 +125,17 @@ class TestEventTeamApiController(unittest2.TestCase):
         self.assertEqual(team["region"], "SC")
         self.assertEqual(team["website"], self.team.website)
 
-
-    def testEventTeamApi(self):
+    def testEventTeamsApi(self):
         response = self.testapp.get('/2010sc', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
 
         team_dict = json.loads(response.body)
         self.assertTeamJson(team_dict)
 
+
 class TestEventMatchApiController(unittest2.TestCase):
 
     def setUp(self):
-        app = webapp2.WSGIApplication([webapp2.Route(r'/<event_key:>', ApiEventMatchController, methods=['GET'])], debug=True)
+        app = webapp2.WSGIApplication([webapp2.Route(r'/<event_key:>', ApiEventMatchesController, methods=['GET'])], debug=True)
         self.testapp = webtest.TestApp(app)
 
         self.testbed = testbed.Testbed()
@@ -172,7 +172,6 @@ class TestEventMatchApiController(unittest2.TestCase):
         )
         self.match.put()
 
-
     def tearDown(self):
         self.testbed.deactivate()
 
@@ -183,7 +182,6 @@ class TestEventMatchApiController(unittest2.TestCase):
         self.assertEqual(match["event_key"], self.match.event.string_id())
         self.assertEqual(match["set_number"], self.match.set_number)
         self.assertEqual(match["match_number"], self.match.match_number)
-
 
     def testEventMatchApi(self):
         response = self.testapp.get('/2010sc', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
