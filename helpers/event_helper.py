@@ -127,8 +127,9 @@ class EventHelper(object):
         diff_from_thurs = 3 - today.weekday()  # 3 is Thursday. diff_from_thurs ranges from 3 to -3 (Monday thru Sunday)
         closest_thursday = today + datetime.timedelta(days=diff_from_thurs)
 
-        two_weeks_of_events = ndb.get_multi(two_weeks_of_events_keys_future.get_result())
-        for event in two_weeks_of_events:
+        two_weeks_of_event_futures = ndb.get_multi_async(two_weeks_of_events_keys_future.get_result())
+        for event_future in two_weeks_of_event_futures:
+            event = event_future.get_result()
             if event.within_a_day:
                 events.append(event)
             else:
