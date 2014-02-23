@@ -7,31 +7,34 @@
 {% block content %}
 <div class="container">
   <div class="row">
-   <div class="tba-sidenav-affixed">
-     <div class="tba-sidebar">
-       <ul class="nav tba-sidenav">
-         <li><a class="smooth-scroll" href="#overview">Overview</a></li>
-         <li>
-           <a class="smooth-scroll" href="#models">Models</a>
-           <ul class="nav">
-             <li><a class="smooth-scroll" href="#team-model">Team Model</a></li>
-             <li><a class="smooth-scroll" href="#event-model">Event Model</a></li>
-             <li><a class="smooth-scroll" href="#match-model">Match Model</a></li>
-             <li><a class="smooth-scroll" href="#award-model">Award Model</a></li>
-           </ul>
-         </li>
-         <li>
-           <a class="smooth-scroll" href="#requests">Requests</a>
-           <ul class="nav">
-             <li><a class="smooth-scroll" href="#team-request">Team Request</a></li>
-             <li><a class="smooth-scroll" href="#event-request">Event Request</a></li>
-             <li><a class="smooth-scroll" href="#event-teams-request">Event Teams Request</a></li>
-             <li><a class="smooth-scroll" href="#event-matches-request">Event Matches Request</a></li>
-           </ul>
-        </ul>
+    <div class="col-sm-3 col-lg-2">
+      <div class="tba-sidenav-affixed">
+        <div class="tba-sidebar">
+          <ul class="nav tba-sidenav">
+            <li><a class="smooth-scroll" href="#overview">Overview</a></li>
+            <li>
+              <a class="smooth-scroll" href="#models">Models</a>
+              <ul class="nav">
+                <li><a class="smooth-scroll" href="#team-model">Team Model</a></li>
+                <li><a class="smooth-scroll" href="#event-model">Event Model</a></li>
+                <li><a class="smooth-scroll" href="#match-model">Match Model</a></li>
+                <li><a class="smooth-scroll" href="#award-model">Award Model</a></li>
+              </ul>
+            </li>
+            <li>
+              <a class="smooth-scroll" href="#requests">Requests</a>
+              <ul class="nav">
+                <li><a class="smooth-scroll" href="#team-request">Team Request</a></li>
+                <li><a class="smooth-scroll" href="#event-request">Event Request</a></li>
+                <li><a class="smooth-scroll" href="#event-teams-request">Event Teams Request</a></li>
+                <li><a class="smooth-scroll" href="#event-matches-request">Event Matches Request</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
-    <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
+    <div class="col-xs-12 col-sm-9 col-lg-10">
       <h1 class="endheader">Public API (v2)</h1>
       <div class="alert alert-danger"><strong>Note:</strong> Version 2 of our
       API is still under development. This means that we may make changes
@@ -47,9 +50,9 @@
       about this API or would like to stay up-to-date on its development,
       you can join our <a href="https://groups.google.com/forum/#!forum/thebluealliance-developers">developer's mailing list</a>.</p>
       <h3>X-TBA-App-Id Header or URL Parameter</h3>
-      <p>So we can know how the API is being used to prioritize future development, we require clients to identify themselves. All API requests <strong>must</strong> include a unique, descriptive X-TBA-App-Id header or URL parameter to identify the application.</strong></p>
+      <p>So we can know how the API is being used to prioritize future development, we require clients to identify themselves. All API requests <strong>must</strong> include a unique, descriptive X-TBA-App-Id header or URL parameter to identify the application.</p>
       <p>The X-TBA-App-Id needs to follow this format:
-      <code>&ltteam/person id&gt:&ltapp description&gt:&ltversion&gt</code> and
+      <code>&lt;team/person id&gt;:&lt;app description&gt;:&lt;version&gt;</code> and
       not use any colons except for the two already present.</p>
       <h4>Valid examples:</h4>
       <ul>
@@ -224,10 +227,10 @@
           <tr>
             <td>key</td>
             <td>TBA event key with the format
-            <code>yyyy[EVENT_CODE]_[COMPETITION_LEVEL]m[MATCH_NUMBER]</code>,
+            <code>yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]</code>,
             where yyyy is the year, and EVENT_CODE is the
             <a href="https://docs.google.com/spreadsheet/ccc?key=0ApRO2Yzh2z01dExFZEdieV9WdTJsZ25HSWI3VUxsWGc">event code</a>
-            of the event, MATCH_CODE is the match code (qm, ef, qf, ect…), and
+            of the event, COMP_LEVEL is (qm, ef, qf, sf, f), and
             MATCH_NUMBER is the match number in the competition level. A set number
             may append the competition level if more than one match in required
             per set .</td>
@@ -304,7 +307,7 @@
       <h4>Related: <a class="smooth-scroll" href="#team-model">Team Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/team/&ltteam key&gt/(&ltyear&gt)</code>
+        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/(&lt;year&gt;)</code>
       </p>
       <table class=table>
         <thead>
@@ -343,7 +346,7 @@
               </span>
             </div>
           </form>
-          <div class="panel-group" id="accordion">
+          <div class="panel-group">
             <pre class="team-request-json">
             </pre>
           </div>
@@ -354,7 +357,7 @@
       <h4>Related: <a class="smooth-scroll" href="#event-model">Event Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/event/&ltevent key&gt</code>
+        <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;</code>
       </p>
       <table class=table>
         <thead>
@@ -389,7 +392,7 @@
               </span>
             </div>
           </form>
-          <div class="panel-group" id="accordion">
+          <div class="panel-group">
             <pre class="event-request-json">
             </pre>
           </div>
@@ -400,7 +403,7 @@
       <h4>Related: <a class="smooth-scroll" href="#team-model">Team Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/event/&ltevent key&gt/teams</code>
+        <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;/teams</code>
       </p>
       <table class=table>
         <thead>
@@ -435,7 +438,7 @@
               </span>
             </div>
           </form>
-          <div class="panel-group" id="accordion">
+          <div class="panel-group">
             <pre class="event-teams-request-json">
             </pre>
           </div>
@@ -446,7 +449,7 @@
       <h4>Related: <a class="smooth-scroll" href="#match-model">Match Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/event/&ltevent key&gt/matches</code>
+        <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;/matches</code>
       </p>
       <table class=table>
         <thead>
@@ -482,7 +485,7 @@
               </span>
             </div>
           </form>
-          <div class="panel-group" id="accordion">
+          <div class="panel-group">
             <pre class="event-matches-request-json">
             </pre>
           </div>
