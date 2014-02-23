@@ -47,7 +47,7 @@
                     <p><strong>Team {{reference.team_number}}{% if reference.nickname %} - {{reference.nickname}}{% endif %} ({{suggestion.contents.year}})</strong></p>
                     {% if suggestion.contents.media_type_enum == 1 %}
                       <a href="http://www.chiefdelphi.com/media/photos/{{suggestion.contents.foreign_key}}" target="_blank">
-                        <img class="img-thumbnail" src="http://www.chiefdelphi.com/media/img/{{suggestion.details.image_partial}}" style="max-height: 150px;">
+                        <img class="img-thumbnail" src="http://www.chiefdelphi.com/media/img/{{suggestion.details.thumbnail}}" style="max-height: 150px;">
                       </a>
                     {% else %}
                       {% if suggestion.contents.media_type_enum == 0 %}
