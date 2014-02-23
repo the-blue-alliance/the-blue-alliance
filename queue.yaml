@@ -1,4 +1,7 @@
 queue:
+- name: default
+  rate: 500/s
+
 - name: usfirst
   rate: 1/s
   retry_parameters:
