@@ -53,7 +53,9 @@
     {% if medias_by_slugname.cdphotothread %}
       {% include "media_partials/image_carousel_partial.html" %}
     {% else %}
-      <a class="btn btn-lg btn-success btn-block" href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add robot image!</a>
+      {% if year %}
+        <a class="btn btn-lg btn-success btn-block" href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add robot image!</a>
+      {% endif %}
     {% endif %}
   {% endif %}
   </div>
