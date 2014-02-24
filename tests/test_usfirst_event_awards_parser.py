@@ -451,3 +451,12 @@ class TestUsfirstEventAwardsParser(unittest2.TestCase):
                                     {'team_number': None, 'awardee': "Pascale Wallace Patterson"}],
         }
         self.assertTrue(new_award in awards)
+
+        # Test Award with unknown unicode characters
+        unknown_unicode_award = {
+            'name_str': "Gracious Professionalism Award sponsored by Johnson & Johnson",
+            'award_type_enum': AwardType.GRACIOUS_PROFESSIONALISM,
+            'team_number_list': [3138],
+            'recipient_json_list': [{'team_number': 3138, 'awardee': None}],
+        }
+        self.assertTrue(unknown_unicode_award in awards)
