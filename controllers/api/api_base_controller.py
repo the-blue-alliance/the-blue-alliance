@@ -1,6 +1,7 @@
 import json
 import logging
 import urllib
+import uuid
 import webapp2
 
 from google.appengine.api import urlfetch
@@ -25,13 +26,14 @@ def track_call(api_action, api_label, x_tba_app_id):
         params = urllib.urlencode({
             'v': 1,
             'tid': GOOGLE_ANALYTICS_ID,
-            'cid': '1',
+            'cid': uuid.uuid3(uuid.NAMESPACE_X500, x_tba_app_id),
             't': 'event',
             'ec': 'api-v02',
             'ea': api_action,
             'el': api_label,
             'cd1': x_tba_app_id,  # custom dimension 1
-            'ni': 1
+            'ni': 1,
+            'sc': 'end',  # forces tracking session to end
         })
 
         analytics_url = 'http://www.google-analytics.com/collect?%s' % params

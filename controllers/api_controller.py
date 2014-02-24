@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import urllib
+import uuid
 import webapp2
 
 from datetime import datetime
@@ -29,13 +30,14 @@ def track_call(api_action, api_details, x_tba_app_id):
         params = urllib.urlencode({
             'v': 1,
             'tid': GOOGLE_ANALYTICS_ID,
-            'cid': '1',
+            'cid': uuid.uuid3(uuid.NAMESPACE_X500, x_tba_app_id),
             't': 'event',
             'ec': 'api',
             'ea': api_action,
             'el': api_details,
             'cd1': x_tba_app_id,  # custom dimension 1
             'ni': 1,
+            'sc': 'end',  # forces tracking session to end
         })
 
         # Sets up the call
