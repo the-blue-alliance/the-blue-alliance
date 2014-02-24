@@ -30,7 +30,7 @@ def track_call(api_action, api_details, x_tba_app_id):
         params = urllib.urlencode({
             'v': 1,
             'tid': GOOGLE_ANALYTICS_ID,
-            'cid': uuid.uuid3(uuid.NAMESPACE_X500, x_tba_app_id),
+            'cid': uuid.uuid3(uuid.NAMESPACE_X500, str(x_tba_app_id)),
             't': 'event',
             'ec': 'api',
             'ea': api_action,
