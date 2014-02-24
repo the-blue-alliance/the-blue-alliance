@@ -21,9 +21,7 @@
       <span class="image-atc"></span> <a href="http://atthecontrol.com/{{team.team_number}}">See live data on At The Control</a>
     </p>
 
-    {% if current_event or medias_by_slugname.cdphotothread%}
-      {% include "team_partials/team_social_media.html" %}
-    {% endif %}
+    {% include "team_partials/team_social_media.html" %}
   </div>
   <div class="col-sm-5">
   {% if current_event %}
@@ -55,7 +53,7 @@
     {% if medias_by_slugname.cdphotothread %}
       {% include "media_partials/image_carousel_partial.html" %}
     {% else %}
-      {% include "team_partials/team_social_media.html" %}
+      <a class="btn btn-lg btn-success btn-block" href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add robot image!</a>
     {% endif %}
   {% endif %}
   </div>
