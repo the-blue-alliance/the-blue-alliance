@@ -18,6 +18,12 @@ class TestEventGetTimezoneId(unittest2.TestCase):
         event['location'] = None
         self.assertEqual(EventHelper.get_timezone_id(event), None)
 
+    def test_2012ct_bad_location(self):
+        with open('test_data/usfirst_html/usfirst_event_details_2012ct.html', 'r') as f:
+            event, _ = UsfirstEventDetailsParser.parse(f.read())
+        event['location'] = "somewhere on mars"
+        self.assertEqual(EventHelper.get_timezone_id(event), None)
+
     def test_2012ct(self):
         with open('test_data/usfirst_html/usfirst_event_details_2012ct.html', 'r') as f:
             event, _ = UsfirstEventDetailsParser.parse(f.read())
