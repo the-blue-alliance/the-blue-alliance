@@ -20,6 +20,7 @@ class EventManipulator(ManipulatorBase):
             "facebook_eid",
             "first_eid",
             "location",
+            "timezone_id",
             "name",
             "official",
             "matchstats_json",

@@ -11,6 +11,8 @@ from datafeeds.usfirst_legacy_event_details_parser import UsfirstLegacyEventDeta
 from datafeeds.usfirst_legacy_event_teams_parser import UsfirstLegacyEventTeamsParser
 from datafeeds.usfirst_legacy_team_details_parser import UsfirstLegacyTeamDetailsParser
 
+from helpers.event_helper import EventHelper
+
 from models.event import Event
 from models.team import Team
 
@@ -79,6 +81,7 @@ class DatafeedUsfirstLegacy(DatafeedUsfirst):
             start_date=event.get("start_date", None),
             venue_address=event.get("venue_address", None),
             location=event.get("location", None),
+            timezone_id=EventHelper.get_timezone_id(event),
             website=event.get("website", None),
             year=event.get("year", None)
         )
