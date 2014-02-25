@@ -18,7 +18,7 @@ class MatchHelper(object):
             logging.warning('Cannot compute match time for event with no timezone_id: {}'.format(event.key_name))
             return
 
-        matches_reversed = sorted(matches, key=lambda match: match.play_order, reverse=True)
+        matches_reversed = cls.play_order_sort_matches(matches, reverse=True)
         tz = pytz.timezone(event.timezone_id)
 
         last_match_time = None
@@ -54,11 +54,10 @@ class MatchHelper(object):
         alphanum_key = lambda match: [convert(c) for c in re.split('([0-9]+)', str(match.key_name))]
         return sorted(matches, key=alphanum_key)
 
-    # Note: Only works for a list of matches in the same comp level
     @classmethod
-    def play_order_sort_matches(self, matches):
+    def play_order_sort_matches(self, matches, reverse=False):
         sort_key = lambda match: match.play_order
-        return sorted(matches, key=sort_key)
+        return sorted(matches, key=sort_key, reverse=reverse)
 
     @classmethod
     def organizeMatches(self, match_list):
