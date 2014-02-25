@@ -91,3 +91,25 @@ class TestUsfirstMatchesParser(unittest2.TestCase):
         self.assertEqual(match["team_key_names"], [u'frc1143', u'frc2729', u'frc3123', u'frc87', u'frc304', u'frc1495'])
         self.assertEqual(match["alliances_json"], """{"blue": {"score": -1, "teams": ["frc87", "frc304", "frc1495"]}, "red": {"score": -1, "teams": ["frc1143", "frc2729", "frc3123"]}}""")
         self.assertEqual(match["time_string"], "5:32 PM")
+
+    def test_parse_2014test(self):
+        with open('test_data/usfirst_html/usfirst_event_matches_2014test.html', 'r') as f:
+            matches, _ = UsfirstMatchesParser.parse(f.read())
+
+        # Test 2014test_qm1, played match
+        match = matches[0]
+        self.assertEqual(match["comp_level"], "qm")
+        self.assertEqual(match["set_number"], 1)
+        self.assertEqual(match["match_number"], 1)
+        self.assertEqual(match["team_key_names"], [u'frc7', u'frc9', u'frc12', u'frc3', u'frc2', u'frc11'])
+        self.assertEqual(match["alliances_json"], """{"blue": {"score": 225, "teams": ["frc3", "frc2", "frc11"]}, "red": {"score": 45, "teams": ["frc7", "frc9", "frc12"]}}""")
+        self.assertEqual(match["time_string"], "4:00 PM")
+
+        # Test 2014test_qm16, unplayed match
+        match = matches[15]
+        self.assertEqual(match["comp_level"], "qm")
+        self.assertEqual(match["set_number"], 1)
+        self.assertEqual(match["match_number"], 16)
+        self.assertEqual(match["team_key_names"], [u'frc9', u'frc2', u'frc1', u'frc13', u'frc3', u'frc10'])
+        self.assertEqual(match["alliances_json"], """{"blue": {"score": -1, "teams": ["frc13", "frc3", "frc10"]}, "red": {"score": -1, "teams": ["frc9", "frc2", "frc1"]}}""")
+        self.assertEqual(match["time_string"], "8:45 PM")
