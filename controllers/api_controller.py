@@ -56,6 +56,7 @@ class MainApiHandler(webapp2.RequestHandler):
         # Need to initialize a webapp2 instance
         self.initialize(request, response)
         self.response.headers.add_header("content-type", "application/json")
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
 
     def handle_exception(self, exception, debug):
         """

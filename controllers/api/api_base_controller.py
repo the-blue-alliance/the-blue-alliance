@@ -49,6 +49,7 @@ class ApiBaseController(CacheableHandler):
     def __init__(self, *args, **kw):
         super(ApiBaseController, self).__init__(*args, **kw)
         self.response.headers['content-type'] = 'application/json; charset="utf-8"'
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
 
     def handle_exception(self, exception, debug):
         """
