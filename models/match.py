@@ -24,6 +24,13 @@ class Match(ndb.Model):
         "sf": "Semis",
         "f": "Finals",
     }
+    COMP_LEVELS_PLAY_ORDER = {
+        'qm': 1,
+        'ef': 2,
+        'qf': 3,
+        'sf': 4,
+        'f': 5,
+    }
 
     FRC_GAMES = [
         "frc_2012_rebr",
@@ -94,8 +101,8 @@ class Match(ndb.Model):
     no_auto_update = ndb.BooleanProperty(default=False, indexed=False)  # Set to True after manual update
     set_number = ndb.IntegerProperty(required=True, indexed=False)
     team_key_names = ndb.StringProperty(repeated=True)  # list of teams in Match, for indexing.
-    time = ndb.DateTimeProperty(indexed=False)
-    time_string = ndb.StringProperty(indexed=False)  # the time as displayed on FIRST's site
+    time = ndb.DateTimeProperty()  # UTC
+    time_string = ndb.StringProperty(indexed=False)  # the time as displayed on FIRST's site (event's local time)
     youtube_videos = ndb.StringProperty(repeated=True)  # list of Youtube IDs
     tba_videos = ndb.StringProperty(repeated=True)  # list of filetypes a TBA video exists for
 
@@ -174,7 +181,7 @@ class Match(ndb.Model):
 
     @property
     def play_order(self):
-        return self.match_number * 1000 + self.set_number
+        return self.COMP_LEVELS_PLAY_ORDER[self.comp_level] * 1000000 + self.match_number * 1000 + self.set_number
 
     @property
     def name(self):

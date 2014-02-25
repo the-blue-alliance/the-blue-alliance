@@ -2,6 +2,8 @@
 {% for match in matches %}
     <ul>
         <li>{{match.comp_level}}{{match.set_number}}m{{match.match_number}}</li>
+        <li>Time String: {{match.time_string}}</li>
+        <li>Time: {{match.time}}</li>
         <li>Teams: {{match.team_key_names}}</li>
         <li>Alliances: {{match.alliances_json}}</li>
     </ul>

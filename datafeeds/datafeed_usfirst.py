@@ -10,6 +10,7 @@ import tba_config
 from consts.event_type import EventType
 
 from helpers.event_helper import EventHelper
+from helpers.match_helper import MatchHelper
 from helpers.team_helper import TeamTpidHelper
 
 from datafeeds.datafeed_base import DatafeedBase
@@ -185,24 +186,27 @@ class DatafeedUsfirst(DatafeedBase):
                 event.year, self.EVENT_SHORT_EXCEPTIONS.get(event.event_short,
                                                             event.event_short))
 
-        matches, _ = self.parse(url, self.YEAR_MATCH_PARSER.get(event.year, self.DEFAULT_MATCH_PARSER))
+        match_dicts, _ = self.parse(url, self.YEAR_MATCH_PARSER.get(event.year, self.DEFAULT_MATCH_PARSER))
 
-        return [Match(
+        matches = [Match(
             id=Match.renderKeyName(
                 event.key.id(),
-                match.get("comp_level", None),
-                match.get("set_number", 0),
-                match.get("match_number", 0)),
+                match_dict.get("comp_level", None),
+                match_dict.get("set_number", 0),
+                match_dict.get("match_number", 0)),
             event=event.key,
             game=Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
-            set_number=match.get("set_number", 0),
-            match_number=match.get("match_number", 0),
-            comp_level=match.get("comp_level", None),
-            team_key_names=match.get("team_key_names", None),
-            time_string=match.get("time_string", None),
-            alliances_json=match.get("alliances_json", None)
+            set_number=match_dict.get("set_number", 0),
+            match_number=match_dict.get("match_number", 0),
+            comp_level=match_dict.get("comp_level", None),
+            team_key_names=match_dict.get("team_key_names", None),
+            time_string=match_dict.get("time_string", None),
+            alliances_json=match_dict.get("alliances_json", None)
             )
-            for match in matches]
+            for match_dict in match_dicts]
+
+        MatchHelper.add_match_times(event, matches)
+        return matches
 
     def getTeamDetails(self, team):
         if hasattr(team, 'first_tpid'):
