@@ -16,7 +16,7 @@ function checkUpdate(eventKey) {
     type: 'GET',
     dataType: 'json',
     success: function(timestamp) {
-      if (lastTimestamp == null || timestamp != lastTimestamp) {
+      if (timestamp != null && (lastTimestamp == null || timestamp != lastTimestamp)) {
         getUpdate(eventKey, timestamp);
         lastTimestamp = timestamp;
       }
