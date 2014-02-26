@@ -12,7 +12,7 @@ function updateAll() {
 var lastTimestamp = null;
 function checkUpdate(eventKey) {
   $.ajax({
-    url: 'https://thebluealliance-dev.firebaseio.com/events/' + eventKey + '.json',
+    url: 'https://thebluealliance.firebaseio.com/events/' + eventKey + '.json',
     type: 'GET',
     dataType: 'json',
     success: function(timestamp) {
