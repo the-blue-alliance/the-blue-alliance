@@ -20,7 +20,7 @@ class LiveEventHandler(CacheableHandler):
     """
     def __init__(self, *args, **kw):
         super(LiveEventHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24
+        self._cache_expiration = 60 * 10
         self._cache_key = "live-event:{}:{}"  # (event_key, timestamp)
         self._cache_version = 1
 
@@ -31,8 +31,8 @@ class LiveEventHandler(CacheableHandler):
         super(LiveEventHandler, self).get(event_key, timestamp)
 
     def _render(self, event_key, timestamp):
-#         self.response.headers['Cache-Control'] = 'public, max-age=%d' % self._cache_expiration
-#         self.response.headers['Pragma'] = 'Public'
+        self.response.headers['Cache-Control'] = 'public, max-age=%d' % self._cache_expiration
+        self.response.headers['Pragma'] = 'Public'
         self.response.headers['content-type'] = 'application/json; charset="utf-8"'
 
         event = Event.get_by_id(event_key)
