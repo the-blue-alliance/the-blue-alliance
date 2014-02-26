@@ -166,7 +166,7 @@ class EventHelper(object):
 
     @classmethod
     def get_timezone_id(cls, event_dict):
-        if 'location' not in event_dict:
+        if event_dict.get('location', None) is None:
             logging.warning('Could not get timezone for event {}{} with no location!'.format(event_dict['year'], event_dict['event_short']))
             return None
 
