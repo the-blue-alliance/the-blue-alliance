@@ -22,7 +22,7 @@ class MatchHelper(object):
         tz = pytz.timezone(event.timezone_id)
 
         last_match_time = None
-        cur_date = event.end_date
+        cur_date = event.end_date + datetime.timedelta(hours=23, minutes=59, seconds=59)  # end_date is specified at midnight of the last day
         for match in matches_reversed:
             r = re.match(r'(\d+):(\d+) (am|pm)', match.time_string.lower())
             hour = int(r.group(1))
@@ -33,12 +33,12 @@ class MatchHelper(object):
                 hour += 12
 
             match_time = datetime.datetime(cur_date.year, cur_date.month, cur_date.day, hour, minute)
-            if last_match_time is not None and last_match_time < match_time:
+            if last_match_time is not None and last_match_time + datetime.timedelta(hours=6) < match_time:
                 cur_date = cur_date - datetime.timedelta(days=1)
                 match_time = datetime.datetime(cur_date.year, cur_date.month, cur_date.day, hour, minute)
             last_match_time = match_time
 
-            match.time = match_time - tz.utcoffset(cur_date)
+            match.time = match_time - tz.utcoffset(match_time)
 
     """
     Helper to put matches into sub-dictionaries for the way we render match tables
