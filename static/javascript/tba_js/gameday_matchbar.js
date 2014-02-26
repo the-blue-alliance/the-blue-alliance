@@ -27,7 +27,7 @@ function checkUpdate(eventKey) {
 
 function getUpdate(eventKey, timestamp) {
   $.ajax({
-    url: 'http://localhost:8080/_/live-event/' + eventKey + '/' + timestamp,
+    url: '/_/live-event/' + eventKey + '/' + timestamp,
     type: 'GET',
     dataType: 'json',
     success: function(data) {
