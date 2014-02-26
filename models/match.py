@@ -24,6 +24,13 @@ class Match(ndb.Model):
         "sf": "Semis",
         "f": "Finals",
     }
+    COMP_LEVELS_PLAY_ORDER = {
+        'qm': 1,
+        'ef': 2,
+        'qf': 3,
+        'sf': 4,
+        'f': 5,
+    }
 
     FRC_GAMES = [
         "frc_2012_rebr",
@@ -174,7 +181,7 @@ class Match(ndb.Model):
 
     @property
     def play_order(self):
-        return self.match_number * 1000 + self.set_number
+        return self.COMP_LEVELS_PLAY_ORDER[self.comp_level] * 1000000 + self.match_number * 1000 + self.set_number
 
     @property
     def name(self):
