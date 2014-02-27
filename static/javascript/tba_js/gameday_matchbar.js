@@ -1,12 +1,41 @@
-var eventsRef = new Firebase('https://thebluealliance.firebaseio.com/events/');
+function updateAll() {
+  var eventKeys = {};
+  $('.view-close').each(function () {
+    eventKeys[$(this).attr('event_key')] = true;
+  });
+  
+  for (var eventKey in eventKeys){
+    checkUpdate(eventKey);
+  }
+}
 
-eventsRef.on('child_changed', function(snapshot) {
-  updateMatchbar(snapshot);
-});
+var lastTimestamp = null;
+function checkUpdate(eventKey) {
+  $.ajax({
+    url: 'https://thebluealliance.firebaseio.com/events/' + eventKey + '.json',
+    type: 'GET',
+    dataType: 'json',
+    success: function(timestamp) {
+      if (timestamp != null && (lastTimestamp == null || timestamp != lastTimestamp)) {
+        getUpdate(eventKey, timestamp);
+        lastTimestamp = timestamp;
+      }
+    },
+    contentType: 'application/json'
+  });
+}
 
-eventsRef.on('child_added', function(snapshot) {
-  updateMatchbar(snapshot);
-});
+function getUpdate(eventKey, timestamp) {
+  $.ajax({
+    url: '/_/live-event/' + eventKey + '/' + timestamp,
+    type: 'GET',
+    dataType: 'json',
+    success: function(data) {
+      updateMatchbar(eventKey, data);
+    },
+    contentType: 'application/json'
+  });
+}
 
 // Handle matchbar "Follow" settings
 var following_set = JSON.parse($.cookie("tba-gameday-following"));
@@ -14,16 +43,36 @@ if (following_set == null) {
   following_set = {};
 }
 
-function updateMatchbar(snapshot) {
-  var event_key = snapshot.name();
-  var event_data = snapshot.val();
+function updateMatchbar(event_key, event_data) {
   if (event_data == null) {
     return;
   }
-  var upcoming_matches = event_data.upcoming_matches;
-  var last_matches = event_data.last_matches;
-  var match_bar = $('.' + event_key + '_matches');
   
+  var matches = event_data.matches;
+  matches.sort(function(match1, match2){return match1.order - match2.order});
+  
+  var upcoming_matches = [];
+  var last_matches = [];
+  for (var i=0; i<matches.length; i++) {
+    var match = matches[i];
+    
+    if (match.alliances.red.score == -1 || match.alliances.blue.score == -1) {
+      upcoming_matches.push(match);
+    } else {
+      if (match.alliances.red.score > match.alliances.blue.score) {
+        match.winning_alliance = 'red';
+      } else if (match.alliances.red.score > match.alliances.blue.score) {
+        match.winning_alliance = 'blue';
+      } else {
+        match.winning_alliance = '';
+      }
+      last_matches.push(match);
+    }
+  }
+  last_matches.reverse();
+
+  var match_bar = $('.' + event_key + '_matches');
+
   match_bar.each(function() { // Because the user might have more than 1 view of a given event open
     var matches = $(this)[0].children;
     
@@ -75,11 +124,6 @@ function updateMatchbar(snapshot) {
 }
 
 function renderMatch(match) {
-  var comp_level = match.comp_level.toUpperCase();
-  comp_level = (comp_level == 'QM') ? 'Q' : comp_level;
-  var match_number = (comp_level == 'QF' || comp_level == 'SF' || comp_level == 'F') ? match.set_number + '-' + match.match_number : match.match_number;
-  var match_label = comp_level + match_number;
-  
   var red_teams = match.alliances.red.teams[0].substring(3) + ', ' +
     match.alliances.red.teams[1].substring(3) + ', ' +
     match.alliances.red.teams[2].substring(3);
@@ -92,7 +136,7 @@ function renderMatch(match) {
   red_score = (red_score == -1) ? '' : ' - ' + red_score;
   blue_score = (blue_score == -1) ? '' : ' - ' + blue_score;
 
-  var match_number = $('<div>', {'class': 'match-number', text: match_label});
+  var match_number = $('<div>', {'class': 'match-number', text: match.name});
   var red_score = $('<div>', {'class': 'red', text: red_teams + red_score});
   var blue_score = $('<div>', {'class': 'blue' , text: blue_teams + blue_score});
   var alliances = $('<div>', {'class': 'alliances'});
@@ -103,6 +147,9 @@ function renderMatch(match) {
 }
 
 $(document).ready(function() {
+  // start matchbar updating
+  setInterval(updateAll, 10000);
+  
   // Helper to insert teams in order
   function insertTeam(number) {
     var followed_teams = $("#followed-teams")[0].children;
