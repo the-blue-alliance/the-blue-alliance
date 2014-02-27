@@ -14,18 +14,19 @@ cron:
   schedule: every day 02:00
   timezone: America/Los_Angeles
 
-#- description: FIRST match detail scraping for current events
-#  url: /tasks/enqueue/usfirst_matches/now
-#  schedule: every 5 minutes
-#
-#- description: FIRST team ranking scraping for current events
-#  url: /tasks/enqueue/usfirst_event_rankings/now
-#  schedule: every 5 minutes
-#
-#- description: FIRST awards scraping
-#  url: /tasks/enqueue/usfirst_awards/now
-#  schedule: every day 04:00
+- description: FIRST match detail scraping for current events
+  url: /tasks/enqueue/usfirst_matches/now
+  schedule: every 5 minutes
+
+- description: FIRST team ranking scraping for current events
+  url: /tasks/enqueue/usfirst_event_rankings/now
+  schedule: every 5 minutes
+
+- description: FIRST awards scraping
+  url: /tasks/enqueue/usfirst_awards/now
+  schedule: every 1 hours
+  timezone: America/Los_Angeles
 
 #- description: OPR Calculation
-#  url: /tasks/math/enqueue/event_opr/now
+#  url: /tasks/math/enqueue/event_matchstats/now
 #  schedule: every day 22:00

@@ -331,6 +331,11 @@ class UsfirstMatchesGet(webapp.RequestHandler):
         except:
             logging.warning("Enqueuing Firebase push failed!")
 
+        # Enqueue task to calculate matchstats
+        taskqueue.add(
+                url='/tasks/math/do/event_matchstats/' + event.key_name,
+                method='GET')
+
         template_values = {
             'matches': new_matches,
         }
