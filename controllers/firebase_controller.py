@@ -18,10 +18,10 @@ class FirebasePushDo(webapp.RequestHandler):
     def post(self):
         payload = json.loads(self.request.body)
         key = payload['key']
-        payload_json = payload['data']
+        payload_json = json.dumps(payload['data'])
 
         firebase_secrets = Sitevar.get_by_id("firebase.secrets")
-        if firebase_secrets == None:
+        if firebase_secrets is None:
             raise Exception("Missing sitevar: firebase.secrets. Can't write to Firebase.")
         FIREBASE_SECRET = firebase_secrets.contents['FIREBASE_SECRET']
 
