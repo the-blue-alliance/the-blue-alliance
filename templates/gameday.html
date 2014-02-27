@@ -53,8 +53,8 @@
         {% for event in ongoing_events_w_webcasts %}
           <li><a id='{{event.event.key_name}}-{% if event.count %}{{event.count}}{% else %}1{% endif %}'
           event='{{event.event.key_name}}' num='{% if event.count %}{{event.count}}{% else %}1{% endif %}'
-          class='video_buttons' alt='{{event.event.name}} [{{event.event.event_short|upper}}]{% if event.count %} {{event.count}}{% endif %}'>
-          {{event.event.name}} [{{event.event.event_short|upper}}]{% if event.count %} {{event.count}}{% endif %}</a></li>
+          class='video_buttons' alt='{{event.event.short_name}} [{{event.event.event_short|upper}}]{% if event.count %} {{event.count}}{% endif %}'>
+          {{event.event.short_name}} [{{event.event.event_short|upper}}]{% if event.count %} {{event.count}}{% endif %}</a></li>
         {% endfor %}
         {% if not special_webcasts and not ongoing_events_w_webcasts %}
           <li><a>No webcasts</a></li>
@@ -66,7 +66,7 @@
         <a class="dropdown-toggle" href="#">Results</a>
         <ul class="dropdown-menu results">
         {% for event in ongoing_events %}
-          <li><a class="event_results" href="/event/{{event.key_name}}">{{event.name}} [{{event.event_short|upper}}]</a></li>
+          <li><a class="event_results" href="/event/{{event.key_name}}">{{event.short_name}} [{{event.event_short|upper}}]</a></li>
         {% empty %}
           <li><a>No events</a></li>
         {% endfor %}
