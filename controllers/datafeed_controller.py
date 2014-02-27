@@ -326,14 +326,8 @@ class UsfirstMatchesGet(webapp.RequestHandler):
 
         event = Event.get_by_id(event_key)
         new_matches = MatchManipulator.createOrUpdate(df.getMatches(event))
-
         try:
-            last_matches = MatchHelper.recentMatches(new_matches, 1)
-            upcoming_matches = MatchHelper.upcomingMatches(new_matches, 8)
-        except:
-            logging.warning("Computing last/upcoming matches for Firebase failed!")
-        try:
-            FirebasePusher.updateEvent(event, last_matches, upcoming_matches)
+            FirebasePusher.updated_event(event.key_name)
         except:
             logging.warning("Enqueuing Firebase push failed!")
 

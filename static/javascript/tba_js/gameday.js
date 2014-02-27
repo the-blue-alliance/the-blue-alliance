@@ -230,7 +230,7 @@ function setupView(viewNum, $item) {
 		"<div class='matches " + eventKey + "_matches'></div></div>" +
 		"<div id='overlay_"+ viewNum + "' class='overlay' alt='" + eventName + "'>" +
 		"<div class='overlay-title'>" + eventName + "</div>" +
-		"<div id='close_" + viewNum + "' class='view-close' rel='tooltip' data-placement='left' title='Close'>" +
+		"<div id='close_" + viewNum + "' class='view-close' event_key='" + eventKey + "' rel='tooltip' data-placement='left' title='Close'>" +
 		"<span class='glyphicon glyphicon-remove'></span></div>" +
 		"<div id='swap_" + viewNum + "' class='swap' rel='tooltip' data-placement='left' title='Drag to another screen to swap'>" +
 		"<span class='glyphicon glyphicon-move'></span></div></div>";
@@ -240,11 +240,8 @@ function setupView(viewNum, $item) {
 		$("[rel=tooltip]").tooltip();
 		setupCloseSwap(viewNum);
 		
-		// Update matchbar on init
-		var eventsRef = new Firebase('https://thebluealliance.firebaseio.com/events/' + eventKey);
-		eventsRef.on('value', function(snapshot) {
-		  updateMatchbar(snapshot);
-		});
+		// Force update
+		checkUpdate(eventKey)
 	});
 }
 

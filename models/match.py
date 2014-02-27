@@ -165,6 +165,15 @@ class Match(ndb.Model):
             return "%s %s Match %s" % (self.COMP_LEVELS_VERBOSE[self.comp_level], self.set_number, self.match_number)
 
     @property
+    def short_name(self):
+        if self.comp_level == "qm":
+            return "Q%s" % self.match_number
+        elif self.comp_level == "f":
+            return "F%s" % self.match_number
+        else:
+            return "%s%s-%s" % (self.comp_level.upper(), self.set_number, self.match_number)
+
+    @property
     def has_video(self):
         return (len(self.youtube_videos) + len(self.tba_videos)) > 0
 

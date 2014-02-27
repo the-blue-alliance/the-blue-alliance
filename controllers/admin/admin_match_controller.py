@@ -8,7 +8,6 @@ from google.appengine.ext.webapp import template
 from controllers.base_controller import LoggedInHandler
 from datafeeds.offseason_matches_parser import OffseasonMatchesParser
 from helpers.firebase.firebase_pusher import FirebasePusher
-from helpers.match_helper import MatchHelper
 from helpers.match_manipulator import MatchManipulator
 from models.event import Event
 from models.match import Match
@@ -132,14 +131,8 @@ class AdminMatchAdd(LoggedInHandler):
             )
             for match in matches]
 
-        new_matches = MatchManipulator.createOrUpdate(matches)
         try:
-            last_matches = MatchHelper.recentMatches(new_matches, 1)
-            upcoming_matches = MatchHelper.upcomingMatches(new_matches, 8)
-        except:
-            logging.warning("Computing last/upcoming matches for Firebase failed!")
-        try:
-            FirebasePusher.updateEvent(event, last_matches, upcoming_matches)
+            FirebasePusher.updated_event(event.key_name)
         except:
             logging.warning("Enqueuing Firebase push failed!")
 
