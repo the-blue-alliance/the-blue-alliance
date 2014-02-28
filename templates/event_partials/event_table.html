@@ -15,7 +15,7 @@
             {% if event.within_a_day %}
               <a class="btn btn-success btn-small" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
             {% else %}
-              <a class="btn btn-default btn-small disabled">Watch</a>
+              <a class="btn btn-default btn-small disabled">Offline</a>
             {% endif %}
           {% else %}
             {% if event.future or event.within_a_day %}
