@@ -13,7 +13,7 @@ class DatafeedBase(object):
                                 headers={'Cache-Control': 'no-cache, max-age=10',
                                          'Pragma': 'no-cache',
                                          },
-                                deadline=10,)
+                                deadline=10)
         if result.status_code == 200:
             return parser.parse(result.content)
         else:
