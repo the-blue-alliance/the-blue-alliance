@@ -117,27 +117,13 @@
               {% include "bracket_partials/bracket_table.html" %}
             {% endif %}
 
-            {% if oprs|length > 0 %}
-            <h3>OPRs - Top 15 (<a href="/opr">?</a>)</h3>
-            <table class="table table-condensed table-striped table-center">
-              <thead>
-                <tr>
-                  <th>Team</th>
-                  <th>OPR</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for team, opr in oprs %}
-                <tr>
-                  <td><a href="/team/{{ team }}/{{ event.year }}">{{ team }}</a></td>
-                  <td>{{ opr|floatformat:2 }}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-            {% endif %}
+            {% include "event_partials/event_opr_table.html" %}
           {% endif %}
         </div>
+        {% else %}
+          <div class="col-sm-6">
+            {% include "event_partials/event_opr_table.html" %}
+          </div>
         {% endif %}
 
         {% if not matches.qm %}
@@ -147,21 +133,7 @@
           {% include "bracket_partials/bracket_table.html" %}
           {% endif %}
 
-          {% if oprs|length > 0 %}
-          <h3>OPRs - Top 15 (<a href="/opr" rel="tooltip" title="What are Offensive Power Rankings?">?</a>)</h3>
-          <table class="table table-condensed table-striped table-center">
-            <tr>
-              <th>Team</th>
-              <th>OPR</th>
-            </tr>
-            {% for opr,opr_team in oprs %}
-            <tr>
-              <td><a href="/team/{{ opr_team }}">{{ opr_team }}</a></td>
-              <td>{{ opr|floatformat:2 }}</td>
-            </tr>
-            {% endfor %}
-          </table>
-          {% endif %}
+          {% include "event_partials/event_opr_table.html" %}
         </div>
         {% endif %}
       </div>
