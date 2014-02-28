@@ -20,6 +20,7 @@ class Event(ndb.Model):
     venue = ndb.StringProperty(indexed=False)
     venue_address = ndb.StringProperty(indexed=False)  # We can scrape this.
     location = ndb.StringProperty(indexed=False)  # in the format "locality, region, country". similar to Team.address
+    timezone_id = ndb.StringProperty()  # such as 'America/Los_Angeles' or 'Asia/Jerusalem'
     official = ndb.BooleanProperty(default=False)  # Is the event FIRST-official?
     first_eid = ndb.StringProperty()  # from USFIRST
     facebook_eid = ndb.StringProperty(indexed=False)  # from Facebook
@@ -59,8 +60,6 @@ class Event(ndb.Model):
         from models.match import Match
         match_keys = yield Match.query(Match.event == self.key).fetch_async(500, keys_only=True)
         self._matches = yield ndb.get_multi_async(match_keys)
-    
-
 
     @property
     def matches(self):

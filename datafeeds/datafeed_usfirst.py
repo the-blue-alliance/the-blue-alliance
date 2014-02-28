@@ -9,6 +9,7 @@ import tba_config
 
 from consts.event_type import EventType
 
+from helpers.event_helper import EventHelper
 from helpers.team_helper import TeamTpidHelper
 
 from datafeeds.datafeed_base import DatafeedBase
@@ -98,6 +99,7 @@ class DatafeedUsfirst(DatafeedBase):
             venue_address=event.get("venue_address", None),
             venue=event.get("venue", None),
             location=event.get("location", None),
+            timezone_id=EventHelper.get_timezone_id(event),
             website=event.get("website", None),
             year=event.get("year", None)
         )
