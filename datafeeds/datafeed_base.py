@@ -9,7 +9,11 @@ class DatafeedBase(object):
     Other Datafeeds inherit from here.
     """
     def parse(self, url, parser):
-        result = urlfetch.fetch(url, deadline=10)
+        result = urlfetch.fetch(url,
+                                headers={'Cache-Control': 'no-cache, max-age=10',
+                                         'Pragma': 'no-cache',
+                                         },
+                                deadline=10,)
         if result.status_code == 200:
             return parser.parse(result.content)
         else:
