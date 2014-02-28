@@ -61,7 +61,7 @@ function updateMatchbar(event_key, event_data) {
     } else {
       if (match.alliances.red.score > match.alliances.blue.score) {
         match.winning_alliance = 'red';
-      } else if (match.alliances.red.score > match.alliances.blue.score) {
+      } else if (match.alliances.blue.score > match.alliances.red.score) {
         match.winning_alliance = 'blue';
       } else {
         match.winning_alliance = '';
