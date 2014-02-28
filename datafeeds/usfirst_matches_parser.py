@@ -18,7 +18,6 @@ class UsfirstMatchesParser(ParserBase):
         tables = soup.findAll('table')
 
         matches.extend(self.parseMatchResultList(tables[2]))
-        matches.extend(self.parseMatchResultList(tables[2]))
         matches.extend(self.parseMatchResultList(tables[3]))
 
         return matches, False

@@ -1,13 +1,48 @@
 import logging
+import datetime
+import pytz
+import re
 
 from models.match import Match
 
 
 class MatchHelper(object):
+    @classmethod
+    def add_match_times(cls, event, matches):
+        """
+        Calculates and adds match times given an event and match time strings (from USFIRST)
+        Assumes the last match is played on the last day of comeptition and
+        works backwards from there.
+        """
+        if event.timezone_id is None:  # Can only calculate match times if event timezone is known
+            logging.warning('Cannot compute match time for event with no timezone_id: {}'.format(event.key_name))
+            return
+
+        matches_reversed = cls.play_order_sort_matches(matches, reverse=True)
+        tz = pytz.timezone(event.timezone_id)
+
+        last_match_time = None
+        cur_date = event.end_date + datetime.timedelta(hours=23, minutes=59, seconds=59)  # end_date is specified at midnight of the last day
+        for match in matches_reversed:
+            r = re.match(r'(\d+):(\d+) (am|pm)', match.time_string.lower())
+            hour = int(r.group(1))
+            minute = int(r.group(2))
+            if hour == 12:
+                hour = 0
+            if r.group(3) == 'pm':
+                hour += 12
+
+            match_time = datetime.datetime(cur_date.year, cur_date.month, cur_date.day, hour, minute)
+            if last_match_time is not None and last_match_time + datetime.timedelta(hours=6) < match_time:
+                cur_date = cur_date - datetime.timedelta(days=1)
+                match_time = datetime.datetime(cur_date.year, cur_date.month, cur_date.day, hour, minute)
+            last_match_time = match_time
+
+            match.time = match_time - tz.utcoffset(match_time)
+
     """
     Helper to put matches into sub-dictionaries for the way we render match tables
     """
-
     # Allows us to sort matches by key name.
     # Note: Matches within a comp_level (qual, qf, sf, f, etc.) will be in order,
     # but the comp levels themselves may not be in order. Doesn't matter because
