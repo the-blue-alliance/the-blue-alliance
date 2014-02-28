@@ -163,12 +163,9 @@ class EventMatchstatsEnqueue(webapp.RequestHandler):
     """
     def get(self, when):
         if when == "now":
-            events = Event.query(Event.end_date <= datetime.datetime.today() + datetime.timedelta(days=4))
-            events = Event.query(Event.end_date >= datetime.datetime.today() - datetime.timedelta(days=1))
+            events = EventHelper.getEventsWithinADay()
         else:
-            events = Event.query(Event.year == int(when))
-
-        events = events.fetch(500)
+            events = Event.query(Event.year == int(when)).fetch(500)
 
         for event in events:
             taskqueue.add(

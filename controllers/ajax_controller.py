@@ -47,8 +47,8 @@ class LiveEventHandler(CacheableHandler):
             })
 
         event_dict = {
-            'rankings': event.rankings,
-            'matchstats': event.matchstats,
+#             'rankings': event.rankings,
+#             'matchstats': event.matchstats,
             'matches': matches,
         }
 

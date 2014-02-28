@@ -25,6 +25,7 @@ from datafeeds.usfirst_event_teams_parser import UsfirstEventTeamsParser
 from datafeeds.usfirst_matches_parser import UsfirstMatchesParser
 from datafeeds.usfirst_matches_parser_2002 import UsfirstMatchesParser2002
 from datafeeds.usfirst_matches_parser_2003 import UsfirstMatchesParser2003
+from datafeeds.usfirst_match_schedule_parser import UsfirstMatchScheduleParser
 from datafeeds.usfirst_team_details_parser import UsfirstTeamDetailsParser
 from datafeeds.usfirst_pre2003_team_events_parser import UsfirstPre2003TeamEventsParser
 
@@ -64,6 +65,8 @@ class DatafeedUsfirst(DatafeedBase):
         2003: UsfirstMatchesParser2003,
     }
     DEFAULT_MATCH_PARSER = UsfirstMatchesParser
+
+    MATCH_SCHEDULE_PARSER = UsfirstMatchScheduleParser
 
     YEAR_AWARD_PARSER = {
         2002: UsfirstEventAwardsParser_02,
@@ -181,12 +184,22 @@ class DatafeedUsfirst(DatafeedBase):
             for team in teams]
 
     def getMatches(self, event):
-        url = self.YEAR_MATCH_RESULTS_URL_PATTERN.get(
+        matches_url = self.YEAR_MATCH_RESULTS_URL_PATTERN.get(
             event.year, self.DEFAULT_MATCH_RESULTS_URL_PATTERN) % (
                 event.year, self.EVENT_SHORT_EXCEPTIONS.get(event.event_short,
                                                             event.event_short))
 
-        match_dicts, _ = self.parse(url, self.YEAR_MATCH_PARSER.get(event.year, self.DEFAULT_MATCH_PARSER))
+        match_dicts, _ = self.parse(matches_url, self.YEAR_MATCH_PARSER.get(event.year, self.DEFAULT_MATCH_PARSER))
+        if not match_dicts:  # Matches have been played, but qual match schedule may be out
+            # If this is run when there are already matches in the DB, it will overwrite scores!
+            # Check to make sure event has no existing matches
+            if len(Match.query(Match.event == event.key).fetch(1, keys_only=True)) == 0:
+                logging.warning("No matches found for {}. Trying to parse qual match schedule.".format(event.key.id()))
+
+                match_sched_url = self.MATCH_SCHEDULE_QUAL_URL_PATTERN % (
+                    event.year, self.EVENT_SHORT_EXCEPTIONS.get(event.event_short,
+                                                                event.event_short))
+                match_dicts, _ = self.parse(match_sched_url, self.MATCH_SCHEDULE_PARSER)
 
         matches = [Match(
             id=Match.renderKeyName(

@@ -240,7 +240,9 @@ class UsfirstAwardsGet(webapp.RequestHandler):
 
         event = Event.get_by_id(event_key)
         new_awards = AwardManipulator.createOrUpdate(datafeed.getEventAwards(event))
-        if type(new_awards) != list:
+        if new_awards is None:
+            new_awards = []
+        elif type(new_awards) != list:
             new_awards = [new_awards]
 
         # create EventTeams
@@ -330,6 +332,11 @@ class UsfirstMatchesGet(webapp.RequestHandler):
             FirebasePusher.updated_event(event.key_name)
         except:
             logging.warning("Enqueuing Firebase push failed!")
+
+        # Enqueue task to calculate matchstats
+        taskqueue.add(
+                url='/tasks/math/do/event_matchstats/' + event.key_name,
+                method='GET')
 
         template_values = {
             'matches': new_matches,
