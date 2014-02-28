@@ -252,5 +252,5 @@ class EventHelper(object):
                 return EventType.CMP_FINALS
 
         # An event slipped through!
-        logging.warn("Event type '{}' not recognized!".format(event_type_str))
+        logging.info("Event type '{}' not recognized!".format(event_type_str))
         return EventType.UNLABLED

@@ -142,5 +142,5 @@ class AwardHelper(object):
                     # found a match
                     return type_enum
         # no matches
-        logging.warning("Found an award without an associated type: " + name_str)
+        logging.info("Found an award without an associated type: " + name_str)
         return None

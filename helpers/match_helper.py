@@ -5,6 +5,7 @@ import re
 
 from models.match import Match
 
+import tba_config
 
 class MatchHelper(object):
     @classmethod
@@ -123,7 +124,8 @@ class MatchHelper(object):
                     match_1.winning_alliance == match_2.winning_alliance:
                         try:
                             match.key.delete()
-                            logging.warning("Deleting invalid match: %s" % match.key_name)
+                            if not tba_config.CONFIG["env"] == "prod":
+                                logging.warning("Deleting invalid match: %s" % match.key_name)
                         except:
                             logging.warning("Tried to delete invalid match, but failed: %s" % match.key_name)
                         continue
