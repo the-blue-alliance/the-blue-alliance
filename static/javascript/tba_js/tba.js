@@ -45,4 +45,22 @@ $(document).ready(function(){
       controlbar: "bottom",
     });
 	}
+	
+	// Converting match time to local time
+	$('.tba-match-time-utc').each(function () {
+	  var matchTime = new Date($(this).text());  // Converts UTC to local time
+	  if (!isNaN(matchTime)) {
+      var hour24 = matchTime.getHours();
+      var hour12 = (hour24 % 12);
+      if (hour12 == 0) {
+        hour12 = 12;
+      }
+      var minute = matchTime.getMinutes();
+      var matchTimeStr = hour12 + ':' + ((''+minute).length<2 ? '0' :'')+minute;
+      matchTimeStr += hour24 < 12 ? ' AM' : ' PM';
+      
+      $(this).text(matchTimeStr);
+      $(this).css('visibility', 'visible');
+	  }
+	});
 });
