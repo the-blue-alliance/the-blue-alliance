@@ -9,17 +9,19 @@ function updateAll() {
   }
 }
 
-var lastTimestamp = null;
+var lastTimestamps = {};
 function checkUpdate(eventKey) {
   $.ajax({
     url: 'https://thebluealliance.firebaseio.com/events/' + eventKey + '.json',
     type: 'GET',
     dataType: 'json',
     success: function(timestamp) {
-      if (timestamp != null && (lastTimestamp == null || timestamp != lastTimestamp)) {
+      if (!(eventKey in lastTimestamps) || timestamp != lastTimestamps[eventKey]) {
+        console.log(eventKey);
         getUpdate(eventKey, timestamp);
-        lastTimestamp = timestamp;
       }
+      lastTimestamps[eventKey] = timestamp;
+      console.log(lastTimestamps);
     },
     contentType: 'application/json'
   });
