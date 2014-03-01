@@ -17,11 +17,9 @@ function checkUpdate(eventKey) {
     dataType: 'json',
     success: function(timestamp) {
       if (!(eventKey in lastTimestamps) || timestamp != lastTimestamps[eventKey]) {
-        console.log(eventKey);
         getUpdate(eventKey, timestamp);
       }
       lastTimestamps[eventKey] = timestamp;
-      console.log(lastTimestamps);
     },
     contentType: 'application/json'
   });
