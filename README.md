@@ -18,8 +18,8 @@ Setup
 0. Learn a bit about Git and Github:
 	* http://help.github.com
 	* http://learn.github.com
-1. Install [App Engine](http://code.google.com/intl/en/appengine/)
-	* Specifically use the [Python SDK](http://code.google.com/intl/en/appengine/downloads.html#Google_App_Engine_SDK_for_Python)
+1. Install [App Engine](http://developers.google.com/appengine/)
+	* Specifically use the [Python SDK](http://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python)
 	* Run installer and allow it make symbolic links (you will be asked to enter your root password)
 2. Get the latest version of The Blue Alliance
 	* Run `git clone git://github.com/gregmarra/the-blue-alliance.git`
