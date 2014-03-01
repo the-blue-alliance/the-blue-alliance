@@ -27,6 +27,26 @@ cron:
   schedule: every 1 hours
   timezone: America/Los_Angeles
 
+- description: Match Insights Calculation
+  url: /tasks/math/enqueue/insights/matches/2014
+  schedule: every day 01:00
+  timezone: America/Los_Angeles
+
+- description: Award Insights Calculation
+  url: /tasks/math/enqueue/insights/awards/2014
+  schedule: every day 01:00
+  timezone: America/Los_Angeles
+
+- description: Match Overall Insights Calculation
+  url: /tasks/math/enqueue/overallinsights/matches
+  schedule: every day 01:10
+  timezone: America/Los_Angeles
+
+- description: Award Overall Insights Calculation
+  url: /tasks/math/enqueue/overallinsights/awards
+  schedule: every day 01:10
+  timezone: America/Los_Angeles
+
 #- description: OPR Calculation
 #  url: /tasks/math/enqueue/event_matchstats/now
 #  schedule: every day 22:00
