@@ -19,6 +19,6 @@ class Account(ndb.Model):
 
     # User preferences
     # TODO: Add typeahead support for follow fields
-    follow_teams = ndb.StringProperty()
-    follow_events = ndb.StringProperty()
-    gameday_layout = ndb.IntegerProperty(default=2)
+    follow_teams_json = ndb.TextProperty(indexed=False)
+    follow_events_json = ndb.TextProperty(indexed=False)
+    gameday_preferences = ndb.TextProperty(indexed=False)

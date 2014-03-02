@@ -11,9 +11,9 @@ register = webapp.template.create_template_register()
 def digits(value):
     return re.sub('[^0-9]', '', value)
 
-@register.filter(name='user_gameday_selection')
+@register.filter(name='is_active')
 def user_gameday_selection(current,value):
-    if current is value:
+    if current == value:
         return "selected"
     else:
     		return ""

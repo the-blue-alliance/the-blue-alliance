@@ -43,42 +43,53 @@
             <table class="table table-striped table-hover table-condensed">
               <tbody>
                 <tr>
+                  <td>Color Scheme:</td>
+                </tr>
+                <tr>
+                  <td>
+                    <input type="radio" name="gameday_scheme" id="gameday_scheme_light" value="light" {% if gameday_scheme == "light" %}checked="checked"{% endif %} />
+                    <label for="gameday_scheme_light" class="{{gameday_scheme|is_active:"light"}}">Light</label>
+                    <input type="radio" name="gameday_scheme" id="gameday_scheme_dark" value="dark" {% if gameday_scheme == "dark" %}checked="checked"{% endif %} />
+                    <label for="gameday_scheme_dark" class="{{gameday_scheme|is_active:"dark"}}">Dark</label>
+                  </td>
+                </tr>
+                <tr>
                   <td>Prefered Layout:</td>
                 </tr>
                 <tr>
                   <td>
-                    <input type="radio" class="form-control" name="gameday_layout" id="gameday_layout_0" value="0" {% if user_bundle.account.gameday_layout == 0 %}checked="checked"{% endif %} />
-                    <label for="gameday_layout_0" class="layout_0 {{ user_bundle.account.gameday_layout|user_gameday_selection:0 }}">
+                    <input type="radio" class="form-control" name="gameday_layout" id="gameday_layout_0" value="0" {% if gameday_layout == 0 %}checked="checked"{% endif %} />
+                    <label for="gameday_layout_0" class="layout_0 {{ gameday_layout|is_active:0 }}">
                       <img src="http://placehold.it/350x150" width="350" height="150" />
                       <div class="layout_name">Single</div>
                     </label>
-                    <input type="radio" class="form-control" name="gameday_layout" id="gameday_layout_1" value="1" {% if user_bundle.account.gameday_layout == 1 %}checked="checked"{% endif %} />
-                    <label for="gameday_layout_1" class="layout_1 {{ user_bundle.account.gameday_layout|user_gameday_selection:1 }}">
+                    <input type="radio" class="form-control" name="gameday_layout" id="gameday_layout_1" value="1" {% if gameday_layout == 1 %}checked="checked"{% endif %} />
+                    <label for="gameday_layout_1" class="layout_1 {{ gameday_layout|is_active:1 }}">
                       <img src="http://placehold.it/350x150" width="350" height="150" />
                       <div class="layout_name">Split</div>
                     </label>
-                    <input type="radio" class="form-control" name="gameday_layout" id="gameday_layout_2" value="2" {% if user_bundle.account.gameday_layout == 2 %}checked="checked"{% endif %} />
-                    <label for="gameday_layout_2" class="layout_2 {{ user_bundle.account.gameday_layout|user_gameday_selection:2 }}">
+                    <input type="radio" class="form-control" name="gameday_layout" id="gameday_layout_2" value="2" {% if gameday_layout == 2 %}checked="checked"{% endif %} />
+                    <label for="gameday_layout_2" class="layout_2 {{ gameday_layout|is_active:2 }}">
                       <img src="http://placehold.it/350x150" width="350" height="150" />
                       <div class="layout_name">1+2</div>
                     </label>
-                    <input type="radio" class="form-control" name="gameday_layout" id="gameday_layout_3" value="3" {% if user_bundle.account.gameday_layout == 3 %}checked="checked"{% endif %} />
-                    <label for="gameday_layout_3" class="layout_3 {{ user_bundle.account.gameday_layout|user_gameday_selection:3 }}">
+                    <input type="radio" class="form-control" name="gameday_layout" id="gameday_layout_3" value="3" {% if gameday_layout == 3 %}checked="checked"{% endif %} />
+                    <label for="gameday_layout_3" class="layout_3 {{ gameday_layout|is_active:3 }}">
                       <img src="http://placehold.it/350x150" width="350" height="150" />
                       <div class="layout_name">Quad</div>
                     </label>
-                    <input type="radio" class="form-control" name="gameday_layout" id="gameday_layout_4" value="4" {% if user_bundle.account.gameday_layout == 4 %}checked="checked"{% endif %} />
-                    <label for="gameday_layout_4" class="layout_4 {{ user_bundle.account.gameday_layout|user_gameday_selection:4 }}">
+                    <input type="radio" class="form-control" name="gameday_layout" id="gameday_layout_4" value="4" {% if gameday_layout == 4 %}checked="checked"{% endif %} />
+                    <label for="gameday_layout_4" class="layout_4 {{ gameday_layout|is_active:4 }}">
                       <img src="http://placehold.it/350x150" width="350" height="150" />
                       <div class="layout_name">1+3</div>
                     </label>
-                    <input type="radio" class="form-control" name="gameday_layout" id="gameday_layout_5" value="5" {% if user_bundle.account.gameday_layout == 5 %}checked="checked"{% endif %} />
-                    <label for="gameday_layout_5" class="layout_5 {{ user_bundle.account.gameday_layout|user_gameday_selection:5 }}">
+                    <input type="radio" class="form-control" name="gameday_layout" id="gameday_layout_5" value="5" {% if gameday_layout == 5 %}checked="checked"{% endif %} />
+                    <label for="gameday_layout_5" class="layout_5 {{ gameday_layout|is_active:5 }}">
                       <img src="http://placehold.it/350x150" width="350" height="150" />
                       <div class="layout_name">1+4</div>
                     </label>
-                    <input type="radio" class="form-control" name="gameday_layout" id="gameday_layout_6" value="6" {% if user_bundle.account.gameday_layout == 6 %}checked="checked"{% endif %} />
-                    <label for="gameday_layout_6" class="layout_6 {{ user_bundle.account.gameday_layout|user_gameday_selection:6 }}">
+                    <input type="radio" class="form-control" name="gameday_layout" id="gameday_layout_6" value="6" {% if gameday_layout == 6 %}checked="checked"{% endif %} />
+                    <label for="gameday_layout_6" class="layout_6 {{ gameday_layout|is_active:6 }}">
                       <img src="http://placehold.it/350x150" width="350" height="150" />
                       <div class="layout_name">Hex</div>
                     </label>
@@ -92,11 +103,11 @@
               <tbody>
                 <tr>
                   <td>Teams</td>
-                  <td><input type="text" id="follow_teams" name="follow_teams" data-role="tagsinput" {% if user_bundle.account.follow_teams != None %}value="{{teams_following}}"{% endif %}/></td>
+                  <td><input type="text" id="follow_teams" name="follow_teams" data-role="tagsinput" {% if teams_following != None %}value="{{teams_following}}"{% endif %}/></td>
                 </tr>
                 <tr>
                   <td>Events</td>
-                  <td><input type="text" id="follow_events" name="follow_events" data-role="tagsinput" {% if user_bundle.account.follow_events != None %}value="{{events_following}}"{% endif %}/></td>
+                  <td><input type="text" id="follow_events" name="follow_events" data-role="tagsinput" {% if events_following != None %}value="{{events_following}}"{% endif %}/></td>
                 </tr>
               </tbody>
             </table>

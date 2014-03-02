@@ -5,7 +5,6 @@ from google.appengine.ext.webapp import template
 
 from base_controller import LoggedInHandler
 
-from consts.gameday_layout_type import GamedayLayoutType
 from models.account import Account
 
 
@@ -31,10 +30,13 @@ class AccountEdit(LoggedInHandler):
         self.template_values['teams_following'] = []
         self.template_values['events_following'] = []
 
-        if self.user_bundle.account.follow_teams:
-            self.template_values['teams_following'] = ",".join(json.loads(self.user_bundle.account.follow_teams))
-        if self.user_bundle.account.follow_events:
-            self.template_values['events_following'] = ",".join(json.loads(self.user_bundle.account.follow_events))
+        if self.user_bundle.account.follow_teams_json:
+            self.template_values['teams_following'] = ",".join(json.loads(self.user_bundle.account.follow_teams_json))
+        if self.user_bundle.account.follow_events_json:
+            self.template_values['events_following'] = ",".join(json.loads(self.user_bundle.account.follow_events_json))
+        if self.user_bundle.account.gameday_preferences:
+            self.template_values['gameday_layout'] = json.loads(self.user_bundle.account.gameday_preferences)['layout']
+            self.template_values['gameday_scheme'] = json.loads(self.user_bundle.account.gameday_preferences)['scheme']
 
         path = os.path.join(os.path.dirname(__file__), '../templates/account_edit.html')
         self.response.out.write(template.render(path, self.template_values))
@@ -47,17 +49,16 @@ class AccountEdit(LoggedInHandler):
 
         # Check to make sure that they aren't trying to edit another user
         # TODO: Add server-side validation; Move to manipulator
-
         real_account_id = self.user_bundle.account.key.id()
         check_account_id = self.request.get('account_id')
         if check_account_id == real_account_id:
             user = Account.get_by_id(self.user_bundle.account.key.id())
             user.display_name = self.request.get('display_name')
-            user.gameday_layout = int(self.request.get('gameday_layout'))
+            user.gameday_preferences = json.dumps({"layout":int(self.request.get('gameday_layout')), "scheme":self.request.get('gameday_scheme')})
             follow_teams = self.request.get('follow_teams').split(',')
-            user.follow_teams = json.dumps(follow_teams)
+            user.follow_teams_json = json.dumps(follow_teams)
             follow_events = self.request.get('follow_events').split(',')
-            user.follow_events = json.dumps(follow_events)
+            user.follow_events_json = json.dumps(follow_events)
 
             user.put()
             self.redirect('/account')
