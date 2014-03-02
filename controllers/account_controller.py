@@ -47,24 +47,17 @@ class AccountEdit(LoggedInHandler):
             self.redirect('/account/register')
             return None
 
-        # Check to make sure that they aren't trying to edit another user
-        # TODO: Add server-side validation; Move to manipulator
-        real_account_id = self.user_bundle.account.key.id()
-        check_account_id = self.request.get('account_id')
-        if check_account_id == real_account_id:
-            user = Account.get_by_id(self.user_bundle.account.key.id())
-            user.display_name = self.request.get('display_name')
-            user.gameday_preferences = json.dumps({"layout":int(self.request.get('gameday_layout')), "scheme":self.request.get('gameday_scheme')})
-            follow_teams = self.request.get('follow_teams').split(',')
-            user.follow_teams_json = json.dumps(follow_teams)
-            follow_events = self.request.get('follow_events').split(',')
-            user.follow_events_json = json.dumps(follow_events)
+        # TODO: Move to manipulator
+        user = Account.get_by_id(self.user_bundle.account.key.id())
+        user.display_name = self.request.get('display_name')
+        user.gameday_preferences = json.dumps({"layout":int(self.request.get('gameday_layout')), "scheme":self.request.get('gameday_scheme')})
+        follow_teams = self.request.get('follow_teams').split(',')
+        user.follow_teams_json = json.dumps(follow_teams)
+        follow_events = self.request.get('follow_events').split(',')
+        user.follow_events_json = json.dumps(follow_events)
 
-            user.put()
-            self.redirect('/account')
-        else:
-            self.redirect('/')
-
+        user.put()
+        self.redirect('/account')
 
 class AccountRegister(LoggedInHandler):
     def get(self):
