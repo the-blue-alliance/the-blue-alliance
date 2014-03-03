@@ -332,16 +332,17 @@ class UsfirstMatchesGet(webapp.RequestHandler):
         if new_matches:
             for match in new_matches:
                 if hasattr(match, 'dirty') and match.dirty:
+                    # Enqueue push notification
                     try:
                         FirebasePusher.updated_event(event.key_name)
                     except:
                         logging.warning("Enqueuing Firebase push failed!")
+                    # Enqueue task to calculate matchstats
+                    taskqueue.add(
+                            url='/tasks/math/do/event_matchstats/' + event.key_name,
+                            method='GET')
                     break
 
-        # Enqueue task to calculate matchstats
-        taskqueue.add(
-                url='/tasks/math/do/event_matchstats/' + event.key_name,
-                method='GET')
 
         template_values = {
             'matches': new_matches,
