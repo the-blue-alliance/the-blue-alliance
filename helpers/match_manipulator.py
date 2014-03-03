@@ -1,4 +1,5 @@
 from helpers.manipulator_base import ManipulatorBase
+import json
 
 
 class MatchManipulator(ManipulatorBase):
@@ -21,11 +22,14 @@ class MatchManipulator(ManipulatorBase):
         ]  # These build key_name, and cannot be changed without deleting the model.
 
         attrs = [
-            "alliances_json",
             "game",
             "no_auto_update",
             "time",
             "time_string",
+        ]
+
+        json_attrs = [
+            "alliances_json",
         ]
 
         list_attrs = [
@@ -46,10 +50,14 @@ class MatchManipulator(ManipulatorBase):
             if getattr(new_match, attr) is not None:
                 if getattr(new_match, attr) != getattr(old_match, attr):
                     setattr(old_match, attr, getattr(new_match, attr))
-                    if attr == 'alliances_json':
-                        # Necessary since 'alliances' doesn't get changed
-                        # when mutating 'alliances_json'
-                        old_match.clearAlliances()
+                    old_match.dirty = True
+
+        for attr in json_attrs:
+            if getattr(new_match, attr) is not None:
+                if json.loads(getattr(new_match, attr)) != json.loads(getattr(old_match, attr)):
+                    setattr(old_match, attr, getattr(new_match, attr))
+                    # changinging 'attr_json' doesn't clear lazy-loaded '_attr'
+                    setattr(old_match, '_{}'.format(attr.replace('_json', '')), None)
                     old_match.dirty = True
 
         for attr in list_attrs:
