@@ -15,6 +15,7 @@ from helpers.event_manipulator import EventManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.team_manipulator import TeamManipulator
 from helpers.match_manipulator import MatchManipulator
+from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
 from models.award import Award
 from models.event import Event
 from models.event_team import EventTeam
@@ -200,6 +201,8 @@ class AdminEventEdit(LoggedInHandler):
             rankings_json=self.request.get("rankings_json"),
         )
         event = EventManipulator.createOrUpdate(event)
+
+        MemcacheWebcastFlusher.flushEvent(event.key_name)
 
         self.redirect("/admin/event/" + event.key_name)
 
