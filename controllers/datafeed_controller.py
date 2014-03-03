@@ -329,13 +329,14 @@ class UsfirstMatchesGet(webapp.RequestHandler):
         event = Event.get_by_id(event_key)
         new_matches = MatchManipulator.createOrUpdate(df.getMatches(event))
 
-        for match in new_matches:
-            if hasattr(match, 'dirty') and match.dirty:
-                try:
-                    FirebasePusher.updated_event(event.key_name)
-                except:
-                    logging.warning("Enqueuing Firebase push failed!")
-                break
+        if new_matches:
+            for match in new_matches:
+                if hasattr(match, 'dirty') and match.dirty:
+                    try:
+                        FirebasePusher.updated_event(event.key_name)
+                    except:
+                        logging.warning("Enqueuing Firebase push failed!")
+                    break
 
         # Enqueue task to calculate matchstats
         taskqueue.add(
