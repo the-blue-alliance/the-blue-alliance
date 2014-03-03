@@ -70,6 +70,5 @@ class EventTeamUpdater(object):
             for team_id in existing_team_ids.difference(team_ids):
                 et_key_name = "{}_{}".format(event.key_name, team_id)
                 et_keys_to_delete.add(ndb.Key(EventTeam, et_key_name))
-            ndb.delete_multi(et_keys_to_delete)
 
         return teams, event_teams, et_keys_to_delete
