@@ -102,7 +102,7 @@ class ApiEventListController(ApiBaseController):
     def _render(self, year=None):
         self._set_cache_header_length(60 * 60 * 24 * 3)
 
-        if self.year < 1996 or self.year > datetime.now().year + 1:
+        if self.year < 1992 or self.year > datetime.now().year + 1:
             self._errors = json.dumps({"404": "No events found for %s" % self.year})
             self.abort(404)
 
