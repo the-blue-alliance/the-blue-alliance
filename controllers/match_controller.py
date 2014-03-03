@@ -16,7 +16,7 @@ class MatchDetail(CacheableHandler):
     SHORT_CACHE_EXPIRATION = 60 * 5
 
     def __init__(self, *args, **kw):
-        super(CacheableHandler, self).__init__(*args, **kw)
+        super(MatchDetail, self).__init__(*args, **kw)
         self._cache_expiration = self.LONG_CACHE_EXPIRATION
         self._cache_key = "match_detail_{}"  # (match_key)
         self._cache_version = 4
