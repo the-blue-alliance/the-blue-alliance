@@ -33,7 +33,7 @@ def render_static(page):
 
 class MainKickoffHandler(CacheableHandler):
     def __init__(self, *args, **kw):
-        super(CacheableHandler, self).__init__(*args, **kw)
+        super(MainKickoffHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
         self._cache_key = "main_kickoff"
         self._cache_version = 3
@@ -53,7 +53,7 @@ class MainKickoffHandler(CacheableHandler):
 
 class MainBuildseasonHandler(CacheableHandler):
     def __init__(self, *args, **kw):
-        super(CacheableHandler, self).__init__(*args, **kw)
+        super(MainBuildseasonHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
         self._cache_key = "main_buildseason"
         self._cache_version = 1
@@ -70,7 +70,7 @@ class MainBuildseasonHandler(CacheableHandler):
 
 class MainCompetitionseasonHandler(CacheableHandler):
     def __init__(self, *args, **kw):
-        super(CacheableHandler, self).__init__(*args, **kw)
+        super(MainCompetitionseasonHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60
         self._cache_key = "main_competitionseason"
         self._cache_version = 5
@@ -87,7 +87,7 @@ class MainCompetitionseasonHandler(CacheableHandler):
 
 class MainInsightsHandler(CacheableHandler):
     def __init__(self, *args, **kw):
-        super(CacheableHandler, self).__init__(*args, **kw)
+        super(MainInsightsHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
         self._cache_key = "main_insights"
         self._cache_version = 1
@@ -109,7 +109,7 @@ class MainInsightsHandler(CacheableHandler):
 
 class MainOffseasonHandler(CacheableHandler):
     def __init__(self, *args, **kw):
-        super(CacheableHandler, self).__init__(*args, **kw)
+        super(MainOffseasonHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
         self._cache_key = "main_offseason"
         self._cache_version = 2
@@ -126,7 +126,7 @@ class MainOffseasonHandler(CacheableHandler):
 
 class ContactHandler(CacheableHandler):
     def __init__(self, *args, **kw):
-        super(CacheableHandler, self).__init__(*args, **kw)
+        super(ContactHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
         self._cache_key = "main_contact"
         self._cache_version = 1
@@ -138,7 +138,7 @@ class ContactHandler(CacheableHandler):
 
 class HashtagsHandler(CacheableHandler):
     def __init__(self, *args, **kw):
-        super(CacheableHandler, self).__init__(*args, **kw)
+        super(HashtagsHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
         self._cache_key = "main_hashtags"
         self._cache_version = 1
@@ -150,7 +150,7 @@ class HashtagsHandler(CacheableHandler):
 
 class AboutHandler(CacheableHandler):
     def __init__(self, *args, **kw):
-        super(CacheableHandler, self).__init__(*args, **kw)
+        super(AboutHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
         self._cache_key = "main_about"
         self._cache_version = 1
@@ -162,7 +162,7 @@ class AboutHandler(CacheableHandler):
 
 class ThanksHandler(CacheableHandler):
     def __init__(self, *args, **kw):
-        super(CacheableHandler, self).__init__(*args, **kw)
+        super(ThanksHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
         self._cache_key = "main_thanks"
         self._cache_version = 1
@@ -174,7 +174,7 @@ class ThanksHandler(CacheableHandler):
 
 class OprHandler(CacheableHandler):
     def __init__(self, *args, **kw):
-        super(CacheableHandler, self).__init__(*args, **kw)
+        super(OprHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
         self._cache_key = "main_opr"
         self._cache_version = 1
@@ -203,7 +203,7 @@ class SearchHandler(webapp2.RequestHandler):
 
 class GamedayHandler(CacheableHandler):
     def __init__(self, *args, **kw):
-        super(CacheableHandler, self).__init__(*args, **kw)
+        super(GamedayHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
         self._cache_key = "main_gameday"
         self._cache_version = 1
@@ -258,7 +258,7 @@ class PageNotFoundHandler(webapp2.RequestHandler):
 
 class WebcastsHandler(CacheableHandler):
     def __init__(self, *args, **kw):
-        super(CacheableHandler, self).__init__(*args, **kw)
+        super(WebcastsHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
         self._cache_key = "main_webcasts"
         self._cache_version = 2
@@ -277,7 +277,7 @@ class WebcastsHandler(CacheableHandler):
 
 class RecordHandler(CacheableHandler):
     def __init__(self, *args, **kw):
-        super(CacheableHandler, self).__init__(*args, **kw)
+        super(RecordHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
         self._cache_key = "main_record"
         self._cache_version = 1
@@ -289,7 +289,7 @@ class RecordHandler(CacheableHandler):
 
 class ApiDocumentationHandler(CacheableHandler):
     def __init__(self, *args, **kw):
-        super(CacheableHandler, self).__init__(*args, **kw)
+        super(ApiDocumentationHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
         self._cache_key = "api_docs"
         self._cache_version = 1
