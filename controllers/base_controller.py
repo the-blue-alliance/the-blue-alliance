@@ -22,6 +22,10 @@ class CacheableHandler(webapp2.RequestHandler):
         self._cache_key = ""
         self._cache_version = 0
 
+        # Cache all pages for 61 seconds, unless overwritten.
+        self.response.headers['Cache-Control'] = 'public, max-age=61'
+        self.response.headers['Pragma'] = 'Public'
+
     @property
     def cache_key(self):
         return "{}:{}:{}".format(
