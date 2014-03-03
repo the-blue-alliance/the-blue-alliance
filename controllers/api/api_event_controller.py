@@ -2,6 +2,7 @@ import json
 import logging
 import webapp2
 
+from datetime import datetime
 from google.appengine.ext import ndb
 
 from controllers.api.api_base_controller import ApiBaseController
@@ -79,3 +80,33 @@ class ApiEventMatchesController(ApiEventController):
         match_dicts = [ModelToDict.matchConverter(match) for match in matches]
 
         return json.dumps(match_dicts, ensure_ascii=True)
+
+
+class ApiEventListController(ApiBaseController):
+    LONG_CACHE_EXPIRATION = 60 * 60 * 24
+
+    def __init__(self, *args, **kw):
+        super(ApiEventListController, self).__init__(*args, **kw)
+        self.year = int(self.request.route_kwargs.get("year") or datetime.now().year)
+        self._cache_key = "apiv2_event_list_controller_{}".format(self.year)
+        self._cache_expiration = self.LONG_CACHE_EXPIRATION
+        self._cache_version = 2
+
+    @property
+    def _validators(self):
+        return []
+
+    def _track_call(self, *args, **kw):
+        self._track_call_defer('event/list', self.year)
+
+    def _render(self, year=None):
+        self._set_cache_header_length(60 * 60 * 24 * 3)
+
+        if self.year < 1992 or self.year > datetime.now().year + 1:
+            self._errors = json.dumps({"404": "No events found for %s" % self.year})
+            self.abort(404)
+
+        event_keys = Event.query(Event.year == self.year).fetch(1000, keys_only=True)
+        keys = [key.string_id() for key in event_keys]
+
+        return json.dumps(keys, ensure_ascii=True)

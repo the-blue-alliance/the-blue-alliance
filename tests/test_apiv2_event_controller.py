@@ -13,6 +13,7 @@ from consts.event_type import EventType
 from controllers.api.api_event_controller import ApiEventController
 from controllers.api.api_event_controller import ApiEventTeamsController
 from controllers.api.api_event_controller import ApiEventMatchesController
+from controllers.api.api_event_controller import ApiEventListController
 
 from models.event import Event
 from models.event_team import EventTeam
@@ -189,3 +190,40 @@ class TestEventMatchApiController(unittest2.TestCase):
 
         match_json = json.loads(response.body)
         self.assertMatchJson(match_json)
+
+
+class TestEventListApiController(unittest2.TestCase):
+
+    def setUp(self):
+        app = webapp2.WSGIApplication([webapp2.Route(r'/<year:>', ApiEventListController, methods=['GET'])], debug=True)
+        self.testapp = webtest.TestApp(app)
+
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_urlfetch_stub()
+        self.testbed.init_memcache_stub()
+        self.testbed.init_taskqueue_stub()
+
+        self.event = Event(
+                id="2010sc",
+                name="Palmetto Regional",
+                event_type_enum=EventType.REGIONAL,
+                short_name="Palmetto",
+                event_short="sc",
+                year=2010,
+                end_date=datetime(2010, 03, 27),
+                official=True,
+                location='Clemson, SC',
+                start_date=datetime(2010, 03, 24),
+        )
+
+        self.event.put()
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def testEventListApi(self):
+        response = self.testapp.get('/2010', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
+        event_dict = json.loads(response.body)
+        self.assertEqual(event_dict[0], self.event.key_name)

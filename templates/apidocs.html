@@ -25,6 +25,7 @@
               <a class="smooth-scroll" href="#requests">Requests</a>
               <ul class="nav">
                 <li><a class="smooth-scroll" href="#team-request">Team Request</a></li>
+                <li><a class="smooth-scroll" href="#event-list-request">Event List Request</a></li>
                 <li><a class="smooth-scroll" href="#event-request">Event Request</a></li>
                 <li><a class="smooth-scroll" href="#event-teams-request">Event Teams Request</a></li>
                 <li><a class="smooth-scroll" href="#event-matches-request">Event Matches Request</a></li>
@@ -353,6 +354,50 @@
         </div>
       </div>
 
+      <h3 id="event-list-request">Event List Request</h3>
+      <h4>Related: <a class="smooth-scroll" href="#event-model">Event Model</a></h4>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/events/&lt;year&gt;</code>
+      </p>
+      <table class=table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>year</td>
+            <td>A year to specify what year of events you want. Valid years are within 1992, and
+            the current year + 1. Defaults to current year if not specified.</td>
+            <td>2010</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_event_list_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="6" id="example_event_list_request" type="text" value="/api/v2/events/2010">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group">
+            <pre class="event-list-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+
       <h3 id="event-request">Event Request</h3>
       <h4>Related: <a class="smooth-scroll" href="#event-model">Event Model</a></h4>
       <p>
@@ -559,6 +604,22 @@
       },
       error: function(data) {
         $(".event-matches-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+  $("#example_event_list_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".event-list-request-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_event_list_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-event-list-request:v01'},
+      success: function(data) {
+        $(".event-list-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".event-list-request-json").html('Something went wrong! Please check for correct request format.');
       }
     });
   });
