@@ -84,6 +84,13 @@ class EventHelper(object):
             return event.start_date
 
     @classmethod
+    def distantFutureIfNoEndDate(self, event):
+        if not event.end_date:
+            return datetime.datetime(2177, 1, 1, 1, 1, 1)
+        else:
+            return event.end_date
+
+    @classmethod
     def calculateTeamWLTFromMatches(self, team_key, matches):
         """
         Given a team_key and some matches, find the Win Loss Tie.
@@ -140,6 +147,7 @@ class EventHelper(object):
                 if (offset == datetime.timedelta(0)) or (offset > datetime.timedelta(0) and offset < datetime.timedelta(4)):
                     events.append(event)
 
+        EventHelper.sort_events(events)
         return events
 
     @classmethod
@@ -254,3 +262,12 @@ class EventHelper(object):
         # An event slipped through!
         logging.warn("Event type '{}' not recognized!".format(event_type_str))
         return EventType.UNLABLED
+
+    @classmethod
+    def sort_events(cls, events):
+        """
+        Sorts by start date then end date
+        Sort is stable
+        """
+        events.sort(key=EventHelper.distantFutureIfNoStartDate)
+        events.sort(key=EventHelper.distantFutureIfNoEndDate)

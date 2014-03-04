@@ -49,7 +49,7 @@ class EventList(CacheableHandler):
     def _render(self, year=None, explicit_year=False):
         event_keys = Event.query(Event.year == year).fetch(1000, keys_only=True)
         events = ndb.get_multi(event_keys)
-        events.sort(key=EventHelper.distantFutureIfNoStartDate)
+        EventHelper.sort_events(events)
 
         week_events = EventHelper.groupByWeek(events)
 
