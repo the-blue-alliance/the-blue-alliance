@@ -264,11 +264,13 @@ class WebcastsHandler(CacheableHandler):
         self._cache_version = 2
 
     def _render(self, *args, **kw):
-        event_keys = Event.query(Event.year == 2014).order(Event.start_date).fetch(500, keys_only=True)
+        year = datetime.datetime.now().year
+        event_keys = Event.query(Event.year == year).order(Event.start_date).fetch(500, keys_only=True)
         events = ndb.get_multi(event_keys)
 
         template_values = {
             'events': events,
+            'year': year,
         }
 
         path = os.path.join(os.path.dirname(__file__), '../templates/webcasts.html')
