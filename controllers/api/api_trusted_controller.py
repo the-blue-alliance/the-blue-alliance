@@ -19,6 +19,11 @@ class ApiTrustedAddMatchYoutubeVideo(webapp2.RequestHandler):
             self.response.out.write(json.dumps({"400": "No secret given"}))
             return
 
+        if str(trusted_api_secret.values_json) != str(secret):
+            self.response.set_status(400)
+            self.response.out.write(json.dumps({"400": "Incorrect secret"}))
+            return
+
         match_key = self.request.get('match_key', None)
         if match_key is None:
             self.response.set_status(400)
