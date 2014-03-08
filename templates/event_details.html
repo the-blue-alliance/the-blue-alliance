@@ -53,7 +53,7 @@
         <div class="panel-heading">
           <div class="hidden-xs pull-right">
             {% if event.webcast %}
-              <a class="btn btn-lg btn-success" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch now</a>
+              <a class="btn btn-xs btn-success" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch now</a>
             {% else %}
               <a class="btn btn-xs btn-default" href="/suggest/event/webcast?event_key={{event.key_name}}" target="_blank">Add webcast</a>
             {% endif %}
