@@ -3,12 +3,13 @@ import webapp2
 
 import tba_config
 
-from controllers.api_controller import ApiEventsShow, ApiTeamDetails, ApiTeamsShow,\
-                                       ApiEventList, ApiEventDetails, ApiMatchDetails,\
+from controllers.api_controller import ApiEventsShow, ApiTeamDetails, ApiTeamsShow, \
+                                       ApiEventList, ApiEventDetails, ApiMatchDetails, \
                                        CsvTeamsAll
 from controllers.api.api_team_controller import ApiTeamController
-from controllers.api.api_event_controller import ApiEventController, ApiEventTeamsController,\
+from controllers.api.api_event_controller import ApiEventController, ApiEventTeamsController, \
                                                  ApiEventMatchesController, ApiEventListController
+from controllers.api.api_trusted_controller import ApiTrustedAddMatchYoutubeVideo
 
 
 app = webapp2.WSGIApplication([('/api/v1/team/details', ApiTeamDetails),
@@ -19,7 +20,7 @@ app = webapp2.WSGIApplication([('/api/v1/team/details', ApiTeamDetails),
                                ('/api/v1/match/details', ApiMatchDetails),
                                ('/api/csv/teams/all', CsvTeamsAll),
                                webapp2.Route(r'/api/v2/team/<team_key:>',
-                                             ApiTeamController, 
+                                             ApiTeamController,
                                              methods=['GET']),
                                webapp2.Route(r'/api/v2/team/<team_key:>/<year:([0-9]*)>',
                                              ApiTeamController,
@@ -36,4 +37,7 @@ app = webapp2.WSGIApplication([('/api/v1/team/details', ApiTeamDetails),
                                webapp2.Route(r'/api/v2/events/<year:([0-9]*)>',
                                              ApiEventListController,
                                              methods=['GET']),
+                               webapp2.Route(r'/api/trusted/v1/match/add_youtube_video',
+                                             ApiTrustedAddMatchYoutubeVideo,
+                                             methods=['POST']),
                                ], debug=tba_config.DEBUG)
