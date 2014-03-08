@@ -30,14 +30,17 @@
             </div>
             <p>If you're setting up a full copy of The Blue Alliance, these will help you create all the data you need.
             <ol>
-                <li><a href="/tasks/get/usfirst_event_list/2012">UsfirstEventListGet</a>, enqueues Tasks to create Event objects for regional events from USFIRST.</li>
+                <li><a href="/tasks/get/usfirst_event_list/2014">UsfirstEventListGet</a>, enqueues Tasks to create Event objects for regional events from USFIRST.</li>
+                <li>Initiate 2014 Teams: <a href="/tasks/get/usfirst_teams_tpids/2014?skip=0">UsfirstTeamsTpidsGet @0</a> <a href="/tasks/get/usfirst_teams_tpids/2014?skip=1000">@1000</a> <a href="/tasks/get/usfirst_teams_tpids/2014?skip=2000">@2000</a> <a href="/tasks/get/usfirst_teams_tpids/2012?skip=3000">@3000</a> <a href="/tasks/get/usfirst_teams_tpids/2014?skip=4000">@4000</a>
+                <a href="/tasks/get/usfirst_teams_tpids/2014?skip=5000">@5000</a></li>
+                <li>Initiate 2013 Teams: <a href="/tasks/get/usfirst_teams_tpids/2013?skip=0">UsfirstTeamsTpidsGet @0</a> <a href="/tasks/get/usfirst_teams_tpids/2013?skip=1000">@1000</a> <a href="/tasks/get/usfirst_teams_tpids/2013?skip=2000">@2000</a> <a href="/tasks/get/usfirst_teams_tpids/2013?skip=3000">@3000</a> <a href="/tasks/get/usfirst_teams_tpids/2013?skip=4000">@4000</a></li>
                 <li>Initiate 2012 Teams: <a href="/tasks/get/usfirst_teams_tpids/2012?skip=0">UsfirstTeamsTpidsGet @0</a> <a href="/tasks/get/usfirst_teams_tpids/2012?skip=1000">@1000</a> <a href="/tasks/get/usfirst_teams_tpids/2012?skip=2000">@2000</a> <a href="/tasks/get/usfirst_teams_tpids/2012?skip=3000">@3000</a></li>
                 <li>Initiate 2011 Teams: <a href="/tasks/get/usfirst_teams_tpids/2011?skip=0">UsfirstTeamsTpidsGet @0</a> <a href="/tasks/get/usfirst_teams_tpids/2011?skip=1000">@1000</a> <a href="/tasks/get/usfirst_teams_tpids/2011?skip=2000">@2000</a></li>
                 <li>Initiate 2010 Teams: <a href="/tasks/get/usfirst_teams_tpids/2010?skip=0">UsfirstTeamsTpidsGet @0</a> <a href="/tasks/get/usfirst_teams_tpids/2010?skip=1000">@1000</a> <a href="/tasks/get/usfirst_teams_tpids/2010?skip=2000">@2000</a></li>
                 <li>Initiate 2009 Teams: <a href="/tasks/get/usfirst_teams_tpids/2009?skip=0">UsfirstTeamsTpidsGet @0</a> <a href="/tasks/get/usfirst_teams_tpids/2009?skip=1000">@1000</a> <a href="/tasks/get/usfirst_teams_tpids/2009?skip=2000">@2000</a></li>
                 <li>Bulkload Old Events:<br />appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/events.csv --kind=Event --url=http://tbatv-prod.appspot.com/_ah/remote_api</li>
                 <li>Bulkload Old Matches: <br />appcfg.py upload_data --config_file=bulkloader.yaml --filename=test_data/matches.csv --kind=Match --url=http://tbatv-prod.appspot.com/_ah/remote_api</li>
-                <li><a href="/tasks/math/enqueue/eventteam_update">Update EventTeams</a>, to build all the event attendance information.</li>
+                <li><a href="/tasks/math/enqueue/eventteam_update/2014">Update EventTeams</a>, to build all the event attendance information.</li>
             </ol>
         </div>
 
