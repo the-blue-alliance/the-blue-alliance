@@ -217,7 +217,7 @@ class DatafeedUsfirst(DatafeedBase):
                     event.year, self.EVENT_SHORT_EXCEPTIONS.get(event.event_short,
                                                                 event.event_short))
                 elim_match_dicts, _ = self.parse(elim_match_sched_url, self.MATCH_SCHEDULE_PARSER)
-                match_dicts.append(elim_match_dicts)
+                match_dicts += elim_match_dicts
 
         matches = [Match(
             id=Match.renderKeyName(
