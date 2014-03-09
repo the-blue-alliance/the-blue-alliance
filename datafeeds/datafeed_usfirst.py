@@ -1,4 +1,5 @@
 import logging
+import json
 import re
 
 from google.appengine.api import memcache
@@ -196,10 +197,27 @@ class DatafeedUsfirst(DatafeedBase):
             if len(Match.query(Match.event == event.key).fetch(1, keys_only=True)) == 0:
                 logging.warning("No matches found for {}. Trying to parse qual match schedule.".format(event.key.id()))
 
-                match_sched_url = self.MATCH_SCHEDULE_QUAL_URL_PATTERN % (
+                qual_match_sched_url = self.MATCH_SCHEDULE_QUAL_URL_PATTERN % (
                     event.year, self.EVENT_SHORT_EXCEPTIONS.get(event.event_short,
                                                                 event.event_short))
-                match_dicts, _ = self.parse(match_sched_url, self.MATCH_SCHEDULE_PARSER)
+                match_dicts, _ = self.parse(qual_match_sched_url, self.MATCH_SCHEDULE_PARSER)
+
+        for match_dict in match_dicts:
+            alliances = json.loads(match_dict['alliances_json'])
+            if (alliances['red']['score'] == -1 or alliances['blue']['score'] == -1 or
+                match_dict['comp_level'] in Match.ELIM_LEVELS):
+                break
+        else:  # Only qual matches have been played and they have all been played
+            # If this is run when there are already elim matches in the DB, it will overwrite scores!
+            # Check to make sure event has no existing elim matches
+            if len(Match.query(Match.event == event.key, Match.comp_level.IN(Match.ELIM_LEVELS)).fetch(1, keys_only=True)) == 0:
+                logging.warning("No elim matches found for {}. Trying to parse elim match schedule.".format(event.key.id()))
+
+                elim_match_sched_url = self.MATCH_SCHEDULE_ELIMS_URL_PATTERN % (
+                    event.year, self.EVENT_SHORT_EXCEPTIONS.get(event.event_short,
+                                                                event.event_short))
+                elim_match_dicts, _ = self.parse(elim_match_sched_url, self.MATCH_SCHEDULE_PARSER)
+                match_dicts.append(elim_match_dicts)
 
         matches = [Match(
             id=Match.renderKeyName(
