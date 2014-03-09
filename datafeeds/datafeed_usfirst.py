@@ -190,7 +190,7 @@ class DatafeedUsfirst(DatafeedBase):
                                                             event.event_short))
 
         match_dicts, _ = self.parse(matches_url, self.YEAR_MATCH_PARSER.get(event.year, self.DEFAULT_MATCH_PARSER))
-        if not match_dicts:  # Matches have been played, but qual match schedule may be out
+        if not match_dicts:  # Matches have not been played, but qual match schedule may be out
             # If this is run when there are already matches in the DB, it will overwrite scores!
             # Check to make sure event has no existing matches
             if len(Match.query(Match.event == event.key).fetch(1, keys_only=True)) == 0:
