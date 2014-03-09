@@ -255,6 +255,8 @@ class UsfirstAwardsGet(webapp.RequestHandler):
             team_number=int(team_id[3:]))
             for team_id in team_ids])
         if teams:
+            if type(teams) is not list:
+                teams = [teams]
             event_teams = EventTeamManipulator.createOrUpdate([EventTeam(
                 id=event_key + "_" + team.key.id(),
                 event=event.key,
