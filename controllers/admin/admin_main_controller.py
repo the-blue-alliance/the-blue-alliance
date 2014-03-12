@@ -2,6 +2,7 @@ import os
 import json
 import re
 import logging
+import datetime
 
 from google.appengine.api import memcache
 from google.appengine.ext.webapp import template
@@ -64,6 +65,7 @@ class AdminMain(LoggedInHandler):
 class AdminDebugHandler(LoggedInHandler):
     def get(self):
         self._require_admin()
+        self.template_values['cur_year'] = datetime.datetime.now().year
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/debug.html')
         self.response.out.write(template.render(path, self.template_values))
 
