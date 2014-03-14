@@ -195,6 +195,13 @@ class SearchHandler(webapp2.RequestHandler):
                 if team:
                     self.redirect(team.details_url)
                     return None
+            elif len(q) in {3, 4, 5}:  # event shorts are between 3 and 5 characters long
+                year = datetime.datetime.now().year  # default to current year
+                event_id = "%s%s" % (year, q)
+                event = Event.get_by_id(event_id)
+                if event:
+                    self.redirect(event.details_url)
+                    return None
         except Exception, e:
             logging.warning("warning: %s" % e)
         finally:
