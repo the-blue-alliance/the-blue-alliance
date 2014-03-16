@@ -1,5 +1,4 @@
 import cookielib
-import csv
 import json
 import urllib2
 
