@@ -9,7 +9,7 @@ from models.award import Award
 
 class CSVAwardsParser(ParserBase):
     @classmethod
-    def parse(self, data):
+    def parse(cls, data):
         """
         Parse CSV that contains awards
         Format is as follows:
