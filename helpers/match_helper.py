@@ -131,18 +131,14 @@ class MatchHelper(object):
         return return_list
 
     @classmethod
-    def generateBracket(self, matches):
+    def generateBracket(cls, matches, alliances=None):
         results = {}
         for match in matches:
             set_number = str(match.set_number)
 
             if set_number not in results:
-                red_alliance = []
-                for team in match.alliances['red']['teams']:
-                    red_alliance.append(team[3:])
-                blue_alliance = []
-                for team in match.alliances['blue']['teams']:
-                    blue_alliance.append(team[3:])
+                red_alliance = cls.getOrderedAlliance(match.alliances['red']['teams'], alliances)
+                blue_alliance = cls.getOrderedAlliance(match.alliances['blue']['teams'], alliances)
 
                 results[set_number] = {'red_alliance': red_alliance,
                                        'blue_alliance': blue_alliance,
@@ -162,3 +158,34 @@ class MatchHelper(object):
                 results[set_number]['winning_alliance'] = 'blue'
 
         return results
+
+    @classmethod
+    def getOrderedAlliance(cls, teams, alliances):
+        # First we need to find the alliance the teams are on...
+        # This can probably be made more efficient.
+        if alliances:
+            for num in alliances:
+                picks = alliances[num]['picks']
+                intersect = (set(picks) & set(teams))
+                # FIXME: Support 4 team alliances like IRI
+                if len(teams) == 4:
+                    break  # Bail for now
+
+                if len(intersect) == 3:
+                    teams = picks
+                    break
+                elif len(intersect) == 2:
+                    # So, we've got a backup robot.
+                    # Let's figure out which robots were switched
+                    removed = list(set(picks) - set(teams))[0]
+                    backup = list(set(teams) - set(picks))[0]
+                    teams = list(picks)  # Clone
+                    teams.remove(removed)
+                    teams.append(backup)
+                    break
+
+        real_teams = []
+        for team in teams:
+            # Strip the "frc" prefix
+            real_teams.append(team[3:])
+        return real_teams
