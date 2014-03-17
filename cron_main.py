@@ -5,6 +5,7 @@ import tba_config
 
 from controllers.datafeed_controller import TbaVideosGet, TbaVideosEnqueue
 from controllers.datafeed_controller import FmsEventListGet, FmsTeamListGet
+from controllers.datafeed_controller import GoogleDocsAllianceSelectionGet
 from controllers.datafeed_controller import OffseasonMatchesGet
 from controllers.datafeed_controller import TwitterFrcfmsMatchesGet
 from controllers.datafeed_controller import UsfirstEventDetailsEnqueue, UsfirstEventDetailsGet, UsfirstEventListGet
@@ -31,6 +32,7 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
                                ('/tasks/enqueue/usfirst_pre2003_team_events', UsfirstPre2003TeamEventsEnqueue),
                                ('/tasks/get/fms_event_list', FmsEventListGet),
                                ('/tasks/get/fms_team_list', FmsTeamListGet),
+                               ('/tasks/get/gdocs_alliance_selections/([0-9]*)', GoogleDocsAllianceSelectionGet),
                                ('/tasks/get/offseason_matches/(.*)', OffseasonMatchesGet),
                                ('/tasks/get/tba_videos/(.*)', TbaVideosGet),
                                ('/tasks/get/twitter_frcfms_matches', TwitterFrcfmsMatchesGet),
