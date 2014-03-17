@@ -164,8 +164,8 @@ class MatchHelper(object):
         # First we need to find the alliance the teams are on...
         # This can probably be made more efficient.
         if alliances:
-            for num in alliances:
-                picks = alliances[num]['picks']
+            for alliance in alliances.values():
+                picks = alliance['picks']
                 intersect = (set(picks) & set(team_keys))
                 # FIXME: Support 4 team alliances like IRI
                 if len(team_keys) == 4:
