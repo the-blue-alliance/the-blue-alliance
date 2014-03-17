@@ -160,32 +160,32 @@ class MatchHelper(object):
         return results
 
     @classmethod
-    def getOrderedAlliance(cls, teams, alliances):
+    def getOrderedAlliance(cls, team_keys, alliances):
         # First we need to find the alliance the teams are on...
         # This can probably be made more efficient.
         if alliances:
             for num in alliances:
                 picks = alliances[num]['picks']
-                intersect = (set(picks) & set(teams))
+                intersect = (set(picks) & set(team_keys))
                 # FIXME: Support 4 team alliances like IRI
-                if len(teams) == 4:
+                if len(team_keys) == 4:
                     break  # Bail for now
 
                 if len(intersect) == 3:
-                    teams = picks
+                    team_keys = picks
                     break
                 elif len(intersect) == 2:
                     # So, we've got a backup robot.
                     # Let's figure out which robots were switched
-                    removed = list(set(picks) - set(teams))[0]
-                    backup = list(set(teams) - set(picks))[0]
-                    teams = list(picks)  # Clone
-                    teams.remove(removed)
-                    teams.append(backup)
+                    removed = list(set(picks) - set(team_keys))[0]
+                    backup = list(set(team_keys) - set(picks))[0]
+                    team_keys = list(picks)  # Clone
+                    team_keys.remove(removed)
+                    team_keys.append(backup)
                     break
 
-        real_teams = []
-        for team in teams:
+        team_nums = []
+        for team in team_keys:
             # Strip the "frc" prefix
-            real_teams.append(team[3:])
-        return real_teams
+            team_nums.append(team[3:])
+        return team_nums
