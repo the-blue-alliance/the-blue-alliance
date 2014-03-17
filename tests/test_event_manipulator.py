@@ -6,6 +6,7 @@ import unittest2
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
+from consts.district_type import DistrictType
 from consts.event_type import EventType
 from datafeeds.usfirst_event_rankings_parser import UsfirstEventRankingsParser
 from helpers.event_manipulator import EventManipulator
@@ -31,6 +32,7 @@ class TestEventManipulator(unittest2.TestCase):
             end_date=datetime.datetime(2011, 4, 2, 0, 0),
             event_short="ct",
             event_type_enum=EventType.REGIONAL,
+            event_district_enum=DistrictType.NO_DISTRICT,
             first_eid="5561",
             name="Northeast Utilities FIRST Connecticut Regional",
             start_date=datetime.datetime(2011, 3, 31, 0, 0),
@@ -45,6 +47,7 @@ class TestEventManipulator(unittest2.TestCase):
             end_date=datetime.datetime(2011, 4, 2, 0, 0),
             event_short="ct",
             event_type_enum=EventType.REGIONAL,
+            event_district_enum=DistrictType.NO_DISTRICT,
             first_eid="5561",
             name="Northeast Utilities FIRST Connecticut Regional",
             start_date=datetime.datetime(2011, 3, 31, 0, 0),
@@ -73,6 +76,7 @@ class TestEventManipulator(unittest2.TestCase):
         self.assertEqual(event.key.id(), "2011ct")
         self.assertEqual(event.name, "Northeast Utilities FIRST Connecticut Regional")
         self.assertEqual(event.event_type_enum, EventType.REGIONAL)
+        self.assertEqual(event.event_district_enum, DistrictType.NO_DISTRICT)
         self.assertEqual(event.start_date, datetime.datetime(2011, 3, 31, 0, 0))
         self.assertEqual(event.end_date, datetime.datetime(2011, 4, 2, 0, 0))
         self.assertEqual(event.year, 2011)
