@@ -114,6 +114,7 @@ class DatafeedUsfirst(DatafeedBase):
 
         return [Event(
             event_type_enum=event.get("event_type_enum", None),
+            event_district_enum=event.get("event_district_enum", None),
             event_short="???",
             first_eid=event.get("first_eid", None),
             name=event.get("name", None),

@@ -161,6 +161,9 @@ class UsfirstEventDetailsGet(webapp.RequestHandler):
         if not event:
             logging.warning("getEventDetails with DatafeedUsfirst for event id {} failed. Retrying with DatafeedUsfirstLegacy.".format(first_eid))
             event = df_legacy.getEventDetails(int(year), first_eid)
+
+        if self.request.get('event_district_enum'):
+            event.event_district_enum = int(self.request.get('event_district_enum'))
         event = EventManipulator.createOrUpdate(event)
 
         teams = df.getEventTeams(int(year), first_eid)
@@ -285,6 +288,7 @@ class UsfirstEventListGet(webapp.RequestHandler):
             taskqueue.add(
                 queue_name='usfirst',
                 url='/tasks/get/usfirst_event_details/%s/%s' % (year, event.first_eid),
+                params={'event_district_enum': event.event_district_enum},  # district info is not available on event detail pages
                 method='GET')
 
         template_values = {
