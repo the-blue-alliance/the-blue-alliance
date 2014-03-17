@@ -55,4 +55,7 @@ class GoogleDocsAllianceSelectionsParser(ParserBase):
         alliance = (row_num - 2) % 8
         if alliance == 0:
             alliance = 8
+        if row_num >= 19:
+            # This part is serpentine, so flip it
+            alliance = 9 - alliance
         return alliance
