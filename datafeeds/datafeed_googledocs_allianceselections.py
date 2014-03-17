@@ -24,7 +24,8 @@ class DatafeedGoogleDocsAllianceSelection(DatafeedBase):
         return data
 
     def run(self, year):
-        data = GoogleDocsAllianceSelectionsParser.parse(self.fetch_csv(year))
+        url = self.GDOCS_CSV_EXPORT_URL.format(self.YEAR_SPREADSHEET_KEY[year])
+        data = self.parse(url, GoogleDocsAllianceSelectionsParser)
         for eventcode in data:
             yrcode = str(year) + eventcode.lower()
             event = Event.get_by_id(yrcode)
