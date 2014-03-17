@@ -2,6 +2,8 @@ from google.appengine.ext import ndb
 import datetime
 import json
 import re
+
+from consts.district_type import DistrictType
 from consts.event_type import EventType
 
 
@@ -207,6 +209,10 @@ class Event(ndb.Model):
         key_name_regex = re.compile(r'^[1-9]\d{3}[a-z]+[1-9]?$')
         match = re.match(key_name_regex, event_key)
         return True if match else False
+
+    @property
+    def event_district_str(self):
+        return DistrictType.type_names.get(self.event_district_enum, None)
 
     @property
     def event_type_str(self):

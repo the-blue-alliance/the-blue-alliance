@@ -10,6 +10,15 @@ class DistrictType(object):
     NEW_ENGLAND = 3
     PACIFIC_NORTHWEST = 4
 
+    # Used for rendering
+    type_names = {
+        NO_DISTRICT: None,
+        MICHIGAN: 'Michigan',
+        MID_ATLANTIC: 'Mid Atlantic',
+        NEW_ENGLAND: 'New England',
+        PACIFIC_NORTHWEST: 'Pacific Northwest',
+    }
+
     # Names used on the FIRST website
     names = {
         'FIRST in Michigan': MICHIGAN,

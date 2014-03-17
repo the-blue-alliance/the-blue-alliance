@@ -14,6 +14,7 @@
         <th>Year</th>
         <th>Event Short</th>
         <th>Event Type</th>
+        <th>Event District</th>
         <th>EID</th>
     </thead>
 
@@ -25,6 +26,7 @@
         <td>{{ event.year }}</td>
         <td>{{ event.event_short }}</td>
         <td>{{ event.event_type_str }}</td>
+        <td>{{ event.event_district_str }}</td>
         <td>{{ event.first_eid }}</td>
     </tr>
     {% endfor %}
