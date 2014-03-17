@@ -189,6 +189,7 @@ class AdminEventEdit(LoggedInHandler):
             end_date=end_date,
             event_short=self.request.get("event_short"),
             event_type_enum=EventHelper.parseEventType(self.request.get("event_type_str")),
+            event_district_enum=EventHelper.parseDistrictName(self.request.get("event_district_str")),
             location=self.request.get("location"),
             name=self.request.get("name"),
             short_name=self.request.get("short_name"),
