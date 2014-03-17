@@ -113,6 +113,7 @@ class Match(ndb.Model):
         self._alliances = None
         self._tba_video = None
         self._winning_alliance = None
+        self._youtube_videos = None
         super(Match, self).__init__(*args, **kw)
 
     @property
@@ -195,6 +196,28 @@ class Match(ndb.Model):
     @property
     def name(self):
         return "%s" % (self.COMP_LEVELS_VERBOSE[self.comp_level])
+
+    @property
+    def youtube_videos_formatted(self):
+        """
+        Get youtube video ids formatted for embedding
+        """
+        if self._youtube_videos is None:
+            self._youtube_videos = []
+            for video in self.youtube_videos:
+                if '#t=' in video:  # Old style-timetamp, convert it!
+                    sp = video.split('#t=')
+                    video_id = sp[0]
+                    old_ts = sp[1]
+                    match = re.match('((?P<hour>\d*?)h)?((?P<min>\d*?)m)?((?P<sec>\d*)s?)?', old_ts).groupdict()
+                    hours = match['hour'] or 0
+                    minutes = match['min'] or 0
+                    seconds = match['sec'] or 0
+                    total_seconds = (int(hours) * 3600) + (int(minutes) * 60) + int(seconds)
+                    video = '%s?start=%i' % (video_id, total_seconds)
+                self._youtube_videos.append(video)
+        return self._youtube_videos
+
 
     @classmethod
     def renderKeyName(self, event_key_name, comp_level, set_number, match_number):

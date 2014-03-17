@@ -49,7 +49,7 @@
     {% if match.tba_video %}
       {% include "video_partials/tbavideo_player.html" %}
     {% endif %}
-    {% for youtube_video in match.youtube_videos %}
+    {% for youtube_video in match.youtube_videos_formatted %}
       {% include "video_partials/youtube_video_player.html" %}
     {% endfor %}
     {% if not match.tba_video and not match.youtube_videos %}
