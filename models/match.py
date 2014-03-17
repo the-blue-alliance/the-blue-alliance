@@ -209,10 +209,11 @@ class Match(ndb.Model):
                     sp = video.split('#t=')
                     video_id = sp[0]
                     old_ts = sp[1]
-                    match = re.match('((?P<min>\d*?)m)?((?P<sec>\d*?)s)?', old_ts).groupdict()
+                    match = re.match('((?P<hour>\d*?)h)?((?P<min>\d*?)m)?((?P<sec>\d*)s?)?', old_ts).groupdict()
+                    hours = match['hour'] or 0
                     minutes = match['min'] or 0
                     seconds = match['sec'] or 0
-                    total_seconds = (int(minutes) * 60) + int(seconds)
+                    total_seconds = (int(hours) * 3600) + (int(minutes) * 60) + int(seconds)
                     video = '%s?start=%i' % (video_id, total_seconds)
                 self._youtube_videos.append(video)
         return self._youtube_videos
