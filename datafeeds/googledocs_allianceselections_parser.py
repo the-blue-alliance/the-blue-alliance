@@ -1,9 +1,7 @@
 import csv
 import StringIO
 
-
 from datafeeds.parser_base import ParserBase
-from helpers.event_helper import EventHelper
 
 
 class GoogleDocsAllianceSelectionsParser(ParserBase):
