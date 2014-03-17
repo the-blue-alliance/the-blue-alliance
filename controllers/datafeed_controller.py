@@ -133,7 +133,7 @@ class GoogleDocsAllianceSelectionGet(webapp.RequestHandler):
     def get(self, year):
         df = DatafeedGoogleDocsAllianceSelection()
         events = df.run(year)
-        ndb.put_multi(events)
+        EventManipulator.createOrUpdate(events)
 
 
 class UsfirstEventDetailsEnqueue(webapp.RequestHandler):

@@ -18,7 +18,8 @@ class DatafeedGoogleDocsAllianceSelection(DatafeedGoogleDocs):
         events = []
         for event_short in data:
             event_id = str(year) + event_short.lower()
-            event = Event.get_by_id(event_id)
-            event.alliance_selections_json = json.dumps(data[event_short])
-            events.append(event)
+            events.append(Event(
+                id=event_id,
+                alliance_selections_json=json.dumps(data[event_short])
+            ))
         return events
