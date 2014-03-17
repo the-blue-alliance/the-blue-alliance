@@ -4,6 +4,7 @@ import logging
 
 from BeautifulSoup import BeautifulSoup
 
+from consts.district_type import DistrictType
 from consts.event_type import EventType
 from datafeeds.parser_base import ParserBase
 from helpers.event_helper import EventHelper
@@ -28,12 +29,15 @@ class UsfirstEventListParser(ParserBase):
                     # this may happen if this is a district event, in which case we can also extract the district name
                     event_type_str = unicode(tds[0].findAll(text=True)[2].string)
 
-                    # for future use:
-                    # district_name_str = unicode(tds[0].findAll('em')[0].string)
+                    district_name_str = unicode(tds[0].findAll('em')[0].string)
                 else:
                     event_type_str = unicode(tds[0].string)
+                    district_name_str = None
                 event["event_type_enum"] = EventHelper.parseEventType(event_type_str)
-
+                if district_name_str:
+                    event["event_district_enum"] = EventHelper.parseDistrictName(district_name_str)
+                else:
+                    event["event_district_enum"] = DistrictType.NO_DISTRICT
                 url_get_params = urlparse.parse_qs(urlparse.urlparse(tds[1].a["href"]).query)
                 event["first_eid"] = url_get_params["eid"][0]
 

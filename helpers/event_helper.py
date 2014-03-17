@@ -8,6 +8,7 @@ import urllib
 from google.appengine.api import urlfetch
 from google.appengine.ext import ndb
 
+from consts.district_type import DistrictType
 from consts.event_type import EventType
 
 from models.event import Event
@@ -221,6 +222,10 @@ class EventHelper(object):
             logging.warning('No timeZoneId for (lat, lng)'.format(lat, lng))
             return None
         return tz_dict['timeZoneId']
+
+    @classmethod
+    def parseDistrictName(cls, district_name_str):
+        return DistrictType.names.get(district_name_str, DistrictType.NO_DISTRICT)
 
     @classmethod
     def parseEventType(self, event_type_str):
