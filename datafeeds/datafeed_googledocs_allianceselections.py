@@ -1,4 +1,5 @@
 import json
+import logging
 
 from datafeeds.datafeed_googledocs import DatafeedGoogleDocs
 from datafeeds.googledocs_allianceselections_parser import GoogleDocsAllianceSelectionsParser
@@ -18,8 +19,11 @@ class DatafeedGoogleDocsAllianceSelection(DatafeedGoogleDocs):
         events = []
         for event_short in data:
             event_id = str(year) + event_short.lower()
-            events.append(Event(
-                id=event_id,
-                alliance_selections_json=json.dumps(data[event_short])
-            ))
+            event = Event.get_by_id(event_id)
+            if not event:
+                logging.warning('No event exists for: ' +event_id)
+                continue
+            event.alliance_selections_json = json.dumps(data[event_short])
+            event.dirty = True  # FIXME Hack!
+            events.append(event)
         return events
