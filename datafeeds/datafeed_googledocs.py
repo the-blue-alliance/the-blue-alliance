@@ -10,7 +10,7 @@ class DatafeedGoogleDocs(DatafeedBase):
     General Datafeed for anything that wants to fetch
     from Google Docs
     """
-    def fetch_url(self, url):
+    def _fetch_url(self, url):
         """
         Google Docs uses a bunch of 302's when providing the data, and expects
         that the cookies are passed along with them

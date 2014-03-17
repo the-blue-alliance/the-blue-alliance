@@ -8,7 +8,7 @@ class DatafeedBase(object):
     Provides structure for fetching and parsing pages from websites.
     Other Datafeeds inherit from here.
     """
-    def fetch_url(self, url):
+    def _fetch_url(self, url):
         result = urlfetch.fetch(url,
                                 headers={'Cache-Control': 'no-cache, max-age=10',
                                          'Pragma': 'no-cache',
@@ -21,7 +21,7 @@ class DatafeedBase(object):
             return list(), False
 
     def parse(self, url, parser):
-        content = self.fetch_url(url)
+        content = self._fetch_url(url)
         return parser.parse(content)
 
     def _shorten(self, string):
