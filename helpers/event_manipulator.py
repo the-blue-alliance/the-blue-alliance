@@ -17,6 +17,7 @@ class EventManipulator(ManipulatorBase):
             "end_date",
             "event_short",
             "event_type_enum",
+            "event_district_enum",
             "facebook_eid",
             "first_eid",
             "location",
