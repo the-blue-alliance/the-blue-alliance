@@ -3,11 +3,11 @@ import unittest2
 
 from google.appengine.ext import testbed
 
-from datafeeds.datafeed_googledocs_allianceselections import DatafeedGoogleDocsAllianceSelection
+from datafeeds.datafeed_googledocs import DatafeedGoogleDocs
 from models.event import Event, EventType
 
 
-class TestDatafeedGoogleDocsAllianceSelections(unittest2.TestCase):
+class TestDatafeedGoogleDocs(unittest2.TestCase):
     
     CASA = """{"1": {"declines": [], "picks": ["frc971", "frc1678", "frc766"]}, "2": {"declines": [], "picks": ["frc2085", "frc1671", "frc692"]}, "3": {"declines": [], "picks": ["frc2761", "frc100", "frc1662"]}, "4": {"declines": [], "picks": ["frc114", "frc2035", "frc115"]}, "5": {"declines": [], "picks": ["frc4159", "frc599", "frc3250"]}, "6": {"declines": [], "picks": ["frc1280", "frc4135", "frc701"]}, "7": {"declines": [], "picks": ["frc668", "frc1868", "frc2073"]}, "8": {"declines": [], "picks": ["frc1388", "frc2551", "frc2144"]}}"""
 
@@ -17,7 +17,7 @@ class TestDatafeedGoogleDocsAllianceSelections(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
 
-        self.datafeed = DatafeedGoogleDocsAllianceSelection()
+        self.datafeed = DatafeedGoogleDocs()
 
         # Create a stub 2014casa
         event = Event(
@@ -38,8 +38,8 @@ class TestDatafeedGoogleDocsAllianceSelections(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def test_run(self):
-        events = self.datafeed.run(2014)
+    def test_getAllianceSelections(self):
+        events = self.datafeed.getAllianceSelections(2014)
         casa = events[0]
         # Make sure we have the right event
         self.assertEqual(casa.event_short, 'casa')

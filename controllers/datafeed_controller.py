@@ -12,7 +12,7 @@ from google.appengine.ext.webapp import template
 from consts.event_type import EventType
 
 from datafeeds.datafeed_fms import DatafeedFms
-from datafeeds.datafeed_googledocs_allianceselections import DatafeedGoogleDocsAllianceSelection
+from datafeeds.datafeed_googledocs import DatafeedGoogleDocs
 from datafeeds.datafeed_tba import DatafeedTba
 from datafeeds.datafeed_usfirst import DatafeedUsfirst
 from datafeeds.datafeed_usfirst_legacy import DatafeedUsfirstLegacy
@@ -131,8 +131,8 @@ class GoogleDocsAllianceSelectionGet(webapp.RequestHandler):
     Handles fetching and upating of event's alliance selection results
     """
     def get(self, year):
-        df = DatafeedGoogleDocsAllianceSelection()
-        events = df.run(year)
+        df = DatafeedGoogleDocs()
+        events = df.getAllianceSelections(year)
         EventManipulator.createOrUpdate(events)
 
 
