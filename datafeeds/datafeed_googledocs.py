@@ -11,7 +11,7 @@ from models.event import Event
 class DatafeedGoogleDocs(DatafeedBase):
     GDOCS_CSV_EXPORT_URL = 'https://docs.google.com/spreadsheet/ccc?key={0}&output=csv'
 
-    YEAR_SPREADSHEET_KEY = {
+    YEAR_ALLIANCE_SELECTIONS_SPREADSHEET_KEY = {
         2014: '0ArVM96D1kMDzdE82Y2lCOW9yekJRc3EtUTZvZzZma3c'
     }
 
@@ -31,7 +31,7 @@ class DatafeedGoogleDocs(DatafeedBase):
             logging.warning('Unable to retrieve url: ' + url)
 
     def getAllianceSelections(self, year):
-        url = self.GDOCS_CSV_EXPORT_URL.format(self.YEAR_SPREADSHEET_KEY[year])
+        url = self.GDOCS_CSV_EXPORT_URL.format(self.YEAR_ALLIANCE_SELECTIONS_SPREADSHEET_KEY[year])
         data = self.parse(url, GoogleDocsAllianceSelectionsParser)
         events = []
         for event_short in data:
