@@ -16,3 +16,9 @@ class Account(ndb.Model):
 
     # These optional properties are editable by the user
     display_name = ndb.StringProperty()
+
+    # User preferences
+    # TODO: Add typeahead support for follow fields
+    follow_teams_json = ndb.TextProperty(indexed=False)
+    follow_events_json = ndb.TextProperty(indexed=False)
+    gameday_preferences = ndb.TextProperty(indexed=False)

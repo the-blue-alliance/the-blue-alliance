@@ -63,4 +63,9 @@ $(document).ready(function(){
       $(this).css('visibility', 'visible');
 	  }
 	});
+
+  $('#preferences input:radio').addClass('input_hidden');
+  $('#preferences label').click(function() {
+      $(this).addClass('selected').siblings().removeClass('selected');
+  });
 });

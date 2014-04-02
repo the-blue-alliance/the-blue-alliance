@@ -7,6 +7,7 @@ YUI_COMPRESSOR = 'utils/yuicompressor-2.4.7.jar'
 SCRIPTS_MAIN = ['static/jwplayer/jwplayer.js',
                 'static/xcharts/d3.v2.min.js',
                 'static/xcharts/xcharts.min.js',
+                'static/javascript/bootstrap_js/bootstrap-tagsinput.js',
                 'static/javascript/tba_js/tablesorter.js',
                 'static/javascript/tba_js/tba_charts.js',
                 'static/javascript/tba_js/tba_countdown.js',
