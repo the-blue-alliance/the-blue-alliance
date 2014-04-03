@@ -10,6 +10,17 @@ class TestUsfirstTeamDetailsParser(unittest2.TestCase):
 
         self.assertEqual(team, None)
 
+    def test_parse_frc842_2014(self):
+	with open('test_data/usfirst_html/usfirst_team_details_frc842_2014.html', 'r') as f:
+	   team, _ = UsfirstTeamDetailsParser.parse(f.read())
+	
+	self.assertEqual(team["address"],u"Phoenix, AZ, USA")
+	self.assertEqual(team["name"],"The Boeing Company/DLR Group/Fast Signs/Southwest Fasteners & Carl Hayden High School")
+	self.assertEqual(team["nickname"],"Falcon Robotics")
+	self.assertEqual(team["team_number"],842)
+	self.assertEqual(team["website"],"https://sites.google.com/site/falconroboticsfrcteam842/frc-robots/2014-dream")
+
+
     def test_parse_frc177_2013(self):
         with open('test_data/usfirst_html/usfirst_team_details_frc177_2013.html', 'r') as f:
             team, _ = UsfirstTeamDetailsParser.parse(f.read())
