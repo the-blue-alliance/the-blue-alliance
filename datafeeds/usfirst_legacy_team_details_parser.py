@@ -45,7 +45,7 @@ class UsfirstLegacyTeamDetailsParser(ParserBase):
                 if field == "Team Website":
                     try:
                         website_str = re.sub(r'^/|/$', '', unicode(tds[1].a["href"]))  # strip starting and trailing slashes
-                        if not website_str.startswith('http://'):
+                        if not (website_str.startswith('http://') or website_str.startswith('https://')):
                             website_str = 'http://%s' % website_str
                         team['website'] = db.Link(website_str)
                     except Exception, details:
