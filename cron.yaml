@@ -27,6 +27,10 @@ cron:
   schedule: every 1 hours
   timezone: America/Los_Angeles
 
+- description: Google Docs Alliance Selection fetching
+  url: /tasks/get/gdocs_alliance_selections/2014
+  schedule: every 1 hours
+
 - description: Match Insights Calculation
   url: /tasks/math/enqueue/insights/matches/2014
   schedule: every day 01:00

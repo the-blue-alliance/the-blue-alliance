@@ -12,6 +12,7 @@ from google.appengine.ext.webapp import template
 from consts.event_type import EventType
 
 from datafeeds.datafeed_fms import DatafeedFms
+from datafeeds.datafeed_googledocs import DatafeedGoogleDocs
 from datafeeds.datafeed_tba import DatafeedTba
 from datafeeds.datafeed_usfirst import DatafeedUsfirst
 from datafeeds.datafeed_usfirst_legacy import DatafeedUsfirstLegacy
@@ -123,6 +124,16 @@ class TbaVideosGet(webapp.RequestHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/tba_videos_get.html')
         self.response.out.write(template.render(path, template_values))
+
+
+class GoogleDocsAllianceSelectionGet(webapp.RequestHandler):
+    """
+    Handles fetching and upating of event's alliance selection results
+    """
+    def get(self, year):
+        df = DatafeedGoogleDocs()
+        events = df.getAllianceSelections(year)
+        EventManipulator.createOrUpdate(events)
 
 
 class UsfirstEventDetailsEnqueue(webapp.RequestHandler):

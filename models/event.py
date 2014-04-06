@@ -31,6 +31,10 @@ class Event(ndb.Model):
     webcast_json = ndb.TextProperty(indexed=False)  # list of dicts, valid keys include 'type' and 'channel'
     matchstats_json = ndb.TextProperty(indexed=False)  # for OPR, DPR, CCWM, etc.
     rankings_json = ndb.TextProperty(indexed=False)
+    alliance_selections_json = ndb.TextProperty(indexed=False)
+    # Formatted as
+    # {1: {'picks': [captain, pick1, pick2], 'declines':[###] } }
+    # TODO: Find a way to populate declindes
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
@@ -42,6 +46,7 @@ class Event(ndb.Model):
         self._rankings = None
         self._teams = None
         self._webcast = None
+        self._alliance_selections = None
         super(Event, self).__init__(*args, **kw)
 
     @ndb.tasklet
@@ -147,6 +152,18 @@ class Event(ndb.Model):
             except Exception, e:
                 self._rankings = None
         return self._rankings
+
+    @property
+    def alliance_selections(self):
+        """
+        Lazy load alliance selections order JSON
+        """
+        if self._alliance_selections is None:
+            try:
+                self._alliance_selections = json.loads(self.alliance_selections_json)
+            except Exception, e:
+                self._alliance_selections = None
+        return self._alliance_selections
 
     @property
     def webcast(self):
