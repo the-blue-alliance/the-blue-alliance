@@ -113,8 +113,8 @@ class TestTeamApiController(unittest2.TestCase):
         self.assertEqual(event["name"], self.event.name)
         self.assertEqual(event["short_name"], self.event.short_name)
         self.assertEqual(event["official"], self.event.official)
-        self.assertEqual(event["start_date"], self.event.start_date.isoformat())
-        self.assertEqual(event["end_date"], self.event.end_date.isoformat())
+        self.assertEqual(event["start_date"], self.event.start_date.date().isoformat())
+        self.assertEqual(event["end_date"], self.event.end_date.date().isoformat())
         self.assertEqual(event["event_type_string"], self.event.event_type_str)
         self.assertEqual(event["event_type"], self.event.event_type_enum)
 

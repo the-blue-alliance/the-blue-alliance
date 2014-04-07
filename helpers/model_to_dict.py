@@ -45,11 +45,11 @@ class ModelToDict(object):
         event_dict["facebook_eid"] = event.facebook_eid
 
         if event.start_date:
-            event_dict["start_date"] = event.start_date.isoformat()
+            event_dict["start_date"] = event.start_date.date().isoformat()
         else:
             event_dict["start_date"] = None
         if event.end_date:
-            event_dict["end_date"] = event.end_date.isoformat()
+            event_dict["end_date"] = event.end_date.date().isoformat()
         else:
             event_dict["end_date"] = None
 
