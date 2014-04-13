@@ -98,7 +98,7 @@ class MainInsightsHandler(CacheableHandler):
             "events": week_events,
         }
 
-        insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(2013, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
+        insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(2014, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
         for insight in insights:
             if insight:
                 template_values[insight.name] = insight
