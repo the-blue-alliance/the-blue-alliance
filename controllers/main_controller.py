@@ -90,7 +90,7 @@ class MainInsightsHandler(CacheableHandler):
         super(MainInsightsHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
         self._cache_key = "main_insights"
-        self._cache_version = 1
+        self._cache_version = 2
 
     def _render(self, *args, **kw):
         week_events = EventHelper.getWeekEvents()
