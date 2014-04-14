@@ -10,6 +10,16 @@
       </div>
     </div>
     {% endfor %}
+    {% for media in medias_by_slugname.imgur %}
+    <div class="item{% if forloop.first %} active{% endif %}">
+      <div class="cdphotothread-thumbnail">
+        <a href="http://imgur.com/{{media.foreign_key}}" target="_blank">
+          <span style="background-image:url('http://imgur.com/{{media.foreign_key}}.png')"></span>
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+
   </div>
 
   {% if medias_by_slugname.cdphotothread|length > 1 %}

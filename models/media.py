@@ -16,6 +16,7 @@ class Media(ndb.Model):
     SLUG_NAMES = {
         MediaType.YOUTUBE: 'youtube',
         MediaType.CD_PHOTO_THREAD: 'cdphotothread',
+		MediaType.IMGUR:'imgur',
     }
 
     REFERENCE_MAP = {
@@ -75,3 +76,7 @@ class Media(ndb.Model):
     @property
     def youtube_url(self):
         return 'http://www.youtube.com/embed/{}'.format(self.foreign_key)
+
+	@property
+	def imgur_url(self):
+		return 'http://imgur.com/{}'.format(self.foreign_key)
