@@ -1,6 +1,8 @@
 import json
 import math
 
+from collections import defaultdict
+
 from google.appengine.ext import ndb
 
 from consts.award_type import AwardType
@@ -105,12 +107,9 @@ class InsightsHelper(object):
         by number of wins and by team number
         """
         wins_dict = sorted(wins_dict.items(), key=lambda pair: int(pair[0][3:]))   # Sort by team number
-        temp = {}
+        temp = defaultdict(list)
         for team, numWins in wins_dict:
-            if numWins in temp:
-                temp[numWins] += [team]
-            else:
-                temp[numWins] = [team]
+            temp[numWins].append(team)
         return sorted(temp.items(), key=lambda pair: int(pair[0]), reverse=True)  # Sort by win number
 
     @classmethod
@@ -227,8 +226,8 @@ class InsightsHelper(object):
         The data for each Insight is a dict:
         Key: Middle score of a bucketed range of scores, Value: % occurrence
         """
-        score_distribution = {}
-        elim_score_distribution = {}
+        score_distribution = defaultdict(int)
+        elim_score_distribution = defaultdict(int)
         overall_highscore = 0
         for _, week_events in week_event_matches:
             for _, matches in week_events:
@@ -238,24 +237,12 @@ class InsightsHelper(object):
 
                     overall_highscore = max(overall_highscore, redScore, blueScore)
 
-                    if redScore in score_distribution:
-                        score_distribution[redScore] += 1
-                    else:
-                        score_distribution[redScore] = 1
-                    if blueScore in score_distribution:
-                        score_distribution[blueScore] += 1
-                    else:
-                        score_distribution[blueScore] = 1
+                    score_distribution[redScore] += 1
+                    score_distribution[blueScore] += 1
 
                     if match.comp_level in Match.ELIM_LEVELS:
-                        if redScore in elim_score_distribution:
-                            elim_score_distribution[redScore] += 1
-                        else:
-                            elim_score_distribution[redScore] = 1
-                        if blueScore in elim_score_distribution:
-                            elim_score_distribution[blueScore] += 1
-                        else:
-                            elim_score_distribution[blueScore] = 1
+                        elim_score_distribution[redScore] += 1
+                        elim_score_distribution[blueScore] += 1
 
         insights = []
         if score_distribution != {}:
@@ -310,16 +297,13 @@ class InsightsHelper(object):
         Returns an Insight where the data is a dict:
         Key: number of blue banners, Value: list of teams with that number of blue banners
         """
-        blue_banner_winners = {}
+        blue_banner_winners = defaultdict(int)
         for award_future in award_futures:
             award = award_future.get_result()
             if award.award_type_enum in AwardType.BLUE_BANNER_AWARDS:
                 for team_key in award.team_list:
                     team_key_name = team_key.id()
-                    if team_key_name in blue_banner_winners:
-                        blue_banner_winners[team_key_name] += 1
-                    else:
-                        blue_banner_winners[team_key_name] = 1
+                    blue_banner_winners[team_key_name] += 1
         blue_banner_winners = self._sortTeamWinsDict(blue_banner_winners)
 
         insight = None
@@ -384,7 +368,7 @@ class InsightsHelper(object):
         Key: number of wins, Value: list of teams with that number of wins
         """
         rca_winners = []
-        regional_winners = {}
+        regional_winners = defaultdict(int)
         for award_future in award_futures:
             award = award_future.get_result()
             if award.event_type_enum in EventType.CMP_EVENT_TYPES:
@@ -395,10 +379,7 @@ class InsightsHelper(object):
                     # Only count Chairman's at regionals and district championships
                     rca_winners.append(team_key_name)
                 elif award.award_type_enum == AwardType.WINNER:
-                    if team_key_name in regional_winners:
-                        regional_winners[team_key_name] += 1
-                    else:
-                        regional_winners[team_key_name] = 1
+                    regional_winners[team_key_name] += 1
 
         rca_winners = self._sortTeamList(rca_winners)
         regional_winners = self._sortTeamWinsDict(regional_winners)
@@ -436,42 +417,30 @@ class InsightsHelper(object):
         insights = []
 
         year_regional_winners = Insight.query(Insight.name == Insight.INSIGHT_NAMES[Insight.REGIONAL_DISTRICT_WINNERS], Insight.year != 0).fetch(1000)
-        regional_winners = {}
+        regional_winners = defaultdict(int)
         for insight in year_regional_winners:
             for number, team_list in insight.data:
                 for team in team_list:
-                    if team in regional_winners:
-                        regional_winners[team] += number
-                    else:
-                        regional_winners[team] = number
+                    regional_winners[team] += number
 
         year_blue_banners = Insight.query(Insight.name == Insight.INSIGHT_NAMES[Insight.BLUE_BANNERS], Insight.year != 0).fetch(1000)
-        blue_banners = {}
+        blue_banners = defaultdict(int)
         for insight in year_blue_banners:
             for number, team_list in insight.data:
                 for team in team_list:
-                    if team in blue_banners:
-                        blue_banners[team] += number
-                    else:
-                        blue_banners[team] = number
+                    blue_banners[team] += number
 
         year_rca_winners = Insight.query(Insight.name == Insight.INSIGHT_NAMES[Insight.RCA_WINNERS], Insight.year != 0).fetch(1000)
-        rca_winners = {}
+        rca_winners = defaultdict(int)
         for insight in year_rca_winners:
             for team in insight.data:
-                if team in rca_winners:
-                    rca_winners[team] += 1
-                else:
-                    rca_winners[team] = 1
+                rca_winners[team] += 1
 
         year_world_champions = Insight.query(Insight.name == Insight.INSIGHT_NAMES[Insight.WORLD_CHAMPIONS], Insight.year != 0).fetch(1000)
-        world_champions = {}
+        world_champions = defaultdict(int)
         for insight in year_world_champions:
             for team in insight.data:
-                if team in world_champions:
-                    world_champions[team] += 1
-                else:
-                    world_champions[team] = 1
+                world_champions[team] += 1
 
         # Sorting
         regional_winners = self._sortTeamWinsDict(regional_winners)
