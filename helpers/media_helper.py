@@ -142,7 +142,7 @@ class MediaParser(object):
     @classmethod
     def _parse_imgur_foreign_key(cls, url):
         imgur_id = None
-        regex1 = re.match(r".*imgur.com\/(.*)", url)
+        regex1 = re.match(r".*imgur.com\/(\w+)\/?\Z", url)
         if regex1 is not None:
             imgur_id = regex1.group(1)
 
