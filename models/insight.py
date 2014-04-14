@@ -51,8 +51,8 @@ class Insight(ndb.Model):
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
     def __init__(self, *args, **kw):
-      self._data = None
-      super(Insight, self).__init__(*args, **kw)
+        self._data = None
+        super(Insight, self).__init__(*args, **kw)
 
     @property
     def data(self):
@@ -71,7 +71,7 @@ class Insight(ndb.Model):
         return self.renderKeyName(self.year, self.name)
 
     @classmethod
-    def renderKeyName(self, year, name):
+    def renderKeyName(cls, year, name):
         if year == 0:
             return 'insights' + '_' + str(name)
         else:
