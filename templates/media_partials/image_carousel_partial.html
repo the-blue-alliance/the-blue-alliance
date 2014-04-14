@@ -22,7 +22,7 @@
 
   </div>
 
-  {% if medias_by_slugname.cdphotothread|length > 1 %}
+  {% if medias_by_slugname.cdphotothread|length|add:medias_by_slugname.imgur|length > 1 %}
   <!-- Controls -->
   <a class="left carousel-control" href="#team-carousel" data-slide="prev">
     <span class="glyphicon glyphicon-chevron-left"></span>
