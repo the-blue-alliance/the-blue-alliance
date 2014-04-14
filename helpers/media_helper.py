@@ -19,7 +19,14 @@ class MediaHelper(object):
             else:
                 medias_by_slugname[slugname] = [media]
         return medias_by_slugname
-
+    
+    @classmethod
+    def get_images(cls,medias):
+        images = []
+        for media in medias:
+            if(media.media_type_enum in MediaType.image_types):
+                images.append(media)
+        return images
 
 class MediaParser(object):
     CD_PHOTO_THREAD_URL_PATTERNS = ['chiefdelphi.com/media/photos/']

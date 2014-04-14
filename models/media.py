@@ -77,6 +77,29 @@ class Media(ndb.Model):
     def youtube_url(self):
         return 'http://www.youtube.com/embed/{}'.format(self.foreign_key)
 
-	@property
-	def imgur_url(self):
-		return 'http://imgur.com/{}'.format(self.foreign_key)
+    @property
+    def imgur_url(self):
+        return 'http://imgur.com/{}'.format(self.foreign_key)
+
+    @property
+    def imgur_direct_url(self):
+        return 'http://i.imgur.com/{}.jpg'.format(self.foreign_key)
+
+    @property
+    def view_image_url(self):
+        if(self.media_type_enum == MediaType.CD_PHOTO_THREAD):
+            return self.cdphotothread_thread_url
+        elif(self.media_type_enum == MediaType.IMGUR):
+            return self.imgur_url
+        else:
+            return ""
+
+    @property 
+    def view_image_direct(self):
+        if(self.media_type_enum == MediaType.CD_PHOTO_THREAD):
+            return self.cdphotothread_image_url_med
+        elif(self.media_type_enum == MediaType.IMGUR):
+            return self.imgur_direct_url
+        else:
+            return ""
+ 

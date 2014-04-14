@@ -1,5 +1,6 @@
 import datetime
 import os
+import logging
 
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
@@ -74,7 +75,9 @@ class TeamRenderer(object):
             year_wlt = None
 
         medias_by_slugname = MediaHelper.group_by_slugname([media_future.get_result() for media_future in media_futures])
-
+        image_medias = MediaHelper.get_images([media_future.get_result() for media_future in media_futures])
+        for media in image_medias: 
+            logging.warning(media.foreign_key)
         template_values = {"is_canonical": is_canonical,
                            "team": team,
                            "participation": participation,
@@ -83,7 +86,8 @@ class TeamRenderer(object):
                            "year_wlt": year_wlt,
                            "current_event": current_event,
                            "matches_upcoming": matches_upcoming,
-                           "medias_by_slugname": medias_by_slugname}
+                           "medias_by_slugname": medias_by_slugname,
+                           "image_medias":image_medias}
 
         if short_cache:
             handler._cache_expiration = handler.SHORT_CACHE_EXPIRATION

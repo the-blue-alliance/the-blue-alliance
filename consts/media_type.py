@@ -9,3 +9,8 @@ class MediaType(object):
         CD_PHOTO_THREAD: 'Chief Delphi Photo Thread',
         IMGUR: 'Imgur Image',
     }
+
+    image_types = [
+        CD_PHOTO_THREAD,
+        IMGUR
+    ]
