@@ -104,7 +104,7 @@ class InsightsHelper(object):
         Sorts dicts with key: number of wins, value: list of teams
         by number of wins and by team number
         """
-        wins_dict = sorted(wins_dict.items(), key=lambda pair: int(pair[0][3:]))   # Sort by team number
+        wins_dict = sorted(wins_dict.items(), key=lambda pair: int(pair[0][3:]))  # Sort by team number
         temp = {}
         for team, numWins in wins_dict:
             if numWins in temp:
@@ -118,7 +118,7 @@ class InsightsHelper(object):
         """
         Sorts list of teams
         """
-        return sorted(team_list, key=lambda team: int(team[3:]))   # Sort by team number
+        return sorted(team_list, key=lambda team: int(team[3:]))  # Sort by team number
 
     @classmethod
     def _calculateHighscoreMatchesByWeek(self, week_event_matches, year):
@@ -201,17 +201,13 @@ class InsightsHelper(object):
                         elim_week_match_sum += redScore + blueScore
                         elim_num_matches_by_week += 1
 
-            if num_matches_by_week == 0:
-                week_average = 0
-            else:
+            if num_matches_by_week != 0:
                 week_average = float(week_match_sum) / num_matches_by_week / 2
-            match_averages_by_week.append((week, week_average))
+                match_averages_by_week.append((week, week_average))
 
-            if elim_num_matches_by_week == 0:
-                elim_week_average = 0
-            else:
+            if elim_num_matches_by_week != 0:
                 elim_week_average = float(elim_week_match_sum) / elim_num_matches_by_week / 2
-            elim_match_averages_by_week.append((week, elim_week_average))
+                elim_match_averages_by_week.append((week, elim_week_average))
 
         insights = []
         if match_averages_by_week != []:
