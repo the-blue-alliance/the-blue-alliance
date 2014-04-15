@@ -85,7 +85,7 @@ class TeamRenderer(object):
                            "current_event": current_event,
                            "matches_upcoming": matches_upcoming,
                            "medias_by_slugname": medias_by_slugname,
-                           "image_medias":image_medias}
+                           "image_medias": image_medias}
 
         if short_cache:
             handler._cache_expiration = handler.SHORT_CACHE_EXPIRATION

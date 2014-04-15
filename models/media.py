@@ -16,7 +16,7 @@ class Media(ndb.Model):
     SLUG_NAMES = {
         MediaType.YOUTUBE: 'youtube',
         MediaType.CD_PHOTO_THREAD: 'cdphotothread',
-        MediaType.IMGUR:'imgur',
+        MediaType.IMGUR: 'imgur',
     }
 
     REFERENCE_MAP = {
