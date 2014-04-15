@@ -87,18 +87,18 @@ class Media(ndb.Model):
 
     @property
     def view_image_url(self):
-        if(self.media_type_enum == MediaType.CD_PHOTO_THREAD):
+        if self.media_type_enum == MediaType.CD_PHOTO_THREAD:
             return self.cdphotothread_thread_url
-        elif(self.media_type_enum == MediaType.IMGUR):
+        elif self.media_type_enum == MediaType.IMGUR:
             return self.imgur_url
         else:
             return ""
 
     @property 
     def view_image_direct(self):
-        if(self.media_type_enum == MediaType.CD_PHOTO_THREAD):
+        if self.media_type_enum == MediaType.CD_PHOTO_THREAD:
             return self.cdphotothread_image_url_med
-        elif(self.media_type_enum == MediaType.IMGUR):
+        elif self.media_type_enum == MediaType.IMGUR:
             return self.imgur_direct_url
         else:
             return ""

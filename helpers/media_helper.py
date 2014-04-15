@@ -21,10 +21,10 @@ class MediaHelper(object):
         return medias_by_slugname
     
     @classmethod
-    def get_images(cls,medias):
+    def get_images(cls, medias):
         images = []
         for media in medias:
-            if(media.media_type_enum in MediaType.image_types):
+            if media.media_type_enum in MediaType.image_types:
                 images.append(media)
         return images
 
