@@ -10,6 +10,7 @@ from google.appengine.ext.webapp import template
 import tba_config
 
 from base_controller import CacheableHandler
+from consts.event_type import EventType
 from helpers.event_helper import EventHelper
 
 from models.event import Event
@@ -66,6 +67,30 @@ class MainBuildseasonHandler(CacheableHandler):
         return template.render(path, {'endbuild_datetime_est': endbuild_datetime_est,
                                       'endbuild_datetime_utc': endbuild_datetime_utc
                                       })
+
+
+class MainChampsHandler(CacheableHandler):
+    def __init__(self, *args, **kw):
+        super(MainChampsHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24
+        self._cache_key = "main_champs"
+        self._cache_version = 1
+
+    def _render(self, *args, **kw):
+        year = datetime.datetime.now().year
+        event_keys = Event.query(Event.year == year, Event.event_type_enum.IN(EventType.CMP_EVENT_TYPES)).fetch(100, keys_only=True)
+        events = [event_key.get() for event_key in event_keys]
+        template_values = {
+            "events": events,
+        }
+
+        insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(year, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
+        for insight in insights:
+            if insight:
+                template_values[insight.name] = insight
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/index_champs.html')
+        return template.render(path, template_values)
 
 
 class MainCompetitionseasonHandler(CacheableHandler):

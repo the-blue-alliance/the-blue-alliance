@@ -9,7 +9,7 @@ from controllers.event_controller import EventList, EventDetail, EventRss
 from controllers.gameday2_controller import Gameday2Controller
 from controllers.insights_controller import InsightsOverview, InsightsDetail
 from controllers.main_controller import ContactHandler, HashtagsHandler, \
-      MainKickoffHandler, MainBuildseasonHandler, MainCompetitionseasonHandler, \
+      MainKickoffHandler, MainBuildseasonHandler, MainChampsHandler, MainCompetitionseasonHandler, \
       MainInsightsHandler, MainOffseasonHandler, OprHandler, SearchHandler, \
       AboutHandler, ThanksHandler, PageNotFoundHandler, \
       GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler
@@ -24,6 +24,7 @@ template.register_template_library('common.my_filters')
 
 landing_handler = {tba_config.KICKOFF: MainKickoffHandler,
                    tba_config.BUILDSEASON: MainBuildseasonHandler,
+                   tba_config.CHAMPS: MainChampsHandler,
                    tba_config.COMPETITIONSEASON: MainCompetitionseasonHandler,
                    tba_config.OFFSEASON: MainOffseasonHandler,
                    tba_config.INSIGHTS: MainInsightsHandler,
