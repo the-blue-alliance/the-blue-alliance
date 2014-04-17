@@ -18,53 +18,17 @@ from models.team import Team
 
 
 class DatafeedUsfirstLegacy(DatafeedUsfirst):
-    SESSION_KEY_GENERATING_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=searchresults&programs=FRC&reports=events&omit_searchform=1&season_FRC=%s"
-
-    EVENT_DETAILS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=event_details&eid=%s&-session=myarea:%s"
-    EVENT_TEAMS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=event_teamlist&results_size=250&eid=%s&-session=myarea:%s"
-    TEAM_DETAILS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=team_details&tpid=%s&-session=myarea:%s"
+    EVENT_DETAILS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=event_details&eid=%s"
+    EVENT_TEAMS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=event_teamlist&results_size=250&eid=%s"
+    TEAM_DETAILS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?page=team_details&tpid=%s"
 
     def __init__(self, *args, **kw):
-        self._session_key = dict()
         super(DatafeedUsfirstLegacy, self).__init__(*args, **kw)
-
-    def getSessionKey(self, year):
-        """
-        Grab a page from FIRST so we can get a session key out of URLs on it. This session
-        key is needed to construct working event detail information URLs.
-        """
-
-        if self._session_key.get(year, False):
-            return self._session_key.get(year)
-
-        memcache_key = "usfirst_session_key_%s" % year
-        session_key = memcache.get(memcache_key)
-        if session_key is not None:
-            self._session_key[year] = session_key
-            return self._session_key.get(year)
-
-        sessionRe = re.compile(r'myarea:([A-Za-z0-9]*)')
-
-        result = urlfetch.fetch(self.SESSION_KEY_GENERATING_PATTERN % year, deadline=60)
-        if result.status_code == 200:
-            regex_results = re.search(sessionRe, result.content)
-            if regex_results is not None:
-                session_key = regex_results.group(1)  # first parenthetical group
-                if session_key is not None:
-                    if tba_config.CONFIG["memcache"]:
-                        memcache.set(memcache_key, session_key, 60 * 5)
-                    self._session_key[year] = session_key
-                    return self._session_key[year]
-            logging.error('Unable to get USFIRST session key for %s.' % year)
-            return None
-        else:
-            logging.error('HTTP code %s. Unable to retreive url: %s' %
-                (result.status_code, self.SESSION_KEY_GENERATING_URL))
 
     def getEventDetails(self, year, first_eid):
         if type(year) is not int:
             raise TypeError("year must be an integer")
-        url = self.EVENT_DETAILS_URL_PATTERN % (first_eid, self.getSessionKey(year))
+        url = self.EVENT_DETAILS_URL_PATTERN % (first_eid)
         event, _ = self.parse(url, UsfirstLegacyEventDetailsParser)
         if event is None:
             return None
@@ -92,7 +56,7 @@ class DatafeedUsfirstLegacy(DatafeedUsfirst):
         """
         if type(year) is not int:
             raise TypeError("year must be an integer")
-        url = self.EVENT_TEAMS_URL_PATTERN % (first_eid, self.getSessionKey(year))
+        url = self.EVENT_TEAMS_URL_PATTERN % (first_eid)
         teams, _ = self.parse(url, UsfirstLegacyEventTeamsParser)
         if teams is None:
             return None
@@ -108,8 +72,7 @@ class DatafeedUsfirstLegacy(DatafeedUsfirst):
     def getTeamDetails(self, team):
         if hasattr(team, 'first_tpid'):
             if team.first_tpid:
-                session_key = self.getSessionKey(team.first_tpid_year)
-                url = self.TEAM_DETAILS_URL_PATTERN % (team.first_tpid, session_key)
+                url = self.TEAM_DETAILS_URL_PATTERN % (team.first_tpid)
                 team_dict, _ = self.parse(url, UsfirstLegacyTeamDetailsParser)
 
                 if team_dict is not None and "team_number" in team_dict:

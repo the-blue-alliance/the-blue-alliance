@@ -19,8 +19,8 @@ class TestDatafeedUsfirstLegacyTeams(unittest2.TestCase):
         self.team177 = Team(
             id="frc177",
             team_number=177,
-            first_tpid=61771,
-            first_tpid_year=2012
+            first_tpid=211521,
+            first_tpid_year=2014,
         )
         self.team177.put()
 
@@ -30,7 +30,7 @@ class TestDatafeedUsfirstLegacyTeams(unittest2.TestCase):
     def test_getTeamDetails(self):
         team = self.datafeed.getTeamDetails(self.team177)
 
-        self.assertEqual(team.name, "UTC Power/Ensign Bickford Aerospace & Defense & South Windsor High School")
+        self.assertEqual(team.name, "United Technologies / ClearEdge Power / Gain Talent / EBA&amp;D & South Windsor High School")
         self.assertEqual(team.address, u"South Windsor, CT\xa0 USA")
         self.assertEqual(team.nickname, "Bobcat Robotics")
         self.assertEqual(team.website, "http://www.bobcatrobotics.org")
