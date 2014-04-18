@@ -130,6 +130,7 @@ class AdminMatchAdd(LoggedInHandler):
             alliances_json=match.get("alliances_json", None)
             )
             for match in matches]
+        MatchManipulator.createOrUpdate(matches)
 
         try:
             FirebasePusher.updated_event(event.key_name)
