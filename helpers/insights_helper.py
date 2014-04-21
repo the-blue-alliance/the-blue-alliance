@@ -229,11 +229,12 @@ class InsightsHelper(object):
         for _, week_events in week_event_matches:
             for _, matches in week_events:
                 for match in matches:
+                    if not match.has_been_played: continue
                     redScore = int(match.alliances['red']['score'])
                     blueScore = int(match.alliances['blue']['score'])
 
                     overall_highscore = max(overall_highscore, redScore, blueScore)
-
+                    
                     if redScore in score_distribution:
                         score_distribution[redScore] += 1
                     else:
@@ -259,7 +260,7 @@ class InsightsHelper(object):
             totalCount = float(sum(score_distribution.values()))
             score_distribution_normalized = {}
             for score, amount in score_distribution.items():
-                roundedScore = score - int((score % binAmount) + binAmount / 2)
+                roundedScore = score - int(score % binAmount) + binAmount / 2 #Round off and then center in the bin
                 contribution = float(amount) * 100 / totalCount
                 if roundedScore in score_distribution_normalized:
                     score_distribution_normalized[roundedScore] += contribution
@@ -272,7 +273,7 @@ class InsightsHelper(object):
             totalCount = float(sum(elim_score_distribution.values()))
             elim_score_distribution_normalized = {}
             for score, amount in elim_score_distribution.items():
-                roundedScore = score - int((score % binAmount) + binAmount / 2)
+                roundedScore = score - int(score % binAmount) + binAmount / 2
                 contribution = float(amount) * 100 / totalCount
                 if roundedScore in elim_score_distribution_normalized:
                     elim_score_distribution_normalized[roundedScore] += contribution
