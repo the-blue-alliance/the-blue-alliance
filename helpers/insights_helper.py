@@ -229,12 +229,11 @@ class InsightsHelper(object):
         for _, week_events in week_event_matches:
             for _, matches in week_events:
                 for match in matches:
+                    if match.has_been_played(): continue
                     redScore = int(match.alliances['red']['score'])
                     blueScore = int(match.alliances['blue']['score'])
 
                     overall_highscore = max(overall_highscore, redScore, blueScore)
-                    
-                    if -1 in [redScore, blueScore]: continue #Do not include the -1 scores for matches which haven't been completed yet
                     
                     if redScore in score_distribution:
                         score_distribution[redScore] += 1
