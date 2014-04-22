@@ -52,8 +52,7 @@ Potentially useful: http://spriteme.org/
 
 LESS
 ----
-The CSS files are compiled from LESS to ease in development. Use a program such as [http://wearekiss.com/simpless](http://wearekiss.com/simpless "Simpless") that automatically compiles
-the LESS files into CSS. Just drag static/css into SimpLESS, and whenever you edit and save a LESS file, the CSS will be compiled! Make sure "minify" is enabled in order to minimize the final CSS file size.
+The CSS files are compiled from LESS to ease in development. Make sure you have [Node Package Manager](https://www.npmjs.org/) installed, and install lessc by running `npm install less`. Now, you can run `paver less` to compile the LESS into CSS.
 
 CSS/Javascript Combination and Compression
 ------------------------------------------
@@ -61,6 +60,7 @@ Once the LESS files are compressed into CSS, we combine the resulting file with 
 This means that whenever changes are made to CSS or Javascript, you must run of the following:
 * `paver less`
 * `paver javascript`
+* `paver make` (builds both LESS and JS)
 
 Testing
 -------
