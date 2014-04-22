@@ -11,6 +11,7 @@ from helpers.model_to_dict import ModelToDict
 
 from models.event import Event
 
+
 class ApiEventController(ApiBaseController):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
@@ -43,6 +44,7 @@ class ApiEventController(ApiBaseController):
 
         return json.dumps(event_dict, ensure_ascii=True)
 
+
 class ApiEventTeamsController(ApiEventController):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
@@ -62,6 +64,7 @@ class ApiEventTeamsController(ApiEventController):
 
         return json.dumps(team_dicts, ensure_ascii=True)
 
+
 class ApiEventMatchesController(ApiEventController):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
@@ -80,6 +83,23 @@ class ApiEventMatchesController(ApiEventController):
         match_dicts = [ModelToDict.matchConverter(match) for match in matches]
 
         return json.dumps(match_dicts, ensure_ascii=True)
+
+
+class ApiEventStatsController(ApiEventController):
+    LONG_CACHE_EXPIRATION = 60 * 60 * 24
+    SHORT_CACHE_EXPIRATION = 60 * 5
+
+    def __init__(self, *args, **kw):
+        super(ApiEventStatsController, self).__init__(*args, **kw)
+        self._cache_key = "apiv2_event_stats_controller_{}".format(self.event_key)
+        self._cache_expiration = self.SHORT_CACHE_EXPIRATION
+        self._cache_version = 2
+
+    def _render(self, event_key):
+        self._set_cache_header_length(61)
+        self._set_event(event_key)
+
+        return json.dumps(Event.get_by_id(event_key).matchstats)
 
 
 class ApiEventListController(ApiBaseController):

@@ -13,6 +13,7 @@ from consts.event_type import EventType
 from controllers.api.api_event_controller import ApiEventController
 from controllers.api.api_event_controller import ApiEventTeamsController
 from controllers.api.api_event_controller import ApiEventMatchesController
+from controllers.api.api_event_controller import ApiEventStatsController
 from controllers.api.api_event_controller import ApiEventListController
 
 from models.event import Event
@@ -190,6 +191,50 @@ class TestEventMatchApiController(unittest2.TestCase):
 
         match_json = json.loads(response.body)
         self.assertMatchJson(match_json)
+
+
+class TestEventStatsApiController(unittest2.TestCase):
+
+    def setUp(self):
+        app = webapp2.WSGIApplication([webapp2.Route(r'/<event_key:>', ApiEventStatsController, methods=['GET'])], debug=True)
+        self.testapp = webtest.TestApp(app)
+
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_urlfetch_stub()
+        self.testbed.init_memcache_stub()
+        self.testbed.init_taskqueue_stub()
+
+        self.matchstats = {
+            "dprs": {"971": 10.52178695299036, "114": 23.7313645955704, "115": 29.559784481082044},
+            "oprs": {"971": 91.42946669932006, "114": 59.27751047482864, "115": 13.285278757495144},
+            "ccwms": {"971": 80.90767974632955, "114": 35.54614587925829, "115": -16.27450572358693},
+        }
+
+        self.event = Event(
+                id="2010sc",
+                name="Palmetto Regional",
+                event_type_enum=EventType.REGIONAL,
+                short_name="Palmetto",
+                event_short="sc",
+                year=2010,
+                end_date=datetime(2010, 03, 27),
+                official=True,
+                location='Clemson, SC',
+                start_date=datetime(2010, 03, 24),
+                matchstats_json=json.dumps(self.matchstats)
+        )
+        self.event.put()
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def testEventStatsApi(self):
+        response = self.testapp.get('/2010sc', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
+
+        matchstats = json.loads(response.body)
+        self.assertEqual(self.matchstats, matchstats)
 
 
 class TestEventListApiController(unittest2.TestCase):
