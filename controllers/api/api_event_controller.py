@@ -1,6 +1,8 @@
 import json
 import logging
 import webapp2
+import math
+import numpy
 
 from datetime import datetime
 from google.appengine.ext import ndb
@@ -81,6 +83,43 @@ class ApiEventMatchesController(ApiEventController):
 
         return json.dumps(match_dicts, ensure_ascii=True)
 
+
+class ApiEventOprsController(ApiEventController):
+    LONG_CACHE_EXPIRATION = 60 * 60 * 24
+    SHORT_CACHE_EXPIRATION = 60 * 5
+
+    def __init__(self, *args, **kw):
+        super(ApiEventOprsController, self).__init__(*args, **kw)
+        self._cache_key = "apiv2_event_matches_controller_{}".format(self.event_key)
+        self._cache_expiration = self.SHORT_CACHE_EXPIRATION
+        self._cache_version = 2
+
+    def _render(self, event_key):
+        self._set_cache_header_length(61)
+        self._set_event(event_key)
+
+        oprs = [i for i in self.event.matchstats['oprs'].items()] if (self.event.matchstats is not None and 'oprs' in self.event.matchstats) else []
+        sum_opr = 0
+        num_oprs = 0
+        just_oprs = []
+        for opr in oprs:
+            d = opr[1]
+            sum_opr += d
+            num_oprs += 1
+            just_oprs.append(d)
+        mean = sum_opr / num_oprs
+        just_oprs = sorted(just_oprs)
+        median = 0
+        if len(just_oprs) % 2 == 0:
+            median = (just_oprs[(len(just_oprs) / 2) - 1] + just_oprs[(len(just_oprs) / 2)]) / 2
+        else:
+            median = just_oprs[(len(just_oprs) / 2)]
+        oprs = dict(sorted(oprs, key=lambda t: t[1], reverse=True))
+        stdev = numpy.std(just_oprs)
+        stats = {"median" : median, "stdev" : stdev, "mean" : mean}
+        ret = {"stats" : stats, "oprs" : oprs}
+
+        return json.dumps(ret, ensure_ascii=True)
 
 class ApiEventListController(ApiBaseController):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
