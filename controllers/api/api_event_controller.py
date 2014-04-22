@@ -126,7 +126,9 @@ class ApiEventListController(ApiBaseController):
             self._errors = json.dumps({"404": "No events found for %s" % self.year})
             self.abort(404)
 
-        event_keys = Event.query(Event.year == self.year).fetch(1000, keys_only=True)
-        keys = [key.string_id() for key in event_keys]
+        keys = Event.query(Event.year == self.year).fetch(1000, keys_only=True)
+        events = ndb.get_multi(keys)
 
-        return json.dumps(keys, ensure_ascii=True)
+        event_list = [ModelToDict.eventConverter(event) for event in events]
+
+        return json.dumps(event_list, ensure_ascii=True)

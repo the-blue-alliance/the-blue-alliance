@@ -268,7 +268,15 @@ class TestEventListApiController(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
+    def assertEventJson(self, event):
+        self.assertEqual(event["key"], self.event.key_name)
+        self.assertEqual(event["name"], self.event.name)
+        self.assertEqual(event["short_name"], self.event.short_name)
+        self.assertEqual(event["official"], self.event.official)
+        self.assertEqual(event["start_date"], self.event.start_date.date().isoformat())
+        self.assertEqual(event["end_date"], self.event.end_date.date().isoformat())
+
     def testEventListApi(self):
         response = self.testapp.get('/2010', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
         event_dict = json.loads(response.body)
-        self.assertEqual(event_dict[0], self.event.key_name)
+        self.assertEventJson(event_dict[0])
