@@ -22,7 +22,9 @@ Setup
 	* Specifically use the [Python SDK](http://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python)
 	* Run installer and allow it make symbolic links (you will be asked to enter your root password)
 2. Get the latest version of The Blue Alliance
-	* Run `git clone git://github.com/gregmarra/the-blue-alliance.git`
+	* First make sure you have forked TBA by clicking on "Fork" in the top right of the page
+	* Run `git clone git://github.com/username/the-blue-alliance.git` where username is your GitHub username
+	* For detailed instructions see [the GitHub guide on contributing](https://guides.github.com/activities/contributing-to-open-source/index.html#contributing)
 3. Import the project into Google App Engine Launcher
 	* By default TBA uses port **8088**, make sure your local setup is consistent with this
 4. Run the app in App Engine
@@ -62,7 +64,7 @@ This means that whenever changes are made to CSS or Javascript, you must run of 
 
 Testing
 -------
-[![Build Status](https://travis-ci.org/gregmarra/the-blue-alliance.png?branch=master)](https://travis-ci.org/gregmarra/the-blue-alliance)
+[![Build Status](https://travis-ci.org/the-blue-alliance/the-blue-alliance.png?branch=master)](https://travis-ci.org/the-blue-alliance/the-blue-alliance)
 
 Testing is implemented using a combination of [unittest2](http://pypi.python.org/pypi/unittest2 "Uniter Test 2") and the Google App Engine testbed framework. Test coverage is a work in progress, and focuses on maintaining datafeed integrity in the face of optimizations and changes to FIRST's data formats.
 

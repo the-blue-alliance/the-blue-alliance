@@ -106,7 +106,7 @@ class InsightsHelper(object):
         Sorts dicts with key: number of wins, value: list of teams
         by number of wins and by team number
         """
-        wins_dict = sorted(wins_dict.items(), key=lambda pair: int(pair[0][3:]))   # Sort by team number
+        wins_dict = sorted(wins_dict.items(), key=lambda pair: int(pair[0][3:]))  # Sort by team number
         temp = defaultdict(list)
         for team, numWins in wins_dict:
             temp[numWins].append(team)
@@ -117,7 +117,7 @@ class InsightsHelper(object):
         """
         Sorts list of teams
         """
-        return sorted(team_list, key=lambda team: int(team[3:]))   # Sort by team number
+        return sorted(team_list, key=lambda team: int(team[3:]))  # Sort by team number
 
     @classmethod
     def _calculateHighscoreMatchesByWeek(self, week_event_matches, year):
@@ -200,17 +200,13 @@ class InsightsHelper(object):
                         elim_week_match_sum += redScore + blueScore
                         elim_num_matches_by_week += 1
 
-            if num_matches_by_week == 0:
-                week_average = 0
-            else:
+            if num_matches_by_week != 0:
                 week_average = float(week_match_sum) / num_matches_by_week / 2
-            match_averages_by_week.append((week, week_average))
+                match_averages_by_week.append((week, week_average))
 
-            if elim_num_matches_by_week == 0:
-                elim_week_average = 0
-            else:
+            if elim_num_matches_by_week != 0:
                 elim_week_average = float(elim_week_match_sum) / elim_num_matches_by_week / 2
-            elim_match_averages_by_week.append((week, elim_week_average))
+                elim_match_averages_by_week.append((week, elim_week_average))
 
         insights = []
         if match_averages_by_week != []:
@@ -232,6 +228,7 @@ class InsightsHelper(object):
         for _, week_events in week_event_matches:
             for _, matches in week_events:
                 for match in matches:
+                    if not match.has_been_played: continue
                     redScore = int(match.alliances['red']['score'])
                     blueScore = int(match.alliances['blue']['score'])
 
@@ -250,7 +247,7 @@ class InsightsHelper(object):
             totalCount = float(sum(score_distribution.values()))
             score_distribution_normalized = {}
             for score, amount in score_distribution.items():
-                roundedScore = score - int((score % binAmount) + binAmount / 2)
+                roundedScore = score - int(score % binAmount) + binAmount / 2 #Round off and then center in the bin
                 contribution = float(amount) * 100 / totalCount
                 if roundedScore in score_distribution_normalized:
                     score_distribution_normalized[roundedScore] += contribution
@@ -263,7 +260,7 @@ class InsightsHelper(object):
             totalCount = float(sum(elim_score_distribution.values()))
             elim_score_distribution_normalized = {}
             for score, amount in elim_score_distribution.items():
-                roundedScore = score - int((score % binAmount) + binAmount / 2)
+                roundedScore = score - int(score % binAmount) + binAmount / 2
                 contribution = float(amount) * 100 / totalCount
                 if roundedScore in elim_score_distribution_normalized:
                     elim_score_distribution_normalized[roundedScore] += contribution

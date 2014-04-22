@@ -51,7 +51,9 @@ class TeamTpidHelper(object):
 
         tpids_dict = dict()
 
-        teamList = urlfetch.fetch(self.TPID_URL_PATTERN % (year, skip), deadline=10)
+        # FIRST is now checking the 'Referer' header for the string 'usfirst.org'.
+        # See https://github.com/patfair/frclinks/commit/051bf91d23ca0242dad5b1e471f78468173f597f
+        teamList = urlfetch.fetch(self.TPID_URL_PATTERN % (year, skip), headers={'Referrer': 'usfirst.org'}, deadline=10)
         teamResults = self.teamRe.findall(teamList.content)
 
         for teamResult in teamResults:
