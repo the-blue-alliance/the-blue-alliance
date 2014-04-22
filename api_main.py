@@ -8,7 +8,7 @@ from controllers.api_controller import ApiEventsShow, ApiTeamDetails, ApiTeamsSh
                                        CsvTeamsAll
 from controllers.api.api_team_controller import ApiTeamController
 from controllers.api.api_event_controller import ApiEventController, ApiEventTeamsController, \
-                                                 ApiEventMatchesController, ApiEventListController
+                                                 ApiEventMatchesController, ApiEventStatsController, ApiEventListController
 from controllers.api.api_trusted_controller import ApiTrustedAddMatchYoutubeVideo
 
 
@@ -33,6 +33,9 @@ app = webapp2.WSGIApplication([('/api/v1/team/details', ApiTeamDetails),
                                              methods=['GET']),
                                webapp2.Route(r'/api/v2/event/<event_key:>/matches',
                                              ApiEventMatchesController,
+                                             methods=['GET']),
+                               webapp2.Route(r'/api/v2/event/<event_key:>/stats',
+                                             ApiEventStatsController,
                                              methods=['GET']),
                                webapp2.Route(r'/api/v2/events/<year:([0-9]*)>',
                                              ApiEventListController,
