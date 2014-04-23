@@ -1,5 +1,6 @@
 import re
 from BeautifulSoup import NavigableString
+import HTMLParser
 
 
 class ParserBase(object):
@@ -36,3 +37,15 @@ class ParserBase(object):
             if results != []:
                 return ' '.join(results)
         return None
+
+    @classmethod
+    def _html_unescape_items(self, d):
+        """
+        Unescapes HTML in a dict
+        """
+        h = HTMLParser.HTMLParser()
+        for key, value in d.items():
+            try:
+                d[key] = h.unescape(value)
+            except TypeError:
+                continue

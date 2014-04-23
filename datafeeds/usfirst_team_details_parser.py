@@ -57,4 +57,6 @@ class UsfirstTeamDetailsParser(ParserBase):
             logging.info("Team website is invalid for team %s." % team['team_number'])
             logging.info(details)
 
+        self._html_unescape_items(team)
+
         return team, False

@@ -16,7 +16,7 @@ class TestUsfirstTeamDetailsParser(unittest2.TestCase):
 
         self.assertEqual(team["address"],u"San Jose, CA, USA")
         self.assertEqual(team["name"],"NASA Ames Research Center / Lockheed Martin / The Mercadante Family / Ooyala / TR Manufacturing / Qualcomm / HP / West Coast Products / The Magarelli Family / The Yun Family / Google / Modern Machine / The Gebhart Family / Aditazz / Cisco Meraki / Vivid-Hosting / Nvidia / BAE Systems / Gilbert Spray Coat / Pacific Coast Metal / S&S Welding / Good Plastics / Team Whyachi / Hy-Tech Plating / Applied Welding / World Metal Finishing / The Jimenez Family & Bellarmine College Preparatory")
-        self.assertEqual(team["nickname"],"The Cheesey Poofs")
+        self.assertEqual(team["nickname"],"The Cheesy Poofs")
         self.assertEqual(team["team_number"],254)
         self.assertEqual(team["website"],"http://www.team254.com")
 
