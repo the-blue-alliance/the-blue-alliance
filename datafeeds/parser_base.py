@@ -39,7 +39,12 @@ class ParserBase(object):
         return None
 
     @classmethod
-    def _html_unescape_items(self, d):
+    def _html_unescape(cls, html):
+        h = HTMLParser.HTMLParser()
+        return h.unescape(html)
+
+    @classmethod
+    def _html_unescape_items(cls, d):
         """
         Unescapes HTML in a dict
         """

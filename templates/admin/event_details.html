@@ -102,11 +102,11 @@
       <tr>
       {% if forloop.first %}
             {% for element in row %}
-                <th>{{ element|safe }}</th>
+                <th>{{ element }}</th>
             {% endfor %}
       {% else %}
         {% for element in row %}
-            <td>{{ element|safe }}</td>
+            <td>{{ element }}</td>
         {% endfor %}
     {% endif %}
     </tr>

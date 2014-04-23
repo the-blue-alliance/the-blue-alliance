@@ -155,7 +155,7 @@
             <thead>
               <tr>
               {% for element in event.rankings.0 %}
-                <th>{{ element|safe }}</th>
+                <th>{{ element }}</th>
               {% endfor %}
               </tr>
             </thead>
@@ -166,9 +166,9 @@
                 {% for element in row %}
                 <td>
                   {% if forloop.counter == 2 %}
-                    <a href="/team/{{ element|safe }}/{{event.year}}">{{ element|safe }}</a>
+                    <a href="/team/{{ element }}/{{event.year}}">{{ element }}</a>
                   {% else %}
-                    {{ element|safe }}
+                    {{ element }}
                   {% endif %}
                 </td>
                 {% endfor %}

@@ -24,6 +24,7 @@ class UsfirstEventRankingsParser(ParserBase):
             if len(tds) > 1:
                 row = []
                 for td in tds:
-                    row.append(str(self._recurseUntilString(td)))
+                    row.append(str(self._html_unescape(self._recurseUntilString(td))))
                 rankings.append(row)
+
         return rankings, False
