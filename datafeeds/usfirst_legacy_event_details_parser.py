@@ -56,6 +56,8 @@ class UsfirstLegacyEventDetailsParser(ParserBase):
                         m = re.match(r"http://www2\.usfirst\.org/%scomp/Events/([a-zA-Z0-9]*)" % result["year"], tds[1].a["href"])
                     result["event_short"] = m.group(1).lower()
 
+        self._html_unescape_items(result)
+
         return result, False
 
     @classmethod

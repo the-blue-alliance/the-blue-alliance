@@ -63,6 +63,8 @@ class UsfirstEventDetailsParser(ParserBase):
             logging.warning("Event short parse failed: {}".format(detail))
             return None, False
 
+        self._html_unescape_items(result)
+
         return result, False
 
     @classmethod
