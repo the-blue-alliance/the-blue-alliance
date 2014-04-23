@@ -10,16 +10,25 @@ class TestUsfirstTeamDetailsParser(unittest2.TestCase):
 
         self.assertEqual(team, None)
 
-    def test_parse_frc842_2014(self):
-	with open('test_data/usfirst_html/usfirst_team_details_frc842_2014.html', 'r') as f:
-	   team, _ = UsfirstTeamDetailsParser.parse(f.read())
-	
-	self.assertEqual(team["address"],u"Phoenix, AZ, USA")
-	self.assertEqual(team["name"],"The Boeing Company/DLR Group/Fast Signs/Southwest Fasteners & Carl Hayden High School")
-	self.assertEqual(team["nickname"],"Falcon Robotics")
-	self.assertEqual(team["team_number"],842)
-	self.assertEqual(team["website"],"https://sites.google.com/site/falconroboticsfrcteam842/frc-robots/2014-dream")
+    def test_parse_frc254_2014(self):
+        with open('test_data/usfirst_html/usfirst_team_details_frc254_2014.html', 'r') as f:
+           team, _ = UsfirstTeamDetailsParser.parse(f.read())
 
+        self.assertEqual(team["address"],u"San Jose, CA, USA")
+        self.assertEqual(team["name"],"NASA Ames Research Center / Lockheed Martin / The Mercadante Family / Ooyala / TR Manufacturing / Qualcomm / HP / West Coast Products / The Magarelli Family / The Yun Family / Google / Modern Machine / The Gebhart Family / Aditazz / Cisco Meraki / Vivid-Hosting / Nvidia / BAE Systems / Gilbert Spray Coat / Pacific Coast Metal / S&S Welding / Good Plastics / Team Whyachi / Hy-Tech Plating / Applied Welding / World Metal Finishing / The Jimenez Family & Bellarmine College Preparatory")
+        self.assertEqual(team["nickname"],"The Cheesey Poofs")
+        self.assertEqual(team["team_number"],254)
+        self.assertEqual(team["website"],"http://www.team254.com")
+
+    def test_parse_frc842_2014(self):
+        with open('test_data/usfirst_html/usfirst_team_details_frc842_2014.html', 'r') as f:
+           team, _ = UsfirstTeamDetailsParser.parse(f.read())
+
+        self.assertEqual(team["address"],u"Phoenix, AZ, USA")
+        self.assertEqual(team["name"],"The Boeing Company/DLR Group/Fast Signs/Southwest Fasteners & Carl Hayden High School")
+        self.assertEqual(team["nickname"],"Falcon Robotics")
+        self.assertEqual(team["team_number"],842)
+        self.assertEqual(team["website"],"https://sites.google.com/site/falconroboticsfrcteam842/frc-robots/2014-dream")
 
     def test_parse_frc177_2013(self):
         with open('test_data/usfirst_html/usfirst_team_details_frc177_2013.html', 'r') as f:
