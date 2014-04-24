@@ -32,5 +32,7 @@ class TestDatafeedFmsTeams(unittest2.TestCase):
                 #self.assertEqual(team.address, u"South Windsor, CT, USA")
                 self.assertEqual(team.nickname, "Bobcat Robotics")
 
+                break
+
         self.assertTrue(found_177)
         self.assertTrue(len(teams) > 0)
