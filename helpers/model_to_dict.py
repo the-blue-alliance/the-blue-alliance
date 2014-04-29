@@ -67,7 +67,7 @@ class ModelToDict(object):
         match_dict["comp_level"] = match.comp_level
         match_dict["match_number"] = match.match_number
         match_dict["set_number"] = match.set_number
-        match_dict["time_string"] = match.time_string
+        match_dict["time"] = json.loads(match.time.strftime("%s"))
 
         return match_dict
 
