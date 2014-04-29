@@ -172,6 +172,7 @@ class ApiHelper(object):
             match_dict["match_number"] = match.match_number
             match_dict["team_keys"] = match.team_key_names
             match_dict["alliances"] = json.loads(match.alliances_json)
+            match_dict["video"] = {"youtube": match.youtube_videos, "tba": match.tba_videos}
 
             if tba_config.CONFIG["memcache"]:
                 memcache.set(memcache_key, match_dict, (2 * (60 * 60)))
