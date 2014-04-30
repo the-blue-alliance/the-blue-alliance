@@ -117,11 +117,13 @@
               {% include "bracket_partials/bracket_table.html" %}
             {% endif %}
 
+            {% include "event_partials/event_alliances_table.html" %}
             {% include "event_partials/event_opr_table.html" %}
           {% endif %}
         </div>
         {% else %}
           <div class="col-sm-6">
+            {% include "event_partials/event_alliances_table.html" %}
             {% include "event_partials/event_opr_table.html" %}
           </div>
         {% endif %}
@@ -133,6 +135,7 @@
           {% include "bracket_partials/bracket_table.html" %}
           {% endif %}
 
+          {% include "event_partials/event_alliances_table.html" %}
           {% include "event_partials/event_opr_table.html" %}
         </div>
         {% endif %}

@@ -266,8 +266,18 @@
           </tr>
           <tr>
             <td>videos</td>
-            <td>JSON dict of video keys associated with this match 
+            <td>JSON array of videos associated with this match and corresponding information
             <td>"videos": [{"key": "xswGjxzNEoY", "type": "youtube"}, {"key": "http://videos.thebluealliance.net/2010cmp/2010cmp_f1m1.mp4", "type": "tba"}]</td>
+          </tr>
+          <tr>
+            <td>time_string</td>
+            <td>Time string for this match, as published on the official schedule. Of course, this may or may not be accurate, as events often run ahead or behind schedule</td>
+            <td>11:15 AM</td>
+          </tr>
+          <tr>
+            <td>time</td>
+            <td>UNIX timestamp of match time, as taken from the published schedule</td>
+            <td>1394904600</td>
           </tr>
         </tbody>
       </table>

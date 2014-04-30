@@ -275,6 +275,59 @@ class UsfirstAwardsGet(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
 
 
+class UsfirstEventAlliancesEnqueue(webapp.RequestHandler):
+    """
+    Handles enqueing getting alliances for USFIRST events.
+    """
+    def get(self, when):
+        if when == "now":
+            events = EventHelper.getEventsWithinADay()
+        else:
+            event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
+            events = ndb.get_multi(event_keys)
+
+        for event in events:
+            taskqueue.add(
+                queue_name='usfirst',
+                url='/tasks/get/usfirst_event_alliances/' + event.key_name,
+                method='GET')
+
+        template_values = {
+            'events': events,
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_alliances_enqueue.html')
+        self.response.out.write(template.render(path, template_values))
+
+
+class UsfirstEventAlliancesGet(webapp.RequestHandler):
+    """
+    Handles reading a USFIRST alliances page and updating the datastore as needed.
+    """
+    def get(self, event_key):
+        df = DatafeedUsfirst()
+
+        event = Event.get_by_id(event_key)
+
+        if event.event_type_enum == EventType.CMP_FINALS:
+            logging.info("Skipping Einstein alliance selections")
+            return
+
+        alliance_selections = df.getEventAlliances(event)
+        if alliance_selections and event.alliance_selections != alliance_selections:
+            event.alliance_selections_json = json.dumps(alliance_selections)
+            event._alliance_selections = None
+            event.dirty = True
+
+        EventManipulator.createOrUpdate(event)
+
+        template_values = {'alliance_selections': alliance_selections,
+                           'event_name': event.key_name}
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_alliances_get.html')
+        self.response.out.write(template.render(path, template_values))
+
+
 class UsfirstEventListGet(webapp.RequestHandler):
     """
     Handles reading the USFIRST event list.

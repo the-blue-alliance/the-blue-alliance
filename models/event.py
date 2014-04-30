@@ -31,11 +31,13 @@ class Event(ndb.Model):
     webcast_json = ndb.TextProperty(indexed=False)  # list of dicts, valid keys include 'type' and 'channel'
     matchstats_json = ndb.TextProperty(indexed=False)  # for OPR, DPR, CCWM, etc.
     rankings_json = ndb.TextProperty(indexed=False)
+    alliance_selections_json = ndb.TextProperty(indexed=False)  # Formatted as: [{'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] }, {'picks': [], 'declines': []}, ... ]
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
     def __init__(self, *args, **kw):
+        self._alliance_selections = None
         self._awards = None
         self._matches = None
         self._matchstats = None
@@ -49,6 +51,18 @@ class Event(ndb.Model):
         from models.award import Award
         award_keys = yield Award.query(Award.event == self.key).fetch_async(500, keys_only=True)
         self._awards = yield ndb.get_multi_async(award_keys)
+
+    @property
+    def alliance_selections(self):
+        """
+        Lazy load alliance_selections JSON
+        """
+        if self._alliance_selections is None:
+            try:
+                self._alliance_selections = json.loads(self.alliance_selections_json)
+            except Exception, e:
+                self._alliance_selections = None
+        return self._alliance_selections
 
     @property
     def awards(self):
