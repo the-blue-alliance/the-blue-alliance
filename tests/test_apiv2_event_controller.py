@@ -15,6 +15,7 @@ from controllers.api.api_event_controller import ApiEventTeamsController
 from controllers.api.api_event_controller import ApiEventMatchesController
 from controllers.api.api_event_controller import ApiEventStatsController
 from controllers.api.api_event_controller import ApiEventListController
+from controllers.api.api_event_controller import ApiEventRankingsController
 
 from models.event import Event
 from models.event_team import EventTeam
@@ -241,6 +242,69 @@ class TestEventStatsApiController(unittest2.TestCase):
         matchstats = json.loads(response.body)
         self.assertEqual(self.matchstats, matchstats)
 
+class TestEventRankingsApiController(unittest2.TestCase):
+
+    def setUp(self):
+        app = webapp2.WSGIApplication([webapp2.Route(r'/<event_key:>', ApiEventRankingsController, methods=['GET'])], debug=True)
+        self.testapp = webtest.TestApp(app)
+
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_urlfetch_stub()
+        self.testbed.init_memcache_stub()
+        self.testbed.init_taskqueue_stub()
+
+        self.rankings = [
+            ["Rank", "Team", "QS", "ASSIST", "AUTO", "T&C", "TELEOP", "Record (W-L-T)", "DQ", "PLAYED"], 
+            ["1", "1126", "20.00", "240.00", "480.00", "230.00", "478.00", "10-2-0", "0", "12"], 
+            ["2", "5030", "20.00", "200.00", "290.00", "220.00", "592.00", "10-2-0", "0", "12"], 
+            ["3", "250", "20.00", "70.00", "415.00", "220.00", "352.00", "10-2-0", "0", "12"]
+            ]
+        
+
+        self.event = Event(
+                id="2010sc",
+                name="Palmetto Regional",
+                event_type_enum=EventType.REGIONAL,
+                short_name="Palmetto",
+                event_short="sc",
+                year=2010,
+                end_date=datetime(2010, 03, 27),
+                official=True,
+                location='Clemson, SC',
+                start_date=datetime(2010, 03, 24),
+                rankings_json=json.dumps(self.rankings)
+        )
+        self.event.put()
+
+        self.eventNoRanks = Event(
+                id="2010ct",
+                name="Palmetto Regional",
+                event_type_enum=EventType.REGIONAL,
+                short_name="Palmetto",
+                event_short="ct",
+                year=2010,
+                end_date=datetime(2010, 03, 27),
+                official=True,
+                location='Clemson, SC',
+                start_date=datetime(2010, 03, 24),
+        )
+        self.eventNoRanks.put()
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def testEventRankingsApi(self):
+        response = self.testapp.get('/2010sc', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
+
+        rankings = json.loads(response.body)
+        self.assertEqual(self.rankings, rankings)
+
+    def testEventNoRankingsApi(self):
+        response = self.testapp.get('/2010ct', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
+
+        self.assertEqual("[]", response.body)
 
 class TestEventListApiController(unittest2.TestCase):
 
