@@ -8,6 +8,7 @@ from consts.event_type import EventType
 
 from datafeeds.datafeed_usfirst import DatafeedUsfirst
 
+from models.event import Event
 from models.team import Team
 
 
@@ -36,6 +37,26 @@ class TestDatafeedUsfirstEvents(unittest2.TestCase):
         self.assertEqual(event.venue_address, "Connecticut Convention Center\r\n100 Columbus Blvd\r\nHartford, CT 06103\r\nUSA")
         self.assertEqual(event.website, "http://www.ctfirst.org/ctr")
         self.assertEqual(event.event_short, "ct")
+
+    def test_getEventAlliances(self):
+        event = Event(
+            event_short='cur',
+            year=2014,
+        )
+        alliances = self.datafeed.getEventAlliances(event)
+        self.assertEqual(
+            alliances,
+            [
+                {'picks': ['frc254', 'frc469', 'frc2848', 'frc74'], 'declines':[] },
+                {'picks': ['frc1718', 'frc2451', 'frc573', 'frc2016'], 'declines':[] },
+                {'picks': ['frc2928', 'frc2013', 'frc1311', 'frc842'], 'declines':[] },
+                {'picks': ['frc180', 'frc125', 'frc1323', 'frc2468'], 'declines':[] },
+                {'picks': ['frc118', 'frc359', 'frc4334', 'frc865'], 'declines':[] },
+                {'picks': ['frc135', 'frc1241', 'frc11', 'frc68'], 'declines':[] },
+                {'picks': ['frc3478', 'frc177', 'frc294', 'frc230'], 'declines':[] },
+                {'picks': ['frc624', 'frc987', 'frc3476', 'frc3015'], 'declines':[] },
+            ]
+        )
 
     def test_getEventTeams(self):
         # test with 2011ct

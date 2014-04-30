@@ -15,6 +15,7 @@ from helpers.match_helper import MatchHelper
 from helpers.team_helper import TeamTpidHelper
 
 from datafeeds.datafeed_base import DatafeedBase
+from datafeeds.usfirst_alliances_parser import UsfirstAlliancesParser
 from datafeeds.usfirst_event_details_parser import UsfirstEventDetailsParser
 from datafeeds.usfirst_event_list_parser import UsfirstEventListParser
 from datafeeds.usfirst_event_rankings_parser import UsfirstEventRankingsParser
@@ -51,6 +52,8 @@ class DatafeedUsfirst(DatafeedBase):
     }
     DEFAULT_MATCH_RESULTS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/matchresults.html"  # % (year, event_short)
 
+    DEFAULT_ALLIANCES_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/matchresults.html"  # % (year, event_short)
+
     MATCH_SCHEDULE_QUAL_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/schedulequal.html"  # % (year, event_short)
     MATCH_SCHEDULE_ELIMS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/scheduleelim.html"  # % (year, event_short)
     EVENT_SHORT_EXCEPTIONS = {
@@ -60,6 +63,8 @@ class DatafeedUsfirst(DatafeedBase):
         "new": "Newton",
         "ein": "Einstein",  # Only used for 2008ein due to FIRST's inconsistent naming
     }
+
+    ALLIANCES_PARSER = UsfirstAlliancesParser
 
     YEAR_MATCH_PARSER = {
         2002: UsfirstMatchesParser2002,
@@ -81,6 +86,14 @@ class DatafeedUsfirst(DatafeedBase):
     def __init__(self, *args, **kw):
         self._session_key = dict()
         super(DatafeedUsfirst, self).__init__(*args, **kw)
+
+    def getEventAlliances(self, event):
+        alliances_url = self.DEFAULT_ALLIANCES_URL_PATTERN % (
+                event.year, self.EVENT_SHORT_EXCEPTIONS.get(event.event_short,
+                                                            event.event_short))
+
+        alliances, _ = self.parse(alliances_url, self.ALLIANCES_PARSER)
+        return alliances
 
     def getEventDetails(self, first_eid):
         url = self.EVENT_DETAILS_URL_PATTERN % (first_eid)

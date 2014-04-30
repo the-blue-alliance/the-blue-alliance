@@ -9,6 +9,7 @@ from controllers.datafeed_controller import OffseasonMatchesGet
 from controllers.datafeed_controller import TwitterFrcfmsMatchesGet
 from controllers.datafeed_controller import UsfirstEventDetailsEnqueue, UsfirstEventDetailsGet, UsfirstEventListGet
 from controllers.datafeed_controller import UsfirstAwardsEnqueue, UsfirstAwardsGet
+from controllers.datafeed_controller import UsfirstEventAlliancesEnqueue, UsfirstEventAlliancesGet
 from controllers.datafeed_controller import UsfirstMatchesEnqueue, UsfirstMatchesGet, UsfirstEventRankingsEnqueue, UsfirstEventRankingsGet
 from controllers.datafeed_controller import UsfirstTeamDetailsEnqueue, UsfirstTeamDetailsRollingEnqueue, UsfirstTeamDetailsGet, UsfirstTeamsTpidsGet
 from controllers.datafeed_controller import UsfirstPre2003TeamEventsEnqueue, UsfirstPre2003TeamEventsGet
@@ -22,6 +23,7 @@ from controllers.firebase_controller import FirebasePushDo
 
 
 app = webapp2.WSGIApplication([('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
+                               ('/tasks/enqueue/usfirst_event_alliances/(.*)', UsfirstEventAlliancesEnqueue),
                                ('/tasks/enqueue/usfirst_event_details/([0-9]*)', UsfirstEventDetailsEnqueue),
                                ('/tasks/enqueue/usfirst_event_rankings/(.*)', UsfirstEventRankingsEnqueue),
                                ('/tasks/enqueue/usfirst_awards/(.*)', UsfirstAwardsEnqueue),
@@ -34,6 +36,7 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
                                ('/tasks/get/offseason_matches/(.*)', OffseasonMatchesGet),
                                ('/tasks/get/tba_videos/(.*)', TbaVideosGet),
                                ('/tasks/get/twitter_frcfms_matches', TwitterFrcfmsMatchesGet),
+                               ('/tasks/get/usfirst_event_alliances/(.*)', UsfirstEventAlliancesGet),
                                ('/tasks/get/usfirst_event_list/([0-9]*)', UsfirstEventListGet),
                                ('/tasks/get/usfirst_event_details/([0-9]*)/([0-9]*)', UsfirstEventDetailsGet),
                                ('/tasks/get/usfirst_event_rankings/(.*)', UsfirstEventRankingsGet),
