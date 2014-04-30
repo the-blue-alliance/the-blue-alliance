@@ -8,9 +8,9 @@
         <h4>Got Alliances for {{event_name}}</h4>
     </div>
     <table class="table table-striped table-hover">
-    {% for num, alliance in alliance_selections.items %}
+    {% for alliance in alliance_selections %}
         <tr>
-            <td>{{num}}</td>
+            <td>{{forloop.counter}}</td>
             {% for team in alliance.picks %}
                 <td>{{team}}</td>
             {% endfor %}

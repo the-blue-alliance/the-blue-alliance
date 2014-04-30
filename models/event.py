@@ -31,7 +31,7 @@ class Event(ndb.Model):
     webcast_json = ndb.TextProperty(indexed=False)  # list of dicts, valid keys include 'type' and 'channel'
     matchstats_json = ndb.TextProperty(indexed=False)  # for OPR, DPR, CCWM, etc.
     rankings_json = ndb.TextProperty(indexed=False)
-    alliance_selections_json = ndb.TextProperty(indexed=False)  # Formatted as: {'1': {'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] } }
+    alliance_selections_json = ndb.TextProperty(indexed=False)  # Formatted as: [{'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] }, {'picks': [], 'declines': []}, ... ]
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)

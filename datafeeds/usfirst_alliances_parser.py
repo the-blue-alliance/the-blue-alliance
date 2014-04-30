@@ -22,7 +22,7 @@ class UsfirstAlliancesParser(ParserBase):
 
     @classmethod
     def parseAlliances(self, table):
-        alliances = {}
+        alliances = []
         for tr in table.findAll('tr'):
             tds = tr.findAll('td')
             if len(tds) < 4:
@@ -32,7 +32,6 @@ class UsfirstAlliancesParser(ParserBase):
             if not alliance_num_str.isdigit():
                 continue
 
-            alliances[int(alliance_num_str)] = {'picks': [], 'declines': []}
-            alliances[int(alliance_num_str)]['picks'] = ['frc' + self._recurseUntilString(team_td) for team_td in tds[1:]]
+            alliances.append({'picks': ['frc' + self._recurseUntilString(team_td) for team_td in tds[1:]], 'declines': []})
 
-        return alliances if alliances != {} else None
+        return alliances if alliances != [] else None
