@@ -7,6 +7,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
+from datafeeds.csv_alliance_selections_parser import CSVAllianceSelectionsParser
 from datafeeds.csv_teams_parser import CSVTeamsParser
 from helpers.event.event_test_creator import EventTestCreator
 from helpers.event.event_webcast_adder import EventWebcastAdder
@@ -23,6 +24,27 @@ from models.match import Match
 from models.team import Team
 
 import tba_config
+
+
+class AdminEventAddAllianceSelections(LoggedInHandler):
+    """
+    Add alliance selections to an Event.
+    """
+    def post(self, event_key_id):
+        self._require_admin()
+        event = Event.get_by_id(event_key_id)
+
+        alliance_selections_csv = self.request.get('alliance_selections_csv')
+        alliance_selections = CSVAllianceSelectionsParser.parse(alliance_selections_csv)
+
+        if alliance_selections and event.alliance_selections != alliance_selections:
+            event.alliance_selections_json = json.dumps(alliance_selections)
+            event._alliance_selections = None
+            event.dirty = True
+
+        EventManipulator.createOrUpdate(event)
+
+        self.redirect("/admin/event/" + event.key_name)
 
 
 class AdminEventAddTeams(LoggedInHandler):
