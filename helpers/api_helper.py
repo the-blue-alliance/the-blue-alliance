@@ -172,7 +172,11 @@ class ApiHelper(object):
             match_dict["match_number"] = match.match_number
             match_dict["team_keys"] = match.team_key_names
             match_dict["alliances"] = json.loads(match.alliances_json)
-            match_dict["time"] = json.loads(match.time.strftime("%s"))
+            match_dict["time_string"] = match.time_string
+            if match.time is not None:
+                match_dict["time"] =  match.time.strftime("%s")
+            else:
+                match_dict["time"] = None
 
             if tba_config.CONFIG["memcache"]:
                 memcache.set(memcache_key, match_dict, (2 * (60 * 60)))

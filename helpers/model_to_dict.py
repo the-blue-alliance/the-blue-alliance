@@ -67,7 +67,11 @@ class ModelToDict(object):
         match_dict["comp_level"] = match.comp_level
         match_dict["match_number"] = match.match_number
         match_dict["set_number"] = match.set_number
-        match_dict["time"] = json.loads(match.time.strftime("%s"))
+        match_dict["time_string"] = match.time_string
+        if match.time is not None:
+            match_dict["time"] = match.time.strftime("%s")
+        else:
+            match_dict["time"] = None
 
         return match_dict
 
