@@ -14,6 +14,7 @@ class EventManipulator(ManipulatorBase):
         the "old" team that are null in the "new" team.
         """
         attrs = [
+            "alliance_selections_json",
             "end_date",
             "event_short",
             "event_type_enum",
