@@ -186,7 +186,7 @@ class TestEventMatchApiController(unittest2.TestCase):
         self.assertEqual(match["event_key"], self.match.event.string_id())
         self.assertEqual(match["set_number"], self.match.set_number)
         self.assertEqual(match["match_number"], self.match.match_number)
-        self.assertEqual(match["videos"], self.match.videos_json)
+        self.assertEqual(match["videos"], self.match.videos)
 
     def testEventMatchApi(self):
         response = self.testapp.get('/2010sc', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})

@@ -67,7 +67,7 @@ class ModelToDict(object):
         match_dict["comp_level"] = match.comp_level
         match_dict["match_number"] = match.match_number
         match_dict["set_number"] = match.set_number
-        match_dict["videos"] = match.videos_json
+        match_dict["videos"] = match.videos
 
         return match_dict
 
