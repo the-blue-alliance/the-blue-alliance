@@ -185,7 +185,12 @@ class TestEventMatchApiController(unittest2.TestCase):
         self.assertEqual(match["event_key"], self.match.event.string_id())
         self.assertEqual(match["set_number"], self.match.set_number)
         self.assertEqual(match["match_number"], self.match.match_number)
-
+        self.assertEqual(match["time_string"], self.match.time_string)
+        if self.match.time is None:
+            self.assertEqual(match["time"], None)
+        else:
+            self.assertEqual(match["time"], self.match.time.strftime("%s"))
+    
     def testEventMatchApi(self):
         response = self.testapp.get('/2010sc', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
 
