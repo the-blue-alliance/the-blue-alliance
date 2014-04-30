@@ -113,6 +113,18 @@
   {% endfor %}
 </table>
 
+<h2>Alliances</h2>
+<table class="table table-striped table-condensed">
+{% for alliance in event.alliance_selections %}
+    <tr>
+        <td>{{forloop.counter}}</td>
+        {% for team in alliance.picks %}
+            <td>{{team}}</td>
+        {% endfor %}
+    </tr>
+{% endfor %}
+</table>
+
 <h2>Awards</h2>
 <table class="table table-striped table-condensed">
     <tbody>
