@@ -70,13 +70,15 @@ class TbaCSVBackupEventDo(webapp.RequestHandler):
 
         with cloudstorage.open(self.RANKINGS_FILENAME_PATTERN.format(event.year, event_key, event_key), 'w') as rankings_file:
             writer = csv.writer(rankings_file, delimiter=',')
-            for row in event.rankings:
-                self._writerow_unicode(writer, row)
+            if event.rankings:
+                for row in event.rankings:
+                    self._writerow_unicode(writer, row)
 
         with cloudstorage.open(self.ALLIANCES_FILENAME_PATTERN.format(event.year, event_key, event_key), 'w') as alliances_file:
             writer = csv.writer(alliances_file, delimiter=',')
-            for alliance in event.alliance_selections:
-                self._writerow_unicode(writer, alliance['picks'])
+            if event.alliance_selections:
+                for alliance in event.alliance_selections:
+                    self._writerow_unicode(writer, alliance['picks'])
 
         self.response.out.write("Done backing up {}!".format(event_key))
 
