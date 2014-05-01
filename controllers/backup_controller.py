@@ -53,17 +53,26 @@ class TbaCSVBackupEventDo(webapp.RequestHandler):
                     team = recipient['team_number']
                     if type(team) == int:
                         team = 'frc{}'.format(team)
-                    writer.writerow([award.key.id(), award.name_str, team, recipient['awardee']])
+                    self._writerow_unicode(writer, [award.key.id(), award.name_str, team, recipient['awardee']])
 
         with cloudstorage.open(self.MATCHES_FILENAME_PATTERN.format(event.year, event_key, event_key), 'w') as matches_file:
             writer = csv.writer(matches_file, delimiter=',')
             for match in event.matches:
                 red_score = match.alliances['red']['score']
                 blue_score = match.alliances['blue']['score']
-                writer.writerow([match.key.id()] + match.alliances['red']['teams'] + match.alliances['blue']['teams'] + [red_score, blue_score])
+                self._writerow_unicode(writer, [match.key.id()] + match.alliances['red']['teams'] + match.alliances['blue']['teams'] + [red_score, blue_score])
 
         with cloudstorage.open(self.TEAMS_FILENAME_PATTERN.format(event.year, event_key, event_key), 'w') as teams_file:
             writer = csv.writer(teams_file, delimiter=',')
-            writer.writerow([team.key.id() for team in event.teams])
+            self._writerow_unicode(writer, [team.key.id() for team in event.teams])
 
         self.response.out.write("Done backing up {}!".format(event_key))
+
+    def _writerow_unicode(self, writer, row):
+        unicode_row = []
+        for s in row:
+            try:
+                unicode_row.append(s.encode("utf-8"))
+            except:
+                unicode_row.append(s)
+        writer.writerow(unicode_row)
