@@ -1,5 +1,6 @@
 import cloudstorage
 import csv
+import datetime
 import os
 
 from google.appengine.api import taskqueue
@@ -18,18 +19,23 @@ class TbaCSVBackupEnqueue(webapp.RequestHandler):
     """
     def get(self, year=None):
         if year is None:
-            event_keys = Event.query().fetch(None, keys_only=True)
+            years = range(1992, datetime.datetime.now().year + 1)
+            for y in years:
+                taskqueue.add(
+                    url='/tasks/enqueue/csv_backup/{}'.format(y),
+                    method='GET')
+            self.response.out.write("Enqueued backup for years: {}".format(years))
         else:
             event_keys = Event.query(Event.year == int(year)).fetch(None, keys_only=True)
 
-        for event_key in event_keys:
-            taskqueue.add(
-                url='/tasks/do/csv_backup_event/{}'.format(event_key.id()),
-                method='GET')
+            for event_key in event_keys:
+                taskqueue.add(
+                    url='/tasks/do/csv_backup_event/{}'.format(event_key.id()),
+                    method='GET')
 
-        template_values = {'event_keys': event_keys}
-        path = os.path.join(os.path.dirname(__file__), '../templates/backup/csv_backup_enqueue.html')
-        self.response.out.write(template.render(path, template_values))
+            template_values = {'event_keys': event_keys}
+            path = os.path.join(os.path.dirname(__file__), '../templates/backup/csv_backup_enqueue.html')
+            self.response.out.write(template.render(path, template_values))
 
 
 class TbaCSVBackupEventDo(webapp.RequestHandler):
