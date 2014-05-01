@@ -6,7 +6,7 @@ import tba_config
 from controllers.api_controller import ApiEventsShow, ApiTeamDetails, ApiTeamsShow, \
                                        ApiEventList, ApiEventDetails, ApiMatchDetails, \
                                        CsvTeamsAll
-from controllers.api.api_team_controller import ApiTeamController
+from controllers.api.api_team_controller import ApiTeamController, ApiTeamEventsController
 from controllers.api.api_event_controller import ApiEventController, ApiEventTeamsController, \
                                                  ApiEventMatchesController, ApiEventStatsController, ApiEventRankingsController, ApiEventListController
 from controllers.api.api_trusted_controller import ApiTrustedAddMatchYoutubeVideo
@@ -24,6 +24,12 @@ app = webapp2.WSGIApplication([('/api/v1/team/details', ApiTeamDetails),
                                              methods=['GET']),
                                webapp2.Route(r'/api/v2/team/<team_key:>/<year:([0-9]*)>',
                                              ApiTeamController,
+                                             methods=['GET']),
+                               webapp2.Route(r'/api/v2/team/<team_key:>/events',
+                                             ApiTeamEventsController,
+                                             methods=['GET']),
+                               webapp2.Route(r'/api/v2/team/<team_key:>/<year:([0-9]*)>/events',
+                                             ApiTeamEventsController,
                                              methods=['GET']),
                                webapp2.Route(r'/api/v2/event/<event_key:>',
                                              ApiEventController,
