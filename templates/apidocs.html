@@ -30,6 +30,7 @@
                 <li><a class="smooth-scroll" href="#event-teams-request">Event Teams Request</a></li>
                 <li><a class="smooth-scroll" href="#event-matches-request">Event Matches Request</a></li>
                 <li><a class="smooth-scroll" href="#event-stats-request">Event Stats Request</a></li>
+                <li><a class="smooth-scroll" href="#event-rankings-request">Event Rankings Request</a></li>
               </ul>
             </li>
           </ul>
@@ -598,6 +599,51 @@
           </div>
         </div>
       </div>
+      <h3 id="event-rankings-request">Event Rankings Request</h3>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;/rankings</code>
+      </p>
+      <table class=table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>event key</td>
+            <td>TBA event key with the format <code>yyyy[EVENT_CODE]</code>,
+            where yyyy is the year, and EVENT_CODE is the
+            <a href="https://docs.google.com/spreadsheet/ccc?key=0ApRO2Yzh2z01dExFZEdieV9WdTJsZ25HSWI3VUxsWGc">event code</a>
+            of the event.</td>
+            <td>2010sc</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_event_rankings_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="6"
+              id="example_event_rankings_request" type="text" value="/api/v2/event/2010sc/rankings">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group">
+            <pre class="event-rankings-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
 
     </div>
   </div>
@@ -682,6 +728,22 @@
       },
       error: function(data) {
         $(".event-stats-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+  $("#example_event_rankings_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".event-rankings-request-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_event_rankings_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-event-rankings-request:v01'},
+      success: function(data) {
+        $(".event-rankings-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".event-rankings-request-json").html('Something went wrong! Please check for correct request format.');
       }
     });
   });
