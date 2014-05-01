@@ -171,7 +171,8 @@ class TestEventMatchApiController(unittest2.TestCase):
             set_number=1,
             match_number=1,
             team_key_names=[u'frc281', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073'],
-
+            youtube_videos=["94UGXIq6jUA"],
+            tba_videos=[".mp4"]
         )
         self.match.put()
 
@@ -185,6 +186,7 @@ class TestEventMatchApiController(unittest2.TestCase):
         self.assertEqual(match["event_key"], self.match.event.string_id())
         self.assertEqual(match["set_number"], self.match.set_number)
         self.assertEqual(match["match_number"], self.match.match_number)
+        self.assertEqual(match["videos"], self.match.videos)
         self.assertEqual(match["time_string"], self.match.time_string)
         if self.match.time is None:
             self.assertEqual(match["time"], None)
