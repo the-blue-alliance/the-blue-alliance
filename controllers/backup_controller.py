@@ -34,12 +34,14 @@ class TbaCSVBackupEnqueue(webapp.RequestHandler):
 
 class TbaCSVBackupEventDo(webapp.RequestHandler):
     """
-    Backs up event awards, matches, and team list
+    Backs up event awards, matches, team list, rankings, and alliance selection order
     """
 
     AWARDS_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/{}/{}/{}_awards.csv'  # % (year, event_key, event_key)
     MATCHES_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/{}/{}/{}_matches.csv'  # % (year, event_key, event_key)
     TEAMS_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/{}/{}/{}_teams.csv'  # % (year, event_key, event_key)
+    RANKINGS_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/{}/{}/{}_rankings.csv'  # % (year, event_key, event_key)
+    ALLIANCES_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/{}/{}/{}_alliances.csv'  # % (year, event_key, event_key)
 
     def get(self, event_key):
         event = Event.get_by_id(event_key)
@@ -65,6 +67,16 @@ class TbaCSVBackupEventDo(webapp.RequestHandler):
         with cloudstorage.open(self.TEAMS_FILENAME_PATTERN.format(event.year, event_key, event_key), 'w') as teams_file:
             writer = csv.writer(teams_file, delimiter=',')
             self._writerow_unicode(writer, [team.key.id() for team in event.teams])
+
+        with cloudstorage.open(self.RANKINGS_FILENAME_PATTERN.format(event.year, event_key, event_key), 'w') as rankings_file:
+            writer = csv.writer(rankings_file, delimiter=',')
+            for row in event.rankings:
+                self._writerow_unicode(writer, row)
+
+        with cloudstorage.open(self.ALLIANCES_FILENAME_PATTERN.format(event.year, event_key, event_key), 'w') as alliances_file:
+            writer = csv.writer(alliances_file, delimiter=',')
+            for alliance in event.alliance_selections:
+                self._writerow_unicode(writer, alliance['picks'])
 
         self.response.out.write("Done backing up {}!".format(event_key))
 
