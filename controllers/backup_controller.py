@@ -48,35 +48,38 @@ class TbaCSVBackupEventDo(webapp.RequestHandler):
 
         event.prepAwardsMatchesTeams()
 
-        with cloudstorage.open(self.AWARDS_FILENAME_PATTERN.format(event.year, event_key, event_key), 'w') as awards_file:
-            writer = csv.writer(awards_file, delimiter=',')
-            for award in event.awards:
-                for recipient in award.recipient_list:
-                    team = recipient['team_number']
-                    if type(team) == int:
-                        team = 'frc{}'.format(team)
-                    self._writerow_unicode(writer, [award.key.id(), award.name_str, team, recipient['awardee']])
+        if event.awards:
+            with cloudstorage.open(self.AWARDS_FILENAME_PATTERN.format(event.year, event_key, event_key), 'w') as awards_file:
+                writer = csv.writer(awards_file, delimiter=',')
+                for award in event.awards:
+                    for recipient in award.recipient_list:
+                        team = recipient['team_number']
+                        if type(team) == int:
+                            team = 'frc{}'.format(team)
+                        self._writerow_unicode(writer, [award.key.id(), award.name_str, team, recipient['awardee']])
 
-        with cloudstorage.open(self.MATCHES_FILENAME_PATTERN.format(event.year, event_key, event_key), 'w') as matches_file:
-            writer = csv.writer(matches_file, delimiter=',')
-            for match in event.matches:
-                red_score = match.alliances['red']['score']
-                blue_score = match.alliances['blue']['score']
-                self._writerow_unicode(writer, [match.key.id()] + match.alliances['red']['teams'] + match.alliances['blue']['teams'] + [red_score, blue_score])
+        if event.matches:
+            with cloudstorage.open(self.MATCHES_FILENAME_PATTERN.format(event.year, event_key, event_key), 'w') as matches_file:
+                writer = csv.writer(matches_file, delimiter=',')
+                for match in event.matches:
+                    red_score = match.alliances['red']['score']
+                    blue_score = match.alliances['blue']['score']
+                    self._writerow_unicode(writer, [match.key.id()] + match.alliances['red']['teams'] + match.alliances['blue']['teams'] + [red_score, blue_score])
 
-        with cloudstorage.open(self.TEAMS_FILENAME_PATTERN.format(event.year, event_key, event_key), 'w') as teams_file:
-            writer = csv.writer(teams_file, delimiter=',')
-            self._writerow_unicode(writer, [team.key.id() for team in event.teams])
+        if event.teams:
+            with cloudstorage.open(self.TEAMS_FILENAME_PATTERN.format(event.year, event_key, event_key), 'w') as teams_file:
+                writer = csv.writer(teams_file, delimiter=',')
+                self._writerow_unicode(writer, [team.key.id() for team in event.teams])
 
-        with cloudstorage.open(self.RANKINGS_FILENAME_PATTERN.format(event.year, event_key, event_key), 'w') as rankings_file:
-            writer = csv.writer(rankings_file, delimiter=',')
-            if event.rankings:
+        if event.rankings:
+            with cloudstorage.open(self.RANKINGS_FILENAME_PATTERN.format(event.year, event_key, event_key), 'w') as rankings_file:
+                writer = csv.writer(rankings_file, delimiter=',')
                 for row in event.rankings:
                     self._writerow_unicode(writer, row)
 
-        with cloudstorage.open(self.ALLIANCES_FILENAME_PATTERN.format(event.year, event_key, event_key), 'w') as alliances_file:
-            writer = csv.writer(alliances_file, delimiter=',')
-            if event.alliance_selections:
+        if event.alliance_selections:
+            with cloudstorage.open(self.ALLIANCES_FILENAME_PATTERN.format(event.year, event_key, event_key), 'w') as alliances_file:
+                writer = csv.writer(alliances_file, delimiter=',')
                 for alliance in event.alliance_selections:
                     self._writerow_unicode(writer, alliance['picks'])
 
