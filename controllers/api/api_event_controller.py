@@ -101,6 +101,26 @@ class ApiEventStatsController(ApiEventController):
 
         return json.dumps(Event.get_by_id(event_key).matchstats)
 
+class ApiEventRankingsController(ApiEventController):
+    LONG_CACHE_EXPIRATION = 60 * 60 * 24
+    SHORT_CACHE_EXPIRATION = 60 * 5
+
+    def __init__(self, *args, **kw):
+        super(ApiEventRankingsController, self).__init__(*args, **kw)
+        self._cache_key = "apiv2_event_rankings_controller_{}".format(self.event_key)
+        self._cache_expiration = self.SHORT_CACHE_EXPIRATION
+        self._cache_version = 2
+
+    def _render(self, event_key):
+        self._set_cache_header_length(61)
+        self._set_event(event_key)
+
+        ranks = json.dumps(Event.get_by_id(event_key).rankings)
+        if ranks is None or ranks == 'null':
+            return '[]'
+        else:
+            return ranks
+
 
 class ApiEventListController(ApiBaseController):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
