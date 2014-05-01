@@ -218,6 +218,16 @@ class Match(ndb.Model):
                 self._youtube_videos.append(video)
         return self._youtube_videos
 
+    @property
+    def videos(self):
+        videos = []
+        for v in self.youtube_videos_formatted:
+            videos.append({"type": "youtube", "key": v})
+        if self.tba_video is not None:
+            tba_path = self.tba_video.streamable_path
+            if tba_path is not None:
+                videos.append({"type": "tba", "key": tba_path})
+        return videos
 
     @classmethod
     def renderKeyName(self, event_key_name, comp_level, set_number, match_number):

@@ -172,6 +172,7 @@ class ApiHelper(object):
             match_dict["match_number"] = match.match_number
             match_dict["team_keys"] = match.team_key_names
             match_dict["alliances"] = json.loads(match.alliances_json)
+            match_dict["videos"] = match.videos 
             match_dict["time_string"] = match.time_string
             if match.time is not None:
                 match_dict["time"] =  match.time.strftime("%s")
