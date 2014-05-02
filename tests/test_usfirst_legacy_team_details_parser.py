@@ -12,4 +12,5 @@ class TestUsfirstLegacyTeamDetailsParser(unittest2.TestCase):
         self.assertEqual(team["name"], "UTC Power/Ensign Bickford Aerospace & Defense & South Windsor High School")
         self.assertEqual(team["nickname"], "Bobcat Robotics")
         self.assertEqual(team["team_number"], 177)
+        self.assertEqual(team["rookie_year"], 1995)
         self.assertEqual(team["website"], "http://www.bobcatrobotics.org")

@@ -81,7 +81,8 @@ class DatafeedUsfirstLegacy(DatafeedUsfirst):
                         name=self._shorten(team_dict.get("name", None)),
                         address=team_dict.get("address", None),
                         nickname=team_dict.get("nickname", None),
-                        website=team_dict.get("website", None)
+                        website=team_dict.get("website", None),
+                        rookie_year=team_dict.get("rookie_year", None),
                     )
                 else:
                     logging.warning("No team_number found scraping %s, probably retired team" % team.team_number)

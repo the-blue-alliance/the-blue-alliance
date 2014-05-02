@@ -517,11 +517,15 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
     """
     def get(self, key_name):
         df = DatafeedUsfirst()
+        legacy_df = DatafeedUsfirstLegacy()
+
         team = df.getTeamDetails(Team.get_by_id(key_name))
         if not team:
             logging.warning("getTeamDetails with DatafeedUsfirst for event id {} failed. Retrying with DatafeedUsfirstLegacy.".format(key_name))
-            legacy_df = DatafeedUsfirstLegacy()
             team = legacy_df.getTeamDetails(Team.get_by_id(key_name))
+        else:
+            legacy_team = legacy_df.getTeamDetails(Team.get_by_id(key_name))
+            team.rookie_year = legacy_team.rookie_year  # only available on legacy df
 
         if team:
             team = TeamManipulator.createOrUpdate(team)

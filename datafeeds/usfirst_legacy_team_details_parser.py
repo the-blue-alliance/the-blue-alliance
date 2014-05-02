@@ -38,8 +38,8 @@ class UsfirstLegacyTeamDetailsParser(ParserBase):
                 if field == "Team Location":
                     #TODO: Filter out &nbsp;'s and stuff -greg 5/21/2010
                     team["address"] = unicode(tds[1].string)
-                #if field == "Rookie Season": #Unused
-                #    team["rookie_season"] = int(tds[1].string)
+                if field == "Rookie Season":
+                   team["rookie_year"] = int(tds[1].string)
                 if field == "Team Nickname":
                     team["nickname"] = unicode(tds[1].string)
                 if field == "Team Website":
