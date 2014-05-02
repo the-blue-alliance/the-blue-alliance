@@ -18,6 +18,7 @@ class TeamManipulator(ManipulatorBase):
             "name",
             "nickname",
             "website",
+            "rookie_year",
         ]
 
         for attr in attrs:
