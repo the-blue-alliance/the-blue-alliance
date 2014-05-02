@@ -3,7 +3,7 @@ import webapp2
 
 import tba_config
 
-from controllers.backup_controller import TbaCSVBackupEnqueue, TbaCSVBackupEventDo
+from controllers.backup_controller import TbaCSVBackupEnqueue, TbaCSVBackupEventDo, TbaCSVRestoreEnqueue, TbaCSVRestoreEventDo
 
 from controllers.datafeed_controller import TbaVideosGet, TbaVideosEnqueue
 from controllers.datafeed_controller import FmsEventListGet, FmsTeamListGet
@@ -27,6 +27,9 @@ from controllers.firebase_controller import FirebasePushDo
 app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup', TbaCSVBackupEnqueue),
                                ('/tasks/enqueue/csv_backup/([0-9]*)', TbaCSVBackupEnqueue),
                                ('/tasks/do/csv_backup_event/(.*)', TbaCSVBackupEventDo),
+                               ('/tasks/enqueue/csv_restore', TbaCSVRestoreEnqueue),
+                               ('/tasks/enqueue/csv_restore/([0-9]*)', TbaCSVRestoreEnqueue),
+                               ('/tasks/do/csv_restore_event/(.*)', TbaCSVRestoreEventDo),
                                ('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
                                ('/tasks/enqueue/usfirst_event_alliances/(.*)', UsfirstEventAlliancesEnqueue),
                                ('/tasks/enqueue/usfirst_event_details/([0-9]*)', UsfirstEventDetailsEnqueue),
