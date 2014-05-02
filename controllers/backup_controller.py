@@ -1,16 +1,30 @@
 import cloudstorage
 import csv
 import datetime
+import json
+import logging
 import os
+import StringIO
+import tba_config
 
 from google.appengine.api import taskqueue
+from google.appengine.api import urlfetch
 from google.appengine.ext import ndb
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
+from helpers.award_manipulator import AwardManipulator
+from helpers.event_manipulator import EventManipulator
+from helpers.match_manipulator import MatchManipulator
+
 from models.award import Award
 from models.event import Event
 from models.match import Match
+from models.team import Team
+
+from datafeeds.csv_alliance_selections_parser import CSVAllianceSelectionsParser
+from datafeeds.csv_awards_parser import CSVAwardsParser
+from datafeeds.offseason_matches_parser import OffseasonMatchesParser
 
 
 class TbaCSVBackupEnqueue(webapp.RequestHandler):
@@ -99,3 +113,133 @@ class TbaCSVBackupEventDo(webapp.RequestHandler):
             except:
                 unicode_row.append(s)
         writer.writerow(unicode_row)
+
+
+class TbaCSVRestoreEnqueue(webapp.RequestHandler):
+    """
+    Enqueues CSV restore
+    """
+    def get(self, year=None):
+        if tba_config.CONFIG["env"] == "prod":  # disable in prod for now
+            logging.error("Tried to restore {} from CSV in prod! No can do.".format(event_key))
+            return
+
+        if year is None:
+            years = range(1992, datetime.datetime.now().year + 1)
+            for y in years:
+                taskqueue.add(
+                    url='/tasks/enqueue/csv_restore/{}'.format(y),
+                    method='GET')
+            self.response.out.write("Enqueued restore for years: {}".format(years))
+        else:
+            event_keys = Event.query(Event.year == int(year)).fetch(None, keys_only=True)
+
+            for event_key in event_keys:
+                taskqueue.add(
+                    url='/tasks/do/csv_restore_event/{}'.format(event_key.id()),
+                    method='GET')
+
+            template_values = {'event_keys': event_keys}
+            path = os.path.join(os.path.dirname(__file__), '../templates/backup/csv_restore_enqueue.html')
+            self.response.out.write(template.render(path, template_values))
+
+
+class TbaCSVRestoreEventDo(webapp.RequestHandler):
+    """
+    Restores event awards, matches, team list, rankings, and alliance selection order
+    """
+
+    BASE_URL = 'https://raw.githubusercontent.com/the-blue-alliance/tba-data-backup/master/tba-data-backup/{}/{}/'  # % (year, event_key)
+    ALLIANCES_URL = BASE_URL + '{}_alliances.csv'  # % (year, event_key, event_key)
+    AWARDS_URL = BASE_URL + '{}_awards.csv'  # % (year, event_key, event_key)
+    MATCHES_URL = BASE_URL + '{}_matches.csv'  # % (year, event_key, event_key)
+    RANKINGS_URL = BASE_URL + '{}_rankings.csv'  # % (year, event_key, event_key)
+    # TEAMS_URL = BASE_URL + '{}_teams.csv'  # % (year, event_key, event_key)  # currently unused
+
+    def get(self, event_key):
+        if tba_config.CONFIG["env"] == "prod":  # disable in prod for now
+            logging.error("Tried to restore {} from CSV in prod! No can do.".format(event_key))
+            return
+
+        event = Event.get_by_id(event_key)
+
+        # alliances
+        result = urlfetch.fetch(self.ALLIANCES_URL.format(event.year, event_key, event_key))
+        if result.status_code != 200:
+            logging.warning('Unable to retreive url: ' + (self.ALLIANCES_URL.format(event.year, event_key, event_key)))
+            return
+        data = result.content.replace('frc', '')
+        alliance_selections = CSVAllianceSelectionsParser.parse(data)
+        if alliance_selections and event.alliance_selections != alliance_selections:
+            event.alliance_selections_json = json.dumps(alliance_selections)
+            event._alliance_selections = None
+            event.dirty = True
+        EventManipulator.createOrUpdate(event)
+
+        # awards
+        result = urlfetch.fetch(self.AWARDS_URL.format(event.year, event_key, event_key))
+        if result.status_code != 200:
+            logging.warning('Unable to retreive url: ' + (self.Awards_URL.format(event.year, event_key, event_key)))
+            return
+
+        # convert into expected input format
+        data = StringIO.StringIO()
+        writer = csv.writer(data, delimiter=',')
+        for row in csv.reader(StringIO.StringIO(result.content), delimiter=','):
+            writer.writerow([event.year, event.event_short, row[1], row[2].replace('frc', ''), row[3]])
+
+        awards = []
+        for award in CSVAwardsParser.parse(data.getvalue()):
+            awards.append(Award(
+                id=Award.render_key_name(event.key_name, award['award_type_enum']),
+                name_str=award['name_str'],
+                award_type_enum=award['award_type_enum'],
+                year=event.year,
+                event=event.key,
+                event_type_enum=event.event_type_enum,
+                team_list=[ndb.Key(Team, 'frc{}'.format(team_number)) for team_number in award['team_number_list']],
+                recipient_json_list=award['recipient_json_list']
+            ))
+        AwardManipulator.createOrUpdate(awards)
+
+        # matches
+        result = urlfetch.fetch(self.MATCHES_URL.format(event.year, event_key, event_key))
+        if result.status_code != 200:
+            logging.warning('Unable to retreive url: ' + (self.MATCHES_URL.format(event.year, event_key, event_key)))
+            return
+
+        data = result.content.replace('frc', '').replace('{}_'.format(event_key), '')
+        match_dicts = OffseasonMatchesParser.parse(data)
+        matches = [
+            Match(
+                id=Match.renderKeyName(
+                    event.key.id(),
+                    match.get("comp_level", None),
+                    match.get("set_number", 0),
+                    match.get("match_number", 0)),
+                event=event.key,
+                game=Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
+                set_number=match.get("set_number", 0),
+                match_number=match.get("match_number", 0),
+                comp_level=match.get("comp_level", None),
+                team_key_names=match.get("team_key_names", None),
+                alliances_json=match.get("alliances_json", None)
+            )
+        for match in match_dicts]
+        MatchManipulator.createOrUpdate(matches)
+
+        # rankings
+        result = urlfetch.fetch(self.RANKINGS_URL.format(event.year, event_key, event_key))
+        if result.status_code != 200:
+            logging.warning('Unable to retreive url: ' + (self.RANKINGS_URL.format(event.year, event_key, event_key)))
+            return
+
+        # convert into expected input format
+        rankings = list(csv.reader(StringIO.StringIO(result.content), delimiter=','))
+        if rankings and event.rankings != rankings:
+            event.rankings_json = json.dumps(rankings)
+            event._rankings = None
+            event.dirty = True
+        EventManipulator.createOrUpdate(event)
+
+        self.response.out.write("Done restoring {}!".format(event_key))
