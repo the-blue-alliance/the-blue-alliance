@@ -17,14 +17,16 @@ class TestTeamManipulator(unittest2.TestCase):
         self.old_team = Team(
             id="frc177",
             team_number=177,
+            rookie_year=1996,
             first_tpid=61771,
-            first_tpid_year=2012
+            first_tpid_year=2012,
         )
 
         self.new_team = Team(
             id="frc177",
             team_number=177,
-            website="http://www.bobcatrobotics.org"
+            rookie_year=1995,
+            website="http://www.bobcatrobotics.org",
         )
 
     def tearDown(self):
@@ -33,6 +35,7 @@ class TestTeamManipulator(unittest2.TestCase):
     def assertMergedTeam(self, team):
         self.assertOldTeam(team)
         self.assertEqual(team.website, "http://www.bobcatrobotics.org")
+        self.assertEqual(team.rookie_year, 1995)
 
     def assertOldTeam(self, team):
         self.assertEqual(team.first_tpid, 61771)
