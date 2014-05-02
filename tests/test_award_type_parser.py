@@ -21,14 +21,14 @@ class TestUsfirstEventTypeParser(unittest2.TestCase):
         self.assertEqual(AwardHelper.parse_award_type("Championship Champion #4"), AwardType.WINNER)
         self.assertEqual(AwardHelper.parse_award_type("Championship Champion"), AwardType.WINNER)
         self.assertEqual(AwardHelper.parse_award_type("Championship Winner"), AwardType.WINNER)
-        self.assertEqual(AwardHelper.parse_award_type("Winner"), None)
+        self.assertEqual(AwardHelper.parse_award_type("Winner"), AwardType.WINNER)
 
         self.assertEqual(AwardHelper.parse_award_type("Finalist #1"), AwardType.FINALIST)
         self.assertEqual(AwardHelper.parse_award_type("Division Finalist #2"), AwardType.FINALIST)
         self.assertEqual(AwardHelper.parse_award_type("Championship Finalist #3"), AwardType.FINALIST)
         self.assertEqual(AwardHelper.parse_award_type("Championship Finalist #4"), AwardType.FINALIST)
         self.assertEqual(AwardHelper.parse_award_type("Championship Finalist"), AwardType.FINALIST)
-        self.assertEqual(AwardHelper.parse_award_type("Finalist"), None)
+        self.assertEqual(AwardHelper.parse_award_type("Finalist"), AwardType.FINALIST)
 
         self.assertEqual(AwardHelper.parse_award_type("Dean's List Finalist #1"), AwardType.DEANS_LIST)
         self.assertEqual(AwardHelper.parse_award_type("Dean's List Finalist"), AwardType.DEANS_LIST)
@@ -57,6 +57,10 @@ class TestUsfirstEventTypeParser(unittest2.TestCase):
         self.assertEqual(AwardHelper.parse_award_type("People's Choice Animation Award"), AwardType.PEOPLES_CHOICE_ANIMATION)
         self.assertEqual(AwardHelper.parse_award_type("Autodesk Award for Visualization - Grand Prize"), AwardType.VISUALIZATION)
         self.assertEqual(AwardHelper.parse_award_type("Autodesk Award for Visualization - Rising Star"), AwardType.VISUALIZATION_RISING_STAR)
+
+        self.assertEqual(AwardHelper.parse_award_type("Some Random Award Winner"), None)
+        self.assertEqual(AwardHelper.parse_award_type("Random Champion"), None)
+        self.assertEqual(AwardHelper.parse_award_type("An Award"), None)
 
         # Make sure all old regional awards have matching types
         with open('test_data/pre_2002_regional_awards.csv', 'r') as f:

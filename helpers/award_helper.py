@@ -130,6 +130,13 @@ class AwardHelper(object):
         Returns the AwardType given a name_str, or None if there are no matches.
         """
         name_str_lower = name_str.lower()
+
+        # to match awards without the "#1", "#2", etc suffix
+        if name_str_lower == 'winner':
+            return AwardType.WINNER
+        elif name_str_lower == 'finalist':
+            return AwardType.FINALIST
+
         for type_enum, (yes_strings, no_strings) in AWARD_MATCHING_STRINGS:
             for string in yes_strings:
                 if string not in name_str_lower:
