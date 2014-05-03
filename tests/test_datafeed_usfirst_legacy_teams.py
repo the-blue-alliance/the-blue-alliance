@@ -30,6 +30,7 @@ class TestDatafeedUsfirstLegacyTeams(unittest2.TestCase):
     def test_getTeamDetails(self):
         team = self.datafeed.getTeamDetails(self.team177)
 
+        self.assertEqual(team.key.id(), 'frc177')
         self.assertEqual(team.name, "United Technologies / ClearEdge Power / Gain Talent / EBA&D & South Windsor High School")
         self.assertEqual(team.address, u"South Windsor, CT\xa0 USA")
         self.assertEqual(team.nickname, "Bobcat Robotics")

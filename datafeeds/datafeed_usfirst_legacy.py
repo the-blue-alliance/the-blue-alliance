@@ -77,6 +77,7 @@ class DatafeedUsfirstLegacy(DatafeedUsfirst):
 
                 if team_dict is not None and "team_number" in team_dict:
                     return Team(
+                        id="frc%s" % team_dict.get("team_number", None),
                         team_number=team_dict.get("team_number", None),
                         name=self._shorten(team_dict.get("name", None)),
                         address=team_dict.get("address", None),
