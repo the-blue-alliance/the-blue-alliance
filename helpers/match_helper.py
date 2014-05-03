@@ -3,6 +3,8 @@ import datetime
 import pytz
 import re
 
+from collections import defaultdict
+
 from models.match import Match
 
 
@@ -131,34 +133,62 @@ class MatchHelper(object):
         return return_list
 
     @classmethod
-    def generateBracket(self, matches):
-        results = {}
-        for match in matches:
-            set_number = str(match.set_number)
+    def generateBracket(cls, matches, alliance_selections=None):
+        complete_alliances = []
+        bracket_table = defaultdict(dict)
+        for comp_level in ['qf', 'sf', 'f']:
+            for match in matches[comp_level]:
+                set_number = str(match.set_number)  # for template to work
+                if set_number not in bracket_table[comp_level]:
+                    bracket_table[comp_level][set_number] = {
+                        'red_alliance': [],
+                        'blue_alliance': [],
+                        'winning_alliance': None,
+                        'red_wins': 0,
+                        'blue_wins': 0,
+                    }
+                for color in ['red', 'blue']:
+                    alliance = match.alliances[color]['teams']
+                    for i, complete_alliance in enumerate(complete_alliances):  # search for alliance. could be more efficient
+                        if len(set(alliance).intersection(set(complete_alliance))) >= 2:  # if >= 2 teams are the same, then the alliance is the same
+                            backups = list(set(alliance).difference(set(complete_alliance)))
+                            complete_alliances[i] += backups  # ensures that backup robots are listed last
 
-            if set_number not in results:
-                red_alliance = []
-                for team in match.alliances['red']['teams']:
-                    red_alliance.append(team[3:])
-                blue_alliance = []
-                for team in match.alliances['blue']['teams']:
-                    blue_alliance.append(team[3:])
+                            for team_num in cls.getOrderedAlliance(complete_alliances[i], alliance_selections):
+                                if team_num not in bracket_table[comp_level][set_number]['{}_alliance'.format(color)]:
+                                    bracket_table[comp_level][set_number]['{}_alliance'.format(color)].append(team_num)
 
-                results[set_number] = {'red_alliance': red_alliance,
-                                       'blue_alliance': blue_alliance,
-                                       'winning_alliance': None,
-                                       'red_wins': 0,
-                                       'blue_wins': 0}
-            winner = match.winning_alliance
-            if not winner or winner == '':
-                # if the match is a tie
-                continue
+                            break
+                    else:
+                        complete_alliances.append(alliance)
 
-            results[set_number]['{}_wins'.format(winner)] = \
-                results[set_number]['{}_wins'.format(winner)] + 1
-            if results[set_number]['red_wins'] == 2:
-                results[set_number]['winning_alliance'] = 'red'
-            if results[set_number]['blue_wins'] == 2:
-                results[set_number]['winning_alliance'] = 'blue'
+                winner = match.winning_alliance
+                if not winner or winner == '':
+                    # if the match is a tie
+                    continue
 
-        return results
+                bracket_table[comp_level][set_number]['{}_wins'.format(winner)] = \
+                    bracket_table[comp_level][set_number]['{}_wins'.format(winner)] + 1
+                if bracket_table[comp_level][set_number]['red_wins'] == 2:
+                    bracket_table[comp_level][set_number]['winning_alliance'] = 'red'
+                if bracket_table[comp_level][set_number]['blue_wins'] == 2:
+                    bracket_table[comp_level][set_number]['winning_alliance'] = 'blue'
+
+
+        return bracket_table
+
+    @classmethod
+    def getOrderedAlliance(cls, team_keys, alliance_selections):
+        if alliance_selections:
+            for alliance_selection in alliance_selections:  # search for alliance. could be more efficient
+                picks = alliance_selection['picks']
+                if len(set(picks).intersection(set(team_keys))) >= 2:  # if >= 2 teams are the same, then the alliance is the same
+                    backups = list(set(team_keys).difference(set(picks)))
+                    team_keys = picks + backups
+                    break
+
+        team_nums = []
+        for team in team_keys:
+            # Strip the "frc" prefix
+            team_nums.append(team[3:])
+        return team_nums
