@@ -123,16 +123,7 @@ class EventDetail(CacheableHandler):
             matches_recent = None
             matches_upcoming = None
 
-        bracket_table = {}
-        qf_matches = matches['qf']
-        sf_matches = matches['sf']
-        f_matches = matches['f']
-        if qf_matches:
-            bracket_table['qf'] = MatchHelper.generateBracket(qf_matches)
-        if sf_matches:
-            bracket_table['sf'] = MatchHelper.generateBracket(sf_matches)
-        if f_matches:
-            bracket_table['f'] = MatchHelper.generateBracket(f_matches)
+        bracket_table = MatchHelper.generateBracket(matches, event.alliance_selections)
 
         template_values = {
             "event": event,
