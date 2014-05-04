@@ -252,6 +252,7 @@ class ApiMatchDetails(MainApiHandler):
 
         self.response.out.write(json.dumps(response))
 
+        self._track_call_defer('matches/details')
 
 class CsvTeamsAll(MainApiHandler):
     """
