@@ -237,9 +237,6 @@ class ApiMatchDetails(MainApiHandler):
         matches = []
         if value is not '':
             match_keys = value.split(',')
-            match_keys_sorted = sorted(value.split(','))
-            track_matches_keys = ",".join(match_keys_sorted)
-            track_matches = value
             for match_key in match_keys:
                 if match_key == '':
                     continue
@@ -255,8 +252,7 @@ class ApiMatchDetails(MainApiHandler):
 
         self.response.out.write(json.dumps(response))
 
-        self._track_call_defer('matches/details', track_matches)
-
+        self._track_call_defer('matches/details')
 
 class CsvTeamsAll(MainApiHandler):
     """
