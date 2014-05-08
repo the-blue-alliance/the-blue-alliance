@@ -125,6 +125,10 @@ class EventDetail(CacheableHandler):
 
         bracket_table = MatchHelper.generateBracket(matches, event.alliance_selections)
 
+        district_points_sorted = None
+        if event.district_points:
+            district_points_sorted = sorted(event.district_points['points'].items(), key=lambda (team, points): -points['total'])
+
         template_values = {
             "event": event,
             "matches": matches,
@@ -136,6 +140,7 @@ class EventDetail(CacheableHandler):
             "num_teams": num_teams,
             "oprs": oprs,
             "bracket_table": bracket_table,
+            "district_points_sorted": district_points_sorted,
         }
 
         if event.within_a_day:
