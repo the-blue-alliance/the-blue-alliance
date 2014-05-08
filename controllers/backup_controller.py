@@ -167,79 +167,76 @@ class TbaCSVRestoreEventDo(webapp.RequestHandler):
         result = urlfetch.fetch(self.ALLIANCES_URL.format(event.year, event_key, event_key))
         if result.status_code != 200:
             logging.warning('Unable to retreive url: ' + (self.ALLIANCES_URL.format(event.year, event_key, event_key)))
-            return
-        data = result.content.replace('frc', '')
-        alliance_selections = CSVAllianceSelectionsParser.parse(data)
-        if alliance_selections and event.alliance_selections != alliance_selections:
-            event.alliance_selections_json = json.dumps(alliance_selections)
-            event._alliance_selections = None
-            event.dirty = True
-        EventManipulator.createOrUpdate(event)
+        else:
+            data = result.content.replace('frc', '')
+            alliance_selections = CSVAllianceSelectionsParser.parse(data)
+            if alliance_selections and event.alliance_selections != alliance_selections:
+                event.alliance_selections_json = json.dumps(alliance_selections)
+                event._alliance_selections = None
+                event.dirty = True
+            EventManipulator.createOrUpdate(event)
 
         # awards
         result = urlfetch.fetch(self.AWARDS_URL.format(event.year, event_key, event_key))
         if result.status_code != 200:
             logging.warning('Unable to retreive url: ' + (self.Awards_URL.format(event.year, event_key, event_key)))
-            return
+        else:
+            # convert into expected input format
+            data = StringIO.StringIO()
+            writer = csv.writer(data, delimiter=',')
+            for row in csv.reader(StringIO.StringIO(result.content), delimiter=','):
+                writer.writerow([event.year, event.event_short, row[1], row[2].replace('frc', ''), row[3]])
 
-        # convert into expected input format
-        data = StringIO.StringIO()
-        writer = csv.writer(data, delimiter=',')
-        for row in csv.reader(StringIO.StringIO(result.content), delimiter=','):
-            writer.writerow([event.year, event.event_short, row[1], row[2].replace('frc', ''), row[3]])
-
-        awards = []
-        for award in CSVAwardsParser.parse(data.getvalue()):
-            awards.append(Award(
-                id=Award.render_key_name(event.key_name, award['award_type_enum']),
-                name_str=award['name_str'],
-                award_type_enum=award['award_type_enum'],
-                year=event.year,
-                event=event.key,
-                event_type_enum=event.event_type_enum,
-                team_list=[ndb.Key(Team, 'frc{}'.format(team_number)) for team_number in award['team_number_list']],
-                recipient_json_list=award['recipient_json_list']
-            ))
-        AwardManipulator.createOrUpdate(awards)
+            awards = []
+            for award in CSVAwardsParser.parse(data.getvalue()):
+                awards.append(Award(
+                    id=Award.render_key_name(event.key_name, award['award_type_enum']),
+                    name_str=award['name_str'],
+                    award_type_enum=award['award_type_enum'],
+                    year=event.year,
+                    event=event.key,
+                    event_type_enum=event.event_type_enum,
+                    team_list=[ndb.Key(Team, 'frc{}'.format(team_number)) for team_number in award['team_number_list']],
+                    recipient_json_list=award['recipient_json_list']
+                ))
+            AwardManipulator.createOrUpdate(awards)
 
         # matches
         result = urlfetch.fetch(self.MATCHES_URL.format(event.year, event_key, event_key))
         if result.status_code != 200:
             logging.warning('Unable to retreive url: ' + (self.MATCHES_URL.format(event.year, event_key, event_key)))
-            return
-
-        data = result.content.replace('frc', '').replace('{}_'.format(event_key), '')
-        match_dicts = OffseasonMatchesParser.parse(data)
-        matches = [
-            Match(
-                id=Match.renderKeyName(
-                    event.key.id(),
-                    match.get("comp_level", None),
-                    match.get("set_number", 0),
-                    match.get("match_number", 0)),
-                event=event.key,
-                game=Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
-                set_number=match.get("set_number", 0),
-                match_number=match.get("match_number", 0),
-                comp_level=match.get("comp_level", None),
-                team_key_names=match.get("team_key_names", None),
-                alliances_json=match.get("alliances_json", None)
-            )
-        for match in match_dicts]
-        MatchManipulator.createOrUpdate(matches)
+        else:
+            data = result.content.replace('frc', '').replace('{}_'.format(event_key), '')
+            match_dicts = OffseasonMatchesParser.parse(data)
+            matches = [
+                Match(
+                    id=Match.renderKeyName(
+                        event.key.id(),
+                        match.get("comp_level", None),
+                        match.get("set_number", 0),
+                        match.get("match_number", 0)),
+                    event=event.key,
+                    game=Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
+                    set_number=match.get("set_number", 0),
+                    match_number=match.get("match_number", 0),
+                    comp_level=match.get("comp_level", None),
+                    team_key_names=match.get("team_key_names", None),
+                    alliances_json=match.get("alliances_json", None)
+                )
+            for match in match_dicts]
+            MatchManipulator.createOrUpdate(matches)
 
         # rankings
         result = urlfetch.fetch(self.RANKINGS_URL.format(event.year, event_key, event_key))
         if result.status_code != 200:
             logging.warning('Unable to retreive url: ' + (self.RANKINGS_URL.format(event.year, event_key, event_key)))
-            return
-
-        # convert into expected input format
-        rankings = list(csv.reader(StringIO.StringIO(result.content), delimiter=','))
-        if rankings and event.rankings != rankings:
-            event.rankings_json = json.dumps(rankings)
-            event._rankings = None
-            event.dirty = True
-        EventManipulator.createOrUpdate(event)
+        else:
+            # convert into expected input format
+            rankings = list(csv.reader(StringIO.StringIO(result.content), delimiter=','))
+            if rankings and event.rankings != rankings:
+                event.rankings_json = json.dumps(rankings)
+                event._rankings = None
+                event.dirty = True
+            EventManipulator.createOrUpdate(event)
 
         self.response.out.write("Done restoring {}!".format(event_key))
