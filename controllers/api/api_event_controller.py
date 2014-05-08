@@ -121,6 +121,24 @@ class ApiEventRankingsController(ApiEventController):
         else:
             return ranks
 
+class ApiEventAwardsController(ApiEventController):
+    LONG_CACHE_EXPIRATION = 60 * 60 * 24
+    SHORT_CACHE_EXPIRATION = 60 * 5
+
+    def __init__(self, *args, **kw):
+        super(ApiEventAwardsController, self).__init__(*args, **kw)
+        self._cache_key = "apiv2_event_awards_controller_{}".format(self.event_key)
+        self._cache_expiration = self.SHORT_CACHE_EXPIRATION
+        self._cache_version = 2
+
+    def _render(self,event_key):
+        self._set_cache_header_length(61)
+        self._set_event(event_key)
+        
+        award_list = Event.get_by_id(event_key).awards
+        award_dicts = [ModelToDict.awardConverter(award) for award in award_list]
+        return json.dumps(award_dicts, ensure_ascii=True)
+
 
 class ApiEventListController(ApiBaseController):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
