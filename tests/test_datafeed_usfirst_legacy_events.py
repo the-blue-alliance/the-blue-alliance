@@ -20,7 +20,6 @@ class TestDatafeedUsfirstLegacyEvents(unittest2.TestCase):
         self.testbed.deactivate()
 
     def test_getEvent(self):
-        return  # 2014-04-22 FIXME temporarily disabled due to server-side changes by FIRST -fangeugene
         # test with 2011ct
         event = self.datafeed.getEventDetails(2011, "5561")
 
@@ -35,7 +34,6 @@ class TestDatafeedUsfirstLegacyEvents(unittest2.TestCase):
         self.assertEqual(event.event_short, "ct")
 
     def test_getEventTeams(self):
-        return  # 2014-04-22 FIXME temporarily disabled due to server-side changes by FIRST -fangeugene
         # test with 2011ct
         teams = self.datafeed.getEventTeams(2011, "5561")
 
