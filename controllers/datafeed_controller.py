@@ -525,7 +525,8 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
             team = legacy_df.getTeamDetails(Team.get_by_id(key_name))
         else:
             legacy_team = legacy_df.getTeamDetails(Team.get_by_id(key_name))
-            team.rookie_year = legacy_team.rookie_year  # only available on legacy df
+            if legacy_team is not None:
+                team.rookie_year = legacy_team.rookie_year  # only available on legacy df
 
         if team:
             team = TeamManipulator.createOrUpdate(team)
