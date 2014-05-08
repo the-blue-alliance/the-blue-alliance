@@ -21,6 +21,8 @@ from controllers.cron_controller import EventTeamRepairDo, EventTeamUpdate, Even
 from controllers.cron_controller import EventMatchstatsDo, EventMatchstatsEnqueue
 from controllers.cron_controller import FinalMatchesRepairDo
 from controllers.cron_controller import YearInsightsEnqueue, YearInsightsDo, OverallInsightsEnqueue, OverallInsightsDo, TypeaheadCalcEnqueue, TypeaheadCalcDo
+from controllers.cron_controller import DistrictPointsCalcEnqueue, DistrictPointsCalcDo
+
 from controllers.firebase_controller import FirebasePushDo
 
 
@@ -65,6 +67,8 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup', TbaCSVBackupEnqueue
                                ('/tasks/math/do/overallinsights/(.*)', OverallInsightsDo),
                                ('/tasks/math/enqueue/insights/(.*)/([0-9]*)', YearInsightsEnqueue),
                                ('/tasks/math/do/insights/(.*)/([0-9]*)', YearInsightsDo),
+                               ('/tasks/math/enqueue/district_points_calc/([0-9]*)/([0-9]*)', DistrictPointsCalcEnqueue),
+                               ('/tasks/math/do/district_points_calc/(.*)', DistrictPointsCalcDo),
                                ('/tasks/math/enqueue/typeaheadcalc', TypeaheadCalcEnqueue),
                                ('/tasks/math/do/typeaheadcalc', TypeaheadCalcDo),
                                ('/tasks/posts/firebase_push', FirebasePushDo),

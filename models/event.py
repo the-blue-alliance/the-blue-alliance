@@ -32,6 +32,7 @@ class Event(ndb.Model):
     matchstats_json = ndb.TextProperty(indexed=False)  # for OPR, DPR, CCWM, etc.
     rankings_json = ndb.TextProperty(indexed=False)
     alliance_selections_json = ndb.TextProperty(indexed=False)  # Formatted as: [{'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] }, {'picks': [], 'declines': []}, ... ]
+    district_points_json = ndb.TextProperty(indexed=False)
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
@@ -39,6 +40,7 @@ class Event(ndb.Model):
     def __init__(self, *args, **kw):
         self._alliance_selections = None
         self._awards = None
+        self._district_points = None
         self._matches = None
         self._matchstats = None
         self._rankings = None
@@ -71,6 +73,18 @@ class Event(ndb.Model):
         if self._awards is None:
             self.get_awards_async().wait()
         return self._awards
+
+    @property
+    def district_points(self):
+        """
+        Lazy load district_points JSON
+        """
+        if self._district_points is None:
+            try:
+                self._district_points = json.loads(self.district_points_json)
+            except Exception, e:
+                self._district_points = None
+        return self._district_points
 
     @ndb.tasklet
     def get_matches_async(self):

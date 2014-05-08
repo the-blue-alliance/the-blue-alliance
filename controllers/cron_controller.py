@@ -1,7 +1,10 @@
 import datetime
+import heapq
 import logging
 import os
 import json
+
+from collections import defaultdict
 
 from google.appengine.api import taskqueue
 
@@ -10,8 +13,11 @@ from google.appengine.ext import ndb
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
-from helpers.event_helper import EventHelper
+from consts.award_type import AwardType
+from consts.event_type import EventType
 
+from helpers.event_helper import EventHelper
+from helpers.event_manipulator import EventManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.event_team_repairer import EventTeamRepairer
 from helpers.event_team_updater import EventTeamUpdater
@@ -21,6 +27,7 @@ from helpers.team_manipulator import TeamManipulator
 from helpers.matchstats_helper import MatchstatsHelper
 from helpers.insights_helper import InsightsHelper
 
+from models.award import Award
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
@@ -394,3 +401,111 @@ class TypeaheadCalcDo(webapp.RequestHandler):
         template_values = {'results': results}
         path = os.path.join(os.path.dirname(__file__), '../templates/math/typeaheadcalc_do.html')
         self.response.out.write(template.render(path, template_values))
+
+
+class DistrictPointsCalcEnqueue(webapp.RequestHandler):
+    """
+    Enqueues calculation of district points for events within a district for a given year
+    """
+
+    def get(self, district_type_enum, year):
+        district_type_enum = int(district_type_enum)
+        year = int(year)
+
+        event_keys = Event.query(Event.year == year, Event.event_district_enum == district_type_enum).fetch(None, keys_only=True)
+        for event_key in event_keys:
+            taskqueue.add(url='/tasks/math/do/district_points_calc/{}'.format(event_key.id()), method='GET')
+
+        self.response.out.write("Enqueued for: {}".format([event_key.id() for event_key in event_keys]))
+
+
+class DistrictPointsCalcDo(webapp.RequestHandler):
+    """
+    Calculates district points for an event
+    """
+
+    def get(self, event_key):
+        event = Event.get_by_id(event_key)
+
+        match_key_futures = Match.query(Match.event == event.key).fetch_async(None, keys_only=True)
+        award_key_futures = Award.query(Award.event == event.key).fetch_async(None, keys_only=True)
+
+        match_futures = ndb.get_multi_async(match_key_futures.get_result())
+        award_futures = ndb.get_multi_async(award_key_futures.get_result())
+
+        POINTS_MULTIPLIER = 3 if event.event_type_enum == EventType.DISTRICT_CMP else 1
+
+        data = {
+            'points': defaultdict(lambda: {
+                'qual_points': 0,
+                'elim_points': 0,
+                'alliance_points': 0,
+                'award_points': 0,
+                'total': 0,
+            }),
+            'tiebreakers': defaultdict(lambda: {  # for tiebreaker stats that can't be calculated with 'points'
+                'qual_wins': 0,
+                'highest_qual_scores': [],
+            }),
+        }
+
+        # match points
+        elim_num_wins = defaultdict(lambda: defaultdict(int))
+        elim_alliances = defaultdict(lambda: defaultdict(list))
+        for match_future in match_futures:
+            match = match_future.get_result()
+            if not match.has_been_played:
+                continue
+
+            if match.comp_level == 'qm':
+                if match.winning_alliance == '':
+                    for team in match.team_key_names:
+                        data['points'][team]['qual_points'] += 1 * POINTS_MULTIPLIER
+                else:
+                    for team in match.alliances[match.winning_alliance]['teams']:
+                        data['points'][team]['qual_points'] += 2 * POINTS_MULTIPLIER
+                        data['tiebreakers'][team]['qual_wins'] += 1
+                        winning_score = match.alliances[match.winning_alliance]['score']
+                        data['tiebreakers'][team]['highest_qual_scores'] = heapq.nlargest(3, data['tiebreakers'][team]['highest_qual_scores'] + [winning_score])
+            else:
+                if match.winning_alliance == '':
+                    continue
+
+                match_set_key = '{}_{}{}'.format(match.event.id(), match.comp_level, match.set_number)
+                elim_num_wins[match_set_key][match.winning_alliance] += 1
+                elim_alliances[match_set_key][match.winning_alliance] += match.alliances[match.winning_alliance]['teams']
+
+                if elim_num_wins[match_set_key][match.winning_alliance] >= 2:
+                    for team in elim_alliances[match_set_key][match.winning_alliance]:
+                        data['points'][team]['elim_points'] += 5* POINTS_MULTIPLIER
+
+        # alliance points
+        if event.alliance_selections:
+            selection_points = EventHelper.alliance_selections_to_points(event.alliance_selections)
+            for team, points in selection_points.items():
+                data['points'][team]['alliance_points'] += points * POINTS_MULTIPLIER
+        else:
+            logging.warning("Event {} has no alliance selection data!".format(event.key.id()))
+
+        # award points
+        for award_future in award_futures:
+            award = award_future.get_result()
+            if award.award_type_enum not in AwardType.NON_JUDGED_NON_TEAM_AWARDS:
+                if award.award_type_enum == AwardType.CHAIRMANS:
+                    point_value = 10
+                elif award.award_type_enum in {AwardType.ENGINEERING_INSPIRATION, AwardType.ROOKIE_ALL_STAR}:
+                    point_value = 8
+                else:
+                    point_value = 5
+                for team in award.team_list:
+                    data['points'][team.id()]['award_points'] += point_value * POINTS_MULTIPLIER
+
+        for team, point_breakdown in data['points'].items():
+            for p in point_breakdown.values():
+                data['points'][team]['total'] += p
+
+        event.district_points_json = json.dumps(data)
+        event.dirty = True  # This is so hacky. -fangeugene 2014-05-08
+        EventManipulator.createOrUpdate(event)
+
+        self.response.out.write(event.district_points)
