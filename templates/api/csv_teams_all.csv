@@ -1,2 +1,4 @@
+{% autoescape off %}
 team_number,name,nickname,location,website{% for team in teams %}
-{{team.team_number}},{{team.name}},{{team.nickname}},"{{team.location}}",{{team.website}}{% endfor %}
+{{team.team_number}},"{{team.name}}","{{team.nickname}}","{{team.location}}","{{team.website}}"{% endfor %}
+{% endautoescape %}
