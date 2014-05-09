@@ -4,6 +4,7 @@ import webapp2
 import tba_config
 
 from controllers.backup_controller import TbaCSVBackupEventsEnqueue, TbaCSVBackupEventDo, TbaCSVRestoreEventsEnqueue, TbaCSVRestoreEventDo
+from controllers.backup_controller import TbaCSVBackupTeamsEnqueue, TbaCSVBackupTeamsDo
 
 from controllers.datafeed_controller import TbaVideosGet, TbaVideosEnqueue
 from controllers.datafeed_controller import FmsEventListGet, FmsTeamListGet
@@ -30,6 +31,8 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/enqueue/csv_restore_events', TbaCSVRestoreEventsEnqueue),
                                ('/tasks/enqueue/csv_restore_events/([0-9]*)', TbaCSVRestoreEventsEnqueue),
                                ('/tasks/do/csv_restore_event/(.*)', TbaCSVRestoreEventDo),
+                               ('/tasks/enqueue/csv_backup_teams', TbaCSVBackupTeamsEnqueue),
+                               ('/tasks/do/csv_backup_teams', TbaCSVBackupTeamsDo),
                                ('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
                                ('/tasks/enqueue/usfirst_event_alliances/(.*)', UsfirstEventAlliancesEnqueue),
                                ('/tasks/enqueue/usfirst_event_details/([0-9]*)', UsfirstEventDetailsEnqueue),
