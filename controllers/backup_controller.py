@@ -59,7 +59,7 @@ class TbaCSVBackupEventDo(webapp.RequestHandler):
 
     AWARDS_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/events/{}/{}/{}_awards.csv'  # % (year, event_key, event_key)
     MATCHES_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/events/{}/{}/{}_matches.csv'  # % (year, event_key, event_key)
-    TEAMS_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/{}/events/{}/{}_teams.csv'  # % (year, event_key, event_key)
+    TEAMS_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/events/{}/{}/{}_teams.csv'  # % (year, event_key, event_key)
     RANKINGS_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/events/{}/{}/{}_rankings.csv'  # % (year, event_key, event_key)
     ALLIANCES_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/events/{}/{}/{}_alliances.csv'  # % (year, event_key, event_key)
 
