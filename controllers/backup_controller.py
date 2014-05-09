@@ -27,7 +27,7 @@ from datafeeds.csv_awards_parser import CSVAwardsParser
 from datafeeds.offseason_matches_parser import OffseasonMatchesParser
 
 
-class TbaCSVBackupEnqueue(webapp.RequestHandler):
+class TbaCSVBackupEventsEnqueue(webapp.RequestHandler):
     """
     Enqueues CSV backup
     """
@@ -36,7 +36,7 @@ class TbaCSVBackupEnqueue(webapp.RequestHandler):
             years = range(1992, datetime.datetime.now().year + 1)
             for y in years:
                 taskqueue.add(
-                    url='/tasks/enqueue/csv_backup/{}'.format(y),
+                    url='/tasks/enqueue/csv_backup_events/{}'.format(y),
                     method='GET')
             self.response.out.write("Enqueued backup for years: {}".format(years))
         else:
@@ -115,7 +115,7 @@ class TbaCSVBackupEventDo(webapp.RequestHandler):
         writer.writerow(unicode_row)
 
 
-class TbaCSVRestoreEnqueue(webapp.RequestHandler):
+class TbaCSVRestoreEventsEnqueue(webapp.RequestHandler):
     """
     Enqueues CSV restore
     """
@@ -128,7 +128,7 @@ class TbaCSVRestoreEnqueue(webapp.RequestHandler):
             years = range(1992, datetime.datetime.now().year + 1)
             for y in years:
                 taskqueue.add(
-                    url='/tasks/enqueue/csv_restore/{}'.format(y),
+                    url='/tasks/enqueue/csv_restore_events/{}'.format(y),
                     method='GET')
             self.response.out.write("Enqueued restore for years: {}".format(years))
         else:
