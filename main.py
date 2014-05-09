@@ -15,6 +15,7 @@ from controllers.main_controller import ContactHandler, HashtagsHandler, \
       AboutHandler, ThanksHandler, PageNotFoundHandler, \
       GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler
 from controllers.match_controller import MatchDetail
+from controllers.rankings_controller import RankingsCanonical, RankingsDetail
 from controllers.suggestions.suggest_match_video_controller import SuggestMatchVideoController
 from controllers.suggestions.suggest_event_webcast_controller import SuggestEventWebcastController
 from controllers.suggestions.suggest_team_media_controller import SuggestTeamMediaController
@@ -59,6 +60,8 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/logout', AccountLogout, 'account-logout', strict_slash=True),
       RedirectRoute(r'/match/<match_key>', MatchDetail, 'match-detail', strict_slash=True),
       RedirectRoute(r'/opr', OprHandler, 'opr', strict_slash=True),
+      RedirectRoute(r'/rankings', RankingsCanonical, 'rankings-canonical', strict_slash=True),
+      RedirectRoute(r'/rankings/<year:[0-9]+>/<district_abbrev>', RankingsDetail, 'rankings-detail', strict_slash=True),
       RedirectRoute(r'/record', RecordHandler, 'record', strict_slash=True),
       RedirectRoute(r'/search', SearchHandler, 'search', strict_slash=True),
       RedirectRoute(r'/suggest/event/webcast', SuggestEventWebcastController, 'suggest-event-webcast', strict_slash=True),

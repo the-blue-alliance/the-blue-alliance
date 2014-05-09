@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}{% if not is_canonical %}{{year}} {% endif %}FIRST Robotics District Rankings - The Blue Alliance{% endblock %}
+
+{% block meta_description %}{% endblock %}
+
+{% block rankings_active %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-3 col-lg-2">
+      <div class="tba-sidenav-affixed">
+        <div class="btn-group">
+          <a class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" href="#">
+            {{year}}
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu tba-dropdown-menu-limited">
+            {% for valid_year in valid_years %}
+              <li><a href="/rankings/{{valid_year}}">{{valid_year}}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <h1 class="visible-xs end_header">{{year}} {{district_name}} District Rankings</h1>
+
+        <div class="tba-sidebar">
+          <ul class="nav tba-sidenav">
+            {% for valid_district in valid_districts %}
+              <li {% if district_name == valid_district.0 %}class="active"{% endif %}><a href="/rankings/{{valid_district.1}}/{{year}}">{{valid_district.0}}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-9 col-lg-10">
+      <h1 class="hidden-xs end_header">{{year}} {{district_name}} District Rankings</h1>
+      <table class="table table-striped table-condensed table-center">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Team</th>
+            <th>Event 1</th>
+            <th>Event 2</th>
+            <th>District Champ</th>
+            <th>Rookie Bonus</th>
+            <th>Total Points</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for team_key, totals in team_totals %}
+          <tr>
+            <td>{{forloop.counter}}</td>
+            <td><a href="/team/{{team_key|digits}}/{{year}}">{{team_key|digits}}</a></td>
+            <td>
+              {% if totals.event_points.0 %}
+              {{totals.event_points.0.1.total}} <a href="/event/{{totals.event_points.0.0.key.id}}" rel="tooltip" title="{{totals.event_points.0.0.short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
+              {% else %}
+              --
+              {% endif %}
+            </td>
+            <td>
+              {% if totals.event_points.1 %}
+              {{totals.event_points.1.1.total}} <a href="/event/{{totals.event_points.1.0.key.id}}" rel="tooltip" title="{{totals.event_points.1.0.short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
+              {% else %}
+              --
+              {% endif %}
+            </td>
+            <td>
+              {% if totals.event_points.2 %}
+              {{totals.event_points.2.1.total}} <a href="/event/{{totals.event_points.2.0.key.id}}" rel="tooltip" title="{{totals.event_points.2.0.short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
+              {% else %}
+              --
+              {% endif %}
+            </td>
+            <td>
+              {% if totals.rookie_bonus %}
+              {{totals.rookie_bonus}}
+              {% else %}
+              --
+              {% endif %}
+            </td>
+            <td><strong>{{totals.point_total}}</strong></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <p>* District rankings are not official and are calculated using the <a href="http://www.usfirst.org/sites/default/files/uploadedFiles/Robotics_Programs/FRC/Resources/FRC_District_Standard_Points_Ranking_System.pdf">FRC Standard District Points Ranking System (PDF)</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}
