@@ -57,11 +57,11 @@ class TbaCSVBackupEventDo(webapp.RequestHandler):
     Backs up event awards, matches, team list, rankings, and alliance selection order
     """
 
-    AWARDS_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/{}/{}/{}_awards.csv'  # % (year, event_key, event_key)
-    MATCHES_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/{}/{}/{}_matches.csv'  # % (year, event_key, event_key)
-    TEAMS_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/{}/{}/{}_teams.csv'  # % (year, event_key, event_key)
-    RANKINGS_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/{}/{}/{}_rankings.csv'  # % (year, event_key, event_key)
-    ALLIANCES_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/{}/{}/{}_alliances.csv'  # % (year, event_key, event_key)
+    AWARDS_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/events/{}/{}/{}_awards.csv'  # % (year, event_key, event_key)
+    MATCHES_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/events/{}/{}/{}_matches.csv'  # % (year, event_key, event_key)
+    TEAMS_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/{}/events/{}/{}_teams.csv'  # % (year, event_key, event_key)
+    RANKINGS_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/events/{}/{}/{}_rankings.csv'  # % (year, event_key, event_key)
+    ALLIANCES_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/events/{}/{}/{}_alliances.csv'  # % (year, event_key, event_key)
 
     def get(self, event_key):
         event = Event.get_by_id(event_key)
@@ -149,7 +149,7 @@ class TbaCSVRestoreEventDo(webapp.RequestHandler):
     Restores event awards, matches, team list, rankings, and alliance selection order
     """
 
-    BASE_URL = 'https://raw.githubusercontent.com/the-blue-alliance/tba-data-backup/master/tba-data-backup/{}/{}/'  # % (year, event_key)
+    BASE_URL = 'https://raw.githubusercontent.com/the-blue-alliance/tba-data-backup/master/events/{}/{}/'  # % (year, event_key)
     ALLIANCES_URL = BASE_URL + '{}_alliances.csv'  # % (year, event_key, event_key)
     AWARDS_URL = BASE_URL + '{}_awards.csv'  # % (year, event_key, event_key)
     MATCHES_URL = BASE_URL + '{}_matches.csv'  # % (year, event_key, event_key)
