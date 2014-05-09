@@ -240,3 +240,43 @@ class TbaCSVRestoreEventDo(webapp.RequestHandler):
             EventManipulator.createOrUpdate(event)
 
         self.response.out.write("Done restoring {}!".format(event_key))
+
+
+class TbaCSVBackupTeamsEnqueue(webapp.RequestHandler):
+    """
+    Enqueues CSV teams backup
+    """
+    def get(self):
+        taskqueue.add(
+            url='/tasks/do/csv_backup_teams',
+            method='GET')
+        self.response.out.write("Enqueued CSV teams backup")
+
+
+class TbaCSVBackupTeamsDo(webapp.RequestHandler):
+    """
+    Backs up teams
+    """
+    TEAMS_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/teams/teams.csv'
+
+    def get(self):
+        team_keys = Team.query().order(Team.team_number).fetch(None, keys_only=True)
+        team_futures = ndb.get_multi_async(team_keys)
+
+        if team_futures:
+            with cloudstorage.open(self.TEAMS_FILENAME_PATTERN, 'w') as teams_file:
+                writer = csv.writer(teams_file, delimiter=',')
+                for team_future in team_futures:
+                    team = team_future.get_result()
+                    self._writerow_unicode(writer, [team.key.id(), team.nickname, team.name, team.address, team.website, team.rookie_year])
+
+        self.response.out.write("Done backing up teams!")
+
+    def _writerow_unicode(self, writer, row):
+        unicode_row = []
+        for s in row:
+            try:
+                unicode_row.append(s.encode("utf-8"))
+            except:
+                unicode_row.append(s)
+        writer.writerow(unicode_row)
