@@ -179,7 +179,7 @@ class TbaCSVRestoreEventDo(webapp.RequestHandler):
         # awards
         result = urlfetch.fetch(self.AWARDS_URL.format(event.year, event_key, event_key))
         if result.status_code != 200:
-            logging.warning('Unable to retreive url: ' + (self.Awards_URL.format(event.year, event_key, event_key)))
+            logging.warning('Unable to retreive url: ' + (self.AWARDS_URL.format(event.year, event_key, event_key)))
         else:
             # convert into expected input format
             data = StringIO.StringIO()
