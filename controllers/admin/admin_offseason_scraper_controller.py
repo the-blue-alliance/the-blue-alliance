@@ -24,7 +24,7 @@ class AdminOffseasonScraperController(LoggedInHandler):
         new_events = df.getEventList()
         old_events = Event.query().filter(
             Event.event_type_enum == EventType.OFFSEASON).filter(
-            Event.year == 2013).filter(
+            Event.year == 2014).filter(
             Event.first_eid != None).fetch(100)
 
         old_first_eids = [event.first_eid for event in old_events]
