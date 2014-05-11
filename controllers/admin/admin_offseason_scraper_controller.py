@@ -69,7 +69,7 @@ class AdminOffseasonScraperController(LoggedInHandler):
                 event_short=self.request.get("event_short"),
                 first_eid=self.request.get("event_first_eid"),
                 name=self.request.get("event_name"),
-                year=self.request.get("event_year"),
+                year=int(self.request.get("event_year")),
                 start_date=start_date,
                 end_date=end_date,
                 location=self.request.get("event_location"),
