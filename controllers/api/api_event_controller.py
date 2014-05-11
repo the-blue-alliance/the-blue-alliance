@@ -135,7 +135,7 @@ class ApiEventAwardsController(ApiEventController):
         self._set_cache_header_length(61)
         self._set_event(event_key)
         
-        award_list = Event.get_by_id(event_key).awards
+        award_list = self.event.awards
         award_dicts = [ModelToDict.awardConverter(award) for award in award_list]
         return json.dumps(award_dicts, ensure_ascii=True)
 
