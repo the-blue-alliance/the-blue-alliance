@@ -2,6 +2,7 @@
 import multiprocessing
 import optparse
 import sys
+import time
 import warnings
 
 # Install the Python unittest2 package before you run this script.
@@ -27,6 +28,8 @@ def start_suite(suite):
 
 
 def main(sdk_path, test_pattern):
+    start_time = time.time()
+
     sys.path.insert(0, sdk_path)
     import dev_appserver
     dev_appserver.fix_sys_path()
@@ -43,8 +46,10 @@ def main(sdk_path, test_pattern):
         process.join()
 
     fail = False
+    tests_run = 0
     while not RESULT_QUEUE.empty():
         test_names, suite_result = RESULT_QUEUE.get()
+        tests_run += suite_result.testsRun
         print '-----------------------'
         for test_name in test_names:
             print test_name
@@ -54,12 +59,13 @@ def main(sdk_path, test_pattern):
             print "FAIL"
             fail = True
 
-    print "============="
+    print "================================"
+    print "Completed {} tests in: {} seconds".format(tests_run, time.time() - start_time)
     if fail:
         print "TESTS FAILED!"
     else:
         print "TESTS PASSED!"
-    print "============="
+    print "================================"
     if fail:
         sys.exit(1)
     else:
