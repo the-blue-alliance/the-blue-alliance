@@ -1,5 +1,7 @@
+import csv
 import json
 import logging
+import StringIO
 import os
 import urllib
 import uuid
@@ -267,12 +269,17 @@ class CsvTeamsAll(MainApiHandler):
             team_keys = Team.query().order(Team.team_number).fetch(10000, keys_only=True)
             teams = ndb.get_multi(team_keys)
 
-            template_values = {
-                "teams": teams
-            }
+            sio = StringIO.StringIO()
+            writer = csv.writer(sio, delimiter=',')
+            writer.writerow(['team_number','name','nickname','location','website'])
 
-            path = os.path.join(os.path.dirname(__file__), '../templates/api/csv_teams_all.csv')
-            output = template.render(path, template_values)
+            for team in teams:
+                row = [team.team_number, team.name, team.nickname, team.location, team.website]
+                row_utf8 = [unicode(e).encode('utf-8') for e in row]
+                writer.writerow(row_utf8)
+
+            output = sio.getvalue()
+
             if tba_config.CONFIG["memcache"]:
                 memcache.set(memcache_key, output, 86400)
 
