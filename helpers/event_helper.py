@@ -70,10 +70,10 @@ class EventHelper(object):
         # Add weekless + other events last
         if weekless_events:
             to_return[WEEKLESS_EVENTS_LABEL] = weekless_events
-        if offseason_events:
-            to_return[OFFSEASON_EVENTS_LABEL] = offseason_events
         if preseason_events:
             to_return[PRESEASON_EVENTS_LABEL] = preseason_events
+        if offseason_events:
+            to_return[OFFSEASON_EVENTS_LABEL] = offseason_events
 
         return to_return
 
