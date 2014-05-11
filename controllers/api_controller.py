@@ -267,13 +267,14 @@ class CsvTeamsAll(MainApiHandler):
 
         if output is None:
             team_keys = Team.query().order(Team.team_number).fetch(10000, keys_only=True)
-            teams = ndb.get_multi(team_keys)
+            team_futures = ndb.get_multi_async(team_keys)
 
             sio = StringIO.StringIO()
             writer = csv.writer(sio, delimiter=',')
             writer.writerow(['team_number','name','nickname','location','website'])
 
-            for team in teams:
+            for team_future in team_futures:
+                team = team_future.get_result()
                 row = [team.team_number, team.name, team.nickname, team.location, team.website]
                 row_utf8 = [unicode(e).encode('utf-8') for e in row]
                 writer.writerow(row_utf8)
