@@ -55,6 +55,9 @@ class ApiEventTeamsController(ApiEventController):
         self._cache_expiration = self.LONG_CACHE_EXPIRATION
         self._cache_version = 2
 
+    def _track_call(self, event_key):
+        self._track_call_defer('event/teams', event_key)
+
     def _render(self, event_key):
         self._set_cache_header_length(60 * 60)
         self._set_event(event_key)
@@ -74,6 +77,9 @@ class ApiEventMatchesController(ApiEventController):
         self._cache_key = "apiv2_event_matches_controller_{}".format(self.event_key)
         self._cache_expiration = self.SHORT_CACHE_EXPIRATION
         self._cache_version = 2
+
+    def _track_call(self, event_key):
+        self._track_call_defer('event/matches', event_key)
 
     def _render(self, event_key):
         self._set_cache_header_length(61)
@@ -95,6 +101,9 @@ class ApiEventStatsController(ApiEventController):
         self._cache_expiration = self.SHORT_CACHE_EXPIRATION
         self._cache_version = 2
 
+    def _track_call(self, event_key):
+        self._track_call_defer('event/stats', event_key)
+
     def _render(self, event_key):
         self._set_cache_header_length(61)
         self._set_event(event_key)
@@ -110,6 +119,9 @@ class ApiEventRankingsController(ApiEventController):
         self._cache_key = "apiv2_event_rankings_controller_{}".format(self.event_key)
         self._cache_expiration = self.SHORT_CACHE_EXPIRATION
         self._cache_version = 2
+
+    def _track_call(self, event_key):
+        self._track_call_defer('event/rankings', event_key)
 
     def _render(self, event_key):
         self._set_cache_header_length(61)
@@ -131,10 +143,13 @@ class ApiEventAwardsController(ApiEventController):
         self._cache_expiration = self.SHORT_CACHE_EXPIRATION
         self._cache_version = 2
 
+    def _track_call(self, event_key):
+        self._track_call_defer('event/awards', event_key)
+
     def _render(self,event_key):
         self._set_cache_header_length(61)
         self._set_event(event_key)
-        
+
         award_list = self.event.awards
         award_dicts = [ModelToDict.awardConverter(award) for award in award_list]
         return json.dumps(award_dicts, ensure_ascii=True)
