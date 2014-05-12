@@ -43,7 +43,13 @@ class DatafeedUsfirstLegacy(DatafeedUsfirst):
             self._session_key[year] = session_key
             return self._session_key.get(year)
 
-        result = urlfetch.fetch(self.SESSION_KEY_GENERATING_PATTERN % year, headers={'Referer': 'usfirst.org'}, deadline=60)
+        url = self.SESSION_KEY_GENERATING_PATTERN % year
+        try:
+            result = urlfetch.fetch(url, headers={'Referer': 'usfirst.org'}, deadline=10)
+        except Exception:
+            logging.error("URLFetch failed for: {}".format(url))
+            return None
+
         if result.status_code == 200:
             session_key = result.headers.get('Set-Cookie', None)
             if session_key is not None:
