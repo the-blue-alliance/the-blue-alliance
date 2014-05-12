@@ -20,14 +20,19 @@ class DatafeedBase(object):
         if usfirst_session_key is not None:
             headers['Cookie'] = usfirst_session_key
 
-        result = urlfetch.fetch(url,
-                                headers=headers,
-                                deadline=10)
+        try:
+            result = urlfetch.fetch(url,
+                                    headers=headers,
+                                    deadline=10)
+        except Exception:
+            logging.error("URLFetch failed for: {}".format(url))
+            return [], False
+
         if result.status_code == 200:
             return parser.parse(result.content)
         else:
             logging.warning('Unable to retreive url: ' + (url))
-            return list(), False
+            return [], False
 
     def _shorten(self, string):
         MAX_DB_LENGTH = 500
