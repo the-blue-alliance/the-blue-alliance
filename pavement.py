@@ -8,6 +8,10 @@ from paver.easy import *
 path = path("./")
 
 @task
+def deploy():
+  sh("python deploy.py")
+
+@task
 def javascript():
     """Combine Compress Javascript"""
     print("Combining and Compressing Javascript")
