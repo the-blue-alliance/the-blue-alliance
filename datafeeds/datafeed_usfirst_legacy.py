@@ -50,7 +50,7 @@ class DatafeedUsfirstLegacy(DatafeedUsfirst):
             logging.error("URLFetch failed for: {}".format(url))
             logging.info(e)
 
-            session_key = None
+            session_key = ''
             if tba_config.CONFIG["memcache"]:
                 memcache.set(memcache_key, session_key, 60 * 5)
             self._session_key[year] = session_key
