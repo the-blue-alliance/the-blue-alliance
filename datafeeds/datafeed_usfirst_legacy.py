@@ -49,8 +49,12 @@ class DatafeedUsfirstLegacy(DatafeedUsfirst):
         except Exception, e:
             logging.error("URLFetch failed for: {}".format(url))
             logging.info(e)
-            self._session_key[year] = None
-            return None
+
+            session_key = None
+            if tba_config.CONFIG["memcache"]:
+                memcache.set(memcache_key, session_key, 60 * 5)
+            self._session_key[year] = session_key
+            return session_key
 
         if result.status_code == 200:
             session_key = result.headers.get('Set-Cookie', None)
