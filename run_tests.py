@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import multiprocessing
 import optparse
+import StringIO
 import sys
 import time
 import warnings
@@ -18,13 +19,9 @@ RESULT_QUEUE = multiprocessing.Queue()
 
 
 def start_suite(suite):
-    testresult = unittest2.TextTestRunner(verbosity=2).run(suite)
-
-    test_names = []
-    for sub in suite:
-        for test in sub:
-            test_names.append(str(test))
-    RESULT_QUEUE.put((test_names, testresult.testsRun, testresult.wasSuccessful()))
+    sio = StringIO.StringIO()
+    testresult = unittest2.TextTestRunner(sio, verbosity=2).run(suite)
+    RESULT_QUEUE.put((sio.getvalue(), testresult.testsRun, testresult.wasSuccessful()))
 
 
 def main(sdk_path, test_pattern):
@@ -48,15 +45,11 @@ def main(sdk_path, test_pattern):
     fail = False
     total_tests_run = 0
     while not RESULT_QUEUE.empty():
-        test_names, tests_run, was_successful = RESULT_QUEUE.get()
+        test_output, tests_run, was_successful = RESULT_QUEUE.get()
         total_tests_run += tests_run
         print '-----------------------'
-        for test_name in test_names:
-            print test_name
-        if was_successful:
-            print "PASS"
-        else:
-            print "FAIL"
+        print test_output
+        if not was_successful:
             fail = True
 
     print "================================"
