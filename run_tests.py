@@ -24,7 +24,7 @@ def start_suite(suite):
     for sub in suite:
         for test in sub:
             test_names.append(str(test))
-    RESULT_QUEUE.put((test_names, testresult))
+    RESULT_QUEUE.put((test_names, testresult.testsRun, testresult.wasSuccessful()))
 
 
 def main(sdk_path, test_pattern):
@@ -46,21 +46,21 @@ def main(sdk_path, test_pattern):
         process.join()
 
     fail = False
-    tests_run = 0
+    total_tests_run = 0
     while not RESULT_QUEUE.empty():
-        test_names, suite_result = RESULT_QUEUE.get()
-        tests_run += suite_result.testsRun
+        test_names, tests_run, was_successful = RESULT_QUEUE.get()
+        total_tests_run += tests_run
         print '-----------------------'
         for test_name in test_names:
             print test_name
-        if suite_result.wasSuccessful():
+        if was_successful:
             print "PASS"
         else:
             print "FAIL"
             fail = True
 
     print "================================"
-    print "Completed {} tests in: {} seconds".format(tests_run, time.time() - start_time)
+    print "Completed {} tests in: {} seconds".format(total_tests_run, time.time() - start_time)
     if fail:
         print "TESTS FAILED!"
     else:
