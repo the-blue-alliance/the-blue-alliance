@@ -45,9 +45,11 @@ class DatafeedUsfirstLegacy(DatafeedUsfirst):
 
         url = self.SESSION_KEY_GENERATING_PATTERN % year
         try:
-            result = urlfetch.fetch(url, headers={'Referer': 'usfirst.org'}, deadline=10)
-        except Exception:
+            result = urlfetch.fetch(url, headers={'Referer': 'usfirst.org'}, deadline=20)
+        except Exception, e:
             logging.error("URLFetch failed for: {}".format(url))
+            logging.info(e)
+            self._session_key[year] = None
             return None
 
         if result.status_code == 200:

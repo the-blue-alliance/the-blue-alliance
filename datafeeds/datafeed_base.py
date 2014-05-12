@@ -24,8 +24,9 @@ class DatafeedBase(object):
             result = urlfetch.fetch(url,
                                     headers=headers,
                                     deadline=10)
-        except Exception:
+        except Exception, e:
             logging.error("URLFetch failed for: {}".format(url))
+            logging.info(e)
             return [], False
 
         if result.status_code == 200:
