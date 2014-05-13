@@ -6,6 +6,9 @@ class TeamManipulator(ManipulatorBase):
     """
     Handle Team database writes.
     """
+    @classmethod
+    def clearCache(self, team):
+        CacheClearer.clear_team_and_references([team.key])
 
     @classmethod
     def updateMerge(self, new_team, old_team, auto_union=True):
