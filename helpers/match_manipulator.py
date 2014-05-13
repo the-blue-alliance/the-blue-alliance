@@ -1,5 +1,10 @@
-from helpers.manipulator_base import ManipulatorBase
 import json
+
+from google.appengine.ext import ndb
+
+from cache_clearer.cache_clearer import CacheClearer
+from helpers.manipulator_base import ManipulatorBase
+from models.team import Team
 
 
 class MatchManipulator(ManipulatorBase):
@@ -14,6 +19,17 @@ class MatchManipulator(ManipulatorBase):
         "old" team that are present in the "new" team, but keep fields from
         the "old" team that are null in the "new" team.
         """
+        # build set of referenced keys for cache clearing
+        match_keys = set()
+        event_keys = set()
+        team_keys = set()
+        years = set()
+        for m in [old_match, new_match]:
+            match_keys.add(m.key)
+            event_keys.add(m.event)
+            team_keys = team_keys.union(set([ndb.Key(Team, team_key_name) for team_key_name in getattr(m, 'team_key_names', [])]))
+            years.add(m.event.id()[:4])  # because the match model doesn't store the year
+
         immutable_attrs = [
             "comp_level",
             "event",
@@ -73,5 +89,8 @@ class MatchManipulator(ManipulatorBase):
             if unioned != old_set:
                 setattr(old_match, attr, list(unioned))
                 old_match.dirty = True
+
+        if getattr(old_match, 'dirty', False):
+            CacheClearer.clear_match_and_references(match_keys, event_keys, team_keys, years)
 
         return old_match

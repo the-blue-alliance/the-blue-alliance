@@ -57,6 +57,11 @@ class CacheableHandler(webapp2.RequestHandler):
         memcache.delete(self.cache_key)
         return self.cache_key
 
+    @classmethod
+    def clear_cache(cls, *args):
+        cache_key = cls.CACHE_KEY_FORMAT.format(*args)
+        memcache.delete(cache_key)
+
     def _read_cache(self):
         return memcache.get(self.cache_key)
 
