@@ -27,7 +27,7 @@ class MatchManipulator(ManipulatorBase):
         for m in [old_match, new_match]:
             match_keys.add(m.key)
             event_keys.add(m.event)
-            team_keys = team_keys.union(set([ndb.Key(Team, team_key_name) for team_key_name in getattr(m, 'team_key_names', [])]))
+            team_keys = team_keys.union(set([ndb.Key(Team, team_key_name) for team_key_name in m.team_key_names]))
             years.add(m.event.id()[:4])  # because the match model doesn't store the year
 
         immutable_attrs = [

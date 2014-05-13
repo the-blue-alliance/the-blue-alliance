@@ -22,7 +22,7 @@ class AwardManipulator(ManipulatorBase):
         years = set()
         for a in [old_award, new_award]:
             event_keys.add(a.event)
-            team_keys = team_keys.union(set(getattr(a, 'team_list', [])))
+            team_keys = team_keys.union(a.team_list)
             years.add(a.year)
 
         immutable_attrs = [
