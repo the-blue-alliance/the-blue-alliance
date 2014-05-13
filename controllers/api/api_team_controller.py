@@ -16,13 +16,13 @@ from models.team import Team
 
 class ApiTeamController(ApiBaseController):
     CACHE_KEY_FORMAT = "apiv2_team_controller_{}_{}"  # (team_key, year)
+    CACHE_VERSION = 0
 
     def __init__(self, *args, **kw):
         super(ApiTeamController, self).__init__(*args, **kw)
         self.team_key = self.request.route_kwargs["team_key"]
         self.year = int(self.request.route_kwargs.get("year") or datetime.now().year)
         self._cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.year)
-        self._cache_version = 2
 
     @property
     def _validators(self):
