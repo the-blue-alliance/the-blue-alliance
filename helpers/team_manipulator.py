@@ -1,3 +1,4 @@
+from cache_clearer.cache_clearer import CacheClearer
 from helpers.manipulator_base import ManipulatorBase
 
 
@@ -13,6 +14,11 @@ class TeamManipulator(ManipulatorBase):
         "old" team that are present in the "new" team, but keep fields from
         the "old" team that are null in the "new" team.
         """
+        # build set of referenced keys for cache clearing
+        team_keys = set()
+        for t in [old_team, new_team]:
+            team_keys.add(t.key)
+
         attrs = [
             "address",
             "name",
@@ -32,5 +38,8 @@ class TeamManipulator(ManipulatorBase):
             old_team.first_tpid_year = new_team.first_tpid_year
             old_team.first_tpid = new_team.first_tpid
             old_team.dirty = True
+
+        if getattr(old_team, 'dirty', False):
+            CacheClearer.clear_team_and_references(team_keys)
 
         return old_team

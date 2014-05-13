@@ -1,4 +1,6 @@
 import json
+
+from cache_clearer.cache_clearer import CacheClearer
 from helpers.manipulator_base import ManipulatorBase
 
 
@@ -14,6 +16,15 @@ class AwardManipulator(ManipulatorBase):
         "old" award that are present in the "new" award, but keep fields from
         the "old" award that are null in the "new" award.
         """
+        # build set of referenced keys for cache clearing
+        event_keys = set()
+        team_keys = set()
+        years = set()
+        for a in [old_award, new_award]:
+            event_keys.add(a.event)
+            team_keys = team_keys.union(set(getattr(a, 'team_list', [])))
+            years.add(a.year)
+
         immutable_attrs = [
             'event',
             'award_type_enum',
@@ -77,5 +88,8 @@ class AwardManipulator(ManipulatorBase):
                 merged_list = old_list
 
             setattr(old_award, attr, merged_list)
+
+        if getattr(old_award, 'dirty', False):
+            CacheClearer.clear_award_and_references(event_keys, team_keys, years)
 
         return old_award

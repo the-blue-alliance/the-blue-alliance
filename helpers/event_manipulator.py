@@ -1,3 +1,4 @@
+from cache_clearer.cache_clearer import CacheClearer
 from helpers.manipulator_base import ManipulatorBase
 
 
@@ -13,6 +14,13 @@ class EventManipulator(ManipulatorBase):
         "old" team that are present in the "new" team, but keep fields from
         the "old" team that are null in the "new" team.
         """
+        # build set of referenced keys for cache clearing
+        event_keys = set()
+        years = set()
+        for e in [old_event, new_event]:
+            event_keys.add(e.key)
+            years.add(e.year)
+
         attrs = [
             "alliance_selections_json",
             "end_date",
@@ -57,5 +65,8 @@ class EventManipulator(ManipulatorBase):
                 if getattr(new_event, attr) != getattr(old_event, attr):
                     setattr(old_event, attr, getattr(new_event, attr))
                     old_event.dirty = True
+
+        if getattr(old_event, 'dirty', False):
+            CacheClearer.clear_event_and_references(event_keys, years)
 
         return old_event

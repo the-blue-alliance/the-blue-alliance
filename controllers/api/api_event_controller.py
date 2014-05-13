@@ -15,12 +15,13 @@ from models.event import Event
 class ApiEventController(ApiBaseController):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
+    CACHE_KEY_FORMAT = "apiv2_event_controller_{}"  # (event_key)
 
     def __init__(self, *args, **kw):
         super(ApiEventController, self).__init__(*args, **kw)
         self.event_key = self.request.route_kwargs["event_key"]
         self._cache_expiration = self.LONG_CACHE_EXPIRATION
-        self._cache_key = "apiv2_event_controller_{}".format(self.event_key)
+        self._cache_key = self.CACHE_KEY_FORMAT.format(self.event_key)
         self._cache_version = 2
 
     @property
@@ -48,10 +49,11 @@ class ApiEventController(ApiBaseController):
 class ApiEventTeamsController(ApiEventController):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
+    CACHE_KEY_FORMAT = "apiv2_event_teams_controller_{}"  # (event_key)
 
     def __init__(self, *args, **kw):
         super(ApiEventTeamsController, self).__init__(*args, **kw)
-        self._cache_key = "apiv2_event_teams_controller_{}".format(self.event_key)
+        self._cache_key = self.CACHE_KEY_FORMAT.format(self.event_key)
         self._cache_expiration = self.LONG_CACHE_EXPIRATION
         self._cache_version = 2
 
@@ -71,10 +73,11 @@ class ApiEventTeamsController(ApiEventController):
 class ApiEventMatchesController(ApiEventController):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
+    CACHE_KEY_FORMAT = "apiv2_event_matches_controller_{}"  # (event_key)
 
     def __init__(self, *args, **kw):
         super(ApiEventMatchesController, self).__init__(*args, **kw)
-        self._cache_key = "apiv2_event_matches_controller_{}".format(self.event_key)
+        self._cache_key = self.CACHE_KEY_FORMAT.format(self.event_key)
         self._cache_expiration = self.SHORT_CACHE_EXPIRATION
         self._cache_version = 2
 
@@ -94,10 +97,11 @@ class ApiEventMatchesController(ApiEventController):
 class ApiEventStatsController(ApiEventController):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
+    CACHE_KEY_FORMAT = "apiv2_event_stats_controller_{}"  # (event_key)
 
     def __init__(self, *args, **kw):
         super(ApiEventStatsController, self).__init__(*args, **kw)
-        self._cache_key = "apiv2_event_stats_controller_{}".format(self.event_key)
+        self._cache_key = self.CACHE_KEY_FORMAT.format(self.event_key)
         self._cache_expiration = self.SHORT_CACHE_EXPIRATION
         self._cache_version = 2
 
@@ -113,10 +117,11 @@ class ApiEventStatsController(ApiEventController):
 class ApiEventRankingsController(ApiEventController):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
+    CACHE_KEY_FORMAT = "apiv2_event_rankings_controller_{}"  # (event_key)
 
     def __init__(self, *args, **kw):
         super(ApiEventRankingsController, self).__init__(*args, **kw)
-        self._cache_key = "apiv2_event_rankings_controller_{}".format(self.event_key)
+        self._cache_key = self.CACHE_KEY_FORMAT.format(self.event_key)
         self._cache_expiration = self.SHORT_CACHE_EXPIRATION
         self._cache_version = 2
 
@@ -136,10 +141,11 @@ class ApiEventRankingsController(ApiEventController):
 class ApiEventAwardsController(ApiEventController):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
+    CACHE_KEY_FORMAT = "apiv2_event_awards_controller_{}"  # (event_key)
 
     def __init__(self, *args, **kw):
         super(ApiEventAwardsController, self).__init__(*args, **kw)
-        self._cache_key = "apiv2_event_awards_controller_{}".format(self.event_key)
+        self._cache_key = self.CACHE_KEY_FORMAT.format(self.event_key)
         self._cache_expiration = self.SHORT_CACHE_EXPIRATION
         self._cache_version = 2
 
@@ -157,11 +163,12 @@ class ApiEventAwardsController(ApiEventController):
 
 class ApiEventListController(ApiBaseController):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
+    CACHE_KEY_FORMAT = "apiv2_event_list_controller_{}"  # (year)
 
     def __init__(self, *args, **kw):
         super(ApiEventListController, self).__init__(*args, **kw)
         self.year = int(self.request.route_kwargs.get("year") or datetime.now().year)
-        self._cache_key = "apiv2_event_list_controller_{}".format(self.year)
+        self._cache_key = self.CACHE_KEY_FORMAT.format(self.year)
         self._cache_expiration = self.LONG_CACHE_EXPIRATION
         self._cache_version = 2
 
