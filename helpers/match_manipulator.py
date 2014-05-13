@@ -11,6 +11,14 @@ class MatchManipulator(ManipulatorBase):
     """
     Handle Match database writes.
     """
+    @classmethod
+    def clearCache(self, match):
+        CacheClearer.clear_match_and_references(
+            [match.key],
+            [match.event],
+            set([ndb.Key(Team, team_key_name) for team_key_name in match.team_key_names]),
+            [match.event.id()[:4]]
+        )
 
     @classmethod
     def updateMerge(self, new_match, old_match, auto_union=True):

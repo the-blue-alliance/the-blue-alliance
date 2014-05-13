@@ -8,6 +8,9 @@ class AwardManipulator(ManipulatorBase):
     """
     Handle Award database writes.
     """
+    @classmethod
+    def clearCache(self, award):
+        CacheClearer.clear_award_and_references([award.event], award.team_list, [award.year])
 
     @classmethod
     def updateMerge(self, new_award, old_award, auto_union=True):

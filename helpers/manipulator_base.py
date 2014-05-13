@@ -13,6 +13,8 @@ class ManipulatorBase(object):
     def delete(self, models):
         keys = [model.key for model in self.listify(models)]
         ndb.delete_multi(keys)
+        for model in self.listify(models):
+            self.clearCache(model)
 
     @classmethod
     def listify(self, thing):

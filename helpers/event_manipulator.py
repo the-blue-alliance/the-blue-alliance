@@ -6,6 +6,10 @@ class EventManipulator(ManipulatorBase):
     """
     Handle Event database writes.
     """
+    @classmethod
+    def clearCache(self, event):
+        CacheClearer.clear_event_and_references([event.key], [event.year])
+
 
     @classmethod
     def updateMerge(self, new_event, old_event, auto_union=True):

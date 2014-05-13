@@ -36,8 +36,7 @@ class CacheClearer(object):
 
     @classmethod
     def clear_match_and_references(cls, match_keys, event_keys, team_keys, years):
-        cls._clear_matches(match_keys)
-        cls._clear_events(event_keys)
+        cls._clear_matches(event_keys)
         for year in years:
             cls._clear_teams(team_keys, years)
 
@@ -53,7 +52,7 @@ class CacheClearer(object):
             years.add(int(event_key_name[:4]))
 
         cls._clear_teams(team_keys, years)
-        cls._clear_events(event_keys)
+        cls._clear_eventteams(event_keys)
 
     @classmethod
     def _clear_event_awards(cls, event_keys):
@@ -68,7 +67,7 @@ class CacheClearer(object):
             ApiEventRankingsController.clear_cache(event_key.id())
 
         for year in years:
-            ApiEventListController.clear_cache(event_key.id())
+            ApiEventListController.clear_cache(year)
 
     @classmethod
     def _clear_eventteams(cls, event_keys):
@@ -76,9 +75,9 @@ class CacheClearer(object):
             ApiEventTeamsController.clear_cache(event_key.id())
 
     @classmethod
-    def _clear_matches(cls, match_keys):
-        for match_key in match_keys:
-            ApiEventMatchesController.clear_cache(match_key.id())
+    def _clear_matches(cls, event_keys):
+        for event_key in event_keys:
+            ApiEventMatchesController.clear_cache(event_key.id())
 
     @classmethod
     def _clear_teams(cls, team_keys, years):
