@@ -465,3 +465,17 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(memcache.get(self.eventawards_2010sc_cache_key), None)
         self.assertEqual(memcache.get(self.team_frc1_cache_key), None)
         self.assertEqual(memcache.get(self.team_frc2_cache_key), None)
+
+        self.resetAll()
+
+        # deleting an eventteam
+        EventTeamManipulator.delete(self.eventteam_2010sc_frc1)
+        self.assertNotEqual(memcache.get(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(memcache.get(self.event_2010sc_cache_key), None)
+        self.assertEqual(memcache.get(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(memcache.get(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(memcache.get(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(memcache.get(self.eventrankings_2010sc_cache_key), None)
+        self.assertNotEqual(memcache.get(self.eventawards_2010sc_cache_key), None)
+        self.assertEqual(memcache.get(self.team_frc1_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_frc2_cache_key), None)
