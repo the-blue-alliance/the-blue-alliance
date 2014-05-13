@@ -5,6 +5,7 @@ from google.appengine.ext import ndb
 
 from helpers.tbavideo_helper import TBAVideoHelper
 from models.event import Event
+from models.team import Team
 
 
 class Match(ndb.Model):
@@ -140,6 +141,10 @@ class Match(ndb.Model):
     @property
     def event_key_name(self):
         return self.event.id()
+
+    @property
+    def team_keys(self):
+        return [ndb.Key(Team, team_key_name) for team_key_name in self.team_key_names]
 
     @property
     def year(self):

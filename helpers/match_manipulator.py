@@ -16,8 +16,8 @@ class MatchManipulator(ManipulatorBase):
         CacheClearer.clear_match_and_references(
             [match.key],
             [match.event],
-            set([ndb.Key(Team, team_key_name) for team_key_name in match.team_key_names]),
-            [match.event.id()[:4]]
+            match.team_keys,
+            [match.year]
         )
 
     @classmethod
@@ -35,8 +35,8 @@ class MatchManipulator(ManipulatorBase):
         for m in [old_match, new_match]:
             match_keys.add(m.key)
             event_keys.add(m.event)
-            team_keys = team_keys.union(set([ndb.Key(Team, team_key_name) for team_key_name in m.team_key_names]))
-            years.add(m.event.id()[:4])  # because the match model doesn't store the year
+            team_keys = team_keys.union(m.team_keys)
+            years.add(m.year)
 
         immutable_attrs = [
             "comp_level",
