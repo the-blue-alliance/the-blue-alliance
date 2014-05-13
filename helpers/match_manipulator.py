@@ -2,7 +2,7 @@ import json
 
 from google.appengine.ext import ndb
 
-from cache_clearer.cache_clearer import CacheClearer
+from helpers.cache_clearer import CacheClearer
 from helpers.manipulator_base import ManipulatorBase
 from models.team import Team
 
