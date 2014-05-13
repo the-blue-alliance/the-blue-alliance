@@ -6,6 +6,9 @@ class EventTeamManipulator(ManipulatorBase):
     """
     Handle EventTeam database writes.
     """
+    @classmethod
+    def clearCache(self, event_team):
+        CacheClearer.clear_eventteam_and_references([event_team.event], [event_team.team], [event_team.year])
 
     @classmethod
     def updateMerge(self, new_event_team, old_event_team, auto_union=True):

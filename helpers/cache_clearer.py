@@ -31,7 +31,8 @@ class CacheClearer(object):
             team_key_name = et_key.id().split('_')[1]
             team_keys.add(ndb.Key(Team, team_key_name))
 
-        cls._clear_events_controllers(event_keys, years)
+        cls._clear_events_controllers(event_keys)
+        cls._clear_eventlist_controllers(years)
         cls._clear_teams_controllers(team_keys, years)
 
     @classmethod
@@ -39,7 +40,6 @@ class CacheClearer(object):
         """
         Clears cache for controllers that references this eventteam
         """
-        cls._clear_events_controllers(event_keys)
         cls._clear_eventteams_controllers(event_keys)
         cls._clear_teams_controllers(team_keys, years)
 
@@ -75,12 +75,14 @@ class CacheClearer(object):
             ApiEventAwardsController.clear_cache(event_key.id())
 
     @classmethod
-    def _clear_events_controllers(cls, event_keys, years=set()):
+    def _clear_events_controllers(cls, event_keys):
         for event_key in event_keys:
             ApiEventController.clear_cache(event_key.id())
             ApiEventStatsController.clear_cache(event_key.id())
             ApiEventRankingsController.clear_cache(event_key.id())
 
+    @classmethod
+    def _clear_eventlist_controllers(cls, years):
         for year in years:
             ApiEventListController.clear_cache(year)
 
