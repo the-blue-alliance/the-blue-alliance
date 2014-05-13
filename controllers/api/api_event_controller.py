@@ -69,6 +69,7 @@ class ApiEventMatchesController(ApiEventController):
 
     def __init__(self, *args, **kw):
         super(ApiEventMatchesController, self).__init__(*args, **kw)
+        self._cache_key = self.CACHE_KEY_FORMAT.format(self.event_key)
         self._cache_version = 2
 
     def _track_call(self, event_key):
