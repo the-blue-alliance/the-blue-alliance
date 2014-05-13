@@ -17,6 +17,10 @@ class ManipulatorBase(object):
             self.clearCache(model)
 
     @classmethod
+    def clearCache(cls, model):
+        return
+
+    @classmethod
     def listify(self, thing):
         if not isinstance(thing, list):
             return [thing]
