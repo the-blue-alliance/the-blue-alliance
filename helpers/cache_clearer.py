@@ -70,33 +70,33 @@ class CacheClearer(object):
 
     @classmethod
     def _clear_event_awards_controllers(cls, event_keys):
-        for event_key in event_keys:
+        for event_key in filter(None, event_keys):
             ApiEventAwardsController.clear_cache(event_key.id())
 
     @classmethod
     def _clear_events_controllers(cls, event_keys):
-        for event_key in event_keys:
+        for event_key in filter(None, event_keys):
             ApiEventController.clear_cache(event_key.id())
             ApiEventStatsController.clear_cache(event_key.id())
             ApiEventRankingsController.clear_cache(event_key.id())
 
     @classmethod
     def _clear_eventlist_controllers(cls, years):
-        for year in years:
+        for year in filter(None, years):
             ApiEventListController.clear_cache(year)
 
     @classmethod
     def _clear_eventteams_controllers(cls, event_keys):
-        for event_key in event_keys:
+        for event_key in filter(None, event_keys):
             ApiEventTeamsController.clear_cache(event_key.id())
 
     @classmethod
     def _clear_matches_controllers(cls, event_keys):
-        for event_key in event_keys:
+        for event_key in filter(None, event_keys):
             ApiEventMatchesController.clear_cache(event_key.id())
 
     @classmethod
     def _clear_teams_controllers(cls, team_keys, years):
-        for team_key in team_keys:
-            for year in years:
+        for team_key in filter(None, team_keys):
+            for year in filter(None, years):
                 ApiTeamController.clear_cache(team_key.id(), year)
