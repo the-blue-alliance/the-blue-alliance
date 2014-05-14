@@ -68,6 +68,7 @@ class ManipulatorBase(object):
         """
         if old_model is None:
             new_model.dirty = True
+            self.clearCache(new_model)
             return new_model
 
         return self.updateMerge(new_model, old_model, auto_union=auto_union)
