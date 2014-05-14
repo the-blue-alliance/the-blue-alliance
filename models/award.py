@@ -27,6 +27,11 @@ class Award(ndb.Model):
     updated = ndb.DateTimeProperty(auto_now=True)
 
     def __init__(self, *args, **kw):
+        self._affected_references = {
+            'event': set(),
+            'team_list': set(),
+            'year': set(),
+        }
         self._recipient_list = None
         self._recipient_dict = None
         self._recipient_list_json = None

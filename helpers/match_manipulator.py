@@ -12,13 +12,8 @@ class MatchManipulator(ManipulatorBase):
     Handle Match database writes.
     """
     @classmethod
-    def clearCache(self, match):
-        CacheClearer.clear_match_and_references(
-            [match.key],
-            [match.event],
-            match.team_keys,
-            [match.year]
-        )
+    def clearCache(cls, affected_refs):
+        CacheClearer.clear_match_and_references(affected_refs)
 
     @classmethod
     def updateMerge(self, new_match, old_match, auto_union=True):
@@ -27,17 +22,6 @@ class MatchManipulator(ManipulatorBase):
         "old" team that are present in the "new" team, but keep fields from
         the "old" team that are null in the "new" team.
         """
-        # build set of referenced keys for cache clearing
-        match_keys = set()
-        event_keys = set()
-        team_keys = set()
-        years = set()
-        for m in [old_match, new_match]:
-            match_keys.add(m.key)
-            event_keys.add(m.event)
-            team_keys = team_keys.union(m.team_keys)
-            years.add(m.year)
-
         immutable_attrs = [
             "comp_level",
             "event",
@@ -97,8 +81,5 @@ class MatchManipulator(ManipulatorBase):
             if unioned != old_set:
                 setattr(old_match, attr, list(unioned))
                 old_match.dirty = True
-
-        if getattr(old_match, 'dirty', False):
-            CacheClearer.clear_match_and_references(match_keys, event_keys, team_keys, years)
 
         return old_match

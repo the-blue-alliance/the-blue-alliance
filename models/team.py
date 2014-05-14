@@ -22,6 +22,9 @@ class Team(ndb.Model):
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
     def __init__(self, *args, **kw):
+        self._affected_references = {
+            'key': set(),
+        }
         self._country_name = None
         self._locality = None
         self._location = None

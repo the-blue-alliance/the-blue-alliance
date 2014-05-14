@@ -1,4 +1,5 @@
 from google.appengine.ext import ndb
+from helpers.cache_clearer import CacheClearer
 
 
 class ManipulatorBase(object):
@@ -14,10 +15,11 @@ class ManipulatorBase(object):
         keys = [model.key for model in self.listify(models)]
         ndb.delete_multi(keys)
         for model in self.listify(models):
-            self.clearCache(model)
+            self._computeAndSaveAffectedReferences(model)
+            self.clearCache(model._affected_references)
 
     @classmethod
-    def clearCache(cls, model):
+    def clearCache(cls, affected_refs):
         return
 
     @classmethod
@@ -37,6 +39,13 @@ class ManipulatorBase(object):
             return things
 
     @classmethod
+    def _computeAndSaveAffectedReferences(cls, old_model, new_model=None):
+        for attr in old_model._affected_references.keys():
+            for a in [old_model, new_model] if new_model is not None else [old_model]:
+                val = cls.listify(getattr(a, attr))
+                old_model._affected_references[attr] = old_model._affected_references[attr].union(val)
+
+    @classmethod
     def createOrUpdate(self, new_models, auto_union=True):
         """
         Given a model or list of models, either insert them into the database, or update
@@ -45,6 +54,9 @@ class ManipulatorBase(object):
         models = self.listify(self.findOrSpawn(self.listify(new_models), auto_union=auto_union))
         models_to_put = [model for model in models if getattr(model, "dirty", False)]
         ndb.put_multi(models_to_put)
+        for model in models:
+            if getattr(model, 'dirty', False):
+                self.clearCache(model._affected_references)
         return self.delistify(models)
 
     @classmethod
@@ -68,9 +80,10 @@ class ManipulatorBase(object):
         """
         if old_model is None:
             new_model.dirty = True
-            self.clearCache(new_model)
+            self._computeAndSaveAffectedReferences(new_model)
             return new_model
 
+        self._computeAndSaveAffectedReferences(old_model, new_model)
         return self.updateMerge(new_model, old_model, auto_union=auto_union)
 
     @classmethod

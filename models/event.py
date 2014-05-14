@@ -37,6 +37,10 @@ class Event(ndb.Model):
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
     def __init__(self, *args, **kw):
+        self._affected_references = {
+            'key': set(),
+            'year': set(),
+        }
         self._alliance_selections = None
         self._awards = None
         self._matches = None

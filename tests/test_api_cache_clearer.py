@@ -209,13 +209,18 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.testbed.deactivate()
 
     def resetAll(self, flushed=False):
-        self.event_2010sc_1.put()
-        self.team_frc1_1.put()
-        self.team_frc2_1.put()
-        self.eventteam_2010sc_frc1.put()
-        self.eventteam_2010sc_frc2.put()
-        self.match1_1.put()
-        self.award1_1.put()
+        response = self.testapp.get('/api/v2/events/2010', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
+        self.assertNotEqual(memcache.get(self.eventlist_2010_cache_key), None)
+
+        EventManipulator.createOrUpdate(self.event_2010sc_1)
+        if flushed:
+            self.assertEqual(memcache.get(self.eventlist_2010_cache_key), None)
+        TeamManipulator.createOrUpdate(self.team_frc1_1)
+        TeamManipulator.createOrUpdate(self.team_frc2_1)
+        EventTeamManipulator.createOrUpdate(self.eventteam_2010sc_frc1)
+        EventTeamManipulator.createOrUpdate(self.eventteam_2010sc_frc2)
+        MatchManipulator.createOrUpdate(self.match1_1)
+        AwardManipulator.createOrUpdate(self.award1_1)
 
         response = self.testapp.get('/api/v2/events/2010', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(memcache.get(self.eventlist_2010_cache_key), None)
