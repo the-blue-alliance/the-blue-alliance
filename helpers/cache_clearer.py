@@ -49,8 +49,7 @@ class CacheClearer(object):
         Clears cache for controllers that references this match
         """
         cls._clear_matches_controllers(event_keys)
-        for year in years:
-            cls._clear_teams_controllers(team_keys, years)
+        cls._clear_teams_controllers(team_keys, years)
 
     @classmethod
     def clear_team_and_references(cls, team_keys):
