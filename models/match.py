@@ -111,6 +111,11 @@ class Match(ndb.Model):
     updated = ndb.DateTimeProperty(auto_now=True)
 
     def __init__(self, *args, **kw):
+        self._affected_references = {
+            'event': set(),
+            'team_keys': set(),
+            'year': set(),
+        }
         self._alliances = None
         self._tba_video = None
         self._winning_alliance = None

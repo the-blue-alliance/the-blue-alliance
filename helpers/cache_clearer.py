@@ -12,18 +12,25 @@ from models.team import Team
 
 class CacheClearer(object):
     @classmethod
-    def clear_award_and_references(cls, event_keys, team_keys, years):
+    def clear_award_and_references(cls, affected_refs):
         """
         Clears cache for controllers that references this award
         """
+        event_keys = affected_refs['event']
+        team_keys = affected_refs['team_list']
+        years = affected_refs['year']
+
         cls._clear_event_awards_controllers(event_keys)
         cls._clear_teams_controllers(team_keys, years)
 
     @classmethod
-    def clear_event_and_references(cls, event_keys, years):
+    def clear_event_and_references(cls, affected_refs):
         """
         Clears cache for controllers that references this event
         """
+        event_keys = affected_refs['key']
+        years = affected_refs['year']
+
         event_team_keys_future = EventTeam.query(EventTeam.event.IN([event_key for event_key in event_keys])).fetch_async(None, keys_only=True)
 
         team_keys = set()
@@ -36,26 +43,36 @@ class CacheClearer(object):
         cls._clear_teams_controllers(team_keys, years)
 
     @classmethod
-    def clear_eventteam_and_references(cls, event_keys, team_keys, years):
+    def clear_eventteam_and_references(cls, affected_refs):
         """
         Clears cache for controllers that references this eventteam
         """
+        event_keys = affected_refs['event']
+        team_keys = affected_refs['team']
+        years = affected_refs['year']
+
         cls._clear_eventteams_controllers(event_keys)
         cls._clear_teams_controllers(team_keys, years)
 
     @classmethod
-    def clear_match_and_references(cls, match_keys, event_keys, team_keys, years):
+    def clear_match_and_references(cls, affected_refs):
         """
         Clears cache for controllers that references this match
         """
+        event_keys = affected_refs['event']
+        team_keys = affected_refs['team_keys']
+        years = affected_refs['year']
+
         cls._clear_matches_controllers(event_keys)
         cls._clear_teams_controllers(team_keys, years)
 
     @classmethod
-    def clear_team_and_references(cls, team_keys):
+    def clear_team_and_references(cls, affected_refs):
         """
         Clears cache for controllers that references this team
         """
+        team_keys = affected_refs['key']
+
         event_team_keys_future = EventTeam.query(EventTeam.team.IN([team_key for team_key in team_keys])).fetch_async(None, keys_only=True)
 
         event_keys = set()
