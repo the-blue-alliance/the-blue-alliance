@@ -12,14 +12,13 @@ from renderers.team_renderer import TeamRenderer
 
 
 class TeamList(CacheableHandler):
-
     VALID_PAGES = [1, 2, 3, 4, 5, 6]
+    CACHE_VERSION = 1
 
     def __init__(self, *args, **kw):
         super(TeamList, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
         self._cache_key = "team_list_{}"  # (page)
-        self._cache_version = 1
 
     def get(self, page='1'):
         if page == '':
@@ -74,12 +73,12 @@ class TeamList(CacheableHandler):
 class TeamCanonical(CacheableHandler):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
+    CACHE_VERSION = 1
 
     def __init__(self, *args, **kw):
         super(TeamCanonical, self).__init__(*args, **kw)
         self._cache_expiration = self.LONG_CACHE_EXPIRATION
         self._cache_key = "team_canonical_{}"  # (team_number)
-        self._cache_version = 1
 
     def get(self, team_number):
         # /team/0201 should redirect to /team/201
@@ -106,12 +105,12 @@ class TeamCanonical(CacheableHandler):
 class TeamDetail(CacheableHandler):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
+    CACHE_VERSION = 2
 
     def __init__(self, *args, **kw):
         super(TeamDetail, self).__init__(*args, **kw)
         self._cache_expiration = self.LONG_CACHE_EXPIRATION
         self._cache_key = "team_detail_{}_{}"  # (team_number, year)
-        self._cache_version = 2
 
     def get(self, team_number, year):
         # /team/0201 should redirect to /team/201
@@ -136,12 +135,12 @@ class TeamDetail(CacheableHandler):
 class TeamHistory(CacheableHandler):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
+    CACHE_VERSION = 2
 
     def __init__(self, *args, **kw):
         super(TeamHistory, self).__init__(*args, **kw)
         self._cache_expiration = self.LONG_CACHE_EXPIRATION
         self._cache_key = "team_history_{}"  # (team_number)
-        self._cache_version = 2
 
     def get(self, team_number):
         # /team/0604/history should redirect to /team/604/history

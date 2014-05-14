@@ -15,11 +15,12 @@ class InsightsOverview(CacheableHandler):
     """
     Show Insights Overview
     """
+    CACHE_VERSION = 2
+
     def __init__(self, *args, **kw):
         super(InsightsOverview, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
         self._cache_key = "insights_overview"
-        self._cache_version = 2
 
     def _render(self):
         template_values = {
@@ -39,11 +40,12 @@ class InsightsDetail(CacheableHandler):
     """
     Show Insights for a particular year
     """
+    CACHE_VERSION = 2
+
     def __init__(self, *args, **kw):
         super(InsightsDetail, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
         self._cache_key = "insight_detail_{}"  # (year)
-        self._cache_version = 2
 
     def get(self, year):
         if year == '':
