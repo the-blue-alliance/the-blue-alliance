@@ -4,7 +4,6 @@ from google.appengine.ext import ndb
 
 from helpers.cache_clearer import CacheClearer
 from helpers.manipulator_base import ManipulatorBase
-from models.team import Team
 
 
 class MatchManipulator(ManipulatorBase):
