@@ -18,6 +18,8 @@ class EventTeam(ndb.Model):
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
     def __init__(self, *args, **kw):
+        # store set of affected references referenced keys for cache clearing
+        # keys must be model properties
         self._affected_references = {
             'event': set(),
             'team': set(),

@@ -19,7 +19,6 @@ class AwardManipulator(ManipulatorBase):
         "old" award that are present in the "new" award, but keep fields from
         the "old" award that are null in the "new" award.
         """
-
         immutable_attrs = [
             'event',
             'award_type_enum',

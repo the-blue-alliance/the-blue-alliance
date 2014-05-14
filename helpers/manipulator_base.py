@@ -20,6 +20,9 @@ class ManipulatorBase(object):
 
     @classmethod
     def clearCache(cls, affected_refs):
+        """
+        Child classes should replace method with appropriate call to CacheClearer.
+        """
         return
 
     @classmethod
@@ -40,10 +43,15 @@ class ManipulatorBase(object):
 
     @classmethod
     def _computeAndSaveAffectedReferences(cls, old_model, new_model=None):
-        for attr in old_model._affected_references.keys():
-            for a in [old_model, new_model] if new_model is not None else [old_model]:
-                val = cls.listify(getattr(a, attr))
-                old_model._affected_references[attr] = old_model._affected_references[attr].union(val)
+        """
+        This method is called whenever a model may potentially be created or updated.
+        Stores the affected references in the original instance of the model.
+        """
+        if hasattr(old_model, '_affected_references'):
+            for attr in old_model._affected_references.keys():
+                for a in [old_model, new_model] if new_model is not None else [old_model]:
+                    val = cls.listify(getattr(a, attr))
+                    old_model._affected_references[attr] = old_model._affected_references[attr].union(val)
 
     @classmethod
     def createOrUpdate(self, new_models, auto_union=True):
