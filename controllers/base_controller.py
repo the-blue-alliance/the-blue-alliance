@@ -1,3 +1,4 @@
+import logging
 import webapp2
 
 from time import mktime
@@ -66,6 +67,7 @@ class CacheableHandler(webapp2.RequestHandler):
     def clear_cache(cls, *args):
         full_cache_key = cls._get_full_cache_key(cls.CACHE_KEY_FORMAT.format(*args))
         memcache.delete(full_cache_key)
+        logging.info("Deleting cache key: {}".format(full_cache_key))
 
     def _read_cache(self):
         return memcache.get(self.full_cache_key)
