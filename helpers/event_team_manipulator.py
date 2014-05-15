@@ -1,3 +1,4 @@
+from helpers.cache_clearer import CacheClearer
 from helpers.manipulator_base import ManipulatorBase
 
 
@@ -5,13 +6,15 @@ class EventTeamManipulator(ManipulatorBase):
     """
     Handle EventTeam database writes.
     """
+    @classmethod
+    def clearCache(cls, affected_refs):
+        CacheClearer.clear_eventteam_and_references(affected_refs)
 
     @classmethod
     def updateMerge(self, new_event_team, old_event_team, auto_union=True):
         """
         Update and return EventTeams.
         """
-
         immutable_attrs = [
             "event",
             "team",

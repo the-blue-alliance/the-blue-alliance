@@ -1,3 +1,4 @@
+from helpers.cache_clearer import CacheClearer
 from helpers.manipulator_base import ManipulatorBase
 
 
@@ -5,6 +6,9 @@ class TeamManipulator(ManipulatorBase):
     """
     Handle Team database writes.
     """
+    @classmethod
+    def clearCache(cls, affected_refs):
+        CacheClearer.clear_team_and_references(affected_refs)
 
     @classmethod
     def updateMerge(self, new_team, old_team, auto_union=True):

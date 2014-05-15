@@ -46,7 +46,8 @@ class AdminOffseasonScraperController(LoggedInHandler):
         if self.request.get("submit") == "duplicate":
             old_event = Event.get_by_id(self.request.get("duplicate_event_key"))
             old_event.first_eid = self.request.get("event_first_eid")
-            old_event.put()
+            old_event.dirty = True  # TODO: hacky
+            EventManipulator.createOrUpdate(old_event)
 
             self.redirect("/admin/offseasons?success=duplicate&event_key=%s" % self.request.get("duplicate_event_key"))
             return

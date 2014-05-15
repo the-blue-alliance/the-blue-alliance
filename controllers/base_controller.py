@@ -1,3 +1,4 @@
+import logging
 import webapp2
 
 from time import mktime
@@ -15,12 +16,13 @@ class CacheableHandler(webapp2.RequestHandler):
     Provides a standard way of caching the output of pages.
     Currently only supports logged-out pages.
     """
+    CACHE_KEY_FORMAT = ''
 
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
         self._cache_expiration = 0
-        self._cache_key = ""
-        self._cache_version = 0
+        if not hasattr(self, '_cache_key'):
+            self._cache_key = self.CACHE_KEY_FORMAT
 
         # Cache all pages for 61 seconds, unless overwritten.
         if self.response is not None:
@@ -28,17 +30,21 @@ class CacheableHandler(webapp2.RequestHandler):
             self.response.headers['Pragma'] = 'Public'
 
     @property
-    def cache_key(self):
+    def full_cache_key(self):
+        return self._get_full_cache_key(self._cache_key)
+
+    @classmethod
+    def _get_full_cache_key(cls, cache_key):
         return "{}:{}:{}".format(
-            self._cache_key,
-            self._cache_version,
+            cache_key,
+            cls.CACHE_VERSION,
             tba_config.CONFIG["static_resource_version"])
 
     def get(self, *args, **kw):
         cached_response = self._read_cache()
         if cached_response:
-            self.response.headers = cached_response.headers
             self.response.out.write(cached_response.body)
+            self.response.headers = cached_response.headers
         else:
             self.response.out.write(self._render(*args, **kw))
             self._write_cache(self.response)
@@ -54,18 +60,24 @@ class CacheableHandler(webapp2.RequestHandler):
             return True
 
     def memcacheFlush(self):
-        memcache.delete(self.cache_key)
-        return self.cache_key
+        memcache.delete(self.full_cache_key)
+        return self.full_cache_key
+
+    @classmethod
+    def clear_cache(cls, *args):
+        full_cache_key = cls._get_full_cache_key(cls.CACHE_KEY_FORMAT.format(*args))
+        memcache.delete(full_cache_key)
+        logging.info("Deleting cache key: {}".format(full_cache_key))
 
     def _read_cache(self):
-        return memcache.get(self.cache_key)
+        return memcache.get(self.full_cache_key)
 
     def _render(self):
         raise NotImplementedError("No _render method.")
 
     def _write_cache(self, response):
         if tba_config.CONFIG["memcache"]:
-            memcache.set(self.cache_key, response, self._cache_expiration)
+            memcache.set(self.full_cache_key, response, self._cache_expiration)
 
 
 class LoggedInHandler(webapp2.RequestHandler):
