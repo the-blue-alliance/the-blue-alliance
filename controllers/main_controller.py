@@ -34,11 +34,11 @@ def render_static(page):
 
 class MainKickoffHandler(CacheableHandler):
     CACHE_VERSION = 3
+    CACHE_KEY_FORMAT = "main_kickoff"
 
     def __init__(self, *args, **kw):
         super(MainKickoffHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
-        self._cache_key = "main_kickoff"
 
     def _render(self, *args, **kw):
         kickoff_datetime_est = datetime.datetime(2014, 1, 4, 10, 30)
@@ -55,11 +55,11 @@ class MainKickoffHandler(CacheableHandler):
 
 class MainBuildseasonHandler(CacheableHandler):
     CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "main_buildseason"
 
     def __init__(self, *args, **kw):
         super(MainBuildseasonHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
-        self._cache_key = "main_buildseason"
 
     def _render(self, *args, **kw):
         endbuild_datetime_est = datetime.datetime(2014, 2, 18, 23, 59)
@@ -73,11 +73,11 @@ class MainBuildseasonHandler(CacheableHandler):
 
 class MainChampsHandler(CacheableHandler):
     CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "main_champs"
 
     def __init__(self, *args, **kw):
         super(MainChampsHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
-        self._cache_key = "main_champs"
 
     def _render(self, *args, **kw):
         year = datetime.datetime.now().year
@@ -98,11 +98,11 @@ class MainChampsHandler(CacheableHandler):
 
 class MainCompetitionseasonHandler(CacheableHandler):
     CACHE_VERSION = 5
+    CACHE_KEY_FORMAT = "main_competitionseason"
 
     def __init__(self, *args, **kw):
         super(MainCompetitionseasonHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60
-        self._cache_key = "main_competitionseason"
 
     def _render(self, *args, **kw):
         week_events = EventHelper.getWeekEvents()
@@ -116,11 +116,11 @@ class MainCompetitionseasonHandler(CacheableHandler):
 
 class MainInsightsHandler(CacheableHandler):
     CACHE_VERSION = 2
+    CACHE_KEY_FORMAT = "main_insights"
 
     def __init__(self, *args, **kw):
         super(MainInsightsHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
-        self._cache_key = "main_insights"
 
     def _render(self, *args, **kw):
         week_events = EventHelper.getWeekEvents()
@@ -139,11 +139,11 @@ class MainInsightsHandler(CacheableHandler):
 
 class MainOffseasonHandler(CacheableHandler):
     CACHE_VERSION = 2
+    CACHE_KEY_FORMAT = "main_offseason"
 
     def __init__(self, *args, **kw):
         super(MainOffseasonHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
-        self._cache_key = "main_offseason"
 
     def _render(self, *args, **kw):
         week_events = EventHelper.getWeekEvents()
@@ -157,11 +157,11 @@ class MainOffseasonHandler(CacheableHandler):
 
 class ContactHandler(CacheableHandler):
     CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "main_contact"
 
     def __init__(self, *args, **kw):
         super(ContactHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
-        self._cache_key = "main_contact"
 
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/contact.html")
@@ -170,11 +170,11 @@ class ContactHandler(CacheableHandler):
 
 class HashtagsHandler(CacheableHandler):
     CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "main_hashtags"
 
     def __init__(self, *args, **kw):
         super(HashtagsHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
-        self._cache_key = "main_hashtags"
 
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/hashtags.html")
@@ -183,11 +183,11 @@ class HashtagsHandler(CacheableHandler):
 
 class AboutHandler(CacheableHandler):
     CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "main_about"
 
     def __init__(self, *args, **kw):
         super(AboutHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
-        self._cache_key = "main_about"
 
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/about.html")
@@ -196,11 +196,11 @@ class AboutHandler(CacheableHandler):
 
 class ThanksHandler(CacheableHandler):
     CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "main_thanks"
 
     def __init__(self, *args, **kw):
         super(ThanksHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
-        self._cache_key = "main_thanks"
 
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/thanks.html")
@@ -209,11 +209,11 @@ class ThanksHandler(CacheableHandler):
 
 class OprHandler(CacheableHandler):
     CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "main_opr"
 
     def __init__(self, *args, **kw):
         super(OprHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
-        self._cache_key = "main_opr"
 
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/opr.html")
@@ -246,11 +246,11 @@ class SearchHandler(webapp2.RequestHandler):
 
 class GamedayHandler(CacheableHandler):
     CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "main_gameday"
 
     def __init__(self, *args, **kw):
         super(GamedayHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
-        self._cache_key = "main_gameday"
 
     def _render(self, *args, **kw):
         special_webcasts_future = Sitevar.get_by_id_async('gameday.special_webcasts')
@@ -302,11 +302,11 @@ class PageNotFoundHandler(webapp2.RequestHandler):
 
 class WebcastsHandler(CacheableHandler):
     CACHE_VERSION = 2
+    CACHE_KEY_FORMAT = "main_webcasts"
 
     def __init__(self, *args, **kw):
         super(WebcastsHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
-        self._cache_key = "main_webcasts"
 
     def _render(self, *args, **kw):
         year = datetime.datetime.now().year
@@ -324,11 +324,11 @@ class WebcastsHandler(CacheableHandler):
 
 class RecordHandler(CacheableHandler):
     CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "main_record"
 
     def __init__(self, *args, **kw):
         super(RecordHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
-        self._cache_key = "main_record"
 
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/record.html")
@@ -337,11 +337,11 @@ class RecordHandler(CacheableHandler):
 
 class ApiDocumentationHandler(CacheableHandler):
     CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "api_docs"
 
     def __init__(self, *args, **kw):
         super(ApiDocumentationHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
-        self._cache_key = "api_docs"
 
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/apidocs.html")

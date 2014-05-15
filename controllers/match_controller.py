@@ -14,17 +14,17 @@ class MatchDetail(CacheableHandler):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
     CACHE_VERSION = 4
+    CACHE_KEY_FORMAT = "match_detail_{}"  # (match_key)
 
     def __init__(self, *args, **kw):
         super(MatchDetail, self).__init__(*args, **kw)
         self._cache_expiration = self.LONG_CACHE_EXPIRATION
-        self._cache_key = "match_detail_{}"  # (match_key)
 
     def get(self, match_key):
         if not match_key:
             return self.redirect("/")
 
-        self._cache_key = self._cache_key.format(match_key)
+        self._cache_key = self.CACHE_KEY_FORMAT.format(match_key)
         super(MatchDetail, self).get(match_key)
 
     def _render(self, match_key):

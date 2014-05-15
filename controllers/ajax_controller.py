@@ -19,16 +19,16 @@ class LiveEventHandler(CacheableHandler):
     Uses timestamp for aggressive caching
     """
     CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "live-event:{}:{}"  # (event_key, timestamp)
 
     def __init__(self, *args, **kw):
         super(LiveEventHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 10
-        self._cache_key = "live-event:{}:{}"  # (event_key, timestamp)
 
     def get(self, event_key, timestamp):
         if int(timestamp) > time.time():
             self.abort(404)
-        self._cache_key = self._cache_key.format(event_key, timestamp)
+        self._cache_key = self.CACHE_KEY_FORMAT.format(event_key, timestamp)
         super(LiveEventHandler, self).get(event_key, timestamp)
 
     def _render(self, event_key, timestamp):
@@ -64,15 +64,15 @@ class TypeaheadHandler(CacheableHandler):
     fit into memcache efficiently
     """
     CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "typeahead_entries:{}"  # (search_key)
 
     def __init__(self, *args, **kw):
         super(TypeaheadHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
-        self._cache_key = "typeahead_entries:{}"
 
     def get(self, search_key):
         search_key = urllib2.unquote(search_key)
-        self._cache_key = self._cache_key.format(search_key)
+        self._cache_key = self.CACHE_KEY_FORMAT.format(search_key)
         super(TypeaheadHandler, self).get(search_key)
 
     def _render(self, search_key):
@@ -95,14 +95,14 @@ class WebcastHandler(CacheableHandler):
     Returns the HTML necessary to generate the webcast embed for a given event
     """
     CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "webcast_{}_{}"  # (event_key)
 
     def __init__(self, *args, **kw):
         super(WebcastHandler, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
-        self._cache_key = "webcast_{}_{}"  # (event_key)
 
     def get(self, event_key, webcast_number):
-        self._cache_key = self._cache_key.format(event_key, webcast_number)
+        self._cache_key = self.CACHE_KEY_FORMAT.format(event_key, webcast_number)
         super(WebcastHandler, self).get(event_key, webcast_number)
 
     def _render(self, event_key, webcast_number):
@@ -142,6 +142,6 @@ class WebcastHandler(CacheableHandler):
         return template.render(path, template_values)
 
     def memcacheFlush(self, event_key):
-        keys = [self.cache_key.format(event_key, n) for n in range(10)]
+        keys = [self.CACHE_KEY_FORMAT.format(event_key, n) for n in range(10)]
         memcache.delete_multi(keys)
         return keys
