@@ -5,10 +5,12 @@ from time import mktime
 from wsgiref.handlers import format_date_time
 
 from google.appengine.api import memcache
+from google.appengine.ext import ndb
 
 import tba_config
 
 from helpers.user_bundle import UserBundle
+from models.cached_response import CachedResponse
 
 
 class CacheableHandler(webapp2.RequestHandler):
@@ -67,6 +69,7 @@ class CacheableHandler(webapp2.RequestHandler):
     def clear_cache(cls, *args):
         full_cache_key = cls._get_full_cache_key(cls.CACHE_KEY_FORMAT.format(*args))
         memcache.delete(full_cache_key)
+        ndb.Key(CachedResponse, full_cache_key).delete()
         logging.info("Deleting cache key: {}".format(full_cache_key))
 
     def _read_cache(self):
@@ -78,6 +81,12 @@ class CacheableHandler(webapp2.RequestHandler):
     def _write_cache(self, response):
         if tba_config.CONFIG["memcache"]:
             memcache.set(self.full_cache_key, response, self._cache_expiration)
+        if tba_config.CONFIG["response_cache"]:
+            if str(self.__class__.__module__) in {'controllers.api.api_team_controller', 'controllers.api.api_event_controller'}:  # TODO: enable for all
+                CachedResponse(
+                    id=self.full_cache_key,
+                    body=response.body,
+                ).put()
 
 
 class LoggedInHandler(webapp2.RequestHandler):

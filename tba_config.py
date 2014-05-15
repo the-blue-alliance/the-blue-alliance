@@ -16,12 +16,14 @@ if DEBUG:
     CONFIG = {
         "env": "dev",
         "memcache": False,
+        "response_cache": True,
         "firebase-url": "https://thebluealliance-dev.firebaseio.com/{}.json?auth={}"
     }
 else:
     CONFIG = {
         "env": "prod",
         "memcache": True,
+        "response_cache": True,
         "firebase-url": "https://thebluealliance.firebaseio.com/{}.json?auth={}"
     }
 
