@@ -11,6 +11,11 @@ class ManipulatorBase(object):
     BATCH_SIZE = 500
 
     @classmethod
+    def delete_keys(cls, model_keys):
+        models = [model_key.get() for model_key in model_keys]
+        cls.delete(models)
+
+    @classmethod
     def delete(self, models):
         keys = [model.key for model in self.listify(models)]
         ndb.delete_multi(keys)
