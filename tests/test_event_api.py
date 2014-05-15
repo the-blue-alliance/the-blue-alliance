@@ -132,7 +132,7 @@ class TestApiMatchDetails(unittest2.TestCase):
                 comp_level='f',
                 match_number=1,
                 team_key_names=["frc177", "frc67", "frc294", "frc469", "frc1114", "frc2041"],
-                alliances_json='{"blue": {"score": "14", "teams": ["frc469", "frc1114", "frc2041"]}, "red": {"score": "16", "teams": ["frc177", "frc67", "frc294"]}}',
+                alliances_json='{"blue": {"score": 14, "teams": ["frc469", "frc1114", "frc2041"]}, "red": {"score": 16, "teams": ["frc177", "frc67", "frc294"]}}',
                 set_number=1,
                 game='frc_2010_bkwy',
                 event=event_keys['2010cmp']
