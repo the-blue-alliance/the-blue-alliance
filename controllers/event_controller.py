@@ -21,11 +21,11 @@ class EventList(CacheableHandler):
     MAX_YEAR = 2014
     VALID_YEARS = list(reversed(range(1992, MAX_YEAR + 1)))
     CACHE_VERSION = 4
+    CACHE_KEY_FORMAT = "event_list_{}_{}"  # (year, explicit_year)
 
     def __init__(self, *args, **kw):
         super(EventList, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
-        self._cache_key = "event_list_{}_{}"  # (year, explicit_year)
 
     def get(self, year=None, explicit_year=False):
         if year == '':
@@ -42,7 +42,7 @@ class EventList(CacheableHandler):
             year = datetime.datetime.now().year
             explicit_year = False
 
-        self._cache_key = self._cache_key.format(year, explicit_year)
+        self._cache_key = self.CACHE_KEY_FORMAT.format(year, explicit_year)
         super(EventList, self).get(year, explicit_year)
 
     def _render(self, year=None, explicit_year=False):
@@ -65,7 +65,7 @@ class EventList(CacheableHandler):
 
     def memcacheFlush(self):
         year = datetime.datetime.now().year
-        keys = [self.cache_key.format(year, True), self.cache_key.format(year, False)]
+        keys = [self.CACHE_KEY_FORMAT.format(year, True), self.CACHE_KEY_FORMAT.format(year, False)]
         memcache.delete_multi(keys)
         return keys
 
@@ -78,17 +78,17 @@ class EventDetail(CacheableHandler):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
     CACHE_VERSION = 3
+    CACHE_KEY_FORMAT = "event_detail_{}"  # (event_key)
 
     def __init__(self, *args, **kw):
         super(EventDetail, self).__init__(*args, **kw)
         self._cache_expiration = self.LONG_CACHE_EXPIRATION
-        self._cache_key = "event_detail_{}"  # (event_key)
 
     def get(self, event_key):
         if not event_key:
             return self.redirect("/events")
 
-        self._cache_key = self._cache_key.format(event_key)
+        self._cache_key = self.CACHE_KEY_FORMAT.format(event_key)
         super(EventDetail, self).get(event_key)
 
     def _render(self, event_key):
@@ -148,17 +148,17 @@ class EventRss(CacheableHandler):
     Generates a RSS feed for the matches in a event
     """
     CACHE_VERSION = 2
+    CACHE_KEY_FORMAT = "event_rss_{}"  # (event_key)
 
     def __init__(self, *args, **kw):
         super(EventRss, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 5
-        self._cache_key = "event_rss_{}"  # (event_key)
 
     def get(self, event_key):
         if not event_key:
             return self.redirect("/events")
 
-        self._cache_key = self._cache_key.format(event_key)
+        self._cache_key = self.CACHE_KEY_FORMAT.format(event_key)
         super(EventRss, self).get(event_key)
 
     def _render(self, event_key):

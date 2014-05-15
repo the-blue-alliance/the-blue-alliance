@@ -15,12 +15,12 @@ class CacheableHandler(webapp2.RequestHandler):
     Provides a standard way of caching the output of pages.
     Currently only supports logged-out pages.
     """
-    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = ''
 
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
         self._cache_expiration = 0
-        self._cache_key = ""
+        self._cache_key = self.CACHE_KEY_FORMAT
 
         # Cache all pages for 61 seconds, unless overwritten.
         if self.response is not None:

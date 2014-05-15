@@ -16,11 +16,11 @@ class InsightsOverview(CacheableHandler):
     Show Insights Overview
     """
     CACHE_VERSION = 2
+    CACHE_KEY_FORMAT = "insights_overview"
 
     def __init__(self, *args, **kw):
         super(InsightsOverview, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
-        self._cache_key = "insights_overview"
 
     def _render(self):
         template_values = {
@@ -41,11 +41,11 @@ class InsightsDetail(CacheableHandler):
     Show Insights for a particular year
     """
     CACHE_VERSION = 2
+    CACHE_KEY_FORMAT = "insight_detail_{}"  # (year)
 
     def __init__(self, *args, **kw):
         super(InsightsDetail, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
-        self._cache_key = "insight_detail_{}"  # (year)
 
     def get(self, year):
         if year == '':
@@ -56,7 +56,7 @@ class InsightsDetail(CacheableHandler):
         if year not in VALID_YEARS:
             self.abort(404)
 
-        self._cache_key = self._cache_key.format(year)
+        self._cache_key = self.CACHE_KEY_FORMAT.format(year)
         super(InsightsDetail, self).get(year)
 
     def _render(self, year):
