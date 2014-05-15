@@ -1,6 +1,6 @@
 from controllers.ajax_controller import WebcastHandler
 from controllers.event_controller import EventList
-from controllers.main_controller import MainCompetitionseasonHandler, MainOffseasonHandler, MainInsightsHandler, GamedayHandler, WebcastsHandler
+from controllers.main_controller import MainChampsHandler, MainCompetitionseasonHandler, MainOffseasonHandler, MainInsightsHandler, GamedayHandler, WebcastsHandler
 
 
 class MemcacheWebcastFlusher(object):
@@ -8,6 +8,7 @@ class MemcacheWebcastFlusher(object):
     def flush(self):
         flushed = []
 
+        flushed.append(MainChampsHandler().memcacheFlush())
         flushed.append(MainCompetitionseasonHandler().memcacheFlush())
         flushed.append(MainOffseasonHandler().memcacheFlush())
         flushed.append(MainInsightsHandler().memcacheFlush())
