@@ -16,7 +16,7 @@ if DEBUG:
     CONFIG = {
         "env": "dev",
         "memcache": False,
-        "response_cache": True,
+        "response_cache": False,
         "firebase-url": "https://thebluealliance-dev.firebaseio.com/{}.json?auth={}"
     }
 else:
