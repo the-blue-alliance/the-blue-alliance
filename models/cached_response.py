@@ -1,3 +1,4 @@
+import json
 from google.appengine.ext import ndb
 
 
@@ -8,7 +9,21 @@ class CachedResponse(ndb.Model):
     apiv2_event_controller_2014casj:0:7
     team_detail_frc604_2010:2:7
     """
-    body = ndb.TextProperty(required=True)  # not indexed by default
+    headers_json = ndb.TextProperty(required=True, indexed=False)  # not indexed by default
+    body = ndb.TextProperty(required=True, indexed=False)  # not indexed by default
 
-    created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
+    created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
+
+    def __init__(self, *args, **kw):
+        self._headers = None
+        super(CachedResponse, self).__init__(*args, **kw)
+
+    @property
+    def headers(self):
+        """
+        Lazy load headers_json
+        """
+        if self._headers is None:
+            self._headers = json.loads(self.headers_json)
+        return self._headers
