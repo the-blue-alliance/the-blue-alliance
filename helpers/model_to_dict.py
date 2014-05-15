@@ -1,4 +1,3 @@
-import json
 import logging
 
 
@@ -63,7 +62,7 @@ class ModelToDict(object):
         match_dict = dict()
         match_dict["key"] = match.key_name
         match_dict["event_key"] = match.event.id()
-        match_dict["alliances"] = json.loads(match.alliances_json)
+        match_dict["alliances"] = match.alliances
         match_dict["comp_level"] = match.comp_level
         match_dict["match_number"] = match.match_number
         match_dict["set_number"] = match.set_number
