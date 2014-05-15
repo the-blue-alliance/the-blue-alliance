@@ -20,7 +20,8 @@ class CacheableHandler(webapp2.RequestHandler):
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
         self._cache_expiration = 0
-        self._cache_key = self.CACHE_KEY_FORMAT
+        if not hasattr(self, '_cache_key'):
+            self._cache_key = self.CACHE_KEY_FORMAT
 
         # Cache all pages for 61 seconds, unless overwritten.
         if self.response is not None:
