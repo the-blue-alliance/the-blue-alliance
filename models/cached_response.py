@@ -9,8 +9,8 @@ class CachedResponse(ndb.Model):
     apiv2_event_controller_2014casj:0:7
     team_detail_frc604_2010:2:7
     """
-    headers_json = ndb.TextProperty(required=True, indexed=False)  # not indexed by default
-    body = ndb.TextProperty(required=True, indexed=False)  # not indexed by default
+    headers_json = ndb.TextProperty(required=True)  # not indexed by default
+    body = ndb.TextProperty(required=True)  # not indexed by default
 
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
