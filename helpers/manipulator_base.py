@@ -20,8 +20,9 @@ class ManipulatorBase(object):
         keys = [model.key for model in self.listify(models)]
         ndb.delete_multi(keys)
         for model in self.listify(models):
-            self._computeAndSaveAffectedReferences(model)
-            self.clearCache(model._affected_references)
+            if hasattr(model, '_affected_references'):
+                self._computeAndSaveAffectedReferences(model)
+                self.clearCache(model._affected_references)
 
     @classmethod
     def clearCache(cls, affected_refs):
@@ -68,7 +69,7 @@ class ManipulatorBase(object):
         models_to_put = [model for model in models if getattr(model, "dirty", False)]
         ndb.put_multi(models_to_put)
         for model in models:
-            if getattr(model, 'dirty', False):
+            if hasattr(model, '_affected_references') and getattr(model, 'dirty', False):
                 self.clearCache(model._affected_references)
         return self.delistify(models)
 
