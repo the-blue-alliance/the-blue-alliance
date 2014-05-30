@@ -87,7 +87,10 @@ class MainApiHandler(webapp2.RequestHandler):
         if not self.x_tba_app_id:
             self._errors = json.dumps({"Error": "X-TBA-App-Id is a required header or URL param. Please see http://www.thebluealliance.com/apidocs for more info."})
             self.abort(400)
-        if len(self.x_tba_app_id.split(':')) != 3:
+
+        x_tba_app_id_parts = self.x_tba_app_id.split(':')
+
+        if len(x_tba_app_id_parts) != 3 or any(len(part) == 0 for part in x_tba_app_id_parts):
             self._errors = json.dumps({"Error": "X-TBA-App-Id must follow a specific format. Please see http://www.thebluealliance.com/apidocs for more info."})
             self.abort(400)
 
