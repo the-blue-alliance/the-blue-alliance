@@ -9,11 +9,13 @@ from controllers.api.api_base_controller import ApiBaseController
 
 from helpers.model_to_dict import ModelToDict
 from helpers.data_fetchers.team_details_data_fetcher import TeamDetailsDataFetcher
+from helpers.media_helper import MediaHelper
 
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
+from models.media import Media
 
 class ApiTeamController(ApiBaseController):
     CACHE_KEY_FORMAT = "apiv2_team_controller_{}_{}"  # (team_key, year)
@@ -72,6 +74,29 @@ class ApiTeamEventsController(ApiTeamController):
 
         return json.dumps(events, ensure_ascii=True)
 
+class ApiTeamMediaController(ApiTeamController):
+    def __init__(self, *args, **kw):
+        super(ApiTeamMediaController, self).__init__(*args, **kw)
+        self._cache_key = "apiv2_team_media_controller_{}".format(self.team_key)
+        self._cache_version = 2
+
+    def _render(self, team_key, year=None):
+        self._set_cache_header_length(61)
+        self._set_team(team_key)
+
+        if year is None:
+            year = self.year
+        
+        media_keys = Media.query(Media.references == self.team.key, Media.year == year).fetch(500, keys_only=True)
+        medias = ndb.get_multi(media_keys)
+        media_list = [ModelToDict.mediaConverter(media) for media in medias]
+      
+        out = {} 
+        out["team"] = self.team.key_name
+        out["year"] = self.year
+        out["media"] = media_list
+ 
+        return json.dumps(out, ensure_ascii=True)
 
 class ApiTeamMatchesController(ApiTeamController):
 
