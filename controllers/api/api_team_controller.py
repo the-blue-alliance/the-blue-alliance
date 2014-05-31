@@ -75,10 +75,13 @@ class ApiTeamEventsController(ApiTeamController):
         return json.dumps(events, ensure_ascii=True)
 
 class ApiTeamMediaController(ApiTeamController):
+
+    CACHE_KEY_FORMAT = "apiv2_team_media_controller_{team}_{year}"  # (event_key)
+    CACHE_VERSION = 0
+
     def __init__(self, *args, **kw):
         super(ApiTeamMediaController, self).__init__(*args, **kw)
-        self._cache_key = "apiv2_team_media_controller_{}".format(self.team_key)
-        self._cache_version = 2
+        self._cache_key = self.CACHE_KEY_FORMAT.format(team=self.team_key, year=self.year)
 
     def _render(self, team_key, year=None):
         self._set_cache_header_length(61)
@@ -91,12 +94,7 @@ class ApiTeamMediaController(ApiTeamController):
         medias = ndb.get_multi(media_keys)
         media_list = [ModelToDict.mediaConverter(media) for media in medias]
       
-        out = {} 
-        out["team"] = self.team.key_name
-        out["year"] = self.year
-        out["media"] = media_list
- 
-        return json.dumps(out, ensure_ascii=True)
+        return json.dumps(media_list, ensure_ascii=True)
 
 class ApiTeamMatchesController(ApiTeamController):
 
