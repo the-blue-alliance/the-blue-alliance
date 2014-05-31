@@ -76,12 +76,12 @@ class ApiTeamEventsController(ApiTeamController):
 
 class ApiTeamMediaController(ApiTeamController):
 
-    CACHE_KEY_FORMAT = "apiv2_team_media_controller_{team}_{year}"  # (event_key)
+    CACHE_KEY_FORMAT = "apiv2_team_media_controller_{}_{}"  # (team, year)
     CACHE_VERSION = 0
 
     def __init__(self, *args, **kw):
         super(ApiTeamMediaController, self).__init__(*args, **kw)
-        self._cache_key = self.CACHE_KEY_FORMAT.format(team=self.team_key, year=self.year)
+        self._cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.year)
 
     def _render(self, team_key, year=None):
         self._set_team(team_key)
