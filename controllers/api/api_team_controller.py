@@ -84,7 +84,6 @@ class ApiTeamMediaController(ApiTeamController):
         self._cache_key = self.CACHE_KEY_FORMAT.format(team=self.team_key, year=self.year)
 
     def _render(self, team_key, year=None):
-        self._set_cache_header_length(61)
         self._set_team(team_key)
 
         if year is None:
