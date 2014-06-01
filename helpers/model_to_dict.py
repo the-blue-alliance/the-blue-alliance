@@ -51,6 +51,11 @@ class ModelToDict(object):
             event_dict["end_date"] = event.end_date.date().isoformat()
         else:
             event_dict["end_date"] = None
+       
+        if event.webcast:
+            event_dict["webcast"] = event.webcast
+        else:
+            event_dict["webcast"] = dict()
 
         return event_dict
 
