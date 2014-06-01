@@ -10,7 +10,7 @@ from google.appengine.ext import testbed
 
 from consts.event_type import EventType
 
-from controllers.api.api_team_controller import ApiTeamController
+from controllers.api.api_team_controller import ApiTeamController, ApiTeamMediaController
 
 from consts.award_type import AwardType
 from consts.event_type import EventType
@@ -139,3 +139,58 @@ class TestTeamApiController(unittest2.TestCase):
         self.assertEventJson(team_dict["events"][0])
         self.assertMatchJson(team_dict["events"][0]["matches"][0])
         self.assertAwardJson(team_dict["events"][0]["awards"][0])
+
+class TestTeamMediaApiController:
+
+    def setUp(self):
+        app = webapp2.WSGIApplication([webapp2.Route(r'/<team_key:>/<year:>', ApiTeamMediaController, methods=['GET'])], debug=True)
+        self.testapp = webtest.TestApp(app)
+
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_urlfetch_stub()
+        self.testbed.init_memcache_stub()
+        self.testbed.init_taskqueue_stub()
+
+        self.cdmedia = Media(
+                        key=Key('Media', 'cdphotothread_39894'), 
+                        created=datetime.datetime(2014, 5, 31, 19, 19, 35, 329924), 
+                        details_json=u'{"image_partial": "fe3/fe38d320428adf4f51ac969efb3db32c_l.jpg"}', 
+                        foreign_key=u'39894', 
+                        media_type_enum=1, 
+                        references=[Key('Team', 'frc254')], 
+                        updated=datetime.datetime(2014, 5, 31, 19, 19, 35, 329931), 
+                        year=2014)
+        self.cdmedia.put()
+        self.cddetails_json = "\"image_partial\": \"fe3/fe38d320428adf4f51ac969efb3db32c_l.jpg\"}"
+
+        self.ytmedia = Media(
+                        key=Key('Media', 'youtube_aFZy8iibMD0'), 
+                        created=datetime.datetime(2014, 5, 31, 19, 19, 35, 304671), 
+                        details_json=None, 
+                        foreign_key=u'aFZy8iibMD0', 
+                        media_type_enum=0, 
+                        references=[Key('Team', 'frc254')], 
+                        updated=datetime.datetime(2014, 5, 31, 19, 19, 35, 304678), 
+                        year=2014)
+        self.ytmedia.put()
+        
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def testTeamMediaApi(self):
+        response = self.testapp.get('/frc254/2014', headers={"X-TBA-App-Id": "tba-tests:team_media-controller-test:v01"})
+        media = json.loads(response.body)
+        
+        self.assertEqual(len(media), 2)
+        
+        cd = media[0]
+        self.assertEqual(cd["type"], "cdphotothread")
+        self.assertEqual(cd["foreign_key"], "39894")
+        self.assertEqual(cd["details"], self.cddetails_json)
+
+        yt = media[1]
+        self.assertEqual(yt["type"], "youtube")
+        self.assertEqual(yt["foreign_key"], "aFZy8iibMD0")
+        self.assertEqual(yt["details"], "{}")
