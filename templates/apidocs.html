@@ -19,6 +19,7 @@
                 <li><a class="smooth-scroll" href="#event-model">Event Model</a></li>
                 <li><a class="smooth-scroll" href="#match-model">Match Model</a></li>
                 <li><a class="smooth-scroll" href="#award-model">Award Model</a></li>
+                <li><a class="smooth-scroll" href="#media-model">Media Model</a></li>
               </ul>
             </li>
             <li>
@@ -219,6 +220,7 @@
       </table>
 
       <h3 id="match-model">Match Model</h3>
+      <h4>Related: <a class="smooth-scroll" href="#event-matches-request">Event Matches Request</a></h4>      
       <table class=table>
         <caption>Response Data</caption>
         <thead>
@@ -286,8 +288,9 @@
       </table>
 
       <h3 id="award-model">Award Model</h3>
+      <h4>Related: <a class="smooth-scroll" href="#event-awards-request">Event Awards Request</a></h4>
       <table class=table>
-        <caption>Model Data</caption>
+        <caption>Response Data</caption>
         <thead>
           <tr>
             <th>Key</th>
@@ -316,6 +319,36 @@
             <td>year</td>
             <td>The year this award was won.</td>
             <td>2010</td>
+          </tr>
+        </tbody>   
+      </table>
+
+      <h3 id="media-model">Media Model</h3>
+      <h4>Related: <a class="smooth-scroll" href="#team-media-request">Team Media Request</a></h4>
+      <table class=table>
+        <caption>Response Data</caption>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Description</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Type</td>
+            <td>The string type of the media element, as determined <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/master/models/media.py#L16">here</a>.</td>
+            <td>cdphotothread</td>
+          </tr>
+          <tr>
+            <td>foreign_key</td>
+            <td>The key used to indentify this media element on the remote site (e.g YouTube video key)</td>
+            <td>aFZy8iibMD0</td>
+          </tr>
+          <tr>
+            <td>details</td>
+            <td>If the media requires it, a json dict of additional information</td>
+            <td>{"image_partial": "fe3/fe38d320428adf4f51ac969efb3db32c_l.jpg"}</td>
           </tr>
         </tbody>
       </table>
