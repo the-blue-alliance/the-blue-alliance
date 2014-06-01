@@ -46,6 +46,7 @@ class TestEventApiController(unittest2.TestCase):
                 official=True,
                 location='Clemson, SC',
                 start_date=datetime(2010, 03, 24),
+                webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]"
         )
 
         self.event.put()
@@ -60,6 +61,7 @@ class TestEventApiController(unittest2.TestCase):
         self.assertEqual(event["official"], self.event.official)
         self.assertEqual(event["start_date"], self.event.start_date.date().isoformat())
         self.assertEqual(event["end_date"], self.event.end_date.date().isoformat())
+        self.assertEqual(event["webcast"], json.loads(self.event.webcast_json))
 
     def testEventApi(self):
         response = self.testapp.get('/2010sc', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
