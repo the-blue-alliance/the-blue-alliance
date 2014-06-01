@@ -1,5 +1,6 @@
 import logging
 
+from consts.media_type import MediaType
 
 class ModelToDict(object):
 
@@ -87,3 +88,18 @@ class ModelToDict(object):
         award_dict["recipient_list"] = award.recipient_list
 
         return award_dict
+
+    @classmethod
+    def mediaConverter(self, media):
+        """
+        return top level media dictionary
+        """
+        media_dict = dict()
+        media_dict["type"] = media.slug_name 
+        media_dict["foreign_key"] = media.foreign_key
+        if media.details is not None:
+            media_dict["details"] = media.details
+        else:
+            media_dict["details"] = {}
+
+        return media_dict
