@@ -19,11 +19,19 @@ class MediaHelper(object):
             else:
                 medias_by_slugname[slugname] = [media]
         return medias_by_slugname
-
+    
+    @classmethod
+    def get_images(cls, medias):
+        images = []
+        for media in medias:
+            if media.media_type_enum in MediaType.image_types:
+                images.append(media)
+        return images
 
 class MediaParser(object):
     CD_PHOTO_THREAD_URL_PATTERNS = ['chiefdelphi.com/media/photos/']
     YOUTUBE_URL_PATTERNS = ['youtube.com', 'youtu.be']
+    IMGUR_URL_PATTERNS = ['imgur.com/']
 
     @classmethod
     def partial_media_dict_from_url(cls, url):
@@ -34,6 +42,8 @@ class MediaParser(object):
             return cls._partial_media_dict_from_cd_photo_thread(url)
         elif any(s in url for s in cls.YOUTUBE_URL_PATTERNS):
             return cls._partial_media_dict_from_youtube(url)
+        elif any(s in url for s in cls.IMGUR_URL_PATTERNS):
+            return cls._partial_media_dict_from_imgur(url)
         else:
             logging.warning("Failed to determine media type from url: {}".format(url))
             return None
@@ -72,6 +82,19 @@ class MediaParser(object):
         media_dict['foreign_key'] = foreign_key
 
         return media_dict
+
+    @classmethod
+    def _partial_media_dict_from_imgur(cls,url):
+        media_dict = {}
+        media_dict['media_type_enum'] = MediaType.IMGUR
+        foreign_key = cls._parse_imgur_foreign_key(url)
+        if foreign_key is None:
+            logging.warning("Failed to determine foreign_key from url: {}".format(url))
+            return None
+        media_dict['foreign_key'] = foreign_key
+
+        return media_dict
+
 
     @classmethod
     def _parse_cdphotothread_foreign_key(cls, url):
@@ -122,3 +145,16 @@ class MediaParser(object):
             return None
         else:
             return youtube_id
+
+    @classmethod
+    def _parse_imgur_foreign_key(cls, url):
+        imgur_id = None
+        regex1 = re.match(r".*imgur.com\/(\w+)\/?\Z", url)
+        if regex1 is not None:
+            imgur_id = regex1.group(1)
+
+        if imgur_id is None:
+            return None
+        else:
+            return imgur_id
+

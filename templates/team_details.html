@@ -113,11 +113,15 @@
 
           <div class="row">
             <div class="col-xs-12">
-              <h3 id="photos">Chief Delphi Photos</h3>
-              {% if medias_by_slugname.cdphotothread %}
-                {% for media in medias_by_slugname.cdphotothread %}
+              <h3 id="photos">Photos</h3>
+              {% if image_medias %}
+                {% for media in image_medias %}
                   <div class="col-xs-6 col-sm-3">
-                  {% include "media_partials/cdphotothread_partial.html" %}
+                  {% if media.slug_name == "cdphotothread" %}
+                    {% include "media_partials/cdphotothread_partial.html" %}
+                  {% else %} {% if media.slug_name == "imgur" %}
+                    {% include "media_partials/imgur_partial.html" %}
+                  {% endif %} {% endif %}
                   </div>
                 {% endfor %}
               {% else %}

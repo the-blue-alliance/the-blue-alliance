@@ -50,7 +50,7 @@
       </div>
     </div>
   {% else %}
-    {% if medias_by_slugname.cdphotothread %}
+    {% if medias_by_slugname.cdphotothread or medias_by_slugname.imgur %}
       {% include "media_partials/image_carousel_partial.html" %}
     {% else %}
       {% if year %}
