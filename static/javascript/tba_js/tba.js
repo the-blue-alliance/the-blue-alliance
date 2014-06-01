@@ -29,7 +29,8 @@ $(document).ready(function(){
 	$(".fancybox").fancybox();
 	
 	// Tooltips
-	$("[rel=tooltip]").tooltip();
+  $("[rel=tooltip]").tooltip();
+  $("[rel=tooltip-bottom]").tooltip({placement: 'bottom'});
 	
 	// Fitvids
 	$('.fitvids').fitVids();
