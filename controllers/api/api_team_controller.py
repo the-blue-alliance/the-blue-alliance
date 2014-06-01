@@ -71,7 +71,6 @@ class ApiTeamMediaController(ApiBaseController):
         return [("team_id_validator", self.team_key)]
 
     def _track_call(self, team_key, year=None):
-        api_label = "team_media"+team_key
         api_label = team_key
         if year is not None:
             api_label += '/{}'.format(year) 
