@@ -85,7 +85,9 @@ class ApiTeamMediaController(ApiBaseController):
 
         if year is None:
             year = self.year
-       
+        else:
+            year = int(year)
+        
         media_keys = Media.query(Media.references == self.team.key, Media.year == year).fetch(500, keys_only=True)
         medias = ndb.get_multi(media_keys)
         media_list = [ModelToDict.mediaConverter(media) for media in medias] 
