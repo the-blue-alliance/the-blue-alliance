@@ -20,7 +20,7 @@ from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
-
+from models.media import Media
 
 class TestTeamApiController(unittest2.TestCase):
 
@@ -140,7 +140,7 @@ class TestTeamApiController(unittest2.TestCase):
         self.assertMatchJson(team_dict["events"][0]["matches"][0])
         self.assertAwardJson(team_dict["events"][0]["awards"][0])
 
-class TestTeamMediaApiController:
+class TestTeamMediaApiController(unittest2.TestCase):
 
     def setUp(self):
         app = webapp2.WSGIApplication([webapp2.Route(r'/<team_key:>/<year:>', ApiTeamMediaController, methods=['GET'])], debug=True)
@@ -153,26 +153,33 @@ class TestTeamMediaApiController:
         self.testbed.init_memcache_stub()
         self.testbed.init_taskqueue_stub()
 
+        self.team = Team(
+                id="frc254",
+                name="very long name",
+                team_number=254,
+                nickname="Teh Chezy Pofs",
+                address="Greenville, SC, USA"
+        )
+        self.team.put()
+
+
         self.cdmedia = Media(
-                        key=Key('Media', 'cdphotothread_39894'), 
-                        created=datetime.datetime(2014, 5, 31, 19, 19, 35, 329924), 
+                        key=ndb.Key('Media', 'cdphotothread_39894'), 
                         details_json=u'{"image_partial": "fe3/fe38d320428adf4f51ac969efb3db32c_l.jpg"}', 
                         foreign_key=u'39894', 
                         media_type_enum=1, 
-                        references=[Key('Team', 'frc254')], 
-                        updated=datetime.datetime(2014, 5, 31, 19, 19, 35, 329931), 
+                        references=[ndb.Key('Team', 'frc254')], 
                         year=2014)
         self.cdmedia.put()
-        self.cddetails_json = "\"image_partial\": \"fe3/fe38d320428adf4f51ac969efb3db32c_l.jpg\"}"
+        self.cddetails = dict()
+        self.cddetails["image_partial"] = "fe3/fe38d320428adf4f51ac969efb3db32c_l.jpg" 
 
         self.ytmedia = Media(
-                        key=Key('Media', 'youtube_aFZy8iibMD0'), 
-                        created=datetime.datetime(2014, 5, 31, 19, 19, 35, 304671), 
+                        key=ndb.Key('Media', 'youtube_aFZy8iibMD0'), 
                         details_json=None, 
                         foreign_key=u'aFZy8iibMD0', 
                         media_type_enum=0, 
-                        references=[Key('Team', 'frc254')], 
-                        updated=datetime.datetime(2014, 5, 31, 19, 19, 35, 304678), 
+                        references=[ndb.Key('Team', 'frc254')], 
                         year=2014)
         self.ytmedia.put()
         
@@ -188,9 +195,9 @@ class TestTeamMediaApiController:
         cd = media[0]
         self.assertEqual(cd["type"], "cdphotothread")
         self.assertEqual(cd["foreign_key"], "39894")
-        self.assertEqual(cd["details"], self.cddetails_json)
+        self.assertEqual(cd["details"], self.cddetails)
 
         yt = media[1]
         self.assertEqual(yt["type"], "youtube")
         self.assertEqual(yt["foreign_key"], "aFZy8iibMD0")
-        self.assertEqual(yt["details"], "{}")
+        self.assertEqual(yt["details"], {})
