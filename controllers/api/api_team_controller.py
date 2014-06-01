@@ -72,9 +72,10 @@ class ApiTeamMediaController(ApiBaseController):
 
     def _track_call(self, team_key, year=None):
         api_label = "team_media"+team_key
+        api_label = team_key
         if year is not None:
-            api_label += '/{}'.format(year)
-        self._track_call_defer('team_media', api_label)
+            api_label += '/{}'.format(year) 
+        self._track_call_defer('team/media', api_label)
 
 
     def _render(self, team_key, year=None):
