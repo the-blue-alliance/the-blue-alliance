@@ -11,9 +11,8 @@ from helpers.model_to_dict import ModelToDict
 from helpers.data_fetchers.team_details_data_fetcher import TeamDetailsDataFetcher
 from helpers.media_helper import MediaHelper
 
-from models.team import Team
 from models.media import Media
-
+from models.team import Team
 
 class ApiTeamController(ApiBaseController):
     CACHE_KEY_FORMAT = "apiv2_team_controller_{}_{}"  # (team_key, year)
@@ -75,7 +74,6 @@ class ApiTeamMediaController(ApiBaseController):
         if year is not None:
             api_label += '/{}'.format(year) 
         self._track_call_defer('team/media', api_label)
-
 
     def _render(self, team_key, year=None):
         self.team = Team.get_by_id(team_key)
