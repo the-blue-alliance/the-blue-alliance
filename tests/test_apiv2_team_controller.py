@@ -19,8 +19,8 @@ from models.award import Award
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
-from models.media import Media
 from models.team import Team
+from models.media import Media
 
 class TestTeamApiController(unittest2.TestCase):
 
