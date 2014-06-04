@@ -5,8 +5,8 @@ import tba_config
 
 from controllers.api_controller import ApiEventsShow, ApiTeamDetails, ApiTeamsShow, \
                                        ApiEventList, ApiEventDetails, ApiMatchDetails, \
-                                       CsvTeamsAll
-from controllers.api.api_team_controller import ApiTeamController
+                                       CsvTeamsAll 
+from controllers.api.api_team_controller import ApiTeamController, ApiTeamMediaController
 from controllers.api.api_event_controller import ApiEventController, ApiEventTeamsController, \
                                                  ApiEventMatchesController, ApiEventStatsController, \
                                                  ApiEventRankingsController, ApiEventAwardsController, ApiEventListController
@@ -25,6 +25,12 @@ app = webapp2.WSGIApplication([('/api/v1/team/details', ApiTeamDetails),
                                              methods=['GET']),
                                webapp2.Route(r'/api/v2/team/<team_key:>/<year:([0-9]*)>',
                                              ApiTeamController,
+                                             methods=['GET']),
+                               webapp2.Route(r'/api/v2/team/<team_key:>/media',
+                                             ApiTeamMediaController,
+                                             methods=['GET']),
+                               webapp2.Route(r'/api/v2/team/<team_key:>/<year:([0-9]*)>/media',
+                                             ApiTeamMediaController,
                                              methods=['GET']),
                                webapp2.Route(r'/api/v2/event/<event_key:>',
                                              ApiEventController,

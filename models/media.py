@@ -39,7 +39,7 @@ class Media(ndb.Model):
 
     @property
     def details(self):
-        if self._details is None:
+        if self._details is None and self.details_json is not None:
             self._details = json.loads(self.details_json)
         return self._details
 

@@ -19,12 +19,14 @@
                 <li><a class="smooth-scroll" href="#event-model">Event Model</a></li>
                 <li><a class="smooth-scroll" href="#match-model">Match Model</a></li>
                 <li><a class="smooth-scroll" href="#award-model">Award Model</a></li>
+                <li><a class="smooth-scroll" href="#media-model">Media Model</a></li>
               </ul>
             </li>
             <li>
               <a class="smooth-scroll" href="#requests">Requests</a>
               <ul class="nav">
                 <li><a class="smooth-scroll" href="#team-request">Team Request</a></li>
+                <li><a class="smooth-scroll" href="#team-media-request">Team Media Request</a></li>
                 <li><a class="smooth-scroll" href="#event-list-request">Event List Request</a></li>
                 <li><a class="smooth-scroll" href="#event-request">Event Request</a></li>
                 <li><a class="smooth-scroll" href="#event-teams-request">Event Teams Request</a></li>
@@ -223,6 +225,7 @@
       </table>
 
       <h3 id="match-model">Match Model</h3>
+      <h4>Related: <a class="smooth-scroll" href="#event-matches-request">Event Matches Request</a></h4>      
       <table class=table>
         <caption>Response Data</caption>
         <thead>
@@ -290,8 +293,9 @@
       </table>
 
       <h3 id="award-model">Award Model</h3>
+      <h4>Related: <a class="smooth-scroll" href="#event-awards-request">Event Awards Request</a></h4>
       <table class=table>
-        <caption>Model Data</caption>
+        <caption>Response Data</caption>
         <thead>
           <tr>
             <th>Key</th>
@@ -320,6 +324,36 @@
             <td>year</td>
             <td>The year this award was won.</td>
             <td>2010</td>
+          </tr>
+        </tbody>   
+      </table>
+
+      <h3 id="media-model">Media Model</h3>
+      <h4>Related: <a class="smooth-scroll" href="#team-media-request">Team Media Request</a></h4>
+      <table class=table>
+        <caption>Response Data</caption>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Description</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Type</td>
+            <td>The string type of the media element, as determined <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/master/models/media.py#L16">here</a>.</td>
+            <td>cdphotothread</td>
+          </tr>
+          <tr>
+            <td>foreign_key</td>
+            <td>The key used to indentify this media element on the remote site (e.g YouTube video key)</td>
+            <td>aFZy8iibMD0</td>
+          </tr>
+          <tr>
+            <td>details</td>
+            <td>If the media requires it, a json dict of additional information</td>
+            <td>{"image_partial": "fe3/fe38d320428adf4f51ac969efb3db32c_l.jpg"}</td>
           </tr>
         </tbody>
       </table>
@@ -372,6 +406,56 @@
           </form>
           <div class="panel-group">
             <pre class="team-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 id="team-media-request">Team Media Request</h3>
+      <h4>Related: <a class="smooth-scroll" href="#media-model">Media Model</a></h4>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/(&lt;year&gt;)/media</code>
+      </p>
+      <table class=table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>team key</td>
+            <td>A team key name where the format is <code>frcyyyy</code> where yyyy is the a
+              valid, official team number issued by <em>FIRST</em></td>
+            <td>frc1, frc281, frc1114</td>
+          </tr>
+          <tr>
+            <td>year  </td>
+            <td>A specific year you would like to grab data for this team.
+              Defaults to current year if not provided. </td>
+            <td>2008, 2013</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_team_media_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="6" id="example_team_media_request" type="text" value="/api/v2/team/frc254/2014/media">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group">
+            <pre class="team-media-request-json">
             </pre>
           </div>
         </div>
@@ -714,6 +798,22 @@
       },
       error: function(data) {
         $(".team-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+  $("#example_team_media_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".team-media-request-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_team_media_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-team-media-request:v01'},
+      success: function(data) {
+        $(".team-media-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".team-media-request-json").html('Something went wrong! Please check for correct request format.');
       }
     });
   });
