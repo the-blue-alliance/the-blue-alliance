@@ -46,7 +46,15 @@ class TestEventApiController(unittest2.TestCase):
                 official=True,
                 location='Clemson, SC',
                 start_date=datetime(2010, 03, 24),
-                webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]"
+                webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
+                alliance_selections_json="[ {\"declines\": [], \"picks\": [\"frc971\", \"frc254\", \"frc1662\"]},"+ 
+                                           "{\"declines\": [], \"picks\": [\"frc1678\", \"frc368\", \"frc4171\"]},"+ 
+                                           "{\"declines\": [], \"picks\": [\"frc2035\", \"frc192\", \"frc4990\"]},"+ 
+                                           "{\"declines\": [], \"picks\": [\"frc1323\", \"frc846\", \"frc2135\"]},"+ 
+                                           "{\"declines\": [], \"picks\": [\"frc2144\", \"frc1388\", \"frc668\"]},"+ 
+                                           "{\"declines\": [], \"picks\": [\"frc1280\", \"frc604\", \"frc100\"]},"+ 
+                                           "{\"declines\": [], \"picks\": [\"frc114\", \"frc852\", \"frc841\"]},"+ 
+                                           "{\"declines\": [], \"picks\": [\"frc2473\", \"frc3256\", \"frc1868\"]}]"
         )
 
         self.event.put()
@@ -62,6 +70,7 @@ class TestEventApiController(unittest2.TestCase):
         self.assertEqual(event["start_date"], self.event.start_date.date().isoformat())
         self.assertEqual(event["end_date"], self.event.end_date.date().isoformat())
         self.assertEqual(event["webcast"], json.loads(self.event.webcast_json))
+        self.assertEqual(event["alliances"], json.loads(self.event.alliance_selections_json))
 
     def testEventApi(self):
         response = self.testapp.get('/2010sc', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})

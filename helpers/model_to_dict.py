@@ -44,6 +44,10 @@ class ModelToDict(object):
         event_dict["official"] = event.official
         event_dict["facebook_eid"] = event.facebook_eid
 
+        if event.alliance_selections:
+            event_dict["alliances"] = event.alliance_selections
+        else:
+            event_dict["alliances"] = []
         if event.start_date:
             event_dict["start_date"] = event.start_date.date().isoformat()
         else:
