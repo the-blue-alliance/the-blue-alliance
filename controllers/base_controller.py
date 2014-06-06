@@ -1,3 +1,4 @@
+import json
 import logging
 import webapp2
 
@@ -5,10 +6,12 @@ from time import mktime
 from wsgiref.handlers import format_date_time
 
 from google.appengine.api import memcache
+from google.appengine.ext import ndb
 
 import tba_config
 
 from helpers.user_bundle import UserBundle
+from models.cached_response import CachedResponse
 
 
 class CacheableHandler(webapp2.RequestHandler):
@@ -41,12 +44,18 @@ class CacheableHandler(webapp2.RequestHandler):
             tba_config.CONFIG["static_resource_version"])
 
     def get(self, *args, **kw):
-        cached_response = self._read_cache()
+        cached_response = memcache.get(self.full_cache_key)
         if cached_response:
             self.response.out.write(cached_response.body)
             self.response.headers = cached_response.headers
         else:
-            self.response.out.write(self._render(*args, **kw))
+            ndb_cached_response = CachedResponse.get_by_id(self.full_cache_key)
+            if ndb_cached_response:
+                self.response.out.write(ndb_cached_response.body)
+                for key, value in ndb_cached_response.headers.items():
+                    self.response.headers[str(key)] = str(value)
+            else:
+                self.response.out.write(self._render(*args, **kw))
             self._write_cache(self.response)
 
     def _has_been_modified_since(self, datetime):
@@ -67,10 +76,8 @@ class CacheableHandler(webapp2.RequestHandler):
     def clear_cache(cls, *args):
         full_cache_key = cls._get_full_cache_key(cls.CACHE_KEY_FORMAT.format(*args))
         memcache.delete(full_cache_key)
+        ndb.Key(CachedResponse, full_cache_key).delete()
         logging.info("Deleting cache key: {}".format(full_cache_key))
-
-    def _read_cache(self):
-        return memcache.get(self.full_cache_key)
 
     def _render(self):
         raise NotImplementedError("No _render method.")
@@ -78,6 +85,13 @@ class CacheableHandler(webapp2.RequestHandler):
     def _write_cache(self, response):
         if tba_config.CONFIG["memcache"]:
             memcache.set(self.full_cache_key, response, self._cache_expiration)
+        if tba_config.CONFIG["response_cache"]:
+            if str(self.__class__.__module__) in {'controllers.api.api_team_controller', 'controllers.api.api_event_controller'}:  # TODO: enable for all
+                CachedResponse(
+                    id=self.full_cache_key,
+                    headers_json=json.dumps(dict(response.headers)),
+                    body=response.body,
+                ).put()
 
 
 class LoggedInHandler(webapp2.RequestHandler):
