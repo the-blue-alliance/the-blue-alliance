@@ -1,6 +1,6 @@
 from google.appengine.ext import ndb
 
-from controllers.api.api_team_controller import ApiTeamController
+from controllers.api.api_team_controller import ApiTeamController, ApiTeamMediaController
 from controllers.api.api_event_controller import ApiEventController, ApiEventTeamsController, \
                                                  ApiEventMatchesController, ApiEventStatsController, \
                                                  ApiEventRankingsController, ApiEventAwardsController, ApiEventListController
@@ -67,6 +67,16 @@ class CacheClearer(object):
         cls._clear_teams_controllers(team_keys, years)
 
     @classmethod
+    def clear_media_and_references(cls, affected_refs):
+        """
+        Clears cache for controllers that reference this media
+        """
+        reference_keys = affected_refs['references']
+        years = affected_refs['year']
+
+        cls._clear_media_controllers(reference_keys, years)
+
+    @classmethod
     def clear_team_and_references(cls, affected_refs):
         """
         Clears cache for controllers that references this team
@@ -111,6 +121,12 @@ class CacheClearer(object):
     def _clear_matches_controllers(cls, event_keys):
         for event_key in filter(None, event_keys):
             ApiEventMatchesController.clear_cache(event_key.id())
+
+    @classmethod
+    def _clear_media_controllers(cls, team_keys, years):
+        for team_key in filter(None, team_keys):
+            for year in filter(None, years):
+                ApiTeamMediaController.clear_cache(team_key.id(), year)
 
     @classmethod
     def _clear_teams_controllers(cls, team_keys, years):
