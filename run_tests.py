@@ -15,13 +15,11 @@ The SDK Path is probably /usr/local/google_appengine on Mac OS
 
 SDK_PATH    Path to the SDK installation"""
 
-RESULT_QUEUE = multiprocessing.Queue()
 
-
-def start_suite(suite):
+def start_suite(suite, queue):
     sio = StringIO.StringIO()
     testresult = unittest2.TextTestRunner(sio, verbosity=2).run(suite)
-    RESULT_QUEUE.put((sio.getvalue(), testresult.testsRun, testresult.wasSuccessful()))
+    queue.put((sio.getvalue(), testresult.testsRun, testresult.wasSuccessful()))
 
 
 def main(sdk_path, test_pattern):
@@ -34,8 +32,9 @@ def main(sdk_path, test_pattern):
     suites = unittest2.loader.TestLoader().discover("tests", test_pattern)
 
     processes = []
+    result_queue = multiprocessing.Queue()
     for suite in suites:
-        process = multiprocessing.Process(target=start_suite, args=[suite])
+        process = multiprocessing.Process(target=start_suite, args=[suite, result_queue])
         process.start()
         processes.append(process)
 
@@ -44,8 +43,8 @@ def main(sdk_path, test_pattern):
 
     fail = False
     total_tests_run = 0
-    while not RESULT_QUEUE.empty():
-        test_output, tests_run, was_successful = RESULT_QUEUE.get()
+    while not result_queue.empty():
+        test_output, tests_run, was_successful = result_queue.get()
         total_tests_run += tests_run
         print '-----------------------'
         print test_output
