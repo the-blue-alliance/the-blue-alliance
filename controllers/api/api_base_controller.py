@@ -80,7 +80,13 @@ class ApiBaseController(CacheableHandler):
         """
         Overrides parent method to use CachedResponse instead of memcache
         """
-        return CachedResponse.get_by_id(self.full_cache_key)
+        response = CachedResponse.get_by_id(self.full_cache_key)
+        if response:
+            if self._has_been_modified_since(response.updated):
+                response.headers['Last-Modified'] = self.response.headers['Last-Modified']
+                return response
+            else:
+                return None
 
     def _write_cache(self, response):
         """
