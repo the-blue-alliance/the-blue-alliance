@@ -5,12 +5,14 @@ import tba_config
 
 from controllers.api_controller import ApiEventsShow, ApiTeamDetails, ApiTeamsShow, \
                                        ApiEventList, ApiEventDetails, ApiMatchDetails, \
-                                       CsvTeamsAll 
+                                       CsvTeamsAll
 from controllers.api.api_team_controller import ApiTeamController, ApiTeamMediaController
 from controllers.api.api_event_controller import ApiEventController, ApiEventTeamsController, \
                                                  ApiEventMatchesController, ApiEventStatsController, \
                                                  ApiEventRankingsController, ApiEventAwardsController, ApiEventListController
-from controllers.api.api_trusted_controller import ApiTrustedAddMatchYoutubeVideo
+from controllers.api.api_trusted_controller import ApiTrustedEventAllianceSelectionsUpdate, ApiTrustedEventAwardsUpdate, \
+                                                   ApiTrustedEventMatchesUpdate, ApiTrustedEventRankingsUpdate, \
+                                                   ApiTrustedEventTeamsUpdate, ApiTrustedAddMatchYoutubeVideo
 
 
 app = webapp2.WSGIApplication([('/api/v1/team/details', ApiTeamDetails),
@@ -53,6 +55,21 @@ app = webapp2.WSGIApplication([('/api/v1/team/details', ApiTeamDetails),
                                webapp2.Route(r'/api/v2/events/<year:([0-9]*)>',
                                              ApiEventListController,
                                              methods=['GET']),
+                               webapp2.Route(r'/api/trusted/v1/event/<event_key:>/alliance_selections/update',
+                                             ApiTrustedEventAllianceSelectionsUpdate,
+                                             methods=['POST']),
+                               webapp2.Route(r'/api/trusted/v1/event/<event_key:>/awards/update',
+                                             ApiTrustedEventAwardsUpdate,
+                                             methods=['POST']),
+                               webapp2.Route(r'/api/trusted/v1/event/<event_key:>/matches/update',
+                                             ApiTrustedEventMatchesUpdate,
+                                             methods=['POST']),
+                               webapp2.Route(r'/api/trusted/v1/event/<event_key:>/rankings/update',
+                                             ApiTrustedEventRankingsUpdate,
+                                             methods=['POST']),
+                               webapp2.Route(r'/api/trusted/v1/event/<event_key:>/teams/update',
+                                             ApiTrustedEventTeamsUpdate,
+                                             methods=['POST']),
                                webapp2.Route(r'/api/trusted/v1/match/add_youtube_video',
                                              ApiTrustedAddMatchYoutubeVideo,
                                              methods=['POST']),

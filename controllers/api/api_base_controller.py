@@ -9,6 +9,7 @@ from google.appengine.ext import deferred
 
 from controllers.base_controller import CacheableHandler
 from helpers.validation_helper import ValidationHelper
+from models.api_auth_access import ApiAuthAccess
 from models.sitevar import Sitevar
 
 
@@ -102,3 +103,45 @@ class ApiBaseController(CacheableHandler):
 
         self.response.headers['Cache-Control'] = "public, max-age=%d" % seconds
         self.response.headers['Pragma'] = 'Public'
+
+
+class ApiTrustedBaseController(webapp2.RequestHandler):
+    def handle_exception(self, exception, debug):
+        """
+        Handle an HTTP exception and actually writeout a
+        response.
+        Called by webapp when abort() is called, stops code excution.
+        """
+        logging.info(exception)
+        if isinstance(exception, webapp2.HTTPException):
+            self.response.set_status(exception.code)
+            self.response.out.write(self._errors)
+        else:
+            self.response.set_status(500)
+
+    def post(self, event_key):
+        auth_id = self.request.get('secretid')
+        if not auth_id:
+            self._errors = json.dumps({"Error": "Must provide a request header 'secretid'"})
+            self.abort(400)
+
+        secret = self.request.get('secret')
+        if not secret:
+            self._errors = json.dumps({"Error": "Must provide a request header 'secret'"})
+            self.abort(400)
+
+        auth = ApiAuthAccess.get_by_id(auth_id)
+        if not auth:
+            self._errors = json.dumps({"Error": "secretid not found"})
+            self.abort(400)
+
+        if auth.secret != secret:
+            self._errors = json.dumps({"Error": "Incorrect secret for given secretid"})
+            self.abort(400)
+
+        allowed_event_keys = [ekey.id() for ekey in auth.event_list]
+        if event_key not in allowed_event_keys:
+            self._errors = json.dumps({"Error": "Only allowed to edit events: {}".format(', '.join(allowed_event_keys))})
+            self.abort(400)
+
+        self._process_request(self.request)

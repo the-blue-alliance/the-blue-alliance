@@ -1,10 +1,38 @@
 import json
+import logging
 import webapp2
+
+from controllers.api.api_base_controller import ApiTrustedBaseController
 
 from helpers.match_manipulator import MatchManipulator
 
 from models.match import Match
 from models.sitevar import Sitevar
+
+
+class ApiTrustedEventAllianceSelectionsUpdate(ApiTrustedBaseController):
+    def _process_request(self, request):
+        logging.info(request)
+
+
+class ApiTrustedEventAwardsUpdate(ApiTrustedBaseController):
+    def _process_request(self, request):
+        logging.info(request)
+
+
+class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
+    def _process_request(self, request):
+        logging.info(request)
+
+
+class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
+    def _process_request(self, request):
+        logging.info(request)
+
+
+class ApiTrustedEventTeamsUpdate(ApiTrustedBaseController):
+    def _process_request(self, request):
+        logging.info(request)
 
 
 class ApiTrustedAddMatchYoutubeVideo(webapp2.RequestHandler):
