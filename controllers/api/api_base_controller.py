@@ -8,6 +8,7 @@ from google.appengine.api import urlfetch
 from google.appengine.ext import deferred
 
 from controllers.base_controller import CacheableHandler
+from datafeeds.parser_base import ParserInputException
 from helpers.validation_helper import ValidationHelper
 from models.api_auth_access import ApiAuthAccess
 from models.sitevar import Sitevar
@@ -120,23 +121,23 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
             self.response.set_status(500)
 
     def post(self, event_key):
-        auth_id = self.request.get('secretid')
+        auth_id = self.request.get('secret-id')
         if not auth_id:
-            self._errors = json.dumps({"Error": "Must provide a request header 'secretid'"})
+            self._errors = json.dumps({"Error": "Must provide a request parameter 'secret-id'"})
             self.abort(400)
 
         secret = self.request.get('secret')
         if not secret:
-            self._errors = json.dumps({"Error": "Must provide a request header 'secret'"})
+            self._errors = json.dumps({"Error": "Must provide a request parameter 'secret'"})
             self.abort(400)
 
         auth = ApiAuthAccess.get_by_id(auth_id)
         if not auth:
-            self._errors = json.dumps({"Error": "secretid not found"})
+            self._errors = json.dumps({"Error": "secret-id not found"})
             self.abort(400)
 
         if auth.secret != secret:
-            self._errors = json.dumps({"Error": "Incorrect secret for given secretid"})
+            self._errors = json.dumps({"Error": "Incorrect secret for given secret-id"})
             self.abort(400)
 
         allowed_event_keys = [ekey.id() for ekey in auth.event_list]
@@ -144,4 +145,8 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
             self._errors = json.dumps({"Error": "Only allowed to edit events: {}".format(', '.join(allowed_event_keys))})
             self.abort(400)
 
-        self._process_request(self.request)
+        try:
+            self._process_request(self.request, event_key)
+        except ParserInputException, e:
+            self._errors = json.dumps({"Error": e.message})
+            self.abort(400)

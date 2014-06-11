@@ -3,6 +3,10 @@ from BeautifulSoup import NavigableString
 import HTMLParser
 
 
+class ParserInputException(Exception):
+    pass
+
+
 class ParserBase(object):
     """
     Provides a basic structure for parsing pages.

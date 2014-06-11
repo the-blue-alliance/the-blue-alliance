@@ -12,7 +12,7 @@ from controllers.api.api_event_controller import ApiEventController, ApiEventTea
                                                  ApiEventRankingsController, ApiEventAwardsController, ApiEventListController
 from controllers.api.api_trusted_controller import ApiTrustedEventAllianceSelectionsUpdate, ApiTrustedEventAwardsUpdate, \
                                                    ApiTrustedEventMatchesUpdate, ApiTrustedEventRankingsUpdate, \
-                                                   ApiTrustedEventTeamsUpdate, ApiTrustedAddMatchYoutubeVideo
+                                                   ApiTrustedEventTeamListUpdate, ApiTrustedAddMatchYoutubeVideo
 
 
 app = webapp2.WSGIApplication([('/api/v1/team/details', ApiTeamDetails),
@@ -67,8 +67,8 @@ app = webapp2.WSGIApplication([('/api/v1/team/details', ApiTeamDetails),
                                webapp2.Route(r'/api/trusted/v1/event/<event_key:>/rankings/update',
                                              ApiTrustedEventRankingsUpdate,
                                              methods=['POST']),
-                               webapp2.Route(r'/api/trusted/v1/event/<event_key:>/teams/update',
-                                             ApiTrustedEventTeamsUpdate,
+                               webapp2.Route(r'/api/trusted/v1/event/<event_key:>/team_list/update',
+                                             ApiTrustedEventTeamListUpdate,
                                              methods=['POST']),
                                webapp2.Route(r'/api/trusted/v1/match/add_youtube_video',
                                              ApiTrustedAddMatchYoutubeVideo,
