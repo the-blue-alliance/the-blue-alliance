@@ -78,12 +78,19 @@ class AdminApiAuthEdit(LoggedInHandler):
     def post(self, auth_id):
         self._require_admin()
 
-        ApiAuthAccess(
-            id=auth_id,
-            description=self.request.get('description'),
-            secret=''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for _ in range(64)),
-            event_list=[ndb.Key(Event, event_key.strip()) for event_key in self.request.get('event_list_str').split(',')],
-        ).put()
+        auth = ApiAuthAccess.get_by_id(auth_id)
+        if not auth:
+            auth = ApiAuthAccess(
+                id=auth_id,
+                description=self.request.get('description'),
+                secret=''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for _ in range(64)),
+                event_list=[ndb.Key(Event, event_key.strip()) for event_key in self.request.get('event_list_str').split(',')],
+            )
+        else:
+            auth.description = self.request.get('description')
+            auth.event_list = event_list=[ndb.Key(Event, event_key.strip()) for event_key in self.request.get('event_list_str').split(',')]
+
+        auth.put()
 
         self.redirect("/admin/api_auth/manage")
 
