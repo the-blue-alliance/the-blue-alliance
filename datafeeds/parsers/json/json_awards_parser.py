@@ -40,7 +40,7 @@ class JSONAwardsParser(ParserBase):
                 raise ParserInputException("Cannot determine award type from: '{}'. Please contact a www.thebluealliance.com admin.".format(name_str))
 
             recipient_json = json.dumps({
-                'team_number': team_key[3:] if team_key else None,
+                'team_number': int(team_key[3:]) if team_key else None,
                 'awardee': awardee,
             })
 
