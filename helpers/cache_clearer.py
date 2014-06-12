@@ -84,13 +84,11 @@ class CacheClearer(object):
         event_team_keys_future = EventTeam.query(EventTeam.team.IN([team_key for team_key in team_keys])).fetch_async(None, keys_only=True)
 
         event_keys = set()
-        years = set()
         for et_key in event_team_keys_future.get_result():
             event_key_name = et_key.id().split('_')[0]
             event_keys.add(ndb.Key(Event, event_key_name))
-            years.add(int(event_key_name[:4]))
 
-        cls._clear_teams_controllers(team_keys, years)
+        cls._clear_teams_controllers(team_keys)
         cls._clear_eventteams_controllers(event_keys)
 
     @classmethod
@@ -133,7 +131,6 @@ class CacheClearer(object):
                 ApiTeamEventsController.clear_cache(team_key.id(), year)
 
     @classmethod
-    def _clear_teams_controllers(cls, team_keys, years):
+    def _clear_teams_controllers(cls, team_keys):
         for team_key in filter(None, team_keys):
-            for year in filter(None, years):
-                ApiTeamController.clear_cache(team_key.id(), year)
+            ApiTeamController.clear_cache(team_key.id())

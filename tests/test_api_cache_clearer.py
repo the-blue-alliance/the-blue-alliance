@@ -335,7 +335,7 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(memcache.get(self.team_media_frc1_cache_key), None)
             self.assertEqual(memcache.get(self.team_media_frc2_cache_key), None)
 
-        response = self.testapp.get('/api/v2/team/frc1/2010', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
+        response = self.testapp.get('/api/v2/team/frc1', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(memcache.get(self.eventlist_2010_cache_key), None)
         self.assertNotEqual(memcache.get(self.event_2010sc_cache_key), None)
         self.assertNotEqual(memcache.get(self.eventteams_2010sc_cache_key), None)
@@ -351,7 +351,7 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(memcache.get(self.team_media_frc1_cache_key), None)
             self.assertEqual(memcache.get(self.team_media_frc2_cache_key), None)
 
-        response = self.testapp.get('/api/v2/team/frc2/2010', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
+        response = self.testapp.get('/api/v2/team/frc2', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(memcache.get(self.eventlist_2010_cache_key), None)
         self.assertNotEqual(memcache.get(self.event_2010sc_cache_key), None)
         self.assertNotEqual(memcache.get(self.eventteams_2010sc_cache_key), None)

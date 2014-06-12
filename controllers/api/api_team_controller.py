@@ -29,22 +29,18 @@ class ApiTeamControllerBase(ApiBaseController):
 
 
 class ApiTeamController(ApiTeamControllerBase):
-    CACHE_KEY_FORMAT = "apiv2_team_controller_{}_{}"  # (team_key, year)
+    CACHE_KEY_FORMAT = "apiv2_team_controller_{}"  # (team_key)
     CACHE_VERSION = 0
 
     def __init__(self, *args, **kw):
         super(ApiTeamController, self).__init__(*args, **kw)
         self.team_key = self.request.route_kwargs["team_key"]
-        self.year = int(self.request.route_kwargs.get("year") or datetime.now().year)
-        self._cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.year)
+        self._cache_key = self.CACHE_KEY_FORMAT.format(self.team_key)
 
-    def _track_call(self, team_key, year=None):
-        api_label = team_key
-        if year is not None:
-            api_label += '/{}'.format(year)
-        self._track_call_defer('team', api_label)
+    def _track_call(self, team_key):
+        self._track_call_defer('team', team_key)
 
-    def _render(self, team_key, year=None):
+    def _render(self, team_key):
         self._set_team(team_key)
 
         team_dict = ModelToDict.teamConverter(self.team)
