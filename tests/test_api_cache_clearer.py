@@ -23,6 +23,7 @@ from controllers.api.api_event_controller import ApiEventRankingsController
 from controllers.api.api_event_controller import ApiEventAwardsController
 
 from controllers.api.api_team_controller import ApiTeamController
+from controllers.api.api_team_controller import ApiTeamEventsController
 from controllers.api.api_team_controller import ApiTeamMediaController
 
 from helpers.award_manipulator import AwardManipulator
@@ -199,6 +200,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.eventawards_2010sc_cache_key = ApiEventAwardsController._get_full_cache_key(ApiEventAwardsController.CACHE_KEY_FORMAT.format('2010sc'))
         self.team_frc1_cache_key = ApiTeamController._get_full_cache_key(ApiTeamController.CACHE_KEY_FORMAT.format('frc1', 2010))
         self.team_frc2_cache_key = ApiTeamController._get_full_cache_key(ApiTeamController.CACHE_KEY_FORMAT.format('frc2', 2010))
+        self.team_events_frc1_cache_key = ApiTeamEventsController._get_full_cache_key(ApiTeamEventsController.CACHE_KEY_FORMAT.format('frc1', 2010))
+        self.team_events_frc2_cache_key = ApiTeamEventsController._get_full_cache_key(ApiTeamEventsController.CACHE_KEY_FORMAT.format('frc2', 2010))
         self.team_media_frc1_cache_key = ApiTeamMediaController._get_full_cache_key(ApiTeamMediaController.CACHE_KEY_FORMAT.format('frc1', 2010))
         self.team_media_frc2_cache_key = ApiTeamMediaController._get_full_cache_key(ApiTeamMediaController.CACHE_KEY_FORMAT.format('frc2', 2010))
 
@@ -231,6 +234,8 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(memcache.get(self.eventawards_2010sc_cache_key), None)
             self.assertEqual(memcache.get(self.team_frc1_cache_key), None)
             self.assertEqual(memcache.get(self.team_frc2_cache_key), None)
+            self.assertEqual(memcache.get(self.team_events_frc1_cache_key), None)
+            self.assertEqual(memcache.get(self.team_events_frc2_cache_key), None)
             self.assertEqual(memcache.get(self.team_media_frc1_cache_key), None)
             self.assertEqual(memcache.get(self.team_media_frc2_cache_key), None)
 
@@ -245,6 +250,8 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(memcache.get(self.eventawards_2010sc_cache_key), None)
             self.assertEqual(memcache.get(self.team_frc1_cache_key), None)
             self.assertEqual(memcache.get(self.team_frc2_cache_key), None)
+            self.assertEqual(memcache.get(self.team_events_frc1_cache_key), None)
+            self.assertEqual(memcache.get(self.team_events_frc2_cache_key), None)
             self.assertEqual(memcache.get(self.team_media_frc1_cache_key), None)
             self.assertEqual(memcache.get(self.team_media_frc2_cache_key), None)
 
@@ -259,6 +266,8 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(memcache.get(self.eventawards_2010sc_cache_key), None)
             self.assertEqual(memcache.get(self.team_frc1_cache_key), None)
             self.assertEqual(memcache.get(self.team_frc2_cache_key), None)
+            self.assertEqual(memcache.get(self.team_events_frc1_cache_key), None)
+            self.assertEqual(memcache.get(self.team_events_frc2_cache_key), None)
             self.assertEqual(memcache.get(self.team_media_frc1_cache_key), None)
             self.assertEqual(memcache.get(self.team_media_frc2_cache_key), None)
 
@@ -273,6 +282,8 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(memcache.get(self.eventawards_2010sc_cache_key), None)
             self.assertEqual(memcache.get(self.team_frc1_cache_key), None)
             self.assertEqual(memcache.get(self.team_frc2_cache_key), None)
+            self.assertEqual(memcache.get(self.team_events_frc1_cache_key), None)
+            self.assertEqual(memcache.get(self.team_events_frc2_cache_key), None)
             self.assertEqual(memcache.get(self.team_media_frc1_cache_key), None)
             self.assertEqual(memcache.get(self.team_media_frc2_cache_key), None)
 
@@ -287,6 +298,8 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(memcache.get(self.eventawards_2010sc_cache_key), None)
             self.assertEqual(memcache.get(self.team_frc1_cache_key), None)
             self.assertEqual(memcache.get(self.team_frc2_cache_key), None)
+            self.assertEqual(memcache.get(self.team_events_frc1_cache_key), None)
+            self.assertEqual(memcache.get(self.team_events_frc2_cache_key), None)
             self.assertEqual(memcache.get(self.team_media_frc1_cache_key), None)
             self.assertEqual(memcache.get(self.team_media_frc2_cache_key), None)
 
@@ -301,6 +314,8 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(memcache.get(self.eventawards_2010sc_cache_key), None)
             self.assertEqual(memcache.get(self.team_frc1_cache_key), None)
             self.assertEqual(memcache.get(self.team_frc2_cache_key), None)
+            self.assertEqual(memcache.get(self.team_events_frc1_cache_key), None)
+            self.assertEqual(memcache.get(self.team_events_frc2_cache_key), None)
             self.assertEqual(memcache.get(self.team_media_frc1_cache_key), None)
             self.assertEqual(memcache.get(self.team_media_frc2_cache_key), None)
 
@@ -315,6 +330,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         if flushed:
             self.assertEqual(memcache.get(self.team_frc1_cache_key), None)
             self.assertEqual(memcache.get(self.team_frc2_cache_key), None)
+            self.assertEqual(memcache.get(self.team_events_frc1_cache_key), None)
+            self.assertEqual(memcache.get(self.team_events_frc2_cache_key), None)
             self.assertEqual(memcache.get(self.team_media_frc1_cache_key), None)
             self.assertEqual(memcache.get(self.team_media_frc2_cache_key), None)
 
@@ -329,6 +346,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(memcache.get(self.team_frc1_cache_key), None)
         if flushed:
             self.assertEqual(memcache.get(self.team_frc2_cache_key), None)
+            self.assertEqual(memcache.get(self.team_events_frc1_cache_key), None)
+            self.assertEqual(memcache.get(self.team_events_frc2_cache_key), None)
             self.assertEqual(memcache.get(self.team_media_frc1_cache_key), None)
             self.assertEqual(memcache.get(self.team_media_frc2_cache_key), None)
 
@@ -343,6 +362,40 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(memcache.get(self.team_frc1_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc2_cache_key), None)
         if flushed:
+            self.assertEqual(memcache.get(self.team_events_frc1_cache_key), None)
+            self.assertEqual(memcache.get(self.team_events_frc2_cache_key), None)
+            self.assertEqual(memcache.get(self.team_media_frc1_cache_key), None)
+            self.assertEqual(memcache.get(self.team_media_frc2_cache_key), None)
+
+        response = self.testapp.get('/api/v2/team/frc1/2010/events', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
+        self.assertNotEqual(memcache.get(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(memcache.get(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(memcache.get(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(memcache.get(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(memcache.get(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(memcache.get(self.eventrankings_2010sc_cache_key), None)
+        self.assertNotEqual(memcache.get(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_frc1_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_frc2_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc1_cache_key), None)
+        if flushed:
+            self.assertEqual(memcache.get(self.team_events_frc2_cache_key), None)
+            self.assertEqual(memcache.get(self.team_media_frc1_cache_key), None)
+            self.assertEqual(memcache.get(self.team_media_frc2_cache_key), None)
+
+        response = self.testapp.get('/api/v2/team/frc2/2010/events', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
+        self.assertNotEqual(memcache.get(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(memcache.get(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(memcache.get(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(memcache.get(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(memcache.get(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(memcache.get(self.eventrankings_2010sc_cache_key), None)
+        self.assertNotEqual(memcache.get(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_frc1_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_frc2_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc2_cache_key), None)
+        if flushed:
             self.assertEqual(memcache.get(self.team_media_frc1_cache_key), None)
             self.assertEqual(memcache.get(self.team_media_frc2_cache_key), None)
 
@@ -356,6 +409,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(memcache.get(self.eventawards_2010sc_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc1_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc2_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc2_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_media_frc1_cache_key), None)
         if flushed:
             self.assertEqual(memcache.get(self.team_media_frc2_cache_key), None)
@@ -372,6 +427,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(memcache.get(self.team_frc2_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_media_frc1_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc2_cache_key), None)
 
     def testApiCacheClear(self):
         self.assertEqual(memcache.get(self.eventlist_2010_cache_key), None)
@@ -383,6 +440,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertEqual(memcache.get(self.eventawards_2010sc_cache_key), None)
         self.assertEqual(memcache.get(self.team_frc1_cache_key), None)
         self.assertEqual(memcache.get(self.team_frc2_cache_key), None)
+        self.assertEqual(memcache.get(self.team_events_frc1_cache_key), None)
+        self.assertEqual(memcache.get(self.team_events_frc2_cache_key), None)
         self.assertEqual(memcache.get(self.team_media_frc1_cache_key), None)
         self.assertEqual(memcache.get(self.team_media_frc2_cache_key), None)
 
@@ -406,6 +465,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(memcache.get(self.eventawards_2010sc_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc1_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc2_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc2_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_media_frc1_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_media_frc2_cache_key), None)
 
@@ -420,6 +481,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(memcache.get(self.eventawards_2010sc_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc1_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc2_cache_key), None)
+        self.assertEqual(memcache.get(self.team_events_frc1_cache_key), None)
+        self.assertEqual(memcache.get(self.team_events_frc2_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_media_frc1_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_media_frc2_cache_key), None)
 
@@ -436,6 +499,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(memcache.get(self.eventawards_2010sc_cache_key), None)
         self.assertEqual(memcache.get(self.team_frc1_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc2_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc2_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_media_frc1_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_media_frc2_cache_key), None)
 
@@ -452,6 +517,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(memcache.get(self.eventawards_2010sc_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc1_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc2_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc2_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_media_frc1_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_media_frc2_cache_key), None)
 
@@ -468,6 +535,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertEqual(memcache.get(self.eventawards_2010sc_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc1_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc2_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc2_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_media_frc1_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_media_frc2_cache_key), None)
 
@@ -484,6 +553,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(memcache.get(self.eventawards_2010sc_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc1_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc2_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc2_cache_key), None)
         self.assertEqual(memcache.get(self.team_media_frc1_cache_key), None)
         self.assertEqual(memcache.get(self.team_media_frc2_cache_key), None)
 
@@ -500,6 +571,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(memcache.get(self.eventawards_2010sc_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc1_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc2_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc2_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_media_frc1_cache_key), None)
         self.assertEqual(memcache.get(self.team_media_frc2_cache_key), None)
 
@@ -516,6 +589,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertEqual(memcache.get(self.eventawards_2010sc_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc1_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc2_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc2_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_media_frc1_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_media_frc2_cache_key), None)
 
@@ -532,6 +607,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(memcache.get(self.eventawards_2010sc_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc1_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc2_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc2_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_media_frc1_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_media_frc2_cache_key), None)
 
@@ -548,6 +625,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(memcache.get(self.eventawards_2010sc_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc1_cache_key), None)
         self.assertEqual(memcache.get(self.team_frc2_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc2_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_media_frc1_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_media_frc2_cache_key), None)
 
@@ -564,6 +643,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(memcache.get(self.eventawards_2010sc_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc1_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc2_cache_key), None)
+        self.assertEqual(memcache.get(self.team_events_frc1_cache_key), None)
+        self.assertEqual(memcache.get(self.team_events_frc2_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_media_frc1_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_media_frc2_cache_key), None)
 
@@ -580,5 +661,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(memcache.get(self.eventawards_2010sc_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc1_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_frc2_cache_key), None)
+        self.assertEqual(memcache.get(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(memcache.get(self.team_events_frc2_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_media_frc1_cache_key), None)
         self.assertNotEqual(memcache.get(self.team_media_frc2_cache_key), None)
