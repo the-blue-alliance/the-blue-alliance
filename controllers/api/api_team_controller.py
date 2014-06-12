@@ -14,6 +14,7 @@ from helpers.media_helper import MediaHelper
 from models.media import Media
 from models.team import Team
 
+
 class ApiTeamController(ApiBaseController):
     CACHE_KEY_FORMAT = "apiv2_team_controller_{}_{}"  # (team_key, year)
     CACHE_VERSION = 0
@@ -54,15 +55,15 @@ class ApiTeamController(ApiBaseController):
 
         return json.dumps(team_dict, ensure_ascii=True)
 
-class ApiTeamMediaController(ApiBaseController):
 
+class ApiTeamMediaController(ApiBaseController):
     CACHE_KEY_FORMAT = "apiv2_team_media_controller_{}_{}"  # (team, year)
     CACHE_VERSION = 0
 
     def __init__(self, *args, **kw):
         super(ApiTeamMediaController, self).__init__(*args, **kw)
         self.team_key = self.request.route_kwargs["team_key"]
-        self.year = int(self.request.route_kwargs.get("year") or datetime.now().year)     
+        self.year = int(self.request.route_kwargs.get("year") or datetime.now().year)
         self._cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.year)
 
     @property
@@ -72,21 +73,56 @@ class ApiTeamMediaController(ApiBaseController):
     def _track_call(self, team_key, year=None):
         api_label = team_key
         if year is not None:
-            api_label += '/{}'.format(year) 
+            api_label += '/{}'.format(year)
         self._track_call_defer('team/media', api_label)
 
     def _render(self, team_key, year=None):
         self.team = Team.get_by_id(team_key)
         if self.team is None:
             self._errors = json.dumps({"404": "%s team not found" % team_key})
-            self.abort(404) 
+            self.abort(404)
 
         if year is None:
             year = self.year
         else:
             year = int(year)
-        
+
         media_keys = Media.query(Media.references == self.team.key, Media.year == year).fetch(500, keys_only=True)
         medias = ndb.get_multi(media_keys)
-        media_list = [ModelToDict.mediaConverter(media) for media in medias] 
+        media_list = [ModelToDict.mediaConverter(media) for media in medias]
         return json.dumps(media_list, ensure_ascii=True)
+
+
+class ApiTeamListController(ApiBaseController):
+    """
+    Returns a JSON list of teams, paginated by team number in sets of 500
+    page_num = 0 returns teams from 0-499
+    page_num = 1 returns teams from 500-999
+    page_num = 2 returns teams from 1000-1499
+    etc.
+    """
+    CACHE_KEY_FORMAT = "apiv2_team_list_controller_{}"  # (page_num)
+    CACHE_VERSION = 0
+    PAGE_SIZE = 500
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamListController, self).__init__(*args, **kw)
+        self.page_num = self.request.route_kwargs['page_num']
+        self._cache_key = self.CACHE_KEY_FORMAT.format(self.page_num)
+
+    @property
+    def _validators(self):
+        return []
+
+    def _track_call(self, page_num):
+        self._track_call_defer('team/list', page_num)
+
+    def _render(self, page_num):
+        page_num = int(page_num)
+        start = self.PAGE_SIZE * page_num
+        end = start + self.PAGE_SIZE
+
+        team_keys = Team.query(Team.team_number >= start, Team.team_number < end).fetch(None, keys_only=True)
+        team_futures = ndb.get_multi_async(team_keys)
+        team_list = [ModelToDict.teamConverter(team_future.get_result()) for team_future in team_futures]
+        return json.dumps(team_list, ensure_ascii=True)
