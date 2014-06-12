@@ -16,16 +16,7 @@ from models.event_team import EventTeam
 from models.team import Team
 
 
-class ApiTeamController(ApiBaseController):
-    CACHE_KEY_FORMAT = "apiv2_team_controller_{}_{}"  # (team_key, year)
-    CACHE_VERSION = 0
-
-    def __init__(self, *args, **kw):
-        super(ApiTeamController, self).__init__(*args, **kw)
-        self.team_key = self.request.route_kwargs["team_key"]
-        self.year = int(self.request.route_kwargs.get("year") or datetime.now().year)
-        self._cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.year)
-
+class ApiTeamControllerBase(ApiBaseController):
     @property
     def _validators(self):
         return [("team_id_validator", self.team_key)]
@@ -36,6 +27,17 @@ class ApiTeamController(ApiBaseController):
             self._errors = json.dumps({"404": "%s team not found" % team_key})
             self.abort(404)
 
+
+class ApiTeamController(ApiTeamControllerBase):
+    CACHE_KEY_FORMAT = "apiv2_team_controller_{}_{}"  # (team_key, year)
+    CACHE_VERSION = 0
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamController, self).__init__(*args, **kw)
+        self.team_key = self.request.route_kwargs["team_key"]
+        self.year = int(self.request.route_kwargs.get("year") or datetime.now().year)
+        self._cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.year)
+
     def _track_call(self, team_key, year=None):
         api_label = team_key
         if year is not None:
@@ -43,21 +45,28 @@ class ApiTeamController(ApiBaseController):
         self._track_call_defer('team', api_label)
 
     def _render(self, team_key, year=None):
-        self._set_cache_header_length(61)
-
         self._set_team(team_key)
+
         team_dict = ModelToDict.teamConverter(self.team)
 
         return json.dumps(team_dict, ensure_ascii=True)
 
 
-class ApiTeamEventsController(ApiTeamController):
-    CACHE_KEY_FORMAT = "apiv2_team_events_controller_{}"  # (team_key)
+class ApiTeamEventsController(ApiTeamControllerBase):
+    CACHE_KEY_FORMAT = "apiv2_team_events_controller_{}"  # (team_key, year)
     CACHE_VERSION = 0
 
     def __init__(self, *args, **kw):
         super(ApiTeamEventsController, self).__init__(*args, **kw)
-        self._cache_key = self.CACHE_KEY_FORMAT.format(self.team_key)
+        self.team_key = self.request.route_kwargs["team_key"]
+        self.year = int(self.request.route_kwargs.get("year") or datetime.now().year)
+        self._cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.year)
+
+    def _track_call(self, team_key, year=None):
+        api_label = team_key
+        if year is not None:
+            api_label += '/{}'.format(year)
+        self._track_call_defer('team/events', api_label)
 
     def _render(self, team_key, year=None):
         self._set_team(team_key)
@@ -72,7 +81,7 @@ class ApiTeamEventsController(ApiTeamController):
         return json.dumps(events, ensure_ascii=True)
 
 
-class ApiTeamMediaController(ApiTeamController):
+class ApiTeamMediaController(ApiTeamControllerBase):
     CACHE_KEY_FORMAT = "apiv2_team_media_controller_{}_{}"  # (team_key, year)
     CACHE_VERSION = 0
 
@@ -81,10 +90,6 @@ class ApiTeamMediaController(ApiTeamController):
         self.team_key = self.request.route_kwargs["team_key"]
         self.year = int(self.request.route_kwargs.get("year") or datetime.now().year)
         self._cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.year)
-
-    @property
-    def _validators(self):
-        return [("team_id_validator", self.team_key)]
 
     def _track_call(self, team_key, year=None):
         api_label = team_key
@@ -95,12 +100,8 @@ class ApiTeamMediaController(ApiTeamController):
     def _render(self, team_key, year=None):
         self._set_team(team_key)
 
-        if year is None:
-            year = self.year
-        else:
-            year = int(year)
-
-        media_keys = Media.query(Media.references == self.team.key, Media.year == year).fetch(500, keys_only=True)
+        media_keys = Media.query(Media.references == self.team.key, Media.year == self.year).fetch(500, keys_only=True)
         medias = ndb.get_multi(media_keys)
         media_list = [ModelToDict.mediaConverter(media) for media in medias]
+
         return json.dumps(media_list, ensure_ascii=True)
