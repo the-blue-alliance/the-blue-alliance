@@ -21,7 +21,6 @@ class CacheClearer(object):
         years = affected_refs['year']
 
         cls._clear_event_awards_controllers(event_keys)
-        cls._clear_teams_controllers(team_keys, years)
 
     @classmethod
     def clear_event_and_references(cls, affected_refs):
@@ -40,7 +39,6 @@ class CacheClearer(object):
 
         cls._clear_events_controllers(event_keys)
         cls._clear_eventlist_controllers(years)
-        cls._clear_teams_controllers(team_keys, years)
 
     @classmethod
     def clear_eventteam_and_references(cls, affected_refs):
@@ -52,7 +50,6 @@ class CacheClearer(object):
         years = affected_refs['year']
 
         cls._clear_eventteams_controllers(event_keys)
-        cls._clear_teams_controllers(team_keys, years)
 
     @classmethod
     def clear_match_and_references(cls, affected_refs):
@@ -64,7 +61,6 @@ class CacheClearer(object):
         years = affected_refs['year']
 
         cls._clear_matches_controllers(event_keys)
-        cls._clear_teams_controllers(team_keys, years)
 
     @classmethod
     def clear_media_and_references(cls, affected_refs):
