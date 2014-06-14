@@ -1,6 +1,6 @@
 from google.appengine.ext import ndb
 
-from controllers.api.api_team_controller import ApiTeamController, ApiTeamMediaController
+from controllers.api.api_team_controller import ApiTeamController, ApiTeamMediaController, ApiTeamListController
 from controllers.api.api_event_controller import ApiEventController, ApiEventTeamsController, \
                                                  ApiEventMatchesController, ApiEventStatsController, \
                                                  ApiEventRankingsController, ApiEventAwardsController, ApiEventListController
@@ -94,6 +94,7 @@ class CacheClearer(object):
 
         cls._clear_teams_controllers(team_keys, years)
         cls._clear_eventteams_controllers(event_keys)
+        cls._clear_teamlist_controllers(team_keys)
 
     @classmethod
     def _clear_event_awards_controllers(cls, event_keys):
@@ -133,3 +134,9 @@ class CacheClearer(object):
         for team_key in filter(None, team_keys):
             for year in filter(None, years):
                 ApiTeamController.clear_cache(team_key.id(), year)
+
+    @classmethod
+    def _clear_teamlist_controllers(cls, team_keys):
+        for team_key in filter(None, team_keys):
+            page_num = int(team_key.id()[3:]) / ApiTeamListController.PAGE_SIZE
+            ApiTeamListController.clear_cache(page_num)
