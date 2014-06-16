@@ -61,8 +61,9 @@
       and file an issue or send a pull request. If you have any questions
       about this API or would like to stay up-to-date on its development,
       you can join our <a href="https://groups.google.com/forum/#!forum/thebluealliance-developers">developer's mailing list</a>.</p>
+
       <h3>X-TBA-App-Id Header or URL Parameter</h3>
-      <p>So we can know how the API is being used to prioritize future development, we require clients to identify themselves. All API requests <strong>must</strong> include a unique, descriptive X-TBA-App-Id header or URL parameter to identify the application.</p>
+      <p>So we can know how the API is being used to prioritize future development, we require clients to identify themselves. All API requests <strong>must</strong> include a unique, descriptive <code>X-TBA-App-Id</code> header or URL parameter to identify the application.</p>
       <p>The X-TBA-App-Id needs to follow this format:
       <code>&lt;team/person id&gt;:&lt;app description&gt;:&lt;version&gt;</code> and
       not use any colons except for the two already present.</p>
@@ -71,6 +72,11 @@
         <li><code>frc281:scouting-system:v01</code></li>
         <li><code>woodie_flowers:match_scraper:5</code></li>
       </ul>
+
+      <h3>Last-Updated and If-Modified-Since Headers</h3>
+      <p>All API responses have a <code>Last-Updated</code> header, which indicates the date and time at which the data at a particular endpoint was last updated. When making repeated calls to a particular endpoint, you should set the <code>If-Modified-Since</code> header in your request to the value of <code>Last-Updated</code> from the previous call to that endpoint. On the first call, <code>If-Modified-Since</code> does not need to be set.</p>
+      <p>Consumers of the TBA API are highly encouraged to make use of these headers. If the server determines that no data has been updated, it returns a <code>304 Not Modified</code> response with an empty body, saving both the server and the consumer time and bandwidth.</p>
+
       <hr>
 
       <h2 id="models">Models</h2>
