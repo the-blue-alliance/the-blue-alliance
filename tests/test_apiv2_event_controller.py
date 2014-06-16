@@ -56,7 +56,8 @@ class TestEventApiController(unittest2.TestCase):
                                            "{\"declines\": [], \"picks\": [\"frc2144\", \"frc1388\", \"frc668\"]},"+
                                            "{\"declines\": [], \"picks\": [\"frc1280\", \"frc604\", \"frc100\"]},"+
                                            "{\"declines\": [], \"picks\": [\"frc114\", \"frc852\", \"frc841\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc2473\", \"frc3256\", \"frc1868\"]}]"
+                                           "{\"declines\": [], \"picks\": [\"frc2473\", \"frc3256\", \"frc1868\"]}]",
+                website="http://www.firstsv.org",
         )
 
         self.event.put()
@@ -77,6 +78,7 @@ class TestEventApiController(unittest2.TestCase):
         self.assertEqual(event["end_date"], self.event.end_date.date().isoformat())
         self.assertEqual(event["webcast"], json.loads(self.event.webcast_json))
         self.assertEqual(event["alliances"], json.loads(self.event.alliance_selections_json))
+        self.assertEqual(event["website"], self.event.website)
 
     def testEventApi(self):
         response = self.testapp.get('/2010sc', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
