@@ -79,6 +79,10 @@ class ApiBaseController(CacheableHandler):
     def _read_cache(self):
         """
         Overrides parent method to use CachedResponse instead of memcache
+        Returns:
+        None if not cached
+        the cached response if cached
+        True if in not modified
         """
         response = CachedResponse.get_by_id(self.full_cache_key)
         if response:
@@ -86,7 +90,9 @@ class ApiBaseController(CacheableHandler):
                 response.headers['Last-Modified'] = self.response.headers['Last-Modified']
                 return response
             else:
-                return None
+                return True
+        else:
+            return None
 
     def _write_cache(self, response):
         """

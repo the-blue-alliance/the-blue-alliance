@@ -42,7 +42,9 @@ class CacheableHandler(webapp2.RequestHandler):
 
     def get(self, *args, **kw):
         cached_response = self._read_cache()
-        if cached_response:
+        if cached_response is True:
+            pass
+        elif cached_response is not None:
             self.response.out.write(cached_response.body)
             self.response.headers = cached_response.headers
         else:
