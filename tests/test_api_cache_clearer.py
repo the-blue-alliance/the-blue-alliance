@@ -32,13 +32,12 @@ from helpers.media_manipulator import MediaManipulator
 from helpers.team_manipulator import TeamManipulator
 
 from models.award import Award
+from models.cached_response import CachedResponse
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
 from models.media import Media
 from models.team import Team
-
-from models.cached_response import CachedResponse
 
 
 class TestApiCacheClearer(unittest2.TestCase):
