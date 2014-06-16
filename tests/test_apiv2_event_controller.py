@@ -47,6 +47,8 @@ class TestEventApiController(unittest2.TestCase):
                 end_date=datetime(2010, 03, 27),
                 official=True,
                 location='Clemson, SC',
+                venue="Long Beach Arena",
+                venue_address="Long Beach Arena\r\n300 East Ocean Blvd\r\nLong Beach, CA 90802\r\nUSA",
                 start_date=datetime(2010, 03, 24),
                 webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
                 alliance_selections_json="[ {\"declines\": [], \"picks\": [\"frc971\", \"frc254\", \"frc1662\"]},"+
@@ -76,6 +78,8 @@ class TestEventApiController(unittest2.TestCase):
         self.assertEqual(event["event_district"], self.event.event_district_enum)
         self.assertEqual(event["start_date"], self.event.start_date.date().isoformat())
         self.assertEqual(event["end_date"], self.event.end_date.date().isoformat())
+        self.assertEqual(event["location"], self.event.location)
+        self.assertEqual(event["venue_address"], self.event.venue_address.replace('\r\n', '\n'))
         self.assertEqual(event["webcast"], json.loads(self.event.webcast_json))
         self.assertEqual(event["alliances"], json.loads(self.event.alliance_selections_json))
         self.assertEqual(event["website"], self.event.website)

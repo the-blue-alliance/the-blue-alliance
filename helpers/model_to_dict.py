@@ -44,6 +44,7 @@ class ModelToDict(object):
         event_dict["event_district"] = event.event_district_enum
         event_dict["year"] = event.year
         event_dict["location"] = event.location
+        event_dict["venue_address"] = event.venue_address.replace('\r\n', '\n') if event.venue_address else None
         event_dict["official"] = event.official
         event_dict["facebook_eid"] = event.facebook_eid
         event_dict["website"] = event.website
