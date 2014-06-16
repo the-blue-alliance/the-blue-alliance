@@ -64,6 +64,7 @@ class ManipulatorBase(object):
         """
         Given a model or list of models, either insert them into the database, or update
         existing models with the same key.
+        Once inserted or updated, the model can be marked not dirty.
         """
         models = self.listify(self.findOrSpawn(self.listify(new_models), auto_union=auto_union))
         models_to_put = [model for model in models if getattr(model, "dirty", False)]
@@ -71,6 +72,7 @@ class ManipulatorBase(object):
         for model in models:
             if hasattr(model, '_affected_references') and getattr(model, 'dirty', False):
                 self.clearCache(model._affected_references)
+            model.dirty = False
         return self.delistify(models)
 
     @classmethod

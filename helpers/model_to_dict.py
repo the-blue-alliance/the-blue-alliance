@@ -2,6 +2,7 @@ import logging
 
 from consts.media_type import MediaType
 
+
 class ModelToDict(object):
 
     @classmethod
@@ -39,6 +40,8 @@ class ModelToDict(object):
         event_dict["event_code"] = event.event_short
         event_dict["event_type_string"] = event.event_type_str
         event_dict["event_type"] = event.event_type_enum
+        event_dict["event_district_string"] = event.event_district_str
+        event_dict["event_district"] = event.event_district_enum
         event_dict["year"] = event.year
         event_dict["location"] = event.location
         event_dict["official"] = event.official
@@ -56,7 +59,7 @@ class ModelToDict(object):
             event_dict["end_date"] = event.end_date.date().isoformat()
         else:
             event_dict["end_date"] = None
-       
+
         if event.webcast:
             event_dict["webcast"] = event.webcast
         else:
@@ -104,7 +107,7 @@ class ModelToDict(object):
         return top level media dictionary
         """
         media_dict = dict()
-        media_dict["type"] = media.slug_name 
+        media_dict["type"] = media.slug_name
         media_dict["foreign_key"] = media.foreign_key
         if media.details is not None:
             media_dict["details"] = media.details
