@@ -63,7 +63,7 @@ class ModelToDict(object):
         if event.webcast:
             event_dict["webcast"] = event.webcast
         else:
-            event_dict["webcast"] = dict()
+            event_dict["webcast"] = []
 
         return event_dict
 

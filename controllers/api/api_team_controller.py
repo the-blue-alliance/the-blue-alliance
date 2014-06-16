@@ -17,7 +17,7 @@ from models.team import Team
 
 class ApiTeamController(ApiBaseController):
     CACHE_KEY_FORMAT = "apiv2_team_controller_{}_{}"  # (team_key, year)
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
