@@ -75,6 +75,7 @@ class ApiBaseController(CacheableHandler):
 
         self._track_call(*args, **kw)
         super(ApiBaseController, self).get(*args, **kw)
+        self._set_cache_header_length(self.CACHE_HEADER_LENGTH)
 
     def _read_cache(self):
         """
@@ -139,5 +140,5 @@ class ApiBaseController(CacheableHandler):
             logging.error("Cache-Control max-age is not integer: {}".format(seconds))
             return
 
-        self.response.headers['Cache-Control'] = "public, max-age=%d" % seconds
+        self.response.headers['Cache-Control'] = "public, max-age=%d" % max(seconds, 61)  # needs to be at least 61 seconds to work
         self.response.headers['Pragma'] = 'Public'

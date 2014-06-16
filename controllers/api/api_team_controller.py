@@ -18,6 +18,7 @@ from models.team import Team
 class ApiTeamController(ApiBaseController):
     CACHE_KEY_FORMAT = "apiv2_team_controller_{}_{}"  # (team_key, year)
     CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
         super(ApiTeamController, self).__init__(*args, **kw)
@@ -36,8 +37,6 @@ class ApiTeamController(ApiBaseController):
         self._track_call_defer('team', api_label)
 
     def _render(self, team_key, year=None):
-        self._set_cache_header_length(61)
-
         self.team = Team.get_by_id(self.team_key)
         if self.team is None:
             self._errors = json.dumps({"404": "%s team not found" % self.team_key})
@@ -59,6 +58,7 @@ class ApiTeamController(ApiBaseController):
 class ApiTeamMediaController(ApiBaseController):
     CACHE_KEY_FORMAT = "apiv2_team_media_controller_{}_{}"  # (team, year)
     CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
         super(ApiTeamMediaController, self).__init__(*args, **kw)
@@ -103,6 +103,7 @@ class ApiTeamListController(ApiBaseController):
     """
     CACHE_KEY_FORMAT = "apiv2_team_list_controller_{}"  # (page_num)
     CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
     PAGE_SIZE = 500
 
     def __init__(self, *args, **kw):
