@@ -48,8 +48,16 @@
         <td>{{ event.event_district_str }}</td>
     </tr>
     <tr>
+        <td>Event Venue</td>
+        <td><a href="http://maps.google.com/maps?q={{ event.venue|urlencode }}">{{ event.venue }}</a></td>
+    </tr>
+    <tr>
+        <td>Event Venue Address</td>
+        <td><a href="http://maps.google.com/maps?q={{ event.venue_address|urlencode }}">{{ event.venue_address }}</a></td>
+    </tr>
+    <tr>
         <td>Event Location</td>
-        <td><a href="http://maps.google.com/maps?q={{ event.location }}">{{ event.location }}</a></td>
+        <td><a href="http://maps.google.com/maps?q={{ event.location|urlencode }}">{{ event.location }}</a></td>
     </tr>
     <tr>
         <td>Event Timezone</td>
