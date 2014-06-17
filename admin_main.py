@@ -23,6 +23,7 @@ from controllers.admin.admin_user_controller import AdminUserList, AdminUserEdit
 app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/debug', AdminDebugHandler),
                                ('/admin/events', AdminEventList),
+                               ('/admin/events/([0-9]*)', AdminEventList),
                                ('/admin/event/add_alliance_selections/(.*)', AdminEventAddAllianceSelections),
                                ('/admin/event/add_teams/(.*)', AdminEventAddTeams),
                                ('/admin/event/add_webcast/(.*)', AdminEventAddWebcast),

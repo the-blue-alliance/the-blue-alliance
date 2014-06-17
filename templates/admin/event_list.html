@@ -4,7 +4,20 @@
 
 {% block content %}
 
-<h1>All {{ events|length }} Events</h1>
+<h1>All {{ events|length }} Events from {{selected_year}}</h1>
+
+<div class="btn-group">
+  <a class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" href="#">
+    {{selected_year}}
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu tba-dropdown-menu-limited">
+    {% for year in valid_years reversed %}
+      <li><a href="/admin/events/{{year}}">{{year}}</a></li>
+    {% endfor %}
+  </ul>
+</div>
+
 <table class="table table-striped table-hover">
     <caption>{{ events|length }} total events</caption>
     <thead>

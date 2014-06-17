@@ -34,7 +34,7 @@ class AdminMatchCleanup(LoggedInHandler):
                     matches_to_delete.append(match)
                     match_keys_to_delete.append(match.key_name)
 
-            ndb.delete_multi(matches_to_delete)
+            MatchManipulator.delete(matches_to_delete)
 
         self.template_values.update({
             "match_keys_deleted": match_keys_to_delete,
@@ -202,15 +202,15 @@ class AdminVideosAdd(LoggedInHandler):
             if match:
                 if youtube_video not in match.youtube_videos:
                     match.youtube_videos.append(youtube_video)
+                    match.dirty = True  # hacky
                     matches_to_put.append(match)
                     results["added"].append(match_key)
                 else:
                     results["existing"].append(match_key)
             else:
                 results["bad_match"].append(match_key)
-        ndb.put_multi(matches_to_put)
 
-        # TODO use Manipulators -gregmarra 20121006
+        MatchManipulator.createOrUpdate(matches_to_put)
 
         self.template_values.update({
             "results": results,

@@ -30,11 +30,20 @@
   <div class="row">
     <div class="col-sm-8">
       <p>
-        {% if event.start_date %}<span class="glyphicon glyphicon-calendar"></span> <time itemprop="startDate" datetime="{{event.start_date|date:"c"}}">{{ event.start_date|date:"M jS" }}{% if event.start_date != event.end_date %}</time> to <time itemprop="endDate" datetime="{{event.end_date|date:"c"}}">{{ event.end_date|date:"M jS" }}{% endif %}{{ event.end_date|date:", Y" }}</time>{% endif %}
-        {% if event.location %}{% if not event.start_date %}<br /><span class="glyphicon glyphicon-map-marker"></span>{% endif %} in <a href="http://maps.google.com/maps?q={{ event.location|urlencode }}"><span itemprop="location">{{ event.location }}</span></a>{% endif %}
-        {% if event.website %}<br /><span class="glyphicon glyphicon-globe"></span> <a href="{{ event.website }}" title="{{ event.name }}">{{ event.website }}</a>{% endif %}
-        {% if event.official %}{% if not event.website %}<br /><span class="glyphicon glyphicon-info-sign"></span>{% else %} - {% endif %} details on <a href="https://my.usfirst.org/myarea/index.lasso?page=teamlist&amp;event_type=FRC&amp;sort_teams=number&amp;year={{ event.year }}&amp;event={{ event.event_short }}">usfirst.org</a>{% endif %}
-        {% if event.facebook_eid %}<br /><span class="glyphicon glyphicon-thumbs-up"></span> <a href="{{ event.facebook_event_url }}" title="Facebook Event">RSVP on Facebook</a><br />{% endif %}
+        {% if event.start_date %}
+          <span class="glyphicon glyphicon-calendar"></span> <time itemprop="startDate" datetime="{{event.start_date|date:"c"}}">{{ event.start_date|date:"M jS" }}{% if event.start_date != event.end_date %}</time> to <time itemprop="endDate" datetime="{{event.end_date|date:"c"}}">{{ event.end_date|date:"M jS" }}{% endif %}{{ event.end_date|date:", Y" }}</time>
+        {% endif %}
+        {% if event.location or event.venue_address %}
+          <br><span class="glyphicon glyphicon-map-marker"></span>
+          {% if event.venue_address %}
+            <a href="http://maps.google.com/maps?q={{ event.venue_address|urlencode }}">{{ event.venue_or_venue_from_address }}</a>{% if event.location %} in {{event.location}}{% endif %}
+          {% else %}
+            <a href="http://maps.google.com/maps?q={{ event.location|urlencode }}">{{event.location}}</a>
+          {% endif %}
+        {% endif %}
+        {% if event.website %}<br><span class="glyphicon glyphicon-globe"></span> <a href="{{ event.website }}" title="{{ event.name }}">{{ event.website }}</a>{% endif %}
+        {% if event.official %}{% if not event.website %}<br><span class="glyphicon glyphicon-info-sign"></span>{% else %} - {% endif %} details on <a href="https://my.usfirst.org/myarea/index.lasso?page=teamlist&amp;event_type=FRC&amp;sort_teams=number&amp;year={{ event.year }}&amp;event={{ event.event_short }}">usfirst.org</a>{% endif %}
+        {% if event.facebook_eid %}<br><span class="glyphicon glyphicon-thumbs-up"></span> <a href="{{ event.facebook_event_url }}" title="Facebook Event">RSVP on Facebook</a><br>{% endif %}
       </p>
 
       <p><strong>#frc{{ event.event_short }}</strong> <small><a href="/hashtags" rel="tooltip" title="What are hashtags?">?</a></small> - Search

@@ -235,12 +235,21 @@ class AdminEventList(LoggedInHandler):
     """
     List all Events.
     """
-    def get(self):
+    VALID_YEARS = range(1992, datetime.now().year + 1)
+
+    def get(self, year=None):
         self._require_admin()
 
-        events = Event.query().order(Event.year).order(Event.start_date).fetch(10000)
+        if year is not None:
+            year = int(year)
+        else:
+            year = datetime.now().year
+
+        events = Event.query(Event.year == year).order(Event.start_date).fetch(10000)
 
         self.template_values.update({
+            "valid_years": self.VALID_YEARS,
+            "selected_year": year,
             "events": events,
         })
 

@@ -1,11 +1,18 @@
-from helpers.manipulator_base import ManipulatorBase
 import json
+
+from google.appengine.ext import ndb
+
+from helpers.cache_clearer import CacheClearer
+from helpers.manipulator_base import ManipulatorBase
 
 
 class MatchManipulator(ManipulatorBase):
     """
     Handle Match database writes.
     """
+    @classmethod
+    def clearCache(cls, affected_refs):
+        CacheClearer.clear_match_and_references(affected_refs)
 
     @classmethod
     def updateMerge(self, new_match, old_match, auto_union=True):

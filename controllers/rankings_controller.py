@@ -13,14 +13,13 @@ from renderers.rankings_renderer import RankingsRenderer
 
 
 class RankingsCanonical(CacheableHandler):
-    LONG_CACHE_EXPIRATION = 60 * 60 * 24
-    SHORT_CACHE_EXPIRATION = 60 * 5
+    CACHE_KEY_FORMAT = "rankings_canonical"
+    CACHE_VERSION = 0
 
     def __init__(self, *args, **kw):
         super(RankingsCanonical, self).__init__(*args, **kw)
-        self._cache_expiration = self.LONG_CACHE_EXPIRATION
-        self._cache_key = "rankings_canonical"
-        self._cache_version = 1
+        self._cache_expiration = 60 * 60 * 24
+        self._cache_key = self.CACHE_KEY_FORMAT
 
     def _render(self):
         year = datetime.datetime.now().year
@@ -33,14 +32,12 @@ class RankingsCanonical(CacheableHandler):
 
 
 class RankingsDetail(CacheableHandler):
-    LONG_CACHE_EXPIRATION = 60 * 60 * 24
-    SHORT_CACHE_EXPIRATION = 60 * 5
+    CACHE_KEY_FORMAT = "rankings_detail_{}_{}"  # (year, district_abbrev)
+    CACHE_VERSION = 0
 
     def __init__(self, *args, **kw):
         super(RankingsDetail, self).__init__(*args, **kw)
-        self._cache_expiration = self.LONG_CACHE_EXPIRATION
-        self._cache_key = "rankings_detail_{}_{}"  # (year, district_abbrev)
-        self._cache_version = 1
+        self._cache_expiration = 60 * 60 * 24
 
     def get(self, year, district_abbrev):
         if district_abbrev not in DistrictType.abbrevs.keys():
@@ -48,7 +45,7 @@ class RankingsDetail(CacheableHandler):
         if int(year) not in RankingsRenderer.VALID_YEARS:
             self.abort(404)
 
-        self._cache_key = self._cache_key.format(year, district_abbrev)
+        self._cache_key = self.CACHE_KEY_FORMAT.format(year, district_abbrev)
         super(RankingsDetail, self).get(year, district_abbrev)
 
     def _render(self, year, district_abbrev):

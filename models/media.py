@@ -34,12 +34,18 @@ class Media(ndb.Model):
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
     def __init__(self, *args, **kw):
+        # store set of affected references referenced keys for cache clearing
+        # keys must be model properties
+        self._affected_references = {
+            'references': set(),
+            'year': set(),
+        }
         self._details = None
         super(Media, self).__init__(*args, **kw)
 
     @property
     def details(self):
-        if self._details is None:
+        if self._details is None and self.details_json is not None:
             self._details = json.loads(self.details_json)
         return self._details
 

@@ -12,14 +12,13 @@ from renderers.team_renderer import TeamRenderer
 
 
 class TeamList(CacheableHandler):
-
     VALID_PAGES = [1, 2, 3, 4, 5, 6]
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "team_list_{}"  # (page)
 
     def __init__(self, *args, **kw):
         super(TeamList, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24 * 7
-        self._cache_key = "team_list_{}"  # (page)
-        self._cache_version = 1
 
     def get(self, page='1'):
         if page == '':
@@ -28,7 +27,7 @@ class TeamList(CacheableHandler):
         if page not in self.VALID_PAGES:
             self.abort(404)
 
-        self._cache_key = self._cache_key.format(page)
+        self._cache_key = self.CACHE_KEY_FORMAT.format(page)
         super(TeamList, self).get(page)
 
     def _render(self, page=''):
@@ -74,19 +73,19 @@ class TeamList(CacheableHandler):
 class TeamCanonical(CacheableHandler):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "team_canonical_{}"  # (team_number)
 
     def __init__(self, *args, **kw):
         super(TeamCanonical, self).__init__(*args, **kw)
         self._cache_expiration = self.LONG_CACHE_EXPIRATION
-        self._cache_key = "team_canonical_{}"  # (team_number)
-        self._cache_version = 1
 
     def get(self, team_number):
         # /team/0201 should redirect to /team/201
         if str(int(team_number)) != team_number:
             return self.redirect("/team/%s" % int(team_number))
 
-        self._cache_key = self._cache_key.format("frc{}".format(team_number))
+        self._cache_key = self.CACHE_KEY_FORMAT.format("frc{}".format(team_number))
         super(TeamCanonical, self).get(team_number)
 
     def _render(self, team_number):
@@ -106,19 +105,19 @@ class TeamCanonical(CacheableHandler):
 class TeamDetail(CacheableHandler):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
+    CACHE_VERSION = 2
+    CACHE_KEY_FORMAT = "team_detail_{}_{}"  # (team_number, year)
 
     def __init__(self, *args, **kw):
         super(TeamDetail, self).__init__(*args, **kw)
         self._cache_expiration = self.LONG_CACHE_EXPIRATION
-        self._cache_key = "team_detail_{}_{}"  # (team_number, year)
-        self._cache_version = 2
 
     def get(self, team_number, year):
         # /team/0201 should redirect to /team/201
         if str(int(team_number)) != team_number:
             return self.redirect("/team/%s/%s" % (int(team_number), year))
 
-        self._cache_key = self._cache_key.format("frc{}".format(team_number), year)
+        self._cache_key = self.CACHE_KEY_FORMAT.format("frc{}".format(team_number), year)
         super(TeamDetail, self).get(team_number, year)
 
     def _render(self, team_number, year):
@@ -136,19 +135,19 @@ class TeamDetail(CacheableHandler):
 class TeamHistory(CacheableHandler):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
+    CACHE_VERSION = 2
+    CACHE_KEY_FORMAT = "team_history_{}"  # (team_number)
 
     def __init__(self, *args, **kw):
         super(TeamHistory, self).__init__(*args, **kw)
         self._cache_expiration = self.LONG_CACHE_EXPIRATION
-        self._cache_key = "team_history_{}"  # (team_number)
-        self._cache_version = 2
 
     def get(self, team_number):
         # /team/0604/history should redirect to /team/604/history
         if str(int(team_number)) != team_number:
             return self.redirect("/team/%s/history" % int(team_number))
 
-        self._cache_key = self._cache_key.format("frc" + team_number)
+        self._cache_key = self.CACHE_KEY_FORMAT.format("frc" + team_number)
         super(TeamHistory, self).get(team_number)
 
     def _render(self, team_number):

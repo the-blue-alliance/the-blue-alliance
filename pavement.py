@@ -8,6 +8,10 @@ from paver.easy import *
 path = path("./")
 
 @task
+def deploy():
+  sh("python deploy.py")
+
+@task
 def javascript():
     """Combine Compress Javascript"""
     print("Combining and Compressing Javascript")
@@ -94,4 +98,4 @@ def test_function(args):
   if len(args) > 0:
     test_pattern = " --test_pattern=*%s*" % args[0]
 
-  sh("python run_tests.py%s" % test_pattern)
+  sh("python run_tests.py%s 2> test_failures.temp" % test_pattern)

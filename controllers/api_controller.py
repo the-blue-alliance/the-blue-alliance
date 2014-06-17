@@ -1,5 +1,7 @@
+import csv
 import json
 import logging
+import StringIO
 import os
 import urllib
 import uuid
@@ -85,7 +87,10 @@ class MainApiHandler(webapp2.RequestHandler):
         if not self.x_tba_app_id:
             self._errors = json.dumps({"Error": "X-TBA-App-Id is a required header or URL param. Please see http://www.thebluealliance.com/apidocs for more info."})
             self.abort(400)
-        if len(self.x_tba_app_id.split(':')) != 3:
+
+        x_tba_app_id_parts = self.x_tba_app_id.split(':')
+
+        if len(x_tba_app_id_parts) != 3 or any(len(part) == 0 for part in x_tba_app_id_parts):
             self._errors = json.dumps({"Error": "X-TBA-App-Id must follow a specific format. Please see http://www.thebluealliance.com/apidocs for more info."})
             self.abort(400)
 
@@ -265,14 +270,20 @@ class CsvTeamsAll(MainApiHandler):
 
         if output is None:
             team_keys = Team.query().order(Team.team_number).fetch(10000, keys_only=True)
-            teams = ndb.get_multi(team_keys)
+            team_futures = ndb.get_multi_async(team_keys)
 
-            template_values = {
-                "teams": teams
-            }
+            sio = StringIO.StringIO()
+            writer = csv.writer(sio, delimiter=',')
+            writer.writerow(['team_number','name','nickname','location','website'])
 
-            path = os.path.join(os.path.dirname(__file__), '../templates/api/csv_teams_all.csv')
-            output = template.render(path, template_values)
+            for team_future in team_futures:
+                team = team_future.get_result()
+                row = [team.team_number, team.name, team.nickname, team.location, team.website]
+                row_utf8 = [unicode(e).encode('utf-8') for e in row]
+                writer.writerow(row_utf8)
+
+            output = sio.getvalue()
+
             if tba_config.CONFIG["memcache"]:
                 memcache.set(memcache_key, output, 86400)
 

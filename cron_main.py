@@ -3,7 +3,8 @@ import webapp2
 
 import tba_config
 
-from controllers.backup_controller import TbaCSVBackupEnqueue, TbaCSVBackupEventDo, TbaCSVRestoreEnqueue, TbaCSVRestoreEventDo
+from controllers.backup_controller import TbaCSVBackupEventsEnqueue, TbaCSVBackupEventDo, TbaCSVRestoreEventsEnqueue, TbaCSVRestoreEventDo
+from controllers.backup_controller import TbaCSVBackupTeamsEnqueue, TbaCSVBackupTeamsDo
 
 from controllers.datafeed_controller import TbaVideosGet, TbaVideosEnqueue
 from controllers.datafeed_controller import FmsEventListGet, FmsTeamListGet
@@ -26,12 +27,14 @@ from controllers.cron_controller import DistrictPointsCalcEnqueue, DistrictPoint
 from controllers.firebase_controller import FirebasePushDo
 
 
-app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup', TbaCSVBackupEnqueue),
-                               ('/tasks/enqueue/csv_backup/([0-9]*)', TbaCSVBackupEnqueue),
+app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackupEventsEnqueue),
+                               ('/tasks/enqueue/csv_backup_events/([0-9]*)', TbaCSVBackupEventsEnqueue),
                                ('/tasks/do/csv_backup_event/(.*)', TbaCSVBackupEventDo),
-                               ('/tasks/enqueue/csv_restore', TbaCSVRestoreEnqueue),
-                               ('/tasks/enqueue/csv_restore/([0-9]*)', TbaCSVRestoreEnqueue),
+                               ('/tasks/enqueue/csv_restore_events', TbaCSVRestoreEventsEnqueue),
+                               ('/tasks/enqueue/csv_restore_events/([0-9]*)', TbaCSVRestoreEventsEnqueue),
                                ('/tasks/do/csv_restore_event/(.*)', TbaCSVRestoreEventDo),
+                               ('/tasks/enqueue/csv_backup_teams', TbaCSVBackupTeamsEnqueue),
+                               ('/tasks/do/csv_backup_teams', TbaCSVBackupTeamsDo),
                                ('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
                                ('/tasks/enqueue/usfirst_event_alliances/(.*)', UsfirstEventAlliancesEnqueue),
                                ('/tasks/enqueue/usfirst_event_details/([0-9]*)', UsfirstEventDetailsEnqueue),

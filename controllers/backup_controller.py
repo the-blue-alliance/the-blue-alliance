@@ -27,7 +27,7 @@ from datafeeds.csv_awards_parser import CSVAwardsParser
 from datafeeds.offseason_matches_parser import OffseasonMatchesParser
 
 
-class TbaCSVBackupEnqueue(webapp.RequestHandler):
+class TbaCSVBackupEventsEnqueue(webapp.RequestHandler):
     """
     Enqueues CSV backup
     """
@@ -36,7 +36,7 @@ class TbaCSVBackupEnqueue(webapp.RequestHandler):
             years = range(1992, datetime.datetime.now().year + 1)
             for y in years:
                 taskqueue.add(
-                    url='/tasks/enqueue/csv_backup/{}'.format(y),
+                    url='/tasks/enqueue/csv_backup_events/{}'.format(y),
                     method='GET')
             self.response.out.write("Enqueued backup for years: {}".format(years))
         else:
@@ -57,11 +57,11 @@ class TbaCSVBackupEventDo(webapp.RequestHandler):
     Backs up event awards, matches, team list, rankings, and alliance selection order
     """
 
-    AWARDS_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/{}/{}/{}_awards.csv'  # % (year, event_key, event_key)
-    MATCHES_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/{}/{}/{}_matches.csv'  # % (year, event_key, event_key)
-    TEAMS_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/{}/{}/{}_teams.csv'  # % (year, event_key, event_key)
-    RANKINGS_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/{}/{}/{}_rankings.csv'  # % (year, event_key, event_key)
-    ALLIANCES_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/{}/{}/{}_alliances.csv'  # % (year, event_key, event_key)
+    AWARDS_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/events/{}/{}/{}_awards.csv'  # % (year, event_key, event_key)
+    MATCHES_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/events/{}/{}/{}_matches.csv'  # % (year, event_key, event_key)
+    TEAMS_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/events/{}/{}/{}_teams.csv'  # % (year, event_key, event_key)
+    RANKINGS_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/events/{}/{}/{}_rankings.csv'  # % (year, event_key, event_key)
+    ALLIANCES_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/events/{}/{}/{}_alliances.csv'  # % (year, event_key, event_key)
 
     def get(self, event_key):
         event = Event.get_by_id(event_key)
@@ -115,7 +115,7 @@ class TbaCSVBackupEventDo(webapp.RequestHandler):
         writer.writerow(unicode_row)
 
 
-class TbaCSVRestoreEnqueue(webapp.RequestHandler):
+class TbaCSVRestoreEventsEnqueue(webapp.RequestHandler):
     """
     Enqueues CSV restore
     """
@@ -128,7 +128,7 @@ class TbaCSVRestoreEnqueue(webapp.RequestHandler):
             years = range(1992, datetime.datetime.now().year + 1)
             for y in years:
                 taskqueue.add(
-                    url='/tasks/enqueue/csv_restore/{}'.format(y),
+                    url='/tasks/enqueue/csv_restore_events/{}'.format(y),
                     method='GET')
             self.response.out.write("Enqueued restore for years: {}".format(years))
         else:
@@ -149,7 +149,7 @@ class TbaCSVRestoreEventDo(webapp.RequestHandler):
     Restores event awards, matches, team list, rankings, and alliance selection order
     """
 
-    BASE_URL = 'https://raw.githubusercontent.com/the-blue-alliance/tba-data-backup/master/tba-data-backup/{}/{}/'  # % (year, event_key)
+    BASE_URL = 'https://raw.githubusercontent.com/the-blue-alliance/tba-data-backup/master/events/{}/{}/'  # % (year, event_key)
     ALLIANCES_URL = BASE_URL + '{}_alliances.csv'  # % (year, event_key, event_key)
     AWARDS_URL = BASE_URL + '{}_awards.csv'  # % (year, event_key, event_key)
     MATCHES_URL = BASE_URL + '{}_matches.csv'  # % (year, event_key, event_key)
@@ -179,7 +179,7 @@ class TbaCSVRestoreEventDo(webapp.RequestHandler):
         # awards
         result = urlfetch.fetch(self.AWARDS_URL.format(event.year, event_key, event_key))
         if result.status_code != 200:
-            logging.warning('Unable to retreive url: ' + (self.Awards_URL.format(event.year, event_key, event_key)))
+            logging.warning('Unable to retreive url: ' + (self.AWARDS_URL.format(event.year, event_key, event_key)))
         else:
             # convert into expected input format
             data = StringIO.StringIO()
@@ -240,3 +240,43 @@ class TbaCSVRestoreEventDo(webapp.RequestHandler):
             EventManipulator.createOrUpdate(event)
 
         self.response.out.write("Done restoring {}!".format(event_key))
+
+
+class TbaCSVBackupTeamsEnqueue(webapp.RequestHandler):
+    """
+    Enqueues CSV teams backup
+    """
+    def get(self):
+        taskqueue.add(
+            url='/tasks/do/csv_backup_teams',
+            method='GET')
+        self.response.out.write("Enqueued CSV teams backup")
+
+
+class TbaCSVBackupTeamsDo(webapp.RequestHandler):
+    """
+    Backs up teams
+    """
+    TEAMS_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/teams/teams.csv'
+
+    def get(self):
+        team_keys = Team.query().order(Team.team_number).fetch(None, keys_only=True)
+        team_futures = ndb.get_multi_async(team_keys)
+
+        if team_futures:
+            with cloudstorage.open(self.TEAMS_FILENAME_PATTERN, 'w') as teams_file:
+                writer = csv.writer(teams_file, delimiter=',')
+                for team_future in team_futures:
+                    team = team_future.get_result()
+                    self._writerow_unicode(writer, [team.key.id(), team.nickname, team.name, team.address, team.website, team.rookie_year])
+
+        self.response.out.write("Done backing up teams!")
+
+    def _writerow_unicode(self, writer, row):
+        unicode_row = []
+        for s in row:
+            try:
+                unicode_row.append(s.encode("utf-8"))
+            except:
+                unicode_row.append(s)
+        writer.writerow(unicode_row)

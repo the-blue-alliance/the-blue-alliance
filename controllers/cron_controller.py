@@ -24,6 +24,7 @@ from helpers.event_team_updater import EventTeamUpdater
 
 from helpers.insight_manipulator import InsightManipulator
 from helpers.team_manipulator import TeamManipulator
+from helpers.match_manipulator import MatchManipulator
 from helpers.matchstats_helper import MatchstatsHelper
 from helpers.insights_helper import InsightsHelper
 
@@ -60,7 +61,8 @@ class EventShortNameCalcDo(webapp.RequestHandler):
     def get(self, event_key):
         event = Event.get_by_id(event_key)
         event.short_name = EventHelper.getShortName(event.name)
-        event.put()
+        event.dirty = True  # TODO: hacky
+        EventManipulator.createOrUpdate(event)
 
         template_values = {'event': event}
         path = os.path.join(os.path.dirname(__file__), '../templates/math/event_short_name_calc_do.html')
@@ -105,7 +107,7 @@ class EventTeamUpdate(webapp.RequestHandler):
             event_teams = EventTeamManipulator.createOrUpdate(event_teams)
 
         if et_keys_to_del:
-            ndb.delete_multi(et_keys_to_del)
+            EventTeamManipulator.delete_keys(et_keys_to_del)
 
         template_values = {
             'event_teams': event_teams,
@@ -149,7 +151,8 @@ class EventMatchstatsDo(webapp.RequestHandler):
         matchstats_dict = MatchstatsHelper.calculate_matchstats(event.matches)
         if matchstats_dict != {}:
             event.matchstats_json = json.dumps(matchstats_dict)
-            event.put()
+            event.dirty = True  # TODO: hacky
+            EventManipulator.createOrUpdate(event)
         else:
             logging.warn("Matchstat calculation for {} failed!".format(event_key))
 
@@ -217,9 +220,10 @@ class FinalMatchesRepairDo(webapp.RequestHandler):
                 match.comp_level,
                 match.set_number,
                 match.match_number))
+            match.dirty = True  # hacky
 
-        ndb.put_multi(matches_to_repair)
-        ndb.delete_multi(deleted_keys)
+        MatchManipulator.createOrUpdate(matches_to_repair)
+        MatchManipulator.delete_keys(deleted_keys)
 
         template_values = {'deleted_keys': deleted_keys,
                            'new_matches': matches_to_repair}

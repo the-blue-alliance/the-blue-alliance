@@ -38,6 +38,12 @@ class Event(ndb.Model):
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
     def __init__(self, *args, **kw):
+        # store set of affected references referenced keys for cache clearing
+        # keys must be model properties
+        self._affected_references = {
+            'key': set(),
+            'year': set(),
+        }
         self._alliance_selections = None
         self._awards = None
         self._district_points = None
@@ -175,6 +181,16 @@ class Event(ndb.Model):
             except Exception, e:
                 self._rankings = None
         return self._rankings
+
+    @property
+    def venue_or_venue_from_address(self):
+        if self.venue:
+            return self.venue
+        else:
+            try:
+                return self.venue_address.split('\r\n')[0]
+            except:
+                return None
 
     @property
     def webcast(self):

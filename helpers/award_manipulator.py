@@ -1,4 +1,6 @@
 import json
+
+from helpers.cache_clearer import CacheClearer
 from helpers.manipulator_base import ManipulatorBase
 
 
@@ -6,6 +8,9 @@ class AwardManipulator(ManipulatorBase):
     """
     Handle Award database writes.
     """
+    @classmethod
+    def clearCache(cls, affected_refs):
+        CacheClearer.clear_award_and_references(affected_refs)
 
     @classmethod
     def updateMerge(self, new_award, old_award, auto_union=True):

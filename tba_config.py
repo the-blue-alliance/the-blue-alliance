@@ -16,14 +16,16 @@ if DEBUG:
     CONFIG = {
         "env": "dev",
         "memcache": False,
+        "response_cache": False,
         "firebase-url": "https://thebluealliance-dev.firebaseio.com/{}.json?auth={}"
     }
 else:
     CONFIG = {
         "env": "prod",
         "memcache": True,
+        "response_cache": True,
         "firebase-url": "https://thebluealliance.firebaseio.com/{}.json?auth={}"
     }
 
-CONFIG['landing_handler'] = CHAMPS
+CONFIG['landing_handler'] = INSIGHTS
 CONFIG["static_resource_version"] = 7

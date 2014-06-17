@@ -6,9 +6,10 @@ import tba_config
 from controllers.api_controller import ApiEventsShow, ApiTeamDetails, ApiTeamsShow, \
                                        ApiEventList, ApiEventDetails, ApiMatchDetails, \
                                        CsvTeamsAll
-from controllers.api.api_team_controller import ApiTeamController
+from controllers.api.api_team_controller import ApiTeamController, ApiTeamMediaController, ApiTeamListController
 from controllers.api.api_event_controller import ApiEventController, ApiEventTeamsController, \
-                                                 ApiEventMatchesController, ApiEventStatsController, ApiEventRankingsController, ApiEventListController
+                                                 ApiEventMatchesController, ApiEventStatsController, \
+                                                 ApiEventRankingsController, ApiEventAwardsController, ApiEventListController
 from controllers.api.api_trusted_controller import ApiTrustedAddMatchYoutubeVideo
 
 
@@ -25,6 +26,15 @@ app = webapp2.WSGIApplication([('/api/v1/team/details', ApiTeamDetails),
                                webapp2.Route(r'/api/v2/team/<team_key:>/<year:([0-9]*)>',
                                              ApiTeamController,
                                              methods=['GET']),
+                               webapp2.Route(r'/api/v2/team/<team_key:>/media',
+                                             ApiTeamMediaController,
+                                             methods=['GET']),
+                               webapp2.Route(r'/api/v2/team/<team_key:>/<year:([0-9]*)>/media',
+                                             ApiTeamMediaController,
+                                             methods=['GET']),
+                               webapp2.Route(r'/api/v2/teams/<page_num:([0-9]*)>',
+                                             ApiTeamListController,
+                                             methods=['GET']),
                                webapp2.Route(r'/api/v2/event/<event_key:>',
                                              ApiEventController,
                                              methods=['GET']),
@@ -40,6 +50,9 @@ app = webapp2.WSGIApplication([('/api/v1/team/details', ApiTeamDetails),
                                webapp2.Route(r'/api/v2/event/<event_key:>/rankings',
                                              ApiEventRankingsController,
                                              methods=['GET']),
+                               webapp2.Route(r'/api/v2/event/<event_key:>/awards',
+                                            ApiEventAwardsController,
+                                            methods=['GET']),
                                webapp2.Route(r'/api/v2/events/<year:([0-9]*)>',
                                              ApiEventListController,
                                              methods=['GET']),

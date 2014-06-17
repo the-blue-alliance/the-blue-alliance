@@ -5,6 +5,7 @@ from google.appengine.ext import ndb
 
 from helpers.tbavideo_helper import TBAVideoHelper
 from models.event import Event
+from models.team import Team
 
 
 class Match(ndb.Model):
@@ -110,6 +111,13 @@ class Match(ndb.Model):
     updated = ndb.DateTimeProperty(auto_now=True)
 
     def __init__(self, *args, **kw):
+        # store set of affected references referenced keys for cache clearing
+        # keys must be model properties
+        self._affected_references = {
+            'event': set(),
+            'team_keys': set(),
+            'year': set(),
+        }
         self._alliances = None
         self._tba_video = None
         self._winning_alliance = None
@@ -123,6 +131,15 @@ class Match(ndb.Model):
         """
         if self._alliances is None:
             self._alliances = json.loads(self.alliances_json)
+
+            # score types are inconsistent in the db. convert everything to ints for now.
+            for color in ['red', 'blue']:
+                score = self._alliances[color]['score']
+                if score is None:
+                    self._alliances[color]['score'] = -1
+                else:
+                    self._alliances[color]['score'] = int(score)
+
         return self._alliances
 
     @property
@@ -140,6 +157,10 @@ class Match(ndb.Model):
     @property
     def event_key_name(self):
         return self.event.id()
+
+    @property
+    def team_keys(self):
+        return [ndb.Key(Team, team_key_name) for team_key_name in self.team_key_names]
 
     @property
     def year(self):

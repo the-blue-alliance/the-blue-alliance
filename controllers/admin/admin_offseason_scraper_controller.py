@@ -24,7 +24,7 @@ class AdminOffseasonScraperController(LoggedInHandler):
         new_events = df.getEventList()
         old_events = Event.query().filter(
             Event.event_type_enum == EventType.OFFSEASON).filter(
-            Event.year == 2013).filter(
+            Event.year == 2014).filter(
             Event.first_eid != None).fetch(100)
 
         old_first_eids = [event.first_eid for event in old_events]
@@ -46,7 +46,8 @@ class AdminOffseasonScraperController(LoggedInHandler):
         if self.request.get("submit") == "duplicate":
             old_event = Event.get_by_id(self.request.get("duplicate_event_key"))
             old_event.first_eid = self.request.get("event_first_eid")
-            old_event.put()
+            old_event.dirty = True  # TODO: hacky
+            EventManipulator.createOrUpdate(old_event)
 
             self.redirect("/admin/offseasons?success=duplicate&event_key=%s" % self.request.get("duplicate_event_key"))
             return
@@ -69,7 +70,7 @@ class AdminOffseasonScraperController(LoggedInHandler):
                 event_short=self.request.get("event_short"),
                 first_eid=self.request.get("event_first_eid"),
                 name=self.request.get("event_name"),
-                year=2013, #TODO: don't hardcode me -gregmarra 20130921
+                year=int(self.request.get("event_year")),
                 start_date=start_date,
                 end_date=end_date,
                 location=self.request.get("event_location"),
