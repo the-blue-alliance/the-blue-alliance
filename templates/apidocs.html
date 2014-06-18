@@ -376,7 +376,7 @@
       <h4>Related: <a class="smooth-scroll" href="#team-model">Team Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/(&lt;year&gt;)</code>
+        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;</code>
       </p>
       <table class=table>
         <thead>
@@ -393,12 +393,6 @@
               valid, official team number issued by <em>FIRST</em></td>
             <td>frc1, frc281, frc1114</td>
           </tr>
-          <tr>
-            <td>year  </td>
-            <td>A specific year you would like to grab data for this team.
-              Defaults to current year if not provided. </td>
-            <td>2008, 2013</td>
-          </tr>
         </tbody>
       </table>
       <div class="panel panel-default">
@@ -409,7 +403,7 @@
           <form id="example_team_request_form" class="form-inline">
             <div class="input-group">
               <span class="input-group-addon">www.thebluealliance.com</span>
-              <input class="form-control" size="6" id="example_team_request" type="text" value="/api/v2/team/frc281/2011">
+              <input class="form-control" size="6" id="example_team_request" type="text" value="/api/v2/team/frc254">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
               </span>
