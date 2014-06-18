@@ -1,3 +1,4 @@
+from collections import defaultdict
 from google.appengine.ext import ndb
 from helpers.cache_clearer import CacheClearer
 
@@ -17,19 +18,32 @@ class ManipulatorBase(object):
 
     @classmethod
     def delete(self, models):
-        keys = [model.key for model in self.listify(models)]
+        models = self.listify(models)
+        keys = [model.key for model in models]
         ndb.delete_multi(keys)
-        for model in self.listify(models):
-            if hasattr(model, '_affected_references'):
-                self._computeAndSaveAffectedReferences(model)
-                self.clearCache(model._affected_references)
+        for model in models:
+            model.dirty = True
+            self._computeAndSaveAffectedReferences(model)
+        self._clearCache(models)
 
     @classmethod
-    def clearCache(cls, affected_refs):
+    def getCacheKeysAndControllers(cls, affected_refs):
         """
         Child classes should replace method with appropriate call to CacheClearer.
         """
-        return
+        return []
+
+    @classmethod
+    def _clearCache(cls, models):
+        to_clear = defaultdict(set)
+        for model in models:
+            if hasattr(model, '_affected_references') and getattr(model, 'dirty', False):
+                for cache_key, controller in cls.getCacheKeysAndControllers(model._affected_references):
+                    to_clear[controller].add(cache_key)
+            model.dirty = False
+
+        for controller, cache_keys in to_clear.items():
+            controller.delete_cache_multi(cache_keys)
 
     @classmethod
     def listify(self, thing):
@@ -69,10 +83,7 @@ class ManipulatorBase(object):
         models = self.listify(self.findOrSpawn(self.listify(new_models), auto_union=auto_union))
         models_to_put = [model for model in models if getattr(model, "dirty", False)]
         ndb.put_multi(models_to_put)
-        for model in models:
-            if hasattr(model, '_affected_references') and getattr(model, 'dirty', False):
-                self.clearCache(model._affected_references)
-            model.dirty = False
+        self._clearCache(models)
         return self.delistify(models)
 
     @classmethod

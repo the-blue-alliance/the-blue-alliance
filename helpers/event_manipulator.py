@@ -7,8 +7,8 @@ class EventManipulator(ManipulatorBase):
     Handle Event database writes.
     """
     @classmethod
-    def clearCache(cls, affected_refs):
-        CacheClearer.clear_event_and_references(affected_refs)
+    def getCacheKeysAndControllers(cls, affected_refs):
+        return CacheClearer.get_event_cache_keys_and_controllers(affected_refs)
 
     @classmethod
     def updateMerge(self, new_event, old_event, auto_union=True):
@@ -53,7 +53,7 @@ class EventManipulator(ManipulatorBase):
                     setattr(old_event, attr, getattr(new_event, attr))
                     old_event.dirty = True
             if getattr(new_event, attr) == "None":
-                if getattr(old_event, attr, None) != None:
+                if getattr(old_event, attr, None) is not None:
                     setattr(old_event, attr, None)
                     old_event.dirty = True
 

@@ -9,8 +9,8 @@ class AwardManipulator(ManipulatorBase):
     Handle Award database writes.
     """
     @classmethod
-    def clearCache(cls, affected_refs):
-        CacheClearer.clear_award_and_references(affected_refs)
+    def getCacheKeysAndControllers(cls, affected_refs):
+        return CacheClearer.get_award_cache_keys_and_controllers(affected_refs)
 
     @classmethod
     def updateMerge(self, new_award, old_award, auto_union=True):

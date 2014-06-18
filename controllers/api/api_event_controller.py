@@ -20,7 +20,7 @@ class ApiEventController(ApiBaseController):
     def __init__(self, *args, **kw):
         super(ApiEventController, self).__init__(*args, **kw)
         self.event_key = self.request.route_kwargs["event_key"]
-        self._cache_key = self.CACHE_KEY_FORMAT.format(self.event_key)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.event_key)
 
     @property
     def _validators(self):
@@ -45,12 +45,12 @@ class ApiEventController(ApiBaseController):
 
 class ApiEventTeamsController(ApiEventController):
     CACHE_KEY_FORMAT = "apiv2_event_teams_controller_{}"  # (event_key)
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 60 * 60
 
     def __init__(self, *args, **kw):
         super(ApiEventTeamsController, self).__init__(*args, **kw)
-        self._cache_key = self.CACHE_KEY_FORMAT.format(self.event_key)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.event_key)
 
     def _track_call(self, event_key):
         self._track_call_defer('event/teams', event_key)
@@ -71,7 +71,7 @@ class ApiEventMatchesController(ApiEventController):
 
     def __init__(self, *args, **kw):
         super(ApiEventMatchesController, self).__init__(*args, **kw)
-        self._cache_key = self.CACHE_KEY_FORMAT.format(self.event_key)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.event_key)
 
     def _track_call(self, event_key):
         self._track_call_defer('event/matches', event_key)
@@ -92,7 +92,7 @@ class ApiEventStatsController(ApiEventController):
 
     def __init__(self, *args, **kw):
         super(ApiEventStatsController, self).__init__(*args, **kw)
-        self._cache_key = self.CACHE_KEY_FORMAT.format(self.event_key)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.event_key)
 
     def _track_call(self, event_key):
         self._track_call_defer('event/stats', event_key)
@@ -102,6 +102,7 @@ class ApiEventStatsController(ApiEventController):
 
         return json.dumps(Event.get_by_id(event_key).matchstats)
 
+
 class ApiEventRankingsController(ApiEventController):
     CACHE_KEY_FORMAT = "apiv2_event_rankings_controller_{}"  # (event_key)
     CACHE_VERSION = 0
@@ -109,7 +110,7 @@ class ApiEventRankingsController(ApiEventController):
 
     def __init__(self, *args, **kw):
         super(ApiEventRankingsController, self).__init__(*args, **kw)
-        self._cache_key = self.CACHE_KEY_FORMAT.format(self.event_key)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.event_key)
 
     def _track_call(self, event_key):
         self._track_call_defer('event/rankings', event_key)
@@ -123,6 +124,7 @@ class ApiEventRankingsController(ApiEventController):
         else:
             return ranks
 
+
 class ApiEventAwardsController(ApiEventController):
     CACHE_KEY_FORMAT = "apiv2_event_awards_controller_{}"  # (event_key)
     CACHE_VERSION = 0
@@ -130,7 +132,7 @@ class ApiEventAwardsController(ApiEventController):
 
     def __init__(self, *args, **kw):
         super(ApiEventAwardsController, self).__init__(*args, **kw)
-        self._cache_key = self.CACHE_KEY_FORMAT.format(self.event_key)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.event_key)
 
     def _track_call(self, event_key):
         self._track_call_defer('event/awards', event_key)
@@ -151,7 +153,7 @@ class ApiEventListController(ApiBaseController):
     def __init__(self, *args, **kw):
         super(ApiEventListController, self).__init__(*args, **kw)
         self.year = int(self.request.route_kwargs.get("year") or datetime.now().year)
-        self._cache_key = self.CACHE_KEY_FORMAT.format(self.year)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.year)
 
     @property
     def _validators(self):
