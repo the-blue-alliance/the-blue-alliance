@@ -33,7 +33,7 @@ class ApiTeamControllerBase(ApiBaseController):
 
 class ApiTeamController(ApiTeamControllerBase):
     CACHE_KEY_FORMAT = "apiv2_team_controller_{}"  # (team_key)
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
