@@ -15,7 +15,7 @@ from controllers.main_controller import ContactHandler, HashtagsHandler, \
       AboutHandler, ThanksHandler, PageNotFoundHandler, \
       GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler
 from controllers.match_controller import MatchDetail
-from controllers.rankings_controller import RankingsCanonical, RankingsDetail
+from controllers.district_controller import DistrictList, DistrictRankings
 from controllers.suggestions.suggest_match_video_controller import SuggestMatchVideoController
 from controllers.suggestions.suggest_event_webcast_controller import SuggestEventWebcastController
 from controllers.suggestions.suggest_team_media_controller import SuggestTeamMediaController
@@ -48,6 +48,9 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/account/register', AccountRegister, 'account-register', strict_slash=True),
       RedirectRoute(r'/apidocs', ApiDocumentationHandler, 'api-documentation', strict_slash=True),
       RedirectRoute(r'/contact', ContactHandler, 'contact', strict_slash=True),
+      RedirectRoute(r'/districts/<year:[0-9]+>', DistrictList, 'district-list-year', strict_slash=True),
+      RedirectRoute(r'/districts', DistrictList, 'district-list', strict_slash=True),
+      RedirectRoute(r'/districts/rankings/<district_abbrev>/<year:[0-9]+>', DistrictRankings, 'district-rankings', strict_slash=True),
       RedirectRoute(r'/event/<event_key>', EventDetail, 'event-detail', strict_slash=True),
       RedirectRoute(r'/event/<event_key>/feed', EventRss, 'event-rss', strict_slash=True),
       RedirectRoute(r'/events/<year:[0-9]+>', EventList, 'event-list-year', strict_slash=True),
@@ -60,8 +63,6 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/logout', AccountLogout, 'account-logout', strict_slash=True),
       RedirectRoute(r'/match/<match_key>', MatchDetail, 'match-detail', strict_slash=True),
       RedirectRoute(r'/opr', OprHandler, 'opr', strict_slash=True),
-      RedirectRoute(r'/rankings', RankingsCanonical, 'rankings-canonical', strict_slash=True),
-      RedirectRoute(r'/rankings/<year:[0-9]+>/<district_abbrev>', RankingsDetail, 'rankings-detail', strict_slash=True),
       RedirectRoute(r'/record', RecordHandler, 'record', strict_slash=True),
       RedirectRoute(r'/search', SearchHandler, 'search', strict_slash=True),
       RedirectRoute(r'/suggest/event/webcast', SuggestEventWebcastController, 'suggest-event-webcast', strict_slash=True),

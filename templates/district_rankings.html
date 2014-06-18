@@ -1,10 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}{% if not is_canonical %}{{year}} {% endif %}FIRST Robotics District Rankings - The Blue Alliance{% endblock %}
+{% block title %}{{year}} FIRST Robotics District Rankings - The Blue Alliance{% endblock %}
 
 {% block meta_description %}{% endblock %}
-
-{% block rankings_active %}active{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -17,21 +15,14 @@
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu tba-dropdown-menu-limited">
-            {% for valid_year in valid_years %}
-              <li><a href="/rankings/{{valid_year}}">{{valid_year}}</a></li>
+            {% for valid_year in valid_years reversed %}
+              <li><a href="/districts/rankings/{{district_abbrev}}/{{valid_year}}">{{valid_year}}</a></li>
             {% endfor %}
           </ul>
         </div>
 
         <h1 class="visible-xs end_header">{{year}} {{district_name}} District Rankings</h1>
 
-        <div class="tba-sidebar">
-          <ul class="nav tba-sidenav">
-            {% for valid_district in valid_districts %}
-              <li {% if district_name == valid_district.0 %}class="active"{% endif %}><a href="/rankings/{{valid_district.1}}/{{year}}">{{valid_district.0}}</a></li>
-            {% endfor %}
-          </ul>
-        </div>
       </div>
     </div>
     <div class="col-xs-12 col-sm-9 col-lg-10">
