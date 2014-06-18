@@ -42,6 +42,7 @@ class TestTeamApiController(unittest2.TestCase):
                 Laserflex South & Greenville County Schools & Greenville\
                 Technical Charter High School",
                 team_number=281,
+                rookie_year=1999,
                 nickname="EnTech GreenVillians",
                 address="Greenville, SC, USA",
                 website="www.entech.org",
@@ -60,6 +61,7 @@ class TestTeamApiController(unittest2.TestCase):
         self.assertEqual(team["country_name"], "USA")
         self.assertEqual(team["region"], "SC")
         self.assertEqual(team["website"], self.team.website)
+        self.assertEqual(team["rookie_year"], self.team.rookie_year)
 
     def testTeamApi(self):
         response = self.testapp.get('/frc281', headers={"X-TBA-App-Id": "tba-tests:team-controller-test:v01"})
