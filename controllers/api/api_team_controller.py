@@ -162,6 +162,29 @@ class ApiTeamMediaController(ApiTeamControllerBase):
         return json.dumps(media_list, ensure_ascii=True)
 
 
+class ApiTeamYearsParticipatedController(ApiTeamControllerBase):
+    CACHE_KEY_FORMAT = "apiv2_team_years_participated_controller_{}"  # (team_key)
+    CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamYearsParticipatedController, self).__init__(*args, **kw)
+        self.team_key = self.request.route_kwargs["team_key"]
+        self._cache_key = self.CACHE_KEY_FORMAT.format(self.team_key)
+
+    def _track_call(self, team_key):
+        self._track_call_defer('team/years_participated', team_key)
+
+    def _render(self, team_key):
+        event_team_keys = EventTeam.query(EventTeam.team == ndb.Key(Team, team_key)).fetch(None, keys_only=True)
+        years_participated = set()
+        for event_team_key in event_team_keys:
+            years_participated.add(int(event_team_key.id()[:4]))
+        years_participated = sorted(list(years_participated))
+
+        return json.dumps(years_participated, ensure_ascii=True)
+
+
 class ApiTeamListController(ApiTeamControllerBase):
     """
     Returns a JSON list of teams, paginated by team number in sets of 500

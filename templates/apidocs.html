@@ -30,6 +30,7 @@
                 <li><a class="smooth-scroll" href="#team-events-request">Team Events Request</a></li>
                 <li><a class="smooth-scroll" href="#team-event-awards-request">Team Event Awards Request</a></li>
                 <li><a class="smooth-scroll" href="#team-event-matches-request">Team Event Matches Request</a></li>
+                <li><a class="smooth-scroll" href="#team-years-participated-request">Team Years Participated Request</a></li>
                 <li><a class="smooth-scroll" href="#team-media-request">Team Media Request</a></li>
               </ul>
             </li>
@@ -642,6 +643,49 @@
         </div>
       </div>
 
+      <h3 id="team-years-participated-request">Team Years Participated Request</h3>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/years_participated</code>
+      </p>
+      <table class=table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>team key</td>
+            <td>A team key name where the format is <code>frcyyyy</code> where yyyy is the a
+              valid, official team number issued by <em>FIRST</em></td>
+            <td>frc1, frc281, frc1114</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_team_years_participated_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="6" id="example_team_years_participated_request" type="text" value="/api/v2/team/frc254/years_participated">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group">
+            <pre class="team-years-participated-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+
       <h3 id="team-media-request">Team Media Request</h3>
       <h4>Related: <a class="smooth-scroll" href="#media-model">Media Model</a></h4>
       <p>
@@ -1094,6 +1138,22 @@
       },
       error: function(data) {
         $(".team-event-matches-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+  $("#example_team_years_participated_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".team-years-participated-request-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_team_years_participated_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-team-years-participated-request:v01'},
+      success: function(data) {
+        $(".team-years-participated-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".team-years-participated-request-json").html('Something went wrong! Please check for correct request format.');
       }
     });
   });

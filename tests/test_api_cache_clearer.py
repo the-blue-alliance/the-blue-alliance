@@ -26,6 +26,7 @@ from controllers.api.api_team_controller import ApiTeamEventsController
 from controllers.api.api_team_controller import ApiTeamEventAwardsController
 from controllers.api.api_team_controller import ApiTeamEventMatchesController
 from controllers.api.api_team_controller import ApiTeamMediaController
+from controllers.api.api_team_controller import ApiTeamYearsParticipatedController
 from controllers.api.api_team_controller import ApiTeamListController
 
 from helpers.award_manipulator import AwardManipulator
@@ -211,6 +212,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.team_event_matches_frc2_2010sc_cache_key = ApiTeamEventMatchesController._get_full_cache_key(ApiTeamEventMatchesController.CACHE_KEY_FORMAT.format('frc2', '2010sc'))
         self.team_media_frc1_cache_key = ApiTeamMediaController._get_full_cache_key(ApiTeamMediaController.CACHE_KEY_FORMAT.format('frc1', 2010))
         self.team_media_frc2_cache_key = ApiTeamMediaController._get_full_cache_key(ApiTeamMediaController.CACHE_KEY_FORMAT.format('frc2', 2010))
+        self.team_years_participated_frc1_cache_key = ApiTeamYearsParticipatedController._get_full_cache_key(ApiTeamYearsParticipatedController.CACHE_KEY_FORMAT.format('frc1'))
+        self.team_years_participated_frc2_cache_key = ApiTeamYearsParticipatedController._get_full_cache_key(ApiTeamYearsParticipatedController.CACHE_KEY_FORMAT.format('frc2'))
         self.team_list_page_0_cache_key = ApiTeamListController._get_full_cache_key(ApiTeamListController.CACHE_KEY_FORMAT.format(0))
         self.team_list_page_1_cache_key = ApiTeamListController._get_full_cache_key(ApiTeamListController.CACHE_KEY_FORMAT.format(1))
 
@@ -251,6 +254,8 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -273,6 +278,8 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -295,6 +302,8 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -317,6 +326,8 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -339,6 +350,8 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -361,6 +374,8 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -383,6 +398,8 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -405,6 +422,8 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -427,6 +446,8 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -449,6 +470,8 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -471,6 +494,8 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -493,6 +518,8 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -515,6 +542,8 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -537,6 +566,8 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -559,6 +590,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         if flushed:
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -581,6 +614,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
         if flushed:
             self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -603,6 +638,56 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
         if flushed:
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+
+        response = self.testapp.get('/api/v2/team/frc1/years_participated', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+        if flushed:
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+
+        response = self.testapp.get('/api/v2/team/frc2/years_participated', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
+        if flushed:
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -624,6 +709,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         if flushed:
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
@@ -646,6 +733,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -667,6 +756,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+        self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -699,6 +790,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -721,6 +814,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -745,6 +840,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -769,6 +866,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -793,6 +892,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -817,6 +918,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -841,6 +944,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -865,6 +970,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -889,6 +996,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -913,6 +1022,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -937,6 +1048,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
 
@@ -961,5 +1074,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)

@@ -7,7 +7,8 @@ from controllers.api_controller import ApiEventsShow, ApiTeamDetails, ApiTeamsSh
                                        ApiEventList, ApiEventDetails, ApiMatchDetails, \
                                        CsvTeamsAll
 from controllers.api.api_team_controller import ApiTeamController, ApiTeamEventsController, ApiTeamEventAwardsController, \
-                                                ApiTeamEventMatchesController, ApiTeamMediaController, ApiTeamListController
+                                                ApiTeamEventMatchesController, ApiTeamMediaController, ApiTeamListController, \
+                                                ApiTeamYearsParticipatedController
 from controllers.api.api_event_controller import ApiEventController, ApiEventTeamsController, \
                                                  ApiEventMatchesController, ApiEventStatsController, \
                                                  ApiEventRankingsController, ApiEventAwardsController, ApiEventListController
@@ -41,6 +42,9 @@ app = webapp2.WSGIApplication([('/api/v1/team/details', ApiTeamDetails),
                                              methods=['GET']),
                                webapp2.Route(r'/api/v2/team/<team_key:>/<year:([0-9]*)>/media',
                                              ApiTeamMediaController,
+                                             methods=['GET']),
+                               webapp2.Route(r'/api/v2/team/<team_key:>/years_participated',
+                                             ApiTeamYearsParticipatedController,
                                              methods=['GET']),
                                webapp2.Route(r'/api/v2/teams/<page_num:([0-9]*)>',
                                              ApiTeamListController,
