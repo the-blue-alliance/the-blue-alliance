@@ -14,6 +14,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
 from consts.award_type import AwardType
+from consts.district_type import DistrictType
 from consts.event_type import EventType
 
 from helpers.event_helper import EventHelper
@@ -414,6 +415,10 @@ class DistrictPointsCalcEnqueue(webapp.RequestHandler):
 
     def get(self, district_type_enum, year):
         district_type_enum = int(district_type_enum)
+        if district_type_enum == DistrictType.NO_DISTRICT:
+            self.response.out.write("Can't enqueue for non district events!")
+            return
+
         year = int(year)
 
         event_keys = Event.query(Event.year == year, Event.event_district_enum == district_type_enum).fetch(None, keys_only=True)
@@ -430,6 +435,9 @@ class DistrictPointsCalcDo(webapp.RequestHandler):
 
     def get(self, event_key):
         event = Event.get_by_id(event_key)
+        if event.event_district_enum == DistrictType.NO_DISTRICT:
+            self.response.out.write("Can't calculate district points for a non-district event!")
+            return
 
         match_key_futures = Match.query(Match.event == event.key).fetch_async(None, keys_only=True)
         award_key_futures = Award.query(Award.event == event.key).fetch_async(None, keys_only=True)
