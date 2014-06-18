@@ -21,8 +21,8 @@ class CacheableHandler(webapp2.RequestHandler):
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
         self._cache_expiration = 0
-        if not hasattr(self, '_cache_key'):
-            self._cache_key = self.CACHE_KEY_FORMAT
+        if not hasattr(self, '_partial_cache_key'):
+            self._partial_cache_key = self.CACHE_KEY_FORMAT
 
         # Cache all pages for 61 seconds, unless overwritten.
         if self.response is not None:
@@ -30,15 +30,15 @@ class CacheableHandler(webapp2.RequestHandler):
             self.response.headers['Pragma'] = 'Public'
 
     @property
-    def full_cache_key(self):
-        return self._get_full_cache_key(self._cache_key)
+    def cache_key(self):
+        return self._render_cache_key(self._partial_cache_key)
 
     @classmethod
-    def get_full_cache_key(cls, *args):
-        return cls._get_full_cache_key(cls.CACHE_KEY_FORMAT.format(*args))
+    def get_cache_key_from_format(cls, *args):
+        return cls._render_cache_key(cls.CACHE_KEY_FORMAT.format(*args))
 
     @classmethod
-    def _get_full_cache_key(cls, cache_key):
+    def _render_cache_key(cls, cache_key):
         return "{}:{}:{}".format(
             cache_key,
             cls.CACHE_VERSION,
@@ -66,23 +66,19 @@ class CacheableHandler(webapp2.RequestHandler):
             return True
 
     def memcacheFlush(self):
-        memcache.delete(self.full_cache_key)
-        return self.full_cache_key
+        memcache.delete(self.cache_key)
+        return self.cache_key
 
     def _read_cache(self):
-        return memcache.get(self.full_cache_key)
+        return memcache.get(self.cache_key)
 
     def _write_cache(self, response):
         if tba_config.CONFIG["memcache"]:
-            memcache.set(self.full_cache_key, response, self._cache_expiration)
+            memcache.set(self.cache_key, response, self._cache_expiration)
 
     @classmethod
-    def _delete_cache(cls, full_cache_key):
-        memcache.delete(full_cache_key)
-
-    @classmethod
-    def delete_cache_multi(cls, full_cache_keys):
-        memcache.delete_multi(full_cache_keys)
+    def delete_cache_multi(cls, cache_keys):
+        memcache.delete_multi(cache_keys)
 
     def _render(self):
         raise NotImplementedError("No _render method.")

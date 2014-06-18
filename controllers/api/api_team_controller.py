@@ -24,7 +24,7 @@ class ApiTeamController(ApiBaseController):
         super(ApiTeamController, self).__init__(*args, **kw)
         self.team_key = self.request.route_kwargs["team_key"]
         self.year = int(self.request.route_kwargs.get("year") or datetime.now().year)
-        self._cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.year)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.year)
 
     @property
     def _validators(self):
@@ -64,7 +64,7 @@ class ApiTeamMediaController(ApiBaseController):
         super(ApiTeamMediaController, self).__init__(*args, **kw)
         self.team_key = self.request.route_kwargs["team_key"]
         self.year = int(self.request.route_kwargs.get("year") or datetime.now().year)
-        self._cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.year)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.year)
 
     @property
     def _validators(self):
@@ -109,7 +109,7 @@ class ApiTeamListController(ApiBaseController):
     def __init__(self, *args, **kw):
         super(ApiTeamListController, self).__init__(*args, **kw)
         self.page_num = self.request.route_kwargs['page_num']
-        self._cache_key = self.CACHE_KEY_FORMAT.format(self.page_num)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.page_num)
 
     @property
     def _validators(self):

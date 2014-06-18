@@ -24,7 +24,7 @@ class MatchDetail(CacheableHandler):
         if not match_key:
             return self.redirect("/")
 
-        self._cache_key = self.CACHE_KEY_FORMAT.format(match_key)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(match_key)
         super(MatchDetail, self).get(match_key)
 
     def _render(self, match_key):

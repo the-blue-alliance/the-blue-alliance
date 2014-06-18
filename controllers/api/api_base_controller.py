@@ -85,7 +85,7 @@ class ApiBaseController(CacheableHandler):
         the cached response if cached
         True if in not modified
         """
-        response = CachedResponse.get_by_id(self.full_cache_key)
+        response = CachedResponse.get_by_id(self.cache_key)
         if response:
             if self._has_been_modified_since(response.updated):
                 response.headers['Last-Modified'] = self.response.headers['Last-Modified']
@@ -101,22 +101,18 @@ class ApiBaseController(CacheableHandler):
         """
         if tba_config.CONFIG["response_cache"]:
             CachedResponse(
-                id=self.full_cache_key,
+                id=self.cache_key,
                 headers_json=json.dumps(dict(response.headers)),
                 body=response.body,
             ).put()
 
     @classmethod
-    def _delete_cache(cls, full_cache_key):
+    def delete_cache_multi(cls, cache_keys):
         """
         Overrides parent method to use CachedResponse instead of memcache
         """
-        ndb.Key(CachedResponse, full_cache_key).delete()
-
-    @classmethod
-    def delete_cache_multi(cls, full_cache_keys):
-        logging.info("Deleting cache keys: {}".format(full_cache_keys))
-        ndb.delete_multi([ndb.Key(CachedResponse, full_cache_key) for full_cache_key in full_cache_keys])
+        logging.info("Deleting cache keys: {}".format(cache_keys))
+        ndb.delete_multi([ndb.Key(CachedResponse, cache_key) for cache_key in cache_keys])
 
     def _track_call_defer(self, api_action, api_label):
         deferred.defer(track_call, api_action, api_label, self.x_tba_app_id)

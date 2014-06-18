@@ -100,37 +100,37 @@ class CacheClearer(object):
     def _get_event_awards_cache_keys_and_controllers(cls, event_keys):
         cache_keys_and_controllers = []
         for event_key in filter(None, event_keys):
-            cache_keys_and_controllers.append((ApiEventAwardsController.get_full_cache_key(event_key.id()), ApiEventAwardsController))
+            cache_keys_and_controllers.append((ApiEventAwardsController.get_cache_key_from_format(event_key.id()), ApiEventAwardsController))
         return cache_keys_and_controllers
 
     @classmethod
     def _get_events_cache_keys_and_controllers(cls, event_keys):
         cache_keys_and_controllers = []
         for event_key in filter(None, event_keys):
-            cache_keys_and_controllers.append((ApiEventController.get_full_cache_key(event_key.id()), ApiEventController))
-            cache_keys_and_controllers.append((ApiEventStatsController.get_full_cache_key(event_key.id()), ApiEventStatsController))
-            cache_keys_and_controllers.append((ApiEventRankingsController.get_full_cache_key(event_key.id()), ApiEventRankingsController))
+            cache_keys_and_controllers.append((ApiEventController.get_cache_key_from_format(event_key.id()), ApiEventController))
+            cache_keys_and_controllers.append((ApiEventStatsController.get_cache_key_from_format(event_key.id()), ApiEventStatsController))
+            cache_keys_and_controllers.append((ApiEventRankingsController.get_cache_key_from_format(event_key.id()), ApiEventRankingsController))
         return cache_keys_and_controllers
 
     @classmethod
     def _get_eventlist_cache_keys_and_controllers(cls, years):
         cache_keys_and_controllers = []
         for year in filter(None, years):
-            cache_keys_and_controllers.append((ApiEventListController.get_full_cache_key(year), ApiEventListController))
+            cache_keys_and_controllers.append((ApiEventListController.get_cache_key_from_format(year), ApiEventListController))
         return cache_keys_and_controllers
 
     @classmethod
     def _get_eventteams_cache_keys_and_controllers(cls, event_keys):
         cache_keys_and_controllers = []
         for event_key in filter(None, event_keys):
-            cache_keys_and_controllers.append((ApiEventTeamsController.get_full_cache_key(event_key.id()), ApiEventTeamsController))
+            cache_keys_and_controllers.append((ApiEventTeamsController.get_cache_key_from_format(event_key.id()), ApiEventTeamsController))
         return cache_keys_and_controllers
 
     @classmethod
     def _get_matches_cache_keys_and_controllers(cls, event_keys):
         cache_keys_and_controllers = []
         for event_key in filter(None, event_keys):
-            cache_keys_and_controllers.append((ApiEventMatchesController.get_full_cache_key(event_key.id()), ApiEventMatchesController))
+            cache_keys_and_controllers.append((ApiEventMatchesController.get_cache_key_from_format(event_key.id()), ApiEventMatchesController))
         return cache_keys_and_controllers
 
     @classmethod
@@ -138,7 +138,7 @@ class CacheClearer(object):
         cache_keys_and_controllers = []
         for team_key in filter(None, team_keys):
             for year in filter(None, years):
-                cache_keys_and_controllers.append((ApiTeamMediaController.get_full_cache_key(team_key.id(), year), ApiTeamMediaController))
+                cache_keys_and_controllers.append((ApiTeamMediaController.get_cache_key_from_format(team_key.id(), year), ApiTeamMediaController))
         return cache_keys_and_controllers
 
     @classmethod
@@ -146,7 +146,7 @@ class CacheClearer(object):
         cache_keys_and_controllers = []
         for team_key in filter(None, team_keys):
             for year in filter(None, years):
-                cache_keys_and_controllers.append((ApiTeamController.get_full_cache_key(team_key.id(), year), ApiTeamController))
+                cache_keys_and_controllers.append((ApiTeamController.get_cache_key_from_format(team_key.id(), year), ApiTeamController))
         return cache_keys_and_controllers
 
     @classmethod
@@ -154,5 +154,5 @@ class CacheClearer(object):
         cache_keys_and_controllers = []
         for team_key in filter(None, team_keys):
             page_num = int(team_key.id()[3:]) / ApiTeamListController.PAGE_SIZE
-            cache_keys_and_controllers.append((ApiTeamListController.get_full_cache_key(page_num), ApiTeamListController))
+            cache_keys_and_controllers.append((ApiTeamListController.get_cache_key_from_format(page_num), ApiTeamListController))
         return cache_keys_and_controllers

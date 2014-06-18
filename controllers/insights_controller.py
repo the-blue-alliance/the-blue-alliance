@@ -56,7 +56,7 @@ class InsightsDetail(CacheableHandler):
         if year not in VALID_YEARS:
             self.abort(404)
 
-        self._cache_key = self.CACHE_KEY_FORMAT.format(year)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(year)
         super(InsightsDetail, self).get(year)
 
     def _render(self, year):
