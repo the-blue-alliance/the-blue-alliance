@@ -23,6 +23,13 @@
 
         <h1 class="visible-xs end_header">{{year}} {{district_name}} District Rankings</h1>
 
+        <div class="tba-sidebar">
+          <ul class="nav tba-sidenav">
+            {% for valid_district in valid_districts %}
+              <li {% if district_name == valid_district.0 %}class="active"{% endif %}><a href="/districts/rankings/{{valid_district.1}}/{{year}}">{{valid_district.0}}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
       </div>
     </div>
     <div class="col-xs-12 col-sm-9 col-lg-10">
