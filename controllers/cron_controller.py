@@ -470,7 +470,11 @@ class DistrictPointsCalcDo(webapp.RequestHandler):
                         data['points'][team]['qual_points'] += 2 * POINTS_MULTIPLIER
                         data['tiebreakers'][team]['qual_wins'] += 1
                         winning_score = match.alliances[match.winning_alliance]['score']
-                        data['tiebreakers'][team]['highest_qual_scores'] = heapq.nlargest(3, data['tiebreakers'][team]['highest_qual_scores'] + [winning_score])
+
+                    for color in ['red', 'blue']:
+                        for team in match.alliances[color]['teams']:
+                            score = match.alliances[color]['score']
+                            data['tiebreakers'][team]['highest_qual_scores'] = heapq.nlargest(3, data['tiebreakers'][team]['highest_qual_scores'] + [score])
             else:
                 if match.winning_alliance == '':
                     continue
