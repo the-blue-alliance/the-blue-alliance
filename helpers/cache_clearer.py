@@ -1,6 +1,7 @@
 from google.appengine.ext import ndb
 
-from controllers.api.api_team_controller import ApiTeamController, ApiTeamEventsController, ApiTeamMediaController, ApiTeamListController
+from controllers.api.api_team_controller import ApiTeamController, ApiTeamEventsController, ApiTeamEventAwardsController, \
+                                                ApiTeamEventMatchesController, ApiTeamMediaController, ApiTeamListController
 from controllers.api.api_event_controller import ApiEventController, ApiEventTeamsController, \
                                                  ApiEventMatchesController, ApiEventStatsController, \
                                                  ApiEventRankingsController, ApiEventAwardsController, ApiEventListController
@@ -21,6 +22,7 @@ class CacheClearer(object):
         years = affected_refs['year']
 
         cls._clear_event_awards_controllers(event_keys)
+        cls._clear_team_event_awards_controllers(team_keys, event_keys)
 
     @classmethod
     def clear_event_and_references(cls, affected_refs):
@@ -63,6 +65,7 @@ class CacheClearer(object):
         years = affected_refs['year']
 
         cls._clear_matches_controllers(event_keys)
+        cls._clear_team_event_matches_controllers(team_keys, event_keys)
 
     @classmethod
     def clear_media_and_references(cls, affected_refs):
@@ -125,11 +128,22 @@ class CacheClearer(object):
             for year in filter(None, years):
                 ApiTeamMediaController.clear_cache(team_key.id(), year)
 
-
     @classmethod
     def _clear_teams_controllers(cls, team_keys):
         for team_key in filter(None, team_keys):
             ApiTeamController.clear_cache(team_key.id())
+
+    @classmethod
+    def _clear_team_event_awards_controllers(cls, team_keys, event_keys):
+        for team_key in filter(None, team_keys):
+            for event_key in filter(None, event_keys):
+                ApiTeamEventAwardsController.clear_cache(team_key.id(), event_key.id())
+
+    @classmethod
+    def _clear_team_event_matches_controllers(cls, team_keys, event_keys):
+        for team_key in filter(None, team_keys):
+            for event_key in filter(None, event_keys):
+                ApiTeamEventMatchesController.clear_cache(team_key.id(), event_key.id())
 
     @classmethod
     def _clear_team_events_controllers(cls, team_keys, years):
