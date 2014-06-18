@@ -1,9 +1,9 @@
 import json
 import webapp2
 
-from google.appengine.ext import ndb
-
 from datetime import datetime
+
+from google.appengine.ext import ndb
 
 from controllers.api.api_base_controller import ApiBaseController
 
@@ -11,52 +11,133 @@ from helpers.model_to_dict import ModelToDict
 from helpers.data_fetchers.team_details_data_fetcher import TeamDetailsDataFetcher
 from helpers.media_helper import MediaHelper
 
+from models.award import Award
+from models.event import Event
+from models.match import Match
 from models.media import Media
+from models.event_team import EventTeam
 from models.team import Team
 
 
-class ApiTeamController(ApiBaseController):
-    CACHE_KEY_FORMAT = "apiv2_team_controller_{}_{}"  # (team_key, year)
-    CACHE_VERSION = 1
+class ApiTeamControllerBase(ApiBaseController):
+    @property
+    def _validators(self):
+        return [("team_id_validator", self.team_key)]
+
+    def _set_team(self, team_key):
+        self.team = Team.get_by_id(team_key)
+        if self.team is None:
+            self._errors = json.dumps({"404": "%s team not found" % team_key})
+            self.abort(404)
+
+
+class ApiTeamController(ApiTeamControllerBase):
+    CACHE_KEY_FORMAT = "apiv2_team_controller_{}"  # (team_key)
+    CACHE_VERSION = 2
     CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
         super(ApiTeamController, self).__init__(*args, **kw)
         self.team_key = self.request.route_kwargs["team_key"]
+        self._cache_key = self.CACHE_KEY_FORMAT.format(self.team_key)
+
+    def _track_call(self, team_key):
+        self._track_call_defer('team', team_key)
+
+    def _render(self, team_key):
+        self._set_team(team_key)
+
+        team_dict = ModelToDict.teamConverter(self.team)
+
+        return json.dumps(team_dict, ensure_ascii=True)
+
+
+class ApiTeamEventsController(ApiTeamControllerBase):
+    CACHE_KEY_FORMAT = "apiv2_team_events_controller_{}_{}"  # (team_key, year)
+    CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamEventsController, self).__init__(*args, **kw)
+        self.team_key = self.request.route_kwargs["team_key"]
         self.year = int(self.request.route_kwargs.get("year") or datetime.now().year)
         self._cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.year)
-
-    @property
-    def _validators(self):
-        return [("team_id_validator", self.team_key)]
 
     def _track_call(self, team_key, year=None):
         api_label = team_key
         if year is not None:
             api_label += '/{}'.format(year)
-        self._track_call_defer('team', api_label)
+        self._track_call_defer('team/events', api_label)
 
     def _render(self, team_key, year=None):
-        self.team = Team.get_by_id(self.team_key)
-        if self.team is None:
-            self._errors = json.dumps({"404": "%s team not found" % self.team_key})
-            self.abort(404)
+        self._set_team(team_key)
 
-        events_sorted, matches_by_event_key, awards_by_event_key, _ = TeamDetailsDataFetcher.fetch(self.team, self.year)
-        team_dict = ModelToDict.teamConverter(self.team)
+        event_team_keys = EventTeam.query(EventTeam.team == self.team.key, EventTeam.year == self.year).fetch(1000, keys_only=True)
+        event_teams = ndb.get_multi(event_team_keys)
+        event_keys = [event_team.event for event_team in event_teams]
+        events = ndb.get_multi(event_keys)
 
-        team_dict["events"] = list()
-        for event in events_sorted:
-            event_dict = ModelToDict.eventConverter(event)
-            event_dict["matches"] = [ModelToDict.matchConverter(match) for match in matches_by_event_key.get(event.key, [])]
-            event_dict["awards"] = [ModelToDict.awardConverter(award) for award in awards_by_event_key.get(event.key, [])]
-            team_dict["events"].append(event_dict)
+        events = [ModelToDict.eventConverter(event) for event in events]
 
-        return json.dumps(team_dict, ensure_ascii=True)
+        return json.dumps(events, ensure_ascii=True)
 
 
-class ApiTeamMediaController(ApiBaseController):
-    CACHE_KEY_FORMAT = "apiv2_team_media_controller_{}_{}"  # (team, year)
+class ApiTeamEventAwardsController(ApiTeamControllerBase):
+    CACHE_KEY_FORMAT = "apiv2_team_event_awards_controller_{}_{}"  # (team_key, event_key)
+    CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamEventAwardsController, self).__init__(*args, **kw)
+        self.team_key = self.request.route_kwargs["team_key"]
+        self.event_key = self.request.route_kwargs["event_key"]
+        self._cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.event_key)
+
+    @property
+    def _validators(self):
+        return [("team_id_validator", self.team_key), ("event_id_validator", self.event_key)]
+
+    def _track_call(self, team_key, event_key):
+        self._track_call_defer('team/event/awards', '{}/{}'.format(team_key, event_key))
+
+    def _render(self, team_key, event_key):
+        award_keys_future = Award.query(Award.team_list == ndb.Key(Team, self.team_key), Award.event == ndb.Key(Event, event_key)).fetch_async(None, keys_only=True)
+        award_futures = ndb.get_multi_async(award_keys_future.get_result())
+
+        awards = [ModelToDict.awardConverter(award_future.get_result()) for award_future in award_futures]
+
+        return json.dumps(awards, ensure_ascii=True)
+
+
+class ApiTeamEventMatchesController(ApiTeamControllerBase):
+    CACHE_KEY_FORMAT = "apiv2_team_event_matches_controller_{}"  # (team_key, event_key)
+    CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamEventMatchesController, self).__init__(*args, **kw)
+        self.team_key = self.request.route_kwargs["team_key"]
+        self.event_key = self.request.route_kwargs["event_key"]
+        self._cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.event_key)
+
+    @property
+    def _validators(self):
+        return [("team_id_validator", self.team_key), ("event_id_validator", self.event_key)]
+
+    def _track_call(self, team_key, event_key):
+        self._track_call_defer('team/event/matches', '{}/{}'.format(team_key, event_key))
+
+    def _render(self, team_key, event_key):
+        match_keys_future = Match.query(Match.event == ndb.Key(Event, self.event_key), Match.team_key_names == self.team_key).fetch_async(None, keys_only=True)
+        match_futures = ndb.get_multi_async(match_keys_future.get_result())
+
+        matches = [ModelToDict.matchConverter(match_future.get_result()) for match_future in match_futures]
+
+        return json.dumps(matches, ensure_ascii=True)
+
+
+class ApiTeamMediaController(ApiTeamControllerBase):
+    CACHE_KEY_FORMAT = "apiv2_team_media_controller_{}_{}"  # (team_key, year)
     CACHE_VERSION = 0
     CACHE_HEADER_LENGTH = 61
 
@@ -66,10 +147,6 @@ class ApiTeamMediaController(ApiBaseController):
         self.year = int(self.request.route_kwargs.get("year") or datetime.now().year)
         self._cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.year)
 
-    @property
-    def _validators(self):
-        return [("team_id_validator", self.team_key)]
-
     def _track_call(self, team_key, year=None):
         api_label = team_key
         if year is not None:
@@ -77,23 +154,38 @@ class ApiTeamMediaController(ApiBaseController):
         self._track_call_defer('team/media', api_label)
 
     def _render(self, team_key, year=None):
-        self.team = Team.get_by_id(team_key)
-        if self.team is None:
-            self._errors = json.dumps({"404": "%s team not found" % team_key})
-            self.abort(404)
+        self._set_team(team_key)
 
-        if year is None:
-            year = self.year
-        else:
-            year = int(year)
-
-        media_keys = Media.query(Media.references == self.team.key, Media.year == year).fetch(500, keys_only=True)
+        media_keys = Media.query(Media.references == self.team.key, Media.year == self.year).fetch(500, keys_only=True)
         medias = ndb.get_multi(media_keys)
         media_list = [ModelToDict.mediaConverter(media) for media in medias]
         return json.dumps(media_list, ensure_ascii=True)
 
 
-class ApiTeamListController(ApiBaseController):
+class ApiTeamYearsParticipatedController(ApiTeamControllerBase):
+    CACHE_KEY_FORMAT = "apiv2_team_years_participated_controller_{}"  # (team_key)
+    CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamYearsParticipatedController, self).__init__(*args, **kw)
+        self.team_key = self.request.route_kwargs["team_key"]
+        self._cache_key = self.CACHE_KEY_FORMAT.format(self.team_key)
+
+    def _track_call(self, team_key):
+        self._track_call_defer('team/years_participated', team_key)
+
+    def _render(self, team_key):
+        event_team_keys = EventTeam.query(EventTeam.team == ndb.Key(Team, team_key)).fetch(None, keys_only=True)
+        years_participated = set()
+        for event_team_key in event_team_keys:
+            years_participated.add(int(event_team_key.id()[:4]))
+        years_participated = sorted(list(years_participated))
+
+        return json.dumps(years_participated, ensure_ascii=True)
+
+
+class ApiTeamListController(ApiTeamControllerBase):
     """
     Returns a JSON list of teams, paginated by team number in sets of 500
     page_num = 0 returns teams from 0-499
