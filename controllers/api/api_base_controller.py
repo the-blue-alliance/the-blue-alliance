@@ -54,7 +54,7 @@ class ApiBaseController(CacheableHandler):
         self.response.headers['content-type'] = 'application/json; charset="utf-8"'
         self.response.headers['Access-Control-Allow-Origin'] = '*'
 
-    def handle_exceptione(self, exception, debug):
+    def handle_exception(self, exception, debug):
         """
         Handle an HTTP exception and actually writeout a
         response.
