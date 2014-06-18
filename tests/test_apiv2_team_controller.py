@@ -10,7 +10,7 @@ from google.appengine.ext import testbed
 
 from consts.event_type import EventType
 
-from controllers.api.api_team_controller import ApiTeamController, ApiTeamEventsController, ApiTeamMediaController
+from controllers.api.api_team_controller import ApiTeamController, ApiTeamEventsController, ApiTeamMediaController, ApiTeamListController
 
 from consts.award_type import AwardType
 from consts.event_type import EventType
@@ -195,3 +195,63 @@ class TestTeamMediaApiController(unittest2.TestCase):
         self.assertEqual(yt["type"], "youtube")
         self.assertEqual(yt["foreign_key"], "aFZy8iibMD0")
         self.assertEqual(yt["details"], {})
+
+
+class TestTeamListApiController(unittest2.TestCase):
+    def setUp(self):
+        app = webapp2.WSGIApplication([webapp2.Route(r'/<page_num:([0-9]*)>', ApiTeamListController, methods=['GET'])], debug=True)
+        self.testapp = webtest.TestApp(app)
+
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_urlfetch_stub()
+        self.testbed.init_memcache_stub()
+        self.testbed.init_taskqueue_stub()
+
+        self.team1 = Team(
+                id="frc123",
+                name="SomeName",
+                team_number=123,
+                nickname="SomeNickname",
+                address="San Jose, CA, USA",
+                website="www.website.com",
+        )
+
+        self.team2 = Team(
+                id="frc4567",
+                name="SomeName",
+                team_number=4567,
+                nickname="SomeNickname",
+                address="San Jose, CA, USA",
+                website="www.website.com",
+        )
+
+        self.team1.put()
+        self.team2.put()
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def assertTeam1Json(self, team):
+        self.assertEqual(team["key"], self.team1.key_name)
+        self.assertEqual(team["name"], self.team1.name)
+        self.assertEqual(team["team_number"], self.team1.team_number)
+
+    def assertTeam2Json(self, team):
+        self.assertEqual(team["key"], self.team2.key_name)
+        self.assertEqual(team["name"], self.team2.name)
+        self.assertEqual(team["team_number"], self.team2.team_number)
+
+    def testTeamListApi(self):
+        response = self.testapp.get('/0', headers={"X-TBA-App-Id": "tba-tests:team_list-controller-test:v01"})
+        team_list = json.loads(response.body)
+        self.assertTeam1Json(team_list[0])
+
+        response = self.testapp.get('/9', headers={"X-TBA-App-Id": "tba-tests:team_list-controller-test:v01"})
+        team_list = json.loads(response.body)
+        self.assertTeam2Json(team_list[0])
+
+        response = self.testapp.get('/10', headers={"X-TBA-App-Id": "tba-tests:team_list-controller-test:v01"})
+        team_list = json.loads(response.body)
+        self.assertEqual(team_list, [])

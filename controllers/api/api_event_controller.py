@@ -14,7 +14,8 @@ from models.event import Event
 
 class ApiEventController(ApiBaseController):
     CACHE_KEY_FORMAT = "apiv2_event_controller_{}"  # (event_key)
-    CACHE_VERSION = 0
+    CACHE_VERSION = 2
+    CACHE_HEADER_LENGTH = 60 * 60
 
     def __init__(self, *args, **kw):
         super(ApiEventController, self).__init__(*args, **kw)
@@ -35,7 +36,6 @@ class ApiEventController(ApiBaseController):
         self._track_call_defer('event', event_key)
 
     def _render(self, event_key):
-        self._set_cache_header_length(60 * 60)
         self._set_event(event_key)
 
         event_dict = ModelToDict.eventConverter(self.event)
@@ -46,6 +46,7 @@ class ApiEventController(ApiBaseController):
 class ApiEventTeamsController(ApiEventController):
     CACHE_KEY_FORMAT = "apiv2_event_teams_controller_{}"  # (event_key)
     CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 60 * 60
 
     def __init__(self, *args, **kw):
         super(ApiEventTeamsController, self).__init__(*args, **kw)
@@ -55,7 +56,6 @@ class ApiEventTeamsController(ApiEventController):
         self._track_call_defer('event/teams', event_key)
 
     def _render(self, event_key):
-        self._set_cache_header_length(60 * 60)
         self._set_event(event_key)
 
         teams = self.event.teams
@@ -67,6 +67,7 @@ class ApiEventTeamsController(ApiEventController):
 class ApiEventMatchesController(ApiEventController):
     CACHE_KEY_FORMAT = "apiv2_event_matches_controller_{}"  # (event_key)
     CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
         super(ApiEventMatchesController, self).__init__(*args, **kw)
@@ -76,7 +77,6 @@ class ApiEventMatchesController(ApiEventController):
         self._track_call_defer('event/matches', event_key)
 
     def _render(self, event_key):
-        self._set_cache_header_length(61)
         self._set_event(event_key)
 
         matches = self.event.matches
@@ -88,6 +88,7 @@ class ApiEventMatchesController(ApiEventController):
 class ApiEventStatsController(ApiEventController):
     CACHE_KEY_FORMAT = "apiv2_event_stats_controller_{}"  # (event_key)
     CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
         super(ApiEventStatsController, self).__init__(*args, **kw)
@@ -97,7 +98,6 @@ class ApiEventStatsController(ApiEventController):
         self._track_call_defer('event/stats', event_key)
 
     def _render(self, event_key):
-        self._set_cache_header_length(61)
         self._set_event(event_key)
 
         return json.dumps(Event.get_by_id(event_key).matchstats)
@@ -105,6 +105,7 @@ class ApiEventStatsController(ApiEventController):
 class ApiEventRankingsController(ApiEventController):
     CACHE_KEY_FORMAT = "apiv2_event_rankings_controller_{}"  # (event_key)
     CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
         super(ApiEventRankingsController, self).__init__(*args, **kw)
@@ -114,7 +115,6 @@ class ApiEventRankingsController(ApiEventController):
         self._track_call_defer('event/rankings', event_key)
 
     def _render(self, event_key):
-        self._set_cache_header_length(61)
         self._set_event(event_key)
 
         ranks = json.dumps(Event.get_by_id(event_key).rankings)
@@ -126,6 +126,7 @@ class ApiEventRankingsController(ApiEventController):
 class ApiEventAwardsController(ApiEventController):
     CACHE_KEY_FORMAT = "apiv2_event_awards_controller_{}"  # (event_key)
     CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
         super(ApiEventAwardsController, self).__init__(*args, **kw)
@@ -135,7 +136,6 @@ class ApiEventAwardsController(ApiEventController):
         self._track_call_defer('event/awards', event_key)
 
     def _render(self,event_key):
-        self._set_cache_header_length(61)
         self._set_event(event_key)
 
         award_list = self.event.awards
@@ -145,7 +145,8 @@ class ApiEventAwardsController(ApiEventController):
 
 class ApiEventListController(ApiBaseController):
     CACHE_KEY_FORMAT = "apiv2_event_list_controller_{}"  # (year)
-    CACHE_VERSION = 0
+    CACHE_VERSION = 2
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):
         super(ApiEventListController, self).__init__(*args, **kw)
@@ -160,8 +161,6 @@ class ApiEventListController(ApiBaseController):
         self._track_call_defer('event/list', self.year)
 
     def _render(self, year=None):
-        self._set_cache_header_length(60 * 60 * 24 * 3)
-
         if self.year < 1992 or self.year > datetime.now().year + 1:
             self._errors = json.dumps({"404": "No events found for %s" % self.year})
             self.abort(404)

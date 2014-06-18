@@ -42,7 +42,9 @@ class CacheableHandler(webapp2.RequestHandler):
 
     def get(self, *args, **kw):
         cached_response = self._read_cache()
-        if cached_response:
+        if cached_response is True:
+            pass
+        elif cached_response is not None:
             self.response.out.write(cached_response.body)
             self.response.headers = cached_response.headers
         else:
@@ -66,18 +68,22 @@ class CacheableHandler(webapp2.RequestHandler):
     @classmethod
     def clear_cache(cls, *args):
         full_cache_key = cls._get_full_cache_key(cls.CACHE_KEY_FORMAT.format(*args))
-        memcache.delete(full_cache_key)
+        cls._delete_cache(full_cache_key)
         logging.info("Deleting cache key: {}".format(full_cache_key))
 
     def _read_cache(self):
         return memcache.get(self.full_cache_key)
 
-    def _render(self):
-        raise NotImplementedError("No _render method.")
-
     def _write_cache(self, response):
         if tba_config.CONFIG["memcache"]:
             memcache.set(self.full_cache_key, response, self._cache_expiration)
+
+    @classmethod
+    def _delete_cache(cls, full_cache_key):
+        memcache.delete(full_cache_key)
+
+    def _render(self):
+        raise NotImplementedError("No _render method.")
 
 
 class LoggedInHandler(webapp2.RequestHandler):

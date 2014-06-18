@@ -27,10 +27,10 @@ class ApiTeamControllerBase(ApiBaseController):
             self._errors = json.dumps({"404": "%s team not found" % team_key})
             self.abort(404)
 
-
 class ApiTeamController(ApiTeamControllerBase):
     CACHE_KEY_FORMAT = "apiv2_team_controller_{}"  # (team_key)
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
+    CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
         super(ApiTeamController, self).__init__(*args, **kw)
@@ -49,8 +49,9 @@ class ApiTeamController(ApiTeamControllerBase):
 
 
 class ApiTeamEventsController(ApiTeamControllerBase):
-    CACHE_KEY_FORMAT = "apiv2_team_events_controller_{}"  # (team_key, year)
+    CACHE_KEY_FORMAT = "apiv2_team_events_controller_{}_{}"  # (team_key, year)
     CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
         super(ApiTeamEventsController, self).__init__(*args, **kw)
@@ -80,6 +81,7 @@ class ApiTeamEventsController(ApiTeamControllerBase):
 class ApiTeamMediaController(ApiTeamControllerBase):
     CACHE_KEY_FORMAT = "apiv2_team_media_controller_{}_{}"  # (team_key, year)
     CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
         super(ApiTeamMediaController, self).__init__(*args, **kw)
@@ -99,5 +101,40 @@ class ApiTeamMediaController(ApiTeamControllerBase):
         media_keys = Media.query(Media.references == self.team.key, Media.year == self.year).fetch(500, keys_only=True)
         medias = ndb.get_multi(media_keys)
         media_list = [ModelToDict.mediaConverter(media) for media in medias]
-
         return json.dumps(media_list, ensure_ascii=True)
+
+
+class ApiTeamListController(ApiTeamControllerBase):
+    """
+    Returns a JSON list of teams, paginated by team number in sets of 500
+    page_num = 0 returns teams from 0-499
+    page_num = 1 returns teams from 500-999
+    page_num = 2 returns teams from 1000-1499
+    etc.
+    """
+    CACHE_KEY_FORMAT = "apiv2_team_list_controller_{}"  # (page_num)
+    CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
+    PAGE_SIZE = 500
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamListController, self).__init__(*args, **kw)
+        self.page_num = self.request.route_kwargs['page_num']
+        self._cache_key = self.CACHE_KEY_FORMAT.format(self.page_num)
+
+    @property
+    def _validators(self):
+        return []
+
+    def _track_call(self, page_num):
+        self._track_call_defer('team/list', page_num)
+
+    def _render(self, page_num):
+        page_num = int(page_num)
+        start = self.PAGE_SIZE * page_num
+        end = start + self.PAGE_SIZE
+
+        team_keys = Team.query(Team.team_number >= start, Team.team_number < end).fetch(None, keys_only=True)
+        team_futures = ndb.get_multi_async(team_keys)
+        team_list = [ModelToDict.teamConverter(team_future.get_result()) for team_future in team_futures]
+        return json.dumps(team_list, ensure_ascii=True)
