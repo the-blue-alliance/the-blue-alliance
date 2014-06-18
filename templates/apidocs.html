@@ -7,7 +7,7 @@
 {% block content %}
 <div class="container">
   <div class="row">
-    <div class="col-sm-3 col-lg-2">
+    <div class="col-sm-3 col-lg-3">
       <div class="tba-sidenav-affixed">
         <div class="tba-sidebar">
           <ul class="nav tba-sidenav">
@@ -28,6 +28,8 @@
                 <li><a class="smooth-scroll" href="#team-list-request">Team List Request</a></li>
                 <li><a class="smooth-scroll" href="#team-request">Team Request</a></li>
                 <li><a class="smooth-scroll" href="#team-events-request">Team Events Request</a></li>
+                <li><a class="smooth-scroll" href="#team-event-awards-request">Team Event Awards Request</a></li>
+                <li><a class="smooth-scroll" href="#team-event-matches-request">Team Event Matches Request</a></li>
                 <li><a class="smooth-scroll" href="#team-media-request">Team Media Request</a></li>
               </ul>
             </li>
@@ -47,7 +49,7 @@
         </div>
       </div>
     </div>
-    <div class="col-xs-12 col-sm-9 col-lg-10">
+    <div class="col-xs-12 col-sm-9 col-lg-9">
       <h1 class="endheader">Public API (v2)</h1>
       <div class="alert alert-danger"><strong>Note:</strong> Version 2 of our
       API is still under development. This means that we may make changes
@@ -538,6 +540,108 @@
         </div>
       </div>
 
+      <h3 id="team-event-awards-request">Team Event Awards Request</h3>
+      <h4>Related: <a class="smooth-scroll" href="#award-model">Award Model</a></h4>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/event/&lt;event key&gt;/awards</code>
+      </p>
+      <table class=table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>team key</td>
+            <td>A team key name where the format is <code>frcyyyy</code> where yyyy is the a
+              valid, official team number issued by <em>FIRST</em></td>
+            <td>frc1, frc281, frc1114</td>
+          </tr>
+          <tr>
+            <td>event key</td>
+            <td>TBA event key with the format <code>yyyy[EVENT_CODE]</code>, where yyyy is the year, and EVENT_CODE is the
+            <a href="https://docs.google.com/spreadsheet/ccc?key=0ApRO2Yzh2z01dExFZEdieV9WdTJsZ25HSWI3VUxsWGc">event code</a>
+            of the event.</td>
+            <td>2014casj, 2010cmp</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_team_event_awards_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="6" id="example_team_event_awards_request" type="text" value="/api/v2/team/frc254/event/2014casj/awards">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group">
+            <pre class="team-event-awards-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 id="team-event-matches-request">Team Event Matches Request</h3>
+      <h4>Related: <a class="smooth-scroll" href="#award-match">Match Model</a></h4>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/event/&lt;event key&gt;/matches</code>
+      </p>
+      <table class=table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>team key</td>
+            <td>A team key name where the format is <code>frcyyyy</code> where yyyy is the a
+              valid, official team number issued by <em>FIRST</em></td>
+            <td>frc1, frc281, frc1114</td>
+          </tr>
+          <tr>
+            <td>event key</td>
+            <td>TBA event key with the format <code>yyyy[EVENT_CODE]</code>, where yyyy is the year, and EVENT_CODE is the
+            <a href="https://docs.google.com/spreadsheet/ccc?key=0ApRO2Yzh2z01dExFZEdieV9WdTJsZ25HSWI3VUxsWGc">event code</a>
+            of the event.</td>
+            <td>2014casj, 2010cmp</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_team_event_matches_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="6" id="example_team_event_matches_request" type="text" value="/api/v2/team/frc254/event/2014casj/matches">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group">
+            <pre class="team-event-matches-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+
       <h3 id="team-media-request">Team Media Request</h3>
       <h4>Related: <a class="smooth-scroll" href="#media-model">Media Model</a></h4>
       <p>
@@ -958,6 +1062,38 @@
       },
       error: function(data) {
         $(".team-events-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+  $("#example_team_event_awards_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".team-event-awards-request-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_team_event_awards_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-team-event-awards-request:v01'},
+      success: function(data) {
+        $(".team-event-awards-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".team-event-awards-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+  $("#example_team_event_matches_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".team-event-matches-request-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_team_event_matches_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-team-event-matches-request:v01'},
+      success: function(data) {
+        $(".team-event-matches-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".team-event-matches-request-json").html('Something went wrong! Please check for correct request format.');
       }
     });
   });
