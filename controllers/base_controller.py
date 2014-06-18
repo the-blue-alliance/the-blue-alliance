@@ -34,6 +34,10 @@ class CacheableHandler(webapp2.RequestHandler):
         return self._get_full_cache_key(self._cache_key)
 
     @classmethod
+    def get_full_cache_key(cls, *args):
+        return cls._get_full_cache_key(cls.CACHE_KEY_FORMAT.format(*args))
+
+    @classmethod
     def _get_full_cache_key(cls, cache_key):
         return "{}:{}:{}".format(
             cache_key,
@@ -65,12 +69,6 @@ class CacheableHandler(webapp2.RequestHandler):
         memcache.delete(self.full_cache_key)
         return self.full_cache_key
 
-    @classmethod
-    def clear_cache(cls, *args):
-        full_cache_key = cls._get_full_cache_key(cls.CACHE_KEY_FORMAT.format(*args))
-        cls._delete_cache(full_cache_key)
-        logging.info("Deleting cache key: {}".format(full_cache_key))
-
     def _read_cache(self):
         return memcache.get(self.full_cache_key)
 
@@ -81,6 +79,10 @@ class CacheableHandler(webapp2.RequestHandler):
     @classmethod
     def _delete_cache(cls, full_cache_key):
         memcache.delete(full_cache_key)
+
+    @classmethod
+    def delete_cache_multi(cls, full_cache_keys):
+        memcache.delete_multi(full_cache_keys)
 
     def _render(self):
         raise NotImplementedError("No _render method.")

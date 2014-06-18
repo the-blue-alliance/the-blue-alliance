@@ -113,6 +113,11 @@ class ApiBaseController(CacheableHandler):
         """
         ndb.Key(CachedResponse, full_cache_key).delete()
 
+    @classmethod
+    def delete_cache_multi(cls, full_cache_keys):
+        logging.info("Deleting cache keys: {}".format(full_cache_keys))
+        ndb.delete_multi([ndb.Key(CachedResponse, full_cache_key) for full_cache_key in full_cache_keys])
+
     def _track_call_defer(self, api_action, api_label):
         deferred.defer(track_call, api_action, api_label, self.x_tba_app_id)
 

@@ -11,8 +11,8 @@ class MatchManipulator(ManipulatorBase):
     Handle Match database writes.
     """
     @classmethod
-    def clearCache(cls, affected_refs):
-        CacheClearer.clear_match_and_references(affected_refs)
+    def getCacheKeysAndControllers(cls, affected_refs):
+        return CacheClearer.get_match_cache_keys_and_controllers(affected_refs)
 
     @classmethod
     def updateMerge(self, new_match, old_match, auto_union=True):
