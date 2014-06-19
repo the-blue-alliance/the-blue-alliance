@@ -7,6 +7,7 @@ from google.appengine.ext import ndb
 
 from controllers.api.api_base_controller import ApiBaseController
 
+from helpers.award_helper import AwardHelper
 from helpers.model_to_dict import ModelToDict
 from helpers.data_fetchers.team_details_data_fetcher import TeamDetailsDataFetcher
 from helpers.media_helper import MediaHelper
@@ -84,7 +85,7 @@ class ApiTeamEventsController(ApiTeamControllerBase):
 
 class ApiTeamEventAwardsController(ApiTeamControllerBase):
     CACHE_KEY_FORMAT = "apiv2_team_event_awards_controller_{}_{}"  # (team_key, event_key)
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
@@ -102,11 +103,11 @@ class ApiTeamEventAwardsController(ApiTeamControllerBase):
 
     def _render(self, team_key, event_key):
         award_keys_future = Award.query(Award.team_list == ndb.Key(Team, self.team_key), Award.event == ndb.Key(Event, event_key)).fetch_async(None, keys_only=True)
-        award_futures = ndb.get_multi_async(award_keys_future.get_result())
+        awards = ndb.get_multi(award_keys_future.get_result())
 
-        awards = [ModelToDict.awardConverter(award_future.get_result()) for award_future in award_futures]
+        awards_dicts = [ModelToDict.awardConverter(award) for award in AwardHelper.organizeAwards(awards)]
 
-        return json.dumps(awards, ensure_ascii=True)
+        return json.dumps(awards_dicts, ensure_ascii=True)
 
 
 class ApiTeamEventMatchesController(ApiTeamControllerBase):
