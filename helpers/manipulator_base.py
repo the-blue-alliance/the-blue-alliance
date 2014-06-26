@@ -40,7 +40,8 @@ class ManipulatorBase(object):
             if hasattr(model, '_affected_references') and getattr(model, 'dirty', False):
                 for cache_key, controller in cls.getCacheKeysAndControllers(model._affected_references):
                     to_clear[controller].add(cache_key)
-            model.dirty = False
+            if hasattr(model, 'dirty'):
+                model.dirty = False
 
         for controller, cache_keys in to_clear.items():
             controller.delete_cache_multi(cache_keys)
