@@ -18,7 +18,7 @@ class EventList(CacheableHandler):
     """
     List all Events.
     """
-    MAX_YEAR = 2014
+    MAX_YEAR = 2015
     VALID_YEARS = list(reversed(range(1992, MAX_YEAR + 1)))
     CACHE_VERSION = 4
     CACHE_KEY_FORMAT = "event_list_{}_{}"  # (year, explicit_year)
