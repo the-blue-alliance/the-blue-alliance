@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<h1>{{ suggestions|length }} Pending Webcast Suggestions</h1>
+<h1>Pending Webcast Suggestions</h1>
 
 <form action="/admin/suggestions/event/webcast/review" method="post">
     <div class="col-xs-12">
@@ -32,36 +32,38 @@
 
         {% include "partials/webcast_add_instructions_partial.html" %}
 
-        {% for suggestion in suggestions %}
-        <div class="row">
-            <div class="well">
-                <div class="col-xs-6">
-                    <p><a href="/event/{{suggestion.target_key}}"><strong>{{suggestion.target_key}}</strong></a></p>
-                    <p><a href="{{suggestion.contents.webcast_url}}">{{suggestion.contents.webcast_url}}</a></p>
-                    <form action="/admin/suggestions/event/webcast/review" method="post">
-                        {% include "partials/webcast_add_form_partial.html" %}
-                        <input type="hidden" name="suggestion_key" value="{{suggestion.key.id}}" />
-                        <input type="hidden" name="event_key" value="{{suggestion.target_key}}" />
-                        <button type="submit" class="btn btn-primary" name="verdict" value="accept"><span class="glyphicon glyphicon-thumbs-up"></span> Add Webcast</button> <button type="submit" class="btn btn-danger" name="verdict" value="reject"><span class="glyphicon glyphicon-thumbs-down"></span> Reject</button>
-                    </form>
+        {% for event_key, suggestions in suggestions_by_event_key.items %}
+            <h3><a href="/event/{{event_key}}">{{event_key}}</a></h3>
+            {% for suggestion in suggestions %}
+                <div class="row">
+                    <div class="well">
+                        <div class="col-xs-6">
+                            <p><a href="{{suggestion.contents.webcast_url}}">{{suggestion.contents.webcast_url}}</a></p>
+                            <form action="/admin/suggestions/event/webcast/review" method="post">
+                                {% include "partials/webcast_add_form_partial.html" %}
+                                <input type="hidden" name="suggestion_key" value="{{suggestion.key.id}}" />
+                                <input type="hidden" name="event_key" value="{{suggestion.target_key}}" />
+                                <button type="submit" class="btn btn-primary" name="verdict" value="accept"><span class="glyphicon glyphicon-thumbs-up"></span> Add Webcast</button> <button type="submit" class="btn btn-danger" name="verdict" value="reject"><span class="glyphicon glyphicon-thumbs-down"></span> Reject</button>
+                            </form>
+                        </div>
+                        <div class="col-xs-6">
+                            <ul>
+                                <li>{{ suggestion.author.get.email }}</a></li>
+                                <li>{{ suggestion.author.get.nickname }}</a></li>
+                                <li>{{ suggestion.target_model }}:{{ suggestion.target_key }}</li>
+                                <li>{{ suggestion.contents_json }}</li>
+                            </ul>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
                 </div>
-                <div class="col-xs-6">
-                    <ul>
-                        <li>{{ suggestion.author.get.email }}</a></li>
-                        <li>{{ suggestion.author.get.nickname }}</a></li>
-                        <li>{{ suggestion.target_model }}:{{ suggestion.target_key }}</li>
-                        <li>{{ suggestion.contents_json }}</li>
-                    </ul>
-                </div>
-                <div class="clearfix"></div>
-            </div>
-        </div>
+            {% endfor %}
         {% empty %}
-        <div class="row">
-            <div class="well">
-                <p>No suggestions! Go build more community!</p>
+            <div class="row">
+                <div class="well">
+                    <p>No suggestions! Go build more community!</p>
+                </div>
             </div>
-        </div>
         {% endfor %}
     </div>
 </form>

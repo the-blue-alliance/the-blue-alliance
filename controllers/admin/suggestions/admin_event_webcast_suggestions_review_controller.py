@@ -25,10 +25,14 @@ class AdminEventWebcastSuggestionsReviewController(LoggedInHandler):
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
             Suggestion.target_model == "event")
 
+        suggestions_by_event_key = {}
+        for suggestion in suggestions:
+            suggestions_by_event_key.setdefault(suggestion.target_key, []).append(suggestion)
+
         self.template_values.update({
             "event_key": self.request.get("event_key"),
             "success": self.request.get("success"),
-            "suggestions": suggestions,
+            "suggestions_by_event_key": suggestions_by_event_key
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../../templates/admin/event_webcast_suggestion_list.html')
