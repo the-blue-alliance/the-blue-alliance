@@ -65,7 +65,7 @@ class ApiTrustedEventAwardsUpdate(ApiTrustedBaseController):
 
         # it's easier to clear all awards and add new ones than try to find the difference
         old_award_keys = Award.query(Award.event == event.key).fetch(None, keys_only=True)
-        ndb.delete_multi(old_award_keys)
+        AwardManipulator.delete_keys(old_award_keys)
 
         AwardManipulator.createOrUpdate(awards)
 
