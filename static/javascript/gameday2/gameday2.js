@@ -31,7 +31,7 @@ var GamedayFrame = React.createClass({
   render: function() {
     return (
       <div className="gameday container-full">
-        <GamedayKickoffNavbar 
+        <GamedayNavbar 
           chatEnabled={this.state.chatEnabled}
           hashtagEnabled={this.state.hashtagEnabled}
           events={this.state.events}
@@ -61,38 +61,6 @@ var GamedayFrame = React.createClass({
   },
   handleWebcastReset: function() {
     this.setState({displayedEvents: []});
-  }
-});
-
-var GamedayKickoffNavbar = React.createClass({
-  render: function() {
-    return (
-      <nav className="navbar navbar-default navbar-fixed-top" role="navigation">
-        <div className="navbar-header">
-          <button type="button" className="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-            <span className="sr-only">Toggle navigation</span>
-            <span className="icon-bar"></span>
-            <span className="icon-bar"></span>
-            <span className="icon-bar"></span>
-          </button>
-          <a className="navbar-brand" href="#">GameDay</a>
-        </div>
-        <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <p className="navbar-text navbar-left"><small>by <a href="/" className="navbar-link">The Blue Alliance</a></small></p>
-          <ul className="nav navbar-nav navbar-right">
-            <li>
-              <BootstrapButton
-                active={this.props.chatEnabled}
-                handleClick={this.props.onChatToggle}>Chat</BootstrapButton>
-            </li>
-            <li>
-              <BootstrapButton
-                active={this.props.hashtagEnabled}
-                handleClick={this.props.onHashtagToggle}>#omgrobots</BootstrapButton></li>
-          </ul>
-        </div>
-      </nav>
-    );
   }
 });
 
@@ -128,13 +96,14 @@ var GamedayNavbar = React.createClass({
               onWebcastReset={this.props.onWebcastReset} />
             <li>
               <BootstrapButton
-                active={this.props.chatEnabled}
-                handleClick={this.props.onChatToggle}>Chat</BootstrapButton>
+                active={this.props.hashtagEnabled}
+                handleClick={this.props.onHashtagToggle}>Hashtags</BootstrapButton>
             </li>
             <li>
               <BootstrapButton
-                active={this.props.hashtagEnabled}
-                handleClick={this.props.onHashtagToggle}>Hashtags</BootstrapButton></li>
+                active={this.props.chatEnabled}
+                handleClick={this.props.onChatToggle}>Chat</BootstrapButton>
+            </li>
             <li><a href="#">Settings</a></li>
           </ul>
         </div>
@@ -431,7 +400,7 @@ var WebcastListItem = React.createClass({
     this.props.onWebcastAdd(this.props.eventModel);
   },
   render: function() {
-    return <BootstrapNavDropdownListItem handleClick={this.handleClick}>{this.props.eventModel.name}</BootstrapNavDropdownListItem>
+    return <BootstrapNavDropdownListItem handleClick={this.handleClick}>{this.props.eventModel.event_name}</BootstrapNavDropdownListItem>
   },
 })
 
