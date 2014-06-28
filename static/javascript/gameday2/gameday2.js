@@ -89,13 +89,14 @@ var GamedayNavbar = React.createClass({
               onWebcastReset={this.props.onWebcastReset} />
             <li>
               <BootstrapButton
-                active={this.props.chatEnabled}
-                handleClick={this.props.onChatToggle}>Chat</BootstrapButton>
+                active={this.props.hashtagEnabled}
+                handleClick={this.props.onHashtagToggle}>Hashtags</BootstrapButton>
             </li>
             <li>
               <BootstrapButton
-                active={this.props.hashtagEnabled}
-                handleClick={this.props.onHashtagToggle}>Hashtags</BootstrapButton></li>
+                active={this.props.chatEnabled}
+                handleClick={this.props.onChatToggle}>Chat</BootstrapButton>
+            </li>
             <li><a href="#">Settings</a></li>
           </ul>
         </div>
@@ -439,7 +440,7 @@ var WebcastListItem = React.createClass({
     this.props.onWebcastAdd(this.props.eventModel);
   },
   render: function() {
-    return <BootstrapNavDropdownListItem handleClick={this.handleClick}>{this.props.eventModel.name}</BootstrapNavDropdownListItem>
+    return <BootstrapNavDropdownListItem handleClick={this.handleClick}>{this.props.eventModel.event_name}</BootstrapNavDropdownListItem>
   },
 })
 
