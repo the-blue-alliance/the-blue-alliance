@@ -2,6 +2,7 @@ import os
 
 from google.appengine.ext.webapp import template
 
+from helpers.event_helper import EventHelper
 from models.sitevar import Sitevar
 
 from base_controller import CacheableHandler
@@ -16,20 +17,22 @@ class Gameday2Controller(CacheableHandler):
     def _render(self, *args, **kw):
         template_values = {}
 
-        special_webcasts_future = Sitevar.get_by_id_async('gameday.special_webcasts')
-        special_webcasts_temp = special_webcasts_future.get_result()
-        if special_webcasts_temp:
-            special_webcasts_temp = special_webcasts_temp.contents
-        else:
-            special_webcasts_temp = {}
-        special_webcasts = []
-        for webcast in special_webcasts_temp.values():
-            toAppend = {}
-            for key, value in webcast.items():
-                toAppend[str(key)] = str(value)
-            special_webcasts.append(toAppend)
+        events_with_webcasts = []
+        for event in EventHelper.getWeekEvents():
+            if event.within_a_day and event.webcast:
+                events_with_webcasts.append(event)
 
-        template_values = {'special_webcasts': special_webcasts}
+        events_with_webcasts_dict_list = []
+        for event in events_with_webcasts:
+            events_with_webcasts_dict_list.append({
+                "event_name": event.name,
+                "event_key": event.key_name,
+                "webcasts": event.webcast
+            })
+
+        template_values = {
+            'events_with_webcasts': events_with_webcasts_dict_list
+        }
 
         path = os.path.join(os.path.dirname(__file__), '../templates/gameday2.html')
         return template.render(path, template_values)
