@@ -42,7 +42,7 @@ class DistrictDetail(CacheableHandler):
         if district_abbrev not in DistrictType.abbrevs.keys():
             self.abort(404)
 
-        self._cache_key = self.CACHE_KEY_FORMAT.format(district_abbrev, year, explicit_year)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(district_abbrev, year, explicit_year)
         super(DistrictDetail, self).get(district_abbrev, year, explicit_year)
 
     def _render(self, district_abbrev, year=None, explicit_year=False):
@@ -83,7 +83,7 @@ class DistrictDetail(CacheableHandler):
                 valid_districts.add((DistrictType.type_names[cmp_dis_type], DistrictType.type_abbrevs[cmp_dis_type]))
         valid_districts = sorted(valid_districts, key=lambda (name, _): name)
 
-        template_values = {
+        self.template_values.update({
             'explicit_year': explicit_year,
             'year': year,
             'valid_years': sorted(set([int(event_key.id()[:4]) for event_key in all_cmp_event_keys_future.get_result()])),
@@ -92,7 +92,7 @@ class DistrictDetail(CacheableHandler):
             'district_abbrev': district_abbrev,
             'events': events,
             'team_totals': team_totals,
-        }
+        })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/district_details.html')
-        return template.render(path, template_values)
+        return template.render(path, self.template_values)

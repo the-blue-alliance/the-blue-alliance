@@ -46,11 +46,14 @@ class MainKickoffHandler(CacheableHandler):
 
         is_kickoff = datetime.datetime.now() >= kickoff_datetime_est - datetime.timedelta(days=1)  # turn on 1 day before
 
+        self.template_values.update({
+            'is_kickoff': is_kickoff,
+            'kickoff_datetime_est': kickoff_datetime_est,
+            'kickoff_datetime_utc': kickoff_datetime_utc,
+        })
+
         path = os.path.join(os.path.dirname(__file__), "../templates/index_kickoff.html")
-        return template.render(path, {'is_kickoff': is_kickoff,
-                                      'kickoff_datetime_est': kickoff_datetime_est,
-                                      'kickoff_datetime_utc': kickoff_datetime_utc,
-                                      })
+        return template.render(path, self.template_values)
 
 
 class MainBuildseasonHandler(CacheableHandler):
@@ -65,10 +68,13 @@ class MainBuildseasonHandler(CacheableHandler):
         endbuild_datetime_est = datetime.datetime(2014, 2, 18, 23, 59)
         endbuild_datetime_utc = endbuild_datetime_est + datetime.timedelta(hours=5)
 
+        self.template_values.update({
+            'endbuild_datetime_est': endbuild_datetime_est,
+            'endbuild_datetime_utc': endbuild_datetime_utc
+        })
+
         path = os.path.join(os.path.dirname(__file__), "../templates/index_buildseason.html")
-        return template.render(path, {'endbuild_datetime_est': endbuild_datetime_est,
-                                      'endbuild_datetime_utc': endbuild_datetime_utc
-                                      })
+        return template.render(path, self.template_values)
 
 
 class MainChampsHandler(CacheableHandler):
@@ -83,17 +89,18 @@ class MainChampsHandler(CacheableHandler):
         year = datetime.datetime.now().year
         event_keys = Event.query(Event.year == year, Event.event_type_enum.IN(EventType.CMP_EVENT_TYPES)).fetch(100, keys_only=True)
         events = [event_key.get() for event_key in event_keys]
-        template_values = {
+        
+        self.template_values.update({
             "events": events,
-        }
+        })
 
         insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(year, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
         for insight in insights:
             if insight:
-                template_values[insight.name] = insight
+                self.template_values[insight.name] = insight
 
         path = os.path.join(os.path.dirname(__file__), '../templates/index_champs.html')
-        return template.render(path, template_values)
+        return template.render(path, self.template_values)
 
 
 class MainCompetitionseasonHandler(CacheableHandler):
@@ -106,12 +113,13 @@ class MainCompetitionseasonHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         week_events = EventHelper.getWeekEvents()
-        template_values = {
+        
+        self.template_values.update({
             "events": week_events,
-        }
+        })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/index_competitionseason.html')
-        return template.render(path, template_values)
+        return template.render(path, self.template_values)
 
 
 class MainInsightsHandler(CacheableHandler):
@@ -124,17 +132,17 @@ class MainInsightsHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         week_events = EventHelper.getWeekEvents()
-        template_values = {
+        self.template_values.update({
             "events": week_events,
-        }
+        })
 
         insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(2014, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
         for insight in insights:
             if insight:
-                template_values[insight.name] = insight
+                self.template_values[insight.name] = insight
 
         path = os.path.join(os.path.dirname(__file__), '../templates/index_insights.html')
-        return template.render(path, template_values)
+        return template.render(path, self.template_values)
 
 
 class MainOffseasonHandler(CacheableHandler):
@@ -147,12 +155,12 @@ class MainOffseasonHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         week_events = EventHelper.getWeekEvents()
-        template_values = {
+        self.template_values.update({
             "events": week_events,
-        }
+        })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/index_offseason.html')
-        return template.render(path, template_values)
+        return template.render(path, self.template_values)
 
 
 class ContactHandler(CacheableHandler):
@@ -165,7 +173,7 @@ class ContactHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/contact.html")
-        return template.render(path, {})
+        return template.render(path, self.template_values)
 
 
 class HashtagsHandler(CacheableHandler):
@@ -178,7 +186,7 @@ class HashtagsHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/hashtags.html")
-        return template.render(path, {})
+        return template.render(path, self.template_values)
 
 
 class AboutHandler(CacheableHandler):
@@ -191,7 +199,7 @@ class AboutHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/about.html")
-        return template.render(path, {})
+        return template.render(path, self.template_values)
 
 
 class ThanksHandler(CacheableHandler):
@@ -204,7 +212,7 @@ class ThanksHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/thanks.html")
-        return template.render(path, {})
+        return template.render(path, self.template_values)
 
 
 class OprHandler(CacheableHandler):
@@ -217,7 +225,7 @@ class OprHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/opr.html")
-        return template.render(path, {})
+        return template.render(path, self.template_values)
 
 
 class SearchHandler(webapp2.RequestHandler):
@@ -286,12 +294,14 @@ class GamedayHandler(CacheableHandler):
                             count += 1
                     ongoing_events_w_webcasts += valid
 
-        template_values = {'special_webcasts': special_webcasts,
-                           'ongoing_events': ongoing_events,
-                           'ongoing_events_w_webcasts': ongoing_events_w_webcasts}
+        self.template_values.update({
+            'special_webcasts': special_webcasts,
+            'ongoing_events': ongoing_events,
+            'ongoing_events_w_webcasts': ongoing_events_w_webcasts
+        })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/gameday.html')
-        return template.render(path, template_values)
+        return template.render(path, self.template_values)
 
 
 class PageNotFoundHandler(webapp2.RequestHandler):
@@ -313,13 +323,13 @@ class WebcastsHandler(CacheableHandler):
         event_keys = Event.query(Event.year == year).order(Event.start_date).fetch(500, keys_only=True)
         events = ndb.get_multi(event_keys)
 
-        template_values = {
+        self.template_values.update({
             'events': events,
             'year': year,
-        }
+        })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/webcasts.html')
-        return template.render(path, template_values)
+        return template.render(path, self.template_values)
 
 
 class RecordHandler(CacheableHandler):
@@ -332,7 +342,7 @@ class RecordHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/record.html")
-        return template.render(path, {})
+        return template.render(path, self.template_values)
 
 
 class ApiDocumentationHandler(CacheableHandler):
@@ -345,4 +355,4 @@ class ApiDocumentationHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/apidocs.html")
-        return template.render(path, {})
+        return template.render(path, self.template_values)

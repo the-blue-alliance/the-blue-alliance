@@ -57,17 +57,17 @@ class TeamList(CacheableHandler):
             middle_value += 1
         teams_a, teams_b = teams[:middle_value], teams[middle_value:]
 
-        template_values = {
+        self.template_values.update({
             "teams_a": teams_a,
             "teams_b": teams_b,
             "num_teams": num_teams,
             "page_labels": page_labels,
             "cur_page_label": cur_page_label,
             "current_page": page
-        }
+        })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/team_list.html')
-        return template.render(path, template_values)
+        return template.render(path, self.template_values)
 
 
 class TeamCanonical(CacheableHandler):

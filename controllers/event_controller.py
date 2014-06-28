@@ -64,17 +64,17 @@ class EventList(CacheableHandler):
                               DistrictType.type_names[district_enum]))
         districts = sorted(districts, key=lambda d: d[1])
 
-        template_values = {
+        self.template_values.update({
             "events": events,
             "explicit_year": explicit_year,
             "selected_year": year,
             "valid_years": self.VALID_YEARS,
             "week_events": week_events,
             "districts": districts,
-        }
+        })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/event_list.html')
-        return template.render(path, template_values)
+        return template.render(path, self.template_values)
 
     def memcacheFlush(self):
         year = datetime.datetime.now().year
@@ -140,7 +140,7 @@ class EventDetail(CacheableHandler):
         if event.district_points:
             district_points_sorted = sorted(event.district_points['points'].items(), key=lambda (team, points): -points['total'])
 
-        template_values = {
+        self.template_values.update({
             "event": event,
             "matches": matches,
             "matches_recent": matches_recent,
@@ -152,13 +152,13 @@ class EventDetail(CacheableHandler):
             "oprs": oprs,
             "bracket_table": bracket_table,
             "district_points_sorted": district_points_sorted,
-        }
+        })
 
         if event.within_a_day:
             self._cache_expiration = self.SHORT_CACHE_EXPIRATION
 
         path = os.path.join(os.path.dirname(__file__), '../templates/event_details.html')
-        return template.render(path, template_values)
+        return template.render(path, self.template_values)
 
 
 class EventRss(CacheableHandler):
@@ -186,12 +186,12 @@ class EventRss(CacheableHandler):
 
         matches = MatchHelper.organizeMatches(event.matches)
 
-        template_values = {
+        self.template_values.update({
             "event": event,
             "matches": matches,
             "datetime": datetime.datetime.now()
-        }
+        })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/event_rss.xml')
         self.response.headers['content-type'] = 'application/xml; charset=UTF-8'
-        return template.render(path, template_values)
+        return template.render(path, self.template_values)

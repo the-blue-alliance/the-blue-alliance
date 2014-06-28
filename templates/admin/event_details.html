@@ -117,6 +117,7 @@
 </form>
 
 <h2>Add Webcast</h2>
+{% include "partials/webcast_add_instructions_partial.html" %}
 <form action="/admin/event/add_webcast/{{event.key_name}}" method="post">
     {% include "partials/webcast_add_form_partial.html" %}
     <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Add Webcast</button>
