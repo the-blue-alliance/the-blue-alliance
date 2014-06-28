@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<h1>{{ suggestions|length }} Pending Suggestions</h1>
+<h1>{{ suggestions|length }} Pending Webcast Suggestions</h1>
 
 <form action="/admin/suggestions/event/webcast/review" method="post">
     <div class="col-xs-12">
@@ -29,6 +29,8 @@
             </div>
         </div>
         {% endif %}
+
+        {% include "partials/webcast_add_instructions_partial.html" %}
 
         {% for suggestion in suggestions %}
         <div class="row">

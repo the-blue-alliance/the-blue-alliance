@@ -18,7 +18,7 @@ class EventList(CacheableHandler):
     """
     List all Events.
     """
-    MAX_YEAR = 2014
+    MAX_YEAR = 2015
     VALID_YEARS = list(reversed(range(1992, MAX_YEAR + 1)))
     CACHE_VERSION = 4
     CACHE_KEY_FORMAT = "event_list_{}_{}"  # (year, explicit_year)
@@ -42,7 +42,7 @@ class EventList(CacheableHandler):
             year = datetime.datetime.now().year
             explicit_year = False
 
-        self._cache_key = self.CACHE_KEY_FORMAT.format(year, explicit_year)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(year, explicit_year)
         super(EventList, self).get(year, explicit_year)
 
     def _render(self, year=None, explicit_year=False):
@@ -88,7 +88,7 @@ class EventDetail(CacheableHandler):
         if not event_key:
             return self.redirect("/events")
 
-        self._cache_key = self.CACHE_KEY_FORMAT.format(event_key)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(event_key)
         super(EventDetail, self).get(event_key)
 
     def _render(self, event_key):
@@ -158,7 +158,7 @@ class EventRss(CacheableHandler):
         if not event_key:
             return self.redirect("/events")
 
-        self._cache_key = self.CACHE_KEY_FORMAT.format(event_key)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(event_key)
         super(EventRss, self).get(event_key)
 
     def _render(self, event_key):

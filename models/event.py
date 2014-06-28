@@ -169,6 +169,16 @@ class Event(ndb.Model):
         return self._rankings
 
     @property
+    def venue_or_venue_from_address(self):
+        if self.venue:
+            return self.venue
+        else:
+            try:
+                return self.venue_address.split('\r\n')[0]
+            except:
+                return None
+
+    @property
     def webcast(self):
         """
         Lazy load parsing webcast JSON

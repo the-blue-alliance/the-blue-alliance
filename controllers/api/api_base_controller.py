@@ -1,14 +1,17 @@
 import json
 import logging
+import tba_config
 import urllib
 import uuid
 import webapp2
 
 from google.appengine.api import urlfetch
 from google.appengine.ext import deferred
+from google.appengine.ext import ndb
 
 from controllers.base_controller import CacheableHandler
 from helpers.validation_helper import ValidationHelper
+from models.cached_response import CachedResponse
 from models.sitevar import Sitevar
 
 
@@ -72,6 +75,44 @@ class ApiBaseController(CacheableHandler):
 
         self._track_call(*args, **kw)
         super(ApiBaseController, self).get(*args, **kw)
+        self._set_cache_header_length(self.CACHE_HEADER_LENGTH)
+
+    def _read_cache(self):
+        """
+        Overrides parent method to use CachedResponse instead of memcache
+        Returns:
+        None if not cached
+        the cached response if cached
+        True if in not modified
+        """
+        response = CachedResponse.get_by_id(self.cache_key)
+        if response:
+            if self._has_been_modified_since(response.updated):
+                response.headers['Last-Modified'] = self.response.headers['Last-Modified']
+                return response
+            else:
+                return True
+        else:
+            return None
+
+    def _write_cache(self, response):
+        """
+        Overrides parent method to use CachedResponse instead of memcache
+        """
+        if tba_config.CONFIG["response_cache"]:
+            CachedResponse(
+                id=self.cache_key,
+                headers_json=json.dumps(dict(response.headers)),
+                body=response.body,
+            ).put()
+
+    @classmethod
+    def delete_cache_multi(cls, cache_keys):
+        """
+        Overrides parent method to use CachedResponse instead of memcache
+        """
+        logging.info("Deleting cache keys: {}".format(cache_keys))
+        ndb.delete_multi([ndb.Key(CachedResponse, cache_key) for cache_key in cache_keys])
 
     def _track_call_defer(self, api_action, api_label):
         deferred.defer(track_call, api_action, api_label, self.x_tba_app_id)
@@ -100,5 +141,5 @@ class ApiBaseController(CacheableHandler):
             logging.error("Cache-Control max-age is not integer: {}".format(seconds))
             return
 
-        self.response.headers['Cache-Control'] = "public, max-age=%d" % seconds
+        self.response.headers['Cache-Control'] = "public, max-age=%d" % max(seconds, 61)  # needs to be at least 61 seconds to work
         self.response.headers['Pragma'] = 'Public'

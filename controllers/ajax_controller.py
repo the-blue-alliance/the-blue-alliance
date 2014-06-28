@@ -28,7 +28,7 @@ class LiveEventHandler(CacheableHandler):
     def get(self, event_key, timestamp):
         if int(timestamp) > time.time():
             self.abort(404)
-        self._cache_key = self.CACHE_KEY_FORMAT.format(event_key, timestamp)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(event_key, timestamp)
         super(LiveEventHandler, self).get(event_key, timestamp)
 
     def _render(self, event_key, timestamp):
@@ -72,7 +72,7 @@ class TypeaheadHandler(CacheableHandler):
 
     def get(self, search_key):
         search_key = urllib2.unquote(search_key)
-        self._cache_key = self.CACHE_KEY_FORMAT.format(search_key)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(search_key)
         super(TypeaheadHandler, self).get(search_key)
 
     def _render(self, search_key):
@@ -102,7 +102,7 @@ class WebcastHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24
 
     def get(self, event_key, webcast_number):
-        self._cache_key = self.CACHE_KEY_FORMAT.format(event_key, webcast_number)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(event_key, webcast_number)
         super(WebcastHandler, self).get(event_key, webcast_number)
 
     def _render(self, event_key, webcast_number):

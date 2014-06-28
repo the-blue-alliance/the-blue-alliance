@@ -30,6 +30,16 @@ class TestUsfirstTeamDetailsParser(unittest2.TestCase):
         self.assertEqual(team["team_number"], 842)
         self.assertEqual(team["website"], "https://sites.google.com/site/falconroboticsfrcteam842/frc-robots/2014-dream")
 
+    def test_parse_frc254_2014(self):
+        with open('test_data/usfirst_html/usfirst_team_details_frc999_2014.html', 'r') as f:
+           team, _ = UsfirstTeamDetailsParser.parse(f.read())
+
+        self.assertEqual(team["address"], u"Cheshire, CT, USA")
+        self.assertEqual(team["name"], "Sikorsky Aircraft & Cheshire High School")
+        self.assertEqual(team["nickname"], "MechaRams (Cheshire Robotics and Sikorsky Helicopters)")
+        self.assertEqual(team["team_number"], 999)
+        self.assertEqual(team["website"], "https://sites.google.com/a/cheshire.k12.ct.us/crash999")
+
     def test_parse_frc177_2013(self):
         with open('test_data/usfirst_html/usfirst_team_details_frc177_2013.html', 'r') as f:
             team, _ = UsfirstTeamDetailsParser.parse(f.read())
