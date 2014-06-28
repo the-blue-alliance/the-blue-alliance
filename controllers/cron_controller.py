@@ -1,10 +1,7 @@
 import datetime
-import heapq
 import logging
 import os
 import json
-
-from collections import defaultdict
 
 from google.appengine.api import taskqueue
 
@@ -13,10 +10,9 @@ from google.appengine.ext import ndb
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
-from consts.award_type import AwardType
 from consts.district_type import DistrictType
-from consts.event_type import EventType
 
+from helpers.district_helper import DistrictHelper
 from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
@@ -29,7 +25,6 @@ from helpers.match_manipulator import MatchManipulator
 from helpers.matchstats_helper import MatchstatsHelper
 from helpers.insights_helper import InsightsHelper
 
-from models.award import Award
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
@@ -442,88 +437,9 @@ class DistrictPointsCalcDo(webapp.RequestHandler):
             self.response.out.write("Can't calculate district points for events before 2014!")  # TODO: implement correct points for pre-2014 districts
             return
 
-        match_key_futures = Match.query(Match.event == event.key).fetch_async(None, keys_only=True)
-        award_key_futures = Award.query(Award.event == event.key).fetch_async(None, keys_only=True)
+        district_points = DistrictHelper.calculate_event_points(event)
 
-        match_futures = ndb.get_multi_async(match_key_futures.get_result())
-        award_futures = ndb.get_multi_async(award_key_futures.get_result())
-
-        POINTS_MULTIPLIER = 3 if event.event_type_enum == EventType.DISTRICT_CMP else 1
-
-        data = {
-            'points': defaultdict(lambda: {
-                'qual_points': 0,
-                'elim_points': 0,
-                'alliance_points': 0,
-                'award_points': 0,
-                'total': 0,
-            }),
-            'tiebreakers': defaultdict(lambda: {  # for tiebreaker stats that can't be calculated with 'points'
-                'qual_wins': 0,
-                'highest_qual_scores': [],
-            }),
-        }
-
-        # match points
-        elim_num_wins = defaultdict(lambda: defaultdict(int))
-        elim_alliances = defaultdict(lambda: defaultdict(list))
-        for match_future in match_futures:
-            match = match_future.get_result()
-            if not match.has_been_played:
-                continue
-
-            if match.comp_level == 'qm':
-                if match.winning_alliance == '':
-                    for team in match.team_key_names:
-                        data['points'][team]['qual_points'] += 1 * POINTS_MULTIPLIER
-                else:
-                    for team in match.alliances[match.winning_alliance]['teams']:
-                        data['points'][team]['qual_points'] += 2 * POINTS_MULTIPLIER
-                        data['tiebreakers'][team]['qual_wins'] += 1
-                        winning_score = match.alliances[match.winning_alliance]['score']
-
-                for color in ['red', 'blue']:
-                    for team in match.alliances[color]['teams']:
-                        score = match.alliances[color]['score']
-                        data['tiebreakers'][team]['highest_qual_scores'] = heapq.nlargest(3, data['tiebreakers'][team]['highest_qual_scores'] + [score])
-            else:
-                if match.winning_alliance == '':
-                    continue
-
-                match_set_key = '{}_{}{}'.format(match.event.id(), match.comp_level, match.set_number)
-                elim_num_wins[match_set_key][match.winning_alliance] += 1
-                elim_alliances[match_set_key][match.winning_alliance] += match.alliances[match.winning_alliance]['teams']
-
-                if elim_num_wins[match_set_key][match.winning_alliance] >= 2:
-                    for team in elim_alliances[match_set_key][match.winning_alliance]:
-                        data['points'][team]['elim_points'] += 5* POINTS_MULTIPLIER
-
-        # alliance points
-        if event.alliance_selections:
-            selection_points = EventHelper.alliance_selections_to_points(event.alliance_selections)
-            for team, points in selection_points.items():
-                data['points'][team]['alliance_points'] += points * POINTS_MULTIPLIER
-        else:
-            logging.warning("Event {} has no alliance selection data!".format(event.key.id()))
-
-        # award points
-        for award_future in award_futures:
-            award = award_future.get_result()
-            if award.award_type_enum not in AwardType.NON_JUDGED_NON_TEAM_AWARDS:
-                if award.award_type_enum == AwardType.CHAIRMANS:
-                    point_value = 10
-                elif award.award_type_enum in {AwardType.ENGINEERING_INSPIRATION, AwardType.ROOKIE_ALL_STAR}:
-                    point_value = 8
-                else:
-                    point_value = 5
-                for team in award.team_list:
-                    data['points'][team.id()]['award_points'] += point_value * POINTS_MULTIPLIER
-
-        for team, point_breakdown in data['points'].items():
-            for p in point_breakdown.values():
-                data['points'][team]['total'] += p
-
-        event.district_points_json = json.dumps(data)
+        event.district_points_json = json.dumps(district_points)
         event.dirty = True  # This is so hacky. -fangeugene 2014-05-08
         EventManipulator.createOrUpdate(event)
 
