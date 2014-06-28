@@ -79,6 +79,22 @@ class AdminEventWebcastSuggestionsReviewController(LoggedInHandler):
             self.redirect("/admin/suggestions/event/webcast/review?success=reject")
             return
 
+        elif self.request.get("verdict") == "reject_all":
+            suggestion_keys = self.request.get("suggestion_keys").split(",")
+
+            suggestions = [Suggestion.get_by_id(int(suggestion_key)) for suggestion_key in suggestion_keys]
+
+            for suggestion in suggestions:
+                event_key = suggestion.target_key
+                suggestion.review_state = Suggestion.REVIEW_REJECTED
+                suggestion.reviewer = self.user_bundle.account.key
+                suggestion.reviewer_at = datetime.datetime.now()
+                suggestion.put()
+
+            self.redirect("/admin/suggestions/event/webcast/review?success=reject_all&event_key=%s" % event_key)
+            return
+
+
         self.redirect("/admin/suggestions/event/webcast/review")
 
 
