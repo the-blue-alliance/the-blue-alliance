@@ -55,7 +55,6 @@ class DistrictHelper(object):
                     for team in match.alliances[match.winning_alliance]['teams']:
                         district_points['points'][team]['qual_points'] += 2 * POINTS_MULTIPLIER
                         district_points['tiebreakers'][team]['qual_wins'] += 1
-                        winning_score = match.alliances[match.winning_alliance]['score']
 
                 for color in ['red', 'blue']:
                     for team in match.alliances[color]['teams']:
