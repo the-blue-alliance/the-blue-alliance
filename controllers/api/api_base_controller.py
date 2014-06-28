@@ -173,12 +173,8 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
             self.abort(400)
 
         auth = ApiAuthAccess.get_by_id(auth_id)
-        if not auth:
-            self._errors = json.dumps({"Error": "secret-id not found"})
-            self.abort(400)
-
-        if auth.secret != secret:
-            self._errors = json.dumps({"Error": "Incorrect secret for given secret-id"})
+        if not auth or auth.secret != secret:
+            self._errors = json.dumps({"Error": "Invalid auth-id, secret combination!"})
             self.abort(400)
 
         allowed_event_keys = [ekey.id() for ekey in auth.event_list]
