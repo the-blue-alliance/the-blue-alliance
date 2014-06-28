@@ -41,43 +41,51 @@
         {% include "partials/webcast_add_instructions_partial.html" %}
 
         {% for suggestion_set in suggestion_sets %}
-            <h3><a href="/event/{{suggestion_set.event.key_name}}">{{suggestion_set.event.key_name}}</a></h3>
-            <ul><strong>Existing Webcasts</strong>
-                {% for webcast in suggestion_set.event.webcast %}
-                    <li>{{webcast}}</li>
-                {% empty %}
-                    <li>None Yet!</li>
-                {% endfor %}
-            </ul>
-            <form action="/admin/suggestions/event/webcast/review" method="post">
-                <input type="hidden" name="suggestion_keys" value="{% for suggestion in suggestion_set.suggestions %}{{suggestion.key.id}}{% if not forloop.last %},{% endif %}{% endfor %}" />
-                <input type="hidden" name="event_key" value="{{suggestion_set.event.key_name}}" />
-                <button type="submit" class="btn btn-danger" name="verdict" value="reject_all"><span class="glyphicon glyphicon-thumbs-down"></span> Reject All</button>
-            </form>
-            {% for suggestion in suggestion_set.suggestions %}
-                <div class="row">
-                    <div class="well">
-                        <div class="col-xs-6">
-                            <p><a href="{{suggestion.contents.webcast_url}}">{{suggestion.contents.webcast_url}}</a></p>
-                            <form action="/admin/suggestions/event/webcast/review" method="post">
-                                {% include "partials/webcast_add_form_partial.html" %}
-                                <input type="hidden" name="suggestion_key" value="{{suggestion.key.id}}" />
-                                <input type="hidden" name="event_key" value="{{suggestion.target_key}}" />
-                                <button type="submit" class="btn btn-primary" name="verdict" value="accept"><span class="glyphicon glyphicon-thumbs-up"></span> Add Webcast</button> <button type="submit" class="btn btn-danger" name="verdict" value="reject"><span class="glyphicon glyphicon-thumbs-down"></span> Reject</button>
-                            </form>
-                        </div>
-                        <div class="col-xs-6">
-                            <ul>
-                                <li>{{ suggestion.author.get.email }}</a></li>
-                                <li>{{ suggestion.author.get.nickname }}</a></li>
-                                <li>{{ suggestion.target_model }}:{{ suggestion.target_key }}</li>
-                                <li>{{ suggestion.contents_json }}</li>
-                            </ul>
-                        </div>
-                        <div class="clearfix"></div>
-                    </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <form action="/admin/suggestions/event/webcast/review" method="post">
+                        <input type="hidden" name="suggestion_keys" value="{% for suggestion in suggestion_set.suggestions %}{{suggestion.key.id}}{% if not forloop.last %},{% endif %}{% endfor %}" />
+                        <input type="hidden" name="event_key" value="{{suggestion_set.event.key_name}}" />
+                        <button type="submit" class="btn btn-xs btn-danger pull-right" name="verdict" value="reject_all"><span class="glyphicon glyphicon-thumbs-down"></span> Reject All</button>
+                    </form>
+                    <h3 class="panel-title"><a href="/event/{{suggestion_set.event.key_name}}">{{suggestion_set.event.key_name}}</a></h3>
                 </div>
-            {% endfor %}
+                <div class="panel-body">
+                    <ul><strong>Existing Webcasts</strong>
+                    {% for webcast in suggestion_set.event.webcast %}
+                        <li>{{webcast}}</li>
+                    {% empty %}
+                        <li>None Yet!</li>
+                    {% endfor %}
+                    </ul>
+                </div>
+                <hr>
+                <ul class="list-group">
+                    {% for suggestion in suggestion_set.suggestions %}
+                        <li class="list-group-item">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <p><strong><a href="{{suggestion.contents.webcast_url}}">{{suggestion.contents.webcast_url}}</a></strong></p>
+                                    <form action="/admin/suggestions/event/webcast/review" method="post">
+                                        {% include "partials/webcast_add_form_partial.html" %}
+                                        <input type="hidden" name="suggestion_key" value="{{suggestion.key.id}}" />
+                                        <input type="hidden" name="event_key" value="{{suggestion.target_key}}" />
+                                        <button type="submit" class="btn btn-primary" name="verdict" value="accept"><span class="glyphicon glyphicon-thumbs-up"></span> Add Webcast</button> <button type="submit" class="btn btn-danger" name="verdict" value="reject"><span class="glyphicon glyphicon-thumbs-down"></span> Reject</button>
+                                    </form>
+                                </div>
+                                <div class="col-xs-6">
+                                    <ul>
+                                        <li>{{ suggestion.author.get.email }}</a></li>
+                                        <li>{{ suggestion.author.get.nickname }}</a></li>
+                                        <li>{{ suggestion.target_model }}:{{ suggestion.target_key }}</li>
+                                        <li>{{ suggestion.contents_json }}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
         {% empty %}
             <div class="row">
                 <div class="well">
