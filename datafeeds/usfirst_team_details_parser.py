@@ -38,7 +38,7 @@ class UsfirstTeamDetailsParser(ParserBase):
         except AttributeError, details:
             logging.warning("Team number could not be parsed: {}".format(details))
             return None, False
-        team['nickname'] = unicode(re.search(team_nick_re, page_title).group(1).strip())
+        team['nickname'] = re.sub(' +', ' ', unicode(re.search(team_nick_re, page_title).group(1).strip()))
 
         full_address = unicode(soup.find('div', {'class': 'team-address'}).find('div', {'class': 'content'}).text)
         match = re.match(team_address_re, full_address)

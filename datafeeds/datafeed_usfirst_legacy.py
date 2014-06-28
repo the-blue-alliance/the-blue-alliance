@@ -67,7 +67,7 @@ class DatafeedUsfirstLegacy(DatafeedUsfirst):
             return None
         else:
             logging.error('HTTP code %s. Unable to retreive url: %s' %
-                (result.status_code, self.SESSION_KEY_GENERATING_URL))
+                (result.status_code, self.SESSION_KEY_GENERATING_PATTERN))
 
     def getEventDetails(self, year, first_eid):
         if type(year) is not int:
