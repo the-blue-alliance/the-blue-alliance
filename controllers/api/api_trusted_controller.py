@@ -27,6 +27,9 @@ from models.team import Team
 
 
 class ApiTrustedEventAllianceSelectionsUpdate(ApiTrustedBaseController):
+    """
+    Overwrites an event's alliance_selections_json with new data
+    """
     def _process_request(self, request, event_key):
         alliances_json = request.get('alliances')
         if not alliances_json:
@@ -42,6 +45,9 @@ class ApiTrustedEventAllianceSelectionsUpdate(ApiTrustedBaseController):
 
 
 class ApiTrustedEventAwardsUpdate(ApiTrustedBaseController):
+    """
+    Removes all awards for an event and adds the awards given in the request
+    """
     def _process_request(self, request, event_key):
         awards_json = request.get('awards')
         if not awards_json:
@@ -71,6 +77,10 @@ class ApiTrustedEventAwardsUpdate(ApiTrustedBaseController):
 
 
 class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
+    """
+    Creates/updates matches in 'matches'
+    Deletes matches given in 'keys_to_delete'
+    """
     def _process_request(self, request, event_key):
         matches_json = request.get('matches')
         if not matches_json:
@@ -115,6 +125,9 @@ class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
 
 
 class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
+    """
+    Overwrites an event's rankings_json with new data
+    """
     def _process_request(self, request, event_key):
         rankings_json = request.get('rankings')
         if not rankings_json:
@@ -130,6 +143,10 @@ class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
 
 
 class ApiTrustedEventTeamListUpdate(ApiTrustedBaseController):
+    """
+    Creates/updates EventTeams for teams given in the request
+    and removes EventTeams for teams not in the request
+    """
     def _process_request(self, request, event_key):
         team_list_json = request.get('team_list')
         if not team_list_json:
