@@ -148,6 +148,10 @@ class ApiBaseController(CacheableHandler):
 
 
 class ApiTrustedBaseController(webapp2.RequestHandler):
+    def __init__(self, *args, **kw):
+        super(ApiTrustedBaseController, self).__init__(*args, **kw)
+        self.response.headers['content-type'] = 'application/json; charset="utf-8"'
+
     def handle_exception(self, exception, debug):
         """
         Handle an HTTP exception and actually writeout a
