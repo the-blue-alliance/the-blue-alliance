@@ -77,6 +77,18 @@ class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
             self._errors = json.dumps({"Error": "Must provide a request parameter 'matches'"})
             self.abort(400)
 
+        match_keys_to_delete = request.get('keys_to_delete')
+        keys_to_delete = set()
+        if match_keys_to_delete:
+            try:
+                match_keys = json.loads(match_keys_to_delete)
+            except Exception:
+                self._errors = json.dumps({"Error": "'keys_to_delete' could not be parsed"})
+                self.abort(400)
+            for match_key in match_keys:
+                if match_key.split('_')[0] == event_key:  # Very important! Don't delete matches from events that aren't authorized.
+                    keys_to_delete.add(ndb.Key(Match, match_key))
+
         event = Event.get_by_id(event_key)
 
         matches = [Match(
@@ -95,13 +107,11 @@ class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
             time_string=match.get("time_string", None),
         ) for match in JSONMatchesParser.parse(matches_json)]
 
-        # delete old matches
-        old_match_keys = Match.query(Match.event == event.key).fetch(None, keys_only=True)
-        to_delete = set(old_match_keys).difference(set([m.key for m in matches]))
-        MatchManipulator.delete_keys(to_delete)
-
+        MatchManipulator.delete_keys(keys_to_delete)
         MatchManipulator.createOrUpdate(matches)
         taskqueue.add(url='/tasks/math/do/event_matchstats/{}'.format(event_key), method='GET')
+
+        self.response.out.write(json.dumps({'keys_deleted': [key.id() for key in keys_to_delete]}))
 
 
 class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):

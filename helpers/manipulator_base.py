@@ -18,7 +18,7 @@ class ManipulatorBase(object):
 
     @classmethod
     def delete(self, models):
-        models = self.listify(models)
+        models = filter(None, self.listify(models))
         keys = [model.key for model in models]
         ndb.delete_multi(keys)
         for model in models:
