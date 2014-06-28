@@ -11,18 +11,17 @@ var GamedayFrame = React.createClass({
   getInitialState: function() {
     return {
       chatEnabled: false,
-      events: [],
       displayedEvents: [],
+      events: [],
+      followingTeams: [177,230],
       hashtagEnabled: false,
     };
   },
   componentWillMount: function() {
-    //this.loadDataFromServer();
-    //setInterval(this.loadDataFromServer, this.props.pollInterval);
     this.setState({events: this.props.events});
-    this.setKickoffState();
+    this.setInitialState();
   },
-  setKickoffState: function() {
+  setInitialState: function() {
     this.setState({
       displayedEvents: this.props.events,
       hashtagEnabled: true,
@@ -45,11 +44,18 @@ var GamedayFrame = React.createClass({
           rightPanelEnabled={this.state.chatEnabled}
           leftPanelEnabled={this.state.hashtagEnabled} />
         <ChatPanel enabled={this.state.chatEnabled} />
+        <FollowingTeamsModal
+          followingTeams={this.state.followingTeams}
+          onFollowTeam={this.handleFollowTeam}
+          onUnfollowTeam={this.handleUnfollowTeam} />
       </div>
     );
   },
   handleChatToggle: function() {
     this.setState({chatEnabled: !this.state.chatEnabled});
+  },
+  handleFollowTeam: function(team) {
+    this.setState({followingTeams: this.state.followingTeams.push(team)})
   },
   handleHashtagToggle: function() {
     this.setState({hashtagEnabled: !this.state.hashtagEnabled});
@@ -58,6 +64,12 @@ var GamedayFrame = React.createClass({
     var displayedEvents = this.state.displayedEvents;
     var newDisplayedEvents = displayedEvents.concat([eventModel]);
     this.setState({displayedEvents: newDisplayedEvents});
+  },
+  handleUnfollowTeam: function(team) {
+    var newFollowingTeams = this.state.followingTeams.filter(function(a) {
+      return a != team
+    });
+    this.setState({followingTeams: newFollowingTeams});
   },
   handleWebcastReset: function() {
     this.setState({displayedEvents: []});
@@ -80,16 +92,6 @@ var GamedayNavbar = React.createClass({
 
         <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul className="nav navbar-nav navbar-right">
-            <li className="dropdown">
-              <a href="#" className="dropdown-toggle" data-toggle="dropdown">Layouts <b className="caret"></b></a>
-              <ul className="dropdown-menu">
-                <li><a href="#">First</a></li>
-                <li><a href="#">Second</a></li>
-                <li><a href="#">Third</a></li>
-                <li className="divider"></li>
-                <li><a href="#">Separated link</a></li>
-              </ul>
-            </li>
             <WebcastDropdown
               events={this.props.events}
               onWebcastAdd={this.props.onWebcastAdd}
@@ -104,7 +106,7 @@ var GamedayNavbar = React.createClass({
                 active={this.props.chatEnabled}
                 handleClick={this.props.onChatToggle}>Chat</BootstrapButton>
             </li>
-            <li><a href="#">Settings</a></li>
+            <SettingsDropdown />
           </ul>
         </div>
       </nav>
@@ -384,11 +386,29 @@ var WebcastDropdown = React.createClass({
     };
     return (
       <li className="dropdown">
-        <a href="#" className="dropdown-toggle" data-toggle="dropdown">Webcasts <b className="caret"></b></a>
+        <a href="#" className="dropdown-toggle" data-toggle="dropdown">Add Webcasts <b className="caret"></b></a>
         <ul className="dropdown-menu">
           {webcastListItems}
           <li className="divider"></li>
           <BootstrapNavDropdownListItem handleClick={this.props.onWebcastReset}>Reset Webcasts</BootstrapNavDropdownListItem>
+        </ul>
+      </li>
+    );    
+  }
+})
+
+var SettingsDropdown = React.createClass({
+  render: function() {
+    return (
+      <li className="dropdown">
+        <a href="#" className="dropdown-toggle" data-toggle="dropdown"><span className="glyphicon glyphicon-cog"></span></a>
+        <ul className="dropdown-menu">
+          <BootstrapNavDropdownListItem
+            data_toggle="modal"
+            data_target="#followingTeamsModal">Follow Teams</BootstrapNavDropdownListItem>
+          <li className="divider"></li>
+          <BootstrapNavDropdownListItem>Debug Menu</BootstrapNavDropdownListItem>
+          <BootstrapNavDropdownListItem>TODO Show Beeper</BootstrapNavDropdownListItem>
         </ul>
       </li>
     );    
@@ -418,10 +438,59 @@ var BootstrapNavDropdownListItem = React.createClass({
   },
   render: function() {
     return (
-      <li><a href="{this.props.a}" onClick={this.handleClick}>{this.props.children}</a></li>
+      <li data-toggle={this.props.data_toggle} data-target={this.props.data_target}><a href={this.props.a} onClick={this.handleClick}>{this.props.children}</a></li>
     )
   },
 })
+
+var FollowingTeamListItems = React.createClass({
+  unfollowTeam: function() {
+    this.props.onUnfollowTeam(this.props.team)
+  },
+  render: function() {
+    return (
+      <li>
+        {this.props.team} 
+        <a href="#" onClick={this.unfollowTeam}>x</a>
+      </li>
+    );
+  }
+})
+
+var FollowingTeamsModal = React.createClass({
+  render: function() {
+    var followingTeamListItems = [];
+    for (var index in this.props.followingTeams) {
+      followingTeamListItems.push(
+        <FollowingTeamListItems
+          team={this.props.followingTeams[index]}
+          onUnfollowTeam={this.props.onUnfollowTeam} />
+        );
+    };
+    return (
+      <div className="modal fade" id="followingTeamsModal" tabindex="-1" role="dialog" aria-labelledby="#followingTeamsModal" aria-hidden="true">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <button type="button" className="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span className="sr-only">Close</span></button>
+              <h4 className="modal-title" id="followingTeamsModalLabel">Following Teams</h4>
+            </div>
+            <div className="modal-body">
+              <p>You can follow teams to get alerts about them.</p>
+              <hr></hr>
+              <h4>Following</h4>
+              <ul>{followingTeamListItems}</ul>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-primary" data-dismiss="modal">Done</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );    
+  }
+})
+
 
 // [{'webcasts': [{u'channel': u'6540154', u'type': u'ustream'}], 'event_name': u'Present Test Event', 'event_key': u'2014testpresent'}]
 
