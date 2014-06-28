@@ -75,21 +75,23 @@ class TeamRenderer(object):
 
         medias_by_slugname = MediaHelper.group_by_slugname([media_future.get_result() for media_future in media_futures])
 
-        template_values = {"is_canonical": is_canonical,
-                           "team": team,
-                           "participation": participation,
-                           "year": year,
-                           "years": valid_years,
-                           "year_wlt": year_wlt,
-                           "current_event": current_event,
-                           "matches_upcoming": matches_upcoming,
-                           "medias_by_slugname": medias_by_slugname}
+        handler.template_values.update({
+            "is_canonical": is_canonical,
+            "team": team,
+            "participation": participation,
+            "year": year,
+            "years": valid_years,
+            "year_wlt": year_wlt,
+            "current_event": current_event,
+            "matches_upcoming": matches_upcoming,
+            "medias_by_slugname": medias_by_slugname
+        })
 
         if short_cache:
             handler._cache_expiration = handler.SHORT_CACHE_EXPIRATION
 
         path = os.path.join(os.path.dirname(__file__), '../templates/team_details.html')
-        return template.render(path, template_values)
+        return template.render(path, handler.template_values)
 
     @classmethod
     def render_team_history(cls, handler, team, is_canonical):
@@ -136,15 +138,17 @@ class TeamRenderer(object):
 
         years = sorted(set([et.get_result().year for et in event_teams_futures if et.get_result().year is not None]))
 
-        template_values = {'is_canonical': is_canonical,
-                           'team': team,
-                           'event_awards': event_awards,
-                           'years': years,
-                           'current_event': current_event,
-                           'matches_upcoming': matches_upcoming}
+        handler.template_values.update({
+            'is_canonical': is_canonical,
+            'team': team,
+            'event_awards': event_awards,
+            'years': years,
+            'current_event': current_event,
+            'matches_upcoming': matches_upcoming
+        })
 
         if short_cache:
             handler._cache_expiration = handler.SHORT_CACHE_EXPIRATION
 
         path = os.path.join(os.path.dirname(__file__), '../templates/team_history.html')
-        return template.render(path, template_values)
+        return template.render(path, handler.template_values)

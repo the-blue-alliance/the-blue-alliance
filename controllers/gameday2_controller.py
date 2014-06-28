@@ -26,7 +26,9 @@ class Gameday2Controller(CacheableHandler):
                 "webcast": event.webcast,
                 })
 
-        template_values = {'webcasts': webcasts}
+        self.template_values.update({
+            'webcasts': webcasts
+        })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/gameday2.html')
-        return template.render(path, template_values)
+        return template.render(path, self.template_values)
