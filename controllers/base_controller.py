@@ -29,6 +29,8 @@ class CacheableHandler(webapp2.RequestHandler):
             self.response.headers['Cache-Control'] = 'public, max-age=61'
             self.response.headers['Pragma'] = 'Public'
 
+        self.template_values = {}
+
     @property
     def cache_key(self):
         return self._render_cache_key(self._partial_cache_key)
