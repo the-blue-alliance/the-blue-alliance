@@ -39,13 +39,13 @@ class MatchDetail(CacheableHandler):
         if not match:
             self.abort(404)
 
-        template_values = {
+        self.template_values.update({
             "event": event,
             "match": match,
-        }
+        })
 
         if event.within_a_day:
             self._cache_expiration = self.SHORT_CACHE_EXPIRATION
 
         path = os.path.join(os.path.dirname(__file__), '../templates/match_details.html')
-        return template.render(path, template_values)
+        return template.render(path, self.template_values)
