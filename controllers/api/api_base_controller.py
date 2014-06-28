@@ -162,9 +162,9 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
             self.response.set_status(500)
 
     def post(self, event_key):
-        auth_id = self.request.get('secret-id')
+        auth_id = self.request.get('auth-id')
         if not auth_id:
-            self._errors = json.dumps({"Error": "Must provide a request parameter 'secret-id'"})
+            self._errors = json.dumps({"Error": "Must provide a request parameter 'auth-id'"})
             self.abort(400)
 
         secret = self.request.get('secret')
