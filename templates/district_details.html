@@ -4,6 +4,8 @@
 
 {% block meta_description %}{{district_name}} district details for the FIRST Robotics Competition{% if explicit_year %} from {{year}}{% endif %}.{% endblock %}
 
+{% block events_active %}active{% endblock %}
+
 {% block content %}
 <div class="container">
   <div class="row">
@@ -21,7 +23,7 @@
           </ul>
         </div>
 
-        <h1 class="visible-xs end_header">{% if explicit_year %}{{year}} {% endif %}{{district_name}} District</h1>
+        <h1 class="visible-xs end_header">{% if explicit_year %}{{year}} {% endif %}{{district_name}} District{% if events|length > 0 %}<small> {{ events|length }} Events</small>{% endif %}</h1>
 
         <div class="tba-sidebar">
           <ul class="nav tba-sidenav">
@@ -34,7 +36,7 @@
       </div>
     </div>
     <div class="col-xs-12 col-sm-9 col-lg-10">
-      <h1 class="hidden-xs end_header">{% if explicit_year %}{{year}} {% endif %}{{district_name}} District</h1>
+      <h1 class="hidden-xs end_header">{% if explicit_year %}{{year}} {% endif %}{{district_name}} District{% if events|length > 0 %}<small> {{ events|length }} Events</small>{% endif %}</h1>
 
       <ul class="nav nav-tabs" role="tablist">
         <li class="active"><a href="#events" role="tab" data-toggle="tab">Events</a></li>
