@@ -37,14 +37,12 @@
     <ul class="nav navbar-nav tba-navbar-nav">
       <li class="tba-nav-persistent {% block teams_active %}{% endblock %}"><a href="/teams"><span><span class="glyphicon glyphicon-user"></span> Teams</span></a></li>
       <li class="tba-nav-persistent {% block events_active %}{% endblock %}"><a href="/events"><span><span class="glyphicon glyphicon-calendar"></span> Events</span></a></li>
-      <li class="tba-nav-persistent hidden-xs {% block districts_active %}{% endblock %}"><a href="/districts"><span><span class="glyphicon glyphicon-map-marker"></span> Districts</span></a></li>
       <li class="tba-nav-persistent hidden-xs {% block insights_active %}{% endblock %}"><a href="/insights"><span><span class="glyphicon glyphicon-align-left"></span> Insights</span></a></li>
       <li class="tba-nav-persistent hidden-xs"><a href="/gameday"><span><span class="glyphicon glyphicon-facetime-video"></span> GameDay</span></a></li>
     </ul>
 
     <div class="navbar-collapse collapse tba-navbar-collapse tba-collapse navbar-responsive-collapse">
       <ul class="nav navbar-nav">
-        <li class="visible-xs {% block districts_active_collapsed %}{% endblock %}"><a href="/districts"><span><span class="glyphicon glyphicon-map-marker"></span> Districts</span></a></li>
         <li class="visible-xs {% block insights_active_collapsed %}{% endblock %}"><a href="/insights"><span><span class="glyphicon glyphicon-align-left"></span> Insights</span></a></li>
         <li class="visible-xs"><a href="/gameday"><span><span class="glyphicon glyphicon-facetime-video"></span> GameDay</span></a></li>
       </ul>
