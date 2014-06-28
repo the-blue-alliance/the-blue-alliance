@@ -32,9 +32,16 @@
 
         {% include "partials/webcast_add_instructions_partial.html" %}
 
-        {% for event_key, suggestions in suggestions_by_event_key.items %}
-            <h3><a href="/event/{{event_key}}">{{event_key}}</a></h3>
-            {% for suggestion in suggestions %}
+        {% for suggestion_set in suggestion_sets %}
+            <h3><a href="/event/{{suggestion_set.event.key_name}}">{{suggestion_set.event.key_name}}</a></h3>
+            <ul><strong>Existing Webcasts</strong>
+                {% for webcast in suggestion_set.event.webcast %}
+                    <li>{{webcast}}</li>
+                {% empty %}
+                    <li>None Yet!</li>
+                {% endfor %}
+            </ul>
+            {% for suggestion in suggestion_set.suggestions %}
                 <div class="row">
                     <div class="well">
                         <div class="col-xs-6">

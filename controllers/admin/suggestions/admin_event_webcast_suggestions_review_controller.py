@@ -9,7 +9,6 @@ from controllers.base_controller import LoggedInHandler
 from helpers.event.event_webcast_adder import EventWebcastAdder
 from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
 
-
 from models.event import Event
 from models.suggestion import Suggestion
 
@@ -29,10 +28,17 @@ class AdminEventWebcastSuggestionsReviewController(LoggedInHandler):
         for suggestion in suggestions:
             suggestions_by_event_key.setdefault(suggestion.target_key, []).append(suggestion)
 
+        suggestion_sets = []
+        for event_key, suggestions in suggestions_by_event_key.items():
+            suggestion_sets.append({
+                "event": Event.get_by_id(event_key),
+                "suggestions": suggestions
+                })
+
         self.template_values.update({
             "event_key": self.request.get("event_key"),
             "success": self.request.get("success"),
-            "suggestions_by_event_key": suggestions_by_event_key
+            "suggestion_sets": suggestion_sets
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../../templates/admin/event_webcast_suggestion_list.html')
