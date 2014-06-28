@@ -23,17 +23,17 @@ class InsightsOverview(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24
 
     def _render(self):
-        template_values = {
+        self.template_values.update({
             'valid_years': VALID_YEARS,
-        }
+        })
 
         insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(0, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
         for insight in insights:
             if insight:
-                template_values[insight.name] = insight
+                self.template_values[insight.name] = insight
 
         path = os.path.join(os.path.dirname(__file__), '../templates/insights.html')
-        return template.render(path, template_values)
+        return template.render(path, self.template_values)
 
 
 class InsightsDetail(CacheableHandler):
@@ -56,19 +56,19 @@ class InsightsDetail(CacheableHandler):
         if year not in VALID_YEARS:
             self.abort(404)
 
-        self._cache_key = self.CACHE_KEY_FORMAT.format(year)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(year)
         super(InsightsDetail, self).get(year)
 
     def _render(self, year):
-        template_values = {
+        self.template_values.update({
             'valid_years': VALID_YEARS,
             'selected_year': year,
-        }
+        })
 
         insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(year, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
         for insight in insights:
             if insight:
-                template_values[insight.name] = insight
+                self.template_values[insight.name] = insight
 
         path = os.path.join(os.path.dirname(__file__), '../templates/insights_details.html')
-        return template.render(path, template_values)
+        return template.render(path, self.template_values)

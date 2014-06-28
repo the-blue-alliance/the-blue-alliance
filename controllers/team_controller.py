@@ -27,7 +27,7 @@ class TeamList(CacheableHandler):
         if page not in self.VALID_PAGES:
             self.abort(404)
 
-        self._cache_key = self.CACHE_KEY_FORMAT.format(page)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(page)
         super(TeamList, self).get(page)
 
     def _render(self, page=''):
@@ -57,17 +57,17 @@ class TeamList(CacheableHandler):
             middle_value += 1
         teams_a, teams_b = teams[:middle_value], teams[middle_value:]
 
-        template_values = {
+        self.template_values.update({
             "teams_a": teams_a,
             "teams_b": teams_b,
             "num_teams": num_teams,
             "page_labels": page_labels,
             "cur_page_label": cur_page_label,
             "current_page": page
-        }
+        })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/team_list.html')
-        return template.render(path, template_values)
+        return template.render(path, self.template_values)
 
 
 class TeamCanonical(CacheableHandler):
@@ -85,7 +85,7 @@ class TeamCanonical(CacheableHandler):
         if str(int(team_number)) != team_number:
             return self.redirect("/team/%s" % int(team_number))
 
-        self._cache_key = self.CACHE_KEY_FORMAT.format("frc{}".format(team_number))
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format("frc{}".format(team_number))
         super(TeamCanonical, self).get(team_number)
 
     def _render(self, team_number):
@@ -117,7 +117,7 @@ class TeamDetail(CacheableHandler):
         if str(int(team_number)) != team_number:
             return self.redirect("/team/%s/%s" % (int(team_number), year))
 
-        self._cache_key = self.CACHE_KEY_FORMAT.format("frc{}".format(team_number), year)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format("frc{}".format(team_number), year)
         super(TeamDetail, self).get(team_number, year)
 
     def _render(self, team_number, year):
@@ -147,7 +147,7 @@ class TeamHistory(CacheableHandler):
         if str(int(team_number)) != team_number:
             return self.redirect("/team/%s/history" % int(team_number))
 
-        self._cache_key = self.CACHE_KEY_FORMAT.format("frc" + team_number)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format("frc" + team_number)
         super(TeamHistory, self).get(team_number)
 
     def _render(self, team_number):

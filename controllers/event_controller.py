@@ -18,7 +18,7 @@ class EventList(CacheableHandler):
     """
     List all Events.
     """
-    MAX_YEAR = 2014
+    MAX_YEAR = 2015
     VALID_YEARS = list(reversed(range(1992, MAX_YEAR + 1)))
     CACHE_VERSION = 4
     CACHE_KEY_FORMAT = "event_list_{}_{}"  # (year, explicit_year)
@@ -42,7 +42,7 @@ class EventList(CacheableHandler):
             year = datetime.datetime.now().year
             explicit_year = False
 
-        self._cache_key = self.CACHE_KEY_FORMAT.format(year, explicit_year)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(year, explicit_year)
         super(EventList, self).get(year, explicit_year)
 
     def _render(self, year=None, explicit_year=False):
@@ -52,16 +52,16 @@ class EventList(CacheableHandler):
 
         week_events = EventHelper.groupByWeek(events)
 
-        template_values = {
+        self.template_values.update({
             "events": events,
             "explicit_year": explicit_year,
             "selected_year": year,
             "valid_years": self.VALID_YEARS,
             "week_events": week_events,
-        }
+        })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/event_list.html')
-        return template.render(path, template_values)
+        return template.render(path, self.template_values)
 
     def memcacheFlush(self):
         year = datetime.datetime.now().year
@@ -88,7 +88,7 @@ class EventDetail(CacheableHandler):
         if not event_key:
             return self.redirect("/events")
 
-        self._cache_key = self.CACHE_KEY_FORMAT.format(event_key)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(event_key)
         super(EventDetail, self).get(event_key)
 
     def _render(self, event_key):
@@ -123,7 +123,7 @@ class EventDetail(CacheableHandler):
 
         bracket_table = MatchHelper.generateBracket(matches, event.alliance_selections)
 
-        template_values = {
+        self.template_values.update({
             "event": event,
             "matches": matches,
             "matches_recent": matches_recent,
@@ -134,13 +134,13 @@ class EventDetail(CacheableHandler):
             "num_teams": num_teams,
             "oprs": oprs,
             "bracket_table": bracket_table,
-        }
+        })
 
         if event.within_a_day:
             self._cache_expiration = self.SHORT_CACHE_EXPIRATION
 
         path = os.path.join(os.path.dirname(__file__), '../templates/event_details.html')
-        return template.render(path, template_values)
+        return template.render(path, self.template_values)
 
 
 class EventRss(CacheableHandler):
@@ -158,7 +158,7 @@ class EventRss(CacheableHandler):
         if not event_key:
             return self.redirect("/events")
 
-        self._cache_key = self.CACHE_KEY_FORMAT.format(event_key)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(event_key)
         super(EventRss, self).get(event_key)
 
     def _render(self, event_key):
@@ -168,12 +168,12 @@ class EventRss(CacheableHandler):
 
         matches = MatchHelper.organizeMatches(event.matches)
 
-        template_values = {
+        self.template_values.update({
             "event": event,
             "matches": matches,
             "datetime": datetime.datetime.now()
-        }
+        })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/event_rss.xml')
         self.response.headers['content-type'] = 'application/xml; charset=UTF-8'
-        return template.render(path, template_values)
+        return template.render(path, self.template_values)

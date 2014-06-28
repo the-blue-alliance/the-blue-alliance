@@ -8,6 +8,7 @@ from datetime import datetime
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
+from consts.district_type import DistrictType
 from consts.event_type import EventType
 
 from controllers.api.api_event_controller import ApiEventController
@@ -22,8 +23,8 @@ from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
 
-class TestEventApiController(unittest2.TestCase):
 
+class TestEventApiController(unittest2.TestCase):
     def setUp(self):
         app = webapp2.WSGIApplication([webapp2.Route(r'/<event_key:>', ApiEventController, methods=['GET'])], debug=True)
         self.testapp = webtest.TestApp(app)
@@ -39,22 +40,26 @@ class TestEventApiController(unittest2.TestCase):
                 id="2010sc",
                 name="Palmetto Regional",
                 event_type_enum=EventType.REGIONAL,
+                event_district_enum=DistrictType.NO_DISTRICT,
                 short_name="Palmetto",
                 event_short="sc",
                 year=2010,
                 end_date=datetime(2010, 03, 27),
                 official=True,
                 location='Clemson, SC',
+                venue="Long Beach Arena",
+                venue_address="Long Beach Arena\r\n300 East Ocean Blvd\r\nLong Beach, CA 90802\r\nUSA",
                 start_date=datetime(2010, 03, 24),
                 webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
-                alliance_selections_json="[ {\"declines\": [], \"picks\": [\"frc971\", \"frc254\", \"frc1662\"]},"+ 
-                                           "{\"declines\": [], \"picks\": [\"frc1678\", \"frc368\", \"frc4171\"]},"+ 
-                                           "{\"declines\": [], \"picks\": [\"frc2035\", \"frc192\", \"frc4990\"]},"+ 
-                                           "{\"declines\": [], \"picks\": [\"frc1323\", \"frc846\", \"frc2135\"]},"+ 
-                                           "{\"declines\": [], \"picks\": [\"frc2144\", \"frc1388\", \"frc668\"]},"+ 
-                                           "{\"declines\": [], \"picks\": [\"frc1280\", \"frc604\", \"frc100\"]},"+ 
-                                           "{\"declines\": [], \"picks\": [\"frc114\", \"frc852\", \"frc841\"]},"+ 
-                                           "{\"declines\": [], \"picks\": [\"frc2473\", \"frc3256\", \"frc1868\"]}]"
+                alliance_selections_json="[ {\"declines\": [], \"picks\": [\"frc971\", \"frc254\", \"frc1662\"]},"+
+                                           "{\"declines\": [], \"picks\": [\"frc1678\", \"frc368\", \"frc4171\"]},"+
+                                           "{\"declines\": [], \"picks\": [\"frc2035\", \"frc192\", \"frc4990\"]},"+
+                                           "{\"declines\": [], \"picks\": [\"frc1323\", \"frc846\", \"frc2135\"]},"+
+                                           "{\"declines\": [], \"picks\": [\"frc2144\", \"frc1388\", \"frc668\"]},"+
+                                           "{\"declines\": [], \"picks\": [\"frc1280\", \"frc604\", \"frc100\"]},"+
+                                           "{\"declines\": [], \"picks\": [\"frc114\", \"frc852\", \"frc841\"]},"+
+                                           "{\"declines\": [], \"picks\": [\"frc2473\", \"frc3256\", \"frc1868\"]}]",
+                website="http://www.firstsv.org",
         )
 
         self.event.put()
@@ -67,10 +72,17 @@ class TestEventApiController(unittest2.TestCase):
         self.assertEqual(event["name"], self.event.name)
         self.assertEqual(event["short_name"], self.event.short_name)
         self.assertEqual(event["official"], self.event.official)
+        self.assertEqual(event["event_type_string"], self.event.event_type_str)
+        self.assertEqual(event["event_type"], self.event.event_type_enum)
+        self.assertEqual(event["event_district_string"], self.event.event_district_str)
+        self.assertEqual(event["event_district"], self.event.event_district_enum)
         self.assertEqual(event["start_date"], self.event.start_date.date().isoformat())
         self.assertEqual(event["end_date"], self.event.end_date.date().isoformat())
+        self.assertEqual(event["location"], self.event.location)
+        self.assertEqual(event["venue_address"], self.event.venue_address.replace('\r\n', '\n'))
         self.assertEqual(event["webcast"], json.loads(self.event.webcast_json))
         self.assertEqual(event["alliances"], json.loads(self.event.alliance_selections_json))
+        self.assertEqual(event["website"], self.event.website)
 
     def testEventApi(self):
         response = self.testapp.get('/2010sc', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
@@ -80,7 +92,6 @@ class TestEventApiController(unittest2.TestCase):
 
 
 class TestEventTeamsApiController(unittest2.TestCase):
-
     def setUp(self):
         app = webapp2.WSGIApplication([webapp2.Route(r'/<event_key:>', ApiEventTeamsController, methods=['GET'])], debug=True)
         self.testapp = webtest.TestApp(app)
@@ -148,7 +159,6 @@ class TestEventTeamsApiController(unittest2.TestCase):
 
 
 class TestEventMatchApiController(unittest2.TestCase):
-
     def setUp(self):
         app = webapp2.WSGIApplication([webapp2.Route(r'/<event_key:>', ApiEventMatchesController, methods=['GET'])], debug=True)
         self.testapp = webtest.TestApp(app)
@@ -204,7 +214,7 @@ class TestEventMatchApiController(unittest2.TestCase):
             self.assertEqual(match["time"], None)
         else:
             self.assertEqual(match["time"], self.match.time.strftime("%s"))
-    
+
     def testEventMatchApi(self):
         response = self.testapp.get('/2010sc', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})
 
@@ -213,7 +223,6 @@ class TestEventMatchApiController(unittest2.TestCase):
 
 
 class TestEventStatsApiController(unittest2.TestCase):
-
     def setUp(self):
         app = webapp2.WSGIApplication([webapp2.Route(r'/<event_key:>', ApiEventStatsController, methods=['GET'])], debug=True)
         self.testapp = webtest.TestApp(app)
@@ -255,8 +264,8 @@ class TestEventStatsApiController(unittest2.TestCase):
         matchstats = json.loads(response.body)
         self.assertEqual(self.matchstats, matchstats)
 
-class TestEventRankingsApiController(unittest2.TestCase):
 
+class TestEventRankingsApiController(unittest2.TestCase):
     def setUp(self):
         app = webapp2.WSGIApplication([webapp2.Route(r'/<event_key:>', ApiEventRankingsController, methods=['GET'])], debug=True)
         self.testapp = webtest.TestApp(app)
@@ -269,12 +278,11 @@ class TestEventRankingsApiController(unittest2.TestCase):
         self.testbed.init_taskqueue_stub()
 
         self.rankings = [
-            ["Rank", "Team", "QS", "ASSIST", "AUTO", "T&C", "TELEOP", "Record (W-L-T)", "DQ", "PLAYED"], 
-            ["1", "1126", "20.00", "240.00", "480.00", "230.00", "478.00", "10-2-0", "0", "12"], 
-            ["2", "5030", "20.00", "200.00", "290.00", "220.00", "592.00", "10-2-0", "0", "12"], 
+            ["Rank", "Team", "QS", "ASSIST", "AUTO", "T&C", "TELEOP", "Record (W-L-T)", "DQ", "PLAYED"],
+            ["1", "1126", "20.00", "240.00", "480.00", "230.00", "478.00", "10-2-0", "0", "12"],
+            ["2", "5030", "20.00", "200.00", "290.00", "220.00", "592.00", "10-2-0", "0", "12"],
             ["3", "250", "20.00", "70.00", "415.00", "220.00", "352.00", "10-2-0", "0", "12"]
             ]
-        
 
         self.event = Event(
                 id="2010sc",
@@ -319,8 +327,8 @@ class TestEventRankingsApiController(unittest2.TestCase):
 
         self.assertEqual("[]", response.body)
 
-class TestEventListApiController(unittest2.TestCase):
 
+class TestEventListApiController(unittest2.TestCase):
     def setUp(self):
         app = webapp2.WSGIApplication([webapp2.Route(r'/<year:>', ApiEventListController, methods=['GET'])], debug=True)
         self.testapp = webtest.TestApp(app)

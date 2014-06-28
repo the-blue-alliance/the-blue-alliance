@@ -48,8 +48,16 @@
         <td>{{ event.event_district_str }}</td>
     </tr>
     <tr>
+        <td>Event Venue</td>
+        <td><a href="http://maps.google.com/maps?q={{ event.venue|urlencode }}">{{ event.venue }}</a></td>
+    </tr>
+    <tr>
+        <td>Event Venue Address</td>
+        <td><a href="http://maps.google.com/maps?q={{ event.venue_address|urlencode }}">{{ event.venue_address }}</a></td>
+    </tr>
+    <tr>
         <td>Event Location</td>
-        <td><a href="http://maps.google.com/maps?q={{ event.location }}">{{ event.location }}</a></td>
+        <td><a href="http://maps.google.com/maps?q={{ event.location|urlencode }}">{{ event.location }}</a></td>
     </tr>
     <tr>
         <td>Event Timezone</td>
@@ -109,6 +117,7 @@
 </form>
 
 <h2>Add Webcast</h2>
+{% include "partials/webcast_add_instructions_partial.html" %}
 <form action="/admin/event/add_webcast/{{event.key_name}}" method="post">
     {% include "partials/webcast_add_form_partial.html" %}
     <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Add Webcast</button>

@@ -21,20 +21,26 @@ class CacheableHandler(webapp2.RequestHandler):
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
         self._cache_expiration = 0
-        if not hasattr(self, '_cache_key'):
-            self._cache_key = self.CACHE_KEY_FORMAT
+        if not hasattr(self, '_partial_cache_key'):
+            self._partial_cache_key = self.CACHE_KEY_FORMAT
 
         # Cache all pages for 61 seconds, unless overwritten.
         if self.response is not None:
             self.response.headers['Cache-Control'] = 'public, max-age=61'
             self.response.headers['Pragma'] = 'Public'
 
+        self.template_values = {}
+
     @property
-    def full_cache_key(self):
-        return self._get_full_cache_key(self._cache_key)
+    def cache_key(self):
+        return self._render_cache_key(self._partial_cache_key)
 
     @classmethod
-    def _get_full_cache_key(cls, cache_key):
+    def get_cache_key_from_format(cls, *args):
+        return cls._render_cache_key(cls.CACHE_KEY_FORMAT.format(*args))
+
+    @classmethod
+    def _render_cache_key(cls, cache_key):
         return "{}:{}:{}".format(
             cache_key,
             cls.CACHE_VERSION,
@@ -42,10 +48,13 @@ class CacheableHandler(webapp2.RequestHandler):
 
     def get(self, *args, **kw):
         cached_response = self._read_cache()
-        if cached_response:
+        if cached_response is True:
+            pass
+        elif cached_response is not None:
             self.response.out.write(cached_response.body)
             self.response.headers = cached_response.headers
         else:
+            self.template_values["cache_key"] = self.cache_key
             self.response.out.write(self._render(*args, **kw))
             self._write_cache(self.response)
 
@@ -60,24 +69,22 @@ class CacheableHandler(webapp2.RequestHandler):
             return True
 
     def memcacheFlush(self):
-        memcache.delete(self.full_cache_key)
-        return self.full_cache_key
-
-    @classmethod
-    def clear_cache(cls, *args):
-        full_cache_key = cls._get_full_cache_key(cls.CACHE_KEY_FORMAT.format(*args))
-        memcache.delete(full_cache_key)
-        logging.info("Deleting cache key: {}".format(full_cache_key))
+        memcache.delete(self.cache_key)
+        return self.cache_key
 
     def _read_cache(self):
-        return memcache.get(self.full_cache_key)
-
-    def _render(self):
-        raise NotImplementedError("No _render method.")
+        return memcache.get(self.cache_key)
 
     def _write_cache(self, response):
         if tba_config.CONFIG["memcache"]:
-            memcache.set(self.full_cache_key, response, self._cache_expiration)
+            memcache.set(self.cache_key, response, self._cache_expiration)
+
+    @classmethod
+    def delete_cache_multi(cls, cache_keys):
+        memcache.delete_multi(cache_keys)
+
+    def _render(self):
+        raise NotImplementedError("No _render method.")
 
 
 class LoggedInHandler(webapp2.RequestHandler):

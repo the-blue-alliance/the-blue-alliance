@@ -65,11 +65,11 @@ class AdminAwardAdd(LoggedInHandler):
         if type(new_awards) != list:
             new_awards = [new_awards]
 
-        template_values = {
+        self.template_values = {
             'awards': new_awards,
         }
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/awards_add.html')
-        self.response.out.write(template.render(path, template_values))
+        self.response.out.write(template.render(path, self.template_values))
 
 
 class AdminAwardEdit(LoggedInHandler):

@@ -7,6 +7,8 @@ class ApiAuthAccess(ndb.Model):
     """
     Manages secrets for access to the write API.
     Access may be granted for more than one event.
+
+    Models are fetched by ID, which will be some randomly generated alphanumeric string
     """
     description = ndb.StringProperty(indexed=False)  # human-readable description
     secret = ndb.StringProperty(indexed=False)
