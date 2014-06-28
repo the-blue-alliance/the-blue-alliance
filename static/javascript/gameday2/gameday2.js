@@ -462,15 +462,11 @@ var BootstrapNavDropdownListItem = React.createClass({
   },
 })
 
-var events = [
-  {"key": "2014nh", "name": "BAE Granite State", "webcast": [{"type": "youtube", "channel": "olhwB5grOtA"}]},
-  {"key": "2014ct", "name": "UTC Regional", "webcast": [{"type": "youtube", "channel": "FKpIWmsDPq4"}]},
-  {"key": "2014az", "name": "Arizona!", "webcast": [{"type": "youtube", "channel": "QZv70PG9eXM"}]}
-]
+// [{'webcasts': [{u'channel': u'6540154', u'type': u'ustream'}], 'event_name': u'Present Test Event', 'event_key': u'2014testpresent'}]
 
-var webcast_data = $.parseJSON($("#webcast_data").text().replace(/(u)*\'/g,'\"'));
+var events_with_webcasts = $.parseJSON($("#events_with_webcasts").text().replace(/u'/g,'\'').replace(/'/g,'"'));
 
 React.renderComponent(
-  <GamedayFrame events={webcast_data} pollInterval={20000} />,
+  <GamedayFrame events={events_with_webcasts} pollInterval={20000} />,
   document.getElementById('content')
 );
