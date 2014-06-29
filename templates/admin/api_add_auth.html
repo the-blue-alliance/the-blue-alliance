@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}API Auth Add{% endblock %}
+
+{% block content %}
+
+<form action="/admin/api_auth/edit/{{auth_id}}" method="post">
+    <legend>Add new Auth</legend>
+    <table class="table table-striped table-hover table-condensed">
+        <tr>
+            <td>Description</td>
+            <td><input class="form-control" type="text" name="description" placeholder="Cheesy Arena @ Chezy Champs"/></td>
+        </tr>
+        <tr>
+            <td>Events (Event keys separated by commas)</td>
+            <td><input class="form-control" type="text" name="event_list_str" placeholder="2014cc,2014mttd"/></td>
+        </tr>
+    </table>
+
+    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Add</button>
+    <a href="/admin/" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-down"></span> Cancel</a>
+</form>
+
+{% endblock %}
