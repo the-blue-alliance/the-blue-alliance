@@ -8,7 +8,7 @@ class JSONTeamListParser(ParserBase):
     @classmethod
     def parse(self, team_list_json):
         """
-        Parse JSON that contains team_keys
+        Parse JSON that contains team_keys in the format "frcXXX"
         Format is as follows:
         [team1, team1, team3, ...]
         """
