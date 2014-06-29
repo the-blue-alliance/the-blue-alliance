@@ -55,7 +55,8 @@ var GamedayFrame = React.createClass({
     this.setState({chatEnabled: !this.state.chatEnabled});
   },
   handleFollowTeam: function(team) {
-    this.setState({followingTeams: this.state.followingTeams.push(team)})
+    var newFollowingTeams = this.state.followingTeams.concat([team]);
+    this.setState({followingTeams: newFollowingTeams})
   },
   handleHashtagToggle: function() {
     this.setState({hashtagEnabled: !this.state.hashtagEnabled});
@@ -451,13 +452,16 @@ var FollowingTeamListItems = React.createClass({
     return (
       <li>
         {this.props.team} 
-        <a href="#" onClick={this.unfollowTeam}>x</a>
+        <a href="#" onClick={this.unfollowTeam}>&times;</a>
       </li>
     );
   }
 })
 
 var FollowingTeamsModal = React.createClass({
+  followTeam: function() {
+    this.props.onFollowTeam(177)
+  },
   render: function() {
     var followingTeamListItems = [];
     for (var index in this.props.followingTeams) {
@@ -477,6 +481,12 @@ var FollowingTeamsModal = React.createClass({
             </div>
             <div className="modal-body">
               <p>You can follow teams to get alerts about them.</p>
+              <div className="input-group">
+                <input className="form-control" type="text" placeholder="Team Number"></input>
+                <span className="input-group-btn">
+                  <a onClick={this.followTeam} href="#" className="btn btn-primary"><span className="glyphicon glyphicon-plus-sign"></span></a>
+                </span>
+              </div>
               <hr></hr>
               <h4>Following</h4>
               <ul>{followingTeamListItems}</ul>
