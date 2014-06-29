@@ -189,38 +189,9 @@ var BootstrapButton = React.createClass({
 });
 
 var VideoGrid = React.createClass({
-  render: function() {
-    var cx = React.addons.classSet;
-    var classes = cx({
-      'videoGrid': true,
-      'leaveLeftMargin': this.props.leftPanelEnabled,
-      'leaveRightMargin': this.props.rightPanelEnabled,
-    });
-    switch (this.props.events.length) {
-      case 0:
-        var layout = <VideoCellLayoutZero />
-        break;
-      case 1:
-        var layout = <VideoCellLayoutOne events={this.props.events} />
-        break;
-      case 2:
-        var layout = <VideoCellLayoutTwo events={this.props.events} />
-        break;
-      case 3:
-        var layout = <VideoCellLayoutThree events={this.props.events} />
-        break;
-    }
+  renderLayoutZero: function(classes) {
     return (
       <div className={classes}>
-        {layout}
-      </div>
-    );
-  },
-});
-
-var VideoCellLayoutZero = React.createClass({
-  render: function() {
-    return (
         <div className="row">
           <div className="col-md-12">
             <div className="panel panel-default">
@@ -233,57 +204,58 @@ var VideoCellLayoutZero = React.createClass({
             </div>   
           </div>
         </div>
-      );
-  }
-});
-
-var VideoCellLayoutOne = React.createClass({
-  render: function() {
+      </div>
+    );
+  },
+  renderLayoutOne: function(classes) {
     if (this.props.events) {
       var eventModel = this.props.events[0];
     } else {
       var eventModel = null;
     }
     return (
+      <div className={classes}>
         <div className="row">
           <div className="col-md-12">      
             <VideoCell
+              key={this.props.events[0].event_name}
               eventModel={eventModel}
               vidHeight="100%"
               vidWidth="100%" />
           </div>
         </div>
-      );
-  }
-});
-
-var VideoCellLayoutTwo = React.createClass({
-  render: function() {
+      </div>
+    );
+  },
+  renderLayoutTwo: function(classes) {
     return (
+      <div className={classes}>
         <div className="row">
           <div className="col-md-6">
             <VideoCell
+              key={this.props.events[0].event_name}
               eventModel={this.props.events[0]}
               vidHeight="100%"
               vidWidth="100%" />
           </div>
           <div className="col-md-6">
             <VideoCell
+              key={this.props.events[1].event_name}
               eventModel={this.props.events[1]}
               vidHeight="100%"
               vidWidth="100%" />
           </div>
         </div>
-      );
-  }
-});
-
-var VideoCellLayoutThree = React.createClass({
-  render: function() {
+      </div>
+    );
+  },
+  renderLayoutThree: function(classes) {
     return (
+      <div className={classes}>
         <div className="row">
           <div className="col-md-6">
             <VideoCell
+              key={this.props.events[0].event_name}
               eventModel={this.props.events[0]}
               vidHeight="100%"
               vidWidth="100%" />
@@ -292,6 +264,7 @@ var VideoCellLayoutThree = React.createClass({
             <div className="row">
               <div className="col-md-12">
                 <VideoCell
+                  key={this.props.events[1].event_name}
                   eventModel={this.props.events[1]}
                   vidHeight="50%"
                   vidWidth="100%" />
@@ -300,6 +273,7 @@ var VideoCellLayoutThree = React.createClass({
             <div className="row">
               <div className="col-md-12">
                 <VideoCell
+                  key={this.props.events[2].event_name}
                   eventModel={this.props.events[2]}
                   vidHeight="50%"
                   vidWidth="100%" />
@@ -307,8 +281,27 @@ var VideoCellLayoutThree = React.createClass({
             </div>
           </div>
         </div>
-      );
-  }
+      </div>
+    );
+  },
+  render: function() {
+    var cx = React.addons.classSet;
+    var classes = cx({
+      'videoGrid': true,
+      'leaveLeftMargin': this.props.leftPanelEnabled,
+      'leaveRightMargin': this.props.rightPanelEnabled,
+    });
+    switch (this.props.events.length) {
+      case 0:
+        return this.renderLayoutZero(classes);
+      case 1:
+        return this.renderLayoutOne(classes);
+      case 2:
+        return this.renderLayoutTwo(classes);
+      case 3:
+        return this.renderLayoutThree(classes);
+    }
+  },
 });
 
 var VideoCell = React.createClass({

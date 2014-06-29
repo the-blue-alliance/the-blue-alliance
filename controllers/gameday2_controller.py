@@ -31,12 +31,12 @@ class Gameday2Controller(CacheableHandler):
             events_with_webcasts_dict_list.append({
                 "event_name": event.name,
                 "event_key": event.key_name,
-                "webcasts": event.webcast
+                "webcast": event.webcast
             })
 
-        template_values = {
+        self.template_values.update({
             'events_with_webcasts': events_with_webcasts_dict_list
-        }
+        })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/gameday2.html')
         return template.render(path, self.template_values)
