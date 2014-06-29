@@ -2,12 +2,9 @@ import os
 
 from google.appengine.ext.webapp import template
 
-<<<<<<< HEAD
-=======
 from helpers.event_helper import EventHelper
 from models.sitevar import Sitevar
 
->>>>>>> Improve passing events to gameday2.
 from base_controller import CacheableHandler
 
 from helpers.event_helper import EventHelper
