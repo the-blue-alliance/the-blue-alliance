@@ -15,6 +15,9 @@ from models.award import Award
 from models.match import Match
 
 class DistrictHelper(object):
+    """
+    Point calculations based on: http://www.usfirst.org/sites/default/files/uploadedFiles/Robotics_Programs/FRC/Resources/FRC_District_Standard_Points_Ranking_System.pdf
+    """
     @classmethod
     def calculate_event_points(cls, event):
         match_key_futures = Match.query(Match.event == event.key).fetch_async(None, keys_only=True)
