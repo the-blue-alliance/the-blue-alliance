@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 import logging
 import os
 
@@ -56,11 +56,11 @@ class AdminOffseasonScraperController(LoggedInHandler):
 
             start_date = None
             if self.request.get("event_start_date"):
-                start_date = datetime.strptime(self.request.get("event_start_date"), "%Y-%m-%d")
+                start_date = datetime.datetime.strptime(self.request.get("event_start_date"), "%Y-%m-%d")
 
             end_date = None
             if self.request.get("event_end_date"):
-                end_date = datetime.strptime(self.request.get("event_end_date"), "%Y-%m-%d")
+                end_date = datetime.datetime.strptime(self.request.get("event_end_date"), "%Y-%m-%d")
 
             event_key = str(self.request.get("event_year")) + str.lower(str(self.request.get("event_short")))
 
