@@ -10,19 +10,20 @@ from google.appengine.ext import ndb
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
+from consts.district_type import DistrictType
+
+from helpers.district_helper import DistrictHelper
 from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
-
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.event_team_repairer import EventTeamRepairer
 from helpers.event_team_updater import EventTeamUpdater
 
 from helpers.insight_manipulator import InsightManipulator
 from helpers.team_manipulator import TeamManipulator
+from helpers.match_manipulator import MatchManipulator
 from helpers.matchstats_helper import MatchstatsHelper
 from helpers.insights_helper import InsightsHelper
-
-from helpers.match_manipulator import MatchManipulator
 
 from models.event import Event
 from models.event_team import EventTeam
@@ -400,3 +401,46 @@ class TypeaheadCalcDo(webapp.RequestHandler):
         template_values = {'results': results}
         path = os.path.join(os.path.dirname(__file__), '../templates/math/typeaheadcalc_do.html')
         self.response.out.write(template.render(path, template_values))
+
+
+class DistrictPointsCalcEnqueue(webapp.RequestHandler):
+    """
+    Enqueues calculation of district points for events within a district for a given year
+    """
+
+    def get(self, district_type_enum, year):
+        district_type_enum = int(district_type_enum)
+        if district_type_enum == DistrictType.NO_DISTRICT:
+            self.response.out.write("Can't enqueue for non district events!")
+            return
+
+        year = int(year)
+
+        event_keys = Event.query(Event.year == year, Event.event_district_enum == district_type_enum).fetch(None, keys_only=True)
+        for event_key in event_keys:
+            taskqueue.add(url='/tasks/math/do/district_points_calc/{}'.format(event_key.id()), method='GET')
+
+        self.response.out.write("Enqueued for: {}".format([event_key.id() for event_key in event_keys]))
+
+
+class DistrictPointsCalcDo(webapp.RequestHandler):
+    """
+    Calculates district points for an event
+    """
+
+    def get(self, event_key):
+        event = Event.get_by_id(event_key)
+        if event.event_district_enum == DistrictType.NO_DISTRICT:
+            self.response.out.write("Can't calculate district points for a non-district event!")
+            return
+        if event.year < 2014:
+            self.response.out.write("Can't calculate district points for events before 2014!")  # TODO: implement correct points for pre-2014 districts
+            return
+
+        district_points = DistrictHelper.calculate_event_points(event)
+
+        event.district_points_json = json.dumps(district_points)
+        event.dirty = True  # This is so hacky. -fangeugene 2014-05-08
+        EventManipulator.createOrUpdate(event)
+
+        self.response.out.write(event.district_points)

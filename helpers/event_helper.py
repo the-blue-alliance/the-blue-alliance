@@ -26,6 +26,16 @@ class EventHelper(object):
     Helper class for Events.
     """
     @classmethod
+    def alliance_selections_to_points(self, alliance_selections):
+        team_points = {}
+        for n, alliance in enumerate(alliance_selections):
+            n += 1
+            team_points[alliance['picks'][0]] = 17 - n
+            team_points[alliance['picks'][1]] = 17 - n
+            team_points[alliance['picks'][2]] = n
+        return team_points
+
+    @classmethod
     def groupByWeek(self, events):
         """
         Events should already be ordered by start_date

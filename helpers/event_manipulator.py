@@ -19,6 +19,7 @@ class EventManipulator(ManipulatorBase):
         """
         attrs = [
             "alliance_selections_json",
+            "district_points_json",
             "end_date",
             "event_short",
             "event_type_enum",

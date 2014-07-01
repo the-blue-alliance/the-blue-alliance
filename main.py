@@ -15,6 +15,7 @@ from controllers.main_controller import ContactHandler, HashtagsHandler, \
       AboutHandler, ThanksHandler, PageNotFoundHandler, \
       GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler
 from controllers.match_controller import MatchDetail
+from controllers.district_controller import DistrictDetail
 from controllers.suggestions.suggest_match_video_controller import SuggestMatchVideoController
 from controllers.suggestions.suggest_event_webcast_controller import SuggestEventWebcastController
 from controllers.suggestions.suggest_team_media_controller import SuggestTeamMediaController
@@ -50,6 +51,8 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/event/<event_key>', EventDetail, 'event-detail', strict_slash=True),
       RedirectRoute(r'/event/<event_key>/feed', EventRss, 'event-rss', strict_slash=True),
       RedirectRoute(r'/events/<year:[0-9]+>', EventList, 'event-list-year', strict_slash=True),
+      RedirectRoute(r'/events/<district_abbrev:[a-z]+>/<year:[0-9]+>', DistrictDetail, 'district-detail', strict_slash=True),
+      RedirectRoute(r'/events/<district_abbrev:[a-z]+>', DistrictDetail, 'district-canonical', strict_slash=True),
       RedirectRoute(r'/events', EventList, 'event-list', strict_slash=True),
       RedirectRoute(r'/gameday', GamedayHandler, 'gameday', strict_slash=True),
       RedirectRoute(r'/gameday2', Gameday2Controller, 'gameday2', strict_slash=True),
