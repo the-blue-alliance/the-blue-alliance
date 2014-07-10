@@ -15,9 +15,9 @@ If you're having trouble getting set up, reach out to us at [our mailing list](h
 
 Setup
 -----
-0. Learn a bit about Git and Github:
-	* http://help.github.com
-	* http://learn.github.com
+0. Learn a bit about Git and GitHub:
+	* [GitHub help](https://help.github.com/)
+	* [Try Git](https://try.github.io/)
 1. Install [App Engine](http://developers.google.com/appengine/)
 	* Specifically use the [Python SDK](http://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python)
 	* Run installer and allow it make symbolic links (you will be asked to enter your root password)
