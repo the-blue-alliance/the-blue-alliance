@@ -22,6 +22,24 @@ class ApiDistrictControllerBase(ApiBaseController):
     def _validators(self):
         return []
 
+class ApiDistrictListController(ApiDistrictControllerBase):
+    CACHE_KEY_FORMAT = "apiv2_districts"
+    CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
+
+    def __init__(self, *args, **kw):
+        super(ApiDistrictListController, self).__init__(*args, **kw)
+
+    def _track_call(self):
+        pass
+
+    def _render(self):
+        districts = []
+        for enum, key in DistrictType.type_abbrevs.iteritems():
+            if enum != DistrictType.NO_DISTRICT:
+                districts.append(key)
+        return json.dumps(districts)
+
 class ApiDistrictEventsController(ApiDistrictControllerBase):
     CACHE_KEY_FORMAT = "apiv2_district_events_controller_{}_{}"  # (district_short, year)
     CACHE_VERSION = 0
