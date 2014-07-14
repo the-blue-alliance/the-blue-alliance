@@ -7,7 +7,12 @@ from datetime import datetime
 from google.appengine.ext import ndb
 
 from models.event import Event
+from models.event_team import EventTeam
+from models.team import Team
+
+from helpers.district_helper import DistrictHelper
 from helpers.model_to_dict import ModelToDict
+from helpers.event_helper import EventHelper
 
 from controllers.api.api_base_controller import ApiBaseController
 from consts.district_type import DistrictType
@@ -64,7 +69,7 @@ class ApiDistrictEventsController(ApiDistrictControllerBase):
     def _render(self, district_abbrev, year=None):
         self._set_district(district_abbrev)  
         
-        event_keys = Event.query(Event.year == int(year), Event.event_district_enum == self.district).fetch(None, keys_only=True)
+        event_keys = Event.query(Event.year == self.year, Event.event_district_enum == self.district).fetch(None, keys_only=True)
         events = ndb.get_multi(event_keys)
         
         events = [ModelToDict.eventConverter(event) for event in events]
@@ -90,4 +95,45 @@ class ApiDistrictRankingsController(ApiDistrictControllerBase):
         #self._track_call_defer('district/events', api_label)
 
     def _render(self, district_abbrev, year=None):
-        pass
+        self._set_district(district_abbrev)
+
+        event_keys = Event.query(Event.year == self.year, Event.event_district_enum == self.district).fetch(None, keys_only=True)
+        events = ndb.get_multi(event_keys)
+        
+        district_cmp_keys_future = Event.query(Event.year == self.year, Event.event_type_enum == EventType.DISTRICT_CMP).fetch_async(None, keys_only=True)
+
+        event_futures = ndb.get_multi_async(event_keys)
+        event_team_keys_future = EventTeam.query(EventTeam.event.IN(event_keys)).fetch_async(None, keys_only=True)
+
+        if self.year == 2014: # TODO: only 2014 has accurate rankings calculations
+            team_futures = ndb.get_multi_async(set([ndb.Key(Team, et_key.id().split('_')[1]) for et_key in event_team_keys_future.get_result()]))
+
+        events = [event_future.get_result() for event_future in event_futures]
+        EventHelper.sort_events(events)
+
+        district_cmp_futures = ndb.get_multi_async(district_cmp_keys_future.get_result())
+
+        if self.year == 2014: # TODO: only 2014 has accurate rankings calculations
+            team_totals = DistrictHelper.calculate_rankings(events, team_futures, self.year)
+        else:
+            return json.dumps([])
+
+        rankings = []
+
+        currentRank = 1
+        for key, points in team_totals:
+            point_detail = {}
+            point_detail["rank"] = currentRank
+            point_detail["team_key"] = key
+            point_detail["event_points"] = {}
+            eventCount = 0
+            for event in points["event_points"]:
+                point_detail["event_points"][event[0].key_name] = event[1] 
+                eventCount += 1
+            
+            rankings.append(point_detail)
+            currentRank += 1
+        #logging.info(str(rankings))       
+ 
+        return json.dumps(rankings)
+            
