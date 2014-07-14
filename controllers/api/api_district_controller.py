@@ -44,7 +44,6 @@ class ApiDistrictListController(ApiDistrictControllerBase):
     def _render(self, year=None):
         all_cmp_event_keys = Event.query(Event.year == int(self.year), Event.event_type_enum == EventType.DISTRICT_CMP).fetch(None, keys_only=True)    
         events = ndb.get_multi(all_cmp_event_keys)    
-        logging.info(len(events))
         district_keys = [DistrictType.type_abbrevs[event.event_district_enum] for event in events]
         return json.dumps(district_keys, ensure_ascii=True)
 
@@ -78,7 +77,7 @@ class ApiDistrictEventsController(ApiDistrictControllerBase):
 
 class ApiDistrictRankingsController(ApiDistrictControllerBase):
     CACHE_KEY_FORMAT = "apiv2_district_rankings_controller_{}_{}"  # (district_short, year)
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1 
     CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
@@ -129,6 +128,11 @@ class ApiDistrictRankingsController(ApiDistrictControllerBase):
             for event in points["event_points"]:
                 point_detail["event_points"][event[0].key_name] = event[1] 
             
+            if "rookie_bonus" in points:
+                point_detail["rookie_bonus"] = points["rookie_bonus"]
+            else:
+                point_detail["rookie_bonus"] = 0
+            point_detail["point_total"] = points["point_total"]
             rankings.append(point_detail)
             currentRank += 1
  
