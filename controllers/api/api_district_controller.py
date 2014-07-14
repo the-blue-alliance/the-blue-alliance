@@ -126,14 +126,11 @@ class ApiDistrictRankingsController(ApiDistrictControllerBase):
             point_detail["rank"] = currentRank
             point_detail["team_key"] = key
             point_detail["event_points"] = {}
-            eventCount = 0
             for event in points["event_points"]:
                 point_detail["event_points"][event[0].key_name] = event[1] 
-                eventCount += 1
             
             rankings.append(point_detail)
             currentRank += 1
-        #logging.info(str(rankings))       
  
         return json.dumps(rankings)
             
