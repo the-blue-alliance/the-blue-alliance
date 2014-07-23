@@ -53,6 +53,7 @@
                 <li><a class="smooth-scroll" href="#district-list-request">District List Request</a></li>
                 <li><a class="smooth-scroll" href="#district-events-request">District Events Request</a></li>
                 <li><a class="smooth-scroll" href="#district-rankings-request">District Rankings Request</a></li>
+              </ul>
             </li>
           </ul>
         </div>
@@ -1158,7 +1159,7 @@
         </div>
       </div>
       
-      <h3 id="district-list-request">District Events Request</h3>
+      <h3 id="district-events-request">District Events Request</h3>
       <p>
         Request format:
         <code>www.thebluealliance.com/api/v2/district/&lt;district short&rt;/&lt;year&gt;/events</code>
@@ -1193,7 +1194,7 @@
             <div class="input-group">
               <span class="input-group-addon">www.thebluealliance.com</span>
               <input class="form-control" size="6"
-              id="example_district_events_request" type="text" value="/api/v2/districts/ne/2014/events">
+              id="example_district_events_request" type="text" value="/api/v2/district/ne/2014/events">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
               </span>
@@ -1205,50 +1206,8 @@
           </div>
         </div>
       </div>
-      <h3 id="district-list-request">District List Request</h3>
-      <p>
-        Request format:
-        <code>www.thebluealliance.com/api/v2/districts/&lt;year&gt;</code>
-      </p>
-      <table class=table>
-        <thead>
-          <tr>
-            <th>Key</th>
-            <th>Desciption</th>
-            <th>Examples</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Year</td>
-            <td>The year you want data for</td>
-            <td>2014</td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h3 class="panel-title">Example GET Request:</h3>
-        </div>
-        <div class="panel-body">
-          <form id="example_district_list_request_form" class="form-inline">
-            <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
-              <input class="form-control" size="6"
-              id="example_district_list_request" type="text" value="/api/v2/districts/2014">
-              <span class="input-group-btn">
-                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
-              </span>
-            </div>
-          </form>
-          <div class="panel-group">
-            <pre class="district-list-request-json">
-            </pre>
-          </div>
-        </div>
-      </div>
       
-      <h3 id="district-list-request">District Rankings Request</h3>
+      <h3 id="district-rankings-request">District Rankings Request</h3>
       <p>
         Request format:
         <code>www.thebluealliance.com/api/v2/district/&lt;district short&rt;/&lt;year&gt;/rankings</code>
@@ -1283,7 +1242,7 @@
             <div class="input-group">
               <span class="input-group-addon">www.thebluealliance.com</span>
               <input class="form-control" size="6"
-              id="example_district_rankings_request" type="text" value="/api/v2/districts/ne/2014/rankings">
+              id="example_district_rankings_request" type="text" value="/api/v2/district/ne/2014/rankings">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
               </span>
@@ -1580,7 +1539,7 @@
     $.ajax({
       url: $("#example_district_rankings_request").val(),
       dataType: 'json',
-      headers: {'X-TBA-App-Id': 'tba-web:example-district-events-request:v01'},
+      headers: {'X-TBA-App-Id': 'tba-web:example-district-rankings-request:v01'},
       success: function(data) {
         $(".district-rankings-request-json").html(JSON.stringify(data, null, 2));
       },
