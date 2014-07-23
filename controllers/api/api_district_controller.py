@@ -39,7 +39,9 @@ class ApiDistrictListController(ApiDistrictControllerBase):
         self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.year)
 
     def _track_call(self, year=None):
-        pass
+        if year is None:
+            year = datetime.now().year
+        self._track_call_defer('district_list', year) 
 
     def _render(self, year=None):
         all_cmp_event_keys = Event.query(Event.year == int(self.year), Event.event_type_enum == EventType.DISTRICT_CMP).fetch(None, keys_only=True)    
@@ -59,11 +61,10 @@ class ApiDistrictEventsController(ApiDistrictControllerBase):
         self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.district_abbrev, self.year) 
 
     def _track_call(self, district_abbrev, year=None):
-        pass 
-        #api_label = district
-        #if year is not None:
-        #    api_label += '/{}'.format(year)
-        #self._track_call_defer('district/events', api_label)
+        if year is None:
+            year = datetime.now().year
+    
+        self._track_call_defer('district/events', district_abbrev, year)
 
     def _render(self, district_abbrev, year=None):
         self._set_district(district_abbrev)  
@@ -87,11 +88,11 @@ class ApiDistrictRankingsController(ApiDistrictControllerBase):
         self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.district_abbrev, self.year)
 
     def _track_call(self, district_abbrev, year=None):
-        pass
-        #api_label = district
-        #if year is not None:
-        #    api_label += '/{}'.format(year)
-        #self._track_call_defer('district/events', api_label)
+        if year is None:
+            year = datetime.now().year
+
+        self._track_call_defer('district/rankings', district_abbrev, year)
+
 
     def _render(self, district_abbrev, year=None):
         self._set_district(district_abbrev)
