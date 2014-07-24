@@ -34,7 +34,6 @@ class DistrictHelper(object):
                 'elim_points': 0,
                 'alliance_points': 0,
                 'award_points': 0,
-                'points_multiplier': POINTS_MUTIPLIER,
                 'total': 0,
             }),
             'tiebreakers': defaultdict(lambda: {  # for tiebreaker stats that can't be calculated with 'points'
