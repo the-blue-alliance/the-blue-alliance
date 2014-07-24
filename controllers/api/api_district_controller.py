@@ -28,7 +28,7 @@ class ApiDistrictControllerBase(ApiBaseController):
         return []
 
 class ApiDistrictListController(ApiDistrictControllerBase):
-    CACHE_KEY_FORMAT = "apiv2_districts_{}"  # year
+    CACHE_KEY_FORMAT = "apiv2_district_list_controller_{}"  # year
     CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 61
 
@@ -40,7 +40,7 @@ class ApiDistrictListController(ApiDistrictControllerBase):
     def _track_call(self, year=None):
         if year is None:
             year = datetime.now().year
-        self._track_call_defer('district_list', year) 
+        self._track_call_defer('district/list', year) 
 
     def _render(self, year=None):
         all_cmp_event_keys = Event.query(Event.year == int(self.year), Event.event_type_enum == EventType.DISTRICT_CMP).fetch(None, keys_only=True)    
@@ -63,7 +63,7 @@ class ApiDistrictEventsController(ApiDistrictControllerBase):
         if year is None:
             year = datetime.now().year
     
-        self._track_call_defer('district/events', str(year)+district_abbrev)
+        self._track_call_defer('district/events', '{}{}'.format(year, district_abrev))
 
     def _render(self, district_abbrev, year=None):
         self._set_district(district_abbrev)  
