@@ -66,7 +66,7 @@ class ApiDistrictEventsController(ApiDistrictControllerBase):
         if year is None:
             year = datetime.now().year
 
-        self._track_call_defer('district/events', '{}{}'.format(year, district_abrev))
+        self._track_call_defer('district/events', '{}{}'.format(year, district_abbrev))
 
     def _render(self, district_abbrev, year=None):
         self._set_district(district_abbrev)
