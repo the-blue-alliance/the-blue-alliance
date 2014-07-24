@@ -98,7 +98,6 @@ class ModelToDict(object):
         """
         award_dict = dict()
         award_dict["name"] = award.name_str
-        award_dict["enum"] = award.award_type_enum
         award_dict["award_type"] = award.award_type_enum
         award_dict["year"] = award.year
         award_dict["event_key"] = award.event.id()

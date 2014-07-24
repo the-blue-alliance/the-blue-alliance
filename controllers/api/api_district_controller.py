@@ -1,22 +1,21 @@
 import json
 import webapp2
-import logging
+
+from controllers.api.api_base_controller import ApiBaseController
+from consts.district_type import DistrictType
+from consts.event_type import EventType
 
 from datetime import datetime
 
 from google.appengine.ext import ndb
 
+from helpers.district_helper import DistrictHelper
+from helpers.event_helper import EventHelper
+from helpers.model_to_dict import ModelToDict
+
 from models.event import Event
 from models.event_team import EventTeam
 from models.team import Team
-
-from helpers.district_helper import DistrictHelper
-from helpers.model_to_dict import ModelToDict
-from helpers.event_helper import EventHelper
-
-from controllers.api.api_base_controller import ApiBaseController
-from consts.district_type import DistrictType
-from consts.event_type import EventType
 
 class ApiDistrictControllerBase(ApiBaseController):
 
@@ -29,7 +28,7 @@ class ApiDistrictControllerBase(ApiBaseController):
         return []
 
 class ApiDistrictListController(ApiDistrictControllerBase):
-    CACHE_KEY_FORMAT = "apiv2_districts_{}" #year
+    CACHE_KEY_FORMAT = "apiv2_districts_{}"  # year
     CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 61
 

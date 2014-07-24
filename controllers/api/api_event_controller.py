@@ -145,17 +145,17 @@ class ApiEventAwardsController(ApiEventController):
         award_dicts = [ModelToDict.awardConverter(award) for award in AwardHelper.organizeAwards(self.event.awards)]
         return json.dumps(award_dicts, ensure_ascii=True)
 
-class ApiEventPointsController(ApiEventController):
-    CACHE_KEY_FORMAT = "apiv2_event_points_controller_{}"  # (event_key)
+class ApiEventDistrictPointsController(ApiEventController):
+    CACHE_KEY_FORMAT = "apiv2_event_district_points_controller_{}"  # (event_key)
     CACHE_VERSION = 0
     CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
-        super(ApiEventPointsController, self).__init__(*args, **kw)
+        super(ApiEventDistrictPointsController, self).__init__(*args, **kw)
         self.partial_cache_key = self.CACHE_KEY_FORMAT.format(self.event_key)
 
     def _track_call(self, event_key):
-        self._track_call_defer('event/points', event_key)
+        self._track_call_defer('event/district_points', event_key)
     
     def _render(self, event_key):
         self._set_event(event_key)
