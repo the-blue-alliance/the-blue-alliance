@@ -42,7 +42,7 @@ class ApiDistrictListController(ApiDistrictControllerBase):
     def _track_call(self, year=None):
         if year is None:
             year = datetime.now().year
-        self._track_call_defer('district/list', year
+        self._track_call_defer('district/list', year)
 
     def _render(self, year=None):
         all_cmp_event_keys = Event.query(Event.year == int(self.year), Event.event_type_enum == EventType.DISTRICT_CMP).fetch(None, keys_only=True)
