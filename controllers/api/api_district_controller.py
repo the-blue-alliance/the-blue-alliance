@@ -46,7 +46,7 @@ class ApiDistrictListController(ApiDistrictControllerBase):
 
     def _render(self, year=None):
         all_cmp_event_keys = Event.query(Event.year == int(self.year), Event.event_type_enum == EventType.DISTRICT_CMP).fetch(None, keys_only=True)
-        events = ndb.get_multi(all_cmp_event_keys
+        events = ndb.get_multi(all_cmp_event_keys)
         district_keys = [DistrictType.type_abbrevs[event.event_district_enum] for event in events]
         return json.dumps(district_keys, ensure_ascii=True)
 
@@ -78,6 +78,7 @@ class ApiDistrictEventsController(ApiDistrictControllerBase):
 
         return json.dumps(events, ensure_ascii=True)
 
+
 class ApiDistrictRankingsController(ApiDistrictControllerBase):
     CACHE_KEY_FORMAT = "apiv2_district_rankings_controller_{}_{}"  # (district_short, year)
     CACHE_VERSION = 1
@@ -94,7 +95,6 @@ class ApiDistrictRankingsController(ApiDistrictControllerBase):
             year = datetime.now().year
 
         self._track_call_defer('district/rankings', '{}{}'.format(year, district_abbrev))
-
 
     def _render(self, district_abbrev, year=None):
         self._set_district(district_abbrev)
