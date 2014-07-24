@@ -126,8 +126,11 @@ class ApiDistrictRankingsController(ApiDistrictControllerBase):
             point_detail["team_key"] = key
             point_detail["event_points"] = {}
             for event in points["event_points"]:
-                point_detail["event_points"][event[0].key_name] = event[1] 
-            
+                event_key = event[0].key_name
+                point_detail["event_points"][event_key] = event[1] 
+                event_details = Event.get_by_id(event_key)
+                point_detail["event_points"][event[0].key_name]['district_cmp'] = True if event_details.event_type_enum == EventType.DISTRICT_CMP else False           
+ 
             if "rookie_bonus" in points:
                 point_detail["rookie_bonus"] = points["rookie_bonus"]
             else:
