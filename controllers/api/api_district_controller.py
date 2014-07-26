@@ -26,7 +26,14 @@ class ApiDistrictControllerBase(ApiBaseController):
 
     @property
     def _validators(self):
-        return [("district_id_validator", self.district_abbrev)]
+        try:
+            return [("district_id_validator", self.district_abbrev)]
+        except AttributeError:
+            '''
+            If we're hitting the district list endpoint, then there won't be a district_abbrev passed
+            Catch that exception (the variable won't be defined) and don't validate a nonexistant value
+            '''
+            return []
 
 
 class ApiDistrictListController(ApiDistrictControllerBase):
