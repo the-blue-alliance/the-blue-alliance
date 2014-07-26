@@ -26,7 +26,7 @@ class ApiDistrictControllerBase(ApiBaseController):
 
     @property
     def _validators(self):
-        return []
+        return [("district_id_validator", self.district_abbrev)]
 
 
 class ApiDistrictListController(ApiDistrictControllerBase):
@@ -99,27 +99,21 @@ class ApiDistrictRankingsController(ApiDistrictControllerBase):
     def _render(self, district_abbrev, year=None):
         self._set_district(district_abbrev)
 
-        if year < 2014:
+        if self.year < 2014:
             return json.dumps([], ensure_ascii=True)
 
         event_keys = Event.query(Event.year == self.year, Event.event_district_enum == self.district).fetch(None, keys_only=True)
         events = ndb.get_multi(event_keys)
 
-        district_cmp_keys_future = Event.query(Event.year == self.year, Event.event_type_enum == EventType.DISTRICT_CMP).fetch_async(None, keys_only=True)
-
         event_futures = ndb.get_multi_async(event_keys)
         event_team_keys_future = EventTeam.query(EventTeam.event.IN(event_keys)).fetch_async(None, keys_only=True)
 
-        if self.year == 2014:  # TODO: only 2014 has accurate rankings calculations
-            team_futures = ndb.get_multi_async(set([ndb.Key(Team, et_key.id().split('_')[1]) for et_key in event_team_keys_future.get_result()]))
+        team_futures = ndb.get_multi_async(set([ndb.Key(Team, et_key.id().split('_')[1]) for et_key in event_team_keys_future.get_result()]))
 
         events = [event_future.get_result() for event_future in event_futures]
         EventHelper.sort_events(events)
 
-        if self.year == 2014:  # TODO: only 2014 has accurate rankings calculations
-            team_totals = DistrictHelper.calculate_rankings(events, team_futures, self.year)
-        else:
-            return json.dumps([])
+        team_totals = DistrictHelper.calculate_rankings(events, team_futures, self.year)
 
         rankings = []
 
