@@ -26,14 +26,7 @@ class ApiDistrictControllerBase(ApiBaseController):
 
     @property
     def _validators(self):
-        try:
-            return [("district_id_validator", self.district_abbrev)]
-        except AttributeError:
-            '''
-            If we're hitting the district list endpoint, then there won't be a district_abbrev passed
-            Catch that exception (the variable won't be defined) and don't validate a nonexistant value
-            '''
-            return []
+        return [("district_id_validator", self.district_abbrev)]
 
 
 class ApiDistrictListController(ApiDistrictControllerBase):
@@ -45,6 +38,13 @@ class ApiDistrictListController(ApiDistrictControllerBase):
         super(ApiDistrictListController, self).__init__(*args, **kw)
         self.year = int(self.request.route_kwargs["year"] or datetime.now().year)
         self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.year)
+
+    @property
+    def _validators(self):
+        '''
+        No validators for this endpoint
+        '''
+        return []
 
     def _track_call(self, year=None):
         if year is None:
