@@ -47,6 +47,8 @@ handlers:
   login: admin
 - url: /api/.*
   script: api_main.app
+- url: /notifications/.*
+  script: notify_main.app
 - url: .*
   script: main.app
 
