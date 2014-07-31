@@ -2,6 +2,8 @@ import json
 import logging
 import webapp2
 
+from models.mobile_client import MobileClient
+
 class NotificationRegistrationController(webapp2.RequestHandler):
     '''
     When GCM (and in the future, other systems) clients register,
@@ -37,7 +39,9 @@ class NotificationRegistrationController(webapp2.RequestHandler):
         gcmId = data[self.GCM_REGISTRATION_ID]
         userKey = data[self.GCM_KEY]
 
-        # TODO store these in NDB
-        
-        logging.info("GCM KEY: "+gcmId)
-        logging.info("USER ID: "+userKey)
+        if len(MobileClient.query( MobileClient.messaging_id==gcmId, MobileClient.user_key==userKey ).fetch()) == 0:
+            # Record doesn't exist yet, so add it
+            MobileClient(   messaging_id = gcmId,
+                            user_key = userKey ).put()        
+            logging.info("GCM KEY: "+gcmId)
+            logging.info("USER ID: "+userKey)
