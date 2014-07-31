@@ -4,7 +4,7 @@ import webapp2
 
 from models.mobile_client import MobileClient
 
-class NotificationRegistrationController(webapp2.RequestHandler):
+class MobileRegistrationController(webapp2.RequestHandler):
     '''
     When GCM (and in the future, other systems) clients register,
     they will send a POST request here. That request will contain the 
