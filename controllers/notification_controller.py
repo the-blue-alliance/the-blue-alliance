@@ -20,8 +20,8 @@ class NotificationRegistrationController(webapp2.RequestHandler):
     GCM_KEY = "gcm_key"
 
     def __init__(self, *args, **kw):
-        super(NotificationRegistrationController, *args, **kw)
-        self.checksum = self.request.headers[REQUEST_CHECKSUM]
+        super(NotificationRegistrationController, self).__init__( *args, **kw)
+        self.checksum = self.request.headers[self.REQUEST_CHECKSUM]
         self.request_data = self.request.body
 
     def validate_checksum(self, checksum, data):
@@ -29,13 +29,13 @@ class NotificationRegistrationController(webapp2.RequestHandler):
         return True
 
     def post(self, *args, **kw):
-        if not validate_checksum(self.checksum, self.data):
+        if not self.validate_checksum(self.checksum, self.request_data):
             self.response.set_status(401)
             return
         data = json.loads(self.request_data)
 
-        gcmId = data[GCM_REGISTRATION_ID]
-        userKey = data[GCM_KEY]
+        gcmId = data[self.GCM_REGISTRATION_ID]
+        userKey = data[self.GCM_KEY]
 
         # TODO store these in NDB
         
