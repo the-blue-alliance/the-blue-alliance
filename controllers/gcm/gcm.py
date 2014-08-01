@@ -32,6 +32,8 @@ import json
 
 from google.appengine.api import taskqueue  ## Google App Engine specific
 
+from helpers.gcm_helper import GCMHelper
+
 from models.sitevar import Sitevar
 
 LOCALHOST = False
@@ -40,7 +42,8 @@ if SERVER_KEY is None:
     raise Exception("Missing sitevar: gcm.serverKey. Can't send GCM messages.")
 logging.info("GCM KEY: "+str(SERVER_KEY.values_json))
 GCM_CONFIG = {'gcm_api_key': str(SERVER_KEY.values_json),
-#              'delete_bad_token_callback_func': 'EXAMPLE_MANAGE_TOKENS_MODULE.delete_bad_gcm_token',
+              'delete_bad_token_callback_func': 'GCMHelper.delete_bad_gcm_token',
+              'update_token_callback_func': 'GCMHelper.update_token'
              }
 GOOGLE_LOGIN_URL = 'https://www.google.com/accounts/ClientLogin'
 # Can't use https on localhost due to Google cert bug
@@ -136,8 +139,7 @@ class GCMConnection:
         if 'delete_bad_token_callback_func' in GCM_CONFIG:
             bad_token_callback_func_path = GCM_CONFIG['delete_bad_token_callback_func']
             mod_path, func_name = bad_token_callback_func_path.rsplit('.', 1)
-            mod = importlib.import_module(mod_path)
-            
+            mod = importlib.import_module(mod_path)            
             logging.info('delete_bad_token_callback_func: ' + repr((mod_path, func_name, mod)))
             
             bad_token_callback_func = getattr(mod, func_name)
