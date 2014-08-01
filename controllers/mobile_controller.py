@@ -1,3 +1,4 @@
+import hashlib
 import json
 import logging
 import webapp2
@@ -5,7 +6,24 @@ import webapp2
 from controllers.gcm.gcm import GCMMessage, GCMConnection
 from models.mobile_client import MobileClient
 
-class MobileRegistrationController(webapp2.RequestHandler):
+class BaseIncomingMessageController(webapp2.RequestHandler):
+    
+    REQUEST_CHECKSUM = "checksum"   
+
+    def __init__(self, *args, **kw):
+        super(BaseIncomingMessageController, self).__init__(*args, **kw)
+        self.checksum = self.request.headers[self.REQUEST_CHECKSUM]    
+
+    def validate_checksum(self, checksum, data):
+        secret_sitevar = Sitevar.get_by_id('gcm.serverKey')
+        if secret_sitevar is None
+            raise Exception("Sitevar mobile.secretKey in undefined. Can't process incoming requests")
+        secret_key = str(secret_sitevar.values_json)
+        expected_hash = hashlib.sha256(secret_key+str(data)).hexdigest()
+        
+        return expected_hash == checksum
+
+class MobileRegistrationController(BaseIncomingMessageController):
     '''
     When GCM (and in the future, other systems) clients register,
     they will send a POST request here. That request will contain the 
@@ -18,18 +36,12 @@ class MobileRegistrationController(webapp2.RequestHandler):
     salted with a secret key.
     '''
 
-    REQUEST_CHECKSUM = "checksum"
     GCM_REGISTRATION_ID = "gcm_registration_id"
     GCM_KEY = "gcm_key"
 
     def __init__(self, *args, **kw):
         super(NotificationRegistrationController, self).__init__( *args, **kw)
-        self.checksum = self.request.headers[self.REQUEST_CHECKSUM]
         self.request_data = self.request.body
-
-    def validate_checksum(self, checksum, data):
-        # TODO Get secret salt from ENV variable, hash the data and compare
-        return True
 
     def post(self, *args, **kw):
         if not self.validate_checksum(self.checksum, self.request_data):
