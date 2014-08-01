@@ -19,7 +19,7 @@ class BaseIncomingMessageController(webapp2.RequestHandler):
         if secret_sitevar is None
             raise Exception("Sitevar mobile.secretKey in undefined. Can't process incoming requests")
         secret_key = str(secret_sitevar.values_json)
-        expected_hash = hashlib.sha256(secret_key+str(data)).hexdigest()
+        expected_hash = hashlib.sha256(str(secret_key+str(data)).encode()).hexdigest()
         
         return expected_hash == checksum
 
