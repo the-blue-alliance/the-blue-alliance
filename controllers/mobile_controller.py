@@ -2,6 +2,7 @@ import json
 import logging
 import webapp2
 
+from controllers.gcm.gcm import GCMMessage, GCMConnection
 from models.mobile_client import MobileClient
 
 class MobileRegistrationController(webapp2.RequestHandler):
@@ -45,3 +46,15 @@ class MobileRegistrationController(webapp2.RequestHandler):
                             user_key = userKey ).put()        
             logging.info("GCM KEY: "+gcmId)
             logging.info("USER ID: "+userKey)
+
+class MobileTestMessageController(webapp2.RequestHandler):
+
+    def get(self, *args, **kw):
+        gcmId = self.request.get("id")
+        message_dict = {}
+        message_dict["message_type"] = "gcm"
+        message_dict["message_data"] = {"type": "test", "title": "Test Notification", "desc": "Foobar"}
+        message = GCMMessage(gcmId, message_dict) 
+        logging.info("Sending message to: "+gcmId)
+        connection = GCMConnection() 
+        connection.notify_device(message)
