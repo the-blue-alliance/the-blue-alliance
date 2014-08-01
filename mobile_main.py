@@ -2,11 +2,16 @@ import webapp2
 
 import tba_config
 
-from controllers.mobile_controller import MobileRegistrationController, MobileTestMessageController
+from controllers.mobile_controller import MobileRegistrationController, MobileTestMessageController \
+                                          AddFavoriteController
 
 app = webapp2.WSGIApplication([
                                 webapp2.Route(r'/mobile/register',
                                 MobileRegistrationController,
+                                methods=['POST']),
+
+                                webapp2.Route(r'/mobile/favorite/add',
+                                AddFavoriteController,
                                 methods=['POST']),
 
                                 webapp2.Route(r'/mobile/test_message',
