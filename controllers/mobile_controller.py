@@ -1,3 +1,4 @@
+import hashlib
 import json
 import logging
 import webapp2
@@ -5,6 +6,7 @@ import webapp2
 from controllers.gcm.gcm import GCMMessage, GCMConnection
 from helpers.gcm_helper import GCMHelper
 from models.mobile_client import MobileClient
+from models.sitevar import Sitevar
 
 class BaseIncomingMessageController(webapp2.RequestHandler):
     
@@ -20,7 +22,9 @@ class BaseIncomingMessageController(webapp2.RequestHandler):
         if secret_sitevar is None:
             raise Exception("Sitevar mobile.secretKey in undefined. Can't process incoming requests")
         secret_key = str(secret_sitevar.values_json)
-        expected_hash = hashlib.sha256(str(secret_key+str(data)).encode()).hexdigest()
+        expected_hash = hashlib.sha256(str(secret_key+data).encode()).hexdigest()
+        logging.info("secret: "+str(secret_key)+"!")
+        logging.info("data: "+str(data))
         logging.info("Expected hash: "+expected_hash)
         logging.info("Got hash: "+checksum) 
         return expected_hash == checksum
