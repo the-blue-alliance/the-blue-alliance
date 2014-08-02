@@ -3,9 +3,33 @@ import logging
 import webapp2
 
 from controllers.gcm.gcm import GCMMessage, GCMConnection
+from helpers.gcm_helper import GCMHelper
 from models.mobile_client import MobileClient
 
-class MobileRegistrationController(webapp2.RequestHandler):
+class BaseIncomingMessageController(webapp2.RequestHandler):
+    
+    REQUEST_CHECKSUM = "checksum"   
+
+    def __init__(self, *args, **kw):
+        super(BaseIncomingMessageController, self).__init__(*args, **kw)
+        self.checksum = self.request.headers[self.REQUEST_CHECKSUM]    
+        self.request_data = self.request.body
+
+    def validate_checksum(self, checksum, data):
+        secret_sitevar = Sitevar.get_by_id('gcm.checksumSecret')
+        if secret_sitevar is None:
+            raise Exception("Sitevar mobile.secretKey in undefined. Can't process incoming requests")
+        secret_key = str(secret_sitevar.values_json)
+        expected_hash = hashlib.sha256(str(secret_key+str(data)).encode()).hexdigest()
+        logging.info("Expected hash: "+expected_hash)
+        logging.info("Got hash: "+checksum) 
+        return expected_hash == checksum
+
+    def post(self, *args, **kw):
+        pass
+
+
+class MobileRegistrationController(BaseIncomingMessageController):
     '''
     When GCM (and in the future, other systems) clients register,
     they will send a POST request here. That request will contain the 
@@ -23,13 +47,8 @@ class MobileRegistrationController(webapp2.RequestHandler):
     GCM_KEY = "gcm_key"
 
     def __init__(self, *args, **kw):
-        super(NotificationRegistrationController, self).__init__( *args, **kw)
-        self.checksum = self.request.headers[self.REQUEST_CHECKSUM]
-        self.request_data = self.request.body
+        super(MobileRegistrationController, self).__init__( *args, **kw)
 
-    def validate_checksum(self, checksum, data):
-        # TODO Get secret salt from ENV variable, hash the data and compare
-        return True
 
     def post(self, *args, **kw):
         if not self.validate_checksum(self.checksum, self.request_data):
@@ -47,6 +66,30 @@ class MobileRegistrationController(webapp2.RequestHandler):
             logging.info("GCM KEY: "+gcmId)
             logging.info("USER ID: "+userKey)
 
+class AddFavoriteController(BaseIncomingMessageController):
+
+    USER_KEY = "user_key"
+    MODEL_KEY = "model_key"
+
+    def __init__(self, *args, **kw):
+        super(AddFavoriteController, self).__init__(*args, **kw)
+
+    def post(self, *args, **kw):
+        if not self.validate_checksum(self.checksum, self.request_data):
+            self.response.set_status(401)
+            return
+        data = json.loads(self.request_data)
+
+        userKey = data[self.USER_KEY]
+        modelKey = data[self.MODEL_KEY] 
+
+        if Favorite.query( Favorite.user_key == userKey, Favorite.model_key == modelKey).count() == 0:
+            # Favorite doesn't exist, add it
+            Favorite( user_key = userKey, model_key = modle_key).put()
+
+            logging.info("Added favorite: "+userKey+"/"+modelKey)
+
+
 class MobileTestMessageController(webapp2.RequestHandler):
 
     def get(self, *args, **kw):
@@ -58,3 +101,16 @@ class MobileTestMessageController(webapp2.RequestHandler):
         logging.info("Sending message to: "+gcmId)
         connection = GCMConnection() 
         connection.notify_device(message)
+
+class MobileTokenDeleteController(webapp2.RequestHandler):
+    
+    def get(self, *args, **kw):
+        token = self.request.get("id")
+        GCMHelper.delete_bad_gcm_token(token)
+
+class MobileTokenUpdateController(webapp2.RequestHandler):
+    
+    def get(self, *args, **kw):
+        old = self.request.get("old")
+        new = self.request.get("new")
+        GCMHelper.update_token(old, new)
