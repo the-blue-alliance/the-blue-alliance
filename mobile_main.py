@@ -10,6 +10,12 @@ app = webapp2.WSGIApplication([
                                 MobileRegistrationController,
                                 methods=['POST']),
 
+                                webapp2.Route(r'/mobile/favorite/add',
+                                AddFavoriteController,
+                                methods=['POST']),
+
+                                # ALL ENDPOINT BELOW THIS LINE ARE TESTS AND SHOULD BE REMOVED (eventually)
+
                                 webapp2.Route(r'/mobile/test_message',
                                 MobileTestMessageController,
                                 methods=['GET']),

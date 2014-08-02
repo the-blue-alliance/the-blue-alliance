@@ -5,6 +5,7 @@ import webapp2
 
 from controllers.gcm.gcm import GCMMessage, GCMConnection
 from helpers.gcm_helper import GCMHelper
+from models.favorite import Favorite
 from models.mobile_client import MobileClient
 from models.sitevar import Sitevar
 
@@ -89,7 +90,7 @@ class AddFavoriteController(BaseIncomingMessageController):
 
         if Favorite.query( Favorite.user_key == userKey, Favorite.model_key == modelKey).count() == 0:
             # Favorite doesn't exist, add it
-            Favorite( user_key = userKey, model_key = modle_key).put()
+            Favorite( user_key = userKey, model_key = modelKey).put()
 
             logging.info("Added favorite: "+userKey+"/"+modelKey)
 
