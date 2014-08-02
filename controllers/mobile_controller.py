@@ -33,7 +33,6 @@ class BaseIncomingMessageController(webapp2.RequestHandler):
     def post(self, *args, **kw):
         pass
 
-
 class MobileRegistrationController(BaseIncomingMessageController):
     '''
     When GCM (and in the future, other systems) clients register,
@@ -47,13 +46,11 @@ class MobileRegistrationController(BaseIncomingMessageController):
     salted with a secret key.
     '''
 
-    REQUEST_CHECKSUM = "checksum"
     GCM_REGISTRATION_ID = "gcm_registration_id"
     GCM_KEY = "gcm_key"
 
     def __init__(self, *args, **kw):
         super(MobileRegistrationController, self).__init__( *args, **kw)
-
 
     def post(self, *args, **kw):
         if not self.validate_checksum(self.checksum, self.request_data):
@@ -64,7 +61,7 @@ class MobileRegistrationController(BaseIncomingMessageController):
         gcmId = data[self.GCM_REGISTRATION_ID]
         userKey = data[self.GCM_KEY]
 
-        if len(MobileClient.query( MobileClient.messaging_id==gcmId, MobileClient.user_key==userKey ).fetch()) == 0:
+        if MobileClient.query( MobileClient.messaging_id==gcmId, MobileClient.user_key==userKey ).count() == 0:
             # Record doesn't exist yet, so add it
             MobileClient(   messaging_id = gcmId,
                             user_key = userKey ).put()        
@@ -93,7 +90,6 @@ class AddFavoriteController(BaseIncomingMessageController):
             Favorite( user_key = userKey, model_key = modelKey).put()
 
             logging.info("Added favorite: "+userKey+"/"+modelKey)
-
 
 class MobileTestMessageController(webapp2.RequestHandler):
 
