@@ -1,4 +1,4 @@
-application: tbatv-dev-hrd
+application: tba-dev-phil
 version: 1-2
 runtime: python27
 api_version: 1

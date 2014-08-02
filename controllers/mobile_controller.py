@@ -4,19 +4,26 @@ import logging
 import webapp2
 
 from controllers.gcm.gcm import GCMMessage, GCMConnection
+from controllers.base_controller import CacheableHandler
+
 from helpers.gcm_helper import GCMHelper
 from models.favorite import Favorite
 from models.mobile_client import MobileClient
 from models.sitevar import Sitevar
 
 class BaseIncomingMessageController(webapp2.RequestHandler):
-    
+        
     REQUEST_CHECKSUM = "checksum"   
 
     def __init__(self, *args, **kw):
         super(BaseIncomingMessageController, self).__init__(*args, **kw)
+        
+        if not self.REQUEST_CHECKSUM in self.request.headers:
+            self.error(401)
+
         self.checksum = self.request.headers[self.REQUEST_CHECKSUM]    
         self.request_data = self.request.body
+        logging.info("data: "+self.request_data)
 
     def validate_checksum(self, checksum, data):
         secret_sitevar = Sitevar.get_by_id('gcm.checksumSecret')
@@ -29,9 +36,6 @@ class BaseIncomingMessageController(webapp2.RequestHandler):
         logging.info("Expected hash: "+expected_hash)
         logging.info("Got hash: "+checksum) 
         return expected_hash == checksum
-
-    def post(self, *args, **kw):
-        pass
 
 class MobileRegistrationController(BaseIncomingMessageController):
     '''
@@ -54,7 +58,7 @@ class MobileRegistrationController(BaseIncomingMessageController):
 
     def post(self, *args, **kw):
         if not self.validate_checksum(self.checksum, self.request_data):
-            self.response.set_status(401)
+            self.error(401)
             return
         data = json.loads(self.request_data)
 
@@ -67,6 +71,29 @@ class MobileRegistrationController(BaseIncomingMessageController):
                             user_key = userKey ).put()        
             logging.info("GCM KEY: "+gcmId)
             logging.info("USER ID: "+userKey)
+
+class GetFavoritesController(CacheableHandler, BaseIncomingMessageController):
+
+    CACHE_KEY_FORMAT = "mobile_favorite_controller_{}"  # (user_key)
+    CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 60 * 60
+    USER_KEY = "user_key"
+
+    def __init__(self, *args, **kw):
+        super(GetFavoritesController, self).__init__(*args, **kw)
+        self.data = json.loads(self.request_data)
+        self.user_key = self.data[self.USER_KEY]
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.user_key)
+
+    def _render(self):
+        if not self.validate_checksum(self.checksum, self.request_data):
+            self.error(401)
+            return
+        favorites = Favorite.query( Favorite.user_key == self.user_key ).fetch()
+        output = []
+        for favorite in favorites:
+            output.append(favorite.model_key)
+        return json.dumps(output)
 
 class AddFavoriteController(BaseIncomingMessageController):
 
@@ -90,6 +117,27 @@ class AddFavoriteController(BaseIncomingMessageController):
             Favorite( user_key = userKey, model_key = modelKey).put()
 
             logging.info("Added favorite: "+userKey+"/"+modelKey)
+
+class RemoveFavoriteController(BaseIncomingMessageController):
+
+    USER_KEY = "user_key"
+    MODEL_KEY = "model_key"
+
+    def __init__(self, *args, **kw):
+        super(RemoveFavoriteController, self).__init__(*args, **kw)
+
+    def post(self, *args, **kw):
+        if not self.validate_checksum(self.checksum, self.request_data):
+            self.response.set_status(401)
+            return
+        data = json.loads(self.request_data)
+
+        userKey = data[self.USER_KEY]
+        modelKey = data[self.MODEL_KEY]
+
+        to_delete = Favorite.query( Favorite.user_key == userKey, Favorite.model_key == modelKey).fetch()
+        ndb.delete_multi([m.key for m in to_delete])
+
 
 class MobileTestMessageController(webapp2.RequestHandler):
 
