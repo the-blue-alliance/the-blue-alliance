@@ -110,6 +110,8 @@ class ApiDistrictRankingsController(ApiDistrictControllerBase):
             return json.dumps([], ensure_ascii=True)
 
         event_keys = Event.query(Event.year == self.year, Event.event_district_enum == self.district).fetch(None, keys_only=True)
+        if not event_keys:
+            return json.dumps([], ensure_ascii=True)
         events = ndb.get_multi(event_keys)
 
         event_futures = ndb.get_multi_async(event_keys)
