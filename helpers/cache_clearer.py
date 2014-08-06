@@ -5,7 +5,7 @@ from controllers.api.api_team_controller import ApiTeamController, ApiTeamEvents
                                                 ApiTeamListController
 from controllers.api.api_event_controller import ApiEventController, ApiEventTeamsController, \
                                                  ApiEventMatchesController, ApiEventStatsController, \
-                                                 ApiEventRankingsController, ApiEventAwardsController, ApiEventListController
+                                                 ApiEventRankingsController, ApiEventAwardsController, ApiEventListController, ApiEventDistrictPointsController
 
 from models.event import Event
 from models.event_team import EventTeam
@@ -41,6 +41,7 @@ class CacheClearer(object):
             team_keys.add(ndb.Key(Team, team_key_name))
 
         return cls._get_events_cache_keys_and_controllers(event_keys) + \
+            cls._get_event_district_points_cache_keys_and_controllers(event_keys) + \
             cls._get_eventlist_cache_keys_and_controllers(years) + \
             cls._get_team_events_cache_keys_and_controllers(team_keys, years)
 
@@ -102,6 +103,13 @@ class CacheClearer(object):
         cache_keys_and_controllers = []
         for event_key in filter(None, event_keys):
             cache_keys_and_controllers.append((ApiEventAwardsController.get_cache_key_from_format(event_key.id()), ApiEventAwardsController))
+        return cache_keys_and_controllers
+
+    @classmethod
+    def _get_event_district_points_cache_keys_and_controllers(cls, event_keys):
+        cache_keys_and_controllers = []
+        for event_key in filter(None, event_keys):
+            cache_keys_and_controllers.append((ApiEventDistrictPointsController.get_cache_key_from_format(event_key.id()), ApiEventDistrictPointsController))
         return cache_keys_and_controllers
 
     @classmethod
