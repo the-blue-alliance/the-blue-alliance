@@ -8,7 +8,7 @@ class MobileClient(ndb.Model):
     """
 
     messaging_id = ndb.StringProperty(required=True)
-    user_key = ndb.StringProperty(required=True)
+    operating_system = ndb.StringProperty(required=True)
 
     created = ndb.DateTimeProperty(auto_now_add=True)
 

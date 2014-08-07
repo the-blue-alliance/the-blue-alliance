@@ -1,4 +1,4 @@
-application: tba-dev-phil
+application: tbatv-dev-hrd
 version: 1-2
 runtime: python27
 api_version: 1
@@ -14,6 +14,8 @@ libraries:
   version: "1.2"
 - name: numpy
   version: "1.6.1"
+- name: endpoints
+  version: 1.0
 
 handlers:
 - url: /css
@@ -47,7 +49,7 @@ handlers:
   login: admin
 - url: /api/.*
   script: api_main.app
-- url: /mobile/.*
+- url: /_ah/spi/.* # Endpoints for internal mobile API
   script: mobile_main.app
 - url: .*
   script: main.app

@@ -1,40 +1,53 @@
+import logging
 import webapp2
+
+import endpoints
+from protorpc import remote
 
 import tba_config
 
-from controllers.mobile_controller import MobileRegistrationController, MobileTestMessageController, \
-                                          AddFavoriteController, RemoveFavoriteController, GetFavoritesController, \
-                                          MobileTokenUpdateController, MobileTokenDeleteController
+from helpers.gcm_helper import GCMHelper
+from models.favorite import Favorite
+from models.sitevar import Sitevar
+from models.mobile_api_messages import BaseResponse, RegistrationRequest
+from models.mobile_client import MobileClient
 
-app = webapp2.WSGIApplication([
-                                webapp2.Route(r'/mobile/register',
-                                MobileRegistrationController,
-                                methods=['POST']),
+client_id_sitevar = Sitevar.get_by_id('gcm.serverKey')
+if client_id_sitevar is None:
+    raise Exception("Sitevar gcm.serverKey is undefined. Can't process incoming requests")
+WEB_CLIENT_ID = str(client_id_sitevar.values_json)
+ANDROID_AUDIENCE = WEB_CLIENT_ID
 
-                                webapp2.Route(r'/mobile/favorites',
-                                GetFavoritesController,
-                                methods=['POST']),
+android_id_sitevar = Sitevar.get_by_id('android.clientId')
+if android_id_sitevar is None:
+    raise Exception("Sitevar android.clientId is undefined. Can't process incoming requests")
+ANDROID_CLIENT_ID = str(android_id_sitevar.values_json)
 
-                                webapp2.Route(r'/mobile/favorite/add',
-                                AddFavoriteController,
-                                methods=['POST']),
+# To enable iOS access to the API, add another variable for the iOS client ID
 
-                                webapp2.Route(r'/mobile/favorite/remove',
-                                RemoveFavoriteController,
-                                methods=['POST']),
+@endpoints.api(name='tbaMobile', version='v1',
+               allowed_client_ids=[WEB_CLIENT_ID, ANDROID_CLIENT_ID,
+                                   # To enable iOS addess, add its client ID here
+                                   endpoints.API_EXPLORER_CLIENT_ID],
+               audiences=[ANDROID_AUDIENCE],
+               scopes=[endpoints.EMAIL_SCOPE])
+class MobileAPI(remote.Service):
+    
+    @endpoints.method(RegistrationRequest, BaseResponse,
+                      path='register', http_method='POST',
+                      name='register')
+    def register_client(self, request):
+        gcmId = request.mobile_id
+        os = request.operating_system
+        if MobileClient.query( MobileClient.messaging_id==gcmId ).count() == 0:
+            # Record doesn't exist yet, so add it
+            MobileClient(   messaging_id = gcmId,
+                            operating_system = os ).put()        
+            logging.info("GCM KEY: "+gcmId)
+            logging.info("OS: "+os)
+            return BaseResponse(code=200, message="Registration successful")
+        else:
+            # Record already exists, don't bother updating it again
+            return BaseResponse(code=304, message="Client already exists")
 
-                                # ALL ENDPOINT BELOW THIS LINE ARE TESTS AND SHOULD BE REMOVED (eventually)
-
-                                webapp2.Route(r'/mobile/test_message',
-                                MobileTestMessageController,
-                                methods=['GET']),
-
-                                webapp2.Route(r'/mobile/update_token',
-                                MobileTokenUpdateController,
-                                methods=['GET']),
-
-                                webapp2.Route(r'/mobile/delete_token',
-                                MobileTokenDeleteController,
-                                methods=['GET'])
-
-                                ], debug=tba_config.DEBUG)
+app = endpoints.api_server([MobileAPI])
