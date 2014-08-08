@@ -37,14 +37,17 @@ class MobileAPI(remote.Service):
                       path='register', http_method='POST',
                       name='register')
     def register_client(self, request):
+        current_user = endpoints.get_current_user()
+        if current_user is None:
+            return BaseResponse(code=401, message="Unauthorized to register")
+        userId = current_user.user_id() 
         gcmId = request.mobile_id
         os = request.operating_system
         if MobileClient.query( MobileClient.messaging_id==gcmId ).count() == 0:
             # Record doesn't exist yet, so add it
             MobileClient(   messaging_id = gcmId,
+                            user_id = userId,
                             operating_system = os ).put()        
-            logging.info("GCM KEY: "+gcmId)
-            logging.info("OS: "+os)
             return BaseResponse(code=200, message="Registration successful")
         else:
             # Record already exists, don't bother updating it again
