@@ -1,15 +1,18 @@
+import endpoints
 import logging
 import webapp2
 
-import endpoints
+from google.appengine.ext import ndb
+
 from protorpc import remote
+from protorpc import message_types
 
 import tba_config
 
 from helpers.gcm_helper import GCMHelper
 from models.favorite import Favorite
 from models.sitevar import Sitevar
-from models.mobile_api_messages import BaseResponse, RegistrationRequest
+from models.mobile_api_messages import BaseResponse, FavoriteCollection, FavoriteMessage, RegistrationRequest
 from models.mobile_client import MobileClient
 
 client_id_sitevar = Sitevar.get_by_id('gcm.serverKey')
@@ -25,7 +28,7 @@ ANDROID_CLIENT_ID = str(android_id_sitevar.values_json)
 
 # To enable iOS access to the API, add another variable for the iOS client ID
 
-@endpoints.api(name='tbaMobile', version='v1',
+@endpoints.api(name='tbaMobile', version='v2', description="API for TBA Mobile clients",
                allowed_client_ids=[WEB_CLIENT_ID, ANDROID_CLIENT_ID,
                                    # To enable iOS addess, add its client ID here
                                    endpoints.API_EXPLORER_CLIENT_ID],
@@ -52,5 +55,56 @@ class MobileAPI(remote.Service):
         else:
             # Record already exists, don't bother updating it again
             return BaseResponse(code=304, message="Client already exists")
+
+    @endpoints.method(FavoriteMessage, BaseResponse,
+                      path='favorites/add', http_method='POST',
+                      name='favorites.add')
+    def add_favorite(self, request):
+        current_user = endpoints.get_current_user()
+        if current_user is None:
+            return BaseResponse(code=401, message="Unauthorized to add favorite")
+        userId = current_user.user_id()
+        modelKey = request.model_key
+
+        if Favorite.query( Favorite.user_id == userId, Favorite.model_key == modelKey).count() == 0:
+            # Favorite doesn't exist, add it
+            Favorite( user_id = userId, model_key = modelKey).put()
+            return BaseResponse(code=200, message="Favorite added")
+        else:
+            # Favorite already exists. Don't add it again
+            return BaseResponse(code=304, message="Favorite already exists")
+
+    @endpoints.method(FavoriteMessage, BaseResponse,
+                      path='favorites/remove', http_method='POST',
+                      name='favorites.remove')
+    def remove_favorite(self, request):
+        current_user = endpoints.get_current_user()
+        if current_user is None:
+            return BaseResponse(code=401, message="Unauthorized to remove favorite")
+        userId = current_user.user_id()
+        modelKey = request.model_key
+
+        to_delete = Favorite.query( Favorite.user_id == userId, Favorite.model_key == modelKey).fetch()
+        if len(to_delete) > 0:
+            ndb.delete_multi([m.key for m in to_delete])
+            return BaseResponse(code=200, message="Favorites deleted")
+        else:
+            # Favorite doesn't exist. Can't delete it
+            return BaseResponse(code=404, message="Favorite not found")
+
+    @endpoints.method(message_types.VoidMessage, FavoriteCollection,
+                      path='favorites/list', http_method='POST',
+                      name='favorites.list')
+    def list_favorites(self, request):
+        current_user = endpoints.get_current_user()
+        if current_user is None:
+            return FavoriteCollection(favorites = [])
+        userId = current_user.user_id()
+
+        favorites = Favorite.query( Favorite.user_id == userId ).fetch()
+        output = []
+        for favorite in favorites:
+            output.append(FavoriteMessage(model_key = favorite.model_key))
+        return FavoriteCollection(favorites = output)
 
 app = endpoints.api_server([MobileAPI])
