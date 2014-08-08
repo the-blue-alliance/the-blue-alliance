@@ -6,6 +6,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from base_controller import CacheableHandler
+from consts.district_type import DistrictType
 from helpers.match_helper import MatchHelper
 from helpers.award_helper import AwardHelper
 from helpers.team_helper import TeamHelper
@@ -52,12 +53,24 @@ class EventList(CacheableHandler):
 
         week_events = EventHelper.groupByWeek(events)
 
+        district_enums = set()
+        for event in events:
+            if event.event_district_enum is not None and event.event_district_enum != DistrictType.NO_DISTRICT:
+                district_enums.add(event.event_district_enum)
+
+        districts = []  # a tuple of (district abbrev, district name)
+        for district_enum in district_enums:
+            districts.append((DistrictType.type_abbrevs[district_enum],
+                              DistrictType.type_names[district_enum]))
+        districts = sorted(districts, key=lambda d: d[1])
+
         self.template_values.update({
             "events": events,
             "explicit_year": explicit_year,
             "selected_year": year,
             "valid_years": self.VALID_YEARS,
             "week_events": week_events,
+            "districts": districts,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/event_list.html')
@@ -123,6 +136,10 @@ class EventDetail(CacheableHandler):
 
         bracket_table = MatchHelper.generateBracket(matches, event.alliance_selections)
 
+        district_points_sorted = None
+        if event.district_points:
+            district_points_sorted = sorted(event.district_points['points'].items(), key=lambda (team, points): -points['total'])
+
         self.template_values.update({
             "event": event,
             "matches": matches,
@@ -134,6 +151,7 @@ class EventDetail(CacheableHandler):
             "num_teams": num_teams,
             "oprs": oprs,
             "bracket_table": bracket_table,
+            "district_points_sorted": district_points_sorted,
         })
 
         if event.within_a_day:

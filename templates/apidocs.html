@@ -44,6 +44,15 @@
                 <li><a class="smooth-scroll" href="#event-stats-request">Event Stats Request</a></li>
                 <li><a class="smooth-scroll" href="#event-rankings-request">Event Rankings Request</a></li>
                 <li><a class="smooth-scroll" href="#event-awards-request">Event Awards Request</a></li>
+                <li><a class="smooth-scroll" href="#event-points-request">Event District Points Request</a></li>
+              </ul>
+            </li>
+            <li>
+              <a class="smooth-scroll" href="#district-requests">District Requests</a>
+              <ul class="nav hide">
+                <li><a class="smooth-scroll" href="#district-list-request">District List Request</a></li>
+                <li><a class="smooth-scroll" href="#district-events-request">District Events Request</a></li>
+                <li><a class="smooth-scroll" href="#district-rankings-request">District Rankings Request</a></li>
               </ul>
             </li>
           </ul>
@@ -263,6 +272,11 @@
             <td>If we have alliance selection data for this event, this contains a JSON array of the alliances. The captain is the first team, followed by their picks, in order.</td>
             <td></td>
           </tr>
+          <tr>
+            <td>district_points</td>
+            <td>If this event is part of a district, this contains the number and breakdown of points that each team attending earned.</td>
+            <td></td>
+          </tr>
         </tbody>
       </table>
 
@@ -350,6 +364,11 @@
             <td>name</td>
             <td>The name of the award from TIMS. May vary for the same award type.</td>
             <td>Engineering Inspiration</td>
+          </tr>
+          <tr>
+            <td>award_type</td>
+            <td>An integer that represents the award type as a constant.</td>
+            <td><a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/award_type.py#L15">List of constants to award type</a></td>
           </tr>
           <tr>
             <td>event_key</td>
@@ -1055,6 +1074,192 @@
         </div>
       </div>
 
+    <h3 id="event-points-request">Event District Points Request</h3>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;/district_points</code>
+      </p>
+      <table class=table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>event key</td>
+            <td>TBA event key with the format <code>yyyy[EVENT_CODE]</code>,
+            where yyyy is the year, and EVENT_CODE is the
+            <a href="https://docs.google.com/spreadsheet/ccc?key=0ApRO2Yzh2z01dExFZEdieV9WdTJsZ25HSWI3VUxsWGc">event code</a>
+            of the event.</td>
+            <td>2010sc</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_event_points_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="6"
+              id="example_event_points_request" type="text" value="/api/v2/event/2014cthar/district_points">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group">
+            <pre class="event-points-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+    
+      <h2 id="district-requests">District Requests</h2>
+      <h3 id="district-list-request">District List Request</h3>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/districts/&lt;year&gt;</code>
+      </p>
+      <table class=table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Year</td>
+            <td>The year you want data for</td>
+            <td>2014</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_district_list_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="6"
+              id="example_district_list_request" type="text" value="/api/v2/districts/2014">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group">
+            <pre class="district-list-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+      
+      <h3 id="district-events-request">District Events Request</h3>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/district/&lt;district short&gt;/&lt;year&gt;/events</code>
+      </p>
+      <table class=table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>district short</td>
+            <td>The district abbreviation you want data for, as defined <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/district_type.py#L38">here</a>
+            <td>ne</td>
+          </tr>
+          <tr>
+            <td>Year</td>
+            <td>The year you want data for</td>
+            <td>2014</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_district_events_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="6"
+              id="example_district_events_request" type="text" value="/api/v2/district/ne/2014/events">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group">
+            <pre class="district-events-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+      
+      <h3 id="district-rankings-request">District Rankings Request</h3>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/district/&lt;district short&gt;/&lt;year&gt;/rankings</code>
+      </p>
+      <table class=table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>district short</td>
+            <td>The district abbreviation you want data for, as defined <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/district_type.py#L38">here</a>
+            <td>ne</td>
+          </tr>
+          <tr>
+            <td>Year</td>
+            <td>The year you want data for</td>
+            <td>2014</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_district_rankings_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="6"
+              id="example_district_rankings_request" type="text" value="/api/v2/district/ne/2014/rankings">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group">
+            <pre class="district-rankings-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+
   </div>
 </div>
 {% endblock %}
@@ -1281,6 +1486,70 @@
       },
       error: function(data) {
         $(".event-awards-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+  $("#example_event_points_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".event-points-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_event_points_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-event-points-request:v01'},
+      success: function(data) {
+        $(".event-points-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".event-points-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+  $("#example_district_list_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".district-list-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_district_list_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-district-list-request:v01'},
+      success: function(data) {
+        $(".district-list-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".district-list-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+  $("#example_district_events_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".district-events-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_district_events_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-district-events-request:v01'},
+      success: function(data) {
+        $(".district-events-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".district-events-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+  $("#example_district_rankings_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".district-rankings-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_district_rankings_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-district-rankings-request:v01'},
+      success: function(data) {
+        $(".district-rankings-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".district-rankings-request-json").html('Something went wrong! Please check for correct request format.');
       }
     });
   });

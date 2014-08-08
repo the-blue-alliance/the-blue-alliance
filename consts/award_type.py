@@ -82,3 +82,11 @@ class AwardType(object):
     BLUE_BANNER_AWARDS = {CHAIRMANS, WINNER}
     INDIVIDUAL_AWARDS = {WOODIE_FLOWERS, DEANS_LIST, VOLUNTEER, FOUNDERS,
                          BART_KAMEN_MEMORIAL, MAKE_IT_LOUD}
+    NON_JUDGED_NON_TEAM_AWARDS = {  # awards not used in the district point model
+        HIGHEST_ROOKIE_SEED,
+        WOODIE_FLOWERS,
+        DEANS_LIST,
+        VOLUNTEER,
+        WINNER,
+        FINALIST,
+    }

@@ -19,10 +19,25 @@ class DistrictType(object):
         PACIFIC_NORTHWEST: 'Pacific Northwest',
     }
 
+    type_abbrevs = {
+        NO_DISTRICT: None,
+        MICHIGAN: 'fim',
+        MID_ATLANTIC: 'mar',
+        NEW_ENGLAND: 'ne',
+        PACIFIC_NORTHWEST: 'pnw',
+    }
+
     # Names used on the FIRST website
     names = {
         'FIRST in Michigan': MICHIGAN,
         'Mid-Atlantic Robotics': MID_ATLANTIC,
         'New England': NEW_ENGLAND,
         'Pacific Northwest': PACIFIC_NORTHWEST,
+    }
+
+    abbrevs = {
+        'fim': MICHIGAN,
+        'mar': MID_ATLANTIC,
+        'ne': NEW_ENGLAND,
+        'pnw': PACIFIC_NORTHWEST,
     }

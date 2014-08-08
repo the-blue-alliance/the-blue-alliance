@@ -8,6 +8,7 @@ from google.appengine.ext import ndb
 from controllers.api.api_base_controller import ApiBaseController
 
 from helpers.award_helper import AwardHelper
+from helpers.district_helper import DistrictHelper
 from helpers.model_to_dict import ModelToDict
 
 from models.event import Event
@@ -128,7 +129,7 @@ class ApiEventRankingsController(ApiEventController):
 
 class ApiEventAwardsController(ApiEventController):
     CACHE_KEY_FORMAT = "apiv2_event_awards_controller_{}"  # (event_key)
-    CACHE_VERSION = 1
+    CACHE_VERSION = 3
     CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
@@ -144,6 +145,23 @@ class ApiEventAwardsController(ApiEventController):
         award_dicts = [ModelToDict.awardConverter(award) for award in AwardHelper.organizeAwards(self.event.awards)]
         return json.dumps(award_dicts, ensure_ascii=True)
 
+class ApiEventDistrictPointsController(ApiEventController):
+    CACHE_KEY_FORMAT = "apiv2_event_district_points_controller_{}"  # (event_key)
+    CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
+
+    def __init__(self, *args, **kw):
+        super(ApiEventDistrictPointsController, self).__init__(*args, **kw)
+        self.partial_cache_key = self.CACHE_KEY_FORMAT.format(self.event_key)
+
+    def _track_call(self, event_key):
+        self._track_call_defer('event/district_points', event_key)
+    
+    def _render(self, event_key):
+        self._set_event(event_key)
+
+        points = DistrictHelper.calculate_event_points(self.event)
+        return json.dumps(points, ensure_ascii=True)
 
 class ApiEventListController(ApiBaseController):
     CACHE_KEY_FORMAT = "apiv2_event_list_controller_{}"  # (year)

@@ -11,15 +11,21 @@ var GamedayFrame = React.createClass({
   getInitialState: function() {
     return {
       chatEnabled: false,
-      events: [],
       displayedEvents: [],
+      events: [],
+      followingTeams: [177,230],
       hashtagEnabled: false,
     };
   },
   componentWillMount: function() {
-    //this.loadDataFromServer();
-    //setInterval(this.loadDataFromServer, this.props.pollInterval);
     this.setState({events: this.props.events});
+    this.setInitialState();
+  },
+  setInitialState: function() {
+    this.setState({
+      displayedEvents: this.props.events,
+      hashtagEnabled: true,
+    });
   },
   render: function() {
     return (
@@ -38,11 +44,19 @@ var GamedayFrame = React.createClass({
           rightPanelEnabled={this.state.chatEnabled}
           leftPanelEnabled={this.state.hashtagEnabled} />
         <ChatPanel enabled={this.state.chatEnabled} />
+        <FollowingTeamsModal
+          followingTeams={this.state.followingTeams}
+          onFollowTeam={this.handleFollowTeam}
+          onUnfollowTeam={this.handleUnfollowTeam} />
       </div>
     );
   },
   handleChatToggle: function() {
     this.setState({chatEnabled: !this.state.chatEnabled});
+  },
+  handleFollowTeam: function(team) {
+    var newFollowingTeams = this.state.followingTeams.concat([team]);
+    this.setState({followingTeams: newFollowingTeams})
   },
   handleHashtagToggle: function() {
     this.setState({hashtagEnabled: !this.state.hashtagEnabled});
@@ -51,6 +65,12 @@ var GamedayFrame = React.createClass({
     var displayedEvents = this.state.displayedEvents;
     var newDisplayedEvents = displayedEvents.concat([eventModel]);
     this.setState({displayedEvents: newDisplayedEvents});
+  },
+  handleUnfollowTeam: function(team) {
+    var newFollowingTeams = this.state.followingTeams.filter(function(a) {
+      return a != team
+    });
+    this.setState({followingTeams: newFollowingTeams});
   },
   handleWebcastReset: function() {
     this.setState({displayedEvents: []});
@@ -73,30 +93,21 @@ var GamedayNavbar = React.createClass({
 
         <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul className="nav navbar-nav navbar-right">
-            <li className="dropdown">
-              <a href="#" className="dropdown-toggle" data-toggle="dropdown">Layouts <b className="caret"></b></a>
-              <ul className="dropdown-menu">
-                <li><a href="#">First</a></li>
-                <li><a href="#">Second</a></li>
-                <li><a href="#">Third</a></li>
-                <li className="divider"></li>
-                <li><a href="#">Separated link</a></li>
-              </ul>
-            </li>
             <WebcastDropdown
               events={this.props.events}
               onWebcastAdd={this.props.onWebcastAdd}
               onWebcastReset={this.props.onWebcastReset} />
             <li>
               <BootstrapButton
-                active={this.props.chatEnabled}
-                handleClick={this.props.onChatToggle}>Chat</BootstrapButton>
+                active={this.props.hashtagEnabled}
+                handleClick={this.props.onHashtagToggle}>Hashtags</BootstrapButton>
             </li>
             <li>
               <BootstrapButton
-                active={this.props.hashtagEnabled}
-                handleClick={this.props.onHashtagToggle}>Hashtags</BootstrapButton></li>
-            <li><a href="#">Settings</a></li>
+                active={this.props.chatEnabled}
+                handleClick={this.props.onChatToggle}>Chat</BootstrapButton>
+            </li>
+            <SettingsDropdown />
           </ul>
         </div>
       </nav>
@@ -178,38 +189,9 @@ var BootstrapButton = React.createClass({
 });
 
 var VideoGrid = React.createClass({
-  render: function() {
-    var cx = React.addons.classSet;
-    var classes = cx({
-      'videoGrid': true,
-      'leaveLeftMargin': this.props.leftPanelEnabled,
-      'leaveRightMargin': this.props.rightPanelEnabled,
-    });
-    switch (this.props.events.length) {
-      case 0:
-        var layout = <VideoCellLayoutZero />
-        break;
-      case 1:
-        var layout = <VideoCellLayoutOne events={this.props.events} />
-        break;
-      case 2:
-        var layout = <VideoCellLayoutTwo events={this.props.events} />
-        break;
-      case 3:
-        var layout = <VideoCellLayoutThree events={this.props.events} />
-        break;
-    }
+  renderLayoutZero: function(classes) {
     return (
       <div className={classes}>
-        {layout}
-      </div>
-    );
-  },
-});
-
-var VideoCellLayoutZero = React.createClass({
-  render: function() {
-    return (
         <div className="row">
           <div className="col-md-12">
             <div className="panel panel-default">
@@ -222,57 +204,58 @@ var VideoCellLayoutZero = React.createClass({
             </div>   
           </div>
         </div>
-      );
-  }
-});
-
-var VideoCellLayoutOne = React.createClass({
-  render: function() {
+      </div>
+    );
+  },
+  renderLayoutOne: function(classes) {
     if (this.props.events) {
       var eventModel = this.props.events[0];
     } else {
       var eventModel = null;
     }
     return (
+      <div className={classes}>
         <div className="row">
           <div className="col-md-12">      
             <VideoCell
+              key={this.props.events[0].event_name}
               eventModel={eventModel}
               vidHeight="100%"
               vidWidth="100%" />
           </div>
         </div>
-      );
-  }
-});
-
-var VideoCellLayoutTwo = React.createClass({
-  render: function() {
+      </div>
+    );
+  },
+  renderLayoutTwo: function(classes) {
     return (
+      <div className={classes}>
         <div className="row">
           <div className="col-md-6">
             <VideoCell
+              key={this.props.events[0].event_name}
               eventModel={this.props.events[0]}
               vidHeight="100%"
               vidWidth="100%" />
           </div>
           <div className="col-md-6">
             <VideoCell
+              key={this.props.events[1].event_name}
               eventModel={this.props.events[1]}
               vidHeight="100%"
               vidWidth="100%" />
           </div>
         </div>
-      );
-  }
-});
-
-var VideoCellLayoutThree = React.createClass({
-  render: function() {
+      </div>
+    );
+  },
+  renderLayoutThree: function(classes) {
     return (
+      <div className={classes}>
         <div className="row">
           <div className="col-md-6">
             <VideoCell
+              key={this.props.events[0].event_name}
               eventModel={this.props.events[0]}
               vidHeight="100%"
               vidWidth="100%" />
@@ -281,6 +264,7 @@ var VideoCellLayoutThree = React.createClass({
             <div className="row">
               <div className="col-md-12">
                 <VideoCell
+                  key={this.props.events[1].event_name}
                   eventModel={this.props.events[1]}
                   vidHeight="50%"
                   vidWidth="100%" />
@@ -289,6 +273,7 @@ var VideoCellLayoutThree = React.createClass({
             <div className="row">
               <div className="col-md-12">
                 <VideoCell
+                  key={this.props.events[2].event_name}
                   eventModel={this.props.events[2]}
                   vidHeight="50%"
                   vidWidth="100%" />
@@ -296,8 +281,27 @@ var VideoCellLayoutThree = React.createClass({
             </div>
           </div>
         </div>
-      );
-  }
+      </div>
+    );
+  },
+  render: function() {
+    var cx = React.addons.classSet;
+    var classes = cx({
+      'videoGrid': true,
+      'leaveLeftMargin': this.props.leftPanelEnabled,
+      'leaveRightMargin': this.props.rightPanelEnabled,
+    });
+    switch (this.props.events.length) {
+      case 0:
+        return this.renderLayoutZero(classes);
+      case 1:
+        return this.renderLayoutOne(classes);
+      case 2:
+        return this.renderLayoutTwo(classes);
+      case 3:
+        return this.renderLayoutThree(classes);
+    }
+  },
 });
 
 var VideoCell = React.createClass({
@@ -423,11 +427,29 @@ var WebcastDropdown = React.createClass({
     };
     return (
       <li className="dropdown">
-        <a href="#" className="dropdown-toggle" data-toggle="dropdown">Webcasts <b className="caret"></b></a>
+        <a href="#" className="dropdown-toggle" data-toggle="dropdown">Add Webcasts <b className="caret"></b></a>
         <ul className="dropdown-menu">
           {webcastListItems}
           <li className="divider"></li>
           <BootstrapNavDropdownListItem handleClick={this.props.onWebcastReset}>Reset Webcasts</BootstrapNavDropdownListItem>
+        </ul>
+      </li>
+    );    
+  }
+})
+
+var SettingsDropdown = React.createClass({
+  render: function() {
+    return (
+      <li className="dropdown">
+        <a href="#" className="dropdown-toggle" data-toggle="dropdown"><span className="glyphicon glyphicon-cog"></span></a>
+        <ul className="dropdown-menu">
+          <BootstrapNavDropdownListItem
+            data_toggle="modal"
+            data_target="#followingTeamsModal">Follow Teams</BootstrapNavDropdownListItem>
+          <li className="divider"></li>
+          <BootstrapNavDropdownListItem>Debug Menu</BootstrapNavDropdownListItem>
+          <BootstrapNavDropdownListItem>TODO Show Beeper</BootstrapNavDropdownListItem>
         </ul>
       </li>
     );    
@@ -439,7 +461,7 @@ var WebcastListItem = React.createClass({
     this.props.onWebcastAdd(this.props.eventModel);
   },
   render: function() {
-    return <BootstrapNavDropdownListItem handleClick={this.handleClick}>{this.props.eventModel.name}</BootstrapNavDropdownListItem>
+    return <BootstrapNavDropdownListItem handleClick={this.handleClick}>{this.props.eventModel.event_name}</BootstrapNavDropdownListItem>
   },
 })
 
@@ -457,20 +479,74 @@ var BootstrapNavDropdownListItem = React.createClass({
   },
   render: function() {
     return (
-      <li><a href="{this.props.a}" onClick={this.handleClick}>{this.props.children}</a></li>
+      <li data-toggle={this.props.data_toggle} data-target={this.props.data_target}><a href={this.props.a} onClick={this.handleClick}>{this.props.children}</a></li>
     )
   },
 })
 
-var events = [
-  {"key": "2014nh", "name": "BAE Granite State", "webcast": [{"type": "youtube", "channel": "olhwB5grOtA"}]},
-  {"key": "2014ct", "name": "UTC Regional", "webcast": [{"type": "youtube", "channel": "FKpIWmsDPq4"}]},
-  {"key": "2014az", "name": "Arizona!", "webcast": [{"type": "youtube", "channel": "QZv70PG9eXM"}]}
-]
+var FollowingTeamListItems = React.createClass({
+  unfollowTeam: function() {
+    this.props.onUnfollowTeam(this.props.team)
+  },
+  render: function() {
+    return (
+      <li>
+        {this.props.team} 
+        <a href="#" onClick={this.unfollowTeam}>&times;</a>
+      </li>
+    );
+  }
+})
 
-var webcast_data = $.parseJSON($("#webcast_data").text().replace(/(u)*\'/g,'\"'));
+var FollowingTeamsModal = React.createClass({
+  followTeam: function() {
+    this.props.onFollowTeam(177)
+  },
+  render: function() {
+    var followingTeamListItems = [];
+    for (var index in this.props.followingTeams) {
+      followingTeamListItems.push(
+        <FollowingTeamListItems
+          team={this.props.followingTeams[index]}
+          onUnfollowTeam={this.props.onUnfollowTeam} />
+        );
+    };
+    return (
+      <div className="modal fade" id="followingTeamsModal" tabindex="-1" role="dialog" aria-labelledby="#followingTeamsModal" aria-hidden="true">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <button type="button" className="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span className="sr-only">Close</span></button>
+              <h4 className="modal-title" id="followingTeamsModalLabel">Following Teams</h4>
+            </div>
+            <div className="modal-body">
+              <p>You can follow teams to get alerts about them.</p>
+              <div className="input-group">
+                <input className="form-control" type="text" placeholder="Team Number"></input>
+                <span className="input-group-btn">
+                  <a onClick={this.followTeam} href="#" className="btn btn-primary"><span className="glyphicon glyphicon-plus-sign"></span></a>
+                </span>
+              </div>
+              <hr></hr>
+              <h4>Following</h4>
+              <ul>{followingTeamListItems}</ul>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-primary" data-dismiss="modal">Done</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );    
+  }
+})
+
+
+// [{'webcasts': [{u'channel': u'6540154', u'type': u'ustream'}], 'event_name': u'Present Test Event', 'event_key': u'2014testpresent'}]
+
+var events_with_webcasts = $.parseJSON($("#events_with_webcasts").text().replace(/u'/g,'\'').replace(/'/g,'"'));
 
 React.renderComponent(
-  <GamedayFrame events={webcast_data} pollInterval={20000} />,
+  <GamedayFrame events={events_with_webcasts} pollInterval={20000} />,
   document.getElementById('content')
 );

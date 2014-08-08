@@ -9,7 +9,6 @@ from controllers.base_controller import LoggedInHandler
 from helpers.event.event_webcast_adder import EventWebcastAdder
 from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
 
-
 from models.event import Event
 from models.suggestion import Suggestion
 
@@ -25,10 +24,21 @@ class AdminEventWebcastSuggestionsReviewController(LoggedInHandler):
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
             Suggestion.target_model == "event")
 
+        suggestions_by_event_key = {}
+        for suggestion in suggestions:
+            suggestions_by_event_key.setdefault(suggestion.target_key, []).append(suggestion)
+
+        suggestion_sets = []
+        for event_key, suggestions in suggestions_by_event_key.items():
+            suggestion_sets.append({
+                "event": Event.get_by_id(event_key),
+                "suggestions": suggestions
+                })
+
         self.template_values.update({
             "event_key": self.request.get("event_key"),
             "success": self.request.get("success"),
-            "suggestions": suggestions,
+            "suggestion_sets": suggestion_sets
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../../templates/admin/event_webcast_suggestion_list.html')
@@ -68,6 +78,22 @@ class AdminEventWebcastSuggestionsReviewController(LoggedInHandler):
 
             self.redirect("/admin/suggestions/event/webcast/review?success=reject")
             return
+
+        elif self.request.get("verdict") == "reject_all":
+            suggestion_keys = self.request.get("suggestion_keys").split(",")
+
+            suggestions = [Suggestion.get_by_id(int(suggestion_key)) for suggestion_key in suggestion_keys]
+
+            for suggestion in suggestions:
+                event_key = suggestion.target_key
+                suggestion.review_state = Suggestion.REVIEW_REJECTED
+                suggestion.reviewer = self.user_bundle.account.key
+                suggestion.reviewer_at = datetime.datetime.now()
+                suggestion.put()
+
+            self.redirect("/admin/suggestions/event/webcast/review?success=reject_all&event_key=%s" % event_key)
+            return
+
 
         self.redirect("/admin/suggestions/event/webcast/review")
 

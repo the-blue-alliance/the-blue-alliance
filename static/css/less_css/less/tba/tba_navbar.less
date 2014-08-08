@@ -86,7 +86,7 @@
 .social-icons {
   max-height: @social-icon-size;
   padding: 0;
-  margin-top: (@navbar-height - @social-icon-size)/2;
+  margin-top: (@navbar-height - @social-icon-size)/2 + 2;
   float: right;
 
   @media (min-width: @screen-sm-min) and (max-width: @screen-sm-max) {
@@ -101,9 +101,10 @@
   }
 }
 
-.socialIcon {
+.social-icons i {
   width: @social-icon-size;
   height: @social-icon-size;
+  color: white;
   display: inline-block;
   margin: 0 4px 0px 4px;
   background-repeat: no-repeat;
@@ -114,23 +115,4 @@
     text-align: center;
     float: none;
   }
-}
-
-#facebook {
-  background-image: url('/images/icons/tba-sprite.png');
-  background-position: -10px -10px;
-}
-
-#instagram {
-  background-image: url('/images/icons/instagram-24x24.png');
-}
-
-#twitter {
-  background-image: url('/images/icons/tba-sprite.png');
-  background-position: -10px -54px;
-}
-
-#tumblr {
-  background-image: url('/images/icons/tba-sprite.png');
-  background-position: -10px -98px;
 }

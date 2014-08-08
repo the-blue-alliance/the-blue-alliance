@@ -6,12 +6,14 @@ import tba_config
 from controllers.api_controller import ApiEventsShow, ApiTeamDetails, ApiTeamsShow, \
                                        ApiEventList, ApiEventDetails, ApiMatchDetails, \
                                        CsvTeamsAll
+from controllers.api.api_district_controller import ApiDistrictListController, ApiDistrictEventsController, ApiDistrictRankingsController
 from controllers.api.api_team_controller import ApiTeamController, ApiTeamEventsController, ApiTeamEventAwardsController, \
                                                 ApiTeamEventMatchesController, ApiTeamMediaController, ApiTeamListController, \
                                                 ApiTeamYearsParticipatedController
 from controllers.api.api_event_controller import ApiEventController, ApiEventTeamsController, \
                                                  ApiEventMatchesController, ApiEventStatsController, \
-                                                 ApiEventRankingsController, ApiEventAwardsController, ApiEventListController
+                                                 ApiEventRankingsController, ApiEventAwardsController, \
+                                                 ApiEventDistrictPointsController, ApiEventListController
 from controllers.api.api_trusted_controller import ApiTrustedEventAllianceSelectionsUpdate, ApiTrustedEventAwardsUpdate, \
                                                    ApiTrustedEventMatchesUpdate, ApiTrustedEventRankingsUpdate, \
                                                    ApiTrustedEventTeamListUpdate, ApiTrustedAddMatchYoutubeVideo
@@ -69,8 +71,20 @@ app = webapp2.WSGIApplication([('/api/v1/team/details', ApiTeamDetails),
                                webapp2.Route(r'/api/v2/event/<event_key:>/awards',
                                             ApiEventAwardsController,
                                             methods=['GET']),
+                               webapp2.Route(r'/api/v2/event/<event_key:>/district_points',
+                                            ApiEventDistrictPointsController,
+                                            methods=['GET']),
                                webapp2.Route(r'/api/v2/events/<year:([0-9]*)>',
                                              ApiEventListController,
+                                             methods=['GET']),
+                               webapp2.Route(r'/api/v2/districts/<year:([0-9]*)>',
+                                             ApiDistrictListController,
+                                             methods=['GET']),
+                               webapp2.Route(r'/api/v2/district/<district_abbrev:>/<year:([0-9]*)>/events',
+                                             ApiDistrictEventsController,
+                                             methods=['GET']),
+                               webapp2.Route(r'/api/v2/district/<district_abbrev:>/<year:([0-9]*)>/rankings',
+                                             ApiDistrictRankingsController,
                                              methods=['GET']),
                                webapp2.Route(r'/api/trusted/v1/event/<event_key:>/alliance_selections/update',
                                              ApiTrustedEventAllianceSelectionsUpdate,

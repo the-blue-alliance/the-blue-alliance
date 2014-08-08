@@ -121,7 +121,7 @@ class TbaCSVRestoreEventsEnqueue(webapp.RequestHandler):
     """
     def get(self, year=None):
         if tba_config.CONFIG["env"] == "prod":  # disable in prod for now
-            logging.error("Tried to restore {} from CSV in prod! No can do.".format(event_key))
+            logging.error("Tried to restore events from CSV for year {} in prod! No can do.".format(year))
             return
 
         if year is None:

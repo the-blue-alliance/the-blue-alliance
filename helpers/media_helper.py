@@ -93,7 +93,14 @@ class MediaParser(object):
         # parse html for the image url
         soup = BeautifulSoup(html,
                              convertEntities=BeautifulSoup.HTML_ENTITIES)
-        element = soup.find('a', {'target': 'cdmLargePic'})
+
+        # 2014-07-15: CD doesn't properly escape the photo title, which breaks the find() for cdmLargePic element below
+        # Fix by removing all instances of the photo title from the HTML
+        photo_title = soup.find('div', {'id': 'cdm_single_photo_title'}).text
+        cleaned_soup = BeautifulSoup(html.replace(photo_title, ''),
+                             convertEntities=BeautifulSoup.HTML_ENTITIES)
+
+        element = cleaned_soup.find('a', {'target': 'cdmLargePic'})
         if element is not None:
             partial_url = element['href']
         else:
