@@ -12,7 +12,9 @@ import tba_config
 from helpers.gcm_helper import GCMHelper
 from models.favorite import Favorite
 from models.sitevar import Sitevar
-from models.mobile_api_messages import BaseResponse, FavoriteCollection, FavoriteMessage, RegistrationRequest
+from models.subscription import Subscription
+from models.mobile_api_messages import BaseResponse, FavoriteCollection, FavoriteMessage, RegistrationRequest, \
+                                       SubscriptionCollection, SubscriptionMessage
 from models.mobile_client import MobileClient
 
 client_id_sitevar = Sitevar.get_by_id('gcm.serverKey')
@@ -28,7 +30,7 @@ ANDROID_CLIENT_ID = str(android_id_sitevar.values_json)
 
 # To enable iOS access to the API, add another variable for the iOS client ID
 
-@endpoints.api(name='tbaMobile', version='v2', description="API for TBA Mobile clients",
+@endpoints.api(name='tbaMobile', version='v4', description="API for TBA Mobile clients",
                allowed_client_ids=[WEB_CLIENT_ID, ANDROID_CLIENT_ID,
                                    # To enable iOS addess, add its client ID here
                                    endpoints.API_EXPLORER_CLIENT_ID],
@@ -106,5 +108,57 @@ class MobileAPI(remote.Service):
         for favorite in favorites:
             output.append(FavoriteMessage(model_key = favorite.model_key))
         return FavoriteCollection(favorites = output)
+
+    @endpoints.method(SubscriptionMessage, BaseResponse,
+                      path='subscriptions/add', http_method='POST',
+                      name='subscriptions.add')
+    def add_subscription(self, request):
+        current_user = endpoints.get_current_user()
+        if current_user is None:
+            return BaseResponse(code=401, message="Unauthorized to add subscription")
+        userId = current_user.user_id()
+        modelKey = request.model_key
+
+        if Subscription.query( Subscription.user_id == userId, Subscription.model_key == modelKey).count() == 0:
+            # Subscription doesn't exist, add it
+            Subscription( user_id = userId, model_key = modelKey).put()
+            return BaseResponse(code=200, message="Subscription added")
+        else:
+            # Subscription already exists. Don't add it again
+            return BaseResponse(code=304, message="Subscription already exists")
+
+    @endpoints.method(SubscriptionMessage, BaseResponse,
+                      path='subscriptions/remove', http_method='POST',
+                      name='subscriptions.remove')
+    def remove_subscription(self, request):
+        current_user = endpoints.get_current_user()
+        if current_user is None:
+            return BaseResponse(code=401, message="Unauthorized to remove subscription")
+        userId = current_user.user_id()
+        modelKey = request.model_key
+
+        to_delete = Subscription.query( Subscription.user_id == userId, Subscription.model_key == modelKey).fetch()
+        if len(to_delete) > 0:
+            ndb.delete_multi([m.key for m in to_delete])
+            return BaseResponse(code=200, message="Subscriptions deleted")
+        else:
+            # Subscription doesn't exist. Can't delete it
+            return BaseResponse(code=404, message="Subscription not found")
+
+    @endpoints.method(message_types.VoidMessage, SubscriptionCollection,
+                      path='subscriptions/list', http_method='POST',
+                      name='subscriptions.list')
+    def list_subscriptions(self, request):
+        current_user = endpoints.get_current_user()
+        if current_user is None:
+            return SubscriptionCollection(subscriptions = [])
+        userId = current_user.user_id()
+
+        subscriptions = Subscription.query( Subscription.user_id == userId ).fetch()
+        output = []
+        for subscription in subscriptions:
+            output.append(SubscriptionMessage(model_key = subscription.model_key))
+        return SubscriptionCollection(subscriptions = output)
+
 
 app = endpoints.api_server([MobileAPI])
