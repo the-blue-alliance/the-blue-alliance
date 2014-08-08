@@ -13,7 +13,7 @@ from controllers.main_controller import ContactHandler, HashtagsHandler, \
       MainKickoffHandler, MainBuildseasonHandler, MainChampsHandler, MainCompetitionseasonHandler, \
       MainInsightsHandler, MainOffseasonHandler, OprHandler, SearchHandler, \
       AboutHandler, ThanksHandler, PageNotFoundHandler, \
-      GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler
+      GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler, ApiWriteHandler
 from controllers.match_controller import MatchDetail
 from controllers.district_controller import DistrictDetail
 from controllers.suggestions.suggest_match_video_controller import SuggestMatchVideoController
@@ -47,6 +47,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/account/edit', AccountEdit, 'account-edit', strict_slash=True),
       RedirectRoute(r'/account/register', AccountRegister, 'account-register', strict_slash=True),
       RedirectRoute(r'/apidocs', ApiDocumentationHandler, 'api-documentation', strict_slash=True),
+      RedirectRoute(r'/apiwrite', ApiWriteHandler, 'api-write', strict_slash=True),
       RedirectRoute(r'/contact', ContactHandler, 'contact', strict_slash=True),
       RedirectRoute(r'/event/<event_key>', EventDetail, 'event-detail', strict_slash=True),
       RedirectRoute(r'/event/<event_key>/feed', EventRss, 'event-rss', strict_slash=True),

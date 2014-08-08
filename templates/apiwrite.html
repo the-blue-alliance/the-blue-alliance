@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance - API Docs{% endblock %}
+
+{% block meta_description %}Interface to update events using The Blue Alliance's write API.{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-3 col-lg-2">
+      <div class="tba-sidenav-affixed">
+        <div class="tba-sidebar">
+          <ul class="nav tba-sidenav">
+            <li><a class="smooth-scroll" href="#overview">Overview</a></li>
+            <li>
+              <a class="smooth-scroll" href="#models">Models</a>
+              <ul class="nav hide">
+                <li><a class="smooth-scroll" href="#team-model">Team Model</a></li>
+                <li><a class="smooth-scroll" href="#event-model">Event Model</a></li>
+                <li><a class="smooth-scroll" href="#match-model">Match Model</a></li>
+                <li><a class="smooth-scroll" href="#award-model">Award Model</a></li>
+                <li><a class="smooth-scroll" href="#media-model">Media Model</a></li>
+              </ul>
+            </li>
+            <li>
+              <a class="smooth-scroll" href="#team-requests">Team Requests</a>
+              <ul class="nav hide">
+                <li><a class="smooth-scroll" href="#team-list-request">Team List Request</a></li>
+                <li><a class="smooth-scroll" href="#team-request">Team Request</a></li>
+                <li><a class="smooth-scroll" href="#team-events-request">Team Events Request</a></li>
+                <li><a class="smooth-scroll" href="#team-event-awards-request">Team Event Awards Request</a></li>
+                <li><a class="smooth-scroll" href="#team-event-matches-request">Team Event Matches Request</a></li>
+                <li><a class="smooth-scroll" href="#team-years-participated-request">Team Years Participated Request</a></li>
+                <li><a class="smooth-scroll" href="#team-media-request">Team Media Request</a></li>
+              </ul>
+            </li>
+            <li>
+              <a class="smooth-scroll" href="#event-requests">Event Requests</a>
+              <ul class="nav hide">
+                <li><a class="smooth-scroll" href="#event-list-request">Event List Request</a></li>
+                <li><a class="smooth-scroll" href="#event-request">Event Request</a></li>
+                <li><a class="smooth-scroll" href="#event-teams-request">Event Teams Request</a></li>
+                <li><a class="smooth-scroll" href="#event-matches-request">Event Matches Request</a></li>
+                <li><a class="smooth-scroll" href="#event-stats-request">Event Stats Request</a></li>
+                <li><a class="smooth-scroll" href="#event-rankings-request">Event Rankings Request</a></li>
+                <li><a class="smooth-scroll" href="#event-awards-request">Event Awards Request</a></li>
+                <li><a class="smooth-scroll" href="#event-points-request">Event District Points Request</a></li>
+              </ul>
+            </li>
+            <li>
+              <a class="smooth-scroll" href="#district-requests">District Requests</a>
+              <ul class="nav hide">
+                <li><a class="smooth-scroll" href="#district-list-request">District List Request</a></li>
+                <li><a class="smooth-scroll" href="#district-events-request">District Events Request</a></li>
+                <li><a class="smooth-scroll" href="#district-rankings-request">District Rankings Request</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-9 col-lg-10">
+      <h1 class="endheader">Event Updater</h1>
+      <h2 id="overview">Overview</h2>
+      <p>This is an interface that allows the live updating of offseason events using the TBA Write Api (v1).</p>
+      <p>If you are an offseason event coordinator and would like to use this, please <a href="/contact">contact us</a> for more information.</p>
+
+      <hr>
+
+      <h2>Setup</h2>
+      <form class="form-horizontal" role="form">
+        <div class="form-group">
+          <label for="event_key" class="col-sm-2 control-label">Event Key</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="event_key" placeholder="Event Key" value="2014testfuture">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="auth_id" class="col-sm-2 control-label">Auth Id</label>
+          <div class="col-sm-10">
+            <input type="password" class="form-control" id="auth_id" placeholder="Auth ID" value="K2kQgbxpKJfWcSdV">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="auth_secret" class="col-sm-2 control-label">Auth Secret</label>
+          <div class="col-sm-10">
+            <input type="password" class="form-control" id="auth_secret" placeholder="Auth Secret" value="8DZFe2ND3CPRgjo0KKU62SVeMPVwdYzUwMtbvy1Jnb9LIe3VMftts1WOfnHxglCU">
+          </div>
+        </div>
+      </form>
+
+      <hr>
+
+      <h2>Update Team List</h2>
+      <p>A list of team numbers separated by commas. This will remove all teams attending this event and update it with the given list.</p>
+      <p>Example:</p>
+      <div class="well">254,604,971</div>
+      <form id="update-team-list-form" class="form-horizontal" role="form">
+        <div class="form-group">
+          <label for="team_list" class="col-sm-2 control-label">Team List</label>
+          <div class="col-sm-10">
+            <textarea id="team_list" class="form-control" rows="3"></textarea>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-success">Submit</button>
+          </div>
+        </div>
+      </form>
+      <div id="update-team-list-form-feedback" class="well"></div>
+
+      <hr>
+
+      <h2>Update Alliance Selections</h2>
+      <p>Rows of teams where each row has teams (in pick order) separated by commas. Row 1 is alliance 1, row 2 is alliance 2, etc.</p>
+      <p>Example:</p>
+      <div class="well">
+        971,254,1662<br>
+        1678,368,4171<br>
+        2035,192,4990<br>
+        1323,846,2135<br>
+        2144,1388,668<br>
+        1280,604,100<br>
+        114,852,841<br>
+        2473,3256,1868<br>
+      </div>
+      <form id="update-alliance-selections-form" class="form-horizontal" role="form">
+        <div class="form-group">
+          <label for="alliance_selections" class="col-sm-2 control-label">Alliance Selections</label>
+          <div class="col-sm-10">
+            <textarea id="alliance_selections" class="form-control" rows="3"></textarea>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-success">Submit</button>
+          </div>
+        </div>
+      </form>
+      <div id="update-alliance-selections-form-feedback" class="well"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block inline_javascript %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/md5.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
+
+<script>
+  $(function() {
+    function makeRequest(request_path, request_body, feedback_id) {
+      $(feedback_id).html('Processing request...');
+
+      var auth_id = $('#auth_id').val();
+      var auth_secret = $('#auth_secret').val();
+      var auth_sig = CryptoJS.MD5(auth_secret + request_path + request_body).toString();
+      console.log("Auth ID: " + auth_id);
+      console.log("Auth Sig String:" + auth_secret + request_path + request_body);
+      console.log("Auth Sig: " + auth_sig);
+
+      $.ajax({
+        type: 'POST',
+        url: request_path,
+        dataType: 'json',
+        headers: {
+          'X-TBA-Auth-Id': auth_id,
+          'X-TBA-Auth-Sig': auth_sig
+        },
+        data: request_body,
+        success: function(data) {
+          $(feedback_id).html('Success!');
+        },
+        error: function(data) {
+          $(feedback_id).html(data.responseText);
+        }
+      });
+    }
+
+    $('#update-team-list-form').submit(function(e) {
+      e.preventDefault();
+
+      var team_list = $.csv.toArray($('#team_list').val())
+      for (var i = 0; i < team_list.length; i++) {
+        team_list[i] = 'frc' + $.trim(team_list[i]);
+      }
+
+      var request_body = JSON.stringify(team_list);
+      makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/team_list/update', request_body, '#update-team-list-form-feedback');
+    });
+
+    $('#update-alliance-selections-form').submit(function(e) {
+      e.preventDefault();
+
+      var alliance_selections = $.csv.toArrays($('#alliance_selections').val())
+      for (var i = 0; i < alliance_selections.length; i++) {
+        var row = alliance_selections[i];
+        for (var j = 0; j < row.length; j++) {
+          row[j] = 'frc' + $.trim(row[j]);
+        }
+      }
+
+      var request_body = JSON.stringify(alliance_selections);
+      makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/alliance_selections/update', request_body, '#update-alliance-selections-form-feedback');
+    });
+  });
+</script>
+{% endblock %}

@@ -89,7 +89,7 @@ class MainChampsHandler(CacheableHandler):
         year = datetime.datetime.now().year
         event_keys = Event.query(Event.year == year, Event.event_type_enum.IN(EventType.CMP_EVENT_TYPES)).fetch(100, keys_only=True)
         events = [event_key.get() for event_key in event_keys]
-        
+
         self.template_values.update({
             "events": events,
         })
@@ -113,7 +113,7 @@ class MainCompetitionseasonHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         week_events = EventHelper.getWeekEvents()
-        
+
         self.template_values.update({
             "events": week_events,
         })
@@ -355,4 +355,30 @@ class ApiDocumentationHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/apidocs.html")
+        return template.render(path, self.template_values)
+
+
+class ApiDocumentationHandler(CacheableHandler):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "api_docs"
+
+    def __init__(self, *args, **kw):
+        super(ApiDocumentationHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+
+    def _render(self, *args, **kw):
+        path = os.path.join(os.path.dirname(__file__), "../templates/apidocs.html")
+        return template.render(path, self.template_values)
+
+
+class ApiWriteHandler(CacheableHandler):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "api_write"
+
+    def __init__(self, *args, **kw):
+        super(ApiWriteHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+
+    def _render(self, *args, **kw):
+        path = os.path.join(os.path.dirname(__file__), "../templates/apiwrite.html")
         return template.render(path, self.template_values)
