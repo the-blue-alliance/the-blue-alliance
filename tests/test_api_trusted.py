@@ -215,26 +215,17 @@ class TestApiTrustedController(unittest2.TestCase):
         response = self.testapp.post(update_request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 200)
 
-        keys_to_delete = ['2014casj_qm1']
+        keys_to_delete = ['qm1']
         request_body = json.dumps(keys_to_delete)
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', delete_request_path, request_body)).hexdigest()
         response = self.testapp.post(delete_request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json['keys_deleted'], ['2014casj_qm1'])
+        self.assertEqual(response.json['keys_deleted'], ['qm1'])
 
         db_matches = Match.query(Match.event == self.event.key).fetch(None)
         self.assertEqual(len(db_matches), 2)
         self.assertTrue('2014casj_f1m1' in [m.key.id() for m in db_matches])
         self.assertTrue('2014casj_f1m2' in [m.key.id() for m in db_matches])
-
-        # delete a match from unauthorized event
-        matches = []
-        keys_to_delete = ['2014cama_f1m1']
-        request_body = json.dumps(keys_to_delete)
-        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', delete_request_path, request_body)).hexdigest()
-        response = self.testapp.post(delete_request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json['keys_deleted'], [])
 
         db_matches = Match.query(Match.event == self.event.key).fetch(None)
         self.assertEqual(len(db_matches), 2)

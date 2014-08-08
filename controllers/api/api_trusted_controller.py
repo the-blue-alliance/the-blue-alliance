@@ -105,13 +105,12 @@ class ApiTrustedEventMatchesDelete(ApiTrustedBaseController):
             self._errors = json.dumps({"Error": "'keys_to_delete' could not be parsed"})
             self.abort(400)
         for match_key in match_keys:
-            if match_key.split('_')[0] == event_key:  # Very important! Don't delete matches from events that aren't authorized.
-                keys_to_delete.add(ndb.Key(Match, match_key))
+            keys_to_delete.add(ndb.Key(Match, '{}_{}'.format(event_key, match_key)))
 
         MatchManipulator.delete_keys(keys_to_delete)
         taskqueue.add(url='/tasks/math/do/event_matchstats/{}'.format(event_key), method='GET')
 
-        self.response.out.write(json.dumps({'keys_deleted': [key.id() for key in keys_to_delete]}))
+        self.response.out.write(json.dumps({'keys_deleted': [key.id().split('_')[1] for key in keys_to_delete]}))
 
 
 class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
