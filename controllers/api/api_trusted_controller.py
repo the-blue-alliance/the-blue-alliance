@@ -31,12 +31,7 @@ class ApiTrustedEventAllianceSelectionsUpdate(ApiTrustedBaseController):
     Overwrites an event's alliance_selections_json with new data
     """
     def _process_request(self, request, event_key):
-        alliances_json = request.get('alliances')
-        if not alliances_json:
-            self._errors = json.dumps({"Error": "Must provide a request parameter 'alliances'"})
-            self.abort(400)
-
-        alliance_selections = JSONAllianceSelectionsParser.parse(alliances_json)
+        alliance_selections = JSONAllianceSelectionsParser.parse(request.body)
 
         event = Event.get_by_id(event_key)
         event.alliance_selections_json = json.dumps(alliance_selections)
@@ -49,15 +44,10 @@ class ApiTrustedEventAwardsUpdate(ApiTrustedBaseController):
     Removes all awards for an event and adds the awards given in the request
     """
     def _process_request(self, request, event_key):
-        awards_json = request.get('awards')
-        if not awards_json:
-            self._errors = json.dumps({"Error": "Must provide a request parameter 'awards'"})
-            self.abort(400)
-
         event = Event.get_by_id(event_key)
 
         awards = []
-        for award in JSONAwardsParser.parse(awards_json, event_key):
+        for award in JSONAwardsParser.parse(request.body, event_key):
             awards.append(Award(
                 id=Award.render_key_name(event.key_name, award['award_type_enum']),
                 name_str=award['name_str'],
@@ -78,27 +68,9 @@ class ApiTrustedEventAwardsUpdate(ApiTrustedBaseController):
 
 class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
     """
-    Creates/updates matches in 'matches'
-    Deletes matches given in 'keys_to_delete'
+    Creates/updates matches
     """
     def _process_request(self, request, event_key):
-        matches_json = request.get('matches')
-        if not matches_json:
-            self._errors = json.dumps({"Error": "Must provide a request parameter 'matches'"})
-            self.abort(400)
-
-        match_keys_to_delete = request.get('keys_to_delete')
-        keys_to_delete = set()
-        if match_keys_to_delete:
-            try:
-                match_keys = json.loads(match_keys_to_delete)
-            except Exception:
-                self._errors = json.dumps({"Error": "'keys_to_delete' could not be parsed"})
-                self.abort(400)
-            for match_key in match_keys:
-                if match_key.split('_')[0] == event_key:  # Very important! Don't delete matches from events that aren't authorized.
-                    keys_to_delete.add(ndb.Key(Match, match_key))
-
         event = Event.get_by_id(event_key)
 
         matches = [Match(
@@ -115,10 +87,28 @@ class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
             team_key_names=match.get("team_key_names", None),
             alliances_json=match.get("alliances_json", None),
             time_string=match.get("time_string", None),
-        ) for match in JSONMatchesParser.parse(matches_json)]
+        ) for match in JSONMatchesParser.parse(request.body)]
+
+        MatchManipulator.createOrUpdate(matches)
+        taskqueue.add(url='/tasks/math/do/event_matchstats/{}'.format(event_key), method='GET')
+
+
+class ApiTrustedEventMatchesDelete(ApiTrustedBaseController):
+    """
+    Deletes given match keys
+    """
+    def _process_request(self, request, event_key):
+        keys_to_delete = set()
+        try:
+            match_keys = json.loads(request.body)
+        except Exception:
+            self._errors = json.dumps({"Error": "'keys_to_delete' could not be parsed"})
+            self.abort(400)
+        for match_key in match_keys:
+            if match_key.split('_')[0] == event_key:  # Very important! Don't delete matches from events that aren't authorized.
+                keys_to_delete.add(ndb.Key(Match, match_key))
 
         MatchManipulator.delete_keys(keys_to_delete)
-        MatchManipulator.createOrUpdate(matches)
         taskqueue.add(url='/tasks/math/do/event_matchstats/{}'.format(event_key), method='GET')
 
         self.response.out.write(json.dumps({'keys_deleted': [key.id() for key in keys_to_delete]}))
@@ -129,12 +119,7 @@ class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
     Overwrites an event's rankings_json with new data
     """
     def _process_request(self, request, event_key):
-        rankings_json = request.get('rankings')
-        if not rankings_json:
-            self._errors = json.dumps({"Error": "Must provide a request parameter 'rankings'"})
-            self.abort(400)
-
-        rankings = JSONRankingsParser.parse(rankings_json)
+        rankings = JSONRankingsParser.parse(request.body)
 
         event = Event.get_by_id(event_key)
         event.rankings_json = json.dumps(rankings)
@@ -148,12 +133,7 @@ class ApiTrustedEventTeamListUpdate(ApiTrustedBaseController):
     and removes EventTeams for teams not in the request
     """
     def _process_request(self, request, event_key):
-        team_list_json = request.get('team_list')
-        if not team_list_json:
-            self._errors = json.dumps({"Error": "Must provide a request parameter 'team_list'"})
-            self.abort(400)
-
-        team_keys = JSONTeamListParser.parse(team_list_json)
+        team_keys = JSONTeamListParser.parse(request.body)
         event = Event.get_by_id(event_key)
 
         event_teams = []

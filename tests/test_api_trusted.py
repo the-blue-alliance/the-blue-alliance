@@ -1,6 +1,7 @@
 import unittest2
 import webtest
 import json
+import md5
 import webapp2
 
 import api_main
@@ -47,34 +48,49 @@ class TestApiTrustedController(unittest2.TestCase):
         self.testbed.deactivate()
 
     def test_auth(self):
+        request_path = '/api/trusted/v1/event/2014casj/matches/update'
+
         # Fail
-        response = self.testapp.post('/api/trusted/v1/event/2014casj/matches/update', expect_errors=True)
+        response = self.testapp.post(request_path, expect_errors=True)
         self.assertEqual(response.status_code, 400)
         self.assertTrue('Error' in response.json)
 
         # Fail
-        response = self.testapp.post('/api/trusted/v1/event/2014casj/matches/update', {'auth-id': 'TeStAuThId123', 'secret': '321tEsTsEcReT', 'matches': json.dumps([])}, expect_errors=True)
+        request_body = json.dumps([])
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 400)
         self.assertTrue('Error' in response.json)
 
         self.aaa.put()
 
         # Pass
-        response = self.testapp.post('/api/trusted/v1/event/2014casj/matches/update', {'auth-id': 'TeStAuThId123', 'secret': '321tEsTsEcReT', 'matches': json.dumps([])}, expect_errors=True)
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 200)
 
-        # Fail; bad auth-id
-        response = self.testapp.post('/api/trusted/v1/event/2014casj/matches/update', {'auth-id': 'TeStAuThId1231', 'secret': '321tEsTsEcReT', 'matches': json.dumps([])}, expect_errors=True)
+        # Fail; bad X-TBA-Auth-Id
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'badTestAuthId', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 400)
         self.assertTrue('Error' in response.json)
 
-        # Fail; bad secret
-        response = self.testapp.post('/api/trusted/v1/event/2014casj/matches/update', {'auth-id': 'TeStAuThId123', 'secret': '321tEsTsEcReT1', 'matches': json.dumps([])}, expect_errors=True)
+        # Fail; bad sig
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': '123abc'}, expect_errors=True)
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('Error' in response.json)
+
+        # Fail; bad sig due to wrong body
+        body2 = json.dumps([{}])
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, body2, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 400)
         self.assertTrue('Error' in response.json)
 
         # Fail; bad event
-        response = self.testapp.post('/api/trusted/v1/event/2014cama/matches/update', {'auth-id': 'TeStAuThId123', 'secret': '321tEsTsEcReT', 'matches': json.dumps([])}, expect_errors=True)
+        request_path2 = '/api/trusted/v1/event/2014cama/matches/update'
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path2, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 400)
         self.assertTrue('Error' in response.json)
 
@@ -89,8 +105,14 @@ class TestApiTrustedController(unittest2.TestCase):
                      ['frc1280', 'frc604', 'frc100'],
                      ['frc114', 'frc852', 'frc841'],
                      ['frc2473', 'frc3256', 'frc1868']]
-        response = self.testapp.post('/api/trusted/v1/event/2014casj/alliance_selections/update', {'auth-id': 'TeStAuThId123', 'secret': '321tEsTsEcReT', 'alliances': json.dumps(alliances)}, expect_errors=True)
+        request_body = json.dumps(alliances)
+
+        request_path = '/api/trusted/v1/event/2014casj/alliance_selections/update'
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+
         self.assertEqual(response.status_code, 200)
+
         for i, selection in enumerate(self.event.alliance_selections):
             self.assertEqual(alliances[i], selection['picks'])
 
@@ -100,7 +122,12 @@ class TestApiTrustedController(unittest2.TestCase):
         awards = [{'name_str': 'Winner', 'team_key': 'frc254'},
                   {'name_str': 'Winner', 'team_key': 'frc604'},
                   {'name_str': 'Volunteer Blahblah', 'team_key': 'frc1', 'awardee': 'Bob Bobby'}]
-        response = self.testapp.post('/api/trusted/v1/event/2014casj/awards/update', {'auth-id': 'TeStAuThId123', 'secret': '321tEsTsEcReT', 'awards': json.dumps(awards)}, expect_errors=True)
+        request_body = json.dumps(awards)
+
+        request_path = '/api/trusted/v1/event/2014casj/awards/update'
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+
         self.assertEqual(response.status_code, 200)
 
         db_awards = Award.query(Award.event == self.event.key).fetch(None)
@@ -110,7 +137,11 @@ class TestApiTrustedController(unittest2.TestCase):
 
         awards = [{'name_str': 'Winner', 'team_key': 'frc254'},
                   {'name_str': 'Winner', 'team_key': 'frc604'}]
-        response = self.testapp.post('/api/trusted/v1/event/2014casj/awards/update', {'auth-id': 'TeStAuThId123', 'secret': '321tEsTsEcReT', 'awards': json.dumps(awards)}, expect_errors=True)
+        request_body = json.dumps(awards)
+
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+
         self.assertEqual(response.status_code, 200)
 
         db_awards = Award.query(Award.event == self.event.key).fetch(None)
@@ -119,6 +150,9 @@ class TestApiTrustedController(unittest2.TestCase):
 
     def test_matches_update(self):
         self.aaa.put()
+
+        update_request_path = '/api/trusted/v1/event/2014casj/matches/update'
+        delete_request_path = '/api/trusted/v1/event/2014casj/matches/delete'
 
         # add one match
         matches = [{
@@ -132,9 +166,11 @@ class TestApiTrustedController(unittest2.TestCase):
                         'score': 26},
             }
         }]
-        response = self.testapp.post('/api/trusted/v1/event/2014casj/matches/update', {'auth-id': 'TeStAuThId123', 'secret': '321tEsTsEcReT', 'matches': json.dumps(matches)}, expect_errors=True)
+        request_body = json.dumps(matches)
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', update_request_path, request_body)).hexdigest()
+        response = self.testapp.post(update_request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json['keys_deleted'], [])
 
         db_matches = Match.query(Match.event == self.event.key).fetch(None)
         self.assertEqual(len(db_matches), 1)
@@ -152,9 +188,10 @@ class TestApiTrustedController(unittest2.TestCase):
                         'score': 260},
             }
         }]
-        response = self.testapp.post('/api/trusted/v1/event/2014casj/matches/update', {'auth-id': 'TeStAuThId123', 'secret': '321tEsTsEcReT', 'matches': json.dumps(matches)}, expect_errors=True)
+        request_body = json.dumps(matches)
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', update_request_path, request_body)).hexdigest()
+        response = self.testapp.post(update_request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json['keys_deleted'], [])
 
         db_matches = Match.query(Match.event == self.event.key).fetch(None)
         self.assertEqual(len(db_matches), 2)
@@ -173,10 +210,15 @@ class TestApiTrustedController(unittest2.TestCase):
                         'score': 260},
             }
         }]
+        request_body = json.dumps(matches)
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', update_request_path, request_body)).hexdigest()
+        response = self.testapp.post(update_request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        self.assertEqual(response.status_code, 200)
+
         keys_to_delete = ['2014casj_qm1']
-        response = self.testapp.post(
-            '/api/trusted/v1/event/2014casj/matches/update', {'auth-id': 'TeStAuThId123', 'secret': '321tEsTsEcReT',
-            'matches': json.dumps(matches), 'keys_to_delete': json.dumps(keys_to_delete)}, expect_errors=True)
+        request_body = json.dumps(keys_to_delete)
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', delete_request_path, request_body)).hexdigest()
+        response = self.testapp.post(delete_request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json['keys_deleted'], ['2014casj_qm1'])
 
@@ -188,9 +230,9 @@ class TestApiTrustedController(unittest2.TestCase):
         # delete a match from unauthorized event
         matches = []
         keys_to_delete = ['2014cama_f1m1']
-        response = self.testapp.post(
-            '/api/trusted/v1/event/2014casj/matches/update', {'auth-id': 'TeStAuThId123', 'secret': '321tEsTsEcReT',
-            'matches': json.dumps(matches), 'keys_to_delete': json.dumps(keys_to_delete)}, expect_errors=True)
+        request_body = json.dumps(keys_to_delete)
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', delete_request_path, request_body)).hexdigest()
+        response = self.testapp.post(delete_request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json['keys_deleted'], [])
 
@@ -209,7 +251,12 @@ class TestApiTrustedController(unittest2.TestCase):
                 {'team_key': 'frc971', 'rank': 2, 'wins': 10, 'losses': 0, 'ties': 0, 'played': 10, 'dqs': 0, 'QS': 20, 'Auton': 500, 'Teleop': 500, 'T&C': 200}
             ],
         }
-        response = self.testapp.post('/api/trusted/v1/event/2014casj/rankings/update', {'auth-id': 'TeStAuThId123', 'secret': '321tEsTsEcReT', 'rankings': json.dumps(rankings)}, expect_errors=True)
+        request_body = json.dumps(rankings)
+
+        request_path = '/api/trusted/v1/event/2014casj/rankings/update'
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.event.rankings[0], ['Rank', 'Team', 'QS', 'Auton', 'Teleop', 'T&C', 'Record (W-L-T)', 'DQ', 'Played'])
         self.assertEqual(self.event.rankings[1], [1, '254', 20, 500, 500, 200, '10-0-0', 0, 10])
@@ -218,7 +265,12 @@ class TestApiTrustedController(unittest2.TestCase):
         self.aaa.put()
 
         team_list = ['frc254', 'frc971', 'frc604']
-        response = self.testapp.post('/api/trusted/v1/event/2014casj/team_list/update', {'auth-id': 'TeStAuThId123', 'secret': '321tEsTsEcReT', 'team_list': json.dumps(team_list)}, expect_errors=True)
+        request_body = json.dumps(team_list)
+
+        request_path = '/api/trusted/v1/event/2014casj/team_list/update'
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+
         self.assertEqual(response.status_code, 200)
 
         db_eventteams = EventTeam.query(EventTeam.event == self.event.key).fetch(None)
@@ -228,7 +280,11 @@ class TestApiTrustedController(unittest2.TestCase):
         self.assertTrue('2014casj_frc604' in [et.key.id() for et in db_eventteams])
 
         team_list = ['frc254', 'frc100']
-        response = self.testapp.post('/api/trusted/v1/event/2014casj/team_list/update', {'auth-id': 'TeStAuThId123', 'secret': '321tEsTsEcReT', 'team_list': json.dumps(team_list)}, expect_errors=True)
+        request_body = json.dumps(team_list)
+
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+
         self.assertEqual(response.status_code, 200)
 
         db_eventteams = EventTeam.query(EventTeam.event == self.event.key).fetch(None)
