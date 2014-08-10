@@ -89,7 +89,7 @@ class MainChampsHandler(CacheableHandler):
         year = datetime.datetime.now().year
         event_keys = Event.query(Event.year == year, Event.event_type_enum.IN(EventType.CMP_EVENT_TYPES)).fetch(100, keys_only=True)
         events = [event_key.get() for event_key in event_keys]
-        
+
         self.template_values.update({
             "events": events,
         })
@@ -113,7 +113,7 @@ class MainCompetitionseasonHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         week_events = EventHelper.getWeekEvents()
-        
+
         self.template_values.update({
             "events": week_events,
         })
@@ -308,6 +308,12 @@ class PageNotFoundHandler(webapp2.RequestHandler):
     def get(self, *args):
         self.error(404)
         self.response.out.write(render_static("404"))
+
+
+class InternalServerErrorHandler(webapp2.RequestHandler):
+    def get(self, *args):
+        self.error(500)
+        self.response.out.write(render_static("500"))
 
 
 class WebcastsHandler(CacheableHandler):
