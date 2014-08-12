@@ -65,7 +65,10 @@ class JSONMatchesParser(ParserBase):
 
             datetime_utc = None
             if time_utc is not None:
-                datetime_utc = dateutil.parser.parse(time_utc)
+                try:
+                    datetime_utc = dateutil.parser.parse(time_utc)
+                except Exception:
+                    raise ParserInputException("Could not parse 'time_utc'. Check that it is in ISO 8601 format.")
 
             # validation passed. build new dicts to sanitize
             parsed_alliances = {
