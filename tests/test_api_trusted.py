@@ -1,3 +1,4 @@
+import datetime
 import unittest2
 import webtest
 import json
@@ -21,6 +22,7 @@ from models.match import Match
 
 
 class TestApiTrustedController(unittest2.TestCase):
+
     def setUp(self):
         self.testapp = webtest.TestApp(api_main.app)
 
@@ -164,7 +166,9 @@ class TestApiTrustedController(unittest2.TestCase):
                         'score': 25},
                 'blue': {'teams': ['frc4', 'frc5', 'frc6'],
                         'score': 26},
-            }
+            },
+            'time_string': '9:00 AM',
+            'time_utc': '2014-08-31T17:00:00',
         }]
         request_body = json.dumps(matches)
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', update_request_path, request_body)).hexdigest()
@@ -186,7 +190,9 @@ class TestApiTrustedController(unittest2.TestCase):
                         'score': 250},
                 'blue': {'teams': ['frc4', 'frc5', 'frc6'],
                         'score': 260},
-            }
+            },
+            'time_string': '10:00 AM',
+            'time_utc': '2014-08-31T18:00:00',
         }]
         request_body = json.dumps(matches)
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', update_request_path, request_body)).hexdigest()
@@ -208,7 +214,9 @@ class TestApiTrustedController(unittest2.TestCase):
                         'score': 250},
                 'blue': {'teams': ['frc4', 'frc5', 'frc6'],
                         'score': 260},
-            }
+            },
+            'time_string': '11:00 AM',
+            'time_utc': '2014-08-31T19:00:00',
         }]
         request_body = json.dumps(matches)
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', update_request_path, request_body)).hexdigest()
@@ -231,6 +239,11 @@ class TestApiTrustedController(unittest2.TestCase):
         self.assertEqual(len(db_matches), 2)
         self.assertTrue('2014casj_f1m1' in [m.key.id() for m in db_matches])
         self.assertTrue('2014casj_f1m2' in [m.key.id() for m in db_matches])
+
+        # verify match data
+        match = Match.get_by_id('2014casj_f1m2')
+        self.assertEqual(match.time, datetime.datetime(2014, 8, 31, 19, 0))
+        self.assertEqual(match.time_string, '11:00 AM')
 
     def test_rankings_update(self):
         self.aaa.put()

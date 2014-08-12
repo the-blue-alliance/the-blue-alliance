@@ -1,3 +1,4 @@
+import dateutil.parser
 import json
 import re
 
@@ -31,6 +32,7 @@ class JSONMatchesParser(ParserBase):
             match_number = match.get('match_number', None)
             alliances = match.get('alliances', None)
             time_string = match.get('time_string', None)
+            time_utc = match.get('time_utc', None)
 
             if comp_level is None:
                 raise ParserInputException("Match must have a 'comp_level'")
@@ -61,6 +63,10 @@ class JSONMatchesParser(ParserBase):
                     if details['score'] is not None and type(details['score']) is not int:
                         raise ParserInputException("alliances[color]['score'] must be an integer or null")
 
+            datetime_utc = None
+            if time_utc is not None:
+                datetime_utc = dateutil.parser.parse(time_utc)
+
             # validation passed. build new dicts to sanitize
             parsed_alliances = {
                 'red': {
@@ -78,6 +84,7 @@ class JSONMatchesParser(ParserBase):
                 'match_number': match_number,
                 'alliances_json': json.dumps(parsed_alliances),
                 'time_string': time_string,
+                'time': datetime_utc,
                 'team_key_names': parsed_alliances['red']['teams'] + parsed_alliances['blue']['teams'],
             }
 

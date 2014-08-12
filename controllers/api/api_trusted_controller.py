@@ -87,6 +87,7 @@ class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
             team_key_names=match.get("team_key_names", None),
             alliances_json=match.get("alliances_json", None),
             time_string=match.get("time_string", None),
+            time=match.get("time", None),
         ) for match in JSONMatchesParser.parse(request.body)]
 
         MatchManipulator.createOrUpdate(matches)
