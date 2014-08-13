@@ -65,7 +65,7 @@ class MobileAPI(remote.Service):
         current_user = endpoints.get_current_user()
         if current_user is None:
             return BaseResponse(code=401, message="Unauthorized to add favorite")
-        userId = current_user.user_id()
+        userId = GCMHelper.user_email_to_id(current_user.email())
         modelKey = request.model_key
 
         if Favorite.query( Favorite.user_id == userId, Favorite.model_key == modelKey).count() == 0:
@@ -83,7 +83,7 @@ class MobileAPI(remote.Service):
         current_user = endpoints.get_current_user()
         if current_user is None:
             return BaseResponse(code=401, message="Unauthorized to remove favorite")
-        userId = current_user.user_id()
+        userId = GCMHelper.user_email_to_id(current_user.email())
         modelKey = request.model_key
 
         to_delete = Favorite.query( Favorite.user_id == userId, Favorite.model_key == modelKey).fetch()
@@ -101,7 +101,7 @@ class MobileAPI(remote.Service):
         current_user = endpoints.get_current_user()
         if current_user is None:
             return FavoriteCollection(favorites = [])
-        userId = current_user.user_id()
+        userId = GCMHelper.user_email_to_id(current_user.email())
 
         favorites = Favorite.query( Favorite.user_id == userId ).fetch()
         output = []
@@ -116,7 +116,7 @@ class MobileAPI(remote.Service):
         current_user = endpoints.get_current_user()
         if current_user is None:
             return BaseResponse(code=401, message="Unauthorized to add subscription")
-        userId = current_user.user_id()
+        userId = GCMHelper.user_email_to_id(current_user.email())
         modelKey = request.model_key
 
         if Subscription.query( Subscription.user_id == userId, Subscription.model_key == modelKey).count() == 0:
@@ -134,7 +134,7 @@ class MobileAPI(remote.Service):
         current_user = endpoints.get_current_user()
         if current_user is None:
             return BaseResponse(code=401, message="Unauthorized to remove subscription")
-        userId = current_user.user_id()
+        userId = GCMHelper.user_email_to_id(current_user.email())
         modelKey = request.model_key
 
         to_delete = Subscription.query( Subscription.user_id == userId, Subscription.model_key == modelKey).fetch()
@@ -152,7 +152,7 @@ class MobileAPI(remote.Service):
         current_user = endpoints.get_current_user()
         if current_user is None:
             return SubscriptionCollection(subscriptions = [])
-        userId = current_user.user_id()
+        userId = GCMHelper.user_email_to_id(current_user.email())
 
         subscriptions = Subscription.query( Subscription.user_id == userId ).fetch()
         output = []
