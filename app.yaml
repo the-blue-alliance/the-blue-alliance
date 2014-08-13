@@ -16,6 +16,8 @@ libraries:
   version: "1.6.1"
 - name: endpoints
   version: 1.0
+- name: pycrypto
+  version: latest
 
 handlers:
 - url: /css

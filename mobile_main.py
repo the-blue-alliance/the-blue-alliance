@@ -17,9 +17,9 @@ from models.mobile_api_messages import BaseResponse, FavoriteCollection, Favorit
                                        SubscriptionCollection, SubscriptionMessage
 from models.mobile_client import MobileClient
 
-client_id_sitevar = Sitevar.get_by_id('gcm.serverKey')
+client_id_sitevar = Sitevar.get_by_id('appengine.webClientId')
 if client_id_sitevar is None:
-    raise Exception("Sitevar gcm.serverKey is undefined. Can't process incoming requests")
+    raise Exception("Sitevar appengine.webClientId is undefined. Can't process incoming requests")
 WEB_CLIENT_ID = str(client_id_sitevar.values_json)
 ANDROID_AUDIENCE = WEB_CLIENT_ID
 
@@ -45,7 +45,7 @@ class MobileAPI(remote.Service):
         current_user = endpoints.get_current_user()
         if current_user is None:
             return BaseResponse(code=401, message="Unauthorized to register")
-        userId = current_user.user_id() 
+        userId = GCMHelper.user_email_to_id(current_user.email())
         gcmId = request.mobile_id
         os = request.operating_system
         if MobileClient.query( MobileClient.messaging_id==gcmId ).count() == 0:
