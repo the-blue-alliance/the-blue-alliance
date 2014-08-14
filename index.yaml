@@ -111,3 +111,8 @@ indexes:
   - name: team_key_names
   - name: set_number
   - name: match_number
+
+- kind: Subscription
+  properties:
+  - name: model_key
+  - name: user_id

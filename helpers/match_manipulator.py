@@ -3,6 +3,7 @@ import json
 from google.appengine.ext import ndb
 
 from helpers.cache_clearer import CacheClearer
+from helpers.gcm_message_helper import GCMMessageHelper
 from helpers.manipulator_base import ManipulatorBase
 
 
@@ -80,5 +81,7 @@ class MatchManipulator(ManipulatorBase):
             if unioned != old_set:
                 setattr(old_match, attr, list(unioned))
                 old_match.dirty = True
+
+        GCMMessageHelper.send_match_score_update(old_match)
 
         return old_match

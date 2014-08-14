@@ -5,6 +5,7 @@ from google.appengine.ext import ndb
 from google.appengine.api import users
 
 from models.mobile_client import MobileClient
+from models.subscription import Subscription
 from models.user import User
 
 class MobileUser(db.Model):
@@ -42,3 +43,30 @@ class GCMHelper(object):
         for model in to_update:
             model.messaging_id = new
             model.put()
+
+    @classmethod
+    def get_users_subscribed(cls, model_key):
+        user_list = Subscription.query(Subscription.model_key == model_key).fetch()
+        output = []
+        for user in user_list:
+            output.append(user.user_id)
+        return output
+
+    @classmethod
+    def get_users_subscribed_to_match(cls, match):
+        keys = match.team_key_names
+        keys.append(match.key_name)
+
+        users = Subscription.query(Subscription.model_key.IN(keys), projection=[Subscription.user_id], distinct=True).fetch()
+        output = []
+        [output.append(user.user_id) for user in users]
+        return output
+
+    @classmethod
+    def get_client_ids_for_users(cls, os_type, user_list):
+        output = []
+        for user in user_list:
+            client_list = MobileClient.query(MobileClient.user_id == user, MobileClient.operating_system == os_type).fetch()
+            for client in client_list:
+                output.append(client.messaging_id)
+        return output

@@ -7,7 +7,7 @@ class MobileClient(ndb.Model):
     as a per-user unique key that is generated client side and sent up.
     """
 
-    user_id = ndb.StringProperty(required=True)
+    user_id = ndb.StringProperty(required=True, indexed=True)
     messaging_id = ndb.StringProperty(required=True)
     operating_system = ndb.StringProperty(required=True)
 
