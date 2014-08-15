@@ -163,7 +163,7 @@ class Match(ndb.Model):
         """
         Lazy load score_breakdown_json
         """
-        if self._score_breakdown is None:
+        if self._score_breakdown is None and self.score_breakdown_json is not None:
             self._score_breakdown = json.loads(self.score_breakdown_json)
 
         return self._score_breakdown
