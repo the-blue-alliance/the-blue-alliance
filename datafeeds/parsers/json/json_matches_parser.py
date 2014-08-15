@@ -1,4 +1,4 @@
-import dateutil.parser
+import iso8601
 import json
 import re
 
@@ -16,6 +16,7 @@ class JSONMatchesParser(ParserBase):
         match_number: Integer identifying the match number within a set. ex: the 2 in qf4m2
         alliances: Dict of {'red': {'teams': ['frcXXX'...], 'score': S}, 'blue': {...}}. Where scores (S) are integers. Null scores indicate that a match has not yet been played.
         time_string: String in the format "(H)H:MM AM/PM" for when the match will be played in the event's local timezone. ex: "9:15 AM"
+        time: UTC time of the match as a string in ISO 8601 format (YYYY-MM-DDTHH:MM:SS).
         """
         try:
             matches = json.loads(matches_json)
@@ -66,7 +67,7 @@ class JSONMatchesParser(ParserBase):
             datetime_utc = None
             if time_utc is not None:
                 try:
-                    datetime_utc = dateutil.parser.parse(time_utc)
+                    datetime_utc = iso8601.parse_date(time_utc)
                 except Exception:
                     raise ParserInputException("Could not parse 'time_utc'. Check that it is in ISO 8601 format.")
 
