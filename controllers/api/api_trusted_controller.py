@@ -72,6 +72,7 @@ class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
     """
     def _process_request(self, request, event_key):
         event = Event.get_by_id(event_key)
+        year = int(event_key[:4])
 
         matches = [Match(
             id=Match.renderKeyName(
@@ -86,9 +87,10 @@ class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
             comp_level=match.get("comp_level", None),
             team_key_names=match.get("team_key_names", None),
             alliances_json=match.get("alliances_json", None),
+            score_breakdown_json=match.get("score_breakdown_json", None),
             time_string=match.get("time_string", None),
             time=match.get("time", None),
-        ) for match in JSONMatchesParser.parse(request.body)]
+        ) for match in JSONMatchesParser.parse(request.body, year)]
 
         MatchManipulator.createOrUpdate(matches)
         taskqueue.add(url='/tasks/math/do/event_matchstats/{}'.format(event_key), method='GET')
