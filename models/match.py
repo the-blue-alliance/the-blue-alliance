@@ -95,6 +95,21 @@ class Match(ndb.Model):
     # }
     # }
 
+    score_breakdown_json = ndb.StringProperty(indexed=False)  # JSON dictionary with score breakdowns. Fields are those used for seeding. Varies by year.
+    # Example for 2014. Seeding outlined in Section 5.3.4 in the 2014 manual.
+    # {"red": {
+    #     "auto": 20,
+    #     "assist": 40,
+    #     "truss+catch": 20,
+    #     "teleop_goal+foul": 20,
+    # },
+    # "blue"{
+    #     "auto": 40,
+    #     "assist": 60,
+    #     "truss+catch": 10,
+    #     "teleop_goal+foul": 40,
+    # }}
+
     comp_level = ndb.StringProperty(required=True, choices=set(COMP_LEVELS))
     event = ndb.KeyProperty(kind=Event, required=True)
     game = ndb.StringProperty(required=True, choices=set(FRC_GAMES), indexed=False)
@@ -119,6 +134,7 @@ class Match(ndb.Model):
             'year': set(),
         }
         self._alliances = None
+        self._score_breakdown = None
         self._tba_video = None
         self._winning_alliance = None
         self._youtube_videos = None
@@ -141,6 +157,16 @@ class Match(ndb.Model):
                     self._alliances[color]['score'] = int(score)
 
         return self._alliances
+
+    @property
+    def score_breakdown(self):
+        """
+        Lazy load score_breakdown_json
+        """
+        if self._score_breakdown is None:
+            self._score_breakdown = json.loads(self.score_breakdown_json)
+
+        return self._score_breakdown
 
     @property
     def winning_alliance(self):
