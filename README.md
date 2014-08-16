@@ -54,10 +54,10 @@ LESS
 ----
 The CSS files are compiled from LESS to ease in development. Make sure you have [Node Package Manager](https://www.npmjs.org/) installed, and install lessc by running `npm install less`. Now, you can run `paver less` to compile the LESS into CSS.
 
-CSS/Javascript Combination and Compression
+CSS/JavaScript Combination and Compression
 ------------------------------------------
-Once the LESS files are compressed into CSS, we combine the resulting file with other precompiled CSS files. Similarly, we combine all relevant Javascript files into a single file and compress them.
-This means that whenever changes are made to CSS or Javascript, you must run of the following:
+Once the LESS files are compressed into CSS, we combine the resulting file with other precompiled CSS files. Similarly, we combine all relevant JavaScript files into a single file and compress them.
+This means that whenever changes are made to CSS or JavaScript, you must run of the following:
 * `paver less`
 * `paver javascript`
 * `paver make` (builds both LESS and JS)
