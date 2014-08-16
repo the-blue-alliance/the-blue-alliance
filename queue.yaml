@@ -1,5 +1,8 @@
 queue:
 - name: default
+  rate: 1/s
+
+- name: api-track-call
   rate: 500/s
 
 - name: usfirst
