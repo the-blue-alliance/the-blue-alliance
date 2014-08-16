@@ -13,3 +13,8 @@ queue:
   rate: 5/s
   retry_parameters:
     task_retry_limit: 1
+
+- name: post-update-hooks
+  rate: 5/s
+  retry_parameters:
+    task_retry_limit: 1
