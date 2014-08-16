@@ -13,6 +13,7 @@ from consts.event_type import EventType
 
 from models.event import Event
 from models.match import Match
+from models.sitevar import Sitevar
 
 CHAMPIONSHIP_EVENTS_LABEL = 'Championship Event'
 REGIONAL_EVENTS_LABEL = 'Week {}'
@@ -189,12 +190,21 @@ class EventHelper(object):
             logging.warning('Could not get timezone for event {} with no location!'.format(event_key))
             return None
 
+        google_secrets = Sitevar.get_by_id("google.secrets")
+        google_api_key = None
+        if google_secrets is None:
+            logging.warning("Missing sitevar: google.api_key. API calls rate limited by IP and may be over rate limit.")
+        else:
+            google_api_key = google_secrets.contents['api_key']
+
         # geocode request
-        geocode_params = urllib.urlencode({
+        geocode_params = {
             'address': location,
             'sensor': 'false',
-        })
-        geocode_url = 'https://maps.googleapis.com/maps/api/geocode/json?%s' % geocode_params
+        }
+        if google_api_key is not None:
+            geocode_params['key'] = google_api_key
+        geocode_url = 'https://maps.googleapis.com/maps/api/geocode/json?%s' % urllib.urlencode(geocode_params)
         try:
             geocode_result = urlfetch.fetch(geocode_url)
         except Exception, e:
@@ -212,12 +222,14 @@ class EventHelper(object):
         lng = geocode_dict['results'][0]['geometry']['location']['lng']
 
         # timezone request
-        tz_params = urllib.urlencode({
+        tz_params = {
             'location': '%s,%s' % (lat, lng),
             'timestamp': 0,  # we only care about timeZoneId, which doesn't depend on timestamp
             'sensor': 'false',
-        })
-        tz_url = 'https://maps.googleapis.com/maps/api/timezone/json?%s' % tz_params
+        }
+        if google_api_key is not None:
+            tz_params['key'] = google_api_key
+        tz_url = 'https://maps.googleapis.com/maps/api/timezone/json?%s' % urllib.urlencode(tz_params)
         try:
             tz_result = urlfetch.fetch(tz_url)
         except Exception, e:
