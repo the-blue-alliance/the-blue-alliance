@@ -89,7 +89,7 @@ class DatafeedUsfirstLegacy(DatafeedUsfirst):
             start_date=event.get("start_date", None),
             venue_address=event.get("venue_address", None),
             location=event.get("location", None),
-            timezone_id=EventHelper.get_timezone_id(event),
+            timezone_id=EventHelper.get_timezone_id(event.get("location", None), '{}{}'.format(event['year'], event['event_short'])),
             website=event.get("website", None),
             year=event.get("year", None)
         )

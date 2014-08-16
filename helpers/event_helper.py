@@ -184,14 +184,14 @@ class EventHelper(object):
         return name_str.strip()
 
     @classmethod
-    def get_timezone_id(cls, event_dict):
-        if event_dict.get('location', None) is None:
-            logging.warning('Could not get timezone for event {}{} with no location!'.format(event_dict['year'], event_dict['event_short']))
+    def get_timezone_id(cls, location, event_key):
+        if location is None:
+            logging.warning('Could not get timezone for event {} with no location!'.format(event_key))
             return None
 
         # geocode request
         geocode_params = urllib.urlencode({
-            'address': event_dict['location'],
+            'address': location,
             'sensor': 'false',
         })
         geocode_url = 'https://maps.googleapis.com/maps/api/geocode/json?%s' % geocode_params
@@ -202,11 +202,11 @@ class EventHelper(object):
             logging.info(e)
             return None
         if geocode_result.status_code != 200:
-            logging.warning('Geocoding for event {}{} failed with url {}'.format(event_dict['year'], event_dict['event_short'], geocode_url))
+            logging.warning('Geocoding for event {} failed with url {}'.format(event_key, geocode_url))
             return None
         geocode_dict = json.loads(geocode_result.content)
         if not geocode_dict['results']:
-            logging.warning('No geocode results for event location: {}'.format(event_dict['location']))
+            logging.warning('No geocode results for event location: {}'.format(location))
             return None
         lat = geocode_dict['results'][0]['geometry']['location']['lat']
         lng = geocode_dict['results'][0]['geometry']['location']['lng']
