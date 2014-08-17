@@ -60,7 +60,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
-        self.testbed.init_taskqueue_stub()
+        self.testbed.init_taskqueue_stub(root_path=".")
 
         # populate mini db
         self.event_2010sc_1 = Event(

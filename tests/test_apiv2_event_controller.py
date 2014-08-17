@@ -34,7 +34,7 @@ class TestEventApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
-        self.testbed.init_taskqueue_stub()
+        self.testbed.init_taskqueue_stub(root_path=".")
 
         self.event = Event(
                 id="2010sc",
@@ -101,7 +101,7 @@ class TestEventTeamsApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
-        self.testbed.init_taskqueue_stub()
+        self.testbed.init_taskqueue_stub(root_path=".")
 
         self.event = Event(
                 id="2010sc",
@@ -168,7 +168,7 @@ class TestEventMatchApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
-        self.testbed.init_taskqueue_stub()
+        self.testbed.init_taskqueue_stub(root_path=".")
 
         self.event = Event(
                 id="2010sc",
@@ -232,7 +232,7 @@ class TestEventStatsApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
-        self.testbed.init_taskqueue_stub()
+        self.testbed.init_taskqueue_stub(root_path=".")
 
         self.matchstats = {
             "dprs": {"971": 10.52178695299036, "114": 23.7313645955704, "115": 29.559784481082044},
@@ -275,7 +275,7 @@ class TestEventRankingsApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
-        self.testbed.init_taskqueue_stub()
+        self.testbed.init_taskqueue_stub(root_path=".")
 
         self.rankings = [
             ["Rank", "Team", "QS", "ASSIST", "AUTO", "T&C", "TELEOP", "Record (W-L-T)", "DQ", "PLAYED"],
@@ -338,7 +338,7 @@ class TestEventListApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
-        self.testbed.init_taskqueue_stub()
+        self.testbed.init_taskqueue_stub(root_path=".")
 
         self.event = Event(
                 id="2010sc",

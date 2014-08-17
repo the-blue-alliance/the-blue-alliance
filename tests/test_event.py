@@ -14,6 +14,7 @@ class TestEventManipulator(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        self.testbed.init_taskqueue_stub(root_path=".")
 
         self.future_event = EventTestCreator.createFutureEvent(only_event=True)
         self.present_event = EventTestCreator.createPresentEvent(only_event=True)

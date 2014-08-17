@@ -14,7 +14,7 @@ class TestMatchManipulator(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
-        self.testbed.init_taskqueue_stub()
+        self.testbed.init_taskqueue_stub(root_path=".")
 
         self.event = Event(
           id="2012ct",
