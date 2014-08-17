@@ -12,7 +12,7 @@ from controllers.insights_controller import InsightsOverview, InsightsDetail
 from controllers.main_controller import ContactHandler, HashtagsHandler, \
       MainKickoffHandler, MainBuildseasonHandler, MainChampsHandler, MainCompetitionseasonHandler, \
       MainInsightsHandler, MainOffseasonHandler, OprHandler, SearchHandler, \
-      AboutHandler, ThanksHandler, PageNotFoundHandler, \
+      AboutHandler, ThanksHandler, PageNotFoundHandler, InternalServerErrorHandler, \
       GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler, ApiWriteHandler
 from controllers.match_controller import MatchDetail
 from controllers.district_controller import DistrictDetail
@@ -82,3 +82,4 @@ app = webapp2.WSGIApplication([
       ],
       debug=tba_config.DEBUG)
 app.error_handlers[404] = Webapp2HandlerAdapter(PageNotFoundHandler)
+app.error_handlers[500] = Webapp2HandlerAdapter(InternalServerErrorHandler)

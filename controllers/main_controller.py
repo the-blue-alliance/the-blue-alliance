@@ -310,6 +310,12 @@ class PageNotFoundHandler(webapp2.RequestHandler):
         self.response.out.write(render_static("404"))
 
 
+class InternalServerErrorHandler(webapp2.RequestHandler):
+    def get(self, *args):
+        self.error(500)
+        self.response.out.write(render_static("500"))
+
+
 class WebcastsHandler(CacheableHandler):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "main_webcasts"

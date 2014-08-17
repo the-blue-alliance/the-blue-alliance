@@ -1,3 +1,4 @@
+import datetime
 import unittest2
 import webtest
 import json
@@ -21,6 +22,7 @@ from models.match import Match
 
 
 class TestApiTrustedController(unittest2.TestCase):
+
     def setUp(self):
         self.testapp = webtest.TestApp(api_main.app)
 
@@ -29,7 +31,7 @@ class TestApiTrustedController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
-        self.testbed.init_taskqueue_stub()
+        self.testbed.init_taskqueue_stub(root_path=".")
 
         self.aaa = ApiAuthAccess(id='TeStAuThId123',
                                  secret='321tEsTsEcReT',
@@ -164,7 +166,9 @@ class TestApiTrustedController(unittest2.TestCase):
                         'score': 25},
                 'blue': {'teams': ['frc4', 'frc5', 'frc6'],
                         'score': 26},
-            }
+            },
+            'time_string': '9:00 AM',
+            'time_utc': '2014-08-31T16:00:00',
         }]
         request_body = json.dumps(matches)
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', update_request_path, request_body)).hexdigest()
@@ -186,7 +190,9 @@ class TestApiTrustedController(unittest2.TestCase):
                         'score': 250},
                 'blue': {'teams': ['frc4', 'frc5', 'frc6'],
                         'score': 260},
-            }
+            },
+            'time_string': '10:00 AM',
+            'time_utc': '2014-08-31T17:00:00',
         }]
         request_body = json.dumps(matches)
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', update_request_path, request_body)).hexdigest()
@@ -208,7 +214,13 @@ class TestApiTrustedController(unittest2.TestCase):
                         'score': 250},
                 'blue': {'teams': ['frc4', 'frc5', 'frc6'],
                         'score': 260},
-            }
+            },
+            'score_breakdown': {
+                'red': {'auto': 20, 'assist': 40, 'truss+catch': 20, 'teleop_goal+foul': 20},
+                'blue': {'auto': 40, 'assist': 60, 'truss+catch': 10, 'teleop_goal+foul': 40},
+            },
+            'time_string': '11:00 AM',
+            'time_utc': '2014-08-31T18:00:00',
         }]
         request_body = json.dumps(matches)
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', update_request_path, request_body)).hexdigest()
@@ -231,6 +243,13 @@ class TestApiTrustedController(unittest2.TestCase):
         self.assertEqual(len(db_matches), 2)
         self.assertTrue('2014casj_f1m1' in [m.key.id() for m in db_matches])
         self.assertTrue('2014casj_f1m2' in [m.key.id() for m in db_matches])
+
+        # verify match data
+        match = Match.get_by_id('2014casj_f1m2')
+        self.assertEqual(match.time, datetime.datetime(2014, 8, 31, 18, 0))
+        self.assertEqual(match.time_string, '11:00 AM')
+        self.assertEqual(match.alliances['red']['score'], 250)
+        self.assertEqual(match.score_breakdown['red']['truss+catch'], 20)
 
     def test_rankings_update(self):
         self.aaa.put()

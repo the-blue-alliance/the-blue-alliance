@@ -15,6 +15,7 @@ class TestEventTeamCreator(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        self.testbed.init_taskqueue_stub(root_path=".")
 
         for team_number in range(7):
             Team(id="frc%s" % team_number,

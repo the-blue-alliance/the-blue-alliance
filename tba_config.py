@@ -2,6 +2,8 @@ import os
 
 DEBUG = os.environ.get('SERVER_SOFTWARE', '').startswith('Dev')
 
+MAX_YEAR = 2015
+
 # For choosing what the main landing page displays
 KICKOFF = 1
 BUILDSEASON = 2

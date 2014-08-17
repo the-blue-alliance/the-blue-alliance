@@ -1,3 +1,4 @@
+import json
 import unittest2
 
 from google.appengine.ext import ndb
@@ -14,7 +15,7 @@ class TestMatchManipulator(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
-        self.testbed.init_taskqueue_stub()
+        self.testbed.init_taskqueue_stub(root_path=".")
 
         self.event = Event(
           id="2012ct",
@@ -25,6 +26,10 @@ class TestMatchManipulator(unittest2.TestCase):
         self.old_match = Match(
             id="2012ct_qm1",
             alliances_json="""{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""",
+            score_breakdown_json=json.dumps({
+                'red': {'auto': 20, 'assist': 40, 'truss+catch': 20, 'teleop_goal+foul': 20},
+                'blue': {'auto': 40, 'assist': 60, 'truss+catch': 10, 'teleop_goal+foul': 40},
+            }),
             comp_level="qm",
             event=self.event.key,
             game="frc_2012_rebr",
@@ -37,6 +42,10 @@ class TestMatchManipulator(unittest2.TestCase):
         self.new_match = Match(
             id="2012ct_qm1",
             alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
+            score_breakdown_json=json.dumps({
+                'red': {'auto': 80, 'assist': 40, 'truss+catch': 20, 'teleop_goal+foul': 20},
+                'blue': {'auto': 40, 'assist': 60, 'truss+catch': 10, 'teleop_goal+foul': 40},
+            }),
             comp_level="qm",
             event=self.event.key,
             game="frc_2012_rebr",
@@ -56,6 +65,7 @@ class TestMatchManipulator(unittest2.TestCase):
             self.assertEqual(set(match.youtube_videos), {u'P3C2BOtL7e8', u'TqY324xLU4s', u'tst1', u'tst2', u'tst3', u'tst4'})
         else:
             self.assertEqual(match.youtube_videos, [u'TqY324xLU4s', u'tst1', u'tst3', u'tst4'])
+        self.assertEqual(match.score_breakdown['red']['auto'], 80)
 
     def assertOldMatch(self, match):
         self.assertEqual(match.comp_level, "qm")
@@ -68,6 +78,7 @@ class TestMatchManipulator(unittest2.TestCase):
 
         self.assertOldMatch(Match.get_by_id("2012ct_qm1"))
         self.assertEqual(Match.get_by_id("2012ct_qm1").alliances_json, """{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""")
+        self.assertEqual(Match.get_by_id("2012ct_qm1").score_breakdown['red']['auto'], 20)
 
         MatchManipulator.createOrUpdate(self.new_match)
         self.assertMergedMatch(Match.get_by_id("2012ct_qm1"), True)
