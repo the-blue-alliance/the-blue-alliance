@@ -193,11 +193,13 @@
     <thead>
         <th>Match Key</th>
         <th>Alliances JSON</th>
+        <th>Score Breakdown JSON</th>
     </thead>
     {% for match in event.matches %}
     <tr>
         <td><a href="/admin/match/{{match.key_name}}">{{ match.key_name }}</a></td>
         <td>{{ match.alliances_json }}</td>
+        <td>{{ match.score_breakdown_json }}</td>
     </tr>
     {% endfor %}
 </table>

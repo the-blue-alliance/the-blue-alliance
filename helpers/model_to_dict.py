@@ -79,6 +79,7 @@ class ModelToDict(object):
         match_dict["key"] = match.key_name
         match_dict["event_key"] = match.event.id()
         match_dict["alliances"] = match.alliances
+        match_dict["score_breakdown"] = match.score_breakdown
         match_dict["comp_level"] = match.comp_level
         match_dict["match_number"] = match.match_number
         match_dict["set_number"] = match.set_number

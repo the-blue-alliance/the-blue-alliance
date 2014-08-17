@@ -215,6 +215,10 @@ class TestApiTrustedController(unittest2.TestCase):
                 'blue': {'teams': ['frc4', 'frc5', 'frc6'],
                         'score': 260},
             },
+            'score_breakdown': {
+                'red': {'auto': 20, 'assist': 40, 'truss+catch': 20, 'teleop_goal+foul': 20},
+                'blue': {'auto': 40, 'assist': 60, 'truss+catch': 10, 'teleop_goal+foul': 40},
+            },
             'time_string': '11:00 AM',
             'time_utc': '2014-08-31T18:00:00',
         }]
@@ -244,6 +248,8 @@ class TestApiTrustedController(unittest2.TestCase):
         match = Match.get_by_id('2014casj_f1m2')
         self.assertEqual(match.time, datetime.datetime(2014, 8, 31, 18, 0))
         self.assertEqual(match.time_string, '11:00 AM')
+        self.assertEqual(match.alliances['red']['score'], 250)
+        self.assertEqual(match.score_breakdown['red']['truss+catch'], 20)
 
     def test_rankings_update(self):
         self.aaa.put()

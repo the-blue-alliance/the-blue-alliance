@@ -68,7 +68,7 @@ class ApiEventTeamsController(ApiEventController):
 
 class ApiEventMatchesController(ApiEventController):
     CACHE_KEY_FORMAT = "apiv2_event_matches_controller_{}"  # (event_key)
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
@@ -156,7 +156,7 @@ class ApiEventDistrictPointsController(ApiEventController):
 
     def _track_call(self, event_key):
         self._track_call_defer('event/district_points', event_key)
-    
+
     def _render(self, event_key):
         self._set_event(event_key)
 
