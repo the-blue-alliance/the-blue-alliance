@@ -168,7 +168,7 @@ class TestApiTrustedController(unittest2.TestCase):
                         'score': 26},
             },
             'time_string': '9:00 AM',
-            'time_utc': '2014-08-31T17:00:00',
+            'time_utc': '2014-08-31T16:00:00',
         }]
         request_body = json.dumps(matches)
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', update_request_path, request_body)).hexdigest()
@@ -192,7 +192,7 @@ class TestApiTrustedController(unittest2.TestCase):
                         'score': 260},
             },
             'time_string': '10:00 AM',
-            'time_utc': '2014-08-31T18:00:00',
+            'time_utc': '2014-08-31T17:00:00',
         }]
         request_body = json.dumps(matches)
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', update_request_path, request_body)).hexdigest()
@@ -216,7 +216,7 @@ class TestApiTrustedController(unittest2.TestCase):
                         'score': 260},
             },
             'time_string': '11:00 AM',
-            'time_utc': '2014-08-31T19:00:00',
+            'time_utc': '2014-08-31T18:00:00',
         }]
         request_body = json.dumps(matches)
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', update_request_path, request_body)).hexdigest()
@@ -242,7 +242,7 @@ class TestApiTrustedController(unittest2.TestCase):
 
         # verify match data
         match = Match.get_by_id('2014casj_f1m2')
-        self.assertEqual(match.time, datetime.datetime(2014, 8, 31, 19, 0))
+        self.assertEqual(match.time, datetime.datetime(2014, 8, 31, 18, 0))
         self.assertEqual(match.time_string, '11:00 AM')
 
     def test_rankings_update(self):
