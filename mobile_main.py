@@ -30,7 +30,7 @@ ANDROID_CLIENT_ID = str(android_id_sitevar.values_json)
 
 # To enable iOS access to the API, add another variable for the iOS client ID
 
-@endpoints.api(name='tbaMobile', version='v4', description="API for TBA Mobile clients",
+@endpoints.api(name='tbaMobile', version='v5', description="API for TBA Mobile clients",
                allowed_client_ids=[WEB_CLIENT_ID, ANDROID_CLIENT_ID,
                                    # To enable iOS addess, add its client ID here
                                    endpoints.API_EXPLORER_CLIENT_ID],
@@ -52,7 +52,7 @@ class MobileAPI(remote.Service):
             # Record doesn't exist yet, so add it
             MobileClient(   messaging_id = gcmId,
                             user_id = userId,
-                            operating_system = os ).put()        
+                            operating_system = os ).put()
             return BaseResponse(code=200, message="Registration successful")
         else:
             # Record already exists, don't bother updating it again
@@ -71,6 +71,9 @@ class MobileAPI(remote.Service):
         if Favorite.query( Favorite.user_id == userId, Favorite.model_key == modelKey).count() == 0:
             # Favorite doesn't exist, add it
             Favorite( user_id = userId, model_key = modelKey).put()
+            if request.device_key:
+                # Send updates to user's other devices
+                GCMHelper.push_update_favorite(userId, request.device_key)
             return BaseResponse(code=200, message="Favorite added")
         else:
             # Favorite already exists. Don't add it again
@@ -89,6 +92,9 @@ class MobileAPI(remote.Service):
         to_delete = Favorite.query( Favorite.user_id == userId, Favorite.model_key == modelKey).fetch()
         if len(to_delete) > 0:
             ndb.delete_multi([m.key for m in to_delete])
+            if request.device_key:
+                # Send updates to user's other devices
+                GCMHelper.push_update_favorite(userId, request.device_key)
             return BaseResponse(code=200, message="Favorites deleted")
         else:
             # Favorite doesn't exist. Can't delete it
@@ -122,6 +128,9 @@ class MobileAPI(remote.Service):
         if Subscription.query( Subscription.user_id == userId, Subscription.model_key == modelKey).count() == 0:
             # Subscription doesn't exist, add it
             Subscription( user_id = userId, model_key = modelKey).put()
+            if request.device_key:
+                # Send updates to user's other devices
+                GCMHelper.push_update_subscription(userId, request.device_key)
             return BaseResponse(code=200, message="Subscription added")
         else:
             # Subscription already exists. Don't add it again
@@ -140,6 +149,9 @@ class MobileAPI(remote.Service):
         to_delete = Subscription.query( Subscription.user_id == userId, Subscription.model_key == modelKey).fetch()
         if len(to_delete) > 0:
             ndb.delete_multi([m.key for m in to_delete])
+            if request.device_key:
+                # Send updates to user's other devices
+                GCMHelper.push_update_subscription(userId, request.device_key)
             return BaseResponse(code=200, message="Subscriptions deleted")
         else:
             # Subscription doesn't exist. Can't delete it

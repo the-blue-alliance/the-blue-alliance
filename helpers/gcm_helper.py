@@ -53,13 +53,15 @@ class GCMHelper(object):
         return output
 
     @classmethod
-    def get_users_subscribed_to_match(cls, match):
+    def get_users_subscribed_to_match(cls, match, notification):
         keys = match.team_key_names
         keys.append(match.key_name)
 
         users = Subscription.query(Subscription.model_key.IN(keys), projection=[Subscription.user_id], distinct=True).fetch()
         output = []
-        [output.append(user.user_id) for user in users]
+        for user in users:
+            if notification in user.settings:
+                output.append(user.user_id)
         return output
 
     @classmethod
@@ -70,3 +72,20 @@ class GCMHelper(object):
             for client in client_list:
                 output.append(client.messaging_id)
         return output
+
+    @classmethod
+    def push_update_favorite(cls, user_id, sending_device_key):
+        clients = get_client_ids_for_users("android", [user_id])
+        if sending_device_key in clients:
+            clients.remove(sending_device_key)
+
+        GCMMessageHelper.send_favorite_updates(user_id, clients)  
+
+    @classmethod
+    def push_update_subscriptions(cls, user_id, sending_device_key):
+        clients = get_client_ids_for_users("android", [user_id])
+        if sending_device_key in clients:
+            clients.remove(sending_device_key)
+
+        GCMMessageHelper.send_subscription_updates(user_id, clients)
+      
