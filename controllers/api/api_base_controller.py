@@ -1,5 +1,6 @@
 import json
 import logging
+import md5
 import tba_config
 import urllib
 import uuid
@@ -10,7 +11,9 @@ from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 
 from controllers.base_controller import CacheableHandler
+from datafeeds.parser_base import ParserInputException
 from helpers.validation_helper import ValidationHelper
+from models.api_auth_access import ApiAuthAccess
 from models.cached_response import CachedResponse
 from models.sitevar import Sitevar
 
@@ -125,7 +128,7 @@ class ApiBaseController(CacheableHandler):
         if self.x_tba_app_id is None:
             self.x_tba_app_id = self.request.get('X-TBA-App-Id')
 
-        logging.info("X-TBA-App-ID: {}".format(self.x_tba_app_id))
+        logging.info("X-TBA-App-Id: {}".format(self.x_tba_app_id))
         if not self.x_tba_app_id:
             self._errors = json.dumps({"Error": "X-TBA-App-Id is a required header or URL param. Please see http://www.thebluealliance.com/apidocs for more info."})
             self.abort(400)
@@ -143,3 +146,49 @@ class ApiBaseController(CacheableHandler):
 
         self.response.headers['Cache-Control'] = "public, max-age=%d" % max(seconds, 61)  # needs to be at least 61 seconds to work
         self.response.headers['Pragma'] = 'Public'
+
+
+class ApiTrustedBaseController(webapp2.RequestHandler):
+    def __init__(self, *args, **kw):
+        super(ApiTrustedBaseController, self).__init__(*args, **kw)
+        self.response.headers['content-type'] = 'application/json; charset="utf-8"'
+
+    def handle_exception(self, exception, debug):
+        """
+        Handle an HTTP exception and actually writeout a
+        response.
+        Called by webapp when abort() is called, stops code excution.
+        """
+        logging.info(exception)
+        if isinstance(exception, webapp2.HTTPException):
+            self.response.set_status(exception.code)
+            self.response.out.write(self._errors)
+        else:
+            self.response.set_status(500)
+
+    def post(self, event_key):
+        auth_id = self.request.headers.get('X-TBA-Auth-Id')
+        if not auth_id:
+            self._errors = json.dumps({"Error": "Must provide a request header parameter 'X-TBA-Auth-Id'"})
+            self.abort(400)
+
+        auth_sig = self.request.headers.get('X-TBA-Auth-Sig')
+        if not auth_sig:
+            self._errors = json.dumps({"Error": "Must provide a request header parameter 'X-TBA-Auth-Sig'"})
+            self.abort(400)
+
+        auth = ApiAuthAccess.get_by_id(auth_id)
+        if not auth or md5.new('{}{}{}'.format(auth.secret, self.request.path, self.request.body)).hexdigest() != auth_sig:
+            self._errors = json.dumps({"Error": "Invalid X-TBA-Auth-Id and/or X-TBA-Auth-Sig!"})
+            self.abort(400)
+
+        allowed_event_keys = [ekey.id() for ekey in auth.event_list]
+        if event_key not in allowed_event_keys:
+            self._errors = json.dumps({"Error": "Only allowed to edit events: {}".format(', '.join(allowed_event_keys))})
+            self.abort(400)
+
+        try:
+            self._process_request(self.request, event_key)
+        except ParserInputException, e:
+            self._errors = json.dumps({"Error": e.message})
+            self.abort(400)
