@@ -169,7 +169,7 @@
         },
         data: request_body,
         success: function(data) {
-          $(feedback_id).html('Success!');
+          $(feedback_id).html("Success: " + data.Success);
         },
         error: function(data) {
           $(feedback_id).html(data.responseText);

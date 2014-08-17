@@ -38,6 +38,8 @@ class ApiTrustedEventAllianceSelectionsUpdate(ApiTrustedBaseController):
         event.dirty = True  # TODO: hacky
         EventManipulator.createOrUpdate(event)
 
+        self.response.out.write(json.dumps({'Success': "Alliance selections successfully updated"}))
+
 
 class ApiTrustedEventAwardsUpdate(ApiTrustedBaseController):
     """
@@ -64,6 +66,8 @@ class ApiTrustedEventAwardsUpdate(ApiTrustedBaseController):
         AwardManipulator.delete_keys(old_award_keys)
 
         AwardManipulator.createOrUpdate(awards)
+
+        self.response.out.write(json.dumps({'Success': "Awards successfully updated"}))
 
 
 class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
@@ -95,6 +99,8 @@ class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
         MatchManipulator.createOrUpdate(matches)
         taskqueue.add(url='/tasks/math/do/event_matchstats/{}'.format(event_key), method='GET')
 
+        self.response.out.write(json.dumps({'Success': "Matches successfully updated"}))
+
 
 class ApiTrustedEventMatchesDelete(ApiTrustedBaseController):
     """
@@ -113,7 +119,7 @@ class ApiTrustedEventMatchesDelete(ApiTrustedBaseController):
         MatchManipulator.delete_keys(keys_to_delete)
         taskqueue.add(url='/tasks/math/do/event_matchstats/{}'.format(event_key), method='GET')
 
-        self.response.out.write(json.dumps({'keys_deleted': [key.id().split('_')[1] for key in keys_to_delete]}))
+        self.response.out.write(json.dumps({'Success': "keys deleted: " + [key.id().split('_')[1] for key in keys_to_delete]}))
 
 
 class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
@@ -127,6 +133,8 @@ class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
         event.rankings_json = json.dumps(rankings)
         event.dirty = True  # TODO: hacky
         EventManipulator.createOrUpdate(event)
+
+        self.response.out.write(json.dumps({'Success': "Rankings successfully updated"}))
 
 
 class ApiTrustedEventTeamListUpdate(ApiTrustedBaseController):
@@ -151,6 +159,8 @@ class ApiTrustedEventTeamListUpdate(ApiTrustedBaseController):
         EventTeamManipulator.delete_keys(to_delete)
 
         EventTeamManipulator.createOrUpdate(event_teams)
+
+        self.response.out.write(json.dumps({'Success': "Event teams successfully updated"}))
 
 
 class ApiTrustedAddMatchYoutubeVideo(webapp2.RequestHandler):
