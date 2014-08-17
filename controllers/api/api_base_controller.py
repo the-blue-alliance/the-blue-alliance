@@ -115,7 +115,7 @@ class ApiBaseController(CacheableHandler):
         ndb.delete_multi([ndb.Key(CachedResponse, cache_key) for cache_key in cache_keys])
 
     def _track_call_defer(self, api_action, api_label):
-        deferred.defer(track_call, api_action, api_label, self.x_tba_app_id)
+        deferred.defer(track_call, api_action, api_label, self.x_tba_app_id, _queue="api-track-call")
 
     def _validate_tba_app_id(self):
         """

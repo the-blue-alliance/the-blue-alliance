@@ -1,3 +1,4 @@
+from consts.district_type import DistrictType
 from models.event import Event
 from models.match import Match
 from models.team import Team
@@ -26,7 +27,7 @@ class ValidationHelper(object):
                 error_dict["Errors"].append(results)
                 valid = False
 
-        if valid is False: 
+        if valid is False:
             return error_dict
 
     @classmethod
@@ -49,3 +50,10 @@ class ValidationHelper(object):
         match_key_error = { "match_id": error_message}
         if Match.validate_key_name(value) is False:
             return match_key_error
+
+    @classmethod
+    def district_id_validator(cls, value):
+        error_message = "{} is not a valid district abbreviation".format(value)
+        district_key_error = {"district_abbrev": error_message}
+        if not value in DistrictType.abbrevs:
+            return district_key_error

@@ -43,6 +43,7 @@ class Event(ndb.Model):
         self._affected_references = {
             'key': set(),
             'year': set(),
+            'event_district_abbrev': set(),
         }
         self._alliance_selections = None
         self._awards = None
@@ -257,6 +258,10 @@ class Event(ndb.Model):
     @property
     def event_district_str(self):
         return DistrictType.type_names.get(self.event_district_enum, None)
+
+    @property
+    def event_district_abbrev(self):
+        return DistrictType.type_abbrevs.get(self.event_district_enum, None)
 
     @property
     def event_type_str(self):

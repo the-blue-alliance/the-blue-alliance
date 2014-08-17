@@ -10,8 +10,13 @@ from google.appengine.ext import testbed
 import api_main
 
 from consts.award_type import AwardType
+from consts.district_type import DistrictType
 from consts.event_type import EventType
 from consts.media_type import MediaType
+
+from controllers.api.api_district_controller import ApiDistrictListController
+from controllers.api.api_district_controller import ApiDistrictEventsController
+from controllers.api.api_district_controller import ApiDistrictRankingsController
 
 from controllers.api.api_event_controller import ApiEventController
 from controllers.api.api_event_controller import ApiEventListController
@@ -20,6 +25,7 @@ from controllers.api.api_event_controller import ApiEventMatchesController
 from controllers.api.api_event_controller import ApiEventStatsController
 from controllers.api.api_event_controller import ApiEventRankingsController
 from controllers.api.api_event_controller import ApiEventAwardsController
+from controllers.api.api_event_controller import ApiEventDistrictPointsController
 
 from controllers.api.api_team_controller import ApiTeamController
 from controllers.api.api_team_controller import ApiTeamEventsController
@@ -54,13 +60,14 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
-        self.testbed.init_taskqueue_stub()
+        self.testbed.init_taskqueue_stub(root_path=".")
 
         # populate mini db
         self.event_2010sc_1 = Event(
             id='2010sc',
             name='Palmetto Regional',
             event_type_enum=EventType.REGIONAL,
+            event_district_enum=DistrictType.MICHIGAN,
             short_name='Palmetto',
             event_short='sc',
             year=2010,
@@ -74,6 +81,7 @@ class TestApiCacheClearer(unittest2.TestCase):
             id='2010sc',
             name='New Regional',
             event_type_enum=EventType.REGIONAL,
+            event_district_enum=DistrictType.MICHIGAN,
             short_name='Palmetto',
             event_short='sc',
             year=2010,
@@ -195,6 +203,10 @@ class TestApiCacheClearer(unittest2.TestCase):
             references=[self.team_frc2_1.key],
         )
 
+        self.districtlist_2010_cache_key = ApiDistrictListController.get_cache_key_from_format('2010')
+        self.district_events_2010_cache_key = ApiDistrictEventsController.get_cache_key_from_format('fim', '2010')
+        self.district_rankings_2010_cache_key = ApiDistrictRankingsController.get_cache_key_from_format('fim', '2010')
+
         self.eventlist_2010_cache_key = ApiEventListController.get_cache_key_from_format('2010')
         self.event_2010sc_cache_key = ApiEventController.get_cache_key_from_format('2010sc')
         self.eventteams_2010sc_cache_key = ApiEventTeamsController.get_cache_key_from_format('2010sc')
@@ -202,18 +214,25 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.eventstats_2010sc_cache_key = ApiEventStatsController.get_cache_key_from_format('2010sc')
         self.eventrankings_2010sc_cache_key = ApiEventRankingsController.get_cache_key_from_format('2010sc')
         self.eventawards_2010sc_cache_key = ApiEventAwardsController.get_cache_key_from_format('2010sc')
+        self.eventdistrictpoints_2010sc_cache_key = ApiEventDistrictPointsController.get_cache_key_from_format('2010sc')
+
         self.team_frc1_cache_key = ApiTeamController.get_cache_key_from_format('frc1', 2010)
         self.team_frc2_cache_key = ApiTeamController.get_cache_key_from_format('frc2', 2010)
+
         self.team_events_frc1_cache_key = ApiTeamEventsController.get_cache_key_from_format('frc1', 2010)
         self.team_events_frc2_cache_key = ApiTeamEventsController.get_cache_key_from_format('frc2', 2010)
+
         self.team_event_awards_frc1_2010sc_cache_key = ApiTeamEventAwardsController.get_cache_key_from_format('frc1', '2010sc')
         self.team_event_awards_frc2_2010sc_cache_key = ApiTeamEventAwardsController.get_cache_key_from_format('frc2', '2010sc')
         self.team_event_matches_frc1_2010sc_cache_key = ApiTeamEventMatchesController.get_cache_key_from_format('frc1', '2010sc')
         self.team_event_matches_frc2_2010sc_cache_key = ApiTeamEventMatchesController.get_cache_key_from_format('frc2', '2010sc')
+
         self.team_media_frc1_cache_key = ApiTeamMediaController.get_cache_key_from_format('frc1', 2010)
         self.team_media_frc2_cache_key = ApiTeamMediaController.get_cache_key_from_format('frc2', 2010)
+
         self.team_years_participated_frc1_cache_key = ApiTeamYearsParticipatedController.get_cache_key_from_format('frc1')
         self.team_years_participated_frc2_cache_key = ApiTeamYearsParticipatedController.get_cache_key_from_format('frc2')
+
         self.team_list_page_0_cache_key = ApiTeamListController.get_cache_key_from_format(0)
         self.team_list_page_1_cache_key = ApiTeamListController.get_cache_key_from_format(1)
 
@@ -244,6 +263,7 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -258,6 +278,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         response = self.testapp.get('/api/v2/event/2010sc', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
@@ -268,6 +291,7 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -282,6 +306,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         response = self.testapp.get('/api/v2/event/2010sc/teams', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
@@ -292,6 +319,7 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -306,6 +334,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         response = self.testapp.get('/api/v2/event/2010sc/matches', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
@@ -316,6 +347,7 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -330,6 +362,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         response = self.testapp.get('/api/v2/event/2010sc/stats', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
@@ -340,6 +375,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         if flushed:
             self.assertEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -354,6 +390,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         response = self.testapp.get('/api/v2/event/2010sc/rankings', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
@@ -364,6 +403,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         if flushed:
             self.assertEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -378,6 +418,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         response = self.testapp.get('/api/v2/event/2010sc/awards', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
@@ -387,6 +430,35 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        if flushed:
+            self.assertEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+
+        response = self.testapp.get('/api/v2/event/2010sc/district_points', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         if flushed:
             self.assertEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
@@ -402,6 +474,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         response = self.testapp.get('/api/v2/team/frc1', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
@@ -411,6 +486,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         if flushed:
             self.assertEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
@@ -426,6 +502,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         response = self.testapp.get('/api/v2/team/frc2', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
@@ -435,6 +514,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         if flushed:
@@ -450,6 +530,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         response = self.testapp.get('/api/v2/team/frc1/2010/events', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
@@ -459,6 +542,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -474,6 +558,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         response = self.testapp.get('/api/v2/team/frc2/2010/events', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
@@ -483,6 +570,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -498,6 +586,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         response = self.testapp.get('/api/v2/team/frc1/event/2010sc/awards', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
@@ -507,6 +598,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -522,6 +614,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         response = self.testapp.get('/api/v2/team/frc2/event/2010sc/awards', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
@@ -531,6 +626,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -546,6 +642,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         response = self.testapp.get('/api/v2/team/frc1/event/2010sc/matches', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
@@ -555,6 +654,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -570,6 +670,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         response = self.testapp.get('/api/v2/team/frc2/event/2010sc/matches', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
@@ -579,6 +682,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -594,6 +698,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         response = self.testapp.get('/api/v2/team/frc1/2010/media', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
@@ -603,6 +710,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -618,6 +726,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         response = self.testapp.get('/api/v2/team/frc2/2010/media', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
@@ -627,6 +738,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -642,6 +754,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         response = self.testapp.get('/api/v2/team/frc1/years_participated', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
@@ -651,6 +766,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -666,6 +782,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         response = self.testapp.get('/api/v2/team/frc2/years_participated', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
@@ -675,6 +794,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -690,6 +810,9 @@ class TestApiCacheClearer(unittest2.TestCase):
         if flushed:
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         response = self.testapp.get('/api/v2/teams/0', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
@@ -699,6 +822,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -714,6 +838,9 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         if flushed:
             self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         response = self.testapp.get('/api/v2/teams/1', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
@@ -723,6 +850,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -737,6 +865,93 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        if flushed:
+            self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+
+        response = self.testapp.get('/api/v2/districts/2010', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        if flushed:
+            self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+
+        response = self.testapp.get('/api/v2/district/fim/2010/events', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+        if flushed:
+            self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
+
+        response = self.testapp.get('/api/v2/district/fim/2010/rankings', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventmatches_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_awards_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc1_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_event_matches_frc2_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_media_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
     def testApiCacheClear(self):
         self.assertEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
@@ -746,6 +961,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -760,6 +976,9 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+        self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         self.resetAll(flushed=True)
 
@@ -780,6 +999,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -794,6 +1014,9 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         # updating an event
         EventManipulator.createOrUpdate(self.event_2010sc_2)
@@ -804,6 +1027,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -818,6 +1042,9 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+        self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         self.resetAll()
 
@@ -830,6 +1057,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -844,6 +1072,9 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         self.resetAll()
 
@@ -856,6 +1087,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -870,6 +1102,9 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         self.resetAll()
 
@@ -882,6 +1117,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -896,6 +1132,9 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         self.resetAll()
 
@@ -908,6 +1147,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -922,6 +1162,9 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         self.resetAll()
 
@@ -934,6 +1177,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -948,6 +1192,9 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         self.resetAll()
 
@@ -960,6 +1207,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -974,6 +1222,9 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         self.resetAll()
 
@@ -986,6 +1237,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -1000,6 +1252,9 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         self.resetAll()
 
@@ -1012,6 +1267,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -1026,6 +1282,9 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         self.resetAll()
 
@@ -1038,6 +1297,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -1052,6 +1312,9 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+        self.assertEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
 
         self.resetAll()
 
@@ -1064,6 +1327,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.eventstats_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventrankings_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventawards_2010sc_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.eventdistrictpoints_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc1_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_frc2_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.team_events_frc1_cache_key), None)
@@ -1078,3 +1342,6 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.assertNotEqual(CachedResponse.get_by_id(self.team_years_participated_frc2_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_0_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.team_list_page_1_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.districtlist_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.district_events_2010_cache_key), None)
+        self.assertNotEqual(CachedResponse.get_by_id(self.district_rankings_2010_cache_key), None)
