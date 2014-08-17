@@ -62,7 +62,7 @@ class MatchManipulator(ManipulatorBase):
 
         for attr in json_attrs:
             if getattr(new_match, attr) is not None:
-                if json.loads(getattr(new_match, attr)) != json.loads(getattr(old_match, attr)):
+                if (getattr(old_match, attr) is None) or (json.loads(getattr(new_match, attr)) != json.loads(getattr(old_match, attr))):
                     setattr(old_match, attr, getattr(new_match, attr))
                     # changinging 'attr_json' doesn't clear lazy-loaded '_attr'
                     setattr(old_match, '_{}'.format(attr.replace('_json', '')), None)
