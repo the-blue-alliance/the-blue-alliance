@@ -82,6 +82,8 @@ class MatchManipulator(ManipulatorBase):
                 setattr(old_match, attr, list(unioned))
                 old_match.dirty = True
 
-        GCMMessageHelper.send_match_score_update(old_match)
+        if old_match.dirty:
+            # Only send updates if a match property changed
+            GCMMessageHelper.send_match_score_update(old_match)
 
         return old_match
