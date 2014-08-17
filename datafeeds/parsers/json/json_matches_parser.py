@@ -83,6 +83,8 @@ class JSONMatchesParser(ParserBase):
             if time_utc is not None:
                 try:
                     datetime_utc = iso8601.parse_date(time_utc)
+                    # remove timezone info because DatetimeProperty can't handle timezones
+                    datetime_utc = datetime_utc.replace(tzinfo=None)
                 except Exception:
                     raise ParserInputException("Could not parse 'time_utc'. Check that it is in ISO 8601 format.")
 
