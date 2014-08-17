@@ -37,6 +37,7 @@ class MatchManipulator(ManipulatorBase):
 
         json_attrs = [
             "alliances_json",
+            "score_breakdown_json",
         ]
 
         list_attrs = [
