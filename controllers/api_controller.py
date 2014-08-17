@@ -73,7 +73,7 @@ class MainApiHandler(webapp2.RequestHandler):
             self.response.set_status(500)
 
     def _track_call_defer(self, api_action, api_details=''):
-        deferred.defer(track_call, api_action, api_details, self.x_tba_app_id)
+        deferred.defer(track_call, api_action, api_details, self.x_tba_app_id, _queue="api-track-call")
 
     def _validate_tba_app_id(self):
         """

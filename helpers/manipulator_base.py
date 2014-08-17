@@ -1,4 +1,5 @@
 from collections import defaultdict
+from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from helpers.cache_clearer import CacheClearer
 
@@ -75,7 +76,7 @@ class ManipulatorBase(object):
                     old_model._affected_references[attr] = old_model._affected_references[attr].union(val)
 
     @classmethod
-    def createOrUpdate(self, new_models, auto_union=True):
+    def createOrUpdate(self, new_models, auto_union=True, run_post_update_hook=True):
         """
         Given a model or list of models, either insert them into the database, or update
         existing models with the same key.
@@ -85,6 +86,8 @@ class ManipulatorBase(object):
         models_to_put = [model for model in models if getattr(model, "dirty", False)]
         ndb.put_multi(models_to_put)
         self._clearCache(models)
+        if run_post_update_hook:
+            self.runPostUpdateHook(models_to_put)
         return self.delistify(models)
 
     @classmethod
@@ -120,3 +123,13 @@ class ManipulatorBase(object):
         Child classes should replace with method with specific merging logic
         """
         raise NotImplementedError("No updateMerge method!")
+
+    @classmethod
+    def runPostUpdateHook(cls, models):
+        """
+        Asynchronously runs the manipulator's post update hook if available.
+        """
+        post_update_hook = getattr(cls, "postUpdateHook", None)
+        if callable(post_update_hook):
+            for model in models:
+                deferred.defer(post_update_hook, model, _queue="post-update-hooks")

@@ -1,4 +1,5 @@
 from helpers.cache_clearer import CacheClearer
+from helpers.event_helper import EventHelper
 from helpers.manipulator_base import ManipulatorBase
 
 
@@ -9,6 +10,14 @@ class EventManipulator(ManipulatorBase):
     @classmethod
     def getCacheKeysAndControllers(cls, affected_refs):
         return CacheClearer.get_event_cache_keys_and_controllers(affected_refs)
+
+    @classmethod
+    def postUpdateHook(cls, event):
+        """
+        To run after a model has been updated
+        """
+        event.timezone_id = EventHelper.get_timezone_id(event.location, event.key.id())
+        cls.createOrUpdate(event, run_post_update_hook=False)
 
     @classmethod
     def updateMerge(self, new_event, old_event, auto_union=True):
