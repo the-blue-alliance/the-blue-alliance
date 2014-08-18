@@ -38,6 +38,7 @@ class MatchManipulator(ManipulatorBase):
 
         json_attrs = [
             "alliances_json",
+            "score_breakdown_json",
         ]
 
         list_attrs = [
@@ -62,7 +63,7 @@ class MatchManipulator(ManipulatorBase):
 
         for attr in json_attrs:
             if getattr(new_match, attr) is not None:
-                if json.loads(getattr(new_match, attr)) != json.loads(getattr(old_match, attr)):
+                if (getattr(old_match, attr) is None) or (json.loads(getattr(new_match, attr)) != json.loads(getattr(old_match, attr))):
                     setattr(old_match, attr, getattr(new_match, attr))
                     # changinging 'attr_json' doesn't clear lazy-loaded '_attr'
                     setattr(old_match, '_{}'.format(attr.replace('_json', '')), None)
@@ -70,7 +71,7 @@ class MatchManipulator(ManipulatorBase):
 
         for attr in list_attrs:
             if len(getattr(new_match, attr)) > 0:
-                if getattr(new_match, attr) != getattr(old_match, attr):
+                if set(getattr(new_match, attr)) != set(getattr(old_match, attr)):  # lists are treated as sets
                     setattr(old_match, attr, getattr(new_match, attr))
                     old_match.dirty = True
 

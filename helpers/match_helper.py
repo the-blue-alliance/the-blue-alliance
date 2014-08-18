@@ -176,7 +176,6 @@ class MatchHelper(object):
                 if bracket_table[comp_level][set_number]['blue_wins'] == 2:
                     bracket_table[comp_level][set_number]['winning_alliance'] = 'blue'
 
-
         return bracket_table
 
     @classmethod
@@ -194,3 +193,22 @@ class MatchHelper(object):
             # Strip the "frc" prefix
             team_nums.append(team[3:])
         return team_nums
+
+    """
+    Valid breakdowns are those used for seeding. Varies by year.
+    For 2014, seeding outlined in Section 5.3.4 in the 2014 manual.
+    """
+    VALID_BREAKDOWNS = {
+        2014: set(['auto', 'assist', 'truss+catch', 'teleop_goal+foul']),
+    }
+
+    @classmethod
+    def is_valid_score_breakdown_key(cls, key, year):
+        """
+        If valid, returns True. Otherwise, returns the set of valid breakdowns.
+        """
+        valid_breakdowns = cls.VALID_BREAKDOWNS.get(year, set())
+        if key in valid_breakdowns:
+            return True
+        else:
+            return valid_breakdowns
