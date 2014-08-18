@@ -34,7 +34,9 @@ class GCMMessageHelper(object):
         clients = GCMHelper.get_client_ids_for_users("android", [user_id])
         if sending_device_key in clients:
             clients.remove(sending_device_key)
-        logging.info("Sending to: "+str(clients))
+        if len(clients) == 0:
+            return
+
         user_collapse_key = "{}_favorite_update".format(user_id)
 
         data = {}
@@ -49,6 +51,8 @@ class GCMMessageHelper(object):
         clients = GCMHelper.get_client_ids_for_users("android", [user_id])
         if sending_device_key in clients:
             clients.remove(sending_device_key)
+        if len(clients) == 0:
+            return
 
         user_collapse_key = "{}_subscription_update".format(user_id)
 
