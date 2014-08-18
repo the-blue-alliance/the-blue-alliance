@@ -172,7 +172,7 @@ class MobileAPI(remote.Service):
         subscriptions = Subscription.query( Subscription.user_id == userId ).fetch()
         output = []
         for subscription in subscriptions:
-            output.append(SubscriptionMessage(model_key = subscription.model_key))
+            output.append(SubscriptionMessage(model_key = subscription.model_key, settings = subscription.settings_json))
         return SubscriptionCollection(subscriptions = output)
 
 
