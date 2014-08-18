@@ -19,7 +19,7 @@ class GCMMessageHelper(object):
             return
 
         data = {}
-        data['message_type'] = 'score_update'
+        data['message_type'] = NotificationType.MATCH_SCORE
         data['message_data'] = {}
         data['message_data']['event_name'] = match.event.get().name
         data['message_data']['match'] = ModelToDict.matchConverter(match)
@@ -29,23 +29,31 @@ class GCMMessageHelper(object):
         gcm_connection.notify_device(message)
 
     @classmethod
-    def send_favorite_update(cls, user_id, client_ids):
+    def send_favorite_update(cls, user_id, sending_device_key):
 
+        clients = GCMHelper.get_client_ids_for_users("android", [user_id])
+        if sending_device_key in clients:
+            clients.remove(sending_device_key)
+        logging.info("Sending to: "+str(clients))
         user_collapse_key = "{}_favorite_update".format(user_id)
 
         data = {}
-        data['message_type'] = "update_favorites"
-        message = GCMMessage(client_ids, data, collapse_key=user_collapse_key)
+        data['message_type'] = NotificationType.UPDATE_FAVORITES
+        message = GCMMessage(clients, data, collapse_key=user_collapse_key)
         gcm_connection = GCMConnection()
         gcm_connection.notify_device(message)
 
     @classmethod
-    def send_subscription_update(cls, user_id, client_ids):
+    def send_subscription_update(cls, user_id, sending_device_key):
+
+        clients = GCMHelper.get_client_ids_for_users("android", [user_id])
+        if sending_device_key in clients:
+            clients.remove(sending_device_key)
 
         user_collapse_key = "{}_subscription_update".format(user_id)
 
         data = {}
-        data['message_type'] = "update_subscriptions"
-        message = GCMMessage(client_ids, data, collapse_key=user_collapse_key)
+        data['message_type'] = NotificationType.UPDATE_SUBSCRIPTIONS
+        message = GCMMessage(clients, data, collapse_key=user_collapse_key)
         gcm_connection = GCMConnection()
         gcm_connection.notify_device(message)

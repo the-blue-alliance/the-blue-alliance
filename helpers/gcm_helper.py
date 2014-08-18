@@ -4,6 +4,8 @@ from google.appengine.ext import db
 from google.appengine.ext import ndb
 from google.appengine.api import users
 
+#from helpers.gcm_message_helper import GCMMessageHelper
+
 from models.mobile_client import MobileClient
 from models.subscription import Subscription
 from models.user import User
@@ -76,20 +78,3 @@ class GCMHelper(object):
             for client in client_list:
                 output.append(client.messaging_id)
         return output
-
-    @classmethod
-    def push_update_favorite(cls, user_id, sending_device_key):
-        clients = get_client_ids_for_users("android", [user_id])
-        if sending_device_key in clients:
-            clients.remove(sending_device_key)
-
-        GCMMessageHelper.send_favorite_updates(user_id, clients)
-
-    @classmethod
-    def push_update_subscriptions(cls, user_id, sending_device_key):
-        clients = get_client_ids_for_users("android", [user_id])
-        if sending_device_key in clients:
-            clients.remove(sending_device_key)
-
-        GCMMessageHelper.send_subscription_updates(user_id, clients)
-

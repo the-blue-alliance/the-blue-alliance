@@ -13,4 +13,7 @@ class NotificationType(object):
     MEDIA_POSTED = "media_posted"
     DISTRICT_POINTS_UPDATED = "district_points_updated"
     SCHEDULE_POSTED = "schedule_posted"
-    FINAL_RESULTS = "final_results" 
+    FINAL_RESULTS = "final_results"
+
+    UPDATE_FAVORITES = "update_favorites"
+    UPDATE_SUBSCIPTION = "update_subscriptions"

@@ -10,6 +10,7 @@ from protorpc import message_types
 import tba_config
 
 from helpers.gcm_helper import GCMHelper
+from helpers.gcm_message_helper import GCMMessageHelper
 from models.favorite import Favorite
 from models.sitevar import Sitevar
 from models.subscription import Subscription
@@ -74,7 +75,8 @@ class MobileAPI(remote.Service):
             Favorite( user_id = userId, model_key = modelKey).put()
             if request.device_key:
                 # Send updates to user's other devices
-                GCMHelper.push_update_favorite(userId, request.device_key)
+                logging.info("Sending favorite update to user other devices")
+                GCMMessageHelper.send_favorite_update(userId, request.device_key)
             return BaseResponse(code=200, message="Favorite added")
         else:
             # Favorite already exists. Don't add it again
@@ -95,7 +97,7 @@ class MobileAPI(remote.Service):
             ndb.delete_multi([m.key for m in to_delete])
             if request.device_key:
                 # Send updates to user's other devices
-                GCMHelper.push_update_favorite(userId, request.device_key)
+                GCMMessageHelper.send_favorite_update(userId, request.device_key)
             return BaseResponse(code=200, message="Favorites deleted")
         else:
             # Favorite doesn't exist. Can't delete it
@@ -131,7 +133,7 @@ class MobileAPI(remote.Service):
             Subscription( user_id = userId, model_key = modelKey, settings_json = request.settings).put()
             if request.device_key:
                 # Send updates to user's other devices
-                GCMHelper.push_update_subscription(userId, request.device_key)
+                GCMMessageHelper.send_subscription_update(userId, request.device_key)
             return BaseResponse(code=200, message="Subscription added")
         else:
             # Subscription already exists. Don't add it again
@@ -152,7 +154,7 @@ class MobileAPI(remote.Service):
             ndb.delete_multi([m.key for m in to_delete])
             if request.device_key:
                 # Send updates to user's other devices
-                GCMHelper.push_update_subscription(userId, request.device_key)
+                GCMMessageHelper.send_subscription_update(userId, request.device_key)
             return BaseResponse(code=200, message="Subscriptions deleted")
         else:
             # Subscription doesn't exist. Can't delete it
