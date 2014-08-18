@@ -8,6 +8,7 @@ from models.mobile_client import MobileClient
 from models.subscription import Subscription
 from models.user import User
 
+
 class MobileUser(db.Model):
     '''
     Used in workaround for null user id (see below)
@@ -15,6 +16,7 @@ class MobileUser(db.Model):
     This is not a good long term solution, I don't think
     '''
     user = db.UserProperty(required=True)
+
 
 class GCMHelper(object):
 
@@ -38,7 +40,7 @@ class GCMHelper(object):
 
     @classmethod
     def update_token(cls, old, new):
-        logging.info("updating token"+old+"\n->"+new)    
+        logging.info("updating token"+old+"\n->"+new)
         to_update = MobileClient.query(MobileClient.messaging_id == old).fetch()
         for model in to_update:
             model.messaging_id = new
@@ -56,10 +58,12 @@ class GCMHelper(object):
     def get_users_subscribed_to_match(cls, match, notification):
         keys = match.team_key_names
         keys.append(match.key_name)
-
-        users = Subscription.query(Subscription.model_key.IN(keys), projection=[Subscription.user_id], distinct=True).fetch()
+        keys.append(match.event.id())
+        logging.info("Getting subscriptions for keys: "+str(keys))
+        users = Subscription.query(Subscription.model_key.IN(keys), projection=[Subscription.user_id, Subscription.settings_json], distinct=True).fetch()
         output = []
         for user in users:
+            logging.info("User settings: "+str(user.settings))
             if notification in user.settings:
                 output.append(user.user_id)
         return output
@@ -79,7 +83,7 @@ class GCMHelper(object):
         if sending_device_key in clients:
             clients.remove(sending_device_key)
 
-        GCMMessageHelper.send_favorite_updates(user_id, clients)  
+        GCMMessageHelper.send_favorite_updates(user_id, clients)
 
     @classmethod
     def push_update_subscriptions(cls, user_id, sending_device_key):
@@ -88,4 +92,4 @@ class GCMHelper(object):
             clients.remove(sending_device_key)
 
         GCMMessageHelper.send_subscription_updates(user_id, clients)
-      
+

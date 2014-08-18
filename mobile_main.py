@@ -30,6 +30,7 @@ ANDROID_CLIENT_ID = str(android_id_sitevar.values_json)
 
 # To enable iOS access to the API, add another variable for the iOS client ID
 
+
 @endpoints.api(name='tbaMobile', version='v5', description="API for TBA Mobile clients",
                allowed_client_ids=[WEB_CLIENT_ID, ANDROID_CLIENT_ID,
                                    # To enable iOS addess, add its client ID here
@@ -37,7 +38,7 @@ ANDROID_CLIENT_ID = str(android_id_sitevar.values_json)
                audiences=[ANDROID_AUDIENCE],
                scopes=[endpoints.EMAIL_SCOPE])
 class MobileAPI(remote.Service):
-    
+
     @endpoints.method(RegistrationRequest, BaseResponse,
                       path='register', http_method='POST',
                       name='register')
@@ -127,7 +128,7 @@ class MobileAPI(remote.Service):
 
         if Subscription.query( Subscription.user_id == userId, Subscription.model_key == modelKey).count() == 0:
             # Subscription doesn't exist, add it
-            Subscription( user_id = userId, model_key = modelKey).put()
+            Subscription( user_id = userId, model_key = modelKey, settings_json = request.settings).put()
             if request.device_key:
                 # Send updates to user's other devices
                 GCMHelper.push_update_subscription(userId, request.device_key)
