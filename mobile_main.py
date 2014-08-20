@@ -9,7 +9,7 @@ from protorpc import message_types
 
 import tba_config
 
-from helpers.gcm_helper import GCMHelper
+from helpers.push_helper import PushHelper
 from helpers.gcm_message_helper import GCMMessageHelper
 from models.favorite import Favorite
 from models.sitevar import Sitevar
@@ -47,7 +47,7 @@ class MobileAPI(remote.Service):
         current_user = endpoints.get_current_user()
         if current_user is None:
             return BaseResponse(code=401, message="Unauthorized to register")
-        userId = GCMHelper.user_email_to_id(current_user.email())
+        userId = PushHelper.user_email_to_id(current_user.email())
         gcmId = request.mobile_id
         os = request.operating_system
         if MobileClient.query( MobileClient.messaging_id==gcmId ).count() == 0:
@@ -67,7 +67,7 @@ class MobileAPI(remote.Service):
         current_user = endpoints.get_current_user()
         if current_user is None:
             return BaseResponse(code=401, message="Unauthorized to add favorite")
-        userId = GCMHelper.user_email_to_id(current_user.email())
+        userId = PushHelper.user_email_to_id(current_user.email())
         modelKey = request.model_key
 
         if Favorite.query( Favorite.user_id == userId, Favorite.model_key == modelKey).count() == 0:
@@ -89,7 +89,7 @@ class MobileAPI(remote.Service):
         current_user = endpoints.get_current_user()
         if current_user is None:
             return BaseResponse(code=401, message="Unauthorized to remove favorite")
-        userId = GCMHelper.user_email_to_id(current_user.email())
+        userId = PushHelper.user_email_to_id(current_user.email())
         modelKey = request.model_key
 
         to_delete = Favorite.query( Favorite.user_id == userId, Favorite.model_key == modelKey).fetch()
@@ -110,7 +110,7 @@ class MobileAPI(remote.Service):
         current_user = endpoints.get_current_user()
         if current_user is None:
             return FavoriteCollection(favorites = [])
-        userId = GCMHelper.user_email_to_id(current_user.email())
+        userId = PushHelper.user_email_to_id(current_user.email())
 
         favorites = Favorite.query( Favorite.user_id == userId ).fetch()
         output = []
@@ -125,7 +125,7 @@ class MobileAPI(remote.Service):
         current_user = endpoints.get_current_user()
         if current_user is None:
             return BaseResponse(code=401, message="Unauthorized to add subscription")
-        userId = GCMHelper.user_email_to_id(current_user.email())
+        userId = PushHelper.user_email_to_id(current_user.email())
         modelKey = request.model_key
 
         sub = Subscription.query( Subscription.user_id == userId, Subscription.model_key == modelKey).get()
@@ -156,7 +156,7 @@ class MobileAPI(remote.Service):
         current_user = endpoints.get_current_user()
         if current_user is None:
             return BaseResponse(code=401, message="Unauthorized to remove subscription")
-        userId = GCMHelper.user_email_to_id(current_user.email())
+        userId = PushHelper.user_email_to_id(current_user.email())
         modelKey = request.model_key
 
         to_delete = Subscription.query( Subscription.user_id == userId, Subscription.model_key == modelKey).fetch()
@@ -177,7 +177,7 @@ class MobileAPI(remote.Service):
         current_user = endpoints.get_current_user()
         if current_user is None:
             return SubscriptionCollection(subscriptions = [])
-        userId = GCMHelper.user_email_to_id(current_user.email())
+        userId = PushHelper.user_email_to_id(current_user.email())
 
         subscriptions = Subscription.query( Subscription.user_id == userId ).fetch()
         output = []

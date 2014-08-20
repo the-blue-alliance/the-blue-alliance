@@ -3,7 +3,7 @@ import logging
 from consts.gcm import GCM
 from consts.notification_type import NotificationType
 from controllers.gcm.gcm import GCMMessage, GCMConnection
-from helpers.gcm_helper import GCMHelper
+from helpers.push_helper import PushHelper
 from helpers.model_to_dict import ModelToDict
 from models.event import Event
 
@@ -12,8 +12,8 @@ class GCMMessageHelper(object):
 
     @classmethod
     def send_match_score_update(cls, match):
-        users = GCMHelper.get_users_subscribed_to_match(match, NotificationType.MATCH_SCORE)
-        gcm_keys = GCMHelper.get_client_ids_for_users(GCM.OS_ANDROID, users)
+        users = PushHelper.get_users_subscribed_to_match(match, NotificationType.MATCH_SCORE)
+        gcm_keys = PushHelper.get_client_ids_for_users(GCM.OS_ANDROID, users)
 
         if len(gcm_keys) == 0:
             return
@@ -31,7 +31,7 @@ class GCMMessageHelper(object):
     @classmethod
     def send_favorite_update(cls, user_id, sending_device_key):
 
-        clients = GCMHelper.get_client_ids_for_users("android", [user_id])
+        clients = PushHelper.get_client_ids_for_users("android", [user_id])
         if sending_device_key in clients:
             clients.remove(sending_device_key)
         if len(clients) == 0:
@@ -48,7 +48,7 @@ class GCMMessageHelper(object):
     @classmethod
     def send_subscription_update(cls, user_id, sending_device_key):
 
-        clients = GCMHelper.get_client_ids_for_users("android", [user_id])
+        clients = PushHelper.get_client_ids_for_users("android", [user_id])
         if sending_device_key in clients:
             clients.remove(sending_device_key)
         if len(clients) == 0:

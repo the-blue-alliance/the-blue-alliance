@@ -33,7 +33,7 @@ import importlib
 
 from google.appengine.api import taskqueue  # Google App Engine specific
 
-from helpers.gcm_helper import GCMHelper
+from helpers.push_helper import PushHelper
 
 from models.sitevar import Sitevar
 
@@ -133,10 +133,10 @@ class GCMConnection:
     # Hooks - Override to change functionality #####
 
     def delete_bad_token(self, bad_device_token):
-        GCMHelper.delete_bad_gcm_token(bad_device_token)
+        PushHelper.delete_bad_gcm_token(bad_device_token)
 
     def update_token(self, old_device_token, new_device_token):
-        GCMHelper.update_token(old_device_token, new_device_token)
+        PushHelper.update_token(old_device_token, new_device_token)
 
     # Currently unused
     def login_complete(self):

@@ -20,7 +20,7 @@ class MobileUser(db.Model):
     user = db.UserProperty(required=True)
 
 
-class GCMHelper(object):
+class PushHelper(object):
 
     @classmethod
     def user_email_to_id(cls, user_email):
