@@ -1,4 +1,5 @@
 import json
+import logging
 
 from google.appengine.ext import ndb
 
@@ -14,6 +15,15 @@ class MatchManipulator(ManipulatorBase):
     @classmethod
     def getCacheKeysAndControllers(cls, affected_refs):
         return CacheClearer.get_match_cache_keys_and_controllers(affected_refs)
+
+    @classmethod
+    def postUpdateHook(cls, match):
+        '''
+        To run after the match has been updated.
+        Send push notifications to subscribed users
+        '''
+        logging.info("Sending push notifications for "+match.key_name)
+        GCMMessageHelper.send_match_score_update(match)
 
     @classmethod
     def updateMerge(self, new_match, old_match, auto_union=True):
@@ -82,9 +92,5 @@ class MatchManipulator(ManipulatorBase):
             if unioned != old_set:
                 setattr(old_match, attr, list(unioned))
                 old_match.dirty = True
-
-        if old_match.dirty:
-            # Only send updates if a match property changed
-            GCMMessageHelper.send_match_score_update(old_match)
 
         return old_match

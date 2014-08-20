@@ -58,9 +58,6 @@ class CacheableHandler(webapp2.RequestHandler):
             self.response.out.write(self._render(*args, **kw))
             self._write_cache(self.response)
 
-    def post(self, *args, **kw):
-        self.get(*args, **kw)
-
     def _has_been_modified_since(self, datetime):
         last_modified = format_date_time(mktime(datetime.timetuple()))
         if_modified_since = self.request.headers.get('If-Modified-Since')
