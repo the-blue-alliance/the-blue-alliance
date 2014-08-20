@@ -128,7 +128,8 @@ class MobileAPI(remote.Service):
         userId = GCMHelper.user_email_to_id(current_user.email())
         modelKey = request.model_key
 
-        if Subscription.query( Subscription.user_id == userId, Subscription.model_key == modelKey).count() == 0:
+        sub = Subscription.query( Subscription.user_id == userId, Subscription.model_key == modelKey).get()
+        if sub is None:
             # Subscription doesn't exist, add it
             Subscription( user_id = userId, model_key = modelKey, settings_json = request.settings).put()
             if request.device_key:
@@ -136,8 +137,17 @@ class MobileAPI(remote.Service):
                 GCMMessageHelper.send_subscription_update(userId, request.device_key)
             return BaseResponse(code=200, message="Subscription added")
         else:
-            # Subscription already exists. Don't add it again
-            return BaseResponse(code=304, message="Subscription already exists")
+            if sub.settings_json == request.settings:
+                # Subscription already exists. Don't add it again
+                return BaseResponse(code=304, message="Subscription already exists")
+            else:
+                # We're updating the settings
+                sub.settings_json = request.settings
+                sub.put()
+                if request.device_key:
+                    # Send updates to user's other devices
+                    GCMMessageHelper.send_subscription_update(userId, request.device_key)
+                return BaseResponse(code=200, message="Subscription updated")
 
     @endpoints.method(SubscriptionMessage, BaseResponse,
                       path='subscriptions/remove', http_method='POST',
