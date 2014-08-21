@@ -1,18 +1,15 @@
-from google.appengine.ext import ndb
+from webapp2_extras.appengine.auth.models import User
+from google.appengine.ext.ndb import key, model
 
-
-class Account(ndb.Model):
+class Account(User):
     """
     Accounts represent accounts people use on TBA.
     """
     # Set by login/registration
     # Not editable by the user
-    email = ndb.StringProperty()
-    nickname = ndb.StringProperty()
-    registered = ndb.BooleanProperty()
+    email = model.StringProperty()
+    nickname = model.StringProperty()
 
-    created = ndb.DateTimeProperty(auto_now_add=True)
-    updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+    created = model.DateTimeProperty(auto_now_add=True)
+    updated = model.DateTimeProperty(auto_now=True, indexed=False)
 
-    # These optional properties are editable by the user
-    display_name = ndb.StringProperty()
