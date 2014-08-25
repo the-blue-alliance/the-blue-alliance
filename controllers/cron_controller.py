@@ -145,7 +145,7 @@ class EventMatchstatsDo(webapp.RequestHandler):
     def get(self, event_key):
         event = Event.get_by_id(event_key)
         matchstats_dict = MatchstatsHelper.calculate_matchstats(event.matches)
-        if matchstats_dict != {}:
+        if any([v != {} for v in matchstats_dict.values()]):
             event.matchstats_json = json.dumps(matchstats_dict)
             event.dirty = True  # TODO: hacky
             EventManipulator.createOrUpdate(event)
