@@ -1,6 +1,7 @@
 import json
 import logging
 
+from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 
 from helpers.cache_clearer import CacheClearer
@@ -22,10 +23,16 @@ class MatchManipulator(ManipulatorBase):
         To run after models have been updated
         """
         if matches:
+            event_key = matches[0].event.id()
             try:
-                FirebasePusher.updated_event(matches[0].event.id())
+                FirebasePusher.updated_event(event_key)
             except Exception:
                 logging.warning("Enqueuing Firebase push failed!")
+
+            # Enqueue task to calculate matchstats
+            taskqueue.add(
+                    url='/tasks/math/do/event_matchstats/' + event_key,
+                    method='GET')
 
     @classmethod
     def updateMerge(self, new_match, old_match, auto_union=True):

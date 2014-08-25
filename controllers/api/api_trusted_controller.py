@@ -2,7 +2,6 @@ import json
 import logging
 import webapp2
 
-from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 
 from controllers.api.api_base_controller import ApiTrustedBaseController
@@ -93,7 +92,6 @@ class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
         ) for match in JSONMatchesParser.parse(request.body, year)]
 
         MatchManipulator.createOrUpdate(matches)
-        taskqueue.add(url='/tasks/math/do/event_matchstats/{}'.format(event_key), method='GET')
 
 
 class ApiTrustedEventMatchesDelete(ApiTrustedBaseController):
@@ -111,7 +109,6 @@ class ApiTrustedEventMatchesDelete(ApiTrustedBaseController):
             keys_to_delete.add(ndb.Key(Match, '{}_{}'.format(event_key, match_key)))
 
         MatchManipulator.delete_keys(keys_to_delete)
-        taskqueue.add(url='/tasks/math/do/event_matchstats/{}'.format(event_key), method='GET')
 
         self.response.out.write(json.dumps({'keys_deleted': [key.id().split('_')[1] for key in keys_to_delete]}))
 
