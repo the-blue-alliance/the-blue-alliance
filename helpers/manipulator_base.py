@@ -131,5 +131,4 @@ class ManipulatorBase(object):
         """
         post_update_hook = getattr(cls, "postUpdateHook", None)
         if callable(post_update_hook):
-            for model in models:
-                deferred.defer(post_update_hook, model, _queue="post-update-hooks")
+            deferred.defer(post_update_hook, models, _queue="post-update-hooks")
