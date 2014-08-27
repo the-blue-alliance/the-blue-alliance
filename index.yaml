@@ -116,4 +116,3 @@ indexes:
   properties:
   - name: model_key
   - name: user_id
-  - name: settings_json

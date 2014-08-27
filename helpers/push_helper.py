@@ -7,17 +7,9 @@ from google.appengine.api import users
 #from helpers.gcm_message_helper import GCMMessageHelper
 
 from models.mobile_client import MobileClient
+from models.mobile_user import MobileUser
 from models.subscription import Subscription
 from models.user import User
-
-
-class MobileUser(db.Model):
-    '''
-    Used in workaround for null user id (see below)
-    We can restructure this once regular oauth logins happen (https://github.com/the-blue-alliance/the-blue-alliance/issues/1069)
-    This is not a good long term solution, I don't think
-    '''
-    user = db.UserProperty(required=True)
 
 
 class PushHelper(object):
