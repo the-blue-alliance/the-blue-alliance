@@ -32,7 +32,7 @@ ANDROID_CLIENT_ID = str(android_id_sitevar.values_json)
 # To enable iOS access to the API, add another variable for the iOS client ID
 
 
-@endpoints.api(name='tbaMobile', version='v5', description="API for TBA Mobile clients",
+@endpoints.api(name='tbaMobile', version='v7', description="API for TBA Mobile clients",
                allowed_client_ids=[WEB_CLIENT_ID, ANDROID_CLIENT_ID,
                                    # To enable iOS addess, add its client ID here
                                    endpoints.API_EXPLORER_CLIENT_ID],
@@ -131,18 +131,18 @@ class MobileAPI(remote.Service):
         sub = Subscription.query( Subscription.user_id == userId, Subscription.model_key == modelKey).get()
         if sub is None:
             # Subscription doesn't exist, add it
-            Subscription( user_id = userId, model_key = modelKey, settings_json = request.settings).put()
+            Subscription( user_id = userId, model_key = modelKey, notifications = PushHelper.notification_enums_from_string(request.notifications)).put()
             if request.device_key:
                 # Send updates to user's other devices
                 GCMMessageHelper.send_subscription_update(userId, request.device_key)
             return BaseResponse(code=200, message="Subscription added")
         else:
-            if sub.settings_json == request.settings:
+            if sub.notifications == PushHelper.notification_enums_from_string(request.notifications):
                 # Subscription already exists. Don't add it again
                 return BaseResponse(code=304, message="Subscription already exists")
             else:
                 # We're updating the settings
-                sub.settings_json = request.settings
+                sub.notifications = request.notifications
                 sub.put()
                 if request.device_key:
                     # Send updates to user's other devices
@@ -182,7 +182,7 @@ class MobileAPI(remote.Service):
         subscriptions = Subscription.query( Subscription.user_id == userId ).fetch()
         output = []
         for subscription in subscriptions:
-            output.append(SubscriptionMessage(model_key = subscription.model_key, settings = subscription.settings_json))
+            output.append(SubscriptionMessage(model_key = subscription.model_key, notifications = subscription.notifications))
         return SubscriptionCollection(subscriptions = output)
 
 

@@ -6,6 +6,7 @@ from google.appengine.api import users
 
 #from helpers.gcm_message_helper import GCMMessageHelper
 
+from consts.notification_type import NotificationType
 from models.mobile_client import MobileClient
 from models.mobile_user import MobileUser
 from models.subscription import Subscription
@@ -13,6 +14,13 @@ from models.user import User
 
 
 class PushHelper(object):
+
+    @classmethod
+    def notification_enums_from_string(cls, notifications):
+        out = []
+        for notification in notifications:
+            out.append(NotificationType.types[notification])
+        return out
 
     @classmethod
     def user_email_to_id(cls, user_email):
@@ -54,12 +62,10 @@ class PushHelper(object):
         keys.append(match.key_name)
         keys.append(match.event.id())
         logging.info("Getting subscriptions for keys: "+str(keys))
-        users = Subscription.query(Subscription.model_key.IN(keys), projection=[Subscription.user_id, Subscription.settings_json], distinct=True).fetch()
+        users = Subscription.query(Subscription.model_key.IN(keys), Subscription.notifications == notification).fetch()
         output = []
         for user in users:
-            logging.info("User settings: "+str(user.settings))
-            if notification in user.settings:
-                output.append(user.user_id)
+            output.append(user.user_id)
         return output
 
     @classmethod

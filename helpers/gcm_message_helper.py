@@ -19,7 +19,7 @@ class GCMMessageHelper(object):
             return
 
         data = {}
-        data['message_type'] = NotificationType.MATCH_SCORE
+        data['message_type'] = NotificationType.type_names[NotificationType.MATCH_SCORE]
         data['message_data'] = {}
         data['message_data']['event_name'] = match.event.get().name
         data['message_data']['match'] = ModelToDict.matchConverter(match)
@@ -40,7 +40,7 @@ class GCMMessageHelper(object):
         user_collapse_key = "{}_favorite_update".format(user_id)
 
         data = {}
-        data['message_type'] = NotificationType.UPDATE_FAVORITES
+        data['message_type'] = NotificationType.type_names[NotificationType.UPDATE_FAVORITES]
         message = GCMMessage(clients, data, collapse_key=user_collapse_key)
         gcm_connection = GCMConnection()
         gcm_connection.notify_device(message)
@@ -57,7 +57,7 @@ class GCMMessageHelper(object):
         user_collapse_key = "{}_subscription_update".format(user_id)
 
         data = {}
-        data['message_type'] = NotificationType.UPDATE_SUBSCRIPTIONS
+        data['message_type'] = NotificationType.type_names[NotificationType.UPDATE_SUBSCRIPTIONS]
         message = GCMMessage(clients, data, collapse_key=user_collapse_key)
         gcm_connection = GCMConnection()
         gcm_connection.notify_device(message)
