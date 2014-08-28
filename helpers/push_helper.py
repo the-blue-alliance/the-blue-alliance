@@ -23,6 +23,13 @@ class PushHelper(object):
         return out
 
     @classmethod
+    def notification_string_from_enums(cls, notifications):
+        out = []
+        for notification in notifications:
+            out.append(NotificationType.type_names[notification])
+        return out
+
+    @classmethod
     def user_email_to_id(cls, user_email):
         '''
         Returns the user id for a given email address (or None if invalid)
