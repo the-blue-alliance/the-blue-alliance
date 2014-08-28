@@ -31,11 +31,18 @@ ANDROID_CLIENT_ID = str(android_id_sitevar.values_json)
 
 # To enable iOS access to the API, add another variable for the iOS client ID
 
+client_ids = [WEB_CLIENT_ID, ANDROID_CLIENT_ID]
+if tba_config.DEBUG:
+    '''
+    Only allow API Explorer access on dev versions
+    '''
+    client_ids.append(endpoints.API_EXPLORER_CLIENT_ID)
+
+# To enable iOS access, add it's client ID here
+
 
 @endpoints.api(name='tbaMobile', version='v7', description="API for TBA Mobile clients",
-               allowed_client_ids=[WEB_CLIENT_ID, ANDROID_CLIENT_ID,
-                                   # To enable iOS addess, add its client ID here
-                                   endpoints.API_EXPLORER_CLIENT_ID],
+               allowed_client_ids=client_ids,
                audiences=[ANDROID_AUDIENCE],
                scopes=[endpoints.EMAIL_SCOPE])
 class MobileAPI(remote.Service):
