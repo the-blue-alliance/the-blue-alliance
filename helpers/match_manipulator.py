@@ -1,9 +1,11 @@
 import json
 import logging
 
+from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 
 from helpers.cache_clearer import CacheClearer
+from helpers.firebase.firebase_pusher import FirebasePusher
 from helpers.gcm_message_helper import GCMMessageHelper
 from helpers.manipulator_base import ManipulatorBase
 
@@ -17,13 +19,29 @@ class MatchManipulator(ManipulatorBase):
         return CacheClearer.get_match_cache_keys_and_controllers(affected_refs)
 
     @classmethod
-    def postUpdateHook(cls, match):
+    def postUpdateHook(cls, matches):
         '''
         To run after the match has been updated.
         Send push notifications to subscribed users
         '''
-        logging.info("Sending push notifications for "+match.key_name)
-        GCMMessageHelper.send_match_score_update(match)
+        for match in matches:
+            logging.info("Sending push notifications for "+match.key_name)
+            GCMMessageHelper.send_match_score_update(match)
+
+        '''
+        Enqueue firebase push
+        '''
+        if matches:
+            event_key = matches[0].event.id()
+            try:
+                FirebasePusher.updated_event(event_key)
+            except Exception:
+                logging.warning("Enqueuing Firebase push failed!")
+
+            # Enqueue task to calculate matchstats
+            taskqueue.add(
+                    url='/tasks/math/do/event_matchstats/' + event_key,
+                    method='GET')
 
     @classmethod
     def updateMerge(self, new_match, old_match, auto_union=True):

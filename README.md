@@ -52,7 +52,7 @@ Potentially useful: http://spriteme.org/
 
 LESS
 ----
-The CSS files are compiled from LESS to ease in development. Make sure you have [Node Package Manager](https://www.npmjs.org/) installed, and install lessc by running `npm install less`. Now, you can run `paver less` to compile the LESS into CSS.
+The CSS files are compiled from LESS to ease in development. Make sure you have [Node Package Manager](https://www.npmjs.org/) installed, and install lessc by running `npm install -g less`. Now, you can run `paver less` to compile the LESS into CSS.
 
 CSS/JavaScript Combination and Compression
 ------------------------------------------

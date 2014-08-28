@@ -70,7 +70,7 @@ class EventTeamRepairDo(webapp.RequestHandler):
     Repair broken EventTeams.
     """
     def get(self):
-        event_teams_keys = EventTeam.query(EventTeam.year == None).fetch(keys_only=True)
+        event_teams_keys = EventTeam.query(EventTeam.year is None).fetch(keys_only=True)
         event_teams = ndb.get_multi(event_teams_keys)
 
         event_teams = EventTeamRepairer.repair(event_teams)
@@ -145,7 +145,7 @@ class EventMatchstatsDo(webapp.RequestHandler):
     def get(self, event_key):
         event = Event.get_by_id(event_key)
         matchstats_dict = MatchstatsHelper.calculate_matchstats(event.matches)
-        if matchstats_dict != {}:
+        if any([v != {} for v in matchstats_dict.values()]):
             event.matchstats_json = json.dumps(matchstats_dict)
             event.dirty = True  # TODO: hacky
             EventManipulator.createOrUpdate(event)
@@ -261,7 +261,7 @@ class YearInsightsDo(webapp.RequestHandler):
         elif kind == 'awards':
             insights = InsightsHelper.doAwardInsights(year)
 
-        if insights != None:
+        if insights is not None:
             InsightManipulator.createOrUpdate(insights)
 
         template_values = {
@@ -307,7 +307,7 @@ class OverallInsightsDo(webapp.RequestHandler):
         elif kind == 'awards':
             insights = InsightsHelper.doOverallAwardInsights()
 
-        if insights != None:
+        if insights is not None:
             InsightManipulator.createOrUpdate(insights)
 
         template_values = {

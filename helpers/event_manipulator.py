@@ -1,3 +1,5 @@
+import logging
+
 from helpers.cache_clearer import CacheClearer
 from helpers.event_helper import EventHelper
 from helpers.manipulator_base import ManipulatorBase
@@ -12,12 +14,16 @@ class EventManipulator(ManipulatorBase):
         return CacheClearer.get_event_cache_keys_and_controllers(affected_refs)
 
     @classmethod
-    def postUpdateHook(cls, event):
+    def postUpdateHook(cls, events):
         """
-        To run after a model has been updated
+        To run after models have been updated
         """
-        event.timezone_id = EventHelper.get_timezone_id(event.location, event.key.id())
-        cls.createOrUpdate(event, run_post_update_hook=False)
+        for event in events:
+            try:
+                event.timezone_id = EventHelper.get_timezone_id(event.location, event.key.id())
+                cls.createOrUpdate(event, run_post_update_hook=False)
+            except Exception:
+                logging.warning("Timezone update for event {} failed!".format(event.key.id()))
 
     @classmethod
     def updateMerge(self, new_event, old_event, auto_union=True):

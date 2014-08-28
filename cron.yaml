@@ -46,7 +46,3 @@ cron:
 #   url: /tasks/math/enqueue/overallinsights/awards
 #   schedule: every day 01:10
 #   timezone: America/Los_Angeles
-
-#- description: OPR Calculation
-#  url: /tasks/math/enqueue/event_matchstats/now
-#  schedule: every day 22:00

@@ -7,7 +7,7 @@ $(document).ready(function(){
     refreshScrollspyThrottled();
   });
 
-  $('.tba-sidebar').on('activate.bs.scrollspy', function() {
+  $('.tba-sidebar-collapsed').on('activate.bs.scrollspy', function() {
     $('.tba-sidenav').find('ul').each(function() {
       if ($(this).parent().hasClass('active')) {
         $(this).removeClass('hide');

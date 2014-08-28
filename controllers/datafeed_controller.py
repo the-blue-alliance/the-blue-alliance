@@ -30,8 +30,6 @@ from models.event import Event
 from models.event_team import EventTeam
 from models.team import Team
 
-from helpers.firebase.firebase_pusher import FirebasePusher
-
 
 class FmsEventListGet(webapp.RequestHandler):
     """
@@ -387,21 +385,6 @@ class UsfirstMatchesGet(webapp.RequestHandler):
 
         event = Event.get_by_id(event_key)
         new_matches = MatchManipulator.createOrUpdate(df.getMatches(event))
-
-        if new_matches:
-            for match in new_matches:
-                if hasattr(match, 'dirty') and match.dirty:
-                    # Enqueue push notification
-                    try:
-                        FirebasePusher.updated_event(event.key_name)
-                    except:
-                        logging.warning("Enqueuing Firebase push failed!")
-                    # Enqueue task to calculate matchstats
-                    taskqueue.add(
-                            url='/tasks/math/do/event_matchstats/' + event.key_name,
-                            method='GET')
-                    break
-
 
         template_values = {
             'matches': new_matches,

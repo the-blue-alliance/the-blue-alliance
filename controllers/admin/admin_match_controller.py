@@ -7,7 +7,6 @@ from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
 from datafeeds.offseason_matches_parser import OffseasonMatchesParser
-from helpers.firebase.firebase_pusher import FirebasePusher
 from helpers.match_manipulator import MatchManipulator
 from models.event import Event
 from models.match import Match
@@ -131,11 +130,6 @@ class AdminMatchAdd(LoggedInHandler):
             )
             for match in matches]
         MatchManipulator.createOrUpdate(matches)
-
-        try:
-            FirebasePusher.updated_event(event.key_name)
-        except:
-            logging.warning("Enqueuing Firebase push failed!")
 
         self.redirect('/admin/event/{}'.format(event_key))
 
