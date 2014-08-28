@@ -58,7 +58,10 @@ class PushHelper(object):
 
     @classmethod
     def get_users_subscribed_to_match(cls, match, notification):
-        keys = match.team_key_names
+        keys = []
+        for team in match.team_key_names:
+            keys.append(team)
+            keys.append("{}_{}".format(match.event.id(), team))
         keys.append(match.key_name)
         keys.append(match.event.id())
         logging.info("Getting subscriptions for keys: "+str(keys))

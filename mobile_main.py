@@ -142,7 +142,7 @@ class MobileAPI(remote.Service):
                 return BaseResponse(code=304, message="Subscription already exists")
             else:
                 # We're updating the settings
-                sub.notifications = request.notifications
+                sub.notifications = PushHelper.notification_enums_from_string(request.notifications)
                 sub.put()
                 if request.device_key:
                     # Send updates to user's other devices
