@@ -1,3 +1,5 @@
+import webapp2
+from webapp2_extras import auth, sessions
 from google.appengine.api import users
 
 from models.account import Account
@@ -15,12 +17,21 @@ class UserBundle(object):
     def account(self):
         if self._account is None:
             self._account = Account.get_or_insert(
-                self.user.user_id(),
-                email = self.user.email(),
-                nickname = self.user.nickname(),
-                registered = False,
-                display_name = self.user.nickname())
+                self.current_user.get_id(),
+                email = self.current_user.email,
+                nickname = self.current_user.name,
+                display_name = self.current_user.name)
         return self._account
+
+    @webapp2.cached_property
+    def auth(self):
+        return auth.get_auth()
+
+    @webapp2.cached_property
+    def current_user(self):
+      """Returns currently logged in user"""
+      user_dict = self.auth.get_user_by_session()
+      return self.auth.store.user_model.get_by_id(user_dict['user_id'])
 
     @property
     def user(self):

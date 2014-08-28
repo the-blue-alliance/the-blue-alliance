@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 import webapp2
+import logging
 from webapp2_extras.routes import RedirectRoute
 
 import tba_config
 
-from controllers.account_controller import AccountEdit, AccountLogout, AccountOverview, AccountRegister
+from controllers.auth_controller import AuthOverview, AuthHandler, AccountEdit, AccountProfile
 from controllers.ajax_controller import LiveEventHandler, TypeaheadHandler, WebcastHandler
 from controllers.event_controller import EventList, EventDetail, EventRss
 from controllers.gameday2_controller import Gameday2Controller
@@ -32,7 +33,6 @@ landing_handler = {tba_config.KICKOFF: MainKickoffHandler,
                    tba_config.INSIGHTS: MainInsightsHandler,
                    }
 
-
 class Webapp2HandlerAdapter(webapp2.BaseHandlerAdapter):
     def __call__(self, request, response, exception):
         request.route_args = {}
@@ -43,9 +43,11 @@ class Webapp2HandlerAdapter(webapp2.BaseHandlerAdapter):
 app = webapp2.WSGIApplication([
       RedirectRoute(r'/', landing_handler[tba_config.CONFIG['landing_handler']], 'landing', strict_slash=True),
       RedirectRoute(r'/about', AboutHandler, 'about', strict_slash=True),
-      RedirectRoute(r'/account', AccountOverview, 'account-overview', strict_slash=True),
-      RedirectRoute(r'/account/edit', AccountEdit, 'account-edit', strict_slash=True),
-      RedirectRoute(r'/account/register', AccountRegister, 'account-register', strict_slash=True),
+      RedirectRoute(r'/auth', AuthOverview, name='account_auth', strict_slash=True),
+      RedirectRoute(r'/account', AccountProfile, name='account_profile', strict_slash=True),
+      RedirectRoute(r'/account/edit', AccountEdit, name='account_edit', strict_slash=True),
+      RedirectRoute(r'/auth/<provider>', AuthHandler, name='auth_login', handler_method='_simple_auth', strict_slash=True),
+      RedirectRoute(r'/auth/<provider>/callback', AuthHandler, name='auth_callback', handler_method='_auth_callback', strict_slash=True),
       RedirectRoute(r'/apidocs', ApiDocumentationHandler, 'api-documentation', strict_slash=True),
       RedirectRoute(r'/contact', ContactHandler, 'contact', strict_slash=True),
       RedirectRoute(r'/event/<event_key>', EventDetail, 'event-detail', strict_slash=True),
@@ -59,7 +61,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/hashtags', HashtagsHandler, 'hashtags', strict_slash=True),
       RedirectRoute(r'/insights/<year:[0-9]+>', InsightsDetail, 'insights-detail', strict_slash=True),
       RedirectRoute(r'/insights', InsightsOverview, 'insights', strict_slash=True),
-      RedirectRoute(r'/logout', AccountLogout, 'account-logout', strict_slash=True),
+      RedirectRoute(r'/logout', AuthHandler, name='logout', handler_method='logout', strict_slash=True),
       RedirectRoute(r'/match/<match_key>', MatchDetail, 'match-detail', strict_slash=True),
       RedirectRoute(r'/opr', OprHandler, 'opr', strict_slash=True),
       RedirectRoute(r'/record', RecordHandler, 'record', strict_slash=True),
@@ -79,6 +81,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/_/webcast/<event_key>/<webcast_number>', WebcastHandler, 'ajax-webcast', strict_slash=True),
       RedirectRoute(r'/<:.*>', PageNotFoundHandler, 'page-not-found', strict_slash=True),
       ],
+      config=tba_config.app_config,
       debug=tba_config.DEBUG)
 app.error_handlers[404] = Webapp2HandlerAdapter(PageNotFoundHandler)
 app.error_handlers[500] = Webapp2HandlerAdapter(InternalServerErrorHandler)

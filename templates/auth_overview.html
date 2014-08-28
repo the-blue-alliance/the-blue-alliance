@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance - myTBA{% endblock %}
+
+{% block meta_description %}Log in to your myTBA account.{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-6">
+      <h2>Log in:</h2>
+      <p>
+        <a href="/auth/google" class="btn auth-gplus">Sign-In With Google</a>
+      </p>
+    </div>
+    <div class="col-sm-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Why Create An Account?</h3>
+        </div>
+        <div class="panel-body">
+          List of benefits here.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

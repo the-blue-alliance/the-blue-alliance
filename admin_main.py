@@ -22,6 +22,7 @@ from controllers.admin.admin_team_controller import AdminTeamDetail, AdminTeamLi
 from controllers.admin.admin_migration_controller import AdminMigration
 from controllers.admin.admin_user_controller import AdminUserList, AdminUserEdit, AdminUserDetail
 
+
 app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/api_auth/add', AdminApiAuthAdd),
                                ('/admin/api_auth/delete/(.*)', AdminApiAuthDelete),
@@ -66,4 +67,5 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/user/(.*)', AdminUserDetail),
                                ('/admin/videos/add', AdminVideosAdd),
                                ],
+                              config=tba_config.app_config,
                               debug=tba_config.DEBUG)
