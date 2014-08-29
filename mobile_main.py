@@ -101,7 +101,7 @@ class MobileAPI(remote.Service):
 
         to_delete = Favorite.query( Favorite.user_id == userId, Favorite.model_key == modelKey).fetch(keys_only=True)
         if len(to_delete) > 0:
-            ndb.delete_mult(to_delete)
+            ndb.delete_multi(to_delete)
             if request.device_key:
                 # Send updates to user's other devices
                 GCMMessageHelper.send_favorite_update(userId, request.device_key)
@@ -189,7 +189,7 @@ class MobileAPI(remote.Service):
         subscriptions = Subscription.query( Subscription.user_id == userId ).fetch()
         output = []
         for subscription in subscriptions:
-            output.append(SubscriptionMessage(model_key = subscription.model_key, notification_types = PushHelper.notification_string_from_enums(subscription.notification_types)))
+            output.append(SubscriptionMessage(model_key = subscription.model_key, notifications = PushHelper.notification_string_from_enums(subscription.notification_types)))
         return SubscriptionCollection(subscriptions = output)
 
 

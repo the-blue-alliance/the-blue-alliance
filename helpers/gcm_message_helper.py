@@ -2,10 +2,12 @@ import logging
 
 from consts.client_type import ClientType
 from consts.notification_type import NotificationType
-from controllers.gcm.gcm import GCMMessage, GCMConnection
+from controllers.gcm.gcm import GCMConnection
 from helpers.push_helper import PushHelper
-from helpers.model_to_dict import ModelToDict
 from models.event import Event
+from notifications.match_score import MatchScoreNotification
+from notifications.update_favorites import UpdateFavoritesNotification
+from notifications.update_subscriptions import UpdateSubscriptionsNotification
 
 
 class GCMMessageHelper(object):
@@ -18,13 +20,8 @@ class GCMMessageHelper(object):
         if len(gcm_keys) == 0:
             return
 
-        data = {}
-        data['message_type'] = NotificationType.type_names[NotificationType.MATCH_SCORE]
-        data['message_data'] = {}
-        data['message_data']['event_name'] = match.event.get().name
-        data['message_data']['match'] = ModelToDict.matchConverter(match)
-
-        message = GCMMessage(gcm_keys, data)
+        notification = MatchScoreNotification(match)
+        message = notification.build(ClientType.OS_ANDROID, {ClientType.OS_ANDROID: gcm_keys})
         gcm_connection = GCMConnection()
         gcm_connection.notify_device(message)
 
@@ -37,11 +34,8 @@ class GCMMessageHelper(object):
         if len(clients) == 0:
             return
 
-        user_collapse_key = "{}_favorite_update".format(user_id)
-
-        data = {}
-        data['message_type'] = NotificationType.type_names[NotificationType.UPDATE_FAVORITES]
-        message = GCMMessage(clients, data, collapse_key=user_collapse_key)
+        notification = UpdateFavoritesNotification(user_id)
+        message = notification.build(ClientType.OS_ANDROID, {ClientType.OS_ANDROID: clients})
         gcm_connection = GCMConnection()
         gcm_connection.notify_device(message)
 
@@ -54,10 +48,7 @@ class GCMMessageHelper(object):
         if len(clients) == 0:
             return
 
-        user_collapse_key = "{}_subscription_update".format(user_id)
-
-        data = {}
-        data['message_type'] = NotificationType.type_names[NotificationType.UPDATE_SUBSCRIPTIONS]
-        message = GCMMessage(clients, data, collapse_key=user_collapse_key)
+        notification = UpdateSubscriptionssNotification(user_id)
+        message = notification.build(ClientType.OS_ANDROID, {ClientType.OS_ANDROID: clients})
         gcm_connection = GCMConnection()
         gcm_connection.notify_device(message)

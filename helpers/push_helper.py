@@ -4,8 +4,6 @@ from google.appengine.ext import db
 from google.appengine.ext import ndb
 from google.appengine.api import users
 
-#from helpers.gcm_message_helper import GCMMessageHelper
-
 from consts.notification_type import NotificationType
 from models.mobile_client import MobileClient
 from models.mobile_user import MobileUser
