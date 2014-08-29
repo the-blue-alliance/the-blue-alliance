@@ -41,7 +41,7 @@ class PushHelper(object):
         user_id = obj.user.user_id()
         key.delete()
 
-        if Account.query( Account.email == user_email).count() == 0:
+        if Account.get_by_id(user_id) is None:
             # Create an account for this user
             Account(id=user_id, email = user_email, nickname = user_email.split('@')[0], registered = False).put()
 
