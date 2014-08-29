@@ -41,7 +41,7 @@ if tba_config.DEBUG:
 # To enable iOS access, add it's client ID here
 
 
-@endpoints.api(name='tbaMobile', version='v7', description="API for TBA Mobile clients",
+@endpoints.api(name='tbaMobile', version='v8', description="API for TBA Mobile clients",
                allowed_client_ids=client_ids,
                audiences=[ANDROID_AUDIENCE],
                scopes=[endpoints.EMAIL_SCOPE])
@@ -66,6 +66,23 @@ class MobileAPI(remote.Service):
         else:
             # Record already exists, don't bother updating it again
             return BaseResponse(code=304, message="Client already exists")
+
+    @endpoints.method(RegistrationRequest, BaseResponse,
+                      path='unregister', http_method='POST',
+                      name='unregister')
+    def unregister_client(self, request):
+        current_user = endpoints.get_current_user()
+        if current_user is None:
+            return BaseResponse(code=401, message="Unauthorized to unregister")
+        userID = PushHelper.user_email_to_id(current_user.email())
+        gcmId = request.mobile_id
+        query = MobileClient.query(MobileClient.messaging_id == gcmId, MobileClient.user_id == userID).fetch(keys_only=True)
+        if len(query) == 0:
+            # Record doesn't exist, so we can't remove it
+            return BaseResponse(code=404, message="User doesn't exist. Can't remove it")
+        else:
+            ndb.delete_multi(query)
+            return BaseResponse(code=200, message="User deleted")
 
     @endpoints.method(FavoriteMessage, BaseResponse,
                       path='favorites/add', http_method='POST',
