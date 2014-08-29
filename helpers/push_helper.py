@@ -5,6 +5,7 @@ from google.appengine.ext import ndb
 from google.appengine.api import users
 
 from consts.notification_type import NotificationType
+from models.account import Account
 from models.mobile_client import MobileClient
 from models.mobile_user import MobileUser
 from models.subscription import Subscription
@@ -36,8 +37,15 @@ class PushHelper(object):
         '''
         u = users.User(user_email)
         key = MobileUser(user=u).put()
-        obj = MobileUser.get(key)
-        return obj.user.user_id()
+        obj = key.get()
+        user_id = obj.user.user_id()
+        key.delete()
+
+        if Account.query( Account.email == user_email).count() == 0:
+            # Create an account for this user
+            Account(id=user_id, email = user_email, nickname = user_email.split('@')[0], registered = False).put()
+
+        return user_id
 
     @classmethod
     def delete_bad_gcm_token(cls, key):
