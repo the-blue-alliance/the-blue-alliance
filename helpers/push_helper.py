@@ -44,8 +44,8 @@ class PushHelper(object):
     @classmethod
     def delete_bad_gcm_token(cls, key):
         logging.info("removing bad GCM token: "+key)
-        to_delete = MobileClient.query(MobileClient.messaging_id == key).fetch()
-        ndb.delete_multi([m.key for m in to_delete])
+        to_delete = MobileClient.query(MobileClient.messaging_id == key).fetch(keys_only=True)
+        ndb.delete_multi(to_delete)
 
     @classmethod
     def update_token(cls, old, new):
@@ -72,7 +72,7 @@ class PushHelper(object):
         keys.append(match.key_name)
         keys.append(match.event.id())
         logging.info("Getting subscriptions for keys: "+str(keys))
-        users = Subscription.query(Subscription.model_key.IN(keys), Subscription.notifications == notification).fetch()
+        users = Subscription.query(Subscription.model_key.IN(keys), Subscription.notification_types == notification).fetch()
         output = []
         for user in users:
             output.append(user.user_id)

@@ -1,6 +1,6 @@
 import logging
 
-from consts.push import Push
+from consts.client_type import ClientType
 from consts.notification_type import NotificationType
 from controllers.gcm.gcm import GCMMessage, GCMConnection
 from helpers.push_helper import PushHelper
@@ -13,7 +13,7 @@ class GCMMessageHelper(object):
     @classmethod
     def send_match_score_update(cls, match):
         users = PushHelper.get_users_subscribed_to_match(match, NotificationType.MATCH_SCORE)
-        gcm_keys = PushHelper.get_client_ids_for_users(Push.OS_ANDROID, users)
+        gcm_keys = PushHelper.get_client_ids_for_users(ClientType.names[ClientType.OS_ANDROID], users)
 
         if len(gcm_keys) == 0:
             return

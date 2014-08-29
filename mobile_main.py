@@ -99,9 +99,9 @@ class MobileAPI(remote.Service):
         userId = PushHelper.user_email_to_id(current_user.email())
         modelKey = request.model_key
 
-        to_delete = Favorite.query( Favorite.user_id == userId, Favorite.model_key == modelKey).fetch()
+        to_delete = Favorite.query( Favorite.user_id == userId, Favorite.model_key == modelKey).fetch(keys_only=True)
         if len(to_delete) > 0:
-            ndb.delete_multi([m.key for m in to_delete])
+            ndb.delete_mult(to_delete)
             if request.device_key:
                 # Send updates to user's other devices
                 GCMMessageHelper.send_favorite_update(userId, request.device_key)
@@ -138,18 +138,18 @@ class MobileAPI(remote.Service):
         sub = Subscription.query( Subscription.user_id == userId, Subscription.model_key == modelKey).get()
         if sub is None:
             # Subscription doesn't exist, add it
-            Subscription( user_id = userId, model_key = modelKey, notifications = PushHelper.notification_enums_from_string(request.notifications)).put()
+            Subscription( user_id = userId, model_key = modelKey, notification_types = PushHelper.notification_enums_from_string(request.notifications)).put()
             if request.device_key:
                 # Send updates to user's other devices
                 GCMMessageHelper.send_subscription_update(userId, request.device_key)
             return BaseResponse(code=200, message="Subscription added")
         else:
-            if sub.notifications == PushHelper.notification_enums_from_string(request.notifications):
+            if sub.notification_types == PushHelper.notification_enums_from_string(request.notifications):
                 # Subscription already exists. Don't add it again
                 return BaseResponse(code=304, message="Subscription already exists")
             else:
                 # We're updating the settings
-                sub.notifications = PushHelper.notification_enums_from_string(request.notifications)
+                sub.notification_types = PushHelper.notification_enums_from_string(request.notifications)
                 sub.put()
                 if request.device_key:
                     # Send updates to user's other devices
@@ -166,9 +166,9 @@ class MobileAPI(remote.Service):
         userId = PushHelper.user_email_to_id(current_user.email())
         modelKey = request.model_key
 
-        to_delete = Subscription.query( Subscription.user_id == userId, Subscription.model_key == modelKey).fetch()
+        to_delete = Subscription.query( Subscription.user_id == userId, Subscription.model_key == modelKey).fetch(keys_only=True)
         if len(to_delete) > 0:
-            ndb.delete_multi([m.key for m in to_delete])
+            ndb.delete_multi(to_delete)
             if request.device_key:
                 # Send updates to user's other devices
                 GCMMessageHelper.send_subscription_update(userId, request.device_key)
@@ -189,7 +189,7 @@ class MobileAPI(remote.Service):
         subscriptions = Subscription.query( Subscription.user_id == userId ).fetch()
         output = []
         for subscription in subscriptions:
-            output.append(SubscriptionMessage(model_key = subscription.model_key, notifications = PushHelper.notification_string_from_enums(subscription.notifications)))
+            output.append(SubscriptionMessage(model_key = subscription.model_key, notification_types = PushHelper.notification_string_from_enums(subscription.notification_types)))
         return SubscriptionCollection(subscriptions = output)
 
 

@@ -7,7 +7,7 @@ class Subscription(ndb.Model):
 
     user_id = ndb.StringProperty(required=True)
     model_key = ndb.StringProperty(required=True)
-    notifications = ndb.IntegerProperty(repeated=True)
+    notification_types = ndb.IntegerProperty(repeated=True)
 
     created = ndb.DateTimeProperty(auto_now_add=True)
 
