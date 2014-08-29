@@ -26,7 +26,10 @@ class MatchManipulator(ManipulatorBase):
         '''
         for match in matches:
             logging.info("Sending push notifications for "+match.key_name)
-            GCMMessageHelper.send_match_score_update(match)
+            try:
+                GCMMessageHelper.send_match_score_update(match)
+            except exception:
+                logging.error("Error sending match updates: "+str(exception))
 
         '''
         Enqueue firebase push
