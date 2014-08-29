@@ -9,6 +9,7 @@ from protorpc import message_types
 
 import tba_config
 
+from consts.client_type import ClientType
 from helpers.push_helper import PushHelper
 from helpers.gcm_message_helper import GCMMessageHelper
 from models.favorite import Favorite
@@ -56,12 +57,12 @@ class MobileAPI(remote.Service):
             return BaseResponse(code=401, message="Unauthorized to register")
         userId = PushHelper.user_email_to_id(current_user.email())
         gcmId = request.mobile_id
-        os = request.operating_system
+        os = ClientType.enums[request.operating_system]
         if MobileClient.query( MobileClient.messaging_id==gcmId ).count() == 0:
             # Record doesn't exist yet, so add it
             MobileClient(   messaging_id = gcmId,
                             user_id = userId,
-                            operating_system = os ).put()
+                            client_type = os ).put()
             return BaseResponse(code=200, message="Registration successful")
         else:
             # Record already exists, don't bother updating it again

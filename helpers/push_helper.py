@@ -4,6 +4,7 @@ from google.appengine.ext import db
 from google.appengine.ext import ndb
 from google.appengine.api import users
 
+from consts.client_type import ClientType
 from consts.notification_type import NotificationType
 from models.account import Account
 from models.mobile_client import MobileClient
@@ -88,7 +89,7 @@ class PushHelper(object):
     def get_client_ids_for_users(cls, os_type, user_list):
         output = []
         for user in user_list:
-            client_list = MobileClient.query(MobileClient.user_id == user, MobileClient.operating_system == os_type).fetch()
+            client_list = MobileClient.query(MobileClient.user_id == user, MobileClient.client_type == ClientType.enums[os_type]).fetch()
             for client in client_list:
                 output.append(client.messaging_id)
         return output
