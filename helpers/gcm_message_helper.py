@@ -48,7 +48,7 @@ class GCMMessageHelper(object):
         if len(clients) == 0:
             return
 
-        notification = UpdateSubscriptionssNotification(user_id)
+        notification = UpdateSubscriptionsNotification(user_id)
         message = notification.build(ClientType.OS_ANDROID, {ClientType.OS_ANDROID: clients})
         gcm_connection = GCMConnection()
         gcm_connection.notify_device(message)
