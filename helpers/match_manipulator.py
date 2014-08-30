@@ -6,6 +6,7 @@ from google.appengine.ext import ndb
 
 from helpers.cache_clearer import CacheClearer
 from helpers.firebase.firebase_pusher import FirebasePusher
+from helpers.gcm_message_helper import GCMMessageHelper
 from helpers.manipulator_base import ManipulatorBase
 
 
@@ -19,9 +20,20 @@ class MatchManipulator(ManipulatorBase):
 
     @classmethod
     def postUpdateHook(cls, matches):
-        """
-        To run after models have been updated
-        """
+        '''
+        To run after the match has been updated.
+        Send push notifications to subscribed users
+        '''
+        for match in matches:
+            logging.info("Sending push notifications for "+match.key_name)
+            try:
+                GCMMessageHelper.send_match_score_update(match)
+            except exception:
+                logging.error("Error sending match updates: "+str(exception))
+
+        '''
+        Enqueue firebase push
+        '''
         if matches:
             event_key = matches[0].event.id()
             try:
