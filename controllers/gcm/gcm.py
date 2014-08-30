@@ -37,20 +37,6 @@ from helpers.push_helper import PushHelper
 
 from models.sitevar import Sitevar
 
-LOCALHOST = False
-SERVER_KEY = Sitevar.get_by_id('gcm.serverKey')
-if SERVER_KEY is None:
-    raise Exception("Missing sitevar: gcm.serverKey. Can't send GCM messages.")
-logging.info("GCM KEY: "+str(SERVER_KEY.values_json))
-GCM_CONFIG = {'gcm_api_key': str(SERVER_KEY.values_json) }
-GOOGLE_LOGIN_URL = 'https://www.google.com/accounts/ClientLogin'
-# Can't use https on localhost due to Google cert bug
-GOOGLE_GCM_SEND_URL = 'https://android.apis.google.com/gcm/send'
-GOOGLE_GCM_SEND_URL = 'https://android.googleapis.com/gcm/send'
-
-GCM_QUEUE_NAME = 'gcm-retries'
-GCM_QUEUE_CALLBACK_URL = '/gae_python_gcm/send_request'
-
 
 class GCMMessage:
     device_tokens = None
@@ -111,12 +97,26 @@ class GCMConnection:
     #                   'update_token_callback_func': lambda x: x}
     ##############################################################################
 
+    def __init__(self):
+        self.LOCALHOST = False
+        self.SERVER_KEY = Sitevar.get_by_id('gcm.serverKey')
+        if self.SERVER_KEY is None:
+            raise Exception("Missing sitevar: gcm.serverKey. Can't send GCM messages.")
+        logging.info("GCM KEY: "+str(self.SERVER_KEY.values_json))
+        self.GCM_CONFIG = {'gcm_api_key': str(self.SERVER_KEY.values_json) }
+        self.GOOGLE_LOGIN_URL = 'https://www.google.com/accounts/ClientLogin'
+        # Can't use https on localhost due to Google cert bug
+        self.GOOGLE_GCM_SEND_URL = 'https://android.apis.google.com/gcm/send'
+        self.GOOGLE_GCM_SEND_URL = 'https://android.googleapis.com/gcm/send'
+
+        self.GCM_QUEUE_NAME = 'gcm-retries'
+        self.GCM_QUEUE_CALLBACK_URL = '/gae_python_gcm/send_request'
+
     # Call this to send a push notification
     def notify_device(self, message, deferred=False):
         self._submit_message(message, deferred=deferred)
 
     ##### Public Utils #####
-
     def debug(self, option):
         if option == "help":
             return "Commands: help stats\n"
@@ -146,7 +146,7 @@ class GCMConnection:
 
     # Add message to queue
     def _requeue_message(self, message):
-        taskqueue.add(queue_name=GCM_QUEUE_NAME, url=GCM_QUEUE_CALLBACK_URL, params={'device_token': message.device_tokens, 'collapse_key': message.collapse_key, 'notification': message.notification})
+        taskqueue.add(queue_name=self.GCM_QUEUE_NAME, url=self.GCM_QUEUE_CALLBACK_URL, params={'device_token': message.device_tokens, 'collapse_key': message.collapse_key, 'notification': message.notification})
 
     # If send message now or add it to the queue
     def _submit_message(self, message, deferred=False):
@@ -170,7 +170,7 @@ class GCMConnection:
 
         # Build request
         headers = {
-                   'Authorization': 'key=' + GCM_CONFIG['gcm_api_key'],
+                   'Authorization': 'key=' + self.GCM_CONFIG['gcm_api_key'],
                    'Content-Type': 'application/json'
                    }
 
@@ -183,7 +183,7 @@ class GCMConnection:
 
         logging.info('Sending gcm_post_body: ' + repr(gcm_post_json_str))
 
-        request = urllib2.Request(GOOGLE_GCM_SEND_URL, gcm_post_json_str, headers)
+        request = urllib2.Request(self.GOOGLE_GCM_SEND_URL, gcm_post_json_str, headers)
 
         # Post
         try:
