@@ -10,14 +10,9 @@ from models.match import Match
 
 class ApiMatchControllerBase(ApiBaseController):
 
-    CACHE_KEY_FORMAT = "apiv2_match_controller_{}"  # (match_key)
-    CACHE_VERSION = 2
-    CACHE_HEADER_LENGTH = 60 * 60
-
     def __init__(self, *args, **kw):
         super(ApiMatchControllerBase, self).__init__(*args, **kw)
         self.match_key = self.request.route_kwargs["match_key"]
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.match_key)
 
     @property
     def _validators(self):
@@ -31,6 +26,14 @@ class ApiMatchControllerBase(ApiBaseController):
 
 
 class ApiMatchController(ApiMatchControllerBase):
+
+    CACHE_KEY_FORMAT = "apiv2_match_controller_{}"  # (match_key)
+    CACHE_VERSION = 2
+    CACHE_HEADER_LENGTH = 60 * 60
+
+    def __init__(self, *args, **kw):
+        super(ApiMatchController, self).__init__(*args, **kw)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.match_key)
 
     def _track_call(self, match_key):
         self._track_call_defer('match', match_key)
