@@ -9,8 +9,6 @@ from helpers.firebase.firebase_pusher import FirebasePusher
 from helpers.gcm_message_helper import GCMMessageHelper
 from helpers.manipulator_base import ManipulatorBase
 
-from models.event import Event
-
 
 class MatchManipulator(ManipulatorBase):
     """
