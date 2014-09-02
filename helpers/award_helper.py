@@ -112,6 +112,9 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.BEST_CRAFTSMANSHIP, (["best craftsmanship"], [])),
     (AwardType.BEST_DEFENSIVE_MATCH, (["best defensive match"], [])),
     (AwardType.PLAY_OF_THE_DAY, (["play of the day"], [])),
+    (AwardType.PROGRAMMING, (["programming"], [])),
+    (AwardType.PROFESSIONALISM, (["professionalism"], ["gracious"])),
+    (AwardType.GOLDEN_CORNDOG, (["golden corndog"], [])),
 ]
 
 
