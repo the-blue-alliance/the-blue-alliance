@@ -15,6 +15,12 @@ from models.user import User
 
 class PushHelper(object):
 
+    '''
+    General helper methods for push notifications
+    Actual notifications should be built and send from NotificationHelper
+    (they're split up for cleanliness)
+    '''
+
     @classmethod
     def notification_enums_from_string(cls, notifications):
         out = []

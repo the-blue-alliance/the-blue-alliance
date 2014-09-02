@@ -2,7 +2,6 @@ import logging
 
 from consts.client_type import ClientType
 from consts.notification_type import NotificationType
-from controllers.gcm.gcm import GCMConnection
 from helpers.push_helper import PushHelper
 from models.event import Event
 from notifications.match_score import MatchScoreNotification
@@ -10,7 +9,12 @@ from notifications.update_favorites import UpdateFavoritesNotification
 from notifications.update_subscriptions import UpdateSubscriptionsNotification
 
 
-class GCMMessageHelper(object):
+class NotificationHelper(object):
+
+    '''
+    Helper class for sending push notifications.
+    Methods here should build a Notification object and use their send method
+    '''
 
     @classmethod
     def send_match_score_update(cls, match):
@@ -21,9 +25,7 @@ class GCMMessageHelper(object):
             return
 
         notification = MatchScoreNotification(match)
-        message = notification.build(ClientType.OS_ANDROID, {ClientType.OS_ANDROID: gcm_keys})
-        gcm_connection = GCMConnection()
-        gcm_connection.notify_device(message)
+        notification.send({ClientType.OS_ANDROID: gcm_keys})
 
     @classmethod
     def send_favorite_update(cls, user_id, sending_device_key):
@@ -35,9 +37,7 @@ class GCMMessageHelper(object):
             return
 
         notification = UpdateFavoritesNotification(user_id)
-        message = notification.build(ClientType.OS_ANDROID, {ClientType.OS_ANDROID: clients})
-        gcm_connection = GCMConnection()
-        gcm_connection.notify_device(message)
+        notification.send({ClientType.OS_ANDROID: clients})
 
     @classmethod
     def send_subscription_update(cls, user_id, sending_device_key):
@@ -49,6 +49,4 @@ class GCMMessageHelper(object):
             return
 
         notification = UpdateSubscriptionsNotification(user_id)
-        message = notification.build(ClientType.OS_ANDROID, {ClientType.OS_ANDROID: clients})
-        gcm_connection = GCMConnection()
-        gcm_connection.notify_device(message)
+        notification.send(ClientType.OS_ANDROID, {ClientType.OS_ANDROID: clients})
