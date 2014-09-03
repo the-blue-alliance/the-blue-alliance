@@ -6,8 +6,9 @@ from notifications.base_notification import BaseNotification
 
 class UpdateFavoritesNotification(BaseNotification):
 
-    def __init__(self, user_id):
+    def __init__(self, user_id, sending_device_key):
         self.user_id = user_id
+        self.sending_device_key = sending_device_key
 
     def _build_dict(self):
         data = {}
@@ -17,6 +18,9 @@ class UpdateFavoritesNotification(BaseNotification):
     def _render_android(self):
         user_collapse_key = "{}_favorite_update".format(self.user_id)
         clients = self.keys[ClientType.OS_ANDROID]
+
+        if self.sending_device_key in clients:
+            clients.remove(self.sending_device_key)
 
         data = self._build_dict()
         return GCMMessage(clients, data, collapse_key=user_collapse_key)

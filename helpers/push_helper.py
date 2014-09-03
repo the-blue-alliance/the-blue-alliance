@@ -92,10 +92,21 @@ class PushHelper(object):
         return output
 
     @classmethod
-    def get_client_ids_for_users(cls, os_type, user_list):
-        output = []
-        for user in user_list:
-            client_list = MobileClient.query(MobileClient.user_id == user, MobileClient.client_type == ClientType.enums[os_type]).fetch()
-            for client in client_list:
-                output.append(client.messaging_id)
+    def get_client_ids_for_users(cls, user_list, os_types=None ):
+        logging.info("Finding clients for: "+str(user_list))
+        if os_types is None:
+            os_types = ClientType.names.keys()
+        logging.info("Client Types: "+str(os_types))
+        output = {}
+        for os_type in os_types:
+            output[os_type] = []
+            for user in user_list:
+                client_list = MobileClient.query(MobileClient.user_id == user, MobileClient.client_type == os_type).fetch()
+                for client in client_list:
+                    if os_type == ClientType.WEBHOOK:
+                        # For webhooks, instead, pass a tuple including the secret key used to validate requests
+                        output[os_type].append( (client.messaging_id, client.secret) )
+                    else:
+                        output[os_type].append( client.messaging_id )
+        logging.info("Found clients: "+str(output))
         return output

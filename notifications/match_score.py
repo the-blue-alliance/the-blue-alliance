@@ -24,3 +24,6 @@ class MatchScoreNotification(BaseNotification):
         data = self._build_dict()
 
         return GCMMessage(gcm_keys, data)
+
+    def _render_webhook(self):
+        return self._build_dict()

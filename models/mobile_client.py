@@ -11,6 +11,7 @@ class MobileClient(ndb.Model):
     user_id = ndb.StringProperty(required=True, indexed=True)
     messaging_id = ndb.StringProperty(required=True)
     client_type = ndb.IntegerProperty(required=True)
+    secret = ndb.StringProperty(default="")  # Used to hash webhooks
 
     created = ndb.DateTimeProperty(auto_now_add=True)
 
