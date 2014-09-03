@@ -36,5 +36,22 @@
       </table>
     </div>
   </div>
+  <div class="row">
+    <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
+    <h2>Connected Devices</h2>
+      <table class="table table-striped">
+        <tr>
+          <th>Type</th>
+          <th>ID</td>
+        </tr>
+          {% for client in user_bundle.mobile_clients %}
+            <tr>
+              <td>{{ client.type_string }}</td>
+              <td>{{ client.messaging_id }}</td>
+            </tr>
+          {% endfor %}
+      </table>
+    </div>
+  </div>
 </div>
 {% endblock %}

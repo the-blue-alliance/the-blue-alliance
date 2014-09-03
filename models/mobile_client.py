@@ -1,5 +1,7 @@
 from google.appengine.ext import ndb
 
+from consts.client_type import ClientType
+
 
 class MobileClient(ndb.Model):
     """
@@ -17,3 +19,7 @@ class MobileClient(ndb.Model):
 
     def __init__(self, *args, **kw):
         super(MobileClient, self).__init__(*args, **kw)
+
+    @property
+    def type_string(self):
+        return ClientType.names[self.client_type]

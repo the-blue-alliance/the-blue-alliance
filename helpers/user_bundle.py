@@ -1,6 +1,7 @@
 from google.appengine.api import users
 
 from models.account import Account
+from models.mobile_client import MobileClient
 
 
 class UserBundle(object):
@@ -25,6 +26,11 @@ class UserBundle(object):
     @property
     def user(self):
         return users.get_current_user()
+
+    @property
+    def mobile_clients(self):
+        user_id = self.user.user_id()
+        return MobileClient.query( MobileClient.user_id == user_id ).fetch()
 
     @property
     def is_current_user_admin(self):
