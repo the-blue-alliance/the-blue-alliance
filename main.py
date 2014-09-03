@@ -15,6 +15,7 @@ from controllers.main_controller import ContactHandler, HashtagsHandler, \
       AboutHandler, ThanksHandler, PageNotFoundHandler, InternalServerErrorHandler, \
       GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler
 from controllers.match_controller import MatchDetail
+from controllers.notification_controller import UserNotificationBroadcast
 from controllers.district_controller import DistrictDetail
 from controllers.suggestions.suggest_match_video_controller import SuggestMatchVideoController
 from controllers.suggestions.suggest_event_webcast_controller import SuggestEventWebcastController
@@ -62,6 +63,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/insights', InsightsOverview, 'insights', strict_slash=True),
       RedirectRoute(r'/logout', AccountLogout, 'account-logout', strict_slash=True),
       RedirectRoute(r'/match/<match_key>', MatchDetail, 'match-detail', strict_slash=True),
+      RedirectRoute(r'/notifications/broadcast', UserNotificationBroadcast, 'notification-broadcast', strict_slash=True),
       RedirectRoute(r'/opr', OprHandler, 'opr', strict_slash=True),
       RedirectRoute(r'/record', RecordHandler, 'record', strict_slash=True),
       RedirectRoute(r'/search', SearchHandler, 'search', strict_slash=True),

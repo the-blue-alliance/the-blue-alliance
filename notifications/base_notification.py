@@ -3,6 +3,8 @@ import json
 import logging
 import urllib2
 
+from google.appengine.ext import deferred
+
 from controllers.gcm.gcm import GCMConnection
 from consts.client_type import ClientType
 
@@ -17,7 +19,7 @@ class BaseNotification(object):
     def send(self, keys):
         self.keys = keys  # dict like {ClientType : [ (key, secret) ] }
         for client_type in ClientType.names.keys():
-            self.render(client_type)
+            deferred.defer(self.render, client_type)
 
     '''
     This method will create platform specific notifications and send them to the platform specified
@@ -66,7 +68,7 @@ class BaseNotification(object):
             checksum = ch.hexdigest()
 
             logging.info("Checksum: "+str(checksum))
-
+            logging.info("URL: "+str(url))
             request = urllib2.Request(url, payload)
             request.add_header("X-Tba-Checksum", checksum)
             try:
@@ -82,3 +84,6 @@ class BaseNotification(object):
                     logging.error('500, Internal error on server sending message')
                 else:
                     logging.exception('Unexpected HTTPError: ' + str(e.code) + " " + e.msg + " " + e.read())
+
+            except Exception, ex:
+                logging.error("Other Exception: "+str(ex))
