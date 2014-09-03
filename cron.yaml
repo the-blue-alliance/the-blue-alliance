@@ -1,7 +1,7 @@
 cron:
 - description: FIRST event list scraping. Also includes detail scraping.
   url: /tasks/get/usfirst_event_list/2015
-  schedule: every sunday 02:00
+  schedule: every day 02:00
   timezone: America/Los_Angeles
 
 # - description: FIRST event detail scraping

@@ -23,6 +23,7 @@ class MatchManipulator(ManipulatorBase):
         '''
         To run after the match has been updated.
         Send push notifications to subscribed users
+        Only if the match is part of an active event
         '''
         for match in matches:
             logging.info("Sending push notifications for "+match.key_name)
