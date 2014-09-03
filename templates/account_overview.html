@@ -50,7 +50,7 @@
           {% for client in user_bundle.mobile_clients %}
             <tr>
               <td>{{ client.type_string }}</td>
-              <td>{{ client.messaging_id }}</td>
+              <td>{{ client.short_id }}</td>
               <td><form action="/notifications/broadcast" method="post">
                 <input name="account_id" type="hidden" value="{{user_bundle.account.key.id}}" />
                 <input name="messaging_id" type="hidden" value="{{client.messaging_id}}" />

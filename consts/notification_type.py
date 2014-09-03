@@ -14,6 +14,8 @@ class NotificationType(object):
     DISTRICT_POINTS_UPDATED = 6
     SCHEDULE_POSTED = 7
     FINAL_RESULTS = 8
+    PING = 9
+    BROADCAST = 10
 
     # These aren't notifications, but used for upstream API calls
     UPDATE_FAVORITES = 100
@@ -29,6 +31,8 @@ class NotificationType(object):
         DISTRICT_POINTS_UPDATED: "district_points_updated",
         SCHEDULE_POSTED: "schedule_posted",
         FINAL_RESULTS: "final_results",
+        PING: "ping",
+        BROADCAST: "broadcast",
 
         UPDATE_FAVORITES: "update_favorites",
         UPDATE_SUBSCIPTION: "update_subscriptions",

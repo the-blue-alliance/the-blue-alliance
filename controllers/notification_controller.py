@@ -1,6 +1,7 @@
 import logging
 
 from base_controller import LoggedInHandler
+from consts.client_type import ClientType
 from models.mobile_client import MobileClient
 from notifications.ping import PingNotification
 
@@ -27,7 +28,10 @@ class UserNotificationBroadcast(LoggedInHandler):
             if to_ping is not None:
                 device = to_ping[0]
                 # This makes sure that the client actually exists and that this user owns it
-                keys = {device.client_type: [(device.messaging_id, device.secret)]}
+                if device.client_type == ClientType.WEBHOOK:
+                    keys = {device.client_type: [(device.messaging_id, device.secret)]}
+                else:
+                    keys = {device.client_type: [device.messaging_id]}
                 logging.info("url: "+str(messaging_id))
                 logging.info("keys: "+str(keys))
                 notification = PingNotification()

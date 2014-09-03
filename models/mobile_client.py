@@ -30,3 +30,7 @@ class MobileClient(ndb.Model):
     def is_webhook(self):
         logging.info(str(self.client_type == ClientType.WEBHOOK))
         return self.client_type == ClientType.WEBHOOK
+
+    @property
+    def short_id(self):
+        return self.messaging_id if len(self.messaging_id)<=50 else self.messaging_id[0:50]+'...'
