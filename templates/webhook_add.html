@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance - Add Webhook{% endblock %}
+
+{% block meta_description %}Create a webhook so TBA can notify your server on live events.{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
+      <h1>Add Webhook</h1>
+      <form class="account_signup_form" action="/webhooks/add" method="post">
+        <table class="table table-striped">
+          <tbody>
+            <tr>
+              <td>URL</td>
+              <td><input class="form-control" type="text" name="url" placeholder="http://yoursite.com"/></td>
+            </tr>
+            <tr>
+              <td>Secret Key</td>
+              <td><input class="form-control" type="text" name="secret" placeholder=""/></td>
+            </tr>
+          </tbody>
+        </table>
+        <input name="account_id" type="hidden" value="{{user_bundle.account.key.id}}" />
+        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Create Webhook</button>
+        <a class="btn btn-default" href="/account"><span class="glyphicon glyphicon-remove"></span> Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

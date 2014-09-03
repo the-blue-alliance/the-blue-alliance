@@ -34,6 +34,18 @@ class NotificationType(object):
         UPDATE_SUBSCIPTION: "update_subscriptions",
     }
 
+    render_names = {
+        UPCOMING_MATCH: "Upcoming Match",
+        MATCH_SCORE: "Match Score",
+        LEVEL_STARTING: "Competition Level Starting",
+        ALLIANCE_SELECTION: "Alliance Selection",
+        AWARDS: "Awards Posted",
+        MEDIA_POSTED: "Media Posted",
+        DISTRICT_POINTS_UPDATED: "District Points Updated",
+        SCHEDULE_POSTED: "Event Schedule Posted",
+        FINAL_RESULTS: "Final Results",
+    }
+
     types = {
         "upcoming_match": UPCOMING_MATCH,
         "match_score": MATCH_SCORE,
