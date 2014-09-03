@@ -1,3 +1,4 @@
+import logging
 from google.appengine.ext import ndb
 
 from consts.client_type import ClientType
@@ -23,3 +24,8 @@ class MobileClient(ndb.Model):
     @property
     def type_string(self):
         return ClientType.names[self.client_type]
+
+    @property
+    def is_webhook(self):
+        logging.info(str(self.client_type == ClientType.WEBHOOK))
+        return self.client_type == ClientType.WEBHOOK
