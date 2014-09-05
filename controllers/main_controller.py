@@ -362,3 +362,16 @@ class ApiDocumentationHandler(CacheableHandler):
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/apidocs.html")
         return template.render(path, self.template_values)
+
+
+class WebhookDocumentationHandler(CacheableHandler):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "webhook_docs"
+
+    def __init__(self, *args, **kw):
+        super(WebhookDocumentationHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 *24 * 7
+
+    def _render(self, *args, **kw):
+        path = os.path.join(os.path.dirname(__file__), "../templates/webhookdocs.html")
+        return template.render(path, self.template_values)
