@@ -32,8 +32,18 @@ class WebhookAdd(LoggedInHandler):
         real_account_id = self.user_bundle.account.key.id()
         check_account_id = self.request.get('account_id')
         if check_account_id == real_account_id:
-            client = MobileClient( user_id = real_account_id, messaging_id = self.request.get('url'), secret=self.request.get('secret'), client_type = ClientType.WEBHOOK)
-            client.put()
+            url = self.request.get('url')
+            secret_key = self.request.get('secret')
+            query = MobileClient.query(MobileClient.user_id == real_account_id, MobileClient.messaging_id == url)
+            if query.count() == 0:
+                # Webhook doesn't exist, add it
+                client = MobileClient( user_id = real_account_id, messaging_id = url, secret=secret_key, client_type = ClientType.WEBHOOK)
+                client.put()
+            else:
+                # Webhook already exists. Update the secret
+                current = query.fetch()[0]
+                current.secret = secret_key
+                current.put()
             self.redirect('/account')
         else:
             self.redirect('/')
