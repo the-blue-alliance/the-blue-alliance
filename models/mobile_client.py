@@ -1,4 +1,3 @@
-import logging
 import urllib
 from google.appengine.ext import ndb
 
@@ -28,7 +27,6 @@ class MobileClient(ndb.Model):
 
     @property
     def is_webhook(self):
-        logging.info(str(self.client_type == ClientType.WEBHOOK))
         return self.client_type == ClientType.WEBHOOK
 
     @property

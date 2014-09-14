@@ -1,5 +1,3 @@
-import logging
-
 from base_controller import LoggedInHandler
 from consts.client_type import ClientType
 from models.mobile_client import MobileClient
@@ -29,8 +27,6 @@ class UserNotificationBroadcast(LoggedInHandler):
                     keys = {client.client_type: [(client.messaging_id, client.secret)]}
                 else:
                     keys = {client.client_type: [client.messaging_id]}
-                logging.info("url: "+str(messaging_id))
-                logging.info("keys: "+str(keys))
                 notification = PingNotification()
                 notification.send(keys)
             self.redirect('/account')

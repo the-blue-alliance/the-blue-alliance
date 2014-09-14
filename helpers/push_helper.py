@@ -56,13 +56,12 @@ class PushHelper(object):
 
     @classmethod
     def delete_bad_gcm_token(cls, key):
-        logging.info("removing bad GCM token: "+key)
+        logging.info("removing bad GCM token: {}".format(key))
         to_delete = MobileClient.query(MobileClient.messaging_id == key).fetch(keys_only=True)
         ndb.delete_multi(to_delete)
 
     @classmethod
     def update_token(cls, old, new):
-        logging.info("updating token"+old+"\n->"+new)
         to_update = MobileClient.query(MobileClient.messaging_id == old).fetch()
         for model in to_update:
             model.messaging_id = new
@@ -84,7 +83,6 @@ class PushHelper(object):
             keys.append("{}_{}".format(match.event.id(), team))
         keys.append(match.key_name)
         keys.append(match.event.id())
-        logging.info("Getting subscriptions for keys: "+str(keys))
         users = Subscription.query(Subscription.model_key.IN(keys), Subscription.notification_types == notification).fetch()
         output = []
         for user in users:
@@ -93,10 +91,8 @@ class PushHelper(object):
 
     @classmethod
     def get_client_ids_for_users(cls, user_list, os_types=None ):
-        logging.info("Finding clients for: "+str(user_list))
         if os_types is None:
             os_types = ClientType.names.keys()
-        logging.info("Client Types: "+str(os_types))
         output = {}
         for os_type in os_types:
             output[os_type] = []
@@ -108,5 +104,4 @@ class PushHelper(object):
                         output[os_type].append( (client.messaging_id, client.secret) )
                     else:
                         output[os_type].append( client.messaging_id )
-        logging.info("Found clients: "+str(output))
         return output
