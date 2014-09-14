@@ -12,7 +12,7 @@ from models.mobile_client import MobileClient
 
 class WebhookAdd(LoggedInHandler):
     def get(self):
-        self._require_login('/account')
+        self._require_login('/account/register')
 
         if not self.user_bundle.account.registered:
             self.redirect('/account/register')

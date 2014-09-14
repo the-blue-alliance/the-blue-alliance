@@ -11,25 +11,25 @@ from consts.client_type import ClientType
 
 class BaseNotification(object):
 
-    '''
+    """
     Class that acts as a basic notification.
     To send a notification, instantiate one and call this method
-    '''
+    """
 
     def send(self, keys):
         self.keys = keys  # dict like {ClientType : [ (key, secret) ] }
         for client_type in ClientType.names.keys():
             deferred.defer(self.render, client_type)
 
-    '''
+    """
     This method will create platform specific notifications and send them to the platform specified
     Clients should implement the referenced methods in order to build the notification for each platform
-    '''
+    """
     def render(self, client_type):
         if client_type == ClientType.OS_ANDROID and hasattr(self, "_render_android"):
             if ClientType.OS_ANDROID in self.keys and len(self.keys[ClientType.OS_ANDROID]) > 0:
                 notification = self._render_android()
-                self.send_android(notification)
+                self.send_gcm(notification)
 
         elif client_type == ClientType.OS_IOS and hasattr(self, "_render_ios"):
             notification = self._render_ios()
@@ -40,14 +40,14 @@ class BaseNotification(object):
                 notification = self._render_webhook()
                 self.send_webhook(notification)
 
-    '''
+    """
     Subclasses should override this method and return a dict containing the payload of the notification.
     The dict should have two entries: 'message_type' (should be one of NotificationType, string) and 'message_data'
-    '''
+    """
     def _build_dict(self):
         raise NotImplementedError("Subclasses must implement this method to build JSON data to send")
 
-    def send_android(self, gcm_message):
+    def send_gcm(self, gcm_message):
         gcm_connection = GCMConnection()
         gcm_connection.notify_device(gcm_message)
 
