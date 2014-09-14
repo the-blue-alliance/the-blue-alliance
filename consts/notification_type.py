@@ -19,7 +19,7 @@ class NotificationType(object):
 
     # These aren't notifications, but used for upstream API calls
     UPDATE_FAVORITES = 100
-    UPDATE_SUBSCIPTION = 101
+    UPDATE_SUBSCRIPTION = 101
 
     type_names = {
         UPCOMING_MATCH: "upcoming_match",
@@ -35,7 +35,7 @@ class NotificationType(object):
         BROADCAST: "broadcast",
 
         UPDATE_FAVORITES: "update_favorites",
-        UPDATE_SUBSCIPTION: "update_subscriptions",
+        UPDATE_SUBSCRIPTION: "update_subscriptions",
     }
 
     render_names = {
@@ -62,5 +62,5 @@ class NotificationType(object):
         "final_results": FINAL_RESULTS,
 
         "update_favorites": UPDATE_FAVORITES,
-        "update_subscriptions": UPDATE_SUBSCIPTION
+        "update_subscriptions": UPDATE_SUBSCRIPTION
     }

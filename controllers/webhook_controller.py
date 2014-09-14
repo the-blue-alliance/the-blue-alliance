@@ -52,7 +52,7 @@ class WebhookDelete(LoggedInHandler):
         current_user_account_id = self.user_bundle.account.key.id()
         target_account_id = self.request.get('account_id')
         if target_account_id == current_user_account_id:
-            to_delete = MobileClient.query(MobileClient.user_id == current_user_account_id, MobileClient.messaging_id == self.request.get('messaging_id').fetch(keys_only=True)
+            to_delete = MobileClient.query(MobileClient.user_id == current_user_account_id, MobileClient.messaging_id == self.request.get('messaging_id')).fetch(keys_only=True)
             ndb.delete_multi(to_delete)
             self.redirect('/account')
         else:

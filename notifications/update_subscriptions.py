@@ -1,3 +1,5 @@
+import logging
+
 from consts.client_type import ClientType
 from consts.notification_type import NotificationType
 from controllers.gcm.gcm import GCMMessage
@@ -12,16 +14,14 @@ class UpdateSubscriptionsNotification(BaseNotification):
 
     def _build_dict(self):
         data = {}
-        data['message_type'] = NotificationType.type_names[NotificationType.UPDATE_SUBSCRIPTIONS]
+        data['message_type'] = NotificationType.type_names[NotificationType.UPDATE_SUBSCRIPTION]
         return data
 
     def _render_android(self):
         user_collapse_key = "{}_subscriptions_update".format(self.user_id)
-        clients = self.keys[ClientType.OS_ANDROID]
 
-        if self.sending_device_key in clients:
-            clients.remove(self.sending_device_key)
+        if self.sending_device_key in self.keys[ClientType.OS_ANDROID]:
+            self.keys[ClientType.OS_ANDROID].remove(self.sending_device_key)
 
         data = self._build_dict()
-        return GCMMessage(clients, data, collapse_key=user_collapse_key)
-
+        return GCMMessage(self.keys[ClientType.OS_ANDROID], data, collapse_key=user_collapse_key)

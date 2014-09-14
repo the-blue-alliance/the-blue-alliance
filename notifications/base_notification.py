@@ -18,27 +18,28 @@ class BaseNotification(object):
 
     def send(self, keys):
         self.keys = keys  # dict like {ClientType : [ (key, secret) ] }
-        for client_type in ClientType.names.keys():
-            deferred.defer(self.render, client_type)
+        deferred.defer(self.render, ClientType.names.keys())
 
     """
     This method will create platform specific notifications and send them to the platform specified
     Clients should implement the referenced methods in order to build the notification for each platform
     """
-    def render(self, client_type):
-        if client_type == ClientType.OS_ANDROID and hasattr(self, "_render_android"):
-            if ClientType.OS_ANDROID in self.keys and len(self.keys[ClientType.OS_ANDROID]) > 0:
-                notification = self._render_android()
-                self.send_gcm(notification)
+    def render(self, client_types):
+        for client_type in client_types:
+            if client_type == ClientType.OS_ANDROID and hasattr(self, "_render_android"):
+                if ClientType.OS_ANDROID in self.keys:
+                    notification = self._render_android()
+                    if len(self.keys[ClientType.OS_ANDROID]) > 0:
+                        self.send_gcm(notification)
 
-        elif client_type == ClientType.OS_IOS and hasattr(self, "_render_ios"):
-            notification = self._render_ios()
-            self.send_ios(notification)
+            elif client_type == ClientType.OS_IOS and hasattr(self, "_render_ios"):
+                notification = self._render_ios()
+                self.send_ios(notification)
 
-        elif client_type == ClientType.WEBHOOK and hasattr(self, "_render_webhook"):
-            if ClientType.WEBHOOK in self.keys and len(self.keys[ClientType.WEBHOOK]) > 0:
-                notification = self._render_webhook()
-                self.send_webhook(notification)
+            elif client_type == ClientType.WEBHOOK and hasattr(self, "_render_webhook"):
+                if ClientType.WEBHOOK in self.keys and len(self.keys[ClientType.WEBHOOK]) > 0:
+                    notification = self._render_webhook()
+                    self.send_webhook(notification)
 
     """
     Subclasses should override this method and return a dict containing the payload of the notification.
@@ -67,14 +68,12 @@ class BaseNotification(object):
             ch.update(payload)
             checksum = ch.hexdigest()
 
-            logging.info("Checksum: "+str(checksum))
-            logging.info("URL: "+str(url))
             request = urllib2.Request(url, payload)
             request.add_header("X-Tba-Checksum", checksum)
             try:
                 resp = urllib2.urlopen(request)
 
-            except HTTPError, e:
+            except urllib2.HTTPError, e:
 
                 if e.code == 400:
                     logging.error('400, Invalid message: ' + repr(gcm_post_json_str))

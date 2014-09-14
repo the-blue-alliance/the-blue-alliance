@@ -33,7 +33,7 @@ class NotificationHelper(object):
 
     @classmethod
     def send_subscription_update(cls, user_id, sending_device_key):
-        clients = PushHelper.get_client_ids_for_users("android", [user_id])
+        clients = PushHelper.get_client_ids_for_users([user_id])
 
         notification = UpdateSubscriptionsNotification(user_id, sending_device_key)
         notification.send(clients)
