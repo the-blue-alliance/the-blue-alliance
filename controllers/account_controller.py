@@ -11,9 +11,8 @@ class AccountOverview(LoggedInHandler):
     def get(self):
         self._require_login('/account')
         # Redirects to registration page if account not registered
-        if not self.user_bundle.account.registered:
-            self.redirect('/account/register')
-            return None
+        self._require_registration('/account/register')
+
         path = os.path.join(os.path.dirname(__file__), '../templates/account_overview.html')
         self.response.out.write(template.render(path, self.template_values))
 
@@ -21,18 +20,14 @@ class AccountOverview(LoggedInHandler):
 class AccountEdit(LoggedInHandler):
     def get(self):
         self._require_login('/account/edit')
-        if not self.user_bundle.account.registered:
-            self.redirect('/account/register')
-            return None
+        self._require_registration('/account/register')
 
         path = os.path.join(os.path.dirname(__file__), '../templates/account_edit.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self):
         self._require_login('/account/edit')
-        if not self.user_bundle.account.registered:
-            self.redirect('/account/register')
-            return None
+        self._require_registration('/account/register')
 
         # Check to make sure that they aren't trying to edit another user
         real_account_id = self.user_bundle.account.key.id()
