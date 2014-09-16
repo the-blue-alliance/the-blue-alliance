@@ -1,5 +1,7 @@
 import logging
 
+from collections import defaultdict
+
 from google.appengine.ext import db
 from google.appengine.ext import ndb
 from google.appengine.api import users
@@ -93,15 +95,11 @@ class PushHelper(object):
     def get_client_ids_for_users(cls, user_list, os_types=None ):
         if os_types is None:
             os_types = ClientType.names.keys()
-        output = {}
-        for os_type in os_types:
-            output[os_type] = []
-            for user in user_list:
-                client_list = MobileClient.query(MobileClient.user_id == user, MobileClient.client_type == os_type).fetch()
-                for client in client_list:
-                    if os_type == ClientType.WEBHOOK:
-                        # For webhooks, instead, pass a tuple including the secret key used to validate requests
-                        output[os_type].append( (client.messaging_id, client.secret) )
-                    else:
-                        output[os_type].append( client.messaging_id )
+        output = defaultdict(list)
+        clients = MobileClient.query(MobileClient.user_id.IN(user_list), MobileClient.client_type.IN(os_types)).fetch()
+        for client in clients:
+            if client.client_type == ClientType.WEBHOOK:
+                output[client.client_type].append( (client.messaging_id, client.secret) )
+            else:
+                output[client.client_type].append(client.messaging_id)
         return output
