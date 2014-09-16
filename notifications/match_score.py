@@ -1,6 +1,4 @@
-from consts.client_type import ClientType
 from consts.notification_type import NotificationType
-from controllers.gcm.gcm import GCMMessage
 from helpers.model_to_dict import ModelToDict
 from notifications.base_notification import BaseNotification
 
@@ -17,13 +15,3 @@ class MatchScoreNotification(BaseNotification):
         data['message_data']['event_name'] = self.match.event.get().name
         data['message_data']['match'] = ModelToDict.matchConverter(self.match)
         return data
-
-    def _render_android(self):
-        gcm_keys = self.keys[ClientType.OS_ANDROID]
-
-        data = self._build_dict()
-
-        return GCMMessage(gcm_keys, data)
-
-    def _render_webhook(self):
-        return self._build_dict()

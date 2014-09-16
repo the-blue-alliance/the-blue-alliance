@@ -5,11 +5,14 @@ import urllib2
 
 from google.appengine.ext import deferred
 
-from controllers.gcm.gcm import GCMConnection
+from controllers.gcm.gcm import GCMConnection, GCMMessage
 from consts.client_type import ClientType
 
 
 class BaseNotification(object):
+
+    _supported_clients = [ClientType.OS_ANDROID, ClientType.WEBHOOK]  # List of clients this notification type supports (these are default values)
+                                                                        # Can be overridden by subclasses to only send to some types
 
     """
     Class that acts as a basic notification.
@@ -17,8 +20,8 @@ class BaseNotification(object):
     """
 
     def send(self, keys):
-        self.keys = keys  # dict like {ClientType : [ (key, secret) ] }
-        deferred.defer(self.render, ClientType.names.keys())
+        self.keys = keys  # dict like {ClientType : [ key ] } ... The list for webhooks is a tuple of (key, secret)
+        deferred.defer(self.render, self._supported_clients)
 
     """
     This method will create platform specific notifications and send them to the platform specified
@@ -26,18 +29,16 @@ class BaseNotification(object):
     """
     def render(self, client_types):
         for client_type in client_types:
-            if client_type == ClientType.OS_ANDROID and hasattr(self, "_render_android"):
-                if ClientType.OS_ANDROID in self.keys:
+            if client_type == ClientType.OS_ANDROID and ClientType.OS_ANDROID in self.keys:
                     notification = self._render_android()
-                    if len(self.keys[ClientType.OS_ANDROID]) > 0:
-                        self.send_gcm(notification)
+                    if len(self.keys[ClientType.OS_ANDROID]) > 0:  # this is after _render because if it's an update fav/subscription notification, then
+                        self.send_gcm(notification)                # we remove the client id that sent the update so it doesn't get notified redundantly
 
-            elif client_type == ClientType.OS_IOS and hasattr(self, "_render_ios"):
+            elif client_type == ClientType.OS_IOS and ClientType.OS_IOS in self.keys:
                 notification = self._render_ios()
                 self.send_ios(notification)
 
-            elif client_type == ClientType.WEBHOOK and hasattr(self, "_render_webhook"):
-                if ClientType.WEBHOOK in self.keys and len(self.keys[ClientType.WEBHOOK]) > 0:
+            elif client_type == ClientType.WEBHOOK and ClientType.WEBHOOK in self.keys and len(self.keys[ClientType.WEBHOOK]) > 0:
                     notification = self._render_webhook()
                     self.send_webhook(notification)
 
@@ -47,6 +48,22 @@ class BaseNotification(object):
     """
     def _build_dict(self):
         raise NotImplementedError("Subclasses must implement this method to build JSON data to send")
+
+    """
+    The following methods are default render methods. Often, the way we construct the messages doesn't change, so we abstract it to here.
+    However, if a notification type needs to do something special (e.g. specify a GCM collapse key), then subclasses can override them
+    in order to provide that functionality.
+    """
+    def _render_android(self):
+        gcm_keys = self.keys[ClientType.OS_ANDROID]
+        data = self._build_dict()
+        return GCMMessage(gcm_keys, data)
+
+    def _render_ios(self):
+        pass
+
+    def _render_webhook(self):
+        return self._build_dict()
 
     def send_gcm(self, gcm_message):
         gcm_connection = GCMConnection()
