@@ -9,6 +9,7 @@ class DistrictType(object):
     MID_ATLANTIC = 2
     NEW_ENGLAND = 3
     PACIFIC_NORTHWEST = 4
+    INDIANA = 5
 
     # Used for rendering
     type_names = {
@@ -17,6 +18,7 @@ class DistrictType(object):
         MID_ATLANTIC: 'Mid Atlantic',
         NEW_ENGLAND: 'New England',
         PACIFIC_NORTHWEST: 'Pacific Northwest',
+        INDIANA: 'Indiana',
     }
 
     type_abbrevs = {
@@ -25,6 +27,7 @@ class DistrictType(object):
         MID_ATLANTIC: 'mar',
         NEW_ENGLAND: 'ne',
         PACIFIC_NORTHWEST: 'pnw',
+        INDIANA: 'in',
     }
 
     # Names used on the FIRST website
@@ -33,6 +36,7 @@ class DistrictType(object):
         'Mid-Atlantic Robotics': MID_ATLANTIC,
         'New England': NEW_ENGLAND,
         'Pacific Northwest': PACIFIC_NORTHWEST,
+        'Indiana': INDIANA,
     }
 
     abbrevs = {
@@ -40,4 +44,5 @@ class DistrictType(object):
         'mar': MID_ATLANTIC,
         'ne': NEW_ENGLAND,
         'pnw': PACIFIC_NORTHWEST,
+        'in': INDIANA,
     }
