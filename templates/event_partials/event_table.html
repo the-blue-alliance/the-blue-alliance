@@ -9,7 +9,13 @@
   <tbody>
     {% for event in events %}
       <tr itemscope itemtype="http://data-vocabulary.org/Event">
-        <td><a href="/event/{{event.key_name}}" title="{{event.name}}" itemprop="url"><span itemprop="summary">{{event.name}}</span></a></td>
+        <td>
+          <a href="/event/{{event.key_name}}" title="{{event.name}}" itemprop="url"><span itemprop="summary">{{event.name}}</span></a>
+          {% if event.location %}
+            <br>
+            <small>{{event.location}}</small>
+          {% endif %}
+        </td>
         <td class="hidden-xs">
           {% if event.webcast %}
             {% if event.within_a_day %}
