@@ -22,4 +22,5 @@ class UpcomingMatchNotification(BaseNotification):
     def render(self, client_types):
         super(UpcomingMatchNotification, self).render(client_types)
         self.match.push_sent = True
+        self.match.updated = datetime.datetime.now()
         self.match.put()
