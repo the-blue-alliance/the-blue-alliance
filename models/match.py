@@ -121,6 +121,7 @@ class Match(ndb.Model):
     time_string = ndb.StringProperty(indexed=False)  # the time as displayed on FIRST's site (event's local time)
     youtube_videos = ndb.StringProperty(repeated=True)  # list of Youtube IDs
     tba_videos = ndb.StringProperty(repeated=True)  # list of filetypes a TBA video exists for
+    push_sent = ndb.BooleanProperty(default=False)  # has an upcoming match notification been sent for this match?
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True)
