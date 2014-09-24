@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 from consts.client_type import ClientType
@@ -7,6 +8,7 @@ from helpers.push_helper import PushHelper
 
 from models.event import Event
 
+from notifications.level_starting import CompLevelStartingNotification
 from notifications.match_score import MatchScoreNotification
 from notifications.upcoming_match import UpcomingMatchNotification
 from notifications.update_favorites import UpdateFavoritesNotification
@@ -45,12 +47,24 @@ class NotificationHelper(object):
     @classmethod
     def send_upcoming(cls, live_events):
         from helpers.match_helper import MatchHelper
+        now = datetime.datetime.utcnow()
         for event in live_events:
             matches = event.matches
-            next_match = MatchHelper.upcomingMatches(matches, num=1) 
+            next_match = MatchHelper.upcomingMatches(matches, num=1)
             if next_match[0] and not next_match[0].push_sent:
-                users = PushHelper.get_users_subscribed_to_match(next_match[0], NotificationType.UPCOMING_MATCH)
-                keys = PushHelper.get_client_ids_for_users(users)
+                match = next_match[0]
+                if match.time is None or (now.day == match.time.day and match.time + datetime.timedelta(minutes=-15) <=  now):
+                    # Only send notifications for matches happening on this day and no more than 15 minutes before it's scheduled to start
+                    # Unless, the match has no time info. Then #yolo and send it
+                    users = PushHelper.get_users_subscribed_to_match(match, NotificationType.UPCOMING_MATCH)
+                    keys = PushHelper.get_client_ids_for_users(users)
 
-                notification = UpcomingMatchNotification(next_match[0], event)
-                notification.send(keys)
+                    if match.set_number == 1 and match.match_number == 1:
+                        # First match of a new type, send level starting notifications
+                        start_users = PushHelper.get_users_subscribed_to_match(match, NotificationType.LEVEL_STARTING)
+                        start_keys = PushHelper.get_client_ids_for_users(start_users)
+                        level_start = CompLevelStartingNotification(match, event)
+                        level_start.send(start_keys)
+
+                    notification = UpcomingMatchNotification(match, event)
+                    notification.send(keys)
