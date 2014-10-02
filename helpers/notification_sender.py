@@ -32,7 +32,7 @@ class NotificationSender(object):
             checksum = ch.hexdigest()
 
             request = urllib2.Request(url, payload)
-            request.add_header("X-Tba-Checksum", checksum)
+            request.add_header("X-TBA-Checksum", checksum)
             try:
                 resp = urllib2.urlopen(request)
             except urllib2.HTTPError, e:

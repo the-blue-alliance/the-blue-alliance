@@ -25,7 +25,7 @@
 
       <h2 id="request">Request Structure</h2>
         <p>Each request will contain a payload of JSON data containing information about the event that has been pushed to you. Details of each type of supported event is below.</p>
-        <p>Each request also contains a <code>X-Tba-Checksum</code> header that you can use to validate requests on your client. The header will contain a hash of a secret key that you set when you create the webhook concatenated with the payload string. 
+        <p>Each request also contains a <code>X-TBA-Checksum</code> header that you can use to validate requests on your client. The header will contain a hash of a secret key that you set when you create the webhook concatenated with the payload string. This is caculated using SHA1(secret+payload).
 
       <h2 id="configuration">Configuration</h2>
         <p>Webhooks are tied to your TBA Account - you can create them from your <a href="/account">account overview</a>. You will have to enter a URL that will receive the pushed notification. You also have to enter a secret key used to secure requests - we recommend using a long randomly generated string.</p>
