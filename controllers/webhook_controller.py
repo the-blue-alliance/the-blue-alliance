@@ -33,7 +33,6 @@ class WebhookAdd(LoggedInHandler):
             if query.count() == 0:
                 # Webhook doesn't exist, add it
                 verification_key = NotificationHelper.verify_webhook(url, secret_key)
-                logging.info("KEY: "+verification_key)
                 client = MobileClient( user_id = current_user_account_id, messaging_id = url, secret=secret_key, client_type = ClientType.WEBHOOK, verified=False, verification_code=verification_key)
                 client.put()
             else:
@@ -64,17 +63,51 @@ class WebhookDelete(LoggedInHandler):
 
 
 class WebhookVerify(LoggedInHandler):
-    def get(self):
+    def get(self, client_id):
         self._require_login('/account/register')
-        self._require_registration('/account/register')    
+        self._require_registration('/account/register')
+        self.template_values['client_id'] = client_id
         path = os.path.join(os.path.dirname(__file__), '../templates/webhook_verify.html')
         self.response.out.write(template.render(path, self.template_values))
 
-    def post(self):
+    def post(self, client_id):
         self._require_login('/account/register')
         self._require_registration('/account/register')
 
+        # Check to make sure the user isn't trying to impersonate another
+        current_user_account_id = self.user_bundle.account.key.id()
+        target_account_id = self.request.get('account_id')
+        if target_account_id == current_user_account_id:
+            verification = self.request.get('code')
+            webhook = MobileClient.get_by_id(int(client_id))
+            if webhook.client_type == ClientType.WEBHOOK and current_user_account_id == webhook.user_id:
+                if verification == MobileClient.verification_code:
+                    webhook.verfied = True
+                    webhook.put()
+                    self.redirect('/account')
+                else:  # Verification failed
+                    # Redirect back to the verification page
+                    self.redirect('/webhooks/verify/'+webhook.key.id)
+        self.redirect('/')
 
 class WebhookVerificationSend(LoggedInHandler):
-    def get(self):
-        pass
+    def post(self):
+        self._require_login('/account_register')
+        self._require_registration('/account_register')
+
+        current_user_account_id = self.user_bundle.account.key.id()
+        target_account_id = self.request.get('account_id')
+        if target_account_id == current_user_account_id:
+            client_id = self.request.get('client_id')
+            webhook = MobileClient.get_by_id(int(client_id))
+            if webhook.client_type == ClientType.WEBHOOK and current_user_account_id == webhook.user_id:
+                verification_key = NotificationHelper.verify_webhook(webhook.messaging_id, webhook.secret)
+                webhook.verification_code = verification_key
+                webhook.verified = False
+                webhook.put() 
+                self.redirect('/account')
+            else:
+                logging.warning("Not webhook, or wrong owner")
+        else:
+            logging.warning("Users don't match. "+current_user_account_id+"/"+target_account_id)
+        self.redirect('/')

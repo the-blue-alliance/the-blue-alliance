@@ -9,7 +9,7 @@
   <div class="row">
     <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
       <h1>Verify Webhook</h1>
-      <form class="webhook_verification_form" action="/webhooks/verify" method="post">
+      <form class="webhook_verification_form" method="post">
         <table class="table table-striped">
           <tbody>
             <tr>
@@ -19,7 +19,7 @@
           </tbody>
         </table>
         <input name="account_id" type="hidden" value="{{user_bundle.account.key.id}}" />
-        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Create Webhook</button>
+        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Verify Webhook</button>
         <a class="btn btn-default" href="/account"><span class="glyphicon glyphicon-remove"></span> Cancel</a>
       </form>
     </div>

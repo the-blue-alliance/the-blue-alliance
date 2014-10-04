@@ -70,11 +70,11 @@
                   {% if client.verified %}
                     <span class="glyphicon glyphicon-check"></span>
                   {% else %}
-                    <form action="/webhooks/verify" method="get">
-                      <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span> Verify</button>
-                    </form>
+                    <a href="/webhooks/verify/{{client.key.id}}"><button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span> Verify</button></a>
                     <form action="/webhooks/send_verification" method="post">
-                      <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-send"></span> Resend Code</button>
+                    <input name="account_id" type="hidden" value="{{user_bundle.account.key.id}}" />
+                    <input name="client_id" type="hidden" value="{{client.key.id}}" />
+                    <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-send"></span> Resend Code</button>
                     </form>
                   {% endif %}
                 </td>
