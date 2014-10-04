@@ -16,6 +16,10 @@ class MobileClient(ndb.Model):
     client_type = ndb.IntegerProperty(required=True)
     secret = ndb.StringProperty(default="")  # Used to hash webhooks
 
+    # Used to verify that webhooks are actually controlled by the account holder
+    verification_code = ndb.StringProperty(default="")
+    verified = ndb.BooleanProperty(default=True)
+
     created = ndb.DateTimeProperty(auto_now_add=True)
 
     def __init__(self, *args, **kw):

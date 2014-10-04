@@ -18,10 +18,9 @@ class UserNotificationBroadcast(LoggedInHandler):
         current_user_account_id = self.user_bundle.account.key.id()
         target_account_id = self.request.get('account_id')
         if target_account_id == current_user_account_id:
-            messaging_id = self.request.get('messaging_id')
-            to_ping = MobileClient.query(MobileClient.user_id == current_user_account_id, MobileClient.messaging_id == messaging_id).fetch()
-            if to_ping is not None:
-                client = to_ping[0]
+            client_id = self.request.get('client_id')
+            client = MobileClient.get_by_id(int(client_id))
+            if client is not None:
                 # This makes sure that the client actually exists and that this user owns it
                 if client.client_type == ClientType.WEBHOOK:
                     keys = {client.client_type: [(client.messaging_id, client.secret)]}

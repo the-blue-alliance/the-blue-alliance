@@ -7,6 +7,7 @@ from models.event import Event
 from notifications.match_score import MatchScoreNotification
 from notifications.update_favorites import UpdateFavoritesNotification
 from notifications.update_subscriptions import UpdateSubscriptionsNotification
+from notifications.verification import VerificationNotification
 
 
 class NotificationHelper(object):
@@ -37,3 +38,10 @@ class NotificationHelper(object):
 
         notification = UpdateSubscriptionsNotification(user_id, sending_device_key)
         notification.send(clients)
+
+    @classmethod
+    def verify_webhook(cls, url, secret):
+        key = {ClientType.WEBHOOK: [(url, secret)]}
+        notification = VerificationNotification(url, secret)
+        notification.send(key)
+        return notification.verification_key
