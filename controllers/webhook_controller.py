@@ -82,13 +82,16 @@ class WebhookVerify(LoggedInHandler):
             webhook = MobileClient.get_by_id(int(client_id))
             if webhook.client_type == ClientType.WEBHOOK and current_user_account_id == webhook.user_id:
                 if verification == MobileClient.verification_code:
-                    webhook.verfied = True
+                    logging.info("webhook verified")
+                    webhook.verified = True
                     webhook.put()
                     self.redirect('/account')
+                    return
                 else:  # Verification failed
                     # Redirect back to the verification page
                     self.redirect('/webhooks/verify/'+webhook.key.id)
         self.redirect('/')
+
 
 class WebhookVerificationSend(LoggedInHandler):
     def post(self):
@@ -104,8 +107,9 @@ class WebhookVerificationSend(LoggedInHandler):
                 verification_key = NotificationHelper.verify_webhook(webhook.messaging_id, webhook.secret)
                 webhook.verification_code = verification_key
                 webhook.verified = False
-                webhook.put() 
+                webhook.put()
                 self.redirect('/account')
+                return
             else:
                 logging.warning("Not webhook, or wrong owner")
         else:
