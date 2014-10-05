@@ -5,6 +5,8 @@ from google.appengine.ext.webapp import template
 from base_controller import LoggedInHandler
 
 from models.account import Account
+from models.favorite import Favorite
+from models.subscription import Subscription
 
 
 class AccountOverview(LoggedInHandler):
@@ -84,3 +86,16 @@ class AccountLogout(LoggedInHandler):
         response.delete_cookie('SACSID')
 
         return response
+
+
+class MyTBAController(LoggedInHandler):
+    def get(self):
+        self._require_login('/account/register')
+        self._require_registration('/account/register')
+
+        user_id = self.user_bundle.account.key.id()
+        self.template_values['favorites'] = Favorite.query(Favorite.user_id == user_id).fetch()
+        self.template_values['subscriptions'] = Subscription.query(Subscription.user_id == user_id).fetch()
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/mytba.html')  
+        self.response.out.write(template.render(path, self.template_values))

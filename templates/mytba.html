@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance - My TBA{% endblock %}
+
+{% block meta_description %}View your favorites and subscriptions{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
+      <h1>My TBA</h1>
+      <h2>Favorites</h2>
+        <table>
+          {% for favorite in favorites %}
+            <tr>
+              <td>{{favorite.model_key}}</td>
+              <td><form method="post">
+                <input name="action" type="hidden" value="favorite_delete" />
+                <input name="account_id" type="hidden" value="{{user_bundle.account.key.id}}" />
+                <input name="client_id" type="hidden" value="{{favorite.key.id}}" />
+                <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-trash"></span> Delete</button></form>
+              </td></tr>
+            {% empty %}
+              <tr><td>No favorites found</td></tr>
+            {% endfor %}
+        </table>
+        <h3>Add Favorite</h3>
+        <p><form method="post">
+          <input name="action" type="hidden" value="favorite_add" />
+          <input name="account_id" type="hidden" value="{{user_bundle.account.key.id}}" />
+          <input class="form-control" type="text" name="model_key" style="width:50%;" placeholder="2014cur"/>
+          <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Add Favorite</button>
+        </form></p>
+      <h2>Subscriptions</h2>
+        <table>
+        {% for subscription in subscriptions %}
+          <tr>
+            <td>{{subscription.model_key}}</td>
+            <td><form method="post">
+              <input name="action" type="hidden" value="subscription_delete" />
+              <input name="account_id" type="hidden" value="{{user_bundle.account.key.id}}" />
+              <input name="client_id" type="hidden" value="{{subscription.key.id}}" />
+              <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-trash"></span> Delete</button></form>
+            </tr></tr>
+        {% empty %}
+          <tr><td>No subscriptions found</td></tr>
+        {% endfor %}
+        </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
