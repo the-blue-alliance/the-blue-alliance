@@ -7,6 +7,8 @@ from base_controller import LoggedInHandler
 
 from consts.notification_type import NotificationType
 
+from helpers.validation_helper import ValidationHelper
+
 from models.account import Account
 from models.favorite import Favorite
 from models.subscription import Subscription
@@ -113,7 +115,9 @@ class MyTBAController(LoggedInHandler):
             action = self.request.get('action')
             if action == "favorite_add":
                 model = self.request.get('model_key')
-                # TODO validate input model key
+                if not ValidationHelper.is_valid_model_key(model):
+                    self.redirect('/account/mytba')
+                    return
                 favorite = Favorite(model_key =  model, user_id = current_user_id)
                 favorite.put()
                 # TODO send updated favorite push
@@ -129,7 +133,9 @@ class MyTBAController(LoggedInHandler):
                     return
             elif action == "subscription_add":
                 model = self.request.get('model_key')
-                # TODO validate model key
+                if not ValidationHelper.is_valid_model_key(model):
+                    self.redirect('/account/mytba')
+                    return
                 subs = self.request.get_all('notification_types')
                 if not subs:
                     # No notification types specified. Don't add
