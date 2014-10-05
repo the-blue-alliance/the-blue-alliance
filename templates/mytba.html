@@ -9,6 +9,18 @@
   <div class="row">
     <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
       <h1>My TBA</h1>
+
+      <div class="row">
+        <div class="col-sm-12">
+          <ul class="nav nav-tabs">
+            <li class="active"><a href="#favorites" data-toggle="tab">Favorites</a></li>
+            <li><a href="#subscriptions" data-toggle="tab">Subscriptions</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tab-content">
+      <div class="tab-pane active" id="favorites">
       <h2>Favorites</h2>
         <table class="table table-striped">
           {% for favorite in favorites %}
@@ -34,6 +46,7 @@
           <td>
             <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Add Favorite</button></td>
         </form></tr></table>
+      </div><div class="tab-pane" id="subscriptions">
       <h2>Subscriptions</h2>
         <table class="table table-striped">
         {% for subscription in subscriptions %}
@@ -76,6 +89,8 @@
               </tr>
           </table>
         </form>
+        </div>
+        </div>
     </div>
   </div>
 </div>
