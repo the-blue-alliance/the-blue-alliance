@@ -10,14 +10,14 @@
     <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
       <h1>My TBA</h1>
       <h2>Favorites</h2>
-        <table>
+        <table class="table table-striped">
           {% for favorite in favorites %}
             <tr>
-              <td>{{favorite.model_key}}</td>
+              <td style="padding-right:20px;">{{favorite.model_key}}</td>
               <td><form method="post">
                 <input name="action" type="hidden" value="favorite_delete" />
                 <input name="account_id" type="hidden" value="{{user_bundle.account.key.id}}" />
-                <input name="client_id" type="hidden" value="{{favorite.key.id}}" />
+                <input name="client_id" type="hidden" value="{{favorite.key.id}}"/>
                 <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-trash"></span> Delete</button></form>
               </td></tr>
             {% empty %}
@@ -25,17 +25,25 @@
             {% endfor %}
         </table>
         <h3>Add Favorite</h3>
-        <p><form method="post">
-          <input name="action" type="hidden" value="favorite_add" />
-          <input name="account_id" type="hidden" value="{{user_bundle.account.key.id}}" />
-          <input class="form-control" type="text" name="model_key" style="width:50%;" placeholder="2014cur"/>
-          <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Add Favorite</button>
-        </form></p>
+        <table class="table"><tr><form method="post">
+          <td>Model Key: </td>
+          <td style="padding-right:20px;">
+            <input name="action" type="hidden" value="favorite_add" />
+            <input name="account_id" type="hidden" value="{{user_bundle.account.key.id}}" />
+            <input class="form-control" type="text" name="model_key" placeholder="2014cur"/></td>
+          <td>
+            <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Add Favorite</button></td>
+        </form></tr></table>
       <h2>Subscriptions</h2>
-        <table>
+        <table class="table table-striped">
         {% for subscription in subscriptions %}
           <tr>
             <td>{{subscription.model_key}}</td>
+            <td><ul>
+              {% for type in subscription.notification_names %}
+                <li>{{ type }}</li>
+              {% endfor %}
+            </ul></td>
             <td><form method="post">
               <input name="action" type="hidden" value="subscription_delete" />
               <input name="account_id" type="hidden" value="{{user_bundle.account.key.id}}" />
@@ -46,6 +54,28 @@
           <tr><td>No subscriptions found</td></tr>
         {% endfor %}
         </table>
+        <h3>Add Subscription</h3>
+          <form method="post">
+            <input name="action" type="hidden" value="subscription_add" />
+            <input name="account_id" type="hidden" value="{{user_bundle.account.key.id}}" />
+            <table class="table">
+              <tr>
+                <td>Model Key:</td>
+                <td><input class="form-control" type="text" name="model_key" placeholder="fr254" /></td>
+              </tr>
+              <tr>
+                <td>Notification Types:</td>
+                <td><ul style="list-style-type: none;">
+                  {% for index, name in enabled_notifications.items %}
+                    <li><input type="checkbox" name="notification_types" value="{{index}}" /> {{ name }}</li>
+                  {% endfor %}
+                </ul></td>
+              </tr>
+              <tr>              
+                <td><button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Add Subscription</button></td>
+              </tr>
+          </table>
+        </form>
     </div>
   </div>
 </div>

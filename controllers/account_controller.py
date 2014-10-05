@@ -4,6 +4,8 @@ from google.appengine.ext.webapp import template
 
 from base_controller import LoggedInHandler
 
+from consts.notification_type import NotificationType
+
 from models.account import Account
 from models.favorite import Favorite
 from models.subscription import Subscription
@@ -96,6 +98,32 @@ class MyTBAController(LoggedInHandler):
         user_id = self.user_bundle.account.key.id()
         self.template_values['favorites'] = Favorite.query(Favorite.user_id == user_id).fetch()
         self.template_values['subscriptions'] = Subscription.query(Subscription.user_id == user_id).fetch()
-
-        path = os.path.join(os.path.dirname(__file__), '../templates/mytba.html')  
+        self.template_values['enabled_notifications'] = NotificationType.enabled_notifications
+        path = os.path.join(os.path.dirname(__file__), '../templates/mytba.html')
         self.response.out.write(template.render(path, self.template_values))
+
+    def post(self):
+        self._require_login('/account/register')
+        self._require_registration('/account/register')
+
+        current_user_id = self.user_bundle.account.key.id()
+        target_account_id = self.request.get('account_id')
+        if current_user_id == target_account_id:
+            action = self.request.get('action')
+            if action == "favorite_add":
+                model = self.request.get('model_key')
+                # TODO validate input model key
+                favorite = Favorite(model_key =  model, user_id = current_user_id)
+                favorite.put()
+                # TODO send updated favorite push
+                self.redirect('/account/mytba')
+                return
+            elif action == "favorite_delete":
+                client_id = self.request.get('client_id')
+                favorite = Favorite.get_by_id(int(client_id))
+                if current_user_id == favorite.user_id:
+                    favorite.key.delete()
+                    # TODO send updated favorites push
+                    self.redirect('/account/mytba')
+                    return
+        self.redirect('/')
