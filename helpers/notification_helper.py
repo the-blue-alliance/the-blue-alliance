@@ -26,14 +26,14 @@ class NotificationHelper(object):
         notification.send(keys)
 
     @classmethod
-    def send_favorite_update(cls, user_id, sending_device_key):
+    def send_favorite_update(cls, user_id, sending_device_key=""):
         clients = PushHelper.get_client_ids_for_users([user_id])
-
+        
         notification = UpdateFavoritesNotification(user_id, sending_device_key)
         notification.send(clients)
 
     @classmethod
-    def send_subscription_update(cls, user_id, sending_device_key):
+    def send_subscription_update(cls, user_id, sending_device_key=""):
         clients = PushHelper.get_client_ids_for_users([user_id])
 
         notification = UpdateSubscriptionsNotification(user_id, sending_device_key)

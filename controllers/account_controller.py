@@ -7,6 +7,7 @@ from base_controller import LoggedInHandler
 
 from consts.notification_type import NotificationType
 
+from helpers.notification_helper import NotificationHelper
 from helpers.validation_helper import ValidationHelper
 
 from models.account import Account
@@ -120,7 +121,7 @@ class MyTBAController(LoggedInHandler):
                     return
                 favorite = Favorite(model_key =  model, user_id = current_user_id)
                 favorite.put()
-                # TODO send updated favorite push
+                NotificationHelper.send_favorite_update(current_user_id)
                 self.redirect('/account/mytba')
                 return
             elif action == "favorite_delete":
@@ -128,7 +129,7 @@ class MyTBAController(LoggedInHandler):
                 favorite = Favorite.get_by_id(int(client_id))
                 if current_user_id == favorite.user_id:
                     favorite.key.delete()
-                    # TODO send updated favorites push
+                    NotificationHelper.send_favorite_update(current_user_id)
                     self.redirect('/account/mytba')
                     return
             elif action == "subscription_add":
@@ -144,7 +145,7 @@ class MyTBAController(LoggedInHandler):
                 subs = map(int, subs)
                 subscription = Subscription(user_id = current_user_id, model_key = model, notification_types = subs)
                 subscription.put()
-                # TODO send updated subscription push
+                NotificationHelper.send_subscription_update(current_user_id)
                 self.redirect('/account/mytba')
                 return
             elif action == "subscription_delete":
@@ -152,7 +153,7 @@ class MyTBAController(LoggedInHandler):
                 subscription = Subscription.get_by_id(int(client_id))
                 if current_user_id == subscription.user_id:
                     subscription.key.delete()
-                    # TODO send updated subscription push
+                    NotificationHelper.send_subscription_update(current_user_id)
                     self.redirect('/account/mytba')
                 return
         self.redirect('/')
