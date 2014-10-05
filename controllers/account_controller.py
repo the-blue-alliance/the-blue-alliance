@@ -131,8 +131,11 @@ class MyTBAController(LoggedInHandler):
                 model = self.request.get('model_key')
                 # TODO validate model key
                 subs = self.request.get_all('notification_types')
+                if not subs:
+                    # No notification types specified. Don't add
+                    self.redirect('/account/mytba')
+                    return
                 subs = map(int, subs)
-                logging.warning("subs: "+str(subs))
                 subscription = Subscription(user_id = current_user_id, model_key = model, notification_types = subs)
                 subscription.put()
                 # TODO send updated subscription push
