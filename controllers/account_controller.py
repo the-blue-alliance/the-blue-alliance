@@ -1,4 +1,5 @@
 import os
+import logging
 
 from google.appengine.ext.webapp import template
 
@@ -126,4 +127,23 @@ class MyTBAController(LoggedInHandler):
                     # TODO send updated favorites push
                     self.redirect('/account/mytba')
                     return
+            elif action == "subscription_add":
+                model = self.request.get('model_key')
+                # TODO validate model key
+                subs = self.request.get_all('notification_types')
+                subs = map(int, subs)
+                logging.warning("subs: "+str(subs))
+                subscription = Subscription(user_id = current_user_id, model_key = model, notification_types = subs)
+                subscription.put()
+                # TODO send updated subscription push
+                self.redirect('/account/mytba')
+                return
+            elif action == "subscription_delete":
+                client_id = self.request.get('client_id')
+                subscription = Subscription.get_by_id(int(client_id))
+                if current_user_id == subscription.user_id:
+                    subscription.key.delete()
+                    # TODO send updated subscription push
+                    self.redirect('/account/mytba')
+                return
         self.redirect('/')
