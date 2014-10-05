@@ -67,6 +67,7 @@
                   {% endif %}
                 </td>
                 <td>
+                  {% if client.is_webhook %}
                     {% if client.verified %}
                       <p><span class="glyphicon glyphicon-check"></span> Verified</p>
                     {% else %}
@@ -77,6 +78,7 @@
                       <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-send"></span> Resend Code</button>
                       </form>
                     {% endif %}
+                  {% endif %}
                 </td>
             </tr>
           {% endfor %}
