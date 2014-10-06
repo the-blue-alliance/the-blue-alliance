@@ -131,9 +131,11 @@ class MyTBAController(LoggedInHandler):
                 if not ValidationHelper.is_valid_model_key(model):
                     self.redirect('/account/mytba?error=invalid_model')
                     return
-                favorite = Favorite(model_key =  model, user_id = current_user_id)
-                favorite.put()
-                NotificationHelper.send_favorite_update(current_user_id)
+                existing = Favorite.query(Favorite.model_key == model, Favorite.user_id == current_user_id)
+                if existing is None or existing.count() == 0:
+                    favorite = Favorite(model_key =  model, user_id = current_user_id)
+                    favorite.put()
+                    NotificationHelper.send_favorite_update(current_user_id)
                 self.redirect('/account/mytba')
                 return
             elif action == "favorite_delete":
@@ -154,9 +156,15 @@ class MyTBAController(LoggedInHandler):
                     # No notification types specified. Don't add
                     self.redirect('/account/mytba?error=no_sub_types')
                     return
+                existing = Subscription.query(Subscription.user_id == current_user_id, Subscription.model_key == model)
                 subs = map(int, subs)
-                subscription = Subscription(user_id = current_user_id, model_key = model, notification_types = subs)
-                subscription.put()
+                if existing is None or existing.count() == 0:
+                    subscription = Subscription(user_id = current_user_id, model_key = model, notification_types = subs)
+                    subscription.put()
+                else:
+                    subscription = existing.fetch()[0]
+                    subscription.notification_types = subs
+                    subscription.put()
                 NotificationHelper.send_subscription_update(current_user_id)
                 self.redirect('/account/mytba')
                 return
