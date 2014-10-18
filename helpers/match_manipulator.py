@@ -26,11 +26,12 @@ class MatchManipulator(ManipulatorBase):
         Only if the match is part of an active event
         '''
         for match in matches:
-            logging.info("Sending push notifications for "+match.key_name)
-            try:
-                NotificationHelper.send_match_score_update(match)
-            except Exception, exception:
-                logging.error("Error sending match updates: "+str(exception))
+            if match.event.get().now:
+                logging.info("Sending push notifications for "+match.key_name)
+                try:
+                    NotificationHelper.send_match_score_update(match)
+                except Exception, exception:
+                    logging.error("Error sending match updates: "+str(exception))
 
         '''
         Enqueue firebase push
