@@ -113,7 +113,7 @@ class ApiDistrictRankingsController(ApiDistrictControllerBase):
     def _render(self, district_abbrev, year=None):
         self._set_district(district_abbrev)
 
-        if self.year < datetime.now().year:
+        if self.year < 2014:
             return json.dumps([], ensure_ascii=True)
 
         event_keys = Event.query(Event.year == self.year, Event.event_district_enum == self.district).fetch(None, keys_only=True)
