@@ -81,7 +81,7 @@ class WebhookVerify(LoggedInHandler):
             verification = self.request.get('code')
             webhook = MobileClient.get_by_id(int(client_id))
             if webhook.client_type == ClientType.WEBHOOK and current_user_account_id == webhook.user_id:
-                if verification == MobileClient.verification_code:
+                if verification == webhook.verification_code:
                     logging.info("webhook verified")
                     webhook.verified = True
                     webhook.put()
@@ -89,7 +89,8 @@ class WebhookVerify(LoggedInHandler):
                     return
                 else:  # Verification failed
                     # Redirect back to the verification page
-                    self.redirect('/webhooks/verify/'+webhook.key.id)
+                    self.redirect('/webhooks/verify/{}'.format(webhook.key.id()))
+                    return
         self.redirect('/')
 
 
