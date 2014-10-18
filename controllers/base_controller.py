@@ -111,3 +111,10 @@ class LoggedInHandler(webapp2.RequestHandler):
                 self.user_bundle.create_login_url(target_url),
                 abort=True
             )
+
+    def _require_registration(self, target_url="/"):
+        if not self.user_bundle.account.registered:
+            return self.redirect(
+                target_url,
+                abort=True
+            )

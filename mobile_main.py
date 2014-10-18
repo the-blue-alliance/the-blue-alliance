@@ -11,7 +11,7 @@ import tba_config
 
 from consts.client_type import ClientType
 from helpers.push_helper import PushHelper
-from helpers.gcm_message_helper import GCMMessageHelper
+from helpers.notification_helper import NotificationHelper
 from models.favorite import Favorite
 from models.sitevar import Sitevar
 from models.subscription import Subscription
@@ -101,7 +101,7 @@ class MobileAPI(remote.Service):
             if request.device_key:
                 # Send updates to user's other devices
                 logging.info("Sending favorite update to user other devices")
-                GCMMessageHelper.send_favorite_update(userId, request.device_key)
+                NotificationHelper.send_favorite_update(userId, request.device_key)
             return BaseResponse(code=200, message="Favorite added")
         else:
             # Favorite already exists. Don't add it again
@@ -122,7 +122,7 @@ class MobileAPI(remote.Service):
             ndb.delete_multi(to_delete)
             if request.device_key:
                 # Send updates to user's other devices
-                GCMMessageHelper.send_favorite_update(userId, request.device_key)
+                NotificationHelper.send_favorite_update(userId, request.device_key)
             return BaseResponse(code=200, message="Favorites deleted")
         else:
             # Favorite doesn't exist. Can't delete it
@@ -159,7 +159,7 @@ class MobileAPI(remote.Service):
             Subscription( user_id = userId, model_key = modelKey, notification_types = PushHelper.notification_enums_from_string(request.notifications)).put()
             if request.device_key:
                 # Send updates to user's other devices
-                GCMMessageHelper.send_subscription_update(userId, request.device_key)
+                NotificationHelper.send_subscription_update(userId, request.device_key)
             return BaseResponse(code=200, message="Subscription added")
         else:
             if sub.notification_types == PushHelper.notification_enums_from_string(request.notifications):
@@ -171,7 +171,7 @@ class MobileAPI(remote.Service):
                 sub.put()
                 if request.device_key:
                     # Send updates to user's other devices
-                    GCMMessageHelper.send_subscription_update(userId, request.device_key)
+                    NotificationHelper.send_subscription_update(userId, request.device_key)
                 return BaseResponse(code=200, message="Subscription updated")
 
     @endpoints.method(SubscriptionMessage, BaseResponse,
@@ -189,7 +189,7 @@ class MobileAPI(remote.Service):
             ndb.delete_multi(to_delete)
             if request.device_key:
                 # Send updates to user's other devices
-                GCMMessageHelper.send_subscription_update(userId, request.device_key)
+                NotificationHelper.send_subscription_update(userId, request.device_key)
             return BaseResponse(code=200, message="Subscriptions deleted")
         else:
             # Subscription doesn't exist. Can't delete it
