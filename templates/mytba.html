@@ -9,6 +9,26 @@
   <div class="row">
     <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
       <h1>My TBA</h1>
+      <div class="row">
+        <p><a class="btn btn-default" href="/account"><span class="glyphicon glyphicon-chevron-left"></span> My Account</a></p>
+        <p>Here you can manage the favorites and subscriptions associated with your account</p>
+      </div>
+      {% if error_message %}
+        <div class="row" style="color:#D8000C;background-color:#FFBABA">
+          <p>{{ error_message }}</p>
+        </div>
+      {% endif %}
+      <div class="row">
+        <div class="col-sm-12">
+          <ul class="nav nav-tabs">
+            <li class="active"><a href="#favorites" data-toggle="tab">Favorites</a></li>
+            <li><a href="#subscriptions" data-toggle="tab">Subscriptions</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tab-content">
+      <div class="tab-pane active" id="favorites">
       <h2>Favorites</h2>
         <table class="table table-striped">
           {% for favorite in favorites %}
@@ -34,6 +54,7 @@
           <td>
             <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Add Favorite</button></td>
         </form></tr></table>
+      </div><div class="tab-pane" id="subscriptions">
       <h2>Subscriptions</h2>
         <table class="table table-striped">
         {% for subscription in subscriptions %}
@@ -61,7 +82,7 @@
             <table class="table">
               <tr>
                 <td>Model Key:</td>
-                <td><input class="form-control" type="text" name="model_key" placeholder="fr254" /></td>
+                <td><input class="form-control" type="text" name="model_key" placeholder="frc254" /></td>
               </tr>
               <tr>
                 <td>Notification Types:</td>
@@ -76,6 +97,8 @@
               </tr>
           </table>
         </form>
+        </div>
+        </div>
     </div>
   </div>
 </div>

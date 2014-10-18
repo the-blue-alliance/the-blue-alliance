@@ -1,10 +1,14 @@
 import os
+import logging
 
 from google.appengine.ext.webapp import template
 
 from base_controller import LoggedInHandler
 
 from consts.notification_type import NotificationType
+
+from helpers.notification_helper import NotificationHelper
+from helpers.validation_helper import ValidationHelper
 
 from models.account import Account
 from models.favorite import Favorite
@@ -99,6 +103,18 @@ class MyTBAController(LoggedInHandler):
         self.template_values['favorites'] = Favorite.query(Favorite.user_id == user_id).fetch()
         self.template_values['subscriptions'] = Subscription.query(Subscription.user_id == user_id).fetch()
         self.template_values['enabled_notifications'] = NotificationType.enabled_notifications
+        
+        error = self.request.get('error')
+        if error:
+            error_message = "An unknown error occurred"
+            if error == 'invalid_model':
+                error_message = "Error: Invalid model key"
+            elif error == "no_sub_types":
+                error_message = "Error: No notification types selected"
+            elif error == "invalid_account":
+                error_message = "Error: Invalid account"
+            self.template_values['error_message'] = error_message
+
         path = os.path.join(os.path.dirname(__file__), '../templates/mytba.html')
         self.response.out.write(template.render(path, self.template_values))
 
@@ -112,10 +128,14 @@ class MyTBAController(LoggedInHandler):
             action = self.request.get('action')
             if action == "favorite_add":
                 model = self.request.get('model_key')
-                # TODO validate input model key
-                favorite = Favorite(model_key =  model, user_id = current_user_id)
-                favorite.put()
-                # TODO send updated favorite push
+                if not ValidationHelper.is_valid_model_key(model):
+                    self.redirect('/account/mytba?error=invalid_model')
+                    return
+                existing = Favorite.query(Favorite.model_key == model, Favorite.user_id == current_user_id)
+                if existing is None or existing.count() == 0:
+                    favorite = Favorite(model_key =  model, user_id = current_user_id)
+                    favorite.put()
+                    NotificationHelper.send_favorite_update(current_user_id)
                 self.redirect('/account/mytba')
                 return
             elif action == "favorite_delete":
@@ -123,7 +143,37 @@ class MyTBAController(LoggedInHandler):
                 favorite = Favorite.get_by_id(int(client_id))
                 if current_user_id == favorite.user_id:
                     favorite.key.delete()
-                    # TODO send updated favorites push
+                    NotificationHelper.send_favorite_update(current_user_id)
                     self.redirect('/account/mytba')
                     return
-        self.redirect('/')
+            elif action == "subscription_add":
+                model = self.request.get('model_key')
+                if not ValidationHelper.is_valid_model_key(model):
+                    self.redirect('/account/mytba?error=invalid_model')
+                    return
+                subs = self.request.get_all('notification_types')
+                if not subs:
+                    # No notification types specified. Don't add
+                    self.redirect('/account/mytba?error=no_sub_types')
+                    return
+                existing = Subscription.query(Subscription.user_id == current_user_id, Subscription.model_key == model)
+                subs = map(int, subs)
+                if existing is None or existing.count() == 0:
+                    subscription = Subscription(user_id = current_user_id, model_key = model, notification_types = subs)
+                    subscription.put()
+                else:
+                    subscription = existing.fetch()[0]
+                    subscription.notification_types = subs
+                    subscription.put()
+                NotificationHelper.send_subscription_update(current_user_id)
+                self.redirect('/account/mytba')
+                return
+            elif action == "subscription_delete":
+                client_id = self.request.get('client_id')
+                subscription = Subscription.get_by_id(int(client_id))
+                if current_user_id == subscription.user_id:
+                    subscription.key.delete()
+                    NotificationHelper.send_subscription_update(current_user_id)
+                    self.redirect('/account/mytba')
+                return
+        self.redirect('/account/mytba?error=invalid_account')
