@@ -8,6 +8,7 @@ from base_controller import LoggedInHandler
 from consts.client_type import ClientType
 from consts.notification_type import NotificationType
 from helpers.notification_helper import NotificationHelper
+from models.account import Account
 from models.mobile_client import MobileClient
 
 
@@ -29,11 +30,18 @@ class WebhookAdd(LoggedInHandler):
         if target_account_id == current_user_account_id:
             url = self.request.get('url')
             secret_key = self.request.get('secret')
-            query = MobileClient.query(MobileClient.user_id == current_user_account_id, MobileClient.messaging_id == url)
+            query = MobileClient.query(MobileClient.messaging_id == url, ancestor=ndb.Key(Account, current_user_account_id))
             if query.count() == 0:
                 # Webhook doesn't exist, add it
                 verification_key = NotificationHelper.verify_webhook(url, secret_key)
-                client = MobileClient( user_id = current_user_account_id, messaging_id = url, secret=secret_key, client_type = ClientType.WEBHOOK, verified=False, verification_code=verification_key)
+                client = MobileClient(
+                    parent=self.user_bundle.account.key,
+                    user_id=current_user_account_id,
+                    messaging_id=url,
+                    secret=secret_key,
+                    client_type=ClientType.WEBHOOK,
+                    verified=False,
+                    verification_code=verification_key)
                 client.put()
             else:
                 # Webhook already exists. Update the secret
@@ -55,7 +63,7 @@ class WebhookDelete(LoggedInHandler):
         target_account_id = self.request.get('account_id')
         client_id = self.request.get('client_id')
         if target_account_id == current_user_account_id:
-            to_delete = ndb.Key(MobileClient, int(client_id))
+            to_delete = ndb.Key(Account, current_user_account_id, MobileClient, int(client_id))
             to_delete.delete()
             self.redirect('/account')
         else:
@@ -82,17 +90,17 @@ class WebhookVerify(LoggedInHandler):
         target_account_id = self.request.get('account_id')
         if target_account_id == current_user_account_id:
             verification = self.request.get('code')
-            webhook = MobileClient.get_by_id(int(client_id))
+            webhook = MobileClient.get_by_id(int(client_id), parent=ndb.Key(Account, current_user_account_id))
             if webhook.client_type == ClientType.WEBHOOK and current_user_account_id == webhook.user_id:
                 if verification == webhook.verification_code:
                     logging.info("webhook verified")
                     webhook.verified = True
                     webhook.put()
-                    self.redirect('/account')
+                    self.redirect('/account?webhook_verification_success=1')
                     return
                 else:  # Verification failed
                     # Redirect back to the verification page
-                    self.redirect('/webhooks/verify/{}'.format(webhook.key.id()))
+                    self.redirect('/webhooks/verify/{}?error=1'.format(webhook.key.id()))
                     return
         self.redirect('/')
 
@@ -106,7 +114,7 @@ class WebhookVerificationSend(LoggedInHandler):
         target_account_id = self.request.get('account_id')
         if target_account_id == current_user_account_id:
             client_id = self.request.get('client_id')
-            webhook = MobileClient.get_by_id(int(client_id))
+            webhook = MobileClient.get_by_id(int(client_id), parent=ndb.Key(Account, current_user_account_id))
             if webhook.client_type == ClientType.WEBHOOK and current_user_account_id == webhook.user_id:
                 verification_key = NotificationHelper.verify_webhook(webhook.messaging_id, webhook.secret)
                 webhook.verification_code = verification_key

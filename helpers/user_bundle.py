@@ -1,3 +1,4 @@
+from google.appengine.ext import ndb
 from google.appengine.api import users
 
 from models.account import Account
@@ -30,7 +31,7 @@ class UserBundle(object):
     @property
     def mobile_clients(self):
         user_id = self.user.user_id()
-        return MobileClient.query( MobileClient.user_id == user_id ).fetch()
+        return MobileClient.query(ancestor=ndb.Key(Account, user_id)).fetch()
 
     @property
     def is_current_user_admin(self):

@@ -9,6 +9,9 @@ class MobileClient(ndb.Model):
     This class repesents a mobile client that has registered with the server
     We store a messaging ID (e.g. Google Cloud Messaging sender ID) as well
     as a per-user unique key that is generated client side and sent up.
+
+    In order to make strongly consistent DB requests, instances of this class
+    should be created with a parent that is the associated Account key.
     """
 
     user_id = ndb.StringProperty(required=True, indexed=True)
