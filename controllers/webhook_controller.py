@@ -66,7 +66,10 @@ class WebhookVerify(LoggedInHandler):
     def get(self, client_id):
         self._require_login('/account/register')
         self._require_registration('/account/register')
+
         self.template_values['client_id'] = client_id
+        self.template_values['error'] = self.request.get('error')
+
         path = os.path.join(os.path.dirname(__file__), '../templates/webhook_verify.html')
         self.response.out.write(template.render(path, self.template_values))
 
