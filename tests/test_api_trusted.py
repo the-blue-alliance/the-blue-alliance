@@ -10,6 +10,7 @@ import api_main
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
+from consts.auth_type import AuthType
 from consts.event_type import EventType
 
 from controllers.api.api_event_controller import ApiEventController
@@ -36,7 +37,8 @@ class TestApiTrustedController(unittest2.TestCase):
         self.aaa = ApiAuthAccess(id='TeStAuThId123',
                                  secret='321tEsTsEcReT',
                                  description='test',
-                                 event_list=[ndb.Key(Event, '2014casj')])
+                                 event_list=[ndb.Key(Event, '2014casj')],
+                                 auth_types_enum=[AuthType.EVENT_DATA])
 
         self.event = Event(
                 id='2014casj',
