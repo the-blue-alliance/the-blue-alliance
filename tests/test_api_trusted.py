@@ -34,11 +34,17 @@ class TestApiTrustedController(unittest2.TestCase):
         self.testbed.init_memcache_stub()
         self.testbed.init_taskqueue_stub(root_path=".")
 
-        self.aaa = ApiAuthAccess(id='TeStAuThId123',
+        self.aaa = ApiAuthAccess(id='tEsT_id_1',
                                  secret='321tEsTsEcReT',
                                  description='test',
                                  event_list=[ndb.Key(Event, '2014casj')],
                                  auth_types_enum=[AuthType.EVENT_DATA])
+
+        self.aaa2 = ApiAuthAccess(id='tEsT_id_2',
+                                 secret='321tEsTsEcReT',
+                                 description='test',
+                                 event_list=[ndb.Key(Event, '2014casj')],
+                                 auth_types_enum=[AuthType.MATCH_VIDEO])
 
         self.event = Event(
                 id='2014casj',
@@ -62,15 +68,16 @@ class TestApiTrustedController(unittest2.TestCase):
         # Fail
         request_body = json.dumps([])
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
-        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 400)
         self.assertTrue('Error' in response.json)
 
         self.aaa.put()
+        self.aaa2.put()
 
         # Pass
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
-        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 200)
 
         # Fail; bad X-TBA-Auth-Id
@@ -80,23 +87,28 @@ class TestApiTrustedController(unittest2.TestCase):
         self.assertTrue('Error' in response.json)
 
         # Fail; bad sig
-        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': '123abc'}, expect_errors=True)
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': '123abc'}, expect_errors=True)
         self.assertEqual(response.status_code, 400)
         self.assertTrue('Error' in response.json)
 
         # Fail; bad sig due to wrong body
         body2 = json.dumps([{}])
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
-        response = self.testapp.post(request_path, body2, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        response = self.testapp.post(request_path, body2, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 400)
         self.assertTrue('Error' in response.json)
 
         # Fail; bad event
         request_path2 = '/api/trusted/v1/event/2014cama/matches/update'
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path2, request_body)).hexdigest()
-        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 400)
         self.assertTrue('Error' in response.json)
+
+        # Fail; insufficient auth_types_enum
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_2', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        self.assertEqual(response.status_code, 400)
 
     def test_alliance_selections_update(self):
         self.aaa.put()
@@ -113,7 +125,7 @@ class TestApiTrustedController(unittest2.TestCase):
 
         request_path = '/api/trusted/v1/event/2014casj/alliance_selections/update'
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
-        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
 
         self.assertEqual(response.status_code, 200)
 
@@ -130,7 +142,7 @@ class TestApiTrustedController(unittest2.TestCase):
 
         request_path = '/api/trusted/v1/event/2014casj/awards/update'
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
-        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
 
         self.assertEqual(response.status_code, 200)
 
@@ -144,7 +156,7 @@ class TestApiTrustedController(unittest2.TestCase):
         request_body = json.dumps(awards)
 
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
-        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
 
         self.assertEqual(response.status_code, 200)
 
@@ -174,7 +186,7 @@ class TestApiTrustedController(unittest2.TestCase):
         }]
         request_body = json.dumps(matches)
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', update_request_path, request_body)).hexdigest()
-        response = self.testapp.post(update_request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        response = self.testapp.post(update_request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
 
         self.assertEqual(response.status_code, 200)
 
@@ -198,7 +210,7 @@ class TestApiTrustedController(unittest2.TestCase):
         }]
         request_body = json.dumps(matches)
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', update_request_path, request_body)).hexdigest()
-        response = self.testapp.post(update_request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        response = self.testapp.post(update_request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 200)
 
         db_matches = Match.query(Match.event == self.event.key).fetch(None)
@@ -226,13 +238,13 @@ class TestApiTrustedController(unittest2.TestCase):
         }]
         request_body = json.dumps(matches)
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', update_request_path, request_body)).hexdigest()
-        response = self.testapp.post(update_request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        response = self.testapp.post(update_request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 200)
 
         keys_to_delete = ['qm1']
         request_body = json.dumps(keys_to_delete)
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', delete_request_path, request_body)).hexdigest()
-        response = self.testapp.post(delete_request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        response = self.testapp.post(delete_request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json['keys_deleted'], ['qm1'])
 
@@ -267,7 +279,7 @@ class TestApiTrustedController(unittest2.TestCase):
 
         request_path = '/api/trusted/v1/event/2014casj/rankings/update'
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
-        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.event.rankings[0], ['Rank', 'Team', 'QS', 'Auton', 'Teleop', 'T&C', 'Record (W-L-T)', 'DQ', 'Played'])
@@ -281,7 +293,7 @@ class TestApiTrustedController(unittest2.TestCase):
 
         request_path = '/api/trusted/v1/event/2014casj/team_list/update'
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
-        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
 
         self.assertEqual(response.status_code, 200)
 
@@ -295,7 +307,7 @@ class TestApiTrustedController(unittest2.TestCase):
         request_body = json.dumps(team_list)
 
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
-        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'TeStAuThId123', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
 
         self.assertEqual(response.status_code, 200)
 
@@ -303,3 +315,44 @@ class TestApiTrustedController(unittest2.TestCase):
         self.assertEqual(len(db_eventteams), 2)
         self.assertTrue('2014casj_frc254' in [et.key.id() for et in db_eventteams])
         self.assertTrue('2014casj_frc100' in [et.key.id() for et in db_eventteams])
+
+    def test_match_videos_add(self):
+        self.aaa2.put()
+
+        match1 = Match(
+            id="2014casj_qm1",
+            alliances_json="""{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""",
+            comp_level="qm",
+            event=ndb.Key(Event, '2014casj'),
+            game="frc_unknown",
+            set_number=1,
+            match_number=1,
+            team_key_names=[u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073'],
+            youtube_videos=["abcdef"]
+        )
+        match1.put()
+
+        match2 = Match(
+            id="2014casj_sf1m1",
+            alliances_json="""{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""",
+            comp_level="sf",
+            event=ndb.Key(Event, '2014casj'),
+            game="frc_unknown",
+            set_number=1,
+            match_number=1,
+            team_key_names=[u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073'],
+        )
+        match2.put()
+
+        match_videos = {'qm1': 'aFZy8iibMD0', 'sf1m1': 'RpSgUrsghv4'}
+
+        request_body = json.dumps(match_videos)
+
+        request_path = '/api/trusted/v1/event/2014casj/match_videos/add'
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_2', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(set(Match.get_by_id('2014casj_qm1').youtube_videos), {'abcdef', 'aFZy8iibMD0'})
+        self.assertEqual(set(Match.get_by_id('2014casj_sf1m1').youtube_videos), {'RpSgUrsghv4'})
