@@ -8,7 +8,7 @@ from controllers.gcm.gcm import GCMConnection
 
 class NotificationSender(object):
 
-    webhook_version = "webhooksv1.0.0"
+    WEBHOOK_VERSION = 1
 
     @classmethod
     def send_gcm(cls, notification):
@@ -35,7 +35,7 @@ class NotificationSender(object):
 
             request = urllib2.Request(url, payload)
             request.add_header("X-TBA-Checksum", checksum)
-            request.add_header("X-TBA-Version", cls.webhook_version)
+            request.add_header("X-TBA-Version", cls.WEBHOOK_VERSION)
             try:
                 resp = urllib2.urlopen(request)
             except urllib2.HTTPError, e:
