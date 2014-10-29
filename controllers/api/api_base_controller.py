@@ -80,7 +80,7 @@ class ApiBaseController(CacheableHandler):
 
         self._track_call(*args, **kw)
         super(ApiBaseController, self).get(*args, **kw)
-        self.response.headers['X-TBA-Version'] = self.API_VERSION
+        self.response.headers['X-TBA-Version'] = '{}'.format(self.API_VERSION)
         self._set_cache_header_length(self.CACHE_HEADER_LENGTH)
 
     def _read_cache(self):
