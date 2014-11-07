@@ -17,6 +17,7 @@ class MobileClient(ndb.Model):
     user_id = ndb.StringProperty(required=True, indexed=True)
     messaging_id = ndb.StringProperty(required=True)
     client_type = ndb.IntegerProperty(required=True)
+    display_name = ndb.StringProperty(default="Unnamed Device")
     secret = ndb.StringProperty(default="")  # Used to hash webhooks
 
     # Used to verify that webhooks are actually controlled by the account holder

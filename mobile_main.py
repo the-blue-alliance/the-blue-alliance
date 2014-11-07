@@ -43,7 +43,7 @@ if tba_config.DEBUG:
 # To enable iOS access, add it's client ID here
 
 
-@endpoints.api(name='tbaMobile', version='v8', description="API for TBA Mobile clients",
+@endpoints.api(name='tbaMobile', version='v9', description="API for TBA Mobile clients",
                allowed_client_ids=client_ids,
                audiences=[ANDROID_AUDIENCE],
                scopes=[endpoints.EMAIL_SCOPE])
@@ -59,16 +59,24 @@ class MobileAPI(remote.Service):
         userId = PushHelper.user_email_to_id(current_user.email())
         gcmId = request.mobile_id
         os = ClientType.enums[request.operating_system]
-        if MobileClient.query( MobileClient.messaging_id==gcmId ).count() == 0:
+        name = request.name
+
+        query = MobileClient.query( MobileClient.messaging_id==gcmId )
+        logging.info(query.count())
+        if query.count() == 0:
             # Record doesn't exist yet, so add it
             MobileClient(
                 parent = ndb.Key(Account, userId),
                 user_id = userId,
                 messaging_id = gcmId,
-                client_type = os ).put()
+                client_type = os,
+                display_name = name ).put()
             return BaseResponse(code=200, message="Registration successful")
         else:
-            # Record already exists, don't bother updating it again
+            # Record already exists, update the name
+            client = query.fetch(1)
+            client.display_name = name
+            client.put()
             return BaseResponse(code=304, message="Client already exists")
 
     @endpoints.method(RegistrationRequest, BaseResponse,

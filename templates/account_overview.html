@@ -54,6 +54,7 @@
       <table class="table table-striped">
         <tr>
           <th>Type</th>
+          <th>Name</th>
           <th>ID</td>
           <th></th>
           <th></th>
@@ -62,6 +63,7 @@
           {% for client in user_bundle.mobile_clients %}
             <tr>
               <td>{{ client.type_string }}</td>
+              <td> {{ client.display_name }} </td>
               <td>{{ client.short_id }}</td>
               <td><form action="/notifications/broadcast" method="post">
                 <input name="account_id" type="hidden" value="{{user_bundle.account.key.id}}" />
