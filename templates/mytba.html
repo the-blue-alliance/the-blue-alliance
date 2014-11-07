@@ -6,6 +6,17 @@
 
 {% block content %}
 <div class="container">
+  {% if error_message %}
+  <div class="row">
+    <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
+      <div class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Error!</h4>
+        <p>{{ error_message}} </p>
+      </div>
+    </div>
+  </div>
+  {% endif %}
   <div class="row">
     <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
       <h1>My TBA</h1>
@@ -13,11 +24,6 @@
         <p><a class="btn btn-default" href="/account"><span class="glyphicon glyphicon-chevron-left"></span> My Account</a></p>
         <p>Here you can manage the favorites and subscriptions associated with your account</p>
       </div>
-      {% if error_message %}
-        <div class="row" style="color:#D8000C;background-color:#FFBABA">
-          <p>{{ error_message }}</p>
-        </div>
-      {% endif %}
       <div class="row">
         <div class="col-sm-12">
           <ul class="nav nav-tabs">

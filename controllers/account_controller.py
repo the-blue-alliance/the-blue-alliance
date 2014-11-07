@@ -108,11 +108,11 @@ class MyTBAController(LoggedInHandler):
         if error:
             error_message = "An unknown error occurred"
             if error == 'invalid_model':
-                error_message = "Error: Invalid model key"
+                error_message = "Invalid model key"
             elif error == "no_sub_types":
-                error_message = "Error: No notification types selected"
+                error_message = "No notification types selected"
             elif error == "invalid_account":
-                error_message = "Error: Invalid account"
+                error_message = "Invalid account"
             self.template_values['error_message'] = error_message
 
         path = os.path.join(os.path.dirname(__file__), '../templates/mytba.html')
