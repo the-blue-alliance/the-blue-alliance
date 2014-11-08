@@ -12,7 +12,7 @@ class NotificationType(object):
     AWARDS = 4
     MEDIA_POSTED = 5
     DISTRICT_POINTS_UPDATED = 6
-    SCHEDULE_POSTED = 7
+    SCHEDULE_UPDATED = 7
     FINAL_RESULTS = 8
     PING = 9  # This type of message is sent when the user hits 'ping device' in their account overview
     BROADCAST = 10  # Not yet implemented, but gives functionality for admins to send to many devices
@@ -32,7 +32,7 @@ class NotificationType(object):
         AWARDS: "awards_posted",
         MEDIA_POSTED: "media_posted",
         DISTRICT_POINTS_UPDATED: "district_points_updated",
-        SCHEDULE_POSTED: "schedule_posted",
+        SCHEDULE_UPDATED: "schedule_updated",
         FINAL_RESULTS: "final_results",
         PING: "ping",
         BROADCAST: "broadcast",
@@ -51,7 +51,7 @@ class NotificationType(object):
         AWARDS: "Awards Posted",
         MEDIA_POSTED: "Media Posted",
         DISTRICT_POINTS_UPDATED: "District Points Updated",
-        SCHEDULE_POSTED: "Event Schedule Posted",
+        SCHEDULE_UPDATED: "Event Schedule Updated",
         FINAL_RESULTS: "Final Results",
     }
 
@@ -63,7 +63,7 @@ class NotificationType(object):
         "awards_posted": AWARDS,
         "media_posted": MEDIA_POSTED,
         "district_points_updated": DISTRICT_POINTS_UPDATED,
-        "schedule_posted": SCHEDULE_POSTED,
+        "schedule_updated": SCHEDULE_UPDATED,
         "final_results": FINAL_RESULTS,
 
         "update_favorites": UPDATE_FAVORITES,

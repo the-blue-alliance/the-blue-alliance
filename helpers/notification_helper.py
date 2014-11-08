@@ -10,6 +10,7 @@ from models.event import Event
 
 from notifications.level_starting import CompLevelStartingNotification
 from notifications.match_score import MatchScoreNotification
+from notifications.schedule_updated import ScheduleUpdatedNotification
 from notifications.upcoming_match import UpcomingMatchNotification
 from notifications.update_favorites import UpdateFavoritesNotification
 from notifications.update_subscriptions import UpdateSubscriptionsNotification
@@ -70,9 +71,17 @@ class NotificationHelper(object):
                     notification = UpcomingMatchNotification(match, event)
                     notification.send(keys)
 
+    @classmethod
+    def send_schedule_update(cls, event): 
+        users = PushHelper.get_users_subscribed_to_event(event, NotificationType.SCHEDULE_UPDATED)
+        keys = PushHelper.get_client_ids_for_users(users)
+
+        notification = ScheduleUpdatedNotification(event)
+        notification.send(keys)
+
+    @classmethod
     def verify_webhook(cls, url, secret):
         key = {ClientType.WEBHOOK: [(url, secret)]}
         notification = VerificationNotification(url, secret)
         notification.send(key)
         return notification.verification_key
->>>>>>> master

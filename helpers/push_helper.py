@@ -92,6 +92,14 @@ class PushHelper(object):
         return output
 
     @classmethod
+    def get_users_subscribed_to_event(cls, event, notification):
+        users = Subscription.query(Subscription.model_key == event.id(), Subscription.notification_types == notification).fetch()
+        output = []
+        for user in users:
+            output.append(user.user_id)
+        return output
+
+    @classmethod
     def get_client_ids_for_users(cls, user_list, os_types=None ):
         if os_types is None:
             os_types = ClientType.names.keys()
