@@ -21,6 +21,9 @@ class NotificationType(object):
     UPDATE_FAVORITES = 100
     UPDATE_SUBSCRIPTION = 101
 
+    # This is used for verification that the proper people are in control
+    VERIFICATION = 200
+
     type_names = {
         UPCOMING_MATCH: "upcoming_match",
         MATCH_SCORE: "match_score",
@@ -36,6 +39,8 @@ class NotificationType(object):
 
         UPDATE_FAVORITES: "update_favorites",
         UPDATE_SUBSCRIPTION: "update_subscriptions",
+
+        VERIFICATION: "verification"
     }
 
     render_names = {
@@ -62,5 +67,7 @@ class NotificationType(object):
         "final_results": FINAL_RESULTS,
 
         "update_favorites": UPDATE_FAVORITES,
-        "update_subscriptions": UPDATE_SUBSCRIPTION
+        "update_subscriptions": UPDATE_SUBSCRIPTION,
+
+        "verification": VERIFICATION
     }

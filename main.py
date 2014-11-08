@@ -21,7 +21,7 @@ from controllers.suggestions.suggest_match_video_controller import SuggestMatchV
 from controllers.suggestions.suggest_event_webcast_controller import SuggestEventWebcastController
 from controllers.suggestions.suggest_team_media_controller import SuggestTeamMediaController
 from controllers.team_controller import TeamList, TeamCanonical, TeamDetail, TeamHistory
-from controllers.webhook_controller import WebhookAdd, WebhookDelete
+from controllers.webhook_controller import WebhookAdd, WebhookDelete, WebhookVerify, WebhookVerificationSend
 
 from google.appengine.ext.webapp import template
 template.register_template_library('common.my_filters')
@@ -80,6 +80,8 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/webcasts', WebcastsHandler, 'webcasts', strict_slash=True),
       RedirectRoute(r'/webhooks/add', WebhookAdd, 'webhook-add', strict_slash=True),
       RedirectRoute(r'/webhooks/delete', WebhookDelete, 'webhook-delete', strict_slash=True),
+      RedirectRoute(r'/webhooks/verify/<client_id:[0-9]+>', WebhookVerify, 'webhook-verify', strict_slash=True),
+      RedirectRoute(r'/webhooks/send_verification', WebhookVerificationSend, 'webhook-send-verification', strict_slash=True),
       RedirectRoute(r'/_/live-event/<event_key>/<timestamp:[0-9]+>', LiveEventHandler, 'ajax-live-event', strict_slash=True),
       RedirectRoute(r'/_/typeahead/<search_key>', TypeaheadHandler, 'ajax-typeahead', strict_slash=True),
       RedirectRoute(r'/_/webcast/<event_key>/<webcast_number>', WebcastHandler, 'ajax-webcast', strict_slash=True),

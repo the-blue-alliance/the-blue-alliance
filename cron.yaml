@@ -14,10 +14,10 @@ cron:
 #   schedule: every thursday 02:00
 #   timezone: America/Los_Angeles
 
-# - description: FIRST team detail scraping
-#   url: /tasks/enqueue/usfirst_team_details_rolling
-#   schedule: every day 02:00
-#   timezone: America/Los_Angeles
+- description: FIRST team detail scraping
+  url: /tasks/enqueue/usfirst_team_details_rolling
+  schedule: every day 02:00
+  timezone: America/Los_Angeles
 
 # - description: FIRST match detail scraping for current events
 #   url: /tasks/enqueue/usfirst_matches/now

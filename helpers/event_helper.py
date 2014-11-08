@@ -60,8 +60,8 @@ class EventHelper(object):
                     weekless_events.append(event)
                 else:
                     if week_start is None:
-                        diff_from_thurs = (event.start_date.weekday() - 3) % 7  # 3 is Thursday
-                        week_start = event.start_date - datetime.timedelta(days=diff_from_thurs)
+                        diff_from_wed = (event.start_date.weekday() - 2) % 7  # 2 is Wednesday
+                        week_start = event.start_date - datetime.timedelta(days=diff_from_wed)
 
                     if event.start_date >= week_start + datetime.timedelta(days=7):
                         current_week += 1
@@ -135,7 +135,7 @@ class EventHelper(object):
         An event shows up in this query iff:
         a) The event is within_a_day
         OR
-        b) The event.start_date is on or within 4 days after the closest Thursday
+        b) The event.start_date is on or within 4 days after the closest Wednesday
         """
         today = datetime.datetime.today()
 
@@ -146,8 +146,8 @@ class EventHelper(object):
           Event.start_date).fetch_async(50, keys_only=True)
 
         events = []
-        diff_from_thurs = 3 - today.weekday()  # 3 is Thursday. diff_from_thurs ranges from 3 to -3 (Monday thru Sunday)
-        closest_thursday = today + datetime.timedelta(days=diff_from_thurs)
+        diff_from_wed = 2 - today.weekday()  # 2 is Wednesday. diff_from_wed ranges from 3 to -3 (Monday thru Sunday)
+        closest_wednesday = today + datetime.timedelta(days=diff_from_wed)
 
         two_weeks_of_event_futures = ndb.get_multi_async(two_weeks_of_events_keys_future.get_result())
         for event_future in two_weeks_of_event_futures:
@@ -155,7 +155,7 @@ class EventHelper(object):
             if event.within_a_day:
                 events.append(event)
             else:
-                offset = event.start_date.date() - closest_thursday.date()
+                offset = event.start_date.date() - closest_wednesday.date()
                 if (offset == datetime.timedelta(0)) or (offset > datetime.timedelta(0) and offset < datetime.timedelta(4)):
                     events.append(event)
 

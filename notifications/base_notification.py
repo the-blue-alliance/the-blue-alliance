@@ -28,17 +28,17 @@ class BaseNotification(object):
     def render(self, client_types):
         for client_type in client_types:
             if client_type == ClientType.OS_ANDROID and ClientType.OS_ANDROID in self.keys:
-                    notification = self._render_android()
-                    if len(self.keys[ClientType.OS_ANDROID]) > 0:  # this is after _render because if it's an update fav/subscription notification, then
-                        NotificationSender.send_gcm(notification)  # we remove the client id that sent the update so it doesn't get notified redundantly
+                notification = self._render_android()
+                if len(self.keys[ClientType.OS_ANDROID]) > 0:  # this is after _render because if it's an update fav/subscription notification, then
+                    NotificationSender.send_gcm(notification)  # we remove the client id that sent the update so it doesn't get notified redundantly
 
             elif client_type == ClientType.OS_IOS and ClientType.OS_IOS in self.keys:
                 notification = self._render_ios()
                 NotificationSender.send_ios(notification)
 
             elif client_type == ClientType.WEBHOOK and ClientType.WEBHOOK in self.keys and len(self.keys[ClientType.WEBHOOK]) > 0:
-                    notification = self._render_webhook()
-                    NotificationSender.send_webhook(notification, self.keys[ClientType.WEBHOOK])
+                notification = self._render_webhook()
+                NotificationSender.send_webhook(notification, self.keys[ClientType.WEBHOOK])
 
     """
     Subclasses should override this method and return a dict containing the payload of the notification.

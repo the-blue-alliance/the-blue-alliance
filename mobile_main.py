@@ -12,6 +12,7 @@ import tba_config
 from consts.client_type import ClientType
 from helpers.push_helper import PushHelper
 from helpers.notification_helper import NotificationHelper
+from models.account import Account
 from models.favorite import Favorite
 from models.sitevar import Sitevar
 from models.subscription import Subscription
@@ -60,9 +61,11 @@ class MobileAPI(remote.Service):
         os = ClientType.enums[request.operating_system]
         if MobileClient.query( MobileClient.messaging_id==gcmId ).count() == 0:
             # Record doesn't exist yet, so add it
-            MobileClient(   messaging_id = gcmId,
-                            user_id = userId,
-                            client_type = os ).put()
+            MobileClient(
+                parent = ndb.Key(Account, userId),
+                user_id = userId,
+                messaging_id = gcmId,
+                client_type = os ).put()
             return BaseResponse(code=200, message="Registration successful")
         else:
             # Record already exists, don't bother updating it again
@@ -77,7 +80,7 @@ class MobileAPI(remote.Service):
             return BaseResponse(code=401, message="Unauthorized to unregister")
         userID = PushHelper.user_email_to_id(current_user.email())
         gcmId = request.mobile_id
-        query = MobileClient.query(MobileClient.messaging_id == gcmId, MobileClient.user_id == userID).fetch(keys_only=True)
+        query = MobileClient.query(MobileClient.messaging_id == gcmId, ancestor=ndb.Key(Account, userID)).fetch(keys_only=True)
         if len(query) == 0:
             # Record doesn't exist, so we can't remove it
             return BaseResponse(code=404, message="User doesn't exist. Can't remove it")

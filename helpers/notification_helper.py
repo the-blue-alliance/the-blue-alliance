@@ -13,6 +13,7 @@ from notifications.match_score import MatchScoreNotification
 from notifications.upcoming_match import UpcomingMatchNotification
 from notifications.update_favorites import UpdateFavoritesNotification
 from notifications.update_subscriptions import UpdateSubscriptionsNotification
+from notifications.verification import VerificationNotification
 
 
 class NotificationHelper(object):
@@ -68,3 +69,10 @@ class NotificationHelper(object):
 
                     notification = UpcomingMatchNotification(match, event)
                     notification.send(keys)
+
+    def verify_webhook(cls, url, secret):
+        key = {ClientType.WEBHOOK: [(url, secret)]}
+        notification = VerificationNotification(url, secret)
+        notification.send(key)
+        return notification.verification_key
+>>>>>>> master
