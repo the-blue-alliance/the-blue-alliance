@@ -178,8 +178,8 @@ class MobileAPI(remote.Service):
             return BaseResponse(code=500, message="Unknown error removing subscription")
 
     @endpoints.method(ModelPreferenceMessage, BaseResponse,
-                      path="model_preferences", http_method="POST",
-                      name="model_preferences")
+                      path="model/setPreferences", http_method="POST",
+                      name="model.setPreferences")
     def update_model_preferences(self, request):
         current_user = endpoints.get_current_user()
         if current_user is None:
