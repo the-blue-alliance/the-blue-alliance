@@ -61,7 +61,8 @@ class MobileAPI(remote.Service):
         userId = PushHelper.user_email_to_id(current_user.email())
         gcmId = request.mobile_id
         os = ClientType.enums[request.operating_system]
-        if MobileClient.query( MobileClient.messaging_id==gcmId ).count() == 0:
+        existing =  MobileClient.query( MobileClient.messaging_id==gcmId ).get()
+        if not existing:
             # Record doesn't exist yet, so add it
             MobileClient(
                 parent = ndb.Key(Account, userId),
@@ -213,28 +214,29 @@ class MobileAPI(remote.Service):
                 output['favorite'] = {500: "Unknown error removing favorite"}
                 code += 500
 
-        if request.notification:
+        if request.notifications:
             sub = Subscription( user_id = userId, model_key = modelKey, notification_types = PushHelper.notification_enums_from_string(request.notifications))
             result = MyTBAHelper.add_subscription(sub, request.device_key)
             if result == 200:
                 output['subscription'] = {200: "Subscription updated"}
-                count += 100
+                code += 100
             elif result == 304:
                 output['subscription'] = {304: "Subscription already exists"}
-                count += 304
+                code += 304
             else:
                 output['subscription'] = {500: "Unknown error adding favorite"}
-                count += 500
+                code += 500
         else:
             result = MyTBAHelper.remove_subscription(userId, modelKey, request.device_key)
             if result == 200:
                 output['subscription'] = {200: "Subscription removed"}
-                count += 100
+                code += 100
             elif result == 404:
                 output['subscription'] = {404: "Subscription not found"}
-                count += 404
+                code += 404
             else:
                 output['subscription'] = {500: "Unknown error removing subscription"}
+                code += 500
 
         return BaseResponse(code=code, message=json.dumps(output))
 
