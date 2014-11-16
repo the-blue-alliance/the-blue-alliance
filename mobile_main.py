@@ -194,48 +194,60 @@ class MobileAPI(remote.Service):
             fav = Favorite( user_id = userId, model_key = modelKey)
             result = MyTBAHelper.add_favorite(fav, request.device_key)
             if result == 200:
-                output['favorite'] = {200: "Favorite added"}
+                output['favorite'] = {"code"   : 200,
+                                      "message": "Favorite added"}
                 code += 100
             elif result == 304:
-                output['favorite'] = {304: "Favorite already exists"}
+                output['favorite'] = {"code"   : 304,
+                                      "message": "Favorite already exists"}
                 code += 304
             else:
-                output['favorite'] = {500: "Unknown error adding favorite"}
+                output['favorite'] = {"code"   : 500,
+                                      "message": "Unknown error adding favorite"}
                 code += 500
         else:
             result = MyTBAHelper.remove_favorite(userId, modelKey, request.device_key)
             if result == 200:
-                output['favorite'] = {200: "Favorite deleted"}
+                output['favorite'] = {"code"    : 200,
+                                      "message" : "Favorite deleted"}
                 code += 100
             elif result == 404:
-                output['favorite'] = {404: "Favorite not found"}
+                output['favorite'] = {"code"    : 404,
+                                      "message" : "Favorite not found"}
                 code += 404
             else:
-                output['favorite'] = {500: "Unknown error removing favorite"}
+                output['favorite'] = {"code"    : 500,
+                                      "message" : "Unknown error removing favorite"}
                 code += 500
 
         if request.notifications:
             sub = Subscription( user_id = userId, model_key = modelKey, notification_types = PushHelper.notification_enums_from_string(request.notifications))
             result = MyTBAHelper.add_subscription(sub, request.device_key)
             if result == 200:
-                output['subscription'] = {200: "Subscription updated"}
+                output['subscription'] = {"code"    : 200,
+                                          "message" : "Subscription updated"}
                 code += 100
             elif result == 304:
-                output['subscription'] = {304: "Subscription already exists"}
+                output['subscription'] = {"code"    : 304,
+                                          "message" : "Subscription already exists"}
                 code += 304
             else:
-                output['subscription'] = {500: "Unknown error adding favorite"}
+                output['subscription'] = {"code"    : 500,
+                                          "message" : "Unknown error adding favorite"}
                 code += 500
         else:
             result = MyTBAHelper.remove_subscription(userId, modelKey, request.device_key)
             if result == 200:
-                output['subscription'] = {200: "Subscription removed"}
+                output['subscription'] = {"code:"   : 200,
+                                          "message" : "Subscription removed"}
                 code += 100
             elif result == 404:
-                output['subscription'] = {404: "Subscription not found"}
+                output['subscription'] = {"code"    : 404,
+                                          "message" : "Subscription not found"}
                 code += 404
             else:
-                output['subscription'] = {500: "Unknown error removing subscription"}
+                output['subscription'] = {"code"    : 500,
+                                          "message" : "Unknown error removing subscription"}
                 code += 500
 
         return BaseResponse(code=code, message=json.dumps(output))
