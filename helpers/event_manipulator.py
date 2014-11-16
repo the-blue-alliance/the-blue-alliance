@@ -25,9 +25,13 @@ class EventManipulator(ManipulatorBase):
                 cls.createOrUpdate(event, run_post_update_hook=False)
             except Exception:
                 logging.warning("Timezone update for event {} failed!".format(event.key.id()))
-            if event.dirty and "alliance_selections_json" in event._updated_attrs:
-                # Send updated alliances notification
-                NotificationHelper.send_alliance_update(event)
+
+            try:
+                if event.dirty and "alliance_selections_json" in event._updated_attrs:
+                    # Send updated alliances notification
+                    NotificationHelper.send_alliance_update(event)
+            except Exception:
+                logging.error("Error sending alliance update notification for {}").format(event.id)
 
     @classmethod
     def updateMerge(self, new_event, old_event, auto_union=True):
