@@ -8,6 +8,7 @@ from helpers.push_helper import PushHelper
 
 from models.event import Event
 
+from notifications.alliance_selections import AllianceSelectionNotification
 from notifications.level_starting import CompLevelStartingNotification
 from notifications.match_score import MatchScoreNotification
 from notifications.schedule_updated import ScheduleUpdatedNotification
@@ -77,6 +78,14 @@ class NotificationHelper(object):
         keys = PushHelper.get_client_ids_for_users(users)
 
         notification = ScheduleUpdatedNotification(event)
+        notification.send(keys)
+
+    @classmethod
+    def send_alliance_update(cls, event):
+        users = PushHelper.get_users_subscribed_to_event(event, NotificationType.ALLIANCE_SELECTION)
+        keys = PushHelper.get_client_ids_for_users(users)
+
+        notification = AllianceSelectionNotification(event)
         notification.send(keys)
 
     @classmethod
