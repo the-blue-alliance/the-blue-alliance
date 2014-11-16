@@ -31,7 +31,7 @@ class EventManipulator(ManipulatorBase):
                     # Send updated alliances notification
                     NotificationHelper.send_alliance_update(event)
             except Exception:
-                logging.error("Error sending alliance update notification for {}").format(event.id)
+                logging.error("Error sending alliance update notification for {}".format(event.id))
 
     @classmethod
     def updateMerge(self, new_event, old_event, auto_union=True):

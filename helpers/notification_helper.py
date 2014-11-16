@@ -89,6 +89,15 @@ class NotificationHelper(object):
         notification.send(keys)
 
     @classmethod
+    def send_award_update(cls, event):
+        users = PushHelper.get_users_subscribed_to_event(event, NotificationType.AWARDS)
+        keys = PushHelper.get_client_ids_for_users(users)
+
+        notification = AwardsUpdatedNotification(event)
+        notification.send(keys)
+
+
+    @classmethod
     def verify_webhook(cls, url, secret):
         key = {ClientType.WEBHOOK: [(url, secret)]}
         notification = VerificationNotification(url, secret)
