@@ -65,6 +65,11 @@ class MobileAPI(remote.Service):
         uuid = request.device_uuid
 
         query = MobileClient.query( MobileClient.user_id == userId, MobileClient.device_uuid == uuid, MobileClient.client_type == os )
+        # trying to figure out an elusive dupe bug
+        logging.info("DEBUGGING")
+        logging.info("User ID: {}".format(userId))
+        logging.info("UUID: {}".format(uuid))
+        logging.info("Count: {}".format(query.count()))
         if query.count() == 0:
             # Record doesn't exist yet, so add it
             MobileClient(
@@ -168,7 +173,7 @@ class MobileAPI(remote.Service):
         elif result == 304:
             return BaseResponse(code=304, message="Subscription already exists")
         else:
-            return BaseResponse(code=500, message="Unknown error adding favorite") 
+            return BaseResponse(code=500, message="Unknown error adding favorite")
 
     @endpoints.method(SubscriptionMessage, BaseResponse,
                       path='subscriptions/remove', http_method='POST',
