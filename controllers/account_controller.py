@@ -106,7 +106,7 @@ class MyTBAController(LoggedInHandler):
         self.template_values['favorites'] = Favorite.query(Favorite.user_id == user_id).fetch()
         self.template_values['subscriptions'] = Subscription.query(Subscription.user_id == user_id).fetch()
         self.template_values['enabled_notifications'] = NotificationType.enabled_notifications
-        
+
         error = self.request.get('error')
         if error:
             if error == 'invalid_model':
@@ -157,7 +157,7 @@ class MyTBAController(LoggedInHandler):
                     # No notification types specified. Don't add
                     self.redirect('/account/mytba?error=no_sub_types')
                     return
-                subscription = Subscription(user_id = current_user_id, model_key = model, notification_types = subs)
+                subscription = Subscription(user_id = current_user_id, model_key = model, notification_types = [int(s) for s in subs])
                 MyTBAHelper.add_subscription(subscription)
                 self.redirect('/account/mytba')
                 return
