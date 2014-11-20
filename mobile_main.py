@@ -82,7 +82,7 @@ class MobileAPI(remote.Service):
             return BaseResponse(code=200, message="Registration successful")
         else:
             # Record already exists, update it
-            client = query.fetch(1)
+            client = query.fetch(1)[0]
             client.messaging_id = gcmId,
             client.display_name = name
             client.put()
