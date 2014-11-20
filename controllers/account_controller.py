@@ -7,6 +7,7 @@ from base_controller import LoggedInHandler
 
 from consts.notification_type import NotificationType
 
+from helpers.mytba_helper import MyTBAHelper
 from helpers.notification_helper import NotificationHelper
 from helpers.validation_helper import ValidationHelper
 
@@ -134,11 +135,8 @@ class MyTBAController(LoggedInHandler):
                 if not ValidationHelper.is_valid_model_key(model):
                     self.redirect('/account/mytba?error=invalid_model')
                     return
-                existing = Favorite.query(Favorite.model_key == model, Favorite.user_id == current_user_id)
-                if existing is None or existing.count() == 0:
-                    favorite = Favorite(model_key =  model, user_id = current_user_id)
-                    favorite.put()
-                    NotificationHelper.send_favorite_update(current_user_id)
+                favorite = Favorite(model_key =  model, user_id = current_user_id)
+                MyTBAHelper.add_favorite(favorite)
                 self.redirect('/account/mytba')
                 return
             elif action == "favorite_delete":
@@ -159,16 +157,8 @@ class MyTBAController(LoggedInHandler):
                     # No notification types specified. Don't add
                     self.redirect('/account/mytba?error=no_sub_types')
                     return
-                existing = Subscription.query(Subscription.user_id == current_user_id, Subscription.model_key == model)
-                subs = map(int, subs)
-                if existing is None or existing.count() == 0:
-                    subscription = Subscription(user_id = current_user_id, model_key = model, notification_types = subs)
-                    subscription.put()
-                else:
-                    subscription = existing.fetch()[0]
-                    subscription.notification_types = subs
-                    subscription.put()
-                NotificationHelper.send_subscription_update(current_user_id)
+                subscription = Subscription(user_id = current_user_id, model_key = model, notification_types = subs)
+                MyTBAHelper.add_subscription(subscription)
                 self.redirect('/account/mytba')
                 return
             elif action == "subscription_delete":
