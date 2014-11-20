@@ -61,17 +61,26 @@ class MobileAPI(remote.Service):
         userId = PushHelper.user_email_to_id(current_user.email())
         gcmId = request.mobile_id
         os = ClientType.enums[request.operating_system]
-        existing =  MobileClient.query( MobileClient.messaging_id==gcmId ).get()
-        if not existing:
+        name = request.name
+        uuid = request.device_uuid
+
+        query = MobileClient.query( MobileClient.user_id == userId, MobileClient.device_uuid == uuid, MobileClient.client_type == os )
+        if query.count() == 0:
             # Record doesn't exist yet, so add it
             MobileClient(
                 parent = ndb.Key(Account, userId),
                 user_id = userId,
                 messaging_id = gcmId,
-                client_type = os ).put()
+                client_type = os,
+                device_uuid = uuid,
+                display_name = name ).put()
             return BaseResponse(code=200, message="Registration successful")
         else:
-            # Record already exists, don't bother updating it again
+            # Record already exists, update it
+            client = query.fetch(1)
+            client.messaging_id = gcmId,
+            client.display_name = name
+            client.put()
             return BaseResponse(code=304, message="Client already exists")
 
     @endpoints.method(RegistrationRequest, BaseResponse,

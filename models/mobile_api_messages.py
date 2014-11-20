@@ -11,7 +11,8 @@ class BaseResponse(messages.Message):
 class RegistrationRequest(messages.Message):
     operating_system = messages.StringField(1, required=True)
     mobile_id = messages.StringField(2, required=True)
-
+    name = messages.StringField(3, required=False, default='Unnamed Device')
+    device_uuid = messages.StringField(4, required=False, default='')
 
 class FavoriteMessage(messages.Message):
     model_key = messages.StringField(1, required=True)
