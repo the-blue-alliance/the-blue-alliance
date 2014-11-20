@@ -173,6 +173,18 @@ class EventHelper(object):
 
     @classmethod
     def getShortName(self, name_str):
+        # 2015+ districts
+        re_string = '(' + '|'.join(DistrictType.abbrevs.keys()).upper() + ') District -(.*)'
+        match = re.match(re.compile(re_string), name_str)
+        if match:
+            partial = match.group(2).strip()
+            match2 = re.match('(.*)Event(.*)', partial)
+            if match2:
+                return match2.group(1).strip()
+            else:
+                return partial
+
+        # other districts and regionals
         match = re.match(r'(MAR |PNW )?(FIRST Robotics|FRC)?(.*)(FIRST Robotics|FRC)?(District|Regional|Region|State|Tournament|FRC|Field)( Competition| Event| Championship)?', name_str)
         if match:
             short = match.group(3)
