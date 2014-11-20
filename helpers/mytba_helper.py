@@ -7,7 +7,7 @@ from models.subscription import Subscription
 class MyTBAHelper(object):
 
     @classmethod
-    def add_favorite(cls, fav, device_key):
+    def add_favorite(cls, fav, device_key=""):
         if Favorite.query( Favorite.user_id == fav.user_id, Favorite.model_key == fav.model_key).count() == 0:
             # Favorite doesn't exist, add it
             fav.put()
@@ -20,7 +20,7 @@ class MyTBAHelper(object):
             return 304
 
     @classmethod
-    def remove_favorite(cls, userId, modelKey, device_key):
+    def remove_favorite(cls, userId, modelKey, device_key=""):
         to_delete = Favorite.query( Favorite.user_id == userId, Favorite.model_key == modelKey).fetch(keys_only=True)
         if len(to_delete) > 0:
             ndb.delete_multi(to_delete)
@@ -33,7 +33,7 @@ class MyTBAHelper(object):
             return 404
 
     @classmethod
-    def add_subscription(cls, sub, device_key):
+    def add_subscription(cls, sub, device_key=""):
         current = Subscription.query( Subscription.user_id == sub.user_id, Subscription.model_key == sub.model_key).get()
         if current is None:
             # Subscription doesn't exist, add it
@@ -56,7 +56,7 @@ class MyTBAHelper(object):
                 return 200
 
     @classmethod
-    def remove_subscription(cls, userId, modelKey, device_key):
+    def remove_subscription(cls, userId, modelKey, device_key=""):
         to_delete = Subscription.query( Subscription.user_id == userId, Subscription.model_key == modelKey).fetch(keys_only=True)
         if len(to_delete) > 0:
             ndb.delete_multi(to_delete)

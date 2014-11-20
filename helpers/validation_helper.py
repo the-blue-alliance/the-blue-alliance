@@ -31,6 +31,13 @@ class ValidationHelper(object):
             return error_dict
 
     @classmethod
+    def is_valid_model_key(cls, key):
+        return (Team.validate_key_name(key) or
+            Event.validate_key_name(key) or
+            Match.validate_key_name(key) or 
+            key[3:] in DistrictType.abbrevs)
+
+    @classmethod
     def team_id_validator(cls, value):
         error_message = "{} is not a valid team id".format(value)
         team_key_error = { "team_id": error_message}
