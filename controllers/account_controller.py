@@ -21,6 +21,8 @@ class AccountOverview(LoggedInHandler):
         # Redirects to registration page if account not registered
         self._require_registration('/account/register')
 
+        self.template_values['webhook_verification_success'] = self.request.get('webhook_verification_success')
+
         path = os.path.join(os.path.dirname(__file__), '../templates/account_overview.html')
         self.response.out.write(template.render(path, self.template_values))
 
