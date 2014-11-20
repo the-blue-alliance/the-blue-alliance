@@ -83,7 +83,7 @@ class MobileAPI(remote.Service):
         else:
             # Record already exists, update it
             client = query.fetch(1)[0]
-            client.messaging_id = gcmId,
+            client.messaging_id = gcmId
             client.display_name = name
             client.put()
             return BaseResponse(code=304, message="Client already exists")
