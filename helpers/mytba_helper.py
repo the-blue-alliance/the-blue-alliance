@@ -1,0 +1,71 @@
+from google.appengine.ext import ndb
+
+from helpers.notification_helper import NotificationHelper
+from models.favorite import Favorite
+from models.subscription import Subscription
+
+class MyTBAHelper(object):
+
+    @classmethod
+    def add_favorite(cls, fav, device_key=""):
+        if Favorite.query( Favorite.user_id == fav.user_id, Favorite.model_key == fav.model_key).count() == 0:
+            # Favorite doesn't exist, add it
+            fav.put()
+            if device_key:
+                # Send updates to user's other devices
+                NotificationHelper.send_favorite_update(fav.user_id, device_key)
+            return 200
+        else:
+            # Favorite already exists. Don't add it again
+            return 304
+
+    @classmethod
+    def remove_favorite(cls, userId, modelKey, device_key=""):
+        to_delete = Favorite.query( Favorite.user_id == userId, Favorite.model_key == modelKey).fetch(keys_only=True)
+        if len(to_delete) > 0:
+            ndb.delete_multi(to_delete)
+            if device_key:
+                # Send updates to user's other devices
+                NotificationHelper.send_favorite_update(userId, device_key)
+            return 200
+        else:
+            # Favorite doesn't exist. Can't delete it
+            return 404
+
+    @classmethod
+    def add_subscription(cls, sub, device_key=""):
+        current = Subscription.query( Subscription.user_id == sub.user_id, Subscription.model_key == sub.model_key).get()
+        if current is None:
+            # Subscription doesn't exist, add it
+            sub.put()
+            if device_key:
+                # Send updates to user's other devices
+                NotificationHelper.send_subscription_update(sub.user_id, device_key)
+            return 200
+        else:
+            if current.notification_types == sub.notification_types:
+                # Subscription already exists. Don't add it again
+                return 304
+            else:
+                # We're updating the settings
+                current.notification_types = sub.notification_types 
+                current.put()
+                if device_key:
+                    # Send updates to user's other devices
+                    NotificationHelper.send_subscription_update(sub.user_id, device_key)
+                return 200
+
+    @classmethod
+    def remove_subscription(cls, userId, modelKey, device_key=""):
+        to_delete = Subscription.query( Subscription.user_id == userId, Subscription.model_key == modelKey).fetch(keys_only=True)
+        if len(to_delete) > 0:
+            ndb.delete_multi(to_delete)
+            if device_key:
+                # Send updates to user's other devices
+                NotificationHelper.send_subscription_update(userId, device_key)
+            return 200
+        else:
+            # Subscription doesn't exist. Can't delete it
+            return 404
+
+

@@ -71,3 +71,7 @@ class NotificationType(object):
 
         "verification": VERIFICATION
     }
+
+    enabled_notifications = {
+        MATCH_SCORE: render_names[MATCH_SCORE]
+    }
