@@ -1,14 +1,15 @@
 from google.appengine.ext import ndb
 
 from helpers.notification_helper import NotificationHelper
+from models.account import Account
 from models.favorite import Favorite
 from models.subscription import Subscription
 
-class MyTBAHelper(object):
 
+class MyTBAHelper(object):
     @classmethod
     def add_favorite(cls, fav, device_key=""):
-        if Favorite.query( Favorite.user_id == fav.user_id, Favorite.model_key == fav.model_key).count() == 0:
+        if Favorite.query(Favorite.model_key == fav.model_key, ancestor=ndb.Key(Account, fav.user_id)).count() == 0:
             # Favorite doesn't exist, add it
             fav.put()
             if device_key:
@@ -21,7 +22,7 @@ class MyTBAHelper(object):
 
     @classmethod
     def remove_favorite(cls, userId, modelKey, device_key=""):
-        to_delete = Favorite.query( Favorite.user_id == userId, Favorite.model_key == modelKey).fetch(keys_only=True)
+        to_delete = Favorite.query(Favorite.model_key == modelKey, ancestor=ndb.Key(Account, userId)).fetch(keys_only=True)
         if len(to_delete) > 0:
             ndb.delete_multi(to_delete)
             if device_key:
@@ -34,7 +35,7 @@ class MyTBAHelper(object):
 
     @classmethod
     def add_subscription(cls, sub, device_key=""):
-        current = Subscription.query( Subscription.user_id == sub.user_id, Subscription.model_key == sub.model_key).get()
+        current = Subscription.query(Subscription.model_key == sub.model_key, ancestor=ndb.Key(Account, sub.user_id)).get()
         if current is None:
             # Subscription doesn't exist, add it
             sub.put()
@@ -48,7 +49,7 @@ class MyTBAHelper(object):
                 return 304
             else:
                 # We're updating the settings
-                current.notification_types = sub.notification_types 
+                current.notification_types = sub.notification_types
                 current.put()
                 if device_key:
                     # Send updates to user's other devices
@@ -57,7 +58,7 @@ class MyTBAHelper(object):
 
     @classmethod
     def remove_subscription(cls, userId, modelKey, device_key=""):
-        to_delete = Subscription.query( Subscription.user_id == userId, Subscription.model_key == modelKey).fetch(keys_only=True)
+        to_delete = Subscription.query(Subscription.model_key == modelKey, ancestor=ndb.Key(Account, userId)).fetch(keys_only=True)
         if len(to_delete) > 0:
             ndb.delete_multi(to_delete)
             if device_key:

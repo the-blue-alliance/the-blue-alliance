@@ -102,9 +102,9 @@ class MyTBAController(LoggedInHandler):
         self._require_login('/account/register')
         self._require_registration('/account/register')
 
-        user_id = self.user_bundle.account.key.id()
-        self.template_values['favorites'] = Favorite.query(Favorite.user_id == user_id).fetch()
-        self.template_values['subscriptions'] = Subscription.query(Subscription.user_id == user_id).fetch()
+        user = self.user_bundle.account.key
+        self.template_values['favorites'] = Favorite.query(ancestor=user).fetch()
+        self.template_values['subscriptions'] = Subscription.query(ancestor=user).fetch()
         self.template_values['enabled_notifications'] = NotificationType.enabled_notifications
 
         error = self.request.get('error')

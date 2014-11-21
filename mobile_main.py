@@ -114,7 +114,7 @@ class MobileAPI(remote.Service):
             return FavoriteCollection(favorites = [])
         userId = PushHelper.user_email_to_id(current_user.email())
 
-        favorites = Favorite.query( Favorite.user_id == userId ).fetch()
+        favorites = Favorite.query(ancestor=ndb.Key(Account, userId)).fetch()
         output = []
         for favorite in favorites:
             output.append(FavoriteMessage(model_key = favorite.model_key, model_type = favorite.model_type))
@@ -214,7 +214,7 @@ class MobileAPI(remote.Service):
             return SubscriptionCollection(subscriptions = [])
         userId = PushHelper.user_email_to_id(current_user.email())
 
-        subscriptions = Subscription.query( Subscription.user_id == userId ).fetch()
+        subscriptions = Subscription.query(ancestor=ndb.Key(Account, userId)).fetch()
         output = []
         for subscription in subscriptions:
             output.append(SubscriptionMessage(model_key = subscription.model_key, notifications = PushHelper.notification_string_from_enums(subscription.notification_types)), model_type = subscription.model_type)
