@@ -45,7 +45,7 @@ if tba_config.DEBUG:
 # To enable iOS access, add it's client ID here
 
 
-@endpoints.api(name='tbaMobile', version='v8', description="API for TBA Mobile clients",
+@endpoints.api(name='tbaMobile', version='v9', description="API for TBA Mobile clients",
                allowed_client_ids=client_ids,
                audiences=[ANDROID_AUDIENCE],
                scopes=[endpoints.EMAIL_SCOPE])
@@ -105,42 +105,6 @@ class MobileAPI(remote.Service):
             ndb.delete_multi(query)
             return BaseResponse(code=200, message="User deleted")
 
-    @endpoints.method(FavoriteMessage, BaseResponse,
-                      path='favorites/add', http_method='POST',
-                      name='favorites.add')
-    def add_favorite(self, request):
-        current_user = endpoints.get_current_user()
-        if current_user is None:
-            return BaseResponse(code=401, message="Unauthorized to add favorite")
-        userId = PushHelper.user_email_to_id(current_user.email())
-        modelKey = request.model_key
-
-        fav = Favorite( user_id = userId, model_key = modelKey)
-        result = MyTBAHelper.add_favorite(fav, request.device_key)
-        if result == 200:
-            return BaseResponse(code=200, message="Favorite added")
-        elif result == 304:
-            return BaseResponse(code=304, message="Favorite already exists")
-        else:
-            return BaseResponse(code=500, message="Unknown error adding favorite")
-
-    @endpoints.method(FavoriteMessage, BaseResponse,
-                      path='favorites/remove', http_method='POST',
-                      name='favorites.remove')
-    def remove_favorite(self, request):
-        current_user = endpoints.get_current_user()
-        if current_user is None:
-            return BaseResponse(code=401, message="Unauthorized to remove favorite")
-        userId = PushHelper.user_email_to_id(current_user.email())
-        modelKey = request.model_key
-        result = MyTBAHelper.remove_favorite(userId, modelKey, request.device_key)
-        if result == 200:
-            return BaseResponse(code=200, message="Favorite deleted")
-        elif result == 404:
-            return BaseResponse(code=404, message="Favorite not found")
-        else:
-            return BaseResponse(code=500, message="Unknown error removing favorite")
-
     @endpoints.method(message_types.VoidMessage, FavoriteCollection,
                       path='favorites/list', http_method='POST',
                       name='favorites.list')
@@ -153,44 +117,8 @@ class MobileAPI(remote.Service):
         favorites = Favorite.query( Favorite.user_id == userId ).fetch()
         output = []
         for favorite in favorites:
-            output.append(FavoriteMessage(model_key = favorite.model_key))
+            output.append(FavoriteMessage(model_key = favorite.model_key, model_type = favorite.model_type))
         return FavoriteCollection(favorites = output)
-
-    @endpoints.method(SubscriptionMessage, BaseResponse,
-                      path='subscriptions/add', http_method='POST',
-                      name='subscriptions.add')
-    def add_subscription(self, request):
-        current_user = endpoints.get_current_user()
-        if current_user is None:
-            return BaseResponse(code=401, message="Unauthorized to add subscription")
-        userId = PushHelper.user_email_to_id(current_user.email())
-        modelKey = request.model_key
-
-        sub = Subscription( user_id = userId, model_key = modelKey, notification_types = PushHelper.notification_enums_from_string(request.notifications))
-        result = MyTBAHelper.add_subscription(sub, request.device_key)
-        if result == 200:
-            return BaseResponse(code=200, message="Subscription updated")
-        elif result == 304:
-            return BaseResponse(code=304, message="Subscription already exists")
-        else:
-            return BaseResponse(code=500, message="Unknown error adding favorite")
-
-    @endpoints.method(SubscriptionMessage, BaseResponse,
-                      path='subscriptions/remove', http_method='POST',
-                      name='subscriptions.remove')
-    def remove_subscription(self, request):
-        current_user = endpoints.get_current_user()
-        if current_user is None:
-            return BaseResponse(code=401, message="Unauthorized to remove subscription")
-        userId = PushHelper.user_email_to_id(current_user.email())
-        modelKey = request.model_key
-        result = MyTBAHelper.remove_subscription(userId, modelKey, request.device_key)
-        if result == 200:
-            return BaseResponse(code=200, message="Subscription removed")
-        elif result == 404:
-            return BaseResponse(code=404, message="Subscription not found")
-        else:
-            return BaseResponse(code=500, message="Unknown error removing subscription")
 
     @endpoints.method(ModelPreferenceMessage, BaseResponse,
                       path="model/setPreferences", http_method="POST",
@@ -205,7 +133,7 @@ class MobileAPI(remote.Service):
         code = 0
 
         if request.favorite:
-            fav = Favorite( user_id = userId, model_key = modelKey)
+            fav = Favorite( user_id = userId, model_key = modelKey, model_type = request.model_type)
             result = MyTBAHelper.add_favorite(fav, request.device_key)
             if result == 200:
                 output['favorite'] = {"code"   : 200,
@@ -235,7 +163,7 @@ class MobileAPI(remote.Service):
                 code += 500
 
         if request.notifications:
-            sub = Subscription( user_id = userId, model_key = modelKey, notification_types = PushHelper.notification_enums_from_string(request.notifications))
+            sub = Subscription( user_id = userId, model_key = modelKey, notification_types = PushHelper.notification_enums_from_string(request.notifications), model_type = request.model_type)
             result = MyTBAHelper.add_subscription(sub, request.device_key)
             if result == 200:
                 output['subscription'] = {"code"    : 200,
@@ -278,7 +206,7 @@ class MobileAPI(remote.Service):
         subscriptions = Subscription.query( Subscription.user_id == userId ).fetch()
         output = []
         for subscription in subscriptions:
-            output.append(SubscriptionMessage(model_key = subscription.model_key, notifications = PushHelper.notification_string_from_enums(subscription.notification_types)))
+            output.append(SubscriptionMessage(model_key = subscription.model_key, notifications = PushHelper.notification_string_from_enums(subscription.notification_types)), model_type = subscription.model_type)
         return SubscriptionCollection(subscriptions = output)
 
 

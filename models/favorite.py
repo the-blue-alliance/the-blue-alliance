@@ -4,6 +4,7 @@ class Favorite(ndb.Model):
 
     user_id = ndb.StringProperty(required=True)
     model_key = ndb.StringProperty(required=True)
+    model_type = ndb.IntegerProperty(required=True)
 
     created = ndb.DateTimeProperty(auto_now_add=True)
 
