@@ -26,6 +26,8 @@ class BaseNotification(object):
     Clients should implement the referenced methods in order to build the notification for each platform
     """
     def render(self, client_types):
+        if not isistance(client_types, list):
+            client_types = [client_types]
         for client_type in client_types:
             if client_type == ClientType.OS_ANDROID and ClientType.OS_ANDROID in self.keys:
                 notification = self._render_android()
