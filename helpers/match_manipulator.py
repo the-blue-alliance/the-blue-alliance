@@ -42,11 +42,11 @@ class MatchManipulator(ManipulatorBase):
         If we have an unplayed match, send out a schedule update notification
         '''
         for event in unplayed_matches:
- #           try:
-             logging.info("Sending schedule updates for: {}".format(event.key_name))
-             NotificationHelper.send_schedule_update(event)
-#            except Exception, exception:
-#                logging.error("Eror sending schedule updates for: {}".format(event.key_name))
+            try:
+                logging.info("Sending schedule updates for: {}".format(event.key_name))
+                NotificationHelper.send_schedule_update(event)
+            except Exception, exception:
+                logging.error("Eror sending schedule updates for: {}".format(event.key_name))
 
         '''
         Enqueue firebase push

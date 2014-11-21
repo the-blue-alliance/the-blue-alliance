@@ -11,6 +11,7 @@ from models.event import Event
 from notifications.alliance_selections import AllianceSelectionNotification
 from notifications.level_starting import CompLevelStartingNotification
 from notifications.match_score import MatchScoreNotification
+from notifications.awards_updated import AwardsUpdatedNotification 
 from notifications.schedule_updated import ScheduleUpdatedNotification
 from notifications.upcoming_match import UpcomingMatchNotification
 from notifications.update_favorites import UpdateFavoritesNotification
