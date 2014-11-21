@@ -12,11 +12,12 @@ class RegistrationRequest(messages.Message):
     operating_system = messages.StringField(1, required=True)
     mobile_id = messages.StringField(2, required=True)
     name = messages.StringField(3, required=False, default='Unnamed Device')
-    device_uuid = messages.StringField(4, required=False, default='')
+    device_uuid = messages.StringField(4, required=True)
 
 class FavoriteMessage(messages.Message):
     model_key = messages.StringField(1, required=True)
     device_key = messages.StringField(2)  # So we know which device NOT to push sync notification to
+    model_type = messages.IntegerField(3, required=True)
 
 
 class FavoriteCollection(messages.Message):
@@ -27,6 +28,7 @@ class SubscriptionMessage(messages.Message):
     model_key = messages.StringField(1, required=True)
     notifications = messages.StringField(2, repeated=True)
     device_key = messages.StringField(3)  # So we know which device NOT to push sync notifications to
+    model_type = messages.IntegerField(4, required=True)
 
 
 class SubscriptionCollection(messages.Message):
@@ -38,3 +40,4 @@ class ModelPreferenceMessage(messages.Message):
     notifications = messages.StringField(2, repeated=True)
     device_key = messages.StringField(3)  # So we know which device NOT to push sync notifications to
     favorite = messages.BooleanField(4, required=True)
+    model_type = messages.IntegerField(5, required=True)
