@@ -217,7 +217,7 @@ class MobileAPI(remote.Service):
         subscriptions = Subscription.query(ancestor=ndb.Key(Account, userId)).fetch()
         output = []
         for subscription in subscriptions:
-            output.append(SubscriptionMessage(model_key = subscription.model_key, notifications = PushHelper.notification_string_from_enums(subscription.notification_types)), model_type = subscription.model_type)
+            output.append(SubscriptionMessage(model_key = subscription.model_key, notifications = PushHelper.notification_string_from_enums(subscription.notification_types), model_type = subscription.model_type))
         return SubscriptionCollection(subscriptions = output)
 
 
