@@ -9,5 +9,6 @@ class ModelType(object):
     MATCH = 2
     EVENT_TEAM = 3
     DISTRICT = 4
-    AWARD = 5
-    MEDIA = 6
+    DISTRICT_TEAM = 5
+    AWARD = 6
+    MEDIA = 7
