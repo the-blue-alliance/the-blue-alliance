@@ -163,7 +163,7 @@ class MobileAPI(remote.Service):
                 code += 500
 
         if request.notifications:
-            sub = Subscription( user_id = userId, model_key = modelKey, notification_types = PushHelper.notification_enums_from_string(request.notifications, model_type = request.model_type))
+            sub = Subscription( user_id = userId, model_key = modelKey, notification_types = PushHelper.notification_enums_from_string(request.notifications), model_type = request.model_type)
             result = MyTBAHelper.add_subscription(sub, request.device_key)
             if result == 200:
                 output['subscription'] = {"code"    : 200,
