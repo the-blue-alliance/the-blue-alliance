@@ -135,7 +135,7 @@ class MyTBAController(LoggedInHandler):
     #             if not ValidationHelper.is_valid_model_key(model):
     #                 self.redirect('/account/mytba?error=invalid_model')
     #                 return
-    #             favorite = Favorite(model_key =  model, user_id = current_user_id)
+    #             favorite = Favorite(parent = ndb.Key(Account, current_user_id), model_key =  model, user_id = current_user_id)
     #             MyTBAHelper.add_favorite(favorite)
     #             self.redirect('/account/mytba')
     #             return
@@ -157,7 +157,7 @@ class MyTBAController(LoggedInHandler):
     #                 # No notification types specified. Don't add
     #                 self.redirect('/account/mytba?error=no_sub_types')
     #                 return
-    #             subscription = Subscription(user_id = current_user_id, model_key = model, notification_types = [int(s) for s in subs])
+    #             subscription = Subscription(parent = ndb.Key(Account, current_user_id), user_id = current_user_id, model_key = model, notification_types = [int(s) for s in subs])
     #             MyTBAHelper.add_subscription(subscription)
     #             self.redirect('/account/mytba')
     #             return

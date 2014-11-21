@@ -26,6 +26,7 @@ class MobileClient(ndb.Model):
     verified = ndb.BooleanProperty(default=True)
 
     created = ndb.DateTimeProperty(auto_now_add=True)
+    updated = ndb.DateTimeProperty(auto_now=True)
 
     def __init__(self, *args, **kw):
         super(MobileClient, self).__init__(*args, **kw)

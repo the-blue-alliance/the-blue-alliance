@@ -73,12 +73,12 @@ class MobileAPI(remote.Service):
         if query.count() == 0:
             # Record doesn't exist yet, so add it
             MobileClient(
-                parent = ndb.Key(Account, userId),
-                user_id = userId,
-                messaging_id = gcmId,
-                client_type = os,
-                device_uuid = uuid,
-                display_name = name ).put()
+                parent=ndb.Key(Account, userId),
+                user_id=userId,
+                messaging_id=gcmId,
+                client_type=os,
+                device_uuid=uuid,
+                display_name=name ).put()
             return BaseResponse(code=200, message="Registration successful")
         else:
             # Record already exists, update it
@@ -133,7 +133,12 @@ class MobileAPI(remote.Service):
         code = 0
 
         if request.favorite:
-            fav = Favorite( user_id = userId, model_key = modelKey, model_type = request.model_type)
+            fav = Favorite(
+                parent=ndb.Key(Account, userId),
+                user_id=userId,
+                model_key=modelKey,
+                model_type=request.model_type
+            )
             result = MyTBAHelper.add_favorite(fav, request.device_key)
             if result == 200:
                 output['favorite'] = {"code"   : 200,
@@ -163,7 +168,13 @@ class MobileAPI(remote.Service):
                 code += 500
 
         if request.notifications:
-            sub = Subscription( user_id = userId, model_key = modelKey, notification_types = PushHelper.notification_enums_from_string(request.notifications), model_type = request.model_type)
+            sub = Subscription(
+                parent=ndb.Key(Account, userId),
+                user_id=userId,
+                model_key=modelKey,
+                model_type=request.model_type,
+                notification_types=PushHelper.notification_enums_from_string(request.notifications)
+            )
             result = MyTBAHelper.add_subscription(sub, request.device_key)
             if result == 200:
                 output['subscription'] = {"code"    : 200,
