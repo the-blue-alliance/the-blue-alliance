@@ -34,7 +34,7 @@ class MatchManipulator(ManipulatorBase):
                     NotificationHelper.send_match_score_update(match)
                 except Exception, exception:
                     logging.error("Error sending match updates: "+str(exception))
-            elif not match.has_been_played() not event in unplayed_matches:
+            elif not match.has_been_played() and not event in unplayed_matches:
                 unplayed_matches.append(event)
 
         
