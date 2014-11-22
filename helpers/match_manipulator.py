@@ -28,13 +28,13 @@ class MatchManipulator(ManipulatorBase):
         unplayed_matches = []
         for match in matches:
             event = match.event.get()
-            if event.now and match.has_been_played():
+            if event.now and match.has_been_played:
                 logging.info("Sending push notifications for "+match.key_name)
                 try:
                     NotificationHelper.send_match_score_update(match)
                 except Exception, exception:
                     logging.error("Error sending match updates: "+str(exception))
-            elif not match.has_been_played() not event in unplayed_matches:
+            elif not match.has_been_played and not event in unplayed_matches:
                 unplayed_matches.append(event)
 
         
@@ -43,9 +43,10 @@ class MatchManipulator(ManipulatorBase):
         '''
         for event in unplayed_matches:
             try:
+                logging.info("Sending schedule updates for: {}".format(event.key_name))
                 NotificationHelper.send_schedule_update(event)
             except Exception, exception:
-                logging.error("Eror sending schedule updates for: {}".format(event.id()))
+                logging.error("Eror sending schedule updates for: {}".format(event.key_name))
 
         '''
         Enqueue firebase push
