@@ -8,7 +8,7 @@ from notifications.base_notification import BaseNotification
 
 class UpdateSubscriptionsNotification(BaseNotification):
 
-    _supported_clients = [ClientType.OS_ANDROID]  # We don't want to send these updates to webhooks
+    _supported_clients = [ClientType.OS_ANDROID, ClientType.WEBHOOK]
 
     def __init__(self, user_id, sending_device_key):
         self.user_id = user_id

@@ -210,3 +210,11 @@ class TestEventGetShortName(unittest2.TestCase):
         self.assertEqual(EventHelper.getShortName("PNW FIRST Robotics Mt. Vernon District Event"), "Mt. Vernon")
         self.assertEqual(EventHelper.getShortName("PNW FIRST Robotics Shorewood District Event"), "Shorewood")
         self.assertEqual(EventHelper.getShortName("PNW FIRST Robotics Glacier Peak District Event"), "Glacier Peak")
+        # 2015 edge cases
+        self.assertEqual(EventHelper.getShortName("FIM District - Howell Event"), "Howell")
+        self.assertEqual(EventHelper.getShortName("NE District - Granite State Event"), "Granite State")
+        self.assertEqual(EventHelper.getShortName("PNW District - Oregon City Event"), "Oregon City")
+        self.assertEqual(EventHelper.getShortName("IN District -Indianapolis"), "Indianapolis")
+        self.assertEqual(EventHelper.getShortName("MAR District - Mt. Olive Event"), "Mt. Olive")
+        self.assertEqual(EventHelper.getShortName("Israel Regional - see Site Info for additional information"), "Israel")
+        self.assertEqual(EventHelper.getShortName("IN District - Kokomo City of Firsts Event sponsored by AndyMark"), "Kokomo City of Firsts")
