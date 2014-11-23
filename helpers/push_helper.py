@@ -47,7 +47,7 @@ class PushHelper(object):
         u = users.User(user_email)
         key = MobileUser(user=u).put()
         obj = key.get()
-        user_id = obj.user.user_d()
+        user_id = obj.user.user_id()
         key.delete()
 
         if Account.get_by_id(user_id) is None:
@@ -82,9 +82,9 @@ class PushHelper(object):
         keys = []
         for team in match.team_key_names:
             keys.append(team)
-            keys.append("{}_{}".format(match.event.key_name, team))
+            keys.append("{}_{}".format(match.event_key_name, team))
         keys.append(match.key_name)
-        keys.append(match.event.key_name)
+        keys.append(match.event_key_name)
         users = Subscription.query(Subscription.model_key.IN(keys), Subscription.notification_types == notification).fetch()
         output = []
         for user in users:
