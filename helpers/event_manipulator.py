@@ -1,4 +1,5 @@
 import logging
+import traceback
 
 from helpers.cache_clearer import CacheClearer
 from helpers.event_helper import EventHelper
@@ -24,14 +25,16 @@ class EventManipulator(ManipulatorBase):
                 event.timezone_id = EventHelper.get_timezone_id(event.location, event.key.id())
                 cls.createOrUpdate(event, run_post_update_hook=False)
             except Exception:
-                logging.warning("Timezone update for event {} failed!".format(event.key.id()))
+                logging.warning("Timezone update for event {} failed!".format(event.key_name))
 
             try:
-                if event.dirty and "alliance_selections_json" in event._updated_attrs:
+                if "alliance_selections_json" in event.updated_attrs :
                     # Send updated alliances notification
-                    NotificationHelper.send_alliance_update(event)
+                    # NotificationHelper.send_alliance_update(event) # Comment this out for now, can't figure out why it doesn't work
+                    pass
             except Exception:
-                logging.error("Error sending alliance update notification for {}".format(event.id))
+                logging.error("Error sending alliance update notification for {}".format(event.key_name))
+                logging.error(traceback.format_exc())
 
     @classmethod
     def updateMerge(self, new_event, old_event, auto_union=True):
@@ -66,7 +69,7 @@ class EventManipulator(ManipulatorBase):
 
         list_attrs = []
 
-        old_event._updated_attrs = []
+        updated_attrs = []
 
         for attr in attrs:
             # Special case for rankings. Don't merge bad data.
@@ -76,19 +79,20 @@ class EventManipulator(ManipulatorBase):
             if getattr(new_event, attr) is not None:
                 if getattr(new_event, attr) != getattr(old_event, attr):
                     setattr(old_event, attr, getattr(new_event, attr))
-                    old_event._updated_attrs.append(attr)
+                    updated_attrs.append(attr)
                     old_event.dirty = True
             if getattr(new_event, attr) == "None":
                 if getattr(old_event, attr, None) is not None:
                     setattr(old_event, attr, None)
-                    old_event._updated_attrs.append(attr)
+                    updated_attrs.append(attr)
                     old_event.dirty = True
 
         for attr in list_attrs:
             if len(getattr(new_event, attr)) > 0:
                 if getattr(new_event, attr) != getattr(old_event, attr):
                     setattr(old_event, attr, getattr(new_event, attr))
-                    old_event._updated_attrs.append(attr)
+                    updated_attrs.append(attr)
                     old_event.dirty = True
-
+        
+        old_event.updated_attrs = updated_attrs
         return old_event
