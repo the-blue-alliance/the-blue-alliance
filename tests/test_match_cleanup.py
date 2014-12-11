@@ -26,7 +26,7 @@ class TestMatchCleanup(unittest2.TestCase):
 
     def setupMatches(self, csv):
         with open(csv, 'r') as f:
-            parsed_matches = OffseasonMatchesParser.parse(f.read())
+            parsed_matches, _ = OffseasonMatchesParser.parse(f.read())
             matches = [Match(
                 id=Match.renderKeyName(
                     self.event.key.id(),

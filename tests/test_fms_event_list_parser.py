@@ -6,7 +6,7 @@ from datafeeds.fms_event_list_parser import FmsEventListParser
 class TestFmsEventListParser(unittest2.TestCase):
     def test_parse_2012(self):
         with open('test_data/usfirst_html/fms_event_list_2012.html', 'r') as f:
-            events = FmsEventListParser.parse_2012(f.read())
+            events, _ = FmsEventListParser.parse_2012(f.read())
 
         self.assertEqual(len(events), 74)
 
@@ -18,7 +18,7 @@ class TestFmsEventListParser(unittest2.TestCase):
 
     def test_parse_2014(self):
     	with open('test_data/usfirst_html/fms_event_list_2014.html', 'r') as f:
-            events = FmsEventListParser.parse_2014(f.read())
+            events, _ = FmsEventListParser.parse_2014(f.read())
 
         self.assertEqual(len(events), 103)
 

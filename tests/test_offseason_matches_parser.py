@@ -6,7 +6,7 @@ from datafeeds.offseason_matches_parser import OffseasonMatchesParser
 class TestUsfirstMatchesParser(unittest2.TestCase):
     def test_parse(self):
         with open('test_data/offseason_matches.csv', 'r') as f:
-            matches = OffseasonMatchesParser.parse(f.read())
+            matches, _ = OffseasonMatchesParser.parse(f.read())
 
         match = matches[0]
         self.assertEqual(match["comp_level"], "qm")
