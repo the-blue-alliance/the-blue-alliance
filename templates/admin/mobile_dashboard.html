@@ -16,16 +16,20 @@
 </div>
 {% endif %}
 
-<h1>Connected Mobile Devices</h1>
+<h1>Mobile Device Dashboard</h1>
 
+<h2>Actions</h2>
 <div class="btn-group">
     <a href="/admin/mobile/broadcast" class="btn btn-primary"><span class="glyphicon glyphicon-edit"></span> Broadcast Message</a>
+</div>
+<div class="btn-group">
     <a href="/admin/mobile/clear_duplicates" class="btn btn-warning"><span class="glyphicon glyphicon-remove"></span> Remove Duplicate Client IDs</a>
-    <a href="/admin/mobile/clear_old" class="btn btn-warning"><span class="glyphicon glyphicon-eject"></span> Remove Past Year Subscriptions</a>
-    <a href="/admin/mobile/clear_webhooks" class="btn btn-warning"><span class="glyphicon glyphicon-eject"></span> Remove Broken Webhooks</a>
+    <a href="/admin/mobile/clear_old" class="btn btn-warning"><span class="glyphicon glyphicon-remove"></span> Remove Past Year Subscriptions</a>
+    <a href="/admin/mobile/clear_webhooks" class="btn btn-warning"><span class="glyphicon glyphicon-remove"></span> Remove Broken Webhooks</a>
 </div>
 <br />
 
+<h2>Connected Devices</h2>
 <table class="table table-striped table-hover">
     <tr>
         <td>Total Users</td>

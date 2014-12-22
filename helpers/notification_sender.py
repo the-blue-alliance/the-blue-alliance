@@ -21,6 +21,7 @@ class NotificationSender(object):
     def send_webhook(cls, message, keys):
         payload = json.dumps(message, ensure_ascii=True)
 
+        invalid_urls = []
         for client in keys:
 
             url = client[0]
@@ -40,9 +41,14 @@ class NotificationSender(object):
                     logging.error('400, Invalid message: ' + repr(gcm_post_json_str))
                 elif e.code == 401:
                     logging.error('401, Webhook unauthorized')
+                elif e.code == 404:
+                    invalid_urls.append(url)
                 elif e.code == 500:
                     logging.error('500, Internal error on server sending message')
                 else:
                     logging.exception('Unexpected HTTPError: ' + str(e.code) + " " + e.msg + " " + e.read())
             except Exception, ex:
-                logging.error("Other Exception: "+str(ex))
+                logging.error("Other Exception: {}".format(str(ex)))
+
+        if invalid_urls:
+            logging.error("Invalid urls: {}".format(str(invalid_urls)))
