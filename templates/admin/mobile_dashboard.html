@@ -4,12 +4,25 @@
 
 {% block content %}
 
+{% if broadcast_success %}
+<div class="row">
+  <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
+    <div class="alert alert-success">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <h4>Success!</h4>
+      <p>Broadcast sent!</p>
+    </div>
+  </div>
+</div>
+{% endif %}
+
 <h1>Connected Mobile Devices</h1>
 
 <div class="btn-group">
     <a href="/admin/mobile/broadcast" class="btn btn-primary"><span class="glyphicon glyphicon-edit"></span> Broadcast Message</a>
     <a href="/admin/mobile/clear_duplicates" class="btn btn-warning"><span class="glyphicon glyphicon-remove"></span> Remove Duplicate Client IDs</a>
     <a href="/admin/mobile/clear_old" class="btn btn-warning"><span class="glyphicon glyphicon-eject"></span> Remove Past Year Subscriptions</a>
+    <a href="/admin/mobile/clear_webhooks" class="btn btn-warning"><span class="glyphicon glyphicon-eject"></span> Remove Broken Webhooks</a>
 </div>
 <br />
 

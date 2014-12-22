@@ -4,6 +4,7 @@ from consts.client_type import ClientType
 from consts.notification_type import NotificationType
 from helpers.push_helper import PushHelper
 from models.event import Event
+from notifications.broadcast import BroadcastNotification
 from notifications.match_score import MatchScoreNotification
 from notifications.update_favorites import UpdateFavoritesNotification
 from notifications.update_subscriptions import UpdateSubscriptionsNotification
@@ -28,7 +29,7 @@ class NotificationHelper(object):
     @classmethod
     def send_favorite_update(cls, user_id, sending_device_key=""):
         clients = PushHelper.get_client_ids_for_users([user_id])
-        
+
         notification = UpdateFavoritesNotification(user_id, sending_device_key)
         notification.send(clients)
 
@@ -38,6 +39,14 @@ class NotificationHelper(object):
 
         notification = UpdateSubscriptionsNotification(user_id, sending_device_key)
         notification.send(clients)
+
+    @classmethod
+    def send_broadcast(cls, client_types, title, message, url):
+        users = PushHelper.get_all_mobile_clients(client_types)
+        keys = PushHelper.get_client_ids_for_users(users)
+
+        notification = BroadcastNotification(title, message, url)
+        notification.send(keys)
 
     @classmethod
     def verify_webhook(cls, url, secret):

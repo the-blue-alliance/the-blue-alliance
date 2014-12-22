@@ -21,7 +21,7 @@ from controllers.admin.suggestions.admin_media_suggestions_review_controller imp
 from controllers.admin.admin_team_controller import AdminTeamDetail, AdminTeamList
 from controllers.admin.admin_migration_controller import AdminMigration
 from controllers.admin.admin_user_controller import AdminUserList, AdminUserEdit, AdminUserDetail
-from controllers.admin.admin_mobile_controller import AdminMobile
+from controllers.admin.admin_mobile_controller import AdminMobile, AdminBroadcast
 
 app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/api_auth/add', AdminApiAuthAdd),
@@ -67,5 +67,6 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/user/(.*)', AdminUserDetail),
                                ('/admin/videos/add', AdminVideosAdd),
                                ('/admin/mobile', AdminMobile),
+                               ('/admin/mobile/broadcast', AdminBroadcast),
                                ],
                               debug=tba_config.DEBUG)
