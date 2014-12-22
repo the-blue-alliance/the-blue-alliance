@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Mobile Dashboard{% endblock %}
+
+{% block content %}
+
+<h1>Connected Mobile Devices</h1>
+
+<div class="btn-group">
+    <a href="/admin/mobile/broadcast" class="btn btn-primary"><span class="glyphicon glyphicon-edit"></span> Broadcast Message</a>
+    <a href="/admin/mobile/clear_duplicates" class="btn btn-warning"><span class="glyphicon glyphicon-remove"></span> Remove Duplicate Client IDs</a>
+    <a href="/admin/mobile/clear_old" class="btn btn-warning"><span class="glyphicon glyphicon-eject"></span> Remove Past Year Subscriptions</a>
+</div>
+<br />
+
+<table class="table table-striped table-hover">
+    <tr>
+        <td>Total Users</td>
+        <td>{{ mobile_users }}</td>
+    </tr>
+    <tr>
+        <td>Android Users</td>
+        <td>{{ android_users }}</td>
+    </tr>
+    <tr>
+        <td>iOS Users</td>
+        <td>{{ ios_users }}</td>
+    </tr>
+    <tr>
+        <td>Webhooks</td>
+        <td>{{ webhooks }}</td>
+    </tr>
+</table>
+
+{% endblock %}
