@@ -7,9 +7,12 @@ from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
+from consts.client_type import ClientType
 from controllers.base_controller import LoggedInHandler
+from helpers.notification_sender import NotificationSender
 from models.mobile_client import MobileClient
 from models.subscription import Subscription
+from notifications.ping import PingNotification
 
 
 class AdminMobileClearEnqueue(LoggedInHandler):
@@ -96,9 +99,32 @@ class AdminWebhooksClearEnqueue(LoggedInHandler):
     Tries to ping every webhook and removes ones that don't respond
     """
     def get(self):
-        pass
+        self._require_admin()
+        taskqueue.add(
+            queue_name='admin',
+            url='/tasks/admin/do/clear_old_webhooks',
+            method='GET')
+
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/webhooks_clear_enqueue.html')
+        self.response.out.write(template.render(path, self.template_values))
 
 
 class AdminWebhooksClearDo(LoggedInHandler):
     def get(self):
-        pass
+        webhooks = MobileClient.query(MobileClient.client_type == ClientType.WEBHOOK).fetch()
+        failures = []
+
+        notification = PingNotification()._render_webhook()
+
+        for key in webhooks:
+            if not NotificationSender.send_webhook(notification, [(key.messaging_id, key.secret)]):
+                failures.append(key.key)
+
+        count = len(failures)
+        if failures:
+            ndb.delete_multi(failures)
+        logging.info("Deleted {} broken webhooks".format(count))
+
+        template_values = {'count': count}
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/webhooks_clear_do.html')
+        self.response.out.write(template.render(path, template_values))
