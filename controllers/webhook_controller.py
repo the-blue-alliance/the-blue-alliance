@@ -38,6 +38,7 @@ class WebhookAdd(LoggedInHandler):
                     parent=self.user_bundle.account.key,
                     user_id=current_user_account_id,
                     messaging_id=url,
+                    display_name = self.request.get('name'),
                     secret=secret_key,
                     client_type=ClientType.WEBHOOK,
                     verified=False,

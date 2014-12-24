@@ -4,7 +4,7 @@ from webapp2_extras.routes import RedirectRoute
 
 import tba_config
 
-from controllers.account_controller import AccountEdit, AccountLogout, AccountOverview, AccountRegister
+from controllers.account_controller import AccountEdit, AccountLogout, AccountOverview, AccountRegister, MyTBAController
 from controllers.ajax_controller import LiveEventHandler, TypeaheadHandler, WebcastHandler
 from controllers.event_controller import EventList, EventDetail, EventRss
 from controllers.gameday2_controller import Gameday2Controller
@@ -48,6 +48,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/account', AccountOverview, 'account-overview', strict_slash=True),
       RedirectRoute(r'/account/edit', AccountEdit, 'account-edit', strict_slash=True),
       RedirectRoute(r'/account/register', AccountRegister, 'account-register', strict_slash=True),
+      RedirectRoute(r'/account/mytba', MyTBAController, 'account-mytba', strict_slash=True),
       RedirectRoute(r'/apidocs', ApiDocumentationHandler, 'api-documentation', strict_slash=True),
       RedirectRoute(r'/apidocs/webhooks', WebhookDocumentationHandler, 'webhook-documentation', strict_slash=True),
       RedirectRoute(r'/contact', ContactHandler, 'contact', strict_slash=True),

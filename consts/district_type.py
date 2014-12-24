@@ -36,7 +36,7 @@ class DistrictType(object):
         'Mid-Atlantic Robotics': MID_ATLANTIC,
         'New England': NEW_ENGLAND,
         'Pacific Northwest': PACIFIC_NORTHWEST,
-        'Indiana': INDIANA,
+        'IndianaFIRST': INDIANA,
     }
 
     abbrevs = {

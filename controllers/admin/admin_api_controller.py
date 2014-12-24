@@ -7,6 +7,7 @@ import os
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
+from consts.auth_type import AuthType
 from controllers.base_controller import LoggedInHandler
 
 from models.api_auth_access import ApiAuthAccess
@@ -79,16 +80,25 @@ class AdminApiAuthEdit(LoggedInHandler):
         self._require_admin()
 
         auth = ApiAuthAccess.get_by_id(auth_id)
+
+        auth_types_enum = []
+        if self.request.get('allow_edit_data'):
+            auth_types_enum.append(AuthType.EVENT_DATA)
+        if self.request.get('allow_edit_match_video'):
+            auth_types_enum.append(AuthType.MATCH_VIDEO)
+
         if not auth:
             auth = ApiAuthAccess(
                 id=auth_id,
                 description=self.request.get('description'),
                 secret=''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for _ in range(64)),
                 event_list=[ndb.Key(Event, event_key.strip()) for event_key in self.request.get('event_list_str').split(',')],
+                auth_types_enum=auth_types_enum,
             )
         else:
             auth.description = self.request.get('description')
             auth.event_list = event_list=[ndb.Key(Event, event_key.strip()) for event_key in self.request.get('event_list_str').split(',')]
+            auth.auth_types_enum = auth_types_enum
 
         auth.put()
 

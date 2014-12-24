@@ -17,6 +17,8 @@ class MobileClient(ndb.Model):
     user_id = ndb.StringProperty(required=True, indexed=True)
     messaging_id = ndb.StringProperty(required=True)
     client_type = ndb.IntegerProperty(required=True)
+    display_name = ndb.StringProperty(default="Unnamed Device")
+    device_uuid = ndb.StringProperty(default='')
     secret = ndb.StringProperty(default="")  # Used to hash webhooks
 
     # Used to verify that webhooks are actually controlled by the account holder
@@ -24,6 +26,7 @@ class MobileClient(ndb.Model):
     verified = ndb.BooleanProperty(default=True)
 
     created = ndb.DateTimeProperty(auto_now_add=True)
+    updated = ndb.DateTimeProperty(auto_now=True)
 
     def __init__(self, *args, **kw):
         super(MobileClient, self).__init__(*args, **kw)

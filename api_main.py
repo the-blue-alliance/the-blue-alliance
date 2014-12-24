@@ -104,7 +104,7 @@ app = webapp2.WSGIApplication([('/api/v1/team/details', ApiTeamDetails),
                                webapp2.Route(r'/api/trusted/v1/event/<event_key:>/team_list/update',
                                              ApiTrustedEventTeamListUpdate,
                                              methods=['POST']),
-                               webapp2.Route(r'/api/trusted/v1/match/add_youtube_video',
+                               webapp2.Route(r'/api/trusted/v1/event/<event_key:>/match_videos/add',
                                              ApiTrustedAddMatchYoutubeVideo,
                                              methods=['POST']),
                                ], debug=tba_config.DEBUG)

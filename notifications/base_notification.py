@@ -19,7 +19,7 @@ class BaseNotification(object):
 
     def send(self, keys):
         self.keys = keys  # dict like {ClientType : [ key ] } ... The list for webhooks is a tuple of (key, secret)
-        deferred.defer(self.render, self._supported_clients)
+        deferred.defer(self.render, self._supported_clients, _queue="push-notifications")
 
     """
     This method will create platform specific notifications and send them to the platform specified

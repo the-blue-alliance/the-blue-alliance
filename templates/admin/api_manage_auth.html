@@ -12,6 +12,8 @@
     <th>ID</th>
     <th>Secret</th>
     <th>Events</th>
+    <th>Event Data</th>
+    <th>Match Video</th>
   </tr>
   {% for auth in auths %}
   <tr>
@@ -23,6 +25,8 @@
         <a href="/admin/event/{{event_key.id}}">{{event_key.id}}</a>
       {% endfor %}
     </td>
+    <td>{% if auth.can_edit_event_data %}<span class="glyphicon glyphicon-ok"><span>{% endif %}</td>
+    <td>{% if auth.can_edit_match_video %}<span class="glyphicon glyphicon-ok"><span>{% endif %}</td>
   </tr>
   {% endfor %}
 </table>
