@@ -1,14 +1,15 @@
 import json
 import logging
 import webapp2
+import datetime
 
-from datetime import datetime
 from google.appengine.ext import ndb
 
 from controllers.api.api_base_controller import ApiBaseController
 
 from helpers.award_helper import AwardHelper
 from helpers.district_helper import DistrictHelper
+from helpers.event_helper import EventHelper
 from helpers.model_to_dict import ModelToDict
 
 from models.event import Event
@@ -139,7 +140,7 @@ class ApiEventAwardsController(ApiEventController):
     def _track_call(self, event_key):
         self._track_call_defer('event/awards', event_key)
 
-    def _render(self,event_key):
+    def _render(self, event_key):
         self._set_event(event_key)
 
         award_dicts = [ModelToDict.awardConverter(award) for award in AwardHelper.organizeAwards(self.event.awards)]
@@ -165,6 +166,40 @@ class ApiEventDistrictPointsController(ApiEventController):
         return json.dumps(points, ensure_ascii=True)
 
 
+class ApiLiveEventsController(ApiBaseController):
+    CACHE_KEY_FORMAT = "apiv2_live_events_controller_{}"  # (event_key)
+    CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
+
+    # Set a datetime variable to the most recent Monday at 0:00 UTC
+    def _set_week_start(self, dt):
+        if dt.weekday() != 0:
+            # If we're given a datetime for a non-Monday, normalize to that
+            dt = dt + datetime.timedelta(days=(-1 * dt.weekday()))
+            self.date = datetime.datetime(dt.year, dt.month, dt.day, 0, 0, 0)
+
+    def __init__(self, *args, **kw):
+        super(ApiLiveEventsController, self).__init__(*args, **kw)
+        if "time" in self.request.route_kwargs and self.request.route_kwargs["time"]:
+            dt = datetime.datetime.utcfromtimestamp(int(self.request.route_kwargs["time"]))
+        else:
+            dt = datetime.datetime.now()
+        self._set_week_start(dt)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.date.isoformat())
+
+    @property
+    def _validators(self):
+        return []
+
+    def _track_call(self, time=datetime.datetime.utcnow()):
+        self._track_call_defer('live_event', '{}'.format(time))
+
+    def _render(self, time=datetime.datetime.utcnow()):
+        events = EventHelper.getWeekEvents(self.date)
+        event_list = [ModelToDict.eventConverter(event) for event in events]
+        return json.dumps(event_list, ensure_ascii=True)
+
+
 class ApiEventListController(ApiBaseController):
     CACHE_KEY_FORMAT = "apiv2_event_list_controller_{}"  # (year)
     CACHE_VERSION = 2
@@ -172,7 +207,7 @@ class ApiEventListController(ApiBaseController):
 
     def __init__(self, *args, **kw):
         super(ApiEventListController, self).__init__(*args, **kw)
-        self.year = int(self.request.route_kwargs.get("year") or datetime.now().year)
+        self.year = int(self.request.route_kwargs.get("year") or datetime.datetime.now().year)
         self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.year)
 
     @property
@@ -183,7 +218,7 @@ class ApiEventListController(ApiBaseController):
         self._track_call_defer('event/list', self.year)
 
     def _render(self, year=None):
-        if self.year < 1992 or self.year > datetime.now().year + 1:
+        if self.year < 1992 or self.year > datetime.datetime.now().year + 1:
             self._errors = json.dumps({"404": "No events found for %s" % self.year})
             self.abort(404)
 
