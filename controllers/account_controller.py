@@ -1,19 +1,29 @@
 import os
+import logging
 
 from google.appengine.ext.webapp import template
 
 from base_controller import LoggedInHandler
 
+from consts.notification_type import NotificationType
+
+from helpers.mytba_helper import MyTBAHelper
+from helpers.notification_helper import NotificationHelper
+from helpers.validation_helper import ValidationHelper
+
 from models.account import Account
+from models.favorite import Favorite
+from models.subscription import Subscription
 
 
 class AccountOverview(LoggedInHandler):
     def get(self):
         self._require_login('/account')
         # Redirects to registration page if account not registered
-        if not self.user_bundle.account.registered:
-            self.redirect('/account/register')
-            return None
+        self._require_registration('/account/register')
+
+        self.template_values['webhook_verification_success'] = self.request.get('webhook_verification_success')
+
         path = os.path.join(os.path.dirname(__file__), '../templates/account_overview.html')
         self.response.out.write(template.render(path, self.template_values))
 
@@ -21,18 +31,14 @@ class AccountOverview(LoggedInHandler):
 class AccountEdit(LoggedInHandler):
     def get(self):
         self._require_login('/account/edit')
-        if not self.user_bundle.account.registered:
-            self.redirect('/account/register')
-            return None
+        self._require_registration('/account/register')
 
         path = os.path.join(os.path.dirname(__file__), '../templates/account_edit.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self):
         self._require_login('/account/edit')
-        if not self.user_bundle.account.registered:
-            self.redirect('/account/register')
-            return None
+        self._require_registration('/account/register')
 
         # Check to make sure that they aren't trying to edit another user
         real_account_id = self.user_bundle.account.key.id()
@@ -89,3 +95,78 @@ class AccountLogout(LoggedInHandler):
         response.delete_cookie('SACSID')
 
         return response
+
+
+class MyTBAController(LoggedInHandler):
+    def get(self):
+        self._require_login('/account/register')
+        self._require_registration('/account/register')
+
+        user = self.user_bundle.account.key
+        self.template_values['favorites'] = Favorite.query(ancestor=user).fetch()
+        self.template_values['subscriptions'] = Subscription.query(ancestor=user).fetch()
+        self.template_values['enabled_notifications'] = NotificationType.enabled_notifications
+
+        error = self.request.get('error')
+        if error:
+            if error == 'invalid_model':
+                error_message = "Invalid model key"
+            elif error == "no_sub_types":
+                error_message = "No notification types selected"
+            elif error == "invalid_account":
+                error_message = "Invalid account"
+            else:
+                error_message = "An unknown error occurred"
+            self.template_values['error_message'] = error_message
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/mytba.html')
+        self.response.out.write(template.render(path, self.template_values))
+
+    # def post(self):
+    #     self._require_login('/account/register')
+    #     self._require_registration('/account/register')
+
+    #     current_user_id = self.user_bundle.account.key.id()
+    #     target_account_id = self.request.get('account_id')
+    #     if current_user_id == target_account_id:
+    #         action = self.request.get('action')
+    #         if action == "favorite_add":
+    #             model = self.request.get('model_key')
+    #             if not ValidationHelper.is_valid_model_key(model):
+    #                 self.redirect('/account/mytba?error=invalid_model')
+    #                 return
+    #             favorite = Favorite(parent = ndb.Key(Account, current_user_id), model_key =  model, user_id = current_user_id)
+    #             MyTBAHelper.add_favorite(favorite)
+    #             self.redirect('/account/mytba')
+    #             return
+    #         elif action == "favorite_delete":
+    #             client_id = self.request.get('client_id')
+    #             favorite = Favorite.get_by_id(int(client_id))
+    #             if current_user_id == favorite.user_id:
+    #                 favorite.key.delete()
+    #                 NotificationHelper.send_favorite_update(current_user_id)
+    #                 self.redirect('/account/mytba')
+    #                 return
+    #         elif action == "subscription_add":
+    #             model = self.request.get('model_key')
+    #             if not ValidationHelper.is_valid_model_key(model):
+    #                 self.redirect('/account/mytba?error=invalid_model')
+    #                 return
+    #             subs = self.request.get_all('notification_types')
+    #             if not subs:
+    #                 # No notification types specified. Don't add
+    #                 self.redirect('/account/mytba?error=no_sub_types')
+    #                 return
+    #             subscription = Subscription(parent = ndb.Key(Account, current_user_id), user_id = current_user_id, model_key = model, notification_types = [int(s) for s in subs])
+    #             MyTBAHelper.add_subscription(subscription)
+    #             self.redirect('/account/mytba')
+    #             return
+    #         elif action == "subscription_delete":
+    #             client_id = self.request.get('client_id')
+    #             subscription = Subscription.get_by_id(int(client_id))
+    #             if current_user_id == subscription.user_id:
+    #                 subscription.key.delete()
+    #                 NotificationHelper.send_subscription_update(current_user_id)
+    #                 self.redirect('/account/mytba')
+    #             return
+    #     self.redirect('/account/mytba?error=invalid_account')

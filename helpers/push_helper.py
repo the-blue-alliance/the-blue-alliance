@@ -1,5 +1,7 @@
 import logging
 
+from collections import defaultdict
+
 from google.appengine.ext import db
 from google.appengine.ext import ndb
 from google.appengine.api import users
@@ -14,6 +16,12 @@ from models.user import User
 
 
 class PushHelper(object):
+
+    '''
+    General helper methods for push notifications
+    Actual notifications should be built and send from NotificationHelper
+    (they're split up for cleanliness)
+    '''
 
     @classmethod
     def notification_enums_from_string(cls, notifications):
@@ -50,13 +58,12 @@ class PushHelper(object):
 
     @classmethod
     def delete_bad_gcm_token(cls, key):
-        logging.info("removing bad GCM token: "+key)
+        logging.info("removing bad GCM token: {}".format(key))
         to_delete = MobileClient.query(MobileClient.messaging_id == key).fetch(keys_only=True)
         ndb.delete_multi(to_delete)
 
     @classmethod
     def update_token(cls, old, new):
-        logging.info("updating token"+old+"\n->"+new)
         to_update = MobileClient.query(MobileClient.messaging_id == old).fetch()
         for model in to_update:
             model.messaging_id = new
@@ -78,7 +85,6 @@ class PushHelper(object):
             keys.append("{}_{}".format(match.event.id(), team))
         keys.append(match.key_name)
         keys.append(match.event.id())
-        logging.info("Getting subscriptions for keys: "+str(keys))
         users = Subscription.query(Subscription.model_key.IN(keys), Subscription.notification_types == notification).fetch()
         output = []
         for user in users:
@@ -86,10 +92,14 @@ class PushHelper(object):
         return output
 
     @classmethod
-    def get_client_ids_for_users(cls, os_type, user_list):
-        output = []
-        for user in user_list:
-            client_list = MobileClient.query(MobileClient.user_id == user, MobileClient.client_type == ClientType.enums[os_type]).fetch()
-            for client in client_list:
-                output.append(client.messaging_id)
+    def get_client_ids_for_users(cls, user_list, os_types=None ):
+        if os_types is None:
+            os_types = ClientType.names.keys()
+        output = defaultdict(list)
+        clients = MobileClient.query(MobileClient.user_id.IN(user_list), MobileClient.client_type.IN(os_types), MobileClient.verified==True).fetch()
+        for client in clients:
+            if client.client_type == ClientType.WEBHOOK:
+                output[client.client_type].append( (client.messaging_id, client.secret) )
+            else:
+                output[client.client_type].append(client.messaging_id)
         return output

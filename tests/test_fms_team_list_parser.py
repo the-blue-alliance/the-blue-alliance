@@ -6,7 +6,7 @@ from datafeeds.fms_team_list_parser import FmsTeamListParser
 class TestFmsTeamListParser(unittest2.TestCase):
     def test_parse(self):
         with open('test_data/usfirst_html/fms_team_list_2012.html', 'r') as f:
-            teams = FmsTeamListParser.parse(f.read())
+            teams, _ = FmsTeamListParser.parse(f.read())
 
         # Test frc1
         team = teams[0]

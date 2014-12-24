@@ -6,7 +6,7 @@ from google.appengine.ext import ndb
 
 from helpers.cache_clearer import CacheClearer
 from helpers.firebase.firebase_pusher import FirebasePusher
-from helpers.gcm_message_helper import GCMMessageHelper
+from helpers.notification_helper import NotificationHelper
 from helpers.manipulator_base import ManipulatorBase
 
 
@@ -23,13 +23,15 @@ class MatchManipulator(ManipulatorBase):
         '''
         To run after the match has been updated.
         Send push notifications to subscribed users
+        Only if the match is part of an active event
         '''
         for match in matches:
-            logging.info("Sending push notifications for "+match.key_name)
-            try:
-                GCMMessageHelper.send_match_score_update(match)
-            except exception:
-                logging.error("Error sending match updates: "+str(exception))
+            if match.event.get().now:
+                logging.info("Sending push notifications for "+match.key_name)
+                try:
+                    NotificationHelper.send_match_score_update(match)
+                except Exception, exception:
+                    logging.error("Error sending match updates: "+str(exception))
 
         '''
         Enqueue firebase push

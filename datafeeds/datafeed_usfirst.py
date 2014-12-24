@@ -41,7 +41,7 @@ class DatafeedUsfirst(DatafeedBase):
     EVENT_LIST_REGIONALS_URL_PATTERN = "https://my.usfirst.org/myarea/index.lasso?event_type=FRC&season_FRC=%s"  # % (year)
 
     EVENT_DETAILS_URL_PATTERN = "http://www.usfirst.org/whats-going-on/event/%s?ProgramCode=FRC"  # % (eid)
-    EVENT_TEAMS_URL_PATTERN = "http://www.usfirst.org/whats-going-on/event/%s/teams?sort=asc&order=Team%%20Number&ProgramCode=FRC"  # % (eid)
+    EVENT_TEAMS_URL_PATTERN = "http://www.usfirst.org/whats-going-on/event/%s/teams?%sProgramCode=FRC&sort=asc&order=Team%%20Number"  # % (eid, page_urlparam)
     TEAM_DETAILS_URL_PATTERN = "http://www.usfirst.org/whats-going-on/team/%s?ProgramCode=FRC"  # % (tpid)
 
     EVENT_AWARDS_URL_PATTERN = "http://www2.usfirst.org/%scomp/events/%s/awards.html"  # % (year, event_short)
@@ -177,9 +177,10 @@ class DatafeedUsfirst(DatafeedBase):
         teams = []
         seen_teams = set()
         for page in range(8):  # Ensures this won't loop forever. 8 pages should be plenty.
-            url = self.EVENT_TEAMS_URL_PATTERN % (first_eid)
+            page_urlparam = ''
             if page != 0:
-                url += '&page=%s' % page
+                page_urlparam = 'page=%s&' % page
+            url = self.EVENT_TEAMS_URL_PATTERN % (first_eid, page_urlparam)
             partial_teams, more_pages = self.parse(url, UsfirstEventTeamsParser)
             teams.extend(partial_teams)
 

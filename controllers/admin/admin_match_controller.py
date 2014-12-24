@@ -153,6 +153,7 @@ class AdminMatchEdit(LoggedInHandler):
         self._require_admin()
         alliances_json = self.request.get("alliances_json")
         alliances = json.loads(alliances_json)
+        youtube_videos = json.loads(self.request.get("youtube_videos"))
         team_key_names = list()
 
         for alliance in alliances:
@@ -170,6 +171,9 @@ class AdminMatchEdit(LoggedInHandler):
             # no_auto_update = str(self.request.get("no_auto_update")).lower() == "true", #TODO
         )
         match = MatchManipulator.createOrUpdate(match)
+        match.youtube_videos = youtube_videos
+        match.dirty = True  # hacky
+        MatchManipulator.createOrUpdate(match)
 
         self.redirect("/admin/match/" + match.key_name)
 

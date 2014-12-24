@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance - Webhooks{% endblock %}
+
+{% block meta_description %}Documentation for The Blue Alliance's webhook API.{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-3 col-lg-2">
+      <div class="tba-sidenav-affixed">
+        <div class="tba-sidebar tba-sidebar-collapsed">
+          <ul class="nav tba-sidenav">
+            <li><a class="smooth-scroll" href="#overview">Overview</a></li>
+            <li><a class="smooth-scroll" href="#request">Request Structure</a><li>
+            <li><a class="smooth-scroll" href="#configuration">Configuration</a></li>
+            <li><a class="smooth-scroll" href="#notifications">Notification Types</a>
+              <ul class="nav hide">
+                <li><a class="smooth-scroll" href="#notification_upcoming_match">Upcoming Match</a></li>
+                <li><a class="smooth-scroll" href="#notification_match_score">Match Score</a></li>
+                <li><a class="smooth-scroll" href="#notification_level_starting">Competition Level Starting</a></li>
+                <li><a class="smooth-scroll" href="#notification_alliance_selection">Alliance Selection</a></li>
+                <li><a class="smooth-scroll" href="#notification_awards">Awards Posted</a></li>
+                <li><a class="smooth-scroll" href="#notification_media_posted">Media Posted</a></li>
+                <li><a class="smooth-scroll" href="#notification_district_points">District Points Updated</a></li>
+                <li><a class="smooth-scroll" href="#notification_schedule_updated">Event Schedule Updated</a></li>
+                <li><a class="smooth-scroll" href="#notification_final_results">Event Final Results</a></li>
+                <li><a class="smooth-scroll" href="#notification_ping">Ping</a></li>
+                <li><a class="smooth-scroll" href="#notification_broadcast">Broadcast</a></li>
+                <li><a class="smooth-scroll" href="#notification_update_favorites">Update Favorites</a></li>
+                <li><a class="smooth-scroll" href="#notification_update_subscriptions">Update Subscriptions</a></li>
+                <li><a class="smooth-scroll" href="#notification_verification">Webhook Verification</a></li>
+            </ul></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-9 col-lg-10">
+      <h1 class="endheader">Webhooks</h1>
+      <h2 id="overview">Overview</h2>
+        <p>This documentation is for using webhooks with The Blue Alliance's dataset, which allow our server to push notifications to you. Notifications will be sent as HTTP POST requests to a URL that your specify. This API does not replace the regular <a href="/apidocs">API</a>; it be used to replace excessive polling or in other situations where realtime notifications are beneficial.</p>
+
+      <h2 id="request">Request Structure</h2>
+        <p>Each request will contain a payload of JSON data containing information about the event that has been pushed to you. Details of each type of supported event is below.</p>
+        <p>Each request also contains a <code>X-TBA-Checksum</code> header that you can use to validate requests on your client. The header will contain a hash of a secret key that you set when you create the webhook concatenated with the payload string. This is caculated using SHA1(secret+payload).
+
+      <h2 id="configuration">Configuration</h2>
+        <p>Webhooks are tied to your TBA Account - you can create them from your <a href="/account">account overview</a>. You will have to enter a URL that will receive the pushed notification. You also have to enter a secret key used to secure requests - we recommend using a long randomly generated string.</p>
+      <h3>Validation</h3>
+        <p>Once you create a webhook from the web interface, The Blue Alliance will push an initial notification to your server. The message will be of type 'verification' and look something like this:
+          <code>
+            {"message_type"=>"verification", "message_data"=>{"verification_key"=>"a93774ec6197d456f4aaadfea5fdba6697e71e6a"}}
+          </code>
+        Once you receive a verification message, go to your <a href="/account">account overview</a>, where you can verify the webhook you just created. If you need to, you can resend a new verification code (keep in mind that only the most recently sent code will properly verify a webhook). Until you have verified your webhook, it will not recieve any notifications from the Blue Alliance. You can still ping a webhook from the account panel without verification in order to make sure it's working properly - but no other notifications will go through. So be sure to verify your webhooks soon after making them!</p>
+      <h3>Testing</h3>
+        <p>If you want to test out recieving webhooks on your local computer, you can use a program called <a href="https://ngrok.com/download">ngrok</a> to expose a port on your device to the internet. You can check out <a href="https://developer.github.com/webhooks/configuring/">this page</a> from GitHub's documentation to see a brief overview of testing webhooks using ngrok.</p>
+
+    <h2 id="notifications">Notification Types</h2>
+      <p>Please keep in mind that not all notification types have been implemented or enabled yet. Watch the <code>enabled_notifications</code> enum of <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/notification_type.py#L75">this file</a> to see which types are enabled on the server.</p>
+      <h3 id="notification_upcoming_match">Upcoming Match Notification</h3>
+        <p>These notifications are tested for every three minutes. A notification will be sent for the next unplayed match of each currently live event.</p>
+        <h4>Structure</h4>
+          <ul>
+            <li>message_type: “upcoming_match”</li>
+            <li>fields in “message_data” object<ul>
+              <li>“match_key”</li>
+              <li>“event_name”</li>
+              <li>“team_keys”: list of keys for all teams participating in the match</li>
+              <li>“scheduled_time”: time that the match was originally scheduled for, in UNIX UTC</li>
+              <li>“predicted_time”: time that the match is predicted to start at based on the times that scores were posted for previous events, in UNIX UTC</li></ul></li>
+            </ul>
+
+        <h3 id="notification_match_score">Match Score Notification</h3>
+          <p>This notification is sent every time a match score at a live event is updated.</p>
+          <h4>Structure</h4>
+            <ul>
+              <li>message_type: “match_score”
+              <li>fields in “message_data” object<ul>
+                <li>“event_name”</li>
+                <li>“match”: a full match model representing the appropriate match</li></ul></li>
+            </ul>
+
+        <h3 id="notification_level_starting">Competition Level Starting Notification</h3>
+          <p>This notification is sent at the same time as <a class="smooth-scroll" href="#notification_upcoming_match">Upcoming Match Notifications</a> are. If the next upcoming match is of a different type (qual, quarterfinal, semifinal, etc.), then this notification will also be sent out.</p>
+          <h4>Structure</h4>
+            <ul>
+              <li>message_type: “starting_comp_level”
+              <li>fields in “message_data” object<ul>
+                <li>“event_name”</li>
+                <li>“event_key”</li>
+                <li>“comp_level”: One of <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/master/models/match.py#L19">these types</a>
+                <li>“scheduled_time”: the time that the specified comp level is scheduled to start</li></ul></li>
+              </ul>
+
+        <h3 id="notification_alliance_selection">Alliance Selection Notification</h3>
+          <p>This notification is sent out every time the alliances at a live event are updated</p>
+          <h4>Structure</h4>
+            <ul>
+              <li>message_type: “alliance_selection”
+              <li>fields in “message_data” object<ul>
+                <li>“event”: full event model for the related event</li></ul></li>
+            </ul>
+        <h3 id="notification_awards">Awards Posted Notification</h3>
+          <p>This notification is sent every time an award is added at a live event</p>
+          <h4>Structure</h4>
+            <ul>
+              <li>message_type: “awards_posted”
+              <li>fields in message_data object<ul>
+                <li>“event_name”</li>
+                <li>“awards”: If we want awards for a specific team (if user is subscribed to the EventTeam), then this is an array of the following objects (else, it will be null)<ul>
+                  <li>“award_name”</li>
+                  <li>“team_key”: Key of winning team</li>
+                  <li>“team_name”: Name of winning team</li></ul></li></ul></li>
+            </ul>
+        <h3 id="notification_media_posted">Team Media Posted Notification</h3>
+          <p>This notification is sent out whenever new team media is posted (can be either photos or videos).</p>
+          <h4>Structure</h4>
+            <ul>
+              <li>message_type: “media_posted”
+              <li>fields in message_data object<ul>
+                <li>“team_key”</li>
+                <li>“team_name”</li>
+                <li>“media_type”: One of <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/media_type.py">these media types</a>.</li></ul></li>
+            </ul>
+        <h3 id="notification_district_points">District Points Updated Notification</h3>
+          <p>This notification is sent when points are recalculated for a district</p>
+          <h4>Structure</h4>
+            <ul>
+              <li>message_type: “district_points_updated”
+              <li>fields in message_data object<ul>
+                <li>“district_key”</li>
+                <li>“district_name”</li></ul></li>
+            </ul>
+        <h3 id="notification_schedule_updated">Event Schedule Updated</h3>
+          <p>This notification is sent when new unplayed matches are added to a live event.</p>
+          <h4>Structure</h4>
+          <ul>
+            <li>message_type: “schedule_posted”</li>
+            <li>fields in message_data object<ul>
+              <li>“event_key”</li>
+              <li>“event_name”</li>
+              <li>“first_match_time” (optional)</li></ul></li>
+          </ul>
+        <h3 id="notification_final_results">Final Results Notification</h3>
+          <p>This notification is sent upon the conclusion of a live event</p>
+          <h4>Structure</h4>
+            <ul>
+              <li>message_type: “final_results”
+              <li>fields in message_data object<ul>
+                <li>“team_key”</li>
+                <li>“team_name”</li>
+                <li>“event_key”</li>
+                <li>“event_name”</li></ul></li>
+            </ul>
+        <h3 id="notification_ping">Ping Notification</h3>
+          <p>This notification is sent from the <a href="http://www.thebluealliance.com/account">Account Overview</a> page to an individual one of the user's connected devices.</p>
+          <h4>Structure</h4>
+            <ul>
+              <li>"message_type": "ping"</li>
+              <li>fields in message_data object<ul>
+                <li>"title": Title of the notification to be shown</li>
+                <li>"desc": Contents of the notification</li></ul></li>
+            </ul>
+        <h3 id="notification_broadcast">Admin Broadcast</h3>
+          <p>This notification can be sent by TBA Admins when they want to announce something important.</p>
+          <h4>Structure</h4>
+            <ul>
+              <li>"message_type: "broadcast"</li>
+              <li>fields in message_data object<ul>
+                <li>"title": Title of the notification to be shown</li>
+                <li>"desc": Contents of the notification</li>
+                <li>"url": URL to open when the notification is tapped</li></ul></li>
+            </ul>
+        <h3 id="notification_update_favorites">Update Favorites Notification</h3>
+          <p>This notification is sent out to a user's devices when favorites are updated on their account, telling that device to re-sync the list from the server.</p>
+          <h4>Structure</h4>
+            <ul>
+              <li>"message_type": "update_favorites"</li>
+            </ul>
+        <h3 id="notification_update_subscriptions">Update Subscriptions Notification</h3>
+          <p>This notification is sent out to a user's devices when their subscriptions are updated for the account, telling that device to re-sync the list from the server.</p>
+          <h4>Structure</h4>
+            <ul>
+              <li>"message_type": "update_subscriptions"</li>
+            </ul>
+        <h3 id="notification_verification">Webhook Verification Notifications</h3>
+          <p>This notification is sent when a new webhook is created. It contains a verification code that needs to be entered in the <a href="http://www.thebluealliance.com/account">Account Overview</a> page for the webhook before it recieves live updates.</p>
+          <h4>Structure</h4>
+            <ul>
+              <li>"message_type": "verification"</li>
+              <li>fields in message_data object<ul>
+                <li>"verification_key"</li></ul></li>
+            </ul>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

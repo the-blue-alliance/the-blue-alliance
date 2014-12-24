@@ -50,7 +50,7 @@ class FmsEventListParser(ParserBase):
                     logging.warning("Failed to parse event row: %s" % data)
                     logging.warning(e)
 
-        return events
+        return events, False
 
     @classmethod
     def parse_2014(self, html):
@@ -96,7 +96,7 @@ class FmsEventListParser(ParserBase):
                     logging.info("Failed to parse event row: %s" % data)
                     logging.info(e)
 
-        return events
+        return events, False
 
     @classmethod
     def splitDate(self, date):

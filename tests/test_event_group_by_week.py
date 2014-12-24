@@ -13,7 +13,7 @@ from models.event import Event
 class TestEventGroupByWeek(unittest2.TestCase):
     def test_group_by_week(self):
         """
-        All events that start in the same span of Thursday-Wednesday
+        All events that start in the same span of Wednesday-Tuesday
         should be considered as being in the same week.
         """
         events_by_week = {}  # we will use this as the "answer key"
@@ -24,7 +24,7 @@ class TestEventGroupByWeek(unittest2.TestCase):
         state.seed(seed)
 
         event_id_counter = 0
-        week_start = datetime.datetime(2013, 2, 28)
+        week_start = datetime.datetime(2013, 2, 27)
         for i in range(1, 7):  # test for 6 weeks
             for _ in range(state.randint(1, 15)):  # random number of events per week
                 week_label = REGIONAL_EVENTS_LABEL.format(i)

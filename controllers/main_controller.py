@@ -41,7 +41,7 @@ class MainKickoffHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24
 
     def _render(self, *args, **kw):
-        kickoff_datetime_est = datetime.datetime(2014, 1, 4, 10, 30)
+        kickoff_datetime_est = datetime.datetime(2015, 1, 3, 10, 30)
         kickoff_datetime_utc = kickoff_datetime_est + datetime.timedelta(hours=5)
 
         is_kickoff = datetime.datetime.now() >= kickoff_datetime_est - datetime.timedelta(days=1)  # turn on 1 day before
@@ -361,4 +361,17 @@ class ApiDocumentationHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/apidocs.html")
+        return template.render(path, self.template_values)
+
+
+class WebhookDocumentationHandler(CacheableHandler):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "webhook_docs"
+
+    def __init__(self, *args, **kw):
+        super(WebhookDocumentationHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 *24 * 7
+
+    def _render(self, *args, **kw):
+        path = os.path.join(os.path.dirname(__file__), "../templates/webhookdocs.html")
         return template.render(path, self.template_values)

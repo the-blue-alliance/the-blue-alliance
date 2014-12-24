@@ -18,7 +18,7 @@ class DatafeedFms(DatafeedBase):
         super(DatafeedFms, self).__init__(*args, **kw)
 
     def getFmsEventList(self):
-        events = self.parse(self.FMS_EVENT_LIST_URL, FmsEventListParser)
+        events, _ = self.parse(self.FMS_EVENT_LIST_URL, FmsEventListParser)
 
         return [Event(
             id="%s%s" % (event.get("year", None), event.get("event_short", None)),
@@ -34,7 +34,7 @@ class DatafeedFms(DatafeedBase):
             for event in events]
 
     def getFmsTeamList(self):
-        teams = self.parse(self.FMS_TEAM_LIST_URL, FmsTeamListParser)
+        teams, _ = self.parse(self.FMS_TEAM_LIST_URL, FmsTeamListParser)
 
         return [Team(
             id="frc%s" % team.get("team_number", None),
