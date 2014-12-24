@@ -11,7 +11,7 @@ class DatafeedOffseason(DatafeedBase):
         super(DatafeedOffseason, self).__init__(*args, **kw)
 
     def getMatches(self, event, url):
-        matches = self.parse(url, OffseasonMatchesParser)
+        matches, _ = self.parse(url, OffseasonMatchesParser)
         logging.info(matches)
 
         return [Match(
