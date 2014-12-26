@@ -176,7 +176,7 @@ class ApiEventWeekController(ApiBaseController):
         if dt.weekday() != 0:
             # If we're given a datetime for a non-Monday, normalize to that
             dt = dt + datetime.timedelta(days=(-1 * dt.weekday()))
-            self.date = datetime.datetime(dt.year, dt.month, dt.day, 0, 0, 0)
+        self.date = datetime.datetime(dt.year, dt.month, dt.day, 0, 0, 0)
 
     def __init__(self, *args, **kw):
         super(ApiEventWeekController, self).__init__(*args, **kw)
