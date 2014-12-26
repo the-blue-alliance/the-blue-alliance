@@ -31,7 +31,7 @@ class ApiDistrictControllerBase(ApiBaseController):
 
 class ApiDistrictListController(ApiDistrictControllerBase):
     CACHE_KEY_FORMAT = "apiv2_district_list_controller_{}"  # year
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
