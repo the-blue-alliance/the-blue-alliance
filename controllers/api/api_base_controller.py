@@ -53,7 +53,7 @@ def track_call(api_action, api_label, x_tba_app_id):
 
 class ApiBaseController(CacheableHandler):
 
-    API_VERSION = 1
+    API_VERSION = 2
 
     def __init__(self, *args, **kw):
         super(ApiBaseController, self).__init__(*args, **kw)
