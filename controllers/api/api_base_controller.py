@@ -53,6 +53,8 @@ def track_call(api_action, api_label, x_tba_app_id):
 
 class ApiBaseController(CacheableHandler):
 
+    API_VERSION = 1
+
     def __init__(self, *args, **kw):
         super(ApiBaseController, self).__init__(*args, **kw)
         self.response.headers['content-type'] = 'application/json; charset="utf-8"'
@@ -79,6 +81,7 @@ class ApiBaseController(CacheableHandler):
 
         self._track_call(*args, **kw)
         super(ApiBaseController, self).get(*args, **kw)
+        self.response.headers['X-TBA-Version'] = '{}'.format(self.API_VERSION)
         self._set_cache_header_length(self.CACHE_HEADER_LENGTH)
 
     def _read_cache(self):
