@@ -169,7 +169,7 @@ class ApiEventDistrictPointsController(ApiEventController):
 class ApiEventWeekController(ApiBaseController):
     CACHE_KEY_FORMAT = "apiv2_live_events_controller_{}"  # (start of week timestamp [Monday])
     CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 61
+    CACHE_HEADER_LENGTH = 60 * 60  # One day in seconds
 
     # Set a datetime variable to the most recent Monday at 0:00 UTC
     def _set_week_start(self, dt):
