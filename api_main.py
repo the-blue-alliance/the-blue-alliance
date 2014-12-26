@@ -14,7 +14,7 @@ from controllers.api.api_event_controller import ApiEventController, ApiEventTea
                                                  ApiEventMatchesController, ApiEventStatsController, \
                                                  ApiEventRankingsController, ApiEventAwardsController, \
                                                  ApiEventDistrictPointsController, ApiEventListController, \
-ApiLiveEventsController
+ApiEventWeekController
 from controllers.api.api_trusted_controller import ApiTrustedEventAllianceSelectionsUpdate, ApiTrustedEventAwardsUpdate, \
                                                    ApiTrustedEventMatchesUpdate, ApiTrustedEventMatchesDelete, ApiTrustedEventRankingsUpdate, \
                                                    ApiTrustedEventTeamListUpdate, ApiTrustedAddMatchYoutubeVideo
@@ -76,10 +76,10 @@ app = webapp2.WSGIApplication([('/api/v1/team/details', ApiTeamDetails),
                                             ApiEventDistrictPointsController,
                                             methods=['GET']),
                                webapp2.Route(r'/api/v2/events/live',
-                                             ApiLiveEventsController,
+                                             ApiEventWeekController,
                                              methods=['GET']),
                                webapp2.Route(r'/api/v2/events/live/<time:([0-9]*)>',
-                                             ApiLiveEventsController,
+                                             ApiEventWeekController,
                                              methods=['GET']),
                                webapp2.Route(r'/api/v2/events/<year:([0-9]*)>',
                                              ApiEventListController,

@@ -166,8 +166,8 @@ class ApiEventDistrictPointsController(ApiEventController):
         return json.dumps(points, ensure_ascii=True)
 
 
-class ApiLiveEventsController(ApiBaseController):
-    CACHE_KEY_FORMAT = "apiv2_live_events_controller_{}"  # (event_key)
+class ApiEventWeekController(ApiBaseController):
+    CACHE_KEY_FORMAT = "apiv2_live_events_controller_{}"  # (start of week timestamp [Monday])
     CACHE_VERSION = 0
     CACHE_HEADER_LENGTH = 61
 
@@ -179,7 +179,7 @@ class ApiLiveEventsController(ApiBaseController):
             self.date = datetime.datetime(dt.year, dt.month, dt.day, 0, 0, 0)
 
     def __init__(self, *args, **kw):
-        super(ApiLiveEventsController, self).__init__(*args, **kw)
+        super(ApiEventWeekController, self).__init__(*args, **kw)
         if "time" in self.request.route_kwargs and self.request.route_kwargs["time"]:
             dt = datetime.datetime.utcfromtimestamp(int(self.request.route_kwargs["time"]))
         else:
