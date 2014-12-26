@@ -113,12 +113,12 @@ class MyTBAController(LoggedInHandler):
         for fav in favorites:
             favorites_by_type[ModelType.type_names[fav.model_type]].append(fav)
 
-        subscriptpions_by_type = defaultdict(list)
+        subscriptions_by_type = defaultdict(list)
         for sub in subscriptions:
-            subscriptpions_by_type[ModelType.type_names[sub.model_type]].append(sub)
+            subscriptions_by_type[ModelType.type_names[sub.model_type]].append(sub)
 
         self.template_values['favorites_by_type'] = dict(favorites_by_type)
-        self.template_values['subscriptions_by_type'] = dict(subscriptpions_by_type)
+        self.template_values['subscriptions_by_type'] = dict(subscriptions_by_type)
         self.template_values['enabled_notifications'] = NotificationType.enabled_notifications
 
         error = self.request.get('error')
