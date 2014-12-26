@@ -49,6 +49,12 @@
               </ul>
             </li>
             <li>
+              <a class="smooth-scroll" href="#match-requests">Match Requests</a>
+              <ul class="nav hide">
+                <li><a class="smooth-scroll" href="#match-request">Single Match Request</a></li>
+              </ul>
+            </li>
+            <li>
               <a class="smooth-scroll" href="#district-requests">District Requests</a>
               <ul class="nav hide">
                 <li><a class="smooth-scroll" href="#district-list-request">District List Request</a></li>
@@ -1125,10 +1131,18 @@
         </div>
       </div>
 
+<<<<<<< HEAD
     <h3 id="event-live-request">Live Events Request</h3>
       <p>
         Request format:
         <code>www.thebluealliance.com/api/v2/events/live(/&lt;timestamp&gt;)</code>
+=======
+      <h2 id="match-requests">Match Requests</h2>
+      <h3 id="match-request">Single Match Request</h3>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/match/&lt;match_key&gt;</code>
+>>>>>>> master
       </p>
       <table class=table>
         <thead>
@@ -1140,10 +1154,16 @@
         </thead>
         <tbody>
           <tr>
+<<<<<<< HEAD
             <td>timestamp</td>
             <td>UNIX timestamp (UTC) of a date that you want to get live events during.
             Dates will be truncated back to the most recent Monday, and then passed to <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/master/helpers/event_helper.py#L131">this function</a>. If omitted, this parameter will default to the current timestamp, to allow for fetching events happening currently.</td>
             <td>1396583383</td>
+=======
+            <td>match_key</td>
+            <td>Key for the match you want to request data for</td>
+            <td>2014cmp_f1m1</td>
+>>>>>>> master
           </tr>
         </tbody>
       </table>
@@ -1152,25 +1172,40 @@
           <h3 class="panel-title">Example GET Request:</h3>
         </div>
         <div class="panel-body">
+<<<<<<< HEAD
           <form id="example_live_event_request_form" class="form-inline">
             <div class="input-group">
               <span class="input-group-addon">www.thebluealliance.com</span>
               <input class="form-control" size="6"
               id="example_live_event_request" type="text" value="/api/v2/events/live/1396583383">
+=======
+          <form id="example_match_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="6"
+              id="example_match_request" type="text" value="/api/v2/match/2014cmp_f1m1">
+>>>>>>> master
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
               </span>
             </div>
           </form>
           <div class="panel-group">
+<<<<<<< HEAD
             <pre class="live-event-request-json">
+=======
+            <pre class="match-request-json">
+>>>>>>> master
             </pre>
           </div>
         </div>
       </div>
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> master
       <h2 id="district-requests">District Requests</h2>
       <h3 id="district-list-request">District List Request</h3>
       <p>
@@ -1557,6 +1592,7 @@
     });
   });
 
+<<<<<<< HEAD
   $("#example_live_event_request_form").submit(function(e) {
     e.preventDefault();
     $(".live-event-request-json").html('Processing request...');
@@ -1569,11 +1605,28 @@
       },
       error: function(data) {
         $(".live-event-request-json").html('Something went wrong! Please check for correct request format.');
+=======
+  $("#example_match_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".match-request-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_match_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-match-request:v01'},
+      success: function(data) {
+        $(".match-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".match-request-json").html('Something went wrong! Please check for correct request format.');
+>>>>>>> master
       }
     });
   });
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
   $("#example_district_list_request_form").submit(function(e) {
     e.preventDefault();
     $(".district-list-json").html('Processing request...');
