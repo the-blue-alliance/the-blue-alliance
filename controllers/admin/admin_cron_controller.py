@@ -24,14 +24,14 @@ class AdminMobileClearEnqueue(LoggedInHandler):
         self._require_admin()
         taskqueue.add(
             queue_name='admin',
-            url='/tasks/admin/do/clear_mobile_duplicates',
+            url='/tasks/admin/clear_mobile_duplicates',
             method='GET')
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/mobile_clear_enqueue.html')
         self.response.out.write(template.render(path, self.template_values))
 
 
-class AdminMobileClearDo(LoggedInHandler):
+class AdminMobileClear(LoggedInHandler):
     """
     Fetch all mobile clients, order by messaging ID, then update time (desc).
     If the current client has the same ID as the last one (which is always going to be newer), mark the current one to be removed
@@ -64,14 +64,14 @@ class AdminSubsClearEnqueue(LoggedInHandler):
         self._require_admin()
         taskqueue.add(
             queue_name='admin',
-            url='/tasks/admin/do/clear_old_subs',
+            url='/tasks/admin/clear_old_subs',
             method='GET')
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/subs_clear_enqueue.html')
         self.response.out.write(template.render(path, self.template_values))
 
 
-class AdminSubsClearDo(LoggedInHandler):
+class AdminSubsClear(LoggedInHandler):
     def get(self):
         year = date.today().year - 1
         # Compile key regex
@@ -102,14 +102,14 @@ class AdminWebhooksClearEnqueue(LoggedInHandler):
         self._require_admin()
         taskqueue.add(
             queue_name='admin',
-            url='/tasks/admin/do/clear_old_webhooks',
+            url='/tasks/admin/clear_old_webhooks',
             method='GET')
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/webhooks_clear_enqueue.html')
         self.response.out.write(template.render(path, self.template_values))
 
 
-class AdminWebhooksClearDo(LoggedInHandler):
+class AdminWebhooksClear(LoggedInHandler):
     def get(self):
         webhooks = MobileClient.query(MobileClient.client_type == ClientType.WEBHOOK).fetch()
         failures = []

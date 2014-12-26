@@ -85,7 +85,7 @@ class AdminBroadcast(LoggedInHandler):
         try:
             clients = [int(c) for c in clients]
             NotificationHelper.send_broadcast(clients, title, message, url)
-            logging.info('User {} send broadcast'.format(user_id))
+            logging.info('User {} sent broadcast'.format(user_id))
         except Exception, e:
             logging.error("Error sending broadcast: {}".format(str(e)))
             logging.error("Trace: {}".format(traceback.format_exc()))
