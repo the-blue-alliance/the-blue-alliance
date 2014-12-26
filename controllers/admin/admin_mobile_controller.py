@@ -70,6 +70,7 @@ class AdminBroadcast(LoggedInHandler):
         title = self.request.get('title')
         message = self.request.get('message')
         url = self.request.get('url')
+        app_version = self.request.get('app_version')
 
         error = ""
         if not clients:
@@ -84,7 +85,7 @@ class AdminBroadcast(LoggedInHandler):
 
         try:
             clients = [int(c) for c in clients]
-            NotificationHelper.send_broadcast(clients, title, message, url)
+            NotificationHelper.send_broadcast(clients, title, message, url, app_version)
             logging.info('User {} sent broadcast'.format(user_id))
         except Exception, e:
             logging.error("Error sending broadcast: {}".format(str(e)))

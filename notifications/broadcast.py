@@ -4,10 +4,11 @@ from notifications.base_notification import BaseNotification
 
 class BroadcastNotification(BaseNotification):
 
-    def __init__(self, title, message, url):
+    def __init__(self, title, message, url, app_version=''):
         self.title = title
         self.message = message
         self.url = url
+        self.app_version = app_version
 
     def _build_dict(self):
         data = {}
@@ -16,5 +17,6 @@ class BroadcastNotification(BaseNotification):
             'title': self.title,
             'desc': self.message,
             'url': self.url,
+            'app_version': self.app_version,
         }
         return data
