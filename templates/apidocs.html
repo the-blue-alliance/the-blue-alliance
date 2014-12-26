@@ -48,6 +48,12 @@
               </ul>
             </li>
             <li>
+              <a class="smooth-scroll" href="#match-requests">Match Requests</a>
+              <ul class="nav hide">
+                <li><a class="smooth-scroll" href="#match-request">Single Match Request</a></li>
+              </ul>
+            </li>
+            <li>
               <a class="smooth-scroll" href="#district-requests">District Requests</a>
               <ul class="nav hide">
                 <li><a class="smooth-scroll" href="#district-list-request">District List Request</a></li>
@@ -1124,6 +1130,50 @@
         </div>
       </div>
 
+      <h2 id="match-requests">Match Requests</h2>
+      <h3 id="match-request">Single Match Request</h3>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/match/&lt;match_key&gt;</code>
+      </p>
+      <table class=table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>match_key</td>
+            <td>Key for the match you want to request data for</td>
+            <td>2014cmp_f1m1</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_match_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="6"
+              id="example_match_request" type="text" value="/api/v2/match/2014cmp_f1m1">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group">
+            <pre class="match-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+
       <h2 id="district-requests">District Requests</h2>
       <h3 id="district-list-request">District List Request</h3>
       <p>
@@ -1506,6 +1556,22 @@
       },
       error: function(data) {
         $(".event-points-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+  $("#example_match_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".match-request-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_match_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-match-request:v01'},
+      success: function(data) {
+        $(".match-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".match-request-json").html('Something went wrong! Please check for correct request format.');
       }
     });
   });
