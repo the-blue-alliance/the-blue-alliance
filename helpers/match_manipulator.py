@@ -2,7 +2,6 @@ import json
 import logging
 
 from google.appengine.api import taskqueue
-from google.appengine.ext import ndb
 
 from helpers.cache_clearer import CacheClearer
 from helpers.firebase.firebase_pusher import FirebasePusher

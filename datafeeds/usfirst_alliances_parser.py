@@ -1,6 +1,3 @@
-import json
-import logging
-
 from BeautifulSoup import BeautifulSoup
 
 from datafeeds.parser_base import ParserBase

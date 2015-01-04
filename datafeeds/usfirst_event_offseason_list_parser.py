@@ -1,12 +1,9 @@
 from datetime import datetime
-import urlparse
-import logging
 
 from BeautifulSoup import BeautifulSoup
 
 from consts.event_type import EventType
 from datafeeds.parser_base import ParserBase
-from helpers.event_helper import EventHelper
 
 
 class UsfirstEventOffseasonListParser(ParserBase):

@@ -1,5 +1,4 @@
 import unittest2
-import datetime
 
 from google.appengine.ext import testbed
 

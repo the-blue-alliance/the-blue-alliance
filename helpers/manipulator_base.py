@@ -1,7 +1,6 @@
 from collections import defaultdict
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
-from helpers.cache_clearer import CacheClearer
 
 
 class ManipulatorBase(object):

@@ -3,7 +3,6 @@ import unittest2
 import webtest
 import json
 import md5
-import webapp2
 
 import api_main
 
@@ -12,8 +11,6 @@ from google.appengine.ext import testbed
 
 from consts.auth_type import AuthType
 from consts.event_type import EventType
-
-from controllers.api.api_event_controller import ApiEventController
 
 from models.api_auth_access import ApiAuthAccess
 from models.award import Award

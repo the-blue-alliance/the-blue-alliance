@@ -1,14 +1,8 @@
-import logging
-
-from google.appengine.api import memcache
-from google.appengine.api import urlfetch
-
-import tba_config
-
 from datafeeds.datafeed_base import DatafeedBase
 from datafeeds.usfirst_event_offseason_list_parser import UsfirstEventOffseasonListParser
 
 from models.event import Event
+
 
 class DatafeedUsfirstOffseason(DatafeedBase):
     EVENT_OFFSEASON_LIST_URL = "http://www.usfirst.org/roboticsprograms/frc/calendar/list"

@@ -1,8 +1,6 @@
 import datetime
 import os
-import logging
 
-from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler

@@ -2,22 +2,15 @@ import csv
 import json
 import logging
 import StringIO
-import os
 import urllib
 import uuid
 import webapp2
 
-from datetime import datetime
-
 from google.appengine.api import memcache, urlfetch
 from google.appengine.ext import deferred, ndb
-from google.appengine.ext.webapp import template
-
 
 import tba_config
-from helpers.api_helper import ApiHelper
 
-from models.event import Event
 from models.sitevar import Sitevar
 from models.team import Team
 

@@ -6,13 +6,13 @@ from collections import defaultdict
 from google.appengine.ext import ndb
 
 from consts.award_type import AwardType
-from consts.district_type import DistrictType
 from consts.event_type import EventType
 
 from helpers.event_helper import EventHelper
 
 from models.award import Award
 from models.match import Match
+
 
 class DistrictHelper(object):
     """

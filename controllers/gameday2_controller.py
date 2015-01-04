@@ -2,9 +2,6 @@ import os
 
 from google.appengine.ext.webapp import template
 
-from helpers.event_helper import EventHelper
-from models.sitevar import Sitevar
-
 from base_controller import CacheableHandler
 
 from helpers.event_helper import EventHelper

@@ -1,6 +1,5 @@
 import unittest2
 import webtest
-import json
 import webapp2
 
 from google.appengine.ext import testbed

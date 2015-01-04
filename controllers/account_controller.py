@@ -1,5 +1,4 @@
 import os
-import logging
 
 from collections import defaultdict
 
@@ -10,9 +9,9 @@ from base_controller import LoggedInHandler
 from consts.model_type import ModelType
 from consts.notification_type import NotificationType
 
-from helpers.mytba_helper import MyTBAHelper
-from helpers.notification_helper import NotificationHelper
-from helpers.validation_helper import ValidationHelper
+from helpers.mytba_helper import MyTBAHelper  # noqa
+from helpers.notification_helper import NotificationHelper  # noqa
+from helpers.validation_helper import ValidationHelper  # noqa
 
 from models.account import Account
 from models.favorite import Favorite
