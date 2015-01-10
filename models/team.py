@@ -10,7 +10,7 @@ class Team(ndb.Model):
     key_name is like 'frc177'
     """
     team_number = ndb.IntegerProperty(required=True)
-    name = ndb.StringProperty(indexed=False)
+    name = ndb.TextProperty(indexed=False)
     nickname = ndb.StringProperty(indexed=False)
     address = ndb.StringProperty(indexed=False)  # in the format "locality, region, country". similar to Event.location
     website = ndb.StringProperty(indexed=False)
