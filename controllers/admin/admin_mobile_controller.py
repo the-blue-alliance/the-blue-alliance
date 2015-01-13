@@ -9,6 +9,7 @@ from consts.client_type import ClientType
 from controllers.base_controller import LoggedInHandler
 from helpers.notification_helper import NotificationHelper
 from models.mobile_client import MobileClient
+from models.sitevar import Sitevar
 
 
 class AdminMobile(LoggedInHandler):
@@ -23,12 +24,25 @@ class AdminMobile(LoggedInHandler):
         ios = all_clients.filter(MobileClient.client_type == ClientType.OS_IOS).count()
         webhook = all_clients.filter(MobileClient.client_type == ClientType.WEBHOOK).count()
 
+        var = Sitevar.get_by_id('notifications.enable')
+        if var is None or not var.values_json == 'true':
+            push_enabled = "disabled"
+            disp_enable = ""
+            disp_disable = "disabled"
+        else:
+            push_enabled = "enabled"
+            disp_enable = "disabled"
+            disp_disable = ""
+
         self.template_values.update({
             'mobile_users': all_clients.count(),
             'android_users': android,
             'ios_users': ios,
             'webhooks': webhook,
             'broadcast_success': self.request.get('broadcast_success'),
+            'push_enabled': push_enabled,
+            'disp_enable': disp_enable,
+            'disp_disable': disp_disable,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/mobile_dashboard.html')
