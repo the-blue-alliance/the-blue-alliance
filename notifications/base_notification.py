@@ -5,6 +5,7 @@ from google.appengine.ext import deferred
 from controllers.gcm.gcm import GCMMessage
 from consts.client_type import ClientType
 from helpers.notification_sender import NotificationSender
+from models.sitevar import Sitevar
 
 
 class BaseNotification(object):
@@ -26,6 +27,8 @@ class BaseNotification(object):
     Clients should implement the referenced methods in order to build the notification for each platform
     """
     def render(self, client_types):
+        if not self.check_enabled():
+            return
         for client_type in client_types:
             if client_type == ClientType.OS_ANDROID and ClientType.OS_ANDROID in self.keys:
                 notification = self._render_android()
@@ -39,6 +42,12 @@ class BaseNotification(object):
             elif client_type == ClientType.WEBHOOK and ClientType.WEBHOOK in self.keys and len(self.keys[ClientType.WEBHOOK]) > 0:
                 notification = self._render_webhook()
                 NotificationSender.send_webhook(notification, self.keys[ClientType.WEBHOOK])
+
+    def check_enabled(self):
+        var = Sitevar.get_by_id('notifications.enable')
+        if var is None or not var.values_json  == "true":
+            return True
+        return False
 
     """
     Subclasses should override this method and return a dict containing the payload of the notification.
