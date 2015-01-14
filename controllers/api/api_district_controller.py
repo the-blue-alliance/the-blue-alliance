@@ -31,7 +31,7 @@ class ApiDistrictControllerBase(ApiBaseController):
 
 class ApiDistrictListController(ApiDistrictControllerBase):
     CACHE_KEY_FORMAT = "apiv2_district_list_controller_{}"  # year
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
@@ -55,7 +55,14 @@ class ApiDistrictListController(ApiDistrictControllerBase):
         all_cmp_event_keys = Event.query(Event.year == int(self.year), Event.event_type_enum == EventType.DISTRICT_CMP).fetch(None, keys_only=True)
         events = ndb.get_multi(all_cmp_event_keys)
         district_keys = [DistrictType.type_abbrevs[event.event_district_enum] for event in events]
-        return json.dumps(district_keys, ensure_ascii=True)
+        districts = list()
+        for key in district_keys:
+            dictionary = dict()
+            dictionary["key"] = key
+            dictionary["name"] = DistrictType.type_names[DistrictType.abbrevs[key]]
+            districts.append(dictionary)
+
+        return json.dumps(districts, ensure_ascii=True)
 
 
 class ApiDistrictEventsController(ApiDistrictControllerBase):

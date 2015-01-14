@@ -65,7 +65,7 @@ class MainBuildseasonHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        endbuild_datetime_est = datetime.datetime(2014, 2, 18, 23, 59)
+        endbuild_datetime_est = datetime.datetime(2015, 2, 17, 23, 59)
         endbuild_datetime_utc = endbuild_datetime_est + datetime.timedelta(hours=5)
 
         self.template_values.update({
