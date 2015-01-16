@@ -191,7 +191,7 @@ class MobileAPI(remote.Service):
         else:
             result = MyTBAHelper.remove_subscription(userId, modelKey, request.device_key)
             if result == 200:
-                output['subscription'] = {"code:"   : 200,
+                output['subscription'] = {"code"   : 200,
                                           "message" : "Subscription removed"}
                 code += 100
             elif result == 404:
