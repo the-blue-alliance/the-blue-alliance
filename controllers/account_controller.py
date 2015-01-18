@@ -202,10 +202,6 @@ class MyTBAController(LoggedInHandler):
                 subscription = Subscription(parent = ndb.Key(Account, current_user_id), user_id = current_user_id, model_key = key, model_type = ModelType.EVENT, notification_types = [int(s) for s in subs])
 
                 logging.info("{}".format(self.request.get('webhooks_only')))
-                if self.request.get('webhooks_only') == "true":
-                    logging.info("webhooks")
-                    subscription.client_types = [ClientType.WEBHOOK]
-                logging.info("{}".format(subscription.client_types))
                 MyTBAHelper.add_subscription(subscription)
                 self.redirect('/account/mytba')
                 return
