@@ -75,8 +75,8 @@ class AdminSubsClear(LoggedInHandler):
     def get(self):
         year = date.today().year - 1
         # Compile key regex
-        # Matches event (2014ctgro), team@event (frc2014_2014ctgro)
-        ps = "\A{}[a-z]+|_{}[a-z]+".format(year, year)
+        # Matches event (2014ctgro), team@event (frc2014_2014ctgro), firehose (2014*)
+        ps = "^{}[a-z]+|_{}[a-z]+|{}\*$".format(year, year, year)
         logging.info("Pattern: {}".format(ps))
         p = re.compile(ps)
 
