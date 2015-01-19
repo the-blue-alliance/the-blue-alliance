@@ -3,9 +3,12 @@ import os
 from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
+from helpers.team.team_test_creator import TeamTestCreator
 from models.event_team import EventTeam
 from models.team import Team
 from models.media import Media
+
+import tba_config
 
 
 class AdminTeamList(LoggedInHandler):
@@ -51,3 +54,19 @@ class AdminTeamDetail(LoggedInHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/team_details.html')
         self.response.out.write(template.render(path, self.template_values))
+
+
+class AdminTeamCreateTest(LoggedInHandler):
+    """
+    Create 6 test teams.
+    """
+    def get(self):
+        self._require_admin()
+
+        if tba_config.CONFIG["env"] != "prod":
+            TeamTestCreator.createSixTeams()
+            self.redirect("/teams/")
+        else:
+            logging.error("{} tried to create test teams in prod! No can do.".format(
+                self.user_bundle.user.email()))
+            self.redirect("/admin/")

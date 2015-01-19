@@ -18,7 +18,7 @@ from controllers.admin.admin_sitevar_controller import AdminSitevarCreate, Admin
 from controllers.admin.suggestions.admin_event_webcast_suggestions_review_controller import AdminEventWebcastSuggestionsReviewController
 from controllers.admin.suggestions.admin_match_video_suggestions_review_controller import AdminMatchVideoSuggestionsReviewController
 from controllers.admin.suggestions.admin_media_suggestions_review_controller import AdminMediaSuggestionsReviewController
-from controllers.admin.admin_team_controller import AdminTeamDetail, AdminTeamList
+from controllers.admin.admin_team_controller import AdminTeamCreateTest, AdminTeamDetail, AdminTeamList
 from controllers.admin.admin_migration_controller import AdminMigration
 from controllers.admin.admin_user_controller import AdminUserList, AdminUserEdit, AdminUserDetail
 
@@ -60,6 +60,7 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/suggestions/media/review', AdminMediaSuggestionsReviewController),
                                ('/admin/tasks', AdminTasksHandler),
                                ('/admin/teams', AdminTeamList),
+                               ('/admin/team/create/test', AdminTeamCreateTest),
                                ('/admin/team/(.*)', AdminTeamDetail),
                                ('/admin/users', AdminUserList),
                                ('/admin/user/edit/(.*)', AdminUserEdit),
