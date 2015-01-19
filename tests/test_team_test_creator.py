@@ -4,7 +4,6 @@ import unittest2
 from google.appengine.ext import testbed
 
 from helpers.team.team_test_creator import TeamTestCreator
-
 from models.team import Team
 
 
