@@ -6,7 +6,6 @@ from google.appengine.ext.webapp import template
 
 from base_controller import LoggedInHandler
 from consts.client_type import ClientType
-from consts.notification_type import NotificationType
 from helpers.notification_helper import NotificationHelper
 from models.account import Account
 from models.mobile_client import MobileClient

@@ -1,7 +1,5 @@
 import logging
 
-from consts.media_type import MediaType
-
 
 class ModelToDict(object):
 

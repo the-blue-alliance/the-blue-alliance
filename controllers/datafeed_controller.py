@@ -22,7 +22,6 @@ from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.match_manipulator import MatchManipulator
-from helpers.match_helper import MatchHelper
 from helpers.award_manipulator import AwardManipulator
 from helpers.team_manipulator import TeamManipulator
 

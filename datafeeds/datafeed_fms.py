@@ -1,5 +1,3 @@
-import logging
-
 from datafeeds.datafeed_base import DatafeedBase
 from datafeeds.fms_event_list_parser import FmsEventListParser
 from datafeeds.fms_team_list_parser import FmsTeamListParser

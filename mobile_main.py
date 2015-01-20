@@ -1,7 +1,6 @@
 import endpoints
 import json
 import logging
-import webapp2
 
 from google.appengine.ext import ndb
 
@@ -13,7 +12,6 @@ import tba_config
 from consts.client_type import ClientType
 from helpers.push_helper import PushHelper
 from helpers.mytba_helper import MyTBAHelper
-from helpers.notification_helper import NotificationHelper
 from models.account import Account
 from models.favorite import Favorite
 from models.sitevar import Sitevar

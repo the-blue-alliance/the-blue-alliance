@@ -2,7 +2,6 @@ import logging
 
 from collections import defaultdict
 
-from google.appengine.ext import db
 from google.appengine.ext import ndb
 from google.appengine.api import users
 
@@ -12,7 +11,6 @@ from models.account import Account
 from models.mobile_client import MobileClient
 from models.mobile_user import MobileUser
 from models.subscription import Subscription
-from models.user import User
 
 
 class PushHelper(object):

@@ -1,5 +1,4 @@
 import json
-import webapp2
 
 from datetime import datetime
 
@@ -9,8 +8,6 @@ from controllers.api.api_base_controller import ApiBaseController
 
 from helpers.award_helper import AwardHelper
 from helpers.model_to_dict import ModelToDict
-from helpers.data_fetchers.team_details_data_fetcher import TeamDetailsDataFetcher
-from helpers.media_helper import MediaHelper
 
 from models.award import Award
 from models.event import Event

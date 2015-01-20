@@ -1,10 +1,8 @@
-import logging
 import json
 import oauth2
 
 from datafeeds.datafeed_base import DatafeedBase
 from datafeeds.twitter_matches_parser import TwitterMatchesParser
-import tba_config
 
 from models.sitevar import Sitevar
 

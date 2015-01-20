@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import os
 import webapp2
 
 import tba_config

@@ -5,18 +5,15 @@ import webapp2
 
 from datetime import datetime
 
-from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from consts.district_type import DistrictType
 from consts.event_type import EventType
 
-from controllers.api.api_district_controller import ApiDistrictListController, ApiDistrictEventsController, ApiDistrictRankingsController
+from controllers.api.api_district_controller import ApiDistrictListController, ApiDistrictEventsController
 
 from models.event import Event
-from models.team import Team
-from models.match import Match
-from models.event_team import EventTeam
+
 
 class TestListDistrictsController(unittest2.TestCase):
     def setUp(self):

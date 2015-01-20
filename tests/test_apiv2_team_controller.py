@@ -8,17 +8,12 @@ from datetime import datetime
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
-from consts.event_type import EventType
-
 from controllers.api.api_team_controller import ApiTeamController, ApiTeamEventsController, ApiTeamMediaController, ApiTeamListController
 
-from consts.award_type import AwardType
 from consts.event_type import EventType
 
-from models.award import Award
 from models.event import Event
 from models.event_team import EventTeam
-from models.match import Match
 from models.media import Media
 from models.team import Team
 

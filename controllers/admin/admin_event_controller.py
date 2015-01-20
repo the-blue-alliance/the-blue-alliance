@@ -17,7 +17,6 @@ from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.team_manipulator import TeamManipulator
 from helpers.match_manipulator import MatchManipulator
 from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
-from models.award import Award
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match

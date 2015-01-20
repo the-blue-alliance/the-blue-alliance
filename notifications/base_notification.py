@@ -1,5 +1,3 @@
-import logging
-
 from google.appengine.ext import deferred
 
 from controllers.gcm.gcm import GCMMessage

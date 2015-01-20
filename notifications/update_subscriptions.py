@@ -1,5 +1,3 @@
-import logging
-
 from consts.client_type import ClientType
 from consts.notification_type import NotificationType
 from controllers.gcm.gcm import GCMMessage

@@ -1,5 +1,4 @@
 import logging
-import re
 
 from google.appengine.api import memcache
 from google.appengine.api import urlfetch

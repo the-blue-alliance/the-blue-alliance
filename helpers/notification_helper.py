@@ -1,9 +1,6 @@
-import logging
-
 from consts.client_type import ClientType
 from consts.notification_type import NotificationType
 from helpers.push_helper import PushHelper
-from models.event import Event
 from notifications.match_score import MatchScoreNotification
 from notifications.update_favorites import UpdateFavoritesNotification
 from notifications.update_subscriptions import UpdateSubscriptionsNotification

@@ -1,6 +1,4 @@
 import json
-import logging
-import webapp2
 
 from google.appengine.ext import ndb
 
@@ -23,7 +21,6 @@ from models.award import Award
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
-from models.sitevar import Sitevar
 from models.team import Team
 
 

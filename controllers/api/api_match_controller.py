@@ -1,5 +1,4 @@
 import json
-import webapp2
 
 from controllers.api.api_base_controller import ApiBaseController
 

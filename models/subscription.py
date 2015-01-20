@@ -1,5 +1,3 @@
-import json
-
 from google.appengine.ext import ndb
 
 from consts.notification_type import NotificationType

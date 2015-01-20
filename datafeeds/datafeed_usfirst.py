@@ -1,12 +1,7 @@
 import logging
 import json
-import re
 
-from google.appengine.api import memcache
-from google.appengine.api import urlfetch
 from google.appengine.ext import ndb
-
-import tba_config
 
 from consts.event_type import EventType
 
