@@ -129,6 +129,7 @@ class Match(ndb.Model):
         # store set of affected references referenced keys for cache clearing
         # keys must be model properties
         self._affected_references = {
+            'key': set(),
             'event': set(),
             'team_keys': set(),
             'year': set(),
@@ -285,6 +286,6 @@ class Match(ndb.Model):
 
     @classmethod
     def validate_key_name(self, match_key):
-        key_name_regex = re.compile(r'^[1-9]\d{3}[a-z]+\_(?:qm|ef|qf\dm|sf\dm|f\dm)\d+$')
+        key_name_regex = re.compile(r'^[1-9]\d{3}[a-z]+[1-9]?\_(?:qm|ef|qf\dm|sf\dm|f\dm)\d+$')
         match = re.match(key_name_regex, match_key)
         return True if match else False

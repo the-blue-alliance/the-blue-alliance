@@ -52,7 +52,8 @@ class PushHelper(object):
 
         if Account.get_by_id(user_id) is None:
             # Create an account for this user
-            Account(id=user_id, email=user_email, nickname=user_email.split('@')[0], registered=False).put()
+            nickname = user_email.split('@')[0]
+            Account(id=user_id, email=user_email, nickname=nickname, display_name=nickname, registered = False).put()
 
         return user_id
 

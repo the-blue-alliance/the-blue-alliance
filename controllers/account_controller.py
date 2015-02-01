@@ -1,10 +1,13 @@
 import os
 import logging
 
+from collections import defaultdict
+
 from google.appengine.ext.webapp import template
 
 from base_controller import LoggedInHandler
 
+from consts.model_type import ModelType
 from consts.notification_type import NotificationType
 
 from helpers.mytba_helper import MyTBAHelper
@@ -111,8 +114,19 @@ class MyTBAController(LoggedInHandler):
         self._require_registration('/account/register')
 
         user = self.user_bundle.account.key
-        self.template_values['favorites'] = Favorite.query(ancestor=user).fetch()
-        self.template_values['subscriptions'] = Subscription.query(ancestor=user).fetch()
+        favorites = Favorite.query(ancestor=user).fetch()
+        subscriptions = Subscription.query(ancestor=user).fetch()
+
+        favorites_by_type = defaultdict(list)
+        for fav in favorites:
+            favorites_by_type[ModelType.type_names[fav.model_type]].append(fav)
+
+        subscriptions_by_type = defaultdict(list)
+        for sub in subscriptions:
+            subscriptions_by_type[ModelType.type_names[sub.model_type]].append(sub)
+
+        self.template_values['favorites_by_type'] = dict(favorites_by_type)
+        self.template_values['subscriptions_by_type'] = dict(subscriptions_by_type)
         self.template_values['enabled_notifications'] = NotificationType.enabled_notifications
 
         error = self.request.get('error')
