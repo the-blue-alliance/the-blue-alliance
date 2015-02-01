@@ -111,7 +111,7 @@ class AdminMatchAdd(LoggedInHandler):
         self._require_admin()
         event_key = self.request.get('event_key')
         matches_csv = self.request.get('matches_csv')
-        matches = OffseasonMatchesParser.parse(matches_csv)
+        matches, _ = OffseasonMatchesParser.parse(matches_csv)
 
         event = Event.get_by_id(event_key)
         matches = [Match(

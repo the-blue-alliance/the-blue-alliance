@@ -32,7 +32,7 @@ class NotificationType(object):
         AWARDS: "awards_posted",
         MEDIA_POSTED: "media_posted",
         DISTRICT_POINTS_UPDATED: "district_points_updated",
-        SCHEDULE_POSTED: "schedule_posted",
+        SCHEDULE_POSTED: "schedule_updated",
         FINAL_RESULTS: "final_results",
         PING: "ping",
         BROADCAST: "broadcast",
@@ -63,7 +63,7 @@ class NotificationType(object):
         "awards_posted": AWARDS,
         "media_posted": MEDIA_POSTED,
         "district_points_updated": DISTRICT_POINTS_UPDATED,
-        "schedule_posted": SCHEDULE_POSTED,
+        "schedule_updated": SCHEDULE_POSTED,
         "final_results": FINAL_RESULTS,
 
         "update_favorites": UPDATE_FAVORITES,
