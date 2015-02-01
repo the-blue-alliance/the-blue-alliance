@@ -207,7 +207,7 @@ class TbaCSVRestoreEventDo(webapp.RequestHandler):
             logging.warning('Unable to retreive url: ' + (self.MATCHES_URL.format(event.year, event_key, event_key)))
         else:
             data = result.content.replace('frc', '').replace('{}_'.format(event_key), '')
-            match_dicts = OffseasonMatchesParser.parse(data)
+            match_dicts, _ = OffseasonMatchesParser.parse(data)
             matches = [
                 Match(
                     id=Match.renderKeyName(

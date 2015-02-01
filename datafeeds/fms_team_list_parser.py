@@ -41,4 +41,4 @@ class FmsTeamListParser(ParserBase):
                 except Exception, e:
                     logging.warning("Failed to parse team row: %s" % data)
 
-        return teams
+        return teams, False

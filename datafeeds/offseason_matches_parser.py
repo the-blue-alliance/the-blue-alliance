@@ -24,7 +24,7 @@ class OffseasonMatchesParser(ParserBase):
         for row in csv_data:
             matches.append(self.parseCSVMatch(row))
 
-        return matches
+        return matches, False
 
     @classmethod
     def parseCSVMatch(self, row):

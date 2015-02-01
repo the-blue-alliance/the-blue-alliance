@@ -41,7 +41,7 @@ class MainKickoffHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24
 
     def _render(self, *args, **kw):
-        kickoff_datetime_est = datetime.datetime(2014, 1, 4, 10, 30)
+        kickoff_datetime_est = datetime.datetime(2015, 1, 3, 10, 30)
         kickoff_datetime_utc = kickoff_datetime_est + datetime.timedelta(hours=5)
 
         is_kickoff = datetime.datetime.now() >= kickoff_datetime_est - datetime.timedelta(days=1)  # turn on 1 day before
@@ -65,7 +65,7 @@ class MainBuildseasonHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        endbuild_datetime_est = datetime.datetime(2014, 2, 18, 23, 59)
+        endbuild_datetime_est = datetime.datetime(2015, 2, 17, 23, 59)
         endbuild_datetime_utc = endbuild_datetime_est + datetime.timedelta(hours=5)
 
         self.template_values.update({
