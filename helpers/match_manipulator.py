@@ -1,5 +1,6 @@
 import json
 import logging
+import traceback
 
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
@@ -25,13 +26,29 @@ class MatchManipulator(ManipulatorBase):
         Send push notifications to subscribed users
         Only if the match is part of an active event
         '''
+        unplayed_matches = []
         for match in matches:
-            if match.event.get().now:
+            event = match.event.get()
+            if event.now and match.has_been_played:
                 logging.info("Sending push notifications for "+match.key_name)
                 try:
                     NotificationHelper.send_match_score_update(match)
                 except Exception, exception:
                     logging.error("Error sending match updates: "+str(exception))
+                    logging.error(traceback.format_exc())
+            elif not match.has_been_played and not event in unplayed_matches:
+                unplayed_matches.append(event)
+
+        
+        '''
+        If we have an unplayed match, send out a schedule update notification
+        '''
+        for event in unplayed_matches:
+            try:
+                logging.info("Sending schedule updates for: {}".format(event.key_name))
+                NotificationHelper.send_schedule_update(event)
+            except Exception, exception:
+                logging.error("Eror sending schedule updates for: {}".format(event.key_name))
 
         '''
         Enqueue firebase push

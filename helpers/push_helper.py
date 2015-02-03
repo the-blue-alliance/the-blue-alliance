@@ -17,11 +17,11 @@ from models.user import User
 
 class PushHelper(object):
 
-    '''
+    """
     General helper methods for push notifications
     Actual notifications should be built and send from NotificationHelper
     (they're split up for cleanliness)
-    '''
+    """
 
     @classmethod
     def notification_enums_from_string(cls, notifications):
@@ -39,11 +39,11 @@ class PushHelper(object):
 
     @classmethod
     def user_email_to_id(cls, user_email):
-        '''
+        """
         Returns the user id for a given email address (or None if invalid)
         workaround for this bug: https://code.google.com/p/googleappengine/issues/detail?id=8848
         solution from: http://stackoverflow.com/questions/816372/how-can-i-determine-a-user-id-based-on-an-email-address-in-app-engine
-        '''
+        """
         u = users.User(user_email)
         key = MobileUser(user=u).put()
         obj = key.get()
@@ -83,10 +83,22 @@ class PushHelper(object):
         keys = []
         for team in match.team_key_names:
             keys.append(team)
-            keys.append("{}_{}".format(match.event.id(), team))
+            keys.append("{}_{}".format(match.event_key_name, team))
+
         keys.append("{}*".format(match.year))  # key for all events in year
         keys.append(match.key_name)
-        keys.append(match.event.id())
+        keys.append(match.event_key_name)
+        users = Subscription.query(Subscription.model_key.IN(keys), Subscription.notification_types == notification).fetch()
+        output = []
+        for user in users:
+            output.append(user.user_id)
+        return output
+
+    @classmethod
+    def get_users_subscribed_to_event(cls, event, notification):
+        keys = []
+        keys.append(event.key_name)
+        keys.append("{}*".format(event.year))
         users = Subscription.query(Subscription.model_key.IN(keys), Subscription.notification_types == notification).fetch()
         output = []
         for user in users:
