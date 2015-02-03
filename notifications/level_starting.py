@@ -17,5 +17,9 @@ class CompLevelStartingNotification(BaseNotification):
         data['message_data']['event_name'] = self.event.name
         data['message_data']['event_key'] = self.event.key_name
         data['message_data']['comp_level'] = self.match.comp_level
-        data['message_data']['scheduled_time'] = calendar.timegm(self.match.time.utctimetuple())
+        if self.match.time:
+            data['message_data']['scheduled_time'] = calendar.timegm(self.match.time.utctimetuple())
+        else:
+            data['message_data']['scheduled_time'] = None
+
         return data

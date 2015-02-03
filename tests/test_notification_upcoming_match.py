@@ -1,3 +1,4 @@
+import calendar
 import unittest2
 import json
 
@@ -8,10 +9,10 @@ from consts.notification_type import NotificationType
 from helpers.event.event_test_creator import EventTestCreator
 from helpers.model_to_dict import ModelToDict
 from models.team import Team
-from notifications.match_score import UpcomingMatchNotification
+from notifications.upcoming_match import UpcomingMatchNotification
 
 
-class TestMatchScoreNotification(unittest2.TestCase):
+class TestUpcomingMatchNotification(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
@@ -25,7 +26,7 @@ class TestMatchScoreNotification(unittest2.TestCase):
 
         self.event = EventTestCreator.createPresentEvent()
         self.match = self.event.matches[0]
-        self.notification = MatchScoreNotification(self.match)
+        self.notification = UpcomingMatchNotification(self.match, self.event)
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -37,8 +38,12 @@ class TestMatchScoreNotification(unittest2.TestCase):
         expected['message_data']['event_name'] = self.event.name
         expected['message_data']['match_key'] = self.match.key_name
         expected['message_data']['team_keys'] = self.match.team_key_names
-        expected['message_data']['scheduled_time'] = self.match.time
-        expected['message_data']['predicted_time'] = self.match.time
+        if self.match.time:
+            expected['message_data']['scheduled_time'] = calendar.timegm(self.match.time.utctimetuple())
+            expected['message_data']['predicted_time'] = calendar.timegm(self.match.time.utctimetuple())
+        else:
+            expected['message_data']['scheduled_time'] = None
+            expected['message_data']['predicted_time'] = None
 
         data = self.notification._build_dict()
 

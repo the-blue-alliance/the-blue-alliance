@@ -18,8 +18,13 @@ class UpcomingMatchNotification(BaseNotification):
         data['message_data']['event_name'] = self.event.name
         data['message_data']['match_key'] = self.match.key_name
         data['message_data']['team_keys'] = self.match.team_key_names
-        data['message_data']['scheduled_time'] = calendar.timegm(self.match.time.utctimetuple())
-        data['message_data']['predicted_time'] = calendar.timegm(self.match.time.utctimetuple())  # TODO Add in some time predictions
+        if self.match.time:
+            data['message_data']['scheduled_time'] = calendar.timegm(self.match.time.utctimetuple())
+            data['message_data']['predicted_time'] = calendar.timegm(self.match.time.utctimetuple())  # TODO Add in some time predictions
+        else:
+            data['message_data']['scheduled_time'] = None
+            data['message_data']['predicted_time'] = None
+
         return data
 
     def render(self, client_types):
