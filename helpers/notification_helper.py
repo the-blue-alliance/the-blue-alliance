@@ -37,7 +37,7 @@ class NotificationHelper(object):
     @classmethod
     def send_favorite_update(cls, user_id, sending_device_key=""):
         clients = PushHelper.get_client_ids_for_users([user_id])
-        
+
         notification = UpdateFavoritesNotification(user_id, sending_device_key)
         notification.send(clients)
 

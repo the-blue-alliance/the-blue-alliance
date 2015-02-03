@@ -45,7 +45,7 @@
                 <td><form method="post">
                   <input name="action" type="hidden" value="favorite_delete" />
                   <input name="account_id" type="hidden" value="{{user_bundle.account.key.id}}" />
-                  <input name="client_id" type="hidden" value="{{favorite.key.id}}"/>
+                  <input name="model_key" type="hidden" value="{{favorite.model_key}}"/>
                   <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-trash"></span> Delete</button></form>
                 </td>
               </tr>
@@ -80,29 +80,29 @@
                   <td><form method="post">
                     <input name="action" type="hidden" value="subscription_delete" />
                     <input name="account_id" type="hidden" value="{{user_bundle.account.key.id}}" />
-                    <input name="client_id" type="hidden" value="{{subscription.key.id}}" />
+                    <input name="model_key" type="hidden" value="{{subscription.model_key}}" />
                     <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-trash"></span> Delete</button></form>
-                  </tr>
+                  </td>
                 </tr>
               {% endfor %}
             </table>
           {% empty %}
             <tr><td>No subscriptions found</td></tr>
           {% endfor %}
-        <!-- <h3>Add Subscription</h3>
+        <h3>Subscribe to All Events This Year</h3>
           <form method="post">
-            <input name="action" type="hidden" value="subscription_add" />
+            <input name="action" type="hidden" value="subscription_year_add" />
             <input name="account_id" type="hidden" value="{{user_bundle.account.key.id}}" />
             <table class="table">
               <tr>
-                <td>Model Key:</td>
-                <td><input class="form-control" type="text" name="model_key" placeholder="frc254" /></td>
+                <td>Year:</td>
+                <td><input class="form-control" type="text" name="year" value="{{this_year}}" readonly/></td>
               </tr>
               <tr>
                 <td>Notification Types:</td>
                 <td><ul style="list-style-type: none;">
                   {% for index, name in enabled_notifications.items %}
-                    <li><input type="checkbox" name="notification_types" value="{{index}}" /> {{ name }}</li>
+                    <li><input type="checkbox" name="notification_types" value="{{index}}"/> {{ name }}</li>
                   {% endfor %}
                 </ul></td>
               </tr>
@@ -110,7 +110,7 @@
                 <td><button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Add Subscription</button></td>
               </tr>
           </table>
-        </form> -->
+        </form>
         </div>
         </div>
     </div>
