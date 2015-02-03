@@ -84,7 +84,6 @@ class PushHelper(object):
         for team in match.team_key_names:
             keys.append(team)
             keys.append("{}_{}".format(match.event_key_name, team))
-            keys.append("{}_{}".format(match.event.id(), team))
         keys.append("{}*".format(match.year))  # key for all events in year
         keys.append(match.key_name)
         keys.append(match.event_key_name)
