@@ -24,6 +24,7 @@ from controllers.cron_controller import EventMatchstatsDo, EventMatchstatsEnqueu
 from controllers.cron_controller import FinalMatchesRepairDo
 from controllers.cron_controller import YearInsightsEnqueue, YearInsightsDo, OverallInsightsEnqueue, OverallInsightsDo, TypeaheadCalcEnqueue, TypeaheadCalcDo
 from controllers.cron_controller import UpcomingNotificationDo
+from controllers.test_notification_controller import TestNotificationController
 
 from controllers.firebase_controller import FirebasePushDo
 
@@ -76,6 +77,7 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/math/enqueue/typeaheadcalc', TypeaheadCalcEnqueue),
                                ('/tasks/math/do/typeaheadcalc', TypeaheadCalcDo),
                                ('/tasks/posts/firebase_push', FirebasePushDo),
-                               ('/tasks/notifications/upcoming_match', UpcomingNotificationDo)
+                               ('/tasks/notifications/upcoming_match', UpcomingNotificationDo),
+                               ('/tasks/test_notification/([0-9]+)', TestNotificationController)
                                ],
                               debug=tba_config.DEBUG)

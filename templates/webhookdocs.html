@@ -69,6 +69,10 @@
               <li>“scheduled_time”: time that the match was originally scheduled for, in UNIX UTC</li>
               <li>“predicted_time”: time that the match is predicted to start at based on the times that scores were posted for previous events, in UNIX UTC</li></ul></li>
             </ul>
+        {% if types.upcoming_match in enabled %}
+        <h4>Test Notification</h4>
+            <a href="/tasks/test_notification/{{types.upcoming_match}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Upcoming Match</a>
+        {% endif %}
 
         <h3 id="notification_match_score">Match Score Notification</h3>
           <p>This notification is sent every time a match score at a live event is updated.</p>
@@ -79,6 +83,10 @@
                 <li>“event_name”</li>
                 <li>“match”: a full match model representing the appropriate match</li></ul></li>
             </ul>
+        {% if types.match_score in enabled %}
+        <h4>Test Notification</h4>
+            <a href="/tasks/test_notification/{{types.match_score}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Match Score</a>
+        {% endif %}
 
         <h3 id="notification_level_starting">Competition Level Starting Notification</h3>
           <p>This notification is sent at the same time as <a class="smooth-scroll" href="#notification_upcoming_match">Upcoming Match Notifications</a> are. If the next upcoming match is of a different type (qual, quarterfinal, semifinal, etc.), then this notification will also be sent out.</p>
@@ -91,6 +99,10 @@
                 <li>“comp_level”: One of <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/master/models/match.py#L19">these types</a>
                 <li>“scheduled_time”: the time that the specified comp level is scheduled to start</li></ul></li>
               </ul>
+        {% if types.level_starting in enabled %}
+        <h4>Test Notification</h4>
+            <a href="/tasks/test_notification/{{types.level_starting}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Level Starting</a>
+        {% endif %}
 
         <h3 id="notification_alliance_selection">Alliance Selection Notification</h3>
           <p>This notification is sent out every time the alliances at a live event are updated</p>
@@ -100,6 +112,11 @@
               <li>fields in “message_data” object<ul>
                 <li>“event”: full event model for the related event</li></ul></li>
             </ul>
+        {% if types.alliance_selection in enabled %}
+        <h4>Test Notification</h4>
+            <a href="/tasks/test_notification/{{types.alliance_selection}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Alliance Selection</a>
+        {% endif %}
+
         <h3 id="notification_awards">Awards Posted Notification</h3>
           <p>This notification is sent every time an award is added at a live event</p>
           <h4>Structure</h4>
@@ -112,6 +129,11 @@
                   <li>“team_key”: Key of winning team</li>
                   <li>“team_name”: Name of winning team</li></ul></li></ul></li>
             </ul>
+        {% if types.awards_posted in enabled %}
+        <h4>Test Notification</h4>
+            <a href="/tasks/test_notification/{{types.awards_posted}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Awards</a>
+        {% endif %}
+
         <h3 id="notification_media_posted">Team Media Posted Notification</h3>
           <p>This notification is sent out whenever new team media is posted (can be either photos or videos).</p>
           <h4>Structure</h4>
@@ -122,6 +144,11 @@
                 <li>“team_name”</li>
                 <li>“media_type”: One of <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/media_type.py">these media types</a>.</li></ul></li>
             </ul>
+        {% if types.media_posted in enabled %}
+        <h4>Test Notification</h4>
+            <a href="/tasks/test_notification/{{types.media_posted}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Media</a>
+        {% endif %}
+
         <h3 id="notification_district_points">District Points Updated Notification</h3>
           <p>This notification is sent when points are recalculated for a district</p>
           <h4>Structure</h4>
@@ -131,6 +158,11 @@
                 <li>“district_key”</li>
                 <li>“district_name”</li></ul></li>
             </ul>
+        {% if types.disrict_points_updated in enabled %}
+        <h4>Test Notification</h4>
+            <a href="/tasks/test_notification/{{types.district_points_updated}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test District Points</a>
+        {% endif %}
+
         <h3 id="notification_schedule_updated">Event Schedule Updated</h3>
           <p>This notification is sent when new unplayed matches are added to a live event.</p>
           <h4>Structure</h4>
@@ -141,6 +173,11 @@
               <li>“event_name”</li>
               <li>“first_match_time” (optional)</li></ul></li>
           </ul>
+        {% if types.schedule_updated in enabled %}
+        <h4>Test Notification</h4>
+            <a href="/tasks/test_notification/{{types.schedule_updated}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Schedule Update</a>
+        {% endif %}
+
         <h3 id="notification_final_results">Final Results Notification</h3>
           <p>This notification is sent upon the conclusion of a live event</p>
           <h4>Structure</h4>
@@ -152,6 +189,11 @@
                 <li>“event_key”</li>
                 <li>“event_name”</li></ul></li>
             </ul>
+        {% if types.final_results in enabled %}
+        <h4>Test Notification</h4>
+            <a href="/tasks/test_notification/{{types.final_results}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Final Results</a>
+        {% endif %}
+
         <h3 id="notification_ping">Ping Notification</h3>
           <p>This notification is sent from the <a href="http://www.thebluealliance.com/account">Account Overview</a> page to an individual one of the user's connected devices.</p>
           <h4>Structure</h4>

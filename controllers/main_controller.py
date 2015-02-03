@@ -11,6 +11,7 @@ import tba_config
 
 from base_controller import CacheableHandler
 from consts.event_type import EventType
+from consts.notification_type import NotificationType
 from helpers.event_helper import EventHelper
 
 from models.event import Event
@@ -370,8 +371,10 @@ class WebhookDocumentationHandler(CacheableHandler):
 
     def __init__(self, *args, **kw):
         super(WebhookDocumentationHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 *24 * 7
+        self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
+        self.template_values['enabled'] = NotificationType.enabled_notifications
+        self.template_values['types'] = NotificationType.types
         path = os.path.join(os.path.dirname(__file__), "../templates/webhookdocs.html")
         return template.render(path, self.template_values)

@@ -106,9 +106,7 @@ class PushHelper(object):
         return output
 
     @classmethod
-    def get_client_ids_for_users(cls, user_list, os_types=None ):
-        if os_types is None:
-            os_types = ClientType.names.keys()
+    def get_client_ids_for_users(cls, user_list, os_types=ClientType.names.keys() ):
         output = defaultdict(list)
         clients = MobileClient.query(MobileClient.user_id.IN(user_list), MobileClient.client_type.IN(os_types), MobileClient.verified==True).fetch()
         for client in clients:
