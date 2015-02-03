@@ -1,3 +1,4 @@
+import calendar
 import datetime
 
 from consts.notification_type import NotificationType
@@ -17,8 +18,8 @@ class UpcomingMatchNotification(BaseNotification):
         data['message_data']['event_name'] = self.event.name
         data['message_data']['match_key'] = self.match.key_name
         data['message_data']['team_keys'] = self.match.team_key_names
-        data['message_data']['scheduled_time'] = str(self.match.time)
-        data['message_data']['predicted_time'] = str(self.match.time)  # TODO Add in some time predictions
+        data['message_data']['scheduled_time'] = calendar.timegm(self.match.time.utctimetuple())
+        data['message_data']['predicted_time'] = calendar.timegm(self.match.time.utctimetuple())  # TODO Add in some time predictions
         return data
 
     def render(self, client_types):
