@@ -100,9 +100,9 @@
                 <li>“comp_level”: One of <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/master/models/match.py#L19">these types</a>
                 <li>“scheduled_time”: the time that the specified comp level is scheduled to start</li></ul></li>
               </ul>
-        {% if types.level_starting in enabled %}
+        {% if types.starting_comp_level in enabled %}
         <h4>Test Notification</h4>
-            <a href="/tasks/test_notification/{{types.level_starting}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Level Starting</a>
+            <a href="/tasks/test_notification/{{types.starting_comp_level}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Level Starting</a>
         {% endif %}
 
         <h3 id="notification_alliance_selection">Alliance Selection Notification</h3>
