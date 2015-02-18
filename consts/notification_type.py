@@ -76,7 +76,7 @@ class NotificationType(object):
         UPCOMING_MATCH: render_names[UPCOMING_MATCH],
         MATCH_SCORE: render_names[MATCH_SCORE],
         LEVEL_STARTING: render_names[LEVEL_STARTING],
-        # ALLIANCE_SELECTION: render_names[ALLIANCE_SELECTION],
+        ALLIANCE_SELECTION: render_names[ALLIANCE_SELECTION],
         AWARDS: render_names[AWARDS],
         SCHEDULE_UPDATED: render_names[SCHEDULE_UPDATED],
     }
