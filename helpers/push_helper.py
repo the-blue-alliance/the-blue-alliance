@@ -53,7 +53,7 @@ class PushHelper(object):
         if Account.get_by_id(user_id) is None:
             # Create an account for this user
             nickname = user_email.split('@')[0]
-            Account(id=user_id, email=user_email, nickname=nickname, display_name=nickname, registered = False).put()
+            Account(id=user_id, email=user_email, nickname=nickname, display_name=nickname, registered=False).put()
 
         return user_id
 
@@ -105,14 +105,26 @@ class PushHelper(object):
         return output
 
     @classmethod
-    def get_client_ids_for_users(cls, user_list, os_types=None ):
+    def get_users_subscribed_for_alliances(cls, event, notification):
+        keys = []
+        for team in event.alliance_teams:
+            keys.append(team)
+            keys.append("{}_{}".format(event.key_name, team))  # team@event key
+        keys.append("{}*".format(event.year))  # key for all events in year
+        keys.append(event.key_name)
+        users = Subscription.query(Subscription.model_key.IN(keys), Subscription.notification_types == notification).fetch()
+        output = [user.user_id for user in users]
+        return output
+
+    @classmethod
+    def get_client_ids_for_users(cls, user_list, os_types=None):
         if os_types is None:
             os_types = ClientType.names.keys()
         output = defaultdict(list)
-        clients = MobileClient.query(MobileClient.user_id.IN(user_list), MobileClient.client_type.IN(os_types), MobileClient.verified==True).fetch()
+        clients = MobileClient.query(MobileClient.user_id.IN(user_list), MobileClient.client_type.IN(os_types), MobileClient.verified == True).fetch()
         for client in clients:
             if client.client_type == ClientType.WEBHOOK:
-                output[client.client_type].append( (client.messaging_id, client.secret) )
+                output[client.client_type].append((client.messaging_id, client.secret))
             else:
                 output[client.client_type].append(client.messaging_id)
         return output

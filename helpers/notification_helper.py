@@ -11,7 +11,7 @@ from models.event import Event
 from notifications.alliance_selections import AllianceSelectionNotification
 from notifications.level_starting import CompLevelStartingNotification
 from notifications.match_score import MatchScoreNotification
-from notifications.awards_updated import AwardsUpdatedNotification 
+from notifications.awards_updated import AwardsUpdatedNotification
 from notifications.schedule_updated import ScheduleUpdatedNotification
 from notifications.upcoming_match import UpcomingMatchNotification
 from notifications.update_favorites import UpdateFavoritesNotification
@@ -57,7 +57,7 @@ class NotificationHelper(object):
             next_match = MatchHelper.upcomingMatches(matches, num=1)
             if next_match[0] and not next_match[0].push_sent:
                 match = next_match[0]
-                if match.time is None or (now.day == match.time.day and match.time + datetime.timedelta(minutes=-15) <=  now):
+                if match.time is None or (now.day == match.time.day and match.time + datetime.timedelta(minutes=-15) <= now):
                     # Only send notifications for matches happening on this day and no more than 15 minutes before it's scheduled to start
                     # Unless, the match has no time info. Then #yolo and send it
                     users = PushHelper.get_users_subscribed_to_match(match, NotificationType.UPCOMING_MATCH)
@@ -74,7 +74,7 @@ class NotificationHelper(object):
                     notification.send(keys)
 
     @classmethod
-    def send_schedule_update(cls, event): 
+    def send_schedule_update(cls, event):
         users = PushHelper.get_users_subscribed_to_event(event, NotificationType.SCHEDULE_UPDATED)
         keys = PushHelper.get_client_ids_for_users(users)
 
@@ -83,7 +83,7 @@ class NotificationHelper(object):
 
     @classmethod
     def send_alliance_update(cls, event):
-        users = PushHelper.get_users_subscribed_to_event(event, NotificationType.ALLIANCE_SELECTION)
+        users = PushHelper.get_users_subscribed_for_alliances(event, NotificationType.ALLIANCE_SELECTION)
         keys = PushHelper.get_client_ids_for_users(users)
 
         notification = AllianceSelectionNotification(event)
@@ -96,7 +96,6 @@ class NotificationHelper(object):
 
         notification = AwardsUpdatedNotification(event)
         notification.send(keys)
-
 
     @classmethod
     def verify_webhook(cls, url, secret):

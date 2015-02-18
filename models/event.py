@@ -75,6 +75,18 @@ class Event(ndb.Model):
         return self._alliance_selections
 
     @property
+    def alliance_teams(self):
+        """
+        Load a list of team keys playing in elims
+        """
+        alliances = self.alliance_selections
+        teams = []
+        for alliance in alliances:
+            for pick in alliance['picks']:
+                teams.append(pick)
+        return teams
+
+    @property
     def awards(self):
         # This import is ugly, and maybe all the models should be in one file again -gregmarra 20121006
         from models.award import Award
