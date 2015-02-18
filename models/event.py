@@ -53,6 +53,7 @@ class Event(ndb.Model):
         self._rankings = None
         self._teams = None
         self._webcast = None
+        self._updated_attrs = []  # Used in EventManipulator to track what changed
         super(Event, self).__init__(*args, **kw)
 
     @ndb.tasklet
