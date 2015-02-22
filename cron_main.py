@@ -26,6 +26,9 @@ from controllers.cron_controller import YearInsightsEnqueue, YearInsightsDo, Ove
 
 from controllers.firebase_controller import FirebasePushDo
 
+from controllers.admin.admin_cron_controller import AdminMobileClearEnqueue, AdminMobileClear, AdminSubsClearEnqueue, AdminSubsClear, \
+    AdminWebhooksClearEnqueue, AdminWebhooksClear
+
 
 app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackupEventsEnqueue),
                                ('/tasks/enqueue/csv_backup_events/([0-9]*)', TbaCSVBackupEventsEnqueue),
@@ -75,5 +78,11 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/math/enqueue/typeaheadcalc', TypeaheadCalcEnqueue),
                                ('/tasks/math/do/typeaheadcalc', TypeaheadCalcDo),
                                ('/tasks/posts/firebase_push', FirebasePushDo),
+                               ('/tasks/admin/enqueue/clear_mobile_duplicates', AdminMobileClearEnqueue),
+                               ('/tasks/admin/clear_mobile_duplicates', AdminMobileClear),
+                               ('/tasks/admin/enqueue/clear_old_subs', AdminSubsClearEnqueue),
+                               ('/tasks/admin/clear_old_subs', AdminSubsClear),
+                               ('/tasks/admin/enqueue/clear_old_webhooks', AdminWebhooksClearEnqueue),
+                               ('/tasks/admin/clear_old_webhooks', AdminWebhooksClear),
                                ],
                               debug=tba_config.DEBUG)
