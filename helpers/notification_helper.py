@@ -62,8 +62,8 @@ class NotificationHelper(object):
             if next_match[0] and not next_match[0].push_sent:
                 # Only continue sending for the next match if a push hasn't already been sent for it
                 match = next_match[0]
-                if match.time is None or match.time + datetime.timedelta(minutes=-15) <= now:
-                    # Only send notifications for matches no more than 15 minutes before it's scheduled to start
+                if match.time is None or match.time + datetime.timedelta(minutes=-7) <= now:
+                    # Only send notifications for matches no more than 7 minutes (average-ish match cycle time) before it's scheduled to start
                     # Unless, the match has no time info. Then #yolo and send it
                     users = PushHelper.get_users_subscribed_to_match(match, NotificationType.UPCOMING_MATCH)
                     keys = PushHelper.get_client_ids_for_users(users)
