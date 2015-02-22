@@ -29,5 +29,5 @@ else:
         "firebase-url": "https://thebluealliance.firebaseio.com/{}.json?auth={}"
     }
 
-CONFIG['landing_handler'] = BUILDSEASON
+CONFIG['landing_handler'] = COMPETITIONSEASON
 CONFIG["static_resource_version"] = 7
