@@ -1,4 +1,4 @@
-var eventsRef = new Firebase('https://thebluealliance.firebaseio.com/events/');
+var eventsRef = new Firebase('https://thebluealliance-dev.firebaseio.com/events/');
 
 eventsRef.on('child_changed', function(snapshot) {
   updateMatchbar(snapshot);
@@ -21,8 +21,36 @@ function updateMatchbar(snapshot) {
     return;
   }
 
-  var upcoming_matches = event_data.upcoming_matches;
-  var last_matches = event_data.last_matches;
+  var matches = event_data.matches;
+
+  var matches_list = [];
+  for (match_key in matches) {
+    var match = matches[match_key];
+    match.key_name = match_key;
+    matches_list.push(match);
+  }
+  matches_list.sort(function(match1, match2){return match1.order - match2.order});
+
+  var upcoming_matches = [];
+  var last_matches = [];
+  for (var i=0; i<matches_list.length; i++) {
+    var match = matches_list[i];
+
+    if (match.alliances.red.score == -1 || match.alliances.blue.score == -1) {
+      upcoming_matches.push(match);
+    } else {
+      if (match.alliances.red.score > match.alliances.blue.score) {
+        match.winning_alliance = 'red';
+      } else if (match.alliances.red.score > match.alliances.blue.score) {
+        match.winning_alliance = 'blue';
+      } else {
+        match.winning_alliance = '';
+      }
+      last_matches.push(match);
+    }
+  }
+  last_matches.reverse();
+
   var match_bar = $('.' + event_key + '_matches');
 
   match_bar.each(function() { // Because the user might have more than 1 view of a given event open

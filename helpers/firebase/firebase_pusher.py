@@ -31,7 +31,8 @@ class FirebasePusher(object):
                 'match_number': match.match_number,
                 'set_number': match.set_number,
                 'alliances': match.alliances,
-                'winning_alliance': match.winning_alliance}
+                'winning_alliance': match.winning_alliance,
+                'order': match.play_order}
 
     @classmethod
     def update_match(cls, match):
