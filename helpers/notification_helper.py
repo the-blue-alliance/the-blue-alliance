@@ -10,6 +10,7 @@ from models.event import Event
 
 from notifications.alliance_selections import AllianceSelectionNotification
 from notifications.level_starting import CompLevelStartingNotification
+from notifications.broadcast import BroadcastNotification
 from notifications.match_score import MatchScoreNotification
 from notifications.awards_updated import AwardsUpdatedNotification
 from notifications.schedule_updated import ScheduleUpdatedNotification
@@ -49,16 +50,20 @@ class NotificationHelper(object):
         notification.send(clients)
 
     @classmethod
-    def send_upcoming(cls, live_events):
-        from helpers.match_helper import MatchHelper
+    def send_upcoming_matches(cls, live_events):
+        from helpers.match_helper import MatchHelper  # PJL: Hacky :P
+        # Causes circular import, otherwise
+        # https://github.com/the-blue-alliance/the-blue-alliance/pull/1098#discussion_r25128966
+
         now = datetime.datetime.utcnow()
         for event in live_events:
             matches = event.matches
             next_match = MatchHelper.upcomingMatches(matches, num=1)
             if next_match[0] and not next_match[0].push_sent:
+                # Only continue sending for the next match if a push hasn't already been sent for it
                 match = next_match[0]
-                if match.time is None or (now.day == match.time.day and match.time + datetime.timedelta(minutes=-15) <= now):
-                    # Only send notifications for matches happening on this day and no more than 15 minutes before it's scheduled to start
+                if match.time is None or match.time + datetime.timedelta(minutes=-15) <= now:
+                    # Only send notifications for matches no more than 15 minutes before it's scheduled to start
                     # Unless, the match has no time info. Then #yolo and send it
                     users = PushHelper.get_users_subscribed_to_match(match, NotificationType.UPCOMING_MATCH)
                     keys = PushHelper.get_client_ids_for_users(users)
@@ -95,6 +100,13 @@ class NotificationHelper(object):
         keys = PushHelper.get_client_ids_for_users(users)
 
         notification = AwardsUpdatedNotification(event)
+        notification.send(keys)
+
+    def send_broadcast(cls, client_types, title, message, url):
+        users = PushHelper.get_all_mobile_clients(client_types)
+        keys = PushHelper.get_client_ids_for_users(users)
+
+        notification = BroadcastNotification(title, message, url)
         notification.send(keys)
 
     @classmethod

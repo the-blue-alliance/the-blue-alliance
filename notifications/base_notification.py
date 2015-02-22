@@ -5,12 +5,14 @@ from google.appengine.ext import deferred
 from controllers.gcm.gcm import GCMMessage
 from consts.client_type import ClientType
 from helpers.notification_sender import NotificationSender
+from models.sitevar import Sitevar
 
 
 class BaseNotification(object):
 
-    _supported_clients = [ClientType.OS_ANDROID, ClientType.WEBHOOK]    # List of clients this notification type supports (these are default values)
-                                                                        # Can be overridden by subclasses to only send to some types
+    # List of clients this notification type supports (these are default values)
+    # Can be overridden by subclasses to only send to some types
+    _supported_clients = [ClientType.OS_ANDROID, ClientType.WEBHOOK]
 
     """
     Class that acts as a basic notification.
@@ -27,7 +29,13 @@ class BaseNotification(object):
     """
     def render(self, client_types):
         if not isinstance(client_types, list):
+            # Listify client types, if needed
             client_types = [client_types]
+
+        if not self.check_enabled():
+            # Don't send for NotificationTypes that aren't enabled
+            return
+
         for client_type in client_types:
             if client_type == ClientType.OS_ANDROID and ClientType.OS_ANDROID in self.keys:
                 notification = self._render_android()
@@ -41,6 +49,10 @@ class BaseNotification(object):
             elif client_type == ClientType.WEBHOOK and ClientType.WEBHOOK in self.keys and len(self.keys[ClientType.WEBHOOK]) > 0:
                 notification = self._render_webhook()
                 NotificationSender.send_webhook(notification, self.keys[ClientType.WEBHOOK])
+
+    def check_enabled(self):
+        var = Sitevar.get_by_id('notifications.enable')
+        return var is None or var.values_json == "true"
 
     """
     Subclasses should override this method and return a dict containing the payload of the notification.

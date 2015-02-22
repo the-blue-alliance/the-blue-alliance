@@ -15,7 +15,7 @@ class NotificationType(object):
     SCHEDULE_UPDATED = 7
     FINAL_RESULTS = 8
     PING = 9  # This type of message is sent when the user hits 'ping device' in their account overview
-    BROADCAST = 10  # Not yet implemented, but gives functionality for admins to send to many devices
+    BROADCAST = 10  # Gives functionality for admins to send to many devices
 
     # These aren't notifications, but used for upstream API calls
     UPDATE_FAVORITES = 100

@@ -129,3 +129,13 @@ class PushHelper(object):
             else:
                 output[client.client_type].append(client.messaging_id)
         return output
+
+    @classmethod
+    def get_all_mobile_clients(cls, client_types=[]):
+        output = []
+        if client_types == []:
+            return output
+        clients = MobileClient.query(MobileClient.client_type.IN(client_types))
+        for user in clients:
+            output.append(user.user_id)
+        return output

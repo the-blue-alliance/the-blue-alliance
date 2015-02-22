@@ -15,11 +15,14 @@ class AwardManipulator(ManipulatorBase):
         return CacheClearer.get_award_cache_keys_and_controllers(affected_refs)
 
     @classmethod
-    def postUpdateHook(cls, awards):
+    def postUpdateHook(cls, awards, updated_attr_list):
+        # Note, updated_attr_list will always be empty, for now
+        # Still needs to be implemented in updateMerge
+        # See helpers.EventManipulator
         events = []
-        for award in awards:
+        for (award, updated_attrs) in zip(awards, updated_attr_list):
             event = award.event
-            if not event in events:
+            if event not in events:
                 events.append(event)
 
         for event in events:

@@ -20,6 +20,7 @@ from helpers.validation_helper import ValidationHelper
 from models.account import Account
 from models.favorite import Favorite
 from models.subscription import Subscription
+from models.sitevar import Sitevar
 
 
 class AccountOverview(LoggedInHandler):
@@ -28,7 +29,14 @@ class AccountOverview(LoggedInHandler):
         # Redirects to registration page if account not registered
         self._require_registration('/account/register')
 
+        push_sitevar = Sitevar.get_by_id('notifications.enable')
+        if push_sitevar is None or not push_sitevar.values_json == "true":
+            ping_enabled = "disabled"
+        else:
+            ping_enabled = ""
+
         self.template_values['webhook_verification_success'] = self.request.get('webhook_verification_success')
+        self.template_values['ping_enabled'] = ping_enabled
 
         path = os.path.join(os.path.dirname(__file__), '../templates/account_overview.html')
         self.response.out.write(template.render(path, self.template_values))
