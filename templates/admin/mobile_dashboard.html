@@ -30,14 +30,14 @@
 <br />
 
 <h2>Enable Notifications</h2>
-  <p>Push notifications are <strong>{{push_enabled}}</strong>.</p>
+  <p>Push notifications are <strong>{{ push_enabled|yesno:"Enabled,Disabled" }}</strong>.</p>
   <div class="btn-group">
     <form method="post">
       <input type="hidden" name="enable" value="true" />
-      <button type="submit" class="btn btn-info" {{disp_enable}}><span class="glyphicon glyphicon-thumbs-up"> Enable</span></button></form>
+      <button type="submit" class="btn btn-info" {{ push_enabled|yesno:"disabled,enabled" }}><span class="glyphicon glyphicon-thumbs-up"> Enable</span></button></form>
     <form method="post">
       <input type="hidden" name="enable" value="false" />
-      <button type="submit" class="btn btn-info" {{disp_disable}}><span class="glyphicon glyphicon-thumbs-down"> Disable</span></button></form>
+      <button type="submit" class="btn btn-info" {{ push_enabled|yesno:"enabled,disabled" }}><span class="glyphicon glyphicon-thumbs-down"> Disable</span></button></form>
   </div>
 
 <h2>Connected Devices</h2>

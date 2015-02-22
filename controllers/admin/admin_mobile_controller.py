@@ -26,13 +26,9 @@ class AdminMobile(LoggedInHandler):
 
         var = Sitevar.get_by_id('notifications.enable')
         if var is None or not var.values_json == "true":
-            push_enabled = "disabled"
-            disp_enable = ""
-            disp_disable = "disabled"
+            push_enabled = False
         else:
-            push_enabled = "enabled"
-            disp_enable = "disabled"
-            disp_disable = ""
+            push_enabled = True
 
         self.template_values.update({
             'mobile_users': all_clients.count(),
@@ -41,8 +37,6 @@ class AdminMobile(LoggedInHandler):
             'webhooks': webhook,
             'broadcast_success': self.request.get('broadcast_success'),
             'push_enabled': push_enabled,
-            'disp_enable': disp_enable,
-            'disp_disable': disp_disable,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/mobile_dashboard.html')
