@@ -51,7 +51,10 @@ class NotificationHelper(object):
 
     @classmethod
     def send_upcoming_matches(cls, live_events):
-        from helpers.match_helper import MatchHelper
+        from helpers.match_helper import MatchHelper  # PJL: Hacky :P
+        # Causes circular import, otherwise
+        # https://github.com/the-blue-alliance/the-blue-alliance/pull/1098#discussion_r25128966
+
         now = datetime.datetime.utcnow()
         for event in live_events:
             matches = event.matches
