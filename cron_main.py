@@ -88,6 +88,5 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/admin/clear_old_subs', AdminSubsClear),
                                ('/tasks/admin/enqueue/clear_old_webhooks', AdminWebhooksClearEnqueue),
                                ('/tasks/admin/clear_old_webhooks', AdminWebhooksClear),
->>>>>>> more-notifications
                                ],
                               debug=tba_config.DEBUG)
