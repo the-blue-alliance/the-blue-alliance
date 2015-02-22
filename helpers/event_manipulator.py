@@ -26,7 +26,6 @@ class EventManipulator(ManipulatorBase):
                     # Send updated alliances notification
                     logging.info("Sending alliance notifications for {}".format(event.key_name))
                     NotificationHelper.send_alliance_update(event)
-                    pass
             except Exception:
                 logging.error("Error sending alliance update notification for {}".format(event.key_name))
                 logging.error(traceback.format_exc())

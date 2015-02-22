@@ -29,7 +29,7 @@ class MatchManipulator(ManipulatorBase):
         # Note, updated_attr_list will always be empty, for now
         # Still needs to be implemented in updateMerge
         # See helpers.EventManipulator
-        unplayed_matches = []
+        unplayed_match_events = []
         for (match, updated_attrs) in zip(matches, updated_attr_list):
             event = match.event.get()
             if event.now and match.has_been_played:
@@ -39,13 +39,13 @@ class MatchManipulator(ManipulatorBase):
                 except Exception, exception:
                     logging.error("Error sending match updates: {}".format(exception))
                     logging.error(traceback.format_exc())
-            elif not match.has_been_played and event not in unplayed_matches:
-                unplayed_matches.append(event)
+            elif not match.has_been_played and event not in unplayed_match_events:
+                unplayed_match_events.append(event)
 
         '''
         If we have an unplayed match, send out a schedule update notification
         '''
-        for event in unplayed_matches:
+        for event in unplayed_match_events:
             try:
                 logging.info("Sending schedule updates for: {}".format(event.key_name))
                 NotificationHelper.send_schedule_update(event)
