@@ -20,26 +20,28 @@ class MatchManipulator(ManipulatorBase):
         return CacheClearer.get_match_cache_keys_and_controllers(affected_refs)
 
     @classmethod
-    def postUpdateHook(cls, matches):
+    def postUpdateHook(cls, matches, updated_attr_list):
         '''
         To run after the match has been updated.
         Send push notifications to subscribed users
         Only if the match is part of an active event
         '''
+        # Note, updated_attr_list will always be empty, for now
+        # Still needs to be implemented in updateMerge
+        # See helpers.EventManipulator
         unplayed_matches = []
-        for match in matches:
+        for (match, updated_attrs) in zip(matches, updated_attr_list):
             event = match.event.get()
             if event.now and match.has_been_played:
-                logging.info("Sending push notifications for "+match.key_name)
+                logging.info("Sending push notifications for {}".format(match.key_name))
                 try:
                     NotificationHelper.send_match_score_update(match)
                 except Exception, exception:
-                    logging.error("Error sending match updates: "+str(exception))
+                    logging.error("Error sending match updates: {}".format(exception))
                     logging.error(traceback.format_exc())
-            elif not match.has_been_played and not event in unplayed_matches:
+            elif not match.has_been_played and event not in unplayed_matches:
                 unplayed_matches.append(event)
 
-        
         '''
         If we have an unplayed match, send out a schedule update notification
         '''
@@ -62,8 +64,8 @@ class MatchManipulator(ManipulatorBase):
 
             # Enqueue task to calculate matchstats
             taskqueue.add(
-                    url='/tasks/math/do/event_matchstats/' + event_key,
-                    method='GET')
+                url='/tasks/math/do/event_matchstats/' + event_key,
+                method='GET')
 
     @classmethod
     def updateMerge(self, new_match, old_match, auto_union=True):
