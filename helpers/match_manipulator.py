@@ -19,6 +19,17 @@ class MatchManipulator(ManipulatorBase):
         return CacheClearer.get_match_cache_keys_and_controllers(affected_refs)
 
     @classmethod
+    def postDeleteHook(cls, matches):
+        '''
+        To run after the match has been deleted.
+        '''
+        for match in matches:
+            try:
+                FirebasePusher.delete_match(match)
+            except Exception:
+                logging.warning("Enqueuing Firebase delete failed!")
+
+    @classmethod
     def postUpdateHook(cls, matches):
         '''
         To run after the match has been updated.
@@ -37,13 +48,12 @@ class MatchManipulator(ManipulatorBase):
         Enqueue firebase push
         '''
         event_keys = set()
-        if matches:
-            for match in matches:
-                event_keys.add(match.event.id())
-                try:
-                    FirebasePusher.update_match(match)
-                except Exception:
-                    logging.warning("Enqueuing Firebase push failed!")
+        for match in matches:
+            event_keys.add(match.event.id())
+            try:
+                FirebasePusher.update_match(match)
+            except Exception:
+                logging.warning("Enqueuing Firebase push failed!")
 
         # Enqueue task to calculate matchstats
         for event_key in event_keys:

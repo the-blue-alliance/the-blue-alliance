@@ -10,18 +10,25 @@ from models.sitevar import Sitevar
 
 
 class FirebasePusher(object):
-    SUCCESS_STATUS_CODES = {200, 204}
-
     @classmethod
-    def _put_data(cls, key, data_json):
+    def _get_secret(cls):
         firebase_secrets = Sitevar.get_by_id("firebase.secrets")
         if firebase_secrets is None:
             raise Exception("Missing sitevar: firebase.secrets. Can't write to Firebase.")
-        FIREBASE_SECRET = firebase_secrets.contents['FIREBASE_SECRET']
+        return firebase_secrets.contents['FIREBASE_SECRET']
 
-        url = tba_config.CONFIG['firebase-url'].format(key, FIREBASE_SECRET)
-        result = urlfetch.fetch(url, data_json, 'PUT')
-        if result.status_code not in cls.SUCCESS_STATUS_CODES:
+    @classmethod
+    def _delete_data(cls, key):
+        url = tba_config.CONFIG['firebase-url'].format(key, cls._get_secret())
+        result = urlfetch.fetch(url, method='DELETE')
+        if result.status_code != 204:
+            logging.warning("Error deleting data from Firebase: {}. ERROR {}: {}".format(url, result.status_code, result.content))
+
+    @classmethod
+    def _put_data(cls, key, data_json):
+        url = tba_config.CONFIG['firebase-url'].format(key, cls._get_secret())
+        result = urlfetch.fetch(url, payload=data_json, method='PUT')
+        if result.status_code != 200:
             logging.warning("Error pushing data to Firebase: {}; {}. ERROR {}: {}".format(url, data_json, result.status_code, result.content))
 
     @classmethod
@@ -33,6 +40,12 @@ class FirebasePusher(object):
                 'alliances': match.alliances,
                 'winning_alliance': match.winning_alliance,
                 'order': match.play_order}
+
+    @classmethod
+    def delete_match(cls, match):
+        payload_key = 'events/{}/matches/{}'.format(match.event.id(), match.key_name)
+
+        deferred.defer(cls._delete_data, payload_key, _queue="firebase")
 
     @classmethod
     def update_match(cls, match):
