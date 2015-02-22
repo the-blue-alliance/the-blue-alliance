@@ -453,4 +453,4 @@ class UpcomingNotificationDo(webapp.RequestHandler):
     """
     def get(self):
         live_events = EventHelper.getEventsWithinADay()
-        NotificationHelper.send_upcoming(live_events)
+        NotificationHelper.send_upcoming_matches(live_events)
