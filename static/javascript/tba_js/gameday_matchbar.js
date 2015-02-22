@@ -39,13 +39,6 @@ function updateMatchbar(snapshot) {
     if (match.alliances.red.score == -1 || match.alliances.blue.score == -1) {
       upcoming_matches.push(match);
     } else {
-      if (match.alliances.red.score > match.alliances.blue.score) {
-        match.winning_alliance = 'red';
-      } else if (match.alliances.red.score > match.alliances.blue.score) {
-        match.winning_alliance = 'blue';
-      } else {
-        match.winning_alliance = '';
-      }
       last_matches.push(match);
     }
   }
