@@ -30,11 +30,12 @@ class EventManipulator(ManipulatorBase):
                 logging.error("Error sending alliance update notification for {}".format(event.key_name))
                 logging.error(traceback.format_exc())
 
-            try:
-                event.timezone_id = EventHelper.get_timezone_id(event.location, event.key.id())
-                cls.createOrUpdate(event, run_post_update_hook=False)
-            except Exception:
-                logging.warning("Timezone update for event {} failed!".format(event.key_name))
+            if event.within_a_day:
+                try:
+                    event.timezone_id = EventHelper.get_timezone_id(event.location, event.key.id())
+                    cls.createOrUpdate(event, run_post_update_hook=False)
+                except Exception:
+                    logging.warning("Timezone update for event {} failed!".format(event.key_name))
 
     @classmethod
     def updateMerge(self, new_event, old_event, auto_union=True):

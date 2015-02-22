@@ -26,10 +26,11 @@ class AwardManipulator(ManipulatorBase):
                 events.append(event)
 
         for event in events:
-            try:
-                NotificationHelper.send_award_update(event.get())
-            except Exception:
-                logging.error("Error sending award update for {}".format(event.id()))
+            if event.within_a_day:
+                try:
+                    NotificationHelper.send_award_update(event.get())
+                except Exception:
+                    logging.error("Error sending award update for {}".format(event.id()))
 
     @classmethod
     def updateMerge(self, new_award, old_award, auto_union=True):
