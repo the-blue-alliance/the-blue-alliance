@@ -1,3 +1,5 @@
+import calendar
+
 from consts.notification_type import NotificationType
 from notifications.base_notification import BaseNotification
 
@@ -13,5 +15,9 @@ class ScheduleUpdatedNotification(BaseNotification):
         data['message_data'] = {}
         data['message_data']['event_key'] = self.event.key_name
         data['message_data']['event_name'] = self.event.name
-        data['message_data']['first_match_time'] = self.event.matches[0].time
+        if self.event.matches[0] and self.event.matches[0].time:
+            data['message_data']['first_match_time'] = calendar.timegm(self.event.matches[0].time.utctimetuple())
+        else:
+            data['message_data']['first_match_time'] = None
+
         return data

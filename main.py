@@ -10,16 +10,17 @@ from controllers.event_controller import EventList, EventDetail, EventRss
 from controllers.gameday2_controller import Gameday2Controller
 from controllers.insights_controller import InsightsOverview, InsightsDetail
 from controllers.main_controller import ContactHandler, HashtagsHandler, \
-      MainKickoffHandler, MainBuildseasonHandler, MainChampsHandler, MainCompetitionseasonHandler, \
-      MainInsightsHandler, MainOffseasonHandler, OprHandler, SearchHandler, \
-      AboutHandler, ThanksHandler, PageNotFoundHandler, InternalServerErrorHandler, \
-      GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler, WebhookDocumentationHandler
+    MainKickoffHandler, MainBuildseasonHandler, MainChampsHandler, MainCompetitionseasonHandler, \
+    MainInsightsHandler, MainOffseasonHandler, OprHandler, SearchHandler, \
+    AboutHandler, ThanksHandler, PageNotFoundHandler, InternalServerErrorHandler, \
+    GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler, WebhookDocumentationHandler
 from controllers.match_controller import MatchDetail
 from controllers.notification_controller import UserNotificationBroadcast
 from controllers.district_controller import DistrictDetail
 from controllers.suggestions.suggest_match_video_controller import SuggestMatchVideoController
 from controllers.suggestions.suggest_event_webcast_controller import SuggestEventWebcastController
 from controllers.suggestions.suggest_team_media_controller import SuggestTeamMediaController
+from controllers.test_notification_controller import TestNotificationController
 from controllers.team_controller import TeamList, TeamCanonical, TeamDetail, TeamHistory
 from controllers.webhook_controller import WebhookAdd, WebhookDelete, WebhookVerify, WebhookVerificationSend
 
@@ -66,6 +67,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/logout', AccountLogout, 'account-logout', strict_slash=True),
       RedirectRoute(r'/match/<match_key>', MatchDetail, 'match-detail', strict_slash=True),
       RedirectRoute(r'/notifications/broadcast', UserNotificationBroadcast, 'notification-broadcast', strict_slash=True),
+      RedirectRoute(r'/notifications/test/<type:[0-9]+>', TestNotificationController, 'test-notifications', strict_slash=True),
       RedirectRoute(r'/opr', OprHandler, 'opr', strict_slash=True),
       RedirectRoute(r'/record', RecordHandler, 'record', strict_slash=True),
       RedirectRoute(r'/search', SearchHandler, 'search', strict_slash=True),
