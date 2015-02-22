@@ -32,15 +32,20 @@ class MatchManipulator(ManipulatorBase):
         unplayed_match_events = []
         for (match, updated_attrs) in zip(matches, updated_attr_list):
             event = match.event.get()
-            if event.now and match.has_been_played:
-                logging.info("Sending push notifications for {}".format(match.key_name))
-                try:
-                    NotificationHelper.send_match_score_update(match)
-                except Exception, exception:
-                    logging.error("Error sending match updates: {}".format(exception))
-                    logging.error(traceback.format_exc())
-            elif not match.has_been_played and event not in unplayed_match_events:
-                unplayed_match_events.append(event)
+            if event.now:
+                if match.has_been_played:
+                    # There is a score update for this match, push a notification
+                    logging.info("Sending push notifications for {}".format(match.key_name))
+                    try:
+                        NotificationHelper.send_match_score_update(match)
+                    except Exception, exception:
+                        logging.error("Error sending match updates: {}".format(exception))
+                        logging.error(traceback.format_exc())
+                elif not match.has_been_played and event not in unplayed_match_events:
+                    # The match has not been played, so we're changing a different property
+                    # This means the event's schedule has been updated (e.g. we're adding elim matches)
+                    # So send a schedule update notification for the parent event
+                    unplayed_match_events.append(event)
 
         '''
         If we have an unplayed match, send out a schedule update notification
