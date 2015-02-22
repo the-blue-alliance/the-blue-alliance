@@ -18,13 +18,15 @@ class ManipulatorBase(object):
         cls.delete(models)
 
     @classmethod
-    def delete(self, models):
+    def delete(self, models, run_post_delete_hook=True):
         models = filter(None, self.listify(models))
         keys = [model.key for model in models]
         ndb.delete_multi(keys)
         for model in models:
             model.dirty = True
             self._computeAndSaveAffectedReferences(model)
+        if run_post_delete_hook:
+            self.runPostDeleteHook(models)
         self._clearCache(models)
 
     @classmethod
@@ -123,6 +125,15 @@ class ManipulatorBase(object):
         Child classes should replace with method with specific merging logic
         """
         raise NotImplementedError("No updateMerge method!")
+
+    @classmethod
+    def runPostDeleteHook(cls, models):
+        """
+        Asynchronously runs the manipulator's post delete hook if available.
+        """
+        post_delete_hook = getattr(cls, "postDeleteHook", None)
+        if callable(post_delete_hook):
+            deferred.defer(post_delete_hook, models, _queue="post-update-hooks")
 
     @classmethod
     def runPostUpdateHook(cls, models):

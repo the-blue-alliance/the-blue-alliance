@@ -25,8 +25,6 @@ from controllers.cron_controller import FinalMatchesRepairDo
 from controllers.cron_controller import YearInsightsEnqueue, YearInsightsDo, OverallInsightsEnqueue, OverallInsightsDo, TypeaheadCalcEnqueue, TypeaheadCalcDo
 from controllers.cron_controller import UpcomingNotificationDo
 
-from controllers.firebase_controller import FirebasePushDo
-
 from controllers.admin.admin_cron_controller import AdminMobileClearEnqueue, AdminMobileClear, AdminSubsClearEnqueue, AdminSubsClear, \
     AdminWebhooksClearEnqueue, AdminWebhooksClear
 
