@@ -23,6 +23,7 @@ from controllers.cron_controller import EventTeamRepairDo, EventTeamUpdate, Even
 from controllers.cron_controller import EventMatchstatsDo, EventMatchstatsEnqueue
 from controllers.cron_controller import FinalMatchesRepairDo
 from controllers.cron_controller import YearInsightsEnqueue, YearInsightsDo, OverallInsightsEnqueue, OverallInsightsDo, TypeaheadCalcEnqueue, TypeaheadCalcDo
+from controllers.cron_controller import UpcomingNotificationDo
 
 from controllers.admin.admin_cron_controller import AdminMobileClearEnqueue, AdminMobileClear, AdminSubsClearEnqueue, AdminSubsClear, \
     AdminWebhooksClearEnqueue, AdminWebhooksClear
@@ -75,6 +76,8 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/math/do/insights/(.*)/([0-9]*)', YearInsightsDo),
                                ('/tasks/math/enqueue/typeaheadcalc', TypeaheadCalcEnqueue),
                                ('/tasks/math/do/typeaheadcalc', TypeaheadCalcDo),
+                               ('/tasks/posts/firebase_push', FirebasePushDo),
+                               ('/tasks/notifications/upcoming_match', UpcomingNotificationDo)
                                ('/tasks/admin/enqueue/clear_mobile_duplicates', AdminMobileClearEnqueue),
                                ('/tasks/admin/clear_mobile_duplicates', AdminMobileClear),
                                ('/tasks/admin/enqueue/clear_old_subs', AdminSubsClearEnqueue),

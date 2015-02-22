@@ -1,5 +1,6 @@
 import json
 import logging
+import traceback
 
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
@@ -30,19 +31,42 @@ class MatchManipulator(ManipulatorBase):
                 logging.warning("Enqueuing Firebase delete failed!")
 
     @classmethod
-    def postUpdateHook(cls, matches):
+    def postUpdateHook(cls, matches, updated_attr_list):
         '''
         To run after the match has been updated.
         Send push notifications to subscribed users
         Only if the match is part of an active event
         '''
-        for match in matches:
-            if match.event.get().now:
-                logging.info("Sending push notifications for "+match.key_name)
-                try:
-                    NotificationHelper.send_match_score_update(match)
-                except Exception, exception:
-                    logging.error("Error sending match updates: "+str(exception))
+        # Note, updated_attr_list will always be empty, for now
+        # Still needs to be implemented in updateMerge
+        # See helpers.EventManipulator
+        unplayed_match_events = []
+        for (match, updated_attrs) in zip(matches, updated_attr_list):
+            event = match.event.get()
+            if event.within_a_day:
+                if match.has_been_played:
+                    # There is a score update for this match, push a notification
+                    logging.info("Sending push notifications for {}".format(match.key_name))
+                    try:
+                        NotificationHelper.send_match_score_update(match)
+                    except Exception, exception:
+                        logging.error("Error sending match updates: {}".format(exception))
+                        logging.error(traceback.format_exc())
+                elif not match.has_been_played and event not in unplayed_match_events:
+                    # The match has not been played, so we're changing a different property
+                    # This means the event's schedule has been updated (e.g. we're adding elim matches)
+                    # So send a schedule update notification for the parent event
+                    unplayed_match_events.append(event)
+
+        '''
+        If we have an unplayed match during an event within a day, send out a schedule update notification
+        '''
+        for event in unplayed_match_events:
+            try:
+                logging.info("Sending schedule updates for: {}".format(event.key_name))
+                NotificationHelper.send_schedule_update(event)
+            except Exception, exception:
+                logging.error("Eror sending schedule updates for: {}".format(event.key_name))
 
         '''
         Enqueue firebase push
@@ -58,8 +82,8 @@ class MatchManipulator(ManipulatorBase):
         # Enqueue task to calculate matchstats
         for event_key in event_keys:
             taskqueue.add(
-                    url='/tasks/math/do/event_matchstats/' + event_key,
-                    method='GET')
+                url='/tasks/math/do/event_matchstats/' + event_key,
+                method='GET')
 
     @classmethod
     def updateMerge(self, new_match, old_match, auto_union=True):

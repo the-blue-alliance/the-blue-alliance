@@ -18,6 +18,7 @@ from helpers.event_manipulator import EventManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.event_team_repairer import EventTeamRepairer
 from helpers.event_team_updater import EventTeamUpdater
+from helpers.notification_helper import NotificationHelper
 
 from helpers.insight_manipulator import InsightManipulator
 from helpers.team_manipulator import TeamManipulator
@@ -444,3 +445,12 @@ class DistrictPointsCalcDo(webapp.RequestHandler):
         EventManipulator.createOrUpdate(event)
 
         self.response.out.write(event.district_points)
+
+
+class UpcomingNotificationDo(webapp.RequestHandler):
+    """
+    Sends out notifications for upcoming matches
+    """
+    def get(self):
+        live_events = EventHelper.getEventsWithinADay()
+        NotificationHelper.send_upcoming_matches(live_events)

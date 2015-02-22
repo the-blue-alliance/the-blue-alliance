@@ -53,6 +53,7 @@ class Event(ndb.Model):
         self._rankings = None
         self._teams = None
         self._webcast = None
+        self._updated_attrs = []  # Used in EventManipulator to track what changed
         super(Event, self).__init__(*args, **kw)
 
     @ndb.tasklet
@@ -72,6 +73,18 @@ class Event(ndb.Model):
             except Exception, e:
                 self._alliance_selections = None
         return self._alliance_selections
+
+    @property
+    def alliance_teams(self):
+        """
+        Load a list of team keys playing in elims
+        """
+        alliances = self.alliance_selections
+        teams = []
+        for alliance in alliances:
+            for pick in alliance['picks']:
+                teams.append(pick)
+        return teams
 
     @property
     def awards(self):
