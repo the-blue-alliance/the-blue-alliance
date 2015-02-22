@@ -75,8 +75,11 @@ class NotificationHelper(object):
                         level_start = CompLevelStartingNotification(match, event)
                         level_start.send(start_keys)
 
+                    # Send upcoming match notification
                     notification = UpcomingMatchNotification(match, event)
                     notification.send(keys)
+                    match.push_sent = True  # Make sure we don't send updates for this match again
+                    match.put()
 
     @classmethod
     def send_schedule_update(cls, event):

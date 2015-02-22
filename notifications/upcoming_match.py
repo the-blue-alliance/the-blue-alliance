@@ -20,8 +20,3 @@ class UpcomingMatchNotification(BaseNotification):
         data['message_data']['scheduled_time'] = self.match.time
         data['message_data']['predicted_time'] = self.match.time  # TODO Add in some time predictions
         return data
-
-    def render(self, client_types):
-        super(UpcomingMatchNotification, self).render(client_types)
-        self.match.push_sent = True
-        self.match.put()
