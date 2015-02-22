@@ -36,14 +36,17 @@ class MatchManipulator(ManipulatorBase):
         '''
         Enqueue firebase push
         '''
+        event_keys = set()
         if matches:
-            event_key = matches[0].event.id()
-            try:
-                FirebasePusher.updated_event(event_key)
-            except Exception:
-                logging.warning("Enqueuing Firebase push failed!")
+            for match in matches:
+                event_keys.add(match.event.id())
+                try:
+                    FirebasePusher.update_match(match)
+                except Exception:
+                    logging.warning("Enqueuing Firebase push failed!")
 
-            # Enqueue task to calculate matchstats
+        # Enqueue task to calculate matchstats
+        for event_key in event_keys:
             taskqueue.add(
                     url='/tasks/math/do/event_matchstats/' + event_key,
                     method='GET')
