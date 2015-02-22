@@ -1,4 +1,4 @@
-var eventsRef = new Firebase('https://thebluealliance-dev.firebaseio.com/events/');
+var eventsRef = new Firebase('https://thebluealliance.firebaseio.com/events/');
 
 eventsRef.on('child_changed', function(snapshot) {
   updateMatchbar(snapshot);
