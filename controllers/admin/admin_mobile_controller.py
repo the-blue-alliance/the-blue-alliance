@@ -9,6 +9,7 @@ from consts.client_type import ClientType
 from controllers.base_controller import LoggedInHandler
 from helpers.notification_helper import NotificationHelper
 from models.mobile_client import MobileClient
+from models.sitevar import Sitevar
 
 
 class AdminMobile(LoggedInHandler):
@@ -23,16 +24,39 @@ class AdminMobile(LoggedInHandler):
         ios = all_clients.filter(MobileClient.client_type == ClientType.OS_IOS).count()
         webhook = all_clients.filter(MobileClient.client_type == ClientType.WEBHOOK).count()
 
+        var = Sitevar.get_by_id('notifications.enable')
+        if var is None or not var.values_json == "true":
+            push_enabled = False
+        else:
+            push_enabled = True
+
         self.template_values.update({
             'mobile_users': all_clients.count(),
             'android_users': android,
             'ios_users': ios,
             'webhooks': webhook,
             'broadcast_success': self.request.get('broadcast_success'),
+            'push_enabled': push_enabled,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/mobile_dashboard.html')
         self.response.out.write(template.render(path, self.template_values))
+
+    def post(self):
+        self._require_admin()
+
+        user_id = self.user_bundle.account.key.id()
+        action = self.request.get('enable')
+        sitevar = Sitevar.get_or_insert('notifications.enable')
+        if action == "true":
+            sitevar.values_json = "true"
+            logging.info("User {} enabled push notificatios".format(user_id))
+        else:
+            sitevar.values_json = "false"
+            logging.info("User {} disabled push notification".format(user_id))
+        sitevar.put()
+
+        self.redirect('/admin/mobile')
 
 
 class AdminBroadcast(LoggedInHandler):
