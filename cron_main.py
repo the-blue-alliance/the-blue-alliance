@@ -76,7 +76,6 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/math/do/insights/(.*)/([0-9]*)', YearInsightsDo),
                                ('/tasks/math/enqueue/typeaheadcalc', TypeaheadCalcEnqueue),
                                ('/tasks/math/do/typeaheadcalc', TypeaheadCalcDo),
-                               ('/tasks/posts/firebase_push', FirebasePushDo),
                                ('/tasks/notifications/upcoming_match', UpcomingNotificationDo),
                                ('/tasks/admin/enqueue/clear_mobile_duplicates', AdminMobileClearEnqueue),
                                ('/tasks/admin/clear_mobile_duplicates', AdminMobileClear),
