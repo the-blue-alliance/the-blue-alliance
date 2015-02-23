@@ -103,6 +103,26 @@ class EventHelper(object):
             return event.end_date
 
     @classmethod
+    def calculateTeamAvgScoreFromMatches(self, team_key, matches):
+        """
+        Given a team_key and some matches, find the team's average qual and elim score
+        """
+        all_qual_scores = []
+        all_elim_scores = []
+        for match in matches:
+            if match.has_been_played:
+                for alliance in match.alliances.values():
+                    if team_key in alliance['teams']:
+                        if match.comp_level in Match.ELIM_LEVELS:
+                            all_elim_scores.append(alliance['score'])
+                        else:
+                            all_qual_scores.append(alliance['score'])
+                        break
+        qual_avg = float(sum(all_qual_scores)) / len(all_qual_scores) if all_qual_scores != [] else None
+        elim_avg = float(sum(all_elim_scores)) / len(all_elim_scores) if all_elim_scores != [] else None
+        return qual_avg, elim_avg, all_qual_scores, all_elim_scores
+
+    @classmethod
     def calculateTeamWLTFromMatches(self, team_key, matches):
         """
         Given a team_key and some matches, find the Win Loss Tie.

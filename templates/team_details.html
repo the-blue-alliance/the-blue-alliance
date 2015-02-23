@@ -50,6 +50,16 @@
           <h2 id="event-results">Event Results</h2>
           {% if year_wlt %}
             <p>Overall, team {{team.team_number}} was <strong>{{year_wlt.win}}-{{year_wlt.loss}}-{{year_wlt.tie}}</strong> in {{year}}.</p>
+          {% else %}
+            {% if year_qual_avg or year_elim_avg %}
+              <p>Overall, team {{team.team_number}} had
+              {% if year_qual_avg %}an average qual score of <strong>{{year_qual_avg|floatformat:2}}</strong>{% endif %}
+              {% if year_qual_avg and year_elim_avg %}
+                and
+              {% endif %}
+              {% if year_elim_avg %}an average elim score of <strong>{{year_elim_avg|floatformat:2}}</strong>{% endif %}
+              in {{year}}.</p>
+            {% endif %}
           {% endif %}
 
           {% for comp in participation %}
@@ -61,12 +71,23 @@
                   {% if comp.event.start_date %}<span class="glyphicon glyphicon-calendar"></span> {{ comp.event.start_date|date:"M jS" }}{% if comp.event.start_date != comp.event.end_date %} - {{ comp.event.end_date|date:"M jS" }}{% endif %}{{ comp.event.end_date|date:", Y" }}{% endif %}
                 </p>
 
-                {% if comp.wlt or comp.rank or comp.awards %}
+                {% if comp.wlt or comp.rank or comp.awards or comp.qual_avg or comp.elim_avg %}
                 <p>Team {{ team.team_number }}
                   {% if comp.rank %}was <strong>Rank {{ comp.rank }}</strong>{% endif %}
                   {% if comp.wlt %}
-                  {% if comp.rank %}with a record of{% else %}had a record of{% endif %}
-                  <strong>{{comp.wlt.win}}-{{comp.wlt.loss}}-{{comp.wlt.tie}}</strong>
+                    {% if comp.rank %}with a record of{% else %}had a record of{% endif %}
+                    <strong>{{comp.wlt.win}}-{{comp.wlt.loss}}-{{comp.wlt.tie}}</strong>
+                  {% else %}
+                    {% if comp.qual_avg or comp.elim_avg %}
+                      {% if comp.rank %}with{% else %}had{% endif %}
+                      {% if comp.qual_avg %}
+                        an average qual score of <strong>{{comp.qual_avg|floatformat:2}}</strong>
+                      {% endif %}
+                      {% if comp.qual_avg and comp.elim_avg %}and{% endif %}
+                      {% if comp.elim_avg %}
+                        an average elim score of <strong>{{comp.elim_avg|floatformat:2}}</strong>
+                      {% endif %}
+                    {% endif %}
                   {% endif %}
 
                   {% if comp.awards %}
@@ -144,6 +165,6 @@
       </div>
 
     </div>
-  </div>    
+  </div>
 </div>
 {% endblock %}

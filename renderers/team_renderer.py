@@ -29,6 +29,7 @@ class TeamRenderer(object):
 
         participation = []
         year_wlt_list = []
+        year_match_avg_list = []
 
         current_event = None
         matches_upcoming = None
@@ -45,12 +46,20 @@ class TeamRenderer(object):
             if event.within_a_day:
                 short_cache = True
 
-            wlt = EventHelper.calculateTeamWLTFromMatches(team.key_name, event_matches)
-            year_wlt_list.append(wlt)
-            if wlt["win"] + wlt["loss"] + wlt["tie"] == 0:
+            if year == 2015:
                 display_wlt = None
+                match_avg = EventHelper.calculateTeamAvgScoreFromMatches(team.key_name, event_matches)
+                year_match_avg_list.append(match_avg)
+                qual_avg, elim_avg, _, _ = match_avg
             else:
-                display_wlt = wlt
+                qual_avg = None
+                elim_avg = None
+                wlt = EventHelper.calculateTeamWLTFromMatches(team.key_name, event_matches)
+                year_wlt_list.append(wlt)
+                if wlt["win"] + wlt["loss"] + wlt["tie"] == 0:
+                    display_wlt = None
+                else:
+                    display_wlt = wlt
 
             team_rank = None
             if event.rankings:
@@ -60,18 +69,33 @@ class TeamRenderer(object):
                         break
 
             participation.append({'event': event,
-                                   'matches': matches_organized,
-                                   'wlt': display_wlt,
-                                   'rank': team_rank,
-                                   'awards': event_awards})
+                                  'matches': matches_organized,
+                                  'wlt': display_wlt,
+                                  'qual_avg': qual_avg,
+                                  'elim_avg': elim_avg,
+                                  'rank': team_rank,
+                                  'awards': event_awards})
 
-        year_wlt = {"win": 0, "loss": 0, "tie": 0}
-        for wlt in year_wlt_list:
-            year_wlt["win"] += wlt["win"]
-            year_wlt["loss"] += wlt["loss"]
-            year_wlt["tie"] += wlt["tie"]
-        if year_wlt["win"] + year_wlt["loss"] + year_wlt["tie"] == 0:
+        if year == 2015:
             year_wlt = None
+            year_qual_scores = []
+            year_elim_scores = []
+            for _, _, event_qual_scores, event_elim_scores in year_match_avg_list:
+                year_qual_scores += event_qual_scores
+                year_elim_scores += event_elim_scores
+
+            year_qual_avg = float(sum(year_qual_scores)) / len(year_qual_scores) if year_qual_scores != [] else None
+            year_elim_avg = float(sum(year_elim_scores)) / len(year_elim_scores) if year_elim_scores != [] else None
+        else:
+            year_qual_avg = None
+            year_elim_avg = None
+            year_wlt = {"win": 0, "loss": 0, "tie": 0}
+            for wlt in year_wlt_list:
+                year_wlt["win"] += wlt["win"]
+                year_wlt["loss"] += wlt["loss"]
+                year_wlt["tie"] += wlt["tie"]
+            if year_wlt["win"] + year_wlt["loss"] + year_wlt["tie"] == 0:
+                year_wlt = None
 
         medias_by_slugname = MediaHelper.group_by_slugname([media_future.get_result() for media_future in media_futures])
 
@@ -82,6 +106,8 @@ class TeamRenderer(object):
             "year": year,
             "years": valid_years,
             "year_wlt": year_wlt,
+            "year_qual_avg": year_qual_avg,
+            "year_elim_avg": year_elim_avg,
             "current_event": current_event,
             "matches_upcoming": matches_upcoming,
             "medias_by_slugname": medias_by_slugname
