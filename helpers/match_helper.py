@@ -175,6 +175,8 @@ class MatchHelper(object):
         advancement = defaultdict(list)  # key: comp level; value: list of [complete_alliance, [scores], average_score]
         for comp_level in ['qf', 'sf']:
             for match in matches[comp_level]:
+                if not match.has_been_played:
+                    continue
                 for color in ['red', 'blue']:
                     alliance = cls.getOrderedAlliance(match.alliances[color]['teams'], alliance_selections)
                     for i, complete_alliance in enumerate(complete_alliances):  # search for alliance. could be more efficient
