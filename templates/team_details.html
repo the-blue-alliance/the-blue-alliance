@@ -57,7 +57,7 @@
               {% if year_qual_avg and year_elim_avg %}
                 and
               {% endif %}
-              {% if year_elim_avg %}an average elim score of <strong>{{year_elim_avg|floatformat:2}}</strong>{% endif %}
+              {% if year_elim_avg %}an average playoff score of <strong>{{year_elim_avg|floatformat:2}}</strong>{% endif %}
               in {{year}}.</p>
             {% endif %}
           {% endif %}
@@ -85,7 +85,7 @@
                       {% endif %}
                       {% if comp.qual_avg and comp.elim_avg %}and{% endif %}
                       {% if comp.elim_avg %}
-                        an average elim score of <strong>{{comp.elim_avg|floatformat:2}}</strong>
+                        an average playoff score of <strong>{{comp.elim_avg|floatformat:2}}</strong>
                       {% endif %}
                     {% endif %}
                   {% endif %}
