@@ -199,9 +199,11 @@ class MatchHelper(object):
                         else:
                             is_new = True
 
-                    if i is None or is_new:
-                        score = match.alliances[color]['score']
+                    score = match.alliances[color]['score']
+                    if i is None:
                         advancement[comp_level].append([alliance, [score], score])
+                    elif is_new:
+                        advancement[comp_level].append([complete_alliances[i], [score], score])
 
             advancement[comp_level] = sorted(advancement[comp_level], key=lambda x: -x[2])  # sort by descending average score
 
