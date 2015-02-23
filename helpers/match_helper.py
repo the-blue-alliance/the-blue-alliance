@@ -76,36 +76,27 @@ class MatchHelper(object):
 
     @classmethod
     def recentMatches(self, matches, num=3):
-        def cmp_matches(x, y):
-            if x.updated is None:
-                return False
-            if y.updated is None:
-                return True
-            else:
-                cmp(x.updated, y.updated)
-
         matches = filter(lambda x: x.has_been_played, matches)
-        matches = MatchHelper.organizeMatches(matches)
-
-        all_matches = []
-        for comp_level in Match.COMP_LEVELS:
-            if comp_level in matches:
-                play_order_sorted = self.play_order_sort_matches(matches[comp_level])
-                all_matches += play_order_sorted
-        return all_matches[-num:]
+        matches = self.play_order_sort_matches(matches)
+        return matches[-num:]
 
     @classmethod
     def upcomingMatches(self, matches, num=3):
-        matches = filter(lambda x: not x.has_been_played, matches)
-        matches = MatchHelper.organizeMatches(matches)
+        matches = self.play_order_sort_matches(matches)
 
-        unplayed_matches = []
-        for comp_level in Match.COMP_LEVELS:
-            if comp_level in matches:
-                play_order_sorted = self.play_order_sort_matches(matches[comp_level])
-                for match in play_order_sorted:
-                    unplayed_matches.append(match)
-        return unplayed_matches[:num]
+        last_played_match_index = None
+        for i, match in enumerate(reversed(matches)):
+            if match.has_been_played:
+                last_played_match_index = len(matches) - i
+                break
+
+        upcoming_matches = []
+        for i, match in enumerate(matches[last_played_match_index-1:]):
+            if i == num:
+                break
+            if not match.has_been_played:
+                upcoming_matches.append(match)
+        return upcoming_matches
 
     @classmethod
     def deleteInvalidMatches(self, match_list):
