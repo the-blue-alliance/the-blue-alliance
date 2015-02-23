@@ -179,6 +179,42 @@ class MatchHelper(object):
         return bracket_table
 
     @classmethod
+    def generatePlayoffAdvancement2015(cls, matches, alliance_selections=None):
+        complete_alliances = []
+        advancement = defaultdict(list)  # key: comp level; value: list of [complete_alliance, [scores], average_score]
+        for comp_level in ['qf', 'sf']:
+            for match in matches[comp_level]:
+                for color in ['red', 'blue']:
+                    alliance = cls.getOrderedAlliance(match.alliances[color]['teams'], alliance_selections)
+                    for i, complete_alliance in enumerate(complete_alliances):  # search for alliance. could be more efficient
+                        if len(set(alliance).intersection(set(complete_alliance))) >= 2:  # if >= 2 teams are the same, then the alliance is the same
+                            backups = list(set(alliance).difference(set(complete_alliance)))
+                            complete_alliances[i] += backups  # ensures that backup robots are listed last
+                            break
+                    else:
+                        i = None
+                        complete_alliances.append(alliance)
+
+                    is_new = False
+                    if i is not None:
+                        for j, (complete_alliance, scores, _) in enumerate(advancement[comp_level]):  # search for alliance. could be more efficient
+                            if len(set(complete_alliances[i]).intersection(set(complete_alliance))) >= 2:  # if >= 2 teams are the same, then the alliance is the same
+                                complete_alliance = complete_alliances[i]
+                                scores.append(match.alliances[color]['score'])
+                                advancement[comp_level][j][2] = float(sum(scores)) / len(scores)
+                                break
+                        else:
+                            is_new = True
+
+                    if i is None or is_new:
+                        score = match.alliances[color]['score']
+                        advancement[comp_level].append([alliance, [score], score])
+
+            advancement[comp_level] = sorted(advancement[comp_level], key=lambda x: -x[2])  # sort by descending average score
+
+        return advancement
+
+    @classmethod
     def getOrderedAlliance(cls, team_keys, alliance_selections):
         if alliance_selections:
             for alliance_selection in alliance_selections:  # search for alliance. could be more efficient
