@@ -91,7 +91,7 @@ class MatchHelper(object):
                 break
 
         upcoming_matches = []
-        for i, match in enumerate(matches[last_played_match_index-1:]):
+        for i, match in enumerate(matches[last_played_match_index:]):
             if i == num:
                 break
             if not match.has_been_played:
