@@ -73,7 +73,7 @@ class TeamList(CacheableHandler):
 class TeamCanonical(CacheableHandler):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "team_canonical_{}"  # (team_number)
 
     def __init__(self, *args, **kw):
@@ -105,7 +105,7 @@ class TeamCanonical(CacheableHandler):
 class TeamDetail(CacheableHandler):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
-    CACHE_VERSION = 2
+    CACHE_VERSION = 3
     CACHE_KEY_FORMAT = "team_detail_{}_{}"  # (team_number, year)
 
     def __init__(self, *args, **kw):
@@ -135,7 +135,7 @@ class TeamDetail(CacheableHandler):
 class TeamHistory(CacheableHandler):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
-    CACHE_VERSION = 2
+    CACHE_VERSION = 3
     CACHE_KEY_FORMAT = "team_history_{}"  # (team_number)
 
     def __init__(self, *args, **kw):
