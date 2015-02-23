@@ -105,11 +105,12 @@ class NotificationHelper(object):
         notification = AwardsUpdatedNotification(event)
         notification.send(keys)
 
-    def send_broadcast(cls, client_types, title, message, url):
+    @classmethod
+    def send_broadcast(cls, client_types, title, message, url, app_version=''):
         users = PushHelper.get_all_mobile_clients(client_types)
         keys = PushHelper.get_client_ids_for_users(users)
 
-        notification = BroadcastNotification(title, message, url)
+        notification = BroadcastNotification(title, message, url, app_version)
         notification.send(keys)
 
     @classmethod
