@@ -58,6 +58,8 @@ class NotificationHelper(object):
         now = datetime.datetime.utcnow()
         for event in live_events:
             matches = event.matches
+            if not matches:
+                continue
             next_match = MatchHelper.upcomingMatches(matches, num=1)
             if next_match[0] and not next_match[0].push_sent:
                 # Only continue sending for the next match if a push hasn't already been sent for it
