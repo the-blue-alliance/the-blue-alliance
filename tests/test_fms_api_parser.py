@@ -2,12 +2,51 @@ import datetime
 import json
 import unittest2
 
+from consts.event_type import EventType
+from consts.district_type import DistrictType
+
+from datafeeds.parsers.fms_api.fms_api_awards_parser import FMSAPIAwardsParser
 from datafeeds.parsers.fms_api.fms_api_event_alliances_parser import FMSAPIEventAlliancesParser
 from datafeeds.parsers.fms_api.fms_api_event_rankings_parser import FMSAPIEventRankingsParser
 from datafeeds.parsers.fms_api.fms_api_hybrid_schedule_parser import FMSAPIHybridScheduleParser
 
+from models.event import Event
+
 
 class TestFMSAPIParser(unittest2.TestCase):
+    def test_parseAwards(self):
+        event = Event(
+            id="2015waamv",
+            end_date=datetime.datetime(2015, 4, 2, 0, 0),
+            event_short="waamv",
+            event_type_enum=EventType.REGIONAL,
+            event_district_enum=DistrictType.NO_DISTRICT,
+            first_eid="13467",
+            name="PNW District - Auburn Mountainview Event",
+            start_date=datetime.datetime(2015, 3, 31, 0, 0),
+            year=2015,
+        )
+
+        with open('test_data/fms_api/2015waamv_staging_awards.json', 'r') as f:
+            awards = FMSAPIAwardsParser(event).parse(json.loads(f.read()))
+
+        self.assertEqual(len(awards), 5)
+
+        for award in awards:
+            if award.key.id() == '2015waamv_3':
+                self.assertEqual(award.name_str, 'Woodie Flowers Award')
+                self.assertEqual(award.award_type_enum, 3)
+                self.assertTrue({'team_number': None, 'awardee': 'Bob'} in award.recipient_list)
+            elif award.key.id() == '2015waamv_17':
+                self.assertEqual(award.name_str, 'Quality Award sponsored by Motorola')
+                self.assertEqual(award.award_type_enum, 17)
+                self.assertTrue({'team_number': 1318, 'awardee': None} in award.recipient_list)
+            elif award.key.id() == '2015waamv_4':
+                self.assertEqual(award.name_str, 'FIRST Dean\'s List Award')
+                self.assertEqual(award.award_type_enum, 4)
+                self.assertTrue({'team_number': 123, 'awardee': 'Person Name 1'} in award.recipient_list)
+                self.assertTrue({'team_number': 321, 'awardee': 'Person Name 2'} in award.recipient_list)
+
     def test_parseMatches(self):
         with open('test_data/fms_api/2015waamv_staging_matches.json', 'r') as f:
             matches = FMSAPIHybridScheduleParser(2015, 'waamv').parse(json.loads(f.read()))

@@ -10,8 +10,8 @@ from controllers.datafeed_controller import TbaVideosGet, TbaVideosEnqueue
 from controllers.datafeed_controller import FmsEventListGet, FmsTeamListGet
 from controllers.datafeed_controller import OffseasonMatchesGet
 from controllers.datafeed_controller import TwitterFrcfmsMatchesGet
-from controllers.datafeed_controller import FMSAPIEventAlliancesEnqueue, FMSAPIEventRankingsEnqueue, FMSAPIMatchesEnqueue
-from controllers.datafeed_controller import FMSAPIEventAlliancesGet, FMSAPIEventRankingsGet, FMSAPIMatchesGet
+from controllers.datafeed_controller import FMSAPIAwardsEnqueue, FMSAPIEventAlliancesEnqueue, FMSAPIEventRankingsEnqueue, FMSAPIMatchesEnqueue
+from controllers.datafeed_controller import FMSAPIAwardsGet, FMSAPIEventAlliancesGet, FMSAPIEventRankingsGet, FMSAPIMatchesGet
 from controllers.datafeed_controller import UsfirstEventDetailsEnqueue, UsfirstEventDetailsGet, UsfirstEventListGet
 from controllers.datafeed_controller import UsfirstAwardsEnqueue, UsfirstAwardsGet
 from controllers.datafeed_controller import UsfirstEventAlliancesEnqueue, UsfirstEventAlliancesGet
@@ -40,6 +40,7 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/enqueue/csv_backup_teams', TbaCSVBackupTeamsEnqueue),
                                ('/tasks/do/csv_backup_teams', TbaCSVBackupTeamsDo),
                                ('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
+                               ('/tasks/enqueue/fmsapi_awards/(.*)', FMSAPIAwardsEnqueue),
                                ('/tasks/enqueue/fmsapi_event_alliances/(.*)', FMSAPIEventAlliancesEnqueue),
                                ('/tasks/enqueue/fmsapi_event_rankings/(.*)', FMSAPIEventRankingsEnqueue),
                                ('/tasks/enqueue/fmsapi_matches/(.*)', FMSAPIMatchesEnqueue),
@@ -56,6 +57,7 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/get/offseason_matches/(.*)', OffseasonMatchesGet),
                                ('/tasks/get/tba_videos/(.*)', TbaVideosGet),
                                ('/tasks/get/twitter_frcfms_matches', TwitterFrcfmsMatchesGet),
+                               ('/tasks/get/fmsapi_awards/(.*)', FMSAPIAwardsGet),
                                ('/tasks/get/fmsapi_event_alliances/(.*)', FMSAPIEventAlliancesGet),
                                ('/tasks/get/fmsapi_event_rankings/(.*)', FMSAPIEventRankingsGet),
                                ('/tasks/get/fmsapi_matches/(.*)', FMSAPIMatchesGet),

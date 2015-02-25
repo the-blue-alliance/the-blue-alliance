@@ -31,10 +31,10 @@ cron:
   url: /tasks/enqueue/fmsapi_event_alliances/now
   schedule: every 30 minutes
 
-# - description: FIRST award scraping for current events
-#   url: /tasks/enqueue/usfirst_awards/now
-#   schedule: every 1 hours
-#   timezone: America/Los_Angeles
+- description: FIRST award scraping for current events
+  url: /tasks/enqueue/fmsapi_awards/now
+  schedule: every 1 hours
+  timezone: America/Los_Angeles
 
 - description: Match Insights Calculation
   url: /tasks/math/enqueue/insights/matches/2015

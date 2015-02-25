@@ -32,6 +32,67 @@ from models.event_team import EventTeam
 from models.team import Team
 
 
+class FMSAPIAwardsEnqueue(webapp.RequestHandler):
+    """
+    Handles enqueing getting awards from the FMS API
+    """
+    def get(self, when):
+        if when == "now":
+            events = EventHelper.getEventsWithinADay()
+        else:
+            event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
+            events = ndb.get_multi(event_keys)
+
+        for event in events:
+            taskqueue.add(
+                queue_name='fms-api',
+                url='/tasks/get/fmsapi_awards/%s' % (event.key_name),
+                method='GET')
+        template_values = {
+            'events': events,
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_awards_enqueue.html')
+        self.response.out.write(template.render(path, template_values))
+
+
+class FMSAPIAwardsGet(webapp.RequestHandler):
+    """
+    Handles updating awards based on the FMS API
+    """
+    def get(self, event_key):
+        datafeed = DatafeedFMSAPI()
+
+        event = Event.get_by_id(event_key)
+        new_awards = AwardManipulator.createOrUpdate(datafeed.getAwards(event))
+
+        # create EventTeams
+        team_ids = set()
+        for award in new_awards:
+            for team in award.team_list:
+                team_ids.add(team.id())
+        teams = TeamManipulator.createOrUpdate([Team(
+            id=team_id,
+            team_number=int(team_id[3:]))
+            for team_id in team_ids])
+        if teams:
+            if type(teams) is not list:
+                teams = [teams]
+            event_teams = EventTeamManipulator.createOrUpdate([EventTeam(
+                id=event_key + "_" + team.key.id(),
+                event=event.key,
+                team=team.key,
+                year=event.year)
+                for team in teams])
+
+        template_values = {
+            'awards': new_awards,
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_awards_get.html')
+        self.response.out.write(template.render(path, template_values))
+
+
 class FMSAPIEventAlliancesEnqueue(webapp.RequestHandler):
     """
     Handles enqueing getting alliances from the FMS API
