@@ -17,4 +17,4 @@ class FMSAPIEventRankingsParser(object):
                 team['totePoints'],
                 team['matchesPlayed']])
 
-        return rankings
+        return rankings if len(rankings) > 1 else None

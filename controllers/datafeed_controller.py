@@ -120,7 +120,7 @@ class FMSAPIEventRankingsGet(webapp.RequestHandler):
         rankings = df.getEventRankings(event_key)
 
         event = Event.get_by_id(event_key)
-        if event.rankings_json != json.dumps(rankings):
+        if rankings and event.rankings_json != json.dumps(rankings):
             event.rankings_json = json.dumps(rankings)
             event.dirty = True
 
