@@ -131,16 +131,18 @@ class ManipulatorBase(object):
         """
         Asynchronously runs the manipulator's post delete hook if available.
         """
-        post_delete_hook = getattr(cls, "postDeleteHook", None)
-        if callable(post_delete_hook):
-            deferred.defer(post_delete_hook, models, _queue="post-update-hooks")
+        if models:
+            post_delete_hook = getattr(cls, "postDeleteHook", None)
+            if callable(post_delete_hook):
+                deferred.defer(post_delete_hook, models, _queue="post-update-hooks")
 
     @classmethod
     def runPostUpdateHook(cls, models):
         """
         Asynchronously runs the manipulator's post update hook if available.
         """
-        post_update_hook = getattr(cls, "postUpdateHook", None)
-        if callable(post_update_hook):
-            updated_attrs = [model._updated_attrs if hasattr(model, '_updated_attrs') else [] for model in models]
-            deferred.defer(post_update_hook, models, updated_attrs, _queue="post-update-hooks")
+        if models:
+            post_update_hook = getattr(cls, "postUpdateHook", None)
+            if callable(post_update_hook):
+                updated_attrs = [model._updated_attrs if hasattr(model, '_updated_attrs') else [] for model in models]
+                deferred.defer(post_update_hook, models, updated_attrs, _queue="post-update-hooks")
