@@ -15,7 +15,7 @@ from parsers.fms_api.fms_api_hybrid_schedule_parser import FMSAPIHybridScheduleP
 
 
 class DatafeedFMSAPI(object):
-    FMS_API_URL_BASE = 'https://frc.staging.api.usfirst.org/api/v1.0'
+    FMS_API_URL_BASE = 'https://frc-api.usfirst.org/api/v1.0'
 
     FMS_API_AWARDS_URL_PATTERN = FMS_API_URL_BASE + '/awards/%s/%s'  # (year, event_short)
     FMS_API_HYBRID_SCHEDULE_QUAL_URL_PATTERN = FMS_API_URL_BASE + '/schedule/%s/%s/qual/hybrid'  # (year, event_short)
