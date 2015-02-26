@@ -66,6 +66,11 @@ class FMSAPIAwardsGet(webapp.RequestHandler):
         event = Event.get_by_id(event_key)
         new_awards = AwardManipulator.createOrUpdate(datafeed.getAwards(event))
 
+        if new_awards is None:
+            new_awards = []
+        elif type(new_awards) != list:
+            new_awards = [new_awards]
+
         # create EventTeams
         team_ids = set()
         for award in new_awards:
