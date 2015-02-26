@@ -1,3 +1,4 @@
+import datetime
 import json
 import logging
 import tba_config
@@ -32,6 +33,13 @@ class FirebasePusher(object):
             logging.warning("Error pushing data to Firebase: {}; {}. ERROR {}: {}".format(url, data_json, result.status_code, result.content))
 
     @classmethod
+    def _push_data(cls, key, data_json):
+        url = tba_config.CONFIG['firebase-url'].format(key, cls._get_secret())
+        result = urlfetch.fetch(url, payload=data_json, method='POST')
+        if result.status_code != 200:
+            logging.warning("Error pushing data to Firebase: {}; {}. ERROR {}: {}".format(url, data_json, result.status_code, result.content))
+
+    @classmethod
     def match_to_payload_dict(cls, match):
         return {'key_name': match.key_name,
                 'comp_level': match.comp_level,
@@ -53,3 +61,12 @@ class FirebasePusher(object):
         payload_data_json = json.dumps(cls.match_to_payload_dict(match))
 
         deferred.defer(cls._put_data, payload_key, payload_data_json, _queue="firebase")
+
+    @classmethod
+    def push_notification(cls, notification):
+        payload_data_json = json.dumps({
+            'time': datetime.datetime.now().isoformat(),
+            'payload': notification._render_webhook()
+        })
+
+        deferred.defer(cls._push_data, 'notifications', payload_data_json, _queue="firebase")

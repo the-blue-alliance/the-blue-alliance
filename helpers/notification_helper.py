@@ -9,6 +9,7 @@ from consts.notification_type import NotificationType
 from google.appengine.ext import deferred
 from google.appengine.api import urlfetch
 
+from helpers.firebase.firebase_pusher import FirebasePusher
 from helpers.push_helper import PushHelper
 
 from models.event import Event
@@ -72,6 +73,7 @@ class NotificationHelper(object):
         notification = MatchScoreNotification(match)
         notification.send(keys)
 
+        FirebasePusher.push_notification(notification)
         deferred.defer(track_notification, NotificationType.MATCH_SCORE, len(keys), _queue="api-track-call")
 
     @classmethod
@@ -116,6 +118,7 @@ class NotificationHelper(object):
                         level_start = CompLevelStartingNotification(match, event)
                         level_start.send(start_keys)
 
+                        FirebasePusher.push_notification(level_start)
                         deferred.defer(track_notification, NotificationType.LEVEL_STARTING, len(start_keys), _queue="api-track-call")
 
                     # Send upcoming match notification
@@ -124,6 +127,7 @@ class NotificationHelper(object):
                     match.push_sent = True  # Make sure we don't send updates for this match again
                     match.put()
 
+                    FirebasePusher.push_notification(notification)
                     deferred.defer(track_notification, NotificationType.UPCOMING_MATCH, len(keys), _queue="api-track-call")
 
     @classmethod
@@ -134,6 +138,7 @@ class NotificationHelper(object):
         notification = ScheduleUpdatedNotification(event)
         notification.send(keys)
 
+        FirebasePusher.push_notification(notification)
         deferred.defer(track_notification, NotificationType.SCHEDULE_UPDATED, len(keys), _queue="api-track-call")
 
     @classmethod
@@ -144,6 +149,7 @@ class NotificationHelper(object):
         notification = AllianceSelectionNotification(event)
         notification.send(keys)
 
+        FirebasePusher.push_notification(notification)
         deferred.defer(track_notification, NotificationType.ALLIANCE_SELECTION, len(keys), _queue="api-track-call")
 
     @classmethod
@@ -154,6 +160,7 @@ class NotificationHelper(object):
         notification = AwardsUpdatedNotification(event)
         notification.send(keys)
 
+        FirebasePusher.push_notification(notification)
         deferred.defer(track_notification, NotificationType.AWARDS, len(keys), _queue="api-track-call")
 
     @classmethod
