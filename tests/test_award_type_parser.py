@@ -1,5 +1,6 @@
 import unittest2
 import csv
+import json
 import StringIO
 
 from consts.award_type import AwardType
@@ -73,3 +74,9 @@ class TestUsfirstEventTypeParser(unittest2.TestCase):
             csv_data = list(csv.reader(StringIO.StringIO(f.read()), delimiter=',', skipinitialspace=True))
             for award in csv_data:
                 self.assertNotEqual(AwardHelper.parse_award_type(award[2]), None)
+
+        # test 2015 award names
+        with open('test_data/fms_api/2015_award_types.json', 'r') as f:
+            for award in json.loads(f.read()):
+                print award['description']
+                self.assertNotEqual(AwardHelper.parse_award_type(award['description']), None)
