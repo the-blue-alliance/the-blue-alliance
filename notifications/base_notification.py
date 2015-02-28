@@ -1,5 +1,6 @@
 import logging
 import urllib
+import uuid
 
 from google.appengine.ext import deferred
 from google.appengine.api import urlfetch
