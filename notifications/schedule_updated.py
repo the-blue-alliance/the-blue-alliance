@@ -9,9 +9,13 @@ class ScheduleUpdatedNotification(BaseNotification):
     def __init__(self, event):
         self.event = event
 
+    @property
+    def _type(self):
+        return NotificationType.SCHEDULE_UPDATED
+
     def _build_dict(self):
         data = {}
-        data['message_type'] = NotificationType.type_names[NotificationType.SCHEDULE_UPDATED]
+        data['message_type'] = NotificationType.type_names[self._type]
         data['message_data'] = {}
         data['message_data']['event_key'] = self.event.key_name
         data['message_data']['event_name'] = self.event.name

@@ -4,6 +4,7 @@ from google.appengine.ext import deferred
 
 from controllers.gcm.gcm import GCMMessage
 from consts.client_type import ClientType
+from helpers.firebase.firebase_pusher import FirebasePusher
 from helpers.notification_sender import NotificationSender
 from models.sitevar import Sitevar
 
@@ -14,6 +15,14 @@ class BaseNotification(object):
     # Can be overridden by subclasses to only send to some types
     _supported_clients = [ClientType.OS_ANDROID, ClientType.WEBHOOK]
 
+    # Send analytics updates for this notification?
+    # Can be overridden by subclasses if not
+    _track_call = True
+
+    # Also post this notification to the Firebase stream?
+    # Can be overridden if not
+    _push_firebase = True
+
     """
     Class that acts as a basic notification.
     To send a notification, instantiate one and call this method
@@ -22,6 +31,14 @@ class BaseNotification(object):
     def send(self, keys):
         self.keys = keys  # dict like {ClientType : [ key ] } ... The list for webhooks is a tuple of (key, secret)
         deferred.defer(self.render, self._supported_clients, _queue="push-notifications")
+        if self._push_firebase:
+            FirebasePusher.push_notification(self)
+        if self._track_call:
+            num_keys = 0
+            for v in keys.values():
+                # Count the number of clients receiving the notification
+                num_keys += len(v)
+            deferred.defer(self.track_notification, self._type, num_keys, _queue="api-track-call")
 
     """
     This method will create platform specific notifications and send them to the platform specified
@@ -52,7 +69,7 @@ class BaseNotification(object):
 
     def check_enabled(self):
         var = Sitevar.get_by_id('notifications.enable')
-        return var is None or var.values_json == "true"
+        return (self._type in NotificationType.enabled_notifications) and (var is None or var.values_json == "true")
 
     """
     Subclasses should override this method and return a dict containing the payload of the notification.
@@ -60,6 +77,10 @@ class BaseNotification(object):
     """
     def _build_dict(self):
         raise NotImplementedError("Subclasses must implement this method to build JSON data to send")
+
+    @property
+    def _type(self):
+        raise NotImplementedError("Subclasses must implement this message to set its notification type")
 
     """
     The following methods are default render methods. Often, the way we construct the messages doesn't change, so we abstract it to here.
@@ -76,3 +97,33 @@ class BaseNotification(object):
 
     def _render_webhook(self):
         return self._build_dict()
+
+    # used for deferred analytics call
+    def track_notification(notification_type_enum, num_keys):
+        """
+        For more information about GAnalytics Protocol Parameters, visit
+        https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
+        """
+        analytics_id = Sitevar.get_by_id("google_analytics.id")
+        if analytics_id is None:
+            logging.warning("Missing sitevar: google_analytics.id. Can't track API usage.")
+        else:
+            GOOGLE_ANALYTICS_ID = analytics_id.contents['GOOGLE_ANALYTICS_ID']
+            params = urllib.urlencode({
+                'v': 1,
+                'tid': GOOGLE_ANALYTICS_ID,
+                'cid': uuid.uuid3(uuid.NAMESPACE_X500, str('tba-notification-tracking')),
+                't': 'event',
+                'ec': 'notification',
+                'ea': NotificationType.type_names[notification_type_enum],
+                'ev': num_keys,
+                'ni': 1,
+                'sc': 'end',  # forces tracking session to end
+            })
+
+            analytics_url = 'http://www.google-analytics.com/collect?%s' % params
+            urlfetch.fetch(
+                url=analytics_url,
+                method=urlfetch.GET,
+                deadline=10,
+            )

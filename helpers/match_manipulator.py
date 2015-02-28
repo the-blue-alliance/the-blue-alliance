@@ -37,13 +37,12 @@ class MatchManipulator(ManipulatorBase):
         Send push notifications to subscribed users
         Only if the match is part of an active event
         '''
-        # Note, updated_attr_list will always be empty, for now
-        # Still needs to be implemented in updateMerge
-        # See helpers.EventManipulator
         unplayed_match_events = []
         for (match, updated_attrs) in zip(matches, updated_attr_list):
             event = match.event.get()
-            if event.within_a_day:
+            # Only continue if the event is currently happening
+            # And we're updating a property that affects scores
+            if "alliances_json" in updated_attrs and event.within_a_day:
                 if match.has_been_played:
                     # There is a score update for this match, push a notification
                     logging.info("Sending push notifications for {}".format(match.key_name))
@@ -120,6 +119,8 @@ class MatchManipulator(ManipulatorBase):
             "youtube_videos"
         ]
 
+        old_match._updated_attrs = []
+
         # if not auto_union, treat auto_union_attrs as list_attrs
         if not auto_union:
             list_attrs += auto_union_attrs
@@ -129,6 +130,7 @@ class MatchManipulator(ManipulatorBase):
             if getattr(new_match, attr) is not None:
                 if getattr(new_match, attr) != getattr(old_match, attr):
                     setattr(old_match, attr, getattr(new_match, attr))
+                    old_match._updated_attrs.append(attr)
                     old_match.dirty = True
 
         for attr in json_attrs:
@@ -137,12 +139,14 @@ class MatchManipulator(ManipulatorBase):
                     setattr(old_match, attr, getattr(new_match, attr))
                     # changinging 'attr_json' doesn't clear lazy-loaded '_attr'
                     setattr(old_match, '_{}'.format(attr.replace('_json', '')), None)
+                    old_match._updated_attrs.append(attr)
                     old_match.dirty = True
 
         for attr in list_attrs:
             if len(getattr(new_match, attr)) > 0:
                 if set(getattr(new_match, attr)) != set(getattr(old_match, attr)):  # lists are treated as sets
                     setattr(old_match, attr, getattr(new_match, attr))
+                    old_match._updated_attrs.append(attr)
                     old_match.dirty = True
 
         for attr in auto_union_attrs:
@@ -151,6 +155,7 @@ class MatchManipulator(ManipulatorBase):
             unioned = old_set.union(new_set)
             if unioned != old_set:
                 setattr(old_match, attr, list(unioned))
+                old_match._updated_attrs.append(attr)
                 old_match.dirty = True
 
         return old_match

@@ -10,9 +10,13 @@ class CompLevelStartingNotification(BaseNotification):
         self.match = match
         self.event = event
 
+    @property
+    def _type(self):
+        return NotificationType.LEVEL_STARTING
+
     def _build_dict(self):
         data = {}
-        data['message_type'] = NotificationType.type_names[NotificationType.LEVEL_STARTING]
+        data['message_type'] = NotificationType.type_names[self._type]
         data['message_data'] = {}
         data['message_data']['event_name'] = self.event.name
         data['message_data']['event_key'] = self.event.key_name

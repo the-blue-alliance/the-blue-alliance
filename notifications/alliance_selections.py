@@ -8,9 +8,13 @@ class AllianceSelectionNotification(BaseNotification):
     def __init__(self, event):
         self.event = event
 
+    @property
+    def _type(self):
+        return NotificationType.ALLIANCE_SELECTION
+
     def _build_dict(self):
         data = {}
-        data['message_type'] = NotificationType.type_names[NotificationType.ALLIANCE_SELECTION]
+        data['message_type'] = NotificationType.type_names[self._type]
         data['message_data'] = {}
         data['message_data']['event'] = ModelToDict.eventConverter(self.event)
         return data

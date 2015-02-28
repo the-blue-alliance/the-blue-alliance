@@ -140,6 +140,7 @@ class Match(ndb.Model):
         self._tba_video = None
         self._winning_alliance = None
         self._youtube_videos = None
+        self._updated_attrs = []  # Used in MatchManipulator to track what changed
         super(Match, self).__init__(*args, **kw)
 
     @property
@@ -202,7 +203,7 @@ class Match(ndb.Model):
     def has_been_played(self):
         """If there are scores, it's been played"""
         for alliance in self.alliances:
-            if (self.alliances[alliance]["score"] == None) or \
+            if (self.alliances[alliance]["score"] is None) or \
             (self.alliances[alliance]["score"] == -1):
                 return False
         return True

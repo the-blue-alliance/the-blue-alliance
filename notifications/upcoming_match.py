@@ -11,9 +11,13 @@ class UpcomingMatchNotification(BaseNotification):
         self.match = match
         self.event = event
 
+    @property
+    def _type(self):
+        return NotificationType.UPCOMING_MATCH
+
     def _build_dict(self):
         data = {}
-        data['message_type'] = NotificationType.type_names[NotificationType.UPCOMING_MATCH]
+        data['message_type'] = NotificationType.type_names[self._type]
         data['message_data'] = {}
         data['message_data']['event_name'] = self.event.name
         data['message_data']['match_key'] = self.match.key_name
