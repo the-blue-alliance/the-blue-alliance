@@ -120,6 +120,8 @@ class MatchManipulator(ManipulatorBase):
             "youtube_videos"
         ]
 
+        old_match._updated_attrs = []
+
         # if not auto_union, treat auto_union_attrs as list_attrs
         if not auto_union:
             list_attrs += auto_union_attrs
@@ -129,6 +131,7 @@ class MatchManipulator(ManipulatorBase):
             if getattr(new_match, attr) is not None:
                 if getattr(new_match, attr) != getattr(old_match, attr):
                     setattr(old_match, attr, getattr(new_match, attr))
+                    old_match._updated_attrs.append(attr)
                     old_match.dirty = True
 
         for attr in json_attrs:
@@ -137,12 +140,14 @@ class MatchManipulator(ManipulatorBase):
                     setattr(old_match, attr, getattr(new_match, attr))
                     # changinging 'attr_json' doesn't clear lazy-loaded '_attr'
                     setattr(old_match, '_{}'.format(attr.replace('_json', '')), None)
+                    old_match._updated_attrs.append(attr)
                     old_match.dirty = True
 
         for attr in list_attrs:
             if len(getattr(new_match, attr)) > 0:
                 if set(getattr(new_match, attr)) != set(getattr(old_match, attr)):  # lists are treated as sets
                     setattr(old_match, attr, getattr(new_match, attr))
+                    old_match._updated_attrs.append(attr)
                     old_match.dirty = True
 
         for attr in auto_union_attrs:
@@ -151,6 +156,7 @@ class MatchManipulator(ManipulatorBase):
             unioned = old_set.union(new_set)
             if unioned != old_set:
                 setattr(old_match, attr, list(unioned))
+                old_match._updated_attrs.append(attr)
                 old_match.dirty = True
 
         return old_match
