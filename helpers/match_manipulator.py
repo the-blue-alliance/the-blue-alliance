@@ -37,13 +37,12 @@ class MatchManipulator(ManipulatorBase):
         Send push notifications to subscribed users
         Only if the match is part of an active event
         '''
-        # Note, updated_attr_list will always be empty, for now
-        # Still needs to be implemented in updateMerge
-        # See helpers.EventManipulator
         unplayed_match_events = []
         for (match, updated_attrs) in zip(matches, updated_attr_list):
             event = match.event.get()
-            if event.within_a_day:
+            # Only continue if the event is currently happening
+            # And we're updating a property that affects scores
+            if ("alliances_json" in updated_attrs or "score_breakdown_json" in updated_attrs) and event.within_a_day:
                 if match.has_been_played:
                     # There is a score update for this match, push a notification
                     logging.info("Sending push notifications for {}".format(match.key_name))
