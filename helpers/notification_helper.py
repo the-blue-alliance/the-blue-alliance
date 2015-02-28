@@ -65,28 +65,31 @@ class NotificationHelper(object):
             matches = event.matches
             if not matches:
                 continue
-            next_match = MatchHelper.upcomingMatches(matches, num=1)
-            if next_match[0] and not next_match[0].push_sent:
-                # Only continue sending for the next match if a push hasn't already been sent for it
-                match = next_match[0]
-                if match.time is None or match.time + datetime.timedelta(minutes=-7) <= now:
-                    # Only send notifications for matches no more than 7 minutes (average-ish match cycle time) before it's scheduled to start
-                    # Unless, the match has no time info. Then #yolo and send it
-                    users = PushHelper.get_users_subscribed_to_match(match, NotificationType.UPCOMING_MATCH)
-                    keys = PushHelper.get_client_ids_for_users(users)
+            next_matchs = MatchHelper.upcomingMatches(matches, num=2)
+            for match in next_matches:
+                if match and not match.push_sent:
+                    # Only continue sending for the next match if a push hasn't already been sent for it
+                    if match.time is None or match.time + datetime.timedelta(minutes=-7) <= now:
+                        # Only send notifications for matches no more than 7 minutes (average-ish match cycle time) before it's scheduled to start
+                        # Unless, the match has no time info. Then #yolo and send it
+                        users = PushHelper.get_users_subscribed_to_match(match, NotificationType.UPCOMING_MATCH)
+                        keys = PushHelper.get_client_ids_for_users(users)
 
-                    if match.set_number == 1 and match.match_number == 1:
-                        # First match of a new type, send level starting notifications
-                        start_users = PushHelper.get_users_subscribed_to_match(match, NotificationType.LEVEL_STARTING)
-                        start_keys = PushHelper.get_client_ids_for_users(start_users)
-                        level_start = CompLevelStartingNotification(match, event)
-                        level_start.send(start_keys)
+                        if match.set_number == 1 and match.match_number == 1:
+                            # First match of a new type, send level starting notifications
+                            start_users = PushHelper.get_users_subscribed_to_match(match, NotificationType.LEVEL_STARTING)
+                            start_keys = PushHelper.get_client_ids_for_users(start_users)
+                            level_start = CompLevelStartingNotification(match, event)
+                            level_start.send(start_keys)
 
-                    # Send upcoming match notification
-                    notification = UpcomingMatchNotification(match, event)
-                    notification.send(keys)
-                    match.push_sent = True  # Make sure we don't send updates for this match again
-                    match.put()
+                        # Send upcoming match notification
+                        notification = UpcomingMatchNotification(match, event)
+                        notification.send(keys)
+                        match.push_sent = True  # Make sure we don't send updates for this match again
+                        match.put()
+
+                        # Don't send update for any further matches
+                        return
 
     @classmethod
     def send_schedule_update(cls, event):
