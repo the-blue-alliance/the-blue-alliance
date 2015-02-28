@@ -1,6 +1,8 @@
 import logging
+import urllib
 
 from google.appengine.ext import deferred
+from google.appengine.api import urlfetch
 
 from controllers.gcm.gcm import GCMMessage
 from consts.client_type import ClientType
