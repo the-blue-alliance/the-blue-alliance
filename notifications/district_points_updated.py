@@ -11,10 +11,14 @@ class DistrictPointsUpdatedNotification(BaseNotification):
         self.district_key = district_key
         self.district_enum = DistrictType.abbrevs[district_key[4:]]
 
+    @property
+    def _type(self):
+        return NotificationType.DISTRICT_POINTS_UPDATED
+
     def _build_dict(self):
         data = {}
-        data['message_type'] = NotificationType.type_names[NotificationType.DISTRICT_POINTS_UPDATED]
+        data['message_type'] = NotificationType.type_names[self._type]
         data['message_data'] = {}
         data['message_data']['district_key'] = self.district_key
-        data['message_data']['district_name'] =  DistrictType.names[self.district_enum]
+        data['message_data']['district_name'] = DistrictType.names[self.district_enum]
         return data

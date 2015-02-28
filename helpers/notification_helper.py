@@ -6,10 +6,8 @@ import uuid
 from consts.client_type import ClientType
 from consts.notification_type import NotificationType
 
-from google.appengine.ext import deferred
 from google.appengine.api import urlfetch
 
-from helpers.firebase.firebase_pusher import FirebasePusher
 from helpers.push_helper import PushHelper
 
 from models.event import Event
@@ -27,37 +25,6 @@ from notifications.update_subscriptions import UpdateSubscriptionsNotification
 from notifications.verification import VerificationNotification
 
 
-# used for deferred call
-def track_notification(notification_type_enum, num_keys):
-    """
-    For more information about GAnalytics Protocol Parameters, visit
-    https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
-    """
-    analytics_id = Sitevar.get_by_id("google_analytics.id")
-    if analytics_id is None:
-        logging.warning("Missing sitevar: google_analytics.id. Can't track API usage.")
-    else:
-        GOOGLE_ANALYTICS_ID = analytics_id.contents['GOOGLE_ANALYTICS_ID']
-        params = urllib.urlencode({
-            'v': 1,
-            'tid': GOOGLE_ANALYTICS_ID,
-            'cid': uuid.uuid3(uuid.NAMESPACE_X500, str('tba-notification-tracking')),
-            't': 'event',
-            'ec': 'notification',
-            'ea': NotificationType.type_names[notification_type_enum],
-            'ev': num_keys,
-            'ni': 1,
-            'sc': 'end',  # forces tracking session to end
-        })
-
-        analytics_url = 'http://www.google-analytics.com/collect?%s' % params
-        urlfetch.fetch(
-            url=analytics_url,
-            method=urlfetch.GET,
-            deadline=10,
-        )
-
-
 class NotificationHelper(object):
 
     """
@@ -72,9 +39,6 @@ class NotificationHelper(object):
 
         notification = MatchScoreNotification(match)
         notification.send(keys)
-
-        FirebasePusher.push_notification(notification)
-        deferred.defer(track_notification, NotificationType.MATCH_SCORE, len(keys), _queue="api-track-call")
 
     @classmethod
     def send_favorite_update(cls, user_id, sending_device_key=""):
@@ -118,17 +82,11 @@ class NotificationHelper(object):
                         level_start = CompLevelStartingNotification(match, event)
                         level_start.send(start_keys)
 
-                        FirebasePusher.push_notification(level_start)
-                        deferred.defer(track_notification, NotificationType.LEVEL_STARTING, len(start_keys), _queue="api-track-call")
-
                     # Send upcoming match notification
                     notification = UpcomingMatchNotification(match, event)
                     notification.send(keys)
                     match.push_sent = True  # Make sure we don't send updates for this match again
                     match.put()
-
-                    FirebasePusher.push_notification(notification)
-                    deferred.defer(track_notification, NotificationType.UPCOMING_MATCH, len(keys), _queue="api-track-call")
 
     @classmethod
     def send_schedule_update(cls, event):
@@ -138,9 +96,6 @@ class NotificationHelper(object):
         notification = ScheduleUpdatedNotification(event)
         notification.send(keys)
 
-        FirebasePusher.push_notification(notification)
-        deferred.defer(track_notification, NotificationType.SCHEDULE_UPDATED, len(keys), _queue="api-track-call")
-
     @classmethod
     def send_alliance_update(cls, event):
         users = PushHelper.get_users_subscribed_for_alliances(event, NotificationType.ALLIANCE_SELECTION)
@@ -149,9 +104,6 @@ class NotificationHelper(object):
         notification = AllianceSelectionNotification(event)
         notification.send(keys)
 
-        FirebasePusher.push_notification(notification)
-        deferred.defer(track_notification, NotificationType.ALLIANCE_SELECTION, len(keys), _queue="api-track-call")
-
     @classmethod
     def send_award_update(cls, event):
         users = PushHelper.get_users_subscribed_to_event(event, NotificationType.AWARDS)
@@ -159,9 +111,6 @@ class NotificationHelper(object):
 
         notification = AwardsUpdatedNotification(event)
         notification.send(keys)
-
-        FirebasePusher.push_notification(notification)
-        deferred.defer(track_notification, NotificationType.AWARDS, len(keys), _queue="api-track-call")
 
     @classmethod
     def send_broadcast(cls, client_types, title, message, url, app_version=''):
