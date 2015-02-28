@@ -38,7 +38,7 @@ class BaseNotification(object):
             for v in keys.values():
                 # Count the number of clients receiving the notification
                 num_keys += len(v)
-            deferred.defer(track_notification, self._type, num_keys, _queue="api-track-call")
+            deferred.defer(self.track_notification, self._type, num_keys, _queue="api-track-call")
 
     """
     This method will create platform specific notifications and send them to the platform specified
