@@ -99,7 +99,7 @@ class BaseNotification(object):
         return self._build_dict()
 
     # used for deferred analytics call
-    def track_notification(notification_type_enum, num_keys):
+    def track_notification(self, notification_type_enum, num_keys):
         """
         For more information about GAnalytics Protocol Parameters, visit
         https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
