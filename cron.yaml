@@ -4,10 +4,10 @@ cron:
   schedule: every day 02:00
   timezone: America/Los_Angeles
 
-- description: Upcoming match notification sending
-  url: /tasks/notifications/upcoming_match
-  schedule: every 2 minutes
-  timezone: America/Los_Angeles
+#- description: Upcoming match notification sending
+#  url: /tasks/notifications/upcoming_match
+#  schedule: every 2 minutes
+#  timezone: America/Los_Angeles
 
 # - description: FIRST event detail scraping
 #   url: /tasks/enqueue/usfirst_event_details/2014
