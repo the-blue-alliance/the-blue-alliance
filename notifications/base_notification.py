@@ -65,7 +65,7 @@ class BaseNotification(object):
 
     def check_enabled(self):
         var = Sitevar.get_by_id('notifications.enable')
-        return var is None or var.values_json == "true"
+        return (self._type in NotificationType.enabled_notifications) and (var is None or var.values_json == "true")
 
     """
     Subclasses should override this method and return a dict containing the payload of the notification.
