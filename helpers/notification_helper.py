@@ -65,7 +65,7 @@ class NotificationHelper(object):
             matches = event.matches
             if not matches:
                 continue
-            next_matchs = MatchHelper.upcomingMatches(matches, num=2)
+            next_matches = MatchHelper.upcomingMatches(matches, num=2)
             for match in next_matches:
                 if match and not match.push_sent:
                     # Only continue sending for the next match if a push hasn't already been sent for it

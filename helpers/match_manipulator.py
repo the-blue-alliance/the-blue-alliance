@@ -42,7 +42,7 @@ class MatchManipulator(ManipulatorBase):
             event = match.event.get()
             # Only continue if the event is currently happening
             # And we're updating a property that affects scores
-            if ("alliances_json" in updated_attrs or "score_breakdown_json" in updated_attrs) and event.within_a_day:
+            if "alliances_json" in updated_attrs and event.within_a_day:
                 if match.has_been_played:
                     # There is a score update for this match, push a notification
                     logging.info("Sending push notifications for {}".format(match.key_name))

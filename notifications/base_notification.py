@@ -35,7 +35,7 @@ class BaseNotification(object):
             FirebasePusher.push_notification(self)
         if self._track_call:
             num_keys = 0
-            for k, v in keys.iteritems():
+            for v in keys.values():
                 # Count the number of clients receiving the notification
                 num_keys += len(v)
             deferred.defer(track_notification, self._type, num_keys, _queue="api-track-call")
