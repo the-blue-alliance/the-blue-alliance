@@ -7,6 +7,7 @@ from google.appengine.api import urlfetch
 
 from controllers.gcm.gcm import GCMMessage
 from consts.client_type import ClientType
+from consts.notification_type import NotificationType		
 from helpers.firebase.firebase_pusher import FirebasePusher
 from helpers.notification_sender import NotificationSender
 from models.sitevar import Sitevar
