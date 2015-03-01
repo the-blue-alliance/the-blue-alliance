@@ -140,7 +140,7 @@ class Event(ndb.Model):
         if self.timezone_id is not None:
             return self.withinDays(0, 0)
         else:
-            return self.within_a_day()  # overestimate what is "now" if no timezone
+            return self.within_a_day  # overestimate what is "now" if no timezone
 
     @property
     def within_a_day(self):
