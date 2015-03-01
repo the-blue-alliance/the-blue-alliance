@@ -22,7 +22,7 @@ class EventManipulator(ManipulatorBase):
         """
         for (event, updated_attrs) in zip(events, updated_attr_list):
             try:
-                if "alliance_selections_json" in updated_attrs:
+                if event.within_a_day and "alliance_selections_json" in updated_attrs:
                     # Send updated alliances notification
                     logging.info("Sending alliance notifications for {}".format(event.key_name))
                     NotificationHelper.send_alliance_update(event)
@@ -30,12 +30,11 @@ class EventManipulator(ManipulatorBase):
                 logging.error("Error sending alliance update notification for {}".format(event.key_name))
                 logging.error(traceback.format_exc())
 
-            if event.within_a_day:
-                try:
-                    event.timezone_id = EventHelper.get_timezone_id(event.location, event.key.id())
-                    cls.createOrUpdate(event, run_post_update_hook=False)
-                except Exception:
-                    logging.warning("Timezone update for event {} failed!".format(event.key_name))
+            try:
+                event.timezone_id = EventHelper.get_timezone_id(event.location, event.key.id())
+                cls.createOrUpdate(event, run_post_update_hook=False)
+            except Exception:
+                logging.warning("Timezone update for event {} failed!".format(event.key_name))
 
     @classmethod
     def updateMerge(self, new_event, old_event, auto_union=True):

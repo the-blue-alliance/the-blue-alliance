@@ -1,6 +1,7 @@
 from google.appengine.ext import ndb
 import datetime
 import json
+import pytz
 import re
 
 from consts.district_type import DistrictType
@@ -124,7 +125,11 @@ class Event(ndb.Model):
     def withinDays(self, negative_days_before, days_after):
         if not self.start_date or not self.end_date:
             return False
-        today = datetime.datetime.today()
+        now = datetime.datetime.now()
+        if self.timezone_id is not None:
+            tz = pytz.timezone(self.timezone_id)
+            now = now - tz.utcoffset(now)
+        today = now.today()
         after_start = self.start_date.date() + datetime.timedelta(days=negative_days_before) <= today.date()
         before_end = self.end_date.date() + datetime.timedelta(days=days_after) >= today.date()
 
@@ -132,7 +137,10 @@ class Event(ndb.Model):
 
     @property
     def now(self):
-        return self.withinDays(0, 0)
+        if self.timezone_id is not None:
+            return self.withinDays(0, 0)
+        else:
+            return self.within_a_day()  # overestimate what is "now" if no timezone
 
     @property
     def within_a_day(self):

@@ -279,7 +279,7 @@ class GamedayHandler(CacheableHandler):
         ongoing_events_w_webcasts = []
         week_events = EventHelper.getWeekEvents()
         for event in week_events:
-            if event.within_a_day:
+            if event.now:
                 ongoing_events.append(event)
                 if event.webcast:
                     valid = []

@@ -127,7 +127,7 @@ class EventDetail(CacheableHandler):
         oprs = sorted(oprs, key=lambda t: t[1], reverse=True)  # sort by OPR
         oprs = oprs[:15]  # get the top 15 OPRs
 
-        if event.within_a_day:
+        if event.now:
             matches_recent = MatchHelper.recentMatches(cleaned_matches)
             matches_upcoming = MatchHelper.upcomingMatches(cleaned_matches)
         else:
