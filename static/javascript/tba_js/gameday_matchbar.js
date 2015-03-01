@@ -15,7 +15,6 @@ if (following_set == null) {
 }
 
 function updateMatchbar(snapshot) {
-  console.log(snapshot);
   var event_key = snapshot.key();
   var event_data = snapshot.val();
   var event_code = event_key.replace(/[0-9]/g, '').toUpperCase();
