@@ -10,7 +10,7 @@ body {
   background: #000000;
 }
 
-.gameday { 
+.gameday {
   .nav, .navbar, .navbar-inner,
   .container, .brand,
   .dropdown, .dropdown-toggle,
@@ -23,27 +23,27 @@ body {
     min-height: auto !important;
     color: #ffffff !important;
   }
-  
+
   .navbar-fixed-top {
     position: static;
   }
-  
+
   .chat_active, .social_active {
     background: @gray !important;
   }
-  
+
   .gameday-container {
     width: auto;
     margin-left: 10px !important;
   }
-  
+
   .gameday-brand {
     background-image: url('/images/tba_blue_lamp_navbar.png');
     background-repeat: no-repeat;
     background-position: left center;
     width: 600px;
   }
-  
+
   .gameday-title {
     vertical-align: middle;
     padding-left: 25px;
@@ -62,24 +62,24 @@ body {
     padding: 6px 8px !important;
     height: 18px !important;
   }
-  
+
   .dropdown:hover, .chat:hover, .social:hover, .settings:hover {
     background-color: @gray;
   }
-  
+
   .dropdown-menu {
     margin: 0;
-  
+
     .layout-choice, .layout-choice:hover {
       background-repeat: no-repeat;
       filter: none;
     }
-  
+
     .layout_0 {
       background-image: url('/images/icons/tba-gameday-sprite.png');
       background-position: 95% -5px;
     }
-    
+
     .layout_1 {
       background-image: url('/images/icons/tba-gameday-sprite.png');
       background-position: 95% -40px;
@@ -110,9 +110,9 @@ body {
       background-position: 95% -215px;
     }
   }
-  
+
   ul.nav li.dropdown:hover ul.dropdown-menu{
-    display: block;    
+    display: block;
   }
 
 }
@@ -125,7 +125,7 @@ body {
   width: @socialWidth;
   background-color: @gray-lighter;
   visibility: hidden;
-  
+
   #twitter-widget {
     background-color: #000000;
     height: 100%;
@@ -145,14 +145,14 @@ body {
   width: @chatWidth;
   background-color: @gray-lighter;
   visibility: hidden;
-  
+
   #chat-info-background {
     position: absolute;
     background-color: #000000;
     background: rgba(0, 0, 0, 0.7);
     height: 100%;
     width: 100%;
-    
+
     #chat-info {
       margin: 50px 25px;
     }
@@ -239,44 +239,44 @@ body {
   left: 0px;
   text-align: left;
   overflow: hidden;
-  
+
   .matches {
     width: 200%;
     height: 100%;
   }
-  
+
   .finished_match_red {
     background-color: @TBAredDarker;
   }
-  
+
   .finished_match_blue {
     background-color: @TBAblueDarker;
   }
-  
+
   .finished_match_tie {
     background-color: @TBApurpleDarker;
   }
-  
+
   .upcoming_match {
     background-color: transparent;
   }
-  
+
   .followed_match {
     background-color: #ffc40d * 0.8;
-    
+
     .match-number {
       color: @gray-lighter;
     }
-    
+
     .red {
       color: #CC0000;
     }
-    
+
     .blue {
       color: #0044CC;
     }
   }
-  
+
   .match {
     height: 100%;
     width: auto;
@@ -286,7 +286,7 @@ body {
       font-weight: bold;
     }
   }
-  
+
   .match-number {
     color: #ffffff;
     font-size: 19px;
@@ -296,7 +296,7 @@ body {
     margin: 0 10px 0 10px;
     float: left;
   }
-  
+
   .alliances {
     display: inline-block;
     height: 100%;
@@ -304,20 +304,30 @@ body {
     float: left;
     margin: 0 10px 0 0;
   }
-  
+
   .red {
     color: #FF0000;
   }
-  
+
   .blue {
     color: #0066FF;
   }
-  
+
   .red, .blue {
     font-size: 13px;
     width: auto;
     height: 50%;
     display: block;
+  }
+
+  .match-bar-info {
+    color: #ffffff;
+    font-size: 14px;
+    width: auto;
+    display: inline-block;
+    line-height: @matchBarHeight;
+    margin: 0 10px 0 10px;
+    float: left;
   }
 }
 
@@ -334,14 +344,14 @@ body {
   top: 0px;
   left: 0px;
   pointer-events: none;
-  
+
   .overlay-title {
     font-size: 24px;
     color: white;
     float: left;
     margin: 15px;
   }
-  
+
   .view-close, .swap {
     padding: 3px;
     margin: 2px;
@@ -349,12 +359,12 @@ body {
     cursor: pointer;
     position: absolute;
   }
-  
+
   .view-close {
     top: 0;
     right: 0;
   }
-  
+
   .swap {
     top: 25px;
     right: 0;

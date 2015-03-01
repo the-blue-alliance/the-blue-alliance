@@ -15,9 +15,17 @@ if (following_set == null) {
 }
 
 function updateMatchbar(snapshot) {
-  var event_key = snapshot.name();
+  console.log(snapshot);
+  var event_key = snapshot.key();
   var event_data = snapshot.val();
+  var event_code = event_key.replace(/[0-9]/g, '').toUpperCase();
+
+  var match_bar = $('.' + event_key + '_matches');
   if (event_data == null) {
+    match_bar.each(function() {
+      $(this).html($('<div>', {'class': 'match-number', text: event_code}));
+      $(this).append($('<div>', {'class': 'match-bar-info', text: "No matches yet!"}));
+    });
     return;
   }
 
@@ -44,7 +52,6 @@ function updateMatchbar(snapshot) {
   }
   last_matches.reverse();
 
-  var match_bar = $('.' + event_key + '_matches');
 
   match_bar.each(function() { // Because the user might have more than 1 view of a given event open
     var matches = $(this)[0].children;
@@ -88,7 +95,6 @@ function updateMatchbar(snapshot) {
     }
 
     // Add event code to first match
-    var event_code = event_key.replace(/[0-9]/g, '').toUpperCase();
     var match_num = $(this)[0].firstChild.firstChild.innerHTML;
     if (match_num.indexOf(event_code) == -1) {  // Make sure not to add twice
       $(this)[0].firstChild.firstChild.innerHTML = event_code + " " + match_num;
