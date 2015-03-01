@@ -24,6 +24,9 @@ class BroadcastNotification(BaseNotification):
             'title': self.title,
             'desc': self.message,
             'url': self.url,
-            'app_version': self.app_version,
         }
+
+        if self.app_version:
+            data['message_data']['app_version'] = self.app_version
+
         return data
