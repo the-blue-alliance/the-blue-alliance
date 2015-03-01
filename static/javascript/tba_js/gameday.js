@@ -8,15 +8,17 @@ var order = [];
 var views = [];
 // hiddenviews are the contents views that are not supported by the chosen layout
 var hiddenviews = [];
+// For keeping track of what view a webcast key is in
+var viewLocations = {};
 
 $(document).ready(function() {
-	
+
 	// Bootstrap is stopping propagation of event
 	$('body').on('click', '.event_results', function(e) {
 		e.preventDefault();
 		$(document).trigger(e);
 	});
-	
+
 	$(".event_results").fancybox({
 		'overlayColor'  :	'#333',
 		'overlayShow'	:	true,
@@ -25,7 +27,7 @@ $(document).ready(function() {
 		'height'		:	0.9*$(".video_container").height(),
 		'type'			:	'iframe',
 	});
-	
+
 	setupViews();
 
     $(window).resize(function(){
@@ -34,10 +36,17 @@ $(document).ready(function() {
 });
 
 function setupViews() {
-  createViews();
-  
   var urlvars = getUrlVars();
-  
+   // save views
+  for (var n=0; n < 6; n++) {
+	  var view = urlvars['view_' + n];
+	  if (view != null) {
+		  viewLocations[n] = view;
+	  }
+  }
+
+  createViews();
+
   // Choosing layout
   var layout = urlvars['layout'];
   if (layout == null) {
@@ -45,24 +54,24 @@ function setupViews() {
 	layout = 2;
   }
   eval('layout_' + layout + '()');
-  
+
   // Choosing which views to populate
   for (var n=0; n < 6; n++) {
 	  var view = urlvars['view_' + n];
 	  if (view != null) {
-		var $item = $('#' + view);
-		if ($item[0] != null) {
-			setupView(n, $item);
-		}
+			var $item = $('#' + view);
+			if ($item[0] != null) {
+				setupView(n, $item);
+			}
 	  }
   }
-  
+
   // Choosing to start chat opened or closed
   var chatOpen = urlvars['chat'];
   if (chatOpen != null) {
 	  setChat(true);
   }
-  
+
   // Special Kickoff Mode
   var isKickoff = urlvars['kickoff'];
   if (isKickoff != null) {
@@ -72,7 +81,7 @@ function setupViews() {
 	  setupView(0, $("#kickoff-1"));
 	  $("#nav-alert-container").html('<div class="alert alert-success nav-alert"><button type="button" class="close" data-dismiss="alert">&times;</button><strong>Welcome!</strong> Remember to come back during the competition season for webcasts, scores, and more!</div>');
   }
-  
+
   // Special Champs Mode
   var isChamps = urlvars['champs'];
   if (isChamps != null) {
@@ -187,7 +196,7 @@ function createViews(){
 // Setup Draggable/Droppable
 function setupDragDrop() {
 	var swapping = false;
-				
+
 	// Let the video items be draggable
 	$( ".video_buttons" ).draggable({
 		drag: function() {$('.webcasts').addClass('webcasts-show');},
@@ -200,7 +209,7 @@ function setupDragDrop() {
 		},
 		cursorAt: {left: 15, top: 15},
 	});
-	
+
 	// Let the views be droppable, accepting the video items OR drag handles
 	$('.view').droppable({
 		drop: function( event, ui ) {
@@ -210,6 +219,7 @@ function setupDragDrop() {
 				var view_num = parseInt(/view_(\d+)/.exec($(this).attr('id'))[1]);
 				setupView(view_num, ui.draggable);
 			}
+			updateURLParams();
 		}
 	});
 }
@@ -218,15 +228,16 @@ function setupView(viewNum, $item) {
 	var eventKey = $item.attr('event');
 	var webcastNumber = $item.attr('num');
 	var eventName = $item.attr('alt');
-	
+	viewLocations[order.indexOf(viewNum)] = eventKey + '-' + webcastNumber;
+
 	$.getJSON('/_/webcast/' + eventKey + '/' + webcastNumber, function(data) {
 		player = data.player;
 		if (player == undefined) {
 			player = "No webcast available"
 		}
-		
+
 		// Combines the video player with overlay
-		var viewContents = player + "<div id='match_bar_" + viewNum + "' class='match_bar'>" + 
+		var viewContents = player + "<div id='match_bar_" + viewNum + "' class='match_bar'>" +
 		"<div class='matches " + eventKey + "_matches'></div></div>" +
 		"<div id='overlay_"+ viewNum + "' class='overlay' alt='" + eventName + "'>" +
 		"<div class='overlay-title'>" + eventName + "</div>" +
@@ -234,12 +245,12 @@ function setupView(viewNum, $item) {
 		"<span class='glyphicon glyphicon-remove'></span></div>" +
 		"<div id='swap_" + viewNum + "' class='swap' rel='tooltip' data-placement='left' title='Drag to another screen to swap'>" +
 		"<span class='glyphicon glyphicon-move'></span></div></div>";
-		
+
 		hiddenviews[viewNum] = viewContents;
 		document.getElementById('view_' + viewNum).innerHTML = hiddenviews[viewNum];
 		$("[rel=tooltip]").tooltip();
 		setupCloseSwap(viewNum);
-		
+
 		// Update matchbar on init
 		var eventsRef = new Firebase('https://thebluealliance.firebaseio.com/events/' + eventKey);
 		eventsRef.on('value', function(snapshot) {
@@ -254,8 +265,10 @@ function setupCloseSwap(viewNum) {
 	$("#close_"+viewNum).click(function() {
 		document.getElementById("view_"+viewNum).innerHTML = default_view;
 		hiddenviews[parseInt(viewNum)] = default_view;
+		viewLocations[order.indexOf(parseInt(viewNum))] = null;
+		updateURLParams();
 	});
-	
+
 	// Setup Swap
 	swapping = false;
 	$(function() {
@@ -271,7 +284,7 @@ function setupCloseSwap(viewNum) {
 			}
 		});
 	});
-	
+
 	$("#view_" + viewNum).mouseover(function() {
 		$("#overlay_"+viewNum).fadeIn(0);
 		$("#match_bar_"+viewNum).slideUp(75);
@@ -289,14 +302,19 @@ function swap(dragged, target) {
 	var draggedNum = parseInt(/swap_(\d+)/.exec(dragged.attr('id'))[1]);
 	var targetNum = parseInt(/view_(\d+)/.exec(target.attr('id'))[1]);
 
+	var temp = viewLocations[order.indexOf(draggedNum)];
+	viewLocations[order.indexOf(draggedNum)] = viewLocations[order.indexOf(targetNum)];
+	viewLocations[order.indexOf(targetNum)] = temp;
+
 	var draggedIndex = order.indexOf(draggedNum),
 		targetIndex = order.indexOf(targetNum);
-	
+
 	var temp = order[draggedIndex];
 	order[draggedIndex] = order[targetIndex];
 	order[targetIndex] = temp;
-	
+
 	fixLayout();
+	updateURLParams();
 }
 
 //Layout Changing Control
@@ -316,24 +334,38 @@ function addRemoveViews(current_layout, last_layout) {
 		$(views[parseInt(order[i])]).appendTo('.video_container');
 		document.getElementById('view_'+order[i]).innerHTML = hiddenviews[parseInt(order[i])];
 	}
-	
+
 	// Remove views that are't visible in current layout
 	for (var i = num_views[current_layout]; i < order.length; i++) {
 		$("#view_"+order[i]).remove();
 	}
-	
+
 	for (var i = 0; i < num_views[current_layout]; i++) {
 		setupCloseSwap(order[i]);
 	}
-	
+
 	setupDragDrop();
+	updateURLParams();
+}
+
+// Update URL Params
+function updateURLParams() {
+	var params = {
+		'layout': current_layout
+	};
+	for (num in viewLocations) {
+		if ((parseInt(num) < num_views[current_layout]) && (viewLocations[num] != null)){
+			params['view_' + num] = viewLocations[num];
+		}
+	}
+	location.hash = $.param(params);
 }
 
 // Defines the layouts
 function layout_0() {
 	current_layout = 0;
 	addRemoveViews(current_layout, last_layout);
-	
+
 	height = $(".video_container").height();
 	width = $(".video_container").width();
 
@@ -347,7 +379,7 @@ function layout_0() {
 function layout_1() {
 	current_layout = 1;
 	addRemoveViews(current_layout, last_layout);
-		
+
 	height = $(".video_container").height();
 	width = $(".video_container").width();
 
@@ -355,7 +387,7 @@ function layout_1() {
 	$("#view_"+order[0]).height(height);
 	$("#view_"+order[0]).css('top', 0);
 	$("#view_"+order[0]).css('left', 0);
-	
+
 	$("#view_"+order[1]).width(width*0.5);
 	$("#view_"+order[1]).height(height);
 	$("#view_"+order[1]).css('top', 0);
@@ -369,17 +401,17 @@ function layout_2() {
 
 	height = $(".video_container").height();
 	width = $(".video_container").width();
-	
+
 	$("#view_"+order[0]).width(width*0.65);
 	$("#view_"+order[0]).height(height);
 	$("#view_"+order[0]).css('top', 0);
 	$("#view_"+order[0]).css('left', 0);
-	
+
 	$("#view_"+order[1]).width(width*0.35);
 	$("#view_"+order[1]).height(height*0.5);
 	$("#view_"+order[1]).css('top', 0);
 	$("#view_"+order[1]).css('left', width*0.65);
-	
+
 	$("#view_"+order[2]).width(width*0.35);
 	$("#view_"+order[2]).height(height*0.5);
 	$("#view_"+order[2]).css('top', height*0.5);
@@ -390,7 +422,7 @@ function layout_2() {
 function layout_3() {
 	current_layout = 3;
 	addRemoveViews(current_layout, last_layout);
-		
+
 	height = $(".video_container").height();
 	width = $(".video_container").width();
 
@@ -398,17 +430,17 @@ function layout_3() {
 	$("#view_"+order[0]).height(height*0.5);
 	$("#view_"+order[0]).css('top', 0);
 	$("#view_"+order[0]).css('left', 0);
-	
+
 	$("#view_"+order[1]).width(width*0.5);
 	$("#view_"+order[1]).height(height*0.5);
 	$("#view_"+order[1]).css('top', 0);
 	$("#view_"+order[1]).css('left', width*0.5);
-	
+
 	$("#view_"+order[2]).width(width*0.5);
 	$("#view_"+order[2]).height(height*0.5);
 	$("#view_"+order[2]).css('top', height*0.5);
 	$("#view_"+order[2]).css('left', 0);
-	
+
 	$("#view_"+order[3]).width(width*0.5);
 	$("#view_"+order[3]).height(height*0.5);
 	$("#view_"+order[3]).css('top', height*0.5);
@@ -419,7 +451,7 @@ function layout_3() {
 function layout_4() {
 	current_layout = 4;
 	addRemoveViews(current_layout, last_layout);
-		
+
 	height = $(".video_container").height();
 	width = $(".video_container").width();
 
@@ -427,17 +459,17 @@ function layout_4() {
 	$("#view_"+order[0]).height(height);
 	$("#view_"+order[0]).css('top', 0);
 	$("#view_"+order[0]).css('left', 0);
-	
+
 	$("#view_"+order[1]).width(width*0.25);
 	$("#view_"+order[1]).height(height*0.25);
 	$("#view_"+order[1]).css('top', 0);
 	$("#view_"+order[1]).css('left', width*0.75);
-	
+
 	$("#view_"+order[2]).width(width*0.25);
 	$("#view_"+order[2]).height(height*0.25);
 	$("#view_"+order[2]).css('top', height*0.25);
 	$("#view_"+order[2]).css('left', width*0.75);
-	
+
 	$("#view_"+order[3]).width(width*0.25);
 	$("#view_"+order[3]).height(height*0.25);
 	$("#view_"+order[3]).css('top', height*0.5);
@@ -453,26 +485,26 @@ function layout_4() {
 function layout_5() {
 	current_layout = 5;
 	addRemoveViews(current_layout, last_layout);
-		
+
 	height = $(".video_container").height();
 	width = $(".video_container").width();
-	
+
 
 	$("#view_"+order[0]).width(width*0.34);
 	$("#view_"+order[0]).height(height*0.5);
 	$("#view_"+order[0]).css('top', 0);
 	$("#view_"+order[0]).css('left', 0);
-	
+
 	$("#view_"+order[1]).width(width*0.33);
 	$("#view_"+order[1]).height(height*0.5);
 	$("#view_"+order[1]).css('top', 0);
 	$("#view_"+order[1]).css('left', width*0.34);
-	
+
 	$("#view_"+order[2]).width(width*0.33);
 	$("#view_"+order[2]).height(height*0.5);
 	$("#view_"+order[2]).css('top', 0);
 	$("#view_"+order[2]).css('left', width*0.67);
-	
+
 	$("#view_"+order[3]).width(width*0.34);
 	$("#view_"+order[3]).height(height*0.5);
 	$("#view_"+order[3]).css('top', height*0.5);
@@ -501,17 +533,17 @@ function layout_6() {
 	$("#view_"+order[0]).height(height);
 	$("#view_"+order[0]).css('top', 0);
 	$("#view_"+order[0]).css('left', 0);
-	
+
 	$("#view_"+order[1]).width(width*0.25);
 	$("#view_"+order[1]).height(height*0.34);
 	$("#view_"+order[1]).css('top', 0);
 	$("#view_"+order[1]).css('left', width*0.75);
-	
+
 	$("#view_"+order[2]).width(width*0.25);
 	$("#view_"+order[2]).height(height*0.33);
 	$("#view_"+order[2]).css('top', height*0.34);
 	$("#view_"+order[2]).css('left', width*0.75);
-	
+
 	$("#view_"+order[3]).width(width*0.25);
 	$("#view_"+order[3]).height(height*0.33);
 	$("#view_"+order[3]).css('top', height*0.67);
