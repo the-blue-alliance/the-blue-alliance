@@ -113,25 +113,28 @@ class FMSAPIHybridScheduleParser(object):
         organized_matches = MatchHelper.organizeMatches(parsed_matches)
         for level in ['sf', 'f']:
             playoff_advancement = MatchHelper.generatePlayoffAdvancement2015(organized_matches)
-            for match in organized_matches[level]:
-                if 'frcNone' in match.team_key_names:
-                    if level == 'sf':
-                        red_seed, blue_seed = QF_SF_MAP[match.match_number]
-                    else:
-                        red_seed = 0
-                        blue_seed = 1
-                    red_teams = ['frc{}'.format(t) for t in playoff_advancement[LAST_LEVEL[level]][red_seed][0]]
-                    blue_teams = ['frc{}'.format(t) for t in playoff_advancement[LAST_LEVEL[level]][blue_seed][0]]
+            if playoff_advancement[LAST_LEVEL[level]] != []:
+                for match in organized_matches[level]:
+                    if 'frcNone' in match.team_key_names:
+                        if level == 'sf':
+                            red_seed, blue_seed = QF_SF_MAP[match.match_number]
+                        else:
+                            red_seed = 0
+                            blue_seed = 1
+                        red_teams = ['frc{}'.format(t) for t in playoff_advancement[LAST_LEVEL[level]][red_seed][0]]
+                        blue_teams = ['frc{}'.format(t) for t in playoff_advancement[LAST_LEVEL[level]][blue_seed][0]]
 
-                    alliances = match.alliances
-                    alliances['red']['teams'] = red_teams
-                    alliances['blue']['teams'] = blue_teams
-                    match.alliances_json = json.dumps(alliances)
-                    match.team_key_names = red_teams + blue_teams
+                        alliances = match.alliances
+                        alliances['red']['teams'] = red_teams
+                        alliances['blue']['teams'] = blue_teams
+                        match.alliances_json = json.dumps(alliances)
+                        match.team_key_names = red_teams + blue_teams
 
         fixed_matches = []
         for key, matches in organized_matches.items():
             if key != 'num':
-                fixed_matches += matches
+                for match in matches:
+                    if 'frcNone' not in match.team_key_names:
+                        fixed_matches.append(match)
 
         return fixed_matches
