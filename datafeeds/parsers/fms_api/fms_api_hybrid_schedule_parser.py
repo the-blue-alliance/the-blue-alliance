@@ -2,9 +2,23 @@ import datetime
 import json
 
 from google.appengine.ext import ndb
-
+from helpers.match_helper import MatchHelper
 from models.event import Event
 from models.match import Match
+
+QF_SF_MAP = {
+    1: (1, 3),  # in sf1, qf seeds 2 and 4 play. 0-indexed becomes 1, 3
+    2: (0, 2),
+    3: (1, 2),
+    4: (0, 3),
+    5: (2, 3),
+    6: (0, 1)
+}
+
+LAST_LEVEL = {
+    'sf': 'qf',
+    'f': 'sf'
+}
 
 
 class FMSAPIHybridScheduleParser(object):
@@ -93,4 +107,30 @@ class FMSAPIHybridScheduleParser(object):
                 score_breakdown_json=json.dumps(score_breakdown)
             ))
 
-        return parsed_matches
+        # Fix null teams in elims (due to FMS API failure, some info not complete)
+        # Should only happen for sf and f matches
+        organized_matches = MatchHelper.organizeMatches(parsed_matches)
+        for level in ['sf', 'f']:
+            playoff_advancement = MatchHelper.generatePlayoffAdvancement2015(organized_matches)
+            for match in organized_matches[level]:
+                if 'frcNone' in match.team_key_names:
+                    if level == 'sf':
+                        red_seed, blue_seed = QF_SF_MAP[match.match_number]
+                    else:
+                        red_seed = 0
+                        blue_seed = 1
+                    red_teams = ['frc{}'.format(t) for t in playoff_advancement[LAST_LEVEL[level]][red_seed][0]]
+                    blue_teams = ['frc{}'.format(t) for t in playoff_advancement[LAST_LEVEL[level]][blue_seed][0]]
+
+                    alliances = match.alliances
+                    alliances['red']['teams'] = red_teams
+                    alliances['blue']['teams'] = blue_teams
+                    match.alliances_json = json.dumps(alliances)
+                    match.team_key_names = red_teams + blue_teams
+
+        fixed_matches = []
+        for key, matches in organized_matches.items():
+            if key != 'num':
+                fixed_matches += matches
+
+        return fixed_matches
