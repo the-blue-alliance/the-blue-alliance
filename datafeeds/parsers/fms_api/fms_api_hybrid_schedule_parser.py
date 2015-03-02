@@ -56,6 +56,7 @@ class FMSAPIHybridScheduleParser(object):
         parsed_matches = []
         for match in matches:
             comp_level = self._get_comp_level(match['level'], match['matchNumber'])
+            match_number = self._get_match_number(comp_level, match['matchNumber'])
 
             red_teams = []
             blue_teams = []
@@ -95,11 +96,11 @@ class FMSAPIHybridScheduleParser(object):
                     event_key,
                     comp_level,
                     set_number,
-                    match['matchNumber']),
+                    match_number),
                 event=ndb.Key(Event, event_key),
                 game="frc_unknown",  # TODO: deprecate in favor of a 'year' property
                 set_number=set_number,
-                match_number=self._get_match_number(comp_level, match['matchNumber']),
+                match_number=match_number,
                 comp_level=comp_level,
                 team_key_names=team_key_names,
                 time=datetime.datetime.strptime(match['startTime'], "%Y-%m-%dT%H:%M:%S"),
