@@ -23,6 +23,14 @@ class FMSAPIHybridScheduleParser(object):
             else:
                 return 'f'
 
+    def _get_match_number(self, comp_level, match_number):
+        if comp_level == 'sf':
+            return match_number - 8
+        elif comp_level == 'f':
+            return match_number - 14
+        else:  # qm, qf
+            return match_number
+
     def parse(self, response):
         """
         This currently only works for the 2015 game, where elims matches are all part of one set.
@@ -77,7 +85,7 @@ class FMSAPIHybridScheduleParser(object):
                 event=ndb.Key(Event, event_key),
                 game="frc_unknown",  # TODO: deprecate in favor of a 'year' property
                 set_number=set_number,
-                match_number=match['matchNumber'],
+                match_number=self._get_match_number(comp_level, match['matchNumber']),
                 comp_level=comp_level,
                 team_key_names=team_key_names,
                 time=datetime.datetime.strptime(match['startTime'], "%Y-%m-%dT%H:%M:%S"),
