@@ -174,6 +174,9 @@ class Match(ndb.Model):
     @property
     def winning_alliance(self):
         if self._winning_alliance is None:
+            if self.year == 2015 and self.comp_level != 'f':
+                return ''  # report all 2015 non finals matches as ties
+
             highest_score = 0
             for alliance in self.alliances:
                 if int(self.alliances[alliance]["score"]) > highest_score:
