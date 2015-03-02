@@ -193,7 +193,7 @@ class Match(ndb.Model):
 
     @property
     def year(self):
-        return self.event.id()[:4]
+        return int(self.event.id()[:4])
 
     @property
     def key_name(self):
@@ -210,7 +210,7 @@ class Match(ndb.Model):
 
     @property
     def verbose_name(self):
-        if self.comp_level == "qm" or self.comp_level == "f":
+        if self.comp_level == "qm" or self.comp_level == "f" or self.year == 2015:
             return "%s %s" % (self.COMP_LEVELS_VERBOSE[self.comp_level], self.match_number)
         else:
             return "%s %s Match %s" % (self.COMP_LEVELS_VERBOSE[self.comp_level], self.set_number, self.match_number)
