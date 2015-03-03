@@ -91,5 +91,5 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/<:.*>', PageNotFoundHandler, 'page-not-found', strict_slash=True),
       ],
       debug=tba_config.DEBUG)
-app.error_handlers[404] = Webapp2HandlerAdapter(PageNotFoundHandler)
-app.error_handlers[500] = Webapp2HandlerAdapter(InternalServerErrorHandler)
+# app.error_handlers[404] = Webapp2HandlerAdapter(PageNotFoundHandler)
+# app.error_handlers[500] = Webapp2HandlerAdapter(InternalServerErrorHandler)
