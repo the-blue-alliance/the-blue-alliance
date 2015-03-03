@@ -88,14 +88,17 @@ class DistrictHelper(object):
             from helpers.match_helper import MatchHelper  # circular import issue
 
             # qual match points are calculated by rank
-            rankings = event.rankings[1:]  # skip title row
-            num_teams = len(rankings)
-            alpha = 1.07
-            for row in rankings:
-                rank = int(row[0])
-                team = 'frc{}'.format(row[1])
-                qual_points = int(np.ceil(cls.inverf(float(num_teams - 2 * rank + 2) / (alpha * num_teams)) * (10.0 / cls.inverf(1.0 / alpha)) + 12))
-                district_points['points'][team]['qual_points'] = qual_points * POINTS_MULTIPLIER
+            if event.rankings and len(event.rankings) > 1:
+                rankings = event.rankings[1:]  # skip title row
+                num_teams = len(rankings)
+                alpha = 1.07
+                for row in rankings:
+                    rank = int(row[0])
+                    team = 'frc{}'.format(row[1])
+                    qual_points = int(np.ceil(cls.inverf(float(num_teams - 2 * rank + 2) / (alpha * num_teams)) * (10.0 / cls.inverf(1.0 / alpha)) + 12))
+                    district_points['points'][team]['qual_points'] = qual_points * POINTS_MULTIPLIER
+            else:
+                logging.warning("Event {} has no rankings for qual_points calculations!".format(event.key.id()))
 
             # elim match point calculations
             matches = MatchHelper.organizeMatches([mf.get_result() for mf in match_futures])
