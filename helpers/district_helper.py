@@ -107,6 +107,9 @@ class DistrictHelper(object):
                 team_num_played = defaultdict(int)
 
                 for match in matches[level]:
+                    if not match.has_been_played:
+                        continue
+
                     for team_key in match.team_key_names:
                         team_num_played[team_key] += 1
 
@@ -122,7 +125,7 @@ class DistrictHelper(object):
             num_wins = {'red': 0, 'blue': 0}
             team_matches_played = {'red': [], 'blue': []}
             for match in matches['f']:
-                if match.winning_alliance == '':
+                if not match.has_been_played or match.winning_alliance == '':
                     continue
 
                 num_wins[match.winning_alliance] += 1
