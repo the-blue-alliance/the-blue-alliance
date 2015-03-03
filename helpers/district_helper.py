@@ -1,5 +1,8 @@
 import logging
 import heapq
+import math
+import numpy as np
+from sys import float_info
 
 from collections import defaultdict
 
@@ -14,10 +17,48 @@ from helpers.event_helper import EventHelper
 from models.award import Award
 from models.match import Match
 
+
 class DistrictHelper(object):
     """
-    Point calculations based on: http://www.usfirst.org/sites/default/files/uploadedFiles/Robotics_Programs/FRC/Resources/FRC_District_Standard_Points_Ranking_System.pdf
+    Point calculations based on:
+    2014: http://www.usfirst.org/sites/default/files/uploadedFiles/Robotics_Programs/FRC/Resources/FRC_District_Standard_Points_Ranking_System.pdf
+    2015: http://www.usfirst.org/sites/default/files/uploadedFiles/Robotics_Programs/FRC/Game_and_Season__Info/2015/FRC_District_Standard_Points_Ranking_System_2015%20Summary.pdf
     """
+    @classmethod
+    def inverf(cls, y):
+        """Return the inverse error function of y."""
+
+        # http://stackoverflow.com/questions/5971830/need-code-for-inverse-error-function
+        a = [0.886226899, -1.645349621,  0.914624893, -0.140543331]
+        b = [-2.118377725,  1.442710462, -0.329097515,  0.012229801]
+        c = [-1.970840454, -1.624906493,  3.429567803,  1.641345311]
+        d = [3.543889200,  1.637067800]
+        y0 = 0.7
+
+        if not (-1. <= y <= 1.):
+            raise ValueError("inverf argument must be between -1. and 1. (inclusive)")
+
+        if y == -1.:
+            return -float_info.max
+
+        if y == 1.:
+            return float_info.max
+
+        if y < -y0:
+            z = np.sqrt(-np.log((1. + y)/2.))
+            x = -(((c[3]*z + c[2])*z + c[1])*z + c[0])/((d[1]*z + d[0])*z + 1.0)
+        else:
+            if y < y0:
+                z = y**2
+                x = y*(((a[3]*z + a[2])*z + a[1])*z + a[0])/((((b[3]*z + b[3])*z + b[1])*z + b[0])*z + 1.)
+            else:
+                z = np.sqrt(-np.log((1. - y)/2.))
+                x = (((c[3]*z + c[2])*z + c[1])*z + c[0])/((d[1]*z + d[0])*z + 1.)
+
+            x = x - (math.erf(x) - y) / (2./np.sqrt(np.pi) * np.exp(pow(-x, 2)))
+            x = x - (math.erf(x) - y) / (2./np.sqrt(np.pi) * np.exp(pow(-x, 2)))
+        return x
+
     @classmethod
     def calculate_event_points(cls, event):
         match_key_futures = Match.query(Match.event == event.key).fetch_async(None, keys_only=True)
@@ -43,37 +84,84 @@ class DistrictHelper(object):
         }
 
         # match points
-        elim_num_wins = defaultdict(lambda: defaultdict(int))
-        elim_alliances = defaultdict(lambda: defaultdict(list))
-        for match_future in match_futures:
-            match = match_future.get_result()
-            if not match.has_been_played:
-                continue
+        if event.year == 2015:
+            from helpers.match_helper import MatchHelper  # circular import issue
 
-            if match.comp_level == 'qm':
-                if match.winning_alliance == '':
-                    for team in match.team_key_names:
-                        district_points['points'][team]['qual_points'] += 1 * POINTS_MULTIPLIER
-                else:
-                    for team in match.alliances[match.winning_alliance]['teams']:
-                        district_points['points'][team]['qual_points'] += 2 * POINTS_MULTIPLIER
-                        district_points['tiebreakers'][team]['qual_wins'] += 1
+            # qual match points are calculated by rank
+            rankings = event.rankings[1:]  # skip title row
+            num_teams = len(rankings)
+            alpha = 1.07
+            for row in rankings:
+                rank = int(row[0])
+                team = 'frc{}'.format(row[1])
+                qual_points = int(np.ceil(cls.inverf(float(num_teams - 2 * rank + 2) / (alpha * num_teams)) * (10.0 / cls.inverf(1.0 / alpha)) + 12))
+                district_points['points'][team]['qual_points'] = qual_points * POINTS_MULTIPLIER
 
-                for color in ['red', 'blue']:
-                    for team in match.alliances[color]['teams']:
-                        score = match.alliances[color]['score']
-                        district_points['tiebreakers'][team]['highest_qual_scores'] = heapq.nlargest(3, district_points['tiebreakers'][team]['highest_qual_scores'] + [score])
-            else:
+            # elim match point calculations
+            matches = MatchHelper.organizeMatches([mf.get_result() for mf in match_futures])
+            advancement = MatchHelper.generatePlayoffAdvancement2015(matches)
+            for level in ['qf', 'sf']:
+                team_num_played = defaultdict(int)
+
+                for match in matches[level]:
+                    for team_key in match.team_key_names:
+                        team_num_played[team_key] += 1
+
+                for i, (teams, _, _) in enumerate(advancement[level]):  # advancement includes the entire alliance including backup bots
+                    limit = 4 if level == 'qf' else 2
+                    if i >= limit:
+                        break
+                    for team in teams:
+                        team = 'frc{}'.format(team)
+                        points = 5.0 if level == 'qf' else 3.3
+                        district_points['points'][team]['elim_points'] += int(np.ceil(points * team_num_played[team])) * POINTS_MULTIPLIER
+
+            num_wins = {'red': 0, 'blue': 0}
+            team_matches_played = {'red': [], 'blue': []}
+            for match in matches['f']:
                 if match.winning_alliance == '':
                     continue
 
-                match_set_key = '{}_{}{}'.format(match.event.id(), match.comp_level, match.set_number)
-                elim_num_wins[match_set_key][match.winning_alliance] += 1
-                elim_alliances[match_set_key][match.winning_alliance] += match.alliances[match.winning_alliance]['teams']
+                num_wins[match.winning_alliance] += 1
+                for team in match.alliances[match.winning_alliance]['teams']:
+                    team_matches_played[match.winning_alliance].append(team)
 
-                if elim_num_wins[match_set_key][match.winning_alliance] >= 2:
-                    for team in elim_alliances[match_set_key][match.winning_alliance]:
-                        district_points['points'][team]['elim_points'] += 5* POINTS_MULTIPLIER
+                if num_wins[match.winning_alliance] >= 2:
+                    for team in team_matches_played[match.winning_alliance]:
+                        district_points['points'][team]['elim_points'] += 5 * POINTS_MULTIPLIER
+
+        else:
+            elim_num_wins = defaultdict(lambda: defaultdict(int))
+            elim_alliances = defaultdict(lambda: defaultdict(list))
+            for match_future in match_futures:
+                match = match_future.get_result()
+                if not match.has_been_played:
+                    continue
+
+                if match.comp_level == 'qm':
+                    if match.winning_alliance == '':
+                        for team in match.team_key_names:
+                            district_points['points'][team]['qual_points'] += 1 * POINTS_MULTIPLIER
+                    else:
+                        for team in match.alliances[match.winning_alliance]['teams']:
+                            district_points['points'][team]['qual_points'] += 2 * POINTS_MULTIPLIER
+                            district_points['tiebreakers'][team]['qual_wins'] += 1
+
+                    for color in ['red', 'blue']:
+                        for team in match.alliances[color]['teams']:
+                            score = match.alliances[color]['score']
+                            district_points['tiebreakers'][team]['highest_qual_scores'] = heapq.nlargest(3, district_points['tiebreakers'][team]['highest_qual_scores'] + [score])
+                else:
+                    if match.winning_alliance == '':
+                        continue
+
+                    match_set_key = '{}_{}{}'.format(match.event.id(), match.comp_level, match.set_number)
+                    elim_num_wins[match_set_key][match.winning_alliance] += 1
+                    elim_alliances[match_set_key][match.winning_alliance] += match.alliances[match.winning_alliance]['teams']
+
+                    if elim_num_wins[match_set_key][match.winning_alliance] >= 2:
+                        for team in elim_alliances[match_set_key][match.winning_alliance]:
+                            district_points['points'][team]['elim_points'] += 5* POINTS_MULTIPLIER
 
         # alliance points
         if event.alliance_selections:
@@ -101,7 +189,6 @@ class DistrictHelper(object):
                 district_points['points'][team]['total'] += p
 
         return district_points
-
 
     @classmethod
     def calculate_rankings(cls, events, team_futures, year):
