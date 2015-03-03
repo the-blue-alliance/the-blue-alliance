@@ -24,7 +24,7 @@
               <a class="btn btn-default btn-small disabled">Offline</a>
             {% endif %}
           {% else %}
-            {% if event.future or event.now %}
+            {% if event.future or event.within_a_day %}
               <a href="/suggest/event/webcast?event_key={{event.key_name}}" target="_blank">Add webcast</a>
             {% endif %}
           {% endif %}
