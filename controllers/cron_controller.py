@@ -409,19 +409,20 @@ class DistrictPointsCalcEnqueue(webapp.RequestHandler):
     Enqueues calculation of district points for events within a district for a given year
     """
 
-    def get(self, district_type_enum, year):
-        district_type_enum = int(district_type_enum)
-        if district_type_enum == DistrictType.NO_DISTRICT:
-            self.response.out.write("Can't enqueue for non district events!")
-            return
+    def get(self, year):
+        all_event_keys = []
+        for district_type_enum in DistrictType.type_names.keys():
+            if district_type_enum == DistrictType.NO_DISTRICT:
+                continue
 
-        year = int(year)
+            year = int(year)
 
-        event_keys = Event.query(Event.year == year, Event.event_district_enum == district_type_enum).fetch(None, keys_only=True)
-        for event_key in event_keys:
-            taskqueue.add(url='/tasks/math/do/district_points_calc/{}'.format(event_key.id()), method='GET')
+            event_keys = Event.query(Event.year == year, Event.event_district_enum == district_type_enum).fetch(None, keys_only=True)
+            all_event_keys += event_keys
+            for event_key in event_keys:
+                taskqueue.add(url='/tasks/math/do/district_points_calc/{}'.format(event_key.id()), method='GET')
 
-        self.response.out.write("Enqueued for: {}".format([event_key.id() for event_key in event_keys]))
+        self.response.out.write("Enqueued for: {}".format([event_key.id() for event_key in all_event_keys]))
 
 
 class DistrictPointsCalcDo(webapp.RequestHandler):

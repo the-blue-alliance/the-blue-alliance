@@ -70,7 +70,7 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/get/usfirst_team_details/(.*)', UsfirstTeamDetailsGet),
                                ('/tasks/get/usfirst_teams_tpids/([0-9]*)', UsfirstTeamsTpidsGet),
                                ('/tasks/get/usfirst_pre2003_team_events/(.*)', UsfirstPre2003TeamEventsGet),
-                               ('/tasks/math/enqueue/district_points_calc/([0-9]*)/([0-9]*)', DistrictPointsCalcEnqueue),
+                               ('/tasks/math/enqueue/district_points_calc/([0-9]*)', DistrictPointsCalcEnqueue),
                                ('/tasks/math/do/district_points_calc/(.*)', DistrictPointsCalcDo),
                                ('/tasks/math/enqueue/event_short_name_calc_enqueue/([0-9]*)', EventShortNameCalcEnqueue),
                                ('/tasks/math/do/event_short_name_calc_do/(.*)', EventShortNameCalcDo),
