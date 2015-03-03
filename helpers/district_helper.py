@@ -100,8 +100,16 @@ class DistrictHelper(object):
             else:
                 logging.warning("Event {} has no rankings for qual_points calculations!".format(event.key.id()))
 
-            # elim match point calculations
             matches = MatchHelper.organizeMatches([mf.get_result() for mf in match_futures])
+
+            # qual match calculations. only used for tiebreaking
+            for match in matches['qm']:
+                for color in ['red', 'blue']:
+                    for team in match.alliances[color]['teams']:
+                        score = match.alliances[color]['score']
+                        district_points['tiebreakers'][team]['highest_qual_scores'] = heapq.nlargest(3, district_points['tiebreakers'][team]['highest_qual_scores'] + [score])
+
+            # elim match point calculations
             advancement = MatchHelper.generatePlayoffAdvancement2015(matches)
             for level in ['qf', 'sf']:
                 team_num_played = defaultdict(int)
