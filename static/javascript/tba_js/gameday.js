@@ -143,8 +143,34 @@ function setSocial(open) {
 	}
 }
 
-//Chat Toggle
+// Ticker toggle
+function ticker_tab() {
+    var ticker = $(".ticker");
+    if (ticker.hasClass("ticker_active")) {
+        setTicker(false);
+    } else {
+        setTicker(true);
+    }
+}
 
+function setTicker(open) {
+    var ticker = $(".ticker");
+    var ticker_panel = $(".ticker_panel");
+    var webcasts_panel = $(".webcasts_panel");
+    if (open) {
+        ticker.addClass("ticker_active");
+        ticker_panel.addClass("ticker_panel_active");
+        webcasts_panel.addClass("webcasts_panel_ticker_active");
+        fixLayout();
+    } else {
+        ticker.removeClass("ticker_active");
+        ticker.removeClass("ticker_panel_active");
+        ticker.removeClass("webcasts_panel_ticker_active");
+        fixLayout();
+    }
+}
+
+//Chat Toggle
 function chat_tab() {
 	var chat = $(".chat");
 
