@@ -122,6 +122,8 @@ function social_tab() {
 	if(social.hasClass("social_active")) {
 		setSocial(false);
 	} else {
+        // Don't show both ticker and social
+        setTicker(false);
 		setSocial(true);
 	}
 }
@@ -149,6 +151,8 @@ function ticker_tab() {
     if (ticker.hasClass("ticker_active")) {
         setTicker(false);
     } else {
+        // Don't show both ticker and social
+        setSocial(false);
         setTicker(true);
     }
 }
@@ -164,8 +168,8 @@ function setTicker(open) {
         fixLayout();
     } else {
         ticker.removeClass("ticker_active");
-        ticker.removeClass("ticker_panel_active");
-        ticker.removeClass("webcasts_panel_ticker_active");
+        ticker_panel.removeClass("ticker_panel_active");
+        webcasts_panel.removeClass("webcasts_panel_ticker_active");
         fixLayout();
     }
 }

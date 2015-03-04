@@ -15,8 +15,9 @@ body {
   .nav, .navbar, .navbar-inner,
   .container, .brand,
   .dropdown, .dropdown-toggle,
-  .chat, .chat-toggle, .social, .social-toggle,
-  .ticker .ticker-toggle,
+  .chat, .chat-toggle,
+  .social, .social-toggle,
+  .ticker, .ticker-toggle,
   .settings, .settings-button {
     padding: 0 !important;
     margin: 0 !important;
@@ -164,7 +165,7 @@ body {
 .ticker_panel {
   position: fixed;
   top: 30px + @videoContainerTopOffset;
-  right: 0px;
+  left: 0px;
   bottom: 0px;
   width: @tickerWidth;
   background-color: @gray-lighter;
@@ -182,7 +183,8 @@ body {
       margin: 50px 25px;
     }
   }
-}.ticker_panel_active {
+}
+.ticker_panel_active {
   visibility: visible;
 }
 
@@ -219,7 +221,7 @@ body {
 }
 
 .webcasts_panel_ticker_active {
-  right: @tickerWidth;
+  left: @tickerWidth;
 }
 
 .video_container {
