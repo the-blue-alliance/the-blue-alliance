@@ -113,6 +113,7 @@ class ManipulatorBase(object):
         """
         if old_model is None:
             new_model.dirty = True
+            new_model._is_new = True  # used for post update/delete hooks
             self._computeAndSaveAffectedReferences(new_model)
             return new_model
 
@@ -145,4 +146,5 @@ class ManipulatorBase(object):
             post_update_hook = getattr(cls, "postUpdateHook", None)
             if callable(post_update_hook):
                 updated_attrs = [model._updated_attrs if hasattr(model, '_updated_attrs') else [] for model in models]
-                deferred.defer(post_update_hook, models, updated_attrs, _queue="post-update-hooks")
+                is_new = [model._is_new if hasattr(model, '_is_new') else False for model in models]
+                deferred.defer(post_update_hook, models, updated_attrs, is_new, _queue="post-update-hooks")

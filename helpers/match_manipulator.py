@@ -31,7 +31,7 @@ class MatchManipulator(ManipulatorBase):
                 logging.warning("Enqueuing Firebase delete failed!")
 
     @classmethod
-    def postUpdateHook(cls, matches, updated_attr_list):
+    def postUpdateHook(cls, matches, updated_attr_list, is_new_list):
         '''
         To run after the match has been updated.
         Send push notifications to subscribed users
