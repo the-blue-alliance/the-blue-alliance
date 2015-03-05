@@ -38,11 +38,11 @@ class MatchManipulator(ManipulatorBase):
         Only if the match is part of an active event
         '''
         unplayed_match_events = []
-        for (match, updated_attrs) in zip(matches, updated_attr_list):
+        for (match, updated_attrs, is_new) in zip(matches, updated_attr_list, is_new_list):
             event = match.event.get()
             # Only continue if the event is currently happening
-            # And we're updating a property that affects scores
-            if "alliances_json" in updated_attrs and event.within_a_day:
+            # And we're updating a property that affects scores or the match is newly created
+            if (is_new or "alliances_json" in updated_attrs) and event.within_a_day:
                 if match.has_been_played:
                     # There is a score update for this match, push a notification
                     logging.info("Sending push notifications for {}".format(match.key_name))
