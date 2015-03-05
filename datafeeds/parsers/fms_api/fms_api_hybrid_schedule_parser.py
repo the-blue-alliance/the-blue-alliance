@@ -3,7 +3,6 @@ import json
 import logging
 import pytz
 
-from google.appengine.ext import ndb
 from helpers.match_helper import MatchHelper
 from models.event import Event
 from models.match import Match
