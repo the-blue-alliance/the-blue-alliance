@@ -41,21 +41,22 @@ class MatchManipulator(ManipulatorBase):
         for (match, updated_attrs, is_new) in zip(matches, updated_attr_list, is_new_list):
             event = match.event.get()
             # Only continue if the event is currently happening
-            # And we're updating a property that affects scores or the match is newly created
-            if (is_new or "alliances_json" in updated_attrs) and event.within_a_day:
+            if event.within_a_day:
                 if match.has_been_played:
-                    # There is a score update for this match, push a notification
-                    logging.info("Sending push notifications for {}".format(match.key_name))
-                    try:
-                        NotificationHelper.send_match_score_update(match)
-                    except Exception, exception:
-                        logging.error("Error sending match updates: {}".format(exception))
-                        logging.error(traceback.format_exc())
-                elif not match.has_been_played and event not in unplayed_match_events:
-                    # The match has not been played, so we're changing a different property
-                    # This means the event's schedule has been updated (e.g. we're adding elim matches)
-                    # So send a schedule update notification for the parent event
-                    unplayed_match_events.append(event)
+                    if 'alliances_json' in updated_attrs:
+                        # There is a score update for this match, push a notification
+                        logging.info("Sending push notifications for {}".format(match.key_name))
+                        try:
+                            NotificationHelper.send_match_score_update(match)
+                        except Exception, exception:
+                            logging.error("Error sending match updates: {}".format(exception))
+                            logging.error(traceback.format_exc())
+                else:
+                    if is_new or (set(['alliances_json', 'time', 'time_string']).symmetric_difference(set(updated_attrs)) != set()):
+                        # The match has not been played and we're changing a property that affects the event's schedule
+                        # So send a schedule update notification for the parent event
+                        if event not in unplayed_match_events:
+                            unplayed_match_events.append(event)
 
         '''
         If we have an unplayed match during an event within a day, send out a schedule update notification
