@@ -254,12 +254,12 @@ class SearchHandler(webapp2.RequestHandler):
 
 
 class GamedayHandler(CacheableHandler):
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "main_gameday"
 
     def __init__(self, *args, **kw):
         super(GamedayHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24 * 7
+        self._cache_expiration = 60 * 60
 
     def _render(self, *args, **kw):
         special_webcasts_future = Sitevar.get_by_id_async('gameday.special_webcasts')
