@@ -1,5 +1,7 @@
 import datetime
 import json
+import logging
+import pytz
 
 from google.appengine.ext import ndb
 from helpers.match_helper import MatchHelper
@@ -52,6 +54,13 @@ class FMSAPIHybridScheduleParser(object):
         matches = response['Schedule']
 
         event_key = '{}{}'.format(self.year, self.event_short)
+        event = Event.get_by_id(event_key)
+        if event.timezone_id:
+            event_tz = pytz.timezone(event.timezone_id)
+        else:
+            logging.warning("Event {} has no timezone! Match times may be wrong.").format(event_key)
+            event_tz = None
+
         set_number = 1
         parsed_matches = []
         for match in matches:
@@ -91,19 +100,23 @@ class FMSAPIHybridScheduleParser(object):
                 }
             }
 
+            time = datetime.datetime.strptime(match['startTime'], "%Y-%m-%dT%H:%M:%S")
+            if event_tz is not None:
+                time = time - event_tz.utcoffset(time)
+
             parsed_matches.append(Match(
                 id=Match.renderKeyName(
                     event_key,
                     comp_level,
                     set_number,
                     match_number),
-                event=ndb.Key(Event, event_key),
+                event=event.key,
                 game="frc_unknown",  # TODO: deprecate in favor of a 'year' property
                 set_number=set_number,
                 match_number=match_number,
                 comp_level=comp_level,
                 team_key_names=team_key_names,
-                time=datetime.datetime.strptime(match['startTime'], "%Y-%m-%dT%H:%M:%S"),
+                time=time,
                 alliances_json=json.dumps(alliances),
                 score_breakdown_json=json.dumps(score_breakdown)
             ))
