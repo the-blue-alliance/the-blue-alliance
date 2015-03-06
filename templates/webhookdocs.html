@@ -78,6 +78,10 @@
               <li>“scheduled_time”: time that the match was originally scheduled for, in UNIX UTC</li>
               <li>“predicted_time”: time that the match is predicted to start at based on the times that scores were posted for previous events, in UNIX UTC</li></ul></li>
             </ul>
+          <h4>Example JSON</h4>
+            <pre class="example-json">
+            {"message_data": {"event_name": "New England FRC Region Championship", "scheduled_time": 1397330280, "match_key": "2014necmp_f1m1", "team_keys": ["frc195", "frc558", "frc5122", "frc177", "frc230", "frc4055"], "predicted_time": 1397330280}, "message_type": "upcoming_match"}
+            </pre>
         {% if types.upcoming_match in enabled %}
         <h4>Test Notification</h4>
             <a href="/notifications/test/{{types.upcoming_match}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Upcoming Match</a>
@@ -92,6 +96,10 @@
                 <li>“event_name”</li>
                 <li>“match”: a full match model representing the appropriate match</li></ul></li>
             </ul>
+          <h4>Example JSON</h4>
+            <pre class="example-json">
+            {"message_data": {"event_name": "New England FRC Region Championship", "match": {"comp_level": "f", "match_number": 1, "videos": [], "time_string": "3:18 PM", "set_number": 1, "key": "2014necmp_f1m1", "time": "1397330280", "score_breakdown": null, "alliances": {"blue": {"score": 154, "teams": ["frc177", "frc230", "frc4055"]}, "red": {"score": 78, "teams": ["frc195", "frc558", "frc5122"]} }, "event_key": "2014necmp"} }, "message_type": "match_score"}
+            </pre>
         {% if types.match_score in enabled %}
         <h4>Test Notification</h4>
             <a href="/notifications/test/{{types.match_score}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Match Score</a>
@@ -108,6 +116,10 @@
                 <li>“comp_level”: One of <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/master/models/match.py#L19">these types</a>
                 <li>“scheduled_time”: the time that the specified comp level is scheduled to start</li></ul></li>
               </ul>
+          <h4>Example JSON</h4>
+            <pre class="example-json">
+            {"message_data": {"event_name": "New England FRC Region Championship", "comp_level": "f", "event_key": "2014necmp", "scheduled_time": 1397330280}, "message_type": "starting_comp_level"}
+            </pre>
         {% if types.starting_comp_level in enabled %}
         <h4>Test Notification</h4>
             <a href="/notifications/test/{{types.starting_comp_level}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Level Starting</a>
@@ -121,6 +133,10 @@
               <li>fields in “message_data” object<ul>
                 <li>“event”: full event model for the related event</li></ul></li>
             </ul>
+          <h4>Example JSON</h4>
+            <pre class="example-json">
+            {"message_data": {"event": {"key": "2014necmp", "website": "http://www.nefirst.org/", "official": true, "end_date": "2014-04-12", "name": "New England FRC Region Championship", "short_name": "New England", "facebook_eid": null, "event_district_string": "New England", "venue_address": "Boston University\nAgganis Arena\nBoston, MA 02215\nUSA", "event_district": 3, "location": "Boston, MA, USA", "event_code": "necmp", "year": 2014, "webcast": [], "alliances": [{"declines": [], "picks": ["frc195", "frc558", "frc5122"]}, {"declines": [], "picks": ["frc1153", "frc125", "frc4048"]}, {"declines": [], "picks": ["frc230", "frc177", "frc4055"]}, {"declines": [], "picks": ["frc716", "frc78", "frc811"]}, {"declines": [], "picks": ["frc1519", "frc3467", "frc58"]}, {"declines": [], "picks": ["frc131", "frc175", "frc1073"]}, {"declines": [], "picks": ["frc228", "frc3525", "frc2168"]}, {"declines": [], "picks": ["frc172", "frc1058", "frc2067"]}], "event_type_string": "District Championship", "start_date": "2014-04-10", "event_type": 2} }, "message_type": "alliance_selection"}
+            </pre>
         {% if types.alliance_selection in enabled %}
         <h4>Test Notification</h4>
             <a href="/notifications/test/{{types.alliance_selection}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Alliance Selection</a>
@@ -138,6 +154,10 @@
                   <li>“team_key”: Key of winning team</li>
                   <li>“team_name”: Name of winning team</li></ul></li></ul></li>
             </ul>
+          <h4>Example JSON</h4>
+            <pre class="example-json">
+            {"message_data": {"event_name": "New England FRC Region Championship", "awards": [{"event_key": "2014necmp", "award_type": 0, "name": "Regional Chairman's Award", "recipient_list": [{"team_number": 2067, "awardee": null}, {"team_number": 78, "awardee": null}, {"team_number": 811, "awardee": null}, {"team_number": 2648, "awardee": null}], "year": 2014}], "message_type": "awards_posted"} }
+            </pre>
         {% if types.awards_posted in enabled %}
         <h4>Test Notification</h4>
             <a href="/notifications/test/{{types.awards_posted}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Awards</a>
@@ -153,6 +173,10 @@
                 <li>“team_name”</li>
                 <li>“media_type”: One of <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/media_type.py">these media types</a>.</li></ul></li>
             </ul>
+          <h4>Example JSON</h4>
+            <pre>
+            Not yet implemented
+            </pre>
         {% if types.media_posted in enabled %}
         <h4>Test Notification</h4>
             <a href="/notifications/test/{{types.media_posted}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Media</a>
@@ -167,6 +191,10 @@
                 <li>“district_key”</li>
                 <li>“district_name”</li></ul></li>
             </ul>
+          <h4>Example JSON</h4>
+            <pre>
+            Not yet implemented
+            </pre>
         {% if types.disrict_points_updated in enabled %}
         <h4>Test Notification</h4>
             <a href="/notifications/test/{{types.district_points_updated}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test District Points</a>
@@ -182,6 +210,10 @@
               <li>“event_name”</li>
               <li>“first_match_time” (optional)</li></ul></li>
           </ul>
+          <h4>Example JSON</h4>
+            <pre class="example-json">
+            {"message_data": {"event_name": "New England FRC Region Championship", "first_match_time": 1397330280, "event_key": "2014necmp"}, "message_type": "schedule_updated"}
+            </pre>
         {% if types.schedule_updated in enabled %}
         <h4>Test Notification</h4>
             <a href="/notifications/test/{{types.schedule_updated}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Schedule Update</a>
@@ -189,7 +221,7 @@
 
         <h3 id="notification_final_results">Final Results Notification</h3>
           <p>This notification is sent upon the conclusion of a live event</p>
-          <h4>Structure</h4>
+        <h4>Structure</h4>
             <ul>
               <li>message_type: “final_results”
               <li>fields in message_data object<ul>
@@ -198,6 +230,10 @@
                 <li>“event_key”</li>
                 <li>“event_name”</li></ul></li>
             </ul>
+          <h4>Example JSON</h4>
+          <pre>
+            <i>Not yet implemented</i>
+          </pre>
         {% if types.final_results in enabled %}
         <h4>Test Notification</h4>
             <a href="/notifications/test/{{types.final_results}}" class="btn btn-default"><span class="glyphicon glyphicon-envelope"></span> Send Test Final Results</a>
@@ -212,6 +248,10 @@
                 <li>"title": Title of the notification to be shown</li>
                 <li>"desc": Contents of the notification</li></ul></li>
             </ul>
+          <h4>Example JSON</h4>
+            <pre class="example-json">
+            {"message_data": {"desc": "This is a test message ensuring your device can recieve push messages from The Blue Alliance.", "title": "Test Message"}, "message_type": "ping"}
+            </pre>
         <h3 id="notification_broadcast">Admin Broadcast</h3>
           <p>This notification can be sent by TBA Admins when they want to announce something important.</p>
           <h4>Structure</h4>
@@ -220,20 +260,33 @@
               <li>fields in message_data object<ul>
                 <li>"title": Title of the notification to be shown</li>
                 <li>"desc": Contents of the notification</li>
-                <li>"url": URL to open when the notification is tapped</li></ul></li>
+                <li>"url": URL to open when the notification is tapped</li>
+                <li>"app_version": App version number this broadcast is targeting</ul></li>
             </ul>
+          <h4>Example JSON</h4>
+            <pre class="example-json">
+            {"message_data": {"title": "Test", "desc": "Test Broadcast", "url": "http://foo.bar", "app_version": "2.0.0"}, "message_type": "broadcast"}
+            </pre>
         <h3 id="notification_update_favorites">Update Favorites Notification</h3>
           <p>This notification is sent out to a user's devices when favorites are updated on their account, telling that device to re-sync the list from the server.</p>
           <h4>Structure</h4>
             <ul>
               <li>"message_type": "update_favorites"</li>
             </ul>
+          <h4>Example JSON</h4>
+            <pre class="example-json">
+            {"message_type": "update_favorites"}
+            </pre>
         <h3 id="notification_update_subscriptions">Update Subscriptions Notification</h3>
           <p>This notification is sent out to a user's devices when their subscriptions are updated for the account, telling that device to re-sync the list from the server.</p>
           <h4>Structure</h4>
             <ul>
               <li>"message_type": "update_subscriptions"</li>
             </ul>
+          <h4>Example JSON</h4>
+            <pre class="example-json">
+            {"message_type": "update_subscriptions"}
+            </pre>
         <h3 id="notification_verification">Webhook Verification Notifications</h3>
           <p>This notification is sent when a new webhook is created. It contains a verification code that needs to be entered in the <a href="http://www.thebluealliance.com/account">Account Overview</a> page for the webhook before it recieves live updates.</p>
           <h4>Structure</h4>
@@ -242,8 +295,23 @@
               <li>fields in message_data object<ul>
                 <li>"verification_key"</li></ul></li>
             </ul>
-
+            <h4>Example JSON</h4>
+              <pre class="example-json">
+              {"message_data": {"verification_key": "8279a61abdeee0cf46a86136bf888188a4b18cdf"}, "message_type": "verification"}
+              </pre>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block inline_javascript %}
+<script>
+$( document ).ready(function() {
+    $('.example-json').each(function(){
+        var jsonObject = JSON.parse($(this).html());
+        var stringified = JSON.stringify(jsonObject, null, 2)
+        $(this).html(stringified);
+    });
+});
+</script>
 {% endblock %}
