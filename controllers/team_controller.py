@@ -48,7 +48,7 @@ class TeamList(CacheableHandler):
             start = 1
 
         team_keys = Team.query().order(Team.team_number).filter(
-          Team.team_number >= start).filter(Team.team_number < stop).fetch(10000, keys_only=True)
+          Team.team_number >= start).filter(Team.team_number <= stop).fetch(10000, keys_only=True)
         teams = ndb.get_multi(team_keys)
 
         num_teams = len(teams)
