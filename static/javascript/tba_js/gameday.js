@@ -219,7 +219,7 @@ function setupDragDrop() {
 				var view_num = parseInt(/view_(\d+)/.exec($(this).attr('id'))[1]);
 				setupView(view_num, ui.draggable);
 			}
-			updateURLParams();
+			updateURLParamsAndEvents();
 		}
 	});
 }
@@ -251,11 +251,7 @@ function setupView(viewNum, $item) {
 		$("[rel=tooltip]").tooltip();
 		setupCloseSwap(viewNum);
 
-		// Update matchbar on init
-		var eventsRef = new Firebase('https://thebluealliance.firebaseio.com/events/' + eventKey);
-		eventsRef.on('value', function(snapshot) {
-		  updateMatchbar(snapshot);
-		});
+		updateURLParamsAndEvents();
 	});
 }
 
@@ -266,7 +262,7 @@ function setupCloseSwap(viewNum) {
 		document.getElementById("view_"+viewNum).innerHTML = default_view;
 		hiddenviews[parseInt(viewNum)] = default_view;
 		viewLocations[order.indexOf(parseInt(viewNum))] = null;
-		updateURLParams();
+		updateURLParamsAndEvents();
 	});
 
 	// Setup Swap
@@ -314,7 +310,7 @@ function swap(dragged, target) {
 	order[targetIndex] = temp;
 
 	fixLayout();
-	updateURLParams();
+	updateURLParamsAndEvents();
 }
 
 //Layout Changing Control
@@ -345,20 +341,26 @@ function addRemoveViews(current_layout, last_layout) {
 	}
 
 	setupDragDrop();
-	updateURLParams();
+	updateURLParamsAndEvents();
 }
 
-// Update URL Params
-function updateURLParams() {
+// Update URL Params and active events for matchbar
+function updateURLParamsAndEvents() {
+	// Update URL Params
 	var params = {
 		'layout': current_layout
 	};
+	var activeEventKeys = {};
 	for (num in viewLocations) {
 		if ((parseInt(num) < num_views[current_layout]) && (viewLocations[num] != null)){
 			params['view_' + num] = viewLocations[num];
+			activeEventKeys[viewLocations[num].split('-')[0]] = true;
 		}
 	}
 	location.hash = $.param(params);
+
+	// Update events to subscribe to in gameday_matchbar.js
+	setActiveEvents(activeEventKeys);
 }
 
 // Defines the layouts

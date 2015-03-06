@@ -1,12 +1,28 @@
 var eventsRef = new Firebase('https://thebluealliance.firebaseio.com/events/');
+var savedSnapshots = {};
 
-eventsRef.on('child_changed', function(snapshot) {
-  updateMatchbar(snapshot);
-});
+function setActiveEvents(eventKeys) {
+  // Remove old eventRefs
+  for (eventKey in savedSnapshots) {
+    if (!(eventKey in eventKeys)) {
+      var eventKey = String(eventKey);
+      eventsRef.child(eventKey).off();
+      delete savedSnapshots[eventKey];
+    }
+  }
 
-eventsRef.on('child_added', function(snapshot) {
-  updateMatchbar(snapshot);
-});
+  // Add new eventRefs
+  for (eventKey in eventKeys) {
+    var eventKey = String(eventKey)
+    if (eventKey in savedSnapshots) {
+      updateMatchbar(eventKey, savedSnapshots[eventKey]);
+    } else {
+      eventsRef.child(eventKey).on('value', function(snapshot) {
+        saveSnapshotAndUpdate(snapshot);
+      });
+    }
+  }
+}
 
 // Handle matchbar "Follow" settings
 var following_set = JSON.parse($.cookie("tba-gameday-following"));
@@ -14,13 +30,19 @@ if (following_set == null) {
   following_set = {};
 }
 
-function updateMatchbar(snapshot) {
-  var event_key = snapshot.key();
-  var event_data = snapshot.val();
+function saveSnapshotAndUpdate(snapshot) {
+  var eventKey = snapshot.key()
+  savedSnapshots[eventKey] = snapshot;
+  updateMatchbar(eventKey, snapshot);
+}
+
+function updateMatchbar(event_key, snapshot) {
+  var data = snapshot.val();
   var event_code = event_key.replace(/[0-9]/g, '').toUpperCase();
 
   var match_bar = $('.' + event_key + '_matches');
-  if (event_data == null) {
+
+  if (data == null) {
     match_bar.each(function() {
       $(this).html($('<div>', {'class': 'match-number', text: event_code}));
       $(this).append($('<div>', {'class': 'match-bar-info', text: "No matches yet!"}));
@@ -28,11 +50,11 @@ function updateMatchbar(snapshot) {
     return;
   }
 
-  var matches = event_data.matches;
+  var matchData = data.matches;
 
   var matches_list = [];
-  for (match_key in matches) {
-    var match = matches[match_key];
+  for (match_key in matchData) {
+    var match = matchData[match_key];
     match.key_name = match_key;
     matches_list.push(match);
   }
@@ -49,27 +71,23 @@ function updateMatchbar(snapshot) {
       last_matches.push(match);
     }
   }
-  last_matches.reverse();
-
 
   match_bar.each(function() { // Because the user might have more than 1 view of a given event open
     var matches = $(this)[0].children;
 
-    if (last_matches != null && last_matches[0] != null) {
-      var last_match = last_matches[0];
+    if (last_matches != null && last_matches[last_matches.length - 1] != null) {
+      var last_match = last_matches[last_matches.length - 1];
       // Remove old matches up to the last played match
       while (matches.length > 0) {
-        if (last_match.id != matches[0].id) {
-          matches[0].remove();
-        } else {
-          matches[0].remove();
+        if (last_match.id == matches[0].id) {
           break;
         }
+        matches[0].remove();
       }
 
       // Render last played match
-      var winning_alliance = (last_matches[0].winning_alliance == '') ? 'tie' : last_matches[0].winning_alliance;
-      var rendered_match = renderMatch(last_matches[0]).addClass('finished_match_' + winning_alliance);
+      var winning_alliance = (last_match.winning_alliance == '') ? 'tie' : last_match.winning_alliance;
+      var rendered_match = renderMatch(last_match).addClass('finished_match_' + winning_alliance);
       $(this).prepend(rendered_match);
     }
 
