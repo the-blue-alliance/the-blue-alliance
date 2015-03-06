@@ -28,7 +28,7 @@ class ApiMatchControllerBase(ApiBaseController):
 class ApiMatchController(ApiMatchControllerBase):
 
     CACHE_KEY_FORMAT = "apiv2_match_controller_{}"  # (match_key)
-    CACHE_VERSION = 2
+    CACHE_VERSION = 3
     CACHE_HEADER_LENGTH = 60 * 60
 
     def __init__(self, *args, **kw):
