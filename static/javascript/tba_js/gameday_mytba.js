@@ -37,7 +37,7 @@ $(function() {
         $.ajax({
           type: 'POST',
           dataType: 'json',
-          url: urlBase + '/_/account/favorites',
+          url: urlBase + '/_/account/favorites/add',
           data: data,
           success: function(msg) {
             updateFavoritesList();
@@ -55,12 +55,10 @@ function updateFavoritesList() {
   $.ajax({
     type: 'GET',
     dataType: 'json',
-    url: urlBase + '/_/account/favorites',
+    url: urlBase + '/_/account/favorites/1',
     success: function(favorites) {
       for (var key in favorites) {
-        if (favorites[key]['model_type'] == 1) {  // Only show favorite teams
-          insertFavoriteTeam(favorites[key]);
-        }
+        insertFavoriteTeam(favorites[key]);
       }
       updateAllMatchbars();
     },
@@ -112,7 +110,7 @@ function insertFavoriteTeam(favorite_team) {
     $.ajax({
       type: 'POST',
       dataType: 'json',
-      url: urlBase + '/_/account/favorites',
+      url: urlBase + '/_/account/favorites/delete',
       data: data,
       success: function(msg) {
         $("#favorite-" + teamNum).remove();

@@ -18,38 +18,54 @@ from models.typeahead_entry import TypeaheadEntry
 
 class AccountFavoritesHandler(LoggedInHandler):
     """
-    For getting, adding, and deleting an account's favorites
+    For getting an account's favorites
     """
-    def get(self):
+    def get(self, model_type):
         if not self.user_bundle.user:
             self.response.set_status(401)
             return
 
-        favorites = Favorite.query(ancestor=ndb.Key(Account, self.user_bundle.user.user_id())).fetch()
+        favorites = Favorite.query(
+            Favorite.model_type==int(model_type),
+            ancestor=ndb.Key(Account, self.user_bundle.user.user_id())).fetch()
         self.response.out.write(json.dumps([ModelToDict.favoriteConverter(fav) for fav in favorites]))
 
+
+class AccountFavoritesAddHandler(LoggedInHandler):
+    """
+    For adding an account's favorites
+    """
     def post(self):
         if not self.user_bundle.user:
             self.response.set_status(401)
             return
 
-        action = self.request.get("action")  # 'add' or 'delete'
         model_type = int(self.request.get("model_type"))
         model_key = self.request.get("model_key")
         user_id = self.user_bundle.user.user_id()
 
-        if action == 'add':
-            fav = Favorite(
-                parent=ndb.Key(Account, user_id),
-                user_id=user_id,
-                model_key=model_key,
-                model_type=model_type
-            )
-            MyTBAHelper.add_favorite(fav)
-        elif action == 'delete':
-            MyTBAHelper.remove_favorite(user_id, model_key)
-        else:
-            raise Exception("Unknown action: {}".format(action))
+        fav = Favorite(
+            parent=ndb.Key(Account, user_id),
+            user_id=user_id,
+            model_key=model_key,
+            model_type=model_type
+        )
+        MyTBAHelper.add_favorite(fav)
+
+
+class AccountFavoritesDeleteHandler(LoggedInHandler):
+    """
+    For deleting an account's favorites
+    """
+    def post(self):
+        if not self.user_bundle.user:
+            self.response.set_status(401)
+            return
+
+        model_key = self.request.get("model_key")
+        user_id = self.user_bundle.user.user_id()
+
+        MyTBAHelper.remove_favorite(user_id, model_key)
 
 
 class LiveEventHandler(CacheableHandler):
