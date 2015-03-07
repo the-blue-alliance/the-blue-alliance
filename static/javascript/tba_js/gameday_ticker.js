@@ -55,7 +55,7 @@ function loadMore() {
             cards.reverse();
             for (idx in cards.slice(1)) {// First element is repeated
                 var card = cards[idx];
-                $('#notifications').append(card);
+                $('#ticker-notifications').append(card);
                 updateVisibility(card, card.attr('data-type'));
             }
         });
@@ -63,8 +63,8 @@ function loadMore() {
 }
 
 // Load more notifications when scroll reaches the bottom
-$('#ticker-notifications').scroll(function() {
-    if (window.scrollY == document.body.scrollHeight - window.innerHeight) {
+$('.ticker_panel').scroll(function() {
+    if ($(this).scrollTop() + $(this).innerHeight()>=$(this)[0].scrollHeight) {
         loadMore();
     }
 });
