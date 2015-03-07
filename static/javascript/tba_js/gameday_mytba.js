@@ -34,10 +34,9 @@ $(function() {
         var data = $("#add-favorite-team-form :input").serializeArray();
         $.ajax({
           type: 'POST',
-          dataType: 'json',
           url: '/_/account/favorites/add',
           data: data,
-          success: function(msg) {
+          success: function(data, textStatus, xhr) {
             updateFavoritesList();
             $('#add-favorite-team-input').typeahead('setQuery', '');
           },
@@ -54,7 +53,7 @@ function updateFavoritesList() {
     type: 'GET',
     dataType: 'json',
     url: '/_/account/favorites/1',
-    success: function(favorites) {
+    success: function(favorites, textStatus, xhr) {
       for (var key in favorites) {
         insertFavoriteTeam(favorites[key]);
       }
@@ -107,10 +106,9 @@ function insertFavoriteTeam(favorite_team) {
     };
     $.ajax({
       type: 'POST',
-      dataType: 'json',
       url: '/_/account/favorites/delete',
       data: data,
-      success: function(msg) {
+      success: function(data, textStatus, xhr) {
         $("#favorite-" + teamNum).remove();
         updateAllMatchbars();
       },
