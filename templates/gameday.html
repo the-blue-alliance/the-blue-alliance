@@ -91,14 +91,12 @@
       </div>
       <div class="modal-body">
         <strong>Add Team to Favorite:</strong>
-        <form id="add-favorite-team-form" class="form-inline" action="/_/account/favorites" method="post">
-          <div class="input-group">
+        <form id="add-favorite-team-form" class="form-inline">
+          <div class="inline-block">
             <input name="action" type="hidden" value="add" />
             <input name="model_type" type="hidden" value="1" />
-            <input class="form-control" name="model_key" type="text" placeholder="Team Key">
-            <span class="input-group-btn">
-              <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
-            </span>
+            <input id="add-favorite-team-input" class="form-control" type="text" placeholder="Team Name or Number">
+            <input id="add-favorite-team-model-key" name="model_key" type="hidden">
           </div>
         </form>
 

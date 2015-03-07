@@ -3,6 +3,28 @@ var urlBase = '';
 $(function() {
     updateFavoritesList();  // Setup
 
+    // Setup typeahead
+    $('#add-favorite-team-input').attr('autocomplete', 'off');
+    $('#add-favorite-team-input').typeahead([
+      {
+        prefetch: {
+          url: '/_/typeahead/teams-all',
+          filter: unicodeFilter
+        },
+      }
+    ]);
+    // Submit form when entry chosen
+    function doAction(obj, datum) {
+      var team_re = datum.value.match(/(\d+) [|] .+/);
+      if (team_re != null) {
+        team_key = 'frc' + team_re[1];
+        $('#add-favorite-team-model-key').attr('value', team_key);
+        $('#add-favorite-team-form').submit();
+      }
+    }
+    $('#add-favorite-team-input').bind('typeahead:selected', doAction);
+    $('#add-favorite-team-input').bind('typeahead:autocompleted', doAction);
+
     // Form for adding favorites
     $('#add-favorite-team-form').on('submit', function(e) {
         e.preventDefault();
@@ -14,6 +36,7 @@ $(function() {
           data: data,
           success: function(msg) {
             updateFavoritesList();
+            $('#add-favorite-team-input').typeahead('setQuery', '');
           },
           error: function(xhr, textStatus, errorThrown) {
             console.log("FAIL: " + xhr.status);
