@@ -5,6 +5,7 @@ from webapp2_extras.routes import RedirectRoute
 import tba_config
 
 from controllers.account_controller import AccountEdit, AccountLogout, AccountOverview, AccountRegister, MyTBAController
+from controllers.ajax_controller import AccountFavoritesHandler
 from controllers.ajax_controller import LiveEventHandler, TypeaheadHandler, WebcastHandler
 from controllers.event_controller import EventList, EventDetail, EventRss
 from controllers.gameday2_controller import Gameday2Controller
@@ -85,6 +86,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/webhooks/delete', WebhookDelete, 'webhook-delete', strict_slash=True),
       RedirectRoute(r'/webhooks/verify/<client_id:[0-9]+>', WebhookVerify, 'webhook-verify', strict_slash=True),
       RedirectRoute(r'/webhooks/send_verification', WebhookVerificationSend, 'webhook-send-verification', strict_slash=True),
+      RedirectRoute(r'/_/account/favorites', AccountFavoritesHandler, 'ajax-account-favorites', strict_slash=True),
       RedirectRoute(r'/_/live-event/<event_key>/<timestamp:[0-9]+>', LiveEventHandler, 'ajax-live-event', strict_slash=True),
       RedirectRoute(r'/_/typeahead/<search_key>', TypeaheadHandler, 'ajax-typeahead', strict_slash=True),
       RedirectRoute(r'/_/webcast/<event_key>/<webcast_number>', WebcastHandler, 'ajax-webcast', strict_slash=True),

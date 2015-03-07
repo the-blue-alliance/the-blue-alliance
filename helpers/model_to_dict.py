@@ -72,6 +72,13 @@ class ModelToDict(object):
         return event_dict
 
     @classmethod
+    def favoriteConverter(self, favorite):
+        return {
+            'model_type': favorite.model_type,
+            'model_key': favorite.model_key
+        }
+
+    @classmethod
     def matchConverter(self, match):
         """
         return top level match dictionary
