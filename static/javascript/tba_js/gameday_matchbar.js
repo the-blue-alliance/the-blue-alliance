@@ -102,10 +102,9 @@ function updateMatchbar(event_key, snapshot) {
           for (var n=0; n<teams.length; n++) {
             var number = teams[n].substring(3);
 
-            var favorites = $('.favorite-team');
-            for (var m=0; m<favorites.length; m++) {
-              var fav_num = favorites[m].id.split('-')[1];
-              if (fav_num == number) {
+            var favNums = getFavoriteTeamNums();
+            for (var m=0; m<favNums.length; m++) {
+              if (favNums[m] == number) {
                 rendered_match.addClass('followed_match');
                 break;
               }

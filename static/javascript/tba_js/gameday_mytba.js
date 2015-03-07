@@ -118,3 +118,12 @@ function insertFavoriteTeam(favorite_team) {
     });
   });
 }
+
+function getFavoriteTeamNums() {
+  var favorites = $('.favorite-team');
+  var favNums = [];
+  for (var m=0; m<favorites.length; m++) {
+    favNums.push(favorites[m].id.split('-')[1]);
+  }
+  return favNums;
+}

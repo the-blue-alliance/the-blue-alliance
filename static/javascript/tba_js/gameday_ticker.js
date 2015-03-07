@@ -176,21 +176,32 @@ function constructMatchTable(redTeams, blueTeams, redScore, blueScore) {
         blueTeams[i] = blueTeams[i].substring(3);
     }
 
+    var favTeamNums = getFavoriteTeamNums();
     var matchTable = $('<table>', {'class': 'match-table'});
+
     var redRow = $('<tr>');
     for (var i in redTeams) {
-        redRow.append($('<td>', {'class': 'red'}).append($('<a>', {'href': '/team/'+redTeams[i], 'target': '_blank', text: redTeams[i]})));
+        var td = $('<td>', {'class': 'red'}).append($('<a>', {'href': '/team/'+redTeams[i], 'target': '_blank', text: redTeams[i]}));
+        if (favTeamNums.indexOf(redTeams[i]) != -1) {
+            td.addClass('favorite');
+        }
+        redRow.append(td)
     }
     if (redScore != null) {
         redRow.append($('<td>', {'class': 'redScore', text: redScore}));
     }
     var blueRow = $('<tr>');
     for (var i in blueTeams) {
-        blueRow.append($('<td>', {'class': 'blue'}).append($('<a>', {'href': '/team/'+blueTeams[i], 'target': '_blank', text: blueTeams[i]})));
+        var td = $('<td>', {'class': 'blue'}).append($('<a>', {'href': '/team/'+blueTeams[i], 'target': '_blank', text: blueTeams[i]}));
+        if (favTeamNums.indexOf(blueTeams[i]) != -1) {
+            td.addClass('favorite');
+        }
+        blueRow.append(td)
     }
     if (blueScore != null) {
         blueRow.append($('<td>', {'class': 'blueScore', text: blueScore}));
     }
+
     var tbody = $('<tbody>');
     tbody.append(redRow);
     tbody.append(blueRow);
