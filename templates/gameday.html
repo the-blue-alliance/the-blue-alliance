@@ -75,13 +75,13 @@
 
       <li class="social"><a class="social-toggle" href="javascript:social_tab();">Social Feed</a></li>
       <li class="chat"><a class="chat-toggle" href="javascript:chat_tab();">Chat</a></li>
-      <li class="settings"><a class="settings-button" href="#settings-modal" data-toggle="modal"><span class="glyphicon glyphicon-cog"></span></a></li>
+      <li class="settings"><a id="settings-button" class="settings-button" href="#settings-modal" data-toggle="modal"><span class="glyphicon glyphicon-star"></span> myTBA</a></li>
     </ul>
   </div>
 </div>
 </div>
 
-<!-- Settings Modal -->
+<!-- Settings (myTBA) Modal -->
 <div id="settings-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -105,6 +105,26 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Login Modal -->
+<div id="login-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="text-center">Follow your favorite teams with myTBA</h3>
+      </div>
+      <div class="modal-body">
+        <p>myTBA lets you save, follow, and get notifications about your favorite teams and events!</p>
+        <p>Your settings will be accessible both on <a href="http://www.thebluealliance.com/" target="_blank">www.thebluealliance.com</a> and our <a href="https://play.google.com/store/apps/details?id=com.thebluealliance.androidclient" target="_blank">Android app</a>.</p>
+        <p>Sign in with your Google Account to use myTBA today!</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success btn-lg btn-block">Yes, I'm in!</button>
+        <button type="button" class="btn btn-danger btn-lg btn-block" data-dismiss="modal">No thanks.</button>
       </div>
     </div>
   </div>

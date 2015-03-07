@@ -1,4 +1,5 @@
 var urlBase = '';
+var userIsLoggedIn = false;
 
 $(function() {
     updateFavoritesList();  // Setup
@@ -39,6 +40,9 @@ $(function() {
             $('#add-favorite-team-input').typeahead('setQuery', '');
           },
           error: function(xhr, textStatus, errorThrown) {
+            if (xhr.status == 401) {
+              userIsLoggedIn = false;
+            }
             console.log("FAIL: " + xhr.status);
           }
         });
@@ -52,6 +56,7 @@ function updateFavoritesList() {
     dataType: 'json',
     url: urlBase + '/_/account/favorites',
     success: function(favorites) {
+      userIsLoggedIn = true;
       for (var key in favorites) {
         if (favorites[key]['model_type'] == 1) {  // Only show favorite teams
           insertFavoriteTeam(favorites[key]);
@@ -60,6 +65,11 @@ function updateFavoritesList() {
       updateAllMatchbars();
     },
     error: function(xhr, textStatus, errorThrown) {
+      if (xhr.status == 401) {
+        userIsLoggedIn = false;
+        $('#login-modal').modal('show');
+        $('#settings-button').attr('href', '#login-modal');
+      }
       console.log("FAIL: " + xhr.status);
     }
   });
@@ -105,6 +115,9 @@ function insertFavoriteTeam(favorite_team) {
         updateAllMatchbars();
       },
       error: function(xhr, textStatus, errorThrown) {
+        if (xhr.status == 401) {
+          userIsLoggedIn = false;
+        }
         console.log("FAIL: " + xhr.status);
       }
     });
