@@ -57,6 +57,7 @@ function updateFavoritesList() {
           insertFavoriteTeam(favorites[key]);
         }
       }
+      updateAllMatchbars();
     },
     error: function(xhr, textStatus, errorThrown) {
       console.log("FAIL: " + xhr.status);
@@ -101,6 +102,7 @@ function insertFavoriteTeam(favorite_team) {
       data: data,
       success: function(msg) {
         $("#favorite-" + teamNum).remove();
+        updateAllMatchbars();
       },
       error: function(xhr, textStatus, errorThrown) {
         console.log("FAIL: " + xhr.status);

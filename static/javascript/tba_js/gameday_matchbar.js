@@ -24,16 +24,16 @@ function setActiveEvents(eventKeys) {
   }
 }
 
-// Handle matchbar "Follow" settings
-var following_set = JSON.parse($.cookie("tba-gameday-following"));
-if (following_set == null) {
-  following_set = {};
-}
-
 function saveSnapshotAndUpdate(snapshot) {
   var eventKey = snapshot.key()
   savedSnapshots[eventKey] = snapshot;
   updateMatchbar(eventKey, snapshot);
+}
+
+function updateAllMatchbars() {
+  for (eventKey in savedSnapshots) {
+    updateMatchbar(eventKey, savedSnapshots[eventKey]);
+  }
 }
 
 function updateMatchbar(event_key, snapshot) {
@@ -101,9 +101,14 @@ function updateMatchbar(event_key, snapshot) {
           var teams = upcoming_match.alliances.red.teams.concat(upcoming_match.alliances.blue.teams);
           for (var n=0; n<teams.length; n++) {
             var number = teams[n].substring(3);
-            if (following_set[number]) {
-              rendered_match.addClass('followed_match');
-              break;
+
+            var favorites = $('.favorite-team');
+            for (var m=0; m<favorites.length; m++) {
+              var fav_num = favorites[m].id.split('-')[1];
+              if (fav_num == number) {
+                rendered_match.addClass('followed_match');
+                break;
+              }
             }
           }
           $(this).append(rendered_match);
