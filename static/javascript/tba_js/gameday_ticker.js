@@ -79,7 +79,7 @@ function buildNotificationCard(data){
         return;
     }
     var timeString = data['time'];
-    var time = new Date(timeString+"+00:00").toLocaleString();
+    var timeFormatted = new Date(timeString+"+00:00").toLocaleString();
     var messageData = JSON.stringify(payload['message_data'], null, 2);
     var messageType = payload['message_type'];
 
@@ -149,10 +149,22 @@ function buildNotificationCard(data){
             body.append($('<pre>', {text: messageData}));
             break;
     }
+    var eventName = payload['message_data']['event_name'];
+    // Strip things out like "FIM District - " This is crude and may break
+    var splitEventName = eventName.split(' - ');
+    if (splitEventName.length == 1) {
+        eventName = splitEventName[0];
+    } else {
+        eventName = splitEventName[1];
+    }
     var heading = $('<div>', {
         'class': 'panel-heading',
-        'style': 'min-height:55px;',
-        html: payload['message_data']['event_name']+" [<a href='http://thebluealliance.com/event/"+eventKey+"' target='_blank' style='color:#FFFFFF'>"+eventKey.toUpperCase().substring(4)+"</a>]"
-    }).append($('<div>', {'class': 'pull-left', text: time}));
-    return card.append(heading).append(body);
+        html: "<a href='http://thebluealliance.com/event/"+eventKey+"' target='_blank' style='color:#FFFFFF'>"+eventName+" ["+eventKey.toUpperCase().substring(4)+"</a>]"
+    });
+
+    var footer = $('<div>', {'class': 'panel-footer'});
+    var time = $('<div>', {'class': 'pull-right'});
+    time.append($('<small>', {text: timeFormatted}));
+    footer.append(time)
+    return card.append(heading).append(body).append(footer);
 }
