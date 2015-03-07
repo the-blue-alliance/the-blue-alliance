@@ -64,9 +64,9 @@ function updateFavoritesList() {
     },
     error: function(xhr, textStatus, errorThrown) {
       if (xhr.status == 401) {  // User not logged in
-        var last_login_prompt = parseInt($.cookie("tba-gameday-last-login-prompt"));
+        var last_login_prompt = $.cookie("tba-gameday-last-login-prompt");
         var cur_epoch_ms = new Date().getTime();
-        if (last_login_prompt == null || last_login_prompt + 1000*60*60*24 < cur_epoch_ms) {  // Show prompt at most once per day
+        if (last_login_prompt == null || parseInt(last_login_prompt) + 1000*60*60*24 < cur_epoch_ms) {  // Show prompt at most once per day
           $('#login-modal').modal('show');
           $.cookie("tba-gameday-last-login-prompt", cur_epoch_ms);
         }
