@@ -75,6 +75,9 @@ function setupViews() {
 	  setChat(true);
   }
 
+  // Always start with ticker open
+  setTicker(true);
+
   // Special Kickoff Mode
   var isKickoff = urlvars['kickoff'];
   if (isKickoff != null) {
@@ -125,8 +128,8 @@ function social_tab() {
 	if(social.hasClass("social_active")) {
 		setSocial(false);
 	} else {
-        // Don't show both ticker and social
-        setTicker(false);
+    // Don't show both ticker and social
+    setTicker(false);
 		setSocial(true);
 	}
 }
