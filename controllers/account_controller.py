@@ -25,7 +25,11 @@ from models.sitevar import Sitevar
 
 class AccountOverview(LoggedInHandler):
     def get(self):
-        self._require_login('/account')
+        redirect = self.request.get('redirect')
+        if redirect:
+            self._require_login(redirect)
+        else:
+            self._require_login('/account')
         # Redirects to registration page if account not registered
         self._require_registration('/account/register')
 

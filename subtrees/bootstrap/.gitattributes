@@ -5,4 +5,11 @@
 *.json  text eol=lf
 *.less  text eol=lf
 *.md    text eol=lf
+*.svg   text eol=lf
 *.yml   text eol=lf
+# Don't diff or textually merge source maps
+*.map   binary
+
+bootstrap-theme.css linguist-vendored=false
+bootstrap.css linguist-vendored=false
+bootstrap.js linguist-vendored=false

@@ -1,8 +1,3 @@
-.container {
-  padding-left: 15px;
-  padding-right: 15px;
-}
-
 h4 {
   margin-top: 25px;
 }
@@ -17,8 +12,8 @@ h4 {
   padding-top: 15px;
   padding-bottom: 15px;
   background-color: #eee;
-  border: 1px solid #ddd;
   background-color: rgba(86,61,124,.15);
+  border: 1px solid #ddd;
   border: 1px solid rgba(86,61,124,.2);
 }
 

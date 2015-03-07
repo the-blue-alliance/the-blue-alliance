@@ -4,11 +4,15 @@ body {
 }
 
 .theme-dropdown .dropdown-menu {
-  display: block;
   position: static;
+  display: block;
   margin-bottom: 20px;
 }
 
 .theme-showcase > p > .btn {
   margin: 5px 0;
+}
+
+.theme-showcase .navbar .container {
+  width: auto;
 }
