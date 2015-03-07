@@ -10,12 +10,19 @@ from datafeeds.parsers.fms_api.fms_api_event_alliances_parser import FMSAPIEvent
 from datafeeds.parsers.fms_api.fms_api_event_rankings_parser import FMSAPIEventRankingsParser
 from datafeeds.parsers.fms_api.fms_api_hybrid_schedule_parser import FMSAPIHybridScheduleParser
 
+from google.appengine.ext import testbed
+
 from models.event import Event
 
 
 class TestFMSAPIParser(unittest2.TestCase):
-    def test_parseAwards(self):
-        event = Event(
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+
+        self.event = Event(
             id="2015waamv",
             end_date=datetime.datetime(2015, 4, 2, 0, 0),
             event_short="waamv",
@@ -25,10 +32,16 @@ class TestFMSAPIParser(unittest2.TestCase):
             name="PNW District - Auburn Mountainview Event",
             start_date=datetime.datetime(2015, 3, 31, 0, 0),
             year=2015,
+            timezone_id='America/Los_Angeles'
         )
+        self.event.put()
 
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def test_parseAwards(self):
         with open('test_data/fms_api/2015waamv_staging_awards.json', 'r') as f:
-            awards = FMSAPIAwardsParser(event).parse(json.loads(f.read()))
+            awards = FMSAPIAwardsParser(self.event).parse(json.loads(f.read()))
 
         self.assertEqual(len(awards), 5)
 
@@ -61,7 +74,7 @@ class TestFMSAPIParser(unittest2.TestCase):
         self.assertEqual(match.match_number, 1)
         self.assertEqual(match.team_key_names, [u'frc4131', u'frc4469', u'frc3663', u'frc3684', u'frc5295', u'frc2976'])
         self.assertEqual(match.alliances_json, """{"blue": {"score": 30, "teams": ["frc4131", "frc4469", "frc3663"]}, "red": {"score": 18, "teams": ["frc3684", "frc5295", "frc2976"]}}""")
-        self.assertEqual(match.time, datetime.datetime(2015, 2, 26, 16, 0))
+        self.assertEqual(match.time, datetime.datetime(2015, 2, 27, 0, 0))
         self.assertEqual(match.score_breakdown['red']['foul'], 0)
         self.assertEqual(match.score_breakdown['red']['auto'], 8)
         self.assertEqual(match.score_breakdown['blue']['foul'], 0)
@@ -73,7 +86,7 @@ class TestFMSAPIParser(unittest2.TestCase):
         self.assertEqual(match.match_number, 12)
         self.assertEqual(match.team_key_names, [u'frc3663', u'frc5295', u'frc2907', u'frc2046', u'frc3218', u'frc2412'])
         self.assertEqual(match.alliances_json, """{"blue": {"score": null, "teams": ["frc3663", "frc5295", "frc2907"]}, "red": {"score": null, "teams": ["frc2046", "frc3218", "frc2412"]}}""")
-        self.assertEqual(match.time, datetime.datetime(2015, 2, 26, 18, 17))
+        self.assertEqual(match.time, datetime.datetime(2015, 2, 27, 2, 17))
         self.assertEqual(match.score_breakdown['red']['foul'], None)
         self.assertEqual(match.score_breakdown['red']['auto'], None)
         self.assertEqual(match.score_breakdown['blue']['foul'], None)

@@ -80,7 +80,7 @@ class TestMatchApiController(unittest2.TestCase):
         if self.match.time is None:
             self.assertEqual(match["time"], None)
         else:
-            self.assertEqual(match["time"], self.match.time.strftime("%s"))
+            self.assertEqual(match["time"], 1409527874)
 
     def testMatchApi(self):
         response = self.testapp.get('/2014cc_f1m1', headers={"X-TBA-App-Id": "tba-tests:match-controller-test:v01"})

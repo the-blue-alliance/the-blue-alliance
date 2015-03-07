@@ -16,7 +16,7 @@ class EventManipulator(ManipulatorBase):
         return CacheClearer.get_event_cache_keys_and_controllers(affected_refs)
 
     @classmethod
-    def postUpdateHook(cls, events, updated_attr_list):
+    def postUpdateHook(cls, events, updated_attr_list, is_new_list):
         """
         To run after models have been updated
         """

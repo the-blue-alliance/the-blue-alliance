@@ -64,7 +64,7 @@ class TeamRenderer(object):
             team_rank = None
             if event.rankings:
                 for element in event.rankings:
-                    if element[1] == str(team.team_number):
+                    if str(element[1]) == str(team.team_number):
                         team_rank = element[0]
                         break
 

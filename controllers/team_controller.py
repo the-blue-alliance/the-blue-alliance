@@ -48,7 +48,7 @@ class TeamList(CacheableHandler):
             start = 1
 
         team_keys = Team.query().order(Team.team_number).filter(
-          Team.team_number >= start).filter(Team.team_number < stop).fetch(10000, keys_only=True)
+          Team.team_number >= start).filter(Team.team_number <= stop).fetch(10000, keys_only=True)
         teams = ndb.get_multi(team_keys)
 
         num_teams = len(teams)
@@ -73,7 +73,7 @@ class TeamList(CacheableHandler):
 class TeamCanonical(CacheableHandler):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
-    CACHE_VERSION = 2
+    CACHE_VERSION = 3
     CACHE_KEY_FORMAT = "team_canonical_{}"  # (team_number)
 
     def __init__(self, *args, **kw):
@@ -105,7 +105,7 @@ class TeamCanonical(CacheableHandler):
 class TeamDetail(CacheableHandler):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
-    CACHE_VERSION = 3
+    CACHE_VERSION = 4
     CACHE_KEY_FORMAT = "team_detail_{}_{}"  # (team_number, year)
 
     def __init__(self, *args, **kw):
