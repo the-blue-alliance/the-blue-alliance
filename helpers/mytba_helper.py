@@ -12,9 +12,8 @@ class MyTBAHelper(object):
         if Favorite.query(Favorite.model_key == fav.model_key, ancestor=ndb.Key(Account, fav.user_id)).count() == 0:
             # Favorite doesn't exist, add it
             fav.put()
-            if device_key:
-                # Send updates to user's other devices
-                NotificationHelper.send_favorite_update(fav.user_id, device_key)
+            # Send updates to user's other devices
+            NotificationHelper.send_favorite_update(fav.user_id, device_key)
             return 200
         else:
             # Favorite already exists. Don't add it again
@@ -25,9 +24,8 @@ class MyTBAHelper(object):
         to_delete = Favorite.query(Favorite.model_key == modelKey, ancestor=ndb.Key(Account, userId)).fetch(keys_only=True)
         if len(to_delete) > 0:
             ndb.delete_multi(to_delete)
-            if device_key:
-                # Send updates to user's other devices
-                NotificationHelper.send_favorite_update(userId, device_key)
+            # Send updates to user's other devices
+            NotificationHelper.send_favorite_update(userId, device_key)
             return 200
         else:
             # Favorite doesn't exist. Can't delete it
@@ -39,9 +37,8 @@ class MyTBAHelper(object):
         if current is None:
             # Subscription doesn't exist, add it
             sub.put()
-            if device_key:
-                # Send updates to user's other devices
-                NotificationHelper.send_subscription_update(sub.user_id, device_key)
+            # Send updates to user's other devices
+            NotificationHelper.send_subscription_update(sub.user_id, device_key)
             return 200
         else:
             if current.notification_types == sub.notification_types:
@@ -51,9 +48,8 @@ class MyTBAHelper(object):
                 # We're updating the settings
                 current.notification_types = sub.notification_types
                 current.put()
-                if device_key:
-                    # Send updates to user's other devices
-                    NotificationHelper.send_subscription_update(sub.user_id, device_key)
+                # Send updates to user's other devices
+                NotificationHelper.send_subscription_update(sub.user_id, device_key)
                 return 200
 
     @classmethod
@@ -61,12 +57,9 @@ class MyTBAHelper(object):
         to_delete = Subscription.query(Subscription.model_key == modelKey, ancestor=ndb.Key(Account, userId)).fetch(keys_only=True)
         if len(to_delete) > 0:
             ndb.delete_multi(to_delete)
-            if device_key:
-                # Send updates to user's other devices
-                NotificationHelper.send_subscription_update(userId, device_key)
+            # Send updates to user's other devices
+            NotificationHelper.send_subscription_update(userId, device_key)
             return 200
         else:
             # Subscription doesn't exist. Can't delete it
             return 404
-
-
