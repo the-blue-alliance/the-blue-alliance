@@ -148,7 +148,7 @@ function buildNotificationCard(data){
     var heading = $('<div>', {
         'class': 'panel-heading',
         'style': 'min-height:55px;',
-        text: payload['message_data']['event_name']+" ["+eventKey.toUpperCase().substring(4)+"]"
+        html: payload['message_data']['event_name']+" [<a href='http://thebluealliance.com/event/"+eventKey+"' target='_blank' style='color:#FFFFFF'>"+eventKey.toUpperCase().substring(4)+"</a>]"
     }).append($('<div>', {'class': 'pull-left', text: time}));
     return card.append(heading).append(body);
 }
