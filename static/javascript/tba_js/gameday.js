@@ -33,6 +33,9 @@ $(document).ready(function() {
     $(window).resize(function(){
 	  fixLayout();
     });
+
+    // Init material design theme
+    $.material.init();
 });
 
 function setupViews() {
