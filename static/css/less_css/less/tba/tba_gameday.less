@@ -171,6 +171,15 @@ body {
   background-color: @gray-lighter;
   visibility: hidden;
   overflow: auto;
+  padding: 5px;
+
+  #ticker-filter {
+    margin-top: -10px;
+  }
+
+  #ticker-filter-options {
+    display: none;
+  }
 
   #ticker-info-background {
     position: absolute;
@@ -178,9 +187,11 @@ body {
     background: rgba(0, 0, 0, 0.7);
     height: 100%;
     width: 100%;
+  }
 
-    #ticker-info {
-      margin: 50px 25px;
+  #ticker-notifications {
+    .panel {
+      margin-bottom: 5px;
     }
   }
 }

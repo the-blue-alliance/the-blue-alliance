@@ -145,51 +145,55 @@
   <div class="ticker-info-background">
     <div id="ticker-info" class="alert alert-info">
       <strong>Live Event Notification Ticker</strong>
-      <p>Created using <a href="http://www.thebluealliance.com/apidocs/webhooks" target="_blank">TBA Webhooks &raquo;</a></p>
+      <button id="ticker-filter" class="btn btn-fab btn-fab-mini btn-raised btn-sm btn-material-blue-grey pull-right" data-toggle="dropdown"><span class="glyphicon glyphicon-filter"></span></button>
     </div>
-    <div class="btn-group">
-      <a href="javascript:void(0)" class="btn btn-default" data-toggle="dropdown">Filter <span class="caret"></span></a>
-      <ul class="dropdown-menu" style="min-width:300px;">
-        <li><div class="checkbox checkbox-material-orange">
-          <label>
-            <input checked type="checkbox" value="upcoming_match">
-            Upcoming Matches
-            </label>
-        </div></li>
-        <li><div class="checkbox checkbox-material-indigo">
+      <div id="ticker-filter-options" class="panel">
+        <div class="panel-body">
+          <div class="togglebutton togglebutton-material-indigo">
             <label>
-            <input checked type="checkbox" value="match_score">
-            Match Results
+              <input type="checkbox">
+              Favorite Teams Only
             </label>
-        </div></li>
-        <li><div class="checkbox checkbox-material-light-blue">
+          </div>
+          <div class="checkbox checkbox-material-orange">
             <label>
-            <input checked type="checkbox" value="schedule_updated">
-            Schedule Updated
+              <input checked type="checkbox" value="upcoming_match">
+              Upcoming Matches
             </label>
-        </div></li>
-        <li><div class="checkbox checkbox-material-purple">
+          </div>
+          <div class="checkbox checkbox-material-indigo">
             <label>
-            <input checked type="checkbox" value="starting_comp_level">
-            Competition Level Starting
+              <input checked type="checkbox" value="match_score">
+              Match Results
             </label>
-        </div></li>
-        <li><div class="checkbox checkbox-material-red">
+          </div>
+          <div class="checkbox checkbox-material-light-blue">
             <label>
-            <input checked type="checkbox" value="alliance_selection">
-            Alliance Selections
+              <input checked type="checkbox" value="schedule_updated">
+              Schedule Updated
             </label>
-        </div></li>
-        <li><div class="checkbox checkbox-material-green">
+          </div>
+          <div class="checkbox checkbox-material-purple">
             <label>
-            <input checked type="checkbox" value="awards_posted">
-            Awards Posted
+              <input checked type="checkbox" value="starting_comp_level">
+              Competition Level Starting
             </label>
-        </div></li>
-      </ul>
-    </div>
+          </div>
+          <div class="checkbox checkbox-material-red">
+            <label>
+              <input checked type="checkbox" value="alliance_selection">
+              Alliance Selections
+            </label>
+          </div>
+          <div class="checkbox checkbox-material-green">
+            <label>
+              <input checked type="checkbox" value="awards_posted">
+              Awards Posted
+            </label>
+          </div>
+        </div>
+      </div>
     <div id="ticker-notifications">
-
     </div>
   </div>
 </div>

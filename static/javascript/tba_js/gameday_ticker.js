@@ -4,6 +4,10 @@ var earliestKey = null;
 var visibleTypes = {};  // default = visible
 
 $(window).load(function() {
+    $('#ticker-filter').click(function() {
+        $('#ticker-filter-options').slideToggle();
+    });
+
     firebase.limitToLast(pageSize).on('child_added', function(childSnapshot) {
         var card = buildNotificationCard(childSnapshot.val());
         $('#ticker-notifications').prepend(card);
