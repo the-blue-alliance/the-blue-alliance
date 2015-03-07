@@ -20,14 +20,10 @@ libraries:
   version: "2.6"
 
 handlers:
-- url: /css/material
-  static_dir: subtrees/material/dist/css
 - url: /css
   static_dir: static/css
 - url: /images
   static_dir: static/images
-- url: /javascript/material
-  static_dir: subtrees/material/dist/js
 - url: /javascript
   static_dir: static/javascript
 - url: /jwplayer
