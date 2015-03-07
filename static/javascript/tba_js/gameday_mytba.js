@@ -1,5 +1,4 @@
-var urlBase = '';
-var userIsLoggedIn = false;
+var urlBase = 'https://tbatv-prod-hrd.appspot.com';  // Use https
 
 $(function() {
     // Setup redirect after login
@@ -45,10 +44,7 @@ $(function() {
             $('#add-favorite-team-input').typeahead('setQuery', '');
           },
           error: function(xhr, textStatus, errorThrown) {
-            if (xhr.status == 401) {
-              userIsLoggedIn = false;
-            }
-            console.log("FAIL: " + xhr.status);
+            $('#mytba-alert-container').append('<div class="alert alert-warning alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Oops! Failed to add favorite.</strong><br>Something went wrong on our end. Please try again later.</div>');
           }
         });
     });
@@ -61,7 +57,6 @@ function updateFavoritesList() {
     dataType: 'json',
     url: urlBase + '/_/account/favorites',
     success: function(favorites) {
-      userIsLoggedIn = true;
       for (var key in favorites) {
         if (favorites[key]['model_type'] == 1) {  // Only show favorite teams
           insertFavoriteTeam(favorites[key]);
@@ -71,11 +66,10 @@ function updateFavoritesList() {
     },
     error: function(xhr, textStatus, errorThrown) {
       if (xhr.status == 401) {
-        userIsLoggedIn = false;
         $('#login-modal').modal('show');
         $('#settings-button').attr('href', '#login-modal');
       }
-      console.log("FAIL: " + xhr.status);
+      $('#mytba-alert-container').append('<div class="alert alert-warning alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Oops! Unable to get favorites.</strong><br>Something went wrong on our end. Please try again later.</div>');
     }
   });
 }
@@ -120,10 +114,7 @@ function insertFavoriteTeam(favorite_team) {
         updateAllMatchbars();
       },
       error: function(xhr, textStatus, errorThrown) {
-        if (xhr.status == 401) {
-          userIsLoggedIn = false;
-        }
-        console.log("FAIL: " + xhr.status);
+        $('#mytba-alert-container').append('<div class="alert alert-warning alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Oops! Failed to delete favorite.</strong><br>Something went wrong on our end. Please try again later.</div>');
       }
     });
   });
