@@ -147,7 +147,8 @@ function buildNotificationCard(data){
     }
     var heading = $('<div>', {
         'class': 'panel-heading',
+        'style': 'min-height:55px;',
         text: payload['message_data']['event_name']+" ["+eventKey.toUpperCase().substring(4)+"]"
-    }).append($('<span>', {'class': 'pull-right', text: time}));
+    }).append($('<div>', {'class': 'pull-left', text: time}));
     return card.append(heading).append(body);
 }
