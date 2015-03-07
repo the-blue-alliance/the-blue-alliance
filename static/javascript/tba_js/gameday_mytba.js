@@ -2,6 +2,11 @@ var urlBase = '';
 var userIsLoggedIn = false;
 
 $(function() {
+    // Setup redirect after login
+    $('#mytba-login').click(function() {
+      window.location.href = '/account?redirect=' + escape(document.URL);
+    });
+
     updateFavoritesList();  // Setup
 
     // Setup typeahead
