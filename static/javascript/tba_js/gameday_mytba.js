@@ -65,8 +65,13 @@ function updateFavoritesList() {
       updateAllMatchbars();
     },
     error: function(xhr, textStatus, errorThrown) {
-      if (xhr.status == 401) {
-        $('#login-modal').modal('show');
+      if (xhr.status == 401) {  // User not logged in
+        var last_login_prompt = parseInt($.cookie("tba-gameday-last-login-prompt"));
+        var cur_epoch_ms = new Date().getTime();
+        if (last_login_prompt == null || last_login_prompt + 1000*60*60*24 < cur_epoch_ms) {  // Show prompt at most once per day
+          $('#login-modal').modal('show');
+          $.cookie("tba-gameday-last-login-prompt", cur_epoch_ms);
+        }
         $('#settings-button').attr('href', '#login-modal');
       }
       $('#mytba-alert-container').append('<div class="alert alert-warning alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Oops! Unable to get favorites.</strong><br>Something went wrong on our end. Please try again later.</div>');
