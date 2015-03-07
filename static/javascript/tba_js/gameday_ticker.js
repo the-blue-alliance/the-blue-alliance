@@ -183,7 +183,7 @@ function constructMatchTable(redTeams, blueTeams, redScore, blueScore) {
     for (var i in redTeams) {
         var td = $('<td>', {'class': 'red'}).append($('<a>', {'href': '/team/'+redTeams[i], 'target': '_blank', text: redTeams[i]}));
         if (favTeamNums.indexOf(redTeams[i]) != -1) {
-            td.addClass('favorite');
+            td.addClass('red-favorite');
         }
         redRow.append(td)
     }
@@ -194,7 +194,7 @@ function constructMatchTable(redTeams, blueTeams, redScore, blueScore) {
     for (var i in blueTeams) {
         var td = $('<td>', {'class': 'blue'}).append($('<a>', {'href': '/team/'+blueTeams[i], 'target': '_blank', text: blueTeams[i]}));
         if (favTeamNums.indexOf(blueTeams[i]) != -1) {
-            td.addClass('favorite');
+            td.addClass('blue-favorite');
         }
         blueRow.append(td)
     }
