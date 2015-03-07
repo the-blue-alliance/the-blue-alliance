@@ -114,7 +114,7 @@ class EventDetail(CacheableHandler):
 
         awards = AwardHelper.organizeAwards(event.awards)
         # cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
-        cleaned_matches = matches  # 2015/03/07 Temp disable -@fangeugene
+        cleaned_matches = event.matches  # 2015/03/07 Temp disable -@fangeugene
         matches = MatchHelper.organizeMatches(cleaned_matches)
         teams = TeamHelper.sortTeams(event.teams)
 
