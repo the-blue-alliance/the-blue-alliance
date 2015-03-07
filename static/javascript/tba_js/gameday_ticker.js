@@ -106,13 +106,13 @@ function buildNotificationCard(data){
             card.addClass('panel-material-indigo');
             eventKey = payload['message_data']['match']['event_key'];
 
-            body.append($('<strong>', {text: 'Match Score: ' + payload['message_data']['match']['key']}));
+            body.append($('<strong>', {text: 'Match Result: ' + matchKeyToReadableName(payload['message_data']['match']['key'])}));
+
             var redTeams = payload['message_data']['match']['alliances']['red']['teams'];
             var blueTeams = payload['message_data']['match']['alliances']['blue']['teams'];
             var redScore = payload['message_data']['match']['alliances']['red']['score'];
             var blueScore = payload['message_data']['match']['alliances']['blue']['score'];
-            body.append($('<div>', {text: redTeams.toString() + ' - ' + redScore}));
-            body.append($('<div>', {text: blueTeams.toString() + ' - ' + blueScore}));
+            body.append(constructMatchTable(redTeams, blueTeams, redScore, blueScore));
             break;
         case 'schedule_updated':
             card.addClass('panel-material-light-blue');
@@ -137,12 +137,11 @@ function buildNotificationCard(data){
             card.addClass('panel-material-orange');
             eventKey = payload['message_data']['match_key'].split('_')[0];
 
-            body.append($('<strong>', {text: 'Upcoming Match: ' + payload['message_data']['match_key']}));
+            body.append($('<strong>', {text: 'Upcoming Match: ' + matchKeyToReadableName(payload['message_data']['match_key'])}));
 
             var redTeams = payload['message_data']['team_keys'].slice(0, 3);
             var blueTeams = payload['message_data']['team_keys'].slice(3, 6);
-            body.append($('<div>', {text: redTeams.toString()}));
-            body.append($('<div>', {text: blueTeams.toString()}));
+            body.append(constructMatchTable(redTeams, blueTeams, null, null));
             break;
         default:
             body.append($('<strong>', {text: messageType}));
@@ -159,7 +158,7 @@ function buildNotificationCard(data){
     }
     var heading = $('<div>', {
         'class': 'panel-heading',
-        html: "<a href='http://thebluealliance.com/event/"+eventKey+"' target='_blank' style='color:#FFFFFF'>"+eventName+" ["+eventKey.toUpperCase().substring(4)+"</a>]"
+        html: "<a href='http://thebluealliance.com/event/"+eventKey+"' target='_blank' style='color:#FFFFFF'>"+eventName+" ["+eventKey.toUpperCase().substring(4)+"]</a>"
     });
 
     var footer = $('<div>', {'class': 'panel-footer'});
@@ -167,4 +166,38 @@ function buildNotificationCard(data){
     time.append($('<small>', {text: timeFormatted}));
     footer.append(time)
     return card.append(heading).append(body).append(footer);
+}
+
+function constructMatchTable(redTeams, blueTeams, redScore, blueScore) {
+    for (var i=0; i<redTeams.length; i++) {
+        redTeams[i] = redTeams[i].substring(3);
+    }
+    for (var i=0; i<blueTeams.length; i++) {
+        blueTeams[i] = blueTeams[i].substring(3);
+    }
+
+    var matchTable = $('<table>', {'class': 'match-table'});
+    var redRow = $('<tr>');
+    for (var i in redTeams) {
+        redRow.append($('<td>', {'class': 'red'}).append($('<a>', {'href': '/team/'+redTeams[i], 'target': '_blank', text: redTeams[i]})));
+    }
+    if (redScore != null) {
+        redRow.append($('<td>', {'class': 'redScore', text: redScore}));
+    }
+    var blueRow = $('<tr>');
+    for (var i in blueTeams) {
+        blueRow.append($('<td>', {'class': 'blue'}).append($('<a>', {'href': '/team/'+blueTeams[i], 'target': '_blank', text: blueTeams[i]})));
+    }
+    if (blueScore != null) {
+        blueRow.append($('<td>', {'class': 'blueScore', text: blueScore}));
+    }
+    var tbody = $('<tbody>');
+    tbody.append(redRow);
+    tbody.append(blueRow);
+    matchTable.append(tbody)
+    return matchTable
+}
+
+function matchKeyToReadableName(matchKey) {
+    return matchKey.split('_')[1];
 }

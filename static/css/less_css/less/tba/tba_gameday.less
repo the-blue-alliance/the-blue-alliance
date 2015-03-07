@@ -11,6 +11,10 @@ body {
   background: #000000;
 }
 
+a, a:hover, a:focus {  // override bootstrap material
+  color: #428bca !important;
+}
+
 .gameday {
   .nav, .navbar, .navbar-inner,
   .container, .brand,
@@ -54,7 +58,7 @@ body {
     font-weight: 600;
   }
 
-  a {
+  a, a:hover {
     color: #ffffff;
     font-size: 12px;
     font-weight: normal;
@@ -198,9 +202,17 @@ body {
     .panel {
       margin-bottom: 5px;
     }
+    .panel-heading {
+      a, a:hover {
+        color: #ffffff !important;
+      }
+    }
     .panel-body {
       padding-top: 5px;
       padding-bottom: 5px;
+      .match-table {
+        margin-bottom: 0px !important;
+      }
     }
     .panel-footer {
       padding: 0px 10px;
