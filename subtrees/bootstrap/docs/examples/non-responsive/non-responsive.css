@@ -8,7 +8,17 @@
 body {
   padding-top: 70px;
   padding-bottom: 30px;
+}
+
+body,
+.navbar-fixed-top,
+.navbar-fixed-bottom {
   min-width: 970px;
+}
+
+/* Don't let the lead text change font-size. */
+.lead {
+  font-size: 16px;
 }
 
 /* Finesse the page header spacing */
@@ -22,14 +32,14 @@ body {
 
 /* Non-responsive overrides
  *
- * Utilitze the following CSS to disable the responsive-ness of the container,
+ * Utilize the following CSS to disable the responsive-ness of the container,
  * grid system, and navbar.
  */
 
 /* Reset the container */
 .container {
-  max-width: none !important;
   width: 970px;
+  max-width: none !important;
 }
 
 /* Demonstrate the grids */
@@ -37,8 +47,8 @@ body {
   padding-top: 15px;
   padding-bottom: 15px;
   background-color: #eee;
-  border: 1px solid #ddd;
   background-color: rgba(86,61,124,.15);
+  border: 1px solid #ddd;
   border: 1px solid rgba(86,61,124,.2);
 }
 
@@ -59,6 +69,7 @@ body {
   height: auto !important;
   padding-bottom: 0;
   overflow: visible !important;
+  visibility: visible !important;
 }
 
 .navbar-toggle {
@@ -94,12 +105,12 @@ body {
   position: absolute;
   float: left;
   background-color: #fff;
-  border: 1px solid #cccccc;
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, .15);
   border-width: 0 1px 1px;
   border-radius: 0 0 4px 4px;
-  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
-          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+          box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
 }
 .navbar-default .navbar-nav .open .dropdown-menu > li > a {
   color: #333;
@@ -117,4 +128,77 @@ body {
 .navbar .navbar-nav .open .dropdown-menu > .disabled > a:focus {
   color: #999 !important;
   background-color: transparent !important;
+}
+
+/* Undo form expansion */
+.navbar-form {
+  float: left;
+  width: auto;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-right: 0;
+  margin-left: 0;
+  border: 0;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+}
+
+/* Copy-pasted from forms.less since we mixin the .form-inline styles. */
+.navbar-form .form-group {
+  display: inline-block;
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+
+.navbar-form .form-control {
+  display: inline-block;
+  width: auto;
+  vertical-align: middle;
+}
+
+.navbar-form .form-control-static {
+  display: inline-block;
+}
+
+.navbar-form .input-group {
+  display: inline-table;
+  vertical-align: middle;
+}
+
+.navbar-form .input-group .input-group-addon,
+.navbar-form .input-group .input-group-btn,
+.navbar-form .input-group .form-control {
+  width: auto;
+}
+
+.navbar-form .input-group > .form-control {
+  width: 100%;
+}
+
+.navbar-form .control-label {
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+
+.navbar-form .radio,
+.navbar-form .checkbox {
+  display: inline-block;
+  margin-top: 0;
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+
+.navbar-form .radio label,
+.navbar-form .checkbox label {
+  padding-left: 0;
+}
+
+.navbar-form .radio input[type="radio"],
+.navbar-form .checkbox input[type="checkbox"] {
+  position: relative;
+  margin-left: 0;
+}
+
+.navbar-form .has-feedback .form-control-feedback {
+  top: 0;
 }
