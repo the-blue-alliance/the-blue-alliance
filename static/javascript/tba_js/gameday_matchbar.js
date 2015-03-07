@@ -95,7 +95,7 @@ function updateMatchbar(event_key, snapshot) {
       for (var i=0; i<upcoming_matches.length; i++) {
         // Render match if not already present in matchbar
         var upcoming_match = upcoming_matches[i];
-        if ($(this).children('div[id="' + upcoming_match.key_name + '"').length == 0) {
+        if ($(this).children('div[id="' + upcoming_match.key_name + '"]').length == 0) {
           var rendered_match = renderMatch(upcoming_match).addClass('upcoming_match');
           // Color followed matches a different color
           var teams = upcoming_match.alliances.red.teams.concat(upcoming_match.alliances.blue.teams);
