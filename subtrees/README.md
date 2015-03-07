@@ -14,8 +14,6 @@ To update a subtree:
 
 Example: `git subtree pull --prefix subtrees/bootstrap git@github.com:twbs/bootstrap.git master --squash`
 
-To download [Bootstrap Material Design](https://fezvrasta.github.io/bootstrap-material-design/) theme: `git subtree add --prefix subtrees/material git@github.com:FezVrasta/bootstrap-material-design.git master --squash`
-
 More information about subtrees:
 --------------------------------
 - https://help.github.com/articles/working-with-subtree-merge
