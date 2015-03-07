@@ -1,7 +1,8 @@
 var firebase = new Firebase('https://thebluealliance.firebaseio.com/notifications/');
 var pageSize = 25;
+var numToAnimate = 3; // How many cards to animate
 var earliestKey = null;
-var visibleTypes = {};  // default = visible
+var visibleTypes = {'favorite_teams_only': true};  // default = visible
 
 $(window).load(function() {
     $('#ticker-filter').click(function() {
@@ -26,20 +27,66 @@ $(window).load(function() {
         } else {
             visibleTypes[type] = false;
         }
-
-        if (visibleTypes[type]) {
-            $('.' + $(this).attr("value")).slideDown()
-        } else {
-            $('.' + $(this).attr("value")).slideUp();
-        }
+        updateAllVisibility();
     });
 });
 
-function updateVisibility(e, type) {
-    if (!(type in visibleTypes) || visibleTypes[type]) {
-        e.slideDown();
-    }
+function updateAllVisibility() {
+    var favTeamNums = getFavoriteTeamNums();
+    var index = 0;
+    $('#ticker-notifications').children().each(function () {
+        var dataType = $(this).attr('data-type');
+        if (!(dataType in visibleTypes) || visibleTypes[dataType]) {
+            if (visibleTypes['favorite_teams_only'] && (dataType == 'upcoming_match' || dataType == 'match_score')) {
+                var isFav = false;
+                for (var i=0; i<favTeamNums.length; i++) {
+                    if ($(this).attr('data-team-nums').split(',').indexOf(favTeamNums[i]) != -1) {
+                        isFav = true;
+                        break;
+                    }
+                }
+                if (!isFav) {
+                    if (index < 3) {
+                        $(this).slideUp();
+                    } else {
+                        $(this).hide();
+                    }
+                    return;
+                }
+            }
+            if (index < 3) {
+                $(this).slideDown();
+            } else {
+                $(this).show();
+            }
+        } else {
+            if (index < 3) {
+                $(this).slideUp();
+            } else {
+                $(this).hide();
+            }
+            return;
+        }
+        if ($(this).is(':visible')) {
+            index++;
+        }
+    });
+}
 
+function updateVisibility(e, type) {
+    // New cads are always hidden. This chooses whether or not to show it
+    if (!(type in visibleTypes) || visibleTypes[type]) {
+        if (type == 'match_score' || type == 'upcoming_match') {
+            var favTeamNums = getFavoriteTeamNums();
+            for (var i=0; i<favTeamNums.length; i++) {
+                if (e.attr('data-team-nums').split(',').indexOf(favTeamNums[i]) != -1) {
+                    e.slideDown();
+                }
+            }
+        } else {
+            e.slideDown();
+        }
+    }
 }
 
 function loadMore() {
@@ -85,7 +132,6 @@ function buildNotificationCard(data){
 
     var card = $('<div>', {'class': 'panel'});
     card.hide();  // default with cards hidden
-    card.addClass(messageType);
     card.attr('data-type', messageType);
     var body = $('<div>', {'class': 'panel-body'});
     var eventKey = 'XXXX????';
@@ -113,6 +159,7 @@ function buildNotificationCard(data){
             var redScore = payload['message_data']['match']['alliances']['red']['score'];
             var blueScore = payload['message_data']['match']['alliances']['blue']['score'];
             body.append(constructMatchTable(redTeams, blueTeams, redScore, blueScore));
+            card.attr('data-team-nums', redTeams.concat(blueTeams));
             break;
         case 'schedule_updated':
             card.addClass('panel-material-light-blue');
@@ -142,6 +189,7 @@ function buildNotificationCard(data){
             var redTeams = payload['message_data']['team_keys'].slice(0, 3);
             var blueTeams = payload['message_data']['team_keys'].slice(3, 6);
             body.append(constructMatchTable(redTeams, blueTeams, null, null));
+            card.attr('data-team-nums', redTeams.concat(blueTeams));
             break;
         default:
             body.append($('<strong>', {text: messageType}));
