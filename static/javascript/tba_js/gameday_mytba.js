@@ -1,5 +1,3 @@
-var urlBase = 'https://tbatv-prod-hrd.appspot.com';  // Use https
-
 $(function() {
     // Setup redirect after login
     $('#mytba-login').click(function() {
@@ -37,7 +35,7 @@ $(function() {
         $.ajax({
           type: 'POST',
           dataType: 'json',
-          url: urlBase + '/_/account/favorites/add',
+          url: '/_/account/favorites/add',
           data: data,
           success: function(msg) {
             updateFavoritesList();
@@ -55,7 +53,7 @@ function updateFavoritesList() {
   $.ajax({
     type: 'GET',
     dataType: 'json',
-    url: urlBase + '/_/account/favorites/1',
+    url: '/_/account/favorites/1',
     success: function(favorites) {
       for (var key in favorites) {
         insertFavoriteTeam(favorites[key]);
@@ -110,7 +108,7 @@ function insertFavoriteTeam(favorite_team) {
     $.ajax({
       type: 'POST',
       dataType: 'json',
-      url: urlBase + '/_/account/favorites/delete',
+      url: '/_/account/favorites/delete',
       data: data,
       success: function(msg) {
         $("#favorite-" + teamNum).remove();
