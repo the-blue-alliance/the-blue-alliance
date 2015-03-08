@@ -133,37 +133,6 @@ function updateVisibility(e, type) {
     }
 }
 
-// function loadMore() {
-//     if (earliestKey != null) {
-//         firebase.orderByKey().endAt(earliestKey).limitToLast(pageSize).once('value', function(snapshot) {
-//             var data = snapshot.val();
-//             var cards = [];
-//             for (childKey in data) {
-//                 var card = buildNotificationCard(data[childKey]);
-//                 cards.push(card);
-
-//                 if (earliestKey == null || childKey < earliestKey) {
-//                     earliestKey = childKey;
-//                 }
-//             }
-
-//             cards.reverse();
-//             for (idx in cards.slice(1)) {// First element is repeated
-//                 var card = cards[idx];
-//                 $('#ticker-notifications').append(card);
-//                 updateVisibility(card, card.attr('data-type'));
-//             }
-//         });
-//     }
-// }
-
-// // Load more notifications when scroll reaches the bottom
-// $('.ticker_panel').scroll(function() {
-//     if ($(this).scrollTop() + $(this).innerHeight()>=$(this)[0].scrollHeight) {
-//         loadMore();
-//     }
-// });
-
 function buildNotificationCard(data){
     var payload = data['payload'];
     if(payload == null){
