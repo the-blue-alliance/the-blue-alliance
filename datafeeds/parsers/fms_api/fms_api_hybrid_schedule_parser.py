@@ -69,13 +69,19 @@ class FMSAPIHybridScheduleParser(object):
             red_teams = []
             blue_teams = []
             team_key_names = []
+            null_team = False
             for team in match['Teams']:
+                if team['teamNumber'] is None:
+                    null_team = True
+                    break
                 team_key = 'frc{}'.format(team['teamNumber'])
                 team_key_names.append(team_key)
                 if 'Red' in team['station']:
                     red_teams.append(team_key)
                 elif 'Blue' in team['station']:
                     blue_teams.append(team_key)
+            if null_team:
+                continue
 
             alliances = {
                 'red': {
