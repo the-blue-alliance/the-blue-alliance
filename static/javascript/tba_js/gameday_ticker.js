@@ -12,7 +12,7 @@ $(window).load(function() {
     firebase.limitToLast(maxNumCards).on('child_added', function(childSnapshot) {
         var card = buildNotificationCard(childSnapshot.val());
         $('#ticker-notifications').prepend(card);
-        var len = $('#ticker-notifications').length;
+        var len = $('#ticker-notifications').children().length;
         if (len > maxNumCards) {
             $('#ticker-notifications').children()[len-1].remove();
         }
