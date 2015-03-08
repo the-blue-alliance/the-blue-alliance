@@ -1,5 +1,5 @@
 var firebase = new Firebase('https://thebluealliance.firebaseio.com/notifications/');
-var pageSize = 25;
+var maxNumCards = 100;
 var numToAnimate = 3; // How many cards to animate
 var earliestKey = null;
 var visibleTypes = {'favorite_teams_only': true};  // default = visible
@@ -9,9 +9,13 @@ $(window).load(function() {
         $('#ticker-filter-options').slideToggle();
     });
 
-    firebase.limitToLast(pageSize).on('child_added', function(childSnapshot) {
+    firebase.limitToLast(maxNumCards).on('child_added', function(childSnapshot) {
         var card = buildNotificationCard(childSnapshot.val());
         $('#ticker-notifications').prepend(card);
+        var len = $('#ticker-notifications').length;
+        if (len > maxNumCards) {
+            $('#ticker-notifications').children()[l-1].remove();
+        }
         updateVisibility(card, card.attr('data-type'));
 
         if (earliestKey == null || childSnapshot.key() < earliestKey) {
@@ -89,36 +93,36 @@ function updateVisibility(e, type) {
     }
 }
 
-function loadMore() {
-    if (earliestKey != null) {
-        firebase.orderByKey().endAt(earliestKey).limitToLast(pageSize).once('value', function(snapshot) {
-            var data = snapshot.val();
-            var cards = [];
-            for (childKey in data) {
-                var card = buildNotificationCard(data[childKey]);
-                cards.push(card);
+// function loadMore() {
+//     if (earliestKey != null) {
+//         firebase.orderByKey().endAt(earliestKey).limitToLast(pageSize).once('value', function(snapshot) {
+//             var data = snapshot.val();
+//             var cards = [];
+//             for (childKey in data) {
+//                 var card = buildNotificationCard(data[childKey]);
+//                 cards.push(card);
 
-                if (earliestKey == null || childKey < earliestKey) {
-                    earliestKey = childKey;
-                }
-            }
+//                 if (earliestKey == null || childKey < earliestKey) {
+//                     earliestKey = childKey;
+//                 }
+//             }
 
-            cards.reverse();
-            for (idx in cards.slice(1)) {// First element is repeated
-                var card = cards[idx];
-                $('#ticker-notifications').append(card);
-                updateVisibility(card, card.attr('data-type'));
-            }
-        });
-    }
-}
+//             cards.reverse();
+//             for (idx in cards.slice(1)) {// First element is repeated
+//                 var card = cards[idx];
+//                 $('#ticker-notifications').append(card);
+//                 updateVisibility(card, card.attr('data-type'));
+//             }
+//         });
+//     }
+// }
 
-// Load more notifications when scroll reaches the bottom
-$('.ticker_panel').scroll(function() {
-    if ($(this).scrollTop() + $(this).innerHeight()>=$(this)[0].scrollHeight) {
-        loadMore();
-    }
-});
+// // Load more notifications when scroll reaches the bottom
+// $('.ticker_panel').scroll(function() {
+//     if ($(this).scrollTop() + $(this).innerHeight()>=$(this)[0].scrollHeight) {
+//         loadMore();
+//     }
+// });
 
 function buildNotificationCard(data){
     var payload = data['payload'];
