@@ -2,7 +2,11 @@
 
 {% block title %}GameDay - The Blue Alliance{% endblock %}
 
-{% block main_style %}<link rel="stylesheet" href="/css/tba_combined_style.gameday.min.css" type="text/css" />{% endblock %}
+{% block main_style %}
+<link rel="stylesheet" href="/css/tba_combined_style.gameday.min.css" type="text/css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.2.2/css/ripples.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.2.2/css/material-wfont.min.css" />
+{% endblock %}
 
 {% block meta_description %}Live competition page for the FIRST Robotics Competition.{% endblock %}
 
@@ -18,7 +22,7 @@
 {% block navbar %}
 <div class="gameday">
 <div id="nav-alert-container"></div>
-<div class="navbar navbar-default navbar-fixed-top">
+<div class="navbar navbar-material-indigo-900 navbar-fixed-top">
   <div class="gameday-container">
     <div class="brand gameday-brand pull-left">
       <span class="gameday-title">GameDay</span>
@@ -29,7 +33,7 @@
 
     <ul class="nav navbar-nav pull-right">
       <li class="dropdown">
-        <a class="dropdown-toggle" href="#">Layouts</a>
+        <a class="dropdown-toggle" href="#">Layouts <b class="caret"></b></a>
         <ul class="dropdown-menu">
           <li><a class="layout-choice layout_0" href="javascript:layout_0()">Single View</a>
           <li><a class="layout-choice layout_1" href="javascript:layout_1()">Split View</a></li>
@@ -42,7 +46,7 @@
       </li>
 
       <li class="dropdown">
-        <a class="dropdown-toggle" href="#">Webcasts</a>
+        <a class="dropdown-toggle" href="#">Webcasts <b class="caret"></b></a>
         <ul class="dropdown-menu webcasts">
         {% for webcast in special_webcasts %}
           <li><a id='{{webcast.key_name}}-1'
@@ -63,7 +67,7 @@
       </li>
 
       <li class="dropdown">
-        <a class="dropdown-toggle" href="#">Results</a>
+        <a class="dropdown-toggle" href="#">Results <b class="caret"></b></a>
         <ul class="dropdown-menu results">
         {% for event in ongoing_events %}
           <li><a class="event_results" href="/event/{{event.key_name}}">{{event.short_name}} [{{event.event_short|upper}}]</a></li>
@@ -73,9 +77,10 @@
         </ul>
       </li>
 
-      <li class="social"><a class="social-toggle" href="javascript:social_tab();">Social Feed</a></li>
-      <li class="chat"><a class="chat-toggle" href="javascript:chat_tab();">Chat</a></li>
-      <li class="settings"><a id="settings-button" class="settings-button" href="#settings-modal" data-toggle="modal"><span class="glyphicon glyphicon-star"></span> myTBA</a></li>
+      <li class="navbar-toggle ticker"><a class="ticker-toggle" href="javascript:ticker_tab();">Live Ticker</a></li>
+      <li class="navbar-toggle social"><a class="social-toggle" href="javascript:social_tab();">Social Feed</a></li>
+      <li class="navbar-toggle chat"><a class="chat-toggle" href="javascript:chat_tab();">Chat</a></li>
+      <li class="navbar-toggle settings"><a class="settings-button mytba-button" href="#settings-modal" data-toggle="modal"><span class="glyphicon glyphicon-star"></span> myTBA</a></li>
     </ul>
   </div>
 </div>
@@ -136,6 +141,72 @@
 <div class="social_panel">
   <div id="twitter-widget"><a class="twitter-timeline" href="https://twitter.com/search?q=%23omgrobots" data-widget-id="282256949859454976">Tweets about "#omgrobots"</a></div>
 </div>
+<div class="ticker_panel">
+  <div class="ticker-info-background">
+    <div id="ticker-info">
+      <strong>Live Event Notification Ticker</strong>
+      <button id="ticker-filter" class="btn btn-fab btn-fab-mini btn-raised btn-sm btn-material-blue-grey pull-right" data-toggle="dropdown"><span class="glyphicon glyphicon-filter"></span></button>
+    </div>
+    <div id="ticker-filter-options" class="panel">
+      <div class="panel-body">
+        <div>
+          <a class="btn btn-block btn-sm btn-material-indigo mytba-button" href="#settings-modal" data-toggle="modal">
+            <span class="glyphicon glyphicon-star"></span> Edit myTBA Favorites
+          </a>
+        </div>
+        <div class="togglebutton togglebutton-material-indigo">
+          <label>
+            <input id="favorite-teams-only" checked type="checkbox" value="favorite_teams_only">
+            Favorite Team Matches Only
+          </label>
+        </div>
+        <div class="checkbox checkbox-material-orange">
+          <label>
+            <input checked type="checkbox" value="upcoming_match">
+            Upcoming Matches
+          </label>
+        </div>
+        <div class="checkbox checkbox-material-indigo">
+          <label>
+            <input checked type="checkbox" value="match_score">
+            Match Results
+          </label>
+        </div>
+        <div class="checkbox checkbox-material-light-blue">
+          <label>
+            <input checked type="checkbox" value="schedule_updated">
+            Schedule Updated
+          </label>
+        </div>
+        <div class="checkbox checkbox-material-purple">
+          <label>
+            <input checked type="checkbox" value="starting_comp_level">
+            Competition Level Starting
+          </label>
+        </div>
+        <div class="checkbox checkbox-material-red">
+          <label>
+            <input checked type="checkbox" value="alliance_selection">
+            Alliance Selections
+          </label>
+        </div>
+        <div class="checkbox checkbox-material-green">
+          <label>
+            <input checked type="checkbox" value="awards_posted">
+            Awards Posted
+          </label>
+        </div>
+      </div>
+    </div>
+    <div id="ticker-notifications">
+    </div>
+    <div class="panel">
+        <div class="panel-body">
+            No more recent notifications!
+        </div>
+    </div>
+  </div>
+</div>
 
 <div class="webcasts_panel">
   <div class="video_container"></div>
@@ -162,6 +233,8 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.9.3/typeahead.min.js"></script>
 <script src="https://cdn.firebase.com/js/client/2.2.1/firebase.js"></script>
 <script type="text/javascript" src="/javascript/tba_combined_js.gameday.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.2.2/js/ripples.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.2.2/js/material.min.js"></script>
 {% endblock %}
 
 {% block ganalytics_timer %}
