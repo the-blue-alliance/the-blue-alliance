@@ -58,6 +58,7 @@ function updateFavoritesList() {
         insertFavoriteTeam(favorites[key]);
       }
       updateAllMatchbars();
+      updateAllTickerCards();
     },
     error: function(xhr, textStatus, errorThrown) {
       if (xhr.status == 401) {  // User not logged in
@@ -111,6 +112,7 @@ function insertFavoriteTeam(favorite_team) {
       success: function(data, textStatus, xhr) {
         $("#favorite-" + teamNum).remove();
         updateAllMatchbars();
+        updateAllTickerCards();
       },
       error: function(xhr, textStatus, errorThrown) {
         $('#mytba-alert-container').append('<div class="alert alert-warning alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Oops! Failed to delete favorite.</strong><br>Something went wrong on our end. Please try again later.</div>');

@@ -31,13 +31,13 @@ $(window).load(function() {
         } else {
             visibleTypes[type] = false;
         }
-        updateAllVisibility();
+        updateAllTickerCards();
     });
 });
 
-function updateAllVisibility() {
+function updateAllTickerCards() {
     var favTeamNums = getFavoriteTeamNums();
-    var index = 0;
+    var count = 0;
     $('#ticker-notifications').children().each(function () {
         var dataType = $(this).attr('data-type');
         if (!(dataType in visibleTypes) || visibleTypes[dataType]) {
@@ -50,31 +50,44 @@ function updateAllVisibility() {
                     }
                 }
                 if (!isFav) {
-                    if (index < 3) {
-                        $(this).slideUp();
-                    } else {
-                        $(this).hide();
-                    }
+                    count = hideHelper($(this), count);
                     return;
                 }
             }
-            if (index < 3) {
-                $(this).slideDown();
-            } else {
-                $(this).show();
-            }
+            count = showHelper($(this), count);
         } else {
-            if (index < 3) {
-                $(this).slideUp();
-            } else {
-                $(this).hide();
-            }
+            count = hideHelper($(this), count);
             return;
         }
-        if ($(this).is(':visible')) {
-            index++;
-        }
     });
+}
+
+function hideHelper(e, count) {
+    // Helper for hiding cards
+    var new_count = count;
+    if ($(this).is(':visible')) {
+        new_count++;
+    }
+    if (count < numToAnimate) {
+        e.slideUp();
+    } else {
+        e.hide();
+    }
+    return new_count
+}
+
+function showHelper(e, count) {
+    // Helper for showing cards
+    var new_count = count;
+    if (!$(this).is(':visible')) {
+        new_count++;
+    }
+    if (count < numToAnimate) {
+        e.slideDown();
+    } else {
+        e.show();
+    }
+    return new_count
 }
 
 function updateVisibility(e, type) {
