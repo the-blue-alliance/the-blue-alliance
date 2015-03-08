@@ -26,7 +26,7 @@ class AwardManipulator(ManipulatorBase):
                 events.append(event)
 
         for event in events:
-            if event.within_a_day:
+            if event.get().within_a_day:
                 try:
                     NotificationHelper.send_award_update(event.get())
                 except Exception:
