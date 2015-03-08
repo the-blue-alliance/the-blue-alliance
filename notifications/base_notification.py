@@ -7,7 +7,7 @@ from google.appengine.api import urlfetch
 
 from controllers.gcm.gcm import GCMMessage
 from consts.client_type import ClientType
-from consts.notification_type import NotificationType		
+from consts.notification_type import NotificationType
 from helpers.firebase.firebase_pusher import FirebasePusher
 from helpers.notification_sender import NotificationSender
 from models.sitevar import Sitevar
@@ -32,12 +32,12 @@ class BaseNotification(object):
     To send a notification, instantiate one and call this method
     """
 
-    def send(self, keys):
+    def send(self, keys, push_firebase=True, track_call=True):
         self.keys = keys  # dict like {ClientType : [ key ] } ... The list for webhooks is a tuple of (key, secret)
         deferred.defer(self.render, self._supported_clients, _queue="push-notifications")
-        if self._push_firebase:
+        if self._push_firebase and push_firebase:
             FirebasePusher.push_notification(self)
-        if self._track_call:
+        if self._track_call and track_call:
             num_keys = 0
             for v in keys.values():
                 # Count the number of clients receiving the notification
