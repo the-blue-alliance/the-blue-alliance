@@ -128,7 +128,10 @@ class Event(ndb.Model):
         now = datetime.datetime.now()
         if self.timezone_id is not None:
             tz = pytz.timezone(self.timezone_id)
-            now = now - tz.utcoffset(now)
+            try:
+                now = now - tz.utcoffset(now)
+            except pytz.NonExistentTimeError:  # may happen during DST
+                now = now - tz.utcoffset(now + datetime.timedelta(hours=1))  # add offset to get out of non-existant time
         today = now.today()
         after_start = self.start_date.date() + datetime.timedelta(days=negative_days_before) <= today.date()
         before_end = self.end_date.date() + datetime.timedelta(days=days_after) >= today.date()
