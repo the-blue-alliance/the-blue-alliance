@@ -67,7 +67,7 @@ function updateFavoritesList() {
           $('#login-modal').modal('show');
           $.cookie("tba-gameday-last-login-prompt", cur_epoch_ms);
         }
-        $('#settings-button').attr('href', '#login-modal');
+        $('.mytba-button').attr('href', '#login-modal');
       }
       $('#mytba-alert-container').append('<div class="alert alert-warning alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Oops! Unable to get favorites.</strong><br>Something went wrong on our end. Please try again later.</div>');
     }

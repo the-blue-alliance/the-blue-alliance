@@ -2,7 +2,7 @@ var firebase = new Firebase('https://thebluealliance.firebaseio.com/notification
 var maxNumCards = 100;
 var numToAnimate = 3; // How many cards to animate
 var earliestKey = null;
-var visibleTypes = {'favorite_teams_only': true};  // default = visible
+var visibleTypes = {'favorite_teams_only': false};  // default = visible
 
 $(window).load(function() {
     $('#ticker-filter').click(function() {
@@ -14,7 +14,7 @@ $(window).load(function() {
         $('#ticker-notifications').prepend(card);
         var len = $('#ticker-notifications').length;
         if (len > maxNumCards) {
-            $('#ticker-notifications').children()[l-1].remove();
+            $('#ticker-notifications').children()[len-1].remove();
         }
         updateVisibility(card, card.attr('data-type'));
 
@@ -80,7 +80,7 @@ function updateAllVisibility() {
 function updateVisibility(e, type) {
     // New cads are always hidden. This chooses whether or not to show it
     if (!(type in visibleTypes) || visibleTypes[type]) {
-        if (type == 'match_score' || type == 'upcoming_match') {
+        if (visibleTypes['favorite_teams_only'] && (type == 'match_score' || type == 'upcoming_match')) {
             var favTeamNums = getFavoriteTeamNums();
             for (var i=0; i<favTeamNums.length; i++) {
                 if (e.attr('data-team-nums').split(',').indexOf(favTeamNums[i]) != -1) {
