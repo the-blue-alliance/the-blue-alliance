@@ -66,6 +66,8 @@ class TestNotificationController(LoggedInHandler):
         keys = PushHelper.get_client_ids_for_users([user_id])
         logging.info("Keys: {}".format(keys))
         if notification:
-            notification.send(keys)
+            # This page should not push notifications to the firebase queue
+            # Nor should its notifications be tracked in analytics
+            notification.send(keys, push_firebase=False, track_call=False)
 
         self.redirect('/apidocs/webhooks')
