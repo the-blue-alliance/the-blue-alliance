@@ -2,7 +2,7 @@ var firebase = new Firebase('https://thebluealliance.firebaseio.com/notification
 var maxNumCards = 100;
 var numToAnimate = 3; // How many cards to animate
 var earliestKey = null;
-var visibleTypes = {'favorite_teams_only': false};  // default = visible
+var visibleTypes = {'favorite_teams_only': true};  // default = visible
 
 $(window).load(function() {
     $('#ticker-filter').click(function() {
@@ -34,6 +34,11 @@ $(window).load(function() {
         updateAllTickerCards();
     });
 });
+
+function favoriteTeamsOff() {
+    visibleTypes['favorite_teams_only'] = false;
+    $('#favorite-teams-only').attr('checked', false);
+}
 
 function updateFavMatchOutline() {
     var favTeamNums = getFavoriteTeamNums();
