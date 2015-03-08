@@ -58,6 +58,7 @@ function updateFavoritesList() {
         insertFavoriteTeam(favorites[key]);
       }
       updateAllMatchbars();
+      updateFavMatchOutline();
       updateAllTickerCards();
     },
     error: function(xhr, textStatus, errorThrown) {
@@ -112,6 +113,7 @@ function insertFavoriteTeam(favorite_team) {
       success: function(data, textStatus, xhr) {
         $("#favorite-" + teamNum).remove();
         updateAllMatchbars();
+        updateFavMatchOutline();
         updateAllTickerCards();
       },
       error: function(xhr, textStatus, errorThrown) {

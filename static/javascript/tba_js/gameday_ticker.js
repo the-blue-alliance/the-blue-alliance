@@ -35,6 +35,28 @@ $(window).load(function() {
     });
 });
 
+function updateFavMatchOutline() {
+    var favTeamNums = getFavoriteTeamNums();
+    $('.team-cell').each(function (){
+        var hasFav = false;
+        for (var i=0; i<favTeamNums.length; i++) {
+            if (favTeamNums[i] == $(this).text()) {
+                if ($(this).hasClass('red')) {
+                    $(this).addClass('red-favorite');
+                } else {
+                    $(this).addClass('blue-favorite');
+                }
+                hasFav = true;
+                break;
+            }
+        }
+        if (!hasFav) {
+            $(this).removeClass('red-favorite');
+            $(this).removeClass('blue-favorite');
+        }
+    });
+}
+
 function updateAllTickerCards() {
     var favTeamNums = getFavoriteTeamNums();
     var count = 0;
@@ -246,7 +268,7 @@ function constructMatchTable(redTeams, blueTeams, redScore, blueScore) {
 
     var redRow = $('<tr>');
     for (var i in redTeams) {
-        var td = $('<td>', {'class': 'red'}).append($('<a>', {'href': '/team/'+redTeams[i], 'target': '_blank', text: redTeams[i]}));
+        var td = $('<td>', {'class': 'red team-cell'}).append($('<a>', {'href': '/team/'+redTeams[i], 'target': '_blank', text: redTeams[i]}));
         if (favTeamNums.indexOf(redTeams[i]) != -1) {
             td.addClass('red-favorite');
         }
@@ -257,7 +279,7 @@ function constructMatchTable(redTeams, blueTeams, redScore, blueScore) {
     }
     var blueRow = $('<tr>');
     for (var i in blueTeams) {
-        var td = $('<td>', {'class': 'blue'}).append($('<a>', {'href': '/team/'+blueTeams[i], 'target': '_blank', text: blueTeams[i]}));
+        var td = $('<td>', {'class': 'blue team-cell'}).append($('<a>', {'href': '/team/'+blueTeams[i], 'target': '_blank', text: blueTeams[i]}));
         if (favTeamNums.indexOf(blueTeams[i]) != -1) {
             td.addClass('blue-favorite');
         }
