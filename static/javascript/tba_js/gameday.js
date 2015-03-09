@@ -33,6 +33,9 @@ $(document).ready(function() {
     $(window).resize(function(){
 	  fixLayout();
     });
+
+    // Init material design theme
+    $.material.init();
 });
 
 function setupViews() {
@@ -71,6 +74,9 @@ function setupViews() {
   if (chatOpen != null) {
 	  setChat(true);
   }
+
+  // Always start with ticker open
+  setTicker(true);
 
   // Special Kickoff Mode
   var isKickoff = urlvars['kickoff'];
@@ -122,6 +128,8 @@ function social_tab() {
 	if(social.hasClass("social_active")) {
 		setSocial(false);
 	} else {
+    // Don't show both ticker and social
+    setTicker(false);
 		setSocial(true);
 	}
 }
@@ -143,8 +151,36 @@ function setSocial(open) {
 	}
 }
 
-//Chat Toggle
+// Ticker toggle
+function ticker_tab() {
+    var ticker = $(".ticker");
+    if (ticker.hasClass("ticker_active")) {
+        setTicker(false);
+    } else {
+        // Don't show both ticker and social
+        setSocial(false);
+        setTicker(true);
+    }
+}
 
+function setTicker(open) {
+    var ticker = $(".ticker");
+    var ticker_panel = $(".ticker_panel");
+    var webcasts_panel = $(".webcasts_panel");
+    if (open) {
+        ticker.addClass("ticker_active");
+        ticker_panel.addClass("ticker_panel_active");
+        webcasts_panel.addClass("webcasts_panel_ticker_active");
+        fixLayout();
+    } else {
+        ticker.removeClass("ticker_active");
+        ticker_panel.removeClass("ticker_panel_active");
+        webcasts_panel.removeClass("webcasts_panel_ticker_active");
+        fixLayout();
+    }
+}
+
+//Chat Toggle
 function chat_tab() {
 	var chat = $(".chat");
 

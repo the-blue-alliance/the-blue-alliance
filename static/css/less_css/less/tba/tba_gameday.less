@@ -1,5 +1,6 @@
 @chatWidth: 300px;
 @socialWidth: 250px;
+@tickerWidth: 300px;
 @videoContainerTopOffset: 1px;
 @matchBarHeight: 36px;
 
@@ -14,7 +15,9 @@ body {
   .nav, .navbar, .navbar-inner,
   .container, .brand,
   .dropdown, .dropdown-toggle,
-  .chat, .chat-toggle, .social, .social-toggle,
+  .chat, .chat-toggle,
+  .social, .social-toggle,
+  .ticker, .ticker-toggle,
   .settings, .settings-button {
     padding: 0 !important;
     margin: 0 !important;
@@ -28,7 +31,7 @@ body {
     position: static;
   }
 
-  .chat_active, .social_active {
+  .chat_active, .social_active, .ticker_active {
     background: @gray !important;
   }
 
@@ -58,12 +61,12 @@ body {
     padding-left: 10px;
   }
 
-  .dropdown-toggle, .chat-toggle, .social-toggle, .settings-button {
+  .dropdown-toggle, .chat-toggle, .social-toggle, .ticker-toggle, .settings-button {
     padding: 6px 8px !important;
     height: 18px !important;
   }
 
-  .dropdown:hover, .chat:hover, .social:hover, .settings:hover {
+  .dropdown:hover, .chat:hover, .social:hover, .ticker:hover, .settings:hover {
     background-color: @gray;
   }
 
@@ -159,7 +162,61 @@ body {
   }
 }
 
-.chat_panel_active {
+.ticker_panel {
+  position: fixed;
+  top: 30px + @videoContainerTopOffset;
+  left: 0px;
+  bottom: 0px;
+  width: @tickerWidth;
+  background-color: @gray-lighter;
+  visibility: hidden;
+  overflow: auto;
+  padding: 5px;
+
+  #ticker-info {
+    .alert;
+    margin-bottom: 5px;
+  }
+
+  #ticker-filter {
+    margin-top: -10px;
+  }
+
+  #ticker-filter-options {
+    display: none;
+  }
+
+  #ticker-info-background {
+    position: absolute;
+    background-color: #000000;
+    background: rgba(0, 0, 0, 0.7);
+    height: 100%;
+    width: 100%;
+  }
+
+  #ticker-notifications {
+    .panel {
+      margin-bottom: 5px;
+    }
+    .panel-heading {
+      a, a:hover {
+        color: #ffffff !important;
+      }
+    }
+    .panel-body {
+      padding-top: 5px;
+      padding-bottom: 5px;
+      .match-table {
+        margin-bottom: 0px !important;
+      }
+    }
+    .panel-footer {
+      padding: 0px 10px;
+      height: 20px;
+    }
+  }
+}
+.ticker_panel_active {
   visibility: visible;
 }
 
@@ -193,6 +250,10 @@ body {
 
 .webcasts_panel_chat_active {
   right: @chatWidth;
+}
+
+.webcasts_panel_ticker_active {
+  left: @tickerWidth;
 }
 
 .video_container {
@@ -329,6 +390,11 @@ body {
     margin: 0 10px 0 10px;
     float: left;
   }
+}
+
+#add-favorite-team-input {
+  padding-left: 13px;
+  margin-top: 3px;
 }
 
 .overlay {
