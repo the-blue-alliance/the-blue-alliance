@@ -110,26 +110,36 @@ class DistrictHelper(object):
                         district_points['tiebreakers'][team]['highest_qual_scores'] = heapq.nlargest(3, district_points['tiebreakers'][team]['highest_qual_scores'] + [score])
 
             # elim match point calculations
-            advancement = MatchHelper.generatePlayoffAdvancement2015(matches)
+            # count number of matches played per team per comp level
+            num_played = defaultdict(lambda: defaultdict(int))
             for level in ['qf', 'sf']:
-                team_num_played = defaultdict(int)
-
                 for match in matches[level]:
                     if not match.has_been_played:
                         continue
+                    for color in ['red', 'blue']:
+                        for team in match.alliances[color]['teams']:
+                            num_played[level][team] += 1
 
-                    for team_key in match.team_key_names:
-                        team_num_played[team_key] += 1
+            # qf and sf points
+            advancement = MatchHelper.generatePlayoffAdvancement2015(matches)
+            for last_level, level in [('qf', 'sf'), ('sf', 'f')]:
+                for (teams, _, _) in advancement[last_level]:
+                    teams = ['frc{}'.format(t) for t in teams]
+                    done = False
+                    for match in matches[level]:
+                        for color in ['red', 'blue']:
+                            if set(teams).intersection(set(match.alliances[color]['teams'])) != set():
+                                for team in teams:
+                                    points = 5.0 if last_level == 'qf' else 3.3
+                                    district_points['points'][team]['elim_points'] += int(np.ceil(points * num_played[last_level][team])) * POINTS_MULTIPLIER
+                                done = True
+                                break
+                            if done:
+                                break
+                        if done:
+                            break
 
-                for i, (teams, _, _) in enumerate(advancement[level]):  # advancement includes the entire alliance including backup bots
-                    limit = 4 if level == 'qf' else 2
-                    if i >= limit:
-                        break
-                    for team in teams:
-                        team = 'frc{}'.format(team)
-                        points = 5.0 if level == 'qf' else 3.3
-                        district_points['points'][team]['elim_points'] += int(np.ceil(points * team_num_played[team])) * POINTS_MULTIPLIER
-
+            # final points
             num_wins = {'red': 0, 'blue': 0}
             team_matches_played = {'red': [], 'blue': []}
             for match in matches['f']:
