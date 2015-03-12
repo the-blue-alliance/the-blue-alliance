@@ -55,7 +55,9 @@ class CacheableHandler(webapp2.RequestHandler):
             self.response.headers = cached_response.headers
         else:
             self.template_values["cache_key"] = self.cache_key
-            self.response.out.write(self._render(*args, **kw))
+            rendered = self._render(*args, **kw)
+            if rendered is not None:
+                self.response.out.write(rendered)
             self._write_cache(self.response)
 
     def _has_been_modified_since(self, datetime):
