@@ -55,7 +55,7 @@ class NotificationHelper(object):
         notification.send(clients)
 
     @classmethod
-    def send_upcoming_match_notification(cls, match):
+    def send_upcoming_match_notification(cls, match, event):
         users = PushHelper.get_users_subscribed_to_match(match, NotificationType.UPCOMING_MATCH)
         keys = PushHelper.get_client_ids_for_users(users)
 
@@ -93,7 +93,7 @@ class NotificationHelper(object):
                 if last_match.time and next_match.time:
                     diff = next_match.time - last_match.time
                     if diff < datetime.timedelta(minutes=10):
-                        cls.send_upcoming_match_notification(next_match)
+                        cls.send_upcoming_match_notification(next_match, event)
                         # We're done here, no need to send anywhere else
                         return
 
@@ -103,7 +103,7 @@ class NotificationHelper(object):
                     if match.time is None or match.time + datetime.timedelta(minutes=-7) <= now:
                         # Only send notifications for matches no more than 7 minutes (average-ish match cycle time) before it's scheduled to start
                         # Unless, the match has no time info. Then #yolo and send it
-                        cls.send_upcoming_match_notification(match)
+                        cls.send_upcoming_match_notification(match, event)
 
                         # Don't send update for any further matches
                         return
