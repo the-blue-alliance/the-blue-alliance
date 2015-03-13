@@ -89,11 +89,11 @@ class NotificationHelper(object):
 
             # First, compare the difference between scheduled times of next/last match
             # Send an upcoming notification if it's <7 minutes, to account for events ahead of schedule
-            if last_match and next_match:
+            if last_match and next_match and not next_match.push_sent:
                 if last_match.time and next_match.time:
                     diff = next_match.time - last_match.time
-                    if diff < datetime.timedelta(minutes=7):
-                        send_upcoming_match_notification(next_match)
+                    if diff < datetime.timedelta(minutes=10):
+                        cls.send_upcoming_match_notification(next_match)
                         # We're done here, no need to send anywhere else
                         return
 
