@@ -50,6 +50,7 @@ class EventManipulator(ManipulatorBase):
             "event_short",
             "event_type_enum",
             "event_district_enum",
+            "custom_hashtag",
             "facebook_eid",
             "first_eid",
             "location",
