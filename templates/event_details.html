@@ -46,11 +46,11 @@
         {% if event.facebook_eid %}<br><span class="glyphicon glyphicon-thumbs-up"></span> <a href="{{ event.facebook_event_url }}" title="Facebook Event">RSVP on Facebook</a><br>{% endif %}
       </p>
 
-      <p><strong>#{{ event.hashtag_event }}</strong> <small><a href="/hashtags" rel="tooltip" title="What are hashtags?">?</a></small> - Search
-        <a class="hashtag-link hashtag-twitter" href="https://twitter.com/search/%23{{ event.hashtag_event }}" target="_blank" title="Search Twitter">Twitter</a> &middot;
-        <a class="hashtag-link hashtag-youtube" href="http://www.youtube.com/results?search_query=%23{{ event.hashtag_event }}+OR+%22{{ event.name|urlencode }}%22" target="_blank" title="Search YouTube">YouTube</a> &middot;
-        <a class="hashtag-link hashtag-cd" href="http://www.chiefdelphi.com/media/photos/tags/{{ event.hashtag_event }}" target="_blank" title="Search Chief Delphi">Chief Delphi</a> &middot;
-        <a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23{{ event.hashtag_event }}" target="_blank" title="Search Flickr">Flickr</a>
+      <p><strong>#{{ event.hashtag }}</strong> <small><a href="/hashtags" rel="tooltip" title="What are hashtags?">?</a></small> - Search
+        <a class="hashtag-link hashtag-twitter" href="https://twitter.com/search/%23{{ event.hashtag }}" target="_blank" title="Search Twitter">Twitter</a> &middot;
+        <a class="hashtag-link hashtag-youtube" href="http://www.youtube.com/results?search_query=%23{{ event.hashtag }}+OR+%22{{ event.name|urlencode }}%22" target="_blank" title="Search YouTube">YouTube</a> &middot;
+        <a class="hashtag-link hashtag-cd" href="http://www.chiefdelphi.com/media/photos/tags/{{ event.hashtag }}" target="_blank" title="Search Chief Delphi">Chief Delphi</a> &middot;
+        <a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23{{ event.hashtag }}" target="_blank" title="Search Flickr">Flickr</a>
       </p>
     </div>
   </div>

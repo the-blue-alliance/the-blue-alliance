@@ -271,9 +271,9 @@ class Event(ndb.Model):
             return None
 
     @property
-    def hashtag_event(self):
+    def hashtag(self):
         """
-        Return the hastag used for the event.
+        Return the hashtag used for the event.
         """
         if self.custom_hashtag:
             return self.custom_hashtag
