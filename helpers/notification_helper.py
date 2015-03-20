@@ -96,7 +96,7 @@ class NotificationHelper(object):
                         if diff < datetime.timedelta(minutes=10*(i+1)):
                             cls.send_upcoming_match_notification(next_match, event)
                             # We're done here, no need to send anywhere else
-                            return
+                            continue
 
             for match in next_matches:
                 if match and not match.push_sent:
@@ -107,7 +107,7 @@ class NotificationHelper(object):
                         cls.send_upcoming_match_notification(match, event)
 
                         # Don't send update for any further matches
-                        return
+                        continue
 
     @classmethod
     def send_schedule_update(cls, event):
