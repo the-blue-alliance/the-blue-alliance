@@ -88,6 +88,7 @@ class NotificationHelper(object):
 
             # First, compare the difference between scheduled times of next/last match
             # Send an upcoming notification if it's <10 minutes, to account for events ahead of schedule
+            event_done = False
             if last_matches != []:
                 last_match = last_matches[0]
                 for i, next_match in enumerate(next_matches):
@@ -96,7 +97,10 @@ class NotificationHelper(object):
                         if diff < datetime.timedelta(minutes=10*(i+1)):
                             cls.send_upcoming_match_notification(next_match, event)
                             # We're done here, no need to send anywhere else
-                            continue
+                            event_done = True
+                            break
+            if event_done:
+                continue
 
             for match in next_matches:
                 if match and not match.push_sent:
@@ -107,7 +111,7 @@ class NotificationHelper(object):
                         cls.send_upcoming_match_notification(match, event)
 
                         # Don't send update for any further matches
-                        continue
+                        break
 
     @classmethod
     def send_schedule_update(cls, event):
