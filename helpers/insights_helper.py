@@ -59,7 +59,7 @@ class InsightsHelper(object):
         # Get all Blue Banner, Division Finalist, and Championship Finalist awards
         blue_banner_award_keys_future = Award.query(
             Award.year == year,
-            Award.award_type_enum.IN(AwardType.BLUE_BANNER_AWARDS)
+            Award.award_type_enum.IN(list(AwardType.BLUE_BANNER_AWARDS))
         ).fetch_async(10000, keys_only=True)
         cmp_finalist_award_keys_future = Award.query(
             Award.year == year,
@@ -300,7 +300,8 @@ class InsightsHelper(object):
         blue_banner_winners = defaultdict(int)
         for award_future in award_futures:
             award = award_future.get_result()
-            if award.award_type_enum in AwardType.BLUE_BANNER_AWARDS:
+            if award.award_type_enum in AwardType.BLUE_BANNER_AWARDS \
+                    and award.year >= AwardType.BLUE_BANNER_AWARDS[award.award_type_enum]:
                 for team_key in award.team_list:
                     team_key_name = team_key.id()
                     blue_banner_winners[team_key_name] += 1
