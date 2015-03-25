@@ -220,3 +220,55 @@ class ApiTeamListController(ApiTeamControllerBase):
         team_futures = ndb.get_multi_async(team_keys)
         team_list = [ModelToDict.teamConverter(team_future.get_result()) for team_future in team_futures]
         return json.dumps(team_list, ensure_ascii=True)
+
+
+class ApiTeamHistoryEventsController(ApiTeamControllerBase):
+    """
+    Returns a JSON list of event models of all events attended by a team
+    """
+    CACHE_KEY_FORMAT = "apiv2_team_history_events_controller_{}"  # (team_key)
+    CACHE_VERSION = 1
+    CACHE_HEADER_LENGTH = 61
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamHistoryEventsController, self).__init__(*args, **kw)
+        self.team_key = self.request.route_kwargs['team_key']
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key)
+
+    def _track_call(self, team_key):
+        self._track_call_defer('team/history/events', team_key)
+
+    def _render(self, team_key):
+        self._set_team(team_key)
+        event_team_keys_future = EventTeam.query(EventTeam.team == self.team.key).fetch_async(1000, keys_only=True)
+        event_teams_futures = ndb.get_multi_async(event_team_keys_future.get_result())
+
+        event_keys = [event_team_future.get_result().event for event_team_future in event_teams_futures]
+        events_futures = ndb.get_multi_async(event_keys)
+
+        event_list = [ModelToDict.eventConverter(events_future.get_result()) for events_future in events_futures]
+        return json.dumps(event_list, ensure_ascii=True)
+
+
+class ApiTeamHistoryAwardsController(ApiTeamControllerBase):
+    """
+    Returns a JSON list of award models won by a team
+    """
+    CACHE_KEY_FORMAT = "apiv2_team_history_awards_controller_{}"  # (team_key)
+    CACHE_VERSION = 1
+    CACHE_HEADER_LENGTH = 61
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamHistoryAwardsController, self).__init__(*args, **kw)
+        self.team_key = self.request.route_kwargs['team_key']
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key)
+
+    def _track_call(self, team_key):
+        self._track_call_defer('team/history/awards', team_key)
+
+    def _render(self, team_key):
+        self._set_team(team_key)
+        award_keys_future = Award.query(Award.team_list == self.team.key).fetch_async(1000, keys_only=True)
+        awards_futures = ndb.get_multi_async(award_keys_future.get_result())
+        awards_list = [ModelToDict.awardConverter(award_future.get_result()) for award_future in awards_futures]
+        return json.dumps(awards_list, ensure_ascii=True)
