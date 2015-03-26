@@ -1,3 +1,4 @@
+import datetime
 from google.appengine.ext import ndb
 
 from controllers.api.api_district_controller import ApiDistrictListController, ApiDistrictEventsController, ApiDistrictRankingsController
@@ -38,7 +39,7 @@ class CacheClearer(object):
 
         event_team_keys_future = EventTeam.query(EventTeam.event.IN([event_key for event_key in event_keys])).fetch_async(None, keys_only=True)
 
-        events_future = Event.query(Event.id.IN([event_key for event_key in event_keys])).fetch_async(None, projection=[Event.end_date, Event.start_date])
+        events_future = Event.query(Event.key.IN([event_key for event_key in event_keys])).fetch_async(None, projection=[Event.end_date, Event.start_date])
 
         team_keys = set()
         for et_key in event_team_keys_future.get_result():
