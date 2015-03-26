@@ -69,7 +69,7 @@
               <td><form action="/notifications/broadcast" method="post">
                 <input name="account_id" type="hidden" value="{{user_bundle.account.key.id}}" />
                 <input name="client_id" type="hidden" value="{{client.key.id}}" />
-                <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-cloud"></span> Ping</button>
+                <button type="submit" class="btn btn-default" {{ping_enabled}}><span class="glyphicon glyphicon-cloud"></span> Ping</button>
               </form></td>
                 <td>
                   {% if client.is_webhook %}

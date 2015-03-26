@@ -12,6 +12,7 @@ from google.appengine.ext.webapp import template
 from consts.event_type import EventType
 
 from datafeeds.datafeed_fms import DatafeedFms
+from datafeeds.datafeed_fms_api import DatafeedFMSAPI
 from datafeeds.datafeed_tba import DatafeedTba
 from datafeeds.datafeed_usfirst import DatafeedUsfirst
 from datafeeds.datafeed_usfirst_legacy import DatafeedUsfirstLegacy
@@ -29,6 +30,215 @@ from helpers.team_manipulator import TeamManipulator
 from models.event import Event
 from models.event_team import EventTeam
 from models.team import Team
+
+
+class FMSAPIAwardsEnqueue(webapp.RequestHandler):
+    """
+    Handles enqueing getting awards from the FMS API
+    """
+    def get(self, when):
+        if when == "now":
+            events = EventHelper.getEventsWithinADay()
+        else:
+            event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
+            events = ndb.get_multi(event_keys)
+
+        for event in events:
+            taskqueue.add(
+                queue_name='fms-api',
+                url='/tasks/get/fmsapi_awards/%s' % (event.key_name),
+                method='GET')
+        template_values = {
+            'events': events,
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_awards_enqueue.html')
+        self.response.out.write(template.render(path, template_values))
+
+
+class FMSAPIAwardsGet(webapp.RequestHandler):
+    """
+    Handles updating awards based on the FMS API
+    """
+    def get(self, event_key):
+        datafeed = DatafeedFMSAPI()
+
+        event = Event.get_by_id(event_key)
+        new_awards = AwardManipulator.createOrUpdate(datafeed.getAwards(event))
+
+        if new_awards is None:
+            new_awards = []
+        elif type(new_awards) != list:
+            new_awards = [new_awards]
+
+        # create EventTeams
+        team_ids = set()
+        for award in new_awards:
+            for team in award.team_list:
+                team_ids.add(team.id())
+        teams = TeamManipulator.createOrUpdate([Team(
+            id=team_id,
+            team_number=int(team_id[3:]))
+            for team_id in team_ids])
+        if teams:
+            if type(teams) is not list:
+                teams = [teams]
+            event_teams = EventTeamManipulator.createOrUpdate([EventTeam(
+                id=event_key + "_" + team.key.id(),
+                event=event.key,
+                team=team.key,
+                year=event.year)
+                for team in teams])
+
+        template_values = {
+            'awards': new_awards,
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_awards_get.html')
+        self.response.out.write(template.render(path, template_values))
+
+
+class FMSAPIEventAlliancesEnqueue(webapp.RequestHandler):
+    """
+    Handles enqueing getting alliances from the FMS API
+    """
+    def get(self, when):
+        if when == "now":
+            events = EventHelper.getEventsWithinADay()
+        else:
+            event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
+            events = ndb.get_multi(event_keys)
+
+        for event in events:
+            taskqueue.add(
+                queue_name='fms-api',
+                url='/tasks/get/fmsapi_event_alliances/' + event.key_name,
+                method='GET')
+
+        template_values = {
+            'events': events,
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_alliances_enqueue.html')
+        self.response.out.write(template.render(path, template_values))
+
+
+class FMSAPIEventAlliancesGet(webapp.RequestHandler):
+    """
+    Handles updating an event's alliances based on the FMS API
+    """
+    def get(self, event_key):
+        df = DatafeedFMSAPI()
+
+        event = Event.get_by_id(event_key)
+
+        if event.event_type_enum == EventType.CMP_FINALS:
+            logging.info("Skipping Einstein alliance selections")
+            return
+
+        alliance_selections = df.getEventAlliances(event_key)
+        if alliance_selections and event.alliance_selections != alliance_selections:
+            event.alliance_selections_json = json.dumps(alliance_selections)
+            event._alliance_selections = None
+            event.dirty = True
+
+        EventManipulator.createOrUpdate(event)
+
+        template_values = {'alliance_selections': alliance_selections,
+                           'event_name': event.key_name}
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_alliances_get.html')
+        self.response.out.write(template.render(path, template_values))
+
+
+class FMSAPIEventRankingsEnqueue(webapp.RequestHandler):
+    """
+    Handles enqueing getting rankings from the FMS API
+    """
+    def get(self, when):
+        if when == "now":
+            events = EventHelper.getEventsWithinADay()
+        else:
+            event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
+            events = ndb.get_multi(event_keys)
+
+        for event in events:
+            taskqueue.add(
+                queue_name='fms-api',
+                url='/tasks/get/fmsapi_event_rankings/' + event.key_name,
+                method='GET')
+
+        template_values = {
+            'events': events,
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_rankings_enqueue.html')
+        self.response.out.write(template.render(path, template_values))
+
+
+class FMSAPIEventRankingsGet(webapp.RequestHandler):
+    """
+    Handles updating an event's rankings based on the FMS API
+    """
+    def get(self, event_key):
+        df = DatafeedFMSAPI()
+
+        rankings = df.getEventRankings(event_key)
+
+        event = Event.get_by_id(event_key)
+        if rankings and event.rankings_json != json.dumps(rankings):
+            event.rankings_json = json.dumps(rankings)
+            event.dirty = True
+
+        EventManipulator.createOrUpdate(event)
+
+        template_values = {'rankings': rankings,
+                           'event_name': event.key_name}
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_rankings_get.html')
+        self.response.out.write(template.render(path, template_values))
+
+
+class FMSAPIMatchesEnqueue(webapp.RequestHandler):
+    """
+    Handles enqueing getting match results from the FMS API
+    """
+    def get(self, when):
+        if when == "now":
+            events = EventHelper.getEventsWithinADay()
+        else:
+            event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
+            events = ndb.get_multi(event_keys)
+
+        for event in events:
+            taskqueue.add(
+                queue_name='fms-api',
+                url='/tasks/get/fmsapi_matches/' + event.key_name,
+                method='GET')
+
+        template_values = {
+            'events': events,
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_matches_enqueue.html')
+        self.response.out.write(template.render(path, template_values))
+
+
+class FMSAPIMatchesGet(webapp.RequestHandler):
+    """
+    Handles updating matches based on the FMS API
+    """
+    def get(self, event_key):
+        df = DatafeedFMSAPI()
+
+        new_matches = MatchManipulator.createOrUpdate(df.getMatches(event_key))
+
+        template_values = {
+            'matches': new_matches,
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_matches_get.html')
+        self.response.out.write(template.render(path, template_values))
 
 
 class FmsEventListGet(webapp.RequestHandler):

@@ -55,7 +55,7 @@
     </div>
   </div>
 
-  {% if event.within_a_day %}
+  {% if event.now %}
   <div class="row">
     <div class="col-sm-12">
       <div class="panel panel-default">
@@ -118,16 +118,22 @@
 
         {% if matches.ef or matches.qf or matches.sf or matches.f %}
         <div class="col-sm-6">
-          <h3>Elimination Results</h3>
+          {% include "event_partials/event_alliances_table.html" %}
+
+          <h3>{% if event.year == 2015 %}Playoff{% else %}Elimination{% endif %} Results</h3>
           {% include "match_partials/elim_match_table.html" %}
 
           {% if matches.qm %}
             {% if matches.qf or matches.sf or matches.f %}
-              <h3>Elimination Bracket</h3>
-              {% include "bracket_partials/bracket_table.html" %}
+              {% if event.year == 2015 %}
+                <h3>Playoff Advancement</h3>
+                {% include "playoff_partials/playoff_table.html" %}
+              {% else %}
+                <h3>Elimination Bracket</h3>
+                {% include "bracket_partials/bracket_table.html" %}
+              {% endif %}
             {% endif %}
 
-            {% include "event_partials/event_alliances_table.html" %}
             {% include "event_partials/event_opr_table.html" %}
           {% endif %}
         </div>
@@ -141,8 +147,13 @@
         {% if not matches.qm %}
         <div class="col-sm-6">
           {% if matches.qf or matches.sf or matches.f %}
-          <h3>Elimination Bracket</h3>
-          {% include "bracket_partials/bracket_table.html" %}
+            {% if event.year == 2015 %}
+              <h3>Playoff Advancement</h3>
+              {% include "playoff_partials/playoff_table.html" %}
+            {% else %}
+              <h3>Elimination Bracket</h3>
+              {% include "bracket_partials/bracket_table.html" %}
+            {% endif %}
           {% endif %}
 
           {% include "event_partials/event_alliances_table.html" %}

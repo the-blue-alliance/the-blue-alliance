@@ -90,7 +90,7 @@ class EventDetail(CacheableHandler):
     """
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 60 * 5
-    CACHE_VERSION = 3
+    CACHE_VERSION = 4
     CACHE_KEY_FORMAT = "event_detail_{}"  # (event_key)
 
     def __init__(self, *args, **kw):
@@ -113,7 +113,10 @@ class EventDetail(CacheableHandler):
         event.prepAwardsMatchesTeams()
 
         awards = AwardHelper.organizeAwards(event.awards)
-        cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
+        if event.within_a_day:
+            cleaned_matches = event.matches
+        else:
+            cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
         matches = MatchHelper.organizeMatches(cleaned_matches)
         teams = TeamHelper.sortTeams(event.teams)
 
@@ -127,7 +130,7 @@ class EventDetail(CacheableHandler):
         oprs = sorted(oprs, key=lambda t: t[1], reverse=True)  # sort by OPR
         oprs = oprs[:15]  # get the top 15 OPRs
 
-        if event.within_a_day:
+        if event.now:
             matches_recent = MatchHelper.recentMatches(cleaned_matches)
             matches_upcoming = MatchHelper.upcomingMatches(cleaned_matches)
         else:
@@ -135,6 +138,13 @@ class EventDetail(CacheableHandler):
             matches_upcoming = None
 
         bracket_table = MatchHelper.generateBracket(matches, event.alliance_selections)
+        if event.year == 2015:
+            playoff_advancement = MatchHelper.generatePlayoffAdvancement2015(matches, event.alliance_selections)
+            for comp_level in ['qf', 'sf']:
+                if comp_level in bracket_table:
+                    del bracket_table[comp_level]
+        else:
+            playoff_advancement = None
 
         district_points_sorted = None
         if event.district_points:
@@ -151,6 +161,7 @@ class EventDetail(CacheableHandler):
             "num_teams": num_teams,
             "oprs": oprs,
             "bracket_table": bracket_table,
+            "playoff_advancement": playoff_advancement,
             "district_points_sorted": district_points_sorted,
         })
 

@@ -17,11 +17,11 @@ from models.user import User
 
 class PushHelper(object):
 
-    '''
+    """
     General helper methods for push notifications
     Actual notifications should be built and send from NotificationHelper
     (they're split up for cleanliness)
-    '''
+    """
 
     @classmethod
     def notification_enums_from_string(cls, notifications):
@@ -39,11 +39,11 @@ class PushHelper(object):
 
     @classmethod
     def user_email_to_id(cls, user_email):
-        '''
+        """
         Returns the user id for a given email address (or None if invalid)
         workaround for this bug: https://code.google.com/p/googleappengine/issues/detail?id=8848
         solution from: http://stackoverflow.com/questions/816372/how-can-i-determine-a-user-id-based-on-an-email-address-in-app-engine
-        '''
+        """
         u = users.User(user_email)
         key = MobileUser(user=u).put()
         obj = key.get()
@@ -52,7 +52,8 @@ class PushHelper(object):
 
         if Account.get_by_id(user_id) is None:
             # Create an account for this user
-            Account(id=user_id, email = user_email, nickname = user_email.split('@')[0], registered = False).put()
+            nickname = user_email.split('@')[0]
+            Account(id=user_id, email=user_email, nickname=nickname, display_name=nickname, registered=False).put()
 
         return user_id
 
@@ -82,9 +83,11 @@ class PushHelper(object):
         keys = []
         for team in match.team_key_names:
             keys.append(team)
-            keys.append("{}_{}".format(match.event.id(), team))
+            keys.append("{}_{}".format(match.event_key_name, team))
+
+        keys.append("{}*".format(match.year))  # key for all events in year
         keys.append(match.key_name)
-        keys.append(match.event.id())
+        keys.append(match.event_key_name)
         users = Subscription.query(Subscription.model_key.IN(keys), Subscription.notification_types == notification).fetch()
         output = []
         for user in users:
@@ -92,14 +95,47 @@ class PushHelper(object):
         return output
 
     @classmethod
-    def get_client_ids_for_users(cls, user_list, os_types=None ):
+    def get_users_subscribed_to_event(cls, event, notification):
+        keys = []
+        keys.append(event.key_name)
+        keys.append("{}*".format(event.year))
+        users = Subscription.query(Subscription.model_key.IN(keys), Subscription.notification_types == notification).fetch()
+        output = []
+        for user in users:
+            output.append(user.user_id)
+        return output
+
+    @classmethod
+    def get_users_subscribed_for_alliances(cls, event, notification):
+        keys = []
+        for team in event.alliance_teams:
+            keys.append(team)
+            keys.append("{}_{}".format(event.key_name, team))  # team@event key
+        keys.append("{}*".format(event.year))  # key for all events in year
+        keys.append(event.key_name)
+        users = Subscription.query(Subscription.model_key.IN(keys), Subscription.notification_types == notification).fetch()
+        output = [user.user_id for user in users]
+        return output
+
+    @classmethod
+    def get_client_ids_for_users(cls, user_list, os_types=None):
         if os_types is None:
             os_types = ClientType.names.keys()
         output = defaultdict(list)
-        clients = MobileClient.query(MobileClient.user_id.IN(user_list), MobileClient.client_type.IN(os_types), MobileClient.verified==True).fetch()
+        clients = MobileClient.query(MobileClient.user_id.IN(user_list), MobileClient.client_type.IN(os_types), MobileClient.verified == True).fetch()
         for client in clients:
             if client.client_type == ClientType.WEBHOOK:
-                output[client.client_type].append( (client.messaging_id, client.secret) )
+                output[client.client_type].append((client.messaging_id, client.secret))
             else:
                 output[client.client_type].append(client.messaging_id)
+        return output
+
+    @classmethod
+    def get_all_mobile_clients(cls, client_types=[]):
+        output = []
+        if client_types == []:
+            return output
+        clients = MobileClient.query(MobileClient.client_type.IN(client_types))
+        for user in clients:
+            output.append(user.user_id)
         return output

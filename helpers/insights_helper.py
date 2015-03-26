@@ -1,3 +1,4 @@
+import itertools
 import json
 import math
 
@@ -75,6 +76,7 @@ class InsightsHelper(object):
         insights += self._calculateBlueBanners(award_futures, year)
         insights += self._calculateChampionshipStats(award_futures, year)
         insights += self._calculateRegionalStats(award_futures, year)
+        insights += self._calculateSuccessfulElimTeamups(award_futures, year)
 
         return insights
 
@@ -228,7 +230,8 @@ class InsightsHelper(object):
         for _, week_events in week_event_matches:
             for _, matches in week_events:
                 for match in matches:
-                    if not match.has_been_played: continue
+                    if not match.has_been_played:
+                        continue
                     redScore = int(match.alliances['red']['score'])
                     blueScore = int(match.alliances['blue']['score'])
 
@@ -247,7 +250,7 @@ class InsightsHelper(object):
             totalCount = float(sum(score_distribution.values()))
             score_distribution_normalized = {}
             for score, amount in score_distribution.items():
-                roundedScore = score - int(score % binAmount) + binAmount / 2 #Round off and then center in the bin
+                roundedScore = score - int(score % binAmount) + binAmount / 2  # Round off and then center in the bin
                 contribution = float(amount) * 100 / totalCount
                 if roundedScore in score_distribution_normalized:
                     score_distribution_normalized[roundedScore] += contribution
@@ -389,6 +392,22 @@ class InsightsHelper(object):
         return insights
 
     @classmethod
+    def _calculateSuccessfulElimTeamups(self, award_futures, year):
+        """
+        Returns an Insight where the data is a list of list of teams that won an event together
+        """
+        successful_elim_teamups = []
+        for award_future in award_futures:
+            award = award_future.get_result()
+            if award.award_type_enum == AwardType.WINNER:
+                successful_elim_teamups.append([team_key.id() for team_key in award.team_list])
+
+        if successful_elim_teamups != []:
+            return [self._createInsight(successful_elim_teamups, Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_ELIM_TEAMUPS], year)]
+        else:
+            return []
+
+    @classmethod
     def doOverallMatchInsights(self):
         """
         Calculate match insights across all years. Returns a list of Insights.
@@ -439,6 +458,18 @@ class InsightsHelper(object):
             for team in insight.data:
                 world_champions[team] += 1
 
+        year_successful_elim_teamups = Insight.query(Insight.name == Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_ELIM_TEAMUPS], Insight.year != 0).fetch(1000)
+        successful_elim_teamups = defaultdict(int)
+        for insight in year_successful_elim_teamups:
+            for teams in insight.data:
+                for pairs in itertools.combinations(teams, 2):
+                    successful_elim_teamups[tuple(sorted(pairs))] += 1
+        successful_elim_teamups_sorted = defaultdict(list)
+        for teams, num_wins in successful_elim_teamups.items():
+            sorted_teams = sorted(teams, key=lambda team_key: int(team_key[3:]))
+            successful_elim_teamups_sorted[num_wins].append(sorted_teams)
+        successful_elim_teamups_sorted = sorted(successful_elim_teamups_sorted.items(), key=lambda x: -x[0])
+
         # Sorting
         regional_winners = self._sortTeamWinsDict(regional_winners)
         blue_banners = self._sortTeamWinsDict(blue_banners)
@@ -457,5 +488,8 @@ class InsightsHelper(object):
 
         if world_champions:
             insights.append(self._createInsight(world_champions, Insight.INSIGHT_NAMES[Insight.WORLD_CHAMPIONS], 0))
+
+        if year_successful_elim_teamups:
+            insights.append(self._createInsight(successful_elim_teamups_sorted, Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_ELIM_TEAMUPS], 0))
 
         return insights

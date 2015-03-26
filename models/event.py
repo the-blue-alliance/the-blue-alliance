@@ -1,6 +1,7 @@
 from google.appengine.ext import ndb
 import datetime
 import json
+import pytz
 import re
 
 from consts.district_type import DistrictType
@@ -53,6 +54,7 @@ class Event(ndb.Model):
         self._rankings = None
         self._teams = None
         self._webcast = None
+        self._updated_attrs = []  # Used in EventManipulator to track what changed
         super(Event, self).__init__(*args, **kw)
 
     @ndb.tasklet
@@ -72,6 +74,18 @@ class Event(ndb.Model):
             except Exception, e:
                 self._alliance_selections = None
         return self._alliance_selections
+
+    @property
+    def alliance_teams(self):
+        """
+        Load a list of team keys playing in elims
+        """
+        alliances = self.alliance_selections
+        teams = []
+        for alliance in alliances:
+            for pick in alliance['picks']:
+                teams.append(pick)
+        return teams
 
     @property
     def awards(self):
@@ -111,15 +125,24 @@ class Event(ndb.Model):
     def withinDays(self, negative_days_before, days_after):
         if not self.start_date or not self.end_date:
             return False
-        today = datetime.datetime.today()
-        after_start = self.start_date.date() + datetime.timedelta(days=negative_days_before) <= today.date()
-        before_end = self.end_date.date() + datetime.timedelta(days=days_after) >= today.date()
+        now = datetime.datetime.now()
+        if self.timezone_id is not None:
+            tz = pytz.timezone(self.timezone_id)
+            try:
+                now = now + tz.utcoffset(now)
+            except pytz.NonExistentTimeError:  # may happen during DST
+                now = now + tz.utcoffset(now + datetime.timedelta(hours=1))  # add offset to get out of non-existant time
+        after_start = self.start_date.date() + datetime.timedelta(days=negative_days_before) <= now.date()
+        before_end = self.end_date.date() + datetime.timedelta(days=days_after) >= now.date()
 
         return (after_start and before_end)
 
     @property
     def now(self):
-        return self.withinDays(0, 0)
+        if self.timezone_id is not None:
+            return self.withinDays(0, 0)
+        else:
+            return self.within_a_day  # overestimate what is "now" if no timezone
 
     @property
     def within_a_day(self):

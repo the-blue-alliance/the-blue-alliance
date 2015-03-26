@@ -11,6 +11,7 @@ import tba_config
 
 from base_controller import CacheableHandler
 from consts.event_type import EventType
+from consts.notification_type import NotificationType
 from helpers.event_helper import EventHelper
 
 from models.event import Event
@@ -253,12 +254,12 @@ class SearchHandler(webapp2.RequestHandler):
 
 
 class GamedayHandler(CacheableHandler):
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "main_gameday"
 
     def __init__(self, *args, **kw):
         super(GamedayHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24 * 7
+        self._cache_expiration = 60 * 60
 
     def _render(self, *args, **kw):
         special_webcasts_future = Sitevar.get_by_id_async('gameday.special_webcasts')
@@ -278,7 +279,7 @@ class GamedayHandler(CacheableHandler):
         ongoing_events_w_webcasts = []
         week_events = EventHelper.getWeekEvents()
         for event in week_events:
-            if event.within_a_day:
+            if event.now:
                 ongoing_events.append(event)
                 if event.webcast:
                     valid = []
@@ -370,8 +371,10 @@ class WebhookDocumentationHandler(CacheableHandler):
 
     def __init__(self, *args, **kw):
         super(WebhookDocumentationHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 *24 * 7
+        self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
+        self.template_values['enabled'] = NotificationType.enabled_notifications
+        self.template_values['types'] = NotificationType.types
         path = os.path.join(os.path.dirname(__file__), "../templates/webhookdocs.html")
         return template.render(path, self.template_values)
