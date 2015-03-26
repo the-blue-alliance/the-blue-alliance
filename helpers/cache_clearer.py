@@ -49,12 +49,12 @@ class CacheClearer(object):
         # Clear keys for live events. Normalize event starts to last monday
         time_indexes = set()
         for event in events_future.get_result():
-            dt = event.start_date
-            if dt.weekday() != 0:
-                # If we're given a datetime for a non-Monday, normalize to that
-                dt = dt + datetime.timedelta(days=(-1 * dt.weekday()))
-            time_indexes.add(datetime.datetime(dt.year, dt.month, dt.day, 0, 0, 0))
-
+            if event.start_date:
+                dt = event.start_date
+                if dt.weekday() != 0:
+                    # If we're given a datetime for a non-Monday, normalize to that
+                    dt = dt + datetime.timedelta(days=(-1 * dt.weekday()))
+                time_indexes.add(datetime.datetime(dt.year, dt.month, dt.day, 0, 0, 0))
         return cls._get_events_cache_keys_and_controllers(event_keys) + \
             cls._get_event_district_points_cache_keys_and_controllers(event_keys) + \
             cls._get_eventlist_cache_keys_and_controllers(years) + \
