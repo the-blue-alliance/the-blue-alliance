@@ -28,6 +28,7 @@ class Event(ndb.Model):
     official = ndb.BooleanProperty(default=False)  # Is the event FIRST-official?
     first_eid = ndb.StringProperty()  # from USFIRST
     facebook_eid = ndb.StringProperty(indexed=False)  # from Facebook
+    custom_hashtag = ndb.StringProperty(indexed=False) #Custom HashTag
     website = ndb.StringProperty(indexed=False)
     webcast_json = ndb.TextProperty(indexed=False)  # list of dicts, valid keys include 'type' and 'channel'
     matchstats_json = ndb.TextProperty(indexed=False)  # for OPR, DPR, CCWM, etc.
@@ -269,6 +270,16 @@ class Event(ndb.Model):
         else:
             return None
 
+    @property
+    def hashtag(self):
+        """
+        Return the hashtag used for the event.
+        """
+        if self.custom_hashtag:
+            return self.custom_hashtag
+        else:
+            return "frc" + self.event_short
+    
     # Depreciated, still here to keep GAE clean.
     webcast_url = ndb.StringProperty(indexed=False)
 
