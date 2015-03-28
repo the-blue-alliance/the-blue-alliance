@@ -32,6 +32,8 @@
                 <li><a class="smooth-scroll" href="#team-event-matches-request">Team Event Matches Request</a></li>
                 <li><a class="smooth-scroll" href="#team-years-participated-request">Team Years Participated Request</a></li>
                 <li><a class="smooth-scroll" href="#team-media-request">Team Media Request</a></li>
+                <li><a class="smooth-scroll" href="#team-history-events-request">Team History Events Request</a></li>
+                <li><a class="smooth-scroll" href="#team-history-awards-request">Team History Awards Request</a></li>
               </ul>
             </li>
             <li>
@@ -764,6 +766,94 @@
         </div>
       </div>
 
+      <h3 id="team-history-events-request">Team History Events Request</h3>
+      <h4>Related: <a class="smooth-scroll" href="#event-model">Event Model</a></h4>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/events</code>
+      </p>
+      <table class=table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>team key</td>
+            <td>A team key name where the format is <code>frcyyyy</code> where yyyy is the a
+              valid, official team number issued by <em>FIRST</em></td>
+            <td>frc1, frc281, frc1114</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_team_history_events_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="6" id="example_team_history_events_request" type="text" value="/api/v2/team/frc254/history/events">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group">
+            <pre class="team-history-events-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 id="team-history-awards-request">Team History Awards Request</h3>
+      <h4>Related: <a class="smooth-scroll" href="#award-model">Awards Model</a></h4>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/awards</code>
+      </p>
+      <table class=table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>team key</td>
+            <td>A team key name where the format is <code>frcyyyy</code> where yyyy is the a
+              valid, official team number issued by <em>FIRST</em></td>
+            <td>frc1, frc281, frc1114</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_team_history_awards_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="6" id="example_team_history_awards_request" type="text" value="/api/v2/team/frc254/history/awards">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group">
+            <pre class="team-history-awards-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+
       <h2 id="event-requests">Event Requests</h2>
       <h3 id="event-list-request">Event List Request</h3>
       <h4>Related: <a class="smooth-scroll" href="#event-model">Event Model</a></h4>
@@ -1428,6 +1518,38 @@
       },
       error: function(data) {
         $(".team-media-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+  $("#example_team_history_events_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".team-history-events-request-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_team_history_events_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-team-history-events-request:v01'},
+      success: function(data) {
+        $(".team-history-events-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".team-history-events-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+  $("#example_team_history_awards_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".team-history-awards-request-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_team_history_awards_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-team-history-awards-request:v01'},
+      success: function(data) {
+        $(".team-history-awards-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".team-history-awards-request-json").html('Something went wrong! Please check for correct request format.');
       }
     });
   });
