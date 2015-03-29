@@ -52,8 +52,8 @@ Run a local dev server
 	* Visit [localhost:8088](http://localhost:8088) to see your local version of The Blue Alliance
 	* Also see [localhost:8088/admin/](http://localhost:8088/admin/)
 4. Get some data into the local server
-	* NOTE: These steps are intended for local dev servers. They might also work on a deployed server if you set DEBUG to True.
-	* NOTE: The /admin/ page's buttons like "Create Test Teams" and "Create Test Events" are obsolete. They try to access decomissioned usfirst.org data feeds.
+	* NOTE: These steps are intended for local dev servers. They might also work on a deployed server if you edit `tba_config.py` to set `DEBUG = True`.
+	* NOTE: The /admin/ page's buttons "Get FMS Teams" and "Create Test Teams" are obsolete. They try to access decomissioned usfirst.org data feeds. "Create Test Events" still works *if* you have teams in the database.
 	* Visit, say, [localhost:8088/tasks/get/usfirst_teams_tpids/2015?skip=0](http://localhost:8088/tasks/get/usfirst_teams_tpids/2015?skip=0), [localhost:8088/tasks/get/usfirst_teams_tpids/2015?skip=1000](http://localhost:8088/tasks/get/usfirst_teams_tpids/2015?skip=1000), ...
 	* Also visit [localhost:8088/tasks/enqueue/usfirst_event_details/2015](http://localhost:8088/tasks/enqueue/usfirst_event_details/2015), [2014](http://localhost:8088/tasks/enqueue/usfirst_event_details/2014), ...
 	* Once you have events for a certain year, you can visit [localhost:8088/tasks/enqueue/csv_restore_events/2015](http://localhost:8088/tasks/enqueue/csv_restore_events/2015), [2014](http://localhost:8088/tasks/enqueue/csv_restore_events/2014), ... etc. to get data from [github.com/the-blue-alliance/the-blue-alliance-data](https://github.com/the-blue-alliance/the-blue-alliance-data) instead of hitting up usfirst.org lots of times.
@@ -73,6 +73,10 @@ Setup notes:
 
 * Note that it needs your application's "Project ID", not its "Project name".
 * The `--oauth2` argument of `appcfg.py` [saves repeating the login steps each time](https://cloud.google.com/appengine/docs/python/tools/uploadinganapp#Python_Password-less_login_with_OAuth2). If you skip it or deploy via the App Engine Launcher, you'll have to enter your name and password each time. If you use 2-Step Verification for your Google account (you should!), that means generating an [App password](https://security.google.com/settings/security/apppasswords) each time.
+* The `cron.yaml` file in master will create cron jobs that use up daily free AE Datastore quotas.
+	* To avoid that in a dev server, checkout [a no-op version of cron.yaml](https://github.com/the-blue-alliance/the-blue-alliance/blob/c5d173f23310caf9f2c80d08829083c22ea1c0c3/cron.yaml).
+	* If it's already happening in a dev server, deploy a no-op `cron.yaml` via `appcfg.py update_cron`, then delete the tasks in the `usfirst` queue.)
+	* If you try to deploy a server while it's over Datastore quota, appcfg will say "there was an error updating your indexes. Please retry later with appcfg.py update_indexes." The fix is to wait until the next day's quota then use `appcfg.py update_indexes` or `appcfg.py update`.
 * When you set sitevars, the server automatically internalizes them.
 * You don't need a sitevar for `firebase.secrets` even though that's the placeholder text for a new sitevar name.
 * Ignore these deployment warnings:
