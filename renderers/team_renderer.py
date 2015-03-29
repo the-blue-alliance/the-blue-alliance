@@ -49,13 +49,17 @@ class TeamRenderer(object):
             if year == 2015:
                 display_wlt = None
                 match_avg = EventHelper.calculateTeamAvgScoreFromMatches(team.key_name, event_matches)
-                year_match_avg_list.append(match_avg)
+                if event.event_type_enum != EventType.PRESEASON and event.event_type_enum != EventType.OFFSEASON:
+                    year_match_avg_list.append(match_avg)
+                    
                 qual_avg, elim_avg, _, _ = match_avg
             else:
                 qual_avg = None
                 elim_avg = None
                 wlt = EventHelper.calculateTeamWLTFromMatches(team.key_name, event_matches)
-                year_wlt_list.append(wlt)
+                if event.event_type_enum != EventType.PRESEASON and event.event_type_enum != EventType.OFFSEASON:
+                    year_wlt_list.append(wlt)
+                    
                 if wlt["win"] + wlt["loss"] + wlt["tie"] == 0:
                     display_wlt = None
                 else:
