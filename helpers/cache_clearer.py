@@ -7,7 +7,7 @@ from controllers.api.api_event_controller import ApiEventController, ApiEventTea
 from controllers.api.api_match_controller import ApiMatchController
 from controllers.api.api_team_controller import ApiTeamController, ApiTeamEventsController, ApiTeamEventAwardsController, \
                                                 ApiTeamEventMatchesController, ApiTeamMediaController, ApiTeamYearsParticipatedController, \
-                                                ApiTeamListController
+                                                ApiTeamListController, ApiTeamHistoryEventsController, ApiTeamHistoryAwardsController
 
 from models.event import Event
 from models.event_team import EventTeam
@@ -201,6 +201,7 @@ class CacheClearer(object):
         for team_key in filter(None, team_keys):
             for event_key in filter(None, event_keys):
                 cache_keys_and_controllers.append((ApiTeamEventAwardsController.get_cache_key_from_format(team_key.id(), event_key.id()), ApiTeamEventAwardsController))
+            cache_keys_and_controllers.append((ApiTeamHistoryAwardsController.get_cache_key_from_format(team_key.id()), ApiTeamHistoryAwardsController))
         return cache_keys_and_controllers
 
     @classmethod
@@ -217,6 +218,7 @@ class CacheClearer(object):
         for team_key in filter(None, team_keys):
             for year in filter(None, years):
                 cache_keys_and_controllers.append((ApiTeamEventsController.get_cache_key_from_format(team_key.id(), year), ApiTeamEventsController))
+            cache_keys_and_controllers.append((ApiTeamHistoryEventsController.get_cache_key_from_format(team_key.id()), ApiTeamHistoryEventsController))
         return cache_keys_and_controllers
 
     @classmethod
