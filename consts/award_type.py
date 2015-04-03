@@ -82,7 +82,12 @@ class AwardType(object):
     PROFESSIONALISM = 65
     GOLDEN_CORNDOG = 66
 
-    BLUE_BANNER_AWARDS = {CHAIRMANS, WINNER}
+    # Award --> Year award started earning blue banners
+    BLUE_BANNER_AWARDS = {
+        CHAIRMANS: 1992,
+        WINNER: 1992,
+        WOODIE_FLOWERS: 2015,
+    }
     INDIVIDUAL_AWARDS = {WOODIE_FLOWERS, DEANS_LIST, VOLUNTEER, FOUNDERS,
                          BART_KAMEN_MEMORIAL, MAKE_IT_LOUD}
     NON_JUDGED_NON_TEAM_AWARDS = {  # awards not used in the district point model
