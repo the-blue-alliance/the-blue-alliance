@@ -26,7 +26,6 @@ class DistrictHelper(object):
     """
     @classmethod
     def inverf(cls, x):
-    	x = 0.3
     	if x > 0:
     		s = 1
     	elif x < 0:
