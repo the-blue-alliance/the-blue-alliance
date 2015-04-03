@@ -25,18 +25,18 @@ class DistrictHelper(object):
     2015: http://www.usfirst.org/sites/default/files/uploadedFiles/Robotics_Programs/FRC/Game_and_Season__Info/2015/FRC_District_Standard_Points_Ranking_System_2015%20Summary.pdf
     """
     @classmethod
-    def inverf(cls, y):
+    def inverf(cls, x):
        
-        if y > 0:
+        if x > 0:
             s = 1
-        elif y < 0:
+        elif x < 0:
             s = -1
         else:
             s = 0
             
         a = 0.147
-        x = s * math.sqrt((math.sqrt((((2 / (math.pi * a)) + ((math.log(1 - x**2)) / 2))**2) - ((math.log(1 - x**2)) / a))) - ((2 / (math.pi * a)) + (math.log(1 - x**2)) / 2))
-        return x
+        y = s * math.sqrt((math.sqrt((((2 / (math.pi * a)) + ((math.log(1 - x**2)) / 2))**2) - ((math.log(1 - x**2)) / a))) - ((2 / (math.pi * a)) + (math.log(1 - x**2)) / 2))
+        return y
 
     @classmethod
     def calculate_event_points(cls, event):
