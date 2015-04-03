@@ -35,7 +35,7 @@ class DistrictHelper(object):
     		s = 0
     	a = 0.147
         y = s * math.sqrt((math.sqrt((((2 / (math.pi * a)) + ((math.log(1 - x**2)) / 2))**2) - ((math.log(1 - x**2)) / a))) - ((2 / (math.pi * a)) + (math.log(1 - x**2)) / 2))
-	    return y
+	return y
 
     @classmethod
     def calculate_event_points(cls, event):
