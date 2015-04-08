@@ -1,3 +1,27 @@
+{% if playoff_advancement.ef %}
+  <h4>Eighth-Finals</h4>
+  <table class="table table-condensed table-striped">
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>Alliance</th>
+        <th>Average Score</th>
+        <th>Advance to Quarters</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for alliance, scores, average_score in playoff_advancement.ef %}
+        <tr>
+          <td>{{forloop.counter}}</td>
+          <td>{% for team in alliance %}<a href="/team/{{ team|digits }}/{{ event.year }}">{{ team }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td>{{ average_score|floatformat:2 }}</td>
+          <td>{% if forloop.counter0 < 8 %}<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>{% endif %}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+
 {% if playoff_advancement.qf %}
   <h4>Quarterfinals</h4>
   <table class="table table-condensed table-striped">
