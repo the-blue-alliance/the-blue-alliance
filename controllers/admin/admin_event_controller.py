@@ -222,6 +222,7 @@ class AdminEventEdit(LoggedInHandler):
             year=int(self.request.get("year")),
             official={"true": True, "false": False}.get(self.request.get("official").lower()),
             facebook_eid=self.request.get("facebook_eid"),
+            custom_hashtag=self.request.get("custom_hashtag"),
             webcast_json=self.request.get("webcast_json"),
             alliance_selections_json=self.request.get("alliance_selections_json"),
             rankings_json=self.request.get("rankings_json"),

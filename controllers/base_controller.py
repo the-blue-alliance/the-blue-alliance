@@ -55,7 +55,9 @@ class CacheableHandler(webapp2.RequestHandler):
             self.response.headers = cached_response.headers
         else:
             self.template_values["cache_key"] = self.cache_key
-            self.response.out.write(self._render(*args, **kw))
+            rendered = self._render(*args, **kw)
+            if rendered is not None:
+                self.response.out.write(rendered)
             self._write_cache(self.response)
 
     def _has_been_modified_since(self, datetime):
@@ -109,5 +111,12 @@ class LoggedInHandler(webapp2.RequestHandler):
         if not self.user_bundle.user:
             return self.redirect(
                 self.user_bundle.create_login_url(target_url),
+                abort=True
+            )
+
+    def _require_registration(self, target_url="/"):
+        if not self.user_bundle.account.registered:
+            return self.redirect(
+                target_url,
                 abort=True
             )

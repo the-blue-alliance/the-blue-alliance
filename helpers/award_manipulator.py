@@ -1,7 +1,9 @@
 import json
+import logging
 
 from helpers.cache_clearer import CacheClearer
 from helpers.manipulator_base import ManipulatorBase
+from helpers.notification_helper import NotificationHelper
 
 
 class AwardManipulator(ManipulatorBase):
@@ -11,6 +13,24 @@ class AwardManipulator(ManipulatorBase):
     @classmethod
     def getCacheKeysAndControllers(cls, affected_refs):
         return CacheClearer.get_award_cache_keys_and_controllers(affected_refs)
+
+    @classmethod
+    def postUpdateHook(cls, awards, updated_attr_list, is_new_list):
+        # Note, updated_attr_list will always be empty, for now
+        # Still needs to be implemented in updateMerge
+        # See helpers.EventManipulator
+        events = []
+        for (award, updated_attrs) in zip(awards, updated_attr_list):
+            event = award.event
+            if event not in events:
+                events.append(event)
+
+        for event in events:
+            if event.get().within_a_day:
+                try:
+                    NotificationHelper.send_award_update(event.get())
+                except Exception:
+                    logging.error("Error sending award update for {}".format(event.id()))
 
     @classmethod
     def updateMerge(self, new_award, old_award, auto_union=True):

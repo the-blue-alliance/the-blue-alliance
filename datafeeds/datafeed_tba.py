@@ -9,6 +9,6 @@ class DatafeedTba(DatafeedBase):
 
     def getVideos(self, event):
         url = self.TBA_VIDS_DIR_URL_PATTERN % (event.key_name)
-        videos = self.parse(url, TbaVideosParser)
+        videos, _ = self.parse(url, TbaVideosParser)
 
         return videos

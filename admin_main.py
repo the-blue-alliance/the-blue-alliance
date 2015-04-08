@@ -18,9 +18,10 @@ from controllers.admin.admin_sitevar_controller import AdminSitevarCreate, Admin
 from controllers.admin.suggestions.admin_event_webcast_suggestions_review_controller import AdminEventWebcastSuggestionsReviewController
 from controllers.admin.suggestions.admin_match_video_suggestions_review_controller import AdminMatchVideoSuggestionsReviewController
 from controllers.admin.suggestions.admin_media_suggestions_review_controller import AdminMediaSuggestionsReviewController
-from controllers.admin.admin_team_controller import AdminTeamDetail, AdminTeamList
+from controllers.admin.admin_team_controller import AdminTeamCreateTest, AdminTeamDetail, AdminTeamList
 from controllers.admin.admin_migration_controller import AdminMigration
 from controllers.admin.admin_user_controller import AdminUserList, AdminUserEdit, AdminUserDetail
+from controllers.admin.admin_mobile_controller import AdminMobile, AdminBroadcast
 
 app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/api_auth/add', AdminApiAuthAdd),
@@ -60,10 +61,13 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/suggestions/media/review', AdminMediaSuggestionsReviewController),
                                ('/admin/tasks', AdminTasksHandler),
                                ('/admin/teams', AdminTeamList),
+                               ('/admin/team/create/test', AdminTeamCreateTest),
                                ('/admin/team/(.*)', AdminTeamDetail),
                                ('/admin/users', AdminUserList),
                                ('/admin/user/edit/(.*)', AdminUserEdit),
                                ('/admin/user/(.*)', AdminUserDetail),
                                ('/admin/videos/add', AdminVideosAdd),
+                               ('/admin/mobile', AdminMobile),
+                               ('/admin/mobile/broadcast', AdminBroadcast),
                                ],
                               debug=tba_config.DEBUG)

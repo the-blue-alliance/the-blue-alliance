@@ -10,6 +10,8 @@ from controllers.datafeed_controller import TbaVideosGet, TbaVideosEnqueue
 from controllers.datafeed_controller import FmsEventListGet, FmsTeamListGet
 from controllers.datafeed_controller import OffseasonMatchesGet
 from controllers.datafeed_controller import TwitterFrcfmsMatchesGet
+from controllers.datafeed_controller import FMSAPIAwardsEnqueue, FMSAPIEventAlliancesEnqueue, FMSAPIEventRankingsEnqueue, FMSAPIMatchesEnqueue
+from controllers.datafeed_controller import FMSAPIAwardsGet, FMSAPIEventAlliancesGet, FMSAPIEventRankingsGet, FMSAPIMatchesGet
 from controllers.datafeed_controller import UsfirstEventDetailsEnqueue, UsfirstEventDetailsGet, UsfirstEventListGet
 from controllers.datafeed_controller import UsfirstAwardsEnqueue, UsfirstAwardsGet
 from controllers.datafeed_controller import UsfirstEventAlliancesEnqueue, UsfirstEventAlliancesGet
@@ -23,8 +25,10 @@ from controllers.cron_controller import EventTeamRepairDo, EventTeamUpdate, Even
 from controllers.cron_controller import EventMatchstatsDo, EventMatchstatsEnqueue
 from controllers.cron_controller import FinalMatchesRepairDo
 from controllers.cron_controller import YearInsightsEnqueue, YearInsightsDo, OverallInsightsEnqueue, OverallInsightsDo, TypeaheadCalcEnqueue, TypeaheadCalcDo
+from controllers.cron_controller import UpcomingNotificationDo
 
-from controllers.firebase_controller import FirebasePushDo
+from controllers.admin.admin_cron_controller import AdminMobileClearEnqueue, AdminMobileClear, AdminSubsClearEnqueue, AdminSubsClear, \
+    AdminWebhooksClearEnqueue, AdminWebhooksClear
 
 
 app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackupEventsEnqueue),
@@ -36,6 +40,10 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/enqueue/csv_backup_teams', TbaCSVBackupTeamsEnqueue),
                                ('/tasks/do/csv_backup_teams', TbaCSVBackupTeamsDo),
                                ('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
+                               ('/tasks/enqueue/fmsapi_awards/(.*)', FMSAPIAwardsEnqueue),
+                               ('/tasks/enqueue/fmsapi_event_alliances/(.*)', FMSAPIEventAlliancesEnqueue),
+                               ('/tasks/enqueue/fmsapi_event_rankings/(.*)', FMSAPIEventRankingsEnqueue),
+                               ('/tasks/enqueue/fmsapi_matches/(.*)', FMSAPIMatchesEnqueue),
                                ('/tasks/enqueue/usfirst_event_alliances/(.*)', UsfirstEventAlliancesEnqueue),
                                ('/tasks/enqueue/usfirst_event_details/([0-9]*)', UsfirstEventDetailsEnqueue),
                                ('/tasks/enqueue/usfirst_event_rankings/(.*)', UsfirstEventRankingsEnqueue),
@@ -49,6 +57,10 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/get/offseason_matches/(.*)', OffseasonMatchesGet),
                                ('/tasks/get/tba_videos/(.*)', TbaVideosGet),
                                ('/tasks/get/twitter_frcfms_matches', TwitterFrcfmsMatchesGet),
+                               ('/tasks/get/fmsapi_awards/(.*)', FMSAPIAwardsGet),
+                               ('/tasks/get/fmsapi_event_alliances/(.*)', FMSAPIEventAlliancesGet),
+                               ('/tasks/get/fmsapi_event_rankings/(.*)', FMSAPIEventRankingsGet),
+                               ('/tasks/get/fmsapi_matches/(.*)', FMSAPIMatchesGet),
                                ('/tasks/get/usfirst_event_alliances/(.*)', UsfirstEventAlliancesGet),
                                ('/tasks/get/usfirst_event_list/([0-9]*)', UsfirstEventListGet),
                                ('/tasks/get/usfirst_event_details/([0-9]*)/([0-9]*)', UsfirstEventDetailsGet),
@@ -58,7 +70,7 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/get/usfirst_team_details/(.*)', UsfirstTeamDetailsGet),
                                ('/tasks/get/usfirst_teams_tpids/([0-9]*)', UsfirstTeamsTpidsGet),
                                ('/tasks/get/usfirst_pre2003_team_events/(.*)', UsfirstPre2003TeamEventsGet),
-                               ('/tasks/math/enqueue/district_points_calc/([0-9]*)/([0-9]*)', DistrictPointsCalcEnqueue),
+                               ('/tasks/math/enqueue/district_points_calc/([0-9]*)', DistrictPointsCalcEnqueue),
                                ('/tasks/math/do/district_points_calc/(.*)', DistrictPointsCalcDo),
                                ('/tasks/math/enqueue/event_short_name_calc_enqueue/([0-9]*)', EventShortNameCalcEnqueue),
                                ('/tasks/math/do/event_short_name_calc_do/(.*)', EventShortNameCalcDo),
@@ -74,6 +86,12 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/math/do/insights/(.*)/([0-9]*)', YearInsightsDo),
                                ('/tasks/math/enqueue/typeaheadcalc', TypeaheadCalcEnqueue),
                                ('/tasks/math/do/typeaheadcalc', TypeaheadCalcDo),
-                               ('/tasks/posts/firebase_push', FirebasePushDo),
+                               ('/tasks/notifications/upcoming_match', UpcomingNotificationDo),
+                               ('/tasks/admin/enqueue/clear_mobile_duplicates', AdminMobileClearEnqueue),
+                               ('/tasks/admin/clear_mobile_duplicates', AdminMobileClear),
+                               ('/tasks/admin/enqueue/clear_old_subs', AdminSubsClearEnqueue),
+                               ('/tasks/admin/clear_old_subs', AdminSubsClear),
+                               ('/tasks/admin/enqueue/clear_old_webhooks', AdminWebhooksClearEnqueue),
+                               ('/tasks/admin/clear_old_webhooks', AdminWebhooksClear),
                                ],
                               debug=tba_config.DEBUG)

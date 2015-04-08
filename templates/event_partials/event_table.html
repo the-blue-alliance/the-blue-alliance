@@ -9,10 +9,16 @@
   <tbody>
     {% for event in events %}
       <tr itemscope itemtype="http://data-vocabulary.org/Event">
-        <td><a href="/event/{{event.key_name}}" title="{{event.name}}" itemprop="url"><span itemprop="summary">{{event.name}}</span></a></td>
+        <td>
+          <a href="/event/{{event.key_name}}" title="{{event.name}}" itemprop="url"><span itemprop="summary">{{event.name}}</span></a>
+          {% if event.location %}
+            <br>
+            <small>{{event.location}}</small>
+          {% endif %}
+        </td>
         <td class="hidden-xs">
           {% if event.webcast %}
-            {% if event.within_a_day %}
+            {% if event.now %}
               <a class="btn btn-success btn-small" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
             {% else %}
               <a class="btn btn-default btn-small disabled">Offline</a>

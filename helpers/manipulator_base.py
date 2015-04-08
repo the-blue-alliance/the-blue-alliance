@@ -18,13 +18,15 @@ class ManipulatorBase(object):
         cls.delete(models)
 
     @classmethod
-    def delete(self, models):
+    def delete(self, models, run_post_delete_hook=True):
         models = filter(None, self.listify(models))
         keys = [model.key for model in models]
         ndb.delete_multi(keys)
         for model in models:
             model.dirty = True
             self._computeAndSaveAffectedReferences(model)
+        if run_post_delete_hook:
+            self.runPostDeleteHook(models)
         self._clearCache(models)
 
     @classmethod
@@ -111,6 +113,7 @@ class ManipulatorBase(object):
         """
         if old_model is None:
             new_model.dirty = True
+            new_model._is_new = True  # used for post update/delete hooks
             self._computeAndSaveAffectedReferences(new_model)
             return new_model
 
@@ -125,11 +128,23 @@ class ManipulatorBase(object):
         raise NotImplementedError("No updateMerge method!")
 
     @classmethod
+    def runPostDeleteHook(cls, models):
+        """
+        Asynchronously runs the manipulator's post delete hook if available.
+        """
+        if models:
+            post_delete_hook = getattr(cls, "postDeleteHook", None)
+            if callable(post_delete_hook):
+                deferred.defer(post_delete_hook, models, _queue="post-update-hooks")
+
+    @classmethod
     def runPostUpdateHook(cls, models):
         """
         Asynchronously runs the manipulator's post update hook if available.
         """
-        post_update_hook = getattr(cls, "postUpdateHook", None)
-        if callable(post_update_hook):
-            for model in models:
-                deferred.defer(post_update_hook, model, _queue="post-update-hooks")
+        if models:
+            post_update_hook = getattr(cls, "postUpdateHook", None)
+            if callable(post_update_hook):
+                updated_attrs = [model._updated_attrs if hasattr(model, '_updated_attrs') else [] for model in models]
+                is_new = [model._is_new if hasattr(model, '_is_new') else False for model in models]
+                deferred.defer(post_update_hook, models, updated_attrs, is_new, _queue="post-update-hooks")

@@ -1,34 +1,7 @@
 $(document).ready(function(){
 	// Disable browser autocompletes
 	$('.typeahead').attr('autocomplete', 'off');
-	
-	// helper function to match standard characters
-  function cleanUnicode(s){
-    var a = s.toLowerCase();
-    a = a.replace(/[àáâãäå]/g, "a");
-    a = a.replace(/æ/g, "ae");
-    a = a.replace(/ç/g, "c");
-    a = a.replace(/[èéêë]/g, "e");
-    a = a.replace(/[ìíîï]/g, "i");
-    a = a.replace(/ñ/g, "n");
-    a = a.replace(/[òóôõö]/g, "o");
-    a = a.replace(/œ/g, "oe");
-    a = a.replace(/[ùúûü]/g, "u");
-    a = a.replace(/[ýÿ]/g, "y");
-    return a;
-  };
-  
-  function unicodeFilter(data) {
-    var to_return = [];
-    for(var i=0; i<data.length; i++) {
-      to_return.push({
-        value: data[i],
-        tokens: cleanUnicode(data[i]).split(' ')
-      });
-    }
-    return to_return;
-  }
-  
+
   // Set up Twitter Typeahead
 	$('.typeahead').typeahead([
 	  {
@@ -48,7 +21,7 @@ $(document).ready(function(){
       header: '<div class="tba-typeahead-header">Events</div>'
     }
 	]);
-  
+
 	// Go to event and team pages on select or autocomplete
 	function goToPage(obj, datum) {
 	  var event_re = datum.value.match(/(\d*).+\[(.+?)\]/);
@@ -64,10 +37,10 @@ $(document).ready(function(){
       window.location.href = url;
     }
 	}
-	
+
   $('.typeahead').bind('typeahead:selected', goToPage);
   $('.typeahead').bind('typeahead:autocompleted', goToPage);
-  
+
   // Submit form on Enter
   $(".typeahead").keypress(function (event) {
     if (event.which == 13) {
@@ -75,3 +48,30 @@ $(document).ready(function(){
     }
   });
 });
+
+// helper function to match standard characters
+function cleanUnicode(s){
+  var a = s.toLowerCase();
+  a = a.replace(/[àáâãäå]/g, "a");
+  a = a.replace(/æ/g, "ae");
+  a = a.replace(/ç/g, "c");
+  a = a.replace(/[èéêë]/g, "e");
+  a = a.replace(/[ìíîï]/g, "i");
+  a = a.replace(/ñ/g, "n");
+  a = a.replace(/[òóôõö]/g, "o");
+  a = a.replace(/œ/g, "oe");
+  a = a.replace(/[ùúûü]/g, "u");
+  a = a.replace(/[ýÿ]/g, "y");
+  return a;
+};
+
+function unicodeFilter(data) {
+  var to_return = [];
+  for(var i=0; i<data.length; i++) {
+    to_return.push({
+      value: data[i],
+      tokens: cleanUnicode(data[i]).split(' ')
+    });
+  }
+  return to_return;
+}

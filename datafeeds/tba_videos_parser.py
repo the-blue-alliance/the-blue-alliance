@@ -31,4 +31,4 @@ class TbaVideosParser(ParserBase):
                 logging.info("Malformed video filename: " + a["href"])
                 continue
 
-        return videos
+        return videos, False

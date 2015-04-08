@@ -76,36 +76,27 @@ class MatchHelper(object):
 
     @classmethod
     def recentMatches(self, matches, num=3):
-        def cmp_matches(x, y):
-            if x.updated is None:
-                return False
-            if y.updated is None:
-                return True
-            else:
-                cmp(x.updated, y.updated)
-
         matches = filter(lambda x: x.has_been_played, matches)
-        matches = MatchHelper.organizeMatches(matches)
-
-        all_matches = []
-        for comp_level in Match.COMP_LEVELS:
-            if comp_level in matches:
-                play_order_sorted = self.play_order_sort_matches(matches[comp_level])
-                all_matches += play_order_sorted
-        return all_matches[-num:]
+        matches = self.play_order_sort_matches(matches)
+        return matches[-num:]
 
     @classmethod
     def upcomingMatches(self, matches, num=3):
-        matches = filter(lambda x: not x.has_been_played, matches)
-        matches = MatchHelper.organizeMatches(matches)
+        matches = self.play_order_sort_matches(matches)
 
-        unplayed_matches = []
-        for comp_level in Match.COMP_LEVELS:
-            if comp_level in matches:
-                play_order_sorted = self.play_order_sort_matches(matches[comp_level])
-                for match in play_order_sorted:
-                    unplayed_matches.append(match)
-        return unplayed_matches[:num]
+        last_played_match_index = None
+        for i, match in enumerate(reversed(matches)):
+            if match.has_been_played:
+                last_played_match_index = len(matches) - i
+                break
+
+        upcoming_matches = []
+        for i, match in enumerate(matches[last_played_match_index:]):
+            if i == num:
+                break
+            if not match.has_been_played:
+                upcoming_matches.append(match)
+        return upcoming_matches
 
     @classmethod
     def deleteInvalidMatches(self, match_list):
@@ -122,7 +113,7 @@ class MatchHelper(object):
             if match.comp_level in Match.ELIM_LEVELS and match.match_number == 3 and (not match.has_been_played):
                 match_1 = matches_by_key.get(Match.renderKeyName(match.event.id(), match.comp_level, match.set_number, 1))
                 match_2 = matches_by_key.get(Match.renderKeyName(match.event.id(), match.comp_level, match.set_number, 2))
-                if match_1 != None and match_2 != None and\
+                if match_1 is not None and match_2 is not None and\
                     match_1.has_been_played and match_2.has_been_played and\
                     match_1.winning_alliance == match_2.winning_alliance:
                         try:
@@ -177,6 +168,46 @@ class MatchHelper(object):
                     bracket_table[comp_level][set_number]['winning_alliance'] = 'blue'
 
         return bracket_table
+
+    @classmethod
+    def generatePlayoffAdvancement2015(cls, matches, alliance_selections=None):
+        complete_alliances = []
+        advancement = defaultdict(list)  # key: comp level; value: list of [complete_alliance, [scores], average_score]
+        for comp_level in ['ef', 'qf', 'sf']:
+            for match in matches.get(comp_level, []):
+                if not match.has_been_played:
+                    continue
+                for color in ['red', 'blue']:
+                    alliance = cls.getOrderedAlliance(match.alliances[color]['teams'], alliance_selections)
+                    for i, complete_alliance in enumerate(complete_alliances):  # search for alliance. could be more efficient
+                        if len(set(alliance).intersection(set(complete_alliance))) >= 2:  # if >= 2 teams are the same, then the alliance is the same
+                            backups = list(set(alliance).difference(set(complete_alliance)))
+                            complete_alliances[i] += backups  # ensures that backup robots are listed last
+                            break
+                    else:
+                        i = None
+                        complete_alliances.append(alliance)
+
+                    is_new = False
+                    if i is not None:
+                        for j, (complete_alliance, scores, _) in enumerate(advancement[comp_level]):  # search for alliance. could be more efficient
+                            if len(set(complete_alliances[i]).intersection(set(complete_alliance))) >= 2:  # if >= 2 teams are the same, then the alliance is the same
+                                complete_alliance = complete_alliances[i]
+                                scores.append(match.alliances[color]['score'])
+                                advancement[comp_level][j][2] = float(sum(scores)) / len(scores)
+                                break
+                        else:
+                            is_new = True
+
+                    score = match.alliances[color]['score']
+                    if i is None:
+                        advancement[comp_level].append([alliance, [score], score])
+                    elif is_new:
+                        advancement[comp_level].append([complete_alliances[i], [score], score])
+
+            advancement[comp_level] = sorted(advancement[comp_level], key=lambda x: -x[2])  # sort by descending average score
+
+        return advancement
 
     @classmethod
     def getOrderedAlliance(cls, team_keys, alliance_selections):

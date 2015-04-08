@@ -47,7 +47,7 @@ class ApiEventController(ApiBaseController):
 
 class ApiEventTeamsController(ApiEventController):
     CACHE_KEY_FORMAT = "apiv2_event_teams_controller_{}"  # (event_key)
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_HEADER_LENGTH = 60 * 60
 
     def __init__(self, *args, **kw):
@@ -60,7 +60,7 @@ class ApiEventTeamsController(ApiEventController):
     def _render(self, event_key):
         self._set_event(event_key)
 
-        teams = self.event.teams
+        teams = filter(None, self.event.teams)
         team_dicts = [ModelToDict.teamConverter(team) for team in teams]
 
         return json.dumps(team_dicts, ensure_ascii=True)
@@ -68,7 +68,7 @@ class ApiEventTeamsController(ApiEventController):
 
 class ApiEventMatchesController(ApiEventController):
     CACHE_KEY_FORMAT = "apiv2_event_matches_controller_{}"  # (event_key)
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
@@ -145,6 +145,7 @@ class ApiEventAwardsController(ApiEventController):
         award_dicts = [ModelToDict.awardConverter(award) for award in AwardHelper.organizeAwards(self.event.awards)]
         return json.dumps(award_dicts, ensure_ascii=True)
 
+
 class ApiEventDistrictPointsController(ApiEventController):
     CACHE_KEY_FORMAT = "apiv2_event_district_points_controller_{}"  # (event_key)
     CACHE_VERSION = 0
@@ -162,6 +163,7 @@ class ApiEventDistrictPointsController(ApiEventController):
 
         points = DistrictHelper.calculate_event_points(self.event)
         return json.dumps(points, ensure_ascii=True)
+
 
 class ApiEventListController(ApiBaseController):
     CACHE_KEY_FORMAT = "apiv2_event_list_controller_{}"  # (year)

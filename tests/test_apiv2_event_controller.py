@@ -194,7 +194,8 @@ class TestEventMatchApiController(unittest2.TestCase):
             match_number=1,
             team_key_names=[u'frc281', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073'],
             youtube_videos=["94UGXIq6jUA"],
-            tba_videos=[".mp4"]
+            tba_videos=[".mp4"],
+            time=datetime.fromtimestamp(1409527874)
         )
         self.match.put()
 
@@ -210,10 +211,7 @@ class TestEventMatchApiController(unittest2.TestCase):
         self.assertEqual(match["match_number"], self.match.match_number)
         self.assertEqual(match["videos"], self.match.videos)
         self.assertEqual(match["time_string"], self.match.time_string)
-        if self.match.time is None:
-            self.assertEqual(match["time"], None)
-        else:
-            self.assertEqual(match["time"], self.match.time.strftime("%s"))
+        self.assertEqual(match["time"], 1409527874)
 
     def testEventMatchApi(self):
         response = self.testapp.get('/2010sc', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})

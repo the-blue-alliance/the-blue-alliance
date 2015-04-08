@@ -31,6 +31,8 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.WINNER, (["championship winner"], [])),
     (AwardType.WINNER, (["championship champion"], [])),
     (AwardType.WINNER, (["division champion"], [])),
+    (AwardType.WINNER, (["championship subdivision winner"], [])),
+    (AwardType.WINNER, (["district event winner"], [])),
     (AwardType.WINNER, (["winner", "1"], [])),
     (AwardType.WINNER, (["winner", "2"], [])),
     (AwardType.WINNER, (["winner", "3"], ["3d"])),
@@ -46,6 +48,7 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.FINALIST, (["regional finalist"], ["dean"])),
     (AwardType.FINALIST, (["championship finalist"], ["dean"])),
     (AwardType.FINALIST, (["division finalist"], ["dean"])),
+    (AwardType.FINALIST, (["district event finalist"], [])),
     (AwardType.FINALIST, (["finalist", "1"], ["dean"])),
     (AwardType.FINALIST, (["finalist", "2"], ["dean"])),
     (AwardType.FINALIST, (["finalist", "3"], ["dean", "3d"])),
@@ -112,6 +115,9 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.BEST_CRAFTSMANSHIP, (["best craftsmanship"], [])),
     (AwardType.BEST_DEFENSIVE_MATCH, (["best defensive match"], [])),
     (AwardType.PLAY_OF_THE_DAY, (["play of the day"], [])),
+    (AwardType.PROGRAMMING, (["programming"], [])),
+    (AwardType.PROFESSIONALISM, (["professionalism"], ["gracious"])),
+    (AwardType.GOLDEN_CORNDOG, (["golden corndog"], [])),
 ]
 
 

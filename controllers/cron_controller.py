@@ -18,6 +18,7 @@ from helpers.event_manipulator import EventManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.event_team_repairer import EventTeamRepairer
 from helpers.event_team_updater import EventTeamUpdater
+from helpers.notification_helper import NotificationHelper
 
 from helpers.insight_manipulator import InsightManipulator
 from helpers.team_manipulator import TeamManipulator
@@ -145,7 +146,7 @@ class EventMatchstatsDo(webapp.RequestHandler):
     def get(self, event_key):
         event = Event.get_by_id(event_key)
         matchstats_dict = MatchstatsHelper.calculate_matchstats(event.matches)
-        if matchstats_dict != {}:
+        if any([v != {} for v in matchstats_dict.values()]):
             event.matchstats_json = json.dumps(matchstats_dict)
             event.dirty = True  # TODO: hacky
             EventManipulator.createOrUpdate(event)
@@ -408,19 +409,20 @@ class DistrictPointsCalcEnqueue(webapp.RequestHandler):
     Enqueues calculation of district points for events within a district for a given year
     """
 
-    def get(self, district_type_enum, year):
-        district_type_enum = int(district_type_enum)
-        if district_type_enum == DistrictType.NO_DISTRICT:
-            self.response.out.write("Can't enqueue for non district events!")
-            return
+    def get(self, year):
+        all_event_keys = []
+        for district_type_enum in DistrictType.type_names.keys():
+            if district_type_enum == DistrictType.NO_DISTRICT:
+                continue
 
-        year = int(year)
+            year = int(year)
 
-        event_keys = Event.query(Event.year == year, Event.event_district_enum == district_type_enum).fetch(None, keys_only=True)
-        for event_key in event_keys:
-            taskqueue.add(url='/tasks/math/do/district_points_calc/{}'.format(event_key.id()), method='GET')
+            event_keys = Event.query(Event.year == year, Event.event_district_enum == district_type_enum).fetch(None, keys_only=True)
+            all_event_keys += event_keys
+            for event_key in event_keys:
+                taskqueue.add(url='/tasks/math/do/district_points_calc/{}'.format(event_key.id()), method='GET')
 
-        self.response.out.write("Enqueued for: {}".format([event_key.id() for event_key in event_keys]))
+        self.response.out.write("Enqueued for: {}".format([event_key.id() for event_key in all_event_keys]))
 
 
 class DistrictPointsCalcDo(webapp.RequestHandler):
@@ -444,3 +446,12 @@ class DistrictPointsCalcDo(webapp.RequestHandler):
         EventManipulator.createOrUpdate(event)
 
         self.response.out.write(event.district_points)
+
+
+class UpcomingNotificationDo(webapp.RequestHandler):
+    """
+    Sends out notifications for upcoming matches
+    """
+    def get(self):
+        live_events = EventHelper.getEventsWithinADay()
+        NotificationHelper.send_upcoming_matches(live_events)

@@ -1,8 +1,13 @@
 import json
+import logging
+import traceback
 
+from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 
 from helpers.cache_clearer import CacheClearer
+from helpers.firebase.firebase_pusher import FirebasePusher
+from helpers.notification_helper import NotificationHelper
 from helpers.manipulator_base import ManipulatorBase
 
 
@@ -13,6 +18,72 @@ class MatchManipulator(ManipulatorBase):
     @classmethod
     def getCacheKeysAndControllers(cls, affected_refs):
         return CacheClearer.get_match_cache_keys_and_controllers(affected_refs)
+
+    @classmethod
+    def postDeleteHook(cls, matches):
+        '''
+        To run after the match has been deleted.
+        '''
+        for match in matches:
+            try:
+                FirebasePusher.delete_match(match)
+            except Exception:
+                logging.warning("Enqueuing Firebase delete failed!")
+
+    @classmethod
+    def postUpdateHook(cls, matches, updated_attr_list, is_new_list):
+        '''
+        To run after the match has been updated.
+        Send push notifications to subscribed users
+        Only if the match is part of an active event
+        '''
+        unplayed_match_events = []
+        for (match, updated_attrs, is_new) in zip(matches, updated_attr_list, is_new_list):
+            event = match.event.get()
+            # Only continue if the event is currently happening
+            if event.within_a_day:
+                if match.has_been_played:
+                    if is_new or 'alliances_json' in updated_attrs:
+                        # There is a score update for this match, push a notification
+                        logging.info("Sending push notifications for {}".format(match.key_name))
+                        try:
+                            NotificationHelper.send_match_score_update(match)
+                        except Exception, exception:
+                            logging.error("Error sending match updates: {}".format(exception))
+                            logging.error(traceback.format_exc())
+                else:
+                    if is_new or (set(['alliances_json', 'time', 'time_string']).symmetric_difference(set(updated_attrs)) != set()):
+                        # The match has not been played and we're changing a property that affects the event's schedule
+                        # So send a schedule update notification for the parent event
+                        if event not in unplayed_match_events:
+                            unplayed_match_events.append(event)
+
+        '''
+        If we have an unplayed match during an event within a day, send out a schedule update notification
+        '''
+        for event in unplayed_match_events:
+            try:
+                logging.info("Sending schedule updates for: {}".format(event.key_name))
+                NotificationHelper.send_schedule_update(event)
+            except Exception, exception:
+                logging.error("Eror sending schedule updates for: {}".format(event.key_name))
+
+        '''
+        Enqueue firebase push
+        '''
+        event_keys = set()
+        for match in matches:
+            event_keys.add(match.event.id())
+            try:
+                FirebasePusher.update_match(match)
+            except Exception:
+                logging.warning("Enqueuing Firebase push failed!")
+
+        # Enqueue task to calculate matchstats
+        for event_key in event_keys:
+            taskqueue.add(
+                url='/tasks/math/do/event_matchstats/' + event_key,
+                method='GET')
 
     @classmethod
     def updateMerge(self, new_match, old_match, auto_union=True):
@@ -49,6 +120,8 @@ class MatchManipulator(ManipulatorBase):
             "youtube_videos"
         ]
 
+        old_match._updated_attrs = []
+
         # if not auto_union, treat auto_union_attrs as list_attrs
         if not auto_union:
             list_attrs += auto_union_attrs
@@ -58,6 +131,7 @@ class MatchManipulator(ManipulatorBase):
             if getattr(new_match, attr) is not None:
                 if getattr(new_match, attr) != getattr(old_match, attr):
                     setattr(old_match, attr, getattr(new_match, attr))
+                    old_match._updated_attrs.append(attr)
                     old_match.dirty = True
 
         for attr in json_attrs:
@@ -66,12 +140,14 @@ class MatchManipulator(ManipulatorBase):
                     setattr(old_match, attr, getattr(new_match, attr))
                     # changinging 'attr_json' doesn't clear lazy-loaded '_attr'
                     setattr(old_match, '_{}'.format(attr.replace('_json', '')), None)
+                    old_match._updated_attrs.append(attr)
                     old_match.dirty = True
 
         for attr in list_attrs:
             if len(getattr(new_match, attr)) > 0:
-                if getattr(new_match, attr) != getattr(old_match, attr):
+                if set(getattr(new_match, attr)) != set(getattr(old_match, attr)):  # lists are treated as sets
                     setattr(old_match, attr, getattr(new_match, attr))
+                    old_match._updated_attrs.append(attr)
                     old_match.dirty = True
 
         for attr in auto_union_attrs:
@@ -80,6 +156,7 @@ class MatchManipulator(ManipulatorBase):
             unioned = old_set.union(new_set)
             if unioned != old_set:
                 setattr(old_match, attr, list(unioned))
+                old_match._updated_attrs.append(attr)
                 old_match.dirty = True
 
         return old_match

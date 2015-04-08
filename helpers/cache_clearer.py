@@ -1,12 +1,13 @@
 from google.appengine.ext import ndb
 
 from controllers.api.api_district_controller import ApiDistrictListController, ApiDistrictEventsController, ApiDistrictRankingsController
-from controllers.api.api_team_controller import ApiTeamController, ApiTeamEventsController, ApiTeamEventAwardsController, \
-                                                ApiTeamEventMatchesController, ApiTeamMediaController, ApiTeamYearsParticipatedController, \
-                                                ApiTeamListController
 from controllers.api.api_event_controller import ApiEventController, ApiEventTeamsController, \
                                                  ApiEventMatchesController, ApiEventStatsController, \
                                                  ApiEventRankingsController, ApiEventAwardsController, ApiEventListController, ApiEventDistrictPointsController
+from controllers.api.api_match_controller import ApiMatchController
+from controllers.api.api_team_controller import ApiTeamController, ApiTeamEventsController, ApiTeamEventAwardsController, \
+                                                ApiTeamEventMatchesController, ApiTeamMediaController, ApiTeamYearsParticipatedController, \
+                                                ApiTeamListController, ApiTeamHistoryEventsController, ApiTeamHistoryAwardsController
 
 from models.event import Event
 from models.event_team import EventTeam
@@ -68,11 +69,13 @@ class CacheClearer(object):
         """
         Gets cache keys and controllers that references this match
         """
+        match_keys = affected_refs['key']
         event_keys = affected_refs['event']
         team_keys = affected_refs['team_keys']
         years = affected_refs['year']
 
-        return cls._get_matches_cache_keys_and_controllers(event_keys) + \
+        return cls._get_match_cache_keys_and_controllers(match_keys) + \
+            cls._get_matches_cache_keys_and_controllers(event_keys) + \
             cls._get_team_event_matches_cache_keys_and_controllers(team_keys, event_keys)
 
     @classmethod
@@ -164,6 +167,13 @@ class CacheClearer(object):
         return cache_keys_and_controllers
 
     @classmethod
+    def _get_match_cache_keys_and_controllers(cls, match_keys):
+        cache_keys_and_controllers = []
+        for match_key in filter(None, match_keys):
+            cache_keys_and_controllers.append((ApiMatchController.get_cache_key_from_format(match_key.id()), ApiMatchController))
+        return cache_keys_and_controllers
+
+    @classmethod
     def _get_matches_cache_keys_and_controllers(cls, event_keys):
         cache_keys_and_controllers = []
         for event_key in filter(None, event_keys):
@@ -191,6 +201,7 @@ class CacheClearer(object):
         for team_key in filter(None, team_keys):
             for event_key in filter(None, event_keys):
                 cache_keys_and_controllers.append((ApiTeamEventAwardsController.get_cache_key_from_format(team_key.id(), event_key.id()), ApiTeamEventAwardsController))
+            cache_keys_and_controllers.append((ApiTeamHistoryAwardsController.get_cache_key_from_format(team_key.id()), ApiTeamHistoryAwardsController))
         return cache_keys_and_controllers
 
     @classmethod
@@ -207,6 +218,7 @@ class CacheClearer(object):
         for team_key in filter(None, team_keys):
             for year in filter(None, years):
                 cache_keys_and_controllers.append((ApiTeamEventsController.get_cache_key_from_format(team_key.id(), year), ApiTeamEventsController))
+            cache_keys_and_controllers.append((ApiTeamHistoryEventsController.get_cache_key_from_format(team_key.id()), ApiTeamHistoryEventsController))
         return cache_keys_and_controllers
 
     @classmethod

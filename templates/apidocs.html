@@ -9,7 +9,7 @@
   <div class="row">
     <div class="col-sm-3 col-lg-2">
       <div class="tba-sidenav-affixed">
-        <div class="tba-sidebar">
+        <div class="tba-sidebar tba-sidebar-collapsed">
           <ul class="nav tba-sidenav">
             <li><a class="smooth-scroll" href="#overview">Overview</a></li>
             <li>
@@ -32,6 +32,8 @@
                 <li><a class="smooth-scroll" href="#team-event-matches-request">Team Event Matches Request</a></li>
                 <li><a class="smooth-scroll" href="#team-years-participated-request">Team Years Participated Request</a></li>
                 <li><a class="smooth-scroll" href="#team-media-request">Team Media Request</a></li>
+                <li><a class="smooth-scroll" href="#team-history-events-request">Team History Events Request</a></li>
+                <li><a class="smooth-scroll" href="#team-history-awards-request">Team History Awards Request</a></li>
               </ul>
             </li>
             <li>
@@ -48,6 +50,12 @@
               </ul>
             </li>
             <li>
+              <a class="smooth-scroll" href="#match-requests">Match Requests</a>
+              <ul class="nav hide">
+                <li><a class="smooth-scroll" href="#match-request">Single Match Request</a></li>
+              </ul>
+            </li>
+            <li>
               <a class="smooth-scroll" href="#district-requests">District Requests</a>
               <ul class="nav hide">
                 <li><a class="smooth-scroll" href="#district-list-request">District List Request</a></li>
@@ -61,10 +69,6 @@
     </div>
     <div class="col-xs-12 col-sm-9 col-lg-10">
       <h1 class="endheader">Public API (v2)</h1>
-      <div class="alert alert-danger"><strong>Note:</strong> Version 2 of our
-      API is still under development. This means that we may make changes
-      to it that are not backwards compatible. We will try to finalize the API
-      as soon as possible.</div>
       <h2 id="overview">Overview</h2>
       <p>This documentation is for The Blue Alliance's public web API for
       programmatically accessing data.</p>
@@ -89,6 +93,9 @@
       <h3>Last-Updated and If-Modified-Since Headers</h3>
       <p>All API responses have a <code>Last-Updated</code> header, which indicates the date and time at which the data at a particular endpoint was last updated. When making repeated calls to a particular endpoint, you should set the <code>If-Modified-Since</code> header in your request to the value of <code>Last-Updated</code> from the previous call to that endpoint. On the first call, <code>If-Modified-Since</code> does not need to be set.</p>
       <p>Consumers of the TBA API are highly encouraged to make use of these headers. If the server determines that no data has been updated, it returns a <code>304 Not Modified</code> response with an empty body, saving both the server and the consumer time and bandwidth.</p>
+
+      <h3>Webhooks</h3>
+      <p>The TBA API also includes support for webhooks. We can push notifications for things you've subscribed to your sever. This can save both your client and our server time and processing power, as it can reduce the need to poll the API. See <a href="/apidocs/webhooks">this page</a> for more documentation on webhooks.
 
       <hr>
 
@@ -759,6 +766,94 @@
         </div>
       </div>
 
+      <h3 id="team-history-events-request">Team History Events Request</h3>
+      <h4>Related: <a class="smooth-scroll" href="#event-model">Event Model</a></h4>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/events</code>
+      </p>
+      <table class=table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>team key</td>
+            <td>A team key name where the format is <code>frcyyyy</code> where yyyy is the a
+              valid, official team number issued by <em>FIRST</em></td>
+            <td>frc1, frc281, frc1114</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_team_history_events_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="6" id="example_team_history_events_request" type="text" value="/api/v2/team/frc254/history/events">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group">
+            <pre class="team-history-events-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 id="team-history-awards-request">Team History Awards Request</h3>
+      <h4>Related: <a class="smooth-scroll" href="#award-model">Awards Model</a></h4>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/awards</code>
+      </p>
+      <table class=table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>team key</td>
+            <td>A team key name where the format is <code>frcyyyy</code> where yyyy is the a
+              valid, official team number issued by <em>FIRST</em></td>
+            <td>frc1, frc281, frc1114</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_team_history_awards_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="6" id="example_team_history_awards_request" type="text" value="/api/v2/team/frc254/history/awards">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group">
+            <pre class="team-history-awards-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+
       <h2 id="event-requests">Event Requests</h2>
       <h3 id="event-list-request">Event List Request</h3>
       <h4>Related: <a class="smooth-scroll" href="#event-model">Event Model</a></h4>
@@ -1125,6 +1220,50 @@
         </div>
       </div>
 
+      <h2 id="match-requests">Match Requests</h2>
+      <h3 id="match-request">Single Match Request</h3>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/match/&lt;match_key&gt;</code>
+      </p>
+      <table class=table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>match_key</td>
+            <td>Key for the match you want to request data for</td>
+            <td>2014cmp_f1m1</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_match_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="6"
+              id="example_match_request" type="text" value="/api/v2/match/2014cmp_f1m1">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group">
+            <pre class="match-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+
       <h2 id="district-requests">District Requests</h2>
       <h3 id="district-list-request">District List Request</h3>
       <p>
@@ -1383,6 +1522,38 @@
     });
   });
 
+  $("#example_team_history_events_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".team-history-events-request-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_team_history_events_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-team-history-events-request:v01'},
+      success: function(data) {
+        $(".team-history-events-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".team-history-events-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+  $("#example_team_history_awards_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".team-history-awards-request-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_team_history_awards_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-team-history-awards-request:v01'},
+      success: function(data) {
+        $(".team-history-awards-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".team-history-awards-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
   $("#example_event_request_form").submit(function(e) {
     e.preventDefault();
     $(".event-request-json").html('Processing request...');
@@ -1507,6 +1678,22 @@
       },
       error: function(data) {
         $(".event-points-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+  $("#example_match_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".match-request-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_match_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-match-request:v01'},
+      success: function(data) {
+        $(".match-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".match-request-json").html('Something went wrong! Please check for correct request format.');
       }
     });
   });

@@ -1,4 +1,5 @@
 import logging
+import time
 
 from consts.media_type import MediaType
 
@@ -71,6 +72,13 @@ class ModelToDict(object):
         return event_dict
 
     @classmethod
+    def favoriteConverter(self, favorite):
+        return {
+            'model_type': favorite.model_type,
+            'model_key': favorite.model_key
+        }
+
+    @classmethod
     def matchConverter(self, match):
         """
         return top level match dictionary
@@ -86,7 +94,7 @@ class ModelToDict(object):
         match_dict["videos"] = match.videos
         match_dict["time_string"] = match.time_string
         if match.time is not None:
-            match_dict["time"] = match.time.strftime("%s")
+            match_dict["time"] = int(time.mktime(match.time.timetuple()))
         else:
             match_dict["time"] = None
 

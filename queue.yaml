@@ -12,6 +12,11 @@ queue:
     task_age_limit: 1d
   max_concurrent_requests: 1
 
+- name: fms-api
+  rate: 5/s
+  retry_parameters:
+    task_retry_limit: 1
+
 - name: firebase
   rate: 5/s
   retry_parameters:
@@ -19,5 +24,15 @@ queue:
 
 - name: post-update-hooks
   rate: 5/s
+  retry_parameters:
+    task_retry_limit: 1
+
+- name: push-notifications
+  rate: 100/s
+  retry_parameters:
+    task_retry_limit: 1
+
+- name: admin
+  rate: 1/s
   retry_parameters:
     task_retry_limit: 1

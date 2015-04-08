@@ -46,16 +46,16 @@
         {% if event.facebook_eid %}<br><span class="glyphicon glyphicon-thumbs-up"></span> <a href="{{ event.facebook_event_url }}" title="Facebook Event">RSVP on Facebook</a><br>{% endif %}
       </p>
 
-      <p><strong>#frc{{ event.event_short }}</strong> <small><a href="/hashtags" rel="tooltip" title="What are hashtags?">?</a></small> - Search
-        <a class="hashtag-link hashtag-twitter" href="https://twitter.com/search/%23frc{{ event.event_short }}" target="_blank" title="Search Twitter">Twitter</a> &middot;
-        <a class="hashtag-link hashtag-youtube" href="http://www.youtube.com/results?search_query=%23frc{{ event.event_short }}+OR+%22{{ event.name|urlencode }}%22" target="_blank" title="Search YouTube">YouTube</a> &middot;
-        <a class="hashtag-link hashtag-cd" href="http://www.chiefdelphi.com/media/photos/tags/frc{{ event.event_short }}" target="_blank" title="Search Chief Delphi">Chief Delphi</a> &middot;
-        <a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23frc{{ event.event_short }}" target="_blank" title="Search Flickr">Flickr</a>
+      <p><strong>#{{ event.hashtag }}</strong> <small><a href="/hashtags" rel="tooltip" title="What are hashtags?">?</a></small> - Search
+        <a class="hashtag-link hashtag-twitter" href="https://twitter.com/search/%23{{ event.hashtag }}" target="_blank" title="Search Twitter">Twitter</a> &middot;
+        <a class="hashtag-link hashtag-youtube" href="http://www.youtube.com/results?search_query=%23{{ event.hashtag }}+OR+%22{{ event.name|urlencode }}%22" target="_blank" title="Search YouTube">YouTube</a> &middot;
+        <a class="hashtag-link hashtag-cd" href="http://www.chiefdelphi.com/media/photos/tags/{{ event.hashtag }}" target="_blank" title="Search Chief Delphi">Chief Delphi</a> &middot;
+        <a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23{{ event.hashtag }}" target="_blank" title="Search Flickr">Flickr</a>
       </p>
     </div>
   </div>
 
-  {% if event.within_a_day %}
+  {% if event.now %}
   <div class="row">
     <div class="col-sm-12">
       <div class="panel panel-default">
@@ -118,16 +118,22 @@
 
         {% if matches.ef or matches.qf or matches.sf or matches.f %}
         <div class="col-sm-6">
-          <h3>Elimination Results</h3>
+          {% include "event_partials/event_alliances_table.html" %}
+
+          <h3>{% if event.year == 2015 %}Playoff{% else %}Elimination{% endif %} Results</h3>
           {% include "match_partials/elim_match_table.html" %}
 
           {% if matches.qm %}
             {% if matches.qf or matches.sf or matches.f %}
-              <h3>Elimination Bracket</h3>
-              {% include "bracket_partials/bracket_table.html" %}
+              {% if event.year == 2015 %}
+                <h3>Playoff Advancement</h3>
+                {% include "playoff_partials/playoff_table.html" %}
+              {% else %}
+                <h3>Elimination Bracket</h3>
+                {% include "bracket_partials/bracket_table.html" %}
+              {% endif %}
             {% endif %}
 
-            {% include "event_partials/event_alliances_table.html" %}
             {% include "event_partials/event_opr_table.html" %}
           {% endif %}
         </div>
@@ -141,8 +147,13 @@
         {% if not matches.qm %}
         <div class="col-sm-6">
           {% if matches.qf or matches.sf or matches.f %}
-          <h3>Elimination Bracket</h3>
-          {% include "bracket_partials/bracket_table.html" %}
+            {% if event.year == 2015 %}
+              <h3>Playoff Advancement</h3>
+              {% include "playoff_partials/playoff_table.html" %}
+            {% else %}
+              <h3>Elimination Bracket</h3>
+              {% include "bracket_partials/bracket_table.html" %}
+            {% endif %}
           {% endif %}
 
           {% include "event_partials/event_alliances_table.html" %}

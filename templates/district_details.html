@@ -102,7 +102,11 @@
             </tbody>
           </table>
 
-          <p>* District rankings are not official and are calculated using the <a href="http://www.usfirst.org/sites/default/files/uploadedFiles/Robotics_Programs/FRC/Resources/FRC_District_Standard_Points_Ranking_System.pdf">FRC Standard District Points Ranking System (PDF)</a></p>
+          {% if year == 2015 %}
+            <p>* District rankings are not official and are calculated using the <a href="http://www.usfirst.org/sites/default/files/uploadedFiles/Robotics_Programs/FRC/Game_and_Season__Info/2015/FRC_District_Standard_Points_Ranking_System_2015%20Summary.pdf">2015 FRC Standard District Points Ranking System (PDF)</a></p>
+          {% else %}
+            <p>* District rankings are not official and are calculated using the <a href="http://www.usfirst.org/sites/default/files/uploadedFiles/Robotics_Programs/FRC/Resources/FRC_District_Standard_Points_Ranking_System.pdf">FRC Standard District Points Ranking System (PDF)</a></p>
+          {% endif %}
         </div>
         {% endif %}
       </div>

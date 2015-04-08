@@ -1,5 +1,6 @@
 @chatWidth: 300px;
 @socialWidth: 250px;
+@tickerWidth: 300px;
 @videoContainerTopOffset: 1px;
 @matchBarHeight: 36px;
 
@@ -10,11 +11,13 @@ body {
   background: #000000;
 }
 
-.gameday { 
+.gameday {
   .nav, .navbar, .navbar-inner,
   .container, .brand,
   .dropdown, .dropdown-toggle,
-  .chat, .chat-toggle, .social, .social-toggle,
+  .chat, .chat-toggle,
+  .social, .social-toggle,
+  .ticker, .ticker-toggle,
   .settings, .settings-button {
     padding: 0 !important;
     margin: 0 !important;
@@ -23,27 +26,27 @@ body {
     min-height: auto !important;
     color: #ffffff !important;
   }
-  
+
   .navbar-fixed-top {
     position: static;
   }
-  
-  .chat_active, .social_active {
+
+  .chat_active, .social_active, .ticker_active {
     background: @gray !important;
   }
-  
+
   .gameday-container {
     width: auto;
     margin-left: 10px !important;
   }
-  
+
   .gameday-brand {
     background-image: url('/images/tba_blue_lamp_navbar.png');
     background-repeat: no-repeat;
     background-position: left center;
     width: 600px;
   }
-  
+
   .gameday-title {
     vertical-align: middle;
     padding-left: 25px;
@@ -58,28 +61,28 @@ body {
     padding-left: 10px;
   }
 
-  .dropdown-toggle, .chat-toggle, .social-toggle, .settings-button {
+  .dropdown-toggle, .chat-toggle, .social-toggle, .ticker-toggle, .settings-button {
     padding: 6px 8px !important;
     height: 18px !important;
   }
-  
-  .dropdown:hover, .chat:hover, .social:hover, .settings:hover {
+
+  .dropdown:hover, .chat:hover, .social:hover, .ticker:hover, .settings:hover {
     background-color: @gray;
   }
-  
+
   .dropdown-menu {
     margin: 0;
-  
+
     .layout-choice, .layout-choice:hover {
       background-repeat: no-repeat;
       filter: none;
     }
-  
+
     .layout_0 {
       background-image: url('/images/icons/tba-gameday-sprite.png');
       background-position: 95% -5px;
     }
-    
+
     .layout_1 {
       background-image: url('/images/icons/tba-gameday-sprite.png');
       background-position: 95% -40px;
@@ -110,9 +113,9 @@ body {
       background-position: 95% -215px;
     }
   }
-  
+
   ul.nav li.dropdown:hover ul.dropdown-menu{
-    display: block;    
+    display: block;
   }
 
 }
@@ -125,7 +128,7 @@ body {
   width: @socialWidth;
   background-color: @gray-lighter;
   visibility: hidden;
-  
+
   #twitter-widget {
     background-color: #000000;
     height: 100%;
@@ -144,22 +147,75 @@ body {
   bottom: 0px;
   width: @chatWidth;
   background-color: @gray-lighter;
-  visibility: hidden;
-  
+
   #chat-info-background {
     position: absolute;
     background-color: #000000;
     background: rgba(0, 0, 0, 0.7);
     height: 100%;
     width: 100%;
-    
+
     #chat-info {
       margin: 50px 25px;
     }
   }
 }
 
-.chat_panel_active {
+.ticker_panel {
+  position: fixed;
+  top: 30px + @videoContainerTopOffset;
+  left: 0px;
+  bottom: 0px;
+  width: @tickerWidth;
+  background-color: @gray-lighter;
+  visibility: hidden;
+  overflow: auto;
+  padding: 5px;
+
+  #ticker-info {
+    .alert;
+    margin-bottom: 5px;
+  }
+
+  #ticker-filter {
+    margin-top: -10px;
+  }
+
+  #ticker-filter-options {
+    display: none;
+  }
+
+  #ticker-info-background {
+    position: absolute;
+    background-color: #000000;
+    background: rgba(0, 0, 0, 0.7);
+    height: 100%;
+    width: 100%;
+  }
+
+  #ticker-notifications {
+    .panel {
+      margin-bottom: 5px;
+    }
+    .panel-heading {
+      a, a:hover {
+        color: #ffffff !important;
+      }
+    }
+    .panel-body {
+      padding-top: 5px;
+      padding-bottom: 5px;
+      .match-table {
+        margin-bottom: 0px !important;
+      }
+    }
+    .panel-footer {
+      padding: 0px 10px;
+      height: 20px;
+    }
+  }
+}
+.ticker_panel_active {
   visibility: visible;
 }
 
@@ -169,7 +225,7 @@ body {
     height: 100%;
 }
 
-.remove-following {
+.remove-favorite {
   cursor: pointer;
 }
 
@@ -193,6 +249,10 @@ body {
 
 .webcasts_panel_chat_active {
   right: @chatWidth;
+}
+
+.webcasts_panel_ticker_active {
+  left: @tickerWidth;
 }
 
 .video_container {
@@ -239,44 +299,44 @@ body {
   left: 0px;
   text-align: left;
   overflow: hidden;
-  
+
   .matches {
     width: 200%;
     height: 100%;
   }
-  
+
   .finished_match_red {
     background-color: @TBAredDarker;
   }
-  
+
   .finished_match_blue {
     background-color: @TBAblueDarker;
   }
-  
+
   .finished_match_tie {
     background-color: @TBApurpleDarker;
   }
-  
+
   .upcoming_match {
     background-color: transparent;
   }
-  
+
   .followed_match {
     background-color: #ffc40d * 0.8;
-    
+
     .match-number {
       color: @gray-lighter;
     }
-    
+
     .red {
       color: #CC0000;
     }
-    
+
     .blue {
       color: #0044CC;
     }
   }
-  
+
   .match {
     height: 100%;
     width: auto;
@@ -286,7 +346,7 @@ body {
       font-weight: bold;
     }
   }
-  
+
   .match-number {
     color: #ffffff;
     font-size: 19px;
@@ -296,29 +356,44 @@ body {
     margin: 0 10px 0 10px;
     float: left;
   }
-  
+
   .alliances {
     display: inline-block;
     height: 100%;
     width: auto;
     float: left;
-    margin: 0 10px 0 0;
+    margin: 1px 10px 0 0;
   }
-  
+
   .red {
     color: #FF0000;
   }
-  
+
   .blue {
     color: #0066FF;
   }
-  
+
   .red, .blue {
     font-size: 13px;
     width: auto;
     height: 50%;
     display: block;
   }
+
+  .match-bar-info {
+    color: #ffffff;
+    font-size: 14px;
+    width: auto;
+    display: inline-block;
+    line-height: @matchBarHeight;
+    margin: 0 10px 0 10px;
+    float: left;
+  }
+}
+
+#add-favorite-team-input {
+  padding-left: 13px;
+  margin-top: 3px;
 }
 
 .overlay {
@@ -334,14 +409,14 @@ body {
   top: 0px;
   left: 0px;
   pointer-events: none;
-  
+
   .overlay-title {
     font-size: 24px;
     color: white;
     float: left;
     margin: 15px;
   }
-  
+
   .view-close, .swap {
     padding: 3px;
     margin: 2px;
@@ -349,12 +424,12 @@ body {
     cursor: pointer;
     position: absolute;
   }
-  
+
   .view-close {
     top: 0;
     right: 0;
   }
-  
+
   .swap {
     top: 25px;
     right: 0;
