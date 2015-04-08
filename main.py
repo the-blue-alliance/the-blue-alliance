@@ -14,7 +14,7 @@ from controllers.main_controller import ContactHandler, HashtagsHandler, \
     MainKickoffHandler, MainBuildseasonHandler, MainChampsHandler, MainCompetitionseasonHandler, \
     MainInsightsHandler, MainOffseasonHandler, OprHandler, SearchHandler, \
     AboutHandler, ThanksHandler, PageNotFoundHandler, InternalServerErrorHandler, \
-    GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler, ApiWriteHandle, rWebhookDocumentationHandler
+    GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler, ApiWriteHandler, WebhookDocumentationHandler
 from controllers.match_controller import MatchDetail
 from controllers.notification_controller import UserNotificationBroadcast
 from controllers.district_controller import DistrictDetail

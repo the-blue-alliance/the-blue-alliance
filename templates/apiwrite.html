@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}The Blue Alliance - API Docs{% endblock %}
+{% block title %}The Blue Alliance - Write API{% endblock %}
 
 {% block meta_description %}Interface to update events using The Blue Alliance's write API.{% endblock %}
 
@@ -11,50 +11,9 @@
       <div class="tba-sidenav-affixed">
         <div class="tba-sidebar">
           <ul class="nav tba-sidenav">
-            <li><a class="smooth-scroll" href="#overview">Overview</a></li>
-            <li>
-              <a class="smooth-scroll" href="#models">Models</a>
-              <ul class="nav hide">
-                <li><a class="smooth-scroll" href="#team-model">Team Model</a></li>
-                <li><a class="smooth-scroll" href="#event-model">Event Model</a></li>
-                <li><a class="smooth-scroll" href="#match-model">Match Model</a></li>
-                <li><a class="smooth-scroll" href="#award-model">Award Model</a></li>
-                <li><a class="smooth-scroll" href="#media-model">Media Model</a></li>
-              </ul>
-            </li>
-            <li>
-              <a class="smooth-scroll" href="#team-requests">Team Requests</a>
-              <ul class="nav hide">
-                <li><a class="smooth-scroll" href="#team-list-request">Team List Request</a></li>
-                <li><a class="smooth-scroll" href="#team-request">Team Request</a></li>
-                <li><a class="smooth-scroll" href="#team-events-request">Team Events Request</a></li>
-                <li><a class="smooth-scroll" href="#team-event-awards-request">Team Event Awards Request</a></li>
-                <li><a class="smooth-scroll" href="#team-event-matches-request">Team Event Matches Request</a></li>
-                <li><a class="smooth-scroll" href="#team-years-participated-request">Team Years Participated Request</a></li>
-                <li><a class="smooth-scroll" href="#team-media-request">Team Media Request</a></li>
-              </ul>
-            </li>
-            <li>
-              <a class="smooth-scroll" href="#event-requests">Event Requests</a>
-              <ul class="nav hide">
-                <li><a class="smooth-scroll" href="#event-list-request">Event List Request</a></li>
-                <li><a class="smooth-scroll" href="#event-request">Event Request</a></li>
-                <li><a class="smooth-scroll" href="#event-teams-request">Event Teams Request</a></li>
-                <li><a class="smooth-scroll" href="#event-matches-request">Event Matches Request</a></li>
-                <li><a class="smooth-scroll" href="#event-stats-request">Event Stats Request</a></li>
-                <li><a class="smooth-scroll" href="#event-rankings-request">Event Rankings Request</a></li>
-                <li><a class="smooth-scroll" href="#event-awards-request">Event Awards Request</a></li>
-                <li><a class="smooth-scroll" href="#event-points-request">Event District Points Request</a></li>
-              </ul>
-            </li>
-            <li>
-              <a class="smooth-scroll" href="#district-requests">District Requests</a>
-              <ul class="nav hide">
-                <li><a class="smooth-scroll" href="#district-list-request">District List Request</a></li>
-                <li><a class="smooth-scroll" href="#district-events-request">District Events Request</a></li>
-                <li><a class="smooth-scroll" href="#district-rankings-request">District Rankings Request</a></li>
-              </ul>
-            </li>
+            <li><a class="smooth-scroll" href="#setup">Setup</a></li>
+            <li><a class="smooth-scroll" href="#team-list">Team List</a></li>
+            <li><a class="smooth-scroll" href="#alliance-selection">Alliance Selections</a></li>
           </ul>
         </div>
       </div>
@@ -67,7 +26,7 @@
 
       <hr>
 
-      <h2>Setup</h2>
+      <h2 id="setup">Setup</h2>
       <form class="form-horizontal" role="form">
         <div class="form-group">
           <label for="event_key" class="col-sm-2 control-label">Event Key</label>
@@ -91,7 +50,7 @@
 
       <hr>
 
-      <h2>Update Team List</h2>
+      <h2 id="team-list">Update Team List</h2>
       <p>A list of team numbers separated by commas. This will remove all teams attending this event and update it with the given list.</p>
       <p>Example:</p>
       <div class="well">254,604,971</div>
@@ -112,7 +71,7 @@
 
       <hr>
 
-      <h2>Update Alliance Selections</h2>
+      <h2 id="alliance-selection">Update Alliance Selections</h2>
       <p>Rows of teams where each row has teams (in pick order) separated by commas. Row 1 is alliance 1, row 2 is alliance 2, etc.</p>
       <p>Example:</p>
       <div class="well">
