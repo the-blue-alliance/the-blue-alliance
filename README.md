@@ -53,7 +53,7 @@ Run a local dev server
 	* Also see [localhost:8088/admin/](http://localhost:8088/admin/)
 4. Get some data into the local server
 	* NOTE: These steps are intended for local dev servers. They might also work on a deployed server if you edit `tba_config.py` to set `DEBUG = True`.
-	* NOTE: The /admin/ page's buttons "Get FMS Teams" and "Create Test Teams" are obsolete. They try to access decomissioned usfirst.org data feeds. "Create Test Events" still works *if* you have teams in the database.
+	* NOTE: The /admin/ page's buttons "Get FMS Teams" and "Create Test Teams" and the existing import /tasks are broken due to the move to FMSAPI datafeed. "Create Test Events" still works *if* you have teams in the database. Try visiting the urls /tasks/enqueue/csv_restore_events/YEAR (for a chosen year) or /tasks/enqueue/csv_restore_events.
 	* Visit, say, [localhost:8088/tasks/get/usfirst_teams_tpids/2015?skip=0](http://localhost:8088/tasks/get/usfirst_teams_tpids/2015?skip=0), [localhost:8088/tasks/get/usfirst_teams_tpids/2015?skip=1000](http://localhost:8088/tasks/get/usfirst_teams_tpids/2015?skip=1000), ...
 	* Also visit [localhost:8088/tasks/enqueue/usfirst_event_details/2015](http://localhost:8088/tasks/enqueue/usfirst_event_details/2015), [2014](http://localhost:8088/tasks/enqueue/usfirst_event_details/2014), ...
 	* Once you have events for a certain year, you can visit [localhost:8088/tasks/enqueue/csv_restore_events/2015](http://localhost:8088/tasks/enqueue/csv_restore_events/2015), [2014](http://localhost:8088/tasks/enqueue/csv_restore_events/2014), ... etc. to get data from [github.com/the-blue-alliance/the-blue-alliance-data](https://github.com/the-blue-alliance/the-blue-alliance-data) instead of hitting up usfirst.org lots of times.
