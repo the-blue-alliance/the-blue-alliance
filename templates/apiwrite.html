@@ -13,6 +13,7 @@
           <ul class="nav tba-sidenav">
             <li><a class="smooth-scroll" href="#setup">Setup</a></li>
             <li><a class="smooth-scroll" href="#team-list">Team List</a></li>
+            <li><a class="smooth-scroll" href="#matches">Matches</a></li>
             <li><a class="smooth-scroll" href="#alliance-selection">Alliance Selections</a></li>
           </ul>
         </div>
@@ -31,19 +32,19 @@
         <div class="form-group">
           <label for="event_key" class="col-sm-2 control-label">Event Key</label>
           <div class="col-sm-10">
-            <input type="text" class="form-control" id="event_key" placeholder="Event Key" value="2014testfuture">
+            <input type="text" class="form-control" id="event_key" placeholder="Event Key" value="2015test">
           </div>
         </div>
         <div class="form-group">
           <label for="auth_id" class="col-sm-2 control-label">Auth Id</label>
           <div class="col-sm-10">
-            <input type="password" class="form-control" id="auth_id" placeholder="Auth ID" value="K2kQgbxpKJfWcSdV">
+            <input type="password" class="form-control" id="auth_id" placeholder="Auth ID" value="M4WJ7DxMagZp2A9L">
           </div>
         </div>
         <div class="form-group">
           <label for="auth_secret" class="col-sm-2 control-label">Auth Secret</label>
           <div class="col-sm-10">
-            <input type="password" class="form-control" id="auth_secret" placeholder="Auth Secret" value="8DZFe2ND3CPRgjo0KKU62SVeMPVwdYzUwMtbvy1Jnb9LIe3VMftts1WOfnHxglCU">
+            <input type="password" class="form-control" id="auth_secret" placeholder="Auth Secret" value="wYGSg3knn2L5Ge5vSF5N2davK3C2pg7GpFaBfP2gpeWLFY6pim4dWlHFFUKNkwyX">
           </div>
         </div>
       </form>
@@ -70,6 +71,19 @@
       <div id="update-team-list-form-feedback" class="well"></div>
 
       <hr>
+
+      <h2 id="matches">Update Matches</h2>
+      <p>Add matches, formatted as csv. Columns are: comp_level, set_number, match_number, 3 red teams, 3 blue teams, red score, blue score, time_string, UTC Time. One match per line. Matches with the same key will be overwritten.</p>
+      <p>Example:</p>
+      <div class="well">
+        <p>qm,,1, 342, 401, 296, 1592, 71, 335, 17, 41, 9:14 AM, 12455653</p>
+        <p>f, 1, 1, 245, 217, 766, 191, 179, 494, 65, 28, 2:54 PM, 13452123</p>
+      </div>
+      <form id="update-matches-form" class="form-horizontal" role="form">
+        <textarea class="form-control" id="matches_csv"></textarea><br>
+        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Matches</button>
+      </form>
+      <div id="update-matches-form-feedback" class="well"></div>
 
       <h2 id="alliance-selection">Update Alliance Selections</h2>
       <p>Rows of teams where each row has teams (in pick order) separated by commas. Row 1 is alliance 1, row 2 is alliance 2, etc.</p>
@@ -161,6 +175,36 @@
 
       var request_body = JSON.stringify(alliance_selections);
       makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/alliance_selections/update', request_body, '#update-alliance-selections-form-feedback');
+    });
+
+    $('#update-matches-form').submit(function(e) {
+      e.preventDefault();
+
+      var matches_csv = $.csv.toArrays($('#matches_csv').val().replace(', ', ','))
+      var matches = [];
+      for (var i = 0; i < matches_csv.length; i++) {
+        var row = matches_csv[i];
+        matches[i] = {}
+        matches[i]['comp_level'] = $.trim(row[0]);
+        matches[i]['set_number'] = parseInt(row[1]);
+        matches[i]['match_number'] = parseInt(row[2]);
+        matches[i]['alliances'] =
+            {'red':
+                {'teams': ['frc'+$.trim(row[3]), 'frc'+$.trim(row[4]), 'frc'+$.trim(row[5])],
+                 'score': parseInt(row[9])
+                }
+            ,'blue':
+                {'teams': ['frc'+$.trim(row[6]), 'frc'+$.trim(row[7]), 'frc'+$.trim(row[8])],
+                 'score': parseInt(row[10])
+                }
+            };
+        //TODO find a way to do score breakdown
+        matches[i]['time_string'] = row[11];
+        matches[i]['time'] = row[12];
+      }
+
+      var request_body = JSON.stringify(matches);
+      makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/matches/update', request_body, '#update-matches-form-feedback');
     });
   });
 </script>
