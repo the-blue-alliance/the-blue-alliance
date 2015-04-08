@@ -23,7 +23,7 @@ class DatafeedFMSAPI(object):
     FMS_API_HYBRID_SCHEDULE_PLAYOFF_URL_PATTERN = FMS_API_URL_BASE + '/schedule/%s/%s/playoff/hybrid'  # (year, event_short)
     FMS_API_EVENT_RANKINGS_URL_PATTERN = FMS_API_URL_BASE + '/rankings/%s/%s'  # (year, event_short)
     FMS_API_EVENT_ALLIANCES_URL_PATTERN = FMS_API_URL_BASE + '/alliances/%s/%s'  # (year, event_short)
-    FMS_API_TEAM_DETAILS_URL_PATTERN = FMS_API_URL_BASE + '/api/v1.0/teams/%s/?teamNumber=%s'  # (year, teamNumber)
+    FMS_API_TEAM_DETAILS_URL_PATTERN = FMS_API_URL_BASE + '/teams/%s/?teamNumber=%s'  # (year, teamNumber)
 
     def __init__(self, *args, **kw):
         fms_api_secrets = Sitevar.get_by_id('fmsapi.secrets')
@@ -90,5 +90,5 @@ class DatafeedFMSAPI(object):
     def getTeamDetails(self, year, team_key):
         team_number = team_key[3:]  # everything after 'frc'
 
-        team = self._parse(self.FMS_API_TEAM_DETAILS_URL_PATTERN % (year, team_number), FMSAPITeamDetailsParser())
+        team = self._parse(self.FMS_API_TEAM_DETAILS_URL_PATTERN % (year, team_number), FMSAPITeamDetailsParser(year, team_key))
         return team

@@ -12,7 +12,7 @@ class DistrictTeam(ndb.Model):
     """
 
     team = ndb.KeyProperty(kind=Team)
-    year = ndb.IntegreProperty()
+    year = ndb.IntegerProperty()
     district = ndb.IntegerProperty()  # One of DistrictType constants
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
@@ -29,4 +29,4 @@ class DistrictTeam(ndb.Model):
 
     @property
     def key_name(self):
-        return self.year + DistrictType.type_abbrevs[self.district] + "_" + self.team.id()
+        return "{}{}_{}".format(self.year, DistrictType.type_abbrevs[self.district], self.team.id())

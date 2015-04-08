@@ -2,9 +2,12 @@ import datetime
 import json
 import logging
 
+from google.appengine.ext import ndb
+
 from consts.district_type import DistrictType
 from models.district_team import DistrictTeam
 from models.team import Team
+from models.robot import Robot
 
 
 class FMSAPITeamDetailsParser(object):
@@ -37,15 +40,15 @@ class FMSAPITeamDetailsParser(object):
         districtTeam = None
         if teamData['districtCode']:
             districtTeam = DistrictTeam(
-                team=team.key,
+                team=ndb.Key(Team, team.key_name),
                 year=self.year,
-                district=DistrictType.abbrevs[teamData['districtCode']]
+                district=DistrictType.abbrevs[teamData['districtCode'].lower()]
             )
 
         robot = None
         if teamData['robotName']:
             robot = Robot(
-                team=team.key,
+                team=ndb.Key(Team, team.key_name),
                 year=self.year,
                 robot_name=teamData['robotName']
             )

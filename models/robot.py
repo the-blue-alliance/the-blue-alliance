@@ -27,4 +27,4 @@ class Robot(ndb.Model):
 
     @property
     def key_name(self):
-        return self.team.id() + "_" + self.year
+        return "{}_{}".format(self.team.id(), self.year)
