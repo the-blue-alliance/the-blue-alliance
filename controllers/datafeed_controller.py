@@ -3,6 +3,7 @@ import os
 import datetime
 import time
 import json
+from datetime import date
 
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
@@ -26,6 +27,8 @@ from helpers.match_manipulator import MatchManipulator
 from helpers.match_helper import MatchHelper
 from helpers.award_manipulator import AwardManipulator
 from helpers.team_manipulator import TeamManipulator
+from helpers.district_team_manipulator import DistrictTeamManipulator
+from helpers.robot_manipulator import RobotManipulator
 
 from models.event import Event
 from models.event_team import EventTeam
@@ -711,6 +714,7 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
     def get(self, key_name):
         df = DatafeedUsfirst()
         legacy_df = DatafeedUsfirstLegacy()
+        fms_df = DatafeedFMSAPI()
 
         team = df.getTeamDetails(Team.get_by_id(key_name))
         if not team:
@@ -720,6 +724,26 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
             legacy_team = legacy_df.getTeamDetails(Team.get_by_id(key_name))
             if legacy_team is not None:
                 team.rookie_year = legacy_team.rookie_year  # only available on legacy df
+
+        # Query FMSAPI for full suite of team data
+        # returns tuple with models (Team, DistrictTeam, Robot)
+        # Use current year, fallback to usfirst datafeeds for legacy teams
+        year = date.today().year
+        fmsTeamDetails = fms_df.getTeamDetails(year, key_name)
+        if fmsTeamDetails:
+            fmsTeam = fmsTeamDetails[0]
+            fmsDistrictTeam = fmsTeamDetails[1]
+            fmsRobot = fmsTeamDetails[2]
+
+            if fmsTeam:
+                # add properties from fms datafeed
+                team = TeamManipulator.updateMergeBase(team, fmsTeam)
+
+            if fmsDistrictTeam:
+                fmsDistrictTeam = DistrictTeamManipulator.createOrUpdate(fmsDistrictTeam)
+
+            if fmsRobot:
+                fmsRobot = RobotManipulator.createOrUpdate(fmsRobot)
 
         if team:
             team = TeamManipulator.createOrUpdate(team)
