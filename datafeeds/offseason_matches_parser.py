@@ -103,5 +103,5 @@ class OffseasonMatchesParser(ParserBase):
     def parseElimMatchNumberInfo(self, string):
         set_number, match_number = string.split('m')
         match_number = int(match_number)
-        set_number = int(set_number[-1:])
+        set_number = int(set_number[-1])
         return match_number, set_number
