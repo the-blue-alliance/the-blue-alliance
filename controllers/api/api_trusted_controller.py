@@ -126,7 +126,8 @@ class ApiTrustedEventMatchesDelete(ApiTrustedBaseController):
 
         MatchManipulator.delete_keys(keys_to_delete)
 
-        self.response.out.write(json.dumps({'Success': "keys deleted: " + [key.id().split('_')[1] for key in keys_to_delete]}))
+        ret = json.dumps({"keys_deleted": [key.id().split('_')[1] for key in keys_to_delete]})
+        self.response.out.write(ret)
 
 
 class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
