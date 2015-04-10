@@ -32,19 +32,19 @@
         <div class="form-group">
           <label for="event_key" class="col-sm-2 control-label">Event Key</label>
           <div class="col-sm-10">
-            <input type="text" class="form-control" id="event_key" placeholder="Event Key" value="2015test">
+            <input type="text" class="form-control" id="event_key" placeholder="Event Key">
           </div>
         </div>
         <div class="form-group">
           <label for="auth_id" class="col-sm-2 control-label">Auth Id</label>
           <div class="col-sm-10">
-            <input type="password" class="form-control" id="auth_id" placeholder="Auth ID" value="M4WJ7DxMagZp2A9L">
+            <input type="password" class="form-control" id="auth_id" placeholder="Auth ID">
           </div>
         </div>
         <div class="form-group">
           <label for="auth_secret" class="col-sm-2 control-label">Auth Secret</label>
           <div class="col-sm-10">
-            <input type="password" class="form-control" id="auth_secret" placeholder="Auth Secret" value="wYGSg3knn2L5Ge5vSF5N2davK3C2pg7GpFaBfP2gpeWLFY6pim4dWlHFFUKNkwyX">
+            <input type="password" class="form-control" id="auth_secret" placeholder="Auth Secret">
           </div>
         </div>
       </form>
@@ -128,9 +128,6 @@
       var auth_id = $('#auth_id').val();
       var auth_secret = $('#auth_secret').val();
       var auth_sig = CryptoJS.MD5(auth_secret + request_path + request_body).toString();
-      console.log("Auth ID: " + auth_id);
-      console.log("Auth Sig String:" + auth_secret + request_path + request_body);
-      console.log("Auth Sig: " + auth_sig);
 
       $.ajax({
         type: 'POST',
