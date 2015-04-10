@@ -50,7 +50,7 @@ class FMSAPITeamDetailsParser(object):
             robot = Robot(
                 team=ndb.Key(Team, team.key_name),
                 year=self.year,
-                robot_name=teamData['robotName']
+                robot_name=teamData['robotName'].strip()
             )
 
         return (team, districtTeam, robot)
