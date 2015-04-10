@@ -17,6 +17,7 @@ from datafeeds.parsers.json.json_team_list_parser import JSONTeamListParser
 from helpers.award_manipulator import AwardManipulator
 from helpers.event_manipulator import EventManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
+from helpers.match_helper import MatchHelper
 from helpers.match_manipulator import MatchManipulator
 
 from models.award import Award
@@ -85,23 +86,32 @@ class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
         event = Event.get_by_id(event_key)
         year = int(event_key[:4])
 
-        matches = [Match(
-            id=Match.renderKeyName(
-                event.key.id(),
-                match.get("comp_level", None),
-                match.get("set_number", 0),
-                match.get("match_number", 0)),
-            event=event.key,
-            game=Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
-            set_number=match.get("set_number", 0),
-            match_number=match.get("match_number", 0),
-            comp_level=match.get("comp_level", None),
-            team_key_names=match.get("team_key_names", None),
-            alliances_json=match.get("alliances_json", None),
-            score_breakdown_json=match.get("score_breakdown_json", None),
-            time_string=match.get("time_string", None),
-            time=match.get("time", None),
-        ) for match in JSONMatchesParser.parse(request.body, year)]
+        matches = []
+        for match in JSONMatchesParser.parse(request.body, year):
+            match = Match(
+                id=Match.renderKeyName(
+                    event.key.id(),
+                    match.get("comp_level", None),
+                    match.get("set_number", 0),
+                    match.get("match_number", 0)),
+                event=event.key,
+                game=Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
+                set_number=match.get("set_number", 0),
+                match_number=match.get("match_number", 0),
+                comp_level=match.get("comp_level", None),
+                team_key_names=match.get("team_key_names", None),
+                alliances_json=match.get("alliances_json", None),
+                score_breakdown_json=match.get("score_breakdown_json", None),
+                time_string=match.get("time_string", None),
+                time=match.get("time", None),
+            )
+
+            if (not match.time or match.time == "") and match.time_string:
+                # We can calculate the real time from the time string
+                logging.debug("Calculating time!")
+                MatchHelper.add_match_times(event, [match])
+
+            matches.append(match)
 
         MatchManipulator.createOrUpdate(matches)
 

@@ -196,8 +196,8 @@
                 }
             };
         //TODO find a way to do score breakdown
-        matches[i]['time_string'] = row[11];
-        matches[i]['time'] = row[12];
+        matches[i]['time_string'] = row[11].trim();
+        matches[i]['time'] = row[12].trim();
       }
 
       var request_body = JSON.stringify(matches);
