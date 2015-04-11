@@ -365,6 +365,19 @@ class ApiDocumentationHandler(CacheableHandler):
         return template.render(path, self.template_values)
 
 
+class ApiWriteHandler(CacheableHandler):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "api_write"
+
+    def __init__(self, *args, **kw):
+        super(ApiWriteHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+
+    def _render(self, *args, **kw):
+        path = os.path.join(os.path.dirname(__file__), "../templates/apiwrite.html")
+        return template.render(path, self.template_values)
+
+
 class WebhookDocumentationHandler(CacheableHandler):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "webhook_docs"
