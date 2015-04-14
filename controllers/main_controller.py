@@ -93,6 +93,7 @@ class MainChampsHandler(CacheableHandler):
 
         self.template_values.update({
             "events": events,
+            "year": year,
         })
 
         insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(year, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
