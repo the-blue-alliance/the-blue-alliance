@@ -28,17 +28,20 @@ Setup
 	* Run `git clone git://github.com/USERNAME/the-blue-alliance.git` where _USERNAME_ is your GitHub username, or use GitHub's Windows or OS X app to clone it to your computer
 	* For detailed instructions see [the GitHub guide on contributing](https://guides.github.com/activities/contributing-to-open-source/index.html#contributing)
 3. Install [numpy](http://www.numpy.org/)
-	* Download [the latest version of numpy](http://sourceforge.net/projects/numpy/files/latest/download?source=files)
-	* Unpack the archive
-	* cd into the archive
-	* Run `setup.py install` or `python setup.py install`
+	* You can use your favorite package manager.
+	* Or download a binary of [the latest version of numpy](http://sourceforge.net/projects/numpy/files/latest/download?source=files).
+		* Unpack the archive
+		* cd into the archive
+		* Run `setup.py install` or `python setup.py install`
+	* Or compile it from source code. (On Windows, use the [Microsoft Visual C++ Compiler for Python 2.7](http://www.microsoft.com/en-us/download/details.aspx?id=44266).)
 4. Install [Node.js](https://nodejs.org/) which includes [Node Package Manager](https://www.npmjs.org/)
 5. Install LESS via Node Package Manager
 	* `npm install -g less`
 6. Install Paver
 	* `easy_install -U Paver`
 	* or `pip install -U Paver`
-7. Run `paver setup`
+7. Run `easy_install pep8` to avoid the `lint` error `[Error 2] The system cannot find the file specified`.
+8. Run `paver setup`
 
 Run a local dev server
 ----------------------
