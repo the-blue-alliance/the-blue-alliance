@@ -11,14 +11,14 @@
     </div>
     <div class="col-xs-12 col-sm-7 col-lg-8">
       <h2>Watch the Championship LIVE on GameDay!</h2>
-      <p><a class="btn btn-primary" href="https://www.facebook.com/events/153536261510651/" target="_blank"><span class="glyphicon glyphicon-calendar"></span> RSVP on Facebook</a></p>
+      <p><a class="btn btn-primary" href="https://www.facebook.com/events/460552190748295/" target="_blank"><span class="glyphicon glyphicon-calendar"></span> RSVP on Facebook</a></p>
       {% if events and events|length > 0%}
         {% with events as events %}
           {% include "event_partials/event_table.html" %}
         {% endwith %}
       {% endif %}
 
-      <h2 class="end_header">2014 Stats Recap{% if num_matches %} <small>{{num_matches.data}} Matches Played</small>{% endif %}</h2>
+      <h2 class="end_header">{{year}} Stats Recap{% if num_matches %} <small>{{num_matches.data}} Matches Played</small>{% endif %}</h2>
 
       {% if match_highscore %}
         <div class="row">

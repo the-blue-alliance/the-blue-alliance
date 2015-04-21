@@ -93,6 +93,7 @@ class MainChampsHandler(CacheableHandler):
 
         self.template_values.update({
             "events": events,
+            "year": year,
         })
 
         insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(year, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
@@ -362,6 +363,19 @@ class ApiDocumentationHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/apidocs.html")
+        return template.render(path, self.template_values)
+
+
+class ApiWriteHandler(CacheableHandler):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "api_write"
+
+    def __init__(self, *args, **kw):
+        super(ApiWriteHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+
+    def _render(self, *args, **kw):
+        path = os.path.join(os.path.dirname(__file__), "../templates/apiwrite.html")
         return template.render(path, self.template_values)
 
 
