@@ -28,6 +28,8 @@ handlers:
   static_dir: static/javascript
 - url: /jwplayer
   static_dir: static/jwplayer
+- url: /flowplayer
+  static_dir: static/flowplayer
 - url: /ovp
   static_dir: static/ovp
 - url: /favicon.ico
