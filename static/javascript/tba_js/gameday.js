@@ -11,6 +11,8 @@ var hiddenviews = [];
 // For keeping track of what view a webcast key is in
 var viewLocations = {};
 
+var MAX_VIEWS = 8;
+
 $(document).ready(function() {
 
 	// Bootstrap is stopping propagation of event
@@ -41,7 +43,7 @@ $(document).ready(function() {
 function setupViews() {
   var urlvars = getUrlVars();
    // save views
-  for (var n=0; n < 6; n++) {
+  for (var n=0; n < MAX_VIEWS; n++) {
 	  var view = urlvars['view_' + n];
 	  if (view != null) {
 		  viewLocations[n] = view;
@@ -59,7 +61,7 @@ function setupViews() {
   eval('layout_' + layout + '()');
 
   // Choosing which views to populate
-  for (var n=0; n < 6; n++) {
+  for (var n=0; n < MAX_VIEWS; n++) {
 	  var view = urlvars['view_' + n];
 	  if (view != null) {
 			var $item = $('#' + view);
@@ -219,8 +221,7 @@ $(document).ready(function() {
 var default_view = "<div class='empty_info'>Drag and drop an event from the 'Webcasts' menu to assign it to this screen.</div><div class='div_helper'></div>";
 
 function createViews(){
-  var maxViews = 6;
-  for (var n = 0; n < maxViews; n++) {
+  for (var n = 0; n < MAX_VIEWS; n++) {
     var view="<div id='view_" + n + "' class='view'>" + default_view + "</div>";
     $(view).appendTo('.video_container');
     views[n] = view;
@@ -352,7 +353,7 @@ function swap(dragged, target) {
 //Layout Changing Control
 var height, width, current_layout, last_layout, num_views;
 // num_views[layout_number] = number of views provided by that layout
-num_views = [1, 2, 3, 4, 5, 6, 4];
+num_views = [1, 2, 3, 4, 5, 6, 4, 8];
 
 // Fixes layout. Call this if window resized, etc.
 function fixLayout() {
@@ -587,4 +588,54 @@ function layout_6() {
 	$("#view_"+order[3]).css('top', height*0.67);
 	$("#view_"+order[3]).css('left', width*0.75);
 	last_layout = current_layout;
+}
+
+function layout_7() {
+  current_layout = 7;
+  addRemoveViews(current_layout, last_layout);
+
+  height = $(".video_container").height();
+  width = $(".video_container").width();
+
+  $("#view_"+order[0]).width(width*0.25);
+  $("#view_"+order[0]).height(height*0.5);
+  $("#view_"+order[0]).css('top', 0);
+  $("#view_"+order[0]).css('left', 0);
+
+  $("#view_"+order[1]).width(width*0.25);
+  $("#view_"+order[1]).height(height*0.5);
+  $("#view_"+order[1]).css('top', 0);
+  $("#view_"+order[1]).css('left', width*0.25);
+
+  $("#view_"+order[2]).width(width*0.25);
+  $("#view_"+order[2]).height(height*0.5);
+  $("#view_"+order[2]).css('top', 0);
+  $("#view_"+order[2]).css('left', width*0.5);
+
+  $("#view_"+order[3]).width(width*0.25);
+  $("#view_"+order[3]).height(height*0.5);
+  $("#view_"+order[3]).css('top', 0);
+  $("#view_"+order[3]).css('left', width*0.75);
+
+  $("#view_"+order[4]).width(width*0.25);
+  $("#view_"+order[4]).height(height*0.5);
+  $("#view_"+order[4]).css('top', height*0.5);
+  $("#view_"+order[4]).css('left', 0);
+
+  $("#view_"+order[5]).width(width*0.25);
+  $("#view_"+order[5]).height(height*0.5);
+  $("#view_"+order[5]).css('top', height*0.5);
+  $("#view_"+order[5]).css('left', width*0.25);
+
+  $("#view_"+order[6]).width(width*0.25);
+  $("#view_"+order[6]).height(height*0.5);
+  $("#view_"+order[6]).css('top', height*0.5);
+  $("#view_"+order[6]).css('left', width*0.5);
+
+  $("#view_"+order[7]).width(width*0.25);
+  $("#view_"+order[7]).height(height*0.5);
+  $("#view_"+order[7]).css('top', height*0.5);
+  $("#view_"+order[7]).css('left', width*0.75);
+
+  last_layout = current_layout;
 }
