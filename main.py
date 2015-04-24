@@ -14,7 +14,7 @@ from controllers.main_controller import ContactHandler, HashtagsHandler, \
     MainKickoffHandler, MainBuildseasonHandler, MainChampsHandler, MainCompetitionseasonHandler, \
     MainInsightsHandler, MainOffseasonHandler, OprHandler, SearchHandler, \
     AboutHandler, ThanksHandler, PageNotFoundHandler, InternalServerErrorHandler, \
-    GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler, ApiWriteHandler, WebhookDocumentationHandler
+    GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler, ApiWriteHandler, MatchInputHandler, WebhookDocumentationHandler
 from controllers.match_controller import MatchDetail
 from controllers.notification_controller import UserNotificationBroadcast
 from controllers.district_controller import DistrictDetail
@@ -68,6 +68,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/insights', InsightsOverview, 'insights', strict_slash=True),
       RedirectRoute(r'/logout', AccountLogout, 'account-logout', strict_slash=True),
       RedirectRoute(r'/match/<match_key>', MatchDetail, 'match-detail', strict_slash=True),
+      RedirectRoute(r'/matchinput', MatchInputHandler, 'match-input', strict_slash=True),
       RedirectRoute(r'/notifications/broadcast', UserNotificationBroadcast, 'notification-broadcast', strict_slash=True),
       RedirectRoute(r'/notifications/test/<type:[0-9]+>', TestNotificationController, 'test-notifications', strict_slash=True),
       RedirectRoute(r'/opr', OprHandler, 'opr', strict_slash=True),
