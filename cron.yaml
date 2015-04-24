@@ -14,9 +14,9 @@ cron:
   schedule: every day 02:00
   timezone: America/Los_Angeles
 
-- description: FIRST match scraping for current events
-  url: /tasks/enqueue/fmsapi_matches/now
-  schedule: every 1 minutes
+# - description: FIRST match scraping for current events
+#   url: /tasks/enqueue/fmsapi_matches/now
+#   schedule: every 1 minutes
 
 - description: FIRST event ranking scraping for current events
   url: /tasks/enqueue/fmsapi_event_rankings/now
