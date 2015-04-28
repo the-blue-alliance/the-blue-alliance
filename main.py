@@ -8,6 +8,7 @@ from controllers.account_controller import AccountEdit, AccountLogout, AccountOv
 from controllers.ajax_controller import AccountFavoritesHandler, AccountFavoritesAddHandler, AccountFavoritesDeleteHandler
 from controllers.ajax_controller import LiveEventHandler, TypeaheadHandler, WebcastHandler
 from controllers.event_controller import EventList, EventDetail, EventRss
+from controllers.event_wizard_controller import EventWizardHandler
 from controllers.gameday2_controller import Gameday2Controller
 from controllers.insights_controller import InsightsOverview, InsightsDetail
 from controllers.main_controller import ContactHandler, HashtagsHandler, \
@@ -61,6 +62,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/events/<district_abbrev:[a-z]+>/<year:[0-9]+>', DistrictDetail, 'district-detail', strict_slash=True),
       RedirectRoute(r'/events/<district_abbrev:[a-z]+>', DistrictDetail, 'district-canonical', strict_slash=True),
       RedirectRoute(r'/events', EventList, 'event-list', strict_slash=True),
+      RedirectRoute(r'/eventwizard/', EventWizardHandler, 'event-wizard', strict_slash=True),
       RedirectRoute(r'/gameday', GamedayHandler, 'gameday', strict_slash=True),
       RedirectRoute(r'/gameday2', Gameday2Controller, 'gameday2', strict_slash=True),
       RedirectRoute(r'/hashtags', HashtagsHandler, 'hashtags', strict_slash=True),
