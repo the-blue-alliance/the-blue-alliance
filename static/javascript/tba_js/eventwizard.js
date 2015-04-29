@@ -63,12 +63,10 @@ $('#event_key_select').change(function(){
     }else{
         $('#event_key').hide();
     }
-    var storedAuth = getCookie(eventKey);
-    if(storedAuth){
-        var auth = JSON.parse(storedAuth);
-        $('#auth_id').val(auth['id']);
-        $('#auth_secret').val(auth['secret']);
-    }
+
+    // clear auth boxes
+    $('#auth_id').val("");
+    $('#auth_secret').val("");
 });
 
 $('#load_auth').click(function(){
@@ -136,6 +134,7 @@ $('#schedule_file').change(function(){
 
         var request_body = [];
 
+        $('#schedule_preview').empty();
         for(var i=0; i<matches.length; i++){
             var match = matches[i];
 
