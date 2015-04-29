@@ -7,6 +7,7 @@ function makeRequest(request_path, request_body, feedback) {
     type: 'POST',
     url: request_path,
     dataType: 'json',
+    contentType: 'application/json',
     headers: {
       'X-TBA-Auth-Id': auth_id,
       'X-TBA-Auth-Sig': auth_sig
@@ -45,9 +46,102 @@ function getCookie(name) {
     return "";
 }
 
+function playoffTypeFromNumber(matchNum){
+    if(matchNum > 0 && matchNum <= 8) return "qf";
+    if(matchNum > 8 && matchNum <= 14) return "sf";
+    return "f";
+}
+
 $('#event_key_select').change(function(){
     var eventKey = $(this).val();
     var storedAuth = getCookie(eventKey);
+});
+
+$('#schedule_preview').hide();
+$('#schedule-ok').hide();
+$('#schedule_file').change(function(){
+    var f = this.files[0];
+    var reader = new FileReader();
+    var name = f.name;
+    reader.onload = function(e) {
+        var data = e.target.result;
+        var workbook = XLSX.read(data, {type: 'binary'});
+        var first_sheet = workbook.SheetNames[0];
+        var sheet = workbook.Sheets[first_sheet];
+
+        //parse the excel to array of matches
+        //headers start on 5th row
+        var matches = XLSX.utils.sheet_to_json(sheet, {range:4});
+
+        if(matches.length > 0){
+            $('#schedule_preview_status').html("Loaded "+matches.length+" matches");
+        }else{
+            $('#schedule_preview_status').html("No matches found in the file.");
+            return;
+        }
+
+        var request_body = [];
+
+        for(var i=0; i<matches.length; i++){
+            var match = matches[i];
+
+            // check for invalid match
+            if(!match['Match']){
+                continue;
+            }
+
+            var row = $('<tr>');
+            row.append($('<td>').html(match['Time']));
+            row.append($('<td>').html(match['Description']));
+            row.append($('<td>').html(match['Match']));
+            row.append($('<td>').html(match['Blue 1']));
+            row.append($('<td>').html(match['Blue 2']));
+            row.append($('<td>').html(match['Blue 3']));
+            row.append($('<td>').html(match['Red 1']));
+            row.append($('<td>').html(match['Red 2']));
+            row.append($('<td>').html(match['Red 3']));
+
+            $('#schedule_preview').append(row);
+
+            var compLevel, setNumber, matchNumber;
+            // only works for 2015 format
+            matchNumber = parseInt(match['Match']);
+            setNumber = 1;
+            if(match['Description'].indexOf("Qualification") == 0){
+                compLevel = "qm";
+            }else{
+                compLevel = playoffTypeFromNumber(matchNumber);
+            }
+
+            // make json dict
+            request_body.push({
+                'comp_level': compLevel,
+                'set_number': setNumber,
+                'match_number': matchNumber,
+                'alliances': {
+                    'red': {
+                    'teams': ['frc'+match['Red 1'], 'frc'+match['Red 2'], 'frc'+match['Red 3']],
+                    'score': null
+                    },'blue': {
+                    'teams': ['frc'+match['Blue 1'], 'frc'+match['Blue 2'], 'frc'+match['Blue 3']],
+                    'score': null
+                    }
+                },
+                'time_string': match['Time'],
+            });
+        }
+
+        $('#schedule_preview').show();
+        $('#schedule-ok').show();
+        $('#schedule-ok').click(function(){
+            $(this).css('background-color', '#eb9316');
+            makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/matches/update', JSON.stringify(request_body), $(this));
+        });
+
+    };
+
+    $('#schedule_preview_status').html("Loading...");
+    reader.readAsBinaryString(f);
 });
 
 $('#setup-ok').click(function(e) {
