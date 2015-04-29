@@ -125,16 +125,10 @@ $('#schedule_file').change(function(){
         //headers start on 5th row
         var matches = XLSX.utils.sheet_to_json(sheet, {range:4});
 
-        if(matches.length > 0){
-            $('#schedule_preview_status').html("Loaded "+matches.length+" matches");
-        }else{
-            $('#schedule_preview_status').html("No matches found in the file.");
-            return;
-        }
-
         var request_body = [];
 
         $('#schedule_preview').empty();
+        $('#schedule_preview').html("<tr><th>Time</th><th>Description</th><th>Match</th><th>Blue 1</th><th>Blue 2</th><th>Blue 3</th><th>Red 1</th><th>Red 2</th><th>Red 3</th></tr>");
         for(var i=0; i<matches.length; i++){
             var match = matches[i];
 
@@ -184,6 +178,15 @@ $('#schedule_file').change(function(){
             });
         }
 
+
+         if(request_body.length > 0){
+            $('#schedule_preview_status').html("Loaded "+request_body.length+" matches");
+        }else{
+            $('#schedule_preview_status').html("No matches found in the file.");
+            return;
+        }
+
+
         $('#schedule_preview').show();
         $('#schedule-ok').show();
         $('#schedule-ok').click(function(){
@@ -197,6 +200,96 @@ $('#schedule_file').change(function(){
     reader.readAsBinaryString(f);
 });
 
+$('#results_preview').hide();
+$('#results-ok').hide();
+$('#results_file').change(function(){
+    var f = this.files[0];
+    var reader = new FileReader();
+    var name = f.name;
+    reader.onload = function(e) {
+        var data = e.target.result;
+        var workbook = XLSX.read(data, {type: 'binary'});
+        var first_sheet = workbook.SheetNames[0];
+        var sheet = workbook.Sheets[first_sheet];
+
+        //parse the excel to array of matches
+        //headers start on 5th row
+        var matches = XLSX.utils.sheet_to_json(sheet, {range:2});
+
+        var request_body = [];
+
+        $('#results_preview').empty();
+        $('#results_preview').html("<tr><th>Time</th><th>Match</th><th>Red 1</th><th>Red 2</th><th>Red 3</th><th>Blue 1</th><th>Blue 2</th><th>Blue 3</th><th>Red Score</th><th>Blue Score</th></tr>");
+        for(var i=0; i<matches.length; i++){
+            var match = matches[i];
+
+            // check for invalid match
+            if(!match['Time']){
+                continue;
+            }
+
+            var row = $('<tr>');
+            row.append($('<td>').html(match['Time']));
+            row.append($('<td>').html(match['Match']));
+            row.append($('<td>').html(match['Red 1']));
+            row.append($('<td>').html(match['Red 2']));
+            row.append($('<td>').html(match['Red 3']));
+            row.append($('<td>').html(match['Blue 1']));
+            row.append($('<td>').html(match['Blue 2']));
+            row.append($('<td>').html(match['Blue 3']));
+            row.append($('<td>').html(match['Red Score']));
+            row.append($('<td>').html(match['Blue Score']));
+
+            $('#results_preview').append(row);
+
+            var compLevel, setNumber, matchNumber;
+            // only works for 2015 format
+            matchNumber = parseInt(match['Match'].split(" ")[1]);
+            setNumber = 1;
+            if(match['Match'].indexOf("Qualification") == 0){
+                compLevel = "qm";
+            }else{
+                compLevel = playoffTypeFromNumber(matchNumber);
+            }
+
+            // make json dict
+            request_body.push({
+                'comp_level': compLevel,
+                'set_number': setNumber,
+                'match_number': matchNumber,
+                'alliances': {
+                    'red': {
+                    'teams': ['frc'+match['Red 1'], 'frc'+match['Red 2'], 'frc'+match['Red 3']],
+                    'score': parseInt(match['Red Score'])
+                    },'blue': {
+                    'teams': ['frc'+match['Blue 1'], 'frc'+match['Blue 2'], 'frc'+match['Blue 3']],
+                    'score': parseInt(match['Blue Score'])
+                    }
+                },
+                'time_string': match['Time'],
+            });
+        }
+
+        if(request_body.length > 0){
+            $('#results_preview_status').html("Loaded "+request_body.length+" matches");
+        }else{
+            $('#results_preview_status').html("No matches found in the file.");
+            return;
+        }
+
+
+        $('#results_preview').show();
+        $('#results-ok').show();
+        $('#results-ok').click(function(){
+            $(this).css('background-color', '#eb9316');
+            makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/matches/update', JSON.stringify(request_body), $(this));
+        });
+
+    };
+
+    $('#schedule_preview_status').html("Loading...");
+    reader.readAsBinaryString(f);
+});
 $('#setup-ok').click(function(e) {
   e.preventDefault();
 

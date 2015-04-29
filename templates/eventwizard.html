@@ -92,6 +92,17 @@
 
         <div class="tab-pane" id="results">
           <h3>Upload Match Results</h3>
+          <p>Lets you upload a final Match Results report. Note that this will overwite data that currently exists for these matches.</p>
+
+          <label for="results_file">Report File</label><input type="file" id="results_file" name="results_file" />
+          <div id="results_preview_status">
+
+          </div>
+
+          <button class="btn btn-info" id="results-ok"><span class="glyphicon glyphicon-refresh"></span> Post Results</button>
+          <table id="results_preview" class="table table-striped">
+
+          </table>
         </div>
 
         <div class="tab-pane" id="rankings">
