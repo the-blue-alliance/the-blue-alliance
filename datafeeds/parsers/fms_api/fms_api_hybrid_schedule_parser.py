@@ -57,7 +57,7 @@ class FMSAPIHybridScheduleParser(object):
         if event.timezone_id:
             event_tz = pytz.timezone(event.timezone_id)
         else:
-            logging.warning("Event {} has no timezone! Match times may be wrong.").format(event_key)
+            logging.warning("Event {} has no timezone! Match times may be wrong.".format(event_key))
             event_tz = None
 
         set_number = 1

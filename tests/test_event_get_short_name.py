@@ -5,9 +5,31 @@ from helpers.event_helper import EventHelper
 
 class TestEventGetShortName(unittest2.TestCase):
     def test_event_get_short_name(self):
-        """
-        A bunch of tests from various years
-        """
+        # Edge cases.
+        self.assertEquals(EventHelper.getShortName("  { Random 2.718 stuff! }  "), "{ Random 2.718 stuff! }")
+        self.assertEquals(EventHelper.getShortName("IN District -Bee's Knee's LX  "), "Bee's Knee's LX")
+        self.assertEquals(EventHelper.getShortName("MAR District - Brussels Int'l Event sponsored by Sprouts"), "Brussels Int'l")
+        self.assertEquals(EventHelper.getShortName("FIM District - Brussels Int'l Eventapalooza sponsored by TBA"), "Brussels Int'l")
+        self.assertEquals(EventHelper.getShortName("NE District - ReallyBigEvent Scaling Up Every Year"), "ReallyBig")
+        self.assertEquals(EventHelper.getShortName("PNW District -  Event!  "), "Event!")
+
+        self.assertEquals(EventHelper.getShortName("FRC Detroit FIRST Robotics District Competition"), "Detroit")
+        self.assertEquals(EventHelper.getShortName("FIRST Robotics Detroit FRC State Championship"), "Detroit")
+        self.assertEquals(EventHelper.getShortName("Maui FIRST Robotics Regional and Luau"), "Maui")
+        self.assertEquals(EventHelper.getShortName("California State Surf and Turf sponsored by TBA"), "California")
+        self.assertEquals(EventHelper.getShortName("CarTalk Plaza Tournament"), "CarTalk Plaza")
+        self.assertEquals(EventHelper.getShortName("IRI FRC Be-all and End-all"), "IRI")
+        self.assertEquals(EventHelper.getShortName("   Ada    Field  "), "Ada")
+        self.assertEquals(EventHelper.getShortName(" FIRST Robotics Einstein Field Equations "), "Einstein")
+        self.assertEquals(EventHelper.getShortName("FRC Martin Luther King Jr. Region Championship"), "Martin Luther King Jr.")
+        self.assertEquals(EventHelper.getShortName("PNW   Ada Lovelace    Tournament of Software  "), "Ada Lovelace")
+        self.assertEquals(EventHelper.getShortName("\tPNW   Ada Lovelace    Tournament of Software  "), "Ada Lovelace")
+        self.assertEquals(EventHelper.getShortName(" MAR FIRST Robotics   Rosa Parks    FRC Tournament of Roses  "), "Rosa Parks")
+        self.assertEquals(EventHelper.getShortName("Washington D.C. FIRST Robotics Region"), "Washington D.C.")
+        self.assertEquals(EventHelper.getShortName("Washington D.C. FIRST Robotics Region."), "Washington D.C.")
+        self.assertEquals(EventHelper.getShortName("Washington D.C. FIRST Robotics Regiontonian"), "Washington D.C. FIRST Robotics Regiontonian") # Does not match "Region\b"
+
+        # Tests from various years
         self.assertEqual(EventHelper.getShortName("FIRST Robotics Competition"), "FIRST Robotics Competition")
         self.assertEqual(EventHelper.getShortName("National Championship"), "National Championship")
         self.assertEqual(EventHelper.getShortName("New England Tournament"), "New England")

@@ -35,6 +35,7 @@ class NotificationSender(object):
             checksum = ch.hexdigest()
 
             request = urllib2.Request(url, payload)
+            request.add_header("Content-Type", 'application/json; charset="utf-8"')
             request.add_header("X-TBA-Checksum", checksum)
             request.add_header("X-TBA-Version", '{}'.format(cls.WEBHOOK_VERSION))
             try:
