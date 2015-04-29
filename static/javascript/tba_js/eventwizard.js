@@ -290,7 +290,79 @@ $('#results_file').change(function(){
     $('#schedule_preview_status').html("Loading...");
     reader.readAsBinaryString(f);
 });
-$('#setup-ok').click(function(e) {
+
+$('#rankings_preview').hide();
+$('#rankings-ok').hide();
+$('#rankings_file').change(function(){
+    var f = this.files[0];
+    var reader = new FileReader();
+    var name = f.name;
+    reader.onload = function(e) {
+        var data = e.target.result;
+        var workbook = XLSX.read(data, {type: 'binary'});
+        var first_sheet = workbook.SheetNames[0];
+        var sheet = workbook.Sheets[first_sheet];
+
+        //parse the excel to array of matches
+        //headers start on 5th row
+        var rankings = XLSX.utils.sheet_to_json(sheet, {range:3});
+
+        var request_body = [];
+
+        $('#rankings_preview').empty();
+        $('#rankings_preview').html("<tr><th>Rank</th><th>Team</th><th>Qual Avg</th><th>Coopertition</th><th>Auto</th><th>Container</th><th>Tote</th><th>Litter</th><th>DQ</th><th>Played</th></tr>");
+        for(var i=0; i<rankings.length; i++){
+            var rank = rankings[i];
+
+            // check for invalid row
+            if(!rank['Rank']){
+                continue;
+            }
+
+            var row = $('<tr>');
+            row.append($('<td>').html(rank['Rank']));
+            row.append($('<td>').html(rank['Team']));
+            row.append($('<td>').html(rank['Qual Avg']));
+            row.append($('<td>').html(rank['Coopertition']));
+            row.append($('<td>').html(rank['Auto']));
+            row.append($('<td>').html(rank['Container']));
+            row.append($('<td>').html(rank['Tote']));
+            row.append($('<td>').html(rank['Litter']));
+            row.append($('<td>').html(rank['DQ']));
+            row.append($('<td>').html(rank['Played']));
+
+            $('#rankings_preview').append(row);
+
+            // make json dict
+            request_body.push({
+                rank: parseInt(rank['Rank']),
+                team_key: 'frc'+rank['Team'],
+                // needs #1115 for format
+            });
+        }
+
+        if(request_body.length > 0){
+            $('#rankings_preview_status').html("Loaded rankings for "+request_body.length+" teams");
+        }else{
+            $('#rankings_preview_status').html("No rankings found in the file.");
+            return;
+        }
+
+
+        $('#rankings_preview').show();
+        $('#rankings-ok').show();
+        $('#rankings-ok').click(function(){
+            $(this).css('background-color', '#eb9316');
+            makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/rankings/update', JSON.stringify(request_body), $(this));
+        });
+
+    };
+
+    $('#schedule_preview_status').html("Loading...");
+    reader.readAsBinaryString(f);
+});
+
+$('#fetch-matches').click(function(e) {
   e.preventDefault();
 
   $.ajax({

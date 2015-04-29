@@ -85,7 +85,7 @@
 
         <div class="tab-pane" id="matches">
           <h3>Match Play</h3>
-          <button class="btn btn-success" id="setup-ok"><span class="glyphicon glyphicon-refresh"></span> Fetch Matches</button>
+          <button class="btn btn-success" id="fetch-matches"><span class="glyphicon glyphicon-refresh"></span> Fetch Matches</button>
           <table id="match-table" class="match-table">
           </table>
         </div>
@@ -107,6 +107,17 @@
 
         <div class="tab-pane" id="rankings">
           <h3>Upload Rankings</h3>
+          <p>Upload event rankings from FMS report. This will overwrite current rankings for that event.</p>
+
+          <label for="rankings_file">Rankings File</label><input type="file" id="rankings_file" name="rankings_file" />
+          <div id="rankings_preview_status">
+
+          </div>
+
+          <button class="btn btn-info" id="rankings-ok"><span class="glyphicon glyphicon-refresh"></span> Post Rankings</button>
+          <table id="rankings_preview" class="table table-striped">
+
+          </table>
         </div>
 
         <div class="tab-pane" id="alliances">
