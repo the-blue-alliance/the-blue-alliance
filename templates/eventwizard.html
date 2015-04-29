@@ -18,12 +18,21 @@
         <div class="form-group">
           <label for="event_key" class="col-sm-2 control-label">Select Event</label>
           <div class="col-sm-10">
-            <select id="event_key">
+            <select id="event_key_select" class="form-control">
                 <option value="">Select Event</option>
-                <option value="2015nyc">NYC</option>
+                <option value="other">Other</option>
             </select>
+            <input type="text" class="form-control" id="event_key" placeholder="Event Key"/>
           </div>
         </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Auth Tools</label>
+          <div class="col-sm-10">
+            <button type="button" class="btn btn-default" id="load_auth">Load Auth</button>
+            <button type="button" class="btn btn-default" id="store_auth">Store Auth</button>
+          </div>
+        </div>
+        <div id="auth-container">
         <div class="form-group">
           <label for="auth_id" class="col-sm-2 control-label">Auth Id</label>
           <div class="col-sm-10">
@@ -35,6 +44,7 @@
           <div class="col-sm-10">
             <input type="password" class="form-control" id="auth_secret" placeholder="Auth Secret">
           </div>
+        </div>
         </div>
       </form>
 

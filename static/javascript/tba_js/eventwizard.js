@@ -31,7 +31,7 @@ var COMP_LEVELS_PLAY_ORDER = {
   'f': 5,
 }
 
- function setCookie(name, value) {
+function setCookie(name, value) {
     document.cookie = name + "=" + value;
 }
 
@@ -52,9 +52,63 @@ function playoffTypeFromNumber(matchNum){
     return "f";
 }
 
+if($('#event_key_select').val() != "other"){
+    $('#event_key').hide();
+}
 $('#event_key_select').change(function(){
     var eventKey = $(this).val();
+    $('#event_key').val(eventKey);
+    if(eventKey == "other"){
+        $('#event_key').val("").show()
+    }else{
+        $('#event_key').hide();
+    }
     var storedAuth = getCookie(eventKey);
+    if(storedAuth){
+        var auth = JSON.parse(storedAuth);
+        $('#auth_id').val(auth['id']);
+        $('#auth_secret').val(auth['secret']);
+    }
+});
+
+$('#load_auth').click(function(){
+    var eventKey = $('#event_key').val();
+    if(!eventKey){
+        alert("You must select an event.");
+        return false;
+    }
+
+    var auth = JSON.parse(getCookie(eventKey+"_auth"));
+    if(!auth){
+        alert("No auth found");
+        return false;
+    }
+    $('#auth_id').val(auth['id']);
+    $('#auth_secret').val(auth['secret']);
+});
+
+$('#store_auth').click(function(){
+    var eventKey = $('#event_key').val();
+    var authId = $('#auth_id').val();
+    var authSecret = $('#auth_secret').val();
+
+    if(!eventKey){
+        alert("You must select an event.");
+        return false;
+    }
+
+    if(!authId || !authSecret){
+        alert("You must enter your auth id and secret.");
+        return false;
+    }
+
+    var auth = {};
+    auth['id'] = authId;
+    auth['secret'] = authSecret;
+
+    setCookie(eventKey+"_auth", JSON.stringify(auth));
+
+    alert("Auth stored!");
 });
 
 $('#schedule_preview').hide();
