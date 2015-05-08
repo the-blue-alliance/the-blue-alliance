@@ -125,6 +125,22 @@
 
         <div class="tab-pane" id="alliances">
           <h3>Alliance Selection</h3>
+          <p>Input team numbers for event Alliance Selections. This will overwite existing alliances.</p>
+          <label for="alliance-size">Number of teams per alliance</label>
+          <div class="radio">
+            <label><input type="radio" name="alliance-size" id="alliance-size-2" value="2">2</label>
+          </div>
+          <div class="radio">
+            <label><input type="radio" name="alliance-size" id="alliance-size-3" value="3" checked>3</label>
+          </div>
+          <div class="radio">
+            <label><input type="radio" name="alliance-size" id="alliance-size-4" value="4">4</label>
+          </div>
+
+          <button class="btn btn-info" id="alliances-ok"><span class="glyphicon glyphicon-refresh"></span> Post Alliances</button>
+          <table id="alliances" class="table table-striped">
+            <tr><th>Alliance</th><th>Captain</th><th class="pick-1">Pick 1</th><th class="pick-2">Pick 2</th><th class="pick-3">Pick 3</th></tr>
+          </table>
         </div>
 
         <div class="tab-pane" id="awards">

@@ -23,6 +23,20 @@ function makeRequest(request_path, request_body, feedback) {
   });
 }
 
+var ALLIANCE_PICKS_MAX = 3;
+var NUM_ALLIANCES = 8;
+function generateAllianceTable(size, table){
+    for(var i=size; i>0; i--){
+        var row = $('<tr>');
+        row.append($('<td>').html("Alliance "+i));
+        row.append($('<td>', {'class': 'captain'}).append($('<input>', {'id': "alliance"+i+"-captain", 'placeholder': "Captain "+i})));
+        for(var j=1; j<=ALLIANCE_PICKS_MAX; j++){
+            row.append($('<td>', {'class':"pick-"+j}).append($('<input>', {'class':"pick-"+j, 'id': "alliance"+i+"-pick"+j, 'placeholder': "Pick "+j})));
+        }
+        table.after(row);
+    }
+}
+
 var COMP_LEVELS_PLAY_ORDER = {
   'qm': 1,
   'ef': 2,
@@ -124,9 +138,51 @@ $('#teams-ok').click(function(){
         }
         teams[i] = "frc"+teamNum;
     }
-    alert(JSON.stringify(teams));
     $(this).css('background-color', '#eb9316');
     makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/team_list/update', JSON.stringify(teams), $(this));
+});
+
+generateAllianceTable(8, $('#alliances tr:last'));
+$('.pick-3').hide();
+$('input[name="alliance-size"]:radio').change(function(){
+    var size = $(this).val();
+    if(size == "2"){
+        $('.pick-2').val("").hide();
+        $('.pick-3').val("").hide();
+    }else if(size == "3"){
+        $('.pick-2').show();
+        $('.pick-3').val("").hide();
+    }else if(size == "4"){
+        $('.pick-2').show();
+        $('.pick-3').show();
+    }
+});
+
+$('#alliances-ok').click(function(){
+    var request = [];
+    var count = 0;
+    for(var count=1; count <= NUM_ALLIANCES; count++){
+        var alliance = [];
+        var captain = $("#alliance"+count+"-captain").val();
+        var pick1 = $("#alliance"+count+"-pick1").val();
+        var pick2 = $("#alliance"+count+"-pick2").val();
+        var pick3 = $("#alliance"+count+"-pick3").val();
+
+        if(captain){
+            alliance.push('frc'+captain);
+        }else{
+            request.push([]);
+            continue;
+        }
+        if(pick1) alliance.push('frc'+pick1);
+        if(pick2) alliance.push('frc'+pick2);
+        if(pick3) alliance.push('frc'+pick3);
+
+        request.push(alliance);
+    }
+    alert(JSON.stringify(request));
+    $(this).css('background-color', '#eb9316');
+    makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/alliance_selections/update', JSON.stringify(request), $(this));
 });
 
 $('#schedule_preview').hide();
@@ -461,5 +517,3 @@ $('#fetch-matches').click(function(e) {
     }
   });
 });
-
-
