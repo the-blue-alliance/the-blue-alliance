@@ -109,6 +109,26 @@ $('#store_auth').click(function(){
     alert("Auth stored!");
 });
 
+$('#teams-ok').click(function(){
+    if(!$("#team_list").val()){
+        alert("Please team data.");
+        return true;
+    }
+
+    var teams = $('#team_list').val().split("\n");
+    for(var i=0; i<teams.length; i++){
+        var teamNum = parseInt(teams[i]);
+        if(!teamNum || isNaN(teamNum) || teamNum <= 0 || teamNum > 9999){
+            alert("Invalid team "+teams[i]);
+            return true;
+        }
+        teams[i] = "frc"+teamNum;
+    }
+    alert(JSON.stringify(teams));
+    $(this).css('background-color', '#eb9316');
+    makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/team_list/update', JSON.stringify(teams), $(this));
+});
+
 $('#schedule_preview').hide();
 $('#schedule-ok').hide();
 $('#schedule_file').change(function(){
