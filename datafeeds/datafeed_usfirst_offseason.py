@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 from google.appengine.api import memcache
@@ -21,7 +22,7 @@ class DatafeedUsfirstOffseason(DatafeedBase):
             event_short="???",
             first_eid=event.get("first_eid", None),
             name=event.get("name", None),
-            year=2014, #TODO: don't hardcode me -gregmarra 20130921
+            year=datetime.datetime.now().year,
             start_date=event.get("start_date", None),
             end_date=event.get("end_date", None),
             location=event.get("location", None),
