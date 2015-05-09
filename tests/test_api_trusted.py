@@ -269,10 +269,10 @@ class TestApiTrustedController(unittest2.TestCase):
         self.aaa.put()
 
         rankings = {
-            'breakdowns': ['QS', 'Auton', 'Teleop', 'T&C'],
+            'breakdowns': ['QS', 'Auton', 'Teleop', 'T&C', 'Record (W-L-T)'],
             'rankings': [
-                {'team_key': 'frc254', 'rank': 1, 'wins': 10, 'losses': 0, 'ties': 0, 'played': 10, 'dqs': 0, 'QS': 20, 'Auton': 500, 'Teleop': 500, 'T&C': 200},
-                {'team_key': 'frc971', 'rank': 2, 'wins': 10, 'losses': 0, 'ties': 0, 'played': 10, 'dqs': 0, 'QS': 20, 'Auton': 500, 'Teleop': 500, 'T&C': 200}
+                {'team_key': 'frc254', 'rank': 1, 'Record (W-L-T)': '10-0-0', 'played': 10, 'dqs': 0, 'QS': 20, 'Auton': 500, 'Teleop': 500, 'T&C': 200},
+                {'team_key': 'frc971', 'rank': 2, 'Record (W-L-T)': '10-0-0', 'played': 10, 'dqs': 0, 'QS': 20, 'Auton': 500, 'Teleop': 500, 'T&C': 200}
             ],
         }
         request_body = json.dumps(rankings)
