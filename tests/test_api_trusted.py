@@ -285,6 +285,26 @@ class TestApiTrustedController(unittest2.TestCase):
         self.assertEqual(self.event.rankings[0], ['Rank', 'Team', 'QS', 'Auton', 'Teleop', 'T&C', 'Record (W-L-T)', 'DQ', 'Played'])
         self.assertEqual(self.event.rankings[1], [1, '254', 20, 500, 500, 200, '10-0-0', 0, 10])
 
+    def test_rankings_wlt_update(self):
+        self.aaa.put()
+
+        rankings = {
+            'breakdowns': ['QS', 'Auton', 'Teleop', 'T&C', 'wins', 'losses', 'ties'],
+            'rankings': [
+                {'team_key': 'frc254', 'rank': 1, 'wins': 10, 'losses': 0, 'ties': 0, 'played': 10, 'dqs': 0, 'QS': 20, 'Auton': 500, 'Teleop': 500, 'T&C': 200},
+                {'team_key': 'frc971', 'rank': 2, 'wins': 10, 'losses': 0, 'ties': 0, 'played': 10, 'dqs': 0, 'QS': 20, 'Auton': 500, 'Teleop': 500, 'T&C': 200}
+            ],
+        }
+        request_body = json.dumps(rankings)
+
+        request_path = '/api/trusted/v1/event/2014casj/rankings/update'
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.event.rankings[0], ['Rank', 'Team', 'QS', 'Auton', 'Teleop', 'T&C', 'Record (W-L-T)', 'DQ', 'Played'])
+        self.assertEqual(self.event.rankings[1], [1, '254', 20, 500, 500, 200, '10-0-0', 0, 10])
+
     def test_eventteams_update(self):
         self.aaa.put()
 
