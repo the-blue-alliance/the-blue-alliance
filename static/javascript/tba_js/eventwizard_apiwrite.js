@@ -319,7 +319,7 @@ $('#rankings_file').change(function(){
     reader.readAsBinaryString(f);
 });
 
-$('.update-match').click(function(e) {
+$('#match-table').on('click', 'button', function(e) {
     e.preventDefault();
 
     $(this).parent().css('background-color', '#eb9316');
