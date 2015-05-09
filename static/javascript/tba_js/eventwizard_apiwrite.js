@@ -288,16 +288,14 @@ $('#rankings_file').change(function(){
             $('#rankings_preview').append(row);
 
             var breakdown = {};
+            breakdown['team_key'] = 'frc'+rank['Team'];
+            breakdown['rank'] = parseInt(rank['Rank']);
+            breakdown['played'] = parseInt(rank['Played']);
+            breakdown['dqs'] = parseInt(rank['DQ']);
             for(var j=0; j<request_body['breakdowns'].length; j++){
                 breakdown[request_body['breakdowns'][j]] = parseInt(rank[request_body['breakdowns'][j]]);
             }
-            request_body['rankings'].push({
-                'team_key': 'frc'+rank['Team'],
-                'rank': parseInt(rank['Rank']),
-                'played': parseInt(rank['Played']),
-                'dqs': parseInt(rank['DQ']),
-                'breakdown': breakdown
-            });
+            request_body['rankings'].push(breakdown);
         }
 
         if(request_body['rankings'].length > 0){
@@ -312,7 +310,6 @@ $('#rankings_file').change(function(){
         $('#rankings-ok').show();
         $('#rankings-ok').click(function(){
             $(this).css('background-color', '#eb9316');
-            alert(JSON.stringify(request_body));
             makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/rankings/update', JSON.stringify(request_body), $(this));
         });
 
