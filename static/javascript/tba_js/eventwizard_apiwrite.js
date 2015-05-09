@@ -262,10 +262,16 @@ $('#rankings_file').change(function(){
         //headers start on 5th row
         var rankings = XLSX.utils.sheet_to_json(sheet, {range:3});
 
-        var request_body = [];
+        var request_body = {};
 
         $('#rankings_preview').empty();
         $('#rankings_preview').html("<tr><th>Rank</th><th>Team</th><th>Qual Avg</th><th>Coopertition</th><th>Auto</th><th>Container</th><th>Tote</th><th>Litter</th><th>DQ</th><th>Played</th></tr>");
+
+        var headers = ['Rank', 'Team', 'Qual Avg', 'Coopertition', 'Auto', 'Container', 'Tote', 'Litter', 'DQ', 'Played'];
+
+        request_body['breakdowns'] = headers.slice(2, 8);
+        request_body['rankings'] = [];
+
         for(var i=0; i<rankings.length; i++){
             var rank = rankings[i];
 
@@ -275,29 +281,27 @@ $('#rankings_file').change(function(){
             }
 
             var row = $('<tr>');
-            row.append($('<td>').html(rank['Rank']));
-            row.append($('<td>').html(rank['Team']));
-            row.append($('<td>').html(rank['Qual Avg']));
-            row.append($('<td>').html(rank['Coopertition']));
-            row.append($('<td>').html(rank['Auto']));
-            row.append($('<td>').html(rank['Container']));
-            row.append($('<td>').html(rank['Tote']));
-            row.append($('<td>').html(rank['Litter']));
-            row.append($('<td>').html(rank['DQ']));
-            row.append($('<td>').html(rank['Played']));
+            for(var j=0; j<headers.length; j++){
+                row.append($('<td>').html(rank[headers[j]]));
+            }
 
             $('#rankings_preview').append(row);
 
-            // make json dict
-            request_body.push({
-                rank: parseInt(rank['Rank']),
-                team_key: 'frc'+rank['Team'],
-                // needs #1115 for format
+            var breakdown = {};
+            for(var j=0; j<request_body['breakdowns'].length; j++){
+                breakdown[request_body['breakdowns'][j]] = parseInt(rank[request_body['breakdowns'][j]]);
+            }
+            request_body['rankings'].push({
+                'team_key': 'frc'+rank['Team'],
+                'rank': parseInt(rank['Rank']),
+                'played': parseInt(rank['Played']),
+                'dqs': parseInt(rank['DQ']),
+                'breakdown': breakdown
             });
         }
 
-        if(request_body.length > 0){
-            $('#rankings_preview_status').html("Loaded rankings for "+request_body.length+" teams");
+        if(request_body['rankings'].length > 0){
+            $('#rankings_preview_status').html("Loaded rankings for "+request_body['rankings'].length+" teams");
         }else{
             $('#rankings_preview_status').html("No rankings found in the file.");
             return;
@@ -308,6 +312,7 @@ $('#rankings_file').change(function(){
         $('#rankings-ok').show();
         $('#rankings-ok').click(function(){
             $(this).css('background-color', '#eb9316');
+            alert(JSON.stringify(request_body));
             makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/rankings/update', JSON.stringify(request_body), $(this));
         });
 
