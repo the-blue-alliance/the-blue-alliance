@@ -43,7 +43,7 @@ class JSONRankingsParser(ParserBase):
 
             row = [ranking['rank'], ranking['team_key'][3:]]
             for b in data['breakdowns']:
-                row.append(ranking['breakdown'].get(b, '--'))
+                row.append(ranking.get(b, '--'))
             row.extend([ranking['dqs'], ranking['played']])
             rankings.append(row)
 
