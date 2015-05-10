@@ -114,6 +114,11 @@ $('input[name="alliance-size"]:radio').change(function(){
     }
 });
 
+$('#auth-help').hide();
+$('#show-help').click(function(){
+    $('#auth-help').attr("display", "inline").show();
+});
+
 $('#schedule_preview').hide();
 $('#schedule-ok').hide();
 
