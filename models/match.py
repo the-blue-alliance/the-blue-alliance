@@ -63,7 +63,7 @@ class Match(ndb.Model):
 
     comp_level = ndb.StringProperty(required=True, choices=set(COMP_LEVELS))
     event = ndb.KeyProperty(kind=Event, required=True)
-    year = ndb.IntegerProperty(required=True)
+    year = ndb.IntegerProperty()
     match_number = ndb.IntegerProperty(required=True, indexed=False)
     no_auto_update = ndb.BooleanProperty(default=False, indexed=False)  # Set to True after manual update
     set_number = ndb.IntegerProperty(required=True, indexed=False)
