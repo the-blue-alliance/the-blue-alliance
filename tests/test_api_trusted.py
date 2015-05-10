@@ -269,10 +269,10 @@ class TestApiTrustedController(unittest2.TestCase):
         self.aaa.put()
 
         rankings = {
-            'breakdowns': ['QS', 'Auton', 'Teleop', 'T&C', 'Record (W-L-T)'],
+            'breakdowns': ['QS', 'Auton', 'Teleop', 'T&C'],
             'rankings': [
-                {'team_key': 'frc254', 'rank': 1, 'Record (W-L-T)': '10-0-0', 'played': 10, 'dqs': 0, 'QS': 20, 'Auton': 500, 'Teleop': 500, 'T&C': 200},
-                {'team_key': 'frc971', 'rank': 2, 'Record (W-L-T)': '10-0-0', 'played': 10, 'dqs': 0, 'QS': 20, 'Auton': 500, 'Teleop': 500, 'T&C': 200}
+                {'team_key': 'frc254', 'rank': 1, 'played': 10, 'dqs': 0, 'QS': 20, 'Auton': 500, 'Teleop': 500, 'T&C': 200},
+                {'team_key': 'frc971', 'rank': 2, 'played': 10, 'dqs': 0, 'QS': 20, 'Auton': 500, 'Teleop': 500, 'T&C': 200}
             ],
         }
         request_body = json.dumps(rankings)
@@ -282,8 +282,8 @@ class TestApiTrustedController(unittest2.TestCase):
         response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(self.event.rankings[0], ['Rank', 'Team', 'QS', 'Auton', 'Teleop', 'T&C', 'Record (W-L-T)', 'DQ', 'Played'])
-        self.assertEqual(self.event.rankings[1], [1, '254', 20, 500, 500, 200, '10-0-0', 0, 10])
+        self.assertEqual(self.event.rankings[0], ['Rank', 'Team', 'QS', 'Auton', 'Teleop', 'T&C', 'DQ', 'Played'])
+        self.assertEqual(self.event.rankings[1], [1, '254', 20, 500, 500, 200, 0, 10])
 
     def test_rankings_wlt_update(self):
         self.aaa.put()
