@@ -33,55 +33,6 @@ class Match(ndb.Model):
         'f': 5,
     }
 
-    FRC_GAMES = [
-        "frc_2012_rebr",
-        "frc_2011_logo",
-        "frc_2010_bkwy",
-        "frc_2009_lncy",
-        "frc_2008_ovdr",
-        "frc_2007_rkrl",
-        "frc_2006_amhi",
-        "frc_2005_trpl",
-        "frc_2004_frnz",
-        "frc_2003_stck",
-        "frc_2002_znzl",
-        "frc_2001_dbdy",
-        "frc_2000_coop",
-        "frc_1999_trbl",
-        "frc_1998_lddr",
-        "frc_1997_trdt",
-        "frc_1996_hxgn",
-        "frc_1995_rmpr",
-        "frc_1994_tpwr",
-        "frc_1993_rgrg",
-        "frc_1992_maiz",
-        "frc_unknown",
-    ]
-
-    FRC_GAMES_BY_YEAR = {
-        2012: "frc_2012_rebr",
-        2011: "frc_2011_logo",
-        2010: "frc_2010_bkwy",
-        2009: "frc_2009_lncy",
-        2008: "frc_2008_ovdr",
-        2007: "frc_2007_rkrl",
-        2006: "frc_2006_amhi",
-        2005: "frc_2005_trpl",
-        2004: "frc_2004_frnz",
-        2003: "frc_2003_stck",
-        2002: "frc_2002_znzl",
-        2001: "frc_2001_dbdy",
-        2000: "frc_2000_coop",
-        1999: "frc_1999_trbl",
-        1998: "frc_1998_lddr",
-        1997: "frc_1997_trdt",
-        1996: "frc_1996_hxgn",
-        1995: "frc_1995_rmpr",
-        1994: "frc_1994_tpwr",
-        1993: "frc_1993_rgrg",
-        1992: "frc_1992_maiz",
-    }
-
     alliances_json = ndb.StringProperty(required=True, indexed=False)  # JSON dictionary with alliances and scores.
 
     # {
@@ -112,7 +63,7 @@ class Match(ndb.Model):
 
     comp_level = ndb.StringProperty(required=True, choices=set(COMP_LEVELS))
     event = ndb.KeyProperty(kind=Event, required=True)
-    game = ndb.StringProperty(required=True, choices=set(FRC_GAMES), indexed=False)
+    year = ndb.IntegerProperty(required=True)
     match_number = ndb.IntegerProperty(required=True, indexed=False)
     no_auto_update = ndb.BooleanProperty(default=False, indexed=False)  # Set to True after manual update
     set_number = ndb.IntegerProperty(required=True, indexed=False)
@@ -194,9 +145,9 @@ class Match(ndb.Model):
     def team_keys(self):
         return [ndb.Key(Team, team_key_name) for team_key_name in self.team_key_names]
 
-    @property
-    def year(self):
-        return int(self.event.id()[:4])
+    # @property
+    # def year(self):
+    #     return int(self.event.id()[:4])
 
     @property
     def key_name(self):
