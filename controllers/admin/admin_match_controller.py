@@ -162,7 +162,6 @@ class AdminMatchEdit(LoggedInHandler):
         match = Match(
             id=match_key,
             event=Event.get_by_id(self.request.get("event_key_name")).key,
-            game=self.request.get("game"),
             set_number=int(self.request.get("set_number")),
             match_number=int(self.request.get("match_number")),
             comp_level=self.request.get("comp_level"),

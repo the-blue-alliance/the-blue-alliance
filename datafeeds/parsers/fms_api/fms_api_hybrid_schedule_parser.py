@@ -115,7 +115,7 @@ class FMSAPIHybridScheduleParser(object):
                     set_number,
                     match_number),
                 event=event.key,
-                game="frc_unknown",  # TODO: deprecate in favor of a 'year' property
+                year=event.year,
                 set_number=set_number,
                 match_number=match_number,
                 comp_level=comp_level,

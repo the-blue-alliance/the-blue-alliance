@@ -150,7 +150,7 @@ class TestApiCacheClearer(unittest2.TestCase):
             event=self.event_2010sc_1.key,
             set_number=1,
             match_number=1,
-            game='frc_unknown',
+            year=2010,
             team_key_names=[u'frc1', u'frc2', u'frc3', u'frc4', u'frc5', u'frc6'],
         )
 
@@ -161,7 +161,7 @@ class TestApiCacheClearer(unittest2.TestCase):
             event=self.event_2010sc_1.key,
             set_number=1,
             match_number=1,
-            game='frc_unknown',
+            year=2010,
             team_key_names=[u'frc1', u'frc999', u'frc3', u'frc4', u'frc5', u'frc6'],
         )
 
