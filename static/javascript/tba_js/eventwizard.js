@@ -64,12 +64,11 @@ $('#load_auth').click(function(){
         alert("You must select an event.");
         return false;
     }
-
-    var auth = JSON.parse(getCookie(eventKey+"_auth"));
-    if(!auth){
+    var cookie = getCookie(eventKey+"_auth");
+    if(!cookie){
         alert("No auth found");
         return false;
-    }
+    }var auth = JSON.parse();
     $('#auth_id').val(auth['id']);
     $('#auth_secret').val(auth['secret']);
 });
@@ -130,14 +129,14 @@ $('#rankings-ok').hide();
 
 $('#fetch-matches').click(function(e) {
   e.preventDefault();
-
+  $('#match_play_load_status').html("Loading matches");
   $.ajax({
     url: '/api/v2/event/' + $('#event_key').val() + '/matches',
     dataType: 'json',
     headers: {'X-TBA-App-Id': 'tba-web:match-input:v01'},
     success: function(matches) {
       $("#match-table").empty();
-
+      $('#match_play_load_status').html("Loaded "+matches.length+" matches");
       for (i in matches) {
         var match = matches[i];
         match.play_order = COMP_LEVELS_PLAY_ORDER[match.comp_level] * 1000000 + match.match_number * 1000 + match.set_number
