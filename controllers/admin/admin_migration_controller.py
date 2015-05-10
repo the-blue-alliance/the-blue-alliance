@@ -8,6 +8,7 @@ from models.event import Event
 from helpers.match_manipulator import MatchManipulator
 
 def add_year(event_key):
+  logging.info(event_key)
   matches = event_key.get().matches
   if matches:
     for match in matches:
