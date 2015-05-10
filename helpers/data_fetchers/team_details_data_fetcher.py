@@ -15,7 +15,7 @@ class TeamDetailsDataFetcher(object):
         of a team for a given year
         """
         @ndb.tasklet
-        def get_events_and_matches_async():
+        def get_events_async():
             if return_valid_years:
                 event_team_keys_query = EventTeam.query(EventTeam.team == team.key)
             else:
@@ -28,15 +28,13 @@ class TeamDetailsDataFetcher(object):
                     valid_years.add(event_team.year)  # valid_years is a "global" variable (defined below). Doing this removes the complexity of having to propagate the years up through the tasklet call chain.
                 if not return_valid_years or event_team.year == year:
                     event_keys.append(event_team.event)
-            events, matches = yield ndb.get_multi_async(event_keys), get_matches_async(event_keys)
-            raise ndb.Return((events, matches))
+            events = yield ndb.get_multi_async(event_keys)
+            raise ndb.Return(events)
 
         @ndb.tasklet
-        def get_matches_async(event_keys):
-            if event_keys == []:
-                raise ndb.Return([])
+        def get_matches_async():
             match_keys = yield Match.query(
-                Match.event.IN(event_keys), Match.team_key_names == team.key_name).fetch_async(500, keys_only=True)
+                Match.year == year, Match.team_key_names == team.key_name).fetch_async(500, keys_only=True)
             matches = yield ndb.get_multi_async(match_keys)
             raise ndb.Return(matches)
 
@@ -48,7 +46,7 @@ class TeamDetailsDataFetcher(object):
 
         @ndb.toplevel
         def get_events_matches_awards():
-            (events, matches), awards = yield get_events_and_matches_async(), get_awards_async()
+            events, matches, awards = yield get_events_async(), get_matches_async(), get_awards_async()
             raise ndb.Return(events, matches, awards)
 
         valid_years = set()
