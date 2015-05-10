@@ -8,10 +8,12 @@ from models.event import Event
 from helpers.match_manipulator import MatchManipulator
 
 def add_year(event_key):
-  for match in event_key.get().matches:
-    match.year = int(match.event.id()[:4])
-    match.dirty = True
-    MatchManipulator.createOrUpdate(match)
+  matches = event_key.get().matches
+  if matches:
+    for match in matches:
+      match.year = int(match.event.id()[:4])
+      match.dirty = True
+      MatchManipulator.createOrUpdate(match)
 
 class AdminMigration(LoggedInHandler):
   def get(self):
