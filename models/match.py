@@ -92,6 +92,10 @@ class Match(ndb.Model):
         self._winning_alliance = None
         self._youtube_videos = None
         self._updated_attrs = []  # Used in MatchManipulator to track what changed
+
+        # temp until match year migration finishes
+        if not self.year:
+            self.year = int(self.event.id()[:4])
         super(Match, self).__init__(*args, **kw)
 
     @property
