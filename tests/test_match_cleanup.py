@@ -34,7 +34,7 @@ class TestMatchCleanup(unittest2.TestCase):
                     match.get("set_number", 0),
                     match.get("match_number", 0)),
                 event=self.event.key,
-                game=Match.FRC_GAMES_BY_YEAR.get(self.event.year, "frc_unknown"),
+                year=self.event.year,
                 set_number=match.get("set_number", 0),
                 match_number=match.get("match_number", 0),
                 comp_level=match.get("comp_level", None),

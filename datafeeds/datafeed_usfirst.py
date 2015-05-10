@@ -241,7 +241,7 @@ class DatafeedUsfirst(DatafeedBase):
                 match_dict.get("set_number", 0),
                 match_dict.get("match_number", 0)),
             event=event.key,
-            game=Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
+            year=event.year,
             set_number=match_dict.get("set_number", 0),
             match_number=match_dict.get("match_number", 0),
             comp_level=match_dict.get("comp_level", None),
