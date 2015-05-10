@@ -56,7 +56,7 @@ class MatchTestCreator(object):
             alliances_json=json.dumps(alliances),
             comp_level=comp_level,
             event=self.event.key,
-            game="frc_2012_rebr",
+            year=2012,
             set_number=set_number,
             match_number=match_number,
             team_key_names=[team.key_name for team in teams],

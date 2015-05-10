@@ -269,10 +269,30 @@ class TestApiTrustedController(unittest2.TestCase):
         self.aaa.put()
 
         rankings = {
-            'breakdowns': ['QS', 'Auton', 'Teleop', 'T&C', 'Record (W-L-T)'],
+            'breakdowns': ['QS', 'Auton', 'Teleop', 'T&C'],
             'rankings': [
-                {'team_key': 'frc254', 'rank': 1, 'Record (W-L-T)': '10-0-0', 'played': 10, 'dqs': 0, 'QS': 20, 'Auton': 500, 'Teleop': 500, 'T&C': 200},
-                {'team_key': 'frc971', 'rank': 2, 'Record (W-L-T)': '10-0-0', 'played': 10, 'dqs': 0, 'QS': 20, 'Auton': 500, 'Teleop': 500, 'T&C': 200}
+                {'team_key': 'frc254', 'rank': 1, 'played': 10, 'dqs': 0, 'QS': 20, 'Auton': 500, 'Teleop': 500, 'T&C': 200},
+                {'team_key': 'frc971', 'rank': 2, 'played': 10, 'dqs': 0, 'QS': 20, 'Auton': 500, 'Teleop': 500, 'T&C': 200}
+            ],
+        }
+        request_body = json.dumps(rankings)
+
+        request_path = '/api/trusted/v1/event/2014casj/rankings/update'
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.event.rankings[0], ['Rank', 'Team', 'QS', 'Auton', 'Teleop', 'T&C', 'DQ', 'Played'])
+        self.assertEqual(self.event.rankings[1], [1, '254', 20, 500, 500, 200, 0, 10])
+
+    def test_rankings_wlt_update(self):
+        self.aaa.put()
+
+        rankings = {
+            'breakdowns': ['QS', 'Auton', 'Teleop', 'T&C', 'wins', 'losses', 'ties'],
+            'rankings': [
+                {'team_key': 'frc254', 'rank': 1, 'wins': 10, 'losses': 0, 'ties': 0, 'played': 10, 'dqs': 0, 'QS': 20, 'Auton': 500, 'Teleop': 500, 'T&C': 200},
+                {'team_key': 'frc971', 'rank': 2, 'wins': 10, 'losses': 0, 'ties': 0, 'played': 10, 'dqs': 0, 'QS': 20, 'Auton': 500, 'Teleop': 500, 'T&C': 200}
             ],
         }
         request_body = json.dumps(rankings)
@@ -324,7 +344,7 @@ class TestApiTrustedController(unittest2.TestCase):
             alliances_json="""{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""",
             comp_level="qm",
             event=ndb.Key(Event, '2014casj'),
-            game="frc_unknown",
+            year=2014,
             set_number=1,
             match_number=1,
             team_key_names=[u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073'],
@@ -337,7 +357,7 @@ class TestApiTrustedController(unittest2.TestCase):
             alliances_json="""{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""",
             comp_level="sf",
             event=ndb.Key(Event, '2014casj'),
-            game="frc_unknown",
+            year=2014,
             set_number=1,
             match_number=1,
             team_key_names=[u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073'],

@@ -31,7 +31,19 @@ class JSONRankingsParser(ParserBase):
         if 'rankings' not in data or type(data['rankings']) is not list:
             raise ParserInputException("Data must have a list 'rankings'")
 
-        rankings = [['Rank', 'Team'] + data['breakdowns'] + ['DQ', 'Played']]
+        # Account for wins/losses/ties to be present and show them as Record (W-L-T)
+        post_breakdowns = ['DQ', 'Played']
+        has_record = False
+        if "wins" in data["breakdowns"] and "losses" in data["breakdowns"] and "ties" in data["breakdowns"]:
+            post_breakdowns.insert(0, 'Record (W-L-T)')
+            has_record = True
+
+            # remove wlt from breakdown list so they're not added twice
+            data["breakdowns"].remove("wins")
+            data["breakdowns"].remove("losses")
+            data["breakdowns"].remove("ties")
+
+        rankings = [['Rank', 'Team'] + data['breakdowns'] + post_breakdowns]
         for ranking in data['rankings']:
             if type(ranking) is not dict:
                 raise ParserInputException("Ranking must be a dict.")
@@ -44,7 +56,12 @@ class JSONRankingsParser(ParserBase):
             row = [ranking['rank'], ranking['team_key'][3:]]
             for b in data['breakdowns']:
                 row.append(ranking.get(b, '--'))
-            row.extend([ranking['dqs'], ranking['played']])
+
+            # Special case for when wlt passed
+            if has_record:
+                row.extend(['{}-{}-{}'.format(ranking['wins'], ranking['losses'], ranking['ties']), ranking['dqs'], ranking['played']])
+            else:
+                row.extend([ranking['dqs'], ranking['played']])
             rankings.append(row)
 
         return rankings
