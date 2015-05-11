@@ -134,11 +134,13 @@ class MainInsightsHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         week_events = EventHelper.getWeekEvents()
+        year = datetime.datetime.now().year
         self.template_values.update({
             "events": week_events,
+            "year": year,
         })
 
-        insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(2014, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
+        insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(year, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
         for insight in insights:
             if insight:
                 self.template_values[insight.name] = insight
