@@ -82,8 +82,16 @@ class AdminApiAuthEdit(LoggedInHandler):
         auth = ApiAuthAccess.get_by_id(auth_id)
 
         auth_types_enum = []
-        if self.request.get('allow_edit_data'):
-            auth_types_enum.append(AuthType.EVENT_DATA)
+        if self.request.get('allow_edit_teams'):
+            auth_types_enum.append(AuthType.EVENT_TEAMS)
+        if self.request.get('allow_edit_matches'):
+            auth_types_enum.append(AuthType.EVENT_MATCHES)
+        if self.request.get('allow_edit_rankings'):
+            auth_types_enum.append(AuthType.EVENT_RANKINGS)
+        if self.request.get('allow_edit_alliances'):
+            auth_types_enum.append(AuthType.EVENT_ALLIANCES)
+        if self.request.get('allow_edit_awards'):
+            auth_types_enum.append(AuthType.EVENT_AWARDS)
         if self.request.get('allow_edit_match_video'):
             auth_types_enum.append(AuthType.MATCH_VIDEO)
 
