@@ -27,7 +27,7 @@ function makeRequest(request_path, request_body, feedback) {
 
 $('#teams-ok').click(function(){
     if(!$("#team_list").val()){
-        alert("Please team data.");
+        alert("Please enter team data.");
         return true;
     }
 
