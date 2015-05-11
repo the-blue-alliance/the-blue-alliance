@@ -9,7 +9,7 @@ import warnings
 # Install the Python unittest2 package before you run this script.
 import unittest2
 
-USAGE = """%prog SDK_PATH
+USAGE = """%prog -s SDK_PATH -t TEST_PATTERN
 Run unit tests for App Engine apps.
 The SDK Path is probably /usr/local/google_appengine on Mac OS
 

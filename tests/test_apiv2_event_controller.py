@@ -189,7 +189,7 @@ class TestEventMatchApiController(unittest2.TestCase):
             alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc281", "frc571", "frc176"]}}""",
             comp_level="qm",
             event=self.event.key,
-            game="frc_2012_rebr",
+            year=2010,
             set_number=1,
             match_number=1,
             team_key_names=[u'frc281', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073'],

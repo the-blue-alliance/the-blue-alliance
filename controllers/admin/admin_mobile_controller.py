@@ -2,6 +2,7 @@ import logging
 import os
 import traceback
 
+from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
@@ -109,7 +110,7 @@ class AdminBroadcast(LoggedInHandler):
 
         try:
             clients = [int(c) for c in clients]
-            NotificationHelper.send_broadcast(clients, title, message, url, app_version)
+            deferred.defer(NotificationHelper.send_broadcast, clients, title, message, url, app_version, _queue="admin")
             logging.info('User {} sent broadcast'.format(user_id))
         except Exception, e:
             logging.error("Error sending broadcast: {}".format(str(e)))

@@ -57,7 +57,7 @@ class FMSAPIHybridScheduleParser(object):
         if event.timezone_id:
             event_tz = pytz.timezone(event.timezone_id)
         else:
-            logging.warning("Event {} has no timezone! Match times may be wrong.").format(event_key)
+            logging.warning("Event {} has no timezone! Match times may be wrong.".format(event_key))
             event_tz = None
 
         set_number = 1
@@ -115,7 +115,7 @@ class FMSAPIHybridScheduleParser(object):
                     set_number,
                     match_number),
                 event=event.key,
-                game="frc_unknown",  # TODO: deprecate in favor of a 'year' property
+                year=event.year,
                 set_number=set_number,
                 match_number=match_number,
                 comp_level=comp_level,

@@ -100,7 +100,7 @@ class MatchManipulator(ManipulatorBase):
         ]  # These build key_name, and cannot be changed without deleting the model.
 
         attrs = [
-            "game",
+            "year",
             "no_auto_update",
             "time",
             "time_string",

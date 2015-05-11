@@ -19,7 +19,7 @@ from controllers.admin.suggestions.admin_event_webcast_suggestions_review_contro
 from controllers.admin.suggestions.admin_match_video_suggestions_review_controller import AdminMatchVideoSuggestionsReviewController
 from controllers.admin.suggestions.admin_media_suggestions_review_controller import AdminMediaSuggestionsReviewController
 from controllers.admin.admin_team_controller import AdminTeamCreateTest, AdminTeamDetail, AdminTeamList
-from controllers.admin.admin_migration_controller import AdminMigration
+from controllers.admin.admin_migration_controller import AdminMigration, AdminMigrationAddMatchYear
 from controllers.admin.admin_user_controller import AdminUserList, AdminUserEdit, AdminUserDetail
 from controllers.admin.admin_mobile_controller import AdminMobile, AdminBroadcast
 
@@ -52,6 +52,7 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/media/add_media', AdminMediaAdd),
                                ('/admin/memcache', AdminMemcacheMain),
                                ('/admin/migration', AdminMigration),
+                               ('/admin/migration/add_match_year', AdminMigrationAddMatchYear),
                                ('/admin/offseasons', AdminOffseasonScraperController),
                                ('/admin/sitevars', AdminSitevarList),
                                ('/admin/sitevar/create', AdminSitevarCreate),
