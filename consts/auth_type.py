@@ -2,7 +2,7 @@ class AuthType(object):
     """
     An auth type defines what write privileges an authenticated agent has.
     """
-    EVENT_DATA = 0
+    EVENT_DATA = 0  # DEPRECATED - USE FINER PERMISSIONS INSTEAD
     MATCH_VIDEO = 1
     EVENT_TEAMS = 2
     EVENT_MATCHES = 3
