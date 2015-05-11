@@ -32,7 +32,7 @@ class ApiTrustedEventAllianceSelectionsUpdate(ApiTrustedBaseController):
     """
     Overwrites an event's alliance_selections_json with new data
     """
-    REQUIRED_AUTH_TYPES = {AuthType.EVENT_DATA}
+    REQUIRED_AUTH_TYPES = {AuthType.EVENT_ALLIANCES}
 
     def _process_request(self, request, event_key):
         alliance_selections = JSONAllianceSelectionsParser.parse(request.body)
@@ -49,7 +49,7 @@ class ApiTrustedEventAwardsUpdate(ApiTrustedBaseController):
     """
     Removes all awards for an event and adds the awards given in the request
     """
-    REQUIRED_AUTH_TYPES = {AuthType.EVENT_DATA}
+    REQUIRED_AUTH_TYPES = {AuthType.EVENT_AWARDS}
 
     def _process_request(self, request, event_key):
         event = Event.get_by_id(event_key)
@@ -80,7 +80,7 @@ class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
     """
     Creates/updates matches
     """
-    REQUIRED_AUTH_TYPES = {AuthType.EVENT_DATA}
+    REQUIRED_AUTH_TYPES = {AuthType.EVENT_MATCHES}
 
     def _process_request(self, request, event_key):
         event = Event.get_by_id(event_key)
@@ -122,7 +122,7 @@ class ApiTrustedEventMatchesDelete(ApiTrustedBaseController):
     """
     Deletes given match keys
     """
-    REQUIRED_AUTH_TYPES = {AuthType.EVENT_DATA}
+    REQUIRED_AUTH_TYPES = {AuthType.EVENT_MATCHES}
 
     def _process_request(self, request, event_key):
         keys_to_delete = set()
@@ -144,7 +144,7 @@ class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
     """
     Overwrites an event's rankings_json with new data
     """
-    REQUIRED_AUTH_TYPES = {AuthType.EVENT_DATA}
+    REQUIRED_AUTH_TYPES = {AuthType.EVENT_RANKINGS}
 
     def _process_request(self, request, event_key):
         rankings = JSONRankingsParser.parse(request.body)
@@ -162,7 +162,7 @@ class ApiTrustedEventTeamListUpdate(ApiTrustedBaseController):
     Creates/updates EventTeams for teams given in the request
     and removes EventTeams for teams not in the request
     """
-    REQUIRED_AUTH_TYPES = {AuthType.EVENT_DATA}
+    REQUIRED_AUTH_TYPES = {AuthType.EVENT_TEAMS}
 
     def _process_request(self, request, event_key):
         team_keys = JSONTeamListParser.parse(request.body)
