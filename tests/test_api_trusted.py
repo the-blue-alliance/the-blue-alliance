@@ -38,7 +38,7 @@ class TestApiTrustedController(unittest2.TestCase):
                                  secret='321tEsTsEcReT',
                                  description='test',
                                  event_list=[ndb.Key(Event, '2014casj')],
-                                 auth_types_enum=[AuthType.EVENT_TEAMS, AuthType.EVENT_MATCHES, AuthType.EVENT_RANKINGS, AuthType.EVENT_ALLIANCES, AuthType.EVENT_AWARDS])
+                                 auth_types_enum=[AuthType.EVENT_DATA])
 
         self.aaa2 = ApiAuthAccess(id='tEsT_id_2',
                                  secret='321tEsTsEcReT',

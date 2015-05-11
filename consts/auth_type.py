@@ -5,10 +5,11 @@ class AuthType(object):
     EVENT_DATA = 0
     MATCH_VIDEO = 1
     EVENT_TEAMS = 2
-    EVENT_MATCHES = 3
-    EVENT_RANKINGS = 4
-    EVENT_ALLIANCES = 5
-    EVENT_AWARDS = 6
+    EVENT_SCHEDULE = 3
+    EVENT_MATCHES = 4
+    EVENT_RANKINGS = 5
+    EVENT_ALLIANCES = 6
+    EVENT_AWARDS = 7
 
     type_names = {
         EVENT_DATA: "event data",
