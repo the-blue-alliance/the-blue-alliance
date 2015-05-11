@@ -38,16 +38,19 @@ class FMSAPITeamDetailsParser(object):
         )
 
         districtTeam = None
+        districtAbbrev = DistrictType.abbrevs[teamData['districtCode'].lower()]
         if teamData['districtCode']:
             districtTeam = DistrictTeam(
+                id=DistrictTeam.renderKeyName(self.year, districtAbbrev, team.key_name),
                 team=ndb.Key(Team, team.key_name),
                 year=self.year,
-                district=DistrictType.abbrevs[teamData['districtCode'].lower()]
+                district=districtAbbrev
             )
 
         robot = None
         if teamData['robotName']:
             robot = Robot(
+                id=Robot.renderKeyName(team.key_name, self.year),
                 team=ndb.Key(Team, team.key_name),
                 year=self.year,
                 robot_name=teamData['robotName'].strip()
