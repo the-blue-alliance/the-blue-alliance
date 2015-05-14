@@ -1,13 +1,13 @@
 import calendar
 
 from consts.notification_type import NotificationType
-from helpers.match_helper import MatchHelper
 from notifications.base_notification import BaseNotification
 
 
 class ScheduleUpdatedNotification(BaseNotification):
 
     def __init__(self, event):
+        from helpers.match_helper import MatchHelper  # recursive import issues
         self.event = event
         upcoming = MatchHelper.upcomingMatches(event.matches, 1)
         self.next_match = upcoming[0] if upcoming[0] else None
