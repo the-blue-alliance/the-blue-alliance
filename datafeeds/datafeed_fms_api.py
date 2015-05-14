@@ -4,8 +4,10 @@ import logging
 
 from google.appengine.api import urlfetch
 
+from consts.event_type import EventType
 from datafeeds.datafeed_base import DatafeedBase
 
+from models.event_team import EventTeam
 from models.sitevar import Sitevar
 
 from parsers.fms_api.fms_api_awards_parser import FMSAPIAwardsParser
@@ -32,6 +34,17 @@ class DatafeedFMSAPI(object):
         'hop': 'hopper',
         'new': 'newton',
         'tes': 'tesla',
+    }
+
+    SUBDIV_TO_DIV = {
+        'arc': 'cmp-arte',
+        'cars': 'cmp-gaca',
+        'carv': 'cmp-cuca',
+        'cur': 'cmp-cuca',
+        'gal': 'cmp-gaca',
+        'hop': 'cmp-neho',
+        'new': 'cmp-neho',
+        'tes': 'cmp-arte',
     }
 
     def __init__(self, *args, **kw):
@@ -66,7 +79,14 @@ class DatafeedFMSAPI(object):
             return None
 
     def getAwards(self, event):
-        awards = self._parse(self.FMS_API_AWARDS_URL_PATTERN % (event.year, self._get_event_short(event.event_short)), FMSAPIAwardsParser(event))
+        awards = []
+        if event.event_type_enum == EventType.CMP_DIVISION and event.year >= 2015:  # 8 subdivisions from 2015+ have awards listed under 4 divisions
+            event_team_keys = EventTeam.query(EventTeam.event == event.key).fetch(keys_only=True)
+            valid_team_nums = set([int(etk.id().split('_')[1][3:]) for etk in event_team_keys])
+
+            awards += self._parse(self.FMS_API_AWARDS_URL_PATTERN % (event.year, self._get_event_short(self.SUBDIV_TO_DIV[event.event_short])), FMSAPIAwardsParser(event, valid_team_nums))
+
+        awards += self._parse(self.FMS_API_AWARDS_URL_PATTERN % (event.year, self._get_event_short(event.event_short)), FMSAPIAwardsParser(event))
         return awards
 
     def getEventAlliances(self, event_key):
