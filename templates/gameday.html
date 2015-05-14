@@ -139,6 +139,22 @@
 {% endblock %}
 
 {% block content %}
+<noscript>
+  <style type="text/css">
+    .chat_panel, .social_panel, .ticker_panel, .webcasts_panel { 
+      display: none; 
+    }
+    .noscript-container { 
+      margin-top: 150px;
+      text-align: center;
+    }
+  </style>
+  <div class="noscript-container">
+    <h1>GameDay requires JavaScript</h1>
+    <p>Please enable JavaScript in your browser to use GameDay.</p>
+    <a href="http://enable-javascript.com" class="btn btn-warning" target="_blank">Learn how »</a>
+  </div>
+</noscript>
 <div class="social_panel">
   <div id="twitter-widget"><a class="twitter-timeline" href="https://twitter.com/search?q=%23omgrobots" data-widget-id="282256949859454976">Tweets about "#omgrobots"</a></div>
 </div>
