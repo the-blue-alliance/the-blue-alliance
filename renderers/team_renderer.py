@@ -30,7 +30,6 @@ class TeamRenderer(object):
 
         participation = []
         year_wlt_list = []
-        offseason_wlt_list = []
         year_match_avg_list = []
 
         current_event = None
@@ -51,7 +50,8 @@ class TeamRenderer(object):
             if year == 2015:
                 display_wlt = None
                 match_avg = EventHelper.calculateTeamAvgScoreFromMatches(team.key_name, event_matches)
-                year_match_avg_list.append(match_avg)
+                if event.event_type_enum != EventType.PRESEASON and event.event_type_enum != EventType.OFFSEASON:
+                    year_match_avg_list.append(match_avg)
                     
                 qual_avg, elim_avg, _, _ = match_avg
             else:
@@ -60,8 +60,6 @@ class TeamRenderer(object):
                 wlt = EventHelper.calculateTeamWLTFromMatches(team.key_name, event_matches)
                 if event.event_type_enum != EventType.PRESEASON and event.event_type_enum != EventType.OFFSEASON:
                     year_wlt_list.append(wlt)
-                else:
-                    offseason_wlt_list.append(wlt)
                     
                     
                 if wlt["win"] + wlt["loss"] + wlt["tie"] == 0:
@@ -105,13 +103,6 @@ class TeamRenderer(object):
             if year_wlt["win"] + year_wlt["loss"] + year_wlt["tie"] == 0:
                 year_wlt = None
                 
-            offseason_wlt = {"win": 0, "loss": 0, "tie": 0}
-            for wlt in offseason_wlt_list:
-                offseason_wlt["win"] += wlt["win"]
-                offseason_wlt["loss"] += wlt["loss"]
-                offseason_wlt["tie"] += wlt["tie"]
-            if offseason_wlt["win"] + offseason_wlt["loss"] + offseason_wlt["tie"] == 0:
-                offseason_wlt = None
 
         medias_by_slugname = MediaHelper.group_by_slugname([media_future.get_result() for media_future in media_futures])
 
@@ -122,7 +113,6 @@ class TeamRenderer(object):
             "year": year,
             "years": valid_years,
             "year_wlt": year_wlt,
-            "offseason_wlt": offseason_wlt,
             "year_qual_avg": year_qual_avg,
             "year_elim_avg": year_elim_avg,
             "current_event": current_event,
