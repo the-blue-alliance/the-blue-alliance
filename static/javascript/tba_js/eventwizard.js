@@ -68,7 +68,8 @@ $('#load_auth').click(function(){
     if(!cookie){
         alert("No auth found");
         return false;
-    }var auth = JSON.parse();
+    }
+    var auth = JSON.parse(cookie);
     $('#auth_id').val(auth['id']);
     $('#auth_secret').val(auth['secret']);
 });
