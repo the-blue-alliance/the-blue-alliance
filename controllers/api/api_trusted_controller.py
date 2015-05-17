@@ -106,10 +106,10 @@ class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
                 time=match.get("time", None),
             )
 
-            if (not match.time or match.time == "") and match.time_string:
-                # We can calculate the real time from the time string
-                logging.debug("Calculating time!")
-                MatchHelper.add_match_times(event, [match])
+            # if (not match.time or match.time == "") and match.time_string:
+            #     # We can calculate the real time from the time string
+            #     logging.debug("Calculating time!")
+            #     MatchHelper.add_match_times(event, [match])
 
             matches.append(match)
 
