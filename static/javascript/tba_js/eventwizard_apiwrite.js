@@ -110,12 +110,13 @@ $('#schedule_file').change(function(){
 
             var compLevel, setNumber, matchNumber;
             // only works for 2015 format
-            matchNumber = parseInt(match['Match']);
             setNumber = 1;
+            matchNumber = parseInt(match['Match']);
             if(match['Description'].indexOf("Qualification") == 0){
                 compLevel = "qm";
             }else{
                 compLevel = playoffTypeFromNumber(matchNumber);
+                matchNumber = playoffMatchNumber(compLevel, matchNumber);
             }
 
             // make json dict

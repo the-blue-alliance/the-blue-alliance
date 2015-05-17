@@ -35,10 +35,18 @@ function getCookie(name) {
     return "";
 }
 
+/* ONLY FOR 2015 */
 function playoffTypeFromNumber(matchNum){
     if(matchNum > 0 && matchNum <= 8) return "qf";
     if(matchNum > 8 && matchNum <= 14) return "sf";
     return "f";
+}
+
+/* ONLY FOR 2015 */
+function playoffMatchNumber(type, totalMatchNum){
+    if(type == "sf") return totalMatchNum - 8;
+    if(type == "f") return totalMatchNum - 14;
+    return totalMatchNum;
 }
 
 if($('#event_key_select').val() != "other"){
