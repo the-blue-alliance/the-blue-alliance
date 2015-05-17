@@ -122,7 +122,7 @@ class TeamRenderer(object):
             "year": year,
             "years": valid_years,
             "year_wlt": year_wlt,
-            "offseason_wlt": offseason_wlt
+            "offseason_wlt": offseason_wlt,
             "year_qual_avg": year_qual_avg,
             "year_elim_avg": year_elim_avg,
             "current_event": current_event,
