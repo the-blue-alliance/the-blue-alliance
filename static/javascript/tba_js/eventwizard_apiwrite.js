@@ -83,7 +83,6 @@ $('#schedule_file').change(function(){
         //parse the excel to array of matches
         //headers start on 5th row
         var matches = XLSX.utils.sheet_to_json(sheet, {range:4});
-
         var request_body = [];
 
         $('#schedule_preview').empty();
@@ -148,7 +147,7 @@ $('#schedule_file').change(function(){
 
         $('#schedule_preview').show();
         $('#schedule-ok').show();
-        $('#schedule-ok').click(function(){
+        $('#schedule-ok').unbind('click').click(function(){
             $(this).css('background-color', '#eb9316');
             makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/matches/update', JSON.stringify(request_body), $(this));
         });
@@ -237,7 +236,7 @@ $('#results_file').change(function(){
 
         $('#results_preview').show();
         $('#results-ok').show();
-        $('#results-ok').click(function(){
+        $('#results-ok').unbind('click').click(function(){
             $(this).css('background-color', '#eb9316');
             makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/matches/update', JSON.stringify(request_body), $(this));
         });
@@ -308,7 +307,7 @@ $('#rankings_file').change(function(){
 
         $('#rankings_preview').show();
         $('#rankings-ok').show();
-        $('#rankings-ok').click(function(){
+        $('#rankings-ok').unbind('click').click(function(){
             $(this).css('background-color', '#eb9316');
             makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/rankings/update', JSON.stringify(request_body), $(this));
         });
