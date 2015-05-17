@@ -1,6 +1,7 @@
 import datetime
 import os
 
+from consts.event_type import EventType
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
@@ -49,13 +50,18 @@ class TeamRenderer(object):
             if year == 2015:
                 display_wlt = None
                 match_avg = EventHelper.calculateTeamAvgScoreFromMatches(team.key_name, event_matches)
-                year_match_avg_list.append(match_avg)
+                if event.event_type_enum != EventType.PRESEASON and event.event_type_enum != EventType.OFFSEASON:
+                    year_match_avg_list.append(match_avg)
+                    
                 qual_avg, elim_avg, _, _ = match_avg
             else:
                 qual_avg = None
                 elim_avg = None
                 wlt = EventHelper.calculateTeamWLTFromMatches(team.key_name, event_matches)
-                year_wlt_list.append(wlt)
+                if event.event_type_enum != EventType.PRESEASON and event.event_type_enum != EventType.OFFSEASON:
+                    year_wlt_list.append(wlt)
+                    
+                    
                 if wlt["win"] + wlt["loss"] + wlt["tie"] == 0:
                     display_wlt = None
                 else:
@@ -96,6 +102,7 @@ class TeamRenderer(object):
                 year_wlt["tie"] += wlt["tie"]
             if year_wlt["win"] + year_wlt["loss"] + year_wlt["tie"] == 0:
                 year_wlt = None
+                
 
         medias_by_slugname = MediaHelper.group_by_slugname([media_future.get_result() for media_future in media_futures])
 
