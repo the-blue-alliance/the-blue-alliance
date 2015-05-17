@@ -49,7 +49,10 @@
           <hr>
           <h2 id="event-results">Event Results</h2>
           {% if year_wlt %}
-            <p>Overall, team {{team.team_number}} was <strong>{{year_wlt.win}}({{offseason_wlt.win}})-{{year_wlt.loss}}({{offseason_wlt.loss}})-{{year_wlt.tie({{offseason_wlt.tie}})}}</strong> in {{year}}.</p>
+             {% if offseason_wlt %}
+               <p>Overall, team {{team.team_number}} was <strong>{{year_wlt.win}}({{offseason_wlt.win}})-{{year_wlt.loss}}({{offseason_wlt.loss}})-{{year_wlt.tie}}({{offseason_wlt.tie}})</strong> in {{year}}.</p>
+             {% else %}
+               <p>Overall, team {{team.team_number}} was <strong>{{year_wlt.win}}-{{year_wlt.loss}}-{{year_wlt.tie}}</strong> in {{year}}.</p>
           {% else %}
             {% if year_qual_avg or year_elim_avg %}
               <p>Overall, team {{team.team_number}} had
