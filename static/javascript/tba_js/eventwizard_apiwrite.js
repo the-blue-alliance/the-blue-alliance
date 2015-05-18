@@ -326,6 +326,70 @@ $('#rankings_file').change(function(){
     reader.readAsBinaryString(f);
 });
 
+$('#teams_file').change(function(){
+    var f = this.files[0];
+    var reader = new FileReader();
+    var name = f.name;
+    reader.onload = function(e) {
+        var data = e.target.result;
+        var workbook = XLSX.read(data, {type: 'binary'});
+        var first_sheet = workbook.SheetNames[0];
+        var sheet = workbook.Sheets[first_sheet];
+
+        //parse the excel to array of matches
+        //headers start on 2nd row
+        var teams = XLSX.utils.sheet_to_json(sheet, {range:2});
+
+        var request_body = {};
+
+        $('#teams_preview').empty();
+        $('#teams_preview').html("<tr><th>Team Number</th><th>Team Name</th></tr>");
+
+        var request_body = []
+        for(var i=0; i<teams.length; i++){
+            var team = teams[i];
+
+            // check for invalid row
+            if(!team['#']){
+                continue;
+            }
+
+            var teamNum = parseInt(team['#']);
+            if(!teamNum || isNaN(teamNum) || teamNum <= 0 || teamNum > 9999){
+                alert("Invalid team "+teams[i]);
+                return true;
+            }
+            request_body[i] = "frc"+teamNum;
+
+            var row = $('<tr>');
+            row.append($('<td>').html(teamNum));
+            row.append($('<td>').html(team['Short Name']));
+
+            $('#teams_preview').append(row);
+
+        }
+
+        if(request_body.length > 0){
+            $('#teams_preview_status').html("Loaded "+request_body.length+" teams");
+        }else{
+            $('#teams_preview_status').html("No teams found in the file.");
+            return;
+        }
+
+
+        $('#teams_preview').show();
+        $('#fmsteams-ok').show();
+        $('#fmsteams-ok').unbind('click').click(function(){
+            $(this).css('background-color', '#eb9316');
+            makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/team_list/update', JSON.stringify(request_body), $(this));
+        });
+
+    };
+
+    $('#schedule_preview_status').html("Loading...");
+    reader.readAsBinaryString(f);
+});
+
 $('#match-table').on('click', 'button', function(e) {
     e.preventDefault();
 

@@ -133,6 +133,9 @@ $('#show-help').click(function(){
     $('#auth-help').attr("display", "inline").show();
 });
 
+$('#teams_preview').hide();
+$('#fmsteams-ok').hide();
+
 $('#schedule_preview').hide();
 $('#schedule-ok').hide();
 
