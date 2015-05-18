@@ -206,7 +206,7 @@ $('#results_file').change(function(){
             if(match['Match'].indexOf("Qualification") == 0){
                 compLevel = "qm";
             }else{
-                compLevel = playoffTypeFromNumber(matchNumber);
+                compLevel = playoffTypeFromMatchString(match['Match']);
             }
 
             // make json dict
@@ -239,6 +239,7 @@ $('#results_file').change(function(){
         $('#results-ok').show();
         $('#results-ok').unbind('click').click(function(){
             $(this).css('background-color', '#eb9316');
+            alert(JSON.stringify(request_body));
             makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/matches/update', JSON.stringify(request_body), $(this));
         });
 

@@ -42,6 +42,12 @@ function playoffTypeFromNumber(matchNum){
     return "f";
 }
 
+function playoffTypeFromMatchString(matchString){
+    if(matchString.indexOf("Quarterfinal") == 0) return "qf";
+    if(matchString.indexOf("Semifinal") == 0) return "sf";
+    if(matchString.indexOf("Final") == 0) return "f";
+}
+
 /* ONLY FOR 2015 */
 function playoffMatchNumber(type, totalMatchNum){
     if(type == "sf") return totalMatchNum - 8;
