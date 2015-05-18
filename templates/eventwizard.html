@@ -79,8 +79,21 @@
 
         <div class="tab-pane" id="schedule">
           <h3>Import Schedule</h3>
-            <p>Allows you to import matches via FMS report. Note that this will overwrite all data that currently exists for these matches</p>
-            <label for="schedule_file">Report File</label><input type="file" id="schedule_file" name="schedule_file" />
+            <p>Allows you to import matches via FMS report. Note that this <strong>will overwrite all data</strong> that currently exists for these matches. If you are running a Playoff Tournament and need to import only a certain level of matches (e.g. only import Semifinals so Quarterfinals don't get overwritten), select the level below prior to selecting a file.</p>
+          <label for="import-comp-level">Comp Level to Import</label>
+          <div class="radio">
+            <label><input type="radio" name="import-comp-level" id="import-comp-level-all" value="all" checked>All</label>
+          </div>
+          <div class="radio">
+            <label><input type="radio" name="import-comp-level" id="import-comp-level-qf" value="qf">Quarterfinals</label>
+          </div>
+          <div class="radio">
+            <label><input type="radio" name="import-comp-level" id="import-comp-level-sf" value="sf">Semifinals</label>
+          </div>
+          <div class="radio">
+            <label><input type="radio" name="import-comp-level" id="import-comp-level-f" value="f">Finals</label>
+          </div>
+          <label for="schedule_file">Report File</label><input type="file" id="schedule_file" name="schedule_file" />
 
             <div id="schedule_preview_status">
 

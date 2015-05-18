@@ -87,11 +87,28 @@ $('#schedule_file').change(function(){
 
         $('#schedule_preview').empty();
         $('#schedule_preview').html("<tr><th>Time</th><th>Description</th><th>Match</th><th>Blue 1</th><th>Blue 2</th><th>Blue 3</th><th>Red 1</th><th>Red 2</th><th>Red 3</th></tr>");
+        var filter = $('input[name="import-comp-level"]:checked').val();
         for(var i=0; i<matches.length; i++){
             var match = matches[i];
 
             // check for invalid match
-            if(!match['Match']){
+            if(!match['Match'] || !match['Red 1']){
+                continue;
+            }
+
+            var compLevel, setNumber, matchNumber;
+            // only works for 2015 format
+            setNumber = 1;
+            matchNumber = parseInt(match['Match']);
+            if(match['Description'].indexOf("Qualification") == 0){
+                compLevel = "qm";
+            }else{
+                compLevel = playoffTypeFromNumber(matchNumber);
+                matchNumber = playoffMatchNumber(compLevel, matchNumber);
+            }
+
+            /* Ignore matches the user doesn't want */
+            if(filter != "all" && filter != compLevel){
                 continue;
             }
 
@@ -107,17 +124,6 @@ $('#schedule_file').change(function(){
             row.append($('<td>').html(match['Red 3']));
 
             $('#schedule_preview').append(row);
-
-            var compLevel, setNumber, matchNumber;
-            // only works for 2015 format
-            setNumber = 1;
-            matchNumber = parseInt(match['Match']);
-            if(match['Description'].indexOf("Qualification") == 0){
-                compLevel = "qm";
-            }else{
-                compLevel = playoffTypeFromNumber(matchNumber);
-                matchNumber = playoffMatchNumber(compLevel, matchNumber);
-            }
 
             // make json dict
             request_body.push({
