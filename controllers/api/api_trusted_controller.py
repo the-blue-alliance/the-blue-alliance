@@ -87,6 +87,7 @@ class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
         year = int(event_key[:4])
 
         matches = []
+        needs_time = []
         for match in JSONMatchesParser.parse(request.body, year):
             match = Match(
                 id=Match.renderKeyName(
@@ -106,12 +107,17 @@ class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
                 time=match.get("time", None),
             )
 
-            # if (not match.time or match.time == "") and match.time_string:
-            #     # We can calculate the real time from the time string
-            #     logging.debug("Calculating time!")
-            #     MatchHelper.add_match_times(event, [match])
-
+            if (not match.time or match.time == "") and match.time_string:
+                # We can calculate the real time from the time string
+                needs_time.append(match)
             matches.append(match)
+
+        if needs_time:
+            try:
+                logging.debug("Calculating time!")
+                MatchHelper.add_match_times(event, needs_time)
+            except Exception, e:
+                logging.error("Failed to calculate match times")
 
         MatchManipulator.createOrUpdate(matches)
 
