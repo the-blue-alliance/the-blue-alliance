@@ -6,7 +6,7 @@ function generateAllianceTable(size, table){
         row.append($('<td>').html("Alliance "+i));
         row.append($('<td>', {'class': 'captain'}).append($('<input>', {'id': "alliance"+i+"-captain", 'placeholder': "Captain "+i})));
         for(var j=1; j<=ALLIANCE_PICKS_MAX; j++){
-            row.append($('<td>', {'class':"pick-"+j}).append($('<input>', {'class':"pick-"+j, 'id': "alliance"+i+"-pick"+j, 'placeholder': "Pick "+j})));
+            row.append($('<td>', {'class':"pick-"+j}).append($('<input>', {'class':"pick-"+j, 'id': "alliance"+i+"-pick"+j, 'placeholder': "Pick "+i+"-"+j})));
         }
         table.after(row);
     }
@@ -35,10 +35,24 @@ function getCookie(name) {
     return "";
 }
 
+/* ONLY FOR 2015 */
 function playoffTypeFromNumber(matchNum){
     if(matchNum > 0 && matchNum <= 8) return "qf";
     if(matchNum > 8 && matchNum <= 14) return "sf";
     return "f";
+}
+
+function playoffTypeFromMatchString(matchString){
+    if(matchString.indexOf("Quarterfinal") == 0) return "qf";
+    if(matchString.indexOf("Semifinal") == 0) return "sf";
+    if(matchString.indexOf("Final") == 0) return "f";
+}
+
+/* ONLY FOR 2015 */
+function playoffMatchNumber(type, totalMatchNum){
+    if(type == "sf") return totalMatchNum - 8;
+    if(type == "f") return totalMatchNum - 14;
+    return totalMatchNum;
 }
 
 if($('#event_key_select').val() != "other"){
@@ -68,7 +82,8 @@ $('#load_auth').click(function(){
     if(!cookie){
         alert("No auth found");
         return false;
-    }var auth = JSON.parse();
+    }
+    var auth = JSON.parse(cookie);
     $('#auth_id').val(auth['id']);
     $('#auth_secret').val(auth['secret']);
 });
@@ -118,6 +133,9 @@ $('#show-help').click(function(){
     $('#auth-help').attr("display", "inline").show();
 });
 
+$('#teams_preview').hide();
+$('#fmsteams-ok').hide();
+
 $('#schedule_preview').hide();
 $('#schedule-ok').hide();
 
@@ -137,6 +155,7 @@ $('#fetch-matches').click(function(e) {
     success: function(matches) {
       $("#match-table").empty();
       $('#match_play_load_status').html("Loaded "+matches.length+" matches");
+      var tabIndex = 1;
       for (i in matches) {
         var match = matches[i];
         match.play_order = COMP_LEVELS_PLAY_ORDER[match.comp_level] * 1000000 + match.match_number * 1000 + match.set_number
@@ -147,20 +166,21 @@ $('#fetch-matches').click(function(e) {
         var match = matches[i];
 
         var trRed = $('<tr>');
-        trRed.append($('<td>', {rowspan: 2, text: match.key.split('_')[1]}));
+        trRed.append($('<td>', {rowspan: 2, text: match.key.split('_')[1], 'style': 'border-top-width: 4px;border-left-width:4px;border-bottom-width:4px;'}));
         for (j in match.alliances.red.teams) {
-          trRed.append($('<td>', {'class': 'red', 'data-matchKey-redTeam': match.key, 'text': match.alliances.red.teams[j].substring(3)}));
+          trRed.append($('<td>', {'class': 'red', 'data-matchKey-redTeam': match.key, 'text': match.alliances.red.teams[j].substring(3), 'style':'border-top-width:4px;'}));
         }
-        trRed.append($('<td>', {'class': 'redScore'}).append($('<input>', {'id': match.key + '-redScore', 'type': 'text', 'type': 'number', 'value': match.alliances.red.score}).css('max-width', '50px')));
-        trRed.append($('<td>', {rowspan: 2}).append($('<button>', {'class': 'update-match', 'data-matchKey': match.key, 'data-matchCompLevel': match.comp_level, 'data-matchSetNumber': match.set_number, 'data-matchNumber': match.match_number, text: 'SUBMIT'})));
+        trRed.append($('<td>', {'style':'background-color: #FF9999;border-top-width:4px;'}).append($('<input>', {'id': match.key + '-redScore', 'type': 'text', 'type': 'number', 'value': match.alliances.red.score, 'tabIndex':tabIndex}).css('max-width', '50px')));
+        trRed.append($('<td>', {rowspan: 2, 'style': 'border-top-width: 4px;border-right-width:4px;border-bottom-width:4px;width:17%'}).append($('<button>', {'class': 'update-match', 'data-matchKey': match.key, 'data-matchCompLevel': match.comp_level, 'data-matchSetNumber': match.set_number, 'data-matchNumber': match.match_number, text: 'SUBMIT - '+match.key.split('_')[1],'tabIndex':tabIndex+2})));
         $("#match-table").append(trRed);
 
         var trBlue = $('<tr>');
         for (j in match.alliances.blue.teams) {
-          trBlue.append($('<td>', {'class': 'blue', 'data-matchKey-blueTeam': match.key, 'text': match.alliances.blue.teams[j].substring(3)}));
+          trBlue.append($('<td>', {'class': 'blue', 'data-matchKey-blueTeam': match.key, 'text': match.alliances.blue.teams[j].substring(3), 'style':'border-bottom-width:4px;'}));
         }
-        trBlue.append($('<td>', {'class': 'blueScore'}).append($('<input>', {'id': match.key + '-blueScore', 'type': 'text', 'type': 'number', 'value': match.alliances.blue.score}).css('max-width', '50px')));
+        trBlue.append($('<td>', {'style':'background-color: #9999FF;border-bottom-width:4px;'}).append($('<input>', {'id': match.key + '-blueScore', 'type': 'text', 'type': 'number', 'value': match.alliances.blue.score,'tabIndex':tabIndex+1}).css('max-width', '50px')));
         $("#match-table").append(trBlue);
+        tabIndex = tabIndex+3;
       }
 
     },

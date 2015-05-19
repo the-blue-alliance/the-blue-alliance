@@ -59,7 +59,8 @@
       <div class="row">
         <div class="col-sm-12">
           <ul class="nav nav-tabs">
-            <li><a href="#teams" data-toggle="tab">Teams</a></li>
+            <li><a href="#teams" data-toggle="tab">Manual Teams</a></li>
+            <li><a href="#fms-teams" data-toggle="tab">FMS Teams</a></li>
             <li><a href="#schedule" data-toggle="tab">FMS Schedule Import</a></li>
             <li><a href="#matches" data-toggle="tab">Match Play</a></li>
             <li><a href="#results" data-toggle="tab">FMS Match Import</a></li>
@@ -71,15 +72,37 @@
 
       <div class="tab-content">
         <div class="tab-pane" id="teams">
-          <h3>Teams</h3>
+          <h3>Teams (Manual)</h3>
           <p>Add a list of teams attending an event. This will overwrite all existing team data for the event. Input one team number per line.</p>
           <button class="btn btn-info" id="teams-ok"><span class="glyphicon glyphicon-refresh"></span>  Add Teams</button><br/>
           <label for="team_list">Team List</label><textarea class="form-control" id="team_list"></textarea>
         </div>
 
+        <div class="tab-pane" id="fms-teams">
+          <h3>Teams (FMS)</h3>
+          <p>Add a list of teams attending an event via FMS Report. This will overwrite all existing team data for the event.</p>
+          <label for="teams_file">Report File</label><input type="file" id="teams_file" name="teams_file" />
+          <div id="teams_preview_status"></div>
+          <button class="btn btn-info" id="fmsteams-ok"><span class="glyphicon glyphicon-refresh"></span> Post Teams</button>
+          <table id="teams_preview" class="table table-striped"></table>
+        </div>
+
         <div class="tab-pane" id="schedule">
           <h3>Import Schedule</h3>
-            <p>Allows you to import matches via FMS report. Note that this will overwrite all data that currently exists for these matches</p>
+            <p>Allows you to import matches via FMS report. Note that this <strong>will overwrite all data</strong> that currently exists for these matches. If you are running a Playoff Tournament and need to import only a certain level of matches (e.g. only import Semifinals so Quarterfinals don't get overwritten), select the level below prior to selecting a file.</p>
+            <label for="import-comp-level">Comp Level to Import</label>
+            <div class="radio">
+              <label><input type="radio" name="import-comp-level" id="import-comp-level-all" value="all" checked>All</label>
+            </div>
+            <div class="radio">
+              <label><input type="radio" name="import-comp-level" id="import-comp-level-qf" value="qf">Quarterfinals</label>
+            </div>
+            <div class="radio">
+              <label><input type="radio" name="import-comp-level" id="import-comp-level-sf" value="sf">Semifinals</label>
+            </div>
+            <div class="radio">
+              <label><input type="radio" name="import-comp-level" id="import-comp-level-f" value="f">Finals</label>
+            </div>
             <label for="schedule_file">Report File</label><input type="file" id="schedule_file" name="schedule_file" />
 
             <div id="schedule_preview_status">

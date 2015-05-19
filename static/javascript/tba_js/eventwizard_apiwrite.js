@@ -83,16 +83,32 @@ $('#schedule_file').change(function(){
         //parse the excel to array of matches
         //headers start on 5th row
         var matches = XLSX.utils.sheet_to_json(sheet, {range:4});
-
         var request_body = [];
 
         $('#schedule_preview').empty();
         $('#schedule_preview').html("<tr><th>Time</th><th>Description</th><th>Match</th><th>Blue 1</th><th>Blue 2</th><th>Blue 3</th><th>Red 1</th><th>Red 2</th><th>Red 3</th></tr>");
+        var filter = $('input[name="import-comp-level"]:checked').val();
         for(var i=0; i<matches.length; i++){
             var match = matches[i];
 
             // check for invalid match
-            if(!match['Match']){
+            if(!match['Match'] || !match['Red 1']){
+                continue;
+            }
+
+            var compLevel, setNumber, matchNumber;
+            // only works for 2015 format
+            setNumber = 1;
+            matchNumber = parseInt(match['Match']);
+            if(match['Description'].indexOf("Qualification") == 0){
+                compLevel = "qm";
+            }else{
+                compLevel = playoffTypeFromNumber(matchNumber);
+                matchNumber = playoffMatchNumber(compLevel, matchNumber);
+            }
+
+            /* Ignore matches the user doesn't want */
+            if(filter != "all" && filter != compLevel){
                 continue;
             }
 
@@ -108,16 +124,6 @@ $('#schedule_file').change(function(){
             row.append($('<td>').html(match['Red 3']));
 
             $('#schedule_preview').append(row);
-
-            var compLevel, setNumber, matchNumber;
-            // only works for 2015 format
-            matchNumber = parseInt(match['Match']);
-            setNumber = 1;
-            if(match['Description'].indexOf("Qualification") == 0){
-                compLevel = "qm";
-            }else{
-                compLevel = playoffTypeFromNumber(matchNumber);
-            }
 
             // make json dict
             request_body.push({
@@ -148,7 +154,7 @@ $('#schedule_file').change(function(){
 
         $('#schedule_preview').show();
         $('#schedule-ok').show();
-        $('#schedule-ok').click(function(){
+        $('#schedule-ok').unbind('click').click(function(){
             $(this).css('background-color', '#eb9316');
             makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/matches/update', JSON.stringify(request_body), $(this));
         });
@@ -206,7 +212,7 @@ $('#results_file').change(function(){
             if(match['Match'].indexOf("Qualification") == 0){
                 compLevel = "qm";
             }else{
-                compLevel = playoffTypeFromNumber(matchNumber);
+                compLevel = playoffTypeFromMatchString(match['Match']);
             }
 
             // make json dict
@@ -237,8 +243,9 @@ $('#results_file').change(function(){
 
         $('#results_preview').show();
         $('#results-ok').show();
-        $('#results-ok').click(function(){
+        $('#results-ok').unbind('click').click(function(){
             $(this).css('background-color', '#eb9316');
+            alert(JSON.stringify(request_body));
             makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/matches/update', JSON.stringify(request_body), $(this));
         });
 
@@ -308,9 +315,73 @@ $('#rankings_file').change(function(){
 
         $('#rankings_preview').show();
         $('#rankings-ok').show();
-        $('#rankings-ok').click(function(){
+        $('#rankings-ok').unbind('click').click(function(){
             $(this).css('background-color', '#eb9316');
             makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/rankings/update', JSON.stringify(request_body), $(this));
+        });
+
+    };
+
+    $('#schedule_preview_status').html("Loading...");
+    reader.readAsBinaryString(f);
+});
+
+$('#teams_file').change(function(){
+    var f = this.files[0];
+    var reader = new FileReader();
+    var name = f.name;
+    reader.onload = function(e) {
+        var data = e.target.result;
+        var workbook = XLSX.read(data, {type: 'binary'});
+        var first_sheet = workbook.SheetNames[0];
+        var sheet = workbook.Sheets[first_sheet];
+
+        //parse the excel to array of matches
+        //headers start on 2nd row
+        var teams = XLSX.utils.sheet_to_json(sheet, {range:2});
+
+        var request_body = {};
+
+        $('#teams_preview').empty();
+        $('#teams_preview').html("<tr><th>Team Number</th><th>Team Name</th></tr>");
+
+        var request_body = []
+        for(var i=0; i<teams.length; i++){
+            var team = teams[i];
+
+            // check for invalid row
+            if(!team['#']){
+                continue;
+            }
+
+            var teamNum = parseInt(team['#']);
+            if(!teamNum || isNaN(teamNum) || teamNum <= 0 || teamNum > 9999){
+                alert("Invalid team "+teams[i]);
+                return true;
+            }
+            request_body[i] = "frc"+teamNum;
+
+            var row = $('<tr>');
+            row.append($('<td>').html(teamNum));
+            row.append($('<td>').html(team['Short Name']));
+
+            $('#teams_preview').append(row);
+
+        }
+
+        if(request_body.length > 0){
+            $('#teams_preview_status').html("Loaded "+request_body.length+" teams");
+        }else{
+            $('#teams_preview_status').html("No teams found in the file.");
+            return;
+        }
+
+
+        $('#teams_preview').show();
+        $('#fmsteams-ok').show();
+        $('#fmsteams-ok').unbind('click').click(function(){
+            $(this).css('background-color', '#eb9316');
+            makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/team_list/update', JSON.stringify(request_body), $(this));
         });
 
     };
