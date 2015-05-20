@@ -38,8 +38,8 @@ class FMSAPITeamDetailsParser(object):
         )
 
         districtTeam = None
-        districtAbbrev = DistrictType.abbrevs[teamData['districtCode'].lower()]
         if teamData['districtCode']:
+            districtAbbrev = DistrictType.abbrevs[teamData['districtCode'].lower()]
             districtTeam = DistrictTeam(
                 id=DistrictTeam.renderKeyName(self.year, districtAbbrev, team.key_name),
                 team=ndb.Key(Team, team.key_name),
