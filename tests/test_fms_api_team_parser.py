@@ -49,7 +49,7 @@ class TestFMSAPITeamParser(unittest2.TestCase):
 
     def test_parseTeamWithNoDistrict(self):
         with open('test_data/fms_api/2015_frc254.json', 'r') as f:
-            team, districtTeam, robot = FMSAPITeamDetailsParser(2015, "frc1124").parse(json.loads(f.read()))
+            team, districtTeam, robot = FMSAPITeamDetailsParser(2015, "frc254").parse(json.loads(f.read()))
 
             # Ensure we get the proper Team model back
             self.assertEqual(team.key_name, "frc254")
