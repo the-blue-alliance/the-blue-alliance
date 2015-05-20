@@ -15,6 +15,7 @@ class ApiAuthAccess(ndb.Model):
     secret = ndb.StringProperty(indexed=False)
     event_list = ndb.KeyProperty(kind=Event, repeated=True)  # events for which auth is granted
     auth_types_enum = ndb.IntegerProperty(repeated=True)
+    live_event_only = ndb.BooleanProperty()
 
     @property
     def can_edit_event_teams(self):

@@ -37,7 +37,7 @@ class ApiTrustedEventAllianceSelectionsUpdate(ApiTrustedBaseController):
     def _process_request(self, request, event_key):
         alliance_selections = JSONAllianceSelectionsParser.parse(request.body)
 
-        event = Event.get_by_id(event_key)
+        event = self.event
         event.alliance_selections_json = json.dumps(alliance_selections)
         event.dirty = True  # TODO: hacky
         EventManipulator.createOrUpdate(event)
@@ -52,7 +52,7 @@ class ApiTrustedEventAwardsUpdate(ApiTrustedBaseController):
     REQUIRED_AUTH_TYPES = {AuthType.EVENT_AWARDS}
 
     def _process_request(self, request, event_key):
-        event = Event.get_by_id(event_key)
+        event = self.event
 
         awards = []
         for award in JSONAwardsParser.parse(request.body, event_key):
@@ -83,7 +83,7 @@ class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
     REQUIRED_AUTH_TYPES = {AuthType.EVENT_MATCHES}
 
     def _process_request(self, request, event_key):
-        event = Event.get_by_id(event_key)
+        event = self.event
         year = int(event_key[:4])
 
         matches = []
@@ -155,7 +155,7 @@ class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
     def _process_request(self, request, event_key):
         rankings = JSONRankingsParser.parse(request.body)
 
-        event = Event.get_by_id(event_key)
+        event = self.event
         event.rankings_json = json.dumps(rankings)
         event.dirty = True  # TODO: hacky
         EventManipulator.createOrUpdate(event)
@@ -172,7 +172,7 @@ class ApiTrustedEventTeamListUpdate(ApiTrustedBaseController):
 
     def _process_request(self, request, event_key):
         team_keys = JSONTeamListParser.parse(request.body)
-        event = Event.get_by_id(event_key)
+        event = self.event
 
         event_teams = []
         for team_key in team_keys:

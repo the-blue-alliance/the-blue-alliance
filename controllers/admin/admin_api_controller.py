@@ -98,6 +98,7 @@ class AdminApiAuthEdit(LoggedInHandler):
         if not auth:
             auth = ApiAuthAccess(
                 id=auth_id,
+                live_event_only=(self.request.get('live_event_only', 'on')=='on'),
                 description=self.request.get('description'),
                 secret=''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for _ in range(64)),
                 event_list=[ndb.Key(Event, event_key.strip()) for event_key in self.request.get('event_list_str').split(',')],
@@ -105,7 +106,7 @@ class AdminApiAuthEdit(LoggedInHandler):
             )
         else:
             auth.description = self.request.get('description')
-            auth.event_list = event_list=[ndb.Key(Event, event_key.strip()) for event_key in self.request.get('event_list_str').split(',')]
+            auth.event_list = [ndb.Key(Event, event_key.strip()) for event_key in self.request.get('event_list_str').split(',')]
             auth.auth_types_enum = auth_types_enum
 
         auth.put()
