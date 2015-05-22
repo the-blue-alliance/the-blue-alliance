@@ -82,6 +82,8 @@ class Event(ndb.Model):
         Load a list of team keys playing in elims
         """
         alliances = self.alliance_selections
+        if alliances is None:
+            return []
         teams = []
         for alliance in alliances:
             for pick in alliance['picks']:
@@ -279,7 +281,7 @@ class Event(ndb.Model):
             return self.custom_hashtag
         else:
             return "frc" + self.event_short
-    
+
     # Depreciated, still here to keep GAE clean.
     webcast_url = ndb.StringProperty(indexed=False)
 
