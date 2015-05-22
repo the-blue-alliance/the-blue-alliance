@@ -19,7 +19,8 @@ class EventTeamUpdater(object):
         a) played a match at the event,
         b) the team received an award at the event,
         c) the event has not yet occurred,
-        d) or the event is not from the current year. (This is to make sure we don't delete old data we may no longer be able to scrape)
+        d) the team is on an alliance
+        e) or the event is not from the current year. (This is to make sure we don't delete old data we may no longer be able to scrape)
         """
         event = Event.get_by_id(event_key)
         cur_year = datetime.datetime.now().year
@@ -41,6 +42,10 @@ class EventTeamUpdater(object):
             award = award_future.get_result()
             for team_key in award.team_list:
                 team_ids.add(team_key.id())
+
+        # Add teams from Alliances
+        for team in event.alliance_teams:
+            team_ids.add(team)
 
         # Create or update EventTeams
         teams = [Team(id=team_id,
