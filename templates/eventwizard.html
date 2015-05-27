@@ -116,6 +116,10 @@
 
         <div class="tab-pane" id="matches">
           <h3>Match Play</h3>
+          <div>
+            <label for="enable_fms_rankings">Enable Rankings import from FMS (must be on field network)</label>
+            <input type="checkbox" id="enable_fms_rankings"/>
+          </div>
           <button class="btn btn-success" id="fetch-matches"><span class="glyphicon glyphicon-refresh"></span> Fetch Matches</button>
           <div id="match_play_load_status"></div>
           <table id="match-table" class="match-table">

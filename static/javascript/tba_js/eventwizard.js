@@ -133,6 +133,16 @@ $('#show-help').click(function(){
     $('#auth-help').attr("display", "inline").show();
 });
 
+$('#enable_fms_rankings').change(function(){
+    update_fmsrankings_enabled();
+});
+
+function update_fmsrankings_enabled(){
+    $('.update-rankings').each(function(){
+        $(this).prop('disabled', !$('#enable_fms_rankings').is(':checked'));
+    });
+}
+
 $('#teams_preview').hide();
 $('#fmsteams-ok').hide();
 
@@ -172,6 +182,7 @@ $('#fetch-matches').click(function(e) {
         }
         trRed.append($('<td>', {'style':'background-color: #FF9999;border-top-width:4px;'}).append($('<input>', {'id': match.key + '-redScore', 'type': 'text', 'type': 'number', 'value': match.alliances.red.score, 'tabIndex':tabIndex}).css('max-width', '50px')));
         trRed.append($('<td>', {rowspan: 2, 'style': 'border-top-width: 4px;border-right-width:4px;border-bottom-width:4px;width:17%'}).append($('<button>', {'class': 'update-match', 'data-matchKey': match.key, 'data-matchCompLevel': match.comp_level, 'data-matchSetNumber': match.set_number, 'data-matchNumber': match.match_number, text: 'SUBMIT - '+match.key.split('_')[1],'tabIndex':tabIndex+2})));
+        trRed.append($('<td>', {rowspan: 2, 'style': 'border-top-width: 4px;border-right-width:4px;border-bottom-width:4px;width:17%'}).append($('<button>', {'class': 'update-rankings', text: 'Update Rankings','tabIndex':tabIndex+3})));
         $("#match-table").append(trRed);
 
         var trBlue = $('<tr>');
@@ -180,8 +191,10 @@ $('#fetch-matches').click(function(e) {
         }
         trBlue.append($('<td>', {'style':'background-color: #9999FF;border-bottom-width:4px;'}).append($('<input>', {'id': match.key + '-blueScore', 'type': 'text', 'type': 'number', 'value': match.alliances.blue.score,'tabIndex':tabIndex+1}).css('max-width', '50px')));
         $("#match-table").append(trBlue);
-        tabIndex = tabIndex+3;
+        tabIndex = tabIndex+4;
       }
+
+        update_fmsrankings_enabled();
 
     },
     error: function(data) {

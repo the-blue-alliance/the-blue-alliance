@@ -326,6 +326,29 @@ $('#rankings_file').change(function(){
     reader.readAsBinaryString(f);
 });
 
+$('.update-rankings').click(function(){
+    $(this).css('background-color', '#eb9316');
+    $.ajax({
+            url: '10.0.100.5/pit/getdata?random=' + Math.random(),
+            cache: false,
+            timeout: 5000, success: function (data) {
+                rankings = ['Rank', 'Team', 'Avg', 'CP', 'AP', 'RC', 'TP', 'LP', 'Played'];
+                rankData = JSON.parse(data);
+                for(var i=0; i<rankData.length; i++){
+                    // Turn team number -> team key
+                    rankData[i]['Team'] = "frc"+rankData[i]['Team'];
+                    rankings.push(rankData[i]);
+                }
+                makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/rankings/update', JSON.stringify(rankings), $(this));
+            },
+            error: function (error) {
+                // We had an error getting the results so set the top of the screen red
+                alert("Error getting rankings. Are you sure you're connected to the field network?");
+               $(this).parent().css({ 'background-color': 'red' });
+            }
+    });
+});
+
 $('#teams_file').change(function(){
     var f = this.files[0];
     var reader = new FileReader();
