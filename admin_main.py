@@ -14,6 +14,7 @@ from controllers.admin.admin_media_controller import AdminMediaDashboard, AdminM
 
 from controllers.admin.admin_memcache_controller import AdminMemcacheMain
 from controllers.admin.admin_offseason_scraper_controller import AdminOffseasonScraperController
+from controllers.admin.admin_offseason_spreadsheet_controller import AdminOffseasonSpreadsheetController
 from controllers.admin.admin_sitevar_controller import AdminSitevarCreate, AdminSitevarEdit, AdminSitevarList
 from controllers.admin.suggestions.admin_event_webcast_suggestions_review_controller import AdminEventWebcastSuggestionsReviewController
 from controllers.admin.suggestions.admin_match_video_suggestions_review_controller import AdminMatchVideoSuggestionsReviewController
@@ -54,6 +55,7 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/migration', AdminMigration),
                                ('/admin/migration/add_match_year', AdminMigrationAddMatchYear),
                                ('/admin/offseasons', AdminOffseasonScraperController),
+                               ('/admin/offseasons/spreadsheet', AdminOffseasonSpreadsheetController),
                                ('/admin/sitevars', AdminSitevarList),
                                ('/admin/sitevar/create', AdminSitevarCreate),
                                ('/admin/sitevar/edit/(.*)', AdminSitevarEdit),
