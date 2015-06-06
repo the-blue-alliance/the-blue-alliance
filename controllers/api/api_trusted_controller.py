@@ -176,10 +176,11 @@ class ApiTrustedEventTeamListUpdate(ApiTrustedBaseController):
 
         event_teams = []
         for team_key in team_keys:
-            event_teams.append(EventTeam(id=event.key.id() + '_{}'.format(team_key),
-                                         event=event.key,
-                                         team=ndb.Key(Team, team_key),
-                                         year=event.year))
+            if Team.get_by_id(team_key):  # Don't create EventTeams for teams that don't exist
+                event_teams.append(EventTeam(id=event.key.id() + '_{}'.format(team_key),
+                                             event=event.key,
+                                             team=ndb.Key(Team, team_key),
+                                             year=event.year))
 
         # delete old eventteams
         old_eventteam_keys = EventTeam.query(EventTeam.event == event.key).fetch(None, keys_only=True)
