@@ -426,4 +426,12 @@ $('#match-table').on('click', 'button', function(e) {
     };
     var request_body = JSON.stringify([match]);
     makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/matches/update', request_body, $(this).parent());
+
+    var video_request = {};
+    var video_key = $("#"+matchKey+"_video").val();
+    if (!video_key) {
+        return;
+    }
+    video_request[matchKey.split('_')[1]] = video_key;
+    makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/match_videos/add', JSON.stringify(video_request), $("#"+matchKey+"_video").parent());
 });

@@ -218,3 +218,5 @@ class ApiTrustedAddMatchYoutubeVideo(ApiTrustedBaseController):
                 match.dirty = True  # This is hacky -fangeugene 2014-10-26
                 matches_to_put.append(match)
         MatchManipulator.createOrUpdate(matches_to_put)
+
+        self.response.out.write(json.dumps({'Success': "Match videos successfully updated"}))
