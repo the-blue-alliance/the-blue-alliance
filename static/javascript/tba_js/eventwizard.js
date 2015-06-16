@@ -171,7 +171,7 @@ $('#fetch-matches').click(function(e) {
           trRed.append($('<td>', {'class': 'red', 'data-matchKey-redTeam': match.key, 'text': match.alliances.red.teams[j].substring(3), 'style':'border-top-width:4px;'}));
         }
         trRed.append($('<td>', {'style':'background-color: #FF9999;border-top-width:4px;'}).append($('<input>', {'id': match.key + '-redScore', 'type': 'text', 'type': 'number', 'value': match.alliances.red.score, 'tabIndex':tabIndex}).css('max-width', '50px')));
-        trRed.append($('<td>', {rowspan: 2, 'style': 'border-top-width: 4px;border-right-width:4px;border-bottom-width:4px;width:17%'}).append($('<input>', {'id': match.key+"_video", 'placeholder': 'YouTube ID'})));
+        trRed.append($('<td>', {rowspan: 2, 'style': 'border-top-width: 4px;border-right-width:4px;border-bottom-width:4px;width:17%'}).append($('<input>', {'id': match.key+"_video", 'placeholder': 'YouTube URL'})));
         trRed.append($('<td>', {rowspan: 2, 'style': 'border-top-width: 4px;border-right-width:4px;border-bottom-width:4px;width:17%'}).append($('<button>', {'class': 'update-match', 'data-matchKey': match.key, 'data-matchCompLevel': match.comp_level, 'data-matchSetNumber': match.set_number, 'data-matchNumber': match.match_number, text: 'SUBMIT - '+match.key.split('_')[1],'tabIndex':tabIndex+2})));
         $("#match-table").append(trRed);
 

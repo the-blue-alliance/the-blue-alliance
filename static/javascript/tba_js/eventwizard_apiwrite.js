@@ -25,6 +25,17 @@ function makeRequest(request_path, request_body, feedback) {
   });
 }
 
+function getYoutubeId(url) {
+    // regex from http://stackoverflow.com/a/9102270
+    var regex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    var match = url.match(regex);
+    if (match && match[2].length == 11) {
+        return match[2];
+    } else {
+        return null;
+    }
+}
+
 $('#teams-ok').click(function(){
     if(!$("#team_list").val()){
         alert("Please enter team data.");
@@ -428,10 +439,12 @@ $('#match-table').on('click', 'button', function(e) {
     makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/matches/update', request_body, $(this).parent());
 
     var video_request = {};
-    var video_key = $("#"+matchKey+"_video").val();
+    var yt_url = $("#"+matchKey+"_video").val();
+    var video_key = getYoutubeId(yt_url);
     if (!video_key) {
         return;
     }
     video_request[matchKey.split('_')[1]] = video_key;
+    alert(JSON.stringify(video_request));
     makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/match_videos/add', JSON.stringify(video_request), $("#"+matchKey+"_video").parent());
 });
