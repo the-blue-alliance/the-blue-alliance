@@ -20,6 +20,7 @@ from models.award import Award
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
+from models.team import Team
 
 
 class TestApiTrustedController(unittest2.TestCase):
@@ -335,6 +336,12 @@ class TestApiTrustedController(unittest2.TestCase):
         team_list = ['frc254', 'frc971', 'frc604']
         request_body = json.dumps(team_list)
 
+        # Insert teams into db, otherwise they won't get added (see 072058b)
+        Team(id='frc254', team_number=254).put()
+        Team(id='frc971', team_number=971).put()
+        Team(id='frc604', team_number=604).put()
+        Team(id='frc100', team_number=100).put()
+
         request_path = '/api/trusted/v1/event/2014casj/team_list/update'
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
         response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_0', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
@@ -359,6 +366,42 @@ class TestApiTrustedController(unittest2.TestCase):
         self.assertEqual(len(db_eventteams), 2)
         self.assertTrue('2014casj_frc254' in [et.key.id() for et in db_eventteams])
         self.assertTrue('2014casj_frc100' in [et.key.id() for et in db_eventteams])
+
+    def test_eventteams_unknown(self):
+        self.teams_auth.put()
+
+        team_list = ['frc254', 'frc971', 'frc604']
+        request_body = json.dumps(team_list)
+
+        # Insert teams into db, otherwise they won't get added (see 072058b)
+        Team(id='frc254', team_number=254).put()
+        Team(id='frc971', team_number=971).put()
+
+        request_path = '/api/trusted/v1/event/2014casj/team_list/update'
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_0', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+
+        self.assertEqual(response.status_code, 200)
+
+        db_eventteams = EventTeam.query(EventTeam.event == self.event.key).fetch(None)
+        self.assertEqual(len(db_eventteams), 2)
+        self.assertTrue('2014casj_frc254' in [et.key.id() for et in db_eventteams])
+        self.assertTrue('2014casj_frc971' in [et.key.id() for et in db_eventteams])
+        self.assertTrue('2014casj_frc604' not in [et.key.id() for et in db_eventteams])
+
+        team_list = ['frc254', 'frc100']
+        request_body = json.dumps(team_list)
+
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_0', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+
+        self.assertEqual(response.status_code, 200)
+
+        db_eventteams = EventTeam.query(EventTeam.event == self.event.key).fetch(None)
+        self.assertEqual(len(db_eventteams), 1)
+        self.assertTrue('2014casj_frc254' in [et.key.id() for et in db_eventteams])
+        self.assertTrue('2014casj_frc100' not in [et.key.id() for et in db_eventteams])
+
 
     def test_match_videos_add(self):
         self.video_auth.put()
