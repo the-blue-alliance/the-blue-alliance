@@ -197,8 +197,8 @@ $('#results_file').change(function(){
         for(var i=0; i<matches.length; i++){
             var match = matches[i];
 
-            // check for invalid match
-            if(!match['Time']){
+            // check for invalid/unplayed match
+            if(!match['Time'] || !match['Red Score'] || !match['Blue Score']){
                 continue;
             }
 
