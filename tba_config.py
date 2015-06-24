@@ -2,7 +2,7 @@ import os
 
 DEBUG = os.environ.get('SERVER_SOFTWARE', '').startswith('Dev')
 
-MAX_YEAR = 2015
+MAX_YEAR = 2016
 
 # For choosing what the main landing page displays
 KICKOFF = 1
