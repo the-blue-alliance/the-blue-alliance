@@ -15,7 +15,7 @@ from google.appengine.ext import testbed
 from models.event import Event
 
 
-class TestFMSAPIParser(unittest2.TestCase):
+class TestFMSAPIEventParser(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
