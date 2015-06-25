@@ -755,6 +755,8 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
             'key_name': key_name,
             'team': team,
             'success': success,
+            'district': fmsDistrictTeam,
+            'robot': fmsRobot,
         }
 
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_team_details_get.html')
