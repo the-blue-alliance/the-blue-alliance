@@ -31,7 +31,7 @@ class TeamRenderer(object):
 
         media_futures = ndb.get_multi_async(media_key_futures.get_result())
         robot_future = Robot.get_by_id_async('{}_{}'.format(team.key.id(), year))
-        district_team_keys_future = DistrictTeam.query(DistrictTeam.team == team.key).fetch_async(keys_only=True)
+        district_team_keys_future = DistrictTeam.query(DistrictTeam.team == team.key, DistrictTeam.year == year).fetch_async(keys_only=True)
 
         participation = []
         year_wlt_list = []
