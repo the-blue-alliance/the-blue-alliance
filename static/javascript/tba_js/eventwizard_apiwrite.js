@@ -460,7 +460,7 @@ function updateRankings(cell) {
                 teamRank['dqs'] = 0;
                 teamRank['breakdown'] = [];
                 for(var j=0; j<breakdowns.length; j++){
-                    teamRank['breakdown'].push(rankData[i][breakdowns[j]);
+                    teamRank['breakdown'].push(rankData[i][breakdowns[j]]);
                 }
                 request_body['rankings'].push(teamRank);
             }
