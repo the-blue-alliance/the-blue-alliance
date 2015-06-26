@@ -19,6 +19,7 @@ class DatafeedOffseasonSpreadsheet(GoogleSheetsDatafeedBase):
             event_type_enum=event.get("event_type_enum", None),
             event_short="???",
             name=event.get("name", None),
+            short_name=event.get("name", None)
             year=datetime.datetime.now().year,
             start_date=event.get("start_date", None),
             end_date=event.get("end_date", None),
