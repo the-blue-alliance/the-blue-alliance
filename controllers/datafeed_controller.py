@@ -730,6 +730,8 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
         # Use current year, fallback to usfirst datafeeds for legacy teams
         year = date.today().year
         fmsTeamDetails = fms_df.getTeamDetails(year, key_name)
+        fmsDistrictTeam = None
+        fmsRobot = None
         if fmsTeamDetails:
             fmsTeam = fmsTeamDetails[0]
             fmsDistrictTeam = fmsTeamDetails[1]
