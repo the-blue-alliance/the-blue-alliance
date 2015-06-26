@@ -27,7 +27,7 @@ class FMSAPITeamDetailsParser(object):
         teamData = teams[0]
 
         # concat city/state/country to get address
-        address = "{}, {}, {}".format(teamData['city'], teamData['stateProv'], teamData['country'])
+        address = u"{}, {}, {}".format(teamData['city'], teamData['stateProv'], teamData['country'])
 
         team = Team(
             team_number=teamData['teamNumber'],
