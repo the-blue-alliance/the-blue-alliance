@@ -21,6 +21,7 @@ class DistrictType(object):
         INDIANA: 'Indiana',
     }
 
+    # make sure abbreviations stay all lower case
     type_abbrevs = {
         NO_DISTRICT: None,
         MICHIGAN: 'fim',
@@ -39,6 +40,7 @@ class DistrictType(object):
         'IndianaFIRST': INDIANA,
     }
 
+    # make sure abbreviations stay all lower case
     abbrevs = {
         'fim': MICHIGAN,
         'mar': MID_ATLANTIC,

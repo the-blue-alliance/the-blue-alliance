@@ -4,6 +4,8 @@ import os
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
+from consts.district_type import DistrictType
+
 from helpers.data_fetchers.team_details_data_fetcher import TeamDetailsDataFetcher
 
 from helpers.award_helper import AwardHelper
@@ -12,9 +14,11 @@ from helpers.match_helper import MatchHelper
 from helpers.media_helper import MediaHelper
 
 from models.award import Award
+from models.district_team import DistrictTeam
 from models.event_team import EventTeam
 from models.match import Match
 from models.media import Media
+from models.robot import Robot
 
 
 class TeamRenderer(object):
@@ -26,6 +30,8 @@ class TeamRenderer(object):
             return None
 
         media_futures = ndb.get_multi_async(media_key_futures.get_result())
+        robot_future = Robot.get_by_id_async('{}_{}'.format(team.key.id(), year))
+        district_team_keys_future = DistrictTeam.query(DistrictTeam.team == team.key, DistrictTeam.year == year).fetch_async(keys_only=True)
 
         participation = []
         year_wlt_list = []
@@ -99,6 +105,15 @@ class TeamRenderer(object):
 
         medias_by_slugname = MediaHelper.group_by_slugname([media_future.get_result() for media_future in media_futures])
 
+        district_name = None
+        district_abbrev = None
+        district_team_keys = district_team_keys_future.get_result()
+        if len(district_team_keys) != 0:
+            district_team_key = district_team_keys[0]
+            district_abbrev = district_team_key.id().split('_')[0][4:]
+            district_type = DistrictType.abbrevs[district_abbrev]
+            district_name = DistrictType.type_names[district_type]
+
         handler.template_values.update({
             "is_canonical": is_canonical,
             "team": team,
@@ -110,7 +125,10 @@ class TeamRenderer(object):
             "year_elim_avg": year_elim_avg,
             "current_event": current_event,
             "matches_upcoming": matches_upcoming,
-            "medias_by_slugname": medias_by_slugname
+            "medias_by_slugname": medias_by_slugname,
+            "robot": robot_future.get_result(),
+            "district_name": district_name,
+            "district_abbrev": district_abbrev,
         })
 
         if short_cache:

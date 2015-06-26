@@ -14,6 +14,7 @@ from parsers.fms_api.fms_api_awards_parser import FMSAPIAwardsParser
 from parsers.fms_api.fms_api_event_alliances_parser import FMSAPIEventAlliancesParser
 from parsers.fms_api.fms_api_event_rankings_parser import FMSAPIEventRankingsParser
 from parsers.fms_api.fms_api_hybrid_schedule_parser import FMSAPIHybridScheduleParser
+from parsers.fms_api.fms_api_team_details_parser import FMSAPITeamDetailsParser
 
 
 class DatafeedFMSAPI(object):
@@ -24,6 +25,7 @@ class DatafeedFMSAPI(object):
     FMS_API_HYBRID_SCHEDULE_PLAYOFF_URL_PATTERN = FMS_API_URL_BASE + '/schedule/%s/%s/playoff/hybrid'  # (year, event_short)
     FMS_API_EVENT_RANKINGS_URL_PATTERN = FMS_API_URL_BASE + '/rankings/%s/%s'  # (year, event_short)
     FMS_API_EVENT_ALLIANCES_URL_PATTERN = FMS_API_URL_BASE + '/alliances/%s/%s'  # (year, event_short)
+    FMS_API_TEAM_DETAILS_URL_PATTERN = FMS_API_URL_BASE + '/teams/%s/?teamNumber=%s'  # (year, teamNumber)
 
     EVENT_SHORT_EXCEPTIONS = {
         'arc': 'archimedes',
@@ -118,3 +120,9 @@ class DatafeedFMSAPI(object):
 
         rankings = self._parse(self.FMS_API_EVENT_RANKINGS_URL_PATTERN % (year, self._get_event_short(event_short)), FMSAPIEventRankingsParser())
         return rankings
+
+    def getTeamDetails(self, year, team_key):
+        team_number = team_key[3:]  # everything after 'frc'
+
+        team = self._parse(self.FMS_API_TEAM_DETAILS_URL_PATTERN % (year, team_number), FMSAPITeamDetailsParser(year, team_key))
+        return team
