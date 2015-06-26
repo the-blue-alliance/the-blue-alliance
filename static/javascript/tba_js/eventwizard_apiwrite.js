@@ -326,29 +326,6 @@ $('#rankings_file').change(function(){
     reader.readAsBinaryString(f);
 });
 
-$('.update-rankings').click(function(){
-    $(this).css('background-color', '#eb9316');
-    $.ajax({
-            url: '10.0.100.5/pit/getdata?random=' + Math.random(),
-            cache: false,
-            timeout: 5000, success: function (data) {
-                rankings = ['Rank', 'Team', 'Avg', 'CP', 'AP', 'RC', 'TP', 'LP', 'Played'];
-                rankData = JSON.parse(data);
-                for(var i=0; i<rankData.length; i++){
-                    // Turn team number -> team key
-                    rankData[i]['Team'] = "frc"+rankData[i]['Team'];
-                    rankings.push(rankData[i]);
-                }
-                makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/rankings/update', JSON.stringify(rankings), $(this));
-            },
-            error: function (error) {
-                // We had an error getting the results so set the top of the screen red
-                alert("Error getting rankings. Are you sure you're connected to the field network?");
-               $(this).parent().css({ 'background-color': 'red' });
-            }
-    });
-});
-
 $('#teams_file').change(function(){
     var f = this.files[0];
     var reader = new FileReader();
@@ -414,11 +391,19 @@ $('#teams_file').change(function(){
 });
 
 $('#match-table').on('click', 'button', function(e) {
+    if($(this).attr('class') == "update-rankings") {
+        updateRankings($(this));
+    }else if($(this).attr('class') == "update-match") {
+        updateMatchScore($(this), e);
+    }
+});
+
+function updateMatchScore(cell, e) {
     e.preventDefault();
 
-    $(this).parent().css('background-color', '#eb9316');
+    cell.parent().css('background-color', '#eb9316');
 
-    var matchKey = $(this).attr('data-matchKey');
+    var matchKey = cell.attr('data-matchKey');
     var redEls = $("[data-matchKey-redTeam='" + matchKey + "']");
     var blueEls = $("[data-matchKey-blueTeam='" + matchKey + "']");
     var redTeams = [];
@@ -433,9 +418,9 @@ $('#match-table').on('click', 'button', function(e) {
     var blueScore = parseInt($('#' + matchKey + '-blueScore')[0].value);
 
     var match = {
-        'comp_level': $(this).attr('data-matchCompLevel'),
-        'set_number': parseInt($(this).attr('data-matchSetNumber')),
-        'match_number': parseInt($(this).attr('data-matchNumber')),
+        'comp_level': cell.attr('data-matchCompLevel'),
+        'set_number': parseInt(cell.attr('data-matchSetNumber')),
+        'match_number': parseInt(cell.attr('data-matchNumber')),
         'alliances': {
           'red': {
             'teams': redTeams,
@@ -448,5 +433,45 @@ $('#match-table').on('click', 'button', function(e) {
         },
     };
     var request_body = JSON.stringify([match]);
-    makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/matches/update', request_body, $(this).parent());
-});
+    makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/matches/update', request_body, cell.parent());
+
+}
+
+function updateRankings(cell) {
+    cell.parent().css('background-color', '#eb9316');
+    $.ajax({
+        type: 'GET',
+        url: '10.0.100.5/pit/getdata?random=' + Math.random(),
+        cache: false,
+        timeout: 5000, success: function (data) {
+            var request_body = {};
+            var rankings = ['Rank', 'Team', 'Avg', 'CP', 'AP', 'RC', 'TP', 'LP', 'Played'];
+            var breakdowns = rankings.slice(0, 2);
+            var rankData = JSON.parse(data)['Ranks'];
+            request_body['breakdowns'] = breakdowns;
+            request_body['rankings'] = [];
+            for(var i=0; i<rankData.length; i++){
+                // Turn team number -> team key
+                rankData[i]['Team'] = "frc"+rankData[i]['Team'];
+                var teamRank = {};
+                teamRank['team_key'] = rankData[i]['Team'];
+                teamRank['rank'] = rankData[i]['Rank']
+                teamRank['played'] = rankData[i]['Played'];
+                teamRank['dqs'] = 0;
+                teamRank['breakdown'] = [];
+                for(var j=0; j<breakdowns.length; j++){
+                    teamRank['breakdown'].push(rankData[i][breakdowns[j]);
+                }
+                request_body['rankings'].push(teamRank);
+            }
+            makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/rankings/update', JSON.stringify(request_body), cell);
+        },
+        error: function (error) {
+            // We had an error getting the results so set the top of the screen red
+            alert("Error getting rankings. Are you sure you're connected to the field network?");
+            cell.parent().css({ 'background-color': '#c12e2a' });
+        }
+    });
+}
+
+
