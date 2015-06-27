@@ -712,53 +712,43 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
     model accordingly.
     """
     def get(self, key_name):
-        df = DatafeedUsfirst()
+        # Combines data from three datafeeds with priorities:
+        # 1) DatafeedFMSAPI (missing website)
+        # 2) DatafeedUsfirst (missing rookie year)
+        # 3) DatafeedUsfirstLegacy (has all info)
+
         legacy_df = DatafeedUsfirstLegacy()
+        usfirst_df = DatafeedUsfirst()
         fms_df = DatafeedFMSAPI()
 
-        team = df.getTeamDetails(Team.get_by_id(key_name))
-        if not team:
-            logging.warning("getTeamDetails with DatafeedUsfirst for event id {} failed. Retrying with DatafeedUsfirstLegacy.".format(key_name))
-            team = legacy_df.getTeamDetails(Team.get_by_id(key_name))
-        else:
-            legacy_team = legacy_df.getTeamDetails(Team.get_by_id(key_name))
-            if legacy_team is not None:
-                team.rookie_year = legacy_team.rookie_year  # only available on legacy df
+        # Start with lowest priority
+        legacy_team = legacy_df.getTeamDetails(Team.get_by_id(key_name))
+        usfirst_team = usfirst_df.getTeamDetails(Team.get_by_id(key_name))
+        fms_team, district_team, robot = fms_df.getTeamDetails(date.today().year, key_name)
 
-        # Query FMSAPI for full suite of team data
-        # returns tuple with models (Team, DistrictTeam, Robot)
-        # Use current year, fallback to usfirst datafeeds for legacy teams
-        year = date.today().year
-        fmsTeamDetails = fms_df.getTeamDetails(year, key_name)
-        fmsDistrictTeam = None
-        fmsRobot = None
-        if fmsTeamDetails:
-            fmsTeam = fmsTeamDetails[0]
-            fmsDistrictTeam = fmsTeamDetails[1]
-            fmsRobot = fmsTeamDetails[2]
+        team = None
+        if usfirst_team:
+            team = TeamManipulator.updateMergeBase(usfirst_team, legacy_team)
+        if fms_team:
+            team = TeamManipulator.updateMergeBase(fms_team, team)
 
-            if fmsTeam:
-                # add properties from fms datafeed
-                team = TeamManipulator.updateMergeBase(team, fmsTeam)
-
-            if fmsDistrictTeam:
-                fmsDistrictTeam = DistrictTeamManipulator.createOrUpdate(fmsDistrictTeam)
-
-            if fmsRobot:
-                fmsRobot = RobotManipulator.createOrUpdate(fmsRobot)
-
+        if district_team:
+            district_team = DistrictTeamManipulator.createOrUpdate(district_team)
+        if robot:
+            robot = RobotManipulator.createOrUpdate(robot)
         if team:
             team = TeamManipulator.createOrUpdate(team)
             success = True
         else:
             success = False
+            logging.warning("getTeamDetails failed for team: {}".format(key_name))
 
         template_values = {
             'key_name': key_name,
             'team': team,
             'success': success,
-            'district': fmsDistrictTeam,
-            'robot': fmsRobot,
+            'district': district_team,
+            'robot': robot,
         }
 
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_team_details_get.html')
