@@ -460,6 +460,7 @@ function updateRankings(cell) {
     $.ajax({
         type: 'GET',
         url: 'http://10.0.100.5/pit/getdata?random=' + Math.random(),
+        dataType: 'jsonp',
         cache: false,
         timeout: 5000,
         success: function (data) {
