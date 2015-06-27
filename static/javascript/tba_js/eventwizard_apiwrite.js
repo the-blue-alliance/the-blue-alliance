@@ -323,7 +323,6 @@ $('#rankings_file').change(function(){
             return;
         }
 
-
         $('#rankings_preview').show();
         $('#rankings-ok').show();
         $('#rankings-ok').unbind('click').click(function(){
@@ -462,10 +461,12 @@ function updateRankings(cell) {
         type: 'GET',
         url: '10.0.100.5/pit/getdata?random=' + Math.random(),
         cache: false,
-        timeout: 5000, success: function (data) {
+        timeout: 5000,
+        success: function (data) {
+            console.log(data);
+
             var request_body = {};
-            var rankings = ['Rank', 'Team', 'Avg', 'CP', 'AP', 'RC', 'TP', 'LP', 'Played'];
-            var breakdowns = rankings.slice(0, 2);
+            var breakdowns = ['Avg', 'CP', 'AP', 'RC', 'TP', 'LP'];
             var rankData = JSON.parse(data)['Ranks'];
             request_body['breakdowns'] = breakdowns;
             request_body['rankings'] = [];
@@ -477,15 +478,15 @@ function updateRankings(cell) {
                 teamRank['rank'] = rankData[i]['Rank']
                 teamRank['played'] = rankData[i]['Played'];
                 teamRank['dqs'] = 0;
-                teamRank['breakdown'] = [];
                 for(var j=0; j<breakdowns.length; j++){
-                    teamRank['breakdown'].push(rankData[i][breakdowns[j]]);
+                    teamRank[breakdowns[j]] = rankData[i][breakdowns[j]];
                 }
                 request_body['rankings'].push(teamRank);
             }
-            makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/rankings/update', JSON.stringify(request_body), cell);
+            makeRequest('/api/trusted/v1/event/' + $('#event_key').val() + '/rankings/update', JSON.stringify(request_body), cell.parent());
         },
         error: function (error) {
+            console.log(error);
             // We had an error getting the results so set the top of the screen red
             alert("Error getting rankings. Are you sure you're connected to the field network?");
             cell.parent().css({ 'background-color': '#c12e2a' });
