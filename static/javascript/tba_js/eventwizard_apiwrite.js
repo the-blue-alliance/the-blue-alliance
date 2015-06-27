@@ -459,7 +459,7 @@ function updateRankings(cell) {
     cell.parent().css('background-color', '#eb9316');
     $.ajax({
         type: 'GET',
-        url: '10.0.100.5/pit/getdata?random=' + Math.random(),
+        url: 'http://10.0.100.5/pit/getdata?random=' + Math.random(),
         cache: false,
         timeout: 5000,
         success: function (data) {
