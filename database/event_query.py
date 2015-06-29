@@ -2,7 +2,6 @@ from google.appengine.ext import ndb
 
 from database.database_query import DatabaseQuery
 from models.award import Award
-from models.cached_query_result import CachedQueryResult
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
