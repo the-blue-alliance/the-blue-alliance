@@ -1,6 +1,8 @@
 from google.appengine.ext import ndb
 
+from consts.district_type import DistrictType
 from database.database_query import DatabaseQuery
+from models.district_team import DistrictTeam
 from models.event import Event
 from models.event_team import EventTeam
 from models.team import Team
@@ -20,6 +22,51 @@ class TeamListQuery(DatabaseQuery):
         start = self.PAGE_SIZE * page_num
         end = start + self.PAGE_SIZE
         teams = yield Team.query(Team.team_number >= start, Team.team_number < end).fetch_async()
+        raise ndb.Return(teams)
+
+
+class TeamListYearQuery(DatabaseQuery):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = 'team_list_year_{}_{}'  # (year, page_num)
+
+    def __init__(self, year, page_num):
+        self._query_args = (year, page_num, )
+
+    @ndb.tasklet
+    def _query_async(self):
+        year = self._query_args[0]
+        page_num = self._query_args[1]
+
+        event_team_keys_future = EventTeam.query(EventTeam.year == year).fetch_async(keys_only=True)
+        teams_future = TeamListQuery(page_num).fetch_async()
+
+        year_team_keys = set()
+        for et_key in event_team_keys_future.get_result():
+            team_key = et_key.id().split('_')[1]
+            year_team_keys.add(team_key)
+
+        teams = filter(lambda team: team.key.id() in year_team_keys, teams_future.get_result())
+        raise ndb.Return(teams)
+
+
+class DistrictTeamsQuery(DatabaseQuery):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = 'district_teams_{}'  # (district_key)
+
+    def __init__(self, district_key):
+        self._query_args = (district_key, )
+
+    @ndb.tasklet
+    def _query_async(self):
+        district_key = self._query_args[0]
+        year = int(district_key[:4])
+        district_abbrev = district_key[4:]
+        district_type = DistrictType.abbrevs.get(district_abbrev, None)
+        district_teams = yield DistrictTeam.query(
+            DistrictTeam.year == year,
+            DistrictTeam.district == district_type).fetch_async()
+        team_keys = map(lambda district_team: district_team.team, district_teams)
+        teams = yield ndb.get_multi_async(team_keys)
         raise ndb.Return(teams)
 
 

@@ -6,16 +6,17 @@ from models.cached_query_result import CachedQueryResult
 
 class DatabaseQuery(object):
     DATABASE_QUERY_VERSION = 0
+    BASE_CACHE_KEY_FORMAT = "{}:{}:{}"  # (partial_cache_key, cache_version, database_query_version)
 
-    def _get_cache_key(self):
-        return "{}:{}:{}".format(
-            self.CACHE_KEY_FORMAT.format(*self._query_args),
+    def _render_cache_key(self, partial_cache_key):
+        return self.BASE_CACHE_KEY_FORMAT.format(
+            partial_cache_key,
             self.CACHE_VERSION,
             self.DATABASE_QUERY_VERSION)
 
     @ndb.tasklet
     def fetch_async(self):
-        cache_key = self._get_cache_key()
+        cache_key = self._render_cache_key(self.CACHE_KEY_FORMAT.format(*self._query_args))
 
         cached_query = yield CachedQueryResult.get_by_id_async(cache_key)
         if cached_query is None:
