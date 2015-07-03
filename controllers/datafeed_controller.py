@@ -724,7 +724,14 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
         # Start with lowest priority
         legacy_team = legacy_df.getTeamDetails(Team.get_by_id(key_name))
         usfirst_team = usfirst_df.getTeamDetails(Team.get_by_id(key_name))
-        fms_team, district_team, robot = fms_df.getTeamDetails(date.today().year, key_name)
+        fms_details = fms_df.getTeamDetails(date.today().year, key_name)
+        
+        if fms_details:
+            fms_team, district_team, robot = fms_details
+        else:
+            fms_team = None
+            district_team = None
+            robot = None
 
         team = None
         if usfirst_team:
