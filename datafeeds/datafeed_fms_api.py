@@ -18,15 +18,6 @@ from parsers.fms_api.fms_api_team_details_parser import FMSAPITeamDetailsParser
 
 
 class DatafeedFMSAPI(object):
-    FMS_API_URL_BASE = 'https://frc-api.usfirst.org/api/v1.0'
-
-    FMS_API_AWARDS_URL_PATTERN = FMS_API_URL_BASE + '/awards/%s/%s'  # (year, event_short)
-    FMS_API_HYBRID_SCHEDULE_QUAL_URL_PATTERN = FMS_API_URL_BASE + '/schedule/%s/%s/qual/hybrid'  # (year, event_short)
-    FMS_API_HYBRID_SCHEDULE_PLAYOFF_URL_PATTERN = FMS_API_URL_BASE + '/schedule/%s/%s/playoff/hybrid'  # (year, event_short)
-    FMS_API_EVENT_RANKINGS_URL_PATTERN = FMS_API_URL_BASE + '/rankings/%s/%s'  # (year, event_short)
-    FMS_API_EVENT_ALLIANCES_URL_PATTERN = FMS_API_URL_BASE + '/alliances/%s/%s'  # (year, event_short)
-    FMS_API_TEAM_DETAILS_URL_PATTERN = FMS_API_URL_BASE + '/teams/%s/?teamNumber=%s'  # (year, teamNumber)
-
     EVENT_SHORT_EXCEPTIONS = {
         'arc': 'archimedes',
         'cars': 'carson',
@@ -49,7 +40,7 @@ class DatafeedFMSAPI(object):
         'tes': 'cmp-arte',
     }
 
-    def __init__(self, *args, **kw):
+    def __init__(self, version):
         fms_api_secrets = Sitevar.get_by_id('fmsapi.secrets')
         if fms_api_secrets is None:
             raise Exception("Missing sitevar: fmsapi.secrets. Can't access FMS API.")
@@ -57,6 +48,25 @@ class DatafeedFMSAPI(object):
         fms_api_username = fms_api_secrets.contents['username']
         fms_api_authkey = fms_api_secrets.contents['authkey']
         self._fms_api_authtoken = base64.b64encode('{}:{}'.format(fms_api_username, fms_api_authkey))
+
+        if version == 'v1.0':
+            FMS_API_URL_BASE = 'https://frc-api.usfirst.org/api/v1.0'
+            self.FMS_API_AWARDS_URL_PATTERN = FMS_API_URL_BASE + '/awards/%s/%s'  # (year, event_short)
+            self.FMS_API_HYBRID_SCHEDULE_QUAL_URL_PATTERN = FMS_API_URL_BASE + '/schedule/%s/%s/qual/hybrid'  # (year, event_short)
+            self.FMS_API_HYBRID_SCHEDULE_PLAYOFF_URL_PATTERN = FMS_API_URL_BASE + '/schedule/%s/%s/playoff/hybrid'  # (year, event_short)
+            self.FMS_API_EVENT_RANKINGS_URL_PATTERN = FMS_API_URL_BASE + '/rankings/%s/%s'  # (year, event_short)
+            self.FMS_API_EVENT_ALLIANCES_URL_PATTERN = FMS_API_URL_BASE + '/alliances/%s/%s'  # (year, event_short)
+            self.FMS_API_TEAM_DETAILS_URL_PATTERN = FMS_API_URL_BASE + '/teams/%s/?teamNumber=%s'  # (year, teamNumber)
+        elif version == 'v2.0':
+            FMS_API_URL_BASE = 'https://frc-api.usfirst.org/v2.0'
+            self.FMS_API_AWARDS_URL_PATTERN = FMS_API_URL_BASE + '/%s/awards/%s'  # (year, event_short)
+            self.FMS_API_HYBRID_SCHEDULE_QUAL_URL_PATTERN = FMS_API_URL_BASE + '/%s/schedule/%s/qual/hybrid'  # (year, event_short)
+            self.FMS_API_HYBRID_SCHEDULE_PLAYOFF_URL_PATTERN = FMS_API_URL_BASE + '/%s/schedule/%s/playoff/hybrid'  # (year, event_short)
+            self.FMS_API_EVENT_RANKINGS_URL_PATTERN = FMS_API_URL_BASE + '/%s/rankings/%s'  # (year, event_short)
+            self.FMS_API_EVENT_ALLIANCES_URL_PATTERN = FMS_API_URL_BASE + '/%s/alliances/%s'  # (year, event_short)
+            self.FMS_API_TEAM_DETAILS_URL_PATTERN = FMS_API_URL_BASE + '/%s/teams/?teamNumber=%s'  # (year, teamNumber)
+        else:
+            raise Exception("Unknown FMS API version: {}".formation(version))
 
     def _get_event_short(self, event_short):
         return self.EVENT_SHORT_EXCEPTIONS.get(event_short, event_short)
