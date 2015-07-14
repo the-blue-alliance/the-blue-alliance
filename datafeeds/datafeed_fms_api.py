@@ -121,7 +121,7 @@ class DatafeedFMSAPI(object):
         qual_matches = self._parse(self.FMS_API_HYBRID_SCHEDULE_QUAL_URL_PATTERN % (year, self._get_event_short(event_short)), hs_parser)
         playoff_matches = self._parse(self.FMS_API_HYBRID_SCHEDULE_PLAYOFF_URL_PATTERN % (year, self._get_event_short(event_short)), hs_parser)
         qual_details = self._parse(self.FMS_API_MATCH_DETAILS_QUAL_URL_PATTERN % (year, self._get_event_short(event_short)), detail_parser)
-        playoff_details = self._parse(self.FMS_API_MATCH_DETAILS_QUAL_URL_PATTERN % (year, self._get_event_short(event_short)), detail_parser)
+        playoff_details = self._parse(self.FMS_API_MATCH_DETAILS_PLAYOFF_URL_PATTERN % (year, self._get_event_short(event_short)), detail_parser)
 
         matches_by_key = {}
         if qual_matches is not None:
