@@ -183,10 +183,13 @@ class FMSAPIMatchDetailsParser(object):
             comp_level = get_comp_level(match['matchLevel'], match['matchNumber'])
             match_number = get_match_number(comp_level, match['matchNumber'])
             breakdown = {
-                'coopertition_points': match['coopertitionPoints'],
                 'red': {},
                 'blue': {},
             }
+            if 'coopertition' in match:
+                breakdown['coopertition'] = match['coopertition']
+            if 'coopertitionPoints' in match:
+                breakdown['coopertition_points'] = match['coopertitionPoints']
             for alliance in match['Alliances']:
                 color = alliance['alliance'].lower()
                 for key, value in alliance.items():
