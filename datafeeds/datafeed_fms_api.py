@@ -75,7 +75,9 @@ class DatafeedFMSAPI(object):
 
     def _parse(self, url, parser):
         headers = {
-            'Authorization': 'Basic {}'.format(self._fms_api_authtoken)
+            'Authorization': 'Basic {}'.format(self._fms_api_authtoken),
+            'Cache-Control': 'no-cache, max-age=10',
+            'Pragma': 'no-cache',
         }
         try:
             result = urlfetch.fetch(url,
