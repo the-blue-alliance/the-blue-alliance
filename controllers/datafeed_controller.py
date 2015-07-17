@@ -42,6 +42,7 @@ class FMSAPIAwardsEnqueue(webapp.RequestHandler):
     def get(self, when):
         if when == "now":
             events = EventHelper.getEventsWithinADay()
+            filter(lambda e: e.official, events)
         else:
             event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
             events = ndb.get_multi(event_keys)
@@ -108,6 +109,7 @@ class FMSAPIEventAlliancesEnqueue(webapp.RequestHandler):
     def get(self, when):
         if when == "now":
             events = EventHelper.getEventsWithinADay()
+            filter(lambda e: e.official, events)
         else:
             event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
             events = ndb.get_multi(event_keys)
@@ -161,6 +163,7 @@ class FMSAPIEventRankingsEnqueue(webapp.RequestHandler):
     def get(self, when):
         if when == "now":
             events = EventHelper.getEventsWithinADay()
+            filter(lambda e: e.official, events)
         else:
             event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
             events = ndb.get_multi(event_keys)
@@ -209,6 +212,7 @@ class FMSAPIMatchesEnqueue(webapp.RequestHandler):
     def get(self, when):
         if when == "now":
             events = EventHelper.getEventsWithinADay()
+            filter(lambda e: e.official, events)
         else:
             event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
             events = ndb.get_multi(event_keys)
