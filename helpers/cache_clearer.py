@@ -9,12 +9,21 @@ from controllers.api.api_team_controller import ApiTeamController, ApiTeamEvents
                                                 ApiTeamEventMatchesController, ApiTeamMediaController, ApiTeamYearsParticipatedController, \
                                                 ApiTeamListController, ApiTeamHistoryEventsController, ApiTeamHistoryAwardsController
 
+from database import get_affected_queries
+
 from models.event import Event
 from models.event_team import EventTeam
 from models.team import Team
 
 
 class CacheClearer(object):
+    @classmethod
+    def _queries_to_cache_keys_and_controllers(cls, queries):
+        out = []
+        for query in queries:
+            out.append((query.cache_key, type(query)))
+        return out
+
     @classmethod
     def get_award_cache_keys_and_controllers(cls, affected_refs):
         """
@@ -25,7 +34,8 @@ class CacheClearer(object):
         years = affected_refs['year']
 
         return cls._get_event_awards_cache_keys_and_controllers(event_keys) + \
-            cls._get_team_event_awards_cache_keys_and_controllers(team_keys, event_keys)
+            cls._get_team_event_awards_cache_keys_and_controllers(team_keys, event_keys) + \
+            cls._queries_to_cache_keys_and_controllers(get_affected_queries.award_updated(affected_refs))
 
     @classmethod
     def get_event_cache_keys_and_controllers(cls, affected_refs):
@@ -49,7 +59,8 @@ class CacheClearer(object):
             cls._get_team_events_cache_keys_and_controllers(team_keys, years) + \
             cls._get_districtlist_cache_keys_and_controllers(years) + \
             cls._get_district_events_cache_keys_and_controllers(event_district_abbrevs, years) + \
-            cls._get_district_rankings_cache_keys_and_controllers(event_district_abbrevs, years)
+            cls._get_district_rankings_cache_keys_and_controllers(event_district_abbrevs, years) + \
+            cls._queries_to_cache_keys_and_controllers(get_affected_queries.event_updated(affected_refs))
 
     @classmethod
     def get_eventteam_cache_keys_and_controllers(cls, affected_refs):
@@ -62,7 +73,16 @@ class CacheClearer(object):
 
         return cls._get_eventteams_cache_keys_and_controllers(event_keys) + \
             cls._get_team_events_cache_keys_and_controllers(team_keys, years) + \
-            cls._get_team_years_participated_cache_keys_and_controllers(team_keys)
+            cls._get_team_years_participated_cache_keys_and_controllers(team_keys) + \
+            cls._queries_to_cache_keys_and_controllers(get_affected_queries.eventteam_updated(affected_refs))
+
+    @classmethod
+    def get_districtteam_cache_keys_and_controllers(cls, affected_refs):
+        """
+        Gets cache keys and controllers that references this eventteam
+        """
+
+        return cls._queries_to_cache_keys_and_controllers(get_affected_queries.districtteam_updated(affected_refs))
 
     @classmethod
     def get_match_cache_keys_and_controllers(cls, affected_refs):
@@ -76,7 +96,8 @@ class CacheClearer(object):
 
         return cls._get_match_cache_keys_and_controllers(match_keys) + \
             cls._get_matches_cache_keys_and_controllers(event_keys) + \
-            cls._get_team_event_matches_cache_keys_and_controllers(team_keys, event_keys)
+            cls._get_team_event_matches_cache_keys_and_controllers(team_keys, event_keys) + \
+            cls._queries_to_cache_keys_and_controllers(get_affected_queries.match_updated(affected_refs))
 
     @classmethod
     def get_media_cache_keys_and_controllers(cls, affected_refs):
@@ -104,7 +125,8 @@ class CacheClearer(object):
 
         return cls._get_teams_cache_keys_and_controllers(team_keys) + \
             cls._get_eventteams_cache_keys_and_controllers(event_keys) + \
-            cls._get_teamlist_cache_keys_and_controllers(team_keys)
+            cls._get_teamlist_cache_keys_and_controllers(team_keys) + \
+            cls._queries_to_cache_keys_and_controllers(get_affected_queries.team_updated(affected_refs))
 
     @classmethod
     def _get_districtlist_cache_keys_and_controllers(cls, years):

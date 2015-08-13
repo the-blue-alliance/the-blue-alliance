@@ -8,8 +8,7 @@ class DistrictTeamManipulator(ManipulatorBase):
     """
     @classmethod
     def getCacheKeysAndControllers(cls, affected_refs):
-        # Not rendered anywhere (yet), so no cache keys to clear
-        return []
+        return CacheClearer.get_districtteam_cache_keys_and_controllers(affected_refs)
 
     @classmethod
     def updateMerge(self, new_district_team, old_district_team, auto_union=True):
