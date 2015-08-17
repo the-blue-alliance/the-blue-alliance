@@ -5,6 +5,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from consts.district_type import DistrictType
+from database import award_query, event_query, match_query
 
 from helpers.data_fetchers.team_details_data_fetcher import TeamDetailsDataFetcher
 
@@ -139,18 +140,11 @@ class TeamRenderer(object):
 
     @classmethod
     def render_team_history(cls, handler, team, is_canonical):
-        event_team_keys_future = EventTeam.query(EventTeam.team == team.key).fetch_async(1000, keys_only=True)
-        award_keys_future = Award.query(Award.team_list == team.key).fetch_async(1000, keys_only=True)
-
-        event_teams_futures = ndb.get_multi_async(event_team_keys_future.get_result())
-        awards_futures = ndb.get_multi_async(award_keys_future.get_result())
-
-        event_keys = [event_team_future.get_result().event for event_team_future in event_teams_futures]
-        events_futures = ndb.get_multi_async(event_keys)
+        award_futures = award_query.TeamAwardsQuery(team.key.id()).fetch_async()
+        event_futures = event_query.TeamEventsQuery(team.key.id()).fetch_async()
 
         awards_by_event = {}
-        for award_future in awards_futures:
-            award = award_future.get_result()
+        for award in award_futures.get_result():
             if award.event.id() not in awards_by_event:
                 awards_by_event[award.event.id()] = [award]
             else:
@@ -160,14 +154,12 @@ class TeamRenderer(object):
         current_event = None
         matches_upcoming = None
         short_cache = False
-        for event_future in events_futures:
-            event = event_future.get_result()
+        years = set()
+        for event in event_futures.get_result():
+            years.add(event.year)
             if event.now:
                 current_event = event
-
-                team_matches_future = Match.query(Match.event == event.key, Match.team_key_names == team.key_name)\
-                  .fetch_async(500, keys_only=True)
-                matches = ndb.get_multi(team_matches_future.get_result())
+                matches = match_query.TeamEventMatchesQuery(team.key.id(), event.key.id()).fetch()
                 matches_upcoming = MatchHelper.upcomingMatches(matches)
 
             if event.within_a_day:
@@ -180,13 +172,11 @@ class TeamRenderer(object):
             event_awards.append((event, sorted_awards))
         event_awards = sorted(event_awards, key=lambda (e, _): e.start_date if e.start_date else datetime.datetime(e.year, 12, 31))
 
-        years = sorted(set([et.get_result().year for et in event_teams_futures if et.get_result().year is not None]))
-
         handler.template_values.update({
             'is_canonical': is_canonical,
             'team': team,
             'event_awards': event_awards,
-            'years': years,
+            'years': sorted(years),
             'current_event': current_event,
             'matches_upcoming': matches_upcoming
         })
