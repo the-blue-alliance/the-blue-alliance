@@ -61,9 +61,8 @@ class Event(ndb.Model):
 
     @ndb.tasklet
     def get_awards_async(self):
-        from models.award import Award
-        award_keys = yield Award.query(Award.event == self.key).fetch_async(500, keys_only=True)
-        self._awards = yield ndb.get_multi_async(award_keys)
+        from database import award_query
+        self._awards = yield award_query.EventAwardsQuery(self.key_name).fetch_async()
 
     @property
     def alliance_selections(self):
@@ -113,9 +112,8 @@ class Event(ndb.Model):
 
     @ndb.tasklet
     def get_matches_async(self):
-        from models.match import Match
-        match_keys = yield Match.query(Match.event == self.key).fetch_async(500, keys_only=True)
-        self._matches = yield ndb.get_multi_async(match_keys)
+        from database import match_query
+        self._matches = yield match_query.EventMatchesQuery(self.key_name).fetch_async()
 
     @property
     def matches(self):
@@ -162,11 +160,8 @@ class Event(ndb.Model):
 
     @ndb.tasklet
     def get_teams_async(self):
-        from models.event_team import EventTeam
-        event_team_keys = yield EventTeam.query(EventTeam.event == self.key).fetch_async(500, keys_only=True)
-        event_teams = yield ndb.get_multi_async(event_team_keys)
-        team_keys = map(lambda event_team: event_team.team, event_teams)
-        self._teams = yield ndb.get_multi_async(team_keys)
+        from database import team_query
+        self._teams = yield team_query.EventTeamsQuery(self.key_name).fetch_async()
 
     @property
     def teams(self):
