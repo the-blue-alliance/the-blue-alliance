@@ -107,6 +107,7 @@ def eventteam_updated(affected_refs):
     queries_and_keys = []
     for team_key in team_keys:
         queries_and_keys.append(TeamEventsQuery(team_key.id()))
+        queries_and_keys.append(TeamParticipationQuery(team_key.id()))
         page_num = _get_team_page_num(team_key.id())
         for year in years:
             queries_and_keys.append(TeamYearEventsQuery(team_key.id(), year))
@@ -116,6 +117,7 @@ def eventteam_updated(affected_refs):
         queries_and_keys.append(EventTeamsQuery(event_key.id()))
 
     return queries_and_keys
+
 
 def districtteam_updated(affected_refs):
     district_keys = filter(None, affected_refs['district_key'])
