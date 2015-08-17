@@ -34,3 +34,20 @@ class TeamEventMatchesQuery(DatabaseQuery):
             Match.team_key_names == team_key,
             Match.event == ndb.Key(Event, event_key)).fetch_async()
         raise ndb.Return(matches)
+
+
+class TeamYearMatchesQuery(DatabaseQuery):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = 'team_year_matches_{}_{}'  # (team_key, year)
+
+    def __init__(self, team_key, year):
+        self._query_args = (team_key, year, )
+
+    @ndb.tasklet
+    def _query_async(self):
+        team_key = self._query_args[0]
+        year = self._query_args[1]
+        matches = yield Match.query(
+            Match.team_key_names == team_key,
+            Match.year == year).fetch_async()
+        raise ndb.Return(matches)
