@@ -8,6 +8,7 @@ from google.appengine.ext.webapp import template
 
 from base_controller import CacheableHandler
 from consts.district_type import DistrictType
+from database import event_query
 from helpers.match_helper import MatchHelper
 from helpers.award_helper import AwardHelper
 from helpers.team_helper import TeamHelper
@@ -47,8 +48,7 @@ class EventList(CacheableHandler):
         super(EventList, self).get(year, explicit_year)
 
     def _render(self, year=None, explicit_year=False):
-        event_keys = Event.query(Event.year == year).fetch(1000, keys_only=True)
-        events = ndb.get_multi(event_keys)
+        events = event_query.EventListQuery(year).fetch()
         EventHelper.sort_events(events)
 
         week_events = EventHelper.groupByWeek(events)

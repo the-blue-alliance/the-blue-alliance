@@ -26,6 +26,9 @@ class DatabaseQuery(object):
         logging.info("Deleting db query cache keys: {}".format(cache_keys))
         ndb.delete_multi([ndb.Key(CachedQueryResult, cache_key) for cache_key in cache_keys])
 
+    def fetch(self):
+        return self.fetch_async().get_result()
+
     @ndb.tasklet
     def fetch_async(self):
         cached_query = yield CachedQueryResult.get_by_id_async(self.cache_key)
@@ -34,11 +37,10 @@ class DatabaseQuery(object):
                 'database_query_misses:{}'.format(self.DATABASE_QUERY_VERSION),
                 initial_value=0)
             query_result = yield self._query_async()
-            if query_result:
-                yield CachedQueryResult(
-                    id=self.cache_key,
-                    result=query_result,
-                ).put_async()
+            yield CachedQueryResult(
+                id=self.cache_key,
+                result=query_result,
+            ).put_async()
         else:
             memcache.incr(
                 'database_query_hits:{}'.format(self.DATABASE_QUERY_VERSION),
