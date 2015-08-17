@@ -42,6 +42,7 @@ class FMSAPIAwardsEnqueue(webapp.RequestHandler):
     def get(self, when):
         if when == "now":
             events = EventHelper.getEventsWithinADay()
+            events = filter(lambda e: e.official, events)
         else:
             event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
             events = ndb.get_multi(event_keys)
@@ -64,7 +65,7 @@ class FMSAPIAwardsGet(webapp.RequestHandler):
     Handles updating awards based on the FMS API
     """
     def get(self, event_key):
-        datafeed = DatafeedFMSAPI()
+        datafeed = DatafeedFMSAPI('v2.0')
 
         event = Event.get_by_id(event_key)
         new_awards = AwardManipulator.createOrUpdate(datafeed.getAwards(event))
@@ -108,6 +109,7 @@ class FMSAPIEventAlliancesEnqueue(webapp.RequestHandler):
     def get(self, when):
         if when == "now":
             events = EventHelper.getEventsWithinADay()
+            events = filter(lambda e: e.official, events)
         else:
             event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
             events = ndb.get_multi(event_keys)
@@ -131,7 +133,7 @@ class FMSAPIEventAlliancesGet(webapp.RequestHandler):
     Handles updating an event's alliances based on the FMS API
     """
     def get(self, event_key):
-        df = DatafeedFMSAPI()
+        df = DatafeedFMSAPI('v2.0')
 
         event = Event.get_by_id(event_key)
 
@@ -161,6 +163,7 @@ class FMSAPIEventRankingsEnqueue(webapp.RequestHandler):
     def get(self, when):
         if when == "now":
             events = EventHelper.getEventsWithinADay()
+            events = filter(lambda e: e.official, events)
         else:
             event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
             events = ndb.get_multi(event_keys)
@@ -184,7 +187,7 @@ class FMSAPIEventRankingsGet(webapp.RequestHandler):
     Handles updating an event's rankings based on the FMS API
     """
     def get(self, event_key):
-        df = DatafeedFMSAPI()
+        df = DatafeedFMSAPI('v2.0')
 
         rankings = df.getEventRankings(event_key)
 
@@ -209,6 +212,7 @@ class FMSAPIMatchesEnqueue(webapp.RequestHandler):
     def get(self, when):
         if when == "now":
             events = EventHelper.getEventsWithinADay()
+            events = filter(lambda e: e.official, events)
         else:
             event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
             events = ndb.get_multi(event_keys)
@@ -232,7 +236,7 @@ class FMSAPIMatchesGet(webapp.RequestHandler):
     Handles updating matches based on the FMS API
     """
     def get(self, event_key):
-        df = DatafeedFMSAPI()
+        df = DatafeedFMSAPI('v2.0')
 
         new_matches = MatchManipulator.createOrUpdate(df.getMatches(event_key))
 
@@ -719,12 +723,19 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
 
         legacy_df = DatafeedUsfirstLegacy()
         usfirst_df = DatafeedUsfirst()
-        fms_df = DatafeedFMSAPI()
+        fms_df = DatafeedFMSAPI('v2.0')
 
         # Start with lowest priority
         legacy_team = legacy_df.getTeamDetails(Team.get_by_id(key_name))
         usfirst_team = usfirst_df.getTeamDetails(Team.get_by_id(key_name))
-        fms_team, district_team, robot = fms_df.getTeamDetails(date.today().year, key_name)
+        fms_details = fms_df.getTeamDetails(date.today().year, key_name)
+
+        if fms_details:
+            fms_team, district_team, robot = fms_details
+        else:
+            fms_team = None
+            district_team = None
+            robot = None
 
         team = None
         if usfirst_team:

@@ -66,8 +66,10 @@ class EventHelper(object):
                     if event.start_date >= week_start + datetime.timedelta(days=7):
                         current_week += 1
                         week_start += datetime.timedelta(days=7)
-
-                    label = REGIONAL_EVENTS_LABEL.format(current_week)
+                    if event.year == 2016:  # Special case for 2016 week 0.5
+                        label = REGIONAL_EVENTS_LABEL.format(0.5 if current_week == 1 else current_week - 1)
+                    else:
+                        label = REGIONAL_EVENTS_LABEL.format(current_week)
                     if label in to_return:
                         to_return[label].append(event)
                     else:

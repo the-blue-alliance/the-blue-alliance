@@ -2,6 +2,7 @@ import datetime
 import json
 import logging
 import pytz
+import re
 
 from helpers.match_helper import MatchHelper
 from models.event import Event
@@ -22,29 +23,37 @@ LAST_LEVEL = {
 }
 
 
+def camel_to_snake(s):
+    # From https://stackoverflow.com/questions/1175208/elegant-python-function-to-convert-camelcase-to-camel-case
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', s)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
+
+def get_comp_level(match_level, match_number):
+    if match_level == 'Qualification':
+        return 'qm'
+    else:
+        if match_number <= 8:
+            return 'qf'
+        elif match_number <= 14:
+            return 'sf'
+        else:
+            return 'f'
+
+
+def get_match_number(comp_level, match_number):
+    if comp_level == 'sf':
+        return match_number - 8
+    elif comp_level == 'f':
+        return match_number - 14
+    else:  # qm, qf
+        return match_number
+
+
 class FMSAPIHybridScheduleParser(object):
     def __init__(self, year, event_short):
         self.year = year
         self.event_short = event_short
-
-    def _get_comp_level(self, match_level, match_number):
-        if match_level == 'Qualification':
-            return 'qm'
-        else:
-            if match_number <= 8:
-                return 'qf'
-            elif match_number <= 14:
-                return 'sf'
-            else:
-                return 'f'
-
-    def _get_match_number(self, comp_level, match_number):
-        if comp_level == 'sf':
-            return match_number - 8
-        elif comp_level == 'f':
-            return match_number - 14
-        else:  # qm, qf
-            return match_number
 
     def parse(self, response):
         """
@@ -63,8 +72,8 @@ class FMSAPIHybridScheduleParser(object):
         set_number = 1
         parsed_matches = []
         for match in matches:
-            comp_level = self._get_comp_level(match['level'], match['matchNumber'])
-            match_number = self._get_match_number(comp_level, match['matchNumber'])
+            comp_level = get_comp_level(match['level'], match['matchNumber'])
+            match_number = get_match_number(comp_level, match['matchNumber'])
 
             red_teams = []
             blue_teams = []
@@ -95,12 +104,12 @@ class FMSAPIHybridScheduleParser(object):
 
             score_breakdown = {
                 'red': {
-                    'auto': match['scoreRedAuto'],
-                    'foul': match['scoreRedFoul']
+                    'auto_points': match['scoreRedAuto'],
+                    'foul_points': match['scoreRedFoul']
                 },
                 'blue': {
-                    'auto': match['scoreBlueAuto'],
-                    'foul': match['scoreBlueFoul']
+                    'auto_points': match['scoreBlueAuto'],
+                    'foul_points': match['scoreBlueFoul']
                 }
             }
 
@@ -155,3 +164,42 @@ class FMSAPIHybridScheduleParser(object):
                         fixed_matches.append(match)
 
         return fixed_matches
+
+
+class FMSAPIMatchDetailsParser(object):
+    def __init__(self, year, event_short):
+        self.year = year
+        self.event_short = event_short
+
+    def parse(self, response):
+        """
+        This currently only works for the 2015 game.
+        """
+        matches = response['MatchScores']
+
+        match_details_by_key = {}
+        set_number = 1
+        for match in matches:
+            comp_level = get_comp_level(match['matchLevel'], match['matchNumber'])
+            match_number = get_match_number(comp_level, match['matchNumber'])
+            breakdown = {
+                'red': {},
+                'blue': {},
+            }
+            if 'coopertition' in match:
+                breakdown['coopertition'] = match['coopertition']
+            if 'coopertitionPoints' in match:
+                breakdown['coopertition_points'] = match['coopertitionPoints']
+            for alliance in match['Alliances']:
+                color = alliance['alliance'].lower()
+                for key, value in alliance.items():
+                    if key != 'alliance':
+                        breakdown[color][camel_to_snake(key)] = value
+
+            match_details_by_key[Match.renderKeyName(
+                    '{}{}'.format(self.year, self.event_short),
+                    comp_level,
+                    set_number,
+                    match_number)] = breakdown
+
+        return match_details_by_key
