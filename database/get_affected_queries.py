@@ -59,7 +59,7 @@ def event_updated(affected_refs):
 def match_updated(affected_refs):
     event_keys = filter(None, affected_refs['event'])
     team_keys = filter(None, affected_refs['team_keys'])
-    years = filter(None, affected_refs['years'])
+    years = filter(None, affected_refs['year'])
 
     queries_and_keys = []
     for event_key in event_keys:
