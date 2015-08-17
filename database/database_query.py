@@ -7,7 +7,7 @@ from models.cached_query_result import CachedQueryResult
 
 class DatabaseQuery(object):
     DATABASE_QUERY_VERSION = 0
-    BASE_CACHE_KEY_FORMAT = "DBQUERY:{}:{}:{}"  # (partial_cache_key, cache_version, database_query_version)
+    BASE_CACHE_KEY_FORMAT = "{}:{}:{}"  # (partial_cache_key, cache_version, database_query_version)
 
     def _render_cache_key(self, partial_cache_key):
         return self.BASE_CACHE_KEY_FORMAT.format(
