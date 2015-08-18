@@ -12,6 +12,7 @@ class SocialConnection(ndb.Model):
 
     parent_model = ndb.KeyProperty(required=True)
     social_type_enum = ndb.IntegerProperty(required=True)
+    profile_url = ndb.StringProperty(required=True)
     foreign_key = ndb.StringProperty(required=True)
 
     created = ndb.DateTimeProperty(auto_now_add=True)
