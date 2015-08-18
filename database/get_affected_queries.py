@@ -2,7 +2,7 @@ from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwar
 from database.event_query import EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
 from database.match_query import EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
 from database.media_query import TeamYearMediaQuery
-from database.team_query import TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery
+from database.team_query import TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery
 
 from models.district_team import DistrictTeam
 from models.event_team import EventTeam
