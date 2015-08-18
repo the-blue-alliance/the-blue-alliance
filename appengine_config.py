@@ -1,4 +1,4 @@
-# appstats_CALC_RPC_COSTS = False
+appstats_CALC_RPC_COSTS = True
 # appstats_RECORD_FRACTION = 0.1
 
 
