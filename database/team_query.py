@@ -99,3 +99,23 @@ class TeamParticipationQuery(DatabaseQuery):
         event_teams = yield EventTeam.query(EventTeam.team == ndb.Key(Team, team_key)).fetch_async(keys_only=True)
         years = map(lambda event_team: int(event_team.id()[:4]), event_teams)
         raise ndb.Return(set(years))
+
+
+class TeamDistrictsQuery(DatabaseQuery):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = 'team_districts_{}'  # (team_key)
+
+    def __init__(self, team_key):
+        self._query_args = (team_key, )
+
+    @ndb.tasklet
+    def _query_async(self):
+        team_key = self._query_args[0]
+        district_team_keys = yield DistrictTeam.query(EventTeam.team == ndb.Key(Team, team_key)).fetch_async(keys_only=True)
+        ret = {}
+        for district_team_key in district_team_keys:
+            district_key = district_team_key.split('_')
+            year = int(district_key[:4])
+            ret[year] = district_key
+
+        raise ndb.Return(ret)

@@ -5,7 +5,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from consts.district_type import DistrictType
-from database import award_query, event_query, match_query, media_query
+from database import award_query, event_query, match_query, media_query, team_query
 
 from helpers.data_fetchers.team_details_data_fetcher import TeamDetailsDataFetcher
 
@@ -15,7 +15,6 @@ from helpers.match_helper import MatchHelper
 from helpers.media_helper import MediaHelper
 
 from models.award import Award
-from models.district_team import DistrictTeam
 from models.event_team import EventTeam
 from models.match import Match
 from models.robot import Robot
@@ -30,7 +29,7 @@ class TeamRenderer(object):
 
         media_future = media_query.TeamYearMediaQuery(team.key.id(), year).fetch_async()
         robot_future = Robot.get_by_id_async('{}_{}'.format(team.key.id(), year))
-        district_team_keys_future = DistrictTeam.query(DistrictTeam.team == team.key, DistrictTeam.year == year).fetch_async(keys_only=True)
+        team_districts_future = team_query.TeamDistrictsQuery(team.key.id()).fetch_async()
 
         participation = []
         year_wlt_list = []
@@ -106,10 +105,10 @@ class TeamRenderer(object):
 
         district_name = None
         district_abbrev = None
-        district_team_keys = district_team_keys_future.get_result()
-        if len(district_team_keys) != 0:
-            district_team_key = district_team_keys[0]
-            district_abbrev = district_team_key.id().split('_')[0][4:]
+        team_districts = team_districts_future.get_result()
+        if year in team_districts:
+            district_key = team_districts[year]
+            district_abbrev = district_key[4:]
             district_type = DistrictType.abbrevs[district_abbrev]
             district_name = DistrictType.type_names[district_type]
 

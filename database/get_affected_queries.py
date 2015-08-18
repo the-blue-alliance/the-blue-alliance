@@ -2,7 +2,7 @@ from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwar
 from database.event_query import EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
 from database.match_query import EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
 from database.media_query import TeamYearMediaQuery
-from database.team_query import TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery
+from database.team_query import TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
 
 from models.district_team import DistrictTeam
 from models.event_team import EventTeam
@@ -132,9 +132,13 @@ def eventteam_updated(affected_refs):
 
 def districtteam_updated(affected_refs):
     district_keys = filter(None, affected_refs['district_key'])
+    team_keys = filter(None, affected_refs['team'])
 
     queries_and_keys = []
     for district_key in district_keys:
         queries_and_keys.append(DistrictTeamsQuery(district_key))
+
+    for team_key in team_keys:
+        queries_and_keys.append(TeamDistrictsQuery(team_key.id()))
 
     return queries_and_keys

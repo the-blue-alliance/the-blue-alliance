@@ -8,7 +8,7 @@ from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwar
 from database.event_query import EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
 from database.match_query import EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
 from database.media_query import TeamYearMediaQuery
-from database.team_query import TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery
+from database.team_query import TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
 
 from consts.district_type import DistrictType
 
@@ -178,10 +178,13 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
 
     def test_districtteam_updated(self):
         affected_refs = {
-            'district_key': {'2015fim', '2015mar'}
+            'district_key': {'2015fim', '2015mar'},
+            'team': {ndb.Key(Team, 'frc254'), ndb.Key(Team, 'frc604')}
         }
         cache_keys = [q.cache_key for q in get_affected_queries.districtteam_updated(affected_refs)]
 
-        self.assertEqual(len(cache_keys), 2)
+        self.assertEqual(len(cache_keys), 4)
         self.assertTrue(DistrictTeamsQuery('2015fim').cache_key in cache_keys)
         self.assertTrue(DistrictTeamsQuery('2015mar').cache_key in cache_keys)
+        self.assertTrue(TeamDistrictsQuery('frc254').cache_key in cache_keys)
+        self.assertTrue(TeamDistrictsQuery('frc604').cache_key in cache_keys)
