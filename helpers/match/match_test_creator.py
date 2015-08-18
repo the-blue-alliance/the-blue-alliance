@@ -1,3 +1,4 @@
+import datetime
 import json
 import random
 
@@ -56,7 +57,7 @@ class MatchTestCreator(object):
             alliances_json=json.dumps(alliances),
             comp_level=comp_level,
             event=self.event.key,
-            year=2012,
+            year=datetime.datetime.now().year,
             set_number=set_number,
             match_number=match_number,
             team_key_names=[team.key_name for team in teams],
