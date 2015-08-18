@@ -23,13 +23,13 @@ from models.robot import Robot
 class TeamRenderer(object):
     @classmethod
     def render_team_details(cls, handler, team, year, is_canonical):
-        events_sorted, matches_by_event_key, awards_by_event_key, valid_years = TeamDetailsDataFetcher.fetch(team, year, return_valid_years=True)
-        if not events_sorted:
-            return None
-
         media_future = media_query.TeamYearMediaQuery(team.key.id(), year).fetch_async()
         robot_future = Robot.get_by_id_async('{}_{}'.format(team.key.id(), year))
         team_districts_future = team_query.TeamDistrictsQuery(team.key.id()).fetch_async()
+
+        events_sorted, matches_by_event_key, awards_by_event_key, valid_years = TeamDetailsDataFetcher.fetch(team, year, return_valid_years=True)
+        if not events_sorted:
+            return None
 
         participation = []
         year_wlt_list = []
