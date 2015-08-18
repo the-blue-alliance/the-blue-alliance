@@ -114,7 +114,7 @@ class TeamDistrictsQuery(DatabaseQuery):
         district_team_keys = yield DistrictTeam.query(EventTeam.team == ndb.Key(Team, team_key)).fetch_async(keys_only=True)
         ret = {}
         for district_team_key in district_team_keys:
-            district_key = district_team_key.split('_')
+            district_key = district_team_key.id().split('_')
             year = int(district_key[:4])
             ret[year] = district_key
 
