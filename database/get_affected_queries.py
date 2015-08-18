@@ -45,9 +45,6 @@ def event_updated(affected_refs):
     for event_district_key in event_district_keys:
         queries_and_keys.append((DistrictEventsQuery(event_district_key)))
 
-    for event_key in event_keys:
-        queries_and_keys.append((EventListQuery(event_key.id())))
-
     for et_key in event_team_keys_future.get_result():
         team_key = et_key.id().split('_')[1]
         year = int(et_key.id()[:4])
@@ -107,7 +104,7 @@ def team_updated(affected_refs):
         queries_and_keys.append((EventTeamsQuery(event_key)))
 
     for dt_key in district_team_keys_future.get_result():
-        district_key = dt_key.district_key
+        district_key = dt_key.id().split('_')[0]
         queries_and_keys.append((DistrictTeamsQuery(district_key)))
 
     return queries_and_keys
