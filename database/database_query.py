@@ -7,6 +7,8 @@ from models.cached_query_result import CachedQueryResult
 
 class DatabaseQuery(object):
     DATABASE_QUERY_VERSION = 0
+    DATABASE_HITS_MEMCACHE_KEY = 'database_query_hits:{}'.format(DATABASE_QUERY_VERSION)
+    DATABASE_MISSES_MEMCACHE_KEY = 'database_query_misses:{}'.format(DATABASE_QUERY_VERSION)
     BASE_CACHE_KEY_FORMAT = "{}:{}:{}"  # (partial_cache_key, cache_version, database_query_version)
 
     def _render_cache_key(self, partial_cache_key):
@@ -34,7 +36,7 @@ class DatabaseQuery(object):
         cached_query = yield CachedQueryResult.get_by_id_async(self.cache_key)
         if cached_query is None:
             memcache.incr(
-                'database_query_misses:{}'.format(self.DATABASE_QUERY_VERSION),
+                self.DATABASE_MISSES_MEMCACHE_KEY,
                 initial_value=0)
             query_result = yield self._query_async()
             yield CachedQueryResult(
@@ -43,7 +45,7 @@ class DatabaseQuery(object):
             ).put_async()
         else:
             memcache.incr(
-                'database_query_hits:{}'.format(self.DATABASE_QUERY_VERSION),
+                self.DATABASE_HITS_MEMCACHE_KEY,
                 initial_value=0)
             query_result = cached_query.result
 
