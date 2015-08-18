@@ -4,6 +4,8 @@ from google.appengine.ext import ndb
 import logging
 from models.cached_query_result import CachedQueryResult
 
+MEMCACHE_CLIENT = memcache.Client()
+
 
 class DatabaseQuery(object):
     DATABASE_QUERY_VERSION = 0
@@ -35,7 +37,7 @@ class DatabaseQuery(object):
     def fetch_async(self):
         cached_query = yield CachedQueryResult.get_by_id_async(self.cache_key)
         if cached_query is None:
-            memcache.incr(
+            rpc = MEMCACHE_CLIENT.incr_async(
                 self.DATABASE_MISSES_MEMCACHE_KEY,
                 initial_value=0)
             query_result = yield self._query_async()
@@ -44,9 +46,10 @@ class DatabaseQuery(object):
                 result=query_result,
             ).put_async()
         else:
-            memcache.incr(
+            rpc = MEMCACHE_CLIENT.incr_async(
                 self.DATABASE_HITS_MEMCACHE_KEY,
                 initial_value=0)
             query_result = cached_query.result
 
+        rpc.wait()
         raise ndb.Return(query_result)
