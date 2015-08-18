@@ -111,10 +111,10 @@ class TeamDistrictsQuery(DatabaseQuery):
     @ndb.tasklet
     def _query_async(self):
         team_key = self._query_args[0]
-        district_team_keys = yield DistrictTeam.query(EventTeam.team == ndb.Key(Team, team_key)).fetch_async(keys_only=True)
+        district_team_keys = yield DistrictTeam.query(DistrictTeam.team == ndb.Key(Team, team_key)).fetch_async(keys_only=True)
         ret = {}
         for district_team_key in district_team_keys:
-            district_key = district_team_key.id().split('_')
+            district_key = district_team_key.id().split('_')[0]
             year = int(district_key[:4])
             ret[year] = district_key
 
