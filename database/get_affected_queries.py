@@ -1,6 +1,7 @@
 from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
 from database.event_query import EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
 from database.match_query import EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
+from database.media_query import TeamYearMediaQuery
 from database.team_query import TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery
 
 from models.district_team import DistrictTeam
@@ -70,6 +71,19 @@ def match_updated(affected_refs):
     for team_key in team_keys:
         for year in years:
             queries_and_keys.append((TeamYearMatchesQuery(team_key.id(), year)))
+
+    return queries_and_keys
+
+
+def media_updated(affected_refs):
+    reference_keys = filter(None, affected_refs['references'])
+    years = filter(None, affected_refs['year'])
+
+    queries_and_keys = []
+    for year in years:
+        for reference_key in reference_keys:
+            if reference_key.kind() == 'Team':
+                queries_and_keys.append((TeamYearMediaQuery(reference_key.id(), year)))
 
     return queries_and_keys
 

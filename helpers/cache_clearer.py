@@ -107,7 +107,8 @@ class CacheClearer(object):
         reference_keys = affected_refs['references']
         years = affected_refs['year']
 
-        return cls._get_media_cache_keys_and_controllers(reference_keys, years)
+        return cls._get_media_cache_keys_and_controllers(reference_keys, years) + \
+            cls._queries_to_cache_keys_and_controllers(get_affected_queries.media_updated(affected_refs))
 
     @classmethod
     def get_team_cache_keys_and_controllers(cls, affected_refs):

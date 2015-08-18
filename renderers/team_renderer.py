@@ -5,7 +5,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from consts.district_type import DistrictType
-from database import award_query, event_query, match_query
+from database import award_query, event_query, match_query, media_query
 
 from helpers.data_fetchers.team_details_data_fetcher import TeamDetailsDataFetcher
 
@@ -18,19 +18,17 @@ from models.award import Award
 from models.district_team import DistrictTeam
 from models.event_team import EventTeam
 from models.match import Match
-from models.media import Media
 from models.robot import Robot
 
 
 class TeamRenderer(object):
     @classmethod
     def render_team_details(cls, handler, team, year, is_canonical):
-        media_key_futures = Media.query(Media.references == team.key, Media.year == year).fetch_async(500, keys_only=True)
         events_sorted, matches_by_event_key, awards_by_event_key, valid_years = TeamDetailsDataFetcher.fetch(team, year, return_valid_years=True)
         if not events_sorted:
             return None
 
-        media_futures = ndb.get_multi_async(media_key_futures.get_result())
+        media_future = media_query.TeamYearMediaQuery(team.key.id(), year).fetch_async()
         robot_future = Robot.get_by_id_async('{}_{}'.format(team.key.id(), year))
         district_team_keys_future = DistrictTeam.query(DistrictTeam.team == team.key, DistrictTeam.year == year).fetch_async(keys_only=True)
 
@@ -104,7 +102,7 @@ class TeamRenderer(object):
             if year_wlt["win"] + year_wlt["loss"] + year_wlt["tie"] == 0:
                 year_wlt = None
 
-        medias_by_slugname = MediaHelper.group_by_slugname([media_future.get_result() for media_future in media_futures])
+        medias_by_slugname = MediaHelper.group_by_slugname([media for media in media_future.get_result()])
 
         district_name = None
         district_abbrev = None
