@@ -18,6 +18,7 @@ if DEBUG:
     CONFIG = {
         "env": "dev",
         "memcache": False,
+        "database_query_cache": False,
         "response_cache": False,
         "firebase-url": "https://thebluealliance-dev.firebaseio.com/{}.json?auth={}"
     }
@@ -25,6 +26,7 @@ else:
     CONFIG = {
         "env": "prod",
         "memcache": True,
+        "database_query_cache": True,
         "response_cache": True,
         "firebase-url": "https://thebluealliance.firebaseio.com/{}.json?auth={}"
     }
