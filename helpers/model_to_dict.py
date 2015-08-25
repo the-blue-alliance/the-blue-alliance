@@ -130,7 +130,7 @@ class ModelToDict(object):
         return media_dict
 
     @classmethod
-    def robotConvertor(self, robot):
+    def robotConverter(self, robot):
         """
         return top level robot dict
         """
