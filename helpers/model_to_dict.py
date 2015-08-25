@@ -128,3 +128,15 @@ class ModelToDict(object):
             media_dict["details"] = {}
 
         return media_dict
+
+    @classmethod
+    def robotConvertor(self, robot):
+        """
+        return top level robot dict
+        """
+        robot_dict = dict()
+        robot_dict["key"] = robot.key_name
+        robot_dict["team_key"] = robot.team
+        robot_dict["year"] = robot.year
+        robot_dict["name"] = robot.robot_name
+        return robot_dict

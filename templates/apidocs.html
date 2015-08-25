@@ -20,6 +20,7 @@
                 <li><a class="smooth-scroll" href="#match-model">Match Model</a></li>
                 <li><a class="smooth-scroll" href="#award-model">Award Model</a></li>
                 <li><a class="smooth-scroll" href="#media-model">Media Model</a></li>
+                <li><a class="smooth-scroll" href="#robot-model">Robot Model</a></li>
               </ul>
             </li>
             <li>
@@ -34,6 +35,7 @@
                 <li><a class="smooth-scroll" href="#team-media-request">Team Media Request</a></li>
                 <li><a class="smooth-scroll" href="#team-history-events-request">Team History Events Request</a></li>
                 <li><a class="smooth-scroll" href="#team-history-awards-request">Team History Awards Request</a></li>
+                <li><a class="smooth-scroll" href="#team-history-robots-request">Team History Robots Request</a></li>
               </ul>
             </li>
             <li>
@@ -431,7 +433,42 @@
         </tbody>
       </table>
 
-      <hr>
+      <h3 id="robot-model">Robot Model</h3>
+      <h4>Related: <a class="smooth-scroll" href="#team-history-robots-request">Team History Robots Request</a></h4>
+      <table class=table>
+        <caption>Response Data</caption>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Description</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>key</td>
+            <td>A key identifying the robot object. Formed like <team_key>_<year></td>
+            <td>frc1124_2015</td>
+          </tr>
+          <tr>
+            <td>team_key</td>
+            <td>The associated <a href="#team-model">Team</a> key</td>
+            <td>frc1124</td>
+          </tr>
+          <tr>
+            <td>year</td>
+            <td>The year this Robot model referes to</td>
+            <td>2015</td>
+          </tr>
+          <tr>
+            <td>name</td>
+            <td>The robot name in this year</td>
+            <td>Orion</td>
+          </tr>
+        </tbody>
+      </table>
+
+     <hr>
 
       <h2 id="team-requests">Team Requests</h2>
       <h3 id="team-list-request">Team List Request</h3>
@@ -770,7 +807,7 @@
       <h4>Related: <a class="smooth-scroll" href="#event-model">Event Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/events</code>
+        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/history/events</code>
       </p>
       <table class=table>
         <thead>
@@ -814,7 +851,7 @@
       <h4>Related: <a class="smooth-scroll" href="#award-model">Awards Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/awards</code>
+        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/history/awards</code>
       </p>
       <table class=table>
         <thead>
@@ -849,6 +886,50 @@
           </form>
           <div class="panel-group">
             <pre class="team-history-awards-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 id="team-history-robots-request">Team History Robots Request</h3>
+      <h4>Related: <a class="smooth-scroll" href="#robot-model">Robot Model</a></h4>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/history/robots</code>
+      </p>
+      <table class=table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>team key</td>
+            <td>A team key name where the format is <code>frcyyyy</code> where yyyy is the a
+              valid, official team number issued by <em>FIRST</em></td>
+            <td>frc1, frc281, frc1114</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_team_history_robots_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="600" id="example_team_history_robots_request" type="text" value="/api/v2/team/frc254/history/robots">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group">
+            <pre class="team-history-robots-request-json">
             </pre>
           </div>
         </div>
@@ -1550,6 +1631,22 @@
       },
       error: function(data) {
         $(".team-history-awards-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+  $("#example_team_history_robots_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".team-history-robots-request-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_team_history_robots_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-team-history-robots-request:v01'},
+      success: function(data) {
+        $(".team-history-robots-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".team-history-robots-request-json").html('Something went wrong! Please check for correct request format.');
       }
     });
   });
