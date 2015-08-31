@@ -295,10 +295,11 @@ class TestTeamHistoryRobotsApiController(unittest2.TestCase):
 
     def testRobotApi(self):
         response = self.testapp.get('/frc1124', headers={"X-TBA-App-Id": "tba-tests:team_list-controller-test:v01"})
-        robot_list = json.loads(response.body)
+        print response.body
+        robot_dict = json.loads(response.body)
 
-        self.assertEqual(1, len(robot_list))
-        robot = robot_list[0]
+        self.assertTrue("2015" in robot_dict)
+        robot = robot_dict["2015"]
 
         self.assertEqual(robot["key"], "frc1124_2015")
         self.assertEqual(robot["team_key"], "frc1124")

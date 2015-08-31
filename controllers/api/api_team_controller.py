@@ -282,5 +282,5 @@ class ApiTeamHistoryRobotsController(ApiTeamControllerBase):
 
         robots = TeamRobotsQuery(self.team_key).fetch()
 
-        robots_list = [ModelToDict.robotConverter(robot) for robot in robots]
-        return json.dumps(robots_list, ensure_ascii=True)
+        robots_dict = {robot.year: ModelToDict.robotConverter(robot) for robot in robots}
+        return json.dumps(robots_dict, ensure_ascii=True)
