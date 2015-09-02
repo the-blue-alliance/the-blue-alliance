@@ -19,8 +19,8 @@ class AdminMain(LoggedInHandler):
 
         self.template_values['memcache_stats'] = memcache.get_stats()
         self.template_values['databasequery_stats'] = {
-            'hits': memcache.get(DatabaseQuery.DATABASE_HITS_MEMCACHE_KEY),
-            'misses': memcache.get(DatabaseQuery.DATABASE_MISSES_MEMCACHE_KEY)
+            'hits': sum(filter(None, [memcache.get(key) for key in DatabaseQuery.DATABASE_HITS_MEMCACHE_KEYS])),
+            'misses': sum(filter(None, [memcache.get(key) for key in DatabaseQuery.DATABASE_MISSES_MEMCACHE_KEYS]))
         }
 
         # Gets the 5 recently created users

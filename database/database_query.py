@@ -3,6 +3,7 @@ from google.appengine.ext import ndb
 
 import logging
 from models.cached_query_result import CachedQueryResult
+import random
 import tba_config
 
 MEMCACHE_CLIENT = memcache.Client()
@@ -10,8 +11,8 @@ MEMCACHE_CLIENT = memcache.Client()
 
 class DatabaseQuery(object):
     DATABASE_QUERY_VERSION = 0
-    DATABASE_HITS_MEMCACHE_KEY = 'database_query_hits:{}'.format(DATABASE_QUERY_VERSION)
-    DATABASE_MISSES_MEMCACHE_KEY = 'database_query_misses:{}'.format(DATABASE_QUERY_VERSION)
+    DATABASE_HITS_MEMCACHE_KEYS = ['database_query_hits_{}:{}'.format(i, DATABASE_QUERY_VERSION) for i in range(25)]
+    DATABASE_MISSES_MEMCACHE_KEYS = ['database_query_misses_{}:{}'.format(i, DATABASE_QUERY_VERSION) for i in range(25)]
     BASE_CACHE_KEY_FORMAT = "{}:{}:{}"  # (partial_cache_key, cache_version, database_query_version)
 
     def _render_cache_key(self, partial_cache_key):
@@ -40,7 +41,7 @@ class DatabaseQuery(object):
         rpcs = []
         if cached_query is None:
             rpcs.append(MEMCACHE_CLIENT.incr_async(
-                self.DATABASE_MISSES_MEMCACHE_KEY,
+                random.choice(self.DATABASE_MISSES_MEMCACHE_KEYS),
                 initial_value=0))
             query_result = yield self._query_async()
             if tba_config.CONFIG['database_query_cache']:
@@ -50,7 +51,7 @@ class DatabaseQuery(object):
                 ).put_async())
         else:
             rpcs.append(MEMCACHE_CLIENT.incr_async(
-                self.DATABASE_HITS_MEMCACHE_KEY,
+                random.choice(self.DATABASE_HITS_MEMCACHE_KEYS),
                 initial_value=0))
             query_result = cached_query.result
 
