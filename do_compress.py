@@ -13,6 +13,7 @@ SCRIPTS_MAIN = ['static/jwplayer/jwplayer.js',
                 'static/javascript/tba_js/tba_sidebar.js',
                 'static/javascript/tba_js/tba_typeahead.js',
                 'static/javascript/tba_js/tba.js',
+                'static/javascript/tba_js/ReView0.65b.js',
                 ]
 
 SCRIPTS_GAMEDAY = SCRIPTS_MAIN + ['static/javascript/tba_js/gameday.js',
