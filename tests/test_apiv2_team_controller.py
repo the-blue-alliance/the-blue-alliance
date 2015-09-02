@@ -10,7 +10,8 @@ from google.appengine.ext import testbed
 
 from consts.event_type import EventType
 
-from controllers.api.api_team_controller import ApiTeamController, ApiTeamEventsController, ApiTeamMediaController, ApiTeamListController
+from controllers.api.api_team_controller import ApiTeamController, ApiTeamEventsController, ApiTeamMediaController,\
+                                                ApiTeamListController, ApiTeamHistoryRobotsController
 
 from consts.award_type import AwardType
 from consts.event_type import EventType
@@ -20,6 +21,7 @@ from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
 from models.media import Media
+from models.robot import Robot
 from models.team import Team
 
 
@@ -257,3 +259,50 @@ class TestTeamListApiController(unittest2.TestCase):
         response = self.testapp.get('/10', headers={"X-TBA-App-Id": "tba-tests:team_list-controller-test:v01"})
         team_list = json.loads(response.body)
         self.assertEqual(team_list, [])
+
+
+class TestTeamHistoryRobotsApiController(unittest2.TestCase):
+    def setUp(self):
+        app = webapp2.WSGIApplication([webapp2.Route(r'/<team_key:>', ApiTeamHistoryRobotsController, methods=['GET'])], debug=True)
+        self.testapp = webtest.TestApp(app)
+
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_urlfetch_stub()
+        self.testbed.init_memcache_stub()
+        self.testbed.init_taskqueue_stub(root_path=".")
+
+        self.team = Team(
+                id="frc1124",
+                name="UberBots",
+                team_number=1124,
+                nickname="UberBots",
+        )
+
+        self.robot = Robot(
+                id="frc1124_2015",
+                team=self.team.key,
+                year=2015,
+                robot_name="Orion"
+        )
+
+        self.team.put()
+        self.robot.put()
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def testRobotApi(self):
+        response = self.testapp.get('/frc1124', headers={"X-TBA-App-Id": "tba-tests:team_list-controller-test:v01"})
+        print response.body
+        robot_dict = json.loads(response.body)
+
+        self.assertTrue("2015" in robot_dict)
+        robot = robot_dict["2015"]
+
+        self.assertEqual(robot["key"], "frc1124_2015")
+        self.assertEqual(robot["team_key"], "frc1124")
+        self.assertEqual(robot["year"], 2015)
+        self.assertEqual(robot["name"], "Orion")
+

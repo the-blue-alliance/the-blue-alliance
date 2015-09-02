@@ -11,6 +11,7 @@ from database.award_query import TeamAwardsQuery, TeamEventAwardsQuery
 from database.event_query import TeamEventsQuery, TeamYearEventsQuery
 from database.match_query import TeamEventMatchesQuery
 from database.media_query import TeamYearMediaQuery
+from database.robot_query import TeamRobotsQuery
 from database.team_query import TeamListQuery, TeamParticipationQuery
 
 from helpers.award_helper import AwardHelper
@@ -258,3 +259,28 @@ class ApiTeamHistoryAwardsController(ApiTeamControllerBase):
 
         awards_list = [ModelToDict.awardConverter(award) for award in awards]
         return json.dumps(awards_list, ensure_ascii=True)
+
+
+class ApiTeamHistoryRobotsController(ApiTeamControllerBase):
+    """
+    Returns a JSON list of all robot models associated with a Team
+    """
+    CACHE_KEY_FORMAT = "apiv2_team_history_robots_controller_{}"  # (team_key)
+    CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamHistoryRobotsController, self).__init__(*args, **kw)
+        self.team_key = self.request.route_kwargs['team_key']
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key)
+
+    def _track_call(self, team_key):
+        self._track_call_defer('team/history/robots', team_key)
+
+    def _render(self, team_key):
+        self._set_team(team_key)
+
+        robots = TeamRobotsQuery(self.team_key).fetch()
+
+        robots_dict = {robot.year: ModelToDict.robotConverter(robot) for robot in robots}
+        return json.dumps(robots_dict, ensure_ascii=True)
