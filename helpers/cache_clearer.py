@@ -7,7 +7,7 @@ from controllers.api.api_event_controller import ApiEventController, ApiEventTea
 from controllers.api.api_match_controller import ApiMatchController
 from controllers.api.api_team_controller import ApiTeamController, ApiTeamEventsController, ApiTeamEventAwardsController, \
                                                 ApiTeamEventMatchesController, ApiTeamMediaController, ApiTeamYearsParticipatedController, \
-                                                ApiTeamListController, ApiTeamHistoryEventsController, ApiTeamHistoryAwardsController
+                                                ApiTeamListController, ApiTeamHistoryEventsController, ApiTeamHistoryAwardsController, ApiTeamHistoryRobotsController
 
 from database import get_affected_queries
 
@@ -115,10 +115,10 @@ class CacheClearer(object):
         """
         Gets cache keys and controllers that reference this robot
         """
-        team_keys = affected_refs['teams']
+        team_keys = affected_refs['team']
 
-        return cls._queries_to_cache_keys_and_controllers(get_affected_queries.robot_updated(affected_refs))
-
+        return cls._get_robots_cache_keys_and_controllers(team_keys) + \
+            cls._queries_to_cache_keys_and_controllers(get_affected_queries.robot_updated(affected_refs))
 
     @classmethod
     def get_team_cache_keys_and_controllers(cls, affected_refs):
@@ -219,6 +219,13 @@ class CacheClearer(object):
         for team_key in filter(None, team_keys):
             for year in filter(None, years):
                 cache_keys_and_controllers.append((ApiTeamMediaController.get_cache_key_from_format(team_key.id(), year), ApiTeamMediaController))
+        return cache_keys_and_controllers
+
+    @classmethod
+    def _get_robots_cache_keys_and_controllers(cls, team_keys):
+        cache_keys_and_controllers = []
+        for team_key in filter(None, team_keys):
+                cache_keys_and_controllers.append((ApiTeamHistoryRobotsController.get_cache_key_from_format(team_key.id()), ApiTeamHistoryRobotsController))
         return cache_keys_and_controllers
 
     @classmethod
