@@ -8,8 +8,7 @@ class RobotManipulator(ManipulatorBase):
     """
     @classmethod
     def getCacheKeysAndControllers(cls, affected_refs):
-        # Not rendered yet, so no cache keys
-        return []
+        return CacheClearer.get_robot_cache_keys_and_controllers(affected_refs)
 
     @classmethod
     def updateMerge(self, new_robot, old_robot, auto_union=True):

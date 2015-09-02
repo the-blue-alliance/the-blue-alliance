@@ -8,6 +8,7 @@ from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwar
 from database.event_query import EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
 from database.match_query import EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
 from database.media_query import TeamYearMediaQuery
+from database.robot_query import TeamRobotsQuery
 from database.team_query import TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
 
 from consts.district_type import DistrictType
@@ -135,6 +136,16 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         self.assertTrue(TeamYearMediaQuery('frc254', 2015).cache_key in cache_keys)
         self.assertTrue(TeamYearMediaQuery('frc604', 2014).cache_key in cache_keys)
         self.assertTrue(TeamYearMediaQuery('frc604', 2015).cache_key in cache_keys)
+
+    def test_robot_updated(self):
+        affected_refs = {
+            'team': {ndb.Key(Team, 'frc254'), ndb.Key(Team, 'frc604')},
+        }
+        cache_keys = [q.cache_key for q in get_affected_queries.robot_updated(affected_refs)]
+
+        self.assertEqual(len(cache_keys), 2)
+        self.assertTrue(TeamRobotsQuery('frc254').cache_key in cache_keys)
+        self.assertTrue(TeamRobotsQuery('frc604').cache_key in cache_keys)
 
     def test_team_updated(self):
         affected_refs = {

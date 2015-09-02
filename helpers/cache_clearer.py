@@ -111,6 +111,16 @@ class CacheClearer(object):
             cls._queries_to_cache_keys_and_controllers(get_affected_queries.media_updated(affected_refs))
 
     @classmethod
+    def get_robot_cache_keys_and_controllers(cls, affected_refs):
+        """
+        Gets cache keys and controllers that reference this robot
+        """
+        team_keys = affected_refs['teams']
+
+        return cls._queries_to_cache_keys_and_controllers(get_affected_queries.robot_updated(affected_refs))
+
+
+    @classmethod
     def get_team_cache_keys_and_controllers(cls, affected_refs):
         """
         Gets cache keys and controllers that references this team
