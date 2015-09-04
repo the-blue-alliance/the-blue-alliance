@@ -10,6 +10,9 @@ class DistrictType(object):
     NEW_ENGLAND = 3
     PACIFIC_NORTHWEST = 4
     INDIANA = 5
+    CHESAPEAKE = 6
+    NORTH_CAROLINA = 7
+    GEORGIA = 8
 
     # Used for rendering
     type_names = {
@@ -19,6 +22,9 @@ class DistrictType(object):
         NEW_ENGLAND: 'New England',
         PACIFIC_NORTHWEST: 'Pacific Northwest',
         INDIANA: 'Indiana',
+        CHESAPEAKE: 'Chesapeake',
+        NORTH_CAROLINA: 'North Carolina',
+        GEORGIA: 'Georgia',
     }
 
     # make sure abbreviations stay all lower case
@@ -29,6 +35,9 @@ class DistrictType(object):
         NEW_ENGLAND: 'ne',
         PACIFIC_NORTHWEST: 'pnw',
         INDIANA: 'in',
+        CHESAPEAKE: 'chs',
+        NORTH_CAROLINA: 'nc',
+        GEORGIA: 'pch',
     }
 
     # Names used on the FIRST website
@@ -38,6 +47,9 @@ class DistrictType(object):
         'New England': NEW_ENGLAND,
         'Pacific Northwest': PACIFIC_NORTHWEST,
         'IndianaFIRST': INDIANA,
+        'FIRST Chesapeake': CHESAPEAKE,
+        'North Carolina': NORTH_CAROLINA,
+        'Georgia': GEORGIA,
     }
 
     # make sure abbreviations stay all lower case
@@ -47,4 +59,7 @@ class DistrictType(object):
         'ne': NEW_ENGLAND,
         'pnw': PACIFIC_NORTHWEST,
         'in': INDIANA,
+        'chs': CHESAPEAKE,
+        'nc': NORTH_CAROLINA,
+        'pch': GEORGIA,
     }
