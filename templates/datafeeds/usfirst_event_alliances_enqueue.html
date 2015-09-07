@@ -4,3 +4,13 @@
 <li>{{event.key_name}}</li>
 {% endfor %}
 </ul>
+
+<h2>Skipped enqueuing for {{skipped_events|length}} events</h2>
+{% if skipped_events|length > 0 %}
+<p>These have not been enqueued this time because they are not ending today:</p>
+<ul>
+{% for event in skipped_events %}
+<li>{{event.key_name}} (ends {{event.end_date.date}})</li>
+{% endfor %}
+</ul>
+{% endif %}
