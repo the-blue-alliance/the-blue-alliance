@@ -27,13 +27,13 @@ $(document).ready(function(){
 	  var event_re = datum.value.match(/(\d*).+\[(.+?)\]/);
     if (event_re != null) {
       event_key = (event_re[1] + event_re[2]).toLowerCase();
-      url = "http://www.thebluealliance.com/event/" + event_key;
+      url = "/event/" + event_key;
       window.location.href = url;
     }
     var team_re = datum.value.match(/(\d+) [|] .+/);
     if (team_re != null) {
       team_key = team_re[1];
-      url = "http://www.thebluealliance.com/team/" + team_key;
+      url = "/team/" + team_key;
       window.location.href = url;
     }
 	}
