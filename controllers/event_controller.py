@@ -138,7 +138,8 @@ class EventDetail(CacheableHandler):
             matches_upcoming = None
 
         bracket_table = MatchHelper.generateBracket(matches, event.alliance_selections)
-        if event.year == 2015:
+        is_2015_playoff = EventHelper.is_2015_playoff(event_key)
+        if is_2015_playoff:
             playoff_advancement = MatchHelper.generatePlayoffAdvancement2015(matches, event.alliance_selections)
             for comp_level in ['qf', 'sf']:
                 if comp_level in bracket_table:
@@ -163,6 +164,7 @@ class EventDetail(CacheableHandler):
             "bracket_table": bracket_table,
             "playoff_advancement": playoff_advancement,
             "district_points_sorted": district_points_sorted,
+            "is_2015_playoff": is_2015_playoff,
         })
 
         if event.within_a_day:

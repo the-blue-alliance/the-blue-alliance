@@ -124,8 +124,9 @@ class Match(ndb.Model):
 
     @property
     def winning_alliance(self):
+        from helpers.event_helper import EventHelper
         if self._winning_alliance is None:
-            if self.year == 2015 and self.comp_level != 'f':
+            if EventHelper.is_2015_playoff(self.event_key_name) and self.comp_level != 'f':
                 return ''  # report all 2015 non finals matches as ties
 
             highest_score = 0
@@ -160,7 +161,8 @@ class Match(ndb.Model):
 
     @property
     def verbose_name(self):
-        if self.comp_level == "qm" or self.comp_level == "f" or self.year == 2015:
+        from helpers.event_helper import EventHelper
+        if self.comp_level == "qm" or self.comp_level == "f" or EventHelper.is_2015_playoff(self.event_key_name):
             return "%s %s" % (self.COMP_LEVELS_VERBOSE[self.comp_level], self.match_number)
         else:
             return "%s %s Match %s" % (self.COMP_LEVELS_VERBOSE[self.comp_level], self.set_number, self.match_number)

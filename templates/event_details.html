@@ -120,12 +120,12 @@
         <div class="col-sm-6">
           {% include "event_partials/event_alliances_table.html" %}
 
-          <h3>{% if event.year == 2015 %}Playoff{% else %}Elimination{% endif %} Results</h3>
+          <h3>{% if is_2015_playoff %}Playoff{% else %}Elimination{% endif %} Results</h3>
           {% include "match_partials/elim_match_table.html" %}
 
           {% if matches.qm %}
             {% if matches.qf or matches.sf or matches.f %}
-              {% if event.year == 2015 %}
+              {% if is_2015_playoff %}
                 <h3>Playoff Advancement</h3>
                 {% include "playoff_partials/playoff_table.html" %}
               {% else %}
@@ -147,7 +147,7 @@
         {% if not matches.qm %}
         <div class="col-sm-6">
           {% if matches.qf or matches.sf or matches.f %}
-            {% if event.year == 2015 %}
+            {% if is_2015_playoff %}
               <h3>Playoff Advancement</h3>
               {% include "playoff_partials/playoff_table.html" %}
             {% else %}

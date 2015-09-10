@@ -338,3 +338,9 @@ class EventHelper(object):
         """
         events.sort(key=EventHelper.distantFutureIfNoStartDate)
         events.sort(key=EventHelper.distantFutureIfNoEndDate)
+
+    @classmethod
+    def is_2015_playoff(Cls, event_key):
+        year = event_key[:4]
+        event_short = event_key[4:]
+        return year == '2015' and event_short not in {'cc', 'cacc'}
