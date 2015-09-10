@@ -231,6 +231,7 @@ class MatchHelper(object):
     """
     VALID_BREAKDOWNS = {
         2014: set(['auto', 'assist', 'truss+catch', 'teleop_goal+foul']),
+        2015: set(['coopertitionPoints', 'autoPoints', 'containerPoints', 'totePoints', 'litterPoints', 'foulPoints']),
     }
 
     @classmethod
