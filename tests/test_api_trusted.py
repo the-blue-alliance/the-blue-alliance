@@ -194,6 +194,7 @@ class TestApiTrustedController(unittest2.TestCase):
 
         update_request_path = '/api/trusted/v1/event/2014casj/matches/update'
         delete_request_path = '/api/trusted/v1/event/2014casj/matches/delete'
+        delete_all_request_path = '/api/trusted/v1/event/2014casj/matches/delete_all'
 
         # add one match
         matches = [{
@@ -289,6 +290,20 @@ class TestApiTrustedController(unittest2.TestCase):
         self.assertEqual(match.time_string, '11:00 AM')
         self.assertEqual(match.alliances['red']['score'], 250)
         self.assertEqual(match.score_breakdown['red']['truss+catch'], 20)
+
+        # test delete all matches
+        request_body = ''
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', delete_all_request_path, request_body)).hexdigest()
+        response = self.testapp.post(delete_all_request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        self.assertEqual(response.status_code, 400)
+
+        request_body = '2014casj'
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', delete_all_request_path, request_body)).hexdigest()
+        response = self.testapp.post(delete_all_request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        self.assertEqual(response.status_code, 200)
+
+        db_matches = Match.query(Match.event == self.event.key).fetch(None)
+        self.assertEqual(len(db_matches), 0)
 
     def test_rankings_update(self):
         self.rankings_auth.put()
@@ -401,7 +416,6 @@ class TestApiTrustedController(unittest2.TestCase):
         self.assertEqual(len(db_eventteams), 1)
         self.assertTrue('2014casj_frc254' in [et.key.id() for et in db_eventteams])
         self.assertTrue('2014casj_frc100' not in [et.key.id() for et in db_eventteams])
-
 
     def test_match_videos_add(self):
         self.video_auth.put()

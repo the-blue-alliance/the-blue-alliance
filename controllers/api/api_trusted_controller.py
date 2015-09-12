@@ -146,6 +146,23 @@ class ApiTrustedEventMatchesDelete(ApiTrustedBaseController):
         self.response.out.write(ret)
 
 
+class ApiTrustedEventMatchesDeleteAll(ApiTrustedBaseController):
+    """
+    Deletes all matches
+    """
+    REQUIRED_AUTH_TYPES = {AuthType.EVENT_MATCHES}
+
+    def _process_request(self, request, event_key):
+        if request.body != event_key:
+            self._errors = json.dumps({"Error": "To delete all matches for this event, the body of the request must be the event key."})
+            self.abort(400)
+
+        keys_to_delete = Match.query(Match.event == ndb.Key(Event, event_key)).fetch(keys_only=True)
+        MatchManipulator.delete_keys(keys_to_delete)
+
+        self.response.out.write(json.dumps({'Success': "All matches for {} deleted".format(event_key)}))
+
+
 class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
     """
     Overwrites an event's rankings_json with new data
