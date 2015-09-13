@@ -34,21 +34,21 @@
           {% if match.youtube_videos %}
           <p>Videos on The Blue Alliance</p>
           {% for youtube_video in match.youtube_videos %}
-            <iframe width="240" height="180" src="http://www.youtube.com/embed/{{youtube_video}}?rel=0" frameborder="0" allowfullscreen></iframe>
+            <iframe width="240" height="180" src="https://www.youtube.com/embed/{{youtube_video}}?rel=0" frameborder="0" allowfullscreen></iframe>
           {% endfor %}
           <h4>Add another video</h4>
           {% endif %}
           <form action="/suggest/match/video" method="post">
             <input name="match_key" type="hidden" value="{{match.key.id}}" />
             <div class="input-group">
-              <input class="form-control" type="text" name="youtube_url" placeholder="http://www.youtube.com/watch?v=MQ0VNzIvHx0" value="" />
+              <input class="form-control" type="text" name="youtube_url" placeholder="https://www.youtube.com/watch?v=MQ0VNzIvHx0" value="" />
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit"><span class="glyphicon glyphicon-plus-sign"></span> Add Video</button>
               </span>
             </div>
           </form>
           <br>
-          <p><a class="btn btn-primary" href="http://www.youtube.com/results?search_query={{match.verbose_name|urlencode}}+{{event.year|urlencode}}+{{event.name|urlencode}}" target="_blank"><span class="glyphicon glyphicon-search"></span> Search YouTube :: {{match.verbose_name}} - {{event.year}} {{event.name}}</a></p>
+          <p><a class="btn btn-primary" href="https://www.youtube.com/results?search_query={{match.verbose_name|urlencode}}+{{event.year|urlencode}}+{{event.name|urlencode}}" target="_blank"><span class="glyphicon glyphicon-search"></span> Search YouTube :: {{match.verbose_name}} - {{event.year}} {{event.name}}</a></p>
         </div>
       </div>
     </div>
