@@ -200,7 +200,7 @@ class Event(ndb.Model):
         """
         if self._rankings is None:
             try:
-                self._rankings = json.loads(self.rankings_json)
+                self._rankings = [[str(el) for el in row] for row in json.loads(self.rankings_json)]
             except Exception, e:
                 self._rankings = None
         return self._rankings
