@@ -323,7 +323,7 @@ class TestApiTrustedController(unittest2.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.event.rankings[0], ['Rank', 'Team', 'QS', 'Auton', 'Teleop', 'T&C', 'DQ', 'Played'])
-        self.assertEqual(self.event.rankings[1], [1, '254', 20, 500, 500, 200, 0, 10])
+        self.assertEqual(self.event.rankings[1], ['1', '254', '20', '500', '500', '200', '0', '10'])
 
     def test_rankings_wlt_update(self):
         self.rankings_auth.put()
@@ -343,7 +343,7 @@ class TestApiTrustedController(unittest2.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.event.rankings[0], ['Rank', 'Team', 'QS', 'Auton', 'Teleop', 'T&C', 'Record (W-L-T)', 'DQ', 'Played'])
-        self.assertEqual(self.event.rankings[1], [1, '254', 20, 500, 500, 200, '10-0-0', 0, 10])
+        self.assertEqual(self.event.rankings[1], ['1', '254', '20', '500', '500', '200', '10-0-0', '0', '10'])
 
     def test_eventteams_update(self):
         self.teams_auth.put()
