@@ -8,7 +8,6 @@ from consts.notification_type import NotificationType
 
 from google.appengine.api import urlfetch
 
-from helpers.match_manipulator import MatchManipulator
 from helpers.push_helper import PushHelper
 
 from models.event import Event
@@ -72,6 +71,7 @@ class NotificationHelper(object):
         notification.send(keys)
         match.push_sent = True  # Make sure we don't send updates for this match again
         match.dirty = True
+        from helpers.match_manipulator import MatchManipulator
         MatchManipulator.createOrUpdate(match)
 
     @classmethod
