@@ -306,3 +306,7 @@ class Event(ndb.Model):
     @property
     def event_type_str(self):
         return EventType.type_names[self.event_type_enum]
+
+    @property
+    def display_name(self):
+        return self.name if self.short_name is None else self.short_name
