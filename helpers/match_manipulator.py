@@ -104,6 +104,7 @@ class MatchManipulator(ManipulatorBase):
             "no_auto_update",
             "time",
             "time_string",
+            "push_sent",
         ]
 
         json_attrs = [
