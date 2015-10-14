@@ -8,6 +8,7 @@ from google.appengine.ext.webapp import template
 
 from base_controller import CacheableHandler
 from consts.district_type import DistrictType
+from database import event_query
 from helpers.match_helper import MatchHelper
 from helpers.award_helper import AwardHelper
 from helpers.team_helper import TeamHelper
@@ -47,8 +48,7 @@ class EventList(CacheableHandler):
         super(EventList, self).get(year, explicit_year)
 
     def _render(self, year=None, explicit_year=False):
-        event_keys = Event.query(Event.year == year).fetch(1000, keys_only=True)
-        events = ndb.get_multi(event_keys)
+        events = event_query.EventListQuery(year).fetch()
         EventHelper.sort_events(events)
 
         week_events = EventHelper.groupByWeek(events)
@@ -113,10 +113,7 @@ class EventDetail(CacheableHandler):
         event.prepAwardsMatchesTeams()
 
         awards = AwardHelper.organizeAwards(event.awards)
-        if event.within_a_day:
-            cleaned_matches = event.matches
-        else:
-            cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
+        cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
         matches = MatchHelper.organizeMatches(cleaned_matches)
         teams = TeamHelper.sortTeams(event.teams)
 
@@ -138,7 +135,8 @@ class EventDetail(CacheableHandler):
             matches_upcoming = None
 
         bracket_table = MatchHelper.generateBracket(matches, event.alliance_selections)
-        if event.year == 2015:
+        is_2015_playoff = EventHelper.is_2015_playoff(event_key)
+        if is_2015_playoff:
             playoff_advancement = MatchHelper.generatePlayoffAdvancement2015(matches, event.alliance_selections)
             for comp_level in ['qf', 'sf']:
                 if comp_level in bracket_table:
@@ -163,6 +161,7 @@ class EventDetail(CacheableHandler):
             "bracket_table": bracket_table,
             "playoff_advancement": playoff_advancement,
             "district_points_sorted": district_points_sorted,
+            "is_2015_playoff": is_2015_playoff,
         })
 
         if event.within_a_day:

@@ -66,8 +66,10 @@ class EventHelper(object):
                     if event.start_date >= week_start + datetime.timedelta(days=7):
                         current_week += 1
                         week_start += datetime.timedelta(days=7)
-
-                    label = REGIONAL_EVENTS_LABEL.format(current_week)
+                    if event.year == 2016:  # Special case for 2016 week 0.5
+                        label = REGIONAL_EVENTS_LABEL.format(0.5 if current_week == 1 else current_week - 1)
+                    else:
+                        label = REGIONAL_EVENTS_LABEL.format(current_week)
                     if label in to_return:
                         to_return[label].append(event)
                     else:
@@ -192,22 +194,28 @@ class EventHelper(object):
 
     @classmethod
     def getShortName(self, name_str):
+        """
+        Extracts a short name like "Silicon Valley" from an event name like
+        "Silicon Valley Regional sponsored by Google.org".
+
+        See https://github.com/the-blue-alliance/the-blue-alliance-android/blob/master/android/src/test/java/com/thebluealliance/androidclient/test/helpers/EventHelperTest.java
+        """
         # 2015+ districts
-        re_string = '(' + '|'.join(DistrictType.abbrevs.keys()).upper() + ') District -(.*)'
-        match = re.match(re.compile(re_string), name_str)
+        re_string = '(?:' + '|'.join(DistrictType.abbrevs.keys()).upper() + ') District -(.+)'
+        match = re.match(re_string, name_str)
         if match:
-            partial = match.group(2).strip()
-            match2 = re.match('(.*)Event(.*)', partial)
+            partial = match.group(1).strip()
+            match2 = re.match(r'(.+)Event', partial)
             if match2:
                 return match2.group(1).strip()
             else:
                 return partial
 
         # other districts and regionals
-        match = re.match(r'(MAR |PNW )?(FIRST Robotics|FRC)?(.*)(FIRST Robotics|FRC)?(District|Regional|Region|State|Tournament|FRC|Field)( Competition| Event| Championship)?', name_str)
+        match = re.match(r'\s*(?:MAR |PNW |)(?:FIRST Robotics|FRC|)(.+)(?:District|Regional|Region|State|Tournament|FRC|Field)\b', name_str)
         if match:
-            short = match.group(3)
-            match = re.match(r'(.*)(FIRST Robotics|FRC)', short)
+            short = match.group(1)
+            match = re.match(r'(.+)(?:FIRST Robotics|FRC)', short)
             if match:
                 return match.group(1).strip()
             else:
@@ -329,3 +337,9 @@ class EventHelper(object):
         """
         events.sort(key=EventHelper.distantFutureIfNoStartDate)
         events.sort(key=EventHelper.distantFutureIfNoEndDate)
+
+    @classmethod
+    def is_2015_playoff(Cls, event_key):
+        year = event_key[:4]
+        event_short = event_key[4:]
+        return year == '2015' and event_short not in {'cc', 'cacc'}

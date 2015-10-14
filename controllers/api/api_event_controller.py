@@ -7,6 +7,8 @@ from google.appengine.ext import ndb
 
 from controllers.api.api_base_controller import ApiBaseController
 
+from database.event_query import EventListQuery
+
 from helpers.award_helper import AwardHelper
 from helpers.district_helper import DistrictHelper
 from helpers.event_helper import EventHelper
@@ -108,7 +110,7 @@ class ApiEventStatsController(ApiEventController):
 
 class ApiEventRankingsController(ApiEventController):
     CACHE_KEY_FORMAT = "apiv2_event_rankings_controller_{}"  # (event_key)
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
@@ -222,8 +224,7 @@ class ApiEventListController(ApiBaseController):
             self._errors = json.dumps({"404": "No events found for %s" % self.year})
             self.abort(404)
 
-        keys = Event.query(Event.year == self.year).fetch(1000, keys_only=True)
-        events = ndb.get_multi(keys)
+        events = EventListQuery(self.year).fetch()
 
         event_list = [ModelToDict.eventConverter(event) for event in events]
 

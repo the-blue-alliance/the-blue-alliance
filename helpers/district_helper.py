@@ -25,39 +25,16 @@ class DistrictHelper(object):
     2015: http://www.usfirst.org/sites/default/files/uploadedFiles/Robotics_Programs/FRC/Game_and_Season__Info/2015/FRC_District_Standard_Points_Ranking_System_2015%20Summary.pdf
     """
     @classmethod
-    def inverf(cls, y):
-        """Return the inverse error function of y."""
-
-        # http://stackoverflow.com/questions/5971830/need-code-for-inverse-error-function
-        a = [0.886226899, -1.645349621,  0.914624893, -0.140543331]
-        b = [-2.118377725,  1.442710462, -0.329097515,  0.012229801]
-        c = [-1.970840454, -1.624906493,  3.429567803,  1.641345311]
-        d = [3.543889200,  1.637067800]
-        y0 = 0.7
-
-        if not (-1. <= y <= 1.):
-            raise ValueError("inverf argument must be between -1. and 1. (inclusive)")
-
-        if y == -1.:
-            return -float_info.max
-
-        if y == 1.:
-            return float_info.max
-
-        if y < -y0:
-            z = np.sqrt(-np.log((1. + y)/2.))
-            x = -(((c[3]*z + c[2])*z + c[1])*z + c[0])/((d[1]*z + d[0])*z + 1.0)
-        else:
-            if y < y0:
-                z = y**2
-                x = y*(((a[3]*z + a[2])*z + a[1])*z + a[0])/((((b[3]*z + b[3])*z + b[1])*z + b[0])*z + 1.)
-            else:
-                z = np.sqrt(-np.log((1. - y)/2.))
-                x = (((c[3]*z + c[2])*z + c[1])*z + c[0])/((d[1]*z + d[0])*z + 1.)
-
-            x = x - (math.erf(x) - y) / (2./np.sqrt(np.pi) * np.exp(pow(-x, 2)))
-            x = x - (math.erf(x) - y) / (2./np.sqrt(np.pi) * np.exp(pow(-x, 2)))
-        return x
+    def inverf(cls, x):
+    	if x > 0:
+    		s = 1
+    	elif x < 0:
+    		s = -1
+    	else:
+    		s = 0
+    	a = 0.147
+        y = s * math.sqrt((math.sqrt((((2 / (math.pi * a)) + ((math.log(1 - x**2)) / 2))**2) - ((math.log(1 - x**2)) / a))) - ((2 / (math.pi * a)) + (math.log(1 - x**2)) / 2))
+	return y
 
     @classmethod
     def calculate_event_points(cls, event):

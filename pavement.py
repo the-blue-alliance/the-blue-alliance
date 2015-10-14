@@ -86,10 +86,6 @@ def test_fast():
 def setup_function():
   make()
 
-  print("Set up test data at http://localhost:8088/admin/")
-  print("1/ Click 'Get Teams' and 'Create Test Events'")
-  print("2/ Click 'Create Test Events'")
-
 
 def test_function(args):
   print("Running Tests")

@@ -28,6 +28,7 @@ class Event(ndb.Model):
     official = ndb.BooleanProperty(default=False)  # Is the event FIRST-official?
     first_eid = ndb.StringProperty()  # from USFIRST
     facebook_eid = ndb.StringProperty(indexed=False)  # from Facebook
+    custom_hashtag = ndb.StringProperty(indexed=False) #Custom HashTag
     website = ndb.StringProperty(indexed=False)
     webcast_json = ndb.TextProperty(indexed=False)  # list of dicts, valid keys include 'type' and 'channel'
     matchstats_json = ndb.TextProperty(indexed=False)  # for OPR, DPR, CCWM, etc.
@@ -45,6 +46,7 @@ class Event(ndb.Model):
             'key': set(),
             'year': set(),
             'event_district_abbrev': set(),
+            'event_district_key': set()
         }
         self._alliance_selections = None
         self._awards = None
@@ -59,9 +61,8 @@ class Event(ndb.Model):
 
     @ndb.tasklet
     def get_awards_async(self):
-        from models.award import Award
-        award_keys = yield Award.query(Award.event == self.key).fetch_async(500, keys_only=True)
-        self._awards = yield ndb.get_multi_async(award_keys)
+        from database import award_query
+        self._awards = yield award_query.EventAwardsQuery(self.key_name).fetch_async()
 
     @property
     def alliance_selections(self):
@@ -81,6 +82,8 @@ class Event(ndb.Model):
         Load a list of team keys playing in elims
         """
         alliances = self.alliance_selections
+        if alliances is None:
+            return []
         teams = []
         for alliance in alliances:
             for pick in alliance['picks']:
@@ -109,9 +112,8 @@ class Event(ndb.Model):
 
     @ndb.tasklet
     def get_matches_async(self):
-        from models.match import Match
-        match_keys = yield Match.query(Match.event == self.key).fetch_async(500, keys_only=True)
-        self._matches = yield ndb.get_multi_async(match_keys)
+        from database import match_query
+        self._matches = yield match_query.EventMatchesQuery(self.key_name).fetch_async()
 
     @property
     def matches(self):
@@ -158,11 +160,8 @@ class Event(ndb.Model):
 
     @ndb.tasklet
     def get_teams_async(self):
-        from models.event_team import EventTeam
-        event_team_keys = yield EventTeam.query(EventTeam.event == self.key).fetch_async(500, keys_only=True)
-        event_teams = yield ndb.get_multi_async(event_team_keys)
-        team_keys = map(lambda event_team: event_team.team, event_teams)
-        self._teams = yield ndb.get_multi_async(team_keys)
+        from database import team_query
+        self._teams = yield team_query.EventTeamsQuery(self.key_name).fetch_async()
 
     @property
     def teams(self):
@@ -201,7 +200,7 @@ class Event(ndb.Model):
         """
         if self._rankings is None:
             try:
-                self._rankings = json.loads(self.rankings_json)
+                self._rankings = [[str(el) for el in row] for row in json.loads(self.rankings_json)]
             except Exception, e:
                 self._rankings = None
         return self._rankings
@@ -269,6 +268,16 @@ class Event(ndb.Model):
         else:
             return None
 
+    @property
+    def hashtag(self):
+        """
+        Return the hashtag used for the event.
+        """
+        if self.custom_hashtag:
+            return self.custom_hashtag
+        else:
+            return "frc" + self.event_short
+
     # Depreciated, still here to keep GAE clean.
     webcast_url = ndb.StringProperty(indexed=False)
 
@@ -287,5 +296,17 @@ class Event(ndb.Model):
         return DistrictType.type_abbrevs.get(self.event_district_enum, None)
 
     @property
+    def event_district_key(self):
+        district_abbrev = DistrictType.type_abbrevs.get(self.event_district_enum, None)
+        if district_abbrev is None:
+            return None
+        else:
+            return '{}{}'.format(self.year, district_abbrev)
+
+    @property
     def event_type_str(self):
         return EventType.type_names[self.event_type_enum]
+
+    @property
+    def display_name(self):
+        return self.name if self.short_name is None else self.short_name

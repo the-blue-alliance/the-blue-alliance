@@ -18,7 +18,7 @@ class AdminMatchVideoSuggestionsReviewController(LoggedInHandler):
 
         suggestions = Suggestion.query().filter(
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
-            Suggestion.target_model == "match")
+            Suggestion.target_model == "match").fetch(limit=50)
 
         self.template_values.update({
             "suggestions": suggestions,

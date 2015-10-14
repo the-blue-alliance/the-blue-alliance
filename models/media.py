@@ -80,4 +80,4 @@ class Media(ndb.Model):
 
     @property
     def youtube_url(self):
-        return 'http://www.youtube.com/embed/{}'.format(self.foreign_key)
+        return 'https://www.youtube.com/embed/{}'.format(self.foreign_key)

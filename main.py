@@ -8,13 +8,14 @@ from controllers.account_controller import AccountEdit, AccountLogout, AccountOv
 from controllers.ajax_controller import AccountFavoritesHandler, AccountFavoritesAddHandler, AccountFavoritesDeleteHandler
 from controllers.ajax_controller import LiveEventHandler, TypeaheadHandler, WebcastHandler
 from controllers.event_controller import EventList, EventDetail, EventRss
+from controllers.event_wizard_controller import EventWizardHandler
 from controllers.gameday2_controller import Gameday2Controller
 from controllers.insights_controller import InsightsOverview, InsightsDetail
 from controllers.main_controller import ContactHandler, HashtagsHandler, \
     MainKickoffHandler, MainBuildseasonHandler, MainChampsHandler, MainCompetitionseasonHandler, \
     MainInsightsHandler, MainOffseasonHandler, OprHandler, SearchHandler, \
     AboutHandler, ThanksHandler, PageNotFoundHandler, InternalServerErrorHandler, \
-    GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler, WebhookDocumentationHandler
+    GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler, ApiWriteHandler, MatchInputHandler, WebhookDocumentationHandler
 from controllers.match_controller import MatchDetail
 from controllers.notification_controller import UserNotificationBroadcast
 from controllers.district_controller import DistrictDetail
@@ -53,6 +54,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/account/mytba', MyTBAController, 'account-mytba', strict_slash=True),
       RedirectRoute(r'/apidocs', ApiDocumentationHandler, 'api-documentation', strict_slash=True),
       RedirectRoute(r'/apidocs/webhooks', WebhookDocumentationHandler, 'webhook-documentation', strict_slash=True),
+      RedirectRoute(r'/apiwrite', ApiWriteHandler, 'api-write', strict_slash=True),
       RedirectRoute(r'/contact', ContactHandler, 'contact', strict_slash=True),
       RedirectRoute(r'/event/<event_key>', EventDetail, 'event-detail', strict_slash=True),
       RedirectRoute(r'/event/<event_key>/feed', EventRss, 'event-rss', strict_slash=True),
@@ -60,6 +62,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/events/<district_abbrev:[a-z]+>/<year:[0-9]+>', DistrictDetail, 'district-detail', strict_slash=True),
       RedirectRoute(r'/events/<district_abbrev:[a-z]+>', DistrictDetail, 'district-canonical', strict_slash=True),
       RedirectRoute(r'/events', EventList, 'event-list', strict_slash=True),
+      RedirectRoute(r'/eventwizard', EventWizardHandler, 'event-wizard', strict_slash=True),
       RedirectRoute(r'/gameday', GamedayHandler, 'gameday', strict_slash=True),
       RedirectRoute(r'/gameday2', Gameday2Controller, 'gameday2', strict_slash=True),
       RedirectRoute(r'/hashtags', HashtagsHandler, 'hashtags', strict_slash=True),
@@ -67,6 +70,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/insights', InsightsOverview, 'insights', strict_slash=True),
       RedirectRoute(r'/logout', AccountLogout, 'account-logout', strict_slash=True),
       RedirectRoute(r'/match/<match_key>', MatchDetail, 'match-detail', strict_slash=True),
+      RedirectRoute(r'/matchinput', MatchInputHandler, 'match-input', strict_slash=True),
       RedirectRoute(r'/notifications/broadcast', UserNotificationBroadcast, 'notification-broadcast', strict_slash=True),
       RedirectRoute(r'/notifications/test/<type:[0-9]+>', TestNotificationController, 'test-notifications', strict_slash=True),
       RedirectRoute(r'/opr', OprHandler, 'opr', strict_slash=True),

@@ -70,7 +70,9 @@ class NotificationHelper(object):
         notification = UpcomingMatchNotification(match, event)
         notification.send(keys)
         match.push_sent = True  # Make sure we don't send updates for this match again
-        match.put()
+        match.dirty = True
+        from helpers.match_manipulator import MatchManipulator
+        MatchManipulator.createOrUpdate(match)
 
     @classmethod
     def send_upcoming_matches(cls, live_events):

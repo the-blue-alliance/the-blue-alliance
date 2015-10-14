@@ -52,7 +52,7 @@ class MatchManipulator(ManipulatorBase):
                             logging.error("Error sending match updates: {}".format(exception))
                             logging.error(traceback.format_exc())
                 else:
-                    if is_new or (set(['alliances_json', 'time', 'time_string']).symmetric_difference(set(updated_attrs)) != set()):
+                    if is_new or (set(['alliances_json', 'time', 'time_string']).intersection(set(updated_attrs)) != set()):
                         # The match has not been played and we're changing a property that affects the event's schedule
                         # So send a schedule update notification for the parent event
                         if event not in unplayed_match_events:
@@ -100,10 +100,11 @@ class MatchManipulator(ManipulatorBase):
         ]  # These build key_name, and cannot be changed without deleting the model.
 
         attrs = [
-            "game",
+            "year",
             "no_auto_update",
             "time",
             "time_string",
+            "push_sent",
         ]
 
         json_attrs = [

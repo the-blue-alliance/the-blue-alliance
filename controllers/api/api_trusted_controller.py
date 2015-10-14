@@ -17,6 +17,7 @@ from datafeeds.parsers.json.json_team_list_parser import JSONTeamListParser
 from helpers.award_manipulator import AwardManipulator
 from helpers.event_manipulator import EventManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
+from helpers.match_helper import MatchHelper
 from helpers.match_manipulator import MatchManipulator
 
 from models.award import Award
@@ -31,7 +32,7 @@ class ApiTrustedEventAllianceSelectionsUpdate(ApiTrustedBaseController):
     """
     Overwrites an event's alliance_selections_json with new data
     """
-    REQUIRED_AUTH_TYPES = {AuthType.EVENT_DATA}
+    REQUIRED_AUTH_TYPES = {AuthType.EVENT_ALLIANCES}
 
     def _process_request(self, request, event_key):
         alliance_selections = JSONAllianceSelectionsParser.parse(request.body)
@@ -41,12 +42,14 @@ class ApiTrustedEventAllianceSelectionsUpdate(ApiTrustedBaseController):
         event.dirty = True  # TODO: hacky
         EventManipulator.createOrUpdate(event)
 
+        self.response.out.write(json.dumps({'Success': "Alliance selections successfully updated"}))
+
 
 class ApiTrustedEventAwardsUpdate(ApiTrustedBaseController):
     """
     Removes all awards for an event and adds the awards given in the request
     """
-    REQUIRED_AUTH_TYPES = {AuthType.EVENT_DATA}
+    REQUIRED_AUTH_TYPES = {AuthType.EVENT_AWARDS}
 
     def _process_request(self, request, event_key):
         event = Event.get_by_id(event_key)
@@ -70,43 +73,62 @@ class ApiTrustedEventAwardsUpdate(ApiTrustedBaseController):
 
         AwardManipulator.createOrUpdate(awards)
 
+        self.response.out.write(json.dumps({'Success': "Awards successfully updated"}))
+
 
 class ApiTrustedEventMatchesUpdate(ApiTrustedBaseController):
     """
     Creates/updates matches
     """
-    REQUIRED_AUTH_TYPES = {AuthType.EVENT_DATA}
+    REQUIRED_AUTH_TYPES = {AuthType.EVENT_MATCHES}
 
     def _process_request(self, request, event_key):
         event = Event.get_by_id(event_key)
         year = int(event_key[:4])
 
-        matches = [Match(
-            id=Match.renderKeyName(
-                event.key.id(),
-                match.get("comp_level", None),
-                match.get("set_number", 0),
-                match.get("match_number", 0)),
-            event=event.key,
-            game=Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
-            set_number=match.get("set_number", 0),
-            match_number=match.get("match_number", 0),
-            comp_level=match.get("comp_level", None),
-            team_key_names=match.get("team_key_names", None),
-            alliances_json=match.get("alliances_json", None),
-            score_breakdown_json=match.get("score_breakdown_json", None),
-            time_string=match.get("time_string", None),
-            time=match.get("time", None),
-        ) for match in JSONMatchesParser.parse(request.body, year)]
+        matches = []
+        needs_time = []
+        for match in JSONMatchesParser.parse(request.body, year):
+            match = Match(
+                id=Match.renderKeyName(
+                    event.key.id(),
+                    match.get("comp_level", None),
+                    match.get("set_number", 0),
+                    match.get("match_number", 0)),
+                event=event.key,
+                year=event.year,
+                set_number=match.get("set_number", 0),
+                match_number=match.get("match_number", 0),
+                comp_level=match.get("comp_level", None),
+                team_key_names=match.get("team_key_names", None),
+                alliances_json=match.get("alliances_json", None),
+                score_breakdown_json=match.get("score_breakdown_json", None),
+                time_string=match.get("time_string", None),
+                time=match.get("time", None),
+            )
+
+            if (not match.time or match.time == "") and match.time_string:
+                # We can calculate the real time from the time string
+                needs_time.append(match)
+            matches.append(match)
+
+        if needs_time:
+            try:
+                logging.debug("Calculating time!")
+                MatchHelper.add_match_times(event, needs_time)
+            except Exception, e:
+                logging.error("Failed to calculate match times")
 
         MatchManipulator.createOrUpdate(matches)
+
+        self.response.out.write(json.dumps({'Success': "Matches successfully updated"}))
 
 
 class ApiTrustedEventMatchesDelete(ApiTrustedBaseController):
     """
     Deletes given match keys
     """
-    REQUIRED_AUTH_TYPES = {AuthType.EVENT_DATA}
+    REQUIRED_AUTH_TYPES = {AuthType.EVENT_MATCHES}
 
     def _process_request(self, request, event_key):
         keys_to_delete = set()
@@ -120,14 +142,32 @@ class ApiTrustedEventMatchesDelete(ApiTrustedBaseController):
 
         MatchManipulator.delete_keys(keys_to_delete)
 
-        self.response.out.write(json.dumps({'keys_deleted': [key.id().split('_')[1] for key in keys_to_delete]}))
+        ret = json.dumps({"keys_deleted": [key.id().split('_')[1] for key in keys_to_delete]})
+        self.response.out.write(ret)
+
+
+class ApiTrustedEventMatchesDeleteAll(ApiTrustedBaseController):
+    """
+    Deletes all matches
+    """
+    REQUIRED_AUTH_TYPES = {AuthType.EVENT_MATCHES}
+
+    def _process_request(self, request, event_key):
+        if request.body != event_key:
+            self._errors = json.dumps({"Error": "To delete all matches for this event, the body of the request must be the event key."})
+            self.abort(400)
+
+        keys_to_delete = Match.query(Match.event == ndb.Key(Event, event_key)).fetch(keys_only=True)
+        MatchManipulator.delete_keys(keys_to_delete)
+
+        self.response.out.write(json.dumps({'Success': "All matches for {} deleted".format(event_key)}))
 
 
 class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
     """
     Overwrites an event's rankings_json with new data
     """
-    REQUIRED_AUTH_TYPES = {AuthType.EVENT_DATA}
+    REQUIRED_AUTH_TYPES = {AuthType.EVENT_RANKINGS}
 
     def _process_request(self, request, event_key):
         rankings = JSONRankingsParser.parse(request.body)
@@ -137,13 +177,15 @@ class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
         event.dirty = True  # TODO: hacky
         EventManipulator.createOrUpdate(event)
 
+        self.response.out.write(json.dumps({'Success': "Rankings successfully updated"}))
+
 
 class ApiTrustedEventTeamListUpdate(ApiTrustedBaseController):
     """
     Creates/updates EventTeams for teams given in the request
     and removes EventTeams for teams not in the request
     """
-    REQUIRED_AUTH_TYPES = {AuthType.EVENT_DATA}
+    REQUIRED_AUTH_TYPES = {AuthType.EVENT_TEAMS}
 
     def _process_request(self, request, event_key):
         team_keys = JSONTeamListParser.parse(request.body)
@@ -151,10 +193,11 @@ class ApiTrustedEventTeamListUpdate(ApiTrustedBaseController):
 
         event_teams = []
         for team_key in team_keys:
-            event_teams.append(EventTeam(id=event.key.id() + '_{}'.format(team_key),
-                                         event=event.key,
-                                         team=ndb.Key(Team, team_key),
-                                         year=event.year))
+            if Team.get_by_id(team_key):  # Don't create EventTeams for teams that don't exist
+                event_teams.append(EventTeam(id=event.key.id() + '_{}'.format(team_key),
+                                             event=event.key,
+                                             team=ndb.Key(Team, team_key),
+                                             year=event.year))
 
         # delete old eventteams
         old_eventteam_keys = EventTeam.query(EventTeam.event == event.key).fetch(None, keys_only=True)
@@ -162,6 +205,8 @@ class ApiTrustedEventTeamListUpdate(ApiTrustedBaseController):
         EventTeamManipulator.delete_keys(to_delete)
 
         EventTeamManipulator.createOrUpdate(event_teams)
+
+        self.response.out.write(json.dumps({'Success': "Event teams successfully updated"}))
 
 
 class ApiTrustedAddMatchYoutubeVideo(ApiTrustedBaseController):
@@ -190,3 +235,5 @@ class ApiTrustedAddMatchYoutubeVideo(ApiTrustedBaseController):
                 match.dirty = True  # This is hacky -fangeugene 2014-10-26
                 matches_to_put.append(match)
         MatchManipulator.createOrUpdate(matches_to_put)
+
+        self.response.out.write(json.dumps({'Success': "Match videos successfully updated"}))

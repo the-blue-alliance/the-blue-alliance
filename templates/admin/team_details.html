@@ -41,6 +41,24 @@
         <td>Events</td>
         <td>{{event_teams|length}} Events - {% for event_team in event_teams %}<a href="/admin/event/{{event_team.event.id}}">{{event_team.event.id}}</a>, {% endfor %}</td>
     </tr>
+    <tr>
+        <td>Robots</td>
+        <td>
+            {% for robot in robots %}
+                {{ robot.year }}: {{ robot.robot_name }}
+                {% if not forloop.last %}<br>{% endif %}
+            {% endfor %}
+        </td>
+    </tr>
+    <tr>
+        <td>Districts</td>
+        <td>
+            {% for district_team in district_teams %}
+                {{district_team.key.id}}
+                {% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </td>
+    </tr>
 </table>
 
 <p>Teams are currently uneditable. They are updated via TIMS scraping.</p>

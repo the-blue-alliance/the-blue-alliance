@@ -47,6 +47,14 @@ $(document).ready(function(){
 	}
 
 	// Converting match time to local time
+  var weekday = new Array(7);
+  weekday[0]=  "Sun";
+  weekday[1] = "Mon";
+  weekday[2] = "Tue";
+  weekday[3] = "Wed";
+  weekday[4] = "Thu";
+  weekday[5] = "Fri";
+  weekday[6] = "Sat";
 	$('.tba-match-time-utc').each(function () {
 	  var matchTime = new Date($(this).text());  // Converts UTC to local time
 	  if (!isNaN(matchTime)) {
@@ -56,11 +64,22 @@ $(document).ready(function(){
         hour12 = 12;
       }
       var minute = matchTime.getMinutes();
-      var matchTimeStr = hour12 + ':' + ((''+minute).length<2 ? '0' :'')+minute;
+      var matchTimeStr = weekday[matchTime.getDay()] + ' ' + hour12 + ':' + ((''+minute).length<2 ? '0' :'')+minute;
       matchTimeStr += hour24 < 12 ? ' AM' : ' PM';
 
       $(this).text(matchTimeStr);
       $(this).css('display', 'inline');
 	  }
 	});
+
+  // For 4/1
+  var today = new Date();
+  var dd = today.getDate();
+  var mm = today.getMonth() + 1;
+  if (dd == 1 && mm == 4) {
+    var urls = ['http://i.imgur.com/hGmvG8L.jpg', 'http://i.imgur.com/bC3gvxa.jpg', 'http://i.imgur.com/8lLN9jB.jpg', 'http://i.imgur.com/qiRHQtB.jpg', 'http://i.imgur.com/zWyyZ2N.jpg', 'http://i.imgur.com/ZUcX3Hw.jpg'];
+    var randInt = Math.floor(Math.random() * 6);
+    var url = urls[randInt];
+    $("#robot-image").html('<div class="thumbnail carousel team-media-carousel"><a href="' + url + '" target="_blank"><img src="' + url + '" alt="April Fools!"></a></div>');
+  }
 });

@@ -1,7 +1,7 @@
 $(function() {
     // Setup redirect after login
     $('#mytba-login').click(function() {
-      window.location.href = '/account?redirect=' + escape(document.URL);
+      window.location.href = '/account?redirect=' + escape(document.URL.replace(document.location.origin, ""));
     });
 
     updateFavoritesList();  // Setup

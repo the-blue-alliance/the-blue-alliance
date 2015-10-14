@@ -2,7 +2,7 @@ import os
 
 DEBUG = os.environ.get('SERVER_SOFTWARE', '').startswith('Dev')
 
-MAX_YEAR = 2015
+MAX_YEAR = 2016
 
 # For choosing what the main landing page displays
 KICKOFF = 1
@@ -18,6 +18,7 @@ if DEBUG:
     CONFIG = {
         "env": "dev",
         "memcache": False,
+        "database_query_cache": False,
         "response_cache": False,
         "firebase-url": "https://thebluealliance-dev.firebaseio.com/{}.json?auth={}"
     }
@@ -25,9 +26,10 @@ else:
     CONFIG = {
         "env": "prod",
         "memcache": True,
+        "database_query_cache": True,
         "response_cache": True,
         "firebase-url": "https://thebluealliance.firebaseio.com/{}.json?auth={}"
     }
 
-CONFIG['landing_handler'] = COMPETITIONSEASON
+CONFIG['landing_handler'] = INSIGHTS
 CONFIG["static_resource_version"] = 7

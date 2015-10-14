@@ -7,6 +7,8 @@ from consts.event_type import EventType
 
 from datetime import datetime
 
+from database.event_query import DistrictEventsQuery
+
 from google.appengine.ext import ndb
 
 from helpers.district_helper import DistrictHelper
@@ -85,8 +87,7 @@ class ApiDistrictEventsController(ApiDistrictControllerBase):
     def _render(self, district_abbrev, year=None):
         self._set_district(district_abbrev)
 
-        event_keys = Event.query(Event.year == self.year, Event.event_district_enum == self.district).fetch(None, keys_only=True)
-        events = ndb.get_multi(event_keys)
+        events = DistrictEventsQuery('{}{}'.format(self.year, self.district_abbrev)).fetch()
 
         events = [ModelToDict.eventConverter(event) for event in events]
 

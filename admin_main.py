@@ -14,12 +14,13 @@ from controllers.admin.admin_media_controller import AdminMediaDashboard, AdminM
 
 from controllers.admin.admin_memcache_controller import AdminMemcacheMain
 from controllers.admin.admin_offseason_scraper_controller import AdminOffseasonScraperController
+from controllers.admin.admin_offseason_spreadsheet_controller import AdminOffseasonSpreadsheetController
 from controllers.admin.admin_sitevar_controller import AdminSitevarCreate, AdminSitevarEdit, AdminSitevarList
 from controllers.admin.suggestions.admin_event_webcast_suggestions_review_controller import AdminEventWebcastSuggestionsReviewController
 from controllers.admin.suggestions.admin_match_video_suggestions_review_controller import AdminMatchVideoSuggestionsReviewController
 from controllers.admin.suggestions.admin_media_suggestions_review_controller import AdminMediaSuggestionsReviewController
 from controllers.admin.admin_team_controller import AdminTeamCreateTest, AdminTeamDetail, AdminTeamList
-from controllers.admin.admin_migration_controller import AdminMigration
+from controllers.admin.admin_migration_controller import AdminMigration, AdminMigrationAddMatchYear
 from controllers.admin.admin_user_controller import AdminUserList, AdminUserEdit, AdminUserDetail
 from controllers.admin.admin_mobile_controller import AdminMobile, AdminBroadcast
 
@@ -52,7 +53,9 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/media/add_media', AdminMediaAdd),
                                ('/admin/memcache', AdminMemcacheMain),
                                ('/admin/migration', AdminMigration),
+                               ('/admin/migration/add_match_year', AdminMigrationAddMatchYear),
                                ('/admin/offseasons', AdminOffseasonScraperController),
+                               ('/admin/offseasons/spreadsheet', AdminOffseasonSpreadsheetController),
                                ('/admin/sitevars', AdminSitevarList),
                                ('/admin/sitevar/create', AdminSitevarCreate),
                                ('/admin/sitevar/edit/(.*)', AdminSitevarEdit),

@@ -7,7 +7,8 @@ from controllers.api_controller import ApiDeprecatedController, CsvTeamsAll
 from controllers.api.api_district_controller import ApiDistrictListController, ApiDistrictEventsController, ApiDistrictRankingsController
 from controllers.api.api_team_controller import ApiTeamController, ApiTeamEventsController, ApiTeamEventAwardsController, \
                                                 ApiTeamEventMatchesController, ApiTeamMediaController, ApiTeamListController, \
-                                                ApiTeamYearsParticipatedController
+                                                ApiTeamYearsParticipatedController, ApiTeamHistoryEventsController, \
+                                                ApiTeamHistoryAwardsController, ApiTeamHistoryRobotsController
 from controllers.api.api_event_controller import ApiEventController, ApiEventTeamsController, \
                                                  ApiEventMatchesController, ApiEventStatsController, \
                                                  ApiEventRankingsController, ApiEventAwardsController, \
@@ -15,7 +16,7 @@ from controllers.api.api_event_controller import ApiEventController, ApiEventTea
                                                  ApiEventWeekController
 from controllers.api.api_match_controller import ApiMatchController
 from controllers.api.api_trusted_controller import ApiTrustedEventAllianceSelectionsUpdate, ApiTrustedEventAwardsUpdate, \
-                                                   ApiTrustedEventMatchesUpdate, ApiTrustedEventMatchesDelete, ApiTrustedEventRankingsUpdate, \
+                                                   ApiTrustedEventMatchesUpdate, ApiTrustedEventMatchesDelete, ApiTrustedEventMatchesDeleteAll, ApiTrustedEventRankingsUpdate, \
                                                    ApiTrustedEventTeamListUpdate, ApiTrustedAddMatchYoutubeVideo
 
 
@@ -43,6 +44,15 @@ app = webapp2.WSGIApplication([webapp2.Route(r'/api/v1/<:.*>',
                                              methods=['GET']),
                                webapp2.Route(r'/api/v2/team/<team_key:>/<year:([0-9]*)>/media',
                                              ApiTeamMediaController,
+                                             methods=['GET']),
+                               webapp2.Route(r'/api/v2/team/<team_key:>/history/events',
+                                             ApiTeamHistoryEventsController,
+                                             methods=['GET']),
+                               webapp2.Route(r'/api/v2/team/<team_key:>/history/awards',
+                                             ApiTeamHistoryAwardsController,
+                                             methods=['GET']),
+                               webapp2.Route(r'/api/v2/team/<team_key:>/history/robots',
+                                             ApiTeamHistoryRobotsController,
                                              methods=['GET']),
                                webapp2.Route(r'/api/v2/team/<team_key:>/years_participated',
                                              ApiTeamYearsParticipatedController,
@@ -103,6 +113,9 @@ app = webapp2.WSGIApplication([webapp2.Route(r'/api/v1/<:.*>',
                                              methods=['POST']),
                                webapp2.Route(r'/api/trusted/v1/event/<event_key:>/matches/delete',
                                              ApiTrustedEventMatchesDelete,
+                                             methods=['POST']),
+                               webapp2.Route(r'/api/trusted/v1/event/<event_key:>/matches/delete_all',
+                                             ApiTrustedEventMatchesDeleteAll,
                                              methods=['POST']),
                                webapp2.Route(r'/api/trusted/v1/event/<event_key:>/rankings/update',
                                              ApiTrustedEventRankingsUpdate,

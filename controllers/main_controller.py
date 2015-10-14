@@ -93,6 +93,7 @@ class MainChampsHandler(CacheableHandler):
 
         self.template_values.update({
             "events": events,
+            "year": year,
         })
 
         insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(year, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
@@ -133,11 +134,13 @@ class MainInsightsHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         week_events = EventHelper.getWeekEvents()
+        year = datetime.datetime.now().year
         self.template_values.update({
             "events": week_events,
+            "year": year,
         })
 
-        insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(2014, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
+        insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(year, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
         for insight in insights:
             if insight:
                 self.template_values[insight.name] = insight
@@ -362,6 +365,32 @@ class ApiDocumentationHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/apidocs.html")
+        return template.render(path, self.template_values)
+
+
+class ApiWriteHandler(CacheableHandler):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "api_write"
+
+    def __init__(self, *args, **kw):
+        super(ApiWriteHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+
+    def _render(self, *args, **kw):
+        path = os.path.join(os.path.dirname(__file__), "../templates/apiwrite.html")
+        return template.render(path, self.template_values)
+
+
+class MatchInputHandler(CacheableHandler):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "match_input"
+
+    def __init__(self, *args, **kw):
+        super(MatchInputHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60
+
+    def _render(self, *args, **kw):
+        path = os.path.join(os.path.dirname(__file__), "../templates/matchinput.html")
         return template.render(path, self.template_values)
 
 

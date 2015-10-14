@@ -1,5 +1,9 @@
-appstats_CALC_RPC_COSTS = False
-appstats_RECORD_FRACTION = 0.1
+import tba_config
+
+if tba_config.CONFIG['env'] == 'prod':
+    appstats_RECORD_FRACTION = 0.1
+else:
+    appstats_CALC_RPC_COSTS = True
 
 
 def webapp_add_wsgi_middleware(app):

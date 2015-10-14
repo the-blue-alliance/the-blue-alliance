@@ -8,14 +8,14 @@ from consts.district_type import DistrictType
 from datafeeds.parsers.fms_api.fms_api_awards_parser import FMSAPIAwardsParser
 from datafeeds.parsers.fms_api.fms_api_event_alliances_parser import FMSAPIEventAlliancesParser
 from datafeeds.parsers.fms_api.fms_api_event_rankings_parser import FMSAPIEventRankingsParser
-from datafeeds.parsers.fms_api.fms_api_hybrid_schedule_parser import FMSAPIHybridScheduleParser
+from datafeeds.parsers.fms_api.fms_api_match_parser import FMSAPIHybridScheduleParser
 
 from google.appengine.ext import testbed
 
 from models.event import Event
 
 
-class TestFMSAPIParser(unittest2.TestCase):
+class TestFMSAPIEventParser(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
@@ -75,10 +75,10 @@ class TestFMSAPIParser(unittest2.TestCase):
         self.assertEqual(match.team_key_names, [u'frc4131', u'frc4469', u'frc3663', u'frc3684', u'frc5295', u'frc2976'])
         self.assertEqual(match.alliances_json, """{"blue": {"score": 30, "teams": ["frc4131", "frc4469", "frc3663"]}, "red": {"score": 18, "teams": ["frc3684", "frc5295", "frc2976"]}}""")
         self.assertEqual(match.time, datetime.datetime(2015, 2, 27, 0, 0))
-        self.assertEqual(match.score_breakdown['red']['foul'], 0)
-        self.assertEqual(match.score_breakdown['red']['auto'], 8)
-        self.assertEqual(match.score_breakdown['blue']['foul'], 0)
-        self.assertEqual(match.score_breakdown['blue']['auto'], 14)
+        self.assertEqual(match.score_breakdown['red']['foul_points'], 0)
+        self.assertEqual(match.score_breakdown['red']['auto_points'], 8)
+        self.assertEqual(match.score_breakdown['blue']['foul_points'], 0)
+        self.assertEqual(match.score_breakdown['blue']['auto_points'], 14)
 
         match = matches[11]
         self.assertEqual(match.comp_level, "qm")
@@ -87,10 +87,10 @@ class TestFMSAPIParser(unittest2.TestCase):
         self.assertEqual(match.team_key_names, [u'frc3663', u'frc5295', u'frc2907', u'frc2046', u'frc3218', u'frc2412'])
         self.assertEqual(match.alliances_json, """{"blue": {"score": null, "teams": ["frc3663", "frc5295", "frc2907"]}, "red": {"score": null, "teams": ["frc2046", "frc3218", "frc2412"]}}""")
         self.assertEqual(match.time, datetime.datetime(2015, 2, 27, 2, 17))
-        self.assertEqual(match.score_breakdown['red']['foul'], None)
-        self.assertEqual(match.score_breakdown['red']['auto'], None)
-        self.assertEqual(match.score_breakdown['blue']['foul'], None)
-        self.assertEqual(match.score_breakdown['blue']['auto'], None)
+        self.assertEqual(match.score_breakdown['red']['foul_points'], None)
+        self.assertEqual(match.score_breakdown['red']['auto_points'], None)
+        self.assertEqual(match.score_breakdown['blue']['foul_points'], None)
+        self.assertEqual(match.score_breakdown['blue']['auto_points'], None)
 
     def test_parseEventAlliances(self):
         with open('test_data/fms_api/2015waamv_staging_alliances.json', 'r') as f:

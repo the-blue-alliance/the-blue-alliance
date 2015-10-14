@@ -173,8 +173,8 @@ class MatchHelper(object):
     def generatePlayoffAdvancement2015(cls, matches, alliance_selections=None):
         complete_alliances = []
         advancement = defaultdict(list)  # key: comp level; value: list of [complete_alliance, [scores], average_score]
-        for comp_level in ['qf', 'sf']:
-            for match in matches[comp_level]:
+        for comp_level in ['ef', 'qf', 'sf']:
+            for match in matches.get(comp_level, []):
                 if not match.has_been_played:
                     continue
                 for color in ['red', 'blue']:
@@ -231,6 +231,7 @@ class MatchHelper(object):
     """
     VALID_BREAKDOWNS = {
         2014: set(['auto', 'assist', 'truss+catch', 'teleop_goal+foul']),
+        2015: set(['coopertition_points', 'auto_points', 'container_points', 'tote_points', 'litter_points', 'foul_points']),
     }
 
     @classmethod

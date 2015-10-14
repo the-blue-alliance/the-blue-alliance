@@ -4,6 +4,9 @@ import os
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
+from consts.district_type import DistrictType
+from database import award_query, event_query, match_query, media_query, team_query
+
 from helpers.data_fetchers.team_details_data_fetcher import TeamDetailsDataFetcher
 
 from helpers.award_helper import AwardHelper
@@ -14,18 +17,19 @@ from helpers.media_helper import MediaHelper
 from models.award import Award
 from models.event_team import EventTeam
 from models.match import Match
-from models.media import Media
+from models.robot import Robot
 
 
 class TeamRenderer(object):
     @classmethod
     def render_team_details(cls, handler, team, year, is_canonical):
-        media_key_futures = Media.query(Media.references == team.key, Media.year == year).fetch_async(500, keys_only=True)
+        media_future = media_query.TeamYearMediaQuery(team.key.id(), year).fetch_async()
+        robot_future = Robot.get_by_id_async('{}_{}'.format(team.key.id(), year))
+        team_districts_future = team_query.TeamDistrictsQuery(team.key.id()).fetch_async()
+
         events_sorted, matches_by_event_key, awards_by_event_key, valid_years = TeamDetailsDataFetcher.fetch(team, year, return_valid_years=True)
         if not events_sorted:
             return None
-
-        media_futures = ndb.get_multi_async(media_key_futures.get_result())
 
         participation = []
         year_wlt_list = []
@@ -97,7 +101,16 @@ class TeamRenderer(object):
             if year_wlt["win"] + year_wlt["loss"] + year_wlt["tie"] == 0:
                 year_wlt = None
 
-        medias_by_slugname = MediaHelper.group_by_slugname([media_future.get_result() for media_future in media_futures])
+        medias_by_slugname = MediaHelper.group_by_slugname([media for media in media_future.get_result()])
+
+        district_name = None
+        district_abbrev = None
+        team_districts = team_districts_future.get_result()
+        if year in team_districts:
+            district_key = team_districts[year]
+            district_abbrev = district_key[4:]
+            district_type = DistrictType.abbrevs[district_abbrev]
+            district_name = DistrictType.type_names[district_type]
 
         handler.template_values.update({
             "is_canonical": is_canonical,
@@ -110,7 +123,10 @@ class TeamRenderer(object):
             "year_elim_avg": year_elim_avg,
             "current_event": current_event,
             "matches_upcoming": matches_upcoming,
-            "medias_by_slugname": medias_by_slugname
+            "medias_by_slugname": medias_by_slugname,
+            "robot": robot_future.get_result(),
+            "district_name": district_name,
+            "district_abbrev": district_abbrev,
         })
 
         if short_cache:
@@ -121,18 +137,11 @@ class TeamRenderer(object):
 
     @classmethod
     def render_team_history(cls, handler, team, is_canonical):
-        event_team_keys_future = EventTeam.query(EventTeam.team == team.key).fetch_async(1000, keys_only=True)
-        award_keys_future = Award.query(Award.team_list == team.key).fetch_async(1000, keys_only=True)
-
-        event_teams_futures = ndb.get_multi_async(event_team_keys_future.get_result())
-        awards_futures = ndb.get_multi_async(award_keys_future.get_result())
-
-        event_keys = [event_team_future.get_result().event for event_team_future in event_teams_futures]
-        events_futures = ndb.get_multi_async(event_keys)
+        award_futures = award_query.TeamAwardsQuery(team.key.id()).fetch_async()
+        event_futures = event_query.TeamEventsQuery(team.key.id()).fetch_async()
 
         awards_by_event = {}
-        for award_future in awards_futures:
-            award = award_future.get_result()
+        for award in award_futures.get_result():
             if award.event.id() not in awards_by_event:
                 awards_by_event[award.event.id()] = [award]
             else:
@@ -142,14 +151,12 @@ class TeamRenderer(object):
         current_event = None
         matches_upcoming = None
         short_cache = False
-        for event_future in events_futures:
-            event = event_future.get_result()
+        years = set()
+        for event in event_futures.get_result():
+            years.add(event.year)
             if event.now:
                 current_event = event
-
-                team_matches_future = Match.query(Match.event == event.key, Match.team_key_names == team.key_name)\
-                  .fetch_async(500, keys_only=True)
-                matches = ndb.get_multi(team_matches_future.get_result())
+                matches = match_query.TeamEventMatchesQuery(team.key.id(), event.key.id()).fetch()
                 matches_upcoming = MatchHelper.upcomingMatches(matches)
 
             if event.within_a_day:
@@ -162,13 +169,11 @@ class TeamRenderer(object):
             event_awards.append((event, sorted_awards))
         event_awards = sorted(event_awards, key=lambda (e, _): e.start_date if e.start_date else datetime.datetime(e.year, 12, 31))
 
-        years = sorted(set([et.get_result().year for et in event_teams_futures if et.get_result().year is not None]))
-
         handler.template_values.update({
             'is_canonical': is_canonical,
             'team': team,
             'event_awards': event_awards,
-            'years': years,
+            'years': sorted(years),
             'current_event': current_event,
             'matches_upcoming': matches_upcoming
         })

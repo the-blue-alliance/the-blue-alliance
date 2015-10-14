@@ -5,7 +5,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from base_controller import CacheableHandler
-
+from database import team_query
 from models.team import Team
 
 from renderers.team_renderer import TeamRenderer
@@ -41,15 +41,9 @@ class TeamList(CacheableHandler):
             if curPage == page:
                 cur_page_label = label
 
-        start = (page - 1) * 1000
-        stop = start + 999
-
-        if start == 0:
-            start = 1
-
-        team_keys = Team.query().order(Team.team_number).filter(
-          Team.team_number >= start).filter(Team.team_number <= stop).fetch(10000, keys_only=True)
-        teams = ndb.get_multi(team_keys)
+        teams_1 = team_query.TeamListQuery(2 * (page - 1)).fetch_async()
+        teams_2 = team_query.TeamListQuery(2 * (page - 1) + 1).fetch_async()
+        teams = teams_1.get_result() + teams_2.get_result()
 
         num_teams = len(teams)
         middle_value = num_teams / 2

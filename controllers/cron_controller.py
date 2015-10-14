@@ -96,11 +96,10 @@ class EventTeamUpdate(webapp.RequestHandler):
     ^^^ Does it actually do this? Eugene -- 2013/07/30
     """
     def get(self, event_key):
-        teams, event_teams, et_keys_to_del = EventTeamUpdater.update(event_key)
+        _, event_teams, et_keys_to_del = EventTeamUpdater.update(event_key)
 
-        teams = TeamManipulator.createOrUpdate(teams)
-
-        if teams:
+        if event_teams:
+            event_teams = filter(lambda et: et.team.get() is not None, event_teams)
             event_teams = EventTeamManipulator.createOrUpdate(event_teams)
 
         if et_keys_to_del:

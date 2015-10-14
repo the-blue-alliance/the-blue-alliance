@@ -51,6 +51,51 @@ $(function () {
             enabled: false
         },
     });
+
+    $('#graphdatabasequery').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false
+        },
+        title: {
+            text: 'Database Queries',
+            useHTML: true
+        },
+        tooltip: {
+            pointFormat: '<b>{point.y}</b>'
+        },
+        plotOptions: {
+            pie: {
+                dataLabels: {
+                    enabled: false
+                },
+                showInLegend: true
+            }
+        },
+        series: [{
+            type: 'pie',
+            name: 'Database Queries',
+            data: [
+                {
+                    name: 'Misses',
+                    y: {{databasequery_stats.misses}},
+                    color: '#8B0000'
+                },
+                {
+                    name: 'Hits',
+                    y: {{databasequery_stats.hits}},
+                    color: '#008000'
+                }
+            ]
+        }],
+        exporting: {
+            enabled: false
+        },
+        credits: {
+            enabled: false
+        },
+    });
 });
 </script>
 {% endblock %}
@@ -127,6 +172,9 @@ $(function () {
                     </ul>
                 </div>
                 <div class="row">
+                    <div id="graphdatabasequery" style="width: 100%; height: 400px;"></div>
+                </div>
+                <div class="row">
                     <div id="graphmemcache" style="width: 100%; height: 400px;"></div>
                 </div>
             </div>
@@ -156,7 +204,7 @@ $(function () {
     </div>
 </div>
 <div class="row">
-    
+
 </div>
 
 {% endblock %}

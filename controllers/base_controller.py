@@ -101,6 +101,9 @@ class LoggedInHandler(webapp2.RequestHandler):
         self.template_values = {
             "user_bundle": self.user_bundle
         }
+        self.response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        self.response.headers['Pragma'] = 'no-cache'
+        self.response.headers['Expires'] = '0'
 
     def _require_admin(self):
         self._require_login()

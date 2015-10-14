@@ -77,11 +77,13 @@ class OffseasonMatchesParser(ParserBase):
     def parseMatchNumberInfo(self, string):
         string = string.strip()
         COMP_LEVEL_MAP = {'qm': 'qm',
+                          'efm': 'ef',
                           'qfm': 'qf',
                           'sfm': 'sf',
                           'fm': 'f', }
 
         MATCH_PARSE_STYLE = {'qm': self.parseQualMatchNumberInfo,
+                             'ef': self.parseElimMatchNumberInfo,
                              'qf': self.parseElimMatchNumberInfo,
                              'sf': self.parseElimMatchNumberInfo,
                              'f': self.parseElimMatchNumberInfo, }
@@ -99,6 +101,7 @@ class OffseasonMatchesParser(ParserBase):
 
     @classmethod
     def parseElimMatchNumberInfo(self, string):
-        match_number = int(string[-1:])
-        set_number = int(string[-3:-2])
+        set_number, match_number = string.split('m')
+        match_number = int(match_number)
+        set_number = int(set_number[-1])
         return match_number, set_number

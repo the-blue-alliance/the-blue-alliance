@@ -8,6 +8,7 @@ from google.appengine.api import memcache
 from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
+from database.database_query import DatabaseQuery
 from models.account import Account
 from models.suggestion import Suggestion
 
@@ -17,6 +18,10 @@ class AdminMain(LoggedInHandler):
         self._require_admin()
 
         self.template_values['memcache_stats'] = memcache.get_stats()
+        self.template_values['databasequery_stats'] = {
+            'hits': sum(filter(None, [memcache.get(key) for key in DatabaseQuery.DATABASE_HITS_MEMCACHE_KEYS])),
+            'misses': sum(filter(None, [memcache.get(key) for key in DatabaseQuery.DATABASE_MISSES_MEMCACHE_KEYS]))
+        }
 
         # Gets the 5 recently created users
         users = Account.query().order(-Account.created).fetch(5)
