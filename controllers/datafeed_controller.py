@@ -248,6 +248,94 @@ class FMSAPIMatchesGet(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
 
 
+class UsfirstTeamDetailsEnqueue(webapp.RequestHandler):
+    """
+    Handles enqueing updates to individual teams
+    """
+    def get(self):
+        offset = int(self.request.get("offset", 0))
+
+        team_keys = Team.query().fetch(1000, offset=int(offset), keys_only=True)
+        teams = ndb.get_multi(team_keys)
+        for team in teams:
+            taskqueue.add(
+                queue_name='frc-api',
+                url='/tasks/get/fmsapi_team_details/' + team.key_name,
+                method='GET')
+
+        # FIXME omg we're just writing out? -gregmarra 2012 Aug 26
+        self.response.out.write("%s team gets have been enqueued offset from %s.<br />" % (len(teams), offset))
+        self.response.out.write("Reload with ?offset=%s to enqueue more." % (offset + len(teams)))
+
+
+class FMSAPITeamDetailsRollingEnqueue(webapp.RequestHandler):
+    """
+    Handles enqueing updates to individual teams
+    Enqueues a certain fraction of teams so that all teams will get updated
+    every PERIOD days.
+    """
+    PERIOD = 14  # a particular team will be updated every PERIOD days
+
+    def get(self):
+        now_epoch = time.mktime(datetime.datetime.now().timetuple())
+        bucket_num = int((now_epoch / (60 * 60 * 24)) % self.PERIOD)
+
+        highest_team_key = Team.query().order(-Team.team_number).fetch(1, keys_only=True)[0]
+        highest_team_num = int(highest_team_key.id()[3:])
+        bucket_size = int(highest_team_num / (self.PERIOD)) + 1
+
+        min_team = bucket_num * bucket_size
+        max_team = min_team + bucket_size
+        team_keys = Team.query(Team.team_number >= min_team, Team.team_number < max_team).fetch(1000, keys_only=True)
+
+        teams = ndb.get_multi(team_keys)
+        for team in teams:
+            taskqueue.add(
+                queue_name='fms-api',
+                url='/tasks/get/fmsapi_team_details/' + team.key_name,
+                method='GET')
+
+        # FIXME omg we're just writing out? -fangeugene 2013 Nov 6
+        self.response.out.write("Bucket number {} out of {}<br>".format(bucket_num, self.PERIOD))
+        self.response.out.write("{} team gets have been enqueued in the interval [{}, {}).".format(len(teams), min_team, max_team))
+
+
+class FMSAPITeamDetailsGet(webapp.RequestHandler):
+    """
+    Requests team details from FMS API and imports the data
+    """
+    def get(self, key_name):
+        fms_df = DatafeedFMSAPI('v2.0')
+        fms_details = fms_df.getTeamDetails(date.today().year, key_name)
+
+        if fms_details:
+            team, district_team, robot = fms_details
+        else:
+            fms_team = None
+            district_team = None
+            robot = None
+
+        if team:
+            team = TeamManipulator.createorUpdate(team)
+
+        if district_team:
+            district_team = DistrictTeamManipulator.createOrUpdate(district_team)
+
+        if robot:
+            robot = RobotManipulator.createOrUpdate(robot)
+
+        template_values = {
+            'key_name': key_name,
+            'team': team,
+            'success': success,
+            'district': district_team,
+            'robot': robot,
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_team_details_get.html')
+        self.response.out.write(template.render(path, template_values))
+
+
 class FmsEventListGet(webapp.RequestHandler):
     """
     Fetch basic data about all current season events at once.
@@ -717,7 +805,7 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
     """
     def get(self, key_name):
         # Combines data from three datafeeds with priorities:
-        # 1) DatafeedFMSAPI (missing website)
+        # 1) DatafeedFMSAPI
         # 2) DatafeedUsfirst (missing rookie year)
         # 3) DatafeedUsfirstLegacy (has all info)
 

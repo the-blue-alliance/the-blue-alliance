@@ -10,7 +10,7 @@ cron:
 #   timezone: America/Los_Angeles
 
 # - description: FIRST team detail scraping
-#   url: /tasks/enqueue/usfirst_team_details_rolling
+#   url: /tasks/enqueue/fmsapi_team_details_rolling
 #   schedule: every day 02:00
 #   timezone: America/Los_Angeles
 
