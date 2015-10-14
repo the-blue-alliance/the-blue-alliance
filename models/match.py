@@ -68,8 +68,9 @@ class Match(ndb.Model):
     no_auto_update = ndb.BooleanProperty(default=False, indexed=False)  # Set to True after manual update
     set_number = ndb.IntegerProperty(required=True, indexed=False)
     team_key_names = ndb.StringProperty(repeated=True)  # list of teams in Match, for indexing.
-    time = ndb.DateTimeProperty()  # UTC
+    time = ndb.DateTimeProperty()  # UTC time of scheduled start
     time_string = ndb.StringProperty(indexed=False)  # the time as displayed on FIRST's site (event's local time)
+    actual_time = ndb.DateTimeProperty()  # UTC time of match actual start
     youtube_videos = ndb.StringProperty(repeated=True)  # list of Youtube IDs
     tba_videos = ndb.StringProperty(repeated=True)  # list of filetypes a TBA video exists for
     push_sent = ndb.BooleanProperty()  # has an upcoming match notification been sent for this match? None counts as False
@@ -155,7 +156,7 @@ class Match(ndb.Model):
         """If there are scores, it's been played"""
         for alliance in self.alliances:
             if (self.alliances[alliance]["score"] is None) or \
-            (self.alliances[alliance]["score"] == -1):
+               (self.alliances[alliance]["score"] == -1):
                 return False
         return True
 

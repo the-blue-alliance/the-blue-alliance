@@ -22,6 +22,8 @@ LAST_LEVEL = {
     'f': 'sf'
 }
 
+TIME_PATTERN = "%Y-%m-%dT%H:%M:%S"
+
 
 def camel_to_snake(s):
     # From https://stackoverflow.com/questions/1175208/elegant-python-function-to-convert-camelcase-to-camel-case
@@ -51,6 +53,7 @@ def get_match_number(comp_level, match_number):
 
 
 class FMSAPIHybridScheduleParser(object):
+
     def __init__(self, year, event_short):
         self.year = year
         self.event_short = event_short
@@ -113,9 +116,16 @@ class FMSAPIHybridScheduleParser(object):
                 }
             }
 
-            time = datetime.datetime.strptime(match['startTime'], "%Y-%m-%dT%H:%M:%S")
+            time = datetime.datetime.strptime(match['startTime'], TIME_PATTERN)
+            actual_time_raw = match['actualStartTime'] if 'actualStartTime' in match else None
+            actual_time = None
             if event_tz is not None:
                 time = time - event_tz.utcoffset(time)
+
+            if actual_time_raw is not None:
+                actual_time = datetime.datetime.strptime(actual_time_raw, TIME_PATTERN)
+                if event_tz is not None:
+                    actual_time = actual_time - event_tz.utcoffset(actual_time)
 
             parsed_matches.append(Match(
                 id=Match.renderKeyName(
@@ -130,6 +140,7 @@ class FMSAPIHybridScheduleParser(object):
                 comp_level=comp_level,
                 team_key_names=team_key_names,
                 time=time,
+                actual_time=actual_time,
                 alliances_json=json.dumps(alliances),
                 score_breakdown_json=json.dumps(score_breakdown)
             ))
@@ -197,9 +208,9 @@ class FMSAPIMatchDetailsParser(object):
                         breakdown[color][camel_to_snake(key)] = value
 
             match_details_by_key[Match.renderKeyName(
-                    '{}{}'.format(self.year, self.event_short),
-                    comp_level,
-                    set_number,
-                    match_number)] = breakdown
+                '{}{}'.format(self.year, self.event_short),
+                comp_level,
+                set_number,
+                match_number)] = breakdown
 
         return match_details_by_key
