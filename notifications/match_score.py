@@ -7,6 +7,8 @@ class MatchScoreNotification(BaseNotification):
 
     def __init__(self, match):
         self.match = match
+        self._event_feed = match.event.id
+        # TODO Add notion of District to Match model?
 
     @property
     def _type(self):

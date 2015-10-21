@@ -10,6 +10,8 @@ class UpcomingMatchNotification(BaseNotification):
     def __init__(self, match, event):
         self.match = match
         self.event = event
+        self._event_feed = event.key_name
+        self._district_feed = event.event_district_enum
 
     @property
     def _type(self):
