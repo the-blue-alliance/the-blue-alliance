@@ -1,9 +1,9 @@
 import logging
 import os
 import datetime
+import tba_config
 import time
 import json
-from datetime import date
 
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
@@ -728,7 +728,7 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
         # Start with lowest priority
         legacy_team = legacy_df.getTeamDetails(Team.get_by_id(key_name))
         usfirst_team = usfirst_df.getTeamDetails(Team.get_by_id(key_name))
-        fms_details = fms_df.getTeamDetails(date.today().year, key_name)
+        fms_details = fms_df.getTeamDetails(tba_config.MAX_YEAR, key_name)
 
         if fms_details:
             fms_team, district_team, robot = fms_details
