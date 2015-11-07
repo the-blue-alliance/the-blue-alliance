@@ -22,6 +22,7 @@ from controllers.district_controller import DistrictDetail
 from controllers.suggestions.suggest_match_video_controller import SuggestMatchVideoController
 from controllers.suggestions.suggest_event_webcast_controller import SuggestEventWebcastController
 from controllers.suggestions.suggest_team_media_controller import SuggestTeamMediaController
+from controllers.suggestions.suggest_team_social_controller import SuggestTeamSocialController
 from controllers.test_notification_controller import TestNotificationController
 from controllers.team_controller import TeamList, TeamCanonical, TeamDetail, TeamHistory
 from controllers.webhook_controller import WebhookAdd, WebhookDelete, WebhookVerify, WebhookVerificationSend
@@ -79,6 +80,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/suggest/event/webcast', SuggestEventWebcastController, 'suggest-event-webcast', strict_slash=True),
       RedirectRoute(r'/suggest/match/video', SuggestMatchVideoController, 'suggest-match-video', strict_slash=True),
       RedirectRoute(r'/suggest/team/media', SuggestTeamMediaController, 'suggest-team-media', strict_slash=True),
+      RedirectRoute(r'/suggest/team/social', SuggestTeamSocialController, 'suggest-team-social', strict_slash=True),
       RedirectRoute(r'/team/<team_number:[0-9]+>', TeamCanonical, 'team-canonical', strict_slash=True),
       RedirectRoute(r'/team/<team_number:[0-9]+>/<year:[0-9]+>', TeamDetail, 'team-detail', strict_slash=True),
       RedirectRoute(r'/team/<team_number:[0-9]+>/history', TeamHistory, 'team-history', strict_slash=True),

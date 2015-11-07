@@ -29,7 +29,7 @@
     <div class="col-xs-12 col-lg-6 col-lg-offset-3">
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h1 class="panel-title">Help others by adding media!</h1>
+          <h1 class="panel-title">Help others by adding social accounts!</h1>
         </div>
         <div class="panel-body">
           <p>Thanks for helping make The Blue Alliance better! Let us know about a social account so we can add them to the site!</p>
@@ -66,7 +66,7 @@
 
           <hr>
 
-          <h3>Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %} ({{year}})</h3>
+          <h3>Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h3>
 
           {% if medias_by_slugname.cdphotothread %}
           <div class="row">
@@ -96,13 +96,12 @@
           <hr>
           <div class="row">
             <div class="col-xs-12">
-              <h4>Add more media</h4>
-              <form action="/suggest/team/media" method="post">
+              <h4>Add Social Connection</h4>
+              <form action="/suggest/team/social" method="post">
                 <input name="team_key" type="hidden" value="{{team.key.id}}" />
-                <input name="year" type="hidden" value="{{year}}" />
                 <div class="input-group">
                   <span class="input-group-addon">{{year}}</span>
-                  <input class="form-control" type="text" name="media_url" placeholder="http://www.chiefdelphi.com/media/photos/36646" value="" />
+                  <input class="form-control" type="text" name="media_url" placeholder="https://github.com/frc1124/" value="" />
                   <span class="input-group-btn">
                     <button class="btn btn-success" type="submit"><span class="glyphicon glyphicon-plus-sign"></span> Add Media</button>
                   </span>
