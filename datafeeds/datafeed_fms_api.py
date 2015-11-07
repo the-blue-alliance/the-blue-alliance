@@ -49,6 +49,10 @@ class DatafeedFMSAPI(object):
         fms_api_authkey = fms_api_secrets.contents['authkey']
         self._fms_api_authtoken = base64.b64encode('{}:{}'.format(fms_api_username, fms_api_authkey))
 
+        self._is_down_sitevar = Sitevar.get_by_id('apistatus.fmaspi_down')
+        if not self._is_down_sitevar:
+            self._is_down_sitevar = Sitevar(id="apistatus.fmsapi_down", description="Is FMSAPI down?")
+
         if version == 'v1.0':
             FMS_API_URL_BASE = 'https://frc-api.usfirst.org/api/v1.0'
             self.FMS_API_AWARDS_URL_PATTERN = FMS_API_URL_BASE + '/awards/%s/%s'  # (year, event_short)
@@ -89,7 +93,14 @@ class DatafeedFMSAPI(object):
             return None
 
         if result.status_code == 200:
+            self._is_down_sitevar.values_json = True
+            self._is_down_sitevar.put()
             return parser.parse(json.loads(result.content))
+        elif result.status_code % 100 == 5:
+            # 5XX error - something is wrong with the server
+            logging.warning('URLFetch for %s failed; Error code %s' % (url, result.status_code))
+            self._is_down_sitevar.values_json = True
+            self._is_down_sitevar.put()
         else:
             logging.warning('URLFetch for %s failed; Error code %s' % (url, result.status_code))
             return None
