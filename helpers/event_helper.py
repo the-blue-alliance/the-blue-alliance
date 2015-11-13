@@ -287,7 +287,10 @@ class EventHelper(object):
 
     @classmethod
     def parseDistrictName(cls, district_name_str):
-        return DistrictType.names.get(district_name_str, DistrictType.NO_DISTRICT)
+        district = DistrictType.names.get(district_name_str, DistrictType.NO_DISTRICT)
+
+        # Fall back to checking abbreviations if needed
+        return district if district != DistrictType.NO_DISTRICT else DistrictType.abbrevs.get(district_name_str, DistrictType.NO_DISTRICT)
 
     @classmethod
     def parseEventType(self, event_type_str):
