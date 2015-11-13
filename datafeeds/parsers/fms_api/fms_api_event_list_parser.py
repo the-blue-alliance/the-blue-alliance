@@ -31,7 +31,7 @@ class FMSAPIEventListParser(object):
             # TODO read timezone from API
 
             # Do not read in CMP divisions, we'll add those manually
-            if event_type not in EventType.NON_CMP_EVENT_TYPES:
+            if event_type in EventType.CMP_EVENT_TYPES:
                 continue
 
             events.append(Event(
