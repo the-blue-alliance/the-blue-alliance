@@ -336,6 +336,44 @@ class FMSAPITeamDetailsGet(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
 
 
+class FMSAPIEventListEnqueue(webapp.RequestHandler):
+    """
+    Handles enqueing fetching a year's worth of events from FMSAPI
+    """
+    def get(self, year):
+
+        taskqueue.add(
+            queue_name='fms-api',
+            url='/tasks/get/fmsapi_event_list/'+year,
+            method='GET'
+        )
+
+        template_values = {
+            'year': year,
+            'event_count': year
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_details_enqueue.html')
+        self.response.out.write(template.render(path, template_values))
+
+
+class FMSAPIEventListGet(webapp.RequestHandler):
+    """
+    Fetch one year of events from FMS API
+    """
+    def get(self, year):
+        df = DatafeedFMSAPI('v2.0')
+
+        new_events = EventManipulator.createOrUpdate(df.getEventList(year))
+
+        template_values = {
+            "events": new_events
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fms_event_list_get.html')
+        self.response.out.write(template.render(path, template_values))
+
+
 class FmsEventListGet(webapp.RequestHandler):
     """
     Fetch basic data about all current season events at once.

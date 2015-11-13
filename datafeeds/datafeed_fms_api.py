@@ -12,6 +12,7 @@ from models.sitevar import Sitevar
 
 from parsers.fms_api.fms_api_awards_parser import FMSAPIAwardsParser
 from parsers.fms_api.fms_api_event_alliances_parser import FMSAPIEventAlliancesParser
+from parsers.fms_api.fms_api_event_list_parser import FMSAPIEventListParser
 from parsers.fms_api.fms_api_event_rankings_parser import FMSAPIEventRankingsParser
 from parsers.fms_api.fms_api_match_parser import FMSAPIHybridScheduleParser, FMSAPIMatchDetailsParser
 from parsers.fms_api.fms_api_team_details_parser import FMSAPITeamDetailsParser
@@ -57,6 +58,7 @@ class DatafeedFMSAPI(object):
             self.FMS_API_EVENT_RANKINGS_URL_PATTERN = FMS_API_URL_BASE + '/rankings/%s/%s'  # (year, event_short)
             self.FMS_API_EVENT_ALLIANCES_URL_PATTERN = FMS_API_URL_BASE + '/alliances/%s/%s'  # (year, event_short)
             self.FMS_API_TEAM_DETAILS_URL_PATTERN = FMS_API_URL_BASE + '/teams/%s/?teamNumber=%s'  # (year, teamNumber)
+            self.FMS_API_EVENT_LIST_URL_PATTERN = FMS_API_URL_BASE + '/events/season=%s'
         elif version == 'v2.0':
             FMS_API_URL_BASE = 'https://frc-api.usfirst.org/v2.0'
             self.FMS_API_AWARDS_URL_PATTERN = FMS_API_URL_BASE + '/%s/awards/%s'  # (year, event_short)
@@ -67,8 +69,9 @@ class DatafeedFMSAPI(object):
             self.FMS_API_EVENT_RANKINGS_URL_PATTERN = FMS_API_URL_BASE + '/%s/rankings/%s'  # (year, event_short)
             self.FMS_API_EVENT_ALLIANCES_URL_PATTERN = FMS_API_URL_BASE + '/%s/alliances/%s'  # (year, event_short)
             self.FMS_API_TEAM_DETAILS_URL_PATTERN = FMS_API_URL_BASE + '/%s/teams/?teamNumber=%s'  # (year, teamNumber)
+            self.FMS_API_EVENT_LIST_URL_PATTERN = FMS_API_URL_BASE + '/%s/events'  # year
         else:
-            raise Exception("Unknown FMS API version: {}".formation(version))
+            raise Exception("Unknown FMS API version: {}".format(version))
 
     def _get_event_short(self, event_short):
         return self.EVENT_SHORT_EXCEPTIONS.get(event_short, event_short)
@@ -149,3 +152,7 @@ class DatafeedFMSAPI(object):
 
         team = self._parse(self.FMS_API_TEAM_DETAILS_URL_PATTERN % (year, team_number), FMSAPITeamDetailsParser(year, team_key))
         return team
+
+    def getEventList(self, year):
+        events = self._parse(self.FMS_API_EVENT_LIST_URL_PATTERN % (year), FMSAPIEventListParser(year))
+        return events
