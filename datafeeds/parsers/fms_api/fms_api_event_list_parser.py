@@ -1,6 +1,7 @@
 import datetime
 
 from consts.district_type import DistrictType
+from consts.event_type import EventType
 from helpers.event_helper import EventHelper
 
 from models.event import Event
@@ -28,6 +29,10 @@ class FMSAPIEventListParser(object):
             end = datetime.datetime.strptime(event['dateEnd'], self.DATE_FORMAT_STR)
 
             # TODO read timezone from API
+
+            # Do not read in CMP divisions, we'll add those manually
+            if event_type not in EventType.NON_CMP_EVENT_TYPES:
+                continue
 
             events.append(Event(
                 id=key,

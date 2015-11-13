@@ -353,7 +353,7 @@ class FMSAPIEventListEnqueue(webapp.RequestHandler):
             'event_count': year
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_details_enqueue.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_events_details_enqueue.html')
         self.response.out.write(template.render(path, template_values))
 
 
