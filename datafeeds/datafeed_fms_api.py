@@ -59,6 +59,7 @@ class DatafeedFMSAPI(object):
             self.FMS_API_EVENT_ALLIANCES_URL_PATTERN = FMS_API_URL_BASE + '/alliances/%s/%s'  # (year, event_short)
             self.FMS_API_TEAM_DETAILS_URL_PATTERN = FMS_API_URL_BASE + '/teams/%s/?teamNumber=%s'  # (year, teamNumber)
             self.FMS_API_EVENT_LIST_URL_PATTERN = FMS_API_URL_BASE + '/events/season=%s'
+            self.FMS_API_EVENTTEAM_LIST_URL_PATTERN = FMS_API_URL_BASE + '/teams/?season=%s&eventCode=%s&page=%s'  # (year, eventCode, page)
         elif version == 'v2.0':
             FMS_API_URL_BASE = 'https://frc-api.usfirst.org/v2.0'
             self.FMS_API_AWARDS_URL_PATTERN = FMS_API_URL_BASE + '/%s/awards/%s'  # (year, event_short)
@@ -70,6 +71,7 @@ class DatafeedFMSAPI(object):
             self.FMS_API_EVENT_ALLIANCES_URL_PATTERN = FMS_API_URL_BASE + '/%s/alliances/%s'  # (year, event_short)
             self.FMS_API_TEAM_DETAILS_URL_PATTERN = FMS_API_URL_BASE + '/%s/teams/?teamNumber=%s'  # (year, teamNumber)
             self.FMS_API_EVENT_LIST_URL_PATTERN = FMS_API_URL_BASE + '/%s/events'  # year
+            self.FMS_API_EVENTTEAM_LIST_URL_PATTERN = FMS_API_URL_BASE + '/%s/teams/?eventCode=%s&page=%s'  # (year, eventCode, page)
         else:
             raise Exception("Unknown FMS API version: {}".format(version))
 
@@ -156,3 +158,19 @@ class DatafeedFMSAPI(object):
     def getEventList(self, year):
         events = self._parse(self.FMS_API_EVENT_LIST_URL_PATTERN % (year), FMSAPIEventListParser(year))
         return events
+
+    # Returns list of tuples (team, districtteam, robot)
+    def getEventTeams(self, event_key):
+        year = int(event_key[:4])
+        event_code = event_key[4:]
+        parser = FMSAPITeamDetailsParser(year)
+        models = []  # will be list of tuples (team, districtteam, robot) model
+        for page in range(1, 9):  # Ensure this won't loop forever. 8 pages should be more than enough
+            url = self.FMS_API_EVENTTEAM_LIST_URL_PATTERN % (year, event_code, page)
+            partial_models, more_pages = self._parse(url, parser)
+            models.extend(partial_models)
+
+            if not more_pages:
+                break
+
+        return models
