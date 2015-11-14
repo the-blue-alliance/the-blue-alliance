@@ -167,7 +167,10 @@ class DatafeedFMSAPI(object):
         models = []  # will be list of tuples (team, districtteam, robot) model
         for page in range(1, 9):  # Ensure this won't loop forever. 8 pages should be more than enough
             url = self.FMS_API_EVENTTEAM_LIST_URL_PATTERN % (year, event_code, page)
-            partial_models, more_pages = self._parse(url, parser)
+            result = self._parse(url, parser)
+            if result is None:
+                break
+            partial_models, more_pages = result
             models.extend(partial_models)
 
             if not more_pages:

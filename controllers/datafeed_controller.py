@@ -401,6 +401,7 @@ class FMSAPIEventTeamsEnqueue(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fmsapi_eventteams_enqueue.html')
         self.response.out.write(template.render(path, template_values))
 
+
 class FMSAPIEventTeamsGet(webapp.RequestHandler):
     """
     Fetch list of teams attending a single event
@@ -426,6 +427,10 @@ class FMSAPIEventTeamsGet(webapp.RequestHandler):
         teams = TeamManipulator.createOrUpdate(teams)
         district_teams = DistrictTeamManipulator.createOrUpdate(district_teams)
         robots = RobotManipulator.createOrUpdate(robots)
+
+        if not teams:
+            # No teams found registered for this event
+            teams = []
 
         # Build EventTeams
         event_teams = [EventTeam(
