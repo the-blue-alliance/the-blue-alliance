@@ -29,6 +29,7 @@ class FMSAPITeamDetailsParser(object):
             address = u"{}, {}, {}".format(teamData['city'], teamData['stateProv'], teamData['country'])
 
             team = Team(
+                id="frc{}".format(teamData['teamNumber']),
                 team_number=teamData['teamNumber'],
                 name=teamData['nameFull'],
                 nickname=teamData['nameShort'],
