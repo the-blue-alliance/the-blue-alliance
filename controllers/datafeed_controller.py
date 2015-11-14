@@ -854,10 +854,14 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
         # Start with lowest priority
         legacy_team = legacy_df.getTeamDetails(Team.get_by_id(key_name))
         usfirst_team = usfirst_df.getTeamDetails(Team.get_by_id(key_name))
-        fms_details = fms_df.getTeamDetails(tba_config.MAX_YEAR, key_name)
+        fms_details = fms_df.getTeamDetails(tba_config.MAX_YEAR)
 
-        if fms_details:
-            fms_team, district_team, robot = fms_details
+        # Separate out the multiple models returned from FMSAPI call
+        # Since we're only hitting one team at a time, the response won't
+        # ever be paginated so we can ignore the possibility
+        if fms_details and fms_details[0]:
+            models, more_pages = fms_details
+            fms_team, district_team, robot = models[0]
         else:
             fms_team = None
             district_team = None

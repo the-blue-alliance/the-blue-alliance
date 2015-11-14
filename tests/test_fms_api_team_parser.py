@@ -25,7 +25,12 @@ class TestFMSAPITeamParser(unittest2.TestCase):
 
     def test_parseTeamWithDistrict(self):
         with open('test_data/fms_api/2015_frc1124.json', 'r') as f:
-            team, districtTeam, robot = FMSAPITeamDetailsParser(2015, "frc1124").parse(json.loads(f.read()))
+            models, more_pages = FMSAPITeamDetailsParser(2015).parse(json.loads(f.read()))
+
+            self.assertFalse(more_pages)
+            self.assertEqual(len(models), 1)
+
+            team, districtTeam, robot = models[0]
 
             # Ensure we get the proper Team model back
             self.assertEqual(team.key_name, "frc1124")
@@ -50,7 +55,12 @@ class TestFMSAPITeamParser(unittest2.TestCase):
 
     def test_parseTeamWithNoDistrict(self):
         with open('test_data/fms_api/2015_frc254.json', 'r') as f:
-            team, districtTeam, robot = FMSAPITeamDetailsParser(2015, "frc254").parse(json.loads(f.read()))
+            models, more_pages = FMSAPITeamDetailsParser(2015).parse(json.loads(f.read()))
+
+            self.assertFalse(more_pages)
+            self.assertEqual(len(models), 1)
+
+            team, districtTeam, robot = models[0]
 
             # Ensure we get the proper Team model back
             self.assertEqual(team.key_name, "frc254")
