@@ -368,6 +368,14 @@ class FMSAPIEventListGet(webapp.RequestHandler):
 
         new_events = EventManipulator.createOrUpdate(df.getEventList(year))
 
+        # Fetch EventTeams for each event
+        for event in new_events:
+            taskqueue.add(
+                queue_name='fms-api',
+                url='/tasks/get/fmsapi_eventteams/'+event.key_name,
+                method='GET'
+            )
+
         template_values = {
             "events": new_events
         }
