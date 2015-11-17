@@ -152,7 +152,7 @@ class DatafeedFMSAPI(object):
     def getTeamDetails(self, year, team_key):
         team_number = team_key[3:]  # everything after 'frc'
 
-        team = self._parse(self.FMS_API_TEAM_DETAILS_URL_PATTERN % (year, team_number), FMSAPITeamDetailsParser(year, team_key))
+        team = self._parse(self.FMS_API_TEAM_DETAILS_URL_PATTERN % (year, team_number), FMSAPITeamDetailsParser(year))
         return team
 
     def getEventList(self, year):
