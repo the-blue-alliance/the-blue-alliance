@@ -28,9 +28,9 @@
         <td>Permissions</td>
         <td>
             <ul>
-            {% for enum,desc in permissions.items %}
+            {% for enum, permission in permissions.items %}
                 {% if enum in user.permissions %}
-                    <li>{{desc}}</li>
+                    <li><strong>{{permission.name}}</strong> – {{permission.description}}</li>
                 {% endif %}
             {% endfor %}
             </ul>

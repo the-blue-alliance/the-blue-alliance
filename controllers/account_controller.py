@@ -93,8 +93,6 @@ class AccountRegister(LoggedInHandler):
         if check_account_id == real_account_id:
             account = Account.get_by_id(self.user_bundle.account.key.id())
             account.display_name = self.request.get('display_name')
-            account.permissions = []
-            Account.get
             account.registered = True
             account.put()
             self.redirect('/account')

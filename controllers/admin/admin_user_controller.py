@@ -37,7 +37,7 @@ class AdminUserDetail(LoggedInHandler):
 
         self.template_values.update({
             "user": user,
-            "permissions": AccountPermissions.descriptions
+            "permissions": AccountPermissions.permissions
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/user_details.html')
@@ -53,7 +53,7 @@ class AdminUserEdit(LoggedInHandler):
         user = Account.get_by_id(user_id)
         self.template_values.update({
             "user": user,
-            "permissions": AccountPermissions.descriptions
+            "permissions": AccountPermissions.permissions
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/user_edit.html')
@@ -69,7 +69,6 @@ class AdminUserEdit(LoggedInHandler):
             permcheck = self.request.get("perm-" + str(enum))
             if permcheck :
                 user.permissions.append(enum)
-        user.is_admin = self.request.get("is_admin")
         user.put()
 
         self.redirect("/admin/user/" + user_id)
