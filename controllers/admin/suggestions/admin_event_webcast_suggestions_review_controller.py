@@ -5,7 +5,7 @@ import logging
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
-from controllers.base_controller import LoggedInHandler
+from controllers.suggestions.suggestions_review_base_controller import SuggestionsReviewBaseController
 from helpers.event.event_webcast_adder import EventWebcastAdder
 from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
 
@@ -13,13 +13,11 @@ from models.event import Event
 from models.suggestion import Suggestion
 
 
-class AdminEventWebcastSuggestionsReviewController(LoggedInHandler):
+class AdminEventWebcastSuggestionsReviewController(SuggestionsReviewBaseController):
     """
     View the list of suggestions.
     """
     def get(self):
-        self._require_admin()
-
         suggestions = Suggestion.query().filter(
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
             Suggestion.target_model == "event")
@@ -45,8 +43,6 @@ class AdminEventWebcastSuggestionsReviewController(LoggedInHandler):
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self):
-        self._require_admin()
-
         if self.request.get("verdict") == "accept":
             webcast = dict()
             webcast["type"] = self.request.get("webcast_type")
