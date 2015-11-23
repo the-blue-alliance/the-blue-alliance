@@ -98,14 +98,15 @@ class DatafeedFMSAPI(object):
             return None
 
         if result.status_code == 200:
-            self._is_down_sitevar.values_json = True
+            self._is_down_sitevar.values_json = "False"
             self._is_down_sitevar.put()
             return parser.parse(json.loads(result.content))
         elif result.status_code % 100 == 5:
             # 5XX error - something is wrong with the server
             logging.warning('URLFetch for %s failed; Error code %s' % (url, result.status_code))
-            self._is_down_sitevar.values_json = True
+            self._is_down_sitevar.values_json = "True"
             self._is_down_sitevar.put()
+            return None
         else:
             logging.warning('URLFetch for %s failed; Error code %s' % (url, result.status_code))
             return None
