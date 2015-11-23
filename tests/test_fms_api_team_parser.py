@@ -34,6 +34,7 @@ class TestFMSAPITeamParser(unittest2.TestCase):
             self.assertEqual(team.nickname, "UberBots")
             self.assertEqual(team.address, "Avon, Connecticut, USA")
             self.assertEqual(team.rookie_year, 2003)
+            self.assertEqual(team.website, "http://uberbots.org")
 
             # Test the DistrictTeam model we get back
             self.assertNotEqual(districtTeam, None)
@@ -58,6 +59,7 @@ class TestFMSAPITeamParser(unittest2.TestCase):
             self.assertEqual(team.nickname, "The Cheesy Poofs")
             self.assertEqual(team.address, "San Jose, California, USA")
             self.assertEqual(team.rookie_year, 1999)
+            self.assertEqual(team.website, "http://team254.com/")
 
             # Test the DistrictTeam model we get back
             self.assertEqual(districtTeam, None)

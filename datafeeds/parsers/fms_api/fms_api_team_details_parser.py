@@ -34,7 +34,8 @@ class FMSAPITeamDetailsParser(object):
             name=teamData['nameFull'],
             nickname=teamData['nameShort'],
             address=address,
-            rookie_year=teamData['rookieYear']
+            rookie_year=teamData['rookieYear'],
+            website=teamData['website']
         )
 
         districtTeam = None
