@@ -30,8 +30,10 @@ from helpers.team_manipulator import TeamManipulator
 from helpers.district_team_manipulator import DistrictTeamManipulator
 from helpers.robot_manipulator import RobotManipulator
 
+from models.district_team import DistrictTeam
 from models.event import Event
 from models.event_team import EventTeam
+from models.robot import Robot
 from models.team import Team
 
 
@@ -366,11 +368,95 @@ class FMSAPIEventListGet(webapp.RequestHandler):
 
         new_events = EventManipulator.createOrUpdate(df.getEventList(year))
 
+        # Fetch EventTeams for each event
+        for event in new_events:
+            taskqueue.add(
+                queue_name='fms-api',
+                url='/tasks/get/fmsapi_eventteams/'+event.key_name,
+                method='GET'
+            )
+
         template_values = {
             "events": new_events
         }
 
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fms_event_list_get.html')
+        self.response.out.write(template.render(path, template_values))
+
+
+class FMSAPIEventTeamsEnqueue(webapp.RequestHandler):
+    """
+    Handlers enqueueing fetching a list of teams attending an event
+    """
+    def get(self, event_key):
+        taskqueue.add(
+            queue_name='fms-api',
+            url='/tasks/get/fmsapi_eventteams/'+event_key,
+            method='GET')
+
+        template_values = {
+            'event_key': event_key
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fmsapi_eventteams_enqueue.html')
+        self.response.out.write(template.render(path, template_values))
+
+
+class FMSAPIEventTeamsGet(webapp.RequestHandler):
+    """
+    Fetch list of teams attending a single event
+    """
+    def get(self, event_key):
+        df = DatafeedFMSAPI('v2.0')
+        event = Event.get_by_id(event_key)
+
+        models = df.getEventTeams(event_key)
+        teams = []
+        district_teams = []
+        robots = []
+        for group in models:
+            # models is a list of tuples (team, districtTeam, robot)
+            if isinstance(group[0], Team):
+                teams.append(group[0])
+            if isinstance(group[1], DistrictTeam):
+                district_teams.append(group[1])
+            if isinstance(group[2], Robot):
+                robots.append(group[2])
+
+        # Write new models
+        teams = TeamManipulator.createOrUpdate(teams)
+        district_teams = DistrictTeamManipulator.createOrUpdate(district_teams)
+        robots = RobotManipulator.createOrUpdate(robots)
+
+        if not teams:
+            # No teams found registered for this event
+            teams = []
+
+        # Build EventTeams
+        event_teams = [EventTeam(
+            id=event.key_name + "_" + team.key_name,
+            event=event.key,
+            team=team.key,
+            year=event.year)
+            for team in teams]
+
+        # Delete eventteams of teams that are no longer registered
+        if event.future:
+            existing_event_team_keys = set(EventTeam.query(EventTeam.event == event.key).fetch(1000, keys_only=True))
+            event_team_keys = set([et.key for et in event_teams])
+            et_keys_to_delete = existing_event_team_keys.difference(event_team_keys)
+            EventTeamManipulator.delete_keys(et_keys_to_delete)
+
+        event_teams = EventTeamManipulator.createOrUpdate(event_teams)
+        if type(event_teams) is not list:
+            event_teams = [event_teams]
+
+        template_values = {
+            'event': event,
+            'event_teams': event_teams,
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_details_get.html')
         self.response.out.write(template.render(path, template_values))
 
 
@@ -856,8 +942,12 @@ class UsfirstTeamDetailsGet(webapp.RequestHandler):
         usfirst_team = usfirst_df.getTeamDetails(Team.get_by_id(key_name))
         fms_details = fms_df.getTeamDetails(tba_config.MAX_YEAR, key_name)
 
-        if fms_details:
-            fms_team, district_team, robot = fms_details
+        # Separate out the multiple models returned from FMSAPI call
+        # Since we're only hitting one team at a time, the response won't
+        # ever be paginated so we can ignore the possibility
+        if fms_details and fms_details[0]:
+            models, more_pages = fms_details
+            fms_team, district_team, robot = models[0]
         else:
             fms_team = None
             district_team = None
