@@ -3,7 +3,6 @@ class EventType(object):
     DISTRICT = 1
     DISTRICT_CMP = 2
     CMP_DIVISION = 3
-    CMP_SUBDIVISION = 5
     CMP_FINALS = 4
     OFFSEASON = 99
     PRESEASON = 100
@@ -14,7 +13,6 @@ class EventType(object):
         DISTRICT: 'District',
         DISTRICT_CMP: 'District Championship',
         CMP_DIVISION: 'Championship Division',
-        CMP_SUBDIVISION: 'Championship Subdivision',
         CMP_FINALS: 'Championship Finals',
         OFFSEASON: 'Offseason',
         PRESEASON: 'Preseason',
@@ -29,6 +27,5 @@ class EventType(object):
 
     CMP_EVENT_TYPES = {
         CMP_DIVISION,
-        CMP_SUBDIVISION,
         CMP_FINALS,
     }
