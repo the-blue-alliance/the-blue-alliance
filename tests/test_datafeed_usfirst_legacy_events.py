@@ -49,10 +49,14 @@ class TestDatafeedUsfirstLegacyEvents(unittest2.TestCase):
 
         self.assertEqual(len(events), 58)  # 58 events expected
 
-        self.assertEqual(events[0].first_eid, "5519")
+        self.assertEqual(events[0].first_eid, "5623")
         self.assertEqual(events[0].event_type_enum, EventType.REGIONAL)
-        self.assertEqual(events[0].name, "BAE Systems/Granite State Regional")
+        self.assertEqual(events[0].name, "Alamo Regional")
 
-        self.assertEqual(events[1].first_eid, "5523")
+        self.assertEqual(events[1].first_eid, "5519")
         self.assertEqual(events[1].event_type_enum, EventType.REGIONAL)
-        self.assertEqual(events[1].name, "New Jersey Regional")
+        self.assertEqual(events[1].name, "BAE Systems/Granite State Regional")
+
+        self.assertEqual(events[2].first_eid, "5523")
+        self.assertEqual(events[2].event_type_enum, EventType.REGIONAL)
+        self.assertEqual(events[2].name, "New Jersey Regional")
