@@ -16,6 +16,7 @@ from controllers.datafeed_controller import FMSAPIAwardsGet, FMSAPIEventAlliance
 from controllers.datafeed_controller import UsfirstEventDetailsEnqueue, UsfirstEventDetailsGet, UsfirstEventListGet
 from controllers.datafeed_controller import UsfirstAwardsEnqueue, UsfirstAwardsGet
 from controllers.datafeed_controller import UsfirstEventAlliancesEnqueue, UsfirstEventAlliancesGet
+from controllers.datafeed_controller import FMSAPIEventListEnqueue, FMSAPIEventListGet
 from controllers.datafeed_controller import UsfirstMatchesEnqueue, UsfirstMatchesGet, UsfirstEventRankingsEnqueue, UsfirstEventRankingsGet
 from controllers.datafeed_controller import UsfirstTeamDetailsEnqueue, UsfirstTeamDetailsRollingEnqueue, UsfirstTeamDetailsGet, UsfirstTeamsTpidsGet
 from controllers.datafeed_controller import UsfirstPre2003TeamEventsEnqueue, UsfirstPre2003TeamEventsGet
@@ -47,6 +48,7 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/enqueue/fmsapi_matches/(.*)', FMSAPIMatchesEnqueue),
                                ('/tasks/enqueue/fmsapi_team_details', FMSAPITeamDetailsEnqueue),
                                ('/tasks/enqueue/fmsapi_team_details_rolling', FMSAPITeamDetailsRollingEnqueue),
+                               ('/tasks/enqueue/fmsapi_event_list/([0-9]*)', FMSAPIEventListEnqueue),
                                ('/tasks/enqueue/usfirst_event_alliances/(.*)', UsfirstEventAlliancesEnqueue),
                                ('/tasks/enqueue/usfirst_event_details/([0-9]*)', UsfirstEventDetailsEnqueue),
                                ('/tasks/enqueue/usfirst_event_rankings/(.*)', UsfirstEventRankingsEnqueue),
@@ -65,6 +67,7 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/get/fmsapi_event_rankings/(.*)', FMSAPIEventRankingsGet),
                                ('/tasks/get/fmsapi_matches/(.*)', FMSAPIMatchesGet),
                                ('/tasks/get/fmsapi_team_details/(.*)', FMSAPITeamDetailsGet),
+                               ('/tasks/get/fmsapi_event_list/([0-9]*)', FMSAPIEventListGet),
                                ('/tasks/get/usfirst_event_alliances/(.*)', UsfirstEventAlliancesGet),
                                ('/tasks/get/usfirst_event_list/([0-9]*)', UsfirstEventListGet),
                                ('/tasks/get/usfirst_event_details/([0-9]*)/([0-9]*)', UsfirstEventDetailsGet),
