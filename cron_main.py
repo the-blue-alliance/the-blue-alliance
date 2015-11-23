@@ -11,7 +11,7 @@ from controllers.datafeed_controller import FmsEventListGet, FmsTeamListGet
 from controllers.datafeed_controller import OffseasonMatchesGet
 from controllers.datafeed_controller import TwitterFrcfmsMatchesGet
 from controllers.datafeed_controller import FMSAPIAwardsEnqueue, FMSAPIEventAlliancesEnqueue, FMSAPIEventRankingsEnqueue, FMSAPIMatchesEnqueue, \
-    FMSAPITeamDetailsEnqueue, FMSAPITeamDetailsRollingEnqueue
+    FMSAPITeamDetailsRollingEnqueue
 from controllers.datafeed_controller import FMSAPIAwardsGet, FMSAPIEventAlliancesGet, FMSAPIEventRankingsGet, FMSAPIMatchesGet, FMSAPITeamDetailsGet
 from controllers.datafeed_controller import UsfirstEventDetailsEnqueue, UsfirstEventDetailsGet, UsfirstEventListGet
 from controllers.datafeed_controller import UsfirstAwardsEnqueue, UsfirstAwardsGet
@@ -47,7 +47,6 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/enqueue/fmsapi_event_alliances/(.*)', FMSAPIEventAlliancesEnqueue),
                                ('/tasks/enqueue/fmsapi_event_rankings/(.*)', FMSAPIEventRankingsEnqueue),
                                ('/tasks/enqueue/fmsapi_matches/(.*)', FMSAPIMatchesEnqueue),
-                               ('/tasks/enqueue/fmsapi_team_details', FMSAPITeamDetailsEnqueue),
                                ('/tasks/enqueue/fmsapi_team_details_rolling', FMSAPITeamDetailsRollingEnqueue),
                                ('/tasks/enqueue/fmsapi_event_list/([0-9]*)', FMSAPIEventListEnqueue),
                                ('/tasks/enqueue/fmsapi_eventteams/(.*)', FMSAPIEventTeamsEnqueue),
