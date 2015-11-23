@@ -295,7 +295,6 @@ class TestTeamHistoryRobotsApiController(unittest2.TestCase):
 
     def testRobotApi(self):
         response = self.testapp.get('/frc1124', headers={"X-TBA-App-Id": "tba-tests:team_list-controller-test:v01"})
-        print response.body
         robot_dict = json.loads(response.body)
 
         self.assertTrue("2015" in robot_dict)
