@@ -1,4 +1,5 @@
 import datetime
+import json
 
 from consts.client_type import ClientType
 from consts.notification_type import NotificationType
@@ -110,7 +111,7 @@ class NotificationHelper(object):
         status_sitevar = Sitevar.get_by_id('apistatus.down_events')
         if status_sitevar is None:
             status_sitevar = Sitevar(id="apistatus.down_events", description="A list of down event keys")
-        status_sitevar.values_json = down_events
+        status_sitevar.values_json = json.dumps(down_events)
         status_sitevar.put()
 
     @classmethod
