@@ -49,6 +49,7 @@ class TestFIRSTElasticSearchEventListParser(unittest2.TestCase):
                     self.assertEquals(event.year, 2015)
                     self.assertEquals(event.event_type_enum, EventType.REGIONAL)
                     self.assertEquals(event.event_district_enum, DistrictType.NO_DISTRICT)
+                    self.assertEquals(event.first_eid, 13339)
 
     def test_parse_district_event(self):
         with open('test_data/first_elasticsearch/2015_event_list.json', 'r') as f:
@@ -68,6 +69,7 @@ class TestFIRSTElasticSearchEventListParser(unittest2.TestCase):
                     self.assertEquals(event.year, 2015)
                     self.assertEquals(event.event_type_enum, EventType.DISTRICT)
                     self.assertEquals(event.event_district_enum, DistrictType.NEW_ENGLAND)
+                    self.assertEquals(event.first_eid, 13443)
 
     def test_parse_district_cmp(self):
         with open('test_data/first_elasticsearch/2015_event_list.json', 'r') as f:
@@ -87,3 +89,4 @@ class TestFIRSTElasticSearchEventListParser(unittest2.TestCase):
                     self.assertEquals(event.year, 2015)
                     self.assertEquals(event.event_type_enum, EventType.DISTRICT_CMP)
                     self.assertEquals(event.event_district_enum, DistrictType.NEW_ENGLAND)
+                    self.assertEquals(event.first_eid, 13423)

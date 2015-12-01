@@ -30,3 +30,5 @@ class TestFIRSTElasticSearchTeamParser(unittest2.TestCase):
                     self.assertEqual(team.address, "San Jose, CA, USA")
                     self.assertEqual(team.rookie_year, 1999)
                     self.assertEqual(team.website, "http://www.team254.com")
+                    self.assertEqual(team.first_tpid, 357159)
+                    self.assertEqual(team.first_tpid_year, 2015)

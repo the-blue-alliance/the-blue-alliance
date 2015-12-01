@@ -16,6 +16,7 @@ class FIRSTElasticSearchEventListParser(object):
     def parse(self, response):
         events = []
         for event in response['hits']['hits']:
+            first_eid = int(event['_id'])
             event = event['_source']
 
             event_type = EventHelper.parseEventType(event['event_subtype'])
@@ -45,6 +46,7 @@ class FIRSTElasticSearchEventListParser(object):
                 location=location,
                 venue_address="{}, {}".format(venue, location),
                 year=self.season,
-                event_district_enum=district_enum
+                event_district_enum=district_enum,
+                first_eid=first_eid
             ))
         return events
