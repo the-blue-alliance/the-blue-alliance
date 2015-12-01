@@ -365,7 +365,7 @@ class EventListGet(webapp.RequestHandler):
         df = DatafeedFMSAPI('v2.0')
         df2 = DatafeedFIRSTElasticSearch()
 
-        merged_events = EventManipulator.updateMergeBase(df.getEventList(year), df2.getEventList(year))
+        merged_events = EventManipulator.mergeModels(df.getEventList(year), df2.getEventList(year))
         events = EventManipulator.createOrUpdate(merged_events)
 
         # Fetch EventTeams for each event
@@ -427,7 +427,7 @@ class EventTeamsGet(webapp.RequestHandler):
                 robots.append(group[2])
 
         # Merge teams
-        merged_teams = TeamManipulator.updateMergeBase(teams, df2.getEventTeams(event))
+        merged_teams = TeamManipulator.mergeModels(teams, df2.getEventTeams(event))
         teams = TeamManipulator.createOrUpdate(merged_events)
 
         # Write new models
