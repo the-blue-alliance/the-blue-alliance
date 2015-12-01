@@ -10,37 +10,16 @@ from datafeeds.datafeed_base import DatafeedBase
 from models.event_team import EventTeam
 
 from parsers.first_elasticsearch.first_elasticsearch_event_list_parser import FIRSTElasticSearchEventListParser
+from parsers.first_elasticsearch.first_elasticsearch_team_details_parser import FIRSTElasticSearchTeamDetailsParser
 
 
 class DatafeedFIRSTElasticSearch(object):
-    EVENT_SHORT_EXCEPTIONS = {
-        'arc': 'archimedes',
-        'cars': 'carson',
-        'carv': 'carver',
-        'cur': 'curie',
-        'gal': 'galileo',
-        'hop': 'hopper',
-        'new': 'newton',
-        'tes': 'tesla',
-    }
-
-    SUBDIV_TO_DIV = {
-        'arc': 'cmp-arte',
-        'cars': 'cmp-gaca',
-        'carv': 'cmp-cuca',
-        'cur': 'cmp-cuca',
-        'gal': 'cmp-gaca',
-        'hop': 'cmp-neho',
-        'new': 'cmp-neho',
-        'tes': 'cmp-arte',
-    }
-
     def __init__(self):
         URL_BASE = 'http://es01.usfirst.org'
         self.EVENT_LIST_URL_PATTERN = URL_BASE + '/events/_search?size=1000&source={"query":{"query_string":{"query":"(event_type:FRC)%20AND%20(event_season:%s)"}}}'  # (year)
-        self.EVENT_DETAILS_URL_PATTERN = URL_BASE + '/events/_search?size=1&source={"query":{"query_string":{"query":"_id:%s"}}}'  # (first_eid)
-        self.EVENT_TEAMS_URL_PATTERN = URL_BASE + '/teams/_search?size=1000&source={"partial_fields":{"partial1":{"exclude":["awards","events"]}},"query":{"query_string":{"query":"events.fk_events:%s"}}}'  # (first_eid)
-        self.TEAM_DETAILS_URL_PATTERN = URL_BASE + '/teams/_search?size=1&source={"query":{"query_string":{"query":"_id:%s"}}}'  # (first_tpid)
+        # self.EVENT_DETAILS_URL_PATTERN = URL_BASE + '/events/_search?size=1&source={"query":{"query_string":{"query":"_id:%s"}}}'  # (first_eid)
+        self.EVENT_TEAMS_URL_PATTERN = URL_BASE + 'search?size=1000&source={"_source":{"exclude":["awards","events"]},"query":{"query_string":{"query":"events.fk_events:%s%20AND%20profile_year:%s}}}'  # (first_eid, year)
+        # self.TEAM_DETAILS_URL_PATTERN = URL_BASE + '/teams/_search?size=1&source={"query":{"query_string":{"query":"_id:%s"}}}'  # (first_tpid)
 
     def _get_event_short(self, event_short):
         return self.EVENT_SHORT_EXCEPTIONS.get(event_short, event_short)
@@ -64,43 +43,24 @@ class DatafeedFIRSTElasticSearch(object):
             return None
 
     def getEventList(self, year):
-        events = self._parse(self.FMS_API_EVENT_LIST_URL_PATTERN % (year), FMSAPIEventListParser(year))
+        events = self._parse(self.FMS_API_EVENT_LIST_URL_PATTERN % (year), FIRSTElasticSearchEventListParser(year))
         return events
 
-    def getEventDetails(self, event):
-        return
+    # TODO: implement
+    # def getEventDetails(self, event):
+    #     return
 
     def getEventTeams(self, event):
-        return
+        teams = self._parse(self.EVENT_TEAMS_URL_PATTERN % (event.first_eid, event.year), FIRSTElasticSearchTeamDetailsParser(event.year))
+        event_teams = []
+        for team in teams:
+            event_teams.append(EventTeam(
+                event=event.key,
+                team=team.key,
+                year=event.year
+            ))
+        return event_teams
 
-    def getTeamDetails(self, team):
-        return
-
-    # def getTeamDetails(self, year, team_key):
-    #     team_number = team_key[3:]  # everything after 'frc'
-
-    #     team = self._parse(self.FMS_API_TEAM_DETAILS_URL_PATTERN % (year, team_number), FMSAPITeamDetailsParser(year))
-    #     return team
-
-    # def getEventList(self, year):
-    #     events = self._parse(self.FMS_API_EVENT_LIST_URL_PATTERN % (year), FMSAPIEventListParser(year))
-    #     return events
-
-    # # Returns list of tuples (team, districtteam, robot)
-    # def getEventTeams(self, event_key):
-    #     year = int(event_key[:4])
-    #     event_code = event_key[4:]
-    #     parser = FMSAPITeamDetailsParser(year)
-    #     models = []  # will be list of tuples (team, districtteam, robot) model
-    #     for page in range(1, 9):  # Ensure this won't loop forever. 8 pages should be more than enough
-    #         url = self.FMS_API_EVENTTEAM_LIST_URL_PATTERN % (year, event_code, page)
-    #         result = self._parse(url, parser)
-    #         if result is None:
-    #             break
-    #         partial_models, more_pages = result
-    #         models.extend(partial_models)
-
-    #         if not more_pages:
-    #             break
-
-    #     return models
+    # TODO: implement
+    # def getTeamDetails(self, team):
+        # return
