@@ -52,14 +52,7 @@ class DatafeedFIRSTElasticSearch(object):
 
     def getEventTeams(self, event):
         teams = self._parse(self.EVENT_TEAMS_URL_PATTERN % (event.first_eid, event.year), FIRSTElasticSearchTeamDetailsParser(event.year))
-        event_teams = []
-        for team in teams:
-            event_teams.append(EventTeam(
-                event=event.key,
-                team=team.key,
-                year=event.year
-            ))
-        return event_teams
+        return teams
 
     # TODO: implement
     # def getTeamDetails(self, team):
