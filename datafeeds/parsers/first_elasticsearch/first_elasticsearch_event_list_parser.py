@@ -16,7 +16,7 @@ class FIRSTElasticSearchEventListParser(object):
     def parse(self, response):
         events = []
         for event in response['hits']['hits']:
-            first_eid = int(event['_id'])
+            first_eid = event['_id']
             event = event['_source']
 
             event_type = EventHelper.parseEventType(event['event_subtype'])
