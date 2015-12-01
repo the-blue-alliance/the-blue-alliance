@@ -377,7 +377,7 @@ class EventListGet(webapp.RequestHandler):
             )
 
         template_values = {
-            "events": new_events
+            "events": events
         }
 
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fms_event_list_get.html')
