@@ -23,12 +23,14 @@ from controllers.admin.admin_team_controller import AdminTeamCreateTest, AdminTe
 from controllers.admin.admin_migration_controller import AdminMigration, AdminMigrationAddMatchYear
 from controllers.admin.admin_user_controller import AdminUserList, AdminUserEdit, AdminUserDetail
 from controllers.admin.admin_mobile_controller import AdminMobile, AdminBroadcast
+from controllers.admin.admin_apistatus_controller import AdminApiStatus
 
 app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/api_auth/add', AdminApiAuthAdd),
                                ('/admin/api_auth/delete/(.*)', AdminApiAuthDelete),
                                ('/admin/api_auth/edit/(.*)', AdminApiAuthEdit),
                                ('/admin/api_auth/manage', AdminApiAuthManage),
+                               ('/admin/apistatus', AdminApiStatus),
                                ('/admin/debug', AdminDebugHandler),
                                ('/admin/events', AdminEventList),
                                ('/admin/events/([0-9]*)', AdminEventList),

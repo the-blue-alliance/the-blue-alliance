@@ -6,7 +6,7 @@ from models.sitevar import Sitevar
 
 
 class ApiStatusController(ApiBaseController):
-    CACHE_KEY_FORMAT = "apiv2_status_controller"  # year
+    CACHE_KEY_FORMAT = "apiv2_status_controller"
     CACHE_VERSION = 0
     CACHE_HEADER_LENGTH = 61
 
@@ -26,6 +26,7 @@ class ApiStatusController(ApiBaseController):
 
     def _render(self):
         status_sitevar = Sitevar.get_by_id('apistatus')
+        fmsapi_sitevar = Sitevar.get_by_id('apistatus.fmsapi_down')
         down_events_sitevar = Sitevar.get_by_id('apistatus.down_events')
 
         # Error out of no sitevar found
@@ -34,7 +35,8 @@ class ApiStatusController(ApiBaseController):
             self.abort(404)
 
         status_dict = status_sitevar.contents
-        down_events_list = down_events_sitevar.contents
+        down_events_list = down_events_sitevar.contents if down_events_sitevar else None
 
+        status_dict['is_datafeed_down'] = True if fmsapi_sitevar and fmsapi_sitevar.values_json == "True" else False
         status_dict['down_events'] = down_events_list if down_events_list is not None else []
         return json.dumps(status_dict, ensure_ascii=True)
