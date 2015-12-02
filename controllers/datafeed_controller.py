@@ -368,11 +368,11 @@ class EventListGet(webapp.RequestHandler):
         merged_events = EventManipulator.mergeModels(df.getEventList(year), df2.getEventList(year))
         events = EventManipulator.createOrUpdate(merged_events)
 
-        # Fetch EventTeams for each event
+        # Fetch event details for each event
         for event in events:
             taskqueue.add(
                 queue_name='datafeed',
-                url='/tasks/get/eventteams/'+event.key_name,
+                url='/tasks/get/event_details/'+event.key_name,
                 method='GET'
             )
 
@@ -384,14 +384,14 @@ class EventListGet(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
 
 
-class EventTeamsEnqueue(webapp.RequestHandler):
+class EventDetailsEnqueue(webapp.RequestHandler):
     """
-    Handlers enqueueing fetching a list of teams attending an event
+    Handlers enqueueing fetching event details, event teams, and team details
     """
     def get(self, event_key):
         taskqueue.add(
             queue_name='datafeed',
-            url='/tasks/get/eventteams/'+event_key,
+            url='/tasks/get/event_details/'+event_key,
             method='GET')
 
         template_values = {
@@ -402,9 +402,9 @@ class EventTeamsEnqueue(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))
 
 
-class EventTeamsGet(webapp.RequestHandler):
+class EventDetailsGet(webapp.RequestHandler):
     """
-    Fetch list of teams attending a single event
+    Fetch event details, event teams, and team details
     FMSAPI should be trusted over FIRSTElasticSearch
     """
     def get(self, event_key):
@@ -412,6 +412,11 @@ class EventTeamsGet(webapp.RequestHandler):
         df2 = DatafeedFIRSTElasticSearch()
 
         event = Event.get_by_id(event_key)
+
+        # Update event
+        updated_event = df2.getEventDetails(event)
+        if updated_event:
+            event = EventManipulator.createOrUpdate(updated_event)
 
         models = df.getEventTeams(event_key)
         teams = []
