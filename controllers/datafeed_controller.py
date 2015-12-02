@@ -428,7 +428,7 @@ class EventTeamsGet(webapp.RequestHandler):
 
         # Merge teams
         merged_teams = TeamManipulator.mergeModels(teams, df2.getEventTeams(event))
-        teams = TeamManipulator.createOrUpdate(merged_events)
+        teams = TeamManipulator.createOrUpdate(merged_teams)
 
         # Write new models
         teams = TeamManipulator.createOrUpdate(teams)
