@@ -6,7 +6,7 @@ from google.appengine.ext import db
 from google.appengine.ext import testbed
 from google.appengine.ext.webapp import Response
 
-from controllers.datafeed_controller import UsfirstEventDetailsGet
+# from controllers.datafeed_controller import UsfirstEventDetailsGet
 
 from models.event import Event
 from models.team import Team
