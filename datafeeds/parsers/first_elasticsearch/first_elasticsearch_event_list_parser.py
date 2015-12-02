@@ -1,5 +1,6 @@
 import datetime
 
+from consts.district_type import DistrictType
 from consts.event_type import EventType
 from helpers.event_helper import EventHelper
 
@@ -27,7 +28,10 @@ class FIRSTElasticSearchEventListParser(object):
             key = "{}{}".format(self.season, code)
             name = event['event_name']
             short_name = EventHelper.getShortName(name)
-            district_enum = EventHelper.getDistrictFromEventName(name)
+            if event_type in EventType.DISTRICT_EVENT_TYPES:
+                district_enum = EventHelper.getDistrictFromEventName(name)
+            else:
+                district_enum = DistrictType.NO_DISTRICT
             venue = event['event_venue']
             location = "{}, {}, {}".format(event['event_city'], event['event_stateprov'], event['event_country'])
             start = datetime.datetime.strptime(event['date_start'], self.DATE_FORMAT_STR)

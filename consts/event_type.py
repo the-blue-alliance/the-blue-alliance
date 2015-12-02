@@ -19,6 +19,11 @@ class EventType(object):
         UNLABLED: '--',
     }
 
+    DISTRICT_EVENT_TYPES = {
+        DISTRICT,
+        DISTRICT_CMP,
+    }
+
     NON_CMP_EVENT_TYPES = {
         REGIONAL,
         DISTRICT,

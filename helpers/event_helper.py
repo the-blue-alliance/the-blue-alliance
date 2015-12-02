@@ -294,14 +294,16 @@ class EventHelper(object):
 
     @classmethod
     def getDistrictFromEventName(cls, event_name):
-        if 'District' in event_name:
-            for abbrev, district_type in DistrictType.abbrevs.items():
-                if abbrev in event_name.lower():
-                    return district_type
+        for abbrev, district_type in DistrictType.abbrevs.items():
+            if '{} district'.format(abbrev) in event_name.lower():
+                print district_type
+                return district_type
 
-            for district_name, district_type in DistrictType.names.items():
-                if district_name in event_name:
-                    return district_type
+        for district_name, district_type in DistrictType.elasticsearch_names.items():
+            if district_name in event_name:
+                print district_type
+                return district_type
+
         return DistrictType.NO_DISTRICT
 
     @classmethod
