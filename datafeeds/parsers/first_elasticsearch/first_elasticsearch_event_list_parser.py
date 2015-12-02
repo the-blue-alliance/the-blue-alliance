@@ -47,6 +47,7 @@ class FIRSTElasticSearchEventListParser(object):
                 venue_address="{}, {}".format(venue, location),
                 year=self.season,
                 event_district_enum=district_enum,
-                first_eid=first_eid
+                first_eid=first_eid,
+                website=event.get('event_web_url', None)
             ))
         return events

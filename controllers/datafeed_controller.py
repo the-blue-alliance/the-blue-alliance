@@ -453,7 +453,7 @@ class EventTeamsGet(webapp.RequestHandler):
             et_keys_to_delete = existing_event_team_keys.difference(event_team_keys)
             EventTeamManipulator.delete_keys(et_keys_to_delete)
 
-        event_teams = EventTeamManipulator.createOrUpdate(event_teams)
+            event_teams = EventTeamManipulator.createOrUpdate(event_teams)
         if type(event_teams) is not list:
             event_teams = [event_teams]
 
