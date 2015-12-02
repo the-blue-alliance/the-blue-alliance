@@ -57,6 +57,7 @@ class DistrictType(object):
         'Michigan': MICHIGAN,
         'Mid-Atlantic': MID_ATLANTIC,
         'New England': NEW_ENGLAND,
+        'NE FIRST': NEW_ENGLAND,
         'Pacific Northwest': PACIFIC_NORTHWEST,
         'Indiana': INDIANA,
         'Chesapeake': CHESAPEAKE,
