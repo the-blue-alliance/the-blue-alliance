@@ -36,9 +36,9 @@ class FIRSTElasticSearchEventListParser(object):
             start = datetime.datetime.strptime(event['date_start'], self.DATE_FORMAT_STR)
             end = datetime.datetime.strptime(event['date_end'], self.DATE_FORMAT_STR) + datetime.timedelta(hours=23, minutes=59, seconds=59)
             venue_address = event['event_venue']
-            if event['event_address1']:
+            if 'event_address1' in event and event['event_address1']:
                 venue_address += '\n' + event['event_address1']
-            if event['event_address2']:
+            if 'event_address2' in event and event['event_address2']:
                 venue_address += '\n' + event['event_address2']
             venue_address += '\n{}, {} {}\n{}'.format(event['event_city'], event['event_stateprov'], event['event_postalcode'], event['event_country'])
 
