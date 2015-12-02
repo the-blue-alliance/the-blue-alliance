@@ -110,6 +110,11 @@ class ManipulatorBase(object):
         Returns a list of models containing the union of new_models and old_models.
         If a model with the same key is in both input lists, the new_model is merged with the old_model.
         """
+        if new_models is None:
+            new_models = []
+        if old_models is None:
+            old_models = []
+
         old_models_by_key = {}
         untouched_old_keys = set()
         for model in old_models:
