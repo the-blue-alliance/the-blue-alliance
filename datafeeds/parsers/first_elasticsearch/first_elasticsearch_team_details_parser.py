@@ -10,7 +10,7 @@ class FIRSTElasticSearchTeamDetailsParser(object):
     def parse(self, response):
         teams = []
         for team in response['hits']['hits']:
-            first_tpid = int(event['_id'])
+            first_tpid = int(team['_id'])
             team = team['_source']
 
             address = u"{}, {}, {}".format(team['team_city'], team['team_stateprov'], team['team_country'])
@@ -24,7 +24,7 @@ class FIRSTElasticSearchTeamDetailsParser(object):
                 website=team.get('team_web_url', None),
                 rookie_year=team['team_rookieyear'],
                 first_tpid=first_tpid,
-                first_tyid_year=self.year
+                first_tpid_year=self.year
             ))
 
         return teams
