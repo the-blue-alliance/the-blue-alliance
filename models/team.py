@@ -17,6 +17,7 @@ class Team(ndb.Model):
     first_tpid = ndb.IntegerProperty()  # from USFIRST. FIRST team ID number. -greg 5/20/2010
     first_tpid_year = ndb.IntegerProperty()  # from USFIRST. Year tpid is applicable for. -greg 9 Jan 2011
     rookie_year = ndb.IntegerProperty()
+    motto = ndb.StringProperty(indexed=False)
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
@@ -101,3 +102,9 @@ class Team(ndb.Model):
         key_name_regex = re.compile(r'^frc[1-9]\d*$')
         match = re.match(key_name_regex, team_key)
         return True if match else False
+
+    @property
+    def motto_without_quotes(self):
+        if (self.motto[0] == self.motto[-1]) and self.motto.startswith(("'", '"')):
+            return self.motto[1:-1]
+        return self.motto
