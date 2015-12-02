@@ -51,6 +51,10 @@ class DatafeedFIRSTElasticSearch(object):
     #     return
 
     def getEventTeams(self, event):
+        if event.first_eid is None:
+            logging.warning("Cannot get event teams for {}! No first_eid.".format(event.key.id()))
+            return []
+
         teams = self._parse(self.EVENT_TEAMS_URL_PATTERN % (event.first_eid, event.year), FIRSTElasticSearchTeamDetailsParser(event.year))
         return teams
 
