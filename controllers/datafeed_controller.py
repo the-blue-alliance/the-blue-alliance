@@ -447,7 +447,7 @@ class EventTeamsGet(webapp.RequestHandler):
             for team in teams]
 
         # Delete eventteams of teams that are no longer registered
-        if event.future:
+        if event_teams != []:
             existing_event_team_keys = set(EventTeam.query(EventTeam.event == event.key).fetch(1000, keys_only=True))
             event_team_keys = set([et.key for et in event_teams])
             et_keys_to_delete = existing_event_team_keys.difference(event_team_keys)
