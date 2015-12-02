@@ -293,6 +293,18 @@ class EventHelper(object):
         return district if district != DistrictType.NO_DISTRICT else DistrictType.abbrevs.get(district_name_str, DistrictType.NO_DISTRICT)
 
     @classmethod
+    def getDistrictFromEventName(cls, event_name):
+        for abbrev, district_type in DistrictType.abbrevs.items():
+            if '{} district'.format(abbrev) in event_name.lower():
+                return district_type
+
+        for district_name, district_type in DistrictType.elasticsearch_names.items():
+            if district_name in event_name:
+                return district_type
+
+        return DistrictType.NO_DISTRICT
+
+    @classmethod
     def parseEventType(self, event_type_str):
         """
         Given an event_type_str from USFIRST, return the proper event type

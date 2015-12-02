@@ -52,6 +52,19 @@ class DistrictType(object):
         'Georgia': GEORGIA,
     }
 
+    # Names used by FIRST ElasticSearch
+    elasticsearch_names = {
+        'Michigan': MICHIGAN,
+        'Mid-Atlantic': MID_ATLANTIC,
+        'New England': NEW_ENGLAND,
+        'NE FIRST': NEW_ENGLAND,
+        'Pacific Northwest': PACIFIC_NORTHWEST,
+        'Indiana': INDIANA,
+        'Chesapeake': CHESAPEAKE,
+        'NC FIRST': NORTH_CAROLINA,
+        'Peachtree': GEORGIA,
+    }
+
     # make sure abbreviations stay all lower case
     abbrevs = {
         'fim': MICHIGAN,
