@@ -4,6 +4,13 @@ runtime: python27
 api_version: 1
 threadsafe: true
 
+instance_class: F1
+automatic_scaling:
+  min_idle_instances: 1
+  max_idle_instances: automatic  # default
+  min_pending_latency: 30ms  # default
+  max_pending_latency: automatic
+
 builtins:
 - appstats: on
 - remote_api: on
@@ -15,9 +22,7 @@ libraries:
 - name: numpy
   version: "1.6.1"
 - name: endpoints
-  version: 1.0
-- name: pycrypto
-  version: "2.6"
+  version: "1.0"
 
 handlers:
 - url: /css
