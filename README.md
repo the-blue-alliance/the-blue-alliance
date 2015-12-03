@@ -73,7 +73,8 @@ Setup notes:
 * You _could_ edit the `app.yaml` file to change its `application:` setting from `tbatv-dev-hrd` to your app's Project ID, but then you'll have to remember to not check in that edit. Better yet, write a script like the following `mydeploy.sh` file (that filename is in `.gitignore`):
 
 	    #!/bin/sh
-	    appcfg.py --oauth2 --application=<MY_PROJECT_ID> update
+	    appcfg.py --oauth2 --application=<MY_PROJECT_ID> update app.yaml app-backend-tasks.yaml
+	    appcfg.py --oauth2 --application=<MY_PROJECT_ID> update_dispatch .
 
 * Note that it needs your application's "Project ID", not its "Project name".
 * The `--oauth2` argument of `appcfg.py` [saves repeating the login steps each time](https://cloud.google.com/appengine/docs/python/tools/uploadinganapp#Python_Password-less_login_with_OAuth2). If you skip it or deploy via the App Engine Launcher, you'll have to enter your name and password each time. If you use 2-Step Verification for your Google account (you should!), that means generating an [App password](https://security.google.com/settings/security/apppasswords) each time.
