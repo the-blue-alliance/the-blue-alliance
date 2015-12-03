@@ -50,6 +50,7 @@ Run a local dev server
 	* File > Add Existing Application...
 	* Set the Application Path to your `the-blue-alliance` directory
 	* Set port **8088**
+	* Add modules (dispatch.yaml, app.yaml, and app-backend-tasks.yaml) as extra flags [https://cloud.google.com/appengine/docs/python/modules/#devserver](https://cloud.google.com/appengine/docs/python/modules/#devserver).
 2. Run the app in App Engine Launcher and view its Logs window
 3. You should now have a basic development installation!
 	* Visit [localhost:8088](http://localhost:8088) to see your local version of The Blue Alliance
@@ -96,10 +97,10 @@ Notes:
 
 Paver Commands
 --------------
-Paver is an easy way automate repetitive tasks. For The Blue Alliance, these tasks are stored in _pavement.py_. 
+Paver is an easy way automate repetitive tasks. For The Blue Alliance, these tasks are stored in _pavement.py_.
 To install paver, use one of the methods below:
 
-* Download and install paver from [http://pypi.python.org/pypi/Paver/](http://pypi.python.org/pypi/Paver/ "Paver") 
+* Download and install paver from [http://pypi.python.org/pypi/Paver/](http://pypi.python.org/pypi/Paver/ "Paver")
 * Run `easy_install Paver`
 
 Paver commands include:
