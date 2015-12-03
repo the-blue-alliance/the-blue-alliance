@@ -114,7 +114,7 @@ class NotificationHelper(object):
             status_sitevar = Sitevar(id="apistatus.down_events", description="A list of down event keys", values_json="[]")
         old_status = status_sitevar.contents
 
-        status_sitevar.values_json = json.dumps(down_events)
+        status_sitevar.contents = down_events
         status_sitevar.put()
 
         # Clear API Response cache

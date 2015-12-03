@@ -51,7 +51,7 @@ class DatafeedFMSAPI(object):
         fms_api_authkey = fms_api_secrets.contents['authkey']
         self._fms_api_authtoken = base64.b64encode('{}:{}'.format(fms_api_username, fms_api_authkey))
 
-        self._is_down_sitevar = Sitevar.get_by_id('apistatus.fmaspi_down')
+        self._is_down_sitevar = Sitevar.get_by_id('apistatus.fmsapi_down')
         if not self._is_down_sitevar:
             self._is_down_sitevar = Sitevar(id="apistatus.fmsapi_down", description="Is FMSAPI down?")
 
@@ -98,18 +98,18 @@ class DatafeedFMSAPI(object):
             logging.info(e)
             return None
 
-        old_status = self._is_down_sitevar.values_json
+        old_status = self._is_down_sitevar.contents
         if result.status_code == 200:
-            self._is_down_sitevar.values_json = "False"
+            self._is_down_sitevar.contents = False
             self._is_down_sitevar.put()
-            ApiStatusController.clear_cache_if_needed(old_status, self._is_down_sitevar.values_json)
+            ApiStatusController.clear_cache_if_needed(old_status, self._is_down_sitevar.contents)
             return parser.parse(json.loads(result.content))
         elif result.status_code % 100 == 5:
             # 5XX error - something is wrong with the server
             logging.warning('URLFetch for %s failed; Error code %s' % (url, result.status_code))
-            self._is_down_sitevar.values_json = "True"
+            self._is_down_sitevar.contents = True
             self._is_down_sitevar.put()
-            ApiStatusController.clear_cache_if_needed(old_status, self._is_down_sitevar.values_json)
+            ApiStatusController.clear_cache_if_needed(old_status, self._is_down_sitevar.contents)
             return None
         else:
             logging.warning('URLFetch for %s failed; Error code %s' % (url, result.status_code))

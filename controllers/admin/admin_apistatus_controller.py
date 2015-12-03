@@ -45,7 +45,7 @@ class AdminApiStatus(LoggedInHandler):
         status['android']['min_app_version'] = int(self.request.get('android_min_version'))
         status['ios']['latest_app_version'] = int(self.request.get('ios_latest_version'))
         status['ios']['min_app_version'] = int(self.request.get('ios_min_version'))
-        sitevar.values_json = json.dumps(status)
+        sitevar.contents = status
         sitevar.put()
 
         ApiStatusController.clear_cache_if_needed(old_value, status)
