@@ -3,6 +3,7 @@ import json
 
 from consts.client_type import ClientType
 from consts.notification_type import NotificationType
+from controllers.api.api_status_controller import ApiStatusController
 
 from helpers.push_helper import PushHelper
 
@@ -110,9 +111,14 @@ class NotificationHelper(object):
         # Update the status sitevar
         status_sitevar = Sitevar.get_by_id('apistatus.down_events')
         if status_sitevar is None:
-            status_sitevar = Sitevar(id="apistatus.down_events", description="A list of down event keys")
+            status_sitevar = Sitevar(id="apistatus.down_events", description="A list of down event keys", values_json="[]")
+        old_status = status_sitevar.values_json
+
         status_sitevar.values_json = json.dumps(down_events)
         status_sitevar.put()
+
+        # Clear API Response cache
+        ApiStatusController.clear_cache_if_needed(old_status, status_sitevar.values_json)
 
     @classmethod
     def send_schedule_update(cls, event):

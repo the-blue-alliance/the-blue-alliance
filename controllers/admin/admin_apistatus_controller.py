@@ -3,6 +3,7 @@ import os
 
 from google.appengine.ext.webapp import template
 
+from controllers.api.api_status_controller import ApiStatusController
 from controllers.base_controller import LoggedInHandler
 from models.sitevar import Sitevar
 
@@ -34,6 +35,8 @@ class AdminApiStatus(LoggedInHandler):
         self._require_admin()
 
         sitevar = Sitevar.get_or_insert('apistatus')
+        old_value = sitevar.values_json
+
         status = {}
         status['android'] = {}
         status['ios'] = {}
@@ -44,5 +47,7 @@ class AdminApiStatus(LoggedInHandler):
         status['ios']['min_app_version'] = int(self.request.get('ios_min_version'))
         sitevar.values_json = json.dumps(status)
         sitevar.put()
+
+        ApiStatusController.clear_cache_if_needed(old_value, sitevar.values_json)
 
         self.redirect('/admin/apistatus')

@@ -40,3 +40,12 @@ class ApiStatusController(ApiBaseController):
         status_dict['is_datafeed_down'] = True if fmsapi_sitevar and fmsapi_sitevar.values_json == "True" else False
         status_dict['down_events'] = down_events_list if down_events_list is not None else []
         return json.dumps(status_dict, ensure_ascii=True)
+
+    @classmethod
+    def clear_cache_if_needed(cls, old_content, new_content):
+        """
+        Clears the cache associated with this response
+        Only clears if old_content != new_content (e.g. response changes)
+        """
+        if old_content != new_content:
+            cls.delete_cache_multi(cls.CACHE_KEY_FORMAT)
