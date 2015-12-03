@@ -112,13 +112,13 @@ class NotificationHelper(object):
         status_sitevar = Sitevar.get_by_id('apistatus.down_events')
         if status_sitevar is None:
             status_sitevar = Sitevar(id="apistatus.down_events", description="A list of down event keys", values_json="[]")
-        old_status = status_sitevar.values_json
+        old_status = status_sitevar.contents
 
         status_sitevar.values_json = json.dumps(down_events)
         status_sitevar.put()
 
         # Clear API Response cache
-        ApiStatusController.clear_cache_if_needed(old_status, status_sitevar.values_json)
+        ApiStatusController.clear_cache_if_needed(old_status, down_events)
 
     @classmethod
     def send_schedule_update(cls, event):

@@ -48,4 +48,4 @@ class ApiStatusController(ApiBaseController):
         Only clears if old_content != new_content (e.g. response changes)
         """
         if old_content != new_content:
-            cls.delete_cache_multi(cls.get_cache_key_from_format())
+            cls.delete_cache_multi([cls.get_cache_key_from_format()])

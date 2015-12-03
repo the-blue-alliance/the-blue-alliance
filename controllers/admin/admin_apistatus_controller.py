@@ -35,7 +35,7 @@ class AdminApiStatus(LoggedInHandler):
         self._require_admin()
 
         sitevar = Sitevar.get_or_insert('apistatus')
-        old_value = sitevar.values_json
+        old_value = sitevar.contents
 
         status = {}
         status['android'] = {}
@@ -48,6 +48,6 @@ class AdminApiStatus(LoggedInHandler):
         sitevar.values_json = json.dumps(status)
         sitevar.put()
 
-        ApiStatusController.clear_cache_if_needed(old_value, sitevar.values_json)
+        ApiStatusController.clear_cache_if_needed(old_value, status)
 
         self.redirect('/admin/apistatus')
