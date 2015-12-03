@@ -444,7 +444,8 @@ class EventDetailsGet(webapp.RequestHandler):
         teams = TeamManipulator.mergeModels(teams, df2.getEventTeams(event))
 
         # Write new models
-        teams = TeamManipulator.createOrUpdate(teams)
+        if teams:
+            teams = TeamManipulator.createOrUpdate(teams)
         district_teams = DistrictTeamManipulator.createOrUpdate(district_teams)
         robots = RobotManipulator.createOrUpdate(robots)
 
