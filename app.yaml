@@ -59,16 +59,5 @@ handlers:
 - url: .*
   script: main.app
 
-skip_files:
-- ^(.*/)?.*\.less.*
-- .git/*
-- test_data/*
-- tests/*
-- utils/*
-- run_tests.py
-- pavement.py
-- do_compress.py
-- ^(.*/)?.*\.jar.*
-- static/css/less_css/*
-- static/css/precompiled_css/*
-- static/javascript/tba_js/*
+includes:
+- app_shared.yaml
