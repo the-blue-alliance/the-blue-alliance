@@ -10,9 +10,6 @@ from controllers.datafeed_controller import TbaVideosGet, TbaVideosEnqueue
 from controllers.datafeed_controller import FMSAPIAwardsEnqueue, FMSAPIEventAlliancesEnqueue, FMSAPIEventRankingsEnqueue, FMSAPIMatchesEnqueue
 from controllers.datafeed_controller import FMSAPIAwardsGet, FMSAPIEventAlliancesGet, FMSAPIEventRankingsGet, FMSAPIMatchesGet
 
-from controllers.datafeed_controller import EventListEnqueue, EventDetailsEnqueue
-from controllers.datafeed_controller import EventListGet, EventDetailsGet
-
 from controllers.cron_controller import DistrictPointsCalcEnqueue, DistrictPointsCalcDo
 from controllers.cron_controller import EventShortNameCalcEnqueue, EventShortNameCalcDo
 from controllers.cron_controller import EventTeamRepairDo, EventTeamUpdate, EventTeamUpdateEnqueue
@@ -38,15 +35,11 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/enqueue/fmsapi_event_alliances/(.*)', FMSAPIEventAlliancesEnqueue),
                                ('/tasks/enqueue/fmsapi_event_rankings/(.*)', FMSAPIEventRankingsEnqueue),
                                ('/tasks/enqueue/fmsapi_matches/(.*)', FMSAPIMatchesEnqueue),
-                               ('/tasks/enqueue/event_list/([0-9]*)', EventListEnqueue),
-                               ('/tasks/enqueue/event_details/(.*)', EventDetailsEnqueue),
                                ('/tasks/get/tba_videos/(.*)', TbaVideosGet),
                                ('/tasks/get/fmsapi_awards/(.*)', FMSAPIAwardsGet),
                                ('/tasks/get/fmsapi_event_alliances/(.*)', FMSAPIEventAlliancesGet),
                                ('/tasks/get/fmsapi_event_rankings/(.*)', FMSAPIEventRankingsGet),
                                ('/tasks/get/fmsapi_matches/(.*)', FMSAPIMatchesGet),
-                               ('/tasks/get/event_list/([0-9]*)', EventListGet),
-                               ('/tasks/get/event_details/(.*)', EventDetailsGet),
                                ('/tasks/math/enqueue/district_points_calc/([0-9]*)', DistrictPointsCalcEnqueue),
                                ('/tasks/math/do/district_points_calc/(.*)', DistrictPointsCalcDo),
                                ('/tasks/math/enqueue/event_short_name_calc_enqueue/([0-9]*)', EventShortNameCalcEnqueue),

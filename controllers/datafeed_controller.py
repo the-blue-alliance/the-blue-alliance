@@ -343,7 +343,7 @@ class EventListEnqueue(webapp.RequestHandler):
 
         taskqueue.add(
             queue_name='datafeed',
-            url='/tasks/get/event_list/' + year,
+            url='/backend-tasks/get/event_list/' + year,
             method='GET'
         )
 
@@ -372,7 +372,7 @@ class EventListGet(webapp.RequestHandler):
         for event in events:
             taskqueue.add(
                 queue_name='datafeed',
-                url='/tasks/get/event_details/'+event.key_name,
+                url='/backend-tasks/get/event_details/'+event.key_name,
                 method='GET'
             )
 
@@ -391,7 +391,7 @@ class EventDetailsEnqueue(webapp.RequestHandler):
     def get(self, event_key):
         taskqueue.add(
             queue_name='datafeed',
-            url='/tasks/get/event_details/'+event_key,
+            url='/backend-tasks/get/event_details/'+event_key,
             method='GET')
 
         template_values = {
