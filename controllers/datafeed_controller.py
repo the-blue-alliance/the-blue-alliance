@@ -313,16 +313,15 @@ class TeamDetailsGet(webapp.RequestHandler):
 
         if fms_details:
             team, district_team, robot = fms_details[0]
-            team = TeamManipulator.mergeModels(team, existing_team)
         else:
-            team = existing_team
+            team = None
             district_team = None
             robot = None
 
         if team:
-            team = TeamManipulator.mergeModels(team, df2.getTeamDetails(team))
+            team = TeamManipulator.mergeModels(team, df2.getTeamDetails(existing_team))
         else:
-            team = df2.getTeamDetails(team)
+            team = df2.getTeamDetails(existing_team)
 
         if team:
             team = TeamManipulator.createOrUpdate(team)
