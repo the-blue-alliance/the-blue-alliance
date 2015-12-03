@@ -5,11 +5,7 @@ api_version: 1
 threadsafe: true
 
 instance_class: F1
-automatic_scaling:
-  min_idle_instances: 1
-  max_idle_instances: automatic  # default
-  min_pending_latency: 30ms  # default
-  max_pending_latency: automatic
+# defaults to automatic scaling
 
 builtins:
 - appstats: on
