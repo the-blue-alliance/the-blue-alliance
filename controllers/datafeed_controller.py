@@ -299,40 +299,50 @@ class FMSAPIMatchesGet(webapp.RequestHandler):
 #         self.response.out.write("{} team gets have been enqueued in the interval [{}, {}).".format(len(teams), min_team, max_team))
 
 
-# class TeamDetailsGet(webapp.RequestHandler):
-#     """
-#     Requests team details from FMS API and imports the data
-#     """
-#     def get(self, key_name):
-#         fms_df = DatafeedFMSAPI('v2.0')
-#         fms_details = fms_df.getTeamDetails(date.today().year, key_name)
+class TeamDetailsGet(webapp.RequestHandler):
+    """
+    Fetches team details
+    FMSAPI should be trusted over FIRSTElasticSearch
+    """
+    def get(self, key_name):
+        existing_team = Team.get_by_id(key_name)
 
-#         if fms_details:
-#             team, district_team, robot = fms_details
-#         else:
-#             fms_team = None
-#             district_team = None
-#             robot = None
+        fms_df = DatafeedFMSAPI('v2.0')
+        df2 = DatafeedFIRSTElasticSearch()
+        fms_details = fms_df.getTeamDetails(datetime.date.today().year, key_name)
 
-#         if team:
-#             team = TeamManipulator.createorUpdate(team)
+        if fms_details:
+            team, district_team, robot = fms_details[0]
+            team = TeamManipulator.mergeModels(team, existing_team)
+        else:
+            team = existing_team
+            district_team = None
+            robot = None
 
-#         if district_team:
-#             district_team = DistrictTeamManipulator.createOrUpdate(district_team)
+        if team:
+            team = TeamManipulator.mergeModels(team, df2.getTeamDetails(team))
+        else:
+            team = df2.getTeamDetails(team)
 
-#         if robot:
-#             robot = RobotManipulator.createOrUpdate(robot)
+        if team:
+            team = TeamManipulator.createOrUpdate(team)
 
-#         template_values = {
-#             'key_name': key_name,
-#             'team': team,
-#             'success': success,
-#             'district': district_team,
-#             'robot': robot,
-#         }
+        if district_team:
+            district_team = DistrictTeamManipulator.createOrUpdate(district_team)
 
-#         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_team_details_get.html')
-#         self.response.out.write(template.render(path, template_values))
+        if robot:
+            robot = RobotManipulator.createOrUpdate(robot)
+
+        template_values = {
+            'key_name': key_name,
+            'team': team,
+            'success': team is not None,
+            'district': district_team,
+            'robot': robot,
+        }
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_team_details_get.html')
+        self.response.out.write(template.render(path, template_values))
 
 
 class EventListEnqueue(webapp.RequestHandler):

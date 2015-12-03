@@ -115,6 +115,9 @@ class ManipulatorBase(object):
         if old_models is None:
             old_models = []
 
+        new_models = self.listify(new_models)
+        old_models = self.listify(old_models)
+
         old_models_by_key = {}
         untouched_old_keys = set()
         for model in old_models:
@@ -127,13 +130,14 @@ class ManipulatorBase(object):
             model_key = model.key.id()
             if model_key in old_models_by_key:
                 merged_models.append(self.updateMergeBase(model, old_models_by_key[model_key], auto_union=auto_union))
+                untouched_old_keys.remove(model_key)
             else:
                 merged_models.append(model)
 
         for untouched_key in untouched_old_keys:
             merged_models.append(old_models_by_key[untouched_key])
 
-        return merged_models
+        return self.delistify(merged_models)
 
     @classmethod
     def updateMergeBase(self, new_model, old_model, auto_union=True):
