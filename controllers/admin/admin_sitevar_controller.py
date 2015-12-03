@@ -67,6 +67,7 @@ class AdminSitevarEdit(LoggedInHandler):
 
         # If we're changing an apistatus sitevar, clear the API response cache
         # Since this will be used rarely, always clear the cache on update
-        ApiStatusController.clear_cache_if_needed(False, True)
+        if 'apistatus' in self.request.get("key"):
+            ApiStatusController.clear_cache_if_needed(False, True)
 
         self.redirect("/admin/sitevar/edit/" + sitevar.key.id() + "?success=true")
