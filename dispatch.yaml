@@ -1,7 +1,7 @@
 application: tbatv-dev-hrd
 
 dispatch:
-# Send tasks to backend module
+# Send low-frequency long-running tasks to backend module
 - url: "*/backend-tasks/*"
   module: backend-tasks
 
