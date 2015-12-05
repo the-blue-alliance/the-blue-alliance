@@ -48,6 +48,7 @@ class TestTeamApiController(unittest2.TestCase):
                 nickname="EnTech GreenVillians",
                 address="Greenville, SC, USA",
                 website="www.entech.org",
+                motto = "Infiltrating Young Minds One Robot at a Time",
         )
         self.team.put()
 
@@ -64,6 +65,7 @@ class TestTeamApiController(unittest2.TestCase):
         self.assertEqual(team["region"], "SC")
         self.assertEqual(team["website"], self.team.website)
         self.assertEqual(team["rookie_year"], self.team.rookie_year)
+        self.assertEqual(team["motto"], self.team.motto)
 
     def testTeamApi(self):
         response = self.testapp.get('/frc281', headers={"X-TBA-App-Id": "tba-tests:team-controller-test:v01"})
