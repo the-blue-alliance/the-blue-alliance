@@ -155,4 +155,3 @@ class ApiDistrictRankingsController(ApiDistrictControllerBase):
             current_rank += 1
 
         return json.dumps(rankings)
-
