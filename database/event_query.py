@@ -2,6 +2,7 @@ from google.appengine.ext import ndb
 
 from consts.district_type import DistrictType
 from database.database_query import DatabaseQuery
+from models.district_team import DistrictTeam
 from models.event import Event
 from models.event_team import EventTeam
 from models.team import Team
@@ -38,6 +39,25 @@ class DistrictEventsQuery(DatabaseQuery):
             Event.event_district_enum == district_type,
             Event.year == year).fetch_async()
         raise ndb.Return(events)
+
+
+class DistrictTeamsQuery(DatabaseQuery):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = 'district_events_{}'  # (district_key)
+
+    def __init__(self, district_key):
+        self._query_args = (district_key, )
+
+    @ndb.tasklet
+    def _query_async(self):
+        district_key = self._query_args[0]
+        year = int(district_key[:4])
+        district_abbrev = district_key[4:]
+        district_type = DistrictType.abbrevs.get(district_abbrev, None)
+        district_teams = yield DistrictTeam.query(
+            DistrictTeam.district == district_type,
+            DistrictTeam.year == year).fetch_async()
+        raise ndb.Return(district_teams)
 
 
 class TeamEventsQuery(DatabaseQuery):

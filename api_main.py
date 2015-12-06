@@ -4,7 +4,8 @@ import webapp2
 import tba_config
 
 from controllers.api_controller import ApiDeprecatedController, CsvTeamsAll
-from controllers.api.api_district_controller import ApiDistrictListController, ApiDistrictEventsController, ApiDistrictRankingsController
+from controllers.api.api_district_controller import ApiDistrictListController, ApiDistrictTeamsController, ApiDistrictRankingsController, \
+    ApiDistrictEventsController
 from controllers.api.api_team_controller import ApiTeamController, ApiTeamEventsController, ApiTeamEventAwardsController, \
                                                 ApiTeamEventMatchesController, ApiTeamMediaController, ApiTeamListController, \
                                                 ApiTeamYearsParticipatedController, ApiTeamHistoryEventsController, \
@@ -93,12 +94,15 @@ app = webapp2.WSGIApplication([webapp2.Route(r'/api/v1/<:.*>',
                                webapp2.Route(r'/api/v2/district/<district_abbrev:>/<year:([0-9]*)>/events',
                                              ApiDistrictEventsController,
                                              methods=['GET']),
+                               webapp2.Route(r'/api/v2/district/<district_abbrev:>/<year:([0-9]*)>/teams',
+                                             ApiDistrictTeamsController,
+                                             methods=['GET']),
                                webapp2.Route(r'/api/v2/district/<district_abbrev:>/<year:([0-9]*)>/rankings',
                                              ApiDistrictRankingsController,
                                              methods=['GET']),
                                webapp2.Route(r'/api/v2/status',
-                                            ApiStatusController,
-                                            methods=['GET']),
+                                             ApiStatusController,
+                                             methods=['GET']),
                                webapp2.Route(r'/api/trusted/v1/event/<event_key:>/alliance_selections/update',
                                              ApiTrustedEventAllianceSelectionsUpdate,
                                              methods=['POST']),
