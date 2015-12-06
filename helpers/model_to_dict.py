@@ -19,6 +19,7 @@ class ModelToDict(object):
         team_dict["website"] = team.website
         team_dict["location"] = team.location
         team_dict["rookie_year"] = team.rookie_year
+        team_dict["motto"] = team.motto
 
         try:
             team_dict["location"] = team.location
