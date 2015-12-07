@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import date
 import logging
 import os
@@ -8,10 +9,16 @@ from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from consts.client_type import ClientType
+from consts.district_type import DistrictType
 from controllers.base_controller import LoggedInHandler
+from helpers.district_team_manipulator import DistrictTeamManipulator
 from helpers.notification_sender import NotificationSender
+from models.district_team import DistrictTeam
+from models.event import Event
+from models.event_team import EventTeam
 from models.mobile_client import MobileClient
 from models.subscription import Subscription
+from models.team import Team
 from notifications.ping import PingNotification
 
 
@@ -128,3 +135,40 @@ class AdminWebhooksClear(LoggedInHandler):
         template_values = {'count': count}
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/webhooks_clear_do.html')
         self.response.out.write(template.render(path, template_values))
+
+
+class AdminCreateDistrictTeamsEnqueue(LoggedInHandler):
+    """
+    Trying to Enqueue a task to rebuild old district teams from event teams.
+    """
+    def get(self, year):
+        self._require_admin()
+        taskqueue.add(
+            queue_name='admin',
+            url='/tasks/admin/rebuild_district_teams/{}'.format(year),
+            method='GET')
+
+        self.response.out.write("Enqueued district teams for {}".format(year))
+
+
+class AdminCreateDistrictTeamsDo(LoggedInHandler):
+    def get(self, year):
+        year = int(year)
+        team_districts = defaultdict(list)
+        logging.info("Fetching events in {}".format(year))
+        year_events = Event.query(year == Event.year, Event.event_district_enum != DistrictType.NO_DISTRICT).fetch()
+        for event in year_events:
+            logging.info("Fetching EventTeams for {}".format(event.key_name))
+            event_teams = EventTeam.query(EventTeam.event == event.key).fetch()
+            for event_team in event_teams:
+                team_districts[event_team.team.id()].append(event.event_district_enum)
+
+        new_district_teams = []
+        for team_key, districts in team_districts.iteritems():
+            most_frequent_district = max(set(districts), key=districts.count)
+            logging.info("Assuming team {} belongs to {}".format(team_key, DistrictType.type_names[most_frequent_district]))
+            dt_key = DistrictTeam.renderKeyName(year, most_frequent_district, team_key)
+            new_district_teams.append(DistrictTeam(id=dt_key, year=year, team=ndb.Key(Team, team_key), district=most_frequent_district))
+
+        logging.info("Finishing updating old district teams from event teams")
+        DistrictTeamManipulator.createOrUpdate(new_district_teams)
