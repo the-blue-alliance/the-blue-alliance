@@ -14,6 +14,7 @@ from database.team_query import DistrictTeamsQuery
 
 from helpers.district_helper import DistrictHelper
 from helpers.event_helper import EventHelper
+from helpers.team_helper import TeamHelper
 
 from models.event import Event
 from models.event_team import EventTeam
@@ -54,6 +55,7 @@ class DistrictDetail(CacheableHandler):
         if not event_keys:
             self.abort(404)
 
+        # needed for district teams
         district_key = '{}{}'.format(year, district_abbrev)
         district_teams_future = DistrictTeamsQuery(district_key).fetch_async()
 
@@ -88,6 +90,14 @@ class DistrictDetail(CacheableHandler):
                 valid_districts.add((DistrictType.type_names[cmp_dis_type], DistrictType.type_abbrevs[cmp_dis_type]))
         valid_districts = sorted(valid_districts, key=lambda (name, _): name)
 
+        teams = TeamHelper.sortTeams(district_teams_future.get_result())
+
+        num_teams = len(teams)
+        middle_value = num_teams / 2
+        if num_teams % 2 != 0:
+            middle_value += 1
+        teams_a, teams_b = teams[:middle_value], teams[middle_value:]
+
         self.template_values.update({
             'explicit_year': explicit_year,
             'year': year,
@@ -97,7 +107,8 @@ class DistrictDetail(CacheableHandler):
             'district_abbrev': district_abbrev,
             'events': events,
             'team_totals': team_totals,
-            'district_teams': district_teams_future.get_result(),
+            'teams_a': teams_a,
+            'teams_b': teams_b,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/district_details.html')
