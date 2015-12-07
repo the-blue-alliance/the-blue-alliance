@@ -9,7 +9,8 @@ from controllers.api.api_district_controller import ApiDistrictListController, A
 from controllers.api.api_team_controller import ApiTeamController, ApiTeamEventsController, ApiTeamEventAwardsController, \
                                                 ApiTeamEventMatchesController, ApiTeamMediaController, ApiTeamListController, \
                                                 ApiTeamYearsParticipatedController, ApiTeamHistoryEventsController, \
-                                                ApiTeamHistoryAwardsController, ApiTeamHistoryRobotsController
+                                                ApiTeamHistoryAwardsController, ApiTeamHistoryRobotsController, \
+    ApiTeamHistoryDistrictsController
 from controllers.api.api_event_controller import ApiEventController, ApiEventTeamsController, \
                                                  ApiEventMatchesController, ApiEventStatsController, \
                                                  ApiEventRankingsController, ApiEventAwardsController, \
@@ -54,6 +55,9 @@ app = webapp2.WSGIApplication([webapp2.Route(r'/api/v1/<:.*>',
                                              methods=['GET']),
                                webapp2.Route(r'/api/v2/team/<team_key:>/history/robots',
                                              ApiTeamHistoryRobotsController,
+                                             methods=['GET']),
+                               webapp2.Route(r'/api/v2/team/<team_key:>/history/districts',
+                                             ApiTeamHistoryDistrictsController,
                                              methods=['GET']),
                                webapp2.Route(r'/api/v2/team/<team_key:>/years_participated',
                                              ApiTeamYearsParticipatedController,

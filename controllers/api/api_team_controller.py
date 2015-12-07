@@ -12,8 +12,7 @@ from database.event_query import TeamEventsQuery, TeamYearEventsQuery
 from database.match_query import TeamEventMatchesQuery
 from database.media_query import TeamYearMediaQuery
 from database.robot_query import TeamRobotsQuery
-from database.team_query import TeamListQuery, TeamParticipationQuery
-
+from database.team_query import TeamListQuery, TeamParticipationQuery, TeamDistrictsQuery
 from helpers.award_helper import AwardHelper
 from helpers.model_to_dict import ModelToDict
 from helpers.data_fetchers.team_details_data_fetcher import TeamDetailsDataFetcher
@@ -284,3 +283,28 @@ class ApiTeamHistoryRobotsController(ApiTeamControllerBase):
 
         robots_dict = {robot.year: ModelToDict.robotConverter(robot) for robot in robots}
         return json.dumps(robots_dict, ensure_ascii=True)
+
+
+class ApiTeamHistoryDistrictsController(ApiTeamControllerBase):
+    """
+    Returns a JSON list of all DistrictTeam models associated with a Team
+    """
+    CACHE_KEY_FORMAT = "apiv2_team_history_districts_controller_{}"  # (team_key)
+    CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamHistoryDistrictsController, self).__init__(*args, **kw)
+        self.team_key = self.request.route_kwargs['team_key']
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key)
+
+    def _track_call(self, team_key):
+        self._track_call_defer('team/history/districts', team_key)
+
+    def _render(self, team_key):
+        self._set_team(team_key)
+
+        district_teams = TeamDistrictsQuery(self.team_key).fetch()
+
+        team_dict = {int(year): district_key[4:] for year, district_key in district_teams.iteritems()}
+        return json.dumps(team_dict, ensure_ascii=True)
