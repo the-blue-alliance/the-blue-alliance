@@ -7,9 +7,10 @@ from consts.event_type import EventType
 
 from datetime import datetime
 
-from database.event_query import DistrictEventsQuery, DistrictTeamsQuery
+from database.event_query import DistrictEventsQuery
 from google.appengine.ext import ndb
 
+from database.team_query import DistrictTeamsQuery
 from helpers.district_helper import DistrictHelper
 from helpers.event_helper import EventHelper
 from helpers.model_to_dict import ModelToDict
@@ -179,6 +180,6 @@ class ApiDistrictTeamsController(ApiDistrictControllerBase):
 
         district_teams = DistrictTeamsQuery('{}{}'.format(self.year, self.district_abbrev)).fetch()
 
-        district_teams_dict = [ModelToDict.districtTeamConverter(team) for team in district_teams]
+        district_teams_dict = [ModelToDict.teamConverter(team) for team in district_teams]
 
         return json.dumps(district_teams_dict, ensure_ascii=True)

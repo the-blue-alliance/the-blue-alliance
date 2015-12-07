@@ -1,6 +1,6 @@
 from google.appengine.ext import ndb
 
-from controllers.api.api_district_controller import ApiDistrictListController, ApiDistrictEventsController, ApiDistrictRankingsController
+from controllers.api.api_district_controller import ApiDistrictListController, ApiDistrictEventsController, ApiDistrictRankingsController, ApiDistrictTeamsController
 from controllers.api.api_event_controller import ApiEventController, ApiEventTeamsController, \
                                                  ApiEventMatchesController, ApiEventStatsController, \
                                                  ApiEventRankingsController, ApiEventAwardsController, ApiEventListController, ApiEventDistrictPointsController
@@ -81,8 +81,10 @@ class CacheClearer(object):
         """
         Gets cache keys and controllers that references this eventteam
         """
+        district_keys = affected_refs['district_key']
 
-        return cls._queries_to_cache_keys_and_controllers(get_affected_queries.districtteam_updated(affected_refs))
+        return cls._get_districtteams_cache_keys_and_controllers(district_keys) + \
+            cls._queries_to_cache_keys_and_controllers(get_affected_queries.districtteam_updated(affected_refs))
 
     @classmethod
     def get_match_cache_keys_and_controllers(cls, affected_refs):
@@ -197,6 +199,15 @@ class CacheClearer(object):
         cache_keys_and_controllers = []
         for event_key in filter(None, event_keys):
             cache_keys_and_controllers.append((ApiEventTeamsController.get_cache_key_from_format(event_key.id()), ApiEventTeamsController))
+        return cache_keys_and_controllers
+
+    @classmethod
+    def _get_districtteams_cache_keys_and_controllers(cls, district_keys):
+        cache_keys_and_controllers = []
+        for district_key in filter(None, district_keys):
+            year = district_key[:4]
+            district_short = district_key[4:]
+            cache_keys_and_controllers.append((ApiDistrictTeamsController.get_cache_key_from_format(district_short, year), ApiDistrictTeamsController))
         return cache_keys_and_controllers
 
     @classmethod

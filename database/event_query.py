@@ -41,25 +41,6 @@ class DistrictEventsQuery(DatabaseQuery):
         raise ndb.Return(events)
 
 
-class DistrictTeamsQuery(DatabaseQuery):
-    CACHE_VERSION = 0
-    CACHE_KEY_FORMAT = 'district_teams_{}'  # (district_key)
-
-    def __init__(self, district_key):
-        self._query_args = (district_key, )
-
-    @ndb.tasklet
-    def _query_async(self):
-        district_key = self._query_args[0]
-        year = int(district_key[:4])
-        district_abbrev = district_key[4:]
-        district_type = DistrictType.abbrevs.get(district_abbrev, None)
-        district_teams = yield DistrictTeam.query(
-            DistrictTeam.district == district_type,
-            DistrictTeam.year == year).fetch_async()
-        raise ndb.Return(district_teams)
-
-
 class TeamEventsQuery(DatabaseQuery):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = 'team_events_{}'  # (team_key)

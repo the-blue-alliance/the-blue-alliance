@@ -2,13 +2,25 @@ The Blue Alliance
 ==================
 The Blue Alliance is a FIRST Robotics tool to help teams scout for, compete at, and relive competitions. You can see how the whole site works here, or even write code to make it better!
 
-Contributing
+Help Build The Blue Alliance
 ------------
-0. Join [thebluealliance-developers on groups.google.com](https://groups.google.com/forum/#!forum/thebluealliance-developers) to stay up to date with development
+
+### Stay in Touch
+
+* *Mailing List* Join [thebluealliance-developers on groups.google.com](https://groups.google.com/forum/#!forum/thebluealliance-developers) to stay up to date with development.
+* *Slack* Ask to join [the-blue-alliance.slack.com](the-blue-alliance.slack.com) to hang out in our chat channels.
+
+### Add Data
+* *Facebook* Join our group, [#moardata @ The Blue Alliance](https://www.facebook.com/groups/moardata/), to submit video and match data we're missing on the site.
+* Submit missing videos using the "Add Video" links on the site.
+* Submit missing webcasts, team photos, etc using other links on the site.
+
+### Contributing Code
+
 1. Fork this project!
-2. Make your changes on a branch.
+2. Make a branch to hold your changes.
 3. Make changes!
-4. Send pull request from your fork.
+4. Send over a pull request from your fork.
 5. We'll review it, and push your changes to the site!
 
 If you're having trouble getting set up, reach out to us at [our mailing list](https://groups.google.com/forum/?fromgroups#!forum/thebluealliance-developers) and we'll help you through it!
