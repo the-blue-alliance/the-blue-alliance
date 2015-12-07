@@ -156,7 +156,7 @@ class AdminCreateDistrictTeamsDo(LoggedInHandler):
         year = int(year)
         team_districts = defaultdict(list)
         logging.info("Fetching events in {}".format(year))
-        year_events = Event.query(year == Event.year, Event.event_district_enum != DistrictType.NO_DISTRICT).fetch()
+        year_events = Event.query(year == Event.year, Event.event_district_enum != DistrictType.NO_DISTRICT, Event.event_district_enum != None).fetch()
         for event in year_events:
             logging.info("Fetching EventTeams for {}".format(event.key_name))
             event_teams = EventTeam.query(EventTeam.event == event.key).fetch()
