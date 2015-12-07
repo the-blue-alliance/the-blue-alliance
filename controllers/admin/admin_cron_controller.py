@@ -136,6 +136,7 @@ class AdminWebhooksClear(LoggedInHandler):
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/webhooks_clear_do.html')
         self.response.out.write(template.render(path, template_values))
 
+
 class AdminCreateDistrictTeamsEnqueue(LoggedInHandler):
     """
     Trying to Enqueue a task to rebuild old district teams from event teams.
@@ -144,10 +145,11 @@ class AdminCreateDistrictTeamsEnqueue(LoggedInHandler):
         self._require_admin()
         taskqueue.add(
             queue_name='admin',
-            url='/tasks/admin/rebuild_district_teams/{}'.format(year),
+            url='/backend-tasks/do/rebuild_district_teams/{}'.format(year),
             method='GET')
 
         self.response.out.write("Enqueued district teams for {}".format(year))
+
 
 class AdminCreateDistrictTeamsDo(LoggedInHandler):
     def get(self, year):
@@ -170,3 +172,4 @@ class AdminCreateDistrictTeamsDo(LoggedInHandler):
 
         logging.info("Finishing updating old district teams from event teams")
         DistrictTeamManipulator.createOrUpdate(new_district_teams)
+        self.response.out.write("Finished creating district teams for {}".format(year))

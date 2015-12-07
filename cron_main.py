@@ -19,7 +19,7 @@ from controllers.cron_controller import YearInsightsEnqueue, YearInsightsDo, Ove
 from controllers.cron_controller import UpcomingNotificationDo
 
 from controllers.admin.admin_cron_controller import AdminMobileClearEnqueue, AdminMobileClear, AdminSubsClearEnqueue, AdminSubsClear, \
-    AdminWebhooksClearEnqueue, AdminWebhooksClear, AdminCreateDistrictTeamsDo
+    AdminWebhooksClearEnqueue, AdminWebhooksClear
 
 app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackupEventsEnqueue),
                                ('/tasks/enqueue/csv_backup_events/([0-9]*)', TbaCSVBackupEventsEnqueue),
@@ -62,6 +62,5 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/admin/clear_old_subs', AdminSubsClear),
                                ('/tasks/admin/enqueue/clear_old_webhooks', AdminWebhooksClearEnqueue),
                                ('/tasks/admin/clear_old_webhooks', AdminWebhooksClear),
-                               ('/tasks/admin/rebuild_district_teams/([0-9]+)', AdminCreateDistrictTeamsDo),
                                ],
                               debug=tba_config.DEBUG)
