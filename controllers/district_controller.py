@@ -10,6 +10,8 @@ from controllers.base_controller import CacheableHandler
 from consts.district_type import DistrictType
 from consts.event_type import EventType
 
+from database.team_query import DistrictTeamsQuery
+
 from helpers.district_helper import DistrictHelper
 from helpers.event_helper import EventHelper
 
@@ -52,6 +54,9 @@ class DistrictDetail(CacheableHandler):
         if not event_keys:
             self.abort(404)
 
+        district_key = '{}{}'.format(year, district_abbrev)
+        district_teams_future = DistrictTeamsQuery(district_key).fetch_async()
+
         # needed for valid_years
         all_cmp_event_keys_future = Event.query(Event.event_district_enum == district_type, Event.event_type_enum == EventType.DISTRICT_CMP).fetch_async(None, keys_only=True)
 
@@ -92,6 +97,7 @@ class DistrictDetail(CacheableHandler):
             'district_abbrev': district_abbrev,
             'events': events,
             'team_totals': team_totals,
+            'district_teams': district_teams_future.get_result(),
         })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/district_details.html')
