@@ -306,5 +306,5 @@ class ApiTeamHistoryDistrictsController(ApiTeamControllerBase):
 
         district_teams = TeamDistrictsQuery(self.team_key).fetch()
 
-        team_dict = {int(year): district_key[4:] for year, district_key in district_teams.iteritems()}
+        team_dict = {int(year): district_key for year, district_key in district_teams.iteritems()}
         return json.dumps(team_dict, ensure_ascii=True)
