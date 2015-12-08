@@ -2,7 +2,6 @@ from google.appengine.ext import ndb
 
 from consts.district_type import DistrictType
 from database.database_query import DatabaseQuery
-from models.district_team import DistrictTeam
 from models.event import Event
 from models.event_team import EventTeam
 from models.team import Team
