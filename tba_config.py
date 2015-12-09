@@ -1,6 +1,6 @@
 import os
 
-DEBUG = os.environ.get('SERVER_SOFTWARE', '').startswith('Dev')
+DEBUG = os.getenv('APPLICATION_ID') != 's~tbatv-prod-hrd'
 
 MAX_YEAR = 2016
 
