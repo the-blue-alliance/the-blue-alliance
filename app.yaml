@@ -5,7 +5,8 @@ api_version: 1
 threadsafe: true
 
 instance_class: F1
-# defaults to automatic scaling
+automatic_scaling:
+  max_idle_instances: 1
 
 builtins:
 - appstats: on
