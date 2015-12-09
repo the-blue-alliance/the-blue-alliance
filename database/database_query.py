@@ -56,5 +56,5 @@ class DatabaseQuery(object):
             query_result = cached_query.result
 
         for rpc in rpcs:
-            rpc.wait()
+            rpc.get_result()
         raise ndb.Return(query_result)
