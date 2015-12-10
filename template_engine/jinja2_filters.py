@@ -26,7 +26,7 @@ def strip_frc(s):
 
 
 def urlencode(s):
-    return urllib.quote(str(s))
+    return urllib.quote(s.encode('utf8'))
 
 
 # def rfc2822(datetime):

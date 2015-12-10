@@ -309,7 +309,7 @@
             <tbody>
               {% for team_key, breakdown in district_points_sorted %}
               <tr>
-                <td>{{forloop.counter}}</td>
+                <td>{{loop.index}}</td>
                 <td><a href="/team/{{team_key|strip_frc}}/{{event.year}}">{{team_key|strip_frc}}</a></td>
                 <td>{{breakdown.qual_points}}</td>
                 <td>{{breakdown.elim_points}}</td>
