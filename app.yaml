@@ -22,6 +22,8 @@ libraries:
   version: "1.0"
 - name: pycrypto  # for mobile API
   version: "2.6"
+- name: jinja2
+  version: "2.6"
 
 handlers:
 - url: /css

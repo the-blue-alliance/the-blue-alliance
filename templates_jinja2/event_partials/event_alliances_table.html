@@ -1,0 +1,26 @@
+{% if event.alliance_selections %}
+  <h3>Alliances</h3>
+  <table class="table table-condensed table-striped table-center">
+  {% for alliance in event.alliance_selections %}
+    {% if loop.index0 == 0 %}
+    <tr>
+      <th>#</th>
+      {% for _ in alliance.picks %}
+        {% if loop.index0 == 0 %}
+          <th>Captain</th>
+        {% else %}
+          <th>Pick {{loop.index0}}</th>
+        {% endif %}
+      {% endfor %}
+    </tr>
+    {% endif %}
+
+    <tr>
+      <td>{{loop.index}}</td>
+      {% for team in alliance.picks %}
+        <td><a href="/team/{{ team|digits }}/{{event.year}}">{{ team|strip_frc }}</a></td>
+      {% endfor %}
+    </tr>
+  {% endfor %}
+  </table>
+{% endif %}

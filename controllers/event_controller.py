@@ -15,6 +15,7 @@ from helpers.team_helper import TeamHelper
 from helpers.event_helper import EventHelper
 
 from models.event import Event
+from template_engine import jinja2_engine
 
 
 class EventList(CacheableHandler):
@@ -167,8 +168,7 @@ class EventDetail(CacheableHandler):
         if event.within_a_day:
             self._cache_expiration = self.SHORT_CACHE_EXPIRATION
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/event_details.html')
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('event_details.html', self.template_values)
 
 
 class EventRss(CacheableHandler):

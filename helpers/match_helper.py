@@ -131,7 +131,7 @@ class MatchHelper(object):
         bracket_table = defaultdict(dict)
         for comp_level in ['qf', 'sf', 'f']:
             for match in matches[comp_level]:
-                set_number = str(match.set_number)  # for template to work
+                set_number = match.set_number
                 if set_number not in bracket_table[comp_level]:
                     bracket_table[comp_level][set_number] = {
                         'red_alliance': [],
