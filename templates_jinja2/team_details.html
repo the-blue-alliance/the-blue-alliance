@@ -96,7 +96,7 @@
                   {% if comp.rank or comp.wlt %}and{% endif %} won the following awards:
                   <ul>
                   {% for award in comp.awards %}
-                  {% for team_number, awardees in award.recipient_dict.items %}
+                  {% for team_number, awardees in award.recipient_dict.items() %}
                   {% if team_number == team.team_number %}
                     {% for awardee in awardees %}
                     <li>{{ award.name_str }}{% if awardee %} ({{ awardee }}){% endif %}</li>
@@ -122,7 +122,7 @@
                 {% endif %}
               </div>
             </div>
-            {% if loop.index != loop.size %}<hr>{% endif %}
+            {% if not loop.last %}<hr>{% endif %}
           {% endfor %}
         </div>
       </div>
