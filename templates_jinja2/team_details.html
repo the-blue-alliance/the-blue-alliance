@@ -112,6 +112,7 @@
               <div class="col-sm-8" style="margin-top: 1em">
                 {% if comp.matches.num %}
                   {% set matches = comp.matches %}
+                  {% set cur_team = team %}
                   {% include "match_partials/full_match_table.html" %}
                 {% else %}
                   {% if comp.event.past %}
