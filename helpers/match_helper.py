@@ -128,7 +128,7 @@ class MatchHelper(object):
     @classmethod
     def generateBracket(cls, matches, alliance_selections=None):
         complete_alliances = []
-        bracket_table = defaultdict(dict)
+        bracket_table = defaultdict(lambda: defaultdict(dict))
         for comp_level in ['qf', 'sf', 'f']:
             for match in matches[comp_level]:
                 set_number = match.set_number

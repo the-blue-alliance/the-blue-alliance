@@ -7,6 +7,8 @@ from email import utils
 
 
 def digits(s):
+    if not s:
+        return ''
     return re.sub('[^0-9]', '', s)
 
 
