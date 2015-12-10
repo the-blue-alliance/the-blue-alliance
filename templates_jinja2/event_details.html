@@ -184,7 +184,7 @@
             </thead>
             <tbody>
               {% for row in event.rankings %}
-              {% if loop.index0 != 0 %}
+              {% if not loop.first %}
               <tr>
                 {% for element in row %}
                 <td>

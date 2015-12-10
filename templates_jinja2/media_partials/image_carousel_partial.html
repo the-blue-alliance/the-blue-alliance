@@ -2,7 +2,7 @@
   <!-- Wrapper for slides -->
   <div class="carousel-inner">
     {% for media in medias_by_slugname.cdphotothread %}
-    <div class="item{% if loop.index0 == 0 %} active{% endif %}">
+    <div class="item{% if loop.first %} active{% endif %}">
       <div class="cdphotothread-thumbnail">
         <a href="{{media.cdphotothread_image_url}}" target="_blank">
           <span style="background-image:url('{{media.cdphotothread_image_url_med}}')"></span>

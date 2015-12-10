@@ -2,11 +2,11 @@
   <h3>Alliances</h3>
   <table class="table table-condensed table-striped table-center">
   {% for alliance in event.alliance_selections %}
-    {% if loop.index0 == 0 %}
+    {% if loop.first %}
     <tr>
       <th>#</th>
       {% for _ in alliance.picks %}
-        {% if loop.index0 == 0 %}
+        {% if loop.first %}
           <th>Captain</th>
         {% else %}
           <th>Pick {{loop.index0}}</th>
