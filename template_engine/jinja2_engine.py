@@ -10,6 +10,7 @@ def get_jinja_env(force_filesystemloader=False):
     if tba_config.CONFIG['use-compiled-templates'] and not force_filesystemloader:
         logging.info("Using jinja2.ModuleLoader")
         env = jinja2.Environment(
+            auto_reload=False,
             loader=jinja2.ModuleLoader(os.path.join(os.path.dirname(__file__), '../templates_jinja2_compiled.zip')),
             extensions=['jinja2.ext.autoescape'],
             autoescape=True)
