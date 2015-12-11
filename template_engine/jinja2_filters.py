@@ -1,9 +1,5 @@
 import re
-import time
 import urllib
-
-from django.template import defaultfilters
-from email import utils
 
 
 def digits(s):
@@ -24,6 +20,8 @@ def strftime(datetime, formatstr):
 
 
 def strip_frc(s):
+    if not s:
+        return ''
     return s[3:]
 
 
@@ -42,4 +40,3 @@ def urlencode(s):
 #     Use Django's slugify method
 #     """
 #     return defaultfilters.slugify(s)
-
