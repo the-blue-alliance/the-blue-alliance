@@ -21,7 +21,8 @@ if DEBUG:
         "memcache": False,
         "database_query_cache": False,
         "response_cache": False,
-        "firebase-url": "https://thebluealliance-dev.firebaseio.com/{}.json?auth={}"
+        "firebase-url": "https://thebluealliance-dev.firebaseio.com/{}.json?auth={}",
+        "use-compiled-templates": False,
     }
 else:
     CONFIG = {
@@ -29,7 +30,8 @@ else:
         "memcache": True,
         "database_query_cache": True,
         "response_cache": True,
-        "firebase-url": "https://thebluealliance.firebaseio.com/{}.json?auth={}"
+        "firebase-url": "https://thebluealliance.firebaseio.com/{}.json?auth={}",
+        "use-compiled-templates": True
     }
 
 CONFIG['landing_handler'] = KICKOFF
