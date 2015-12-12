@@ -37,7 +37,7 @@ Setup
 	* Run the installer and allow it make symbolic links (it might ask you to enter your root password)
 2. Get the latest version of The Blue Alliance
 	* Fork TBA by clicking on "Fork" in the top right of [its GitHub page](https://github.com/the-blue-alliance/the-blue-alliance)
-	* Run `git clone git://github.com/USERNAME/the-blue-alliance.git` where _USERNAME_ is your GitHub username, or use GitHub's Windows or OS X app to clone it to your computer
+	* Run `git clone https://github.com/USERNAME/the-blue-alliance.git` where _USERNAME_ is your GitHub username, or use GitHub's Windows or OS X app to clone it to your computer
 	* For detailed instructions see [the GitHub guide on contributing](https://guides.github.com/activities/contributing-to-open-source/index.html#contributing)
 3. Install [numpy](http://www.numpy.org/)
 	* You can use your favorite package manager.
