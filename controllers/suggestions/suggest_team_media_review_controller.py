@@ -11,7 +11,7 @@ from models.media import Media
 from models.suggestion import Suggestion
 
 
-class AdminMediaSuggestionsReviewController(SuggestionsReviewBaseController):
+class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
     """
     View the list of suggestions.
     """
@@ -38,7 +38,7 @@ class AdminMediaSuggestionsReviewController(SuggestionsReviewBaseController):
             "suggestions_and_references": suggestions_and_references,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../../templates/admin/media_suggestion_list.html')
+        path = os.path.join(os.path.dirname(__file__), '../../templates/suggest_team_media_review_list.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self):
@@ -76,4 +76,4 @@ class AdminMediaSuggestionsReviewController(SuggestionsReviewBaseController):
 
         ndb.put_multi(all_suggestions)
 
-        self.redirect("/admin/suggestions/media/review")
+        self.redirect("/suggest/team/media/review")

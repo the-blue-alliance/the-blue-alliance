@@ -9,7 +9,7 @@ from helpers.suggestions.match_suggestion_accepter import MatchSuggestionAccepte
 from models.suggestion import Suggestion
 
 
-class AdminMatchVideoSuggestionsReviewController(SuggestionsReviewBaseController):
+class SuggestMatchVideoReviewController(SuggestionsReviewBaseController):
     """
     View the list of suggestions.
     """
@@ -22,7 +22,7 @@ class AdminMatchVideoSuggestionsReviewController(SuggestionsReviewBaseController
             "suggestions": suggestions,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../../templates/admin/match_video_suggestion_list.html')
+        path = os.path.join(os.path.dirname(__file__), '../../templates/suggest_match_video_review_list.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self):
@@ -49,4 +49,4 @@ class AdminMatchVideoSuggestionsReviewController(SuggestionsReviewBaseController
 
         ndb.put_multi(all_suggestions)
 
-        self.redirect("/admin/suggestions/match/video/review")
+        self.redirect("/suggest/match/video/review")
