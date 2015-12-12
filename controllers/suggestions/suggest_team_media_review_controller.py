@@ -5,19 +5,17 @@ import json
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
-from controllers.base_controller import LoggedInHandler
+from controllers.suggestions.suggestions_review_base_controller import SuggestionsReviewBaseController
 from helpers.media_manipulator import MediaManipulator
 from models.media import Media
 from models.suggestion import Suggestion
 
 
-class AdminMediaSuggestionsReviewController(LoggedInHandler):
+class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
     """
     View the list of suggestions.
     """
     def get(self):
-        self._require_admin()
-
         suggestions = Suggestion.query().filter(
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
             Suggestion.target_model == "media")
@@ -40,12 +38,10 @@ class AdminMediaSuggestionsReviewController(LoggedInHandler):
             "suggestions_and_references": suggestions_and_references,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../../templates/admin/media_suggestion_list.html')
+        path = os.path.join(os.path.dirname(__file__), '../../templates/suggest_team_media_review_list.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self):
-        self._require_admin()
-
         accept_keys = map(int, self.request.POST.getall("accept_keys[]"))
         reject_keys = map(int, self.request.POST.getall("reject_keys[]"))
 
@@ -80,4 +76,4 @@ class AdminMediaSuggestionsReviewController(LoggedInHandler):
 
         ndb.put_multi(all_suggestions)
 
-        self.redirect("/admin/suggestions/media/review")
+        self.redirect("/suggest/team/media/review")

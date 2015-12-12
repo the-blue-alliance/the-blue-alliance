@@ -5,7 +5,7 @@ import logging
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
-from controllers.base_controller import LoggedInHandler
+from controllers.suggestions.suggestions_review_base_controller import SuggestionsReviewBaseController
 from helpers.event.event_webcast_adder import EventWebcastAdder
 from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
 
@@ -13,13 +13,11 @@ from models.event import Event
 from models.suggestion import Suggestion
 
 
-class AdminEventWebcastSuggestionsReviewController(LoggedInHandler):
+class SuggestEventWebcastReviewController(SuggestionsReviewBaseController):
     """
     View the list of suggestions.
     """
     def get(self):
-        self._require_admin()
-
         suggestions = Suggestion.query().filter(
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
             Suggestion.target_model == "event")
@@ -41,12 +39,10 @@ class AdminEventWebcastSuggestionsReviewController(LoggedInHandler):
             "suggestion_sets": suggestion_sets
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../../templates/admin/event_webcast_suggestion_list.html')
+        path = os.path.join(os.path.dirname(__file__), '../../templates/suggest_event_webcast_review_list.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self):
-        self._require_admin()
-
         if self.request.get("verdict") == "accept":
             webcast = dict()
             webcast["type"] = self.request.get("webcast_type")
@@ -65,7 +61,7 @@ class AdminEventWebcastSuggestionsReviewController(LoggedInHandler):
             suggestion.reviewer_at = datetime.datetime.now()
             suggestion.put()
 
-            self.redirect("/admin/suggestions/event/webcast/review?success=accept&event_key=%s" % event.key.id())
+            self.redirect("/suggest/event/webcast/review?success=accept&event_key=%s" % event.key.id())
             return
 
         elif self.request.get("verdict") == "reject":
@@ -76,7 +72,7 @@ class AdminEventWebcastSuggestionsReviewController(LoggedInHandler):
             suggestion.reviewer_at = datetime.datetime.now()
             suggestion.put()
 
-            self.redirect("/admin/suggestions/event/webcast/review?success=reject")
+            self.redirect("/suggest/event/webcast/review?success=reject")
             return
 
         elif self.request.get("verdict") == "reject_all":
@@ -91,11 +87,11 @@ class AdminEventWebcastSuggestionsReviewController(LoggedInHandler):
                 suggestion.reviewer_at = datetime.datetime.now()
                 suggestion.put()
 
-            self.redirect("/admin/suggestions/event/webcast/review?success=reject_all&event_key=%s" % event_key)
+            self.redirect("/suggest/event/webcast/review?success=reject_all&event_key=%s" % event_key)
             return
 
 
-        self.redirect("/admin/suggestions/event/webcast/review")
+        self.redirect("/suggest/event/webcast/review")
 
 
 

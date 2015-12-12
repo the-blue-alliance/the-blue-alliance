@@ -117,6 +117,17 @@ class LoggedInHandler(webapp2.RequestHandler):
                 abort=True
             )
 
+    def _require_permission(self, permission):
+        self._require_login()
+        logging.info("logged in")
+        self._require_registration()
+        logging.info("registered")
+        if permission not in self.user_bundle.account.permissions:
+            return self.redirect(
+                "/",
+                abort=True
+            )
+
     def _require_registration(self, target_url="/"):
         if not self.user_bundle.account.registered:
             return self.redirect(
