@@ -8,7 +8,7 @@ Help Build The Blue Alliance
 ### Stay in Touch
 
 * *Mailing List* Join [thebluealliance-developers on groups.google.com](https://groups.google.com/forum/#!forum/thebluealliance-developers) to stay up to date with development.
-* *Slack* Ask to join [the-blue-alliance.slack.com](the-blue-alliance.slack.com) to hang out in our chat channels.
+* *Slack* Ask to join [the-blue-alliance.slack.com](https://the-blue-alliance.slack.com) to hang out in our chat channels.
 
 ### Add Data
 * *Facebook* Join our group, [#moardata @ The Blue Alliance](https://www.facebook.com/groups/moardata/), to submit video and match data we're missing on the site.
