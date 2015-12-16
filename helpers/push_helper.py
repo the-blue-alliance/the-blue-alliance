@@ -135,7 +135,7 @@ class PushHelper(object):
         output = []
         if client_types == []:
             return output
-        clients = MobileClient.query(MobileClient.client_type.IN(client_types))
+        clients = MobileClient.query(MobileClient.client_type.IN(client_types)).fetch()
         for user in clients:
             output.append(user.user_id)
         return output
