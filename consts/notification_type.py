@@ -17,6 +17,7 @@ class NotificationType(object):
     PING = 9  # This type of message is sent when the user hits 'ping device' in their account overview
     BROADCAST = 10  # Gives functionality for admins to send to many devices
     STATUS_SYNC = 11  # Send-to-Sync notification for mobile clients to refresh status
+    EVENT_DOWN = 12  # Alert mobile users that an event they're following has stopped posting data
 
     # These aren't notifications, but used for upstream API calls
     UPDATE_FAVORITES = 100
@@ -38,6 +39,7 @@ class NotificationType(object):
         PING: "ping",
         BROADCAST: "broadcast",
         STATUS_SYNC: "sync_status",
+        EVENT_DOWN: "event_down",
 
         UPDATE_FAVORITES: "update_favorites",
         UPDATE_SUBSCRIPTION: "update_subscriptions",
