@@ -117,6 +117,7 @@ class PushHelper(object):
         output = [user.user_id for user in users]
         return output
 
+    #TODO make this async/ndb Tasklet for scaling
     @classmethod
     def get_client_ids_for_users(cls, user_list, os_types=None):
         if os_types is None:
@@ -130,6 +131,7 @@ class PushHelper(object):
                 output[client.client_type].append(client.messaging_id)
         return output
 
+    #TODO make this async/ndb Tasklet for scaling
     @classmethod
     def get_all_mobile_clients(cls, client_types=[]):
         output = []

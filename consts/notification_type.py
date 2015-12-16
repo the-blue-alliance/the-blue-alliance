@@ -16,6 +16,7 @@ class NotificationType(object):
     FINAL_RESULTS = 8
     PING = 9  # This type of message is sent when the user hits 'ping device' in their account overview
     BROADCAST = 10  # Gives functionality for admins to send to many devices
+    STATUS_SYNC = 11  # Send-to-Sync notification for mobile clients to refresh status
 
     # These aren't notifications, but used for upstream API calls
     UPDATE_FAVORITES = 100
@@ -36,6 +37,7 @@ class NotificationType(object):
         FINAL_RESULTS: "final_results",
         PING: "ping",
         BROADCAST: "broadcast",
+        STATUS_SYNC: "sync_status",
 
         UPDATE_FAVORITES: "update_favorites",
         UPDATE_SUBSCRIPTION: "update_subscriptions",
