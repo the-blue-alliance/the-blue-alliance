@@ -1,7 +1,7 @@
 import json
 
 from controllers.api.api_base_controller import ApiBaseController
-
+from helpers.notification_helper import NotificationHelper
 from models.sitevar import Sitevar
 
 
@@ -42,10 +42,13 @@ class ApiStatusController(ApiBaseController):
         return json.dumps(status_dict, ensure_ascii=True)
 
     @classmethod
-    def clear_cache_if_needed(cls, old_content, new_content):
+    def clear_cache_if_needed(cls, old_content, new_content, users_not_to_notify=[]):
         """
         Clears the cache associated with this response
         Only clears if old_content != new_content (e.g. response changes)
         """
         if old_content != new_content:
             cls.delete_cache_multi([cls.get_cache_key_from_format()])
+
+            # Send update notifications
+            NotificationHelper.send_status_sync(users_not_to_notify)

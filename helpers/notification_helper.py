@@ -11,11 +11,13 @@ from models.event import Event
 from models.sitevar import Sitevar
 
 from notifications.alliance_selections import AllianceSelectionNotification
+from notifications.event_down import EventDownNotification
 from notifications.level_starting import CompLevelStartingNotification
 from notifications.broadcast import BroadcastNotification
 from notifications.match_score import MatchScoreNotification
 from notifications.awards_updated import AwardsUpdatedNotification
 from notifications.schedule_updated import ScheduleUpdatedNotification
+from notifications.status_sync import StatusSyncNotification
 from notifications.upcoming_match import UpcomingMatchNotification
 from notifications.update_favorites import UpdateFavoritesNotification
 from notifications.update_subscriptions import UpdateSubscriptionsNotification
@@ -78,6 +80,7 @@ class NotificationHelper(object):
         # https://github.com/the-blue-alliance/the-blue-alliance/pull/1098#discussion_r25128966
 
         down_events = []
+        down_names = []
         now = datetime.datetime.utcnow()
         for event in live_events:
             matches = event.matches
@@ -107,6 +110,7 @@ class NotificationHelper(object):
             # Determine if event is down
             if cls.is_event_down(last_matches[0] if last_matches else None, next_matches[0] if next_matches else None):
                 down_events.append(event.key_name)
+                down_names.append(event.short_name)
 
         # Update the status sitevar
         status_sitevar = Sitevar.get_by_id('apistatus.down_events')
@@ -117,12 +121,19 @@ class NotificationHelper(object):
         status_sitevar.contents = down_events
         status_sitevar.put()
 
+        users_notified = []
+        for event_key, event_name in zip(down_events, down_names):
+            if event_key not in old_status:
+                # Send notification!
+                users = cls.send_event_down(event_key, event_name)
+                users_notified.append(users)
+
         # Clear API Response cache
-        ApiStatusController.clear_cache_if_needed(old_status, down_events)
+        ApiStatusController.clear_cache_if_needed(old_status, down_events, users_notified)
 
     @classmethod
     def send_schedule_update(cls, event):
-        users = PushHelper.get_users_subscribed_to_event(event, NotificationType.SCHEDULE_UPDATED)
+        users = PushHelper.get_users_subscribed_to_event(event.key_name, NotificationType.SCHEDULE_UPDATED)
         keys = PushHelper.get_client_ids_for_users(users)
 
         notification = ScheduleUpdatedNotification(event)
@@ -138,7 +149,7 @@ class NotificationHelper(object):
 
     @classmethod
     def send_award_update(cls, event):
-        users = PushHelper.get_users_subscribed_to_event(event, NotificationType.AWARDS)
+        users = PushHelper.get_users_subscribed_to_event(event.key_name, NotificationType.AWARDS)
         keys = PushHelper.get_client_ids_for_users(users)
 
         notification = AwardsUpdatedNotification(event)
@@ -151,6 +162,24 @@ class NotificationHelper(object):
 
         notification = BroadcastNotification(title, message, url, app_version)
         notification.send(keys)
+
+    @classmethod
+    def send_status_sync(cls, users_to_skip=[]):
+        users = PushHelper.get_all_mobile_clients()
+        users = [user for user in users if user not in users_to_skip]
+        keys = PushHelper.get_client_ids_for_users(users)
+
+        notification = StatusSyncNotification()
+        notification.send(keys)
+
+    @classmethod
+    def send_event_down(cls, event_key, event_name):
+        users = PushHelper.get_users_subscribed_to_event(event_key)
+        keys = PushHelper.get_client_ids_for_users(users)
+
+        notification = EventDownNotification(event_key, event_name)
+        notification.send(keys)
+        return users
 
     @classmethod
     def verify_webhook(cls, url, secret):
