@@ -5,6 +5,9 @@ DEBUG = os.environ.get('SERVER_SOFTWARE') is not None and os.getenv('APPLICATION
 
 MAX_YEAR = 2016
 
+# Fraction of requests to profile
+RECORD_FRACTION = 0.1
+
 # For choosing what the main landing page displays
 KICKOFF = 1
 BUILDSEASON = 2
