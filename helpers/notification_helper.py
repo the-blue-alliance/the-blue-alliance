@@ -3,7 +3,6 @@ import json
 
 from consts.client_type import ClientType
 from consts.notification_type import NotificationType
-from controllers.api.api_status_controller import ApiStatusController
 
 from helpers.push_helper import PushHelper
 
@@ -129,6 +128,8 @@ class NotificationHelper(object):
                 users_notified.append(users)
 
         # Clear API Response cache
+        # Import locally to avoid circular import
+        from controllers.api.api_status_controller import ApiStatusController
         ApiStatusController.clear_cache_if_needed(old_status, down_events, users_notified)
 
     @classmethod
