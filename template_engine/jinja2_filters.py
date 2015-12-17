@@ -1,4 +1,6 @@
+from email import utils
 import re
+import time
 import urllib
 
 
@@ -29,10 +31,10 @@ def urlencode(s):
     return urllib.quote(s.encode('utf8'))
 
 
-# def rfc2822(datetime):
-#     tt = datetime.timetuple()
-#     timestamp = time.mktime(tt)
-#     return utils.formatdate(timestamp)
+def rfc2822(datetime):
+    tt = datetime.timetuple()
+    timestamp = time.mktime(tt)
+    return utils.formatdate(timestamp)
 
 
 # def slugify(s):
