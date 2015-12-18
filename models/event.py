@@ -92,8 +92,6 @@ class Event(ndb.Model):
 
     @property
     def awards(self):
-        # This import is ugly, and maybe all the models should be in one file again -gregmarra 20121006
-        from models.award import Award
         if self._awards is None:
             self.get_awards_async().wait()
         return self._awards
@@ -117,8 +115,6 @@ class Event(ndb.Model):
 
     @property
     def matches(self):
-        # This import is ugly, and maybe all the models should be in one file again -gregmarra 20121006
-        from models.match import Match
         if self._matches is None:
             if self._matches is None:
                 self.get_matches_async().wait()

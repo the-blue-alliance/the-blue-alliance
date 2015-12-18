@@ -22,7 +22,7 @@ class FIRSTElasticSearchTeamDetailsParser(object):
                 id="frc{}".format(team['team_number_yearly']),
                 team_number=team['team_number_yearly'],
                 name=team.get('team_name', None),
-                nickname=team['team_nickname'],
+                nickname=team.get('team_nickname', None),
                 address=address,
                 website=team.get('team_web_url', None),
                 rookie_year=team.get('team_rookieyear', None),

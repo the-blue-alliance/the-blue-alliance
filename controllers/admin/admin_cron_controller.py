@@ -145,7 +145,7 @@ class AdminCreateDistrictTeamsEnqueue(LoggedInHandler):
         self._require_admin()
         taskqueue.add(
             queue_name='admin',
-            url='/tasks/admin/rebuild_district_teams/{}'.format(year),
+            url='/backend-tasks/do/rebuild_district_teams/{}'.format(year),
             method='GET')
 
         self.response.out.write("Enqueued district teams for {}".format(year))
@@ -156,7 +156,7 @@ class AdminCreateDistrictTeamsDo(LoggedInHandler):
         year = int(year)
         team_districts = defaultdict(list)
         logging.info("Fetching events in {}".format(year))
-        year_events = Event.query(year == Event.year, Event.event_district_enum != DistrictType.NO_DISTRICT).fetch()
+        year_events = Event.query(year == Event.year, Event.event_district_enum != DistrictType.NO_DISTRICT, Event.event_district_enum != None).fetch()
         for event in year_events:
             logging.info("Fetching EventTeams for {}".format(event.key_name))
             event_teams = EventTeam.query(EventTeam.event == event.key).fetch()
@@ -172,3 +172,4 @@ class AdminCreateDistrictTeamsDo(LoggedInHandler):
 
         logging.info("Finishing updating old district teams from event teams")
         DistrictTeamManipulator.createOrUpdate(new_district_teams)
+        self.response.out.write("Finished creating district teams for {}".format(year))
