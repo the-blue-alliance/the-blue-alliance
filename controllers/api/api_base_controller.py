@@ -85,6 +85,10 @@ class ApiBaseController(CacheableHandler):
         self._set_cache_header_length(self.CACHE_HEADER_LENGTH)
 
     def options(self, *args, **kw):
+        """
+        Supply an OPTIONS method in order to comply with CORS preflghted requests
+        https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests
+        """
         self.response.headers['Access-Control-Allow-Methods'] = "GET, OPTIONS"
         self.response.headers['Access-Control-Allow-Headers'] = 'X-TBA-App-Id'
 
