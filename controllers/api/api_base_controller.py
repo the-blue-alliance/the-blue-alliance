@@ -84,6 +84,10 @@ class ApiBaseController(CacheableHandler):
         self.response.headers['X-TBA-Version'] = '{}'.format(self.API_VERSION)
         self._set_cache_header_length(self.CACHE_HEADER_LENGTH)
 
+    def options(self, *args, **kw):
+        self.response.headers['Access-Control-Allow-Methods'] = "GET, OPTIONS"
+        self.response.headers['Access-Control-Allow-Headers'] = 'X-TBA-App-Id'
+
     def _read_cache(self):
         """
         Overrides parent method to use CachedResponse instead of memcache
