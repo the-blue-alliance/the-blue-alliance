@@ -25,8 +25,10 @@ def main(argv):
         test_status = os.system('paver preflight')
 
     if test_status == 0:
-        os.system('python ' + APP_CFG_DIR + ' -A tbatv-prod-hrd update app.yaml app-backend-tasks.yaml')
-        os.system('python ' + APP_CFG_DIR + ' -A tbatv-prod-hrd update_dispatch .')
+        # Update default module and other YAMLs
+        os.system('python ' + APP_CFG_DIR + ' -A tbatv-prod-hrd update .')
+        # Update other modules
+        os.system('python ' + APP_CFG_DIR + ' -A tbatv-prod-hrd update app-backend-tasks.yaml')
     else:
         print "Tests failed! Did not deploy."
 

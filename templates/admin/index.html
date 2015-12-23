@@ -104,9 +104,9 @@ $(function () {
 
 <div class="row">
     <div class="col-xs-6">
-        <div class="panel panel-default">
+        <div class="panel {% if debug %}panel-default{% else %}panel-primary{% endif %}">
             <div class="panel-heading">
-                <h3 class="panel-title">Version Info</h3>
+                <h3 class="panel-title">{% if debug %}Development{% else %}Production{% endif %} Server Version Info</h3>
             </div>
             <div class="panel-body">
                 <p>Build time: {{build_time}}</p>

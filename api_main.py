@@ -21,6 +21,8 @@ from controllers.api.api_trusted_controller import ApiTrustedEventAllianceSelect
                                                    ApiTrustedEventTeamListUpdate, ApiTrustedAddMatchYoutubeVideo
 
 
+# Ensure that APIv2 routes include OPTIONS method for CORS preflight compatibility
+# https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests
 app = webapp2.WSGIApplication([webapp2.Route(r'/api/v1/<:.*>',
                                              ApiDeprecatedController,
                                              methods=['GET']),

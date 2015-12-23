@@ -28,6 +28,11 @@ def less():
 
 
 @task
+def jinja2():
+    sh("python compile_jinja2_templates.py")
+
+
+@task
 def lint():
   sh("python linter.py")
 
@@ -36,6 +41,7 @@ def lint():
 def make():
   javascript()
   less()
+  jinja2()
 
   git_branch_name = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
   git_last_commit = subprocess.check_output(["git", "log", "-1"])

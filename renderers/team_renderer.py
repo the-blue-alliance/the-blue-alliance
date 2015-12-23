@@ -19,6 +19,8 @@ from models.event_team import EventTeam
 from models.match import Match
 from models.robot import Robot
 
+from template_engine import jinja2_engine
+
 
 class TeamRenderer(object):
     @classmethod
@@ -132,8 +134,7 @@ class TeamRenderer(object):
         if short_cache:
             handler._cache_expiration = handler.SHORT_CACHE_EXPIRATION
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/team_details.html')
-        return template.render(path, handler.template_values)
+        return jinja2_engine.render('team_details.html', handler.template_values)
 
     @classmethod
     def render_team_history(cls, handler, team, is_canonical):
