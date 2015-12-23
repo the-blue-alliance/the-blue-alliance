@@ -142,17 +142,3 @@ class ModelToDict(object):
         robot_dict["year"] = robot.year
         robot_dict["name"] = robot.robot_name
         return robot_dict
-
-    @classmethod
-    def districtTeamConverter(self, team):
-        """
-        Converts district team model object to dict
-        :param team:
-        :return: districtTeam dict
-        """
-
-        district_team_dict = dict()
-        district_team_dict["team_key"] = team.team.id()
-        district_team_dict["year"] = team.year
-        district_team_dict["district"] = team.district_key
-        return district_team_dict
