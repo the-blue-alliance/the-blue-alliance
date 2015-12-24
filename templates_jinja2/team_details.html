@@ -97,7 +97,7 @@
                   <ul>
                   {% for award in comp.awards %}
                   {% for team_number, awardees in award.recipient_dict.items() %}
-                  {% if team_number == team.team_number %}
+                  {% if str(team_number) == str(team.team_number) %}
                     {% for awardee in awardees %}
                     <li>{{ award.name_str }}{% if awardee %} ({{ awardee }}){% endif %}</li>
                     {% endfor %}
