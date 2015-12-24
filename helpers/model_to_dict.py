@@ -1,6 +1,7 @@
 import logging
 import time
 
+from consts.district_type import DistrictType
 from consts.media_type import MediaType
 
 
