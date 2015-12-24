@@ -93,6 +93,14 @@
         <td>{{ event.created }} - {{ event.updated }}</td>
     </tr>
 </table>
+<h2>Remap Teams</h2>
+<p>Change all matches, awards and alliance selections for one team to another</p>
+<p>Example:</p>
+<div class="well">{"9254": "254B", "9971": "971B"}</div>
+<form action="/admin/event/remap_teams/{{event.key_name}}" method="post">
+  <textarea class="form-control" name="remap_teams"></textarea><br>
+  <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-random"></span> Remap Teams</button>
+</form>
 
 <h2>Add Teams</h2>
 <p>Add teams formatted as CSV.</p>
