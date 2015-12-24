@@ -118,6 +118,16 @@ class AdminEventRemapTeams(LoggedInHandler):
                             event.dirty = True
                             row[choice][i] = new_team
                             event.alliance_selections_json = json.dumps(event.alliance_selections)
+
+        # Remap rankings
+        for row in event.rankings:
+            for old_team, new_team in remap_teams.items():
+                for i, team_num in enumerate(row[1]):
+                    if team_num == old_team[3:]:
+                        event.dirty = True
+                        row[i] = new_team[3:]
+                        event.rankings_json = json.dumps(event.rankings)
+
         EventManipulator.createOrUpdate(event)
 
         # Remap awards
