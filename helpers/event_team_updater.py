@@ -50,7 +50,7 @@ class EventTeamUpdater(object):
         # Create or update EventTeams
         teams = [Team(id=team_id,
                       team_number=int(team_id[3:]))
-                      for team_id in team_ids]
+                      for team_id in team_ids if team_id.isdigit()]
 
         if teams:
             event_teams = [EventTeam(id=event_key + "_" + team.key.id(),
