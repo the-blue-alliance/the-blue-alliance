@@ -17,18 +17,13 @@ class CacheableHandler(webapp2.RequestHandler):
     Currently only supports logged-out pages.
     """
     CACHE_KEY_FORMAT = ''
+    CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
         self._cache_expiration = 0
         if not hasattr(self, '_partial_cache_key'):
             self._partial_cache_key = self.CACHE_KEY_FORMAT
-
-        # Cache all pages for 61 seconds, unless overwritten.
-        if self.response is not None:
-            self.response.headers['Cache-Control'] = 'public, max-age=61'
-            self.response.headers['Pragma'] = 'Public'
-
         self.template_values = {}
 
     @property
@@ -54,6 +49,7 @@ class CacheableHandler(webapp2.RequestHandler):
             self.response.out.write(cached_response.body)
             self.response.headers = cached_response.headers
         else:
+            self._set_cache_header_length(self.CACHE_HEADER_LENGTH)
             self.template_values["cache_key"] = self.cache_key
             rendered = self._render(*args, **kw)
             if rendered is not None:
@@ -87,6 +83,14 @@ class CacheableHandler(webapp2.RequestHandler):
 
     def _render(self):
         raise NotImplementedError("No _render method.")
+
+    def _set_cache_header_length(self, seconds):
+        if type(seconds) is not int:
+            logging.error("Cache-Control max-age is not integer: {}".format(seconds))
+            return
+
+        self.response.headers['Cache-Control'] = "public, max-age=%d" % max(seconds, 61)  # needs to be at least 61 seconds to work
+        self.response.headers['Pragma'] = 'Public'
 
 
 class LoggedInHandler(webapp2.RequestHandler):

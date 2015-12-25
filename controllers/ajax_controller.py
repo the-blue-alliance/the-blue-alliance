@@ -75,10 +75,11 @@ class LiveEventHandler(CacheableHandler):
     """
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "live-event:{}:{}"  # (event_key, timestamp)
+    CACHE_HEADER_LENGTH = 60 * 10
 
     def __init__(self, *args, **kw):
         super(LiveEventHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 10
+        self._cache_expiration = self.CACHE_HEADER_LENGTH
 
     def get(self, event_key, timestamp):
         if int(timestamp) > time.time():
@@ -87,8 +88,6 @@ class LiveEventHandler(CacheableHandler):
         super(LiveEventHandler, self).get(event_key, timestamp)
 
     def _render(self, event_key, timestamp):
-        self.response.headers['Cache-Control'] = 'public, max-age=%d' % self._cache_expiration
-        self.response.headers['Pragma'] = 'Public'
         self.response.headers['content-type'] = 'application/json; charset="utf-8"'
 
         event = Event.get_by_id(event_key)
@@ -120,10 +119,11 @@ class TypeaheadHandler(CacheableHandler):
     """
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "typeahead_entries:{}"  # (search_key)
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):
         super(TypeaheadHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24
+        self._cache_expiration = self.CACHE_HEADER_LENGTH
 
     def get(self, search_key):
         search_key = urllib2.unquote(search_key)
@@ -131,8 +131,6 @@ class TypeaheadHandler(CacheableHandler):
         super(TypeaheadHandler, self).get(search_key)
 
     def _render(self, search_key):
-        self.response.headers['Cache-Control'] = 'public, max-age=%d' % self._cache_expiration
-        self.response.headers['Pragma'] = 'Public'
         self.response.headers['content-type'] = 'application/json; charset="utf-8"'
 
         entry = TypeaheadEntry.get_by_id(search_key)
@@ -151,6 +149,7 @@ class WebcastHandler(CacheableHandler):
     """
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "webcast_{}_{}"  # (event_key)
+    CACHE_HEADER_LENGTH = 60 * 5
 
     def __init__(self, *args, **kw):
         super(WebcastHandler, self).__init__(*args, **kw)
@@ -161,8 +160,6 @@ class WebcastHandler(CacheableHandler):
         super(WebcastHandler, self).get(event_key, webcast_number)
 
     def _render(self, event_key, webcast_number):
-        self.response.headers['Cache-Control'] = "public, max-age=%d" % (5 * 60)
-        self.response.headers['Pragma'] = 'Public'
         self.response.headers.add_header('content-type', 'application/json', charset='utf-8')
 
         output = {}
