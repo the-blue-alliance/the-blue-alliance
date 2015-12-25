@@ -45,7 +45,7 @@
           {% endif %}
         {% endif %}
         {% if event.website %}<br><span class="glyphicon glyphicon-globe"></span> <a href="{{ event.website }}" title="{{ event.name }}">{{ event.website }}</a>{% endif %}
-        {% if event.official %}{% if not event.website %}<br><span class="glyphicon glyphicon-info-sign"></span>{% else %} - {% endif %} details on <a href="https://my.usfirst.org/myarea/index.lasso?page=teamlist&amp;event_type=FRC&amp;sort_teams=number&amp;year={{ event.year }}&amp;event={{ event.event_short }}">usfirst.org</a>{% endif %}
+        {% if event.official %}{% if not event.website %}<br><span class="glyphicon glyphicon-info-sign"></span>{% else %} - {% endif %} details on <a href="http://www.firstinspires.org/team-event-search/event?id={{ event.first_eid }}">firstinspires.org</a>{% endif %}
         {% if event.facebook_eid %}<br><span class="glyphicon glyphicon-thumbs-up"></span> <a href="{{ event.facebook_event_url }}" title="Facebook Event">RSVP on Facebook</a><br>{% endif %}
       </p>
 
@@ -270,10 +270,10 @@
                 <td>
                 {% if awardee %}
                   {{ awardee }}
-                  {% if team_number %}(<a href="/team/{{team_number}}/{{event.year}}">{{team_number}}</a>){% endif %}
+                  {% if team_number %}(<a href="/team/{{team_number|digits}}/{{event.year}}">{{team_number}}</a>){% endif %}
                 {% else %}
                   {% if team_number %}
-                  <a href="/team/{{team_number}}/{{event.year}}">{{team_number}}</a>
+                  <a href="/team/{{team_number|digits}}/{{event.year}}">{{team_number}}</a>
                   {% else %}
                   --
                   {% endif %}

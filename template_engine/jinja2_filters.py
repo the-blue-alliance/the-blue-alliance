@@ -7,6 +7,8 @@ import urllib
 def digits(s):
     if not s:
         return ''
+    if type(s) is int:
+        return s
     return re.sub('[^0-9]', '', s)
 
 
