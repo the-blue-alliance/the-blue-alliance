@@ -2,7 +2,11 @@ application: tbatv-dev-hrd
 version: 1-3
 runtime: python27
 api_version: 1
-threadsafe: true
+threadsafe: false
+
+instance_class: F1
+automatic_scaling:
+  max_idle_instances: 1
 
 builtins:
 - appstats: on
@@ -11,12 +15,14 @@ builtins:
 
 libraries:
 - name: django
-  version: "1.2"
+  version: "1.5"
 - name: numpy
   version: "1.6.1"
 - name: endpoints
-  version: 1.0
-- name: pycrypto
+  version: "1.0"
+- name: pycrypto  # for mobile API
+  version: "2.6"
+- name: jinja2
   version: "2.6"
 
 handlers:
@@ -58,16 +64,5 @@ handlers:
 - url: .*
   script: main.app
 
-skip_files:
-- ^(.*/)?.*\.less.*
-- .git/*
-- test_data/*
-- tests/*
-- utils/*
-- run_tests.py
-- pavement.py
-- do_compress.py
-- ^(.*/)?.*\.jar.*
-- static/css/less_css/*
-- static/css/precompiled_css/*
-- static/javascript/tba_js/*
+includes:
+- app_shared.yaml

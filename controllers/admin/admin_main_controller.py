@@ -3,6 +3,7 @@ import json
 import re
 import logging
 import datetime
+import tba_config
 
 from google.appengine.api import memcache
 from google.appengine.ext.webapp import template
@@ -62,6 +63,8 @@ class AdminMain(LoggedInHandler):
         except Exception, e:
             logging.warning("version_info.json parsing failed: %s" % e)
             pass
+
+        self.template_values['debug'] = tba_config.DEBUG
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/index.html')
         self.response.out.write(template.render(path, self.template_values))

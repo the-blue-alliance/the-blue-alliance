@@ -1,7 +1,7 @@
 import tba_config
 
 if tba_config.CONFIG['env'] == 'prod':
-    appstats_RECORD_FRACTION = 0.1
+    appstats_RECORD_FRACTION = tba_config.RECORD_FRACTION
 else:
     appstats_CALC_RPC_COSTS = True
 

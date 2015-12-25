@@ -8,7 +8,7 @@
 
 <div class="btn-group">
     <a href="/team/{{team.team_number}}" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> View on TBA</a>
-    <a href="/tasks/get/usfirst_team_details/frc{{team.team_number}}" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span> Refresh from FIRST</a>
+    <a href="/backend-tasks/get/team_details/{{team.key.id}}" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span> Refresh from FIRST</a>
 </div>
 <br><br>
 
@@ -24,6 +24,10 @@
     <tr>
         <td>Rookie Year</td>
         <td>{{ team.rookie_year }}</td>
+    </tr>
+    <tr>
+        <td>Motto</td>
+        <td>{{ team.motto }}</td>
     </tr>
     <tr>
         <td>Address</td>
@@ -61,9 +65,7 @@
     </tr>
 </table>
 
-<p>Teams are currently uneditable. They are updated via TIMS scraping.</p>
-<p>Team info is on FIRST at <a href="http://www.usfirst.org/whatsgoingon">http://www.usfirst.org/whatsgoingon</a></p>
-
+<p>Teams are currently uneditable. They are updated via FRC API scraping.</p>
 
 <h2>Add Media</h2>
 <form action="/admin/media/add_media" method="post">

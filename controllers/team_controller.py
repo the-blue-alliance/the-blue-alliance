@@ -12,7 +12,7 @@ from renderers.team_renderer import TeamRenderer
 
 
 class TeamList(CacheableHandler):
-    VALID_PAGES = [1, 2, 3, 4, 5, 6]
+    VALID_PAGES = [1, 2, 3, 4, 5, 6, 7]
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "team_list_{}"  # (page)
 

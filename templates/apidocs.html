@@ -64,6 +64,7 @@
                 <li><a class="smooth-scroll" href="#district-list-request">District List Request</a></li>
                 <li><a class="smooth-scroll" href="#district-events-request">District Events Request</a></li>
                 <li><a class="smooth-scroll" href="#district-rankings-request">District Rankings Request</a></li>
+                <li><a class="smooth-scroll" href="#district-teams-request">District Teams Request</a></li>
               </ul>
             </li>
           </ul>
@@ -165,6 +166,11 @@
             <td>Team's rookie year</td>
             <td>1999</td>
           </tr>
+        <tr>
+            <td>motto</td>
+            <td>Team's Motto</td>
+            <td>Infiltrating Young Minds One Robot at a Time</td>
+        </tr>
         </tbody>
       </table>
 
@@ -1529,6 +1535,54 @@
         </div>
       </div>
 
+      <h3 id="district-teams-request">District Teams Request</h3>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/district/&lt;district short&gt;/&lt;year&gt;/teams</code>
+      </p>
+      <table class=table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>district short</td>
+            <td>The district abbreviation you want data for, as defined <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/district_type.py#L38">here</a>
+            <td>ne</td>
+          </tr>
+          <tr>
+            <td>Year</td>
+            <td>The year you want data for</td>
+            <td>2014</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_district_teams_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="600"
+              id="example_district_teams_request" type="text" value="/api/v2/district/ne/2015/teams">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group">
+            <pre class="district-teams-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+
   </div>
 </div>
 {% endblock %}
@@ -1898,6 +1952,22 @@
       },
       error: function(data) {
         $(".district-rankings-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+  $("#example_district_teams_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".district-teams-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_district_teams_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-district-teams-request:v01'},
+      success: function(data) {
+        $(".district-teams-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".district-teams-request-json").html('Something went wrong! Please check for correct request format.');
       }
     });
   });

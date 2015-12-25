@@ -39,6 +39,11 @@ indexes:
 - kind: Event
   properties:
   - name: year
+  - name: event_district_enum
+
+- kind: Event
+  properties:
+  - name: year
   - name: first_eid
 
 - kind: Event

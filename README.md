@@ -2,13 +2,25 @@ The Blue Alliance
 ==================
 The Blue Alliance is a FIRST Robotics tool to help teams scout for, compete at, and relive competitions. You can see how the whole site works here, or even write code to make it better!
 
-Contributing
+Help Build The Blue Alliance
 ------------
-0. Join [thebluealliance-developers on groups.google.com](https://groups.google.com/forum/#!forum/thebluealliance-developers) to stay up to date with development
+
+### Stay in Touch
+
+* *Mailing List* Join [thebluealliance-developers on groups.google.com](https://groups.google.com/forum/#!forum/thebluealliance-developers) to stay up to date with development.
+* *Slack* Ask to join [the-blue-alliance.slack.com](https://the-blue-alliance.slack.com) to hang out in our chat channels.
+
+### Add Data
+* *Facebook* Join our group, [#moardata @ The Blue Alliance](https://www.facebook.com/groups/moardata/), to submit video and match data we're missing on the site.
+* Submit missing videos using the "Add Video" links on the site.
+* Submit missing webcasts, team photos, etc using other links on the site.
+
+### Contributing Code
+
 1. Fork this project!
-2. Make your changes on a branch.
+2. Make a branch to hold your changes.
 3. Make changes!
-4. Send pull request from your fork.
+4. Send over a pull request from your fork.
 5. We'll review it, and push your changes to the site!
 
 If you're having trouble getting set up, reach out to us at [our mailing list](https://groups.google.com/forum/?fromgroups#!forum/thebluealliance-developers) and we'll help you through it!
@@ -25,7 +37,7 @@ Setup
 	* Run the installer and allow it make symbolic links (it might ask you to enter your root password)
 2. Get the latest version of The Blue Alliance
 	* Fork TBA by clicking on "Fork" in the top right of [its GitHub page](https://github.com/the-blue-alliance/the-blue-alliance)
-	* Run `git clone git://github.com/USERNAME/the-blue-alliance.git` where _USERNAME_ is your GitHub username, or use GitHub's Windows or OS X app to clone it to your computer
+	* Run `git clone https://github.com/USERNAME/the-blue-alliance.git` where _USERNAME_ is your GitHub username, or use GitHub's Windows or OS X app to clone it to your computer
 	* For detailed instructions see [the GitHub guide on contributing](https://guides.github.com/activities/contributing-to-open-source/index.html#contributing)
 3. Install [numpy](http://www.numpy.org/)
 	* You can use your favorite package manager.
@@ -50,6 +62,7 @@ Run a local dev server
 	* File > Add Existing Application...
 	* Set the Application Path to your `the-blue-alliance` directory
 	* Set port **8088**
+	* Add modules (dispatch.yaml, app.yaml, and app-backend-tasks.yaml) as extra flags [https://cloud.google.com/appengine/docs/python/modules/#devserver](https://cloud.google.com/appengine/docs/python/modules/#devserver).
 2. Run the app in App Engine Launcher and view its Logs window
 3. You should now have a basic development installation!
 	* Visit [localhost:8088](http://localhost:8088) to see your local version of The Blue Alliance
@@ -72,7 +85,8 @@ Setup notes:
 * You _could_ edit the `app.yaml` file to change its `application:` setting from `tbatv-dev-hrd` to your app's Project ID, but then you'll have to remember to not check in that edit. Better yet, write a script like the following `mydeploy.sh` file (that filename is in `.gitignore`):
 
 	    #!/bin/sh
-	    appcfg.py --oauth2 --application=<MY_PROJECT_ID> update
+	    appcfg.py --oauth2 --application=<MY_PROJECT_ID> update app.yaml app-backend-tasks.yaml
+	    appcfg.py --oauth2 --application=<MY_PROJECT_ID> update_dispatch .
 
 * Note that it needs your application's "Project ID", not its "Project name".
 * The `--oauth2` argument of `appcfg.py` [saves repeating the login steps each time](https://cloud.google.com/appengine/docs/python/tools/uploadinganapp#Python_Password-less_login_with_OAuth2). If you skip it or deploy via the App Engine Launcher, you'll have to enter your name and password each time. If you use 2-Step Verification for your Google account (you should!), that means generating an [App password](https://security.google.com/settings/security/apppasswords) each time.
@@ -96,10 +110,10 @@ Notes:
 
 Paver Commands
 --------------
-Paver is an easy way automate repetitive tasks. For The Blue Alliance, these tasks are stored in _pavement.py_. 
+Paver is an easy way automate repetitive tasks. For The Blue Alliance, these tasks are stored in _pavement.py_.
 To install paver, use one of the methods below:
 
-* Download and install paver from [http://pypi.python.org/pypi/Paver/](http://pypi.python.org/pypi/Paver/ "Paver") 
+* Download and install paver from [http://pypi.python.org/pypi/Paver/](http://pypi.python.org/pypi/Paver/ "Paver")
 * Run `easy_install Paver`
 
 Paver commands include:

@@ -7,17 +7,8 @@ from controllers.backup_controller import TbaCSVBackupEventsEnqueue, TbaCSVBacku
 from controllers.backup_controller import TbaCSVBackupTeamsEnqueue, TbaCSVBackupTeamsDo
 
 from controllers.datafeed_controller import TbaVideosGet, TbaVideosEnqueue
-from controllers.datafeed_controller import FmsEventListGet, FmsTeamListGet
-from controllers.datafeed_controller import OffseasonMatchesGet
-from controllers.datafeed_controller import TwitterFrcfmsMatchesGet
 from controllers.datafeed_controller import FMSAPIAwardsEnqueue, FMSAPIEventAlliancesEnqueue, FMSAPIEventRankingsEnqueue, FMSAPIMatchesEnqueue
 from controllers.datafeed_controller import FMSAPIAwardsGet, FMSAPIEventAlliancesGet, FMSAPIEventRankingsGet, FMSAPIMatchesGet
-from controllers.datafeed_controller import UsfirstEventDetailsEnqueue, UsfirstEventDetailsGet, UsfirstEventListGet
-from controllers.datafeed_controller import UsfirstAwardsEnqueue, UsfirstAwardsGet
-from controllers.datafeed_controller import UsfirstEventAlliancesEnqueue, UsfirstEventAlliancesGet
-from controllers.datafeed_controller import UsfirstMatchesEnqueue, UsfirstMatchesGet, UsfirstEventRankingsEnqueue, UsfirstEventRankingsGet
-from controllers.datafeed_controller import UsfirstTeamDetailsEnqueue, UsfirstTeamDetailsRollingEnqueue, UsfirstTeamDetailsGet, UsfirstTeamsTpidsGet
-from controllers.datafeed_controller import UsfirstPre2003TeamEventsEnqueue, UsfirstPre2003TeamEventsGet
 
 from controllers.cron_controller import DistrictPointsCalcEnqueue, DistrictPointsCalcDo
 from controllers.cron_controller import EventShortNameCalcEnqueue, EventShortNameCalcDo
@@ -29,7 +20,6 @@ from controllers.cron_controller import UpcomingNotificationDo
 
 from controllers.admin.admin_cron_controller import AdminMobileClearEnqueue, AdminMobileClear, AdminSubsClearEnqueue, AdminSubsClear, \
     AdminWebhooksClearEnqueue, AdminWebhooksClear
-
 
 app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackupEventsEnqueue),
                                ('/tasks/enqueue/csv_backup_events/([0-9]*)', TbaCSVBackupEventsEnqueue),
@@ -44,32 +34,11 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/enqueue/fmsapi_event_alliances/(.*)', FMSAPIEventAlliancesEnqueue),
                                ('/tasks/enqueue/fmsapi_event_rankings/(.*)', FMSAPIEventRankingsEnqueue),
                                ('/tasks/enqueue/fmsapi_matches/(.*)', FMSAPIMatchesEnqueue),
-                               ('/tasks/enqueue/usfirst_event_alliances/(.*)', UsfirstEventAlliancesEnqueue),
-                               ('/tasks/enqueue/usfirst_event_details/([0-9]*)', UsfirstEventDetailsEnqueue),
-                               ('/tasks/enqueue/usfirst_event_rankings/(.*)', UsfirstEventRankingsEnqueue),
-                               ('/tasks/enqueue/usfirst_awards/(.*)', UsfirstAwardsEnqueue),
-                               ('/tasks/enqueue/usfirst_matches/(.*)', UsfirstMatchesEnqueue),
-                               ('/tasks/enqueue/usfirst_team_details', UsfirstTeamDetailsEnqueue),
-                               ('/tasks/enqueue/usfirst_team_details_rolling', UsfirstTeamDetailsRollingEnqueue),
-                               ('/tasks/enqueue/usfirst_pre2003_team_events', UsfirstPre2003TeamEventsEnqueue),
-                               ('/tasks/get/fms_event_list', FmsEventListGet),
-                               ('/tasks/get/fms_team_list', FmsTeamListGet),
-                               ('/tasks/get/offseason_matches/(.*)', OffseasonMatchesGet),
                                ('/tasks/get/tba_videos/(.*)', TbaVideosGet),
-                               ('/tasks/get/twitter_frcfms_matches', TwitterFrcfmsMatchesGet),
                                ('/tasks/get/fmsapi_awards/(.*)', FMSAPIAwardsGet),
                                ('/tasks/get/fmsapi_event_alliances/(.*)', FMSAPIEventAlliancesGet),
                                ('/tasks/get/fmsapi_event_rankings/(.*)', FMSAPIEventRankingsGet),
                                ('/tasks/get/fmsapi_matches/(.*)', FMSAPIMatchesGet),
-                               ('/tasks/get/usfirst_event_alliances/(.*)', UsfirstEventAlliancesGet),
-                               ('/tasks/get/usfirst_event_list/([0-9]*)', UsfirstEventListGet),
-                               ('/tasks/get/usfirst_event_details/([0-9]*)/([0-9]*)', UsfirstEventDetailsGet),
-                               ('/tasks/get/usfirst_event_rankings/(.*)', UsfirstEventRankingsGet),
-                               ('/tasks/get/usfirst_awards/(.*)', UsfirstAwardsGet),
-                               ('/tasks/get/usfirst_matches/(.*)', UsfirstMatchesGet),
-                               ('/tasks/get/usfirst_team_details/(.*)', UsfirstTeamDetailsGet),
-                               ('/tasks/get/usfirst_teams_tpids/([0-9]*)', UsfirstTeamsTpidsGet),
-                               ('/tasks/get/usfirst_pre2003_team_events/(.*)', UsfirstPre2003TeamEventsGet),
                                ('/tasks/math/enqueue/district_points_calc/([0-9]*)', DistrictPointsCalcEnqueue),
                                ('/tasks/math/do/district_points_calc/(.*)', DistrictPointsCalcDo),
                                ('/tasks/math/enqueue/event_short_name_calc_enqueue/([0-9]*)', EventShortNameCalcEnqueue),

@@ -5,6 +5,7 @@ import logging
 from google.appengine.api import urlfetch
 
 from consts.event_type import EventType
+from controllers.api.api_status_controller import ApiStatusController
 from datafeeds.datafeed_base import DatafeedBase
 
 from models.event_team import EventTeam
@@ -12,6 +13,7 @@ from models.sitevar import Sitevar
 
 from parsers.fms_api.fms_api_awards_parser import FMSAPIAwardsParser
 from parsers.fms_api.fms_api_event_alliances_parser import FMSAPIEventAlliancesParser
+from parsers.fms_api.fms_api_event_list_parser import FMSAPIEventListParser
 from parsers.fms_api.fms_api_event_rankings_parser import FMSAPIEventRankingsParser
 from parsers.fms_api.fms_api_match_parser import FMSAPIHybridScheduleParser, FMSAPIMatchDetailsParser
 from parsers.fms_api.fms_api_team_details_parser import FMSAPITeamDetailsParser
@@ -49,6 +51,10 @@ class DatafeedFMSAPI(object):
         fms_api_authkey = fms_api_secrets.contents['authkey']
         self._fms_api_authtoken = base64.b64encode('{}:{}'.format(fms_api_username, fms_api_authkey))
 
+        self._is_down_sitevar = Sitevar.get_by_id('apistatus.fmsapi_down')
+        if not self._is_down_sitevar:
+            self._is_down_sitevar = Sitevar(id="apistatus.fmsapi_down", description="Is FMSAPI down?")
+
         if version == 'v1.0':
             FMS_API_URL_BASE = 'https://frc-api.usfirst.org/api/v1.0'
             self.FMS_API_AWARDS_URL_PATTERN = FMS_API_URL_BASE + '/awards/%s/%s'  # (year, event_short)
@@ -57,6 +63,8 @@ class DatafeedFMSAPI(object):
             self.FMS_API_EVENT_RANKINGS_URL_PATTERN = FMS_API_URL_BASE + '/rankings/%s/%s'  # (year, event_short)
             self.FMS_API_EVENT_ALLIANCES_URL_PATTERN = FMS_API_URL_BASE + '/alliances/%s/%s'  # (year, event_short)
             self.FMS_API_TEAM_DETAILS_URL_PATTERN = FMS_API_URL_BASE + '/teams/%s/?teamNumber=%s'  # (year, teamNumber)
+            self.FMS_API_EVENT_LIST_URL_PATTERN = FMS_API_URL_BASE + '/events/season=%s'
+            self.FMS_API_EVENTTEAM_LIST_URL_PATTERN = FMS_API_URL_BASE + '/teams/?season=%s&eventCode=%s&page=%s'  # (year, eventCode, page)
         elif version == 'v2.0':
             FMS_API_URL_BASE = 'https://frc-api.usfirst.org/v2.0'
             self.FMS_API_AWARDS_URL_PATTERN = FMS_API_URL_BASE + '/%s/awards/%s'  # (year, event_short)
@@ -67,8 +75,10 @@ class DatafeedFMSAPI(object):
             self.FMS_API_EVENT_RANKINGS_URL_PATTERN = FMS_API_URL_BASE + '/%s/rankings/%s'  # (year, event_short)
             self.FMS_API_EVENT_ALLIANCES_URL_PATTERN = FMS_API_URL_BASE + '/%s/alliances/%s'  # (year, event_short)
             self.FMS_API_TEAM_DETAILS_URL_PATTERN = FMS_API_URL_BASE + '/%s/teams/?teamNumber=%s'  # (year, teamNumber)
+            self.FMS_API_EVENT_LIST_URL_PATTERN = FMS_API_URL_BASE + '/%s/events'  # year
+            self.FMS_API_EVENTTEAM_LIST_URL_PATTERN = FMS_API_URL_BASE + '/%s/teams/?eventCode=%s&page=%s'  # (year, eventCode, page)
         else:
-            raise Exception("Unknown FMS API version: {}".formation(version))
+            raise Exception("Unknown FMS API version: {}".format(version))
 
     def _get_event_short(self, event_short):
         return self.EVENT_SHORT_EXCEPTIONS.get(event_short, event_short)
@@ -88,8 +98,19 @@ class DatafeedFMSAPI(object):
             logging.info(e)
             return None
 
+        old_status = self._is_down_sitevar.contents
         if result.status_code == 200:
+            self._is_down_sitevar.contents = False
+            self._is_down_sitevar.put()
+            ApiStatusController.clear_cache_if_needed(old_status, self._is_down_sitevar.contents)
             return parser.parse(json.loads(result.content))
+        elif result.status_code % 100 == 5:
+            # 5XX error - something is wrong with the server
+            logging.warning('URLFetch for %s failed; Error code %s' % (url, result.status_code))
+            self._is_down_sitevar.contents = True
+            self._is_down_sitevar.put()
+            ApiStatusController.clear_cache_if_needed(old_status, self._is_down_sitevar.contents)
+            return None
         else:
             logging.warning('URLFetch for %s failed; Error code %s' % (url, result.status_code))
             return None
@@ -147,5 +168,31 @@ class DatafeedFMSAPI(object):
     def getTeamDetails(self, year, team_key):
         team_number = team_key[3:]  # everything after 'frc'
 
-        team = self._parse(self.FMS_API_TEAM_DETAILS_URL_PATTERN % (year, team_number), FMSAPITeamDetailsParser(year, team_key))
-        return team
+        result = self._parse(self.FMS_API_TEAM_DETAILS_URL_PATTERN % (year, team_number), FMSAPITeamDetailsParser(year))
+        if result:
+            return result[0]  # (team, districtteam, robot)
+        else:
+            return None
+
+    def getEventList(self, year):
+        events = self._parse(self.FMS_API_EVENT_LIST_URL_PATTERN % (year), FMSAPIEventListParser(year))
+        return events
+
+    # Returns list of tuples (team, districtteam, robot)
+    def getEventTeams(self, event_key):
+        year = int(event_key[:4])
+        event_code = event_key[4:]
+        parser = FMSAPITeamDetailsParser(year)
+        models = []  # will be list of tuples (team, districtteam, robot) model
+        for page in range(1, 9):  # Ensure this won't loop forever. 8 pages should be more than enough
+            url = self.FMS_API_EVENTTEAM_LIST_URL_PATTERN % (year, event_code, page)
+            result = self._parse(url, parser)
+            if result is None:
+                break
+            partial_models, more_pages = result
+            models.extend(partial_models)
+
+            if not more_pages:
+                break
+
+        return models

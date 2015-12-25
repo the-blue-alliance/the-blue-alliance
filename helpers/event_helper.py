@@ -286,7 +286,22 @@ class EventHelper(object):
 
     @classmethod
     def parseDistrictName(cls, district_name_str):
-        return DistrictType.names.get(district_name_str, DistrictType.NO_DISTRICT)
+        district = DistrictType.names.get(district_name_str, DistrictType.NO_DISTRICT)
+
+        # Fall back to checking abbreviations if needed
+        return district if district != DistrictType.NO_DISTRICT else DistrictType.abbrevs.get(district_name_str, DistrictType.NO_DISTRICT)
+
+    @classmethod
+    def getDistrictFromEventName(cls, event_name):
+        for abbrev, district_type in DistrictType.abbrevs.items():
+            if '{} district'.format(abbrev) in event_name.lower():
+                return district_type
+
+        for district_name, district_type in DistrictType.elasticsearch_names.items():
+            if district_name in event_name:
+                return district_type
+
+        return DistrictType.NO_DISTRICT
 
     @classmethod
     def parseEventType(self, event_type_str):
@@ -342,4 +357,4 @@ class EventHelper(object):
     def is_2015_playoff(Cls, event_key):
         year = event_key[:4]
         event_short = event_key[4:]
-        return year == '2015' and event_short not in {'cc', 'cacc'}
+        return year == '2015' and event_short not in {'cc', 'cacc', 'mttd'}

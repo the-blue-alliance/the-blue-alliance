@@ -1,0 +1,26 @@
+skip_files:
+# file types
+- ^(.*/)?.*\.jar.*
+- ^(.*/)?.*\.less.*
+- ^(.*/)?.*\.pyc.*
+- ^(.*/)?.*\.temp.*
+
+# directories
+- .git/*
+- git_hooks/*
+- static/css/less_css/*
+- static/css/precompiled_css/*
+- static/javascript/tba_js/*
+- subtrees/*
+- test_data/*
+- tests/*
+- utils/*
+
+# specific files
+- .gitignore
+- deploy.py
+- do_compress.py
+- linter.py
+- pavement.py
+- requirements.txt
+- run_tests.py

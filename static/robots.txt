@@ -3,4 +3,5 @@ Allow: /
 Disallow: /_
 Disallow: /admin/
 Disallow: /api/
+Disallow: /suggest/
 Disallow: /tasks/

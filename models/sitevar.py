@@ -29,11 +29,11 @@ class Sitevar(ndb.Model):
         """
         Lazy load values_json
         """
-        if self._contents is None:
+        if self._contents is None and self.values_json is not None:
             self._contents = json.loads(self.values_json)
         return self._contents
 
     @contents.setter
     def contents(self, contents):
         self._contents = contents
-        self.values_json = json.puts(self._contents)
+        self.values_json = json.dumps(self._contents)
