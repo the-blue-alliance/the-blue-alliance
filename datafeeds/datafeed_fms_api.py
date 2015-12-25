@@ -56,7 +56,7 @@ class DatafeedFMSAPI(object):
             self._is_down_sitevar = Sitevar(id="apistatus.fmsapi_down", description="Is FMSAPI down?")
 
         if version == 'v1.0':
-            FMS_API_URL_BASE = 'https://frc-api.usfirst.org/api/v1.0'
+            FMS_API_URL_BASE = 'https://frc-api.firstinspires.org/api/v1.0'
             self.FMS_API_AWARDS_URL_PATTERN = FMS_API_URL_BASE + '/awards/%s/%s'  # (year, event_short)
             self.FMS_API_HYBRID_SCHEDULE_QUAL_URL_PATTERN = FMS_API_URL_BASE + '/schedule/%s/%s/qual/hybrid'  # (year, event_short)
             self.FMS_API_HYBRID_SCHEDULE_PLAYOFF_URL_PATTERN = FMS_API_URL_BASE + '/schedule/%s/%s/playoff/hybrid'  # (year, event_short)
@@ -66,7 +66,7 @@ class DatafeedFMSAPI(object):
             self.FMS_API_EVENT_LIST_URL_PATTERN = FMS_API_URL_BASE + '/events/season=%s'
             self.FMS_API_EVENTTEAM_LIST_URL_PATTERN = FMS_API_URL_BASE + '/teams/?season=%s&eventCode=%s&page=%s'  # (year, eventCode, page)
         elif version == 'v2.0':
-            FMS_API_URL_BASE = 'https://frc-api.usfirst.org/v2.0'
+            FMS_API_URL_BASE = 'https://frc-api.firstinspires.org/v2.0'
             self.FMS_API_AWARDS_URL_PATTERN = FMS_API_URL_BASE + '/%s/awards/%s'  # (year, event_short)
             self.FMS_API_HYBRID_SCHEDULE_QUAL_URL_PATTERN = FMS_API_URL_BASE + '/%s/schedule/%s/qual/hybrid'  # (year, event_short)
             self.FMS_API_HYBRID_SCHEDULE_PLAYOFF_URL_PATTERN = FMS_API_URL_BASE + '/%s/schedule/%s/playoff/hybrid'  # (year, event_short)
