@@ -36,6 +36,7 @@
                 <li><a class="smooth-scroll" href="#team-history-events-request">Team History Events Request</a></li>
                 <li><a class="smooth-scroll" href="#team-history-awards-request">Team History Awards Request</a></li>
                 <li><a class="smooth-scroll" href="#team-history-robots-request">Team History Robots Request</a></li>
+                <li><a class="smooth-scroll" href="#team-history-districts-request">Team History Districts Request</a></li>
               </ul>
             </li>
             <li>
@@ -941,6 +942,49 @@
         </div>
       </div>
 
+      <h3 id="team-history-districts-request">Team History Districts Request</h3>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/history/districts</code>
+      </p>
+      <table class=table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>team key</td>
+            <td>A team key name where the format is <code>frcyyyy</code> where yyyy is the a
+              valid, official team number issued by <em>FIRST</em></td>
+            <td>frc1, frc281, frc1114</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_team_history_districts_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="600" id="example_team_history_districts_request" type="text" value="/api/v2/team/frc1124/history/districts">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group">
+            <pre class="team-history-districts-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+
       <h2 id="event-requests">Event Requests</h2>
       <h3 id="event-list-request">Event List Request</h3>
       <h4>Related: <a class="smooth-scroll" href="#event-model">Event Model</a></h4>
@@ -1701,6 +1745,23 @@
       },
       error: function(data) {
         $(".team-history-robots-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+
+  $("#example_team_history_districts_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".team-history-districts-request-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_team_history_districts_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-team-history-districts-request:v01'},
+      success: function(data) {
+        $(".team-history-districts-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".team-history-districts-request-json").html('Something went wrong! Please check for correct request format.');
       }
     });
   });
