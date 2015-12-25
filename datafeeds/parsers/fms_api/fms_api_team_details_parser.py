@@ -28,13 +28,19 @@ class FMSAPITeamDetailsParser(object):
             # concat city/state/country to get address
             address = u"{}, {}, {}".format(teamData['city'], teamData['stateProv'], teamData['country'])
 
+            # Fix issue where FIRST's API returns dummy website for all teams
+            if 'www.firstinspires.org' in teamData['website']:
+                website = None
+            else:
+                website = teamData['website']
+
             team = Team(
                 id="frc{}".format(teamData['teamNumber']),
                 team_number=teamData['teamNumber'],
                 name=teamData['nameFull'],
                 nickname=teamData['nameShort'],
                 address=address,
-                website=teamData['website'],
+                website=website,
                 rookie_year=teamData['rookieYear']
             )
 
