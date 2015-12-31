@@ -23,6 +23,8 @@ from controllers.admin.admin_migration_controller import AdminMigration, AdminMi
 from controllers.admin.admin_user_controller import AdminUserList, AdminUserEdit, AdminUserDetail
 from controllers.admin.admin_mobile_controller import AdminMobile, AdminBroadcast
 from controllers.admin.admin_apistatus_controller import AdminApiStatus
+from controllers.admin.suggestions.admin_social_suggestions_review_controller import \
+    AdminSocialSuggestionsReviewController
 
 app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/api_auth/add', AdminApiAuthAdd),
@@ -64,6 +66,7 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/suggestions/event/webcast/review', AdminEventWebcastSuggestionsReviewController),
                                ('/admin/suggestions/match/video/review', AdminMatchVideoSuggestionsReviewController),
                                ('/admin/suggestions/media/review', AdminMediaSuggestionsReviewController),
+                               ('/admin/suggestions/social/review', AdminSocialSuggestionsReviewController),
                                ('/admin/tasks', AdminTasksHandler),
                                ('/admin/teams', AdminTeamList),
                                ('/admin/team/create/test', AdminTeamCreateTest),
