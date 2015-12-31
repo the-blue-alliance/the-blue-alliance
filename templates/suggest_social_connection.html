@@ -29,7 +29,7 @@
     <div class="col-xs-12 col-lg-6 col-lg-offset-3">
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h1 class="panel-title">Help others by adding social accounts!</h1>
+          <h1 class="panel-title">Add a team's social account to The Blue Alliance!</h1>
         </div>
         <div class="panel-body">
           <p>Thanks for helping make The Blue Alliance better! Let us know about a social account so we can add them to the site!</p>
@@ -68,31 +68,58 @@
 
           <h3>Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h3>
 
-          {% if medias_by_slugname.cdphotothread %}
+          {% if connections_by_type.facebook %}
           <div class="row">
             <div class="col-xs-12">
-              <h4>Existing Chief Delphi Photos</h4>
-              {% for media in medias_by_slugname.cdphotothread %}
+              <h4>Existing Facebook Profile</h4>
+              {% for connection in connections_by_type.facebook %}
                 <div class="col-xs-6 col-sm-4">
-                {% include "media_partials/cdphotothread_partial.html" %}
+                {% include "social_partials/facebook_partial.html" %}
                 </div>
               {% endfor %}
             </div>
           </div>
           {% endif %}
 
-          {% if medias_by_slugname.cdphotothread %}
+          {% if connections_by_type.twitter %}
           <div class="row">
             <div class="col-xs-12">
-              <h4>Existing Videos</h4>
-              {% for media in medias_by_slugname.youtube %}
+              <h4>Existing Twitter Profile</h4>
+              {% for connection in connections_by_type.twitter %}
                 <div class="col-xs-12 col-md-6 fitvids">
-                {% include "media_partials/youtube_partial.html" %}
+                {% include "social_partials/twitter_partial.html" %}
                 </div>
               {% endfor %}
             </div>
           </div>
           {% endif %}
+
+          {% if connections_by_type.youtube %}
+          <div class="row">
+            <div class="col-xs-12">
+              <h4>Existing YouTube Profile</h4>
+              {% for connection in connections_by_type.youtube %}
+                <div class="col-xs-12 col-md-6 fitvids">
+                {% include "social_partials/youtube_partial.html" %}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if connections_by_type.github %}
+          <div class="row">
+            <div class="col-xs-12">
+              <h4>Existing GitHub Profile</h4>
+              {% for connection in connections_by_type.github %}
+                <div class="col-xs-12 col-md-6 fitvids">
+                {% include "social_partials/github_partial.html" %}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
           <hr>
           <div class="row">
             <div class="col-xs-12">

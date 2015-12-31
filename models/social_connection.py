@@ -35,6 +35,23 @@ class SocialConnection(ndb.Model):
     def slug_name(self):
         return self.SLUG_NAMES[self.social_type_enum]
 
+    # URL Renderers
+    @property
+    def facebook_profile_url(self):
+        return "https://www.facebook.com/{}".format(self.foreign_key)
+
+    @property
+    def github_profile_url(self):
+        return "https://github.com/{}".format(self.foreign_key)
+
+    @property
+    def twitter_profile_url(self):
+        return "https://twitter.com/{}".format(self.foreign_key)
+
+    @property
+    def youtube_profile_url(self):
+        return "https://www.youtube.com/user/{}".format(self.foreign_key)
+
     @classmethod
     def render_key_name(self, parent_key_name, social_type_enum, foreign_key):
         return '{}_{}_{}'.format(parent_key_name, self.SLUG_NAMES[social_type_enum], foreign_key)
