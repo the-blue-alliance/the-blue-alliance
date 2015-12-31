@@ -4,7 +4,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
-from helpers.social_connection_helper import SocialConnectionHelper
+from helpers.social_connection_helper import SocialConnectionHelper, SocialConnectionParser
 from models.social_connection import SocialConnection
 from models.suggestion import Suggestion
 from models.team import Team
@@ -25,7 +25,7 @@ class SuggestTeamSocialController(LoggedInHandler):
 
         team_future = Team.get_by_id_async(self.request.get("team_key"))
         team = team_future.get_result()
-        social_key_futures = SocialConnection.query(SocialConnection.parent_model == team.key).fetch_async(500, keys_only=True)
+        social_key_futures = SocialConnection.query(SocialConnection.references == team.key).fetch_async(500, keys_only=True)
         social_futures = ndb.get_multi_async(social_key_futures.get_result())
         connections_by_type = SocialConnectionHelper.group_by_type([social_future.get_result() for social_future in social_futures])
 
@@ -42,23 +42,23 @@ class SuggestTeamSocialController(LoggedInHandler):
         self._require_login()
 
         team_key = self.request.get("team_key")
-        year_str = self.request.get("year")
+        social_url = self.request.get("social_url").strip()
 
         success_code = 0
-        media_dict = MediaParser.partial_media_dict_from_url(self.request.get('media_url').strip())
-        if media_dict is not None:
-            existing_media = Media.get_by_id(Media.render_key_name(media_dict['media_type_enum'], media_dict['foreign_key']))
-            if existing_media is None or team_key not in [reference.id() for reference in existing_media.references]:
-                media_dict['year'] = int(year_str)
-                media_dict['reference_type'] = 'team'
-                media_dict['reference_key'] = team_key
+        social_dict = SocialConnectionParser.partial_social_dict_from_url(social_url)
+        if social_dict is not None:
+            existing_key = SocialConnection.render_key_name(social_dict['social_type_enum'], social_dict['foreign_key'])
+            existing_connection = SocialConnection.get_by_id(existing_key)
+            if existing_connection is None or team_key not in [reference.id() for reference in existing_connection.references]:
+                social_dict['reference_type'] = 'team'
+                social_dict['reference_key'] = team_key
 
                 suggestion = Suggestion(
                     author=self.user_bundle.account.key,
-                    target_model="media",
+                    target_model="social_connection",
                     )
-                suggestion.contents = media_dict
+                suggestion.contents = social_dict
                 suggestion.put()
             success_code = 1
 
-        self.redirect('/suggest/team/media?team_key=%s&year=%s&success=%s' % (team_key, year_str, success_code))
+        self.redirect('/suggest/team/social?team_key=%s&success=%s' % (team_key, success_code))

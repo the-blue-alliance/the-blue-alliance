@@ -20,7 +20,7 @@ class SocialConnection(ndb.Model):
         SocialConnectionType.YOUTUBE: 'youtube'
     }
 
-    parent_model = ndb.KeyProperty(required=True)
+    references = ndb.KeyProperty(repeated=True)  # Other models that are linked to this object
     social_type_enum = ndb.IntegerProperty(required=True)
     profile_url = ndb.StringProperty(required=True)
     foreign_key = ndb.StringProperty(required=True)
@@ -53,5 +53,5 @@ class SocialConnection(ndb.Model):
         return "https://www.youtube.com/user/{}".format(self.foreign_key)
 
     @classmethod
-    def render_key_name(self, parent_key_name, social_type_enum, foreign_key):
-        return '{}_{}_{}'.format(parent_key_name, self.SLUG_NAMES[social_type_enum], foreign_key)
+    def render_key_name(self, social_type_enum, foreign_key):
+        return '{}_{}'.format(self.SLUG_NAMES[social_type_enum], foreign_key)
