@@ -7,7 +7,9 @@ from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
 from helpers.media_manipulator import MediaManipulator
+from helpers.social_connection_manipulator import SocialConnectionManipulator
 from models.media import Media
+from models.social_connection import SocialConnection
 from models.suggestion import Suggestion
 
 
@@ -52,17 +54,15 @@ class AdminSocialSuggestionsReviewController(LoggedInHandler):
         rejected_suggestions = map(lambda a: a.get_result(), rejected_suggestion_futures)
 
         for suggestion in accepted_suggestions:
-            media = Media(
-                id=Media.render_key_name(suggestion.contents['media_type_enum'], suggestion.contents['foreign_key']),
+            media = SocialConnection(
+                id=SocialConnection.render_key_name(suggestion.contents['social_type_enum'], suggestion.contents['foreign_key']),
                 foreign_key=suggestion.contents['foreign_key'],
-                media_type_enum=suggestion.contents['media_type_enum'],
-                details_json=suggestion.contents.get('details_json', None),
-                year=int(suggestion.contents['year']),
-                references=[Media.create_reference(
+                social_type_enum=suggestion.contents['social_type_enum'],
+                references=[SocialConnection.create_reference(
                     suggestion.contents['reference_type'],
                     suggestion.contents['reference_key'])],
             )
-            MediaManipulator.createOrUpdate(media)
+            SocialConnectionManipulator.createOrUpdate(media)
 
         all_suggestions = accepted_suggestions
         all_suggestions.extend(rejected_suggestions)
@@ -77,4 +77,4 @@ class AdminSocialSuggestionsReviewController(LoggedInHandler):
 
         ndb.put_multi(all_suggestions)
 
-        self.redirect("/admin/suggestions/media/review")
+        self.redirect("/admin/suggestions/social/review")

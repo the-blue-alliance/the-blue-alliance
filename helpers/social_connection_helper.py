@@ -127,7 +127,7 @@ class SocialConnectionParser(object):
     @classmethod
     def _parse_github_foreign_key(cls, url):
         github_profile = None
-        regex = re.match(r".*github.com\/(.*)\/?", url)
+        regex = re.match(r".*github.com\/(.*)(\/(.*))?", url)
         if regex is not None:
             github_profile = regex.group(1)
 
