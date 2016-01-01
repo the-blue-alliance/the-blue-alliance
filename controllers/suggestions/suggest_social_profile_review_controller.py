@@ -5,21 +5,18 @@ import json
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
-from controllers.base_controller import LoggedInHandler
-from helpers.media_manipulator import MediaManipulator
+from controllers.suggestions.suggestions_review_base_controller import SuggestionsReviewBaseController
 from helpers.social_connection_manipulator import SocialConnectionManipulator
 from models.media import Media
 from models.social_connection import SocialConnection
 from models.suggestion import Suggestion
 
 
-class AdminSocialSuggestionsReviewController(LoggedInHandler):
+class SuggestSocialProfileReviewController(SuggestionsReviewBaseController):
     """
     View the list of suggestions.
     """
     def get(self):
-        self._require_admin()
-
         suggestions = Suggestion.query().filter(
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
             Suggestion.target_model == "social_connection")
@@ -39,7 +36,7 @@ class AdminSocialSuggestionsReviewController(LoggedInHandler):
             "suggestions_and_references": suggestions_and_references,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../../templates/admin/social_suggestion_list.html')
+        path = os.path.join(os.path.dirname(__file__), '../../templates/suggest_social_review_list.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self):
@@ -77,4 +74,4 @@ class AdminSocialSuggestionsReviewController(LoggedInHandler):
 
         ndb.put_multi(all_suggestions)
 
-        self.redirect("/admin/suggestions/social/review")
+        self.redirect("/suggest/team/social/review")

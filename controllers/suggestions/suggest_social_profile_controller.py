@@ -10,7 +10,7 @@ from models.suggestion import Suggestion
 from models.team import Team
 
 
-class SuggestTeamSocialController(LoggedInHandler):
+class SuggestSocialProfileController(LoggedInHandler):
     """
     Allow users to suggest social network accounts for TBA to add to teams.
     """
