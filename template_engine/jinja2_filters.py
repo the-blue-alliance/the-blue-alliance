@@ -1,10 +1,14 @@
+from email import utils
 import re
+import time
 import urllib
 
 
 def digits(s):
     if not s:
         return ''
+    if type(s) is int:
+        return s
     return re.sub('[^0-9]', '', s)
 
 
@@ -29,10 +33,10 @@ def urlencode(s):
     return urllib.quote(s.encode('utf8'))
 
 
-# def rfc2822(datetime):
-#     tt = datetime.timetuple()
-#     timestamp = time.mktime(tt)
-#     return utils.formatdate(timestamp)
+def rfc2822(datetime):
+    tt = datetime.timetuple()
+    timestamp = time.mktime(tt)
+    return utils.formatdate(timestamp)
 
 
 # def slugify(s):

@@ -9,6 +9,7 @@ from google.appengine.ext.webapp import template
 from controllers.base_controller import LoggedInHandler
 from datafeeds.csv_alliance_selections_parser import CSVAllianceSelectionsParser
 from datafeeds.csv_teams_parser import CSVTeamsParser
+from helpers.award_manipulator import AwardManipulator
 from helpers.event.event_test_creator import EventTestCreator
 from helpers.event.event_webcast_adder import EventWebcastAdder
 from helpers.event_helper import EventHelper
@@ -70,6 +71,82 @@ class AdminEventAddTeams(LoggedInHandler):
 
         EventTeamManipulator.createOrUpdate(event_teams)
         TeamManipulator.createOrUpdate(teams)
+
+        self.redirect("/admin/event/" + event.key_name)
+
+
+class AdminEventRemapTeams(LoggedInHandler):
+    """
+    Remaps teams within an Event. Useful for offseason events.
+    eg: 9254 -> 254B
+    """
+    def post(self, event_key_id):
+        self._require_admin()
+        event = Event.get_by_id(event_key_id)
+        event.prepAwardsMatchesTeams()
+
+        remap_teams = {}
+        for key, value in json.loads(self.request.get('remap_teams')).items():
+            remap_teams['frc{}'.format(key)] = 'frc{}'.format(value)
+
+        # Remap matches
+        for match in event.matches:
+            for old_team, new_team in remap_teams.items():
+                # Update team key names
+                for i, key in enumerate(match.team_key_names):
+                    if key == old_team:
+                        match.dirty = True
+                        if new_team.isdigit():  # Only if non "B" teams
+                            match.team_key_names[i] = new_team
+                        else:
+                            del match.team_key_names[i]
+                # Update alliances
+                for color in ['red', 'blue']:
+                    for i, key in enumerate(match.alliances[color]['teams']):
+                        if key == old_team:
+                            match.dirty = True
+                            match.alliances[color]['teams'][i] = new_team
+                            match.alliances_json = json.dumps(match.alliances)
+        MatchManipulator.createOrUpdate(event.matches)
+
+        # Remap alliance selections
+        for row in event.alliance_selections:
+            for choice in ['picks', 'declines']:
+                for old_team, new_team in remap_teams.items():
+                    for i, key in enumerate(row[choice]):
+                        if key == old_team:
+                            event.dirty = True
+                            row[choice][i] = new_team
+                            event.alliance_selections_json = json.dumps(event.alliance_selections)
+
+        # Remap rankings
+        for row in event.rankings:
+            for old_team, new_team in remap_teams.items():
+                if row[1] == old_team[3:]:
+                    event.dirty = True
+                    row[1] = new_team[3:]
+                    event.rankings_json = json.dumps(event.rankings)
+
+        EventManipulator.createOrUpdate(event)
+
+        # Remap awards
+        for award in event.awards:
+            for old_team, new_team in remap_teams.items():
+                # Update team keys
+                for i, key in enumerate(award.team_list):
+                    if key.id() == old_team:
+                        award.dirty = True
+                        if new_team.isdigit():  # Only if non "B" teams
+                            award.team_list[i] = ndb.Key(Team, new_team)
+                        else:
+                            del award.team_list[i]
+                # Update recipient list
+                for recipient in award.recipient_list:
+                    if str(recipient['team_number']) == old_team[3:]:
+                        award.dirty = True
+                        recipient['team_number'] = new_team[3:]
+                        award.recipient_json_list = [json.dumps(r) for r in award.recipient_list]
+        AwardManipulator.createOrUpdate(event.awards, auto_union=False)
 
         self.redirect("/admin/event/" + event.key_name)
 

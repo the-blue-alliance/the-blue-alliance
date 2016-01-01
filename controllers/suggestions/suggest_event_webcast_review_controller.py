@@ -13,7 +13,7 @@ from models.event import Event
 from models.suggestion import Suggestion
 
 
-class AdminEventWebcastSuggestionsReviewController(SuggestionsReviewBaseController):
+class SuggestEventWebcastReviewController(SuggestionsReviewBaseController):
     """
     View the list of suggestions.
     """
@@ -39,7 +39,7 @@ class AdminEventWebcastSuggestionsReviewController(SuggestionsReviewBaseControll
             "suggestion_sets": suggestion_sets
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../../templates/admin/event_webcast_suggestion_list.html')
+        path = os.path.join(os.path.dirname(__file__), '../../templates/suggest_event_webcast_review_list.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self):
@@ -61,7 +61,7 @@ class AdminEventWebcastSuggestionsReviewController(SuggestionsReviewBaseControll
             suggestion.reviewer_at = datetime.datetime.now()
             suggestion.put()
 
-            self.redirect("/admin/suggestions/event/webcast/review?success=accept&event_key=%s" % event.key.id())
+            self.redirect("/suggest/event/webcast/review?success=accept&event_key=%s" % event.key.id())
             return
 
         elif self.request.get("verdict") == "reject":
@@ -72,7 +72,7 @@ class AdminEventWebcastSuggestionsReviewController(SuggestionsReviewBaseControll
             suggestion.reviewer_at = datetime.datetime.now()
             suggestion.put()
 
-            self.redirect("/admin/suggestions/event/webcast/review?success=reject")
+            self.redirect("/suggest/event/webcast/review?success=reject")
             return
 
         elif self.request.get("verdict") == "reject_all":
@@ -87,11 +87,11 @@ class AdminEventWebcastSuggestionsReviewController(SuggestionsReviewBaseControll
                 suggestion.reviewer_at = datetime.datetime.now()
                 suggestion.put()
 
-            self.redirect("/admin/suggestions/event/webcast/review?success=reject_all&event_key=%s" % event_key)
+            self.redirect("/suggest/event/webcast/review?success=reject_all&event_key=%s" % event_key)
             return
 
 
-        self.redirect("/admin/suggestions/event/webcast/review")
+        self.redirect("/suggest/event/webcast/review")
 
 
 

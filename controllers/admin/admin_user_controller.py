@@ -65,7 +65,7 @@ class AdminUserEdit(LoggedInHandler):
 
         user.display_name = self.request.get("display_name")
         user.permissions = []
-        for enum in AccountPermissions.descriptions:
+        for enum in AccountPermissions.permissions:
             permcheck = self.request.get("perm-" + str(enum))
             if permcheck :
                 user.permissions.append(enum)

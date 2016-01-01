@@ -52,7 +52,7 @@
               {% if awards %}
               {% for award in awards %}
                 {% for team_number, awardees in award.recipient_dict.items %}
-                {% if team_number == team.team_number %}
+                {% if team_number|slugify == team.team_number|slugify %}
                 {% for awardee in awardees %}
                   {{ award.name_str }}{% if awardee %} ({{ awardee }}){% endif %}<br>
                 {% endfor %}

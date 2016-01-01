@@ -1,5 +1,6 @@
 from collections import defaultdict
 from datetime import date
+import json
 import logging
 import os
 import re
@@ -8,11 +9,17 @@ from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
+from consts.award_type import AwardType
 from consts.client_type import ClientType
 from consts.district_type import DistrictType
+from consts.event_type import EventType
 from controllers.base_controller import LoggedInHandler
+from database import match_query
+from helpers.award_manipulator import AwardManipulator
 from helpers.district_team_manipulator import DistrictTeamManipulator
+from helpers.match_helper import MatchHelper
 from helpers.notification_sender import NotificationSender
+from models.award import Award
 from models.district_team import DistrictTeam
 from models.event import Event
 from models.event_team import EventTeam
@@ -173,3 +180,56 @@ class AdminCreateDistrictTeamsDo(LoggedInHandler):
         logging.info("Finishing updating old district teams from event teams")
         DistrictTeamManipulator.createOrUpdate(new_district_teams)
         self.response.out.write("Finished creating district teams for {}".format(year))
+
+
+class AdminPostEventTasksDo(LoggedInHandler):
+    """
+    Runs cleanup tasks after an event is over if necessary
+    """
+    def get(self, event_key):
+        # Fetch for later
+        event_future = Event.get_by_id_async(event_key)
+        matches_future = match_query.EventMatchesQuery(event_key).fetch_async()
+
+        # Rebuild event teams
+        taskqueue.add(
+            url='/tasks/math/do/eventteam_update/' + event_key,
+            method='GET')
+
+        # Create Winner/Finalist awards for offseason events
+        awards = []
+        event = event_future.get_result()
+        if event.event_type_enum == EventType.OFFSEASON:
+            matches = MatchHelper.organizeMatches(matches_future.get_result())
+            bracket = MatchHelper.generateBracket(matches, event.alliance_selections)
+            if 'f' in bracket:
+                winning_alliance = '{}_alliance'.format(bracket['f'][1]['winning_alliance'])
+                if winning_alliance == 'red_alliance':
+                    losing_alliance = 'blue_alliance'
+                else:
+                    losing_alliance = 'red_alliance'
+
+                awards.append(Award(
+                    id=Award.render_key_name(event.key_name, AwardType.WINNER),
+                    name_str="Winner",
+                    award_type_enum=AwardType.WINNER,
+                    year=event.year,
+                    event=event.key,
+                    event_type_enum=event.event_type_enum,
+                    team_list=[ndb.Key(Team, 'frc{}'.format(team)) for team in bracket['f'][1][winning_alliance] if team.isdigit()],
+                    recipient_json_list=[json.dumps({'team_number': team, 'awardee': None}) for team in bracket['f'][1][winning_alliance]],
+                ))
+
+                awards.append(Award(
+                    id=Award.render_key_name(event.key_name, AwardType.FINALIST),
+                    name_str="Finalist",
+                    award_type_enum=AwardType.FINALIST,
+                    year=event.year,
+                    event=event.key,
+                    event_type_enum=event.event_type_enum,
+                    team_list=[ndb.Key(Team, 'frc{}'.format(team)) for team in bracket['f'][1][losing_alliance] if team.isdigit()],
+                    recipient_json_list=[json.dumps({'team_number': team, 'awardee': None}) for team in bracket['f'][1][losing_alliance]],
+                ))
+                AwardManipulator.createOrUpdate(awards)
+
+        self.response.out.write("Finished post-event tasks for {}. Created awards: {}".format(event_key, awards))

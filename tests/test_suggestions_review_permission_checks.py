@@ -6,14 +6,14 @@ import os
 from google.appengine.ext import testbed
 
 from controllers.main_controller import MainKickoffHandler
-from controllers.admin.suggestions.admin_match_video_suggestions_review_controller import AdminMatchVideoSuggestionsReviewController
+from controllers.suggestions.suggest_match_video_review_controller import SuggestMatchVideoReviewController
 from consts.account_permissions import AccountPermissions
 from models.user import User
 from models.account import Account
 
 class TestMatchApiController(unittest2.TestCase):
     def setUp(self):
-        app = webapp2.WSGIApplication([webapp2.Route(r'/suggestions', AdminMatchVideoSuggestionsReviewController, methods=['GET'])], debug=True)
+        app = webapp2.WSGIApplication([webapp2.Route(r'/suggestions', SuggestMatchVideoReviewController, methods=['GET'])], debug=True)
         self.testapp = webtest.TestApp(app)
 
         self.testbed = testbed.Testbed()

@@ -82,7 +82,14 @@ class ApiBaseController(CacheableHandler):
         self._track_call(*args, **kw)
         super(ApiBaseController, self).get(*args, **kw)
         self.response.headers['X-TBA-Version'] = '{}'.format(self.API_VERSION)
-        self._set_cache_header_length(self.CACHE_HEADER_LENGTH)
+
+    def options(self, *args, **kw):
+        """
+        Supply an OPTIONS method in order to comply with CORS preflghted requests
+        https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests
+        """
+        self.response.headers['Access-Control-Allow-Methods'] = "GET, OPTIONS"
+        self.response.headers['Access-Control-Allow-Headers'] = 'X-TBA-App-Id'
 
     def _read_cache(self):
         """
@@ -142,14 +149,6 @@ class ApiBaseController(CacheableHandler):
         if len(x_tba_app_id_parts) != 3 or any(len(part) == 0 for part in x_tba_app_id_parts):
             self._errors = json.dumps({"Error": "X-TBA-App-Id must follow a specific format. Please see http://www.thebluealliance.com/apidocs for more info."})
             self.abort(400)
-
-    def _set_cache_header_length(self, seconds):
-        if type(seconds) is not int:
-            logging.error("Cache-Control max-age is not integer: {}".format(seconds))
-            return
-
-        self.response.headers['Cache-Control'] = "public, max-age=%d" % max(seconds, 61)  # needs to be at least 61 seconds to work
-        self.response.headers['Pragma'] = 'Public'
 
 
 class ApiTrustedBaseController(webapp2.RequestHandler):

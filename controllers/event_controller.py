@@ -202,6 +202,5 @@ class EventRss(CacheableHandler):
             "datetime": datetime.datetime.now()
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/event_rss.xml')
         self.response.headers['content-type'] = 'application/xml; charset=UTF-8'
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('event_rss.xml', self.template_values)

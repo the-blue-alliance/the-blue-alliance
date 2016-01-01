@@ -38,11 +38,13 @@ class DatabaseQuery(object):
     @ndb.tasklet
     def fetch_async(self):
         cached_query = yield CachedQueryResult.get_by_id_async(self.cache_key)
+        do_stats = random.random() < tba_config.RECORD_FRACTION
         rpcs = []
         if cached_query is None:
-            rpcs.append(MEMCACHE_CLIENT.incr_async(
-                random.choice(self.DATABASE_MISSES_MEMCACHE_KEYS),
-                initial_value=0))
+            if do_stats:
+                rpcs.append(MEMCACHE_CLIENT.incr_async(
+                    random.choice(self.DATABASE_MISSES_MEMCACHE_KEYS),
+                    initial_value=0))
             query_result = yield self._query_async()
             if tba_config.CONFIG['database_query_cache']:
                 rpcs.append(CachedQueryResult(
@@ -50,9 +52,10 @@ class DatabaseQuery(object):
                     result=query_result,
                 ).put_async())
         else:
-            rpcs.append(MEMCACHE_CLIENT.incr_async(
-                random.choice(self.DATABASE_HITS_MEMCACHE_KEYS),
-                initial_value=0))
+            if do_stats:
+                rpcs.append(MEMCACHE_CLIENT.incr_async(
+                    random.choice(self.DATABASE_HITS_MEMCACHE_KEYS),
+                    initial_value=0))
             query_result = cached_query.result
 
         for rpc in rpcs:

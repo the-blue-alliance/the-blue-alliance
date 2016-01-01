@@ -9,14 +9,15 @@ from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from consts.event_type import EventType
-
+from controllers.api.api_district_controller import ApiDistrictTeamsController
 from controllers.api.api_team_controller import ApiTeamController, ApiTeamEventsController, ApiTeamMediaController,\
-                                                ApiTeamListController, ApiTeamHistoryRobotsController
-
+                                                ApiTeamListController, ApiTeamHistoryRobotsController, \
+    ApiTeamHistoryDistrictsController
 from consts.award_type import AwardType
 from consts.event_type import EventType
 
 from models.award import Award
+from models.district_team import DistrictTeam
 from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
@@ -139,6 +140,63 @@ class TestTeamEventsApiController(unittest2.TestCase):
 
         event_dict = json.loads(response.body)
         self.assertEventJson(event_dict[0])
+
+
+class TestDistrictTeamsApiController(unittest2.TestCase):
+    def setUp(self):
+        app = webapp2.WSGIApplication([webapp2.Route(r'/<district_abbrev:>/<year:([0-9]*)>', ApiDistrictTeamsController, methods=['GET'])], debug=True)
+        self.testapp = webtest.TestApp(app)
+
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_urlfetch_stub()
+        self.testbed.init_memcache_stub()
+        self.testbed.init_taskqueue_stub(root_path=".")
+
+        self.team = Team(
+                id="frc281",
+                name="Michelin / Caterpillar / Greenville Technical College /\
+                jcpenney / Baldor / ASME / Gastroenterology Associates /\
+                Laserflex South & Greenville County Schools & Greenville\
+                Technical Charter High School",
+                team_number=281,
+                nickname="EnTech GreenVillians",
+                address="Greenville, SC, USA",
+                website="www.entech.org",
+                motto = "Infiltrating Young Minds One Robot at a Time",
+        )
+
+        self.district_team = DistrictTeam(
+                id="2015ne_frc281",
+                team=self.team.key,
+                year=2015,
+                district=3
+        )
+
+        self.team.put()
+        self.district_team.put()
+
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def assertTeamJson(self, team):
+        team = team[0]
+        self.assertEqual(team["key"], self.team.key_name)
+        self.assertEqual(team["team_number"], self.team.team_number)
+        self.assertEqual(team["nickname"], self.team.nickname)
+        self.assertEqual(team["location"], self.team.location)
+        self.assertEqual(team["locality"], "Greenville")
+        self.assertEqual(team["country_name"], "USA")
+        self.assertEqual(team["region"], "SC")
+        self.assertEqual(team["website"], self.team.website)
+        self.assertEqual(team["motto"], self.team.motto)
+
+    def testDistrictsApi(self):
+        response = self.testapp.get('/ne/2015', headers={"X-TBA-App-Id": "tba-tests:team-districts-controller-test:v01"})
+        teams = json.loads(response.body)
+        self.assertTeamJson(teams)
 
 
 class TestTeamMediaApiController(unittest2.TestCase):
@@ -306,4 +364,46 @@ class TestTeamHistoryRobotsApiController(unittest2.TestCase):
         self.assertEqual(robot["team_key"], "frc1124")
         self.assertEqual(robot["year"], 2015)
         self.assertEqual(robot["name"], "Orion")
+
+
+class TestTeamHistoryDistrictsApiController(unittest2.TestCase):
+    def setUp(self):
+        app = webapp2.WSGIApplication([webapp2.Route(r'/<team_key:>', ApiTeamHistoryDistrictsController, methods=['GET'])], debug=True)
+        self.testapp = webtest.TestApp(app)
+
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_urlfetch_stub()
+        self.testbed.init_memcache_stub()
+        self.testbed.init_taskqueue_stub(root_path=".")
+
+        self.team = Team(
+                id="frc1124",
+                name="UberBots",
+                team_number=1124,
+                nickname="UberBots",
+        )
+
+        self.district_team = DistrictTeam(
+                id="2015ne_frc1124",
+                team=self.team.key,
+                year=2015,
+                district=3
+        )
+
+        self.team.put()
+        self.district_team.put()
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def testDistrictsApi(self):
+        response = self.testapp.get('/frc1124', headers={"X-TBA-App-Id": "tba-tests:team-history-districts-controller-test:v01"})
+        district_dict = json.loads(response.body)
+
+        self.assertTrue("2015" in district_dict)
+        district_key = district_dict["2015"]
+
+        self.assertEqual(district_key, "2015ne")
 
