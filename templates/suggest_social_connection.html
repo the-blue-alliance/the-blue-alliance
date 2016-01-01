@@ -74,7 +74,7 @@
               <h4>Existing Facebook Profile</h4>
               {% for connection in connections_by_type.facebook %}
                 <div class="col-xs-6 col-sm-4">
-                {% include "social_partials/facebook_partial.html" %}
+                {% include "social_partials/social_connection_partial.html" %}
                 </div>
               {% endfor %}
             </div>
@@ -87,7 +87,7 @@
               <h4>Existing Twitter Profile</h4>
               {% for connection in connections_by_type.twitter %}
                 <div class="col-xs-12 col-md-6 fitvids">
-                {% include "social_partials/twitter_partial.html" %}
+                {% include "social_partials/social_connection_partial.html" %}
                 </div>
               {% endfor %}
             </div>
@@ -100,7 +100,7 @@
               <h4>Existing YouTube Profile</h4>
               {% for connection in connections_by_type.youtube %}
                 <div class="col-xs-12 col-md-6 fitvids">
-                {% include "social_partials/youtube_partial.html" %}
+                {% include "social_partials/social_connection_partial.html" %}
                 </div>
               {% endfor %}
             </div>
@@ -113,7 +113,7 @@
               <h4>Existing GitHub Profile</h4>
               {% for connection in connections_by_type.github %}
                 <div class="col-xs-12 col-md-6 fitvids">
-                {% include "social_partials/github_partial.html" %}
+                {% include "social_partials/social_connection_partial.html" %}
                 </div>
               {% endfor %}
             </div>

@@ -14,3 +14,10 @@ class SocialConnectionType(object):
         YOUTUBE: 'YouTube',
         GITHUB: 'GitHub',
     }
+
+    PROFILE_URLS = {
+        FACEBOOK: "https://www.facebook.com/{}",
+        TWITTER: "https://twitter.com/{}",
+        YOUTUBE: "https://www.youtube.com/user/{}",
+        GITHUB: "https://github.com/{}"
+    }
