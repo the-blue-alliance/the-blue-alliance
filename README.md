@@ -133,7 +133,7 @@ Potentially useful: http://spriteme.org/
 
 Testing
 -------
-[![Build Status](https://travis-ci.org/the-blue-alliance/the-blue-alliance.png?branch=master)](https://travis-ci.org/the-blue-alliance/the-blue-alliance)
+[![Build Status](https://travis-ci.org/the-blue-alliance/the-blue-alliance.svg?branch=master)](https://travis-ci.org/the-blue-alliance/the-blue-alliance)
 
 Testing is implemented using a combination of [unittest2](http://pypi.python.org/pypi/unittest2 "Uniter Test 2") and the Google App Engine testbed framework. Test coverage is a work in progress, and focuses on maintaining datafeed integrity in the face of optimizations and changes to FIRST's data formats.
 
