@@ -15,9 +15,6 @@ from controllers.admin.admin_memcache_controller import AdminMemcacheMain
 from controllers.admin.admin_offseason_scraper_controller import AdminOffseasonScraperController
 from controllers.admin.admin_offseason_spreadsheet_controller import AdminOffseasonSpreadsheetController
 from controllers.admin.admin_sitevar_controller import AdminSitevarCreate, AdminSitevarEdit, AdminSitevarList
-from controllers.admin.suggestions.admin_event_webcast_suggestions_review_controller import AdminEventWebcastSuggestionsReviewController
-from controllers.admin.suggestions.admin_match_video_suggestions_review_controller import AdminMatchVideoSuggestionsReviewController
-from controllers.admin.suggestions.admin_media_suggestions_review_controller import AdminMediaSuggestionsReviewController
 from controllers.admin.admin_team_controller import AdminTeamCreateTest, AdminTeamDetail, AdminTeamList
 from controllers.admin.admin_migration_controller import AdminMigration, AdminMigrationAddMatchYear
 from controllers.admin.admin_user_controller import AdminUserList, AdminUserEdit, AdminUserDetail
@@ -61,9 +58,6 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/sitevars', AdminSitevarList),
                                ('/admin/sitevar/create', AdminSitevarCreate),
                                ('/admin/sitevar/edit/(.*)', AdminSitevarEdit),
-                               ('/admin/suggestions/event/webcast/review', AdminEventWebcastSuggestionsReviewController),
-                               ('/admin/suggestions/match/video/review', AdminMatchVideoSuggestionsReviewController),
-                               ('/admin/suggestions/media/review', AdminMediaSuggestionsReviewController),
                                ('/admin/tasks', AdminTasksHandler),
                                ('/admin/teams', AdminTeamList),
                                ('/admin/team/create/test', AdminTeamCreateTest),
