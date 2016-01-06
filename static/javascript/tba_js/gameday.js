@@ -73,10 +73,7 @@ function setupViews() {
   }
 
   // Choosing to start chat opened or closed
-  var chatOpen = urlvars['chat'];
-  if (chatOpen != null) {
-	  setChat(true);
-  }
+  setChat(true);
 
   // Always start with ticker open
   setTicker(true);
