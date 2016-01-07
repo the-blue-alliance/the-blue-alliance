@@ -37,5 +37,5 @@ else:
         "use-compiled-templates": True
     }
 
-CONFIG['landing_handler'] = BUILDSEASON
+CONFIG['landing_handler'] = KICKOFF
 CONFIG["static_resource_version"] = 7
