@@ -85,7 +85,7 @@ function setupViews() {
     setTicker(false);
 	  setSocial(true);
 	  setupView(0, $("#kickoff-1"));
-	  $("#nav-alert-container").html('<div class="alert alert-success nav-alert"><button type="button" class="close" data-dismiss="alert">&times;</button><strong>Welcome!</strong> Remember to come back during the competition season for webcasts, scores, and more!<br /><br />Have an android phone? <a href="https://goo.gl/Y3cpqi"><u>Install The Blue Alliance app</u></a> to get live notifications when your team is competing!</div>');
+	  $("#nav-alert-container").html('<div class="alert alert-success nav-alert"><button type="button" class="close" data-dismiss="alert">&times;</button><strong>Welcome!</strong> Remember to come back during the competition season for webcasts, scores, and more!<br /><br />Have an android phone? <a href="https://goo.gl/Y3cpqi" target="_blank"><u>Install The Blue Alliance app</u></a> to get live notifications when your team is competing!</div>');
   }
 
   // Special Champs Mode
