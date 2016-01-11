@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Pending Suggestions{% endblock %}
+
+{% block content %}
+<div class="container">
+
+<h1>{{ suggestions_and_references|length }} Pending Suggestions</h1>
+
+<form action="/suggest/team/social/review" method="post">
+    <div class="col-xs-12">
+
+        <div class="row">
+            <div class="control-group">
+                <div class="controls">
+                    <a href="#" id="accept_all_button" class="btn btn-success">Select All Accepts</a>
+                    <a href="#" id="reject_all_button" class="btn btn-danger">Select All Rejects</a>
+                    <a href="#" id="deselect_all_button" class="btn btn-default">Deselect All</a>
+                </div>
+            </div>
+        </div><br>
+
+        <script>
+        $("#accept_all_button").click(function() {
+            $('.accept').prop('checked', true);
+            $('.reject').prop('checked', false);
+        });
+        $("#reject_all_button").click(function() {
+            $('.accept').prop('checked', false);
+            $('.reject').prop('checked', true);
+        });
+        $("#deselect_all_button").click(function() {
+            $('.accept').prop('checked', false);
+            $('.reject').prop('checked', false);
+        });
+        </script>
+
+        {% for suggestion, reference in suggestions_and_references %}
+        <div class="row">
+            <div class="well">
+                <div class="col-xs-2">
+                  <label class="checkbox text-success" for="accept_{{suggestion.key.id}}"><input class="accept" type="checkbox" name="accept_keys[]" id="accept_{{suggestion.key.id}}" value="{{suggestion.key.id}}"> Accept</label>
+                  <label class="checkbox text-danger" for="reject_{{suggestion.key.id}}"><input class="reject" type="checkbox" name="reject_keys[]" id="reject_{{suggestion.key.id}}" value="{{suggestion.key.id}}"> Reject</label>
+                </div>
+                <div class="col-xs-7 fitvids">
+                    <p><strong>Team {{reference.team_number}}{% if reference.nickname %} - {{reference.nickname}}{% endif %}</strong></p>
+                    {% if suggestion.contents.social_type_enum == 0 %}
+                        <p>facebook: <a href="https://facebook.com/{{ suggestion.contents.foreign_key }}" target="_blank">{{ suggestion.contents.foreign_key }}</a></p>
+                    {% else %}
+                      {% if suggestion.contents.social_type_enum == 1 %}
+                          <p>twitter: <a href="https://twitter.com/{{ suggestion.contents.foreign_key }}" target="_blank">{{ suggestion.contents.foreign_key }}</a></p>
+                      {% else %}
+                          {% if suggestion.contents.social_type_enum == 2 %}
+                              <p>youtube: <a href="https://youtube.com/user/{{ suggestion.contents.foreign_key }}" target="_blank">{{ suggestion.contents.foreign_key }}</a></p>
+                          {% else %}
+                              {% if suggestion.contents.social_type_enum == 3 %}
+                                  <p>github: <a href="https://github.com/{{ suggestion.contents.foreign_key }}" target="_blank">{{ suggestion.contents.foreign_key }}</a></p>
+                              {% endif %}
+                          {% endif %}
+                      {% endif %}
+                    {% endif %}
+
+                </div>
+                <div class="col-xs-3">
+                    <ul>
+                        <li>{{ suggestion.author.get.email }}</li>
+                        <li>{{ suggestion.author.get.nickname }}</li>
+                        <li>{{ suggestion.contents_json }}</li>
+                    </ul>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="row">
+            <div class="well">
+                <p>No suggestions! Go build more community!</p>
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="row">
+            <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-pencil"></span> Act On Selected</button>
+        </div>
+    </div>
+</form>
+</div>
+
+{% endblock %}

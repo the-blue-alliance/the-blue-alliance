@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance - Add Social Account{% endblock %}
+
+{% block meta_description %}Add a social account to The Blue Alliance.{% endblock %}
+
+{% block content %}
+<div class="container">
+  {% if success %}
+  <div class="row">
+    <div class="col-xs-12 col-lg-6 col-lg-offset-3">
+      {% if success == '1' %}
+      <div class="alert alert-success">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Thanks!</h4>
+        <p>We'll review your suggestion and get it added to the site soon!</p>
+      </div>
+      {% else %}
+      <div class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Uh oh!</h4>
+        <p>Sorry, but we are currently unable to support the URL you submitted. See below for currently supported formats.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+  <div class="row">
+    <div class="col-xs-12 col-lg-6 col-lg-offset-3">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h1 class="panel-title">Add a team's social account to The Blue Alliance!</h1>
+        </div>
+        <div class="panel-body">
+          <p>Thanks for helping make The Blue Alliance better! Let us know about a social account so we can add them to the site!</p>
+          <ul>
+            <li>Your suggestion will be reviewed by a moderator</li>
+            <li>Your account info (like {{user_bundle.user.email}} and {{user_bundle.user.nickname}}) will also be submitted. <a href="{{user_bundle.logout_url}}">log in as a different user</a></li>
+          </ul>
+
+          <hr>
+
+          <p><strong>Currently supported formats are:</strong></p>
+          <ul>
+            <li>Facebook Pages
+              <ul>
+                <li>Example: <code>http://facebook.com/theuberbots</code></li>
+              </ul>
+            </li>
+            <li>Twitter Profiles
+              <ul>
+                <li>Example: <code>https://twitter.com/team1124</code></li>
+              </ul>
+            </li>
+            <li>YouTube Profiles
+              <ul>
+                <li>Example: <code>https://www.youtube.com/user/Uberbots1124</code></li>
+              </ul>
+            </li>
+            <li>GitHub Accounts
+              <ul>
+                <li>Example: <code>https://github.com/frc1124/</code></li>
+              </ul>
+            </li>
+          </ul>
+
+          <hr>
+
+          <h3>Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h3>
+
+          {% if connections_by_type.facebook %}
+          <div class="row">
+            <div class="col-xs-12">
+              <h4>Existing Facebook Profile</h4>
+              {% for connection in connections_by_type.facebook %}
+                <div class="col-xs-6 col-sm-4">
+                {% include "social_partials/social_connection_partial.html" %}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if connections_by_type.twitter %}
+          <div class="row">
+            <div class="col-xs-12">
+              <h4>Existing Twitter Profile</h4>
+              {% for connection in connections_by_type.twitter %}
+                <div class="col-xs-12 col-md-6 fitvids">
+                {% include "social_partials/social_connection_partial.html" %}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if connections_by_type.youtube %}
+          <div class="row">
+            <div class="col-xs-12">
+              <h4>Existing YouTube Profile</h4>
+              {% for connection in connections_by_type.youtube %}
+                <div class="col-xs-12 col-md-6 fitvids">
+                {% include "social_partials/social_connection_partial.html" %}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if connections_by_type.github %}
+          <div class="row">
+            <div class="col-xs-12">
+              <h4>Existing GitHub Profile</h4>
+              {% for connection in connections_by_type.github %}
+                <div class="col-xs-12 col-md-6 fitvids">
+                {% include "social_partials/social_connection_partial.html" %}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          <hr>
+          <div class="row">
+            <div class="col-xs-12">
+              <h4>Add Social Connection</h4>
+              <form action="/suggest/team/social" method="post">
+                <input name="team_key" type="hidden" value="{{team.key.id}}" />
+                <div class="input-group">
+                  <input class="form-control" type="text" name="social_url" placeholder="https://github.com/frc1124/" value="" />
+                  <span class="input-group-btn">
+                    <button class="btn btn-success" type="submit"><span class="glyphicon glyphicon-plus-sign"></span> Add Social Account</button>
+                  </span>
+                </div>
+              </form>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

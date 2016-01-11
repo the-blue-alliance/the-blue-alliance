@@ -44,6 +44,11 @@ class AdminMain(LoggedInHandler):
             Suggestion.target_model == "media").count()
         self.template_values['media_suggestions'] = media_suggestions
 
+        social_suggestions = Suggestion.query().filter(
+            Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
+            Suggestion.target_model == "social_connection").count()
+        self.template_values['social_suggestions'] = social_suggestions
+
         # version info
         try:
             fname = os.path.join(os.path.dirname(__file__), '../../version_info.json')
