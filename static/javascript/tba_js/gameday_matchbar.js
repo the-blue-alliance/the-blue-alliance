@@ -45,7 +45,9 @@ function updateMatchbar(event_key, snapshot) {
   if (data == null) {
     match_bar.each(function() {
       $(this).html($('<div>', {'class': 'match-number', text: event_code}));
-      $(this).append($('<div>', {'class': 'match-bar-info', text: "No matches yet!"}));
+      if (event_code != 'KICKOFF') {
+        $(this).append($('<div>', {'class': 'match-bar-info', text: "No matches yet!"}));
+      }
     });
     return;
   }
