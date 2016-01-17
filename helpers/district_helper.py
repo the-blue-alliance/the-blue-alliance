@@ -2,14 +2,12 @@ import logging
 import heapq
 import math
 import numpy as np
-from sys import float_info
 
 from collections import defaultdict
 
 from google.appengine.ext import ndb
 
 from consts.award_type import AwardType
-from consts.district_type import DistrictType
 from consts.event_type import EventType
 
 from helpers.event_helper import EventHelper
@@ -26,15 +24,15 @@ class DistrictHelper(object):
     """
     @classmethod
     def inverf(cls, x):
-    	if x > 0:
-    		s = 1
-    	elif x < 0:
-    		s = -1
-    	else:
-    		s = 0
-    	a = 0.147
+        if x > 0:
+            s = 1
+        elif x < 0:
+            s = -1
+        else:
+            s = 0
+        a = 0.147
         y = s * math.sqrt((math.sqrt((((2 / (math.pi * a)) + ((math.log(1 - x**2)) / 2))**2) - ((math.log(1 - x**2)) / a))) - ((2 / (math.pi * a)) + (math.log(1 - x**2)) / 2))
-	return y
+        return y
 
     @classmethod
     def calculate_event_points(cls, event):
