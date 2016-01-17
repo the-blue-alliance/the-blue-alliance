@@ -13,6 +13,7 @@ from consts.event_type import EventType
 from helpers.event_helper import EventHelper
 
 from models.award import Award
+from models.district_team import DistrictTeam
 from models.match import Match
 
 
@@ -38,9 +39,11 @@ class DistrictHelper(object):
     def calculate_event_points(cls, event):
         match_key_futures = Match.query(Match.event == event.key).fetch_async(None, keys_only=True)
         award_key_futures = Award.query(Award.event == event.key).fetch_async(None, keys_only=True)
+        district_team_key_futures = DistrictTeam.query(DistrictTeam.district == event.event_district_enum, DistrictTeam.year == event.year).fetch_async(None, keys_only=True)
 
         match_futures = ndb.get_multi_async(match_key_futures.get_result())
         award_futures = ndb.get_multi_async(award_key_futures.get_result())
+        district_team_futures = ndb.get_multi_async(district_team_key_futures.get_result())
 
         POINTS_MULTIPLIER = 3 if event.event_type_enum == EventType.DISTRICT_CMP else 1
 
@@ -57,6 +60,7 @@ class DistrictHelper(object):
                 'highest_qual_scores': [],
             }),
         }
+        single_district_points = district_points.copy()
 
         # match points
         if event.year == 2015:
@@ -85,11 +89,20 @@ class DistrictHelper(object):
                 for team in award.team_list:
                     district_points['points'][team.id()]['award_points'] += point_value * POINTS_MULTIPLIER
 
-        for team, point_breakdown in district_points['points'].items():
-            for p in point_breakdown.values():
-                district_points['points'][team]['total'] += p
+        # Filter out teams not in this district (only keep those with a DistrictTeam present for this district)
+        for district_team_future in district_team_futures:
+            district_team = district_team_future.get_result()
+            team_key = district_team.team.id()
+            if team_key in district_points['points']:
+                single_district_points['points'][team_key] = district_points['points'][team_key]
+            if team_key in district_points['tiebreakers']:
+                single_district_points['tiebreakers'][team_key] = district_points['tiebreakers'][team_key]
 
-        return district_points
+        for team, point_breakdown in single_district_points['points'].items():
+            for p in point_breakdown.values():
+                single_district_points['points'][team]['total'] += p
+
+        return single_district_points
 
     @classmethod
     def calculate_rankings(cls, events, team_futures, year):
