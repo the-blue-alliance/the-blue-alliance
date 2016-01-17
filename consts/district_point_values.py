@@ -27,17 +27,15 @@ class DistrictPointValues(object):
     }
 
     # In years prior to 2015, teams get points for a win/tie in a qualification match
-    MATCH_WIN_DEFAULT = 2
-    MATCH_WIN = {}
-
-    MATCH_TIE_DEFAULT = 1
-    MATCH_TIE = {}
+    MATCH_WIN = 2
+    MATCH_TIE = 1
 
     # Used to determine alliance selection points
     # Captain/First pick get 17-alliance number, second pick gets 17 - draft order
     ALLIANCE_MAX_DEFAULT = 17
 
     # In 2009 - 2013 (except 2010), second pick teams got fewer elim round advancement points as captain/pick 1
+    # TODO many of these events don't have alliance selection data, so we can't factor this in
     ELIM_SECOND_PICK_MULTIPLIER_DEFAULT = 1
     ELIM_SECOND_PICK_MULTIPLIER = {
         2013: 0.8,
@@ -50,7 +48,9 @@ class DistrictPointValues(object):
     # Teams on each round's winning alliance gets points per match won
     # For the 2015 game, these are awarded for participating in a qf/sf match, since there were no wins
     QF_WIN_DEFAULT = 5
-    QF_WIN = {}
+    QF_WIN = {
+        2015: 5.0
+    }
 
     SF_WIN_DEFAULT = 5
     SF_WIN = {
@@ -58,7 +58,9 @@ class DistrictPointValues(object):
     }
 
     F_WIN_DEFAULT = 5
-    F_WIN = {}
+    F_WIN = {
+        2015: 5.0
+    }
 
     # Chairman's Award
     CHAIRMANS_DEFAULT = 10
@@ -70,8 +72,7 @@ class DistrictPointValues(object):
     }
 
     # Engineering Inspiration and Rookie All-Star
-    EI_DEFAULT = 8
-    RAS_DEFAULT = 8
+    EI_AND_RAS_DEFAULT = 8
     OTHER_AWARD_DEFAULT = 5
 
     # Pre-2014 Awards, all worth either 5 or 2 points

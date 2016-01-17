@@ -8,6 +8,7 @@ from collections import defaultdict
 from google.appengine.ext import ndb
 
 from consts.award_type import AwardType
+from consts.district_point_values import DistrictPointValues
 from consts.event_type import EventType
 
 from helpers.event_helper import EventHelper
@@ -45,7 +46,8 @@ class DistrictHelper(object):
         award_futures = ndb.get_multi_async(award_key_futures.get_result())
         district_team_futures = ndb.get_multi_async(district_team_key_futures.get_result())
 
-        POINTS_MULTIPLIER = 3 if event.event_type_enum == EventType.DISTRICT_CMP else 1
+        # Typically 3 for District CMP, 1 otherwise
+        POINTS_MULTIPLIER = DistrictPointValues.DISTRICT_CMP_MULTIPLIER.get(event.year, DistrictPointValues.DISTRICT_CMP_MULIPLIER_DEFAULT) if event.event_type_enum == EventType.DISTRICT_CMP else DistrictPointValues.STANDARD_MULTIPLIER
 
         district_points = {
             'points': defaultdict(lambda: {
@@ -79,15 +81,24 @@ class DistrictHelper(object):
         # award points
         for award_future in award_futures:
             award = award_future.get_result()
-            if award.award_type_enum not in AwardType.NON_JUDGED_NON_TEAM_AWARDS:
-                if award.award_type_enum == AwardType.CHAIRMANS:
-                    point_value = 10
-                elif award.award_type_enum in {AwardType.ENGINEERING_INSPIRATION, AwardType.ROOKIE_ALL_STAR}:
-                    point_value = 8
-                else:
+            point_value = 0
+            if event.year >= 2014:
+                if award.award_type_enum not in AwardType.NON_JUDGED_NON_TEAM_AWARDS:
+                    if award.award_type_enum == AwardType.CHAIRMANS:
+                        point_value = DistrictPointValues.CHAIRMANS.get(event.year, DistrictPointValues.CHAIRMANS_DEFAULT)
+                    elif award.award_type_enum in {AwardType.ENGINEERING_INSPIRATION, AwardType.ROOKIE_ALL_STAR}:
+                        point_value = DistrictPointValues.EI_AND_RAS_DEFAULT
+                    else:
+                        point_value = DistrictPointValues.OTHER_AWARD_DEFAULT
+            else:  # Legacy awards
+                if award.award_type_enum in DistrictPointValues.LEGACY_5_PT_AWARDS.get(event.year, []):
                     point_value = 5
-                for team in award.team_list:
-                    district_points['points'][team.id()]['award_points'] += point_value * POINTS_MULTIPLIER
+                elif award.award_type_enum in DistrictPointValues.LEGACY_2_PT_AWARDS.get(event.year, []):
+                    point_value = 2
+
+            # Add award points to all teams who won
+            for team in award.team_list:
+                district_points['points'][team.id()]['award_points'] += point_value * POINTS_MULTIPLIER
 
         # Filter out teams not in this district (only keep those with a DistrictTeam present for this district)
         for district_team_future in district_team_futures:
@@ -169,30 +180,39 @@ class DistrictHelper(object):
             if not match.has_been_played:
                 continue
 
-            if match.comp_level == 'qm':
-                if match.winning_alliance == '':
+            if match.comp_level == 'qm':  # Qual match points
+                if match.winning_alliance == '':  # Match is a tie
                     for team in match.team_key_names:
-                        district_points['points'][team]['qual_points'] += 1 * POINTS_MULTIPLIER
-                else:
+                        district_points['points'][team]['qual_points'] += DistrictPointValues.MATCH_TIE * POINTS_MULTIPLIER
+                else:  # Somebody won the match
                     for team in match.alliances[match.winning_alliance]['teams']:
-                        district_points['points'][team]['qual_points'] += 2 * POINTS_MULTIPLIER
+                        district_points['points'][team]['qual_points'] += DistrictPointValues.MATCH_WIN * POINTS_MULTIPLIER
                         district_points['tiebreakers'][team]['qual_wins'] += 1
 
                 for color in ['red', 'blue']:
                     for team in match.alliances[color]['teams']:
                         score = match.alliances[color]['score']
                         district_points['tiebreakers'][team]['highest_qual_scores'] = heapq.nlargest(3, district_points['tiebreakers'][team]['highest_qual_scores'] + [score])
-            else:
+            else:  # Elim match points
                 if match.winning_alliance == '':
+                    # Skip unplayed matches
                     continue
 
                 match_set_key = '{}_{}{}'.format(match.event.id(), match.comp_level, match.set_number)
                 elim_num_wins[match_set_key][match.winning_alliance] += 1
                 elim_alliances[match_set_key][match.winning_alliance] += match.alliances[match.winning_alliance]['teams']
 
+                # Add in points for elim match wins. Probably doesn't account for backup bots well
                 if elim_num_wins[match_set_key][match.winning_alliance] >= 2:
                     for team in elim_alliances[match_set_key][match.winning_alliance]:
-                        district_points['points'][team]['elim_points'] += 5 * POINTS_MULTIPLIER
+                        point_value = 0
+                        if match.comp_level == 'qf':
+                            point_value = DistrictPointValues.QF_WIN.get(match.year, DistrictPointValues.QF_WIN_DEFAULT) * POINTS_MULTIPLIER
+                        elif match.comp_level == 'sf':
+                            point_value = DistrictPointValues.SF_WIN.get(match.year, DistrictPointValues.SF_WIN_DEFAULT) * POINTS_MULTIPLIER
+                        elif match.comp_level == 'f':
+                            point_value = DistrictPointValues.F_WIN.get(match.year, DistrictPointValues.F_WIN_DEFAULT) * POINTS_MULTIPLIER
+                        district_points['points'][team]['elim_points'] += point_value
 
     @classmethod
     def calc_rank_based_match_points(cls, event, district_points, match_futures, POINTS_MULTIPLIER):
@@ -249,7 +269,7 @@ class DistrictHelper(object):
                     for color in ['red', 'blue']:
                         if set(teams).intersection(set(match.alliances[color]['teams'])) != set():
                             for team in teams:
-                                points = 5.0 if last_level == 'qf' else 3.3
+                                points = DistrictPointValues.QF_WIN.get(event.year, DistrictPointValues.QF_WIN_DEFAULT) if last_level == 'qf' else DistrictPointValues.SF_WIN.get(event.year, DistrictPointValues.SF_WIN_DEFAULT)
                                 district_points['points'][team]['elim_points'] += int(
                                     np.ceil(points * num_played[last_level][team])) * POINTS_MULTIPLIER
                             done = True
@@ -271,5 +291,6 @@ class DistrictHelper(object):
                 team_matches_played[match.winning_alliance].append(team)
 
             if num_wins[match.winning_alliance] >= 2:
+                points = DistrictPointValues.F_WIN.get(event.year, DistrictPointValues.F_WIN_DEFAULT)
                 for team in team_matches_played[match.winning_alliance]:
-                    district_points['points'][team]['elim_points'] += 5 * POINTS_MULTIPLIER
+                    district_points['points'][team]['elim_points'] += points * POINTS_MULTIPLIER

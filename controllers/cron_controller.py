@@ -434,9 +434,6 @@ class DistrictPointsCalcDo(webapp.RequestHandler):
         if event.event_district_enum == DistrictType.NO_DISTRICT:
             self.response.out.write("Can't calculate district points for a non-district event!")
             return
-        if event.year < 2014:
-            self.response.out.write("Can't calculate district points for events before 2014!")  # TODO: implement correct points for pre-2014 districts
-            return
 
         district_points = DistrictHelper.calculate_event_points(event)
 
