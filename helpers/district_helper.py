@@ -70,9 +70,9 @@ class DistrictHelper(object):
 
         # alliance points
         if event.alliance_selections:
-            selection_points = EventHelper.alliance_selections_to_points(event.alliance_selections)
+            selection_points = EventHelper.alliance_selections_to_points(event.key_name, POINTS_MULTIPLIER, event.alliance_selections)
             for team, points in selection_points.items():
-                district_points['points'][team]['alliance_points'] += points * POINTS_MULTIPLIER
+                district_points['points'][team]['alliance_points'] += points
         else:
             logging.warning("Event {} has no alliance selection district_points!".format(event.key.id()))
 
