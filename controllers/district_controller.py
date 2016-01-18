@@ -23,7 +23,7 @@ from models.team import Team
 
 class DistrictDetail(CacheableHandler):
     CACHE_KEY_FORMAT = "district_detail_{}_{}_{}"  # (district_abbrev, year, explicit_year)
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
 
     def __init__(self, *args, **kw):
         super(DistrictDetail, self).__init__(*args, **kw)
@@ -67,18 +67,14 @@ class DistrictDetail(CacheableHandler):
 
         event_futures = ndb.get_multi_async(event_keys)
         event_team_keys_future = EventTeam.query(EventTeam.event.IN(event_keys)).fetch_async(None, keys_only=True)
-        if year >= 2014:  # TODO: only 2014+ has accurate rankings calculations
-            team_futures = ndb.get_multi_async(set([ndb.Key(Team, et_key.id().split('_')[1]) for et_key in event_team_keys_future.get_result()]))
+        team_futures = ndb.get_multi_async(set([ndb.Key(Team, et_key.id().split('_')[1]) for et_key in event_team_keys_future.get_result()]))
 
         events = [event_future.get_result() for event_future in event_futures]
         EventHelper.sort_events(events)
 
         district_cmp_futures = ndb.get_multi_async(district_cmp_keys_future.get_result())
 
-        if year >= 2014:  # TODO: only 2014+ has accurate rankings calculations
-            team_totals = DistrictHelper.calculate_rankings(events, team_futures, year)
-        else:
-            team_totals = None
+        team_totals = DistrictHelper.calculate_rankings(events, team_futures, year)
 
         valid_districts = set()
         for district_cmp_future in district_cmp_futures:
