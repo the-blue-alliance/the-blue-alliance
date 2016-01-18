@@ -65,7 +65,8 @@ class DistrictHelper(object):
         single_district_points = district_points.copy()
 
         # match points
-        if event.year == 2015:
+        if event.year >= 2015:
+            # Switched to ranking-based points for 2015 and onward
             cls.calc_rank_based_match_points(event, district_points, match_futures, POINTS_MULTIPLIER)
         else:
             cls.calc_wlt_based_match_points(district_points, match_futures, POINTS_MULTIPLIER)
