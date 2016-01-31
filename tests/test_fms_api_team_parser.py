@@ -79,3 +79,32 @@ class TestFMSAPITeamParser(unittest2.TestCase):
             self.assertEqual(robot.key_name, "frc254_2015")
             self.assertEqual(robot.team.id(), "frc254")
             self.assertEqual(robot.robot_name, "Deadlift")
+
+    def test_parseTeamWebsites(self):
+        # Modify the websites to some known bad ones, and ensure the parser can recover
+        bad_websites = [None, '', 'www.firstinspires.org', 'website.com', 'www.website.com', 'http://website.com',
+                        'https://website.com', 'ftp://website.com']
+        expected_sites = [None, None, None, 'http:///website.com', 'http:///www.website.com', 'http://website.com',
+                          'https://website.com', 'ftp://website.com']
+        # When urllib prepends the scheme, it'll add three slashes because of how its parsed.
+        # Browsers won't care about the extra /, so it shouldn't be an issue
+        # http://stackoverflow.com/questions/7289481/urlparse-urlparse-returning-3-instead-of-2-after-scheme
+        with open('test_data/fms_api/2015_frc1124.json', 'r') as f:
+            team_data = json.loads(f.read())
+            for site, expected in zip(bad_websites, expected_sites):
+                team_data['teams'][0]['website'] = site
+                models, more_pages = FMSAPITeamDetailsParser(2015).parse(team_data)
+
+                self.assertFalse(more_pages)
+                self.assertEqual(len(models), 1)
+
+                team, districtTeam, robot = models[0]
+
+                # Ensure we get the proper Team model back
+                self.assertEqual(team.key_name, "frc1124")
+                self.assertEqual(team.team_number, 1124)
+                self.assertEqual(team.name, "Avon Public Schools/UTC & AVON HIGH SCHOOL")
+                self.assertEqual(team.nickname, "UberBots")
+                self.assertEqual(team.address, "Avon, Connecticut, USA")
+                self.assertEqual(team.rookie_year, 2003)
+                self.assertEqual(team.website, expected)

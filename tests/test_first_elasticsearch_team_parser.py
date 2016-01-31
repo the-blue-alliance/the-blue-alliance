@@ -43,3 +43,15 @@ class TestFIRSTElasticSearchTeamParser(unittest2.TestCase):
                     self.assertEqual(team.first_tpid, 357405)
                     self.assertEqual(team.first_tpid_year, 2015)
                     self.assertEqual(team.motto, "It will work - because it has to.")
+
+                # A team who doesn't have 'http' starting their website
+                if team.key.id() == 'frc4990':
+                    self.assertEqual(team.key_name, "frc4990")
+                    self.assertEqual(team.team_number, 4990)
+                    self.assertEqual(team.nickname, "Gryphon Robotics")
+                    self.assertEqual(team.address, "Hillsborough, CA, USA")
+                    self.assertEqual(team.rookie_year, 2014)
+                    self.assertEqual(team.website, "http:///gryphonrobotics.org")
+                    self.assertEqual(team.first_tpid, 361441)
+                    self.assertEqual(team.first_tpid_year, 2015)
+                    self.assertEqual(team.motto, None)
