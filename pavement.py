@@ -11,11 +11,17 @@ path = path("./")
 def deploy():
     sh("python deploy.py")
 
+
 @task
 def javascript():
     """Combine Compress Javascript"""
     print("Combining and Compressing Javascript")
     sh("python do_compress.py js")
+
+
+@task
+def jinja2():
+    sh("python compile_jinja2_templates.py")
 
 
 @task
@@ -25,11 +31,6 @@ def less():
     sh("lessc static/css/less_css/tba_style.main.less static/css/less_css/tba_style.main.css")
     sh("lessc static/css/less_css/tba_style.gameday.less static/css/less_css/tba_style.gameday.css")
     sh("python do_compress.py css")
-
-
-@task
-def jinja2():
-    sh("python compile_jinja2_templates.py")
 
 
 @task
