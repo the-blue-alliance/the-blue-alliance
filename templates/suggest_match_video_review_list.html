@@ -20,21 +20,6 @@
                 </div>
             </div><br>
 
-            <script>
-            $("#accept_all_button").click(function() {
-                $('.accept').prop('checked', true);
-                $('.reject').prop('checked', false);
-            });
-            $("#reject_all_button").click(function() {
-                $('.accept').prop('checked', false);
-                $('.reject').prop('checked', true);
-            });
-            $("#deselect_all_button").click(function() {
-                $('.accept').prop('checked', false);
-                $('.reject').prop('checked', false);
-            });
-            </script>
-
             {% for suggestion in suggestions %}
             <div class="row">
                 <div class="well">
@@ -71,5 +56,21 @@
         </div>
     </form>
 </div>
+{% endblock %}
 
+{% block inline_javascript %}
+<script>
+$("#accept_all_button").click(function() {
+    $('.accept').prop('checked', true);
+    $('.reject').prop('checked', false);
+});
+$("#reject_all_button").click(function() {
+    $('.accept').prop('checked', false);
+    $('.reject').prop('checked', true);
+});
+$("#deselect_all_button").click(function() {
+    $('.accept').prop('checked', false);
+    $('.reject').prop('checked', false);
+});
+</script>
 {% endblock %}
