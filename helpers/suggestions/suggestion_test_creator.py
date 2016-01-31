@@ -1,4 +1,5 @@
 from helpers.media_helper import MediaParser
+from helpers.suggestions.suggestion_creator import SuggestionCreator
 from helpers.user_bundle import UserBundle
 
 from models.event import Event
@@ -16,20 +17,12 @@ class SuggestionTestCreator(object):
         user_bundle = UserBundle()
         team = Team.query().fetch(1)[0]
 
-        media_dict = MediaParser.partial_media_dict_from_url(self.YOUTUBE_URL)
-        if media_dict is not None:
-            existing_media = Media.get_by_id(Media.render_key_name(media_dict['media_type_enum'], media_dict['foreign_key']))
-            if existing_media is None or team_key not in [reference.id() for reference in existing_media.references]:
-                media_dict['year'] = 2016
-                media_dict['reference_type'] = 'team'
-                media_dict['reference_key'] = team.key_name
+        SuggestionCreator.createTeamMediaSuggestion(
+            author_account_key=user_bundle.account.key,
+            media_url=self.YOUTUBE_URL,
+            team_key=team.key_name,
+            year_str="2016")
 
-                suggestion = Suggestion(
-                    author=user_bundle.account.key,
-                    target_model="media",
-                    )
-                suggestion.contents = media_dict
-                suggestion.put()
 
     @classmethod
     def createMatchVideoSuggestion(self):

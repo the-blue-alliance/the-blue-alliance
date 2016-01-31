@@ -4,9 +4,11 @@ from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
+
 from helpers.media_helper import MediaHelper, MediaParser
+from helpers.suggestions.suggestion_creator import SuggestionCreator
+
 from models.media import Media
-from models.suggestion import Suggestion
 from models.team import Team
 
 
@@ -47,21 +49,11 @@ class SuggestTeamMediaController(LoggedInHandler):
         team_key = self.request.get("team_key")
         year_str = self.request.get("year")
 
-        success_code = 0
-        media_dict = MediaParser.partial_media_dict_from_url(self.request.get('media_url').strip())
-        if media_dict is not None:
-            existing_media = Media.get_by_id(Media.render_key_name(media_dict['media_type_enum'], media_dict['foreign_key']))
-            if existing_media is None or team_key not in [reference.id() for reference in existing_media.references]:
-                media_dict['year'] = int(year_str)
-                media_dict['reference_type'] = 'team'
-                media_dict['reference_key'] = team_key
+        success = SuggestionCreator.createTeamMediaSuggestion(
+            author_account_key=self.user_bundle.account.key,
+            media_url=self.request.get("media_url"),
+            team_key=team_key,
+            year_str=year_str)
 
-                suggestion = Suggestion(
-                    author=self.user_bundle.account.key,
-                    target_model="media",
-                    )
-                suggestion.contents = media_dict
-                suggestion.put()
-            success_code = 1
 
-        self.redirect('/suggest/team/media?team_key=%s&year=%s&success=%s' % (team_key, year_str, success_code))
+        self.redirect('/suggest/team/media?team_key=%s&year=%s&success=%s' % (team_key, year_str, success))
