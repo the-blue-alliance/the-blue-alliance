@@ -3,7 +3,6 @@ import datetime
 import json
 import pytz
 import re
-import urlparse
 
 from consts.district_type import DistrictType
 from consts.event_type import EventType
@@ -307,12 +306,3 @@ class Event(ndb.Model):
     @property
     def display_name(self):
         return self.name if self.short_name is None else self.short_name
-
-    @property
-    def normalized_website(self):
-        """
-        Returns the event website with a default url scheme
-        In order to avoid situations like #1339
-        """
-        url = urlparse.urlparse(self.website, 'http')
-        return url.geturl()

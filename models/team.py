@@ -1,6 +1,5 @@
 import logging
 import re
-import urlparse
 
 from google.appengine.ext import ndb
 
@@ -109,12 +108,3 @@ class Team(ndb.Model):
         if (self.motto[0] == self.motto[-1]) and self.motto.startswith(("'", '"')):
             return self.motto[1:-1]
         return self.motto
-
-    @property
-    def normalized_website(self):
-        """
-        Returns the team website with a default url scheme
-        In order to avoid situations like #1339
-        """
-        url = urlparse.urlparse(self.website, 'http')
-        return url.geturl()
