@@ -49,7 +49,7 @@ Setup
 1. Install [Node.js](https://nodejs.org/) which includes [Node Package Manager](https://www.npmjs.org/)
 1. Install LESS, which we use to build our CSS files, via Node Package Manager
   * `npm install -g less`
-1. Install Jinja, which we use to build some of our HMTL template files
+1. Install Jinja, which we use to build some of our HTML template files
   * `pip install jinja2`
   * or `easy_install jinja2`
 1. Install Paver, which we use to help run commands to build static files (like LESS and Jinja)
