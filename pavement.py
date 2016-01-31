@@ -8,8 +8,10 @@ from paver.easy import *
 path = path("./")
 
 @task
-def deploy():
-    sh("python deploy.py")
+@consume_args
+def deploy(args):
+    sh("python deploy.py " + " ".join(args))
+
 
 @task
 def javascript():
@@ -19,17 +21,17 @@ def javascript():
 
 
 @task
+def jinja2():
+    sh("python compile_jinja2_templates.py")
+
+
+@task
 def less():
     """Build and Combine CSS"""
     print("Building and Combining CSS")
     sh("lessc static/css/less_css/tba_style.main.less static/css/less_css/tba_style.main.css")
     sh("lessc static/css/less_css/tba_style.gameday.less static/css/less_css/tba_style.gameday.css")
     sh("python do_compress.py css")
-
-
-@task
-def jinja2():
-    sh("python compile_jinja2_templates.py")
 
 
 @task
