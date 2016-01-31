@@ -8,8 +8,9 @@ from paver.easy import *
 path = path("./")
 
 @task
-def deploy():
-    sh("python deploy.py")
+@consume_args
+def deploy(args):
+    sh("python deploy.py " + " ".join(args))
 
 
 @task
