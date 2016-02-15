@@ -12,7 +12,7 @@ from models.sitevar import Sitevar
 class FirebasePusher(object):
 
     FIREHOSE_FEED = 'notifications'  # all the notifications
-    EVENT_FEED = 'event/{}'  # format with event key
+    EVENT_FEED = 'events/{}/notifications'  # format with event key
     DISTRICT_FEED = 'district/{}'  # format with district abbrev
 
     @classmethod
