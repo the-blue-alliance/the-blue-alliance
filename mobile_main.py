@@ -10,15 +10,19 @@ from protorpc import message_types
 import tba_config
 
 from consts.client_type import ClientType
+from helpers.media_helper import MediaParser
 from helpers.push_helper import PushHelper
 from helpers.mytba_helper import MyTBAHelper
 from models.account import Account
 from models.favorite import Favorite
+from models.media import Media
 from models.sitevar import Sitevar
 from models.subscription import Subscription
 from models.mobile_api_messages import BaseResponse, FavoriteCollection, FavoriteMessage, RegistrationRequest, \
-                                       SubscriptionCollection, SubscriptionMessage, ModelPreferenceMessage
+                                       SubscriptionCollection, SubscriptionMessage, ModelPreferenceMessage, \
+                                       MediaSuggestionMessage
 from models.mobile_client import MobileClient
+from models.suggestion import Suggestion
 
 client_id_sitevar = Sitevar.get_by_id('appengine.webClientId')
 if client_id_sitevar is None:
@@ -43,7 +47,7 @@ if tba_config.DEBUG:
 # To enable iOS access, add it's client ID here
 
 
-@endpoints.api(name='tbaMobile', version='v9', description="API for TBA Mobile clients",
+@endpoints.api(name='tbaMobile', version='v10', description="API for TBA Mobile clients",
                allowed_client_ids=client_ids,
                audiences=[ANDROID_AUDIENCE],
                scopes=[endpoints.EMAIL_SCOPE])
@@ -225,5 +229,43 @@ class MobileAPI(remote.Service):
                     model_type=subscription.model_type))
         return SubscriptionCollection(subscriptions=output)
 
+    @endpoints.method(MediaSuggestionMessage, BaseResponse,
+                      path='team/media/suggest', http_method='POST',
+                      name='team.media.suggestion')
+    def suggest_team_media(self, request):
+        current_user = endpoints.get_current_user()
+        if current_user is None:
+            return BaseResponse(code=401, message="Unauthorized to make suggestions")
+        user_id = PushHelper.user_email_to_id(current_user.email())
+
+        # For now, only allow team media suggestions
+        if request.reference_type != "team":
+            # Trying to suggest a media for an invalid model type
+            return BaseResponse(code=400, message="Bad model type")
+
+        media_dict = MediaParser.partial_media_dict_from_url(request.media_url.strip())
+        if media_dict is not None:
+            existing_media = Media.get_by_id(
+                    Media.render_key_name(media_dict['media_type_enum'], media_dict['foreign_key']))
+            if existing_media is None \
+                    or request.reference_key not in [reference.id() for reference in existing_media.references]:
+                media_dict['year'] = request.year
+                media_dict['reference_type'] = request.reference_type
+                media_dict['reference_key'] = request.reference_key
+                if request.details_json:
+                    media_dict['details_json'] = request.details_json
+
+                suggestion = Suggestion(
+                    author=ndb.Key(Account, user_id),
+                    target_model="media"
+                )
+                suggestion.contents = media_dict
+                suggestion.put()
+
+                return BaseResponse(code=200, message="Suggestion added")
+            else:
+                return BaseResponse(code=304, message="Suggestion already exists")
+        else:
+            return BaseResponse(code=400, message="Bad suggestion url")
 
 app = endpoints.api_server([MobileAPI])
