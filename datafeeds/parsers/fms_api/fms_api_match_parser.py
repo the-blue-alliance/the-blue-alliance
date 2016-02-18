@@ -25,12 +25,6 @@ LAST_LEVEL = {
 TIME_PATTERN = "%Y-%m-%dT%H:%M:%S"
 
 
-def camel_to_snake(s):
-    # From https://stackoverflow.com/questions/1175208/elegant-python-function-to-convert-camelcase-to-camel-case
-    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', s)
-    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
-
-
 def get_comp_level(match_level, match_number):
     if match_level == 'Qualification':
         return 'qm'
@@ -205,7 +199,7 @@ class FMSAPIMatchDetailsParser(object):
                 color = alliance['alliance'].lower()
                 for key, value in alliance.items():
                     if key != 'alliance':
-                        breakdown[color][camel_to_snake(key)] = value
+                        breakdown[color][key] = value
 
             match_details_by_key[Match.renderKeyName(
                 '{}{}'.format(self.year, self.event_short),
