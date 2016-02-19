@@ -68,10 +68,12 @@ class MainBuildseasonHandler(CacheableHandler):
     def _render(self, *args, **kw):
         endbuild_datetime_est = datetime.datetime(2016, 2, 23, 23, 59)
         endbuild_datetime_utc = endbuild_datetime_est + datetime.timedelta(hours=5)
+        week_events = EventHelper.getWeekEvents()
 
         self.template_values.update({
             'endbuild_datetime_est': endbuild_datetime_est,
-            'endbuild_datetime_utc': endbuild_datetime_utc
+            'endbuild_datetime_utc': endbuild_datetime_utc,
+            'events': week_events,
         })
 
         path = os.path.join(os.path.dirname(__file__), "../templates/index_buildseason.html")
