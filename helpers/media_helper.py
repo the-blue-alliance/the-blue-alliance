@@ -22,7 +22,7 @@ class MediaHelper(object):
 
     @classmethod
     def get_images(cls, medias):
-        return [media for media in medias if media.media_type_enum in MediaType.image_types ]
+        return [media for media in medias if media.media_type_enum in MediaType.image_types]
 
 
 class MediaParser(object):
@@ -118,7 +118,7 @@ class MediaParser(object):
         # Fix by removing all instances of the photo title from the HTML
         photo_title = soup.find('div', {'id': 'cdm_single_photo_title'}).text
         cleaned_soup = BeautifulSoup(html.replace(photo_title, ''),
-                             convertEntities=BeautifulSoup.HTML_ENTITIES)
+                                     convertEntities=BeautifulSoup.HTML_ENTITIES)
 
         element = cleaned_soup.find('a', {'target': 'cdmLargePic'})
         if element is not None:
