@@ -47,7 +47,7 @@ if tba_config.DEBUG:
 # To enable iOS access, add it's client ID here
 
 
-@endpoints.api(name='tbaMobile', version='v10', description="API for TBA Mobile clients",
+@endpoints.api(name='tbaMobile', version='v9', description="API for TBA Mobile clients",
                allowed_client_ids=client_ids,
                audiences=[ANDROID_AUDIENCE],
                scopes=[endpoints.EMAIL_SCOPE])
