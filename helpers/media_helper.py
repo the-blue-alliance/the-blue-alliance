@@ -20,10 +20,15 @@ class MediaHelper(object):
                 medias_by_slugname[slugname] = [media]
         return medias_by_slugname
 
+    @classmethod
+    def get_images(cls, medias):
+        return [media for media in medias if media.media_type_enum in MediaType.image_types]
+
 
 class MediaParser(object):
     CD_PHOTO_THREAD_URL_PATTERNS = ['chiefdelphi.com/media/photos/']
     YOUTUBE_URL_PATTERNS = ['youtube.com', 'youtu.be']
+    IMGUR_URL_PATTERNS = ['imgur.com/']
 
     @classmethod
     def partial_media_dict_from_url(cls, url):
@@ -34,6 +39,8 @@ class MediaParser(object):
             return cls._partial_media_dict_from_cd_photo_thread(url)
         elif any(s in url for s in cls.YOUTUBE_URL_PATTERNS):
             return cls._partial_media_dict_from_youtube(url)
+        elif any(s in url for s in cls.IMGUR_URL_PATTERNS):
+            return cls._partial_media_dict_from_imgur(url)
         else:
             logging.warning("Failed to determine media type from url: {}".format(url))
             return None
@@ -74,6 +81,17 @@ class MediaParser(object):
         return media_dict
 
     @classmethod
+    def _partial_media_dict_from_imgur(cls, url):
+        media_dict = {}
+        media_dict['media_type_enum'] = MediaType.IMGUR
+        foreign_key = cls._parse_imgur_foreign_key(url)
+        if foreign_key is None:
+            logging.warning("Failed to determine imgur foreign key from url {}".format(url))
+            return None
+        media_dict['foreign_key'] = foreign_key
+        return media_dict
+
+    @classmethod
     def _parse_cdphotothread_foreign_key(cls, url):
         regex1 = re.match(r'.*chiefdelphi.com\/media\/photos\/(\d+)', url)
         if regex1 is not None:
@@ -100,7 +118,7 @@ class MediaParser(object):
         # Fix by removing all instances of the photo title from the HTML
         photo_title = soup.find('div', {'id': 'cdm_single_photo_title'}).text
         cleaned_soup = BeautifulSoup(html.replace(photo_title, ''),
-                             convertEntities=BeautifulSoup.HTML_ENTITIES)
+                                     convertEntities=BeautifulSoup.HTML_ENTITIES)
 
         element = cleaned_soup.find('a', {'target': 'cdmLargePic'})
         if element is not None:
@@ -131,3 +149,15 @@ class MediaParser(object):
             return None
         else:
             return youtube_id
+
+    @classmethod
+    def _parse_imgur_foreign_key(cls, url):
+        # Check imgur.com urls
+        regex = re.match(r".*imgur.com\/(\w+)\/?\Z", url)
+
+        if regex:
+            return regex.group(1)
+
+        # Check i.imgur.com/asdf.{jpg,png,whatever} direct image urls
+        regex = re.match(r".*imgur.com\/(\w+)\.\w+\Z", url)
+        return regex.group(1) if regex else None

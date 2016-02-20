@@ -53,10 +53,14 @@
                         <a href="http://www.chiefdelphi.com/media/photos/{{suggestion.contents.foreign_key}}" target="_blank">
                           <img class="img-thumbnail" src="http://www.chiefdelphi.com/media/img/{{suggestion.details.thumbnail}}" style="max-height: 150px;">
                         </a>
-                      {% else %}
-                        {% if suggestion.contents.media_type_enum == 0 %}
-                          <iframe width="320" height="180" src="https://www.youtube.com/embed/{{suggestion.contents.foreign_key}}" frameborder="0" allowfullscreen></iframe>
-                        {% endif %}
+                      {% endif %}
+                      {% if suggestion.contents.media_type_enum == 0 %}
+                        <iframe width="320" height="180" src="https://www.youtube.com/embed/{{suggestion.contents.foreign_key}}" frameborder="0" allowfullscreen></iframe>
+                      {% endif %}
+                      {% if suggestion.contents.media_type_enum == 2 %}
+                        <a href="http://imgur.com/{{suggestion.contents.foreign_key}}" target="_blank">
+                          <img class="img-thumbnail" src="http://i.imgur.com/{{suggestion.contents.foreign_key}}.jpg" style="max-height: 150px;">
+                        </a>
                       {% endif %}
 
                   </div>

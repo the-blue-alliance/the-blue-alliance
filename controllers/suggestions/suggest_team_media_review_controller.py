@@ -27,7 +27,8 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
                 suggestion.contents['reference_key']))
             if 'details_json' in suggestion.contents:
                 suggestion.details = json.loads(suggestion.contents['details_json'])
-                suggestion.details['thumbnail'] = suggestion.details['image_partial'].replace('_l', '_m')
+                if 'image_partial' in suggestion.details:
+                    suggestion.details['thumbnail'] = suggestion.details['image_partial'].replace('_l', '_m')
 
         reference_futures = ndb.get_multi_async(reference_keys)
         references = map(lambda r: r.get_result(), reference_futures)
