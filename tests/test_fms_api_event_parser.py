@@ -113,7 +113,7 @@ class TestFMSAPIEventParser(unittest2.TestCase):
 
     def test_parseEventRankings(self):
         with open('test_data/fms_api/2015waamv_staging_rankings.json', 'r') as f:
-            rankings = FMSAPIEventRankingsParser().parse(json.loads(f.read()))
+            rankings = FMSAPIEventRankingsParser(2015).parse(json.loads(f.read()))
 
         self.assertEqual(
             rankings,

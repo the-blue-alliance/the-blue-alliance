@@ -162,7 +162,7 @@ class DatafeedFMSAPI(object):
         year = int(event_key[:4])
         event_short = event_key[4:]
 
-        rankings = self._parse(self.FMS_API_EVENT_RANKINGS_URL_PATTERN % (year, self._get_event_short(event_short)), FMSAPIEventRankingsParser())
+        rankings = self._parse(self.FMS_API_EVENT_RANKINGS_URL_PATTERN % (year, self._get_event_short(event_short)), FMSAPIEventRankingsParser(year))
         return rankings
 
     def getTeamDetails(self, year, team_key):
