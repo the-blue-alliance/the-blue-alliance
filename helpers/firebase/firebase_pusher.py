@@ -76,7 +76,7 @@ class FirebasePusher(object):
         deferred.defer(cls._push_data, cls.FIREHOSE_FEED, payload_data_json, _queue="firebase")
 
         if notification._event_feed:
-            deferred.defer(cls._push_data, cls.EVENT_FEED.format(notification.event_feed), payload_data_json, _queue="firebase")
+            deferred.defer(cls._push_data, cls.EVENT_FEED.format(notification._event_feed), payload_data_json, _queue="firebase")
 
         if notification._district_feed:
-            deferred.defer(cls._push_data, cls.DISTRICT_FEED.format(notification.district_feed), payload_data_json, _queue="firebase")
+            deferred.defer(cls._push_data, cls.DISTRICT_FEED.format(notification._district_feed), payload_data_json, _queue="firebase")
