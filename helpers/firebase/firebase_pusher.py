@@ -12,8 +12,8 @@ from models.sitevar import Sitevar
 class FirebasePusher(object):
 
     FIREHOSE_FEED = 'notifications'  # all the notifications
-    EVENT_FEED = 'event/{}'  # format with event key
-    DISTRICT_FEED = 'district/{}'  # format with district abbrev
+    EVENT_FEED = 'events/{}/notifications'  # format with event key
+    DISTRICT_FEED = 'district/{}/notifications'  # format with district abbrev
 
     @classmethod
     def _get_secret(cls):
