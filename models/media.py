@@ -28,6 +28,7 @@ class Media(ndb.Model):
     foreign_key = ndb.StringProperty(required=True)  # Unique id for the particular media type. Ex: the Youtube Video key at the end of a YouTube url
 
     details_json = ndb.StringProperty()  # Additional details required for rendering
+    private_details_json = ndb.StringProperty()  # Additional properties we don't want to expose via API
     year = ndb.IntegerProperty()  # None if year is not relevant
     references = ndb.KeyProperty(repeated=True)  # Other models that are linked to this object
 
@@ -42,6 +43,7 @@ class Media(ndb.Model):
             'year': set(),
         }
         self._details = None
+        self._private_details = None
         super(Media, self).__init__(*args, **kw)
 
     @property
@@ -49,6 +51,12 @@ class Media(ndb.Model):
         if self._details is None and self.details_json is not None:
             self._details = json.loads(self.details_json)
         return self._details
+
+    @property
+    def private_details(self):
+        if self._private_details is None and self.private_details_json is not None:
+            self._private_details = json.loads(self.private_details_json)
+        return self._private_details
 
     @classmethod
     def create_reference(self, reference_type, reference_key):
