@@ -1,3 +1,5 @@
+import urlparse
+
 from google.appengine.ext import ndb
 
 from consts.district_type import DistrictType
@@ -32,7 +34,8 @@ class FMSAPITeamDetailsParser(object):
             if teamData['website'] is not None and 'www.firstinspires.org' in teamData['website']:
                 website = None
             else:
-                website = teamData['website']
+                raw_website = teamData.get('website', None)
+                website = urlparse.urlparse(raw_website, 'http').geturl() if raw_website else None
 
             team = Team(
                 id="frc{}".format(teamData['teamNumber']),

@@ -1,4 +1,5 @@
 import datetime
+import urlparse
 
 from consts.district_type import DistrictType
 from consts.event_type import EventType
@@ -45,6 +46,9 @@ class FIRSTElasticSearchEventListParser(object):
                 venue_address += '\n' + event['event_address2']
             venue_address += '\n{}, {} {}\n{}'.format(event['event_city'], event['event_stateprov'], event['event_postalcode'], event['event_country'])
 
+            raw_website = event.get('event_web_url', None)
+            website = urlparse.urlparse(raw_website, 'http').geturl() if raw_website else None
+
             events.append(Event(
                 id=key,
                 name=name,
@@ -60,6 +64,6 @@ class FIRSTElasticSearchEventListParser(object):
                 year=self.season,
                 event_district_enum=district_enum,
                 first_eid=first_eid,
-                website=event.get('event_web_url', None)
+                website=website
             ))
         return events

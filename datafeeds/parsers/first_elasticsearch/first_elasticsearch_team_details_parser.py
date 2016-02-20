@@ -1,3 +1,5 @@
+import urlparse
+
 from google.appengine.ext import ndb
 
 from models.team import Team
@@ -18,13 +20,16 @@ class FIRSTElasticSearchTeamDetailsParser(object):
             else:
                 address = None
 
+            raw_website = team.get('team_web_url', None)
+            website = urlparse.urlparse(raw_website, 'http').geturl() if raw_website else None
+
             teams.append(Team(
                 id="frc{}".format(team['team_number_yearly']),
                 team_number=team['team_number_yearly'],
                 name=team.get('team_name', None),
                 nickname=team.get('team_nickname', None),
                 address=address,
-                website=team.get('team_web_url', None),
+                website=website,
                 rookie_year=team.get('team_rookieyear', None),
                 first_tpid=first_tpid,
                 first_tpid_year=self.year,
