@@ -69,7 +69,11 @@ class FMSAPIHybridScheduleParser(object):
         set_number = 1
         parsed_matches = []
         for match in matches:
-            comp_level = get_comp_level(match['level'], match['matchNumber'])
+            if 'tournamentLevel' in match:  # 2016+
+                level = match['tournamentLevel']
+            else:  # 2015
+                level = match['level']
+            comp_level = get_comp_level(level, match['matchNumber'])
             match_number = get_match_number(comp_level, match['matchNumber'])
 
             red_teams = []
@@ -110,14 +114,14 @@ class FMSAPIHybridScheduleParser(object):
                 }
             }
 
-            time = datetime.datetime.strptime(match['startTime'], TIME_PATTERN)
+            time = datetime.datetime.strptime(match['startTime'].split('.')[0], TIME_PATTERN)
             actual_time_raw = match['actualStartTime'] if 'actualStartTime' in match else None
             actual_time = None
             if event_tz is not None:
                 time = time - event_tz.utcoffset(time)
 
             if actual_time_raw is not None:
-                actual_time = datetime.datetime.strptime(actual_time_raw, TIME_PATTERN)
+                actual_time = datetime.datetime.strptime(actual_time_raw.split('.')[0], TIME_PATTERN)
                 if event_tz is not None:
                     actual_time = actual_time - event_tz.utcoffset(actual_time)
 
