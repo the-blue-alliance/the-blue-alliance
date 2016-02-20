@@ -252,8 +252,16 @@ class MobileAPI(remote.Service):
                 media_dict['year'] = request.year
                 media_dict['reference_type'] = request.reference_type
                 media_dict['reference_key'] = request.reference_key
+
+                # Need to split deletehash out into its own private dict. Don't want that to be exposed via API...
                 if request.details_json:
-                    media_dict['details_json'] = request.details_json
+                    incoming_details = json.loads(request.details_json)
+                    private_details = None
+                    if 'deletehash' in incoming_details:
+                        private_details = {'deletehash': incoming_details.pop('deletehash')}
+
+                    media_dict['private_details_json'] = json.dumps(private_details) if private_details else None
+                    media_dict['details_json'] = json.dumps(incoming_details)
 
                 suggestion = Suggestion(
                     author=ndb.Key(Account, user_id),

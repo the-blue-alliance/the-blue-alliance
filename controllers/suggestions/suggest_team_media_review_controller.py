@@ -57,6 +57,7 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
                 foreign_key=suggestion.contents['foreign_key'],
                 media_type_enum=suggestion.contents['media_type_enum'],
                 details_json=suggestion.contents.get('details_json', None),
+                private_details_json=suggestion.contents.get('private_details_json', None),
                 year=int(suggestion.contents['year']),
                 references=[Media.create_reference(
                     suggestion.contents['reference_type'],
