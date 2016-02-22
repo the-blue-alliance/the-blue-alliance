@@ -66,7 +66,7 @@ class ApiBaseController(CacheableHandler):
         response.
         Called by webapp when abort() is called, stops code excution.
         """
-        logging.info(exception)
+        logging.error(exception)
         if isinstance(exception, webapp2.HTTPException):
             self.response.set_status(exception.code)
             self.response.out.write(self._errors)
