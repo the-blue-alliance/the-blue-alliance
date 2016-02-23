@@ -217,8 +217,8 @@ class Event(ndb.Model):
         """
         Construct (not detailed) venue address if detailed venue address doesn't exist
         """
-        if self.venue_address is None:
-            if self.venue is None or self.location is None:
+        if not self.venue_address:
+            if not self.venue or not self.location:
                 self._venue_address_safe = None
             else:
                 self._venue_address_safe = "{}\n{}".format(self.venue, self.location)
