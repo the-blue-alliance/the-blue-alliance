@@ -45,7 +45,7 @@ class FMSAPIEventListParser(object):
                 end_date=end,
                 venue=venue,
                 location=location,
-                venue_address="{}, {}".format(venue, location),
+                venue_address=None,  # FIRST API doesn't provide detailed venue address
                 year=self.season,
                 event_district_enum=district_enum
             ))

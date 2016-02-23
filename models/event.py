@@ -21,8 +21,8 @@ class Event(ndb.Model):
     event_district_enum = ndb.IntegerProperty()
     start_date = ndb.DateTimeProperty()
     end_date = ndb.DateTimeProperty()
-    venue = ndb.StringProperty(indexed=False)
-    venue_address = ndb.StringProperty(indexed=False)  # We can scrape this.
+    venue = ndb.StringProperty(indexed=False)  # Name of the event venue
+    venue_address = ndb.StringProperty(indexed=False)  # Most detailed venue address (includes venue, street, and location separated by \n)
     location = ndb.StringProperty(indexed=False)  # in the format "locality, region, country". similar to Team.address
     timezone_id = ndb.StringProperty()  # such as 'America/Los_Angeles' or 'Asia/Jerusalem'
     official = ndb.BooleanProperty(default=False)  # Is the event FIRST-official?
@@ -55,6 +55,7 @@ class Event(ndb.Model):
         self._matchstats = None
         self._rankings = None
         self._teams = None
+        self._venue_address_safe = None
         self._webcast = None
         self._updated_attrs = []  # Used in EventManipulator to track what changed
         super(Event, self).__init__(*args, **kw)
@@ -210,6 +211,20 @@ class Event(ndb.Model):
                 return self.venue_address.split('\r\n')[0]
             except:
                 return None
+
+    @property
+    def venue_address_safe(self):
+        """
+        Construct (not detailed) venue address if detailed venue address doesn't exist
+        """
+        if self.venue_address is None:
+            if self.venue is None or self.location is None:
+                self._venue_address_safe = None
+            else:
+                self._venue_address_safe = "{}\n{}".format(self.venue, self.location)
+        else:
+            self._venue_address_safe = self.venue_address.replace('\r\n', '\n')
+        return self._venue_address_safe
 
     @property
     def webcast(self):
