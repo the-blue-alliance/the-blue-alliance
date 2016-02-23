@@ -69,7 +69,7 @@
               <div class="col-sm-4">
                 <h3><a href="/event/{{ comp.event.key_name }}">{{ comp.event.name }}</a></h3>
                 <p>
-                  {% if comp.event.location %}<span class="glyphicon glyphicon-map-marker"></span> in <a href="http://maps.google.com/maps?q={{ comp.event.location }}">{{ comp.event.location }}</a><br />{% endif %}
+                  {% if comp.event.location %}<span class="glyphicon glyphicon-map-marker"></span> in <a href="http://maps.google.com/maps?q={{ comp.event.location }}" target="_blank">{{ comp.event.location }}</a><br />{% endif %}
                   {% if comp.event.start_date %}<span class="glyphicon glyphicon-calendar"></span> {{ comp.event.start_date|strftime("%B %d") }}{% if comp.event.start_date != comp.event.end_date %} - {{ comp.event.end_date|strftime("%B %d") }}{% endif %}, {{ comp.event.end_date|strftime("%Y") }}{% endif %}
                 </p>
 

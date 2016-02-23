@@ -9,7 +9,7 @@
 <div class="row">
   <div class="col-sm-7">
     <p>
-      {% if team.location %}<span class="glyphicon glyphicon-map-marker"></span> from <a href="http://maps.google.com/maps?q={{ team.location|urlencode }}">{{ team.location }}</a><br>{% endif %}
+      {% if team.location %}<span class="glyphicon glyphicon-map-marker"></span> from <a href="http://maps.google.com/maps?q={{ team.location|urlencode }}" target="_blank">{{ team.location }}</a><br>{% endif %}
       {% if team.name %}<span class="glyphicon glyphicon-info-sign"></span> aka <em>{{ team.name }}</em><br>{% endif %}
       {% if team.rookie_year %}<span class="glyphicon glyphicon-calendar"></span> first competed in {{ team.rookie_year }}<br>{% endif %}
       {% if team.website %}<span class="glyphicon glyphicon-globe"></span> <a href="{{team.website}}" target="_blank">{{ team.website }}</a>{% endif %}
