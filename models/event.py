@@ -221,7 +221,7 @@ class Event(ndb.Model):
             if not self.venue or not self.location:
                 self._venue_address_safe = None
             else:
-                self._venue_address_safe = "{}\n{}".format(self.venue, self.location)
+                self._venue_address_safe = "{}\n{}".format(self.venue.encode('utf-8'), self.location.encode('utf-8'))
         else:
             self._venue_address_safe = self.venue_address.replace('\r\n', '\n')
         return self._venue_address_safe
