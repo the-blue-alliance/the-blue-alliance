@@ -20,5 +20,6 @@ class MatchScoreNotification(BaseNotification):
         data['message_type'] = NotificationType.type_names[self._type]
         data['message_data'] = {}
         data['message_data']['event_name'] = self.event.name
+        data['message_data']['event_key'] = self.event.key_name
         data['message_data']['match'] = ModelToDict.matchConverter(self.match)
         return data
