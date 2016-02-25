@@ -1,3 +1,4 @@
+import logging
 from collections import defaultdict
 
 
@@ -27,32 +28,40 @@ class EventInsightsHelper(object):
         scales = 0
         captures = 0
 
+        finished_matches = 0
         for match in matches:
             for alliance_color in ['red', 'blue']:
-                alliance_breakdown = match.score_breakdown[alliance_color]
+                try:
+                    alliance_breakdown = match.score_breakdown[alliance_color]
 
-                pos1 = 'LowBar'
-                pos2 = alliance_breakdown['position2']
-                pos3 = alliance_breakdown['position3']
-                pos4 = alliance_breakdown['position4']
-                pos5 = alliance_breakdown['position5']
-                positions = [pos1, pos2, pos3, pos4, pos5]
+                    pos1 = 'LowBar'
+                    pos2 = alliance_breakdown['position2']
+                    pos3 = alliance_breakdown['position3']
+                    pos4 = alliance_breakdown['position4']
+                    pos5 = alliance_breakdown['position5']
+                    positions = [pos1, pos2, pos3, pos4, pos5]
 
-                for pos_idx, pos in enumerate(positions):
-                    defense_opportunities[pos] += 1
-                    if alliance_breakdown['position{}crossings'.format(pos_idx + 1)] == 2:
-                        defense_damaged[pos] += 1
+                    for pos_idx, pos in enumerate(positions):
+                        defense_opportunities[pos] += 1
+                        if alliance_breakdown['position{}crossings'.format(pos_idx + 1)] == 2:
+                            defense_damaged[pos] += 1
 
-                breaches += 1 if alliance_breakdown['teleopDefensesBreached'] else 0
-                high_goals += alliance_breakdown['autoBouldersHigh'] + alliance_breakdown['teleopBouldersHigh']
-                low_goals += alliance_breakdown['autoBouldersLow'] + alliance_breakdown['teleopBouldersLow']
-                captures += 1 if alliance_breakdown['teleopTowerCaptured'] else 0
+                    breaches += 1 if alliance_breakdown['teleopDefensesBreached'] else 0
+                    high_goals += alliance_breakdown['autoBouldersHigh'] + alliance_breakdown['teleopBouldersHigh']
+                    low_goals += alliance_breakdown['autoBouldersLow'] + alliance_breakdown['teleopBouldersLow']
+                    captures += 1 if alliance_breakdown['teleopTowerCaptured'] else 0
 
-                for tower_face in ['towerFaceA', 'towerFaceB', 'towerFaceC']:
-                    if alliance_breakdown[tower_face] == 'Challenged':
-                        challenges += 1
-                    elif alliance_breakdown[tower_face] == 'Scaled':
-                        scales += 1
+                    for tower_face in ['towerFaceA', 'towerFaceB', 'towerFaceC']:
+                        if alliance_breakdown[tower_face] == 'Challenged':
+                            challenges += 1
+                        elif alliance_breakdown[tower_face] == 'Scaled':
+                            scales += 1
+
+                    finished_matches += 1
+                except Exeption, e:
+                    logging.error("Event insights failed for {}".format(match.key.id()))
+        if finished_matches == 0:
+            return None
 
         opportunities_1x = 2 * len(matches)  # once per alliance
         opportunities_3x = 6 * len(matches)  # 3x per alliance
