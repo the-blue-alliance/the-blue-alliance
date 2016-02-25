@@ -13,6 +13,7 @@ from helpers.match_helper import MatchHelper
 from helpers.award_helper import AwardHelper
 from helpers.team_helper import TeamHelper
 from helpers.event_helper import EventHelper
+from helpers.event_insights_helper import EventInsightsHelper
 
 from models.event import Event
 from template_engine import jinja2_engine
@@ -149,6 +150,8 @@ class EventDetail(CacheableHandler):
         if event.district_points:
             district_points_sorted = sorted(event.district_points['points'].items(), key=lambda (team, points): -points['total'])
 
+        event_insights = EventInsightsHelper.calculate_event_insights(cleaned_matches, event.year)
+
         self.template_values.update({
             "event": event,
             "matches": matches,
@@ -163,6 +166,7 @@ class EventDetail(CacheableHandler):
             "playoff_advancement": playoff_advancement,
             "district_points_sorted": district_points_sorted,
             "is_2015_playoff": is_2015_playoff,
+            "event_insights": event_insights
         })
 
         if event.within_a_day:

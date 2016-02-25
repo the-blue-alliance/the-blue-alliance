@@ -100,6 +100,7 @@
         {% if awards %}<li><a href="#awards" data-toggle="tab">Awards</a></li>{% endif %}
         {% if district_points_sorted %}<li><a href="#district-points" data-toggle="tab">District Points</a></li>{% endif %}
         <li class="{% if matches.num == 0 %}active{% endif %}"><a href="#teams" data-toggle="tab">Teams</a></li>
+        {% if event_insights %}<li><a href="#event-insights" data-toggle="tab">Insights</a></li>{% endif %}
       </ul>
     </div>
   </div>
@@ -324,6 +325,10 @@
         </div>
       </div>
     </div>
+    {% endif %}
+
+    {% if event_insights %}
+      {% include 'event_partials/event_insights.html' %}
     {% endif %}
 </div>
 {% endblock %}
