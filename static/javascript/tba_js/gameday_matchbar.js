@@ -42,7 +42,7 @@ function updateMatchbar(event_key, snapshot) {
 
   var match_bar = $('.' + event_key + '_matches');
 
-  if (data == null) {
+  if (data == null || data.matches == null) {
     match_bar.each(function() {
       $(this).html($('<div>', {'class': 'match-number', text: event_code}));
       if (event_code != 'KICKOFF') {
