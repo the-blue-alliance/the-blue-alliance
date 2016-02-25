@@ -58,7 +58,7 @@ class EventInsightsHelper(object):
                             scales += 1
 
                     finished_matches += 1
-                except Exeption, e:
+                except Exception, e:
                     logging.error("Event insights failed for {}".format(match.key.id()))
         if finished_matches == 0:
             return None
