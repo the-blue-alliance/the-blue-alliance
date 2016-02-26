@@ -77,10 +77,6 @@ class TestFMSAPIEventParser(unittest2.TestCase):
         self.assertEqual(match.alliances_json, """{"blue": {"score": 30, "teams": ["frc4131", "frc4469", "frc3663"]}, "red": {"score": 18, "teams": ["frc3684", "frc5295", "frc2976"]}}""")
         self.assertEqual(match.time, datetime.datetime(2015, 2, 27, 0, 0))
         self.assertEqual(match.actual_time, datetime.datetime(2015, 2, 27, 0, 0))
-        self.assertEqual(match.score_breakdown['red']['foul_points'], 0)
-        self.assertEqual(match.score_breakdown['red']['auto_points'], 8)
-        self.assertEqual(match.score_breakdown['blue']['foul_points'], 0)
-        self.assertEqual(match.score_breakdown['blue']['auto_points'], 14)
 
         # Test unplayed match
         match = matches[11]
@@ -91,10 +87,6 @@ class TestFMSAPIEventParser(unittest2.TestCase):
         self.assertEqual(match.alliances_json, """{"blue": {"score": null, "teams": ["frc3663", "frc5295", "frc2907"]}, "red": {"score": null, "teams": ["frc2046", "frc3218", "frc2412"]}}""")
         self.assertEqual(match.time, datetime.datetime(2015, 2, 27, 2, 17))
         self.assertEqual(match.actual_time, None)
-        self.assertEqual(match.score_breakdown['red']['foul_points'], None)
-        self.assertEqual(match.score_breakdown['red']['auto_points'], None)
-        self.assertEqual(match.score_breakdown['blue']['foul_points'], None)
-        self.assertEqual(match.score_breakdown['blue']['auto_points'], None)
 
     def test_parseEventAlliances(self):
         with open('test_data/fms_api/2015waamv_staging_alliances.json', 'r') as f:
