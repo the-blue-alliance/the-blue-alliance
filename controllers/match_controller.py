@@ -16,17 +16,6 @@ class MatchDetail(CacheableHandler):
     CACHE_VERSION = 4
     CACHE_KEY_FORMAT = "match_detail_{}"  # (match_key)
 
-    defense_render_names = {
-        'A_ChevalDeFrise': 'Cheval De Frise',
-        'A_Portcullis': 'Portcullis',
-        'B_Ramparts': 'Ramparts',
-        'B_Moat': 'Moat',
-        'C_SallyPort': 'Sally Port',
-        'C_Drawbridge': 'Drawbridge',
-        'D_RoughTerrain': 'Rough Terrain',
-        'D_RockWall': 'Rock Wall'
-    }
-
     def __init__(self, *args, **kw):
         super(MatchDetail, self).__init__(*args, **kw)
         self._cache_expiration = self.LONG_CACHE_EXPIRATION
@@ -54,10 +43,6 @@ class MatchDetail(CacheableHandler):
         if match.score_breakdown is not None:
             match_breakdown_template = 'match_partials/match_breakdown_{}.html'.format(match.year)
 
-            # Specifc to 2016 Game
-            self.add_defense_render_names(match.score_breakdown['red'])
-            self.add_defense_render_names(match.score_breakdown['blue'])
-
         self.template_values.update({
             "event": event,
             "match": match,
@@ -69,12 +54,3 @@ class MatchDetail(CacheableHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../templates/match_details.html')
         return template.render(path, self.template_values)
-
-    """
-    Adds new properties to the score breadown dict because they don't come formatted pretty
-    """
-    @classmethod
-    def add_defense_render_names(self, alliance_breadown):
-        for i in range(2, 6):
-            key = "position{}".format(i)
-            alliance_breadown[key] = self.defense_render_names[alliance_breadown[key]]

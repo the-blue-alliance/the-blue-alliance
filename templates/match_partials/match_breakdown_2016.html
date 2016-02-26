@@ -42,38 +42,38 @@
     {% endif %}
     {% if "position2crossings" in match.score_breakdown.red %}
     <tr>
-      <td class="red">{%if match.score_breakdown.red.position2%}{{match.score_breakdown.red.position2}}{%else%}Defense 2{%endif%}</td>
+      <td class="red">{%if match.score_breakdown.red.position2%}{{match.score_breakdown.red.position2|defense_name}}{%else%}Defense 2{%endif%}</td>
       <td class="red">{%if match.score_breakdown.red.position2crossings%}{{match.score_breakdown.red.position2crossings}}{%else%}0{%endif%}x Cross</td>
       <td>Defense 2</td>
       <td class="blue">{%if match.score_breakdown.blue.position2crossings%}{{match.score_breakdown.blue.position2crossings}}{%else%}0{%endif%}x Cross</td>
-      <td class="blue">{%if match.score_breakdown.blue.position2%}{{match.score_breakdown.blue.position2}}{%else%}Defense 2{%endif%}</td>
+      <td class="blue">{%if match.score_breakdown.blue.position2%}{{match.score_breakdown.blue.position2|defense_name}}{%else%}Defense 2{%endif%}</td>
     </tr>
     {% endif %}
     {% if "position3crossings" in match.score_breakdown.red %}
     <tr>
-      <td class="red">{% if match.score_breakdown.red.position3%}{{match.score_breakdown.red.position3}}{%else%}Defense 3%}{%endif%}</td>
+      <td class="red">{% if match.score_breakdown.red.position3%}{{match.score_breakdown.red.position3|defense_name}}{%else%}Defense 3%}{%endif%}</td>
       <td class="red">{% if match.score_breakdown.red.position3crossings%}{{match.score_breakdown.red.position3crossings}}{%else%}0{%endif%}x Cross</td>
       <td>Defense 3 (Audience)</td>
       <td class="blue">{%if match.score_breakdown.blue.position3crossings%}{{match.score_breakdown.blue.position3crossings}}{%else%}0{%endif%}x Cross</td>
-      <td class="blue">{%if match.score_breakdown.blue.position3%}{{match.score_breakdown.blue.position3}}{%else%}Defense 3{%endif%}</td>
+      <td class="blue">{%if match.score_breakdown.blue.position3%}{{match.score_breakdown.blue.position3|defense_name}}{%else%}Defense 3{%endif%}</td>
     </tr>
     {% endif %}
     {% if "position4crossings" in match.score_breakdown.red %}
     <tr>
-      <td class="red">{% if match.score_breakdown.red.position4%}{{match.score_breakdown.red.position4}}{%else%}Defense 4{%endif%}</td>
+      <td class="red">{% if match.score_breakdown.red.position4%}{{match.score_breakdown.red.position4|defense_name}}{%else%}Defense 4{%endif%}</td>
       <td class="red">{% if match.score_breakdown.red.position4crossings%}{{match.score_breakdown.red.position4crossings}}{%else%}0{%endif%}x Cross</td>
       <td>Defense 4</td>
       <td class="blue">{%if match.score_breakdown.blue.position4crossings%}{{match.score_breakdown.blue.position4crossings}}{%else%}0{%endif%}x Cross</td>
-      <td class="blue">{%if match.score_breakdown.blue.position4%}{{match.score_breakdown.blue.position4}}{%else%}Deffense 4{%endif%}</td>
+      <td class="blue">{%if match.score_breakdown.blue.position4%}{{match.score_breakdown.blue.position4|defense_name}}{%else%}Deffense 4{%endif%}</td>
     </tr>
     {% endif %}
     {% if "position5crossings" in match.score_breakdown.red %}
     <tr>
-      <td class="red">{%if match.score_breakdown.red.position5%}{{match.score_breakdown.red.position5}}{%else%}Defense 5{%endif%}</td>
+      <td class="red">{%if match.score_breakdown.red.position5%}{{match.score_breakdown.red.position5|defense_name}}{%else%}Defense 5{%endif%}</td>
       <td class="red">{%if match.score_breakdown.red.position5crossings%}{{match.score_breakdown.red.position5crossings}}{%else%}0{%endif%}x Cross</td>
       <td>Defense 5</td>
       <td class="blue">{%if match.score_breakdown.blue.position5crossings%}{{match.score_breakdown.blue.position5crossings}}{%else%}0{%endif%}x Cross</td>
-      <td class="blue">{%if match.score_breakdown.blue.position5%}{{match.score_breakdown.blue.position5}}{%else%}Defense 5{%endif%}</td>
+      <td class="blue">{%if match.score_breakdown.blue.position5%}{{match.score_breakdown.blue.position5|defense_name}}{%else%}Defense 5{%endif%}</td>
     </tr>
     {% endif %}
     {% if "teleopCrossingPoints" in match.score_breakdown.red %}
