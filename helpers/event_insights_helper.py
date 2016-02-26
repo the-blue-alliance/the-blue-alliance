@@ -58,16 +58,24 @@ class EventInsightsHelper(object):
                             challenges += 1
                         elif alliance_breakdown[tower_face] == 'Scaled':
                             scales += 1
-
-                    finished_matches += 1
                 except Exception, e:
                     logging.error("Event insights failed for {}".format(match.key.id()))
+            finished_matches += 1
         if finished_matches == 0:
             return None
 
-        opportunities_1x = 2 * len(matches)  # once per alliance
-        opportunities_3x = 6 * len(matches)  # 3x per alliance
+        opportunities_1x = 2 * finished_matches  # once per alliance
+        opportunities_3x = 6 * finished_matches  # 3x per alliance
         event_insights = {
+            'LowBar': [0, 0, 0],
+            'A_ChevalDeFrise': [0, 0, 0],
+            'A_Portcullis': [0, 0, 0],
+            'B_Ramparts': [0, 0, 0],
+            'B_Moat': [0, 0, 0],
+            'C_SallyPort': [0, 0, 0],
+            'C_Drawbridge': [0, 0, 0],
+            'D_RoughTerrain': [0, 0, 0],
+            'D_RockWall': [0, 0, 0],
             'high_goals': high_goals,
             'low_goals': low_goals,
             'breaches': [breaches, opportunities_1x, 100.0 * float(breaches) / opportunities_1x],  # [# success, # opportunities, %]
