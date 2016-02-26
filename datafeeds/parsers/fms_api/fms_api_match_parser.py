@@ -103,17 +103,6 @@ class FMSAPIHybridScheduleParser(object):
                 }
             }
 
-            score_breakdown = {
-                'red': {
-                    'auto_points': match['scoreRedAuto'],
-                    'foul_points': match['scoreRedFoul']
-                },
-                'blue': {
-                    'auto_points': match['scoreBlueAuto'],
-                    'foul_points': match['scoreBlueFoul']
-                }
-            }
-
             time = datetime.datetime.strptime(match['startTime'].split('.')[0], TIME_PATTERN)
             actual_time_raw = match['actualStartTime'] if 'actualStartTime' in match else None
             actual_time = None
@@ -140,7 +129,6 @@ class FMSAPIHybridScheduleParser(object):
                 time=time,
                 actual_time=actual_time,
                 alliances_json=json.dumps(alliances),
-                score_breakdown_json=json.dumps(score_breakdown)
             ))
 
         # Fix null teams in elims (due to FMS API failure, some info not complete)
