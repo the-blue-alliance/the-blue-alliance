@@ -30,6 +30,8 @@ class EventInsightsHelper(object):
 
         finished_matches = 0
         for match in matches:
+            if not match.has_been_played:
+                continue
             for alliance_color in ['red', 'blue']:
                 try:
                     alliance_breakdown = match.score_breakdown[alliance_color]
