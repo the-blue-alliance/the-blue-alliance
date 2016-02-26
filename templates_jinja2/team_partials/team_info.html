@@ -1,3 +1,5 @@
+{% from 'match_partials/upcoming_match_table.html' import upcoming_match_table %}
+
 <div id="team-info" class="row hidden-xs">
   <div class="col-xs-12">
     <h2>Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h2>
@@ -43,8 +45,7 @@
       <div class="panel-body">
       {% if matches_upcoming %}
         <h4>Upcoming Matches</h4>
-        {% set matches = upcoming_matches %}
-        {% include "match_partials/upcoming_match_table.html" %}
+        {{ upcoming_match_table(matches_upcoming) }}
       {% else %}
         No upcoming matches.
       {% endif %}
