@@ -152,7 +152,9 @@ class DatafeedFMSAPI(object):
             for match in playoff_matches:
                 matches_by_key[match.key.id()] = match
 
-        for match_key, match_details in qual_details.items() + playoff_details.items():
+        qual_details_items = qual_details.items() if qual_details is not None else []
+        playoff_details_items = playoff_details.items() if playoff_details is not None else []
+        for match_key, match_details in qual_details_items + playoff_details_items:
             if match_key in matches_by_key:
                 matches_by_key[match_key].score_breakdown_json = json.dumps(match_details)
 
