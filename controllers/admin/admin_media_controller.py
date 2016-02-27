@@ -26,6 +26,21 @@ class AdminMediaDashboard(LoggedInHandler):
         self.response.out.write(template.render(path, self.template_values))
 
 
+class AdminMediaDeleteReference(LoggedInHandler):
+    def post(self, media_key_name):
+        self._require_admin()
+
+        media = Media.get_by_id(media_key_name)
+
+        media.references.remove(media.create_reference(
+            self.request.get("reference_type"),
+            self.request.get("reference_key_name")))
+
+        media.put() ## Todo, update manipulators to support removing an item that ends a list
+
+        self.redirect(self.request.get('originating_url'))
+
+
 class AdminMediaAdd(LoggedInHandler):
     def post(self):
         self._require_admin()
