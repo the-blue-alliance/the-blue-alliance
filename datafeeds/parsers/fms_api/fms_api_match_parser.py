@@ -137,10 +137,13 @@ class FMSAPIHybridScheduleParser(object):
                 }
             }
 
-            time = datetime.datetime.strptime(match['startTime'].split('.')[0], TIME_PATTERN)
+            if match['startTime']:
+                time = datetime.datetime.strptime(match['startTime'].split('.')[0], TIME_PATTERN)
+            else:
+                time = None
             actual_time_raw = match['actualStartTime'] if 'actualStartTime' in match else None
             actual_time = None
-            if event_tz is not None:
+            if time is not None and event_tz is not None:
                 time = time - event_tz.utcoffset(time)
 
             if actual_time_raw is not None:
