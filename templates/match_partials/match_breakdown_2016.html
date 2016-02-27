@@ -51,7 +51,7 @@
     {% endif %}
     {% if "position3crossings" in match.score_breakdown.red %}
     <tr>
-      <td class="red">{% if match.score_breakdown.red.position3%}{{match.score_breakdown.red.position3|defense_name}}{%else%}Defense 3%}{%endif%}</td>
+      <td class="red">{% if match.score_breakdown.red.position3%}{{match.score_breakdown.red.position3|defense_name}}{%else%}Defense 3{%endif%}</td>
       <td class="red">{% if match.score_breakdown.red.position3crossings%}{{match.score_breakdown.red.position3crossings}}{%else%}0{%endif%}x Cross</td>
       <td>Defense 3 (Audience)</td>
       <td class="blue">{%if match.score_breakdown.blue.position3crossings%}{{match.score_breakdown.blue.position3crossings}}{%else%}0{%endif%}x Cross</td>
@@ -112,7 +112,7 @@
     <tr>
       <td class="red" colspan="2">{%if match.score_breakdown.red.teleopChallengePoints%}{{match.score_breakdown.red.teleopChallengePoints}}{%else%}0{%endif%}</td>
       <td>Tower Challenge Points</td>
-      <td class="blue" colspan="2">{%if match.score_breakdown.blue.teleopChallengePoints%}{{match.score_breakdown.blue.teleopChallengePoints}}{%else%}{%endif%}</td>
+      <td class="blue" colspan="2">{%if match.score_breakdown.blue.teleopChallengePoints%}{{match.score_breakdown.blue.teleopChallengePoints}}{%else%}0{%endif%}</td>
     </tr>
     {% endif %}
     {% if "teleopScalePoints" in match.score_breakdown.red %}
