@@ -146,9 +146,9 @@
     {% endif %}
     {% if "foulPoints" in match.score_breakdown.red %}
     <tr>
-      <td class="red" colspan="2">-{%if match.score_breakdown.red.foulPoints%}{{match.score_breakdown.red.foulPoints}}{%else%}0{%endif%}</td>
+      <td class="red" colspan="2">+{%if match.score_breakdown.red.foulPoints%}{{match.score_breakdown.red.foulPoints}}{%else%}0{%endif%}</td>
       <td>Fouls</td>
-      <td class="blue" colspan="2">-{%if match.score_breakdown.blue.foulPoints%}{{match.score_breakdown.blue.foulPoints}}{%else%}0{%endif%}</td>
+      <td class="blue" colspan="2">+{%if match.score_breakdown.blue.foulPoints%}{{match.score_breakdown.blue.foulPoints}}{%else%}0{%endif%}</td>
     </tr>
     {% endif %}
     {% if "adjustPoints" in match.score_breakdown.red %}
