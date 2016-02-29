@@ -29,9 +29,10 @@ class AdminMain(LoggedInHandler):
         users = Account.query().order(-Account.created).fetch(5)
         self.template_values['users'] = users
 
-        self.template_values['video_suggestions'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "match")
-        self.template_values['webcast_suggestions'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "event")
-        self.template_values['media_suggestions'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "media")
+        self.template_values['suggestions'] = dict()
+        self.template_values['suggestions']['match'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "match")
+        self.template_values['suggestions']['event'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "event")
+        self.template_values['suggestions']['media'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "media")
 
         # version info
         try:
