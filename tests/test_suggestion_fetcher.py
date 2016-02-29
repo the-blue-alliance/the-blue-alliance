@@ -8,7 +8,7 @@ from models.suggestion import Suggestion
 from helpers.suggestions.suggestion_fetcher import SuggestionFetcher
 
 
-class TestEventTeamRepairer(unittest2.TestCase):
+class TestSuggestionFetcher(unittest2.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
