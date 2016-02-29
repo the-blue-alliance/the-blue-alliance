@@ -45,7 +45,7 @@ class SuggestMatchVideoReviewController(SuggestionsReviewBaseController):
             if suggestion.key.id() in reject_keys:
                 suggestion.review_state = Suggestion.REVIEW_REJECTED
             suggestion.reviewer = self.user_bundle.account.key
-            suggestion.reviewer_at = datetime.datetime.now()
+            suggestion.reviewed_at = datetime.datetime.now()
 
         ndb.put_multi(all_suggestions)
 
