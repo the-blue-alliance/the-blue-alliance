@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Pending Suggestions{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <h1>Review Pending Suggestions</h1>
+
+    <div class="row">
+        <div class="col-xs-6">
+            <ul class="nav nav-pills nav-stacked">
+                <li>
+                    <a href="/suggest/match/video/review">
+                        <span class="badge pull-right">{{video_suggestions}}</span>
+                        Video Suggestions
+                    </a>
+                </li>
+                <li>
+                    <a href="/suggest/event/webcast/review">
+                        <span class="badge pull-right">{{webcast_suggestions}}</span>
+                        Webcast Suggestions
+                    </a>
+                </li>
+                <li>
+                    <a href="/suggest/team/media/review">
+                        <span class="badge pull-right">{{media_suggestions}}</span>
+                        Media Suggestions
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
