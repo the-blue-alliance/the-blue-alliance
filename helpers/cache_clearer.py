@@ -11,6 +11,7 @@ from controllers.api.api_team_controller import ApiTeamController, ApiTeamEvents
     ApiTeamHistoryDistrictsController
 from database import get_affected_queries
 
+from models.district_team import DistrictTeam
 from models.event import Event
 from models.event_team import EventTeam
 from models.team import Team
@@ -131,15 +132,22 @@ class CacheClearer(object):
         team_keys = affected_refs['key']
 
         event_team_keys_future = EventTeam.query(EventTeam.team.IN([team_key for team_key in team_keys])).fetch_async(None, keys_only=True)
+        district_team_keys_future = DistrictTeam.query(DistrictTeam.team.IN([team_key for team_key in team_keys])).fetch_async(None, keys_only=True)
 
         event_keys = set()
         for et_key in event_team_keys_future.get_result():
             event_key_name = et_key.id().split('_')[0]
             event_keys.add(ndb.Key(Event, event_key_name))
 
+        district_keys = set()
+        for dt_key in district_team_keys_future.get_result():
+            district_key_name = dt_key.id().split('_')[0]
+            district_keys.add(district_key_name)
+
         return cls._get_teams_cache_keys_and_controllers(team_keys) + \
             cls._get_eventteams_cache_keys_and_controllers(event_keys) + \
             cls._get_teamlist_cache_keys_and_controllers(team_keys) + \
+            cls._get_districtteams_cache_keys_and_controllers(district_keys, team_keys) + \
             cls._queries_to_cache_keys_and_controllers(get_affected_queries.team_updated(affected_refs))
 
     @classmethod

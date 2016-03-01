@@ -160,7 +160,7 @@ class ApiDistrictRankingsController(ApiDistrictControllerBase):
 
 class ApiDistrictTeamsController(ApiDistrictControllerBase):
     CACHE_KEY_FORMAT = "apiv2_district_teams_controller_{}_{}"  # (district_short, year)
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
