@@ -3,10 +3,11 @@ from helpers.media_helper import MediaParser
 from models.media import Media
 from models.suggestion import Suggestion
 
+
 class SuggestionCreator(object):
     @classmethod
     def createTeamMediaSuggestion(cls, author_account_key, media_url, team_key, year_str):
-        """Create a Team Media Suggestion. Returns True on success and False on failure"""
+        """Create a Team Media Suggestion. Returns status (success, exists, bad_url)"""
 
         media_dict = MediaParser.partial_media_dict_from_url(media_url)
         if media_dict is not None:
@@ -22,5 +23,8 @@ class SuggestionCreator(object):
                     )
                 suggestion.contents = media_dict
                 suggestion.put()
-                return True
-        return False
+                return 'success'
+            else:
+                return 'exists'
+        else:
+            return 'bad_url'

@@ -34,7 +34,7 @@ class SuggestTeamMediaController(LoggedInHandler):
         medias_by_slugname = MediaHelper.group_by_slugname([media_future.get_result() for media_future in media_futures])
 
         self.template_values.update({
-            "success": self.request.get("success"),
+            "status": self.request.get("status"),
             "team": team,
             "year": year,
             "medias_by_slugname": medias_by_slugname
@@ -49,11 +49,10 @@ class SuggestTeamMediaController(LoggedInHandler):
         team_key = self.request.get("team_key")
         year_str = self.request.get("year")
 
-        success = SuggestionCreator.createTeamMediaSuggestion(
+        status = SuggestionCreator.createTeamMediaSuggestion(
             author_account_key=self.user_bundle.account.key,
             media_url=self.request.get("media_url"),
             team_key=team_key,
             year_str=year_str)
 
-
-        self.redirect('/suggest/team/media?team_key=%s&year=%s&success=%s' % (team_key, year_str, success))
+        self.redirect('/suggest/team/media?team_key=%s&year=%s&status=%s' % (team_key, year_str, status))
