@@ -76,7 +76,20 @@
           </div>
           {% endif %}
 
-          {% if medias_by_slugname.cdphotothread %}
+          {% if medias_by_slugname.imgur %}
+          <div class="row">
+            <div class="col-xs-12">
+              <h4>Existing Imgur Images</h4>
+              {% for media in medias_by_slugname.imgur %}
+                <div class="col-xs-6 col-sm-4">
+                {% include "media_partials/imgur_partial.html" %}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if medias_by_slugname.youtube %}
           <div class="row">
             <div class="col-xs-12">
               <h4>Existing Videos</h4>
