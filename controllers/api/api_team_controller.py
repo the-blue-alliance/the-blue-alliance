@@ -35,8 +35,8 @@ class ApiTeamControllerBase(ApiBaseController):
 
 class ApiTeamController(ApiTeamControllerBase):
     CACHE_KEY_FORMAT = "apiv2_team_controller_{}"  # (team_key)
-    CACHE_VERSION = 4
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 5
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):
         super(ApiTeamController, self).__init__(*args, **kw)
@@ -56,8 +56,8 @@ class ApiTeamController(ApiTeamControllerBase):
 
 class ApiTeamEventsController(ApiTeamControllerBase):
     CACHE_KEY_FORMAT = "apiv2_team_events_controller_{}_{}"  # (team_key, year)
-    CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 1
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):
         super(ApiTeamEventsController, self).__init__(*args, **kw)
@@ -83,8 +83,8 @@ class ApiTeamEventsController(ApiTeamControllerBase):
 
 class ApiTeamEventAwardsController(ApiTeamControllerBase):
     CACHE_KEY_FORMAT = "apiv2_team_event_awards_controller_{}_{}"  # (team_key, event_key)
-    CACHE_VERSION = 3
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 4
+    CACHE_HEADER_LENGTH = 60 * 60
 
     def __init__(self, *args, **kw):
         super(ApiTeamEventAwardsController, self).__init__(*args, **kw)
@@ -135,8 +135,8 @@ class ApiTeamEventMatchesController(ApiTeamControllerBase):
 
 class ApiTeamMediaController(ApiTeamControllerBase):
     CACHE_KEY_FORMAT = "apiv2_team_media_controller_{}_{}"  # (team_key, year)
-    CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 1
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):
         super(ApiTeamMediaController, self).__init__(*args, **kw)
@@ -161,8 +161,8 @@ class ApiTeamMediaController(ApiTeamControllerBase):
 
 class ApiTeamYearsParticipatedController(ApiTeamControllerBase):
     CACHE_KEY_FORMAT = "apiv2_team_years_participated_controller_{}"  # (team_key)
-    CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 1
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):
         super(ApiTeamYearsParticipatedController, self).__init__(*args, **kw)
@@ -187,8 +187,8 @@ class ApiTeamListController(ApiTeamControllerBase):
     etc.
     """
     CACHE_KEY_FORMAT = "apiv2_team_list_controller_{}"  # (page_num)
-    CACHE_VERSION = 1
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 2
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
     PAGE_SIZE = 500
 
     def __init__(self, *args, **kw):
@@ -215,8 +215,8 @@ class ApiTeamHistoryEventsController(ApiTeamControllerBase):
     Returns a JSON list of event models of all events attended by a team
     """
     CACHE_KEY_FORMAT = "apiv2_team_history_events_controller_{}"  # (team_key)
-    CACHE_VERSION = 1
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 2
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):
         super(ApiTeamHistoryEventsController, self).__init__(*args, **kw)
@@ -240,8 +240,8 @@ class ApiTeamHistoryAwardsController(ApiTeamControllerBase):
     Returns a JSON list of award models won by a team
     """
     CACHE_KEY_FORMAT = "apiv2_team_history_awards_controller_{}"  # (team_key)
-    CACHE_VERSION = 1
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 2
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):
         super(ApiTeamHistoryAwardsController, self).__init__(*args, **kw)
@@ -265,8 +265,8 @@ class ApiTeamHistoryRobotsController(ApiTeamControllerBase):
     Returns a JSON list of all robot models associated with a Team
     """
     CACHE_KEY_FORMAT = "apiv2_team_history_robots_controller_{}"  # (team_key)
-    CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 1
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):
         super(ApiTeamHistoryRobotsController, self).__init__(*args, **kw)
@@ -290,8 +290,8 @@ class ApiTeamHistoryDistrictsController(ApiTeamControllerBase):
     Returns a JSON list of all DistrictTeam models associated with a Team
     """
     CACHE_KEY_FORMAT = "apiv2_team_history_districts_controller_{}"  # (team_key)
-    CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 1
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):
         super(ApiTeamHistoryDistrictsController, self).__init__(*args, **kw)

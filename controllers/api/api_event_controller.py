@@ -18,8 +18,8 @@ from models.event import Event
 
 class ApiEventController(ApiBaseController):
     CACHE_KEY_FORMAT = "apiv2_event_controller_{}"  # (event_key)
-    CACHE_VERSION = 2
-    CACHE_HEADER_LENGTH = 60 * 60
+    CACHE_VERSION = 3
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):
         super(ApiEventController, self).__init__(*args, **kw)
@@ -49,8 +49,8 @@ class ApiEventController(ApiBaseController):
 
 class ApiEventTeamsController(ApiEventController):
     CACHE_KEY_FORMAT = "apiv2_event_teams_controller_{}"  # (event_key)
-    CACHE_VERSION = 2
-    CACHE_HEADER_LENGTH = 60 * 60
+    CACHE_VERSION = 3
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):
         super(ApiEventTeamsController, self).__init__(*args, **kw)
@@ -131,8 +131,8 @@ class ApiEventRankingsController(ApiEventController):
 
 class ApiEventAwardsController(ApiEventController):
     CACHE_KEY_FORMAT = "apiv2_event_awards_controller_{}"  # (event_key)
-    CACHE_VERSION = 3
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 4
+    CACHE_HEADER_LENGTH = 60 * 60
 
     def __init__(self, *args, **kw):
         super(ApiEventAwardsController, self).__init__(*args, **kw)
