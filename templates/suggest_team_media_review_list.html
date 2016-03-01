@@ -7,24 +7,44 @@
 
   <h1>{{ suggestions_and_references|length }} Pending Team Media Suggestions</h1>
 
-  <h2>Video Approval Guidelines</h2>
-  <div class="alert alert-success">
-    <strong>Do approve:</strong>
-    <ul>
-      <li>Chairman's video</li>
-      <li>Robot reveal</li>
-      <li>Robot testing</li>
-      <li>Awards ceremony</li>
-      <li>Practice matches</li>
-    </ul>
-  </div>
-  <div class="alert alert-danger">
-    <strong>Do NOT approve:</strong>
-    <ul>
-      <li>Full matches (from any PoV)</li>
-      <li>People dancing</li>
-      <li>Long, drawn out videos with little to no real content</li>
-    </ul>
+  <div class="row">
+    <div class="col-sm-6">
+      <h2>Video Approval Guidelines</h2>
+      <div class="alert alert-success">
+        <strong>Do approve:</strong>
+        <ul>
+          <li>Chairman's video</li>
+          <li>Robot reveal</li>
+          <li>Robot testing</li>
+          <li>Awards ceremony</li>
+          <li>Practice matches</li>
+        </ul>
+      </div>
+      <div class="alert alert-danger">
+        <strong>Do NOT approve:</strong>
+        <ul>
+          <li>Full matches (from any PoV)</li>
+          <li>People dancing</li>
+          <li>Long, drawn out videos with little to no real content</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <h2>Image Approval Guidelines</h2>
+      <div class="alert alert-success">
+        <strong>Do approve:</strong>
+        <ul>
+          <li>Robot Photos</li>
+          <li>Team Photos</li>
+        </ul>
+      </div>
+      <div class="alert alert-danger">
+        <strong>Do NOT approve:</strong>
+        <ul>
+          <li>GIFs</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <form action="/suggest/team/media/review" method="post">
@@ -82,7 +102,7 @@
               </div>
           </div>
           {% endfor %}
-          
+
           <div class="row">
               <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-pencil"></span> Act On Selected</button>
           </div>
