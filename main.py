@@ -14,7 +14,7 @@ from controllers.insights_controller import InsightsOverview, InsightsDetail
 from controllers.main_controller import ContactHandler, HashtagsHandler, \
     MainKickoffHandler, MainBuildseasonHandler, MainChampsHandler, MainCompetitionseasonHandler, \
     MainInsightsHandler, MainOffseasonHandler, OprHandler, SearchHandler, \
-    AboutHandler, ThanksHandler, PageNotFoundHandler, InternalServerErrorHandler, \
+    AboutHandler, ThanksHandler, handle_404, handle_500, \
     GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler, ApiWriteHandler, MatchInputHandler, WebhookDocumentationHandler
 from controllers.match_controller import MatchDetail
 from controllers.notification_controller import UserNotificationBroadcast
@@ -102,8 +102,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/_/live-event/<event_key>/<timestamp:[0-9]+>', LiveEventHandler, 'ajax-live-event', strict_slash=True),
       RedirectRoute(r'/_/typeahead/<search_key>', TypeaheadHandler, 'ajax-typeahead', strict_slash=True),
       RedirectRoute(r'/_/webcast/<event_key>/<webcast_number>', WebcastHandler, 'ajax-webcast', strict_slash=True),
-      RedirectRoute(r'/<:.*>', PageNotFoundHandler, 'page-not-found', strict_slash=True),
       ],
       debug=tba_config.DEBUG)
-# app.error_handlers[404] = Webapp2HandlerAdapter(PageNotFoundHandler)
-# app.error_handlers[500] = Webapp2HandlerAdapter(InternalServerErrorHandler)
+app.error_handlers[404] = handle_404
+app.error_handlers[500] = handle_500

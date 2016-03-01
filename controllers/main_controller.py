@@ -33,6 +33,17 @@ def render_static(page):
     return html
 
 
+def handle_404(request, response, exception):
+    response.write(render_static("404"))
+    response.set_status(404)
+
+
+def handle_500(request, response, exception):
+    logging.exception(exception)
+    response.write(render_static("500"))
+    response.set_status(500)
+
+
 class MainKickoffHandler(CacheableHandler):
     CACHE_VERSION = 3
     CACHE_KEY_FORMAT = "main_kickoff"
@@ -308,18 +319,6 @@ class GamedayHandler(CacheableHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../templates/gameday.html')
         return template.render(path, self.template_values)
-
-
-class PageNotFoundHandler(webapp2.RequestHandler):
-    def get(self, *args):
-        self.error(404)
-        self.response.out.write(render_static("404"))
-
-
-class InternalServerErrorHandler(webapp2.RequestHandler):
-    def get(self, *args):
-        self.error(500)
-        self.response.out.write(render_static("500"))
 
 
 class WebcastsHandler(CacheableHandler):
