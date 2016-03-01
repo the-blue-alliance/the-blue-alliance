@@ -18,8 +18,8 @@ from models.event import Event
 
 class ApiEventController(ApiBaseController):
     CACHE_KEY_FORMAT = "apiv2_event_controller_{}"  # (event_key)
-    CACHE_VERSION = 3
-    CACHE_HEADER_LENGTH = 60 * 60 * 24
+    CACHE_VERSION = 4
+    CACHE_HEADER_LENGTH = 60 * 60
 
     def __init__(self, *args, **kw):
         super(ApiEventController, self).__init__(*args, **kw)

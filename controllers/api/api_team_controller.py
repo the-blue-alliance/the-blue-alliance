@@ -56,8 +56,8 @@ class ApiTeamController(ApiTeamControllerBase):
 
 class ApiTeamEventsController(ApiTeamControllerBase):
     CACHE_KEY_FORMAT = "apiv2_team_events_controller_{}_{}"  # (team_key, year)
-    CACHE_VERSION = 1
-    CACHE_HEADER_LENGTH = 60 * 60 * 24
+    CACHE_VERSION = 2
+    CACHE_HEADER_LENGTH = 60 * 60
 
     def __init__(self, *args, **kw):
         super(ApiTeamEventsController, self).__init__(*args, **kw)
