@@ -152,26 +152,7 @@ $(function () {
             </div>
             <div class="panel-body">
                 <div class="row">
-                    <ul class="nav nav-pills nav-stacked">
-                        <li>
-                            <a href="/suggest/match/video/review">
-                                <span class="badge pull-right">{{video_suggestions}}</span>
-                                Video Suggestions
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/suggest/event/webcast/review">
-                                <span class="badge pull-right">{{webcast_suggestions}}</span>
-                                Webcast Suggestions
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/suggest/team/media/review">
-                                <span class="badge pull-right">{{media_suggestions}}</span>
-                                Media Suggestions
-                            </a>
-                        </li>
-                    </ul>
+                    {% include "partials/pending_suggestion_rows_partial.html" %}
                 </div>
                 <div class="row">
                     <div id="graphdatabasequery" style="width: 100%; height: 400px;"></div>

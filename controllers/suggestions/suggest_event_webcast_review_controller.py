@@ -58,7 +58,7 @@ class SuggestEventWebcastReviewController(SuggestionsReviewBaseController):
 
             suggestion.review_state = Suggestion.REVIEW_ACCEPTED
             suggestion.reviewer = self.user_bundle.account.key
-            suggestion.reviewer_at = datetime.datetime.now()
+            suggestion.reviewed_at = datetime.datetime.now()
             suggestion.put()
 
             self.redirect("/suggest/event/webcast/review?success=accept&event_key=%s" % event.key.id())
@@ -69,7 +69,7 @@ class SuggestEventWebcastReviewController(SuggestionsReviewBaseController):
 
             suggestion.review_state = Suggestion.REVIEW_REJECTED
             suggestion.reviewer = self.user_bundle.account.key
-            suggestion.reviewer_at = datetime.datetime.now()
+            suggestion.reviewed_at = datetime.datetime.now()
             suggestion.put()
 
             self.redirect("/suggest/event/webcast/review?success=reject")
@@ -84,7 +84,7 @@ class SuggestEventWebcastReviewController(SuggestionsReviewBaseController):
                 event_key = suggestion.target_key
                 suggestion.review_state = Suggestion.REVIEW_REJECTED
                 suggestion.reviewer = self.user_bundle.account.key
-                suggestion.reviewer_at = datetime.datetime.now()
+                suggestion.reviewed_at = datetime.datetime.now()
                 suggestion.put()
 
             self.redirect("/suggest/event/webcast/review?success=reject_all&event_key=%s" % event_key)
