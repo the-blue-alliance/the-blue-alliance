@@ -89,7 +89,6 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
         with open('test_data/fms_api/2015_event_list.json', 'r') as f:
             events = FMSAPIEventListParser(2015).parse(json.loads(f.read()))
             event = events[3]
-            print event
 
             self.assertEquals(event.key_name, "2015tes")
             self.assertEquals(event.name, "Tesla Division")
