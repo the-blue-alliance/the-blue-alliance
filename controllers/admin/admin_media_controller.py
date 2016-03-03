@@ -35,8 +35,9 @@ class AdminMediaDeleteReference(LoggedInHandler):
         media.references.remove(media.create_reference(
             self.request.get("reference_type"),
             self.request.get("reference_key_name")))
+        media.dirty = True # hacky -greg 20150302
 
-        media.put() ## Todo, update manipulators to support removing an item that ends a list
+        MediaManipulator.createOrUpdate(media, auto_union=False)
 
         self.redirect(self.request.get('originating_url'))
 

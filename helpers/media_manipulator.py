@@ -43,7 +43,7 @@ class MediaManipulator(ManipulatorBase):
                     old_media.dirty = True
 
         for attr in list_attrs:
-            if len(getattr(new_media, attr)) > 0:
+            if len(getattr(new_media, attr)) > 0 or not auto_union:
                 if getattr(new_media, attr) != getattr(old_media, attr):
                     setattr(old_media, attr, getattr(new_media, attr))
                     old_media.dirty = True
