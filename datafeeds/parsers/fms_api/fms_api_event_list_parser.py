@@ -44,7 +44,6 @@ class FMSAPIEventListParser(object):
             if event_type is None:
                 logging.warn("Event type '{}' not recognized!".format(event['type']))
                 continue
-            key = "{}{}".format(self.season, code)
             name = event['name']
             short_name = EventHelper.getShortName(name)
             district_enum = EventHelper.parseDistrictName(event['districtCode'].lower()) if event['districtCode'] else DistrictType.NO_DISTRICT
@@ -65,7 +64,7 @@ class FMSAPIEventListParser(object):
                     name = '{} Division'.format(short_name)
 
             events.append(Event(
-                id=key,
+                id="{}{}".format(self.season, code),
                 name=name,
                 short_name=short_name,
                 event_short=code,
