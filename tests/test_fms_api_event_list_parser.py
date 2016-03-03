@@ -28,8 +28,8 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
 
             self.assertTrue(isinstance(events, list))
 
-            # File has 5 events, but we ignore CMP events, so only 3 are expected back
-            self.assertEquals(len(events), 3)
+            # File has 5 events, but we ignore CMP divisions (only subdivisions), so only 4 are expected back
+            self.assertEquals(len(events), 4)
 
     def test_parse_regional_event(self):
         with open('test_data/fms_api/2015_event_list.json', 'r') as f:
@@ -84,3 +84,22 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEquals(event.year, 2015)
             self.assertEquals(event.event_type_enum, EventType.DISTRICT_CMP)
             self.assertEquals(event.event_district_enum, DistrictType.NEW_ENGLAND)
+
+    def test_parse_cmp_subdivision(self):
+        with open('test_data/fms_api/2015_event_list.json', 'r') as f:
+            events = FMSAPIEventListParser(2015).parse(json.loads(f.read()))
+            event = events[3]
+            print event
+
+            self.assertEquals(event.key_name, "2015tes")
+            self.assertEquals(event.name, "Tesla Division")
+            self.assertEquals(event.short_name, "Tesla")
+            self.assertEquals(event.event_short, "tes")
+            self.assertEquals(event.official, True)
+            self.assertEquals(event.start_date, datetime.datetime(year=2015, month=4, day=22, hour=0, minute=0, second=0))
+            self.assertEquals(event.end_date, datetime.datetime(year=2015, month=4, day=25, hour=23, minute=59, second=59))
+            self.assertEquals(event.venue, "Edward Jones Dome")
+            self.assertEquals(event.location, "St. Louis, MO, USA")
+            self.assertEquals(event.year, 2015)
+            self.assertEquals(event.event_type_enum, EventType.CMP_DIVISION)
+            self.assertEquals(event.event_district_enum, DistrictType.NO_DISTRICT)
