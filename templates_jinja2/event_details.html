@@ -34,7 +34,7 @@
     <div class="col-sm-8">
       <p>
         {% if event.start_date %}
-          <span class="glyphicon glyphicon-calendar"></span> <time itemprop="startDate" datetime="{{event.start_date.isoformat()}}">{{ event.start_date|strftime("%B %d") }}{% if event.start_date != event.end_date %}</time> to <time itemprop="endDate" datetime="{{event.end_date.isoformat()}}">{{ event.end_date|strftime("%B %d") }}{% endif %}, {{ event.end_date|strftime("%Y") }}</time>
+          <span class="glyphicon glyphicon-calendar"></span> <time itemprop="startDate" datetime="{{event.start_date.isoformat()}}">{{ event.start_date|strftime("%B %d") }}{% if event.start_date.date() != event.end_date.date() %}</time> to <time itemprop="endDate" datetime="{{event.end_date.isoformat()}}">{{ event.end_date|strftime("%B %d") }}{% endif %}, {{ event.end_date|strftime("%Y") }}</time>
         {% endif %}
         {% if event.location or event.venue_address_safe %}
           <br><span class="glyphicon glyphicon-map-marker"></span>
