@@ -14,7 +14,7 @@ class Media(ndb.Model):
 
     # Do not change! key_names are generated based on this
     SLUG_NAMES = {
-        MediaType.YOUTUBE: 'youtube',
+        MediaType.YOUTUBE_VIDEO: 'youtube',
         MediaType.CD_PHOTO_THREAD: 'cdphotothread',
         MediaType.IMGUR: 'imgur',
     }

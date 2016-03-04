@@ -22,11 +22,11 @@ class TestMediaUrlParser(unittest2.TestCase):
 
     def test_youtube_parse(self):
         yt_long = MediaParser.partial_media_dict_from_url("http://www.youtube.com/watch?v=I-IrVbsl_K8")
-        self.assertEqual(yt_long['media_type_enum'], MediaType.YOUTUBE)
+        self.assertEqual(yt_long['media_type_enum'], MediaType.YOUTUBE_VIDEO)
         self.assertEqual(yt_long['foreign_key'], "I-IrVbsl_K8")
 
         yt_short = MediaParser.partial_media_dict_from_url("http://youtu.be/I-IrVbsl_K8")
-        self.assertEqual(yt_short['media_type_enum'], MediaType.YOUTUBE)
+        self.assertEqual(yt_short['media_type_enum'], MediaType.YOUTUBE_VIDEO)
         self.assertEqual(yt_short['foreign_key'], "I-IrVbsl_K8")
 
     def test_cdphotothread_parse(self):

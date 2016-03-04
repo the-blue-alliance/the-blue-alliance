@@ -71,7 +71,7 @@ class MediaParser(object):
     @classmethod
     def _partial_media_dict_from_youtube(cls, url):
         media_dict = {}
-        media_dict['media_type_enum'] = MediaType.YOUTUBE
+        media_dict['media_type_enum'] = MediaType.YOUTUBE_VIDEO
         foreign_key = cls._parse_youtube_foreign_key(url)
         if foreign_key is None:
             logging.warning("Failed to determine foreign_key from url: {}".format(url))
