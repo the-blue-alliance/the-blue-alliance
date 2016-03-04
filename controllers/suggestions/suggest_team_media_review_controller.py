@@ -25,6 +25,7 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
             reference_keys.append(Media.create_reference(
                 suggestion.contents['reference_type'],
                 suggestion.contents['reference_key']))
+            print suggestion.contents
             if 'details_json' in suggestion.contents:
                 suggestion.details = json.loads(suggestion.contents['details_json'])
                 if 'image_partial' in suggestion.details:
