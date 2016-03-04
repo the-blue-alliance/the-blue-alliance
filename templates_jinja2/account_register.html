@@ -8,7 +8,7 @@
 <div class="container">
   <div class="row">
     <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
-      <h1>Greetings, {{user_bundle.user.nickname}}!</h1>
+      <h1>Greetings, {{user_bundle.user.nickname()}}!</h1>
       <p>Fill out this short form to finish signing up for a TBA account.</p>
       <form class="account_signup_form" action="/account/register" method="post">
         <table class="table table-striped">
@@ -19,7 +19,7 @@
             </tr>
           </tbody>
         </table>
-        <input name="account_id" type="hidden" value="{{user_bundle.account.key.id}}" />
+        <input name="account_id" type="hidden" value="{{user_bundle.account.key.id()}}" />
         <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Create Account</button>
         <a class="btn btn-default" href="{{user_bundle.logout_url}}"><span class="glyphicon glyphicon-remove"></span> Cancel</a>
       </form>

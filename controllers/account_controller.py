@@ -5,7 +5,6 @@ import datetime
 from collections import defaultdict
 
 from google.appengine.ext import ndb
-from google.appengine.ext.webapp import template
 
 from base_controller import LoggedInHandler
 
@@ -21,6 +20,8 @@ from models.account import Account
 from models.favorite import Favorite
 from models.subscription import Subscription
 from models.sitevar import Sitevar
+
+from template_engine import jinja2_engine
 
 
 class AccountOverview(LoggedInHandler):
@@ -42,8 +43,7 @@ class AccountOverview(LoggedInHandler):
         self.template_values['webhook_verification_success'] = self.request.get('webhook_verification_success')
         self.template_values['ping_enabled'] = ping_enabled
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/account_overview.html')
-        self.response.out.write(template.render(path, self.template_values))
+        self.response.out.write(jinja2_engine.render('account_overview.html', self.template_values))
 
 
 class AccountEdit(LoggedInHandler):
@@ -51,8 +51,7 @@ class AccountEdit(LoggedInHandler):
         self._require_login('/account/edit')
         self._require_registration('/account/register')
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/account_edit.html')
-        self.response.out.write(template.render(path, self.template_values))
+        self.response.out.write(jinja2_engine.render('account_edit.html', self.template_values))
 
     def post(self):
         self._require_login('/account/edit')
@@ -78,8 +77,7 @@ class AccountRegister(LoggedInHandler):
             self.redirect('/account')
             return None
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/account_register.html')
-        self.response.out.write(template.render(path, self.template_values))
+        self.response.out.write(jinja2_engine.render('account_register.html', self.template_values))
 
     def post(self):
         self._require_login('/account/register')
@@ -156,8 +154,7 @@ class MyTBAController(LoggedInHandler):
                 error_message = "An unknown error occurred"
             self.template_values['error_message'] = error_message
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/mytba.html')
-        self.response.out.write(template.render(path, self.template_values))
+        self.response.out.write(jinja2_engine.render('mytba.html', self.template_values))
 
     def post(self):
         self._require_login('/account/register')
