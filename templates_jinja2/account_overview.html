@@ -15,12 +15,6 @@
           <h4>Success!</h4>
           <p>Your profile has been updated.</p>
         </div>
-      {% elif status == 'account_edit_cancel' %}
-      <div class="alert alert-warning">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        <h4>Canceled!</h4>
-        <p>No changes have been made to your profile.</p>
-      </div>
       {% elif status == 'account_edit_failure' %}
       <div class="alert alert-danger">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
