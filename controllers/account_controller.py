@@ -42,6 +42,7 @@ class AccountOverview(LoggedInHandler):
 
         self.template_values['webhook_verification_success'] = self.request.get('webhook_verification_success')
         self.template_values['ping_enabled'] = ping_enabled
+        self.template_values['status'] = self.request.get('status')
 
         self.response.out.write(jinja2_engine.render('account_overview.html', self.template_values))
 
@@ -64,9 +65,9 @@ class AccountEdit(LoggedInHandler):
             user = Account.get_by_id(self.user_bundle.account.key.id())
             user.display_name = self.request.get('display_name')
             user.put()
-            self.redirect('/account')
+            self.redirect('/account?status=account_edit_success')
         else:
-            self.redirect('/')
+            self.redirect('/account?status=account_edit_failure')
 
 
 class AccountRegister(LoggedInHandler):

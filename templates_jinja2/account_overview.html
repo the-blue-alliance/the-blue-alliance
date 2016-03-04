@@ -1,11 +1,37 @@
 {% extends "base.html" %}
 
-{% block title %}The Blue Alliance - Account Overview{% endblock %}
+{% block title %}Account Overview - The Blue Alliance{% endblock %}
 
 {% block meta_description %}Overview of your TBA account.{% endblock %}
 
 {% block content %}
 <div class="container">
+  {% if status %}
+  <div class="row">
+    <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
+      {% if status == 'account_edit_success' %}
+        <div class="alert alert-success">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <h4>Success!</h4>
+          <p>Your profile has been updated.</p>
+        </div>
+      {% elif status == 'account_edit_cancel' %}
+      <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Canceled!</h4>
+        <p>No changes have been made to your profile.</p>
+      </div>
+      {% elif status == 'account_edit_failure' %}
+      <div class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Oops!</h4>
+        <p>Something went wrong with editing your profile. Please contact support if the problem persists.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
   {% if webhook_verification_success %}
   <div class="row">
     <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
@@ -36,7 +62,7 @@
       <table class="table table-striped">
         <tbody>
           <tr>
-            <td>Name: </td>
+            <td>Name (Public): </td>
             <td>{{user_bundle.account.display_name}}</td>
           </tr>
           <tr>
