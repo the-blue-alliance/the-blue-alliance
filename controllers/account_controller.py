@@ -40,9 +40,16 @@ class AccountOverview(LoggedInHandler):
         else:
             ping_enabled = ""
 
+        # Compute myTBA statistics
+        user = self.user_bundle.account.key
+        num_favorites = Favorite.query(ancestor=user).count()
+        num_subscriptions = Subscription.query(ancestor=user).count()
+
+        self.template_values['status'] = self.request.get('status')
         self.template_values['webhook_verification_success'] = self.request.get('webhook_verification_success')
         self.template_values['ping_enabled'] = ping_enabled
-        self.template_values['status'] = self.request.get('status')
+        self.template_values['num_favorites'] = num_favorites
+        self.template_values['num_subscriptions'] = num_subscriptions
 
         self.response.out.write(jinja2_engine.render('account_overview.html', self.template_values))
 

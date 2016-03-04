@@ -48,17 +48,13 @@
       <p class="pull-right">
         <a class="btn btn-info" href="/logout"><span class="glyphicon glyphicon-remove"></span> Logout</a>
       </p>
-      <p>
-        <a class="btn btn-default" href="/account/edit"><span class="glyphicon glyphicon-pencil"></span> Edit Profile</a>
-      </p>
-      <div class="pull-left">
-        <h1>Welcome back, {{user_bundle.account.display_name}}!</h1>
-      </div>
+      <h1>Welcome back, {{user_bundle.account.display_name}}!</h1>
     </div>
   </div>
+
   <div class="row">
     <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
-      {{user_bundle.account2}}
+      <h2>Profile</h2>
       <table class="table table-striped">
         <tbody>
           <tr>
@@ -71,9 +67,31 @@
           </tr>
         </tbody>
       </table>
+      <p><a class="btn btn-default" href="/account/edit"><span class="glyphicon glyphicon-pencil"></span> Edit Profile</a></p>
+    </div>
+  </div>
+  <hr>
+
+  <div class="row">
+    <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
+      <h2>myTBA</h2>
+      <table class="table table-striped">
+        <tbody>
+          <tr>
+            <td>Favorites: </td>
+            <td>{{num_favorites}}</td>
+          </tr>
+          <tr>
+            <td>Subscriptions: </td>
+            <td>{{num_subscriptions}}</td>
+          </tr>
+        </tbody>
+      </table>
       <p><a class="btn btn-default" href="/account/mytba"><span class="glyphicon glyphicon-bookmark"></span> View myTBA</a></p>
     </div>
   </div>
+  <hr>
+
   <div class="row">
     <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
     <h2>Connected Devices</h2>
