@@ -29,15 +29,18 @@ class SuggestTeamMediaController(LoggedInHandler):
         year = int(year_str)
         team_future = Team.get_by_id_async(self.request.get("team_key"))
         team = team_future.get_result()
-        media_key_futures = Media.query(Media.references == team.key, Media.year == year).fetch_async(500, keys_only=True)
+        media_key_futures = Media.query(Media.references == team.key, ndb.OR(Media.year == year, Media.year == None)).fetch_async(500, keys_only=True)
         media_futures = ndb.get_multi_async(media_key_futures.get_result())
-        medias_by_slugname = MediaHelper.group_by_slugname([media_future.get_result() for media_future in media_futures])
+        medias = [media_future.get_result() for media_future in media_futures]
+        medias_by_slugname = MediaHelper.group_by_slugname(medias)
+        social_medias = MediaHelper.get_socials(medias)
 
         self.template_values.update({
             "status": self.request.get("status"),
             "team": team,
             "year": year,
-            "medias_by_slugname": medias_by_slugname
+            "medias_by_slugname": medias_by_slugname,
+            "social_medias": social_medias,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/suggest_team_media.html')

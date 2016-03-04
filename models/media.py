@@ -126,3 +126,7 @@ class Media(ndb.Model):
         if self.media_type_enum in MediaType.social_types:
             return MediaType.profile_urls[self.media_type_enum].format(self.foreign_key)
         return ""
+
+    @property
+    def type_name(self):
+        return MediaType.type_names[self.media_type_enum]

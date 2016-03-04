@@ -136,6 +136,20 @@
             </div>
           </div>
           {% endif %}
+
+          {% if social_medias%}
+          <div class="row">
+            <div class="col-xs-12">
+              <h4>Existing Social Accounts</h4>
+              <ul>
+              {% for media in social_medias %}
+                <li>{% include "media_partials/social_partial.html" %}</li>
+              {% endfor %}
+              </ul>
+            </div>
+          </div>
+          {% endif %}
+
           <hr>
           <div class="row">
             <div class="col-xs-12">
