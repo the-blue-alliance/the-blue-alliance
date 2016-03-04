@@ -8,7 +8,7 @@
 <div class="container">
   {% if status %}
   <div class="row">
-    <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
+    <div class="col-md-8 col-md-offset-2">
       {% if status == 'account_edit_success' %}
         <div class="alert alert-success">
           <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -34,7 +34,7 @@
 
   {% if webhook_verification_success %}
   <div class="row">
-    <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
+    <div class="col-md-8 col-md-offset-2">
       <div class="alert alert-success">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         <h4>Success!</h4>
@@ -44,7 +44,7 @@
   </div>
   {% endif %}
   <div class="row">
-    <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
+    <div class="col-md-8 col-md-offset-2">
       <p class="pull-right">
         <a class="btn btn-info" href="/logout"><span class="glyphicon glyphicon-remove"></span> Logout</a>
       </p>
@@ -53,7 +53,7 @@
   </div>
 
   <div class="row">
-    <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
+    <div class="col-md-8 col-md-offset-2">
       <h2>Profile</h2>
       <table class="table table-striped">
         <tbody>
@@ -73,7 +73,7 @@
   <hr>
 
   <div class="row">
-    <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
+    <div class="col-md-8 col-md-offset-2">
       <h2>myTBA</h2>
       <table class="table table-striped">
         <tbody>
@@ -93,7 +93,7 @@
   <hr>
 
   <div class="row">
-    <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
+    <div class="col-md-8 col-md-offset-2">
     <h2>Connected Devices</h2>
      {% if user_bundle.mobile_clients %}
       <table class="table table-striped">
