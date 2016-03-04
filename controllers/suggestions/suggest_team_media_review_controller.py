@@ -59,7 +59,7 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
                 media_type_enum=suggestion.contents['media_type_enum'],
                 details_json=suggestion.contents.get('details_json', None),
                 private_details_json=suggestion.contents.get('private_details_json', None),
-                year=int(suggestion.contents['year']),
+                year=int(suggestion.contents['year']) if not suggestion.contents.get('is_social', False) else None,
                 references=[Media.create_reference(
                     suggestion.contents['reference_type'],
                     suggestion.contents['reference_key'])],
