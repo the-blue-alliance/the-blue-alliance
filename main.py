@@ -4,7 +4,7 @@ from webapp2_extras.routes import RedirectRoute
 
 import tba_config
 
-from controllers.account_controller import AccountEdit, AccountLogout, AccountOverview, AccountRegister, MyTBAController
+from controllers.account_controller import AccountEdit, AccountLogout, AccountOverview, AccountRegister, MyTBAController, MyTBAEventController, MyTBATeamController
 from controllers.ajax_controller import AccountFavoritesHandler, AccountFavoritesAddHandler, AccountFavoritesDeleteHandler
 from controllers.ajax_controller import LiveEventHandler, TypeaheadHandler, WebcastHandler
 from controllers.event_controller import EventList, EventDetail, EventRss
@@ -56,6 +56,8 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/account/edit', AccountEdit, 'account-edit', strict_slash=True),
       RedirectRoute(r'/account/register', AccountRegister, 'account-register', strict_slash=True),
       RedirectRoute(r'/account/mytba', MyTBAController, 'account-mytba', strict_slash=True),
+      RedirectRoute(r'/account/mytba/event/<event_key>', MyTBAEventController, 'account-mytba-event', strict_slash=True),
+      RedirectRoute(r'/account/mytba/team/<team_number:[0-9]+>', MyTBATeamController, 'account-mytba-team', strict_slash=True),
       RedirectRoute(r'/apidocs', ApiDocumentationHandler, 'api-documentation', strict_slash=True),
       RedirectRoute(r'/apidocs/webhooks', WebhookDocumentationHandler, 'webhook-documentation', strict_slash=True),
       RedirectRoute(r'/apiwrite', ApiWriteHandler, 'api-write', strict_slash=True),

@@ -6,14 +6,22 @@
 
 {% block content %}
 <div class="container">
-  {% if error_message %}
+  {% if status %}
   <div class="row">
     <div class="col-md-8 col-md-offset-2">
-      <div class="alert alert-danger">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        <h4>Error!</h4>
-        <p>{{ error_message}} </p>
-      </div>
+      {% if status == 'team_updated' %}
+        <div class="alert alert-success">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <h4>Success!</h4>
+          <p>myTBA Team successfully updated.</p>
+        </div>
+      {% elif status == 'event_updated' %}
+        <div class="alert alert-success">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <h4>Success!</h4>
+          <p>myTBA Event successfully updated.</p>
+        </div>
+      {% endif %}
     </div>
   </div>
   {% endif %}
@@ -24,97 +32,141 @@
         <li class="active">Manage myTBA</li>
       </ol>
       <h1>Manage myTBA</h1>
-      <p>Here you can manage the favorites and subscriptions associated with your account.</p>
-      <div class="row">
-        <div class="col-sm-12">
-          <ul class="nav nav-tabs">
-            <li class="active"><a href="#favorites" data-toggle="tab">Favorites</a></li>
-            <li><a href="#subscriptions" data-toggle="tab">Subscriptions</a></li>
-          </ul>
-        </div>
-      </div>
+      <p>
+        Here you can manage your favorites and subscriptions.<br>
+        Favorites are used for personalized content and quick access.<br>
+        Subscriptions are used for push notifications.
+      </p>
+      <p>
+        These settings will be used whenever you log into your TBA account on the web or our
+        <a href="https://play.google.com/store/apps/details?id=com.thebluealliance.androidclient" target="_blank">Android app</a>.
+      </p>
+
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#my-teams" data-toggle="tab">My Teams <span class="badge">{{team_fav_subs|length}}</span></a></li>
+        <li><a href="#my-events" data-toggle="tab">My Events <span class="badge">{{event_fav_subs|length}}</span></a></li>
+      </ul>
 
       <div class="tab-content">
-      <div class="tab-pane active" id="favorites">
-      <h2>Favorites</h2>
-        {% for type, favorites in favorites_by_type.items() %}
-          <h3>{{type}}</h3>
-          <table class="table table-striped">
-            {% for favorite in favorites %}
-              <tr>
-                <td style="padding-right:20px;">{{favorite.model_key}}</td>
-                <td><form method="post">
-                  <input name="action" type="hidden" value="favorite_delete" />
-                  <input name="account_id" type="hidden" value="{{user_bundle.account.key.id()}}" />
-                  <input name="model_key" type="hidden" value="{{favorite.model_key}}"/>
-                  <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-trash"></span> Delete</button></form>
-                </td>
-              </tr>
-            {% endfor %}
-          </table>
-        {% else %}
-          <tr><td>No favorites found</td></tr>
-        {% endfor %}
-        <!-- <h3>Add Favorite</h3>
-        <table class="table"><tr><form method="post">
-          <td>Model Key: </td>
-          <td style="padding-right:20px;">
-            <input name="action" type="hidden" value="favorite_add" />
-            <input name="account_id" type="hidden" value="{{user_bundle.account.key.id()}}" />
-            <input class="form-control" type="text" name="model_key" placeholder="2014cur"/></td>
-          <td>
-            <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Add Favorite</button></td>
-        </form></tr></table> -->
-      </div><div class="tab-pane" id="subscriptions">
-      <h2>Subscriptions</h2>
-        {% for type, subscriptions in subscriptions_by_type.items() %}
-            <h3>{{type}}</h3>
+        <div class="tab-pane active" id="my-teams">
+          <h2>My Teams</h2>
+
+          <input id="add-team-input" class="form-control" type="text" placeholder="Add Team by Name or Number">
+
+          {% if team_fav_subs %}
             <table class="table table-striped">
-              {% for subscription in subscriptions %}
-                <tr>
-                  <td>{{subscription.model_key}}</td>
-                  <td><ul>
-                    {% for type in subscription.notification_names %}
-                      <li>{{ type }}</li>
-                    {% endfor %}
-                  </ul></td>
-                  <td><form method="post">
-                    <input name="action" type="hidden" value="subscription_delete" />
-                    <input name="account_id" type="hidden" value="{{user_bundle.account.key.id()}}" />
-                    <input name="model_key" type="hidden" value="{{subscription.model_key}}" />
-                    <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-trash"></span> Delete</button></form>
-                  </td>
-                </tr>
+              <tr>
+                <th>Number</th>
+                <th>Name</th>
+                <th>Favorite</th>
+                <th>Subscriptions</th>
+                <th>Edit</th>
+              </tr>
+              {% for team, fav, subs in team_fav_subs %}
+              <tr>
+                <td>{{team.team_number}}</td>
+                <td><a href="/team/{{team.team_number}}">{{team.nickname}}</a></td>
+                <td>{% if fav %}<span class="glyphicon glyphicon-ok"></span>{% endif %}</td>
+                <td>
+                  <ul style="padding-left: 0px;">
+                  {% for notification_name in subs.notification_names %}
+                    <li>{{notification_name}}</li>
+                  {% endfor %}
+                  </ul>
+                </td>
+                <td><a class="btn btn-primary" href="/account/mytba/team/{{team.team_number}}"><span class="glyphicon glyphicon-pencil"></span></a></td>
+              </tr>
               {% endfor %}
             </table>
           {% else %}
-            <tr><td>No subscriptions found</td></tr>
-          {% endfor %}
-        <h3>Subscribe to All Events This Year</h3>
-          <form method="post">
-            <input name="action" type="hidden" value="subscription_year_add" />
-            <input name="account_id" type="hidden" value="{{user_bundle.account.key.id()}}" />
-            <table class="table">
+            <p>You have no teams!</p>
+          {% endif %}
+        </div>
+        <div class="tab-pane" id="my-events">
+          <a class="btn btn-default pull-right" href="/account/mytba/event/{{year}}*"><span class="glyphicon glyphicon-plus"></span> Subscribe to all {{year}} Events</a>
+          <h2>My Events</h2>
+
+          <input id="add-event-input" class="form-control" type="text" placeholder="Add Event by Name">
+
+          {% if event_fav_subs %}
+            <table class="table table-striped">
               <tr>
-                <td>Year:</td>
-                <td><input class="form-control" type="text" name="year" value="{{this_year}}" readonly/></td>
+                <th>Event</th>
+                <th>Favorite</th>
+                <th>Subscriptions</th>
+                <th>Edit</th>
               </tr>
+              {% for event, fav, subs in event_fav_subs %}
               <tr>
-                <td>Notification Types:</td>
-                <td><ul style="list-style-type: none;">
-                  {% for index, name in enabled_notifications.items() %}
-                    <li><input type="checkbox" name="notification_types" value="{{index}}"/> {{ name }}</li>
+                <td><a href="/event/{{event.key.id()}}">{{event.year}} {{event.short_name}} [{{event.event_short.upper()}}]</a></td>
+                <td>{% if fav %}<span class="glyphicon glyphicon-ok"></span>{% endif %}</td>
+                <td>
+                  <ul style="padding-left: 0px;">
+                  {% for notification_name in subs.notification_names %}
+                    <li>{{notification_name}}</li>
                   {% endfor %}
-                </ul></td>
+                  </ul>
+                </td>
+                <td><a class="btn btn-primary" href="/account/mytba/event/{{event.key.id()}}"><span class="glyphicon glyphicon-pencil"></span></a></td>
               </tr>
-              <tr>
-                <td><button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Add Subscription</button></td>
-              </tr>
-          </table>
-        </form>
+              {% endfor %}
+            </table>
+          {% else %}
+            <p>You have no events!</p>
+          {% endif %}
         </div>
-        </div>
+      </div>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block inline_javascript %}
+<script>
+  $(function() {
+    // Setup Team typeahead
+    $('#add-team-input').attr('autocomplete', 'off');
+    $('#add-team-input').typeahead([
+      {
+        prefetch: {
+          url: '/_/typeahead/teams-all',
+          filter: unicodeFilter
+        },
+      }
+    ]);
+
+    // Submit form when Team entry chosen
+    function doTeamAction(obj, datum) {
+      var team_re = datum.value.match(/(\d+) [|] .+/);
+      if (team_re != null) {
+        var team_num = team_re[1];
+        window.location.href = '/account/mytba/team/' + team_num;
+      }
+    }
+    $('#add-team-input').bind('typeahead:selected', doTeamAction);
+    $('#add-team-input').bind('typeahead:autocompleted', doTeamAction);
+
+    // Setup Event typeahead
+    $('#add-event-input').attr('autocomplete', 'off');
+    $('#add-event-input').typeahead([
+      {
+        prefetch: {
+          url: '/_/typeahead/events-all',
+          filter: unicodeFilter
+        },
+      }
+    ]);
+
+    // Submit form when Event entry chosen
+    function doEventAction(obj, datum) {
+      var event_re = datum.value.match(/(\d*).+\[(.+?)\]/);
+      if (event_re != null) {
+        var event_key = (event_re[1] + event_re[2]).toLowerCase();
+        window.location.href = '/account/mytba/event/' + event_key;
+      }
+    }
+    $('#add-event-input').bind('typeahead:selected', doEventAction);
+    $('#add-event-input').bind('typeahead:autocompleted', doEventAction);
+  });
+</script>
 {% endblock %}

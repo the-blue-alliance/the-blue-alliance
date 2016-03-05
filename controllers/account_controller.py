@@ -17,11 +17,15 @@ from helpers.notification_helper import NotificationHelper
 from helpers.validation_helper import ValidationHelper
 
 from models.account import Account
+from models.event import Event
 from models.favorite import Favorite
 from models.subscription import Subscription
 from models.sitevar import Sitevar
+from models.team import Team
 
 from template_engine import jinja2_engine
+
+import tba_config
 
 
 class AccountOverview(LoggedInHandler):
@@ -130,104 +134,198 @@ class MyTBAController(LoggedInHandler):
         favorites = Favorite.query(ancestor=user).fetch()
         subscriptions = Subscription.query(ancestor=user).fetch()
 
-        favorites_by_type = defaultdict(list)
-        for fav in favorites:
-            favorites_by_type[ModelType.type_names[fav.model_type]].append(fav)
+        team_keys = set()
+        team_fav = {}
+        team_subs = {}
+        event_keys = set()
+        event_fav = {}
+        event_subs = {}
+        events = []
+        for item in favorites + subscriptions:
+            if item.model_type == ModelType.TEAM:
+                team_keys.add(ndb.Key(Team, item.model_key))
+                if type(item) == Favorite:
+                    team_fav[item.model_key] = item
+                elif type(item) == Subscription:
+                    team_subs[item.model_key] = item
+            elif item.model_type == ModelType.EVENT:
+                if item.model_key.endswith('*'):  # All year events wildcard
+                    event_year = int(item.model_key[:-1])
+                    events.append(Event(  # add fake event for rendering
+                        id=item.model_key,
+                        short_name='ALL EVENTS',
+                        event_short=item.model_key,
+                        year=event_year,
+                        start_date=datetime.datetime(event_year, 1, 1)
+                    ))
+                else:
+                    event_keys.add(ndb.Key(Event, item.model_key))
+                if type(item) == Favorite:
+                    event_fav[item.model_key] = item
+                elif type(item) == Subscription:
+                    event_subs[item.model_key] = item
 
-        subscriptions_by_type = defaultdict(list)
-        for sub in subscriptions:
-            subscriptions_by_type[ModelType.type_names[sub.model_type]].append(sub)
+        team_futures = ndb.get_multi_async(team_keys)
+        event_futures = ndb.get_multi_async(event_keys)
 
-        now = datetime.datetime.now()
-        self.template_values['favorites_by_type'] = dict(favorites_by_type)
-        self.template_values['subscriptions_by_type'] = dict(subscriptions_by_type)
-        self.template_values['enabled_notifications'] = NotificationType.enabled_notifications
-        self.template_values['this_year'] = now.year
+        teams = sorted([team_future.get_result() for team_future in team_futures], key=lambda x: x.team_number)
+        team_fav_subs = []
+        for team in teams:
+            fav = team_fav.get(team.key.id(), None)
+            subs = team_subs.get(team.key.id(), None)
+            team_fav_subs.append((team, fav, subs))
 
-        error = self.request.get('error')
-        if error:
-            if error == 'invalid_model':
-                error_message = "Invalid model key"
-            elif error == "no_sub_types":
-                error_message = "No notification types selected"
-            elif error == "invalid_account":
-                error_message = "Invalid account"
-            elif error == "invalid_year":
-                error_message = "You can only subscribe to the current year"
-            elif error == "sub_not_found":
-                error_message = "Subscription not found"
-            elif error == "fav_not_found":
-                error_message = "Favorite not found"
-            else:
-                error_message = "An unknown error occurred"
-            self.template_values['error_message'] = error_message
+        events += [event_future.get_result() for event_future in event_futures]
+        events = sorted(events, key=lambda x: x.start_date)
+        event_fav_subs = []
+        for event in events:
+            fav = event_fav.get(event.key.id(), None)
+            subs = event_subs.get(event.key.id(), None)
+            event_fav_subs.append((event, fav, subs))
+
+        self.template_values['team_fav_subs'] = team_fav_subs
+        self.template_values['event_fav_subs'] = event_fav_subs
+        self.template_values['status'] = self.request.get('status')
+        self.template_values['year'] = datetime.datetime.now().year
 
         self.response.out.write(jinja2_engine.render('mytba.html', self.template_values))
 
-    def post(self):
+
+class MyTBAEventController(LoggedInHandler):
+    def get(self, event_key):
+        self._require_login('/account/register')
+        self._require_registration('/account/register')
+
+        # Handle wildcard for all events in a year
+        event = None
+        is_wildcard = False
+        if event_key.endswith('*'):
+            try:
+                year = int(event_key[:-1])
+            except:
+                year = None
+            if year and year >= 1992 and year <= tba_config.MAX_YEAR:
+                event = Event(  # fake event for rendering
+                    name="ALL {} EVENTS".format(year),
+                    year=year,
+                )
+                is_wildcard = True
+        else:
+            event = Event.get_by_id(event_key)
+
+        if not event:
+            self.abort(404)
+
+        user = self.user_bundle.account.key
+        favorite = Favorite.query(Favorite.model_key==event_key, Favorite.model_type==ModelType.EVENT, ancestor=user).get()
+        subscription = Subscription.query(Favorite.model_key==event_key, Favorite.model_type==ModelType.EVENT, ancestor=user).get()
+
+        if not favorite and not subscription:  # New entry; default to being a favorite
+            is_favorite = True
+        else:
+            is_favorite = favorite is not None
+
+        enabled_notifications = [(en, NotificationType.render_names[en]) for en in NotificationType.enabled_event_notifications]
+
+        self.template_values['event'] = event
+        self.template_values['is_wildcard'] = is_wildcard
+        self.template_values['is_favorite'] = is_favorite
+        self.template_values['subscription'] = subscription
+        self.template_values['enabled_notifications'] = enabled_notifications
+
+        self.response.out.write(jinja2_engine.render('mytba_event.html', self.template_values))
+
+    def post(self, event_key):
         self._require_login('/account/register')
         self._require_registration('/account/register')
 
         current_user_id = self.user_bundle.account.key.id()
-        target_account_id = self.request.get('account_id')
-        if current_user_id == target_account_id:
-            action = self.request.get('action')
-    #         if action == "favorite_add":
-    #             model = self.request.get('model_key')
-    #             if not ValidationHelper.is_valid_model_key(model):
-    #                 self.redirect('/account/mytba?error=invalid_model')
-    #                 return
-    #             favorite = Favorite(parent = ndb.Key(Account, current_user_id), model_key =  model, user_id = current_user_id)
-    #            MyTBAHelper.add_favorite(favorite)
-    #            self.redirect('/account/mytba')
-    #            return
-            if action == "favorite_delete":
-                model_key = self.request.get('model_key')
-                result = MyTBAHelper.remove_favorite(current_user_id, model_key)
-                if result == 404:
-                    self.redirect('/account/mytba?error=fav_not_found')
-                    return
-                self.redirect('/account/mytba')
-                return
-    #         elif action == "subscription_add":
-    #             model = self.request.get('model_key')
-    #             if not ValidationHelper.is_valid_model_key(model):
-    #                 self.redirect('/account/mytba?error=invalid_model')
-    #                 return
-    #             subs = self.request.get_all('notification_types')
-    #             if not subs:
-    #                 # No notification types specified. Don't add
-    #                 self.redirect('/account/mytba?error=no_sub_types')
-    #                 return
-    #             subscription = Subscription(parent = ndb.Key(Account, current_user_id), user_id = current_user_id, model_key = model, notification_types = [int(s) for s in subs])
-    #             MyTBAHelper.add_subscription(subscription)
-    #             self.redirect('/account/mytba')
-    #             return
-            elif action == "subscription_year_add":
-                now = datetime.datetime.now()
-                year = self.request.get('year')
-                if not "{}".format(now.year) == year:
-                    # Can only subscribe to the current year's firehose
-                    self.redirect('/account/mytba?error=invalid_year')
-                    return
-                key = "{}*".format(year)
-                subs = self.request.get_all('notification_types')
-                if not subs:
-                    # No notification types specified. Don't add
-                    self.redirect('/account/mytba?error=no_sub_types')
-                    return
-                subscription = Subscription(parent = ndb.Key(Account, current_user_id), user_id = current_user_id, model_key = key, model_type = ModelType.EVENT, notification_types = [int(s) for s in subs])
 
-                logging.info("{}".format(self.request.get('webhooks_only')))
-                MyTBAHelper.add_subscription(subscription)
-                self.redirect('/account/mytba')
-                return
-            elif action == "subscription_delete":
-                model_key = self.request.get('model_key')
-                result = MyTBAHelper.remove_subscription(current_user_id, model_key)
-                if result == 404:
-                    self.redirect('/account/mytba?error=sub_not_found')
-                    return
-                self.redirect('/account/mytba')
-                return
-        self.redirect('/account/mytba?error=invalid_account')
+        if self.request.get('favorite'):
+            favorite = Favorite(
+                parent=ndb.Key(Account, current_user_id),
+                user_id=current_user_id,
+                model_type=ModelType.EVENT,
+                model_key=event_key
+            )
+            MyTBAHelper.add_favorite(favorite)
+        else:
+            MyTBAHelper.remove_favorite(current_user_id, event_key)
+
+        subs = self.request.get_all('notification_types')
+        if subs:
+            subscription = Subscription(
+                parent=ndb.Key(Account, current_user_id),
+                user_id=current_user_id,
+                model_type=ModelType.EVENT,
+                model_key=event_key,
+                notification_types=[int(s) for s in subs]
+            )
+            MyTBAHelper.add_subscription(subscription)
+        else:
+            MyTBAHelper.remove_subscription(current_user_id, event_key)
+
+        self.redirect('/account/mytba?status=event_updated#my-events')
+
+
+class MyTBATeamController(LoggedInHandler):
+    def get(self, team_number):
+        self._require_login('/account/register')
+        self._require_registration('/account/register')
+
+        team_key = 'frc{}'.format(team_number)
+        team = Team.get_by_id(team_key)
+
+        if not team:
+            self.abort(404)
+
+        user = self.user_bundle.account.key
+        favorite = Favorite.query(Favorite.model_key==team_key, Favorite.model_type==ModelType.TEAM, ancestor=user).get()
+        subscription = Subscription.query(Favorite.model_key==team_key, Favorite.model_type==ModelType.TEAM, ancestor=user).get()
+
+        if not favorite and not subscription:  # New entry; default to being a favorite
+            is_favorite = True
+        else:
+            is_favorite = favorite is not None
+
+        enabled_notifications = [(en, NotificationType.render_names[en]) for en in NotificationType.enabled_team_notifications]
+
+        self.template_values['team'] = team
+        self.template_values['is_favorite'] = is_favorite
+        self.template_values['subscription'] = subscription
+        self.template_values['enabled_notifications'] = enabled_notifications
+
+        self.response.out.write(jinja2_engine.render('mytba_team.html', self.template_values))
+
+    def post(self, team_number):
+        self._require_login('/account/register')
+        self._require_registration('/account/register')
+
+        current_user_id = self.user_bundle.account.key.id()
+        team_key = 'frc{}'.format(team_number)
+
+        if self.request.get('favorite'):
+            favorite = Favorite(
+                parent=ndb.Key(Account, current_user_id),
+                user_id=current_user_id,
+                model_type=ModelType.TEAM,
+                model_key=team_key
+            )
+            MyTBAHelper.add_favorite(favorite)
+        else:
+            MyTBAHelper.remove_favorite(current_user_id, team_key)
+
+        subs = self.request.get_all('notification_types')
+        if subs:
+            subscription = Subscription(
+                parent=ndb.Key(Account, current_user_id),
+                user_id=current_user_id,
+                model_type=ModelType.TEAM,
+                model_key=team_key,
+                notification_types=[int(s) for s in subs]
+            )
+            MyTBAHelper.add_subscription(subscription)
+        else:
+            MyTBAHelper.remove_subscription(current_user_id, team_key)
+
+        self.redirect('/account/mytba?status=team_updated#my-teams')
