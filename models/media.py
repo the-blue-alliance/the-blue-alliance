@@ -97,7 +97,7 @@ class Media(ndb.Model):
 
     @property
     def imgur_direct_url(self):
-        return 'https://i.imgur.com/{}h.jpg'.format(self.foreign_key)
+        return 'https://i.imgur.com/{}l.jpg'.format(self.foreign_key)
 
     @property
     def view_image_url(self):
