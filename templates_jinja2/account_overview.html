@@ -92,25 +92,50 @@
 
   <div class="row">
     <div class="col-md-10 col-md-offset-1">
-      <h2>Submissions</h2>
-      <p>Statistics for videos, pictures, webcasts, etc. you have submitted for review. Thanks you for your contributions!</p>
+      <h2>Suggestion Submissions</h2>
+      <p>Statistics for videos, pictures, webcasts, etc. you have submitted for review. Thanks for your contributions!</p>
     </div>
     <div class="col-md-6 col-md-offset-3">
       <table class="table table-striped">
         <tbody>
           <tr>
             <td>Pending: </td>
-            <td>{{num_pending}}</td>
+            <td>{{submissions_pending}}</td>
           </tr>
           <tr>
             <td>Accepted: </td>
-            <td>{{num_accepted}}</td>
+            <td>{{submissions_accepted}}</td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
   <hr>
+
+  {% if review_permissions %}
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+      <h2>Suggestion Reviews</h2>
+      <p>Your account has permission to help review Suggestion submissions!</p>
+    </div>
+    <div class="col-md-6 col-md-offset-3">
+      <table class="table table-striped">
+        <tbody>
+          <tr>
+            <td>Pending: </td>
+            <td>{{total_pending}}</td>
+          </tr>
+          <tr>
+            <td>Reviewed: </td>
+            <td>{{num_reviewed}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p><a class="btn btn-primary" href="/suggest/review"><span class="glyphicon glyphicon-ok"></span> Review Pending Suggestions</a></p>
+    </div>
+  </div>
+  <hr>
+  {% endif %}
 
   <div class="row">
     <div class="col-md-10 col-md-offset-1">

@@ -8,6 +8,7 @@ from google.appengine.ext import ndb
 
 from base_controller import LoggedInHandler
 
+from consts.account_permissions import AccountPermissions
 from consts.client_type import ClientType
 from consts.model_type import ModelType
 from consts.notification_type import NotificationType
@@ -51,16 +52,28 @@ class AccountOverview(LoggedInHandler):
         num_subscriptions = Subscription.query(ancestor=user).count()
 
         # Compute suggestion statistics
-        num_pending = Suggestion.query(Suggestion.review_state==Suggestion.REVIEW_PENDING, Suggestion.author==user).count()
-        num_accepted = Suggestion.query(Suggestion.review_state==Suggestion.REVIEW_ACCEPTED, Suggestion.author==user).count()
+        submissions_pending = Suggestion.query(Suggestion.review_state==Suggestion.REVIEW_PENDING, Suggestion.author==user).count()
+        submissions_accepted = Suggestion.query(Suggestion.review_state==Suggestion.REVIEW_ACCEPTED, Suggestion.author==user).count()
+
+        # Suggestion review statistics
+        review_permissions = False
+        num_reviewed = 0
+        total_pending = 0
+        if AccountPermissions.MUTATE_DATA in self.user_bundle.account.permissions:
+            review_permissions = True
+            num_reviewed = Suggestion.query(Suggestion.reviewer==user).count()
+            total_pending = Suggestion.query(Suggestion.review_state==Suggestion.REVIEW_PENDING).count()
 
         self.template_values['status'] = self.request.get('status')
         self.template_values['webhook_verification_success'] = self.request.get('webhook_verification_success')
         self.template_values['ping_enabled'] = ping_enabled
         self.template_values['num_favorites'] = num_favorites
         self.template_values['num_subscriptions'] = num_subscriptions
-        self.template_values['num_pending'] = num_pending
-        self.template_values['num_accepted'] = num_accepted
+        self.template_values['submissions_pending'] = submissions_pending
+        self.template_values['submissions_accepted'] = submissions_accepted
+        self.template_values['review_permissions'] = review_permissions
+        self.template_values['num_reviewed'] = num_reviewed
+        self.template_values['total_pending'] = total_pending
 
         self.response.out.write(jinja2_engine.render('account_overview.html', self.template_values))
 
