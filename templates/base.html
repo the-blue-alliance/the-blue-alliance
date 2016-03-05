@@ -41,17 +41,19 @@
       <li class="tba-nav-persistent {% block events_active %}{% endblock %}"><a href="/events"><span><span class="glyphicon glyphicon-calendar"></span> Events</span></a></li>
       <li class="tba-nav-persistent hidden-xs {% block insights_active %}{% endblock %}"><a href="/insights"><span><span class="glyphicon glyphicon-align-left"></span> Insights</span></a></li>
       <li class="tba-nav-persistent hidden-xs"><a href="/gameday"><span><span class="glyphicon glyphicon-facetime-video"></span> GameDay</span></a></li>
+      <li class="tba-nav-persistent hidden-xs hidden-sm dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-option-vertical"></span> More</a>
+          <ul class="dropdown-menu">
+            <li><a href="/account"><span class="glyphicon glyphicon-cog"></span> Account</a></li>
+          </ul>
+        </li>
     </ul>
 
     <div class="navbar-collapse collapse tba-navbar-collapse tba-collapse navbar-responsive-collapse">
       <ul class="nav navbar-nav">
         <li class="visible-xs {% block insights_active_collapsed %}{% endblock %}"><a href="/insights"><span><span class="glyphicon glyphicon-align-left"></span> Insights</span></a></li>
         <li class="visible-xs"><a href="/gameday"><span><span class="glyphicon glyphicon-facetime-video"></span> GameDay</span></a></li>
-        <li class="visible-xs"><a href="/account"><span class="glyphicon glyphicon-cog"></span> Account</a></li>
-      </ul>
-
-      <ul class="nav navbar-nav pull-right">
-        <li class="hidden-xs"><a href="/account"><span class="glyphicon glyphicon-cog"></span></a></li>
+        <li class="visible-xs visible-sm"><a href="/account"><span class="glyphicon glyphicon-cog"></span> Account</a></li>
       </ul>
 
       <form class="navbar-form tba-navbar-form" action="/search" >
