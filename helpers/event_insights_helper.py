@@ -28,13 +28,42 @@ class EventInsightsHelper(object):
         scales = 0
         captures = 0
 
+        # scores
+        winning_scores = 0
+        win_margins = 0
+        total_scores = 0
+        auto_scores = 0
+        crossing_scores = 0
+        boulder_scores = 0
+        tower_scores = 0
+        foul_scores = 0
+        high_score = [0, "", ""]  # score, match key, match name
+
         finished_matches = 0
         for match in matches:
             if not match.has_been_played:
                 continue
+
+            red_score = match.alliances['red']['score']
+            blue_score = match.alliances['blue']['score']
+            win_score = max(red_score, blue_score)
+
+            winning_scores += win_score
+            win_margins += (win_score - min(red_score, blue_score))
+            total_scores += red_score + blue_score
+
+            if win_score > high_score[0]:
+                high_score = [win_score, match.key_name, match.short_name]
+
             for alliance_color in ['red', 'blue']:
                 try:
                     alliance_breakdown = match.score_breakdown[alliance_color]
+
+                    auto_scores += alliance_breakdown['autoPoints']
+                    crossing_scores += alliance_breakdown['teleopCrossingPoints']
+                    boulder_scores += alliance_breakdown['teleopBoulderPoints']
+                    tower_scores += alliance_breakdown['teleopChallengePoints'] + alliance_breakdown['teleopScalePoints']
+                    foul_scores += alliance_breakdown['foulPoints']
 
                     pos1 = 'LowBar'
                     pos2 = alliance_breakdown['position2']
@@ -82,6 +111,15 @@ class EventInsightsHelper(object):
             'scales': [scales, opportunities_3x, 100.0 * float(scales) / opportunities_3x],
             'challenges': [challenges, opportunities_3x, 100.0 * float(challenges) / opportunities_3x],
             'captures': [captures, opportunities_1x, 100.0 * float(captures) / opportunities_1x],
+            'average_win_score': float(winning_scores) / finished_matches,
+            'average_win_margin': float(win_margins) / finished_matches,
+            'average_score': float(total_scores) / (2 * finished_matches),
+            'average_auto_score': float(auto_scores) / finished_matches,
+            'average_crossing_score': float(crossing_scores) / finished_matches,
+            'average_boulder_score': float(boulder_scores) / finished_matches,
+            'average_tower_score': float(tower_scores) / finished_matches,
+            'average_foul_score': float(foul_scores) / finished_matches,
+            'high_score': high_score,  # [score, match key, match name]
         }
         for defense, opportunities in defense_opportunities.items():
             event_insights[defense] = [defense_damaged[defense], opportunities, 100.0 * float(defense_damaged[defense]) / opportunities]  # [# damaged, # opportunities, %]
