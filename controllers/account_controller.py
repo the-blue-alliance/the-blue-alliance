@@ -19,8 +19,9 @@ from helpers.validation_helper import ValidationHelper
 from models.account import Account
 from models.event import Event
 from models.favorite import Favorite
-from models.subscription import Subscription
 from models.sitevar import Sitevar
+from models.subscription import Subscription
+from models.suggestion import Suggestion
 from models.team import Team
 
 from template_engine import jinja2_engine
@@ -49,11 +50,17 @@ class AccountOverview(LoggedInHandler):
         num_favorites = Favorite.query(ancestor=user).count()
         num_subscriptions = Subscription.query(ancestor=user).count()
 
+        # Compute suggestion statistics
+        num_pending = Suggestion.query(Suggestion.review_state==Suggestion.REVIEW_PENDING, Suggestion.author==user).count()
+        num_accepted = Suggestion.query(Suggestion.review_state==Suggestion.REVIEW_ACCEPTED, Suggestion.author==user).count()
+
         self.template_values['status'] = self.request.get('status')
         self.template_values['webhook_verification_success'] = self.request.get('webhook_verification_success')
         self.template_values['ping_enabled'] = ping_enabled
         self.template_values['num_favorites'] = num_favorites
         self.template_values['num_subscriptions'] = num_subscriptions
+        self.template_values['num_pending'] = num_pending
+        self.template_values['num_accepted'] = num_accepted
 
         self.response.out.write(jinja2_engine.render('account_overview.html', self.template_values))
 
