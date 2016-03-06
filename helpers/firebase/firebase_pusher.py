@@ -25,21 +25,21 @@ class FirebasePusher(object):
     @classmethod
     def _delete_data(cls, key):
         url = tba_config.CONFIG['firebase-url'].format(key, cls._get_secret())
-        result = urlfetch.fetch(url, method='DELETE')
+        result = urlfetch.fetch(url, method='DELETE', deadline=10)
         if result.status_code != 204:
             logging.warning("Error deleting data from Firebase: {}. ERROR {}: {}".format(url, result.status_code, result.content))
 
     @classmethod
     def _put_data(cls, key, data_json):
         url = tba_config.CONFIG['firebase-url'].format(key, cls._get_secret())
-        result = urlfetch.fetch(url, payload=data_json, method='PUT')
+        result = urlfetch.fetch(url, payload=data_json, method='PUT', deadline=10)
         if result.status_code != 200:
             logging.warning("Error pushing data to Firebase: {}; {}. ERROR {}: {}".format(url, data_json, result.status_code, result.content))
 
     @classmethod
     def _push_data(cls, key, data_json):
         url = tba_config.CONFIG['firebase-url'].format(key, cls._get_secret())
-        result = urlfetch.fetch(url, payload=data_json, method='POST')
+        result = urlfetch.fetch(url, payload=data_json, method='POST', deadline=10)
         if result.status_code != 200:
             logging.warning("Error pushing data to Firebase: {}; {}. ERROR {}: {}".format(url, data_json, result.status_code, result.content))
 
