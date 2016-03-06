@@ -105,8 +105,8 @@ class EventInsightsHelper(object):
             'C_Drawbridge': [0, 0, 0],
             'D_RoughTerrain': [0, 0, 0],
             'D_RockWall': [0, 0, 0],
-            'high_goals': high_goals,
-            'low_goals': low_goals,
+            'average_high_goals': float(high_goals) / finished_matches,
+            'average_low_goals': float(low_goals) / finished_matches,
             'breaches': [breaches, opportunities_1x, 100.0 * float(breaches) / opportunities_1x],  # [# success, # opportunities, %]
             'scales': [scales, opportunities_3x, 100.0 * float(scales) / opportunities_3x],
             'challenges': [challenges, opportunities_3x, 100.0 * float(challenges) / opportunities_3x],
