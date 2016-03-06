@@ -36,6 +36,8 @@ class EventTeamsMediasQuery(DatabaseQuery):
         event_key = self._query_args[0]
         year = int(event_key[:4])
         event_team_keys = yield EventTeam.query(EventTeam.event == ndb.Key(Event, event_key)).fetch_async(keys_only=True)
+        if not event_team_keys:
+            raise ndb.Return([])
         team_keys = map(lambda event_team_key: ndb.Key(Team, event_team_key.id().split('_')[1]), event_team_keys)
         medias = yield Media.query(
             Media.references.IN(team_keys),
