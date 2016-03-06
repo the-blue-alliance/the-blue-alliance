@@ -220,7 +220,7 @@
                 <td>{{ team.team_number }}</td>
                 <td><a href="/team/{{ team.team_number }}/{{event.year}}">{% if team.nickname %}{{ team.nickname }}{% else %}--{% endif %}</a></td>
                 <td>{% if team.location %}{{ team.location }}{% else %}--{% endif %}</td>
-                <td>{% if image_medias %}{% include "media_partials/image_carousel_partial.html" %}{% else %}<a class="btn btn-success" href="/suggest/team/media?team_key={{team.key_name}}&year={{event.year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span></a>{% endif %}</td>
+                <td>{% if image_medias %}{% set small_thumbnail = True %}{% include "media_partials/image_carousel_partial.html" %}{% else %}<a class="btn btn-success" href="/suggest/team/media?team_key={{team.key_name}}&year={{event.year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span></a>{% endif %}</td>
               </tr>
               {% endfor %}
             </tbody>
@@ -243,7 +243,7 @@
                 <td>{{ team.team_number }}</td>
                 <td><a href="/team/{{ team.team_number }}/{{event.year}}">{% if team.nickname %}{{ team.nickname }}{% else %}--{% endif %}</a></td>
                 <td>{% if team.location %}{{ team.location }}{% else %}--{% endif %}</td>
-                <td>{% if image_medias %}{% include "media_partials/image_carousel_partial.html" %}{% else %}<a class="btn btn-success" href="/suggest/team/media?team_key={{team.key_name}}&year={{event.year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span></a>{% endif %}</td>
+                <td>{% if image_medias %}{% set small_thumbnail = True %}{% include "media_partials/image_carousel_partial.html" %}{% else %}<a class="btn btn-success" href="/suggest/team/media?team_key={{team.key_name}}&year={{event.year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span></a>{% endif %}</td>
               </tr>
               {% endfor %}
             </tbody>

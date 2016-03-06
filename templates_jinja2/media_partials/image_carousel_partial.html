@@ -4,8 +4,8 @@
     {% for media in image_medias %}
     <div class="item{% if loop.first %} active{% endif %}">
       <div class="cdphotothread-thumbnail">
-        <a href="{{media.view_image_url}}" target="_blank">
-          <span style="background-image:url('{{media.image_direct_url}}')"></span>
+        <a href="#" data-featherlight="{{media.image_direct_url}}">
+          <span style="background-image:url('{% if small_thumbnail %}{{media.image_direct_url_sm}}{% else %}{{media.image_direct_url_med}}{% endif %}')"></span>
         </a>
       </div>
     </div>

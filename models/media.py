@@ -85,6 +85,10 @@ class Media(ndb.Model):
         return self.cdphotothread_image_url.replace('_l', '_m')
 
     @property
+    def cdphotothread_image_url_sm(self):
+        return self.cdphotothread_image_url.replace('_l', '_s')
+
+    @property
     def cdphotothread_thread_url(self):
         return 'http://www.chiefdelphi.com/media/photos/{}'.format(self.foreign_key)
 
@@ -98,7 +102,15 @@ class Media(ndb.Model):
 
     @property
     def imgur_direct_url(self):
-        return 'https://i.imgur.com/{}l.jpg'.format(self.foreign_key)
+        return 'https://i.imgur.com/{}h.jpg'.format(self.foreign_key)
+
+    @property
+    def imgur_direct_url_med(self):
+        return 'https://i.imgur.com/{}m.jpg'.format(self.foreign_key)
+
+    @property
+    def imgur_direct_url_sm(self):
+        return 'https://i.imgur.com/{}s.jpg'.format(self.foreign_key)
 
     @property
     def view_image_url(self):
@@ -112,8 +124,26 @@ class Media(ndb.Model):
     @property
     def image_direct_url(self):
         if self.media_type_enum == MediaType.CD_PHOTO_THREAD:
-            return self.cdphotothread_image_url_med
+            return self.cdphotothread_image_url
         elif self.media_type_enum == MediaType.IMGUR:
             return self.imgur_direct_url
+        else:
+            return ""
+
+    @property
+    def image_direct_url_med(self):
+        if self.media_type_enum == MediaType.CD_PHOTO_THREAD:
+            return self.cdphotothread_image_url_med
+        elif self.media_type_enum == MediaType.IMGUR:
+            return self.imgur_direct_url_med
+        else:
+            return ""
+
+    @property
+    def image_direct_url_sm(self):
+        if self.media_type_enum == MediaType.CD_PHOTO_THREAD:
+            return self.cdphotothread_image_url_sm
+        elif self.media_type_enum == MediaType.IMGUR:
+            return self.imgur_direct_url_sm
         else:
             return ""
