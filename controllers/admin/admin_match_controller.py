@@ -167,12 +167,10 @@ class AdminMatchEdit(LoggedInHandler):
             comp_level=self.request.get("comp_level"),
             team_key_names=team_key_names,
             alliances_json=alliances_json,
+            youtube_videos=youtube_videos
             # no_auto_update = str(self.request.get("no_auto_update")).lower() == "true", #TODO
         )
-        match = MatchManipulator.createOrUpdate(match)
-        match.youtube_videos = youtube_videos
-        match.dirty = True  # hacky
-        MatchManipulator.createOrUpdate(match)
+        MatchManipulator.createOrUpdate(match, auto_union=False)
 
         self.redirect("/admin/match/" + match.key_name)
 
@@ -199,7 +197,6 @@ class AdminVideosAdd(LoggedInHandler):
             if match:
                 if youtube_video not in match.youtube_videos:
                     match.youtube_videos.append(youtube_video)
-                    match.dirty = True  # hacky
                     matches_to_put.append(match)
                     results["added"].append(match_key)
                 else:

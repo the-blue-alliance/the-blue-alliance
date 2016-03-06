@@ -145,7 +145,7 @@ class MatchManipulator(ManipulatorBase):
                     old_match.dirty = True
 
         for attr in list_attrs:
-            if len(getattr(new_match, attr)) > 0:
+            if len(getattr(new_match, attr)) > 0 or not auto_union:
                 if set(getattr(new_match, attr)) != set(getattr(old_match, attr)):  # lists are treated as sets
                     setattr(old_match, attr, getattr(new_match, attr))
                     old_match._updated_attrs.append(attr)
