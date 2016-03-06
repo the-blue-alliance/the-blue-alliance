@@ -1,8 +1,19 @@
 .team-table {
   table-layout: fixed;
-  
+
   td {
     text-overflow: ellipsis;
     overflow: hidden;
+    vertical-align: middle !important;
+  }
+
+  th:first-child, td:first-child {
+    /* your stuff here */
+    width: 10%;
+  }
+
+  .team-media-carousel {
+    height: 100px;
+    width: 100px;
   }
 }

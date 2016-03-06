@@ -1,4 +1,4 @@
-<div id="team-carousel" class="thumbnail carousel team-media-carousel slide" data-ride="carousel">
+<div id="team-carousel-{{team.key.id()}}" class="thumbnail carousel team-media-carousel slide" data-ride="carousel">
   <!-- Wrapper for slides -->
   <div class="carousel-inner">
     {% for media in image_medias %}
@@ -14,10 +14,10 @@
 
   {% if image_medias|length > 1 %}
   <!-- Controls -->
-  <a class="left carousel-control" href="#team-carousel" data-slide="prev">
+  <a class="left carousel-control" href="#team-carousel-{{team.key.id()}}" data-slide="prev">
     <span class="glyphicon glyphicon-chevron-left"></span>
   </a>
-  <a class="right carousel-control" href="#team-carousel" data-slide="next">
+  <a class="right carousel-control" href="#team-carousel-{{team.key.id()}}" data-slide="next">
     <span class="glyphicon glyphicon-chevron-right"></span>
   </a>
   {% endif %}
