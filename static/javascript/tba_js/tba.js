@@ -57,6 +57,9 @@ $(document).ready(function(){
     });
 	}
 
+  // Featherlight Gallery
+  $('.gallery').featherlightGallery();
+
 	// Converting match time to local time
   var weekday = new Array(7);
   weekday[0]=  "Sun";
