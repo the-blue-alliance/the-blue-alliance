@@ -105,7 +105,6 @@ class FMSAPIEventAlliancesEnqueue(webapp.RequestHandler):
     Handles enqueing getting alliances
     """
     def get(self, when):
-        events = []
         if when == "now":
             events = EventHelper.getEventsWithinADay()
             events = filter(lambda e: e.official, events)
