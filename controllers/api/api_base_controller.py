@@ -1,6 +1,7 @@
 import json
 import logging
 import md5
+import random
 import tba_config
 import urllib
 import uuid
@@ -129,7 +130,8 @@ class ApiBaseController(CacheableHandler):
         ndb.delete_multi([ndb.Key(CachedResponse, cache_key) for cache_key in cache_keys])
 
     def _track_call_defer(self, api_action, api_label):
-        deferred.defer(track_call, api_action, api_label, self.x_tba_app_id, _queue="api-track-call")
+        if random.random() < tba_config.RECORD_FRACTION:
+            deferred.defer(track_call, api_action, api_label, self.x_tba_app_id, _queue="api-track-call")
 
     def _validate_tba_app_id(self):
         """
