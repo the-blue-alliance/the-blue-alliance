@@ -44,6 +44,7 @@ class Media(ndb.Model):
         }
         self._details = None
         self._private_details = None
+        self._updated_attrs = []  # Used in MediaManipulator to track what changed
         super(Media, self).__init__(*args, **kw)
 
     @property
