@@ -105,9 +105,13 @@ class FMSAPIEventAlliancesEnqueue(webapp.RequestHandler):
     Handles enqueing getting alliances
     """
     def get(self, when):
+        events = []
         if when == "now":
             events = EventHelper.getEventsWithinADay()
             events = filter(lambda e: e.official, events)
+        elif when == "last_day_only":
+            events = EventHelper.getEventsWithinADay()
+            events = filter(lambda e: e.official and e.ends_today, events)
         else:
             event_keys = Event.query(Event.official == True).filter(Event.year == int(when)).fetch(500, keys_only=True)
             events = ndb.get_multi(event_keys)
@@ -119,7 +123,7 @@ class FMSAPIEventAlliancesEnqueue(webapp.RequestHandler):
                 method='GET')
 
         template_values = {
-            'events': events,
+            'events': events
         }
 
         path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_alliances_enqueue.html')
