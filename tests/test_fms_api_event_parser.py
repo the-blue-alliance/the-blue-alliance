@@ -68,6 +68,7 @@ class TestFMSAPIEventParser(unittest2.TestCase):
 
         matches = sorted(matches, key=lambda m: m.play_order)
 
+        # Test played match
         match = matches[0]
         self.assertEqual(match.comp_level, "qm")
         self.assertEqual(match.set_number, 1)
@@ -75,11 +76,9 @@ class TestFMSAPIEventParser(unittest2.TestCase):
         self.assertEqual(match.team_key_names, [u'frc4131', u'frc4469', u'frc3663', u'frc3684', u'frc5295', u'frc2976'])
         self.assertEqual(match.alliances_json, """{"blue": {"score": 30, "teams": ["frc4131", "frc4469", "frc3663"]}, "red": {"score": 18, "teams": ["frc3684", "frc5295", "frc2976"]}}""")
         self.assertEqual(match.time, datetime.datetime(2015, 2, 27, 0, 0))
-        self.assertEqual(match.score_breakdown['red']['foul_points'], 0)
-        self.assertEqual(match.score_breakdown['red']['auto_points'], 8)
-        self.assertEqual(match.score_breakdown['blue']['foul_points'], 0)
-        self.assertEqual(match.score_breakdown['blue']['auto_points'], 14)
+        self.assertEqual(match.actual_time, datetime.datetime(2015, 2, 27, 0, 0))
 
+        # Test unplayed match
         match = matches[11]
         self.assertEqual(match.comp_level, "qm")
         self.assertEqual(match.set_number, 1)
@@ -87,10 +86,7 @@ class TestFMSAPIEventParser(unittest2.TestCase):
         self.assertEqual(match.team_key_names, [u'frc3663', u'frc5295', u'frc2907', u'frc2046', u'frc3218', u'frc2412'])
         self.assertEqual(match.alliances_json, """{"blue": {"score": null, "teams": ["frc3663", "frc5295", "frc2907"]}, "red": {"score": null, "teams": ["frc2046", "frc3218", "frc2412"]}}""")
         self.assertEqual(match.time, datetime.datetime(2015, 2, 27, 2, 17))
-        self.assertEqual(match.score_breakdown['red']['foul_points'], None)
-        self.assertEqual(match.score_breakdown['red']['auto_points'], None)
-        self.assertEqual(match.score_breakdown['blue']['foul_points'], None)
-        self.assertEqual(match.score_breakdown['blue']['auto_points'], None)
+        self.assertEqual(match.actual_time, None)
 
     def test_parseEventAlliances(self):
         with open('test_data/fms_api/2015waamv_staging_alliances.json', 'r') as f:
@@ -109,7 +105,7 @@ class TestFMSAPIEventParser(unittest2.TestCase):
 
     def test_parseEventRankings(self):
         with open('test_data/fms_api/2015waamv_staging_rankings.json', 'r') as f:
-            rankings = FMSAPIEventRankingsParser().parse(json.loads(f.read()))
+            rankings = FMSAPIEventRankingsParser(2015).parse(json.loads(f.read()))
 
         self.assertEqual(
             rankings,

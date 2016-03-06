@@ -7,7 +7,7 @@ from base_controller import CacheableHandler
 
 from models.insight import Insight
 
-MAX_YEAR = 2015
+MAX_YEAR = 2016
 VALID_YEARS = list(reversed(range(1992, MAX_YEAR + 1)))
 
 

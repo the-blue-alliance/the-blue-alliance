@@ -21,8 +21,8 @@ class Event(ndb.Model):
     event_district_enum = ndb.IntegerProperty()
     start_date = ndb.DateTimeProperty()
     end_date = ndb.DateTimeProperty()
-    venue = ndb.StringProperty(indexed=False)
-    venue_address = ndb.StringProperty(indexed=False)  # We can scrape this.
+    venue = ndb.StringProperty(indexed=False)  # Name of the event venue
+    venue_address = ndb.StringProperty(indexed=False)  # Most detailed venue address (includes venue, street, and location separated by \n)
     location = ndb.StringProperty(indexed=False)  # in the format "locality, region, country". similar to Team.address
     timezone_id = ndb.StringProperty()  # such as 'America/Los_Angeles' or 'Asia/Jerusalem'
     official = ndb.BooleanProperty(default=False)  # Is the event FIRST-official?
@@ -55,6 +55,7 @@ class Event(ndb.Model):
         self._matchstats = None
         self._rankings = None
         self._teams = None
+        self._venue_address_safe = None
         self._webcast = None
         self._updated_attrs = []  # Used in EventManipulator to track what changed
         super(Event, self).__init__(*args, **kw)
@@ -92,8 +93,6 @@ class Event(ndb.Model):
 
     @property
     def awards(self):
-        # This import is ugly, and maybe all the models should be in one file again -gregmarra 20121006
-        from models.award import Award
         if self._awards is None:
             self.get_awards_async().wait()
         return self._awards
@@ -117,8 +116,6 @@ class Event(ndb.Model):
 
     @property
     def matches(self):
-        # This import is ugly, and maybe all the models should be in one file again -gregmarra 20121006
-        from models.match import Match
         if self._matches is None:
             if self._matches is None:
                 self.get_matches_async().wait()
@@ -212,7 +209,7 @@ class Event(ndb.Model):
         """
         if self._rankings is None:
             try:
-                self._rankings = json.loads(self.rankings_json)
+                self._rankings = [[str(el) for el in row] for row in json.loads(self.rankings_json)]
             except Exception, e:
                 self._rankings = None
         return self._rankings
@@ -226,6 +223,20 @@ class Event(ndb.Model):
                 return self.venue_address.split('\r\n')[0]
             except:
                 return None
+
+    @property
+    def venue_address_safe(self):
+        """
+        Construct (not detailed) venue address if detailed venue address doesn't exist
+        """
+        if not self.venue_address:
+            if not self.venue or not self.location:
+                self._venue_address_safe = None
+            else:
+                self._venue_address_safe = "{}\n{}".format(self.venue.encode('utf-8'), self.location.encode('utf-8'))
+        else:
+            self._venue_address_safe = self.venue_address.replace('\r\n', '\n')
+        return self._venue_address_safe
 
     @property
     def webcast(self):
@@ -295,7 +306,7 @@ class Event(ndb.Model):
 
     @classmethod
     def validate_key_name(self, event_key):
-        key_name_regex = re.compile(r'^[1-9]\d{3}[a-z]+[1-9]?$')
+        key_name_regex = re.compile(r'^[1-9]\d{3}[a-z]+[0-9]?$')
         match = re.match(key_name_regex, event_key)
         return True if match else False
 
@@ -318,3 +329,7 @@ class Event(ndb.Model):
     @property
     def event_type_str(self):
         return EventType.type_names[self.event_type_enum]
+
+    @property
+    def display_name(self):
+        return self.name if self.short_name is None else self.short_name

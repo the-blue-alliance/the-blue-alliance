@@ -25,6 +25,17 @@ $(document).ready(function(){
     event.preventDefault();
   });
 
+  // Handle linking to tabs
+  var hash = window.location.hash;
+  hash && $('ul.nav a[href="' + hash + '"]').tab('show');
+
+  $('.nav-tabs a').click(function (e) {
+    $(this).tab('show');
+    var scrollmem = $('body').scrollTop();
+    window.location.hash = this.hash;
+    $('html,body').scrollTop(scrollmem);
+  });
+
 	// Fancybox
 	$(".fancybox").fancybox();
 
@@ -46,7 +57,18 @@ $(document).ready(function(){
     });
 	}
 
+  // Featherlight Gallery
+  $('.gallery').featherlightGallery();
+
 	// Converting match time to local time
+  var weekday = new Array(7);
+  weekday[0]=  "Sun";
+  weekday[1] = "Mon";
+  weekday[2] = "Tue";
+  weekday[3] = "Wed";
+  weekday[4] = "Thu";
+  weekday[5] = "Fri";
+  weekday[6] = "Sat";
 	$('.tba-match-time-utc').each(function () {
 	  var matchTime = new Date($(this).text());  // Converts UTC to local time
 	  if (!isNaN(matchTime)) {
@@ -56,7 +78,7 @@ $(document).ready(function(){
         hour12 = 12;
       }
       var minute = matchTime.getMinutes();
-      var matchTimeStr = hour12 + ':' + ((''+minute).length<2 ? '0' :'')+minute;
+      var matchTimeStr = weekday[matchTime.getDay()] + ' ' + hour12 + ':' + ((''+minute).length<2 ? '0' :'')+minute;
       matchTimeStr += hour24 < 12 ? ' AM' : ' PM';
 
       $(this).text(matchTimeStr);

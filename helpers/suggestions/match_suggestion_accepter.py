@@ -38,6 +38,5 @@ class MatchSuggestionAccepter(object):
         for youtube_video in youtube_videos:
             if youtube_video not in match.youtube_videos:
                 match.youtube_videos.append(youtube_video)
-                match.dirty = True  # This is so hacky. -gregmarra 20130601
 
         return match

@@ -1,6 +1,6 @@
 cron:
-- description: FIRST event list scraping. Also includes detail scraping.
-  url: /tasks/get/usfirst_event_list/2016
+- description: FIRST event list scraping. Also includes event details/event teams/team details scraping.
+  url: /backend-tasks/get/event_list/2016
   schedule: every day 02:00
   timezone: America/Los_Angeles
 
@@ -10,7 +10,7 @@ cron:
 #   timezone: America/Los_Angeles
 
 # - description: FIRST team detail scraping
-#   url: /tasks/enqueue/usfirst_team_details_rolling
+#   url: /tasks/enqueue/fmsapi_team_details_rolling
 #   schedule: every day 02:00
 #   timezone: America/Los_Angeles
 
@@ -34,30 +34,30 @@ cron:
   url: /tasks/enqueue/fmsapi_awards/now
   schedule: every 1 hours
 
-# - description: Match Insights Calculation
-#   url: /tasks/math/enqueue/insights/matches/2015
-#   schedule: every day 01:00
-#   timezone: America/Los_Angeles
+- description: Match Insights Calculation
+  url: /tasks/math/enqueue/insights/matches/2016
+  schedule: every day 01:00
+  timezone: America/Los_Angeles
 
-# - description: Award Insights Calculation
-#   url: /tasks/math/enqueue/insights/awards/2015
-#   schedule: every day 01:00
-#   timezone: America/Los_Angeles
+- description: Award Insights Calculation
+  url: /tasks/math/enqueue/insights/awards/2016
+  schedule: every day 01:00
+  timezone: America/Los_Angeles
 
-# - description: Match Overall Insights Calculation
-#   url: /tasks/math/enqueue/overallinsights/matches
-#   schedule: every day 01:10
-#   timezone: America/Los_Angeles
+- description: Match Overall Insights Calculation
+  url: /tasks/math/enqueue/overallinsights/matches
+  schedule: every day 01:10
+  timezone: America/Los_Angeles
 
-# - description: Award Overall Insights Calculation
-#   url: /tasks/math/enqueue/overallinsights/awards
-#   schedule: every day 01:10
-#   timezone: America/Los_Angeles
+- description: Award Overall Insights Calculation
+  url: /tasks/math/enqueue/overallinsights/awards
+  schedule: every day 01:10
+  timezone: America/Los_Angeles
 
-# - description: District Points Calculation
-#   url: /tasks/math/enqueue/district_points_calc/2015
-#   schedule: every day 01:20
-#   timezone: America/Los_Angeles
+- description: District Points Calculation
+  url: /tasks/math/enqueue/district_points_calc/2016
+  schedule: every day 01:20
+  timezone: America/Los_Angeles
 
 - description: Upcoming match notification sending
   url: /tasks/notifications/upcoming_match

@@ -23,6 +23,7 @@ class TeamManipulator(ManipulatorBase):
             "nickname",
             "website",
             "rookie_year",
+            "motto",
         ]
 
         for attr in attrs:

@@ -2,7 +2,6 @@ import datetime
 import json
 import logging
 import tba_config
-import time
 
 from google.appengine.ext import deferred
 from google.appengine.api import urlfetch
@@ -11,6 +10,11 @@ from models.sitevar import Sitevar
 
 
 class FirebasePusher(object):
+
+    FIREHOSE_FEED = 'notifications'  # all the notifications
+    EVENT_FEED = 'events/{}/notifications'  # format with event key
+    DISTRICT_FEED = 'district/{}/notifications'  # format with district abbrev
+
     @classmethod
     def _get_secret(cls):
         firebase_secrets = Sitevar.get_by_id("firebase.secrets")
@@ -21,21 +25,21 @@ class FirebasePusher(object):
     @classmethod
     def _delete_data(cls, key):
         url = tba_config.CONFIG['firebase-url'].format(key, cls._get_secret())
-        result = urlfetch.fetch(url, method='DELETE')
+        result = urlfetch.fetch(url, method='DELETE', deadline=10)
         if result.status_code != 204:
             logging.warning("Error deleting data from Firebase: {}. ERROR {}: {}".format(url, result.status_code, result.content))
 
     @classmethod
     def _put_data(cls, key, data_json):
         url = tba_config.CONFIG['firebase-url'].format(key, cls._get_secret())
-        result = urlfetch.fetch(url, payload=data_json, method='PUT')
+        result = urlfetch.fetch(url, payload=data_json, method='PUT', deadline=10)
         if result.status_code != 200:
             logging.warning("Error pushing data to Firebase: {}; {}. ERROR {}: {}".format(url, data_json, result.status_code, result.content))
 
     @classmethod
     def _push_data(cls, key, data_json):
         url = tba_config.CONFIG['firebase-url'].format(key, cls._get_secret())
-        result = urlfetch.fetch(url, payload=data_json, method='POST')
+        result = urlfetch.fetch(url, payload=data_json, method='POST', deadline=10)
         if result.status_code != 200:
             logging.warning("Error pushing data to Firebase: {}; {}. ERROR {}: {}".format(url, data_json, result.status_code, result.content))
 
@@ -69,4 +73,10 @@ class FirebasePusher(object):
             'payload': notification._render_webhook()
         })
 
-        deferred.defer(cls._push_data, 'notifications', payload_data_json, _queue="firebase")
+        deferred.defer(cls._push_data, cls.FIREHOSE_FEED, payload_data_json, _queue="firebase")
+
+        if notification._event_feed:
+            deferred.defer(cls._push_data, cls.EVENT_FEED.format(notification._event_feed), payload_data_json, _queue="firebase")
+
+        if notification._district_feed:
+            deferred.defer(cls._push_data, cls.DISTRICT_FEED.format(notification._district_feed), payload_data_json, _queue="firebase")

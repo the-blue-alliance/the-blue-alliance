@@ -39,7 +39,6 @@ class ApiTrustedEventAllianceSelectionsUpdate(ApiTrustedBaseController):
 
         event = Event.get_by_id(event_key)
         event.alliance_selections_json = json.dumps(alliance_selections)
-        event.dirty = True  # TODO: hacky
         EventManipulator.createOrUpdate(event)
 
         self.response.out.write(json.dumps({'Success': "Alliance selections successfully updated"}))
@@ -146,6 +145,23 @@ class ApiTrustedEventMatchesDelete(ApiTrustedBaseController):
         self.response.out.write(ret)
 
 
+class ApiTrustedEventMatchesDeleteAll(ApiTrustedBaseController):
+    """
+    Deletes all matches
+    """
+    REQUIRED_AUTH_TYPES = {AuthType.EVENT_MATCHES}
+
+    def _process_request(self, request, event_key):
+        if request.body != event_key:
+            self._errors = json.dumps({"Error": "To delete all matches for this event, the body of the request must be the event key."})
+            self.abort(400)
+
+        keys_to_delete = Match.query(Match.event == ndb.Key(Event, event_key)).fetch(keys_only=True)
+        MatchManipulator.delete_keys(keys_to_delete)
+
+        self.response.out.write(json.dumps({'Success': "All matches for {} deleted".format(event_key)}))
+
+
 class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
     """
     Overwrites an event's rankings_json with new data
@@ -157,7 +173,6 @@ class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
 
         event = Event.get_by_id(event_key)
         event.rankings_json = json.dumps(rankings)
-        event.dirty = True  # TODO: hacky
         EventManipulator.createOrUpdate(event)
 
         self.response.out.write(json.dumps({'Success': "Rankings successfully updated"}))
@@ -215,7 +230,6 @@ class ApiTrustedAddMatchYoutubeVideo(ApiTrustedBaseController):
 
             if youtube_id not in match.youtube_videos:
                 match.youtube_videos.append(youtube_id)
-                match.dirty = True  # This is hacky -fangeugene 2014-10-26
                 matches_to_put.append(match)
         MatchManipulator.createOrUpdate(matches_to_put)
 

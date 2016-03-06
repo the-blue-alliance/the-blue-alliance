@@ -177,9 +177,7 @@ class DatafeedUsfirst(DatafeedBase):
         teams = []
         seen_teams = set()
         for page in range(8):  # Ensures this won't loop forever. 8 pages should be plenty.
-            page_urlparam = ''
-            if page != 0:
-                page_urlparam = 'page=%s&' % page
+            page_urlparam = 'page=%s&' % page
             url = self.EVENT_TEAMS_URL_PATTERN % (first_eid, page_urlparam)
             partial_teams, more_pages = self.parse(url, UsfirstEventTeamsParser)
             teams.extend(partial_teams)

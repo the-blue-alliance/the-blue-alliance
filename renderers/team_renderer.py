@@ -19,6 +19,8 @@ from models.event_team import EventTeam
 from models.match import Match
 from models.robot import Robot
 
+from template_engine import jinja2_engine
+
 
 class TeamRenderer(object):
     @classmethod
@@ -102,6 +104,7 @@ class TeamRenderer(object):
                 year_wlt = None
 
         medias_by_slugname = MediaHelper.group_by_slugname([media for media in media_future.get_result()])
+        image_medias = MediaHelper.get_images([media for media in media_future.get_result()])
 
         district_name = None
         district_abbrev = None
@@ -124,6 +127,7 @@ class TeamRenderer(object):
             "current_event": current_event,
             "matches_upcoming": matches_upcoming,
             "medias_by_slugname": medias_by_slugname,
+            "image_medias": image_medias,
             "robot": robot_future.get_result(),
             "district_name": district_name,
             "district_abbrev": district_abbrev,
@@ -132,8 +136,7 @@ class TeamRenderer(object):
         if short_cache:
             handler._cache_expiration = handler.SHORT_CACHE_EXPIRATION
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/team_details.html')
-        return template.render(path, handler.template_values)
+        return jinja2_engine.render('team_details.html', handler.template_values)
 
     @classmethod
     def render_team_history(cls, handler, team, is_canonical):

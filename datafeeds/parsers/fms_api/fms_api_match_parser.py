@@ -22,43 +22,75 @@ LAST_LEVEL = {
     'f': 'sf'
 }
 
+TIME_PATTERN = "%Y-%m-%dT%H:%M:%S"
 
-def camel_to_snake(s):
-    # From https://stackoverflow.com/questions/1175208/elegant-python-function-to-convert-camelcase-to-camel-case
-    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', s)
-    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+ELIM_MAPPING = {
+    1: (1, 1),  # (set, match)
+    2: (2, 1),
+    3: (3, 1),
+    4: (4, 1),
+    5: (1, 2),
+    6: (2, 2),
+    7: (3, 2),
+    8: (4, 2),
+    9: (1, 3),
+    10: (2, 3),
+    11: (3, 3),
+    12: (4, 3),
+    13: (1, 1),
+    14: (2, 1),
+    15: (1, 2),
+    16: (2, 2),
+    17: (1, 3),
+    18: (2, 3),
+    19: (1, 1),
+    20: (1, 2),
+    21: (1, 3),
+}
 
 
-def get_comp_level(match_level, match_number):
+def get_comp_level(year, match_level, match_number):
     if match_level == 'Qualification':
         return 'qm'
     else:
-        if match_number <= 8:
-            return 'qf'
-        elif match_number <= 14:
-            return 'sf'
+        if year == 2015:
+            if match_number <= 8:
+                return 'qf'
+            elif match_number <= 14:
+                return 'sf'
+            else:
+                return 'f'
         else:
-            return 'f'
+            if match_number <= 12:
+                return 'qf'
+            elif match_number <= 18:
+                return 'sf'
+            else:
+                return 'f'
 
 
-def get_match_number(comp_level, match_number):
-    if comp_level == 'sf':
-        return match_number - 8
-    elif comp_level == 'f':
-        return match_number - 14
-    else:  # qm, qf
-        return match_number
+def get_set_match_number(year, comp_level, match_number):
+    if year == 2015:
+        if comp_level == 'sf':
+            return 1, match_number - 8
+        elif comp_level == 'f':
+            return 1, match_number - 14
+        else:  # qm, qf
+            return 1, match_number
+    else:
+        if comp_level in {'qf', 'sf', 'f'}:
+            return ELIM_MAPPING[match_number]
+        else:  # qm
+            return 1, match_number
 
 
 class FMSAPIHybridScheduleParser(object):
+
     def __init__(self, year, event_short):
         self.year = year
         self.event_short = event_short
 
     def parse(self, response):
-        """
-        This currently only works for the 2015 game, where elims matches are all part of one set.
-        """
         matches = response['Schedule']
 
         event_key = '{}{}'.format(self.year, self.event_short)
@@ -69,11 +101,14 @@ class FMSAPIHybridScheduleParser(object):
             logging.warning("Event {} has no timezone! Match times may be wrong.".format(event_key))
             event_tz = None
 
-        set_number = 1
         parsed_matches = []
         for match in matches:
-            comp_level = get_comp_level(match['level'], match['matchNumber'])
-            match_number = get_match_number(comp_level, match['matchNumber'])
+            if 'tournamentLevel' in match:  # 2016+
+                level = match['tournamentLevel']
+            else:  # 2015
+                level = match['level']
+            comp_level = get_comp_level(self.year, level, match['matchNumber'])
+            set_number, match_number = get_set_match_number(self.year, comp_level, match['matchNumber'])
 
             red_teams = []
             blue_teams = []
@@ -102,20 +137,19 @@ class FMSAPIHybridScheduleParser(object):
                 }
             }
 
-            score_breakdown = {
-                'red': {
-                    'auto_points': match['scoreRedAuto'],
-                    'foul_points': match['scoreRedFoul']
-                },
-                'blue': {
-                    'auto_points': match['scoreBlueAuto'],
-                    'foul_points': match['scoreBlueFoul']
-                }
-            }
+            if not match['startTime']:  # no startTime means it's an unneeded rubber match
+                continue
 
-            time = datetime.datetime.strptime(match['startTime'], "%Y-%m-%dT%H:%M:%S")
+            time = datetime.datetime.strptime(match['startTime'].split('.')[0], TIME_PATTERN)
+            actual_time_raw = match['actualStartTime'] if 'actualStartTime' in match else None
+            actual_time = None
             if event_tz is not None:
                 time = time - event_tz.utcoffset(time)
+
+            if actual_time_raw is not None:
+                actual_time = datetime.datetime.strptime(actual_time_raw.split('.')[0], TIME_PATTERN)
+                if event_tz is not None:
+                    actual_time = actual_time - event_tz.utcoffset(actual_time)
 
             parsed_matches.append(Match(
                 id=Match.renderKeyName(
@@ -130,40 +164,42 @@ class FMSAPIHybridScheduleParser(object):
                 comp_level=comp_level,
                 team_key_names=team_key_names,
                 time=time,
+                actual_time=actual_time,
                 alliances_json=json.dumps(alliances),
-                score_breakdown_json=json.dumps(score_breakdown)
             ))
 
-        # Fix null teams in elims (due to FMS API failure, some info not complete)
-        # Should only happen for sf and f matches
-        organized_matches = MatchHelper.organizeMatches(parsed_matches)
-        for level in ['sf', 'f']:
-            playoff_advancement = MatchHelper.generatePlayoffAdvancement2015(organized_matches)
-            if playoff_advancement[LAST_LEVEL[level]] != []:
-                for match in organized_matches[level]:
-                    if 'frcNone' in match.team_key_names:
-                        if level == 'sf':
-                            red_seed, blue_seed = QF_SF_MAP[match.match_number]
-                        else:
-                            red_seed = 0
-                            blue_seed = 1
-                        red_teams = ['frc{}'.format(t) for t in playoff_advancement[LAST_LEVEL[level]][red_seed][0]]
-                        blue_teams = ['frc{}'.format(t) for t in playoff_advancement[LAST_LEVEL[level]][blue_seed][0]]
+        if self.year == 2015:
+            # Fix null teams in elims (due to FMS API failure, some info not complete)
+            # Should only happen for sf and f matches
+            organized_matches = MatchHelper.organizeMatches(parsed_matches)
+            for level in ['sf', 'f']:
+                playoff_advancement = MatchHelper.generatePlayoffAdvancement2015(organized_matches)
+                if playoff_advancement[LAST_LEVEL[level]] != []:
+                    for match in organized_matches[level]:
+                        if 'frcNone' in match.team_key_names:
+                            if level == 'sf':
+                                red_seed, blue_seed = QF_SF_MAP[match.match_number]
+                            else:
+                                red_seed = 0
+                                blue_seed = 1
+                            red_teams = ['frc{}'.format(t) for t in playoff_advancement[LAST_LEVEL[level]][red_seed][0]]
+                            blue_teams = ['frc{}'.format(t) for t in playoff_advancement[LAST_LEVEL[level]][blue_seed][0]]
 
-                        alliances = match.alliances
-                        alliances['red']['teams'] = red_teams
-                        alliances['blue']['teams'] = blue_teams
-                        match.alliances_json = json.dumps(alliances)
-                        match.team_key_names = red_teams + blue_teams
+                            alliances = match.alliances
+                            alliances['red']['teams'] = red_teams
+                            alliances['blue']['teams'] = blue_teams
+                            match.alliances_json = json.dumps(alliances)
+                            match.team_key_names = red_teams + blue_teams
 
-        fixed_matches = []
-        for key, matches in organized_matches.items():
-            if key != 'num':
-                for match in matches:
-                    if 'frcNone' not in match.team_key_names:
-                        fixed_matches.append(match)
+            fixed_matches = []
+            for key, matches in organized_matches.items():
+                if key != 'num':
+                    for match in matches:
+                        if 'frcNone' not in match.team_key_names:
+                            fixed_matches.append(match)
+            parsed_matches = fixed_matches
 
-        return fixed_matches
+        return parsed_matches
 
 
 class FMSAPIMatchDetailsParser(object):
@@ -172,16 +208,12 @@ class FMSAPIMatchDetailsParser(object):
         self.event_short = event_short
 
     def parse(self, response):
-        """
-        This currently only works for the 2015 game.
-        """
         matches = response['MatchScores']
 
         match_details_by_key = {}
-        set_number = 1
         for match in matches:
-            comp_level = get_comp_level(match['matchLevel'], match['matchNumber'])
-            match_number = get_match_number(comp_level, match['matchNumber'])
+            comp_level = get_comp_level(self.year, match['matchLevel'], match['matchNumber'])
+            set_number, match_number = get_set_match_number(self.year, comp_level, match['matchNumber'])
             breakdown = {
                 'red': {},
                 'blue': {},
@@ -194,12 +226,12 @@ class FMSAPIMatchDetailsParser(object):
                 color = alliance['alliance'].lower()
                 for key, value in alliance.items():
                     if key != 'alliance':
-                        breakdown[color][camel_to_snake(key)] = value
+                        breakdown[color][key] = value
 
             match_details_by_key[Match.renderKeyName(
-                    '{}{}'.format(self.year, self.event_short),
-                    comp_level,
-                    set_number,
-                    match_number)] = breakdown
+                '{}{}'.format(self.year, self.event_short),
+                comp_level,
+                set_number,
+                match_number)] = breakdown
 
         return match_details_by_key

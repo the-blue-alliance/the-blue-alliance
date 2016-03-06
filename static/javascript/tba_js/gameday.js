@@ -40,8 +40,9 @@ $(document).ready(function() {
     $.material.init();
 });
 
+var urlvars = getUrlVars();
+var isKickoff = urlvars['kickoff'];
 function setupViews() {
-  var urlvars = getUrlVars();
    // save views
   for (var n=0; n < MAX_VIEWS; n++) {
 	  var view = urlvars['view_' + n];
@@ -72,22 +73,19 @@ function setupViews() {
   }
 
   // Choosing to start chat opened or closed
-  var chatOpen = urlvars['chat'];
-  if (chatOpen != null) {
-	  setChat(true);
-  }
+  setChat(true);
 
   // Always start with ticker open
   setTicker(true);
 
   // Special Kickoff Mode
-  var isKickoff = urlvars['kickoff'];
   if (isKickoff != null) {
 	  layout_0();
 	  setChat(true);
+    setTicker(false);
 	  setSocial(true);
 	  setupView(0, $("#kickoff-1"));
-	  $("#nav-alert-container").html('<div class="alert alert-success nav-alert"><button type="button" class="close" data-dismiss="alert">&times;</button><strong>Welcome!</strong> Remember to come back during the competition season for webcasts, scores, and more!</div>');
+	  $("#nav-alert-container").html('<div class="alert alert-success nav-alert"><button type="button" class="close" data-dismiss="alert">&times;</button><strong>Welcome!</strong> Remember to come back during the competition season for webcasts, scores, and more!<br /><br />Have an android phone? <a href="https://goo.gl/Y3cpqi" target="_blank"><u>Install The Blue Alliance app</u></a> to get live notifications when your team is competing!</div>');
   }
 
   // Special Champs Mode

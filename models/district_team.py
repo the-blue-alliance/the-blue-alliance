@@ -35,8 +35,8 @@ class DistrictTeam(ndb.Model):
 
     @property
     def district_key(self):
-        districtAbbrev = DistrictType.type_abbrevs[districtEnum]
-        return '{}{}'.format(year, districtAbbrev)
+        districtAbbrev = DistrictType.type_abbrevs[self.district]
+        return '{}{}'.format(self.year, districtAbbrev)
 
     @classmethod
     def renderKeyName(self, year, districtEnum, teamKey):

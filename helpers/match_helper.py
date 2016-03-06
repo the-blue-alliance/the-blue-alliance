@@ -128,10 +128,10 @@ class MatchHelper(object):
     @classmethod
     def generateBracket(cls, matches, alliance_selections=None):
         complete_alliances = []
-        bracket_table = defaultdict(dict)
+        bracket_table = defaultdict(lambda: defaultdict(dict))
         for comp_level in ['qf', 'sf', 'f']:
             for match in matches[comp_level]:
-                set_number = str(match.set_number)  # for template to work
+                set_number = match.set_number
                 if set_number not in bracket_table[comp_level]:
                     bracket_table[comp_level][set_number] = {
                         'red_alliance': [],
@@ -231,6 +231,7 @@ class MatchHelper(object):
     """
     VALID_BREAKDOWNS = {
         2014: set(['auto', 'assist', 'truss+catch', 'teleop_goal+foul']),
+        2015: set(['coopertition_points', 'auto_points', 'container_points', 'tote_points', 'litter_points', 'foul_points']),
     }
 
     @classmethod

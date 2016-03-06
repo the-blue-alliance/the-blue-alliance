@@ -1,8 +1,12 @@
 import os
 
-DEBUG = os.environ.get('SERVER_SOFTWARE', '').startswith('Dev')
+
+DEBUG = os.environ.get('SERVER_SOFTWARE') is not None and os.getenv('APPLICATION_ID') != 's~tbatv-prod-hrd'
 
 MAX_YEAR = 2016
+
+# Fraction of requests to profile
+RECORD_FRACTION = 0.1
 
 # For choosing what the main landing page displays
 KICKOFF = 1
@@ -20,7 +24,8 @@ if DEBUG:
         "memcache": False,
         "database_query_cache": False,
         "response_cache": False,
-        "firebase-url": "https://thebluealliance-dev.firebaseio.com/{}.json?auth={}"
+        "firebase-url": "https://thebluealliance-dev.firebaseio.com/{}.json?auth={}",
+        "use-compiled-templates": False,
     }
 else:
     CONFIG = {
@@ -28,8 +33,9 @@ else:
         "memcache": True,
         "database_query_cache": True,
         "response_cache": True,
-        "firebase-url": "https://thebluealliance.firebaseio.com/{}.json?auth={}"
+        "firebase-url": "https://thebluealliance.firebaseio.com/{}.json?auth={}",
+        "use-compiled-templates": True
     }
 
-CONFIG['landing_handler'] = INSIGHTS
+CONFIG['landing_handler'] = COMPETITIONSEASON
 CONFIG["static_resource_version"] = 7

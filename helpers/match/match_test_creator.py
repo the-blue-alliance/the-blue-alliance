@@ -63,6 +63,7 @@ class MatchTestCreator(object):
             team_key_names=[team.key_name for team in teams],
             youtube_videos=youtube_videos,
             tba_videos=tba_videos,
+            time=datetime.datetime.now() + datetime.timedelta(hours=2) + datetime.timedelta(minutes=6) * match_number
         )
 
     def createCompleteQuals(self):
