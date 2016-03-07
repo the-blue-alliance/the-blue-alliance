@@ -23,6 +23,7 @@ class DistrictHelper(object):
     Point calculations based on:
     2014: http://www.usfirst.org/sites/default/files/uploadedFiles/Robotics_Programs/FRC/Resources/FRC_District_Standard_Points_Ranking_System.pdf
     2015: http://www.usfirst.org/sites/default/files/uploadedFiles/Robotics_Programs/FRC/Game_and_Season__Info/2015/FRC_District_Standard_Points_Ranking_System_2015%20Summary.pdf
+    2016: https://firstfrc.blob.core.windows.net/frc2016manuals/AdminManual/FRC-2016-admin-manual.pdf
     """
     @classmethod
     def inverf(cls, x):
@@ -169,87 +170,33 @@ class DistrictHelper(object):
         return team_totals
 
     @classmethod
-    def calc_wlt_based_match_points(cls, district_points, match_futures, POINTS_MULTIPLIER):
-        """
-        Calculates match district points based on team record (wins, losses, ties)
-        This algorithm was used prior to the 2015 season
-        """
+    def calc_elim_match_points(cls, district_points, matches, POINTS_MULTIPLIER):
         elim_num_wins = defaultdict(lambda: defaultdict(int))
         elim_alliances = defaultdict(lambda: defaultdict(list))
-        for match_future in match_futures:
-            match = match_future.get_result()
-            if not match.has_been_played:
+        for match in matches:
+            if not match.has_been_played or match.winning_alliance == '':
+                # Skip unplayed matches
                 continue
 
-            if match.comp_level == 'qm':  # Qual match points
-                if match.winning_alliance == '':  # Match is a tie
-                    for team in match.team_key_names:
-                        district_points['points'][team]['qual_points'] += DistrictPointValues.MATCH_TIE * POINTS_MULTIPLIER
-                else:  # Somebody won the match
-                    for team in match.alliances[match.winning_alliance]['teams']:
-                        district_points['points'][team]['qual_points'] += DistrictPointValues.MATCH_WIN * POINTS_MULTIPLIER
-                        district_points['tiebreakers'][team]['qual_wins'] += 1
+            match_set_key = '{}_{}{}'.format(match.event.id(), match.comp_level, match.set_number)
+            elim_num_wins[match_set_key][match.winning_alliance] += 1
+            elim_alliances[match_set_key][match.winning_alliance] += match.alliances[match.winning_alliance]['teams']
 
-                for color in ['red', 'blue']:
-                    for team in match.alliances[color]['teams']:
-                        score = match.alliances[color]['score']
-                        district_points['tiebreakers'][team]['highest_qual_scores'] = heapq.nlargest(3, district_points['tiebreakers'][team]['highest_qual_scores'] + [score])
-            else:  # Elim match points
-                if match.winning_alliance == '':
-                    # Skip unplayed matches
-                    continue
-
-                match_set_key = '{}_{}{}'.format(match.event.id(), match.comp_level, match.set_number)
-                elim_num_wins[match_set_key][match.winning_alliance] += 1
-                elim_alliances[match_set_key][match.winning_alliance] += match.alliances[match.winning_alliance]['teams']
-
-                # Add in points for elim match wins. Probably doesn't account for backup bots well
-                if elim_num_wins[match_set_key][match.winning_alliance] >= 2:
-                    for team in elim_alliances[match_set_key][match.winning_alliance]:
-                        point_value = 0
-                        if match.comp_level == 'qf':
-                            point_value = DistrictPointValues.QF_WIN.get(match.year, DistrictPointValues.QF_WIN_DEFAULT) * POINTS_MULTIPLIER
-                        elif match.comp_level == 'sf':
-                            point_value = DistrictPointValues.SF_WIN.get(match.year, DistrictPointValues.SF_WIN_DEFAULT) * POINTS_MULTIPLIER
-                        elif match.comp_level == 'f':
-                            point_value = DistrictPointValues.F_WIN.get(match.year, DistrictPointValues.F_WIN_DEFAULT) * POINTS_MULTIPLIER
-                        district_points['points'][team]['elim_points'] += point_value
+            # Add in points for elim match wins. Probably doesn't account for backup bots well
+            # 2016-03-07: Maybe this does work for backup bots? -Eugene
+            if elim_num_wins[match_set_key][match.winning_alliance] >= 2:
+                for team in elim_alliances[match_set_key][match.winning_alliance]:
+                    point_value = 0
+                    if match.comp_level == 'qf':
+                        point_value = DistrictPointValues.QF_WIN.get(match.year, DistrictPointValues.QF_WIN_DEFAULT) * POINTS_MULTIPLIER
+                    elif match.comp_level == 'sf':
+                        point_value = DistrictPointValues.SF_WIN.get(match.year, DistrictPointValues.SF_WIN_DEFAULT) * POINTS_MULTIPLIER
+                    elif match.comp_level == 'f':
+                        point_value = DistrictPointValues.F_WIN.get(match.year, DistrictPointValues.F_WIN_DEFAULT) * POINTS_MULTIPLIER
+                    district_points['points'][team]['elim_points'] += point_value
 
     @classmethod
-    def calc_rank_based_match_points(cls, event, district_points, match_futures, POINTS_MULTIPLIER):
-        """
-        Calculates match district points based on team ranking
-        This algorithm was introduced for the 2015 season and also used for 2016
-        See: http://www.firstinspires.org/node/7616 and also
-        http://www.firstinspires.org/robotics/frc/blog/Admin-Manual-Section-7-and-the-FIRST-STRONGHOLD-Logo
-        """
-        from helpers.match_helper import MatchHelper  # circular import issue
-
-        # qual match points are calculated by rank
-        if event.rankings and len(event.rankings) > 1:
-            rankings = event.rankings[1:]  # skip title row
-            num_teams = len(rankings)
-            alpha = 1.07
-            for row in rankings:
-                rank = int(row[0])
-                team = 'frc{}'.format(row[1])
-                qual_points = int(np.ceil(cls.inverf(float(num_teams - 2 * rank + 2) / (alpha * num_teams)) * (
-                10.0 / cls.inverf(1.0 / alpha)) + 12))
-                district_points['points'][team]['qual_points'] = qual_points * POINTS_MULTIPLIER
-        else:
-            logging.warning("Event {} has no rankings for qual_points calculations!".format(event.key.id()))
-
-        matches = MatchHelper.organizeMatches([mf.get_result() for mf in match_futures])
-
-        # qual match calculations. only used for tiebreaking
-        for match in matches['qm']:
-            for color in ['red', 'blue']:
-                for team in match.alliances[color]['teams']:
-                    score = match.alliances[color]['score']
-                    district_points['tiebreakers'][team]['highest_qual_scores'] = heapq.nlargest(3, district_points[
-                        'tiebreakers'][team]['highest_qual_scores'] + [score])
-
-        # elim match point calculations
+    def calc_elim_match_points_2015(cls, district_points, matches, POINTS_MULTIPLIER):
         # count number of matches played per team per comp level
         num_played = defaultdict(lambda: defaultdict(int))
         for level in ['qf', 'sf']:
@@ -295,3 +242,73 @@ class DistrictHelper(object):
                 points = DistrictPointValues.F_WIN.get(event.year, DistrictPointValues.F_WIN_DEFAULT)
                 for team in team_matches_played[match.winning_alliance]:
                     district_points['points'][team]['elim_points'] += points * POINTS_MULTIPLIER
+
+    @classmethod
+    def calc_wlt_based_match_points(cls, district_points, match_futures, POINTS_MULTIPLIER):
+        """
+        Calculates match district points based on team record (wins, losses, ties)
+        This algorithm was used prior to the 2015 season
+        """
+        elim_matches = []
+        for match_future in match_futures:
+            match = match_future.get_result()
+            if not match.has_been_played:
+                continue
+
+            if match.comp_level == 'qm':  # Qual match points
+                if match.winning_alliance == '':  # Match is a tie
+                    for team in match.team_key_names:
+                        district_points['points'][team]['qual_points'] += DistrictPointValues.MATCH_TIE * POINTS_MULTIPLIER
+                else:  # Somebody won the match
+                    for team in match.alliances[match.winning_alliance]['teams']:
+                        district_points['points'][team]['qual_points'] += DistrictPointValues.MATCH_WIN * POINTS_MULTIPLIER
+                        district_points['tiebreakers'][team]['qual_wins'] += 1
+
+                for color in ['red', 'blue']:
+                    for team in match.alliances[color]['teams']:
+                        score = match.alliances[color]['score']
+                        district_points['tiebreakers'][team]['highest_qual_scores'] = heapq.nlargest(3, district_points['tiebreakers'][team]['highest_qual_scores'] + [score])
+            else:  # Elim match points
+                elim_matches.append(match)
+        cls.calc_elim_match_points(district_points, elim_matches, POINTS_MULTIPLIER)
+
+    @classmethod
+    def calc_rank_based_match_points(cls, event, district_points, match_futures, POINTS_MULTIPLIER):
+        """
+        Calculates match district points based on team ranking
+        This algorithm was introduced for the 2015 season and also used for 2016
+        See: http://www.firstinspires.org/node/7616 and also
+        http://www.firstinspires.org/robotics/frc/blog/Admin-Manual-Section-7-and-the-FIRST-STRONGHOLD-Logo
+        """
+        from helpers.match_helper import MatchHelper  # circular import issue
+
+        # qual match points are calculated by rank
+        if event.rankings and len(event.rankings) > 1:
+            rankings = event.rankings[1:]  # skip title row
+            num_teams = len(rankings)
+            alpha = 1.07
+            for row in rankings:
+                rank = int(row[0])
+                team = 'frc{}'.format(row[1])
+                qual_points = int(np.ceil(cls.inverf(float(num_teams - 2 * rank + 2) / (alpha * num_teams)) * (
+                10.0 / cls.inverf(1.0 / alpha)) + 12))
+                district_points['points'][team]['qual_points'] = qual_points * POINTS_MULTIPLIER
+        else:
+            logging.warning("Event {} has no rankings for qual_points calculations!".format(event.key.id()))
+
+        matches = MatchHelper.organizeMatches([mf.get_result() for mf in match_futures])
+
+        # qual match calculations. only used for tiebreaking
+        for match in matches['qm']:
+            for color in ['red', 'blue']:
+                for team in match.alliances[color]['teams']:
+                    score = match.alliances[color]['score']
+                    district_points['tiebreakers'][team]['highest_qual_scores'] = heapq.nlargest(3, district_points[
+                        'tiebreakers'][team]['highest_qual_scores'] + [score])
+
+        # elim match point calculations
+        if match.year == 2015:
+            cls.calc_elim_match_points_2015(district_points, matches, POINTS_MULTIPLIER)
+        else:
+            elim_matches = matches.get('qf', []) + matches.get('sf', []) + matches.get('f', [])
+            cls.calc_elim_match_points(district_points, elim_matches, POINTS_MULTIPLIER)
