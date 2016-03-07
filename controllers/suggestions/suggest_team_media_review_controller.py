@@ -43,8 +43,8 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self):
-        accept_keys = map(int, self.request.POST.getall("accept_keys[]"))
-        reject_keys = map(int, self.request.POST.getall("reject_keys[]"))
+        accept_keys = map(lambda x: int(x) if x.isdigit() else x, self.request.POST.getall("accept_keys[]"))
+        reject_keys = map(lambda x: int(x) if x.isdigit() else x, self.request.POST.getall("reject_keys[]"))
 
         accepted_suggestion_futures = [Suggestion.get_by_id_async(key) for key in accept_keys]
         rejected_suggestion_futures = [Suggestion.get_by_id_async(key) for key in reject_keys]

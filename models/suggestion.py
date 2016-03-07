@@ -49,3 +49,11 @@ class Suggestion(ndb.Model):
     def youtube_video(self):
         if "youtube_videos" in self.contents:
             return self.contents["youtube_videos"][0]
+
+    @classmethod
+    def render_key_name(cls, year, target_model, target_key):
+        """
+        Keys aren't required for this model. This is only necessary if checking
+        for duplicate suggestions is desired.
+        """
+        return '{}_{}_{}'.format(year, target_model, target_key)
