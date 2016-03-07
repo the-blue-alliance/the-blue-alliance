@@ -121,9 +121,7 @@ class Event(ndb.Model):
                 self.get_matches_async().wait()
         return self._matches
 
-    def withinDays(self, negative_days_before, days_after):
-        if not self.start_date or not self.end_date:
-            return False
+    def local_time(self):
         now = datetime.datetime.now()
         if self.timezone_id is not None:
             tz = pytz.timezone(self.timezone_id)
@@ -131,6 +129,12 @@ class Event(ndb.Model):
                 now = now + tz.utcoffset(now)
             except pytz.NonExistentTimeError:  # may happen during DST
                 now = now + tz.utcoffset(now + datetime.timedelta(hours=1))  # add offset to get out of non-existant time
+        return now
+
+    def withinDays(self, negative_days_before, days_after):
+        if not self.start_date or not self.end_date:
+            return False
+        now = self.local_time()
         after_start = self.start_date.date() + datetime.timedelta(days=negative_days_before) <= now.date()
         before_end = self.end_date.date() + datetime.timedelta(days=days_after) >= now.date()
 
@@ -154,6 +158,14 @@ class Event(ndb.Model):
     @property
     def future(self):
         return self.start_date.date() > datetime.date.today() and not self.within_a_day
+
+    @property
+    def starts_today(self):
+        return self.start_date.date() == self.local_time().date()
+
+    @property
+    def ends_today(self):
+        return self.end_date.date() == self.local_time().date()
 
     @ndb.tasklet
     def get_teams_async(self):
