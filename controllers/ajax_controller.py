@@ -194,6 +194,6 @@ class WebcastHandler(CacheableHandler):
         return template.render(path, template_values)
 
     def memcacheFlush(self, event_key):
-        keys = [self.CACHE_KEY_FORMAT.format(event_key, n) for n in range(10)]
+        keys = [self._render_cache_key(self.CACHE_KEY_FORMAT.format(event_key, n)) for n in range(10)]
         memcache.delete_multi(keys)
         return keys
