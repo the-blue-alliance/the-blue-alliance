@@ -144,7 +144,7 @@
         </thead>
         <tbody>
           {% for number, team_list in regional_district_winners.data %}
-            {% if team_list|length < 50 %}
+            {% if team_list|length < 50 or forloop.first %}
             <tr>
               <td>{{number}}</td>
               <td>
