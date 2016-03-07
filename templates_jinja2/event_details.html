@@ -120,7 +120,7 @@
         <div class="col-sm-6">
           {% include "event_partials/event_alliances_table.html" %}
 
-          <h3>{% if is_2015_playoff %}Playoff{% else %}Elimination{% endif %} Results</h3>
+          <h3>{% if event.year >= 2015 %}Playoff{% else %}Elimination{% endif %} Results</h3>
           {% include "match_partials/elim_match_table.html" %}
 
           {% if matches.qm %}
@@ -129,7 +129,7 @@
                 <h3>Playoff Advancement</h3>
                 {% include "playoff_partials/playoff_table.html" %}
               {% else %}
-                <h3>Elimination Bracket</h3>
+                <h3>{% if event.year >= 2015 %}Playoff{% else %}Elimination{% endif %} Bracket</h3>
                 {% include "bracket_partials/bracket_table.html" %}
               {% endif %}
             {% endif %}
@@ -151,7 +151,7 @@
               <h3>Playoff Advancement</h3>
               {% include "playoff_partials/playoff_table.html" %}
             {% else %}
-              <h3>Elimination Bracket</h3>
+              <h3>{% if event.year >= 2015 %}Playoff{% else %}Elimination{% endif %} Bracket</h3>
               {% include "bracket_partials/bracket_table.html" %}
             {% endif %}
           {% endif %}
@@ -301,7 +301,7 @@
                 <th>Rank</th>
                 <th>Team</th>
                 <th>Qual Points</th>
-                <th>Elim Points</th>
+                <th>{% if event.year >= 2015 %}Playoff{% else %}Elim{% endif %} Points</th>
                 <th>Alliance Points</th>
                 <th>Award Points</th>
                 <th>Total Points</th>
