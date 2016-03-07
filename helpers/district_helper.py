@@ -217,7 +217,7 @@ class DistrictHelper(object):
                     for color in ['red', 'blue']:
                         if set(teams).intersection(set(match.alliances[color]['teams'])) != set():
                             for team in teams:
-                                points = DistrictPointValues.QF_WIN.get(event.year, DistrictPointValues.QF_WIN_DEFAULT) if last_level == 'qf' else DistrictPointValues.SF_WIN.get(event.year, DistrictPointValues.SF_WIN_DEFAULT)
+                                points = DistrictPointValues.QF_WIN.get(match.year, DistrictPointValues.QF_WIN_DEFAULT) if last_level == 'qf' else DistrictPointValues.SF_WIN.get(match.year, DistrictPointValues.SF_WIN_DEFAULT)
                                 district_points['points'][team]['elim_points'] += int(
                                     np.ceil(points * num_played[last_level][team])) * POINTS_MULTIPLIER
                             done = True
@@ -307,7 +307,7 @@ class DistrictHelper(object):
                         'tiebreakers'][team]['highest_qual_scores'] + [score])
 
         # elim match point calculations
-        if match.year == 2015:
+        if event.year == 2015:
             cls.calc_elim_match_points_2015(district_points, matches, POINTS_MULTIPLIER)
         else:
             elim_matches = matches.get('qf', []) + matches.get('sf', []) + matches.get('f', [])
