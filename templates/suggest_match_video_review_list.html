@@ -37,6 +37,7 @@
                     </div>
                     <div class="col-xs-3">
                         <ul>
+                            <li>{{ suggestion.key.id }}</a></li>
                             <li>{{ suggestion.author.get.email }}</a></li>
                             <li>{{ suggestion.author.get.nickname }}</a></li>
                             <li>{{ suggestion.target_model }}:{{ suggestion.target_key }}</li>
@@ -53,7 +54,7 @@
                 </div>
             </div>
             {% endfor %}
-            
+
             <div class="row">
                 <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-pencil"></span> Act On Selected</button>
             </div>
