@@ -167,6 +167,8 @@ class EventDetail(CacheableHandler):
 
         self.template_values.update({
             "event": event,
+            "district_name": DistrictType.type_names.get(event.event_district_enum, None),
+            "district_abbrev": DistrictType.type_abbrevs.get(event.event_district_enum, None),
             "matches": matches,
             "matches_recent": matches_recent,
             "matches_upcoming": matches_upcoming,

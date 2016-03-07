@@ -28,6 +28,7 @@
       <p class="pull-right"><a class="btn btn-default" href="/event/{{event.key_name}}"><span class="glyphicon glyphicon-refresh"></span></a></p>
       <p><a class="btn btn-default" href="/events/{{event.year}}"><span class="glyphicon glyphicon-chevron-left"></span> {{event.year}} Events</a></p>
       <h1 itemprop="summary">{{event.name}} {{event.year}}</h1>
+      {% if district_name %}<blockquote><em>Part of the <a href="/events/{{district_abbrev}}/{{event.year}}">{{district_name}} District</a></em></blockquote>{% endif %}
     </div>
   </div>
   <div class="row">
