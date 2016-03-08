@@ -13,7 +13,8 @@ class SuggestionCreator(object):
         if media_dict is not None:
             existing_media = Media.get_by_id(Media.render_key_name(media_dict['media_type_enum'], media_dict['foreign_key']))
             if existing_media is None or team_key not in [reference.id() for reference in existing_media.references]:
-                suggestion_id = Suggestion.render_key_name(year_str, 'team', team_key)
+                foreign_type = Media.SLUG_NAMES[media_dict['media_type_enum']]
+                suggestion_id = Suggestion.render_key_name(year_str, 'team', team_key, foreign_type, media_dict['foreign_key'])
                 suggestion = Suggestion.get_by_id(suggestion_id)
                 if not suggestion or suggestion.review_state != Suggestion.REVIEW_PENDING:
                     media_dict['year'] = int(year_str)

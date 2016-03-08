@@ -55,7 +55,7 @@ class SuggestMatchVideoController(LoggedInHandler):
         if youtube_id is not None:
             if youtube_id not in match_future.get_result().youtube_videos:
                 year = match_key[:4]
-                suggestion_id = Suggestion.render_key_name(year, 'match', match_key)
+                suggestion_id = Suggestion.render_key_name(year, 'match', match_key, 'youtube', youtube_id)
                 suggestion = Suggestion.get_by_id(suggestion_id)
                 if not suggestion or suggestion.review_state != Suggestion.REVIEW_PENDING:
                     suggestion = Suggestion(
