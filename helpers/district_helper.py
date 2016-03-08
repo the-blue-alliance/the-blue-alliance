@@ -241,7 +241,7 @@ class DistrictHelper(object):
                 team_matches_played[match.winning_alliance].append(team)
 
             if num_wins[match.winning_alliance] >= 2:
-                points = DistrictPointValues.F_WIN.get(event.year, DistrictPointValues.F_WIN_DEFAULT)
+                points = DistrictPointValues.F_WIN.get(match.year, DistrictPointValues.F_WIN_DEFAULT)
                 for team in team_matches_played[match.winning_alliance]:
                     district_points['points'][team]['elim_points'] += points * POINTS_MULTIPLIER
 
