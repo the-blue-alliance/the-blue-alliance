@@ -197,6 +197,8 @@ class DistrictHelper(object):
 
     @classmethod
     def calc_elim_match_points_2015(cls, district_points, matches, POINTS_MULTIPLIER):
+        from helpers.match_helper import MatchHelper  # circular import issue
+
         # count number of matches played per team per comp level
         num_played = defaultdict(lambda: defaultdict(int))
         for level in ['qf', 'sf']:
