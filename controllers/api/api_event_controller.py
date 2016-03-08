@@ -11,6 +11,7 @@ from database.event_query import EventListQuery
 
 from helpers.award_helper import AwardHelper
 from helpers.district_helper import DistrictHelper
+from helpers.event_insights_helper import EventInsightsHelper
 from helpers.model_to_dict import ModelToDict
 
 from models.event import Event
@@ -91,7 +92,7 @@ class ApiEventMatchesController(ApiEventController):
 
 class ApiEventStatsController(ApiEventController):
     CACHE_KEY_FORMAT = "apiv2_event_stats_controller_{}"  # (event_key)
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
@@ -104,7 +105,16 @@ class ApiEventStatsController(ApiEventController):
     def _render(self, event_key):
         self._set_event(event_key)
 
-        return json.dumps(Event.get_by_id(event_key).matchstats)
+        stats = {}
+        matchstats = self.event.matchstats
+        if matchstats:
+            stats.update(matchstats)
+
+        year_specific = EventInsightsHelper.calculate_event_insights(self.event.matches, self.event.year)
+        if year_specific:
+            stats['year_specific'] = year_specific
+
+        return json.dumps(stats)
 
 
 class ApiEventRankingsController(ApiEventController):
