@@ -65,18 +65,18 @@
               </div>
           </div><br>
 
-          {% for suggestion, reference in suggestions_and_references %}
+          {% for suggestion, reference, preferred in suggestions_and_references_and_preferred %}
           <div class="row">
               <div class="well">
                   <div class="col-xs-2">
-                    <label class="checkbox text-success" for="accept_{{suggestion.key.id}}"><input class="accept" type="checkbox" name="accept_keys[]" id="accept_{{suggestion.key.id}}" value="{{suggestion.key.id}}"> Accept</label>
-                    <label class="checkbox text-danger" for="reject_{{suggestion.key.id}}"><input class="reject" type="checkbox" name="reject_keys[]" id="reject_{{suggestion.key.id}}" value="{{suggestion.key.id}}"> Reject</label>
+                    <label class="checkbox text-success" for="accept_{{suggestion.key.id()}}"><input class="accept" type="checkbox" name="accept_keys[]" id="accept_{{suggestion.key.id()}}" value="{{suggestion.key.id()}}"> Accept</label>
+                    <label class="checkbox text-danger" for="reject_{{suggestion.key.id()}}"><input class="reject" type="checkbox" name="reject_keys[]" id="reject_{{suggestion.key.id()}}" value="{{suggestion.key.id()}}"> Reject</label>
                   </div>
-                  <div class="col-xs-7 fitvids">
+                  <div class="col-xs-5 fitvids">
                       <p><strong><a href="/team/{{reference.team_number}}/{{suggestion.contents.year}}" target="_blank">Team {{reference.team_number}}{% if reference.nickname %} - {{reference.nickname}}{% endif %} ({{suggestion.contents.year}})</a></strong></p>
                       {% if suggestion.contents.media_type_enum == 1 %}
                         <a href="http://www.chiefdelphi.com/media/photos/{{suggestion.contents.foreign_key}}" target="_blank">
-                          <img class="img-thumbnail" src="http://www.chiefdelphi.com/media/img/{{suggestion.details.thumbnail}}" style="max-height: 150px;">
+                          <img class="img-thumbnail" src="http://www.chiefdelphi.com/media/img/{{suggestion.details.thumbnail}}" style="max-height: 200px;">
                         </a>
                       {% endif %}
                       {% if suggestion.contents.media_type_enum == 0 %}
@@ -84,14 +84,37 @@
                       {% endif %}
                       {% if suggestion.contents.media_type_enum == 2 %}
                         <a href="http://imgur.com/{{suggestion.contents.foreign_key}}" target="_blank">
-                          <img class="img-thumbnail" src="http://i.imgur.com/{{suggestion.contents.foreign_key}}m.jpg" style="max-height: 150px;">
+                          <img class="img-thumbnail" src="http://i.imgur.com/{{suggestion.contents.foreign_key}}m.jpg" style="max-height: 200px;">
                         </a>
                       {% endif %}
-
                   </div>
                   <div class="col-xs-3">
+                    {% if preferred %}
+                    <strong>Existing Preferred:</strong>
+                    {% endif %}
+                    {% for media in preferred %}
+                      {% if preferred|length >= max_preferred %}
+                      <label class="radio text-info">
+                        <input type="radio" name="replace-preferred-{{suggestion.key.id()}}" value="{{media.key.id()}}"> Replace
+                      </label>
+                      {% endif %}
+                      <div style="max-width: 100px;">
+                        {% include "media_partials/image_thumbnail_partial.html" %}
+                      </div>
+                    {% endfor %}
+                    {% if preferred|length < max_preferred %}
+                    <label class="checkbox text-info" for="preferred_{{suggestion.key.id()}}">
+                      <input type="checkbox" name="preferred_keys[]" id="preferred_{{suggestion.key.id()}}" value="{{suggestion.key.id()}}"> Add as Preferred<br>(Doesn't do anything for non-images)
+                    </label>
+                    {% else %}
+                      <label class="radio text-info">
+                        <input type="radio" name="replace-preferred-{{suggestion.key.id()}}" value="" checked> Keep Current Preferred
+                      </label>
+                    {% endif %}
+                  </div>
+                  <div class="col-xs-2">
                       <ul>
-                          <li>{{ suggestion.key.id }}</a></li>
+                          <li>{{ suggestion.key.id() }}</a></li>
                           <li>{{ suggestion.author.get.email }}</a></li>
                           <li>{{ suggestion.author.get.nickname }}</a></li>
                           <li>{{ suggestion.contents_json }}</li>
@@ -101,7 +124,7 @@
                   <div class="clearfix"></div>
               </div>
           </div>
-          {% empty %}
+          {% else %}
           <div class="row">
               <div class="well">
                   <p>No suggestions! Go build more community!</p>

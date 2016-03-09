@@ -11,3 +11,4 @@
 <button class="btn btn-danger" data-key-name="{{media.key_name}}" data-toggle="modal" data-target="#confirm-delete">
     Remove media reference
 </button>
+{% if team.key in media.preferred_references %}Preferred{% endif %}

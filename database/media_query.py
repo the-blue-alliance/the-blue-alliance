@@ -8,7 +8,7 @@ from models.team import Team
 
 
 class TeamYearMediaQuery(DatabaseQuery):
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'team_year_media_{}_{}'  # (team_key, year)
 
     def __init__(self, team_key, year):
@@ -25,7 +25,7 @@ class TeamYearMediaQuery(DatabaseQuery):
 
 
 class EventTeamsMediasQuery(DatabaseQuery):
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'event_teams_medias_{}'  # (event_key)
 
     def __init__(self, event_key):

@@ -23,6 +23,8 @@ class Media(ndb.Model):
         'team': Team
     }
 
+    MAX_PREFERRED = 3  # Loosely enforced. Not a big deal.
+
     # media_type and foreign_key make up the key_name
     media_type_enum = ndb.IntegerProperty(required=True)
     foreign_key = ndb.StringProperty(required=True)  # Unique id for the particular media type. Ex: the Youtube Video key at the end of a YouTube url
@@ -31,6 +33,7 @@ class Media(ndb.Model):
     private_details_json = ndb.StringProperty()  # Additional properties we don't want to expose via API
     year = ndb.IntegerProperty()  # None if year is not relevant
     references = ndb.KeyProperty(repeated=True)  # Other models that are linked to this object
+    preferred_references = ndb.KeyProperty(repeated=True)  # Other models for which this media is "Preferred"
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
@@ -40,6 +43,7 @@ class Media(ndb.Model):
         # keys must be model properties
         self._affected_references = {
             'references': set(),
+            'preferred_references': set(),
             'year': set(),
         }
         self._details = None
