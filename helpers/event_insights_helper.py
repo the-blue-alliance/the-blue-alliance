@@ -123,8 +123,8 @@ class EventInsightsHelper(object):
             'C_Drawbridge': [0, 0, 0],
             'D_RoughTerrain': [0, 0, 0],
             'D_RockWall': [0, 0, 0],
-            'average_high_goals': float(high_goals) / finished_matches,
-            'average_low_goals': float(low_goals) / finished_matches,
+            'average_high_goals': float(high_goals) / (2 * finished_matches),
+            'average_low_goals': float(low_goals) / (2 * finished_matches),
             'breaches': [breaches, opportunities_1x, 100.0 * float(breaches) / opportunities_1x],  # [# success, # opportunities, %]
             'scales': [scales, opportunities_3x, 100.0 * float(scales) / opportunities_3x],
             'challenges': [challenges, opportunities_3x, 100.0 * float(challenges) / opportunities_3x],
@@ -132,11 +132,11 @@ class EventInsightsHelper(object):
             'average_win_score': float(winning_scores) / finished_matches,
             'average_win_margin': float(win_margins) / finished_matches,
             'average_score': float(total_scores) / (2 * finished_matches),
-            'average_auto_score': float(auto_scores) / finished_matches,
-            'average_crossing_score': float(crossing_scores) / finished_matches,
-            'average_boulder_score': float(boulder_scores) / finished_matches,
-            'average_tower_score': float(tower_scores) / finished_matches,
-            'average_foul_score': float(foul_scores) / finished_matches,
+            'average_auto_score': float(auto_scores) / (2 * finished_matches),
+            'average_crossing_score': float(crossing_scores) / (2 * finished_matches),
+            'average_boulder_score': float(boulder_scores) / (2 * finished_matches),
+            'average_tower_score': float(tower_scores) / (2 * finished_matches),
+            'average_foul_score': float(foul_scores) / (2 * finished_matches),
             'high_score': high_score,  # [score, match key, match name]
         }
         for defense, opportunities in defense_opportunities.items():
