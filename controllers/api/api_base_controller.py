@@ -1,3 +1,4 @@
+import datetime
 import json
 import logging
 import md5
@@ -95,18 +96,11 @@ class ApiBaseController(CacheableHandler):
     def _read_cache(self):
         """
         Overrides parent method to use CachedResponse instead of memcache
-        Returns:
-        None if not cached
-        the cached response if cached
-        True if in not modified
         """
         response = CachedResponse.get_by_id(self.cache_key)
         if response:
-            if self._has_been_modified_since(response.updated):
-                response.headers['Last-Modified'] = self.response.headers['Last-Modified']
-                return response
-            else:
-                return True
+            self._last_modified = response.updated
+            return response
         else:
             return None
 

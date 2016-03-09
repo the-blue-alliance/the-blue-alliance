@@ -117,7 +117,7 @@ class TypeaheadHandler(CacheableHandler):
     Tried a trie but the datastructure was too big to
     fit into memcache efficiently
     """
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "typeahead_entries:{}"  # (search_key)
     CACHE_HEADER_LENGTH = 60 * 60 * 24
 
@@ -137,10 +137,8 @@ class TypeaheadHandler(CacheableHandler):
         if entry is None:
             return '[]'
         else:
-            if self._has_been_modified_since(entry.updated):
-                return entry.data_json
-            else:
-                return None
+            self._last_modified = entry.updated
+            return entry.data_json
 
 
 class WebcastHandler(CacheableHandler):
