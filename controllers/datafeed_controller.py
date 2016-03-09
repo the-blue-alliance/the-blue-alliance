@@ -458,6 +458,8 @@ class EventDetailsGet(webapp.RequestHandler):
         if not teams:
             # No teams found registered for this event
             teams = []
+        if type(teams) is not list:
+            teams = [teams]
 
         # Build EventTeams
         event_teams = [EventTeam(
