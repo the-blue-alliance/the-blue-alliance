@@ -17,6 +17,7 @@ from controllers.main_controller import ContactHandler, HashtagsHandler, \
     AboutHandler, ThanksHandler, handle_404, handle_500, \
     GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler, ApiWriteHandler, MatchInputHandler, WebhookDocumentationHandler
 from controllers.match_controller import MatchDetail
+from controllers.nightbot_controller import NightbotTeamNextmatchHandler, NightbotTeamStatuskHandler
 from controllers.notification_controller import UserNotificationBroadcast
 from controllers.district_controller import DistrictDetail
 from controllers.suggestions.suggest_match_video_controller import SuggestMatchVideoController
@@ -104,6 +105,8 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/_/account/favorites/add', AccountFavoritesAddHandler, 'ajax-account-favorites-add', strict_slash=True),
       RedirectRoute(r'/_/account/favorites/delete', AccountFavoritesDeleteHandler, 'ajax-account-favorites-delete', strict_slash=True),
       RedirectRoute(r'/_/live-event/<event_key>/<timestamp:[0-9]+>', LiveEventHandler, 'ajax-live-event', strict_slash=True),
+      RedirectRoute(r'/_/nightbot/nextmatch/<team_number:[0-9]+>', NightbotTeamNextmatchHandler, 'nightbot-team-nextmatch', strict_slash=True),
+      RedirectRoute(r'/_/nightbot/status/<team_number:[0-9]+>', NightbotTeamStatuskHandler, 'nightbot-team-status', strict_slash=True),
       RedirectRoute(r'/_/typeahead/<search_key>', TypeaheadHandler, 'ajax-typeahead', strict_slash=True),
       RedirectRoute(r'/_/webcast/<event_key>/<webcast_number>', WebcastHandler, 'ajax-webcast', strict_slash=True),
       ],
