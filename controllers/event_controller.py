@@ -115,7 +115,7 @@ class EventDetail(CacheableHandler):
             self.abort(404)
 
         event.prepAwardsMatchesTeams()
-        medias_future = media_query.EventTeamsMediasQuery(event_key).fetch_async()
+        medias_future = media_query.EventTeamsPreferredMediasQuery(event_key).fetch_async()
 
         awards = AwardHelper.organizeAwards(event.awards)
         cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)

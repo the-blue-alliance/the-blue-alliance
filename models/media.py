@@ -33,7 +33,7 @@ class Media(ndb.Model):
     private_details_json = ndb.StringProperty()  # Additional properties we don't want to expose via API
     year = ndb.IntegerProperty()  # None if year is not relevant
     references = ndb.KeyProperty(repeated=True)  # Other models that are linked to this object
-    preferred_references = ndb.KeyProperty(repeated=True)  # Other models for which this media is "Preferred"
+    preferred_references = ndb.KeyProperty(repeated=True)  # Other models for which this media is "Preferred". All preferred_references MUST also be in references
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
