@@ -57,6 +57,7 @@ class CacheableHandler(webapp2.RequestHandler):
                 return None
         else:
             self.response.headers.update(cached_response.headers)
+            del self.response.headers['Content-Length']  # Content-Length gets set automatically
             if self._has_been_modified_since(self._last_modified):
                 self.response.out.write(cached_response.body)
                 return
