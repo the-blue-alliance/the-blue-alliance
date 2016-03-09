@@ -5,6 +5,7 @@ import json
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
+from consts.media_type import MediaType
 from controllers.suggestions.suggestions_review_base_controller import SuggestionsReviewBaseController
 from helpers.media_manipulator import MediaManipulator
 from models.media import Media
@@ -19,6 +20,9 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
         suggestions = Suggestion.query().filter(
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
             Suggestion.target_model == "media")
+
+        # Quick and dirty way to group images together
+        suggestions = sorted(suggestions, key=lambda x: 0 if x.contents['media_type_enum'] in MediaType.image_types else 1)
 
         reference_keys = []
         for suggestion in suggestions:
