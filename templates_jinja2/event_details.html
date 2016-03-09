@@ -101,7 +101,7 @@
         {% if awards %}<li><a href="#awards" data-toggle="tab">Awards</a></li>{% endif %}
         {% if district_points_sorted %}<li><a href="#district-points" data-toggle="tab">District Points</a></li>{% endif %}
         <li class="{% if matches.num == 0 %}active{% endif %}"><a href="#teams" data-toggle="tab">Teams</a></li>
-        {% if event_insights %}<li><a href="#event-insights" data-toggle="tab">Insights</a></li>{% endif %}
+        {% if event_insights_qual or event_insights_playoff %}<li><a href="#event-insights" data-toggle="tab">Insights</a></li>{% endif %}
       </ul>
     </div>
   </div>
@@ -328,8 +328,26 @@
     </div>
     {% endif %}
 
-    {% if event_insights %}
-      {% include 'event_partials/event_insights.html' %}
+    {% if event_insights_qual or event_insights_playoff %}
+    <div class="tab-pane" id="event-insights">
+      <div class="row">
+        {% if event_insights_qual %}
+        <div class="col-sm-6">
+          <h2>Qualification</h2>
+          {% set event_insights = event_insights_qual %}
+          {% include 'event_partials/event_insights.html' %}
+        </div>
+        {% endif %}
+
+        {% if event_insights_playoff %}
+        <div class="col-sm-6">
+          <h2>Playoff</h2>
+          {% set event_insights = event_insights_playoff %}
+          {% include 'event_partials/event_insights.html' %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
     {% endif %}
 </div>
 {% endblock %}

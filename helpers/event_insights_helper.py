@@ -16,6 +16,24 @@ class EventInsightsHelper(object):
 
     @classmethod
     def calculate_event_insights_2016(cls, matches):
+        qual_matches = []
+        playoff_matches = []
+        for match in matches:
+            if match.comp_level == 'qm':
+                qual_matches.append(match)
+            else:
+                playoff_matches.append(match)
+
+        qual_insights = cls._calculate_event_insights_2016_helper(qual_matches)
+        playoff_insights = cls._calculate_event_insights_2016_helper(playoff_matches)
+
+        return {
+            'qual': qual_insights,
+            'playoff': playoff_insights,
+        }
+
+    @classmethod
+    def _calculate_event_insights_2016_helper(cls, matches):
         # defenses
         defense_opportunities = defaultdict(int)
         defense_damaged = defaultdict(int)
