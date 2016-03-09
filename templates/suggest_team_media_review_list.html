@@ -73,7 +73,7 @@
                     <label class="checkbox text-danger" for="reject_{{suggestion.key.id}}"><input class="reject" type="checkbox" name="reject_keys[]" id="reject_{{suggestion.key.id}}" value="{{suggestion.key.id}}"> Reject</label>
                   </div>
                   <div class="col-xs-7 fitvids">
-                      <p><strong>Team {{reference.team_number}}{% if reference.nickname %} - {{reference.nickname}}{% endif %} ({{suggestion.contents.year}})</strong></p>
+                      <p><strong><a href="/team/{{reference.team_number}}/{{suggestion.contents.year}}" target="_blank">Team {{reference.team_number}}{% if reference.nickname %} - {{reference.nickname}}{% endif %} ({{suggestion.contents.year}})</a></strong></p>
                       {% if suggestion.contents.media_type_enum == 1 %}
                         <a href="http://www.chiefdelphi.com/media/photos/{{suggestion.contents.foreign_key}}" target="_blank">
                           <img class="img-thumbnail" src="http://www.chiefdelphi.com/media/img/{{suggestion.details.thumbnail}}" style="max-height: 150px;">
