@@ -181,8 +181,8 @@ class EventDetail(CacheableHandler):
             "playoff_advancement": playoff_advancement,
             "district_points_sorted": district_points_sorted,
             "is_2015_playoff": is_2015_playoff,
-            "event_insights_qual": event_insights['qual'],
-            "event_insights_playoff": event_insights['playoff'],
+            "event_insights_qual": event_insights['qual'] if event_insights else None,
+            "event_insights_playoff": event_insights['playoff'] if event_insights else None,
         })
 
         if event.within_a_day:
