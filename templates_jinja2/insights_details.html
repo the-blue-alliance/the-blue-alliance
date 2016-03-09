@@ -106,7 +106,9 @@
     {% endif %}
 
     {% for week, stats in year_specific_by_week.data %}
+      {% if stats.qual or stats.playoff %}
       <li{% if loop.first and not year_specific %} class="active"{% endif %}><a href="#year-specific-week-{{loop.index}}"data-toggle="tab">{{week}}</a></li>
+      {% endif %}
     {% endfor %}
   </ul>
 
@@ -114,7 +116,6 @@
     {% if year_specific %}
       <div class="tab-pane active" id="year-specific">
         <div class="row">
-        {% if year_specific.data.qual or year_specific.data.playoff %}
           {% if year_specific.data.qual %}
           <div class="col-sm-6">
             <h3>Qualification</h3>
@@ -131,18 +132,13 @@
           </div>
           {% endif %}
         </div>
-        {% else %}
-          <div class="col-xs-12">
-            <p>No year aggregate stats yet! Please check back later.</p>
-          </div>
-        {% endif %}
       </div>
     {% endif %}
 
     {% for week, stats in year_specific_by_week.data %}
+    {% if stats.qual or stats.playoff %}
     <div class="tab-pane{% if loop.first and not year_specific %} active{% endif %}" id="year-specific-week-{{loop.index}}">
       <div class="row">
-      {% if stats.qual or stats.playoff %}
         {% if stats.qual %}
         <div class="col-sm-6">
           <h3>Qualification</h3>
@@ -158,13 +154,9 @@
           {% include year_specific_insights_template %}
         </div>
         {% endif %}
-      {% else %}
-        <div class="col-xs-12">
-          <p>No stats for {{week}} yet! Please check back later.</p>
-        </div>
-      {% endif %}
       </div>
     </div>
+    {% endif %}
     {% endfor %}
   </div>
   {% endif %}
