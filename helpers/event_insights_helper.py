@@ -109,7 +109,7 @@ class EventInsightsHelper(object):
                     logging.error("Event insights failed for {}".format(match.key.id()))
             finished_matches += 1
         if finished_matches == 0:
-            return None
+            return {}
 
         opportunities_1x = 2 * finished_matches  # once per alliance
         opportunities_3x = 6 * finished_matches  # 3x per alliance
