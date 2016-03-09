@@ -55,6 +55,7 @@ class NightbotTeamNextmatchHandler(CacheableHandler):
         for match in matches:
             if not match.has_been_played:
                 next_match = match
+                break
 
         event_code_upper = event.event_short.upper()
         if next_match is None:
