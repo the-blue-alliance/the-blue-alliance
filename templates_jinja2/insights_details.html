@@ -170,6 +170,12 @@
   {% endif %}
 
   {% if blue_banners or regional_district_winners %}
+  {% if match_highscore or match_averages_by_week or score_distribution or year_specific_by_week or year_specific %}
+  <hr>
+  {% endif %}
+  {% endif %}
+
+  {% if blue_banners or regional_district_winners %}
   <h2>Awards</h2>
   {% endif %}
 
