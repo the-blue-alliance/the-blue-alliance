@@ -1,11 +1,12 @@
 import os
 
 from google.appengine.ext import ndb
-from google.appengine.ext.webapp import template
 
 from base_controller import CacheableHandler
 
 from models.insight import Insight
+
+from template_engine import jinja2_engine
 
 MAX_YEAR = 2016
 VALID_YEARS = list(reversed(range(1992, MAX_YEAR + 1)))
@@ -32,8 +33,7 @@ class InsightsOverview(CacheableHandler):
             if insight:
                 self.template_values[insight.name] = insight
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/insights.html')
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('insights.html', self.template_values)
 
 
 class InsightsDetail(CacheableHandler):
@@ -70,5 +70,6 @@ class InsightsDetail(CacheableHandler):
             if insight:
                 self.template_values[insight.name] = insight
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/insights_details.html')
-        return template.render(path, self.template_values)
+        self.template_values['year_specific_insights_template'] = 'event_partials/event_insights_{}.html'.format(year)
+
+        return jinja2_engine.render('insights_details.html', self.template_values)

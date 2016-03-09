@@ -6,6 +6,7 @@
 
 {% block detailed_content %}
   <h1 class="end_header">{{selected_year}} Insights</h1>
+  <p>*Insights are updated nightly</p>
 
   {% if match_highscore or match_averages_by_week or score_distribution %}
   <h2>Matches{% if num_matches %} <small>{{num_matches.data}} Matches Played</small>{% endif %}</h2>
@@ -20,17 +21,17 @@
       <table class="match-table insights-table">
         <thead>
           <tr class="key">
-            <th colspan="{{match.alliances.items.0.1.teams|length}}">Teams</th>
+            <th colspan="{{match.alliances.items().0.1.teams|length}}">Teams</th>
             <th>Score</th>
           </tr>
         </thead>
         <tbody>
-          {% for items in match.alliances.items reversed %}
+          {% for items in match.alliances.items()|reverse %}
           <tr>
             {% for team in items.1.teams %}
-              <td class="{{items.0}}{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}"><a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a></td>
+              <td class="{{items.0}}{% if match.winning_alliance == items.0 %} winner{% endif %}"><a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a></td>
             {% endfor %}
-            <td class="{{items.0}}Score{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}">{% ifequal items.1.score "-1" %}?{% else %}{{ items.1.score }}{% endifequal %}</td>
+            <td class="{{items.0}}Score{% if match.winning_alliance == items.0 %} winner{% endif %}">{% if items.1.score == "-1" %}?{% else %}{{ items.1.score }}{% endif %}</td>
           </tr>
           {% endfor %}
         </tbody>
@@ -49,17 +50,17 @@
       <table class="match-table">
         <thead>
           <tr class="key">
-            <th colspan="{{match.alliances.items.0.1.teams|length}}">Teams</th>
+            <th colspan="{{match.alliances.items().0.1.teams|length}}">Teams</th>
             <th>Score</th>
           </tr>
         </thead>
         <tbody>
-          {% for items in match.alliances.items reversed %}
+          {% for items in match.alliances.items()|reverse %}
           <tr>
             {% for team in items.1.teams %}
-              <td class="{{ items.0 }}{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}"><a href="/team/{{ team|slice:"3:" }}">{{ team|slice:"3:" }}</a></td>
+              <td class="{{ items.0 }}{% if match.winning_alliance == items.0 %} winner{% endif %}"><a href="/team/{{ team|strip_frc }}">{{ team|strip_frc }}</a></td>
             {% endfor %}
-            <td class="{{items.0}}Score{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}">{% ifequal items.1.score "-1" %}?{% else %}{{ items.1.score }}{% endifequal %}</td>
+            <td class="{{items.0}}Score{% if match.winning_alliance == items.0 %} winner{% endif %}">{% if items.1.score == "-1" %}?{% else %}{{ items.1.score }}{% endif %}</td>
           </tr>
           {% endfor %}
         </tbody>
@@ -75,7 +76,7 @@
   <h3>Average Match Score By Week</h3>
     {% if elim_match_averages_by_week %}
     <div class="chart-key"><div class="color-key blue-color-key"></div><div class="chart-key-text">All Match Averages</div></div>
-    <div class="chart-key"><div class="color-key green-color-key"></div><div class="chart-key-text">Elim Match Averages</div></div>
+    <div class="chart-key"><div class="color-key green-color-key"></div><div class="chart-key-text">{% if selected_year >= 2015 %}Playoff{% else %}Elim{% endif %} Match Averages</div></div>
     <figure style="width: 90%; height: 300px;" id="elim-match-average-chart"></figure>
     <div id="elim-match-average" class="xcharts-data xcharts-line-data">[{{ match_averages_by_week.data_json|safe }}, {{ elim_match_averages_by_week.data_json|safe }}]</div>
     {% else %}
@@ -88,7 +89,7 @@
   <h3>Match Score Distribution <small>Percent of Matches vs. Match Score</small></h3>
     {% if elim_score_distribution %}
     <div class="chart-key"><div class="color-key blue-color-key"></div><div class="chart-key-text">All Match Scores</div></div>
-    <div class="chart-key"><div class="color-key green-color-key"></div><div class="chart-key-text">Elim Match Scores</div></div>
+    <div class="chart-key"><div class="color-key green-color-key"></div><div class="chart-key-text">{% if selected_year >= 2015 %}Playoff{% else %}Elim{% endif %} Match Scores</div></div>
     <figure style="width: 90%; height: 300px;" id="elim-match-distribution-chart"></figure>
     <div id="elim-match-distribution" class="xcharts-data xcharts-bar-data">[{{ score_distribution.data_json|safe }}, {{ elim_score_distribution.data_json|safe }}]</div>
     {% else %}
@@ -97,10 +98,75 @@
     {% endif %}
   {% endif %}
 
-  {% if blue_banners or regional_district_winners %}
-  {% if match_highscore or match_averages_by_week or score_distribution %}
-  <hr>
-  {% endif %}
+  {% if year_specific_by_week or year_specific %}
+  <h3>Year Specific Statistics</h3>
+  <ul class="nav nav-tabs">
+    {% if year_specific %}
+      <li class="active"><a href="#year-specific" data-toggle="tab">Year Aggregate</a></li>
+    {% endif %}
+
+    {% for week, stats in year_specific_by_week.data %}
+      <li{% if loop.first and not year_specific %} class="active"{% endif %}><a href="#year-specific-week-{{loop.index}}"data-toggle="tab">{{week}}</a></li>
+    {% endfor %}
+  </ul>
+
+  <div class="tab-content">
+    {% if year_specific %}
+      <div class="tab-pane active" id="year-specific">
+        <div class="row">
+        {% if year_specific.data.qual or year_specific.data.playoff %}
+          {% if year_specific.data.qual %}
+          <div class="col-sm-6">
+            <h3>Qualification</h3>
+            {% set event_insights = year_specific.data.qual %}
+            {% include year_specific_insights_template %}
+          </div>
+          {% endif %}
+
+          {% if year_specific.data.playoff %}
+          <div class="col-sm-6">
+            <h3>Playoff</h3>
+            {% set event_insights = year_specific.data.playoff %}
+            {% include year_specific_insights_template %}
+          </div>
+          {% endif %}
+        </div>
+        {% else %}
+          <div class="col-xs-12">
+            <p>No year aggregate stats yet! Please check back later.</p>
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {% for week, stats in year_specific_by_week.data %}
+    <div class="tab-pane{% if loop.first and not year_specific %} active{% endif %}" id="year-specific-week-{{loop.index}}">
+      <div class="row">
+      {% if stats.qual or stats.playoff %}
+        {% if stats.qual %}
+        <div class="col-sm-6">
+          <h3>Qualification</h3>
+          {% set event_insights = stats.qual %}
+          {% include year_specific_insights_template %}
+        </div>
+        {% endif %}
+
+        {% if stats.playoff %}
+        <div class="col-sm-6">
+          <h3>Playoff</h3>
+          {% set event_insights = stats.playoff %}
+          {% include year_specific_insights_template %}
+        </div>
+        {% endif %}
+      {% else %}
+        <div class="col-xs-12">
+          <p>No stats for {{week}} yet! Please check back later.</p>
+        </div>
+      {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
   {% endif %}
 
   {% if blue_banners or regional_district_winners %}
@@ -122,7 +188,7 @@
               <td>{{number}}</td>
               <td>
                 {% for team in team_list %}
-                <a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a>{% if not forloop.last %},{% endif %}
+                <a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a>{% if not loop.last %},{% endif %}
                 {% endfor %}
               </td>
             </tr>
@@ -144,12 +210,12 @@
         </thead>
         <tbody>
           {% for number, team_list in regional_district_winners.data %}
-            {% if team_list|length < 50 or forloop.first %}
+            {% if team_list|length < 50 or loop.first %}
             <tr>
               <td>{{number}}</td>
               <td>
                 {% for team in team_list %}
-                <a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a>{% if not forloop.last %},{% endif %}
+                <a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a>{% if not loop.last %},{% endif %}
                 {% endfor %}
               </td>
             </tr>

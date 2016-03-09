@@ -335,7 +335,7 @@
         <div class="col-sm-6">
           <h2>Qualification</h2>
           {% set event_insights = event_insights_qual %}
-          {% include 'event_partials/event_insights.html' %}
+          {% include event_insights_template %}
         </div>
         {% endif %}
 
@@ -343,7 +343,7 @@
         <div class="col-sm-6">
           <h2>Playoff</h2>
           {% set event_insights = event_insights_playoff %}
-          {% include 'event_partials/event_insights.html' %}
+          {% include event_insights_template %}
         </div>
         {% endif %}
       </div>

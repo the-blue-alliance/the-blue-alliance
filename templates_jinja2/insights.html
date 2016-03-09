@@ -6,6 +6,7 @@
 
 {% block detailed_content %}
   <h1 class="end_header">Insights Overview</h1>
+  <p>*Insights are updated nightly</p>
 
   {% if num_matches %}
   <div class="row">
@@ -30,13 +31,13 @@
         </thead>
         <tbody>
           {% for number, team_list in blue_banners.data %}
-          {% if forloop.counter <= 8 %}
+          {% if loop.index <= 8 %}
           {% if team_list|length < 50 %}
           <tr>
             <td>{{number}}</td>
             <td>
               {% for team in team_list %}
-              <a href="/team/{{team|digits}}/history">{{team|digits}}</a>{% if not forloop.last %},{% endif %}
+              <a href="/team/{{team|digits}}/history">{{team|digits}}</a>{% if not loop.last %},{% endif %}
               {% endfor %}
             </td>
           </tr>
@@ -67,7 +68,7 @@
             <td>{{number}}</td>
             <td>
               {% for team in team_list %}
-              <a href="/team/{{team|digits}}/history">{{team|digits}}</a>{% if not forloop.last %},{% endif %}
+              <a href="/team/{{team|digits}}/history">{{team|digits}}</a>{% if not loop.last %},{% endif %}
               {% endfor %}
             </td>
           </tr>
@@ -92,13 +93,13 @@
         </thead>
         <tbody>
         {% for number, team_list in rca_winners.data %}
-        {% if forloop.counter <= 4 %}
+        {% if loop.index <= 4 %}
         {% if team_list|length < 15 %}
         <tr>
           <td>{{number}}</td>
           <td>
             {% for team in team_list %}
-            <a href="/team/{{team|digits}}/history">{{team|digits}}</a>{% if not forloop.last %},{% endif %}
+            <a href="/team/{{team|digits}}/history">{{team|digits}}</a>{% if not loop.last %},{% endif %}
             {% endfor %}
           </td>
         </tr>
@@ -124,13 +125,13 @@
         </thead>
         <tbody>
           {% for number, team_list in regional_district_winners.data %}
-          {% if forloop.counter <= 6 %}
+          {% if loop.index <= 6 %}
           {% if team_list|length < 15 %}
           <tr>
             <td>{{number}}</td>
             <td>
               {% for team in team_list %}
-              <a href="/team/{{team|digits}}/history">{{team|digits}}</a>{% if not forloop.last %},{% endif %}
+              <a href="/team/{{team|digits}}/history">{{team|digits}}</a>{% if not loop.last %},{% endif %}
               {% endfor %}
             </td>
           </tr>
@@ -156,15 +157,15 @@
         </thead>
         <tbody>
           {% for number, pairs in successful_elim_teamups.data %}
-          {% if forloop.counter <= 4 %}
+          {% if loop.index <= 4 %}
           <tr>
             <td>{{number}}</td>
             <td>
               {% for pair in pairs %}
                 {% for team in pair %}
-                  <a href="/team/{{team|digits}}/history">{{team|digits}}</a>{% if not forloop.last %},{% endif %}
+                  <a href="/team/{{team|digits}}/history">{{team|digits}}</a>{% if not loop.last %},{% endif %}
                 {% endfor %}
-                {% if not forloop.last %}<br>{% endif %}
+                {% if not loop.last %}<br>{% endif %}
               {% endfor %}
             </td>
           </tr>

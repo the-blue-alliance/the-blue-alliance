@@ -164,6 +164,9 @@ class EventDetail(CacheableHandler):
             district_points_sorted = sorted(event.district_points['points'].items(), key=lambda (team, points): -points['total'])
 
         event_insights = EventInsightsHelper.calculate_event_insights(cleaned_matches, event.year)
+        event_insights_template = None
+        if event_insights:
+            event_insights_template = 'event_partials/event_insights_{}.html'.format(event.year)
 
         self.template_values.update({
             "event": event,
@@ -183,6 +186,7 @@ class EventDetail(CacheableHandler):
             "is_2015_playoff": is_2015_playoff,
             "event_insights_qual": event_insights['qual'] if event_insights else None,
             "event_insights_playoff": event_insights['playoff'] if event_insights else None,
+            "event_insights_template": event_insights_template,
         })
 
         if event.within_a_day:
