@@ -156,7 +156,8 @@ class NightbotTeamStatuskHandler(CacheableHandler):
                     losses += 1
             else:
                 unplayed_qual += 1
-        else:
+
+        if wins == 0 and losses == 0 and ties == 0:
             # No matches played yet
             return "{}[{}] Team {} has not played any matches yet.".format(user_str, event_code_upper, team_number)
 
