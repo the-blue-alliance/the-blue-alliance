@@ -57,14 +57,16 @@ class NightbotTeamNextmatchHandler(CacheableHandler):
 
         matches_future = TeamEventMatchesQuery('frc{}'.format(team_number), event.key.id()).fetch_async()
         matches = MatchHelper.play_order_sort_matches(matches_future.get_result())
+
+        # No match schedule yet
+        if not matches:
+            return "{}[{}] Team {} has no scheduled matches yet.".format(user_str, event_code_upper, team_number)
+
         next_match = None
         for match in matches:
             if not match.has_been_played:
                 next_match = match
                 break
-        else:
-            # No matches played yet
-            return "{}[{}] Team {} has not played any matches yet.".format(user_str, event_code_upper, team_number)
 
         if next_match is None:
             return "{}[{}] Team {} has no more scheduled matches.".format(user_str, event_code_upper, team_number)
