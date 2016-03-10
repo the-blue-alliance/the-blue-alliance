@@ -53,7 +53,7 @@
     </div>
   {% else %}
     <div id="robot-image">
-    {% if medias_by_slugname.cdphotothread or medias_by_slugname.imgur %}
+    {% if preferred_image_medias %}
       {% set image_medias = preferred_image_medias %}
       {% include "media_partials/image_carousel_partial.html" %}
     {% else %}
