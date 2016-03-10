@@ -34,7 +34,8 @@ Setup
 1. Install [Python 2.7.X](https://www.python.org/downloads/)
 1. Install [App Engine](https://cloud.google.com/appengine/docs)
   * Specifically use the [Python SDK](https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python)
-  * Run the installer and allow it make symbolic links (it might ask you to enter your root password)
+  * Windows/OS X: Run the installer and allow it make symbolic links (it might ask you to enter your root password)
+  * Linux: Unzip the .zip file and add the location of your `google_appengine` directory to your `PATH` environment variable.
 1. Get the latest version of The Blue Alliance
   * Fork TBA by clicking on "Fork" in the top right of [its GitHub page](https://github.com/the-blue-alliance/the-blue-alliance)
   * Run `git clone https://github.com/USERNAME/the-blue-alliance.git` where _USERNAME_ is your GitHub username, or use GitHub's Windows or OS X app to clone it to your computer
@@ -46,6 +47,7 @@ Setup
     * cd into the archive
     * Run `setup.py install` or `python setup.py install`
   * Or compile it from source code. (On Windows, use the [Microsoft Visual C++ Compiler for Python 2.7](http://www.microsoft.com/en-us/download/details.aspx?id=44266).)
+  * NOTE: If you are using the Linux version, install v1.6.1 instead of the latest version through `pip install numpy==1.6.1`. Installing the latest version raises an `ImportError: No module named _ctypes` from Google App Engine when trying to launch the dev server.
 1. Install [Node.js](https://nodejs.org/) which includes [Node Package Manager](https://www.npmjs.org/)
 1. Install LESS, which we use to build our CSS files, via Node Package Manager
   * `npm install -g less`
@@ -63,13 +65,15 @@ Setup
 
 Run a local dev server
 ----------------------
-1. Import the project into Google App Engine Launcher
+1. Import the project into Google App Engine Launcher 
+  * NOTE: If you have the Linux version, skip to step 2, as it does not come packaged with the App Engine Launcher. You will be manually adding the ports and modules as options when launching the server.
   * Open App Engine Launcher
   * File > Add Existing Application...
   * Set the Application Path to your `the-blue-alliance` directory
   * Set port **8088**
   * Add modules (dispatch.yaml, app.yaml, and app-backend-tasks.yaml) as extra flags [https://cloud.google.com/appengine/docs/python/modules/#devserver](https://cloud.google.com/appengine/docs/python/modules/#devserver).
 2. Run the app in App Engine Launcher and view its Logs window
+  * If you are using the Linux version, you can start the application by moving into your `the-blue-alliance` directory and running `dev_appserver.py --port 8088 dispatch.yaml app.yaml app-backend-tasks.yaml` on the command line.
 3. You should now have a basic development installation!
   * Visit [localhost:8088](http://localhost:8088) to see your local version of The Blue Alliance
   * Also see [localhost:8088/admin/](http://localhost:8088/admin/)
