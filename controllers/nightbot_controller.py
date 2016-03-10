@@ -44,7 +44,7 @@ class NightbotTeamNextmatchHandler(CacheableHandler):
         self.response.headers['content-type'] = 'text/plain; charset="utf-8"'
         user = self.request.get('user')
         if user:
-            user_str = '{}, '.format(user)
+            user_str = '@{}, '.format(user)
         else:
             user_str = ''
 
@@ -61,6 +61,9 @@ class NightbotTeamNextmatchHandler(CacheableHandler):
             if not match.has_been_played:
                 next_match = match
                 break
+        else:
+            # No matches played yet
+            return "{}[{}] Team {} has not played any matches yet.".format(user_str, event_code_upper, team_number)
 
         event_code_upper = event.event_short.upper()
         if next_match is None:
@@ -86,7 +89,7 @@ class NightbotTeamStatuskHandler(CacheableHandler):
         self.response.headers['content-type'] = 'text/plain; charset="utf-8"'
         user = self.request.get('user')
         if user:
-            user_str = '{}, '.format(user)
+            user_str = '@{}, '.format(user)
         else:
             user_str = ''
 
@@ -153,6 +156,9 @@ class NightbotTeamStatuskHandler(CacheableHandler):
                     losses += 1
             else:
                 unplayed_qual += 1
+        else:
+            # No matches played yet
+            return "{}[{}] Team {} has not played any matches yet.".format(user_str, event_code_upper, team_number)
 
         # Compute rank & num_teams
         rank = None
