@@ -47,11 +47,11 @@ class AdminMediaMakePreferred(LoggedInHandler):
 
         media = Media.get_by_id(media_key_name)
 
-        media.preferred_references = [media.create_reference(
+        media.preferred_references.append(media.create_reference(
             self.request.get("reference_type"),
-            self.request.get("reference_key_name"))]
+            self.request.get("reference_key_name")))
 
-        MediaManipulator.createOrUpdate(media)  # will auto union with existing preferred references
+        MediaManipulator.createOrUpdate(media)
 
         self.redirect(self.request.get('originating_url'))
 
