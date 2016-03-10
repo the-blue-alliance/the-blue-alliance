@@ -5,7 +5,7 @@ from helpers.match_helper import MatchHelper
 from models.team import Team
 
 
-def validate_team(team_number):
+def validate_team(user_str, team_number):
     """
     Returns:
     Team object if the team exists and is currently competing
@@ -14,7 +14,7 @@ def validate_team(team_number):
     team_key = 'frc{}'.format(team_number)
     team = Team.get_by_id(team_key)
     if not team:
-        return "Team {} does not exist.".format(team_number)
+        return "{}Team {} does not exist.".format(user_str, team_number)
 
     team_events_future = TeamEventsQuery(team_key).fetch_async()
     current_event = None
@@ -22,7 +22,7 @@ def validate_team(team_number):
         if event.now:
             current_event = event
     if not current_event:
-        return "Team {} is not currently competing.".format(team_number)
+        return "{}Team {} is not currently competing.".format(user_str, team_number)
 
     return team, current_event
 
@@ -42,8 +42,13 @@ class NightbotTeamNextmatchHandler(CacheableHandler):
 
     def _render(self, team_number):
         self.response.headers['content-type'] = 'text/plain; charset="utf-8"'
+        user = self.request.get('user')
+        if user:
+            user_str = '{}, '.format(user)
+        else:
+            user_str = ''
 
-        team_event_or_error = validate_team(team_number)
+        team_event_or_error = validate_team(user_str, team_number)
         if type(team_event_or_error) == str:
             return team_event_or_error
 
@@ -59,9 +64,9 @@ class NightbotTeamNextmatchHandler(CacheableHandler):
 
         event_code_upper = event.event_short.upper()
         if next_match is None:
-            return "[{}]: Team {} has no more scheduled matches.".format(event_code_upper, team_number)
+            return "{}[{}] Team {} has no more scheduled matches.".format(user_str, event_code_upper, team_number)
 
-        return "[{}]: Team {} will be playing in match {}.".format(event_code_upper, team_number, match.short_name)
+        return "{}[{}] Team {} will be playing in match {}.".format(user_str, event_code_upper, team_number, match.short_name)
 
 
 class NightbotTeamStatuskHandler(CacheableHandler):
@@ -79,8 +84,13 @@ class NightbotTeamStatuskHandler(CacheableHandler):
 
     def _render(self, team_number):
         self.response.headers['content-type'] = 'text/plain; charset="utf-8"'
+        user = self.request.get('user')
+        if user:
+            user_str = '{}, '.format(user)
+        else:
+            user_str = ''
 
-        team_event_or_error = validate_team(team_number)
+        team_event_or_error = validate_team(user_str, team_number)
         if type(team_event_or_error) == str:
             return team_event_or_error
 
@@ -119,13 +129,13 @@ class NightbotTeamStatuskHandler(CacheableHandler):
                             losses += 1
                 if wins == 2:
                     if comp_level == 'f':
-                        return "[{}]: Team {} won the event on alliance #{}.".format(event_code_upper, team_number, alliance_number)
+                        return "{}[{}] Team {} won the event on alliance #{}.".format(user_str, event_code_upper, team_number, alliance_number)
                     else:
-                        return "[{}]: Team {} won {} on alliance #{}.".format(event_code_upper, team_number, level_str, alliance_number)
+                        return "{}[{}] Team {} won {} on alliance #{}.".format(user_str, event_code_upper, team_number, level_str, alliance_number)
                 elif losses == 2:
-                    return "[{}]: Team {} got knocked out in {} on alliance #{}.".format(event_code_upper, team_number, level_str, alliance_number)
+                    return "{}[{}] Team {} got knocked out in {} on alliance #{}.".format(user_str, event_code_upper, team_number, level_str, alliance_number)
                 else:
-                    return "[{}]: Team {} is currently {}-{} in {} on alliance #{}.".format(event_code_upper, team_number, wins, losses, level_str, alliance_number)
+                    return "{}[{}] Team {} is currently {}-{} in {} on alliance #{}.".format(user_str, event_code_upper, team_number, wins, losses, level_str, alliance_number)
 
         # Still in quals or team did not make it to elims
         # Compute qual W-L-T
@@ -154,13 +164,13 @@ class NightbotTeamStatuskHandler(CacheableHandler):
 
         if unplayed_qual > 0:
             if rank is not None:
-                return "[{}]: Team {} is currently rank {}/{} with a record of {}-{}-{}.".format(event_code_upper, team_number, rank, num_teams, wins, losses, ties)
+                return "{}[{}] Team {} is currently rank {}/{} with a record of {}-{}-{}.".format(user_str, event_code_upper, team_number, rank, num_teams, wins, losses, ties)
             else:
-                return "[{}]: Team {} currently has a record of {}-{}-{} at [{}].".format(event_code_upper, team_number, wins, losses, ties)
+                return "{}[{}] Team {} currently has a record of {}-{}-{} at [{}].".format(user_str, event_code_upper, team_number, wins, losses, ties)
         else:
             if alliance_number is None:
-                return "[{}]: Team {} ended qualification matches at rank {}/{} with a record of {}-{}-{}.".format(event_code_upper, team_number, rank, num_teams, wins, losses, ties)
+                return "{}[{}] Team {} ended qualification matches at rank {}/{} with a record of {}-{}-{}.".format(user_str, event_code_upper, team_number, rank, num_teams, wins, losses, ties)
             elif alliance_number == 0:
-                return "[{}]: Team {} ended qualification matches at rank {}/{} with a record of {}-{}-{} and was not picked for playoff matches.".format(event_code_upper, team_number, rank, num_teams, wins, losses, ties)
+                return "{}[{}] Team {} ended qualification matches at rank {}/{} with a record of {}-{}-{} and was not picked for playoff matches.".format(user_str, event_code_upper, team_number, rank, num_teams, wins, losses, ties)
             else:
-                return "[{}]: Team {} will be competing in the playoff matches on alliance #{}.".format(event_code_upper, team_number, alliance_number)
+                return "{}[{}] Team {} will be competing in the playoff matches on alliance #{}.".format(user_str, event_code_upper, team_number, alliance_number)
