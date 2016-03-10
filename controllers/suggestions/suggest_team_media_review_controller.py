@@ -62,57 +62,84 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
 
         self.response.out.write(jinja2_engine.render('suggest_team_media_review_list.html', self.template_values))
 
+    def _process_accepted(self, accept_key, preferred_keys):
+        """
+        Performs all actions for an accepted Suggestion.
+        Suggestions are processed one at a time (instead of in batch) to reduce
+        the likelihood of a race condition. We can't use GAE Transactions here
+        due to the ancestor query limitations.
+
+        Actions include:
+        - Creating and saving a new Media for the Suggestion
+        - Removing a reference from another Media's preferred_references
+        - Marking the Suggestion as accepted and saving it
+        """
+        # Async get
+        suggestion_future = Suggestion.get_by_id_async(accept_key)
+
+        # Setup
+        to_replace_id = self.request.POST.get('replace-preferred-{}'.format(accept_key), None)
+
+        # Resolve async Futures
+        suggestion = suggestion_future.get_result()
+
+        # Make sure Suggestion hasn't been processed (by another thread)
+        if suggestion.review_state != Suggestion.REVIEW_PENDING:
+            return
+
+        # Remove preferred reference from another Media if specified
+        team_reference = Media.create_reference(
+            suggestion.contents['reference_type'],
+            suggestion.contents['reference_key'])
+        if to_replace_id:
+            to_replace = Media.get_by_id(to_replace_id)
+            if team_reference not in to_replace.preferred_references:
+                return  # Preferred reference must have been edited earlier. Skip this Suggestion for now.
+            to_replace.preferred_references.remove(team_reference)
+
+        # Add preferred reference to current Media (images only) if explicitly listed in preferred_keys or if to_replace_id exists
+        media_type_enum = suggestion.contents['media_type_enum']
+        preferred_references = []
+        if media_type_enum in MediaType.image_types and (suggestion.key.id() in preferred_keys or to_replace_id):
+            preferred_references = [team_reference]
+
+        media = Media(
+            id=Media.render_key_name(suggestion.contents['media_type_enum'], suggestion.contents['foreign_key']),
+            foreign_key=suggestion.contents['foreign_key'],
+            media_type_enum=media_type_enum,
+            details_json=suggestion.contents.get('details_json', None),
+            private_details_json=suggestion.contents.get('private_details_json', None),
+            year=int(suggestion.contents['year']),
+            references=[team_reference],
+            preferred_references=preferred_references,
+        )
+
+        # Mark Suggestion as accepted
+        suggestion.review_state = Suggestion.REVIEW_ACCEPTED
+        suggestion.reviewer = self.user_bundle.account.key
+        suggestion.reviewed_at = datetime.datetime.now()
+
+        # Do all DB writes
+        if to_replace_id:
+            MediaManipulator.createOrUpdate(to_replace, auto_union=False)
+        MediaManipulator.createOrUpdate(media)
+        suggestion.put()
+
     def post(self):
         accept_keys = self.request.POST.getall("accept_keys[]")
         reject_keys = self.request.POST.getall("reject_keys[]")
         preferred_keys = self.request.POST.getall("preferred_keys[]")
 
-        accepted_suggestion_futures = [Suggestion.get_by_id_async(key) for key in accept_keys]
+        # Process accepts
+        for accept_key in accept_keys:
+            self._process_accepted(accept_key, preferred_keys)
+
+        # Process rejects
         rejected_suggestion_futures = [Suggestion.get_by_id_async(key) for key in reject_keys]
-        accepted_suggestions = map(lambda a: a.get_result(), accepted_suggestion_futures)
         rejected_suggestions = map(lambda a: a.get_result(), rejected_suggestion_futures)
-
-        for suggestion in accepted_suggestions:
-            reference = Media.create_reference(
-                suggestion.contents['reference_type'],
-                suggestion.contents['reference_key'])
-
-            to_replace_id = self.request.POST.get('replace-preferred-{}'.format(suggestion.key.id()))
-            # Remove preferred reference from another Media
-            if to_replace_id:
-                to_replace = Media.get_by_id(to_replace_id)
-                to_replace.preferred_references.remove(reference)
-                MediaManipulator.createOrUpdate(to_replace, auto_union=False)
-
-            # Add preferred reference to current Media (images only)
-            media_type_enum = suggestion.contents['media_type_enum']
-            preferred_references = []
-            if media_type_enum in MediaType.image_types and (to_replace_id or suggestion.key.id() in preferred_keys):
-                preferred_references = [reference]
-
-            media = Media(
-                id=Media.render_key_name(suggestion.contents['media_type_enum'], suggestion.contents['foreign_key']),
-                foreign_key=suggestion.contents['foreign_key'],
-                media_type_enum=media_type_enum,
-                details_json=suggestion.contents.get('details_json', None),
-                private_details_json=suggestion.contents.get('private_details_json', None),
-                year=int(suggestion.contents['year']),
-                references=[reference],
-                preferred_references=preferred_references,
-            )
-            MediaManipulator.createOrUpdate(media)
-
-        all_suggestions = accepted_suggestions
-        all_suggestions.extend(rejected_suggestions)
-
-        for suggestion in all_suggestions:
-            if suggestion.key.id() in accept_keys:
-                suggestion.review_state = Suggestion.REVIEW_ACCEPTED
-            if suggestion.key.id() in reject_keys:
+        for suggestion in rejected_suggestions:
+            if suggestion.review_state == Suggestion.REVIEW_PENDING:
                 suggestion.review_state = Suggestion.REVIEW_REJECTED
-            suggestion.reviewer = self.user_bundle.account.key
-            suggestion.reviewed_at = datetime.datetime.now()
-
-        ndb.put_multi(all_suggestions)
+        ndb.put_multi(rejected_suggestions)
 
         self.redirect("/suggest/team/media/review")
