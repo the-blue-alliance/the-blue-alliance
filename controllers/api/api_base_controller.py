@@ -153,6 +153,7 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
     def __init__(self, *args, **kw):
         super(ApiTrustedBaseController, self).__init__(*args, **kw)
         self.response.headers['content-type'] = 'application/json; charset="utf-8"'
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
 
     def handle_exception(self, exception, debug):
         """
@@ -166,6 +167,14 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
             self.response.out.write(self._errors)
         else:
             self.response.set_status(500)
+
+    def options(self, event_key):
+        """
+        Supply an OPTIONS method in order to comply with CORS preflghted requests
+        https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests
+        """
+        self.response.headers['Access-Control-Allow-Methods'] = "POST, OPTIONS"
+        self.response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-TBA-Auth-Id, X-TBA-Auth-Sig'
 
     def post(self, event_key):
         auth_id = self.request.headers.get('X-TBA-Auth-Id')
