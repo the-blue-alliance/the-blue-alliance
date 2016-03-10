@@ -41,9 +41,10 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
             # Find existing preferred images
             existing_preferred_keys_futures.append(
                 Media.query(
-                    Media.media_type_enum==suggestion.contents['media_type_enum'],
+                    Media.media_type_enum.IN(MediaType.image_types),
                     Media.references==reference,
-                    Media.preferred_references==reference
+                    Media.preferred_references==reference,
+                    Media.year==suggestion.contents['year'],
                 ).fetch_async(keys_only=True)
             )
 
