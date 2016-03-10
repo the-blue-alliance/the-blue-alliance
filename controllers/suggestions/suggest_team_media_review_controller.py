@@ -140,6 +140,9 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
         for suggestion in rejected_suggestions:
             if suggestion.review_state == Suggestion.REVIEW_PENDING:
                 suggestion.review_state = Suggestion.REVIEW_REJECTED
+                suggestion.reviewer = self.user_bundle.account.key
+                suggestion.reviewed_at = datetime.datetime.now()
+
         ndb.put_multi(rejected_suggestions)
 
         self.redirect("/suggest/team/media/review")
