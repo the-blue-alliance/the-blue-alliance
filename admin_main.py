@@ -10,7 +10,7 @@ from controllers.admin.admin_event_controller import AdminEventAddAllianceSelect
 from controllers.admin.admin_main_controller import AdminDebugHandler, AdminMain, AdminTasksHandler
 from controllers.admin.admin_award_controller import AdminAwardDashboard, AdminAwardEdit, AdminAwardAdd
 from controllers.admin.admin_match_controller import AdminVideosAdd, AdminMatchCleanup, AdminMatchDashboard, AdminMatchDelete, AdminMatchDetail, AdminMatchAdd, AdminMatchEdit
-from controllers.admin.admin_media_controller import AdminMediaDashboard, AdminMediaDeleteReference, AdminMediaAdd
+from controllers.admin.admin_media_controller import AdminMediaDashboard, AdminMediaDeleteReference, AdminMediaMakePreferred, AdminMediaRemovePreferred, AdminMediaAdd
 from controllers.admin.admin_memcache_controller import AdminMemcacheMain
 from controllers.admin.admin_migration_controller import AdminMigration, AdminMigrationAddMatchYear
 from controllers.admin.admin_mobile_controller import AdminMobile, AdminBroadcast
@@ -51,6 +51,8 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/media', AdminMediaDashboard),
                                ('/admin/media/add_media', AdminMediaAdd),
                                ('/admin/media/delete_reference/(.*)', AdminMediaDeleteReference),
+                               ('/admin/media/make_preferred/(.*)', AdminMediaMakePreferred),
+                               ('/admin/media/remove_preferred/(.*)', AdminMediaRemovePreferred),
                                ('/admin/memcache', AdminMemcacheMain),
                                ('/admin/migration', AdminMigration),
                                ('/admin/migration/add_match_year', AdminMigrationAddMatchYear),

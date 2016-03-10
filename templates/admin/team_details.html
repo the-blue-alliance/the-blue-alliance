@@ -109,21 +109,78 @@
                 Are you sure you want to remove this reference to this media? References to other models will persist.
             </div>
             <div class="modal-footer">
-                <form id="delete_media_form" action="/admin/media/delete_reference" method="post">
+                <form id="delete_media_form" method="post">
                 <input name="reference_type" type="hidden" value="team" />
                 <input name="reference_key_name" type="hidden" value="{{team.key_name}}" />
                 <input name="originating_url" type="hidden" value="/admin/team/{{team.team_number}}" />
 
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                 <button class="btn btn-danger" type="submit"><span class="glyphicon glyphicon-delete"></span> Remove reference</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="make-preferred" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Make Preferred Confirmation
+            </div>
+            <div class="modal-body">
+                Are you sure you want make this media preferred?
+            </div>
+            <div class="modal-footer">
+                <form id="make_preferred_form" method="post">
+                <input name="reference_type" type="hidden" value="team" />
+                <input name="reference_key_name" type="hidden" value="{{team.key_name}}" />
+                <input name="originating_url" type="hidden" value="/admin/team/{{team.team_number}}" />
+
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-success" type="submit"><span class="glyphicon glyphicon-star"></span> Make Preferred</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="remove-preferred" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Remove Preferred Confirmation
+            </div>
+            <div class="modal-body">
+                Are you sure you want to make this this media not preferred?
+            </div>
+            <div class="modal-footer">
+                <form id="remove_preferred_form" method="post">
+                <input name="reference_type" type="hidden" value="team" />
+                <input name="reference_key_name" type="hidden" value="{{team.key_name}}" />
+                <input name="originating_url" type="hidden" value="/admin/team/{{team.team_number}}" />
+
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-success" type="submit"><span class="glyphicon glyphicon-star-empty"></span> Remove Preferred</button>
+                </form>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-$('#confirm-delete').on('show.bs.modal', function(e) {
-    $(this).find('#delete_media_form').attr('action', '/admin/media/delete_reference/' + $(e.relatedTarget).data('key-name'));
+$(document).ready(function(){
+    $('#confirm-delete').on('show.bs.modal', function(e) {
+        $(this).find('#delete_media_form').attr('action', '/admin/media/delete_reference/' + $(e.relatedTarget).data('key-name'));
+    });
+
+    $('#make-preferred').on('show.bs.modal', function(e) {
+        $(this).find('#make_preferred_form').attr('action', '/admin/media/make_preferred/' + $(e.relatedTarget).data('key-name'));
+    });
+
+    $('#remove-preferred').on('show.bs.modal', function(e) {
+        $(this).find('#remove_preferred_form').attr('action', '/admin/media/remove_preferred/' + $(e.relatedTarget).data('key-name'));
+    });
 });
 </script>
 
