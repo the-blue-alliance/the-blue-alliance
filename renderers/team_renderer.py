@@ -105,6 +105,7 @@ class TeamRenderer(object):
 
         medias_by_slugname = MediaHelper.group_by_slugname([media for media in media_future.get_result()])
         image_medias = MediaHelper.get_images([media for media in media_future.get_result()])
+        preferred_image_medias = filter(lambda x: team.key in x.preferred_references, image_medias)
 
         district_name = None
         district_abbrev = None
@@ -128,6 +129,7 @@ class TeamRenderer(object):
             "matches_upcoming": matches_upcoming,
             "medias_by_slugname": medias_by_slugname,
             "image_medias": image_medias,
+            "preferred_image_medias": preferred_image_medias,
             "robot": robot_future.get_result(),
             "district_name": district_name,
             "district_abbrev": district_abbrev,
