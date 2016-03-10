@@ -188,7 +188,9 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
             self.abort(400)
 
         auth = ApiAuthAccess.get_by_id(auth_id)
-        if not auth or md5.new('{}{}{}'.format(auth.secret, self.request.path, self.request.body)).hexdigest() != auth_sig:
+        expected_sig = md5.new('{}{}{}'.format(auth.secret, self.request.path, self.request.body)).hexdigest()
+        if not auth or expected_sig != auth_sig:
+            logging.info("Auth sig: {}, Expected sig: {}".format(auth_sig, expected_sig))
             self._errors = json.dumps({"Error": "Invalid X-TBA-Auth-Id and/or X-TBA-Auth-Sig!"})
             self.abort(400)
 
