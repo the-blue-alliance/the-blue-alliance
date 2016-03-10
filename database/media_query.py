@@ -46,7 +46,7 @@ class EventTeamsMediasQuery(DatabaseQuery):
 
 
 class EventTeamsPreferredMediasQuery(DatabaseQuery):
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'event_teams_medias_preferred_{}'  # (event_key)
 
     def __init__(self, event_key):

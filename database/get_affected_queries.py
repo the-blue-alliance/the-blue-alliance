@@ -1,7 +1,7 @@
 from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
 from database.event_query import EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
 from database.match_query import EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
-from database.media_query import TeamYearMediaQuery, EventTeamsMediasQuery
+from database.media_query import TeamYearMediaQuery, EventTeamsMediasQuery, EventTeamsPreferredMediasQuery
 from database.robot_query import TeamRobotsQuery
 from database.team_query import TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
 
@@ -89,6 +89,7 @@ def media_updated(affected_refs):
     for event_team_key in event_team_keys_future.get_result():
         event_key = event_team_key.id().split('_')[0]
         queries_and_keys.append(EventTeamsMediasQuery(event_key))
+        queries_and_keys.append(EventTeamsPreferredMediasQuery(event_key))
 
     return queries_and_keys
 
@@ -145,6 +146,7 @@ def eventteam_updated(affected_refs):
     for event_key in event_keys:
         queries_and_keys.append(EventTeamsQuery(event_key.id()))
         queries_and_keys.append(EventTeamsMediasQuery(event_key.id()))
+        queries_and_keys.append(EventTeamsPreferredMediasQuery(event_key.id()))
 
     return queries_and_keys
 
