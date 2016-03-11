@@ -101,7 +101,7 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
         # Add preferred reference to current Media (images only) if explicitly listed in preferred_keys or if to_replace_id exists
         media_type_enum = suggestion.contents['media_type_enum']
         preferred_references = []
-        if media_type_enum in MediaType.image_types and (suggestion.key.id() in preferred_keys or to_replace_id):
+        if media_type_enum in MediaType.image_types and ('preferred::{}'.format(suggestion.key.id()) in preferred_keys or to_replace_id):
             preferred_references = [team_reference]
 
         media = Media(
@@ -127,9 +127,16 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
         suggestion.put()
 
     def post(self):
-        accept_keys = self.request.POST.getall("accept_keys[]")
-        reject_keys = self.request.POST.getall("reject_keys[]")
         preferred_keys = self.request.POST.getall("preferred_keys[]")
+
+        accept_keys = []
+        reject_keys = []
+        for value in self.request.POST.values():
+            key = value.split('::')[1]
+            if value.startswith('accept'):
+                accept_keys.append(key)
+            elif value.startswith('reject'):
+                reject_keys.append(key)
 
         # Process accepts
         for accept_key in accept_keys:

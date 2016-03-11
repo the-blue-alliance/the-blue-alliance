@@ -69,8 +69,12 @@
           <div class="row">
               <div class="well">
                   <div class="col-xs-2">
-                    <label class="checkbox text-success" for="accept_{{suggestion.key.id()}}"><input class="accept" type="checkbox" name="accept_keys[]" id="accept_{{suggestion.key.id()}}" value="{{suggestion.key.id()}}"> Accept</label>
-                    <label class="checkbox text-danger" for="reject_{{suggestion.key.id()}}"><input class="reject" type="checkbox" name="reject_keys[]" id="reject_{{suggestion.key.id()}}" value="{{suggestion.key.id()}}"> Reject</label>
+                    <label class="radio text-success">
+                      <input class="accept" type="radio" name="accept_reject-{{suggestion.key.id()}}" value="accept::{{suggestion.key.id()}}"> Accept
+                    </label>
+                    <label class="radio text-danger">
+                      <input class="reject" type="radio" name="accept_reject-{{suggestion.key.id()}}" value="reject::{{suggestion.key.id()}}"> Reject
+                    </label>
                   </div>
                   <div class="col-xs-5 fitvids">
                       <p><strong><a href="/team/{{reference.team_number}}/{{suggestion.contents.year}}" target="_blank">Team {{reference.team_number}}{% if reference.nickname %} - {{reference.nickname}}{% endif %} ({{suggestion.contents.year}})</a></strong></p>
@@ -102,14 +106,16 @@
                         {% include "media_partials/image_thumbnail_partial.html" %}
                       </div>
                     {% endfor %}
-                    {% if preferred|length < max_preferred %}
-                    <label class="checkbox text-info" for="preferred_{{suggestion.key.id()}}">
-                      <input type="checkbox" name="preferred_keys[]" id="preferred_{{suggestion.key.id()}}" value="{{suggestion.key.id()}}"> Add as Preferred<br>(Doesn't do anything for non-images)
-                    </label>
-                    {% else %}
-                      <label class="radio text-info">
-                        <input type="radio" name="replace-preferred-{{suggestion.key.id()}}" value="" checked> Keep Current Preferred
+                    {% if suggestion.contents.media_type_enum != 0 %}
+                      {% if preferred|length < max_preferred %}
+                      <label class="checkbox text-info" for="preferred_{{suggestion.key.id()}}">
+                        <input type="checkbox" name="preferred_keys[]" id="preferred_{{suggestion.key.id()}}" value="preferred::{{suggestion.key.id()}}"> Add as Preferred<br>(Doesn't do anything for non-images)
                       </label>
+                      {% else %}
+                        <label class="radio text-info">
+                          <input type="radio" name="replace-preferred-{{suggestion.key.id()}}" value="" checked> Keep Current Preferred
+                        </label>
+                      {% endif %}
                     {% endif %}
                   </div>
                   <div class="col-xs-2">
