@@ -44,7 +44,7 @@ class ManipulatorBase(object):
         """
         affected_references = [model._affected_references if hasattr(model, '_affected_references') else [] for model in models]
         dirty = [model.dirty if hasattr(model, 'dirty') else False for model in models]
-        deferred.defer(cls._clearCacheDeferred, zip(models, affected_references, dirty), _queue='cache-clearing')
+        deferred.defer(cls._clearCacheDeferred, zip(models, affected_references, dirty), _queue='cache-clearing', _transactional=ndb.in_transaction(), _target='backend-tasks')
 
     @classmethod
     def _clearCacheDeferred(cls, models_affectedrefs_dirty):

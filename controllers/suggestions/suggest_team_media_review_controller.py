@@ -63,12 +63,12 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
 
         self.response.out.write(jinja2_engine.render('suggest_team_media_review_list.html', self.template_values))
 
+    @ndb.transactional(xg=True)
     def _process_accepted(self, accept_key, preferred_keys):
         """
-        Performs all actions for an accepted Suggestion.
-        Suggestions are processed one at a time (instead of in batch) to reduce
-        the likelihood of a race condition. We can't use GAE Transactions here
-        due to the ancestor query limitations.
+        Performs all actions for an accepted Suggestion in a Transaction.
+        Suggestions are processed one at a time (instead of in batch) in a
+        Transaction to prevent possible race conditions.
 
         Actions include:
         - Creating and saving a new Media for the Suggestion
