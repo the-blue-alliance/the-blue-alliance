@@ -2,6 +2,9 @@ queue:
 - name: default
   rate: 1/s
 
+- name: cache-clearing
+  rate: 5/s
+
 - name: api-track-call
   rate: 500/s
 

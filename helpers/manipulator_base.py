@@ -38,13 +38,21 @@ class ManipulatorBase(object):
 
     @classmethod
     def _clearCache(cls, models):
+        """
+        Makes a deferred call to clear cache.
+        Needs to save _affected_references and dirty flag
+        """
+        affected_references = [model._affected_references if hasattr(model, '_affected_references') else [] for model in models]
+        dirty = [model.dirty if hasattr(model, 'dirty') else False for model in models]
+        deferred.defer(cls._clearCacheDeferred, zip(models, affected_references, dirty), _queue='cache-clearing')
+
+    @classmethod
+    def _clearCacheDeferred(cls, models_affectedrefs_dirty):
         to_clear = defaultdict(set)
-        for model in models:
-            if hasattr(model, '_affected_references') and getattr(model, 'dirty', False):
-                for cache_key, controller in cls.getCacheKeysAndControllers(model._affected_references):
+        for model, affected_references, dirty in models_affectedrefs_dirty:
+            if affected_references and dirty:
+                for cache_key, controller in cls.getCacheKeysAndControllers(affected_references):
                     to_clear[controller].add(cache_key)
-            if hasattr(model, 'dirty'):
-                model.dirty = False
 
         for controller, cache_keys in to_clear.items():
             controller.delete_cache_multi(cache_keys)
@@ -90,6 +98,8 @@ class ManipulatorBase(object):
         self._clearCache(models)
         if run_post_update_hook:
             self.runPostUpdateHook(models_to_put)
+        for model in models:
+            model.dirty = False
         return self.delistify(models)
 
     @classmethod
