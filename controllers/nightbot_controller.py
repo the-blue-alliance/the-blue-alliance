@@ -165,15 +165,18 @@ class NightbotTeamStatuskHandler(CacheableHandler):
 
         # Compute rank & num_teams
         rank = None
+        ranking_points = None
         if event.rankings:
             num_teams = len(event.rankings) - 1
             for i, row in enumerate(event.rankings):
                 if row[1] == team_number:
                     rank = i
+                    ranking_points = int(float(row[2]))
+                    break
 
         if unplayed_qual > 0:
             if rank is not None:
-                return "{}[{}] Team {} is currently rank {}/{} with a record of {}-{}-{}.".format(user_str, event_code_upper, team_number, rank, num_teams, wins, losses, ties)
+                return "{}[{}] Team {} is currently rank {}/{} with a record of {}-{}-{} and {} ranking points.".format(user_str, event_code_upper, team_number, rank, num_teams, wins, losses, ties, ranking_points)
             else:
                 return "{}[{}] Team {} currently has a record of {}-{}-{}.".format(user_str, event_code_upper, team_number, wins, losses, ties)
         else:
