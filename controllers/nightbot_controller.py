@@ -175,7 +175,7 @@ class NightbotTeamStatuskHandler(CacheableHandler):
             if rank is not None:
                 return "{}[{}] Team {} is currently rank {}/{} with a record of {}-{}-{}.".format(user_str, event_code_upper, team_number, rank, num_teams, wins, losses, ties)
             else:
-                return "{}[{}] Team {} currently has a record of {}-{}-{} at [{}].".format(user_str, event_code_upper, team_number, wins, losses, ties)
+                return "{}[{}] Team {} currently has a record of {}-{}-{}.".format(user_str, event_code_upper, team_number, wins, losses, ties)
         else:
             if alliance_number is None:
                 return "{}[{}] Team {} ended qualification matches at rank {}/{} with a record of {}-{}-{}.".format(user_str, event_code_upper, team_number, rank, num_teams, wins, losses, ties)
