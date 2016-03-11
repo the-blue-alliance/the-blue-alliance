@@ -99,7 +99,8 @@ class ManipulatorBase(object):
         if run_post_update_hook:
             self.runPostUpdateHook(models_to_put)
         for model in models:
-            model.dirty = False
+            if model:  # Model can be None
+                model.dirty = False
         return self.delistify(models)
 
     @classmethod
