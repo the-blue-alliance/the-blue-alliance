@@ -104,6 +104,7 @@ class MatchManipulator(ManipulatorBase):
             "no_auto_update",
             "time",
             "time_string",
+            "actual_time",
             "push_sent",
         ]
 
