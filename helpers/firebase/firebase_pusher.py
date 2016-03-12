@@ -83,10 +83,10 @@ class FirebasePusher(object):
             'payload': notification._render_webhook()
         })
 
-        deferred.defer(cls._push_data, cls.FIREHOSE_FEED, payload_data_json, _queue="firebase")
+        deferred.defer(cls._push_data, cls.FIREHOSE_FEED, payload_data_json, _queue="firebase-notifications")
 
         if notification._event_feed:
-            deferred.defer(cls._push_data, cls.EVENT_FEED.format(notification._event_feed), payload_data_json, _queue="firebase")
+            deferred.defer(cls._push_data, cls.EVENT_FEED.format(notification._event_feed), payload_data_json, _queue="firebase-notifications")
 
         if notification._district_feed:
-            deferred.defer(cls._push_data, cls.DISTRICT_FEED.format(notification._district_feed), payload_data_json, _queue="firebase")
+            deferred.defer(cls._push_data, cls.DISTRICT_FEED.format(notification._district_feed), payload_data_json, _queue="firebase-notifications")
