@@ -88,8 +88,10 @@ def media_updated(affected_refs):
 
     for event_team_key in event_team_keys_future.get_result():
         event_key = event_team_key.id().split('_')[0]
-        queries_and_keys.append(EventTeamsMediasQuery(event_key))
-        queries_and_keys.append(EventTeamsPreferredMediasQuery(event_key))
+        year = int(event_key[:4])
+        if year in years:
+            queries_and_keys.append(EventTeamsMediasQuery(event_key))
+            queries_and_keys.append(EventTeamsPreferredMediasQuery(event_key))
 
     return queries_and_keys
 

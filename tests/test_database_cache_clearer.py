@@ -41,8 +41,16 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
             year=2015,
         )
 
+        self.eventteam_2010cama_frc604 = EventTeam(
+            id='2010cama_frc604',
+            event=ndb.Key(Event, '2010cama'),
+            team=ndb.Key(Team, 'frc604'),
+            year=2010,
+        )
+
         self.eventteam_2015casj_frc254.put()
         self.eventteam_2015cama_frc604.put()
+        self.eventteam_2010cama_frc604.put()
 
         self.districtteam_2015fim_frc254 = DistrictTeam(
             id='2015fim_frc254',
@@ -157,15 +165,17 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         }
         cache_keys = [q.cache_key for q in get_affected_queries.team_updated(affected_refs)]
 
-        self.assertEqual(len(cache_keys), 8)
+        self.assertEqual(len(cache_keys), 10)
         self.assertTrue(TeamListQuery(0).cache_key in cache_keys)
         self.assertTrue(TeamListQuery(1).cache_key in cache_keys)
         self.assertTrue(TeamListYearQuery(2015, 0).cache_key in cache_keys)
         self.assertTrue(TeamListYearQuery(2015, 1).cache_key in cache_keys)
+        self.assertTrue(TeamListYearQuery(2010, 1).cache_key in cache_keys)
         self.assertTrue(DistrictTeamsQuery('2015fim').cache_key in cache_keys)
         self.assertTrue(DistrictTeamsQuery('2015mar').cache_key in cache_keys)
         self.assertTrue(EventTeamsQuery('2015casj').cache_key in cache_keys)
         self.assertTrue(EventTeamsQuery('2015cama').cache_key in cache_keys)
+        self.assertTrue(EventTeamsQuery('2010cama').cache_key in cache_keys)
 
     def test_eventteam_updated(self):
         affected_refs = {
