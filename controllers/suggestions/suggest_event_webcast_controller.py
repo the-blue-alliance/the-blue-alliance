@@ -1,6 +1,7 @@
 import os
 
 from controllers.base_controller import LoggedInHandler
+from helpers.suggestions.suggestion_creator import SuggestionCreator
 from models.event import Event
 from models.suggestion import Suggestion
 from template_engine import jinja2_engine
@@ -20,7 +21,7 @@ class SuggestEventWebcastController(LoggedInHandler):
         event = Event.get_by_id(self.request.get("event_key"))
 
         self.template_values.update({
-            "result": self.request.get("result"),
+            "status": self.request.get("status"),
             "event": event,
         })
 
@@ -33,14 +34,11 @@ class SuggestEventWebcastController(LoggedInHandler):
         webcast_url = self.request.get("webcast_url")
 
         if not webcast_url:
-            self.redirect('/suggest/event/webcast?event_key=%s&result=blank_webcast' % event_key, abort=True)
+            self.redirect('/suggest/event/webcast?event_key={}&status=blank_webcast'.format(event_key), abort=True)
 
-        suggestion = Suggestion(
-            author=self.user_bundle.account.key,
-            target_key=event_key,
-            target_model="event",
-            )
-        suggestion.contents = {"webcast_url": webcast_url}
-        suggestion.put()
+        status = SuggestionCreator.createEventWebcastSuggestion(
+            author_account_key=self.user_bundle.account.key,
+            webcast_url=self.request.get("webcast_url"),
+            event_key=event_key)
 
-        self.redirect('/suggest/event/webcast?event_key=%s&result=success' % event_key)
+        self.redirect('/suggest/event/webcast?event_key={}&status={}'.format(event_key, status))
