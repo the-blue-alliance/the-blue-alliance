@@ -13,6 +13,7 @@ from consts.client_type import ClientType
 from consts.model_type import ModelType
 from consts.notification_type import NotificationType
 
+from helpers.event_helper import EventHelper
 from helpers.mytba_helper import MyTBAHelper
 from helpers.notification_helper import NotificationHelper
 from helpers.validation_helper import ValidationHelper
@@ -176,7 +177,8 @@ class MyTBAController(LoggedInHandler):
                         short_name='ALL EVENTS',
                         event_short=item.model_key,
                         year=event_year,
-                        start_date=datetime.datetime(event_year, 1, 1)
+                        start_date=datetime.datetime(event_year, 1, 1),
+                        end_date=datetime.datetime(event_year, 1, 1)
                     ))
                 else:
                     event_keys.add(ndb.Key(Event, item.model_key))
@@ -196,7 +198,8 @@ class MyTBAController(LoggedInHandler):
             team_fav_subs.append((team, fav, subs))
 
         events += [event_future.get_result() for event_future in event_futures]
-        events = sorted(events, key=lambda x: x.start_date)
+        EventHelper.sort_events(events)
+
         event_fav_subs = []
         for event in events:
             fav = event_fav.get(event.key.id(), None)
