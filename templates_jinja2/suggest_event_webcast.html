@@ -6,7 +6,7 @@
 
 {% block content %}
 <div class="container">
-  {% if result = "success" %}
+  {% if result == "success" %}
   <div class="row">
     <div class="col-xs-12 col-lg-6 col-lg-offset-3">
       <div class="alert alert-success">
@@ -38,7 +38,7 @@
           <p>Thanks for helping make The Blue Alliance better! Let us know about webcasts so we can add them to the site!</p>
           <ul>
             <li>Your suggestion will be reviewed by a moderator</li>
-            <li>Your account info (like {{user_bundle.user.email}} and {{user_bundle.user.nickname}}) will also be submitted. <a href="{{user_bundle.logout_url}}">log in as a different user</a></li>
+            <li>Your account info (like {{user_bundle.user.email()}} and {{user_bundle.user.nickname()}}) will also be submitted. <a href="{{user_bundle.logout_url}}">log in as a different user</a></li>
           </ul>
           <hr>
           <h3>{{event.year}} {{event.name}}</h3>
@@ -53,7 +53,7 @@
           {% endif %}
           <p>Find a webcast for {{event.name}} and paste it below so we can add it to the site :)</p>
           <form action="/suggest/event/webcast" method="post">
-            <input name="event_key" type="hidden" value="{{event.key.id}}" />
+            <input name="event_key" type="hidden" value="{{event.key.id()}}" />
             <div class="input-group">
               <input class="form-control" type="text" name="webcast_url" placeholder="like http://www.ustream.tv/nasa" value="" />
               <span class="input-group-btn">

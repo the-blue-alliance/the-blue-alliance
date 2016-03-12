@@ -1,10 +1,9 @@
 import os
 
-from google.appengine.ext.webapp import template
-
 from controllers.base_controller import LoggedInHandler
 from models.event import Event
 from models.suggestion import Suggestion
+from template_engine import jinja2_engine
 
 
 class SuggestEventWebcastController(LoggedInHandler):
@@ -25,8 +24,7 @@ class SuggestEventWebcastController(LoggedInHandler):
             "event": event,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/suggest_event_webcast.html')
-        self.response.out.write(template.render(path, self.template_values))
+        self.response.out.write(jinja2_engine.render('suggest_event_webcast.html', self.template_values))
 
     def post(self):
         self._require_login()
