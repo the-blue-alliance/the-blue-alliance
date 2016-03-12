@@ -77,12 +77,20 @@ class SuggestionCreator(object):
                     return 'success'
                 else:
                     return 'suggestion_exists'
-        else:  # Can't parse URL -- could be an obscure webcast
+        else:  # Can't parse URL -- could be an obscure webcast. Save URL and let a human deal with it.
+            contents = {"webcast_url": webcast_url}
+
+            # Check if suggestion exists
+            existing_suggestions = Suggestion.query(Suggestion.target_model=='event', Suggestion.target_key==event_key).fetch()
+            for existing_suggestion in existing_suggestions:
+                if existing_suggestion.contents == contents:
+                    return 'suggestion_exists'
+
             suggestion = Suggestion(
                 author=author_account_key,
                 target_model="event",
                 target_key=event_key,
                 )
-            suggestion.contents = {"webcast_url": webcast_url}
+            suggestion.contents = contents
             suggestion.put()
             return 'success'
