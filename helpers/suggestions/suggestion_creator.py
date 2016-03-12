@@ -1,3 +1,5 @@
+import logging
+
 from helpers.media_helper import MediaParser
 from helpers.webcast_helper import WebcastParser
 
@@ -48,7 +50,12 @@ class SuggestionCreator(object):
         if not webcast_url.startswith('http://') and not webcast_url.startswith('https://'):
             webcast_url = 'http://' + webcast_url
 
-        webcast_dict = WebcastParser.webcast_dict_from_url(webcast_url)
+        try:
+            webcast_dict = WebcastParser.webcast_dict_from_url(webcast_url)
+        except Exception, e:
+            logging.exception(e)
+            webcast_dict = None
+
         if webcast_dict is not None:
             # Check if webcast already exists in event
             event = Event.get_by_id(event_key)
