@@ -6,7 +6,7 @@
 
 {% block detailed_content %}
   <h1 class="end_header">Insights Overview</h1>
-  <p>*Insights are updated nightly</p>
+  {% if last_updated %}<p>Last updated on <span class="tba-verbose-date-utc" >{{last_updated|rfc2822}}+00:00</span> at <span class="tba-verbose-time-utc" >{{last_updated|rfc2822}}+00:00</span></p>{% endif %}
 
   {% if num_matches %}
   <div class="row">
