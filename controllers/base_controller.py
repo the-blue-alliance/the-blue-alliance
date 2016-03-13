@@ -26,7 +26,8 @@ class CacheableHandler(webapp2.RequestHandler):
         if not hasattr(self, '_partial_cache_key'):
             self._partial_cache_key = self.CACHE_KEY_FORMAT
         self.template_values = {}
-        self.response.headers['Vary'] = 'Accept-Encoding'
+        if self.response:
+            self.response.headers['Vary'] = 'Accept-Encoding'
 
     @property
     def cache_key(self):
