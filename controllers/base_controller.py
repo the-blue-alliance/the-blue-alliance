@@ -26,6 +26,7 @@ class CacheableHandler(webapp2.RequestHandler):
         if not hasattr(self, '_partial_cache_key'):
             self._partial_cache_key = self.CACHE_KEY_FORMAT
         self.template_values = {}
+        self.response.headers['Vary'] = 'Accept-Encoding'
 
     @property
     def cache_key(self):
@@ -125,6 +126,7 @@ class LoggedInHandler(webapp2.RequestHandler):
         self.response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         self.response.headers['Pragma'] = 'no-cache'
         self.response.headers['Expires'] = '0'
+        self.response.headers['Vary'] = 'Accept-Encoding'
 
     def _require_admin(self):
         self._require_login()
