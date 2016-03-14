@@ -54,8 +54,9 @@ class FMSAPIAwardsEnqueue(webapp.RequestHandler):
             'events': events,
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_awards_enqueue.html')
-        self.response.out.write(template.render(path, template_values))
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_awards_enqueue.html')
+            self.response.out.write(template.render(path, template_values))
 
 
 class FMSAPIAwardsGet(webapp.RequestHandler):
@@ -96,8 +97,9 @@ class FMSAPIAwardsGet(webapp.RequestHandler):
             'awards': new_awards,
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_awards_get.html')
-        self.response.out.write(template.render(path, template_values))
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_awards_get.html')
+            self.response.out.write(template.render(path, template_values))
 
 
 class FMSAPIEventAlliancesEnqueue(webapp.RequestHandler):
@@ -125,8 +127,9 @@ class FMSAPIEventAlliancesEnqueue(webapp.RequestHandler):
             'events': events
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_alliances_enqueue.html')
-        self.response.out.write(template.render(path, template_values))
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_alliances_enqueue.html')
+            self.response.out.write(template.render(path, template_values))
 
 
 class FMSAPIEventAlliancesGet(webapp.RequestHandler):
@@ -153,8 +156,9 @@ class FMSAPIEventAlliancesGet(webapp.RequestHandler):
         template_values = {'alliance_selections': alliance_selections,
                            'event_name': event.key_name}
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_alliances_get.html')
-        self.response.out.write(template.render(path, template_values))
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_alliances_get.html')
+            self.response.out.write(template.render(path, template_values))
 
 
 class FMSAPIEventRankingsEnqueue(webapp.RequestHandler):
@@ -179,8 +183,9 @@ class FMSAPIEventRankingsEnqueue(webapp.RequestHandler):
             'events': events,
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_rankings_enqueue.html')
-        self.response.out.write(template.render(path, template_values))
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_rankings_enqueue.html')
+            self.response.out.write(template.render(path, template_values))
 
 
 class FMSAPIEventRankingsGet(webapp.RequestHandler):
@@ -202,8 +207,9 @@ class FMSAPIEventRankingsGet(webapp.RequestHandler):
         template_values = {'rankings': rankings,
                            'event_name': event.key_name}
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_rankings_get.html')
-        self.response.out.write(template.render(path, template_values))
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_rankings_get.html')
+            self.response.out.write(template.render(path, template_values))
 
 
 class FMSAPIMatchesEnqueue(webapp.RequestHandler):
@@ -228,8 +234,9 @@ class FMSAPIMatchesEnqueue(webapp.RequestHandler):
             'events': events,
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_matches_enqueue.html')
-        self.response.out.write(template.render(path, template_values))
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_matches_enqueue.html')
+            self.response.out.write(template.render(path, template_values))
 
 
 class FMSAPIMatchesGet(webapp.RequestHandler):
@@ -245,8 +252,9 @@ class FMSAPIMatchesGet(webapp.RequestHandler):
             'matches': new_matches,
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_matches_get.html')
-        self.response.out.write(template.render(path, template_values))
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_matches_get.html')
+            self.response.out.write(template.render(path, template_values))
 
 # TODO: Currently unused
 
@@ -343,8 +351,9 @@ class TeamDetailsGet(webapp.RequestHandler):
             'robot': robot,
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_team_details_get.html')
-        self.response.out.write(template.render(path, template_values))
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_team_details_get.html')
+            self.response.out.write(template.render(path, template_values))
 
 
 class EventListEnqueue(webapp.RequestHandler):
@@ -365,8 +374,9 @@ class EventListEnqueue(webapp.RequestHandler):
             'event_count': year
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_events_details_enqueue.html')
-        self.response.out.write(template.render(path, template_values))
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_events_details_enqueue.html')
+            self.response.out.write(template.render(path, template_values))
 
 
 class EventListGet(webapp.RequestHandler):
@@ -394,8 +404,9 @@ class EventListGet(webapp.RequestHandler):
             "events": events
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fms_event_list_get.html')
-        self.response.out.write(template.render(path, template_values))
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fms_event_list_get.html')
+            self.response.out.write(template.render(path, template_values))
 
 
 class EventDetailsEnqueue(webapp.RequestHandler):
@@ -413,8 +424,9 @@ class EventDetailsEnqueue(webapp.RequestHandler):
             'event_key': event_key
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fmsapi_eventteams_enqueue.html')
-        self.response.out.write(template.render(path, template_values))
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/fmsapi_eventteams_enqueue.html')
+            self.response.out.write(template.render(path, template_values))
 
 
 class EventDetailsGet(webapp.RequestHandler):
@@ -485,8 +497,9 @@ class EventDetailsGet(webapp.RequestHandler):
             'event_teams': event_teams,
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_details_get.html')
-        self.response.out.write(template.render(path, template_values))
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_details_get.html')
+            self.response.out.write(template.render(path, template_values))
 
 
 class TbaVideosEnqueue(webapp.RequestHandler):
@@ -505,8 +518,9 @@ class TbaVideosEnqueue(webapp.RequestHandler):
             'event_count': Event.query().count(),
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/tba_videos_enqueue.html')
-        self.response.out.write(template.render(path, template_values))
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/tba_videos_enqueue.html')
+            self.response.out.write(template.render(path, template_values))
 
 
 class TbaVideosGet(webapp.RequestHandler):
@@ -537,5 +551,6 @@ class TbaVideosGet(webapp.RequestHandler):
             'tbavideos': tbavideos,
         }
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/tba_videos_get.html')
-        self.response.out.write(template.render(path, template_values))
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/tba_videos_get.html')
+            self.response.out.write(template.render(path, template_values))
