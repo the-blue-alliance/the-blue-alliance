@@ -35,19 +35,20 @@ class NotificationSender(object):
             checksum = ch.hexdigest()
 
             request = urllib2.Request(url, payload)
+            request.add_header("Content-Type", 'application/json; charset="utf-8"')
             request.add_header("X-TBA-Checksum", checksum)
             request.add_header("X-TBA-Version", '{}'.format(cls.WEBHOOK_VERSION))
             try:
                 resp = urllib2.urlopen(request)
             except urllib2.HTTPError, e:
                 if e.code == 400:
-                    logging.error('400, Invalid message: ' + repr(gcm_post_json_str))
+                    logging.warning('400, Invalid message: ' + repr(gcm_post_json_str))
                 elif e.code == 401:
-                    logging.error('401, Webhook unauthorized')
+                    logging.warning('401, Webhook unauthorized')
                 elif e.code == 404:
                     invalid_urls.append(url)
                 elif e.code == 500:
-                    logging.error('500, Internal error on server sending message')
+                    logging.warning('500, Internal error on server sending message')
                 else:
                     logging.exception('Unexpected HTTPError: ' + str(e.code) + " " + e.msg + " " + e.read())
             except Exception, ex:

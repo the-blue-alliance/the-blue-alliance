@@ -121,7 +121,7 @@ class AdminMatchAdd(LoggedInHandler):
                 match.get("set_number", 0),
                 match.get("match_number", 0)),
             event=event.key,
-            game=Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
+            year=event.year,
             set_number=match.get("set_number", 0),
             match_number=match.get("match_number", 0),
             comp_level=match.get("comp_level", None),
@@ -162,18 +162,15 @@ class AdminMatchEdit(LoggedInHandler):
         match = Match(
             id=match_key,
             event=Event.get_by_id(self.request.get("event_key_name")).key,
-            game=self.request.get("game"),
             set_number=int(self.request.get("set_number")),
             match_number=int(self.request.get("match_number")),
             comp_level=self.request.get("comp_level"),
             team_key_names=team_key_names,
             alliances_json=alliances_json,
+            youtube_videos=youtube_videos
             # no_auto_update = str(self.request.get("no_auto_update")).lower() == "true", #TODO
         )
-        match = MatchManipulator.createOrUpdate(match)
-        match.youtube_videos = youtube_videos
-        match.dirty = True  # hacky
-        MatchManipulator.createOrUpdate(match)
+        MatchManipulator.createOrUpdate(match, auto_union=False)
 
         self.redirect("/admin/match/" + match.key_name)
 
@@ -200,7 +197,6 @@ class AdminVideosAdd(LoggedInHandler):
             if match:
                 if youtube_video not in match.youtube_videos:
                     match.youtube_videos.append(youtube_video)
-                    match.dirty = True  # hacky
                     matches_to_put.append(match)
                     results["added"].append(match_key)
                 else:

@@ -33,55 +33,6 @@ class Match(ndb.Model):
         'f': 5,
     }
 
-    FRC_GAMES = [
-        "frc_2012_rebr",
-        "frc_2011_logo",
-        "frc_2010_bkwy",
-        "frc_2009_lncy",
-        "frc_2008_ovdr",
-        "frc_2007_rkrl",
-        "frc_2006_amhi",
-        "frc_2005_trpl",
-        "frc_2004_frnz",
-        "frc_2003_stck",
-        "frc_2002_znzl",
-        "frc_2001_dbdy",
-        "frc_2000_coop",
-        "frc_1999_trbl",
-        "frc_1998_lddr",
-        "frc_1997_trdt",
-        "frc_1996_hxgn",
-        "frc_1995_rmpr",
-        "frc_1994_tpwr",
-        "frc_1993_rgrg",
-        "frc_1992_maiz",
-        "frc_unknown",
-    ]
-
-    FRC_GAMES_BY_YEAR = {
-        2012: "frc_2012_rebr",
-        2011: "frc_2011_logo",
-        2010: "frc_2010_bkwy",
-        2009: "frc_2009_lncy",
-        2008: "frc_2008_ovdr",
-        2007: "frc_2007_rkrl",
-        2006: "frc_2006_amhi",
-        2005: "frc_2005_trpl",
-        2004: "frc_2004_frnz",
-        2003: "frc_2003_stck",
-        2002: "frc_2002_znzl",
-        2001: "frc_2001_dbdy",
-        2000: "frc_2000_coop",
-        1999: "frc_1999_trbl",
-        1998: "frc_1998_lddr",
-        1997: "frc_1997_trdt",
-        1996: "frc_1996_hxgn",
-        1995: "frc_1995_rmpr",
-        1994: "frc_1994_tpwr",
-        1993: "frc_1993_rgrg",
-        1992: "frc_1992_maiz",
-    }
-
     alliances_json = ndb.StringProperty(required=True, indexed=False)  # JSON dictionary with alliances and scores.
 
     # {
@@ -112,16 +63,17 @@ class Match(ndb.Model):
 
     comp_level = ndb.StringProperty(required=True, choices=set(COMP_LEVELS))
     event = ndb.KeyProperty(kind=Event, required=True)
-    game = ndb.StringProperty(required=True, choices=set(FRC_GAMES), indexed=False)
+    year = ndb.IntegerProperty(required=True)
     match_number = ndb.IntegerProperty(required=True, indexed=False)
     no_auto_update = ndb.BooleanProperty(default=False, indexed=False)  # Set to True after manual update
     set_number = ndb.IntegerProperty(required=True, indexed=False)
     team_key_names = ndb.StringProperty(repeated=True)  # list of teams in Match, for indexing.
-    time = ndb.DateTimeProperty()  # UTC
+    time = ndb.DateTimeProperty()  # UTC time of scheduled start
     time_string = ndb.StringProperty(indexed=False)  # the time as displayed on FIRST's site (event's local time)
+    actual_time = ndb.DateTimeProperty()  # UTC time of match actual start
     youtube_videos = ndb.StringProperty(repeated=True)  # list of Youtube IDs
     tba_videos = ndb.StringProperty(repeated=True)  # list of filetypes a TBA video exists for
-    push_sent = ndb.BooleanProperty(default=False)  # has an upcoming match notification been sent for this match?
+    push_sent = ndb.BooleanProperty()  # has an upcoming match notification been sent for this match? None counts as False
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True)
@@ -173,17 +125,20 @@ class Match(ndb.Model):
 
     @property
     def winning_alliance(self):
+        from helpers.event_helper import EventHelper
+        from helpers.match_helper import MatchHelper
         if self._winning_alliance is None:
-            if self.year == 2015 and self.comp_level != 'f':
+            if EventHelper.is_2015_playoff(self.event_key_name) and self.comp_level != 'f':
                 return ''  # report all 2015 non finals matches as ties
 
-            highest_score = 0
-            for alliance in self.alliances:
-                if int(self.alliances[alliance]["score"]) > highest_score:
-                    highest_score = int(self.alliances[alliance]["score"])
-                    self._winning_alliance = alliance
-                elif int(self.alliances[alliance]["score"]) == highest_score:
-                    self._winning_alliance = ""
+            red_score = int(self.alliances['red']['score'])
+            blue_score = int(self.alliances['blue']['score'])
+            if red_score > blue_score:
+                self._winning_alliance = 'red'
+            elif blue_score > red_score:
+                self._winning_alliance = 'blue'
+            else:  # tie
+                self._winning_alliance = MatchHelper.tiebreak_winner(self)
         return self._winning_alliance
 
     @property
@@ -195,10 +150,6 @@ class Match(ndb.Model):
         return [ndb.Key(Team, team_key_name) for team_key_name in self.team_key_names]
 
     @property
-    def year(self):
-        return int(self.event.id()[:4])
-
-    @property
     def key_name(self):
         return self.renderKeyName(self.event_key_name, self.comp_level, self.set_number, self.match_number)
 
@@ -207,13 +158,14 @@ class Match(ndb.Model):
         """If there are scores, it's been played"""
         for alliance in self.alliances:
             if (self.alliances[alliance]["score"] is None) or \
-            (self.alliances[alliance]["score"] == -1):
+               (self.alliances[alliance]["score"] == -1):
                 return False
         return True
 
     @property
     def verbose_name(self):
-        if self.comp_level == "qm" or self.comp_level == "f" or self.year == 2015:
+        from helpers.event_helper import EventHelper
+        if self.comp_level == "qm" or self.comp_level == "f" or EventHelper.is_2015_playoff(self.event_key_name):
             return "%s %s" % (self.COMP_LEVELS_VERBOSE[self.comp_level], self.match_number)
         else:
             return "%s %s Match %s" % (self.COMP_LEVELS_VERBOSE[self.comp_level], self.set_number, self.match_number)
@@ -291,6 +243,6 @@ class Match(ndb.Model):
 
     @classmethod
     def validate_key_name(self, match_key):
-        key_name_regex = re.compile(r'^[1-9]\d{3}[a-z]+[1-9]?\_(?:qm|ef|qf\dm|sf\dm|f\dm)\d+$')
+        key_name_regex = re.compile(r'^[1-9]\d{3}[a-z]+[0-9]?\_(?:qm|ef|qf\dm|sf\dm|f\dm)\d+$')
         match = re.match(key_name_regex, match_key)
         return True if match else False

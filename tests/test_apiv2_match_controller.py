@@ -28,7 +28,7 @@ class TestMatchApiController(unittest2.TestCase):
         self.match = Match(
             id="2014cc_f1m1",
             event=ndb.Key(Event, "2014cc"),
-            game = "frc_unknown",
+            year=2014,
             comp_level = "f",
             set_number = 1,
             match_number = 1,

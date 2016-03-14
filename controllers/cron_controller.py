@@ -58,7 +58,6 @@ class EventShortNameCalcDo(webapp.RequestHandler):
     def get(self, event_key):
         event = Event.get_by_id(event_key)
         event.short_name = EventHelper.getShortName(event.name)
-        event.dirty = True  # TODO: hacky
         EventManipulator.createOrUpdate(event)
 
         template_values = {'event': event}
@@ -96,11 +95,10 @@ class EventTeamUpdate(webapp.RequestHandler):
     ^^^ Does it actually do this? Eugene -- 2013/07/30
     """
     def get(self, event_key):
-        teams, event_teams, et_keys_to_del = EventTeamUpdater.update(event_key)
+        _, event_teams, et_keys_to_del = EventTeamUpdater.update(event_key)
 
-        teams = TeamManipulator.createOrUpdate(teams)
-
-        if teams:
+        if event_teams:
+            event_teams = filter(lambda et: et.team.get() is not None, event_teams)
             event_teams = EventTeamManipulator.createOrUpdate(event_teams)
 
         if et_keys_to_del:
@@ -148,7 +146,6 @@ class EventMatchstatsDo(webapp.RequestHandler):
         matchstats_dict = MatchstatsHelper.calculate_matchstats(event.matches)
         if any([v != {} for v in matchstats_dict.values()]):
             event.matchstats_json = json.dumps(matchstats_dict)
-            event.dirty = True  # TODO: hacky
             EventManipulator.createOrUpdate(event)
         else:
             logging.warn("Matchstat calculation for {} failed!".format(event_key))
@@ -217,7 +214,6 @@ class FinalMatchesRepairDo(webapp.RequestHandler):
                 match.comp_level,
                 match.set_number,
                 match.match_number))
-            match.dirty = True  # hacky
 
         MatchManipulator.createOrUpdate(matches_to_repair)
         MatchManipulator.delete_keys(deleted_keys)
@@ -435,14 +431,10 @@ class DistrictPointsCalcDo(webapp.RequestHandler):
         if event.event_district_enum == DistrictType.NO_DISTRICT:
             self.response.out.write("Can't calculate district points for a non-district event!")
             return
-        if event.year < 2014:
-            self.response.out.write("Can't calculate district points for events before 2014!")  # TODO: implement correct points for pre-2014 districts
-            return
 
         district_points = DistrictHelper.calculate_event_points(event)
 
         event.district_points_json = json.dumps(district_points)
-        event.dirty = True  # This is so hacky. -fangeugene 2014-05-08
         EventManipulator.createOrUpdate(event)
 
         self.response.out.write(event.district_points)

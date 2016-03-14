@@ -1,12 +1,12 @@
 import os
 import re
 
-from google.appengine.ext.webapp import template
-
 from controllers.base_controller import LoggedInHandler
 from models.event import Event
 from models.match import Match
 from models.suggestion import Suggestion
+
+from template_engine import jinja2_engine
 
 
 class SuggestMatchVideoController(LoggedInHandler):
@@ -25,19 +25,22 @@ class SuggestMatchVideoController(LoggedInHandler):
         match = match_future.get_result()
         event = event_future.get_result()
 
+        if not match or not event:
+            self.abort(404)
+
         self.template_values.update({
-            "success": self.request.get("success"),
+            "status": self.request.get("status"),
             "event": event,
             "match": match,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/suggest_match_video.html')
-        self.response.out.write(template.render(path, self.template_values))
+        self.response.out.write(jinja2_engine.render('suggest_match_video.html', self.template_values))
 
     def post(self):
         self._require_login()
 
         match_key = self.request.get("match_key")
+        match_future = Match.get_by_id_async(self.request.get("match_key"))
         youtube_url = self.request.get("youtube_url")
 
         youtube_id = None
@@ -50,12 +53,25 @@ class SuggestMatchVideoController(LoggedInHandler):
                 youtube_id = regex2.group(1)
 
         if youtube_id is not None:
-            suggestion = Suggestion(
-                author=self.user_bundle.account.key,
-                target_key=match_key,
-                target_model="match",
-                )
-            suggestion.contents = {"youtube_videos": [youtube_id]}
-            suggestion.put()
+            if youtube_id not in match_future.get_result().youtube_videos:
+                year = match_key[:4]
+                suggestion_id = Suggestion.render_media_key_name(year, 'match', match_key, 'youtube', youtube_id)
+                suggestion = Suggestion.get_by_id(suggestion_id)
+                if not suggestion or suggestion.review_state != Suggestion.REVIEW_PENDING:
+                    suggestion = Suggestion(
+                        id=suggestion_id,
+                        author=self.user_bundle.account.key,
+                        target_key=match_key,
+                        target_model="match",
+                        )
+                    suggestion.contents = {"youtube_videos": [youtube_id]}
+                    suggestion.put()
+                    status = 'success'
+                else:
+                    status = 'suggestion_exists'
+            else:
+                status = 'video_exists'
+        else:
+            status = 'bad_url'
 
-        self.redirect('/suggest/match/video?match_key=%s&success=1' % match_key)
+        self.redirect('/suggest/match/video?match_key={}&status={}'.format(match_key, status))

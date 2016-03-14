@@ -1,3 +1,7 @@
+# Personal development files #
+##############################
+mydeploy.sh
+
 # Compiled source #
 ###################
 *.com
@@ -48,6 +52,9 @@ $RECYCLE.BIN/
 ###########
 *.project
 *.pydevproject
+
+# IDEA
+.idea/**
 
 # Temp files #
 ##############

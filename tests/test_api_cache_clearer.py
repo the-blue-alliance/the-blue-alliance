@@ -5,6 +5,8 @@ import webapp2
 
 from datetime import datetime
 
+from google.appengine.ext import deferred
+from google.appengine.api import taskqueue
 from google.appengine.ext import testbed
 
 import api_main
@@ -36,12 +38,14 @@ from controllers.api.api_team_controller import ApiTeamEventMatchesController
 from controllers.api.api_team_controller import ApiTeamMediaController
 from controllers.api.api_team_controller import ApiTeamYearsParticipatedController
 from controllers.api.api_team_controller import ApiTeamListController
+from controllers.api.api_team_controller import ApiTeamHistoryRobotsController
 
 from helpers.award_manipulator import AwardManipulator
 from helpers.event_manipulator import EventManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.match_manipulator import MatchManipulator
 from helpers.media_manipulator import MediaManipulator
+from helpers.robot_manipulator import RobotManipulator
 from helpers.team_manipulator import TeamManipulator
 
 from models.award import Award
@@ -50,6 +54,7 @@ from models.event import Event
 from models.event_team import EventTeam
 from models.match import Match
 from models.media import Media
+from models.robot import Robot
 from models.team import Team
 
 
@@ -63,6 +68,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
         self.testbed.init_taskqueue_stub(root_path=".")
+        self.taskqueue_stub = self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME)
 
         # populate mini db
         self.event_2010sc_1 = Event(
@@ -150,7 +156,7 @@ class TestApiCacheClearer(unittest2.TestCase):
             event=self.event_2010sc_1.key,
             set_number=1,
             match_number=1,
-            game='frc_unknown',
+            year=2010,
             team_key_names=[u'frc1', u'frc2', u'frc3', u'frc4', u'frc5', u'frc6'],
         )
 
@@ -161,7 +167,7 @@ class TestApiCacheClearer(unittest2.TestCase):
             event=self.event_2010sc_1.key,
             set_number=1,
             match_number=1,
-            game='frc_unknown',
+            year=2010,
             team_key_names=[u'frc1', u'frc999', u'frc3', u'frc4', u'frc5', u'frc6'],
         )
 
@@ -240,14 +246,54 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.team_list_page_0_cache_key = ApiTeamListController.get_cache_key_from_format(0)
         self.team_list_page_1_cache_key = ApiTeamListController.get_cache_key_from_format(1)
 
+        self.robot1 = Robot(
+            id='frc1_2015',
+            year=2015,
+            team=self.team_frc1_1.key,
+            robot_name='Baymax'
+        )
+        self.robot2 = Robot(
+            id='frc1_2015',
+            year=2015,
+            team=self.team_frc1_1.key,
+            robot_name='Wall-E'
+        )
+        self.robots_cache_key = ApiTeamHistoryRobotsController.get_cache_key_from_format('frc1')
+
     def tearDown(self):
         self.testbed.deactivate()
+
+    def processDeferred(self):
+        """
+        Cache clearing is done in a deferred task. Force it to run here.
+        """
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names='cache-clearing')
+        queue = taskqueue.Queue('cache-clearing')
+        for task in tasks:
+            deferred.run(task.payload)
+            queue.delete_tasks(task)
+
+    def testRobots(self):
+        self.assertEqual(CachedResponse.get_by_id(self.robots_cache_key), None)
+        TeamManipulator.createOrUpdate(self.team_frc1_1)
+        RobotManipulator.createOrUpdate(self.robot1)
+        self.processDeferred()
+        response = self.testapp.get('/api/v2/team/frc1/history/robots', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
+        self.assertNotEqual(CachedResponse.get_by_id(self.robots_cache_key), None)
+
+        RobotManipulator.createOrUpdate(self.robot2)
+        self.processDeferred()
+
+        self.assertEqual(CachedResponse.get_by_id(self.robots_cache_key), None)
+        response = self.testapp.get('/api/v2/team/frc1/history/robots', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
+        self.assertNotEqual(CachedResponse.get_by_id(self.robots_cache_key), None)
 
     def resetAll(self, flushed=False):
         response = self.testapp.get('/api/v2/events/2010', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
 
         EventManipulator.createOrUpdate(self.event_2010sc_1)
+        self.processDeferred()
         if flushed:
             self.assertEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
         TeamManipulator.createOrUpdate(self.team_frc1_1)
@@ -257,6 +303,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         MatchManipulator.createOrUpdate(self.match1_1)
         AwardManipulator.createOrUpdate(self.award1_1)
         MediaManipulator.createOrUpdate(self.media1_1)
+        self.processDeferred()
 
         response = self.testapp.get('/api/v2/events/2010', headers={'X-TBA-App-Id': 'tba-tests:api-cache-clear-test:v01'})
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
@@ -1050,6 +1097,7 @@ class TestApiCacheClearer(unittest2.TestCase):
         TeamManipulator.createOrUpdate(self.team_frc1_1)
         TeamManipulator.createOrUpdate(self.team_frc2_1)
         MediaManipulator.createOrUpdate(self.media1_1)
+        self.processDeferred()
 
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
@@ -1080,6 +1128,7 @@ class TestApiCacheClearer(unittest2.TestCase):
 
         # updating an event
         EventManipulator.createOrUpdate(self.event_2010sc_2)
+        self.processDeferred()
         self.assertEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
@@ -1111,6 +1160,7 @@ class TestApiCacheClearer(unittest2.TestCase):
 
         # updating a team
         TeamManipulator.createOrUpdate(self.team_frc1_2)
+        self.processDeferred()
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
@@ -1142,6 +1192,7 @@ class TestApiCacheClearer(unittest2.TestCase):
 
         # updating a match
         MatchManipulator.createOrUpdate(self.match1_2)
+        self.processDeferred()
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
@@ -1173,6 +1224,7 @@ class TestApiCacheClearer(unittest2.TestCase):
 
         # updating an award
         AwardManipulator.createOrUpdate(self.award1_2)
+        self.processDeferred()
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
@@ -1204,6 +1256,7 @@ class TestApiCacheClearer(unittest2.TestCase):
 
         # updating a media
         MediaManipulator.createOrUpdate(self.media1_2)
+        self.processDeferred()
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
@@ -1235,6 +1288,7 @@ class TestApiCacheClearer(unittest2.TestCase):
 
         # deleting a media
         MediaManipulator.delete(self.media1_2)
+        self.processDeferred()
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
@@ -1266,6 +1320,7 @@ class TestApiCacheClearer(unittest2.TestCase):
 
         # deleting an award
         AwardManipulator.delete(self.award1_2)
+        self.processDeferred()
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
@@ -1297,6 +1352,7 @@ class TestApiCacheClearer(unittest2.TestCase):
 
         # deleting a match
         MatchManipulator.delete(self.match1_2)
+        self.processDeferred()
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
@@ -1328,6 +1384,7 @@ class TestApiCacheClearer(unittest2.TestCase):
 
         # deleting a team
         TeamManipulator.delete(self.team_frc2_2)
+        self.processDeferred()
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
@@ -1359,6 +1416,7 @@ class TestApiCacheClearer(unittest2.TestCase):
 
         # deleting an event
         EventManipulator.delete(self.event_2010sc_2)
+        self.processDeferred()
         self.assertEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)
@@ -1390,6 +1448,7 @@ class TestApiCacheClearer(unittest2.TestCase):
 
         # deleting an eventteam
         EventTeamManipulator.delete(self.eventteam_2010sc_frc1)
+        self.processDeferred()
         self.assertNotEqual(CachedResponse.get_by_id(self.eventlist_2010_cache_key), None)
         self.assertNotEqual(CachedResponse.get_by_id(self.event_2010sc_cache_key), None)
         self.assertEqual(CachedResponse.get_by_id(self.eventteams_2010sc_cache_key), None)

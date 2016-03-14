@@ -1,6 +1,7 @@
 import logging
 import time
 
+from consts.district_type import DistrictType
 from consts.media_type import MediaType
 
 
@@ -19,6 +20,7 @@ class ModelToDict(object):
         team_dict["website"] = team.website
         team_dict["location"] = team.location
         team_dict["rookie_year"] = team.rookie_year
+        team_dict["motto"] = team.motto
 
         try:
             team_dict["location"] = team.location
@@ -46,7 +48,7 @@ class ModelToDict(object):
         event_dict["event_district"] = event.event_district_enum
         event_dict["year"] = event.year
         event_dict["location"] = event.location
-        event_dict["venue_address"] = event.venue_address.replace('\r\n', '\n') if event.venue_address else None
+        event_dict["venue_address"] = event.venue_address_safe
         event_dict["official"] = event.official
         event_dict["facebook_eid"] = event.facebook_eid
         event_dict["website"] = event.website
@@ -128,3 +130,15 @@ class ModelToDict(object):
             media_dict["details"] = {}
 
         return media_dict
+
+    @classmethod
+    def robotConverter(self, robot):
+        """
+        return top level robot dict
+        """
+        robot_dict = dict()
+        robot_dict["key"] = robot.key_name
+        robot_dict["team_key"] = robot.team.id()
+        robot_dict["year"] = robot.year
+        robot_dict["name"] = robot.robot_name
+        return robot_dict

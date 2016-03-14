@@ -78,5 +78,4 @@ class TestUsfirstEventTypeParser(unittest2.TestCase):
         # test 2015 award names
         with open('test_data/fms_api/2015_award_types.json', 'r') as f:
             for award in json.loads(f.read()):
-                print award['description']
                 self.assertNotEqual(AwardHelper.parse_award_type(award['description']), None)
