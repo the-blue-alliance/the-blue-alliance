@@ -3,6 +3,7 @@ import json
 import logging
 
 from google.appengine.api import urlfetch
+from google.appengine.ext import ndb
 
 from consts.event_type import EventType
 from controllers.api.api_status_controller import ApiStatusController
@@ -83,37 +84,42 @@ class DatafeedFMSAPI(object):
     def _get_event_short(self, event_short):
         return self.EVENT_SHORT_EXCEPTIONS.get(event_short, event_short)
 
-    def _parse(self, url, parser):
+    @ndb.tasklet
+    def _parse_async(self, url, parser):
         headers = {
             'Authorization': 'Basic {}'.format(self._fms_api_authtoken),
             'Cache-Control': 'no-cache, max-age=10',
             'Pragma': 'no-cache',
         }
         try:
-            result = urlfetch.fetch(url,
-                                    headers=headers,
-                                    deadline=5)
+            rpc = urlfetch.create_rpc(deadline=10)
+            result = yield urlfetch.make_fetch_call(rpc, url, headers=headers)
         except Exception, e:
             logging.error("URLFetch failed for: {}".format(url))
             logging.info(e)
-            return None
+            raise ndb.Return(None)
 
         old_status = self._is_down_sitevar.contents
         if result.status_code == 200:
             self._is_down_sitevar.contents = False
             self._is_down_sitevar.put()
             ApiStatusController.clear_cache_if_needed(old_status, self._is_down_sitevar.contents)
-            return parser.parse(json.loads(result.content))
+            raise ndb.Return(parser.parse(json.loads(result.content)))
         elif result.status_code % 100 == 5:
             # 5XX error - something is wrong with the server
             logging.warning('URLFetch for %s failed; Error code %s' % (url, result.status_code))
             self._is_down_sitevar.contents = True
             self._is_down_sitevar.put()
             ApiStatusController.clear_cache_if_needed(old_status, self._is_down_sitevar.contents)
-            return None
+            raise ndb.Return(None)
         else:
             logging.warning('URLFetch for %s failed; Error code %s' % (url, result.status_code))
-            return None
+            raise ndb.Return(None)
+
+    @ndb.toplevel
+    def _parse(self, url, parser):
+        result = yield self._parse_async(url, parser)
+        raise ndb.Return(result)
 
     def getAwards(self, event):
         awards = []
@@ -139,20 +145,24 @@ class DatafeedFMSAPI(object):
 
         hs_parser = FMSAPIHybridScheduleParser(year, event_short)
         detail_parser = FMSAPIMatchDetailsParser(year, event_short)
-        qual_matches = self._parse(self.FMS_API_HYBRID_SCHEDULE_QUAL_URL_PATTERN % (year, self._get_event_short(event_short)), hs_parser)
-        playoff_matches = self._parse(self.FMS_API_HYBRID_SCHEDULE_PLAYOFF_URL_PATTERN % (year, self._get_event_short(event_short)), hs_parser)
-        qual_details = self._parse(self.FMS_API_MATCH_DETAILS_QUAL_URL_PATTERN % (year, self._get_event_short(event_short)), detail_parser)
-        playoff_details = self._parse(self.FMS_API_MATCH_DETAILS_PLAYOFF_URL_PATTERN % (year, self._get_event_short(event_short)), detail_parser)
+        qual_matches_future = self._parse_async(self.FMS_API_HYBRID_SCHEDULE_QUAL_URL_PATTERN % (year, self._get_event_short(event_short)), hs_parser)
+        playoff_matches_future = self._parse_async(self.FMS_API_HYBRID_SCHEDULE_PLAYOFF_URL_PATTERN % (year, self._get_event_short(event_short)), hs_parser)
+        qual_details_future = self._parse_async(self.FMS_API_MATCH_DETAILS_QUAL_URL_PATTERN % (year, self._get_event_short(event_short)), detail_parser)
+        playoff_details_future = self._parse_async(self.FMS_API_MATCH_DETAILS_PLAYOFF_URL_PATTERN % (year, self._get_event_short(event_short)), detail_parser)
 
         matches_by_key = {}
+        qual_matches = qual_matches_future.get_result()
         if qual_matches is not None:
             for match in qual_matches:
                 matches_by_key[match.key.id()] = match
+        playoff_matches = playoff_matches_future.get_result()
         if playoff_matches is not None:
             for match in playoff_matches:
                 matches_by_key[match.key.id()] = match
 
+        qual_details = qual_details_future.get_result()
         qual_details_items = qual_details.items() if qual_details is not None else []
+        playoff_details = playoff_details_future.get_result()
         playoff_details_items = playoff_details.items() if playoff_details is not None else []
         for match_key, match_details in qual_details_items + playoff_details_items:
             if match_key in matches_by_key:
