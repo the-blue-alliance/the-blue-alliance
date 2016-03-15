@@ -1,3 +1,4 @@
+from django.template import defaultfilters
 from email import utils
 import re
 import time
@@ -39,8 +40,8 @@ def rfc2822(datetime):
     return utils.formatdate(timestamp)
 
 
-# def slugify(s):
-#     """
-#     Use Django's slugify method
-#     """
-#     return defaultfilters.slugify(s)
+def slugify(s):
+    """
+    Use Django's slugify method
+    """
+    return defaultfilters.slugify(s)
