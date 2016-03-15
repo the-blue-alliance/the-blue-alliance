@@ -1,6 +1,16 @@
 <tr class="visible-lg">
   <td>{% if match.has_video %}<a href="{{match.details_url}}" title="Watch video"><span class="glyphicon glyphicon-play-circle"></span></a>{% endif %}</td>
-  <td><a href="/match/{{match.key_name}}">{{match.verbose_name}}</a></td>
+  <td>
+    <div class="match-name-container">
+        <div class="favorite-match-icon" data-teams='{{match.all_teams_json|safe}}'>
+            <span class="favorite-match-icon-spacer"></span>
+            <span class="glyphicon glyphicon-star" rel="tooltip" title="A Favorited team is in this match!"></span>
+        </div>
+        <div class="match-name">
+          <a href="/match/{{match.key_name}}">{{match.verbose_name}}</a>
+        </div>
+    </div>
+  </td>
   {% if match.alliances.red.teams.2 or match.alliances.red.teams.2 %}
   <td colspan="2" class="red{% if match.winning_alliance == 'red' %} winner{% endif %}{% if cur_team and cur_team.key_name == match.alliances.red.teams.0 %} current-team{% endif %}"><a href="/team/{{ match.alliances.red.teams.0|digits }}/{{match.year}}">{{ match.alliances.red.teams.0|strip_frc }}</a></td>
   <td colspan="2" class="red{% if match.winning_alliance == 'red' %} winner{% endif %}{% if cur_team and cur_team.key_name == match.alliances.red.teams.1 %} current-team{% endif %}"><a href="/team/{{ match.alliances.red.teams.1|digits }}/{{match.year}}">{{ match.alliances.red.teams.1|strip_frc }}</a></td>
@@ -24,7 +34,17 @@
 
 <tr class="hidden-lg">
   <td rowspan="2">{% if match.has_video %}<a href="{{match.details_url}}" title="Watch video"><span class="glyphicon glyphicon-play-circle"></span></a>{% endif %}</td>
-  <td rowspan="2"><a href="/match/{{match.key_name}}">{{match.verbose_name}}</a></td>
+  <td rowspan="2">
+    <div class="match-name-container">
+        <div class="favorite-match-icon" data-teams='{{match.all_teams_json|safe}}'>
+            <span class="favorite-match-icon-spacer"></span>
+            <span class="glyphicon glyphicon-star" rel="tooltip" title="A Favorited team is in this match!"></span>
+        </div>
+        <div class="match-name">
+          <a href="/match/{{match.key_name}}">{{match.verbose_name}}</a>
+        </div>
+    </div>
+  </td>
   {% if match.alliances.red.teams.2 or match.alliances.red.teams.2 %}
   <td class="red{% if match.winning_alliance == 'red' %} winner{% endif %}{% if cur_team and cur_team.key_name == match.alliances.red.teams.0 %} current-team{% endif %}" colspan="4"><a href="/team/{{ match.alliances.red.teams.0|digits }}/{{match.year}}">{{ match.alliances.red.teams.0|strip_frc }}</a></td>
   <td class="red{% if match.winning_alliance == 'red' %} winner{% endif %}{% if cur_team and cur_team.key_name == match.alliances.red.teams.1 %} current-team{% endif %}" colspan="4"><a href="/team/{{ match.alliances.red.teams.1|digits }}/{{match.year}}">{{ match.alliances.red.teams.1|strip_frc }}</a></td>
