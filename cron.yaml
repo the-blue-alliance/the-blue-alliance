@@ -1,65 +1,65 @@
 cron:
-- description: FIRST event list scraping. Also includes event details/event teams/team details scraping.
-  url: /backend-tasks/get/event_list/2016
-  schedule: every day 02:00
-  timezone: America/Los_Angeles
-
-# - description: FIRST event detail scraping
-#   url: /tasks/enqueue/usfirst_event_details/2014
-#   schedule: every thursday 02:00
-#   timezone: America/Los_Angeles
-
-# - description: FIRST team detail scraping
-#   url: /tasks/enqueue/fmsapi_team_details_rolling
+# - description: FIRST event list scraping. Also includes event details/event teams/team details scraping.
+#   url: /backend-tasks/get/event_list/2016
 #   schedule: every day 02:00
 #   timezone: America/Los_Angeles
 
-- description: FIRST match scraping for current events
-  url: /tasks/enqueue/fmsapi_matches/now
-  schedule: every 1 minutes
+# # - description: FIRST event detail scraping
+# #   url: /tasks/enqueue/usfirst_event_details/2014
+# #   schedule: every thursday 02:00
+# #   timezone: America/Los_Angeles
 
-- description: FIRST event ranking scraping for current events
-  url: /tasks/enqueue/fmsapi_event_rankings/now
-  schedule: every 1 minutes
+# # - description: FIRST team detail scraping
+# #   url: /tasks/enqueue/fmsapi_team_details_rolling
+# #   schedule: every day 02:00
+# #   timezone: America/Los_Angeles
 
-- description: FIRST event alliance scraping for current events
-  url: /tasks/enqueue/fmsapi_event_alliances/now
-  schedule: every 30 minutes
+# - description: FIRST match scraping for current events
+#   url: /tasks/enqueue/fmsapi_matches/now
+#   schedule: every 1 minutes
 
-- description: FIRST event alliance scraping for current events on their last day
-  url: /tasks/enqueue/fmsapi_event_alliances/last_day_only
-  schedule: every 5 minutes
+# - description: FIRST event ranking scraping for current events
+#   url: /tasks/enqueue/fmsapi_event_rankings/now
+#   schedule: every 1 minutes
 
-- description: FIRST award scraping for current events
-  url: /tasks/enqueue/fmsapi_awards/now
-  schedule: every 1 hours
+# - description: FIRST event alliance scraping for current events
+#   url: /tasks/enqueue/fmsapi_event_alliances/now
+#   schedule: every 30 minutes
 
-- description: Match Insights Calculation
-  url: /tasks/math/enqueue/insights/matches/2016
-  schedule: every day 01:00
-  timezone: America/Los_Angeles
+# - description: FIRST event alliance scraping for current events on their last day
+#   url: /tasks/enqueue/fmsapi_event_alliances/last_day_only
+#   schedule: every 5 minutes
 
-- description: Award Insights Calculation
-  url: /tasks/math/enqueue/insights/awards/2016
-  schedule: every day 01:00
-  timezone: America/Los_Angeles
+# - description: FIRST award scraping for current events
+#   url: /tasks/enqueue/fmsapi_awards/now
+#   schedule: every 1 hours
 
-- description: Match Overall Insights Calculation
-  url: /tasks/math/enqueue/overallinsights/matches
-  schedule: every day 01:10
-  timezone: America/Los_Angeles
+# - description: Match Insights Calculation
+#   url: /tasks/math/enqueue/insights/matches/2016
+#   schedule: every day 01:00
+#   timezone: America/Los_Angeles
 
-- description: Award Overall Insights Calculation
-  url: /tasks/math/enqueue/overallinsights/awards
-  schedule: every day 01:10
-  timezone: America/Los_Angeles
+# - description: Award Insights Calculation
+#   url: /tasks/math/enqueue/insights/awards/2016
+#   schedule: every day 01:00
+#   timezone: America/Los_Angeles
 
-- description: District Points Calculation
-  url: /tasks/math/enqueue/district_points_calc/2016
-  schedule: every day 01:20
-  timezone: America/Los_Angeles
+# - description: Match Overall Insights Calculation
+#   url: /tasks/math/enqueue/overallinsights/matches
+#   schedule: every day 01:10
+#   timezone: America/Los_Angeles
 
-- description: Upcoming match notification sending
-  url: /tasks/notifications/upcoming_match
-  schedule: every 2 minutes
-  timezone: America/Los_Angeles
+# - description: Award Overall Insights Calculation
+#   url: /tasks/math/enqueue/overallinsights/awards
+#   schedule: every day 01:10
+#   timezone: America/Los_Angeles
+
+# - description: District Points Calculation
+#   url: /tasks/math/enqueue/district_points_calc/2016
+#   schedule: every day 01:20
+#   timezone: America/Los_Angeles
+
+# - description: Upcoming match notification sending
+#   url: /tasks/notifications/upcoming_match
+#   schedule: every 2 minutes
+#   timezone: America/Los_Angeles
