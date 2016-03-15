@@ -15,7 +15,11 @@
   {% endif %}
   <meta property="og:description" content="{{match.verbose_name}} at the {{event.year}} {{event.name}} FIRST Robotics Competition in {{event.location}}."/>
   <meta property="og:site_name" content="The Blue Alliance" />
-  {% if match.tba_video.streamable_path %}<meta property="og:video" content="{{ match.tba_video.steamable_path }}" />{% endif %}
+  {% if match.youtube_videos_formatted %}
+    <meta property="og:video" content="https://www.youtube.com/v/{{match.youtube_videos_formatted.0}}" />
+  {% else %}
+    {% if match.tba_video.streamable_path %}<meta property="og:video" content="{{ match.tba_video.steamable_path }}" />{% endif %}
+  {% endif %}
 {% endblock %}
 
 {% block content %}
