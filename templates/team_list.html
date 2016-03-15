@@ -4,6 +4,13 @@
 
 {% block meta_description %}Information, match results, and videos about FIRST Robotics Competition teams from around the world.{% endblock %}
 
+{% block more_head_tags %}
+  <meta property="og:title" content="FRC Team List" />
+  <meta property="og:image" content="http://www.thebluealliance.com/images/logo_square_200.png" />
+  <meta property="og:description" content="List of teams in the FIRST Robotics Competition."/>
+  <meta property="og:site_name" content="The Blue Alliance" />
+{% endblock %}
+
 {% block teams_active %}active{% endblock %}
 
 {% block content %}
