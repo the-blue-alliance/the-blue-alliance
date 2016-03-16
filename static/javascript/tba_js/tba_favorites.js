@@ -25,7 +25,11 @@ function updateFavoriteTeams(teamKey, action) {
           updateFavoriteTeams();
         },
         error: function(xhr, textStatus, errorThrown) {
-          $('#fixed-alert-container').append('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Oops! Failed to add favorite.</strong><br>Something went wrong on our end. Please try again later.</div>');
+          if (xhr.status == 401) {
+            $('#login-modal').modal('show');
+          } else {
+            $('#fixed-alert-container').append('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Oops! Failed to add favorite.</strong><br>Something went wrong on our end. Please try again later.</div>');
+          }
           updateFavoriteTeams();
         }
       });
@@ -40,7 +44,11 @@ function updateFavoriteTeams(teamKey, action) {
           updateFavoriteTeams();
         },
         error: function(xhr, textStatus, errorThrown) {
-          $('#fixed-alert-container').append('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Oops! Failed to delete favorite.</strong><br>Something went wrong on our end. Please try again later.</div>');
+          if (xhr.status == 401) {
+            $('#login-modal').modal('show');
+          } else {
+            $('#fixed-alert-container').append('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Oops! Failed to delete favorite.</strong><br>Something went wrong on our end. Please try again later.</div>');
+          }
           updateFavoriteTeams();
         }
       });
@@ -60,7 +68,8 @@ function updateFavoriteTeams(teamKey, action) {
           updatePageFavoriteTeams(favoriteTeams);
         },
         error: function(xhr, textStatus, errorThrown) {
-          setLocalFavoriteTeams({});
+          setLocalFavoriteTeams(null);
+          updatePageFavoriteTeams({});
         }
       });
     } else {
@@ -75,8 +84,8 @@ function getLocalFavoriteTeams() {
 
 function setLocalFavoriteTeams(favoriteTeams) {
   var date = new Date();
-  date.setTime(date.getTime() + (5 * 60 * 1000));  // Set 5 minutes cookie expiration
-  // $.cookie(favoriteTeamsCookieName, JSON.stringify(favoriteTeams), { expires: date });
+  date.setTime(date.getTime() + (1 * 60 * 1000));  // Set 5 minutes cookie expiration
+  $.cookie(favoriteTeamsCookieName, JSON.stringify(favoriteTeams), { expires: date });
 }
 
 function addLocalFavoriteTeam(teamKey) {
@@ -180,6 +189,11 @@ function addSpinner(el) {
 }
 
 $(document).ready(function(){
+  // Setup redirect after login
+  $('#mytba-login').click(function() {
+    window.location.href = '/account?redirect=' + escape(document.URL.replace(document.location.origin, ""));
+  });
+
   console.log(getLocalFavoriteTeams());
   setupFavAddClick();
   updateFavoriteTeams();
