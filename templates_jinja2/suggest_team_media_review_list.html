@@ -148,15 +148,18 @@
 
 {% block inline_javascript %}
 <script>
-$("#accept_all_button").click(function() {
+$("#accept_all_button").click(function(e) {
+    e.preventDefault();
     $('.accept').prop('checked', true);
     $('.reject').prop('checked', false);
 });
-$("#reject_all_button").click(function() {
+$("#reject_all_button").click(function(e) {
+    e.preventDefault();
     $('.accept').prop('checked', false);
     $('.reject').prop('checked', true);
 });
-$("#deselect_all_button").click(function() {
+$("#deselect_all_button").click(function(e) {
+    e.preventDefault();
     $('.accept').prop('checked', false);
     $('.reject').prop('checked', false);
 });
