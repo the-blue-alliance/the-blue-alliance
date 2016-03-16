@@ -31,17 +31,17 @@
       <table class="match-table">
         <thead>
           <tr class="key">
-            <th colspan="{{match.alliances.items.0.1.teams|length}}">Teams</th>
+            <th colspan="{{match.alliances.items().0.1.teams|length}}">Teams</th>
             <th>Score</th>
           </tr>
         </thead>
         <tbody>
-          {% for items in match.alliances.items reversed %}
+          {% for items in match.alliances.items()|reverse %}
           <tr>
             {% for team in items.1.teams %}
-              <td class="{{ items.0 }}{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}"><a href="/team/{{ team|digits }}/{{match.year}}">{{ team|slice:"3:" }}</a></td>
+              <td class="{{ items.0 }}{% if match.winning_alliance == items.0 %} winner{% endif %}"><a href="/team/{{ team|digits }}/{{match.year}}">{{ team|strip_frc }}</a></td>
             {% endfor %}
-            <td class="{{items.0}}Score{% ifequal match.winning_alliance items.0 %} winner{% endifequal %}">{% if items.1.score < 0 %}?{% else %}{{ items.1.score }}{% endif %}</td>
+            <td class="{{items.0}}Score{% if match.winning_alliance == items.0 %} winner{% endif %}">{% if items.1.score < 0 %}?{% else %}{{ items.1.score }}{% endif %}</td>
           </tr>
           {% endfor %}
         </tbody>
@@ -70,7 +70,7 @@
     {% endif %}
       <p>
         <a class="btn btn-success" href="/suggest/match/video?match_key={{match.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add videos</a>
-        <a class="btn btn-primary" href="https://www.youtube.com/results?search_query={{match.verbose_name|urlencode}}+{{event.year|urlencode}}+{{event.name|urlencode}}" target="_blank"><span class="glyphicon glyphicon-search"></span> Search YouTube</a>
+        <a class="btn btn-primary" href="https://www.youtube.com/results?search_query={{match.verbose_name|urlencode}}+{{event.year}}+{{event.name|urlencode}}" target="_blank"><span class="glyphicon glyphicon-search"></span> Search YouTube</a>
       </p>
     </div>
   </div>
