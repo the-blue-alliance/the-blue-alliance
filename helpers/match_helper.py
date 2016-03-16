@@ -1,4 +1,5 @@
 import logging
+import copy
 import datetime
 import pytz
 import re
@@ -141,7 +142,7 @@ class MatchHelper(object):
                         'blue_wins': 0,
                     }
                 for color in ['red', 'blue']:
-                    alliance = match.alliances[color]['teams']
+                    alliance = copy.copy(match.alliances[color]['teams'])
                     for i, complete_alliance in enumerate(complete_alliances):  # search for alliance. could be more efficient
                         if len(set(alliance).intersection(set(complete_alliance))) >= 2:  # if >= 2 teams are the same, then the alliance is the same
                             backups = list(set(alliance).difference(set(complete_alliance)))
