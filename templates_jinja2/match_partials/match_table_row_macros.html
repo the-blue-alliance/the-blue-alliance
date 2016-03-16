@@ -1,0 +1,52 @@
+{% import "match_partials/match_table_cell_macros.html" as mtcm %}
+
+{% macro match_row_tr(match, cur_team_key, upcoming=False) %}
+<tr class="visible-lg">
+  {% if upcoming %}
+    {{mtcm.match_time_td(match)}}
+  {% else %}
+    {{mtcm.match_hasvideo_td(match)}}
+  {% endif %}
+
+  {{mtcm.match_name_td(match)}}
+
+  {% for team_key in match.alliances.red.teams %}
+    {{mtcm.match_team_td(match, 'red', team_key, cur_team_key)}}
+  {% endfor %}
+  {% for team_key in match.alliances.blue.teams %}
+    {{mtcm.match_team_td(match, 'blue', team_key, cur_team_key)}}
+  {% endfor %}
+
+  {% if not upcoming %}
+    {{mtcm.match_score_td(match, 'red', cur_team_key)}}
+    {{mtcm.match_score_td(match, 'blue', cur_team_key)}}
+  {% endif %}
+</tr>
+
+<tr class="hidden-lg">
+  {% if upcoming %}
+    {{mtcm.match_time_td(match, compact=True)}}
+  {% else %}
+    {{mtcm.match_hasvideo_td(match, compact=True)}}
+  {% endif %}
+
+  {{mtcm.match_name_td(match, compact=True)}}
+
+  {% for team_key in match.alliances.red.teams %}
+    {{mtcm.match_team_td(match, 'red', team_key, cur_team_key, compact=True)}}
+  {% endfor %}
+
+  {% if not upcoming %}
+  {{mtcm.match_score_td(match, 'red', cur_team_key, compact=True)}}
+  {% endif %}
+</tr>
+<tr class="hidden-lg">
+  {% for team_key in match.alliances.blue.teams %}
+    {{mtcm.match_team_td(match, 'blue', team_key, cur_team_key, compact=True)}}
+  {% endfor %}
+
+  {% if not upcoming %}
+  {{mtcm.match_score_td(match, 'blue', cur_team_key, compact=True)}}
+  {% endif %}
+</tr>
+{% endmacro %}

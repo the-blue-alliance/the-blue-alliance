@@ -1,6 +1,5 @@
 {% extends "base.html" %}
-{% from 'match_partials/upcoming_match_table.html' import upcoming_match_table %}
-{% from 'match_partials/recent_match_table.html' import recent_match_table %}
+{% import 'match_partials/match_table_macros.html' as mtm %}
 
 {% block title %}{{event.name}} ({{event.year}}) - The Blue Alliance{% endblock %}
 
@@ -78,13 +77,13 @@
         {% if matches_upcoming %}
         <div class="col-sm-6">
           <h4>Upcoming Matches</h4>
-          {{ upcoming_match_table(matches_upcoming) }}
+          {{ mtm.upcoming_match_table(matches_upcoming) }}
         </div>
         {% endif %}
         {% if matches_recent %}
         <div class="col-sm-6">
           <h4>Recent Matches</h4>
-          {{ recent_match_table(matches_recent) }}
+          {{ mtm.recent_match_table(matches_recent) }}
         </div>
         {% endif %}
         <div class="clearfix"></div>
@@ -113,7 +112,7 @@
         {% if matches.qm %}
         <div class="col-sm-6">
           <h3>Qualification Results</h3>
-          {% include "match_partials/qual_match_table.html" %}
+          {{mtm.qual_match_table(matches)}}
         </div>
         {% endif %}
 
@@ -122,7 +121,7 @@
           {% include "event_partials/event_alliances_table.html" %}
 
           <h3>{% if event.year >= 2015 %}Playoff{% else %}Elimination{% endif %} Results</h3>
-          {% include "match_partials/elim_match_table.html" %}
+          {{mtm.elim_match_table(matches)}}
 
           {% if matches.qm %}
             {% if matches.qf or matches.sf or matches.f %}

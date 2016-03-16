@@ -123,9 +123,9 @@
     </tr>
     {% endif %}
     <tr class="key">
-      <td class="redScore" colspan="2">{{match.score_breakdown.red.teleopCrossingPoints|add:match.score_breakdown.red.teleopBoulderPoints|add:match.score_breakdown.red.teleopChallengePoints|add:match.score_breakdown.red.teleopScalePoints}}</td>
+      <td class="redScore" colspan="2">{{match.score_breakdown.red.teleopCrossingPoints + match.score_breakdown.red.teleopBoulderPoints + match.score_breakdown.red.teleopChallengePoints + match.score_breakdown.red.teleopScalePoints}}</td>
       <th>Total Teleop</th>
-      <td class="blueScore" colspan="2">{{match.score_breakdown.blue.teleopCrossingPoints|add:match.score_breakdown.blue.teleopBoulderPoints|add:match.score_breakdown.blue.teleopChallengePoints|add:match.score_breakdown.blue.teleopScalePoints}}</td>
+      <td class="blueScore" colspan="2">{{match.score_breakdown.blue.teleopCrossingPoints + match.score_breakdown.blue.teleopBoulderPoints + match.score_breakdown.blue.teleopChallengePoints + match.score_breakdown.blue.teleopScalePoints}}</td>
     </tr>
 
     <!-- Capture/Breach -->
