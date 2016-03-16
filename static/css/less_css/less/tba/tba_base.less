@@ -73,6 +73,24 @@ body {
   display: none;
 }
 
+#fixed-alert-container {
+  position: fixed;
+  top: 20px;
+  left: 0px;
+  right: 0px;
+  margin-right: auto;
+  margin-left: auto;
+  width: 80%;
+  max-width: 500px;
+  z-index: 10000;
+  pointer-events: none;
+
+  .alert {
+    z-index: 10100;
+    pointer-events: auto;
+  }
+}
+
 .tba-fab {
   position: fixed;
   right: 30px;

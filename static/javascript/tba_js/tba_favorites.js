@@ -25,7 +25,8 @@ function updateFavoriteTeams(teamKey, action) {
           updateFavoriteTeams();
         },
         error: function(xhr, textStatus, errorThrown) {
-          $('#mytba-alert-container').append('<div class="alert alert-warning alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Oops! Failed to add favorite.</strong><br>Something went wrong on our end. Please try again later.</div>');
+          $('#fixed-alert-container').append('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Oops! Failed to add favorite.</strong><br>Something went wrong on our end. Please try again later.</div>');
+          updateFavoriteTeams();
         }
       });
     } else if (action == 'delete') {
@@ -39,7 +40,8 @@ function updateFavoriteTeams(teamKey, action) {
           updateFavoriteTeams();
         },
         error: function(xhr, textStatus, errorThrown) {
-          $('#mytba-alert-container').append('<div class="alert alert-warning alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Oops! Failed to add favorite.</strong><br>Something went wrong on our end. Please try again later.</div>');
+          $('#fixed-alert-container').append('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Oops! Failed to delete favorite.</strong><br>Something went wrong on our end. Please try again later.</div>');
+          updateFavoriteTeams();
         }
       });
     }
