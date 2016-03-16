@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "match_partials/match_table_macros.html" as mtm %}
 
 {% block title %}{{match.verbose_name}} - {{event.year}} {{event.name}} - The Blue Alliance{% endblock %}
 
@@ -28,24 +29,7 @@
     <div class="col-sm-6 col-sm-offset-3 col-md-offset-3 col-lg-offset-3">
       <p><a class="btn btn-default" href="/event/{{event.key_name}}"><span class="glyphicon glyphicon-chevron-left"></span> {{ event.year }} {{ event.name }}</a></p>
       <h1>{{match.verbose_name}} <small><a href="/event/{{event.key_name}}">{{ event.year }} {{ event.name }}</a></small></h1>
-      <table class="match-table">
-        <thead>
-          <tr class="key">
-            <th colspan="{{match.alliances.items().0.1.teams|length}}">Teams</th>
-            <th>Score</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for items in match.alliances.items()|reverse %}
-          <tr>
-            {% for team in items.1.teams %}
-              <td class="{{ items.0 }}{% if match.winning_alliance == items.0 %} winner{% endif %}"><a href="/team/{{ team|digits }}/{{match.year}}">{{ team|strip_frc }}</a></td>
-            {% endfor %}
-            <td class="{{items.0}}Score{% if match.winning_alliance == items.0 %} winner{% endif %}">{% if items.1.score < 0 %}?{% else %}{{ items.1.score }}{% endif %}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      {{mtm.single_match_table(match)}}
     </div>
   </div>
   {% if match_breakdown_template %}

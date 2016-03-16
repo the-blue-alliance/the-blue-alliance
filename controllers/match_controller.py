@@ -40,7 +40,7 @@ class MatchDetail(CacheableHandler):
 
         match_breakdown_template = None
         if match.score_breakdown is not None:
-            match_breakdown_template = 'match_partials/match_breakdown_{}.html'.format(match.year)
+            match_breakdown_template = 'match_partials/match_breakdown/match_breakdown_{}.html'.format(match.year)
 
         self.template_values.update({
             "event": event,
