@@ -20,15 +20,19 @@ function getFavoriteTeams() {
         }
         $.cookie(cookieName, JSON.stringify(favoriteTeams), { expires: date });
 
-        updateMatchFavorites(favoriteTeams);
+        updateFavorites(favoriteTeams);
       },
       error: function(xhr, textStatus, errorThrown) {
         $.cookie(cookieName, JSON.stringify({}), { expires: date });
       }
     });
   } else {
-    updateMatchFavorites(JSON.parse(storedFavoriteTeams));
+    updateFavorites(JSON.parse(storedFavoriteTeams));
   }
+}
+function updateFavorites(favoriteTeams) {
+  updateMatchFavorites(favoriteTeams);
+  updateTeamlistFavorites(favoriteTeams);
 }
 
 function updateMatchFavorites(favoriteTeams) {
@@ -36,6 +40,14 @@ function updateMatchFavorites(favoriteTeams) {
     if ($(this).attr("data-team") in favoriteTeams) {
       $(this).show();  // Dot
       $(this).closest('tr').find('.favorite-match-icon').show();  // Star
+    }
+  });
+}
+
+function updateTeamlistFavorites(favoriteTeams) {
+  $(".favorite-team-icon").each(function() {
+    if ($(this).attr("data-team") in favoriteTeams) {
+      $(this).show();
     }
   });
 }
