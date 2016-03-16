@@ -14,6 +14,7 @@ class MatchDetail(CacheableHandler):
     SHORT_CACHE_EXPIRATION = 60 * 5
     CACHE_VERSION = 4
     CACHE_KEY_FORMAT = "match_detail_{}"  # (match_key)
+    VALID_BREAKDOWN_YEARS = set([2015, 2016])
 
     def __init__(self, *args, **kw):
         super(MatchDetail, self).__init__(*args, **kw)
@@ -39,7 +40,7 @@ class MatchDetail(CacheableHandler):
             self.abort(404)
 
         match_breakdown_template = None
-        if match.score_breakdown is not None:
+        if match.score_breakdown is not None and match.year in self.VALID_BREAKDOWN_YEARS:
             match_breakdown_template = 'match_partials/match_breakdown/match_breakdown_{}.html'.format(match.year)
 
         self.template_values.update({
