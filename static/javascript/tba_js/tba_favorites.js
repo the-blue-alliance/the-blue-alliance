@@ -40,6 +40,12 @@ function updateMatchFavorites(favoriteTeams) {
       }
     }
   });
+
+  $(".favorite-team-dot").each(function() {
+    if ($(this).attr("data-team") in favoriteTeams) {
+      $(this).show();
+    }
+  });
 }
 
 $(document).ready(function(){
