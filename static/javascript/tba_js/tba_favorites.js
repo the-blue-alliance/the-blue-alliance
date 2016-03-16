@@ -114,7 +114,8 @@ function updateMatchFavoriteTeams(favoriteTeams) {
   $(".favorite-team-dot").each(function() {
     if ($(this).attr("data-team") in favoriteTeams) {
       $(this).show();  // Dot
-      $(this).closest('tr').find('.favorite-match-icon').show();  // Star
+      var match_key = $(this).attr("data-match");
+      $('.favorite-match-icon-' + match_key).show();  // Star
     } else {
       $(this).hide();  // Dot
     }
