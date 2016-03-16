@@ -102,7 +102,7 @@ function deleteLocalFavoriteTeam(teamKey) {
 function updatePageFavoriteTeams(favoriteTeams) {
   updateMatchFavoriteTeams(favoriteTeams);
   updateTeamlistFavoriteTeams(favoriteTeams);
-  updateTeamFABFavoriteTeams(favoriteTeams);
+  setTimeout(function() {updateTeamFABFavoriteTeams(favoriteTeams)}, 3000);
 }
 
 function updateMatchFavoriteTeams(favoriteTeams) {
@@ -133,13 +133,13 @@ function updateTeamlistFavoriteTeams(favoriteTeams) {
 
 function updateTeamFABFavoriteTeams(favoriteTeams) {
   $(".tba-fab-team").each(function() {
+    $(this).find(".fa-spin").remove();
+    $(this).prop("disabled", false);
     if ($(this).attr("data-team") in favoriteTeams) {
-      $(this).find(".fa-spin").remove();
       $(this).find(".not-favorite").hide();
       $(this).find(".favorite").show();
       setupFavDeleteClick();
     } else {
-      $(this).find(".fa-spin").remove();
       $(this).find(".favorite").hide();
       $(this).find(".not-favorite").show();
       setupFavAddClick();
@@ -175,6 +175,7 @@ function setupFavDeleteClick() {
 
 function addSpinner(el) {
   el.append("<i class='fa fa-refresh fa-spin'/>");
+  el.prop("disabled", true);
 }
 
 $(document).ready(function(){
