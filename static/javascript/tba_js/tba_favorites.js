@@ -1,4 +1,4 @@
-var favoriteTeamsCookieName = "tba-favorite-teams2";
+var favoriteTeamsCookieName = "tba-favorite-teams";
 
 function updateFavoriteTeams() {
   updateFavoriteTeams(null, null);
@@ -132,10 +132,12 @@ function updateTeamlistFavoriteTeams(favoriteTeams) {
 function updateTeamFABFavoriteTeams(favoriteTeams) {
   $(".tba-fab-team").each(function() {
     if ($(this).attr("data-team") in favoriteTeams) {
-      $(this).find(".favorite").show();
+      $(this).find(".fa-spin").remove();
       $(this).find(".not-favorite").hide();
+      $(this).find(".favorite").show();
       setupFavDeleteClick();
     } else {
+      $(this).find(".fa-spin").remove();
       $(this).find(".favorite").hide();
       $(this).find(".not-favorite").show();
       setupFavAddClick();
@@ -147,6 +149,9 @@ function setupFavAddClick() {
   $(".tba-fab-team").off("click");  // make sure only one click handler is attached at a time
   $(".tba-fab-team").click(function() {
     $(".tba-fab-team").off("click");
+    $(this).find(".not-favorite").hide();
+    addSpinner($(this));
+
     console.log("CLICK ADD");
     console.log($(this).attr("data-team"));
     updateFavoriteTeams($(this).attr("data-team"), 'add')
@@ -157,10 +162,17 @@ function setupFavDeleteClick() {
   $(".tba-fab-team").off("click");  // make sure only one click handler is attached at a time
   $(".tba-fab-team").click(function() {
     $(".tba-fab-team").off("click");
+    $(this).find(".favorite").hide();
+    addSpinner($(this));
+
     console.log("CLICK DELETE");
     console.log($(this).attr("data-team"));
     updateFavoriteTeams($(this).attr("data-team"), 'delete')
   });
+}
+
+function addSpinner(el) {
+  el.append("<i class='fa fa-refresh fa-spin'/>");
 }
 
 $(document).ready(function(){
