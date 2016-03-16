@@ -85,7 +85,7 @@ function getLocalFavoriteTeams() {
 function setLocalFavoriteTeams(favoriteTeams) {
   var date = new Date();
   date.setTime(date.getTime() + (1 * 60 * 1000));  // Set 5 minutes cookie expiration
-  $.cookie(favoriteTeamsCookieName, JSON.stringify(favoriteTeams), { expires: date });
+  // $.cookie(favoriteTeamsCookieName, JSON.stringify(favoriteTeams), {expires: date, path: '/'});
 }
 
 function addLocalFavoriteTeam(teamKey) {
