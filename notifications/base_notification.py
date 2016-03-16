@@ -52,7 +52,7 @@ class BaseNotification(object):
             for v in keys.values():
                 # Count the number of clients receiving the notification
                 num_keys += len(v)
-            if random.random() < tba_config.RECORD_FRACTION:
+            if random.random() < tba_config.GA_RECORD_FRACTION:
                 deferred.defer(self.track_notification, self._type, num_keys, _queue="api-track-call")
 
     """
