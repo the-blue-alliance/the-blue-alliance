@@ -30,9 +30,11 @@ function getFavoriteTeams() {
     updateFavorites(JSON.parse(storedFavoriteTeams));
   }
 }
+
 function updateFavorites(favoriteTeams) {
   updateMatchFavorites(favoriteTeams);
   updateTeamlistFavorites(favoriteTeams);
+  updateTeamFABFavorites(favoriteTeams);
 }
 
 function updateMatchFavorites(favoriteTeams) {
@@ -48,6 +50,15 @@ function updateTeamlistFavorites(favoriteTeams) {
   $(".favorite-team-icon").each(function() {
     if ($(this).attr("data-team") in favoriteTeams) {
       $(this).show();
+    }
+  });
+}
+
+function updateTeamFABFavorites(favoriteTeams) {
+  $(".tba-fab-team").each(function() {
+    if ($(this).attr("data-team") in favoriteTeams) {
+      $(this).find(".favorite").show();
+      $(this).find(".not-favorite").hide();
     }
   });
 }
