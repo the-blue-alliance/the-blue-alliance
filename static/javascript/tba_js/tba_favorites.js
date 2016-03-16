@@ -32,18 +32,10 @@ function getFavoriteTeams() {
 }
 
 function updateMatchFavorites(favoriteTeams) {
-  $(".favorite-match-icon").each(function () {
-    var match_teams = JSON.parse($(this).attr("data-teams"));
-    for (var i in match_teams) {
-      if (match_teams[i] in favoriteTeams) {
-        $(this).show();
-      }
-    }
-  });
-
   $(".favorite-team-dot").each(function() {
     if ($(this).attr("data-team") in favoriteTeams) {
-      $(this).show();
+      $(this).show();  // Dot
+      $(this).closest('tr').find('.favorite-match-icon').show();  // Star
     }
   });
 }
