@@ -15,7 +15,7 @@
 {% macro match_name_td(match, compact=False) %}
 <td{% if compact %} rowspan="2"{% endif %}>
   <div class="match-name-container">
-    <div class="favorite-match-icon" data-teams='{{match.all_teams_json|safe}}'>
+    <div class="favorite-match-icon">
         <span class="favorite-match-icon-spacer"></span>
         <span class="glyphicon glyphicon-star" rel="tooltip" title="A Favorited team is in this match!"></span>
     </div>

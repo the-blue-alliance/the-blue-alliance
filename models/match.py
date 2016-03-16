@@ -96,10 +96,6 @@ class Match(ndb.Model):
         super(Match, self).__init__(*args, **kw)
 
     @property
-    def all_teams_json(self):
-        return json.dumps(self.alliances['red']['teams'] + self.alliances['blue']['teams'])
-
-    @property
     def alliances(self):
         """
         Lazy load alliances_json
