@@ -15,6 +15,7 @@ function updateFavoriteTeams(teamKey, action, skipDelay) {
         type: 'POST',
         url: '/_/account/favorites/add',
         data: {'model_key': teamKey, 'model_type': 1},
+        timeout: 10000,  // 10s
         success: function(data, textStatus, xhr) {
           addLocalFavoriteTeam(teamKey);
           updateFavoriteTeams(null, null, false);
@@ -33,6 +34,7 @@ function updateFavoriteTeams(teamKey, action, skipDelay) {
         type: 'POST',
         url: '/_/account/favorites/delete',
         data: {'model_key': teamKey, 'model_type': 1},
+        timeout: 10000,  // 10s
         success: function(data, textStatus, xhr) {
           deleteLocalFavoriteTeam(teamKey);
           updateFavoriteTeams(null, null, false);
