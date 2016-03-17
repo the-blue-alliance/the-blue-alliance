@@ -1,10 +1,6 @@
 var favoriteTeamsCookieName = "tba-favorite-teams";
 
-function updateFavoriteTeams() {
-  updateFavoriteTeams(null, null);
-}
-
-function updateFavoriteTeams(teamKey, action) {
+function updateFavoriteTeams(teamKey, action, skipDelay) {
   /*
   Updates Favorites locally and on the server and
   updates the page to reflect these changes
@@ -22,7 +18,7 @@ function updateFavoriteTeams(teamKey, action) {
         data: {'model_key': teamKey, 'model_type': 1},
         success: function(data, textStatus, xhr) {
           addLocalFavoriteTeam(teamKey);
-          updateFavoriteTeams();
+          updateFavoriteTeams(null, null, false);
         },
         error: function(xhr, textStatus, errorThrown) {
           if (xhr.status == 401) {
@@ -30,7 +26,7 @@ function updateFavoriteTeams(teamKey, action) {
           } else {
             $('#fixed-alert-container').append('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Oops! Failed to add favorite.</strong><br>Something went wrong on our end. Please try again later.</div>');
           }
-          updateFavoriteTeams();
+          updateFavoriteTeams(null, null, false);
         }
       });
     } else if (action == 'delete') {
@@ -41,7 +37,7 @@ function updateFavoriteTeams(teamKey, action) {
         data: {'model_key': teamKey, 'model_type': 1},
         success: function(data, textStatus, xhr) {
           deleteLocalFavoriteTeam(teamKey);
-          updateFavoriteTeams();
+          updateFavoriteTeams(null, null, false);
         },
         error: function(xhr, textStatus, errorThrown) {
           if (xhr.status == 401) {
@@ -49,7 +45,7 @@ function updateFavoriteTeams(teamKey, action) {
           } else {
             $('#fixed-alert-container').append('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Oops! Failed to delete favorite.</strong><br>Something went wrong on our end. Please try again later.</div>');
           }
-          updateFavoriteTeams();
+          updateFavoriteTeams(null, null, false);
         }
       });
     }
@@ -65,15 +61,15 @@ function updateFavoriteTeams(teamKey, action) {
             favoriteTeams[favorites[key]['model_key']] = true;
           }
           setLocalFavoriteTeams(favoriteTeams);
-          updatePageFavoriteTeams(favoriteTeams);
+          updatePageFavoriteTeams(favoriteTeams, skipDelay);
         },
         error: function(xhr, textStatus, errorThrown) {
           setLocalFavoriteTeams(null);
-          updatePageFavoriteTeams({});
+          updatePageFavoriteTeams({}, skipDelay);
         }
       });
     } else {
-      updatePageFavoriteTeams(storedFavoriteTeams);
+      updatePageFavoriteTeams(storedFavoriteTeams, skipDelay);
     }
   }
 }
@@ -108,10 +104,14 @@ function deleteLocalFavoriteTeam(teamKey) {
   }
 }
 
-function updatePageFavoriteTeams(favoriteTeams) {
+function updatePageFavoriteTeams(favoriteTeams, skipDelay) {
   updateMatchFavoriteTeams(favoriteTeams);
   updateTeamlistFavoriteTeams(favoriteTeams);
-  setTimeout(function() {updateTeamFABFavoriteTeams(favoriteTeams)}, 3000);
+  if (skipDelay) {
+    updateTeamFABFavoriteTeams(favoriteTeams);
+  } else {
+    setTimeout(function() {updateTeamFABFavoriteTeams(favoriteTeams)}, 3000);
+  }
 }
 
 function updateMatchFavoriteTeams(favoriteTeams) {
@@ -166,7 +166,7 @@ function setupFavAddClick() {
 
     console.log("CLICK ADD");
     console.log($(this).attr("data-team"));
-    updateFavoriteTeams($(this).attr("data-team"), 'add')
+    updateFavoriteTeams($(this).attr("data-team"), 'add', false);
   });
 }
 
@@ -179,12 +179,12 @@ function setupFavDeleteClick() {
 
     console.log("CLICK DELETE");
     console.log($(this).attr("data-team"));
-    updateFavoriteTeams($(this).attr("data-team"), 'delete')
+    updateFavoriteTeams($(this).attr("data-team"), 'delete', false);
   });
 }
 
 function addSpinner(el) {
-  el.append("<i class='fa fa-refresh fa-spin'/>");
+  el.append("<i class='fa fa-refresh fa-spin'></i>");
   el.prop("disabled", true);
 }
 
@@ -196,5 +196,5 @@ $(document).ready(function(){
 
   console.log(getLocalFavoriteTeams());
   setupFavAddClick();
-  updateFavoriteTeams();
+  updateFavoriteTeams(null, null, true);
 });
