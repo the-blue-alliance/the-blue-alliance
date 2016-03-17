@@ -10,6 +10,11 @@
 {% endblock %}
 
 {% block content %}
+<button class="tba-fab tba-fab-team" data-team="{{team.key.id()}}">
+  <span class="glyphicon glyphicon-star favorite"></span>
+  <span class="glyphicon glyphicon-star-empty not-favorite"></span>
+</button>
+
 <div class="container">
   <div class="row">
     <div class="col-sm-3 col-lg-2">
