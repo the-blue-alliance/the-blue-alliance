@@ -62,7 +62,6 @@ function updateFavoriteTeams(teamKey, action, skipDelay) {
           updatePageFavoriteTeams(favoriteTeams, skipDelay);
         },
         error: function(xhr, textStatus, errorThrown) {
-          setLocalFavoriteTeams(null);
           updatePageFavoriteTeams({}, skipDelay);
         }
       });
@@ -78,8 +77,8 @@ function getLocalFavoriteTeams() {
 
 function setLocalFavoriteTeams(favoriteTeams) {
   var date = new Date();
-  date.setTime(date.getTime() + (1 * 60 * 1000));  // Set 5 minutes cookie expiration
-  // $.cookie(favoriteTeamsCookieName, JSON.stringify(favoriteTeams), {expires: date, path: '/'});
+  date.setTime(date.getTime() + (5 * 60 * 1000));  // Set 5 minutes cookie expiration
+  $.cookie(favoriteTeamsCookieName, JSON.stringify(favoriteTeams), {expires: date, path: '/'});
 }
 
 function addLocalFavoriteTeam(teamKey) {
