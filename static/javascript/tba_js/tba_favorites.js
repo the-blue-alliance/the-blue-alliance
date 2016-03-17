@@ -11,7 +11,6 @@ function updateFavoriteTeams(teamKey, action, skipDelay) {
 
   if (teamKey != null) {
     if (action == 'add') {
-      console.log("REMOTE ADD");
       $.ajax({
         type: 'POST',
         url: '/_/account/favorites/add',
@@ -30,7 +29,6 @@ function updateFavoriteTeams(teamKey, action, skipDelay) {
         }
       });
     } else if (action == 'delete') {
-      console.log("REMOTE DELETE");
       $.ajax({
         type: 'POST',
         url: '/_/account/favorites/delete',
@@ -87,20 +85,16 @@ function setLocalFavoriteTeams(favoriteTeams) {
 function addLocalFavoriteTeam(teamKey) {
   var storedFavoriteTeams = getLocalFavoriteTeams();
   if (storedFavoriteTeams != null) {
-    console.log("Adding: " + teamKey);
     storedFavoriteTeams[teamKey] = true;
     setLocalFavoriteTeams(storedFavoriteTeams);
-    console.log(storedFavoriteTeams);
   }
 }
 
 function deleteLocalFavoriteTeam(teamKey) {
   var storedFavoriteTeams = getLocalFavoriteTeams();
   if (storedFavoriteTeams != null && teamKey in storedFavoriteTeams) {
-    console.log("Deleting: " + teamKey);
     delete storedFavoriteTeams[teamKey];
     setLocalFavoriteTeams(storedFavoriteTeams);
-    console.log(storedFavoriteTeams);
   }
 }
 
@@ -164,8 +158,6 @@ function setupFavAddClick() {
     $(this).find(".not-favorite").hide();
     addSpinner($(this));
 
-    console.log("CLICK ADD");
-    console.log($(this).attr("data-team"));
     updateFavoriteTeams($(this).attr("data-team"), 'add', false);
   });
 }
@@ -177,8 +169,6 @@ function setupFavDeleteClick() {
     $(this).find(".favorite").hide();
     addSpinner($(this));
 
-    console.log("CLICK DELETE");
-    console.log($(this).attr("data-team"));
     updateFavoriteTeams($(this).attr("data-team"), 'delete', false);
   });
 }
@@ -194,7 +184,6 @@ $(document).ready(function(){
     window.location.href = '/account?redirect=' + escape(document.URL.replace(document.location.origin, ""));
   });
 
-  console.log(getLocalFavoriteTeams());
   setupFavAddClick();
   updateFavoriteTeams(null, null, true);
 });
