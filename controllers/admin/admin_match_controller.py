@@ -153,7 +153,7 @@ class AdminMatchEdit(LoggedInHandler):
         self._require_admin()
         alliances_json = self.request.get("alliances_json")
         alliances = json.loads(alliances_json)
-        youtube_videos = json.loads(self.request.get("youtube_videos"))
+        youtube_videos = json.loads(self.request.get("youtube_videos")) if self.request.get("youtube_videos") else []
         team_key_names = list()
 
         for alliance in alliances:
