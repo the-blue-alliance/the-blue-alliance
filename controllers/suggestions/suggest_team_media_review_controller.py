@@ -19,7 +19,7 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
     def get(self):
         suggestions = Suggestion.query().filter(
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
-            Suggestion.target_model == "media")
+            Suggestion.target_model == "media").fetch(limit=50)
 
         # Quick and dirty way to group images together
         suggestions = sorted(suggestions, key=lambda x: 0 if x.contents['media_type_enum'] in MediaType.image_types else 1)
