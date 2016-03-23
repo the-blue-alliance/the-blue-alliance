@@ -1,6 +1,7 @@
 import datetime
 import os
 import json
+import logging
 
 from google.appengine.ext import ndb
 
@@ -132,6 +133,7 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
         accept_keys = []
         reject_keys = []
         for value in self.request.POST.values():
+            logging.debug(value)
             key = value.split('::')[1]
             if value.startswith('accept'):
                 accept_keys.append(key)
