@@ -134,7 +134,11 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
         reject_keys = []
         for value in self.request.POST.values():
             logging.debug(value)
-            key = value.split('::')[1]
+            split_value = value.split('::')
+            if len(split_value) == 2:
+                key = split_value[1]
+            else:
+                continue
             if value.startswith('accept'):
                 accept_keys.append(key)
             elif value.startswith('reject'):
