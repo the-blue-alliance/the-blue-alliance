@@ -8,6 +8,9 @@ MAX_YEAR = 2016
 # Fraction of requests to profile
 RECORD_FRACTION = 0.1
 
+# Fraction of requests to send to Google Analytics
+GA_RECORD_FRACTION = 1.0
+
 # For choosing what the main landing page displays
 KICKOFF = 1
 BUILDSEASON = 2
@@ -37,5 +40,5 @@ else:
         "use-compiled-templates": True
     }
 
-CONFIG['landing_handler'] = KICKOFF
+CONFIG['landing_handler'] = COMPETITIONSEASON
 CONFIG["static_resource_version"] = 7

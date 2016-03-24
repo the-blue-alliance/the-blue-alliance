@@ -10,6 +10,7 @@ from controllers.base_controller import LoggedInHandler
 from consts.account_permissions import AccountPermissions
 from models.account import Account
 
+import tba_config
 
 class AdminUserList(LoggedInHandler):
     """
@@ -72,3 +73,25 @@ class AdminUserEdit(LoggedInHandler):
         user.put()
 
         self.redirect("/admin/user/" + user_id)
+
+
+class AdminUserTestSetup(LoggedInHandler):
+    """
+    Gives the current user all permissions. For testing only.
+    """
+    def get(self):
+        self._require_admin()
+
+        if tba_config.CONFIG["env"] != "prod":
+            account = Account.get_by_id(self.user_bundle.account.key.id())
+            account.display_name = "Test User"
+            account.registered = True
+            account.permissions = AccountPermissions.permissions.keys()
+            account.put()
+
+            self.redirect("/admin/user/" + account.key.id())
+        else:
+            logging.error("{} tried to set up a test user in prod! No can do.".format(
+                self.user_bundle.user.email()))
+            self.redirect("/admin/")
+

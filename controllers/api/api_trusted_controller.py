@@ -39,7 +39,6 @@ class ApiTrustedEventAllianceSelectionsUpdate(ApiTrustedBaseController):
 
         event = Event.get_by_id(event_key)
         event.alliance_selections_json = json.dumps(alliance_selections)
-        event.dirty = True  # TODO: hacky
         EventManipulator.createOrUpdate(event)
 
         self.response.out.write(json.dumps({'Success': "Alliance selections successfully updated"}))
@@ -174,7 +173,6 @@ class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
 
         event = Event.get_by_id(event_key)
         event.rankings_json = json.dumps(rankings)
-        event.dirty = True  # TODO: hacky
         EventManipulator.createOrUpdate(event)
 
         self.response.out.write(json.dumps({'Success': "Rankings successfully updated"}))
@@ -232,7 +230,6 @@ class ApiTrustedAddMatchYoutubeVideo(ApiTrustedBaseController):
 
             if youtube_id not in match.youtube_videos:
                 match.youtube_videos.append(youtube_id)
-                match.dirty = True  # This is hacky -fangeugene 2014-10-26
                 matches_to_put.append(match)
         MatchManipulator.createOrUpdate(matches_to_put)
 

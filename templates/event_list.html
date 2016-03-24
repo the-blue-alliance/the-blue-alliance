@@ -4,6 +4,13 @@
 
 {% block meta_description %}Information, match results, and videos for FIRST Robotics Competition events{% if explicit_year %} from {{selected_year}}{% endif %}.{% endblock %}
 
+{% block more_head_tags %}
+  <meta property="og:title" content="{{selected_year}} FRC Event List" />
+  <meta property="og:image" content="http://www.thebluealliance.com/images/logo_square_200.png" />
+  <meta property="og:description" content="Event list for the {{selected_year}} FIRST Robotics Competition."/>
+  <meta property="og:site_name" content="The Blue Alliance" />
+{% endblock %}
+
 {% block events_active %}active{% endblock %}
 
 {% block content %}

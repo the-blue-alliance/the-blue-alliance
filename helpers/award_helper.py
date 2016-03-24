@@ -119,6 +119,7 @@ AWARD_MATCHING_STRINGS = [
     (AwardType.PROFESSIONALISM, (["professionalism"], ["gracious"])),
     (AwardType.GOLDEN_CORNDOG, (["golden corndog"], [])),
     (AwardType.MOST_IMPROVED_TEAM, (["most improved team"], [])),
+    (AwardType.WILDCARD, (["wildcard"], [])),
 ]
 
 

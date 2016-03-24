@@ -66,7 +66,7 @@ class TeamList(CacheableHandler):
 
 class TeamCanonical(CacheableHandler):
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
-    SHORT_CACHE_EXPIRATION = 60 * 5
+    SHORT_CACHE_EXPIRATION = 61
     CACHE_VERSION = 3
     CACHE_KEY_FORMAT = "team_canonical_{}"  # (team_number)
 

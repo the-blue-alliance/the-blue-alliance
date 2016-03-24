@@ -152,6 +152,7 @@ class AdminCreateDistrictTeamsEnqueue(LoggedInHandler):
         self._require_admin()
         taskqueue.add(
             queue_name='admin',
+            target='backend-tasks',
             url='/backend-tasks/do/rebuild_district_teams/{}'.format(year),
             method='GET')
 

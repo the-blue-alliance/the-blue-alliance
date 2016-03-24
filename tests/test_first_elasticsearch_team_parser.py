@@ -27,7 +27,6 @@ class TestFIRSTElasticSearchTeamParser(unittest2.TestCase):
                     self.assertEqual(team.key_name, "frc254")
                     self.assertEqual(team.team_number, 254)
                     self.assertEqual(team.nickname, "The Cheesy Poofs")
-                    self.assertEqual(team.address, "San Jose, CA, USA")
                     self.assertEqual(team.rookie_year, 1999)
                     self.assertEqual(team.website, "http://www.team254.com")
                     self.assertEqual(team.first_tpid, 357159)
@@ -37,9 +36,19 @@ class TestFIRSTElasticSearchTeamParser(unittest2.TestCase):
                     self.assertEqual(team.key_name, "frc604")
                     self.assertEqual(team.team_number, 604)
                     self.assertEqual(team.nickname, "Quixilver")
-                    self.assertEqual(team.address, "San Jose, CA, USA")
                     self.assertEqual(team.rookie_year, 2001)
                     self.assertEqual(team.website, "http://604robotics.com")
                     self.assertEqual(team.first_tpid, 357405)
                     self.assertEqual(team.first_tpid_year, 2015)
                     self.assertEqual(team.motto, "It will work - because it has to.")
+
+                # A team who doesn't have 'http' starting their website
+                if team.key.id() == 'frc4990':
+                    self.assertEqual(team.key_name, "frc4990")
+                    self.assertEqual(team.team_number, 4990)
+                    self.assertEqual(team.nickname, "Gryphon Robotics")
+                    self.assertEqual(team.rookie_year, 2014)
+                    self.assertEqual(team.website, "http:///gryphonrobotics.org")
+                    self.assertEqual(team.first_tpid, 361441)
+                    self.assertEqual(team.first_tpid_year, 2015)
+                    self.assertEqual(team.motto, None)

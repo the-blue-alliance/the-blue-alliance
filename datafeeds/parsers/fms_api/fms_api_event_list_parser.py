@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 from consts.district_type import DistrictType
 from consts.event_type import EventType
@@ -11,6 +12,27 @@ class FMSAPIEventListParser(object):
 
     DATE_FORMAT_STR = "%Y-%m-%dT%H:%M:%S"
 
+    EVENT_TYPES = {
+        'regional': EventType.REGIONAL,
+        'districtevent': EventType.DISTRICT,
+        'districtchampionship': EventType.DISTRICT_CMP,
+        'championshipsubdivision': EventType.CMP_DIVISION,
+        'championship': EventType.CMP_FINALS,
+        'offseason': EventType.OFFSEASON,
+    }
+
+    EVENT_CODE_EXCEPTIONS = {
+        'cmp-archimedes': ('arc', 'Archimedes'),  # (code, short_name)
+        'cmp-carson': ('cars', 'Carson'),
+        'cmp-carver': ('carv', 'Carver'),
+        'cmp-curie': ('cur', 'Curie'),
+        'cmp-galileo': ('gal', 'Galileo'),
+        'cmp-hopper': ('hop', 'Hopper'),
+        'cmp-newton': ('new', 'Newton'),
+        'cmp-tesla': ('tes', 'Tesla'),
+        'cmp': ('cmp', 'Einstein'),
+    }
+
     def __init__(self, season):
         self.season = int(season)
 
@@ -18,10 +40,12 @@ class FMSAPIEventListParser(object):
         events = []
         for event in response['Events']:
             code = event['code'].lower()
-            key = "{}{}".format(self.season, code)
+            event_type = self.EVENT_TYPES.get(event['type'].lower(), None)
+            if event_type is None:
+                logging.warn("Event type '{}' not recognized!".format(event['type']))
+                continue
             name = event['name']
             short_name = EventHelper.getShortName(name)
-            event_type = EventHelper.parseEventType(event['type'])
             district_enum = EventHelper.parseDistrictName(event['districtCode'].lower()) if event['districtCode'] else DistrictType.NO_DISTRICT
             venue = event['venue']
             location = "{}, {}, {}".format(event['city'], event['stateprov'], event['country'])
@@ -30,12 +54,17 @@ class FMSAPIEventListParser(object):
 
             # TODO read timezone from API
 
-            # Do not read in CMP divisions, we'll add those manually
-            if event_type in EventType.CMP_EVENT_TYPES:
-                continue
+            # Special cases for champs
+            if code in self.EVENT_CODE_EXCEPTIONS:
+                code, short_name = self.EVENT_CODE_EXCEPTIONS[code]
+                if code == 'cmp':  # Einstein
+                    name = '{} Field'.format(short_name)
+                    start = end.replace(hour=0, minute=0, second=0, microsecond=0)  # Set to beginning of last day
+                else:  # Divisions
+                    name = '{} Division'.format(short_name)
 
             events.append(Event(
-                id=key,
+                id="{}{}".format(self.season, code),
                 name=name,
                 short_name=short_name,
                 event_short=code,
@@ -45,7 +74,7 @@ class FMSAPIEventListParser(object):
                 end_date=end,
                 venue=venue,
                 location=location,
-                venue_address="{}, {}".format(venue, location),
+                venue_address=None,  # FIRST API doesn't provide detailed venue address
                 year=self.season,
                 event_district_enum=district_enum
             ))

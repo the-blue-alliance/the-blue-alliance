@@ -10,6 +10,7 @@ from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
 from database.database_query import DatabaseQuery
+from helpers.suggestions.suggestion_fetcher import SuggestionFetcher
 from models.account import Account
 from models.suggestion import Suggestion
 
@@ -28,21 +29,10 @@ class AdminMain(LoggedInHandler):
         users = Account.query().order(-Account.created).fetch(5)
         self.template_values['users'] = users
 
-        # Retrieves the number of pending suggestions
-        video_suggestions = Suggestion.query().filter(
-            Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
-            Suggestion.target_model == "match").count()
-        self.template_values['video_suggestions'] = video_suggestions
-
-        webcast_suggestions = Suggestion.query().filter(
-            Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
-            Suggestion.target_model == "event").count()
-        self.template_values['webcast_suggestions'] = webcast_suggestions
-
-        media_suggestions = Suggestion.query().filter(
-            Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
-            Suggestion.target_model == "media").count()
-        self.template_values['media_suggestions'] = media_suggestions
+        self.template_values['suggestions'] = dict()
+        self.template_values['suggestions']['match'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "match")
+        self.template_values['suggestions']['event'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "event")
+        self.template_values['suggestions']['media'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "media")
 
         # version info
         try:

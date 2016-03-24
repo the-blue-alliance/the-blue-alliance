@@ -36,6 +36,7 @@
                 <li><a class="smooth-scroll" href="#team-history-events-request">Team History Events Request</a></li>
                 <li><a class="smooth-scroll" href="#team-history-awards-request">Team History Awards Request</a></li>
                 <li><a class="smooth-scroll" href="#team-history-robots-request">Team History Robots Request</a></li>
+                <li><a class="smooth-scroll" href="#team-history-districts-request">Team History Districts Request</a></li>
               </ul>
             </li>
             <li>
@@ -66,6 +67,9 @@
                 <li><a class="smooth-scroll" href="#district-rankings-request">District Rankings Request</a></li>
                 <li><a class="smooth-scroll" href="#district-teams-request">District Teams Request</a></li>
               </ul>
+            </li>
+            <li>
+              <a class="smooth-scroll" href="#api-libraries">API Libraries</a>
             </li>
           </ul>
         </div>
@@ -106,7 +110,7 @@
       <h2 id="models">Models</h2>
       <h3 id="team-model">Team Model</h3>
       <h4>Related: <a class="smooth-scroll" href="#team-request">Team Request</a></h4>
-      <table class=table>
+      <table class="table">
         <caption>Response Data</caption>
         <thead>
           <tr>
@@ -176,7 +180,7 @@
 
       <h3 id="event-model">Event Model</h3>
       <h4>Related: <a class="smooth-scroll" href="#event-request">Event Request</a></h4>
-      <table class=table>
+      <table class="table">
         <caption>Response Data</caption>
         <thead>
           <tr>
@@ -298,7 +302,7 @@
 
       <h3 id="match-model">Match Model</h3>
       <h4>Related: <a class="smooth-scroll" href="#event-matches-request">Event Matches Request</a></h4>
-      <table class=table>
+      <table class="table">
         <caption>Response Data</caption>
         <thead>
           <tr>
@@ -371,7 +375,7 @@
 
       <h3 id="award-model">Award Model</h3>
       <h4>Related: <a class="smooth-scroll" href="#event-awards-request">Event Awards Request</a></h4>
-      <table class=table>
+      <table class="table">
         <caption>Response Data</caption>
         <thead>
           <tr>
@@ -412,7 +416,7 @@
 
       <h3 id="media-model">Media Model</h3>
       <h4>Related: <a class="smooth-scroll" href="#team-media-request">Team Media Request</a></h4>
-      <table class=table>
+      <table class="table">
         <caption>Response Data</caption>
         <thead>
           <tr>
@@ -442,7 +446,7 @@
 
       <h3 id="robot-model">Robot Model</h3>
       <h4>Related: <a class="smooth-scroll" href="#team-history-robots-request">Team History Robots Request</a></h4>
-      <table class=table>
+      <table class="table">
         <caption>Response Data</caption>
         <thead>
           <tr>
@@ -484,7 +488,7 @@
         Request format:
         <code>www.thebluealliance.com/api/v2/teams/&lt;page_num&gt;</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
@@ -527,7 +531,7 @@
         Request format:
         <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
@@ -571,7 +575,7 @@
         Request format:
         <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;(/&lt;year&gt;)/events</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
@@ -621,7 +625,7 @@
         Request format:
         <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/event/&lt;event key&gt;/awards</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
@@ -672,7 +676,7 @@
         Request format:
         <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/event/&lt;event key&gt;/matches</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
@@ -722,7 +726,7 @@
         Request format:
         <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/years_participated</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
@@ -766,7 +770,7 @@
         Request format:
         <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;(/&lt;year&gt;)/media</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
@@ -816,7 +820,7 @@
         Request format:
         <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/history/events</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
@@ -860,7 +864,7 @@
         Request format:
         <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/history/awards</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
@@ -904,7 +908,7 @@
         Request format:
         <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/history/robots</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
@@ -942,6 +946,49 @@
         </div>
       </div>
 
+      <h3 id="team-history-districts-request">Team History Districts Request</h3>
+      <p>
+        Request format:
+        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/history/districts</code>
+      </p>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Desciption</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>team key</td>
+            <td>A team key name where the format is <code>frcyyyy</code> where yyyy is the a
+              valid, official team number issued by <em>FIRST</em></td>
+            <td>frc1, frc281, frc1114</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_team_history_districts_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">www.thebluealliance.com</span>
+              <input class="form-control" size="600" id="example_team_history_districts_request" type="text" value="/api/v2/team/frc1124/history/districts">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group">
+            <pre class="team-history-districts-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+
       <h2 id="event-requests">Event Requests</h2>
       <h3 id="event-list-request">Event List Request</h3>
       <h4>Related: <a class="smooth-scroll" href="#event-model">Event Model</a></h4>
@@ -949,7 +996,7 @@
         Request format:
         <code>www.thebluealliance.com/api/v2/events/&lt;year&gt;</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
@@ -993,7 +1040,7 @@
         Request format:
         <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
@@ -1039,7 +1086,7 @@
         Request format:
         <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;/teams</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
@@ -1085,7 +1132,7 @@
         Request format:
         <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;/matches</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
@@ -1131,7 +1178,7 @@
         Request format:
         <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;/stats</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
@@ -1176,7 +1223,7 @@
         Request format:
         <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;/rankings</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
@@ -1221,7 +1268,7 @@
         Request format:
         <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;/awards</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
@@ -1267,7 +1314,7 @@
         Request format:
         <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;/district_points</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
@@ -1357,7 +1404,7 @@
         Request format:
         <code>www.thebluealliance.com/api/v2/match/&lt;match_key&gt;</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
@@ -1401,7 +1448,7 @@
         Request format:
         <code>www.thebluealliance.com/api/v2/districts/&lt;year&gt;</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
@@ -1444,7 +1491,7 @@
         Request format:
         <code>www.thebluealliance.com/api/v2/district/&lt;district short&gt;/&lt;year&gt;/events</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
@@ -1492,7 +1539,7 @@
         Request format:
         <code>www.thebluealliance.com/api/v2/district/&lt;district short&gt;/&lt;year&gt;/rankings</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
@@ -1540,7 +1587,7 @@
         Request format:
         <code>www.thebluealliance.com/api/v2/district/&lt;district short&gt;/&lt;year&gt;/teams</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
@@ -1583,6 +1630,60 @@
         </div>
       </div>
 
+      <h2 id="api-libraries">API Libraries</h3>
+      <p>
+        These libraries have been created by our community to help you use our
+        API in your next project.
+      </p>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Language</th>
+            <th>Repository</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>C#</td>
+            <td><a href="https://github.com/xNovax/TheBlueAlliance_API">TheBlueAlliance_API</a></td>
+          </tr>
+          <tr>
+            <td>Java</td>
+            <td><a href="https://github.com/phil-lopreiato/tba-apiv2-java">tba-apiv2-java</a></td>
+          </tr>
+          <tr>
+            <td>Java</td>
+            <td><a href="https://github.com/AdiSai/TheBlueAlliance-Java">TheBlueAlliance-Java</a></td>
+          </tr>
+          <tr>
+            <td>Java</td>
+            <td><a href="https://github.com/FRC2834/java-blue-alliance-api">java-blue-alliance-api</a></td>
+          </tr>
+          <tr>
+            <td>Java</td>
+            <td><a href="https://github.com/tonypeng/TheBlueAllianceJavaAPI">TheBlueAllianceJavaAPI</td>
+          </tr>
+          <tr>
+            <td>Javascript</td>
+            <td><a href="https://github.com/chacha/thebluealliance-javascript">thebluealliance-javascript</a></td>
+          </tr>
+          <tr>
+            <td>Node.js</td>
+            <td><a href="https://github.com/khanh111/node-thebluealliance">node-thebluealliance</a></td>
+          </tr>
+          <tr>
+            <td>Python</td>
+            <td><a href="https://github.com/Alexanders101/The-Blue-Alliance-Python-API">The-Blue-Alliance-Python-API</a></td>
+          </tr>
+          <tr>
+            <td>Ruby</td>
+            <td><a href="https://github.com/chacha/thebluealliance-ruby">thebluealliance-ruby</a></td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Made a library that you want to be included? <a href="https://github.com/the-blue-alliance/the-blue-alliance/issues/">Let us know!</a>
+      </p>
   </div>
 </div>
 {% endblock %}
@@ -1745,6 +1846,23 @@
       },
       error: function(data) {
         $(".team-history-robots-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+
+  $("#example_team_history_districts_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".team-history-districts-request-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_team_history_districts_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-team-history-districts-request:v01'},
+      success: function(data) {
+        $(".team-history-districts-request-json").html(JSON.stringify(data, null, 2));
+      },
+      error: function(data) {
+        $(".team-history-districts-request-json").html('Something went wrong! Please check for correct request format.');
       }
     });
   });

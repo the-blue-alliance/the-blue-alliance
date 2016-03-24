@@ -1,13 +1,16 @@
 import os
 
 from google.appengine.ext import ndb
-from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
+
 from helpers.media_helper import MediaHelper, MediaParser
+from helpers.suggestions.suggestion_creator import SuggestionCreator
+
 from models.media import Media
-from models.suggestion import Suggestion
 from models.team import Team
+
+from template_engine import jinja2_engine
 
 
 class SuggestTeamMediaController(LoggedInHandler):
@@ -32,14 +35,13 @@ class SuggestTeamMediaController(LoggedInHandler):
         medias_by_slugname = MediaHelper.group_by_slugname([media_future.get_result() for media_future in media_futures])
 
         self.template_values.update({
-            "success": self.request.get("success"),
+            "status": self.request.get("status"),
             "team": team,
             "year": year,
             "medias_by_slugname": medias_by_slugname
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/suggest_team_media.html')
-        self.response.out.write(template.render(path, self.template_values))
+        self.response.out.write(jinja2_engine.render('suggest_team_media.html', self.template_values))
 
     def post(self):
         self._require_login()
@@ -47,21 +49,10 @@ class SuggestTeamMediaController(LoggedInHandler):
         team_key = self.request.get("team_key")
         year_str = self.request.get("year")
 
-        success_code = 0
-        media_dict = MediaParser.partial_media_dict_from_url(self.request.get('media_url').strip())
-        if media_dict is not None:
-            existing_media = Media.get_by_id(Media.render_key_name(media_dict['media_type_enum'], media_dict['foreign_key']))
-            if existing_media is None or team_key not in [reference.id() for reference in existing_media.references]:
-                media_dict['year'] = int(year_str)
-                media_dict['reference_type'] = 'team'
-                media_dict['reference_key'] = team_key
+        status = SuggestionCreator.createTeamMediaSuggestion(
+            author_account_key=self.user_bundle.account.key,
+            media_url=self.request.get("media_url"),
+            team_key=team_key,
+            year_str=year_str)
 
-                suggestion = Suggestion(
-                    author=self.user_bundle.account.key,
-                    target_model="media",
-                    )
-                suggestion.contents = media_dict
-                suggestion.put()
-            success_code = 1
-
-        self.redirect('/suggest/team/media?team_key=%s&year=%s&success=%s' % (team_key, year_str, success_code))
+        self.redirect('/suggest/team/media?team_key=%s&year=%s&status=%s' % (team_key, year_str, status))

@@ -34,8 +34,8 @@ class ApiDistrictControllerBase(ApiBaseController):
 
 class ApiDistrictListController(ApiDistrictControllerBase):
     CACHE_KEY_FORMAT = "apiv2_district_list_controller_{}"  # year
-    CACHE_VERSION = 2
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 3
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):
         super(ApiDistrictListController, self).__init__(*args, **kw)
@@ -70,8 +70,8 @@ class ApiDistrictListController(ApiDistrictControllerBase):
 
 class ApiDistrictEventsController(ApiDistrictControllerBase):
     CACHE_KEY_FORMAT = "apiv2_district_events_controller_{}_{}"  # (district_short, year)
-    CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 1
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):
         super(ApiDistrictEventsController, self).__init__(*args, **kw)
@@ -97,7 +97,7 @@ class ApiDistrictEventsController(ApiDistrictControllerBase):
 
 class ApiDistrictRankingsController(ApiDistrictControllerBase):
     CACHE_KEY_FORMAT = "apiv2_district_rankings_controller_{}_{}"  # (district_short, year)
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
@@ -115,7 +115,7 @@ class ApiDistrictRankingsController(ApiDistrictControllerBase):
     def _render(self, district_abbrev, year=None):
         self._set_district(district_abbrev)
 
-        if self.year < 2014:
+        if self.year < 2009:
             return json.dumps([], ensure_ascii=True)
 
         event_keys = Event.query(Event.year == self.year, Event.event_district_enum == self.district).fetch(None, keys_only=True)
@@ -160,8 +160,8 @@ class ApiDistrictRankingsController(ApiDistrictControllerBase):
 
 class ApiDistrictTeamsController(ApiDistrictControllerBase):
     CACHE_KEY_FORMAT = "apiv2_district_teams_controller_{}_{}"  # (district_short, year)
-    CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 2
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):
         super(ApiDistrictTeamsController, self).__init__(*args, **kw)

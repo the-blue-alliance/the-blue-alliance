@@ -1,3 +1,5 @@
+import urlparse
+
 from google.appengine.ext import ndb
 
 from consts.district_type import DistrictType
@@ -28,13 +30,20 @@ class FMSAPITeamDetailsParser(object):
             # concat city/state/country to get address
             address = u"{}, {}, {}".format(teamData['city'], teamData['stateProv'], teamData['country'])
 
+            # Fix issue where FIRST's API returns dummy website for all teams
+            if teamData['website'] is not None and 'www.firstinspires.org' in teamData['website']:
+                website = None
+            else:
+                raw_website = teamData.get('website', None)
+                website = urlparse.urlparse(raw_website, 'http').geturl() if raw_website else None
+
             team = Team(
                 id="frc{}".format(teamData['teamNumber']),
                 team_number=teamData['teamNumber'],
                 name=teamData['nameFull'],
                 nickname=teamData['nameShort'],
                 address=address,
-                website=teamData['website'],
+                website=website,
                 rookie_year=teamData['rookieYear']
             )
 

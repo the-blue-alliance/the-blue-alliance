@@ -12,6 +12,7 @@ SCRIPTS_MAIN = ['static/jwplayer/jwplayer.js',
                 'static/javascript/tba_js/tba_countdown.js',
                 'static/javascript/tba_js/tba_sidebar.js',
                 'static/javascript/tba_js/tba_typeahead.js',
+                'static/javascript/tba_js/tba_favorites.js',
                 'static/javascript/tba_js/tba.js',
                 'static/javascript/tba_js/ReView0.65b.js',
                 ]

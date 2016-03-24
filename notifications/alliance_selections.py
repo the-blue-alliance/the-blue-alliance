@@ -18,5 +18,7 @@ class AllianceSelectionNotification(BaseNotification):
         data = {}
         data['message_type'] = NotificationType.type_names[self._type]
         data['message_data'] = {}
+        data['message_data']['event_name'] = self.event.name
+        data['message_data']['event_key'] = self.event.key_name
         data['message_data']['event'] = ModelToDict.eventConverter(self.event)
         return data

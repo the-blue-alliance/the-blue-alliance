@@ -21,6 +21,7 @@ class UpcomingMatchNotification(BaseNotification):
         data = {}
         data['message_type'] = NotificationType.type_names[self._type]
         data['message_data'] = {}
+        data['message_data']['event_key'] = self.event.key_name
         data['message_data']['event_name'] = self.event.name
         data['message_data']['match_key'] = self.match.key_name
         data['message_data']['team_keys'] = self.match.team_key_names

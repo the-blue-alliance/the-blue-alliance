@@ -21,8 +21,8 @@ class Event(ndb.Model):
     event_district_enum = ndb.IntegerProperty()
     start_date = ndb.DateTimeProperty()
     end_date = ndb.DateTimeProperty()
-    venue = ndb.StringProperty(indexed=False)
-    venue_address = ndb.StringProperty(indexed=False)  # We can scrape this.
+    venue = ndb.StringProperty(indexed=False)  # Name of the event venue
+    venue_address = ndb.StringProperty(indexed=False)  # Most detailed venue address (includes venue, street, and location separated by \n)
     location = ndb.StringProperty(indexed=False)  # in the format "locality, region, country". similar to Team.address
     timezone_id = ndb.StringProperty()  # such as 'America/Los_Angeles' or 'Asia/Jerusalem'
     official = ndb.BooleanProperty(default=False)  # Is the event FIRST-official?
@@ -55,6 +55,7 @@ class Event(ndb.Model):
         self._matchstats = None
         self._rankings = None
         self._teams = None
+        self._venue_address_safe = None
         self._webcast = None
         self._updated_attrs = []  # Used in EventManipulator to track what changed
         super(Event, self).__init__(*args, **kw)
@@ -120,9 +121,7 @@ class Event(ndb.Model):
                 self.get_matches_async().wait()
         return self._matches
 
-    def withinDays(self, negative_days_before, days_after):
-        if not self.start_date or not self.end_date:
-            return False
+    def local_time(self):
         now = datetime.datetime.now()
         if self.timezone_id is not None:
             tz = pytz.timezone(self.timezone_id)
@@ -130,6 +129,12 @@ class Event(ndb.Model):
                 now = now + tz.utcoffset(now)
             except pytz.NonExistentTimeError:  # may happen during DST
                 now = now + tz.utcoffset(now + datetime.timedelta(hours=1))  # add offset to get out of non-existant time
+        return now
+
+    def withinDays(self, negative_days_before, days_after):
+        if not self.start_date or not self.end_date:
+            return False
+        now = self.local_time()
         after_start = self.start_date.date() + datetime.timedelta(days=negative_days_before) <= now.date()
         before_end = self.end_date.date() + datetime.timedelta(days=days_after) >= now.date()
 
@@ -153,6 +158,14 @@ class Event(ndb.Model):
     @property
     def future(self):
         return self.start_date.date() > datetime.date.today() and not self.within_a_day
+
+    @property
+    def starts_today(self):
+        return self.start_date.date() == self.local_time().date()
+
+    @property
+    def ends_today(self):
+        return self.end_date.date() == self.local_time().date()
 
     @ndb.tasklet
     def get_teams_async(self):
@@ -210,6 +223,20 @@ class Event(ndb.Model):
                 return self.venue_address.split('\r\n')[0]
             except:
                 return None
+
+    @property
+    def venue_address_safe(self):
+        """
+        Construct (not detailed) venue address if detailed venue address doesn't exist
+        """
+        if not self.venue_address:
+            if not self.venue or not self.location:
+                self._venue_address_safe = None
+            else:
+                self._venue_address_safe = "{}\n{}".format(self.venue.encode('utf-8'), self.location.encode('utf-8'))
+        else:
+            self._venue_address_safe = self.venue_address.replace('\r\n', '\n')
+        return self._venue_address_safe
 
     @property
     def webcast(self):
@@ -279,7 +306,7 @@ class Event(ndb.Model):
 
     @classmethod
     def validate_key_name(self, event_key):
-        key_name_regex = re.compile(r'^[1-9]\d{3}[a-z]+[1-9]?$')
+        key_name_regex = re.compile(r'^[1-9]\d{3}[a-z]+[0-9]?$')
         match = re.match(key_name_regex, event_key)
         return True if match else False
 
