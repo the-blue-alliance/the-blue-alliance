@@ -7,8 +7,15 @@
 {% block content %}
 <script type="text/javascript">
     function load_playlist() {
-        var playlist_id = $('#playlist_id').val();
+        var playlist_url = $('#playlist_url').val();
         var video_list = $('#video_list');
+        var captured = /list=([^&]+)/.exec(playlist_url);
+        var playlist_id = captured ? captured[1] : null;
+        if (playlist_id == null) {
+            video_list.empty();
+            video_list.append($("<p>Invalid playlist URL</p>"));
+            return;
+        }
         video_list.empty();
         video_list.append($("<p>Loading videos...</p>"));
         $.get("/_/yt/playlist/videos", {'playlist_id': playlist_id}).done(function(data) {
@@ -29,6 +36,9 @@
                 group.append(match_input);
                 video_list.append(li);
             });
+        }).fail(function() {
+            video_list.empty();
+            video_list.append($("<p>Error loading videos</p>"));
         });
     }
 </script>
@@ -68,9 +78,9 @@
 
           <hr>
           <h3>{{event.year}} {{event.name}}</h3>
-            <label for="playlist_id">YouTube Playlist ID</label>
+            <label for="playlist_id">YouTube Playlist URL</label>
             <div class="input-group">
-              <input class="form-control" type="text" id="playlist_id" placeholder="PLLDODAGuIHqNRyZPxoHlvwMsJYP79ptCv" />
+              <input class="form-control" type="text" id="playlist_url" placeholder="https://www.youtube.com/playlist?list=PLLDODAGuIHqNRyZPxoHlvwMsJYP79ptCv" />
               <span class="input-group-btn">
                 <button class="btn btn-info" onclick="load_playlist()"><span class="glyphicon glyphicon-bookmark"></span> Submit Playlist</button>
               </span>
