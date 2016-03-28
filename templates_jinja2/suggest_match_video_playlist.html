@@ -23,7 +23,7 @@
                 group.append($("<a>", {href:"https://youtu.be/"+yt_id}).append($("<h4>"+video_data['snippet']['title']+"</h4>")));
 
                 var match_input = $("<span>");
-                match_input.append("Match Partial: ");
+                match_input.append("Match ID: ");
                 match_input.append($("<input>", {name: "video_id_"+index, type: "hidden", value: yt_id}));
                 match_input.append($("<input>", {class: "form-control", name: "match_partial_"+index, type: "text"}));
                 group.append(match_input);
@@ -54,15 +54,15 @@
             <li>Your account info (like {{user_bundle.user.email()}} and {{user_bundle.user.nickname()}}) will also be submitted. <a href="{{user_bundle.logout_url}}">log in as a different user</a></li>
           </ul>
           <div class="alert alert-success">
-            <strong>Match Partial Examples</strong>
-            <p>Enter the "match partial" for the various videos in the playlist you want to suggest to The Blue Alliance. A valid match partial consists of <code>&lt;Match Type Abbreviation&gt;m&lt;Match Number&gt;</code>. Leave the field blank if you do not wish to submit the video as a suggestion or if it is not a match video (e.g. award ceremony).</p>
-            <p>The following are acceptable match type abbreviations: <code>q, qf1, sf2, f1</code></p>
-            <p>Below are some examples of valid match partials:</p>
+            <strong>Match ID Examples</strong>
+            <p>Enter the "match id" for the various videos in the playlist you want to suggest to The Blue Alliance. A valid match id consists of <code>&lt;Match Type Abbreviation&gt;m&lt;Match Number&gt;</code>. Leave the field blank if you do not wish to submit the video as a suggestion or if it is not a match video (e.g. award ceremony).</p>
+            <p>The following are examples of match type abbreviations: <code>q, qf1, sf2, f1</code></p>
+            <p>Below are some examples of valid match ids:</p>
             <ul>
               <li>qm3 (Qualification Match #3)</li>
               <li>qf2m1 (Quarterfinal 2 Match #1)</li>
               <li>sf1m3 (Semifinal 1 Match #3)</li>
-              <li>f1m3 (Finals Match #3</li>
+              <li>f1m3 (Finals Match #3)</li>
             </ul>
           </div>
 

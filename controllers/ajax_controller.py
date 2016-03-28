@@ -201,7 +201,7 @@ class WebcastHandler(CacheableHandler):
 
 class YouTubePlaylistHandler(LoggedInHandler):
     """
-    For Hittin the YouTube API to get a list of video keys associated with a playlist
+    For Hitting the YouTube API to get a list of video keys associated with a playlist
     """
     def get(self):
         if not self.user_bundle.user:
