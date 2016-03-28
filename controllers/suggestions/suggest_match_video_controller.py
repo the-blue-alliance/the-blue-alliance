@@ -1,7 +1,9 @@
+import logging
 import os
 import re
 
 from controllers.base_controller import LoggedInHandler
+from helpers.suggestions.suggestion_creator import SuggestionCreator
 from models.event import Event
 from models.match import Match
 from models.suggestion import Suggestion
@@ -40,7 +42,6 @@ class SuggestMatchVideoController(LoggedInHandler):
         self._require_login()
 
         match_key = self.request.get("match_key")
-        match_future = Match.get_by_id_async(self.request.get("match_key"))
         youtube_url = self.request.get("youtube_url")
 
         youtube_id = None
@@ -52,26 +53,64 @@ class SuggestMatchVideoController(LoggedInHandler):
             if regex2 is not None:
                 youtube_id = regex2.group(1)
 
-        if youtube_id is not None:
-            if youtube_id not in match_future.get_result().youtube_videos:
-                year = match_key[:4]
-                suggestion_id = Suggestion.render_media_key_name(year, 'match', match_key, 'youtube', youtube_id)
-                suggestion = Suggestion.get_by_id(suggestion_id)
-                if not suggestion or suggestion.review_state != Suggestion.REVIEW_PENDING:
-                    suggestion = Suggestion(
-                        id=suggestion_id,
-                        author=self.user_bundle.account.key,
-                        target_key=match_key,
-                        target_model="match",
-                        )
-                    suggestion.contents = {"youtube_videos": [youtube_id]}
-                    suggestion.put()
-                    status = 'success'
-                else:
-                    status = 'suggestion_exists'
-            else:
-                status = 'video_exists'
-        else:
-            status = 'bad_url'
+        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.user_bundle.account.key, youtube_id, match_key)
 
         self.redirect('/suggest/match/video?match_key={}&status={}'.format(match_key, status))
+
+
+class SuggestMatchVideoPlaylistController(LoggedInHandler):
+    """
+    Allow users to suggest a playlist of YouTube videos for matches
+    """
+    def get(self):
+        self._require_login("/suggest/event/video?event_key={}".format(self.request.get("event_key")))
+
+        if not self.request.get("event_key"):
+            self.redirect("/", abort=True)
+
+        event_future = Event.get_by_id_async(self.request.get("event_key"))
+        event = event_future.get_result()
+
+        if not event:
+            self.abort(404)
+
+        self.template_values.update({
+            "event": event,
+            "num_added": self.request.get("num_added")
+        })
+
+        self.response.out.write(jinja2_engine.render('suggest_match_video_playlist.html', self.template_values))
+
+    def post(self):
+        self._require_login()
+
+        event_key = self.request.get("event_key")
+        if not event_key:
+            self.response.out.write("No event key found")
+            return
+        event_future = Event.get_by_id_async(event_key)
+        event = event_future.get_result()
+        if not event:
+            self.response.out.write("Invalid event key {}".format(event_key))
+            return
+
+        match_futures = Match.query(Match.event == event.key).fetch_async(keys_only=True)
+        valid_match_keys = [match.id() for match in match_futures.get_result()]
+
+        num_videos = int(self.request.get("num_videos", 0))
+        suggestions_added = 0
+        for i in range(0, num_videos):
+            yt_id = self.request.get("video_id_{}".format(i))
+            match_partial = self.request.get("match_partial_{}".format(i))
+            if not yt_id or not match_partial:
+                continue
+
+            match_key = "{}_{}".format(event_key, match_partial)
+            if match_key not in valid_match_keys:
+                continue
+
+            status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.user_bundle.account.key, yt_id, match_key)
+            if status == 'success':
+                suggestions_added += 1
+
+        self.redirect('/suggest/event/video?event_key={}&num_added={}'.format(event_key, suggestions_added))
