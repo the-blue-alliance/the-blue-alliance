@@ -5,7 +5,8 @@ from webapp2_extras.routes import RedirectRoute
 import tba_config
 
 from controllers.account_controller import AccountEdit, AccountLogout, AccountOverview, AccountRegister, MyTBAController, MyTBAEventController, MyTBATeamController
-from controllers.ajax_controller import AccountFavoritesHandler, AccountFavoritesAddHandler, AccountFavoritesDeleteHandler
+from controllers.ajax_controller import AccountFavoritesHandler, AccountFavoritesAddHandler, AccountFavoritesDeleteHandler, \
+      YouTubePlaylistHandler
 from controllers.ajax_controller import LiveEventHandler, TypeaheadHandler, WebcastHandler
 from controllers.event_controller import EventList, EventDetail, EventRss
 from controllers.event_wizard_controller import EventWizardHandler
@@ -20,7 +21,8 @@ from controllers.match_controller import MatchDetail
 from controllers.nightbot_controller import NightbotTeamNextmatchHandler, NightbotTeamStatuskHandler
 from controllers.notification_controller import UserNotificationBroadcast
 from controllers.district_controller import DistrictDetail
-from controllers.suggestions.suggest_match_video_controller import SuggestMatchVideoController
+from controllers.suggestions.suggest_match_video_controller import SuggestMatchVideoController, \
+      SuggestMatchVideoPlaylistController
 from controllers.suggestions.suggest_match_video_review_controller import SuggestMatchVideoReviewController
 from controllers.suggestions.suggest_event_webcast_controller import SuggestEventWebcastController
 from controllers.suggestions.suggest_event_webcast_review_controller import SuggestEventWebcastReviewController
@@ -85,6 +87,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/search', SearchHandler, 'search', strict_slash=True),
       RedirectRoute(r'/suggest/event/webcast', SuggestEventWebcastController, 'suggest-event-webcast', strict_slash=True),
       RedirectRoute(r'/suggest/event/webcast/review', SuggestEventWebcastReviewController, 'suggest-event-webcast-review', strict_slash=True),
+      RedirectRoute(r'/suggest/event/video', SuggestMatchVideoPlaylistController, 'suggest-matches-playlist', strict_slash=True),
       RedirectRoute(r'/suggest/match/video', SuggestMatchVideoController, 'suggest-match-video', strict_slash=True),
       RedirectRoute(r'/suggest/match/video/review', SuggestMatchVideoReviewController, 'suggest-match-video-review', strict_slash=True),
       RedirectRoute(r'/suggest/review', SuggestReviewHomeController, 'suggest-review-home', strict_slash=True),
@@ -109,6 +112,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/_/nightbot/status/<team_number:[0-9]+>', NightbotTeamStatuskHandler, 'nightbot-team-status', strict_slash=True),
       RedirectRoute(r'/_/typeahead/<search_key>', TypeaheadHandler, 'ajax-typeahead', strict_slash=True),
       RedirectRoute(r'/_/webcast/<event_key>/<webcast_number>', WebcastHandler, 'ajax-webcast', strict_slash=True),
+      RedirectRoute(r'/_/yt/playlist/videos', YouTubePlaylistHandler, 'ajex-yt-playlist', strict_slash=True),
       ],
       debug=tba_config.DEBUG)
 app.error_handlers[404] = handle_404

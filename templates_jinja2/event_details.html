@@ -56,6 +56,10 @@
         <a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23{{ event.hashtag }}" target="_blank" title="Search Flickr">Flickr</a>
       </p>
     </div>
+
+    <div class="col-sm-pull-8 pull-right">
+      <a class="btn btn-success" href="/suggest/event/video?event_key={{event.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add videos!</a>
+    </div>
   </div>
 
   {% if event.now %}
@@ -174,7 +178,9 @@
     <div class="tab-pane" id="rankings">
       <div class="row">
         <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
-          <p>Data from <a href="http://www2.usfirst.org/{{event.year}}comp/events/{{event.event_short}}/rankings.html" target="_blank"> <em>FIRST</em>'s event page</a>.</p>
+          {% if event.official %}
+            <p>Data from <a href="http://frc-events.firstinspires.org/{{event.year}}/{{event.event_short}}/rankings" target="_blank"> <em>FIRST</em>'s event page</a>.</p>
+          {% endif %}
           <table class="table table-striped table-condensed table-center tablesorter" id="rankingsTable">
             <thead>
               <tr>

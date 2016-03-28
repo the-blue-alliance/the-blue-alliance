@@ -4,6 +4,7 @@ from helpers.media_helper import MediaParser
 from helpers.webcast_helper import WebcastParser
 
 from models.event import Event
+from models.match import Match
 from models.media import Media
 from models.suggestion import Suggestion
 
@@ -94,3 +95,29 @@ class SuggestionCreator(object):
             suggestion.contents = contents
             suggestion.put()
             return 'success'
+
+    @classmethod
+    def createMatchVideoYouTubeSuggestion(cls, author_account_key, youtube_id, match_key):
+        """Create a YouTube Match Video. Returns status (success, suggestion_exists, video_exists, bad_url)"""
+        if youtube_id is not None:
+            match = Match.get_by_id(match_key)
+            if match and youtube_id not in match.youtube_videos:
+                year = match_key[:4]
+                suggestion_id = Suggestion.render_media_key_name(year, 'match', match_key, 'youtube', youtube_id)
+                suggestion = Suggestion.get_by_id(suggestion_id)
+                if not suggestion or suggestion.review_state != Suggestion.REVIEW_PENDING:
+                    suggestion = Suggestion(
+                        id=suggestion_id,
+                        author=author_account_key,
+                        target_key=match_key,
+                        target_model="match",
+                        )
+                    suggestion.contents = {"youtube_videos": [youtube_id]}
+                    suggestion.put()
+                    return 'success'
+                else:
+                    return 'suggestion_exists'
+            else:
+                return 'video_exists'
+        else:
+            return 'bad_url'
