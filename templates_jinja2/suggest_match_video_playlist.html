@@ -27,7 +27,7 @@
                 var li = $("<li>");
                 var group = $('<div>', {class: 'input-group'});
                 li.append(group);
-                group.append($("<a>", {href:"https://youtu.be/"+yt_id}).append($("<h4>"+video_data['snippet']['title']+"</h4>")));
+                group.append($("<a>", {href:"https://youtu.be/"+yt_id, target: "_blank"}).append($("<h4>"+video_data['snippet']['title']+"</h4>")));
 
                 var match_input = $("<span>");
                 match_input.append("Match ID: ");
