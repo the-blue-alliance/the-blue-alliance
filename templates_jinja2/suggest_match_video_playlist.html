@@ -4,7 +4,7 @@
 
 {% block meta_description %}Add match videos to The Blue Alliance.{% endblock %}
 
-{% block content %}
+{% block inline_javascript %}
 <script type="text/javascript">
     function load_playlist() {
         var playlist_url = $('#playlist_url').val();
@@ -42,7 +42,9 @@
         });
     }
 </script>
+{% endblock %}
 
+{% block content %}
 <div class="container">
   <div class="row">
     <div class="col-xs-12 col-lg-6 col-lg-offset-3">
