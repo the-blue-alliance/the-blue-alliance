@@ -56,6 +56,10 @@
         <a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23{{ event.hashtag }}" target="_blank" title="Search Flickr">Flickr</a>
       </p>
     </div>
+
+    <div class="col-sm-pull-8 pull-right">
+      <a class="btn btn-success" href="/suggest/event/video?event_key={{event.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add videos!</a>
+    </div>
   </div>
 
   {% if event.now %}
