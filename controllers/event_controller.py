@@ -94,7 +94,7 @@ class EventDetail(CacheableHandler):
     """
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
     SHORT_CACHE_EXPIRATION = 61
-    CACHE_VERSION = 4
+    CACHE_VERSION = 5
     CACHE_KEY_FORMAT = "event_detail_{}"  # (event_key)
 
     def __init__(self, *args, **kw):
