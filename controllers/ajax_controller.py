@@ -215,7 +215,7 @@ class YouTubePlaylistHandler(LoggedInHandler):
 
         video_ids = []
         headers = {}
-        yt_key = Sitevar.get_by_id("youtube_api_key")
+        yt_key = Sitevar.get_by_id("google.secrets")
         if not yt_key:
             self.response.set_status(500)
             return
@@ -227,7 +227,7 @@ class YouTubePlaylistHandler(LoggedInHandler):
 
         while True:
             try:
-                result = urlfetch.fetch(url.format(playlist_id, next_page_token, yt_key.contents),
+                result = urlfetch.fetch(url.format(playlist_id, next_page_token, yt_key.contents["api_key"]),
                                         headers=headers,
                                         deadline=5)
             except Exception, e:
