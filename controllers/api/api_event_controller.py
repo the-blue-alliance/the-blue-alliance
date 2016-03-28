@@ -160,7 +160,7 @@ class ApiEventAwardsController(ApiEventController):
 
 class ApiEventDistrictPointsController(ApiEventController):
     CACHE_KEY_FORMAT = "apiv2_event_district_points_controller_{}"  # (event_key)
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
