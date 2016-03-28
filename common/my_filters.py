@@ -15,3 +15,8 @@ def digits(value):
 @register.filter
 def mul(value, arg):
     return value * arg
+
+
+@register.filter
+def yt_start(value):
+    return value.replace("?t=", "?start=")

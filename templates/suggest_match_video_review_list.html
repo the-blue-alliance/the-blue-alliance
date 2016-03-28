@@ -32,8 +32,8 @@
                       <label class="checkbox text-danger" for="reject_{{suggestion.key.id}}"><input class="reject" type="checkbox" name="reject_keys[]" id="reject_{{suggestion.key.id}}" value="{{suggestion.key.id}}"> Reject</label>
                     </div>
                     <div class="col-xs-7 fitvids">
-                        <p><strong>{{ suggestion.target_key }}</strong></p>
-                        <iframe width="240" height="180" src="https://www.youtube.com/embed/{{suggestion.youtube_video}}?rel=0" frameborder="0" allowfullscreen></iframe>
+                        <p><a href="/match/{{ suggestion.target_key }}" target="_blank"><strong>{{ suggestion.target_key }}</strong></a></p>
+                        <iframe width="240" height="180" src="https://www.youtube.com/embed/{{suggestion.youtube_video|yt_start}}" frameborder="0" allowfullscreen></iframe>
                     </div>
                     <div class="col-xs-3">
                         <ul>
