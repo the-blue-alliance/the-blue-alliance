@@ -18,6 +18,9 @@ class SuggestMatchVideoReviewController(SuggestionsReviewBaseController):
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
             Suggestion.target_model == "match").fetch(limit=50)
 
+        # Roughly sort by event and match for easier review
+        suggestions = sorted(suggestions, key=lambda s: s.target_key)
+
         self.template_values.update({
             "suggestions": suggestions,
         })
