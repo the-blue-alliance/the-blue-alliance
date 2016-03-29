@@ -220,6 +220,8 @@ class Match(ndb.Model):
                     seconds = match['sec'] or 0
                     total_seconds = (int(hours) * 3600) + (int(minutes) * 60) + int(seconds)
                     video = '%s?start=%i' % (video_id, total_seconds)
+                elif '?t=' in video:
+                    video = video.replace('?t=', '?start=')
                 self._youtube_videos.append(video)
         return self._youtube_videos
 
