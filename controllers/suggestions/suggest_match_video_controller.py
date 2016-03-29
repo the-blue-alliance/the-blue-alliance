@@ -1,9 +1,9 @@
 import logging
 import os
-import re
 
 from controllers.base_controller import LoggedInHandler
 from helpers.suggestions.suggestion_creator import SuggestionCreator
+from helpers.youtube_video_helper import YouTubeVideoHelper
 from models.event import Event
 from models.match import Match
 from models.suggestion import Suggestion
@@ -43,15 +43,7 @@ class SuggestMatchVideoController(LoggedInHandler):
 
         match_key = self.request.get("match_key")
         youtube_url = self.request.get("youtube_url")
-
-        youtube_id = None
-        regex1 = re.match(r".*youtu\.be\/(.*)", youtube_url)
-        if regex1 is not None:
-            youtube_id = regex1.group(1)
-        else:
-            regex2 = re.match(r".*v=([a-zA-Z0-9_-]*)", youtube_url)
-            if regex2 is not None:
-                youtube_id = regex2.group(1)
+        youtube_id = YouTubeVideoHelper.parse_id_from_url(youtube_url)
 
         status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.user_bundle.account.key, youtube_id, match_key)
 
