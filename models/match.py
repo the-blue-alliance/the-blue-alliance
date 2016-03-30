@@ -210,7 +210,9 @@ class Match(ndb.Model):
         if self._youtube_videos is None:
             self._youtube_videos = []
             for video in self.youtube_videos:
-                if '#t=' in video:  # Old style-timetamp, convert it!
+                if '?t=' in video:  # Treat ?t= the same as #t=
+                    video = video.replace('?t=', '#t=')
+                if '#t=' in video:
                     sp = video.split('#t=')
                     video_id = sp[0]
                     old_ts = sp[1]
@@ -220,8 +222,6 @@ class Match(ndb.Model):
                     seconds = match['sec'] or 0
                     total_seconds = (int(hours) * 3600) + (int(minutes) * 60) + int(seconds)
                     video = '%s?start=%i' % (video_id, total_seconds)
-                elif '?t=' in video:
-                    video = video.replace('?t=', '?start=')
                 self._youtube_videos.append(video)
         return self._youtube_videos
 
