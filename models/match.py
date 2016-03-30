@@ -229,6 +229,7 @@ class Match(ndb.Model):
     def videos(self):
         videos = []
         for v in self.youtube_videos_formatted:
+            v = v.replace('?start=', '?t=')  # links must use ?t=
             videos.append({"type": "youtube", "key": v})
         if self.tba_video is not None:
             tba_path = self.tba_video.streamable_path
