@@ -24,6 +24,8 @@ class SuggestEventWebcastReviewController(SuggestionsReviewBaseController):
 
         suggestions_by_event_key = {}
         for suggestion in suggestions:
+            if 'webcast_dict' in suggestion.contents:
+                suggestion.webcast_template = 'webcast/{}.html'.format(suggestion.contents['webcast_dict']['type'])
             suggestions_by_event_key.setdefault(suggestion.target_key, []).append(suggestion)
 
         suggestion_sets = []
@@ -51,7 +53,8 @@ class SuggestEventWebcastReviewController(SuggestionsReviewBaseController):
                 webcast["file"] = self.request.get("webcast_file")
 
             event = Event.get_by_id(self.request.get("event_key"))
-            suggestion = Suggestion.get_by_id(int(self.request.get("suggestion_key")))
+            suggestion_key = self.request.get("suggestion_key")
+            suggestion = Suggestion.get_by_id(int(suggestion_key) if suggestion_key.isdigit() else suggestion_key)
 
             EventWebcastAdder.add_webcast(event, webcast)
             MemcacheWebcastFlusher.flush()
@@ -65,7 +68,8 @@ class SuggestEventWebcastReviewController(SuggestionsReviewBaseController):
             return
 
         elif self.request.get("verdict") == "reject":
-            suggestion = Suggestion.get_by_id(int(self.request.get("suggestion_key")))
+            suggestion_key = self.request.get("suggestion_key")
+            suggestion = Suggestion.get_by_id(int(suggestion_key) if suggestion_key.isdigit() else suggestion_key)
 
             suggestion.review_state = Suggestion.REVIEW_REJECTED
             suggestion.reviewer = self.user_bundle.account.key
@@ -78,7 +82,7 @@ class SuggestEventWebcastReviewController(SuggestionsReviewBaseController):
         elif self.request.get("verdict") == "reject_all":
             suggestion_keys = self.request.get("suggestion_keys").split(",")
 
-            suggestions = [Suggestion.get_by_id(int(suggestion_key)) for suggestion_key in suggestion_keys]
+            suggestions = [Suggestion.get_by_id(int(suggestion_key) if suggestion_key.isdigit() else suggestion_key) for suggestion_key in suggestion_keys]
 
             for suggestion in suggestions:
                 event_key = suggestion.target_key
@@ -90,8 +94,4 @@ class SuggestEventWebcastReviewController(SuggestionsReviewBaseController):
             self.redirect("/suggest/event/webcast/review?success=reject_all&event_key=%s" % event_key)
             return
 
-
         self.redirect("/suggest/event/webcast/review")
-
-
-

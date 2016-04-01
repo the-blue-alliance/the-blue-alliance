@@ -22,9 +22,12 @@ class CacheableHandler(webapp2.RequestHandler):
     def __init__(self, *args, **kw):
         super(CacheableHandler, self).__init__(*args, **kw)
         self._cache_expiration = 0
+        self._last_modified = None  # A datetime object
         if not hasattr(self, '_partial_cache_key'):
             self._partial_cache_key = self.CACHE_KEY_FORMAT
         self.template_values = {}
+        if self.response:
+            self.response.headers['Vary'] = 'Accept-Encoding'
 
     @property
     def cache_key(self):
@@ -43,27 +46,37 @@ class CacheableHandler(webapp2.RequestHandler):
 
     def get(self, *args, **kw):
         cached_response = self._read_cache()
-        if cached_response is True:
-            pass
-        elif cached_response is not None:
-            self.response.out.write(cached_response.body)
-            self.response.headers = cached_response.headers
-        else:
+
+        if cached_response is None:
             self._set_cache_header_length(self.CACHE_HEADER_LENGTH)
             self.template_values["cache_key"] = self.cache_key
             rendered = self._render(*args, **kw)
-            if rendered is not None:
+            if self._has_been_modified_since(self._last_modified):
                 self.response.out.write(rendered)
-            self._write_cache(self.response)
+                self._write_cache(self.response)
+                return
+            else:
+                return None
+        else:
+            self.response.headers.update(cached_response.headers)
+            del self.response.headers['Content-Length']  # Content-Length gets set automatically
+            if self._has_been_modified_since(self._last_modified):
+                self.response.out.write(cached_response.body)
+                return
+            else:
+                return None
 
     def _has_been_modified_since(self, datetime):
+        if datetime is None:
+            return True
+
         last_modified = format_date_time(mktime(datetime.timetuple()))
         if_modified_since = self.request.headers.get('If-Modified-Since')
+        self.response.headers['Last-Modified'] = last_modified
         if if_modified_since and if_modified_since == last_modified:
             self.response.set_status(304)
             return False
         else:
-            self.response.headers['Last-Modified'] = last_modified
             return True
 
     def memcacheFlush(self):
@@ -71,11 +84,17 @@ class CacheableHandler(webapp2.RequestHandler):
         return self.cache_key
 
     def _read_cache(self):
-        return memcache.get(self.cache_key)
+        result = memcache.get(self.cache_key)
+        if result is None:
+            return None
+        else:
+            response, last_modified = result
+            self._last_modified = last_modified
+            return response
 
     def _write_cache(self, response):
         if tba_config.CONFIG["memcache"]:
-            memcache.set(self.cache_key, response, self._cache_expiration)
+            memcache.set(self.cache_key, (response, self._last_modified), self._cache_expiration)
 
     @classmethod
     def delete_cache_multi(cls, cache_keys):
@@ -108,6 +127,7 @@ class LoggedInHandler(webapp2.RequestHandler):
         self.response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         self.response.headers['Pragma'] = 'no-cache'
         self.response.headers['Expires'] = '0'
+        self.response.headers['Vary'] = 'Accept-Encoding'
 
     def _require_admin(self):
         self._require_login()

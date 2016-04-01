@@ -21,6 +21,8 @@ class FMSAPIAwardsParser(object):
                 continue
 
             award_type_enum = AwardHelper.parse_award_type(award['name'])
+            if award_type_enum is None:
+                continue
 
             recipient_json = json.dumps({
                 'team_number': team_number,

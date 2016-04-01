@@ -2,7 +2,6 @@ import datetime
 import os
 
 from google.appengine.ext import ndb
-from google.appengine.ext.webapp import template
 
 from consts.district_type import DistrictType
 from database import award_query, event_query, match_query, media_query, team_query
@@ -105,6 +104,7 @@ class TeamRenderer(object):
 
         medias_by_slugname = MediaHelper.group_by_slugname([media for media in media_future.get_result()])
         image_medias = MediaHelper.get_images([media for media in media_future.get_result()])
+        preferred_image_medias = filter(lambda x: team.key in x.preferred_references, image_medias)
 
         district_name = None
         district_abbrev = None
@@ -128,6 +128,7 @@ class TeamRenderer(object):
             "matches_upcoming": matches_upcoming,
             "medias_by_slugname": medias_by_slugname,
             "image_medias": image_medias,
+            "preferred_image_medias": preferred_image_medias,
             "robot": robot_future.get_result(),
             "district_name": district_name,
             "district_abbrev": district_abbrev,
@@ -184,5 +185,4 @@ class TeamRenderer(object):
         if short_cache:
             handler._cache_expiration = handler.SHORT_CACHE_EXPIRATION
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/team_history.html')
-        return template.render(path, handler.template_values)
+        return jinja2_engine.render('team_history.html', handler.template_values)

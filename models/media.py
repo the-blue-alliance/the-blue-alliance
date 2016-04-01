@@ -27,6 +27,8 @@ class Media(ndb.Model):
         'team': Team
     }
 
+    MAX_PREFERRED = 3  # Loosely enforced. Not a big deal.
+
     # media_type and foreign_key make up the key_name
     media_type_enum = ndb.IntegerProperty(required=True)
     foreign_key = ndb.StringProperty(required=True)  # Unique id for the particular media type. Ex: the Youtube Video key at the end of a YouTube url
@@ -35,6 +37,7 @@ class Media(ndb.Model):
     private_details_json = ndb.StringProperty()  # Additional properties we don't want to expose via API
     year = ndb.IntegerProperty()  # None if year is not relevant
     references = ndb.KeyProperty(repeated=True)  # Other models that are linked to this object
+    preferred_references = ndb.KeyProperty(repeated=True)  # Other models for which this media is "Preferred". All preferred_references MUST also be in references
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
@@ -44,10 +47,12 @@ class Media(ndb.Model):
         # keys must be model properties
         self._affected_references = {
             'references': set(),
+            'preferred_references': set(),
             'year': set(),
         }
         self._details = None
         self._private_details = None
+        self._updated_attrs = []  # Used in MediaManipulator to track what changed
         super(Media, self).__init__(*args, **kw)
 
     @property
@@ -88,6 +93,10 @@ class Media(ndb.Model):
         return self.cdphotothread_image_url.replace('_l', '_m')
 
     @property
+    def cdphotothread_image_url_sm(self):
+        return self.cdphotothread_image_url.replace('_l', '_s')
+
+    @property
     def cdphotothread_thread_url(self):
         return 'http://www.chiefdelphi.com/media/photos/{}'.format(self.foreign_key)
 
@@ -104,6 +113,14 @@ class Media(ndb.Model):
         return 'https://i.imgur.com/{}h.jpg'.format(self.foreign_key)
 
     @property
+    def imgur_direct_url_med(self):
+        return 'https://i.imgur.com/{}m.jpg'.format(self.foreign_key)
+
+    @property
+    def imgur_direct_url_sm(self):
+        return 'https://i.imgur.com/{}s.jpg'.format(self.foreign_key)
+
+    @property
     def view_image_url(self):
         if self.media_type_enum == MediaType.CD_PHOTO_THREAD:
             return self.cdphotothread_image_url
@@ -114,6 +131,7 @@ class Media(ndb.Model):
 
     @property
     def image_direct_url(self):
+        # Largest image that isn't max resolution (which can be arbitrarily huge)
         if self.media_type_enum == MediaType.CD_PHOTO_THREAD:
             return self.cdphotothread_image_url_med
         elif self.media_type_enum == MediaType.IMGUR:
@@ -130,3 +148,21 @@ class Media(ndb.Model):
     @property
     def type_name(self):
         return MediaType.type_names[self.media_type_enum]
+
+    @property
+    def image_direct_url_med(self):
+        if self.media_type_enum == MediaType.CD_PHOTO_THREAD:
+            return self.cdphotothread_image_url_med
+        elif self.media_type_enum == MediaType.IMGUR:
+            return self.imgur_direct_url_med
+        else:
+            return ""
+
+    @property
+    def image_direct_url_sm(self):
+        if self.media_type_enum == MediaType.CD_PHOTO_THREAD:
+            return self.cdphotothread_image_url_sm
+        elif self.media_type_enum == MediaType.IMGUR:
+            return self.imgur_direct_url_sm
+        else:
+            return ""

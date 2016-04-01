@@ -1,3 +1,4 @@
+import logging
 import os
 import urllib2
 import json
@@ -5,6 +6,7 @@ import time
 
 from base_controller import CacheableHandler, LoggedInHandler
 from google.appengine.api import memcache
+from google.appengine.api import urlfetch
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 from helpers.model_to_dict import ModelToDict
@@ -117,7 +119,7 @@ class TypeaheadHandler(CacheableHandler):
     Tried a trie but the datastructure was too big to
     fit into memcache efficiently
     """
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "typeahead_entries:{}"  # (search_key)
     CACHE_HEADER_LENGTH = 60 * 60 * 24
 
@@ -137,10 +139,8 @@ class TypeaheadHandler(CacheableHandler):
         if entry is None:
             return '[]'
         else:
-            if self._has_been_modified_since(entry.updated):
-                return entry.data_json
-            else:
-                return None
+            self._last_modified = entry.updated
+            return entry.data_json
 
 
 class WebcastHandler(CacheableHandler):
@@ -194,6 +194,55 @@ class WebcastHandler(CacheableHandler):
         return template.render(path, template_values)
 
     def memcacheFlush(self, event_key):
-        keys = [self.CACHE_KEY_FORMAT.format(event_key, n) for n in range(10)]
+        keys = [self._render_cache_key(self.CACHE_KEY_FORMAT.format(event_key, n)) for n in range(10)]
         memcache.delete_multi(keys)
         return keys
+
+
+class YouTubePlaylistHandler(LoggedInHandler):
+    """
+    For Hitting the YouTube API to get a list of video keys associated with a playlist
+    """
+    def get(self):
+        if not self.user_bundle.user:
+            self.response.set_status(401)
+            return
+
+        playlist_id = self.request.get("playlist_id")
+        if not playlist_id:
+            self.response.set_status(400)
+            return
+
+        video_ids = []
+        headers = {}
+        yt_key = Sitevar.get_by_id("google.secrets")
+        if not yt_key:
+            self.response.set_status(500)
+            return
+
+        next_page_token = ""
+
+        # format with playlist id, page token, api key
+        url = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId={}&&pageToken={}&fields=items%2Fsnippet%2FresourceId%2Citems%2Fsnippet%2Ftitle%2CnextPageToken&key={}"
+
+        while True:
+            try:
+                result = urlfetch.fetch(url.format(playlist_id, next_page_token, yt_key.contents["api_key"]),
+                                        headers=headers,
+                                        deadline=5)
+            except Exception, e:
+                self.response.set_status(500)
+                return []
+
+            if result.status_code != 200:
+                self.response.set_status(result.status_code)
+                return []
+
+            video_result = json.loads(result.content)
+            video_ids += [video for video in video_result["items"] if video["snippet"]["resourceId"]["kind"] == "youtube#video"]
+
+            if "nextPageToken" not in video_result:
+                break
+            next_page_token = video_result["nextPageToken"]
+
+        self.response.out.write(json.dumps(video_ids))

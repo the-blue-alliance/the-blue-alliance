@@ -18,6 +18,9 @@ class SuggestMatchVideoReviewController(SuggestionsReviewBaseController):
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
             Suggestion.target_model == "match").fetch(limit=50)
 
+        # Roughly sort by event and match for easier review
+        suggestions = sorted(suggestions, key=lambda s: s.target_key)
+
         self.template_values.update({
             "suggestions": suggestions,
         })
@@ -26,8 +29,8 @@ class SuggestMatchVideoReviewController(SuggestionsReviewBaseController):
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self):
-        accept_keys = map(int, self.request.POST.getall("accept_keys[]"))
-        reject_keys = map(int, self.request.POST.getall("reject_keys[]"))
+        accept_keys = map(lambda x: int(x) if x.isdigit() else x, self.request.POST.getall("accept_keys[]"))
+        reject_keys = map(lambda x: int(x) if x.isdigit() else x, self.request.POST.getall("reject_keys[]"))
 
         accepted_suggestion_futures = [Suggestion.get_by_id_async(key) for key in accept_keys]
         rejected_suggestion_futures = [Suggestion.get_by_id_async(key) for key in reject_keys]

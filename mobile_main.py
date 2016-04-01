@@ -13,6 +13,7 @@ from consts.client_type import ClientType
 from helpers.media_helper import MediaParser
 from helpers.push_helper import PushHelper
 from helpers.mytba_helper import MyTBAHelper
+from helpers.suggestions.suggestion_creator import SuggestionCreator
 from models.account import Account
 from models.favorite import Favorite
 from models.media import Media
@@ -243,33 +244,24 @@ class MobileAPI(remote.Service):
             # Trying to suggest a media for an invalid model type
             return BaseResponse(code=400, message="Bad model type")
 
-        media_dict = MediaParser.partial_media_dict_from_url(request.media_url.strip())
-        if media_dict is not None:
-            existing_media = Media.get_by_id(
-                    Media.render_key_name(media_dict['media_type_enum'], media_dict['foreign_key']))
-            if existing_media is None \
-                    or request.reference_key not in [reference.id() for reference in existing_media.references]:
-                media_dict['year'] = request.year
-                media_dict['reference_type'] = request.reference_type
-                media_dict['reference_key'] = request.reference_key
+        # Need to split deletehash out into its own private dict. Don't want that to be exposed via API...
+        private_details_json = None
+        if request.details_json:
+            incoming_details = json.loads(request.details_json)
+            private_details = None
+            if 'deletehash' in incoming_details:
+                private_details = {'deletehash': incoming_details.pop('deletehash')}
+            private_details_json = json.dumps(private_details) if private_details else None
 
-                # Need to split deletehash out into its own private dict. Don't want that to be exposed via API...
-                if request.details_json:
-                    incoming_details = json.loads(request.details_json)
-                    private_details = None
-                    if 'deletehash' in incoming_details:
-                        private_details = {'deletehash': incoming_details.pop('deletehash')}
+        status = SuggestionCreator.createTeamMediaSuggestion(
+            author_account_key=ndb.Key(Account, user_id),
+            media_url=request.media_url,
+            team_key=request.reference_key,
+            year_str=str(request.year),
+            private_details_json=private_details_json)
 
-                    media_dict['private_details_json'] = json.dumps(private_details) if private_details else None
-                    media_dict['details_json'] = json.dumps(incoming_details)
-
-                suggestion = Suggestion(
-                    author=ndb.Key(Account, user_id),
-                    target_model="media"
-                )
-                suggestion.contents = media_dict
-                suggestion.put()
-
+        if status != 'bad_url':
+            if status == 'success':
                 return BaseResponse(code=200, message="Suggestion added")
             else:
                 return BaseResponse(code=304, message="Suggestion already exists")

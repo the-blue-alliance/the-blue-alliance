@@ -8,6 +8,9 @@ MAX_YEAR = 2016
 # Fraction of requests to profile
 RECORD_FRACTION = 0.1
 
+# Fraction of requests to send to Google Analytics
+GA_RECORD_FRACTION = 1.0
+
 # For choosing what the main landing page displays
 KICKOFF = 1
 BUILDSEASON = 2

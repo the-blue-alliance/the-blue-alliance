@@ -126,17 +126,19 @@ class Match(ndb.Model):
     @property
     def winning_alliance(self):
         from helpers.event_helper import EventHelper
+        from helpers.match_helper import MatchHelper
         if self._winning_alliance is None:
             if EventHelper.is_2015_playoff(self.event_key_name) and self.comp_level != 'f':
                 return ''  # report all 2015 non finals matches as ties
 
-            highest_score = 0
-            for alliance in self.alliances:
-                if int(self.alliances[alliance]["score"]) > highest_score:
-                    highest_score = int(self.alliances[alliance]["score"])
-                    self._winning_alliance = alliance
-                elif int(self.alliances[alliance]["score"]) == highest_score:
-                    self._winning_alliance = ""
+            red_score = int(self.alliances['red']['score'])
+            blue_score = int(self.alliances['blue']['score'])
+            if red_score > blue_score:
+                self._winning_alliance = 'red'
+            elif blue_score > red_score:
+                self._winning_alliance = 'blue'
+            else:  # tie
+                self._winning_alliance = MatchHelper.tiebreak_winner(self)
         return self._winning_alliance
 
     @property
@@ -208,7 +210,9 @@ class Match(ndb.Model):
         if self._youtube_videos is None:
             self._youtube_videos = []
             for video in self.youtube_videos:
-                if '#t=' in video:  # Old style-timetamp, convert it!
+                if '?t=' in video:  # Treat ?t= the same as #t=
+                    video = video.replace('?t=', '#t=')
+                if '#t=' in video:
                     sp = video.split('#t=')
                     video_id = sp[0]
                     old_ts = sp[1]
@@ -225,6 +229,7 @@ class Match(ndb.Model):
     def videos(self):
         videos = []
         for v in self.youtube_videos_formatted:
+            v = v.replace('?start=', '?t=')  # links must use ?t=
             videos.append({"type": "youtube", "key": v})
         if self.tba_video is not None:
             tba_path = self.tba_video.streamable_path

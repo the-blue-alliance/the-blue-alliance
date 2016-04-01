@@ -23,6 +23,7 @@ class DistrictHelper(object):
     Point calculations based on:
     2014: http://www.usfirst.org/sites/default/files/uploadedFiles/Robotics_Programs/FRC/Resources/FRC_District_Standard_Points_Ranking_System.pdf
     2015: http://www.usfirst.org/sites/default/files/uploadedFiles/Robotics_Programs/FRC/Game_and_Season__Info/2015/FRC_District_Standard_Points_Ranking_System_2015%20Summary.pdf
+    2016: https://firstfrc.blob.core.windows.net/frc2016manuals/AdminManual/FRC-2016-admin-manual.pdf
     """
     @classmethod
     def inverf(cls, x):
@@ -169,13 +170,88 @@ class DistrictHelper(object):
         return team_totals
 
     @classmethod
+    def calc_elim_match_points(cls, district_points, matches, POINTS_MULTIPLIER):
+        elim_num_wins = defaultdict(lambda: defaultdict(int))
+        elim_alliances = defaultdict(lambda: defaultdict(list))
+        for match in matches:
+            if not match.has_been_played or match.winning_alliance == '':
+                # Skip unplayed matches
+                continue
+
+            match_set_key = '{}_{}{}'.format(match.event.id(), match.comp_level, match.set_number)
+            elim_num_wins[match_set_key][match.winning_alliance] += 1
+            elim_alliances[match_set_key][match.winning_alliance] += match.alliances[match.winning_alliance]['teams']
+
+            # Add in points for elim match wins. Probably doesn't account for backup bots well
+            # 2016-03-07: Maybe this does work for backup bots? -Eugene
+            if elim_num_wins[match_set_key][match.winning_alliance] >= 2:
+                for team in elim_alliances[match_set_key][match.winning_alliance]:
+                    point_value = 0
+                    if match.comp_level == 'qf':
+                        point_value = DistrictPointValues.QF_WIN.get(match.year, DistrictPointValues.QF_WIN_DEFAULT) * POINTS_MULTIPLIER
+                    elif match.comp_level == 'sf':
+                        point_value = DistrictPointValues.SF_WIN.get(match.year, DistrictPointValues.SF_WIN_DEFAULT) * POINTS_MULTIPLIER
+                    elif match.comp_level == 'f':
+                        point_value = DistrictPointValues.F_WIN.get(match.year, DistrictPointValues.F_WIN_DEFAULT) * POINTS_MULTIPLIER
+                    district_points['points'][team]['elim_points'] += point_value
+
+    @classmethod
+    def calc_elim_match_points_2015(cls, district_points, matches, POINTS_MULTIPLIER):
+        from helpers.match_helper import MatchHelper  # circular import issue
+
+        # count number of matches played per team per comp level
+        num_played = defaultdict(lambda: defaultdict(int))
+        for level in ['qf', 'sf']:
+            for match in matches[level]:
+                if not match.has_been_played:
+                    continue
+                for color in ['red', 'blue']:
+                    for team in match.alliances[color]['teams']:
+                        num_played[level][team] += 1
+
+        # qf and sf points
+        advancement = MatchHelper.generatePlayoffAdvancement2015(matches)
+        for last_level, level in [('qf', 'sf'), ('sf', 'f')]:
+            for (teams, _, _) in advancement[last_level]:
+                teams = ['frc{}'.format(t) for t in teams]
+                done = False
+                for match in matches[level]:
+                    for color in ['red', 'blue']:
+                        if set(teams).intersection(set(match.alliances[color]['teams'])) != set():
+                            for team in teams:
+                                points = DistrictPointValues.QF_WIN.get(match.year, DistrictPointValues.QF_WIN_DEFAULT) if last_level == 'qf' else DistrictPointValues.SF_WIN.get(match.year, DistrictPointValues.SF_WIN_DEFAULT)
+                                district_points['points'][team]['elim_points'] += int(
+                                    np.ceil(points * num_played[last_level][team])) * POINTS_MULTIPLIER
+                            done = True
+                            break
+                        if done:
+                            break
+                    if done:
+                        break
+
+        # final points
+        num_wins = {'red': 0, 'blue': 0}
+        team_matches_played = {'red': [], 'blue': []}
+        for match in matches['f']:
+            if not match.has_been_played or match.winning_alliance == '':
+                continue
+
+            num_wins[match.winning_alliance] += 1
+            for team in match.alliances[match.winning_alliance]['teams']:
+                team_matches_played[match.winning_alliance].append(team)
+
+            if num_wins[match.winning_alliance] >= 2:
+                points = DistrictPointValues.F_WIN.get(match.year, DistrictPointValues.F_WIN_DEFAULT)
+                for team in team_matches_played[match.winning_alliance]:
+                    district_points['points'][team]['elim_points'] += points * POINTS_MULTIPLIER
+
+    @classmethod
     def calc_wlt_based_match_points(cls, district_points, match_futures, POINTS_MULTIPLIER):
         """
         Calculates match district points based on team record (wins, losses, ties)
         This algorithm was used prior to the 2015 season
         """
-        elim_num_wins = defaultdict(lambda: defaultdict(int))
-        elim_alliances = defaultdict(lambda: defaultdict(list))
+        elim_matches = []
         for match_future in match_futures:
             match = match_future.get_result()
             if not match.has_been_played:
@@ -195,25 +271,8 @@ class DistrictHelper(object):
                         score = match.alliances[color]['score']
                         district_points['tiebreakers'][team]['highest_qual_scores'] = heapq.nlargest(3, district_points['tiebreakers'][team]['highest_qual_scores'] + [score])
             else:  # Elim match points
-                if match.winning_alliance == '':
-                    # Skip unplayed matches
-                    continue
-
-                match_set_key = '{}_{}{}'.format(match.event.id(), match.comp_level, match.set_number)
-                elim_num_wins[match_set_key][match.winning_alliance] += 1
-                elim_alliances[match_set_key][match.winning_alliance] += match.alliances[match.winning_alliance]['teams']
-
-                # Add in points for elim match wins. Probably doesn't account for backup bots well
-                if elim_num_wins[match_set_key][match.winning_alliance] >= 2:
-                    for team in elim_alliances[match_set_key][match.winning_alliance]:
-                        point_value = 0
-                        if match.comp_level == 'qf':
-                            point_value = DistrictPointValues.QF_WIN.get(match.year, DistrictPointValues.QF_WIN_DEFAULT) * POINTS_MULTIPLIER
-                        elif match.comp_level == 'sf':
-                            point_value = DistrictPointValues.SF_WIN.get(match.year, DistrictPointValues.SF_WIN_DEFAULT) * POINTS_MULTIPLIER
-                        elif match.comp_level == 'f':
-                            point_value = DistrictPointValues.F_WIN.get(match.year, DistrictPointValues.F_WIN_DEFAULT) * POINTS_MULTIPLIER
-                        district_points['points'][team]['elim_points'] += point_value
+                elim_matches.append(match)
+        cls.calc_elim_match_points(district_points, elim_matches, POINTS_MULTIPLIER)
 
     @classmethod
     def calc_rank_based_match_points(cls, event, district_points, match_futures, POINTS_MULTIPLIER):
@@ -250,48 +309,8 @@ class DistrictHelper(object):
                         'tiebreakers'][team]['highest_qual_scores'] + [score])
 
         # elim match point calculations
-        # count number of matches played per team per comp level
-        num_played = defaultdict(lambda: defaultdict(int))
-        for level in ['qf', 'sf']:
-            for match in matches[level]:
-                if not match.has_been_played:
-                    continue
-                for color in ['red', 'blue']:
-                    for team in match.alliances[color]['teams']:
-                        num_played[level][team] += 1
-
-        # qf and sf points
-        advancement = MatchHelper.generatePlayoffAdvancement2015(matches)
-        for last_level, level in [('qf', 'sf'), ('sf', 'f')]:
-            for (teams, _, _) in advancement[last_level]:
-                teams = ['frc{}'.format(t) for t in teams]
-                done = False
-                for match in matches[level]:
-                    for color in ['red', 'blue']:
-                        if set(teams).intersection(set(match.alliances[color]['teams'])) != set():
-                            for team in teams:
-                                points = DistrictPointValues.QF_WIN.get(event.year, DistrictPointValues.QF_WIN_DEFAULT) if last_level == 'qf' else DistrictPointValues.SF_WIN.get(event.year, DistrictPointValues.SF_WIN_DEFAULT)
-                                district_points['points'][team]['elim_points'] += int(
-                                    np.ceil(points * num_played[last_level][team])) * POINTS_MULTIPLIER
-                            done = True
-                            break
-                        if done:
-                            break
-                    if done:
-                        break
-
-        # final points
-        num_wins = {'red': 0, 'blue': 0}
-        team_matches_played = {'red': [], 'blue': []}
-        for match in matches['f']:
-            if not match.has_been_played or match.winning_alliance == '':
-                continue
-
-            num_wins[match.winning_alliance] += 1
-            for team in match.alliances[match.winning_alliance]['teams']:
-                team_matches_played[match.winning_alliance].append(team)
-
-            if num_wins[match.winning_alliance] >= 2:
-                points = DistrictPointValues.F_WIN.get(event.year, DistrictPointValues.F_WIN_DEFAULT)
-                for team in team_matches_played[match.winning_alliance]:
-                    district_points['points'][team]['elim_points'] += points * POINTS_MULTIPLIER
+        if event.year == 2015:
+            cls.calc_elim_match_points_2015(district_points, matches, POINTS_MULTIPLIER)
+        else:
+            elim_matches = matches.get('qf', []) + matches.get('sf', []) + matches.get('f', [])
+            cls.calc_elim_match_points(district_points, elim_matches, POINTS_MULTIPLIER)

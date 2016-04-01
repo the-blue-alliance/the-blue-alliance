@@ -49,3 +49,23 @@ class Suggestion(ndb.Model):
     def youtube_video(self):
         if "youtube_videos" in self.contents:
             return self.contents["youtube_videos"][0]
+
+    @classmethod
+    def render_media_key_name(cls, year, target_model, target_key, foreign_type, foreign_key):
+        """
+        Keys aren't required for this model. This is only necessary if checking
+        for duplicate suggestions is desired.
+        """
+        return 'media_{}_{}_{}_{}_{}'.format(year, target_model, target_key, foreign_type, foreign_key)
+
+    @classmethod
+    def render_webcast_key_name(cls, event_key, webcast_dict):
+        """
+        Keys aren't required for this model. This is only necessary if checking
+        for duplicate suggestions is desired.
+        """
+        return 'webcast_{}_{}_{}_{}'.format(
+            event_key,
+            webcast_dict.get('type', None),
+            webcast_dict.get('channel', None),
+            webcast_dict.get('file', None))

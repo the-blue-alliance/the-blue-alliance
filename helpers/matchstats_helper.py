@@ -43,7 +43,8 @@ class MatchstatsHelper(object):
 
         # Solving M*x = s for x
         try:
-            x = np.linalg.solve(M, s)
+            # x = np.linalg.solve(M, s)
+            x = np.dot(np.linalg.pinv(M), s)  # Similar to above, but more numerically stable
         except (np.linalg.LinAlgError, ValueError):
             return {}
 

@@ -1,4 +1,5 @@
 import logging
+import copy
 import datetime
 import pytz
 import re
@@ -141,7 +142,7 @@ class MatchHelper(object):
                         'blue_wins': 0,
                     }
                 for color in ['red', 'blue']:
-                    alliance = match.alliances[color]['teams']
+                    alliance = copy.copy(match.alliances[color]['teams'])
                     for i, complete_alliance in enumerate(complete_alliances):  # search for alliance. could be more efficient
                         if len(set(alliance).intersection(set(complete_alliance))) >= 2:  # if >= 2 teams are the same, then the alliance is the same
                             backups = list(set(alliance).difference(set(complete_alliance)))
@@ -244,3 +245,73 @@ class MatchHelper(object):
             return True
         else:
             return valid_breakdowns
+
+    @classmethod
+    def tiebreak_winner(cls, match):
+        """
+        Compute elim winner using tiebreakers
+        """
+        if match.comp_level not in match.ELIM_LEVELS or not match.score_breakdown or \
+                'red' not in match.score_breakdown or 'blue' not in match.score_breakdown:
+            return ''
+
+        red_breakdown = match.score_breakdown['red']
+        blue_breakdown = match.score_breakdown['blue']
+        tiebreakers = []  # Tuples of (red_tiebreaker, blue_tiebreaker) or None. Higher value wins.
+        if match.year == 2016:
+            # Greater number of FOUL points awarded (i.e. the ALLIANCE that played the cleaner MATCH)
+            if 'foulPoints' in red_breakdown and 'foulPoints' in blue_breakdown:
+                tiebreakers.append((red_breakdown['foulPoints'], blue_breakdown['foulPoints']))
+            else:
+                tiebreakers.append(None)
+
+            # Cumulative sum of BREACH and CAPTURE points
+            if 'breachPoints' in red_breakdown and 'breachPoints' in blue_breakdown and \
+                    'capturePoints' in red_breakdown and 'capturePoints' in blue_breakdown:
+                red_breach_capture = red_breakdown['breachPoints'] + red_breakdown['capturePoints']
+                blue_breach_capture = blue_breakdown['breachPoints'] + blue_breakdown['capturePoints']
+                tiebreakers.append((red_breach_capture, blue_breach_capture))
+            else:
+                tiebreakers.append(None)
+
+            # Cumulative sum of scored AUTO points
+            if 'autoPoints' in red_breakdown and 'autoPoints' in blue_breakdown:
+                tiebreakers.append((red_breakdown['autoPoints'], blue_breakdown['autoPoints']))
+            else:
+                tiebreakers.append(None)
+
+            # Cumulative sum of scored SCALE and CHALLENGE points
+            if 'teleopScalePoints' in red_breakdown and 'teleopScalePoints' in blue_breakdown and \
+                    'teleopChallengePoints' in red_breakdown and 'teleopChallengePoints' in blue_breakdown:
+                red_scale_challenge = red_breakdown['teleopScalePoints'] + red_breakdown['teleopChallengePoints']
+                blue_scale_challenge = blue_breakdown['teleopScalePoints'] + blue_breakdown['teleopChallengePoints']
+                tiebreakers.append((red_scale_challenge, blue_scale_challenge))
+            else:
+                tiebreakers.append(None)
+
+            # Cumulative sum of scored TOWER GOAL points (High and Low goals from AUTO and TELEOP)
+            if 'autoBoulderPoints' in red_breakdown and 'autoBoulderPoints' in blue_breakdown and \
+                    'teleopBoulderPoints' in red_breakdown and 'teleopBoulderPoints' in blue_breakdown:
+                red_boulder = red_breakdown['autoBoulderPoints'] + red_breakdown['teleopBoulderPoints']
+                blue_boulder = blue_breakdown['autoBoulderPoints'] + blue_breakdown['teleopBoulderPoints']
+                tiebreakers.append((red_boulder, blue_boulder))
+            else:
+                tiebreakers.append(None)
+
+            # Cumulative sum of CROSSED UNDAMAGED DEFENSE points (AUTO and TELEOP)
+            if 'autoCrossingPoints' in red_breakdown and 'autoCrossingPoints' in blue_breakdown and \
+                    'teleopCrossingPoints' in red_breakdown and 'teleopCrossingPoints' in blue_breakdown:
+                red_crossing = red_breakdown['autoCrossingPoints'] + red_breakdown['teleopCrossingPoints']
+                blue_crossing = blue_breakdown['autoCrossingPoints'] + blue_breakdown['teleopCrossingPoints']
+                tiebreakers.append((red_crossing, blue_crossing))
+            else:
+                tiebreakers.append(None)
+
+        for tiebreaker in tiebreakers:
+            if tiebreaker is None:
+                return ''
+            elif tiebreaker[0] > tiebreaker[1]:
+                return 'red'
+            elif tiebreaker[1] > tiebreaker[0]:
+                return 'blue'
+        return ''

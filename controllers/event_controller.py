@@ -1,3 +1,4 @@
+from collections import defaultdict
 import datetime
 import os
 import tba_config
@@ -8,12 +9,13 @@ from google.appengine.ext.webapp import template
 
 from base_controller import CacheableHandler
 from consts.district_type import DistrictType
-from database import event_query
+from database import event_query, media_query
 from helpers.match_helper import MatchHelper
 from helpers.award_helper import AwardHelper
 from helpers.team_helper import TeamHelper
 from helpers.event_helper import EventHelper
 from helpers.event_insights_helper import EventInsightsHelper
+from helpers.media_helper import MediaHelper
 
 from models.event import Event
 from template_engine import jinja2_engine
@@ -91,8 +93,8 @@ class EventDetail(CacheableHandler):
     event_code like "2010ct"
     """
     LONG_CACHE_EXPIRATION = 60 * 60 * 24
-    SHORT_CACHE_EXPIRATION = 60 * 5
-    CACHE_VERSION = 4
+    SHORT_CACHE_EXPIRATION = 61
+    CACHE_VERSION = 5
     CACHE_KEY_FORMAT = "event_detail_{}"  # (event_key)
 
     def __init__(self, *args, **kw):
@@ -113,17 +115,28 @@ class EventDetail(CacheableHandler):
             self.abort(404)
 
         event.prepAwardsMatchesTeams()
+        medias_future = media_query.EventTeamsPreferredMediasQuery(event_key).fetch_async()
 
         awards = AwardHelper.organizeAwards(event.awards)
         cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
         matches = MatchHelper.organizeMatches(cleaned_matches)
         teams = TeamHelper.sortTeams(event.teams)
 
-        num_teams = len(teams)
+        # Organize medias by team
+        image_medias = MediaHelper.get_images([media for media in medias_future.get_result()])
+        team_medias = defaultdict(list)
+        for image_media in image_medias:
+            for reference in image_media.references:
+                team_medias[reference].append(image_media)
+        team_and_medias = []
+        for team in teams:
+            team_and_medias.append((team, team_medias.get(team.key, [])))
+
+        num_teams = len(team_and_medias)
         middle_value = num_teams / 2
         if num_teams % 2 != 0:
             middle_value += 1
-        teams_a, teams_b = teams[:middle_value], teams[middle_value:]
+        teams_a, teams_b = team_and_medias[:middle_value], team_and_medias[middle_value:]
 
         oprs = [i for i in event.matchstats['oprs'].items()] if (event.matchstats is not None and 'oprs' in event.matchstats) else []
         oprs = sorted(oprs, key=lambda t: t[1], reverse=True)  # sort by OPR
@@ -151,9 +164,14 @@ class EventDetail(CacheableHandler):
             district_points_sorted = sorted(event.district_points['points'].items(), key=lambda (team, points): -points['total'])
 
         event_insights = EventInsightsHelper.calculate_event_insights(cleaned_matches, event.year)
+        event_insights_template = None
+        if event_insights:
+            event_insights_template = 'event_partials/event_insights_{}.html'.format(event.year)
 
         self.template_values.update({
             "event": event,
+            "district_name": DistrictType.type_names.get(event.event_district_enum, None),
+            "district_abbrev": DistrictType.type_abbrevs.get(event.event_district_enum, None),
             "matches": matches,
             "matches_recent": matches_recent,
             "matches_upcoming": matches_upcoming,
@@ -166,7 +184,9 @@ class EventDetail(CacheableHandler):
             "playoff_advancement": playoff_advancement,
             "district_points_sorted": district_points_sorted,
             "is_2015_playoff": is_2015_playoff,
-            "event_insights": event_insights
+            "event_insights_qual": event_insights['qual'] if event_insights else None,
+            "event_insights_playoff": event_insights['playoff'] if event_insights else None,
+            "event_insights_template": event_insights_template,
         })
 
         if event.within_a_day:

@@ -1,7 +1,6 @@
 import os
 
 from google.appengine.ext import ndb
-from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
 
@@ -10,6 +9,8 @@ from helpers.suggestions.suggestion_creator import SuggestionCreator
 
 from models.media import Media
 from models.team import Team
+
+from template_engine import jinja2_engine
 
 
 class SuggestTeamMediaController(LoggedInHandler):
@@ -43,8 +44,7 @@ class SuggestTeamMediaController(LoggedInHandler):
             "social_medias": social_medias,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/suggest_team_media.html')
-        self.response.out.write(template.render(path, self.template_values))
+        self.response.out.write(jinja2_engine.render('suggest_team_media.html', self.template_values))
 
     def post(self):
         self._require_login()
