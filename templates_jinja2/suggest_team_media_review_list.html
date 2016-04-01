@@ -91,8 +91,22 @@
                           <img class="img-thumbnail" src="http://i.imgur.com/{{suggestion.contents.foreign_key}}m.jpg" style="max-height: 200px;">
                         </a>
                       {% endif %}
-                      {% if suggestion.contents.is_social %}
+                      {% if suggestion.contents.media_type_enum == 3 %}
+                        <!-- Facebook profile -->
+                        <div class="fb-page" data-href="https://www.facebook.com/{{ suggestion.contents.foreign_key }}" data-hide-cover="false" data-show-facepile="false" data-show-posts="false" data-width="500"></div>
+                      {% endif %}
+                      {% if suggestion.contents.media_type_enum == 4 %}
+                        <!-- Twitter profile -->
+                        <a class="twitter-timeline"  href="https://twitter.com/{{ suggestion.contents.foreign_key }}" data-widget-id="715993204777172992" data-screen-name="{{ suggestion.contents.foreign_key }}">Tweets by @{{ suggestion.contents.foreign_key }}</a>
+                        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                      {% endif %}
+                      {% if suggestion.contents.media_type_enum == 5 %}
+                        <!-- YouTube profile -->
                         {{ suggestion.contents.site_name }}: <a href="{{ suggestion.contents.profile_url }}">{{ suggestion.contents.foreign_key }}</a>
+                      {% endif %}
+                      {% if suggestion.contents.media_type_enum == 6 %}
+                        <!-- GitHub profile -->
+                        <div class="github-card" data-user="{{ suggestion.contents.foreign_key }}"></div>
                       {% endif %}
 
                   </div>
@@ -151,6 +165,7 @@
 {% endblock %}
 
 {% block inline_javascript %}
+<script src="//cdn.jsdelivr.net/github-cards/latest/widget.js"></script>
 <script>
 $("#accept_all_button").click(function(e) {
     e.preventDefault();
