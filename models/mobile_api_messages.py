@@ -50,3 +50,8 @@ class MediaSuggestionMessage(messages.Message):
     year = messages.IntegerField(3, required=True)
     media_url = messages.StringField(4, required=True)
     details_json = messages.StringField(5, default="")
+
+
+class MediaSuggestionCollection(messages.Message):
+    suggestions = messages.MessageField(MediaSuggestionMessage, 1, repeated=True)
+    reference_key = messages.StringField(2, required=True)

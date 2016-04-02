@@ -14,14 +14,17 @@ from helpers.media_helper import MediaParser
 from helpers.push_helper import PushHelper
 from helpers.mytba_helper import MyTBAHelper
 from helpers.suggestions.suggestion_creator import SuggestionCreator
+from helpers.youtube_video_helper import YouTubeVideoHelper
 from models.account import Account
+from models.event import Event
 from models.favorite import Favorite
+from models.match import Match
 from models.media import Media
 from models.sitevar import Sitevar
 from models.subscription import Subscription
 from models.mobile_api_messages import BaseResponse, FavoriteCollection, FavoriteMessage, RegistrationRequest, \
                                        SubscriptionCollection, SubscriptionMessage, ModelPreferenceMessage, \
-                                       MediaSuggestionMessage
+                                       MediaSuggestionMessage, MediaSuggestionCollection
 from models.mobile_client import MobileClient
 from models.suggestion import Suggestion
 
@@ -267,5 +270,44 @@ class MobileAPI(remote.Service):
                 return BaseResponse(code=304, message="Suggestion already exists")
         else:
             return BaseResponse(code=400, message="Bad suggestion url")
+
+    @endpoints.method(MediaSuggestionCollection, BaseResponse,
+                      path='match/videos/suggest', http_method='POST',
+                      name='match.videos.suggestion')
+    def suggest_event_match_videos(self, request):
+        current_user = endpoints.get_current_user()
+        if current_user is None:
+            return BaseResponse(code=401, message="Unauthorized to make suggestions")
+        user_id = PushHelper.user_email_to_id(current_user.email())
+
+        event_key = request.reference_key
+        event = Event.get_by_id(event_key)
+        if event is None:
+            return BaseResponse(code=404, message="Event {} not found".format(event_key))
+
+        match_futures = Match.query(Match.event == event.key).fetch_async(keys_only=True)
+        valid_match_keys = [match.id() for match in match_futures.get_result()]
+        bad_match_keys = []
+        success_keys = []
+
+        for suggestion in request.suggestions:
+            if "match" != suggestion.reference_type:
+                continue
+
+            match_key = "{}_{}".format(event_key, suggestion.reference_key)
+            if match_key not in valid_match_keys:
+                bad_match_keys.append(match_key)
+                continue
+
+            youtube_id = YouTubeVideoHelper.parse_id_from_url(suggestion.media_url)
+            status = SuggestionCreator.createMatchVideoYouTubeSuggestion(
+                author_account_key=ndb.Key(Account, user_id),
+                youtube_id=youtube_id,
+                match_key=match_key)
+            if status == 'success':
+                success_keys.append(match_key)
+
+        return BaseResponse(code=200, message="Added suggestions for {} and skipped bad keys {}".format(json.dumps(success_keys), json.dumps(bad_match_keys)))
+
 
 app = endpoints.api_server([MobileAPI])
