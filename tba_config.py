@@ -41,4 +41,4 @@ else:
     }
 
 CONFIG['landing_handler'] = COMPETITIONSEASON
-CONFIG["static_resource_version"] = 7
+CONFIG["static_resource_version"] = 8
