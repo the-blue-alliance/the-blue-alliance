@@ -44,7 +44,7 @@ class MyTBAHelper(object):
             NotificationHelper.send_subscription_update(sub.user_id, device_key)
             return 200
         else:
-            if current.notification_types == sub.notification_types:
+            if len(set(current.notification_types).symmetric_difference(set(sub.notification_types))) == 0:
                 # Subscription already exists. Don't add it again
                 return 304
             else:
