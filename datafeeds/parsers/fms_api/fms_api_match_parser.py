@@ -281,8 +281,7 @@ class FMSAPIMatchDetailsParser(object):
 
         match_details_by_key = {}
 
-        # We can't tell when we're dealing with octofinals here, since we only have match number to work with.
-        is_octofinals = False  # len(matches) > 0 and 'Octofinal' in matches[0]['description']
+        is_octofinals = len(matches) > 0 and matches[len(matches) - 1]['matchNumber'] > 21
         for match in matches:
             comp_level = get_comp_level(self.year, match['matchLevel'], match['matchNumber'], is_octofinals)
             set_number, match_number = get_set_match_number(self.year, comp_level, match['matchNumber'], is_octofinals)

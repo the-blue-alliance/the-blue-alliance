@@ -21,7 +21,7 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def test_parse_qual(self):
+    def test_parse_no_matches(self):
         self.event = Event(
                 id="2016nyny",
                 name="NYC Regional",
@@ -42,7 +42,7 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertTrue(isinstance(matches, list))
             self.assertEqual(len(matches), 0)
 
-    def test_parse_no_matches(self):
+    def test_parse_qual(self):
         self.event = Event(
                 id="2016nyny",
                 name="NYC Regional",
