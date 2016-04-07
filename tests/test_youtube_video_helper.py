@@ -50,3 +50,7 @@ class TestUsfirstEventTypeParser(unittest2.TestCase):
         self.assertEqual(YouTubeVideoHelper.parse_id_from_url('https://youtu.be/1v8_2dW7Kik#t=1m'), '1v8_2dW7Kik?t=60')
         self.assertEqual(YouTubeVideoHelper.parse_id_from_url('https://youtu.be/1v8_2dW7Kik#t=1m1s'), '1v8_2dW7Kik?t=61')
         self.assertEqual(YouTubeVideoHelper.parse_id_from_url('https://youtu.be/1v8_2dW7Kik#t=1s'), '1v8_2dW7Kik?t=1')
+
+        # Not sure where this comes from, but it can happen
+        self.assertEqual(YouTubeVideoHelper.parse_id_from_url('https://youtu.be/1v8_2dW7Kik?t=3h17m30s'), '1v8_2dW7Kik?t=11850')
+        self.assertEqual(YouTubeVideoHelper.parse_id_from_url('https://www.youtube.com/watch?v=1v8_2dW7Kik&t=3h17m30s'), '1v8_2dW7Kik?t=11850')

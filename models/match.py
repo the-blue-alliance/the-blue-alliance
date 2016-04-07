@@ -4,6 +4,7 @@ import re
 from google.appengine.ext import ndb
 
 from helpers.tbavideo_helper import TBAVideoHelper
+from helpers.youtube_video_helper import YouTubeVideoHelper
 from models.event import Event
 from models.team import Team
 
@@ -216,11 +217,7 @@ class Match(ndb.Model):
                     sp = video.split('#t=')
                     video_id = sp[0]
                     old_ts = sp[1]
-                    match = re.match('((?P<hour>\d*?)h)?((?P<min>\d*?)m)?((?P<sec>\d*)s?)?', old_ts).groupdict()
-                    hours = match['hour'] or 0
-                    minutes = match['min'] or 0
-                    seconds = match['sec'] or 0
-                    total_seconds = (int(hours) * 3600) + (int(minutes) * 60) + int(seconds)
+                    total_seconds = YouTubeVideoHelper.time_to_seconds(old_ts)
                     video = '%s?start=%i' % (video_id, total_seconds)
                 self._youtube_videos.append(video)
         return self._youtube_videos
