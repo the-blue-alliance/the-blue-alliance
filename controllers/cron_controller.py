@@ -231,8 +231,8 @@ class YearInsightsEnqueue(webapp.RequestHandler):
     """
     def get(self, kind, year):
         taskqueue.add(
-            target='backend-tasks',
-            url='/backend-tasks/math/do/insights/{}/{}'.format(kind, year),
+            target='backend-tasks-b2',
+            url='/backend-tasks-b2/math/do/insights/{}/{}'.format(kind, year),
             method='GET')
 
         template_values = {
@@ -281,8 +281,8 @@ class OverallInsightsEnqueue(webapp.RequestHandler):
     """
     def get(self, kind):
         taskqueue.add(
-            target='backend-tasks',
-            url='/backend-tasks/math/do/overallinsights/{}'.format(kind),
+            target='backend-tasks-b2',
+            url='/backend-tasks-b2/math/do/overallinsights/{}'.format(kind),
             method='GET')
 
         template_values = {
@@ -327,8 +327,8 @@ class TypeaheadCalcEnqueue(webapp.RequestHandler):
     """
     def get(self):
         taskqueue.add(
-            target='backend-tasks',
-            url='/backend-tasks/math/do/typeaheadcalc',
+            target='backend-tasks-b2',
+            url='/backend-tasks-b2/math/do/typeaheadcalc',
             method='GET')
         template_values = {}
         path = os.path.join(os.path.dirname(__file__), '../templates/math/typeaheadcalc_enqueue.html')

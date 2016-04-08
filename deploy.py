@@ -36,6 +36,7 @@ def main():
         os.system('python ' + args.app_cfg_dir + '/appcfg.py -A tbatv-prod-hrd update .')
         # Update other modules
         os.system('python ' + args.app_cfg_dir + '/appcfg.py -A tbatv-prod-hrd update app-backend-tasks.yaml')
+        os.system('python ' + args.app_cfg_dir + '/appcfg.py -A tbatv-prod-hrd update app-backend-tasks-b2.yaml')
     else:
         print "Tests failed! Did not deploy."
 
