@@ -35,27 +35,27 @@ cron:
   schedule: every 1 hours
 
 - description: Typeahead Calculation
-  url: /backend-tasks/math/enqueue/typeaheadcalc
+  url: /backend-tasks-b2/math/enqueue/typeaheadcalc
   schedule: every day 01:00
   timezone: America/Los_Angeles
 
 - description: Match Insights Calculation
-  url: /backend-tasks/math/enqueue/insights/matches/2016
+  url: /backend-tasks-b2/math/enqueue/insights/matches/2016
   schedule: every day 01:00
   timezone: America/Los_Angeles
 
 - description: Award Insights Calculation
-  url: /backend-tasks/math/enqueue/insights/awards/2016
+  url: /backend-tasks-b2/math/enqueue/insights/awards/2016
   schedule: every day 01:00
   timezone: America/Los_Angeles
 
 - description: Match Overall Insights Calculation
-  url: /backend-tasks/math/enqueue/overallinsights/matches
+  url: /backend-tasks-b2/math/enqueue/overallinsights/matches
   schedule: every day 01:10
   timezone: America/Los_Angeles
 
 - description: Award Overall Insights Calculation
-  url: /backend-tasks/math/enqueue/overallinsights/awards
+  url: /backend-tasks-b2/math/enqueue/overallinsights/awards
   schedule: every day 01:10
   timezone: America/Los_Angeles
 
