@@ -75,6 +75,7 @@ class Match(ndb.Model):
     youtube_videos = ndb.StringProperty(repeated=True)  # list of Youtube IDs
     tba_videos = ndb.StringProperty(repeated=True)  # list of filetypes a TBA video exists for
     push_sent = ndb.BooleanProperty()  # has an upcoming match notification been sent for this match? None counts as False
+    vimeo_videos = ndb.StringProperty(repeated=True)  # list of Vimeo IDs
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True)
@@ -182,7 +183,7 @@ class Match(ndb.Model):
 
     @property
     def has_video(self):
-        return (len(self.youtube_videos) + len(self.tba_videos)) > 0
+        return (len(self.youtube_videos) + len(self.tba_videos) + len(self.vimeo_videos)) > 0
 
     @property
     def details_url(self):
@@ -228,6 +229,8 @@ class Match(ndb.Model):
         for v in self.youtube_videos_formatted:
             v = v.replace('?start=', '?t=')  # links must use ?t=
             videos.append({"type": "youtube", "key": v})
+        for v in self.vimeo_videos:
+            videos.append({"type": "vimeo", "key": v})
         if self.tba_video is not None:
             tba_path = self.tba_video.streamable_path
             if tba_path is not None:

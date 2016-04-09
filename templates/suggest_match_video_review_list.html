@@ -33,7 +33,12 @@
                     </div>
                     <div class="col-xs-7 fitvids">
                         <p><a href="/match/{{ suggestion.target_key }}" target="_blank"><strong>{{ suggestion.target_key }}</strong></a></p>
-                        <iframe width="240" height="180" src="https://www.youtube.com/embed/{{suggestion.youtube_video|yt_start}}" frameborder="0" allowfullscreen></iframe>
+                        {% if suggestion.youtube_video %}
+                          <iframe width="240" height="180" src="https://www.youtube.com/embed/{{suggestion.youtube_video|yt_start}}" frameborder="0" allowfullscreen></iframe>
+                        {% endif %}
+                        {% if suggestion.vimeo_video %}
+                          <iframe src="https://player.vimeo.com/video/{{suggestion.vimeo_video}}?byline=0&portrait=0" width="240" height="180" frameborder="0" allowfullscreen></iframe>
+                        {% endif %}
                     </div>
                     <div class="col-xs-3">
                         <ul>

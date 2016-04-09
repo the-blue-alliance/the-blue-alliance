@@ -91,6 +91,9 @@
                           <img class="img-thumbnail" src="http://i.imgur.com/{{suggestion.contents.foreign_key}}m.jpg" style="max-height: 200px;">
                         </a>
                       {% endif %}
+                      {% if suggestion.contents.media_type_enum == 3 %}
+                        <iframe width="320" height="180" src="https://player.vimeo.com/embed/{{suggestion.contents.foreign_key}}" frameborder="0" allowfullscreen></iframe>
+                      {% endif %}
                   </div>
                   <div class="col-xs-3">
                     {% if preferred %}

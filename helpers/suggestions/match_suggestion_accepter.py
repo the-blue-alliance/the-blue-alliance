@@ -30,6 +30,17 @@ class MatchSuggestionAccepter(object):
     def _accept_suggestion(self, match, suggestion):
         if "youtube_videos" in suggestion.contents:
             match = self._merge_youtube_videos(match, suggestion.contents["youtube_videos"])
+            
+        if "vimeo_videos" in suggestion.contents:
+            match = self._merge_vimeo_videos(match, suggestion.contents["vimeo_videos"])
+
+        return match
+        
+    @classmethod
+    def _merge_vimeo_videos(self, match, vimeo_videos):
+        for vimeo_video in vimeo_videos:
+            if vimeo_video not in match.vimeo_videos:
+                match.vimeo_videos.append(vimeo_video)
 
         return match
 

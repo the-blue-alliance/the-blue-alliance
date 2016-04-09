@@ -17,6 +17,7 @@ class Media(ndb.Model):
         MediaType.YOUTUBE: 'youtube',
         MediaType.CD_PHOTO_THREAD: 'cdphotothread',
         MediaType.IMGUR: 'imgur',
+        MediaType.VIMEO: 'vimeo',
     }
 
     REFERENCE_MAP = {
@@ -115,6 +116,10 @@ class Media(ndb.Model):
     @property
     def imgur_direct_url_sm(self):
         return 'https://i.imgur.com/{}s.jpg'.format(self.foreign_key)
+        
+    @property
+    def vimeo_url(self):
+        return 'https://www.vimeo.com/{}'.format(self.foreign_key)
 
     @property
     def view_image_url(self):

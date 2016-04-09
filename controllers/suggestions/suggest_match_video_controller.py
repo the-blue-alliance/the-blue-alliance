@@ -2,6 +2,7 @@ import logging
 import os
 
 from controllers.base_controller import LoggedInHandler
+from helpers.media_helper import MediaParser
 from helpers.suggestions.suggestion_creator import SuggestionCreator
 from helpers.youtube_video_helper import YouTubeVideoHelper
 from models.event import Event
@@ -42,11 +43,26 @@ class SuggestMatchVideoController(LoggedInHandler):
         self._require_login()
 
         match_key = self.request.get("match_key")
-        youtube_url = self.request.get("youtube_url")
-        youtube_id = YouTubeVideoHelper.parse_id_from_url(youtube_url)
+        video_url = self.request.get("video_url")
+        
+        if any(s in video_url for s in MediaParser.YOUTUBE_URL_PATTERNS):
+            youtube_id = YouTubeVideoHelper.parse_id_from_url(video_url)
 
-        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.user_bundle.account.key, youtube_id, match_key)
+            status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.user_bundle.account.key, youtube_id, match_key)
+        elif any(s in video_url for s in MediaParser.VIMEO_URL_PATTERNS):
+            vimeo_id = None
+            regex1 = re.match(r".*vimeo.com\/video\/([0-9_-]*)", video_url)
+            if regex1 is not None:
+                vimeo_id = regex1.group(1)
+            else:
+                regex2 = re.match(r".*vimeo.com\/([0-9_-]*)", video_url)
+                if regex2 is not None:
+                    vimeo_id = regex2.group(1)
 
+            status = SuggestionCreator.createMatchVideoVimeoSuggestion(self.user_bundle.account.key, vimeo_id, match_key)
+        else:
+            status = 'bad_url'
+        
         self.redirect('/suggest/match/video?match_key={}&status={}'.format(match_key, status))
 
 
