@@ -71,9 +71,9 @@ Run a local dev server
   * File > Add Existing Application...
   * Set the Application Path to your `the-blue-alliance` directory
   * Set port **8088**
-  * Add modules (dispatch.yaml, app.yaml, and app-backend-tasks.yaml) as extra flags [https://cloud.google.com/appengine/docs/python/modules/#devserver](https://cloud.google.com/appengine/docs/python/modules/#devserver).
+  * Add modules (dispatch.yaml, app.yaml, app-backend-tasks.yaml, and app-backend-tasks-b2.yaml) as extra flags [https://cloud.google.com/appengine/docs/python/modules/#devserver](https://cloud.google.com/appengine/docs/python/modules/#devserver).
 2. Run the app in App Engine Launcher and view its Logs window
-  * If you are using the Linux version, you can start the application by moving into your `the-blue-alliance` directory and running `dev_appserver.py --port 8088 dispatch.yaml app.yaml app-backend-tasks.yaml` on the command line.
+  * If you are using the Linux version, you can start the application by moving into your `the-blue-alliance` directory and running `dev_appserver.py --port 8088 dispatch.yaml app.yaml app-backend-tasks.yaml app-backend-tasks-b2.yaml` on the command line.
 3. You should now have a basic development installation!
   * Visit [localhost:8088](http://localhost:8088) to see your local version of The Blue Alliance
   * Also see [localhost:8088/admin/](http://localhost:8088/admin/)
