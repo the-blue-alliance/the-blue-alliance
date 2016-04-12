@@ -6,6 +6,8 @@ from notifications.base_notification import BaseNotification
 
 class ScheduleUpdatedNotification(BaseNotification):
 
+    _priority = 'high'
+
     def __init__(self, event, next_match=None):
         from helpers.match_helper import MatchHelper  # recursive import issues
         self.event = event
