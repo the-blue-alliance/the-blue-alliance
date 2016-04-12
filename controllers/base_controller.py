@@ -1,6 +1,6 @@
 import cPickle
+import datetime
 import logging
-import time
 import webapp2
 import zlib
 
@@ -53,7 +53,7 @@ class CacheableHandler(webapp2.RequestHandler):
         if cached_response is None:
             self._set_cache_header_length(self.CACHE_HEADER_LENGTH)
             self.template_values["cache_key"] = self.cache_key
-            self.template_values["render_time"] = time.strftime('%b. %d, %Y at %l:%M%p %Z')
+            self.template_values["render_time"] = datetime.datetime.now()
             rendered = self._render(*args, **kw)
             if self._has_been_modified_since(self._last_modified):
                 self.response.out.write(rendered)
