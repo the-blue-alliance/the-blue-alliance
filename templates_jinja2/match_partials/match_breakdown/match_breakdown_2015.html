@@ -58,11 +58,13 @@
     </tr>
     {% endif %}
 
+    {% if "tote_points" in match.score_breakdown.red and "container_points" in match.score_breakdown.red and "litter_points" in match.score_breakdown.red %}
     <tr class="key">
       <td class="redScore">{{match.score_breakdown.red.tote_points + match.score_breakdown.red.container_points + match.score_breakdown.red.litter_points}}</td>
       <th>Total Teleop</th>
       <td class="blueScore">{{match.score_breakdown.blue.tote_points + match.score_breakdown.blue.container_points + match.score_breakdown.blue.litter_points}}</td>
     </tr>
+    {% endif %}
 
     {% if "coopertition_points" in match.score_breakdown %}
     <tr>
