@@ -11,8 +11,6 @@ from consts.award_type import AwardType
 from consts.district_point_values import DistrictPointValues
 from consts.event_type import EventType
 
-from database import award_query, match_query
-
 from helpers.event_helper import EventHelper
 
 from models.award import Award
