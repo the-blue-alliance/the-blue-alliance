@@ -65,9 +65,10 @@ class AccountFavoritesDeleteHandler(LoggedInHandler):
             return
 
         model_key = self.request.get("model_key")
+        model_type = int(self.request.get("model_type"))
         user_id = self.user_bundle.user.user_id()
 
-        MyTBAHelper.remove_favorite(user_id, model_key)
+        MyTBAHelper.remove_favorite(user_id, model_key, model_type)
 
 
 class LiveEventHandler(CacheableHandler):

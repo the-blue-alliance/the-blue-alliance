@@ -273,7 +273,7 @@ class MyTBAEventController(LoggedInHandler):
             )
             MyTBAHelper.add_favorite(favorite)
         else:
-            MyTBAHelper.remove_favorite(current_user_id, event_key)
+            MyTBAHelper.remove_favorite(current_user_id, event_key, ModelType.EVENT)
 
         subs = self.request.get_all('notification_types')
         if subs:
@@ -286,7 +286,7 @@ class MyTBAEventController(LoggedInHandler):
             )
             MyTBAHelper.add_subscription(subscription)
         else:
-            MyTBAHelper.remove_subscription(current_user_id, event_key)
+            MyTBAHelper.remove_subscription(current_user_id, event_key, ModelType.EVENT)
 
         self.redirect('/account/mytba?status=event_updated#my-events')
 
@@ -336,7 +336,7 @@ class MyTBATeamController(LoggedInHandler):
             )
             MyTBAHelper.add_favorite(favorite)
         else:
-            MyTBAHelper.remove_favorite(current_user_id, team_key)
+            MyTBAHelper.remove_favorite(current_user_id, team_key, ModelType.TEAM)
 
         subs = self.request.get_all('notification_types')
         if subs:
@@ -349,6 +349,6 @@ class MyTBATeamController(LoggedInHandler):
             )
             MyTBAHelper.add_subscription(subscription)
         else:
-            MyTBAHelper.remove_subscription(current_user_id, team_key)
+            MyTBAHelper.remove_subscription(current_user_id, team_key, ModelType.TEAM)
 
         self.redirect('/account/mytba?status=team_updated#my-teams')
