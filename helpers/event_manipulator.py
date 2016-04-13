@@ -1,6 +1,8 @@
 import logging
 import traceback
 
+from google.appengine.api import taskqueue
+
 from helpers.cache_clearer import CacheClearer
 from helpers.event_helper import EventHelper
 from helpers.manipulator_base import ManipulatorBase
@@ -35,6 +37,12 @@ class EventManipulator(ManipulatorBase):
                 cls.createOrUpdate(event, run_post_update_hook=False)
             except Exception:
                 logging.warning("Timezone update for event {} failed!".format(event.key_name))
+
+        # Enqueue task to calculate district points
+        for event in events:
+            taskqueue.add(
+                url='/tasks/math/do/district_points_calc/{}'.format(event.key.id()),
+                method='GET')
 
     @classmethod
     def updateMerge(self, new_event, old_event, auto_union=True):

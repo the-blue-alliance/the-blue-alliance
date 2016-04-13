@@ -85,6 +85,12 @@ class MatchManipulator(ManipulatorBase):
                 url='/tasks/math/do/event_matchstats/' + event_key,
                 method='GET')
 
+        # Enqueue task to calculate district points
+        for event_key in event_keys:
+            taskqueue.add(
+                url='/tasks/math/do/district_points_calc/{}'.format(event_key),
+                method='GET')
+
     @classmethod
     def updateMerge(self, new_match, old_match, auto_union=True):
         """

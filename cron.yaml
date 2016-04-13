@@ -59,11 +59,6 @@ cron:
   schedule: every day 01:10
   timezone: America/Los_Angeles
 
-- description: District Points Calculation
-  url: /tasks/math/enqueue/district_points_calc/2016
-  schedule: every day 01:20
-  timezone: America/Los_Angeles
-
 - description: Upcoming match notification sending
   url: /tasks/notifications/upcoming_match
   schedule: every 2 minutes
