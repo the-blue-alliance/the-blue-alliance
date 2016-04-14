@@ -183,7 +183,8 @@ class FMSAPIHybridScheduleParser(object):
             blue_teams = []
             team_key_names = []
             null_team = False
-            for team in match['Teams']:
+            sorted_teams = sorted(match['Teams'], key=lambda team: team['station'])  # Sort by station to ensure correct ordering. Kind of hacky.
+            for team in sorted_teams:
                 if team['teamNumber'] is None:
                     null_team = True
                 team_key = 'frc{}'.format(team['teamNumber'])
