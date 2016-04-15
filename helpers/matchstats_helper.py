@@ -22,11 +22,17 @@ class MatchstatsHelper(object):
         parsed_matches_by_type, team_list, team_id_map = cls._parse_matches(matches)
 
         oprs_dict = cls._calculate_stat(parsed_matches_by_type['opr'], team_list, team_id_map)
+        xoprs_dict = cls._calculate_stat(parsed_matches_by_type['xopr'], team_list, team_id_map)
         dprs_dict = cls._calculate_stat(parsed_matches_by_type['dpr'], team_list, team_id_map)
         ccwms_dict = cls._calculate_stat(parsed_matches_by_type['ccwm'], team_list, team_id_map)
-        xoprs_dict = cls._calculate_xoprs(oprs_dict, matches, len(team_list))
 
-        return {'oprs': oprs_dict, 'dprs': dprs_dict, 'ccwms': ccwms_dict, 'xoprs': xoprs_dict}
+        init_oprs = xoprs_dict
+        for _ in range(2):  # 2 iterations of ixOPR seems to work well
+            parsed_matches_by_type, team_list, team_id_map = cls._parse_matches(matches, init_oprs)
+            ixoprs_dict = cls._calculate_stat(parsed_matches_by_type['xopr'], team_list, team_id_map)
+            init_oprs = cls._calculate_stat(parsed_matches_by_type['xopr'], team_list, team_id_map)
+
+        return {'oprs': oprs_dict, 'dprs': dprs_dict, 'ccwms': ccwms_dict, 'xoprs': xoprs_dict, 'ixoprs': ixoprs_dict}
 
     @classmethod
     def _calculate_stat(cls, parsed_matches, team_list, team_id_map):
@@ -61,24 +67,8 @@ class MatchstatsHelper(object):
         return stat_dict
 
     @classmethod
-    def _calculate_xoprs(cls, oprs_dict, matches, num_teams):
-        """
-        Calculate cross-event adjusted OPR
-        xopr = a * previous_event_opr + (1-a) * normalOPR
-        a = max(1 - num_played_matches/(num_teams/2), 0)
-        """
-        num_played = 0
-        for match in matches:
-            if not match.has_been_played or match.comp_level != 'qm':  # only calculate xOPRs for played quals matches
-                continue
-            num_played += 1
-
-        a = max(1 - 2.0 * num_played / num_teams, 0)
-        if a == 0:
-            return oprs_dict
-
-        year = matches[0].year
-        event_key = matches[0].event
+    def _get_last_event_oprs(cls, team_list, event_key):
+        year = int(event_key.id()[:4])
         cur_event = event_key.get()
 
         # Check cache for stored OPRs
@@ -89,7 +79,7 @@ class MatchstatsHelper(object):
 
         # Make necessary queries for missing OPRs
         futures = []
-        for team, opr in oprs_dict.items():
+        for team in team_list:
             if team not in last_event_oprs:
                 events_future = event_query.TeamYearEventsQuery('frc{}'.format(team), year).fetch_async()
                 futures.append((team, events_future))
@@ -107,20 +97,15 @@ class MatchstatsHelper(object):
                         last_event = event
                         last_event_start = event.start_date
 
-            last_event_opr = last_event.matchstats['oprs'].get(team, 0)
-            last_event_oprs[team] = last_event_opr
-
-        xoprs_dict = {}
-        for team, opr in oprs_dict.items():
-            last_event_opr = last_event_oprs[team]
-            xoprs_dict[team] = a * last_event_opr + (1-a) * opr
+            if last_event is not None and 'oprs' in last_event.matchstats and team in last_event.matchstats['oprs']:
+                last_event_opr = last_event.matchstats['oprs'][team]
+                last_event_oprs[team] = last_event_opr
 
         memcache.set(cache_key, last_event_oprs, 60*60*24)
-
-        return xoprs_dict
+        return last_event_oprs
 
     @classmethod
-    def _parse_matches(cls, matches):
+    def _parse_matches(cls, matches, init_oprs=None):
         """
         Returns:
         parsed_matches_by_type: list of matches as the tuple ([team, team, team], <score/opposingscore/scoremargin>) for each key ('opr', 'dpr', 'ccwm')
@@ -130,26 +115,49 @@ class MatchstatsHelper(object):
         team_list = set()
         parsed_matches_by_type = {
             'opr': [],
+            'xopr': [],
             'dpr': [],
             'ccwm': [],
         }
+
+        # Build team list
+        for match in matches:
+            if match.comp_level != 'qm':  # only calculate OPRs for played quals matches
+                continue
+            alliances = match.alliances
+            for alliance_color in ['red', 'blue']:
+                for team in alliances[alliance_color]['teams']:
+                    team_list.add(team[3:])  # turns "frc254B" into "254B"
+
+        # Load last OPR data
+        if init_oprs is None:
+            last_event_oprs = cls._get_last_event_oprs(team_list, matches[0].event)
+        else:
+            last_event_oprs = {}
+            for team, xopr in init_oprs.items():
+                last_event_oprs[team] = xopr
+
         for match in matches:
             if match.comp_level != 'qm':  # only calculate OPRs for played quals matches
                 continue
             alliances = match.alliances
             for alliance_color, opposing_color in zip(['red', 'blue'], ['blue', 'red']):
                 match_team_list = []
+                predicted_score = 0
                 for team in alliances[alliance_color]['teams']:
                     team = team[3:]  # turns "frc254B" into "254B"
-                    team_list.add(team)  # Needed for xoprs
                     match_team_list.append(team)
+                    predicted_score += last_event_oprs.get(team, 0)  # TODO use something other than 0
 
                 if match.has_been_played:  # only calculate OPRs for played matches
                     alliance_score = int(alliances[alliance_color]['score'])
                     opposing_score = int(alliances[opposing_color]['score'])
                     parsed_matches_by_type['opr'].append((match_team_list, alliance_score))
+                    parsed_matches_by_type['xopr'].append((match_team_list, alliance_score))
                     parsed_matches_by_type['dpr'].append((match_team_list, opposing_score))
                     parsed_matches_by_type['ccwm'].append((match_team_list, alliance_score - opposing_score))
+                else:
+                    parsed_matches_by_type['xopr'].append((match_team_list, predicted_score))
 
         team_list = list(team_list)
 
