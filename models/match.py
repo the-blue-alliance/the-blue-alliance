@@ -1,4 +1,5 @@
 import json
+import numpy as np
 import re
 
 from google.appengine.ext import ndb
@@ -95,6 +96,16 @@ class Match(ndb.Model):
         self._youtube_videos = None
         self._updated_attrs = []  # Used in MatchManipulator to track what changed
         super(Match, self).__init__(*args, **kw)
+
+    def predicted_score(self, alliance_color):
+        event = self.event.get()
+        if 'xoprs' not in event.matchstats:
+            return None
+
+        score = 0
+        for team in self.alliances[alliance_color]['teams']:
+            score += event.matchstats['xoprs'][team[3:]]
+        return int(np.round(score))
 
     @property
     def alliances(self):
