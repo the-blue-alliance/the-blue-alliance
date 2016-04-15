@@ -57,6 +57,6 @@
 
 {% macro match_score_td(match, alliance_color, cur_team_key, compact=False, force_played=False) %}
 <td{% if compact %} colspan="2"{% endif %} class="{{alliance_color}}Score{% if match.winning_alliance == alliance_color %} winner{% endif %}{% if cur_team_key and cur_team_key in match.alliances.get(alliance_color).teams %} current-team{% endif %}">
-  {% if not match.has_been_played and not force_played %}{% if match.predicted_score(alliance_color) %}<em rel="tooltip" title="Predicted score">({{match.predicted_score(alliance_color)}}*)</em>{% else %}?{% endif %}{% else %}{{ match.alliances.get(alliance_color).score }}{% endif %}
+  {% if not match.has_been_played and not force_played %}{% if match.predicted_score(alliance_color) %}<em rel="tooltip" title="Predicted score">({{match.predicted_score(alliance_color)|round|int}}*)</em>{% else %}?{% endif %}{% else %}{{ match.alliances.get(alliance_color).score }}{% endif %}
 </td>
 {% endmacro %}
