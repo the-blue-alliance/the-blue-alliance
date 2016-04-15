@@ -97,15 +97,17 @@ class Match(ndb.Model):
         self._updated_attrs = []  # Used in MatchManipulator to track what changed
         super(Match, self).__init__(*args, **kw)
 
-    def predicted_score(self, alliance_color):
-        event = self.event.get()
-        if 'xoprs' not in event.matchstats:
+    def predicted_score(self, alliance_color, matchstats=None, stat='ixoprs'):
+        if matchstats is None:
+            matchstats = self.event.get().matchstats
+
+        if stat not in matchstats:
             return None
 
         score = 0
         for team in self.alliances[alliance_color]['teams']:
-            score += event.matchstats['xoprs'][team[3:]]
-        return int(np.round(score))
+            score += matchstats[stat][team[3:]]
+        return score
 
     @property
     def alliances(self):
