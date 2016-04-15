@@ -10,6 +10,11 @@
 
 import numpy as np
 
+from google.appengine.api import memcache
+
+from database import event_query
+from models.event_team import EventTeam
+
 
 class MatchstatsHelper(object):
     @classmethod
@@ -19,8 +24,9 @@ class MatchstatsHelper(object):
         oprs_dict = cls._calculate_stat(parsed_matches_by_type['opr'], team_list, team_id_map)
         dprs_dict = cls._calculate_stat(parsed_matches_by_type['dpr'], team_list, team_id_map)
         ccwms_dict = cls._calculate_stat(parsed_matches_by_type['ccwm'], team_list, team_id_map)
+        xoprs_dict = cls._calculate_xoprs(oprs_dict, matches, len(team_list))
 
-        return {'oprs': oprs_dict, 'dprs': dprs_dict, 'ccwms': ccwms_dict}
+        return {'oprs': oprs_dict, 'dprs': dprs_dict, 'ccwms': ccwms_dict, 'xoprs': xoprs_dict}
 
     @classmethod
     def _calculate_stat(cls, parsed_matches, team_list, team_id_map):
@@ -55,6 +61,65 @@ class MatchstatsHelper(object):
         return stat_dict
 
     @classmethod
+    def _calculate_xoprs(cls, oprs_dict, matches, num_teams):
+        """
+        Calculate cross-event adjusted OPR
+        xopr = a * previous_event_opr + (1-a) * normalOPR
+        a = max(1 - num_played_matches/(num_teams/2), 0)
+        """
+        num_played = 0
+        for match in matches:
+            if not match.has_been_played or match.comp_level != 'qm':  # only calculate xOPRs for played quals matches
+                continue
+            num_played += 1
+
+        a = max(1 - 2.0 * num_played / num_teams, 0)
+        if a == 0:
+            return oprs_dict
+
+        year = matches[0].year
+        event_key = matches[0].event
+        cur_event = event_key.get()
+
+        # Check cache for stored OPRs
+        cache_key = '{}:last_event_oprs'.format(event_key.id())
+        last_event_oprs = memcache.get(cache_key)
+        if last_event_oprs is None:
+            last_event_oprs = {}
+
+        # Make necessary queries for missing OPRs
+        futures = []
+        for team, opr in oprs_dict.items():
+            if team not in last_event_oprs:
+                events_future = event_query.TeamYearEventsQuery('frc{}'.format(team), year).fetch_async()
+                futures.append((team, events_future))
+
+        # Add missing OPRs to last_event_oprs
+        for team, events_future in futures:
+            events = events_future.get_result()
+
+            # Find last event before current event
+            last_event = None
+            last_event_start = None
+            for event in events:
+                if event.start_date < cur_event.start_date:
+                    if last_event is None or event.start_date > last_event_start:
+                        last_event = event
+                        last_event_start = event.start_date
+
+            last_event_opr = last_event.matchstats['oprs'].get(team, 0)
+            last_event_oprs[team] = last_event_opr
+
+        xoprs_dict = {}
+        for team, opr in oprs_dict.items():
+            last_event_opr = last_event_oprs[team]
+            xoprs_dict[team] = a * last_event_opr + (1-a) * opr
+
+        memcache.set(cache_key, last_event_oprs, 60*60*24)
+
+        return xoprs_dict
+
+    @classmethod
     def _parse_matches(cls, matches):
         """
         Returns:
@@ -69,21 +134,22 @@ class MatchstatsHelper(object):
             'ccwm': [],
         }
         for match in matches:
-            if not match.has_been_played or match.comp_level != 'qm':  # only calculate OPRs for played quals matches
+            if match.comp_level != 'qm':  # only calculate OPRs for played quals matches
                 continue
             alliances = match.alliances
             for alliance_color, opposing_color in zip(['red', 'blue'], ['blue', 'red']):
                 match_team_list = []
                 for team in alliances[alliance_color]['teams']:
                     team = team[3:]  # turns "frc254B" into "254B"
-                    team_list.add(team)
+                    team_list.add(team)  # Needed for xoprs
                     match_team_list.append(team)
 
-                alliance_score = int(alliances[alliance_color]['score'])
-                opposing_score = int(alliances[opposing_color]['score'])
-                parsed_matches_by_type['opr'].append((match_team_list, alliance_score))
-                parsed_matches_by_type['dpr'].append((match_team_list, opposing_score))
-                parsed_matches_by_type['ccwm'].append((match_team_list, alliance_score - opposing_score))
+                if match.has_been_played:  # only calculate OPRs for played matches
+                    alliance_score = int(alliances[alliance_color]['score'])
+                    opposing_score = int(alliances[opposing_color]['score'])
+                    parsed_matches_by_type['opr'].append((match_team_list, alliance_score))
+                    parsed_matches_by_type['dpr'].append((match_team_list, opposing_score))
+                    parsed_matches_by_type['ccwm'].append((match_team_list, alliance_score - opposing_score))
 
         team_list = list(team_list)
 
