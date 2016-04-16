@@ -31,7 +31,8 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-sm-8">
+    <div class="col-sm-12">
+      <a class="btn btn-success pull-right" href="/suggest/event/video?event_key={{event.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add videos!</a>
       <p>
         {% if event.start_date %}
           <span class="glyphicon glyphicon-calendar"></span> <time itemprop="startDate" datetime="{{event.start_date.isoformat()}}">{{ event.start_date|strftime("%B %d") }}{% if event.start_date.date() != event.end_date.date() %}</time> to <time itemprop="endDate" datetime="{{event.end_date.isoformat()}}">{{ event.end_date|strftime("%B %d") }}{% endif %}, {{ event.end_date|strftime("%Y") }}</time>
@@ -55,10 +56,6 @@
         <a class="hashtag-link hashtag-cd" href="http://www.chiefdelphi.com/media/photos/tags/{{ event.hashtag }}" target="_blank" title="Search Chief Delphi">Chief Delphi</a> &middot;
         <a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23{{ event.hashtag }}" target="_blank" title="Search Flickr">Flickr</a>
       </p>
-    </div>
-
-    <div class="col-sm-pull-8 pull-right">
-      <a class="btn btn-success" href="/suggest/event/video?event_key={{event.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add videos!</a>
     </div>
   </div>
 
@@ -92,6 +89,12 @@
         {% endif %}
         <div class="clearfix"></div>
       </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <h4>Show Predictions (?) <input id="predictions-toggle" type="checkbox" data-toggle="toggle"></h4>
     </div>
   </div>
   {% endif %}

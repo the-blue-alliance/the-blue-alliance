@@ -142,6 +142,17 @@ $(document).ready(function(){
     }
   });
 
+  // Predictions toggle
+  $('#predictions-toggle').change(function() {
+    if ($(this).prop('checked')) {
+      $(".predictions-on").show();
+      $(".predictions-off").hide();
+    } else {
+      $(".predictions-on").hide();
+      $(".predictions-off").show();
+    }
+  });
+
   // For 4/1
   var today = new Date();
   var dd = today.getDate();
