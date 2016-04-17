@@ -8,7 +8,7 @@ from controllers.account_controller import AccountEdit, AccountLogout, AccountOv
 from controllers.ajax_controller import AccountFavoritesHandler, AccountFavoritesAddHandler, AccountFavoritesDeleteHandler, \
       YouTubePlaylistHandler
 from controllers.ajax_controller import LiveEventHandler, TypeaheadHandler, WebcastHandler
-from controllers.event_controller import EventList, EventDetail, EventRss
+from controllers.event_controller import EventList, EventDetail, EventInsights, EventRss
 from controllers.event_wizard_controller import EventWizardHandler
 from controllers.gameday2_controller import Gameday2Controller
 from controllers.insights_controller import InsightsOverview, InsightsDetail
@@ -66,6 +66,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/apiwrite', ApiWriteHandler, 'api-write', strict_slash=True),
       RedirectRoute(r'/contact', ContactHandler, 'contact', strict_slash=True),
       RedirectRoute(r'/event/<event_key>', EventDetail, 'event-detail', strict_slash=True),
+      RedirectRoute(r'/event/<event_key>/insights', EventInsights, 'event-insights', strict_slash=True),
       RedirectRoute(r'/event/<event_key>/feed', EventRss, 'event-rss', strict_slash=True),
       RedirectRoute(r'/events/<year:[0-9]+>', EventList, 'event-list-year', strict_slash=True),
       RedirectRoute(r'/events/<district_abbrev:[a-z]+>/<year:[0-9]+>', DistrictDetail, 'district-detail', strict_slash=True),

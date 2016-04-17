@@ -67,7 +67,7 @@ class MatchstatsHelper(object):
         return stat_dict
 
     @classmethod
-    def _get_last_event_oprs(cls, team_list, event_key):
+    def get_last_event_oprs(cls, team_list, event_key):
         year = int(event_key.id()[:4])
         cur_event = event_key.get()
 
@@ -131,7 +131,7 @@ class MatchstatsHelper(object):
 
         # Load last OPR data
         if init_oprs is None:
-            last_event_oprs = cls._get_last_event_oprs(team_list, matches[0].event)
+            last_event_oprs = cls.get_last_event_oprs(team_list, matches[0].event)
         else:
             last_event_oprs = {}
             for team, xopr in init_oprs.items():

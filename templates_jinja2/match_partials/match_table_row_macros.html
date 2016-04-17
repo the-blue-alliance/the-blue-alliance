@@ -1,6 +1,6 @@
 {% import "match_partials/match_table_cell_macros.html" as mtcm %}
 
-{% macro match_row_tr(match, cur_team_key, upcoming=False) %}
+{% macro match_row_tr(match, cur_team_key, upcoming=False, predictions=None) %}
 <tr class="visible-lg">
   {% if upcoming %}
     {{mtcm.match_time_td(match)}}
@@ -18,8 +18,13 @@
   {% endfor %}
 
   {% if not upcoming %}
-    {{mtcm.match_score_td(match, 'red', cur_team_key)}}
-    {{mtcm.match_score_td(match, 'blue', cur_team_key)}}
+    {{mtcm.match_score_td(match, 'red', cur_team_key, predictions=predictions)}}
+    {{mtcm.match_score_td(match, 'blue', cur_team_key, predictions=predictions)}}
+  {% endif %}
+
+  {% if predictions %}
+    {{mtcm.prob(match, predictions)}}
+    {{mtcm.correct_prediction(match, predictions)}}
   {% endif %}
 </tr>
 
@@ -37,7 +42,12 @@
   {% endfor %}
 
   {% if not upcoming %}
-  {{mtcm.match_score_td(match, 'red', cur_team_key, compact=True)}}
+  {{mtcm.match_score_td(match, 'red', cur_team_key, compact=True, predictions=predictions)}}
+  {% endif %}
+
+  {% if predictions %}
+    {{mtcm.prob(match, predictions, compact=True)}}
+    {{mtcm.correct_prediction(match, predictions, compact=True)}}
   {% endif %}
 </tr>
 <tr class="hidden-lg">
@@ -46,7 +56,7 @@
   {% endfor %}
 
   {% if not upcoming %}
-  {{mtcm.match_score_td(match, 'blue', cur_team_key, compact=True)}}
+  {{mtcm.match_score_td(match, 'blue', cur_team_key, compact=True, predictions=predictions)}}
   {% endif %}
 </tr>
 {% endmacro %}

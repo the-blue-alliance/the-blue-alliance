@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% import 'match_partials/match_table_macros.html' as mtm %}
+
+{% block title %}Advanced Insights - {{event.name}} ({{event.year}}) - The Blue Alliance{% endblock %}
+
+{% block meta_description %}Advanced insights for the {{event.year}} {{event.name}} FIRST Robotics Competition.{% endblock %}
+
+{% block more_head_tags %}
+  <meta property="og:title" content="Advanced Insights: {{event.year}} {{event.name}}" />
+  <meta property="og:url" content="http://www.thebluealliance.com/event/{{event.key_name}}/insights" />
+  <meta property="og:image" content="http://www.thebluealliance.com/images/logo_square_200.png" />
+  <meta property="og:description" content="Advanced insights for the {{event.year}} {{event.name}} FIRST Robotics Competition."/>
+  <meta property="og:site_name" content="The Blue Alliance" />
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12">
+      <p><a class="btn btn-default" href="/event/{{event.key.id()}}"><span class="glyphicon glyphicon-chevron-left"></span> Back to main event page</a></p>
+      <h1>{{event.name}} {{event.year}}</h1>
+      <h2>Advanced Insights</h2>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <ul class="nav nav-tabs">
+        {% if matches.num > 0 %}<li class="active"><a href="#match-predictions" data-toggle="tab">Qual Match Predictions</a></li>{% endif %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="tab-content">
+    {% if matches.num > 0 %}
+    <div class="tab-pane active" id="match-predictions">
+      <div class="row">
+        {% if matches.qm %}
+        <div class="col-lg-8 col-lg-offset-2">
+          <h3>Qualification Match Predictions (<a href="/predictions">?</a>)</h3>
+          {% if match_prediction_stats.wl_accuracy %}<p><strong>Prediction accuracy:</strong> {{match_prediction_stats.wl_accuracy|round(2)}}%</p>{% endif %}
+          {% if match_prediction_stats.wl_accuracy_75 %}<p><strong>Prediction accuracy (>75% confidence):</strong> {{match_prediction_stats.wl_accuracy_75|round(2)}}%</p>{% endif %}
+          <p><strong>Match score prediction average error:</strong> {{match_prediction_stats.err_mean|round(2)}}</p>
+          {{mtm.qual_match_prediction_table(matches, match_predictions)}}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

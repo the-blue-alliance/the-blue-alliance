@@ -55,8 +55,28 @@
 {% endmacro %}
 
 
-{% macro match_score_td(match, alliance_color, cur_team_key, compact=False, force_played=False) %}
-<td{% if compact %} colspan="2"{% endif %} class="{{alliance_color}}Score{% if match.winning_alliance == alliance_color %} winner{% endif %}{% if cur_team_key and cur_team_key in match.alliances.get(alliance_color).teams %} current-team{% endif %}">
-  {% if not match.has_been_played and not force_played %}?{% else %}{{ match.alliances.get(alliance_color).score }}{% endif %}
+{% macro match_score_td(match, alliance_color, cur_team_key, compact=False, force_played=False, predictions=None) %}
+<td{% if compact %} colspan="2"{% endif %} class="{{alliance_color}}Score{% if cur_team_key and cur_team_key in match.alliances.get(alliance_color).teams %} current-team{% endif %}">
+  <span{% if match.winning_alliance == alliance_color %} class="winner"{% endif %}>{% if not match.has_been_played and not force_played %}?{% else %}{{ match.alliances.get(alliance_color).score }}{% endif %}</span>{% if predictions %}<br><em{% if predictions.get(match.key.id()).winning_alliance == alliance_color %} class="winner"{% endif %}>({{predictions.get(match.key.id()).get(alliance_color).score|round|int}})</em>{% endif %}
+</td>
+{% endmacro %}
+
+{% macro prob(match, predictions, compact=False) %}
+<td{% if compact %} rowspan="2"{% endif %}>
+  <div class="progress" style="margin: 0px;">
+    <div class="progress-bar {% if predictions.get(match.key.id()).prob < 65 %}progress-bar-danger{% elif predictions.get(match.key.id()).prob < 80 %}progress-bar-warning{% else %}progress-bar-success{% endif %}" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{predictions.get(match.key.id()).prob|round|int}}%;">
+      {{predictions.get(match.key.id()).prob|round|int}}%
+    </div>
+  </div>
+</td>
+{% endmacro %}
+
+{% macro correct_prediction(match, predictions, compact=False) %}
+<td{% if compact %} rowspan="2"{% endif %}>
+  {% if match.has_been_played %}
+    {% if match.winning_alliance == predictions.get(match.key.id()).winning_alliance %}<span class="glyphicon glyphicon-ok"></span>{% endif %}
+  {% else %}
+    <strong>?</strong>
+  {% endif %}
 </td>
 {% endmacro %}

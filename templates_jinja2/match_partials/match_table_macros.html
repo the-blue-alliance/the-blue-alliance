@@ -20,6 +20,24 @@
 </table>
 {% endmacro %}
 
+{% macro qual_match_prediction_table(matches, predictions) %}
+<table class="match-table">
+  <thead>
+    {% include "match_partials/match_predictions_table_header.html" %}
+  </thead>
+
+  <tbody>
+    {% if matches.qm %}
+      <tr class="key">
+        <th colspan="19">Qualifications</th>
+      </tr>
+      {% for match in matches.qm %}
+        {{mtrm.match_row_tr(match, predictions=predictions)}}
+      {% endfor %}
+    {% endif %}
+  </tbody>
+</table>
+{% endmacro %}
 
 {% macro elim_match_table(matches, cur_team_key=None) %}
 <table class="match-table">
