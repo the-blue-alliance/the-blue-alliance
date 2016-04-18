@@ -36,7 +36,7 @@
     <div class="tab-pane active" id="match-predictions">
       <div class="row">
         {% if matches.qm %}
-        <div class="col-lg-8 col-lg-offset-2">
+        <div class="col-xs-12">
           <h3>Qualification Match Predictions (<a href="/predictions">?</a>)</h3>
           {% if match_prediction_stats.wl_accuracy %}<p><strong>Win/Loss prediction accuracy:</strong> {{match_prediction_stats.wl_accuracy|round|int}}%</p>{% endif %}
           {% if match_prediction_stats.wl_accuracy_75 %}<p><strong>Win/Loss prediction accuracy (>75% confidence):</strong> {{match_prediction_stats.wl_accuracy_75|round|int}}%</p>{% endif %}
