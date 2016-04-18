@@ -23,8 +23,10 @@
   {% endif %}
 
   {% if predictions %}
-    {{mtcm.prob(match, predictions)}}
-    {{mtcm.correct_prediction(match, predictions)}}
+    {{mtcm.breach_prob_td(match, 'red', predictions)}}
+    {{mtcm.breach_prob_td(match, 'blue', predictions)}}
+    {{mtcm.prob_td(match, predictions)}}
+    {{mtcm.correct_prediction_td(match, predictions)}}
   {% endif %}
 </tr>
 
@@ -46,8 +48,9 @@
   {% endif %}
 
   {% if predictions %}
-    {{mtcm.prob(match, predictions, compact=True)}}
-    {{mtcm.correct_prediction(match, predictions, compact=True)}}
+    {{mtcm.breach_prob_td(match, 'red', predictions)}}
+    {{mtcm.prob_td(match, predictions, compact=True)}}
+    {{mtcm.correct_prediction_td(match, predictions, compact=True)}}
   {% endif %}
 </tr>
 <tr class="hidden-lg">
@@ -57,6 +60,10 @@
 
   {% if not upcoming %}
   {{mtcm.match_score_td(match, 'blue', cur_team_key, compact=True, predictions=predictions)}}
+  {% endif %}
+
+  {% if predictions %}
+    {{mtcm.breach_prob_td(match, 'blue', predictions)}}
   {% endif %}
 </tr>
 {% endmacro %}
