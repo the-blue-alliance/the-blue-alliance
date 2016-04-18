@@ -38,8 +38,8 @@
         {% if matches.qm %}
         <div class="col-lg-8 col-lg-offset-2">
           <h3>Qualification Match Predictions (<a href="/predictions">?</a>)</h3>
-          {% if match_prediction_stats.wl_accuracy %}<p><strong>Prediction accuracy:</strong> {{match_prediction_stats.wl_accuracy|round(2)}}%</p>{% endif %}
-          {% if match_prediction_stats.wl_accuracy_75 %}<p><strong>Prediction accuracy (>75% confidence):</strong> {{match_prediction_stats.wl_accuracy_75|round(2)}}%</p>{% endif %}
+          {% if match_prediction_stats.wl_accuracy %}<p><strong>Win/Loss prediction accuracy:</strong> {{match_prediction_stats.wl_accuracy|round|int}}%</p>{% endif %}
+          {% if match_prediction_stats.wl_accuracy_75 %}<p><strong>Win/Loss prediction accuracy (>75% confidence):</strong> {{match_prediction_stats.wl_accuracy_75|round|int}}%</p>{% endif %}
           <p><strong>Match score prediction average error:</strong> {{match_prediction_stats.err_mean|round(2)}}</p>
           {{mtm.qual_match_prediction_table(matches, match_predictions)}}
         </div>
