@@ -198,18 +198,40 @@ class PredictionHelper(object):
         return predictions, prediction_stats
 
     @classmethod
-    def get_ranking_predictions(cls, matches, match_predictions, n=100):
+    def get_ranking_predictions(cls, matches, match_predictions, n=1000):
         """
         Only works for 2016
         """
         if not matches:
             return None, None
 
-        team_qual_points = defaultdict(lambda: [0] * n)
-        for i in xrange(n):
-            for match in matches:
-                if match.has_been_played and False:  # TODO temp for testing
+        # Calc surrogates
+        match_counts = defaultdict(int)
+        for match in matches:
+            for alliance_color in ['red', 'blue']:
+                for team in match.alliances[alliance_color]['teams']:
+                    match_counts[team] += 1
+        num_matches = min(match_counts.values())
+        surrogate_teams = set()
+        for k, v in match_counts.items():
+            if v > num_matches:
+                surrogate_teams.add(k)
+
+        # Calculate ranking points
+        team_ranking_points = defaultdict(lambda: [0] * n)
+        num_played = defaultdict(int)
+        for match in matches:
+            for alliance_color in ['red', 'blue']:
+                for team in match.alliances[alliance_color]['teams']:
+                    num_played[team] += 1
+            for i in xrange(n):
+                sampled_breach = {}
+                sampled_capture = {}
+                if match.has_been_played and match.match_number < 170:  # TODO temp for testing
                     sampled_winner = match.winning_alliance
+                    for alliance_color in ['red', 'blue']:
+                        sampled_breach[alliance_color] = match.score_breakdown[alliance_color]['teleopDefensesBreached']
+                        sampled_capture[alliance_color] = match.score_breakdown[alliance_color]['teleopTowerCaptured']
                 else:
                     prediction = match_predictions[match.key.id()]
                     if np.random.uniform(high=100) < prediction['prob']:
@@ -220,17 +242,33 @@ class PredictionHelper(object):
                         elif prediction['winning_alliance'] == 'blue':
                             sampled_winner = 'red'
 
+                    for alliance_color in ['red', 'blue']:
+                        sampled_breach[alliance_color] = np.random.uniform(high=100) < prediction[alliance_color]['prob_breach']
+                        sampled_capture[alliance_color] = np.random.uniform(high=100) < prediction[alliance_color]['prob_capture']
+
+                for alliance_color in ['red', 'blue']:
+                    for team in match.alliances[alliance_color]['teams']:
+                        if team in surrogate_teams and num_played[team] == 3:
+                            continue
+                        if sampled_breach[alliance_color]:
+                            team_ranking_points[team][i] += 1
+                        if sampled_capture[alliance_color]:
+                            team_ranking_points[team][i] += 1
+
                 if sampled_winner == '':
                     for alliance_color in ['red', 'blue']:
                         for team in match.alliances[alliance_color]['teams']:
-                            team_qual_points[team][i] += 1
+                            if team in surrogate_teams and num_played[team] == 3:
+                                continue
+                            team_ranking_points[team][i] += 1
                 else:
                     for team in match.alliances[sampled_winner]['teams']:
-                        team_qual_points[team][i] += 2
+                        if team in surrogate_teams and num_played[team] == 3:
+                            continue
+                        team_ranking_points[team][i] += 2
 
-        # for team, qual_points in sorted(team_qual_points.items(), key=lambda x: int(x[0][3:])):
+        # for team, qual_points in sorted(team_ranking_points.items(), key=lambda x: -np.mean(x[1])):
         #     print team, np.mean(qual_points)
-
-        # print team_qual_points['frc254']
+        # print team_ranking_points['frc4003']
 
         return None, None
