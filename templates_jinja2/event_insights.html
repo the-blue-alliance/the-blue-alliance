@@ -27,6 +27,7 @@
     <div class="col-sm-12">
       <ul class="nav nav-tabs">
         {% if matches.num > 0 %}<li class="active"><a href="#match-predictions" data-toggle="tab">Qual Match Predictions</a></li>{% endif %}
+        <li><a href="#ranking-predictions" data-toggle="tab">Ranking Predictions</a></li>
       </ul>
     </div>
   </div>
@@ -47,6 +48,15 @@
       </div>
     </div>
     {% endif %}
+
+    <div class="tab-pane active" id="ranking-predictions">
+      <div class="row">
+        <div class="col-lg-8 col-lg-offset-2">
+          <h3>Ranking Predictions (<a href="/predictions">?</a>)</h3>
+          HI
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}

@@ -1,3 +1,4 @@
+from collections import defaultdict
 import math
 import numpy as np
 
@@ -149,3 +150,41 @@ class PredictionHelper(object):
         }
 
         return predictions, prediction_stats
+
+    @classmethod
+    def get_ranking_predictions(cls, matches, match_predictions, n=100):
+        """
+        Only works for 2016
+        """
+        if not matches:
+            return None, None
+
+        team_qual_points = defaultdict(lambda: [0] * n)
+        for i in xrange(n):
+            for match in matches:
+                if match.has_been_played and False:  # TODO temp for testing
+                    sampled_winner = match.winning_alliance
+                else:
+                    prediction = match_predictions[match.key.id()]
+                    if np.random.uniform(high=100) < prediction['prob']:
+                        sampled_winner = prediction['winning_alliance']
+                    else:
+                        if prediction['winning_alliance'] == 'red':
+                            sampled_winner = 'blue'
+                        elif prediction['winning_alliance'] == 'blue':
+                            sampled_winner = 'red'
+
+                if sampled_winner == '':
+                    for alliance_color in ['red', 'blue']:
+                        for team in match.alliances[alliance_color]['teams']:
+                            team_qual_points[team][i] += 1
+                else:
+                    for team in match.alliances[sampled_winner]['teams']:
+                        team_qual_points[team][i] += 2
+
+        # for team, qual_points in sorted(team_qual_points.items(), key=lambda x: int(x[0][3:])):
+        #     print team, np.mean(qual_points)
+
+        # print team_qual_points['frc254']
+
+        return None, None

@@ -226,6 +226,10 @@ class EventInsights(CacheableHandler):
         matches = MatchHelper.organizeMatches(cleaned_matches)
 
         match_predictions, match_prediction_stats = PredictionHelper.get_match_predictions(matches['qm'])
+        import time
+        s = time.time()
+        ranking_predictions, ranking_prediction_stats = PredictionHelper.get_ranking_predictions(matches['qm'], match_predictions)
+        print time.time() - s
 
         self.template_values.update({
             "event": event,
