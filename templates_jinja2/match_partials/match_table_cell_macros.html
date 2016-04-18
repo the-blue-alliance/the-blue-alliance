@@ -90,7 +90,7 @@
   {% else %}
     ?
   {% endif %}
-  <br><em>?% / {{predictions.get(match.key.id()).get(alliance_color).prob_capture|round|int}}%</em>
+  <br><em>{{predictions.get(match.key.id()).get(alliance_color).prob_breach|round|int}}% / {{predictions.get(match.key.id()).get(alliance_color).prob_capture|round|int}}%</em>
 </td>
 {% endmacro %}
 

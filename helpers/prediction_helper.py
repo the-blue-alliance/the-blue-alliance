@@ -75,9 +75,14 @@ class PredictionHelper(object):
         else:
             winning_alliance = ''
 
+        # Prob breach
+        #TODO
+        red_prob_breach = 0.7
+        blue_prob_breach = 0.7
+
         prediction = {
-            'red': {'score': red_score, 'boulders': red_boulders, 'prob_capture': red_prob_capture * 100},
-            'blue': {'score': blue_score, 'boulders': blue_boulders, 'prob_capture': blue_prob_capture * 100},
+            'red': {'score': red_score, 'boulders': red_boulders, 'prob_capture': red_prob_capture * 100, 'prob_breach': red_prob_breach * 100},
+            'blue': {'score': blue_score, 'boulders': blue_boulders, 'prob_capture': blue_prob_capture * 100, 'prob_breach': blue_prob_breach * 100},
             'winning_alliance': winning_alliance,
             'prob': prob * 100,
         }
