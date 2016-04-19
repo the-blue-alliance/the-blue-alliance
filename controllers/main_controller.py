@@ -283,9 +283,9 @@ class GamedayHandler(CacheableHandler):
         if special_webcasts_temp:
             special_webcasts_temp = special_webcasts_temp.contents
         else:
-            special_webcasts_temp = {}
+            special_webcasts_temp = []
         special_webcasts = []
-        for webcast in special_webcasts_temp.values():
+        for webcast in special_webcasts_temp:
             toAppend = {}
             for key, value in webcast.items():
                 toAppend[str(key)] = str(value)
