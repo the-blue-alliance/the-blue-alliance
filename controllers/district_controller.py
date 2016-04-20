@@ -97,21 +97,17 @@ class DistrictDetail(CacheableHandler):
         # Currently Competing Team Status
         live_events = EventHelper.getWeekEvents()
         query_futures = []
-        grouped_eventteams = {}
-        event_names = {}
         for event in live_events:
             query_futures.append(EventTeamsQuery(event.key_name).fetch_async())
 
+        live_events_with_teams = []
         for event, teams_future in zip(live_events, query_futures):
-            teams_in_district = filter(lambda t: t in teams, teams_future.get_result())
-            event_names[event.key_name] = event.short_name
-            grouped_eventteams[event.key_name] = TeamHelper.sortTeams(teams_in_district)
+            live_teams_in_district = TeamHelper.sortTeams(filter(lambda t: t in teams, teams_future.get_result()))
 
-        team_statuses = {}
-        for event_key, teams in grouped_eventteams.iteritems():
-            live_event = next((e for e in live_events if e.key_name == event_key))
-            for team in teams:
-                team_statuses[team.key_name] = EventTeamStatusHelper.generateTeamAtEventStatus(team.key_name, live_event)
+            teams_and_statuses = []
+            for team in live_teams_in_district:
+                teams_and_statuses.append((team, EventTeamStatusHelper.generateTeamAtEventStatus(team.key_name, event)))
+            live_events_with_teams.append((event.key_name, event.short_name, teams_and_statuses))
 
         self.template_values.update({
             'explicit_year': explicit_year,
@@ -124,9 +120,7 @@ class DistrictDetail(CacheableHandler):
             'team_totals': team_totals,
             'teams_a': teams_a,
             'teams_b': teams_b,
-            'active_teams': grouped_eventteams,
-            'live_events': event_names,
-            'team_status': team_statuses,
+            'live_events_with_teams': live_events_with_teams,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/district_details.html')
