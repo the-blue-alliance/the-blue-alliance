@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Live Favorites - The Blue Alliance{% endblock %}
+
+{% block meta_description %}View how your favorite teams are doing.{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <h2>Active myTBA Favorites</h2>
+  </div>
+  <div class="row">
+    {% if live_events_with_teams %}
+      <p>Add more teams as Favorites in your <a href="/account/mytba">Account Settings</a></p>
+      <div>
+        {% include "live_teams_partial.html" %}
+      </div>
+    {% else %}
+      <p>No favorite teams are competing this week. Why not <a href="/account/mytba">add one</a>?</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
