@@ -1,6 +1,7 @@
 from base_controller import CacheableHandler
 from database.event_query import TeamEventsQuery
 from database.match_query import TeamEventMatchesQuery
+from helpers.event_team_status_helper import EventTeamStatusHelper
 from helpers.match_helper import MatchHelper
 from helpers.team_helper import TeamHelper
 from models.team import Team
@@ -104,5 +105,5 @@ class NightbotTeamStatuskHandler(CacheableHandler):
         event_code_upper = event.event_short.upper()
 
         team_key = 'frc{}'.format(team_number)
-        status = TeamHelper.generateTeamAtEventStatus(team_key, event)
+        status = EventTeamStatusHelper.generateTeamAtEventStatus(team_key, event)[0]
         return '{}[{}] {}'.format(user_str, event_code_upper, status)

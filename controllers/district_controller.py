@@ -14,6 +14,7 @@ from database.team_query import DistrictTeamsQuery
 
 from helpers.district_helper import DistrictHelper
 from helpers.event_helper import EventHelper
+from helpers.event_team_status_helper import EventTeamStatusHelper
 from helpers.team_helper import TeamHelper
 
 from models.event import Event
@@ -105,7 +106,7 @@ class DistrictDetail(CacheableHandler):
         for event_key, teams in grouped_eventteams.iteritems():
             live_event = next((e for e in live_events if e.key_name == event_key))
             for team in teams:
-                team_statuses[team.key_name] = TeamHelper.generateTeamAtEventStatus(team.key_name, live_event)
+                team_statuses[team.key_name] = EventTeamStatusHelper.generateTeamAtEventStatus(team.key_name, live_event)
 
         self.template_values.update({
             'explicit_year': explicit_year,

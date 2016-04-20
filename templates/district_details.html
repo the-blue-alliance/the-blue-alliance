@@ -164,13 +164,21 @@
               <tr>
                   <th>Team Number</th>
                   <th>Team Name</th>
-                  <th>Status</th>
+                  <th>Qual Record</th>
+                  <th>Ranking</th>
+                  <th>Playoff Status</th>
               </tr>
               {% for team in teams %}
                 <tr>
+                  {% with team_status|get_item:team.key_name as status %}
                   <td>{{ team.team_number }}</td>
                   <td><a href="/team/{{ team.team_number }}">{{ team.nickname }}</a></td>
-                  <td>{{ team_status|get_item:team.key_name }}</td>
+                  <td>{{ status|get_tuple:1 }}</td>
+                  <td>{{ status|get_tuple:2 }}</td>
+                  {% with status|get_tuple:3 as playoff %}
+                  <td>{% if playoff %} {{ playoff }} {% endif %}</td>
+                  {% endwith %}
+                  {% endwith %}
                 </tr>
               {% endfor %}
             </table>
