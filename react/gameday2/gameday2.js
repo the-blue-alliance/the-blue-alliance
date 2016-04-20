@@ -100,9 +100,9 @@ var GamedayFrame = React.createClass({
   handleHashtagToggle: function() {
     this.setState({hashtagEnabled: !this.state.hashtagEnabled});
   },
-  handleWebcastAdd: function(eventModel) {
+  handleWebcastAdd: function(webcast) {
     var displayedWebcasts = this.state.displayedWebcasts;
-    var newDisplayedWebcasts = displayedWebcasts.concat([eventModel]);
+    var newDisplayedWebcasts = displayedWebcasts.concat([webcast]);
     this.setState({displayedWebcasts: newDisplayedWebcasts});
   },
   handleUnfollowTeam: function(team) {
@@ -244,18 +244,18 @@ var VideoGrid = React.createClass({
     );
   },
   renderLayoutOne: function(classes) {
-    if (this.props.events) {
-      var eventModel = this.props.events[0];
+    if (this.props.webcasts) {
+      var webcast = this.props.webcasts[0];
     } else {
-      var eventModel = null;
+      var webcast = null;
     }
     return (
       <div className={classes}>
         <div className="row">
           <div className="col-md-12">
             <VideoCell
-              key={this.props.events[0].event_name}
-              eventModel={eventModel}
+              key={webcast.id}
+              webcast={webcast}
               vidHeight="100%"
               vidWidth="100%" />
           </div>
@@ -269,15 +269,15 @@ var VideoGrid = React.createClass({
         <div className="row">
           <div className="col-md-6">
             <VideoCell
-              key={this.props.events[0].event_name}
-              eventModel={this.props.events[0]}
+              key={this.props.webcasts[0].id}
+              webcast={this.props.webcasts[0]}
               vidHeight="100%"
               vidWidth="100%" />
           </div>
           <div className="col-md-6">
             <VideoCell
-              key={this.props.events[1].event_name}
-              eventModel={this.props.events[1]}
+              key={this.props.webcasts[1].id}
+              webcast={this.props.webcasts[1]}
               vidHeight="100%"
               vidWidth="100%" />
           </div>
@@ -291,8 +291,8 @@ var VideoGrid = React.createClass({
         <div className="row">
           <div className="col-md-6">
             <VideoCell
-              key={this.props.events[0].event_name}
-              eventModel={this.props.events[0]}
+              key={this.props.webcasts[0].id}
+              webcast={this.props.webcasts[0]}
               vidHeight="100%"
               vidWidth="100%" />
           </div>
@@ -300,8 +300,8 @@ var VideoGrid = React.createClass({
             <div className="row">
               <div className="col-md-12">
                 <VideoCell
-                  key={this.props.events[1].event_name}
-                  eventModel={this.props.events[1]}
+                  key={this.props.webcasts[1].id}
+                  webcast={this.props.webcasts[1]}
                   vidHeight="50%"
                   vidWidth="100%" />
               </div>
@@ -309,8 +309,8 @@ var VideoGrid = React.createClass({
             <div className="row">
               <div className="col-md-12">
                 <VideoCell
-                  key={this.props.events[2].event_name}
-                  eventModel={this.props.events[2]}
+                  key={this.props.webcasts[2].id}
+                  webcast={this.props.webcasts[2]}
                   vidHeight="50%"
                   vidWidth="100%" />
               </div>
@@ -352,18 +352,24 @@ var VideoCell = React.createClass({
     this.setState({"showOverlay": false})
   },
   render: function() {
-    if (this.props.eventModel) {
-      var id = this.props.eventModel.name + "-1";
-      switch (this.props.eventModel.webcast[0].type) {
-        case "ustream":
+    if (this.props.webcast) {
+      var cellEmbed;
+      switch (this.props.webcast.type) {
+        case 'ustream':
         cellEmbed = <EmbedUstream
-          eventModel={this.props.eventModel}
+          webcast={this.props.webcast}
           vidHeight={this.props.vidHeight}
           vidWidth={this.props.vidWidth} />;
         break;
-        case "youtube":
+        case 'youtube':
         cellEmbed = <EmbedYoutube
-          eventModel={this.props.eventModel}
+          webcast={this.props.webcast}
+          vidHeight={this.props.vidHeight}
+          vidWidth={this.props.vidWidth} />;
+        break;
+        case 'twitch':
+        cellEmbed = <EmbedTwitch
+          webcast={this.props.webcast}
           vidHeight={this.props.vidHeight}
           vidWidth={this.props.vidWidth} />;
         break;
@@ -373,12 +379,11 @@ var VideoCell = React.createClass({
       }
       return (
         <div className="videoCell"
-          idName={id}
+          idName={this.props.webcast.id}
           onMouseEnter={this.onMouseEnter}
           onMouseLeave={this.onMouseLeave}>
-
-          <VideoCellOverlay eventModel={this.props.eventModel} enabled={this.state.showOverlay} />
           {cellEmbed}
+          <VideoCellOverlay webcast={this.props.webcast} enabled={this.state.showOverlay} />
         </div>
       )
     } else {
@@ -395,22 +400,21 @@ var VideoCellOverlay = React.createClass({
       'panel-default': true,
       'videoCellOverlay': true,
     });
-    if (this.props.eventModel) {
+    if (this.props.webcast) {
       return (
         <div className={classes}>
           <div className="panel-heading">
-            <h3 className="panel-title">{this.props.eventModel.name}</h3>
+            <h3 className="panel-title">{this.props.webcast.name}</h3>
           </div>
-          <div className="panel-body"></div>
         </div>
       )
     }
   }
-})
+});
 
 var EmbedYoutube = React.createClass({
   render: function() {
-    var src = "//www.youtube.com/embed/" + this.props.eventModel.webcast[0].channel;
+    var src = "//www.youtube.com/embed/" + this.props.webcast.channel;
     return (
       <iframe
         width={this.props.vidWidth}
@@ -421,11 +425,11 @@ var EmbedYoutube = React.createClass({
       </iframe>
     );
   }
-})
+});
 
 var EmbedUstream = React.createClass({
   render: function() {
-    var src = "http://www.ustream.tv/flash/live/" + this.props.eventModel.webcast[0].channel;
+    var src = "http://www.ustream.tv/flash/live/" + this.props.webcast.channel;
     return (
       <object
         id='utv_o_322919'
@@ -451,7 +455,33 @@ var EmbedUstream = React.createClass({
       </object>
     );
   }
-})
+});
+
+var EmbedTwitch = React.createClass({
+  render: function() {
+    var channel = this.props.webcast.channel;
+    return (
+      <object
+        type='application/x-shockwave-flash'
+        height='100%'
+        width='100%'
+        id='live_embed_player_flash'
+        data='http://www.twitch.tv/widgets/live_embed_player.swf?channel=${channel}'
+        bgcolor='#000000'>
+        <param name='allowFullScreen' value='true' />
+        <param name='allowScriptAccess' value='always' />
+        <param name='allowNetworking' value='all' />
+        <param
+          name='movie'
+          value='http://www.twitch.tv/widgets/live_embed_player.swf' />
+        <param
+          name='flashvars'
+          value='hostname=www.twitch.tv&channel=${channel}&auto_play=true&start_volume=25&enable_javascript=true' />
+        <param name='wmode' value='transparent' />
+      </object>
+    );
+  }
+});
 
 var WebcastDropdown = React.createClass({
   render: function() {
@@ -585,7 +615,7 @@ var FollowingTeamsModal = React.createClass({
 
 // [{'webcasts': [{u'channel': u'6540154', u'type': u'ustream'}], 'event_name': u'Present Test Event', 'event_key': u'2014testpresent'}]
 
-var webcastData = $.parseJSON($("#webcasts_json").text().replace(/u'/g,/u'/g,/u'/g,/u'/g,'\'').replace(/'/g,/'/g,/'/g,/'/g,'"'));
+var webcastData = $.parseJSON($("#webcasts_json").text().replace(/u'/g,/u'/g,/u'/g,/u'/g,/u'/g,/u'/g,/u'/g,/u'/g,'\'').replace(/'/g,/'/g,/'/g,/'/g,/'/g,/'/g,/'/g,/'/g,'"'));
 
 ReactDOM.render(
   <GamedayFrame webcastData={webcastData} pollInterval={20000} />,
