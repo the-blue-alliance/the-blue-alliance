@@ -264,7 +264,7 @@ class PredictionHelper(object):
             for i in xrange(n):
                 sampled_breach = {}
                 sampled_capture = {}
-                if match.has_been_played and match.match_number < 170:  # TODO temp for testing
+                if match.has_been_played and match.match_number < 0:  # TODO temp for testing
                     sampled_winner = match.winning_alliance
                     for alliance_color in ['red', 'blue']:
                         sampled_breach[alliance_color] = match.score_breakdown[alliance_color]['teleopDefensesBreached']
@@ -304,8 +304,13 @@ class PredictionHelper(object):
                             continue
                         team_ranking_points[team][i] += 2
 
-        # for team, qual_points in sorted(team_ranking_points.items(), key=lambda x: -np.mean(x[1])):
-        #     print team, np.mean(qual_points)
+        for i, (team, qual_points) in enumerate(sorted(team_ranking_points.items(), key=lambda x: -np.mean(x[1]))):
+            actual = 0
+            for row in matches[0].event.get().rankings:
+                if row[1] == team[3:]:
+                    actual = int(row[0])
+                    break
+            print i + 1, team, np.mean(qual_points), min(qual_points), max(qual_points), i + 1 - actual
         # print team_ranking_points['frc4003']
 
         return None, None
