@@ -94,6 +94,19 @@ class DistrictDetail(CacheableHandler):
             middle_value += 1
         teams_a, teams_b = teams[:middle_value], teams[middle_value:]
 
+        # Currently Competing Team Status
+        # TODO use DatabaseQueries here
+        live_events = EventHelper.getWeekEvents()
+        live_eventteams_futures = EventTeam.query(ndb.AND(
+            EventTeam.team.IN([team.key for team in teams]),
+            EventTeam.event.IN([event.key for event in live_events]))).fetch_async()
+        grouped_eventteams = EventHelper.group_by_event(live_eventteams_futures.get_result(), teams)
+        team_statuses = {}
+        for event_key, teams in grouped_eventteams.iteritems():
+            live_event = next((e for e in live_events if e.key_name == event_key))
+            for team in teams:
+                team_statuses[team.key_name] = TeamHelper.generateTeamAtEventStatus(team.key_name, live_event)
+
         self.template_values.update({
             'explicit_year': explicit_year,
             'year': year,
@@ -105,6 +118,9 @@ class DistrictDetail(CacheableHandler):
             'team_totals': team_totals,
             'teams_a': teams_a,
             'teams_b': teams_b,
+            'active_teams': dict(grouped_eventteams),
+            'live_events': EventHelper.build_event_name_dict(live_events),
+            'team_status': team_statuses,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/district_details.html')
