@@ -10,10 +10,10 @@ from controllers.base_controller import CacheableHandler
 from consts.district_type import DistrictType
 from consts.event_type import EventType
 
-from database.team_query import DistrictTeamsQuery
-
+from database.team_query import DistrictTeamsQuery, EventTeamsQuery
 from helpers.district_helper import DistrictHelper
 from helpers.event_helper import EventHelper
+from helpers.event_team_status_helper import EventTeamStatusHelper
 from helpers.team_helper import TeamHelper
 
 from models.event import Event
@@ -65,6 +65,12 @@ class DistrictDetail(CacheableHandler):
         # needed for valid_districts
         district_cmp_keys_future = Event.query(Event.year == year, Event.event_type_enum == EventType.DISTRICT_CMP).fetch_async(None, keys_only=True)  # to compute valid_districts
 
+        # Needed for active team statuses
+        live_events = EventHelper.getWeekEvents()
+        live_eventteams_futures = []
+        for event in live_events:
+            live_eventteams_futures.append(EventTeamsQuery(event.key_name).fetch_async())
+
         event_futures = ndb.get_multi_async(event_keys)
         event_team_keys_future = EventTeam.query(EventTeam.event.IN(event_keys)).fetch_async(None, keys_only=True)
         team_futures = ndb.get_multi_async(set([ndb.Key(Team, et_key.id().split('_')[1]) for et_key in event_team_keys_future.get_result()]))
@@ -94,6 +100,16 @@ class DistrictDetail(CacheableHandler):
             middle_value += 1
         teams_a, teams_b = teams[:middle_value], teams[middle_value:]
 
+        # Currently Competing Team Status
+        live_events_with_teams = []
+        for event, teams_future in zip(live_events, live_eventteams_futures):
+            live_teams_in_district = TeamHelper.sortTeams(filter(lambda t: t in teams, teams_future.get_result()))
+
+            teams_and_statuses = []
+            for team in live_teams_in_district:
+                teams_and_statuses.append((team, EventTeamStatusHelper.generateTeamAtEventStatus(team.key_name, event)))
+            live_events_with_teams.append((event, teams_and_statuses))
+
         self.template_values.update({
             'explicit_year': explicit_year,
             'year': year,
@@ -105,6 +121,7 @@ class DistrictDetail(CacheableHandler):
             'team_totals': team_totals,
             'teams_a': teams_a,
             'teams_b': teams_b,
+            'live_events_with_teams': live_events_with_teams,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../templates/district_details.html')

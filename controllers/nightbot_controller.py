@@ -1,7 +1,9 @@
 from base_controller import CacheableHandler
 from database.event_query import TeamEventsQuery
 from database.match_query import TeamEventMatchesQuery
+from helpers.event_team_status_helper import EventTeamStatusHelper
 from helpers.match_helper import MatchHelper
+from helpers.team_helper import TeamHelper
 from models.team import Team
 
 
@@ -103,86 +105,5 @@ class NightbotTeamStatuskHandler(CacheableHandler):
         event_code_upper = event.event_short.upper()
 
         team_key = 'frc{}'.format(team_number)
-        matches_future = TeamEventMatchesQuery(team_key, event.key.id()).fetch_async()
-        matches = MatchHelper.organizeMatches(matches_future.get_result())
-
-        # Compute alliances
-        alliance_number = None
-        if event.alliance_selections:
-            for i, alliance in enumerate(event.alliance_selections):
-                if team_key in alliance['picks']:
-                    alliance_number = i + 1
-                    break
-            else:
-                alliance_number = 0  # Team didn't make it to elims
-
-        level_map = {
-            'qf': 'quarters',
-            'sf': 'semis',
-            'f': 'the finals',
-        }
-        for comp_level in ['f', 'sf', 'qf']:  # playoffs
-            level_str = level_map[comp_level]
-            if matches[comp_level]:
-                wins = 0
-                losses = 0
-                for match in matches[comp_level]:
-                    if match.has_been_played:
-                        if team_key in match.alliances[match.winning_alliance]['teams']:
-                            wins += 1
-                        else:
-                            losses += 1
-                if wins == 2:
-                    if comp_level == 'f':
-                        return "{}[{}] Team {} won the event on alliance #{}.".format(user_str, event_code_upper, team_number, alliance_number)
-                    else:
-                        return "{}[{}] Team {} won {} on alliance #{}.".format(user_str, event_code_upper, team_number, level_str, alliance_number)
-                elif losses == 2:
-                    return "{}[{}] Team {} got knocked out in {} on alliance #{}.".format(user_str, event_code_upper, team_number, level_str, alliance_number)
-                else:
-                    return "{}[{}] Team {} is currently {}-{} in {} on alliance #{}.".format(user_str, event_code_upper, team_number, wins, losses, level_str, alliance_number)
-
-        # Still in quals or team did not make it to elims
-        # Compute qual W-L-T
-        wins = 0
-        losses = 0
-        ties = 0
-        unplayed_qual = 0
-        for match in matches['qm']:
-            if match.has_been_played:
-                if match.winning_alliance == '':
-                    ties += 1
-                elif team_key in match.alliances[match.winning_alliance]['teams']:
-                    wins += 1
-                else:
-                    losses += 1
-            else:
-                unplayed_qual += 1
-
-        if wins == 0 and losses == 0 and ties == 0:
-            # No matches played yet
-            return "{}[{}] Team {} has not played any matches yet.".format(user_str, event_code_upper, team_number)
-
-        # Compute rank & num_teams
-        rank = None
-        ranking_points = None
-        if event.rankings:
-            num_teams = len(event.rankings) - 1
-            for i, row in enumerate(event.rankings):
-                if row[1] == team_number:
-                    rank = i
-                    ranking_points = int(float(row[2]))
-                    break
-
-        if unplayed_qual > 0:
-            if rank is not None:
-                return "{}[{}] Team {} is currently rank {}/{} with a record of {}-{}-{} and {} ranking points.".format(user_str, event_code_upper, team_number, rank, num_teams, wins, losses, ties, ranking_points)
-            else:
-                return "{}[{}] Team {} currently has a record of {}-{}-{}.".format(user_str, event_code_upper, team_number, wins, losses, ties)
-        else:
-            if alliance_number is None:
-                return "{}[{}] Team {} ended qualification matches at rank {}/{} with a record of {}-{}-{}.".format(user_str, event_code_upper, team_number, rank, num_teams, wins, losses, ties)
-            elif alliance_number == 0:
-                return "{}[{}] Team {} ended qualification matches at rank {}/{} with a record of {}-{}-{} and was not picked for playoff matches.".format(user_str, event_code_upper, team_number, rank, num_teams, wins, losses, ties)
-            else:
-                return "{}[{}] Team {} will be competing in the playoff matches on alliance #{}.".format(user_str, event_code_upper, team_number, alliance_number)
+        status = EventTeamStatusHelper.generateTeamAtEventStatus(team_key, event)[0]
+        return '{}[{}] {}'.format(user_str, event_code_upper, status)
