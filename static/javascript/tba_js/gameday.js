@@ -89,7 +89,7 @@ function setupViews() {
   }
 
   // Special Champs Mode
-  var isChamps = urlvars['champs'];
+  var isChamps = urlvars['champs-all'];
   if (isChamps != null) {
     layout_8();
     setChat(true);
@@ -102,6 +102,13 @@ function setupViews() {
     setupView(6, $("#2016hop-1"));
     setupView(7, $("#2016new-1"));
     setupView(8, $("#2016tes-1"));
+  }
+
+  var isChamps = urlvars['champs'];
+  if (isChamps != null) {
+    layout_2();
+    setChat(true);
+    setupView(0, $("#firstchamplive-1"));
   }
 }
 
