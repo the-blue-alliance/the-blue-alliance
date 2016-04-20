@@ -372,20 +372,3 @@ class EventHelper(object):
         event_short = event_key[4:]
         return year == '2015' and event_short not in {'cc', 'cacc', 'mttd'}
 
-    @classmethod
-    def group_by_event(cls, eventteams, teams):
-        """
-        Group a list of eventteams by their parent event
-        :return: dict with event keys -> teams in that event
-        """
-        result = collections.defaultdict(list)
-        for eventteam in eventteams:
-            result[eventteam.event.id()].append(next((t for t in teams if t.key_name == eventteam.team.id()), None))
-        return result
-
-    @classmethod
-    def build_event_name_dict(cls, events):
-        result = {}
-        for event in events:
-            result[event.key_name] = event.display_name
-        return result

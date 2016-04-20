@@ -10,8 +10,7 @@ from controllers.base_controller import CacheableHandler
 from consts.district_type import DistrictType
 from consts.event_type import EventType
 
-from database.team_query import DistrictTeamsQuery
-
+from database.team_query import DistrictTeamsQuery, EventTeamsQuery
 from helpers.district_helper import DistrictHelper
 from helpers.event_helper import EventHelper
 from helpers.event_team_status_helper import EventTeamStatusHelper
@@ -96,12 +95,18 @@ class DistrictDetail(CacheableHandler):
         teams_a, teams_b = teams[:middle_value], teams[middle_value:]
 
         # Currently Competing Team Status
-        # TODO use DatabaseQueries here
         live_events = EventHelper.getWeekEvents()
-        live_eventteams_futures = EventTeam.query(ndb.AND(
-            EventTeam.team.IN([team.key for team in teams]),
-            EventTeam.event.IN([event.key for event in live_events]))).fetch_async()
-        grouped_eventteams = EventHelper.group_by_event(live_eventteams_futures.get_result(), teams)
+        query_futures = []
+        grouped_eventteams = {}
+        event_names = {}
+        for event in live_events:
+            query_futures.append(EventTeamsQuery(event.key_name).fetch_async())
+
+        for event, teams_future in zip(live_events, query_futures):
+            teams_in_district = filter(lambda t: t in teams, teams_future.get_result())
+            event_names[event.key_name] = event.short_name
+            grouped_eventteams[event.key_name] = TeamHelper.sortTeams(teams_in_district)
+
         team_statuses = {}
         for event_key, teams in grouped_eventteams.iteritems():
             live_event = next((e for e in live_events if e.key_name == event_key))
@@ -119,8 +124,8 @@ class DistrictDetail(CacheableHandler):
             'team_totals': team_totals,
             'teams_a': teams_a,
             'teams_b': teams_b,
-            'active_teams': dict(grouped_eventteams),
-            'live_events': EventHelper.build_event_name_dict(live_events),
+            'active_teams': grouped_eventteams,
+            'live_events': event_names,
             'team_status': team_statuses,
         })
 
