@@ -91,16 +91,17 @@ function setupViews() {
   // Special Champs Mode
   var isChamps = urlvars['champs'];
   if (isChamps != null) {
-    layout_7();
+    layout_8();
     setChat(true);
-    setupView(0, $("#2015arc-1"));
-    setupView(1, $("#2015cars-1"));
-    setupView(2, $("#2015carv-1"));
-    setupView(3, $("#2015cur-1"));
-    setupView(4, $("#2015gal-1"));
-    setupView(5, $("#2015hop-1"));
-    setupView(6, $("#2015new-1"));
-    setupView(7, $("#2015tes-1"));
+    setupView(0, $("#firstchamplive-1"));
+    setupView(1, $("#2016arc-1"));
+    setupView(2, $("#2016cars-1"));
+    setupView(3, $("#2016carv-1"));
+    setupView(4, $("#2016cur-1"));
+    setupView(5, $("#2016gal-1"));
+    setupView(6, $("#2016hop-1"));
+    setupView(7, $("#2016new-1"));
+    setupView(8, $("#2016tes-1"));
   }
 }
 
