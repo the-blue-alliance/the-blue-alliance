@@ -2,6 +2,7 @@ from collections import defaultdict
 import math
 import numpy as np
 
+from consts.event_type import EventType
 from helpers.matchstats_helper import MatchstatsHelper
 
 
@@ -41,7 +42,7 @@ class PredictionHelper(object):
         return s, s_boulder
 
     @classmethod
-    def _predict_match(cls, match, ixoprs, ixoprs_boulder, breach_rates, init_breach_rate):
+    def _predict_match(cls, match, ixoprs, ixoprs_boulder, breach_rates, init_breach_rate, is_champs):
         score_var = 50**2  # TODO temporary set variance to be huge
         boulder_var = 8**2  # TODO get real value
 
@@ -68,10 +69,11 @@ class PredictionHelper(object):
             prob = 0.5
 
         # Prob capture
-        mu = red_boulders - 8
+        tower_strength = 10 if is_champs else 8
+        mu = red_boulders - tower_strength
         red_prob_capture = 1 - cls._normcdf(-mu / np.sqrt(boulder_var))
 
-        mu = blue_boulders - 8
+        mu = blue_boulders - tower_strength
         blue_prob_capture = 1 - cls._normcdf(-mu / np.sqrt(boulder_var))
 
         if red_score > blue_score:
@@ -82,6 +84,7 @@ class PredictionHelper(object):
             winning_alliance = ''
 
         # Prob breach. Artificially limit
+        # Beach predictions aren't really correct, but should be close enough at a high level of play -Eugene 2016-04-19
         red_prob_breach = min(max(red_breach_rate_sum / 3, 0.1), 0.95)
         blue_prob_breach = min(max(blue_breach_rate_sum / 3, 0.1), 0.95)
 
@@ -97,6 +100,9 @@ class PredictionHelper(object):
     def get_match_predictions(cls, matches):
         if not matches:
             return None, None
+
+        event_key = matches[0].event
+        event = event_key.get()
 
         # Build team_list
         team_list = set()
@@ -119,7 +125,7 @@ class PredictionHelper(object):
         s_boulder = np.zeros([n, 1])
 
         # Construct M and populate s with initial guess using previous event OPRs
-        last_event_stats = MatchstatsHelper.get_last_event_stats(team_list, matches[0].event)
+        last_event_stats = MatchstatsHelper.get_last_event_stats(team_list, event_key)
         last_event_oprs = {}
         last_event_oprs_boulder = {}
         breach_rates = {}
@@ -179,7 +185,8 @@ class PredictionHelper(object):
                     ixoprs_boulder[team] = opr_boulder[0]
 
             # Make and benchmark predictions
-            prediction = cls._predict_match(match, ixoprs, ixoprs_boulder, breach_rates, init_breach_rate)
+            is_champs = event.event_type_enum in EventType.CMP_EVENT_TYPES
+            prediction = cls._predict_match(match, ixoprs, ixoprs_boulder, breach_rates, init_breach_rate, is_champs)
             predictions[match.key.id()] = prediction
             if match.has_been_played:
                 played_matches += 1
