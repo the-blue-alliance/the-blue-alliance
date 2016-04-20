@@ -11,7 +11,7 @@ var hiddenviews = [];
 // For keeping track of what view a webcast key is in
 var viewLocations = {};
 
-var MAX_VIEWS = 8;
+var MAX_VIEWS = 9;
 
 $(document).ready(function() {
 
@@ -355,7 +355,7 @@ function swap(dragged, target) {
 //Layout Changing Control
 var height, width, current_layout, last_layout, num_views;
 // num_views[layout_number] = number of views provided by that layout
-num_views = [1, 2, 3, 4, 5, 6, 4, 8];
+num_views = [1, 2, 3, 4, 5, 6, 4, 8, 9];
 
 // Fixes layout. Call this if window resized, etc.
 function fixLayout() {
@@ -638,6 +638,61 @@ function layout_7() {
   $("#view_"+order[7]).height(height*0.5);
   $("#view_"+order[7]).css('top', height*0.5);
   $("#view_"+order[7]).css('left', width*0.75);
+
+  last_layout = current_layout;
+}
+
+function layout_8() {
+  current_layout = 8;
+  addRemoveViews(current_layout, last_layout);
+
+  height = $(".video_container").height();
+  width = $(".video_container").width();
+
+  $("#view_"+order[0]).width(width*0.33);
+  $("#view_"+order[0]).height(height*0.33);
+  $("#view_"+order[0]).css('top', 0);
+  $("#view_"+order[0]).css('left', 0);
+
+  $("#view_"+order[1]).width(width*0.33);
+  $("#view_"+order[1]).height(height*0.33);
+  $("#view_"+order[1]).css('top', 0);
+  $("#view_"+order[1]).css('left', width*0.33);
+
+  $("#view_"+order[2]).width(width*0.34);
+  $("#view_"+order[2]).height(height*0.33);
+  $("#view_"+order[2]).css('top', 0);
+  $("#view_"+order[2]).css('left', width*0.66);
+
+  $("#view_"+order[3]).width(width*0.33);
+  $("#view_"+order[3]).height(height*0.33);
+  $("#view_"+order[3]).css('top', height*0.33);
+  $("#view_"+order[3]).css('left', 0);
+
+  $("#view_"+order[4]).width(width*0.33);
+  $("#view_"+order[4]).height(height*0.33);
+  $("#view_"+order[4]).css('top', height*0.33);
+  $("#view_"+order[4]).css('left', width*0.33);
+
+  $("#view_"+order[5]).width(width*0.34);
+  $("#view_"+order[5]).height(height*0.33);
+  $("#view_"+order[5]).css('top', height*0.33);
+  $("#view_"+order[5]).css('left', width*0.66);
+
+  $("#view_"+order[6]).width(width*0.33);
+  $("#view_"+order[6]).height(height*0.34);
+  $("#view_"+order[6]).css('top', height*0.66);
+  $("#view_"+order[6]).css('left', 0);
+
+  $("#view_"+order[7]).width(width*0.33);
+  $("#view_"+order[7]).height(height*0.34);
+  $("#view_"+order[7]).css('top', height*0.66);
+  $("#view_"+order[7]).css('left', width*0.33);
+
+  $("#view_"+order[8]).width(width*0.34);
+  $("#view_"+order[8]).height(height*0.34);
+  $("#view_"+order[8]).css('top', height*0.66);
+  $("#view_"+order[8]).css('left', width*0.66);
 
   last_layout = current_layout;
 }
