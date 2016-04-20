@@ -14,7 +14,7 @@ body {
     overflow: hidden;
 }
 
-.container-full { 
+.container-full {
     height: 100%;
 }
 
@@ -63,4 +63,3 @@ body {
     padding-right: 300px;
     margin-right: -300px;
 }
-

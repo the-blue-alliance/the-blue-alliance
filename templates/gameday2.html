@@ -22,14 +22,14 @@
 
 {% block content %}
   <div id="content"></div>
-  <div class="hidden" id="events_with_webcasts">{{ events_with_webcasts|safe }}</div>
+  <div class="hidden" id="webcasts_json">{{ webcasts_json|safe }}</div>
 {% endblock %}
 
 {% block footer %}{% endblock %}
 
 {% block main_javascript %}
-    <script src="http://fb.me/react-with-addons-0.10.0.js"></script>
-    <script src="http://fb.me/JSXTransformer-0.10.0.js"></script>
+    <script src="http://fb.me/react-with-addons-15.0.1.js"></script>
+    <script src="http://fb.me/react-dom-15.0.1.js"></script>
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/showdown/0.3.1/showdown.min.js"></script>
 
@@ -37,7 +37,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.0/js/bootstrap.min.js"></script>
 
-    <script type="text/jsx" src="javascript/gameday2/gameday2.js"></script>
+    <script type="text/javascript" src="javascript/gameday2/gameday2.js"></script>
 {% endblock %}
 
 {% block ganalytics_timer %}

@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "less": "^2.6.1",
+    "classnames": "^2.2.3",
+    "react": "^15.0.1",
+    "react-dom": "^15.0.1"
+  },
+  "devDependencies": {
+    "browserify": "^13.0.0",
+    "gulp": "^3.9.1",
+    "gulp-util": "^3.0.7",
+    "reactify": "^1.1.1",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.7.0"
+  }
+}
