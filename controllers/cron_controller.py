@@ -143,7 +143,7 @@ class EventMatchstatsDo(webapp.RequestHandler):
     """
     def get(self, event_key):
         event = Event.get_by_id(event_key)
-        matchstats_dict = MatchstatsHelper.calculate_matchstats(event.matches)
+        matchstats_dict = MatchstatsHelper.calculate_matchstats(event.matches, event.year)
         if any([v != {} for v in matchstats_dict.values()]):
             event.matchstats_json = json.dumps(matchstats_dict)
             EventManipulator.createOrUpdate(event)

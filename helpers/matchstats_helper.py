@@ -8,6 +8,7 @@
 
 # x is OPR and should be n x 1
 
+from collections import defaultdict
 import numpy as np
 
 from google.appengine.api import memcache
@@ -18,21 +19,47 @@ from models.event_team import EventTeam
 
 class MatchstatsHelper(object):
     @classmethod
-    def calculate_matchstats(cls, matches):
-        parsed_matches_by_type, team_list, team_id_map = cls._parse_matches(matches)
+    def calculate_matchstats(cls, matches, year):
+        if not matches:
+            return {}
+
+        parsed_matches_by_type, team_list, team_id_map = cls._parse_matches(matches, year)
 
         oprs_dict = cls._calculate_stat(parsed_matches_by_type['opr'], team_list, team_id_map)
         xoprs_dict = cls._calculate_stat(parsed_matches_by_type['xopr'], team_list, team_id_map)
         dprs_dict = cls._calculate_stat(parsed_matches_by_type['dpr'], team_list, team_id_map)
         ccwms_dict = cls._calculate_stat(parsed_matches_by_type['ccwm'], team_list, team_id_map)
 
+        stats = {'oprs': oprs_dict, 'dprs': dprs_dict, 'ccwms': ccwms_dict, 'xoprs': xoprs_dict}
+        if year == 2016:
+            stats['year_specific'] = {}
+            stats['year_specific']['bouldersOPR'] = cls._calculate_stat(parsed_matches_by_type['bouldersOPR'], team_list, team_id_map)
+            stats['year_specific']['breachRate'] = cls._calculate_rate(parsed_matches_by_type['breachRate'])
+
         init_oprs = xoprs_dict
         for _ in range(2):  # 2 iterations of ixOPR seems to work well
-            parsed_matches_by_type, team_list, team_id_map = cls._parse_matches(matches, init_oprs)
+            parsed_matches_by_type, team_list, team_id_map = cls._parse_matches(matches, year, init_oprs)
             ixoprs_dict = cls._calculate_stat(parsed_matches_by_type['xopr'], team_list, team_id_map)
             init_oprs = cls._calculate_stat(parsed_matches_by_type['xopr'], team_list, team_id_map)
+        stats['ixoprs']= ixoprs_dict
 
-        return {'oprs': oprs_dict, 'dprs': dprs_dict, 'ccwms': ccwms_dict, 'xoprs': xoprs_dict, 'ixoprs': ixoprs_dict}
+        return stats
+
+    @classmethod
+    def _calculate_rate(cls, parsed_matches):
+        totals = defaultdict(int)
+        successes = defaultdict(int)
+        for teams, value in parsed_matches:
+            for team in teams:
+                totals[team] += 1
+                if value:
+                    successes[team] += 1
+
+        stat = {}
+        for team, total in totals.items():
+            stat[team] = float(successes[team]) / total
+
+        return stat
 
     @classmethod
     def _calculate_stat(cls, parsed_matches, team_list, team_id_map):
@@ -67,24 +94,24 @@ class MatchstatsHelper(object):
         return stat_dict
 
     @classmethod
-    def get_last_event_oprs(cls, team_list, event_key):
+    def get_last_event_stats(cls, team_list, event_key):
         year = int(event_key.id()[:4])
         cur_event = event_key.get()
 
         # Check cache for stored OPRs
-        cache_key = '{}:last_event_oprs'.format(event_key.id())
-        last_event_oprs = memcache.get(cache_key)
-        if last_event_oprs is None:
-            last_event_oprs = {}
+        cache_key = '{}:last_event_stats'.format(event_key.id())
+        last_event_stats = memcache.get(cache_key)
+        if last_event_stats is None:
+            last_event_stats = defaultdict(dict)
 
-        # Make necessary queries for missing OPRs
+        # Make necessary queries for missing stats
         futures = []
         for team in team_list:
-            if team not in last_event_oprs:
+            if team not in last_event_stats:
                 events_future = event_query.TeamYearEventsQuery('frc{}'.format(team), year).fetch_async()
                 futures.append((team, events_future))
 
-        # Add missing OPRs to last_event_oprs
+        # Add missing stats to last_event_stats
         for team, events_future in futures:
             events = events_future.get_result()
 
@@ -97,15 +124,25 @@ class MatchstatsHelper(object):
                         last_event = event
                         last_event_start = event.start_date
 
-            if last_event is not None and 'oprs' in last_event.matchstats and team in last_event.matchstats['oprs']:
-                last_event_opr = last_event.matchstats['oprs'][team]
-                last_event_oprs[team] = last_event_opr
+            last_event_stat = None
+            if last_event is not None and last_event.matchstats:
+                for stat, values in last_event.matchstats.items():
+                    if stat == 'year_specific':
+                        for stat2, values2 in last_event.matchstats[stat].items():
+                            if team in values2:
+                                last_event_stats[team][stat2] = values2[team]
+                    else:
+                        if team in values:
+                            last_event_stats[team][stat] = values[team]
 
-        memcache.set(cache_key, last_event_oprs, 60*60*24)
-        return last_event_oprs
+            if last_event_stat:
+                last_event_stats[team] = last_event_stat
+
+        memcache.set(cache_key, last_event_stats, 60*60*24)
+        return last_event_stats
 
     @classmethod
-    def _parse_matches(cls, matches, init_oprs=None):
+    def _parse_matches(cls, matches, year, init_oprs=None):
         """
         Returns:
         parsed_matches_by_type: list of matches as the tuple ([team, team, team], <score/opposingscore/scoremargin>) for each key ('opr', 'dpr', 'ccwm')
@@ -119,6 +156,10 @@ class MatchstatsHelper(object):
             'dpr': [],
             'ccwm': [],
         }
+        # Add year specific OPRs
+        if year == 2016:
+            parsed_matches_by_type['bouldersOPR'] = []
+            parsed_matches_by_type['breachRate'] = []
 
         # Build team list
         for match in matches:
@@ -131,7 +172,9 @@ class MatchstatsHelper(object):
 
         # Load last OPR data
         if init_oprs is None:
-            last_event_oprs = cls.get_last_event_oprs(team_list, matches[0].event)
+            last_event_oprs = {}
+            for team, stat in cls.get_last_event_stats(team_list, matches[0].event).items():
+                last_event_oprs[team] = stat['oprs']
         else:
             last_event_oprs = {}
             for team, xopr in init_oprs.items():
@@ -156,6 +199,14 @@ class MatchstatsHelper(object):
                     parsed_matches_by_type['xopr'].append((match_team_list, alliance_score))
                     parsed_matches_by_type['dpr'].append((match_team_list, opposing_score))
                     parsed_matches_by_type['ccwm'].append((match_team_list, alliance_score - opposing_score))
+
+                    if year == 2016 and match.score_breakdown and alliance_color in match.score_breakdown:
+                        parsed_matches_by_type['bouldersOPR'].append((match_team_list,
+                            match.score_breakdown[alliance_color].get('autoBouldersLow', 0) +
+                            match.score_breakdown[alliance_color].get('autoBouldersHigh', 0) +
+                            match.score_breakdown[alliance_color].get('teleopBouldersLow', 0) +
+                            match.score_breakdown[alliance_color].get('teleopBouldersHigh', 0)))
+                        parsed_matches_by_type['breachRate'].append((match_team_list, match.score_breakdown[alliance_color].get('teleopDefensesBreached', False)))
                 else:
                     parsed_matches_by_type['xopr'].append((match_team_list, predicted_score))
 

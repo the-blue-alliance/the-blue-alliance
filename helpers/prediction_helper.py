@@ -2,6 +2,7 @@ from collections import defaultdict
 import math
 import numpy as np
 
+from consts.event_type import EventType
 from helpers.matchstats_helper import MatchstatsHelper
 
 
@@ -37,23 +38,28 @@ class PredictionHelper(object):
                     team_id = team_id_map[team[3:]]
                     s[team_id] += score
                     s_boulder[team_id] += boulders
+
         return s, s_boulder
 
     @classmethod
-    def _predict_match(cls, match, ixoprs, ixoprs_boulder):
+    def _predict_match(cls, match, ixoprs, ixoprs_boulder, breach_rates, init_breach_rate, is_champs):
         score_var = 50**2  # TODO temporary set variance to be huge
         boulder_var = 8**2  # TODO get real value
 
         red_score = 0
         red_boulders = 0
+        red_breach_rate_sum = 0
         for team in match.alliances['red']['teams']:
             red_score += ixoprs[team[3:]]
             red_boulders += ixoprs_boulder[team[3:]]
+            red_breach_rate_sum += breach_rates.get(team[3:], init_breach_rate)
         blue_score = 0
         blue_boulders = 0
+        blue_breach_rate_sum = 0
         for team in match.alliances['blue']['teams']:
             blue_score += ixoprs[team[3:]]
             blue_boulders += ixoprs_boulder[team[3:]]
+            blue_breach_rate_sum += breach_rates.get(team[3:], init_breach_rate)
 
         # Prob win
         mu = abs(red_score - blue_score)
@@ -63,10 +69,11 @@ class PredictionHelper(object):
             prob = 0.5
 
         # Prob capture
-        mu = red_boulders - 8
+        tower_strength = 10 if is_champs else 8
+        mu = red_boulders - tower_strength
         red_prob_capture = 1 - cls._normcdf(-mu / np.sqrt(boulder_var))
 
-        mu = blue_boulders - 8
+        mu = blue_boulders - tower_strength
         blue_prob_capture = 1 - cls._normcdf(-mu / np.sqrt(boulder_var))
 
         if red_score > blue_score:
@@ -76,10 +83,10 @@ class PredictionHelper(object):
         else:
             winning_alliance = ''
 
-        # Prob breach
-        #TODO
-        red_prob_breach = 0.7
-        blue_prob_breach = 0.7
+        # Prob breach. Artificially limit
+        # Beach predictions aren't really correct, but should be close enough at a high level of play -Eugene 2016-04-19
+        red_prob_breach = min(max(red_breach_rate_sum / 3, 0.1), 0.95)
+        blue_prob_breach = min(max(blue_breach_rate_sum / 3, 0.1), 0.95)
 
         prediction = {
             'red': {'score': red_score, 'boulders': red_boulders, 'prob_capture': red_prob_capture * 100, 'prob_breach': red_prob_breach * 100},
@@ -93,6 +100,9 @@ class PredictionHelper(object):
     def get_match_predictions(cls, matches):
         if not matches:
             return None, None
+
+        event_key = matches[0].event
+        event = event_key.get()
 
         # Build team_list
         team_list = set()
@@ -115,11 +125,24 @@ class PredictionHelper(object):
         s_boulder = np.zeros([n, 1])
 
         # Construct M and populate s with initial guess using previous event OPRs
-        last_event_oprs = MatchstatsHelper.get_last_event_oprs(team_list, matches[0].event)
-        last_event_oprs_boulder = dict()  # TODO: Initialize with previous event
+        last_event_stats = MatchstatsHelper.get_last_event_stats(team_list, event_key)
+        last_event_oprs = {}
+        last_event_oprs_boulder = {}
+        breach_rates = {}
+        for team, stats in last_event_stats.items():
+            if 'oprs' in stats:
+                last_event_oprs[team] = stats['oprs']
+            if 'bouldersOPR' in stats:
+                last_event_oprs_boulder[team] = stats['bouldersOPR']
+            if 'breachRate' in stats:
+                breach_rates[team] = stats['breachRate']
+
         init_opr = np.mean(last_event_oprs.values())  # Initialize with average OPR
-        # init_opr_boulder = np.mean(last_event_oprs_boulder.values())  # TODO Initialize with average boulder OPR
-        init_opr_boulder = 1  # TODO temp. Replace with above
+        init_opr_boulder = np.mean(last_event_oprs_boulder.values())  # Initialize with average boulder OPR
+        init_breach_rate = np.mean(breach_rates.values())  # Initialize with last event breach rates
+        if math.isnan(init_breach_rate):
+            init_breach_rate = 0.5
+
         for match in matches:
             for alliance_color in ['red', 'blue']:
                 for team1 in match.alliances[alliance_color]['teams']:
@@ -139,6 +162,7 @@ class PredictionHelper(object):
         played_match_keys = set()
         all_scores_sum = 0
         all_boulders_sum = 0
+        breach_totals = defaultdict(lambda: [0, 0])  # [success, total]
         for i, match in enumerate(matches):
             # Solving M*x = s for x
             x = np.dot(np.linalg.pinv(M), s)
@@ -161,7 +185,8 @@ class PredictionHelper(object):
                     ixoprs_boulder[team] = opr_boulder[0]
 
             # Make and benchmark predictions
-            prediction = cls._predict_match(match, ixoprs, ixoprs_boulder)
+            is_champs = event.event_type_enum in EventType.CMP_EVENT_TYPES
+            prediction = cls._predict_match(match, ixoprs, ixoprs_boulder, breach_rates, init_breach_rate, is_champs)
             predictions[match.key.id()] = prediction
             if match.has_been_played:
                 played_matches += 1
@@ -184,9 +209,21 @@ class PredictionHelper(object):
                     match.score_breakdown[alliance_color]['autoBouldersHigh'] + \
                     match.score_breakdown[alliance_color]['teleopBouldersLow'] + \
                     match.score_breakdown[alliance_color]['teleopBouldersHigh']
+
+                if match.has_been_played:
+                    for team in match.alliances[alliance_color]['teams']:
+                        breach_totals[team[3:]][1] += 1
+                        if match.score_breakdown[alliance_color]['teleopDefensesBreached']:
+                            breach_totals[team[3:]][0] += 1
+
+            for team, (success, total) in breach_totals.items():
+                breach_rates[team] = float(success) / total
+
             init_opr = float(all_scores_sum) / (i + 1) / 6  # Initialize with 1/3 of average scores (2 alliances per match)
             init_boulders = float(all_boulders_sum) / (i + 1) / 6
-            s, s_boulder = cls._build_s_matrix(matches, team_id_map, n, last_event_oprs, last_event_oprs_boulder, played_match_keys, init_opr=init_opr, init_boulders=init_boulders)
+            s, s_boulder = cls._build_s_matrix(
+                matches, team_id_map, n, last_event_oprs, last_event_oprs_boulder, played_match_keys,
+                init_opr=init_opr, init_boulders=init_boulders)
 
         prediction_stats = {
             'wl_accuracy': None if played_matches == 0 else 100 * float(correct_predictions) / played_matches,
