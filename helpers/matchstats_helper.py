@@ -20,6 +20,9 @@ from models.event_team import EventTeam
 class MatchstatsHelper(object):
     @classmethod
     def calculate_matchstats(cls, matches, year):
+        if not matches:
+            return {}
+
         parsed_matches_by_type, team_list, team_id_map = cls._parse_matches(matches, year)
 
         oprs_dict = cls._calculate_stat(parsed_matches_by_type['opr'], team_list, team_id_map)
@@ -91,7 +94,7 @@ class MatchstatsHelper(object):
         return stat_dict
 
     @classmethod
-    def get_last_event_stats(cls, team_list, event_key, stat):
+    def get_last_event_stats(cls, team_list, event_key):
         year = int(event_key.id()[:4])
         cur_event = event_key.get()
 
@@ -99,7 +102,7 @@ class MatchstatsHelper(object):
         cache_key = '{}:last_event_stats'.format(event_key.id())
         last_event_stats = memcache.get(cache_key)
         if last_event_stats is None:
-            last_event_stats = {}
+            last_event_stats = defaultdict(dict)
 
         # Make necessary queries for missing stats
         futures = []
@@ -121,9 +124,19 @@ class MatchstatsHelper(object):
                         last_event = event
                         last_event_start = event.start_date
 
-            if last_event is not None and stat in last_event.matchstats and team in last_event.matchstats[stat]:
-                last_event_opr = last_event.matchstats[stat][team]
-                last_event_stats[team] = last_event_opr
+            last_event_stat = None
+            if last_event is not None and last_event.matchstats:
+                for stat, values in last_event.matchstats.items():
+                    if stat == 'year_specific':
+                        for stat2, values2 in last_event.matchstats[stat].items():
+                            if team in values2:
+                                last_event_stats[team][stat2] = values2[team]
+                    else:
+                        if team in values:
+                            last_event_stats[team][stat] = values[team]
+
+            if last_event_stat:
+                last_event_stats[team] = last_event_stat
 
         memcache.set(cache_key, last_event_stats, 60*60*24)
         return last_event_stats
@@ -159,7 +172,9 @@ class MatchstatsHelper(object):
 
         # Load last OPR data
         if init_oprs is None:
-            last_event_oprs = cls.get_last_event_stats(team_list, matches[0].event, 'oprs')
+            last_event_oprs = {}
+            for team, stat in cls.get_last_event_stats(team_list, matches[0].event).items():
+                last_event_oprs[team] = stat['oprs']
         else:
             last_event_oprs = {}
             for team, xopr in init_oprs.items():

@@ -114,11 +114,17 @@ class PredictionHelper(object):
         s_boulder = np.zeros([n, 1])
 
         # Construct M and populate s with initial guess using previous event OPRs
-        last_event_oprs = MatchstatsHelper.get_last_event_oprs(team_list, matches[0].event)
-        last_event_oprs_boulder = dict()  # TODO: Initialize with previous event
+        last_event_stats = MatchstatsHelper.get_last_event_stats(team_list, matches[0].event)
+        last_event_oprs = {}
+        last_event_oprs_boulder = {}
+        for team, stats in last_event_stats.items():
+            if 'oprs' in stats:
+                last_event_oprs[team] = stats['oprs']
+            if 'bouldersOPR' in stats:
+                last_event_oprs_boulder[team] = stats['bouldersOPR']
+
         init_opr = np.mean(last_event_oprs.values())  # Initialize with average OPR
-        # init_opr_boulder = np.mean(last_event_oprs_boulder.values())  # TODO Initialize with average boulder OPR
-        init_opr_boulder = 1  # TODO temp. Replace with above
+        init_opr_boulder = np.mean(last_event_oprs_boulder.values())  # Initialize with average boulder OPR
         for match in matches:
             for alliance_color in ['red', 'blue']:
                 for team1 in match.alliances[alliance_color]['teams']:
