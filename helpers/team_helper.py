@@ -3,8 +3,6 @@ import logging
 
 from google.appengine.api import urlfetch
 
-from database.match_query import TeamEventMatchesQuery
-from helpers.match_helper import MatchHelper
 from helpers.team_manipulator import TeamManipulator
 from models.team import Team
 
