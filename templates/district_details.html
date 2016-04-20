@@ -173,9 +173,9 @@
                   {% with team_status|get_item:team.key_name as status %}
                   <td>{{ team.team_number }}</td>
                   <td><a href="/team/{{ team.team_number }}">{{ team.nickname }}</a></td>
-                  <td>{{ status|get_tuple:1 }}</td>
-                  <td>{{ status|get_tuple:2 }}</td>
-                  {% with status|get_tuple:3 as playoff %}
+                  <td>{{ status.1 }}</td>
+                  <td>{{ status.2 }}</td>
+                  {% with status.3 as playoff %}
                   <td>{% if playoff %} {{ playoff }} {% endif %}</td>
                   {% endwith %}
                   {% endwith %}
