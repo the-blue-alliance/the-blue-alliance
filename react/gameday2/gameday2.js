@@ -37,11 +37,15 @@ var GamedayFrame = React.createClass({
       var event = eventsWithWebcasts[i];
       for (var j = 0; j < event.webcast.length; j++) {
         var webcast = event.webcast[i];
+        var name = (event.short_name ? event.short_name : event.name);
+        if (event.webcast.length > 1) {
+          name += (' ' + (j + 1));
+        }
         webcasts.push({
-          'key': webcast.key_name,
+          'key': event.key,
           'num': (j + 1),
-          'id': webcast.key_name + '-' + (j + 1),
-          'name': (event.short_name ? event.short_name : event.name),
+          'id': event.key + '-' + (j + 1),
+          'name': name,
           'type': webcast.type,
           'channel': webcast.channel
         });
@@ -76,8 +80,7 @@ var GamedayFrame = React.createClass({
         <HashtagPanel enabled={this.state.hashtagEnabled} />
         <ChatPanel enabled={this.state.chatEnabled} />
         <VideoGrid
-          //webcasts={this.state.displayedWebcasts}
-          webcasts={[]}
+          webcasts={this.state.displayedWebcasts}
           rightPanelEnabled={this.state.chatEnabled}
           leftPanelEnabled={this.state.hashtagEnabled} />
         <FollowingTeamsModal
@@ -325,13 +328,13 @@ var VideoGrid = React.createClass({
     });
     switch (this.props.webcasts.length) {
       case 0:
-        return this.renderLayoutZero(classes);
+      return this.renderLayoutZero(classes);
       case 1:
-        return this.renderLayoutOne(classes);
+      return this.renderLayoutOne(classes);
       case 2:
-        return this.renderLayoutTwo(classes);
+      return this.renderLayoutTwo(classes);
       case 3:
-        return this.renderLayoutThree(classes);
+      return this.renderLayoutThree(classes);
     }
   },
 });
@@ -353,20 +356,20 @@ var VideoCell = React.createClass({
       var id = this.props.eventModel.name + "-1";
       switch (this.props.eventModel.webcast[0].type) {
         case "ustream":
-          cellEmbed = <EmbedUstream
-            eventModel={this.props.eventModel}
-            vidHeight={this.props.vidHeight}
-            vidWidth={this.props.vidWidth} />;
-          break;
+        cellEmbed = <EmbedUstream
+          eventModel={this.props.eventModel}
+          vidHeight={this.props.vidHeight}
+          vidWidth={this.props.vidWidth} />;
+        break;
         case "youtube":
-          cellEmbed = <EmbedYoutube
-            eventModel={this.props.eventModel}
-            vidHeight={this.props.vidHeight}
-            vidWidth={this.props.vidWidth} />;
-          break;
+        cellEmbed = <EmbedYoutube
+          eventModel={this.props.eventModel}
+          vidHeight={this.props.vidHeight}
+          vidWidth={this.props.vidWidth} />;
+        break;
         default:
-          cellEmbed = "";
-          break;
+        cellEmbed = "";
+        break;
       }
       return (
         <div className="videoCell"
@@ -446,7 +449,7 @@ var EmbedUstream = React.createClass({
           src={src}
           type='application/x-shockwave-flash' />
       </object>
-      )
+    );
   }
 })
 
@@ -454,8 +457,14 @@ var WebcastDropdown = React.createClass({
   render: function() {
     var webcastListItems = [];
     for (var i = 0; i < this.props.webcasts.length; i++) {
-      webcastListItems.push(<WebcastListItem webcast={this.props.webcasts[i]} onWebcastAdd={this.props.onWebcastAdd} />)
-    };
+      var webcast = this.props.webcasts[i];
+      webcastListItems.push(
+        <WebcastListItem
+          key={webcast.id}
+          webcast={webcast}
+          onWebcastAdd={this.props.onWebcastAdd} />
+      );
+    }
     return (
       <li className="dropdown">
         <a href="#" className="dropdown-toggle" data-toggle="dropdown">Add Webcasts <b className="caret"></b></a>
@@ -515,7 +524,7 @@ var BootstrapNavDropdownListItem = React.createClass({
   },
 })
 
-var FollowingTeamListItems = React.createClass({
+var FollowingTeamListItem = React.createClass({
   unfollowTeam: function() {
     this.props.onUnfollowTeam(this.props.team)
   },
@@ -537,10 +546,11 @@ var FollowingTeamsModal = React.createClass({
     var followingTeamListItems = [];
     for (var index in this.props.followingTeams) {
       followingTeamListItems.push(
-        <FollowingTeamListItems
+        <FollowingTeamListItem
+          key={this.props.followingTeams[index]}
           team={this.props.followingTeams[index]}
           onUnfollowTeam={this.props.onUnfollowTeam} />
-        );
+      );
     };
     return (
       <div className="modal fade" id="followingTeamsModal" tabindex="-1" role="dialog" aria-labelledby="#followingTeamsModal" aria-hidden="true">
@@ -575,7 +585,7 @@ var FollowingTeamsModal = React.createClass({
 
 // [{'webcasts': [{u'channel': u'6540154', u'type': u'ustream'}], 'event_name': u'Present Test Event', 'event_key': u'2014testpresent'}]
 
-var webcastData = $.parseJSON($("#webcasts_json").text().replace(/u'/g,'\'').replace(/'/g,'"'));
+var webcastData = $.parseJSON($("#webcasts_json").text().replace(/u'/g,/u'/g,/u'/g,/u'/g,'\'').replace(/'/g,/'/g,/'/g,/'/g,'"'));
 
 ReactDOM.render(
   <GamedayFrame webcastData={webcastData} pollInterval={20000} />,
