@@ -19,7 +19,6 @@ class MyTBALiveController(LoggedInHandler):
         self._require_registration('/account/register')
 
         user = self.user_bundle.account.key
-        year = datetime.datetime.now().year
         team_favorites_future = Favorite.query(Favorite.model_type == ModelType.TEAM, ancestor=user).fetch_async()
 
         live_events = EventHelper.getWeekEvents()
@@ -34,7 +33,6 @@ class MyTBALiveController(LoggedInHandler):
         live_events_with_teams = EventTeamStatusHelper.buildEventTeamStatus(live_events, live_eventteams_futures, favorite_teams)
 
         self.template_values.update({
-            'year': year,
             'live_events_with_teams': live_events_with_teams,
         })
 
