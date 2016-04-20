@@ -1,8 +1,23 @@
 from database.match_query import TeamEventMatchesQuery
 from helpers.match_helper import MatchHelper
+from helpers.team_helper import TeamHelper
 
 
 class EventTeamStatusHelper(object):
+
+    @classmethod
+    def buildEventTeamStatus(cls, live_events, live_eventteams_futures, team_filter):
+        # Currently Competing Team Status
+        live_events_with_teams = []
+        for event, teams_future in zip(live_events, live_eventteams_futures):
+            live_teams_in_district = TeamHelper.sortTeams(filter(lambda t: t in team_filter, teams_future.get_result()))
+
+            teams_and_statuses = []
+            for team in live_teams_in_district:
+                teams_and_statuses.append((team, EventTeamStatusHelper.generateTeamAtEventStatus(team.key_name, event)))
+            if teams_and_statuses:
+                live_events_with_teams.append((event, teams_and_statuses))
+        return live_events_with_teams
 
     @classmethod
     def _get_alliance_number(cls, team_key, event):
