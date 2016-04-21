@@ -49,8 +49,7 @@ Setup
   * Or compile it from source code. (On Windows, use the [Microsoft Visual C++ Compiler for Python 2.7](http://www.microsoft.com/en-us/download/details.aspx?id=44266).)
   * NOTE: If you are using the Linux version, install v1.6.1 instead of the latest version through `pip install numpy==1.6.1`. Installing the latest version raises an `ImportError: No module named _ctypes` from Google App Engine when trying to launch the dev server.
 1. Install [Node.js](https://nodejs.org/) which includes [Node Package Manager](https://www.npmjs.org/)
-1. Install LESS, which we use to build our CSS files, via Node Package Manager
-  * `npm install -g less`
+1. Install all node dependencies by running `npm install`. This includes `less`, which is used to build CSS files for production, as well as a number of packages used in Gameday2.
 1. Install Jinja, which we use to build some of our HTML template files
   * `pip install jinja2`
   * or `easy_install jinja2`
@@ -65,7 +64,7 @@ Setup
 
 Run a local dev server
 ----------------------
-1. Import the project into Google App Engine Launcher 
+1. Import the project into Google App Engine Launcher
   * NOTE: If you have the Linux version, skip to step 2, as it does not come packaged with the App Engine Launcher. You will be manually adding the ports and modules as options when launching the server.
   * Open App Engine Launcher
   * File > Add Existing Application...
