@@ -1,6 +1,19 @@
 {% for live_event in live_events_with_teams %}
     {% with live_event.0 as event %}
-        <a href="/event/{{ event.key_name }}"><h3>{{ event.name }}</h3></a>
+        <div class="row">
+        <div class="col-xs-10">
+          <a href="/event/{{ event.key_name }}"><h3>{{ event.name }}</h3></a>
+        </div>
+        <div class="col-xs-1 h3">
+          {% if event.webcast %}
+            {% if event.now %}
+              <a class="btn btn-success btn-small" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
+            {% else %}
+              <a class="btn btn-default btn-small disabled">Offline</a>
+            {% endif %}
+          {% endif %}
+        </div>
+        </div>
         <table class="table table-striped table-condensed">
             <tr>
                 <th>Team Number</th>
