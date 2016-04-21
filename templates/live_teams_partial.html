@@ -1,6 +1,6 @@
 {% for live_event in live_events_with_teams %}
     {% with live_event.0 as event %}
-        <a href="/event/{{ event.key_name }}"><h3>{{ event.short_name }}</h3></a>
+        <a href="/event/{{ event.key_name }}"><h3>{{ event.name }}</h3></a>
         <table class="table table-striped table-condensed">
             <tr>
                 <th>Team Number</th>

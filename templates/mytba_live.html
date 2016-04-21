@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}myTBA Favorites - The Blue Alliance{% endblock %}
+{% block title %}myTBA Dashboard - The Blue Alliance{% endblock %}
 
 {% block meta_description %}View how your favorite teams are doing.{% endblock %}
 
@@ -8,23 +8,29 @@
 <div class="container">
   <div class="row">
     <div class="col-xs-12">
-      <h2>Currently Competing Favorites</h2>
+      <h1>myTBA Dashboard</h1>
+      <p>Keep up to date with where your favorite teams are competing and how they're doing!</p>
+      <p><a class="btn btn-primary" href="/account/mytba"><span class="glyphicon glyphicon-bookmark"></span> Manage myTBA</a></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <h2>Currently Competing</h2>
     </div>
   </div>
   <div class="row">
     <div class="col-xs-12">
     {% if live_events_with_teams %}
-      <p>Add more teams as Favorites in your <a href="/account/mytba">Account Settings</a></p>
       <div>
         {% include "live_teams_partial.html" %}
       </div>
     {% else %}
-      <p>No favorite teams are competing this week. Why not <a href="/account/mytba">add one</a>?</p>
+      <p>No favorite teams are competing this week.</p>
     {% endif %}
     </div>
     <div class="row">
     <div class="col-xs-12">
-      <h2>Upcoming Competitions for Favorites</h2>
+      <h2>Upcoming Competitions</h2>
     </div>
     </div>
     <div class="row">
