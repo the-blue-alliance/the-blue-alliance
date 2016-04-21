@@ -22,34 +22,34 @@ var GamedayFrame = React.createClass({
     var eventsWithWebcasts = this.props.webcastData.ongoing_events_w_webcasts;
 
     // First, deal with special webcasts
-    for (var i = 0; i < specialWebcasts.length; i++) {
+    for (let webcast of specialWebcasts) {
       webcasts.push({
-        'key': specialWebcasts[i].key_name,
+        'key': webcast.key_name,
         'num': 1,
-        'id': specialWebcasts[i].key_name + '-' + 1,
-        'name': specialWebcasts[i].name,
-        'type': specialWebcasts[i].type,
-        'channel': specialWebcasts[i].channel
+        'id': webcast.key_name + '-' + 1,
+        'name': webcast.name,
+        'type': webcast.type,
+        'channel': webcast.channel
       });
     }
 
     // Now, process normal event webcasts
-    for (var i = 0; i < eventsWithWebcasts.length; i++) {
-      var event = eventsWithWebcasts[i];
-      for (var j = 0; j < event.webcast.length; j++) {
-        var webcast = event.webcast[i];
+    for (let event of eventsWithWebcasts) {
+      var webcastNum = 1;
+      for (let webcast of event.webcast) {
         var name = (event.short_name ? event.short_name : event.name);
         if (event.webcast.length > 1) {
-          name += (' ' + (j + 1));
+          name += (' ' + webcastNum);
         }
         webcasts.push({
           'key': event.key,
-          'num': (j + 1),
-          'id': event.key + '-' + (j + 1),
+          'num': webcastNum,
+          'id': event.key + '-' + webcastNum,
           'name': name,
           'type': webcast.type,
           'channel': webcast.channel
         });
+        webcastNum++;
       }
     }
 
