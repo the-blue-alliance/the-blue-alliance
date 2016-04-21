@@ -56,6 +56,12 @@ body {
   cursor: pointer;
   float: right;
 }
+.jumbotron {
+  height: 100%;
+  text-align: center;
+  background-color: black;
+  color: white;
+}
 /* Layout 1: full screen single video
 
 +------+------+

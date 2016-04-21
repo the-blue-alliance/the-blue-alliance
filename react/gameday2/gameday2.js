@@ -244,17 +244,9 @@ var VideoGrid = React.createClass({
   renderLayoutZero: function(classes) {
     return (
       <div className={classes}>
-        <div className="row">
-          <div className="col-md-12">
-            <div className="panel panel-default">
-              <div className="panel-body">
-                <div className="jumbotron">
-                  <h2>GameDay &mdash; Watch FIRST Webcasts</h2>
-                  <p>To get started, pick some webcasts from the top menu.</p>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="jumbotron">
+          <h2>GameDay &mdash; Watch FIRST Webcasts</h2>
+          <p>To get started, pick some webcasts from the top menu.</p>
         </div>
       </div>
     );
