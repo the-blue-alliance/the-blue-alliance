@@ -1,12 +1,34 @@
 var gulp = require('gulp');
-var source = require('vinyl-source-stream'); // Used to stream bundle for further handling
+var source = require('vinyl-source-stream');
 var browserify = require('browserify');
 var watchify = require('watchify');
-var reactify = require('reactify');
 var gutil = require('gulp-util');
 var debug = require('gulp-debug');
 var less = require('gulp-less');
+var rename = require('gulp-rename');
+var sourcemaps = require('gulp-sourcemaps');
+var cleanCSS = require('gulp-clean-css');
 var babelify = require('babelify');
+var uglify = require('gulp-uglify');
+var buffer = require('vinyl-buffer');
+
+var args = require('yargs').argv;
+
+var config = {
+  gameday: {
+    js: {
+      src: ['./react/gameday2/gameday2.js'],
+      outputDir: './static/javascript',
+      outputFile: 'gameday2.min.js'
+    },
+    less: {
+      src: ['./react/gameday2/gameday2.less'],
+      outputDir: './static/css/',
+      outputFile: 'gameday2.min.css',
+      watch: ['./react/gameday2/**/*.less']
+    }
+  }
+};
 
 var errorHandler = function(err) {
   gutil.log(err);
@@ -14,27 +36,33 @@ var errorHandler = function(err) {
 };
 
 function compile(watch) {
+  if (args.production) {
+    process.env.NODE_ENV = 'production';
+  }
   var bundler = browserify({
-    entries: ['./react/gameday2/gameday2.js'], // Only need initial file, browserify finds the deps
+    entries: config.gameday.js.src,
     debug: true, // Gives us sourcemapping
     cache: {},
     packageCache: {},
-    fullPaths: true // Requirement of watchify
   }).transform('babelify', {
     presets: ['es2015', 'react']
   });
 
-  var watcher = watchify(bundler);
-
   function rebundle() {
     bundler.bundle()
       .on('error', errorHandler)
-      .pipe(source('gameday2.js'))
+      .pipe(source(config.gameday.js.outputFile))
+      .pipe(buffer())
+      .pipe(sourcemaps.init({loadMaps: true}))
+      .pipe(uglify())
+      .on('error', errorHandler)
+      .pipe(sourcemaps.write('./'))
       .pipe(debug())
-      .pipe(gulp.dest('./static/javascript/gameday2/'));
+      .pipe(gulp.dest(config.gameday.js.outputDir));
   }
 
   if (watch) {
+    var watcher = watchify(bundler);
     watcher.on('update', function() {
       rebundle();
     });
@@ -43,28 +71,32 @@ function compile(watch) {
   rebundle();
 }
 
-function watch() {
-  return compile(true);
-}
-
-gulp.task('build-react', function() {
+gulp.task('gameday-js', function() {
   return compile();
 });
 
-gulp.task('less', function() {
-  return gulp.src('./react/**/*.less')
-  .pipe(less())
-  .on('error', function(err) {
-      gutil.log(err);
-      this.emit('end');
-  })
-  .pipe(gulp.dest('./static/css'));
+gulp.task('gameday-js-watch', function() {
+  return compile(true);
 });
 
-gulp.task('watch', function() {
-  return watch();
+gulp.task('gameday-less', function() {
+  return gulp.src(config.gameday.less.src)
+    .pipe(sourcemaps.init())
+    .pipe(less())
+    .pipe(cleanCSS())
+    .pipe(sourcemaps.write())
+    .pipe(debug())
+    .on('error', errorHandler)
+    .pipe(rename(config.gameday.less.outputFile))
+    .pipe(gulp.dest(config.gameday.less.outputDir));
 });
 
-gulp.task('build', ['build-react', 'less']);
+gulp.task('gameday-less-watch', function() {
+  gulp.watch(config.gameday.less.watch, ['gameday-less']);
+});
 
-gulp.task('default', ['watch']);
+gulp.task('build', ['gameday-js', 'gameday-less']);
+
+gulp.task('watch', ['gameday-js-watch', 'gameday-less-watch']);
+
+gulp.task('default', ['build', 'watch']);

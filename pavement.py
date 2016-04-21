@@ -25,7 +25,7 @@ def javascript():
 def gulp():
     """Run 'gulp build' task"""
     print("Running 'gulp build'")
-    sh("gulp build")
+    sh("gulp build --production")
 
 
 @task
