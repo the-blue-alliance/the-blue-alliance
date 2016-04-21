@@ -10,7 +10,7 @@ var GamedayFrame = React.createClass({
       displayedWebcasts: [],
       webcasts: [],
       followingTeams: [177,230],
-      hashtagEnabled: false,
+      hashtagEnabled: true,
     };
   },
   componentWillMount: function() {
@@ -183,11 +183,6 @@ var HashtagPanel = React.createClass({
       }
     }
     (document,"script","twitter-wjs");
-    setTimeout(function(){$(".twitter-timeline").attr("height", "100%");}, 3000);
-    // omg what a hack -gregmarra 20131226
-  },
-  componentDidUpdate: function() {
-    $(".twitter-timeline").attr("height", "100%");
   },
   render: function() {
     var classes = classNames({

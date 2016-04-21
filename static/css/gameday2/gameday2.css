@@ -47,6 +47,10 @@ body {
 }
 #twitter-widget {
   height: 100%;
+  background: white;
+}
+iframe[id^='twitter-widget-'] {
+  height: 100% !important;
 }
 .panel-title {
   display: inline-block;
