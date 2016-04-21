@@ -136,6 +136,9 @@ class AccountRegister(LoggedInHandler):
 
 class AccountLogin(LoggedInHandler):
     def get(self):
+        if self.user_bundle.user:
+            self.redirect('/account', abort=True)
+
         redirect = self.request.get('redirect')
         if redirect:
             url = self._get_login_url(redirect)
