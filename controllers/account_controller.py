@@ -99,11 +99,7 @@ class AccountEdit(LoggedInHandler):
 
 class AccountRegister(LoggedInHandler):
     def get(self):
-        redirect = self.request.get('redirect')
-        if redirect:
-            self._require_login(redirect)
-        else:
-            self._require_login()
+        self._require_login()
 
         # Redirects if already registered
         if self.user_bundle.account.registered:
@@ -112,7 +108,7 @@ class AccountRegister(LoggedInHandler):
             else:
                 self.redirect('/account', abort=True)
 
-        self.template_values['redirect'] = redirect
+        self.template_values['redirect'] = self.request.get('redirect')
         self.response.out.write(jinja2_engine.render('account_register.html', self.template_values))
 
     def post(self):
@@ -150,8 +146,7 @@ class AccountLogin(LoggedInHandler):
 
 class AccountLoginRequired(LoggedInHandler):
     def get(self):
-        redirect = self.request.get('redirect')
-        self.template_values['redirect'] = redirect
+        self.template_values['redirect'] = self.request.get('redirect')
         self.response.out.write(jinja2_engine.render('account_login_required.html', self.template_values))
 
 

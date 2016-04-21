@@ -144,7 +144,9 @@ class LoggedInHandler(webapp2.RequestHandler):
 
     def _require_login(self, redirect_url=None):
         if not self.user_bundle.user:
-            if redirect_url is None:
+            if not redirect_url:
+                redirect_url = self.request.get('redirect')
+            if not redirect_url:
                 redirect_url = self.request.url
             return self.redirect(
                 '/account/login_required?redirect={}'.format(redirect_url),
@@ -164,7 +166,9 @@ class LoggedInHandler(webapp2.RequestHandler):
 
     def _require_registration(self, redirect_url=None):
         if not self.user_bundle.account.registered:
-            if redirect_url is None:
+            if not redirect_url:
+                redirect_url = self.request.get('redirect')
+            if not redirect_url:
                 redirect_url = self.request.url
             return self.redirect(
                 '/account/register?redirect={}'.format(redirect_url),
