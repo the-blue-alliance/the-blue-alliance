@@ -18,29 +18,29 @@ body {
     height: 100%;
 }
 
-.videoCell {
+.video-cell {
     height: 100%;
     width: 100%;
 }
 
-.videoCellOverlay {
+.video-cell-overlay {
     position: absolute;
     top: 0;
     left: 15px;
     width: 100%;
 }
 
-.videoCellOverlay.panel {
+.video-cell-overlay.panel {
     background-color: transparent;
 }
 
-.videoGrid {
+.video-grid {
     height: 100%;
     width: 100%;
     display: inline-block;
 }
 
-.videoGrid .row {
+.video-grid .row {
     height: 100%;
 }
 
@@ -54,11 +54,11 @@ body {
     height: 100%;
 }
 
-.leaveLeftMargin {
+.leave-left-margin {
     padding-left: 300px;
     margin-left: -300px;
 }
-.leaveRightMargin {
+.leave-right-margin {
     padding-right: 300px;
     margin-right: -300px;
 }

@@ -1,6 +1,7 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 var classNames = require('classnames');
+var _ = require('underscore');
 
 var GamedayFrame = React.createClass({
   getInitialState: function() {
@@ -55,16 +56,9 @@ var GamedayFrame = React.createClass({
     this.setState({
       webcasts: webcasts
     });
-    this.setInitialState();
   },
   componentWillUnmount: function() {
     this.serverRequest.abort();
-  },
-  setInitialState: function() {
-    this.setState({
-      displayedWebcasts: [],
-      hashtagEnabled: true,
-    });
   },
   render: function() {
     return (
@@ -80,9 +74,11 @@ var GamedayFrame = React.createClass({
         <HashtagPanel enabled={this.state.hashtagEnabled} />
         <ChatPanel enabled={this.state.chatEnabled} />
         <VideoGrid
-          webcasts={this.state.displayedWebcasts}
+          webcasts={this.state.webcasts}
+          displayedWebcasts={this.state.displayedWebcasts}
           rightPanelEnabled={this.state.chatEnabled}
-          leftPanelEnabled={this.state.hashtagEnabled} />
+          leftPanelEnabled={this.state.hashtagEnabled}
+          onWebcastRemove={this.handleWebcastRemove} />
         <FollowingTeamsModal
           followingTeams={this.state.followingTeams}
           onFollowTeam={this.handleFollowTeam}
@@ -102,7 +98,14 @@ var GamedayFrame = React.createClass({
   },
   handleWebcastAdd: function(webcast) {
     var displayedWebcasts = this.state.displayedWebcasts;
-    var newDisplayedWebcasts = displayedWebcasts.concat([webcast]);
+    var newDisplayedWebcasts = displayedWebcasts.concat([webcast.id]);
+    this.setState({displayedWebcasts: newDisplayedWebcasts});
+  },
+  handleWebcastRemove: function(webcast) {
+    var displayedWebcasts = this.state.displayedWebcasts;
+    var newDisplayedWebcasts = displayedWebcasts.filter(function(id) {
+      return id != webcast.id;
+    });
     this.setState({displayedWebcasts: newDisplayedWebcasts});
   },
   handleUnfollowTeam: function(team) {
@@ -224,7 +227,20 @@ var BootstrapButton = React.createClass({
   }
 });
 
+/**
+ * Responsible for rendering a number of webcasts in a grid-like
+ * presentation.
+ *
+ * Should pr provided with both {webcasts} and {displayedWebcasts} as properties.
+ * {webcasts} should be an array of webcast objects, and {displayedWebcasts}
+ * should be an array of webcast ids.
+ */
 var VideoGrid = React.createClass({
+  getWebcasts: function() {
+    return _.filter(this.props.webcasts, function(webcast) {
+      return _.indexOf(this.props.displayedWebcasts, webcast.id) >= 0;
+    }, this);
+  },
   renderLayoutZero: function(classes) {
     return (
       <div className={classes}>
@@ -243,99 +259,52 @@ var VideoGrid = React.createClass({
       </div>
     );
   },
-  renderLayoutOne: function(classes) {
-    if (this.props.webcasts) {
-      var webcast = this.props.webcasts[0];
-    } else {
-      var webcast = null;
+  renderLayout: function(webcastCount, layoutNumber, classes) {
+    classes += (' layout-' + layoutNumber);
+
+    var videoCells = [];
+    var webcasts = this.getWebcasts();
+    for (var i = 0; i < webcastCount; i++) {
+      var webcast = webcasts[i];
+      videoCells.push(
+        <VideoCell
+          num={i}
+          key={webcast.id}
+          webcast={webcast}
+          onWebcastRemove={this.props.onWebcastRemove}
+          vidHeight="100%"
+          vidWidth="100%" />
+      );
     }
+
     return (
       <div className={classes}>
-        <div className="row">
-          <div className="col-md-12">
-            <VideoCell
-              key={webcast.id}
-              webcast={webcast}
-              vidHeight="100%"
-              vidWidth="100%" />
-          </div>
-        </div>
-      </div>
-    );
-  },
-  renderLayoutTwo: function(classes) {
-    return (
-      <div className={classes}>
-        <div className="row">
-          <div className="col-md-6">
-            <VideoCell
-              key={this.props.webcasts[0].id}
-              webcast={this.props.webcasts[0]}
-              vidHeight="100%"
-              vidWidth="100%" />
-          </div>
-          <div className="col-md-6">
-            <VideoCell
-              key={this.props.webcasts[1].id}
-              webcast={this.props.webcasts[1]}
-              vidHeight="100%"
-              vidWidth="100%" />
-          </div>
-        </div>
-      </div>
-    );
-  },
-  renderLayoutThree: function(classes) {
-    return (
-      <div className={classes}>
-        <div className="row">
-          <div className="col-md-6">
-            <VideoCell
-              key={this.props.webcasts[0].id}
-              webcast={this.props.webcasts[0]}
-              vidHeight="100%"
-              vidWidth="100%" />
-          </div>
-          <div className="col-md-6">
-            <div className="row">
-              <div className="col-md-12">
-                <VideoCell
-                  key={this.props.webcasts[1].id}
-                  webcast={this.props.webcasts[1]}
-                  vidHeight="50%"
-                  vidWidth="100%" />
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-md-12">
-                <VideoCell
-                  key={this.props.webcasts[2].id}
-                  webcast={this.props.webcasts[2]}
-                  vidHeight="50%"
-                  vidWidth="100%" />
-              </div>
-            </div>
-          </div>
-        </div>
+        {videoCells}
       </div>
     );
   },
   render: function() {
     var classes = classNames({
-      'videoGrid': true,
-      'leaveLeftMargin': this.props.leftPanelEnabled,
-      'leaveRightMargin': this.props.rightPanelEnabled,
+      'video-grid': true,
+      'leave-left-margin': this.props.leftPanelEnabled,
+      'leave-right-margin': this.props.rightPanelEnabled,
     });
-    switch (this.props.webcasts.length) {
+    var layout;
+    console.log(this.getWebcasts());
+    console.log(this.getWebcasts().length);
+    switch (this.getWebcasts().length) {
       case 0:
       return this.renderLayoutZero(classes);
       case 1:
-      return this.renderLayoutOne(classes);
+      return this.renderLayout(1, 1, classes);
       case 2:
-      return this.renderLayoutTwo(classes);
+      return this.renderLayout(2, 2, classes);
       case 3:
-      return this.renderLayoutThree(classes);
+      return this.renderLayout(3, 3, classes);
+      case 4:
+      return this.renderLayout(4, 4, classes);
     }
+    return layout;
   },
 });
 
@@ -377,34 +346,44 @@ var VideoCell = React.createClass({
         cellEmbed = "";
         break;
       }
+
+      var classes = 'video-cell video-' + this.props.num;
+
       return (
-        <div className="videoCell"
+        <div className={classes}
           idName={this.props.webcast.id}
           onMouseEnter={this.onMouseEnter}
           onMouseLeave={this.onMouseLeave}>
           {cellEmbed}
-          <VideoCellOverlay webcast={this.props.webcast} enabled={this.state.showOverlay} />
+          <VideoCellOverlay
+            webcast={this.props.webcast}
+            enabled={this.state.showOverlay}
+            onWebcastRemove={this.props.onWebcastRemove} />
         </div>
       )
     } else {
-      return <div className="videoCell" />
+      return <div className="video-cell" />
     }
   }
 });
 
 var VideoCellOverlay = React.createClass({
+  onCloseClicked: function() {
+    this.props.onWebcastRemove(this.props.webcast);
+  },
   render: function() {
     var classes = classNames({
       'hidden': !this.props.enabled,
       'panel': true,
       'panel-default': true,
-      'videoCellOverlay': true,
+      'video-cell-overlay': true,
     });
     if (this.props.webcast) {
       return (
         <div className={classes}>
           <div className="panel-heading">
             <h3 className="panel-title">{this.props.webcast.name}</h3>
+            <span className="button-close glyphicon glyphicon-remove" onClick={this.onCloseClicked}></span>
           </div>
         </div>
       )
@@ -429,30 +408,18 @@ var EmbedYoutube = React.createClass({
 
 var EmbedUstream = React.createClass({
   render: function() {
-    var src = "http://www.ustream.tv/flash/live/" + this.props.webcast.channel;
+    var channel = this.props.webcast.channel;
+    var src = `http://www.ustream.tv/embed/${channel}?html5ui=1`;
     return (
-      <object
-        id='utv_o_322919'
-        height={this.props.vidHeight}
+      <iframe
         width={this.props.vidWidth}
-        classid='clsid:D27CDB6E-AE6D-11cf-96B8-444553540000'>
-        <param value={src} name='movie' />
-        <param value='true' name='allowFullScreen' />
-        <param value='always' name='allowScriptAccess' />
-        <param value='transparent' name='wmode' />
-        <param value='viewcount=true&autoplay=true&brand=embed&' name='flashvars' />
-        <embed
-          name='utv_e_218829'
-          id='utv_e_209572'
-          flashvars='viewcount=true&autoplay=true&brand=embed'
-          height={this.props.vidHeight}
-          width={this.props.vidWidth}
-          allowFullScreen='true'
-          allowScriptAccess='always'
-          wmode='transparent'
-          src={src}
-          type='application/x-shockwave-flash' />
-      </object>
+        height={this.props.vidHeight}
+        src={src}
+        scrolling="no"
+        allowfullscreen
+        webkitallowfullscreen
+        frameborder="0"
+        style={{border: "0 none transparent"}}></iframe>
     );
   }
 });
@@ -460,13 +427,15 @@ var EmbedUstream = React.createClass({
 var EmbedTwitch = React.createClass({
   render: function() {
     var channel = this.props.webcast.channel;
+    var src = `http://www.twitch.tv/widgets/live_embed_player.swf?channel=${channel}`;
+    var flashvars = `hostname=www.twitch.tv&channel=${channel}&auto_play=true&start_volume=25&enable_javascript=true`;
     return (
       <object
         type='application/x-shockwave-flash'
         height='100%'
         width='100%'
         id='live_embed_player_flash'
-        data='http://www.twitch.tv/widgets/live_embed_player.swf?channel=${channel}'
+        data={src}
         bgcolor='#000000'>
         <param name='allowFullScreen' value='true' />
         <param name='allowScriptAccess' value='always' />
@@ -476,7 +445,7 @@ var EmbedTwitch = React.createClass({
           value='http://www.twitch.tv/widgets/live_embed_player.swf' />
         <param
           name='flashvars'
-          value='hostname=www.twitch.tv&channel=${channel}&auto_play=true&start_volume=25&enable_javascript=true' />
+          value={flashvars} />
         <param name='wmode' value='transparent' />
       </object>
     );

@@ -1,0 +1,164 @@
+/* temp to make gameday2 development easier */
+html {
+  height: 100%;
+}
+body {
+  background: black;
+  height: 100%;
+  padding-top: 53px;
+}
+#content {
+  height: 100%;
+  overflow: hidden;
+}
+.container-full {
+  height: 100%;
+}
+.video-cell {
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+.video-cell-overlay {
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+.video-cell-overlay.panel {
+  background-color: transparent;
+}
+.video-grid {
+  height: 100%;
+  width: 100%;
+  display: inline-block;
+  position: relative;
+}
+.video-grid.leave-right-margin,
+.video-grid.leave-left-margin {
+  width: calc(100% - 300px);
+}
+.video-grid.leave-right-margin.leave-left-margin {
+  width: calc(100% - 600px);
+}
+.sidebar {
+  height: 100%;
+  width: 300px;
+  display: inline-block;
+}
+#twitter-widget {
+  height: 100%;
+}
+.panel-title {
+  display: inline-block;
+}
+.button-close {
+  padding: 4px;
+  cursor: pointer;
+  float: right;
+}
+/* Layout 1: full screen single video
+
++------+------+
+|             |
+|      0      |
+|             |
++------+------+
+
+*/
+.video-grid.layout-1 .video-0 {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  position: absolute;
+}
+/* Layout 2: two videos side-by-side
+
++------+------+
+|      |      |
+|  0   |   1  |
+|      |      |
++------+------+
+
+*/
+.video-grid.layout-2 .video-0 {
+  width: 50%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  position: absolute;
+}
+.video-grid.layout-2 .video-1 {
+  width: 50%;
+  height: 100%;
+  top: 0;
+  left: 50%;
+  position: absolute;
+}
+/* Layout 3
+
++------+------+
+|      |   1  |
+|  0   |------|
+|      |   2  |
++------+------+
+
+*/
+.video-grid.layout-3 .video-0 {
+  width: 65%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  position: absolute;
+}
+.video-grid.layout-3 .video-1 {
+  width: 35%;
+  height: 50%;
+  top: 0;
+  left: 65%;
+  position: absolute;
+}
+.video-grid.layout-3 .video-2 {
+  width: 35%;
+  height: 50%;
+  top: 50%;
+  left: 65%;
+  position: absolute;
+}
+/* Layout 4
+
++------+------+
+|   0  |   1  |
+|------|------|
+|   2  |   3  |
++------+------+
+
+*/
+.video-grid.layout-4 .video-0 {
+  width: 50%;
+  height: 50%;
+  top: 0;
+  left: 0;
+  position: absolute;
+}
+.video-grid.layout-4 .video-1 {
+  width: 50%;
+  height: 50%;
+  top: 0;
+  left: 50%;
+  position: absolute;
+}
+.video-grid.layout-4 .video-2 {
+  width: 50%;
+  height: 50%;
+  top: 50%;
+  left: 0%;
+  position: absolute;
+}
+.video-grid.layout-4 .video-3 {
+  width: 50%;
+  height: 50%;
+  top: 50%;
+  left: 50%;
+  position: absolute;
+}

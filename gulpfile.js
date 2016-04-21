@@ -5,6 +5,7 @@ var watchify = require('watchify');
 var reactify = require('reactify');
 var gutil = require('gulp-util');
 var debug = require('gulp-debug');
+var less = require('gulp-less');
 var babelify = require('babelify');
 
 var errorHandler = function(err) {
@@ -46,12 +47,24 @@ function watch() {
   return compile(true);
 }
 
-gulp.task('build', function() {
+gulp.task('build-react', function() {
   return compile();
+});
+
+gulp.task('less', function() {
+  return gulp.src('./react/**/*.less')
+  .pipe(less())
+  .on('error', function(err) {
+      gutil.log(err);
+      this.emit('end');
+  })
+  .pipe(gulp.dest('./static/css'));
 });
 
 gulp.task('watch', function() {
   return watch();
 });
+
+gulp.task('build', ['build-react', 'less']);
 
 gulp.task('default', ['watch']);
