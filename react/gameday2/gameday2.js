@@ -571,7 +571,7 @@ var FollowingTeamsModal = React.createClass({
 
 // [{'webcasts': [{u'channel': u'6540154', u'type': u'ustream'}], 'event_name': u'Present Test Event', 'event_key': u'2014testpresent'}]
 
-var webcastData = $.parseJSON($("#webcasts_json").text().replace(/u'/g,/u'/g,/u'/g,/u'/g,/u'/g,/u'/g,/u'/g,/u'/g,'\'').replace(/'/g,/'/g,/'/g,/'/g,/'/g,/'/g,/'/g,/'/g,'"'));
+var webcastData = $.parseJSON($("#webcasts_json").text().replace(/u'/g,'\'').replace(/'/g,'"'));
 
 ReactDOM.render(
   <GamedayFrame webcastData={webcastData} pollInterval={20000} />,
