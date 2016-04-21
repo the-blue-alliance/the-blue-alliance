@@ -15,8 +15,8 @@ from models.team import Team
 
 class MyTBALiveController(LoggedInHandler):
     def get(self):
-        self._require_login('/mytba')
-        self._require_registration('/account/register')
+        self._require_login()
+        self._require_registration()
 
         user = self.user_bundle.account.key
         team_favorites_future = Favorite.query(Favorite.model_type == ModelType.TEAM, ancestor=user).fetch_async()

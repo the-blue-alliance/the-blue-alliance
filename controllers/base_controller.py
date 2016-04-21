@@ -134,15 +134,20 @@ class LoggedInHandler(webapp2.RequestHandler):
         self.response.headers['Expires'] = '0'
         self.response.headers['Vary'] = 'Accept-Encoding'
 
+    def _get_login_url(self, target_url):
+        return self.user_bundle.create_login_url(target_url)
+
     def _require_admin(self):
         self._require_login()
         if not self.user_bundle.is_current_user_admin:
             return self.redirect(self.user_bundle.login_url, abort=True)
 
-    def _require_login(self, target_url="/"):
+    def _require_login(self, redirect_url=None):
         if not self.user_bundle.user:
+            if redirect_url is None:
+                redirect_url = self.request.url
             return self.redirect(
-                self.user_bundle.create_login_url(target_url),
+                '/account/login_required?redirect={}'.format(redirect_url),
                 abort=True
             )
 
@@ -157,9 +162,11 @@ class LoggedInHandler(webapp2.RequestHandler):
                 abort=True
             )
 
-    def _require_registration(self, target_url="/"):
+    def _require_registration(self, redirect_url=None):
         if not self.user_bundle.account.registered:
+            if redirect_url is None:
+                redirect_url = self.request.url
             return self.redirect(
-                target_url,
+                '/account/register?redirect={}'.format(redirect_url),
                 abort=True
             )

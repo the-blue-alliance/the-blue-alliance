@@ -33,13 +33,8 @@ import tba_config
 
 class AccountOverview(LoggedInHandler):
     def get(self):
-        redirect = self.request.get('redirect')
-        if redirect:
-            self._require_login(redirect)
-        else:
-            self._require_login('/account')
-        # Redirects to registration page if account not registered
-        self._require_registration('/account/register')
+        self._require_login()
+        self._require_registration()
 
         push_sitevar = Sitevar.get_by_id('notifications.enable')
         if push_sitevar is None or not push_sitevar.values_json == "true":
@@ -81,14 +76,14 @@ class AccountOverview(LoggedInHandler):
 
 class AccountEdit(LoggedInHandler):
     def get(self):
-        self._require_login('/account/edit')
-        self._require_registration('/account/register')
+        self._require_login()
+        self._require_registration()
 
         self.response.out.write(jinja2_engine.render('account_edit.html', self.template_values))
 
     def post(self):
-        self._require_login('/account/edit')
-        self._require_registration('/account/register')
+        self._require_login()
+        self._require_registration()
 
         # Check to make sure that they aren't trying to edit another user
         real_account_id = self.user_bundle.account.key.id()
@@ -104,19 +99,26 @@ class AccountEdit(LoggedInHandler):
 
 class AccountRegister(LoggedInHandler):
     def get(self):
-        self._require_login('/account/register')
-        # Redirects to account overview page if already registered
-        if self.user_bundle.account.registered:
-            self.redirect('/account')
-            return None
+        redirect = self.request.get('redirect')
+        if redirect:
+            self._require_login(redirect)
+        else:
+            self._require_login()
 
+        # Redirects if already registered
+        if self.user_bundle.account.registered:
+            if redirect:
+                self.redirect(redirect, abort=True)
+            else:
+                self.redirect('/account', abort=True)
+
+        self.template_values['redirect'] = redirect
         self.response.out.write(jinja2_engine.render('account_register.html', self.template_values))
 
     def post(self):
-        self._require_login('/account/register')
+        self._require_login()
         if self.user_bundle.account.registered:
-            self.redirect('/account')
-            return None
+            self.redirect('/account', abort=True)
 
         # Check to make sure that they aren't trying to edit another user
         real_account_id = self.user_bundle.account.key.id()
@@ -126,9 +128,31 @@ class AccountRegister(LoggedInHandler):
             account.display_name = self.request.get('display_name')
             account.registered = True
             account.put()
-            self.redirect('/account')
+
+            redirect = self.request.get('redirect')
+            if redirect:
+                self.redirect(redirect, abort=True)
+            else:
+                self.redirect('/account', abort=True)
         else:
             self.redirect('/')
+
+
+class AccountLogin(LoggedInHandler):
+    def get(self):
+        redirect = self.request.get('redirect')
+        if redirect:
+            url = self._get_login_url(redirect)
+        else:
+            url = self._get_login_url('/account')
+        self.redirect(url, abort=True)
+
+
+class AccountLoginRequired(LoggedInHandler):
+    def get(self):
+        redirect = self.request.get('redirect')
+        self.template_values['redirect'] = redirect
+        self.response.out.write(jinja2_engine.render('account_login_required.html', self.template_values))
 
 
 class AccountLogout(LoggedInHandler):
@@ -148,8 +172,8 @@ class AccountLogout(LoggedInHandler):
 
 class MyTBAController(LoggedInHandler):
     def get(self):
-        self._require_login('/account/register')
-        self._require_registration('/account/register')
+        self._require_login()
+        self._require_registration()
 
         user = self.user_bundle.account.key
         favorites = Favorite.query(ancestor=user).fetch()
@@ -216,8 +240,8 @@ class MyTBAController(LoggedInHandler):
 
 class MyTBAEventController(LoggedInHandler):
     def get(self, event_key):
-        self._require_login('/account/register')
-        self._require_registration('/account/register')
+        self._require_login()
+        self._require_registration()
 
         # Handle wildcard for all events in a year
         event = None
@@ -259,8 +283,8 @@ class MyTBAEventController(LoggedInHandler):
         self.response.out.write(jinja2_engine.render('mytba_event.html', self.template_values))
 
     def post(self, event_key):
-        self._require_login('/account/register')
-        self._require_registration('/account/register')
+        self._require_login()
+        self._require_registration()
 
         current_user_id = self.user_bundle.account.key.id()
 
@@ -293,8 +317,8 @@ class MyTBAEventController(LoggedInHandler):
 
 class MyTBATeamController(LoggedInHandler):
     def get(self, team_number):
-        self._require_login('/account/register')
-        self._require_registration('/account/register')
+        self._require_login()
+        self._require_registration()
 
         team_key = 'frc{}'.format(team_number)
         team = Team.get_by_id(team_key)
@@ -321,8 +345,8 @@ class MyTBATeamController(LoggedInHandler):
         self.response.out.write(jinja2_engine.render('mytba_team.html', self.template_values))
 
     def post(self, team_number):
-        self._require_login('/account/register')
-        self._require_registration('/account/register')
+        self._require_login()
+        self._require_registration()
 
         current_user_id = self.user_bundle.account.key.id()
         team_key = 'frc{}'.format(team_number)
