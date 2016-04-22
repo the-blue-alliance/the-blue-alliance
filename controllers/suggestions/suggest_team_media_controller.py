@@ -22,7 +22,7 @@ class SuggestTeamMediaController(LoggedInHandler):
         team_key = self.request.get("team_key")
         year_str = self.request.get("year")
 
-        self._require_login("/suggest/team/media?team_key=%s&year=%s" % (team_key, year_str))
+        self._require_login()
 
         if not team_key or not year_str:
             self.redirect("/", abort=True)
