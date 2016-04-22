@@ -6,11 +6,12 @@ var _ = require('underscore');
 var GamedayFrame = React.createClass({
   getInitialState: function() {
     return {
-      chatEnabled: false,
-      displayedWebcasts: [],
       webcasts: [],
-      followingTeams: [177,230],
+      webcastsById: {},
+      displayedWebcasts: [],
       hashtagEnabled: true,
+      chatEnabled: false,
+      followingTeams: [177,230]
     };
   },
   componentWillMount: function() {
@@ -18,43 +19,49 @@ var GamedayFrame = React.createClass({
     // Special and event webcasts are normalized into objects with 6 attributes:
     // key, num, id, name, type, and channel
     var webcasts = [];
+    var webcastsById = {};
     var specialWebcasts = this.props.webcastData.special_webcasts;
     var eventsWithWebcasts = this.props.webcastData.ongoing_events_w_webcasts;
 
     // First, deal with special webcasts
     for (let webcast of specialWebcasts) {
-      webcasts.push({
+      const id = webcast.key_name + 0;
+      webcasts.push(id);
+      webcastsById[id] = {
         'key': webcast.key_name,
-        'num': 1,
-        'id': webcast.key_name + '-' + 1,
+        'num': 0,
+        'id': id,
         'name': webcast.name,
         'type': webcast.type,
         'channel': webcast.channel
-      });
+      };
     }
 
     // Now, process normal event webcasts
     for (let event of eventsWithWebcasts) {
-      var webcastNum = 1;
+      var webcastNum = 0;
       for (let webcast of event.webcast) {
         var name = (event.short_name ? event.short_name : event.name);
         if (event.webcast.length > 1) {
-          name += (' ' + webcastNum);
+          name += (' ' + (webcastNum + 1));
         }
-        webcasts.push({
+        const id = event.key + '-' + webcastNum;
+        webcasts.push(id);
+        webcastsById[id] = {
           'key': event.key,
           'num': webcastNum,
-          'id': event.key + '-' + webcastNum,
+          'id': id,
           'name': name,
           'type': webcast.type,
           'channel': webcast.channel
-        });
+        };
         webcastNum++;
       }
     }
 
     this.setState({
-      webcasts: webcasts
+      webcasts: webcasts,
+      webcastsById: webcastsById
     });
   },
   componentWillUnmount: function() {
@@ -67,6 +74,7 @@ var GamedayFrame = React.createClass({
           chatEnabled={this.state.chatEnabled}
           hashtagEnabled={this.state.hashtagEnabled}
           webcasts={this.state.webcasts}
+          webcastsById={this.state.webcastsById}
           onChatToggle={this.handleChatToggle}
           onHashtagToggle={this.handleHashtagToggle}
           onWebcastAdd={this.handleWebcastAdd}
@@ -75,6 +83,7 @@ var GamedayFrame = React.createClass({
         <ChatPanel enabled={this.state.chatEnabled} />
         <VideoGrid
           webcasts={this.state.webcasts}
+          webcastsById={this.state.webcastsById}
           displayedWebcasts={this.state.displayedWebcasts}
           rightPanelEnabled={this.state.chatEnabled}
           leftPanelEnabled={this.state.hashtagEnabled}
@@ -137,6 +146,7 @@ var GamedayNavbar = React.createClass({
           <ul className="nav navbar-nav navbar-right">
             <WebcastDropdown
               webcasts={this.props.webcasts}
+              webcastsById={this.props.webcastsById}
               onWebcastAdd={this.props.onWebcastAdd}
               onWebcastReset={this.props.onWebcastReset} />
             <li>
@@ -231,11 +241,6 @@ var BootstrapButton = React.createClass({
  * should be an array of webcast ids.
  */
 var VideoGrid = React.createClass({
-  getWebcasts: function() {
-    return _.filter(this.props.webcasts, function(webcast) {
-      return _.indexOf(this.props.displayedWebcasts, webcast.id) >= 0;
-    }, this);
-  },
   renderLayoutZero: function(classes) {
     return (
       <div className={classes}>
@@ -250,13 +255,16 @@ var VideoGrid = React.createClass({
     classes += (' layout-' + layoutNumber);
 
     var videoCells = [];
-    var webcasts = this.getWebcasts();
     for (var i = 0; i < webcastCount; i++) {
-      var webcast = webcasts[i];
+      var webcast = null, id = 'video-' + i;
+      if (i < this.props.displayedWebcasts.length) {
+        webcast = this.props.webcastsById[this.props.displayedWebcasts[i]];
+        id = webcast.id;
+      }
       videoCells.push(
         <VideoCell
           num={i}
-          key={webcast.id}
+          key={id}
           webcast={webcast}
           onWebcastRemove={this.props.onWebcastRemove}
           vidHeight="100%"
@@ -277,19 +285,22 @@ var VideoGrid = React.createClass({
       'leave-right-margin': this.props.rightPanelEnabled,
     });
     var layout;
-    console.log(this.getWebcasts());
-    console.log(this.getWebcasts().length);
-    switch (this.getWebcasts().length) {
+    switch (this.props.displayedWebcasts.length) {
       case 0:
-      return this.renderLayoutZero(classes);
+      layout = this.renderLayoutZero(classes);
+      break;
       case 1:
-      return this.renderLayout(1, 1, classes);
+      layout = this.renderLayout(1, 1, classes);
+      break;
       case 2:
-      return this.renderLayout(2, 2, classes);
+      layout = this.renderLayout(2, 2, classes);
+      break;
       case 3:
-      return this.renderLayout(3, 3, classes);
+      layout = this.renderLayout(3, 3, classes);
+      break;
       case 4:
-      return this.renderLayout(4, 4, classes);
+      layout = this.renderLayout(4, 4, classes);
+      break;
     }
     return layout;
   },
@@ -308,6 +319,8 @@ var VideoCell = React.createClass({
     this.setState({"showOverlay": false})
   },
   render: function() {
+    var classes = 'video-cell video-' + this.props.num;
+
     if (this.props.webcast) {
       var cellEmbed;
       switch (this.props.webcast.type) {
@@ -334,8 +347,6 @@ var VideoCell = React.createClass({
         break;
       }
 
-      var classes = 'video-cell video-' + this.props.num;
-
       return (
         <div className={classes}
           idName={this.props.webcast.id}
@@ -349,7 +360,7 @@ var VideoCell = React.createClass({
         </div>
       )
     } else {
-      return <div className="video-cell" />
+      return <div className={classes} />
     }
   }
 });
@@ -443,7 +454,7 @@ var WebcastDropdown = React.createClass({
   render: function() {
     var webcastListItems = [];
     for (var i = 0; i < this.props.webcasts.length; i++) {
-      var webcast = this.props.webcasts[i];
+      var webcast = this.props.webcastsById[this.props.webcasts[i]];
       webcastListItems.push(
         <WebcastListItem
           key={webcast.id}
