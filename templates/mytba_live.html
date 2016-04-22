@@ -19,13 +19,15 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-xs-12">
+    <div>
     {% if live_events_with_teams %}
-      <div>
+      <div class="col-xs-12">
         {% include "live_teams_partial.html" %}
       </div>
     {% else %}
+     <div class="col-xs-12">
       <p>No favorite teams are competing this week.</p>
+     </div>
     {% endif %}
     </div>
     <div class="row">
