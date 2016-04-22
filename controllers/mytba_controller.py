@@ -1,4 +1,3 @@
-import collections
 import datetime
 import os
 
@@ -7,7 +6,7 @@ from google.appengine.ext.webapp import template
 
 from consts.model_type import ModelType
 from controllers.base_controller import LoggedInHandler
-from database.event_query import EventListQuery, TeamYearEventsQuery
+from database.event_query import TeamYearEventsQuery
 from database.team_query import EventTeamsQuery
 from helpers.event_helper import EventHelper
 from helpers.event_team_status_helper import EventTeamStatusHelper
@@ -49,7 +48,7 @@ class MyTBALiveController(LoggedInHandler):
             EventHelper.sort_events(events)
             next_event = next((e for e in events if e.start_date > now), None)
             if next_event:
-                if not next_event.key_name in future_events_by_event:
+                if next_event.key_name not in future_events_by_event:
                     future_events_by_event[next_event.key_name] = (next_event, [])
                 future_events_by_event[next_event.key_name][1].append(team)
 
