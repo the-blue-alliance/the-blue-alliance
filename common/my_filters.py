@@ -35,8 +35,3 @@ def yt_start(value):
 @register.filter
 def get_item(dictionary, key):
     return dictionary.get(key)
-
-
-@register.filter
-def strftime(d, str):
-    return d.strftime(str)
