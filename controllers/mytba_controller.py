@@ -24,7 +24,7 @@ class MyTBALiveController(LoggedInHandler):
         now = datetime.datetime.now()
         team_favorites_future = Favorite.query(Favorite.model_type == ModelType.TEAM, ancestor=user).fetch_async()
 
-        live_events = EventHelper.getWeekEvents()
+        live_events = EventHelper.getEventsWithinADay()
         favorite_team_keys = map(lambda f: ndb.Key(Team, f.model_key), team_favorites_future.get_result())
         favorite_teams_future = ndb.get_multi_async(favorite_team_keys)
 
@@ -46,7 +46,7 @@ class MyTBALiveController(LoggedInHandler):
             if not events:
                 continue
             EventHelper.sort_events(events)
-            next_event = next((e for e in events if e.start_date > now), None)
+            next_event = next((e for e in events if e.start_date > now and not e.within_a_day), None)
             if next_event:
                 if next_event.key_name not in future_events_by_event:
                     future_events_by_event[next_event.key_name] = (next_event, [])
