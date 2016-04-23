@@ -19,79 +19,158 @@ from models.event_team import EventTeam
 
 class MatchstatsHelper(object):
     @classmethod
-    def calculate_matchstats(cls, matches, year):
-        if not matches:
-            return {}
+    def build_team_mapping(cls, matches):
+        """
+        Returns (team_list, team_id_map)
+        team_list: A list of team_str such as '254' or '254B'
+        team_id_map: A dict of key: team_str, value: row index in x_matrix that corresponds to the team
+        """
+        # Build team list
+        team_list = set()
+        for match in matches:
+            if match.comp_level != 'qm':  # only consider quals matches
+                continue
+            for alliance_color in ['red', 'blue']:
+                for team in match.alliances[alliance_color]['teams']:
+                    team_list.add(team[3:])  # turns "frc254B" into "254B"
 
-        parsed_matches_by_type, team_list, team_id_map = cls._parse_matches(matches, year)
+        team_list = list(team_list)
+        team_id_map = {}
+        for i, team in enumerate(team_list):
+            team_id_map[team] = i
 
-        oprs_dict = cls._calculate_stat(parsed_matches_by_type['opr'], team_list, team_id_map)
-        xoprs_dict = cls._calculate_stat(parsed_matches_by_type['xopr'], team_list, team_id_map)
-        dprs_dict = cls._calculate_stat(parsed_matches_by_type['dpr'], team_list, team_id_map)
-        ccwms_dict = cls._calculate_stat(parsed_matches_by_type['ccwm'], team_list, team_id_map)
-
-        stats = {'oprs': oprs_dict, 'dprs': dprs_dict, 'ccwms': ccwms_dict, 'xoprs': xoprs_dict}
-        if year == 2016:
-            stats['year_specific'] = {}
-            stats['year_specific']['bouldersOPR'] = cls._calculate_stat(parsed_matches_by_type['bouldersOPR'], team_list, team_id_map)
-            stats['year_specific']['breachRate'] = cls._calculate_rate(parsed_matches_by_type['breachRate'])
-
-        init_oprs = xoprs_dict
-        for _ in range(2):  # 2 iterations of ixOPR seems to work well
-            parsed_matches_by_type, team_list, team_id_map = cls._parse_matches(matches, year, init_oprs)
-            ixoprs_dict = cls._calculate_stat(parsed_matches_by_type['xopr'], team_list, team_id_map)
-            init_oprs = cls._calculate_stat(parsed_matches_by_type['xopr'], team_list, team_id_map)
-        stats['ixoprs']= ixoprs_dict
-
-        return stats
+        return team_list, team_id_map
 
     @classmethod
-    def _calculate_rate(cls, parsed_matches):
-        totals = defaultdict(int)
-        successes = defaultdict(int)
-        for teams, value in parsed_matches:
-            for team in teams:
-                totals[team] += 1
-                if value:
-                    successes[team] += 1
-
-        stat = {}
-        for team, total in totals.items():
-            stat[team] = float(successes[team]) / total
-
-        return stat
-
-    @classmethod
-    def _calculate_stat(cls, parsed_matches, team_list, team_id_map):
-        """
-        Returns: a dict where
-        key: a string representing a team number (Example: "254", "254B", "1114")
-        value: a float representing the stat (OPR/DPR/CCWM) for that team
-        """
-        n = len(team_list)
+    def build_M_matrix(cls, matches, team_id_map):
+        n = len(team_id_map.keys())
         M = np.zeros([n, n])
+        for match in matches:
+            if match.comp_level != 'qm':  # only consider quals matches
+                continue
+            for alliance_color in ['red', 'blue']:
+                alliance_teams = match.alliances[alliance_color]['teams']
+                for team1 in alliance_teams:
+                    team1_id = team_id_map[team1[3:]]
+                    for team2 in alliance_teams:
+                        M[team1_id, team_id_map[team2[3:]]] += 1
+        return M
+
+    @classmethod
+    def build_s_matrix(cls, matches, team_id_map, stat_type, init_stats=None, init_stats_default=0, limit_matches=None):
+        n = len(team_id_map.keys())
         s = np.zeros([n, 1])
+        for match in matches:
+            if match.comp_level != 'qm':  # only consider quals matches
+                continue
 
-        # Constructing M and s
-        for teams, score in parsed_matches:
-            for team1 in teams:
-                team1_id = team_id_map[team1]
-                for team2 in teams:
-                    M[team1_id, team_id_map[team2]] += 1
-                s[team1_id] += score
+            treat_as_unplayed = limit_matches is not None and match.match_number > limit_matches
 
-        # Solving M*x = s for x
-        try:
-            # x = np.linalg.solve(M, s)
-            x = np.dot(np.linalg.pinv(M), s)  # Similar to above, but more numerically stable
-        except (np.linalg.LinAlgError, ValueError):
-            return {}
+            for alliance_color in ['red', 'blue']:
+                alliance_teams = [team[3:] for team in match.alliances[alliance_color]['teams']]
+                stat = cls._get_stat(stat_type, match, alliance_color, alliance_teams, init_stats, init_stats_default, treat_as_unplayed)
+                for team in alliance_teams:
+                    s[team_id_map[team]] += stat
+        return s
+
+    @classmethod
+    def calc_avg_match_score(cls, matches):
+        total_scores = 0
+        num_scores = 0
+        for match in matches:
+            if match.comp_level != 'qm' or not match.has_been_played:
+                continue
+            for alliance_color in ['red', 'blue']:
+                total_scores += match.alliances[alliance_color]['score']
+                num_scores += 1
+
+        return float(total_scores) / num_scores
+
+    @classmethod
+    def calc_stat(cls, matches, team_list, team_id_map, M, stat_type, init_stats=None, init_stats_default=0, limit_matches=None):
+        s = cls.build_s_matrix(matches, team_id_map, stat_type, init_stats=init_stats, init_stats_default=init_stats_default, limit_matches=limit_matches)
+        x = np.dot(np.linalg.pinv(M), s)
 
         stat_dict = {}
         for team, stat in zip(team_list, x):
             stat_dict[team] = stat[0]
-
         return stat_dict
+
+    @classmethod
+    def _get_stat(cls, stat_type, match, alliance_color, alliance_teams, init_stats, init_stats_default, treat_as_unplayed):
+        match_played = match.has_been_played and not treat_as_unplayed
+
+        if match_played:
+            if stat_type == 'oprs':
+                return match.alliances[alliance_color]['score']
+            elif stat_type == 'dprs':
+                if alliance_color == 'red':
+                    other_alliance_color = 'blue'
+                else:
+                    other_alliance_color = 'red'
+                return match.alliances[other_alliance_color]['score']
+            elif stat_type == 'ccwms':
+                if alliance_color == 'red':
+                    other_alliance_color = 'blue'
+                else:
+                    other_alliance_color = 'red'
+                return match.alliances[alliance_color]['score'] - match.alliances[other_alliance_color]['score']
+
+            # 2016 specific
+            if stat_type == '2016autoPointsOPR':
+                if match.score_breakdown and alliance_color in match.score_breakdown:
+                    return match.score_breakdown[alliance_color]['autoPoints']
+            elif stat_type == '2016bouldersOPR':
+                if match.score_breakdown and alliance_color in match.score_breakdown:
+                    return (match.score_breakdown[alliance_color]['autoBouldersLow'] +
+                        match.score_breakdown[alliance_color]['autoBouldersHigh'] +
+                        match.score_breakdown[alliance_color]['teleopBouldersLow'] +
+                        match.score_breakdown[alliance_color]['teleopBouldersHigh'])
+            elif stat_type == '2016crossingsOPR':
+                if match.score_breakdown and alliance_color in match.score_breakdown:
+                    return (match.score_breakdown[alliance_color]['position1crossings'] +
+                        match.score_breakdown[alliance_color]['position2crossings'] +
+                        match.score_breakdown[alliance_color]['position3crossings'] +
+                        match.score_breakdown[alliance_color]['position4crossings'] +
+                        match.score_breakdown[alliance_color]['position5crossings'])
+
+        # None of the above cases were met. Return default.
+        if init_stats and stat_type in init_stats:
+            total = 0
+            for team in alliance_teams:
+                total += init_stats[stat_type].get(team, init_stats_default)
+            return total
+        else:
+            total = 0
+            for team in alliance_teams:
+                total += init_stats_default
+            return total
+
+    @classmethod
+    def calculate_matchstats(cls, matches, year):
+        if not matches:
+            return {}
+
+        team_list, team_id_map = cls.build_team_mapping(matches)
+        last_event_stats = cls.get_last_event_stats(team_list, matches[0].event)
+        avg_match_score = cls.calc_avg_match_score(matches)
+
+        M = cls.build_M_matrix(matches, team_id_map)
+
+        oprs_dict = cls.calc_stat(matches, team_list, team_id_map, M, 'oprs')
+        dprs_dict = cls.calc_stat(matches, team_list, team_id_map, M, 'dprs')
+        ccwms_dict = cls.calc_stat(matches, team_list, team_id_map, M, 'ccwms')
+        stats = {'oprs': oprs_dict, 'dprs': dprs_dict, 'ccwms': ccwms_dict}
+
+        if year == 2016:
+            # First ranking tiebreaker
+            stats['2016autoPointsOPR'] = cls.calc_stat(matches, team_list, team_id_map, M, '2016autoPointsOPR')
+
+            # For RP calculation
+            stats['2016crossingsOPR'] = cls.calc_stat(matches, team_list, team_id_map, M, '2016crossingsOPR')
+            stats['2016bouldersOPR'] = cls.calc_stat(matches, team_list, team_id_map, M, '2016bouldersOPR')
+
+        return stats
 
     @classmethod
     def get_last_event_stats(cls, team_list, event_key):
@@ -124,96 +203,10 @@ class MatchstatsHelper(object):
                         last_event = event
                         last_event_start = event.start_date
 
-            last_event_stat = None
             if last_event is not None and last_event.matchstats:
                 for stat, values in last_event.matchstats.items():
-                    if stat == 'year_specific':
-                        for stat2, values2 in last_event.matchstats[stat].items():
-                            if team in values2:
-                                last_event_stats[team][stat2] = values2[team]
-                    else:
-                        if team in values:
-                            last_event_stats[team][stat] = values[team]
-
-            if last_event_stat:
-                last_event_stats[team] = last_event_stat
+                    if team in values:
+                        last_event_stats[stat][team] = values[team]
 
         memcache.set(cache_key, last_event_stats, 60*60*24)
         return last_event_stats
-
-    @classmethod
-    def _parse_matches(cls, matches, year, init_oprs=None):
-        """
-        Returns:
-        parsed_matches_by_type: list of matches as the tuple ([team, team, team], <score/opposingscore/scoremargin>) for each key ('opr', 'dpr', 'ccwm')
-        team_list: list of strings representing team numbers. Example: "254", "254B", "1114"
-        team_id_map: dict that maps a team to a unique integer from 0 to n-1
-        """
-        team_list = set()
-        parsed_matches_by_type = {
-            'opr': [],
-            'xopr': [],
-            'dpr': [],
-            'ccwm': [],
-        }
-        # Add year specific OPRs
-        if year == 2016:
-            parsed_matches_by_type['bouldersOPR'] = []
-            parsed_matches_by_type['breachRate'] = []
-
-        # Build team list
-        for match in matches:
-            if match.comp_level != 'qm':  # only calculate OPRs for played quals matches
-                continue
-            alliances = match.alliances
-            for alliance_color in ['red', 'blue']:
-                for team in alliances[alliance_color]['teams']:
-                    team_list.add(team[3:])  # turns "frc254B" into "254B"
-
-        # Load last OPR data
-        if init_oprs is None:
-            last_event_oprs = {}
-            for team, stat in cls.get_last_event_stats(team_list, matches[0].event).items():
-                last_event_oprs[team] = stat['oprs']
-        else:
-            last_event_oprs = {}
-            for team, xopr in init_oprs.items():
-                last_event_oprs[team] = xopr
-
-        for match in matches:
-            if match.comp_level != 'qm':  # only calculate OPRs for played quals matches
-                continue
-            alliances = match.alliances
-            for alliance_color, opposing_color in zip(['red', 'blue'], ['blue', 'red']):
-                match_team_list = []
-                predicted_score = 0
-                for team in alliances[alliance_color]['teams']:
-                    team = team[3:]  # turns "frc254B" into "254B"
-                    match_team_list.append(team)
-                    predicted_score += last_event_oprs.get(team, 0)  # TODO use something other than 0
-
-                if match.has_been_played:  # only calculate OPRs for played matches
-                    alliance_score = int(alliances[alliance_color]['score'])
-                    opposing_score = int(alliances[opposing_color]['score'])
-                    parsed_matches_by_type['opr'].append((match_team_list, alliance_score))
-                    parsed_matches_by_type['xopr'].append((match_team_list, alliance_score))
-                    parsed_matches_by_type['dpr'].append((match_team_list, opposing_score))
-                    parsed_matches_by_type['ccwm'].append((match_team_list, alliance_score - opposing_score))
-
-                    if year == 2016 and match.score_breakdown and alliance_color in match.score_breakdown:
-                        parsed_matches_by_type['bouldersOPR'].append((match_team_list,
-                            match.score_breakdown[alliance_color].get('autoBouldersLow', 0) +
-                            match.score_breakdown[alliance_color].get('autoBouldersHigh', 0) +
-                            match.score_breakdown[alliance_color].get('teleopBouldersLow', 0) +
-                            match.score_breakdown[alliance_color].get('teleopBouldersHigh', 0)))
-                        parsed_matches_by_type['breachRate'].append((match_team_list, match.score_breakdown[alliance_color].get('teleopDefensesBreached', False)))
-                else:
-                    parsed_matches_by_type['xopr'].append((match_team_list, predicted_score))
-
-        team_list = list(team_list)
-
-        team_id_map = {}
-        for i, team in enumerate(team_list):
-            team_id_map[team] = i
-
-        return parsed_matches_by_type, team_list, team_id_map
