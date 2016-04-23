@@ -108,7 +108,9 @@ class ApiEventStatsController(ApiEventController):
         stats = {}
         matchstats = self.event.matchstats
         if matchstats:
-            stats.update(matchstats)
+            for stat in ['oprs', 'dprs', 'ccwms']:
+                if stat in matchstats:
+                    stats[stat] = matchstats[stat]
 
         year_specific = EventInsightsHelper.calculate_event_insights(self.event.matches, self.event.year)
         if year_specific:
