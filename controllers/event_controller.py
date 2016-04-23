@@ -16,7 +16,6 @@ from helpers.team_helper import TeamHelper
 from helpers.event_helper import EventHelper
 from helpers.event_insights_helper import EventInsightsHelper
 from helpers.media_helper import MediaHelper
-from helpers.prediction_helper import PredictionHelper
 
 from models.event import Event
 from template_engine import jinja2_engine
@@ -222,10 +221,12 @@ class EventInsights(CacheableHandler):
 
         event.get_matches_async()
 
+        match_predictions = event.matchstats.get('match_predictions', None)
+        match_prediction_stats = event.matchstats.get('match_prediction_stats', None)
+
         cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
         matches = MatchHelper.organizeMatches(cleaned_matches)
 
-        match_predictions, match_prediction_stats = PredictionHelper.get_match_predictions(matches['qm'])
         import time
         s = time.time()
         ranking_predictions, ranking_prediction_stats = PredictionHelper.get_ranking_predictions(matches['qm'], match_predictions)
