@@ -204,13 +204,13 @@ class PredictionHelper(object):
 
             # Update s
             for alliance_color in ['red', 'blue']:
-                all_scores_sum += match.alliances[alliance_color]['score']
-                all_boulders_sum += match.score_breakdown[alliance_color]['autoBouldersLow'] + \
-                    match.score_breakdown[alliance_color]['autoBouldersHigh'] + \
-                    match.score_breakdown[alliance_color]['teleopBouldersLow'] + \
-                    match.score_breakdown[alliance_color]['teleopBouldersHigh']
-
                 if match.has_been_played:
+                    all_scores_sum += match.alliances[alliance_color]['score']
+                    all_boulders_sum += match.score_breakdown[alliance_color]['autoBouldersLow'] + \
+                        match.score_breakdown[alliance_color]['autoBouldersHigh'] + \
+                        match.score_breakdown[alliance_color]['teleopBouldersLow'] + \
+                        match.score_breakdown[alliance_color]['teleopBouldersHigh']
+
                     for team in match.alliances[alliance_color]['teams']:
                         breach_totals[team[3:]][1] += 1
                         if match.score_breakdown[alliance_color]['teleopDefensesBreached']:
@@ -228,8 +228,8 @@ class PredictionHelper(object):
         prediction_stats = {
             'wl_accuracy': None if played_matches == 0 else 100 * float(correct_predictions) / played_matches,
             'wl_accuracy_75': None if played_matches_75 == 0 else 100 * float(correct_predictions_75) / played_matches_75,
-            'err_mean': np.mean(score_differences),
-            'err_var': np.var(score_differences),
+            'err_mean': np.mean(score_differences) if score_differences else None,
+            'err_var': np.var(score_differences) if score_differences else None,
         }
 
         return predictions, prediction_stats
