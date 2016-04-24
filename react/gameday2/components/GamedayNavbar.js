@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import BootstrapButton from './BootstrapButton';
 var classNames = require('classnames');
 
 var GamedayNavbar = React.createClass({
@@ -46,30 +47,6 @@ var GamedayNavbar = React.createClass({
           </ul>
         </div>
       </nav>
-    );
-  }
-});
-
-var BootstrapButton = React.createClass({
-  getDefaultProps: function() {
-    return {
-      a: '#'
-    };
-  },
-  handleClick: function() {
-    if (this.props.handleClick) {
-      this.props.handleClick();
-      return false;
-    }
-  },
-  render: function() {
-    var classes = classNames({
-      'btn': true,
-      'btn-default': true,
-      'active': this.props.active,
-    });
-    return (
-      <a className={classes} href={this.props.a} onClick={this.handleClick}>{this.props.children}</a>
     );
   }
 });
