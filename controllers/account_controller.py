@@ -102,13 +102,14 @@ class AccountRegister(LoggedInHandler):
         self._require_login()
 
         # Redirects if already registered
+        redirect = self.request.get('redirect')
         if self.user_bundle.account.registered:
             if redirect:
                 self.redirect(redirect, abort=True)
             else:
                 self.redirect('/account', abort=True)
 
-        self.template_values['redirect'] = self.request.get('redirect')
+        self.template_values['redirect'] = redirect
         self.response.out.write(jinja2_engine.render('account_register.html', self.template_values))
 
     def post(self):
