@@ -1,8 +1,7 @@
 import React, { PropTypes } from 'react';
 import BootstrapButton from './BootstrapButton';
-import BootstrapNavDropdownListItem from './BootstrapNavDropdownListItem';
-import WebcastListItem from './WebcastListItem';
 import SettingsDropdown from './SettingsDropdown';
+import WebcastDropdown from './WebcastDropdown';
 var classNames = require('classnames');
 
 var GamedayNavbar = React.createClass({
@@ -50,31 +49,6 @@ var GamedayNavbar = React.createClass({
           </ul>
         </div>
       </nav>
-    );
-  }
-});
-
-var WebcastDropdown = React.createClass({
-  render: function() {
-    var webcastListItems = [];
-    for (var i = 0; i < this.props.webcasts.length; i++) {
-      var webcast = this.props.webcastsById[this.props.webcasts[i]];
-      webcastListItems.push(
-        <WebcastListItem
-          key={webcast.id}
-          webcast={webcast}
-          onWebcastAdd={this.props.onWebcastAdd} />
-      );
-    }
-    return (
-      <li className="dropdown">
-        <a href="#" className="dropdown-toggle" data-toggle="dropdown">Add Webcasts <b className="caret"></b></a>
-        <ul className="dropdown-menu">
-          {webcastListItems}
-          <li className="divider"></li>
-          <BootstrapNavDropdownListItem handleClick={this.props.onWebcastReset}>Reset Webcasts</BootstrapNavDropdownListItem>
-        </ul>
-      </li>
     );
   }
 });
