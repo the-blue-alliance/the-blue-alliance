@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import BootstrapButton from './BootstrapButton';
 import BootstrapNavDropdownListItem from './BootstrapNavDropdownListItem';
+import WebcastListItem from './WebcastListItem';
 var classNames = require('classnames');
 
 var GamedayNavbar = React.createClass({
@@ -93,15 +94,6 @@ var SettingsDropdown = React.createClass({
       </li>
     );
   }
-});
-
-var WebcastListItem = React.createClass({
-  handleClick: function() {
-    this.props.onWebcastAdd(this.props.webcast);
-  },
-  render: function() {
-    return <BootstrapNavDropdownListItem handleClick={this.handleClick}>{this.props.webcast.name}</BootstrapNavDropdownListItem>
-  },
 });
 
 export default GamedayNavbar
