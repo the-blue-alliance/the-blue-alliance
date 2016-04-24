@@ -4,7 +4,7 @@ var classNames = require('classnames');
 var BootstrapButton = React.createClass({
   propTypes: {
     a: PropTypes.string,
-    handleClick: PropTypes.func.isRequired
+    handleClick: PropTypes.func
   },
   getDefaultProps: function() {
     return {
