@@ -41,7 +41,7 @@
           <h3>Qualification Match Predictions (<a href="/predictions">?</a>)</h3>
           {% if match_prediction_stats.wl_accuracy %}<p><strong>Win/Loss prediction accuracy:</strong> {{match_prediction_stats.wl_accuracy|round|int}}%</p>{% endif %}
           {% if match_prediction_stats.wl_accuracy_75 %}<p><strong>Win/Loss prediction accuracy (>75% confidence):</strong> {{match_prediction_stats.wl_accuracy_75|round|int}}%</p>{% endif %}
-          {% if match_prediction_stats.err_mean %}<p><strong>Match score prediction average error:</strong> {{match_prediction_stats.err_mean|round(2)}}</p>{% endif %}
+          {% if match_prediction_stats.err_mean %}<p><strong>Match score prediction average error:</strong> {{match_prediction_stats.err_mean|round(1)}}</p>{% endif %}
           {{mtm.qual_match_prediction_table(matches, match_predictions)}}
         </div>
         {% endif %}
@@ -51,9 +51,45 @@
 
     <div class="tab-pane active" id="ranking-predictions">
       <div class="row">
-        <div class="col-lg-8 col-lg-offset-2">
+        <div class="col-xs-12">
           <h3>Ranking Predictions (<a href="/predictions">?</a>)</h3>
-          HI
+          {% if ranking_prediction_stats.last_played_match %}
+            <p>Predicted rankings as of match: {{ranking_prediction_stats.last_played_match}}</p>
+          {% else %}
+            <p>Predicted rankings with no matches played.</p>
+          {% endif %}
+
+          <div class="col-md-8 col-md-offset-2">
+            <table class="table table-striped table-condensed table-center tablesorter" id="rankingsTable">
+              <thead>
+                <tr>
+                  <th>Predicted Rank</th>
+                  <th>Team</th>
+                  <th>Average Rank</th>
+                  <th>Rank Std. Dev.</th>
+                  <th>Highest Rank</th>
+                  <th>Lowest Rank</th>
+                  <th>Average RP</th>
+                  <th>Highest RP</th>
+                  <th>Lowest RP</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for team_key, (avg_rank, std_rank, min_rank, max_rank, avg_rp, min_rp, max_rp) in ranking_predictions %}
+                <tr>
+                  <td>{{loop.index}}</td>
+                  <td><a href="/team/{{team_key|strip_frc}}/{{event.year}}">{{team_key|strip_frc}}</a></td>
+                  <td>{{avg_rank|round(1)}}</td>
+                  <td>{{std_rank|round(1)}}</td>
+                  <td>{{min_rank}}</td>
+                  <td>{{max_rank}}</td>
+                  <td>{{avg_rp|round(1)}}</td>
+                  <td>{{min_rp}}</td>
+                  <td>{{max_rp}}</td>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

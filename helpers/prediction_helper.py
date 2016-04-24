@@ -254,6 +254,7 @@ class PredictionHelper(object):
         # Calculate ranking points and tiebreakers
         all_rankings = defaultdict(lambda: [0] * n)
         all_ranking_points = defaultdict(lambda: [0] * n)
+        last_played_match = None
         for i in xrange(n):
             team_ranking_points = defaultdict(int)
             team_rank_tiebreaker = defaultdict(int)
@@ -268,6 +269,7 @@ class PredictionHelper(object):
                 sampled_tiebreaker = {}
                 # Get actual results or sampled results, depending if match has been played
                 if match.has_been_played:
+                    last_played_match = match.key.id()
                     sampled_winner = match.winning_alliance
                     for alliance_color in ['red', 'blue']:
                         sampled_breach[alliance_color] = match.score_breakdown[alliance_color]['teleopDefensesBreached']
@@ -312,10 +314,10 @@ class PredictionHelper(object):
                         team_ranking_points[team] += 2
 
             # Compute ranks for this sample
-            sample_rankings = sorted(team_ranking_points.items(), key=lambda x: team_rank_tiebreaker[x[0]])  # Sort by tiebreaker.
+            sample_rankings = sorted(team_ranking_points.items(), key=lambda x: -team_rank_tiebreaker[x[0]])  # Sort by tiebreaker.
             sample_rankings = sorted(sample_rankings, key=lambda x: -x[1])  # Sort by RP. Sort is stable.
             for rank, (team, ranking_points) in enumerate(sample_rankings):
-                all_rankings[team][i] = rank
+                all_rankings[team][i] = rank + 1
                 all_ranking_points[team][i] = ranking_points
 
         rankings = {}
@@ -330,6 +332,8 @@ class PredictionHelper(object):
 
             rankings[team] = (avg_rank, std_rank, min_rank, max_rank, avg_rp, min_rp, max_rp)
 
-        rankings = sorted(rankings.items(), key=lambda x: x[1][0])  # Sort by avg_rank
+        ranking_predictions = sorted(rankings.items(), key=lambda x: x[1][0])  # Sort by avg_rank
 
-        return rankings
+        ranking_stats = {'last_played_match': last_played_match}
+
+        return ranking_predictions, ranking_stats

@@ -224,6 +224,7 @@ class EventInsights(CacheableHandler):
         match_predictions = event.matchstats.get('match_predictions', None)
         match_prediction_stats = event.matchstats.get('match_prediction_stats', None)
         ranking_predictions = event.matchstats.get('ranking_predictions', None)
+        ranking_prediction_stats = event.matchstats.get('ranking_prediction_stats', None)
 
         cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
         matches = MatchHelper.organizeMatches(cleaned_matches)
@@ -234,6 +235,7 @@ class EventInsights(CacheableHandler):
             "match_predictions": match_predictions,
             "match_prediction_stats": match_prediction_stats,
             "ranking_predictions": ranking_predictions,
+            "ranking_prediction_stats": ranking_prediction_stats,
         })
 
         if event.within_a_day:
