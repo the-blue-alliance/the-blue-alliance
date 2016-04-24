@@ -7,7 +7,7 @@ import GamedayNavbar from './components/GamedayNavbar';
 import EmbedTwitch from './components/EmbedTwitch';
 import Embedyoutube from './components/EmbedYoutube';
 import EmbedUstream from './components/EmbedUstream';
-import VideoCellOverlay from './components/VideoCellOverlay';
+import VideoCell from './components/VideoCell';
 
 var GamedayFrame = React.createClass({
   getInitialState: function() {
@@ -247,65 +247,6 @@ var VideoGrid = React.createClass({
     }
     return layout;
   },
-});
-
-var VideoCell = React.createClass({
-  getInitialState: function() {
-    return {
-      showOverlay: false,
-    };
-  },
-  onMouseEnter: function(event) {
-    this.setState({"showOverlay": true})
-  },
-  onMouseLeave: function(event) {
-    this.setState({"showOverlay": false})
-  },
-  render: function() {
-    var classes = 'video-cell video-' + this.props.num;
-
-    if (this.props.webcast) {
-      var cellEmbed;
-      switch (this.props.webcast.type) {
-        case 'ustream':
-        cellEmbed = <EmbedUstream
-          webcast={this.props.webcast}
-          vidHeight={this.props.vidHeight}
-          vidWidth={this.props.vidWidth} />;
-        break;
-        case 'youtube':
-        cellEmbed = <EmbedYoutube
-          webcast={this.props.webcast}
-          vidHeight={this.props.vidHeight}
-          vidWidth={this.props.vidWidth} />;
-        break;
-        case 'twitch':
-        cellEmbed = <EmbedTwitch
-          webcast={this.props.webcast}
-          vidHeight={this.props.vidHeight}
-          vidWidth={this.props.vidWidth} />;
-        break;
-        default:
-        cellEmbed = "";
-        break;
-      }
-
-      return (
-        <div className={classes}
-          idName={this.props.webcast.id}
-          onMouseEnter={this.onMouseEnter}
-          onMouseLeave={this.onMouseLeave}>
-          {cellEmbed}
-          <VideoCellOverlay
-            webcast={this.props.webcast}
-            enabled={this.state.showOverlay}
-            onWebcastRemove={this.props.onWebcastRemove} />
-        </div>
-      )
-    } else {
-      return <div className={classes} />
-    }
-  }
 });
 
 var FollowingTeamListItem = React.createClass({
