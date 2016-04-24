@@ -371,3 +371,4 @@ class EventHelper(object):
         year = event_key[:4]
         event_short = event_key[4:]
         return year == '2015' and event_short not in {'cc', 'cacc', 'mttd'}
+

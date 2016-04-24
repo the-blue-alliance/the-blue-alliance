@@ -48,8 +48,9 @@
     <a class="navbar-brand tba-navbar-brand hidden-lg" href="/">TBA</a>
 
     <ul class="nav navbar-nav tba-navbar-nav">
-      <li class="tba-nav-persistent {% block teams_active %}{% endblock %}"><a href="/teams"><span><span class="glyphicon glyphicon-user"></span> Teams</span></a></li>
+      <li class="tba-nav-persistent {% block mytba_active %}{% endblock %}"><a href="/mytba"><span><span class="glyphicon glyphicon-star"></span> MyTBA</span></a></li>
       <li class="tba-nav-persistent {% block events_active %}{% endblock %}"><a href="/events"><span><span class="glyphicon glyphicon-calendar"></span> Events</span></a></li>
+      <li class="tba-nav-persistent hidden-xs {% block teams_active %}{% endblock %}"><a href="/teams"><span><span class="glyphicon glyphicon-user"></span> Teams</span></a></li>
       <li class="tba-nav-persistent hidden-xs {% block insights_active %}{% endblock %}"><a href="/insights"><span><span class="glyphicon glyphicon-align-left"></span> Insights</span></a></li>
       <li class="tba-nav-persistent hidden-xs"><a href="/gameday"><span><span class="glyphicon glyphicon-facetime-video"></span> GameDay</span></a></li>
       <li class="tba-nav-persistent hidden-xs hidden-sm dropdown">
@@ -62,6 +63,7 @@
 
     <div class="navbar-collapse collapse tba-navbar-collapse tba-collapse navbar-responsive-collapse">
       <ul class="nav navbar-nav">
+        <li class="visible-xs {% block teams_active_collapsed %}{% endblock %}"><a href="/teams"><span><span class="glyphicon glyphicon-user"></span> Teams</span></a></li>
         <li class="visible-xs {% block insights_active_collapsed %}{% endblock %}"><a href="/insights"><span><span class="glyphicon glyphicon-align-left"></span> Insights</span></a></li>
         <li class="visible-xs"><a href="/gameday"><span><span class="glyphicon glyphicon-facetime-video"></span> GameDay</span></a></li>
         <li class="visible-xs visible-sm"><a href="/account"><span class="glyphicon glyphicon-cog"></span> Account</a></li>
