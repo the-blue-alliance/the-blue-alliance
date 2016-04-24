@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import BootstrapButton from './BootstrapButton';
 import BootstrapNavDropdownListItem from './BootstrapNavDropdownListItem';
 import WebcastListItem from './WebcastListItem';
+import SettingsDropdown from './SettingsDropdown';
 var classNames = require('classnames');
 
 var GamedayNavbar = React.createClass({
@@ -78,22 +79,4 @@ var WebcastDropdown = React.createClass({
   }
 });
 
-var SettingsDropdown = React.createClass({
-  render: function() {
-    return (
-      <li className="dropdown">
-        <a href="#" className="dropdown-toggle" data-toggle="dropdown"><span className="glyphicon glyphicon-cog"></span></a>
-        <ul className="dropdown-menu">
-          <BootstrapNavDropdownListItem
-            data_toggle="modal"
-            data_target="#followingTeamsModal">Follow Teams</BootstrapNavDropdownListItem>
-          <li className="divider"></li>
-          <BootstrapNavDropdownListItem>Debug Menu</BootstrapNavDropdownListItem>
-          <BootstrapNavDropdownListItem>TODO Show Beeper</BootstrapNavDropdownListItem>
-        </ul>
-      </li>
-    );
-  }
-});
-
-export default GamedayNavbar
+export default GamedayNavbar;
