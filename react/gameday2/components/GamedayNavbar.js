@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import BootstrapButton from './BootstrapButton';
+import BootstrapNavDropdownListItem from './BootstrapNavDropdownListItem';
 var classNames = require('classnames');
 
 var GamedayNavbar = React.createClass({
@@ -100,25 +101,6 @@ var WebcastListItem = React.createClass({
   },
   render: function() {
     return <BootstrapNavDropdownListItem handleClick={this.handleClick}>{this.props.webcast.name}</BootstrapNavDropdownListItem>
-  },
-})
-
-var BootstrapNavDropdownListItem = React.createClass({
-  getDefaultProps: function() {
-    return {
-      a: '#'
-    };
-  },
-  handleClick: function() {
-    if (this.props.handleClick) {
-      this.props.handleClick();
-      return false;
-    }
-  },
-  render: function() {
-    return (
-      <li data-toggle={this.props.data_toggle} data-target={this.props.data_target}><a href={this.props.a} onClick={this.handleClick}>{this.props.children}</a></li>
-    )
   },
 });
 
