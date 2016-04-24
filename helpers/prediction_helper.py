@@ -41,7 +41,7 @@ class PredictionHelper(object):
 
     @classmethod
     def _predict_match(cls, match, all_stats, is_champs):
-        score_var = 20**2  # TODO temporary set variance to be huge
+        score_var = 40**2  # TODO temporary set variance to be huge
         boulder_var = 2**2  # TODO get real value
         crossing_var = 2**2  # TODO get real value
 
