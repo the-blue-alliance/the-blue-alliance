@@ -41,23 +41,28 @@ class PredictionHelper(object):
 
     @classmethod
     def _predict_match(cls, match, all_stats, is_champs):
-        score_var = 40**2  # TODO temporary set variance to be huge
-        boulder_var = 5**2  # TODO get real value
-        crossing_var = 4**2  # TODO get real value
+        score_var = 20**2  # TODO temporary set variance to be huge
+        boulder_var = 2**2  # TODO get real value
+        crossing_var = 2**2  # TODO get real value
 
         red_score = 0
+        red_auto_points = 0  # Used for tiebreaking
         red_boulders = 0
         red_num_crossings = 0
         for team in match.alliances['red']['teams']:
             red_score += all_stats['oprs'][team[3:]]
+            red_auto_points += all_stats['2016autoPointsOPR'][team[3:]]
             red_boulders += all_stats['2016bouldersOPR'][team[3:]]
             # Crossing OPR usually underestimates. hacky fix to make numbers more believable
             red_num_crossings += max(0, all_stats['2016crossingsOPR'][team[3:]]) * 1.2
+
         blue_score = 0
+        blue_auto_points = 0  # Used for tiebreaking
         blue_boulders = 0
         blue_num_crossings = 0
         for team in match.alliances['blue']['teams']:
             blue_score += all_stats['oprs'][team[3:]]
+            blue_auto_points += all_stats['2016autoPointsOPR'][team[3:]]
             blue_boulders += all_stats['2016bouldersOPR'][team[3:]]
             # Crossing OPR usually underestimates. hacky fix to make numbers more believable
             blue_num_crossings += max(0, all_stats['2016crossingsOPR'][team[3:]]) * 1.2
@@ -97,8 +102,20 @@ class PredictionHelper(object):
         blue_prob_breach = min(max(blue_prob_breach, 0.1), 0.95)
 
         prediction = {
-            'red': {'score': red_score, 'boulders': red_boulders, 'prob_capture': red_prob_capture * 100, 'prob_breach': red_prob_breach * 100},
-            'blue': {'score': blue_score, 'boulders': blue_boulders, 'prob_capture': blue_prob_capture * 100, 'prob_breach': blue_prob_breach * 100},
+            'red': {
+                'score': red_score,
+                'auto_points': red_auto_points,
+                'boulders': red_boulders,
+                'prob_capture': red_prob_capture * 100,
+                'prob_breach': red_prob_breach * 100
+            },
+            'blue': {
+                'score': blue_score,
+                'auto_points': blue_auto_points,
+                'boulders': blue_boulders,
+                'prob_capture': blue_prob_capture * 100,
+                'prob_breach': blue_prob_breach * 100
+            },
             'winning_alliance': winning_alliance,
             'prob': prob * 100,
         }
@@ -234,21 +251,28 @@ class PredictionHelper(object):
             if v > num_matches:
                 surrogate_teams.add(k)
 
-        # Calculate ranking points
-        team_ranking_points = defaultdict(lambda: [0] * n)
-        num_played = defaultdict(int)
-        for match in matches:
-            for alliance_color in ['red', 'blue']:
-                for team in match.alliances[alliance_color]['teams']:
-                    num_played[team] += 1
-            for i in xrange(n):
+        # Calculate ranking points and tiebreakers
+        all_rankings = defaultdict(lambda: [0] * n)
+        all_ranking_points = defaultdict(lambda: [0] * n)
+        for i in xrange(n):
+            team_ranking_points = defaultdict(int)
+            team_rank_tiebreaker = defaultdict(int)
+            num_played = defaultdict(int)
+            for match in matches:
+                for alliance_color in ['red', 'blue']:
+                    for team in match.alliances[alliance_color]['teams']:
+                        num_played[team] += 1
+
                 sampled_breach = {}
                 sampled_capture = {}
-                if match.has_been_played and match.match_number < 0:  # TODO temp for testing
+                sampled_tiebreaker = {}
+                # Get actual results or sampled results, depending if match has been played
+                if match.has_been_played:
                     sampled_winner = match.winning_alliance
                     for alliance_color in ['red', 'blue']:
                         sampled_breach[alliance_color] = match.score_breakdown[alliance_color]['teleopDefensesBreached']
                         sampled_capture[alliance_color] = match.score_breakdown[alliance_color]['teleopTowerCaptured']
+                        sampled_tiebreaker[alliance_color] = match.score_breakdown[alliance_color]['autoPoints']
                 else:
                     prediction = match_predictions[match.key.id()]
                     if np.random.uniform(high=100) < prediction['prob']:
@@ -262,35 +286,50 @@ class PredictionHelper(object):
                     for alliance_color in ['red', 'blue']:
                         sampled_breach[alliance_color] = np.random.uniform(high=100) < prediction[alliance_color]['prob_breach']
                         sampled_capture[alliance_color] = np.random.uniform(high=100) < prediction[alliance_color]['prob_capture']
+                        sampled_tiebreaker[alliance_color] = prediction[alliance_color]['auto_points']
 
+                # Using match results, update RP and tiebreaker
                 for alliance_color in ['red', 'blue']:
                     for team in match.alliances[alliance_color]['teams']:
                         if team in surrogate_teams and num_played[team] == 3:
                             continue
                         if sampled_breach[alliance_color]:
-                            team_ranking_points[team][i] += 1
+                            team_ranking_points[team] += 1
                         if sampled_capture[alliance_color]:
-                            team_ranking_points[team][i] += 1
+                            team_ranking_points[team] += 1
+                        team_rank_tiebreaker[team] += sampled_tiebreaker[alliance_color]
 
                 if sampled_winner == '':
                     for alliance_color in ['red', 'blue']:
                         for team in match.alliances[alliance_color]['teams']:
                             if team in surrogate_teams and num_played[team] == 3:
                                 continue
-                            team_ranking_points[team][i] += 1
+                            team_ranking_points[team] += 1
                 else:
                     for team in match.alliances[sampled_winner]['teams']:
                         if team in surrogate_teams and num_played[team] == 3:
                             continue
-                        team_ranking_points[team][i] += 2
+                        team_ranking_points[team] += 2
 
-        for i, (team, qual_points) in enumerate(sorted(team_ranking_points.items(), key=lambda x: -np.mean(x[1]))):
-            actual = 0
-            for row in matches[0].event.get().rankings:
-                if row[1] == team[3:]:
-                    actual = int(row[0])
-                    break
-            print i + 1, team, np.mean(qual_points), min(qual_points), max(qual_points), i + 1 - actual
-        # print team_ranking_points['frc4003']
+            # Compute ranks for this sample
+            sample_rankings = sorted(team_ranking_points.items(), key=lambda x: team_rank_tiebreaker[x[0]])  # Sort by tiebreaker.
+            sample_rankings = sorted(sample_rankings, key=lambda x: -x[1])  # Sort by RP. Sort is stable.
+            for rank, (team, ranking_points) in enumerate(sample_rankings):
+                all_rankings[team][i] = rank
+                all_ranking_points[team][i] = ranking_points
 
-        return None, None
+        rankings = {}
+        for team, team_rankings in all_rankings.items():
+            avg_rank = np.mean(team_rankings)
+            std_rank = np.std(team_rankings)
+            min_rank = np.min(team_rankings)
+            max_rank = np.max(team_rankings)
+            avg_rp = np.mean(all_ranking_points[team])
+            min_rp = np.min(all_ranking_points[team])
+            max_rp = np.max(all_ranking_points[team])
+
+            rankings[team] = (avg_rank, std_rank, min_rank, max_rank, avg_rp, min_rp, max_rp)
+
+        rankings = sorted(rankings.items(), key=lambda x: x[1][0])  # Sort by avg_rank
+
+        return rankings
