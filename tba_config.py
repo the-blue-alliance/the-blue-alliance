@@ -40,5 +40,5 @@ else:
         "use-compiled-templates": True
     }
 
-CONFIG['landing_handler'] = COMPETITIONSEASON
+CONFIG['landing_handler'] = CHAMPS
 CONFIG["static_resource_version"] = 8

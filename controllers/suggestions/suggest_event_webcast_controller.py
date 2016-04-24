@@ -13,7 +13,7 @@ class SuggestEventWebcastController(LoggedInHandler):
     """
 
     def get(self):
-        self._require_login("/suggest/event/webcast?event=%s" % self.request.get("event_key"))
+        self._require_login()
 
         if not self.request.get("event_key"):
             self.redirect("/", abort=True)

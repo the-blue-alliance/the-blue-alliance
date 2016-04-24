@@ -30,3 +30,8 @@ def yt_start(value):
         value = '%s?start=%i' % (video_id, total_seconds)
 
     return value
+
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)
