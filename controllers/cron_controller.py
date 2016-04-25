@@ -150,9 +150,12 @@ class EventMatchstatsDo(webapp.RequestHandler):
 
         organized_matches = MatchHelper.organizeMatches(event.matches)
         match_predictions, match_prediction_stats = PredictionHelper.get_match_predictions(organized_matches['qm'])
+        ranking_predictions, ranking_prediction_stats = PredictionHelper.get_ranking_predictions(organized_matches['qm'], match_predictions)
 
         matchstats_dict['match_predictions'] = match_predictions
         matchstats_dict['match_prediction_stats'] = match_prediction_stats
+        matchstats_dict['ranking_predictions'] = ranking_predictions
+        matchstats_dict['ranking_prediction_stats'] = ranking_prediction_stats
 
         if any([v != {} for v in matchstats_dict.values()]):
             event.matchstats_json = json.dumps(matchstats_dict)

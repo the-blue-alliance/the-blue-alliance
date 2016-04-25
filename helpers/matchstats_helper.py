@@ -74,19 +74,6 @@ class MatchstatsHelper(object):
         return s
 
     @classmethod
-    def calc_avg_match_score(cls, matches):
-        total_scores = 0
-        num_scores = 0
-        for match in matches:
-            if match.comp_level != 'qm' or not match.has_been_played:
-                continue
-            for alliance_color in ['red', 'blue']:
-                total_scores += match.alliances[alliance_color]['score']
-                num_scores += 1
-
-        return float(total_scores) / num_scores
-
-    @classmethod
     def calc_stat(cls, matches, team_list, team_id_map, Minv, stat_type, init_stats=None, init_stats_default=0, limit_matches=None):
         s = cls.build_s_matrix(matches, team_id_map, stat_type, init_stats=init_stats, init_stats_default=init_stats_default, limit_matches=limit_matches)
         x = np.dot(Minv, s)
@@ -153,13 +140,13 @@ class MatchstatsHelper(object):
 
         team_list, team_id_map = cls.build_team_mapping(matches)
         last_event_stats = cls.get_last_event_stats(team_list, matches[0].event)
-        avg_match_score = cls.calc_avg_match_score(matches)
 
         Minv = cls.build_Minv_matrix(matches, team_id_map)
 
         oprs_dict = cls.calc_stat(matches, team_list, team_id_map, Minv, 'oprs')
         dprs_dict = cls.calc_stat(matches, team_list, team_id_map, Minv, 'dprs')
         ccwms_dict = cls.calc_stat(matches, team_list, team_id_map, Minv, 'ccwms')
+
         stats = {'oprs': oprs_dict, 'dprs': dprs_dict, 'ccwms': ccwms_dict}
 
         if year == 2016:
