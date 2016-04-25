@@ -10,10 +10,10 @@ var VideoCell = React.createClass({
       showOverlay: false,
     };
   },
-  onMouseEnter: function(event) {
+  onMouseOver: function(event) {
     this.setState({"showOverlay": true})
   },
-  onMouseLeave: function(event) {
+  onMouseOut: function(event) {
     this.setState({"showOverlay": false})
   },
   render: function() {
@@ -48,8 +48,8 @@ var VideoCell = React.createClass({
       return (
         <div className={classes}
           idName={this.props.webcast.id}
-          onMouseEnter={this.onMouseEnter}
-          onMouseLeave={this.onMouseLeave}>
+          onMouseOver={this.onMouseOver}
+          onMouseOut={this.onMouseOut}>
           {cellEmbed}
           <VideoCellOverlay
             webcast={this.props.webcast}
