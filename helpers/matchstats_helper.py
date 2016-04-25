@@ -42,7 +42,7 @@ class MatchstatsHelper(object):
         return team_list, team_id_map
 
     @classmethod
-    def build_M_matrix(cls, matches, team_id_map):
+    def build_Minv_matrix(cls, matches, team_id_map):
         n = len(team_id_map.keys())
         M = np.zeros([n, n])
         for match in matches:
@@ -54,7 +54,7 @@ class MatchstatsHelper(object):
                     team1_id = team_id_map[team1[3:]]
                     for team2 in alliance_teams:
                         M[team1_id, team_id_map[team2[3:]]] += 1
-        return M
+        return np.linalg.pinv(M)
 
     @classmethod
     def build_s_matrix(cls, matches, team_id_map, stat_type, init_stats=None, init_stats_default=0, limit_matches=None):
@@ -87,9 +87,9 @@ class MatchstatsHelper(object):
         return float(total_scores) / num_scores
 
     @classmethod
-    def calc_stat(cls, matches, team_list, team_id_map, M, stat_type, init_stats=None, init_stats_default=0, limit_matches=None):
+    def calc_stat(cls, matches, team_list, team_id_map, Minv, stat_type, init_stats=None, init_stats_default=0, limit_matches=None):
         s = cls.build_s_matrix(matches, team_id_map, stat_type, init_stats=init_stats, init_stats_default=init_stats_default, limit_matches=limit_matches)
-        x = np.dot(np.linalg.pinv(M), s)
+        x = np.dot(Minv, s)
 
         stat_dict = {}
         for team, stat in zip(team_list, x):
@@ -155,20 +155,20 @@ class MatchstatsHelper(object):
         last_event_stats = cls.get_last_event_stats(team_list, matches[0].event)
         avg_match_score = cls.calc_avg_match_score(matches)
 
-        M = cls.build_M_matrix(matches, team_id_map)
+        Minv = cls.build_Minv_matrix(matches, team_id_map)
 
-        oprs_dict = cls.calc_stat(matches, team_list, team_id_map, M, 'oprs')
-        dprs_dict = cls.calc_stat(matches, team_list, team_id_map, M, 'dprs')
-        ccwms_dict = cls.calc_stat(matches, team_list, team_id_map, M, 'ccwms')
+        oprs_dict = cls.calc_stat(matches, team_list, team_id_map, Minv, 'oprs')
+        dprs_dict = cls.calc_stat(matches, team_list, team_id_map, Minv, 'dprs')
+        ccwms_dict = cls.calc_stat(matches, team_list, team_id_map, Minv, 'ccwms')
         stats = {'oprs': oprs_dict, 'dprs': dprs_dict, 'ccwms': ccwms_dict}
 
         if year == 2016:
             # First ranking tiebreaker
-            stats['2016autoPointsOPR'] = cls.calc_stat(matches, team_list, team_id_map, M, '2016autoPointsOPR')
+            stats['2016autoPointsOPR'] = cls.calc_stat(matches, team_list, team_id_map, Minv, '2016autoPointsOPR')
 
             # For RP calculation
-            stats['2016crossingsOPR'] = cls.calc_stat(matches, team_list, team_id_map, M, '2016crossingsOPR')
-            stats['2016bouldersOPR'] = cls.calc_stat(matches, team_list, team_id_map, M, '2016bouldersOPR')
+            stats['2016crossingsOPR'] = cls.calc_stat(matches, team_list, team_id_map, Minv, '2016crossingsOPR')
+            stats['2016bouldersOPR'] = cls.calc_stat(matches, team_list, team_id_map, Minv, '2016bouldersOPR')
 
         return stats
 
