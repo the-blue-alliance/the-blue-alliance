@@ -1,6 +1,5 @@
 import os
 import json
-import logging
 
 from google.appengine.ext.webapp import template
 
