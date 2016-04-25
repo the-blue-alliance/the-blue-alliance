@@ -1,4 +1,5 @@
 import json
+import numpy as np
 import re
 
 from google.appengine.ext import ndb

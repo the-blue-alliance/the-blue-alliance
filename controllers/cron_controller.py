@@ -18,13 +18,15 @@ from helpers.event_manipulator import EventManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.event_team_repairer import EventTeamRepairer
 from helpers.event_team_updater import EventTeamUpdater
+from helpers.insights_helper import InsightsHelper
+from helpers.match_helper import MatchHelper
+from helpers.matchstats_helper import MatchstatsHelper
 from helpers.notification_helper import NotificationHelper
+from helpers.prediction_helper import PredictionHelper
 
 from helpers.insight_manipulator import InsightManipulator
 from helpers.team_manipulator import TeamManipulator
 from helpers.match_manipulator import MatchManipulator
-from helpers.matchstats_helper import MatchstatsHelper
-from helpers.insights_helper import InsightsHelper
 
 from models.event import Event
 from models.event_team import EventTeam
@@ -140,10 +142,18 @@ class EventTeamUpdateEnqueue(webapp.RequestHandler):
 class EventMatchstatsDo(webapp.RequestHandler):
     """
     Calculates match stats (OPR/DPR/CCWM) for an event
+    Calculates predictions for an event
     """
     def get(self, event_key):
         event = Event.get_by_id(event_key)
-        matchstats_dict = MatchstatsHelper.calculate_matchstats(event.matches)
+        matchstats_dict = MatchstatsHelper.calculate_matchstats(event.matches, event.year)
+
+        organized_matches = MatchHelper.organizeMatches(event.matches)
+        match_predictions, match_prediction_stats = PredictionHelper.get_match_predictions(organized_matches['qm'])
+
+        matchstats_dict['match_predictions'] = match_predictions
+        matchstats_dict['match_prediction_stats'] = match_prediction_stats
+
         if any([v != {} for v in matchstats_dict.values()]):
             event.matchstats_json = json.dumps(matchstats_dict)
             EventManipulator.createOrUpdate(event)

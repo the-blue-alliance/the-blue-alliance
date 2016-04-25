@@ -8,13 +8,13 @@ from controllers.account_controller import AccountEdit, AccountLoginRequired, Ac
 from controllers.ajax_controller import AccountFavoritesHandler, AccountFavoritesAddHandler, AccountFavoritesDeleteHandler, \
       YouTubePlaylistHandler
 from controllers.ajax_controller import LiveEventHandler, TypeaheadHandler, WebcastHandler
-from controllers.event_controller import EventList, EventDetail, EventRss
+from controllers.event_controller import EventList, EventDetail, EventInsights, EventRss
 from controllers.event_wizard_controller import EventWizardHandler
 from controllers.gameday2_controller import Gameday2Controller
 from controllers.insights_controller import InsightsOverview, InsightsDetail
 from controllers.main_controller import ContactHandler, HashtagsHandler, \
     MainKickoffHandler, MainBuildseasonHandler, MainChampsHandler, MainCompetitionseasonHandler, \
-    MainInsightsHandler, MainOffseasonHandler, OprHandler, SearchHandler, \
+    MainInsightsHandler, MainOffseasonHandler, OprHandler, PredictionsHandler, SearchHandler, \
     AboutHandler, ThanksHandler, handle_404, handle_500, \
     GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler, ApiWriteHandler, MatchInputHandler, WebhookDocumentationHandler
 from controllers.match_controller import MatchDetail
@@ -68,6 +68,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/apiwrite', ApiWriteHandler, 'api-write', strict_slash=True),
       RedirectRoute(r'/contact', ContactHandler, 'contact', strict_slash=True),
       RedirectRoute(r'/event/<event_key>', EventDetail, 'event-detail', strict_slash=True),
+      RedirectRoute(r'/event/<event_key>/insights', EventInsights, 'event-insights', strict_slash=True),
       RedirectRoute(r'/event/<event_key>/feed', EventRss, 'event-rss', strict_slash=True),
       RedirectRoute(r'/events/<year:[0-9]+>', EventList, 'event-list-year', strict_slash=True),
       RedirectRoute(r'/events/<district_abbrev:[a-z]+>/<year:[0-9]+>', DistrictDetail, 'district-detail', strict_slash=True),
@@ -87,6 +88,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/notifications/broadcast', UserNotificationBroadcast, 'notification-broadcast', strict_slash=True),
       RedirectRoute(r'/notifications/test/<type:[0-9]+>', TestNotificationController, 'test-notifications', strict_slash=True),
       RedirectRoute(r'/opr', OprHandler, 'opr', strict_slash=True),
+      RedirectRoute(r'/predictions', PredictionsHandler, 'predictions', strict_slash=True),
       RedirectRoute(r'/record', RecordHandler, 'record', strict_slash=True),
       RedirectRoute(r'/search', SearchHandler, 'search', strict_slash=True),
       RedirectRoute(r'/suggest/event/webcast', SuggestEventWebcastController, 'suggest-event-webcast', strict_slash=True),

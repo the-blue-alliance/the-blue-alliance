@@ -245,6 +245,19 @@ class OprHandler(CacheableHandler):
         return template.render(path, self.template_values)
 
 
+class PredictionsHandler(CacheableHandler):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "main_predictions"
+
+    def __init__(self, *args, **kw):
+        super(PredictionsHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+
+    def _render(self, *args, **kw):
+        path = os.path.join(os.path.dirname(__file__), "../templates/predictions.html")
+        return template.render(path, self.template_values)
+
+
 class SearchHandler(webapp2.RequestHandler):
     def get(self):
         try:

@@ -195,6 +195,51 @@ class EventDetail(CacheableHandler):
         return jinja2_engine.render('event_details.html', self.template_values)
 
 
+class EventInsights(CacheableHandler):
+    """
+    Show an Event's advanced insights.
+    event_code like "2010ct"
+    """
+    LONG_CACHE_EXPIRATION = 60 * 60 * 24
+    SHORT_CACHE_EXPIRATION = 60 * 5
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "event_insights_{}"  # (event_key)
+
+    def __init__(self, *args, **kw):
+        super(EventInsights, self).__init__(*args, **kw)
+        self._cache_expiration = self.LONG_CACHE_EXPIRATION
+
+    def get(self, event_key):
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(event_key)
+        super(EventInsights, self).get(event_key)
+
+    def _render(self, event_key):
+        event = Event.get_by_id(event_key)
+
+        if not event:
+            self.abort(404)
+
+        event.get_matches_async()
+
+        match_predictions = event.matchstats.get('match_predictions', None)
+        match_prediction_stats = event.matchstats.get('match_prediction_stats', None)
+
+        cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
+        matches = MatchHelper.organizeMatches(cleaned_matches)
+
+        self.template_values.update({
+            "event": event,
+            "matches": matches,
+            "match_predictions": match_predictions,
+            "match_prediction_stats": match_prediction_stats,
+        })
+
+        if event.within_a_day:
+            self._cache_expiration = self.SHORT_CACHE_EXPIRATION
+
+        return jinja2_engine.render('event_insights.html', self.template_values)
+
+
 class EventRss(CacheableHandler):
     """
     Generates a RSS feed for the matches in a event
