@@ -23,9 +23,9 @@ def javascript():
 
 @task
 def gulp():
-    """Run 'gulp build' task"""
+    """Update all npm dependencies and run 'gulp build' task"""
     print("Running 'gulp build'")
-    sh("gulp build --production")
+    sh("npm update && gulp build --production")
 
 
 @task
