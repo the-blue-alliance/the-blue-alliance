@@ -223,6 +223,7 @@ class EventInsights(CacheableHandler):
 
         match_predictions = event.matchstats.get('match_predictions', None)
         match_prediction_stats = event.matchstats.get('match_prediction_stats', None)
+
         ranking_predictions = event.matchstats.get('ranking_predictions', None)
         ranking_prediction_stats = event.matchstats.get('ranking_prediction_stats', None)
 

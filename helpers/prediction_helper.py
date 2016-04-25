@@ -42,8 +42,8 @@ class PredictionHelper(object):
     @classmethod
     def _predict_match(cls, match, all_stats, is_champs):
         score_var = 40**2  # TODO temporary set variance to be huge
-        boulder_var = 2**2  # TODO get real value
-        crossing_var = 2**2  # TODO get real value
+        boulder_var = 5**2  # TODO get real value
+        crossing_var = 4**2  # TODO get real value
 
         red_score = 0
         red_auto_points = 0  # Used for tiebreaking
@@ -132,7 +132,7 @@ class PredictionHelper(object):
         # Setup
         team_list, team_id_map = MatchstatsHelper.build_team_mapping(matches)
         last_event_stats = MatchstatsHelper.get_last_event_stats(team_list, event_key)
-        M = MatchstatsHelper.build_M_matrix(matches, team_id_map)
+        Minv = MatchstatsHelper.build_Minv_matrix(matches, team_id_map)
 
         init_stats_sums = defaultdict(int)
         init_stats_totals = defaultdict(int)
@@ -165,7 +165,7 @@ class PredictionHelper(object):
             all_ixoprs = {}
             for stat in relevant_stats:
                 all_ixoprs[stat] = MatchstatsHelper.calc_stat(
-                    matches, team_list, team_id_map, M, stat,
+                    matches, team_list, team_id_map, Minv, stat,
                     init_stats=last_event_stats,
                     init_stats_default=init_stats_default[stat],
                     limit_matches=i)
@@ -173,7 +173,7 @@ class PredictionHelper(object):
                 for stat in relevant_stats:
                     start = time.time()
                     all_ixoprs[stat] = MatchstatsHelper.calc_stat(
-                        matches, team_list, team_id_map, M, stat,
+                        matches, team_list, team_id_map, Minv, stat,
                         init_stats=all_ixoprs,
                         init_stats_default=init_stats_default[stat],
                         limit_matches=i)
