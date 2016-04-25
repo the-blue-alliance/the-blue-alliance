@@ -17,6 +17,9 @@ class EventTeamStatusHelper(object):
                 teams_and_statuses.append((team, EventTeamStatusHelper.generateTeamAtEventStatus(team.key_name, event)))
             if teams_and_statuses:
                 live_events_with_teams.append((event, teams_and_statuses))
+
+        live_events_with_teams.sort(key=lambda x: x[0].name)
+
         return live_events_with_teams
 
     @classmethod
