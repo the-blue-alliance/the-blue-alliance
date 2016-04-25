@@ -216,7 +216,7 @@ class EventInsights(CacheableHandler):
     def _render(self, event_key):
         event = Event.get_by_id(event_key)
 
-        if not event:
+        if not event or event.year != 2016:
             self.abort(404)
 
         event.get_matches_async()
