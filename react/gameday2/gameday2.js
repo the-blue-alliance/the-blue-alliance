@@ -7,6 +7,7 @@ import GamedayNavbar from './components/GamedayNavbar';
 import VideoGrid from './components/VideoGrid';
 import ChatPanel from './components/ChatPanel';
 import HashtagPanel from './components/HashtagPanel';
+import FollowingTeamModal from './components/FollowingTeamModal';
 
 var GamedayFrame = React.createClass({
   getInitialState: function() {
@@ -132,65 +133,6 @@ var GamedayFrame = React.createClass({
     this.setState({displayedWebcasts: []});
   }
 });
-
-var FollowingTeamListItem = React.createClass({
-  unfollowTeam: function() {
-    this.props.onUnfollowTeam(this.props.team)
-  },
-  render: function() {
-    return (
-      <li>
-        {this.props.team}
-        <a href="#" onClick={this.unfollowTeam}>&times;</a>
-      </li>
-    );
-  }
-})
-
-var FollowingTeamsModal = React.createClass({
-  followTeam: function() {
-    this.props.onFollowTeam(177)
-  },
-  render: function() {
-    var followingTeamListItems = [];
-    for (var index in this.props.followingTeams) {
-      followingTeamListItems.push(
-        <FollowingTeamListItem
-          key={this.props.followingTeams[index]}
-          team={this.props.followingTeams[index]}
-          onUnfollowTeam={this.props.onUnfollowTeam} />
-      );
-    };
-    return (
-      <div className="modal fade" id="followingTeamsModal" tabindex="-1" role="dialog" aria-labelledby="#followingTeamsModal" aria-hidden="true">
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <button type="button" className="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span className="sr-only">Close</span></button>
-              <h4 className="modal-title" id="followingTeamsModalLabel">Following Teams</h4>
-            </div>
-            <div className="modal-body">
-              <p>You can follow teams to get alerts about them.</p>
-              <div className="input-group">
-                <input className="form-control" type="text" placeholder="Team Number"></input>
-                <span className="input-group-btn">
-                  <a onClick={this.followTeam} href="#" className="btn btn-primary"><span className="glyphicon glyphicon-plus-sign"></span></a>
-                </span>
-              </div>
-              <hr></hr>
-              <h4>Following</h4>
-              <ul>{followingTeamListItems}</ul>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-primary" data-dismiss="modal">Done</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-})
-
 
 // [{'webcasts': [{u'channel': u'6540154', u'type': u'ustream'}], 'event_name': u'Present Test Event', 'event_key': u'2014testpresent'}]
 
