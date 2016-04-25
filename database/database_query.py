@@ -59,5 +59,8 @@ class DatabaseQuery(object):
             query_result = cached_query.result
 
         for rpc in rpcs:
-            rpc.get_result()
+            try:
+                rpc.get_result()
+            except Exception, e:
+                logging.warning("An RPC in DatabaseQuery.fetch_async() failed!")
         raise ndb.Return(query_result)
