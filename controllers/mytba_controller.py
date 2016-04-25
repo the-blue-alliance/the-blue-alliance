@@ -55,6 +55,9 @@ class MyTBALiveController(LoggedInHandler):
         future_events_with_teams = []
         for event_key, data in future_events_by_event.iteritems():
             future_events_with_teams.append((data[0], TeamHelper.sortTeams(data[1])))
+        future_events_with_teams.sort(key=lambda x: x[0].name)
+        future_events_with_teams.sort(key=lambda x: EventHelper.distantFutureIfNoStartDate(x[0]))
+        future_events_with_teams.sort(key=lambda x: EventHelper.distantFutureIfNoEndDate(x[0]))
 
         self.template_values.update({
             'live_events_with_teams': live_events_with_teams,
