@@ -324,11 +324,11 @@ class PredictionHelper(object):
         for team, team_rankings in all_rankings.items():
             avg_rank = np.mean(team_rankings)
             std_rank = np.std(team_rankings)
-            min_rank = np.min(team_rankings)
-            max_rank = np.max(team_rankings)
+            min_rank = min(team_rankings)
+            max_rank = max(team_rankings)
             avg_rp = np.mean(all_ranking_points[team])
-            min_rp = np.min(all_ranking_points[team])
-            max_rp = np.max(all_ranking_points[team])
+            min_rp = min(all_ranking_points[team])
+            max_rp = max(all_ranking_points[team])
 
             rankings[team] = (avg_rank, std_rank, min_rank, max_rank, avg_rp, min_rp, max_rp)
 
