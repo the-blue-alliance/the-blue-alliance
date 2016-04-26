@@ -74,8 +74,8 @@
                   <th>Predicted Rank</th>
                   <th>Team</th>
                   <th>Average Rank</th>
-                  <th>Rank Std. Dev.</th>
                   <th>Highest Rank</th>
+                  <th>Median Rank</th>
                   <th>Lowest Rank</th>
                   <th>Average RP</th>
                   <th>Highest RP</th>
@@ -83,14 +83,14 @@
                 </tr>
               </thead>
               <tbody>
-                {% for team_key, (avg_rank, std_rank, min_rank, max_rank, avg_rp, min_rp, max_rp) in ranking_predictions %}
+                {% for team_key, (avg_rank, min_rank, median_rank, max_rank, avg_rp, min_rp, max_rp) in ranking_predictions %}
                 <tr>
                   <td>{{loop.index}}</td>
                   <td><a href="/team/{{team_key|strip_frc}}/{{event.year}}">{{team_key|strip_frc}}</a></td>
                   <td>{{avg_rank|round(1)}}</td>
-                  <td>{{std_rank|round(1)}}</td>
-                  <td>{{min_rank}}</td>
-                  <td>{{max_rank}}</td>
+                  <td>{{min_rank|int}}</td>
+                  <td>{{median_rank|int}}</td>
+                  <td>{{max_rank|int}}</td>
                   <td>{{avg_rp|round(1)}}</td>
                   <td>{{max_rp}}</td>
                   <td>{{min_rp}}</td>
