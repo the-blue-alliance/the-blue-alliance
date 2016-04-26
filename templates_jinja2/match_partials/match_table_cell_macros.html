@@ -12,7 +12,7 @@
 {% endmacro %}
 
 
-{% macro match_name_td(match, compact=False) %}
+{% macro match_name_td(match, compact=False, fake_matches=False) %}
 <td{% if compact %} rowspan="2"{% endif %}>
   <div class="match-name-container">
     <div class="favorite-match-icon favorite-match-icon-{{match.key.id()}}">
@@ -20,14 +20,18 @@
         <span class="glyphicon glyphicon-star" rel="tooltip" title="A Favorited team is in this match!"></span>
     </div>
     <div class="match-name">
+      {% if fake_matches %}
+      {{match.verbose_name}}
+      {% else %}
       <a href="/match/{{match.key_name}}">{{match.verbose_name}}</a>
+      {% endif %}
     </div>
   </div>
 </td>
 {% endmacro %}
 
 
-{% macro match_team_td(match, alliance_color, team_key, cur_team_key, compact=False) %}
+{% macro match_team_td(match, alliance_color, team_key, cur_team_key, compact=False, fake_matches=False) %}
 {% set num_teams = match.alliances.get(alliance_color).teams|length %}
 {% if compact %}
   {% if num_teams == 3 %}
@@ -50,7 +54,11 @@
   <svg class="favorite-team-dot" data-team="{{team_key}}" data-match="{{match.key_name}}" rel="tooltip" title="You have Favorited this team!">
     <circle cx="2.5" cy="2.5" r="2.5"/>
   </svg>
+  {% if fake_matches %}
+  {{ team_key|strip_frc }}
+  {% else %}
   <a href="/team/{{team_key|digits}}/{{match.year}}">{{ team_key|strip_frc }}</a>
+  {% endif %}
 </td>
 {% endmacro %}
 

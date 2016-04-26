@@ -1,5 +1,6 @@
 from collections import defaultdict
 import datetime
+import json
 import os
 import tba_config
 
@@ -18,6 +19,7 @@ from helpers.event_insights_helper import EventInsightsHelper
 from helpers.media_helper import MediaHelper
 
 from models.event import Event
+from models.match import Match
 from template_engine import jinja2_engine
 
 
@@ -230,6 +232,37 @@ class EventInsights(CacheableHandler):
         cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
         matches = MatchHelper.organizeMatches(cleaned_matches)
 
+        # If no matches but there are match predictions, create fake matches
+        # For cases where FIRST doesn't allow posting of match schedule
+        fake_matches = False
+        if not matches['qm'] and match_predictions:
+            fake_matches = True
+            for i in xrange(len(match_predictions.keys())):
+                match_number = i + 1
+                alliances = {
+                    'red': {
+                        'score': -1,
+                        'teams': ['frc?', 'frc?', 'frc?']
+                    },
+                    'blue': {
+                        'score': -1,
+                        'teams': ['frc?', 'frc?', 'frc?']
+                    }
+                }
+                matches['qm'].append(Match(
+                    id=Match.renderKeyName(
+                        event_key,
+                        'qm',
+                        1,
+                        match_number),
+                    event=event.key,
+                    year=event.year,
+                    set_number=1,
+                    match_number=match_number,
+                    comp_level='qm',
+                    alliances_json=json.dumps(alliances),
+                ))
+
         last_played_match_num = None
         if ranking_prediction_stats:
             last_played_match_key = ranking_prediction_stats.get('last_played_match', None)
@@ -239,6 +272,7 @@ class EventInsights(CacheableHandler):
         self.template_values.update({
             "event": event,
             "matches": matches,
+            "fake_matches": fake_matches,
             "match_predictions": match_predictions,
             "match_prediction_stats": match_prediction_stats,
             "ranking_predictions": ranking_predictions,

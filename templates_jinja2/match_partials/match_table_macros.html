@@ -20,7 +20,7 @@
 </table>
 {% endmacro %}
 
-{% macro qual_match_prediction_table(matches, predictions) %}
+{% macro qual_match_prediction_table(matches, predictions, fake_matches) %}
 <table class="match-table">
   <thead>
     {% include "match_partials/match_predictions_table_header.html" %}
@@ -32,7 +32,7 @@
         <th colspan="20">Qualifications</th>
       </tr>
       {% for match in matches.qm %}
-        {{mtrm.match_row_tr(match, predictions=predictions)}}
+        {{mtrm.match_row_tr(match, predictions=predictions, fake_matches=fake_matches)}}
       {% endfor %}
     {% endif %}
   </tbody>

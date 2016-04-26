@@ -40,10 +40,13 @@
         <div class="col-xs-12">
           <h3>Qualification Match Predictions (<a href="/predictions">?</a>)</h3>
           <p>Remember, predictions are just for fun!</p>
+          {% if fake_matches %}
+          <p>Note: Match teams are not shown because <em>FIRST</em> does not allow the re-hosting of the preliminary match schedule. Sorry for the inconvenience.</p>
+          {% endif %}
           {% if match_prediction_stats.wl_accuracy %}<p><strong>Win/Loss prediction accuracy:</strong> {{match_prediction_stats.wl_accuracy|round|int}}%</p>{% endif %}
           {% if match_prediction_stats.wl_accuracy_75 %}<p><strong>Win/Loss prediction accuracy (>75% confidence):</strong> {{match_prediction_stats.wl_accuracy_75|round|int}}%</p>{% endif %}
           {% if match_prediction_stats.err_mean %}<p><strong>Match score prediction average error:</strong> {{match_prediction_stats.err_mean|round(1)}}</p>{% endif %}
-          {{mtm.qual_match_prediction_table(matches, match_predictions)}}
+          {{mtm.qual_match_prediction_table(matches, match_predictions, fake_matches)}}
         </div>
         {% endif %}
       </div>
