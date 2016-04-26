@@ -1,6 +1,7 @@
 import React from 'react';
 import GamedayFrame from './components/GamedayFrame';
 import gamedayReducer from './reducers'
+import { Provider } from 'react-redux'
 import { createStore } from 'redux';
 import { setWebcastsRaw } from './actions/actions.js'
 var ReactDOM = require('react-dom');
@@ -12,7 +13,9 @@ let webcastData = $.parseJSON($("#webcasts_json").text().replace(/u'/g,'\'').rep
 let store = createStore(gamedayReducer)
 
 ReactDOM.render(
-  <GamedayFrame webcastData={webcastData} pollInterval={20000} />,
+  <Provider store={store}>
+    <GamedayFrame />
+  </Provider>,
   document.getElementById('content')
 );
 

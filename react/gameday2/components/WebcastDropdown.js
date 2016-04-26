@@ -11,14 +11,16 @@ var WebcastDropdown = React.createClass({
   },
   render: function() {
     var webcastListItems = [];
-    for (var i = 0; i < this.props.webcasts.length; i++) {
-      var webcast = this.props.webcastsById[this.props.webcasts[i]];
-      webcastListItems.push(
-        <WebcastListItem
-          key={webcast.id}
-          webcast={webcast}
-          onWebcastAdd={this.props.onWebcastAdd} />
-      );
+    if (this.props.webcasts) {
+      for (var i = 0; i < this.props.webcasts.length; i++) {
+        var webcast = this.props.webcastsById[this.props.webcasts[i]];
+        webcastListItems.push(
+          <WebcastListItem
+            key={webcast.id}
+            webcast={webcast}
+            onWebcastAdd={this.props.onWebcastAdd} />
+        );
+      }
     }
     return (
       <li className="dropdown">
