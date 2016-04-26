@@ -230,6 +230,12 @@ class EventInsights(CacheableHandler):
         cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
         matches = MatchHelper.organizeMatches(cleaned_matches)
 
+        last_played_match_num = None
+        if ranking_prediction_stats:
+            last_played_match_key = ranking_prediction_stats.get('last_played_match', None)
+            if last_played_match_key:
+                last_played_match_num = last_played_match_key.split('_qm')[1]
+
         self.template_values.update({
             "event": event,
             "matches": matches,
@@ -237,6 +243,7 @@ class EventInsights(CacheableHandler):
             "match_prediction_stats": match_prediction_stats,
             "ranking_predictions": ranking_predictions,
             "ranking_prediction_stats": ranking_prediction_stats,
+            "last_played_match_num": last_played_match_num,
         })
 
         if event.within_a_day:

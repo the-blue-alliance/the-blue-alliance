@@ -60,8 +60,9 @@
       <div class="row">
         <div class="col-xs-12">
           <h3>Ranking Predictions (<a href="/predictions">?</a>)</h3>
-          {% if ranking_prediction_stats.last_played_match %}
-            <p>Predicted rankings as of match: {{ranking_prediction_stats.last_played_match}}</p>
+          <p>Predictions will update throughout the event.</p>
+          {% if last_played_match_num %}
+            <p>Predicted rankings as of qualification match #{{last_played_match_num}}</p>
           {% else %}
             <p>Predicted rankings with no matches played.</p>
           {% endif %}
