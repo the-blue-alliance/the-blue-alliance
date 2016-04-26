@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import GamedayNavbar from '../components/GamedayNavbar'
-import { toggleChatPanelVisibility, toggleHashtagPanelVisibility } from '../actions/actions'
+import { toggleChatPanelVisibility, toggleHashtagPanelVisibility } from '../actions'
 
 const mapStateToProps = (state) => {
   return {

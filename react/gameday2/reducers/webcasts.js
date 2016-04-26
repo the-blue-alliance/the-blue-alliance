@@ -1,4 +1,4 @@
-import { SET_WEBCASTS_RAW } from '../actions/actions'
+import { SET_WEBCASTS_RAW } from '../actions'
 import { getWebcastId } from '../utils/webcastUtils'
 
 /**
