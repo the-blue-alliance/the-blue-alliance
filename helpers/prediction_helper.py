@@ -232,7 +232,7 @@ class PredictionHelper(object):
         return predictions, prediction_stats
 
     @classmethod
-    def get_ranking_predictions(cls, matches, match_predictions, n=1000):
+    def get_ranking_predictions(cls, matches, match_predictions, n=10000):
         """
         Only works for 2016
         """
