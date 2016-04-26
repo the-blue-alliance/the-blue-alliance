@@ -657,50 +657,50 @@ function layout_8() {
   height = $(".video_container").height();
   width = $(".video_container").width();
 
-  $("#view_"+order[0]).width(width*0.33);
-  $("#view_"+order[0]).height(height*0.33);
+  $("#view_"+order[0]).width(width/3);
+  $("#view_"+order[0]).height(height/3);
   $("#view_"+order[0]).css('top', 0);
   $("#view_"+order[0]).css('left', 0);
 
-  $("#view_"+order[1]).width(width*0.33);
-  $("#view_"+order[1]).height(height*0.33);
+  $("#view_"+order[1]).width(width/3);
+  $("#view_"+order[1]).height(height/3);
   $("#view_"+order[1]).css('top', 0);
-  $("#view_"+order[1]).css('left', width*0.33);
+  $("#view_"+order[1]).css('left', width/3);
 
-  $("#view_"+order[2]).width(width*0.34);
-  $("#view_"+order[2]).height(height*0.33);
+  $("#view_"+order[2]).width(width/3);
+  $("#view_"+order[2]).height(height/3);
   $("#view_"+order[2]).css('top', 0);
-  $("#view_"+order[2]).css('left', width*0.66);
+  $("#view_"+order[2]).css('left', width*2/3);
 
-  $("#view_"+order[3]).width(width*0.33);
-  $("#view_"+order[3]).height(height*0.33);
-  $("#view_"+order[3]).css('top', height*0.33);
+  $("#view_"+order[3]).width(width/3);
+  $("#view_"+order[3]).height(height/3);
+  $("#view_"+order[3]).css('top', height/3);
   $("#view_"+order[3]).css('left', 0);
 
-  $("#view_"+order[4]).width(width*0.33);
-  $("#view_"+order[4]).height(height*0.33);
-  $("#view_"+order[4]).css('top', height*0.33);
-  $("#view_"+order[4]).css('left', width*0.33);
+  $("#view_"+order[4]).width(width/3);
+  $("#view_"+order[4]).height(height/3);
+  $("#view_"+order[4]).css('top', height/3);
+  $("#view_"+order[4]).css('left', width/3);
 
-  $("#view_"+order[5]).width(width*0.34);
-  $("#view_"+order[5]).height(height*0.33);
-  $("#view_"+order[5]).css('top', height*0.33);
-  $("#view_"+order[5]).css('left', width*0.66);
+  $("#view_"+order[5]).width(width/3);
+  $("#view_"+order[5]).height(height/3);
+  $("#view_"+order[5]).css('top', height/3);
+  $("#view_"+order[5]).css('left', width*2/3);
 
-  $("#view_"+order[6]).width(width*0.33);
-  $("#view_"+order[6]).height(height*0.34);
-  $("#view_"+order[6]).css('top', height*0.66);
+  $("#view_"+order[6]).width(width/3);
+  $("#view_"+order[6]).height(height/3);
+  $("#view_"+order[6]).css('top', height*2/3);
   $("#view_"+order[6]).css('left', 0);
 
-  $("#view_"+order[7]).width(width*0.33);
-  $("#view_"+order[7]).height(height*0.34);
-  $("#view_"+order[7]).css('top', height*0.66);
-  $("#view_"+order[7]).css('left', width*0.33);
+  $("#view_"+order[7]).width(width/3);
+  $("#view_"+order[7]).height(height/3);
+  $("#view_"+order[7]).css('top', height*2/3);
+  $("#view_"+order[7]).css('left', width/3);
 
-  $("#view_"+order[8]).width(width*0.34);
-  $("#view_"+order[8]).height(height*0.34);
-  $("#view_"+order[8]).css('top', height*0.66);
-  $("#view_"+order[8]).css('left', width*0.66);
+  $("#view_"+order[8]).width(width/3);
+  $("#view_"+order[8]).height(height/3);
+  $("#view_"+order[8]).css('top', height*2/3);
+  $("#view_"+order[8]).css('left', width*2/3);
 
   last_layout = current_layout;
 }
