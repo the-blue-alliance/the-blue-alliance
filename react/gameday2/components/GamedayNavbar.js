@@ -33,8 +33,8 @@ var GamedayNavbar = React.createClass({
             <WebcastDropdown
               webcasts={this.props.webcasts}
               webcastsById={this.props.webcastsById}
-              onWebcastAdd={this.props.onWebcastAdd}
-              onWebcastReset={this.props.onWebcastReset} />
+              addWebcast={this.props.addWebcast}
+              resetWebcasts={this.props.resetWebcasts} />
             <li>
               <BootstrapButton
                 active={this.props.hashtagPanelVisible}

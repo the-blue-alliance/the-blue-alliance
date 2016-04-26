@@ -3,7 +3,7 @@ var classNames = require('classnames');
 
 var VideoCellOverlay = React.createClass({
   onCloseClicked: function() {
-    this.props.onWebcastRemove(this.props.webcast);
+    this.props.removeWebcast(this.props.webcast.id);
   },
   render: function() {
     var classes = classNames({

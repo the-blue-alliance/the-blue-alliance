@@ -1,6 +1,6 @@
 import React from 'react';
 import GamedayNavbarContainer from '../containers/GamedayNavbarContainer';
-import VideoGrid from './VideoGrid';
+import VideoGridContainer from '../containers/VideoGridContainer';
 import ChatPanelContainer from '../containers/ChatPanelContainer';
 import HashtagPanelContainer from '../containers/HashtagPanelContainer';
 import FollowingTeamsModal from './FollowingTeamsModal';
@@ -22,13 +22,7 @@ var GamedayFrame = React.createClass({
           onWebcastReset={this.handleWebcastReset} />
         <HashtagPanelContainer />
         <ChatPanelContainer />
-        <VideoGrid
-          webcasts={this.state.webcasts}
-          webcastsById={this.state.webcastsById}
-          displayedWebcasts={this.state.displayedWebcasts}
-          rightPanelEnabled={this.state.chatEnabled}
-          leftPanelEnabled={this.state.hashtagEnabled}
-          onWebcastRemove={this.handleWebcastRemove} />
+        <VideoGridContainer />
         <FollowingTeamsModal
           followingTeams={this.state.followingTeams}
           onFollowTeam={this.handleFollowTeam}

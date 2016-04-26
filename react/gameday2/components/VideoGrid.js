@@ -36,7 +36,7 @@ var VideoGrid = React.createClass({
           num={i}
           key={id}
           webcast={webcast}
-          onWebcastRemove={this.props.onWebcastRemove}
+          removeWebcast={this.props.removeWebcast}
           vidHeight="100%"
           vidWidth="100%" />
       );
@@ -51,9 +51,10 @@ var VideoGrid = React.createClass({
   render: function() {
     var classes = classNames({
       'video-grid': true,
-      'leave-left-margin': this.props.leftPanelEnabled,
-      'leave-right-margin': this.props.rightPanelEnabled,
+      'leave-left-margin': this.props.hashtagPanelVisible,
+      'leave-right-margin': this.props.chatPanelVisible,
     });
+    console.log(this.props);
     var layout;
     switch (this.props.displayedWebcasts.length) {
       case 0:

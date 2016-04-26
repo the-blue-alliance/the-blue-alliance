@@ -54,7 +54,7 @@ var VideoCell = React.createClass({
           <VideoCellOverlay
             webcast={this.props.webcast}
             enabled={this.state.showOverlay}
-            onWebcastRemove={this.props.onWebcastRemove} />
+            removeWebcast={this.props.removeWebcast} />
         </div>
       )
     } else {

@@ -6,8 +6,8 @@ var WebcastDropdown = React.createClass({
   propTypes: {
     webcasts: PropTypes.array.isRequired,
     webcastsById: PropTypes.object.isRequired,
-    onWebcastAdd: PropTypes.func.isRequired,
-    onWebcastReset: PropTypes.func.isRequired
+    addWebcast: PropTypes.func.isRequired,
+    resetWebcasts: PropTypes.func.isRequired
   },
   render: function() {
     var webcastListItems = [];
@@ -18,7 +18,7 @@ var WebcastDropdown = React.createClass({
           <WebcastListItem
             key={webcast.id}
             webcast={webcast}
-            onWebcastAdd={this.props.onWebcastAdd} />
+            addWebcast={this.props.addWebcast} />
         );
       }
     }
@@ -28,7 +28,7 @@ var WebcastDropdown = React.createClass({
         <ul className="dropdown-menu">
           {webcastListItems}
           <li className="divider"></li>
-          <BootstrapNavDropdownListItem handleClick={this.props.onWebcastReset}>Reset Webcasts</BootstrapNavDropdownListItem>
+          <BootstrapNavDropdownListItem handleClick={this.props.resetWebcasts}>Reset Webcasts</BootstrapNavDropdownListItem>
         </ul>
       </li>
     );
