@@ -6,19 +6,21 @@ var WebcastDropdown = React.createClass({
   propTypes: {
     webcasts: PropTypes.array.isRequired,
     webcastsById: PropTypes.object.isRequired,
-    onWebcastAdd: PropTypes.func.isRequired,
-    onWebcastReset: PropTypes.func.isRequired
+    addWebcast: PropTypes.func.isRequired,
+    resetWebcasts: PropTypes.func.isRequired
   },
   render: function() {
     var webcastListItems = [];
-    for (var i = 0; i < this.props.webcasts.length; i++) {
-      var webcast = this.props.webcastsById[this.props.webcasts[i]];
-      webcastListItems.push(
-        <WebcastListItem
-          key={webcast.id}
-          webcast={webcast}
-          onWebcastAdd={this.props.onWebcastAdd} />
-      );
+    if (this.props.webcasts) {
+      for (var i = 0; i < this.props.webcasts.length; i++) {
+        var webcast = this.props.webcastsById[this.props.webcasts[i]];
+        webcastListItems.push(
+          <WebcastListItem
+            key={webcast.id}
+            webcast={webcast}
+            addWebcast={this.props.addWebcast} />
+        );
+      }
     }
     return (
       <li className="dropdown">
@@ -26,7 +28,7 @@ var WebcastDropdown = React.createClass({
         <ul className="dropdown-menu">
           {webcastListItems}
           <li className="divider"></li>
-          <BootstrapNavDropdownListItem handleClick={this.props.onWebcastReset}>Reset Webcasts</BootstrapNavDropdownListItem>
+          <BootstrapNavDropdownListItem handleClick={this.props.resetWebcasts}>Reset Webcasts</BootstrapNavDropdownListItem>
         </ul>
       </li>
     );

@@ -1,95 +1,23 @@
 import React from 'react';
-import GamedayNavbar from './GamedayNavbar';
-import VideoGrid from './VideoGrid';
-import ChatPanel from './ChatPanel';
-import HashtagPanel from './HashtagPanel';
+import GamedayNavbarContainer from '../containers/GamedayNavbarContainer';
+import VideoGridContainer from '../containers/VideoGridContainer';
+import ChatPanelContainer from '../containers/ChatPanelContainer';
+import HashtagPanelContainer from '../containers/HashtagPanelContainer';
 import FollowingTeamsModal from './FollowingTeamsModal';
 
 var GamedayFrame = React.createClass({
   getInitialState: function() {
     return {
-      webcasts: [],
-      webcastsById: {},
-      displayedWebcasts: [],
-      hashtagEnabled: true,
-      chatEnabled: false,
       followingTeams: [177,230]
     };
-  },
-  componentWillMount: function() {
-    // Process webcast data
-    // Special and event webcasts are normalized into objects with 6 attributes:
-    // key, num, id, name, type, and channel
-    var webcasts = [];
-    var webcastsById = {};
-    var specialWebcasts = this.props.webcastData.special_webcasts;
-    var eventsWithWebcasts = this.props.webcastData.ongoing_events_w_webcasts;
-
-    // First, deal with special webcasts
-    for (let webcast of specialWebcasts) {
-      const id = webcast.key_name + 0;
-      webcasts.push(id);
-      webcastsById[id] = {
-        'key': webcast.key_name,
-        'num': 0,
-        'id': id,
-        'name': webcast.name,
-        'type': webcast.type,
-        'channel': webcast.channel
-      };
-    }
-
-    // Now, process normal event webcasts
-    for (let event of eventsWithWebcasts) {
-      var webcastNum = 0;
-      for (let webcast of event.webcast) {
-        var name = (event.short_name ? event.short_name : event.name);
-        if (event.webcast.length > 1) {
-          name += (' ' + (webcastNum + 1));
-        }
-        const id = event.key + '-' + webcastNum;
-        webcasts.push(id);
-        webcastsById[id] = {
-          'key': event.key,
-          'num': webcastNum,
-          'id': id,
-          'name': name,
-          'type': webcast.type,
-          'channel': webcast.channel
-        };
-        webcastNum++;
-      }
-    }
-
-    this.setState({
-      webcasts: webcasts,
-      webcastsById: webcastsById
-    });
-  },
-  componentWillUnmount: function() {
-    this.serverRequest.abort();
   },
   render: function() {
     return (
       <div className="gameday container-full">
-        <GamedayNavbar
-          chatEnabled={this.state.chatEnabled}
-          hashtagEnabled={this.state.hashtagEnabled}
-          webcasts={this.state.webcasts}
-          webcastsById={this.state.webcastsById}
-          onChatToggle={this.handleChatToggle}
-          onHashtagToggle={this.handleHashtagToggle}
-          onWebcastAdd={this.handleWebcastAdd}
-          onWebcastReset={this.handleWebcastReset} />
-        <HashtagPanel enabled={this.state.hashtagEnabled} />
-        <ChatPanel enabled={this.state.chatEnabled} />
-        <VideoGrid
-          webcasts={this.state.webcasts}
-          webcastsById={this.state.webcastsById}
-          displayedWebcasts={this.state.displayedWebcasts}
-          rightPanelEnabled={this.state.chatEnabled}
-          leftPanelEnabled={this.state.hashtagEnabled}
-          onWebcastRemove={this.handleWebcastRemove} />
+        <GamedayNavbarContainer />
+        <HashtagPanelContainer />
+        <ChatPanelContainer />
+        <VideoGridContainer />
         <FollowingTeamsModal
           followingTeams={this.state.followingTeams}
           onFollowTeam={this.handleFollowTeam}
@@ -97,36 +25,15 @@ var GamedayFrame = React.createClass({
       </div>
     );
   },
-  handleChatToggle: function() {
-    this.setState({chatEnabled: !this.state.chatEnabled});
-  },
   handleFollowTeam: function(team) {
     var newFollowingTeams = this.state.followingTeams.concat([team]);
     this.setState({followingTeams: newFollowingTeams})
-  },
-  handleHashtagToggle: function() {
-    this.setState({hashtagEnabled: !this.state.hashtagEnabled});
-  },
-  handleWebcastAdd: function(webcast) {
-    var displayedWebcasts = this.state.displayedWebcasts;
-    var newDisplayedWebcasts = displayedWebcasts.concat([webcast.id]);
-    this.setState({displayedWebcasts: newDisplayedWebcasts});
-  },
-  handleWebcastRemove: function(webcast) {
-    var displayedWebcasts = this.state.displayedWebcasts;
-    var newDisplayedWebcasts = displayedWebcasts.filter(function(id) {
-      return id != webcast.id;
-    });
-    this.setState({displayedWebcasts: newDisplayedWebcasts});
   },
   handleUnfollowTeam: function(team) {
     var newFollowingTeams = this.state.followingTeams.filter(function(a) {
       return a != team
     });
     this.setState({followingTeams: newFollowingTeams});
-  },
-  handleWebcastReset: function() {
-    this.setState({displayedWebcasts: []});
   }
 });
 
