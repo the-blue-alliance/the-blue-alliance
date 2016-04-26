@@ -54,7 +54,6 @@ var VideoGrid = React.createClass({
       'leave-left-margin': this.props.hashtagPanelVisible,
       'leave-right-margin': this.props.chatPanelVisible,
     });
-    console.log(this.props);
     var layout;
     switch (this.props.displayedWebcasts.length) {
       case 0:

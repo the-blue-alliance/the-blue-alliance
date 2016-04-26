@@ -8,18 +8,13 @@ import FollowingTeamsModal from './FollowingTeamsModal';
 var GamedayFrame = React.createClass({
   getInitialState: function() {
     return {
-      webcasts: [],
-      webcastsById: {},
-      displayedWebcasts: [],
       followingTeams: [177,230]
     };
   },
   render: function() {
     return (
       <div className="gameday container-full">
-        <GamedayNavbarContainer
-          onWebcastAdd={this.handleWebcastAdd}
-          onWebcastReset={this.handleWebcastReset} />
+        <GamedayNavbarContainer />
         <HashtagPanelContainer />
         <ChatPanelContainer />
         <VideoGridContainer />
@@ -34,26 +29,11 @@ var GamedayFrame = React.createClass({
     var newFollowingTeams = this.state.followingTeams.concat([team]);
     this.setState({followingTeams: newFollowingTeams})
   },
-  handleWebcastAdd: function(webcast) {
-    var displayedWebcasts = this.state.displayedWebcasts;
-    var newDisplayedWebcasts = displayedWebcasts.concat([webcast.id]);
-    this.setState({displayedWebcasts: newDisplayedWebcasts});
-  },
-  handleWebcastRemove: function(webcast) {
-    var displayedWebcasts = this.state.displayedWebcasts;
-    var newDisplayedWebcasts = displayedWebcasts.filter(function(id) {
-      return id != webcast.id;
-    });
-    this.setState({displayedWebcasts: newDisplayedWebcasts});
-  },
   handleUnfollowTeam: function(team) {
     var newFollowingTeams = this.state.followingTeams.filter(function(a) {
       return a != team
     });
     this.setState({followingTeams: newFollowingTeams});
-  },
-  handleWebcastReset: function() {
-    this.setState({displayedWebcasts: []});
   }
 });
 
