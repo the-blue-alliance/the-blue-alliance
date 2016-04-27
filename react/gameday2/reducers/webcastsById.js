@@ -7,6 +7,9 @@ const getWebcastsFromRawWebcasts = (webcasts) => {
   var eventsWithWebcasts = webcasts.ongoing_events_w_webcasts;
 
   // First, deal with special webcasts
+  // Sort order will be used later if we ever have to reconstruct the original
+  // ordering of the webcasts
+  let sortOrder = 0;
   for (let webcast of specialWebcasts) {
     const id = getWebcastId(webcast.key_name, 0);
     webcastsById[id] = {
@@ -15,8 +18,10 @@ const getWebcastsFromRawWebcasts = (webcasts) => {
       'id': id,
       'name': webcast.name,
       'type': webcast.type,
-      'channel': webcast.channel
+      'channel': webcast.channel,
+      'sortOrder': sortOrder
     };
+    sortOrder++;
   }
 
   // Now, process normal event webcasts

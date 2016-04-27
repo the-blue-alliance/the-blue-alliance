@@ -1,10 +1,11 @@
 import { connect } from 'react-redux'
 import GamedayNavbar from '../components/GamedayNavbar'
 import { toggleChatPanelVisibility, toggleHashtagPanelVisibility, addWebcast, resetWebcasts } from '../actions'
+import { getWebcastIdsInDisplayOrder } from '../selectors'
 
 const mapStateToProps = (state) => {
   return {
-    webcasts: state.webcasts,
+    webcasts: getWebcastIdsInDisplayOrder(state),
     webcastsById: state.webcastsById,
     hashtagPanelVisible: state.hashtagPanelVisible,
     chatPanelVisible: state.chatPanelVisible
