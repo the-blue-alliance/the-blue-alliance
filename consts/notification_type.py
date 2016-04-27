@@ -96,3 +96,8 @@ class NotificationType(object):
         ALLIANCE_SELECTION,
         AWARDS
     ]
+
+    enabled_match_notifications = [
+        UPCOMING_MATCH,
+        MATCH_SCORE
+    ]

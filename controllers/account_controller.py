@@ -21,6 +21,7 @@ from helpers.validation_helper import ValidationHelper
 from models.account import Account
 from models.event import Event
 from models.favorite import Favorite
+from models.match import Match
 from models.sitevar import Sitevar
 from models.subscription import Subscription
 from models.suggestion import Suggestion
@@ -185,6 +186,9 @@ class MyTBAController(LoggedInHandler):
         event_fav = {}
         event_subs = {}
         events = []
+        match_keys = set()
+        match_fav = {}
+        match_subs = {}
         for item in favorites + subscriptions:
             if item.model_type == ModelType.TEAM:
                 team_keys.add(ndb.Key(Team, item.model_key))
@@ -192,6 +196,12 @@ class MyTBAController(LoggedInHandler):
                     team_fav[item.model_key] = item
                 elif type(item) == Subscription:
                     team_subs[item.model_key] = item
+            elif item.model_type == ModelType.MATCH:
+                match_keys.add(ndb.Key(Match, item.model_key))
+                if type(item) == Favorite:
+                    match_fav[item.model_key] = item
+                elif type(item) == Subscription:
+                    match_subs[item.model_key] = item
             elif item.model_type == ModelType.EVENT:
                 if item.model_key.endswith('*'):  # All year events wildcard
                     event_year = int(item.model_key[:-1])
@@ -212,6 +222,7 @@ class MyTBAController(LoggedInHandler):
 
         team_futures = ndb.get_multi_async(team_keys)
         event_futures = ndb.get_multi_async(event_keys)
+        match_futures = ndb.get_multi_async(match_keys)
 
         teams = sorted([team_future.get_result() for team_future in team_futures], key=lambda x: x.team_number)
         team_fav_subs = []
@@ -229,8 +240,16 @@ class MyTBAController(LoggedInHandler):
             subs = event_subs.get(event.key.id(), None)
             event_fav_subs.append((event, fav, subs))
 
+        matches = [match_future.get_result() for match_future in match_futures]
+        match_fav_subs = []
+        for match in matches:
+            fav = match_fav.get(match.key.id(), None)
+            subs = match_subs.get(match.key.id(), None)
+            match_fav_subs.append((match, fav, subs))
+
         self.template_values['team_fav_subs'] = team_fav_subs
         self.template_values['event_fav_subs'] = event_fav_subs
+        self.template_values['match_fav_subs'] = match_fav_subs
         self.template_values['status'] = self.request.get('status')
         self.template_values['year'] = datetime.datetime.now().year
 
@@ -312,6 +331,68 @@ class MyTBAEventController(LoggedInHandler):
             MyTBAHelper.remove_subscription(current_user_id, event_key, ModelType.EVENT)
 
         self.redirect('/account/mytba?status=event_updated#my-events')
+
+
+class MyTBAMatchController(LoggedInHandler):
+    def get(self, match_key):
+        self._require_login()
+        self._require_registration()
+
+        match = Match.get_by_id(match_key)
+
+        if not match:
+            self.abort(404)
+
+        user = self.user_bundle.account.key
+        favorite = Favorite.query(Favorite.model_key==match_key, Favorite.model_type==ModelType.MATCH, ancestor=user).get()
+        subscription = Subscription.query(Favorite.model_key==match_key, Favorite.model_type==ModelType.MATCH, ancestor=user).get()
+
+        if not favorite and not subscription:  # New entry; default to being a favorite
+            is_favorite = True
+        else:
+            is_favorite = favorite is not None
+
+        enabled_notifications = [(en, NotificationType.render_names[en]) for en in NotificationType.enabled_match_notifications]
+
+        self.template_values['match'] = match
+        self.template_values['is_favorite'] = is_favorite
+        self.template_values['subscription'] = subscription
+        self.template_values['enabled_notifications'] = enabled_notifications
+
+        self.response.out.write(jinja2_engine.render('mytba_match.html', self.template_values))
+
+    def post(self, match_key):
+        self._require_login()
+        self._require_registration()
+
+        current_user_id = self.user_bundle.account.key.id()
+        match = Match.get_by_id(match_key)
+
+        if self.request.get('favorite'):
+            favorite = Favorite(
+                parent=ndb.Key(Account, current_user_id),
+                user_id=current_user_id,
+                model_type=ModelType.MATCH,
+                model_key=match_key
+            )
+            MyTBAHelper.add_favorite(favorite)
+        else:
+            MyTBAHelper.remove_favorite(current_user_id, match_key, ModelType.MATCH)
+
+        subs = self.request.get_all('notification_types')
+        if subs:
+            subscription = Subscription(
+                parent=ndb.Key(Account, current_user_id),
+                user_id=current_user_id,
+                model_type=ModelType.MATCH,
+                model_key=match_key,
+                notification_types=[int(s) for s in subs]
+            )
+            MyTBAHelper.add_subscription(subscription)
+        else:
+            MyTBAHelper.remove_subscription(current_user_id, match_key, ModelType.MATCH)
+
+        self.redirect('/account/mytba?status=match_updated#my-matches')
 
 
 class MyTBATeamController(LoggedInHandler):
