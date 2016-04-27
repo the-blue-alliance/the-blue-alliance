@@ -298,17 +298,19 @@ class GamedayHandler(CacheableHandler):
         else:
             special_webcasts_temp = []
         special_webcasts = []
+        special_webcast_keys = set()
         for webcast in special_webcasts_temp:
             toAppend = {}
             for key, value in webcast.items():
                 toAppend[str(key)] = str(value)
             special_webcasts.append(toAppend)
+            special_webcast_keys.add(webcast['key_name'])
 
         ongoing_events = []
         ongoing_events_w_webcasts = []
         week_events = EventHelper.getWeekEvents()
         for event in week_events:
-            if event.now:
+            if event.now and event.key.id() not in special_webcast_keys:
                 ongoing_events.append(event)
                 if event.webcast:
                     valid = []
