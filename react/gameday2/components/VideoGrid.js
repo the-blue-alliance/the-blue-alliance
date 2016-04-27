@@ -11,7 +11,7 @@ var classNames = require('classnames');
  * should be an array of webcast ids.
  */
 var VideoGrid = React.createClass({
-  renderLayoutZero: function(classes) {
+  renderEmptyLayout: function(classes) {
     return (
       <div className={classes}>
         <div className="jumbotron">
@@ -57,7 +57,7 @@ var VideoGrid = React.createClass({
     var layout;
     switch (this.props.displayedWebcasts.length) {
       case 0:
-      layout = this.renderLayoutZero(classes);
+      layout = this.renderEmptyLayout(classes);
       break;
       case 1:
       layout = this.renderLayout(1, 1, classes);
