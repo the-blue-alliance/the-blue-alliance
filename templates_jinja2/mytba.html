@@ -45,7 +45,7 @@
       <ul class="nav nav-tabs">
         <li class="active"><a href="#my-teams" data-toggle="tab">My Teams <span class="badge">{{team_fav_subs|length}}</span></a></li>
         <li><a href="#my-events" data-toggle="tab">My Events <span class="badge">{{event_fav_subs|length}}</span></a></li>
-        <li><a href="#my-matches" data-toggle="tab">My Matches <span class="badge">{{match_fav_subs|length}}</span></a></li>
+        <li><a href="#my-matches" data-toggle="tab">My Matches <span class="badge">{{event_match_fav_subs|length}}</span></a></li>
       </ul>
 
       <div class="tab-content">
@@ -120,7 +120,9 @@
           <a class="btn btn-success pull-right" href="/account/mytba/matches/hot"><span class="glyphicon glyphicon-plus"></span> Add Hot Championship Matches</a>
           <h2>My Matches</h2>
 
-          {% if match_fav_subs %}
+          {% if event_match_fav_subs %}
+            {% for event, match_fav_subs in event_match_fav_subs %}
+            <h3>{{event.year}} {{event.short_name}}</h3>
             <table class="table table-striped">
               <tr>
                 <th>Match</th>
@@ -130,7 +132,7 @@
               </tr>
               {% for match, fav, subs in match_fav_subs %}
               <tr>
-                <td><a href="/match/{{match.key.id()}}">{{match.key.id()}}</a></td>
+                <td><a href="/match/{{match.key.id()}}">{{match.verbose_name}}</a></td>
                 <td>{% if fav %}<span class="glyphicon glyphicon-ok"></span>{% endif %}</td>
                 <td>
                   <ul style="padding-left: 0px;">
@@ -143,6 +145,7 @@
               </tr>
               {% endfor %}
             </table>
+            {% endfor %}
           {% else %}
             <p>You have no matches!</p>
           {% endif %}

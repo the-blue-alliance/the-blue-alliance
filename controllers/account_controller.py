@@ -14,6 +14,7 @@ from consts.model_type import ModelType
 from consts.notification_type import NotificationType
 
 from helpers.event_helper import EventHelper
+from helpers.match_helper import MatchHelper
 from helpers.mytba_helper import MyTBAHelper
 from helpers.notification_helper import NotificationHelper
 from helpers.validation_helper import ValidationHelper
@@ -187,6 +188,7 @@ class MyTBAController(LoggedInHandler):
         event_subs = {}
         events = []
         match_keys = set()
+        match_event_keys = set()
         match_fav = {}
         match_subs = {}
         for item in favorites + subscriptions:
@@ -198,6 +200,7 @@ class MyTBAController(LoggedInHandler):
                     team_subs[item.model_key] = item
             elif item.model_type == ModelType.MATCH:
                 match_keys.add(ndb.Key(Match, item.model_key))
+                match_event_keys.add(ndb.Key(Event, item.model_key.split('_')[0]))
                 if type(item) == Favorite:
                     match_fav[item.model_key] = item
                 elif type(item) == Subscription:
@@ -223,6 +226,7 @@ class MyTBAController(LoggedInHandler):
         team_futures = ndb.get_multi_async(team_keys)
         event_futures = ndb.get_multi_async(event_keys)
         match_futures = ndb.get_multi_async(match_keys)
+        match_event_futures = ndb.get_multi_async(match_event_keys)
 
         teams = sorted([team_future.get_result() for team_future in team_futures], key=lambda x: x.team_number)
         team_fav_subs = []
@@ -241,15 +245,25 @@ class MyTBAController(LoggedInHandler):
             event_fav_subs.append((event, fav, subs))
 
         matches = [match_future.get_result() for match_future in match_futures]
-        match_fav_subs = []
+        match_events = [match_event_future.get_result() for match_event_future in match_event_futures]
+        MatchHelper.natural_sort_matches(matches)
+
+        match_fav_subs_by_event = {}
+        for event in match_events:
+            match_fav_subs_by_event[event.key.id()] = (event, [])
+
         for match in matches:
+            event_key = match.key.id().split('_')[0]
             fav = match_fav.get(match.key.id(), None)
             subs = match_subs.get(match.key.id(), None)
-            match_fav_subs.append((match, fav, subs))
+            match_fav_subs_by_event[event_key][1].append((match, fav, subs))
+
+        event_match_fav_subs = sorted(match_fav_subs_by_event.values(), key=lambda x: EventHelper.distantFutureIfNoStartDate(x[0]))
+        event_match_fav_subs = sorted(event_match_fav_subs, key=lambda x: EventHelper.distantFutureIfNoEndDate(x[0]))
 
         self.template_values['team_fav_subs'] = team_fav_subs
         self.template_values['event_fav_subs'] = event_fav_subs
-        self.template_values['match_fav_subs'] = match_fav_subs
+        self.template_values['event_match_fav_subs'] = event_match_fav_subs
         self.template_values['status'] = self.request.get('status')
         self.template_values['year'] = datetime.datetime.now().year
 
