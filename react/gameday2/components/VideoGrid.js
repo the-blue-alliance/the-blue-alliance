@@ -60,16 +60,16 @@ var VideoGrid = React.createClass({
       layout = this.renderEmptyLayout(classes);
       break;
       case 1:
-      layout = this.renderLayout(1, 1, classes);
+      layout = this.renderLayout(1, 0, classes);
       break;
       case 2:
-      layout = this.renderLayout(2, 2, classes);
+      layout = this.renderLayout(2, 1, classes);
       break;
       case 3:
-      layout = this.renderLayout(3, 3, classes);
+      layout = this.renderLayout(3, 2, classes);
       break;
       case 4:
-      layout = this.renderLayout(4, 4, classes);
+      layout = this.renderLayout(4, 3, classes);
       break;
     }
     return layout;
