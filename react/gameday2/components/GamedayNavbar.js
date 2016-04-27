@@ -10,8 +10,8 @@ var GamedayNavbar = React.createClass({
     webcastsById: PropTypes.object.isRequired,
     hashtagPanelVisible: PropTypes.bool.isRequired,
     chatPanelVisible: PropTypes.bool.isRequired,
-    onWebcastAdd: PropTypes.func.isRequired,
-    onWebcastReset: PropTypes.func.isRequired,
+    addWebcast: PropTypes.func.isRequired,
+    resetWebcasts: PropTypes.func.isRequired,
     toggleHashtagPanelVisibility: PropTypes.func.isRequired,
     toggleChatPanelVisibility: PropTypes.func.isRequired
   },
