@@ -21,6 +21,12 @@
           <h4>Success!</h4>
           <p>myTBA Event successfully updated.</p>
         </div>
+      {% elif status == 'match_updated' %}
+        <div class="alert alert-success">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <h4>Success!</h4>
+          <p>myTBA Match successfully updated.</p>
+        </div>
       {% endif %}
     </div>
   </div>
@@ -122,7 +128,7 @@
 
           {% if event_match_fav_subs %}
             {% for event, match_fav_subs in event_match_fav_subs %}
-            <h3>{{event.year}} {{event.short_name}}</h3>
+            <h3><a href="/event/{{event.key.id()}}">{{event.year}} {{event.short_name}}</a></h3>
             <table class="table table-striped">
               <tr>
                 <th>Match</th>
