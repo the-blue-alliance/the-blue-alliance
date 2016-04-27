@@ -83,6 +83,9 @@ var VideoGrid = React.createClass({
       case 8:
       layout = this.renderLayout(8, 7, classes);
       break;
+      case 9:
+      layout = this.renderLayout(9, 8, classes);
+      break;
     }
     return layout;
   },
