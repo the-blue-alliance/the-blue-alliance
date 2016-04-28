@@ -41,7 +41,7 @@ var VideoGrid = React.createClass({
       }
       videoCells.push(
         <VideoCell
-          num={i}
+          location={i}
           key={id}
           webcast={webcast}
           removeWebcast={this.props.removeWebcast}

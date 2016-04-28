@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import VideoCellOverlay from './VideoCellOverlay';
 import EmbedUstream from './EmbedUstream';
 import EmbedYoutube from './EmbedYoutube';
 import EmbedTwitch from './EmbedTwitch';
 
 var VideoCell = React.createClass({
+  propTypes: {
+    location: PropTypes.number.isRequired
+  },
   getInitialState: function() {
     return {
       showOverlay: false,
@@ -17,7 +20,7 @@ var VideoCell = React.createClass({
     this.setState({"showOverlay": false})
   },
   render: function() {
-    var classes = 'video-cell video-' + this.props.num;
+    var classes = 'video-cell video-' + this.props.location;
 
     if (this.props.webcast) {
       var cellEmbed;
