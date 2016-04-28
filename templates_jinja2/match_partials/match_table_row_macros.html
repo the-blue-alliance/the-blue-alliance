@@ -67,3 +67,30 @@
   {% endif %}
 </tr>
 {% endmacro %}
+
+
+{% macro match_row_tr_hot(match) %}
+<tr>
+  {{mtcm.match_name_td(match, compact=True)}}
+
+  {% for team_key in match.alliances.red.teams %}
+    {{mtcm.match_team_td(match, 'red', team_key, None, compact=True)}}
+  {% endfor %}
+
+  <td colspan="2" rowspan="2">
+    <div class="progress" style="margin: 0px;">
+      <div class="progress-bar {% if match.hotness < 75 %}progress-bar-default{% elif match.hotness < 90 %}progress-bar-warning{% else %}progress-bar-danger{% endif %}" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{match.hotness|round|int}}%; min-width:20%">
+        {{match.hotness|round|int}}
+      </div>
+    </div>
+  </td>
+  <td colspan="2" rowspan="2">
+    <input type="checkbox" name="subscribed_matches" value="{{match.key.id()}}"{% if match.already_subscribed %} checked{% endif %}/>
+  </td>
+</tr>
+<tr>
+  {% for team_key in match.alliances.blue.teams %}
+    {{mtcm.match_team_td(match, 'blue', team_key, None, compact=True)}}
+  {% endfor %}
+</tr>
+{% endmacro %}
