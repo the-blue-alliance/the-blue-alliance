@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import VideoCell from './VideoCell';
+import { getNumViewsForLayout } from '../utils/layoutUtils'
 var classNames = require('classnames');
 
 /**
@@ -11,6 +12,9 @@ var classNames = require('classnames');
  * should be an array of webcast ids.
  */
 var VideoGrid = React.createClass({
+  propTypes: {
+    layout: PropTypes.number.isRequired
+  },
   renderEmptyLayout: function(classes) {
     return (
       <div className={classes}>
@@ -55,6 +59,11 @@ var VideoGrid = React.createClass({
       'leave-right-margin': this.props.chatPanelVisible,
     });
     var layout;
+    let selectedLayout = this.props.layout
+    var numViews = getNumViewsForLayout(selectedLayout)
+
+    return this.renderLayout(numViews, selectedLayout, classes)
+
     switch (this.props.displayedWebcasts.length) {
       case 0:
       layout = this.renderEmptyLayout(classes);

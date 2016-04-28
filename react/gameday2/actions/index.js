@@ -4,6 +4,7 @@ export const TOGGLE_HASHTAG_PANEL_VISIBILITY = 'TOGGLE_HASHTAG_PANEL_VISIBILITY'
 export const ADD_WEBCAST = 'ADD_WEBCAST'
 export const REMOVE_WEBCAST = 'REMOVE_WEBCAST'
 export const RESET_WEBCASTS = 'RESET_WEBCASTS'
+export const SET_LAYOUT = 'SET_LAYOUT'
 
 /**
  * Takes the JSON object from the server and produces a list of normalized
@@ -45,5 +46,12 @@ export function removeWebcast(id) {
 export function resetWebcasts() {
   return {
     type: RESET_WEBCASTS
+  }
+}
+
+export function setLayout(layoutId) {
+  return {
+    type: SET_LAYOUT,
+    layoutId
   }
 }

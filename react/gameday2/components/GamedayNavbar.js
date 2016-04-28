@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import BootstrapButton from './BootstrapButton';
 import SettingsDropdown from './SettingsDropdown';
 import WebcastDropdown from './WebcastDropdown';
+import LayoutDropdown from './LayoutDropdown';
 var classNames = require('classnames');
 
 var GamedayNavbar = React.createClass({
@@ -13,7 +14,8 @@ var GamedayNavbar = React.createClass({
     addWebcast: PropTypes.func.isRequired,
     resetWebcasts: PropTypes.func.isRequired,
     toggleHashtagPanelVisibility: PropTypes.func.isRequired,
-    toggleChatPanelVisibility: PropTypes.func.isRequired
+    toggleChatPanelVisibility: PropTypes.func.isRequired,
+    setLayout: PropTypes.func.isRequired
   },
   render: function() {
     return (
@@ -30,6 +32,7 @@ var GamedayNavbar = React.createClass({
 
         <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul className="nav navbar-nav navbar-right">
+            <LayoutDropdown setLayout={this.props.setLayout} />
             <WebcastDropdown
               webcasts={this.props.webcasts}
               webcastsById={this.props.webcastsById}
