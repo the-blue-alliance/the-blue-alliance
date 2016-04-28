@@ -1,9 +1,17 @@
 import { SET_LAYOUT } from '../actions'
 
-const layout = (state = 0, action) => {
+const defaultState = {
+  layoutId: 0,
+  layoutSet: false
+}
+
+const layout = (state = defaultState, action) => {
   switch(action.type) {
     case SET_LAYOUT:
-    return action.layoutId
+    return {
+      layoutId: action.layoutId,
+      layoutSet: true
+    }
     default:
     return state
   }

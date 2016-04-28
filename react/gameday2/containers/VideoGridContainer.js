@@ -9,7 +9,8 @@ const mapStateToProps = (state) => {
     displayedWebcasts: state.displayedWebcasts,
     hashtagPanelVisible: state.hashtagPanelVisible,
     chatPanelVisible: state.chatPanelVisible,
-    layout: state.layout
+    layoutId: state.layout.layoutId,
+    layoutSet: state.layout.layoutSet
   }
 }
 

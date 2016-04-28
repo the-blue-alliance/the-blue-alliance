@@ -14,7 +14,8 @@ var classNames = require('classnames');
 var VideoGrid = React.createClass({
   propTypes: {
     displayedWebcasts: PropTypes.array.isRequired,
-    layout: PropTypes.number.isRequired
+    layoutId: PropTypes.number.isRequired,
+    layoutSet: PropTypes.bool.isRequired
   },
   renderEmptyLayout: function(classes) {
     return (
@@ -61,11 +62,15 @@ var VideoGrid = React.createClass({
       'leave-left-margin': this.props.hashtagPanelVisible,
       'leave-right-margin': this.props.chatPanelVisible,
     });
-    
-    let selectedLayout = this.props.layout
-    let numViews = getNumViewsForLayout(selectedLayout)
 
-    return this.renderLayout(numViews, selectedLayout, classes)
+    // If the user didn't set a layout yet, show the empty "welcome" view
+    if (!this.props.layoutSet) {
+      return this.renderEmptyLayout(classes)
+    }
+
+    let selectedLayoutId = this.props.layoutId
+    let numViews = getNumViewsForLayout(selectedLayoutId)
+    return this.renderLayout(numViews, selectedLayoutId, classes)
   }
 });
 
