@@ -1,10 +1,11 @@
 import { connect } from 'react-redux'
 import VideoGrid from '../components/VideoGrid'
-import { removeWebcast } from '../actions'
+import { addWebcastAtLocation, removeWebcast } from '../actions'
+import { getWebcastIdsInDisplayOrder } from '../selectors'
 
 const mapStateToProps = (state) => {
   return {
-    webcasts: state.webcasts,
+    webcasts: getWebcastIdsInDisplayOrder(state),
     webcastsById: state.webcastsById,
     displayedWebcasts: state.displayedWebcasts,
     hashtagPanelVisible: state.hashtagPanelVisible,
@@ -17,6 +18,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     removeWebcast: (id) => dispatch(removeWebcast(id)),
+    addWebcastAtLocation: (webcastId, location) => dispatch(addWebcastAtLocation(webcastId, location))
   }
 }
 

@@ -67,10 +67,27 @@ iframe[id^='twitter-widget-'] {
   display: inline-block;
 }
 
+.overlay-button-container {
+  float: right;
+}
+
+.overlay-button {
+  float: left;
+  color: #777;
+  text-decoration: none;
+  margin-left: 10px;
+  &:hover {
+    text-decoration: none;
+    color: #333;
+  }
+  &:focus {
+    text-decoration: none;
+  }
+}
+
 .button-close {
   padding: 4px;
   cursor: pointer;
-  float: right;
 }
 
 .jumbotron {
@@ -78,6 +95,31 @@ iframe[id^='twitter-widget-'] {
   text-align: center;
   background-color: black;
   color: white;
+}
+
+.webcast-selection-panel {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: white;
+  overflow: auto;
+  padding-left: 40px;
+  padding-right: 40px;
+
+  .list-group {
+    max-width: 400px;
+    margin: auto;
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
+
+  .button-close {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+  }
 }
 
 /* Layout 0: full screen single video

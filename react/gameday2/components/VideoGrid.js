@@ -14,8 +14,11 @@ var classNames = require('classnames');
 var VideoGrid = React.createClass({
   propTypes: {
     displayedWebcasts: PropTypes.array.isRequired,
+    webcasts: PropTypes.array.isRequired,
+    webcastsById: PropTypes.object.isRequired,
     layoutId: PropTypes.number.isRequired,
-    layoutSet: PropTypes.bool.isRequired
+    layoutSet: PropTypes.bool.isRequired,
+    addWebcastAtLocation: PropTypes.func.isRequired
   },
   renderEmptyLayout: function(classes) {
     return (
@@ -44,6 +47,9 @@ var VideoGrid = React.createClass({
           location={i}
           key={id}
           webcast={webcast}
+          webcasts={this.props.webcasts}
+          webcastsById={this.props.webcastsById}
+          addWebcastAtLocation={this.props.addWebcastAtLocation}
           removeWebcast={this.props.removeWebcast}
           vidHeight="100%"
           vidWidth="100%" />

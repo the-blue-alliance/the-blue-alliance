@@ -1,23 +1,39 @@
 import React, { PropTypes } from 'react';
 import VideoCellOverlay from './VideoCellOverlay';
+import WebcastSelectionPanel from './WebcastSelectionPanel'
 import EmbedUstream from './EmbedUstream';
 import EmbedYoutube from './EmbedYoutube';
 import EmbedTwitch from './EmbedTwitch';
 
 var VideoCell = React.createClass({
   propTypes: {
-    location: PropTypes.number.isRequired
+    webcasts: PropTypes.array.isRequired,
+    webcastsById: PropTypes.object.isRequired,
+    location: PropTypes.number.isRequired,
+    removeWebcast: PropTypes.func.isRequired,
+    addWebcastAtLocation: PropTypes.func.isRequired
   },
   getInitialState: function() {
     return {
       showOverlay: false,
+      showWebcastSelectionPanel: false
     };
   },
-  onMouseOver: function(event) {
+  onMouseOver: function() {
     this.setState({"showOverlay": true})
   },
-  onMouseOut: function(event) {
+  onMouseOut: function() {
     this.setState({"showOverlay": false})
+  },
+  showWebcastSelectionPanel: function() {
+    this.setState({"showWebcastSelectionPanel": true})
+  },
+  hideWebcastSelectionPanel: function() {
+    this.setState({"showWebcastSelectionPanel": false})
+  },
+  webcastSelected: function(webcastId) {
+    this.props.addWebcastAtLocation(webcastId, this.props.location)
+    hideWebcastSelectionPanel()
   },
   render: function() {
     var classes = 'video-cell video-' + this.props.location;
@@ -52,12 +68,19 @@ var VideoCell = React.createClass({
         <div className={classes}
           idName={this.props.webcast.id}
           onMouseOver={this.onMouseOver}
-          onMouseOut={this.onMouseOut}>
+          onMouseOut={this.onMouseOut} >
           {cellEmbed}
           <VideoCellOverlay
             webcast={this.props.webcast}
             enabled={this.state.showOverlay}
-            removeWebcast={this.props.removeWebcast} />
+            removeWebcast={this.props.removeWebcast}
+            showWebcastSelectionPanel={this.showWebcastSelectionPanel} />
+          <WebcastSelectionPanel
+            webcasts={this.props.webcasts}
+            webcastsById={this.props.webcastsById}
+            enabled={this.state.showWebcastSelectionPanel}
+            webcastSelected={this.webcastSelected}
+            closeWebcastSelectionPanel={this.hideWebcastSelectionPanel} />
         </div>
       )
     } else {
