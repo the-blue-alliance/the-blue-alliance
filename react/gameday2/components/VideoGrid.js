@@ -13,6 +13,7 @@ var classNames = require('classnames');
  */
 var VideoGrid = React.createClass({
   propTypes: {
+    displayedWebcasts: PropTypes.array.isRequired,
     layout: PropTypes.number.isRequired
   },
   renderEmptyLayout: function(classes) {
@@ -31,7 +32,9 @@ var VideoGrid = React.createClass({
     var videoCells = [];
     for (var i = 0; i < webcastCount; i++) {
       var webcast = null, id = 'video-' + i;
-      if (i < this.props.displayedWebcasts.length) {
+      // Some entries in the dispalyed webcasts array may be null, for instance
+      // if the user doesn't select webcasts for some views in a layout
+      if (i < this.props.displayedWebcasts.length && this.props.displayedWebcasts[i]) {
         webcast = this.props.webcastsById[this.props.displayedWebcasts[i]];
         id = webcast.id;
       }
@@ -58,46 +61,12 @@ var VideoGrid = React.createClass({
       'leave-left-margin': this.props.hashtagPanelVisible,
       'leave-right-margin': this.props.chatPanelVisible,
     });
-    var layout;
+    
     let selectedLayout = this.props.layout
-    var numViews = getNumViewsForLayout(selectedLayout)
+    let numViews = getNumViewsForLayout(selectedLayout)
 
     return this.renderLayout(numViews, selectedLayout, classes)
-
-    switch (this.props.displayedWebcasts.length) {
-      case 0:
-      layout = this.renderEmptyLayout(classes);
-      break;
-      case 1:
-      layout = this.renderLayout(1, 0, classes);
-      break;
-      case 2:
-      layout = this.renderLayout(2, 1, classes);
-      break;
-      case 3:
-      layout = this.renderLayout(3, 2, classes);
-      break;
-      case 4:
-      layout = this.renderLayout(4, 3, classes);
-      break;
-      case 5:
-      layout = this.renderLayout(5, 5, classes);
-      break;
-      case 6:
-      layout = this.renderLayout(6, 6, classes);
-      break;
-      case 7:
-      layout = this.renderLayout(7, 7, classes);
-      break;
-      case 8:
-      layout = this.renderLayout(8, 7, classes);
-      break;
-      case 9:
-      layout = this.renderLayout(9, 8, classes);
-      break;
-    }
-    return layout;
-  },
+  }
 });
 
 export default VideoGrid;

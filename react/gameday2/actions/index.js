@@ -2,6 +2,7 @@ export const SET_WEBCASTS_RAW = 'SET_WEBCASTS_RAW'
 export const TOGGLE_CHAT_PANEL_VISIBILITY = 'TOGGLE_CHAT_PANEL_VISIBILITY'
 export const TOGGLE_HASHTAG_PANEL_VISIBILITY = 'TOGGLE_HASHTAG_PANEL_VISIBILITY'
 export const ADD_WEBCAST = 'ADD_WEBCAST'
+export const ADD_WEBCAST_AT_LOCATION = 'ADD_WEBCAST_AT_LOCATION'
 export const REMOVE_WEBCAST = 'REMOVE_WEBCAST'
 export const RESET_WEBCASTS = 'RESET_WEBCASTS'
 export const SET_LAYOUT = 'SET_LAYOUT'
@@ -33,6 +34,14 @@ export function addWebcast(id) {
   return {
     type: ADD_WEBCAST,
     id
+  }
+}
+
+export function addWebcastAtLocation(webcastId, location) {
+  return {
+    type: ADD_WEBCAST_AT_LOCATION,
+    webcastId,
+    location
   }
 }
 
