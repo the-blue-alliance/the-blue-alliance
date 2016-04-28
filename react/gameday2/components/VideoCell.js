@@ -85,9 +85,15 @@ var VideoCell = React.createClass({
       )
     } else {
       return <div className={classes} >
-        <div className="jumbotron">
-          <p>Webcast selection will go here eventually.</p>
+        <div className="empty-view">
+          <button type="button" className="btn btn-secondary" onClick={this.showWebcastSelectionPanel}>Select a webcast</button>
         </div>
+        <WebcastSelectionPanel
+          webcasts={this.props.webcasts}
+          webcastsById={this.props.webcastsById}
+          enabled={this.state.showWebcastSelectionPanel}
+          webcastSelected={this.webcastSelected}
+          closeWebcastSelectionPanel={this.hideWebcastSelectionPanel} />
       </div>
     }
   }
