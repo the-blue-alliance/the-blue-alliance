@@ -1,5 +1,5 @@
 import * as types from '../constants/ActionTypes'
-import { MAX_SUPPORTED_VIEWS } from '../utils/layoutUtils'
+import { MAX_SUPPORTED_VIEWS } from '../constants/LayoutConstants'
 
 const addWebcastAtLocation = (displayedWebcasts, webcastId, location, maxSupportedViews) => {
   // Don't add the webcast if we couldn't possibly have a view to display it with
@@ -23,7 +23,7 @@ const addWebcastAtLocation = (displayedWebcasts, webcastId, location, maxSupport
  */
 const addWebcastAtNextAvailableLocation = (displayedWebcasts, webcastId, maxSupportedViews) => {
   for (let i = 0; i < displayedWebcasts.length; i++) {
-    if (!displayedWebcasts[i]) {
+    if (displayedWebcasts[i] == undefined) {
       displayedWebcasts[i] = webcastId
       return
     }
