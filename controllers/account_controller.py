@@ -345,7 +345,6 @@ class myTBAAddHotMatchesController(LoggedInHandler):
             if not match.has_been_played:
                 match_key = match.key.id()
                 if match.key.id() in subscribed_matches:
-                    print match.key.id()
                     sub = Subscription(
                         parent=ndb.Key(Account, current_user_id),
                         user_id=current_user_id,
