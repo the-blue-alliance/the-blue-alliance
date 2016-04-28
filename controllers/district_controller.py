@@ -23,11 +23,11 @@ from models.team import Team
 
 class DistrictDetail(CacheableHandler):
     CACHE_KEY_FORMAT = "district_detail_{}_{}_{}"  # (district_abbrev, year, explicit_year)
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
 
     def __init__(self, *args, **kw):
         super(DistrictDetail, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24
+        self._cache_expiration = 60 * 15
 
     def get(self, district_abbrev, year=None, explicit_year=False):
         if year == '':
