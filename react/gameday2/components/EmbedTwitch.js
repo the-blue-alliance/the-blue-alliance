@@ -6,7 +6,7 @@ var EmbedTwitch = React.createClass({
   },
   render: function() {
     var channel = this.props.webcast.channel
-    let iframeSrc = `https://player.twitch.tv/?channel=${channel}&html5`
+    let iframeSrc = `https://player.twitch.tv/?channel=${channel}`
     return (
       <iframe src={iframeSrc} frameborder="0" scrolling="no" height="100%" width="100%"></iframe>
     )
