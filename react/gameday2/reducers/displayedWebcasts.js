@@ -1,4 +1,4 @@
-import { ADD_WEBCAST, ADD_WEBCAST_AT_LOCATION, REMOVE_WEBCAST, RESET_WEBCASTS } from '../actions'
+import * as types from '../constants/ActionTypes'
 import { MAX_SUPPORTED_VIEWS } from '../utils/layoutUtils'
 
 const addWebcastAtLocation = (displayedWebcasts, webcastId, location, maxSupportedViews) => {
@@ -54,19 +54,19 @@ const removeWebcast = (displayedWebcasts, webcastId) => {
 const displayedWebcasts = (state = [], action) => {
   let webcasts = null;
   switch (action.type) {
-    case ADD_WEBCAST:
+    case types.ADD_WEBCAST:
       webcasts = state.slice(0)
       addWebcastAtNextAvailableLocation(webcasts, action.id, MAX_SUPPORTED_VIEWS)
       return webcasts
-    case ADD_WEBCAST_AT_LOCATION:
+    case types.ADD_WEBCAST_AT_LOCATION:
       webcasts = state.slice(0)
       addWebcastAtLocation(webcasts, action.webcastId, action.location, MAX_SUPPORTED_VIEWS)
       return webcasts
-    case REMOVE_WEBCAST:
+    case types.REMOVE_WEBCAST:
       webcasts = state.slice(0)
       removeWebcast(webcasts, action.id)
       return webcasts
-    case RESET_WEBCASTS:
+    case types.RESET_WEBCASTS:
       return []
     default:
       return state

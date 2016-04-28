@@ -1,8 +1,8 @@
 jest.unmock('../chatPanelVisible')
-jest.unmock('../../actions')
+jest.unmock('../../constants/ActionTypes')
 
 import chatPanelVisible from '../chatPanelVisible'
-import { TOGGLE_CHAT_PANEL_VISIBILITY } from '../../actions'
+import { TOGGLE_CHAT_PANEL_VISIBILITY } from '../../constants/ActionTypes'
 
 describe('chatPanelVisible reducer', () => {
   it('defaults to false', () => {

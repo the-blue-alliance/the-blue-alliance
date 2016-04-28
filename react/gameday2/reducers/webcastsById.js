@@ -1,4 +1,4 @@
-import { SET_WEBCASTS_RAW } from '../actions'
+import { SET_WEBCASTS_RAW } from '../constants/ActionTypes'
 import { getWebcastId } from '../utils/webcastUtils'
 
 const getWebcastsFromRawWebcasts = (webcasts) => {

@@ -1,4 +1,4 @@
-import { SET_LAYOUT } from '../actions'
+import { SET_LAYOUT } from '../constants/ActionTypes'
 
 const defaultState = {
   layoutId: 0,

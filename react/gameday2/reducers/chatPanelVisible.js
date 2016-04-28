@@ -1,4 +1,4 @@
-import { TOGGLE_CHAT_PANEL_VISIBILITY } from '../actions'
+import { TOGGLE_CHAT_PANEL_VISIBILITY } from '../constants/ActionTypes'
 
 const chatPanelVisibility = (state = false, action) => {
   switch(action.type) {

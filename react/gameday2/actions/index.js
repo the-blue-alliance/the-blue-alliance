@@ -1,11 +1,4 @@
-export const SET_WEBCASTS_RAW = 'SET_WEBCASTS_RAW'
-export const TOGGLE_CHAT_PANEL_VISIBILITY = 'TOGGLE_CHAT_PANEL_VISIBILITY'
-export const TOGGLE_HASHTAG_PANEL_VISIBILITY = 'TOGGLE_HASHTAG_PANEL_VISIBILITY'
-export const ADD_WEBCAST = 'ADD_WEBCAST'
-export const ADD_WEBCAST_AT_LOCATION = 'ADD_WEBCAST_AT_LOCATION'
-export const REMOVE_WEBCAST = 'REMOVE_WEBCAST'
-export const RESET_WEBCASTS = 'RESET_WEBCASTS'
-export const SET_LAYOUT = 'SET_LAYOUT'
+import * as types from '../constants/ActionTypes'
 
 /**
  * Takes the JSON object from the server and produces a list of normalized
@@ -13,33 +6,33 @@ export const SET_LAYOUT = 'SET_LAYOUT'
  */
 export function setWebcastsRaw(webcasts) {
   return {
-    type: SET_WEBCASTS_RAW,
+    type: types.SET_WEBCASTS_RAW,
     webcasts
   }
 }
 
 export function toggleChatPanelVisibility() {
   return {
-    type: TOGGLE_CHAT_PANEL_VISIBILITY
+    type: types.TOGGLE_CHAT_PANEL_VISIBILITY
   }
 }
 
 export function toggleHashtagPanelVisibility() {
   return {
-    type: TOGGLE_HASHTAG_PANEL_VISIBILITY
+    type: types.TOGGLE_HASHTAG_PANEL_VISIBILITY
   }
 }
 
 export function addWebcast(id) {
   return {
-    type: ADD_WEBCAST,
+    type: types.ADD_WEBCAST,
     id
   }
 }
 
 export function addWebcastAtLocation(webcastId, location) {
   return {
-    type: ADD_WEBCAST_AT_LOCATION,
+    type: types.ADD_WEBCAST_AT_LOCATION,
     webcastId,
     location
   }
@@ -47,20 +40,20 @@ export function addWebcastAtLocation(webcastId, location) {
 
 export function removeWebcast(id) {
   return {
-    type: REMOVE_WEBCAST,
+    type: types.REMOVE_WEBCAST,
     id
   }
 }
 
 export function resetWebcasts() {
   return {
-    type: RESET_WEBCASTS
+    type: types.RESET_WEBCASTS
   }
 }
 
 export function setLayout(layoutId) {
   return {
-    type: SET_LAYOUT,
+    type: types.SET_LAYOUT,
     layoutId
   }
 }

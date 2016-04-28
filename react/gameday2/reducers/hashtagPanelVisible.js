@@ -1,4 +1,4 @@
-import { TOGGLE_HASHTAG_PANEL_VISIBILITY } from '../actions'
+import { TOGGLE_HASHTAG_PANEL_VISIBILITY } from '../constants/ActionTypes'
 
 const hashtagPanelVisibility = (state = false, action) => {
   switch(action.type) {
