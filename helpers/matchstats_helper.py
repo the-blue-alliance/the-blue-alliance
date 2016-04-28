@@ -42,11 +42,13 @@ class MatchstatsHelper(object):
         return team_list, team_id_map
 
     @classmethod
-    def build_Minv_matrix(cls, matches, team_id_map):
+    def build_Minv_matrix(cls, matches, team_id_map, played_only=False):
         n = len(team_id_map.keys())
         M = np.zeros([n, n])
         for match in matches:
             if match.comp_level != 'qm':  # only consider quals matches
+                continue
+            if played_only and not match.has_been_played:
                 continue
             for alliance_color in ['red', 'blue']:
                 alliance_teams = match.alliances[alliance_color]['teams']
@@ -141,7 +143,7 @@ class MatchstatsHelper(object):
         team_list, team_id_map = cls.build_team_mapping(matches)
         last_event_stats = cls.get_last_event_stats(team_list, matches[0].event)
 
-        Minv = cls.build_Minv_matrix(matches, team_id_map)
+        Minv = cls.build_Minv_matrix(matches, team_id_map, played_only=True)
 
         oprs_dict = cls.calc_stat(matches, team_list, team_id_map, Minv, 'oprs')
         dprs_dict = cls.calc_stat(matches, team_list, team_id_map, Minv, 'dprs')
