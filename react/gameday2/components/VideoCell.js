@@ -58,7 +58,11 @@ var VideoCell = React.createClass({
         </div>
       )
     } else {
-      return <div className={classes} />
+      return <div className={classes} >
+        <div className="jumbotron">
+          <p>Webcast selection will go here eventually.</p>
+        </div>
+      </div>
     }
   }
 });
