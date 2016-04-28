@@ -25,7 +25,7 @@ var VideoGrid = React.createClass({
       <div className={classes}>
         <div className="jumbotron">
           <h2>GameDay &mdash; Watch FIRST Webcasts</h2>
-          <p>To get started, pick some webcasts from the top menu.</p>
+          <p>To get started, pick a layout from the top menu.</p>
         </div>
       </div>
     );
