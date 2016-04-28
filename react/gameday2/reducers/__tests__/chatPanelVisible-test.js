@@ -10,12 +10,10 @@ describe('chatPanelVisible reducer', () => {
   })
 
   it('toggles from false to true', () => {
-    console.log(TOGGLE_CHAT_PANEL_VISIBILITY)
     let initialState = false
     let action = {
       type: TOGGLE_CHAT_PANEL_VISIBILITY
     }
-    console.log(chatPanelVisible)
     expect(chatPanelVisible(initialState, action)).toBe(true)
   })
 
