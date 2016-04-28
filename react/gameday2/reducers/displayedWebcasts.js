@@ -56,7 +56,7 @@ const displayedWebcasts = (state = [], action) => {
   switch (action.type) {
     case types.ADD_WEBCAST:
       webcasts = state.slice(0)
-      addWebcastAtNextAvailableLocation(webcasts, action.id, MAX_SUPPORTED_VIEWS)
+      addWebcastAtNextAvailableLocation(webcasts, action.webcastId, MAX_SUPPORTED_VIEWS)
       return webcasts
     case types.ADD_WEBCAST_AT_LOCATION:
       webcasts = state.slice(0)
@@ -64,7 +64,7 @@ const displayedWebcasts = (state = [], action) => {
       return webcasts
     case types.REMOVE_WEBCAST:
       webcasts = state.slice(0)
-      removeWebcast(webcasts, action.id)
+      removeWebcast(webcasts, action.webcastId)
       return webcasts
     case types.RESET_WEBCASTS:
       return []

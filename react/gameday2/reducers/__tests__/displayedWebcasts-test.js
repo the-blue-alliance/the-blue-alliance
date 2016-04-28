@@ -24,7 +24,7 @@ describe('displayedWebcasts reducer', () => {
   it('adds a webcast to the beginning of an empty list', () => {
     let action = {
       type: types.ADD_WEBCAST,
-      id: 'a'
+      webcastId: 'a'
     }
     expect(displayedWebcasts(undefined, action)).toEqual(['a'])
   })
@@ -32,7 +32,7 @@ describe('displayedWebcasts reducer', () => {
   it('adds a webcast at the first available space', () => {
     let action = {
       type: types.ADD_WEBCAST,
-      id: 'b'
+      webcastId: 'b'
     }
     let initialState = ['a', null, 'c']
     expect(displayedWebcasts(initialState, action)).toEqual(['a', 'b', 'c'])
@@ -41,7 +41,7 @@ describe('displayedWebcasts reducer', () => {
   it('adds a webcast to the end of the list if space is available', () => {
     let action = {
       type: types.ADD_WEBCAST,
-      id: 'd'
+      webcastId: 'd'
     }
     let initialState = ['a', 'b', 'c']
     expect(displayedWebcasts(initialState, action)).toEqual(['a', 'b', 'c', 'd'])
@@ -55,7 +55,7 @@ describe('displayedWebcasts reducer', () => {
 
     let action = {
       type: types.ADD_WEBCAST,
-      id: 'a'
+      webcastId: 'a'
     }
 
     expect(displayedWebcasts(initialState, action)).toEqual(initialState)
@@ -65,7 +65,7 @@ describe('displayedWebcasts reducer', () => {
     let initialState = ['a', 'b', 'c', 'd']
     let action = {
       type: types.REMOVE_WEBCAST,
-      id: 'c'
+      webcastId: 'c'
     }
     expect(displayedWebcasts(initialState, action)).toEqual(['a', 'b', null, 'd'])
   })

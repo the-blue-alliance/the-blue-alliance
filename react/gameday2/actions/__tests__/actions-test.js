@@ -31,7 +31,7 @@ describe('actions', () => {
     let webcastId = 'a'
     let expectedAction = {
       type: types.ADD_WEBCAST,
-      id: webcastId
+      webcastId
     }
     expect(actions.addWebcast(webcastId)).toEqual(expectedAction)
   })
@@ -51,7 +51,7 @@ describe('actions', () => {
     let webcastId = 'a'
     let expectedAction = {
       type: types.REMOVE_WEBCAST,
-      id: webcastId
+      webcastId
     }
     expect(actions.removeWebcast(webcastId)).toEqual(expectedAction)
   })

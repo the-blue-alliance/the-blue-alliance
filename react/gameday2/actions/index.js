@@ -23,10 +23,10 @@ export function toggleHashtagPanelVisibility() {
   }
 }
 
-export function addWebcast(id) {
+export function addWebcast(webcastId) {
   return {
     type: types.ADD_WEBCAST,
-    id
+    webcastId
   }
 }
 
@@ -38,10 +38,10 @@ export function addWebcastAtLocation(webcastId, location) {
   }
 }
 
-export function removeWebcast(id) {
+export function removeWebcast(webcastId) {
   return {
     type: types.REMOVE_WEBCAST,
-    id
+    webcastId
   }
 }
 
