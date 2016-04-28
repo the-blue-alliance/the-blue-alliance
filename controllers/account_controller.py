@@ -270,6 +270,96 @@ class MyTBAController(LoggedInHandler):
         self.response.out.write(jinja2_engine.render('mytba.html', self.template_values))
 
 
+class myTBAAddHotMatchesController(LoggedInHandler):
+    def get(self, event_key=None):
+        self._require_login()
+        self._require_registration()
+
+        if event_key is None:
+            events = EventHelper.getEventsWithinADay()
+            EventHelper.sort_events(events)
+            self.template_values['events'] = events
+            self.response.out.write(jinja2_engine.render('mytba_add_hot_matches_base.html', self.template_values))
+            return
+
+        event = Event.get_by_id(event_key)
+        if not event:
+            self.abort(404)
+
+        subscriptions_future = Subscription.query(
+            Subscription.model_type==ModelType.MATCH,
+            Subscription.notification_types==NotificationType.UPCOMING_MATCH,
+            ancestor=self.user_bundle.account.key).fetch_async(projection=[Subscription.model_key])
+
+        matches = []
+        if event.matchstats and 'match_predictions' in event.matchstats:
+            match_predictions = event.matchstats['match_predictions']
+            max_hotness = 0
+            min_hotness = float('inf')
+            for match in event.matches:
+                if not match.has_been_played and match.key.id() in match_predictions:
+                    prediction = match_predictions[match.key.id()]
+                    red_score = prediction['red']['score']
+                    blue_score = prediction['blue']['score']
+                    if red_score > blue_score:
+                        winner_score = red_score
+                        loser_score = blue_score
+                    else:
+                        winner_score = blue_score
+                        loser_score = red_score
+
+                    hotness = winner_score + 2.0*loser_score  # Favor close high scoring matches
+
+                    max_hotness = max(max_hotness, hotness)
+                    min_hotness = min(min_hotness, hotness)
+                    match.hotness = hotness
+                    matches.append(match)
+
+        existing_subscriptions = set()
+        for sub in subscriptions_future.get_result():
+            existing_subscriptions.add(sub.model_key)
+
+        hot_matches = []
+        for match in matches:
+            match.hotness = 100 * (match.hotness - min_hotness) / (max_hotness - min_hotness)
+            match.already_subscribed = match.key.id() in existing_subscriptions
+            hot_matches.append(match)
+        hot_matches = sorted(hot_matches, key=lambda match: -match.hotness)
+        matches_dict = {'qm': hot_matches[:25]}
+
+        self.template_values['event'] = event
+        self.template_values['matches'] = matches_dict
+
+        self.response.out.write(jinja2_engine.render('mytba_add_hot_matches.html', self.template_values))
+
+    def post(self, event_key):
+        self._require_login()
+        self._require_registration()
+
+        current_user_id = self.user_bundle.account.key.id()
+
+        event = Event.get_by_id(event_key)
+        subscribed_matches = set(self.request.get_all('subscribed_matches'))
+
+        for match in event.matches:
+            if not match.has_been_played:
+                match_key = match.key.id()
+                if match.key.id() in subscribed_matches:
+                    print match.key.id()
+                    sub = Subscription(
+                        parent=ndb.Key(Account, current_user_id),
+                        user_id=current_user_id,
+                        model_type=ModelType.MATCH,
+                        model_key=match_key,
+                        notification_types=[NotificationType.UPCOMING_MATCH]
+                    )
+                    MyTBAHelper.add_subscription(sub)
+                else:
+                    MyTBAHelper.remove_subscription(current_user_id, match_key, ModelType.MATCH)
+
+        self.redirect('/account/mytba?status=match_updated#my-matches'.format(event_key))
+
+
 class MyTBAEventController(LoggedInHandler):
     def get(self, event_key):
         self._require_login()
