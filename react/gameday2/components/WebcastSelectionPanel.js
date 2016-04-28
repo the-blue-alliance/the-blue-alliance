@@ -7,13 +7,16 @@ var WebcastSelectionPanel = React.createClass({
     enabled: PropTypes.bool.isRequired,
     webcasts: PropTypes.array.isRequired,
     webcastsById: PropTypes.object.isRequired,
+    displayedWebcasts: PropTypes.array.isRequired,
     webcastSelected: PropTypes.func.isRequired,
     closeWebcastSelectionPanel: PropTypes.func.isRequired
   },
   render: function() {
     // Construct list of webcasts
     let webcastItems = []
-    for (let webcastId of this.props.webcasts) {
+    // Don't let the user choose a webcast that is already displayed elsewhere
+    let availableWebcasts = this.props.webcasts.filter((webcastId) => this.props.displayedWebcasts.indexOf(webcastId) == -1)
+    for (let webcastId of availableWebcasts) {
       let webcast = this.props.webcastsById[webcastId]
       webcastItems.push(
         <WebcastSelectionPanelItem

@@ -9,6 +9,7 @@ var VideoCell = React.createClass({
   propTypes: {
     webcasts: PropTypes.array.isRequired,
     webcastsById: PropTypes.object.isRequired,
+    displayedWebcasts: PropTypes.array.isRequired,
     location: PropTypes.number.isRequired,
     removeWebcast: PropTypes.func.isRequired,
     addWebcastAtLocation: PropTypes.func.isRequired
@@ -33,7 +34,7 @@ var VideoCell = React.createClass({
   },
   webcastSelected: function(webcastId) {
     this.props.addWebcastAtLocation(webcastId, this.props.location)
-    hideWebcastSelectionPanel()
+    this.hideWebcastSelectionPanel()
   },
   render: function() {
     var classes = 'video-cell video-' + this.props.location;
@@ -78,6 +79,7 @@ var VideoCell = React.createClass({
           <WebcastSelectionPanel
             webcasts={this.props.webcasts}
             webcastsById={this.props.webcastsById}
+            displayedWebcasts={this.props.displayedWebcasts}
             enabled={this.state.showWebcastSelectionPanel}
             webcastSelected={this.webcastSelected}
             closeWebcastSelectionPanel={this.hideWebcastSelectionPanel} />
@@ -91,6 +93,7 @@ var VideoCell = React.createClass({
         <WebcastSelectionPanel
           webcasts={this.props.webcasts}
           webcastsById={this.props.webcastsById}
+          displayedWebcasts={this.props.displayedWebcasts}
           enabled={this.state.showWebcastSelectionPanel}
           webcastSelected={this.webcastSelected}
           closeWebcastSelectionPanel={this.hideWebcastSelectionPanel} />
