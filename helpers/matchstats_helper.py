@@ -141,6 +141,8 @@ class MatchstatsHelper(object):
             return {}
 
         team_list, team_id_map = cls.build_team_mapping(matches)
+        if not team_list:
+            return {}
         last_event_stats = cls.get_last_event_stats(team_list, matches[0].event)
 
         Minv = cls.build_Minv_matrix(matches, team_id_map, played_only=True)
