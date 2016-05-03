@@ -101,6 +101,20 @@
       <p>All API responses have a <code>Last-Updated</code> header, which indicates the date and time at which the data at a particular endpoint was last updated. When making repeated calls to a particular endpoint, you should set the <code>If-Modified-Since</code> header in your request to the value of <code>Last-Updated</code> from the previous call to that endpoint. On the first call, <code>If-Modified-Since</code> does not need to be set.</p>
       <p>Consumers of the TBA API are highly encouraged to make use of these headers. If the server determines that no data has been updated, it returns a <code>304 Not Modified</code> response with an empty body, saving both the server and the consumer time and bandwidth.</p>
 
+      <h3>Checking the Datafeed Status</h3>
+
+      <p>At times, it may be useful to know the status of the datafeeds from
+        which the API is updated. This may be done by sending an API request
+        to <code>www.thebluealliance.com/api/v2/status</code>. If a specific
+        event is no longer updating, it is included inside the array
+        <code>down_events</code>; if the entire FMSAPI is down,
+        <code>is_datafeed_down</code> is set to true.</p>
+
+      <!--<p>Sometimes things break and it becomes useful to know the
+        status of the services used to populate data on The Blue Alliance.
+        Such requests can be handed by <code>www.thebluealliance.com/api/v2/status</code>,
+        which returns some information which may become useful from time to time.</p>-->
+
       <h3>Webhooks</h3>
       <p>The TBA API also includes support for webhooks. We can push notifications for things you've subscribed to your sever. This can save both your client and our server time and processing power, as it can reduce the need to poll the API. See <a href="/apidocs/webhooks">this page</a> for more documentation on webhooks.
 
