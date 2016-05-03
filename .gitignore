@@ -73,3 +73,7 @@ version_info.json
 node_modules
 .npm
 .node_repl_history
+
+# Jest Coverage reports #
+#########################
+coverage
