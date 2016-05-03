@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import VideoCell from './VideoCell';
+import LayoutSelectionPanel from './LayoutSelectionPanel'
 import { getNumViewsForLayout } from '../utils/layoutUtils'
 var classNames = require('classnames');
 
@@ -18,17 +19,13 @@ var VideoGrid = React.createClass({
     webcastsById: PropTypes.object.isRequired,
     layoutId: PropTypes.number.isRequired,
     layoutSet: PropTypes.bool.isRequired,
-    addWebcastAtLocation: PropTypes.func.isRequired
+    addWebcastAtLocation: PropTypes.func.isRequired,
+    setLayout: PropTypes.func.isRequired
   },
   renderEmptyLayout: function(classes) {
     return (
-      <div className={classes}>
-        <div className="jumbotron">
-          <h2>GameDay &mdash; Watch FIRST Webcasts</h2>
-          <p>To get started, pick a layout from the top menu.</p>
-        </div>
-      </div>
-    );
+      <LayoutSelectionPanel setLayout={this.props.setLayout}/>
+    )
   },
   renderLayout: function(webcastCount, layoutNumber, classes) {
     classes += (' layout-' + layoutNumber);
