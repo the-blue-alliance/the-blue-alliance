@@ -1,9 +1,11 @@
 import json
+import numpy as np
 import re
 
 from google.appengine.ext import ndb
 
 from helpers.tbavideo_helper import TBAVideoHelper
+from helpers.youtube_video_helper import YouTubeVideoHelper
 from models.event import Event
 from models.team import Team
 
@@ -210,15 +212,13 @@ class Match(ndb.Model):
         if self._youtube_videos is None:
             self._youtube_videos = []
             for video in self.youtube_videos:
-                if '#t=' in video:  # Old style-timetamp, convert it!
+                if '?t=' in video:  # Treat ?t= the same as #t=
+                    video = video.replace('?t=', '#t=')
+                if '#t=' in video:
                     sp = video.split('#t=')
                     video_id = sp[0]
                     old_ts = sp[1]
-                    match = re.match('((?P<hour>\d*?)h)?((?P<min>\d*?)m)?((?P<sec>\d*)s?)?', old_ts).groupdict()
-                    hours = match['hour'] or 0
-                    minutes = match['min'] or 0
-                    seconds = match['sec'] or 0
-                    total_seconds = (int(hours) * 3600) + (int(minutes) * 60) + int(seconds)
+                    total_seconds = YouTubeVideoHelper.time_to_seconds(old_ts)
                     video = '%s?start=%i' % (video_id, total_seconds)
                 self._youtube_videos.append(video)
         return self._youtube_videos
@@ -227,6 +227,7 @@ class Match(ndb.Model):
     def videos(self):
         videos = []
         for v in self.youtube_videos_formatted:
+            v = v.replace('?start=', '?t=')  # links must use ?t=
             videos.append({"type": "youtube", "key": v})
         if self.tba_video is not None:
             tba_path = self.tba_video.streamable_path

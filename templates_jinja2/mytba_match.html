@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}myTBA Match {{match.key.id()}} - The Blue Alliance{% endblock %}
+
+{% block meta_description %}Manage your favorites and subscriptions{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2">
+      <ol class="breadcrumb">
+        <li><a href="/account">Account Overview</a></li>
+        <li><a href="/account/mytba#my-matches">Manage myTBA</a></li>
+        <li class="active">Match {{match.key.id()}}</li>
+      </ol>
+
+      <h1>myTBA Match: {{match.key.id()}}</h1>
+      <p>
+        Favorite this team for personalized content and quick access to it later.<br>
+        Subscribe to this team for push notifications in our
+        <a href="https://play.google.com/store/apps/details?id=com.thebluealliance.androidclient" target="_blank">Android app</a>.
+      </p>
+
+      <form method="post">
+        <input name="action" type="hidden" value="subscription_year_add" />
+        <input name="account_id" type="hidden" value="{{user_bundle.account.key.id()}}" />
+        <table class="table">
+          <tr>
+            <td>Favorite:</td>
+            <td>
+              <ul style="list-style-type: none;">
+                <li><input type="checkbox" name="favorite"{% if is_favorite %} checked{% endif %}/></li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td>Subscriptions:</td>
+            <td>
+              <ul style="list-style-type: none;">
+                {% for notif_type_enum, name in enabled_notifications %}
+                  <li><input type="checkbox" name="notification_types" value="{{notif_type_enum}}"{% if notif_type_enum in subscription.notification_types %} checked{% endif %}/> {{ name }}</li>
+                {% endfor %}
+              </ul>
+            </td>
+          </tr>
+        </table>
+        <td><button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Save</button></td>
+        <a href="/account/mytba#my-matches" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-down"></span> Cancel</a>
+      </form>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

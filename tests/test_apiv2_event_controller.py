@@ -49,6 +49,7 @@ class TestEventApiController(unittest2.TestCase):
                 location='Clemson, SC',
                 venue="Long Beach Arena",
                 venue_address="Long Beach Arena\r\n300 East Ocean Blvd\r\nLong Beach, CA 90802\r\nUSA",
+                timezone_id="America/New_York",
                 start_date=datetime(2010, 03, 24),
                 webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
                 alliance_selections_json="[ {\"declines\": [], \"picks\": [\"frc971\", \"frc254\", \"frc1662\"]},"+
@@ -83,6 +84,7 @@ class TestEventApiController(unittest2.TestCase):
         self.assertEqual(event["webcast"], json.loads(self.event.webcast_json))
         self.assertEqual(event["alliances"], json.loads(self.event.alliance_selections_json))
         self.assertEqual(event["website"], self.event.website)
+        self.assertEqual(event["timezone"], self.event.timezone_id)
 
     def testEventApi(self):
         response = self.testapp.get('/2010sc', headers={"X-TBA-App-Id": "tba-tests:event-controller-test:v01"})

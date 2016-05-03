@@ -136,6 +136,7 @@ class MobileAPI(remote.Service):
             return BaseResponse(code=401, message="Unauthorized to update model preferences")
         user_id = PushHelper.user_email_to_id(current_user.email())
         model_key = request.model_key
+        model_type = request.model_type
         output = {}
         code = 0
 
@@ -144,7 +145,7 @@ class MobileAPI(remote.Service):
                 parent=ndb.Key(Account, user_id),
                 user_id=user_id,
                 model_key=model_key,
-                model_type=request.model_type
+                model_type=model_type
             )
             result = MyTBAHelper.add_favorite(fav, request.device_key)
             if result == 200:
@@ -160,7 +161,7 @@ class MobileAPI(remote.Service):
                                       "message": "Unknown error adding favorite"}
                 code += 500
         else:
-            result = MyTBAHelper.remove_favorite(user_id, model_key, request.device_key)
+            result = MyTBAHelper.remove_favorite(user_id, model_key, model_type, request.device_key)
             if result == 200:
                 output['favorite'] = {"code":    200,
                                       "message": "Favorite deleted"}
@@ -196,7 +197,7 @@ class MobileAPI(remote.Service):
                                           "message": "Unknown error adding favorite"}
                 code += 500
         else:
-            result = MyTBAHelper.remove_subscription(user_id, model_key, request.device_key)
+            result = MyTBAHelper.remove_subscription(user_id, model_key, model_type, request.device_key)
             if result == 200:
                 output['subscription'] = {"code":    200,
                                           "message": "Subscription removed"}

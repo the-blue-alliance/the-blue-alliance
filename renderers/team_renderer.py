@@ -2,7 +2,6 @@ import datetime
 import os
 
 from google.appengine.ext import ndb
-from google.appengine.ext.webapp import template
 
 from consts.district_type import DistrictType
 from database import award_query, event_query, match_query, media_query, team_query
@@ -186,5 +185,4 @@ class TeamRenderer(object):
         if short_cache:
             handler._cache_expiration = handler.SHORT_CACHE_EXPIRATION
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/team_history.html')
-        return template.render(path, handler.template_values)
+        return jinja2_engine.render('team_history.html', handler.template_values)

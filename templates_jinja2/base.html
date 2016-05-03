@@ -17,11 +17,20 @@
   <meta property="fb:admins" content="1086840001">
   <meta property="fb:app_id" content="117484816504">
   <meta name="viewport" content="width=device-width, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
-  {% block more_head_tags %}{% endblock %}
+  <meta name="theme-color" content="#000077">
+
+  {% block more_head_tags %}
+    <meta property="og:title" content="The Blue Alliance" />
+    <meta property="og:image" content="http://www.thebluealliance.com/images/logo_square_200.png" />
+    <meta property="og:description" content="Team information, webcasts, results, and more from the FIRST Robotics Competition."/>
+    <meta property="og:site_name" content="The Blue Alliance" />
+  {% endblock %}
 </head>
 <body>
 
 <div id="fb-root"></div>
+
+<div id="fixed-alert-container"></div>
 
 {% block navbar %}
 <div class="navbar navbar-default navbar-fixed-top">
@@ -39,8 +48,9 @@
     <a class="navbar-brand tba-navbar-brand hidden-lg" href="/">TBA</a>
 
     <ul class="nav navbar-nav tba-navbar-nav">
-      <li class="tba-nav-persistent {% block teams_active %}{% endblock %}"><a href="/teams"><span><span class="glyphicon glyphicon-user"></span> Teams</span></a></li>
+      <li class="tba-nav-persistent {% block mytba_active %}{% endblock %}"><a href="/mytba"><span><span class="glyphicon glyphicon-star"></span> MyTBA</span></a></li>
       <li class="tba-nav-persistent {% block events_active %}{% endblock %}"><a href="/events"><span><span class="glyphicon glyphicon-calendar"></span> Events</span></a></li>
+      <li class="tba-nav-persistent hidden-xs {% block teams_active %}{% endblock %}"><a href="/teams"><span><span class="glyphicon glyphicon-user"></span> Teams</span></a></li>
       <li class="tba-nav-persistent hidden-xs {% block insights_active %}{% endblock %}"><a href="/insights"><span><span class="glyphicon glyphicon-align-left"></span> Insights</span></a></li>
       <li class="tba-nav-persistent hidden-xs"><a href="/gameday"><span><span class="glyphicon glyphicon-facetime-video"></span> GameDay</span></a></li>
       <li class="tba-nav-persistent hidden-xs hidden-sm dropdown">
@@ -53,6 +63,7 @@
 
     <div class="navbar-collapse collapse tba-navbar-collapse tba-collapse navbar-responsive-collapse">
       <ul class="nav navbar-nav">
+        <li class="visible-xs {% block teams_active_collapsed %}{% endblock %}"><a href="/teams"><span><span class="glyphicon glyphicon-user"></span> Teams</span></a></li>
         <li class="visible-xs {% block insights_active_collapsed %}{% endblock %}"><a href="/insights"><span><span class="glyphicon glyphicon-align-left"></span> Insights</span></a></li>
         <li class="visible-xs"><a href="/gameday"><span><span class="glyphicon glyphicon-facetime-video"></span> GameDay</span></a></li>
         <li class="visible-xs visible-sm"><a href="/account"><span class="glyphicon glyphicon-cog"></span> Account</a></li>
@@ -99,6 +110,11 @@
 
       <hr>
 
+      {% if render_time %}
+      <div>
+          <p>This page was generated on <time datetime="{{render_time|rfc2822}}+00:00" class="tba-verbose-datetime-utc">{{render_time|strftime("%b. %d, %Y at %I:%M%p")}} UTC</time></p>
+      </div>
+      {% endif %}
       <div>The Blue Alliance is <a href="https://github.com/the-blue-alliance/the-blue-alliance/">open source</a>. Help improve it!</div>
       <div>
         <a href="/about">about</a> -
@@ -119,10 +135,31 @@
 </div>
 {% endblock %}
 
-<a class="scroll-up visible-xs smooth-scroll" href="#"><span class="glyphicon glyphicon-arrow-up"></span></a>
+<!-- Login Modal -->
+<div id="login-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="text-center">Follow your favorite teams with myTBA</h3>
+      </div>
+      <div class="modal-body">
+        <p>myTBA lets you customize your experience when using The Blue Alliance.</p>
+        <p><strong><span class="glyphicon glyphicon-star"></span> Favorites</strong> are used for personalized content and quick access.</p>
+        <p><strong><span class="glyphicon glyphicon-bell"></span> Subscriptions</strong> are used for push notifications (Android only).</p>
+        <hr>
+        <p>Your settings will be accessible both on <a href="/" target="_blank">www.thebluealliance.com</a> and our <a href="https://play.google.com/store/apps/details?id=com.thebluealliance.androidclient" target="_blank">Android app</a>.</p>
+        <p>Sign in with your Google Account to start using myTBA!</p>
+        <br>
+        <button id="mytba-login" type="button" class="btn btn-success btn-lg btn-block" data-dismiss="modal">Yes, I'm in!</button>
+        <button type="button" class="btn btn-danger btn-lg btn-block" data-dismiss="modal">No thanks.</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 {% block main_javascript %}
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.3.1/jquery.cookie.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/js/bootstrap.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.pack.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>

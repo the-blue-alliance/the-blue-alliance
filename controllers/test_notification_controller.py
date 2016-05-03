@@ -54,7 +54,7 @@ class TestNotificationController(LoggedInHandler):
         elif type == NotificationType.DISTRICT_POINTS_UPDATED:
             notification = DistrictPointsUpdatedNotification('2014ne')
         elif type == NotificationType.SCHEDULE_UPDATED:
-            notification = ScheduleUpdatedNotification(event)
+            notification = ScheduleUpdatedNotification(event, match)
         elif type == NotificationType.FINAL_RESULTS:
             # Not implemented yet
             pass

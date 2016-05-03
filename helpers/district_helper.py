@@ -39,13 +39,9 @@ class DistrictHelper(object):
 
     @classmethod
     def calculate_event_points(cls, event):
-        match_key_futures = Match.query(Match.event == event.key).fetch_async(None, keys_only=True)
-        award_key_futures = Award.query(Award.event == event.key).fetch_async(None, keys_only=True)
+        event.get_awards_async()
+        event.get_matches_async()
         district_team_key_futures = DistrictTeam.query(DistrictTeam.district == event.event_district_enum, DistrictTeam.year == event.year).fetch_async(None, keys_only=True)
-
-        match_futures = ndb.get_multi_async(match_key_futures.get_result())
-        award_futures = ndb.get_multi_async(award_key_futures.get_result())
-        district_team_futures = ndb.get_multi_async(district_team_key_futures.get_result())
 
         # Typically 3 for District CMP, 1 otherwise
         POINTS_MULTIPLIER = DistrictPointValues.DISTRICT_CMP_MULTIPLIER.get(event.year, DistrictPointValues.DISTRICT_CMP_MULIPLIER_DEFAULT) if event.event_type_enum == EventType.DISTRICT_CMP else DistrictPointValues.STANDARD_MULTIPLIER
@@ -68,9 +64,9 @@ class DistrictHelper(object):
         # match points
         if event.year >= 2015:
             # Switched to ranking-based points for 2015 and onward
-            cls.calc_rank_based_match_points(event, district_points, match_futures, POINTS_MULTIPLIER)
+            cls.calc_rank_based_match_points(event, district_points, event.matches, POINTS_MULTIPLIER)
         else:
-            cls.calc_wlt_based_match_points(district_points, match_futures, POINTS_MULTIPLIER)
+            cls.calc_wlt_based_match_points(district_points, event.matches, POINTS_MULTIPLIER)
 
         # alliance points
         if event.alliance_selections:
@@ -81,8 +77,7 @@ class DistrictHelper(object):
             logging.warning("Event {} has no alliance selection district_points!".format(event.key.id()))
 
         # award points
-        for award_future in award_futures:
-            award = award_future.get_result()
+        for award in event.awards:
             point_value = 0
             if event.year >= 2014:
                 if award.award_type_enum not in AwardType.NON_JUDGED_NON_TEAM_AWARDS:
@@ -103,7 +98,7 @@ class DistrictHelper(object):
                 district_points['points'][team.id()]['award_points'] += point_value * POINTS_MULTIPLIER
 
         # Filter out teams not in this district (only keep those with a DistrictTeam present for this district)
-        for district_team_future in district_team_futures:
+        for district_team_future in ndb.get_multi_async(district_team_key_futures.get_result()):
             district_team = district_team_future.get_result()
             team_key = district_team.team.id()
             if team_key in district_points['points']:
@@ -246,14 +241,13 @@ class DistrictHelper(object):
                     district_points['points'][team]['elim_points'] += points * POINTS_MULTIPLIER
 
     @classmethod
-    def calc_wlt_based_match_points(cls, district_points, match_futures, POINTS_MULTIPLIER):
+    def calc_wlt_based_match_points(cls, district_points, matches, POINTS_MULTIPLIER):
         """
         Calculates match district points based on team record (wins, losses, ties)
         This algorithm was used prior to the 2015 season
         """
         elim_matches = []
-        for match_future in match_futures:
-            match = match_future.get_result()
+        for match in matches:
             if not match.has_been_played:
                 continue
 
@@ -275,7 +269,7 @@ class DistrictHelper(object):
         cls.calc_elim_match_points(district_points, elim_matches, POINTS_MULTIPLIER)
 
     @classmethod
-    def calc_rank_based_match_points(cls, event, district_points, match_futures, POINTS_MULTIPLIER):
+    def calc_rank_based_match_points(cls, event, district_points, matches, POINTS_MULTIPLIER):
         """
         Calculates match district points based on team ranking
         This algorithm was introduced for the 2015 season and also used for 2016
@@ -298,7 +292,7 @@ class DistrictHelper(object):
         else:
             logging.warning("Event {} has no rankings for qual_points calculations!".format(event.key.id()))
 
-        matches = MatchHelper.organizeMatches([mf.get_result() for mf in match_futures])
+        matches = MatchHelper.organizeMatches(matches)
 
         # qual match calculations. only used for tiebreaking
         for match in matches['qm']:

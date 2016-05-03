@@ -19,8 +19,8 @@ from models.event import Event
 
 class ApiEventController(ApiBaseController):
     CACHE_KEY_FORMAT = "apiv2_event_controller_{}"  # (event_key)
-    CACHE_VERSION = 4
-    CACHE_HEADER_LENGTH = 60 * 60
+    CACHE_VERSION = 5
+    CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
         super(ApiEventController, self).__init__(*args, **kw)
@@ -71,7 +71,7 @@ class ApiEventTeamsController(ApiEventController):
 
 class ApiEventMatchesController(ApiEventController):
     CACHE_KEY_FORMAT = "apiv2_event_matches_controller_{}"  # (event_key)
-    CACHE_VERSION = 2
+    CACHE_VERSION = 3
     CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
@@ -92,7 +92,7 @@ class ApiEventMatchesController(ApiEventController):
 
 class ApiEventStatsController(ApiEventController):
     CACHE_KEY_FORMAT = "apiv2_event_stats_controller_{}"  # (event_key)
-    CACHE_VERSION = 4
+    CACHE_VERSION = 5
     CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
@@ -108,7 +108,9 @@ class ApiEventStatsController(ApiEventController):
         stats = {}
         matchstats = self.event.matchstats
         if matchstats:
-            stats.update(matchstats)
+            for stat in ['oprs', 'dprs', 'ccwms']:
+                if stat in matchstats:
+                    stats[stat] = matchstats[stat]
 
         year_specific = EventInsightsHelper.calculate_event_insights(self.event.matches, self.event.year)
         if year_specific:
@@ -160,7 +162,7 @@ class ApiEventAwardsController(ApiEventController):
 
 class ApiEventDistrictPointsController(ApiEventController):
     CACHE_KEY_FORMAT = "apiv2_event_district_points_controller_{}"  # (event_key)
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):

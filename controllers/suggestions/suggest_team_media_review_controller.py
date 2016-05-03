@@ -1,6 +1,7 @@
 import datetime
 import os
 import json
+import logging
 
 from google.appengine.ext import ndb
 
@@ -19,7 +20,7 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
     def get(self):
         suggestions = Suggestion.query().filter(
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
-            Suggestion.target_model == "media")
+            Suggestion.target_model == "media").fetch(limit=50)
 
         # Quick and dirty way to group images together
         suggestions = sorted(suggestions, key=lambda x: 0 if x.contents['media_type_enum'] in MediaType.image_types else 1)
@@ -132,7 +133,12 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
         accept_keys = []
         reject_keys = []
         for value in self.request.POST.values():
-            key = value.split('::')[1]
+            logging.debug(value)
+            split_value = value.split('::')
+            if len(split_value) == 2:
+                key = split_value[1]
+            else:
+                continue
             if value.startswith('accept'):
                 accept_keys.append(key)
             elif value.startswith('reject'):

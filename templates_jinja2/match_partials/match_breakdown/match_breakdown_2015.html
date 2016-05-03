@@ -1,0 +1,104 @@
+<table class="match-table">
+  <tbody>
+    {% if "robot_set" in match.score_breakdown.red %}
+    <tr>
+      <td class="red">{% if match.score_breakdown.red.robot_set %}4{% else %}0{% endif %}</td>
+      <td>Robot Set</td>
+      <td class="blue">{% if match.score_breakdown.blue.robot_set %}4{% else %}0{% endif %}</td>
+    </tr>
+    {% endif %}
+    {% if "container_set" in match.score_breakdown.red %}
+    <tr>
+      <td class="red">{% if match.score_breakdown.red.container_set %}8{% else %}0{% endif %}</td>
+      <td>Container Set</td>
+      <td class="blue">{% if match.score_breakdown.blue.container_set %}8{% else %}0{% endif %}</td>
+    </tr>
+    {% endif %}
+    {% if "tote_set" in match.score_breakdown.red %}
+    <tr>
+      <td class="red">{% if match.score_breakdown.red.tote_set %}6{% else %}0{% endif %}</td>
+      <td>Tote Set</td>
+      <td class="blue">{% if match.score_breakdown.blue.tote_set %}6{% else %}0{% endif %}</td>
+    </tr>
+    {% endif %}
+    {% if "tote_stack" in match.score_breakdown.red %}
+    <tr>
+      <td class="red">{% if match.score_breakdown.red.tote_stack %}20{% else %}0{% endif %}</td>
+      <td>Tote Stack</td>
+      <td class="blue">{% if match.score_breakdown.blue.tote_stack %}20{% else %}0{% endif %}</td>
+    </tr>
+    {% endif %}
+    {% if "auto_points" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore">{{match.score_breakdown.red.auto_points}}</td>
+      <th>Total Auto</th>
+      <td class="blueScore">{{match.score_breakdown.blue.auto_points}}</td>
+    </tr>
+    {% endif %}
+
+    {% if "tote_points" in match.score_breakdown.red %}
+    <tr>
+      <td class="red">{{match.score_breakdown.red.tote_points}}</td>
+      <td>Tote Points</td>
+      <td class="blue">{{match.score_breakdown.blue.tote_points}}</td>
+    </tr>
+    {% endif %}
+    {% if "container_points" in match.score_breakdown.red %}
+    <tr>
+      <td class="red">{{match.score_breakdown.red.container_points}}</td>
+      <td>Container Points</td>
+      <td class="blue">{{match.score_breakdown.blue.container_points}}</td>
+    </tr>
+    {% endif %}
+    {% if "litter_points" in match.score_breakdown.red %}
+    <tr>
+      <td class="red">{{match.score_breakdown.red.litter_points}}</td>
+      <td>Litter Points</td>
+      <td class="blue">{{match.score_breakdown.blue.litter_points}}</td>
+    </tr>
+    {% endif %}
+
+    {% if "tote_points" in match.score_breakdown.red and "container_points" in match.score_breakdown.red and "litter_points" in match.score_breakdown.red %}
+    <tr class="key">
+      <td class="redScore">{{match.score_breakdown.red.tote_points + match.score_breakdown.red.container_points + match.score_breakdown.red.litter_points}}</td>
+      <th>Total Teleop</th>
+      <td class="blueScore">{{match.score_breakdown.blue.tote_points + match.score_breakdown.blue.container_points + match.score_breakdown.blue.litter_points}}</td>
+    </tr>
+    {% endif %}
+
+    {% if "coopertition_points" in match.score_breakdown %}
+    <tr>
+      <td class="red">{{match.score_breakdown.coopertition_points}}</td>
+      <td>Coopertition</td>
+      <td class="blue">{{match.score_breakdown.coopertition_points}}</td>
+    </tr>
+    {% endif %}
+    {% if "coopertition_points" in match.score_breakdown.red %}
+    <tr>
+      <td class="red">{{match.score_breakdown.red.coopertition_points}}</td>
+      <td>Coopertition</td>
+      <td class="blue">{{match.score_breakdown.blue.coopertition_points}}</td>
+    </tr>
+    {% endif %}
+    {% if "foul_points" in match.score_breakdown.red %}
+    <tr>
+      <td class="red">-{{match.score_breakdown.red.foul_points}}</td>
+      <td>Fouls</td>
+      <td class="blue">-{{match.score_breakdown.blue.foul_points}}</td>
+    </tr>
+    {% endif %}
+    {% if "adjust_points" in match.score_breakdown.red %}
+    <tr>
+      <td class="red">{{match.score_breakdown.red.adjust_points}}</td>
+      <td>Adjustments</td>
+      <td class="blue">{{match.score_breakdown.blue.adjust_points}}</td>
+    </tr>
+    {% endif %}
+
+    <tr class="key">
+      <td class="redScore">{{match.alliances.red.score}}</td>
+      <th>Total Score</th>
+      <td class="blueScore">{{match.alliances.blue.score}}</td>
+    </tr>
+  </tbody>
+</table>

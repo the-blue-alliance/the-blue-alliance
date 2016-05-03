@@ -101,6 +101,7 @@ class CacheClearer(object):
         return cls._get_match_cache_keys_and_controllers(match_keys) + \
             cls._get_matches_cache_keys_and_controllers(event_keys) + \
             cls._get_team_event_matches_cache_keys_and_controllers(team_keys, event_keys) + \
+            cls._get_event_district_points_cache_keys_and_controllers(event_keys) + \
             cls._queries_to_cache_keys_and_controllers(get_affected_queries.match_updated(affected_refs))
 
     @classmethod
@@ -233,6 +234,7 @@ class CacheClearer(object):
         cache_keys_and_controllers = []
         for event_key in filter(None, event_keys):
             cache_keys_and_controllers.append((ApiEventMatchesController.get_cache_key_from_format(event_key.id()), ApiEventMatchesController))
+            cache_keys_and_controllers.append((ApiEventStatsController.get_cache_key_from_format(event_key.id()), ApiEventStatsController))
         return cache_keys_and_controllers
 
     @classmethod

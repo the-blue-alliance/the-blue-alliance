@@ -57,7 +57,7 @@ table.match-table td.blueScore {
   background-color: #ddddff;
 }
 
-table.match-table td.winner {
+table.match-table .winner {
   font-weight: bold;
 }
 
@@ -81,4 +81,70 @@ table.match-table td.lose{
 
 table.match-table td.tie{
   background-color: #d3d3d3;
+}
+
+table.match-table div.match-name-container {
+  position: relative;
+
+  .match-name {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .favorite-match-icon {
+    position: absolute;
+    left: 0px;
+    height: 100%;
+    display: none;
+    margin-top: -2px;
+
+    .favorite-match-icon-spacer {
+      height: 100%;
+      vertical-align: middle;
+      display: inline-block;
+    }
+
+    .glyphicon {
+      color: #ffc107;
+      display: inline-block;
+      vertical-align: middle;
+    }
+  }
+}
+
+table td {
+  position: relative;
+}
+
+table.match-table .favorite-team-dot {
+  display: none;
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  height: 5px;
+  width: 5px;
+
+  circle {
+   fill: #ffc107;
+  }
+}
+
+table.match-table .top-left-dot {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  height: 4px;
+  width: 4px;
+}
+
+table.match-table .top-left-dot-2 {
+  position: absolute;
+  top: 3px;
+  left: 10px;
+  height: 4px;
+  width: 4px;
+}
+
+table.match-table .tooltip-inner{
+  width: 130px;
 }

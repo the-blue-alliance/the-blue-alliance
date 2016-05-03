@@ -70,7 +70,7 @@ $(document).ready(function(){
   weekday[5] = "Fri";
   weekday[6] = "Sat";
 	$('.tba-match-time-utc').each(function () {
-	  var matchTime = new Date($(this).text());  // Converts UTC to local time
+	  var matchTime = new Date($(this).attr('datetime'));  // Converts UTC to local time
 	  if (!isNaN(matchTime)) {
       var hour24 = matchTime.getHours();
       var hour12 = (hour24 % 12);
@@ -99,16 +99,16 @@ $(document).ready(function(){
   month[9] = "Oct";
   month[10] = "Nov";
   month[11] = "Dec";
-  $('.tba-verbose-date-utc').each(function () {  // Like "Mar. 13, 2016 at 7:00 PM"
-    var time = new Date($(this).text());  // Converts UTC to local time
+  $('.tba-verbose-date-utc').each(function () {  // Like "Mar. 13, 2016"
+    var time = new Date($(this).attr('datetime'));  // Converts UTC to local time
     if (!isNaN(time)) {
       $(this).text(month[time.getMonth()] + '. ' + time.getDate() + ', ' + time.getFullYear());
       $(this).css('display', 'inline');
     }
   });
 
-  $('.tba-verbose-time-utc').each(function () {  // Like "Mar. 13, 2016 at 7:00 PM"
-    var time = new Date($(this).text());  // Converts UTC to local time
+  $('.tba-verbose-time-utc').each(function () {  // Like "7:00 PM"
+    var time = new Date($(this).attr('datetime'));  // Converts UTC to local time
     if (!isNaN(time)) {
       var hour24 = time.getHours();
       var hour12 = (hour24 % 12);
@@ -117,6 +117,24 @@ $(document).ready(function(){
       }
       var minute = time.getMinutes();
       var timeStr = hour12 + ':' + ((''+minute).length<2 ? '0' :'')+minute;
+      timeStr += hour24 < 12 ? ' AM' : ' PM';
+
+      $(this).text(timeStr);
+      $(this).css('display', 'inline');
+    }
+  });
+
+  $('.tba-verbose-datetime-utc').each(function () {  // Like "Mar. 13, 2016 at 7:00 PM"
+    var time = new Date($(this).attr('datetime'));  // Converts UTC to local time
+    if (!isNaN(time)) {
+      var hour24 = time.getHours();
+      var hour12 = (hour24 % 12);
+      if (hour12 == 0) {
+        hour12 = 12;
+      }
+      var minute = time.getMinutes();
+      var timeStr = month[time.getMonth()] + '. ' + time.getDate() + ', ' + time.getFullYear() + ' at '
+      timeStr += hour12 + ':' + ((''+minute).length<2 ? '0' :'')+minute;
       timeStr += hour24 < 12 ? ' AM' : ' PM';
 
       $(this).text(timeStr);

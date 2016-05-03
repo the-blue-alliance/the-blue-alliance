@@ -1,4 +1,5 @@
 {% extends "insights_base.html" %}
+{% import "match_partials/match_table_macros.html" as mtm %}
 
 {% block title %}{{selected_year}} Insights - The Blue Alliance{% endblock %}
 
@@ -6,7 +7,7 @@
 
 {% block detailed_content %}
   <h1 class="end_header">{{selected_year}} Insights</h1>
-  {% if last_updated %}<p>Last updated on <span class="tba-verbose-date-utc" >{{last_updated|rfc2822}}+00:00</span> at <span class="tba-verbose-time-utc" >{{last_updated|rfc2822}}+00:00</span></p>{% endif %}
+  {% if last_updated %}<p>Last updated on <time datetime="{{render_time|rfc2822}}+00:00" class="tba-verbose-datetime-utc">{{render_time|strftime("%b. %d, %Y at %I:%M%p")}} UTC</time></p>{% endif %}
 
   {% if match_highscore or match_averages_by_week or score_distribution %}
   <h2>Matches{% if num_matches %} <small>{{num_matches.data}} Matches Played</small>{% endif %}</h2>
@@ -18,24 +19,9 @@
       <h3>Highest Scoring Match{% if match_highscore.data|length > 1 %}es{% endif %}</h3>
       {% for match in match_highscore.data %}
       <h4><a href="/match/{{match.key_name}}">{{ match.event_name }} <small>{{ match.verbose_name }}</small></a></h4>
-      <table class="match-table insights-table">
-        <thead>
-          <tr class="key">
-            <th colspan="{{match.alliances.items().0.1.teams|length}}">Teams</th>
-            <th>Score</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for items in match.alliances.items()|reverse %}
-          <tr>
-            {% for team in items.1.teams %}
-              <td class="{{items.0}}{% if match.winning_alliance == items.0 %} winner{% endif %}"><a href="/team/{{team|digits}}/{{selected_year}}">{{team|digits}}</a></td>
-            {% endfor %}
-            <td class="{{items.0}}Score{% if match.winning_alliance == items.0 %} winner{% endif %}">{% if items.1.score == "-1" %}?{% else %}{{ items.1.score }}{% endif %}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      <div class="col-xs-8 col-xs-offset-2">
+        {{mtm.single_match_table(match, force_played=True)}}
+      </div>
       {% endfor %}
     </div>
   </div>

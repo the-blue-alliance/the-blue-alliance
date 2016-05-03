@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import 'match_partials/match_table_macros.html' as mtm %}
 
 {% block title %}{% if team.nickname %}{{team.nickname}} - {% endif %}Team {{team.team_number}}{% if not is_canonical %} ({{year}}){% endif %} - The Blue Alliance{% endblock %}
 
@@ -9,6 +10,11 @@
 {% endblock %}
 
 {% block content %}
+<button class="tba-fab tba-fab-team" data-team="{{team.key.id()}}">
+  <span class="glyphicon glyphicon-star favorite"></span>
+  <span class="glyphicon glyphicon-star-empty not-favorite"></span>
+</button>
+
 <div class="container">
   <div class="row">
     <div class="col-sm-3 col-lg-2">
@@ -111,9 +117,7 @@
               </div>
               <div class="col-sm-8" style="margin-top: 1em">
                 {% if comp.matches.num %}
-                  {% set matches = comp.matches %}
-                  {% set cur_team = team %}
-                  {% include "match_partials/full_match_table.html" %}
+                  {{mtm.full_match_table(comp.matches, cur_team_key=team.key.id())}}
                 {% else %}
                   {% if comp.event.past %}
                     <p class="muted">No matches played.</p>

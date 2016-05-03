@@ -253,6 +253,11 @@
             <td>Long Beach Arena\n300 East Ocean Blvd\nLong Beach, CA 90802\nUSA</td>
           </tr>
           <tr>
+            <td>timezone</td>
+            <td>Timezone name, as found in the <a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones">tz database</a></td>
+            <td>America/New_York</td>
+          </tr>
+          <tr>
             <td>website</td>
             <td>The event's website, if any.</td>
             <td>http://www.firstsv.org</td>
@@ -1609,7 +1614,7 @@
           </tr>
           <tr>
             <td>Java</td>
-            <td><a href="https://github.com/AdiSai/TheBlueAlliance-Java">TheBlueAlliance-Java</a></td>
+            <td><a href="https://github.com/AdiSai/TheBlueAlliance">TheBlueAlliance</a></td>
           </tr>
           <tr>
             <td>Java</td>
@@ -1654,7 +1659,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-team-list-request:v01'},
       success: function(data) {
-        $(".team-list-request-json").html(JSON.stringify(data, null, 2));
+        $(".team-list-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".team-list-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1670,7 +1675,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-team-request:v01'},
       success: function(data) {
-        $(".team-request-json").html(JSON.stringify(data, null, 2));
+        $(".team-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".team-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1686,7 +1691,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-team-events-request:v01'},
       success: function(data) {
-        $(".team-events-request-json").html(JSON.stringify(data, null, 2));
+        $(".team-events-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".team-events-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1702,7 +1707,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-team-event-awards-request:v01'},
       success: function(data) {
-        $(".team-event-awards-request-json").html(JSON.stringify(data, null, 2));
+        $(".team-event-awards-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".team-event-awards-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1718,7 +1723,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-team-event-matches-request:v01'},
       success: function(data) {
-        $(".team-event-matches-request-json").html(JSON.stringify(data, null, 2));
+        $(".team-event-matches-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".team-event-matches-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1734,7 +1739,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-team-years-participated-request:v01'},
       success: function(data) {
-        $(".team-years-participated-request-json").html(JSON.stringify(data, null, 2));
+        $(".team-years-participated-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".team-years-participated-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1750,7 +1755,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-team-media-request:v01'},
       success: function(data) {
-        $(".team-media-request-json").html(JSON.stringify(data, null, 2));
+        $(".team-media-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".team-media-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1766,7 +1771,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-team-history-events-request:v01'},
       success: function(data) {
-        $(".team-history-events-request-json").html(JSON.stringify(data, null, 2));
+        $(".team-history-events-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".team-history-events-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1782,7 +1787,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-team-history-awards-request:v01'},
       success: function(data) {
-        $(".team-history-awards-request-json").html(JSON.stringify(data, null, 2));
+        $(".team-history-awards-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".team-history-awards-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1798,7 +1803,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-team-history-robots-request:v01'},
       success: function(data) {
-        $(".team-history-robots-request-json").html(JSON.stringify(data, null, 2));
+        $(".team-history-robots-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".team-history-robots-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1815,7 +1820,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-team-history-districts-request:v01'},
       success: function(data) {
-        $(".team-history-districts-request-json").html(JSON.stringify(data, null, 2));
+        $(".team-history-districts-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".team-history-districts-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1831,7 +1836,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-event-request:v01'},
       success: function(data) {
-        $(".event-request-json").html(JSON.stringify(data, null, 2));
+        $(".event-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".event-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1847,7 +1852,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-event-teams-request:v01'},
       success: function(data) {
-        $(".event-teams-request-json").html(JSON.stringify(data, null, 2));
+        $(".event-teams-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".event-teams-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1863,7 +1868,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-event-matches-request:v01'},
       success: function(data) {
-        $(".event-matches-request-json").html(JSON.stringify(data, null, 2));
+        $(".event-matches-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".event-matches-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1879,7 +1884,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-event-stats-request:v01'},
       success: function(data) {
-        $(".event-stats-request-json").html(JSON.stringify(data, null, 2));
+        $(".event-stats-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".event-stats-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1895,7 +1900,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-event-rankings-request:v01'},
       success: function(data) {
-        $(".event-rankings-request-json").html(JSON.stringify(data, null, 2));
+        $(".event-rankings-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".event-rankings-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1911,7 +1916,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-event-list-request:v01'},
       success: function(data) {
-        $(".event-list-request-json").html(JSON.stringify(data, null, 2));
+        $(".event-list-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".event-list-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1927,7 +1932,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-event-awards-request:v01'},
       success: function(data) {
-        $(".event-awards-request-json").html(JSON.stringify(data, null, 2));
+        $(".event-awards-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".event-awards-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1943,7 +1948,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-event-points-request:v01'},
       success: function(data) {
-        $(".event-points-request-json").html(JSON.stringify(data, null, 2));
+        $(".event-points-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".event-points-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1959,7 +1964,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-match-request:v01'},
       success: function(data) {
-        $(".match-request-json").html(JSON.stringify(data, null, 2));
+        $(".match-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".match-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1975,7 +1980,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-district-list-request:v01'},
       success: function(data) {
-        $(".district-list-request-json").html(JSON.stringify(data, null, 2));
+        $(".district-list-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".district-list-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1991,7 +1996,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-district-events-request:v01'},
       success: function(data) {
-        $(".district-events-request-json").html(JSON.stringify(data, null, 2));
+        $(".district-events-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".district-events-request-json").html('Something went wrong! Please check for correct request format.');
@@ -2007,7 +2012,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-district-rankings-request:v01'},
       success: function(data) {
-        $(".district-rankings-request-json").html(JSON.stringify(data, null, 2));
+        $(".district-rankings-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".district-rankings-request-json").html('Something went wrong! Please check for correct request format.');
@@ -2023,7 +2028,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-district-teams-request:v01'},
       success: function(data) {
-        $(".district-teams-request-json").html(JSON.stringify(data, null, 2));
+        $(".district-teams-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".district-teams-request-json").html('Something went wrong! Please check for correct request format.');

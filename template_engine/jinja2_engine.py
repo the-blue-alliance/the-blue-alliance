@@ -20,13 +20,13 @@ def get_jinja_env(force_filesystemloader=False):
             loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), '../templates_jinja2')),
             extensions=['jinja2.ext.autoescape'],
             autoescape=True)
+    env.filters['defense_name'] = jinja2_filters.defense_name
     env.filters['digits'] = jinja2_filters.digits
     env.filters['floatformat'] = jinja2_filters.floatformat
     env.filters['strftime'] = jinja2_filters.strftime
     env.filters['strip_frc'] = jinja2_filters.strip_frc
     env.filters['urlencode'] = jinja2_filters.urlencode
     env.filters['rfc2822'] = jinja2_filters.rfc2822
-    # env.filters['slugify'] = jinja2_filters.slugify
     return env
 
 

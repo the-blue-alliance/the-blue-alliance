@@ -37,6 +37,11 @@ class BaseNotification(object):
     # Can be overridden if not
     _push_firebase = True
 
+    # GCM Priority for this message, set to "High" for important pushes
+    # Valid types are 'high' and 'normal'
+    # https://developers.google.com/cloud-messaging/concept-options#setting-the-priority-of-a-message
+    _priority = 'normal'
+
     """
     Class that acts as a basic notification.
     To send a notification, instantiate one and call this method
@@ -52,7 +57,7 @@ class BaseNotification(object):
             for v in keys.values():
                 # Count the number of clients receiving the notification
                 num_keys += len(v)
-            if random.random() < tba_config.RECORD_FRACTION:
+            if random.random() < tba_config.GA_RECORD_FRACTION:
                 deferred.defer(self.track_notification, self._type, num_keys, _queue="api-track-call")
 
     """
@@ -105,7 +110,7 @@ class BaseNotification(object):
     def _render_android(self):
         gcm_keys = self.keys[ClientType.OS_ANDROID]
         data = self._build_dict()
-        return GCMMessage(gcm_keys, data)
+        return GCMMessage(gcm_keys, data, priority=self._priority)
 
     def _render_ios(self):
         pass

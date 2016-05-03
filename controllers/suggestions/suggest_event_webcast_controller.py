@@ -13,7 +13,7 @@ class SuggestEventWebcastController(LoggedInHandler):
     """
 
     def get(self):
-        self._require_login("/suggest/event/webcast?event=%s" % self.request.get("event_key"))
+        self._require_login()
 
         if not self.request.get("event_key"):
             self.redirect("/", abort=True)
@@ -35,6 +35,14 @@ class SuggestEventWebcastController(LoggedInHandler):
 
         if not webcast_url:
             self.redirect('/suggest/event/webcast?event_key={}&status=blank_webcast'.format(event_key), abort=True)
+
+        if ' ' in webcast_url:
+            # This is an invalid url
+            self.redirect('/suggest/event/webcast?event_key={}&status=invalid_url'.format(event_key), abort=True)
+
+        if 'thebluealliance' in webcast_url:
+            # TBA doesn't host webcasts, so we can reject this outright
+            self.redirect('/suggest/event/webcast?event_key={}&status=invalid_url'.format(event_key), abort=True)
 
         status = SuggestionCreator.createEventWebcastSuggestion(
             author_account_key=self.user_bundle.account.key,

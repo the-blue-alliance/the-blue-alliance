@@ -245,6 +245,19 @@ class OprHandler(CacheableHandler):
         return template.render(path, self.template_values)
 
 
+class PredictionsHandler(CacheableHandler):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "main_predictions"
+
+    def __init__(self, *args, **kw):
+        super(PredictionsHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+
+    def _render(self, *args, **kw):
+        path = os.path.join(os.path.dirname(__file__), "../templates/predictions.html")
+        return template.render(path, self.template_values)
+
+
 class SearchHandler(webapp2.RequestHandler):
     def get(self):
         try:
@@ -283,19 +296,21 @@ class GamedayHandler(CacheableHandler):
         if special_webcasts_temp:
             special_webcasts_temp = special_webcasts_temp.contents
         else:
-            special_webcasts_temp = {}
+            special_webcasts_temp = []
         special_webcasts = []
-        for webcast in special_webcasts_temp.values():
+        special_webcast_keys = set()
+        for webcast in special_webcasts_temp:
             toAppend = {}
             for key, value in webcast.items():
                 toAppend[str(key)] = str(value)
             special_webcasts.append(toAppend)
+            special_webcast_keys.add(webcast['key_name'])
 
         ongoing_events = []
         ongoing_events_w_webcasts = []
         week_events = EventHelper.getWeekEvents()
         for event in week_events:
-            if event.now:
+            if event.now and event.key.id() not in special_webcast_keys:
                 ongoing_events.append(event)
                 if event.webcast:
                     valid = []

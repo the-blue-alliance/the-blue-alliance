@@ -44,8 +44,9 @@ class GCMMessage:
     collapse_key = None
     delay_while_idle = None
     time_to_live = None
+    priority = None
 
-    def __init__(self, device_tokens, notification, collapse_key=None, delay_while_idle=None, time_to_live=None):
+    def __init__(self, device_tokens, notification, collapse_key=None, delay_while_idle=None, time_to_live=None, priority=None):
         if isinstance(device_tokens, list):
             self.device_tokens = device_tokens
         else:
@@ -55,6 +56,7 @@ class GCMMessage:
         self.collapse_key = collapse_key
         self.delay_while_idle = delay_while_idle
         self.time_to_live = time_to_live
+        self.priority = priority
 
     def __unicode__(self):
         return "%s:%s:%s:%s:%s" % (repr(self.device_tokens), repr(self.notification), repr(self.collapse_key), repr(self.delay_while_idle), repr(self.time_to_live))
@@ -81,6 +83,8 @@ class GCMMessage:
             json_dict['delay_while_idle'] = self.delay_while_idle
         if self.time_to_live:
             json_dict['time_to_live'] = self.time_to_live
+        if self.priority:
+            json_dict['priority'] = self.priority
 
         json_str = json.dumps(json_dict)
         return json_str
