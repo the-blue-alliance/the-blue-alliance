@@ -154,6 +154,7 @@ class AdminMatchEdit(LoggedInHandler):
         alliances_json = self.request.get("alliances_json")
         alliances = json.loads(alliances_json)
         youtube_videos = json.loads(self.request.get("youtube_videos")) if self.request.get("youtube_videos") else []
+        vimeo_videos = json.loads(self.request.get("vimeo_videos")) if self.request.get("vimeo_videos") else []
         team_key_names = list()
 
         for alliance in alliances:
@@ -167,7 +168,8 @@ class AdminMatchEdit(LoggedInHandler):
             comp_level=self.request.get("comp_level"),
             team_key_names=team_key_names,
             alliances_json=alliances_json,
-            youtube_videos=youtube_videos
+            youtube_videos=youtube_videos,
+            vimeo_videos=vimeo_videos
             # no_auto_update = str(self.request.get("no_auto_update")).lower() == "true", #TODO
         )
         MatchManipulator.createOrUpdate(match, auto_union=False)

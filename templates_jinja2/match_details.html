@@ -18,6 +18,8 @@
   <meta property="og:site_name" content="The Blue Alliance" />
   {% if match.youtube_videos_formatted %}
     <meta property="og:video" content="https://www.youtube.com/v/{{match.youtube_videos_formatted.0}}" />
+  {% elif match.vimeo_videos %}
+    <meta property="og:video" content="https://player.vimeo.com/video/{{match.vimeo_videos.0}}" />
   {% else %}
     {% if match.tba_video.streamable_path %}<meta property="og:video" content="{{ match.tba_video.steamable_path }}" />{% endif %}
   {% endif %}
@@ -47,7 +49,10 @@
     {% for youtube_video in match.youtube_videos_formatted %}
       {% include "video_partials/youtube_video_player.html" %}
     {% endfor %}
-    {% if not match.tba_video and not match.youtube_videos %}
+    {% for vimeo_video in match.vimeo_videos %}
+      {% include "video_partials/vimeo_video_player.html" %}
+    {% endfor %}
+    {% if not match.tba_video and not match.youtube_videos and not match.vimeo_videos %}
       <h3>Video</h3>
       <p>We don't know about any videos for this match yet. :(</p>
       <p>Help others out by searching YouTube and adding videos!</p>

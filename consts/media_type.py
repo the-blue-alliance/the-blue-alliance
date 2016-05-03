@@ -3,11 +3,13 @@ class MediaType(object):
     YOUTUBE = 0
     CD_PHOTO_THREAD = 1
     IMGUR = 2
+    VIMEO = 3
 
     type_names = {
         YOUTUBE: 'YouTube Video',
         CD_PHOTO_THREAD: 'Chief Delphi Photo Thread',
-        IMGUR: 'Imgur Image'
+        IMGUR: 'Imgur Image',
+        VIMEO: 'Vimeo Video'
     }
 
     image_types = [

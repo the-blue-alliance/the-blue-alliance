@@ -52,6 +52,10 @@
             <td>YouTube Videos</td>
             <td><textarea class="form-control" type="text" name="youtube_videos" rows="6" cols="60">[{% for video in match.youtube_videos %}"{{video}}"{% if not forloop.last %},{% endif %}{% endfor %}]</textarea></td>
         </tr>
+        <tr>
+            <td>Vimeo Videos</td>
+            <td><textarea class="form-control" type="text" name="vimeo_videos" rows="6" cols="60">[{% for video in match.vimeo_videos %}"{{video}}"{% if not forloop.last %},{% endif %}{% endfor %}]</textarea></td>
+        </tr>
     </table>
 
     <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Save Match</button>

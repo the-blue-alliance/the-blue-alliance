@@ -121,3 +121,29 @@ class SuggestionCreator(object):
                 return 'video_exists'
         else:
             return 'bad_url'
+
+    @classmethod
+    def createMatchVideoVimeoSuggestion(cls, author_account_key, vimeo_id, match_key):
+        """Create a Vimeo Match Video. Returns status (success, suggestion_exists, video_exists, bad_url)"""
+        if vimeo_id is not None:
+            match = Match.get_by_id(match_key)
+            if match and vimeo_id not in match.vimeo_videos:
+                year = match_key[:4]
+                suggestion_id = Suggestion.render_media_key_name(year, 'match', match_key, 'vimeo', vimeo_id)
+                suggestion = Suggestion.get_by_id(suggestion_id)
+                if not suggestion or suggestion.review_state != Suggestion.REVIEW_PENDING:
+                    suggestion = Suggestion(
+                        id=suggestion_id,
+                        author=author_account_key,
+                        target_key=match_key,
+                        target_model="match",
+                        )
+                    suggestion.contents = {"vimeo_videos": [vimeo_id]}
+                    suggestion.put()
+                    return 'success'
+                else:
+                    return 'suggestion_exists'
+            else:
+                return 'video_exists'
+        else:
+            return 'bad_url'

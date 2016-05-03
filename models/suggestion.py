@@ -50,6 +50,11 @@ class Suggestion(ndb.Model):
         if "youtube_videos" in self.contents:
             return self.contents["youtube_videos"][0]
 
+    @property
+    def vimeo_video(self):
+        if "vimeo_videos" in self.contents:
+            return self.contents["vimeo_videos"][0]
+            
     @classmethod
     def render_media_key_name(cls, year, target_model, target_key, foreign_type, foreign_key):
         """
