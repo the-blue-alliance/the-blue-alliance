@@ -23,7 +23,7 @@ var VideoCellOverlay = React.createClass({
           <div className="panel-heading">
             <h3 className="panel-title">{this.props.webcast.name}</h3>
             <div className="overlay-button-container">
-              <a className="overlay-button" href="#" onClick={this.props.showWebcastSelectionPanel}>Change Webcast</a>
+              <span className="overlay-button" href="#" onClick={this.props.showWebcastSelectionPanel}>Change Webcast</span>
               <span className="overlay-button button-close glyphicon glyphicon-remove" onClick={this.onCloseClicked}></span>
             </div>
           </div>
