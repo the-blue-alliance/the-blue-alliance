@@ -5,8 +5,11 @@ var LayoutDropdownItem = React.createClass({
     layoutId: PropTypes.number.isRequired,
     handleClick: PropTypes.func.isRequired
   },
-  handleClick: function() {
-    this.props.handleClick(this.props.layoutId)
+  handleClick: function(event) {
+    if (this.props.handleClick) {
+      event.preventDefault()
+      this.props.handleClick(this.props.layoutId)
+    }
   },
   render: function() {
     return (
