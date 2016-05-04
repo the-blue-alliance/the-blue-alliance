@@ -14,8 +14,8 @@ var BootstrapNavDropdownListItem = React.createClass({
   },
   handleClick: function(event) {
     if (this.props.handleClick) {
+      // If a callback to handle the click is given, prevent the default behavior
       event.preventDefault()
-      console.log(event)
       this.props.handleClick();
       return false;
     }
