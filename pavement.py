@@ -22,6 +22,13 @@ def javascript():
 
 
 @task
+def gulp():
+    """Update all npm dependencies and run 'gulp build' task"""
+    print("Running 'gulp build'")
+    sh("npm update && gulp build --production")
+
+
+@task
 def jinja2():
     sh("python compile_jinja2_templates.py")
 
@@ -43,6 +50,7 @@ def lint():
 @task
 def make():
     javascript()
+    gulp()
     less()
     jinja2()
 

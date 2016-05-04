@@ -4,6 +4,7 @@ skip_files:
 - ^(.*/)?.*\.less.*
 - ^(.*/)?.*\.pyc.*
 - ^(.*/)?.*\.temp.*
+- ^(.*/)?.*/node_modules/.*$
 
 # directories
 - .git/*
@@ -15,6 +16,7 @@ skip_files:
 - test_data/*
 - tests/*
 - utils/*
+- react/*
 
 # specific files
 - .gitignore
