@@ -43,7 +43,7 @@ var GamedayNavbar = React.createClass({
                   active={this.props.chatPanelVisible}
                   handleClick={this.props.toggleChatPanelVisibility}>Chat</BootstrapButton>
               </li>
-              <SettingsDropdown />
+              <SettingsDropdown resetWebcasts={this.props.resetWebcasts} />
             </ul>
           </div>
         </div>

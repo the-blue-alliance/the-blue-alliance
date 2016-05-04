@@ -7,6 +7,8 @@ var SettingsDropdown = React.createClass({
       <li className="dropdown">
         <a href="#" className="dropdown-toggle" data-toggle="dropdown"><span className="glyphicon glyphicon-cog"></span></a>
         <ul className="dropdown-menu">
+          <BootstrapNavDropdownListItem handleClick={this.props.resetWebcasts}>Reset Layout</BootstrapNavDropdownListItem>
+          <li className="divider"></li>
           <BootstrapNavDropdownListItem
             data_toggle="modal"
             data_target="#followingTeamsModal">Follow Teams</BootstrapNavDropdownListItem>
