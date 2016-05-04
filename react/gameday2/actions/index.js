@@ -24,6 +24,18 @@ export function toggleHashtagPanelVisibility() {
 }
 
 export function addWebcast(webcastId) {
+  // Before displaying the webcast, check that the provided webcast ID
+  // references a webcast that actually exists
+  return (dispatch, getState) => {
+    if (!getState().webcastsById[webcastId]) {
+      return;
+    }
+
+    dispatch(addWebcastNoCheck(webcastId))
+  }
+}
+
+let addWebcastNoCheck = (webcastId) => {
   return {
     type: types.ADD_WEBCAST,
     webcastId
@@ -31,6 +43,18 @@ export function addWebcast(webcastId) {
 }
 
 export function addWebcastAtLocation(webcastId, location) {
+  // Before displaying the webcast, check that the provided webcast ID
+  // references a webcast that actually exists
+  return (dispatch, getState) => {
+    if (!getState().webcastsById[webcastId]) {
+      return;
+    }
+
+    dispatch(addWebcastAtLocationNoCheck(webcastId, location))
+  }
+}
+
+let addWebcastAtLocationNoCheck = (webcastId, location) => {
   return {
     type: types.ADD_WEBCAST_AT_LOCATION,
     webcastId,

@@ -1,17 +1,18 @@
+import 'babel-polyfill'
 import React from 'react'
 import GamedayFrame from './components/GamedayFrame'
 import gamedayReducer from './reducers'
 import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-import { setWebcastsRaw } from './actions'
+import thunk from 'redux-thunk'
+import { createStore, applyMiddleware } from 'redux'
+import { setWebcastsRaw, setLayout, addWebcastAtLocation } from './actions'
+import { MAX_SUPPORTED_VIEWS } from './constants/LayoutConstants'
 var ReactDOM = require('react-dom')
 const queryString = require('query-string')
 
-// [{'webcasts': [{u'channel': u'6540154', u'type': u'ustream'}], 'event_name': u'Present Test Event', 'event_key': u'2014testpresent'}]
+let webcastData = $.parseJSON($("#webcasts_json").text())
 
-let webcastData = $.parseJSON($("#webcasts_json").text());
-
-let store = createStore(gamedayReducer)
+let store = createStore(gamedayReducer, applyMiddleware(thunk))
 
 ReactDOM.render(
   <Provider store={store}>
@@ -19,10 +20,6 @@ ReactDOM.render(
   </Provider>,
   document.getElementById('content')
 )
-
-store.subscribe(() => {
-  console.log(store.getState())
-})
 
 store.subscribe(() => {
   let params = {}
@@ -43,10 +40,24 @@ store.subscribe(() => {
   }
 
   let query = queryString.stringify(params)
-  console.log(query)
   if (query) {
     location.replace('#' + query)
   }
 })
 
 store.dispatch(setWebcastsRaw(webcastData))
+
+// Now that webcasts are loaded, attempt to restore any state that's present in
+// the URL hash
+let params = queryString.parse(location.hash)
+console.log(params)
+if (params.layout && Number.isInteger(Number.parseInt(params.layout))) {
+  store.dispatch(setLayout(Number.parseInt(params.layout)))
+}
+
+for (let i = 0; i < MAX_SUPPORTED_VIEWS; i++) {
+  let key = 'view_' + i
+  if (params[key]) {
+    store.dispatch(addWebcastAtLocation(params[key], i))
+  }
+}
