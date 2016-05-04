@@ -19,31 +19,33 @@ var GamedayNavbar = React.createClass({
   render: function() {
     return (
       <nav className="navbar navbar-default navbar-fixed-top" role="navigation">
-        <div className="navbar-header">
-          <button type="button" className="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-            <span className="sr-only">Toggle navigation</span>
-            <span className="icon-bar"></span>
-            <span className="icon-bar"></span>
-            <span className="icon-bar"></span>
-          </button>
-          <a className="navbar-brand" href="#">Gameday</a>
-        </div>
+        <div className="container-fluid">
+          <div className="navbar-header">
+            <button type="button" className="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+              <span className="sr-only">Toggle navigation</span>
+              <span className="icon-bar"></span>
+              <span className="icon-bar"></span>
+              <span className="icon-bar"></span>
+            </button>
+            <a className="navbar-brand" href="#">Gameday</a>
+          </div>
 
-        <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul className="nav navbar-nav navbar-right">
-            <LayoutDropdown setLayout={this.props.setLayout} />
-            <li>
-              <BootstrapButton
-                active={this.props.hashtagPanelVisible}
-                handleClick={this.props.toggleHashtagPanelVisibility}>Hashtags</BootstrapButton>
-            </li>
-            <li>
-              <BootstrapButton
-                active={this.props.chatPanelVisible}
-                handleClick={this.props.toggleChatPanelVisibility}>Chat</BootstrapButton>
-            </li>
-            <SettingsDropdown />
-          </ul>
+          <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul className="nav navbar-nav navbar-right">
+              <LayoutDropdown setLayout={this.props.setLayout} />
+              <li>
+                <BootstrapButton
+                  active={this.props.hashtagPanelVisible}
+                  handleClick={this.props.toggleHashtagPanelVisibility}>Hashtags</BootstrapButton>
+              </li>
+              <li>
+                <BootstrapButton
+                  active={this.props.chatPanelVisible}
+                  handleClick={this.props.toggleChatPanelVisibility}>Chat</BootstrapButton>
+              </li>
+              <SettingsDropdown />
+            </ul>
+          </div>
         </div>
       </nav>
     );

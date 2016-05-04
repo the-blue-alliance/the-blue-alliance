@@ -11,20 +11,22 @@ var BootstrapButton = React.createClass({
       a: '#'
     };
   },
-  handleClick: function() {
+  handleClick: function(event) {
     if (this.props.handleClick) {
+      // If the button has a callback to handle the click, prevent the default
+      event.preventDefault()
       this.props.handleClick();
-      return false;
     }
   },
   render: function() {
     var classes = classNames({
       'btn': true,
       'btn-default': true,
+      'navbar-btn': true,
       'active': this.props.active,
     });
     return (
-      <a className={classes} href={this.props.a} onClick={this.handleClick}>{this.props.children}</a>
+      <button type="button" className={classes} href={this.props.a} onClick={this.handleClick}>{this.props.children}</button>
     );
   }
 });
