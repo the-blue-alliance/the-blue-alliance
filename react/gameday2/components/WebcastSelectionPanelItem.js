@@ -10,7 +10,7 @@ let WebcastSelectionPanelItem = React.createClass({
   },
   render: function() {
     return (
-      <a href="#" className="list-group-item" onClick={this.handleClick}>{this.props.webcast.name}</a>
+      <button type="button" className="list-group-item" onClick={this.handleClick}>{this.props.webcast.name}</button>
     )
   }
 })

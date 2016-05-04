@@ -33,9 +33,9 @@ var WebcastSelectionPanel = React.createClass({
 
     return (
       <div className={classes}>
-        <a className="button-close" href="#" onClick={this.props.closeWebcastSelectionPanel}>
+        <button type="button" className="button-close btn btn-sm btn-default" href="#" onClick={this.props.closeWebcastSelectionPanel}>
           <span className="glyphicon glyphicon-remove"></span>
-        </a>
+        </button>
         <div className="list-group">
           <h3>Select a Webcast</h3>
           {webcastItems}
