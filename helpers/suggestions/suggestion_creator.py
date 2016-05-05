@@ -28,10 +28,14 @@ class SuggestionCreator(object):
                     if private_details_json is not None:
                         media_dict['private_details_json'] = private_details_json
 
+                    target_model = "media"
+                    if media_dict.get("is_social", False):
+                        target_model = "social-media"
+
                     suggestion = Suggestion(
                         id=suggestion_id,
                         author=author_account_key,
-                        target_model="media",
+                        target_model=target_model,
                         )
                     suggestion.contents = media_dict
                     suggestion.put()

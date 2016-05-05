@@ -14,6 +14,7 @@ class SuggestReviewHomeController(SuggestionsReviewBaseController):
         self.template_values['suggestions']['match'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "match")
         self.template_values['suggestions']['event'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "event")
         self.template_values['suggestions']['media'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "media")
+        self.template_values['suggestions']['social'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "social-media")
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/suggest_review_home.html')
         self.response.out.write(template.render(path, self.template_values))
