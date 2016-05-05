@@ -14,7 +14,12 @@ class SuggestionCreator(object):
     def createTeamMediaSuggestion(cls, author_account_key, media_url, team_key, year_str, private_details_json=None):
         """Create a Team Media Suggestion. Returns status (success, suggestion_exists, media_exists, bad_url)"""
 
-        media_dict = MediaParser.partial_media_dict_from_url(media_url.strip())
+        # Sanitize input url
+        media_url = media_url.strip()
+        if '?' in media_url:
+            media_url = media_url.split('?')[0]
+
+        media_dict = MediaParser.partial_media_dict_from_url(media_url)
         if media_dict is not None:
             existing_media = Media.get_by_id(Media.render_key_name(media_dict['media_type_enum'], media_dict['foreign_key']))
             if existing_media is None or team_key not in [reference.id() for reference in existing_media.references]:
