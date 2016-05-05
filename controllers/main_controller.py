@@ -58,8 +58,8 @@ class TwoChampsHandler(CacheableHandler):
         self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self._team_key_a, self._team_key_b)
 
     def _render(self, *args, **kw):
-        team_a = Team.get_by_id(self._team_key_a)
-        team_b = Team.get_by_id(self._team_key_b)
+        team_a = Team.get_by_id(self._team_key_a) if self._team_key_a else None
+        team_b = Team.get_by_id(self._team_key_b) if self._team_key_b else None
         self.template_values.update({
             'team_a': team_a,
             'team_b': team_b,
