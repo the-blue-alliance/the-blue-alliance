@@ -131,17 +131,17 @@
     <!-- Capture/Breach -->
     {% if "teleopDefensesBreached" in match.score_breakdown.red %}
     <tr>
-      <td class="red" colspan="2">{% if match.score_breakdown.red.teleopDefensesBreached %} <span class="glyphicon glyphicon-ok"></span> {% else %} <span class="glyphicon glyphicon-remove"></span> {% endif %}
+      <td class="red" colspan="2">{% if match.score_breakdown.red.teleopDefensesBreached %} <span class="glyphicon glyphicon-ok"></span> {% if match.score_breakdown.red.breachPoints > 0 %} (+{{ match.score_breakdown.red.breachPoints }}) {% endif %} {% else %} <span class="glyphicon glyphicon-remove"></span> {% endif %}
       <td>Defenses Breached</td>
-      <td class="blue" colspan="2">{% if match.score_breakdown.blue.teleopDefensesBreached %} <span class="glyphicon glyphicon-ok"></span> {% else %} <span class="glyphicon glyphicon-remove"></span> {% endif %}
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.teleopDefensesBreached %} <span class="glyphicon glyphicon-ok"></span> {% if match.score_breakdown.blue.breachPoints > 0 %} (+{{ match.score_breakdown.blue.breachPoints }}) {% endif %} {% else %} <span class="glyphicon glyphicon-remove"></span> {% endif %}
 </td>
     </tr>
     {% endif %}
     {% if "teleopTowerCaptured" in match.score_breakdown.red %}
     <tr>
-      <td class="red" colspan="2">{% if match.score_breakdown.red.teleopTowerCaptured %} <span class="glyphicon glyphicon-ok"></span> {% else %} <span class="glyphicon glyphicon-remove"></span> {% endif %}
+      <td class="red" colspan="2">{% if match.score_breakdown.red.teleopTowerCaptured %} <span class="glyphicon glyphicon-ok"></span> {% if match.score_breakdown.red.capturePoints > 0 %} (+{{ match.score_breakdown.red.capturePoints }}) {% endif %} {% else %} <span class="glyphicon glyphicon-remove"></span> {% endif %}
       <td>Tower Captured</td>
-      <td class="blue" colspan="2">{% if match.score_breakdown.blue.teleopTowerCaptured %} <span class="glyphicon glyphicon-ok"></span> {% else %} <span class="glyphicon glyphicon-remove"></span> {% endif %}
+      <td class="blue" colspan="2">{% if match.score_breakdown.blue.teleopTowerCaptured %} <span class="glyphicon glyphicon-ok"></span> {% if match.score_breakdown.blue.capturePoints > 0 %} (+{{ match.score_breakdown.blue.capturePoints }}) {% endif %}{% else %} <span class="glyphicon glyphicon-remove"></span> {% endif %}
     </tr>
     {% endif %}
     {% if "foulPoints" in match.score_breakdown.red %}

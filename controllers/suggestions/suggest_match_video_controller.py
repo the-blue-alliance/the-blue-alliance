@@ -17,7 +17,7 @@ class SuggestMatchVideoController(LoggedInHandler):
     """
 
     def get(self):
-        self._require_login("/suggest/match/video?match=%s" % self.request.get("match_key"))
+        self._require_login()
 
         if not self.request.get("match_key"):
             self.redirect("/", abort=True)
@@ -55,7 +55,7 @@ class SuggestMatchVideoPlaylistController(LoggedInHandler):
     Allow users to suggest a playlist of YouTube videos for matches
     """
     def get(self):
-        self._require_login("/suggest/event/video?event_key={}".format(self.request.get("event_key")))
+        self._require_login()
 
         if not self.request.get("event_key"):
             self.redirect("/", abort=True)

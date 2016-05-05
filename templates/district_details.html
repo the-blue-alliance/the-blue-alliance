@@ -46,6 +46,9 @@
         {% if team_totals %}
         <li><a href="#rankings" role="tab" data-toggle="tab">Rankings</a></li>
         {% endif %}
+        {% if live_events_with_teams %}
+        <li><a href="#active-teams" role="tab" data-toggle="tab">Active Teams</a></li>
+        {% endif %}
       </ul>
 
       <div class="tab-content">
@@ -150,6 +153,12 @@
           {% else %}
             <p>* District rankings are not official and are calculated using the <a href="http://archive.usfirst.org/sites/default/files/uploadedFiles/Robotics_Programs/FRC/Resources/FRC_District_Standard_Points_Ranking_System.pdf">FRC Standard District Points Ranking System (PDF)</a></p>
           {% endif %}
+        </div>
+        {% endif %}
+
+        {% if live_events_with_teams %}
+        <div class="tab-pane" id="active-teams">
+          {% include "live_teams_partial.html" %}
         </div>
         {% endif %}
       </div>

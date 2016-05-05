@@ -24,14 +24,17 @@
 <div class="container" itemscope itemtype="http://data-vocabulary.org/Event">
   <div class="row">
     <div class="col-sm-12">
-      <p class="pull-right"><a class="btn btn-default" href="/event/{{event.key_name}}"><span class="glyphicon glyphicon-refresh"></span></a></p>
+      {% if event.year == 2016 and event.event_type_enum == 3 %}
+      <p class="pull-right"><a class="btn btn-primary" href="/event/{{event.key_name}}/insights"><span class="glyphicon glyphicon-align-left"></span> Advanced Insights</a></p>
+      {% endif %}
       <p><a class="btn btn-default" href="/events/{{event.year}}"><span class="glyphicon glyphicon-chevron-left"></span> {{event.year}} Events</a></p>
       <h1 itemprop="summary">{{event.name}} {{event.year}}</h1>
       {% if district_name %}<blockquote><em>Part of the <a href="/events/{{district_abbrev}}/{{event.year}}">{{district_name}} District</a></em></blockquote>{% endif %}
     </div>
   </div>
   <div class="row">
-    <div class="col-sm-8">
+    <div class="col-sm-12">
+      <a class="btn btn-success pull-right" href="/suggest/event/video?event_key={{event.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add videos!</a>
       <p>
         {% if event.start_date %}
           <span class="glyphicon glyphicon-calendar"></span> <time itemprop="startDate" datetime="{{event.start_date.isoformat()}}">{{ event.start_date|strftime("%B %d") }}{% if event.start_date.date() != event.end_date.date() %}</time> to <time itemprop="endDate" datetime="{{event.end_date.isoformat()}}">{{ event.end_date|strftime("%B %d") }}{% endif %}, {{ event.end_date|strftime("%Y") }}</time>
@@ -55,10 +58,6 @@
         <a class="hashtag-link hashtag-cd" href="http://www.chiefdelphi.com/media/photos/tags/{{ event.hashtag }}" target="_blank" title="Search Chief Delphi">Chief Delphi</a> &middot;
         <a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23{{ event.hashtag }}" target="_blank" title="Search Flickr">Flickr</a>
       </p>
-    </div>
-
-    <div class="col-sm-pull-8 pull-right">
-      <a class="btn btn-success" href="/suggest/event/video?event_key={{event.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add videos!</a>
     </div>
   </div>
 
@@ -179,7 +178,11 @@
       <div class="row">
         <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
           {% if event.official %}
-            <p>Data from <a href="http://frc-events.firstinspires.org/{{event.year}}/{{event.event_short}}/rankings" target="_blank"> <em>FIRST</em>'s event page</a>.</p>
+            {% if event.year > 2014 %}
+              <p>Data from <a href="http://frc-events.firstinspires.org/{{event.year}}/{{event.event_short}}/rankings" target="_blank"> <em>FIRST</em>'s event page</a>.</p>
+            {% else %}
+              <p>Data from <a href="http://www2.usfirst.org/{{event.year}}comp/events/{{event.event_short}}/rankings.html" target="_blank"> <em>FIRST</em>'s event page</a>.</p>
+            {% endif %}
           {% endif %}
           <table class="table table-striped table-condensed table-center tablesorter" id="rankingsTable">
             <thead>

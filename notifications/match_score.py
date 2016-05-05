@@ -5,6 +5,8 @@ from notifications.base_notification import BaseNotification
 
 class MatchScoreNotification(BaseNotification):
 
+    _priority = 'high'
+
     def __init__(self, match):
         self.match = match
         self.event = match.event.get()

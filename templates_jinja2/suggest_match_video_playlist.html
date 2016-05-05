@@ -11,11 +11,11 @@
          * https://github.com/tytremblay/FRC-Video-Splitter-2
          */
         var lower_title = video_title.toLowerCase();
-        var qualRegex = /[^\w\d]*[q](\d+).*/.exec(lower_title);
+        var qualRegex = /[^\w\d]*(q|qm)(\d+).*/.exec(lower_title);
         var playoffRegex = /[^\w\d]*(ef\dm\d|qf\dm\d|sf\dm\d|f\dm\d).*/.exec(lower_title);
 
         if (qualRegex) {
-            return "qm" + qualRegex[1];
+            return "qm" + qualRegex[2];
         } else if (playoffRegex) {
             return playoffRegex[1];
         } else {

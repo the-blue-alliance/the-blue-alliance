@@ -20,6 +20,43 @@
 </table>
 {% endmacro %}
 
+{% macro qual_match_table_hot(matches) %}
+<table class="match-table">
+  <thead>
+    {% include "match_partials/match_table_header_hot.html" %}
+  </thead>
+
+  <tbody>
+    {% if matches.qm %}
+      <tr class="key">
+        <th colspan="16">Qualifications</th>
+      </tr>
+      {% for match in matches.qm %}
+        {{mtrm.match_row_tr_hot(match)}}
+      {% endfor %}
+    {% endif %}
+  </tbody>
+</table>
+{% endmacro %}
+
+{% macro qual_match_prediction_table(matches, predictions, fake_matches) %}
+<table class="match-table">
+  <thead>
+    {% include "match_partials/match_predictions_table_header.html" %}
+  </thead>
+
+  <tbody>
+    {% if matches.qm %}
+      <tr class="key">
+        <th colspan="20">Qualifications</th>
+      </tr>
+      {% for match in matches.qm %}
+        {{mtrm.match_row_tr(match, predictions=predictions, fake_matches=fake_matches)}}
+      {% endfor %}
+    {% endif %}
+  </tbody>
+</table>
+{% endmacro %}
 
 {% macro elim_match_table(matches, cur_team_key=None) %}
 <table class="match-table">

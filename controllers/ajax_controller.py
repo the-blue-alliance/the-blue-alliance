@@ -65,9 +65,10 @@ class AccountFavoritesDeleteHandler(LoggedInHandler):
             return
 
         model_key = self.request.get("model_key")
+        model_type = int(self.request.get("model_type"))
         user_id = self.user_bundle.user.user_id()
 
-        MyTBAHelper.remove_favorite(user_id, model_key)
+        MyTBAHelper.remove_favorite(user_id, model_key, model_type)
 
 
 class LiveEventHandler(CacheableHandler):
@@ -178,9 +179,14 @@ class WebcastHandler(CacheableHandler):
             if special_webcasts:
                 special_webcasts = special_webcasts.contents
             else:
-                special_webcasts = {}
-            if event_key in special_webcasts:
-                webcast = special_webcasts[event_key]
+                special_webcasts = []
+
+            special_webcasts_dict = {}
+            for webcast in special_webcasts:
+                special_webcasts_dict[webcast['key_name']] = webcast
+
+            if event_key in special_webcasts_dict:
+                webcast = special_webcasts_dict[event_key]
                 if 'type' in webcast and 'channel' in webcast:
                     output['player'] = self._renderPlayer(webcast)
 

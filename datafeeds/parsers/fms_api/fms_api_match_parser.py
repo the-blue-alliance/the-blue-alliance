@@ -2,7 +2,6 @@ import datetime
 import json
 import logging
 import pytz
-import re
 
 from helpers.match_helper import MatchHelper
 from models.event import Event
@@ -48,8 +47,63 @@ ELIM_MAPPING = {
     21: (1, 3),
 }
 
+OCTO_ELIM_MAPPING = {
+    # octofinals
+    1: (1, 1),  # (set, match)
+    2: (2, 1),
+    3: (3, 1),
+    4: (4, 1),
+    5: (5, 1),
+    6: (6, 1),
+    7: (7, 1),
+    8: (8, 1),
+    9: (1, 2),
+    10: (2, 2),
+    11: (3, 2),
+    12: (4, 2),
+    13: (5, 2),
+    14: (6, 2),
+    15: (7, 2),
+    16: (8, 2),
+    17: (1, 3),
+    18: (2, 3),
+    19: (3, 3),
+    20: (4, 3),
+    21: (5, 3),
+    22: (6, 3),
+    23: (7, 3),
+    24: (8, 3),
 
-def get_comp_level(year, match_level, match_number):
+    # quarterfinals
+    25: (1, 1),
+    26: (2, 1),
+    27: (3, 1),
+    28: (4, 1),
+    29: (1, 2),
+    30: (2, 2),
+    31: (3, 2),
+    32: (4, 2),
+    33: (1, 3),
+    34: (2, 3),
+    35: (3, 3),
+    36: (4, 3),
+
+    # semifinals
+    37: (1, 1),
+    38: (2, 1),
+    39: (1, 2),
+    40: (2, 2),
+    41: (1, 3),
+    42: (2, 3),
+
+    # finals
+    43: (1, 1),
+    44: (1, 2),
+    45: (1, 3),
+}
+
+
+def get_comp_level(year, match_level, match_number, is_octofinals):
     if match_level == 'Qualification':
         return 'qm'
     else:
@@ -61,6 +115,8 @@ def get_comp_level(year, match_level, match_number):
             else:
                 return 'f'
         else:
+            if is_octofinals:
+                return get_comp_level_octo(year, match_number)
             if match_number <= 12:
                 return 'qf'
             elif match_number <= 18:
@@ -69,7 +125,19 @@ def get_comp_level(year, match_level, match_number):
                 return 'f'
 
 
-def get_set_match_number(year, comp_level, match_number):
+def get_comp_level_octo(year, match_number):
+    """ No 2015 support """
+    if match_number <= 24:
+        return 'ef'
+    elif match_number <= 36:
+        return 'qf'
+    elif match_number <= 42:
+        return 'sf'
+    else:
+        return 'f'
+
+
+def get_set_match_number(year, comp_level, match_number, is_octofinals):
     if year == 2015:
         if comp_level == 'sf':
             return 1, match_number - 8
@@ -78,8 +146,8 @@ def get_set_match_number(year, comp_level, match_number):
         else:  # qm, qf
             return 1, match_number
     else:
-        if comp_level in {'qf', 'sf', 'f'}:
-            return ELIM_MAPPING[match_number]
+        if comp_level in {'ef', 'qf', 'sf', 'f'}:
+            return OCTO_ELIM_MAPPING[match_number] if is_octofinals else ELIM_MAPPING[match_number]
         else:  # qm
             return 1, match_number
 
@@ -102,19 +170,21 @@ class FMSAPIHybridScheduleParser(object):
             event_tz = None
 
         parsed_matches = []
+        is_octofinals = len(matches) > 0 and 'Octofinal' in matches[0]['description']
         for match in matches:
             if 'tournamentLevel' in match:  # 2016+
                 level = match['tournamentLevel']
             else:  # 2015
                 level = match['level']
-            comp_level = get_comp_level(self.year, level, match['matchNumber'])
-            set_number, match_number = get_set_match_number(self.year, comp_level, match['matchNumber'])
+            comp_level = get_comp_level(self.year, level, match['matchNumber'], is_octofinals)
+            set_number, match_number = get_set_match_number(self.year, comp_level, match['matchNumber'], is_octofinals)
 
             red_teams = []
             blue_teams = []
             team_key_names = []
             null_team = False
-            for team in match['Teams']:
+            sorted_teams = sorted(match['Teams'], key=lambda team: team['station'])  # Sort by station to ensure correct ordering. Kind of hacky.
+            for team in sorted_teams:
                 if team['teamNumber'] is None:
                     null_team = True
                 team_key = 'frc{}'.format(team['teamNumber'])
@@ -211,9 +281,11 @@ class FMSAPIMatchDetailsParser(object):
         matches = response['MatchScores']
 
         match_details_by_key = {}
+
+        is_octofinals = len(matches) > 0 and matches[len(matches) - 1]['matchNumber'] > 21
         for match in matches:
-            comp_level = get_comp_level(self.year, match['matchLevel'], match['matchNumber'])
-            set_number, match_number = get_set_match_number(self.year, comp_level, match['matchNumber'])
+            comp_level = get_comp_level(self.year, match['matchLevel'], match['matchNumber'], is_octofinals)
+            set_number, match_number = get_set_match_number(self.year, comp_level, match['matchNumber'], is_octofinals)
             breakdown = {
                 'red': {},
                 'blue': {},

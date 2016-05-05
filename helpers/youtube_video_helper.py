@@ -26,14 +26,22 @@ class YouTubeVideoHelper(object):
             parsed = urlparse.urlparse(youtube_url)
             queries = urlparse.parse_qs(parsed.query)
             if 't' in queries:
-                youtube_id = '{}?t={}'.format(youtube_id, queries['t'][0])
+                total_seconds = cls.time_to_seconds(queries['t'][0])
+                youtube_id = '{}?t={}'.format(youtube_id, total_seconds)
             elif parsed.fragment and 't=' in parsed.fragment:
-                partial_fragment = parsed.fragment.split('t=')[1]
-                match = re.match('((?P<hour>\d*?)h)?((?P<min>\d*?)m)?((?P<sec>\d*)s?)?', partial_fragment).groupdict()
-                hours = match['hour'] or 0
-                minutes = match['min'] or 0
-                seconds = match['sec'] or 0
-                total_seconds = (int(hours) * 3600) + (int(minutes) * 60) + int(seconds)
+                total_seconds = cls.time_to_seconds(parsed.fragment.split('t=')[1])
                 youtube_id = '{}?t={}'.format(youtube_id, total_seconds)
 
         return youtube_id
+
+    @classmethod
+    def time_to_seconds(cls, time_str):
+        """
+        Format time in seconds. Turns things like "3h17m30s" to "11850"
+        """
+        match = re.match('((?P<hour>\d*?)h)?((?P<min>\d*?)m)?((?P<sec>\d*)s?)?', time_str).groupdict()
+        hours = match['hour'] or 0
+        minutes = match['min'] or 0
+        seconds = match['sec'] or 0
+        total_seconds = (int(hours) * 3600) + (int(minutes) * 60) + int(seconds)
+        return total_seconds
