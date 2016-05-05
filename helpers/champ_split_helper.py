@@ -33,7 +33,7 @@ class ChampSplitHelper(object):
             'Tennessee': HOU,
             'Alabama': HOU,
             'Georgia': HOU,
-            'NorthCarolina': HOU,
+            'North Carolina': HOU,
             'South Carolina': HOU,
             'Florida': HOU,
             'Alaska': HOU,
