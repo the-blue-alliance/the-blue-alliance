@@ -2,6 +2,7 @@ import logging
 import re
 
 from google.appengine.ext import ndb
+from helpers.champ_split_helper import ChampSplitHelper
 
 
 class Team(ndb.Model):
@@ -33,6 +34,10 @@ class Team(ndb.Model):
         self._location = None
         self._region = None
         super(Team, self).__init__(*args, **kw)
+
+    @property
+    def championship_location(self):
+        return ChampSplitHelper.get_champ(self)
 
     @property
     def country_name(self):

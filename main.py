@@ -12,7 +12,7 @@ from controllers.event_controller import EventList, EventDetail, EventInsights, 
 from controllers.event_wizard_controller import EventWizardHandler
 from controllers.gameday2_controller import Gameday2Controller
 from controllers.insights_controller import InsightsOverview, InsightsDetail
-from controllers.main_controller import ContactHandler, HashtagsHandler, \
+from controllers.main_controller import TwoChampsHandler, ContactHandler, HashtagsHandler, \
     MainKickoffHandler, MainBuildseasonHandler, MainChampsHandler, MainCompetitionseasonHandler, \
     MainInsightsHandler, MainOffseasonHandler, OprHandler, PredictionsHandler, SearchHandler, \
     AboutHandler, ThanksHandler, handle_404, handle_500, \
@@ -55,6 +55,7 @@ class Webapp2HandlerAdapter(webapp2.BaseHandlerAdapter):
 
 app = webapp2.WSGIApplication([
       RedirectRoute(r'/', landing_handler[tba_config.CONFIG['landing_handler']], 'landing', strict_slash=True),
+      RedirectRoute(r'/2champs', TwoChampsHandler, '2champs', strict_slash=True),
       RedirectRoute(r'/about', AboutHandler, 'about', strict_slash=True),
       RedirectRoute(r'/account', AccountOverview, 'account-overview', strict_slash=True),
       RedirectRoute(r'/account/edit', AccountEdit, 'account-edit', strict_slash=True),

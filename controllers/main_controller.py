@@ -19,6 +19,8 @@ from models.insight import Insight
 from models.team import Team
 from models.sitevar import Sitevar
 
+from template_engine import jinja2_engine
+
 
 def render_static(page):
     memcache_key = "main_%s" % page
@@ -42,6 +44,27 @@ def handle_500(request, response, exception):
     logging.exception(exception)
     response.write(render_static("500"))
     response.set_status(500)
+
+
+class TwoChampsHandler(CacheableHandler):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "two_champs_{}_{}"
+
+    def __init__(self, *args, **kw):
+        super(TwoChampsHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24
+        self._team_key_a = self.request.get('team_a', None)
+        self._team_key_b = self.request.get('team_b', None)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self._team_key_a, self._team_key_b)
+
+    def _render(self, *args, **kw):
+        team_a = Team.get_by_id(self._team_key_a)
+        team_b = Team.get_by_id(self._team_key_b)
+        self.template_values.update({
+            'team_a': team_a,
+            'team_b': team_b,
+        })
+        return jinja2_engine.render('2champs.html', self.template_values)
 
 
 class MainKickoffHandler(CacheableHandler):
