@@ -22,11 +22,11 @@ class MediaHelper(object):
 
     @classmethod
     def get_images(cls, medias):
-        return [media for media in medias if media.media_type_enum in MediaType.image_types]
+        return filter(lambda m: m.media_type_enum in MediaType.image_types, medias)
 
     @classmethod
     def get_socials(cls, medias):
-        return [media for media in medias if media.media_type_enum in MediaType.social_types]
+        return filter(lambda m: m.media_type_enum in MediaType.social_types, medias)
 
 
 class MediaParser(object):
