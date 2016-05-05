@@ -29,11 +29,11 @@
       <div class="row">
         <form id="team-form" class="form-inline">
           <div class="col-xs-6">
-            <input id="team-a-input" class="form-control team-input" type="text" placeholder="Choose a team by Name or Number" {% if team_a %}value="{{team_a.team_number}} | {{team_a.nickname}}"{% endif %}>
+            <input id="team-a-input" class="form-control team-input" onClick="this.value='';" type="text" placeholder="Choose a team by Name or Number" {% if team_a %}value="{{team_a.team_number}} | {{team_a.nickname}}"{% endif %}>
             <input id="team-a-key" type="hidden" name="team_a" {% if team_a %}value="frc{{team_a.team_number}}"{% endif %}>
           </div>
           <div class="col-xs-6">
-            <input id="team-b-input" class="form-control team-input" type="text" placeholder="Choose a team by Name or Number" {% if team_b %}value="{{team_b.team_number}} | {{team_b.nickname}}"{% endif %}>
+            <input id="team-b-input" class="form-control team-input" onClick="this.value='';" type="text" placeholder="Choose a team by Name or Number" {% if team_b %}value="{{team_b.team_number}} | {{team_b.nickname}}"{% endif %}>
             <input id="team-b-key" type="hidden" name="team_b" {% if team_b %}value="frc{{team_b.team_number}}"{% endif %}>
           </div>
         </form>
