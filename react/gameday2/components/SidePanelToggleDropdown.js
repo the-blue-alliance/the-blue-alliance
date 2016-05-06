@@ -25,7 +25,7 @@ var SettingsDropdown = React.createClass({
   render: function() {
     return (
       <li className="dropdown">
-        <a href="#" className="dropdown-toggle" data-toggle="dropdown">Toggle Side Panels <b className="caret"></b></a>
+        <a href="#" className="dropdown-toggle" data-toggle="dropdown">Side Panels <b className="caret"></b></a>
         <ul className="dropdown-menu">
           <BootstrapDropdownToggleItem
             handleClick={this.props.toggleHashtagPanelVisibility}
