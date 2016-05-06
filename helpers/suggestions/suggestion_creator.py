@@ -31,7 +31,7 @@ class SuggestionCreator(object):
                 suggestion_id = Suggestion.render_media_key_name(year_str, 'team', team_key, foreign_type, media_dict['foreign_key'])
                 suggestion = Suggestion.get_by_id(suggestion_id)
                 if not suggestion or suggestion.review_state != Suggestion.REVIEW_PENDING:
-                    media_dict['year'] = int(year_str)
+                    media_dict['year'] = int(year_str) if year_str else None
                     media_dict['reference_type'] = 'team'
                     media_dict['reference_key'] = team_key
                     if private_details_json is not None:
