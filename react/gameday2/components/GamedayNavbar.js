@@ -34,16 +34,6 @@ var GamedayNavbar = React.createClass({
           <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul className="nav navbar-nav navbar-right">
               <LayoutDropdown setLayout={this.props.setLayout} />
-              <li>
-                <BootstrapButton
-                  active={this.props.hashtagPanelVisible}
-                  handleClick={this.props.toggleHashtagPanelVisibility}>Hashtags</BootstrapButton>
-              </li>
-              <li>
-                <BootstrapButton
-                  active={this.props.chatPanelVisible}
-                  handleClick={this.props.toggleChatPanelVisibility}>Chat</BootstrapButton>
-              </li>
               <SidePanelToggleDropdown
                 toggleChatPanelVisibility={this.props.toggleChatPanelVisibility}
                 toggleHashtagPanelVisibility={this.props.toggleHashtagPanelVisibility}
