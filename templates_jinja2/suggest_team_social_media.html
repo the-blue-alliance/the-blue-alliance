@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}The Blue Alliance - Add Team Media{% endblock %}
+{% block title %}The Blue Alliance - Add Team Social Media{% endblock %}
 
-{% block meta_description %}Add team media to The Blue Alliance.{% endblock %}
+{% block meta_description %}Add team social media to The Blue Alliance.{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -41,7 +41,7 @@
     <div class="col-xs-12 col-lg-6 col-lg-offset-3">
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h1 class="panel-title">Help others by adding media!</h1>
+          <h1 class="panel-title">Help others by adding social media!</h1>
         </div>
         <div class="panel-body">
           <p>Thanks for helping make The Blue Alliance better! Let us know about media so we can add them to the site!</p>
@@ -54,83 +54,56 @@
 
           <p><strong>Currently supported formats are:</strong></p>
           <ul>
-            <li>Chief Delphi Images
+            <li>Facebook Pages
               <ul>
-                <li>Example: <code>http://www.chiefdelphi.com/media/photos/36646</code></li>
+                <li>Example: <code>http://facebook.com/theuberbots</code></li>
               </ul>
             </li>
-            <li>Imgur Images
+            <li>Twitter Profiles
               <ul>
-                <li>Example: <code>http://imgur.com/aF8T5ZE</code></li>
+                <li>Example: <code>https://twitter.com/team1124</code></li>
               </ul>
             </li>
-            <li>YouTube Videos
+            <li>YouTube Profiles
               <ul>
-                <li>Example: <code>https://www.youtube.com/watch?v=DojyJ9bZ4fk</code></li>
+                <li>Example: <code>https://www.youtube.com/user/Uberbots1124</code></li>
+              </ul>
+            </li>
+            <li>GitHub Accounts
+              <ul>
+                <li>Example: <code>https://github.com/frc1124</code></li>
               </ul>
             </li>
           </ul>
 
-          <p><strong>Please do not submit:</strong></p>
-          <ul>
-            <li>Full match videos</li>
-            <li>Long, drawn out videos with little to no real content</li>
-            <li>GIFs</li>
-          </ul>
-
           <hr>
 
-          <h3>Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %} ({{year}})</h3>
+          <h3>Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h3>
 
-          {% if medias_by_slugname.cdphotothread %}
+
           <div class="row">
             <div class="col-xs-12">
-              <h4>Existing Chief Delphi Images</h4>
-              {% for media in medias_by_slugname.cdphotothread %}
-                <div class="col-xs-6 col-sm-4">
-                {% include "media_partials/cdphotothread_partial.html" %}
-                </div>
-              {% endfor %}
+              {% if social_medias%}
+                <h4>Existing Social Media Accounts</h4>
+                <ul>
+                {% for media in social_medias %}
+                  <li>{% include "media_partials/social_partial.html" %}</li>
+                {% endfor %}
+                </ul>
+              {% else %}
+                <p>No existing social media accounts!</p>
+              {% endif %}
             </div>
           </div>
-          {% endif %}
-
-          {% if medias_by_slugname.imgur %}
-          <div class="row">
-            <div class="col-xs-12">
-              <h4>Existing Imgur Images</h4>
-              {% for media in medias_by_slugname.imgur %}
-                <div class="col-xs-6 col-sm-4">
-                {% include "media_partials/imgur_partial.html" %}
-                </div>
-              {% endfor %}
-            </div>
-          </div>
-          {% endif %}
-
-          {% if medias_by_slugname.youtube %}
-          <div class="row">
-            <div class="col-xs-12">
-              <h4>Existing Videos</h4>
-              {% for media in medias_by_slugname.youtube %}
-                <div class="col-xs-12 col-md-6 fitvids">
-                {% include "media_partials/youtube_partial.html" %}
-                </div>
-              {% endfor %}
-            </div>
-          </div>
-          {% endif %}
 
           <hr>
           <div class="row">
             <div class="col-xs-12">
-              <h4>Add more media</h4>
-              <form action="/suggest/team/media" method="post">
+              <h4>Add more social media</h4>
+              <form action="/suggest/team/social_media" method="post">
                 <input name="team_key" type="hidden" value="{{team.key.id()}}" />
-                <input name="year" type="hidden" value="{{year}}" />
                 <div class="input-group">
-                  <span class="input-group-addon">{{year}}</span>
-                  <input class="form-control" type="text" name="media_url" placeholder="http://www.chiefdelphi.com/media/photos/36646" value="" />
+                  <input class="form-control" type="text" name="media_url" placeholder="http://facebook.com/theuberbots" value="" />
                   <span class="input-group-btn">
                     <button class="btn btn-success" type="submit"><span class="glyphicon glyphicon-plus-sign"></span> Add Media</button>
                   </span>

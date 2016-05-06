@@ -19,7 +19,7 @@
       {% if team.championship_location %}<span class="glyphicon glyphicon-flag"></span> home Championship in {{team.championship_location.2017}} for 2017{% if team.championship_location.2017 != team.championship_location.2018 %}, {{team.championship_location.2018}} for 2018{% endif %}+<br>{% endif %}
 
       <hr>
-      <a class="btn btn-xs btn-default{% if social_medias %} pull-right{% endif %}" href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add social media!</a>
+      <a class="btn btn-xs btn-default{% if social_medias %} pull-right{% endif %}" href="/suggest/team/social_media?team_key={{team.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add social media!</a>
       {% for media in social_medias %}
         {{smm.social_media_icon_link(media)}}{% if not loop.last %}&middot;{% endif %}
       {% endfor %}
