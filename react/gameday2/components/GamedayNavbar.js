@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import BootstrapButton from './BootstrapButton';
 import SettingsDropdown from './SettingsDropdown';
+import SidePanelToggleDropdown from './SidePanelToggleDropdown'
 import LayoutDropdown from './LayoutDropdown';
 var classNames = require('classnames');
 
@@ -43,6 +44,11 @@ var GamedayNavbar = React.createClass({
                   active={this.props.chatPanelVisible}
                   handleClick={this.props.toggleChatPanelVisibility}>Chat</BootstrapButton>
               </li>
+              <SidePanelToggleDropdown
+                toggleChatPanelVisibility={this.props.toggleChatPanelVisibility}
+                toggleHashtagPanelVisibility={this.props.toggleHashtagPanelVisibility}
+                chatPanelVisible={this.props.chatPanelVisible}
+                hashtagPanelVisible={this.props.hashtagPanelVisible} />
               <SettingsDropdown resetWebcasts={this.props.resetWebcasts} />
             </ul>
           </div>
