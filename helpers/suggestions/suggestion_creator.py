@@ -21,11 +21,10 @@ class SuggestionCreator(object):
         media_url = "{}://{}{}".format(parsed.scheme, parsed.netloc, parsed.path)
 
         media_dict = MediaParser.partial_media_dict_from_url(media_url)
-
-        if media_dict.get("is_social", False) != is_social:
-            return 'bad_url'
-
         if media_dict is not None:
+            if media_dict.get("is_social", False) != is_social:
+                return 'bad_url'
+
             existing_media = Media.get_by_id(Media.render_key_name(media_dict['media_type_enum'], media_dict['foreign_key']))
             if existing_media is None or team_key not in [reference.id() for reference in existing_media.references]:
                 foreign_type = Media.SLUG_NAMES[media_dict['media_type_enum']]
