@@ -48,7 +48,7 @@ class TestTeamMediaSuggestionCreator(unittest2.TestCase):
     def testCleanUrl(self):
         status = SuggestionCreator.createTeamMediaSuggestion(
             self.account.key,
-            " http://imgur.com/ruRAxDm?foo=bar ",
+            " http://imgur.com/ruRAxDm?foo=bar#meow ",
             "frc1124",
             "2016")
         self.assertEqual(status, 'success')

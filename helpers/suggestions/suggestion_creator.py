@@ -1,4 +1,5 @@
 import logging
+from urlparse import urlparse
 
 from helpers.media_helper import MediaParser
 from helpers.webcast_helper import WebcastParser
@@ -16,8 +17,8 @@ class SuggestionCreator(object):
 
         # Sanitize input url
         media_url = media_url.strip()
-        if '?' in media_url:
-            media_url = media_url.split('?')[0]
+        parsed = urlparse(media_url)
+        media_url = "{}://{}{}".format(parsed.scheme, parsed.netloc, parsed.path)
 
         media_dict = MediaParser.partial_media_dict_from_url(media_url)
         if media_dict is not None:
