@@ -7,7 +7,7 @@ from database import get_affected_queries
 from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
 from database.event_query import EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
 from database.match_query import EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
-from database.media_query import TeamYearMediaQuery, EventTeamsMediasQuery, EventTeamsPreferredMediasQuery
+from database.media_query import TeamSocialMediaQuery, TeamYearMediaQuery, EventTeamsMediasQuery, EventTeamsPreferredMediasQuery
 from database.robot_query import TeamRobotsQuery
 from database.team_query import TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
 
@@ -139,11 +139,13 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         }
         cache_keys = [q.cache_key for q in get_affected_queries.media_updated(affected_refs)]
 
-        self.assertEqual(len(cache_keys), 8)
+        self.assertEqual(len(cache_keys), 10)
         self.assertTrue(TeamYearMediaQuery('frc254', 2014).cache_key in cache_keys)
         self.assertTrue(TeamYearMediaQuery('frc254', 2015).cache_key in cache_keys)
+        self.assertTrue(TeamSocialMediaQuery('frc254').cache_key in cache_keys)
         self.assertTrue(TeamYearMediaQuery('frc604', 2014).cache_key in cache_keys)
         self.assertTrue(TeamYearMediaQuery('frc604', 2015).cache_key in cache_keys)
+        self.assertTrue(TeamSocialMediaQuery('frc604').cache_key in cache_keys)
         self.assertTrue(EventTeamsMediasQuery('2015cama').cache_key in cache_keys)
         self.assertTrue(EventTeamsMediasQuery('2015casj').cache_key in cache_keys)
         self.assertTrue(EventTeamsPreferredMediasQuery('2015cama').cache_key in cache_keys)
