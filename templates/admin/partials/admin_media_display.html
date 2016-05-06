@@ -5,6 +5,8 @@
 {% else %}
   {% if media.slug_name == 'youtube' %}
     <iframe width="320" height="180" src="{{media.youtube_url}}" frameborder="0" allowfullscreen></iframe>
+  {% else %}
+      <p>{{ media.type_name }}: <a href="{{ media.social_profile_url }}" target="_blank">{{ media.foreign_key }}</a></p>
   {% endif %}
 {% endif %}
 

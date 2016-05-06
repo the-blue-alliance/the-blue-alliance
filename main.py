@@ -28,6 +28,8 @@ from controllers.suggestions.suggest_match_video_review_controller import Sugges
 from controllers.suggestions.suggest_event_webcast_controller import SuggestEventWebcastController
 from controllers.suggestions.suggest_event_webcast_review_controller import SuggestEventWebcastReviewController
 from controllers.suggestions.suggest_review_home_controller import SuggestReviewHomeController
+from controllers.suggestions.suggest_social_media_review_controller import \
+      SuggestSocialMediaReviewController
 from controllers.suggestions.suggest_team_media_controller import SuggestTeamMediaController
 from controllers.suggestions.suggest_team_media_review_controller import SuggestTeamMediaReviewController
 from controllers.test_notification_controller import TestNotificationController
@@ -102,6 +104,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/suggest/match/video/review', SuggestMatchVideoReviewController, 'suggest-match-video-review', strict_slash=True),
       RedirectRoute(r'/suggest/review', SuggestReviewHomeController, 'suggest-review-home', strict_slash=True),
       RedirectRoute(r'/suggest/team/media', SuggestTeamMediaController, 'suggest-team-media', strict_slash=True),
+      RedirectRoute(r'/suggest/team/social/review', SuggestSocialMediaReviewController, 'suggest-team-social-media-review', strict_slash=True),
       RedirectRoute(r'/suggest/team/media/review', SuggestTeamMediaReviewController, 'suggest-team-media-review', strict_slash=True),
       RedirectRoute(r'/team/<team_number:[0-9]+>', TeamCanonical, 'team-canonical', strict_slash=True),
       RedirectRoute(r'/team/<team_number:[0-9]+>/<year:[0-9]+>', TeamDetail, 'team-detail', strict_slash=True),

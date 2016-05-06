@@ -11,7 +11,7 @@ class Suggestion(ndb.Model):
     the site. The generally store a model, a key, and then a json blob of
     fields to append or ammend in the model.
     """
-    MODELS = set(["event", "match", "media"])
+    MODELS = {"event", "match", "media", "social-media"}  # social-media is a Media with no year
     REVIEW_ACCEPTED = 1
     REVIEW_PENDING = 0
     REVIEW_REJECTED = -1

@@ -1,4 +1,5 @@
 import logging
+from urlparse import urlparse
 
 from helpers.media_helper import MediaParser
 from helpers.webcast_helper import WebcastParser
@@ -14,7 +15,12 @@ class SuggestionCreator(object):
     def createTeamMediaSuggestion(cls, author_account_key, media_url, team_key, year_str, private_details_json=None):
         """Create a Team Media Suggestion. Returns status (success, suggestion_exists, media_exists, bad_url)"""
 
-        media_dict = MediaParser.partial_media_dict_from_url(media_url.strip())
+        # Sanitize input url
+        media_url = media_url.strip()
+        parsed = urlparse(media_url)
+        media_url = "{}://{}{}".format(parsed.scheme, parsed.netloc, parsed.path)
+
+        media_dict = MediaParser.partial_media_dict_from_url(media_url)
         if media_dict is not None:
             existing_media = Media.get_by_id(Media.render_key_name(media_dict['media_type_enum'], media_dict['foreign_key']))
             if existing_media is None or team_key not in [reference.id() for reference in existing_media.references]:
@@ -28,10 +34,14 @@ class SuggestionCreator(object):
                     if private_details_json is not None:
                         media_dict['private_details_json'] = private_details_json
 
+                    target_model = "media"
+                    if media_dict.get("is_social", False):
+                        target_model = "social-media"
+
                     suggestion = Suggestion(
                         id=suggestion_id,
                         author=author_account_key,
-                        target_model="media",
+                        target_model=target_model,
                         )
                     suggestion.contents = media_dict
                     suggestion.put()

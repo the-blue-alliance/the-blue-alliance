@@ -22,7 +22,11 @@ class MediaHelper(object):
 
     @classmethod
     def get_images(cls, medias):
-        return [media for media in medias if media.media_type_enum in MediaType.image_types]
+        return filter(lambda m: m.media_type_enum in MediaType.image_types, medias)
+
+    @classmethod
+    def get_socials(cls, medias):
+        return filter(lambda m: m.media_type_enum in MediaType.social_types, medias)
 
 
 class MediaParser(object):
@@ -30,11 +34,34 @@ class MediaParser(object):
     YOUTUBE_URL_PATTERNS = ['youtube.com', 'youtu.be']
     IMGUR_URL_PATTERNS = ['imgur.com/']
 
+    # Dict that maps Social media types -> tuple of regex pattern and group # of foreign key
+    SOCIAL_FOREIGN_KEY_PATTERNS = {
+        MediaType.FACEBOOK_PROFILE: (r".*facebook.com\/(.*)(\/(.*))?", 1),
+        MediaType.TWITTER_PROFILE: (r".*twitter.com\/(.*)(\/(.*))?", 1),
+        MediaType.YOUTUBE_CHANNEL: (r".*youtube.com\/user\/(.*)(\/(.*))?", 1),
+        MediaType.GITHUB_PROFILE: (r".*github.com\/(.*)(\/(.*))?", 1),
+    }
+
+    # Social profile URL patterns that map a URL -> Profile type
+    SOCIAL_URL_PATTERNS = {
+        'facebook.com/': MediaType.FACEBOOK_PROFILE,
+        'twitter.com/': MediaType.TWITTER_PROFILE,
+        'youtube.com/user': MediaType.YOUTUBE_CHANNEL,
+        'github.com/': MediaType.GITHUB_PROFILE,
+    }
+
     @classmethod
     def partial_media_dict_from_url(cls, url):
         """
         Takes a url, and turns it into a partial Media object dict
         """
+
+        # Test social profile urls first
+        # Because this YouTube URL is more strict than the video one
+        for s, type in cls.SOCIAL_URL_PATTERNS.iteritems():
+            if s in url:
+                return cls._partial_social_dict(type, url)
+
         if any(s in url for s in cls.CD_PHOTO_THREAD_URL_PATTERNS):
             return cls._partial_media_dict_from_cd_photo_thread(url)
         elif any(s in url for s in cls.YOUTUBE_URL_PATTERNS):
@@ -44,6 +71,33 @@ class MediaParser(object):
         else:
             logging.warning("Failed to determine media type from url: {}".format(url))
             return None
+
+    @classmethod
+    def _partial_social_dict(cls, social_type, url):
+        social_dict = {'media_type_enum': social_type}
+        foreign_key = cls._parse_social_foreign_key(social_type, url)
+        if foreign_key is None:
+            logging.warning("Failed to determine foreign_key from url: {}".format(url))
+            return None
+        social_dict['is_social'] = True
+        social_dict['foreign_key'] = foreign_key
+        social_dict['site_name'] = MediaType.type_names[social_type]
+        social_dict['profile_url'] = MediaType.profile_urls[social_type].format(foreign_key)
+
+        return social_dict
+
+    @classmethod
+    def _parse_social_foreign_key(cls, social_type, url):
+        foreign_key = None
+        regex = re.match(cls.SOCIAL_FOREIGN_KEY_PATTERNS[social_type][0], url)
+        if regex is not None:
+            foreign_key = regex.group(cls.SOCIAL_FOREIGN_KEY_PATTERNS[social_type][1])
+
+        if foreign_key is None:
+            return None
+        else:
+            # Remove trailing slashes in the URL if necessary
+            return foreign_key.replace('/', '')
 
     @classmethod
     def _partial_media_dict_from_cd_photo_thread(cls, url):
@@ -71,7 +125,7 @@ class MediaParser(object):
     @classmethod
     def _partial_media_dict_from_youtube(cls, url):
         media_dict = {}
-        media_dict['media_type_enum'] = MediaType.YOUTUBE
+        media_dict['media_type_enum'] = MediaType.YOUTUBE_VIDEO
         foreign_key = cls._parse_youtube_foreign_key(url)
         if foreign_key is None:
             logging.warning("Failed to determine foreign_key from url: {}".format(url))
