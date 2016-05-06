@@ -36,7 +36,6 @@ class SuggestSocialMediaReviewController(SuggestionsReviewBaseController):
 
         self.template_values.update({
             "suggestions_and_references": suggestions_and_references,
-            "max_preferred": Media.MAX_PREFERRED,
         })
 
         self.response.out.write(jinja2_engine.render('suggest_team_social_review.html', self.template_values))
@@ -91,8 +90,6 @@ class SuggestSocialMediaReviewController(SuggestionsReviewBaseController):
         suggestion.put()
 
     def post(self):
-        preferred_keys = self.request.POST.getall("preferred_keys[]")
-
         accept_keys = []
         reject_keys = []
         for value in self.request.POST.values():
@@ -109,7 +106,7 @@ class SuggestSocialMediaReviewController(SuggestionsReviewBaseController):
 
         # Process accepts
         for accept_key in accept_keys:
-            self._process_accepted(accept_key, preferred_keys)
+            self._process_accepted(accept_key)
 
         # Process rejects
         rejected_suggestion_futures = [Suggestion.get_by_id_async(key) for key in reject_keys]
