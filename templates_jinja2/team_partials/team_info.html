@@ -1,4 +1,5 @@
 {% import 'match_partials/match_table_macros.html' as mtm %}
+{% import 'media_partials/social_media_macros.html' as smm %}
 
 <div id="team-info" class="row hidden-xs">
   <div class="col-xs-12">
@@ -14,15 +15,18 @@
       {% if team.location %}<span class="glyphicon glyphicon-map-marker"></span> from <a href="http://maps.google.com/maps?q={{ team.location|urlencode }}" target="_blank">{{ team.location }}</a><br>{% endif %}
       {% if team.name %}<span class="glyphicon glyphicon-info-sign"></span> aka <em>{{ team.name }}</em><br>{% endif %}
       {% if team.rookie_year %}<span class="glyphicon glyphicon-calendar"></span> first competed in {{ team.rookie_year }}<br>{% endif %}
-      {% if team.website %}<span class="glyphicon glyphicon-globe"></span> <a href="{{team.website}}" target="_blank">{{ team.website }}</a>{% endif %}
-      {% if team.championship_location %}<br><span class="glyphicon glyphicon-flag"></span> home Championship in {{team.championship_location.2017}} for 2017{% if team.championship_location.2017 != team.championship_location.2018 %}, {{team.championship_location.2018}} for 2018{% endif %}+{% endif %}
+      {% if team.website %}<span class="glyphicon glyphicon-globe"></span> <a href="{{team.website}}" target="_blank">{{ team.website }}</a><br>{% endif %}
+      {% if team.championship_location %}<span class="glyphicon glyphicon-flag"></span> home Championship in {{team.championship_location.2017}} for 2017{% if team.championship_location.2017 != team.championship_location.2018 %}, {{team.championship_location.2018}} for 2018{% endif %}+<br>{% endif %}
+
+      <hr>
+      <a class="btn btn-xs btn-default{% if social_medias %} pull-right{% endif %}" href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add social media!</a>
+      {% for media in social_medias %}
+        {{smm.social_media_icon_link(media)}}{% if not loop.last %}&middot;{% endif %}
+      {% endfor %}
+      <hr>
     </p>
 
-    <p><span class="glyphicon glyphicon-search"></span> <strong>#frc{{ team.team_number }}</strong> <small><a href="/hashtags" rel="tooltip" title="Learn more about hashtags">?</a></small> - Search
-      <a class="hashtag-link hashtag-twitter" href="https://twitter.com/search/%23frc{{ team.team_number }}" target="_blank" title="Search Twitter">Twitter</a> &middot;
-      <a class="hashtag-link hashtag-youtube" href="http://www.youtube.com/results?search_query=%23frc{{ team.team_number }}+OR+%22team+{{ team.team_number }}%22" target="_blank" title="Search YouTube">YouTube</a> &middot;
-      <a class="hashtag-link hashtag-cd" href="http://www.chiefdelphi.com/media/photos/tags/frc{{ team.team_number }}" target="_blank" title="Search Chief Delphi">Chief Delphi</a> &middot;
-      <a class="hashtag-link hashtag-flickr" href="http://www.flickr.com/search/?q=%23frc{{ team.team_number }}" target="_blank" title="Search Flickr">Flickr</a><br />
+    <p class="pull-right">
       <span class="image-atc"></span> <a href="http://atthecontrol.com/">See live data on At The Control</a>
     </p>
 

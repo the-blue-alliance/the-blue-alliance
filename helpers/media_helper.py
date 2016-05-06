@@ -9,6 +9,13 @@ from consts.media_type import MediaType
 
 
 class MediaHelper(object):
+    SOCIAL_SORT_ORDER = {
+        MediaType.FACEBOOK_PROFILE: 0,
+        MediaType.YOUTUBE_CHANNEL: 1,
+        MediaType.TWITTER_PROFILE: 2,
+        MediaType.GITHUB_PROFILE: 3,
+    }
+
     @classmethod
     def group_by_slugname(cls, medias):
         medias_by_slugname = {}
@@ -27,6 +34,10 @@ class MediaHelper(object):
     @classmethod
     def get_socials(cls, medias):
         return filter(lambda m: m.media_type_enum in MediaType.social_types, medias)
+
+    @classmethod
+    def social_media_sorter(cls, media):
+        return cls.SOCIAL_SORT_ORDER.get(media.media_type_enum, 1000)
 
 
 class MediaParser(object):

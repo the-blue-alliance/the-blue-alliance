@@ -25,6 +25,7 @@ class TeamRenderer(object):
     @classmethod
     def render_team_details(cls, handler, team, year, is_canonical):
         media_future = media_query.TeamYearMediaQuery(team.key.id(), year).fetch_async()
+        social_media_future = media_query.TeamSocialMediaQuery(team.key.id()).fetch_async()
         robot_future = Robot.get_by_id_async('{}_{}'.format(team.key.id(), year))
         team_districts_future = team_query.TeamDistrictsQuery(team.key.id()).fetch_async()
 
@@ -103,7 +104,8 @@ class TeamRenderer(object):
                 year_wlt = None
 
         medias_by_slugname = MediaHelper.group_by_slugname([media for media in media_future.get_result()])
-        image_medias = MediaHelper.get_images([media for media in media_future.get_result()])
+        image_medias = MediaHelper.get_images(media_future.get_result())
+        social_medias = sorted(social_media_future.get_result(), key=MediaHelper.social_media_sorter)
         preferred_image_medias = filter(lambda x: team.key in x.preferred_references, image_medias)
 
         district_name = None
@@ -127,6 +129,7 @@ class TeamRenderer(object):
             "current_event": current_event,
             "matches_upcoming": matches_upcoming,
             "medias_by_slugname": medias_by_slugname,
+            "social_medias": social_medias,
             "image_medias": image_medias,
             "preferred_image_medias": preferred_image_medias,
             "robot": robot_future.get_result(),
