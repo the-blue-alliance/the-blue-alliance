@@ -91,7 +91,7 @@ class MediaParser(object):
             logging.warning("Failed to determine foreign_key from url: {}".format(url))
             return None
         social_dict['is_social'] = True
-        social_dict['foreign_key'] = foreign_key
+        social_dict['foreign_key'] = foreign_key.lower()
         social_dict['site_name'] = MediaType.type_names[social_type]
         social_dict['profile_url'] = MediaType.profile_urls[social_type].format(foreign_key)
 
