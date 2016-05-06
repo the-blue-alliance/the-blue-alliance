@@ -15,16 +15,14 @@ class DatabaseQuery(object):
     DATABASE_MISSES_MEMCACHE_KEYS = ['database_query_misses_{}:{}'.format(i, DATABASE_QUERY_VERSION) for i in range(25)]
     BASE_CACHE_KEY_FORMAT = "{}:{}:{}"  # (partial_cache_key, cache_version, database_query_version)
 
-    def _render_cache_key(self, partial_cache_key):
-        return self.BASE_CACHE_KEY_FORMAT.format(
-            partial_cache_key,
-            self.CACHE_VERSION,
-            self.DATABASE_QUERY_VERSION)
-
     @property
     def cache_key(self):
         if not hasattr(self, '_cache_key'):
-            self._cache_key = self._render_cache_key(self.CACHE_KEY_FORMAT.format(*self._query_args))
+            self._cache_key = self.BASE_CACHE_KEY_FORMAT.format(
+                self.CACHE_KEY_FORMAT.format(*self._query_args),
+                self.CACHE_VERSION,
+                self.DATABASE_QUERY_VERSION)
+
         return self._cache_key
 
     @classmethod
