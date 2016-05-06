@@ -1,7 +1,7 @@
 from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
 from database.event_query import EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
 from database.match_query import EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
-from database.media_query import TeamYearMediaQuery, EventTeamsMediasQuery, EventTeamsPreferredMediasQuery
+from database.media_query import TeamSocialMediaQuery, TeamYearMediaQuery, EventTeamsMediasQuery, EventTeamsPreferredMediasQuery
 from database.robot_query import TeamRobotsQuery
 from database.team_query import TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
 
@@ -81,10 +81,11 @@ def media_updated(affected_refs):
     event_team_keys_future = EventTeam.query(EventTeam.team.IN(team_keys)).fetch_async(None, keys_only=True)
 
     queries_and_keys = []
-    for year in years:
-        for reference_key in reference_keys:
-            if reference_key.kind() == 'Team':
+    for reference_key in reference_keys:
+        if reference_key.kind() == 'Team':
+            for year in years:
                 queries_and_keys.append((TeamYearMediaQuery(reference_key.id(), year)))
+            queries_and_keys.append((TeamSocialMediaQuery(reference_key.id())))
 
     for event_team_key in event_team_keys_future.get_result():
         event_key = event_team_key.id().split('_')[0]

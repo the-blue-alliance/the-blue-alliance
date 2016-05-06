@@ -8,7 +8,7 @@ from models.team import Team
 
 
 class TeamSocialMediaQuery(DatabaseQuery):
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = 'team_social_media_{}'  # (team_key)
 
     def __init__(self, team_key):
