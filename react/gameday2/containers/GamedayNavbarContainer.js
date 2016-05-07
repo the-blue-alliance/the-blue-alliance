@@ -7,15 +7,15 @@ const mapStateToProps = (state) => {
   return {
     webcasts: getWebcastIdsInDisplayOrder(state),
     webcastsById: state.webcastsById,
-    hashtagPanelVisible: state.visibility.hashtagSidebar,
-    chatPanelVisible: state.visibility.chatSidebar
+    hashtagSidebarVisible: state.visibility.hashtagSidebar,
+    chatSidebarVisible: state.visibility.chatSidebar
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    toggleChatPanelVisibility: () => dispatch(actions.toggleChatSidebarVisibility()),
-    toggleHashtagPanelVisibility: () => dispatch(actions.toggleHashtagSidebarVisibility()),
+    toggleChatSidebarVisibility: () => dispatch(actions.toggleChatSidebarVisibility()),
+    toggleHashtagSidebarVisibility: () => dispatch(actions.toggleHashtagSidebarVisibility()),
     addWebcast: (id) => dispatch(actions.addWebcast(id)),
     resetWebcasts: () => dispatch(actions.resetWebcasts()),
     setLayout: (layoutId) => dispatch(actions.setLayout(layoutId))

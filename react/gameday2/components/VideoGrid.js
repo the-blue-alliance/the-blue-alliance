@@ -63,8 +63,8 @@ var VideoGrid = React.createClass({
   render: function() {
     var classes = classNames({
       'video-grid': true,
-      'leave-left-margin': this.props.hashtagPanelVisible,
-      'leave-right-margin': this.props.chatPanelVisible,
+      'leave-left-margin': this.props.hashtagSidebarVisible,
+      'leave-right-margin': this.props.chatSidebarVisible,
     });
 
     // If the user didn't set a layout yet, show the empty "welcome" view

@@ -8,12 +8,12 @@ var GamedayNavbar = React.createClass({
   propTypes: {
     webcasts: PropTypes.array.isRequired,
     webcastsById: PropTypes.object.isRequired,
-    hashtagPanelVisible: PropTypes.bool.isRequired,
-    chatPanelVisible: PropTypes.bool.isRequired,
+    hashtagSidebarVisible: PropTypes.bool.isRequired,
+    chatSidebarVisible: PropTypes.bool.isRequired,
     addWebcast: PropTypes.func.isRequired,
     resetWebcasts: PropTypes.func.isRequired,
-    toggleHashtagPanelVisibility: PropTypes.func.isRequired,
-    toggleChatPanelVisibility: PropTypes.func.isRequired,
+    toggleHashtagSidebarVisibility: PropTypes.func.isRequired,
+    toggleChatSidebarVisibility: PropTypes.func.isRequired,
     setLayout: PropTypes.func.isRequired
   },
   render: function() {
@@ -35,13 +35,13 @@ var GamedayNavbar = React.createClass({
               <LayoutDropdown setLayout={this.props.setLayout} />
               <li>
                 <BootstrapButton
-                  active={this.props.hashtagPanelVisible}
-                  handleClick={this.props.toggleHashtagPanelVisibility}>Hashtags</BootstrapButton>
+                  active={this.props.hashtagSidebarVisible}
+                  handleClick={this.props.toggleHashtagSidebarVisibility}>Hashtags</BootstrapButton>
               </li>
               <li>
                 <BootstrapButton
-                  active={this.props.chatPanelVisible}
-                  handleClick={this.props.toggleChatPanelVisibility}>Chat</BootstrapButton>
+                  active={this.props.chatSidebarVisible}
+                  handleClick={this.props.toggleChatSidebarVisibility}>Chat</BootstrapButton>
               </li>
               <SettingsDropdown resetWebcasts={this.props.resetWebcasts} />
             </ul>
