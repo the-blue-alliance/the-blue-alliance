@@ -27,24 +27,56 @@ describe('actions', () => {
     expect(actions.toggleChatSidebarVisibility()).toEqual(expectedAction)
   })
 
-  it('should create an action to add a webcast', () => {
-    let webcastId = 'a'
-    let expectedAction = {
+  it('should create an action to add a webcast if the webcast ID exists in webcastsById', () => {
+    const webcastId = 'a';
+    const getState = () => ({
+      webcastsById: {
+        [webcastId]: {}
+      }
+    })
+    const dispatch = jasmine.createSpy()
+    actions.addWebcast(webcastId)(dispatch, getState)
+    expect(dispatch).toHaveBeenCalledWith({
       type: types.ADD_WEBCAST,
       webcastId
-    }
-    expect(actions.addWebcast(webcastId)).toEqual(expectedAction)
+    })
   })
 
-  it('should create an action to add a webcast at a specific location', () => {
-    let webcastId = 'a'
-    let location = 3
-    let expectedAction = {
+  it('should not create an action to add a webcast if the webcast ID does not exist in webcastsById', () => {
+    const getState = () => ({
+      webcastsById: {}
+    })
+    const dispatch = jasmine.createSpy()
+    actions.addWebcast('a')(dispatch, getState)
+    expect(dispatch.calls.any()).toBe(false)
+  })
+
+  it('should create an action to add a webcast at a specific location if the webcast ID exists in webcastsById', () => {
+    const webcastId = 'a'
+    const location = 0
+    const getState = () => ({
+      webcastsById: {
+        [webcastId]: {}
+      }
+    })
+    const dispatch = jasmine.createSpy()
+    actions.addWebcastAtLocation(webcastId, location)(dispatch, getState)
+    expect(dispatch).toHaveBeenCalledWith({
       type: types.ADD_WEBCAST_AT_LOCATION,
       webcastId,
       location
-    }
-    expect(actions.addWebcastAtLocation(webcastId, location)).toEqual(expectedAction)
+    })
+  })
+
+  it('should not create an action to add a webcast at a specific location if the webcast ID does not exist in webcastsById', () => {
+    const webcastId = 'a'
+    const location = 0
+    const getState = () => ({
+      webcastsById: {}
+    })
+    const dispatch = jasmine.createSpy()
+    actions.addWebcastAtLocation(webcastId, location)(dispatch, getState)
+    expect(dispatch.calls.any()).toBe(false)
   })
 
   it('should create an action to remove a specified webcast', () => {
