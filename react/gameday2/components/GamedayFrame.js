@@ -2,7 +2,7 @@ import React from 'react';
 import GamedayNavbarContainer from '../containers/GamedayNavbarContainer';
 import VideoGridContainer from '../containers/VideoGridContainer';
 import ChatSidebarContainer from '../containers/ChatSidebarContainer';
-import HashtagPanelContainer from '../containers/HashtagPanelContainer';
+import HashtagSidebarContainer from '../containers/HashtagSidebarContainer';
 import FollowingTeamsModal from './FollowingTeamsModal';
 
 var GamedayFrame = React.createClass({
@@ -15,7 +15,7 @@ var GamedayFrame = React.createClass({
     return (
       <div className="gameday container-full">
         <GamedayNavbarContainer />
-        <HashtagPanelContainer />
+        <HashtagSidebarContainer />
         <ChatSidebarContainer />
         <VideoGridContainer />
         <FollowingTeamsModal
