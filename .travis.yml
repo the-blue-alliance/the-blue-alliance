@@ -2,7 +2,7 @@ language: python
 python: 2.7
 
 cache:
-  - pip
+  pip: true
   directories:
     - node_modules
 
