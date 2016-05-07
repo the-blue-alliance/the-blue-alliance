@@ -1,45 +1,29 @@
-import { TOGGLE_CHAT_PANEL_VISIBILITY, TOGGLE_HASHTAG_PANEL_VISIBILITY, TOGGLE_TICKER_PANEL_VISIBILITY } from '../constants/ActionTypes'
+import { TOGGLE_CHAT_SIDEBAR_VISIBILITY, TOGGLE_HASHTAG_SIDEBAR_VISIBILITY } from '../constants/ActionTypes'
 
 const defaultState = {
-  hashtagPanel: false,
-  chatPanel: false,
-  tickerPanel: false
+  hashtagSidebar: false,
+  chatSidebar: false,
+  tickerSidebar: false
 }
 
-const toggleChatPanelVisibility = (state) => {
+const toggleChatSidebarVisibility = (state) => {
   return Object.assign({}, state, {
-    chatPanel: !state.chatPanel
+    chatSidebar: !state.chatSidebar
   })
 }
 
-const toggleHashtagPanelVisibility = (state) => {
-  // Only show EITHER the hashtag panel OR the ticker panel, not both
-  let hashtagPanelVisible = !state.hashtagPanel
-  let tickerPanelVisible = state.tickerPanel ? (state.hashtagPanel) : false
+const toggleHashtagSidebarVisibility = (state) => {
   return Object.assign({}, state, {
-    hashtagPanel: hashtagPanelVisible,
-    tickerPanel: tickerPanelVisible
-  })
-}
-
-const toggleTickerPanelVisibility = (state) => {
-  // Only show EITHER the hashtag panel OR the ticker panel, not both
-  let tickerPanelVisible = !state.tickerPanel
-  let hashtagPanelVisible = state.hashtagPanel ? (state.tickerPanel) : false
-  return Object.assign({}, state, {
-    tickerPanel: tickerPanelVisible,
-    hashtagPanel: hashtagPanelVisible
+    hashtagSidebar: !state.hashtagSidebar
   })
 }
 
 const visibility = (state = defaultState, action) => {
   switch(action.type) {
-    case TOGGLE_CHAT_PANEL_VISIBILITY:
-    return toggleChatPanelVisibility(state)
-    case TOGGLE_HASHTAG_PANEL_VISIBILITY:
-    return toggleHashtagPanelVisibility(state)
-    case TOGGLE_TICKER_PANEL_VISIBILITY:
-    return toggleTickerPanelVisibility(state)
+    case TOGGLE_CHAT_SIDEBAR_VISIBILITY:
+    return toggleChatSidebarVisibility(state)
+    case TOGGLE_HASHTAG_SIDEBAR_VISIBILITY:
+    return toggleHashtagSidebarVisibility(state)
     default:
     return state
   }

@@ -7,8 +7,8 @@ const mapStateToProps = (state) => {
   return {
     webcasts: getWebcastIdsInDisplayOrder(state),
     webcastsById: state.webcastsById,
-    hashtagPanelVisible: state.visibility.hashtagPanel,
-    chatPanelVisible: state.visibility.chatPanel
+    hashtagPanelVisible: state.visibility.hashtagSidebar,
+    chatPanelVisible: state.visibility.chatSidebar
   }
 }
 

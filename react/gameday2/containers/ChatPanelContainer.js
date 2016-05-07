@@ -3,7 +3,7 @@ import ChatPanel from '../components/ChatPanel'
 
 const mapStateToProps = (state) => {
   return {
-    enabled: state.visibility.chatPanel
+    enabled: state.visibility.chatSidebar
   }
 }
 

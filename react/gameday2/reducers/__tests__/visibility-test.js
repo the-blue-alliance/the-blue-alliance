@@ -7,145 +7,77 @@ import * as types from '../../constants/ActionTypes'
 describe('visibility reducer', () => {
   it('defaults all views to not visibile', () => {
     const expectedState = {
-      hashtagPanel: false,
-      chatPanel: false,
-      tickerPanel: false
+      hashtagSidebar: false,
+      chatSidebar: false,
+      tickerSidebar: false
     }
     expect(visibility(undefined, {})).toEqual(expectedState)
   })
 
-  it('toggles chat panel from false to true', () => {
+  it('toggles chat sidebar from false to true', () => {
     const initialState = {
-      hashtagPanel: false,
-      chatPanel: false,
-      tickerPanel: false
+      hashtagSidebar: false,
+      chatSidebar: false,
+      tickerSidebar: false
     }
     const expectedState = {
-      hashtagPanel: false,
-      chatPanel: true,
-      tickerPanel: false
+      hashtagSidebar: false,
+      chatSidebar: true,
+      tickerSidebar: false
     }
     const action = {
-      type: types.TOGGLE_CHAT_PANEL_VISIBILITY
+      type: types.TOGGLE_CHAT_SIDEBAR_VISIBILITY
     }
     expect(visibility(initialState, action)).toEqual(expectedState)
   })
 
-  it('toggles chat panel from true to false', () => {
+  it('toggles chat sidebar from true to false', () => {
     const initialState = {
-      hashtagPanel: false,
-      chatPanel: true,
-      tickerPanel: false
+      hashtagSidebar: false,
+      chatSidebar: true,
+      tickerSidebar: false
     }
     const expectedState = {
-      hashtagPanel: false,
-      chatPanel: false,
-      tickerPanel: false
+      hashtagSidebar: false,
+      chatSidebar: false,
+      tickerSidebar: false
     }
     const action = {
-      type: types.TOGGLE_CHAT_PANEL_VISIBILITY
+      type: types.TOGGLE_CHAT_SIDEBAR_VISIBILITY
     }
     expect(visibility(initialState, action)).toEqual(expectedState)
   })
 
-  it('toggles hashtag panel from false to true', () => {
+  it('toggles hashtag sidebar from false to true', () => {
     const initialState = {
-      hashtagPanel: false,
-      chatPanel: false,
-      tickerPanel: false
+      hashtagSidebar: false,
+      chatSidebar: false,
+      tickerSidebar: false
     }
     const expectedState = {
-      hashtagPanel: true,
-      chatPanel: false,
-      tickerPanel: false
+      hashtagSidebar: true,
+      chatSidebar: false,
+      tickerSidebar: false
     }
     const action = {
-      type: types.TOGGLE_HASHTAG_PANEL_VISIBILITY
+      type: types.TOGGLE_HASHTAG_SIDEBAR_VISIBILITY
     }
     expect(visibility(initialState, action)).toEqual(expectedState)
   })
 
-  it('toggles hashtag panel from true to false', () => {
+  it('toggles hashtag sidebar from true to false', () => {
     const initialState = {
-      hashtagPanel: true,
-      chatPanel: false,
-      tickerPanel: false
+      hashtagSidebar: true,
+      chatSidebar: false,
+      tickerSidebar: false
     }
     const expectedState = {
-      hashtagPanel: false,
-      chatPanel: false,
-      tickerPanel: false
+      hashtagSidebar: false,
+      chatSidebar: false,
+      tickerSidebar: false
     }
     const action = {
-      type: types.TOGGLE_HASHTAG_PANEL_VISIBILITY
-    }
-    expect(visibility(initialState, action)).toEqual(expectedState)
-  })
-
-  it('toggles ticker panel from false to true', () => {
-    const initialState = {
-      hashtagPanel: false,
-      chatPanel: false,
-      tickerPanel: false
-    }
-    const expectedState = {
-      hashtagPanel: false,
-      chatPanel: false,
-      tickerPanel: true
-    }
-    const action = {
-      type: types.TOGGLE_TICKER_PANEL_VISIBILITY
-    }
-    expect(visibility(initialState, action)).toEqual(expectedState)
-  })
-
-  it('toggles ticker panel from true to false', () => {
-    const initialState = {
-      hashtagPanel: false,
-      chatPanel: false,
-      tickerPanel: true
-    }
-    const expectedState = {
-      hashtagPanel: false,
-      chatPanel: false,
-      tickerPanel: false
-    }
-    const action = {
-      type: types.TOGGLE_TICKER_PANEL_VISIBILITY
-    }
-    expect(visibility(initialState, action)).toEqual(expectedState)
-  })
-
-  it('hides ticker panel when showing hashtag panel', () => {
-    const initialState = {
-      hashtagPanel: false,
-      chatPanel: false,
-      tickerPanel: true
-    }
-    const expectedState = {
-      hashtagPanel: true,
-      chatPanel: false,
-      tickerPanel: false
-    }
-    const action = {
-      type: types.TOGGLE_HASHTAG_PANEL_VISIBILITY
-    }
-    expect(visibility(initialState, action)).toEqual(expectedState)
-  })
-
-  it('hides hashtag panel when showing ticker panel', () => {
-    const initialState = {
-      hashtagPanel: true,
-      chatPanel: false,
-      tickerPanel: false
-    }
-    const expectedState = {
-      hashtagPanel: false,
-      chatPanel: false,
-      tickerPanel: true
-    }
-    const action = {
-      type: types.TOGGLE_TICKER_PANEL_VISIBILITY
+      type: types.TOGGLE_HASHTAG_SIDEBAR_VISIBILITY
     }
     expect(visibility(initialState, action)).toEqual(expectedState)
   })

@@ -3,7 +3,7 @@ import HashtagPanel from '../components/HashtagPanel'
 
 const mapStateToProps = (state) => {
   return {
-    enabled: state.visibility.hashtagPanel
+    enabled: state.visibility.hashtagSidebar
   }
 }
 
