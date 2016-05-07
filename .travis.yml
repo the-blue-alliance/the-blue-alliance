@@ -1,3 +1,4 @@
+sudo: required
 language: python
 python: 2.7
 
@@ -14,7 +15,7 @@ install:
   - ln -s vendors/google_appengine/dev_appserver.py .
 
   # JavaScript test requirements
-  - sudo npm install
+  - npm install
 
 script:
   # Run python tests
