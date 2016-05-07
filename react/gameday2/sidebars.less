@@ -1,0 +1,31 @@
+@chat-panel-width: 300px;
+@hashtag-panel-width: 300px;
+@ticker-panel-width: 300px;
+
+.chat-panel {
+  position: absolute;
+  right: 0;
+  width: @chat-panel-width;
+  height: 100%;
+}
+
+.hashtag-panel {
+  position: absolute;
+  left: 0;
+  width: @hashtag-panel-width;
+  height: 100%
+}
+
+.video-grid {
+  height: 100%;
+  position: absolute;
+  left: 0;
+  right: 0;
+  &.leave-right-margin {
+    margin-right: 300px;
+  }
+
+  &.leave-left-margin {
+    margin-left: 300px;
+  }
+}

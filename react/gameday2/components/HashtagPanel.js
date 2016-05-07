@@ -16,8 +16,7 @@ var HashtagPanel = React.createClass({
   render: function() {
     var classes = classNames({
       'hidden': !this.props.enabled,
-      'pull-left': true,
-      'sidebar': true,
+      'hashtag-panel': true
     });
     return (
       <div className={classes}>
