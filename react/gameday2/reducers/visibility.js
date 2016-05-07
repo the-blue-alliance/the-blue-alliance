@@ -6,26 +6,40 @@ const defaultState = {
   tickerPanel: false
 }
 
+const toggleChatPanelVisibility = (state) => {
+  return Object.assign({}, state, {
+    chatPanel: !state.chatPanel
+  })
+}
+
+const toggleHashtagPanelVisibility = (state) => {
+  // Only show EITHER the hashtag panel OR the ticker panel, not both
+  let hashtagPanelVisible = !state.hashtagPanel
+  let tickerPanelVisible = state.tickerPanel ? (state.hashtagPanel) : false
+  return Object.assign({}, state, {
+    hashtagPanel: hashtagPanelVisible,
+    tickerPanel: tickerPanelVisible
+  })
+}
+
+const toggleTickerPanelVisibility = (state) => {
+  // Only show EITHER the hashtag panel OR the ticker panel, not both
+  let tickerPanelVisible = !state.tickerPanel
+  let hashtagPanelVisible = state.hashtagPanel ? (state.tickerPanel) : false
+  return Object.assign({}, state, {
+    tickerPanel: tickerPanelVisible,
+    hashtagPanel: hashtagPanelVisible
+  })
+}
+
 const visibility = (state = defaultState, action) => {
   switch(action.type) {
     case TOGGLE_CHAT_PANEL_VISIBILITY:
-    return Object.assign({}, state, {
-      chatPanel: !state.chatPanel
-    })
+    return toggleChatPanelVisibility(state)
     case TOGGLE_HASHTAG_PANEL_VISIBILITY:
-    // Only show EITHER the hashtag panel OR the ticker panel, not both
-    let hashtagPanelVisible = !state.hashtagPanel
-    return Object.assign({}, state, {
-      hashtagPanel: hashtagPanelVisible,
-      tickerPanel: !hashtagPanelVisible
-    })
+    return toggleHashtagPanelVisibility(state)
     case TOGGLE_TICKER_PANEL_VISIBILITY:
-    // Only show EITHER the hashtag panel OR the ticker panel, not both
-    let tickerPanelVisible = !state.tickerPanel
-    return Object.assign({}, state, {
-      tickerPanel: tickerPanelVisible,
-      hashtagPanel: !tickerPanelVisible
-    })
+    return toggleTickerPanelVisibility(state)
     default:
     return state
   }
