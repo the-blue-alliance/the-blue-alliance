@@ -23,6 +23,12 @@ export function toggleHashtagPanelVisibility() {
   }
 }
 
+export function toggleTickerPanelVisibility() {
+  return {
+    type: types.TOGGLE_TICKER_PANEL_VISIBILITY
+  }
+}
+
 export function addWebcast(webcastId) {
   // Before displaying the webcast, check that the provided webcast ID
   // references a webcast that actually exists
