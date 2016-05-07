@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import BootstrapButton from './BootstrapButton';
 import SettingsDropdown from './SettingsDropdown';
-import SidePanelToggleDropdown from './SidePanelToggleDropdown'
+import SidebarToggleDropdown from './SidebarToggleDropdown'
 import LayoutDropdown from './LayoutDropdown';
 var classNames = require('classnames');
 
@@ -9,12 +9,12 @@ var GamedayNavbar = React.createClass({
   propTypes: {
     webcasts: PropTypes.array.isRequired,
     webcastsById: PropTypes.object.isRequired,
-    hashtagPanelVisible: PropTypes.bool.isRequired,
-    chatPanelVisible: PropTypes.bool.isRequired,
+    hashtagSidebarVisible: PropTypes.bool.isRequired,
+    chatSidebarVisible: PropTypes.bool.isRequired,
     addWebcast: PropTypes.func.isRequired,
     resetWebcasts: PropTypes.func.isRequired,
-    toggleHashtagPanelVisibility: PropTypes.func.isRequired,
-    toggleChatPanelVisibility: PropTypes.func.isRequired,
+    toggleHashtagSidebarVisibility: PropTypes.func.isRequired,
+    toggleChatSidebarVisibility: PropTypes.func.isRequired,
     setLayout: PropTypes.func.isRequired
   },
   render: function() {
@@ -34,11 +34,11 @@ var GamedayNavbar = React.createClass({
           <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul className="nav navbar-nav navbar-right">
               <LayoutDropdown setLayout={this.props.setLayout} />
-              <SidePanelToggleDropdown
-                toggleChatPanelVisibility={this.props.toggleChatPanelVisibility}
-                toggleHashtagPanelVisibility={this.props.toggleHashtagPanelVisibility}
-                chatPanelVisible={this.props.chatPanelVisible}
-                hashtagPanelVisible={this.props.hashtagPanelVisible} />
+              <SidebarToggleDropdown
+                toggleChatSidebarVisibility={this.props.toggleChatSidebarVisibility}
+                toggleHashtagSidebarVisibility={this.props.toggleHashtagSidebarVisibility}
+                chatSidebarVisible={this.props.chatSidebarVisible}
+                hashtagSidebarVisible={this.props.hashtagSidebarVisible} />
               <SettingsDropdown resetWebcasts={this.props.resetWebcasts} />
             </ul>
           </div>

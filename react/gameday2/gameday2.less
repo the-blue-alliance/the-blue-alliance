@@ -1,4 +1,5 @@
 @import "layouts.less";
+@import "sidebars.less";
 
 html {
   height: 100%;
@@ -11,12 +12,17 @@ body {
 }
 
 #content {
-  height:100%;
+  height: 100%;
   overflow: hidden;
 }
 
 .container-full {
+  position: relative;
   height: 100%;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 
 .video-cell {
@@ -34,26 +40,6 @@ body {
 
 .video-cell-overlay.panel {
   background-color: transparent;
-}
-
-.video-grid {
-  height: 100%;
-  width: 100%;
-  display: inline-block;
-  position: relative;
-  &.leave-right-margin, &.leave-left-margin {
-    width: ~"calc(100% - 300px)";
-  }
-
-  &.leave-right-margin.leave-left-margin {
-    width: ~"calc(100% - 600px)";
-  }
-}
-
-.sidebar {
-  height: 100%;
-  width: 300px;
-  display: inline-block;
 }
 
 #twitter-widget {
