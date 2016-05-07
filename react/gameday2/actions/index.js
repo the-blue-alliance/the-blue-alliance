@@ -11,13 +11,13 @@ export function setWebcastsRaw(webcasts) {
   }
 }
 
-export function toggleChatPanelVisibility() {
+export function toggleChatSidebarVisibility() {
   return {
     type: types.TOGGLE_CHAT_SIDEBAR_VISIBILITY
   }
 }
 
-export function toggleHashtagPanelVisibility() {
+export function toggleHashtagSidebarVisibility() {
   return {
     type: types.TOGGLE_HASHTAG_SIDEBAR_VISIBILITY
   }

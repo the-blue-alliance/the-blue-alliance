@@ -13,18 +13,18 @@ describe('actions', () => {
     expect(actions.setWebcastsRaw(webcasts)).toEqual(expectedAction)
   })
 
-  it('should create an action to toggle the hashtag panel visibility', () => {
+  it('should create an action to toggle the hashtag sidebar visibility', () => {
     let expectedAction = {
-      type: types.TOGGLE_HASHTAG_PANEL_VISIBILITY
+      type: types.TOGGLE_HASHTAG_SIDEBAR_VISIBILITY
     }
-    expect(actions.toggleHashtagPanelVisibility()).toEqual(expectedAction)
+    expect(actions.toggleHashtagSidebarVisibility()).toEqual(expectedAction)
   })
 
-  it('should create an action to toggle the chat panel visibility', () => {
+  it('should create an action to toggle the chat sidebar visibility', () => {
     let expectedAction = {
-      type: types.TOGGLE_CHAT_PANEL_VISIBILITY
+      type: types.TOGGLE_CHAT_SIDEBAR_VISIBILITY
     }
-    expect(actions.toggleChatPanelVisibility()).toEqual(expectedAction)
+    expect(actions.toggleChatSidebarVisibility()).toEqual(expectedAction)
   })
 
   it('should create an action to add a webcast', () => {

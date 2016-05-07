@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import GamedayNavbar from '../components/GamedayNavbar'
-import { toggleChatPanelVisibility, toggleHashtagPanelVisibility, addWebcast, resetWebcasts, setLayout } from '../actions'
+import * as actions from '../actions'
 import { getWebcastIdsInDisplayOrder } from '../selectors'
 
 const mapStateToProps = (state) => {
@@ -14,11 +14,11 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    toggleChatPanelVisibility: () => dispatch(toggleChatPanelVisibility()),
-    toggleHashtagPanelVisibility: () => dispatch(toggleHashtagPanelVisibility()),
-    addWebcast: (id) => dispatch(addWebcast(id)),
-    resetWebcasts: () => dispatch(resetWebcasts()),
-    setLayout: (layoutId) => dispatch(setLayout(layoutId))
+    toggleChatPanelVisibility: () => dispatch(actions.toggleChatSidebarVisibility()),
+    toggleHashtagPanelVisibility: () => dispatch(actions.toggleHashtagSidebarVisibility()),
+    addWebcast: (id) => dispatch(actions.addWebcast(id)),
+    resetWebcasts: () => dispatch(actions.resetWebcasts()),
+    setLayout: (layoutId) => dispatch(actions.setLayout(layoutId))
   }
 }
 
