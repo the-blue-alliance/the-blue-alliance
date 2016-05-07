@@ -5,7 +5,7 @@ var ChatPanel = React.createClass({
   render: function() {
     var classes = classNames({
       'hidden': !this.props.enabled,
-      'chat-panel': true
+      'chat-sidebar': true
     });
     return (
       <div className={classes}>
