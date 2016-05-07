@@ -25,14 +25,14 @@ var SettingsDropdown = React.createClass({
   render: function() {
     return (
       <li className="dropdown">
-        <a href="#" className="dropdown-toggle" data-toggle="dropdown">Side Panels <b className="caret"></b></a>
+        <a href="#" className="dropdown-toggle" data-toggle="dropdown">Sidebars <b className="caret"></b></a>
         <ul className="dropdown-menu">
           <BootstrapDropdownToggleItem
             handleClick={this.props.toggleHashtagSidebarVisibility}
-            checked={this.props.hashtagSidebarVisible}>Social Panel</BootstrapDropdownToggleItem>
+            checked={this.props.hashtagSidebarVisible}>Social</BootstrapDropdownToggleItem>
           <BootstrapDropdownToggleItem
             handleClick={this.props.toggleChatSidebarVisibility}
-            checked={this.props.chatSidebarVisible}>Chat Panel</BootstrapDropdownToggleItem>
+            checked={this.props.chatSidebarVisible}>Chat</BootstrapDropdownToggleItem>
         </ul>
       </li>
     )
