@@ -4,12 +4,10 @@
   "dependencies": {
     "babel-polyfill": "^6.8.0",
     "classnames": "^2.2.3",
-    "firebase": "^2.4.2",
     "query-string": "^4.1.0",
     "react": "^15.0.1",
     "react-dom": "^15.0.1",
     "react-redux": "^4.4.5",
-    "reactfire": "^0.7.0",
     "redux": "^3.5.2",
     "redux-thunk": "^2.0.1",
     "reselect": "^2.5.1",
