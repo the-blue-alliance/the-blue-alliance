@@ -102,7 +102,9 @@ class InsightsHelper(object):
                 'verbose_name': match.verbose_name,
                 'event_name': event.name,
                 'alliances': match.alliances,
-                'winning_alliance': match.winning_alliance
+                'winning_alliance': match.winning_alliance,
+                'tba_video': match.tba_video,
+                'youtube_videos_formatted': match.youtube_videos_formatted
                 }
 
     @classmethod
