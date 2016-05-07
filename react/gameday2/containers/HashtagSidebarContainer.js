@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import HashtagSidebar from '../components/hashtagSidebar'
+import HashtagSidebar from '../components/HashtagSidebar'
 
 const mapStateToProps = (state) => {
   return {
