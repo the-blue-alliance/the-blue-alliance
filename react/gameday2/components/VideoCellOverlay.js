@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import { Tooltip, OverlayTrigger } from 'react-bootstrap'
 var classNames = require('classnames');
 
 var VideoCellOverlay = React.createClass({
@@ -18,13 +19,23 @@ var VideoCellOverlay = React.createClass({
       'video-cell-overlay': true,
     });
     if (this.props.webcast) {
+      const closeTooltip = (
+        <Tooltip>Close webcast</Tooltip>
+      )
+      const changeWebcastTooltip = (
+        <Tooltip>Change webcast</Tooltip>
+      )
       return (
         <div className={classes}>
           <div className="panel-heading">
             <h3 className="panel-title">{this.props.webcast.name}</h3>
             <div className="overlay-button-container">
-              <span className="overlay-button" href="#" onClick={this.props.showWebcastSelectionPanel}>Change Webcast</span>
-              <span className="overlay-button button-close glyphicon glyphicon-remove" onClick={this.onCloseClicked}></span>
+              <OverlayTrigger placement="bottom" overlay={changeWebcastTooltip}>
+                <span className="overlay-button" onClick={this.props.showWebcastSelectionPanel}>Change Webcast</span>
+              </OverlayTrigger>
+              <OverlayTrigger placement="bottom" overlay={closeTooltip}>
+                <span className="overlay-button button-close glyphicon glyphicon-remove" onClick={this.onCloseClicked}></span>
+              </OverlayTrigger>
             </div>
           </div>
         </div>
