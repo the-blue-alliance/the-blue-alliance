@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import VideoCellOverlay from './VideoCellOverlay';
+import VideoOverlayContainer from '../containers/VideoOverlayContainer';
 import WebcastSelectionPanel from './WebcastSelectionPanel'
 import EmbedUstream from './EmbedUstream';
 import EmbedYoutube from './EmbedYoutube';
@@ -11,20 +11,19 @@ var VideoCell = React.createClass({
     webcastsById: PropTypes.object.isRequired,
     displayedWebcasts: PropTypes.array.isRequired,
     location: PropTypes.number.isRequired,
-    removeWebcast: PropTypes.func.isRequired,
     addWebcastAtLocation: PropTypes.func.isRequired
   },
   getInitialState: function() {
     return {
-      showOverlay: false,
+      mouseOver: false,
       showWebcastSelectionPanel: false
     };
   },
   onMouseOver: function() {
-    this.setState({"showOverlay": true})
+    this.setState({"mouseOver": true})
   },
   onMouseOut: function() {
-    this.setState({"showOverlay": false})
+    this.setState({"mouseOver": false})
   },
   showWebcastSelectionPanel: function() {
     this.setState({"showWebcastSelectionPanel": true})
@@ -71,18 +70,10 @@ var VideoCell = React.createClass({
           onMouseOver={this.onMouseOver}
           onMouseOut={this.onMouseOut} >
           {cellEmbed}
-          <VideoCellOverlay
+          <VideoOverlayContainer
             webcast={this.props.webcast}
-            enabled={this.state.showOverlay}
-            removeWebcast={this.props.removeWebcast}
-            showWebcastSelectionPanel={this.showWebcastSelectionPanel} />
-          <WebcastSelectionPanel
-            webcasts={this.props.webcasts}
-            webcastsById={this.props.webcastsById}
-            displayedWebcasts={this.props.displayedWebcasts}
-            enabled={this.state.showWebcastSelectionPanel}
-            webcastSelected={this.webcastSelected}
-            closeWebcastSelectionPanel={this.hideWebcastSelectionPanel} />
+            mouseOverContainer={this.state.mouseOver}
+            location={this.props.location} />
         </div>
       )
     } else {
