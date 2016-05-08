@@ -79,6 +79,17 @@ describe('actions', () => {
     expect(dispatch.calls.any()).toBe(false)
   })
 
+  it('should create an action to swap two webcasts', () => {
+    let firstLocation = 0
+    let secondLocation = 1
+    let expectedAction = {
+      type: types.SWAP_WEBCASTS,
+      firstLocation,
+      secondLocation
+    }
+    expect(actions.swapWebcasts(firstLocation, secondLocation)).toEqual(expectedAction)
+  })
+
   it('should create an action to remove a specified webcast', () => {
     let webcastId = 'a'
     let expectedAction = {

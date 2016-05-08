@@ -3,8 +3,7 @@ import VideoCellOverlay from '../components/VideoCellOverlay'
 import { addWebcastAtLocation, removeWebcast, setLayout } from '../actions'
 import { getWebcastIdsInDisplayOrder } from '../selectors'
 
-const mapStateToProps = (state, ownProps) => {
-  console.log(ownProps)
+const mapStateToProps = (state) => {
   return {
     webcasts: getWebcastIdsInDisplayOrder(state),
     webcastsById: state.webcastsById,
