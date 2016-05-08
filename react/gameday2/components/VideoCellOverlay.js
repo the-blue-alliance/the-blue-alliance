@@ -31,10 +31,10 @@ var VideoCellOverlay = React.createClass({
             <h3 className="panel-title">{this.props.webcast.name}</h3>
             <div className="overlay-button-container">
               <OverlayTrigger placement="bottom" overlay={changeWebcastTooltip}>
-                <span className="overlay-button" onClick={this.props.showWebcastSelectionPanel}>Change Webcast</span>
+                <i className="material-icons overlay-button" onClick={this.props.showWebcastSelectionPanel}>videocam</i>
               </OverlayTrigger>
               <OverlayTrigger placement="bottom" overlay={closeTooltip}>
-                <span className="overlay-button button-close glyphicon glyphicon-remove" onClick={this.onCloseClicked}></span>
+                <i className="material-icons overlay-button button-close" onClick={this.onCloseClicked}>close</i>
               </OverlayTrigger>
             </div>
           </div>
