@@ -38,6 +38,12 @@ const addWebcastAtNextAvailableLocation = (displayedWebcasts, webcastId, maxSupp
   displayedWebcasts.push(webcastId)
 }
 
+const swapWebcasts = (displayedWebcasts, firstLocation, secondLocation) => {
+  let temp = displayedWebcasts[firstLocation]
+  displayedWebcasts[firstLocation] = displayedWebcasts[secondLocation]
+  displayedWebcasts[secondLocation] = temp
+}
+
 /**
  * If the specified webcast ID exists in displayedWebcasts, this function
  * replaces it with null.
@@ -61,6 +67,10 @@ const displayedWebcasts = (state = [], action) => {
     case types.ADD_WEBCAST_AT_LOCATION:
       webcasts = state.slice(0)
       addWebcastAtLocation(webcasts, action.webcastId, action.location, MAX_SUPPORTED_VIEWS)
+      return webcasts
+    case types.SWAP_WEBCASTS:
+      webcasts = state.slice(0)
+      swapWebcasts(webcasts, action.firstLocation, action.secondLocation)
       return webcasts
     case types.REMOVE_WEBCAST:
       webcasts = state.slice(0)
