@@ -25,11 +25,17 @@ var VideoCellOverlay = React.createClass({
       const changeWebcastTooltip = (
         <Tooltip>Change webcast</Tooltip>
       )
+      const swapWebcastTooltip = (
+        <Tooltip>Swap webcast position</Tooltip>
+      )
       return (
         <div className={classes}>
           <div className="panel-heading">
             <h3 className="panel-title">{this.props.webcast.name}</h3>
             <div className="overlay-button-container">
+              <OverlayTrigger placement="bottom" overlay={swapWebcastTooltip}>
+                <i className="material-icons overlay-button">compare_arrows</i>
+              </OverlayTrigger>
               <OverlayTrigger placement="bottom" overlay={changeWebcastTooltip}>
                 <i className="material-icons overlay-button" onClick={this.props.showWebcastSelectionPanel}>videocam</i>
               </OverlayTrigger>
