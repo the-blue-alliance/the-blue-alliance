@@ -17,7 +17,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    removeWebcast: (id) => dispatch(removeWebcast(id)),
     addWebcastAtLocation: (webcastId, location) => dispatch(addWebcastAtLocation(webcastId, location)),
     setLayout: (layoutId) => dispatch(setLayout(layoutId))
   }
