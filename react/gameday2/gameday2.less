@@ -1,6 +1,8 @@
 @import "layouts.less";
 @import "sidebars.less";
 
+@navbar-height: 50px;
+
 html {
   height: 100%;
 }
@@ -8,12 +10,32 @@ html {
 body {
   background: black;
   height: 100%;
-  padding-top: 50px;
+  padding-top: @navbar-height;
 }
 
 #content {
   height: 100%;
   overflow: hidden;
+}
+
+/*.navbar-default .navbar-nav i {
+  height: @navbar-height;
+  line-height: @navbar-height;
+  padding: 0 15px;
+  color: #777;
+  cursor: pointer;
+  &:hover {
+    color: #333;
+  }
+}*/
+
+.navbar-default .navbar-nav a.navbar-icon {
+  padding-top: 0;
+  padding-bottom: 0;
+  i {
+    height: @navbar-height;
+    line-height: @navbar-height;
+  }
 }
 
 .container-full {

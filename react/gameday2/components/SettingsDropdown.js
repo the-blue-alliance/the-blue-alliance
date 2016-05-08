@@ -5,7 +5,7 @@ var SettingsDropdown = React.createClass({
   render: function() {
     return (
       <li className="dropdown">
-        <a href="#" className="dropdown-toggle" data-toggle="dropdown"><span className="glyphicon glyphicon-cog"></span></a>
+        <a href="#" className="dropdown-toggle navbar-icon" data-toggle="dropdown"><i className="material-icons">settings</i></a>
         <ul className="dropdown-menu">
           <BootstrapNavDropdownListItem handleClick={this.props.resetWebcasts}>Reset Layout</BootstrapNavDropdownListItem>
           <li className="divider"></li>
