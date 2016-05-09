@@ -35,7 +35,7 @@ var classNames = require('classnames');
  * location prop to the index of that key in displayedWebcasts
  * 9. If a key is not present, pop a location from from the array of empty locations
  * and create an empty VideoCell at that location.
- * 
+ *
  */
 
 var VideoGrid = React.createClass({
@@ -143,36 +143,6 @@ var VideoGrid = React.createClass({
         {videoCells}
       </div>
     )
-
-    /*var videoCells = [];
-    for (var i = 0; i < webcastCount; i++) {
-      var webcast = null, id = 'video-' + i;
-      // Some entries in the dispalyed webcasts array may be null, for instance
-      // if the user doesn't select webcasts for some views in a layout
-      if (i < this.props.displayedWebcasts.length && this.props.displayedWebcasts[i]) {
-        webcast = this.props.webcastsById[this.props.displayedWebcasts[i]];
-        id = webcast.id;
-      }
-      videoCells.push(
-        <VideoCell
-          location={i}
-          key={id}
-          webcast={webcast}
-          webcasts={this.props.webcasts}
-          webcastsById={this.props.webcastsById}
-          displayedWebcasts={this.props.displayedWebcasts}
-          addWebcastAtLocation={this.props.addWebcastAtLocation}
-          removeWebcast={this.props.removeWebcast}
-          vidHeight="100%"
-          vidWidth="100%" />
-      );
-    }
-
-    return (
-      <div className={classes}>
-        {videoCells}
-      </div>
-    );*/
   },
   render: function() {
     var classes = classNames({
