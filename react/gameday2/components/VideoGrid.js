@@ -68,9 +68,7 @@ var VideoGrid = React.createClass({
 
     // Now, add any new webcasts in the first available space
     for (let i = 0; i < props.displayedWebcasts.length; i++) {
-      console.log('at index ' + i)
       if (webcastRenderOrder.indexOf(props.displayedWebcasts[i]) == -1) {
-        console.log('not in the array!')
         // Find the first empty space in webcastRenderOrder
         let foundSpace = false
         for (let j = 0; j < webcastRenderOrder.length; j++) {
@@ -80,15 +78,11 @@ var VideoGrid = React.createClass({
             break
           }
         }
-        console.log('found space? ' + foundSpace)
         if (!foundSpace) {
           webcastRenderOrder.push(props.displayedWebcasts[i])
         }
       }
     }
-    console.log('update')
-    console.log(props)
-    console.log(webcastRenderOrder)
 
     this.setState({
       webcastRenderOrder
@@ -111,9 +105,6 @@ var VideoGrid = React.createClass({
         emptyCellLocations.push(i)
       }
     }
-
-    console.log(emptyCellLocations)
-    console.log(webcastRenderOrder)
 
     // Now, render everything!
 
