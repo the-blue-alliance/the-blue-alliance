@@ -1,12 +1,14 @@
 import React, { PropTypes } from 'react';
 import { Tooltip, OverlayTrigger } from 'react-bootstrap'
 import WebcastSelectionPanel from './WebcastSelectionPanel'
+import SwapPanel from './SwapPanel'
 var classNames = require('classnames');
 
 var VideoCellOverlay = React.createClass({
   propTypes: {
     mouseOverContainer: PropTypes.bool.isRequired,
-    webcast: PropTypes.object.isRequired
+    webcast: PropTypes.object.isRequired,
+    location: PropTypes.number.isRequired
   },
   getInitialState: function() {
     return {
@@ -81,6 +83,11 @@ var VideoCellOverlay = React.createClass({
             enabled={this.state.showWebcastSelectionPanel}
             webcastSelected={this.webcastSelected}
             closeWebcastSelectionPanel={this.hideWebcastSelectionPanel} />
+          <SwapPanel
+            location={this.props.location}
+            layoutId={this.props.layoutId}
+            enabled={this.state.showSwapPanel}
+            close={this.hideSwapPanel} />
         </div>
       )
     }
