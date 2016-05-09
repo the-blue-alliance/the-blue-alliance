@@ -1,6 +1,8 @@
 import json
 import logging
 import re
+from urllib import urlencode
+from urlparse import urlparse
 
 from google.appengine.api import urlfetch
 
@@ -67,6 +69,11 @@ class MediaParser(object):
         'imgur.com/': MediaType.IMGUR,
     }
 
+    # The default is to strip out all urlparams, but this is a white-list for exceptions
+    ALLOWED_URLPARAMS = {
+        MediaType.YOUTUBE_VIDEO: ['v'],
+    }
+
     @classmethod
     def partial_media_dict_from_url(cls, url):
         """
@@ -92,6 +99,7 @@ class MediaParser(object):
         Build a media dict from the given url and media type
         This will parse the foreign key from the url and add other data about the media type
         """
+        url = cls._sanitize_media_url(media_type, url)
         media_dict = {'media_type_enum': media_type}
         foreign_key = cls._parse_foreign_key(media_type, url)
         if foreign_key is None:
@@ -123,6 +131,25 @@ class MediaParser(object):
 
         logging.warning("Failed to determine {} foreign_key from url: {}".format(MediaType.type_names[media_type], url))
         return None
+
+    @classmethod
+    def _sanitize_media_url(cls, media_type, url):
+        media_url = url.strip()
+        parsed = urlparse(media_url)
+        clean_url = "{}://{}{}".format(parsed.scheme, parsed.netloc, parsed.path)
+
+        # Add white-listed url params back in
+        if media_type in cls.ALLOWED_URLPARAMS:
+            whitelist = cls.ALLOWED_URLPARAMS[media_type]
+            all_params = parsed.query.split('&')
+            allowed_params = {}
+            for param in all_params:
+                if any(param.startswith(w+'=') for w in whitelist):
+                    split = param.split('=')
+                    allowed_params[split[0]] = split[1]
+
+            clean_url += urlencode(allowed_params)
+        return clean_url
 
     @classmethod
     def _partial_media_dict_from_cd_photo_thread(cls, url):

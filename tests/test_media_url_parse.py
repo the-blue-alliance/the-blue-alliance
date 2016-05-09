@@ -49,7 +49,7 @@ class TestMediaUrlParser(unittest2.TestCase):
         self.assertEqual(MediaParser.partial_media_dict_from_url("http://imgur.com/r/aww"), None)
         self.assertEqual(MediaParser.partial_media_dict_from_url("http://imgur.com/a/album"), None)
 
-    def testFbProfile(self):
+    def test_fb_profile_parse(self):
         result = MediaParser.partial_media_dict_from_url("http://facebook.com/theuberbots")
         self.assertEqual(result['media_type_enum'], MediaType.FACEBOOK_PROFILE)
         self.assertEqual(result['is_social'], True)
@@ -57,7 +57,7 @@ class TestMediaUrlParser(unittest2.TestCase):
         self.assertEqual(result['site_name'], MediaType.type_names[MediaType.FACEBOOK_PROFILE])
         self.assertEqual(result['profile_url'], 'https://www.facebook.com/theuberbots')
 
-    def testTwitterProfile(self):
+    def test_twitter_profile_parse(self):
         result = MediaParser.partial_media_dict_from_url("https://twitter.com/team1124")
         self.assertEqual(result['media_type_enum'], MediaType.TWITTER_PROFILE)
         self.assertEqual(result['is_social'], True)
@@ -65,7 +65,7 @@ class TestMediaUrlParser(unittest2.TestCase):
         self.assertEqual(result['site_name'], MediaType.type_names[MediaType.TWITTER_PROFILE])
         self.assertEqual(result['profile_url'], 'https://twitter.com/team1124')
 
-    def testYouTubeProfile(self):
+    def test_youtube_profile_parse(self):
         result = MediaParser.partial_media_dict_from_url("https://www.youtube.com/user/Uberbots1124")
         self.assertEqual(result['media_type_enum'], MediaType.YOUTUBE_CHANNEL)
         self.assertEqual(result['is_social'], True)
@@ -73,7 +73,7 @@ class TestMediaUrlParser(unittest2.TestCase):
         self.assertEqual(result['site_name'], MediaType.type_names[MediaType.YOUTUBE_CHANNEL])
         self.assertEqual(result['profile_url'], 'https://www.youtube.com/user/uberbots1124')
 
-    def testGitHubProfile(self):
+    def test_github_profile_parse(self):
         result = MediaParser.partial_media_dict_from_url("https://github.com/frc1124")
         self.assertEqual(result['media_type_enum'], MediaType.GITHUB_PROFILE)
         self.assertEqual(result['is_social'], True)
