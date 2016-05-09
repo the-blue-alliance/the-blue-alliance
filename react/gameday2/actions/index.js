@@ -62,6 +62,14 @@ let addWebcastAtLocationNoCheck = (webcastId, location) => {
   }
 }
 
+export function swapWebcasts (firstLocation, secondLocation) {
+  return {
+    type: types.SWAP_WEBCASTS,
+    firstLocation,
+    secondLocation
+  }
+}
+
 export function removeWebcast(webcastId) {
   return {
     type: types.REMOVE_WEBCAST,

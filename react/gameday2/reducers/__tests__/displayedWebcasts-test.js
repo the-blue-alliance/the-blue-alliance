@@ -104,4 +104,15 @@ describe('displayedWebcasts reducer', () => {
 
     expect(displayedWebcasts(initialState, action)).toEqual(initialState)
   })
+
+  it('swaps the location of two webcasts', () => {
+    let initialState = ['a', 'b']
+    let expectedState = ['b', 'a']
+    let action = {
+      type: types.SWAP_WEBCASTS,
+      firstLocation: 0,
+      secondLocation: 1
+    }
+    expect(displayedWebcasts(initialState, action)).toEqual(expectedState)
+  })
 })
