@@ -29,6 +29,10 @@ class TestMediaUrlParser(unittest2.TestCase):
         self.assertEqual(yt_short['media_type_enum'], MediaType.YOUTUBE_VIDEO)
         self.assertEqual(yt_short['foreign_key'], "I-IrVbsl_K8")
 
+        yt_from_playlist = MediaParser.partial_media_dict_from_url("https://www.youtube.com/watch?v=VP992UKFbko&index=1&list=PLZT9pIgNOV6ZE0EgstWeoRWGWT3uoaszm")
+        self.assertEqual(yt_from_playlist['media_type_enum'], MediaType.YOUTUBE_VIDEO)
+        self.assertEqual(yt_from_playlist['foreign_key'], 'VP992UKFbko')
+
     def test_cdphotothread_parse(self):
         cd = MediaParser.partial_media_dict_from_url("http://www.chiefdelphi.com/media/photos/41999")
         self.assertEqual(cd['media_type_enum'], MediaType.CD_PHOTO_THREAD)
