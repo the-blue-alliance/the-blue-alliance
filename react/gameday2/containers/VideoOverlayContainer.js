@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import VideoCellOverlay from '../components/VideoCellOverlay'
-import { addWebcastAtLocation, removeWebcast, setLayout } from '../actions'
+import { addWebcastAtLocation, swapWebcasts, removeWebcast, setLayout } from '../actions'
 import { getWebcastIdsInDisplayOrder } from '../selectors'
 
 const mapStateToProps = (state) => {
@@ -15,7 +15,8 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     removeWebcast: (id) => dispatch(removeWebcast(id)),
-    addWebcastAtLocation: (webcastId, location) => dispatch(addWebcastAtLocation(webcastId, location))
+    addWebcastAtLocation: (webcastId, location) => dispatch(addWebcastAtLocation(webcastId, location)),
+    swapWebcasts: (firstLocation, secondLocation) => dispatch(swapWebcasts(firstLocation, secondLocation))
   }
 }
 

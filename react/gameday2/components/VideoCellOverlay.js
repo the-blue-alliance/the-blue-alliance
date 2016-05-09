@@ -16,6 +16,9 @@ var VideoCellOverlay = React.createClass({
   onCloseClicked: function() {
     this.props.removeWebcast(this.props.webcast.id);
   },
+  onSwapClicked: function() {
+    this.props.swapWebcasts(0, this.props.location)
+  },
   showWebcastSelectionPanel: function() {
     this.setState({"showWebcastSelectionPanel": true})
   },
@@ -29,6 +32,9 @@ var VideoCellOverlay = React.createClass({
   shouldShow: function() {
     return (this.props.mouseOverContainer || this.state.showWebcastSelectionPanel)
   },
+  isOverlayExpanded: function() {
+    return this.state.showWebcastSelectionPanel
+  },
   render: function() {
     console.log(this.props)
     let shouldShow = this.shouldShow()
@@ -37,6 +43,7 @@ var VideoCellOverlay = React.createClass({
       'panel': true,
       'panel-default': true,
       'video-cell-overlay': true,
+      'expanded': this.isOverlayExpanded()
     });
     if (this.props.webcast) {
       const closeTooltip = (
@@ -54,7 +61,7 @@ var VideoCellOverlay = React.createClass({
             <h3 className="panel-title">{this.props.webcast.name}</h3>
             <div className="overlay-button-container">
               <OverlayTrigger placement="bottom" overlay={swapWebcastTooltip}>
-                <i className="material-icons overlay-button">compare_arrows</i>
+                <i className="material-icons overlay-button" onClick={this.onSwapClicked}>compare_arrows</i>
               </OverlayTrigger>
               <OverlayTrigger placement="bottom" overlay={changeWebcastTooltip}>
                 <i className="material-icons overlay-button" onClick={this.showWebcastSelectionPanel}>videocam</i>
