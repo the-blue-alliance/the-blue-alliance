@@ -27,12 +27,15 @@ var classNames = require('classnames');
  * empty index of webcastRenderOrder
  * 4. After steps 1-3, webcastRenderOrder will contain all of the keys from
  * displayedWebcasts
- * 5. Iterate through each key in webcastRenderOrder
- * 6. For each key, generate a VideoCell component with the appropriate key and
- * props. The location should be determined by looking up the index of the webcast
- * ID in displayedWebcasts.
- * 7. After steps 5-6, we will have a VideoCell for each of the dispalyed webcasts.
- * 8. While the number of VideoCells is less than
+ * 5. Compute the locations of each empty VideoCell by checking which indices in
+ * displayedWebcasts are null; store those locations in an array
+ * 6. Iterate through the numbers [0, NUM WEBCASTS IN LAYOUT - 1]
+ * 7. Check if a key is present in webcastRenderOrder at the current index.
+ * 8. If a key is present, render a VideoCell for that specific webcast. Set its
+ * location prop to the index of that key in displayedWebcasts
+ * 9. If a key is not present, pop a location from from the array of empty locations
+ * and create an empty VideoCell at that location.
+ * 
  */
 
 var VideoGrid = React.createClass({
@@ -98,7 +101,7 @@ var VideoGrid = React.createClass({
 
     let webcastRenderOrder = this.state.webcastRenderOrder
 
-    // Now, compute which locations will be empty
+    // Compute which locations will be empty
     let emptyCellLocations = []
     for (let i = 0; i < webcastCount; i++) {
       if (!this.props.displayedWebcasts[i]) {
@@ -106,8 +109,7 @@ var VideoGrid = React.createClass({
       }
     }
 
-    // Now, render everything!
-
+    // Render everything!
     let videoCells = []
     for (let i = 0; i < webcastCount; i++) {
       let webcast = null;
