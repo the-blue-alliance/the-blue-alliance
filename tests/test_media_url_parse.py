@@ -73,6 +73,13 @@ class TestMediaUrlParser(unittest2.TestCase):
         self.assertEqual(result['site_name'], MediaType.type_names[MediaType.YOUTUBE_CHANNEL])
         self.assertEqual(result['profile_url'], 'https://www.youtube.com/user/uberbots1124')
 
+        short_result = MediaParser.partial_media_dict_from_url("https://www.youtube.com/Uberbots1124")
+        self.assertEqual(short_result['media_type_enum'], MediaType.YOUTUBE_CHANNEL)
+        self.assertEqual(short_result['is_social'], True)
+        self.assertEqual(short_result['foreign_key'], 'uberbots1124')
+        self.assertEqual(short_result['site_name'], MediaType.type_names[MediaType.YOUTUBE_CHANNEL])
+        self.assertEqual(short_result['profile_url'], 'https://www.youtube.com/user/uberbots1124')
+
     def test_github_profile_parse(self):
         result = MediaParser.partial_media_dict_from_url("https://github.com/frc1124")
         self.assertEqual(result['media_type_enum'], MediaType.GITHUB_PROFILE)

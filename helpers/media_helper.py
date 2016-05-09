@@ -51,23 +51,27 @@ class MediaParser(object):
     FOREIGN_KEY_PATTERNS = {
         MediaType.FACEBOOK_PROFILE: [(r".*facebook.com\/(.*)(\/(.*))?", 1)],
         MediaType.TWITTER_PROFILE: [(r".*twitter.com\/(.*)(\/(.*))?", 1)],
-        MediaType.YOUTUBE_CHANNEL: [(r".*youtube.com\/user\/(.*)(\/(.*))?", 1)],
+        MediaType.YOUTUBE_CHANNEL: [(r".*youtube.com\/user\/(.*)(\/(.*))?", 1), (r".*youtube.com\/(.*)(\/(.*))?", 1)],
         MediaType.GITHUB_PROFILE: [(r".*github.com\/(.*)(\/(.*))?", 1)],
         MediaType.YOUTUBE_VIDEO: [(r".*youtu\.be\/(.*)", 1), (r".*v=([a-zA-Z0-9_-]*)", 1)],
         MediaType.IMGUR: [(r".*imgur.com\/(\w+)\/?\Z", 1), (r".*imgur.com\/(\w+)\.\w+\Z", 1)],
     }
 
     # Media URL patterns that map a URL -> Profile type (used to determine which type represents a given url)
-    URL_PATTERNS = {
-        'facebook.com/': MediaType.FACEBOOK_PROFILE,
-        'twitter.com/': MediaType.TWITTER_PROFILE,
-        'youtube.com/user': MediaType.YOUTUBE_CHANNEL,
-        'github.com/': MediaType.GITHUB_PROFILE,
-        'chiefdelphi.com/media/photos/': MediaType.CD_PHOTO_THREAD,
-        'youtube.com/watch': MediaType.YOUTUBE_VIDEO,
-        'youtu.be': MediaType.YOUTUBE_VIDEO,
-        'imgur.com/': MediaType.IMGUR,
-    }
+    # This is a list because the order matters
+    URL_PATTERNS = [
+        ('facebook.com/', MediaType.FACEBOOK_PROFILE),
+        ('twitter.com/', MediaType.TWITTER_PROFILE),
+        ('youtube.com/user', MediaType.YOUTUBE_CHANNEL),
+        ('github.com/', MediaType.GITHUB_PROFILE),
+        ('chiefdelphi.com/media/photos/', MediaType.CD_PHOTO_THREAD),
+        ('youtube.com/watch', MediaType.YOUTUBE_VIDEO),
+        ('youtu.be', MediaType.YOUTUBE_VIDEO),
+        ('imgur.com/', MediaType.IMGUR),
+
+        # Keep this last, so it doesn't greedy match over other more specific youtube urls
+        ('youtube.com/', MediaType.YOUTUBE_CHANNEL),
+    ]
 
     # The default is to strip out all urlparams, but this is a white-list for exceptions
     ALLOWED_URLPARAMS = {
@@ -81,7 +85,7 @@ class MediaParser(object):
         """
 
         # Now, we can test for regular media type
-        for s, media_type in cls.URL_PATTERNS.iteritems():
+        for s, media_type in cls.URL_PATTERNS:
             if s in url:
                 if media_type == MediaType.CD_PHOTO_THREAD:
                     # CD images are special - they need to do an additional urlfetch because the given url
