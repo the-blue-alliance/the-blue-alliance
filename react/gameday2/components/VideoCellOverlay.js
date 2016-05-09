@@ -34,6 +34,10 @@ var VideoCellOverlay = React.createClass({
     this.props.addWebcastAtLocation(webcastId, this.props.location)
     this.hideWebcastSelectionPanel()
   },
+  handleSwap: function(destinationLocation) {
+    this.props.swapWebcasts(this.props.location, destinationLocation)
+    this.hideSwapPanel()
+  },
   shouldShow: function() {
     return (this.props.mouseOverContainer || this.isOverlayExpanded())
   },
@@ -87,7 +91,8 @@ var VideoCellOverlay = React.createClass({
             location={this.props.location}
             layoutId={this.props.layoutId}
             enabled={this.state.showSwapPanel}
-            close={this.hideSwapPanel} />
+            close={this.hideSwapPanel}
+            swapToLocation={this.handleSwap} />
         </div>
       )
     }

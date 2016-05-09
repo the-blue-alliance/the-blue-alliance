@@ -147,6 +147,28 @@ iframe[id^='twitter-widget-'] {
   top: 0;
   left: 0;
   background-color: black;
+  padding: 50px;
+
+  .layout-preview-container {
+    position: relative;
+    height: 100%;
+    width: 100%;
+  }
+
+  div[class^="video-"] {
+    background-color: white;
+    padding: 4px;
+    background-clip: content-box;
+
+    &:not(.current-location):hover {
+      background-color: #bbb;
+      cursor: pointer;
+    }
+
+    &.current-location {
+      background-color: #333;
+    }
+  }
 
   .button-close {
     position: absolute;
