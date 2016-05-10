@@ -1,0 +1,69 @@
+/* Based on code from outdatedbrowser.com */
+
+#outdated {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding-bottom: 30px;
+    text-align: center;
+    z-index: 1500;
+    background-color: #f25648;
+    color: #ffffff;
+  }
+#outdated.visible {
+  display: block;
+}
+* html #outdated {
+    position: absolute;
+}
+#outdated h6 {
+    font-size: 25px;
+    line-height: 25px;
+    margin: 30px 0 10px;
+    text-transform: uppercase;
+}
+#outdated p {
+    font-size: 16px;
+    line-height: 16px;
+    margin-top: 10px;
+}
+#outdated #btnUpdateBrowser {
+    display: block;
+    position: relative;
+    padding: 10px 20px;
+    margin: 30px auto 0;
+    width: 250px;
+    text-transform: uppercase;
+    /*need for IE*/
+    color: #ffffff;
+    text-decoration: none;
+    border: 2px solid #ffffff;
+    cursor: pointer;
+}
+#outdated #btnUpdateBrowser:hover {
+    color: #f25648;
+    background-color: #ffffff;
+}
+#outdated .last {
+    position: absolute;
+    top: 10px;
+    right: 25px;
+    width: 20px;
+    height: 20px;
+}
+#outdated .last[dir='rtl'] {
+    right: auto !important;
+    left: 25px !important;
+}
+#outdated #btnCloseUpdateBrowser {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 36px;
+    line-height: 36px;
+}
