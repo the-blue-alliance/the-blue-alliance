@@ -141,10 +141,6 @@ class FMSAPIEventAlliancesGet(webapp.RequestHandler):
 
         event = Event.get_by_id(event_key)
 
-        if event.event_type_enum == EventType.CMP_FINALS:
-            logging.info("Skipping Einstein alliance selections")
-            return
-
         alliance_selections = df.getEventAlliances(event_key)
         if alliance_selections and event.alliance_selections != alliance_selections:
             event.alliance_selections_json = json.dumps(alliance_selections)
