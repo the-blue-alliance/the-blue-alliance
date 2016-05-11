@@ -1,9 +1,9 @@
 class AccountPermissions(object):
-    MUTATE_DATA = 1
+    REVIEW_MEDIA = 1
 
     permissions = {
-        MUTATE_DATA: {
-            "name": "MUTATE_DATA",
-            "description": "Can edit any site data. TODO: make this work.",
+        REVIEW_MEDIA: {
+            "name": "REVIEW_MEDIA",
+            "description": "Can review (accept/reject) media suggestions",
         },
     }

@@ -5,11 +5,10 @@ import os
 
 from google.appengine.ext import testbed
 
-from controllers.main_controller import MainKickoffHandler
 from controllers.suggestions.suggest_match_video_review_controller import SuggestMatchVideoReviewController
 from consts.account_permissions import AccountPermissions
-from models.user import User
 from models.account import Account
+
 
 class TestMatchApiController(unittest2.TestCase):
     def setUp(self):
@@ -43,7 +42,7 @@ class TestMatchApiController(unittest2.TestCase):
             "123",
             email="user@example.com",
             registered=True)
-        account.permissions.append(AccountPermissions.MUTATE_DATA)
+        account.permissions.append(AccountPermissions.REVIEW_MEDIA)
         account.put()
 
     def testLoggedOutUserDenied(self):
