@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" version="XHTML+RDFa 1.0" dir="ltr"
+  xmlns:content="http://purl.org/rss/1.0/modules/content/"
+  xmlns:dc="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:og="http://ogp.me/ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xmlns:sioc="http://rdfs.org/sioc/ns#"
+  xmlns:sioct="http://rdfs.org/sioc/types#"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+
+<head profile="http://www.w3.org/1999/xhtml/vocab">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><script type="text/javascript">window.NREUM||(NREUM={}),__nr_require=function(e,t,n){function r(n){if(!t[n]){var o=t[n]={exports:{}};e[n][0].call(o.exports,function(t){var o=e[n][1][t];return r(o||t)},o,o.exports)}return t[n].exports}if("function"==typeof __nr_require)return __nr_require;for(var o=0;o<n.length;o++)r(n[o]);return r}({1:[function(e,t,n){function r(e,t){return function(){o(e,[(new Date).getTime()].concat(a(arguments)),null,t)}}var o=e("handle"),i=e(2),a=e(3);"undefined"==typeof window.newrelic&&(newrelic=NREUM);var u=["setPageViewName","addPageAction","setCustomAttribute","finished","addToTrace","inlineHit"],c=["addPageAction"],f="api-";i(u,function(e,t){newrelic[t]=r(f+t,"api")}),i(c,function(e,t){newrelic[t]=r(f+t)}),t.exports=newrelic,newrelic.noticeError=function(e){"string"==typeof e&&(e=new Error(e)),o("err",[e,(new Date).getTime()])}},{}],2:[function(e,t,n){function r(e,t){var n=[],r="",i=0;for(r in e)o.call(e,r)&&(n[i]=t(r,e[r]),i+=1);return n}var o=Object.prototype.hasOwnProperty;t.exports=r},{}],3:[function(e,t,n){function r(e,t,n){t||(t=0),"undefined"==typeof n&&(n=e?e.length:0);for(var r=-1,o=n-t||0,i=Array(0>o?0:o);++r<o;)i[r]=e[t+r];return i}t.exports=r},{}],ee:[function(e,t,n){function r(){}function o(e){function t(e){return e&&e instanceof r?e:e?u(e,a,i):i()}function n(n,r,o){e&&e(n,r,o);for(var i=t(o),a=l(n),u=a.length,c=0;u>c;c++)a[c].apply(i,r);var s=f[g[n]];return s&&s.push([m,n,r,i]),i}function p(e,t){w[e]=l(e).concat(t)}function l(e){return w[e]||[]}function d(e){return s[e]=s[e]||o(n)}function v(e,t){c(e,function(e,n){t=t||"feature",g[n]=t,t in f||(f[t]=[])})}var w={},g={},m={on:p,emit:n,get:d,listeners:l,context:t,buffer:v};return m}function i(){return new r}var a="nr@context",u=e("gos"),c=e(2),f={},s={},p=t.exports=o();p.backlog=f},{}],gos:[function(e,t,n){function r(e,t,n){if(o.call(e,t))return e[t];var r=n();if(Object.defineProperty&&Object.keys)try{return Object.defineProperty(e,t,{value:r,writable:!0,enumerable:!1}),r}catch(i){}return e[t]=r,r}var o=Object.prototype.hasOwnProperty;t.exports=r},{}],handle:[function(e,t,n){function r(e,t,n,r){o.buffer([e],r),o.emit(e,t,n)}var o=e("ee").get("handle");t.exports=r,r.ee=o},{}],id:[function(e,t,n){function r(e){var t=typeof e;return!e||"object"!==t&&"function"!==t?-1:e===window?0:a(e,i,function(){return o++})}var o=1,i="nr@id",a=e("gos");t.exports=r},{}],loader:[function(e,t,n){function r(){if(!w++){var e=v.info=NREUM.info,t=s.getElementsByTagName("script")[0];if(e&&e.licenseKey&&e.applicationID&&t){c(l,function(t,n){e[t]||(e[t]=n)});var n="https"===p.split(":")[0]||e.sslForHttp;v.proto=n?"https://":"http://",u("mark",["onload",a()],null,"api");var r=s.createElement("script");r.src=v.proto+e.agent,t.parentNode.insertBefore(r,t)}}}function o(){"complete"===s.readyState&&i()}function i(){u("mark",["domContent",a()],null,"api")}function a(){return(new Date).getTime()}var u=e("handle"),c=e(2),f=window,s=f.document;NREUM.o={ST:setTimeout,CT:clearTimeout,XHR:f.XMLHttpRequest,REQ:f.Request,EV:f.Event,PR:f.Promise,MO:f.MutationObserver},e(1);var p=""+location,l={beacon:"bam.nr-data.net",errorBeacon:"bam.nr-data.net",agent:"js-agent.newrelic.com/nr-918.min.js"},d=window.XMLHttpRequest&&XMLHttpRequest.prototype&&XMLHttpRequest.prototype.addEventListener&&!/CriOS/.test(navigator.userAgent),v=t.exports={offset:a(),origin:p,features:{},xhrWrappable:d};s.addEventListener?(s.addEventListener("DOMContentLoaded",i,!1),f.addEventListener("load",r,!1)):(s.attachEvent("onreadystatechange",o),f.attachEvent("onload",r)),u("mark",["firstbyte",a()],null,"api");var w=0},{}]},{},["loader"]);</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="Generator" content="Drupal 7 (http://drupal.org)" />
+<link rel="shortcut icon" href="http://www.firstinspires.org/sites/default/files/first-favicon.ico" type="image/vnd.microsoft.icon" />
+  <title>FIRST</title>
+  <link type="text/css" rel="stylesheet" href="http://www.firstinspires.org/sites/default/files/css/css_kShW4RPmRstZ3SpIC-ZvVGNFVAi0WEMuCnI0ZkYIaFw.css" media="all" />
+<link type="text/css" rel="stylesheet" href="http://www.firstinspires.org/sites/default/files/css/css_OtWf1bIut1qBXzNt0wSwFzT-Uo1pK3nyHeNgCoVWk9c.css" media="all" />
+<link type="text/css" rel="stylesheet" href="http://www.firstinspires.org/sites/default/files/css/css_OkjNFZu4RJpM7ZzdZwM1IFWYJyQgpcidY8h0N7YLT40.css" media="all" />
+<link type="text/css" rel="stylesheet" href="http://www.firstinspires.org/sites/default/files/css/css_dyMKlQPKitVgjrZF9UewN2hBnN2zoSLXLUw7eUJPA9c.css" media="all" />
+<link type="text/css" rel="stylesheet" href="http://www.firstinspires.org/sites/default/files/css/css_AbpHGcgLb-kRsJGnwFEktk7uzpZOCcBY74-YBdrKVGs.css" media="print" />
+  <script type="text/javascript" src="http://www.firstinspires.org/sites/all/libraries/modernizr/modernizr.min.js?o6z7if"></script>
+<script type="text/javascript" src="http://www.firstinspires.org/sites/default/files/js/js_MpKfe1sTh5JIVGCZ17DsAuT1rqAC38MLLlkjqjQ1X_k.js"></script>
+<script type="text/javascript" src="http://www.firstinspires.org/sites/default/files/js/js_wbIN6RpjqVIO4avKeWbWhP1DkRTAgCYkGpKSI12XG-s.js"></script>
+<script type="text/javascript">
+<!--//--><![CDATA[//><!--
+(function(i,s,o,g,r,a,m){i["GoogleAnalyticsObject"]=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,"script","//www.google-analytics.com/analytics.js","ga");ga("create", "UA-9189324-2", {"cookieDomain":"auto"});ga("set", "anonymizeIp", true);ga("send", "pageview");
+//--><!]]>
+</script>
+<script type="text/javascript" src="http://www.firstinspires.org/sites/default/files/js/js_BCUwxne59iXFK898yPdoUlO-V8aKHcqulEUnwP9G_kY.js"></script>
+<script type="text/javascript" src="http://www.firstinspires.org/sites/default/files/js/js_UYoL7Xj0sB_LTtXRMyvSsrQlEwKGyvMUpOS1twVpPw4.js"></script>
+<script type="text/javascript">
+<!--//--><![CDATA[//><!--
+jQuery.extend(Drupal.settings, {"basePath":"\/","pathPrefix":"","ajaxPageState":{"theme":"first","theme_token":"djIjdFriD22au_lYV01RC5nONx61LyzTZ50d7UHndIY","js":{"0":1,"sites\/all\/libraries\/modernizr\/modernizr.min.js":1,"sites\/all\/modules\/contrib\/jquery_update\/replace\/jquery\/1.10\/jquery.min.js":1,"misc\/jquery.once.js":1,"misc\/drupal.js":1,"sites\/all\/libraries\/bootstrap\/js\/bootstrap.min.js":1,"sites\/all\/modules\/custom\/twitter_fetcher\/js\/twitterFetcher_min.js":1,"sites\/all\/modules\/contrib\/ctools\/js\/auto-submit.js":1,"sites\/all\/modules\/contrib\/google_analytics\/googleanalytics.js":1,"1":1,"sites\/all\/libraries\/bootstrap\/js\/validator.min.js":1,"sites\/all\/themes\/first\/assets\/javascripts\/first_package.min.js":1,"sites\/all\/themes\/first\/assets\/javascripts\/first_package_vendor.min.js":1},"css":{"modules\/system\/system.base.css":1,"modules\/system\/system.messages.css":1,"modules\/system\/system.theme.css":1,"modules\/aggregator\/aggregator.css":1,"sites\/all\/modules\/calendar\/css\/calendar_multiday.css":1,"modules\/comment\/comment.css":1,"sites\/all\/modules\/contrib\/date\/date_api\/date.css":1,"sites\/all\/modules\/contrib\/date\/date_popup\/themes\/datepicker.1.7.css":1,"modules\/field\/theme\/field.css":1,"sites\/all\/modules\/mollom\/mollom.css":1,"modules\/node\/node.css":1,"modules\/search\/search.css":1,"modules\/user\/user.css":1,"sites\/all\/modules\/contrib\/views\/css\/views.css":1,"sites\/all\/modules\/contrib\/ckeditor\/css\/ckeditor.css":1,"sites\/all\/libraries\/bootstrap\/css\/bootstrap.min.css":1,"sites\/all\/libraries\/bootstrap\/css\/bootstrap-theme.min.css":1,"sites\/all\/modules\/contrib\/ctools\/css\/ctools.css":1,"sites\/all\/modules\/contrib\/facebook_pull\/facebook_pull.css":1,"sites\/all\/modules\/panels\/css\/panels.css":1,"sites\/all\/modules\/contrib\/date\/date_views\/css\/date_views.css":1,"sites\/all\/themes\/first\/assets\/stylesheets\/screen.css":1,"sites\/all\/themes\/first\/assets\/stylesheets\/print.css":1}},"first_admin":{"first_google_api":"AIzaSyB8Zv2WMeLkHwcz-9ekdl01beRslygVyWo"},"urlIsAjaxTrusted":{"\/robotics\/frc\/calendar":true,"\/search\/node":true,"\/robotics\/frc\/calendar?field_event_category_tid=416":true},"better_exposed_filters":{"views":{"calendar":{"displays":{"page_4":{"filters":{"field_event_category_tid":{"required":false}}}}}}},"googleanalytics":{"trackOutbound":1,"trackMailto":1,"trackDownload":1,"trackDownloadExtensions":"7z|aac|arc|arj|asf|asx|avi|bin|csv|doc(x|m)?|dot(x|m)?|exe|flv|gif|gz|gzip|hqx|jar|jpe?g|js|mp(2|3|4|e?g)|mov(ie)?|msi|msp|pdf|phps|png|ppt(x|m)?|pot(x|m)?|pps(x|m)?|ppam|sld(x|m)?|thmx|qtm?|ra(m|r)?|sea|sit|tar|tgz|torrent|txt|wav|wma|wmv|wpd|xls(x|m|b)?|xlt(x|m)|xlam|xml|z|zip"}});
+//--><!]]>
+</script>
+  <!--[if lt IE 9]>
+   <script>
+      document.createElement('header');
+      document.createElement('nav');
+      document.createElement('section');
+      document.createElement('article');
+      document.createElement('aside');
+      document.createElement('footer');
+   </script>
+  <![endif]-->
+</head>
+<body class="html not-front not-logged-in no-sidebars page-calendar" >
+  <div id="skip-link">
+    <a href="#main" class="element-invisible element-focusable">Skip to main content</a>
+  </div>
+    <header id="header" class="header" role="header">
+  <div class="color-strip"><div class="fteal"></div><div class="fred"></div><div class="fyellow"></div><div class="fblue"></div></div>
+  <div class="container">
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a href="/" id="logo" class="navbar-brand">
+          <img alt="FIRST" src="/sites/all/themes/first/assets/images/FIRST_logo.png">
+        </a>
+                  <div class="search-container-mobile hidden-sm hidden-md hidden-lg">
+            <form class="search-form navbar-form navbar-right" action="/search/node" method="post" id="search-form" accept-charset="UTF-8" role="form"><div><div class="container-inline form-inline form-wrapper" id="edit-basic"><div class="form-item form-type-textfield form-item-keys form-group">
+  <label class="element-invisible" for="edit-keys">Search </label>
+ <input placeholder="Search" class="form-control form-text" type="text" id="edit-keys" name="keys" value="" size="20" maxlength="255" />
+</div>
+<input type="submit" id="edit-submit" name="op" value="Search" class="form-submit btn btn-default btn-common btn-primary" /></div><input type="hidden" name="form_build_id" value="form-MxqhAJeP72YVAjcrcrLkE--B6JcivkM9C9Ok3ThMPeU" />
+<input type="hidden" name="form_id" value="search_form" />
+</div></form>            <span class="searchbox-icon-mobile"></span>
+          </div>
+              </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="navbar-collapse">
+                  <ul id="main-menu" class="menu nav navbar-nav">
+            <li class="first expanded dropdown menu-link-programs"><a href="/robotics/flljr" title="Programs" class="dropdown-toggle" data-toggle="dropdown" data-target="#">Programs<span class="caret"></span></a><ul class="dropdown-menu"><li class="first expanded dropdown-submenu menu-link-first-lego-league-jr"><a href="/robotics/flljr" title="" class="dropdown-toggle" data-toggle="dropdown" data-target="#">FIRST LEGO League Jr.</a><ul class="dropdown-menu"><li class="first leaf menu-link-about"><a href="/robotics/flljr" title="">About</a></li>
+<li class="leaf menu-link-for-teams"><a href="/robotics/flljr/for-teams">For Teams</a></li>
+<li class="leaf menu-link-challenge--season"><a href="/robotics/flljr/challenge-and-season" title="">Challenge &amp; Season</a></li>
+<li class="leaf menu-link-team-basics"><a href="/robotics/flljr/team-basics">Team Basics</a></li>
+<li class="leaf menu-link-start-a-team"><a href="/robotics/flljr/start-a-team">Start A Team</a></li>
+<li class="leaf menu-link-cost--registration"><a href="/robotics/flljr/cost-and-registration">Cost &amp; Registration</a></li>
+<li class="leaf menu-link-events"><a href="/robotics/flljr/event-experience">Events</a></li>
+<li class="last leaf menu-link-resource-library-tips"><a href="/robotics/flljr/resource-library-tips">Resource Library Tips</a></li>
+</ul></li>
+<li class="expanded dropdown-submenu menu-link-first-lego-league"><a href="/robotics/fll" class="dropdown-toggle" data-toggle="dropdown" data-target="#">FIRST LEGO League</a><ul class="dropdown-menu"><li class="first leaf menu-link-about"><a href="/robotics/fll" title="">About</a></li>
+<li class="leaf menu-link-for-teams"><a href="/robotics/fll/for-teams">For Teams</a></li>
+<li class="leaf menu-link-challenge--season"><a href="/robotics/fll/challenge-and-season-info" title="">Challenge &amp; Season</a></li>
+<li class="leaf menu-link-team-basics"><a href="/robotics/fll/team-basics">Team Basics</a></li>
+<li class="leaf menu-link-start-a-team"><a href="/robotics/fll/start-a-team">Start A Team</a></li>
+<li class="leaf menu-link-cost--registration"><a href="/robotics/fll/cost-and-registration">Cost &amp; Registration</a></li>
+<li class="leaf menu-link-events"><a href="/robotics/fll/event-experience">Events</a></li>
+<li class="leaf menu-link-global-innovation"><a href="/robotics/fll/global-innovation">Global Innovation</a></li>
+<li class="last leaf menu-link-resource-library-tips"><a href="/robotics/fll/resource-library-tips">Resource Library Tips</a></li>
+</ul></li>
+<li class="expanded dropdown-submenu menu-link-first-tech-challenge"><a href="/robotics/ftc" class="dropdown-toggle" data-toggle="dropdown" data-target="#">FIRST Tech Challenge</a><ul class="dropdown-menu"><li class="first leaf menu-link-about"><a href="/robotics/ftc" title="">About</a></li>
+<li class="leaf menu-link-for-teams"><a href="/robotics/ftc/for-teams">For Teams</a></li>
+<li class="leaf menu-link-game--season"><a href="/robotics/ftc/game-and-season" title="">Game &amp; Season</a></li>
+<li class="leaf menu-link-team-basics"><a href="/robotics/ftc/team-basics">Team Basics</a></li>
+<li class="leaf menu-link-start-a-team"><a href="/robotics/ftc/start-a-team">Start A Team</a></li>
+<li class="leaf menu-link-cost--registration"><a href="/robotics/ftc/cost-and-registration">Cost &amp; Registration</a></li>
+<li class="leaf menu-link-events"><a href="/robotics/ftc/event-experience">Events</a></li>
+<li class="leaf menu-link-scholarships"><a href="/scholarships-overview">Scholarships</a></li>
+<li class="leaf menu-link-blog"><a href="http://firsttechchallenge.blogspot.com/" title="">Blog</a></li>
+<li class="leaf menu-link-resource-library-tips"><a href="/robotics/ftc/resource-library-tips">Resource Library Tips</a></li>
+<li class="last leaf menu-link-archived-site"><a href="http://archive.firstinspires.org" title="">Archived Site</a></li>
+</ul></li>
+<li class="last expanded dropdown-submenu menu-link-first-robotics-competition"><a href="/robotics/frc" class="dropdown-toggle" data-toggle="dropdown" data-target="#">FIRST Robotics Competition</a><ul class="dropdown-menu"><li class="first leaf menu-link-about"><a href="/robotics/frc" title="">About</a></li>
+<li class="leaf menu-link-for-teams"><a href="/robotics/frc/for-teams">For Teams</a></li>
+<li class="leaf menu-link-game--season"><a href="/robotics/frc/game-and-season" title="">Game &amp; Season</a></li>
+<li class="leaf menu-link-team-basics"><a href="/robotics/frc/team-basics">Team Basics</a></li>
+<li class="leaf menu-link-start-a-team"><a href="/robotics/frc/start-a-team">Start A Team</a></li>
+<li class="leaf menu-link-cost--registration"><a href="/robotics/frc/cost-and-registration">Cost &amp; Registration</a></li>
+<li class="leaf menu-link-events"><a href="/robotics/frc/event-experience">Events</a></li>
+<li class="leaf menu-link-scholarships"><a href="/scholarships-overview" title="">Scholarships</a></li>
+<li class="leaf menu-link-blog"><a href="/robotics/frc/blog/" title="">Blog</a></li>
+<li class="leaf menu-link-resource-library-tips"><a href="/robotics/frc/resource-library-tips">Resource Library Tips</a></li>
+<li class="last leaf menu-link-archived-site"><a href="http://archive.firstinspires.org" title="">Archived Site</a></li>
+</ul></li>
+</ul></li>
+<li class="expanded dropdown menu-link-community"><a href="/node/1646" title="Community" class="dropdown-toggle" data-toggle="dropdown" data-target="#">Community<span class="caret"></span></a><ul class="dropdown-menu"><li class="first leaf menu-link-first-championship"><a href="http://firstchampionship.org" title="FIRST Championship" target="_blank">FIRST Championship</a></li>
+<li class="leaf menu-link-team--event-search"><a href="/team-event-search">Team &amp; Event Search</a></li>
+<li class="leaf menu-link-resource-library"><a href="/resource-library">Resource Library</a></li>
+<li class="leaf menu-link-scholarships"><a href="/scholarships">Scholarships</a></li>
+<li class="leaf menu-link-alumni--internships"><a href="/alumni" title="Alumni and Internships">Alumni &amp; Internships</a></li>
+<li class="leaf menu-link-find-local-support"><a href="/find-local-support" title="Find Local Support">Find Local Support</a></li>
+<li class="leaf menu-link-archived-site"><a href="http://archive.firstinspires.org/" title="Archived Site">Archived Site</a></li>
+<li class="leaf menu-link-first-newsletter"><a href="/community/newsletter">FIRST Newsletter</a></li>
+<li class="last leaf menu-link-inspire-blog"><a href="/community/inspire" title="Inspire Blog">Inspire Blog</a></li>
+</ul></li>
+<li class="expanded dropdown menu-link-ways-to-help"><a href="/ways-to-help/donors-and-sponsors" title="Ways to Help" class="dropdown-toggle" data-toggle="dropdown" data-target="#">Ways to Help<span class="caret"></span></a><ul class="dropdown-menu"><li class="first leaf menu-link-donate-"><a href="https://ssl.charityweb.net/usfirst/updates" title="" target="_blank">Donate </a></li>
+<li class="leaf menu-link-sponsor"><a href="/ways-to-help/become-a-sponsor">Sponsor</a></li>
+<li class="leaf menu-link-ways-to-give"><a href="/ways-to-help/donors-and-sponsors">Ways To Give</a></li>
+<li class="last leaf menu-link-volunteer"><a href="/ways-to-help/volunteer" title="Volunteer">Volunteer</a></li>
+</ul></li>
+<li class="last expanded dropdown menu-link-about"><a href="/about/vision-and-mission" title="About" class="dropdown-toggle" data-toggle="dropdown" data-target="#">About<span class="caret"></span></a><ul class="dropdown-menu"><li class="first leaf menu-link-site-map"><a href="/about/site-map">Site Map</a></li>
+<li class="leaf menu-link-vision--mission"><a href="/about/vision-and-mission" title="Vision and Mission">Vision &amp; Mission</a></li>
+<li class="leaf menu-link-impact"><a href="/about/impact" title="Impact">Impact</a></li>
+<li class="leaf menu-link-at-a-glance"><a href="/about/at-a-glance" title="At A Glance">At A Glance</a></li>
+<li class="leaf menu-link-history"><a href="/about/history">History</a></li>
+<li class="leaf menu-link-our-supporters"><a href="/about/our-supporters">Our Supporters</a></li>
+<li class="leaf menu-link-leadership"><a href="/about/leadership" title="Leadership">Leadership</a></li>
+<li class="leaf menu-link-annual-report"><a href="/about/annual-report">Annual Report</a></li>
+<li class="leaf menu-link-careers"><a href="/about/careers" title="">Careers</a></li>
+<li class="leaf menu-link-press-room"><a href="/about/press-room">Press Room</a></li>
+<li class="last leaf menu-link-contact-us"><a href="/about/contact-us">Contact Us</a></li>
+</ul></li>            <li class="dropdown collapse menu-link-program-menu">
+                    <a href="#frc" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">FRC<span class="caret"></span></a><ul class="dropdown-menu" role="menu"><li class="first leaf menu-link-about"><a href="/robotics/frc" title="">About</a></li>
+<li class="leaf menu-link-for-teams"><a href="/robotics/frc/for-teams" title="">For Teams</a></li>
+<li class="leaf menu-link-game--season"><a href="/robotics/frc/game-and-season" title="">Game &amp; Season</a></li>
+<li class="leaf menu-link-team-basics"><a href="/robotics/frc/team-basics" title="">Team Basics</a></li>
+<li class="leaf menu-link-start-a-team"><a href="/robotics/frc/start-a-team" title="">Start A Team</a></li>
+<li class="leaf menu-link-cost--registration"><a href="/robotics/frc/cost-and-registration" title="">Cost &amp; Registration</a></li>
+<li class="leaf menu-link-events"><a href="/robotics/frc/event-experience" title="">Events</a></li>
+<li class="leaf menu-link-scholarships"><a href="/scholarships-overview" title="">Scholarships</a></li>
+<li class="leaf menu-link-blog"><a href="/robotics/frc/blog/" title="">Blog</a></li>
+<li class="leaf menu-link-resource-library-tips"><a href="/robotics/frc/resource-library-tips" title="">Resource Library Tips</a></li>
+<li class="last leaf menu-link-archived-site"><a href="http://archive.usfirst.org" title="">Archived Site</a></li>
+</ul></li>          </ul>
+                  <ul id="login-menu" class="menu nav navbar-nav navbar-right">
+            <li class="first leaf menu-link-sign-up"><a href="https://my.firstinspires.org/Dashboard/" title="">Sign Up</a></li>
+<li class="last leaf menu-link-logout"><a href="http://www.firstinspires.org/user/logout?ssologout=1" title="Logout">Logout</a></li>
+<li><div id="block-openid-connect-openid-connect-login" class="block block-openid-connect">
+    
+  <div class="content">
+    <form action="/robotics/frc/calendar?field_event_category_tid=416" method="post" id="openid-connect-login-form" accept-charset="UTF-8" role="form"><div><input type="submit" id="edit-openid-connect-client-generic-login" name="generic" value="Log In" class="form-submit btn btn-default btn-common" /><input type="hidden" name="form_build_id" value="form-X5tmpzNv5KylhfTTksxpGy3oIMVGgydJjJOhT8lxZ1s" />
+<input type="hidden" name="form_id" value="openid_connect_login_form" />
+</div></form>  </div>
+</div>
+</li>          </ul>
+                  <div class="search-container hidden-xs pull-right">
+            <form class="search-form navbar-form navbar-right" action="/search/node" method="post" id="search-form" accept-charset="UTF-8" role="form"><div><div class="container-inline form-inline form-wrapper" id="edit-basic"><div class="form-item form-type-textfield form-item-keys form-group">
+  <label class="element-invisible" for="edit-keys">Search </label>
+ <input placeholder="Search" class="form-control form-text" type="text" id="edit-keys" name="keys" value="" size="20" maxlength="255" />
+</div>
+<input type="submit" id="edit-submit" name="op" value="Search" class="form-submit btn btn-default btn-common btn-primary" /></div><input type="hidden" name="form_build_id" value="form-MxqhAJeP72YVAjcrcrLkE--B6JcivkM9C9Ok3ThMPeU" />
+<input type="hidden" name="form_id" value="search_form" />
+</div></form>            <span class="searchbox-icon">GO</span>
+          </div>
+              </div><!-- /.navbar-collapse -->
+     </div><!-- /.container-fluid -->
+    </nav><!-- /.navbar -->
+  </div> <!-- /.container -->
+</header>
+
+<div id="main-wrapper">
+  <div id="main" class="main">
+    <div class="container">
+            <div id="page-header">
+                      </div>
+    </div>
+    <div id="content" class="container">
+        <div class="region region-content">
+    <div id="block-block-31" class="block block-block calToggle">
+    
+  <div class="content">
+    <a href="/robotics/frc/calendar" style="line-height:50px;">List View</a> | <a href="/robotics/frc/calendar-month" style="line-height:50px;">Month View</a>  </div>
+</div>
+<div id="block-views-exp-calendar-page-4" class="block block-views">
+    
+  <div class="content">
+    <form class="ctools-auto-submit-full-form" action="/robotics/frc/calendar" method="get" id="views-exposed-form-calendar-page-4" accept-charset="UTF-8" role="form"><div><div class="views-exposed-form">
+  <div class="views-exposed-widgets clearfix">
+          <div id="edit-field-event-category-tid-wrapper" class="views-exposed-widget views-widget-filter-field_event_category_tid">
+                  <label for="edit-field-event-category-tid">
+            Event Category (field_event_category)          </label>
+                        <div class="views-widget">
+          <div class="form-item form-type-select form-item-field-event-category-tid form-group">
+ <select class="form-control form-select" id="edit-field-event-category-tid" name="field_event_category_tid"><option value="All">- Any -</option><option value="406">Registration</option><option value="451">Payment Deadlines</option><option value="446">Kit and Kickoff</option><option value="431">FRC Events</option><option value="396">Awards</option><option value="421">Training</option><option value="391">Grants</option><option value="416" selected="selected">Off Season Events</option></select>
+</div>
+        </div>
+              </div>
+                    <div class="views-exposed-widget views-submit-button">
+      <input class="ctools-use-ajax ctools-auto-submit-click form-submit btn btn-default btn-common btn-primary" type="submit" id="edit-submit-calendar" name="" value="Filter" />    </div>
+      </div>
+</div>
+</div></form>  </div>
+</div>
+<div id="block-system-main" class="block block-system">
+    
+  <div class="content">
+    <div class="view view-calendar view-id-calendar view-display-id-page_4 list-view view-dom-id-2c49267cacea24d942fd1ee12df71341">
+            <div class="view-header">
+      <h3>Upcoming <em>FIRST</em> Events</h3>    </div>
+  
+  
+  
+      <div class="view-content">
+      <div class="table-responsive">
+  <table class="views-table cols-4 table table-striped table-bordered" >
+               <thead>
+        <tr>
+                      <th class="views-field views-field-title" >
+              <a href="/robotics/frc/calendar?field_event_category_tid=416&amp;order=title&amp;sort=asc" title="sort by " class="active"></a>            </th>
+                      <th class="views-field views-field-field-event-date views-align-right" >
+              <a href="/robotics/frc/calendar?field_event_category_tid=416&amp;order=field_event_date&amp;sort=asc" title="sort by " class="active"></a>            </th>
+                      <th >
+                          </th>
+                      <th >
+                          </th>
+                  </tr>
+      </thead>
+        <tbody>
+              <tr class="odd views-row-first">
+                      <td class="views-field views-field-title" >
+              <a href="/node/6481">Missouri Robotics State Championship (MO)</a>            </td>
+                      <td class="views-field views-field-field-event-date views-align-right" >
+              <span class="date-display-single" property="dc:date" datatype="xsd:dateTime" content="2016-05-14T00:00:00-04:00">05/14/2016 - 12:00am</span>            </td>
+                      <td >
+              
+  <div class="field field-name-field-event-category field-type-taxonomy-term-reference field-label-hidden">
+    <a href="/taxonomy/term/416" typeof="skos:Concept" property="rdfs:label skos:prefLabel" datatype="">Off Season Events</a>  </div>
+            </td>
+                      <td >
+                          </td>
+                  </tr>
+              <tr class="even">
+                      <td class="views-field views-field-title" >
+              <a href="/node/10526">Hudson Valley Rally (NY)</a>            </td>
+                      <td class="views-field views-field-field-event-date views-align-right" >
+              <span class="date-display-single" property="dc:date" datatype="xsd:dateTime" content="2016-06-04T00:00:00-04:00">06/04/2016 - 12:00am</span>            </td>
+                      <td >
+              
+  <div class="field field-name-field-event-category field-type-taxonomy-term-reference field-label-hidden">
+    <a href="/taxonomy/term/416" typeof="skos:Concept" property="rdfs:label skos:prefLabel" datatype="">Off Season Events</a>  </div>
+            </td>
+                      <td >
+                          </td>
+                  </tr>
+              <tr class="odd">
+                      <td class="views-field views-field-title" >
+              <a href="/node/10341">Gitchi Gummi Get Together (MN)</a>            </td>
+                      <td class="views-field views-field-field-event-date views-align-right" >
+              <span class="date-display-start" property="dc:date" datatype="xsd:dateTime" content="2016-07-29T00:00:00-04:00">07/29/2016 - 12:00am</span> to <span class="date-display-end" property="dc:date" datatype="xsd:dateTime" content="2016-07-30T00:00:00-04:00">07/30/2016 - 12:00am</span>            </td>
+                      <td >
+              
+  <div class="field field-name-field-event-category field-type-taxonomy-term-reference field-label-hidden">
+    <a href="/taxonomy/term/416" typeof="skos:Concept" property="rdfs:label skos:prefLabel" datatype="">Off Season Events</a>  </div>
+            </td>
+                      <td >
+                          </td>
+                  </tr>
+              <tr class="even">
+                      <td class="views-field views-field-title" >
+              <a href="/node/10346">WVROX - West Virginia RObotics eXtreme (WV)</a>            </td>
+                      <td class="views-field views-field-field-event-date views-align-right" >
+              <span class="date-display-start" property="dc:date" datatype="xsd:dateTime" content="2016-08-05T00:00:00-04:00">08/05/2016 - 12:00am</span> to <span class="date-display-end" property="dc:date" datatype="xsd:dateTime" content="2016-08-06T00:00:00-04:00">08/06/2016 - 12:00am</span>            </td>
+                      <td >
+              
+  <div class="field field-name-field-event-category field-type-taxonomy-term-reference field-label-hidden">
+    <a href="/taxonomy/term/416" typeof="skos:Concept" property="rdfs:label skos:prefLabel" datatype="">Off Season Events</a>  </div>
+            </td>
+                      <td >
+                          </td>
+                  </tr>
+              <tr class="odd">
+                      <td class="views-field views-field-title" >
+              <a href="/node/10621">BoB - Battle O&#039; Baltimore (MD)</a>            </td>
+                      <td class="views-field views-field-field-event-date views-align-right" >
+              <span class="date-display-start" property="dc:date" datatype="xsd:dateTime" content="2016-09-23T00:00:00-04:00">09/23/2016 - 12:00am</span> to <span class="date-display-end" property="dc:date" datatype="xsd:dateTime" content="2016-09-24T00:00:00-04:00">09/24/2016 - 12:00am</span>            </td>
+                      <td >
+              
+  <div class="field field-name-field-event-category field-type-taxonomy-term-reference field-label-hidden">
+    <a href="/taxonomy/term/416" typeof="skos:Concept" property="rdfs:label skos:prefLabel" datatype="">Off Season Events</a>  </div>
+            </td>
+                      <td >
+                          </td>
+                  </tr>
+              <tr class="even views-row-last">
+                      <td class="views-field views-field-title" >
+              <a href="/node/10616">Rumble in the Roads (VA)</a>            </td>
+                      <td class="views-field views-field-field-event-date views-align-right" >
+              <span class="date-display-single" property="dc:date" datatype="xsd:dateTime" content="2016-11-05T00:00:00-04:00">11/05/2016 - 12:00am</span>            </td>
+                      <td >
+              
+  <div class="field field-name-field-event-category field-type-taxonomy-term-reference field-label-hidden">
+    <a href="/taxonomy/term/416" typeof="skos:Concept" property="rdfs:label skos:prefLabel" datatype="">Off Season Events</a>  </div>
+            </td>
+                      <td >
+                          </td>
+                  </tr>
+          </tbody>
+  </table>
+</div>
+    </div>
+  
+      <div class="date-nav-wrapper clearfix">
+  <h3 class="pull-left"></h3>
+  <div class="btn-group pull-right">
+          </div>
+</div>  
+  
+  
+  
+  
+</div>  </div>
+</div>
+<div id="block-mylivechat-live-chat-display" class="block block-mylivechat">
+    
+  <div class="content">
+    <div class="mod_mylivechat"><script type="text/javascript" src="https://www.mylivechat.com/chatinline.aspx?hccid=71843916"></script></div>  </div>
+</div>
+  </div>
+    </div>
+  </div> <!-- /#main -->
+</div> <!-- /#main-wrapper -->
+
+<footer id="footer" class="footer" role="footer">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-6 social-col">
+          <div class="region region-footer-left-col">
+    <div id="block-menu-menu-social-menu" class="block block-menu">
+  <img  src="/sites/all/themes/first/assets/images/FIRST_logo.png" class="img-responsive hidden-md hidden-lg pull-left sm-footer-logo" />
+    
+    <ul class="menu nav"><li><a href="https://www.facebook.com/pages/FIRST-For-Inspiration-and-Recognition-of-Science-and-Technology/184063051616518" target="_blank"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x fa-facebook-bg"></i> <i class="fa fa-facebook fa-stack-1x fa-inverse"></i></span></a></li><li><a href="http://www.twitter.com/firstweets" target="_blank"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x fa-twitter-bg"></i> <i class="fa fa-twitter fa-stack-1x fa-inverse"></i></span></a></li><li><a href="https://www.youtube.com/user/FIRSTWorldTube" target="_blank"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x fa-youtube-bg"></i> <i class="fa fa-youtube fa-stack-1x fa-inverse"></i></span></a></li><li><a href="https://instagram.com/first_official_/" target="_blank"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x fa-instagram-bg"></i> <i class="fa fa-instagram fa-stack-1x fa-inverse"></i></span></a></li></ul>  <img style="width:100px" src="/sites/all/themes/first/assets/images/FIRST_logo.png" class="img-responsive hidden-sm hidden-xs pull-left footer-logo" />
+  <img style="width:90%;margin-top:20px" src="/sites/all/themes/first/assets/images/FIRST_tagline.gif" class="img-responsive hidden-sm hidden-xs pull-left footer-logo" />
+
+</div>
+  </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="row">
+            <div class="region region-footer-right-col">
+    <div id="block-facebook-pull-facebook-pull-default" class="block block-facebook-pull col-sm-6">
+    <h2>facebook</h2>
+  
+  <div class="content">
+    <ul class="facebook-feed">
+  <li class="item">
+  <span class="facebook-feed-picture"><img alt="FIRST - For Inspiration and Recognition of Science and Technology" src="//graph.facebook.com/184063051616518/picture" /></span>
+  <span class="facebook-feed-from"><a href="//facebook.com/profile.php?id=184063051616518">FIRST - For Inspiration and Recognition of Science and Technology</a></span>
+      <span class="facebook-feed-message">
+      Is your school device decisive? This week's Inspire Blog offers compelling reasons to reconsider brand loyalty when it comes to in-school technology.                Prepare students for the real-world by implementing a device agnostic technology program. Most 1:1 device programs at schools marry themselves to the idea of buying all their devices as one brand.        <a href="http://www.firstinspires.org/community/inspire">Inspire Blog | FIRST</a>                      </span>
+    <span class="facebook-feed-time">2 hours 58 min ago.</span>
+  </li>
+  <li class="item">
+  <span class="facebook-feed-picture"><img alt="FIRST - For Inspiration and Recognition of Science and Technology" src="//graph.facebook.com/184063051616518/picture" /></span>
+  <span class="facebook-feed-from"><a href="//facebook.com/profile.php?id=184063051616518">FIRST - For Inspiration and Recognition of Science and Technology</a></span>
+      <span class="facebook-feed-message">
+      Sign us up!              Deep-sea mining outfits are itching to exploit black smoker vents, which are loaded with precious metals like copper. An ROV is recording it for posterity.        <a href="http://www.wired.com/2016/05/robots-can-visit-deep-sea-vents-now-can-glorious-vr/">Only Robots Can Visit Deep-Sea Vents. Now You Can—In Glorious VR!</a>                      </span>
+    <span class="facebook-feed-time">1 day 57 min ago.</span>
+  </li>
+  <li class="item">
+  <span class="facebook-feed-picture"><img alt="FIRST - For Inspiration and Recognition of Science and Technology" src="//graph.facebook.com/184063051616518/picture" /></span>
+  <span class="facebook-feed-from"><a href="//facebook.com/profile.php?id=184063051616518">FIRST - For Inspiration and Recognition of Science and Technology</a></span>
+        <span class="facebook-feed-story"> added 3 new photos.</span>
+        <span class="facebook-feed-message">
+      Way to go: Team 3637 has completed Dean's Homework! Sophomore, Jack L. (pictured with Congressman Leonard Lance), has some great advice for other teams who plan to tackle this year's homework:
+
+"...my biggest recommendation would be to have no fear. It's easy to set up a meeting (with almost all Congressman and Senators having Meeting Request forms readily available on his/her website). It's just a matter of filling that out and awaiting a response in a few days from his/her office. One other piece of advice I have is to not be overwhelmed. They are your representatives; it's their job to adhere to the needs and desires of their constituents (you!)."
+
+Check out #DeansHomework2016: http://bit.ly/1NoBwMR                    <a href="https://www.facebook.com/FIRSTOfficial/photos/a.188288274527329.44763.184063051616518/1099349300087884/?type=3" target="_blank"><img src="https://scontent.xx.fbcdn.net/v/t1.0-0/s130x130/13174075_1099349300087884_6891222901316647212_n.jpg?oh=6c46f2f81ac17cb38f9a5dd5715df163&oe=579BBCCB" /></a>                </span>
+    <span class="facebook-feed-time">2 days 16 min ago.</span>
+  </li>
+</ul>
+  </div>
+</div>
+<div id="block-twitter-fetcher-twitter-fetcher-tweets" class="block block-twitter-fetcher col-sm-6">
+    <h2>RECENT TWEETS</h2>
+  
+  <div class="content">
+    <div id="recent-tweets-first-custom-mobiquity"></div>  </div>
+</div>
+  </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+         <div class="region region-footer">
+    <div class="col-sm-2 col-md-2 copyright">&copy; 2016 FIRST </div>
+<div id="block-menu-menu-about-footer" class="block block-menu col-md-7 contact-links">
+
+    
+    <ul class="menu nav"><li class="first leaf menu-link-about"><a href="/about/vision-and-mission" title="About">About</a></li>
+<li class="leaf menu-link-contact"><a href="/about/contact-us" title="Contact">Contact</a></li>
+<li class="leaf menu-link-first-store"><a href="https://usfirstmarketplace.com/" title="FIRST Store">FIRST Store</a></li>
+<li class="last leaf menu-link-donate"><a href="https://ssl.charityweb.net/usfirst/updates/" title="Donate">Donate</a></li>
+</ul>
+</div>
+<div id="block-menu-menu-privacy-footer" class="block block-menu col-sm-6 col-md-3 privacy-legal">
+
+    
+
+    <ul class="menu nav"><li class="first leaf menu-link-privacy--legal"><a href="/about/privacy-policy" title="Privacy">Privacy &amp; Legal</a></li>
+<li class="last leaf menu-link-site-map"><a href="/about/site-map#site-map" title="Site Map">Site Map</a></li>
+</ul>
+</div><div id="block-block-26" class="block block-block">
+    
+  <div class="content">
+    <!-- Start of Async HubSpot Analytics Code -->
+  <script type="text/javascript">
+<!--//--><![CDATA[// ><!--
+
+    (function(d,s,i,r) {
+      if (d.getElementById(i)){return;}
+      var n=d.createElement(s),e=d.getElementsByTagName(s)[0];
+      n.id=i;n.src='//js.hs-analytics.net/analytics/'+(Math.ceil(new Date()/r)*r)+'/1747660.js';
+      e.parentNode.insertBefore(n, e);
+    })(document,"script","hs-analytics",300000);
+  
+//--><!]]>
+</script><!-- End of Async HubSpot Analytics Code -->  </div>
+</div>
+  </div>
+    </div>
+  </div>
+
+  <script>
+      (function ($) {
+          $('.dropdown-toggle').dropdown();
+          var submitIcon = $(".searchbox-icon");
+          var inputBox = $(".form-control");
+          var searchBox = $(".search-form");
+          var formSubmit = $("form-submit");
+          var isOpen = false;
+          submitIcon.click(function () {
+              if (false == isOpen) {
+                  searchBox.addClass("search-form-open");
+                  formSubmit.remove();
+                  inputBox.focus();
+                  isOpen = true;
+              } else {
+                  searchBox.removeClass("search-form-open");
+                  inputBox.focusout();
+                  isOpen = false;
+              }
+          });
+          var submitIconMobile = $(".searchbox-icon-mobile");
+          var inputBoxMobile = $(".form-text");
+          var searchBoxMobile = $(".navbar-form");
+          var formSubmitMobile = $("form-submit");
+          var isOpenMobile = false;
+          submitIconMobile.click(function () {
+              if (false == isOpenMobile) {
+                  searchBoxMobile.addClass("navbar-form-open").show("slide", {
+                      direction: "right"
+                  }, 1e3);
+                  formSubmitMobile.remove();
+                  inputBoxMobile.focus();
+                  isOpenMobile = true;
+              } else {
+                  searchBoxMobile.removeClass("navbar-form-open");
+                  inputBoxMobile.focusout();
+                  isOpenMobile = false;
+              }
+          });
+          $(".views-field-field-testimony-image > .field-content > img").addClass("img-responsive");
+      })(jQuery);
+  </script>
+</footer>
+<div id="overlay" class="hidden"></div>
+
+<!-- Version 3.0-->
+
+  <script type="text/javascript">
+<!--//--><![CDATA[//><!--
+var config1 = {
+				"id": "614116442426998784",
+				"domId": "recent-tweets-first-custom-mobiquity",
+				"maxTweets": 2,
+				"enableLinks": true,
+				"showImages":false,
+				"showInteraction":false
+			};
+			twitterFetcher.fetch(config1);
+//--><!]]>
+</script>
+<script type="text/javascript">window.NREUM||(NREUM={});NREUM.info={"beacon":"bam.nr-data.net","licenseKey":"f66f1bddbe","applicationID":"10665889","transactionName":"ZVcDYURRD0FVUxZbX1wdIFZCWQ5cG0YLV0dBbRFUUVU=","queueTime":0,"applicationTime":350,"atts":"SRAAFwxLHE8=","errorBeacon":"bam.nr-data.net","agent":""}</script></body>
+</html>

@@ -11,8 +11,9 @@ from datafeeds.usfirst_event_offseason_list_parser import UsfirstEventOffseasonL
 
 from models.event import Event
 
+
 class DatafeedUsfirstOffseason(DatafeedBase):
-    EVENT_OFFSEASON_LIST_URL = "http://www.usfirst.org/roboticsprograms/frc/calendar/list"
+    EVENT_OFFSEASON_LIST_URL = "http://www.firstinspires.org/robotics/frc/calendar?field_event_category_tid=416"
 
     def getEventList(self):
         events, _ = self.parse(self.EVENT_OFFSEASON_LIST_URL, UsfirstEventOffseasonListParser)
