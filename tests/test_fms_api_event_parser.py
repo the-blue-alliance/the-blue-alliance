@@ -94,14 +94,14 @@ class TestFMSAPIEventParser(unittest2.TestCase):
 
         self.assertEqual(
             alliances,
-            [{'declines': [], 'picks': ['frc1', 'frc2', 'frc3']},
-            {'declines': [], 'picks': ['frc5', 'frc6', 'frc7', 'frc8']},
-            {'declines': [], 'picks': ['frc9', 'frc10', 'frc11', 'frc12']},
-            {'declines': [], 'picks': ['frc13', 'frc14', 'frc15', 'frc16' ]},
-            {'declines': [], 'picks': ['frc17', 'frc18', 'frc19', 'frc20']},
-            {'declines': [], 'picks': ['frc21', 'frc22', 'frc23', 'frc24']},
-            {'declines': [], 'picks': ['frc25', 'frc26', 'frc27', 'frc28']},
-            {'declines': [], 'picks': ['frc29', 'frc30', 'frc31', 'frc31']}])
+            [{'declines': [], 'picks': ['frc1', 'frc2', 'frc3'], 'backup': None, 'name': 'Alliance 1'},
+            {'declines': [], 'picks': ['frc5', 'frc6', 'frc7', 'frc8'], 'backup': None, 'name': 'Alliance 2'},
+            {'declines': [], 'picks': ['frc9', 'frc10', 'frc11', 'frc12'], 'backup': None, 'name': 'Alliance 3'},
+            {'declines': [], 'picks': ['frc13', 'frc14', 'frc15', 'frc16' ], 'backup': None, 'name': 'Alliance 4'},
+            {'declines': [], 'picks': ['frc17', 'frc18', 'frc19', 'frc20'], 'backup': None, 'name': 'Alliance 5'},
+            {'declines': [], 'picks': ['frc21', 'frc22', 'frc23', 'frc24'], 'backup': None, 'name': 'Alliance 6'},
+            {'declines': [], 'picks': ['frc25', 'frc26', 'frc27', 'frc28'], 'backup': None, 'name': 'Alliance 7'},
+            {'declines': [], 'picks': ['frc29', 'frc30', 'frc31', 'frc31'], 'backup': None, 'name': 'Alliance 8'}])
 
     def test_parseEventRankings(self):
         with open('test_data/fms_api/2015waamv_staging_rankings.json', 'r') as f:
