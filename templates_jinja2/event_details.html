@@ -121,7 +121,9 @@
 
         {% if matches.ef or matches.qf or matches.sf or matches.f %}
         <div class="col-sm-6">
+          {% if matches.qm %}
           {% include "event_partials/event_alliances_table.html" %}
+          {% endif %}
 
           <h3>{% if event.year >= 2015 %}Playoff{% else %}Elimination{% endif %} Results</h3>
           {{mtm.elim_match_table(matches)}}
@@ -149,6 +151,8 @@
 
         {% if not matches.qm %}
         <div class="col-sm-6">
+          {% include "event_partials/event_alliances_table.html" %}
+
           {% if matches.qf or matches.sf or matches.f %}
             {% if is_2015_playoff %}
               <h3>Playoff Advancement</h3>
@@ -158,9 +162,6 @@
               {% include "bracket_partials/bracket_table.html" %}
             {% endif %}
           {% endif %}
-
-          {% include "event_partials/event_alliances_table.html" %}
-          {% include "event_partials/event_opr_table.html" %}
         </div>
         {% endif %}
       </div>
