@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 from helpers.media_helper import MediaParser
 from helpers.webcast_helper import WebcastParser
@@ -128,3 +129,33 @@ class SuggestionCreator(object):
                 return 'video_exists'
         else:
             return 'bad_url'
+
+    @classmethod
+    def createOffseasonEventSuggestion(cls, author_account_key, name, start_date, end_date, website, address):
+        """ Create a suggestion for offseason event. Returns status (success, missing_data) """
+        if not name or not start_date or not end_date or not website or not address:
+            return 'missing_data'
+
+        try:
+            start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
+            end_datetime = datetime.strptime(end_date, "%Y-%m-%d")
+        except ValueError:
+            return 'missing_data'
+
+        if end_datetime < start_datetime:
+            return 'missing_data'
+
+        # Note that we don't specify an explicit key for event suggestions
+        # We don't trust users to input correct event keys (that's for the moderator to do)
+        suggestion = Suggestion(
+            author=author_account_key,
+            target_model="event",
+        )
+        suggestion.contents = {
+            'name': name,
+            'start_date': start_date,
+            'end_date': end_date,
+            'website': website,
+            'address': address}
+        suggestion.put()
+        return 'success'
