@@ -4,7 +4,7 @@
   {% for alliance in event.alliance_selections %}
     {% if loop.first %}
     <tr>
-      <th>#</th>
+      <th>Alliance</th>
       {% for _ in alliance.picks %}
         {% if loop.first %}
           <th>Captain</th>
@@ -16,7 +16,7 @@
     {% endif %}
 
     <tr>
-      <td>{{loop.index}}</td>
+      <td>{% if alliance.name %}{{alliance.name}}{% else %}Alliance {{loop.index}}{% endif %}</td>
       {% for team in alliance.picks %}
         <td><a href="/team/{{ team|digits }}/{{event.year}}">{{ team|strip_frc }}</a></td>
       {% endfor %}
