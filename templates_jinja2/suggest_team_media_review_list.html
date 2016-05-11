@@ -78,19 +78,8 @@
                   </div>
                   <div class="col-xs-5 fitvids">
                       <p><strong><a href="/team/{{reference.team_number}}/{{suggestion.contents.year}}" target="_blank">Team {{reference.team_number}}{% if reference.nickname %} - {{reference.nickname}}{% endif %} ({{suggestion.contents.year}})</a></strong></p>
-                      {% if suggestion.contents.media_type_enum == 1 %}
-                        <a href="http://www.chiefdelphi.com/media/photos/{{suggestion.contents.foreign_key}}" target="_blank">
-                          <img class="img-thumbnail" src="http://www.chiefdelphi.com/media/img/{{suggestion.details.thumbnail}}" style="max-height: 200px;">
-                        </a>
-                      {% endif %}
-                      {% if suggestion.contents.media_type_enum == 0 %}
-                        <iframe width="320" height="180" src="https://www.youtube.com/embed/{{suggestion.contents.foreign_key}}" frameborder="0" allowfullscreen></iframe>
-                      {% endif %}
-                      {% if suggestion.contents.media_type_enum == 2 %}
-                        <a href="http://imgur.com/{{suggestion.contents.foreign_key}}" target="_blank">
-                          <img class="img-thumbnail" src="http://i.imgur.com/{{suggestion.contents.foreign_key}}m.jpg" style="max-height: 200px;">
-                        </a>
-                      {% endif %}
+                      {% set media = suggestion.candidate_media -%}
+                      {% include "media_partials/media_display_partial.html" %}
                   </div>
                   <div class="col-xs-3">
                     {% if preferred %}

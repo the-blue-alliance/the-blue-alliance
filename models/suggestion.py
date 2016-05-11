@@ -2,7 +2,9 @@ import json
 
 from google.appengine.ext import ndb
 
+from helpers.suggestions.media_creator import MediaCreator
 from models.account import Account
+from models.media import Media
 
 
 class Suggestion(ndb.Model):
@@ -44,6 +46,13 @@ class Suggestion(ndb.Model):
     def contents(self, contents):
         self._contents = contents
         self.contents_json = json.dumps(self._contents)
+
+    @property
+    def candidate_media(self):
+        team_reference = Media.create_reference(
+            self.contents['reference_type'],
+            self.contents['reference_key'])
+        return MediaCreator.create_media(self, team_reference)
 
     @property
     def youtube_video(self):

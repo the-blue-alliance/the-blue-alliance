@@ -144,11 +144,7 @@
               {% if image_medias %}
                 {% for media in image_medias %}
                   <div class="col-xs-6 col-sm-3">
-                  {% if media.media_type_enum == 1 %}
-                    {% include "media_partials/cdphotothread_partial.html" %}
-                  {% else %} {% if media.media_type_enum == 2 %}
-                    {% include "media_partials/imgur_partial.html" %}
-                  {% endif %} {% endif %}
+                    {% include "media_partials/media_display_partial.html" %}
                   </div>
                 {% endfor %}
               {% else %}
@@ -163,7 +159,7 @@
               {% if medias_by_slugname.youtube %}
                 {% for media in medias_by_slugname.youtube %}
                   <div class="col-xs-12 col-md-6 fitvids">
-                  {% include "media_partials/youtube_partial.html" %}
+                  {% include "media_partials/media_display_partial.html" %}
                   </div>
                 {% endfor %}
               {% else %}

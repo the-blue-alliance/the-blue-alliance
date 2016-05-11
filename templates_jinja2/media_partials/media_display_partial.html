@@ -1,0 +1,9 @@
+{% if media.media_type_enum == 1 %}
+    {% include "media_partials/cdphotothread_partial.html" %}
+{% endif %}
+{% if media.media_type_enum == 0 %}
+    {% include "media_partials/youtube_partial.html" %}
+{% endif %}
+{% if media.media_type_enum == 2 %}
+    {% include "media_partials/imgur_partial.html" %}
+{% endif %}
