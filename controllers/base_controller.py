@@ -1,6 +1,7 @@
 import cPickle
 import datetime
 import logging
+import urllib
 import webapp2
 import zlib
 
@@ -149,7 +150,7 @@ class LoggedInHandler(webapp2.RequestHandler):
             if not redirect_url:
                 redirect_url = self.request.url
             return self.redirect(
-                '/account/login_required?redirect={}'.format(redirect_url),
+                '/account/login_required?redirect={}'.format(urllib.quote(redirect_url)),
                 abort=True
             )
 
@@ -171,6 +172,6 @@ class LoggedInHandler(webapp2.RequestHandler):
             if not redirect_url:
                 redirect_url = self.request.url
             return self.redirect(
-                '/account/register?redirect={}'.format(redirect_url),
+                '/account/register?redirect={}'.format(urllib.quote(redirect_url)),
                 abort=True
             )

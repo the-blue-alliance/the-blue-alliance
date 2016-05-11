@@ -16,7 +16,7 @@
           <p>Your account settings will be accessible both on <a href="/">www.thebluealliance.com</a> and our <a href="https://play.google.com/store/apps/details?id=com.thebluealliance.androidclient" target="_blank">Android app</a>.</p>
         </div>
         <div class="col-md-6">
-          <a href="/login{% if redirect %}?redirect={{redirect|safe}}{% endif %}" class="btn btn-success btn-block" role="button">Take me to the login page!</a>
+          <a href="/login{% if redirect %}?redirect={{redirect|urlencode}}{% endif %}" class="btn btn-success btn-block" role="button">Take me to the login page!</a>
           <a href="javascript:history.back()" class="btn btn-default btn-block" role="button">No thanks, take me back.</a>
         </div>
       </div>
