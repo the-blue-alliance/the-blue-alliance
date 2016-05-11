@@ -1,9 +1,10 @@
 {% if media.media_type_enum == 1 %}
+    <!-- CD Photo Thread -->
     {% include "media_partials/cdphotothread_partial.html" %}
-{% endif %}
-{% if media.media_type_enum == 0 %}
+{% elif media.media_type_enum == 0 %}
+    <!-- YouTube Video -->
     {% include "media_partials/youtube_partial.html" %}
-{% endif %}
-{% if media.media_type_enum == 2 %}
+{% elif media.media_type_enum == 2 %}
+    <!-- Imgur Image -->
     {% include "media_partials/imgur_partial.html" %}
 {% endif %}
