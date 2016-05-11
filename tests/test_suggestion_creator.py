@@ -45,6 +45,24 @@ class TestTeamMediaSuggestionCreator(unittest2.TestCase):
         self.assertEqual(suggestion.target_model, 'media')
         self.assertDictContainsSubset(expected_dict, suggestion.contents)
 
+    def testCreateSuggestionWithUrlParams(self):
+        status = SuggestionCreator.createTeamMediaSuggestion(
+            self.account.key,
+            "https://www.youtube.com/watch?v=VP992UKFbko",
+            "frc1124",
+            "2016")
+        self.assertEqual(status, 'success')
+
+        # Ensure the Suggestion gets created
+        suggestion_id = Suggestion.render_media_key_name('2016', 'team', 'frc1124', 'youtube', 'VP992UKFbko')
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        expected_dict = MediaParser.partial_media_dict_from_url("https://www.youtube.com/watch?v=VP992UKFbko")
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.review_state, Suggestion.REVIEW_PENDING)
+        self.assertEqual(suggestion.author, self.account.key)
+        self.assertEqual(suggestion.target_model, 'media')
+        self.assertDictContainsSubset(expected_dict, suggestion.contents)
+
     def testCleanUrl(self):
         status = SuggestionCreator.createTeamMediaSuggestion(
             self.account.key,
