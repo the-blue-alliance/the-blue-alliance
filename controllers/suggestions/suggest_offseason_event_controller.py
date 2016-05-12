@@ -9,6 +9,7 @@ class SuggestOffseasonEventController(LoggedInHandler):
     """
 
     def get(self):
+        self._require_login()
         self.template_values.update({
             "status": self.request.get("status"),
         })
