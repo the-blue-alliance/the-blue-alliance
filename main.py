@@ -29,6 +29,8 @@ from controllers.suggestions.suggest_event_webcast_controller import SuggestEven
 from controllers.suggestions.suggest_event_webcast_review_controller import SuggestEventWebcastReviewController
 from controllers.suggestions.suggest_offseason_event_controller import \
       SuggestOffseasonEventController
+from controllers.suggestions.suggest_offseason_event_review_controller import \
+      SuggestOffseasonEventReviewController
 from controllers.suggestions.suggest_review_home_controller import SuggestReviewHomeController
 from controllers.suggestions.suggest_social_media_review_controller import \
       SuggestSocialMediaReviewController
@@ -110,6 +112,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/suggest/team/social/review', SuggestSocialMediaReviewController, 'suggest-team-social-media-review', strict_slash=True),
       RedirectRoute(r'/suggest/team/media/review', SuggestTeamMediaReviewController, 'suggest-team-media-review', strict_slash=True),
       RedirectRoute(r'/suggest/offseason', SuggestOffseasonEventController, 'suggest-offseason-event', strict_slash=True),
+      RedirectRoute(r'/suggest/offseason/review', SuggestOffseasonEventReviewController, 'suggest-offseason-event-review', strict_slash=True),
       RedirectRoute(r'/team/<team_number:[0-9]+>', TeamCanonical, 'team-canonical', strict_slash=True),
       RedirectRoute(r'/team/<team_number:[0-9]+>/<year:[0-9]+>', TeamDetail, 'team-detail', strict_slash=True),
       RedirectRoute(r'/team/<team_number:[0-9]+>/history', TeamHistory, 'team-history', strict_slash=True),

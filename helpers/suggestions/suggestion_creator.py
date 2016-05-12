@@ -149,7 +149,7 @@ class SuggestionCreator(object):
         # We don't trust users to input correct event keys (that's for the moderator to do)
         suggestion = Suggestion(
             author=author_account_key,
-            target_model="event",
+            target_model="offseason-event",
         )
         suggestion.contents = {
             'name': name,
