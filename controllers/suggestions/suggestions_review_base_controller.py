@@ -1,5 +1,3 @@
-from consts.account_permissions import AccountPermissions
-
 from controllers.base_controller import LoggedInHandler
 
 
@@ -8,7 +6,7 @@ class SuggestionsReviewBaseController(LoggedInHandler):
     Base controller for reviewing suggestions.
     """
 
-    REQUIRED_PERMISSIONS = [AccountPermissions.REVIEW_MEDIA]
+    REQUIRED_PERMISSIONS = []
 
     def __init__(self, *args, **kw):
         super(SuggestionsReviewBaseController, self).__init__(*args, **kw)
