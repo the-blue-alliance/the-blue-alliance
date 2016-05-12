@@ -23,10 +23,10 @@
         {{mtm.single_match_table(match, force_played=True)}}
         {% if match.tba_video %}
           {% include "video_partials/tbavideo_player.html" %}
-        {% endif %}
-        {% for youtube_video in match.youtube_videos_formatted %}
+        {% elif match.youtube_videos_formatted %}
+          {% set youtube_video = match.youtube_videos_formatted.0 %}
           {% include "video_partials/youtube_video_player.html" %}
-        {% endfor %}
+        {% endif %}
       </div>
       {% endfor %}
     </div>
