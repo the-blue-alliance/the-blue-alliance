@@ -38,5 +38,5 @@ class MediaType(object):
         TWITTER_PROFILE: 'https://twitter.com/{}',
         YOUTUBE_CHANNEL: 'https://www.youtube.com/{}',
         GITHUB_PROFILE: 'https://github.com/{}',
-        INSTAGRAM_PROFILE: 'https://instagram.com/{}',
+        INSTAGRAM_PROFILE: 'https://www.instagram.com/{}',
     }
