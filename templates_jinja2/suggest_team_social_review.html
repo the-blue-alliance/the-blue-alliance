@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import 'media_partials/social_media_macros.html' as smm %}
 
 {% block title %}Pending Suggestions{% endblock %}
 
@@ -36,25 +37,8 @@
                     </label>
                   </div>
                   <div class="col-xs-5 fitvids">
-                      <p><strong><a href="/team/{{reference.team_number}}/{{suggestion.contents.year}}" target="_blank">Team {{reference.team_number}}{% if reference.nickname %} - {{reference.nickname}}{% endif %}</a></strong></p>
-                      {% if suggestion.contents.media_type_enum == 3 %}
-                        <!-- Facebook profile -->
-                        <div class="fb-page" data-href="https://www.facebook.com/{{ suggestion.contents.foreign_key }}" data-hide-cover="false" data-show-facepile="false" data-show-posts="false" data-width="500"><div class="fb-xfbml-parse-ignore"><blockquote cite="https://www.facebook.com/{{ suggestion.contents.foreign_key }}"><a href="https://www.facebook.com/">Facebook Profile: {{ suggestion.contents.foreign_key }}</a></blockquote></div></div>
-                      {% endif %}
-                      {% if suggestion.contents.media_type_enum == 4 %}
-                        <!-- Twitter profile -->
-                        <a class="twitter-timeline"  href="https://twitter.com/{{ suggestion.contents.foreign_key }}" data-widget-id="715993204777172992" data-screen-name="{{ suggestion.contents.foreign_key }}">Tweets by @{{ suggestion.contents.foreign_key }}</a>
-                        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                      {% endif %}
-                      {% if suggestion.contents.media_type_enum == 5 %}
-                        <!-- YouTube profile -->
-                        {{ suggestion.contents.site_name }}: <a href="{{ suggestion.contents.profile_url }}">{{ suggestion.contents.foreign_key }}</a>
-                      {% endif %}
-                      {% if suggestion.contents.media_type_enum == 6 %}
-                        <!-- GitHub profile -->
-                        <div class="github-card" data-user="{{ suggestion.contents.foreign_key }}"></div>
-                      {% endif %}
-
+                      <p><strong><a href="/team/{{reference.team_number}}/{{suggestion.contents.year}}" target="_blank">Team {{reference.team_number}}{% if reference.nickname %} - {{reference.nickname}}{% endif %} ({{suggestion.contents.year}})</a></strong></p>
+                      {{smm.social_media_card(suggestion)}}
                   </div>
                   <div class="col-xs-2">
                       <ul>

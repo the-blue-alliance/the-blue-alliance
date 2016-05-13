@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import 'media_partials/social_media_macros.html' as smm %}
 
 {% block title %}The Blue Alliance - Add Team Social Media{% endblock %}
 
@@ -88,7 +89,7 @@
                 <h4>Existing Social Media Accounts</h4>
                 <ul>
                 {% for media in social_medias %}
-                  <li>{% include "media_partials/social_partial.html" %}</li>
+                  <li>{{smm.social_media_icon_link(media)}}</li>
                 {% endfor %}
                 </ul>
               {% else %}
