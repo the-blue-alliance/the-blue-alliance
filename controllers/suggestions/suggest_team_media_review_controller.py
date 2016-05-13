@@ -8,6 +8,7 @@ from google.appengine.ext import ndb
 from consts.media_type import MediaType
 from controllers.suggestions.suggestions_review_base_controller import SuggestionsReviewBaseController
 from helpers.media_manipulator import MediaManipulator
+from helpers.suggestions.media_creator import MediaCreator
 from models.media import Media
 from models.suggestion import Suggestion
 from template_engine import jinja2_engine
@@ -105,16 +106,7 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
         if media_type_enum in MediaType.image_types and ('preferred::{}'.format(suggestion.key.id()) in preferred_keys or to_replace_id):
             preferred_references = [team_reference]
 
-        media = Media(
-            id=Media.render_key_name(suggestion.contents['media_type_enum'], suggestion.contents['foreign_key']),
-            foreign_key=suggestion.contents['foreign_key'],
-            media_type_enum=media_type_enum,
-            details_json=suggestion.contents.get('details_json', None),
-            private_details_json=suggestion.contents.get('private_details_json', None),
-            year=int(suggestion.contents['year']) if not suggestion.contents.get('is_social', False) else None,
-            references=[team_reference],
-            preferred_references=preferred_references,
-        )
+        media = MediaCreator.create_media(suggestion, team_reference, preferred_references)
 
         # Mark Suggestion as accepted
         suggestion.review_state = Suggestion.REVIEW_ACCEPTED
