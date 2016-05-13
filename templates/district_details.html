@@ -25,11 +25,17 @@
 
         <h1 class="visible-xs end_header">{% if explicit_year %}{{year}} {% endif %}{{district_name}} District{% if events|length > 0 %}<small> {{ events|length }} Events</small>{% endif %}</h1>
 
-        <div class="tba-sidebar">
-          <ul class="nav tba-sidenav">
+        <div class="btn-group">
+          <a class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" href="#">
+            {{district_name}}
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu tba-dropdown-menu-limited">
             <li><a href="/events{% if explicit_year %}/{{year}}{% endif %}">All Events</a></li>
             {% for valid_district in valid_districts %}
-              <li {% if district_name == valid_district.0 %}class="force-active"{% endif %}><a href="/events/{{valid_district.1}}{% if explicit_year %}/{{year}}{% endif %}">{{valid_district.0}}</a></li>
+              {% if district_name != valid_district.0 %}
+              <li><a href="/events/{{valid_district.1}}{% if explicit_year %}/{{year}}{% endif %}">{{valid_district.0}}</a></li>
+              {% endif %}
             {% endfor %}
           </ul>
         </div>
