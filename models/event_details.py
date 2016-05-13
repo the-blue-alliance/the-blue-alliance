@@ -10,10 +10,10 @@ class EventDetails(ndb.Model):
     In order to make strongly consistent DB requests, instances of this class
     should be created with a parent that is the associated Event key.
     """
-    alliance_selections = ndb.JsonProperty(indexed=False)  # Formatted as: [{'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] }, {'picks': [], 'declines': []}, ... ]
-    district_points = ndb.JsonProperty(indexed=False)
-    matchstats = ndb.JsonProperty(indexed=False)  # for OPR, DPR, CCWM, etc.
-    rankings = ndb.JsonProperty(indexed=False)
+    alliance_selections = ndb.JsonProperty()  # Formatted as: [{'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] }, {'picks': [], 'declines': []}, ... ]
+    district_points = ndb.JsonProperty()
+    matchstats = ndb.JsonProperty()  # for OPR, DPR, CCWM, etc.
+    rankings = ndb.JsonProperty()
 
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
