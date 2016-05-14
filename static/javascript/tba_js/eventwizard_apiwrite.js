@@ -36,6 +36,10 @@ function getYoutubeId(url) {
     }
 }
 
+function cleanTeamNum(number) {
+    return number.trim().replace("*", "")
+}
+
 $('#teams-ok').click(function(){
     if(!$("#team_list").val()){
         alert("Please enter team data.");
@@ -127,12 +131,12 @@ $('#schedule_file').change(function(){
             row.append($('<td>').html(match['Time']));
             row.append($('<td>').html(match['Description']));
             row.append($('<td>').html(match['Match']));
-            row.append($('<td>').html(match['Blue 1']));
-            row.append($('<td>').html(match['Blue 2']));
-            row.append($('<td>').html(match['Blue 3']));
-            row.append($('<td>').html(match['Red 1']));
-            row.append($('<td>').html(match['Red 2']));
-            row.append($('<td>').html(match['Red 3']));
+            row.append($('<td>').html(cleanTeamNum(match['Blue 1'])));
+            row.append($('<td>').html(cleanTeamNum(match['Blue 2'])));
+            row.append($('<td>').html(cleanTeamNum(match['Blue 3'])));
+            row.append($('<td>').html(cleanTeamNum(match['Red 1'])));
+            row.append($('<td>').html(cleanTeamNum(match['Red 2'])));
+            row.append($('<td>').html(cleanTeamNum(match['Red 3'])));
 
             $('#schedule_preview').append(row);
 
@@ -143,10 +147,10 @@ $('#schedule_file').change(function(){
                 'match_number': matchNumber,
                 'alliances': {
                     'red': {
-                    'teams': ['frc'+match['Red 1'], 'frc'+match['Red 2'], 'frc'+match['Red 3']],
+                    'teams': ['frc'+cleanTeamNum(match['Red 1']), 'frc'+cleanTeamNum(match['Red 2']), 'frc'+cleanTeamNum(match['Red 3'])],
                     'score': null
                     },'blue': {
-                    'teams': ['frc'+match['Blue 1'], 'frc'+match['Blue 2'], 'frc'+match['Blue 3']],
+                    'teams': ['frc'+cleanTeamNum(match['Blue 1']), 'frc'+cleanTeamNum(match['Blue 2']), 'frc'+cleanTeamNum(match['Blue 3'])],
                     'score': null
                     }
                 },
@@ -205,12 +209,12 @@ $('#results_file').change(function(){
             var row = $('<tr>');
             row.append($('<td>').html(match['Time']));
             row.append($('<td>').html(match['Match']));
-            row.append($('<td>').html(match['Red 1']));
-            row.append($('<td>').html(match['Red 2']));
-            row.append($('<td>').html(match['Red 3']));
-            row.append($('<td>').html(match['Blue 1']));
-            row.append($('<td>').html(match['Blue 2']));
-            row.append($('<td>').html(match['Blue 3']));
+            row.append($('<td>').html(cleanTeamNum(match['Red 1'])));
+            row.append($('<td>').html(cleanTeamNum(match['Red 2'])));
+            row.append($('<td>').html(cleanTeamNum(match['Red 3'])));
+            row.append($('<td>').html(cleanTeamNum(match['Blue 1'])));
+            row.append($('<td>').html(cleanTeamNum(match['Blue 2'])));
+            row.append($('<td>').html(cleanTeamNum(match['Blue 3'])));
             row.append($('<td>').html(match['Red Score']));
             row.append($('<td>').html(match['Blue Score']));
 
@@ -233,10 +237,10 @@ $('#results_file').change(function(){
                 'match_number': matchNumber,
                 'alliances': {
                     'red': {
-                    'teams': ['frc'+match['Red 1'], 'frc'+match['Red 2'], 'frc'+match['Red 3']],
+                    'teams': ['frc'+cleanTeamNum(match['Red 1']), 'frc'+cleanTeamNum(match['Red 2']), 'frc'+cleanTeamNum(match['Red 3'])],
                     'score': parseInt(match['Red Score'])
                     },'blue': {
-                    'teams': ['frc'+match['Blue 1'], 'frc'+match['Blue 2'], 'frc'+match['Blue 3']],
+                    'teams': ['frc'+cleanTeamNum(match['Blue 1']), 'frc'+cleanTeamNum(match['Blue 2']), 'frc'+cleanTeamNum(match['Blue 3'])],
                     'score': parseInt(match['Blue Score'])
                     }
                 },
