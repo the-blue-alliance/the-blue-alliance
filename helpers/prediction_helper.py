@@ -196,7 +196,7 @@ class PredictionHelper(object):
                         score_differences.append(abs(match.alliances[alliance_color]['score'] - prediction[alliance_color]['score']))
 
             # Update init_stats
-            if match.has_been_played:
+            if match.has_been_played and match.score_breakdown:
                 for alliance_color in ['red', 'blue']:
                     stats_sum['score'] += match.alliances[alliance_color]['score']
 

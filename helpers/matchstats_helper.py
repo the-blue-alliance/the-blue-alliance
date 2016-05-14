@@ -189,7 +189,7 @@ class MatchstatsHelper(object):
             last_event = None
             last_event_start = None
             for event in events:
-                if event.start_date < cur_event.start_date:
+                if event.official and event.start_date < cur_event.start_date:
                     if last_event is None or event.start_date > last_event_start:
                         last_event = event
                         last_event_start = event.start_date
