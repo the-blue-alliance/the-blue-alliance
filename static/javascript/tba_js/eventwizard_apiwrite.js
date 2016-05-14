@@ -471,27 +471,34 @@ function updateRankings(cell) {
     $.ajax({
         type: 'GET',
         url: 'http://10.0.100.5/pit/getdata?random=' + Math.random(),
-        dataType: 'jsonp',
+        dataType: 'json',
         cache: false,
         timeout: 5000,
         success: function (data) {
             console.log(data);
 
             var request_body = {};
-            var breakdowns = ['Avg', 'CP', 'AP', 'RC', 'TP', 'LP'];
+
+            // 2015 Headers
+            //var breakdowns = ['Avg', 'CP', 'AP', 'RC', 'TP', 'LP'];
+
+            // 2016 Headers
+            var breakdowns  = ['RS', 'Sort1', 'Sort2', 'Sort3', 'Sort4', 'Wins', 'Losses', 'Ties', 'Played', 'DQ'];
+            var display = ["Ranking Score", "Auto", "Scale/Challenge", "Goals", "Defense", "Wins", "Losses", "Ties", "Played", 'DQ'];
+
             var rankData = JSON.parse(data)['Ranks'];
-            request_body['breakdowns'] = breakdowns;
+            request_body['breakdowns'] = display;
             request_body['rankings'] = [];
             for(var i=0; i<rankData.length; i++){
                 // Turn team number -> team key
                 rankData[i]['Team'] = "frc"+rankData[i]['Team'];
                 var teamRank = {};
                 teamRank['team_key'] = rankData[i]['Team'];
-                teamRank['rank'] = rankData[i]['Rank']
+                teamRank['rank'] = rankData[i]['Rank'];
                 teamRank['played'] = rankData[i]['Played'];
                 teamRank['dqs'] = 0;
                 for(var j=0; j<breakdowns.length; j++){
-                    teamRank[breakdowns[j]] = rankData[i][breakdowns[j]];
+                    teamRank[display[j]] = parseInt(rankData[i][breakdowns[j]]);
                 }
                 request_body['rankings'].push(teamRank);
             }
