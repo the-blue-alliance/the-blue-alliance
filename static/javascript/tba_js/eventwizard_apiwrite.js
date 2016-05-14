@@ -36,6 +36,10 @@ function getYoutubeId(url) {
     }
 }
 
+function cleanTeamNum(number) {
+    return number.trim().replace("*", "")
+}
+
 $('#teams-ok').click(function(){
     if(!$("#team_list").val()){
         alert("Please enter team data.");
@@ -127,12 +131,12 @@ $('#schedule_file').change(function(){
             row.append($('<td>').html(match['Time']));
             row.append($('<td>').html(match['Description']));
             row.append($('<td>').html(match['Match']));
-            row.append($('<td>').html(match['Blue 1']));
-            row.append($('<td>').html(match['Blue 2']));
-            row.append($('<td>').html(match['Blue 3']));
-            row.append($('<td>').html(match['Red 1']));
-            row.append($('<td>').html(match['Red 2']));
-            row.append($('<td>').html(match['Red 3']));
+            row.append($('<td>').html(cleanTeamNum(match['Blue 1'])));
+            row.append($('<td>').html(cleanTeamNum(match['Blue 2'])));
+            row.append($('<td>').html(cleanTeamNum(match['Blue 3'])));
+            row.append($('<td>').html(cleanTeamNum(match['Red 1'])));
+            row.append($('<td>').html(cleanTeamNum(match['Red 2'])));
+            row.append($('<td>').html(cleanTeamNum(match['Red 3'])));
 
             $('#schedule_preview').append(row);
 
@@ -143,10 +147,10 @@ $('#schedule_file').change(function(){
                 'match_number': matchNumber,
                 'alliances': {
                     'red': {
-                    'teams': ['frc'+match['Red 1'], 'frc'+match['Red 2'], 'frc'+match['Red 3']],
+                    'teams': ['frc'+cleanTeamNum(match['Red 1']), 'frc'+cleanTeamNum(match['Red 2']), 'frc'+cleanTeamNum(match['Red 3'])],
                     'score': null
                     },'blue': {
-                    'teams': ['frc'+match['Blue 1'], 'frc'+match['Blue 2'], 'frc'+match['Blue 3']],
+                    'teams': ['frc'+cleanTeamNum(match['Blue 1']), 'frc'+cleanTeamNum(match['Blue 2']), 'frc'+cleanTeamNum(match['Blue 3'])],
                     'score': null
                     }
                 },
@@ -205,12 +209,12 @@ $('#results_file').change(function(){
             var row = $('<tr>');
             row.append($('<td>').html(match['Time']));
             row.append($('<td>').html(match['Match']));
-            row.append($('<td>').html(match['Red 1']));
-            row.append($('<td>').html(match['Red 2']));
-            row.append($('<td>').html(match['Red 3']));
-            row.append($('<td>').html(match['Blue 1']));
-            row.append($('<td>').html(match['Blue 2']));
-            row.append($('<td>').html(match['Blue 3']));
+            row.append($('<td>').html(cleanTeamNum(match['Red 1'])));
+            row.append($('<td>').html(cleanTeamNum(match['Red 2'])));
+            row.append($('<td>').html(cleanTeamNum(match['Red 3'])));
+            row.append($('<td>').html(cleanTeamNum(match['Blue 1'])));
+            row.append($('<td>').html(cleanTeamNum(match['Blue 2'])));
+            row.append($('<td>').html(cleanTeamNum(match['Blue 3'])));
             row.append($('<td>').html(match['Red Score']));
             row.append($('<td>').html(match['Blue Score']));
 
@@ -233,10 +237,10 @@ $('#results_file').change(function(){
                 'match_number': matchNumber,
                 'alliances': {
                     'red': {
-                    'teams': ['frc'+match['Red 1'], 'frc'+match['Red 2'], 'frc'+match['Red 3']],
+                    'teams': ['frc'+cleanTeamNum(match['Red 1']), 'frc'+cleanTeamNum(match['Red 2']), 'frc'+cleanTeamNum(match['Red 3'])],
                     'score': parseInt(match['Red Score'])
                     },'blue': {
-                    'teams': ['frc'+match['Blue 1'], 'frc'+match['Blue 2'], 'frc'+match['Blue 3']],
+                    'teams': ['frc'+cleanTeamNum(match['Blue 1']), 'frc'+cleanTeamNum(match['Blue 2']), 'frc'+cleanTeamNum(match['Blue 3'])],
                     'score': parseInt(match['Blue Score'])
                     }
                 },
@@ -282,12 +286,18 @@ $('#rankings_file').change(function(){
 
         var request_body = {};
 
+        // 2015 Headers
+        //var headers = ['Rank', 'Team', 'Qual Avg', 'Coopertition', 'Auto', 'Container', 'Tote', 'Litter', 'DQ', 'Played'];
+
+        // 2016 Headers
+        var headers  = ['Rank', 'Team', 'RS', 'Auto', 'S/C', 'Boulders', 'Defenses', 'W-L-T', 'Played', 'DQ'];
+        var display_headers = ["Rank", "Team", "Ranking Score", "Auto", "Scale/Challenge", "Goals", "Defense", "Record (W-L-T)", "Played", 'DQ'];
+        var is_int = [true, true, true, true, true, false, true, true];
+
         $('#rankings_preview').empty();
-        $('#rankings_preview').html("<tr><th>Rank</th><th>Team</th><th>Qual Avg</th><th>Coopertition</th><th>Auto</th><th>Container</th><th>Tote</th><th>Litter</th><th>DQ</th><th>Played</th></tr>");
+        $('#rankings_preview').html("<tr><th>" + display_headers.join("</th><th>") + "</th></tr>");
 
-        var headers = ['Rank', 'Team', 'Qual Avg', 'Coopertition', 'Auto', 'Container', 'Tote', 'Litter', 'DQ', 'Played'];
-
-        request_body['breakdowns'] = headers.slice(2, 8);
+        request_body['breakdowns'] = display_headers.slice(2, 8);
         request_body['rankings'] = [];
 
         for(var i=0; i<rankings.length; i++){
@@ -311,7 +321,8 @@ $('#rankings_file').change(function(){
             breakdown['played'] = parseInt(rank['Played']);
             breakdown['dqs'] = parseInt(rank['DQ']);
             for(var j=0; j<request_body['breakdowns'].length; j++){
-                breakdown[request_body['breakdowns'][j]] = parseInt(rank[request_body['breakdowns'][j]]);
+                var val = rank[headers[j + 2]];
+                breakdown[request_body['breakdowns'][j]] = is_int[j] ? parseInt(val) : val;
             }
             request_body['rankings'].push(breakdown);
         }
@@ -460,27 +471,34 @@ function updateRankings(cell) {
     $.ajax({
         type: 'GET',
         url: 'http://10.0.100.5/pit/getdata?random=' + Math.random(),
-        dataType: 'jsonp',
+        dataType: 'json',
         cache: false,
         timeout: 5000,
         success: function (data) {
             console.log(data);
 
             var request_body = {};
-            var breakdowns = ['Avg', 'CP', 'AP', 'RC', 'TP', 'LP'];
+
+            // 2015 Headers
+            //var breakdowns = ['Avg', 'CP', 'AP', 'RC', 'TP', 'LP'];
+
+            // 2016 Headers
+            var breakdowns  = ['RS', 'Sort1', 'Sort2', 'Sort3', 'Sort4', 'Wins', 'Losses', 'Ties', 'Played', 'DQ'];
+            var display = ["Ranking Score", "Auto", "Scale/Challenge", "Goals", "Defense", "Wins", "Losses", "Ties", "Played", 'DQ'];
+
             var rankData = JSON.parse(data)['Ranks'];
-            request_body['breakdowns'] = breakdowns;
+            request_body['breakdowns'] = display;
             request_body['rankings'] = [];
             for(var i=0; i<rankData.length; i++){
                 // Turn team number -> team key
                 rankData[i]['Team'] = "frc"+rankData[i]['Team'];
                 var teamRank = {};
                 teamRank['team_key'] = rankData[i]['Team'];
-                teamRank['rank'] = rankData[i]['Rank']
+                teamRank['rank'] = rankData[i]['Rank'];
                 teamRank['played'] = rankData[i]['Played'];
                 teamRank['dqs'] = 0;
                 for(var j=0; j<breakdowns.length; j++){
-                    teamRank[breakdowns[j]] = rankData[i][breakdowns[j]];
+                    teamRank[display[j]] = parseInt(rankData[i][breakdowns[j]]);
                 }
                 request_body['rankings'].push(teamRank);
             }
