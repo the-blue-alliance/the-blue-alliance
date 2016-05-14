@@ -196,7 +196,7 @@ class MatchstatsHelper(object):
 
             if last_event is not None and last_event.matchstats:
                 for stat, values in last_event.matchstats.items():
-                    if team in values:
+                    if values and team in values:
                         last_event_stats[stat][team] = values[team]
 
         memcache.set(cache_key, last_event_stats, 60*60*24)
