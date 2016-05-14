@@ -84,7 +84,7 @@
 
 {% macro breach_prob_td(match, alliance_color, predictions) %}
 <td class="{{alliance_color}}">
-  {% if match.has_been_played %}
+  {% if match.has_been_played and match.score_breakdown %}
     {% if "teleopDefensesBreached" in match.score_breakdown.get(alliance_color) and
     match.score_breakdown.get(alliance_color).teleopDefensesBreached and
     "teleopTowerCaptured" in match.score_breakdown.get(alliance_color) and
