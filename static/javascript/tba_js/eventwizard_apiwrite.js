@@ -286,12 +286,18 @@ $('#rankings_file').change(function(){
 
         var request_body = {};
 
+        // 2015 Headers
+        //var headers = ['Rank', 'Team', 'Qual Avg', 'Coopertition', 'Auto', 'Container', 'Tote', 'Litter', 'DQ', 'Played'];
+
+        // 2016 Headers
+        var headers  = ['Rank', 'Team', 'RS', 'Auto', 'S/C', 'Boulders', 'Defenses', 'W-L-T', 'Played', 'DQ'];
+        var display_headers = ["Rank", "Team", "Ranking Score", "Auto", "Scale/Challenge", "Goals", "Defense", "Record (W-L-T)", "Played", 'DQ'];
+        var is_int = [true, true, true, true, true, false, true, true];
+
         $('#rankings_preview').empty();
-        $('#rankings_preview').html("<tr><th>Rank</th><th>Team</th><th>Qual Avg</th><th>Coopertition</th><th>Auto</th><th>Container</th><th>Tote</th><th>Litter</th><th>DQ</th><th>Played</th></tr>");
+        $('#rankings_preview').html("<tr><th>" + display_headers.join("</th><th>") + "</th></tr>");
 
-        var headers = ['Rank', 'Team', 'Qual Avg', 'Coopertition', 'Auto', 'Container', 'Tote', 'Litter', 'DQ', 'Played'];
-
-        request_body['breakdowns'] = headers.slice(2, 8);
+        request_body['breakdowns'] = display_headers.slice(2, 8);
         request_body['rankings'] = [];
 
         for(var i=0; i<rankings.length; i++){
@@ -315,7 +321,8 @@ $('#rankings_file').change(function(){
             breakdown['played'] = parseInt(rank['Played']);
             breakdown['dqs'] = parseInt(rank['DQ']);
             for(var j=0; j<request_body['breakdowns'].length; j++){
-                breakdown[request_body['breakdowns'][j]] = parseInt(rank[request_body['breakdowns'][j]]);
+                var val = rank[headers[j + 2]];
+                breakdown[request_body['breakdowns'][j]] = is_int[j] ? parseInt(val) : val;
             }
             request_body['rankings'].push(breakdown);
         }
