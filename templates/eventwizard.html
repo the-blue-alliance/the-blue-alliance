@@ -103,7 +103,15 @@
             <div class="radio">
               <label><input type="radio" name="import-comp-level" id="import-comp-level-f" value="f">Finals</label>
             </div>
-            <label for="schedule_file">Report File</label><input type="file" id="schedule_file" name="schedule_file" />
+            <label for="alliance-count-schedule">Number of Alliances (Playoffs Only)</label>
+            <div class="radio">
+              <label><input type="radio" name="alliance-count-schedule" id="alliance-count-schedule-8" value="8" checked>8</label>
+            </div>
+            <div class="radio">
+              <label><input type="radio" name="alliance-count-schedule" id="alliance-count-schedule-16" value="16">16</label>
+            </div>
+
+              <label for="schedule_file">Report File</label><input type="file" id="schedule_file" name="schedule_file" />
 
             <div id="schedule_preview_status">
 
@@ -129,6 +137,13 @@
         <div class="tab-pane" id="results">
           <h3>Upload Match Results</h3>
           <p>Lets you upload a FMS Match Results report. Note that this will overwite data that currently exists for these matches.</p>
+          <label for="alliance-count-results">Number of Alliances (Playoffs Only)</label>
+          <div class="radio">
+            <label><input type="radio" name="alliance-count-results" id="alliance-count-results-8" value="8" checked>8</label>
+          </div>
+          <div class="radio">
+            <label><input type="radio" name="alliance-count-results" id="alliance-count-results-16" value="16">16</label>
+          </div>
 
           <label for="results_file">Report File</label><input type="file" id="results_file" name="results_file" />
           <div id="results_preview_status">

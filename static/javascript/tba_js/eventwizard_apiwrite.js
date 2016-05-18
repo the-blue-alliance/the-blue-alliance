@@ -101,7 +101,7 @@ $('#schedule_file').change(function(){
         var request_body = [];
 
         $('#schedule_preview').empty();
-        $('#schedule_preview').html("<tr><th>Time</th><th>Description</th><th>Match</th><th>Blue 1</th><th>Blue 2</th><th>Blue 3</th><th>Red 1</th><th>Red 2</th><th>Red 3</th></tr>");
+        $('#schedule_preview').html("<tr><th>Time</th><th>Description</th><th>Match</th><th>TBA Key</th><th>Blue 1</th><th>Blue 2</th><th>Blue 3</th><th>Red 1</th><th>Red 2</th><th>Red 3</th></tr>");
         var filter = $('input[name="import-comp-level"]:checked').val();
         for(var i=0; i<matches.length; i++){
             var match = matches[i];
@@ -111,15 +111,19 @@ $('#schedule_file').change(function(){
                 continue;
             }
 
-            var compLevel, setNumber, matchNumber;
-            // only works for 2015 format
-            setNumber = 1;
+            var compLevel, setNumber, matchNumber, matchKey;
+            var has_octo = $('input[name="alliance-count-schedule"]:checked').val() == "16";
             matchNumber = parseInt(match['Match']);
             if(match['Description'].indexOf("Qualification") == 0){
                 compLevel = "qm";
+                setNumber = 1;
+                matchKey = "qm" + matchNumber;
             }else{
-                compLevel = playoffTypeFromNumber(matchNumber);
-                matchNumber = playoffMatchNumber(compLevel, matchNumber);
+                compLevel = playoffTypeFromNumber(matchNumber, has_octo);
+                var setAndMatch = playoffMatchAndSet(matchNumber, has_octo);
+                setNumber = setAndMatch[0];
+                matchNumber = setAndMatch[1];
+                matchKey = compLevel + setNumber + "m" + matchNumber;
             }
 
             /* Ignore matches the user doesn't want */
@@ -131,6 +135,7 @@ $('#schedule_file').change(function(){
             row.append($('<td>').html(match['Time']));
             row.append($('<td>').html(match['Description']));
             row.append($('<td>').html(match['Match']));
+            row.append($('<td>').html($('#event_key').val() + "_" + matchKey));
             row.append($('<td>').html(cleanTeamNum(match['Blue 1'])));
             row.append($('<td>').html(cleanTeamNum(match['Blue 2'])));
             row.append($('<td>').html(cleanTeamNum(match['Blue 3'])));
@@ -197,7 +202,9 @@ $('#results_file').change(function(){
         var request_body = [];
 
         $('#results_preview').empty();
-        $('#results_preview').html("<tr><th>Time</th><th>Match</th><th>Red 1</th><th>Red 2</th><th>Red 3</th><th>Blue 1</th><th>Blue 2</th><th>Blue 3</th><th>Red Score</th><th>Blue Score</th></tr>");
+        $('#results_preview').html("<tr><th>Time</th><th>Match</th><th>TBA Key</th><th>Red 1</th><th>Red 2</th><th>Red 3</th><th>Blue 1</th><th>Blue 2</th><th>Blue 3</th><th>Red Score</th><th>Blue Score</th></tr>");
+        var good_matches = 0;
+        var last_match_type = null;
         for(var i=0; i<matches.length; i++){
             var match = matches[i];
 
@@ -205,10 +212,29 @@ $('#results_file').change(function(){
             if(!match['Time']){
                 continue;
             }
+            good_matches++;
+
+            var compLevel, setNumber, matchNumber;
+            var matchKey;
+            var has_octo = $('input[name="alliance-count-results"]:checked').val() == "16";
+            if (match['Match'].includes("Qualification")) {
+                matchNumber = parseInt(match['Match'].split(" ")[1]);
+                compLevel = "qm";
+                setNumber = 1;
+                matchKey = "qm" + matchNumber;
+            } else {
+                var levelSetAndMatch = playoffTypeMatchAndSet(has_octo, match['Match'], last_match_type);
+                compLevel = levelSetAndMatch[0];
+                setNumber = levelSetAndMatch[1];
+                matchNumber = levelSetAndMatch[2];
+                matchKey = compLevel + setNumber + "m" + matchNumber;
+            }
+            last_match_type = compLevel;
 
             var row = $('<tr>');
             row.append($('<td>').html(match['Time']));
             row.append($('<td>').html(match['Match']));
+            row.append($('<td>').html($('#event_key').val() + "_" + matchKey));
             row.append($('<td>').html(cleanTeamNum(match['Red 1'])));
             row.append($('<td>').html(cleanTeamNum(match['Red 2'])));
             row.append($('<td>').html(cleanTeamNum(match['Red 3'])));
@@ -219,16 +245,6 @@ $('#results_file').change(function(){
             row.append($('<td>').html(match['Blue Score']));
 
             $('#results_preview').append(row);
-
-            var compLevel, setNumber, matchNumber;
-            // only works for 2015 format
-            matchNumber = parseInt(match['Match'].split(" ")[1]);
-            setNumber = 1;
-            if(match['Match'].indexOf("Qualification") == 0){
-                compLevel = "qm";
-            }else{
-                compLevel = playoffTypeFromMatchString(match['Match']);
-            }
 
             // make json dict
             request_body.push({
@@ -483,10 +499,10 @@ function updateRankings(cell) {
             //var breakdowns = ['Avg', 'CP', 'AP', 'RC', 'TP', 'LP'];
 
             // 2016 Headers
-            var breakdowns  = ['RS', 'Sort1', 'Sort2', 'Sort3', 'Sort4', 'Wins', 'Losses', 'Ties', 'Played', 'DQ'];
+            var breakdowns  = ['RS', 'Sort2', 'Sort3', 'Sort4', 'Sort 5', 'Wins', 'Losses', 'Ties', 'Played', 'DQ'];
             var display = ["Ranking Score", "Auto", "Scale/Challenge", "Goals", "Defense", "Wins", "Losses", "Ties", "Played", 'DQ'];
 
-            var rankData = JSON.parse(data)['Ranks'];
+            var rankData = data['Ranks'];
             request_body['breakdowns'] = display;
             request_body['rankings'] = [];
             for(var i=0; i<rankData.length; i++){
