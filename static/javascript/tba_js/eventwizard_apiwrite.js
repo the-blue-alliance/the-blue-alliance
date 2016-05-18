@@ -499,10 +499,10 @@ function updateRankings(cell) {
             //var breakdowns = ['Avg', 'CP', 'AP', 'RC', 'TP', 'LP'];
 
             // 2016 Headers
-            var breakdowns  = ['RS', 'Sort1', 'Sort2', 'Sort3', 'Sort4', 'Wins', 'Losses', 'Ties', 'Played', 'DQ'];
+            var breakdowns  = ['RS', 'Sort2', 'Sort3', 'Sort4', 'Sort 5', 'Wins', 'Losses', 'Ties', 'Played', 'DQ'];
             var display = ["Ranking Score", "Auto", "Scale/Challenge", "Goals", "Defense", "Wins", "Losses", "Ties", "Played", 'DQ'];
 
-            var rankData = JSON.parse(data)['Ranks'];
+            var rankData = data['Ranks'];
             request_body['breakdowns'] = display;
             request_body['rankings'] = [];
             for(var i=0; i<rankData.length; i++){
