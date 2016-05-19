@@ -48,18 +48,18 @@
       </div>
     </div>
   </div>
-  <div class="col-xs-12">
-    {% for suggestion_id, event in events_and_ids %}
-      <div class="well">
-        {% include "event_partials/suggest_event_info.html" %}
-      </div>
-    {% else %}
-      <div class="row">
+  <div class="row">
+    <div class="col-xs-12">
+      {% for suggestion_id, event in events_and_ids %}
+        <div class="well">
+          {% include "event_partials/suggest_event_info.html" %}
+        </div>
+      {% else %}
         <div class="well">
           <p>No suggestions! Go build more community!</p>
         </div>
-      </div>
-    {% endfor %}
+      {% endfor %}
+    </div>
   </div>
 </div>
 {% endblock %}
