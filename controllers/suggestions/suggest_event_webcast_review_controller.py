@@ -5,6 +5,7 @@ import logging
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
+from consts.account_permissions import AccountPermissions
 from controllers.suggestions.suggestions_review_base_controller import SuggestionsReviewBaseController
 from helpers.event.event_webcast_adder import EventWebcastAdder
 from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
@@ -14,6 +15,11 @@ from models.suggestion import Suggestion
 
 
 class SuggestEventWebcastReviewController(SuggestionsReviewBaseController):
+
+    def __init__(self, *args, **kw):
+        self.REQUIRED_PERMISSIONS.append(AccountPermissions.REVIEW_MEDIA)
+        super(SuggestEventWebcastReviewController, self).__init__(*args, **kw)
+
     """
     View the list of suggestions.
     """

@@ -57,7 +57,7 @@ class AccountOverview(LoggedInHandler):
         review_permissions = False
         num_reviewed = 0
         total_pending = 0
-        if AccountPermissions.MUTATE_DATA in self.user_bundle.account.permissions:
+        if AccountPermissions.REVIEW_MEDIA in self.user_bundle.account.permissions:
             review_permissions = True
             num_reviewed = Suggestion.query(Suggestion.reviewer==user).count()
             total_pending = Suggestion.query(Suggestion.review_state==Suggestion.REVIEW_PENDING).count()

@@ -116,3 +116,118 @@ class TestTeamMediaSuggestionCreator(unittest2.TestCase):
             "frc1124",
             "2016")
         self.assertEqual(status, 'bad_url')
+
+
+class TestOffseasonEventSuggestionCreator(unittest2.TestCase):
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+
+        self.account = Account.get_or_insert(
+            "123",
+            email="user@example.com",
+            registered=True)
+        self.account.put()
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def testCreateSuggestion(self):
+        status = SuggestionCreator.createOffseasonEventSuggestion(
+            self.account.key,
+            "Test Event",
+            "2016-5-1",
+            "2016-5-2",
+            "http://foo.bar.com",
+            "123 Fake Street, New York, NY")
+        self.assertEqual(status, 'success')
+
+        # Ensure the Suggestion gets created
+        suggestions = Suggestion.query().fetch()
+        self.assertIsNotNone(suggestions)
+        self.assertEqual(len(suggestions), 1)
+
+        suggestion = suggestions[0]
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.contents['name'], "Test Event")
+        self.assertEqual(suggestion.contents['start_date'], '2016-5-1')
+        self.assertEqual(suggestion.contents['end_date'], '2016-5-2')
+        self.assertEqual(suggestion.contents['website'], 'http://foo.bar.com')
+        self.assertEqual(suggestion.contents['address'], '123 Fake Street, New York, NY')
+
+    def testMissingParameters(self):
+        status = SuggestionCreator.createOffseasonEventSuggestion(
+            self.account.key,
+            "",
+            "2016-5-1",
+            "2016-5-2",
+            "http://foo.bar.com",
+            "123 Fake Street, New York, NY")
+        self.assertEqual(status, 'missing_data')
+
+        status = SuggestionCreator.createOffseasonEventSuggestion(
+            self.account.key,
+            "Test Event",
+            "",
+            "2016-5-2",
+            "http://foo.bar.com",
+            "123 Fake Street, New York, NY")
+        self.assertEqual(status, 'missing_data')
+
+        status = SuggestionCreator.createOffseasonEventSuggestion(
+            self.account.key,
+            "Test Event",
+            "2016-5-1",
+            "",
+            "http://foo.bar.com",
+            "123 Fake Street, New York, NY")
+        self.assertEqual(status, 'missing_data')
+
+        status = SuggestionCreator.createOffseasonEventSuggestion(
+            self.account.key,
+            "Test Event",
+            "2016-5-1",
+            "2016-5-2",
+            "",
+            "123 Fake Street, New York, NY")
+        self.assertEqual(status, 'missing_data')
+
+        status = SuggestionCreator.createOffseasonEventSuggestion(
+            self.account.key,
+            "Test Event",
+            "2016-5-1",
+            "2016-5-2",
+            "http://foo.bar.com",
+            "")
+        self.assertEqual(status, 'missing_data')
+
+    def testOutOfOrderDates(self):
+        status = SuggestionCreator.createOffseasonEventSuggestion(
+            self.account.key,
+            "Test Event",
+            "2016-5-4",
+            "2016-5-2",
+            "http://foo.bar.com",
+            "123 Fake Street, New York, NY")
+        self.assertEqual(status, 'missing_data')
+
+    def testMalformedDates(self):
+        status = SuggestionCreator.createOffseasonEventSuggestion(
+            self.account.key,
+            "Test Event",
+            "meow",
+            "2016-5-2",
+            "http://foo.bar.com",
+            "123 Fake Street, New York, NY")
+        self.assertEqual(status, 'missing_data')
+
+        status = SuggestionCreator.createOffseasonEventSuggestion(
+            self.account.key,
+            "Test Event",
+            "2016-5-1",
+            "moo",
+            "http://foo.bar.com",
+            "123 Fake Street, New York, NY")
+        self.assertEqual(status, 'missing_data')
