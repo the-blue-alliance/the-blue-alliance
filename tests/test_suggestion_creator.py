@@ -135,7 +135,7 @@ class TestOffseasonEventSuggestionCreator(unittest2.TestCase):
         self.testbed.deactivate()
 
     def testCreateSuggestion(self):
-        status = SuggestionCreator.createOffseasonEventSuggestion(
+        status, _ = SuggestionCreator.createOffseasonEventSuggestion(
             self.account.key,
             "Test Event",
             "2016-5-1",
@@ -158,76 +158,84 @@ class TestOffseasonEventSuggestionCreator(unittest2.TestCase):
         self.assertEqual(suggestion.contents['address'], '123 Fake Street, New York, NY')
 
     def testMissingParameters(self):
-        status = SuggestionCreator.createOffseasonEventSuggestion(
+        status, failures = SuggestionCreator.createOffseasonEventSuggestion(
             self.account.key,
             "",
             "2016-5-1",
             "2016-5-2",
             "http://foo.bar.com",
             "123 Fake Street, New York, NY")
-        self.assertEqual(status, 'missing_data')
+        self.assertEqual(status, 'validation_failure')
+        self.assertTrue('name' in failures)
 
-        status = SuggestionCreator.createOffseasonEventSuggestion(
+        status, failures = SuggestionCreator.createOffseasonEventSuggestion(
             self.account.key,
             "Test Event",
             "",
             "2016-5-2",
             "http://foo.bar.com",
             "123 Fake Street, New York, NY")
-        self.assertEqual(status, 'missing_data')
+        self.assertEqual(status, 'validation_failure')
+        self.assertTrue('start_date' in failures)
 
-        status = SuggestionCreator.createOffseasonEventSuggestion(
+        status, failures = SuggestionCreator.createOffseasonEventSuggestion(
             self.account.key,
             "Test Event",
             "2016-5-1",
             "",
             "http://foo.bar.com",
             "123 Fake Street, New York, NY")
-        self.assertEqual(status, 'missing_data')
+        self.assertEqual(status, 'validation_failure')
+        self.assertTrue('end_date' in failures)
 
-        status = SuggestionCreator.createOffseasonEventSuggestion(
+        status, failures = SuggestionCreator.createOffseasonEventSuggestion(
             self.account.key,
             "Test Event",
             "2016-5-1",
             "2016-5-2",
             "",
             "123 Fake Street, New York, NY")
-        self.assertEqual(status, 'missing_data')
+        self.assertEqual(status, 'validation_failure')
+        self.assertTrue('website' in failures)
 
-        status = SuggestionCreator.createOffseasonEventSuggestion(
+        status, failures = SuggestionCreator.createOffseasonEventSuggestion(
             self.account.key,
             "Test Event",
             "2016-5-1",
             "2016-5-2",
             "http://foo.bar.com",
             "")
-        self.assertEqual(status, 'missing_data')
+        self.assertEqual(status, 'validation_failure')
+        self.assertTrue('venue_address' in failures)
 
     def testOutOfOrderDates(self):
-        status = SuggestionCreator.createOffseasonEventSuggestion(
+        status, failures = SuggestionCreator.createOffseasonEventSuggestion(
             self.account.key,
             "Test Event",
             "2016-5-4",
             "2016-5-2",
             "http://foo.bar.com",
             "123 Fake Street, New York, NY")
-        self.assertEqual(status, 'missing_data')
+        self.assertEqual(status, 'validation_failure')
+        self.assertTrue('end_date' in failures)
 
     def testMalformedDates(self):
-        status = SuggestionCreator.createOffseasonEventSuggestion(
+        status, failures = SuggestionCreator.createOffseasonEventSuggestion(
             self.account.key,
             "Test Event",
             "meow",
             "2016-5-2",
             "http://foo.bar.com",
             "123 Fake Street, New York, NY")
-        self.assertEqual(status, 'missing_data')
+        self.assertEqual(status, 'validation_failure')
+        self.assertTrue('start_date' in failures)
 
-        status = SuggestionCreator.createOffseasonEventSuggestion(
+        status, failures = SuggestionCreator.createOffseasonEventSuggestion(
             self.account.key,
             "Test Event",
             "2016-5-1",
             "moo",
             "http://foo.bar.com",
             "123 Fake Street, New York, NY")
-        self.assertEqual(status, 'missing_data')
+        self.assertEqual(status, 'validation_failure')
+        self.assertTrue('end_date' in failures)
