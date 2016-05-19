@@ -132,18 +132,42 @@ class SuggestionCreator(object):
 
     @classmethod
     def createOffseasonEventSuggestion(cls, author_account_key, name, start_date, end_date, website, address):
-        """ Create a suggestion for offseason event. Returns status (success, missing_data) """
-        if not name or not start_date or not end_date or not website or not address:
-            return 'missing_data'
+        """
+        Create a suggestion for offseason event. Returns (status, failures):
+        ('success', None)
+        ('validation_failure', failures)
+        """
+        failures = {}
+        if not name:
+            failures['name'] = "Missing event name"
+        if not start_date:
+            failures['start_date'] = "Missing start date"
+        if not end_date:
+            failures['end_date'] = "Missing end date"
+        if not website:
+            failures['website'] = "Missing website"
+        if not address:
+            failures['venue_address'] = "Missing address"
 
-        try:
-            start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
-            end_datetime = datetime.strptime(end_date, "%Y-%m-%d")
-        except ValueError:
-            return 'missing_data'
+        start_datetime = None
+        end_datetime = None
+        if start_date:
+            try:
+                start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
+            except ValueError:
+                failures['start_date'] = "Invalid start date format (year-month-date)"
 
-        if end_datetime < start_datetime:
-            return 'missing_data'
+        if end_date:
+            try:
+                end_datetime = datetime.strptime(end_date, "%Y-%m-%d")
+            except ValueError:
+                failures['end_date'] = "Invalid end date format (year-month-date)"
+
+        if start_datetime and end_datetime and end_datetime < start_datetime:
+            failures['end_date'] = "End date must not be before the start date"
+
+        if failures:
+            return 'validation_failure', failures
 
         # Note that we don't specify an explicit key for event suggestions
         # We don't trust users to input correct event keys (that's for the moderator to do)
@@ -158,4 +182,4 @@ class SuggestionCreator(object):
             'website': website,
             'address': address}
         suggestion.put()
-        return 'success'
+        return 'success', None
