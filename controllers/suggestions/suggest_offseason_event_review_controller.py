@@ -1,10 +1,12 @@
-from datetime import datetime
+from datetime import datetime, date
 
 from consts.account_permissions import AccountPermissions
 from consts.district_type import DistrictType
 from consts.event_type import EventType
 from controllers.suggestions.suggestions_review_base_controller import \
     SuggestionsReviewBaseController
+from database.event_query import EventListQuery
+from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
 from models.event import Event
 from models.suggestion import Suggestion
@@ -18,10 +20,15 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
         super(SuggestOffseasonEventReviewController, self).__init__(*args, **kw)
 
     def get(self):
-        suggestions = Suggestion.query().filter(
+        current_year = date.today().year
+        all_events_future = EventListQuery(current_year).fetch_async()
+        suggestions_future = Suggestion.query().filter(
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
-            Suggestion.target_model == "offseason-event")
-        events_and_ids = [self._create_candidate_event(suggestion) for suggestion in suggestions]
+            Suggestion.target_model == "offseason-event").fetch_async()
+
+        existing_offseason_events = filter(lambda e: e.event_type_enum == EventType.OFFSEASON, all_events_future.get_result())
+        EventHelper.sort_events(existing_offseason_events)
+        events_and_ids = [self._create_candidate_event(suggestion, existing_offseason_events) for suggestion in suggestions_future.get_result()]
 
         self.template_values.update({
             'success': self.request.get("success"),
@@ -81,7 +88,7 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
         self.redirect("/suggest/offseason/review")
 
     @classmethod
-    def _create_candidate_event(cls, suggestion):
+    def _create_candidate_event(cls, suggestion, existing_offseason_events):
         start_date = None
         end_date = None
         try:
@@ -89,6 +96,8 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
             end_date = datetime.strptime(suggestion.contents['end_date'], "%Y-%m-%d")
         except ValueError:
             pass
+
+        similar_events = filter(lambda x: start_date == x.start_date and end_date == x.end_date, existing_offseason_events)
 
         return suggestion.key.id(), Event(
             end_date=end_date,
@@ -99,4 +108,4 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
             start_date=start_date,
             website=suggestion.contents['website'],
             year=start_date.year if start_date else None,
-            official=False)
+            official=False), similar_events

@@ -9,7 +9,7 @@
     <li><a href="/suggest/review">Suggestions</a></li>
     <li class="active">Offseason Events</li>
   </ol>
-  <h1>{{ events|length }} Pending Event Suggestions</h1>
+  <h1>{{ events_and_ids|length }} Pending Event Suggestions</h1>
 
   {% if success == "accept" %}
   <div class="row">
@@ -50,8 +50,16 @@
   </div>
   <div class="row">
     <div class="col-xs-12">
-      {% for suggestion_id, event in events_and_ids %}
+      {% for suggestion_id, event, similar in events_and_ids %}
         <div class="well">
+          <h4>Similar Events</h4>
+          <ul>
+          {% for other_event in similar %}
+            <li><a href="/event/{{ other_event.key_name }}" target="_blank">[{{ other_event.event_short }}] {{ other_event.name }}</a></li>
+          {% else %}
+            <li>No similar events found</li>
+          {% endfor %}
+          </ul>
           {% include "event_partials/suggest_event_info.html" %}
         </div>
       {% else %}
