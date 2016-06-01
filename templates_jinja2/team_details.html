@@ -18,7 +18,7 @@
 <div class="container">
   <div class="row">
     <div class="col-sm-3 col-lg-2">
-      <div class="tba-sidenav-affixed">
+      <div class="tba-sidenav-affixed">over
         {% set dropdown_label = '%d Season' % year %}
         {% include "team_partials/team_year_dropdown.html" %}
 
@@ -57,7 +57,7 @@
           <hr>
           <h2 id="event-results">Event Results</h2>
           {% if year_wlt %}
-            <p>Overall, team {{team.team_number}} was <strong>{{year_wlt.win}}-{{year_wlt.loss}}-{{year_wlt.tie}}</strong> in {{year}}.</p>
+            <p>Overall, Team #{{team.team_number}} was <strong>{{year_wlt.win}}-{{year_wlt.loss}}-{{year_wlt.tie}}</strong> in {{year}}.</p>
           {% else %}
             {% if year_qual_avg or year_elim_avg %}
               <p>Overall, team {{team.team_number}} had
