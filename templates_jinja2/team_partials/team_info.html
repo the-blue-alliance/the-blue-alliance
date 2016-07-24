@@ -12,11 +12,11 @@
 <div class="row">
   <div class="col-sm-7">
     <p>
-      {% if team.location %}<span class="glyphicon glyphicon-map-marker"></span> from <a href="http://maps.google.com/maps?q={{ team.location|urlencode }}" target="_blank">{{ team.location }}</a><br>{% endif %}
+      {% if team.location %}<span class="glyphicon glyphicon-map-marker"></span> From <a href="http://maps.google.com/maps?q={{ team.location|urlencode }}" target="_blank">{{ team.location }}</a><br>{% endif %}
       {% if team.name %}<span class="glyphicon glyphicon-info-sign"></span> aka <em>{{ team.name }}</em><br>{% endif %}
-      {% if team.rookie_year %}<span class="glyphicon glyphicon-calendar"></span> first competed in {{ team.rookie_year }}<br>{% endif %}
+      {% if team.rookie_year %}<span class="glyphicon glyphicon-calendar"></span> First competed in {{ team.rookie_year }}<br>{% endif %}
       {% if team.website %}<span class="glyphicon glyphicon-globe"></span> <a href="{{team.website}}" target="_blank">{{ team.website }}</a><br>{% endif %}
-      {% if team.championship_location %}<span class="glyphicon glyphicon-flag"></span> home Championship in {{team.championship_location.2017}} for 2017{% if team.championship_location.2017 != team.championship_location.2018 %}, {{team.championship_location.2018}} for 2018{% endif %}+<br>{% endif %}
+      {% if team.championship_location %}<span class="glyphicon glyphicon-flag"></span> Home Championship: {{team.championship_location.2017}}, 2017 | {% if team.championship_location.2017 != team.championship_location.2018 %}, {{team.championship_location.2018}}, 2018{% endif %}+<br>{% endif %}
 
       <hr>
       <a class="btn btn-xs btn-default{% if social_medias %} pull-right{% endif %}" href="/suggest/team/social_media?team_key={{team.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add social media!</a>
@@ -27,7 +27,7 @@
     </p>
 
     <p class="pull-right">
-      <span class="image-atc"></span> <a href="http://atthecontrol.com/">See live data on At The Control</a>
+      <span class="image-atc"></span> <a href="http://atthecontrol.com/">Live Data: At The Control</a>
     </p>
 
     {% include "team_partials/team_social_media.html" %}

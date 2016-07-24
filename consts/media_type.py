@@ -33,6 +33,6 @@ class MediaType(object):
     profile_urls = {  # Format with foreign_key
         FACEBOOK_PROFILE: 'https://www.facebook.com/{}',
         TWITTER_PROFILE: 'https://twitter.com/{}',
-        YOUTUBE_CHANNEL: 'https://www.youtube.com/user/{}',
+        YOUTUBE_CHANNEL: 'https://www.youtube.com/{}',
         GITHUB_PROFILE: 'https://github.com/{}',
     }

@@ -260,9 +260,6 @@ class PredictionHelper(object):
             team_rank_tiebreaker = defaultdict(int)
             num_played = defaultdict(int)
             for match in matches:
-                if not match.score_breakdown:  # Can't do rankings without score breakdown
-                    return None, None
-
                 for alliance_color in ['red', 'blue']:
                     for team in match.alliances[alliance_color]['teams']:
                         num_played[team] += 1
@@ -272,6 +269,8 @@ class PredictionHelper(object):
                 sampled_tiebreaker = {}
                 # Get actual results or sampled results, depending if match has been played
                 if match.has_been_played:
+                    if not match.score_breakdown:  # Can't do rankings without score breakdown
+                        return None, None
                     last_played_match = match.key.id()
                     sampled_winner = match.winning_alliance
                     for alliance_color in ['red', 'blue']:
