@@ -58,6 +58,7 @@ class Event(ndb.Model):
         self._venue_address_safe = None
         self._webcast = None
         self._updated_attrs = []  # Used in EventManipulator to track what changed
+        self._rankings_enhanced = None
         super(Event, self).__init__(*args, **kw)
 
     @ndb.tasklet
@@ -213,6 +214,22 @@ class Event(ndb.Model):
             except Exception, e:
                 self._rankings = None
         return self._rankings
+
+    @property 
+    def rankings_enhanced(self):
+        if self._rankings is not None:
+            self._rankings_enhanced = {}
+            team_number_index = self._rankings[0].index("Team")
+            matches_played_index = self._rankings[0].index("Played")
+            ranking_score_index = self._rankings[0].index("Ranking Score")
+            for ranking in self._rankings[1:]:
+                team_number = ranking[team_number_index]
+                ranking_score = float(rankings[ranking_score_index])
+                matches_played = int(ranking[matches_played_index])
+                self._rankings_enhanced[team_number] = { "ranking_score_per_match": ranking_score / matches_played}
+        else:
+            self._rankings_enhanced = None
+        return self._rankings_enhanced
 
     @property
     def venue_or_venue_from_address(self):
