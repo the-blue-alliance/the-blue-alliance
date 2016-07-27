@@ -224,7 +224,7 @@ class Event(ndb.Model):
             ranking_score_index = self._rankings[0].index("Ranking Score")
             for ranking in self._rankings[1:]:
                 team_number = ranking[team_number_index]
-                ranking_score = float(rankings[ranking_score_index])
+                ranking_score = float(ranking[ranking_score_index])
                 matches_played = int(ranking[matches_played_index])
                 ranking_score_per_match = round(ranking_score / matches_played, 2)
                 self._rankings_enhanced[team_number] = { "ranking_score_per_match": ranking_score_per_match }
