@@ -170,6 +170,18 @@ class EventDetail(CacheableHandler):
         if event_insights:
             event_insights_template = 'event_partials/event_insights_{}.html'.format(event.year)
 
+        # rankings processing for ranking score per match
+        full_rankings = event.rankings
+        rankings_enhanced = event.rankings_enhanced
+        if rankings_enhanced:
+            rp_index = full_rankings[0].index("Ranking Score")
+            for row in full_rankings[1:]:
+                team = row[1]
+                if team in rankings_enhanced:
+                    rp_per_match = rankings_enhanced[team]['ranking_score_per_match']
+                    row[rp_index] = "{} ({} per match)".format(row[rp_index], rp_per_match)
+
+
         self.template_values.update({
             "event": event,
             "district_name": DistrictType.type_names.get(event.event_district_enum, None),
