@@ -22,6 +22,7 @@ from models.event import Event
 from models.match import Match
 from template_engine import jinja2_engine
 
+from consts.ranking_indexes import RankingIndexes
 
 class EventList(CacheableHandler):
     """
@@ -174,7 +175,7 @@ class EventDetail(CacheableHandler):
         full_rankings = event.rankings
         rankings_enhanced = event.rankings_enhanced
         if rankings_enhanced is not None:
-            rp_index = 2
+            rp_index = RankingIndexes.CUMULATIVE_RANKING_SCORE[event.year]
             ranking_criterion_name = full_rankings[0][rp_index]
             full_rankings[0].append(ranking_criterion_name + "/Match*")    
             if rankings_enhanced:

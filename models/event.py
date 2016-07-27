@@ -6,6 +6,7 @@ import re
 
 from consts.district_type import DistrictType
 from consts.event_type import EventType
+from consts.ranking_indexes import RankingIndexes
 
 
 class Event(ndb.Model):
@@ -217,18 +218,18 @@ class Event(ndb.Model):
 
     @property 
     def rankings_enhanced(self):
-        # these years are valid because the following hold true:
-        # -the team number has index 1 in the ranking rows (always true)
-        # -the primary ranking criterion has index 2
-        # -the number of matches played is the last entry in the row
-        valid_years = [2012, 2013, 2014, 2016]
+        valid_years = RankingIndexes.CUMULATIVE_RANKING_YEARS
         rankings = self.rankings
         if rankings is not None and self.year in valid_years:
             self._rankings_enhanced = {}
+            team_index = RankingIndexes.TEAM_NUMBER
+            rp_index = RankingIndexes.CUMULATIVE_RANKING_SCORE[self.year]
+            matches_played_index = RankingIndexes.MATCHES_PLAYED[self.year]
+
             for ranking in rankings[1:]:
-                team_number = ranking[1]
-                ranking_score = float(ranking[2])
-                matches_played = int(ranking[-1])
+                team_number = ranking[team_index]
+                ranking_score = float(ranking[rp_index])
+                matches_played = int(ranking[matches_played_index])
                 ranking_score_per_match = round(ranking_score / matches_played, 2)
                 self._rankings_enhanced[team_number] = { "ranking_score_per_match": ranking_score_per_match }
         else:
