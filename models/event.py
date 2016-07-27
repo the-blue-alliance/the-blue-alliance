@@ -224,7 +224,7 @@ class Event(ndb.Model):
         valid_years = [2012, 2013, 2014, 2016]
         rankings = self.rankings
         if rankings is not None and self.year in valid_years:
-            rankings_enhanced = {}
+            self._rankings_enhanced = {}
             for ranking in rankings[1:]:
                 team_number = ranking[1]
                 ranking_score = float(ranking[2])

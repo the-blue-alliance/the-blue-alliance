@@ -173,13 +173,16 @@ class EventDetail(CacheableHandler):
         # rankings processing for ranking score per match
         full_rankings = event.rankings
         rankings_enhanced = event.rankings_enhanced
-        if rankings_enhanced:
-            rp_index = full_rankings[0].index("Ranking Score")
-            for row in full_rankings[1:]:
-                team = row[1]
-                if team in rankings_enhanced:
-                    rp_per_match = rankings_enhanced[team]['ranking_score_per_match']
-                    row[rp_index] = "{} ({} per match)".format(row[rp_index], rp_per_match)
+        if rankings_enhanced is not None:
+            rp_index = 2
+            ranking_criterion_name = full_rankings[0][rp_index]
+            full_rankings[0].append(ranking_criterion_name + "/Match*")    
+            if rankings_enhanced:
+                for row in full_rankings[1:]:
+                    team = row[1]
+                    if team in rankings_enhanced:
+                        rp_per_match = rankings_enhanced[team]['ranking_score_per_match']
+                        row.append(rp_per_match)
 
 
         self.template_values.update({
