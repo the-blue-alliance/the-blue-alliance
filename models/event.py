@@ -217,15 +217,18 @@ class Event(ndb.Model):
 
     @property 
     def rankings_enhanced(self):
-        if self._rankings is not None and self.year == 2016:
-            self._rankings_enhanced = {}
-            team_number_index = self._rankings[0].index("Team")
-            matches_played_index = self._rankings[0].index("Played")
-            ranking_score_index = self._rankings[0].index("Ranking Score")
-            for ranking in self._rankings[1:]:
-                team_number = ranking[team_number_index]
-                ranking_score = float(ranking[ranking_score_index])
-                matches_played = int(ranking[matches_played_index])
+        # these years are valid because the following hold true:
+        # -the team number has index 1 in the ranking rows (always true)
+        # -the primary ranking criterion has index 2
+        # -the number of matches played is the last entry in the row
+        valid_years = [2012, 2013, 2014, 2016]
+        rankings = self.rankings
+        if rankings is not None and self.year in valid_years:
+            rankings_enhanced = {}
+            for ranking in rankings[1:]:
+                team_number = ranking[1]
+                ranking_score = float(ranking[2])
+                matches_played = int(ranking[-1])
                 ranking_score_per_match = round(ranking_score / matches_played, 2)
                 self._rankings_enhanced[team_number] = { "ranking_score_per_match": ranking_score_per_match }
         else:
