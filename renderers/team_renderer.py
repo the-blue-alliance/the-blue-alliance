@@ -20,6 +20,8 @@ from models.robot import Robot
 
 from template_engine import jinja2_engine
 
+from consts.event_type import EventType
+
 
 class TeamRenderer(object):
     @classmethod
@@ -61,7 +63,9 @@ class TeamRenderer(object):
                 qual_avg = None
                 elim_avg = None
                 wlt = EventHelper.calculateTeamWLTFromMatches(team.key_name, event_matches)
-                year_wlt_list.append(wlt)
+                print event.event_type_enum
+                if event.event_type_enum in EventType.SEASON_EVENT_TYPES:
+                    year_wlt_list.append(wlt)
                 if wlt["win"] + wlt["loss"] + wlt["tie"] == 0:
                     display_wlt = None
                 else:
