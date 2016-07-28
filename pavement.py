@@ -3,15 +3,29 @@
 import subprocess
 import json
 import time
+import optparse
 from paver.easy import *
 
 path = path("./")
 
 
 @task
-@consume_args
-def deploy(args):
-    sh("python deploy.py " + " ".join(args))
+@cmdopts([
+    optparse.make_option("-d", "--sdk", help="Path to GAE SDK", default=None),
+    optparse.make_option("-p", "--project", help="App Engine project to deploy", default="tbatv-prod-hrd"),
+    optparse.make_option("--reauth", action="store_true", help="Prompt for re-auth during all GAE commands", default=False),
+    optparse.make_option("--yolo", action="store_true", help="Do not wait for the travis build to succeed #yolo", default=False),
+])
+def deploy(options):
+    args = ["python", "deploy.py", "--project", options.deploy.project]
+    if options.deploy.sdk:
+        args.extend(["--app_cfg_dir", options.deploy.sdk])
+    if options.deploy.reauth:
+        args.append("--reauth")
+    if options.deploy.yolo:
+        args.append("--yolo")
+    print "Running {}".format(subprocess.list2cmdline(args))
+    subprocess.call(args)
 
 
 @task
