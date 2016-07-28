@@ -61,7 +61,8 @@ class TeamRenderer(object):
                 qual_avg = None
                 elim_avg = None
                 wlt = EventHelper.calculateTeamWLTFromMatches(team.key_name, event_matches)
-                year_wlt_list.append(wlt)
+                if event.official:
+                    year_wlt_list.append(wlt)
                 if wlt["win"] + wlt["loss"] + wlt["tie"] == 0:
                     display_wlt = None
                 else:
