@@ -6,6 +6,7 @@ import re
 
 from consts.district_type import DistrictType
 from consts.event_type import EventType
+from consts.ranking_indexes import RankingIndexes
 
 
 class Event(ndb.Model):
@@ -58,6 +59,7 @@ class Event(ndb.Model):
         self._venue_address_safe = None
         self._webcast = None
         self._updated_attrs = []  # Used in EventManipulator to track what changed
+        self._rankings_enhanced = None
         super(Event, self).__init__(*args, **kw)
 
     @ndb.tasklet
@@ -213,6 +215,26 @@ class Event(ndb.Model):
             except Exception, e:
                 self._rankings = None
         return self._rankings
+
+    @property 
+    def rankings_enhanced(self):
+        valid_years = RankingIndexes.CUMULATIVE_RANKING_YEARS
+        rankings = self.rankings
+        if rankings is not None and self.year in valid_years:
+            self._rankings_enhanced = {}
+            team_index = RankingIndexes.TEAM_NUMBER
+            rp_index = RankingIndexes.CUMULATIVE_RANKING_SCORE[self.year]
+            matches_played_index = RankingIndexes.MATCHES_PLAYED[self.year]
+
+            for ranking in rankings[1:]:
+                team_number = ranking[team_index]
+                ranking_score = float(ranking[rp_index])
+                matches_played = int(ranking[matches_played_index])
+                ranking_score_per_match = round(ranking_score / matches_played, 2)
+                self._rankings_enhanced[team_number] = { "ranking_score_per_match": ranking_score_per_match }
+        else:
+            self._rankings_enhanced = None
+        return self._rankings_enhanced
 
     @property
     def venue_or_venue_from_address(self):
