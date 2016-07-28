@@ -63,7 +63,6 @@ class TeamRenderer(object):
                 qual_avg = None
                 elim_avg = None
                 wlt = EventHelper.calculateTeamWLTFromMatches(team.key_name, event_matches)
-                print event.event_type_enum
                 if event.event_type_enum in EventType.SEASON_EVENT_TYPES:
                     year_wlt_list.append(wlt)
                 if wlt["win"] + wlt["loss"] + wlt["tie"] == 0:
