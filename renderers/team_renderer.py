@@ -36,7 +36,8 @@ class TeamRenderer(object):
             return None
 
         participation = []
-        year_wlt_list = []
+        season_wlt_list = []
+        offseason_wlt_list = []
         year_match_avg_list = []
 
         current_event = None
@@ -64,7 +65,9 @@ class TeamRenderer(object):
                 elim_avg = None
                 wlt = EventHelper.calculateTeamWLTFromMatches(team.key_name, event_matches)
                 if event.event_type_enum in EventType.SEASON_EVENT_TYPES:
-                    year_wlt_list.append(wlt)
+                    season_wlt_list.append(wlt)
+                else:
+                    offseason_wlt_list.append(wlt)
                 if wlt["win"] + wlt["loss"] + wlt["tie"] == 0:
                     display_wlt = None
                 else:
@@ -98,13 +101,13 @@ class TeamRenderer(object):
         else:
             year_qual_avg = None
             year_elim_avg = None
-            year_wlt = {"win": 0, "loss": 0, "tie": 0}
-            for wlt in year_wlt_list:
-                year_wlt["win"] += wlt["win"]
-                year_wlt["loss"] += wlt["loss"]
-                year_wlt["tie"] += wlt["tie"]
-            if year_wlt["win"] + year_wlt["loss"] + year_wlt["tie"] == 0:
-                year_wlt = None
+            season_wlt = {"win": 0, "loss": 0, "tie": 0}
+            for wlt in season_wlt_list:
+                season_wlt["win"] += wlt["win"]
+                season_wlt["loss"] += wlt["loss"]
+                season_wlt["tie"] += wlt["tie"]
+            if season_wlt["win"] + season_wlt["loss"] + season_wlt["tie"] == 0:
+                season_wlt = None
 
         medias_by_slugname = MediaHelper.group_by_slugname([media for media in media_future.get_result()])
         image_medias = MediaHelper.get_images(media_future.get_result())
@@ -126,7 +129,7 @@ class TeamRenderer(object):
             "participation": participation,
             "year": year,
             "years": valid_years,
-            "year_wlt": year_wlt,
+            "season_wlt": season_wlt,
             "year_qual_avg": year_qual_avg,
             "year_elim_avg": year_elim_avg,
             "current_event": current_event,

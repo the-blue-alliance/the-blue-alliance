@@ -56,8 +56,8 @@
         <div class="col-xs-12">
           <hr>
           <h2 id="event-results">Event Results</h2>
-          {% if year_wlt %}
-            <p>Overall, Team #{{team.team_number}} was <strong>{{year_wlt.win}}-{{year_wlt.loss}}-{{year_wlt.tie}}</strong> in {{year}}.</p>
+          {% if season_wlt %}
+            <p>Team #{{team.team_number}} was <strong>{{season_wlt.win}}-{{season_wlt.loss}}-{{season_wlt.tie}}</strong> during the {{year}} official season.</p>
           {% else %}
             {% if year_qual_avg or year_elim_avg %}
               <p>Overall, team {{team.team_number}} had
