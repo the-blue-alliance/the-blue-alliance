@@ -28,6 +28,7 @@ class TeamRenderer(object):
         social_media_future = media_query.TeamSocialMediaQuery(team.key.id()).fetch_async()
         robot_future = Robot.get_by_id_async('{}_{}'.format(team.key.id(), year))
         team_districts_future = team_query.TeamDistrictsQuery(team.key.id()).fetch_async()
+        participation_future = team_query.TeamParticipationQuery(team.key.id())._query_async()
 
         events_sorted, matches_by_event_key, awards_by_event_key, valid_years = TeamDetailsDataFetcher.fetch(team, year, return_valid_years=True)
         if not events_sorted:
@@ -118,9 +119,7 @@ class TeamRenderer(object):
             district_name = DistrictType.type_names[district_type]
 
         last_competed = None
-        participation_query = team_query.TeamParticipationQuery(team.key_name)._query_async()
-        participation_years = participation_query.get_result()
-        print participation_years
+        participation_years = participation_future.get_result()
         if len(participation_years) > 0:
             last_competed = max(participation_years)
         current_year = datetime.date.today().year
