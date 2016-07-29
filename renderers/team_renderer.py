@@ -117,6 +117,14 @@ class TeamRenderer(object):
             district_type = DistrictType.abbrevs[district_abbrev]
             district_name = DistrictType.type_names[district_type]
 
+        last_competed = None
+        participation_query = team_query.TeamParticipationQuery(team.key_name)._query_async()
+        participation_years = participation_query.get_result()
+        print participation_years
+        if len(participation_years) > 0:
+            last_competed = max(participation_years)
+        current_year = datetime.date.today().year
+
         handler.template_values.update({
             "is_canonical": is_canonical,
             "team": team,
@@ -135,6 +143,8 @@ class TeamRenderer(object):
             "robot": robot_future.get_result(),
             "district_name": district_name,
             "district_abbrev": district_abbrev,
+            "last_competed": last_competed,
+            "current_year": current_year,
         })
 
         if short_cache:

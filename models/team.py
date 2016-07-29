@@ -4,7 +4,6 @@ import re
 from google.appengine.ext import ndb
 from helpers.champ_split_helper import ChampSplitHelper
 
-
 class Team(ndb.Model):
     """
     Teams represent FIRST Robotics Competition teams.
