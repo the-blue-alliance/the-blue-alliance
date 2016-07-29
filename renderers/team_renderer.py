@@ -116,7 +116,7 @@ class TeamRenderer(object):
                 offseason_wlt["loss"] += wlt["loss"]
                 offseason_wlt["tie"] += wlt["tie"]
             if offseason_wlt["win"] + offseason_wlt["loss"] + offseason_wlt["tie"] == 0:
-                season_wlt = None
+                offseason_wlt = None
 
         medias_by_slugname = MediaHelper.group_by_slugname([media for media in media_future.get_result()])
         image_medias = MediaHelper.get_images(media_future.get_result())
