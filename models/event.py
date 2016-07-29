@@ -221,17 +221,25 @@ class Event(ndb.Model):
         valid_years = RankingIndexes.CUMULATIVE_RANKING_YEARS
         rankings = self.rankings
         if rankings is not None and self.year in valid_years:
-            self._rankings_enhanced = {}
+            self._rankings_enhanced = { "ranking_score_per_match": {},
+                                        "match_offset": None}
             team_index = RankingIndexes.TEAM_NUMBER
             rp_index = RankingIndexes.CUMULATIVE_RANKING_SCORE[self.year]
             matches_played_index = RankingIndexes.MATCHES_PLAYED[self.year]
+
+            max_matches = None
+            if self.within_a_day:
+                max_matches = max([int(el[matches_played_index]) for el in rankings[1:]])
+                self._rankings_enhanced["match_offset"] = {}
 
             for ranking in rankings[1:]:
                 team_number = ranking[team_index]
                 ranking_score = float(ranking[rp_index])
                 matches_played = int(ranking[matches_played_index])
                 ranking_score_per_match = round(ranking_score / matches_played, 2)
-                self._rankings_enhanced[team_number] = { "ranking_score_per_match": ranking_score_per_match }
+                self._rankings_enhanced["ranking_score_per_match"][team_number] = ranking_score_per_match
+                if self.within_a_day:
+                    self._rankings_enhanced["match_offset"][team_number] = matches_played - max_matches
         else:
             self._rankings_enhanced = None
         return self._rankings_enhanced
