@@ -57,7 +57,7 @@
           <hr>
           <h2 id="event-results">Event Results</h2>
           {% if season_wlt %}
-            <p>Team #{{team.team_number}} was <strong>{{season_wlt.win}}-{{season_wlt.loss}}-{{season_wlt.tie}}</strong> during the {{year}} official season
+            <p>Team #{{team.team_number}} was <strong>{{season_wlt.win}}-{{season_wlt.loss}}-{{season_wlt.tie}}</strong> during {{year}} official play
             {% if offseason_wlt %} 
                (and <strong>{{season_wlt.win+offseason_wlt.win}}-{{season_wlt.loss+offseason_wlt.loss}}-{{season_wlt.tie+offseason_wlt.tie}}</strong> overall)
             {% endif %}
