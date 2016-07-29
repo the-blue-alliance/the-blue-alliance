@@ -174,16 +174,24 @@ class EventDetail(CacheableHandler):
         # rankings processing for ranking score per match
         full_rankings = event.rankings
         rankings_enhanced = event.rankings_enhanced
+        unofficial_columns = 0
         if rankings_enhanced is not None:
+            unofficial_columns = 1
             rp_index = RankingIndexes.CUMULATIVE_RANKING_SCORE[event.year]
+            matches_index = RankingIndexes.MATCHES_PLAYED[event.year]
             ranking_criterion_name = full_rankings[0][rp_index]
-            full_rankings[0].append(ranking_criterion_name + "/Match*")    
-            if rankings_enhanced:
-                for row in full_rankings[1:]:
-                    team = row[1]
-                    if team in rankings_enhanced:
-                        rp_per_match = rankings_enhanced[team]['ranking_score_per_match']
-                        row.append(rp_per_match)
+            full_rankings[0].append(ranking_criterion_name + "/Match*")
+
+            for row in full_rankings[1:]:
+                team = row[1]
+                if rankings_enhanced["ranking_score_per_match"] is not None:
+                    rp_per_match = rankings_enhanced['ranking_score_per_match'][team]
+                    row.append(rp_per_match)
+                if rankings_enhanced["match_offset"] is not None:
+                    match_offset = rankings_enhanced["match_offset"][team]
+                    if match_offset == -1:
+                        row[matches_index] = "%s (-1)" % row[matches_index]
+
 
 
         self.template_values.update({
@@ -205,6 +213,7 @@ class EventDetail(CacheableHandler):
             "event_insights_qual": event_insights['qual'] if event_insights else None,
             "event_insights_playoff": event_insights['playoff'] if event_insights else None,
             "event_insights_template": event_insights_template,
+            "unofficial_columns": unofficial_columns,
         })
 
         if event.within_a_day:
