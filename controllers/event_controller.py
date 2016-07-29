@@ -176,14 +176,20 @@ class EventDetail(CacheableHandler):
         rankings_enhanced = event.rankings_enhanced
         if rankings_enhanced is not None:
             rp_index = RankingIndexes.CUMULATIVE_RANKING_SCORE[event.year]
+            matches_index = RankingIndexes.MATCHES_PLAYED[event.year]
             ranking_criterion_name = full_rankings[0][rp_index]
-            full_rankings[0].append(ranking_criterion_name + "/Match*")    
-            if rankings_enhanced:
-                for row in full_rankings[1:]:
-                    team = row[1]
-                    if team in rankings_enhanced:
-                        rp_per_match = rankings_enhanced[team]['ranking_score_per_match']
-                        row.append(rp_per_match)
+            full_rankings[0].append(ranking_criterion_name + "/Match*")
+
+            for row in full_rankings[1:]:
+                team = row[1]
+                if rankings_enhanced["ranking_score_per_match"] is not None:
+                    rp_per_match = rankings_enhanced['ranking_score_per_match'][team]
+                    row.append(rp_per_match)
+                if rankings_enhanced["match_offset"] is not None:
+                    match_offset = rankings_enhanced["match_offset"][team]
+                    if match_offset != 0:
+                        row[matches_index] = "{} ({})".format(row[matches_index], offset)
+
 
 
         self.template_values.update({
