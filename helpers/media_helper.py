@@ -15,8 +15,8 @@ class MediaHelper(object):
         MediaType.FACEBOOK_PROFILE: 0,
         MediaType.YOUTUBE_CHANNEL: 1,
         MediaType.TWITTER_PROFILE: 2,
-        MediaType.GITHUB_PROFILE: 3,
-        MediaType.INSTAGRAM_PROFILE: 4,
+        MediaType.INSTAGRAM_PROFILE: 3,
+        MediaType.GITHUB_PROFILE: 4,
     }
 
     @classmethod
