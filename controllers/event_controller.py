@@ -188,7 +188,7 @@ class EventDetail(CacheableHandler):
                 if rankings_enhanced["match_offset"] is not None:
                     match_offset = rankings_enhanced["match_offset"][team]
                     if match_offset != 0:
-                        row[matches_index] = "{} ({})".format(row[matches_index], offset)
+                        row[matches_index] = "{} ({})".format(row[matches_index], match_offset)
 
 
 
