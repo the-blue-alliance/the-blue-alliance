@@ -21,6 +21,9 @@ install:
   # JavaScript test requirements
   - npm install
 
+before_script:
+  - paver make
+
 script:
   # Run python tests
   - paver test
