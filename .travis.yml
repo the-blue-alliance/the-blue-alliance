@@ -28,4 +28,7 @@ script:
   # Run JavaScript tests
   - npm test
 
+after_failure:
+  - cat test_failures.temp
+
 sudo: false
