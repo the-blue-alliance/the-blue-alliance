@@ -7,6 +7,7 @@ class MediaType(object):
     TWITTER_PROFILE = 4
     YOUTUBE_CHANNEL = 5
     GITHUB_PROFILE = 6
+    INSTAGRAM_PROFILE = 7
 
     type_names = {
         YOUTUBE_VIDEO: 'YouTube Video',
@@ -16,6 +17,7 @@ class MediaType(object):
         TWITTER_PROFILE: 'Twitter Profile',
         YOUTUBE_CHANNEL: 'YouTube Channel',
         GITHUB_PROFILE: 'GitHub Profile',
+        INSTAGRAM_PROFILE: 'Instagram Profile',
     }
 
     image_types = [
@@ -28,6 +30,7 @@ class MediaType(object):
         TWITTER_PROFILE,
         YOUTUBE_CHANNEL,
         GITHUB_PROFILE,
+        INSTAGRAM_PROFILE,
     ]
 
     profile_urls = {  # Format with foreign_key
@@ -35,4 +38,5 @@ class MediaType(object):
         TWITTER_PROFILE: 'https://twitter.com/{}',
         YOUTUBE_CHANNEL: 'https://www.youtube.com/{}',
         GITHUB_PROFILE: 'https://github.com/{}',
+        INSTAGRAM_PROFILE: 'https://www.instagram.com/{}',
     }
