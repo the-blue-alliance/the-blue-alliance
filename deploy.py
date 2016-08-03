@@ -17,7 +17,7 @@ def main():
     parser.add_argument('--project', default='tbatv-prod-hrd', help="App Engine project to deploy")
     parser.add_argument('--yolo', action="store_true", help="Do not wait for travis builds to succeed #yolo", default=False)
     parser.add_argument('--config', help="gcloud configuration profile to use", default="")
-    parser.add_argument('--version', help="Version for app engine modules", default="1-3")
+    parser.add_argument('--version', help="Version for app engine modules", default="prod")
     parser.add_argument('--modules', help="Modules to deploy, comma separated, as yaml spec files in this directory", default="")
     parser.add_argument('--skip-cron', action="store_true", help="Do not deploy cron.yaml", default=False)
     args = parser.parse_args()
@@ -58,7 +58,7 @@ def main():
     if test_status == 0:
         print "Deploying..."
         os.system("gcloud version")
-        cmd = ["gcloud", "app", "deploy", "--project", args.project]
+        cmd = ["gcloud", "app", "deploy", "--verbosity", "info", "--project", args.project]
         if args.config:
             cmd.extend(["--configuration", args.config])
         if args.version:

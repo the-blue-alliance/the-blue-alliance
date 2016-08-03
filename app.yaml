@@ -1,5 +1,3 @@
-application: tbatv-dev-hrd
-version: 1-3
 runtime: python27
 api_version: 1
 threadsafe: false
