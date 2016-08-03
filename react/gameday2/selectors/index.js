@@ -2,6 +2,17 @@ import { createSelector } from 'reselect'
 
 const getWebcastsById = (state) => state.webcastsById
 
+export const getWebcastIds = createSelector(
+  [ getWebcastsById ],
+  (webcastsById) => {
+    let webcastIds = []
+    for (let key in webcastsById) {
+      webcastIds.push(key)
+    }
+    return webcastIds
+  }
+)
+
 export const getWebcastIdsInDisplayOrder = createSelector(
   [ getWebcastsById ],
   (webcastsById) => {

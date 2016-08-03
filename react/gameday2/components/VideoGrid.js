@@ -1,8 +1,8 @@
-import React, { PropTypes } from 'react';
-import VideoCell from './VideoCell';
+import React, { PropTypes } from 'react'
+import VideoCell from './VideoCell'
 import LayoutSelectionPanel from './LayoutSelectionPanel'
 import { getNumViewsForLayout } from '../utils/layoutUtils'
-var classNames = require('classnames');
+var classNames = require('classnames')
 
 /**
  * Responsible for rendering a number of webcasts in a grid-like
@@ -44,9 +44,7 @@ var VideoGrid = React.createClass({
     webcasts: PropTypes.array.isRequired,
     webcastsById: PropTypes.object.isRequired,
     layoutId: PropTypes.number.isRequired,
-    layoutSet: PropTypes.bool.isRequired,
     addWebcastAtLocation: PropTypes.func.isRequired,
-    setLayout: PropTypes.func.isRequired
   },
   getInitialState: function() {
     return {
@@ -90,11 +88,6 @@ var VideoGrid = React.createClass({
     this.setState({
       webcastRenderOrder
     })
-  },
-  renderEmptyLayout: function(classes) {
-    return (
-      <LayoutSelectionPanel setLayout={this.props.setLayout}/>
-    )
   },
   renderLayout: function(webcastCount, layoutNumber, classes) {
     classes += (' layout-' + layoutNumber)
@@ -150,11 +143,6 @@ var VideoGrid = React.createClass({
       'leave-left-margin': this.props.hashtagSidebarVisible,
       'leave-right-margin': this.props.chatSidebarVisible,
     });
-
-    // If the user didn't set a layout yet, show the empty "welcome" view
-    if (!this.props.layoutSet) {
-      return this.renderEmptyLayout(classes)
-    }
 
     let selectedLayoutId = this.props.layoutId
     let numViews = getNumViewsForLayout(selectedLayoutId)
