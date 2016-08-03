@@ -1,28 +1,25 @@
 """
 To use:
 1. Clone a production copy of TBA in the same directory as the development copy by running: `git clone git@github.com:the-blue-alliance/the-blue-alliance.git the-blue-alliance-prod`
-2. Ensure APP_CFG_DIR points to the correct location
+2. Ensure you have gcloud available and in your PATH (https://cloud.google.com/sdk/gcloud/)
 3. If you want to allow travis support, be sure you have the official client installed and in your PATH (https://github.com/travis-ci/travis.rb)
 """
 
 import argparse
 import os
-import sys
+import time
 import subprocess
 import re
 
 
-APP_CFG_DIR = '~/Downloads/google_appengine'  # Eugene's Windows
-# APP_CFG_DIR = '/usr/local/bin' # Mac OS symlinks made by GoogleAppEngineLauncher
-
-
 def main():
     parser = argparse.ArgumentParser(description='Deploy The Blue Alliance app.')
-    parser.add_argument('--app_cfg_dir', type=str, default=APP_CFG_DIR,
-                        help='path to folder containing appcfg.py')
     parser.add_argument('--project', default='tbatv-prod-hrd', help="App Engine project to deploy")
-    parser.add_argument('--reauth', action="store_true", help="Prompt for reauth during GAE commands", default=False)
     parser.add_argument('--yolo', action="store_true", help="Do not wait for travis builds to succeed #yolo", default=False)
+    parser.add_argument('--config', help="gcloud configuration profile to use", default="")
+    parser.add_argument('--version', help="Version for app engine modules", default="1-3")
+    parser.add_argument('--modules', help="Modules to deploy, comma separated, as yaml spec files in this directory", default="")
+    parser.add_argument('--skip-cron', action="store_true", help="Do not deploy cron.yaml", default=False)
     args = parser.parse_args()
 
     os.chdir('../the-blue-alliance-prod')
@@ -59,10 +56,24 @@ def main():
             time.sleep(30)
 
     if test_status == 0:
-        other_args = "--no_cookies" if args.reauth else ""
-        modules = [".", "app-backend-tasks.yaml", "app-backend-tasks-b2.yaml"]
-        for module in modules:
-            os.system("python {}/appcfg.py {} -A {} update {}".format(args.app_cfg_dir, other_args, args.project, module))
+        print "Deploying..."
+        os.system("gcloud version")
+        cmd = ["gcloud", "app", "deploy", "--project", args.project]
+        if args.config:
+            cmd.extend(["--configuration", args.config])
+        if args.version:
+            cmd.extend(["--version", args.version])
+        if args.modules:
+            modules = args.modules.split(",")
+        else:
+            # Full deploy
+            modules = ["app.yaml", "app-backend-tasks-b2.yaml", "app-backend-tasks.yaml", "cron.yaml", "dispatch.yaml", "index.yaml", "queue.yaml"]
+        if args.skip_cron and "cron.yaml" in modules:
+            modules.remove("cron.yaml")
+        cmd.extend(modules)
+        cmd_str = subprocess.list2cmdline(cmd)
+        print "Running {}".format(cmd_str)
+        subprocess.call(cmd)
     else:
         print "Tests failed! Did not deploy."
 
