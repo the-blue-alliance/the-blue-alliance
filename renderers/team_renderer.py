@@ -88,6 +88,8 @@ class TeamRenderer(object):
                                   'rank': team_rank,
                                   'awards': event_awards})
 
+        season_wlt = None
+        offseason_wlt = None
         if year == 2015:
             year_wlt = None
             year_qual_scores = []
