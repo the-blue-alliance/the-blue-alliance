@@ -138,15 +138,9 @@ var VideoGrid = React.createClass({
     )
   },
   render: function() {
-    var classes = classNames({
-      'video-grid': true,
-      'leave-left-margin': this.props.hashtagSidebarVisible,
-      'leave-right-margin': this.props.chatSidebarVisible,
-    });
-
     let selectedLayoutId = this.props.layoutId
     let numViews = getNumViewsForLayout(selectedLayoutId)
-    return this.renderLayout(numViews, selectedLayoutId, classes)
+    return this.renderLayout(numViews, selectedLayoutId, 'video-grid')
   }
 });
 
