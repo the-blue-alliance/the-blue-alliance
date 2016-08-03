@@ -45,7 +45,7 @@ store.subscribe(() => {
   }
 })
 
-// store.dispatch(setWebcastsRaw(webcastData))
+store.dispatch(setWebcastsRaw(webcastData))
 
 // Now that webcasts are loaded, attempt to restore any state that's present in
 // the URL hash
