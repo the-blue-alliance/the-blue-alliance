@@ -3,6 +3,8 @@ To use:
 1. Clone a production copy of TBA in the same directory as the development copy by running: `git clone git@github.com:the-blue-alliance/the-blue-alliance.git the-blue-alliance-prod`
 2. Ensure you have gcloud available and in your PATH (https://cloud.google.com/sdk/gcloud/)
 3. If you want to allow travis support, be sure you have the official client installed and in your PATH (https://github.com/travis-ci/travis.rb)
+
+NOTE: if your deployments are slow, try exporting the environment variable CLOUDSDK_APP_USE_GSUTIL=1 to use a different approach
 """
 
 import argparse
