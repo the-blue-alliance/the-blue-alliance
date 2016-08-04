@@ -59,10 +59,33 @@ class TestTeamController(unittest2.TestCase):
                 event=self.event.key,
                 year=2016
         )
+        self.event2 = Event(
+                id="2015necmp",
+                name="New England District Championship",
+                event_type_enum=EventType.DISTRICT_CMP,
+                short_name="New England",
+                event_short="necmp",
+                year=2015,
+                end_date=datetime(2015, 03, 27),
+                official=True,
+                location='Hartford, CT, USA',
+                venue="Some Venue",
+                venue_address="Some Venue, Hartford, CT, USA",
+                timezone_id="America/New_York",
+                start_date=datetime(2015, 03, 24),
+        )
+        self.event_team2 = EventTeam(
+                id="2015necmp_frc1124",
+                team=self.team.key,
+                event=self.event2.key,
+                year=2015
+        )
         self.event_team.put()
         self.team.put()
         self.event.put()
         self.event_team.put()
+        self.event2.put()
+        self.event_team2.put()
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -94,8 +117,13 @@ class TestTeamController(unittest2.TestCase):
         response = self.testapp.get("/team/1124/2016")
         self.assertEqual(response.status_int, 200)
 
+    # Because 2015 is special :/
+    def testTeamDetail2015(self):
+        response = self.testapp.get("/team/1124/2015")
+        self.assertEqual(response.status_int, 200)
+
     def testTeamDetailBadYear(self):
-        response = self.testapp.get("/team/1124/2015", status=404)
+        response = self.testapp.get("/team/1124/2014", status=404)
         self.assertEqual(response.status_int, 404)
 
     def testBadTeamDetail(self):
