@@ -28,7 +28,7 @@ class TeamRenderer(object):
         social_media_future = media_query.TeamSocialMediaQuery(team.key.id()).fetch_async()
         robot_future = Robot.get_by_id_async('{}_{}'.format(team.key.id(), year))
         team_districts_future = team_query.TeamDistrictsQuery(team.key.id()).fetch_async()
-        participation_future = team_query.TeamParticipationQuery(team.key.id())._query_async()
+        participation_future = team_query.TeamParticipationQuery(team.key.id()).fetch_async()
 
         events_sorted, matches_by_event_key, awards_by_event_key, valid_years = TeamDetailsDataFetcher.fetch(team, year, return_valid_years=True)
         if not events_sorted:
