@@ -58,6 +58,7 @@ class EventInsightsHelper(object):
         high_score = [0, "", ""]  # score, match key, match name
 
         finished_matches = 0
+        has_insights = False
         for match in matches:
             if not match.has_been_played:
                 continue
@@ -105,9 +106,14 @@ class EventInsightsHelper(object):
                             challenges += 1
                         elif alliance_breakdown[tower_face] == 'Scaled':
                             scales += 1
+                    has_insights = True
                 except Exception, e:
                     logging.warning("Event insights failed for {}".format(match.key.id()))
             finished_matches += 1
+
+        if not has_insights:
+            return None
+
         if finished_matches == 0:
             return {}
 
