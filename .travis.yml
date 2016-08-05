@@ -21,11 +21,17 @@ install:
   # JavaScript test requirements
   - npm install
 
+before_script:
+  - paver make
+
 script:
   # Run python tests
   - paver test
 
   # Run JavaScript tests
   - npm test
+
+after_failure:
+  - cat test_failures.temp
 
 sudo: false
