@@ -2,8 +2,6 @@ jest.unmock('../LayoutDropdownItem')
 
 import React from 'react'
 import { shallow } from 'enzyme'
-import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
 import LayoutDropdownItem from '../LayoutDropdownItem'
 
 describe('LayoutDropdownItem', () => {

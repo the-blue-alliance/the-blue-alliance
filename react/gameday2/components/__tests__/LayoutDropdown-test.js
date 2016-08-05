@@ -1,8 +1,8 @@
 jest.unmock('../LayoutDropdown')
 
 import React from 'react'
-import LayoutDropdown from '../LayoutDropdown'
 import renderer from 'react-test-renderer'
+import LayoutDropdown from '../LayoutDropdown'
 
 describe('LayoutDropdown', () => {
   it('renders the correct contents', () => {
