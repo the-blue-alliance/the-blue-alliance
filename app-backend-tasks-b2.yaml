@@ -1,6 +1,4 @@
-application: tbatv-dev-hrd
-module: backend-tasks-b2
-version: 1-1
+service: backend-tasks-b2
 runtime: python27
 api_version: 1
 threadsafe: true
