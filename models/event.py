@@ -29,7 +29,7 @@ class Event(ndb.Model):
     official = ndb.BooleanProperty(default=False)  # Is the event FIRST-official?
     first_eid = ndb.StringProperty()  # from USFIRST
     facebook_eid = ndb.StringProperty(indexed=False)  # from Facebook
-    custom_hashtag = ndb.StringProperty(indexed=False) #Custom HashTag
+    custom_hashtag = ndb.StringProperty(indexed=False)  # Custom HashTag
     website = ndb.StringProperty(indexed=False)
     webcast_json = ndb.TextProperty(indexed=False)  # list of dicts, valid keys include 'type' and 'channel'
     matchstats_json = ndb.TextProperty(indexed=False)  # for OPR, DPR, CCWM, etc.
@@ -216,11 +216,11 @@ class Event(ndb.Model):
                 self._rankings = None
         return self._rankings
 
-    @property 
+    @property
     def rankings_enhanced(self):
         valid_years = RankingIndexes.CUMULATIVE_RANKING_YEARS
         rankings = self.rankings
-        if rankings is not None and self.year in valid_years:
+        if rankings is not None and self.year in valid_years and self.official:
             self._rankings_enhanced = { "ranking_score_per_match": {},
                                         "match_offset": None, }
             team_index = RankingIndexes.TEAM_NUMBER
