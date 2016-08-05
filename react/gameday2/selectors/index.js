@@ -2,6 +2,17 @@ import { createSelector } from 'reselect'
 
 const getWebcastsById = (state) => state.webcastsById
 
+export const getWebcastIds = createSelector(
+  [ getWebcastsById ],
+  (webcastsById) => {
+    let webcastIds = []
+    for (let key in webcastsById) {
+      webcastIds.push(key)
+    }
+    return webcastIds
+  }
+)
+
 export const getWebcastIdsInDisplayOrder = createSelector(
   [ getWebcastsById ],
   (webcastsById) => {
@@ -22,7 +33,8 @@ export const getWebcastIdsInDisplayOrder = createSelector(
     // the order the server provides them in
 
     let orderedWebcasts = webcastsArray.filter(webcast => webcast.hasOwnProperty('sortOrder'))
-    for (let webcast of orderedWebcasts) {
+    let sortedOrderedWebcasts = orderedWebcasts.sort((a, b) => a.sortOrder > b.sortOrder)
+    for (let webcast of sortedOrderedWebcasts) {
       displayOrderWebcastIds.push(webcast.id)
     }
 
