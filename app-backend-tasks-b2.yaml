@@ -1,4 +1,6 @@
-service: backend-tasks-b2
+module: backend-tasks-b2
+version: prod-1
+
 runtime: python27
 api_version: 1
 threadsafe: true
