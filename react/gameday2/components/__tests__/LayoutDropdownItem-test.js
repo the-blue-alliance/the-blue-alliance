@@ -1,5 +1,3 @@
-jest.unmock('../LayoutDropdownItem')
-
 import React from 'react'
 import { shallow } from 'enzyme'
 import LayoutDropdownItem from '../LayoutDropdownItem'
