@@ -1,5 +1,3 @@
-jest.unmock('../LayoutDropdown')
-
 import React from 'react'
 import renderer from 'react-test-renderer'
 import LayoutDropdown from '../LayoutDropdown'

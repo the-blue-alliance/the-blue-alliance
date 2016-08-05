@@ -10,6 +10,70 @@ exports[`LayoutDropdown renders the correct contents 1`] = `
       className="caret" />
   </a>
   <ul
-    className="dropdown-menu" />
+    className="dropdown-menu">
+    <li>
+      <a
+        href="#"
+        onClick={[Function bound handleClick]}>
+        Single View
+      </a>
+    </li>
+    <li>
+      <a
+        href="#"
+        onClick={[Function bound handleClick]}>
+        Split View
+      </a>
+    </li>
+    <li>
+      <a
+        href="#"
+        onClick={[Function bound handleClick]}>
+        \"1+2\" View
+      </a>
+    </li>
+    <li>
+      <a
+        href="#"
+        onClick={[Function bound handleClick]}>
+        Quad View
+      </a>
+    </li>
+    <li>
+      <a
+        href="#"
+        onClick={[Function bound handleClick]}>
+        \"1+3\" View
+      </a>
+    </li>
+    <li>
+      <a
+        href="#"
+        onClick={[Function bound handleClick]}>
+        \"1+4\" View
+      </a>
+    </li>
+    <li>
+      <a
+        href="#"
+        onClick={[Function bound handleClick]}>
+        Hex View
+      </a>
+    </li>
+    <li>
+      <a
+        href="#"
+        onClick={[Function bound handleClick]}>
+        Octo-View
+      </a>
+    </li>
+    <li>
+      <a
+        href="#"
+        onClick={[Function bound handleClick]}>
+        Nona-View
+      </a>
+    </li>
+  </ul>
 </li>
 `;
