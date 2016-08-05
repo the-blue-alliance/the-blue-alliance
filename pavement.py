@@ -17,6 +17,7 @@ path = path("./")
     optparse.make_option("--version", help="App engine version to deploy", default=""),
     optparse.make_option("--modules", help="Comma separated names of module yaml files to deploy", default=""),
     optparse.make_option("--skip-cron", action="store_true", help="Do not deploy cron.yaml", default=False),
+    optparse.make_option("--app-cfg-dir", help="Place to find appcfg.py [deprecated]", default=""),
 ])
 def deploy(options):
     args = ["python", "deploy.py", "--project", options.deploy.project]
@@ -30,6 +31,8 @@ def deploy(options):
         args.extend(["--modules", options.deploy.modules])
     if options.skip_cron:
         args.append("--skip-cron")
+    if options.app_cfg_dir:
+        args.extend(["--app-cfg-dir", options.app_cfg_dir])
     print "Running {}".format(subprocess.list2cmdline(args))
     subprocess.call(args)
 

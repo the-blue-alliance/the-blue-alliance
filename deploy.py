@@ -22,6 +22,7 @@ def main():
     parser.add_argument('--version', help="Version for app engine modules", default="prod-1")
     parser.add_argument('--modules', help="Modules to deploy, comma separated, as yaml spec files in this directory", default="")
     parser.add_argument('--skip-cron', action="store_true", help="Do not deploy cron.yaml", default=False)
+    parser.add_argument('--app-cfg-dir', help="Location of appcfg.py [deprecated]", default="")
     args = parser.parse_args()
 
     os.chdir('../the-blue-alliance-prod')
@@ -61,10 +62,13 @@ def main():
         print "Deploying..."
         os.system("gcloud version")
         cmd = ["gcloud", "app", "deploy", "--verbosity", "info", "--project", args.project]
+        # appcfg.py --no_cookies -A tbatv-prod-hrd -V prod-1 update .
+        appcfg_cmd = ["{}/appcfg.py".format(args.app_cfg_dir), "--no_cookies", "-A", args.project]
         if args.config:
             cmd.extend(["--configuration", args.config])
         if args.version:
             cmd.extend(["--version", args.version])
+            appcfg_cmd.extend(["-V", args.version])
         if args.modules:
             modules = args.modules.split(",")
         else:
@@ -73,7 +77,9 @@ def main():
         if args.skip_cron and "cron.yaml" in modules:
             modules.remove("cron.yaml")
         cmd.extend(modules)
-        cmd_str = subprocess.list2cmdline(cmd)
+        appcfg_cmd.append("update")
+        appcfg_cmd.extend(modules)
+        cmd_str = subprocess.list2cmdline(appcfg_cmd if args.app_cfg_dir else cmd)
         print "Running {}".format(cmd_str)
         os.system(cmd_str)
     else:
