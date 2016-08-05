@@ -36,54 +36,73 @@ class TestApiTrustedController(unittest2.TestCase):
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.teams_auth = ApiAuthAccess(id='tEsT_id_0',
+                                        live_event_only=True,
                                         secret='321tEsTsEcReT',
                                         description='test',
                                         event_list=[ndb.Key(Event, '2014casj')],
                                         auth_types_enum=[AuthType.EVENT_TEAMS])
 
         self.matches_auth = ApiAuthAccess(id='tEsT_id_1',
+                                          live_event_only=True,
                                           secret='321tEsTsEcReT',
                                           description='test',
-                                          event_list=[ndb.Key(Event, '2014casj')],
+                                          event_list=[ndb.Key(Event, '2014casj'), ndb.Key(Event, '2013casj')],
                                           auth_types_enum=[AuthType.EVENT_MATCHES])
 
         self.rankings_auth = ApiAuthAccess(id='tEsT_id_2',
+                                           live_event_only=True,
                                            secret='321tEsTsEcReT',
                                            description='test',
                                            event_list=[ndb.Key(Event, '2014casj')],
                                            auth_types_enum=[AuthType.EVENT_RANKINGS])
 
         self.alliances_auth = ApiAuthAccess(id='tEsT_id_3',
+                                            live_event_only=True,
                                             secret='321tEsTsEcReT',
                                             description='test',
                                             event_list=[ndb.Key(Event, '2014casj')],
                                             auth_types_enum=[AuthType.EVENT_ALLIANCES])
 
         self.awards_auth = ApiAuthAccess(id='tEsT_id_4',
+                                         live_event_only=True,
                                          secret='321tEsTsEcReT',
                                          description='test',
                                          event_list=[ndb.Key(Event, '2014casj')],
                                          auth_types_enum=[AuthType.EVENT_AWARDS])
 
         self.video_auth = ApiAuthAccess(id='tEsT_id_5',
+                                        live_event_only=True,
                                         secret='321tEsTsEcReT',
                                         description='test',
                                         event_list=[ndb.Key(Event, '2014casj')],
                                         auth_types_enum=[AuthType.MATCH_VIDEO])
 
+        now = datetime.datetime.now()
+        one_day = datetime.timedelta(days=1)
         self.event = Event(
             id='2014casj',
             event_type_enum=EventType.REGIONAL,
             event_short='casj',
             year=2014,
+            start_date=now - one_day,
+            end_date=now + one_day,
         )
         self.event.put()
+
+        self.old_event = Event(
+            id='2013casj',
+            event_type_enum=EventType.REGIONAL,
+            event_short='casj',
+            year=2013,
+        )
+        self.old_event.put()
 
     def tearDown(self):
         self.testbed.deactivate()
 
-    def test_auth(self):
+    def test_auth_base(self):
         request_path = '/api/trusted/v1/event/2014casj/matches/update'
+        request_path_old = '/api/trusted/v1/event/2013casj/matches/update'
 
         # Fail
         response = self.testapp.post(request_path, expect_errors=True)
@@ -133,6 +152,11 @@ class TestApiTrustedController(unittest2.TestCase):
         # Fail; insufficient auth_types_enum
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
         response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_2', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        self.assertEqual(response.status_code, 400)
+
+        # Fail; event isn't live when it should be
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path_old, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 400)
 
     def test_alliance_selections_update(self):

@@ -17,6 +17,7 @@ from controllers.base_controller import CacheableHandler
 from datafeeds.parser_base import ParserInputException
 from helpers.validation_helper import ValidationHelper
 from models.api_auth_access import ApiAuthAccess
+from models.event import Event
 from models.cached_response import CachedResponse
 from models.sitevar import Sitevar
 
@@ -203,6 +204,16 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
         missing_auths = self.REQUIRED_AUTH_TYPES.difference(set(auth.auth_types_enum))
         if missing_auths != set():
             self._errors = json.dumps({"Error": "You do not have permission to edit: {}. If this is incorrect, please contact TBA admin.".format(",".join([AuthType.type_names[ma] for ma in missing_auths]))})
+            self.abort(400)
+
+        self.event = Event.get_by_id(event_key)
+
+        if not self.event:
+            self._errors = json.dumps({"Error": "Event {} does not exist. Please check your event key or contact TBA admin if the problem persists".format(event_key)})
+            self.abort(404)
+
+        if auth.live_event_only and not self.event.within_a_day:
+            self._errors = json.dumps({"Error": "Event {} is not currently active. Please contact TBA admin to make updates.".format(event_key)})
             self.abort(400)
 
         try:
