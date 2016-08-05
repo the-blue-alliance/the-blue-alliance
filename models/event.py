@@ -236,7 +236,10 @@ class Event(ndb.Model):
                 team_number = ranking[team_index]
                 ranking_score = float(ranking[rp_index])
                 matches_played = int(ranking[matches_played_index])
-                ranking_score_per_match = round(ranking_score / matches_played, 2)
+                if matches_played == 0:
+                    ranking_score_per_match = 0
+                else:
+                    ranking_score_per_match = round(ranking_score / matches_played, 2)
                 self._rankings_enhanced["ranking_score_per_match"][team_number] = ranking_score_per_match
                 if self.within_a_day:
                     self._rankings_enhanced["match_offset"][team_number] = matches_played - max_matches
