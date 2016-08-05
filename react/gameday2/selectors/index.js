@@ -17,8 +17,6 @@ export const getWebcastIdsInDisplayOrder = createSelector(
   [ getWebcastsById ],
   (webcastsById) => {
     let displayOrderWebcastIds = []
-    console.log('webcasts by id')
-    console.log(webcastsById)
 
     // Flatten the map of id->webcast to an array of webcast objects
     let webcastsArray = [];

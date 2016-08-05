@@ -3,8 +3,6 @@ jest.unmock('reselect')
 
 import * as selectors from '../../selectors'
 
-
-
 describe('getWebcastIds selector', () => {
   const sampleState = {
     webcastsById: {
@@ -46,7 +44,6 @@ describe('getWebcastIdsInDisplayOrder selector', () => {
   }
 
   it('correctly sorts and returns the ids', () => {
-    console.log(selectors.getWebcastIdsInDisplayOrder(sampleState))
     expect(selectors.getWebcastIdsInDisplayOrder(sampleState)).toEqual(['b', 'c', 'a', 'e', 'd'])
   })
 })
