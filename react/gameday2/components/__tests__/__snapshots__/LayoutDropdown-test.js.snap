@@ -1,0 +1,15 @@
+exports[`LayoutDropdown renders the correct contents 1`] = `
+<li
+  className="dropdown">
+  <a
+    className="dropdown-toggle"
+    data-toggle="dropdown"
+    href="#">
+    Set Layout 
+    <b
+      className="caret" />
+  </a>
+  <ul
+    className="dropdown-menu" />
+</li>
+`;
