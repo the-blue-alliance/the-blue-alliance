@@ -46,6 +46,7 @@
     "test": "jest"
   },
   "jest": {
+    "automock": false,
     "testPathDirs": [
       "<rootDir>/react"
     ],
