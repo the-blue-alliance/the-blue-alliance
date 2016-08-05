@@ -75,7 +75,7 @@ def main():
         cmd.extend(modules)
         cmd_str = subprocess.list2cmdline(cmd)
         print "Running {}".format(cmd_str)
-        subprocess.call(cmd)
+        subprocess.call(cmd, shell=True)
     else:
         print "Tests failed! Did not deploy."
 
