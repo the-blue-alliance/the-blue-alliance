@@ -217,6 +217,7 @@ class TeamRenderer(object):
             'years': sorted(years),
             'current_event': current_event,
             'matches_upcoming': matches_upcoming,
+            'last_competed': last_competed,
             'current_year': current_year
         })
 
