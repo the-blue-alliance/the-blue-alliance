@@ -13,6 +13,7 @@ import numpy as np
 
 from google.appengine.api import memcache
 
+from consts.event_type import EventType
 from database import event_query
 from models.event_team import EventTeam
 
@@ -189,14 +190,14 @@ class MatchstatsHelper(object):
             last_event = None
             last_event_start = None
             for event in events:
-                if event.start_date < cur_event.start_date:
+                if event.official and event.start_date < cur_event.start_date and event.event_type_enum != EventType.CMP_FINALS:
                     if last_event is None or event.start_date > last_event_start:
                         last_event = event
                         last_event_start = event.start_date
 
             if last_event is not None and last_event.matchstats:
                 for stat, values in last_event.matchstats.items():
-                    if team in values:
+                    if values and team in values:
                         last_event_stats[stat][team] = values[team]
 
         memcache.set(cache_key, last_event_stats, 60*60*24)

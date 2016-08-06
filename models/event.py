@@ -6,6 +6,7 @@ import re
 
 from consts.district_type import DistrictType
 from consts.event_type import EventType
+from consts.ranking_indexes import RankingIndexes
 
 
 class Event(ndb.Model):
@@ -28,7 +29,7 @@ class Event(ndb.Model):
     official = ndb.BooleanProperty(default=False)  # Is the event FIRST-official?
     first_eid = ndb.StringProperty()  # from USFIRST
     facebook_eid = ndb.StringProperty(indexed=False)  # from Facebook
-    custom_hashtag = ndb.StringProperty(indexed=False) #Custom HashTag
+    custom_hashtag = ndb.StringProperty(indexed=False)  # Custom HashTag
     website = ndb.StringProperty(indexed=False)
     webcast_json = ndb.TextProperty(indexed=False)  # list of dicts, valid keys include 'type' and 'channel'
     matchstats_json = ndb.TextProperty(indexed=False)  # for OPR, DPR, CCWM, etc.
@@ -58,6 +59,7 @@ class Event(ndb.Model):
         self._venue_address_safe = None
         self._webcast = None
         self._updated_attrs = []  # Used in EventManipulator to track what changed
+        self._rankings_enhanced = None
         super(Event, self).__init__(*args, **kw)
 
     @ndb.tasklet
@@ -213,6 +215,37 @@ class Event(ndb.Model):
             except Exception, e:
                 self._rankings = None
         return self._rankings
+
+    @property
+    def rankings_enhanced(self):
+        valid_years = RankingIndexes.CUMULATIVE_RANKING_YEARS
+        rankings = self.rankings
+        if rankings is not None and self.year in valid_years and self.official:
+            self._rankings_enhanced = { "ranking_score_per_match": {},
+                                        "match_offset": None, }
+            team_index = RankingIndexes.TEAM_NUMBER
+            rp_index = RankingIndexes.CUMULATIVE_RANKING_SCORE[self.year]
+            matches_played_index = RankingIndexes.MATCHES_PLAYED[self.year]
+
+            max_matches = 0
+            if self.within_a_day:
+                max_matches = max([int(el[matches_played_index]) for el in rankings[1:]])
+                self._rankings_enhanced["match_offset"] = {}
+
+            for ranking in rankings[1:]:
+                team_number = ranking[team_index]
+                ranking_score = float(ranking[rp_index])
+                matches_played = int(ranking[matches_played_index])
+                if matches_played == 0:
+                    ranking_score_per_match = 0
+                else:
+                    ranking_score_per_match = round(ranking_score / matches_played, 2)
+                self._rankings_enhanced["ranking_score_per_match"][team_number] = ranking_score_per_match
+                if self.within_a_day:
+                    self._rankings_enhanced["match_offset"][team_number] = matches_played - max_matches
+        else:
+            self._rankings_enhanced = None
+        return self._rankings_enhanced
 
     @property
     def venue_or_venue_from_address(self):

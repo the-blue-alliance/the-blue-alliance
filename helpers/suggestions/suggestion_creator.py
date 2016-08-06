@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 from helpers.media_helper import MediaParser
 from helpers.webcast_helper import WebcastParser
@@ -128,3 +129,57 @@ class SuggestionCreator(object):
                 return 'video_exists'
         else:
             return 'bad_url'
+
+    @classmethod
+    def createOffseasonEventSuggestion(cls, author_account_key, name, start_date, end_date, website, address):
+        """
+        Create a suggestion for offseason event. Returns (status, failures):
+        ('success', None)
+        ('validation_failure', failures)
+        """
+        failures = {}
+        if not name:
+            failures['name'] = "Missing event name"
+        if not start_date:
+            failures['start_date'] = "Missing start date"
+        if not end_date:
+            failures['end_date'] = "Missing end date"
+        if not website:
+            failures['website'] = "Missing website"
+        if not address:
+            failures['venue_address'] = "Missing address"
+
+        start_datetime = None
+        end_datetime = None
+        if start_date:
+            try:
+                start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
+            except ValueError:
+                failures['start_date'] = "Invalid start date format (year-month-date)"
+
+        if end_date:
+            try:
+                end_datetime = datetime.strptime(end_date, "%Y-%m-%d")
+            except ValueError:
+                failures['end_date'] = "Invalid end date format (year-month-date)"
+
+        if start_datetime and end_datetime and end_datetime < start_datetime:
+            failures['end_date'] = "End date must not be before the start date"
+
+        if failures:
+            return 'validation_failure', failures
+
+        # Note that we don't specify an explicit key for event suggestions
+        # We don't trust users to input correct event keys (that's for the moderator to do)
+        suggestion = Suggestion(
+            author=author_account_key,
+            target_model="offseason-event",
+        )
+        suggestion.contents = {
+            'name': name,
+            'start_date': start_date,
+            'end_date': end_date,
+            'website': website,
+            'address': address}
+        suggestion.put()
+        return 'success', None

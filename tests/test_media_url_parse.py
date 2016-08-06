@@ -70,19 +70,26 @@ class TestMediaUrlParser(unittest2.TestCase):
         self.assertEqual(result['profile_url'], 'https://twitter.com/team1124')
 
     def test_youtube_profile_parse(self):
-        result = MediaParser.partial_media_dict_from_url("https://www.youtube.com/user/Uberbots1124")
+        result = MediaParser.partial_media_dict_from_url("https://www.youtube.com/Uberbots1124")
         self.assertEqual(result['media_type_enum'], MediaType.YOUTUBE_CHANNEL)
         self.assertEqual(result['is_social'], True)
         self.assertEqual(result['foreign_key'], 'uberbots1124')
         self.assertEqual(result['site_name'], MediaType.type_names[MediaType.YOUTUBE_CHANNEL])
-        self.assertEqual(result['profile_url'], 'https://www.youtube.com/user/uberbots1124')
+        self.assertEqual(result['profile_url'], 'https://www.youtube.com/uberbots1124')
 
         short_result = MediaParser.partial_media_dict_from_url("https://www.youtube.com/Uberbots1124")
         self.assertEqual(short_result['media_type_enum'], MediaType.YOUTUBE_CHANNEL)
         self.assertEqual(short_result['is_social'], True)
         self.assertEqual(short_result['foreign_key'], 'uberbots1124')
         self.assertEqual(short_result['site_name'], MediaType.type_names[MediaType.YOUTUBE_CHANNEL])
-        self.assertEqual(short_result['profile_url'], 'https://www.youtube.com/user/uberbots1124')
+        self.assertEqual(short_result['profile_url'], 'https://www.youtube.com/uberbots1124')
+
+        gapps_result = MediaParser.partial_media_dict_from_url("https://www.youtube.com/c/tnt3102org")
+        self.assertEqual(gapps_result['media_type_enum'], MediaType.YOUTUBE_CHANNEL)
+        self.assertEqual(gapps_result['is_social'], True)
+        self.assertEqual(gapps_result['foreign_key'], 'tnt3102org')
+        self.assertEqual(gapps_result['site_name'], MediaType.type_names[MediaType.YOUTUBE_CHANNEL])
+        self.assertEqual(gapps_result['profile_url'], 'https://www.youtube.com/tnt3102org')
 
     def test_github_profile_parse(self):
         result = MediaParser.partial_media_dict_from_url("https://github.com/frc1124")
@@ -91,6 +98,14 @@ class TestMediaUrlParser(unittest2.TestCase):
         self.assertEqual(result['foreign_key'], 'frc1124')
         self.assertEqual(result['site_name'], MediaType.type_names[MediaType.GITHUB_PROFILE])
         self.assertEqual(result['profile_url'], 'https://github.com/frc1124')
+
+    def test_instagram_profile_parse(self):
+        result = MediaParser.partial_media_dict_from_url("https://www.instagram.com/4hteamneutrino")
+        self.assertEqual(result['media_type_enum'], MediaType.INSTAGRAM_PROFILE)
+        self.assertEqual(result['is_social'], True)
+        self.assertEqual(result['foreign_key'], '4hteamneutrino')
+        self.assertEqual(result['site_name'], MediaType.type_names[MediaType.INSTAGRAM_PROFILE])
+        self.assertEqual(result['profile_url'], 'https://www.instagram.com/4hteamneutrino')
 
     def test_unsupported_url_parse(self):
         self.assertEqual(MediaParser.partial_media_dict_from_url("http://foo.bar"), None)

@@ -22,6 +22,7 @@ from models.event import Event
 from models.match import Match
 from template_engine import jinja2_engine
 
+from consts.ranking_indexes import RankingIndexes
 
 class EventList(CacheableHandler):
     """
@@ -169,6 +170,27 @@ class EventDetail(CacheableHandler):
         event_insights_template = None
         if event_insights:
             event_insights_template = 'event_partials/event_insights_{}.html'.format(event.year)
+
+        # rankings processing for ranking score per match
+        full_rankings = event.rankings
+        rankings_enhanced = event.rankings_enhanced
+        if rankings_enhanced is not None:
+            rp_index = RankingIndexes.CUMULATIVE_RANKING_SCORE[event.year]
+            matches_index = RankingIndexes.MATCHES_PLAYED[event.year]
+            ranking_criterion_name = full_rankings[0][rp_index]
+            full_rankings[0].append(ranking_criterion_name + "/Match*")
+
+            for row in full_rankings[1:]:
+                team = row[1]
+                if rankings_enhanced["ranking_score_per_match"] is not None:
+                    rp_per_match = rankings_enhanced['ranking_score_per_match'][team]
+                    row.append(rp_per_match)
+                if rankings_enhanced["match_offset"] is not None:
+                    match_offset = rankings_enhanced["match_offset"][team]
+                    if match_offset != 0:
+                        row[matches_index] = "{} ({})".format(row[matches_index], match_offset)
+
+
 
         self.template_values.update({
             "event": event,

@@ -5,6 +5,7 @@ import logging
 
 from google.appengine.ext import ndb
 
+from consts.account_permissions import AccountPermissions
 from consts.media_type import MediaType
 from controllers.suggestions.suggestions_review_base_controller import SuggestionsReviewBaseController
 from helpers.media_manipulator import MediaManipulator
@@ -15,6 +16,11 @@ from template_engine import jinja2_engine
 
 
 class SuggestSocialMediaReviewController(SuggestionsReviewBaseController):
+
+    def __init__(self, *args, **kw):
+        self.REQUIRED_PERMISSIONS.append(AccountPermissions.REVIEW_MEDIA)
+        super(SuggestSocialMediaReviewController, self).__init__(*args, **kw)
+
     """
     View the list of suggestions.
     """

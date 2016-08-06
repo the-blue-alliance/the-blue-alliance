@@ -4,12 +4,18 @@ import os
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
+from consts.account_permissions import AccountPermissions
 from controllers.suggestions.suggestions_review_base_controller import SuggestionsReviewBaseController
 from helpers.suggestions.match_suggestion_accepter import MatchSuggestionAccepter
 from models.suggestion import Suggestion
 
 
 class SuggestMatchVideoReviewController(SuggestionsReviewBaseController):
+
+    def __init__(self, *args, **kw):
+        self.REQUIRED_PERMISSIONS.append(AccountPermissions.REVIEW_MEDIA)
+        super(SuggestMatchVideoReviewController, self).__init__(*args, **kw)
+
     """
     View the list of suggestions.
     """

@@ -57,7 +57,7 @@
           <ul>
             <li>Facebook Pages
               <ul>
-                <li>Example: <code>http://facebook.com/theuberbots</code></li>
+                <li>Example: <code>https://facebook.com/theuberbots</code></li>
               </ul>
             </li>
             <li>Twitter Profiles
@@ -74,6 +74,11 @@
             <li>GitHub Accounts
               <ul>
                 <li>Example: <code>https://github.com/frc1124</code></li>
+              </ul>
+            </li>
+            <li>Instagram Profiles
+              <ul>
+                <li>Example: <code>https://www.instagram.com/4hteamneutrino</code></li>
               </ul>
             </li>
           </ul>
@@ -105,7 +110,7 @@
               <form action="/suggest/team/social_media" method="post">
                 <input name="team_key" type="hidden" value="{{team.key.id()}}" />
                 <div class="input-group">
-                  <input class="form-control" type="text" name="media_url" placeholder="http://facebook.com/theuberbots" value="" />
+                  <input class="form-control" type="text" name="media_url" placeholder="https://facebook.com/theuberbots" value="" />
                   <span class="input-group-btn">
                     <button class="btn btn-success" type="submit"><span class="glyphicon glyphicon-plus-sign"></span> Add Media</button>
                   </span>

@@ -34,3 +34,11 @@ class EventType(object):
         CMP_DIVISION,
         CMP_FINALS,
     }
+
+    SEASON_EVENT_TYPES = {
+        REGIONAL,
+        DISTRICT,
+        DISTRICT_CMP,
+        CMP_DIVISION,
+        CMP_FINALS,
+    }

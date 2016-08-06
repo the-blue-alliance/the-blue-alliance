@@ -23,4 +23,13 @@
             Team Social Media Suggestions
         </a>
     </li>
+
+    {% if offseason_permission in user_bundle.account.permissions %}
+    <li>
+        <a href="/suggest/offseason/review">
+            <span class="badge pull-right">{{suggestions.offseason}}</span>
+            Offseason Event Suggestions
+        </a>
+    </li>
+    {% endif %}
 </ul>
