@@ -106,7 +106,7 @@ class TeamRenderer(object):
             year_elim_avg = None
             season_wlt = {"win": 0, "loss": 0, "tie": 0}
             offseason_wlt = {"win": 0, "loss": 0, "tie": 0}
-            
+
             for wlt in season_wlt_list:
                 season_wlt["win"] += wlt["win"]
                 season_wlt["loss"] += wlt["loss"]
@@ -173,6 +173,7 @@ class TeamRenderer(object):
     def render_team_history(cls, handler, team, is_canonical):
         award_futures = award_query.TeamAwardsQuery(team.key.id()).fetch_async()
         event_futures = event_query.TeamEventsQuery(team.key.id()).fetch_async()
+        participation_future = team_query.TeamParticipationQuery(team.key.id()).fetch_async()
 
         awards_by_event = {}
         for award in award_futures.get_result():
@@ -203,13 +204,20 @@ class TeamRenderer(object):
             event_awards.append((event, sorted_awards))
         event_awards = sorted(event_awards, key=lambda (e, _): e.start_date if e.start_date else datetime.datetime(e.year, 12, 31))
 
+        last_competed = None
+        participation_years = participation_future.get_result()
+        if len(participation_years) > 0:
+            last_competed = max(participation_years)
+        current_year = datetime.date.today().year
+
         handler.template_values.update({
             'is_canonical': is_canonical,
             'team': team,
             'event_awards': event_awards,
             'years': sorted(years),
             'current_event': current_event,
-            'matches_upcoming': matches_upcoming
+            'matches_upcoming': matches_upcoming,
+            'current_year': current_year
         })
 
         if short_cache:
