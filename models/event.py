@@ -8,6 +8,8 @@ from consts.district_type import DistrictType
 from consts.event_type import EventType
 from consts.ranking_indexes import RankingIndexes
 
+from models.event_details import EventDetails
+
 
 class Event(ndb.Model):
     """
@@ -32,13 +34,16 @@ class Event(ndb.Model):
     custom_hashtag = ndb.StringProperty(indexed=False)  # Custom HashTag
     website = ndb.StringProperty(indexed=False)
     webcast_json = ndb.TextProperty(indexed=False)  # list of dicts, valid keys include 'type' and 'channel'
+
+    created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
+    updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+
+    # The following properties are deprecated. TODO: Remove entirely
     matchstats_json = ndb.TextProperty(indexed=False)  # for OPR, DPR, CCWM, etc.
     rankings_json = ndb.TextProperty(indexed=False)
     alliance_selections_json = ndb.TextProperty(indexed=False)  # Formatted as: [{'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] }, {'picks': [], 'declines': []}, ... ]
     district_points_json = ndb.TextProperty(indexed=False)
-
-    created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
-    updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+    # End deprecated properties
 
     def __init__(self, *args, **kw):
         # store set of affected references referenced keys for cache clearing
@@ -49,12 +54,9 @@ class Event(ndb.Model):
             'event_district_abbrev': set(),
             'event_district_key': set()
         }
-        self._alliance_selections = None
         self._awards = None
-        self._district_points = None
+        self._details = None
         self._matches = None
-        self._matchstats = None
-        self._rankings = None
         self._teams = None
         self._venue_address_safe = None
         self._webcast = None
@@ -69,15 +71,10 @@ class Event(ndb.Model):
 
     @property
     def alliance_selections(self):
-        """
-        Lazy load alliance_selections JSON
-        """
-        if self._alliance_selections is None:
-            try:
-                self._alliance_selections = json.loads(self.alliance_selections_json)
-            except Exception, e:
-                self._alliance_selections = None
-        return self._alliance_selections
+        if self.details is None:
+            return None
+        else:
+            return self.details.alliance_selections
 
     @property
     def alliance_teams(self):
@@ -100,16 +97,17 @@ class Event(ndb.Model):
         return self._awards
 
     @property
+    def details(self):
+        if self._details is None:
+            self._details = ndb.Key(Event, self.key.id(), EventDetails, self.key.id()).get()
+        return self._details
+
+    @property
     def district_points(self):
-        """
-        Lazy load district_points JSON
-        """
-        if self._district_points is None:
-            try:
-                self._district_points = json.loads(self.district_points_json)
-            except Exception, e:
-                self._district_points = None
-        return self._district_points
+        if self.details is None:
+            return None
+        else:
+            return self.details.district_points
 
     @ndb.tasklet
     def get_matches_async(self):
@@ -194,27 +192,17 @@ class Event(ndb.Model):
 
     @property
     def matchstats(self):
-        """
-        Lazy load parsing matchstats JSON
-        """
-        if self._matchstats is None:
-            try:
-                self._matchstats = json.loads(self.matchstats_json)
-            except Exception, e:
-                self._matchstats = None
-        return self._matchstats
+        if self.details is None:
+            return None
+        else:
+            return self.details.matchstats
 
     @property
     def rankings(self):
-        """
-        Lazy load parsing rankings JSON
-        """
-        if self._rankings is None:
-            try:
-                self._rankings = [[str(el) for el in row] for row in json.loads(self.rankings_json)]
-            except Exception, e:
-                self._rankings = None
-        return self._rankings
+        if self.details is None:
+            return None
+        else:
+            return self.details.rankings
 
     @property
     def rankings_enhanced(self):
