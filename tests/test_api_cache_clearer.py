@@ -121,7 +121,7 @@ class TestApiCacheClearer(unittest2.TestCase):
             nickname='NICKNAME',
             city='San Jose',
             state_prov='CA',
-            country='USA'
+            country='USA',
             website='www.thebluealliance.com',
         )
 
@@ -132,7 +132,7 @@ class TestApiCacheClearer(unittest2.TestCase):
             nickname='NICKNAME',
             city='San Jose'
             state_prov='CA',
-            country='USA'
+            country='USA',
             website='www.usfirst.org',
         )
 
@@ -143,7 +143,7 @@ class TestApiCacheClearer(unittest2.TestCase):
             nickname='nickname',
             city='San Jose'
             state_prov='CA',
-            country='USA'
+            country='USA',
             website='www.usfirst.org',
         )
 
