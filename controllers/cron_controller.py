@@ -15,6 +15,7 @@ from consts.district_type import DistrictType
 from helpers.district_helper import DistrictHelper
 from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
+from helpers.event_details_manipulator import EventDetailsManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.event_team_repairer import EventTeamRepairer
 from helpers.event_team_updater import EventTeamUpdater
@@ -29,6 +30,7 @@ from helpers.team_manipulator import TeamManipulator
 from helpers.match_manipulator import MatchManipulator
 
 from models.event import Event
+from models.event_details import EventDetails
 from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
@@ -161,6 +163,13 @@ class EventMatchstatsDo(webapp.RequestHandler):
         if any([v != {} for v in matchstats_dict.values()]):
             event.matchstats_json = json.dumps(matchstats_dict)
             EventManipulator.createOrUpdate(event)
+
+            event_details = EventDetails(
+                id=event_key,
+                parent=event.key,
+                matchstats=matchstats_dict
+            )
+            EventDetailsManipulator.createOrUpdate(event_details)
         else:
             logging.warn("Matchstat calculation for {} failed!".format(event_key))
 
@@ -455,6 +464,13 @@ class DistrictPointsCalcDo(webapp.RequestHandler):
 
         event.district_points_json = json.dumps(district_points)
         EventManipulator.createOrUpdate(event)
+
+        event_details = EventDetails(
+            id=event_key,
+            parent=event.key,
+            district_points=district_points
+        )
+        EventDetailsManipulator.createOrUpdate(event_details)
 
         self.response.out.write(event.district_points)
 
