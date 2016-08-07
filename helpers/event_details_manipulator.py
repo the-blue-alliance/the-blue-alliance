@@ -26,6 +26,6 @@ class EventDetailsManipulator(ManipulatorBase):
                     continue
             if getattr(new_event_details, attr) is not None:
                 if getattr(new_event_details, attr) != getattr(old_event_details, attr):
-                    setattr(old_event_detail, attr, getattr(new_event_detail, attr))
-                    old.event_detail.dirty = True
-        return old_event_detials
+                    setattr(old_event_details, attr, getattr(new_event_details, attr))
+                    old_event_details.dirty = True
+        return old_event_details
