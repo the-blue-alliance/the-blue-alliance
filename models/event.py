@@ -54,6 +54,7 @@ class Event(ndb.Model):
         self._alliance_selections = None
         self._awards = None
         self._district_points = None
+        self._location = None
         self._matches = None
         self._matchstats = None
         self._rankings = None
@@ -251,14 +252,16 @@ class Event(ndb.Model):
 
     @property
     def location(self):
-        split_location = []
-        if self.city:
-            split_location.append(self.city)
-        if self.state_prov:
-            split_location.append(self.state_prov)
-        if self.country:
-            split_location.append(self.country)
-        return ', '.join(split_location)
+        if self._location is None:
+            split_location = []
+            if self.city:
+                split_location.append(self.city)
+            if self.state_prov:
+                split_location.append(self.state_prov)
+            if self.country:
+                split_location.append(self.country)
+            self._location = ', '.join(split_location)
+        return self._location
 
     @property
     def venue_or_venue_from_address(self):

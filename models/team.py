@@ -86,18 +86,15 @@ class Team(ndb.Model):
 
     @property
     def location(self):
-        if not self._location:
-            location_parts = list()
-            if self.locality:
-                location_parts.append(self.locality)
-            if self.region:
-                location_parts.append(self.region)
-            if self.country_name:
-                location_parts.append(self.country_name)
-            if len(location_parts) > 0:
-                self._location = ", ".join(location_parts)
-            else:
-                self._location = None
+        if self._location is None:
+            split_location = []
+            if self.city:
+                split_location.append(self.city)
+            if self.state_prov:
+                split_location.append(self.state_prov)
+            if self.country:
+                split_location.append(self.country)
+            self._location = ', '.join(split_location)
         return self._location
 
     @property
