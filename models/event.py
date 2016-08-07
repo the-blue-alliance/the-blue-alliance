@@ -19,7 +19,7 @@ class Event(ndb.Model):
     short_name = ndb.StringProperty(indexed=False)  # Should not contain "Regional" or "Division", like "Hartford"
     event_short = ndb.StringProperty(required=True, indexed=False)  # Smaller abbreviation like "CT"
     year = ndb.IntegerProperty(required=True)
-    event_district_enum = ndb.IntegerProperty()
+    event_district_enum = ndb.IntegerProperty(default=DistrictType.NO_DISTRICT)
     start_date = ndb.DateTimeProperty()
     end_date = ndb.DateTimeProperty()
     venue = ndb.StringProperty(indexed=False)  # Name of the event venue
