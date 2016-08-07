@@ -19,6 +19,9 @@ class TeamManipulator(ManipulatorBase):
         """
         attrs = [
             "address",
+            "city",
+            "state_prov",
+            "country",
             "name",
             "nickname",
             "website",
