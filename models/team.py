@@ -13,7 +13,10 @@ class Team(ndb.Model):
     team_number = ndb.IntegerProperty(required=True)
     name = ndb.TextProperty(indexed=False)
     nickname = ndb.StringProperty(indexed=False)
-    address = ndb.StringProperty(indexed=False)  # in the format "locality, region, country". similar to Event.location
+    address = ndb.StringProperty(indexed=False)  # in the format "locality, region, country". similar to Event.location TODO: deprecate
+    city = ndb.StringProperty()  # Equivalent to locality. From FRCAPI
+    state_prov = ndb.StringProperty()  # Equivalent to region. From FRCAPI
+    country = ndb.StringProperty()  # From FRCAPI
     website = ndb.StringProperty(indexed=False)
     first_tpid = ndb.IntegerProperty()  # from USFIRST. FIRST team ID number. -greg 5/20/2010
     first_tpid_year = ndb.IntegerProperty()  # from USFIRST. Year tpid is applicable for. -greg 9 Jan 2011

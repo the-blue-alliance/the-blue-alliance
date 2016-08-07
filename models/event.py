@@ -24,7 +24,10 @@ class Event(ndb.Model):
     end_date = ndb.DateTimeProperty()
     venue = ndb.StringProperty(indexed=False)  # Name of the event venue
     venue_address = ndb.StringProperty(indexed=False)  # Most detailed venue address (includes venue, street, and location separated by \n)
-    location = ndb.StringProperty(indexed=False)  # in the format "locality, region, country". similar to Team.address
+    location = ndb.StringProperty(indexed=False)  # in the format "locality, region, country". similar to Team.address TODO: deprecate
+    city = ndb.StringProperty()  # Equivalent to locality. From FRCAPI
+    state_prov = ndb.StringProperty()  # Equivalent to region. From FRCAPI
+    country = ndb.StringProperty()  # From FRCAPI
     timezone_id = ndb.StringProperty()  # such as 'America/Los_Angeles' or 'Asia/Jerusalem'
     official = ndb.BooleanProperty(default=False)  # Is the event FIRST-official?
     first_eid = ndb.StringProperty()  # from USFIRST
