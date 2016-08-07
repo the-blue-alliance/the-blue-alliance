@@ -13,7 +13,6 @@ class Team(ndb.Model):
     team_number = ndb.IntegerProperty(required=True)
     name = ndb.TextProperty(indexed=False)
     nickname = ndb.StringProperty(indexed=False)
-    address = ndb.StringProperty(indexed=False)  # in the format "locality, region, country". similar to Event.location TODO: deprecate
     city = ndb.StringProperty()  # Equivalent to locality. From FRCAPI
     state_prov = ndb.StringProperty()  # Equivalent to region. From FRCAPI
     country = ndb.StringProperty()  # From FRCAPI
