@@ -15,10 +15,12 @@ from google.appengine.ext.webapp import template
 
 from helpers.award_manipulator import AwardManipulator
 from helpers.event_manipulator import EventManipulator
+from helpers.event_details_manipulator import EventDetailsManipulator
 from helpers.match_manipulator import MatchManipulator
 
 from models.award import Award
 from models.event import Event
+from models.event_details import EventDetails
 from models.match import Match
 from models.team import Team
 
@@ -175,6 +177,13 @@ class TbaCSVRestoreEventDo(webapp.RequestHandler):
                 event._alliance_selections = None
                 event.dirty = True
             EventManipulator.createOrUpdate(event)
+
+            event_details = EventDetails(
+                id=event_key,
+                parent=event.key,
+                alliance_selections=alliance_selections
+            )
+            EventDetailsManipulator.createOrUpdate(event_details)
 
         # awards
         result = urlfetch.fetch(self.AWARDS_URL.format(event.year, event_key, event_key))

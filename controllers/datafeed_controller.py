@@ -18,6 +18,7 @@ from datafeeds.datafeed_tba import DatafeedTba
 
 from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
+from helpers.event_details_manipulator import EventDetailsManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.match_manipulator import MatchManipulator
 from helpers.match_helper import MatchHelper
@@ -28,6 +29,7 @@ from helpers.robot_manipulator import RobotManipulator
 
 from models.district_team import DistrictTeam
 from models.event import Event
+from models.event_details import EventDetails
 from models.event_team import EventTeam
 from models.robot import Robot
 from models.team import Team
@@ -148,6 +150,13 @@ class FMSAPIEventAlliancesGet(webapp.RequestHandler):
             event.dirty = True
 
         EventManipulator.createOrUpdate(event)
+
+        event_details = EventDetails(
+            id=event_key,
+            parent=event.key,
+            alliance_selections=alliance_selections
+        )
+        EventDetailsManipulator.createOrUpdate(event_details)
 
         template_values = {'alliance_selections': alliance_selections,
                            'event_name': event.key_name}

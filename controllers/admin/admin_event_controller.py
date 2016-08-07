@@ -14,12 +14,14 @@ from helpers.event.event_test_creator import EventTestCreator
 from helpers.event.event_webcast_adder import EventWebcastAdder
 from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
+from helpers.event_details_manipulator import EventDetailsManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.team_manipulator import TeamManipulator
 from helpers.match_manipulator import MatchManipulator
 from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
 from models.award import Award
 from models.event import Event
+from models.event_details import EventDetails
 from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
@@ -44,6 +46,13 @@ class AdminEventAddAllianceSelections(LoggedInHandler):
             event.dirty = True
 
         EventManipulator.createOrUpdate(event)
+
+        event_details = EventDetails(
+            id=event_key,
+            parent=event.key,
+            alliance_selections=alliance_selections
+        )
+        EventDetailsManipulator.createOrUpdate(event_details)
 
         self.redirect("/admin/event/" + event.key_name)
 
@@ -305,6 +314,13 @@ class AdminEventEdit(LoggedInHandler):
             rankings_json=self.request.get("rankings_json"),
         )
         event = EventManipulator.createOrUpdate(event)
+
+        event_details = EventDetails(
+            id=event_key,
+            parent=event.key,
+            alliance_selections=json.loads(self.request.get("alliance_selections_json"))
+        )
+        EventDetailsManipulator.createOrUpdate(event_details)
 
         MemcacheWebcastFlusher.flushEvent(event.key_name)
 
