@@ -11,19 +11,28 @@ path = path("./")
 
 @task
 @cmdopts([
-    optparse.make_option("-d", "--sdk", help="Path to GAE SDK", default=None),
     optparse.make_option("-p", "--project", help="App Engine project to deploy", default="tbatv-prod-hrd"),
-    optparse.make_option("--reauth", action="store_true", help="Prompt for re-auth during all GAE commands", default=False),
     optparse.make_option("--yolo", action="store_true", help="Do not wait for the travis build to succeed #yolo", default=False),
+    optparse.make_option("--config", help="gcloud SDK configuration profile to use", default=""),
+    optparse.make_option("--version", help="App engine version to deploy", default=""),
+    optparse.make_option("--modules", help="Comma separated names of module yaml files to deploy", default=""),
+    optparse.make_option("--skip-cron", action="store_true", help="Do not deploy cron.yaml", default=False),
+    optparse.make_option("--app-cfg-dir", help="Place to find appcfg.py [deprecated]", default=""),
 ])
 def deploy(options):
     args = ["python", "deploy.py", "--project", options.deploy.project]
-    if options.deploy.sdk:
-        args.extend(["--app_cfg_dir", options.deploy.sdk])
-    if options.deploy.reauth:
-        args.append("--reauth")
     if options.deploy.yolo:
         args.append("--yolo")
+    if options.deploy.config:
+        args.extend(["--config", options.deploy.config])
+    if options.deploy.version:
+        args.extend(["--version", options.deploy.version])
+    if options.deploy.modules:
+        args.extend(["--modules", options.deploy.modules])
+    if options.skip_cron:
+        args.append("--skip-cron")
+    if options.app_cfg_dir:
+        args.extend(["--app-cfg-dir", options.app_cfg_dir])
     print "Running {}".format(subprocess.list2cmdline(args))
     subprocess.call(args)
 

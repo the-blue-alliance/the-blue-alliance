@@ -14,9 +14,10 @@
     <p>
       {% if team.location %}<span class="glyphicon glyphicon-map-marker"></span> From <a href="http://maps.google.com/maps?q={{ team.location|urlencode }}" target="_blank">{{ team.location }}</a><br>{% endif %}
       {% if team.name %}<span class="glyphicon glyphicon-info-sign"></span> aka <em>{{ team.name }}</em><br>{% endif %}
-      {% if team.rookie_year %}<span class="glyphicon glyphicon-calendar"></span> First competed in {{ team.rookie_year }}<br>{% endif %}
+      {% if team.rookie_year %}<span class="glyphicon glyphicon-calendar"></span> Rookie Year: {{ team.rookie_year }}<br>{% endif %}
+      {% if last_competed and year != current_year %}<span class="glyphicon glyphicon-time"></span> Last competed in {{ last_competed }}.<br>{% endif %}
       {% if team.website %}<span class="glyphicon glyphicon-globe"></span> <a href="{{team.website}}" target="_blank">{{ team.website }}</a><br>{% endif %}
-      {% if team.championship_location %}<span class="glyphicon glyphicon-flag"></span> Home Championship: {{team.championship_location.2017}}, 2017 {% if team.championship_location.2017 != team.championship_location.2018 %} | {{team.championship_location.2018}} , 2018+ {% endif %}<br>{% endif %}
+      {% if team.championship_location %}<span class="glyphicon glyphicon-flag"></span> Home Championship: {{team.championship_location.2017}}, 2017 {% if team.championship_location.2017 != team.championship_location.2018 %} | {{team.championship_location.2018}}, 2018+ {% endif %}<br>{% endif %}
 
       <hr>
       <a class="btn btn-xs btn-default{% if social_medias %} pull-right{% endif %}" href="/suggest/team/social_media?team_key={{team.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add social media!</a>

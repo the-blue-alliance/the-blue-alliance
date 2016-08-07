@@ -1,15 +1,37 @@
 language: python
 python: 2.7
 
-before_script:
+cache:
+  pip: true
+  directories:
+    - node_modules
+
+before_install:
+  - nvm install 6.0.0
+
+install:
+  # Python test requirements
+  - pip install -r requirements.txt
+
   - mkdir -p vendors
   - wget http://googleappengine.googlecode.com/files/google_appengine_1.8.7.zip -nv
   - unzip -qd vendors google_appengine_1.8.7.zip
   - ln -s vendors/google_appengine/dev_appserver.py .
 
-install:
-  - pip install -r requirements.txt
+  # JavaScript test requirements
+  - npm install
 
-:script: paver test
+before_script:
+  - paver make
+
+script:
+  # Run python tests
+  - paver test
+
+  # Run JavaScript tests
+  - npm test
+
+after_failure:
+  - cat test_failures.temp
 
 sudo: false

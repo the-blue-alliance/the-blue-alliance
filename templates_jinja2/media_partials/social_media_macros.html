@@ -8,6 +8,8 @@
   <span class="hashtag-link hashtag-youtube"></span>
 {% elif media.media_type_enum == 6 %}
   <span class="hashtag-link hashtag-github"></span>
+{% elif media.media_type_enum == 7 %}
+  <span class="hashtag-link hashtag-instagram"></span>
 {% endif %}
 {{ media.foreign_key }}</a>
 {% endmacro %}
@@ -47,5 +49,9 @@
     {% elif suggestion.contents.media_type_enum == 6 %}
         <!-- GitHub profile -->
         <div class="github-card" data-user="{{ suggestion.contents.foreign_key }}"></div>
+    {% elif suggestion.contents.media_type_enum == 7 %}
+        <!-- Instagram profile -->
+        {{ suggestion.contents.site_name }}:
+        <a href="{{ suggestion.contents.profile_url }}">{{ suggestion.contents.foreign_key }}</a>
     {% endif %}
 {% endmacro %}
