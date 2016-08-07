@@ -27,9 +27,6 @@ class FMSAPITeamDetailsParser(object):
         ret_models = []
 
         for teamData in teams:
-            # concat city/state/country to get address
-            address = u"{}, {}, {}".format(teamData['city'], teamData['stateProv'], teamData['country'])
-
             # Fix issue where FIRST's API returns dummy website for all teams
             if teamData['website'] is not None and 'www.firstinspires.org' in teamData['website']:
                 website = None
@@ -42,7 +39,9 @@ class FMSAPITeamDetailsParser(object):
                 team_number=teamData['teamNumber'],
                 name=teamData['nameFull'],
                 nickname=teamData['nameShort'],
-                address=address,
+                city=teamData['city'],
+                state_prov=teamData['stateProv'],
+                country=teamData['country'],
                 website=website,
                 rookie_year=teamData['rookieYear']
             )

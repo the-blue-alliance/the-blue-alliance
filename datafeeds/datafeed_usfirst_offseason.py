@@ -26,6 +26,6 @@ class DatafeedUsfirstOffseason(DatafeedBase):
             year=datetime.datetime.now().year,
             start_date=event.get("start_date", None),
             end_date=event.get("end_date", None),
-            location=event.get("location", None),
+            state_prov=event.get("state_prov", None),
             )
             for event in events]

@@ -55,19 +55,27 @@
                             <td><input type="text" name="event_first_eid" value="{{event.first_eid}}" /></td>
                         </tr>
                         <tr>
-                            <td>Event Location</td>
-                            <td><input type="text" name="event_location" value="{{event.location}}" /></td>
+                            <td>City</td>
+                            <td><input type="text" name="city" value="{{event.city}}" /></td>
+                        </tr>
+                        <tr>
+                            <td>State/Prov</td>
+                            <td><input type="text" name="state_prov" value="{{event.state_prov}}" /></td>
+                        </tr>
+                        <tr>
+                            <td>Country</td>
+                            <td><input type="text" name="country" value="{{event.country}}" /></td>
                         </tr>
                     </table>
                     <input type="hidden" name="event_type_enum" value="{{event.event_type_enum}}" />
                     <button type="submit" class="btn btn-success" name="submit" value="create"><span class="glyphicon glyphicon-thumbs-up"></span> Create Event</button>
-                    
+
                     <h4>OR: Declare Duplicate</h4>
                     <input type="text" name="duplicate_event_key" value="" placeholder="2013cmp" /></td>
-                    <button type="submit" class="btn btn-primary" name="submit" value="duplicate"><span class="glyphicon glyphicon-thumbs-up"></span> Dupe Event</button>  
+                    <button type="submit" class="btn btn-primary" name="submit" value="duplicate"><span class="glyphicon glyphicon-thumbs-up"></span> Dupe Event</button>
                 </form>
             </div>
-        </div>                
+        </div>
         {% empty %}
         <div class="row">
             <div class="well">
