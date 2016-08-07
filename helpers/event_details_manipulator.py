@@ -6,6 +6,22 @@ class EventDetailsManipulator(ManipulatorBase):
     Handle EventDetails database writes.
     """
     @classmethod
+    def postUpdateHook(cls, event_details_list, updated_attr_list, is_new_list):
+        """
+        To run after models have been updated
+        """
+        for (event_details, updated_attrs) in zip(event_details_list, updated_attr_list):
+            event = event_details.key.parent().get()
+            try:
+                if event.within_a_day and "alliance_selections" in updated_attrs:
+                    # Send updated alliances notification
+                    logging.info("Sending alliance notifications for {}".format(event.key_name))
+                    NotificationHelper.send_alliance_update(event)
+            except Exception:
+                logging.error("Error sending alliance update notification for {}".format(event.key_name))
+                logging.error(traceback.format_exc())
+
+    @classmethod
     def updateMerge(self, new_event_details, old_event_details, auto_union=True):
         """
         Given an "old" and a "new" EventDetails object, replace the fields in the
@@ -19,6 +35,8 @@ class EventDetailsManipulator(ManipulatorBase):
             'rankings',
         ]
 
+        old_event_details._updated_attrs = []
+
         for attr in attrs:
             # Special case for rankings (only first row). Don't merge bad data.
             if attr == 'rankings':
@@ -27,5 +45,6 @@ class EventDetailsManipulator(ManipulatorBase):
             if getattr(new_event_details, attr) is not None:
                 if getattr(new_event_details, attr) != getattr(old_event_details, attr):
                     setattr(old_event_details, attr, getattr(new_event_details, attr))
+                    old_event_details._updated_attrs.append(attr)
                     old_event_details.dirty = True
         return old_event_details
