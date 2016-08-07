@@ -184,6 +184,13 @@ class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
         event.rankings_json = json.dumps(rankings)
         EventManipulator.createOrUpdate(event)
 
+        event_details = EventDetails(
+            id=event_key,
+            parent=event.key,
+            rankings=rankings
+        )
+        EventDetailsManipulator.createOrUpdate(event_details)
+
         self.response.out.write(json.dumps({'Success': "Rankings successfully updated"}))
 
 

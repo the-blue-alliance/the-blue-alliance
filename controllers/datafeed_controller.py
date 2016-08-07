@@ -209,6 +209,13 @@ class FMSAPIEventRankingsGet(webapp.RequestHandler):
 
         EventManipulator.createOrUpdate(event)
 
+        event_details = EventDetails(
+            id=event_key,
+            parent=event.key,
+            rankings=rankings
+        )
+        EventDetailsManipulator.createOrUpdate(event_details)
+
         template_values = {'rankings': rankings,
                            'event_name': event.key_name}
 

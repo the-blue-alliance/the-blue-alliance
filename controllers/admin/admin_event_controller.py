@@ -319,6 +319,7 @@ class AdminEventEdit(LoggedInHandler):
             id=event_key,
             parent=event.key,
             alliance_selections=json.loads(self.request.get("alliance_selections_json"))
+            rankings=json.loads(self.request.get("rankings_json"))
         )
         EventDetailsManipulator.createOrUpdate(event_details)
 

@@ -248,6 +248,13 @@ class TbaCSVRestoreEventDo(webapp.RequestHandler):
                 event.dirty = True
             EventManipulator.createOrUpdate(event)
 
+            event_details = EventDetails(
+                id=event_key,
+                parent=event.key,
+                rankings=rankings
+            )
+            EventDetailsManipulator.createOrUpdate(event_details)
+
         self.response.out.write("Done restoring {}!".format(event_key))
 
 
