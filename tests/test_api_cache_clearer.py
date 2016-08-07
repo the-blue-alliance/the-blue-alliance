@@ -130,7 +130,7 @@ class TestApiCacheClearer(unittest2.TestCase):
             name='This is a name',
             team_number=2,
             nickname='NICKNAME',
-            city='San Jose'
+            city='San Jose',
             state_prov='CA',
             country='USA',
             website='www.usfirst.org',
@@ -141,7 +141,7 @@ class TestApiCacheClearer(unittest2.TestCase):
             name='This is a name',
             team_number=2,
             nickname='nickname',
-            city='San Jose'
+            city='San Jose',
             state_prov='CA',
             country='USA',
             website='www.usfirst.org',
