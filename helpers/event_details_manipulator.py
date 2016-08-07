@@ -12,14 +12,14 @@ class EventDetailsManipulator(ManipulatorBase):
         "old" event that are present in the "new" EventDetails, but keep fields from
         the "old" event that are null in the "new" EventDetails.
         """
-        json_attrs = [
+        attrs = [
             'alliance_selections',
             'district_points',
             'matchstats',
             'rankings',
         ]
 
-        for attr in json_attrs:
+        for attr in attrs:
             # Special case for rankings (only first row). Don't merge bad data.
             if attr == 'rankings':
                 if new_event_details.rankings and len(new_event_details.rankings) <= 1:
