@@ -268,7 +268,7 @@ class TbaCSVBackupTeamsDo(webapp.RequestHandler):
                 writer = csv.writer(teams_file, delimiter=',')
                 for team_future in team_futures:
                     team = team_future.get_result()
-                    self._writerow_unicode(writer, [team.key.id(), team.nickname, team.name, team.address, team.website, team.rookie_year])
+                    self._writerow_unicode(writer, [team.key.id(), team.nickname, team.name, team.city, team.state_prov, team.country, team.website, team.rookie_year])
 
         self.response.out.write("Done backing up teams!")
 

@@ -40,9 +40,9 @@ class ApiHelper(object):
 
                 try:
                     team_dict["location"] = team.location
-                    team_dict["locality"] = team.locality
-                    team_dict["region"] = team.region
-                    team_dict["country_name"] = team.country_name
+                    team_dict["locality"] = team.city
+                    team_dict["region"] = team.state_prov
+                    team_dict["country_name"] = team.country
                 except Exception, e:
                     logging.warning("Failed to include Address for api_team_info_%s: %s" % (team_key, e))
 
@@ -172,7 +172,7 @@ class ApiHelper(object):
             match_dict["match_number"] = match.match_number
             match_dict["team_keys"] = match.team_key_names
             match_dict["alliances"] = json.loads(match.alliances_json)
-            match_dict["videos"] = match.videos 
+            match_dict["videos"] = match.videos
             match_dict["time_string"] = match.time_string
             if match.time is not None:
                 match_dict["time"] =  match.time.strftime("%s")
