@@ -17,6 +17,7 @@ class EventTeamRepairer(object):
             if event_team.year == None:
                 # Note, y10k bug. -gregmarra
                 new_event_teams.append(EventTeam(
+                    id='{}_{}'.format(event_team.event.id(), event_team.team.id()),
                     event=event_team.event,
                     team=event_team.team,
                     year=int(event_team.event.id()[:4])))
