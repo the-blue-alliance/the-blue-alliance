@@ -69,12 +69,16 @@ class Team(ndb.Model):
                     self._country_name = address_parts.pop().strip()
                     self._region = address_parts.pop().strip()
                     self._locality = address_parts.pop().strip()
-                if len(address_parts) == 2:
+                elif len(address_parts) == 2:
                     region_country = address_parts.pop().strip().split(" ")
                     if len(region_country) == 2:
                         self._country_name = region_country.pop().strip()
                     self._region = region_country.pop().strip()
                     self._locality = address_parts.pop().strip()
+                elif len(address_parts) > 3:
+                    self._country_name = address_parts[-1].strip()
+                    self._region = address_parts[-2].strip()
+                    self._locality = ','.join(address_parts[:-2])
         except Exception, e:
             logging.warning("Error on team.split_address: %s", e)
 
