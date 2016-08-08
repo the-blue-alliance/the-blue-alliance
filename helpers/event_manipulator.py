@@ -43,8 +43,6 @@ class EventManipulator(ManipulatorBase):
         the "old" event that are null in the "new" event.
         """
         attrs = [
-            "alliance_selections_json",
-            "district_points_json",
             "end_date",
             "event_short",
             "event_type_enum",
@@ -58,8 +56,6 @@ class EventManipulator(ManipulatorBase):
             "timezone_id",
             "name",
             "official",
-            "matchstats_json",
-            "rankings_json",
             "short_name",
             "start_date",
             "venue",
@@ -74,10 +70,6 @@ class EventManipulator(ManipulatorBase):
         old_event._updated_attrs = []
 
         for attr in attrs:
-            # Special case for rankings. Don't merge bad data.
-            if attr == 'rankings_json':
-                if new_event.rankings and len(new_event.rankings) <= 1:
-                    continue
             if getattr(new_event, attr) is not None:
                 if getattr(new_event, attr) != getattr(old_event, attr):
                     setattr(old_event, attr, getattr(new_event, attr))

@@ -32,7 +32,7 @@ from models.team import Team
 
 class ApiTrustedEventAllianceSelectionsUpdate(ApiTrustedBaseController):
     """
-    Overwrites an event's alliance_selections_json with new data
+    Overwrites an event_detail's alliance_selections with new data
     """
     REQUIRED_AUTH_TYPES = {AuthType.EVENT_ALLIANCES}
 
@@ -40,8 +40,6 @@ class ApiTrustedEventAllianceSelectionsUpdate(ApiTrustedBaseController):
         alliance_selections = JSONAllianceSelectionsParser.parse(request.body)
 
         event = Event.get_by_id(event_key)
-        event.alliance_selections_json = json.dumps(alliance_selections)
-        EventManipulator.createOrUpdate(event)
 
         event_details = EventDetails(
             id=event_key,
@@ -172,7 +170,7 @@ class ApiTrustedEventMatchesDeleteAll(ApiTrustedBaseController):
 
 class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
     """
-    Overwrites an event's rankings_json with new data
+    Overwrites an event_detail's rankings with new data
     """
     REQUIRED_AUTH_TYPES = {AuthType.EVENT_RANKINGS}
 
@@ -180,8 +178,6 @@ class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
         rankings = JSONRankingsParser.parse(request.body)
 
         event = Event.get_by_id(event_key)
-        event.rankings_json = json.dumps(rankings)
-        EventManipulator.createOrUpdate(event)
 
         event_details = EventDetails(
             id=event_key,

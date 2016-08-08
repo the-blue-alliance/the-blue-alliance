@@ -40,13 +40,6 @@ class AdminEventAddAllianceSelections(LoggedInHandler):
         alliance_selections_csv = self.request.get('alliance_selections_csv')
         alliance_selections = CSVAllianceSelectionsParser.parse(alliance_selections_csv)
 
-        if alliance_selections and event.alliance_selections != alliance_selections:
-            event.alliance_selections_json = json.dumps(alliance_selections)
-            event._alliance_selections = None
-            event.dirty = True
-
-        EventManipulator.createOrUpdate(event)
-
         event_details = EventDetails(
             id=event_key,
             alliance_selections=alliance_selections
@@ -309,8 +302,6 @@ class AdminEventEdit(LoggedInHandler):
             facebook_eid=self.request.get("facebook_eid"),
             custom_hashtag=self.request.get("custom_hashtag"),
             webcast_json=self.request.get("webcast_json"),
-            alliance_selections_json=self.request.get("alliance_selections_json"),
-            rankings_json=self.request.get("rankings_json"),
         )
         event = EventManipulator.createOrUpdate(event)
 
