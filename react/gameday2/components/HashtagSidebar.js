@@ -1,29 +1,26 @@
 import React from 'react'
-var classNames = require('classnames')
+import classNames from 'classnames'
 
-var HashtagSidebar = React.createClass({
-  componentDidMount: function() {
-    !function(d,s,id){
-      var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https'
-      if(!d.getElementById(id)){
-        js=d.createElement(s);js.id=id
-        js.src=p+"://platform.twitter.com/widgets.js"
-        fjs.parentNode.insertBefore(js,fjs)
+export default React.createClass({
+  componentDidMount() {
+    !function (d, s, id) {
+      let js, fjs = d.getElementsByTagName(s)[0], p = /^http:/.test(d.location) ? 'http' : 'https'
+      if (!d.getElementById(id)) {
+        js = d.createElement(s); js.id = id
+        js.src = p + '://platform.twitter.com/widgets.js'
+        fjs.parentNode.insertBefore(js, fjs)
       }
-    }
-    (document,"script","twitter-wjs")
+    }(document, 'script', 'twitter-wjs')
   },
-  render: function() {
-    var classes = classNames({
+  render() {
+    const classes = classNames({
       'hidden': !this.props.enabled,
-      'hashtag-sidebar': true
+      'hashtag-sidebar': true,
     })
     return (
       <div className={classes}>
         <div id="twitter-widget"><a className="twitter-timeline" href="https://twitter.com/search?q=%23omgrobots" data-widget-id="406597120632709121">Tweets about "#omgrobots"</a></div>
       </div>
-    );
-  }
-});
-
-export default HashtagSidebar
+    )
+  },
+})

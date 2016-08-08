@@ -6,6 +6,5 @@ export function getNumViewsForLayout(layoutId) {
   if (layoutId >= 0 && layoutId < NUM_VIEWS_FOR_LAYOUT.length) {
     return NUM_VIEWS_FOR_LAYOUT[layoutId]
   }
-  console.log('Unknown layout id ' + layoutId + '. Defaulting to 1 view.')
   return 1
 }

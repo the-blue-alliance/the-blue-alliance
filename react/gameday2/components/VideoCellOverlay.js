@@ -1,57 +1,57 @@
-import React, { PropTypes } from 'react';
+import React, { PropTypes } from 'react'
 import { Tooltip, OverlayTrigger } from 'react-bootstrap'
 import WebcastSelectionPanel from './WebcastSelectionPanel'
 import SwapPanel from './SwapPanel'
-var classNames = require('classnames');
+const classNames = require('classnames')
 
-var VideoCellOverlay = React.createClass({
+const VideoCellOverlay = React.createClass({
   propTypes: {
     mouseOverContainer: PropTypes.bool.isRequired,
     webcast: PropTypes.object.isRequired,
-    location: PropTypes.number.isRequired
+    location: PropTypes.number.isRequired,
   },
-  getInitialState: function() {
+  getInitialState() {
     return {
-      showWebcastSelectionPanel: false
-    };
+      showWebcastSelectionPanel: false,
+    }
   },
-  onCloseClicked: function() {
-    this.props.removeWebcast(this.props.webcast.id);
+  onCloseClicked() {
+    this.props.removeWebcast(this.props.webcast.id)
   },
-  showWebcastSelectionPanel: function() {
-    this.setState({showWebcastSelectionPanel: true})
+  showWebcastSelectionPanel() {
+    this.setState({ showWebcastSelectionPanel: true })
   },
-  hideWebcastSelectionPanel: function() {
-    this.setState({showWebcastSelectionPanel: false})
+  hideWebcastSelectionPanel() {
+    this.setState({ showWebcastSelectionPanel: false })
   },
-  showSwapPanel: function() {
-    this.setState({showSwapPanel: true})
+  showSwapPanel() {
+    this.setState({ showSwapPanel: true })
   },
-  hideSwapPanel: function() {
-    this.setState({showSwapPanel: false})
+  hideSwapPanel() {
+    this.setState({ showSwapPanel: false })
   },
-  webcastSelected: function(webcastId) {
+  webcastSelected(webcastId) {
     this.props.addWebcastAtLocation(webcastId, this.props.location)
     this.hideWebcastSelectionPanel()
   },
-  handleSwap: function(destinationLocation) {
+  handleSwap(destinationLocation) {
     this.props.swapWebcasts(this.props.location, destinationLocation)
     this.hideSwapPanel()
   },
-  shouldShow: function() {
+  shouldShow() {
     return (this.props.mouseOverContainer || this.isOverlayExpanded())
   },
-  isOverlayExpanded: function() {
+  isOverlayExpanded() {
     return this.state.showWebcastSelectionPanel || this.state.showSwapPanel
   },
-  render: function() {
-    var classes = classNames({
+  render() {
+    let classes = classNames({
       'hidden': !this.shouldShow(),
       'panel': true,
       'panel-default': true,
       'video-cell-overlay': true,
-      'expanded': this.isOverlayExpanded()
-    });
+      'expanded': this.isOverlayExpanded(),
+    })
     if (this.props.webcast) {
       const closeTooltip = (<Tooltip>Close webcast</Tooltip>)
       const changeWebcastTooltip = (<Tooltip>Change webcast</Tooltip>)
@@ -78,17 +78,19 @@ var VideoCellOverlay = React.createClass({
             displayedWebcasts={this.props.displayedWebcasts}
             enabled={this.state.showWebcastSelectionPanel}
             webcastSelected={this.webcastSelected}
-            closeWebcastSelectionPanel={this.hideWebcastSelectionPanel} />
+            closeWebcastSelectionPanel={this.hideWebcastSelectionPanel}
+          />
           <SwapPanel
             location={this.props.location}
             layoutId={this.props.layoutId}
             enabled={this.state.showSwapPanel}
             close={this.hideSwapPanel}
-            swapToLocation={this.handleSwap} />
+            swapToLocation={this.handleSwap}
+          />
         </div>
       )
     }
-  }
-});
+  },
+})
 
-export default VideoCellOverlay;
+export default VideoCellOverlay

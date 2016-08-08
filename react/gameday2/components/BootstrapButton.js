@@ -1,34 +1,31 @@
-import React, { PropTypes } from 'react';
-var classNames = require('classnames');
+import React, { PropTypes } from 'react'
+import classNames from 'classnames'
 
-var BootstrapButton = React.createClass({
+export default React.createClass({
   propTypes: {
     a: PropTypes.string,
-    handleClick: PropTypes.func
+    handleClick: PropTypes.func,
   },
-  getDefaultProps: function() {
+  getDefaultProps() {
     return {
-      a: '#'
-    };
+      a: '#',
+    }
   },
-  handleClick: function(event) {
+  handleClick(event) {
     if (this.props.handleClick) {
       // If the button has a callback to handle the click, prevent the default
       event.preventDefault()
-      this.props.handleClick();
+      this.props.handleClick()
     }
   },
-  render: function() {
-    var classes = classNames({
+  render() {
+    const classes = classNames({
       'btn': true,
       'btn-default': true,
       'navbar-btn': true,
-      'active': this.props.active,
-    });
+    })
     return (
       <button type="button" className={classes} href={this.props.a} onClick={this.handleClick}>{this.props.children}</button>
-    );
-  }
-});
-
-export default BootstrapButton;
+    )
+  },
+})

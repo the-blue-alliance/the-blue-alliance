@@ -26,7 +26,7 @@ describe('actions', () => {
   })
 
   it('should create an action to add a webcast if the webcast ID exists in webcastsById', () => {
-    const webcastId = 'a';
+    const webcastId = 'a'
     const getState = () => ({
       webcastsById: {
         [webcastId]: {},

@@ -20,7 +20,7 @@ export const getWebcastIdsInDisplayOrder = createSelector(
     const displayOrderWebcastIds = []
 
     // Flatten the map of id->webcast to an array of webcast objects
-    const webcastsArray = [];
+    const webcastsArray = []
     Object.keys(webcastsById)
     .filter(key => ({}.hasOwnProperty.call(webcastsById, key)))
     .forEach(key => webcastsArray.push(webcastsById[key]))

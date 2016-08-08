@@ -1,13 +1,13 @@
-import React, { PropTypes} from 'react'
+import React, { PropTypes } from 'react'
 import LayoutSelectionPanelItem from './LayoutSelectionPanelItem'
 import { NUM_LAYOUTS } from '../constants/LayoutConstants'
 
-const LayoutSelectionPanel = React.createClass({
+export default React.createClass({
   propTypes: {
-    setLayout: PropTypes.func.isRequired
+    setLayout: PropTypes.func.isRequired,
   },
-  generateLayoutRows: function() {
-    let rows = []
+  generateLayoutRows() {
+    const rows = []
     let currentRow = []
     let rowNum = 0
     for (let i = 0; i < NUM_LAYOUTS; i++) {
@@ -26,7 +26,7 @@ const LayoutSelectionPanel = React.createClass({
     }
     return rows
   },
-  render: function() {
+  render() {
     let rows = this.generateLayoutRows()
     return (
       <div className="layout-selection-panel" >
@@ -34,7 +34,5 @@ const LayoutSelectionPanel = React.createClass({
         {rows}
       </div>
     )
-  }
+  },
 })
-
-export default LayoutSelectionPanel

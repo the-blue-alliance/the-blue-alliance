@@ -1,11 +1,11 @@
-import React, { PropTypes } from 'react';
-import BootstrapButton from './BootstrapButton';
-import SettingsDropdown from './SettingsDropdown';
+import React, { PropTypes } from 'react'
+import BootstrapButton from './BootstrapButton'
+import SettingsDropdown from './SettingsDropdown'
 import SidebarToggleDropdown from './SidebarToggleDropdown'
-import LayoutDropdown from './LayoutDropdown';
-var classNames = require('classnames');
+import LayoutDropdown from './LayoutDropdown'
+import classNames from 'classnames'
 
-var GamedayNavbar = React.createClass({
+export default React.createClass({
   propTypes: {
     webcasts: PropTypes.array.isRequired,
     webcastsById: PropTypes.object.isRequired,
@@ -15,9 +15,9 @@ var GamedayNavbar = React.createClass({
     resetWebcasts: PropTypes.func.isRequired,
     toggleHashtagSidebarVisibility: PropTypes.func.isRequired,
     toggleChatSidebarVisibility: PropTypes.func.isRequired,
-    setLayout: PropTypes.func.isRequired
+    setLayout: PropTypes.func.isRequired,
   },
-  render: function() {
+  render() {
     return (
       <nav className="navbar navbar-default navbar-fixed-top" role="navigation">
         <div className="container-fluid">
@@ -38,14 +38,13 @@ var GamedayNavbar = React.createClass({
                 toggleChatSidebarVisibility={this.props.toggleChatSidebarVisibility}
                 toggleHashtagSidebarVisibility={this.props.toggleHashtagSidebarVisibility}
                 chatSidebarVisible={this.props.chatSidebarVisible}
-                hashtagSidebarVisible={this.props.hashtagSidebarVisible} />
+                hashtagSidebarVisible={this.props.hashtagSidebarVisible}
+              />
               <SettingsDropdown resetWebcasts={this.props.resetWebcasts} />
             </ul>
           </div>
         </div>
       </nav>
-    );
-  }
-});
-
-export default GamedayNavbar;
+    )
+  },
+})

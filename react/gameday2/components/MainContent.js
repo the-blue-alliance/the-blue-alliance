@@ -1,9 +1,8 @@
 import React, { PropTypes } from 'react'
-import VideoGridContainer from '../containers/VideoGridContainer';
+import VideoGridContainer from '../containers/VideoGridContainer'
 import LayoutSelectionPanel from './LayoutSelectionPanel'
 import NoWebcasts from './NoWebcasts'
-
-var classNames = require('classnames')
+import classNames from 'classnames'
 
 /**
  * Acts as a high-level "controller" for the main content area. This component
@@ -17,14 +16,14 @@ var classNames = require('classnames')
  *
  * If webcasts are present and a layout is set, this displays the video grid.
  */
-var MainContent = React.createClass({
+export default React.createClass({
   propTypes: {
     webcasts: PropTypes.array.isRequired,
     hashtagSidebarVisible: PropTypes.bool.isRequired,
     chatSidebarVisible: PropTypes.bool.isRequired,
-    layoutSet: PropTypes.bool.isRequired
+    layoutSet: PropTypes.bool.isRequired,
   },
-  render: function() {
+  render() {
     let child = null
 
     if (this.props.webcasts.length == 0) {
@@ -35,7 +34,7 @@ var MainContent = React.createClass({
     } else if (!this.props.layoutSet) {
       // No layout set. Display the layout selector.
       child = (
-        <LayoutSelectionPanel setLayout={this.props.setLayout}/>
+        <LayoutSelectionPanel setLayout={this.props.setLayout} />
       )
     } else {
       // Display the video grid
@@ -44,18 +43,16 @@ var MainContent = React.createClass({
       )
     }
 
-    var classes = classNames({
+    let classes = classNames({
       'content': true,
       'leave-left-margin': this.props.hashtagSidebarVisible,
       'leave-right-margin': this.props.chatSidebarVisible,
-    });
+    })
 
     return (
       <div className={classes}>
         {child}
       </div>
     )
-  }
+  },
 })
-
-export default MainContent

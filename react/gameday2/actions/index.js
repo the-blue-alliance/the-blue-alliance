@@ -33,7 +33,7 @@ export function addWebcast(webcastId) {
   // references a webcast that actually exists
   return (dispatch, getState) => {
     if (!getState().webcastsById[webcastId]) {
-      return;
+      return
     }
 
     dispatch(addWebcastNoCheck(webcastId))
@@ -51,7 +51,7 @@ export function addWebcastAtLocation(webcastId, location) {
   // references a webcast that actually exists
   return (dispatch, getState) => {
     if (!getState().webcastsById[webcastId]) {
-      return;
+      return
     }
 
     dispatch(addWebcastAtLocationNoCheck(webcastId, location))

@@ -1,22 +1,23 @@
-import React from 'react';
-import FollowingTeamListItem from './FollowingTeamListItem';
+import React from 'react'
+import FollowingTeamListItem from './FollowingTeamListItem'
 
-var FollowingTeamsModal = React.createClass({
-  followTeam: function() {
+const FollowingTeamsModal = React.createClass({
+  followTeam() {
     this.props.onFollowTeam(177)
   },
-  render: function() {
-    var followingTeamListItems = [];
-    for (var index in this.props.followingTeams) {
+  render() {
+    let followingTeamListItems = []
+    for (const index in this.props.followingTeams) {
       followingTeamListItems.push(
         <FollowingTeamListItem
           key={this.props.followingTeams[index]}
           team={this.props.followingTeams[index]}
-          onUnfollowTeam={this.props.onUnfollowTeam} />
-      );
-    };
+          onUnfollowTeam={this.props.onUnfollowTeam}
+        />
+      )
+    }
     return (
-      <div className="modal fade" id="followingTeamsModal" tabindex="-1" role="dialog" aria-labelledby="#followingTeamsModal" aria-hidden="true">
+      <div className="modal fade" id="followingTeamsModal" tabIndex="-1" role="dialog" aria-labelledby="#followingTeamsModal" aria-hidden="true">
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
@@ -41,8 +42,8 @@ var FollowingTeamsModal = React.createClass({
           </div>
         </div>
       </div>
-    );
-  }
-});
+    )
+  },
+})
 
-export default FollowingTeamsModal;
+export default FollowingTeamsModal

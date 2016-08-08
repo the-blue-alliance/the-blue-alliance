@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react'
 import { NUM_VIEWS_FOR_LAYOUT } from '../constants/LayoutConstants'
 
-var classNames = require('classnames')
+const classNames = require('classnames')
 
 const SwapPanel = React.createClass({
   propTypes: {
@@ -9,28 +9,28 @@ const SwapPanel = React.createClass({
     layoutId: PropTypes.number.isRequired,
     enabled: PropTypes.bool.isRequired,
     close: PropTypes.func.isRequired,
-    swapToLocation: PropTypes.func.isRequired
+    swapToLocation: PropTypes.func.isRequired,
   },
-  swapLocationSelected: function(location) {
+  swapLocationSelected(location) {
     this.props.swapToLocation(location)
   },
-  render: function() {
+  render() {
     let videoViews = []
-    let layoutId = this.props.layoutId
-    for(let i = 0; i < NUM_VIEWS_FOR_LAYOUT[layoutId]; i++) {
+    const layoutId = this.props.layoutId
+    for (let i = 0; i < NUM_VIEWS_FOR_LAYOUT[layoutId]; i++) {
       let className = classNames({
         ['video-' + i]: true,
-        ['current-location']: i == this.props.location
+        ['current-location']: i == this.props.location,
       })
       videoViews.push(
-        <div className={className} key={className} onClick={this.swapLocationSelected.bind(this, i)}/>
+        <div className={className} key={className} onClick={this.swapLocationSelected.bind(this, i)} />
       )
     }
     let containerClasses = 'layout-preview layout-' + layoutId
 
-    var classes = classNames({
+    let classes = classNames({
       'hidden': !this.props.enabled,
-      'swap-panel': true
+      'swap-panel': true,
     })
 
     return (
@@ -45,7 +45,7 @@ const SwapPanel = React.createClass({
         </div>
       </div>
     )
-  }
+  },
 })
 
 export default SwapPanel

@@ -1,13 +1,13 @@
 import React, { PropTypes } from 'react'
 import NativeListener from 'react-native-listener'
-let classNames = require('classnames')
+import classNames from 'classnames'
 
-const BootstrapNavDropdownListItem = React.createClass({
+export default React.createClass({
   propTypes: {
     checked: PropTypes.bool.isRequired,
-    handleClick: PropTypes.func
+    handleClick: PropTypes.func,
   },
-  handleClick: function(event) {
+  handleClick(event) {
     if (this.props.handleClick) {
       // If a callback to handle the click is given, prevent the default behavior
       event.preventDefault()
@@ -15,18 +15,16 @@ const BootstrapNavDropdownListItem = React.createClass({
       this.props.handleClick()
     }
   },
-  render: function() {
+  render() {
     let checkmarkClasses = classNames({
       'hidden': !this.props.checked,
       'glyphicon glyphicon-ok': true,
-      'pull-right': true
+      'pull-right': true,
     })
     return (
       <NativeListener onClick={this.handleClick}>
-        <li><a href={'#'} onClick={this.handleClick}>{this.props.children} <span className={checkmarkClasses}></span></a></li>
+        <li><a href={'#'} onClick={this.handleClick}>{this.props.children} <span className={checkmarkClasses} /></a></li>
       </NativeListener>
     )
-  }
+  },
 })
-
-export default BootstrapNavDropdownListItem;
