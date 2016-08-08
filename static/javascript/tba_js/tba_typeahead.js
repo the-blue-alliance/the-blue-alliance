@@ -84,6 +84,5 @@ function eventFilter(data) {
       tokens: cleanUnicode(data[i]).replace('[', '').replace(']', '').split(' ')
     });
   }
-  console.log(to_return);
   return to_return;
 }
