@@ -5,6 +5,8 @@ from helpers.cache_clearer import CacheClearer
 from helpers.manipulator_base import ManipulatorBase
 from helpers.notification_helper import NotificationHelper
 
+from models.event import Event
+
 
 class EventDetailsManipulator(ManipulatorBase):
     """
@@ -20,7 +22,7 @@ class EventDetailsManipulator(ManipulatorBase):
         To run after models have been updated
         """
         for (event_details, updated_attrs) in zip(event_details_list, updated_attr_list):
-            event = event_details.key.parent().get()
+            event = Event.get_by_id(event_details.key.id())
             try:
                 if event.within_a_day and "alliance_selections" in updated_attrs:
                     # Send updated alliances notification

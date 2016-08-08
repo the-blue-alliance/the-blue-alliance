@@ -55,7 +55,6 @@ class TestListDistrictsController(unittest2.TestCase):
 
         self.event_details = EventDetails(
             id=self.event.key.id(),
-            parent=self.event.key,
             alliance_selections=[
                 {"declines": [], "picks": ["frc971", "frc254", "frc1662"]},
                 {"declines": [], "picks": ["frc1678", "frc368", "frc4171"]},
@@ -118,7 +117,6 @@ class TestListDistrictEventsController(unittest2.TestCase):
 
         self.event_details = EventDetails(
             id=self.event.key.id(),
-            parent=self.event.key,
             alliance_selections=[
                 {"declines": [], "picks": ["frc971", "frc254", "frc1662"]},
                 {"declines": [], "picks": ["frc1678", "frc368", "frc4171"]},
@@ -194,7 +192,6 @@ class TestListDistrictEventsController(unittest2.TestCase):
 
         self.event_details = EventDetails(
             id=self.event.key.id(),
-            parent=self.event.key,
             alliance_selections=[
                 {"declines": [], "picks": ["frc971", "frc254", "frc1662"]},
                 {"declines": [], "picks": ["frc1678", "frc368", "frc4171"]},

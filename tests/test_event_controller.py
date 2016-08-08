@@ -74,14 +74,12 @@ class TestEventController(unittest2.TestCase):
 
         self.event1_details = EventDetails(
             id=self.event1.key.id(),
-            parent=self.event1.key,
             matchstats={"ranking_prediction_stats": None, "match_predictions": None, "ranking_predictions": None, "match_prediction_stats": None}
         )
         self.event1_details.put()
 
         self.event2_details = EventDetails(
             id=self.event2.key.id(),
-            parent=self.event2.key,
             matchstats={"ranking_prediction_stats": None, "match_predictions": None, "ranking_predictions": None, "match_prediction_stats": None}
         )
         self.event2_details.put()

@@ -77,9 +77,10 @@ class CacheClearer(object):
         years = set()
         event_district_abbrevs = set()
         for event_details_key in event_details_keys:
-            event_keys.add(event_details_key.parent())
+            event_key = ndb.Key(Event, event_details_key.id())
+            event_keys.add(event_key)
 
-            event = event_details_key.parent().get()
+            event = event_key.get()
             years.add(event.year)
             event_district_abbrevs.add(event.event_district_abbrev)
 

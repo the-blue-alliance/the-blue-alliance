@@ -48,14 +48,12 @@ class TestEventDetailsManipulator(unittest2.TestCase):
 
         self.old_event_details = EventDetails(
             id='2011ct',
-            parent=ndb.Key(Event, '2011ct'),
             rankings=good_rankings,
             alliance_selections=self.old_alliance_selections,
         )
 
         self.new_event_details = EventDetails(
             id='2011ct',
-            parent=ndb.Key(Event, '2011ct'),
             rankings=bad_rankings,
             alliance_selections=self.new_alliance_selections,
             matchstats={'oprs': {'4255': 7.4877151786460301, '2643': 27.285682906835952, '852': 10.452538750544525, '4159': 25.820137009871139, '581': 18.513816255143144}}
