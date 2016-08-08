@@ -21,7 +21,7 @@
       <h1>Teams {{cur_page_label}} <small>{{ num_teams }} teams</small></h1>
       <ul class="pagination pagination-small">
         {% for page_label in page_labels %}
-        <li{% if forloop.counter == current_page %} class="active"{% endif %}><a href="/teams{% if not forloop.first %}/{{forloop.counter}}{% endif %}">{{page_label}}</a></li>
+        <li{% if loop.index == current_page %} class="active"{% endif %}><a href="/teams{% if not loop.first %}/{{loop.index}}{% endif %}">{{page_label}}</a></li>
         {% endfor %}
       </ul>
     </div>
@@ -38,7 +38,7 @@
           <tr>
             <td>
               <div class="team-name-container">
-                <div class="favorite-team-icon" data-team="{{team.key.id}}">
+                <div class="favorite-team-icon" data-team="{{ team.key.id() }}">
                     <span class="favorite-team-icon-spacer"></span>
                     <span class="glyphicon glyphicon-star"></span>
                 </div>
@@ -67,7 +67,7 @@
           <tr>
             <td>
               <div class="team-name-container">
-                <div class="favorite-team-icon" data-team="{{team.key.id}}">
+                <div class="favorite-team-icon" data-team="{{ team.key.id() }}">
                     <span class="favorite-team-icon-spacer"></span>
                     <span class="glyphicon glyphicon-star"></span>
                 </div>

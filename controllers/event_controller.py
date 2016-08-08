@@ -24,6 +24,7 @@ from template_engine import jinja2_engine
 
 from consts.ranking_indexes import RankingIndexes
 
+
 class EventList(CacheableHandler):
     """
     List all Events.
@@ -80,8 +81,7 @@ class EventList(CacheableHandler):
             "districts": districts,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/event_list.html')
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('event_list.html', self.template_values)
 
     def memcacheFlush(self):
         year = datetime.datetime.now().year
@@ -189,8 +189,6 @@ class EventDetail(CacheableHandler):
                     match_offset = rankings_enhanced["match_offset"][team]
                     if match_offset != 0:
                         row[matches_index] = "{} ({})".format(row[matches_index], match_offset)
-
-
 
         self.template_values.update({
             "event": event,

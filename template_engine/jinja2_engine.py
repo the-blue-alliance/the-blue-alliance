@@ -27,6 +27,7 @@ def get_jinja_env(force_filesystemloader=False):
     env.filters['strip_frc'] = jinja2_filters.strip_frc
     env.filters['urlencode'] = jinja2_filters.urlencode
     env.filters['rfc2822'] = jinja2_filters.rfc2822
+    env.filters['slugify'] = jinja2_filters.slugify
     return env
 
 

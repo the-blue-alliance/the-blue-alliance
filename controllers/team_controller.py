@@ -9,6 +9,7 @@ from database import team_query
 from models.team import Team
 
 from renderers.team_renderer import TeamRenderer
+from template_engine import jinja2_engine
 
 
 class TeamList(CacheableHandler):
@@ -60,8 +61,7 @@ class TeamList(CacheableHandler):
             "current_page": page
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/team_list.html')
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('team_list.html', self.template_values)
 
 
 class TeamCanonical(CacheableHandler):
