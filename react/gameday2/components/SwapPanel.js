@@ -19,24 +19,28 @@ const SwapPanel = React.createClass({
     const layoutId = this.props.layoutId
     for (let i = 0; i < NUM_VIEWS_FOR_LAYOUT[layoutId]; i++) {
       let className = classNames({
-        ['video-' + i]: true,
-        ['current-location']: i == this.props.location,
+        [`video-${i}`]: true,
+        'current-location': i === this.props.location,
       })
       videoViews.push(
         <div className={className} key={className} onClick={this.swapLocationSelected.bind(this, i)} />
       )
     }
-    let containerClasses = 'layout-preview layout-' + layoutId
 
-    let classes = classNames({
-      'hidden': !this.props.enabled,
+    const containerClasses = classNames({
+      'layout-preview': true,
+      [`layout-${layoutId}`]: true,
+    })
+
+    const classes = classNames({
+      hidden: !this.props.enabled,
       'swap-panel': true,
     })
 
     return (
       <div className={classes}>
         <button type="button" className="button-close btn btn-sm btn-default" onClick={this.props.close}>
-          <span className="glyphicon glyphicon-remove"></span>
+          <span className="glyphicon glyphicon-remove" />
         </button>
         <div className="layout-preview-container">
           <div className={containerClasses}>

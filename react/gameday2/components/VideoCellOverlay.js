@@ -1,14 +1,21 @@
 import React, { PropTypes } from 'react'
 import { Tooltip, OverlayTrigger } from 'react-bootstrap'
+import classNames from 'classnames'
 import WebcastSelectionPanel from './WebcastSelectionPanel'
 import SwapPanel from './SwapPanel'
-const classNames = require('classnames')
 
-const VideoCellOverlay = React.createClass({
+export default React.createClass({
   propTypes: {
     mouseOverContainer: PropTypes.bool.isRequired,
     webcast: PropTypes.object.isRequired,
+    webcasts: PropTypes.array.isRequired,
+    webcastsById: PropTypes.object.isRequired,
+    displayedWebcasts: PropTypes.array.isRequired,
+    layoutId: PropTypes.number.isRequired,
     location: PropTypes.number.isRequired,
+    removeWebcast: PropTypes.func.isRequired,
+    addWebcastAtLocation: PropTypes.func.isRequired,
+    swapWebcasts: PropTypes.func.isRequired,
   },
   getInitialState() {
     return {
@@ -47,11 +54,11 @@ const VideoCellOverlay = React.createClass({
   },
   render() {
     let classes = classNames({
-      'hidden': !this.shouldShow(),
-      'panel': true,
+      hidden: !this.shouldShow(),
+      panel: true,
       'panel-default': true,
       'video-cell-overlay': true,
-      'expanded': this.isOverlayExpanded(),
+      expanded: this.isOverlayExpanded(),
     })
     if (this.props.webcast) {
       const closeTooltip = (<Tooltip id="closeTooltip">Close webcast</Tooltip>)
@@ -91,7 +98,6 @@ const VideoCellOverlay = React.createClass({
         </div>
       )
     }
+    return ''
   },
 })
-
-export default VideoCellOverlay

@@ -41,7 +41,7 @@ const VideoCell = React.createClass({
   render() {
     let classes = classNames({
       'video-cell': true,
-       [`video-${this.props.location}`]: true
+      [`video-${this.props.location}`]: true,
      })
 
     if (this.props.webcast) {
@@ -62,7 +62,8 @@ const VideoCell = React.createClass({
       }
 
       return (
-        <div className={classes}
+        <div
+          className={classes}
           onMouseOver={this.onMouseOver}
           onMouseOut={this.onMouseOut}
         >
@@ -74,21 +75,21 @@ const VideoCell = React.createClass({
           />
         </div>
       )
-    } else {
-      return (<div className={classes} >
-        <div className="empty-view">
-          <button type="button" className="btn btn-secondary" onClick={this.showWebcastSelectionPanel}>Select a webcast</button>
-        </div>
-        <WebcastSelectionPanel
-          webcasts={this.props.webcasts}
-          webcastsById={this.props.webcastsById}
-          displayedWebcasts={this.props.displayedWebcasts}
-          enabled={this.state.showWebcastSelectionPanel}
-          webcastSelected={this.webcastSelected}
-          closeWebcastSelectionPanel={this.hideWebcastSelectionPanel}
-        />
-      </div>)
     }
+
+    return (<div className={classes} >
+      <div className="empty-view">
+        <button type="button" className="btn btn-secondary" onClick={this.showWebcastSelectionPanel}>Select a webcast</button>
+      </div>
+      <WebcastSelectionPanel
+        webcasts={this.props.webcasts}
+        webcastsById={this.props.webcastsById}
+        displayedWebcasts={this.props.displayedWebcasts}
+        enabled={this.state.showWebcastSelectionPanel}
+        webcastSelected={this.webcastSelected}
+        closeWebcastSelectionPanel={this.hideWebcastSelectionPanel}
+      />
+    </div>)
   },
 })
 

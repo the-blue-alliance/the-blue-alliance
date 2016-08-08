@@ -1,8 +1,7 @@
 import React, { PropTypes } from 'react'
+import classNames from 'classnames'
 import VideoCell from './VideoCell'
-import LayoutSelectionPanel from './LayoutSelectionPanel'
 import { getNumViewsForLayout } from '../utils/layoutUtils'
-const classNames = require('classnames')
 
 /**
  * Responsible for rendering a number of webcasts in a grid-like
@@ -38,13 +37,14 @@ const classNames = require('classnames')
  *
  */
 
-const VideoGrid = React.createClass({
+export default React.createClass({
   propTypes: {
     displayedWebcasts: PropTypes.array.isRequired,
     webcasts: PropTypes.array.isRequired,
     webcastsById: PropTypes.object.isRequired,
     layoutId: PropTypes.number.isRequired,
     addWebcastAtLocation: PropTypes.func.isRequired,
+    removeWebcast: PropTypes.func.isRequired,
   },
   getInitialState() {
     return {
@@ -62,14 +62,14 @@ const VideoGrid = React.createClass({
 
     // First, remove any webcasts that are no londer in displayedWebcasts
     for (let i = 0; i < webcastRenderOrder.length; i++) {
-      if (props.displayedWebcasts.indexOf(webcastRenderOrder[i]) == -1) {
+      if (props.displayedWebcasts.indexOf(webcastRenderOrder[i]) === -1) {
         webcastRenderOrder[i] = null
       }
     }
 
     // Now, add any new webcasts in the first available space
     for (let i = 0; i < props.displayedWebcasts.length; i++) {
-      if (webcastRenderOrder.indexOf(props.displayedWebcasts[i]) == -1) {
+      if (webcastRenderOrder.indexOf(props.displayedWebcasts[i]) === -1) {
         // Find the first empty space in webcastRenderOrder
         let foundSpace = false
         for (let j = 0; j < webcastRenderOrder.length; j++) {
@@ -89,8 +89,11 @@ const VideoGrid = React.createClass({
       webcastRenderOrder,
     })
   },
-  renderLayout(webcastCount, layoutNumber, classes) {
-    classes += (' layout-' + layoutNumber)
+  renderLayout(webcastCount, layoutNumber) {
+    const classes = classNames({
+      [`layout-${layoutNumber}`]: true,
+      'video-grid': true,
+    })
 
     const webcastRenderOrder = this.state.webcastRenderOrder
 
@@ -106,7 +109,7 @@ const VideoGrid = React.createClass({
     let videoCells = []
     for (let i = 0; i < webcastCount; i++) {
       let webcast = null
-      let id = 'video-' + i
+      let id = `video-${i}`
       let location = null
       if (webcastRenderOrder[i]) {
         webcast = this.props.webcastsById[webcastRenderOrder[i]]
@@ -139,8 +142,6 @@ const VideoGrid = React.createClass({
   render() {
     const selectedLayoutId = this.props.layoutId
     const numViews = getNumViewsForLayout(selectedLayoutId)
-    return this.renderLayout(numViews, selectedLayoutId, 'video-grid')
+    return this.renderLayout(numViews, selectedLayoutId)
   },
 })
-
-export default VideoGrid

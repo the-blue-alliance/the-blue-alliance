@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react'
 
-const WebcastSelectionPanelItem = React.createClass({
+export default React.createClass({
   propTypes: {
     webcast: PropTypes.object.isRequired,
     webcastSelected: PropTypes.func.isRequired,
@@ -14,5 +14,3 @@ const WebcastSelectionPanelItem = React.createClass({
     )
   },
 })
-
-export default WebcastSelectionPanelItem

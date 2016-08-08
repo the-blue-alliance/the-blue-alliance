@@ -1,7 +1,6 @@
 import React from 'react'
 import GamedayNavbarContainer from '../containers/GamedayNavbarContainer'
 import MainContentContainer from '../containers/MainContentContainer'
-import VideoGridContainer from '../containers/VideoGridContainer'
 import ChatSidebarContainer from '../containers/ChatSidebarContainer'
 import HashtagSidebarContainer from '../containers/HashtagSidebarContainer'
 import FollowingTeamsModal from './FollowingTeamsModal'
@@ -17,9 +16,7 @@ const GamedayFrame = React.createClass({
     this.setState({ followingTeams: newFollowingTeams })
   },
   handleUnfollowTeam(team) {
-    const newFollowingTeams = this.state.followingTeams.filter(function (a) {
-      return a != team
-    })
+    const newFollowingTeams = this.state.followingTeams.filter((a) => a !== team)
     this.setState({ followingTeams: newFollowingTeams })
   },
   render() {

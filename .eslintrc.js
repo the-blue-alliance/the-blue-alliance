@@ -16,5 +16,6 @@ module.exports = {
       'ignorePattern': '.*it\\(.*\\).*',
     }],
     'react/jsx-filename-extension': 'off',
+    'react/prefer-es6-class': ['warn']
   },
 }

@@ -11,7 +11,7 @@ export default React.createClass({
     let currentRow = []
     let rowNum = 0
     for (let i = 0; i < NUM_LAYOUTS; i++) {
-      let layoutKey = 'layout-' + i
+      let layoutKey = `layout-${i}`
       currentRow.push(
         <LayoutSelectionPanelItem layoutId={i} key={layoutKey} setLayout={this.props.setLayout} />
       )

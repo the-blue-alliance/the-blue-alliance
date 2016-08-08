@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react'
-import WebcastListItem from './WebcastListItem'
 import LayoutDropdownItem from './LayoutDropdownItem'
 
 export default React.createClass({
@@ -12,7 +11,7 @@ export default React.createClass({
   render() {
     return (
       <li className="dropdown">
-        <a href="#" className="dropdown-toggle" data-toggle="dropdown">Set Layout <b className="caret"></b></a>
+        <a href="#" className="dropdown-toggle" data-toggle="dropdown">Set Layout <b className="caret" /></a>
         <ul className="dropdown-menu">
           <LayoutDropdownItem handleClick={this.layoutSelected} layoutId={0}>Single View</LayoutDropdownItem>
           <LayoutDropdownItem handleClick={this.layoutSelected} layoutId={1}>Split View</LayoutDropdownItem>
