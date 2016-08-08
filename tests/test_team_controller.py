@@ -96,20 +96,17 @@ class TestTeamController(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    """
-    TODO: can't test non-jinja controllers yet, unsure how to make django work
     def testTeamListDefaultPage(self):
         response = self.testapp.get("/teams")
         self.assertEqual(response.status_int, 200)
 
     def testTeamListExplicitPage(self):
-        response = self.testapp.get("/teams/0")
+        response = self.testapp.get("/teams/1")
         self.assertEqual(response.status_int, 200)
 
     def testTeamListBadPage(self):
-        response = self.testapp.get("/teams/19")
-        self.assertEqual(response.status_int, 200)
-    """
+        response = self.testapp.get("/teams/19", status=404)
+        self.assertEqual(response.status_int, 404)
 
     def testTeamCanonical(self):
         response = self.testapp.get("/team/1124")
