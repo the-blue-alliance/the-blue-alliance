@@ -2,18 +2,18 @@ import { SET_LAYOUT } from '../constants/ActionTypes'
 
 const defaultState = {
   layoutId: 0,
-  layoutSet: false
+  layoutSet: false,
 }
 
 const layout = (state = defaultState, action) => {
-  switch(action.type) {
+  switch (action.type) {
     case SET_LAYOUT:
-    return {
-      layoutId: action.layoutId,
-      layoutSet: true
-    }
+      return {
+        layoutId: action.layoutId,
+        layoutSet: true,
+      }
     default:
-    return state
+      return state
   }
 }
 

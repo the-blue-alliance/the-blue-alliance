@@ -3,16 +3,18 @@ import { MAX_SUPPORTED_VIEWS } from '../constants/LayoutConstants'
 
 const addWebcastAtLocation = (displayedWebcasts, webcastId, location, maxSupportedViews) => {
   // Don't add the webcast if we couldn't possibly have a view to display it with
+  const webcasts = displayedWebcasts.slice(0)
   if (location >= maxSupportedViews) {
-    return
+    return webcasts
   }
 
   // If needed, expand the array
-  while (location >= displayedWebcasts.length) {
-    displayedWebcasts.push(null)
+  while (location >= webcasts.length) {
+    webcasts.push(null)
   }
 
-  displayedWebcasts[location] = webcastId
+  webcasts[location] = webcastId
+  return webcasts
 }
 
 /**
@@ -22,26 +24,30 @@ const addWebcastAtLocation = (displayedWebcasts, webcastId, location, maxSupport
  * webcast ID is not added.
  */
 const addWebcastAtNextAvailableLocation = (displayedWebcasts, webcastId, maxSupportedViews) => {
-  for (let i = 0; i < displayedWebcasts.length; i++) {
-    if (displayedWebcasts[i] == undefined) {
-      displayedWebcasts[i] = webcastId
-      return
+  const webcasts = displayedWebcasts.slice(0)
+  for (let i = 0; i < webcasts.length; i++) {
+    if (webcasts[i] == null) {
+      webcasts[i] = webcastId
+      return webcasts
     }
   }
 
   // There wasn't space for it in the original array. Try expanding it.
   if (displayedWebcasts.length >= maxSupportedViews) {
     // We can't expand the array any further. Don't add the webcast.
-    return
+    return webcasts
   }
 
-  displayedWebcasts.push(webcastId)
+  webcasts.push(webcastId)
+  return webcasts
 }
 
 const swapWebcasts = (displayedWebcasts, firstLocation, secondLocation) => {
-  let temp = displayedWebcasts[firstLocation]
-  displayedWebcasts[firstLocation] = displayedWebcasts[secondLocation]
-  displayedWebcasts[secondLocation] = temp
+  const webcasts = displayedWebcasts.slice(0)
+  const temp = webcasts[firstLocation]
+  webcasts[firstLocation] = webcasts[secondLocation]
+  webcasts[secondLocation] = temp
+  return webcasts
 }
 
 /**
@@ -49,33 +55,26 @@ const swapWebcasts = (displayedWebcasts, firstLocation, secondLocation) => {
  * replaces it with null.
  */
 const removeWebcast = (displayedWebcasts, webcastId) => {
-  for (let i = 0; i < displayedWebcasts.length; i++) {
-    if (displayedWebcasts[i] == webcastId) {
-      displayedWebcasts[i] = null
-      return
+  const webcasts = displayedWebcasts.slice(0)
+  for (let i = 0; i < webcasts.length; i++) {
+    if (webcasts[i] === webcastId) {
+      webcasts[i] = null
+      return webcasts
     }
   }
+  return webcasts
 }
 
 const displayedWebcasts = (state = [], action) => {
-  let webcasts = null;
   switch (action.type) {
     case types.ADD_WEBCAST:
-      webcasts = state.slice(0)
-      addWebcastAtNextAvailableLocation(webcasts, action.webcastId, MAX_SUPPORTED_VIEWS)
-      return webcasts
+      return addWebcastAtNextAvailableLocation(state, action.webcastId, MAX_SUPPORTED_VIEWS)
     case types.ADD_WEBCAST_AT_LOCATION:
-      webcasts = state.slice(0)
-      addWebcastAtLocation(webcasts, action.webcastId, action.location, MAX_SUPPORTED_VIEWS)
-      return webcasts
+      return addWebcastAtLocation(state, action.webcastId, action.location, MAX_SUPPORTED_VIEWS)
     case types.SWAP_WEBCASTS:
-      webcasts = state.slice(0)
-      swapWebcasts(webcasts, action.firstLocation, action.secondLocation)
-      return webcasts
+      return swapWebcasts(state, action.firstLocation, action.secondLocation)
     case types.REMOVE_WEBCAST:
-      webcasts = state.slice(0)
-      removeWebcast(webcasts, action.webcastId)
-      return webcasts
+      return removeWebcast(state, action.webcastId)
     case types.RESET_WEBCASTS:
       return []
     default:
