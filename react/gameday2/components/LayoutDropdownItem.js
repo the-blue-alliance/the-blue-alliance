@@ -13,7 +13,7 @@ var LayoutDropdownItem = React.createClass({
   },
   render: function() {
     return (
-      <li><a href='#' onClick={this.handleClick}>{this.props.children}</a></li>
+      <li onClick={this.handleClick}><a href='#'>{this.props.children}</a></li>
     )
   },
 })

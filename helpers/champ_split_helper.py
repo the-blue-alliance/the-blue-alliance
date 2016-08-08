@@ -80,19 +80,19 @@ class ChampSplitHelper(object):
 
     @classmethod
     def get_champ(cls, team):
-        if team.country_name in cls.LOCATION_CHAMP_MAP:
-            if team.country_name in {'USA', 'Canada'}:
-                if team.region in cls.LOCATION_CHAMP_MAP[team.country_name]:
-                    champ = cls.LOCATION_CHAMP_MAP[team.country_name][team.region]
+        if team.country in cls.LOCATION_CHAMP_MAP:
+            if team.country in {'USA', 'Canada'}:
+                if team.state_prov in cls.LOCATION_CHAMP_MAP[team.country]:
+                    champ = cls.LOCATION_CHAMP_MAP[team.country][team.state_prov]
                     return {2017: champ, 2018: champ}
-                elif team.region in {'Kansas', 'Missouri'}:
+                elif team.state_prov in {'Kansas', 'Missouri'}:
                     return {2017: cls.STL, 2018: cls.HOU}
                 else:
                     # All other unlabled states and provinces in US and CA are STL/DET
                     return {2017: cls.STL, 2018: cls.DET}
             else:
                 # Non US/CA other countries
-                return cls.LOCATION_CHAMP_MAP[team.country_name]
+                return cls.LOCATION_CHAMP_MAP[team.country]
         else:
-            logging.warning("Unknown country: {}".format(team.country_name))
+            logging.warning("Unknown country: {}".format(team.country))
             return None

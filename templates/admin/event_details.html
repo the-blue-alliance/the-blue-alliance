@@ -57,8 +57,16 @@
         <td><a href="http://maps.google.com/maps?q={{ event.venue_address|urlencode }}">{{ event.venue_address|linebreaksbr }}</a></td>
     </tr>
     <tr>
-        <td>Event Location</td>
-        <td><a href="http://maps.google.com/maps?q={{ event.location|urlencode }}">{{ event.location }}</a></td>
+        <td>Event City</td>
+        <td>{{ event.city }}</td>
+    </tr>
+    <tr>
+        <td>Event State/Prov</td>
+        <td>{{ event.state_prov }}</td>
+    </tr>
+    <tr>
+        <td>Event Country</td>
+        <td>{{ event.country }}</td>
     </tr>
     <tr>
         <td>Event Timezone</td>

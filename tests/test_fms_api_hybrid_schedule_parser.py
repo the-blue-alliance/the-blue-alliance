@@ -31,7 +31,6 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
                 year=2016,
                 end_date=datetime(2016, 03, 27),
                 official=True,
-                location='New York, NY',
                 start_date=datetime(2016, 03, 24),
                 timezone_id="America/New_York"
         )
@@ -52,7 +51,6 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
                 year=2016,
                 end_date=datetime(2016, 03, 27),
                 official=True,
-                location='New York, NY',
                 start_date=datetime(2016, 03, 24),
                 timezone_id="America/New_York"
         )
@@ -77,7 +75,6 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
                 year=2016,
                 end_date=datetime(2016, 03, 27),
                 official=True,
-                location='New York, NY',
                 start_date=datetime(2016, 03, 24),
                 timezone_id="America/New_York"
         )
@@ -105,7 +102,6 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
                 year=2016,
                 end_date=datetime(2016, 03, 27),
                 official=True,
-                location='Michigan, MI',
                 start_date=datetime(2016, 03, 24),
                 timezone_id="America/New_York"
         )

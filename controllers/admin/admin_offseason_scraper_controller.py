@@ -73,7 +73,9 @@ class AdminOffseasonScraperController(LoggedInHandler):
                 year=int(self.request.get("event_year")),
                 start_date=start_date,
                 end_date=end_date,
-                location=self.request.get("event_location"),
+                city=self.request.get("city"),
+                state_prov=self.request.get("state_prov"),
+                country=self.request.get("country"),
                 )
             event = EventManipulator.createOrUpdate(event)
 
