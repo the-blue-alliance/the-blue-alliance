@@ -31,6 +31,9 @@ script:
   # Run JavaScript tests
   - npm test
 
+  # Run JavaScript linter
+  - npm run lint
+
 after_failure:
   - cat test_failures.temp
 
