@@ -46,7 +46,9 @@ class TestEventApiController(unittest2.TestCase):
                 year=2010,
                 end_date=datetime(2010, 03, 27),
                 official=True,
-                location='Clemson, SC',
+                city="Clemson",
+                state_prov="SC",
+                country="USA",
                 venue="Long Beach Arena",
                 venue_address="Long Beach Arena\r\n300 East Ocean Blvd\r\nLong Beach, CA 90802\r\nUSA",
                 timezone_id="America/New_York",
@@ -114,7 +116,9 @@ class TestEventTeamsApiController(unittest2.TestCase):
                 year=2010,
                 end_date=datetime(2010, 03, 27),
                 official=True,
-                location='Clemson, SC',
+                city="Clemson",
+                state_prov="SC",
+                country="USA",
                 start_date=datetime(2010, 03, 24),
         )
         self.event.put()
@@ -127,7 +131,9 @@ class TestEventTeamsApiController(unittest2.TestCase):
                 Technical Charter High School",
                 team_number=281,
                 nickname="EnTech GreenVillians",
-                address="Greenville, SC, USA",
+                city="Greenville",
+                state_prov="SC",
+                country="USA",
                 website="www.entech.org",
         )
         self.team.put()
@@ -181,7 +187,9 @@ class TestEventMatchApiController(unittest2.TestCase):
                 year=2010,
                 end_date=datetime(2010, 03, 27),
                 official=True,
-                location='Clemson, SC',
+                city="Clemson",
+                state_prov="SC",
+                country="USA",
                 start_date=datetime(2010, 03, 24),
         )
         self.event.put()
@@ -249,7 +257,9 @@ class TestEventStatsApiController(unittest2.TestCase):
                 year=2010,
                 end_date=datetime(2010, 03, 27),
                 official=True,
-                location='Clemson, SC',
+                city="Clemson",
+                state_prov="SC",
+                country="USA",
                 start_date=datetime(2010, 03, 24),
                 matchstats_json=json.dumps(self.matchstats)
         )
@@ -293,7 +303,9 @@ class TestEventRankingsApiController(unittest2.TestCase):
                 year=2010,
                 end_date=datetime(2010, 03, 27),
                 official=True,
-                location='Clemson, SC',
+                city="Clemson",
+                state_prov="SC",
+                country="USA",
                 start_date=datetime(2010, 03, 24),
                 rankings_json=json.dumps(self.rankings)
         )
@@ -308,7 +320,9 @@ class TestEventRankingsApiController(unittest2.TestCase):
                 year=2010,
                 end_date=datetime(2010, 03, 27),
                 official=True,
-                location='Clemson, SC',
+                city="Clemson",
+                state_prov="SC",
+                country="USA",
                 start_date=datetime(2010, 03, 24),
         )
         self.eventNoRanks.put()
@@ -349,7 +363,9 @@ class TestEventListApiController(unittest2.TestCase):
                 year=2010,
                 end_date=datetime(2010, 03, 27),
                 official=True,
-                location='Clemson, SC',
+                city="Clemson",
+                state_prov="SC",
+                country="USA",
                 start_date=datetime(2010, 03, 24),
         )
 

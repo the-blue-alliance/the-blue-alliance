@@ -33,10 +33,9 @@ class FIRSTElasticSearchEventListParser(object):
                 district_enum = EventHelper.getDistrictFromEventName(name)
             else:
                 district_enum = DistrictType.NO_DISTRICT
-            if 'event_city' in event and 'event_stateprov' in event and 'event_country' in event:
-                location = "{}, {}, {}".format(event['event_city'], event['event_stateprov'], event['event_country'])
-            else:
-                location = None
+            city = event.get('event_city', None)
+            state_prov = event.get('event_stateprov', None)
+            country = event.get('event_country', None)
             start = datetime.datetime.strptime(event['date_start'], self.DATE_FORMAT_STR)
             end = datetime.datetime.strptime(event['date_end'], self.DATE_FORMAT_STR) + datetime.timedelta(hours=23, minutes=59, seconds=59)
             venue_address = event['event_venue']
@@ -59,7 +58,9 @@ class FIRSTElasticSearchEventListParser(object):
                 start_date=start,
                 end_date=end,
                 venue=event['event_venue'],
-                location=location,
+                city=city,
+                state_prov=state_prov,
+                country=country,
                 venue_address=venue_address,
                 year=self.season,
                 event_district_enum=district_enum,

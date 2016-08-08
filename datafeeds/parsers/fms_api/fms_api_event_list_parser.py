@@ -48,7 +48,9 @@ class FMSAPIEventListParser(object):
             short_name = EventHelper.getShortName(name)
             district_enum = EventHelper.parseDistrictName(event['districtCode'].lower()) if event['districtCode'] else DistrictType.NO_DISTRICT
             venue = event['venue']
-            location = "{}, {}, {}".format(event['city'], event['stateprov'], event['country'])
+            city = event['city']
+            state_prov = event['stateprov']
+            country = event['country']
             start = datetime.datetime.strptime(event['dateStart'], self.DATE_FORMAT_STR)
             end = datetime.datetime.strptime(event['dateEnd'], self.DATE_FORMAT_STR)
 
@@ -73,7 +75,9 @@ class FMSAPIEventListParser(object):
                 start_date=start,
                 end_date=end,
                 venue=venue,
-                location=location,
+                city=city,
+                state_prov=state_prov,
+                country=country,
                 venue_address=None,  # FIRST API doesn't provide detailed venue address
                 year=self.season,
                 event_district_enum=district_enum

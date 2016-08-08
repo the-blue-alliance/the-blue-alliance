@@ -24,9 +24,9 @@ class ModelToDict(object):
 
         try:
             team_dict["location"] = team.location
-            team_dict["locality"] = team.locality
-            team_dict["region"] = team.region
-            team_dict["country_name"] = team.country_name
+            team_dict["locality"] = team.city
+            team_dict["region"] = team.state_prov
+            team_dict["country_name"] = team.country
         except Exception, e:
             logging.warning("Failed to include Address for api_team_info_%s: %s" % (team.key.id(), e))
 

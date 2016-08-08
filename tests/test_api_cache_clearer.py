@@ -81,7 +81,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             year=2010,
             end_date=datetime(2010, 03, 27),
             official=True,
-            location='Clemson, SC',
+            city="Clemson",
+            state_prov="SC",
+            country="USA",
             start_date=datetime(2010, 03, 24),
         )
 
@@ -95,7 +97,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             year=2010,
             end_date=datetime(2010, 03, 27),
             official=True,
-            location='Clemson, SC',
+            city="Clemson",
+            state_prov="SC",
+            country="USA",
             start_date=datetime(2010, 03, 24),
         )
 
@@ -104,7 +108,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             name='This is a name',
             team_number=1,
             nickname='NICKNAME',
-            address='San Jose, CA, USA',
+            city='San Jose',
+            state_prov='CA',
+            country='USA',
             website='www.usfirst.org',
         )
 
@@ -113,7 +119,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             name='This is a name',
             team_number=1,
             nickname='NICKNAME',
-            address='San Jose, CA, USA',
+            city='San Jose',
+            state_prov='CA',
+            country='USA',
             website='www.thebluealliance.com',
         )
 
@@ -122,7 +130,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             name='This is a name',
             team_number=2,
             nickname='NICKNAME',
-            address='San Jose, CA, USA',
+            city='San Jose',
+            state_prov='CA',
+            country='USA',
             website='www.usfirst.org',
         )
 
@@ -131,7 +141,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             name='This is a name',
             team_number=2,
             nickname='nickname',
-            address='San Jose, CA, USA',
+            city='San Jose',
+            state_prov='CA',
+            country='USA',
             website='www.usfirst.org',
         )
 

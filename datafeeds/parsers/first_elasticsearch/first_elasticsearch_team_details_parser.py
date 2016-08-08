@@ -23,7 +23,9 @@ class FIRSTElasticSearchTeamDetailsParser(object):
                 team_number=team['team_number_yearly'],
                 name=team.get('team_name', None),
                 nickname=team.get('team_nickname', None),
-                address=None,  # team_stateprov isn't in the same format as the FRC API (e.g. 'CA' instead of 'California'). Don't save to avoid unnecessary cache clearing.
+                # city=None,
+                # state_prov=None,  # team_stateprov isn't in the same format as the FRC API (e.g. 'CA' instead of 'California'). Don't save to avoid unnecessary cache clearing.
+                # country=None,
                 website=website,
                 rookie_year=team.get('team_rookieyear', None),
                 first_tpid=first_tpid,
