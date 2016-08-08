@@ -12,13 +12,14 @@ from helpers.event_details_manipulator import EventDetailsManipulator
 
 def create_event_details(event_key):
   event = Event.get_by_id(event_key)
-  event_details = EventDetails(
-    id=event_key,
-    alliance_selections=event.alliance_selections,
-    district_points=event.district_points,
-    matchstats=event.matchstats,
-    rankings=event.rankings)
-  EventDetailsManipulator.createOrUpdate(event_details)
+  if event.alliance_selections or event.district_points or event.matchstats or event.rankings:
+    event_details = EventDetails(
+      id=event_key,
+      alliance_selections=event.alliance_selections,
+      district_points=event.district_points,
+      matchstats=event.matchstats,
+      rankings=event.rankings)
+    EventDetailsManipulator.createOrUpdate(event_details)
 
 
 class AdminMigration(LoggedInHandler):
