@@ -29,7 +29,7 @@
             {% endif %}
           {% endif %}
         </td>
-        <td>{% if event.start_date %}<time itemprop="startDate" datetime="{{event.start_date|strftime("%c")}}">{{ event.start_date|strftime("%M %j%S") }}{% if event.start_date.date != event.end_date.date %}</time> to <time itemprop="endDate" datetime="{{event.end_date|strftime("%c")}}">{{ event.end_date|strftime("%M %j%S") }}{% endif %}{{ event.end_date|strftime(", %Y") }}</time>{% endif %}</td>
+        <td>{% if event.start_date %}<time itemprop="startDate" datetime="{{event.start_date|strftime("%c")}}">{{ event.start_date|strftime("%b %-d") }}{% if event.start_date.date != event.end_date.date %}</time> to <time itemprop="endDate" datetime="{{event.end_date|strftime("%c")}}">{{ event.end_date|strftime("%b %-d") }}{% endif %}{{ event.end_date|strftime(", %Y") }}</time>{% endif %}</td>
       </tr>
     {% endfor %}
   </tbody>
