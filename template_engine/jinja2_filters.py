@@ -55,3 +55,8 @@ def rfc2822(datetime):
     tt = datetime.timetuple()
     timestamp = time.mktime(tt)
     return utils.formatdate(timestamp)
+
+
+def slugify(value):
+    from django.template.defaultfilters import slugify as django_slugify
+    return django_slugify(value)

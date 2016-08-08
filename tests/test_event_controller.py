@@ -87,8 +87,6 @@ class TestEventController(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    """
-    TODO: can't test non-jinja controllers yet, unsure how to make django work
     def testEventListDefaultYear(self):
         response = self.testapp.get("/events")
         self.assertEqual(response.status_int, 200)
@@ -100,7 +98,6 @@ class TestEventController(unittest2.TestCase):
     def testEventListNoEvents(self):
         response = self.testapp.get("/events/2014")
         self.assertEqual(response.status_int, 200)
-    """
 
     def testEventDetails(self):
         response = self.testapp.get("/event/2016necmp")

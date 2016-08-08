@@ -1,0 +1,36 @@
+<table class="event-table">
+  <thead>
+    <tr>
+      <th>Event</th>
+      <th class="hidden-xs">Webcast</th>
+      <th>Dates</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for event in events %}
+      <tr itemscope itemtype="http://data-vocabulary.org/Event">
+        <td>
+          <a href="/event/{{event.key_name}}" title="{{event.name}}" itemprop="url"><span itemprop="summary">{{event.name}}</span></a>
+          {% if event.location %}
+            <br>
+            <small>{{event.location}}</small>
+          {% endif %}
+        </td>
+        <td class="hidden-xs">
+          {% if event.webcast %}
+            {% if event.now %}
+              <a class="btn btn-success btn-small" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
+            {% else %}
+              <a class="btn btn-default btn-small disabled">Offline</a>
+            {% endif %}
+          {% else %}
+            {% if event.future or event.within_a_day %}
+              <a href="/suggest/event/webcast?event_key={{event.key_name}}" target="_blank">Add webcast</a>
+            {% endif %}
+          {% endif %}
+        </td>
+        <td>{% if event.start_date %}<time itemprop="startDate" datetime="{{event.start_date|strftime("%c")}}">{{ event.start_date|strftime("%b %-d") }}{% if event.start_date.date != event.end_date.date %}</time> to <time itemprop="endDate" datetime="{{event.end_date|strftime("%c")}}">{{ event.end_date|strftime("%b %-d") }}{% endif %}{{ event.end_date|strftime(", %Y") }}</time>{% endif %}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
