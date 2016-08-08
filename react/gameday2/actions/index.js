@@ -7,21 +7,26 @@ import * as types from '../constants/ActionTypes'
 export function setWebcastsRaw(webcasts) {
   return {
     type: types.SET_WEBCASTS_RAW,
-    webcasts
+    webcasts,
   }
 }
 
 export function toggleChatSidebarVisibility() {
   return {
-    type: types.TOGGLE_CHAT_SIDEBAR_VISIBILITY
+    type: types.TOGGLE_CHAT_SIDEBAR_VISIBILITY,
   }
 }
 
 export function toggleHashtagSidebarVisibility() {
   return {
-    type: types.TOGGLE_HASHTAG_SIDEBAR_VISIBILITY
+    type: types.TOGGLE_HASHTAG_SIDEBAR_VISIBILITY,
   }
 }
+
+const addWebcastNoCheck = (webcastId) => ({
+  type: types.ADD_WEBCAST,
+  webcastId,
+})
 
 export function addWebcast(webcastId) {
   // Before displaying the webcast, check that the provided webcast ID
@@ -35,12 +40,11 @@ export function addWebcast(webcastId) {
   }
 }
 
-let addWebcastNoCheck = (webcastId) => {
-  return {
-    type: types.ADD_WEBCAST,
-    webcastId
-  }
-}
+const addWebcastAtLocationNoCheck = (webcastId, location) => ({
+  type: types.ADD_WEBCAST_AT_LOCATION,
+  webcastId,
+  location,
+})
 
 export function addWebcastAtLocation(webcastId, location) {
   // Before displaying the webcast, check that the provided webcast ID
@@ -54,38 +58,30 @@ export function addWebcastAtLocation(webcastId, location) {
   }
 }
 
-let addWebcastAtLocationNoCheck = (webcastId, location) => {
-  return {
-    type: types.ADD_WEBCAST_AT_LOCATION,
-    webcastId,
-    location
-  }
-}
-
-export function swapWebcasts (firstLocation, secondLocation) {
+export function swapWebcasts(firstLocation, secondLocation) {
   return {
     type: types.SWAP_WEBCASTS,
     firstLocation,
-    secondLocation
+    secondLocation,
   }
 }
 
 export function removeWebcast(webcastId) {
   return {
     type: types.REMOVE_WEBCAST,
-    webcastId
+    webcastId,
   }
 }
 
 export function resetWebcasts() {
   return {
-    type: types.RESET_WEBCASTS
+    type: types.RESET_WEBCASTS,
   }
 }
 
 export function setLayout(layoutId) {
   return {
     type: types.SET_LAYOUT,
-    layoutId
+    layoutId,
   }
 }
