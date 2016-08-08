@@ -16,12 +16,14 @@ from datafeeds.parsers.json.json_team_list_parser import JSONTeamListParser
 
 from helpers.award_manipulator import AwardManipulator
 from helpers.event_manipulator import EventManipulator
+from helpers.event_details_manipulator import EventDetailsManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.match_helper import MatchHelper
 from helpers.match_manipulator import MatchManipulator
 
 from models.award import Award
 from models.event import Event
+from models.event_details import EventDetails
 from models.event_team import EventTeam
 from models.match import Match
 from models.sitevar import Sitevar
@@ -40,6 +42,12 @@ class ApiTrustedEventAllianceSelectionsUpdate(ApiTrustedBaseController):
         event = Event.get_by_id(event_key)
         event.alliance_selections_json = json.dumps(alliance_selections)
         EventManipulator.createOrUpdate(event)
+
+        event_details = EventDetails(
+            id=event_key,
+            alliance_selections=alliance_selections
+        )
+        EventDetailsManipulator.createOrUpdate(event_details)
 
         self.response.out.write(json.dumps({'Success': "Alliance selections successfully updated"}))
 
@@ -174,6 +182,12 @@ class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
         event = Event.get_by_id(event_key)
         event.rankings_json = json.dumps(rankings)
         EventManipulator.createOrUpdate(event)
+
+        event_details = EventDetails(
+            id=event_key,
+            rankings=rankings
+        )
+        EventDetailsManipulator.createOrUpdate(event_details)
 
         self.response.out.write(json.dumps({'Success': "Rankings successfully updated"}))
 
