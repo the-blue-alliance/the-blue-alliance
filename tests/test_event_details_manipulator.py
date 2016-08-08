@@ -73,9 +73,9 @@ class TestEventDetailsManipulator(unittest2.TestCase):
 
     def test_createOrUpdate(self):
         EventDetailsManipulator.createOrUpdate(self.old_event_details)
-        self.assertOldEventDetails(ndb.Key(Event, '2011ct', EventDetails, '2011ct').get())
+        self.assertOldEventDetails(EventDetails.get_by_id('2011ct'))
         EventDetailsManipulator.createOrUpdate(self.new_event_details)
-        self.assertMergedEventDetails(ndb.Key(Event, '2011ct', EventDetails, '2011ct').get())
+        self.assertMergedEventDetails(EventDetails.get_by_id('2011ct'))
 
     def test_findOrSpawn(self):
         self.old_event_details.put()

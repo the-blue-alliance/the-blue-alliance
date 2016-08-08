@@ -102,7 +102,7 @@ class Event(ndb.Model):
     @property
     def details(self):
         if self._details is None:
-            self._details = ndb.Key(Event, self.key.id(), EventDetails, self.key.id()).get()
+            self._details = EventDetails.get_by_id(self.key.id())
         return self._details
 
     @property
