@@ -10,6 +10,7 @@ from consts.district_type import DistrictType
 from consts.event_type import EventType
 from controllers.event_controller import EventDetail, EventInsights, EventList
 from models.event import Event
+from models.event_details import EventDetails
 
 
 class TestEventController(unittest2.TestCase):
@@ -46,7 +47,6 @@ class TestEventController(unittest2.TestCase):
                 start_date=datetime(2016, 03, 24),
                 webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
                 website="http://www.firstsv.org",
-                matchstats_json='{"ranking_prediction_stats": null, "match_predictions": null, "ranking_predictions": null, "match_prediction_stats": null}',
         )
         this_year = datetime.now().year
         self.event2 = Event(
@@ -68,10 +68,21 @@ class TestEventController(unittest2.TestCase):
                 start_date=datetime(this_year, 03, 24),
                 webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
                 website="http://www.firstsv.org",
-                matchstats_json='{"ranking_prediction_stats": null, "match_predictions": null, "ranking_predictions": null, "match_prediction_stats": null}',
         )
         self.event1.put()
         self.event2.put()
+
+        self.event1_details = EventDetails(
+            id=self.event1.key.id(),
+            matchstats={"ranking_prediction_stats": None, "match_predictions": None, "ranking_predictions": None, "match_prediction_stats": None}
+        )
+        self.event1_details.put()
+
+        self.event2_details = EventDetails(
+            id=self.event2.key.id(),
+            matchstats={"ranking_prediction_stats": None, "match_predictions": None, "ranking_predictions": None, "match_prediction_stats": None}
+        )
+        self.event2_details.put()
 
     def tearDown(self):
         self.testbed.deactivate()

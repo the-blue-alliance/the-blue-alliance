@@ -24,15 +24,6 @@ class EventManipulator(ManipulatorBase):
         """
         for (event, updated_attrs) in zip(events, updated_attr_list):
             try:
-                if event.within_a_day and "alliance_selections_json" in updated_attrs:
-                    # Send updated alliances notification
-                    logging.info("Sending alliance notifications for {}".format(event.key_name))
-                    NotificationHelper.send_alliance_update(event)
-            except Exception:
-                logging.error("Error sending alliance update notification for {}".format(event.key_name))
-                logging.error(traceback.format_exc())
-
-            try:
                 event.timezone_id = EventHelper.get_timezone_id(event.location, event.key.id())
                 cls.createOrUpdate(event, run_post_update_hook=False)
             except Exception:

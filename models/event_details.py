@@ -23,20 +23,5 @@ class EventDetails(ndb.Model):
         }
         super(EventDetails, self).__init__(*args, **kw)
 
-    @property
-    def alliance_teams(self):
-        """
-        Load a list of team keys playing in elims
-        """
-        alliances = self.alliance_selections
-        if alliances is None:
-            return []
-        teams = []
-        for alliance in alliances:
-            for pick in alliance['picks']:
-                teams.append(pick)
-        return teams
-
-    @property
     def key_name(self):
         return self.key.id()

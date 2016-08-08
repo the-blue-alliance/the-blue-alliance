@@ -118,24 +118,22 @@ class AdminEventRemapTeams(LoggedInHandler):
         MatchManipulator.createOrUpdate(event.matches)
 
         # Remap alliance selections
-        for row in event.alliance_selections:
-            for choice in ['picks', 'declines']:
-                for old_team, new_team in remap_teams.items():
-                    for i, key in enumerate(row[choice]):
-                        if key == old_team:
-                            event.dirty = True
-                            row[choice][i] = new_team
-                            event.alliance_selections_json = json.dumps(event.alliance_selections)
+        if event.alliance_selections:
+            for row in event.alliance_selections:
+                for choice in ['picks', 'declines']:
+                    for old_team, new_team in remap_teams.items():
+                        for i, key in enumerate(row[choice]):
+                            if key == old_team:
+                                row[choice][i] = new_team
 
         # Remap rankings
-        for row in event.rankings:
-            for old_team, new_team in remap_teams.items():
-                if row[1] == old_team[3:]:
-                    event.dirty = True
-                    row[1] = new_team[3:]
-                    event.rankings_json = json.dumps(event.rankings)
+        if event.rankings:
+            for row in event.rankings:
+                for old_team, new_team in remap_teams.items():
+                    if row[1] == old_team[3:]:
+                        row[1] = new_team[3:]
 
-        EventManipulator.createOrUpdate(event)
+        EventDetailsManipulator.createOrUpdate(event.details)
 
         # Remap awards
         for award in event.awards:
