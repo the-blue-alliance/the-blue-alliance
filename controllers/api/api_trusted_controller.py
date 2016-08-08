@@ -45,7 +45,6 @@ class ApiTrustedEventAllianceSelectionsUpdate(ApiTrustedBaseController):
 
         event_details = EventDetails(
             id=event_key,
-            parent=event.key,
             alliance_selections=alliance_selections
         )
         EventDetailsManipulator.createOrUpdate(event_details)
@@ -186,7 +185,6 @@ class ApiTrustedEventRankingsUpdate(ApiTrustedBaseController):
 
         event_details = EventDetails(
             id=event_key,
-            parent=event.key,
             rankings=rankings
         )
         EventDetailsManipulator.createOrUpdate(event_details)

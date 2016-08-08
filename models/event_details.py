@@ -5,10 +5,7 @@ class EventDetails(ndb.Model):
     """
     EventsDetails contains aggregate details about an event that tends to
     update often throughout an event. This includes rankings, event stats, etc.
-    key_name is like '2010ct'
-
-    In order to make strongly consistent DB requests, instances of this class
-    should be created with a parent that is the associated Event key.
+    key_name is the event key, like '2010ct'
     """
     alliance_selections = ndb.JsonProperty()  # Formatted as: [{'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] }, {'picks': [], 'declines': []}, ... ]
     district_points = ndb.JsonProperty()

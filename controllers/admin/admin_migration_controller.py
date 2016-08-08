@@ -14,7 +14,6 @@ def create_event_details(event_key):
   event = Event.get_by_id(event_key)
   event_details = EventDetails(
     id=event_key,
-    parent=event.key,
     alliance_selections=event.alliance_selections,
     district_points=event.district_points,
     matchstats=event.matchstats,
