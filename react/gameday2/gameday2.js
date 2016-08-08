@@ -53,7 +53,6 @@ store.dispatch(setWebcastsRaw(webcastData))
 // Now that webcasts are loaded, attempt to restore any state that's present in
 // the URL hash
 const params = queryString.parse(location.hash)
-console.log(params)
 if (params.layout && Number.isInteger(Number.parseInt(params.layout, 10))) {
   store.dispatch(setLayout(Number.parseInt(params.layout, 10)))
 }

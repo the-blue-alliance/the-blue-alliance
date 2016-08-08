@@ -9,12 +9,11 @@ export default React.createClass({
     let src = `http://www.ustream.tv/embed/${channel}?html5ui=1`
     return (
       <iframe
-        width={this.props.vidWidth}
-        height={this.props.vidHeight}
+        width="100%"
+        height="100%"
         src={src}
         scrolling="no"
         allowFullScreen
-        webkitallowfullscreen
         frameBorder="0"
         style={{ border: '0 none transparent' }}
       ></iframe>

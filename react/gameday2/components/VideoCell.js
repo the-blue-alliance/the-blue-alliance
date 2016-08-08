@@ -1,12 +1,15 @@
 import React, { PropTypes } from 'react'
+import classNames from 'classnames'
 import VideoOverlayContainer from '../containers/VideoOverlayContainer'
 import WebcastSelectionPanel from './WebcastSelectionPanel'
 import EmbedUstream from './EmbedUstream'
 import EmbedYoutube from './EmbedYoutube'
 import EmbedTwitch from './EmbedTwitch'
+import { WebcastPropType } from '../utils/webcastUtils'
 
 const VideoCell = React.createClass({
   propTypes: {
+    webcast: WebcastPropType,
     webcasts: PropTypes.array.isRequired,
     webcastsById: PropTypes.object.isRequired,
     displayedWebcasts: PropTypes.array.isRequired,
@@ -20,47 +23,38 @@ const VideoCell = React.createClass({
     }
   },
   onMouseOver() {
-    this.setState({ 'mouseOver': true })
+    this.setState({ mouseOver: true })
   },
   onMouseOut() {
-    this.setState({ 'mouseOver': false })
+    this.setState({ mouseOver: false })
   },
   showWebcastSelectionPanel() {
-    this.setState({ 'showWebcastSelectionPanel': true })
+    this.setState({ showWebcastSelectionPanel: true })
   },
   hideWebcastSelectionPanel() {
-    this.setState({ 'showWebcastSelectionPanel': false })
+    this.setState({ showWebcastSelectionPanel: false })
   },
   webcastSelected(webcastId) {
     this.props.addWebcastAtLocation(webcastId, this.props.location)
     this.hideWebcastSelectionPanel()
   },
   render() {
-    let classes = 'video-cell video-' + this.props.location
+    let classes = classNames({
+      'video-cell': true,
+       [`video-${this.props.location}`]: true
+     })
 
     if (this.props.webcast) {
       let cellEmbed
       switch (this.props.webcast.type) {
         case 'ustream':
-          cellEmbed = (<EmbedUstream
-            webcast={this.props.webcast}
-            vidHeight={this.props.vidHeight}
-            vidWidth={this.props.vidWidth}
-          />)
+          cellEmbed = (<EmbedUstream webcast={this.props.webcast} />)
           break
         case 'youtube':
-          cellEmbed = (<EmbedYoutube
-            webcast={this.props.webcast}
-            vidHeight={this.props.vidHeight}
-            vidWidth={this.props.vidWidth}
-          />)
+          cellEmbed = (<EmbedYoutube webcast={this.props.webcast} />)
           break
         case 'twitch':
-          cellEmbed = (<EmbedTwitch
-            webcast={this.props.webcast}
-            vidHeight={this.props.vidHeight}
-            vidWidth={this.props.vidWidth}
-          />)
+          cellEmbed = (<EmbedTwitch webcast={this.props.webcast} />)
           break
         default:
           cellEmbed = ''
@@ -69,7 +63,6 @@ const VideoCell = React.createClass({
 
       return (
         <div className={classes}
-          idName={this.props.webcast.id}
           onMouseOver={this.onMouseOver}
           onMouseOut={this.onMouseOut}
         >

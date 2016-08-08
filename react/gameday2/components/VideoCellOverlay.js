@@ -13,6 +13,7 @@ const VideoCellOverlay = React.createClass({
   getInitialState() {
     return {
       showWebcastSelectionPanel: false,
+      showSwapPanel: false,
     }
   },
   onCloseClicked() {
@@ -53,9 +54,9 @@ const VideoCellOverlay = React.createClass({
       'expanded': this.isOverlayExpanded(),
     })
     if (this.props.webcast) {
-      const closeTooltip = (<Tooltip>Close webcast</Tooltip>)
-      const changeWebcastTooltip = (<Tooltip>Change webcast</Tooltip>)
-      const swapWebcastTooltip = (<Tooltip>Swap webcast position</Tooltip>)
+      const closeTooltip = (<Tooltip id="closeTooltip">Close webcast</Tooltip>)
+      const changeWebcastTooltip = (<Tooltip id="changeWebcastTooltip">Change webcast</Tooltip>)
+      const swapWebcastTooltip = (<Tooltip id="swapWebcastTooltip">Swap webcast position</Tooltip>)
       return (
         <div className={classes}>
           <div className="panel-heading">

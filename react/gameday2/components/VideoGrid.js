@@ -126,8 +126,6 @@ const VideoGrid = React.createClass({
           displayedWebcasts={this.props.displayedWebcasts}
           addWebcastAtLocation={this.props.addWebcastAtLocation}
           removeWebcast={this.props.removeWebcast}
-          vidHeight="100%"
-          vidWidth="100%"
         />
       )
     }
