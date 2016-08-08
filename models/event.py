@@ -40,13 +40,6 @@ class Event(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
-    # The following properties are deprecated. TODO: Remove entirely
-    matchstats_json = ndb.TextProperty(indexed=False)  # for OPR, DPR, CCWM, etc.
-    rankings_json = ndb.TextProperty(indexed=False)
-    alliance_selections_json = ndb.TextProperty(indexed=False)  # Formatted as: [{'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] }, {'picks': [], 'declines': []}, ... ]
-    district_points_json = ndb.TextProperty(indexed=False)
-    # End deprecated properties
-
     def __init__(self, *args, **kw):
         # store set of affected references referenced keys for cache clearing
         # keys must be model properties

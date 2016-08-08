@@ -144,12 +144,6 @@ class FMSAPIEventAlliancesGet(webapp.RequestHandler):
         event = Event.get_by_id(event_key)
 
         alliance_selections = df.getEventAlliances(event_key)
-        if alliance_selections and event.alliance_selections != alliance_selections:
-            event.alliance_selections_json = json.dumps(alliance_selections)
-            event._alliance_selections = None
-            event.dirty = True
-
-        EventManipulator.createOrUpdate(event)
 
         event_details = EventDetails(
             id=event_key,
@@ -158,7 +152,7 @@ class FMSAPIEventAlliancesGet(webapp.RequestHandler):
         EventDetailsManipulator.createOrUpdate(event_details)
 
         template_values = {'alliance_selections': alliance_selections,
-                           'event_name': event.key_name}
+                           'event_name': event_details.key.id()}
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
             path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_alliances_get.html')
@@ -201,13 +195,6 @@ class FMSAPIEventRankingsGet(webapp.RequestHandler):
 
         rankings = df.getEventRankings(event_key)
 
-        event = Event.get_by_id(event_key)
-        if rankings and event.rankings_json != json.dumps(rankings):
-            event.rankings_json = json.dumps(rankings)
-            event.dirty = True
-
-        EventManipulator.createOrUpdate(event)
-
         event_details = EventDetails(
             id=event_key,
             rankings=rankings
@@ -215,7 +202,7 @@ class FMSAPIEventRankingsGet(webapp.RequestHandler):
         EventDetailsManipulator.createOrUpdate(event_details)
 
         template_values = {'rankings': rankings,
-                           'event_name': event.key_name}
+                           'event_name': event_details.key.id()}
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
             path = os.path.join(os.path.dirname(__file__), '../templates/datafeeds/usfirst_event_rankings_get.html')

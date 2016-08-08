@@ -161,9 +161,6 @@ class EventMatchstatsDo(webapp.RequestHandler):
             matchstats_dict['ranking_prediction_stats'] = ranking_prediction_stats
 
         if any([v != {} for v in matchstats_dict.values()]):
-            event.matchstats_json = json.dumps(matchstats_dict)
-            EventManipulator.createOrUpdate(event)
-
             event_details = EventDetails(
                 id=event_key,
                 matchstats=matchstats_dict
@@ -460,9 +457,6 @@ class DistrictPointsCalcDo(webapp.RequestHandler):
             return
 
         district_points = DistrictHelper.calculate_event_points(event)
-
-        event.district_points_json = json.dumps(district_points)
-        EventManipulator.createOrUpdate(event)
 
         event_details = EventDetails(
             id=event_key,

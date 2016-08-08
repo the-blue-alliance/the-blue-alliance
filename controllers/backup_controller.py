@@ -172,11 +172,6 @@ class TbaCSVRestoreEventDo(webapp.RequestHandler):
         else:
             data = result.content.replace('frc', '')
             alliance_selections = CSVAllianceSelectionsParser.parse(data)
-            if alliance_selections and event.alliance_selections != alliance_selections:
-                event.alliance_selections_json = json.dumps(alliance_selections)
-                event._alliance_selections = None
-                event.dirty = True
-            EventManipulator.createOrUpdate(event)
 
             event_details = EventDetails(
                 id=event_key,
@@ -241,11 +236,6 @@ class TbaCSVRestoreEventDo(webapp.RequestHandler):
         else:
             # convert into expected input format
             rankings = list(csv.reader(StringIO.StringIO(result.content), delimiter=','))
-            if rankings and event.rankings != rankings:
-                event.rankings_json = json.dumps(rankings)
-                event._rankings = None
-                event.dirty = True
-            EventManipulator.createOrUpdate(event)
 
             event_details = EventDetails(
                 id=event_key,
