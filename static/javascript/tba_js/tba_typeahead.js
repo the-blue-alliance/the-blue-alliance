@@ -8,7 +8,7 @@ $(document).ready(function(){
       name: 'teams',
       prefetch: {
         url: '/_/typeahead/teams-all',
-        filter: unicodeFilter
+        filter: teamFilter
       },
       header: '<div class="tba-typeahead-header">Teams</div>'
     },
@@ -16,7 +16,7 @@ $(document).ready(function(){
       name: 'events',
       prefetch: {
         url: '/_/typeahead/events-all',
-        filter: unicodeFilter
+        filter: eventFilter
       },
       header: '<div class="tba-typeahead-header">Events</div>'
     }
@@ -65,7 +65,7 @@ function cleanUnicode(s){
   return a;
 };
 
-function unicodeFilter(data) {
+function teamFilter(data) {
   var to_return = [];
   for(var i=0; i<data.length; i++) {
     to_return.push({
@@ -73,5 +73,17 @@ function unicodeFilter(data) {
       tokens: cleanUnicode(data[i]).split(' ')
     });
   }
+  return to_return;
+}
+
+function eventFilter(data) {
+  var to_return = [];
+  for(var i=0; i<data.length; i++) {
+    to_return.push({
+      value: data[i],
+      tokens: cleanUnicode(data[i]).replace('[', '').replace(']', '').split(' ')
+    });
+  }
+  console.log(to_return);
   return to_return;
 }

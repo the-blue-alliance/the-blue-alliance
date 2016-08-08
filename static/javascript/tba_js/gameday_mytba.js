@@ -12,7 +12,7 @@ $(function() {
       {
         prefetch: {
           url: '/_/typeahead/teams-all',
-          filter: unicodeFilter
+          filter: teamFilter
         },
       }
     ]);
