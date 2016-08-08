@@ -166,7 +166,6 @@ class EventMatchstatsDo(webapp.RequestHandler):
 
             event_details = EventDetails(
                 id=event_key,
-                parent=event.key,
                 matchstats=matchstats_dict
             )
             EventDetailsManipulator.createOrUpdate(event_details)
@@ -467,7 +466,6 @@ class DistrictPointsCalcDo(webapp.RequestHandler):
 
         event_details = EventDetails(
             id=event_key,
-            parent=event.key,
             district_points=district_points
         )
         EventDetailsManipulator.createOrUpdate(event_details)
