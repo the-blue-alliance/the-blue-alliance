@@ -263,7 +263,9 @@ class AdminEventEdit(LoggedInHandler):
         event = Event.get_by_id(event_key)
 
         self.template_values.update({
-            "event": event
+            "event": event,
+            'alliance_selections': json.dumps(event.alliance_selections),
+            'rankings': json.dumps(event.rankings),
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_edit.html')
