@@ -6,6 +6,7 @@ from helpers.manipulator_base import ManipulatorBase
 from helpers.notification_helper import NotificationHelper
 
 from models.event import Event
+from helpers.manipulator_base import ManipulatorBase
 
 
 class EventDetailsManipulator(ManipulatorBase):

@@ -23,6 +23,5 @@ class EventDetails(ndb.Model):
         }
         super(EventDetails, self).__init__(*args, **kw)
 
-    @property
     def key_name(self):
         return self.key.id()
