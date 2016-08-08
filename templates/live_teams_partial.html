@@ -3,6 +3,10 @@
         <div class="row">
         <div class="col-xs-10">
           <a href="/event/{{ event.key_name }}"><h3>{{ event.name }}</h3></a>
+          <p>
+              {% if event.location %}<span class="glyphicon glyphicon-map-marker"></span> in <a href="http://maps.google.com/maps?q={{ event.location }}" target="_blank">{{ event.location }}</a><br />{% endif %}
+              {% if event.start_date %}<span class="glyphicon glyphicon-calendar"></span> {{ event.start_date|date:"M d" }}{% if event.start_date|date:"M d" != event.end_date|date:"M d" %} - {{ event.end_date|date:"M d" }}{% endif %}, {{ event.end_date|date:"Y" }}{% endif %}
+            </p>
         </div>
         <div class="col-xs-1 h3">
           {% if event.webcast %}

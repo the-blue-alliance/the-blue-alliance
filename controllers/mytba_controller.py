@@ -24,13 +24,8 @@ class MyTBALiveController(LoggedInHandler):
         now = datetime.datetime.now()
         team_favorites_future = Favorite.query(Favorite.model_type == ModelType.TEAM, ancestor=user).fetch_async()
 
-        live_events = EventHelper.getEventsWithinADay()
         favorite_team_keys = map(lambda f: ndb.Key(Team, f.model_key), team_favorites_future.get_result())
         favorite_teams_future = ndb.get_multi_async(favorite_team_keys)
-
-        live_eventteams_futures = []
-        for event in live_events:
-            live_eventteams_futures.append(EventTeamsQuery(event.key_name).fetch_async())
 
         favorite_teams = [team_future.get_result() for team_future in favorite_teams_future]
 
@@ -38,19 +33,32 @@ class MyTBALiveController(LoggedInHandler):
         for team in favorite_teams:
             favorite_teams_events_futures.append(TeamYearEventsQuery(team.key_name, now.year).fetch_async())
 
-        live_events_with_teams = EventTeamStatusHelper.buildEventTeamStatus(live_events, live_eventteams_futures, favorite_teams)
-
+        past_events = []
+        past_eventteams_futures = []
+        live_events = []
+        live_eventteams_futures = []
         future_events_by_event = {}
         for team, events_future in zip(favorite_teams, favorite_teams_events_futures):
             events = events_future.get_result()
             if not events:
                 continue
             EventHelper.sort_events(events)
+            for event in events:
+                if event.within_a_day:
+                    live_events.append(event)
+                    live_eventteams_futures.append(EventTeamsQuery(event.key_name).fetch_async())
+                elif event.start_date < now:
+                    past_events.append(event)
+                    past_eventteams_futures.append(EventTeamsQuery(event.key_name).fetch_async())
+
             next_event = next((e for e in events if e.start_date > now and not e.within_a_day), None)
             if next_event:
                 if next_event.key_name not in future_events_by_event:
                     future_events_by_event[next_event.key_name] = (next_event, [])
                 future_events_by_event[next_event.key_name][1].append(team)
+
+        past_events_with_teams = EventTeamStatusHelper.buildEventTeamStatus(past_events, past_eventteams_futures, favorite_teams)
+        live_events_with_teams = EventTeamStatusHelper.buildEventTeamStatus(live_events, live_eventteams_futures, favorite_teams)
 
         future_events_with_teams = []
         for event_key, data in future_events_by_event.iteritems():
@@ -60,6 +68,7 @@ class MyTBALiveController(LoggedInHandler):
         future_events_with_teams.sort(key=lambda x: EventHelper.distantFutureIfNoEndDate(x[0]))
 
         self.template_values.update({
+            'past_events_with_teams': past_events_with_teams,
             'live_events_with_teams': live_events_with_teams,
             'future_events_with_teams': future_events_with_teams,
         })
