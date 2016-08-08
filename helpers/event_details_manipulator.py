@@ -44,6 +44,7 @@ class EventDetailsManipulator(ManipulatorBase):
             'alliance_selections',
             'district_points',
             'matchstats',
+            'predictions',
             'rankings',
         ]
 

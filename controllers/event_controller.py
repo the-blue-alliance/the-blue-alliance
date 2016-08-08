@@ -245,11 +245,11 @@ class EventInsights(CacheableHandler):
 
         event.get_matches_async()
 
-        match_predictions = event.matchstats.get('match_predictions', None)
-        match_prediction_stats = event.matchstats.get('match_prediction_stats', None)
+        match_predictions = event.details.predictions.get('match_predictions', None)
+        match_prediction_stats = event.details.predictions.get('match_prediction_stats', None)
 
-        ranking_predictions = event.matchstats.get('ranking_predictions', None)
-        ranking_prediction_stats = event.matchstats.get('ranking_prediction_stats', None)
+        ranking_predictions = event.details.predictions.get('ranking_predictions', None)
+        ranking_prediction_stats = event.details.predictions.get('ranking_prediction_stats', None)
 
         cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
         matches = MatchHelper.organizeMatches(cleaned_matches)

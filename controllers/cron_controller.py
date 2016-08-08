@@ -149,25 +149,31 @@ class EventMatchstatsDo(webapp.RequestHandler):
     def get(self, event_key):
         event = Event.get_by_id(event_key)
         matchstats_dict = MatchstatsHelper.calculate_matchstats(event.matches, event.year)
+        if any([v != {} for v in matchstats_dict.values()]):
+            pass
+        else:
+            logging.warn("Matchstat calculation for {} failed!".format(event_key))
+            matchstats_dict = None
 
+        predictions_dict = None
         if event.year == 2016:
             organized_matches = MatchHelper.organizeMatches(event.matches)
             match_predictions, match_prediction_stats = PredictionHelper.get_match_predictions(organized_matches['qm'])
             ranking_predictions, ranking_prediction_stats = PredictionHelper.get_ranking_predictions(organized_matches['qm'], match_predictions)
 
-            matchstats_dict['match_predictions'] = match_predictions
-            matchstats_dict['match_prediction_stats'] = match_prediction_stats
-            matchstats_dict['ranking_predictions'] = ranking_predictions
-            matchstats_dict['ranking_prediction_stats'] = ranking_prediction_stats
+            predictions_dict = {
+                'match_predictions': match_predictions,
+                'match_prediction_stats': match_prediction_stats,
+                'ranking_predictions': ranking_predictions,
+                'ranking_prediction_stats': ranking_prediction_stats
+            }
 
-        if any([v != {} for v in matchstats_dict.values()]):
-            event_details = EventDetails(
-                id=event_key,
-                matchstats=matchstats_dict
-            )
-            EventDetailsManipulator.createOrUpdate(event_details)
-        else:
-            logging.warn("Matchstat calculation for {} failed!".format(event_key))
+        event_details = EventDetails(
+            id=event_key,
+            matchstats=matchstats_dict,
+            predictions=predictions_dict
+        )
+        EventDetailsManipulator.createOrUpdate(event_details)
 
         template_values = {
             'matchstats_dict': matchstats_dict,
