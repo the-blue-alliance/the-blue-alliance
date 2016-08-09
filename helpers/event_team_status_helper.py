@@ -18,7 +18,7 @@ class EventTeamStatusHelper(object):
 
             teams_and_statuses_future = []
             for team in live_teams_in_district:
-                teams_and_statuses_future.append((team, EventTeamStatusHelper.generateTeamAtEventStatusAsync(team.key_name, event)))
+                teams_and_statuses_future.append([team, EventTeamStatusHelper.generateTeamAtEventStatusAsync(team.key_name, event)])
             if teams_and_statuses_future:
                 live_events_with_teams.append((event, teams_and_statuses_future))
 

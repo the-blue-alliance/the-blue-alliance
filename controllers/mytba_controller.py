@@ -82,6 +82,14 @@ class MyTBALiveController(LoggedInHandler):
         future_events_with_teams.sort(key=lambda x: EventHelper.distantFutureIfNoStartDate(x[0]))
         future_events_with_teams.sort(key=lambda x: EventHelper.distantFutureIfNoEndDate(x[0]))
 
+        # Resolve future before rendering
+        for _, teams_and_statuses_future in past_events_with_teams:
+            for team_and_status_future in teams_and_statuses_future:
+                team_and_status_future[1] = team_and_status_future[1].get_result()
+        for _, teams_and_statuses_future in live_events_with_teams:
+            for team_and_status_future in teams_and_statuses_future:
+                team_and_status_future[1] = team_and_status_future[1].get_result()
+
         self.template_values.update({
             'past_events_with_teams': past_events_with_teams,
             'live_events_with_teams': live_events_with_teams,

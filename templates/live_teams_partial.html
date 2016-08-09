@@ -29,7 +29,7 @@
             {% for team_and_status in live_event.1 %}
                 <tr>
                     {% with team_and_status.0 as team %}
-                        {% with team_and_status.1.get_result as status %}
+                        {% with team_and_status.1 as status %}
                             <td>{{ team.team_number }}</td>
                             <td>
                                 <a href="/team/{{ team.team_number }}/{{ event.year }}#{{ event.key_name }}">{{ team.nickname }}</a>
