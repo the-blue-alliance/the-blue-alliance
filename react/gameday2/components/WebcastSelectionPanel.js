@@ -13,7 +13,7 @@ const WebcastSelectionPanel = (props) => {
       <WebcastSelectionPanelItem
         key={webcast.id}
         webcast={webcast}
-        webcastSelected={this.props.webcastSelected}
+        webcastSelected={props.webcastSelected}
       />
     )
   }

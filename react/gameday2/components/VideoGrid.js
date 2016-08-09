@@ -44,7 +44,6 @@ export default React.createClass({
     webcastsById: PropTypes.object.isRequired,
     layoutId: PropTypes.number.isRequired,
     addWebcastAtLocation: PropTypes.func.isRequired,
-    removeWebcast: PropTypes.func.isRequired,
   },
   getInitialState() {
     return {
@@ -128,7 +127,6 @@ export default React.createClass({
           webcastsById={this.props.webcastsById}
           displayedWebcasts={this.props.displayedWebcasts}
           addWebcastAtLocation={this.props.addWebcastAtLocation}
-          removeWebcast={this.props.removeWebcast}
         />
       )
     }
