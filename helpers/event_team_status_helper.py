@@ -1,3 +1,5 @@
+from google.appengine.ext.ndb.tasklets import Future
+
 from database.match_query import TeamEventMatchesQuery
 from helpers.match_helper import MatchHelper
 from helpers.team_helper import TeamHelper
@@ -6,11 +8,12 @@ from helpers.team_helper import TeamHelper
 class EventTeamStatusHelper(object):
 
     @classmethod
-    def buildEventTeamStatus(cls, live_events, live_eventteams_futures, team_filter):
+    def buildEventTeamStatus(cls, live_events, live_eventteams, team_filter):
         # Currently Competing Team Status
         live_events_with_teams = []
-        for event, teams_future in zip(live_events, live_eventteams_futures):
-            live_teams_in_district = TeamHelper.sortTeams(filter(lambda t: t in team_filter, teams_future.get_result()))
+        for event, teams in zip(live_events, live_eventteams):
+            teams = teams.get_result() if type(teams) == Future else teams
+            live_teams_in_district = TeamHelper.sortTeams(filter(lambda t: t in team_filter, teams))
 
             teams_and_statuses = []
             for team in live_teams_in_district:

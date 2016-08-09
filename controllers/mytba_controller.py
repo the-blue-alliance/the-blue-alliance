@@ -33,11 +33,8 @@ class MyTBALiveController(LoggedInHandler):
         for team in favorite_teams:
             favorite_teams_events_futures.append(TeamYearEventsQuery(team.key_name, now.year).fetch_async())
 
-        past_events = []
-        past_eventteams_futures = []
-        live_events = []
-        live_eventteams_futures = []
-        processed_events = set()
+        past_events_by_event = {}
+        live_events_by_event = {}
         future_events_by_event = {}
         for team, events_future in zip(favorite_teams, favorite_teams_events_futures):
             events = events_future.get_result()
@@ -45,15 +42,14 @@ class MyTBALiveController(LoggedInHandler):
                 continue
             EventHelper.sort_events(events)
             for event in events:
-                if event.key_name in processed_events:
-                    continue
-                processed_events.add(event.key_name)
                 if event.within_a_day:
-                    live_events.append(event)
-                    live_eventteams_futures.append(EventTeamsQuery(event.key_name).fetch_async())
+                    if event.key_name not in live_events_by_event:
+                        live_events_by_event[event.key_name] = (event, [])
+                    live_events_by_event[event.key_name][1].append(team)
                 elif event.start_date < now:
-                    past_events.append(event)
-                    past_eventteams_futures.append(EventTeamsQuery(event.key_name).fetch_async())
+                    if event.key_name not in past_events_by_event:
+                        past_events_by_event[event.key_name] = (event, [])
+                    past_events_by_event[event.key_name][1].append(team)
 
             next_event = next((e for e in events if e.start_date > now and not e.within_a_day), None)
             if next_event:
@@ -61,12 +57,22 @@ class MyTBALiveController(LoggedInHandler):
                     future_events_by_event[next_event.key_name] = (next_event, [])
                 future_events_by_event[next_event.key_name][1].append(team)
 
-        past_events_with_teams = EventTeamStatusHelper.buildEventTeamStatus(past_events, past_eventteams_futures, favorite_teams)
+        past_events = []
+        past_eventteams = []
+        for past_event, past_eventteam in past_events_by_event.itervalues():
+            past_events.append(past_event)
+            past_eventteams.append(past_eventteam)
+        past_events_with_teams = EventTeamStatusHelper.buildEventTeamStatus(past_events, past_eventteams, favorite_teams)
         past_events_with_teams.sort(key=lambda x: x[0].name)
         past_events_with_teams.sort(key=lambda x: EventHelper.distantFutureIfNoStartDate(x[0]))
         past_events_with_teams.sort(key=lambda x: EventHelper.distantFutureIfNoEndDate(x[0]))
 
-        live_events_with_teams = EventTeamStatusHelper.buildEventTeamStatus(live_events, live_eventteams_futures, favorite_teams)
+        live_events = []
+        live_eventteams = []
+        for live_event, live_eventteam in live_events_by_event.itervalues():
+            live_events.append(live_event)
+            live_eventteams.append(live_eventteam)
+        live_events_with_teams = EventTeamStatusHelper.buildEventTeamStatus(live_events, live_eventteams, favorite_teams)
         live_events_with_teams.sort(key=lambda x: x[0].name)
 
         future_events_with_teams = []
