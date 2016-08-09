@@ -26,14 +26,11 @@ class EventTeamStatusHelper(object):
         return live_events_with_teams
 
     @classmethod
-    @ndb.tasklet
-    def _get_alliance_number_async(cls, team_key, event):
+    def _get_alliance_number(cls, team_key, event_details):
         """
         Get the alliance number of the team
         Returns 0 when the team is not on an alliance
         """
-        event_details = yield EventDetails.get_by_id_async(event.key.id())
-
         alliance_number = None
         if event_details and event_details.alliance_selections:
             for i, alliance in enumerate(event_details.alliance_selections):
@@ -42,7 +39,7 @@ class EventTeamStatusHelper(object):
                     break
             else:
                 alliance_number = 0  # Team didn't make it to elims
-        raise ndb.Return(alliance_number)
+        return alliance_number
 
     @classmethod
     def _get_playoff_status(cls, team_key, matches, alliance_number):
@@ -102,14 +99,11 @@ class EventTeamStatusHelper(object):
         return wins, losses, ties, unplayed_qual
 
     @classmethod
-    @ndb.tasklet
-    def _get_rank_async(cls, team_number, event):
+    def _get_rank(cls, team_number, event_details):
         """
         Returns tuple of <team rank, # RP, total num teams>
         Assumes 2016 format
         """
-        event_details = yield EventDetails.get_by_id_async(event.key.id())
-
         rank = "?"
         ranking_points = 0
         num_teams = "?"
@@ -122,7 +116,7 @@ class EventTeamStatusHelper(object):
                     ranking_points = int(float(row[2]))
                     record = row[7]
                     break
-        raise ndb.Return(rank, ranking_points, record, num_teams)
+        return rank, ranking_points, record, num_teams
 
     @classmethod
     @ndb.tasklet
@@ -132,11 +126,11 @@ class EventTeamStatusHelper(object):
         :return: a tuple future <long summary string, qual record, qual ranking, playoff status>
         """
         team_number = team_key[3:]
-        matches = yield TeamEventMatchesQuery(team_key, event.key.id()).fetch_async()
+        matches, event_details = yield TeamEventMatchesQuery(team_key, event.key.id()).fetch_async(), EventDetails.get_by_id_async(event.key.id())
         matches = MatchHelper.organizeMatches(matches)
 
         # Compute alliances
-        alliance_number = yield cls._get_alliance_number_async(team_key, event)
+        alliance_number = cls._get_alliance_number(team_key, event_details)
 
         # Playoff Status
         status, short_playoff_status = cls._get_playoff_status(team_key, matches, alliance_number)
@@ -150,7 +144,7 @@ class EventTeamStatusHelper(object):
 
         # Compute rank & num_teams
         # Gets record from ranking data to account for surrogate matches
-        rank, ranking_points, record, num_teams = yield cls._get_rank_async(team_number, event)
+        rank, ranking_points, record, num_teams = cls._get_rank(team_number, event_details)
         rank_str = "Rank {} with {} RP".format(rank, ranking_points)
 
         # Compute final long status for nightbot, if one isn't already there
