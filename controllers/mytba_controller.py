@@ -62,6 +62,10 @@ class MyTBALiveController(LoggedInHandler):
                 future_events_by_event[next_event.key_name][1].append(team)
 
         past_events_with_teams = EventTeamStatusHelper.buildEventTeamStatus(past_events, past_eventteams_futures, favorite_teams)
+        past_events_with_teams.sort(key=lambda x: x[0].name)
+        past_events_with_teams.sort(key=lambda x: EventHelper.distantFutureIfNoStartDate(x[0]))
+        past_events_with_teams.sort(key=lambda x: EventHelper.distantFutureIfNoEndDate(x[0]))
+
         live_events_with_teams = EventTeamStatusHelper.buildEventTeamStatus(live_events, live_eventteams_futures, favorite_teams)
         live_events_with_teams.sort(key=lambda x: x[0].name)
 
