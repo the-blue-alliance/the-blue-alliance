@@ -42,7 +42,7 @@ const VideoCell = React.createClass({
     let classes = classNames({
       'video-cell': true,
       [`video-${this.props.location}`]: true,
-     })
+    })
 
     if (this.props.webcast) {
       let cellEmbed

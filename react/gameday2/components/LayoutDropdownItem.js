@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react'
 
 export default React.createClass({
   propTypes: {
+    children: PropTypes.node,
     layoutId: PropTypes.number.isRequired,
     handleClick: PropTypes.func.isRequired,
   },

@@ -3,6 +3,7 @@ import classNames from 'classnames'
 
 export default React.createClass({
   propTypes: {
+    children: PropTypes.node,
     a: PropTypes.string,
     handleClick: PropTypes.func,
   },
@@ -20,7 +21,7 @@ export default React.createClass({
   },
   render() {
     const classes = classNames({
-      'btn': true,
+      btn: true,
       'btn-default': true,
       'navbar-btn': true,
     })

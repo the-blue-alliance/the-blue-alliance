@@ -1,19 +1,21 @@
-import React, { PropTypes } from 'react'
+import React from 'react'
+import { WebcastPropType } from '../utils/webcastUtils'
 
-export default React.createClass({
-  propTypes: {
-    webcast: PropTypes.object.isRequired,
-  },
-  render() {
-    let src = '//www.youtube.com/embed/' + this.props.webcast.channel
-    return (
-      <iframe
-        width="100%"
-        height="100%"
-        src={src}
-        frameBorder="0"
-        allowFullScreen
-      ></iframe>
-    )
-  },
-})
+const EmbedYoutube = (props) => {
+  const src = `//www.youtube.com/embed/${props.webcast.channel}`
+  return (
+    <iframe
+      width="100%"
+      height="100%"
+      src={src}
+      frameBorder="0"
+      allowFullScreen
+    />
+  )
+}
+
+EmbedYoutube.propTypes = {
+  webcast: WebcastPropType.isRequired,
+}
+
+export default EmbedYoutube

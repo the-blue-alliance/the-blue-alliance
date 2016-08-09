@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 import { NUM_VIEWS_FOR_LAYOUT } from '../constants/LayoutConstants'
 
 // Convenience wrapper around NUM_VIEWS_FOR_LAYOUT that has bounds checking and
@@ -8,3 +9,5 @@ export function getNumViewsForLayout(layoutId) {
   }
   return 1
 }
+
+export { getNumViewsForLayout as default }

@@ -4,6 +4,7 @@ import classNames from 'classnames'
 
 export default React.createClass({
   propTypes: {
+    children: PropTypes.node,
     checked: PropTypes.bool.isRequired,
     handleClick: PropTypes.func,
   },
@@ -17,13 +18,13 @@ export default React.createClass({
   },
   render() {
     let checkmarkClasses = classNames({
-      'hidden': !this.props.checked,
+      hidden: !this.props.checked,
       'glyphicon glyphicon-ok': true,
       'pull-right': true,
     })
     return (
       <NativeListener onClick={this.handleClick}>
-        <li><a href={'#'} onClick={this.handleClick}>{this.props.children} <span className={checkmarkClasses} /></a></li>
+        <li><button href={'#'} onClick={this.handleClick}>{this.props.children} <span className={checkmarkClasses} /></button></li>
       </NativeListener>
     )
   },

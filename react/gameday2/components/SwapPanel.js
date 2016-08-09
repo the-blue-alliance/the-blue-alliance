@@ -22,9 +22,14 @@ const SwapPanel = React.createClass({
         [`video-${i}`]: true,
         'current-location': i === this.props.location,
       })
+      /* eslint-disable react/jsx-no-bind */
+      // Disabling this is OK because this component doesn't re-render
+      // frequently, so there is no real performance hit caused by creating a
+      // brand new function on every single render.
       videoViews.push(
         <div className={className} key={className} onClick={this.swapLocationSelected.bind(this, i)} />
       )
+      /* eslint-enable react/jsx-no-bind */
     }
 
     const containerClasses = classNames({

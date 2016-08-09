@@ -1,6 +1,10 @@
-import React from 'react'
+import React, { PropTypes } from 'react'
 
 export default React.createClass({
+  propTypes: {
+    team: PropTypes.string,
+    onUnfollowTeam: PropTypes.func,
+  },
   unfollowTeam() {
     this.props.onUnfollowTeam(this.props.team)
   },

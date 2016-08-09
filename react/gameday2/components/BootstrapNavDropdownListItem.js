@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react'
 
 export default React.createClass({
   propTypes: {
+    children: PropTypes.node,
     data_toggle: PropTypes.string,
     data_target: PropTypes.string,
     a: PropTypes.string,
@@ -17,7 +18,6 @@ export default React.createClass({
       // If a callback to handle the click is given, prevent the default behavior
       event.preventDefault()
       this.props.handleClick()
-      return false
     }
   },
   render() {
