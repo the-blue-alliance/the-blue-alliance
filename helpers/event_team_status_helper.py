@@ -1,3 +1,4 @@
+from google.appengine.ext import ndb
 from google.appengine.ext.ndb.tasklets import Future
 
 from database.match_query import TeamEventMatchesQuery
@@ -15,11 +16,11 @@ class EventTeamStatusHelper(object):
             teams = teams.get_result() if type(teams) == Future else teams
             live_teams_in_district = TeamHelper.sortTeams(filter(lambda t: t in team_filter, teams))
 
-            teams_and_statuses = []
+            teams_and_statuses_future = []
             for team in live_teams_in_district:
-                teams_and_statuses.append((team, EventTeamStatusHelper.generateTeamAtEventStatus(team.key_name, event)))
-            if teams_and_statuses:
-                live_events_with_teams.append((event, teams_and_statuses))
+                teams_and_statuses_future.append((team, EventTeamStatusHelper.generateTeamAtEventStatusAsync(team.key_name, event)))
+            if teams_and_statuses_future:
+                live_events_with_teams.append((event, teams_and_statuses_future))
 
         return live_events_with_teams
 
@@ -117,14 +118,15 @@ class EventTeamStatusHelper(object):
         return rank, ranking_points, record, num_teams
 
     @classmethod
-    def generateTeamAtEventStatus(cls, team_key, event):
+    @ndb.tasklet
+    def generateTeamAtEventStatusAsync(cls, team_key, event):
         """
         Generate Team@Event status items
-        :return: a tuple <long summary string, qual record, qual ranking, playoff status>
+        :return: a tuple future <long summary string, qual record, qual ranking, playoff status>
         """
         team_number = team_key[3:]
-        matches_future = TeamEventMatchesQuery(team_key, event.key.id()).fetch_async()
-        matches = MatchHelper.organizeMatches(matches_future.get_result())
+        matches = yield TeamEventMatchesQuery(team_key, event.key.id()).fetch_async()
+        matches = MatchHelper.organizeMatches(matches)
 
         # Compute alliances
         alliance_number = cls._get_alliance_number(team_key, event)
@@ -158,4 +160,4 @@ class EventTeamStatusHelper(object):
             else:
                 status = "Team {} will be competing in the playoff matches on alliance #{}.".format(team_number, alliance_number)
 
-        return status, record, rank_str, short_playoff_status
+        raise ndb.Return(status, record, rank_str, short_playoff_status)
