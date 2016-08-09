@@ -37,6 +37,7 @@ class MyTBALiveController(LoggedInHandler):
         past_eventteams_futures = []
         live_events = []
         live_eventteams_futures = []
+        processed_events = set()
         future_events_by_event = {}
         for team, events_future in zip(favorite_teams, favorite_teams_events_futures):
             events = events_future.get_result()
@@ -44,6 +45,9 @@ class MyTBALiveController(LoggedInHandler):
                 continue
             EventHelper.sort_events(events)
             for event in events:
+                if event.key_name in processed_events:
+                    continue
+                processed_events.add(event.key_name)
                 if event.within_a_day:
                     live_events.append(event)
                     live_eventteams_futures.append(EventTeamsQuery(event.key_name).fetch_async())
@@ -59,6 +63,7 @@ class MyTBALiveController(LoggedInHandler):
 
         past_events_with_teams = EventTeamStatusHelper.buildEventTeamStatus(past_events, past_eventteams_futures, favorite_teams)
         live_events_with_teams = EventTeamStatusHelper.buildEventTeamStatus(live_events, live_eventteams_futures, favorite_teams)
+        live_events_with_teams.sort(key=lambda x: x[0].name)
 
         future_events_with_teams = []
         for event_key, data in future_events_by_event.iteritems():

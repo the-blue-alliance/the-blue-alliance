@@ -102,6 +102,7 @@ class DistrictDetail(CacheableHandler):
 
         # Currently Competing Team Status
         live_events_with_teams = EventTeamStatusHelper.buildEventTeamStatus(live_events, live_eventteams_futures, teams)
+        live_events_with_teams.sort(key=lambda x: x[0].name)
 
         self.template_values.update({
             'explicit_year': explicit_year,
