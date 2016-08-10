@@ -1,15 +1,12 @@
-jest.unmock('../../selectors')
-jest.unmock('reselect')
-
 import * as selectors from '../../selectors'
 
 describe('getWebcastIds selector', () => {
   const sampleState = {
     webcastsById: {
-      'a': {},
-      'b': {},
-      'c': {}
-    }
+      a: {},
+      b: {},
+      c: {},
+    },
   }
 
   it('correctly extracts the ids', () => {
@@ -20,27 +17,27 @@ describe('getWebcastIds selector', () => {
 describe('getWebcastIdsInDisplayOrder selector', () => {
   const sampleState = {
     webcastsById: {
-      'a': {
+      a: {
         id: 'a',
-        sortOrder: 3
+        sortOrder: 3,
       },
-      'b': {
+      b: {
         id: 'b',
-        sortOrder: 1
+        sortOrder: 1,
       },
-      'c': {
+      c: {
         id: 'c',
-        sortOrder: 2
+        sortOrder: 2,
       },
-      'd': {
+      d: {
         id: 'd',
-        name: 'ccc'
+        name: 'ccc',
       },
-      'e': {
+      e: {
         id: 'e',
-        name: 'aaa'
-      }
-    }
+        name: 'aaa',
+      },
+    },
   }
 
   it('correctly sorts and returns the ids', () => {

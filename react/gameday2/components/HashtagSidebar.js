@@ -1,29 +1,34 @@
-import React from 'react'
-var classNames = require('classnames')
+import React, { PropTypes } from 'react'
+import classNames from 'classnames'
 
-var HashtagSidebar = React.createClass({
-  componentDidMount: function() {
-    !function(d,s,id){
-      var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https'
-      if(!d.getElementById(id)){
-        js=d.createElement(s);js.id=id
-        js.src=p+"://platform.twitter.com/widgets.js"
-        fjs.parentNode.insertBefore(js,fjs)
-      }
-    }
-    (document,"script","twitter-wjs")
+export default React.createClass({
+  propTypes: {
+    enabled: PropTypes.bool,
   },
-  render: function() {
-    var classes = classNames({
-      'hidden': !this.props.enabled,
-      'hashtag-sidebar': true
+  componentDidMount() {
+    (function (d, s, id) {
+      const fjs = d.getElementsByTagName(s)[0]
+      const p = /^http:/.test(d.location) ? 'http' : 'https'
+      if (!d.getElementById(id)) {
+        const js = d.createElement(s); js.id = id
+        /* eslint-disable prefer-template */
+        js.src = p + '://platform.twitter.com/widgets.js'
+        /* eslint-enable prefer-template */
+        fjs.parentNode.insertBefore(js, fjs)
+      }
+    }(document, 'script', 'twitter-wjs'))
+  },
+  render() {
+    const classes = classNames({
+      hidden: !this.props.enabled,
+      'hashtag-sidebar': true,
     })
     return (
       <div className={classes}>
-        <div id="twitter-widget"><a className="twitter-timeline" href="https://twitter.com/search?q=%23omgrobots" data-widget-id="406597120632709121">Tweets about "#omgrobots"</a></div>
+        <div id="twitter-widget">
+          <a className="twitter-timeline" href="https://twitter.com/search?q=%23omgrobots" data-widget-id="406597120632709121">Tweets about "#omgrobots"</a>
+        </div>
       </div>
-    );
-  }
-});
-
-export default HashtagSidebar
+    )
+  },
+})
