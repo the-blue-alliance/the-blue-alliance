@@ -1,48 +1,43 @@
 {% for live_event in live_events_with_teams %}
     {% with live_event.0 as event %}
         <div class="row">
-        <div class="col-xs-10">
-          <a href="/event/{{ event.key_name }}"><h3>{{ event.name }}</h3></a>
-          <p>
-              {% if event.location %}<span class="glyphicon glyphicon-map-marker"></span> in <a href="http://maps.google.com/maps?q={{ event.location }}" target="_blank">{{ event.location }}</a><br />{% endif %}
-              {% if event.start_date %}<span class="glyphicon glyphicon-calendar"></span> {{ event.start_date|date:"M d" }}{% if event.start_date|date:"M d" != event.end_date|date:"M d" %} - {{ event.end_date|date:"M d" }}{% endif %}, {{ event.end_date|date:"Y" }}{% endif %}
-            </p>
-        </div>
-        <div class="col-xs-1 h3">
-          {% if event.webcast %}
-            {% if event.now %}
-              <a class="btn btn-success btn-small" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
-            {% else %}
-              <a class="btn btn-default btn-small disabled">Offline</a>
-            {% endif %}
-          {% endif %}
-        </div>
-        </div>
-        <table class="table table-striped table-condensed col-xs-11">
-            <tr>
-                <th>Team Number</th>
-                <th>Team Name</th>
-                <th>Qual Record</th>
-                <th>Ranking</th>
-                <th>Playoff Status</th>
-            </tr>
-            {% for team_and_status in live_event.1 %}
-                <tr>
-                    {% with team_and_status.0 as team %}
-                        {% with team_and_status.1 as status %}
-                            <td>{{ team.team_number }}</td>
-                            <td>
-                                <a href="/team/{{ team.team_number }}/{{ event.year }}#{{ event.key_name }}">{{ team.nickname }}</a>
-                            </td>
-                            <td>{{ status.1 }}</td>
-                            <td>{{ status.2 }}</td>
-                            {% with status.3 as playoff %}
-                                <td>{% if playoff %} {{ playoff }} {% endif %}</td>
+            <div class="col-xs-12">
+                <a href="/event/{{ event.key_name }}"><h3>{{ event.name }}</h3></a>
+                {% if event.now and event.webcast %}
+                <a class="btn btn-success btn-small pull-right" href="{{event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
+                {% endif %}
+                <p>
+                    {% if event.location %}<span class="glyphicon glyphicon-map-marker"></span> in <a href="http://maps.google.com/maps?q={{ event.location }}" target="_blank">{{ event.location }}</a><br />{% endif %}
+                    {% if event.start_date %}<span class="glyphicon glyphicon-calendar"></span> {{ event.start_date|date:"M d" }}{% if event.start_date|date:"M d" != event.end_date|date:"M d" %} - {{ event.end_date|date:"M d" }}{% endif %}, {{ event.end_date|date:"Y" }}{% endif %}
+                </p>
+
+                <table class="table table-striped table-condensed col-xs-11">
+                    <tr>
+                        <th>Team Number</th>
+                        <th>Team Name</th>
+                        <th>Qual Record</th>
+                        <th>Ranking</th>
+                        <th>Playoff Status</th>
+                    </tr>
+                    {% for team_and_status in live_event.1 %}
+                        <tr>
+                            {% with team_and_status.0 as team %}
+                                {% with team_and_status.1 as status %}
+                                    <td>{{ team.team_number }}</td>
+                                    <td>
+                                        <a href="/team/{{ team.team_number }}/{{ event.year }}#{{ event.key_name }}">{{ team.nickname }}</a>
+                                    </td>
+                                    <td>{{ status.1 }}</td>
+                                    <td>{{ status.2 }}</td>
+                                    {% with status.3 as playoff %}
+                                        <td>{% if playoff %} {{ playoff }} {% endif %}</td>
+                                    {% endwith %}
+                                {% endwith %}
                             {% endwith %}
-                        {% endwith %}
-                    {% endwith %}
-                </tr>
-            {% endfor %}
-        </table>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
     {% endwith %}
 {% endfor %}
