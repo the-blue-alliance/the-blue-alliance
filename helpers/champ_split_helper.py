@@ -94,5 +94,6 @@ class ChampSplitHelper(object):
                 # Non US/CA other countries
                 return cls.LOCATION_CHAMP_MAP[team.country]
         else:
-            logging.warning("Unknown country: {}".format(team.country))
+            if team.country is not None:
+                logging.warning("Unknown country: {}".format(team.country))
             return None
