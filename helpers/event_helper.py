@@ -224,15 +224,18 @@ class EventHelper(object):
             else:
                 return partial
 
-        # other districts and regionals
-        match = re.match(r'\s*(?:MAR |PNW |)(?:FIRST Robotics|FRC|)(.+)(?:District|Regional|Region|State|Tournament|FRC|Field)\b', name_str)
+        # district championships, other districts, and regionals
+        match = re.match(r'\s*(?:MAR |PNW |)(?:FIRST Robotics|FRC|)(.+)(?:District|Regional|Region|Provincial|State|Tournament|FRC|Field)\b', name_str)
         if match:
             short = match.group(1)
             match = re.match(r'(.+)(?:FIRST Robotics|FRC)', short)
             if match:
-                return match.group(1).strip()
+                result = match.group(1).strip()
             else:
-                return short.strip()
+                result = short.strip()
+            if result.startswith('FIRST'):
+                result = result[5:]
+            return result.strip()
 
         return name_str.strip()
 
