@@ -1,17 +1,19 @@
-import React from 'react';
+import React, { PropTypes } from 'react'
 
-var FollowingTeamListItem = React.createClass({
-  unfollowTeam: function() {
+export default React.createClass({
+  propTypes: {
+    team: PropTypes.string,
+    onUnfollowTeam: PropTypes.func,
+  },
+  unfollowTeam() {
     this.props.onUnfollowTeam(this.props.team)
   },
-  render: function() {
+  render() {
     return (
       <li>
         {this.props.team}
         <a href="#" onClick={this.unfollowTeam}>&times;</a>
       </li>
-    );
-  }
-});
-
-export default FollowingTeamListItem;
+    )
+  },
+})

@@ -1,16 +1,16 @@
-import React, { PropTypes } from 'react';
-import BootstrapNavDropdownListItem from './BootstrapNavDropdownListItem';
+import React, { PropTypes } from 'react'
+import BootstrapNavDropdownListItem from './BootstrapNavDropdownListItem'
+import { WebcastPropType } from '../utils/webcastUtils'
 
-var WebcastListItem = React.createClass({
+export default React.createClass({
   propTypes: {
-    addWebcast: PropTypes.func.isRequired
+    webcast: WebcastPropType.isRequired,
+    addWebcast: PropTypes.func.isRequired,
   },
-  handleClick: function() {
-    this.props.addWebcast(this.props.webcast.id);
+  handleClick() {
+    this.props.addWebcast(this.props.webcast.id)
   },
-  render: function() {
+  render() {
     return <BootstrapNavDropdownListItem handleClick={this.handleClick}>{this.props.webcast.name}</BootstrapNavDropdownListItem>
   },
-});
-
-export default WebcastListItem;
+})

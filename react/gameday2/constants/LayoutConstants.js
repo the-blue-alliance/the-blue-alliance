@@ -20,5 +20,5 @@ export const NAME_FOR_LAYOUT = [
   '"1+4" View',
   'Hex View',
   'Octo-View',
-  'Nona-View'
+  'Nona-View',
 ]

@@ -1,6 +1,3 @@
-jest.unmock('../visibility')
-jest.unmock('../../constants/ActionTypes')
-
 import visibility from '../visibility'
 import * as types from '../../constants/ActionTypes'
 
@@ -9,7 +6,7 @@ describe('visibility reducer', () => {
     const expectedState = {
       hashtagSidebar: false,
       chatSidebar: false,
-      tickerSidebar: false
+      tickerSidebar: false,
     }
     expect(visibility(undefined, {})).toEqual(expectedState)
   })
@@ -18,15 +15,15 @@ describe('visibility reducer', () => {
     const initialState = {
       hashtagSidebar: false,
       chatSidebar: false,
-      tickerSidebar: false
+      tickerSidebar: false,
     }
     const expectedState = {
       hashtagSidebar: false,
       chatSidebar: true,
-      tickerSidebar: false
+      tickerSidebar: false,
     }
     const action = {
-      type: types.TOGGLE_CHAT_SIDEBAR_VISIBILITY
+      type: types.TOGGLE_CHAT_SIDEBAR_VISIBILITY,
     }
     expect(visibility(initialState, action)).toEqual(expectedState)
   })
@@ -35,15 +32,15 @@ describe('visibility reducer', () => {
     const initialState = {
       hashtagSidebar: false,
       chatSidebar: true,
-      tickerSidebar: false
+      tickerSidebar: false,
     }
     const expectedState = {
       hashtagSidebar: false,
       chatSidebar: false,
-      tickerSidebar: false
+      tickerSidebar: false,
     }
     const action = {
-      type: types.TOGGLE_CHAT_SIDEBAR_VISIBILITY
+      type: types.TOGGLE_CHAT_SIDEBAR_VISIBILITY,
     }
     expect(visibility(initialState, action)).toEqual(expectedState)
   })
@@ -52,15 +49,15 @@ describe('visibility reducer', () => {
     const initialState = {
       hashtagSidebar: false,
       chatSidebar: false,
-      tickerSidebar: false
+      tickerSidebar: false,
     }
     const expectedState = {
       hashtagSidebar: true,
       chatSidebar: false,
-      tickerSidebar: false
+      tickerSidebar: false,
     }
     const action = {
-      type: types.TOGGLE_HASHTAG_SIDEBAR_VISIBILITY
+      type: types.TOGGLE_HASHTAG_SIDEBAR_VISIBILITY,
     }
     expect(visibility(initialState, action)).toEqual(expectedState)
   })
@@ -69,15 +66,15 @@ describe('visibility reducer', () => {
     const initialState = {
       hashtagSidebar: true,
       chatSidebar: false,
-      tickerSidebar: false
+      tickerSidebar: false,
     }
     const expectedState = {
       hashtagSidebar: false,
       chatSidebar: false,
-      tickerSidebar: false
+      tickerSidebar: false,
     }
     const action = {
-      type: types.TOGGLE_HASHTAG_SIDEBAR_VISIBILITY
+      type: types.TOGGLE_HASHTAG_SIDEBAR_VISIBILITY,
     }
     expect(visibility(initialState, action)).toEqual(expectedState)
   })

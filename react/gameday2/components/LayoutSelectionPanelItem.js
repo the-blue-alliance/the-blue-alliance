@@ -1,25 +1,30 @@
-import React, { PropTypes} from 'react'
+import React, { PropTypes } from 'react'
+import classNames from 'classnames'
 import { NUM_VIEWS_FOR_LAYOUT, NAME_FOR_LAYOUT } from '../constants/LayoutConstants'
-let classNames = require('classnames')
 
-const LayoutSelectionPanelItem = React.createClass({
+export default React.createClass({
   propTypes: {
     layoutId: PropTypes.number.isRequired,
-    setLayout: PropTypes.func.isRequired
+    setLayout: PropTypes.func.isRequired,
   },
-  handleClick: function() {
+  handleClick() {
     this.props.setLayout(this.props.layoutId)
   },
-  render: function() {
+  render() {
     let videoViews = []
-    let layoutId = this.props.layoutId
-    for(let i = 0; i < NUM_VIEWS_FOR_LAYOUT[layoutId]; i++) {
-      let className = ("video-" + i)
+    const layoutId = this.props.layoutId
+    for (let i = 0; i < NUM_VIEWS_FOR_LAYOUT[layoutId]; i++) {
+      let className = `video-${i}`
       videoViews.push(
         <div className={className} key={className} />
       )
     }
-    let containerClasses = 'layout-preview layout-' + layoutId
+
+    const containerClasses = classNames({
+      'layout-preview': true,
+      [`layout-${layoutId}`]: true,
+    })
+
     return (
       <div className="col-md-4 layout-preview-container" onClick={this.handleClick} >
         <div className={containerClasses}>
@@ -28,7 +33,5 @@ const LayoutSelectionPanelItem = React.createClass({
         <p>{NAME_FOR_LAYOUT[layoutId]}</p>
       </div>
     )
-  }
+  },
 })
-
-export default LayoutSelectionPanelItem

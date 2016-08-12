@@ -8,7 +8,7 @@ const gamedayReducer = combineReducers({
   webcastsById,
   visibility,
   displayedWebcasts,
-  layout
+  layout,
 })
 
 export default gamedayReducer
