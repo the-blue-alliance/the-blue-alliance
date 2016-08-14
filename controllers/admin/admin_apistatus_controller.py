@@ -22,6 +22,7 @@ class AdminApiStatus(LoggedInHandler):
 
         self.template_values.update({
             'max_year': status.get('max_season', 2016),
+            'current_year': status.get('current_season', 2016),
             'android_latest_version': android_status.get('latest_app_version', -1) if android_status else -1,
             'android_min_version': android_status.get('min_app_version', -1) if android_status else -1,
             'ios_latest_version': ios_status.get('latest_app_version', -1) if ios_status else -1,
@@ -41,6 +42,7 @@ class AdminApiStatus(LoggedInHandler):
         status['android'] = {}
         status['ios'] = {}
         status['max_season'] = int(self.request.get('max_year'))
+        status['current_season'] = int(self.request.get('current_year'))
         status['android']['latest_app_version'] = int(self.request.get('android_latest_version'))
         status['android']['min_app_version'] = int(self.request.get('android_min_version'))
         status['ios']['latest_app_version'] = int(self.request.get('ios_latest_version'))
