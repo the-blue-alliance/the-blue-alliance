@@ -229,10 +229,22 @@ class MatchHelper(object):
     """
     Valid breakdowns are those used for seeding. Varies by year.
     For 2014, seeding outlined in Section 5.3.4 in the 2014 manual.
+    For 2016+, valid breakdowns match those provided by the FRC API.
     """
     VALID_BREAKDOWNS = {
         2014: set(['auto', 'assist', 'truss+catch', 'teleop_goal+foul']),
         2015: set(['coopertition_points', 'auto_points', 'container_points', 'tote_points', 'litter_points', 'foul_points']),
+        2016: set([
+            'adjustPoints', 'autoBoulderPoints', 'autoBouldersHigh', 'autoBouldersLow',
+            'autoCrossingPoints', 'autoPoints', 'autoReachPoints', 'breachPoints',
+            'capturePoints', 'foulCount', 'foulPoints', 'position1crossings',
+            'position2', 'position2crossings', 'position3', 'position3crossings',
+            'position4', 'position4crossings', 'position5', 'position5crossings',
+            'robot1Auto', 'robot2Auto', 'robot3Auto', 'techFoulCount',
+            'teleopBoulderPoints', 'teleopBouldersHigh', 'teleopBouldersLow',
+            'teleopChallengePoints', 'teleopCrossingPoints', 'teleopDefensesBreached',
+            'teleopPoints', 'teleopScalePoints', 'teleopTowerCaptured', 'totalPoints',
+            'towerEndStrength', 'towerFaceA', 'towerFaceB', 'towerFaceC'])
     }
 
     @classmethod
