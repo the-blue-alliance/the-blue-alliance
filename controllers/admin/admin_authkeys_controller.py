@@ -14,14 +14,14 @@ class AdminAuthKeys(LoggedInHandler):
     """
     def get(self):
         self._require_admin()
-        google_secrets = Sitevar.get_by_id('google.secrets')
-        firebase_secrets = Sitevar.get_by_id('firebase.secrets')
-        fmsapi_secrets = Sitevar.get_by_id('fmsapi.secrets')
-        mobile_clientIds = Sitevar.get_by_id('mobile.clientIds')
-        gcm_serverKey = Sitevar.get_by_id('gcm.serverKey')
+        google_secrets = Sitevar.get_or_insert('google.secrets')
+        firebase_secrets = Sitevar.get_or_insert('firebase.secrets')
+        fmsapi_secrets = Sitevar.get_or_insert('fmsapi.secrets')
+        mobile_clientIds = Sitevar.get_or_insert('mobile.clientIds')
+        gcm_serverKey = Sitevar.get_or_insert('gcm.serverKey')
 
-        fmsapi_keys = fmsapi_secrets.contents if fmsapi_secrets else {}
-        clientIds = mobile_clientIds.contents if mobile_clientIds else {}
+        fmsapi_keys = fmsapi_secrets.contents if fmsapi_secrets and isinstance(fmsapi_secrets.contents, dict) else {}
+        clientIds = mobile_clientIds.contents if mobile_clientIds and isinstance(mobile_clientIds.contents, dict) else {}
         self.template_values.update({
             'google_secret': google_secrets.contents.get('api_key', "") if google_secrets else "",
             'firebase_secret': firebase_secrets.contents.get('FIREBASE_SECRET', "") if firebase_secrets else "",
@@ -29,7 +29,7 @@ class AdminAuthKeys(LoggedInHandler):
             'fmsapi_secret': fmsapi_keys.get('authkey', ''),
             'web_client_id': clientIds.get('web', ''),
             'android_client_id': clientIds.get('android', ''),
-            'gcm_key': gcm_serverKey.contents if gcm_serverKey else "",
+            'gcm_key': gcm_serverKey.contents.get("gcm_key", "") if gcm_serverKey else "",
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/authkeys.html')
@@ -56,7 +56,7 @@ class AdminAuthKeys(LoggedInHandler):
         firebase_secrets.contents = {'FIREBASE_SECRET': firebase_key}
         fmsapi_secrets.contents = {'username': fmsapi_user, 'authkey': fmsapi_secret}
         mobile_clientIds.contents = {'web': web_client_id, 'android': android_client_id}
-        gcm_serverKey.contents = gcm_key
+        gcm_serverKey.contents = {'gcm_key': gcm_key}
 
         google_secrets.put()
         firebase_secrets.put()
