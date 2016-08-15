@@ -83,6 +83,7 @@ Run a local dev server
   * Visit, say, [localhost:8088/tasks/get/usfirst_teams_tpids/2015?skip=0](http://localhost:8088/tasks/get/usfirst_teams_tpids/2015?skip=0), [localhost:8088/tasks/get/usfirst_teams_tpids/2015?skip=1000](http://localhost:8088/tasks/get/usfirst_teams_tpids/2015?skip=1000), ...
   * Also visit [localhost:8088/tasks/enqueue/usfirst_event_details/2015](http://localhost:8088/tasks/enqueue/usfirst_event_details/2015), [2014](http://localhost:8088/tasks/enqueue/usfirst_event_details/2014), ...
   * Once you have events for a certain year, you can visit [localhost:8088/tasks/enqueue/csv_restore_events/2015](http://localhost:8088/tasks/enqueue/csv_restore_events/2015), [2014](http://localhost:8088/tasks/enqueue/csv_restore_events/2014), ... etc. to get data from [github.com/the-blue-alliance/the-blue-alliance-data](https://github.com/the-blue-alliance/the-blue-alliance-data) instead of hitting up usfirst.org lots of times.
+  * If you want to test development using the offical FMS API, you can request API keys [here](https://usfirst.collab.net/sf/projects/first_community_developers/). Once you have your keys, you can input them in [the admin panel](http://localhost:8088/admin/authkeys)
 5. Ignore these warnings in the local dev server:
   * `pytz is required to calculate future run times for cron jobs with timezones` (The pytz library is in the source tree and works fine.)
 

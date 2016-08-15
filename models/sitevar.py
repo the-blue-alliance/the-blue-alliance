@@ -15,7 +15,7 @@ class Sitevar(ndb.Model):
     manually edited by site administrators in the admin console.
     """
     description = ndb.StringProperty(indexed=False)
-    values_json = ndb.StringProperty(indexed=False)  # a json blob
+    values_json = ndb.StringProperty(indexed=False, default="{}")  # a json blob
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)

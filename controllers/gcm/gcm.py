@@ -106,8 +106,7 @@ class GCMConnection:
         self.SERVER_KEY = Sitevar.get_by_id('gcm.serverKey')
         if self.SERVER_KEY is None:
             raise Exception("Missing sitevar: gcm.serverKey. Can't send GCM messages.")
-        logging.info("GCM KEY: "+str(self.SERVER_KEY.values_json))
-        self.GCM_CONFIG = {'gcm_api_key': str(self.SERVER_KEY.values_json) }
+        self.GCM_CONFIG = {'gcm_api_key': self.SERVER_KEY.contents['gcm_key']}
         self.GOOGLE_LOGIN_URL = 'https://www.google.com/accounts/ClientLogin'
         # Can't use https on localhost due to Google cert bug
         self.GOOGLE_GCM_SEND_URL = 'https://android.apis.google.com/gcm/send'
