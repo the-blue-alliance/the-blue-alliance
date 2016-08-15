@@ -25,16 +25,21 @@ from models.mobile_api_messages import BaseResponse, FavoriteCollection, Favorit
 from models.mobile_client import MobileClient
 from models.suggestion import Suggestion
 
-client_id_sitevar = Sitevar.get_by_id('appengine.webClientId')
-if client_id_sitevar is None:
-    raise Exception("Sitevar appengine.webClientId is undefined. Can't process incoming requests")
-WEB_CLIENT_ID = str(client_id_sitevar.values_json)
-ANDROID_AUDIENCE = WEB_CLIENT_ID
+WEB_CLIENT_ID = ""
+ANDROID_AUDIENCE = ""
+ANDROID_CLIENT_ID = ""
 
-android_id_sitevar = Sitevar.get_by_id('android.clientId')
-if android_id_sitevar is None:
-    raise Exception("Sitevar android.clientId is undefined. Can't process incoming requests")
-ANDROID_CLIENT_ID = str(android_id_sitevar.values_json)
+client_ids_sitevar = Sitevar.get_or_insert('mobile.clientIds')
+if isinstance(client_ids_sitevar.contents, dict):
+    WEB_CLIENT_ID = client_ids_sitevar.contents.get("web", "")
+    ANDROID_AUDIENCE = WEB_CLIENT_ID
+    ANDROID_CLIENT_ID = client_ids_sitevar.contents.get("android", "")
+
+if not WEB_CLIENT_ID:
+    logging.error("Web client ID is not set, see /admin/authkeys")
+
+if not ANDROID_CLIENT_ID:
+    logging.error("Android client ID is not set, see /admin/authkeys")
 
 # To enable iOS access to the API, add another variable for the iOS client ID
 
