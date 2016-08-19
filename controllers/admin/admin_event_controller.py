@@ -307,12 +307,13 @@ class AdminEventEdit(LoggedInHandler):
         )
         event = EventManipulator.createOrUpdate(event)
 
-        event_details = EventDetails(
-            id=event_key,
-            alliance_selections=json.loads(self.request.get("alliance_selections_json")),
-            rankings=json.loads(self.request.get("rankings_json"))
-        )
-        EventDetailsManipulator.createOrUpdate(event_details)
+        if self.request.get("alliance_selections_json") or self.request.get("rankings_json"):
+            event_details = EventDetails(
+                id=event_key,
+                alliance_selections=json.loads(self.request.get("alliance_selections_json")),
+                rankings=json.loads(self.request.get("rankings_json"))
+            )
+            EventDetailsManipulator.createOrUpdate(event_details)
 
         MemcacheWebcastFlusher.flushEvent(event.key_name)
 
