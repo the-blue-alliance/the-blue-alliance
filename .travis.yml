@@ -15,7 +15,7 @@ install:
 
   - mkdir -p vendors
   - wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.40.zip -nv
-  - unzip -qd vendors google_appengine_1.8.7.zip
+  - unzip -qd vendors google_appengine_1.9.40.zip
   - ln -s vendors/google_appengine/dev_appserver.py .
 
   # JavaScript test requirements
