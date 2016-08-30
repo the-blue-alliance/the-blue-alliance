@@ -14,7 +14,7 @@ install:
   - pip install -r requirements.txt
 
   - mkdir -p vendors
-  - wget http://googleappengine.googlecode.com/files/google_appengine_1.8.7.zip -nv
+  - wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.40.zip -nv
   - unzip -qd vendors google_appengine_1.8.7.zip
   - ln -s vendors/google_appengine/dev_appserver.py .
 
