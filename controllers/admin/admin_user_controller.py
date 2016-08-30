@@ -18,7 +18,7 @@ class AdminUserList(LoggedInHandler):
     """
     def get(self):
         self._require_admin()
-        users = Account.query().order(Account.created).fetch(10000)
+        users = Account.query().order(Account.created).fetch()
 
         self.template_values.update({
             "users": users,
