@@ -66,6 +66,7 @@ class DistrictType(object):
         'Indiana': INDIANA,
         'Chesapeake': CHESAPEAKE,
         'NC FIRST': NORTH_CAROLINA,
+        'FIRST North Carolina': NORTH_CAROLINA,  # 2017 uses a different name
         'Peachtree': GEORGIA,
         'FIRST Ontario': ONTARIO,
     }
