@@ -60,10 +60,11 @@ class ApiDistrictListController(ApiDistrictControllerBase):
         district_keys = [DistrictType.type_abbrevs[event.event_district_enum] for event in events]
         districts = list()
         for key in district_keys:
-            dictionary = dict()
-            dictionary["key"] = key
-            dictionary["name"] = DistrictType.type_names[DistrictType.abbrevs[key]]
-            districts.append(dictionary)
+            if key in DistrictType.abbrevs:
+                dictionary = dict()
+                dictionary["key"] = key
+                dictionary["name"] = DistrictType.type_names[DistrictType.abbrevs[key]]
+                districts.append(dictionary)
 
         return json.dumps(districts, ensure_ascii=True)
 

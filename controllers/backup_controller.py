@@ -22,6 +22,7 @@ from models.award import Award
 from models.event import Event
 from models.event_details import EventDetails
 from models.match import Match
+from models.media import Media
 from models.team import Team
 
 from datafeeds.csv_alliance_selections_parser import CSVAllianceSelectionsParser
@@ -266,6 +267,8 @@ class TbaCSVBackupTeamsDo(webapp.RequestHandler):
     def get(self):
         team_keys = Team.query().order(Team.team_number).fetch(None, keys_only=True)
         team_futures = ndb.get_multi_async(team_keys)
+
+        social_medias = yield Media.query(Media.year == None).fetch_async()
 
         if team_futures:
             with cloudstorage.open(self.TEAMS_FILENAME_PATTERN, 'w') as teams_file:
