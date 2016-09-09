@@ -15,10 +15,10 @@ const SwapPanel = React.createClass({
     this.props.swapToLocation(location)
   },
   render() {
-    let videoViews = []
+    const videoViews = []
     const layoutId = this.props.layoutId
     for (let i = 0; i < NUM_VIEWS_FOR_LAYOUT[layoutId]; i++) {
-      let className = classNames({
+      const className = classNames({
         [`video-${i}`]: true,
         'current-location': i === this.props.location,
       })

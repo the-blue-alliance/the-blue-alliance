@@ -11,10 +11,10 @@ export default React.createClass({
     this.props.setLayout(this.props.layoutId)
   },
   render() {
-    let videoViews = []
+    const videoViews = []
     const layoutId = this.props.layoutId
     for (let i = 0; i < NUM_VIEWS_FOR_LAYOUT[layoutId]; i++) {
-      let className = `video-${i}`
+      const className = `video-${i}`
       videoViews.push(
         <div className={className} key={className} />
       )

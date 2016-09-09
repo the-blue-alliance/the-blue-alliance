@@ -5,7 +5,7 @@ import LayoutDropdownItem from '../LayoutDropdownItem'
 
 describe('LayoutDropdown', () => {
   it('reacts to click events on children', () => {
-    let setLayoutSpy = jasmine.createSpy()
+    const setLayoutSpy = jasmine.createSpy()
     const wrapper = mount(<LayoutDropdown setLayout={setLayoutSpy} />)
 
     wrapper.find(LayoutDropdownItem).first().simulate('click')
