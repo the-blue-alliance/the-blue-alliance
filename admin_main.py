@@ -14,7 +14,7 @@ from controllers.admin.admin_match_controller import AdminVideosAdd, AdminMatchC
 from controllers.admin.admin_media_controller import AdminMediaDashboard, AdminMediaDeleteReference, AdminMediaMakePreferred, AdminMediaRemovePreferred, AdminMediaAdd
 from controllers.admin.admin_memcache_controller import AdminMemcacheMain
 from controllers.admin.admin_migration_controller import AdminMigration, AdminMigrationCreateEventDetails
-from controllers.admin.admin_mobile_controller import AdminMobile, AdminBroadcast
+from controllers.admin.admin_mobile_controller import AdminMobile, AdminBroadcast, AdminMobileWebhooks
 from controllers.admin.admin_offseason_scraper_controller import AdminOffseasonScraperController
 from controllers.admin.admin_offseason_spreadsheet_controller import AdminOffseasonSpreadsheetController
 from controllers.admin.admin_sitevar_controller import AdminSitevarCreate, AdminSitevarEdit, AdminSitevarList
@@ -75,5 +75,6 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/videos/add', AdminVideosAdd),
                                ('/admin/mobile', AdminMobile),
                                ('/admin/mobile/broadcast', AdminBroadcast),
+                               ('/admin/mobile/webhooks', AdminMobileWebhooks),
                                ],
                               debug=tba_config.DEBUG)

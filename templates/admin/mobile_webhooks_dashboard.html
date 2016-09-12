@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Webhooks Dashboard{% endblock %}
+
+{% block content %}
+<ol class="breadcrumb">
+  <li><a href="/admin/mobile">Mobile Dashboard</a></li>
+  <li class="active">Webhooks Dashboard</li>
+</ol>
+
+<h1>Webhooks Dashboard</h1>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Account</th>
+      <th>URL</th>
+      <th>Verified</th>
+      <th>Created</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for webhook in webhooks %}
+      <tr>
+        <td><a href="/admin/user/{{webhook.user_id}}">{{webhook.user_id}}</a></td>
+        <td>{{webhook.messaging_id}}</td>
+        <td>{% if webhook.verified %}<span class="glyphicon glyphicon-check"></span>{% endif %}</td>
+        <td>{{webhook.created}}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

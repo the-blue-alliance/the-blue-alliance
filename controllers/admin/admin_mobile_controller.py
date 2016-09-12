@@ -60,6 +60,23 @@ class AdminMobile(LoggedInHandler):
         self.redirect('/admin/mobile')
 
 
+class AdminMobileWebhooks(LoggedInHandler):
+    """
+    Details on webhooks
+    """
+    def get(self):
+        self._require_admin()
+
+        webhooks = MobileClient.query(MobileClient.client_type == ClientType.WEBHOOK).fetch()
+
+        self.template_values.update({
+            'webhooks': webhooks,
+        })
+
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/mobile_webhooks_dashboard.html')
+        self.response.out.write(template.render(path, self.template_values))
+
+
 class AdminBroadcast(LoggedInHandler):
     """
     Send a push notification to all connected users
