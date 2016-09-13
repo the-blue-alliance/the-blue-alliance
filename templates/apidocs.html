@@ -103,9 +103,12 @@
 
       <h3>Checking the Datafeed Status</h3>
 
+      <h3>API Endpoint</h3>
+      <p>Requests made to the API <strong>should</strong> be made using SSL to <code>www.thebluealliance.com</code>.</p>
+
       <p>At times, it may be useful to know the status of the datafeeds from
         which the API is updated. This may be done by sending an API request
-        to <code>www.thebluealliance.com/api/v2/status</code>. If a specific
+        to <code>https://www.thebluealliance.com/api/v2/status</code>. If a specific
         event is no longer updating, it is included inside the array
         <code>down_events</code>; if the entire FMSAPI is down,
         <code>is_datafeed_down</code> is set to true.</p>
@@ -278,7 +281,7 @@
           </tr>
           <tr>
             <td>teams</td>
-            <td>List of <a class="smooth-scroll" href="#team-models">team
+            <td>List of <a class="smooth-scroll" href="#team-model">team
             models</a> that attended the event</td>
             <td></td>
           </tr>
@@ -470,7 +473,7 @@
         <tbody>
           <tr>
             <td>key</td>
-            <td>A key identifying the robot object. Formed like <team_key>_<year></td>
+            <td>A key identifying the robot object. Formed like &lt;team_key&gt;_&lt;year&gt;</td>
             <td>frc1124_2015</td>
           </tr>
           <tr>
@@ -480,7 +483,7 @@
           </tr>
           <tr>
             <td>year</td>
-            <td>The year this Robot model referes to</td>
+            <td>The year this Robot model refers to</td>
             <td>2015</td>
           </tr>
           <tr>
@@ -498,13 +501,13 @@
       <h4>Related: <a class="smooth-scroll" href="#team-model">Team Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/teams/&lt;page_num&gt;</code>
+        <code>https://www.thebluealliance.com/api/v2/teams/&lt;page_num&gt;</code>
       </p>
       <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -523,7 +526,7 @@
         <div class="panel-body">
           <form id="example_team_list_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
               <input class="form-control" size="600" id="example_team_list_request" type="text" value="/api/v2/teams/1">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
@@ -541,13 +544,13 @@
       <h4>Related: <a class="smooth-scroll" href="#team-model">Team Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;</code>
+        <code>https://www.thebluealliance.com/api/v2/team/&lt;team key&gt;</code>
       </p>
       <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -567,7 +570,7 @@
         <div class="panel-body">
           <form id="example_team_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
               <input class="form-control" size="600" id="example_team_request" type="text" value="/api/v2/team/frc254">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
@@ -585,13 +588,13 @@
       <h4>Related: <a class="smooth-scroll" href="#event-model">Event Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;(/&lt;year&gt;)/events</code>
+        <code>https://www.thebluealliance.com/api/v2/team/&lt;team key&gt;(/&lt;year&gt;)/events</code>
       </p>
       <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -617,7 +620,7 @@
         <div class="panel-body">
           <form id="example_team_events_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
               <input class="form-control" size="600" id="example_team_events_request" type="text" value="/api/v2/team/frc254/2014/events">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
@@ -635,13 +638,13 @@
       <h4>Related: <a class="smooth-scroll" href="#award-model">Award Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/event/&lt;event key&gt;/awards</code>
+        <code>https://www.thebluealliance.com/api/v2/team/&lt;team key&gt;/event/&lt;event key&gt;/awards</code>
       </p>
       <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -668,7 +671,7 @@
         <div class="panel-body">
           <form id="example_team_event_awards_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
               <input class="form-control" size="600" id="example_team_event_awards_request" type="text" value="/api/v2/team/frc254/event/2014casj/awards">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
@@ -683,16 +686,16 @@
       </div>
 
       <h3 id="team-event-matches-request">Team Event Matches Request</h3>
-      <h4>Related: <a class="smooth-scroll" href="#award-match">Match Model</a></h4>
+      <h4>Related: <a class="smooth-scroll" href="#match-model">Match Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/event/&lt;event key&gt;/matches</code>
+        <code>https://www.thebluealliance.com/api/v2/team/&lt;team key&gt;/event/&lt;event key&gt;/matches</code>
       </p>
       <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -719,7 +722,7 @@
         <div class="panel-body">
           <form id="example_team_event_matches_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
               <input class="form-control" size="600" id="example_team_event_matches_request" type="text" value="/api/v2/team/frc254/event/2014casj/matches">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
@@ -736,13 +739,13 @@
       <h3 id="team-years-participated-request">Team Years Participated Request</h3>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/years_participated</code>
+        <code>https://www.thebluealliance.com/api/v2/team/&lt;team key&gt;/years_participated</code>
       </p>
       <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -762,7 +765,7 @@
         <div class="panel-body">
           <form id="example_team_years_participated_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
               <input class="form-control" size="600" id="example_team_years_participated_request" type="text" value="/api/v2/team/frc254/years_participated">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
@@ -780,13 +783,13 @@
       <h4>Related: <a class="smooth-scroll" href="#media-model">Media Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;(/&lt;year&gt;)/media</code>
+        <code>https://www.thebluealliance.com/api/v2/team/&lt;team key&gt;(/&lt;year&gt;)/media</code>
       </p>
       <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -812,7 +815,7 @@
         <div class="panel-body">
           <form id="example_team_media_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
               <input class="form-control" size="600" id="example_team_media_request" type="text" value="/api/v2/team/frc254/2014/media">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
@@ -830,13 +833,13 @@
       <h4>Related: <a class="smooth-scroll" href="#event-model">Event Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/history/events</code>
+        <code>https://www.thebluealliance.com/api/v2/team/&lt;team key&gt;/history/events</code>
       </p>
       <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -856,7 +859,7 @@
         <div class="panel-body">
           <form id="example_team_history_events_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
               <input class="form-control" size="600" id="example_team_history_events_request" type="text" value="/api/v2/team/frc254/history/events">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
@@ -874,13 +877,13 @@
       <h4>Related: <a class="smooth-scroll" href="#award-model">Awards Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/history/awards</code>
+        <code>https://www.thebluealliance.com/api/v2/team/&lt;team key&gt;/history/awards</code>
       </p>
       <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -900,7 +903,7 @@
         <div class="panel-body">
           <form id="example_team_history_awards_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
               <input class="form-control" size="600" id="example_team_history_awards_request" type="text" value="/api/v2/team/frc254/history/awards">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
@@ -918,13 +921,13 @@
       <h4>Related: <a class="smooth-scroll" href="#robot-model">Robot Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/history/robots</code>
+        <code>https://www.thebluealliance.com/api/v2/team/&lt;team key&gt;/history/robots</code>
       </p>
       <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -944,7 +947,7 @@
         <div class="panel-body">
           <form id="example_team_history_robots_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
               <input class="form-control" size="600" id="example_team_history_robots_request" type="text" value="/api/v2/team/frc254/history/robots">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
@@ -961,13 +964,13 @@
       <h3 id="team-history-districts-request">Team History Districts Request</h3>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/history/districts</code>
+        <code>https://www.thebluealliance.com/api/v2/team/&lt;team key&gt;/history/districts</code>
       </p>
       <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -987,7 +990,7 @@
         <div class="panel-body">
           <form id="example_team_history_districts_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
               <input class="form-control" size="600" id="example_team_history_districts_request" type="text" value="/api/v2/team/frc1124/history/districts">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
@@ -1006,13 +1009,13 @@
       <h4>Related: <a class="smooth-scroll" href="#event-model">Event Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/events/&lt;year&gt;</code>
+        <code>https://www.thebluealliance.com/api/v2/events/&lt;year&gt;</code>
       </p>
       <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -1032,7 +1035,7 @@
         <div class="panel-body">
           <form id="example_event_list_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
               <input class="form-control" size="600" id="example_event_list_request" type="text" value="/api/v2/events/2010">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
@@ -1050,13 +1053,13 @@
       <h4>Related: <a class="smooth-scroll" href="#event-model">Event Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;</code>
+        <code>https://www.thebluealliance.com/api/v2/event/&lt;event key&gt;</code>
       </p>
       <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -1078,7 +1081,7 @@
         <div class="panel-body">
           <form id="example_event_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
               <input class="form-control" size="600" id="example_event_request" type="text" value="/api/v2/event/2010sc">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
@@ -1096,13 +1099,13 @@
       <h4>Related: <a class="smooth-scroll" href="#team-model">Team Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;/teams</code>
+        <code>https://www.thebluealliance.com/api/v2/event/&lt;event key&gt;/teams</code>
       </p>
       <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -1124,7 +1127,7 @@
         <div class="panel-body">
           <form id="example_event_teams_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
               <input class="form-control" size="600" id="example_event_teams_request" type="text" value="/api/v2/event/2010sc/teams">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
@@ -1142,13 +1145,13 @@
       <h4>Related: <a class="smooth-scroll" href="#match-model">Match Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;/matches</code>
+        <code>https://www.thebluealliance.com/api/v2/event/&lt;event key&gt;/matches</code>
       </p>
       <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -1170,7 +1173,7 @@
         <div class="panel-body">
           <form id="example_event_matches_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
               <input class="form-control" size="600"
               id="example_event_matches_request" type="text" value="/api/v2/event/2010sc/matches">
               <span class="input-group-btn">
@@ -1188,13 +1191,13 @@
       <h3 id="event-stats-request">Event Stats Request</h3>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;/stats</code>
+        <code>https://www.thebluealliance.com/api/v2/event/&lt;event key&gt;/stats</code>
       </p>
       <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -1216,7 +1219,7 @@
         <div class="panel-body">
           <form id="example_event_stats_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
               <input class="form-control" size="600"
               id="example_event_stats_request" type="text" value="/api/v2/event/2010sc/stats">
               <span class="input-group-btn">
@@ -1233,13 +1236,13 @@
       <h3 id="event-rankings-request">Event Rankings Request</h3>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;/rankings</code>
+        <code>https://www.thebluealliance.com/api/v2/event/&lt;event key&gt;/rankings</code>
       </p>
       <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -1261,7 +1264,7 @@
         <div class="panel-body">
           <form id="example_event_rankings_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
               <input class="form-control" size="600"
               id="example_event_rankings_request" type="text" value="/api/v2/event/2010sc/rankings">
               <span class="input-group-btn">
@@ -1278,13 +1281,13 @@
       <h3 id="event-awards-request">Event Awards Request</h3>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;/awards</code>
+        <code>https://www.thebluealliance.com/api/v2/event/&lt;event key&gt;/awards</code>
       </p>
       <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -1306,7 +1309,7 @@
         <div class="panel-body">
           <form id="example_event_awards_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
               <input class="form-control" size="600"
               id="example_event_awards_request" type="text" value="/api/v2/event/2010sc/awards">
               <span class="input-group-btn">
@@ -1324,13 +1327,13 @@
     <h3 id="event-points-request">Event District Points Request</h3>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;/district_points</code>
+        <code>https://www.thebluealliance.com/api/v2/event/&lt;event key&gt;/district_points</code>
       </p>
       <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -1352,7 +1355,7 @@
         <div class="panel-body">
           <form id="example_event_points_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
               <input class="form-control" size="600"
               id="example_event_points_request" type="text" value="/api/v2/event/2014cthar/district_points">
               <span class="input-group-btn">
@@ -1371,13 +1374,13 @@
       <h3 id="match-request">Single Match Request</h3>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/match/&lt;match_key&gt;</code>
+        <code>https://www.thebluealliance.com/api/v2/match/&lt;match_key&gt;</code>
       </p>
       <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -1396,7 +1399,7 @@
         <div class="panel-body">
           <form id="example_match_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
               <input class="form-control" size="600"
               id="example_match_request" type="text" value="/api/v2/match/2014cmp_f1m1">
               <span class="input-group-btn">
@@ -1415,13 +1418,13 @@
       <h3 id="district-list-request">District List Request</h3>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/districts/&lt;year&gt;</code>
+        <code>https://www.thebluealliance.com/api/v2/districts/&lt;year&gt;</code>
       </p>
       <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -1440,7 +1443,7 @@
         <div class="panel-body">
           <form id="example_district_list_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
               <input class="form-control" size="600"
               id="example_district_list_request" type="text" value="/api/v2/districts/2014">
               <span class="input-group-btn">
@@ -1458,13 +1461,13 @@
       <h3 id="district-events-request">District Events Request</h3>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/district/&lt;district short&gt;/&lt;year&gt;/events</code>
+        <code>https://www.thebluealliance.com/api/v2/district/&lt;district short&gt;/&lt;year&gt;/events</code>
       </p>
       <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -1488,7 +1491,7 @@
         <div class="panel-body">
           <form id="example_district_events_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
               <input class="form-control" size="600"
               id="example_district_events_request" type="text" value="/api/v2/district/ne/2014/events">
               <span class="input-group-btn">
@@ -1506,13 +1509,13 @@
       <h3 id="district-rankings-request">District Rankings Request</h3>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/district/&lt;district short&gt;/&lt;year&gt;/rankings</code>
+        <code>https://www.thebluealliance.com/api/v2/district/&lt;district short&gt;/&lt;year&gt;/rankings</code>
       </p>
       <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -1536,7 +1539,7 @@
         <div class="panel-body">
           <form id="example_district_rankings_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
               <input class="form-control" size="600"
               id="example_district_rankings_request" type="text" value="/api/v2/district/ne/2014/rankings">
               <span class="input-group-btn">
@@ -1554,13 +1557,13 @@
       <h3 id="district-teams-request">District Teams Request</h3>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/district/&lt;district short&gt;/&lt;year&gt;/teams</code>
+        <code>https://www.thebluealliance.com/api/v2/district/&lt;district short&gt;/&lt;year&gt;/teams</code>
       </p>
       <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -1584,7 +1587,7 @@
         <div class="panel-body">
           <form id="example_district_teams_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
               <input class="form-control" size="600"
               id="example_district_teams_request" type="text" value="/api/v2/district/ne/2015/teams">
               <span class="input-group-btn">
@@ -1599,7 +1602,7 @@
         </div>
       </div>
 
-      <h2 id="api-libraries">API Libraries</h3>
+      <h2 id="api-libraries">API Libraries</h2>
       <p>
         These libraries have been created by our community to help you use our
         API in your next project.
@@ -1630,7 +1633,7 @@
           </tr>
           <tr>
             <td>Java</td>
-            <td><a href="https://github.com/tonypeng/TheBlueAllianceJavaAPI">TheBlueAllianceJavaAPI</td>
+            <td><a href="https://github.com/tonypeng/TheBlueAllianceJavaAPI">TheBlueAllianceJavaAPI</a></td>
           </tr>
           <tr>
             <td>Javascript</td>
