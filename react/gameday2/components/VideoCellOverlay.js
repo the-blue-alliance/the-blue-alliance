@@ -53,7 +53,7 @@ export default React.createClass({
     return this.state.showWebcastSelectionPanel || this.state.showSwapPanel
   },
   render() {
-    let classes = classNames({
+    const classes = classNames({
       hidden: !this.shouldShow(),
       panel: true,
       'panel-default': true,

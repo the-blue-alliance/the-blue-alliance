@@ -11,7 +11,7 @@ const FollowingTeamsModal = React.createClass({
     this.props.onFollowTeam(177)
   },
   render() {
-    let followingTeamListItems = []
+    const followingTeamListItems = []
     Object.keys(this.props.followingTeams).forEach((team) => {
       followingTeamListItems.push(
         <FollowingTeamListItem

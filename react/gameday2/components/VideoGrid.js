@@ -105,7 +105,7 @@ export default React.createClass({
     }
 
     // Render everything!
-    let videoCells = []
+    const videoCells = []
     for (let i = 0; i < webcastCount; i++) {
       let webcast = null
       let id = `video-${i}`

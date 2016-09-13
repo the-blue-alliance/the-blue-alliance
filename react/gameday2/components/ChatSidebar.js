@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react'
 import classNames from 'classnames'
 
 const ChatSidebar = (props) => {
-  let classes = classNames({
+  const classes = classNames({
     hidden: !props.enabled,
     'chat-sidebar': true,
   })

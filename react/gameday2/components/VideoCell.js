@@ -39,7 +39,7 @@ const VideoCell = React.createClass({
     this.hideWebcastSelectionPanel()
   },
   render() {
-    let classes = classNames({
+    const classes = classNames({
       'video-cell': true,
       [`video-${this.props.location}`]: true,
     })

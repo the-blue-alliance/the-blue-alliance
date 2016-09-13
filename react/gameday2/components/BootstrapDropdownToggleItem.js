@@ -17,7 +17,7 @@ export default React.createClass({
     }
   },
   render() {
-    let checkmarkClasses = classNames({
+    const checkmarkClasses = classNames({
       hidden: !this.props.checked,
       'glyphicon glyphicon-ok': true,
       'pull-right': true,
