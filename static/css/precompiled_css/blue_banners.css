@@ -55,6 +55,7 @@
     height: 35px;
     font-weight: bold;
     margin: 0;
+    margin-bottom: 3px;
 }
 .banners .award-name span,
 .banner .award-name span {
