@@ -30,7 +30,7 @@ const MainContent = (props) => {
     child = (<VideoGridContainer />)
   }
 
-  let classes = classNames({
+  const classes = classNames({
     content: true,
     'leave-left-margin': props.hashtagSidebarVisible,
     'leave-right-margin': props.chatSidebarVisible,

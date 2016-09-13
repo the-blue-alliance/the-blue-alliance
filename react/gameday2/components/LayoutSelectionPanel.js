@@ -11,7 +11,7 @@ export default React.createClass({
     let currentRow = []
     let rowNum = 0
     for (let i = 0; i < NUM_LAYOUTS; i++) {
-      let layoutKey = `layout-${i}`
+      const layoutKey = `layout-${i}`
       currentRow.push(
         <LayoutSelectionPanelItem layoutId={i} key={layoutKey} setLayout={this.props.setLayout} />
       )
@@ -27,7 +27,7 @@ export default React.createClass({
     return rows
   },
   render() {
-    let rows = this.generateLayoutRows()
+    const rows = this.generateLayoutRows()
     return (
       <div className="layout-selection-panel" >
         <h1>Select a layout</h1>

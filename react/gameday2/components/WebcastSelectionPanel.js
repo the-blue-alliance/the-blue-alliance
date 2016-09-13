@@ -4,11 +4,11 @@ import WebcastSelectionPanelItem from './WebcastSelectionPanelItem'
 
 const WebcastSelectionPanel = (props) => {
     // Construct list of webcasts
-  let webcastItems = []
+  const webcastItems = []
     // Don't let the user choose a webcast that is already displayed elsewhere
   const availableWebcasts = props.webcasts.filter((webcastId) => props.displayedWebcasts.indexOf(webcastId) === -1)
   for (const webcastId of availableWebcasts) {
-    let webcast = props.webcastsById[webcastId]
+    const webcast = props.webcastsById[webcastId]
     webcastItems.push(
       <WebcastSelectionPanelItem
         key={webcast.id}
@@ -18,7 +18,7 @@ const WebcastSelectionPanel = (props) => {
     )
   }
 
-  let classes = classNames({
+  const classes = classNames({
     hidden: !props.enabled,
     'webcast-selection-panel': true,
   })
