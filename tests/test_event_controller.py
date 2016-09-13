@@ -3,6 +3,7 @@ from datetime import datetime
 import unittest2
 import webapp2
 import webtest
+from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 from webapp2_extras.routes import RedirectRoute
 
@@ -20,6 +21,8 @@ class TestEventController(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         app = webapp2.WSGIApplication([
             RedirectRoute(r'/event/<event_key>', EventDetail, 'event-detail'),
             RedirectRoute(r'/event/<event_key>/insights', EventInsights, 'event-insights'),

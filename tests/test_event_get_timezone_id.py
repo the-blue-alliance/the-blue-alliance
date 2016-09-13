@@ -1,5 +1,6 @@
 import unittest2
 
+from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from datafeeds.usfirst_event_details_parser import UsfirstEventDetailsParser
@@ -13,6 +14,8 @@ class TestEventGetTimezoneId(unittest2.TestCase):
         self.testbed.init_urlfetch_stub()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
 
     def test_2012ct_no_location(self):
         with open('test_data/usfirst_html/usfirst_event_details_2012ct.html', 'r') as f:

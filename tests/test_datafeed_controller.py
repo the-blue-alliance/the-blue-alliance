@@ -3,6 +3,7 @@ import datetime
 
 from google.appengine.api import urlfetch
 from google.appengine.ext import db
+from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 from google.appengine.ext.webapp import Response
 
@@ -19,6 +20,8 @@ class TestUsfirstEventDetailsGet(unittest2.TestCase):
         self.testbed.init_urlfetch_stub()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
 
     def tearDown(self):
         self.testbed.deactivate()

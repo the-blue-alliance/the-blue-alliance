@@ -3,6 +3,7 @@ from datetime import datetime
 import unittest2
 import webapp2
 import webtest
+from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 from webapp2_extras.routes import RedirectRoute
 
@@ -19,6 +20,8 @@ class TestTeamController(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         app = webapp2.WSGIApplication([
             RedirectRoute(r'/team/<team_number:[0-9]+>', TeamCanonical, 'team-canonical'),
             RedirectRoute(r'/team/<team_number:[0-9]+>/<year:[0-9]+>', TeamDetail, 'team-detail'),

@@ -2,6 +2,7 @@ import json
 
 import unittest2
 
+from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from datafeeds.parsers.fms_api.fms_api_event_alliances_parser import FMSAPIEventAlliancesParser
@@ -13,6 +14,8 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
 
     def tearDown(self):
         self.testbed.deactivate()

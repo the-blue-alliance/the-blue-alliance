@@ -10,6 +10,7 @@ from datafeeds.parsers.fms_api.fms_api_event_alliances_parser import FMSAPIEvent
 from datafeeds.parsers.fms_api.fms_api_event_rankings_parser import FMSAPIEventRankingsParser
 from datafeeds.parsers.fms_api.fms_api_match_parser import FMSAPIHybridScheduleParser
 
+from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from models.event import Event
@@ -21,6 +22,8 @@ class TestFMSAPIEventParser(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
 
         self.event = Event(
             id="2015waamv",

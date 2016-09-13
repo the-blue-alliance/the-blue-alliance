@@ -16,6 +16,8 @@ class TestEventDetailsManipulator(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_taskqueue_stub(root_path=".")
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.maxDiff = None
 
         with open('test_data/usfirst_html/usfirst_event_rankings_2012ct.html', 'r') as f:
