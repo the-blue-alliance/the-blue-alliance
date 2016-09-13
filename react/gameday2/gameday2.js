@@ -14,7 +14,7 @@ const webcastData = $.parseJSON($('#webcasts_json').text())
 
 let store = createStore(gamedayReducer, compose(
   applyMiddleware(thunk),
-  window.devToolsExtension && window.devToolsExtension()
+  window.devToolsExtension ? window.devToolsExtension() : f => f
 ))
 
 ReactDOM.render(
