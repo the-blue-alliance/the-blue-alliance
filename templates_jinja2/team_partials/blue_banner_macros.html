@@ -1,0 +1,3 @@
+{% macro blue_banner(award, event) %}
+<div class="banner"><img src="/images/first_icon.svg"><div class="award-name"><span>{{award.normalized_name.upper()}}</span></div><small>{{award.year}} {{event.normalized_name}}</small></div>
+{% endmacro %}

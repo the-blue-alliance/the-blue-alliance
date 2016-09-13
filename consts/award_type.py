@@ -95,3 +95,8 @@ class AwardType(object):
         WINNER,
         FINALIST,
     }
+
+    normalized_name = {
+        CHAIRMANS: "Chairman's Award",
+        WINNER: "Winner",
+    }

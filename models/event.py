@@ -163,6 +163,10 @@ class Event(ndb.Model):
     def ends_today(self):
         return self.end_date.date() == self.local_time().date()
 
+    @property
+    def is_season_event(self):
+        return self.event_type_enum in EventType.SEASON_EVENT_TYPES
+
     @ndb.tasklet
     def get_teams_async(self):
         from database import team_query
@@ -363,3 +367,12 @@ class Event(ndb.Model):
     @property
     def display_name(self):
         return self.name if self.short_name is None else self.short_name
+
+    @property
+    def normalized_name(self):
+        if self.event_type_enum == EventType.CMP_FINALS:
+            return 'Championship'
+        elif self.short_name:
+            return '{} {}'.format(self.short_name, EventType.short_type_names[self.event_type_enum])
+        else:
+            return self.name

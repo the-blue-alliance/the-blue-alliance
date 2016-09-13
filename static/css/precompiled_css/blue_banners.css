@@ -1,0 +1,73 @@
+/* Adapted from https://github.com/ErikBoesen/banners.css */
+
+/* To be standard-compliant, this rule should be applied to *, but for compat it's restricted here. */
+.banners,
+.banners *,
+.banner {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.banner-parent {
+    width: 100%;
+    overflow: scroll;
+}
+.banner-parent .banners {
+    width: auto;
+    white-space: nowrap;
+}
+.banners li,
+.banner {
+    line-height: 1.2;
+    text-align: center;
+    vertical-align: top;
+    display: inline-block;
+    margin: 0 3px 40px;
+    width: 120px;
+    height: 170px;
+    position: relative;
+    background: #0f4bcb;
+    color: white;
+    padding: 10px;
+    white-space: normal
+}
+.banners img,
+.banner img {
+    width: 75px;
+    margin-top: 3px;
+    margin-bottom: 10px;
+}
+.banners li:after,
+.banner:after {
+    content: '';
+    position: absolute;
+    display: block;
+    border: 60px solid #0f4bcb;
+    border-top-width: 5px;
+    border-bottom: 20px transparent solid;
+    top: 100%;
+    left: 0;
+}
+.banners li,
+.banners li:after,
+.banner,
+.banner:after {
+    -webkit-filter: drop-shadow(0 5px 5px rgba(0, 0, 0, .1));
+    filter: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg"><filter id="filter"><feGaussianBlur in="SourceAlpha" stdDeviation="5" /><feOffset dx="1" dy="11" result="offsetblur" /><feFlood flood-color="rgba(0,0,0,0.1)" /><feComposite in2="offsetblur" operator="in" /><feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge></filter></svg>#filter');
+    -webkit-filter: drop-shadow(0 5px 5px rgba(0, 0, 0, .1));
+            filter: drop-shadow(0 5px 5px rgba(0, 0, 0, .1));
+}
+
+.banners .award-name,
+.banner .award-name {
+    display: table;
+    width: 100%;
+    height: 35px;
+    margin-bottom: 10px;
+}
+
+.banners .award-name span,
+.banner .award-name span {
+    display: table-cell;
+    vertical-align: middle;
+}

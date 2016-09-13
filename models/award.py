@@ -2,6 +2,7 @@ import json
 
 from google.appengine.ext import ndb
 
+from consts.award_type import AwardType
 from models.event import Event
 from models.team import Team
 
@@ -38,6 +39,14 @@ class Award(ndb.Model):
         self._recipient_dict = None
         self._recipient_list_json = None
         super(Award, self).__init__(*args, **kw)
+
+    @property
+    def is_blue_banner(self):
+        return self.award_type_enum in AwardType.BLUE_BANNER_AWARDS
+
+    @property
+    def normalized_name(self):
+        return AwardType.normalized_name.get(self.award_type_enum, self.name_str)
 
     @property
     def recipient_dict(self):
