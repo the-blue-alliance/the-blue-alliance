@@ -28,7 +28,6 @@ SCRIPTS_EVENTWIZARD = ['static/javascript/tba_js/eventwizard_apiwrite.js',
 
 STYLESHEETS_MAIN = ['static/css/precompiled_css/jquery.fancybox.css',
                     'static/css/precompiled_css/tablesorter.css',
-                    'static/css/precompiled_css/blue_banners.css',
                     'static/xcharts/xcharts.min.css',
                     'static/css/less_css/tba_style.main.css',
                     ]
