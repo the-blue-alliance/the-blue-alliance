@@ -15,8 +15,8 @@
     text-align: center;
     vertical-align: top;
     display: inline-block;
-    margin: 0 3px 40px;
-    width: 120px;
+    margin: 0 0 40px;
+    width: 140px;
     height: 170px;
     position: relative;
     background: #0f4bcb;
@@ -27,7 +27,7 @@
 .banners img,
 .banner img {
     width: 75px;
-    margin-top: 3px;
+    margin-top: 5px;
     margin-bottom: 10px;
 }
 .banners li:after,
@@ -35,7 +35,7 @@
     content: '';
     position: absolute;
     display: block;
-    border: 60px solid #0f4bcb;
+    border: 70px solid #0f4bcb;
     border-top-width: 5px;
     border-bottom: 20px transparent solid;
     top: 100%;
@@ -49,12 +49,15 @@
     filter: drop-shadow(0 5px 5px rgba(0, 0, 0, .1));
 }
 .banners .award-name,
-.banner .award-name {
+.banner .award-name,
+.banners .award-name-long,
+.banner .award-name-long {
     display: table;
     width: 100%;
     height: 35px;
-    font-weight: bold;
+    font-weight: bolder;
     margin: 0;
+    margin-top: 3px;
     margin-bottom: 3px;
 }
 .banners .award-name span,
@@ -64,21 +67,43 @@
     font-style: italic;
     text-transform: uppercase;
 }
+.banners .award-name-long span,
+.banner .award-name-long span {
+    display: table-cell;
+    vertical-align: middle;
+    font-style: italic;
+    text-transform: uppercase;
+    font-size: 85%;
+}
 .banners .award-event,
 .banner .award-event {
+    display: table;
     text-transform: uppercase;
     font-size: 85%;
     line-height: 130%;
-    text-overflow: ellipsis;
-    width: 100%;
-    overflow: hidden;
+    height: 50px;
 }
 .banners .award-event-long,
 .banner .award-event-long {
+    display: table;
     text-transform: uppercase;
     font-size: 75%;
     line-height: 110%;
+    height: 50px;
+}
+.banners .award-event span,
+.banner .award-event span {
+    display: table-cell;
+    vertical-align: middle;
+    max-width: 125px;
     text-overflow: ellipsis;
-    width: 100%;
+    overflow: hidden;
+}
+.banners .award-event-long span,
+.banner .award-event-long span {
+    display: table-cell;
+    vertical-align: middle;
+    max-width: 125px;
+    text-overflow: ellipsis;
     overflow: hidden;
 }

@@ -46,7 +46,13 @@ class Award(ndb.Model):
 
     @property
     def normalized_name(self):
-        return AwardType.normalized_name.get(self.award_type_enum, self.name_str)
+        if self.award_type_enum in AwardType.normalized_name:
+            if self.event_type_enum in AwardType.normalized_name[self.award_type_enum]:
+                return AwardType.normalized_name[self.award_type_enum][self.event_type_enum]
+            else:
+                return AwardType.normalized_name[self.award_type_enum][None]
+        else:
+            return self.name_str
 
     @property
     def recipient_dict(self):
