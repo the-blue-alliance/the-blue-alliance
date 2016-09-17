@@ -56,7 +56,7 @@ class ApiTeamController(ApiTeamControllerBase):
 
 class ApiTeamEventsController(ApiTeamControllerBase):
     CACHE_KEY_FORMAT = "apiv2_team_events_controller_{}_{}"  # (team_key, year)
-    CACHE_VERSION = 2
+    CACHE_VERSION = 3
     CACHE_HEADER_LENGTH = 60 * 60
 
     def __init__(self, *args, **kw):
@@ -215,7 +215,7 @@ class ApiTeamHistoryEventsController(ApiTeamControllerBase):
     Returns a JSON list of event models of all events attended by a team
     """
     CACHE_KEY_FORMAT = "apiv2_team_history_events_controller_{}"  # (team_key)
-    CACHE_VERSION = 2
+    CACHE_VERSION = 3
     CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):

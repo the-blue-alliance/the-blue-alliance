@@ -71,7 +71,7 @@ class ApiDistrictListController(ApiDistrictControllerBase):
 
 class ApiDistrictEventsController(ApiDistrictControllerBase):
     CACHE_KEY_FORMAT = "apiv2_district_events_controller_{}_{}"  # (district_short, year)
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):

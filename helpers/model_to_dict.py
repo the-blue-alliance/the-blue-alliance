@@ -53,6 +53,7 @@ class ModelToDict(object):
         event_dict["facebook_eid"] = event.facebook_eid
         event_dict["website"] = event.website
         event_dict["timezone"] = event.timezone_id
+        event_dict["week"] = event.week
 
         if event.alliance_selections:
             event_dict["alliances"] = event.alliance_selections
