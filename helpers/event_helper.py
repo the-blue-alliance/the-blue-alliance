@@ -73,7 +73,7 @@ class EventHelper(object):
                     if event.year == 2016:  # Special case for 2016 week 0.5
                         label = REGIONAL_EVENTS_LABEL.format(0.5 if week == 0 else week)
                     else:
-                        label = REGIONAL_EVENTS_LABEL.format(week)
+                        label = REGIONAL_EVENTS_LABEL.format(week + 1)
                     if label in to_return:
                         to_return[label].append(event)
                     else:

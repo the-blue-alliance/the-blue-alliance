@@ -179,7 +179,8 @@ class Event(ndb.Model):
         if week_start is None:
             e = Event.query(
                 Event.year==self.year,
-                Event.event_type_enum.IN(EventType.NON_CMP_EVENT_TYPES)
+                Event.event_type_enum.IN(EventType.NON_CMP_EVENT_TYPES),
+                Event.start_date!=None
             ).order(Event.start_date).fetch(1, projection=[Event.start_date])
             if e:
                 first_start_date = e[0].start_date
