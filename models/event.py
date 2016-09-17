@@ -7,7 +7,7 @@ import re
 from consts.district_type import DistrictType
 from consts.event_type import EventType
 from consts.ranking_indexes import RankingIndexes
-
+from context_cache import context_cache
 from models.event_details import EventDetails
 
 
@@ -58,6 +58,7 @@ class Event(ndb.Model):
         self._webcast = None
         self._updated_attrs = []  # Used in EventManipulator to track what changed
         self._rankings_enhanced = None
+        self._week = None
         super(Event, self).__init__(*args, **kw)
 
     @ndb.tasklet
@@ -162,6 +163,37 @@ class Event(ndb.Model):
     @property
     def ends_today(self):
         return self.end_date.date() == self.local_time().date()
+
+    @property
+    def week(self):
+        """
+        Returns the week of the event relative to the first official season event as an integer
+        Returns None if the event is not of type NON_CMP_EVENT_TYPES or is not official
+        """
+        if self.event_type_enum not in EventType.NON_CMP_EVENT_TYPES or not self.official:
+            return None
+
+        # Cache week_start for the same context
+        cache_key = '{}_week_start:{}'.format(self.year, ndb.get_context().__hash__())
+        week_start = context_cache.get(cache_key)
+        if week_start is None:
+            e = Event.query(
+                Event.year==self.year,
+                Event.event_type_enum.IN(EventType.NON_CMP_EVENT_TYPES)
+            ).order(Event.start_date).fetch(1, projection=[Event.start_date])
+            if e:
+                first_start_date = e[0].start_date
+                diff_from_wed = (first_start_date.weekday() - 2) % 7  # 2 is Wednesday
+                week_start = first_start_date - datetime.timedelta(days=diff_from_wed)
+            else:
+                week_start = None
+        context_cache.set(cache_key, week_start)
+
+        if self._week is None and week_start is not None:
+            days = (self.start_date - week_start).days
+            self._week = days / 7
+
+        return self._week
 
     @property
     def is_season_event(self):
