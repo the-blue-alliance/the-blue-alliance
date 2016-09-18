@@ -17,7 +17,7 @@
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu tba-dropdown-menu-limited">
-            {% for valid_year in valid_years reversed %}
+            {% for valid_year in valid_years|reverse %}
               <li><a href="/events/{{district_abbrev}}/{{valid_year}}">{{valid_year}}</a></li>
             {% endfor %}
           </ul>
@@ -37,6 +37,14 @@
               <li><a href="/events/{{valid_district.1}}{% if explicit_year %}/{{year}}{% endif %}">{{valid_district.0}}</a></li>
               {% endif %}
             {% endfor %}
+          </ul>
+        </div>
+
+        <div class="tba-sidebar">
+          <ul class="nav tba-sidenav">
+          {% for label, events in week_events.items() %}
+            <li><a class="smooth-scroll" href="#{{label|slugify}}">{{label}}</a></li>
+          {% endfor %}
           </ul>
         </div>
       </div>
@@ -59,7 +67,10 @@
 
       <div class="tab-content">
         <div class="tab-pane active" id="events">
-          {% include "event_partials/event_table.html" %}
+          {% for label, events in week_events.items() %}
+            <h2 id="{{label|slugify}}">{{ label }} <small>{{events|length}} Events</small></h2>
+            {% include "event_partials/event_table.html" %}
+          {% endfor %}
         </div>
         {% if teams_a or teams_b %}
         <div class="tab-pane" id="teams">
@@ -118,25 +129,25 @@
             <tbody>
               {% for team_key, totals in team_totals %}
               <tr>
-                <td>{{forloop.counter}}</td>
+                <td>{{loop.index}}</td>
                 <td><a href="/team/{{team_key|digits}}/{{year}}">{{team_key|digits}}</a></td>
                 <td>
                   {% if totals.event_points.0 %}
-                  {{totals.event_points.0.1.total}} <a href="/event/{{totals.event_points.0.0.key.id}}" rel="tooltip" title="{{totals.event_points.0.0.short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
+                  {{totals.event_points.0.1.total}} <a href="/event/{{totals.event_points.0.0.key.id()}}" rel="tooltip" title="{{totals.event_points.0.0.short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
                   {% else %}
                   --
                   {% endif %}
                 </td>
                 <td>
                   {% if totals.event_points.1 %}
-                  {{totals.event_points.1.1.total}} <a href="/event/{{totals.event_points.1.0.key.id}}" rel="tooltip" title="{{totals.event_points.1.0.short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
+                  {{totals.event_points.1.1.total}} <a href="/event/{{totals.event_points.1.0.key.id()}}" rel="tooltip" title="{{totals.event_points.1.0.short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
                   {% else %}
                   --
                   {% endif %}
                 </td>
                 <td>
                   {% if totals.event_points.2 %}
-                  {{totals.event_points.2.1.total}} <a href="/event/{{totals.event_points.2.0.key.id}}" rel="tooltip" title="{{totals.event_points.2.0.short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
+                  {{totals.event_points.2.1.total}} <a href="/event/{{totals.event_points.2.0.key.id()}}" rel="tooltip" title="{{totals.event_points.2.0.short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
                   {% else %}
                   --
                   {% endif %}

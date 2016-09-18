@@ -3,7 +3,6 @@ import logging
 import os
 
 from google.appengine.ext import ndb
-from google.appengine.ext.webapp import template
 
 from controllers.base_controller import CacheableHandler
 
@@ -19,6 +18,8 @@ from helpers.team_helper import TeamHelper
 from models.event import Event
 from models.event_team import EventTeam
 from models.team import Team
+
+from template_engine import jinja2_engine
 
 
 class DistrictDetail(CacheableHandler):
@@ -77,6 +78,7 @@ class DistrictDetail(CacheableHandler):
 
         events = [event_future.get_result() for event_future in event_futures]
         EventHelper.sort_events(events)
+        week_events = EventHelper.groupByWeek(events)
 
         district_cmp_futures = ndb.get_multi_async(district_cmp_keys_future.get_result())
 
@@ -111,12 +113,11 @@ class DistrictDetail(CacheableHandler):
             'valid_districts': valid_districts,
             'district_name': DistrictType.type_names[district_type],
             'district_abbrev': district_abbrev,
-            'events': events,
+            'week_events': week_events,
             'team_totals': team_totals,
             'teams_a': teams_a,
             'teams_b': teams_b,
             'live_events_with_teams': live_events_with_teams,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/district_details.html')
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('district_details.html', self.template_values)
