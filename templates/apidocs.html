@@ -101,11 +101,18 @@
       <p>All API responses have a <code>Last-Modified</code> header, which indicates the date and time at which the data at a particular endpoint was last updated. When making repeated calls to a particular endpoint, you should set the <code>If-Modified-Since</code> header in your request to the value of <code>Last-Modified</code> from the previous call to that endpoint. On the first call, <code>If-Modified-Since</code> does not need to be set.</p>
       <p>Consumers of the TBA API are highly encouraged to make use of these headers. If the server determines that no data has been updated, it returns a <code>304 Not Modified</code> response with an empty body, saving both the server and the consumer time and bandwidth.</p>
 
-      <h3>Checking the Datafeed Status</h3>
+      <h3>Cache-Control Header</h3>
+      <p>If your application makes many queries to the TBA API and you are capable of caching the results locally, the
+      Cache-Control header will provide guidance on how long the API response can remain valid in a local cache. In
+      particular, the <code>max-age</code> value in the <code>Cache-Control</code> header contains the number of
+      seconds the API result should be considered valid for. See also
+      <a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=en#cache-control">
+      Google's Cache-Control reference</a>.</p>
 
       <h3>API Endpoint</h3>
       <p>Requests made to the API <strong>should</strong> be made using SSL to <code>www.thebluealliance.com</code>.</p>
 
+      <h3>Checking the Datafeed Status</h3>
       <p>At times, it may be useful to know the status of the datafeeds from
         which the API is updated. This may be done by sending an API request
         to <code>https://www.thebluealliance.com/api/v2/status</code>. If a specific
