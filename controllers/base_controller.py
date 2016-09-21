@@ -1,5 +1,6 @@
 import cPickle
 import datetime
+import time
 import logging
 import re
 import urllib
@@ -14,6 +15,7 @@ from google.appengine.api import memcache
 import tba_config
 
 from helpers.user_bundle import UserBundle
+from models.sitevar import Sitevar
 from template_engine import jinja2_engine
 
 
@@ -65,12 +67,13 @@ class CacheableHandler(webapp2.RequestHandler):
         cached_response = self._read_cache()
 
         if cached_response is None:
-            self._set_cache_header_length(self.CACHE_HEADER_LENGTH)
+            cache_time = self._get_cache_expiration(self.cache_key)
+            self._set_cache_header_length(cache_time)
             self.template_values["render_time"] = datetime.datetime.now()
             rendered = self._render(*args, **kw)
             if self._has_been_modified_since(self._last_modified):
                 self.response.out.write(self._add_admin_bar(rendered))
-                self._write_cache(self.response)
+                self._write_cache(self.response, cache_time)
                 return
             else:
                 return None
@@ -109,10 +112,10 @@ class CacheableHandler(webapp2.RequestHandler):
             self._last_modified = last_modified
             return response
 
-    def _write_cache(self, response):
+    def _write_cache(self, response, expiration_seconds):
         if tba_config.CONFIG["memcache"] and not self._is_admin:
             compressed = zlib.compress(cPickle.dumps((response, self._last_modified)))
-            memcache.set(self.cache_key, compressed, self._cache_expiration)
+            memcache.set(self.cache_key, compressed, expiration_seconds)
 
     @classmethod
     def delete_cache_multi(cls, cache_keys):
@@ -129,6 +132,23 @@ class CacheableHandler(webapp2.RequestHandler):
         if not self._is_admin:
             self.response.headers['Cache-Control'] = "public, max-age=%d" % max(seconds, 61)  # needs to be at least 61 seconds to work
             self.response.headers['Pragma'] = 'Public'
+
+    def _get_cache_expiration(self, cache_key):
+        turbo_sitevar = Sitevar.get_by_id('turbo_mode')
+        default_length = self._cache_expiration if self._cache_expiration else self.CACHE_HEADER_LENGTH
+        if not turbo_sitevar or not turbo_sitevar.contents:
+            return default_length
+        contents = turbo_sitevar.contents
+        regex = contents['regex'] if 'regex' in contents else "$^"
+        pattern = re.compile(regex)
+        valid_until = contents['valid_until']  if 'valid_until' in contents else -1  # UNIX time
+        cache_length = contents['cache_length'] if 'cache_length' in contents else default_length
+        now = time.time()
+
+        if now <= int(valid_until) and pattern.match(cache_key):
+            return cache_length
+        else:
+            return self.CACHE_HEADER_LENGTH
 
 
 class LoggedInHandler(webapp2.RequestHandler):
