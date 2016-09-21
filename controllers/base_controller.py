@@ -135,13 +135,14 @@ class CacheableHandler(webapp2.RequestHandler):
 
     def _get_cache_expiration(self, cache_key):
         turbo_sitevar = Sitevar.get_by_id('turbo_mode')
+        default_length = self._cache_expiration if self._cache_expiration else self.CACHE_HEADER_LENGTH
         if not turbo_sitevar or not turbo_sitevar.contents:
-            return self._cache_expiration
+            return default_length
         contents = turbo_sitevar.contents
         regex = contents['regex'] if 'regex' in contents else "$^"
         pattern = re.compile(regex)
         valid_until = contents['valid_until']  if 'valid_until' in contents else -1  # UNIX time
-        cache_length = contents['cache_length'] if 'cache_length' in contents else self._cache_expiration
+        cache_length = contents['cache_length'] if 'cache_length' in contents else default_length
         now = time.time()
 
         if now <= int(valid_until) and pattern.match(cache_key):
