@@ -1,6 +1,7 @@
 import cPickle
 import datetime
 import logging
+import re
 import urllib
 import webapp2
 import zlib
@@ -56,7 +57,7 @@ class CacheableHandler(webapp2.RequestHandler):
             self.template_values["cache_key"] = self.cache_key
             self.template_values["user_bundle"] = self._user_bundle
             admin_bar = jinja2_engine.render('admin_bar.html', self.template_values)
-            return html.replace('<!-- Admin Bar -->', admin_bar)
+            return re.sub(r'<!-- Admin Bar -->', admin_bar, html)
         else:
             return html
 
