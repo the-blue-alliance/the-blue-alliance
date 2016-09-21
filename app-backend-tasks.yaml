@@ -9,10 +9,6 @@ builtins:
 - appstats: on
 - deferred: on
 
-libraries:
-- name: jinja2
-  version: "2.6"
-
 instance_class: B1
 basic_scaling:
   max_instances: 1
@@ -22,6 +18,8 @@ libraries:
   version: "1.5"
 - name: numpy
   version: "1.6.1"
+- name: jinja2
+  version: "2.6"
 
 handlers:
 - url: /backend-tasks/.*
