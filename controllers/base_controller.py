@@ -1,6 +1,7 @@
 import cPickle
 import datetime
 import logging
+import re
 import urllib
 import webapp2
 import zlib
@@ -13,6 +14,7 @@ from google.appengine.api import memcache
 import tba_config
 
 from helpers.user_bundle import UserBundle
+from template_engine import jinja2_engine
 
 
 class CacheableHandler(webapp2.RequestHandler):
@@ -27,6 +29,8 @@ class CacheableHandler(webapp2.RequestHandler):
         super(CacheableHandler, self).__init__(*args, **kw)
         self._cache_expiration = 0
         self._last_modified = None  # A datetime object
+        self._user_bundle = UserBundle()
+        self._is_admin = self._user_bundle.is_current_user_admin
         if not hasattr(self, '_partial_cache_key'):
             self._partial_cache_key = self.CACHE_KEY_FORMAT
         self.template_values = {}
@@ -48,16 +52,24 @@ class CacheableHandler(webapp2.RequestHandler):
             cls.CACHE_VERSION,
             tba_config.CONFIG["static_resource_version"])
 
+    def _add_admin_bar(self, html):
+        if self._is_admin:
+            self.template_values["cache_key"] = self.cache_key
+            self.template_values["user_bundle"] = self._user_bundle
+            admin_bar = jinja2_engine.render('admin_bar.html', self.template_values)
+            return re.sub(r'<!-- Admin Bar -->', admin_bar, html)
+        else:
+            return html
+
     def get(self, *args, **kw):
         cached_response = self._read_cache()
 
         if cached_response is None:
             self._set_cache_header_length(self.CACHE_HEADER_LENGTH)
-            self.template_values["cache_key"] = self.cache_key
             self.template_values["render_time"] = datetime.datetime.now()
             rendered = self._render(*args, **kw)
             if self._has_been_modified_since(self._last_modified):
-                self.response.out.write(rendered)
+                self.response.out.write(self._add_admin_bar(rendered))
                 self._write_cache(self.response)
                 return
             else:
@@ -66,7 +78,7 @@ class CacheableHandler(webapp2.RequestHandler):
             self.response.headers.update(cached_response.headers)
             del self.response.headers['Content-Length']  # Content-Length gets set automatically
             if self._has_been_modified_since(self._last_modified):
-                self.response.out.write(cached_response.body)
+                self.response.out.write(self._add_admin_bar(cached_response.body))
                 return
             else:
                 return None
@@ -98,7 +110,7 @@ class CacheableHandler(webapp2.RequestHandler):
             return response
 
     def _write_cache(self, response):
-        if tba_config.CONFIG["memcache"]:
+        if tba_config.CONFIG["memcache"] and not self._is_admin:
             compressed = zlib.compress(cPickle.dumps((response, self._last_modified)))
             memcache.set(self.cache_key, compressed, self._cache_expiration)
 
@@ -114,8 +126,9 @@ class CacheableHandler(webapp2.RequestHandler):
             logging.error("Cache-Control max-age is not integer: {}".format(seconds))
             return
 
-        self.response.headers['Cache-Control'] = "public, max-age=%d" % max(seconds, 61)  # needs to be at least 61 seconds to work
-        self.response.headers['Pragma'] = 'Public'
+        if not self._is_admin:
+            self.response.headers['Cache-Control'] = "public, max-age=%d" % max(seconds, 61)  # needs to be at least 61 seconds to work
+            self.response.headers['Pragma'] = 'Public'
 
 
 class LoggedInHandler(webapp2.RequestHandler):
