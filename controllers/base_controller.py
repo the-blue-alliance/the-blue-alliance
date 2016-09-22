@@ -1,5 +1,6 @@
 import cPickle
 import datetime
+import time
 import logging
 import re
 import urllib
@@ -14,6 +15,7 @@ from google.appengine.api import memcache
 import tba_config
 
 from helpers.user_bundle import UserBundle
+from models.sitevar import Sitevar
 from template_engine import jinja2_engine
 
 
@@ -57,7 +59,7 @@ class CacheableHandler(webapp2.RequestHandler):
             self.template_values["cache_key"] = self.cache_key
             self.template_values["user_bundle"] = self._user_bundle
             admin_bar = jinja2_engine.render('admin_bar.html', self.template_values)
-            return re.sub(r'<!-- Admin Bar -->', admin_bar, html)
+            return re.sub(r'<!-- Admin Bar -->', admin_bar, html.decode('utf-8'))
         else:
             return html
 
@@ -112,11 +114,27 @@ class CacheableHandler(webapp2.RequestHandler):
     def _write_cache(self, response):
         if tba_config.CONFIG["memcache"] and not self._is_admin:
             compressed = zlib.compress(cPickle.dumps((response, self._last_modified)))
-            memcache.set(self.cache_key, compressed, self._cache_expiration)
+            memcache.set(self.cache_key, compressed, self._get_cache_expiration())
 
     @classmethod
     def delete_cache_multi(cls, cache_keys):
         memcache.delete_multi(cache_keys)
+
+    def _get_cache_expiration(self):
+        turbo_sitevar = Sitevar.get_by_id('turbo_mode')
+        if not turbo_sitevar or not turbo_sitevar.contents:
+            return self._cache_expiration
+        contents = turbo_sitevar.contents
+        regex = contents['regex'] if 'regex' in contents else "$^"
+        pattern = re.compile(regex)
+        valid_until = contents.get('valid_until', -1)  # UNIX time
+        cache_length = contents.get('cache_length', self._cache_expiration)
+        now = time.time()
+
+        if now <= int(valid_until) and pattern.match(self.cache_key):
+            return cache_length
+        else:
+            return self._cache_expiration
 
     def _render(self):
         raise NotImplementedError("No _render method.")
@@ -127,6 +145,7 @@ class CacheableHandler(webapp2.RequestHandler):
             return
 
         if not self._is_admin:
+            seconds = min(seconds, self._get_cache_expiration)  # Cache header should never be longer than memcache
             self.response.headers['Cache-Control'] = "public, max-age=%d" % max(seconds, 61)  # needs to be at least 61 seconds to work
             self.response.headers['Pragma'] = 'Public'
 
