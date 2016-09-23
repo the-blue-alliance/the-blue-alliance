@@ -1,6 +1,7 @@
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb.tasklets import Future
 
+from consts.ranking_indexes import RankingIndexes
 from database.match_query import TeamEventMatchesQuery
 from helpers.match_helper import MatchHelper
 from helpers.team_helper import TeamHelper
@@ -8,6 +9,46 @@ from models.event_details import EventDetails
 
 
 class EventTeamStatusHelper(object):
+
+    @classmethod
+    def _build_ranking_info(cls, team_key, event_details):
+        if not event_details:
+            return None
+        year = int(event_details.key_name[0:4])
+        rankings = event_details.rankings
+        team_num = team_key[3:]
+        team_index = next((i for i, row in enumerate(rankings) if row[1] == team_num), None)
+        if not team_index:
+            return None
+        team_line = rankings[team_index]
+        total_teams = len(rankings) - 1  # First row is headers, that doesn't count
+        rank_headers = rankings[0]
+        first_sort = team_line[RankingIndexes.CUMULATIVE_RANKING_SCORE]
+        matches_played = team_line[RankingIndexes.MATCHES_PLAYED]
+        record = cls._build_record_string(team_line, year)
+        breakdown = ", ".join("%s: %s" % tup for tup in zip(rank_headers[1:], team_line[1:]))
+        # ^ a little python magic to automagically build comma-separated key/value pairs for breakdowns, but w/o team #
+        return {
+            'rank': team_index,
+            'total': total_teams,
+            'played': matches_played,
+            'first_sort': first_sort,
+            'record': record,
+            'breakdown': breakdown
+        }
+
+    @classmethod
+    def _build_record_string(cls, ranking_row, year):
+        indexes = RankingIndexes.RECORD_INDEXES[year]
+        if not indexes:
+            return None
+        if isinstance(indexes, tuple):
+            # The item is the indexes of (wins, losses, ties)
+            return "{}-{}-{}".format(ranking_row[indexes[0]], ranking_row[indexes[1]], ranking_row[indexes[2]])
+        elif isinstance(indexes, int):
+            return ranking_row[indexes]
+        else:
+            return None
 
     @classmethod
     def buildEventTeamStatus(cls, live_events, live_eventteams, team_filter):
