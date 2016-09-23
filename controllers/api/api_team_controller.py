@@ -135,7 +135,7 @@ class ApiTeamEventMatchesController(ApiTeamControllerBase):
 
 class ApiTeamMediaController(ApiTeamControllerBase):
     CACHE_KEY_FORMAT = "apiv2_team_media_controller_{}_{}"  # (team_key, year)
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):

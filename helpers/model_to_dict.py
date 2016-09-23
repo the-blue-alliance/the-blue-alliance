@@ -130,6 +130,7 @@ class ModelToDict(object):
             media_dict["details"] = media.details
         else:
             media_dict["details"] = {}
+        media_dict["preferred"] = True if media.preferred_references != [] else False
 
         return media_dict
 
