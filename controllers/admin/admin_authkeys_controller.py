@@ -29,6 +29,7 @@ class AdminAuthKeys(LoggedInHandler):
             'fmsapi_secret': fmsapi_keys.get('authkey', ''),
             'web_client_id': clientIds.get('web', ''),
             'android_client_id': clientIds.get('android', ''),
+            'ios_client_id': clientIds.get('ios', ''),
             'gcm_key': gcm_serverKey.contents.get("gcm_key", "") if gcm_serverKey else "",
         })
 
@@ -50,12 +51,14 @@ class AdminAuthKeys(LoggedInHandler):
         fmsapi_secret = self.request.get("fmsapi_secret")
         web_client_id = self.request.get("web_client_id")
         android_client_id = self.request.get("android_client_id")
+        ios_client_id = self.request.get("ios_client_id")
         gcm_key = self.request.get("gcm_key")
 
         google_secrets.contents = {'api_key': google_key}
         firebase_secrets.contents = {'FIREBASE_SECRET': firebase_key}
         fmsapi_secrets.contents = {'username': fmsapi_user, 'authkey': fmsapi_secret}
-        mobile_clientIds.contents = {'web': web_client_id, 'android': android_client_id}
+        mobile_clientIds.contents = {'web': web_client_id, 'android': android_client_id,
+                                     'ios': ios_client_id}
         gcm_serverKey.contents = {'gcm_key': gcm_key}
 
         google_secrets.put()
