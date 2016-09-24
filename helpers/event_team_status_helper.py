@@ -38,6 +38,26 @@ class EventTeamStatusHelper(object):
         }
 
     @classmethod
+    def _build_alliance_info(cls, team_key, event_details):
+        if not event_details or not event_details.alliance_selections:
+            return None
+        alliance, number = cls._get_alliance(team_key, event_details)
+        if not alliance:
+            return None
+
+        # Calculate the role played by the team on the alliance
+        position = -1 if team_key == alliance.get('backup', {}).get('in', "") else None
+        for i, team in enumerate(alliance['picks']):
+            if team == team_key:
+                position = i
+                break
+
+        return {
+            'position': position,
+            'name': alliance.get('name', "Alliance {}".format(number))
+        }
+
+    @classmethod
     def _build_record_string(cls, ranking_row, year):
         indexes = RankingIndexes.RECORD_INDEXES[year]
         if not indexes:
@@ -49,6 +69,25 @@ class EventTeamStatusHelper(object):
             return ranking_row[indexes]
         else:
             return None
+
+    @classmethod
+    def _get_alliance(cls, team_key, event_details):
+        """
+        Get the alliance number of the team
+        Returns 0 when the team is not on an alliance
+        """
+        if event_details and event_details.alliance_selections:
+            for i, alliance in enumerate(event_details.alliance_selections):
+                alliance_number = i + 1
+                if team_key in alliance['picks']:
+                    return alliance, alliance_number
+
+                if team_key == alliance.get('backup', {}).get('in', ""):
+                    # If this team came in as a backup team
+                    return alliance, alliance_number
+
+        alliance_number = 0
+        return None, alliance_number  # Team didn't make it to elims
 
     @classmethod
     def buildEventTeamStatus(cls, live_events, live_eventteams, team_filter):
