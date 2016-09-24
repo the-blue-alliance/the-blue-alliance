@@ -40,7 +40,7 @@ class PredictionHelper(object):
         return s, s_boulder
 
     @classmethod
-    def _predict_match(cls, match, all_stats, is_champs):
+    def _predict_match(cls, match, all_stats, tower_strength):
         score_var = 40**2  # TODO temporary set variance to be huge
         boulder_var = 5**2  # TODO get real value
         crossing_var = 4**2  # TODO get real value
@@ -75,7 +75,6 @@ class PredictionHelper(object):
             prob = 0.5
 
         # Prob capture
-        tower_strength = 10 if is_champs else 8
         mu = red_boulders - tower_strength
         red_prob_capture = 1 - cls._normcdf(-mu / np.sqrt(boulder_var))
 
@@ -179,8 +178,8 @@ class PredictionHelper(object):
                         limit_matches=i)
 
             # Make prediction
-            is_champs = event.event_type_enum in EventType.CMP_EVENT_TYPES
-            prediction = cls._predict_match(match, all_ixoprs, is_champs)
+            tower_strength = 10 if (event.event_type_enum in EventType.CMP_EVENT_TYPES or event.key.id() == '2016cc') else 8
+            prediction = cls._predict_match(match, all_ixoprs, tower_strength)
             predictions[match.key.id()] = prediction
 
             # Benchmark prediction
