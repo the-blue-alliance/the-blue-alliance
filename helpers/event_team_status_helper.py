@@ -58,6 +58,46 @@ class EventTeamStatusHelper(object):
         }
 
     @classmethod
+    def _build_playoff_status(cls, team_key, event_details, matches):
+        # Matches needs to be all playoff matches at the event, to properly account for backups
+        alliance, alliance_number = cls._get_alliance(team_key, event_details)
+        complete_alliance = set(alliance['picks'])
+        if 'backup' in alliance:
+            complete_alliance.add(alliance['backup']['in'])
+
+        for comp_level in ['f', 'sf', 'qf', 'ef']:  # playoffs
+            if matches[comp_level]:
+                wins = 0
+                losses = 0
+                for match in matches[comp_level]:
+                    if match.has_been_played:
+                        for color in ['red', 'blue']:
+                            match_alliance = set(match.alliances[color]['teams'])
+                            if len(match_alliance.intersection(complete_alliance)) >= 2:
+                                if match_alliance.difference(complete_alliance) == 0:
+                                    wins += 1
+                                    break
+                                else:
+                                    losses += 1
+                                    break
+                if wins == 2:
+                    return {
+                        'status': 'won',
+                        'level': comp_level
+                    }
+                elif losses == 2:
+                    return {
+                        'status': 'eliminated',
+                        'level': comp_level
+                    }
+                else:
+                    return {
+                        'status': 'playing',
+                        'level': comp_level
+                    }
+        return None
+
+    @classmethod
     def _build_record_string(cls, ranking_row, year):
         indexes = RankingIndexes.RECORD_INDEXES[year]
         if not indexes:
