@@ -11,6 +11,24 @@ from models.event_details import EventDetails
 class EventTeamStatusHelper(object):
 
     @classmethod
+    def generate_team_at_event_status(cls, team_key, event, matches=None):
+        """
+        Generate a dict containing team@event status information
+        :param team_key: Key name of the team to focus on
+        :param event: Event object
+        :param matches: Organized matches (via MatchHelper.organizeMatches) from the event, optional
+        """
+        event_details = event.details
+        if not matches:
+            matches = event.matches
+            MatchHelper.organizeMatches(matches)
+        return {
+            'rank': cls._build_ranking_info(team_key, event_details),
+            'alliance': cls._build_alliance_info(team_key, event_details),
+            'playoff': cls._build_playoff_status(team_key, event_details, matches)
+        }
+
+    @classmethod
     def _build_ranking_info(cls, team_key, event_details):
         if not event_details:
             return None
