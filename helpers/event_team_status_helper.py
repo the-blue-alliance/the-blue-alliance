@@ -89,11 +89,13 @@ class EventTeamStatusHelper(object):
 
         all_wins = 0
         all_losses = 0
+        all_ties = 0
         status = None
         for comp_level in ['f', 'sf', 'qf', 'ef']:  # playoffs
             if matches[comp_level]:
                 level_wins = 0
                 level_losses = 0
+                level_ties = 0
                 level_matches = 0
                 for match in matches[comp_level]:
                     if match.has_been_played:
@@ -104,6 +106,10 @@ class EventTeamStatusHelper(object):
                                 if match.winning_alliance == color:
                                     level_wins += 1
                                     all_wins += 1
+                                elif not match.winning_alliance:
+                                    # The match was a tie
+                                    level_ties += 1
+                                    all_ties += 1
                                 else:
                                     level_losses += 1
                                     all_losses += 1
@@ -125,10 +131,10 @@ class EventTeamStatusHelper(object):
                     status = {
                         'status': 'playing',
                         'level': comp_level,
-                        'current_level_record': "{}-{}".format(level_wins, level_losses)
+                        'current_level_record': "{}-{}-{}".format(level_wins, level_losses, level_ties)
                     }
         if status:
-            status['record'] = "{}-{}".format(all_wins, all_losses)
+            status['record'] = "{}-{}-{}".format(all_wins, all_losses, all_ties)
         return status
 
     @classmethod
