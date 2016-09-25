@@ -83,8 +83,8 @@ class EventTeamStatusHelper(object):
     def _build_playoff_status(cls, team_key, event_details, matches):
         # Matches needs to be all playoff matches at the event, to properly account for backups
         alliance, alliance_number = cls._get_alliance(team_key, event_details)
-        complete_alliance = set(alliance['picks'])
-        if alliance.get('backup'):
+        complete_alliance = set(alliance['picks']) if alliance else set()
+        if alliance and alliance.get('backup'):
             complete_alliance.add(alliance['backup']['in'])
 
         all_wins = 0
