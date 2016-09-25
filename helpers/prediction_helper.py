@@ -204,17 +204,17 @@ class PredictionHelper(object):
                             init_stats_default[stat] += match.score_breakdown[alliance_color]['autoPoints']
                         elif stat == '2016bouldersOPR':
                             init_stats_default[stat] += (
-                                match.score_breakdown[alliance_color]['autoBouldersLow'] +
-                                match.score_breakdown[alliance_color]['autoBouldersHigh'] +
-                                match.score_breakdown[alliance_color]['teleopBouldersLow'] +
-                                match.score_breakdown[alliance_color]['teleopBouldersHigh'])
+                                match.score_breakdown[alliance_color].get('autoBouldersLow', 0) +
+                                match.score_breakdown[alliance_color].get('autoBouldersHigh', 0) +
+                                match.score_breakdown[alliance_color].get('teleopBouldersLow', 0) +
+                                match.score_breakdown[alliance_color].get('teleopBouldersHigh', 0))
                         elif stat == '2016crossingsOPR':
                             init_stats_default[stat] += (
-                                match.score_breakdown[alliance_color]['position1crossings'] +
-                                match.score_breakdown[alliance_color]['position2crossings'] +
-                                match.score_breakdown[alliance_color]['position3crossings'] +
-                                match.score_breakdown[alliance_color]['position4crossings'] +
-                                match.score_breakdown[alliance_color]['position5crossings'])
+                                match.score_breakdown[alliance_color].get('position1crossings', 0) +
+                                match.score_breakdown[alliance_color].get('position2crossings', 0) +
+                                match.score_breakdown[alliance_color].get('position3crossings', 0) +
+                                match.score_breakdown[alliance_color].get('position4crossings', 0) +
+                                match.score_breakdown[alliance_color].get('position5crossings', 0))
 
             init_stats_default['oprs'] = float(stats_sum['score']) / (i + 1) / 6  # Initialize with 1/3 of average scores (2 alliances per match)
             for stat in relevant_stats:
