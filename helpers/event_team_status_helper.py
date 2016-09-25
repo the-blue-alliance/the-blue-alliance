@@ -23,7 +23,7 @@ class EventTeamStatusHelper(object):
         if not matches:
             matches = event.matches
             matches = [match for match in matches if match.comp_level in Match.ELIM_LEVELS]
-            MatchHelper.organizeMatches(matches)
+            matches = MatchHelper.organizeMatches(matches)
         return {
             'rank': cls._build_ranking_info(team_key, event_details),
             'alliance': cls._build_alliance_info(team_key, event_details),
@@ -34,19 +34,19 @@ class EventTeamStatusHelper(object):
     def _build_ranking_info(cls, team_key, event_details):
         if not event_details:
             return None
-        year = int(event_details.key_name[0:4])
+        year = int(event_details.key.id()[:4])
         rankings = event_details.rankings
-        team_num = team_key[3:]
-        team_index = next((i for i, row in enumerate(rankings) if row[1] == team_num), None)
+        team_num = int(team_key[3:])
+        team_index = next((row[0] for row in rankings if row[1] == team_num), None)
         if not team_index:
             return None
         team_line = rankings[team_index]
         total_teams = len(rankings) - 1  # First row is headers, that doesn't count
         rank_headers = rankings[0]
-        first_sort = team_line[RankingIndexes.CUMULATIVE_RANKING_SCORE]
-        matches_played = team_line[RankingIndexes.MATCHES_PLAYED]
+        first_sort = team_line[RankingIndexes.CUMULATIVE_RANKING_SCORE[year]]
+        matches_played = team_line[RankingIndexes.MATCHES_PLAYED[year]]
         record = cls._build_record_string(team_line, year)
-        breakdown = ", ".join("%s: %s" % tup for tup in zip(rank_headers[1:], team_line[1:]))
+        breakdown = ", ".join("%s: %s" % tup for tup in zip(rank_headers[2:], team_line[2:]))
         # ^ a little python magic to automagically build comma-separated key/value pairs for breakdowns, but w/o team #
         return {
             'rank': team_index,
@@ -66,7 +66,8 @@ class EventTeamStatusHelper(object):
             return None
 
         # Calculate the role played by the team on the alliance
-        position = -1 if team_key == alliance.get('backup', {}).get('in', "") else None
+        backup_info = alliance.get('backup', {}) if alliance.get('backup') else {}
+        position = -1 if team_key == backup_info.get('in', "") else None
         for i, team in enumerate(alliance['picks']):
             if team == team_key:
                 position = i
@@ -74,7 +75,8 @@ class EventTeamStatusHelper(object):
 
         return {
             'position': position,
-            'name': alliance.get('name', "Alliance {}".format(number))
+            'name': alliance.get('name', "Alliance {}".format(number)),
+            'backup': alliance.get('backup'),
         }
 
     @classmethod
@@ -82,7 +84,7 @@ class EventTeamStatusHelper(object):
         # Matches needs to be all playoff matches at the event, to properly account for backups
         alliance, alliance_number = cls._get_alliance(team_key, event_details)
         complete_alliance = set(alliance['picks'])
-        if 'backup' in alliance:
+        if alliance.get('backup'):
             complete_alliance.add(alliance['backup']['in'])
 
         all_wins = 0
@@ -92,12 +94,14 @@ class EventTeamStatusHelper(object):
             if matches[comp_level]:
                 level_wins = 0
                 level_losses = 0
+                level_matches = 0
                 for match in matches[comp_level]:
                     if match.has_been_played:
                         for color in ['red', 'blue']:
                             match_alliance = set(match.alliances[color]['teams'])
                             if len(match_alliance.intersection(complete_alliance)) >= 2:
-                                if match_alliance.difference(complete_alliance) == 0:
+                                level_matches += 1
+                                if match.winning_alliance == color:
                                     level_wins += 1
                                     all_wins += 1
                                 else:
@@ -117,7 +121,7 @@ class EventTeamStatusHelper(object):
                         'status': 'eliminated',
                         'level': comp_level
                     }
-                else:
+                elif level_matches > 0:
                     status = {
                         'status': 'playing',
                         'level': comp_level,
@@ -152,7 +156,8 @@ class EventTeamStatusHelper(object):
                 if team_key in alliance['picks']:
                     return alliance, alliance_number
 
-                if team_key == alliance.get('backup', {}).get('in', ""):
+                backup_info = alliance.get('backup') if alliance.get('backup') else {}
+                if team_key == backup_info.get('in', ""):
                     # If this team came in as a backup team
                     return alliance, alliance_number
 
