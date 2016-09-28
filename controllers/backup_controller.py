@@ -269,7 +269,7 @@ class TbaCSVBackupTeamsDo(webapp.RequestHandler):
     TEAMS_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/teams/teams.csv'
 
     def get(self):
-        team_keys_future = Team.query().order(Team.team_number).fetch_async(10, keys_only=True)
+        team_keys_future = Team.query().order(Team.team_number).fetch_async(keys_only=True)
         social_media_keys_future = Media.query(Media.year == None).fetch_async(keys_only=True)
 
         team_futures = ndb.get_multi_async(team_keys_future.get_result())
