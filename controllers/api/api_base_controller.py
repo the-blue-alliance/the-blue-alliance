@@ -32,7 +32,7 @@ def track_call(api_action, api_label, x_tba_app_id):
         logging.warning("Missing sitevar: google_analytics.id. Can't track API usage.")
     else:
         GOOGLE_ANALYTICS_ID = analytics_id.contents['GOOGLE_ANALYTICS_ID']
-        params = urllib.urlencode({
+        payload = urllib.urlencode({
             'v': 1,
             'tid': GOOGLE_ANALYTICS_ID,
             'cid': uuid.uuid3(uuid.NAMESPACE_X500, str(x_tba_app_id)),
@@ -45,11 +45,12 @@ def track_call(api_action, api_label, x_tba_app_id):
             'sc': 'end',  # forces tracking session to end
         })
 
-        analytics_url = 'http://www.google-analytics.com/collect?%s' % params
         urlfetch.fetch(
-            url=analytics_url,
-            method=urlfetch.GET,
+            url='https://www.google-analytics.com/collect',
+            validate_certificate=True,
+            method=urlfetch.POST,
             deadline=10,
+            payload=payload,
         )
 
 
