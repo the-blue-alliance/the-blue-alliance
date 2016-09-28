@@ -290,7 +290,7 @@ class TbaCSVBackupTeamsDo(webapp.RequestHandler):
                     for social_type in MediaType.social_types:
                         social = socials_by_team[team.key.id()].get(social_type, None)
                         team_row.append(social.social_profile_url if social is not None else None)
-                    self._writerow_unicode(writer, [team.key.id(), team.nickname, team.name, team.city, team.state_prov, team.country, team.website, team.rookie_year])
+                    self._writerow_unicode(writer, team_row)
 
         self.response.out.write("Done backing up teams!")
 
