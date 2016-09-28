@@ -7,6 +7,10 @@ import os
 import StringIO
 import tba_config
 
+from collections import defaultdict
+
+from consts.media_type import MediaType
+
 from google.appengine.api import taskqueue
 from google.appengine.api import urlfetch
 from google.appengine.ext import ndb
@@ -265,16 +269,27 @@ class TbaCSVBackupTeamsDo(webapp.RequestHandler):
     TEAMS_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/teams/teams.csv'
 
     def get(self):
-        team_keys = Team.query().order(Team.team_number).fetch(None, keys_only=True)
-        team_futures = ndb.get_multi_async(team_keys)
+        team_keys_future = Team.query().order(Team.team_number).fetch_async(10, keys_only=True)
+        social_media_keys_future = Media.query(Media.year == None).fetch_async(keys_only=True)
 
-        social_medias = yield Media.query(Media.year == None).fetch_async()
+        team_futures = ndb.get_multi_async(team_keys_future.get_result())
+        social_futures = ndb.get_multi_async(social_media_keys_future.get_result())
+
+        socials_by_team = defaultdict(dict)
+        for social_future in social_futures:
+            social = social_future.get_result()
+            for reference in social.references:
+                socials_by_team[reference.id()][social.media_type_enum] = social
 
         if team_futures:
             with cloudstorage.open(self.TEAMS_FILENAME_PATTERN, 'w') as teams_file:
                 writer = csv.writer(teams_file, delimiter=',')
                 for team_future in team_futures:
                     team = team_future.get_result()
+                    team_row = [team.key.id(), team.nickname, team.name, team.city, team.state_prov, team.country, team.website, team.rookie_year]
+                    for social_type in MediaType.social_types:
+                        social = socials_by_team[team.key.id()].get(social_type, None)
+                        team_row.append(social.social_profile_url if social is not None else None)
                     self._writerow_unicode(writer, [team.key.id(), team.nickname, team.name, team.city, team.state_prov, team.country, team.website, team.rookie_year])
 
         self.response.out.write("Done backing up teams!")
