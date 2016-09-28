@@ -257,7 +257,8 @@ class TbaCSVBackupTeamsEnqueue(webapp.RequestHandler):
     """
     def get(self):
         taskqueue.add(
-            url='/tasks/do/csv_backup_teams',
+            target='backend-tasks-b2',
+            url='/backend-tasks-b2/do/csv_backup_teams',
             method='GET')
         self.response.out.write("Enqueued CSV teams backup")
 
