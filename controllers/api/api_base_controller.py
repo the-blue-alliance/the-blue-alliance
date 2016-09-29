@@ -49,7 +49,7 @@ def track_call(api_action, api_label, x_tba_app_id):
             url='https://www.google-analytics.com/collect',
             validate_certificate=True,
             method=urlfetch.POST,
-            deadline=10,
+            deadline=30,
             payload=payload,
         )
 
