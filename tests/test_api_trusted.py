@@ -87,6 +87,7 @@ class TestApiTrustedController(unittest2.TestCase):
 
     def test_auth(self):
         request_path = '/api/trusted/v1/event/2014casj/matches/update'
+        request_path_caps_key = '/api/trusted/v1/event/2014CASJ/matches/update'
 
         # Fail
         response = self.testapp.post(request_path, expect_errors=True)
@@ -106,6 +107,11 @@ class TestApiTrustedController(unittest2.TestCase):
         # Pass
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
         response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        self.assertEqual(response.status_code, 200)
+
+        # Pass; all caps key
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path_caps_key, request_body)).hexdigest()
+        response = self.testapp.post(request_path_caps_key, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 200)
 
         # Fail; bad X-TBA-Auth-Id

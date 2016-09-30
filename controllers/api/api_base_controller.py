@@ -179,6 +179,7 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
         self.response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-TBA-Auth-Id, X-TBA-Auth-Sig'
 
     def post(self, event_key):
+        event_key = event_key.lower()  # Normalize keys to lower case (TBA convention)
         auth_id = self.request.headers.get('X-TBA-Auth-Id')
         if not auth_id:
             self._errors = json.dumps({"Error": "Must provide a request header parameter 'X-TBA-Auth-Id'"})
