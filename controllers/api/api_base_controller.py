@@ -194,17 +194,17 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
         if not auth or expected_sig != auth_sig:
             logging.info("Auth sig: {}, Expected sig: {}".format(auth_sig, expected_sig))
             self._errors = json.dumps({"Error": "Invalid X-TBA-Auth-Id and/or X-TBA-Auth-Sig!"})
-            self.abort(400)
+            self.abort(401)
 
         allowed_event_keys = [ekey.id() for ekey in auth.event_list]
         if event_key not in allowed_event_keys:
             self._errors = json.dumps({"Error": "Only allowed to edit events: {}".format(', '.join(allowed_event_keys))})
-            self.abort(400)
+            self.abort(401)
 
         missing_auths = self.REQUIRED_AUTH_TYPES.difference(set(auth.auth_types_enum))
         if missing_auths != set():
             self._errors = json.dumps({"Error": "You do not have permission to edit: {}. If this is incorrect, please contact TBA admin.".format(",".join([AuthType.type_names[ma] for ma in missing_auths]))})
-            self.abort(400)
+            self.abort(401)
 
         try:
             self._process_request(self.request, event_key)
