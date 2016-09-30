@@ -179,6 +179,7 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
         self.response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-TBA-Auth-Id, X-TBA-Auth-Sig'
 
     def post(self, event_key):
+        event_key = event_key.lower()  # Normalize keys to lower case (TBA convention)
         auth_id = self.request.headers.get('X-TBA-Auth-Id')
         if not auth_id:
             self._errors = json.dumps({"Error": "Must provide a request header parameter 'X-TBA-Auth-Id'"})
@@ -194,17 +195,17 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
         if not auth or expected_sig != auth_sig:
             logging.info("Auth sig: {}, Expected sig: {}".format(auth_sig, expected_sig))
             self._errors = json.dumps({"Error": "Invalid X-TBA-Auth-Id and/or X-TBA-Auth-Sig!"})
-            self.abort(400)
+            self.abort(401)
 
         allowed_event_keys = [ekey.id() for ekey in auth.event_list]
         if event_key not in allowed_event_keys:
             self._errors = json.dumps({"Error": "Only allowed to edit events: {}".format(', '.join(allowed_event_keys))})
-            self.abort(400)
+            self.abort(401)
 
         missing_auths = self.REQUIRED_AUTH_TYPES.difference(set(auth.auth_types_enum))
         if missing_auths != set():
             self._errors = json.dumps({"Error": "You do not have permission to edit: {}. If this is incorrect, please contact TBA admin.".format(",".join([AuthType.type_names[ma] for ma in missing_auths]))})
-            self.abort(400)
+            self.abort(401)
 
         try:
             self._process_request(self.request, event_key)
