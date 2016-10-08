@@ -55,7 +55,7 @@ class NotificationSender(object):
                 invalid_urls.append(url)
                 logging.warning('URLError: ' + str(e.code) + " " + e.msg + " " + e.read())
             except Exception, ex:
-                logging.exception("Other Exception: {}".format(str(ex)))
+                logging.warning("Other Exception: {}".format(str(ex)))
 
         if invalid_urls:
             logging.warning("Invalid urls while sending webhook: {}".format(str(invalid_urls)))
