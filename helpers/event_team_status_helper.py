@@ -33,13 +33,13 @@ class EventTeamStatusHelper(object):
     @classmethod
     def _build_ranking_info(cls, team_key, event_details):
         if not event_details:
-            return {}
+            return None
         year = int(event_details.key.id()[:4])
         rankings = event_details.rankings
         team_num = int(team_key[3:])
         team_index = next((row[0] for row in rankings if row[1] == team_num), None)
         if not team_index:
-            return {}
+            return None
         team_line = rankings[team_index]
         total_teams = len(rankings) - 1  # First row is headers, that doesn't count
         rank_headers = rankings[0]
@@ -60,10 +60,10 @@ class EventTeamStatusHelper(object):
     @classmethod
     def _build_alliance_info(cls, team_key, event_details):
         if not event_details or not event_details.alliance_selections:
-            return {}
+            return None
         alliance, number = cls._get_alliance(team_key, event_details)
         if not alliance:
-            return {}
+            return None
 
         # Calculate the role played by the team on the alliance
         backup_info = alliance.get('backup', {}) if alliance.get('backup') else {}
@@ -250,9 +250,9 @@ class EventTeamStatusHelper(object):
         matches = MatchHelper.organizeMatches(playoff_matches)
 
         team_status = cls.generate_team_at_event_status(team_key, event, matches)
-        rank_status = team_status.get('rank', {})
-        alliance_status = team_status.get('alliance', {})
-        playoff_status = team_status.get('playoff', {})
+        rank_status = team_status.get('rank', None)
+        alliance_status = team_status.get('alliance', None)
+        playoff_status = team_status.get('playoff', None)
 
         # Playoff Status
         status, short_playoff_status = cls._get_playoff_status_string(team_key, alliance_status, playoff_status)
@@ -269,7 +269,7 @@ class EventTeamStatusHelper(object):
         record = rank_status.get('record', '?')
         num_teams = rank_status.get('total', '?')
         rank_str = "Rank {} with {} RP".format(rank, ranking_points)
-        alliance_name = alliance_status.get('name', '?')
+        alliance_name = alliance_status.get('name', '?') if alliance_status else '?'
 
         # Compute final long status for nightbot, if one isn't already there
         matches_per_team = qual_match_count // rank_status.get('total', 1)
@@ -279,9 +279,9 @@ class EventTeamStatusHelper(object):
             else:
                 status = "Team {} currently has a record of {}.".format(team_number, record)
         elif not status:
-            if not alliance_status and playoff_match_count == 0:
+            if alliance_status is None and playoff_match_count == 0:
                 status = "Team {} ended qualification matches at rank {}/{} with a record of {}.".format(team_number, rank, num_teams, record)
-            elif not alliance_status and playoff_match_count > 0:
+            elif alliance_status is None and playoff_match_count > 0:
                 status = "Team {} ended qualification matches at rank {}/{} with a record of {} and was not picked for playoff matches.".format(team_number, rank, num_teams, record)
             else:
                 status = "Team {} will be competing in the playoff matches on {}.".format(team_number, alliance_name)
