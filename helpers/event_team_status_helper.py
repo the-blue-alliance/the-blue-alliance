@@ -34,8 +34,9 @@ class EventTeamStatusHelper(object):
     def _build_ranking_info(cls, team_key, event_details):
         if not event_details:
             return None
-        year = int(event_details.key.id()[:4])
         rankings = event_details.rankings
+        if not rankings:
+            return None
         team_num = int(team_key[3:])
         team_index = next((row[0] for row in rankings if row[1] == team_num), None)
         if not team_index:
@@ -43,6 +44,7 @@ class EventTeamStatusHelper(object):
         team_line = rankings[team_index]
         total_teams = len(rankings) - 1  # First row is headers, that doesn't count
         rank_headers = rankings[0]
+        year = int(event_details.key.id()[:4])
         first_sort = team_line[RankingIndexes.CUMULATIVE_RANKING_SCORE[year]]
         matches_played = team_line[RankingIndexes.MATCHES_PLAYED[year]]
         record = cls._build_record_string(team_line, year)
@@ -224,7 +226,7 @@ class EventTeamStatusHelper(object):
             else:
                 return "Team {} won {} on {}.".format(team_number, level_str, alliance_name), "Won {} on {}".format(level_str, alliance_name)
         elif playoff_status['status'] == 'eliminated':
-            return "Team {} got knocked out in {} on {}.".format(team_number, level_str, alliance_name), "Knocked out in {} on alliance #{}".format(level_str, alliance_name)
+            return "Team {} got knocked out in {} on {}.".format(team_number, level_str, alliance_name), "Knocked out in {} on {}".format(level_str, alliance_name)
         else:
             return "Team {} is currently {} in {} on {}.".format(team_number, playoff_status['current_level_record'], level_str, alliance_name), "Currently {} in {} on {}".format(playoff_status['current_level_record'], level_str, alliance_name)
 
@@ -261,8 +263,8 @@ class EventTeamStatusHelper(object):
         if not rank_status or rank_status.get('played', 0) == 0:
             # No matches played yet
             status = "Team {} has not played any matches yet.".format(team_number) if not status else status
-            record = None
-            rank_str = None
+            record = '?'
+            rank_str = '?'
         else:
             # Compute rank & num_teams
             # Gets record from ranking data to account for surrogate matches
