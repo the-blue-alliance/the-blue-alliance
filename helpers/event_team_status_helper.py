@@ -261,29 +261,31 @@ class EventTeamStatusHelper(object):
         if not rank_status or rank_status.get('played', 0) == 0:
             # No matches played yet
             status = "Team {} has not played any matches yet.".format(team_number) if not status else status
+            record = None
+            rank_str = None
+        else:
+            # Compute rank & num_teams
+            # Gets record from ranking data to account for surrogate matches
+            rank = rank_status.get('rank', '?')
+            ranking_points = rank_status.get('first_sort', '?')
+            record = rank_status.get('record', '?')
+            num_teams = rank_status.get('total', '?')
+            rank_str = "Rank {} with {} RP".format(rank, ranking_points)
+            alliance_name = alliance_status.get('name', '?') if alliance_status else '?'
 
-        # Compute rank & num_teams
-        # Gets record from ranking data to account for surrogate matches
-        rank = rank_status.get('rank', '?')
-        ranking_points = rank_status.get('first_sort', '?')
-        record = rank_status.get('record', '?')
-        num_teams = rank_status.get('total', '?')
-        rank_str = "Rank {} with {} RP".format(rank, ranking_points)
-        alliance_name = alliance_status.get('name', '?') if alliance_status else '?'
-
-        # Compute final long status for nightbot, if one isn't already there
-        matches_per_team = qual_match_count // rank_status.get('total', 1)
-        if rank_status.get('played', 0) - matches_per_team > 0 and not status:
-            if rank is not None:
-                status = "Team {} is currently rank {}/{} with a record of {} and {} ranking points.".format(team_number, rank, num_teams, record, ranking_points)
-            else:
-                status = "Team {} currently has a record of {}.".format(team_number, record)
-        elif not status:
-            if alliance_status is None and playoff_match_count == 0:
-                status = "Team {} ended qualification matches at rank {}/{} with a record of {}.".format(team_number, rank, num_teams, record)
-            elif alliance_status is None and playoff_match_count > 0:
-                status = "Team {} ended qualification matches at rank {}/{} with a record of {} and was not picked for playoff matches.".format(team_number, rank, num_teams, record)
-            else:
-                status = "Team {} will be competing in the playoff matches on {}.".format(team_number, alliance_name)
+            # Compute final long status for nightbot, if one isn't already there
+            matches_per_team = qual_match_count // rank_status.get('total', 1)
+            if rank_status.get('played', 0) - matches_per_team > 0 and not status:
+                if rank is not None:
+                    status = "Team {} is currently rank {}/{} with a record of {} and {} ranking points.".format(team_number, rank, num_teams, record, ranking_points)
+                else:
+                    status = "Team {} currently has a record of {}.".format(team_number, record)
+            elif not status:
+                if alliance_status is None and playoff_match_count == 0:
+                    status = "Team {} ended qualification matches at rank {}/{} with a record of {}.".format(team_number, rank, num_teams, record)
+                elif alliance_status is None and playoff_match_count > 0:
+                    status = "Team {} ended qualification matches at rank {}/{} with a record of {} and was not picked for playoff matches.".format(team_number, rank, num_teams, record)
+                else:
+                    status = "Team {} will be competing in the playoff matches on {}.".format(team_number, alliance_name)
 
         raise ndb.Return(status, record, rank_str, short_playoff_status)
