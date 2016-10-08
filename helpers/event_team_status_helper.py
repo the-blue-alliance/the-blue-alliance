@@ -250,9 +250,9 @@ class EventTeamStatusHelper(object):
         matches = MatchHelper.organizeMatches(playoff_matches)
 
         team_status = cls.generate_team_at_event_status(team_key, event, matches)
-        rank_status = team_status.get('rank', None)
-        alliance_status = team_status.get('alliance', None)
-        playoff_status = team_status.get('playoff', None)
+        rank_status = team_status.get('rank', {})
+        alliance_status = team_status.get('alliance', {})
+        playoff_status = team_status.get('playoff', {})
 
         # Playoff Status
         status, short_playoff_status = cls._get_playoff_status_string(team_key, alliance_status, playoff_status)
@@ -269,7 +269,7 @@ class EventTeamStatusHelper(object):
         record = rank_status.get('record', '?')
         num_teams = rank_status.get('total', '?')
         rank_str = "Rank {} with {} RP".format(rank, ranking_points)
-        alliance_name = alliance_status.get('name', '?') if alliance_status else '?'
+        alliance_name = alliance_status.get('name', '?')
 
         # Compute final long status for nightbot, if one isn't already there
         matches_per_team = qual_match_count // rank_status.get('total', 1)
@@ -279,9 +279,9 @@ class EventTeamStatusHelper(object):
             else:
                 status = "Team {} currently has a record of {}.".format(team_number, record)
         elif not status:
-            if alliance_status is None and playoff_match_count == 0:
+            if not alliance_status and playoff_match_count == 0:
                 status = "Team {} ended qualification matches at rank {}/{} with a record of {}.".format(team_number, rank, num_teams, record)
-            elif alliance_status is None and playoff_match_count > 0:
+            elif not alliance_status and playoff_match_count > 0:
                 status = "Team {} ended qualification matches at rank {}/{} with a record of {} and was not picked for playoff matches.".format(team_number, rank, num_teams, record)
             else:
                 status = "Team {} will be competing in the playoff matches on {}.".format(team_number, alliance_name)
