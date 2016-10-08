@@ -28,12 +28,14 @@ from models.suggestion import Suggestion
 WEB_CLIENT_ID = ""
 ANDROID_AUDIENCE = ""
 ANDROID_CLIENT_ID = ""
+IOS_CLIENT_ID = ""
 
 client_ids_sitevar = Sitevar.get_or_insert('mobile.clientIds')
 if isinstance(client_ids_sitevar.contents, dict):
     WEB_CLIENT_ID = client_ids_sitevar.contents.get("web", "")
     ANDROID_AUDIENCE = WEB_CLIENT_ID
     ANDROID_CLIENT_ID = client_ids_sitevar.contents.get("android", "")
+    IOS_CLIENT_ID = client_ids_sitevar.contents.get("ios", "")
 
 if not WEB_CLIENT_ID:
     logging.error("Web client ID is not set, see /admin/authkeys")
@@ -41,16 +43,15 @@ if not WEB_CLIENT_ID:
 if not ANDROID_CLIENT_ID:
     logging.error("Android client ID is not set, see /admin/authkeys")
 
-# To enable iOS access to the API, add another variable for the iOS client ID
+if not IOS_CLIENT_ID:
+    logging.error("iOS client ID is not set, see /admin/authkeys")
 
-client_ids = [WEB_CLIENT_ID, ANDROID_CLIENT_ID]
+client_ids = [WEB_CLIENT_ID, ANDROID_CLIENT_ID, IOS_CLIENT_ID]
 if tba_config.DEBUG:
     '''
     Only allow API Explorer access on dev versions
     '''
     client_ids.append(endpoints.API_EXPLORER_CLIENT_ID)
-
-# To enable iOS access, add it's client ID here
 
 
 @endpoints.api(name='tbaMobile', version='v9', description="API for TBA Mobile clients",
