@@ -33,13 +33,13 @@ class EventTeamStatusHelper(object):
     @classmethod
     def _build_ranking_info(cls, team_key, event_details):
         if not event_details:
-            return None
+            return {}
         year = int(event_details.key.id()[:4])
         rankings = event_details.rankings
         team_num = int(team_key[3:])
         team_index = next((row[0] for row in rankings if row[1] == team_num), None)
         if not team_index:
-            return None
+            return {}
         team_line = rankings[team_index]
         total_teams = len(rankings) - 1  # First row is headers, that doesn't count
         rank_headers = rankings[0]
@@ -60,10 +60,10 @@ class EventTeamStatusHelper(object):
     @classmethod
     def _build_alliance_info(cls, team_key, event_details):
         if not event_details or not event_details.alliance_selections:
-            return None
+            return {}
         alliance, number = cls._get_alliance(team_key, event_details)
         if not alliance:
-            return None
+            return {}
 
         # Calculate the role played by the team on the alliance
         backup_info = alliance.get('backup', {}) if alliance.get('backup') else {}
