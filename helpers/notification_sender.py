@@ -50,9 +50,12 @@ class NotificationSender(object):
                 elif e.code == 500:
                     logging.warning('500, Internal error on server sending message')
                 else:
-                    logging.exception('Unexpected HTTPError: ' + str(e.code) + " " + e.msg + " " + e.read())
+                    logging.warning('Unexpected HTTPError: ' + str(e.code) + " " + e.msg + " " + e.read())
+            except urllib2.URLError, e:
+                invalid_urls.append(url)
+                logging.warning('URLError: ' + str(e.code) + " " + e.msg + " " + e.read())
             except Exception, ex:
-                logging.error("Other Exception: {}".format(str(ex)))
+                logging.exception("Other Exception: {}".format(str(ex)))
 
         if invalid_urls:
             logging.warning("Invalid urls while sending webhook: {}".format(str(invalid_urls)))
