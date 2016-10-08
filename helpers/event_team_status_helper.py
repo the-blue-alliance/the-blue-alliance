@@ -249,7 +249,7 @@ class EventTeamStatusHelper(object):
                 qual_match_count += 1
         matches = MatchHelper.organizeMatches(playoff_matches)
 
-        team_status = cls.generate_team_at_event_status(team_key, event_details, matches)
+        team_status = cls.generate_team_at_event_status(team_key, event, matches)
         rank_status = team_status.get('rank', None)
         alliance_status = team_status.get('alliance', None)
         playoff_status = team_status.get('playoff', None)
