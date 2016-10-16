@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}User Permissions List{% endblock %}
+
+{% block content %}
+
+<h1>{{ users|length }} Users With Permissions</h1>
+<table class="table table-striped table-hover">
+    <thead>
+        <th>Display Name</th>
+        <th>Email</th>
+        <th>Permissions</th>
+    </thead>
+
+    {% for user in users %}
+    <tr>
+        <td><a href="/admin/user/{{ user.key.id }}">{{ user.display_name }}</a></td>
+        <td>{{ user.email }}</td>
+        <td>
+            {% for permission in user.permissions %}
+                <strong>{{permissions|get_item:permission|get_item:"name"}}</strong> – {{permissions|get_item:permission|get_item:"description"}}
+                {% if not forloop.last %}<br>{% endif %}
+            {% endfor %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

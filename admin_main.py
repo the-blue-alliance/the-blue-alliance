@@ -20,7 +20,10 @@ from controllers.admin.admin_offseason_spreadsheet_controller import AdminOffsea
 from controllers.admin.admin_sitevar_controller import AdminSitevarCreate, AdminSitevarEdit, AdminSitevarList
 from controllers.admin.admin_suggestion_controller import AdminCreateTestSuggestions
 from controllers.admin.admin_team_controller import AdminTeamCreateTest, AdminTeamDetail, AdminTeamList
-from controllers.admin.admin_user_controller import AdminUserDetail, AdminUserEdit, AdminUserTestSetup, AdminUserList
+from controllers.admin.admin_user_controller import AdminUserDetail, AdminUserEdit, AdminUserTestSetup, AdminUserList, AdminUserPermissionsList
+
+from google.appengine.ext.webapp import template
+template.register_template_library('common.my_filters')
 
 app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/api_auth/add', AdminApiAuthAdd),
@@ -69,6 +72,7 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/team/create/test', AdminTeamCreateTest),
                                ('/admin/team/(.*)', AdminTeamDetail),
                                ('/admin/users', AdminUserList),
+                               ('/admin/users/permissions', AdminUserPermissionsList),
                                ('/admin/user/edit/(.*)', AdminUserEdit),
                                ('/admin/user/create/test', AdminUserTestSetup),
                                ('/admin/user/(.*)', AdminUserDetail),
