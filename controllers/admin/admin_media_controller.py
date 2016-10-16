@@ -32,11 +32,12 @@ class AdminMediaDeleteReference(LoggedInHandler):
 
         media = Media.get_by_id(media_key_name)
 
-        media.references.remove(media.create_reference(
-            self.request.get("reference_type"),
-            self.request.get("reference_key_name")))
+        if media:
+            media.references.remove(media.create_reference(
+                self.request.get("reference_type"),
+                self.request.get("reference_key_name")))
 
-        MediaManipulator.createOrUpdate(media, auto_union=False)
+            MediaManipulator.createOrUpdate(media, auto_union=False)
 
         self.redirect(self.request.get('originating_url'))
 
