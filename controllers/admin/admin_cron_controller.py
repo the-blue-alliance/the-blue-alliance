@@ -1,5 +1,5 @@
 from collections import defaultdict
-from datetime import date
+from datetime import date, datetime, timedelta
 import json
 import logging
 import os
@@ -24,6 +24,7 @@ from models.district_team import DistrictTeam
 from models.event import Event
 from models.event_team import EventTeam
 from models.mobile_client import MobileClient
+from models.sitevar import Sitevar
 from models.subscription import Subscription
 from models.team import Team
 from notifications.ping import PingNotification
@@ -234,3 +235,45 @@ class AdminPostEventTasksDo(LoggedInHandler):
                 AwardManipulator.createOrUpdate(awards)
 
         self.response.out.write("Finished post-event tasks for {}. Created awards: {}".format(event_key, awards))
+
+
+class AdminRegistrationDayEnqueue(LoggedInHandler):
+    def get(self, date_string, event_year, interval):
+        """
+        Configures scheduling a registration day in advance
+        This will enqueue the requested year's event details task every X minutes
+        Also updates the "short cache" sitevar to reduce timeouts for that day
+        :param date_string: YYYY-mm-dd formatted day on which we poll faster
+        :param event_year: The year of events to fetch
+        :param interval: How many minutes between fetches
+        """
+        self._require_admin()
+        logging.info(date_string)
+        start = datetime.strptime(date_string, "%Y-%m-%d")
+        event_year = int(event_year)
+        interval = int(interval)
+
+        # Enqueue the tasks
+        for i in xrange(0, 24*60, interval):
+            # 24*60 is number of minutes per day
+            taskqueue.add(
+                queue_name='datafeed',
+                target='backend-tasks',
+                url='/backend-tasks/get/event_list/{}'.format(event_year),
+                eta=start + timedelta(minutes=i),
+                method='GET'
+            )
+
+        # Set the cache timeout sitevar
+        end_timestamp = (start + timedelta(days=1) - datetime(1970, 1, 1)).total_seconds()
+        cache_key_regex = ".*{}.*".format(event_year)
+        turbo_mode_json = {
+            'regex':  cache_key_regex,
+            'valid_until': int(end_timestamp),
+            'cache_length': 61
+        }
+        turbo_sitevar = Sitevar.get_or_insert('turbo_mode', description="Temporarily shorten cache expiration")
+        turbo_sitevar.contents = turbo_mode_json
+        turbo_sitevar.put()
+
+        self.response.out.write("Enqueued {} tasks to update {} events starting at {}".format((24*60/interval), event_year, start))
