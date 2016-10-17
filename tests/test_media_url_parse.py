@@ -107,7 +107,7 @@ class TestMediaUrlParser(unittest2.TestCase):
         self.assertEqual(result['site_name'], MediaType.type_names[MediaType.INSTAGRAM_PROFILE])
         self.assertEqual(result['profile_url'], 'https://www.instagram.com/4hteamneutrino')
         
-        def test_periscope_profile_parse(self):
+    def test_periscope_profile_parse(self):
         result = MediaParser.partial_media_dict_from_url("https://www.periscope.tv/Evolution2626")
         self.assertEqual(result['media_type_enum'], MediaType.PERISCOPE_PROFILE)
         self.assertEqual(result['is_social'], True)
