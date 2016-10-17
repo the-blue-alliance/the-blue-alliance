@@ -76,6 +76,26 @@ class AdminEventAddTeams(LoggedInHandler):
         self.redirect("/admin/event/" + event.key_name)
 
 
+class AdminEventDeleteTeams(LoggedInHandler):
+    """
+    Remove teams from an Event. Useful for legacy and offseason events.
+    """
+    def post(self, event_key_id):
+        self._require_admin()
+        event = Event.get_by_id(event_key_id)
+
+        teams_csv = self.request.get('teams_csv')
+        team_numbers = CSVTeamsParser.parse(teams_csv)
+
+        event_teams = []
+        for team_number in team_numbers:
+            event_teams.append(ndb.Key(EventTeam, '{}_frc{}'.format(event.key.id(), team_number)))
+
+        EventTeamManipulator.delete_keys(event_teams)
+
+        self.redirect("/admin/event/" + event.key_name)
+
+
 class AdminEventRemapTeams(LoggedInHandler):
     """
     Remaps teams within an Event. Useful for offseason events.
