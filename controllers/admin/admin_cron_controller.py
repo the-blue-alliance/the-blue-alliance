@@ -254,13 +254,18 @@ class AdminRegistrationDayEnqueue(LoggedInHandler):
         interval = int(interval)
 
         # Enqueue the tasks
+        now = datetime.now()
         for i in xrange(0, 24*60, interval):
             # 24*60 is number of minutes per day
+            task_eta = start + timedelta(minutes=i)
+            if task_eta < now:
+                # Don't enqueue tasks in the past
+                continue
             taskqueue.add(
                 queue_name='datafeed',
                 target='backend-tasks',
                 url='/backend-tasks/get/event_list/{}'.format(event_year),
-                eta=start + timedelta(minutes=i),
+                eta=task_eta,
                 method='GET'
             )
 
