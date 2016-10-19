@@ -238,7 +238,7 @@ class AdminPostEventTasksDo(LoggedInHandler):
 
 
 class AdminRegistrationDayEnqueue(LoggedInHandler):
-    def get(self, date_string, event_year, interval):
+    def post(self):
         """
         Configures scheduling a registration day in advance
         This will enqueue the requested year's event details task every X minutes
@@ -248,7 +248,10 @@ class AdminRegistrationDayEnqueue(LoggedInHandler):
         :param interval: How many minutes between fetches
         """
         self._require_admin()
-        logging.info(date_string)
+        date_string = self.request.get("date_string")
+        event_year = self.request.get("event_year")
+        interval = self.request.get("interval")
+
         start = datetime.strptime(date_string, "%Y-%m-%d")
         event_year = int(event_year)
         interval = int(interval)

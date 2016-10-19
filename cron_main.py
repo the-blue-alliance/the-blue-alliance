@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import webapp2
-from webapp2_extras.routes import RedirectRoute
 
 import tba_config
 
@@ -55,6 +54,6 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/admin/clear_old_subs', AdminSubsClear),
                                ('/tasks/admin/enqueue/clear_old_webhooks', AdminWebhooksClearEnqueue),
                                ('/tasks/admin/clear_old_webhooks', AdminWebhooksClear),
-                               RedirectRoute(r'/tasks/admin/enqueue/registration_day/<date_string>/<event_year>/<interval>', AdminRegistrationDayEnqueue),
+                               ('/tasks/admin/enqueue/registration_day', AdminRegistrationDayEnqueue),
                                ],
                               debug=tba_config.DEBUG)
