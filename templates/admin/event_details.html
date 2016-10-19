@@ -119,6 +119,15 @@
   <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Teams</button>
 </form>
 
+<h2>Remove Teams</h2>
+<p>Remove teams formatted as CSV.</p>
+<p>Example:</p>
+<div class="well">254, 1114, 100, 604, 148</div>
+<form action="/admin/event/delete_teams/{{event.key_name}}" method="post">
+  <textarea class="form-control" name="teams_csv"></textarea><br>
+  <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-delete"></span> Delete Teams</button>
+</form>
+
 <h2>Add Alliance Selections</h2>
 <p>Add alliance selections formatted as CSV.</p>
 <p>Example:</p>
