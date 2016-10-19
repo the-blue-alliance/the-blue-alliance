@@ -34,6 +34,9 @@ class FMSAPITeamDetailsParser(object):
                 raw_website = teamData.get('website', None)
                 website = urlparse.urlparse(raw_website, 'http').geturl() if raw_website else None
 
+                # Fix oddity with urlparse having three slashes after the scheme (#1635)
+                website = website.replace('///', '//') if website else None
+
             team = Team(
                 id="frc{}".format(teamData['teamNumber']),
                 team_number=teamData['teamNumber'],

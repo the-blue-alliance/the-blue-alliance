@@ -21,7 +21,6 @@ class TestFMSAPITeamParser(unittest2.TestCase):
         self.testbed.init_memcache_stub()
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
-
     def tearDown(self):
         self.testbed.deactivate()
 
@@ -90,11 +89,8 @@ class TestFMSAPITeamParser(unittest2.TestCase):
         # Modify the websites to some known bad ones, and ensure the parser can recover
         bad_websites = [None, '', 'www.firstinspires.org', 'website.com', 'www.website.com', 'http://website.com',
                         'https://website.com', 'ftp://website.com']
-        expected_sites = [None, None, None, 'http:///website.com', 'http:///www.website.com', 'http://website.com',
+        expected_sites = [None, None, None, 'http://website.com', 'http://www.website.com', 'http://website.com',
                           'https://website.com', 'ftp://website.com']
-        # When urllib prepends the scheme, it'll add three slashes because of how its parsed.
-        # Browsers won't care about the extra /, so it shouldn't be an issue
-        # http://stackoverflow.com/questions/7289481/urlparse-urlparse-returning-3-instead-of-2-after-scheme
         with open('test_data/fms_api/2015_frc1124.json', 'r') as f:
             team_data = json.loads(f.read())
             for site, expected in zip(bad_websites, expected_sites):
