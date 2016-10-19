@@ -16,7 +16,8 @@ class MediaHelper(object):
         MediaType.YOUTUBE_CHANNEL: 1,
         MediaType.TWITTER_PROFILE: 2,
         MediaType.INSTAGRAM_PROFILE: 3,
-        MediaType.GITHUB_PROFILE: 4,
+        MediaType.PERISCOPE_PROFILE: 4,
+        MediaType.GITHUB_PROFILE: 5,
     }
 
     @classmethod
@@ -59,6 +60,7 @@ class MediaParser(object):
         MediaType.YOUTUBE_VIDEO: [(r".*youtu\.be\/(.*)", 1), (r".*v=([a-zA-Z0-9_-]*)", 1)],
         MediaType.IMGUR: [(r".*imgur.com\/(\w+)\/?\Z", 1), (r".*imgur.com\/(\w+)\.\w+\Z", 1)],
         MediaType.INSTAGRAM_PROFILE: [(r".*instagram.com\/(.*)(\/(.*))?", 1)],
+        MediaType.PERISCOPE_PROFILE: [(r".*periscope.tv\/(.*)(\/(.*))?", 1)],
     }
 
     # Media URL patterns that map a URL -> Profile type (used to determine which type represents a given url)
@@ -70,6 +72,7 @@ class MediaParser(object):
         ('youtube.com/c/', MediaType.YOUTUBE_CHANNEL),
         ('github.com/', MediaType.GITHUB_PROFILE),
         ('instagram.com/', MediaType.INSTAGRAM_PROFILE),
+        ('periscope.tv/', MediaType.PERISCOPE_PROFILE),
         ('chiefdelphi.com/media/photos/', MediaType.CD_PHOTO_THREAD),
         ('youtube.com/watch', MediaType.YOUTUBE_VIDEO),
         ('youtu.be', MediaType.YOUTUBE_VIDEO),

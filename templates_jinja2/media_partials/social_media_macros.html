@@ -10,6 +10,8 @@
   <span class="hashtag-link hashtag-github"></span>
 {% elif media.media_type_enum == 7 %}
   <span class="hashtag-link hashtag-instagram"></span>
+{% elif media.media_type_enum == 8 %}
+  <span class="hashtag-link hashtag-periscope"></span>
 {% endif %}
 {{ media.foreign_key }}</a>
 {% endmacro %}
@@ -51,6 +53,10 @@
         <div class="github-card" data-user="{{ suggestion.contents.foreign_key }}"></div>
     {% elif suggestion.contents.media_type_enum == 7 %}
         <!-- Instagram profile -->
+        {{ suggestion.contents.site_name }}:
+        <a href="{{ suggestion.contents.profile_url }}">{{ suggestion.contents.foreign_key }}</a>
+    {% elif suggestion.contents.media_type_enum == 8 %}
+        <!-- Periscope profile -->
         {{ suggestion.contents.site_name }}:
         <a href="{{ suggestion.contents.profile_url }}">{{ suggestion.contents.foreign_key }}</a>
     {% endif %}

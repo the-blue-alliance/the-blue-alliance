@@ -8,6 +8,7 @@ class MediaType(object):
     YOUTUBE_CHANNEL = 5
     GITHUB_PROFILE = 6
     INSTAGRAM_PROFILE = 7
+    PERISCOPE_PROFILE = 8
 
     type_names = {
         YOUTUBE_VIDEO: 'YouTube Video',
@@ -18,6 +19,7 @@ class MediaType(object):
         YOUTUBE_CHANNEL: 'YouTube Channel',
         GITHUB_PROFILE: 'GitHub Profile',
         INSTAGRAM_PROFILE: 'Instagram Profile',
+        PERISCOPE_PROFILE: 'Periscope Profile',
     }
 
     image_types = [
@@ -31,6 +33,7 @@ class MediaType(object):
         YOUTUBE_CHANNEL,
         GITHUB_PROFILE,
         INSTAGRAM_PROFILE,
+        PERISCOPE_PROFILE,
     ]
 
     profile_urls = {  # Format with foreign_key
@@ -39,4 +42,5 @@ class MediaType(object):
         YOUTUBE_CHANNEL: 'https://www.youtube.com/{}',
         GITHUB_PROFILE: 'https://github.com/{}',
         INSTAGRAM_PROFILE: 'https://www.instagram.com/{}',
+        PERISCOPE_PROFILE: 'https://www.periscope.tv/{}',
     }
