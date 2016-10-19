@@ -57,6 +57,26 @@
 </div>
 
 <hr>
+<h4>Special Registration Days</h4>
+<div class="row">
+    <div class="col-xs-4">
+        <form class="form-inline" action="/tasks/admin/enqueue/registration_day" method="post">
+            <div class="input-group">
+                <span class="help-block">Registration Date</span>
+                <input class="form-control" id="enqueue_registration_date" name="date_string" type="text" placeholder="2016-10-17">
+                <span class="help-block">Event Year to Enqueue</span>
+                <input class="form-control" id="enqueue_registration_year" name="event_year" type="text" placeholder="2017">
+                <span class="help-block">Scrape Interval (minutes)</span>
+                <input class="form-control" id="enqueue_registration_interval" name="interval" type="text" placeholder="30">
+            </div>
+            <span class="input-group-btn" id="enqueue_registration_submit">
+                  <button class="btn btn-warning" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+            </span>
+        </form>
+    </div>
+</div>
+
+<hr>
 <h4>TbaVideos</h4>
 <p>Scrape videos.thebluealliance.com to update hosted video file index</p>
 <div class="row">
