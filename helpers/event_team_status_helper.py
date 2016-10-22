@@ -240,8 +240,9 @@ class EventTeamStatusHelper(object):
         :return: a tuple future <long summary string, qual record, qual ranking, playoff status>
         """
         team_number = team_key[3:]
+        event.prep_details()
         # We need all the event's playoff matches here to properly account for backup teams
-        matches, event_details = yield EventMatchesQuery(event.key.id()).fetch_async(), EventDetails.get_by_id_async(event.key.id())
+        matches = yield EventMatchesQuery(event.key.id()).fetch_async()
         qual_match_count = 0
         playoff_match_count = 0
         playoff_matches = []
