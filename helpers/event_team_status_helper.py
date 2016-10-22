@@ -174,13 +174,16 @@ class EventTeamStatusHelper(object):
     @classmethod
     def buildEventTeamStatus(cls, live_events, live_eventteams, team_filter):
         # Currently Competing Team Status
+        for event in live_events:
+            event.prep_details()  # Prepare details for later
+
         live_events_with_teams = []
         for event, teams in zip(live_events, live_eventteams):
             teams = teams.get_result() if type(teams) == Future else teams
-            live_teams_in_district = TeamHelper.sortTeams(filter(lambda t: t in team_filter, teams))
+            live_teams_in_filter = TeamHelper.sortTeams(filter(lambda t: t in team_filter, teams))
 
             teams_and_statuses_future = []
-            for team in live_teams_in_district:
+            for team in live_teams_in_filter:
                 teams_and_statuses_future.append([team, cls.generateTeamAtEventStatusAsync(team.key_name, event)])
             if teams_and_statuses_future:
                 live_events_with_teams.append((event, teams_and_statuses_future))

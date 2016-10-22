@@ -1,4 +1,6 @@
 from google.appengine.ext import ndb
+from google.appengine.ext.ndb.tasklets import Future
+
 import datetime
 import json
 import pytz
@@ -97,7 +99,13 @@ class Event(ndb.Model):
     def details(self):
         if self._details is None:
             self._details = EventDetails.get_by_id(self.key.id())
+        elif type(self._details) == Future:
+            self._details = self._details.get_result()
         return self._details
+
+    def prep_details(self):
+        if self._details is None:
+            self._details = ndb.Key(EventDetails, self.key.id()).get_async()
 
     @property
     def district_points(self):
