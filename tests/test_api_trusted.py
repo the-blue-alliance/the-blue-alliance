@@ -163,6 +163,27 @@ class TestApiTrustedController(unittest2.TestCase):
 
         self.assertEqual(response.status_code, 200)
 
+        self.assertEqual(len(self.event.alliance_selections), 8)
+        for i, selection in enumerate(self.event.alliance_selections):
+            self.assertEqual(alliances[i], selection['picks'])
+
+    def test_empty_alliance_selections_update(self):
+        self.alliances_auth.put()
+
+        alliances = [['frc971', 'frc254', 'frc1662'],
+                     ['frc1678', 'frc368', 'frc4171'],
+                     ['frc2035', 'frc192', 'frc4990'],
+                     ['frc1323', 'frc846', 'frc2135'],
+                     [],[],[],[]]
+        request_body = json.dumps(alliances)
+
+        request_path = '/api/trusted/v1/event/2014casj/alliance_selections/update'
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_3', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(len(self.event.alliance_selections), 4)
         for i, selection in enumerate(self.event.alliance_selections):
             self.assertEqual(alliances[i], selection['picks'])
 
