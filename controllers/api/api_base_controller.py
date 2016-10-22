@@ -15,6 +15,7 @@ from google.appengine.ext import ndb
 from consts.auth_type import AuthType
 from controllers.base_controller import CacheableHandler
 from datafeeds.parser_base import ParserInputException
+from helpers.user_bundle import UserBundle
 from helpers.validation_helper import ValidationHelper
 from models.api_auth_access import ApiAuthAccess
 from models.cached_response import CachedResponse
@@ -156,6 +157,7 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
         super(ApiTrustedBaseController, self).__init__(*args, **kw)
         self.response.headers['content-type'] = 'application/json; charset="utf-8"'
         self.response.headers['Access-Control-Allow-Origin'] = '*'
+        self._user_bundle = UserBundle()
 
     def handle_exception(self, exception, debug):
         """
@@ -180,32 +182,34 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
 
     def post(self, event_key):
         event_key = event_key.lower()  # Normalize keys to lower case (TBA convention)
-        auth_id = self.request.headers.get('X-TBA-Auth-Id')
-        if not auth_id:
-            self._errors = json.dumps({"Error": "Must provide a request header parameter 'X-TBA-Auth-Id'"})
-            self.abort(400)
 
-        auth_sig = self.request.headers.get('X-TBA-Auth-Sig')
-        if not auth_sig:
-            self._errors = json.dumps({"Error": "Must provide a request header parameter 'X-TBA-Auth-Sig'"})
-            self.abort(400)
+        if not (self._user_bundle.user and self._user_bundle.is_current_user_admin):  # Allow admins to use without auth keys
+            auth_id = self.request.headers.get('X-TBA-Auth-Id')
+            if not auth_id:
+                self._errors = json.dumps({"Error": "Must provide a request header parameter 'X-TBA-Auth-Id'"})
+                self.abort(400)
 
-        auth = ApiAuthAccess.get_by_id(auth_id)
-        expected_sig = md5.new('{}{}{}'.format(auth.secret if auth else None, self.request.path, self.request.body)).hexdigest()
-        if not auth or expected_sig != auth_sig:
-            logging.info("Auth sig: {}, Expected sig: {}".format(auth_sig, expected_sig))
-            self._errors = json.dumps({"Error": "Invalid X-TBA-Auth-Id and/or X-TBA-Auth-Sig!"})
-            self.abort(401)
+            auth_sig = self.request.headers.get('X-TBA-Auth-Sig')
+            if not auth_sig:
+                self._errors = json.dumps({"Error": "Must provide a request header parameter 'X-TBA-Auth-Sig'"})
+                self.abort(400)
 
-        allowed_event_keys = [ekey.id() for ekey in auth.event_list]
-        if event_key not in allowed_event_keys:
-            self._errors = json.dumps({"Error": "Only allowed to edit events: {}".format(', '.join(allowed_event_keys))})
-            self.abort(401)
+            auth = ApiAuthAccess.get_by_id(auth_id)
+            expected_sig = md5.new('{}{}{}'.format(auth.secret if auth else None, self.request.path, self.request.body)).hexdigest()
+            if not auth or expected_sig != auth_sig:
+                logging.info("Auth sig: {}, Expected sig: {}".format(auth_sig, expected_sig))
+                self._errors = json.dumps({"Error": "Invalid X-TBA-Auth-Id and/or X-TBA-Auth-Sig!"})
+                self.abort(401)
 
-        missing_auths = self.REQUIRED_AUTH_TYPES.difference(set(auth.auth_types_enum))
-        if missing_auths != set():
-            self._errors = json.dumps({"Error": "You do not have permission to edit: {}. If this is incorrect, please contact TBA admin.".format(",".join([AuthType.type_names[ma] for ma in missing_auths]))})
-            self.abort(401)
+            allowed_event_keys = [ekey.id() for ekey in auth.event_list]
+            if event_key not in allowed_event_keys:
+                self._errors = json.dumps({"Error": "Only allowed to edit events: {}".format(', '.join(allowed_event_keys))})
+                self.abort(401)
+
+            missing_auths = self.REQUIRED_AUTH_TYPES.difference(set(auth.auth_types_enum))
+            if missing_auths != set():
+                self._errors = json.dumps({"Error": "You do not have permission to edit: {}. If this is incorrect, please contact TBA admin.".format(",".join([AuthType.type_names[ma] for ma in missing_auths]))})
+                self.abort(401)
 
         try:
             self._process_request(self.request, event_key)
