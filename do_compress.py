@@ -44,8 +44,7 @@ STYLESHEETS_MAIN_OUT = 'static/css/tba_combined_style.main.min.css'
 STYLESHEETS_GAMEDAY_OUT = 'static/css/tba_combined_style.gameday.min.css'
 
 
-def compress(in_files, out_file, in_type='js', verbose=False,
-             temp_file='.temp'):
+def compress_css(in_files, out_file, verbose=False, temp_file='.temp'):
     temp = open(temp_file, 'w')
     for f in in_files:
         fh = open(f)
@@ -58,7 +57,7 @@ def compress(in_files, out_file, in_type='js', verbose=False,
     temp.close()
 
     options = ['-o "%s"' % out_file,
-               '--type %s' % in_type]
+               '--type %s' % 'css']
 
     if verbose:
         options.append('-v')
@@ -77,23 +76,29 @@ def compress(in_files, out_file, in_type='js', verbose=False,
     print ''
 
 
+def compress_js(in_files, out_file):
+    os.system('uglifyjs {} --compress -o {}'.format(' '.join(in_files), out_file))
+    print '=> %s' % out_file
+    print ''
+
+
 def main(kind=None):
     if kind == 'js' or kind is None:
         print 'Compressing Main JavaScript...'
-        compress(SCRIPTS_MAIN, SCRIPTS_MAIN_OUT, 'js')
+        compress_js(SCRIPTS_MAIN, SCRIPTS_MAIN_OUT)
 
         print 'Compressing GameDay JavaScript...'
-        compress(SCRIPTS_GAMEDAY, SCRIPTS_GAMEDAY_OUT, 'js')
+        compress_js(SCRIPTS_GAMEDAY, SCRIPTS_GAMEDAY_OUT)
 
         print 'Compressing EventWizard JavaScript...'
-        compress(SCRIPTS_EVENTWIZARD, SCRIPTS_EVENTWIZARD_OUT, 'js')
+        compress_js(SCRIPTS_EVENTWIZARD, SCRIPTS_EVENTWIZARD_OUT)
 
     if kind == 'css' or kind is None:
         print 'Compressing Main CSS...'
-        compress(STYLESHEETS_MAIN, STYLESHEETS_MAIN_OUT, 'css')
+        compress_css(STYLESHEETS_MAIN, STYLESHEETS_MAIN_OUT)
 
         print 'Compressing GameDay CSS...'
-        compress(STYLESHEETS_GAMEDAY, STYLESHEETS_GAMEDAY_OUT, 'css')
+        compress_css(STYLESHEETS_GAMEDAY, STYLESHEETS_GAMEDAY_OUT)
 
 if __name__ == '__main__':
     parser = optparse.OptionParser()

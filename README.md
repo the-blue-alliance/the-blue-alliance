@@ -49,6 +49,7 @@ Setup
   * Or compile it from source code. (On Windows, use the [Microsoft Visual C++ Compiler for Python 2.7](http://www.microsoft.com/en-us/download/details.aspx?id=44266).)
   * NOTE: If you are using the Linux version, install v1.6.1 instead of the latest version through `pip install numpy==1.6.1`. Installing the latest version raises an `ImportError: No module named _ctypes` from Google App Engine when trying to launch the dev server.
 1. Install [Node.js](https://nodejs.org/) which includes [Node Package Manager](https://www.npmjs.org/)
+1. Install [UglifyJS2](https://github.com/mishoo/UglifyJS2) by running `npm install uglify-js -g`
 1. Install [gulp](https://github.com/gulpjs/gulp) by running `npm rm --global gulp && npm install --global gulp-cli`. This removes any version of `gulp` that was previously installed globally so it doesn't conflict with `gulp-cli`. Gulp is used as the build tool for Gameday2.
 1. Install all node dependencies by running `npm install`. This includes `less`, which is used to build CSS files for production, as well as a number of packages used in Gameday2.
 1. Install Jinja, which we use to build some of our HTML template files
