@@ -174,6 +174,7 @@ class TeamRenderer(object):
         award_futures = award_query.TeamAwardsQuery(team.key.id()).fetch_async()
         event_futures = event_query.TeamEventsQuery(team.key.id()).fetch_async()
         participation_future = team_query.TeamParticipationQuery(team.key.id()).fetch_async()
+        social_media_future = media_query.TeamSocialMediaQuery(team.key.id()).fetch_async()
 
         awards_by_event = {}
         for award in award_futures.get_result():
@@ -210,11 +211,14 @@ class TeamRenderer(object):
             last_competed = max(participation_years)
         current_year = datetime.date.today().year
 
+        social_medias = sorted(social_media_future.get_result(), key=MediaHelper.social_media_sorter)
+
         handler.template_values.update({
             'is_canonical': is_canonical,
             'team': team,
             'event_awards': event_awards,
             'years': sorted(years),
+            "social_medias": social_medias,
             'current_event': current_event,
             'matches_upcoming': matches_upcoming,
             'last_competed': last_competed,
