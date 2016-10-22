@@ -1,6 +1,7 @@
 from google.appengine.ext import ndb
 
 from consts.auth_type import AuthType
+from models.account import Account
 from models.event import Event
 
 
@@ -16,6 +17,7 @@ class ApiAuthAccess(ndb.Model):
     event_list = ndb.KeyProperty(kind=Event, repeated=True)  # events for which auth is granted
     auth_types_enum = ndb.IntegerProperty(repeated=True)
     expiration = ndb.DateTimeProperty()
+    owner = ndb.KeyProperty(kind=Account)
 
     @property
     def can_edit_event_teams(self):

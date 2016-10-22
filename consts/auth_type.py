@@ -17,5 +17,5 @@ class AuthType(object):
         EVENT_MATCHES: "event matches",
         EVENT_RANKINGS: "event rankings",
         EVENT_ALLIANCES: "event alliances",
-        EVENT_AWARDS: "event awrads"
+        EVENT_AWARDS: "event awards"
     }

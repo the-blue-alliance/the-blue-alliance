@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
 
+from consts.event_type import EventType
 from helpers.media_helper import MediaParser
 from helpers.webcast_helper import WebcastParser
 
@@ -183,3 +184,31 @@ class SuggestionCreator(object):
             'address': address}
         suggestion.put()
         return 'success', None
+
+    @classmethod
+    def createApiWriteSuggestion(cls, author_account_key, event_key, affiliation, auth_types):
+        """
+        Create a suggestion for auth keys request.
+        Returns status (success, no_affiliation, bad_event)
+        """
+        if not affiliation:
+            return 'no_affiliation'
+
+        if event_key is not None:
+            event = Event.get_by_id(event_key)
+            if event and event.event_type_enum not in EventType.SEASON_EVENT_TYPES:
+                suggestion = Suggestion(
+                    author=author_account_key,
+                    target_model="api_auth_access"
+                )
+                suggestion.contents = {
+                    'event_key': event_key,
+                    'affiliation': affiliation,
+                    'auth_types': [int(type) for type in auth_types],
+                }
+                suggestion.put()
+                return 'success'
+            else:
+                return 'bad_event'
+        else:
+            return 'bad_event'
