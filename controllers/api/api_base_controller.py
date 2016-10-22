@@ -211,6 +211,10 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
                 self._errors = json.dumps({"Error": "You do not have permission to edit: {}. If this is incorrect, please contact TBA admin.".format(",".join([AuthType.type_names[ma] for ma in missing_auths]))})
                 self.abort(401)
 
+            if auth.expiration and auth.expiration < datetime.datetime.now():
+                self._errors = json.dumps({"Error": "These keys expired on {}. Contact TBA admin to make changes".format(auth.expiration)})
+                self.abort(401)
+
         try:
             self._process_request(self.request, event_key)
         except ParserInputException, e:
