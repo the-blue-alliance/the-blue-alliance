@@ -41,7 +41,7 @@ class AdminEventAddAllianceSelections(LoggedInHandler):
         alliance_selections = CSVAllianceSelectionsParser.parse(alliance_selections_csv)
 
         event_details = EventDetails(
-            id=event_key,
+            id=event_key_id,
             alliance_selections=alliance_selections
         )
         EventDetailsManipulator.createOrUpdate(event_details)
