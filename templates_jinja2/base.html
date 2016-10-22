@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>{% block title %}The Blue Alliance{% endblock %}</title>
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="manifest" href="/manifest.json">
 
   {% block main_style %}<link rel="stylesheet" href="/css/tba_combined_style.main.min.css">{% endblock %}
   <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
@@ -159,6 +160,7 @@
 <!-- Admin Bar -->
 
 {% block main_javascript %}
+<script src="https://www.gstatic.com/firebasejs/3.5.1/firebase.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.3.1/jquery.cookie.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/js/bootstrap.min.js"></script>

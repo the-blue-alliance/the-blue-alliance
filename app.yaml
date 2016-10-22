@@ -54,6 +54,14 @@ handlers:
   static_files: static/apple-touch-icon.png
   upload: static/apple-touch-icon.png
   expiration: "1d"
+- url: /firebase-messaging-sw.js
+  static_files: static/firebase-messaging-sw.js
+  upload: static/firebase-messaging-sw.js
+  expiration: "1d"
+- url: /manifest.json
+  static_files: static/manifest.json
+  upload: static/manifest.json
+  expiration: "1d"
 
 - url: /tasks/.*
   script: cron_main.app

@@ -153,3 +153,31 @@ $(document).ready(function(){
     $("#robot-image").html('<div class="thumbnail carousel team-media-carousel"><a href="' + url + '" target="_blank"><img src="' + url + '" alt="April Fools!"></a></div>');
   }
 });
+
+// Init Firebase
+var config = {
+  apiKey: "AIzaSyDBlFwtAgb2i7hMCQ5vBv44UEKVsA543hs",
+  authDomain: "tbatv-prod-hrd.firebaseapp.com",
+  databaseURL: "https://tbatv-prod-hrd.firebaseio.com",
+  storageBucket: "tbatv-prod-hrd.appspot.com",
+  messagingSenderId: "836511118694"
+};
+firebase.initializeApp(config);
+
+// Firebase Cloud Messaging
+const messaging = firebase.messaging();
+messaging.requestPermission()
+.then(function() {
+  console.log('Notification permission granted.');
+  return messaging.getToken();
+})
+.then(function(token) {
+  console.log('Token: ', token);
+})
+.catch(function(err) {
+  console.log('Unable to get permission to notify. ', err);
+});
+
+messaging.onMessage(function(payload) {
+  console.log("Message received. ", payload);
+});
