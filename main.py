@@ -23,6 +23,8 @@ from controllers.nightbot_controller import NightbotTeamNextmatchHandler, Nightb
 from controllers.notification_controller import UserNotificationBroadcast
 from controllers.district_controller import DistrictDetail
 from controllers.suggestions.suggest_apiwrite_controller import SuggestApiWriteController
+from controllers.suggestions.suggest_apiwrite_review_controller import \
+      SuggestApiWriteReviewController
 from controllers.suggestions.suggest_match_video_controller import SuggestMatchVideoController, \
       SuggestMatchVideoPlaylistController
 from controllers.suggestions.suggest_match_video_review_controller import SuggestMatchVideoReviewController
@@ -103,6 +105,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/record', RecordHandler, 'record', strict_slash=True),
       RedirectRoute(r'/search', SearchHandler, 'search', strict_slash=True),
       RedirectRoute(r'/suggest/apiwrite/', SuggestApiWriteController, 'suggets-apiwrite', strict_slash=True),
+      RedirectRoute(r'/suggest/apiwrite/review', SuggestApiWriteReviewController, 'suggets-apiwrite', strict_slash=True),
       RedirectRoute(r'/suggest/event/webcast', SuggestEventWebcastController, 'suggest-event-webcast', strict_slash=True),
       RedirectRoute(r'/suggest/event/webcast/review', SuggestEventWebcastReviewController, 'suggest-event-webcast-review', strict_slash=True),
       RedirectRoute(r'/suggest/event/video', SuggestMatchVideoPlaylistController, 'suggest-matches-playlist', strict_slash=True),
