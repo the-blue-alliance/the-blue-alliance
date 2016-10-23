@@ -27,8 +27,10 @@ class AccountInfoHandler(LoggedInHandler):
     """
     def get(self):
         self.response.headers['content-type'] = 'application/json; charset="utf-8"'
+        user = self.user_bundle.user
         self.response.out.write(json.dumps({
-            'logged_in': True if self.user_bundle.user else False,
+            'logged_in': True if user else False,
+            'user_id': user.user_id() if user else None
         }))
 
 
