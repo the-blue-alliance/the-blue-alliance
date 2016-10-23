@@ -25,7 +25,7 @@ $.ajax({
         });
       })
       .catch(function(err) {
-        console.log('[TBA FCM] Unable to get permission to delete token. Cannot continue with FCM setup.s', err);
+        console.log('[TBA FCM] Unable to get permission to delete token. Cannot continue with FCM setup.', err);
       });
     } else {
       setupMessaging(accountInfo);

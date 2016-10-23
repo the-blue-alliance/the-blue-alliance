@@ -17,18 +17,45 @@ const messaging = firebase.messaging();
 // If you would like to customize notifications that are received in the
 // background (Web app is closed or not in browser focus) then you should
 // implement this optional method.
-// [START background_handler]
 messaging.setBackgroundMessageHandler(function(payload) {
-  console.log('[firebase-messaging-sw.js] Received background message ', payload);
+  console.log('[TBA FCM SW] Received background message.');
 
-  const messageData = JSON.parse(payload.data.message_data);
-  const notificationTitle = messageData.title;
-  const notificationOptions = {
-    body: messageData.desc,
-    icon: '/images/logo_square_200.png'
-  };
+  // Check for login
+  fetch('/_/account/info', {credentials: 'include'})
+  .then(function (response) {
+    response.json().then(function (accountInfo) {
+      if (accountInfo.logged_in) {
+        console.log('[TBA FCM SW] Message:', payload);
 
-  return self.registration.showNotification(notificationTitle,
-      notificationOptions);
+        const messageData = JSON.parse(payload.data.message_data);
+        const notificationTitle = messageData.title;
+        const notificationOptions = {
+          body: messageData.desc,
+          icon: '/images/logo_square_200.png'
+        };
+        return self.registration.showNotification(notificationTitle,
+          notificationOptions);
+      } else {
+        console.log("[TBA FCM SW] Not logged in! Deleting token...");
+
+        messaging.getToken()
+        .then(function(token) {
+          console.log('[TBA FCM SW] Deleting token:', token);
+          messaging.deleteToken(token)
+          .then(function() {
+            console.log('[TBA FCM SW] Token successfully deleted!')
+          })
+          .catch(function(err) {
+            console.log('[TBA FCM SW] Unable to delete token token.', err);
+          });
+        })
+        .catch(function(err) {
+          console.log('[TBA FCM SW] Unable to get permission to delete token.', err);
+        });
+      }
+    });
+  })
+  .catch(function (err) {
+    console.log("[TBA FCM SW] Error checking for login status!", err);
+  });
 });
-// [END background_handler]
