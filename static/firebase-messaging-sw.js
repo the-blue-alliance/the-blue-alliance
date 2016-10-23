@@ -27,14 +27,7 @@ messaging.setBackgroundMessageHandler(function(payload) {
       if (accountInfo.logged_in) {
         console.log('[TBA FCM SW] Message:', payload);
 
-        const messageData = JSON.parse(payload.data.message_data);
-        const notificationTitle = messageData.title;
-        const notificationOptions = {
-          body: messageData.desc,
-          icon: '/images/logo_square_200.png'
-        };
-        return self.registration.showNotification(notificationTitle,
-          notificationOptions);
+        buildAndShowNotification(self.registration, payload);
       } else {
         console.log("[TBA FCM SW] Not logged in! Deleting token...");
 
@@ -59,3 +52,27 @@ messaging.setBackgroundMessageHandler(function(payload) {
     console.log("[TBA FCM SW] Error checking for login status!", err);
   });
 });
+
+function buildAndShowNotification(registration, payload) {
+  const message_type = payload.data.message_type;
+  const message_data = JSON.parse(payload.data.message_data);
+
+  var notificationTitle = null;
+  var notificationOptions = null;
+  if (message_type == 'ping') {
+    notificationTitle = message_data.title;
+    notificationOptions = {
+      body: message_data.desc,
+      icon: '/images/logo_square_200.png'
+    };
+  } else if (message_type == 'match_score') {  // TODO: incomplete
+    notificationTitle = message_data.match.key + ' Results';
+    notificationOptions = {
+      body: 'TODO',
+      icon: '/images/logo_square_200.png'
+    };
+  } else {  // TODO: support other notifications
+    return;
+  }
+  registration.showNotification(notificationTitle, notificationOptions);
+}
