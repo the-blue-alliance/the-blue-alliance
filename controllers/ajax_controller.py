@@ -5,6 +5,7 @@ import json
 import time
 
 from base_controller import CacheableHandler, LoggedInHandler
+from consts.client_type import ClientType
 from google.appengine.api import memcache
 from google.appengine.api import urlfetch
 from google.appengine.ext import ndb
@@ -14,8 +15,57 @@ from helpers.mytba_helper import MyTBAHelper
 from models.account import Account
 from models.event import Event
 from models.favorite import Favorite
+from models.mobile_client import MobileClient
 from models.sitevar import Sitevar
 from models.typeahead_entry import TypeaheadEntry
+
+
+class AccountInfoHandler(LoggedInHandler):
+    """
+    For getting account info.
+    Only provides logged in status for now.
+    """
+    def get(self):
+        self.response.headers['content-type'] = 'application/json; charset="utf-8"'
+        self.response.out.write(json.dumps({
+            'logged_in': True if self.user_bundle.user else False,
+        }))
+
+
+class AccountRegisterFCMToken(LoggedInHandler):
+    """
+    For adding/updating an FCM token
+    """
+    def post(self):
+        if not self.user_bundle.user:
+            self.response.set_status(401)
+            return
+
+        user_id = self.user_bundle.user.user_id()
+        fcm_token = self.request.get('fcm_token')
+        uuid = self.request.get('uuid')
+        display_name = self.request.get('display_name')
+        client_type = ClientType.WEB
+
+        query = MobileClient.query(
+                MobileClient.user_id == user_id,
+                MobileClient.device_uuid == uuid,
+                MobileClient.client_type == client_type)
+        if query.count() == 0:
+            # Record doesn't exist yet, so add it
+            MobileClient(
+                parent=ndb.Key(Account, user_id),
+                user_id=user_id,
+                messaging_id=fcm_token,
+                client_type=client_type,
+                device_uuid=uuid,
+                display_name=display_name).put()
+        else:
+            # Record already exists, update it
+            client = query.fetch(1)[0]
+            client.messaging_id = fcm_token
+            client.display_name = display_name
+            client.put()
 
 
 class AccountFavoritesHandler(LoggedInHandler):

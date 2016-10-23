@@ -7,13 +7,15 @@ YUI_COMPRESSOR = 'utils/yuicompressor-2.4.7.jar'
 SCRIPTS_MAIN = ['static/jwplayer/jwplayer.js',
                 'static/xcharts/d3.v2.min.js',
                 'static/xcharts/xcharts.min.js',
+                'static/javascript/utils/client_detection.js',
                 'static/javascript/tba_js/tablesorter.js',
+                'static/javascript/tba_js/tba.js',
                 'static/javascript/tba_js/tba_charts.js',
                 'static/javascript/tba_js/tba_countdown.js',
                 'static/javascript/tba_js/tba_sidebar.js',
                 'static/javascript/tba_js/tba_typeahead.js',
                 'static/javascript/tba_js/tba_favorites.js',
-                'static/javascript/tba_js/tba.js',
+                'static/javascript/tba_js/tba_fcm.js',
                 'static/javascript/tba_js/ReView0.65b.js',
                 ]
 
