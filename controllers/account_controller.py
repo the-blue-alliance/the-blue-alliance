@@ -20,6 +20,7 @@ from helpers.notification_helper import NotificationHelper
 from helpers.validation_helper import ValidationHelper
 
 from models.account import Account
+from models.api_auth_access import ApiAuthAccess
 from models.event import Event
 from models.favorite import Favorite
 from models.match import Match
@@ -62,6 +63,9 @@ class AccountOverview(LoggedInHandler):
             num_reviewed = Suggestion.query(Suggestion.reviewer==user).count()
             total_pending = Suggestion.query(Suggestion.review_state==Suggestion.REVIEW_PENDING).count()
 
+        # Fetch trusted API keys
+        trusted_keys = ApiAuthAccess.query(ApiAuthAccess.owner == user).fetch()
+
         self.template_values['status'] = self.request.get('status')
         self.template_values['webhook_verification_success'] = self.request.get('webhook_verification_success')
         self.template_values['ping_enabled'] = ping_enabled
@@ -72,6 +76,7 @@ class AccountOverview(LoggedInHandler):
         self.template_values['review_permissions'] = review_permissions
         self.template_values['num_reviewed'] = num_reviewed
         self.template_values['total_pending'] = total_pending
+        self.template_values['trusted_keys'] = trusted_keys
 
         self.response.out.write(jinja2_engine.render('account_overview.html', self.template_values))
 
