@@ -40,7 +40,7 @@ class PredictionHelper(object):
         return s, s_boulder
 
     @classmethod
-    def _predict_match(cls, match, all_stats, is_champs):
+    def _predict_match(cls, match, all_stats, tower_strength):
         score_var = 40**2  # TODO temporary set variance to be huge
         boulder_var = 5**2  # TODO get real value
         crossing_var = 4**2  # TODO get real value
@@ -75,7 +75,6 @@ class PredictionHelper(object):
             prob = 0.5
 
         # Prob capture
-        tower_strength = 10 if is_champs else 8
         mu = red_boulders - tower_strength
         red_prob_capture = 1 - cls._normcdf(-mu / np.sqrt(boulder_var))
 
@@ -179,8 +178,8 @@ class PredictionHelper(object):
                         limit_matches=i)
 
             # Make prediction
-            is_champs = event.event_type_enum in EventType.CMP_EVENT_TYPES
-            prediction = cls._predict_match(match, all_ixoprs, is_champs)
+            tower_strength = 10 if (event.event_type_enum in EventType.CMP_EVENT_TYPES or event.key.id() == '2016cc') else 8
+            prediction = cls._predict_match(match, all_ixoprs, tower_strength)
             predictions[match.key.id()] = prediction
 
             # Benchmark prediction
@@ -205,17 +204,17 @@ class PredictionHelper(object):
                             init_stats_default[stat] += match.score_breakdown[alliance_color]['autoPoints']
                         elif stat == '2016bouldersOPR':
                             init_stats_default[stat] += (
-                                match.score_breakdown[alliance_color]['autoBouldersLow'] +
-                                match.score_breakdown[alliance_color]['autoBouldersHigh'] +
-                                match.score_breakdown[alliance_color]['teleopBouldersLow'] +
-                                match.score_breakdown[alliance_color]['teleopBouldersHigh'])
+                                match.score_breakdown[alliance_color].get('autoBouldersLow', 0) +
+                                match.score_breakdown[alliance_color].get('autoBouldersHigh', 0) +
+                                match.score_breakdown[alliance_color].get('teleopBouldersLow', 0) +
+                                match.score_breakdown[alliance_color].get('teleopBouldersHigh', 0))
                         elif stat == '2016crossingsOPR':
                             init_stats_default[stat] += (
-                                match.score_breakdown[alliance_color]['position1crossings'] +
-                                match.score_breakdown[alliance_color]['position2crossings'] +
-                                match.score_breakdown[alliance_color]['position3crossings'] +
-                                match.score_breakdown[alliance_color]['position4crossings'] +
-                                match.score_breakdown[alliance_color]['position5crossings'])
+                                match.score_breakdown[alliance_color].get('position1crossings', 0) +
+                                match.score_breakdown[alliance_color].get('position2crossings', 0) +
+                                match.score_breakdown[alliance_color].get('position3crossings', 0) +
+                                match.score_breakdown[alliance_color].get('position4crossings', 0) +
+                                match.score_breakdown[alliance_color].get('position5crossings', 0))
 
             init_stats_default['oprs'] = float(stats_sum['score']) / (i + 1) / 6  # Initialize with 1/3 of average scores (2 alliances per match)
             for stat in relevant_stats:

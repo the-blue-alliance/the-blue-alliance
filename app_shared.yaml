@@ -17,6 +17,7 @@ skip_files:
 - tests/*
 - utils/*
 - react/*
+- node_modules/*
 
 # specific files
 - .gitignore

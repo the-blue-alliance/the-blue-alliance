@@ -22,11 +22,14 @@ class JSONAllianceSelectionsParser(ParserBase):
 
         alliance_selections = []
         for alliance in alliances:
+            is_empty = True
             selection = {'picks': [], 'declines': []}
             for team_key in alliance:
                 if not re.match(r'frc\d+', str(team_key)):
                     raise ParserInputException("Bad team_key: '{}'. Must follow format: 'frcXXX'".format(team_key))
                 else:
                     selection['picks'].append(team_key)
-            alliance_selections.append(selection)
+                    is_empty = False
+            if not is_empty:
+                alliance_selections.append(selection)
         return alliance_selections

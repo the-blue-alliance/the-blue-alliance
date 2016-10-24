@@ -55,8 +55,6 @@ class EventHelper(object):
         """
         to_return = collections.OrderedDict()  # key: week_label, value: list of events
 
-        current_week = 1
-        week_start = None
         weekless_events = []
         offseason_events = []
         preseason_events = []
@@ -71,17 +69,11 @@ class EventHelper(object):
                    (event.start_date.month == 12 and event.start_date.day == 31)):
                     weekless_events.append(event)
                 else:
-                    if week_start is None:
-                        diff_from_wed = (event.start_date.weekday() - 2) % 7  # 2 is Wednesday
-                        week_start = event.start_date - datetime.timedelta(days=diff_from_wed)
-
-                    if event.start_date >= week_start + datetime.timedelta(days=7):
-                        current_week += 1
-                        week_start += datetime.timedelta(days=7)
+                    week = event.week
                     if event.year == 2016:  # Special case for 2016 week 0.5
-                        label = REGIONAL_EVENTS_LABEL.format(0.5 if current_week == 1 else current_week - 1)
+                        label = REGIONAL_EVENTS_LABEL.format(0.5 if week == 0 else week)
                     else:
-                        label = REGIONAL_EVENTS_LABEL.format(current_week)
+                        label = REGIONAL_EVENTS_LABEL.format(week + 1)
                     if label in to_return:
                         to_return[label].append(event)
                     else:
@@ -224,15 +216,18 @@ class EventHelper(object):
             else:
                 return partial
 
-        # other districts and regionals
-        match = re.match(r'\s*(?:MAR |PNW |)(?:FIRST Robotics|FRC|)(.+)(?:District|Regional|Region|State|Tournament|FRC|Field)\b', name_str)
+        # district championships, other districts, and regionals
+        match = re.match(r'\s*(?:MAR |PNW |)(?:FIRST Robotics|FRC|)(.+)(?:District|Regional|Region|Provincial|State|Tournament|FRC|Field)\b', name_str)
         if match:
             short = match.group(1)
             match = re.match(r'(.+)(?:FIRST Robotics|FRC)', short)
             if match:
-                return match.group(1).strip()
+                result = match.group(1).strip()
             else:
-                return short.strip()
+                result = short.strip()
+            if result.startswith('FIRST'):
+                result = result[5:]
+            return result.strip()
 
         return name_str.strip()
 

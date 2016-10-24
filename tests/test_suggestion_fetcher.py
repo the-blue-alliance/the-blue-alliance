@@ -1,5 +1,6 @@
 import unittest2
 
+from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from models.account import Account
@@ -14,6 +15,8 @@ class TestSuggestionFetcher(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
 
         account = Account.get_or_insert(
             "123",

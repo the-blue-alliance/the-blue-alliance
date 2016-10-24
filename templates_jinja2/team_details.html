@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% import 'match_partials/match_table_macros.html' as mtm %}
+{% import 'team_partials/blue_banner_macros.html' as bbm %}
 
 {% block title %}{% if team.nickname %}{{team.nickname}} - {% endif %}Team {{team.team_number}}{% if not is_canonical %} ({{year}}){% endif %} - The Blue Alliance{% endblock %}
 
@@ -56,8 +57,12 @@
         <div class="col-xs-12">
           <hr>
           <h2 id="event-results">Event Results</h2>
-          {% if year_wlt %}
-            <p>Overall, Team #{{team.team_number}} was <strong>{{year_wlt.win}}-{{year_wlt.loss}}-{{year_wlt.tie}}</strong> in {{year}}.</p>
+          {% if season_wlt %}
+            <p>Team #{{team.team_number}} was <strong>{{season_wlt.win}}-{{season_wlt.loss}}-{{season_wlt.tie}}</strong> in official play
+            {% if offseason_wlt %}and <strong>{{season_wlt.win+offseason_wlt.win}}-{{season_wlt.loss+offseason_wlt.loss}}-{{season_wlt.tie+offseason_wlt.tie}}</strong> overall
+            {% endif %} in {{year}}.</p>
+          {% elif offseason_wlt %}
+            <p>Team #{{team.team_number}} was <strong>{{offseason_wlt.win}}-{{offseason_wlt.loss}}-{{offseason_wlt.tie}}</strong> during the {{year}} offseason.</p>
           {% else %}
             {% if year_qual_avg or year_elim_avg %}
               <p>Overall, team {{team.team_number}} had
@@ -69,6 +74,22 @@
               in {{year}}.</p>
             {% endif %}
           {% endif %}
+
+          <div class="text-center">
+            {% for comp in participation %}
+              {% if comp.event.is_season_event and comp.awards %}
+                {% for award in comp.awards %}
+                  {% if award.is_blue_banner %}
+                    {% for team_number, _ in award.recipient_dict.items() %}
+                      {% if team_number|string == team.team_number|string %}
+                        {{bbm.blue_banner(award, comp.event)}}
+                      {% endif %}
+                    {% endfor %}
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+          </div>
 
           {% for comp in participation %}
             <div class="row" id="{{ comp.event.key_name }}">

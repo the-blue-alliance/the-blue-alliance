@@ -109,20 +109,20 @@ class MatchstatsHelper(object):
             # 2016 specific
             if stat_type == '2016autoPointsOPR':
                 if match.score_breakdown and alliance_color in match.score_breakdown:
-                    return match.score_breakdown[alliance_color]['autoPoints']
+                    return match.score_breakdown[alliance_color].get('autoPoints', 0)
             elif stat_type == '2016bouldersOPR':
                 if match.score_breakdown and alliance_color in match.score_breakdown:
-                    return (match.score_breakdown[alliance_color]['autoBouldersLow'] +
-                        match.score_breakdown[alliance_color]['autoBouldersHigh'] +
-                        match.score_breakdown[alliance_color]['teleopBouldersLow'] +
-                        match.score_breakdown[alliance_color]['teleopBouldersHigh'])
+                    return (match.score_breakdown[alliance_color].get('autoBouldersLow', 0) +
+                        match.score_breakdown[alliance_color].get('autoBouldersHigh', 0) +
+                        match.score_breakdown[alliance_color].get('teleopBouldersLow', 0) +
+                        match.score_breakdown[alliance_color].get('teleopBouldersHigh', 0))
             elif stat_type == '2016crossingsOPR':
                 if match.score_breakdown and alliance_color in match.score_breakdown:
-                    return (match.score_breakdown[alliance_color]['position1crossings'] +
-                        match.score_breakdown[alliance_color]['position2crossings'] +
-                        match.score_breakdown[alliance_color]['position3crossings'] +
-                        match.score_breakdown[alliance_color]['position4crossings'] +
-                        match.score_breakdown[alliance_color]['position5crossings'])
+                    return (match.score_breakdown[alliance_color].get('position1crossings', 0) +
+                        match.score_breakdown[alliance_color].get('position2crossings', 0) +
+                        match.score_breakdown[alliance_color].get('position3crossings', 0) +
+                        match.score_breakdown[alliance_color].get('position4crossings', 0) +
+                        match.score_breakdown[alliance_color].get('position5crossings', 0))
 
         # None of the above cases were met. Return default.
         if init_stats and stat_type in init_stats:

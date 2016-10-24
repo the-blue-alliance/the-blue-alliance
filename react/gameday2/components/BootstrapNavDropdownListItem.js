@@ -1,30 +1,28 @@
-import React, { PropTypes } from 'react';
+import React, { PropTypes } from 'react'
 
-var BootstrapNavDropdownListItem = React.createClass({
+export default React.createClass({
   propTypes: {
+    children: PropTypes.node,
     data_toggle: PropTypes.string,
     data_target: PropTypes.string,
     a: PropTypes.string,
-    handleClick: PropTypes.func
+    handleClick: PropTypes.func,
   },
-  getDefaultProps: function() {
+  getDefaultProps() {
     return {
-      a: '#'
-    };
+      a: '#',
+    }
   },
-  handleClick: function(event) {
+  handleClick(event) {
     if (this.props.handleClick) {
       // If a callback to handle the click is given, prevent the default behavior
       event.preventDefault()
-      this.props.handleClick();
-      return false;
+      this.props.handleClick()
     }
   },
-  render: function() {
+  render() {
     return (
       <li data-toggle={this.props.data_toggle} data-target={this.props.data_target}><a href={this.props.a} onClick={this.handleClick}>{this.props.children}</a></li>
     )
   },
-});
-
-export default BootstrapNavDropdownListItem;
+})

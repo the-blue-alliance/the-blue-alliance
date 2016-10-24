@@ -1,6 +1,7 @@
 import datetime
 import unittest2
 
+from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from helpers.event.event_test_creator import EventTestCreator
@@ -15,6 +16,8 @@ class TestEventTeamCreator(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.testbed.init_taskqueue_stub(root_path=".")
 
         for team_number in range(7):

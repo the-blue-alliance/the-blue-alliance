@@ -156,7 +156,7 @@
             <tr>
               <td>{{ client.type_string }}</td>
               <td> {{ client.display_name }} </td>
-              <td>{{ client.short_id }}</td>
+              <td>{% if client.is_webhook %}{{ client.messaging_id }}{% else %}{{ client.short_id }}{% endif %}</td>
               <td><form action="/notifications/broadcast" method="post">
                 <input name="account_id" type="hidden" value="{{user_bundle.account.key.id()}}" />
                 <input name="client_id" type="hidden" value="{{client.key.id()}}" />

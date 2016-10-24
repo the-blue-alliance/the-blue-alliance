@@ -105,5 +105,5 @@ class NightbotTeamStatuskHandler(CacheableHandler):
         event_code_upper = event.event_short.upper()
 
         team_key = 'frc{}'.format(team_number)
-        status = EventTeamStatusHelper.generateTeamAtEventStatus(team_key, event)[0]
+        status = EventTeamStatusHelper.generateTeamAtEventStatusAsync(team_key, event).get_result()[0]
         return '{}[{}] {}'.format(user_str, event_code_upper, status)

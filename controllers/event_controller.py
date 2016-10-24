@@ -22,6 +22,8 @@ from models.event import Event
 from models.match import Match
 from template_engine import jinja2_engine
 
+from consts.ranking_indexes import RankingIndexes
+
 
 class EventList(CacheableHandler):
     """
@@ -79,8 +81,7 @@ class EventList(CacheableHandler):
             "districts": districts,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/event_list.html')
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('event_list.html', self.template_values)
 
     def memcacheFlush(self):
         year = datetime.datetime.now().year
@@ -170,6 +171,25 @@ class EventDetail(CacheableHandler):
         if event_insights:
             event_insights_template = 'event_partials/event_insights_{}.html'.format(event.year)
 
+        # rankings processing for ranking score per match
+        full_rankings = event.rankings
+        rankings_enhanced = event.rankings_enhanced
+        if rankings_enhanced is not None:
+            rp_index = RankingIndexes.CUMULATIVE_RANKING_SCORE[event.year]
+            matches_index = RankingIndexes.MATCHES_PLAYED[event.year]
+            ranking_criterion_name = full_rankings[0][rp_index]
+            full_rankings[0].append(ranking_criterion_name + "/Match*")
+
+            for row in full_rankings[1:]:
+                team = row[1]
+                if rankings_enhanced["ranking_score_per_match"] is not None:
+                    rp_per_match = rankings_enhanced['ranking_score_per_match'][team]
+                    row.append(rp_per_match)
+                if rankings_enhanced["match_offset"] is not None:
+                    match_offset = rankings_enhanced["match_offset"][team]
+                    if match_offset != 0:
+                        row[matches_index] = "{} ({})".format(row[matches_index], match_offset)
+
         self.template_values.update({
             "event": event,
             "district_name": DistrictType.type_names.get(event.event_district_enum, None),
@@ -223,11 +243,11 @@ class EventInsights(CacheableHandler):
 
         event.get_matches_async()
 
-        match_predictions = event.matchstats.get('match_predictions', None)
-        match_prediction_stats = event.matchstats.get('match_prediction_stats', None)
+        match_predictions = event.details.predictions.get('match_predictions', None)
+        match_prediction_stats = event.details.predictions.get('match_prediction_stats', None)
 
-        ranking_predictions = event.matchstats.get('ranking_predictions', None)
-        ranking_prediction_stats = event.matchstats.get('ranking_prediction_stats', None)
+        ranking_predictions = event.details.predictions.get('ranking_predictions', None)
+        ranking_prediction_stats = event.details.predictions.get('ranking_prediction_stats', None)
 
         cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
         matches = MatchHelper.organizeMatches(cleaned_matches)

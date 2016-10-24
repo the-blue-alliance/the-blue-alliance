@@ -20,6 +20,8 @@ from models.robot import Robot
 
 from template_engine import jinja2_engine
 
+from consts.event_type import EventType
+
 
 class TeamRenderer(object):
     @classmethod
@@ -28,13 +30,15 @@ class TeamRenderer(object):
         social_media_future = media_query.TeamSocialMediaQuery(team.key.id()).fetch_async()
         robot_future = Robot.get_by_id_async('{}_{}'.format(team.key.id(), year))
         team_districts_future = team_query.TeamDistrictsQuery(team.key.id()).fetch_async()
+        participation_future = team_query.TeamParticipationQuery(team.key.id()).fetch_async()
 
         events_sorted, matches_by_event_key, awards_by_event_key, valid_years = TeamDetailsDataFetcher.fetch(team, year, return_valid_years=True)
         if not events_sorted:
             return None
 
         participation = []
-        year_wlt_list = []
+        season_wlt_list = []
+        offseason_wlt_list = []
         year_match_avg_list = []
 
         current_event = None
@@ -61,7 +65,10 @@ class TeamRenderer(object):
                 qual_avg = None
                 elim_avg = None
                 wlt = EventHelper.calculateTeamWLTFromMatches(team.key_name, event_matches)
-                year_wlt_list.append(wlt)
+                if event.event_type_enum in EventType.SEASON_EVENT_TYPES:
+                    season_wlt_list.append(wlt)
+                else:
+                    offseason_wlt_list.append(wlt)
                 if wlt["win"] + wlt["loss"] + wlt["tie"] == 0:
                     display_wlt = None
                 else:
@@ -82,6 +89,8 @@ class TeamRenderer(object):
                                   'rank': team_rank,
                                   'awards': event_awards})
 
+        season_wlt = None
+        offseason_wlt = None
         if year == 2015:
             year_wlt = None
             year_qual_scores = []
@@ -95,13 +104,22 @@ class TeamRenderer(object):
         else:
             year_qual_avg = None
             year_elim_avg = None
-            year_wlt = {"win": 0, "loss": 0, "tie": 0}
-            for wlt in year_wlt_list:
-                year_wlt["win"] += wlt["win"]
-                year_wlt["loss"] += wlt["loss"]
-                year_wlt["tie"] += wlt["tie"]
-            if year_wlt["win"] + year_wlt["loss"] + year_wlt["tie"] == 0:
-                year_wlt = None
+            season_wlt = {"win": 0, "loss": 0, "tie": 0}
+            offseason_wlt = {"win": 0, "loss": 0, "tie": 0}
+
+            for wlt in season_wlt_list:
+                season_wlt["win"] += wlt["win"]
+                season_wlt["loss"] += wlt["loss"]
+                season_wlt["tie"] += wlt["tie"]
+            if season_wlt["win"] + season_wlt["loss"] + season_wlt["tie"] == 0:
+                season_wlt = None
+
+            for wlt in offseason_wlt_list:
+                offseason_wlt["win"] += wlt["win"]
+                offseason_wlt["loss"] += wlt["loss"]
+                offseason_wlt["tie"] += wlt["tie"]
+            if offseason_wlt["win"] + offseason_wlt["loss"] + offseason_wlt["tie"] == 0:
+                offseason_wlt = None
 
         medias_by_slugname = MediaHelper.group_by_slugname([media for media in media_future.get_result()])
         image_medias = MediaHelper.get_images(media_future.get_result())
@@ -117,13 +135,20 @@ class TeamRenderer(object):
             district_type = DistrictType.abbrevs[district_abbrev]
             district_name = DistrictType.type_names[district_type]
 
+        last_competed = None
+        participation_years = participation_future.get_result()
+        if len(participation_years) > 0:
+            last_competed = max(participation_years)
+        current_year = datetime.date.today().year
+
         handler.template_values.update({
             "is_canonical": is_canonical,
             "team": team,
             "participation": participation,
             "year": year,
             "years": valid_years,
-            "year_wlt": year_wlt,
+            "season_wlt": season_wlt,
+            "offseason_wlt": offseason_wlt,
             "year_qual_avg": year_qual_avg,
             "year_elim_avg": year_elim_avg,
             "current_event": current_event,
@@ -135,6 +160,8 @@ class TeamRenderer(object):
             "robot": robot_future.get_result(),
             "district_name": district_name,
             "district_abbrev": district_abbrev,
+            "last_competed": last_competed,
+            "current_year": current_year,
         })
 
         if short_cache:
@@ -146,6 +173,8 @@ class TeamRenderer(object):
     def render_team_history(cls, handler, team, is_canonical):
         award_futures = award_query.TeamAwardsQuery(team.key.id()).fetch_async()
         event_futures = event_query.TeamEventsQuery(team.key.id()).fetch_async()
+        participation_future = team_query.TeamParticipationQuery(team.key.id()).fetch_async()
+        social_media_future = media_query.TeamSocialMediaQuery(team.key.id()).fetch_async()
 
         awards_by_event = {}
         for award in award_futures.get_result():
@@ -176,13 +205,24 @@ class TeamRenderer(object):
             event_awards.append((event, sorted_awards))
         event_awards = sorted(event_awards, key=lambda (e, _): e.start_date if e.start_date else datetime.datetime(e.year, 12, 31))
 
+        last_competed = None
+        participation_years = participation_future.get_result()
+        if len(participation_years) > 0:
+            last_competed = max(participation_years)
+        current_year = datetime.date.today().year
+
+        social_medias = sorted(social_media_future.get_result(), key=MediaHelper.social_media_sorter)
+
         handler.template_values.update({
             'is_canonical': is_canonical,
             'team': team,
             'event_awards': event_awards,
             'years': sorted(years),
+            "social_medias": social_medias,
             'current_event': current_event,
-            'matches_upcoming': matches_upcoming
+            'matches_upcoming': matches_upcoming,
+            'last_competed': last_competed,
+            'current_year': current_year
         })
 
         if short_cache:

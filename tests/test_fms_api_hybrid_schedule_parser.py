@@ -3,6 +3,7 @@ from datetime import datetime
 
 import unittest2
 
+from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from consts.event_type import EventType
@@ -17,6 +18,8 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -31,7 +34,6 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
                 year=2016,
                 end_date=datetime(2016, 03, 27),
                 official=True,
-                location='New York, NY',
                 start_date=datetime(2016, 03, 24),
                 timezone_id="America/New_York"
         )
@@ -52,7 +54,6 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
                 year=2016,
                 end_date=datetime(2016, 03, 27),
                 official=True,
-                location='New York, NY',
                 start_date=datetime(2016, 03, 24),
                 timezone_id="America/New_York"
         )
@@ -77,7 +78,6 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
                 year=2016,
                 end_date=datetime(2016, 03, 27),
                 official=True,
-                location='New York, NY',
                 start_date=datetime(2016, 03, 24),
                 timezone_id="America/New_York"
         )
@@ -105,7 +105,6 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
                 year=2016,
                 end_date=datetime(2016, 03, 27),
                 official=True,
-                location='Michigan, MI',
                 start_date=datetime(2016, 03, 24),
                 timezone_id="America/New_York"
         )

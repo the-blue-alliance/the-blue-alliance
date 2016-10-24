@@ -119,7 +119,7 @@ class ManipulatorBase(object):
         If it does, update it and give it back. If it does not, give it back.
         """
         new_models = self.listify(new_models)
-        old_models = ndb.get_multi([ndb.Key(type(model).__name__, model.key_name) for model in new_models], use_cache=False)
+        old_models = ndb.get_multi([model.key for model in new_models], use_cache=False)
         new_models = [self.updateMergeBase(new_model, old_model, auto_union=auto_union) for (new_model, old_model) in zip(new_models, old_models)]
         return self.delistify(new_models)
 

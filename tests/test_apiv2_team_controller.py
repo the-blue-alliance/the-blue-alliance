@@ -36,6 +36,8 @@ class TestTeamApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.team = Team(
@@ -47,7 +49,9 @@ class TestTeamApiController(unittest2.TestCase):
                 team_number=281,
                 rookie_year=1999,
                 nickname="EnTech GreenVillians",
-                address="Greenville, SC, USA",
+                city="Greenville",
+                state_prov="SC",
+                country="USA",
                 website="www.entech.org",
                 motto = "Infiltrating Young Minds One Robot at a Time",
         )
@@ -86,6 +90,8 @@ class TestTeamEventsApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.team = Team(
@@ -96,7 +102,9 @@ class TestTeamEventsApiController(unittest2.TestCase):
                 Technical Charter High School",
                 team_number=281,
                 nickname="EnTech GreenVillians",
-                address="Greenville, SC, USA",
+                city="Greenville",
+                state_prov="SC",
+                country="USA",
                 website="www.entech.org",
         )
         self.team.put()
@@ -110,7 +118,9 @@ class TestTeamEventsApiController(unittest2.TestCase):
                 year=datetime.now().year,
                 end_date=datetime(2010, 03, 27),
                 official=True,
-                location='Clemson, SC',
+                city='Clemson',
+                state_prov='SC',
+                country='USA',
                 start_date=datetime(2010, 03, 24),
         )
         self.event.put()
@@ -152,6 +162,8 @@ class TestDistrictTeamsApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.team = Team(
@@ -162,7 +174,9 @@ class TestDistrictTeamsApiController(unittest2.TestCase):
                 Technical Charter High School",
                 team_number=281,
                 nickname="EnTech GreenVillians",
-                address="Greenville, SC, USA",
+                city="Greenville",
+                state_prov="SC",
+                country="USA",
                 website="www.entech.org",
                 motto = "Infiltrating Young Minds One Robot at a Time",
         )
@@ -210,6 +224,8 @@ class TestTeamMediaApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.team = Team(
@@ -217,7 +233,9 @@ class TestTeamMediaApiController(unittest2.TestCase):
                 name="very long name",
                 team_number=254,
                 nickname="Teh Chezy Pofs",
-                address="Greenville, SC, USA"
+                city="Greenville",
+                state_prov="SC",
+                country="USA",
         )
         self.team.put()
 
@@ -271,6 +289,8 @@ class TestTeamListApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.team1 = Team(
@@ -278,7 +298,9 @@ class TestTeamListApiController(unittest2.TestCase):
                 name="SomeName",
                 team_number=123,
                 nickname="SomeNickname",
-                address="San Jose, CA, USA",
+                city="San Jose",
+                state_prov="CA",
+                country="USA",
                 website="www.website.com",
         )
 
@@ -287,7 +309,9 @@ class TestTeamListApiController(unittest2.TestCase):
                 name="SomeName",
                 team_number=4567,
                 nickname="SomeNickname",
-                address="San Jose, CA, USA",
+                city="San Jose",
+                state_prov="CA",
+                country="USA",
                 website="www.website.com",
         )
 
@@ -331,6 +355,8 @@ class TestTeamHistoryRobotsApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.team = Team(
@@ -376,6 +402,8 @@ class TestTeamHistoryDistrictsApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.team = Team(

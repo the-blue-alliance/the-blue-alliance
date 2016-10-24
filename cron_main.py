@@ -4,7 +4,7 @@ import webapp2
 import tba_config
 
 from controllers.backup_controller import TbaCSVBackupEventsEnqueue, TbaCSVBackupEventDo, TbaCSVRestoreEventsEnqueue, TbaCSVRestoreEventDo
-from controllers.backup_controller import TbaCSVBackupTeamsEnqueue, TbaCSVBackupTeamsDo
+from controllers.backup_controller import TbaCSVBackupTeamsEnqueue
 
 from controllers.datafeed_controller import TbaVideosGet, TbaVideosEnqueue
 from controllers.datafeed_controller import FMSAPIAwardsEnqueue, FMSAPIEventAlliancesEnqueue, FMSAPIEventRankingsEnqueue, FMSAPIMatchesEnqueue
@@ -18,7 +18,7 @@ from controllers.cron_controller import FinalMatchesRepairDo
 from controllers.cron_controller import UpcomingNotificationDo
 
 from controllers.admin.admin_cron_controller import AdminMobileClearEnqueue, AdminMobileClear, AdminSubsClearEnqueue, AdminSubsClear, \
-    AdminWebhooksClearEnqueue, AdminWebhooksClear
+    AdminWebhooksClearEnqueue, AdminWebhooksClear, AdminRegistrationDayEnqueue
 
 app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackupEventsEnqueue),
                                ('/tasks/enqueue/csv_backup_events/([0-9]*)', TbaCSVBackupEventsEnqueue),
@@ -27,7 +27,6 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/enqueue/csv_restore_events/([0-9]*)', TbaCSVRestoreEventsEnqueue),
                                ('/tasks/do/csv_restore_event/(.*)', TbaCSVRestoreEventDo),
                                ('/tasks/enqueue/csv_backup_teams', TbaCSVBackupTeamsEnqueue),
-                               ('/tasks/do/csv_backup_teams', TbaCSVBackupTeamsDo),
                                ('/tasks/enqueue/tba_videos', TbaVideosEnqueue),
                                ('/tasks/enqueue/fmsapi_awards/(.*)', FMSAPIAwardsEnqueue),
                                ('/tasks/enqueue/fmsapi_event_alliances/(.*)', FMSAPIEventAlliancesEnqueue),
@@ -55,5 +54,6 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/admin/clear_old_subs', AdminSubsClear),
                                ('/tasks/admin/enqueue/clear_old_webhooks', AdminWebhooksClearEnqueue),
                                ('/tasks/admin/clear_old_webhooks', AdminWebhooksClear),
+                               ('/tasks/admin/enqueue/registration_day', AdminRegistrationDayEnqueue),
                                ],
                               debug=tba_config.DEBUG)

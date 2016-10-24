@@ -1,0 +1,35 @@
+{% for live_event in live_events_with_teams %}
+    <div class="row">
+        <div class="col-xs-12">
+            <a href="/event/{{ live_event.0.key_name }}"><h3>{{ live_event.0.name }}</h3></a>
+            {% if live_event.0.now and live_event.0.webcast %}
+            <a class="btn btn-success btn-small pull-right" href="{{live_event.0.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch Now</a>
+            {% endif %}
+            <p>
+                {% if live_event.0.location %}<span class="glyphicon glyphicon-map-marker"></span> in <a href="http://maps.google.com/maps?q={{ live_event.0.location }}" target="_blank">{{ live_event.0.location }}</a><br />{% endif %}
+                {% if live_event.0.start_date %}<span class="glyphicon glyphicon-calendar"></span> {{ live_event.0.start_date|strftime("%b %d") }}{% if live_event.0.start_date|strftime("%b %d") != live_event.0.end_date|strftime("%b %d") %} - {{ live_event.0.end_date|strftime("%b %d") }}{% endif %}{{ live_event.0.end_date|strftime(", %Y") }}{% endif %}
+            </p>
+
+            <table class="table table-striped table-condensed col-xs-11">
+                <tr>
+                    <th>Team Number</th>
+                    <th>Team Name</th>
+                    <th>Qual Record</th>
+                    <th>Ranking</th>
+                    <th>Playoff Status</th>
+                </tr>
+                {% for team_and_status in live_event.1 %}
+                    <tr>
+                        <td>{{ team_and_status.0.team_number }}</td>
+                        <td>
+                            <a href="/team/{{ team_and_status.0.team_number }}/{{ live_event.0.year }}#{{ live_event.0.key_name }}">{{ team_and_status.0.nickname }}</a>
+                        </td>
+                        <td>{{ team_and_status.1.get_result().1 }}</td>
+                        <td>{{ team_and_status.1.get_result().2 }}</td>
+                        <td>{% if team_and_status.1.get_result().3 %}{{ team_and_status.1.get_result().3 }}{% endif %}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+{% endfor %}

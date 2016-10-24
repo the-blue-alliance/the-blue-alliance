@@ -57,8 +57,16 @@
         <td><a href="http://maps.google.com/maps?q={{ event.venue_address|urlencode }}">{{ event.venue_address|linebreaksbr }}</a></td>
     </tr>
     <tr>
-        <td>Event Location</td>
-        <td><a href="http://maps.google.com/maps?q={{ event.location|urlencode }}">{{ event.location }}</a></td>
+        <td>Event City</td>
+        <td>{{ event.city }}</td>
+    </tr>
+    <tr>
+        <td>Event State/Prov</td>
+        <td>{{ event.state_prov }}</td>
+    </tr>
+    <tr>
+        <td>Event Country</td>
+        <td>{{ event.country }}</td>
     </tr>
     <tr>
         <td>Event Timezone</td>
@@ -109,6 +117,15 @@
 <form action="/admin/event/add_teams/{{event.key_name}}" method="post">
   <textarea class="form-control" name="teams_csv"></textarea><br>
   <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Teams</button>
+</form>
+
+<h2>Remove Teams</h2>
+<p>Remove teams formatted as CSV.</p>
+<p>Example:</p>
+<div class="well">254, 1114, 100, 604, 148</div>
+<form action="/admin/event/delete_teams/{{event.key_name}}" method="post">
+  <textarea class="form-control" name="teams_csv"></textarea><br>
+  <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-delete"></span> Delete Teams</button>
 </form>
 
 <h2>Add Alliance Selections</h2>

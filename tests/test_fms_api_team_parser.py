@@ -19,6 +19,7 @@ class TestFMSAPITeamParser(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -37,7 +38,9 @@ class TestFMSAPITeamParser(unittest2.TestCase):
             self.assertEqual(team.team_number, 1124)
             self.assertEqual(team.name, "Avon Public Schools/UTC & AVON HIGH SCHOOL")
             self.assertEqual(team.nickname, "UberBots")
-            self.assertEqual(team.address, "Avon, Connecticut, USA")
+            self.assertEqual(team.city, "Avon")
+            self.assertEqual(team.state_prov, "Connecticut")
+            self.assertEqual(team.country, "USA")
             self.assertEqual(team.rookie_year, 2003)
             self.assertEqual(team.website, "http://uberbots.org")
 
@@ -67,7 +70,9 @@ class TestFMSAPITeamParser(unittest2.TestCase):
             self.assertEqual(team.team_number, 254)
             self.assertEqual(team.name, "NASA Ames Research Center / Google")
             self.assertEqual(team.nickname, "The Cheesy Poofs")
-            self.assertEqual(team.address, "San Jose, California, USA")
+            self.assertEqual(team.city, "San Jose")
+            self.assertEqual(team.state_prov, "California")
+            self.assertEqual(team.country, "USA")
             self.assertEqual(team.rookie_year, 1999)
             self.assertEqual(team.website, "http://team254.com/")
 
@@ -84,11 +89,8 @@ class TestFMSAPITeamParser(unittest2.TestCase):
         # Modify the websites to some known bad ones, and ensure the parser can recover
         bad_websites = [None, '', 'www.firstinspires.org', 'website.com', 'www.website.com', 'http://website.com',
                         'https://website.com', 'ftp://website.com']
-        expected_sites = [None, None, None, 'http:///website.com', 'http:///www.website.com', 'http://website.com',
+        expected_sites = [None, None, None, 'http://website.com', 'http://www.website.com', 'http://website.com',
                           'https://website.com', 'ftp://website.com']
-        # When urllib prepends the scheme, it'll add three slashes because of how its parsed.
-        # Browsers won't care about the extra /, so it shouldn't be an issue
-        # http://stackoverflow.com/questions/7289481/urlparse-urlparse-returning-3-instead-of-2-after-scheme
         with open('test_data/fms_api/2015_frc1124.json', 'r') as f:
             team_data = json.loads(f.read())
             for site, expected in zip(bad_websites, expected_sites):
@@ -105,6 +107,8 @@ class TestFMSAPITeamParser(unittest2.TestCase):
                 self.assertEqual(team.team_number, 1124)
                 self.assertEqual(team.name, "Avon Public Schools/UTC & AVON HIGH SCHOOL")
                 self.assertEqual(team.nickname, "UberBots")
-                self.assertEqual(team.address, "Avon, Connecticut, USA")
+                self.assertEqual(team.city, "Avon")
+                self.assertEqual(team.state_prov, "Connecticut")
+                self.assertEqual(team.country, "USA")
                 self.assertEqual(team.rookie_year, 2003)
                 self.assertEqual(team.website, expected)

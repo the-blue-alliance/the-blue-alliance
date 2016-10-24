@@ -3,7 +3,7 @@ import os
 
 DEBUG = os.environ.get('SERVER_SOFTWARE') is not None and os.getenv('APPLICATION_ID') != 's~tbatv-prod-hrd'
 
-MAX_YEAR = 2016
+MAX_YEAR = 2017
 
 # Fraction of requests to profile
 RECORD_FRACTION = 0.1

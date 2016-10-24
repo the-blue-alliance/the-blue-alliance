@@ -1,6 +1,7 @@
 import datetime
 import unittest2
 
+from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from consts.event_type import EventType
@@ -17,6 +18,8 @@ class TestAddMatchTimes(unittest2.TestCase):
         self.testbed.init_urlfetch_stub()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
 
         self.event = Event(
             id="2014casj",

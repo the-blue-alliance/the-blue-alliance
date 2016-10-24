@@ -79,5 +79,21 @@
       </div>
     {% endif %}
   </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <h2>Past Competitions This Year</h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      {% if past_events_with_teams %}
+        {% with past_events_with_teams as live_events_with_teams %}
+        {% include "live_teams_partial.html" %}
+        {% endwith %}
+      {% else %}
+        <p>No favorite teams have competed yet.</p>
+      {% endif %}
+    </div>
+  </div>
 </div>
 {% endblock %}

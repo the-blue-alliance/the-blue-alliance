@@ -18,6 +18,7 @@ from controllers.api.api_event_controller import ApiEventController
 from models.api_auth_access import ApiAuthAccess
 from models.award import Award
 from models.event import Event
+from models.event import EventDetails
 from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
@@ -33,6 +34,8 @@ class TestApiTrustedController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.teams_auth = ApiAuthAccess(id='tEsT_id_0',
@@ -84,6 +87,7 @@ class TestApiTrustedController(unittest2.TestCase):
 
     def test_auth(self):
         request_path = '/api/trusted/v1/event/2014casj/matches/update'
+        request_path_caps_key = '/api/trusted/v1/event/2014CASJ/matches/update'
 
         # Fail
         response = self.testapp.post(request_path, expect_errors=True)
@@ -94,7 +98,7 @@ class TestApiTrustedController(unittest2.TestCase):
         request_body = json.dumps([])
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
         response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 401)
         self.assertTrue('Error' in response.json)
 
         self.rankings_auth.put()
@@ -105,35 +109,40 @@ class TestApiTrustedController(unittest2.TestCase):
         response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 200)
 
+        # Pass; all caps key
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path_caps_key, request_body)).hexdigest()
+        response = self.testapp.post(request_path_caps_key, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        self.assertEqual(response.status_code, 200)
+
         # Fail; bad X-TBA-Auth-Id
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
         response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'badTestAuthId', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 401)
         self.assertTrue('Error' in response.json)
 
         # Fail; bad sig
         response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': '123abc'}, expect_errors=True)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 401)
         self.assertTrue('Error' in response.json)
 
         # Fail; bad sig due to wrong body
         body2 = json.dumps([{}])
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
         response = self.testapp.post(request_path, body2, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 401)
         self.assertTrue('Error' in response.json)
 
         # Fail; bad event
         request_path2 = '/api/trusted/v1/event/2014cama/matches/update'
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path2, request_body)).hexdigest()
         response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_1', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 401)
         self.assertTrue('Error' in response.json)
 
         # Fail; insufficient auth_types_enum
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
         response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_2', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 401)
 
     def test_alliance_selections_update(self):
         self.alliances_auth.put()
@@ -154,6 +163,27 @@ class TestApiTrustedController(unittest2.TestCase):
 
         self.assertEqual(response.status_code, 200)
 
+        self.assertEqual(len(self.event.alliance_selections), 8)
+        for i, selection in enumerate(self.event.alliance_selections):
+            self.assertEqual(alliances[i], selection['picks'])
+
+    def test_empty_alliance_selections_update(self):
+        self.alliances_auth.put()
+
+        alliances = [['frc971', 'frc254', 'frc1662'],
+                     ['frc1678', 'frc368', 'frc4171'],
+                     ['frc2035', 'frc192', 'frc4990'],
+                     ['frc1323', 'frc846', 'frc2135'],
+                     [],[],[],[]]
+        request_body = json.dumps(alliances)
+
+        request_path = '/api/trusted/v1/event/2014casj/alliance_selections/update'
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_3', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(len(self.event.alliance_selections), 4)
         for i, selection in enumerate(self.event.alliance_selections):
             self.assertEqual(alliances[i], selection['picks'])
 
@@ -323,7 +353,7 @@ class TestApiTrustedController(unittest2.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.event.rankings[0], ['Rank', 'Team', 'QS', 'Auton', 'Teleop', 'T&C', 'DQ', 'Played'])
-        self.assertEqual(self.event.rankings[1], ['1', '254', '20', '500', '500', '200', '0', '10'])
+        self.assertEqual(self.event.rankings[1], [1, '254', 20, 500, 500, 200, 0, 10])
 
     def test_rankings_wlt_update(self):
         self.rankings_auth.put()
@@ -343,7 +373,7 @@ class TestApiTrustedController(unittest2.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.event.rankings[0], ['Rank', 'Team', 'QS', 'Auton', 'Teleop', 'T&C', 'Record (W-L-T)', 'DQ', 'Played'])
-        self.assertEqual(self.event.rankings[1], ['1', '254', '20', '500', '500', '200', '10-0-0', '0', '10'])
+        self.assertEqual(self.event.rankings[1], [1, '254', 20, 500, 500, 200, '10-0-0', 0, 10])
 
     def test_eventteams_update(self):
         self.teams_auth.put()

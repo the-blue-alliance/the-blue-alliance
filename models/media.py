@@ -21,6 +21,8 @@ class Media(ndb.Model):
         MediaType.YOUTUBE_CHANNEL: 'youtube-channel',
         MediaType.TWITTER_PROFILE: 'twitter-profile',
         MediaType.GITHUB_PROFILE: 'github-profile',
+        MediaType.INSTAGRAM_PROFILE: 'instagram-profile',
+        MediaType.PERISCOPE_PROFILE: 'periscope-profile',
     }
 
     REFERENCE_MAP = {

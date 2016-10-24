@@ -15,6 +15,7 @@ from consts.district_type import DistrictType
 from helpers.district_helper import DistrictHelper
 from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
+from helpers.event_details_manipulator import EventDetailsManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.event_team_repairer import EventTeamRepairer
 from helpers.event_team_updater import EventTeamUpdater
@@ -29,6 +30,7 @@ from helpers.team_manipulator import TeamManipulator
 from helpers.match_manipulator import MatchManipulator
 
 from models.event import Event
+from models.event_details import EventDetails
 from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
@@ -147,22 +149,31 @@ class EventMatchstatsDo(webapp.RequestHandler):
     def get(self, event_key):
         event = Event.get_by_id(event_key)
         matchstats_dict = MatchstatsHelper.calculate_matchstats(event.matches, event.year)
+        if any([v != {} for v in matchstats_dict.values()]):
+            pass
+        else:
+            logging.warn("Matchstat calculation for {} failed!".format(event_key))
+            matchstats_dict = None
 
+        predictions_dict = None
         if event.year == 2016:
             organized_matches = MatchHelper.organizeMatches(event.matches)
             match_predictions, match_prediction_stats = PredictionHelper.get_match_predictions(organized_matches['qm'])
             ranking_predictions, ranking_prediction_stats = PredictionHelper.get_ranking_predictions(organized_matches['qm'], match_predictions)
 
-            matchstats_dict['match_predictions'] = match_predictions
-            matchstats_dict['match_prediction_stats'] = match_prediction_stats
-            matchstats_dict['ranking_predictions'] = ranking_predictions
-            matchstats_dict['ranking_prediction_stats'] = ranking_prediction_stats
+            predictions_dict = {
+                'match_predictions': match_predictions,
+                'match_prediction_stats': match_prediction_stats,
+                'ranking_predictions': ranking_predictions,
+                'ranking_prediction_stats': ranking_prediction_stats
+            }
 
-        if any([v != {} for v in matchstats_dict.values()]):
-            event.matchstats_json = json.dumps(matchstats_dict)
-            EventManipulator.createOrUpdate(event)
-        else:
-            logging.warn("Matchstat calculation for {} failed!".format(event_key))
+        event_details = EventDetails(
+            id=event_key,
+            matchstats=matchstats_dict,
+            predictions=predictions_dict
+        )
+        EventDetailsManipulator.createOrUpdate(event_details)
 
         template_values = {
             'matchstats_dict': matchstats_dict,
@@ -453,8 +464,11 @@ class DistrictPointsCalcDo(webapp.RequestHandler):
 
         district_points = DistrictHelper.calculate_event_points(event)
 
-        event.district_points_json = json.dumps(district_points)
-        EventManipulator.createOrUpdate(event)
+        event_details = EventDetails(
+            id=event_key,
+            district_points=district_points
+        )
+        EventDetailsManipulator.createOrUpdate(event_details)
 
         self.response.out.write(event.district_points)
 

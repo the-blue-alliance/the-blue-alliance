@@ -18,7 +18,9 @@ class TeamManipulator(ManipulatorBase):
         the "old" team that are null in the "new" team.
         """
         attrs = [
-            "address",
+            "city",
+            "state_prov",
+            "country",
             "name",
             "nickname",
             "website",

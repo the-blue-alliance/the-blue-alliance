@@ -3,6 +3,7 @@ import webtest
 import webapp2
 import os
 
+from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from controllers.suggestions.suggest_match_video_review_controller import SuggestMatchVideoReviewController
@@ -19,6 +20,8 @@ class TestMatchApiController(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.testbed.init_urlfetch_stub()
         self.testbed.init_user_stub()
 

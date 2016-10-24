@@ -24,9 +24,9 @@ class ModelToDict(object):
 
         try:
             team_dict["location"] = team.location
-            team_dict["locality"] = team.locality
-            team_dict["region"] = team.region
-            team_dict["country_name"] = team.country_name
+            team_dict["locality"] = team.city
+            team_dict["region"] = team.state_prov
+            team_dict["country_name"] = team.country
         except Exception, e:
             logging.warning("Failed to include Address for api_team_info_%s: %s" % (team.key.id(), e))
 
@@ -53,6 +53,7 @@ class ModelToDict(object):
         event_dict["facebook_eid"] = event.facebook_eid
         event_dict["website"] = event.website
         event_dict["timezone"] = event.timezone_id
+        event_dict["week"] = event.week
 
         if event.alliance_selections:
             event_dict["alliances"] = event.alliance_selections
@@ -129,6 +130,7 @@ class ModelToDict(object):
             media_dict["details"] = media.details
         else:
             media_dict["details"] = {}
+        media_dict["preferred"] = True if media.preferred_references != [] else False
 
         return media_dict
 

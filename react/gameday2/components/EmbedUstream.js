@@ -1,24 +1,24 @@
-import React, { PropTypes } from 'react';
+import React from 'react'
+import { WebcastPropType } from '../utils/webcastUtils'
 
-var EmbedUstream = React.createClass({
-  propTypes: {
-    webcast: PropTypes.object.isRequired
-  },
-  render: function() {
-    var channel = this.props.webcast.channel;
-    var src = `http://www.ustream.tv/embed/${channel}?html5ui=1`;
-    return (
-      <iframe
-        width={this.props.vidWidth}
-        height={this.props.vidHeight}
-        src={src}
-        scrolling="no"
-        allowfullscreen
-        webkitallowfullscreen
-        frameborder="0"
-        style={{border: "0 none transparent"}}></iframe>
-    );
-  }
-});
+const EmbedUstream = (props) => {
+  const channel = props.webcast.channel
+  const src = `http://www.ustream.tv/embed/${channel}?html5ui=1`
+  return (
+    <iframe
+      width="100%"
+      height="100%"
+      src={src}
+      scrolling="no"
+      allowFullScreen
+      frameBorder="0"
+      style={{ border: '0 none transparent' }}
+    />
+  )
+}
 
-export default EmbedUstream;
+EmbedUstream.propTypes = {
+  webcast: WebcastPropType.isRequired,
+}
+
+export default EmbedUstream

@@ -14,9 +14,11 @@ from consts.event_type import EventType
 from controllers.api.api_district_controller import ApiDistrictListController, ApiDistrictEventsController, ApiDistrictRankingsController
 
 from models.event import Event
+from models.event_details import EventDetails
 from models.team import Team
 from models.match import Match
 from models.event_team import EventTeam
+
 
 class TestListDistrictsController(unittest2.TestCase):
     def setUp(self):
@@ -28,6 +30,8 @@ class TestListDistrictsController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.event = Event(
@@ -40,23 +44,31 @@ class TestListDistrictsController(unittest2.TestCase):
                 year=2010,
                 end_date=datetime(2010, 03, 27),
                 official=True,
-                location='Clemson, SC',
+                city="Clemson",
+                state_prov="SC",
+                country="USA",
                 venue="Long Beach Arena",
                 venue_address="Long Beach Arena\r\n300 East Ocean Blvd\r\nLong Beach, CA 90802\r\nUSA",
                 start_date=datetime(2010, 03, 24),
                 webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
-                alliance_selections_json="[ {\"declines\": [], \"picks\": [\"frc971\", \"frc254\", \"frc1662\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc1678\", \"frc368\", \"frc4171\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc2035\", \"frc192\", \"frc4990\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc1323\", \"frc846\", \"frc2135\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc2144\", \"frc1388\", \"frc668\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc1280\", \"frc604\", \"frc100\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc114\", \"frc852\", \"frc841\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc2473\", \"frc3256\", \"frc1868\"]}]",
                 website="http://www.firstsv.org",
         )
-
         self.event.put()
+
+        self.event_details = EventDetails(
+            id=self.event.key.id(),
+            alliance_selections=[
+                {"declines": [], "picks": ["frc971", "frc254", "frc1662"]},
+                {"declines": [], "picks": ["frc1678", "frc368", "frc4171"]},
+                {"declines": [], "picks": ["frc2035", "frc192", "frc4990"]},
+                {"declines": [], "picks": ["frc1323", "frc846", "frc2135"]},
+                {"declines": [], "picks": ["frc2144", "frc1388", "frc668"]},
+                {"declines": [], "picks": ["frc1280", "frc604", "frc100"]},
+                {"declines": [], "picks": ["frc114", "frc852", "frc841"]},
+                {"declines": [], "picks": ["frc2473", "frc3256", "frc1868"]}
+            ]
+        )
+        self.event_details.put()
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -82,6 +94,8 @@ class TestListDistrictEventsController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.event = Event(
@@ -94,23 +108,31 @@ class TestListDistrictEventsController(unittest2.TestCase):
                 year=2010,
                 end_date=datetime(2010, 03, 27),
                 official=True,
-                location='Clemson, SC',
+                city="Clemson",
+                state_prov="SC",
+                country="USA",
                 venue="Long Beach Arena",
                 venue_address="Long Beach Arena\r\n300 East Ocean Blvd\r\nLong Beach, CA 90802\r\nUSA",
                 start_date=datetime(2010, 03, 24),
                 webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
-                alliance_selections_json="[ {\"declines\": [], \"picks\": [\"frc971\", \"frc254\", \"frc1662\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc1678\", \"frc368\", \"frc4171\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc2035\", \"frc192\", \"frc4990\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc1323\", \"frc846\", \"frc2135\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc2144\", \"frc1388\", \"frc668\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc1280\", \"frc604\", \"frc100\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc114\", \"frc852\", \"frc841\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc2473\", \"frc3256\", \"frc1868\"]}]",
                 website="http://www.firstsv.org",
         )
-
         self.event.put()
+
+        self.event_details = EventDetails(
+            id=self.event.key.id(),
+            alliance_selections=[
+                {"declines": [], "picks": ["frc971", "frc254", "frc1662"]},
+                {"declines": [], "picks": ["frc1678", "frc368", "frc4171"]},
+                {"declines": [], "picks": ["frc2035", "frc192", "frc4990"]},
+                {"declines": [], "picks": ["frc1323", "frc846", "frc2135"]},
+                {"declines": [], "picks": ["frc2144", "frc1388", "frc668"]},
+                {"declines": [], "picks": ["frc1280", "frc604", "frc100"]},
+                {"declines": [], "picks": ["frc114", "frc852", "frc841"]},
+                {"declines": [], "picks": ["frc2473", "frc3256", "frc1868"]}
+            ]
+        )
+        self.event_details.put()
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -129,15 +151,15 @@ class TestListDistrictEventsController(unittest2.TestCase):
         self.assertEqual(event["location"], self.event.location)
         self.assertEqual(event["venue_address"], self.event.venue_address.replace('\r\n', '\n'))
         self.assertEqual(event["webcast"], json.loads(self.event.webcast_json))
-        self.assertEqual(event["alliances"], json.loads(self.event.alliance_selections_json))
+        self.assertEqual(event["alliances"], self.event.alliance_selections)
         self.assertEqual(event["website"], self.event.website)
-
 
     def testEventApi(self):
         response = self.testapp.get("/{}/2010".format(DistrictType.type_abbrevs[self.event.event_district_enum]), headers={"X-TBA-App-Id": "tba-tests:disstrict-controller-test:v01"})
 
         events = json.loads(response.body)
         self.assertDistrictEvent(events[0])
+
 
 class TestListDistrictEventsController(unittest2.TestCase):
     def setUp(self):
@@ -149,6 +171,8 @@ class TestListDistrictEventsController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.event = Event(
@@ -161,23 +185,31 @@ class TestListDistrictEventsController(unittest2.TestCase):
                 year=2010,
                 end_date=datetime(2010, 03, 27),
                 official=True,
-                location='Clemson, SC',
+                city="Clemson",
+                state_prov="SC",
+                country="USA",
                 venue="Long Beach Arena",
                 venue_address="Long Beach Arena\r\n300 East Ocean Blvd\r\nLong Beach, CA 90802\r\nUSA",
                 start_date=datetime(2010, 03, 24),
                 webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
-                alliance_selections_json="[ {\"declines\": [], \"picks\": [\"frc971\", \"frc254\", \"frc1662\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc1678\", \"frc368\", \"frc4171\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc2035\", \"frc192\", \"frc4990\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc1323\", \"frc846\", \"frc2135\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc2144\", \"frc1388\", \"frc668\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc1280\", \"frc604\", \"frc100\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc114\", \"frc852\", \"frc841\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc2473\", \"frc3256\", \"frc1868\"]}]",
                 website="http://www.firstsv.org",
         )
-
         self.event.put()
+
+        self.event_details = EventDetails(
+            id=self.event.key.id(),
+            alliance_selections=[
+                {"declines": [], "picks": ["frc971", "frc254", "frc1662"]},
+                {"declines": [], "picks": ["frc1678", "frc368", "frc4171"]},
+                {"declines": [], "picks": ["frc2035", "frc192", "frc4990"]},
+                {"declines": [], "picks": ["frc1323", "frc846", "frc2135"]},
+                {"declines": [], "picks": ["frc2144", "frc1388", "frc668"]},
+                {"declines": [], "picks": ["frc1280", "frc604", "frc100"]},
+                {"declines": [], "picks": ["frc114", "frc852", "frc841"]},
+                {"declines": [], "picks": ["frc2473", "frc3256", "frc1868"]}
+            ]
+        )
+        self.event_details.put()
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -196,9 +228,8 @@ class TestListDistrictEventsController(unittest2.TestCase):
         self.assertEqual(event["location"], self.event.location)
         self.assertEqual(event["venue_address"], self.event.venue_address.replace('\r\n', '\n'))
         self.assertEqual(event["webcast"], json.loads(self.event.webcast_json))
-        self.assertEqual(event["alliances"], json.loads(self.event.alliance_selections_json))
+        self.assertEqual(event["alliances"], self.event.alliance_selections)
         self.assertEqual(event["website"], self.event.website)
-
 
     def testEventApi(self):
         response = self.testapp.get("/{}/2010".format(DistrictType.type_abbrevs[self.event.event_district_enum]), headers={"X-TBA-App-Id": "tba-tests:disstrict-controller-test:v01"})

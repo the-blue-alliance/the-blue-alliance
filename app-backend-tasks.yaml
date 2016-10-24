@@ -1,6 +1,6 @@
-application: tbatv-dev-hrd
 module: backend-tasks
-version: 1-1
+version: prod-1
+
 runtime: python27
 api_version: 1
 threadsafe: true
@@ -18,6 +18,8 @@ libraries:
   version: "1.5"
 - name: numpy
   version: "1.6.1"
+- name: jinja2
+  version: "2.6"
 
 handlers:
 - url: /backend-tasks/.*

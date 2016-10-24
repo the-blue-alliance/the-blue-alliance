@@ -12,19 +12,37 @@ from models.account import Account
 
 import tba_config
 
+
 class AdminUserList(LoggedInHandler):
     """
     List all Users.
     """
     def get(self):
         self._require_admin()
-        users = Account.query().order(Account.created).fetch(10000)
+        users = Account.query().order(Account.created).fetch()
 
         self.template_values.update({
             "users": users,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/user_list.html')
+        self.response.out.write(template.render(path, self.template_values))
+
+
+class AdminUserPermissionsList(LoggedInHandler):
+    """
+    List all Users with Permissions.
+    """
+    def get(self):
+        self._require_admin()
+        users = Account.query(Account.permissions != None).fetch()
+
+        self.template_values.update({
+            "users": users,
+            "permissions": AccountPermissions.permissions,
+        })
+
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/user_permissions_list.html')
         self.response.out.write(template.render(path, self.template_values))
 
 
@@ -68,7 +86,7 @@ class AdminUserEdit(LoggedInHandler):
         user.permissions = []
         for enum in AccountPermissions.permissions:
             permcheck = self.request.get("perm-" + str(enum))
-            if permcheck :
+            if permcheck:
                 user.permissions.append(enum)
         user.put()
 

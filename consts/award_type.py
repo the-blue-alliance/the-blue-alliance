@@ -1,3 +1,6 @@
+from consts.event_type import EventType
+
+
 class AwardType(object):
     """
     An award type defines a logical type of award that an award falls into.
@@ -84,7 +87,7 @@ class AwardType(object):
     MOST_IMPROVED_TEAM = 67
     WILDCARD = 68
 
-    BLUE_BANNER_AWARDS = {CHAIRMANS, WINNER}
+    BLUE_BANNER_AWARDS = {CHAIRMANS, WINNER, WOODIE_FLOWERS}
     INDIVIDUAL_AWARDS = {WOODIE_FLOWERS, DEANS_LIST, VOLUNTEER, FOUNDERS,
                          BART_KAMEN_MEMORIAL, MAKE_IT_LOUD}
     NON_JUDGED_NON_TEAM_AWARDS = {  # awards not used in the district point model
@@ -94,4 +97,17 @@ class AwardType(object):
         VOLUNTEER,
         WINNER,
         FINALIST,
+    }
+
+    normalized_name = {
+        CHAIRMANS: {
+            None: "Chairman's Award",
+        },
+        WINNER: {
+            None: "Winner",
+        },
+        WOODIE_FLOWERS: {
+            None: "Woodie Flowers Finalist Award",
+            EventType.CMP_FINALS: "Woodie Flowers Award",
+        },
     }

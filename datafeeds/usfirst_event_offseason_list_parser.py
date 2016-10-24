@@ -30,7 +30,7 @@ class UsfirstEventOffseasonListParser(ParserBase):
                     if td.get('class') and td["class"].count('views-field-title') > 0:
                         event["first_eid"] = td.a["href"].split("/")[-1]
                         event["name"] = " ".join(td.a.text.split(" ")[:-1])
-                        event["location"] = str(td.a.text.split(" ")[-1]).translate(None, "()")
+                        event["state_prov"] = str(td.a.text.split(" ")[-1]).translate(None, "()")
                     for span in td.findAll('span'):
                         if span["class"].count("date-display-start") > 0:
                             event["start_date"] = datetime.strptime(span["content"][:10], "%Y-%m-%d")

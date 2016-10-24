@@ -60,17 +60,18 @@ class ApiDistrictListController(ApiDistrictControllerBase):
         district_keys = [DistrictType.type_abbrevs[event.event_district_enum] for event in events]
         districts = list()
         for key in district_keys:
-            dictionary = dict()
-            dictionary["key"] = key
-            dictionary["name"] = DistrictType.type_names[DistrictType.abbrevs[key]]
-            districts.append(dictionary)
+            if key in DistrictType.abbrevs:
+                dictionary = dict()
+                dictionary["key"] = key
+                dictionary["name"] = DistrictType.type_names[DistrictType.abbrevs[key]]
+                districts.append(dictionary)
 
         return json.dumps(districts, ensure_ascii=True)
 
 
 class ApiDistrictEventsController(ApiDistrictControllerBase):
     CACHE_KEY_FORMAT = "apiv2_district_events_controller_{}_{}"  # (district_short, year)
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):

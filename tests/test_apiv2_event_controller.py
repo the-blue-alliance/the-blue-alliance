@@ -19,6 +19,7 @@ from controllers.api.api_event_controller import ApiEventListController
 from controllers.api.api_event_controller import ApiEventRankingsController
 
 from models.event import Event
+from models.event_details import EventDetails
 from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
@@ -34,6 +35,8 @@ class TestEventApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.event = Event(
@@ -46,24 +49,32 @@ class TestEventApiController(unittest2.TestCase):
                 year=2010,
                 end_date=datetime(2010, 03, 27),
                 official=True,
-                location='Clemson, SC',
+                city="Clemson",
+                state_prov="SC",
+                country="USA",
                 venue="Long Beach Arena",
                 venue_address="Long Beach Arena\r\n300 East Ocean Blvd\r\nLong Beach, CA 90802\r\nUSA",
                 timezone_id="America/New_York",
                 start_date=datetime(2010, 03, 24),
                 webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
-                alliance_selections_json="[ {\"declines\": [], \"picks\": [\"frc971\", \"frc254\", \"frc1662\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc1678\", \"frc368\", \"frc4171\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc2035\", \"frc192\", \"frc4990\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc1323\", \"frc846\", \"frc2135\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc2144\", \"frc1388\", \"frc668\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc1280\", \"frc604\", \"frc100\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc114\", \"frc852\", \"frc841\"]},"+
-                                           "{\"declines\": [], \"picks\": [\"frc2473\", \"frc3256\", \"frc1868\"]}]",
                 website="http://www.firstsv.org",
         )
-
         self.event.put()
+
+        self.event_details = EventDetails(
+            id=self.event.key.id(),
+            alliance_selections=[
+                {"declines": [], "picks": ["frc971", "frc254", "frc1662"]},
+                {"declines": [], "picks": ["frc1678", "frc368", "frc4171"]},
+                {"declines": [], "picks": ["frc2035", "frc192", "frc4990"]},
+                {"declines": [], "picks": ["frc1323", "frc846", "frc2135"]},
+                {"declines": [], "picks": ["frc2144", "frc1388", "frc668"]},
+                {"declines": [], "picks": ["frc1280", "frc604", "frc100"]},
+                {"declines": [], "picks": ["frc114", "frc852", "frc841"]},
+                {"declines": [], "picks": ["frc2473", "frc3256", "frc1868"]}
+            ]
+        )
+        self.event_details.put()
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -82,7 +93,7 @@ class TestEventApiController(unittest2.TestCase):
         self.assertEqual(event["location"], self.event.location)
         self.assertEqual(event["venue_address"], self.event.venue_address.replace('\r\n', '\n'))
         self.assertEqual(event["webcast"], json.loads(self.event.webcast_json))
-        self.assertEqual(event["alliances"], json.loads(self.event.alliance_selections_json))
+        self.assertEqual(event["alliances"], self.event.alliance_selections)
         self.assertEqual(event["website"], self.event.website)
         self.assertEqual(event["timezone"], self.event.timezone_id)
 
@@ -103,6 +114,8 @@ class TestEventTeamsApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.event = Event(
@@ -114,7 +127,9 @@ class TestEventTeamsApiController(unittest2.TestCase):
                 year=2010,
                 end_date=datetime(2010, 03, 27),
                 official=True,
-                location='Clemson, SC',
+                city="Clemson",
+                state_prov="SC",
+                country="USA",
                 start_date=datetime(2010, 03, 24),
         )
         self.event.put()
@@ -127,7 +142,9 @@ class TestEventTeamsApiController(unittest2.TestCase):
                 Technical Charter High School",
                 team_number=281,
                 nickname="EnTech GreenVillians",
-                address="Greenville, SC, USA",
+                city="Greenville",
+                state_prov="SC",
+                country="USA",
                 website="www.entech.org",
         )
         self.team.put()
@@ -170,6 +187,8 @@ class TestEventMatchApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.event = Event(
@@ -181,7 +200,9 @@ class TestEventMatchApiController(unittest2.TestCase):
                 year=2010,
                 end_date=datetime(2010, 03, 27),
                 official=True,
-                location='Clemson, SC',
+                city="Clemson",
+                state_prov="SC",
+                country="USA",
                 start_date=datetime(2010, 03, 24),
         )
         self.event.put()
@@ -232,6 +253,8 @@ class TestEventStatsApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.matchstats = {
@@ -249,11 +272,18 @@ class TestEventStatsApiController(unittest2.TestCase):
                 year=2010,
                 end_date=datetime(2010, 03, 27),
                 official=True,
-                location='Clemson, SC',
-                start_date=datetime(2010, 03, 24),
-                matchstats_json=json.dumps(self.matchstats)
+                city="Clemson",
+                state_prov="SC",
+                country="USA",
+                start_date=datetime(2010, 03, 24)
         )
         self.event.put()
+
+        self.event_details = EventDetails(
+            id=self.event.key.id(),
+            matchstats=self.matchstats
+        )
+        self.event_details.put()
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -275,6 +305,8 @@ class TestEventRankingsApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.rankings = [
@@ -293,11 +325,18 @@ class TestEventRankingsApiController(unittest2.TestCase):
                 year=2010,
                 end_date=datetime(2010, 03, 27),
                 official=True,
-                location='Clemson, SC',
-                start_date=datetime(2010, 03, 24),
-                rankings_json=json.dumps(self.rankings)
+                city="Clemson",
+                state_prov="SC",
+                country="USA",
+                start_date=datetime(2010, 03, 24)
         )
         self.event.put()
+
+        self.event_details = EventDetails(
+            id=self.event.key.id(),
+            rankings=self.rankings
+        )
+        self.event_details.put()
 
         self.eventNoRanks = Event(
                 id="2010ct",
@@ -308,7 +347,9 @@ class TestEventRankingsApiController(unittest2.TestCase):
                 year=2010,
                 end_date=datetime(2010, 03, 27),
                 official=True,
-                location='Clemson, SC',
+                city="Clemson",
+                state_prov="SC",
+                country="USA",
                 start_date=datetime(2010, 03, 24),
         )
         self.eventNoRanks.put()
@@ -338,6 +379,8 @@ class TestEventListApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.event = Event(
@@ -349,7 +392,9 @@ class TestEventListApiController(unittest2.TestCase):
                 year=2010,
                 end_date=datetime(2010, 03, 27),
                 official=True,
-                location='Clemson, SC',
+                city="Clemson",
+                state_prov="SC",
+                country="USA",
                 start_date=datetime(2010, 03, 24),
         )
 

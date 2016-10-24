@@ -5,6 +5,7 @@ import webapp2
 
 from datetime import datetime
 
+from google.appengine.ext import ndb
 from google.appengine.ext import deferred
 from google.appengine.api import taskqueue
 from google.appengine.ext import testbed
@@ -67,6 +68,8 @@ class TestApiCacheClearer(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.testbed.init_taskqueue_stub(root_path=".")
         self.taskqueue_stub = self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME)
 
@@ -81,7 +84,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             year=2010,
             end_date=datetime(2010, 03, 27),
             official=True,
-            location='Clemson, SC',
+            city="Clemson",
+            state_prov="SC",
+            country="USA",
             start_date=datetime(2010, 03, 24),
         )
 
@@ -95,7 +100,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             year=2010,
             end_date=datetime(2010, 03, 27),
             official=True,
-            location='Clemson, SC',
+            city="Clemson",
+            state_prov="SC",
+            country="USA",
             start_date=datetime(2010, 03, 24),
         )
 
@@ -104,7 +111,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             name='This is a name',
             team_number=1,
             nickname='NICKNAME',
-            address='San Jose, CA, USA',
+            city='San Jose',
+            state_prov='CA',
+            country='USA',
             website='www.usfirst.org',
         )
 
@@ -113,7 +122,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             name='This is a name',
             team_number=1,
             nickname='NICKNAME',
-            address='San Jose, CA, USA',
+            city='San Jose',
+            state_prov='CA',
+            country='USA',
             website='www.thebluealliance.com',
         )
 
@@ -122,7 +133,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             name='This is a name',
             team_number=2,
             nickname='NICKNAME',
-            address='San Jose, CA, USA',
+            city='San Jose',
+            state_prov='CA',
+            country='USA',
             website='www.usfirst.org',
         )
 
@@ -131,7 +144,9 @@ class TestApiCacheClearer(unittest2.TestCase):
             name='This is a name',
             team_number=2,
             nickname='nickname',
-            address='San Jose, CA, USA',
+            city='San Jose',
+            state_prov='CA',
+            country='USA',
             website='www.usfirst.org',
         )
 

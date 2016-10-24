@@ -33,6 +33,12 @@ indexes:
 
 - kind: Event
   properties:
+  - name: event_type_enum
+  - name: year
+  - name: start_date
+
+- kind: Event
+  properties:
   - name: official
   - name: end_date
 

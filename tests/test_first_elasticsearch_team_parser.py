@@ -1,6 +1,7 @@
 import json
 import unittest2
 
+from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from datafeeds.parsers.first_elasticsearch.first_elasticsearch_team_details_parser import FIRSTElasticSearchTeamDetailsParser
@@ -12,6 +13,8 @@ class TestFIRSTElasticSearchTeamParser(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
 
     def tearDown(self):
         self.testbed.deactivate()

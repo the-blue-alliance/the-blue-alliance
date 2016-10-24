@@ -7,6 +7,10 @@ import os
 import StringIO
 import tba_config
 
+from collections import defaultdict
+
+from consts.media_type import MediaType
+
 from google.appengine.api import taskqueue
 from google.appengine.api import urlfetch
 from google.appengine.ext import ndb
@@ -15,11 +19,14 @@ from google.appengine.ext.webapp import template
 
 from helpers.award_manipulator import AwardManipulator
 from helpers.event_manipulator import EventManipulator
+from helpers.event_details_manipulator import EventDetailsManipulator
 from helpers.match_manipulator import MatchManipulator
 
 from models.award import Award
 from models.event import Event
+from models.event_details import EventDetails
 from models.match import Match
+from models.media import Media
 from models.team import Team
 
 from datafeeds.csv_alliance_selections_parser import CSVAllianceSelectionsParser
@@ -170,11 +177,12 @@ class TbaCSVRestoreEventDo(webapp.RequestHandler):
         else:
             data = result.content.replace('frc', '')
             alliance_selections = CSVAllianceSelectionsParser.parse(data)
-            if alliance_selections and event.alliance_selections != alliance_selections:
-                event.alliance_selections_json = json.dumps(alliance_selections)
-                event._alliance_selections = None
-                event.dirty = True
-            EventManipulator.createOrUpdate(event)
+
+            event_details = EventDetails(
+                id=event_key,
+                alliance_selections=alliance_selections
+            )
+            EventDetailsManipulator.createOrUpdate(event_details)
 
         # awards
         result = urlfetch.fetch(self.AWARDS_URL.format(event.year, event_key, event_key))
@@ -233,11 +241,12 @@ class TbaCSVRestoreEventDo(webapp.RequestHandler):
         else:
             # convert into expected input format
             rankings = list(csv.reader(StringIO.StringIO(result.content), delimiter=','))
-            if rankings and event.rankings != rankings:
-                event.rankings_json = json.dumps(rankings)
-                event._rankings = None
-                event.dirty = True
-            EventManipulator.createOrUpdate(event)
+
+            event_details = EventDetails(
+                id=event_key,
+                rankings=rankings
+            )
+            EventDetailsManipulator.createOrUpdate(event_details)
 
         self.response.out.write("Done restoring {}!".format(event_key))
 
@@ -248,7 +257,8 @@ class TbaCSVBackupTeamsEnqueue(webapp.RequestHandler):
     """
     def get(self):
         taskqueue.add(
-            url='/tasks/do/csv_backup_teams',
+            target='backend-tasks-b2',
+            url='/backend-tasks-b2/do/csv_backup_teams',
             method='GET')
         self.response.out.write("Enqueued CSV teams backup")
 
@@ -260,15 +270,28 @@ class TbaCSVBackupTeamsDo(webapp.RequestHandler):
     TEAMS_FILENAME_PATTERN = '/tbatv-prod-hrd.appspot.com/tba-data-backup/teams/teams.csv'
 
     def get(self):
-        team_keys = Team.query().order(Team.team_number).fetch(None, keys_only=True)
-        team_futures = ndb.get_multi_async(team_keys)
+        team_keys_future = Team.query().order(Team.team_number).fetch_async(keys_only=True)
+        social_media_keys_future = Media.query(Media.year == None).fetch_async(keys_only=True)
+
+        team_futures = ndb.get_multi_async(team_keys_future.get_result())
+        social_futures = ndb.get_multi_async(social_media_keys_future.get_result())
+
+        socials_by_team = defaultdict(dict)
+        for social_future in social_futures:
+            social = social_future.get_result()
+            for reference in social.references:
+                socials_by_team[reference.id()][social.media_type_enum] = social
 
         if team_futures:
             with cloudstorage.open(self.TEAMS_FILENAME_PATTERN, 'w') as teams_file:
                 writer = csv.writer(teams_file, delimiter=',')
                 for team_future in team_futures:
                     team = team_future.get_result()
-                    self._writerow_unicode(writer, [team.key.id(), team.nickname, team.name, team.address, team.website, team.rookie_year])
+                    team_row = [team.key.id(), team.nickname, team.name, team.city, team.state_prov, team.country, team.website, team.rookie_year]
+                    for social_type in MediaType.social_types:
+                        social = socials_by_team[team.key.id()].get(social_type, None)
+                        team_row.append(social.social_profile_url if social is not None else None)
+                    self._writerow_unicode(writer, team_row)
 
         self.response.out.write("Done backing up teams!")
 

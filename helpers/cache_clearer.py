@@ -64,6 +64,42 @@ class CacheClearer(object):
             cls._queries_to_cache_keys_and_controllers(get_affected_queries.event_updated(affected_refs))
 
     @classmethod
+    def get_event_details_cache_keys_and_controllers(cls, affected_refs):
+        """
+        Gets cache keys and controllers that references this EventDetails
+
+        TODO: Currently inefficient and also clears event APIv2 endpoints,
+        since alliances are served under the event.
+        APIv3 will break alliances out.
+        """
+        event_details_keys = affected_refs['key']
+        event_keys = set()
+        years = set()
+        event_district_abbrevs = set()
+        for event_details_key in event_details_keys:
+            event_key = ndb.Key(Event, event_details_key.id())
+            event_keys.add(event_key)
+
+            event = event_key.get()
+            years.add(event.year)
+            event_district_abbrevs.add(event.event_district_abbrev)
+
+        event_team_keys_future = EventTeam.query(EventTeam.event.IN([event_key for event_key in event_keys])).fetch_async(None, keys_only=True)
+
+        team_keys = set()
+        for et_key in event_team_keys_future.get_result():
+            team_key_name = et_key.id().split('_')[1]
+            team_keys.add(ndb.Key(Team, team_key_name))
+
+        return cls._get_events_cache_keys_and_controllers(event_keys) + \
+            cls._get_event_district_points_cache_keys_and_controllers(event_keys) + \
+            cls._get_eventlist_cache_keys_and_controllers(years) + \
+            cls._get_team_events_cache_keys_and_controllers(team_keys, years) + \
+            cls._get_districtlist_cache_keys_and_controllers(years) + \
+            cls._get_district_events_cache_keys_and_controllers(event_district_abbrevs, years) + \
+            cls._get_district_rankings_cache_keys_and_controllers(event_district_abbrevs, years)
+
+    @classmethod
     def get_eventteam_cache_keys_and_controllers(cls, affected_refs):
         """
         Gets cache keys and controllers that references this eventteam
