@@ -6,7 +6,7 @@ function setupMessaging(forceRequestPermission) {
   $(".notifications-disabled-visible").show();
   if (Notification.permission == 'denied' && forceRequestPermission) {
     alert("You have blocked push notifications in your browser for this site. Please unblock and try again.");  // TODO show more elegantly
-  } else if (Notification.permission == 'granted' || forceRequestPermission) {
+  } else if ((Notification.permission == 'granted' && !window.localStorage.getItem('TBA_notificationsPermission') == 'disabled') || forceRequestPermission) {
     $.ajax({
       type: 'GET',
       url: '/_/account/info',
@@ -52,6 +52,7 @@ function setupMessagingHelper(accountInfo) {
     sendTokenToServer(accountInfo, token);
     $(".notifications-enabled-visible").show();
     $(".notifications-disabled-visible").hide();
+    window.localStorage.setItem('TBA_notificationsPermission', 'enabled');
   })
   .catch(function(err) {
     console.log('[TBA FCM] Unable to get permission to setup messaging. ', err);
@@ -83,6 +84,7 @@ function disableMessaging() {
     messaging.deleteToken(token);
     $(".notifications-enabled-visible").hide();
     $(".notifications-disabled-visible").show();
+    window.localStorage.setItem('TBA_notificationsPermission', 'disabled');
   })
   .catch(function(err) {
     console.log('[TBA FCM] Unable to delete token token. Cannot disable messaging.', err);
