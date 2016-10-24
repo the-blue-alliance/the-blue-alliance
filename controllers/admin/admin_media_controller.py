@@ -26,6 +26,52 @@ class AdminMediaDashboard(LoggedInHandler):
         self.response.out.write(template.render(path, self.template_values))
 
 
+class AdminMediaDeleteReference(LoggedInHandler):
+    def post(self, media_key_name):
+        self._require_admin()
+
+        media = Media.get_by_id(media_key_name)
+
+        if media:
+            media.references.remove(media.create_reference(
+                self.request.get("reference_type"),
+                self.request.get("reference_key_name")))
+
+            MediaManipulator.createOrUpdate(media, auto_union=False)
+
+        self.redirect(self.request.get('originating_url'))
+
+
+class AdminMediaMakePreferred(LoggedInHandler):
+    def post(self, media_key_name):
+        self._require_admin()
+
+        media = Media.get_by_id(media_key_name)
+
+        media.preferred_references.append(media.create_reference(
+            self.request.get("reference_type"),
+            self.request.get("reference_key_name")))
+
+        MediaManipulator.createOrUpdate(media)
+
+        self.redirect(self.request.get('originating_url'))
+
+
+class AdminMediaRemovePreferred(LoggedInHandler):
+    def post(self, media_key_name):
+        self._require_admin()
+
+        media = Media.get_by_id(media_key_name)
+
+        media.preferred_references.remove(media.create_reference(
+            self.request.get("reference_type"),
+            self.request.get("reference_key_name")))
+
+        MediaManipulator.createOrUpdate(media, auto_union=False)
+
+        self.redirect(self.request.get('originating_url'))
+
+
 class AdminMediaAdd(LoggedInHandler):
     def post(self):
         self._require_admin()

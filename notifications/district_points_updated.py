@@ -10,6 +10,7 @@ class DistrictPointsUpdatedNotification(BaseNotification):
     def __init__(self, district_key):
         self.district_key = district_key
         self.district_enum = DistrictType.abbrevs[district_key[4:]]
+        self._district_feed = self.district_enum
 
     @property
     def _type(self):

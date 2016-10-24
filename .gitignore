@@ -1,3 +1,7 @@
+# Personal development files #
+##############################
+mydeploy.sh
+
 # Compiled source #
 ###################
 *.com
@@ -49,6 +53,9 @@ $RECYCLE.BIN/
 *.project
 *.pydevproject
 
+# IDEA
+.idea/**
+
 # Temp files #
 ##############
 *.temp
@@ -58,4 +65,15 @@ $RECYCLE.BIN/
 static/css/less_css/*.css
 static/css/*.css
 static/javascript/*.js
+static/javascript/*.js.map
 version_info.json
+
+# Node.js/npm #
+###############
+node_modules
+.npm
+.node_repl_history
+
+# Jest Coverage reports #
+#########################
+coverage

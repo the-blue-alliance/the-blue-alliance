@@ -8,7 +8,7 @@ $(document).ready(function(){
       name: 'teams',
       prefetch: {
         url: '/_/typeahead/teams-all',
-        filter: unicodeFilter
+        filter: teamFilter
       },
       header: '<div class="tba-typeahead-header">Teams</div>'
     },
@@ -16,7 +16,7 @@ $(document).ready(function(){
       name: 'events',
       prefetch: {
         url: '/_/typeahead/events-all',
-        filter: unicodeFilter
+        filter: eventFilter
       },
       header: '<div class="tba-typeahead-header">Events</div>'
     }
@@ -27,13 +27,13 @@ $(document).ready(function(){
 	  var event_re = datum.value.match(/(\d*).+\[(.+?)\]/);
     if (event_re != null) {
       event_key = (event_re[1] + event_re[2]).toLowerCase();
-      url = "http://www.thebluealliance.com/event/" + event_key;
+      url = "/event/" + event_key;
       window.location.href = url;
     }
     var team_re = datum.value.match(/(\d+) [|] .+/);
     if (team_re != null) {
       team_key = team_re[1];
-      url = "http://www.thebluealliance.com/team/" + team_key;
+      url = "/team/" + team_key;
       window.location.href = url;
     }
 	}
@@ -65,12 +65,23 @@ function cleanUnicode(s){
   return a;
 };
 
-function unicodeFilter(data) {
+function teamFilter(data) {
   var to_return = [];
   for(var i=0; i<data.length; i++) {
     to_return.push({
       value: data[i],
       tokens: cleanUnicode(data[i]).split(' ')
+    });
+  }
+  return to_return;
+}
+
+function eventFilter(data) {
+  var to_return = [];
+  for(var i=0; i<data.length; i++) {
+    to_return.push({
+      value: data[i],
+      tokens: cleanUnicode(data[i]).replace('[', '').replace(']', '').split(' ')
     });
   }
   return to_return;

@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}Account Overview - The Blue Alliance{% endblock %}
+
+{% block meta_description %}Overview of your TBA account.{% endblock %}
+
+{% block content %}
+<div class="container">
+  {% if status %}
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+      {% if status == 'account_edit_success' %}
+        <div class="alert alert-success">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <h4>Success!</h4>
+          <p>Your profile has been updated.</p>
+        </div>
+      {% elif status == 'account_edit_failure' %}
+      <div class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Oops!</h4>
+        <p>Something went wrong with editing your profile. Please contact support if the problem persists.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if webhook_verification_success %}
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+      <div class="alert alert-success">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Success!</h4>
+        <p>The webhook has been properly verified!</p>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+      <p class="pull-right">
+        <a class="btn btn-warning" href="/logout"><span class="glyphicon glyphicon-remove"></span> Logout</a>
+      </p>
+      <h1>Welcome back, {{user_bundle.account.display_name}}!</h1>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+      <h2>Profile</h2>
+    </div>
+    <div class="col-md-6 col-md-offset-3">
+      <table class="table table-striped">
+        <tbody>
+          <tr>
+            <td>Name (Public): </td>
+            <td>{{user_bundle.account.display_name}}</td>
+          </tr>
+          <tr>
+            <td>Email: </td>
+            <td>{{user_bundle.account.email}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p><a class="btn btn-primary" href="/account/edit"><span class="glyphicon glyphicon-pencil"></span> Edit Profile</a></p>
+    </div>
+  </div>
+  <hr>
+
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+      <h2>myTBA</h2>
+    </div>
+    <div class="col-md-6 col-md-offset-3">
+      <table class="table table-striped">
+        <tbody>
+          <tr>
+            <td>Favorites: </td>
+            <td>{{num_favorites}}</td>
+          </tr>
+          <tr>
+            <td>Subscriptions: </td>
+            <td>{{num_subscriptions}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p><a class="btn btn-primary" href="/account/mytba"><span class="glyphicon glyphicon-bookmark"></span> Manage myTBA</a></p>
+    </div>
+  </div>
+  <hr>
+
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+      <h2>Suggestion Submissions</h2>
+      <p>Statistics for videos, pictures, webcasts, etc. you have submitted for review. Thanks for your contributions!</p>
+    </div>
+    <div class="col-md-6 col-md-offset-3">
+      <table class="table table-striped">
+        <tbody>
+          <tr>
+            <td>Pending: </td>
+            <td>{{submissions_pending}}</td>
+          </tr>
+          <tr>
+            <td>Accepted: </td>
+            <td>{{submissions_accepted}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <hr>
+
+  {% if review_permissions %}
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+      <h2>Suggestion Reviews</h2>
+      <p>Your account has permission to help review Suggestion submissions!</p>
+    </div>
+    <div class="col-md-6 col-md-offset-3">
+      <table class="table table-striped">
+        <tbody>
+          <tr>
+            <td>Pending: </td>
+            <td>{{total_pending}}</td>
+          </tr>
+          <tr>
+            <td>Reviewed: </td>
+            <td>{{num_reviewed}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p><a class="btn btn-primary" href="/suggest/review"><span class="glyphicon glyphicon-ok"></span> Review Pending Suggestions</a></p>
+    </div>
+  </div>
+  <hr>
+  {% endif %}
+
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+      <h2>Connected Devices</h2>
+    </div>
+    <div class="col-md-10 col-md-offset-1">
+     {% if user_bundle.mobile_clients %}
+      <table class="table table-striped">
+        <tr>
+          <th>Type</th>
+          <th>Name</th>
+          <th>ID</td>
+          <th></th>
+          <th></th>
+          <th></th>
+        </tr>
+          {% for client in user_bundle.mobile_clients %}
+            <tr>
+              <td>{{ client.type_string }}</td>
+              <td> {{ client.display_name }} </td>
+              <td>{% if client.is_webhook %}{{ client.messaging_id }}{% else %}{{ client.short_id }}{% endif %}</td>
+              <td><form action="/notifications/broadcast" method="post">
+                <input name="account_id" type="hidden" value="{{user_bundle.account.key.id()}}" />
+                <input name="client_id" type="hidden" value="{{client.key.id()}}" />
+                <button type="submit" class="btn btn-default" {{ping_enabled}}><span class="glyphicon glyphicon-cloud"></span> Ping</button>
+              </form></td>
+                <td>
+                  {% if client.is_webhook %}
+                    <form action="/webhooks/delete" method="post">
+                      <input name="account_id" type="hidden" value="{{user_bundle.account.key.id()}}" />
+                      <input name="client_id" type="hidden" value="{{client.key.id()}}" />
+                      <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+                    </form>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if client.is_webhook %}
+                    {% if client.verified %}
+                      <p><span class="glyphicon glyphicon-check"></span> Verified</p>
+                    {% else %}
+                      <a href="/webhooks/verify/{{client.key.id()}}"><button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span> Verify</button></a>
+                      <form action="/webhooks/send_verification" method="post">
+                      <input name="account_id" type="hidden" value="{{user_bundle.account.key.id()}}" />
+                      <input name="client_id" type="hidden" value="{{client.key.id()}}" />
+                      <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-send"></span> Resend Code</button>
+                      </form>
+                    {% endif %}
+                  {% endif %}
+                </td>
+            </tr>
+          {% endfor %}
+     {% else %}
+        <p>No devices found.</p>
+     {% endif %}
+      </table>
+      <p><a class="btn btn-default" href="/webhooks/add"><span class="glyphicon glyphicon-plus"></span> Add Webhook</a></p>
+      <p>Check out our <a href="/apidocs/webhooks">Webhooks API documentation</a> for more info.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -2,6 +2,7 @@ import logging
 import os
 import traceback
 
+from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
@@ -59,6 +60,23 @@ class AdminMobile(LoggedInHandler):
         self.redirect('/admin/mobile')
 
 
+class AdminMobileWebhooks(LoggedInHandler):
+    """
+    Details on webhooks
+    """
+    def get(self):
+        self._require_admin()
+
+        webhooks = MobileClient.query(MobileClient.client_type == ClientType.WEBHOOK).fetch()
+
+        self.template_values.update({
+            'webhooks': webhooks,
+        })
+
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/mobile_webhooks_dashboard.html')
+        self.response.out.write(template.render(path, self.template_values))
+
+
 class AdminBroadcast(LoggedInHandler):
     """
     Send a push notification to all connected users
@@ -109,7 +127,7 @@ class AdminBroadcast(LoggedInHandler):
 
         try:
             clients = [int(c) for c in clients]
-            NotificationHelper.send_broadcast(clients, title, message, url, app_version)
+            deferred.defer(NotificationHelper.send_broadcast, clients, title, message, url, app_version, _queue="admin")
             logging.info('User {} sent broadcast'.format(user_id))
         except Exception, e:
             logging.error("Error sending broadcast: {}".format(str(e)))

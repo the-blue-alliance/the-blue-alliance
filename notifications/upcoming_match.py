@@ -7,9 +7,13 @@ from notifications.base_notification import BaseNotification
 
 class UpcomingMatchNotification(BaseNotification):
 
+    _priority = 'high'
+
     def __init__(self, match, event):
         self.match = match
         self.event = event
+        self._event_feed = event.key_name
+        self._district_feed = event.event_district_enum
 
     @property
     def _type(self):
@@ -19,6 +23,7 @@ class UpcomingMatchNotification(BaseNotification):
         data = {}
         data['message_type'] = NotificationType.type_names[self._type]
         data['message_data'] = {}
+        data['message_data']['event_key'] = self.event.key_name
         data['message_data']['event_name'] = self.event.name
         data['message_data']['match_key'] = self.match.key_name
         data['message_data']['team_keys'] = self.match.team_key_names

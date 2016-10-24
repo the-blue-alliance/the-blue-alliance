@@ -1,12 +1,14 @@
+import logging
 import os
-import re
-
-from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
+from helpers.suggestions.suggestion_creator import SuggestionCreator
+from helpers.youtube_video_helper import YouTubeVideoHelper
 from models.event import Event
 from models.match import Match
 from models.suggestion import Suggestion
+
+from template_engine import jinja2_engine
 
 
 class SuggestMatchVideoController(LoggedInHandler):
@@ -15,7 +17,7 @@ class SuggestMatchVideoController(LoggedInHandler):
     """
 
     def get(self):
-        self._require_login("/suggest/match/video?match=%s" % self.request.get("match_key"))
+        self._require_login()
 
         if not self.request.get("match_key"):
             self.redirect("/", abort=True)
@@ -25,37 +27,82 @@ class SuggestMatchVideoController(LoggedInHandler):
         match = match_future.get_result()
         event = event_future.get_result()
 
+        if not match or not event:
+            self.abort(404)
+
         self.template_values.update({
-            "success": self.request.get("success"),
+            "status": self.request.get("status"),
             "event": event,
             "match": match,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/suggest_match_video.html')
-        self.response.out.write(template.render(path, self.template_values))
+        self.response.out.write(jinja2_engine.render('suggest_match_video.html', self.template_values))
 
     def post(self):
         self._require_login()
 
         match_key = self.request.get("match_key")
         youtube_url = self.request.get("youtube_url")
+        youtube_id = YouTubeVideoHelper.parse_id_from_url(youtube_url)
 
-        youtube_id = None
-        regex1 = re.match(r".*youtu\.be\/(.*)", youtube_url)
-        if regex1 is not None:
-            youtube_id = regex1.group(1)
-        else:
-            regex2 = re.match(r".*v=([a-zA-Z0-9_-]*)", youtube_url)
-            if regex2 is not None:
-                youtube_id = regex2.group(1)
+        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.user_bundle.account.key, youtube_id, match_key)
 
-        if youtube_id is not None:
-            suggestion = Suggestion(
-                author=self.user_bundle.account.key,
-                target_key=match_key,
-                target_model="match",
-                )
-            suggestion.contents = {"youtube_videos": [youtube_id]}
-            suggestion.put()
+        self.redirect('/suggest/match/video?match_key={}&status={}'.format(match_key, status))
 
-        self.redirect('/suggest/match/video?match_key=%s&success=1' % match_key)
+
+class SuggestMatchVideoPlaylistController(LoggedInHandler):
+    """
+    Allow users to suggest a playlist of YouTube videos for matches
+    """
+    def get(self):
+        self._require_login()
+
+        if not self.request.get("event_key"):
+            self.redirect("/", abort=True)
+
+        event_future = Event.get_by_id_async(self.request.get("event_key"))
+        event = event_future.get_result()
+
+        if not event:
+            self.abort(404)
+
+        self.template_values.update({
+            "event": event,
+            "num_added": self.request.get("num_added")
+        })
+
+        self.response.out.write(jinja2_engine.render('suggest_match_video_playlist.html', self.template_values))
+
+    def post(self):
+        self._require_login()
+
+        event_key = self.request.get("event_key")
+        if not event_key:
+            self.response.out.write("No event key found")
+            return
+        event_future = Event.get_by_id_async(event_key)
+        event = event_future.get_result()
+        if not event:
+            self.response.out.write("Invalid event key {}".format(event_key))
+            return
+
+        match_futures = Match.query(Match.event == event.key).fetch_async(keys_only=True)
+        valid_match_keys = [match.id() for match in match_futures.get_result()]
+
+        num_videos = int(self.request.get("num_videos", 0))
+        suggestions_added = 0
+        for i in range(0, num_videos):
+            yt_id = self.request.get("video_id_{}".format(i))
+            match_partial = self.request.get("match_partial_{}".format(i))
+            if not yt_id or not match_partial:
+                continue
+
+            match_key = "{}_{}".format(event_key, match_partial)
+            if match_key not in valid_match_keys:
+                continue
+
+            status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.user_bundle.account.key, yt_id, match_key)
+            if status == 'success':
+                suggestions_added += 1
+
+        self.redirect('/suggest/event/video?event_key={}&num_added={}'.format(event_key, suggestions_added))

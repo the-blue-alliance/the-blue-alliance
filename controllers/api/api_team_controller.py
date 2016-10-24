@@ -7,16 +7,17 @@ from google.appengine.ext import ndb
 
 from controllers.api.api_base_controller import ApiBaseController
 
+from database.award_query import TeamAwardsQuery, TeamEventAwardsQuery
+from database.event_query import TeamEventsQuery, TeamYearEventsQuery
+from database.match_query import TeamEventMatchesQuery
+from database.media_query import TeamYearMediaQuery
+from database.robot_query import TeamRobotsQuery
+from database.team_query import TeamListQuery, TeamParticipationQuery, TeamDistrictsQuery
 from helpers.award_helper import AwardHelper
 from helpers.model_to_dict import ModelToDict
 from helpers.data_fetchers.team_details_data_fetcher import TeamDetailsDataFetcher
 from helpers.media_helper import MediaHelper
 
-from models.award import Award
-from models.event import Event
-from models.match import Match
-from models.media import Media
-from models.event_team import EventTeam
 from models.team import Team
 
 
@@ -34,8 +35,8 @@ class ApiTeamControllerBase(ApiBaseController):
 
 class ApiTeamController(ApiTeamControllerBase):
     CACHE_KEY_FORMAT = "apiv2_team_controller_{}"  # (team_key)
-    CACHE_VERSION = 3
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 5
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):
         super(ApiTeamController, self).__init__(*args, **kw)
@@ -55,8 +56,8 @@ class ApiTeamController(ApiTeamControllerBase):
 
 class ApiTeamEventsController(ApiTeamControllerBase):
     CACHE_KEY_FORMAT = "apiv2_team_events_controller_{}_{}"  # (team_key, year)
-    CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 3
+    CACHE_HEADER_LENGTH = 60 * 60
 
     def __init__(self, *args, **kw):
         super(ApiTeamEventsController, self).__init__(*args, **kw)
@@ -73,10 +74,7 @@ class ApiTeamEventsController(ApiTeamControllerBase):
     def _render(self, team_key, year=None):
         self._set_team(team_key)
 
-        event_team_keys = EventTeam.query(EventTeam.team == self.team.key, EventTeam.year == self.year).fetch(1000, keys_only=True)
-        event_teams = ndb.get_multi(event_team_keys)
-        event_keys = [event_team.event for event_team in event_teams]
-        events = ndb.get_multi(event_keys)
+        events = TeamYearEventsQuery(self.team_key, self.year).fetch()
 
         events = [ModelToDict.eventConverter(event) for event in events]
 
@@ -85,8 +83,8 @@ class ApiTeamEventsController(ApiTeamControllerBase):
 
 class ApiTeamEventAwardsController(ApiTeamControllerBase):
     CACHE_KEY_FORMAT = "apiv2_team_event_awards_controller_{}_{}"  # (team_key, event_key)
-    CACHE_VERSION = 3
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 4
+    CACHE_HEADER_LENGTH = 60 * 60
 
     def __init__(self, *args, **kw):
         super(ApiTeamEventAwardsController, self).__init__(*args, **kw)
@@ -102,8 +100,7 @@ class ApiTeamEventAwardsController(ApiTeamControllerBase):
         self._track_call_defer('team/event/awards', '{}/{}'.format(team_key, event_key))
 
     def _render(self, team_key, event_key):
-        award_keys_future = Award.query(Award.team_list == ndb.Key(Team, self.team_key), Award.event == ndb.Key(Event, event_key)).fetch_async(None, keys_only=True)
-        awards = ndb.get_multi(award_keys_future.get_result())
+        awards = TeamEventAwardsQuery(self.team_key, self.event_key).fetch()
 
         awards_dicts = [ModelToDict.awardConverter(award) for award in AwardHelper.organizeAwards(awards)]
 
@@ -112,7 +109,7 @@ class ApiTeamEventAwardsController(ApiTeamControllerBase):
 
 class ApiTeamEventMatchesController(ApiTeamControllerBase):
     CACHE_KEY_FORMAT = "apiv2_team_event_matches_controller_{}_{}"  # (team_key, event_key)
-    CACHE_VERSION = 2
+    CACHE_VERSION = 3
     CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
@@ -129,18 +126,17 @@ class ApiTeamEventMatchesController(ApiTeamControllerBase):
         self._track_call_defer('team/event/matches', '{}/{}'.format(team_key, event_key))
 
     def _render(self, team_key, event_key):
-        match_keys_future = Match.query(Match.event == ndb.Key(Event, self.event_key), Match.team_key_names == self.team_key).fetch_async(None, keys_only=True)
-        match_futures = ndb.get_multi_async(match_keys_future.get_result())
+        matches = TeamEventMatchesQuery(self.team_key, self.event_key).fetch()
 
-        matches = [ModelToDict.matchConverter(match_future.get_result()) for match_future in match_futures]
+        matches = [ModelToDict.matchConverter(match) for match in matches]
 
         return json.dumps(matches, ensure_ascii=True)
 
 
 class ApiTeamMediaController(ApiTeamControllerBase):
     CACHE_KEY_FORMAT = "apiv2_team_media_controller_{}_{}"  # (team_key, year)
-    CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 2
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):
         super(ApiTeamMediaController, self).__init__(*args, **kw)
@@ -157,16 +153,16 @@ class ApiTeamMediaController(ApiTeamControllerBase):
     def _render(self, team_key, year=None):
         self._set_team(team_key)
 
-        media_keys = Media.query(Media.references == self.team.key, Media.year == self.year).fetch(500, keys_only=True)
-        medias = ndb.get_multi(media_keys)
+        medias = TeamYearMediaQuery(self.team_key, self.year).fetch()
+
         media_list = [ModelToDict.mediaConverter(media) for media in medias]
         return json.dumps(media_list, ensure_ascii=True)
 
 
 class ApiTeamYearsParticipatedController(ApiTeamControllerBase):
     CACHE_KEY_FORMAT = "apiv2_team_years_participated_controller_{}"  # (team_key)
-    CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 1
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):
         super(ApiTeamYearsParticipatedController, self).__init__(*args, **kw)
@@ -177,11 +173,7 @@ class ApiTeamYearsParticipatedController(ApiTeamControllerBase):
         self._track_call_defer('team/years_participated', team_key)
 
     def _render(self, team_key):
-        event_team_keys = EventTeam.query(EventTeam.team == ndb.Key(Team, team_key)).fetch(None, keys_only=True)
-        years_participated = set()
-        for event_team_key in event_team_keys:
-            years_participated.add(int(event_team_key.id()[:4]))
-        years_participated = sorted(list(years_participated))
+        years_participated = sorted(TeamParticipationQuery(self.team_key).fetch())
 
         return json.dumps(years_participated, ensure_ascii=True)
 
@@ -195,8 +187,8 @@ class ApiTeamListController(ApiTeamControllerBase):
     etc.
     """
     CACHE_KEY_FORMAT = "apiv2_team_list_controller_{}"  # (page_num)
-    CACHE_VERSION = 1
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 2
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
     PAGE_SIZE = 500
 
     def __init__(self, *args, **kw):
@@ -212,13 +204,9 @@ class ApiTeamListController(ApiTeamControllerBase):
         self._track_call_defer('team/list', page_num)
 
     def _render(self, page_num):
-        page_num = int(page_num)
-        start = self.PAGE_SIZE * page_num
-        end = start + self.PAGE_SIZE
+        teams = TeamListQuery(int(page_num)).fetch()
 
-        team_keys = Team.query(Team.team_number >= start, Team.team_number < end).fetch(None, keys_only=True)
-        team_futures = ndb.get_multi_async(team_keys)
-        team_list = [ModelToDict.teamConverter(team_future.get_result()) for team_future in team_futures]
+        team_list = [ModelToDict.teamConverter(team) for team in teams]
         return json.dumps(team_list, ensure_ascii=True)
 
 
@@ -227,8 +215,8 @@ class ApiTeamHistoryEventsController(ApiTeamControllerBase):
     Returns a JSON list of event models of all events attended by a team
     """
     CACHE_KEY_FORMAT = "apiv2_team_history_events_controller_{}"  # (team_key)
-    CACHE_VERSION = 1
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 3
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):
         super(ApiTeamHistoryEventsController, self).__init__(*args, **kw)
@@ -240,13 +228,10 @@ class ApiTeamHistoryEventsController(ApiTeamControllerBase):
 
     def _render(self, team_key):
         self._set_team(team_key)
-        event_team_keys_future = EventTeam.query(EventTeam.team == self.team.key).fetch_async(1000, keys_only=True)
-        event_teams_futures = ndb.get_multi_async(event_team_keys_future.get_result())
 
-        event_keys = [event_team_future.get_result().event for event_team_future in event_teams_futures]
-        events_futures = ndb.get_multi_async(event_keys)
+        events = TeamEventsQuery(self.team_key).fetch()
 
-        event_list = [ModelToDict.eventConverter(events_future.get_result()) for events_future in events_futures]
+        event_list = [ModelToDict.eventConverter(event) for event in events]
         return json.dumps(event_list, ensure_ascii=True)
 
 
@@ -255,8 +240,8 @@ class ApiTeamHistoryAwardsController(ApiTeamControllerBase):
     Returns a JSON list of award models won by a team
     """
     CACHE_KEY_FORMAT = "apiv2_team_history_awards_controller_{}"  # (team_key)
-    CACHE_VERSION = 1
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 2
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):
         super(ApiTeamHistoryAwardsController, self).__init__(*args, **kw)
@@ -268,7 +253,58 @@ class ApiTeamHistoryAwardsController(ApiTeamControllerBase):
 
     def _render(self, team_key):
         self._set_team(team_key)
-        award_keys_future = Award.query(Award.team_list == self.team.key).fetch_async(1000, keys_only=True)
-        awards_futures = ndb.get_multi_async(award_keys_future.get_result())
-        awards_list = [ModelToDict.awardConverter(award_future.get_result()) for award_future in awards_futures]
+
+        awards = TeamAwardsQuery(self.team_key).fetch()
+
+        awards_list = [ModelToDict.awardConverter(award) for award in awards]
         return json.dumps(awards_list, ensure_ascii=True)
+
+
+class ApiTeamHistoryRobotsController(ApiTeamControllerBase):
+    """
+    Returns a JSON list of all robot models associated with a Team
+    """
+    CACHE_KEY_FORMAT = "apiv2_team_history_robots_controller_{}"  # (team_key)
+    CACHE_VERSION = 1
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamHistoryRobotsController, self).__init__(*args, **kw)
+        self.team_key = self.request.route_kwargs['team_key']
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key)
+
+    def _track_call(self, team_key):
+        self._track_call_defer('team/history/robots', team_key)
+
+    def _render(self, team_key):
+        self._set_team(team_key)
+
+        robots = TeamRobotsQuery(self.team_key).fetch()
+
+        robots_dict = {robot.year: ModelToDict.robotConverter(robot) for robot in robots}
+        return json.dumps(robots_dict, ensure_ascii=True)
+
+
+class ApiTeamHistoryDistrictsController(ApiTeamControllerBase):
+    """
+    Returns a JSON list of all DistrictTeam models associated with a Team
+    """
+    CACHE_KEY_FORMAT = "apiv2_team_history_districts_controller_{}"  # (team_key)
+    CACHE_VERSION = 1
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamHistoryDistrictsController, self).__init__(*args, **kw)
+        self.team_key = self.request.route_kwargs['team_key']
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key)
+
+    def _track_call(self, team_key):
+        self._track_call_defer('team/history/districts', team_key)
+
+    def _render(self, team_key):
+        self._set_team(team_key)
+
+        district_teams = TeamDistrictsQuery(self.team_key).fetch()
+
+        team_dict = {int(year): district_key for year, district_key in district_teams.iteritems()}
+        return json.dumps(team_dict, ensure_ascii=True)

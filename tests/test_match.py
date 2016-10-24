@@ -28,6 +28,12 @@ class TestMatch(unittest2.TestCase):
 
             self.assertListEqual(match.youtube_videos_formatted, ['TqY324xLU4s?start=' + seconds])
 
+            match = Match(
+                youtube_videos=['TqY324xLU4s?t=' + old_ts]
+            )
+
+            self.assertListEqual(match.youtube_videos_formatted, ['TqY324xLU4s?start=' + seconds])
+
         # Test that nothing is changed if there is no timestamp
         match = Match(
             youtube_videos=['TqY324xLU4s']

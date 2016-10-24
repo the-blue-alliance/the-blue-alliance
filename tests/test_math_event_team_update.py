@@ -20,6 +20,8 @@ class TestDatafeedUsfirstTeams(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
 
         self.event = Event(
                 id="2010sc",
@@ -40,7 +42,7 @@ class TestDatafeedUsfirstTeams(unittest2.TestCase):
             alliances_json="""{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""",
             comp_level="qm",
             event=self.event.key,
-            game="frc_2010_bkwy",
+            year=2010,
             set_number=1,
             match_number=1,
             team_key_names=[u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073']

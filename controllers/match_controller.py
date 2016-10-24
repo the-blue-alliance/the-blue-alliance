@@ -1,10 +1,9 @@
 import os
 
-from google.appengine.ext.webapp import template
-
 from base_controller import CacheableHandler
 from models.event import Event
 from models.match import Match
+from template_engine import jinja2_engine
 
 
 class MatchDetail(CacheableHandler):
@@ -15,6 +14,7 @@ class MatchDetail(CacheableHandler):
     SHORT_CACHE_EXPIRATION = 60 * 5
     CACHE_VERSION = 4
     CACHE_KEY_FORMAT = "match_detail_{}"  # (match_key)
+    VALID_BREAKDOWN_YEARS = set([2015, 2016])
 
     def __init__(self, *args, **kw):
         super(MatchDetail, self).__init__(*args, **kw)
@@ -39,13 +39,17 @@ class MatchDetail(CacheableHandler):
         if not match:
             self.abort(404)
 
+        match_breakdown_template = None
+        if match.score_breakdown is not None and match.year in self.VALID_BREAKDOWN_YEARS:
+            match_breakdown_template = 'match_partials/match_breakdown/match_breakdown_{}.html'.format(match.year)
+
         self.template_values.update({
             "event": event,
             "match": match,
+            "match_breakdown_template": match_breakdown_template,
         })
 
         if event.within_a_day:
             self._cache_expiration = self.SHORT_CACHE_EXPIRATION
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/match_details.html')
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('match_details.html', self.template_values)

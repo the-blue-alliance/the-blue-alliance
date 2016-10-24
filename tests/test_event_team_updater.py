@@ -27,7 +27,7 @@ def set_up_matches(html, event):
                 match.get("set_number", 0),
                 match.get("match_number", 0)),
             event=event.key,
-            game=Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
+            year=event.year,
             set_number=match.get("set_number", 0),
             match_number=match.get("match_number", 0),
             comp_level=match.get("comp_level", None),
@@ -44,6 +44,8 @@ class TestEventTeamUpdater(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
 
         past_event = Event(
             id="{}tstupdaterpast".format(CUR_YEAR),

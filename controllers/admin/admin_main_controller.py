@@ -3,11 +3,14 @@ import json
 import re
 import logging
 import datetime
+import tba_config
 
 from google.appengine.api import memcache
 from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
+from database.database_query import DatabaseQuery
+from helpers.suggestions.suggestion_fetcher import SuggestionFetcher
 from models.account import Account
 from models.suggestion import Suggestion
 
@@ -17,26 +20,20 @@ class AdminMain(LoggedInHandler):
         self._require_admin()
 
         self.template_values['memcache_stats'] = memcache.get_stats()
+        self.template_values['databasequery_stats'] = {
+            'hits': sum(filter(None, [memcache.get(key) for key in DatabaseQuery.DATABASE_HITS_MEMCACHE_KEYS])),
+            'misses': sum(filter(None, [memcache.get(key) for key in DatabaseQuery.DATABASE_MISSES_MEMCACHE_KEYS]))
+        }
 
         # Gets the 5 recently created users
         users = Account.query().order(-Account.created).fetch(5)
         self.template_values['users'] = users
 
-        # Retrieves the number of pending suggestions
-        video_suggestions = Suggestion.query().filter(
-            Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
-            Suggestion.target_model == "match").count()
-        self.template_values['video_suggestions'] = video_suggestions
-
-        webcast_suggestions = Suggestion.query().filter(
-            Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
-            Suggestion.target_model == "event").count()
-        self.template_values['webcast_suggestions'] = webcast_suggestions
-
-        media_suggestions = Suggestion.query().filter(
-            Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
-            Suggestion.target_model == "media").count()
-        self.template_values['media_suggestions'] = media_suggestions
+        self.template_values['suggestions'] = dict()
+        self.template_values['suggestions']['match'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "match")
+        self.template_values['suggestions']['event'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "event")
+        self.template_values['suggestions']['media'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "media")
+        self.template_values['suggestions']['social'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "social-media")
 
         # version info
         try:
@@ -57,6 +54,8 @@ class AdminMain(LoggedInHandler):
         except Exception, e:
             logging.warning("version_info.json parsing failed: %s" % e)
             pass
+
+        self.template_values['debug'] = tba_config.DEBUG
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/index.html')
         self.response.out.write(template.render(path, self.template_values))

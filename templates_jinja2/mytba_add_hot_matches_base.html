@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}myTBA Subscribe to Hot Matches - The Blue Alliance{% endblock %}
+
+{% block meta_description %}Manage your favorites and subscriptions{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2">
+      <ol class="breadcrumb">
+        <li><a href="/account">Account Overview</a></li>
+        <li><a href="/account/mytba#my-matches">Manage myTBA</a></li>
+        <li class="active">Subscribe to Hot Matches (Beta)</li>
+      </ol>
+
+      <h1>Subscribe to Hot Matches (Beta)</h1>
+      <p>Subscribe to matches that we think will be exciting!</p>
+      <p>This feature is currently in Beta.</p>
+
+      {% if events %}
+        <h2>Choose an event:</h2>
+        {% for event in events %}
+        <h3><a href="/account/mytba/add_hot_matches/{{event.key.id()}}">{{event.short_name}}</a></h3>
+        {% endfor %}
+      {% else %}
+      <p>No current events!</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

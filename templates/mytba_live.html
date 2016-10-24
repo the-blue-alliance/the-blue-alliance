@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}myTBA Dashboard - The Blue Alliance{% endblock %}
+
+{% block meta_description %}View how your favorite teams are doing.{% endblock %}
+
+{% block mytba_active %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12">
+      <p class="pull-right">
+        <em>Signed in with: {{user_bundle.account.email}}</em>
+        <a class="btn btn-warning" href="/logout"><span class="glyphicon glyphicon-remove"></span> Logout</a>
+      </p>
+      <h1>myTBA Dashboard</h1>
+      <p>Keep up to date with where your favorite teams are competing and how they're doing!</p>
+
+      <p>
+        myTBA lets you customize your experience when using The Blue Alliance.<br>
+        <strong><span class="glyphicon glyphicon-star"></span> Favorites</strong> are used for personalized content and quick access.<br>
+        <strong><span class="glyphicon glyphicon-bell"></span> Subscriptions</strong> are used for push notifications (Android only).
+        </p>
+
+      <p><a class="btn btn-primary" href="/account/mytba"><span class="glyphicon glyphicon-bookmark"></span> Manage myTBA</a></p>
+      <hr>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <h2>Currently Competing</h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      {% if live_events_with_teams %}
+        {% include "live_teams_partial.html" %}
+      {% else %}
+        <p>No favorite teams are currently competing.</p>
+      {% endif %}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <h2>Upcoming Competitions</h2>
+    </div>
+  </div>
+  <div class="row">
+    {% if future_events_with_teams %}
+    {% for future_event in future_events_with_teams %}
+      {% with future_event.0 as event %}
+      <div class="col-sm-4">
+        <h3><a href="/event/{{ event.key_name }}">{{ event.name }}</a></h3>
+        <p>
+          {% if event.location %}<span class="glyphicon glyphicon-map-marker"></span> in <a href="http://maps.google.com/maps?q={{ event.location }}" target="_blank">{{ event.location }}</a><br />{% endif %}
+          {% if event.start_date %}<span class="glyphicon glyphicon-calendar"></span> {{ event.start_date|date:"M d" }}{% if event.start_date|date:"M d" != event.end_date|date:"M d" %} - {{ event.end_date|date:"M d" }}{% endif %}, {{ event.end_date|date:"Y" }}{% endif %}
+        </p>
+        <table class="table table-striped table-condensed">
+          <tr>
+            <th>Team Number</th>
+            <th>Team Name</th>
+          </tr>
+          {% for team in future_event.1 %}
+          <tr>
+            <td>{{ team.team_number }}</td>
+            <td>
+                <a href="/team/{{ team.team_number }}/{{ event.year }}#{{ event.key_name }}">{{ team.nickname }}</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+      {% endwith %}
+    {% endfor %}
+    {% else %}
+      <div class="col-xs-12">
+        <p>No favorite teams have upcoming competitions.</p>
+      </div>
+    {% endif %}
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <h2>Past Competitions This Year</h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      {% if past_events_with_teams %}
+        {% with past_events_with_teams as live_events_with_teams %}
+        {% include "live_teams_partial.html" %}
+        {% endwith %}
+      {% else %}
+        <p>No favorite teams have competed yet.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

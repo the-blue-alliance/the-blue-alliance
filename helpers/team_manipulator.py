@@ -18,11 +18,14 @@ class TeamManipulator(ManipulatorBase):
         the "old" team that are null in the "new" team.
         """
         attrs = [
-            "address",
+            "city",
+            "state_prov",
+            "country",
             "name",
             "nickname",
             "website",
             "rookie_year",
+            "motto",
         ]
 
         for attr in attrs:

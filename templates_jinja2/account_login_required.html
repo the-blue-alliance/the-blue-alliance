@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance - Login Required{% endblock %}
+
+{% block meta_description %}Login Required{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-8 col-sm-offset-2">
+      <h1>Please log in to your TBA Account</h1>
+
+
+      <div class="row">
+        <div class="col-md-6">
+          <p>Your account settings will be accessible both on <a href="/">www.thebluealliance.com</a> and our <a href="https://play.google.com/store/apps/details?id=com.thebluealliance.androidclient" target="_blank">Android app</a>.</p>
+        </div>
+        <div class="col-md-6">
+          <a href="/login{% if redirect %}?redirect={{redirect|urlencode}}{% endif %}" class="btn btn-success btn-block" role="button">Take me to the login page!</a>
+          <a href="javascript:history.back()" class="btn btn-default btn-block" role="button">No thanks, take me back.</a>
+        </div>
+      </div>
+
+      <hr>
+
+      <h3>myTBA</h3>
+      <p>Signing in enables myTBA, which lets you customize your experience when using The Blue Alliance.</p>
+      <p><strong><span class="glyphicon glyphicon-star"></span> Favorites</strong> are used for personalized content and quick access.</p>
+      <p><strong><span class="glyphicon glyphicon-bell"></span> Subscriptions</strong> are used for push notifications (Android only).</p>
+
+      <hr>
+
+      <h3>Content Submission</h3>
+      <p>When logged in, you can help contribute by submitting match videos, team photos, and more for review. Once approved,
+      they will be available for everyone to see. In the future, we hope to have a leaderboard to show our top contributors!</p>
+
+      <hr>
+
+      <h3>About Google Accounts</h3>
+      <p>The Blue Alliance uses <a href="https://myaccount.google.com" target="_blank">Google Accounts</a> to handle our login.
+      Only your email address is shared with us and it will always be kept private.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

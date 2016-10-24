@@ -15,7 +15,8 @@ from models.award import Award
 from models.match import Match
 
 from helpers.event_helper import EventHelper
-from helpers.event_helper import OFFSEASON_EVENTS_LABEL
+from helpers.event_helper import OFFSEASON_EVENTS_LABEL, PRESEASON_EVENTS_LABEL
+from helpers.event_insights_helper import EventInsightsHelper
 
 
 class InsightsHelper(object):
@@ -33,7 +34,7 @@ class InsightsHelper(object):
         events_by_week = EventHelper.groupByWeek(official_events)
         week_event_matches = []  # Tuples of: (week, events) where events are tuples of (event, matches)
         for week, events in events_by_week.items():
-            if week == OFFSEASON_EVENTS_LABEL:
+            if week in {OFFSEASON_EVENTS_LABEL, PRESEASON_EVENTS_LABEL}:
                 continue
             week_events = []
             for event in events:
@@ -49,6 +50,7 @@ class InsightsHelper(object):
         insights += self._calculateMatchAveragesByWeek(week_event_matches, year)
         insights += self._calculateScoreDistribution(week_event_matches, year)
         insights += self._calculateNumMatches(week_event_matches, year)
+        insights += self._calculateYearSpecific(week_event_matches, year)
         return insights
 
     @classmethod
@@ -100,7 +102,9 @@ class InsightsHelper(object):
                 'verbose_name': match.verbose_name,
                 'event_name': event.name,
                 'alliances': match.alliances,
-                'winning_alliance': match.winning_alliance
+                'winning_alliance': match.winning_alliance,
+                'tba_video': match.tba_video,
+                'youtube_videos_formatted': match.youtube_videos_formatted
                 }
 
     @classmethod
@@ -291,6 +295,32 @@ class InsightsHelper(object):
             return [insight]
         else:
             return []
+
+    @classmethod
+    def _calculateYearSpecific(self, week_event_matches, year):
+        """
+        Returns an Insight where the data contains year specific insights
+        """
+        all_matches = []
+        event_insights_by_week = []  # tuples: week, week_insights
+        for week, week_events in week_event_matches:
+            week_matches = []
+            for _, matches in week_events:
+                week_matches += matches
+                all_matches += matches
+            week_insights = EventInsightsHelper.calculate_event_insights(week_matches, year)
+            if week_insights:
+                event_insights_by_week.append((week, week_insights))
+
+        total_insights = EventInsightsHelper.calculate_event_insights(all_matches, year)
+
+        insights = []
+        if event_insights_by_week != []:
+            insights.append(self._createInsight(event_insights_by_week, Insight.INSIGHT_NAMES[Insight.YEAR_SPECIFIC_BY_WEEK], year))
+        if total_insights:
+            insights.append(self._createInsight(total_insights, Insight.INSIGHT_NAMES[Insight.YEAR_SPECIFIC], year))
+
+        return insights
 
     @classmethod
     def _calculateBlueBanners(self, award_futures, year):

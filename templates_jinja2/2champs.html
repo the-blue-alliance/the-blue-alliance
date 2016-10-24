@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance - #2CHAMPS{% endblock %}
+
+{% block meta_description %}A tool for the 2017+ Championship event split.{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2">
+      <h1 class="end_header">#2CHAMPS</h1>
+
+      <p>Read more about the 2017 &amp; 2018 <em>FIRST</em> Championship update <a href="http://www.firstinspires.org/2017-2018-first-championship-info" target="_blank">here</a>.</p>
+      <p>This tool will let you know whether two teams will be going to the same
+      Championship event in 2017 and 2018+. This does not take into account the ability to attend
+      a "non-home" Championship.</p>
+
+      <div class="row">
+        <div class="col-xs-6 text-center">
+          <h3>Team A</h3>
+        </div>
+        <div class="col-xs-6 text-center">
+          <h3>Team B</h3>
+        </div>
+      </div>
+
+      <div class="row">
+        <form id="team-form" class="form-inline">
+          <div class="col-xs-6">
+            <input id="team-a-input" class="form-control team-input" onClick="this.value='';" type="text" placeholder="Choose a team by Name or Number" {% if team_a %}value="{{team_a.team_number}} | {{team_a.nickname}}"{% endif %}>
+            <input id="team-a-key" type="hidden" name="team_a" {% if team_a %}value="frc{{team_a.team_number}}"{% endif %}>
+          </div>
+          <div class="col-xs-6">
+            <input id="team-b-input" class="form-control team-input" onClick="this.value='';" type="text" placeholder="Choose a team by Name or Number" {% if team_b %}value="{{team_b.team_number}} | {{team_b.nickname}}"{% endif %}>
+            <input id="team-b-key" type="hidden" name="team_b" {% if team_b %}value="frc{{team_b.team_number}}"{% endif %}>
+          </div>
+        </form>
+      </div>
+
+      <br>
+
+      <div class="row">
+        <div class="col-xs-5 text-center">
+          {% if team_a %}
+          <h3>{{team_a.nickname}}</h3>
+          {% endif %}
+        </div>
+        <div class="col-xs-2">
+        </div>
+        <div class="col-xs-5 text-center">
+          {% if team_b %}
+          <h3>{{team_b.nickname}}</h3>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-xs-5 text-center">
+          {% if team_a %}
+          <h3>2017: {{team_a.championship_location.2017}}</h3>
+          {% else %}
+          <p>Please pick a team.</p>
+          {% endif %}
+        </div>
+        <div class="col-xs-2 text-center">
+          {% if team_a and team_b %}
+            <h2 style="color: red;">
+            {% if team_a.championship_location.2017 != team_b.championship_location.2017 %}
+            💔
+            {% else %}
+            ❤
+            {% endif %}
+            </h2>
+          {% else %}
+            <h2>?</h2>
+          {% endif %}
+        </div>
+        <div class="col-xs-5 text-center">
+          {% if team_b %}
+          <h3>2017: {{team_b.championship_location.2017}}</h3>
+          {% else %}
+          <p>Please pick a team.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-xs-5 text-center">
+          {% if team_a %}
+          <h3>2018+: {{team_a.championship_location.2018}}</h3>
+          {% endif %}
+        </div>
+        <div class="col-xs-2 text-center">
+          {% if team_a and team_b %}
+            <h2 style="color: red;">
+            {% if team_a.championship_location.2018 != team_b.championship_location.2018 %}
+            💔
+            {% else %}
+            ❤
+            {% endif %}
+            </h2>
+          {% else %}
+            <h2>?</h2>
+          {% endif %}
+        </div>
+        <div class="col-xs-5 text-center">
+          {% if team_b %}
+          <h3>2018+: {{team_b.championship_location.2018}}</h3>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block inline_javascript %}
+<script>
+  $(function() {
+    // Setup Team typeahead
+    $('.team-input').attr('autocomplete', 'off');
+    $('.team-input').typeahead([
+      {
+        prefetch: {
+          url: '/_/typeahead/teams-all',
+          filter: teamFilter
+        },
+      }
+    ]);
+
+    function doSelectAction_A(obj, datum) {
+      var team_re = datum.value.match(/(\d+) [|] .+/);
+      if (team_re != null) {
+        var team_num = team_re[1];
+        $('#team-a-key').val('frc' + team_num);
+        $('#team-form').submit();
+      }
+    }
+    $('#team-a-input').bind('typeahead:selected', doSelectAction_A);
+    $('#team-a-input').bind('typeahead:autocompleted', doSelectAction_A);
+
+    function doSelectAction_B(obj, datum) {
+      var team_re = datum.value.match(/(\d+) [|] .+/);
+      if (team_re != null) {
+        var team_num = team_re[1];
+        $('#team-b-key').val('frc' + team_num);
+        $('#team-form').submit();
+      }
+    }
+    $('#team-b-input').bind('typeahead:selected', doSelectAction_B);
+    $('#team-b-input').bind('typeahead:autocompleted', doSelectAction_B);
+  });
+</script>
+{% endblock %}

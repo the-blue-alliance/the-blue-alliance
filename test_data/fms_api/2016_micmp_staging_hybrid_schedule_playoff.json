@@ -1,0 +1,1840 @@
+{
+  "Schedule": [
+    {
+      "description": "Octofinal 1 (B)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 1,
+      "startTime": "2016-04-14T16:47:00",
+      "actualStartTime": "2016-03-30T11:02:57.677",
+      "scoreRedFinal": 159,
+      "scoreRedFoul": 15,
+      "scoreRedAuto": 6,
+      "scoreBlueFinal": 160,
+      "scoreBlueFoul": 5,
+      "scoreBlueAuto": 30,
+      "Teams": [
+        {
+          "teamNumber": 812,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 573,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 589,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 587,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 585,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 623,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Octofinal 2 (B)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 2,
+      "startTime": "2016-04-14T16:54:00",
+      "actualStartTime": "2016-03-30T11:10:53.703",
+      "scoreRedFinal": 178,
+      "scoreRedFoul": 20,
+      "scoreRedAuto": 30,
+      "scoreBlueFinal": 138,
+      "scoreBlueFoul": 20,
+      "scoreBlueAuto": 22,
+      "Teams": [
+        {
+          "teamNumber": 649,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 698,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 816,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 811,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 624,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 1322,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Octofinal 3 (B)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 3,
+      "startTime": "2016-04-14T17:01:00",
+      "actualStartTime": "2016-03-30T11:15:50.347",
+      "scoreRedFinal": 191,
+      "scoreRedFoul": 5,
+      "scoreRedAuto": 30,
+      "scoreBlueFinal": 121,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 30,
+      "Teams": [
+        {
+          "teamNumber": 6207,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 6206,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 571,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 538,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 692,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 829,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Octofinal 4 (B)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 4,
+      "startTime": "2016-04-14T17:08:00",
+      "actualStartTime": "2016-03-30T11:23:27.04",
+      "scoreRedFinal": 146,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 14,
+      "scoreBlueFinal": 124,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 14,
+      "Teams": [
+        {
+          "teamNumber": 581,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 702,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 620,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 6212,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 2834,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 806,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Octofinal 5 (B)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 5,
+      "startTime": "2016-04-14T17:15:00",
+      "actualStartTime": "2016-03-30T11:29:18.097",
+      "scoreRedFinal": 176,
+      "scoreRedFoul": 5,
+      "scoreRedAuto": 30,
+      "scoreBlueFinal": 106,
+      "scoreBlueFoul": 5,
+      "scoreBlueAuto": 30,
+      "Teams": [
+        {
+          "teamNumber": 839,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 501,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 555,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 3618,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 695,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 6204,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Octofinal 6 (B)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 6,
+      "startTime": "2016-04-14T17:22:00",
+      "actualStartTime": "2016-03-30T11:34:11.21",
+      "scoreRedFinal": 177,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 30,
+      "scoreBlueFinal": 161,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 30,
+      "Teams": [
+        {
+          "teamNumber": 691,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 615,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 554,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 568,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 614,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 558,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Octofinal 7 (B)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 7,
+      "startTime": "2016-04-14T17:29:00",
+      "actualStartTime": "2016-03-30T12:38:28.61",
+      "scoreRedFinal": 194,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 30,
+      "scoreBlueFinal": 151,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 30,
+      "Teams": [
+        {
+          "teamNumber": 66,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 1,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 578,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 601,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 6203,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 670,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Octofinal 8 (B)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 8,
+      "startTime": "2016-04-14T17:36:00",
+      "actualStartTime": "2016-03-30T12:45:25.183",
+      "scoreRedFinal": 137,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 14,
+      "scoreBlueFinal": 131,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 30,
+      "Teams": [
+        {
+          "teamNumber": 514,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 610,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 704,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 648,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 668,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 703,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Octofinal 9 (C)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 9,
+      "startTime": "2016-04-14T17:46:00",
+      "actualStartTime": "2016-03-30T13:03:44.063",
+      "scoreRedFinal": 176,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 22,
+      "scoreBlueFinal": 136,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 30,
+      "Teams": [
+        {
+          "teamNumber": 812,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 573,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 589,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 587,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 585,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 623,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Octofinal 10 (C)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 10,
+      "startTime": "2016-04-14T17:53:00",
+      "actualStartTime": "2016-03-30T13:12:16.72",
+      "scoreRedFinal": 107,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 22,
+      "scoreBlueFinal": 135,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 0,
+      "Teams": [
+        {
+          "teamNumber": 649,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 698,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 816,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 811,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 624,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 1322,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Octofinal 11 (C)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 11,
+      "startTime": "2016-04-14T18:00:00",
+      "actualStartTime": "2016-03-30T13:18:21.827",
+      "scoreRedFinal": 138,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 22,
+      "scoreBlueFinal": 138,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 22,
+      "Teams": [
+        {
+          "teamNumber": 6207,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 6206,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 571,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 538,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 692,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 829,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Octofinal 12 (C)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 12,
+      "startTime": "2016-04-14T18:07:00",
+      "actualStartTime": "2016-03-30T13:19:28.913",
+      "scoreRedFinal": 136,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 0,
+      "scoreBlueFinal": 92,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 0,
+      "Teams": [
+        {
+          "teamNumber": 581,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 702,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 620,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 6212,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 2834,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 806,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Octofinal 13 (C)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 13,
+      "startTime": "2016-04-14T18:14:00",
+      "actualStartTime": "2016-03-30T13:22:24.78",
+      "scoreRedFinal": 143,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 30,
+      "scoreBlueFinal": 98,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 22,
+      "Teams": [
+        {
+          "teamNumber": 839,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 501,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 555,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 3618,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 695,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 6204,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Octofinal 14 (C)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 14,
+      "startTime": "2016-04-14T18:21:00",
+      "actualStartTime": "2016-03-30T13:25:47.503",
+      "scoreRedFinal": 147,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 22,
+      "scoreBlueFinal": 165,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 30,
+      "Teams": [
+        {
+          "teamNumber": 691,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 615,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 554,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 568,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 614,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 558,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Octofinal 15 (C)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 15,
+      "startTime": "2016-04-14T18:28:00",
+      "actualStartTime": "2016-03-30T13:28:19.607",
+      "scoreRedFinal": 175,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 30,
+      "scoreBlueFinal": 150,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 22,
+      "Teams": [
+        {
+          "teamNumber": 66,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 1,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 578,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 601,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 6203,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 670,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Octofinal 16 (C)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 16,
+      "startTime": "2016-04-14T18:35:00",
+      "actualStartTime": "2016-03-30T13:30:39.607",
+      "scoreRedFinal": 190,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 30,
+      "scoreBlueFinal": 141,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 30,
+      "Teams": [
+        {
+          "teamNumber": 514,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 610,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 704,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 648,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 668,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 703,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Tiebreaker 1 (C)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 17,
+      "startTime": "2016-04-14T18:48:00",
+      "actualStartTime": "2016-03-30T13:33:39.917",
+      "scoreRedFinal": 161,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 30,
+      "scoreBlueFinal": 138,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 22,
+      "Teams": [
+        {
+          "teamNumber": 812,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 573,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 589,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 587,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 585,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 623,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Tiebreaker 2 (C)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 18,
+      "startTime": "2016-04-14T18:55:00",
+      "actualStartTime": "2016-03-30T13:36:08.997",
+      "scoreRedFinal": 163,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 30,
+      "scoreBlueFinal": 152,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 0,
+      "Teams": [
+        {
+          "teamNumber": 649,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 698,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 816,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 811,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 624,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 1322,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Tiebreaker 3 (C)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 19,
+      "startTime": "2016-04-14T19:02:00",
+      "actualStartTime": "2016-03-30T13:39:07.387",
+      "scoreRedFinal": 212,
+      "scoreRedFoul": 30,
+      "scoreRedAuto": 22,
+      "scoreBlueFinal": 210,
+      "scoreBlueFoul": 30,
+      "scoreBlueAuto": 22,
+      "Teams": [
+        {
+          "teamNumber": 6207,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 6206,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 571,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 538,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 692,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 829,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Tiebreaker 6 (C)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 22,
+      "startTime": "2016-04-14T19:23:00",
+      "actualStartTime": "2016-03-30T13:42:03.597",
+      "scoreRedFinal": 171,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 30,
+      "scoreBlueFinal": 141,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 30,
+      "Teams": [
+        {
+          "teamNumber": 691,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 615,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 554,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 568,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 614,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 558,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Quarterfinal 1 (D)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 25,
+      "startTime": "2016-04-14T19:53:00",
+      "actualStartTime": "2016-03-30T13:45:54.277",
+      "scoreRedFinal": 153,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 30,
+      "scoreBlueFinal": 162,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 32,
+      "Teams": [
+        {
+          "teamNumber": 812,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 573,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 589,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 649,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 698,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 816,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Quarterfinal 2 (D)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 26,
+      "startTime": "2016-04-14T20:00:00",
+      "actualStartTime": "2016-03-30T14:09:11.53",
+      "scoreRedFinal": 165,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 30,
+      "scoreBlueFinal": 140,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 22,
+      "Teams": [
+        {
+          "teamNumber": 6207,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 6206,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 571,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 581,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 702,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 620,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Quarterfinal 3 (D)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 27,
+      "startTime": "2016-04-14T20:07:00",
+      "actualStartTime": "2016-03-30T14:14:05.443",
+      "scoreRedFinal": 31,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 6,
+      "scoreBlueFinal": 21,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 6,
+      "Teams": [
+        {
+          "teamNumber": 839,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 501,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 555,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 691,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 615,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 554,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Quarterfinal 4 (D)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 28,
+      "startTime": "2016-04-14T20:14:00",
+      "actualStartTime": "2016-03-30T14:17:40.057",
+      "scoreRedFinal": 135,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 30,
+      "scoreBlueFinal": 110,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 30,
+      "Teams": [
+        {
+          "teamNumber": 66,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 1,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 578,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 514,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 610,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 704,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Quarterfinal 5 (A)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 29,
+      "startTime": "2016-04-14T20:24:00",
+      "actualStartTime": "2016-03-30T14:21:01.693",
+      "scoreRedFinal": 95,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 30,
+      "scoreBlueFinal": 100,
+      "scoreBlueFoul": 5,
+      "scoreBlueAuto": 30,
+      "Teams": [
+        {
+          "teamNumber": 812,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 573,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 589,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 649,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 698,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 816,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Quarterfinal 6 (A)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 30,
+      "startTime": "2016-04-14T20:31:00",
+      "actualStartTime": "2016-03-30T15:02:38.473",
+      "scoreRedFinal": 120,
+      "scoreRedFoul": 20,
+      "scoreRedAuto": 30,
+      "scoreBlueFinal": 215,
+      "scoreBlueFoul": 15,
+      "scoreBlueAuto": 45,
+      "Teams": [
+        {
+          "teamNumber": 6207,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 6206,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 571,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 581,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 702,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 620,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Quarterfinal 7 (A)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 31,
+      "startTime": "2016-04-14T20:38:00",
+      "actualStartTime": "2016-03-30T15:21:24.473",
+      "scoreRedFinal": 110,
+      "scoreRedFoul": 10,
+      "scoreRedAuto": 30,
+      "scoreBlueFinal": 187,
+      "scoreBlueFoul": 10,
+      "scoreBlueAuto": 60,
+      "Teams": [
+        {
+          "teamNumber": 839,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 501,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 555,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 691,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 615,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 554,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Quarterfinal 8 (A)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 32,
+      "startTime": "2016-04-14T20:45:00",
+      "actualStartTime": "2016-03-30T15:30:52.36",
+      "scoreRedFinal": 176,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 30,
+      "scoreBlueFinal": 159,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 30,
+      "Teams": [
+        {
+          "teamNumber": 66,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 1,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 578,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 514,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 610,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 704,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Tiebreaker 2 (A)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 34,
+      "startTime": "2016-04-14T21:05:00",
+      "actualStartTime": "2016-03-30T15:33:32.47",
+      "scoreRedFinal": 161,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 30,
+      "scoreBlueFinal": 144,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 30,
+      "Teams": [
+        {
+          "teamNumber": 6207,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 6206,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 571,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 581,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 702,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 620,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Tiebreaker 3 (A)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 35,
+      "startTime": "2016-04-14T21:12:00",
+      "actualStartTime": "2016-03-30T15:36:09.367",
+      "scoreRedFinal": 173,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 30,
+      "scoreBlueFinal": 155,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 0,
+      "Teams": [
+        {
+          "teamNumber": 839,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 501,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 555,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 691,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 615,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 554,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Semifinal 1 (B)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 37,
+      "startTime": "2016-04-14T21:35:00",
+      "actualStartTime": "2016-03-30T15:46:59.323",
+      "scoreRedFinal": 158,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 50,
+      "scoreBlueFinal": 209,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 50,
+      "Teams": [
+        {
+          "teamNumber": 649,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 698,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 816,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 6207,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 6206,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 571,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Semifinal 2 (B)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 38,
+      "startTime": "2016-04-14T21:42:00",
+      "actualStartTime": "2016-03-30T15:50:56.047",
+      "scoreRedFinal": 163,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 30,
+      "scoreBlueFinal": 129,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 10,
+      "Teams": [
+        {
+          "teamNumber": 839,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 501,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 555,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 66,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 1,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 578,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Semifinal 3 (B)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 39,
+      "startTime": "2016-04-14T21:49:00",
+      "actualStartTime": "2016-03-30T15:56:16.007",
+      "scoreRedFinal": 179,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 30,
+      "scoreBlueFinal": 187,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 30,
+      "Teams": [
+        {
+          "teamNumber": 649,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 698,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 816,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 6207,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 6206,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 571,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Semifinal 4 (B)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 40,
+      "startTime": "2016-04-14T21:56:00",
+      "actualStartTime": "2016-03-30T16:04:55.077",
+      "scoreRedFinal": 173,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 30,
+      "scoreBlueFinal": 141,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 30,
+      "Teams": [
+        {
+          "teamNumber": 839,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 501,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 555,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 66,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 1,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 578,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Final 1 (C)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 43,
+      "startTime": "2016-04-14T22:32:00",
+      "actualStartTime": "2016-03-30T16:08:47.597",
+      "scoreRedFinal": 183,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 30,
+      "scoreBlueFinal": 185,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 30,
+      "Teams": [
+        {
+          "teamNumber": 6207,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 6206,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 571,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 839,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 501,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 555,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    },
+    {
+      "description": "Final 2 (C)",
+      "tournamentLevel": "Playoff",
+      "matchNumber": 44,
+      "startTime": "2016-04-14T22:45:00",
+      "actualStartTime": "2016-03-30T16:13:38.903",
+      "scoreRedFinal": 171,
+      "scoreRedFoul": 0,
+      "scoreRedAuto": 50,
+      "scoreBlueFinal": 178,
+      "scoreBlueFoul": 0,
+      "scoreBlueAuto": 42,
+      "Teams": [
+        {
+          "teamNumber": 6207,
+          "station": "Red1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 6206,
+          "station": "Red2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 571,
+          "station": "Red3",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 839,
+          "station": "Blue1",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 501,
+          "station": "Blue2",
+          "surrogate": false,
+          "dq": false
+        },
+        {
+          "teamNumber": 555,
+          "station": "Blue3",
+          "surrogate": false,
+          "dq": false
+        }
+      ]
+    }
+  ]
+}

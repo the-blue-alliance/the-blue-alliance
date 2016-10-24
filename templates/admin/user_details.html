@@ -25,6 +25,18 @@
         <td>{{ user.email }}</td>
     </tr>
     <tr>
+        <td>Permissions</td>
+        <td>
+            <ul>
+            {% for enum, permission in permissions.items %}
+                {% if enum in user.permissions %}
+                    <li><strong>{{permission.name}}</strong> – {{permission.description}}</li>
+                {% endif %}
+            {% endfor %}
+            </ul>
+        </td>
+    </tr>
+    <tr>
         <td>Created</td>
         <td>{{ user.created }}</td>
     </tr>

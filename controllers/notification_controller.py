@@ -14,8 +14,8 @@ class UserNotificationBroadcast(LoggedInHandler):
     """
 
     def post(self):
-        self._require_login('/account/register')
-        self._require_registration('/account/register')
+        self._require_login()
+        self._require_registration()
 
         # Check to make sure that they aren't trying to edit another user
         current_user_account_id = self.user_bundle.account.key.id()

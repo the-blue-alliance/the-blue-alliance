@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 from google.appengine.api import memcache
@@ -10,8 +11,9 @@ from datafeeds.usfirst_event_offseason_list_parser import UsfirstEventOffseasonL
 
 from models.event import Event
 
+
 class DatafeedUsfirstOffseason(DatafeedBase):
-    EVENT_OFFSEASON_LIST_URL = "http://www.usfirst.org/roboticsprograms/frc/calendar/list"
+    EVENT_OFFSEASON_LIST_URL = "http://www.firstinspires.org/robotics/frc/calendar?field_event_category_tid=416"
 
     def getEventList(self):
         events, _ = self.parse(self.EVENT_OFFSEASON_LIST_URL, UsfirstEventOffseasonListParser)
@@ -21,9 +23,9 @@ class DatafeedUsfirstOffseason(DatafeedBase):
             event_short="???",
             first_eid=event.get("first_eid", None),
             name=event.get("name", None),
-            year=2014, #TODO: don't hardcode me -gregmarra 20130921
+            year=datetime.datetime.now().year,
             start_date=event.get("start_date", None),
             end_date=event.get("end_date", None),
-            location=event.get("location", None),
+            state_prov=event.get("state_prov", None),
             )
             for event in events]

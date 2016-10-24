@@ -240,3 +240,6 @@ class TestEventGetShortName(unittest2.TestCase):
         self.assertEqual(EventHelper.getShortName("MAR District - Mt. Olive Event"), "Mt. Olive")
         self.assertEqual(EventHelper.getShortName("Israel Regional - see Site Info for additional information"), "Israel")
         self.assertEqual(EventHelper.getShortName("IN District - Kokomo City of Firsts Event sponsored by AndyMark"), "Kokomo City of Firsts")
+        # 2017 edge cases
+        self.assertEqual(EventHelper.getShortName("ONT District - McMaster University Event"), "McMaster University")
+        self.assertEqual(EventHelper.getShortName("FIRST Ontario Provincial Championship"), "Ontario")

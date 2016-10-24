@@ -1,13 +1,15 @@
+import datetime
 import os
 
 from google.appengine.ext import ndb
-from google.appengine.ext.webapp import template
 
 from base_controller import CacheableHandler
 
 from models.insight import Insight
 
-MAX_YEAR = 2015
+from template_engine import jinja2_engine
+
+MAX_YEAR = 2016
 VALID_YEARS = list(reversed(range(1992, MAX_YEAR + 1)))
 
 
@@ -15,12 +17,12 @@ class InsightsOverview(CacheableHandler):
     """
     Show Insights Overview
     """
-    CACHE_VERSION = 2
+    CACHE_VERSION = 3
     CACHE_KEY_FORMAT = "insights_overview"
 
     def __init__(self, *args, **kw):
         super(InsightsOverview, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24
+        self._cache_expiration = 60 * 60 * 4
 
     def _render(self):
         self.template_values.update({
@@ -28,24 +30,30 @@ class InsightsOverview(CacheableHandler):
         })
 
         insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(0, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
+        last_updated = None
         for insight in insights:
             if insight:
                 self.template_values[insight.name] = insight
+                if last_updated is None:
+                    last_updated = insight.updated
+                else:
+                    last_updated = max(last_updated, insight.updated)
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/insights.html')
-        return template.render(path, self.template_values)
+        self.template_values['last_updated'] = last_updated
+
+        return jinja2_engine.render('insights.html', self.template_values)
 
 
 class InsightsDetail(CacheableHandler):
     """
     Show Insights for a particular year
     """
-    CACHE_VERSION = 2
+    CACHE_VERSION = 3
     CACHE_KEY_FORMAT = "insight_detail_{}"  # (year)
 
     def __init__(self, *args, **kw):
         super(InsightsDetail, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24
+        self._cache_expiration = 60 * 60 * 4
 
     def get(self, year):
         if year == '':
@@ -66,9 +74,16 @@ class InsightsDetail(CacheableHandler):
         })
 
         insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(year, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
+        last_updated = None
         for insight in insights:
             if insight:
                 self.template_values[insight.name] = insight
+                if last_updated is None:
+                    last_updated = insight.updated
+                else:
+                    last_updated = max(last_updated, insight.updated)
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/insights_details.html')
-        return template.render(path, self.template_values)
+        self.template_values['year_specific_insights_template'] = 'event_partials/event_insights_{}.html'.format(year)
+        self.template_values['last_updated'] = last_updated
+
+        return jinja2_engine.render('insights_details.html', self.template_values)

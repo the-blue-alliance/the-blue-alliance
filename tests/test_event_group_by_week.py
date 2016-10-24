@@ -4,6 +4,9 @@ import datetime
 import random
 import logging
 
+from google.appengine.ext import ndb
+from google.appengine.ext import testbed
+
 from consts.event_type import EventType
 from helpers.event_helper import EventHelper, REGIONAL_EVENTS_LABEL, CHAMPIONSHIP_EVENTS_LABEL,\
     WEEKLESS_EVENTS_LABEL, OFFSEASON_EVENTS_LABEL, PRESEASON_EVENTS_LABEL
@@ -11,6 +14,15 @@ from models.event import Event
 
 
 class TestEventGroupByWeek(unittest2.TestCase):
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
+        self.testbed.init_taskqueue_stub(root_path=".")
+
     def test_group_by_week(self):
         """
         All events that start in the same span of Wednesday-Tuesday
@@ -37,6 +49,7 @@ class TestEventGroupByWeek(unittest2.TestCase):
                     event_short='tst{}'.format(event_id_counter),
                     start_date=start_date,
                     end_date=end_date,
+                    year=2013,
                     official=True,
                     event_type_enum=state.choice([EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP])
                 )
@@ -57,6 +70,7 @@ class TestEventGroupByWeek(unittest2.TestCase):
                 event_short='arc',
                 start_date=week_start,
                 end_date=week_start + datetime.timedelta(days=2),
+                year=2013,
                 official=True,
                 event_type_enum=EventType.CMP_DIVISION
             ),
@@ -65,6 +79,7 @@ class TestEventGroupByWeek(unittest2.TestCase):
                 event_short='gal',
                 start_date=week_start,
                 end_date=week_start + datetime.timedelta(days=2),
+                year=2013,
                 official=True,
                 event_type_enum=EventType.CMP_DIVISION
             ),
@@ -73,6 +88,7 @@ class TestEventGroupByWeek(unittest2.TestCase):
                 event_short='cmp',
                 start_date=week_start + datetime.timedelta(days=2),
                 end_date=week_start + datetime.timedelta(days=2),
+                year=2013,
                 official=True,
                 event_type_enum=EventType.CMP_FINALS
             )
@@ -83,18 +99,21 @@ class TestEventGroupByWeek(unittest2.TestCase):
             Event(
                 id='2013weekless1'.format(event_id_counter),
                 event_short='weekless1',
+                year=2013,
                 official=True,
                 event_type_enum=state.choice([EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP])
             ),
             Event(
                 id='2013weekless2'.format(event_id_counter),
                 event_short='weekless2',
+                year=2013,
                 official=True,
                 event_type_enum=state.choice([EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP])
             ),
             Event(
                 id='2013weekless3'.format(event_id_counter),
                 event_short='weekless3',
+                year=2013,
                 official=True,
                 event_type_enum=state.choice([EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP])
             ),
@@ -103,6 +122,7 @@ class TestEventGroupByWeek(unittest2.TestCase):
                 event_short='weekless4',
                 start_date=datetime.datetime(2013, 12, 31),
                 end_date=datetime.datetime(2013, 12, 31),
+                year=2013,
                 official=True,
                 event_type_enum=state.choice([EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP])
             )
@@ -113,6 +133,7 @@ class TestEventGroupByWeek(unittest2.TestCase):
             Event(
                 id='2013preseason1'.format(event_id_counter),
                 event_short='preseason1',
+                year=2013,
                 official=False,
                 event_type_enum=EventType.PRESEASON
             ),
@@ -121,6 +142,7 @@ class TestEventGroupByWeek(unittest2.TestCase):
                 event_short='preseason2',
                 start_date=datetime.datetime(2013, 1, 18),
                 end_date=datetime.datetime(2013, 1, 20),
+                year=2013,
                 official=False,
                 event_type_enum=EventType.PRESEASON
             ),
@@ -129,6 +151,7 @@ class TestEventGroupByWeek(unittest2.TestCase):
                 event_short='preseason3',
                 start_date=datetime.datetime(2013, 7, 11),
                 end_date=datetime.datetime(2013, 7, 12),
+                year=2013,
                 official=False,
                 event_type_enum=EventType.PRESEASON
             )
@@ -139,6 +162,7 @@ class TestEventGroupByWeek(unittest2.TestCase):
             Event(
                 id='2013offseason1'.format(event_id_counter),
                 event_short='offseason1',
+                year=2013,
                 official=False,
                 event_type_enum=EventType.OFFSEASON
             ),
@@ -147,6 +171,7 @@ class TestEventGroupByWeek(unittest2.TestCase):
                 event_short='offseason2',
                 start_date=datetime.datetime(2013, 8, 18),
                 end_date=datetime.datetime(2013, 8, 20),
+                year=2013,
                 official=False,
                 event_type_enum=EventType.OFFSEASON
             ),
@@ -155,6 +180,7 @@ class TestEventGroupByWeek(unittest2.TestCase):
                 event_short='offseason3',
                 start_date=datetime.datetime(2013, 12, 30),
                 end_date=datetime.datetime(2013, 12, 31),
+                year=2013,
                 official=False,
                 event_type_enum=EventType.OFFSEASON
             ),
@@ -163,6 +189,7 @@ class TestEventGroupByWeek(unittest2.TestCase):
                 event_short='offseason4',
                 start_date=datetime.datetime(2013, 11, 13),
                 end_date=datetime.datetime(2013, 11, 14),
+                year=2013,
                 official=False,
                 event_type_enum=EventType.REGIONAL
             )
@@ -173,6 +200,7 @@ class TestEventGroupByWeek(unittest2.TestCase):
         for week_events in events_by_week.values():
             events.extend(week_events)
         state.shuffle(events)
+        ndb.put_multi(events)
 
         # Begin testing
         events.sort(key=EventHelper.distantFutureIfNoStartDate)

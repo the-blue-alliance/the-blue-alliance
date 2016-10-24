@@ -6,9 +6,13 @@ from notifications.base_notification import BaseNotification
 
 class CompLevelStartingNotification(BaseNotification):
 
+    _priority = 'high'
+
     def __init__(self, match, event):
         self.match = match
         self.event = event
+        self._event_feed = event.key_name
+        self._district_feed = event.event_district_abbrev
 
     @property
     def _type(self):

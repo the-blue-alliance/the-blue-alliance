@@ -25,6 +25,8 @@ class Insight(ndb.Model):
     DIVISION_FINALISTS = 13
     REGIONAL_DISTRICT_WINNERS = 14
     SUCCESSFUL_ELIM_TEAMUPS = 15
+    YEAR_SPECIFIC_BY_WEEK = 999
+    YEAR_SPECIFIC = 1000
 
     # Used for datastore keys! Don't change unless you know what you're doing.
     INSIGHT_NAMES = {MATCH_HIGHSCORE: 'match_highscore',
@@ -43,6 +45,8 @@ class Insight(ndb.Model):
                      DIVISION_FINALISTS: 'division_finalists',
                      REGIONAL_DISTRICT_WINNERS: 'regional_district_winners',
                      SUCCESSFUL_ELIM_TEAMUPS: 'successful_elim_teamups',
+                     YEAR_SPECIFIC_BY_WEEK: 'year_specific_by_week',
+                     YEAR_SPECIFIC: 'year_specific',
                      }
 
     name = ndb.StringProperty(required=True)  # general name used for sorting

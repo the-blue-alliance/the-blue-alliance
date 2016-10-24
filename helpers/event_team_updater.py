@@ -19,7 +19,8 @@ class EventTeamUpdater(object):
         a) played a match at the event,
         b) the team received an award at the event,
         c) the event has not yet occurred,
-        d) or the event is not from the current year. (This is to make sure we don't delete old data we may no longer be able to scrape)
+        d) the team is on an alliance
+        e) or the event is not from the current year. (This is to make sure we don't delete old data we may no longer be able to scrape)
         """
         event = Event.get_by_id(event_key)
         cur_year = datetime.datetime.now().year
@@ -42,10 +43,14 @@ class EventTeamUpdater(object):
             for team_key in award.team_list:
                 team_ids.add(team_key.id())
 
+        # Add teams from Alliances
+        for team in event.alliance_teams:
+            team_ids.add(team)
+
         # Create or update EventTeams
         teams = [Team(id=team_id,
                       team_number=int(team_id[3:]))
-                      for team_id in team_ids]
+                      for team_id in team_ids if team_id[3:].isdigit()]
 
         if teams:
             event_teams = [EventTeam(id=event_key + "_" + team.key.id(),
@@ -67,7 +72,7 @@ class EventTeamUpdater(object):
 
         et_keys_to_delete = set()
         if event.year == cur_year and event.end_date is not None and event.end_date < datetime.datetime.now():
-            for team_id in existing_team_ids.difference(team_ids):
+            for team_id in existing_team_ids.difference([team.key.id() for team in teams]):
                 et_key_name = "{}_{}".format(event.key_name, team_id)
                 et_keys_to_delete.add(ndb.Key(EventTeam, et_key_name))
 

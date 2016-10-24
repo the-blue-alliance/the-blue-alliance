@@ -15,7 +15,7 @@ class Sitevar(ndb.Model):
     manually edited by site administrators in the admin console.
     """
     description = ndb.StringProperty(indexed=False)
-    values_json = ndb.StringProperty(indexed=False)  # a json blob
+    values_json = ndb.StringProperty(indexed=False, default="{}")  # a json blob
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
@@ -29,11 +29,11 @@ class Sitevar(ndb.Model):
         """
         Lazy load values_json
         """
-        if self._contents is None:
+        if self._contents is None and self.values_json is not None:
             self._contents = json.loads(self.values_json)
         return self._contents
 
     @contents.setter
     def contents(self, contents):
         self._contents = contents
-        self.values_json = json.puts(self._contents)
+        self.values_json = json.dumps(self._contents)

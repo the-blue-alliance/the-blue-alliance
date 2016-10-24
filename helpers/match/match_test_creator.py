@@ -1,3 +1,4 @@
+import datetime
 import json
 import random
 
@@ -56,12 +57,13 @@ class MatchTestCreator(object):
             alliances_json=json.dumps(alliances),
             comp_level=comp_level,
             event=self.event.key,
-            game="frc_2012_rebr",
+            year=datetime.datetime.now().year,
             set_number=set_number,
             match_number=match_number,
             team_key_names=[team.key_name for team in teams],
             youtube_videos=youtube_videos,
             tba_videos=tba_videos,
+            time=datetime.datetime.now() + datetime.timedelta(hours=2) + datetime.timedelta(minutes=6) * match_number
         )
 
     def createCompleteQuals(self):

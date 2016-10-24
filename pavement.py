@@ -3,13 +3,39 @@
 import subprocess
 import json
 import time
+import optparse
 from paver.easy import *
 
 path = path("./")
 
+
 @task
-def deploy():
-  sh("python deploy.py")
+@cmdopts([
+    optparse.make_option("-p", "--project", help="App Engine project to deploy", default="tbatv-prod-hrd"),
+    optparse.make_option("--yolo", action="store_true", help="Do not wait for the travis build to succeed #yolo", default=False),
+    optparse.make_option("--config", help="gcloud SDK configuration profile to use", default=""),
+    optparse.make_option("--version", help="App engine version to deploy", default=""),
+    optparse.make_option("--modules", help="Comma separated names of module yaml files to deploy", default=""),
+    optparse.make_option("--skip-cron", action="store_true", help="Do not deploy cron.yaml", default=False),
+    optparse.make_option("--app-cfg-dir", help="Place to find appcfg.py [deprecated]", default=""),
+])
+def deploy(options):
+    args = ["python", "deploy.py", "--project", options.deploy.project]
+    if options.deploy.yolo:
+        args.append("--yolo")
+    if options.deploy.config:
+        args.extend(["--config", options.deploy.config])
+    if options.deploy.version:
+        args.extend(["--version", options.deploy.version])
+    if options.deploy.modules:
+        args.extend(["--modules", options.deploy.modules])
+    if options.skip_cron:
+        args.append("--skip-cron")
+    if options.app_cfg_dir:
+        args.extend(["--app-cfg-dir", options.app_cfg_dir])
+    print "Running {}".format(subprocess.list2cmdline(args))
+    subprocess.call(args)
+
 
 @task
 def javascript():
@@ -19,83 +45,101 @@ def javascript():
 
 
 @task
+def gulp():
+    """Update all npm dependencies and run 'gulp build' task"""
+    print("Running 'gulp build'")
+    sh("npm update && gulp build --production")
+
+
+@task
+def install_libs():
+    sh("pip install -r deploy_requirements.txt -t lib")
+
+
+@task
+def jinja2():
+    sh("python compile_jinja2_templates.py")
+
+
+@task
 def less():
-  """Build and Combine CSS"""
-  print("Building and Combining CSS")
-  sh("lessc static/css/less_css/tba_style.main.less static/css/less_css/tba_style.main.css")
-  sh("lessc static/css/less_css/tba_style.gameday.less static/css/less_css/tba_style.gameday.css")
-  sh("python do_compress.py css")
+    """Build and Combine CSS"""
+    print("Building and Combining CSS")
+    sh("lessc static/css/less_css/tba_style.main.less static/css/less_css/tba_style.main.css")
+    sh("lessc static/css/less_css/tba_style.gameday.less static/css/less_css/tba_style.gameday.css")
+    sh("python do_compress.py css")
 
 
 @task
 def lint():
-  sh("python linter.py")
+    sh("python linter.py")
 
 
 @task
 def make():
-  javascript()
-  less()
+    javascript()
+    gulp()
+    less()
+    jinja2()
 
-  git_branch_name = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
-  git_last_commit = subprocess.check_output(["git", "log", "-1"])
-  build_time = time.ctime()
-  data = {'git_branch_name': git_branch_name,
-          'git_last_commit': git_last_commit,
-          'build_time': build_time}
-  with open('version_info.json', 'w') as f:
-      f.write(json.dumps(data))
+    git_branch_name = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
+    git_last_commit = subprocess.check_output(["git", "log", "-1"])
+    build_time = time.ctime()
+    data = {"git_branch_name": git_branch_name,
+            "git_last_commit": git_last_commit,
+            "build_time": build_time}
+    with open("version_info.json", "w") as f:
+        f.write(json.dumps(data))
 
 
 @task
 def preflight():
-  """Prep a prod push"""
-  test_function([])
-  make()
+    """Prep a prod push"""
+    install_libs()
+    test_function([])
+    make()
 
 
 @task
 def setup():
-  """Set up for development environments."""
-  setup_function()
+    """Set up for development environments."""
+    setup_function()
 
 
 @task
 @consume_args
 def test(args):
-  """Run tests. Accepts an argument to match subnames of tests"""
-  test_function(args)
+    """Run tests. Accepts an argument to match subnames of tests"""
+    test_function(args)
 
 
 @task
 def test_fast():
-  """Run tests that don't require HTTP"""
-  print("Running Fast Tests")
-  sh("python run_tests.py --test_pattern=test_math_*.py")
-  sh("python run_tests.py --test_pattern=test_*parser*.py")
-  sh("python run_tests.py --test_pattern=test_*manipulator.py")
-  sh("python run_tests.py --test_pattern=test_*api.py")
-  sh("python run_tests.py --test_pattern=test_event.py")
-  sh("python run_tests.py --test_pattern=test_match_cleanup.py")
-  sh("python run_tests.py --test_pattern=test_event_group_by_week.py")
-  sh("python run_tests.py --test_pattern=test_event_team_repairer.py")
-  sh("python run_tests.py --test_pattern=test_event_team_updater.py")
-  sh("python run_tests.py --test_pattern=test_event_get_short_name.py")
+    """Run tests that don't require HTTP"""
+    print("Running Fast Tests")
+    sh("python run_tests.py --test_pattern=test_math_*.py")
+    sh("python run_tests.py --test_pattern=test_*helper*.py")
+    sh("python run_tests.py --test_pattern=test_*parser*.py")
+    sh("python run_tests.py --test_pattern=test_*manipulator.py")
+    sh("python run_tests.py --test_pattern=test_*api.py")
+    sh("python run_tests.py --test_pattern=test_event.py")
+    sh("python run_tests.py --test_pattern=test_match_cleanup.py")
+    sh("python run_tests.py --test_pattern=test_event_group_by_week.py")
+    sh("python run_tests.py --test_pattern=test_event_team_repairer.py")
+    sh("python run_tests.py --test_pattern=test_event_team_updater.py")
+    sh("python run_tests.py --test_pattern=test_event_get_short_name.py")
 
 
 def setup_function():
-  make()
-
-  print("Set up test data at http://localhost:8088/admin/")
-  print("1/ Click 'Get Teams' and 'Create Test Events'")
-  print("2/ Click 'Create Test Events'")
+    install_libs()
+    make()
 
 
 def test_function(args):
-  print("Running Tests")
+    print("Running Tests")
 
-  test_pattern = ""
-  if len(args) > 0:
-    test_pattern = " --test_pattern=*%s*" % args[0]
+    test_pattern = ""
+    if len(args) > 0:
+        test_pattern = " --test_pattern=*%s*" % args[0]
 
-  sh("python run_tests.py%s 2> test_failures.temp" % test_pattern)
+    sh("python run_tests.py%s 2> test_failures.temp" % test_pattern)

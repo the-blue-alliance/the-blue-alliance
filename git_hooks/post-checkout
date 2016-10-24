@@ -1,4 +1,3 @@
 #! /bin/sh
 
-paver less
-paver javascript
+paver make

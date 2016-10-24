@@ -153,7 +153,7 @@ function buildNotificationCard(data){
             card.addClass('panel-material-red');
             eventKey = payload['message_data']['event_key'];
 
-            body.append($('<strong>', {text: 'Alliance Selection Results: TODO'}));
+            body.append($('<strong>', {text: 'Alliance Selection Results Posted'}));
             break;
         case 'awards_posted':
             card.addClass('panel-material-green');

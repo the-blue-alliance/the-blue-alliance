@@ -19,6 +19,8 @@ from models.insight import Insight
 from models.team import Team
 from models.sitevar import Sitevar
 
+from template_engine import jinja2_engine
+
 
 def render_static(page):
     memcache_key = "main_%s" % page
@@ -33,6 +35,38 @@ def render_static(page):
     return html
 
 
+def handle_404(request, response, exception):
+    response.write(render_static("404"))
+    response.set_status(404)
+
+
+def handle_500(request, response, exception):
+    logging.exception(exception)
+    response.write(render_static("500"))
+    response.set_status(500)
+
+
+class TwoChampsHandler(CacheableHandler):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "two_champs_{}_{}"
+
+    def __init__(self, *args, **kw):
+        super(TwoChampsHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24
+        self._team_key_a = self.request.get('team_a', None)
+        self._team_key_b = self.request.get('team_b', None)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self._team_key_a, self._team_key_b)
+
+    def _render(self, *args, **kw):
+        team_a = Team.get_by_id(self._team_key_a) if self._team_key_a else None
+        team_b = Team.get_by_id(self._team_key_b) if self._team_key_b else None
+        self.template_values.update({
+            'team_a': team_a,
+            'team_b': team_b,
+        })
+        return jinja2_engine.render('2champs.html', self.template_values)
+
+
 class MainKickoffHandler(CacheableHandler):
     CACHE_VERSION = 3
     CACHE_KEY_FORMAT = "main_kickoff"
@@ -42,7 +76,7 @@ class MainKickoffHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24
 
     def _render(self, *args, **kw):
-        kickoff_datetime_est = datetime.datetime(2015, 1, 3, 10, 30)
+        kickoff_datetime_est = datetime.datetime(2016, 1, 9, 10, 30)
         kickoff_datetime_utc = kickoff_datetime_est + datetime.timedelta(hours=5)
 
         is_kickoff = datetime.datetime.now() >= kickoff_datetime_est - datetime.timedelta(days=1)  # turn on 1 day before
@@ -66,12 +100,14 @@ class MainBuildseasonHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24 * 7
 
     def _render(self, *args, **kw):
-        endbuild_datetime_est = datetime.datetime(2015, 2, 17, 23, 59)
+        endbuild_datetime_est = datetime.datetime(2016, 2, 23, 23, 59)
         endbuild_datetime_utc = endbuild_datetime_est + datetime.timedelta(hours=5)
+        week_events = EventHelper.getWeekEvents()
 
         self.template_values.update({
             'endbuild_datetime_est': endbuild_datetime_est,
-            'endbuild_datetime_utc': endbuild_datetime_utc
+            'endbuild_datetime_utc': endbuild_datetime_utc,
+            'events': week_events,
         })
 
         path = os.path.join(os.path.dirname(__file__), "../templates/index_buildseason.html")
@@ -134,11 +170,13 @@ class MainInsightsHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         week_events = EventHelper.getWeekEvents()
+        year = datetime.datetime.now().year
         self.template_values.update({
             "events": week_events,
+            "year": year,
         })
 
-        insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(2014, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
+        insights = ndb.get_multi([ndb.Key(Insight, Insight.renderKeyName(year, insight_name)) for insight_name in Insight.INSIGHT_NAMES.values()])
         for insight in insights:
             if insight:
                 self.template_values[insight.name] = insight
@@ -230,6 +268,19 @@ class OprHandler(CacheableHandler):
         return template.render(path, self.template_values)
 
 
+class PredictionsHandler(CacheableHandler):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "main_predictions"
+
+    def __init__(self, *args, **kw):
+        super(PredictionsHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+
+    def _render(self, *args, **kw):
+        path = os.path.join(os.path.dirname(__file__), "../templates/predictions.html")
+        return template.render(path, self.template_values)
+
+
 class SearchHandler(webapp2.RequestHandler):
     def get(self):
         try:
@@ -268,19 +319,21 @@ class GamedayHandler(CacheableHandler):
         if special_webcasts_temp:
             special_webcasts_temp = special_webcasts_temp.contents
         else:
-            special_webcasts_temp = {}
+            special_webcasts_temp = []
         special_webcasts = []
-        for webcast in special_webcasts_temp.values():
+        special_webcast_keys = set()
+        for webcast in special_webcasts_temp:
             toAppend = {}
             for key, value in webcast.items():
                 toAppend[str(key)] = str(value)
             special_webcasts.append(toAppend)
+            special_webcast_keys.add(webcast['key_name'])
 
         ongoing_events = []
         ongoing_events_w_webcasts = []
         week_events = EventHelper.getWeekEvents()
         for event in week_events:
-            if event.now:
+            if event.now and event.key.id() not in special_webcast_keys:
                 ongoing_events.append(event)
                 if event.webcast:
                     valid = []
@@ -304,18 +357,6 @@ class GamedayHandler(CacheableHandler):
 
         path = os.path.join(os.path.dirname(__file__), '../templates/gameday.html')
         return template.render(path, self.template_values)
-
-
-class PageNotFoundHandler(webapp2.RequestHandler):
-    def get(self, *args):
-        self.error(404)
-        self.response.out.write(render_static("404"))
-
-
-class InternalServerErrorHandler(webapp2.RequestHandler):
-    def get(self, *args):
-        self.error(500)
-        self.response.out.write(render_static("500"))
 
 
 class WebcastsHandler(CacheableHandler):
@@ -376,6 +417,19 @@ class ApiWriteHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/apiwrite.html")
+        return template.render(path, self.template_values)
+
+
+class MatchInputHandler(CacheableHandler):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "match_input"
+
+    def __init__(self, *args, **kw):
+        super(MatchInputHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60
+
+    def _render(self, *args, **kw):
+        path = os.path.join(os.path.dirname(__file__), "../templates/matchinput.html")
         return template.render(path, self.template_values)
 
 

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}{% if explicit_year %}{{selected_year}} {% endif %}FIRST Robotics Events - The Blue Alliance{% endblock %}
+
+{% block meta_description %}Information, match results, and videos for FIRST Robotics Competition events{% if explicit_year %} from {{selected_year}}{% endif %}.{% endblock %}
+
+{% block more_head_tags %}
+  <meta property="og:title" content="{{selected_year}} FRC Event List" />
+  <meta property="og:image" content="http://www.thebluealliance.com/images/logo_square_200.png" />
+  <meta property="og:description" content="Event list for the {{selected_year}} FIRST Robotics Competition."/>
+  <meta property="og:site_name" content="The Blue Alliance" />
+{% endblock %}
+
+{% block events_active %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-3 col-lg-2">
+      <div class="tba-sidenav-affixed">
+        <div class="btn-group">
+          <a class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" href="#">
+            {{selected_year}}
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu tba-dropdown-menu-limited">
+            {% for year in valid_years %}
+              <li><a href="/events/{{year}}">{{year}}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <h1 class="visible-xs end_header">{% if explicit_year %}{{selected_year}} {% endif %}<em>FIRST</em> Robotics Competition Events {% if events|length > 0 %}<small>{{ events|length }} Events</small>{% endif %}</h1>
+
+        {% if districts %}
+        <div class="btn-group">
+          <a class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" href="#">
+            All Events
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu tba-dropdown-menu-limited">
+            {% for district in districts %}
+              <li><a href="/events/{{district.0}}{% if explicit_year %}/{{selected_year}}{% endif %}">{{district.1}}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        <div class="tba-sidebar">
+          <ul class="nav tba-sidenav">
+          {% for label, events in week_events.items() %}
+            <li><a class="smooth-scroll" href="#{{label|slugify}}">{{label}}</a></li>
+          {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-9 col-lg-10">
+      <h1 class="hidden-xs end_header">{% if explicit_year %}{{selected_year}} {% endif %}<em>FIRST</em> Robotics Competition Events {% if events|length > 0 %}<small>{{ events|length }} Events</small>{% endif %}</h1>
+      {% for label, events in week_events.items() %}
+        <h2 id="{{label|slugify}}">{{ label }} <small>{{events|length}} Events</small></h2>
+        {% include "event_partials/event_table.html" %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% import 'match_partials/match_table_macros.html' as mtm %}
+
+{% block title %}Advanced Insights - {{event.name}} ({{event.year}}) - The Blue Alliance{% endblock %}
+
+{% block meta_description %}Advanced insights for the {{event.year}} {{event.name}} FIRST Robotics Competition.{% endblock %}
+
+{% block more_head_tags %}
+  <meta property="og:title" content="Advanced Insights: {{event.year}} {{event.name}}" />
+  <meta property="og:url" content="http://www.thebluealliance.com/event/{{event.key_name}}/insights" />
+  <meta property="og:image" content="http://www.thebluealliance.com/images/logo_square_200.png" />
+  <meta property="og:description" content="Advanced insights for the {{event.year}} {{event.name}} FIRST Robotics Competition."/>
+  <meta property="og:site_name" content="The Blue Alliance" />
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12">
+      <p><a class="btn btn-default" href="/event/{{event.key.id()}}"><span class="glyphicon glyphicon-chevron-left"></span> Back to main event page</a></p>
+      <h1>{{event.name}} {{event.year}}</h1>
+      <h2>Advanced Insights</h2>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#match-predictions" data-toggle="tab">Qual Match Predictions</a></li>
+        <li><a href="#ranking-predictions" data-toggle="tab">Ranking Predictions</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tab-content">
+    <div class="tab-pane active" id="match-predictions">
+      {% if match_predictions %}
+      <div class="row">
+        {% if matches.qm %}
+        <div class="col-xs-12">
+          <h3>Qualification Match Predictions (<a href="/predictions">?</a>)</h3>
+          <p>Remember, ranking predictions are JUST FOR FUN! Please do not be discouraged by our predictions -- they are almost certainly wrong.</p>
+          {% if fake_matches %}
+          <p>Note: Match teams are not shown because <em>FIRST</em> does not allow the re-hosting of the preliminary match schedule. Sorry for the inconvenience.</p>
+          {% endif %}
+          {% if match_prediction_stats.wl_accuracy %}<p><strong>Win/Loss prediction accuracy:</strong> {{match_prediction_stats.wl_accuracy|round|int}}%</p>{% endif %}
+          {% if match_prediction_stats.wl_accuracy_75 %}<p><strong>Win/Loss prediction accuracy (>75% confidence):</strong> {{match_prediction_stats.wl_accuracy_75|round|int}}%</p>{% endif %}
+          {% if match_prediction_stats.err_mean %}<p><strong>Match score prediction average error:</strong> {{match_prediction_stats.err_mean|round(1)}}</p>{% endif %}
+          {{mtm.qual_match_prediction_table(matches, match_predictions, fake_matches)}}
+        </div>
+        {% endif %}
+      </div>
+      {% else %}
+      <div class="row">
+        <div class="col-xs-12">
+          <p>No match predictions available. Check back later!</p>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="tab-pane" id="ranking-predictions">
+      {% if ranking_predictions %}
+      <div class="row">
+        <div class="col-xs-12">
+          <h3>Ranking Predictions (<a href="/predictions">?</a>)</h3>
+          <p>Remember, ranking predictions are JUST FOR FUN! Please do not be discouraged by our predictions -- they are almost certainly wrong.</p>
+          <p>Predictions will update throughout the event.</p>
+
+          <div class="col-md-8 col-md-offset-2">
+            {% if last_played_match_num %}
+              <h4>Predicted rankings as of qualification match #{{last_played_match_num}}</h4>
+            {% else %}
+              <h4>Predicted rankings with no matches played.</h4>
+            {% endif %}
+
+            <table class="table table-striped table-condensed table-center tablesorter" id="rankingsTable">
+              <thead>
+                <tr>
+                  <th>Predicted Rank</th>
+                  <th>Team</th>
+                  <th>Average Rank</th>
+                  <th>Highest Rank</th>
+                  <th>Median Rank</th>
+                  <th>Lowest Rank</th>
+                  <th>Average RP</th>
+                  <th>Highest RP</th>
+                  <th>Lowest RP</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for team_key, (avg_rank, min_rank, median_rank, max_rank, avg_rp, min_rp, max_rp) in ranking_predictions %}
+                <tr>
+                  <td>{{loop.index}}</td>
+                  <td><a href="/team/{{team_key|strip_frc}}/{{event.year}}">{{team_key|strip_frc}}</a></td>
+                  <td>{{avg_rank|round(1)}}</td>
+                  <td>{{min_rank|int}}</td>
+                  <td>{{median_rank|int}}</td>
+                  <td>{{max_rank|int}}</td>
+                  <td>{{avg_rp|round(1)}}</td>
+                  <td>{{max_rp}}</td>
+                  <td>{{min_rp}}</td>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="row">
+        <div class="col-xs-12">
+          <p>No ranking predictions available. Check back later!</p>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

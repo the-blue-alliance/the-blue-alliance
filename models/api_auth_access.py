@@ -17,8 +17,24 @@ class ApiAuthAccess(ndb.Model):
     auth_types_enum = ndb.IntegerProperty(repeated=True)
 
     @property
-    def can_edit_event_data(self):
-        return AuthType.EVENT_DATA in self.auth_types_enum
+    def can_edit_event_teams(self):
+        return AuthType.EVENT_TEAMS in self.auth_types_enum
+
+    @property
+    def can_edit_event_matches(self):
+        return AuthType.EVENT_MATCHES in self.auth_types_enum
+
+    @property
+    def can_edit_event_rankings(self):
+        return AuthType.EVENT_RANKINGS in self.auth_types_enum
+
+    @property
+    def can_edit_event_alliances(self):
+        return AuthType.EVENT_ALLIANCES in self.auth_types_enum
+
+    @property
+    def can_edit_event_awards(self):
+        return AuthType.EVENT_AWARDS in self.auth_types_enum
 
     @property
     def can_edit_match_video(self):

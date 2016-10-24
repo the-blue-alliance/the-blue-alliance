@@ -1,0 +1,30 @@
+skip_files:
+# file types
+- ^(.*/)?.*\.jar.*
+- ^(.*/)?.*\.less.*
+- ^(.*/)?.*\.pyc.*
+- ^(.*/)?.*\.temp.*
+- ^(.*/)?.*/node_modules/.*$
+
+# directories
+- .git/*
+- git_hooks/*
+- static/css/less_css/*
+- static/css/precompiled_css/*
+- static/javascript/tba_js/*
+- subtrees/*
+- test_data/*
+- tests/*
+- utils/*
+- react/*
+- node_modules/*
+
+# specific files
+- .gitignore
+- deploy.py
+- do_compress.py
+- linter.py
+- pavement.py
+- deploy_requirements.txt
+- travis_requirements.txt
+- run_tests.py

@@ -3,6 +3,7 @@ import logging
 
 from google.appengine.ext.webapp import template
 
+from controllers.api.api_status_controller import ApiStatusController
 from controllers.base_controller import LoggedInHandler
 from models.sitevar import Sitevar
 
@@ -63,5 +64,10 @@ class AdminSitevarEdit(LoggedInHandler):
             values_json=self.request.get("values_json"),
         )
         sitevar.put()
+
+        # If we're changing an apistatus sitevar, clear the API response cache
+        # Since this will be used rarely, always clear the cache on update
+        if 'apistatus' in self.request.get("key"):
+            ApiStatusController.clear_cache_if_needed(False, True)
 
         self.redirect("/admin/sitevar/edit/" + sitevar.key.id() + "?success=true")

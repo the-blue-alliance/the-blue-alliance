@@ -1,3 +1,4 @@
+import calendar
 import unittest2
 import json
 
@@ -17,6 +18,8 @@ class TestMatchScoreNotification(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.testbed.init_taskqueue_stub(root_path=".")
 
         for team_number in range(7):
@@ -37,7 +40,7 @@ class TestMatchScoreNotification(unittest2.TestCase):
         expected['message_data']['event_name'] = self.event.name
         expected['message_data']['event_key'] = self.event.key_name
         expected['message_data']['comp_level'] = self.match.comp_level
-        expected['message_data']['scheduled_time'] = self.match.time
+        expected['message_data']['scheduled_time'] = calendar.timegm(self.match.time.utctimetuple())
 
         data = self.notification._build_dict()
 

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}The Blue Alliance - Predictions{% endblock %}
+
+{% block meta_description %}How do predictions work?{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-xs-8 col-sm-offset-2 col-lg-offset-2">
+      <h1 class="end_header">How do predictions work?</h1>
+      <p>The Blue Alliances utilizes statistical analysis to try to predict
+      event results.</p>
+      <p>Predictions are just for fun! Don't like our predictions? Go out there
+      and prove us wrong!</p>
+
+      <h2>Match Predictions</h2>
+      <p>Match result predictions use ixOPR, a slight variant of
+      <a href="/opr">OPR</a>, to attempt to extrapolate the final match score
+      based on a team's estimated point contribution to an alliance.</p>
+
+      <h2>Event Ranking Predictions</h2>
+      <p>Rankings are predicted using the <a href="https://en.wikipedia.org/wiki/Monte_Carlo_method" target="_blank">Monte Carlo</a>
+      method, where matches are simulated many times and the rankings are computed
+      for each simulation. Due to the discrete nature of the method, some scenarios
+      may never be simulated even though they may be possible.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

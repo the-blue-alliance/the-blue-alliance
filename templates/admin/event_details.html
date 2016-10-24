@@ -10,7 +10,8 @@
     <a href="/admin/event/edit/{{event.key_name}}" class="btn btn-primary"><span class="glyphicon glyphicon-edit"></span> Edit</a>
     <a href="/event/{{event.key_name}}" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> View on TBA</a>
     <a href="/tasks/math/do/eventteam_update/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-user"></span> Rebuild EventTeams</a>
-    <a href="/tasks/get/usfirst_event_details/{{event.year}}/{{event.first_eid}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Refresh from FIRST</a>
+    <a href="/backend-tasks/get/event_details/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Refresh from FIRST</a>
+    <a href="/backend-tasks/do/post_event_tasks/{{event.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-play"></span> Run Post-Event Tasks</a>
 </div>
 <br />
 
@@ -56,8 +57,16 @@
         <td><a href="http://maps.google.com/maps?q={{ event.venue_address|urlencode }}">{{ event.venue_address|linebreaksbr }}</a></td>
     </tr>
     <tr>
-        <td>Event Location</td>
-        <td><a href="http://maps.google.com/maps?q={{ event.location|urlencode }}">{{ event.location }}</a></td>
+        <td>Event City</td>
+        <td>{{ event.city }}</td>
+    </tr>
+    <tr>
+        <td>Event State/Prov</td>
+        <td>{{ event.state_prov }}</td>
+    </tr>
+    <tr>
+        <td>Event Country</td>
+        <td>{{ event.country }}</td>
     </tr>
     <tr>
         <td>Event Timezone</td>
@@ -92,6 +101,14 @@
         <td>{{ event.created }} - {{ event.updated }}</td>
     </tr>
 </table>
+<h2>Remap Teams</h2>
+<p>Change all matches, awards and alliance selections for one team to another</p>
+<p>Example:</p>
+<div class="well">{"9254": "254B", "9971": "971B"}</div>
+<form action="/admin/event/remap_teams/{{event.key_name}}" method="post">
+  <textarea class="form-control" name="remap_teams"></textarea><br>
+  <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-random"></span> Remap Teams</button>
+</form>
 
 <h2>Add Teams</h2>
 <p>Add teams formatted as CSV.</p>
@@ -100,6 +117,15 @@
 <form action="/admin/event/add_teams/{{event.key_name}}" method="post">
   <textarea class="form-control" name="teams_csv"></textarea><br>
   <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Teams</button>
+</form>
+
+<h2>Remove Teams</h2>
+<p>Remove teams formatted as CSV.</p>
+<p>Example:</p>
+<div class="well">254, 1114, 100, 604, 148</div>
+<form action="/admin/event/delete_teams/{{event.key_name}}" method="post">
+  <textarea class="form-control" name="teams_csv"></textarea><br>
+  <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-delete"></span> Delete Teams</button>
 </form>
 
 <h2>Add Alliance Selections</h2>

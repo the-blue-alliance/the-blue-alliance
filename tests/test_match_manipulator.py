@@ -15,6 +15,8 @@ class TestMatchManipulator(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.event = Event(
@@ -32,7 +34,7 @@ class TestMatchManipulator(unittest2.TestCase):
             }),
             comp_level="qm",
             event=self.event.key,
-            game="frc_2012_rebr",
+            year=2012,
             set_number=1,
             match_number=1,
             team_key_names=[u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073'],
@@ -48,7 +50,7 @@ class TestMatchManipulator(unittest2.TestCase):
             }),
             comp_level="qm",
             event=self.event.key,
-            game="frc_2012_rebr",
+            year=2012,
             set_number=1,
             match_number=1,
             team_key_names=[u'frc69', u'frc571', u'frc176', u'frc3464', u'frc20', u'frc1073'],

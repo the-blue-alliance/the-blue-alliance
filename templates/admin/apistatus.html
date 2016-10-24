@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}APIv2 Status{% endblock %}
+
+{% block content %}
+
+<h1>APIv2 Status</h1>
+<p>Here you can edit the backed values that supply the Status API endpoint. This contains data about datafeeds that are down, as well as some configuration data for the mobile apps</p>
+
+<form method="post">
+<table class="table table-striped">
+<tr><td><p>Max Competition Season</p></td><td><input type="number" name="max_year" value="{{max_year}}" /></td></tr>
+<tr><td><p>Current Competition Season</p></td><td><input type="number" name="current_year" value="{{current_year}}" /></td></tr>
+<tr><td><p>Android Latest App Version Code</p></td><td><input type="number" name="android_latest_version" value="{{android_latest_version}}" /></td></tr>
+<tr><td><p>Android Min App Version Code</p></td><td><input type="number" name="android_min_version" value="{{android_min_version}}" /></td></tr>
+
+<tr><td><p>iOS Latest App Version Code</p></td><td><input type="number" name="ios_latest_version" value="{{ios_latest_version}}" /></td></tr>
+<tr><td><p>iOS Min App Version Code</p></td><td><input type="number" name="ios_min_version" value="{{ios_min_version}}" /></td></tr>
+
+</table>
+
+<button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-thumbs-up"></span> Update</button>
+
+</form>
+
+{% endblock %}

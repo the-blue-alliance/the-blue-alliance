@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% import 'match_partials/match_table_macros.html' as mtm %}
+{% import 'team_partials/blue_banner_macros.html' as bbm %}
+
+{% block title %}{% if team.nickname %}{{team.nickname}} - {% endif %}Team {{team.team_number}}{% if not is_canonical %} ({{year}}){% endif %} - The Blue Alliance{% endblock %}
+
+{% block meta_description %}{% if team.location %}From {{team.location}}{% endif %}. Team information, match results, and match videos from the{% if not is_canonical %} {{year}}{% endif %} FIRST Robotics Competition.{% endblock %}
+
+{% block more_head_tags %}
+{% include "team_partials/team_head_tags.html" %}
+{% endblock %}
+
+{% block content %}
+<button class="tba-fab tba-fab-team" data-team="{{team.key.id()}}">
+  <span class="glyphicon glyphicon-star favorite"></span>
+  <span class="glyphicon glyphicon-star-empty not-favorite"></span>
+</button>
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm-3 col-lg-2">
+      <div class="tba-sidenav-affixed">
+        {% set dropdown_label = '%d Season' % year %}
+        {% include "team_partials/team_year_dropdown.html" %}
+
+        <h2 class="visible-xs end_header">Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h2>
+        {% if team.motto %}<h4 class="visible-xs"><em>&quot;{{team.motto_without_quotes}}&quot;</em></h4>{% endif %}
+        {% if district_name %}<blockquote class="visible-xs"><em>Part of the <a href="/events/{{district_abbrev}}/{{year}}">{{district_name}} District</a></em></blockquote>{% endif %}
+
+        <div class="tba-sidebar">
+          <ul class="nav tba-sidenav">
+            <li><a class="smooth-scroll" href="#team-info">Team Info</a></li>
+            <li>
+              <a class="smooth-scroll" href="#event-results">Event Results</a>
+              <ul class="nav">
+                {% for comp in participation %}
+                  <li><a class="smooth-scroll" href="#{{ comp.event.key_name}}">{% if comp.event.short_name %}{{comp.event.short_name}}{% else %}{{comp.event.name}}{% endif %}</a></li>
+                {% endfor %}
+              </ul>
+            </li>
+            <li>
+              <a class="smooth-scroll" href="#media">Media</a>
+              <ul class="nav">
+                <li><a class="smooth-scroll" href="#photos">Photos</a></li>
+                <li><a class="smooth-scroll" href="#videos">Videos</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xs-12 col-sm-9 col-lg-10">
+      {% include "team_partials/team_info.html" %}
+
+      <div class="row">
+        <div class="col-xs-12">
+          <hr>
+          <h2 id="event-results">Event Results</h2>
+          {% if season_wlt %}
+            <p>Team #{{team.team_number}} was <strong>{{season_wlt.win}}-{{season_wlt.loss}}-{{season_wlt.tie}}</strong> in official play
+            {% if offseason_wlt %}and <strong>{{season_wlt.win+offseason_wlt.win}}-{{season_wlt.loss+offseason_wlt.loss}}-{{season_wlt.tie+offseason_wlt.tie}}</strong> overall
+            {% endif %} in {{year}}.</p>
+          {% elif offseason_wlt %}
+            <p>Team #{{team.team_number}} was <strong>{{offseason_wlt.win}}-{{offseason_wlt.loss}}-{{offseason_wlt.tie}}</strong> during the {{year}} offseason.</p>
+          {% else %}
+            {% if year_qual_avg or year_elim_avg %}
+              <p>Overall, team {{team.team_number}} had
+              {% if year_qual_avg %}an average qual score of <strong>{{year_qual_avg|floatformat(2)}}</strong>{% endif %}
+              {% if year_qual_avg and year_elim_avg %}
+                and
+              {% endif %}
+              {% if year_elim_avg %}an average playoff score of <strong>{{year_elim_avg|floatformat(2)}}</strong>{% endif %}
+              in {{year}}.</p>
+            {% endif %}
+          {% endif %}
+
+          <div class="text-center">
+            {% for comp in participation %}
+              {% if comp.event.is_season_event and comp.awards %}
+                {% for award in comp.awards %}
+                  {% if award.is_blue_banner %}
+                    {% for team_number, _ in award.recipient_dict.items() %}
+                      {% if team_number|string == team.team_number|string %}
+                        {{bbm.blue_banner(award, comp.event)}}
+                      {% endif %}
+                    {% endfor %}
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+          </div>
+
+          {% for comp in participation %}
+            <div class="row" id="{{ comp.event.key_name }}">
+              <div class="col-sm-4">
+                <h3><a href="/event/{{ comp.event.key_name }}">{{ comp.event.name }}</a></h3>
+                <p>
+                  {% if comp.event.location %}<span class="glyphicon glyphicon-map-marker"></span> in <a href="http://maps.google.com/maps?q={{ comp.event.location }}" target="_blank">{{ comp.event.location }}</a><br />{% endif %}
+                  {% if comp.event.start_date %}<span class="glyphicon glyphicon-calendar"></span> {{ comp.event.start_date|strftime("%B %d") }}{% if comp.event.start_date != comp.event.end_date %} - {{ comp.event.end_date|strftime("%B %d") }}{% endif %}, {{ comp.event.end_date|strftime("%Y") }}{% endif %}
+                </p>
+
+                {% if comp.wlt or comp.rank or comp.awards or comp.qual_avg or comp.elim_avg %}
+                <p>Team {{ team.team_number }}
+                  {% if comp.rank %}was <strong>Rank {{ comp.rank }}</strong>{% endif %}
+                  {% if comp.wlt %}
+                    {% if comp.rank %}with a record of{% else %}had a record of{% endif %}
+                    <strong>{{comp.wlt.win}}-{{comp.wlt.loss}}-{{comp.wlt.tie}}</strong>
+                  {% else %}
+                    {% if comp.qual_avg or comp.elim_avg %}
+                      {% if comp.rank %}with{% else %}had{% endif %}
+                      {% if comp.qual_avg %}
+                        an average qual score of <strong>{{comp.qual_avg|floatformat(2)}}</strong>
+                      {% endif %}
+                      {% if comp.qual_avg and comp.elim_avg %}and{% endif %}
+                      {% if comp.elim_avg %}
+                        an average playoff score of <strong>{{comp.elim_avg|floatformat(2)}}</strong>
+                      {% endif %}
+                    {% endif %}
+                  {% endif %}
+
+                  {% if comp.awards %}
+                  {% if comp.rank or comp.wlt %}and{% endif %} won the following awards:
+                  <ul>
+                  {% for award in comp.awards %}
+                  {% for team_number, awardees in award.recipient_dict.items() %}
+                  {% if team_number|string == team.team_number|string %}
+                    {% for awardee in awardees %}
+                    <li>{{ award.name_str }}{% if awardee %} ({{ awardee }}){% endif %}</li>
+                    {% endfor %}
+                  {% endif %}
+                  {% endfor %}
+                  {% endfor %}
+                  </ul>
+                  {% endif %}
+                </p>
+                {% endif %}
+              </div>
+              <div class="col-sm-8" style="margin-top: 1em">
+                {% if comp.matches.num %}
+                  {{mtm.full_match_table(comp.matches, cur_team_key=team.key.id())}}
+                {% else %}
+                  {% if comp.event.past %}
+                    <p class="muted">No matches played.</p>
+                  {% else %}
+                    <p class="muted">No matches yet. Check back after {{ comp.event.start_date|strftime("%B %d, %Y") }}.</p>
+                  {% endif %}
+                {% endif %}
+              </div>
+            </div>
+            {% if not loop.last %}<hr>{% endif %}
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-xs-12">
+          <hr>
+          <a class="btn btn-success pull-right" href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add media!</a>
+          <h2 id="media">Media</h2>
+
+          <div class="row">
+            <div class="col-xs-12">
+              <h3 id="photos">Photos</h3>
+              {% if image_medias %}
+                {% for media in image_medias %}
+                  <div class="col-xs-6 col-sm-3">
+                    {% include "media_partials/media_display_partial.html" %}
+                  </div>
+                {% endfor %}
+              {% else %}
+                <p>No photos for team {{team.team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank">Why not add one</a>?</p>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-xs-12">
+              <h3 id="videos">Videos</h3>
+              {% if medias_by_slugname.youtube %}
+                {% for media in medias_by_slugname.youtube %}
+                  <div class="col-xs-12 col-md-6 fitvids">
+                  {% include "media_partials/media_display_partial.html" %}
+                  </div>
+                {% endfor %}
+              {% else %}
+                <p>No videos for team {{team.team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank">Why not add one</a>?</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

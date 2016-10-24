@@ -5,8 +5,12 @@ from notifications.base_notification import BaseNotification
 
 class AllianceSelectionNotification(BaseNotification):
 
+    _priority = 'high'
+
     def __init__(self, event):
         self.event = event
+        self._event_feed = event.key_name
+        self._district_feed = event.event_district_abbrev
 
     @property
     def _type(self):
@@ -16,5 +20,7 @@ class AllianceSelectionNotification(BaseNotification):
         data = {}
         data['message_type'] = NotificationType.type_names[self._type]
         data['message_data'] = {}
+        data['message_data']['event_name'] = self.event.name
+        data['message_data']['event_key'] = self.event.key_name
         data['message_data']['event'] = ModelToDict.eventConverter(self.event)
         return data

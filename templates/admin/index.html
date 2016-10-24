@@ -51,6 +51,51 @@ $(function () {
             enabled: false
         },
     });
+
+    $('#graphdatabasequery').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false
+        },
+        title: {
+            text: 'Database Queries',
+            useHTML: true
+        },
+        tooltip: {
+            pointFormat: '<b>{point.y}</b>'
+        },
+        plotOptions: {
+            pie: {
+                dataLabels: {
+                    enabled: false
+                },
+                showInLegend: true
+            }
+        },
+        series: [{
+            type: 'pie',
+            name: 'Database Queries',
+            data: [
+                {
+                    name: 'Misses',
+                    y: {{databasequery_stats.misses}},
+                    color: '#8B0000'
+                },
+                {
+                    name: 'Hits',
+                    y: {{databasequery_stats.hits}},
+                    color: '#008000'
+                }
+            ]
+        }],
+        exporting: {
+            enabled: false
+        },
+        credits: {
+            enabled: false
+        },
+    });
 });
 </script>
 {% endblock %}
@@ -59,9 +104,9 @@ $(function () {
 
 <div class="row">
     <div class="col-xs-6">
-        <div class="panel panel-default">
+        <div class="panel {% if debug %}panel-default{% else %}panel-primary{% endif %}">
             <div class="panel-heading">
-                <h3 class="panel-title">Version Info</h3>
+                <h3 class="panel-title">{% if debug %}Development{% else %}Production{% endif %} Server Version Info</h3>
             </div>
             <div class="panel-body">
                 <p>Build time: {{build_time}}</p>
@@ -87,6 +132,8 @@ $(function () {
                 <div class="btn-group">
                     <a class="btn btn-default" href="/admin/team/create/test">Create Test Teams</a>
                     <a class="btn btn-default" href="/admin/event/create/test">Create Test Events</a>
+                    <a class="btn btn-default" href="/admin/suggestions/create/test">Create Test Suggestions</a>
+                    <a class="btn btn-default" href="/admin/user/create/test">Give Current User All Permissions</a>
                 </div>
                 <br /><br />
                 <form class="form-inline" action="/admin/memcache" method="post">
@@ -105,26 +152,10 @@ $(function () {
             </div>
             <div class="panel-body">
                 <div class="row">
-                    <ul class="nav nav-pills nav-stacked">
-                        <li>
-                            <a href="/admin/suggestions/match/video/review">
-                                <span class="badge pull-right">{{video_suggestions}}</span>
-                                Video Suggestions
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/admin/suggestions/event/webcast/review">
-                                <span class="badge pull-right">{{webcast_suggestions}}</span>
-                                Webcast Suggestions
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/admin/suggestions/media/review">
-                                <span class="badge pull-right">{{media_suggestions}}</span>
-                                Media Suggestions
-                            </a>
-                        </li>
-                    </ul>
+                    {% include "partials/pending_suggestion_rows_partial.html" %}
+                </div>
+                <div class="row">
+                    <div id="graphdatabasequery" style="width: 100%; height: 400px;"></div>
                 </div>
                 <div class="row">
                     <div id="graphmemcache" style="width: 100%; height: 400px;"></div>
@@ -156,7 +187,7 @@ $(function () {
     </div>
 </div>
 <div class="row">
-    
+
 </div>
 
 {% endblock %}

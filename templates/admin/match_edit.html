@@ -17,6 +17,10 @@
             <td><input class="form-control" type="text" name="disabled_event_key_name" value="{{match.event_key_name}}" disabled="disabled" /><input type="hidden" name="event_key_name" value="{{match.event_key_name}}" /></td>
         </tr>
         <tr>
+            <td>Event</td>
+            <td><input class="form-control" type="text" name="disabled_year" value="{{match.year}}" disabled="disabled" /><input type="hidden" name="year" value="{{match.year}}" /></td>
+        </tr>
+        <tr>
             <td>Comp Level</td>
             <td><input class="form-control" type="text" name="disabled_comp_level" value="{{match.comp_level}}" disabled="disabled" /><input type="hidden" name="comp_level" value="{{match.comp_level}}" /></td>
         </tr>
@@ -45,6 +49,9 @@
             <td><textarea class="form-control" type="text" name="alliances_json" rows="6" cols="60">{{match.alliances_json}}</textarea></td>
         </tr>
         <tr>
+            <td>TBA Videos</td>
+            <td><textarea class="form-control" type="text" name="tba_videos" rows="6" cols="60">[{% for video in match.tba_videos %}"{{video}}"{% if not forloop.last %},{% endif %}{% endfor %}]</textarea></td>
+        </tr>        <tr>
             <td>YouTube Videos</td>
             <td><textarea class="form-control" type="text" name="youtube_videos" rows="6" cols="60">[{% for video in match.youtube_videos %}"{{video}}"{% if not forloop.last %},{% endif %}{% endfor %}]</textarea></td>
         </tr>

@@ -1,3 +1,4 @@
+import logging
 import os
 import urllib2
 import json
@@ -5,6 +6,7 @@ import time
 
 from base_controller import CacheableHandler, LoggedInHandler
 from google.appengine.api import memcache
+from google.appengine.api import urlfetch
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 from helpers.model_to_dict import ModelToDict
@@ -63,9 +65,10 @@ class AccountFavoritesDeleteHandler(LoggedInHandler):
             return
 
         model_key = self.request.get("model_key")
+        model_type = int(self.request.get("model_type"))
         user_id = self.user_bundle.user.user_id()
 
-        MyTBAHelper.remove_favorite(user_id, model_key)
+        MyTBAHelper.remove_favorite(user_id, model_key, model_type)
 
 
 class LiveEventHandler(CacheableHandler):
@@ -75,10 +78,11 @@ class LiveEventHandler(CacheableHandler):
     """
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "live-event:{}:{}"  # (event_key, timestamp)
+    CACHE_HEADER_LENGTH = 60 * 10
 
     def __init__(self, *args, **kw):
         super(LiveEventHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 10
+        self._cache_expiration = self.CACHE_HEADER_LENGTH
 
     def get(self, event_key, timestamp):
         if int(timestamp) > time.time():
@@ -87,8 +91,6 @@ class LiveEventHandler(CacheableHandler):
         super(LiveEventHandler, self).get(event_key, timestamp)
 
     def _render(self, event_key, timestamp):
-        self.response.headers['Cache-Control'] = 'public, max-age=%d' % self._cache_expiration
-        self.response.headers['Pragma'] = 'Public'
         self.response.headers['content-type'] = 'application/json; charset="utf-8"'
 
         event = Event.get_by_id(event_key)
@@ -118,12 +120,13 @@ class TypeaheadHandler(CacheableHandler):
     Tried a trie but the datastructure was too big to
     fit into memcache efficiently
     """
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "typeahead_entries:{}"  # (search_key)
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):
         super(TypeaheadHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24
+        self._cache_expiration = self.CACHE_HEADER_LENGTH
 
     def get(self, search_key):
         search_key = urllib2.unquote(search_key)
@@ -131,18 +134,14 @@ class TypeaheadHandler(CacheableHandler):
         super(TypeaheadHandler, self).get(search_key)
 
     def _render(self, search_key):
-        self.response.headers['Cache-Control'] = 'public, max-age=%d' % self._cache_expiration
-        self.response.headers['Pragma'] = 'Public'
         self.response.headers['content-type'] = 'application/json; charset="utf-8"'
 
         entry = TypeaheadEntry.get_by_id(search_key)
         if entry is None:
             return '[]'
         else:
-            if self._has_been_modified_since(entry.updated):
-                return entry.data_json
-            else:
-                return None
+            self._last_modified = entry.updated
+            return entry.data_json
 
 
 class WebcastHandler(CacheableHandler):
@@ -151,6 +150,7 @@ class WebcastHandler(CacheableHandler):
     """
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "webcast_{}_{}"  # (event_key)
+    CACHE_HEADER_LENGTH = 60 * 5
 
     def __init__(self, *args, **kw):
         super(WebcastHandler, self).__init__(*args, **kw)
@@ -161,8 +161,6 @@ class WebcastHandler(CacheableHandler):
         super(WebcastHandler, self).get(event_key, webcast_number)
 
     def _render(self, event_key, webcast_number):
-        self.response.headers['Cache-Control'] = "public, max-age=%d" % (5 * 60)
-        self.response.headers['Pragma'] = 'Public'
         self.response.headers.add_header('content-type', 'application/json', charset='utf-8')
 
         output = {}
@@ -181,9 +179,14 @@ class WebcastHandler(CacheableHandler):
             if special_webcasts:
                 special_webcasts = special_webcasts.contents
             else:
-                special_webcasts = {}
-            if event_key in special_webcasts:
-                webcast = special_webcasts[event_key]
+                special_webcasts = []
+
+            special_webcasts_dict = {}
+            for webcast in special_webcasts:
+                special_webcasts_dict[webcast['key_name']] = webcast
+
+            if event_key in special_webcasts_dict:
+                webcast = special_webcasts_dict[event_key]
                 if 'type' in webcast and 'channel' in webcast:
                     output['player'] = self._renderPlayer(webcast)
 
@@ -197,6 +200,55 @@ class WebcastHandler(CacheableHandler):
         return template.render(path, template_values)
 
     def memcacheFlush(self, event_key):
-        keys = [self.CACHE_KEY_FORMAT.format(event_key, n) for n in range(10)]
+        keys = [self._render_cache_key(self.CACHE_KEY_FORMAT.format(event_key, n)) for n in range(10)]
         memcache.delete_multi(keys)
         return keys
+
+
+class YouTubePlaylistHandler(LoggedInHandler):
+    """
+    For Hitting the YouTube API to get a list of video keys associated with a playlist
+    """
+    def get(self):
+        if not self.user_bundle.user:
+            self.response.set_status(401)
+            return
+
+        playlist_id = self.request.get("playlist_id")
+        if not playlist_id:
+            self.response.set_status(400)
+            return
+
+        video_ids = []
+        headers = {}
+        yt_key = Sitevar.get_by_id("google.secrets")
+        if not yt_key:
+            self.response.set_status(500)
+            return
+
+        next_page_token = ""
+
+        # format with playlist id, page token, api key
+        url = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId={}&&pageToken={}&fields=items%2Fsnippet%2FresourceId%2Citems%2Fsnippet%2Ftitle%2CnextPageToken&key={}"
+
+        while True:
+            try:
+                result = urlfetch.fetch(url.format(playlist_id, next_page_token, yt_key.contents["api_key"]),
+                                        headers=headers,
+                                        deadline=5)
+            except Exception, e:
+                self.response.set_status(500)
+                return []
+
+            if result.status_code != 200:
+                self.response.set_status(result.status_code)
+                return []
+
+            video_result = json.loads(result.content)
+            video_ids += [video for video in video_result["items"] if video["snippet"]["resourceId"]["kind"] == "youtube#video"]
+
+            if "nextPageToken" not in video_result:
+                break
+            next_page_token = video_result["nextPageToken"]
+
+        self.response.out.write(json.dumps(video_ids))

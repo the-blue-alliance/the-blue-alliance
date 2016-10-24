@@ -21,7 +21,7 @@ class DatafeedOffseason(DatafeedBase):
                 match.get("set_number", 0),
                 match.get("match_number", 0)),
             event=event.key,
-            game=Match.FRC_GAMES_BY_YEAR.get(event.year, "frc_unknown"),
+            year=event.year,
             set_number=match.get("set_number", 0),
             match_number=match.get("match_number", 0),
             comp_level=match.get("comp_level", None),

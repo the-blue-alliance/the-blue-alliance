@@ -27,13 +27,25 @@ class EventHelper(object):
     Helper class for Events.
     """
     @classmethod
-    def alliance_selections_to_points(self, alliance_selections):
+    def alliance_selections_to_points(self, event_key, multiplier, alliance_selections):
         team_points = {}
-        for n, alliance in enumerate(alliance_selections):
-            n += 1
-            team_points[alliance['picks'][0]] = 17 - n
-            team_points[alliance['picks'][1]] = 17 - n
-            team_points[alliance['picks'][2]] = n
+        if event_key == "2015micmp":
+            # Special case for 2015 Michigan District CMP, due to there being 16 alliances instead of 8
+            # Uses max of 48 points and no multiplier
+            # See 2015 Admin Manual, section 7.4.3.1
+            # http://www.firstinspires.org/sites/default/files/uploads/resource_library/frc/game-and-season-info/archive/2015/AdminManual20150407.pdf
+            for n, alliance in enumerate(alliance_selections):
+                team_points[alliance['picks'][0]] = int(48 - (1.5 * n))
+                team_points[alliance['picks'][1]] = int(48 - (1.5 * n))
+                team_points[alliance['picks'][2]] = int((n + 1) * 1.5)
+                n += 1
+        else:
+            for n, alliance in enumerate(alliance_selections):
+                n += 1
+                team_points[alliance['picks'][0]] = (17 - n) * multiplier
+                team_points[alliance['picks'][1]] = (17 - n) * multiplier
+                team_points[alliance['picks'][2]] = n * multiplier
+
         return team_points
 
     @classmethod
@@ -43,8 +55,6 @@ class EventHelper(object):
         """
         to_return = collections.OrderedDict()  # key: week_label, value: list of events
 
-        current_week = 1
-        week_start = None
         weekless_events = []
         offseason_events = []
         preseason_events = []
@@ -59,15 +69,11 @@ class EventHelper(object):
                    (event.start_date.month == 12 and event.start_date.day == 31)):
                     weekless_events.append(event)
                 else:
-                    if week_start is None:
-                        diff_from_wed = (event.start_date.weekday() - 2) % 7  # 2 is Wednesday
-                        week_start = event.start_date - datetime.timedelta(days=diff_from_wed)
-
-                    if event.start_date >= week_start + datetime.timedelta(days=7):
-                        current_week += 1
-                        week_start += datetime.timedelta(days=7)
-
-                    label = REGIONAL_EVENTS_LABEL.format(current_week)
+                    week = event.week
+                    if event.year == 2016:  # Special case for 2016 week 0.5
+                        label = REGIONAL_EVENTS_LABEL.format(0.5 if week == 0 else week)
+                    else:
+                        label = REGIONAL_EVENTS_LABEL.format(week + 1)
                     if label in to_return:
                         to_return[label].append(event)
                     else:
@@ -210,15 +216,18 @@ class EventHelper(object):
             else:
                 return partial
 
-        # other districts and regionals
-        match = re.match(r'\s*(?:MAR |PNW |)(?:FIRST Robotics|FRC|)(.+)(?:District|Regional|Region|State|Tournament|FRC|Field)\b', name_str)
+        # district championships, other districts, and regionals
+        match = re.match(r'\s*(?:MAR |PNW |)(?:FIRST Robotics|FRC|)(.+)(?:District|Regional|Region|Provincial|State|Tournament|FRC|Field)\b', name_str)
         if match:
             short = match.group(1)
             match = re.match(r'(.+)(?:FIRST Robotics|FRC)', short)
             if match:
-                return match.group(1).strip()
+                result = match.group(1).strip()
             else:
-                return short.strip()
+                result = short.strip()
+            if result.startswith('FIRST'):
+                result = result[5:]
+            return result.strip()
 
         return name_str.strip()
 
@@ -285,7 +294,22 @@ class EventHelper(object):
 
     @classmethod
     def parseDistrictName(cls, district_name_str):
-        return DistrictType.names.get(district_name_str, DistrictType.NO_DISTRICT)
+        district = DistrictType.names.get(district_name_str, DistrictType.NO_DISTRICT)
+
+        # Fall back to checking abbreviations if needed
+        return district if district != DistrictType.NO_DISTRICT else DistrictType.abbrevs.get(district_name_str, DistrictType.NO_DISTRICT)
+
+    @classmethod
+    def getDistrictFromEventName(cls, event_name):
+        for abbrev, district_type in DistrictType.abbrevs.items():
+            if '{} district'.format(abbrev) in event_name.lower():
+                return district_type
+
+        for district_name, district_type in DistrictType.elasticsearch_names.items():
+            if district_name in event_name:
+                return district_type
+
+        return DistrictType.NO_DISTRICT
 
     @classmethod
     def parseEventType(self, event_type_str):
@@ -336,3 +360,10 @@ class EventHelper(object):
         """
         events.sort(key=EventHelper.distantFutureIfNoStartDate)
         events.sort(key=EventHelper.distantFutureIfNoEndDate)
+
+    @classmethod
+    def is_2015_playoff(Cls, event_key):
+        year = event_key[:4]
+        event_short = event_key[4:]
+        return year == '2015' and event_short not in {'cc', 'cacc', 'mttd'}
+

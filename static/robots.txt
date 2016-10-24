@@ -2,5 +2,9 @@ User-agent: *
 Allow: /
 Disallow: /_
 Disallow: /admin/
+Disallow: /account/
 Disallow: /api/
+Disallow: /backend-tasks/
+Disallow: /suggest/
 Disallow: /tasks/
+Disallow: /mytba/

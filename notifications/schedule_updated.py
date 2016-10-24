@@ -6,8 +6,18 @@ from notifications.base_notification import BaseNotification
 
 class ScheduleUpdatedNotification(BaseNotification):
 
-    def __init__(self, event):
+    _priority = 'high'
+
+    def __init__(self, event, next_match=None):
+        from helpers.match_helper import MatchHelper  # recursive import issues
         self.event = event
+        self._event_feed = event.key_name
+        self._district_feed = event.event_district_abbrev
+        if not next_match:
+            upcoming = MatchHelper.upcomingMatches(event.matches, 1)
+            self.next_match = upcoming[0] if upcoming and len(upcoming) > 0 else None
+        else:
+            self.next_match = next_match
 
     @property
     def _type(self):
@@ -19,8 +29,8 @@ class ScheduleUpdatedNotification(BaseNotification):
         data['message_data'] = {}
         data['message_data']['event_key'] = self.event.key_name
         data['message_data']['event_name'] = self.event.name
-        if self.event.matches[0] and self.event.matches[0].time:
-            data['message_data']['first_match_time'] = calendar.timegm(self.event.matches[0].time.utctimetuple())
+        if self.next_match and self.next_match.time:
+            data['message_data']['first_match_time'] = calendar.timegm(self.next_match.time.utctimetuple())
         else:
             data['message_data']['first_match_time'] = None
 

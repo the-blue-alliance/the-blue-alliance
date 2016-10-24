@@ -7,12 +7,15 @@ from consts.event_type import EventType
 
 from datetime import datetime
 
+from database.event_query import DistrictEventsQuery
 from google.appengine.ext import ndb
 
+from database.team_query import DistrictTeamsQuery
 from helpers.district_helper import DistrictHelper
 from helpers.event_helper import EventHelper
 from helpers.model_to_dict import ModelToDict
-
+from models import team
+from models.district_team import DistrictTeam
 from models.event import Event
 from models.event_team import EventTeam
 from models.team import Team
@@ -31,8 +34,8 @@ class ApiDistrictControllerBase(ApiBaseController):
 
 class ApiDistrictListController(ApiDistrictControllerBase):
     CACHE_KEY_FORMAT = "apiv2_district_list_controller_{}"  # year
-    CACHE_VERSION = 2
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 3
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):
         super(ApiDistrictListController, self).__init__(*args, **kw)
@@ -57,18 +60,19 @@ class ApiDistrictListController(ApiDistrictControllerBase):
         district_keys = [DistrictType.type_abbrevs[event.event_district_enum] for event in events]
         districts = list()
         for key in district_keys:
-            dictionary = dict()
-            dictionary["key"] = key
-            dictionary["name"] = DistrictType.type_names[DistrictType.abbrevs[key]]
-            districts.append(dictionary)
+            if key in DistrictType.abbrevs:
+                dictionary = dict()
+                dictionary["key"] = key
+                dictionary["name"] = DistrictType.type_names[DistrictType.abbrevs[key]]
+                districts.append(dictionary)
 
         return json.dumps(districts, ensure_ascii=True)
 
 
 class ApiDistrictEventsController(ApiDistrictControllerBase):
     CACHE_KEY_FORMAT = "apiv2_district_events_controller_{}_{}"  # (district_short, year)
-    CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 61
+    CACHE_VERSION = 2
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
 
     def __init__(self, *args, **kw):
         super(ApiDistrictEventsController, self).__init__(*args, **kw)
@@ -85,8 +89,7 @@ class ApiDistrictEventsController(ApiDistrictControllerBase):
     def _render(self, district_abbrev, year=None):
         self._set_district(district_abbrev)
 
-        event_keys = Event.query(Event.year == self.year, Event.event_district_enum == self.district).fetch(None, keys_only=True)
-        events = ndb.get_multi(event_keys)
+        events = DistrictEventsQuery('{}{}'.format(self.year, self.district_abbrev)).fetch()
 
         events = [ModelToDict.eventConverter(event) for event in events]
 
@@ -95,7 +98,7 @@ class ApiDistrictEventsController(ApiDistrictControllerBase):
 
 class ApiDistrictRankingsController(ApiDistrictControllerBase):
     CACHE_KEY_FORMAT = "apiv2_district_rankings_controller_{}_{}"  # (district_short, year)
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_HEADER_LENGTH = 61
 
     def __init__(self, *args, **kw):
@@ -113,7 +116,7 @@ class ApiDistrictRankingsController(ApiDistrictControllerBase):
     def _render(self, district_abbrev, year=None):
         self._set_district(district_abbrev)
 
-        if self.year < 2014:
+        if self.year < 2009:
             return json.dumps([], ensure_ascii=True)
 
         event_keys = Event.query(Event.year == self.year, Event.event_district_enum == self.district).fetch(None, keys_only=True)
@@ -155,3 +158,29 @@ class ApiDistrictRankingsController(ApiDistrictControllerBase):
 
         return json.dumps(rankings)
 
+
+class ApiDistrictTeamsController(ApiDistrictControllerBase):
+    CACHE_KEY_FORMAT = "apiv2_district_teams_controller_{}_{}"  # (district_short, year)
+    CACHE_VERSION = 2
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
+
+    def __init__(self, *args, **kw):
+        super(ApiDistrictTeamsController, self).__init__(*args, **kw)
+        self.district_abbrev = self.request.route_kwargs["district_abbrev"]
+        self.year = int(self.request.route_kwargs["year"] or datetime.now().year)
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.district_abbrev, self.year)
+
+    def _track_call(self, district_abbrev, year=None):
+        if year is None:
+            year = datetime.now().year
+
+        self._track_call_defer('district/teams', '{}{}'.format(year, district_abbrev))
+
+    def _render(self, district_abbrev, year=None):
+        self._set_district(district_abbrev)
+
+        district_teams = DistrictTeamsQuery('{}{}'.format(self.year, self.district_abbrev)).fetch()
+
+        district_teams_dict = [ModelToDict.teamConverter(team) for team in district_teams]
+
+        return json.dumps(district_teams_dict, ensure_ascii=True)

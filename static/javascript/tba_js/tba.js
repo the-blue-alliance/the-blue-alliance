@@ -25,6 +25,17 @@ $(document).ready(function(){
     event.preventDefault();
   });
 
+  // Handle linking to tabs
+  var hash = window.location.hash;
+  hash && $('ul.nav a[href="' + hash + '"]').tab('show');
+
+  $('.nav-tabs a').click(function (e) {
+    $(this).tab('show');
+    var scrollmem = $('body').scrollTop();
+    window.location.hash = this.hash;
+    $('html,body').scrollTop(scrollmem);
+  });
+
 	// Fancybox
 	$(".fancybox").fancybox();
 
@@ -46,9 +57,20 @@ $(document).ready(function(){
     });
 	}
 
+  // Featherlight Gallery
+  $('.gallery').featherlightGallery();
+
 	// Converting match time to local time
+  var weekday = new Array(7);
+  weekday[0]=  "Sun";
+  weekday[1] = "Mon";
+  weekday[2] = "Tue";
+  weekday[3] = "Wed";
+  weekday[4] = "Thu";
+  weekday[5] = "Fri";
+  weekday[6] = "Sat";
 	$('.tba-match-time-utc').each(function () {
-	  var matchTime = new Date($(this).text());  // Converts UTC to local time
+	  var matchTime = new Date($(this).attr('datetime'));  // Converts UTC to local time
 	  if (!isNaN(matchTime)) {
       var hour24 = matchTime.getHours();
       var hour12 = (hour24 % 12);
@@ -56,13 +78,69 @@ $(document).ready(function(){
         hour12 = 12;
       }
       var minute = matchTime.getMinutes();
-      var matchTimeStr = hour12 + ':' + ((''+minute).length<2 ? '0' :'')+minute;
+      var matchTimeStr = weekday[matchTime.getDay()] + ' ' + hour12 + ':' + ((''+minute).length<2 ? '0' :'')+minute;
       matchTimeStr += hour24 < 12 ? ' AM' : ' PM';
 
       $(this).text(matchTimeStr);
       $(this).css('display', 'inline');
 	  }
 	});
+
+  var month = new Array(12);
+  month[0]=  "Jan";
+  month[1] = "Feb";
+  month[2] = "Mar";
+  month[3] = "Apr";
+  month[4] = "May";
+  month[5] = "Jun";
+  month[6] = "Jul";
+  month[7] = "Aug";
+  month[8] = "Sep";
+  month[9] = "Oct";
+  month[10] = "Nov";
+  month[11] = "Dec";
+  $('.tba-verbose-date-utc').each(function () {  // Like "Mar. 13, 2016"
+    var time = new Date($(this).attr('datetime'));  // Converts UTC to local time
+    if (!isNaN(time)) {
+      $(this).text(month[time.getMonth()] + '. ' + time.getDate() + ', ' + time.getFullYear());
+      $(this).css('display', 'inline');
+    }
+  });
+
+  $('.tba-verbose-time-utc').each(function () {  // Like "7:00 PM"
+    var time = new Date($(this).attr('datetime'));  // Converts UTC to local time
+    if (!isNaN(time)) {
+      var hour24 = time.getHours();
+      var hour12 = (hour24 % 12);
+      if (hour12 == 0) {
+        hour12 = 12;
+      }
+      var minute = time.getMinutes();
+      var timeStr = hour12 + ':' + ((''+minute).length<2 ? '0' :'')+minute;
+      timeStr += hour24 < 12 ? ' AM' : ' PM';
+
+      $(this).text(timeStr);
+      $(this).css('display', 'inline');
+    }
+  });
+
+  $('.tba-verbose-datetime-utc').each(function () {  // Like "Mar. 13, 2016 at 7:00 PM"
+    var time = new Date($(this).attr('datetime'));  // Converts UTC to local time
+    if (!isNaN(time)) {
+      var hour24 = time.getHours();
+      var hour12 = (hour24 % 12);
+      if (hour12 == 0) {
+        hour12 = 12;
+      }
+      var minute = time.getMinutes();
+      var timeStr = month[time.getMonth()] + '. ' + time.getDate() + ', ' + time.getFullYear() + ' at '
+      timeStr += hour12 + ':' + ((''+minute).length<2 ? '0' :'')+minute;
+      timeStr += hour24 < 12 ? ' AM' : ' PM';
+
+      $(this).text(timeStr);
+      $(this).css('display', 'inline');
+    }
+  });
 
   // For 4/1
   var today = new Date();

@@ -23,12 +23,14 @@ class TestMatchApiController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.testbed.init_taskqueue_stub(root_path=".")
 
         self.match = Match(
             id="2014cc_f1m1",
             event=ndb.Key(Event, "2014cc"),
-            game = "frc_unknown",
+            year=2014,
             comp_level = "f",
             set_number = 1,
             match_number = 1,

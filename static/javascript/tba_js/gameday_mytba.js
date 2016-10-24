@@ -1,7 +1,7 @@
 $(function() {
     // Setup redirect after login
     $('#mytba-login').click(function() {
-      window.location.href = '/account?redirect=' + escape(document.URL);
+      window.location.href = '/login?redirect=' + escape(document.URL.replace(document.location.origin, ""));
     });
 
     updateFavoritesList();  // Setup
@@ -12,7 +12,7 @@ $(function() {
       {
         prefetch: {
           url: '/_/typeahead/teams-all',
-          filter: unicodeFilter
+          filter: teamFilter
         },
       }
     ]);
@@ -70,7 +70,9 @@ function updateFavoritesList() {
           $.cookie("tba-gameday-last-login-prompt", cur_epoch_ms);
         }
         // Not logged in. Change default behaviors.
-        $('.mytba-button').attr('href', '#login-modal');
+        if (!isKickoff) {
+          $('.mytba-button').attr('href', '#login-modal');
+        }
         favoriteTeamsOff();
       }
       $('#mytba-alert-container').append('<div class="alert alert-warning alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Oops! Unable to get favorites.</strong><br>Something went wrong on our end. Please try again later.</div>');

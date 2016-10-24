@@ -1,0 +1,35 @@
+<ul class="nav nav-pills nav-stacked">
+    <li>
+        <a href="/suggest/match/video/review">
+            <span class="badge pull-right">{{suggestions.match}}</span>
+            Match Video Suggestions
+        </a>
+    </li>
+    <li>
+        <a href="/suggest/event/webcast/review">
+            <span class="badge pull-right">{{suggestions.event}}</span>
+            Event Webcast Suggestions
+        </a>
+    </li>
+    <li>
+        <a href="/suggest/team/media/review">
+            <span class="badge pull-right">{{suggestions.media}}</span>
+            Team Media Suggestions
+        </a>
+    </li>
+    <li>
+        <a href="/suggest/team/social/review">
+            <span class="badge pull-right">{{suggestions.social}}</span>
+            Team Social Media Suggestions
+        </a>
+    </li>
+
+    {% if offseason_permission in user_bundle.account.permissions %}
+    <li>
+        <a href="/suggest/offseason/review">
+            <span class="badge pull-right">{{suggestions.offseason}}</span>
+            Offseason Event Suggestions
+        </a>
+    </li>
+    {% endif %}
+</ul>

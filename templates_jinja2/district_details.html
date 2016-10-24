@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}{% if explicit_year %}{{year}} {% endif %}FIRST Robotics {{district_name}} District - The Blue Alliance{% endblock %}
+
+{% block meta_description %}{{district_name}} district details for the FIRST Robotics Competition{% if explicit_year %} from {{year}}{% endif %}.{% endblock %}
+
+{% block events_active %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-3 col-lg-2">
+      <div class="tba-sidenav-affixed">
+        <div class="btn-group">
+          <a class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" href="#">
+            {{year}}
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu tba-dropdown-menu-limited">
+            {% for valid_year in valid_years|reverse %}
+              <li><a href="/events/{{district_abbrev}}/{{valid_year}}">{{valid_year}}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <h1 class="visible-xs end_header">{% if explicit_year %}{{year}} {% endif %}{{district_name}} District{% if events|length > 0 %}<small> {{ events|length }} Events</small>{% endif %}</h1>
+
+        <div class="btn-group">
+          <a class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" href="#">
+            {{district_name}}
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu tba-dropdown-menu-limited">
+            <li><a href="/events{% if explicit_year %}/{{year}}{% endif %}">All Events</a></li>
+            {% for valid_district in valid_districts %}
+              {% if district_name != valid_district.0 %}
+              <li><a href="/events/{{valid_district.1}}{% if explicit_year %}/{{year}}{% endif %}">{{valid_district.0}}</a></li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+
+        <div class="tba-sidebar">
+          <ul class="nav tba-sidenav">
+          {% for label, events in week_events.items() %}
+            <li><a class="smooth-scroll" href="#{{label|slugify}}">{{label}}</a></li>
+          {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-9 col-lg-10">
+      <h1 class="hidden-xs end_header">{% if explicit_year %}{{year}} {% endif %}{{district_name}} District{% if events|length > 0 %}<small> {{ events|length }} Events</small>{% endif %}</h1>
+
+      <ul class="nav nav-tabs" role="tablist">
+        <li class="active"><a href="#events" role="tab" data-toggle="tab">Events</a></li>
+        {% if teams_a or teams_b %}
+        <li><a href="#teams" role="tab" data-toggle="tab">Teams</a></li>
+        {% endif %}
+        {% if team_totals %}
+        <li><a href="#rankings" role="tab" data-toggle="tab">Rankings</a></li>
+        {% endif %}
+        {% if live_events_with_teams %}
+        <li><a href="#active-teams" role="tab" data-toggle="tab">Active Teams</a></li>
+        {% endif %}
+      </ul>
+
+      <div class="tab-content">
+        <div class="tab-pane active" id="events">
+          {% for label, events in week_events.items() %}
+            <h2 id="{{label|slugify}}">{{ label }} <small>{{events|length}} Events</small></h2>
+            {% include "event_partials/event_table.html" %}
+          {% endfor %}
+        </div>
+        {% if teams_a or teams_b %}
+        <div class="tab-pane" id="teams">
+          {% if teams_a %}
+          <div class="col-sm-6">
+            <table class="table table-striped table-condensed table-center team-table">
+              <thead>
+                <tr><th>Team Number</th><th>Team Name</th><th>Location</th></tr>
+              </thead>
+              <tbody>
+                {% for team in teams_a %}
+                <tr>
+                  <td><a class="team_table" href="/team/{{ team.team_number }}/{{year}}">{{ team.team_number }}</a></td>
+                  <td><a href="/team/{{ team.team_number }}/{{year}}">{% if team.nickname %}{{ team.nickname }}{% else %}--{% endif %}</a></td>
+                  <td>{% if team.location %}{{ team.location }}{% else %}--{% endif %}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% endif %}
+          {% if teams_b %}
+          <div class="col-sm-6">
+            <table class="table table-striped table-condensed table-center team-table">
+              <thead>
+                <tr><th>Team Number</th><th>Team Name</th><th>Location</th></tr>
+              </thead>
+              <tbody>
+                {% for team in teams_b %}
+                <tr>
+                  <td><a class="team_table" href="/team/{{ team.team_number }}/{{year}}">{{ team.team_number }}</a></td>
+                  <td><a href="/team/{{ team.team_number }}/{{year}}">{% if team.nickname %}{{ team.nickname }}{% else %}--{% endif %}</a></td>
+                  <td>{% if team.location %}{{ team.location }}{% else %}--{% endif %}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+        {% if team_totals %}
+        <div class="tab-pane" id="rankings">
+          <table class="table table-striped table-condensed table-center">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Team</th>
+                <th>Event 1</th>
+                <th>Event 2</th>
+                <th>District Champ</th>
+                <th>Rookie Bonus</th>
+                <th>Total Points</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for team_key, totals in team_totals %}
+              <tr>
+                <td>{{loop.index}}</td>
+                <td><a href="/team/{{team_key|digits}}/{{year}}">{{team_key|digits}}</a></td>
+                <td>
+                  {% if totals.event_points.0 %}
+                  {{totals.event_points.0.1.total}} <a href="/event/{{totals.event_points.0.0.key.id()}}" rel="tooltip" title="{{totals.event_points.0.0.short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
+                  {% else %}
+                  --
+                  {% endif %}
+                </td>
+                <td>
+                  {% if totals.event_points.1 %}
+                  {{totals.event_points.1.1.total}} <a href="/event/{{totals.event_points.1.0.key.id()}}" rel="tooltip" title="{{totals.event_points.1.0.short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
+                  {% else %}
+                  --
+                  {% endif %}
+                </td>
+                <td>
+                  {% if totals.event_points.2 %}
+                  {{totals.event_points.2.1.total}} <a href="/event/{{totals.event_points.2.0.key.id()}}" rel="tooltip" title="{{totals.event_points.2.0.short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
+                  {% else %}
+                  --
+                  {% endif %}
+                </td>
+                <td>
+                  {% if totals.rookie_bonus %}
+                  {{totals.rookie_bonus}}
+                  {% else %}
+                  --
+                  {% endif %}
+                </td>
+                <td><strong>{{totals.point_total}}</strong></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+          {% if year == 2015 %}
+            <p>* District rankings are not official and are calculated using the <a href="http://archive.usfirst.org/sites/default/files/uploadedFiles/Robotics_Programs/FRC/Game_and_Season__Info/2015/FRC_District_Standard_Points_Ranking_System_2015%20Summary.pdf">2015 FRC Standard District Points Ranking System (PDF)</a></p>
+          {% else %}
+            <p>* District rankings are not official and are calculated using the <a href="http://archive.usfirst.org/sites/default/files/uploadedFiles/Robotics_Programs/FRC/Resources/FRC_District_Standard_Points_Ranking_System.pdf">FRC Standard District Points Ranking System (PDF)</a></p>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        {% if live_events_with_teams %}
+        <div class="tab-pane" id="active-teams">
+          {% include "live_teams_partial.html" %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

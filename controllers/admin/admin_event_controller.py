@@ -9,16 +9,19 @@ from google.appengine.ext.webapp import template
 from controllers.base_controller import LoggedInHandler
 from datafeeds.csv_alliance_selections_parser import CSVAllianceSelectionsParser
 from datafeeds.csv_teams_parser import CSVTeamsParser
+from helpers.award_manipulator import AwardManipulator
 from helpers.event.event_test_creator import EventTestCreator
 from helpers.event.event_webcast_adder import EventWebcastAdder
 from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
+from helpers.event_details_manipulator import EventDetailsManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.team_manipulator import TeamManipulator
 from helpers.match_manipulator import MatchManipulator
 from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
 from models.award import Award
 from models.event import Event
+from models.event_details import EventDetails
 from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
@@ -37,12 +40,11 @@ class AdminEventAddAllianceSelections(LoggedInHandler):
         alliance_selections_csv = self.request.get('alliance_selections_csv')
         alliance_selections = CSVAllianceSelectionsParser.parse(alliance_selections_csv)
 
-        if alliance_selections and event.alliance_selections != alliance_selections:
-            event.alliance_selections_json = json.dumps(alliance_selections)
-            event._alliance_selections = None
-            event.dirty = True
-
-        EventManipulator.createOrUpdate(event)
+        event_details = EventDetails(
+            id=event_key_id,
+            alliance_selections=alliance_selections
+        )
+        EventDetailsManipulator.createOrUpdate(event_details)
 
         self.redirect("/admin/event/" + event.key_name)
 
@@ -70,6 +72,100 @@ class AdminEventAddTeams(LoggedInHandler):
 
         EventTeamManipulator.createOrUpdate(event_teams)
         TeamManipulator.createOrUpdate(teams)
+
+        self.redirect("/admin/event/" + event.key_name)
+
+
+class AdminEventDeleteTeams(LoggedInHandler):
+    """
+    Remove teams from an Event. Useful for legacy and offseason events.
+    """
+    def post(self, event_key_id):
+        self._require_admin()
+        event = Event.get_by_id(event_key_id)
+
+        teams_csv = self.request.get('teams_csv')
+        team_numbers = CSVTeamsParser.parse(teams_csv)
+
+        event_teams = []
+        for team_number in team_numbers:
+            event_teams.append(ndb.Key(EventTeam, '{}_frc{}'.format(event.key.id(), team_number)))
+
+        EventTeamManipulator.delete_keys(event_teams)
+
+        self.redirect("/admin/event/" + event.key_name)
+
+
+class AdminEventRemapTeams(LoggedInHandler):
+    """
+    Remaps teams within an Event. Useful for offseason events.
+    eg: 9254 -> 254B
+    """
+    def post(self, event_key_id):
+        self._require_admin()
+        event = Event.get_by_id(event_key_id)
+        event.prepAwardsMatchesTeams()
+
+        remap_teams = {}
+        for key, value in json.loads(self.request.get('remap_teams')).items():
+            remap_teams['frc{}'.format(key)] = 'frc{}'.format(value)
+
+        # Remap matches
+        for match in event.matches:
+            for old_team, new_team in remap_teams.items():
+                # Update team key names
+                for i, key in enumerate(match.team_key_names):
+                    if key == old_team:
+                        match.dirty = True
+                        if new_team.isdigit():  # Only if non "B" teams
+                            match.team_key_names[i] = new_team
+                        else:
+                            del match.team_key_names[i]
+                # Update alliances
+                for color in ['red', 'blue']:
+                    for i, key in enumerate(match.alliances[color]['teams']):
+                        if key == old_team:
+                            match.dirty = True
+                            match.alliances[color]['teams'][i] = new_team
+                            match.alliances_json = json.dumps(match.alliances)
+        MatchManipulator.createOrUpdate(event.matches)
+
+        # Remap alliance selections
+        if event.alliance_selections:
+            for row in event.alliance_selections:
+                for choice in ['picks', 'declines']:
+                    for old_team, new_team in remap_teams.items():
+                        for i, key in enumerate(row[choice]):
+                            if key == old_team:
+                                row[choice][i] = new_team
+
+        # Remap rankings
+        if event.rankings:
+            for row in event.rankings:
+                for old_team, new_team in remap_teams.items():
+                    if row[1] == old_team[3:]:
+                        row[1] = new_team[3:]
+
+        EventDetailsManipulator.createOrUpdate(event.details)
+
+        # Remap awards
+        for award in event.awards:
+            for old_team, new_team in remap_teams.items():
+                # Update team keys
+                for i, key in enumerate(award.team_list):
+                    if key.id() == old_team:
+                        award.dirty = True
+                        if new_team.isdigit():  # Only if non "B" teams
+                            award.team_list[i] = ndb.Key(Team, new_team)
+                        else:
+                            del award.team_list[i]
+                # Update recipient list
+                for recipient in award.recipient_list:
+                    if str(recipient['team_number']) == old_team[3:]:
+                        award.dirty = True
+                        recipient['team_number'] = new_team[3:]
+                        award.recipient_json_list = [json.dumps(r) for r in award.recipient_list]
+        AwardManipulator.createOrUpdate(event.awards, auto_union=False)
 
         self.redirect("/admin/event/" + event.key_name)
 
@@ -187,7 +283,9 @@ class AdminEventEdit(LoggedInHandler):
         event = Event.get_by_id(event_key)
 
         self.template_values.update({
-            "event": event
+            "event": event,
+            'alliance_selections': json.dumps(event.alliance_selections),
+            'rankings': json.dumps(event.rankings),
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/event_edit.html')
@@ -214,7 +312,9 @@ class AdminEventEdit(LoggedInHandler):
             event_district_enum=EventHelper.parseDistrictName(self.request.get("event_district_str")),
             venue=self.request.get("venue"),
             venue_address=self.request.get("venue_address"),
-            location=self.request.get("location"),
+            city=self.request.get("city"),
+            state_prov=self.request.get("state_prov"),
+            country=self.request.get("country"),
             name=self.request.get("name"),
             short_name=self.request.get("short_name"),
             start_date=start_date,
@@ -224,10 +324,16 @@ class AdminEventEdit(LoggedInHandler):
             facebook_eid=self.request.get("facebook_eid"),
             custom_hashtag=self.request.get("custom_hashtag"),
             webcast_json=self.request.get("webcast_json"),
-            alliance_selections_json=self.request.get("alliance_selections_json"),
-            rankings_json=self.request.get("rankings_json"),
         )
         event = EventManipulator.createOrUpdate(event)
+
+        if self.request.get("alliance_selections_json") or self.request.get("rankings_json"):
+            event_details = EventDetails(
+                id=event_key,
+                alliance_selections=json.loads(self.request.get("alliance_selections_json")),
+                rankings=json.loads(self.request.get("rankings_json"))
+            )
+            EventDetailsManipulator.createOrUpdate(event_details)
 
         MemcacheWebcastFlusher.flushEvent(event.key_name)
 

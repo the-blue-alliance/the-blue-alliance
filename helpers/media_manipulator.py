@@ -29,7 +29,10 @@ class MediaManipulator(ManipulatorBase):
 
         auto_union_attrs = [
             'references',
+            'preferred_references',
         ]
+
+        old_media._updated_attrs = []
 
         # if not auto_union, treat auto_union_attrs as list_attrs
         if not auto_union:
@@ -40,12 +43,14 @@ class MediaManipulator(ManipulatorBase):
             if getattr(new_media, attr) is not None:
                 if getattr(new_media, attr) != getattr(old_media, attr):
                     setattr(old_media, attr, getattr(new_media, attr))
+                    old_media._updated_attrs.append(attr)
                     old_media.dirty = True
 
         for attr in list_attrs:
-            if len(getattr(new_media, attr)) > 0:
+            if len(getattr(new_media, attr)) > 0 or not auto_union:
                 if getattr(new_media, attr) != getattr(old_media, attr):
                     setattr(old_media, attr, getattr(new_media, attr))
+                    old_media._updated_attrs.append(attr)
                     old_media.dirty = True
 
         for attr in auto_union_attrs:
@@ -54,6 +59,7 @@ class MediaManipulator(ManipulatorBase):
             unioned = old_set.union(new_set)
             if unioned != old_set:
                 setattr(old_media, attr, list(unioned))
+                old_media._updated_attrs.append(attr)
                 old_media.dirty = True
 
         return old_media

@@ -9,14 +9,20 @@ from models.team import Team
 
 
 class FMSAPIAwardsParser(object):
-    def __init__(self, event):
+    def __init__(self, event, valid_team_nums=None):
         self.event = event
+        self.valid_team_nums = valid_team_nums
 
     def parse(self, response):
         awards_by_type = {}
         for award in response['Awards']:
-            award_type_enum = AwardHelper.parse_award_type(award['name'])
             team_number = award['teamNumber']
+            if self.valid_team_nums is not None and team_number not in self.valid_team_nums:
+                continue
+
+            award_type_enum = AwardHelper.parse_award_type(award['name'])
+            if award_type_enum is None:
+                continue
 
             recipient_json = json.dumps({
                 'team_number': team_number,

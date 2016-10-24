@@ -1,0 +1,74 @@
+{% import 'match_partials/match_table_macros.html' as mtm %}
+{% import 'media_partials/social_media_macros.html' as smm %}
+
+<div id="team-info" class="row hidden-xs">
+  <div class="col-xs-12">
+    <h2>Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h2>
+    {% if team.motto %}<h4><em>&quot;{{team.motto_without_quotes}}&quot;</em></h4>{% endif %}
+    {% if district_name %}<blockquote><em>Part of the <a href="/events/{{district_abbrev}}/{{year}}">{{district_name}} District</a></em></blockquote>{% endif %}
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-7">
+    <p>
+      {% if team.location %}<span class="glyphicon glyphicon-map-marker"></span> From <a href="http://maps.google.com/maps?q={{ team.location|urlencode }}" target="_blank">{{ team.location }}</a><br>{% endif %}
+      {% if team.name %}<span class="glyphicon glyphicon-info-sign"></span> aka <em>{{ team.name }}</em><br>{% endif %}
+      {% if team.rookie_year %}<span class="glyphicon glyphicon-calendar"></span> Rookie Year: {{ team.rookie_year }}<br>{% endif %}
+      {% if last_competed and year != current_year %}<span class="glyphicon glyphicon-time"></span> Last competed in {{ last_competed }}.<br>{% endif %}
+      {% if team.website %}<span class="glyphicon glyphicon-globe"></span> <a href="{{team.website}}" target="_blank">{{ team.website }}</a><br>{% endif %}
+      {% if team.championship_location %}<span class="glyphicon glyphicon-flag"></span> Home Championship: {{team.championship_location.2017}}, 2017 {% if team.championship_location.2017 != team.championship_location.2018 %} | {{team.championship_location.2018}}, 2018+ {% endif %}<br>{% endif %}
+
+      <hr>
+      <a class="btn btn-xs btn-default{% if social_medias %} pull-right{% endif %}" href="/suggest/team/social_media?team_key={{team.key_name}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add social media!</a>
+      {% for media in social_medias %}
+        {{smm.social_media_icon_link(media)}}{% if not loop.last %}&middot;{% endif %}
+      {% endfor %}
+      <hr>
+    </p>
+
+    <p class="pull-right">
+      <span class="image-atc"></span> <a href="http://atthecontrol.com/">Live Data: At The Control</a>
+    </p>
+
+    {% include "team_partials/team_social_media.html" %}
+  </div>
+  <div class="col-sm-5">
+  {% if current_event %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        {% if current_event.webcast%}
+          <div class="hidden-xs pull-right">
+            <a class="btn btn-success" href="{{current_event.gameday_url}}" target="_blank"><span class="glyphicon glyphicon-facetime-video"></span> Watch now</a>
+          </div>
+        {% endif %}
+        <h3 class="panel-title">
+          Currently competing at:<br>
+          <a href="/event/{{ current_event.key_name }}"><strong>{{ current_event.name }}</strong></a>
+        </h3>
+      </div>
+      <div class="clearfix"></div>
+      <div class="panel-body">
+      {% if matches_upcoming %}
+        <h4>Upcoming Matches</h4>
+        {{mtm.upcoming_match_table(matches_upcoming, cur_team_key=team.key.id())}}
+      {% else %}
+        No upcoming matches.
+      {% endif %}
+      </div>
+    </div>
+  {% else %}
+    <div id="robot-image">
+    {% if preferred_image_medias %}
+      {% set image_medias = preferred_image_medias %}
+      {% include "media_partials/image_carousel_partial.html" %}
+    {% else %}
+      {% if year %}
+        <a class="btn btn-lg btn-success btn-block" href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add robot image!</a>
+      {% endif %}
+    {% endif %}
+    {% if robot %}<p class="text-center">Robot Name: <strong>{{robot.robot_name}}</strong></p>{% endif %}
+    </div>
+  {% endif %}
+  </div>
+</div>

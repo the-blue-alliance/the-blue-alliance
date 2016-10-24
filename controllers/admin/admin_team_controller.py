@@ -4,9 +4,11 @@ from google.appengine.ext.webapp import template
 
 from controllers.base_controller import LoggedInHandler
 from helpers.team.team_test_creator import TeamTestCreator
+from models.district_team import DistrictTeam
 from models.event_team import EventTeam
 from models.team import Team
 from models.media import Media
+from models.robot import Robot
 
 import tba_config
 
@@ -38,6 +40,8 @@ class AdminTeamDetail(LoggedInHandler):
         team = Team.get_by_id("frc" + team_number)
         event_teams = EventTeam.query(EventTeam.team == team.key).fetch(500)
         team_medias = Media.query(Media.references == team.key).fetch(500)
+        robots = Robot.query(Robot.team == team.key).fetch()
+        district_teams = DistrictTeam.query(DistrictTeam.team == team.key).fetch()
 
         team_medias_by_year = {}
         for media in team_medias:
@@ -50,6 +54,8 @@ class AdminTeamDetail(LoggedInHandler):
             'event_teams': event_teams,
             'team': team,
             'team_medias_by_year': team_medias_by_year,
+            'robots': robots,
+            'district_teams': district_teams,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/team_details.html')

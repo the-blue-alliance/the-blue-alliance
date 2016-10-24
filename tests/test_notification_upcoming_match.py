@@ -18,6 +18,8 @@ class TestUpcomingMatchNotification(unittest2.TestCase):
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
         self.testbed.init_taskqueue_stub(root_path=".")
 
         for team_number in range(7):
@@ -35,6 +37,7 @@ class TestUpcomingMatchNotification(unittest2.TestCase):
         expected = {}
         expected['message_type'] = NotificationType.type_names[NotificationType.UPCOMING_MATCH]
         expected['message_data'] = {}
+        expected['message_data']['event_key'] = self.event.key_name
         expected['message_data']['event_name'] = self.event.name
         expected['message_data']['match_key'] = self.match.key_name
         expected['message_data']['team_keys'] = self.match.team_key_names

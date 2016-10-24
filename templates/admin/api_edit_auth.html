@@ -19,10 +19,25 @@
             <td><input type="text" name="event_list_str" value="{{auth.event_list_str}}" /></td>
         </tr>
         <tr>
-            <td>Allow Event Data Edit</td>
-            <td><input type="checkbox" name="allow_edit_data" {% if auth.can_edit_event_data %}checked{% endif %}></td>
+            <td>Allow Event Teams Edit</td>
+            <td><input type="checkbox" name="allow_edit_teams" {% if auth.can_edit_event_teams %}checked{% endif %}></td>
         </tr>
         <tr>
+            <td>Allow Event Matches Edit</td>
+            <td><input type="checkbox" name="allow_edit_matches" {% if auth.can_edit_event_matches %}checked{% endif %}></td>
+        </tr>
+        <tr>
+            <td>Allow Event Rankings Edit</td>
+            <td><input type="checkbox" name="allow_edit_rankings" {% if auth.can_edit_event_rankings %}checked{% endif %}></td>
+        </tr>
+       <tr>
+            <td>Allow Event Alliances Edit</td>
+            <td><input type="checkbox" name="allow_edit_alliances" {% if auth.can_edit_event_alliances %}checked{% endif %}></td>
+        </tr>
+        <tr>
+            <td>Allow Event Awards Edit</td>
+            <td><input type="checkbox" name="allow_edit_awards" {% if auth.can_edit_event_awards %}checked{% endif %}></td>
+        </tr>        <tr>
             <td>Allow Match Video Edit</td>
             <td><input type="checkbox" name="allow_edit_match_video" {% if auth.can_edit_match_video %}checked{% endif %}></td>
         </tr>

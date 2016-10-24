@@ -3,28 +3,32 @@ import logging
 import os
 
 from google.appengine.ext import ndb
-from google.appengine.ext.webapp import template
 
 from controllers.base_controller import CacheableHandler
 
 from consts.district_type import DistrictType
 from consts.event_type import EventType
 
+from database.team_query import DistrictTeamsQuery, EventTeamsQuery
 from helpers.district_helper import DistrictHelper
 from helpers.event_helper import EventHelper
+from helpers.event_team_status_helper import EventTeamStatusHelper
+from helpers.team_helper import TeamHelper
 
 from models.event import Event
 from models.event_team import EventTeam
 from models.team import Team
 
+from template_engine import jinja2_engine
+
 
 class DistrictDetail(CacheableHandler):
     CACHE_KEY_FORMAT = "district_detail_{}_{}_{}"  # (district_abbrev, year, explicit_year)
-    CACHE_VERSION = 0
+    CACHE_VERSION = 2
 
     def __init__(self, *args, **kw):
         super(DistrictDetail, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24
+        self._cache_expiration = 60 * 15
 
     def get(self, district_abbrev, year=None, explicit_year=False):
         if year == '':
@@ -52,26 +56,33 @@ class DistrictDetail(CacheableHandler):
         if not event_keys:
             self.abort(404)
 
+        # needed for district teams
+        district_key = '{}{}'.format(year, district_abbrev)
+        district_teams_future = DistrictTeamsQuery(district_key).fetch_async()
+
         # needed for valid_years
         all_cmp_event_keys_future = Event.query(Event.event_district_enum == district_type, Event.event_type_enum == EventType.DISTRICT_CMP).fetch_async(None, keys_only=True)
 
         # needed for valid_districts
         district_cmp_keys_future = Event.query(Event.year == year, Event.event_type_enum == EventType.DISTRICT_CMP).fetch_async(None, keys_only=True)  # to compute valid_districts
 
+        # Needed for active team statuses
+        live_events = EventHelper.getWeekEvents()
+        live_eventteams_futures = []
+        for event in live_events:
+            live_eventteams_futures.append(EventTeamsQuery(event.key_name).fetch_async())
+
         event_futures = ndb.get_multi_async(event_keys)
         event_team_keys_future = EventTeam.query(EventTeam.event.IN(event_keys)).fetch_async(None, keys_only=True)
-        if year >= 2014:  # TODO: only 2014+ has accurate rankings calculations
-            team_futures = ndb.get_multi_async(set([ndb.Key(Team, et_key.id().split('_')[1]) for et_key in event_team_keys_future.get_result()]))
+        team_futures = ndb.get_multi_async(set([ndb.Key(Team, et_key.id().split('_')[1]) for et_key in event_team_keys_future.get_result()]))
 
         events = [event_future.get_result() for event_future in event_futures]
         EventHelper.sort_events(events)
+        week_events = EventHelper.groupByWeek(events)
 
         district_cmp_futures = ndb.get_multi_async(district_cmp_keys_future.get_result())
 
-        if year >= 2014:  # TODO: only 2014+ has accurate rankings calculations
-            team_totals = DistrictHelper.calculate_rankings(events, team_futures, year)
-        else:
-            team_totals = None
+        team_totals = DistrictHelper.calculate_rankings(events, team_futures, year)
 
         valid_districts = set()
         for district_cmp_future in district_cmp_futures:
@@ -83,6 +94,18 @@ class DistrictDetail(CacheableHandler):
                 valid_districts.add((DistrictType.type_names[cmp_dis_type], DistrictType.type_abbrevs[cmp_dis_type]))
         valid_districts = sorted(valid_districts, key=lambda (name, _): name)
 
+        teams = TeamHelper.sortTeams(district_teams_future.get_result())
+
+        num_teams = len(teams)
+        middle_value = num_teams / 2
+        if num_teams % 2 != 0:
+            middle_value += 1
+        teams_a, teams_b = teams[:middle_value], teams[middle_value:]
+
+        # Currently Competing Team Status
+        live_events_with_teams = EventTeamStatusHelper.buildEventTeamStatus(live_events, live_eventteams_futures, teams)
+        live_events_with_teams.sort(key=lambda x: x[0].name)
+
         self.template_values.update({
             'explicit_year': explicit_year,
             'year': year,
@@ -90,9 +113,11 @@ class DistrictDetail(CacheableHandler):
             'valid_districts': valid_districts,
             'district_name': DistrictType.type_names[district_type],
             'district_abbrev': district_abbrev,
-            'events': events,
+            'week_events': week_events,
             'team_totals': team_totals,
+            'teams_a': teams_a,
+            'teams_b': teams_b,
+            'live_events_with_teams': live_events_with_teams,
         })
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/district_details.html')
-        return template.render(path, self.template_values)
+        return jinja2_engine.render('district_details.html', self.template_values)

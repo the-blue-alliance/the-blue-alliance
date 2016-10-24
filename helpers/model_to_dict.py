@@ -1,6 +1,7 @@
 import logging
 import time
 
+from consts.district_type import DistrictType
 from consts.media_type import MediaType
 
 
@@ -19,12 +20,13 @@ class ModelToDict(object):
         team_dict["website"] = team.website
         team_dict["location"] = team.location
         team_dict["rookie_year"] = team.rookie_year
+        team_dict["motto"] = team.motto
 
         try:
             team_dict["location"] = team.location
-            team_dict["locality"] = team.locality
-            team_dict["region"] = team.region
-            team_dict["country_name"] = team.country_name
+            team_dict["locality"] = team.city
+            team_dict["region"] = team.state_prov
+            team_dict["country_name"] = team.country
         except Exception, e:
             logging.warning("Failed to include Address for api_team_info_%s: %s" % (team.key.id(), e))
 
@@ -46,10 +48,12 @@ class ModelToDict(object):
         event_dict["event_district"] = event.event_district_enum
         event_dict["year"] = event.year
         event_dict["location"] = event.location
-        event_dict["venue_address"] = event.venue_address.replace('\r\n', '\n') if event.venue_address else None
+        event_dict["venue_address"] = event.venue_address_safe
         event_dict["official"] = event.official
         event_dict["facebook_eid"] = event.facebook_eid
         event_dict["website"] = event.website
+        event_dict["timezone"] = event.timezone_id
+        event_dict["week"] = event.week
 
         if event.alliance_selections:
             event_dict["alliances"] = event.alliance_selections
@@ -126,5 +130,18 @@ class ModelToDict(object):
             media_dict["details"] = media.details
         else:
             media_dict["details"] = {}
+        media_dict["preferred"] = True if media.preferred_references != [] else False
 
         return media_dict
+
+    @classmethod
+    def robotConverter(self, robot):
+        """
+        return top level robot dict
+        """
+        robot_dict = dict()
+        robot_dict["key"] = robot.key_name
+        robot_dict["team_key"] = robot.team.id()
+        robot_dict["year"] = robot.year
+        robot_dict["name"] = robot.robot_name
+        return robot_dict

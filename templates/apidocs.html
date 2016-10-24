@@ -20,6 +20,7 @@
                 <li><a class="smooth-scroll" href="#match-model">Match Model</a></li>
                 <li><a class="smooth-scroll" href="#award-model">Award Model</a></li>
                 <li><a class="smooth-scroll" href="#media-model">Media Model</a></li>
+                <li><a class="smooth-scroll" href="#robot-model">Robot Model</a></li>
               </ul>
             </li>
             <li>
@@ -34,6 +35,8 @@
                 <li><a class="smooth-scroll" href="#team-media-request">Team Media Request</a></li>
                 <li><a class="smooth-scroll" href="#team-history-events-request">Team History Events Request</a></li>
                 <li><a class="smooth-scroll" href="#team-history-awards-request">Team History Awards Request</a></li>
+                <li><a class="smooth-scroll" href="#team-history-robots-request">Team History Robots Request</a></li>
+                <li><a class="smooth-scroll" href="#team-history-districts-request">Team History Districts Request</a></li>
               </ul>
             </li>
             <li>
@@ -61,7 +64,11 @@
                 <li><a class="smooth-scroll" href="#district-list-request">District List Request</a></li>
                 <li><a class="smooth-scroll" href="#district-events-request">District Events Request</a></li>
                 <li><a class="smooth-scroll" href="#district-rankings-request">District Rankings Request</a></li>
+                <li><a class="smooth-scroll" href="#district-teams-request">District Teams Request</a></li>
               </ul>
+            </li>
+            <li>
+              <a class="smooth-scroll" href="#api-libraries">API Libraries</a>
             </li>
           </ul>
         </div>
@@ -90,9 +97,28 @@
         <li><code>woodie_flowers:match_scraper:5</code></li>
       </ul>
 
-      <h3>Last-Updated and If-Modified-Since Headers</h3>
-      <p>All API responses have a <code>Last-Updated</code> header, which indicates the date and time at which the data at a particular endpoint was last updated. When making repeated calls to a particular endpoint, you should set the <code>If-Modified-Since</code> header in your request to the value of <code>Last-Updated</code> from the previous call to that endpoint. On the first call, <code>If-Modified-Since</code> does not need to be set.</p>
+      <h3>Last-Modified and If-Modified-Since Headers</h3>
+      <p>All API responses have a <code>Last-Modified</code> header, which indicates the date and time at which the data at a particular endpoint was last updated. When making repeated calls to a particular endpoint, you should set the <code>If-Modified-Since</code> header in your request to the value of <code>Last-Modified</code> from the previous call to that endpoint. On the first call, <code>If-Modified-Since</code> does not need to be set.</p>
       <p>Consumers of the TBA API are highly encouraged to make use of these headers. If the server determines that no data has been updated, it returns a <code>304 Not Modified</code> response with an empty body, saving both the server and the consumer time and bandwidth.</p>
+
+      <h3>Cache-Control Header</h3>
+      <p>If your application makes many queries to the TBA API and you are capable of caching the results locally, the
+      Cache-Control header will provide guidance on how long the API response can remain valid in a local cache. In
+      particular, the <code>max-age</code> value in the <code>Cache-Control</code> header contains the number of
+      seconds the API result should be considered valid for. See also
+      <a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=en#cache-control">
+      Google's Cache-Control reference</a>.</p>
+
+      <h3>API Endpoint</h3>
+      <p>Requests made to the API <strong>should</strong> be made using SSL to <code>www.thebluealliance.com</code>.</p>
+
+      <h3>Checking the Datafeed Status</h3>
+      <p>At times, it may be useful to know the status of the datafeeds from
+        which the API is updated. This may be done by sending an API request
+        to <code>https://www.thebluealliance.com/api/v2/status</code>. If a specific
+        event is no longer updating, it is included inside the array
+        <code>down_events</code>; if the entire FMSAPI is down,
+        <code>is_datafeed_down</code> is set to true.</p>
 
       <h3>Webhooks</h3>
       <p>The TBA API also includes support for webhooks. We can push notifications for things you've subscribed to your sever. This can save both your client and our server time and processing power, as it can reduce the need to poll the API. See <a href="/apidocs/webhooks">this page</a> for more documentation on webhooks.
@@ -102,7 +128,7 @@
       <h2 id="models">Models</h2>
       <h3 id="team-model">Team Model</h3>
       <h4>Related: <a class="smooth-scroll" href="#team-request">Team Request</a></h4>
-      <table class=table>
+      <table class="table">
         <caption>Response Data</caption>
         <thead>
           <tr>
@@ -133,7 +159,7 @@
             <td>SC</td>
           </tr>
           <tr>
-            <td>country</td>
+            <td>country_name</td>
             <td>Country of team derived from parsing the address registered with <em>FIRST</em></td>
             <td>USA</td>
           </tr>
@@ -162,12 +188,17 @@
             <td>Team's rookie year</td>
             <td>1999</td>
           </tr>
+        <tr>
+            <td>motto</td>
+            <td>Team's Motto</td>
+            <td>Infiltrating Young Minds One Robot at a Time</td>
+        </tr>
         </tbody>
       </table>
 
       <h3 id="event-model">Event Model</h3>
       <h4>Related: <a class="smooth-scroll" href="#event-request">Event Request</a></h4>
-      <table class=table>
+      <table class="table">
         <caption>Response Data</caption>
         <thead>
           <tr>
@@ -231,6 +262,11 @@
             <td>2010</td>
           </tr>
           <tr>
+            <td>week</td>
+            <td>Week of the event relative to the first official season event. Only valid for Regionals, Districts, and District Championships. Null otherwise.</td>
+            <td>2</td>
+          </tr>
+          <tr>
             <td>location</td>
             <td>Long form address that includes city, and state provided by <em>FIRST</em></td>
             <td>Clemson, SC</td>
@@ -241,19 +277,23 @@
             <td>Long Beach Arena\n300 East Ocean Blvd\nLong Beach, CA 90802\nUSA</td>
           </tr>
           <tr>
+            <td>timezone</td>
+            <td>Timezone name, as found in the <a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones">tz database</a></td>
+            <td>America/New_York</td>
+          </tr>
+          <tr>
             <td>website</td>
             <td>The event's website, if any.</td>
             <td>http://www.firstsv.org</td>
           </tr>
           <tr>
             <td>official</td>
-            <td>Whether this is a <em>FIRST</em> official event, or an offseaon
-            event.</td>
+            <td>Whether this event used the official FMS.</td>
             <td>true</td>
           </tr>
           <tr>
             <td>teams</td>
-            <td>List of <a class="smooth-scroll" href="#team-models">team
+            <td>List of <a class="smooth-scroll" href="#team-model">team
             models</a> that attended the event</td>
             <td></td>
           </tr>
@@ -289,7 +329,7 @@
 
       <h3 id="match-model">Match Model</h3>
       <h4>Related: <a class="smooth-scroll" href="#event-matches-request">Event Matches Request</a></h4>
-      <table class=table>
+      <table class="table">
         <caption>Response Data</caption>
         <thead>
           <tr>
@@ -362,7 +402,7 @@
 
       <h3 id="award-model">Award Model</h3>
       <h4>Related: <a class="smooth-scroll" href="#event-awards-request">Event Awards Request</a></h4>
-      <table class=table>
+      <table class="table">
         <caption>Response Data</caption>
         <thead>
           <tr>
@@ -403,7 +443,7 @@
 
       <h3 id="media-model">Media Model</h3>
       <h4>Related: <a class="smooth-scroll" href="#team-media-request">Team Media Request</a></h4>
-      <table class=table>
+      <table class="table">
         <caption>Response Data</caption>
         <thead>
           <tr>
@@ -414,7 +454,7 @@
         </thead>
         <tbody>
           <tr>
-            <td>Type</td>
+            <td>type</td>
             <td>The string type of the media element, as determined <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/master/models/media.py#L16">here</a>.</td>
             <td>cdphotothread</td>
           </tr>
@@ -428,23 +468,63 @@
             <td>If the media requires it, a json dict of additional information</td>
             <td>{"image_partial": "fe3/fe38d320428adf4f51ac969efb3db32c_l.jpg"}</td>
           </tr>
+          <tr>
+            <td>preferred</td>
+            <td>Whether the media is considered to be of high quality.</td>
+            <td>true</td>
+          </tr>
         </tbody>
       </table>
 
-      <hr>
+      <h3 id="robot-model">Robot Model</h3>
+      <h4>Related: <a class="smooth-scroll" href="#team-history-robots-request">Team History Robots Request</a></h4>
+      <table class="table">
+        <caption>Response Data</caption>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Description</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>key</td>
+            <td>A key identifying the robot object. Formed like &lt;team_key&gt;_&lt;year&gt;</td>
+            <td>frc1124_2015</td>
+          </tr>
+          <tr>
+            <td>team_key</td>
+            <td>The associated <a href="#team-model">Team</a> key</td>
+            <td>frc1124</td>
+          </tr>
+          <tr>
+            <td>year</td>
+            <td>The year this Robot model refers to</td>
+            <td>2015</td>
+          </tr>
+          <tr>
+            <td>name</td>
+            <td>The robot name in this year</td>
+            <td>Orion</td>
+          </tr>
+        </tbody>
+      </table>
+
+     <hr>
 
       <h2 id="team-requests">Team Requests</h2>
       <h3 id="team-list-request">Team List Request</h3>
       <h4>Related: <a class="smooth-scroll" href="#team-model">Team Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/teams/&lt;page_num&gt;</code>
+        <code>https://www.thebluealliance.com/api/v2/teams/&lt;page_num&gt;</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -463,8 +543,8 @@
         <div class="panel-body">
           <form id="example_team_list_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
-              <input class="form-control" size="6" id="example_team_list_request" type="text" value="/api/v2/teams/1">
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
+              <input class="form-control" size="600" id="example_team_list_request" type="text" value="/api/v2/teams/1">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
               </span>
@@ -481,13 +561,13 @@
       <h4>Related: <a class="smooth-scroll" href="#team-model">Team Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;</code>
+        <code>https://www.thebluealliance.com/api/v2/team/&lt;team key&gt;</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -507,8 +587,8 @@
         <div class="panel-body">
           <form id="example_team_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
-              <input class="form-control" size="6" id="example_team_request" type="text" value="/api/v2/team/frc254">
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
+              <input class="form-control" size="600" id="example_team_request" type="text" value="/api/v2/team/frc254">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
               </span>
@@ -525,13 +605,13 @@
       <h4>Related: <a class="smooth-scroll" href="#event-model">Event Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;(/&lt;year&gt;)/events</code>
+        <code>https://www.thebluealliance.com/api/v2/team/&lt;team key&gt;(/&lt;year&gt;)/events</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -557,8 +637,8 @@
         <div class="panel-body">
           <form id="example_team_events_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
-              <input class="form-control" size="6" id="example_team_events_request" type="text" value="/api/v2/team/frc254/2014/events">
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
+              <input class="form-control" size="600" id="example_team_events_request" type="text" value="/api/v2/team/frc254/2014/events">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
               </span>
@@ -575,13 +655,13 @@
       <h4>Related: <a class="smooth-scroll" href="#award-model">Award Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/event/&lt;event key&gt;/awards</code>
+        <code>https://www.thebluealliance.com/api/v2/team/&lt;team key&gt;/event/&lt;event key&gt;/awards</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -608,8 +688,8 @@
         <div class="panel-body">
           <form id="example_team_event_awards_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
-              <input class="form-control" size="6" id="example_team_event_awards_request" type="text" value="/api/v2/team/frc254/event/2014casj/awards">
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
+              <input class="form-control" size="600" id="example_team_event_awards_request" type="text" value="/api/v2/team/frc254/event/2014casj/awards">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
               </span>
@@ -623,16 +703,16 @@
       </div>
 
       <h3 id="team-event-matches-request">Team Event Matches Request</h3>
-      <h4>Related: <a class="smooth-scroll" href="#award-match">Match Model</a></h4>
+      <h4>Related: <a class="smooth-scroll" href="#match-model">Match Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/event/&lt;event key&gt;/matches</code>
+        <code>https://www.thebluealliance.com/api/v2/team/&lt;team key&gt;/event/&lt;event key&gt;/matches</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -659,8 +739,8 @@
         <div class="panel-body">
           <form id="example_team_event_matches_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
-              <input class="form-control" size="6" id="example_team_event_matches_request" type="text" value="/api/v2/team/frc254/event/2014casj/matches">
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
+              <input class="form-control" size="600" id="example_team_event_matches_request" type="text" value="/api/v2/team/frc254/event/2014casj/matches">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
               </span>
@@ -676,13 +756,13 @@
       <h3 id="team-years-participated-request">Team Years Participated Request</h3>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/years_participated</code>
+        <code>https://www.thebluealliance.com/api/v2/team/&lt;team key&gt;/years_participated</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -702,8 +782,8 @@
         <div class="panel-body">
           <form id="example_team_years_participated_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
-              <input class="form-control" size="6" id="example_team_years_participated_request" type="text" value="/api/v2/team/frc254/years_participated">
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
+              <input class="form-control" size="600" id="example_team_years_participated_request" type="text" value="/api/v2/team/frc254/years_participated">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
               </span>
@@ -720,13 +800,13 @@
       <h4>Related: <a class="smooth-scroll" href="#media-model">Media Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;(/&lt;year&gt;)/media</code>
+        <code>https://www.thebluealliance.com/api/v2/team/&lt;team key&gt;(/&lt;year&gt;)/media</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -752,8 +832,8 @@
         <div class="panel-body">
           <form id="example_team_media_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
-              <input class="form-control" size="6" id="example_team_media_request" type="text" value="/api/v2/team/frc254/2014/media">
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
+              <input class="form-control" size="600" id="example_team_media_request" type="text" value="/api/v2/team/frc254/2014/media">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
               </span>
@@ -770,13 +850,13 @@
       <h4>Related: <a class="smooth-scroll" href="#event-model">Event Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/events</code>
+        <code>https://www.thebluealliance.com/api/v2/team/&lt;team key&gt;/history/events</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -796,8 +876,8 @@
         <div class="panel-body">
           <form id="example_team_history_events_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
-              <input class="form-control" size="6" id="example_team_history_events_request" type="text" value="/api/v2/team/frc254/history/events">
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
+              <input class="form-control" size="600" id="example_team_history_events_request" type="text" value="/api/v2/team/frc254/history/events">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
               </span>
@@ -814,13 +894,13 @@
       <h4>Related: <a class="smooth-scroll" href="#award-model">Awards Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/team/&lt;team key&gt;/awards</code>
+        <code>https://www.thebluealliance.com/api/v2/team/&lt;team key&gt;/history/awards</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -840,8 +920,8 @@
         <div class="panel-body">
           <form id="example_team_history_awards_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
-              <input class="form-control" size="6" id="example_team_history_awards_request" type="text" value="/api/v2/team/frc254/history/awards">
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
+              <input class="form-control" size="600" id="example_team_history_awards_request" type="text" value="/api/v2/team/frc254/history/awards">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
               </span>
@@ -854,18 +934,105 @@
         </div>
       </div>
 
+      <h3 id="team-history-robots-request">Team History Robots Request</h3>
+      <h4>Related: <a class="smooth-scroll" href="#robot-model">Robot Model</a></h4>
+      <p>
+        Request format:
+        <code>https://www.thebluealliance.com/api/v2/team/&lt;team key&gt;/history/robots</code>
+      </p>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Description</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>team key</td>
+            <td>A team key name where the format is <code>frcyyyy</code> where yyyy is the a
+              valid, official team number issued by <em>FIRST</em></td>
+            <td>frc1, frc281, frc1114</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_team_history_robots_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
+              <input class="form-control" size="600" id="example_team_history_robots_request" type="text" value="/api/v2/team/frc254/history/robots">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group">
+            <pre class="team-history-robots-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 id="team-history-districts-request">Team History Districts Request</h3>
+      <p>
+        Request format:
+        <code>https://www.thebluealliance.com/api/v2/team/&lt;team key&gt;/history/districts</code>
+      </p>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Description</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>team key</td>
+            <td>A team key name where the format is <code>frcyyyy</code> where yyyy is the a
+              valid, official team number issued by <em>FIRST</em></td>
+            <td>frc1, frc281, frc1114</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_team_history_districts_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
+              <input class="form-control" size="600" id="example_team_history_districts_request" type="text" value="/api/v2/team/frc1124/history/districts">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group">
+            <pre class="team-history-districts-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+
       <h2 id="event-requests">Event Requests</h2>
       <h3 id="event-list-request">Event List Request</h3>
       <h4>Related: <a class="smooth-scroll" href="#event-model">Event Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/events/&lt;year&gt;</code>
+        <code>https://www.thebluealliance.com/api/v2/events/&lt;year&gt;</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -885,8 +1052,8 @@
         <div class="panel-body">
           <form id="example_event_list_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
-              <input class="form-control" size="6" id="example_event_list_request" type="text" value="/api/v2/events/2010">
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
+              <input class="form-control" size="600" id="example_event_list_request" type="text" value="/api/v2/events/2010">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
               </span>
@@ -903,13 +1070,13 @@
       <h4>Related: <a class="smooth-scroll" href="#event-model">Event Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;</code>
+        <code>https://www.thebluealliance.com/api/v2/event/&lt;event key&gt;</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -931,8 +1098,8 @@
         <div class="panel-body">
           <form id="example_event_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
-              <input class="form-control" size="6" id="example_event_request" type="text" value="/api/v2/event/2010sc">
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
+              <input class="form-control" size="600" id="example_event_request" type="text" value="/api/v2/event/2010sc">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
               </span>
@@ -949,13 +1116,13 @@
       <h4>Related: <a class="smooth-scroll" href="#team-model">Team Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;/teams</code>
+        <code>https://www.thebluealliance.com/api/v2/event/&lt;event key&gt;/teams</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -977,8 +1144,8 @@
         <div class="panel-body">
           <form id="example_event_teams_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
-              <input class="form-control" size="6" id="example_event_teams_request" type="text" value="/api/v2/event/2010sc/teams">
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
+              <input class="form-control" size="600" id="example_event_teams_request" type="text" value="/api/v2/event/2010sc/teams">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
               </span>
@@ -995,13 +1162,13 @@
       <h4>Related: <a class="smooth-scroll" href="#match-model">Match Model</a></h4>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;/matches</code>
+        <code>https://www.thebluealliance.com/api/v2/event/&lt;event key&gt;/matches</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -1023,8 +1190,8 @@
         <div class="panel-body">
           <form id="example_event_matches_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
-              <input class="form-control" size="6"
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
+              <input class="form-control" size="600"
               id="example_event_matches_request" type="text" value="/api/v2/event/2010sc/matches">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
@@ -1041,13 +1208,13 @@
       <h3 id="event-stats-request">Event Stats Request</h3>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;/stats</code>
+        <code>https://www.thebluealliance.com/api/v2/event/&lt;event key&gt;/stats</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -1069,8 +1236,8 @@
         <div class="panel-body">
           <form id="example_event_stats_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
-              <input class="form-control" size="6"
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
+              <input class="form-control" size="600"
               id="example_event_stats_request" type="text" value="/api/v2/event/2010sc/stats">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
@@ -1086,13 +1253,13 @@
       <h3 id="event-rankings-request">Event Rankings Request</h3>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;/rankings</code>
+        <code>https://www.thebluealliance.com/api/v2/event/&lt;event key&gt;/rankings</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -1114,8 +1281,8 @@
         <div class="panel-body">
           <form id="example_event_rankings_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
-              <input class="form-control" size="6"
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
+              <input class="form-control" size="600"
               id="example_event_rankings_request" type="text" value="/api/v2/event/2010sc/rankings">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
@@ -1131,13 +1298,13 @@
       <h3 id="event-awards-request">Event Awards Request</h3>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;/awards</code>
+        <code>https://www.thebluealliance.com/api/v2/event/&lt;event key&gt;/awards</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -1159,8 +1326,8 @@
         <div class="panel-body">
           <form id="example_event_awards_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
-              <input class="form-control" size="6"
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
+              <input class="form-control" size="600"
               id="example_event_awards_request" type="text" value="/api/v2/event/2010sc/awards">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
@@ -1177,13 +1344,13 @@
     <h3 id="event-points-request">Event District Points Request</h3>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/event/&lt;event key&gt;/district_points</code>
+        <code>https://www.thebluealliance.com/api/v2/event/&lt;event key&gt;/district_points</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -1205,8 +1372,8 @@
         <div class="panel-body">
           <form id="example_event_points_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
-              <input class="form-control" size="6"
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
+              <input class="form-control" size="600"
               id="example_event_points_request" type="text" value="/api/v2/event/2014cthar/district_points">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
@@ -1224,13 +1391,13 @@
       <h3 id="match-request">Single Match Request</h3>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/match/&lt;match_key&gt;</code>
+        <code>https://www.thebluealliance.com/api/v2/match/&lt;match_key&gt;</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -1249,8 +1416,8 @@
         <div class="panel-body">
           <form id="example_match_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
-              <input class="form-control" size="6"
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
+              <input class="form-control" size="600"
               id="example_match_request" type="text" value="/api/v2/match/2014cmp_f1m1">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
@@ -1268,13 +1435,13 @@
       <h3 id="district-list-request">District List Request</h3>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/districts/&lt;year&gt;</code>
+        <code>https://www.thebluealliance.com/api/v2/districts/&lt;year&gt;</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -1293,8 +1460,8 @@
         <div class="panel-body">
           <form id="example_district_list_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
-              <input class="form-control" size="6"
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
+              <input class="form-control" size="600"
               id="example_district_list_request" type="text" value="/api/v2/districts/2014">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
@@ -1311,13 +1478,13 @@
       <h3 id="district-events-request">District Events Request</h3>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/district/&lt;district short&gt;/&lt;year&gt;/events</code>
+        <code>https://www.thebluealliance.com/api/v2/district/&lt;district short&gt;/&lt;year&gt;/events</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -1341,8 +1508,8 @@
         <div class="panel-body">
           <form id="example_district_events_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
-              <input class="form-control" size="6"
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
+              <input class="form-control" size="600"
               id="example_district_events_request" type="text" value="/api/v2/district/ne/2014/events">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
@@ -1359,13 +1526,13 @@
       <h3 id="district-rankings-request">District Rankings Request</h3>
       <p>
         Request format:
-        <code>www.thebluealliance.com/api/v2/district/&lt;district short&gt;/&lt;year&gt;/rankings</code>
+        <code>https://www.thebluealliance.com/api/v2/district/&lt;district short&gt;/&lt;year&gt;/rankings</code>
       </p>
-      <table class=table>
+      <table class="table">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Desciption</th>
+            <th>Description</th>
             <th>Examples</th>
           </tr>
         </thead>
@@ -1389,8 +1556,8 @@
         <div class="panel-body">
           <form id="example_district_rankings_request_form" class="form-inline">
             <div class="input-group">
-              <span class="input-group-addon">www.thebluealliance.com</span>
-              <input class="form-control" size="6"
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
+              <input class="form-control" size="600"
               id="example_district_rankings_request" type="text" value="/api/v2/district/ne/2014/rankings">
               <span class="input-group-btn">
                 <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
@@ -1404,6 +1571,108 @@
         </div>
       </div>
 
+      <h3 id="district-teams-request">District Teams Request</h3>
+      <p>
+        Request format:
+        <code>https://www.thebluealliance.com/api/v2/district/&lt;district short&gt;/&lt;year&gt;/teams</code>
+      </p>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Description</th>
+            <th>Examples</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>district short</td>
+            <td>The district abbreviation you want data for, as defined <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/district_type.py#L38">here</a>
+            <td>ne</td>
+          </tr>
+          <tr>
+            <td>Year</td>
+            <td>The year you want data for</td>
+            <td>2014</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Example GET Request:</h3>
+        </div>
+        <div class="panel-body">
+          <form id="example_district_teams_request_form" class="form-inline">
+            <div class="input-group">
+              <span class="input-group-addon">https://www.thebluealliance.com</span>
+              <input class="form-control" size="600"
+              id="example_district_teams_request" type="text" value="/api/v2/district/ne/2015/teams">
+              <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+              </span>
+            </div>
+          </form>
+          <div class="panel-group">
+            <pre class="district-teams-request-json">
+            </pre>
+          </div>
+        </div>
+      </div>
+
+      <h2 id="api-libraries">API Libraries</h2>
+      <p>
+        These libraries have been created by our community to help you use our
+        API in your next project.
+      </p>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Language</th>
+            <th>Repository</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>C#</td>
+            <td><a href="https://github.com/xNovax/TheBlueAlliance_API">TheBlueAlliance_API</a></td>
+          </tr>
+          <tr>
+            <td>Java</td>
+            <td><a href="https://github.com/phil-lopreiato/tba-apiv2-java">tba-apiv2-java</a></td>
+          </tr>
+          <tr>
+            <td>Java</td>
+            <td><a href="https://github.com/AdiSai/TheBlueAlliance">TheBlueAlliance</a></td>
+          </tr>
+          <tr>
+            <td>Java</td>
+            <td><a href="https://github.com/FRC2834/java-blue-alliance-api">java-blue-alliance-api</a></td>
+          </tr>
+          <tr>
+            <td>Java</td>
+            <td><a href="https://github.com/tonypeng/TheBlueAllianceJavaAPI">TheBlueAllianceJavaAPI</a></td>
+          </tr>
+          <tr>
+            <td>Javascript</td>
+            <td><a href="https://github.com/chacha/thebluealliance-javascript">thebluealliance-javascript</a></td>
+          </tr>
+          <tr>
+            <td>Node.js</td>
+            <td><a href="https://github.com/khanh111/node-thebluealliance">node-thebluealliance</a></td>
+          </tr>
+          <tr>
+            <td>Python</td>
+            <td><a href="https://github.com/Alexanders101/The-Blue-Alliance-Python-API">The-Blue-Alliance-Python-API</a></td>
+          </tr>
+          <tr>
+            <td>Ruby</td>
+            <td><a href="https://github.com/chacha/thebluealliance-ruby">thebluealliance-ruby</a></td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Made a library that you want to be included? <a href="https://github.com/the-blue-alliance/the-blue-alliance/issues/">Let us know!</a>
+      </p>
   </div>
 </div>
 {% endblock %}
@@ -1418,7 +1687,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-team-list-request:v01'},
       success: function(data) {
-        $(".team-list-request-json").html(JSON.stringify(data, null, 2));
+        $(".team-list-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".team-list-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1434,7 +1703,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-team-request:v01'},
       success: function(data) {
-        $(".team-request-json").html(JSON.stringify(data, null, 2));
+        $(".team-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".team-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1450,7 +1719,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-team-events-request:v01'},
       success: function(data) {
-        $(".team-events-request-json").html(JSON.stringify(data, null, 2));
+        $(".team-events-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".team-events-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1466,7 +1735,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-team-event-awards-request:v01'},
       success: function(data) {
-        $(".team-event-awards-request-json").html(JSON.stringify(data, null, 2));
+        $(".team-event-awards-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".team-event-awards-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1482,7 +1751,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-team-event-matches-request:v01'},
       success: function(data) {
-        $(".team-event-matches-request-json").html(JSON.stringify(data, null, 2));
+        $(".team-event-matches-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".team-event-matches-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1498,7 +1767,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-team-years-participated-request:v01'},
       success: function(data) {
-        $(".team-years-participated-request-json").html(JSON.stringify(data, null, 2));
+        $(".team-years-participated-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".team-years-participated-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1514,7 +1783,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-team-media-request:v01'},
       success: function(data) {
-        $(".team-media-request-json").html(JSON.stringify(data, null, 2));
+        $(".team-media-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".team-media-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1530,7 +1799,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-team-history-events-request:v01'},
       success: function(data) {
-        $(".team-history-events-request-json").html(JSON.stringify(data, null, 2));
+        $(".team-history-events-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".team-history-events-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1546,10 +1815,43 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-team-history-awards-request:v01'},
       success: function(data) {
-        $(".team-history-awards-request-json").html(JSON.stringify(data, null, 2));
+        $(".team-history-awards-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".team-history-awards-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+  $("#example_team_history_robots_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".team-history-robots-request-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_team_history_robots_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-team-history-robots-request:v01'},
+      success: function(data) {
+        $(".team-history-robots-request-json").text(JSON.stringify(data, null, 2)).html();
+      },
+      error: function(data) {
+        $(".team-history-robots-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+
+  $("#example_team_history_districts_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".team-history-districts-request-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_team_history_districts_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-team-history-districts-request:v01'},
+      success: function(data) {
+        $(".team-history-districts-request-json").text(JSON.stringify(data, null, 2)).html();
+      },
+      error: function(data) {
+        $(".team-history-districts-request-json").html('Something went wrong! Please check for correct request format.');
       }
     });
   });
@@ -1562,7 +1864,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-event-request:v01'},
       success: function(data) {
-        $(".event-request-json").html(JSON.stringify(data, null, 2));
+        $(".event-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".event-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1578,7 +1880,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-event-teams-request:v01'},
       success: function(data) {
-        $(".event-teams-request-json").html(JSON.stringify(data, null, 2));
+        $(".event-teams-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".event-teams-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1594,7 +1896,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-event-matches-request:v01'},
       success: function(data) {
-        $(".event-matches-request-json").html(JSON.stringify(data, null, 2));
+        $(".event-matches-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".event-matches-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1610,7 +1912,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-event-stats-request:v01'},
       success: function(data) {
-        $(".event-stats-request-json").html(JSON.stringify(data, null, 2));
+        $(".event-stats-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".event-stats-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1626,7 +1928,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-event-rankings-request:v01'},
       success: function(data) {
-        $(".event-rankings-request-json").html(JSON.stringify(data, null, 2));
+        $(".event-rankings-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".event-rankings-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1642,7 +1944,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-event-list-request:v01'},
       success: function(data) {
-        $(".event-list-request-json").html(JSON.stringify(data, null, 2));
+        $(".event-list-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".event-list-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1658,7 +1960,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-event-awards-request:v01'},
       success: function(data) {
-        $(".event-awards-request-json").html(JSON.stringify(data, null, 2));
+        $(".event-awards-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".event-awards-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1674,7 +1976,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-event-points-request:v01'},
       success: function(data) {
-        $(".event-points-request-json").html(JSON.stringify(data, null, 2));
+        $(".event-points-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".event-points-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1690,7 +1992,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-match-request:v01'},
       success: function(data) {
-        $(".match-request-json").html(JSON.stringify(data, null, 2));
+        $(".match-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".match-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1706,7 +2008,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-district-list-request:v01'},
       success: function(data) {
-        $(".district-list-request-json").html(JSON.stringify(data, null, 2));
+        $(".district-list-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".district-list-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1722,7 +2024,7 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-district-events-request:v01'},
       success: function(data) {
-        $(".district-events-request-json").html(JSON.stringify(data, null, 2));
+        $(".district-events-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".district-events-request-json").html('Something went wrong! Please check for correct request format.');
@@ -1738,10 +2040,26 @@
       dataType: 'json',
       headers: {'X-TBA-App-Id': 'tba-web:example-district-rankings-request:v01'},
       success: function(data) {
-        $(".district-rankings-request-json").html(JSON.stringify(data, null, 2));
+        $(".district-rankings-request-json").text(JSON.stringify(data, null, 2)).html();
       },
       error: function(data) {
         $(".district-rankings-request-json").html('Something went wrong! Please check for correct request format.');
+      }
+    });
+  });
+
+  $("#example_district_teams_request_form").submit(function(e) {
+    e.preventDefault();
+    $(".district-teams-json").html('Processing request...');
+    $.ajax({
+      url: $("#example_district_teams_request").val(),
+      dataType: 'json',
+      headers: {'X-TBA-App-Id': 'tba-web:example-district-teams-request:v01'},
+      success: function(data) {
+        $(".district-teams-request-json").text(JSON.stringify(data, null, 2)).html();
+      },
+      error: function(data) {
+        $(".district-teams-request-json").html('Something went wrong! Please check for correct request format.');
       }
     });
   });

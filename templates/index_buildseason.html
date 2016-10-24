@@ -13,13 +13,21 @@
       <h2><span class="countdown-number countdown-days">--</span><span class="countdown-label day-label"> Days</span> Left to Build! <small>Build Season ends {{endbuild_datetime_est|date:"F jS"}}</small></h2>
       <div id="countdown-finish-time">{{endbuild_datetime_utc|date:"c"}}</div>
       <div class="btn-group game-manual">
-        <a class="btn btn-default" href="https://rps01.usfirst.org/frc/manual/2015/FRC2015GameManual.pdf" target="_blank"><span class="glyphicon glyphicon-file"></span> Game Manual PDF</a>
-        <a class="btn btn-default" href="https://itunes.apple.com/us/app/frc-manual/id488793605"><span class="glyphicon glyphicon-download"></span> iPhone Manual </a>
-        <a class="btn btn-default" href="https://play.google.com/store/apps/details?id=org.usfirst.manual.frc"><span class="glyphicon glyphicon-download"></span> Android Manual</a>
+        <a class="btn btn-default" href="http://www.firstinspires.org/resource-library/frc/competition-manual-qa-system" target="_blank"><span class="glyphicon glyphicon-file"></span> FIRST Stronghold Game Manual and Materials</a>
       </div>
+      {% if events %}
+        <h2>This Week's Events</h2>
+        {% with events as events %}
+          {% include "event_partials/event_table.html" %}
+        {% endwith %}
+        <div>
+          <a class="btn btn-default" href="/webcasts"><span class="glyphicon glyphicon-info-sign"></span> Add Webcasts</a>
+          <a class="btn btn-default" href="/contact"><span class="glyphicon glyphicon-upload"></span> Add YouTube Videos</a>
+        </div>
+      {% endif %}
       <br><br>
       <div class="fitvids">
-        <iframe width="420" height="315" src="https://www.youtube.com/embed/W6UYFKNGHJ8" frameborder="0" allowfullscreen></iframe>
+        <iframe width="420" height="315" src="https://www.youtube.com/embed/VqOKzoHJDjA" frameborder="0" allowfullscreen></iframe>
       </div>
     </div>
   </div>

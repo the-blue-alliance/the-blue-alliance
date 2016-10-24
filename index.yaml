@@ -33,8 +33,19 @@ indexes:
 
 - kind: Event
   properties:
+  - name: event_type_enum
+  - name: year
+  - name: start_date
+
+- kind: Event
+  properties:
   - name: official
   - name: end_date
+
+- kind: Event
+  properties:
+  - name: year
+  - name: event_district_enum
 
 - kind: Event
   properties:
@@ -111,3 +122,10 @@ indexes:
   - name: team_key_names
   - name: set_number
   - name: match_number
+
+- kind: Subscription
+  ancestor: yes
+  properties:
+  - name: model_type
+  - name: notification_types
+  - name: model_key

@@ -204,7 +204,7 @@
           <p>This notification is sent when new unplayed matches are added to a live event.</p>
           <h4>Structure</h4>
           <ul>
-            <li>message_type: “schedule_posted”</li>
+            <li>message_type: “schedule_updated”</li>
             <li>fields in message_data object<ul>
               <li>“event_key”</li>
               <li>“event_name”</li>
@@ -240,7 +240,7 @@
         {% endif %}
 
         <h3 id="notification_ping">Ping Notification</h3>
-          <p>This notification is sent from the <a href="http://www.thebluealliance.com/account">Account Overview</a> page to an individual one of the user's connected devices.</p>
+          <p>This notification is sent from the <a href="/account">Account Overview</a> page to an individual one of the user's connected devices.</p>
           <h4>Structure</h4>
             <ul>
               <li>"message_type": "ping"</li>
@@ -288,7 +288,7 @@
             {"message_type": "update_subscriptions"}
             </pre>
         <h3 id="notification_verification">Webhook Verification Notifications</h3>
-          <p>This notification is sent when a new webhook is created. It contains a verification code that needs to be entered in the <a href="http://www.thebluealliance.com/account">Account Overview</a> page for the webhook before it recieves live updates.</p>
+          <p>This notification is sent when a new webhook is created. It contains a verification code that needs to be entered in the <a href="/account">Account Overview</a> page for the webhook before it recieves live updates.</p>
           <h4>Structure</h4>
             <ul>
               <li>"message_type": "verification"</li>

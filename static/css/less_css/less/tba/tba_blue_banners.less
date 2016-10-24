@@ -1,0 +1,79 @@
+/* Adapted from https://github.com/ErikBoesen/banners.css */
+
+
+@banner_blue: #0f4bcb;
+@banner_width: 140px;
+@banner_padding: 8px;
+
+.banner {
+    background: @banner_blue;
+    color: white;
+    display: inline-block;
+    height: 170px;
+    width: @banner_width;
+    line-height: 1.2;
+    margin: 0 0 40px;
+    padding: @banner_padding;
+    position: relative;
+    text-align: center;
+    vertical-align: top;
+    white-space: normal;
+    img {
+        margin-bottom: 10px;
+        margin-top: 10px;
+        width: 75px;
+    }
+    &:after {
+        content: '';
+        position: absolute;
+        display: block;
+        border: @banner_width/2 solid @banner_blue;
+        border-top-width: 5px;
+        border-bottom: 20px transparent solid;
+        top: 100%;
+        left: 0;
+    }
+    .award-name, .award-name-long {
+        display: table;
+        width: 100%;
+        height: 35px;
+        font-weight: bolder;
+        margin: 0;
+        margin-top: 3px;
+        margin-bottom: 3px;
+        span {
+            display: table-cell;
+            vertical-align: middle;
+            font-style: italic;
+            text-transform: uppercase;
+        }
+    }
+    .award-name-long span {
+        font-size: 85%;
+    }
+    .award-event, .award-event-long {
+        display: table;
+        text-transform: uppercase;
+        height: 50px;
+        width: 100%;
+        span {
+            display: table-cell;
+            vertical-align: middle;
+            max-width: @banner_width - 2*@banner_padding;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+    }
+    .award-event {
+        font-size: 85%;
+        line-height: 130%;
+    }
+    .award-event-long {
+        font-size: 75%;
+        line-height: 110%;
+    }
+}
+.banner, .banner:after  {
+    -webkit-filter: drop-shadow(0 5px 5px rgba(0, 0, 0, .1));
+    filter: drop-shadow(0 5px 5px rgba(0, 0, 0, .1));
+}

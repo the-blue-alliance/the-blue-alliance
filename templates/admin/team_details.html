@@ -8,7 +8,7 @@
 
 <div class="btn-group">
     <a href="/team/{{team.team_number}}" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> View on TBA</a>
-    <a href="/tasks/get/usfirst_team_details/frc{{team.team_number}}" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span> Refresh from FIRST</a>
+    <a href="/backend-tasks/get/team_details/{{team.key.id}}" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span> Refresh from FIRST</a>
 </div>
 <br><br>
 
@@ -26,8 +26,20 @@
         <td>{{ team.rookie_year }}</td>
     </tr>
     <tr>
-        <td>Address</td>
-        <td>{{ team.address }}</td>
+        <td>Motto</td>
+        <td>{{ team.motto }}</td>
+    </tr>
+    <tr>
+        <td>City</td>
+        <td>{{ team.city }}</td>
+    </tr>
+    <tr>
+        <td>State/Prov</td>
+        <td>{{ team.state_prov }}</td>
+    </tr>
+    <tr>
+        <td>Country</td>
+        <td>{{ team.country }}</td>
     </tr>
     <tr>
         <td>Website</td>
@@ -41,11 +53,27 @@
         <td>Events</td>
         <td>{{event_teams|length}} Events - {% for event_team in event_teams %}<a href="/admin/event/{{event_team.event.id}}">{{event_team.event.id}}</a>, {% endfor %}</td>
     </tr>
+    <tr>
+        <td>Robots</td>
+        <td>
+            {% for robot in robots %}
+                {{ robot.year }}: {{ robot.robot_name }}
+                {% if not forloop.last %}<br>{% endif %}
+            {% endfor %}
+        </td>
+    </tr>
+    <tr>
+        <td>Districts</td>
+        <td>
+            {% for district_team in district_teams %}
+                {{district_team.key.id}}
+                {% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </td>
+    </tr>
 </table>
 
-<p>Teams are currently uneditable. They are updated via TIMS scraping.</p>
-<p>Team info is on FIRST at <a href="http://www.usfirst.org/whatsgoingon">http://www.usfirst.org/whatsgoingon</a></p>
-
+<p>Teams are currently uneditable. They are updated via FRC API scraping.</p>
 
 <h2>Add Media</h2>
 <form action="/admin/media/add_media" method="post">
@@ -72,11 +100,96 @@
   {% else %}
     <h3>{{year}}:</h3>
   {% endif %}
+  <ul>
   {% for media in medias %}
-    {% include "partials/admin_media_display.html" %}
+    <li>{% include "partials/admin_media_display.html" %}</li>
   {% endfor %}
-  <br>
+  </ul>
 {% endfor %}
 
-{% endblock %}
+<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Confirm media reference removal
+            </div>
+            <div class="modal-body">
+                Are you sure you want to remove this reference to this media? References to other models will persist.
+            </div>
+            <div class="modal-footer">
+                <form id="delete_media_form" method="post">
+                <input name="reference_type" type="hidden" value="team" />
+                <input name="reference_key_name" type="hidden" value="{{team.key_name}}" />
+                <input name="originating_url" type="hidden" value="/admin/team/{{team.team_number}}" />
 
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-danger" type="submit"><span class="glyphicon glyphicon-delete"></span> Remove reference</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="make-preferred" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Make Preferred Confirmation
+            </div>
+            <div class="modal-body">
+                Are you sure you want make this media preferred?
+            </div>
+            <div class="modal-footer">
+                <form id="make_preferred_form" method="post">
+                <input name="reference_type" type="hidden" value="team" />
+                <input name="reference_key_name" type="hidden" value="{{team.key_name}}" />
+                <input name="originating_url" type="hidden" value="/admin/team/{{team.team_number}}" />
+
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-success" type="submit"><span class="glyphicon glyphicon-star"></span> Make Preferred</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="remove-preferred" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Remove Preferred Confirmation
+            </div>
+            <div class="modal-body">
+                Are you sure you want to make this this media not preferred?
+            </div>
+            <div class="modal-footer">
+                <form id="remove_preferred_form" method="post">
+                <input name="reference_type" type="hidden" value="team" />
+                <input name="reference_key_name" type="hidden" value="{{team.key_name}}" />
+                <input name="originating_url" type="hidden" value="/admin/team/{{team.team_number}}" />
+
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-success" type="submit"><span class="glyphicon glyphicon-star-empty"></span> Remove Preferred</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function(){
+    $('#confirm-delete').on('show.bs.modal', function(e) {
+        $(this).find('#delete_media_form').attr('action', '/admin/media/delete_reference/' + $(e.relatedTarget).data('key-name'));
+    });
+
+    $('#make-preferred').on('show.bs.modal', function(e) {
+        $(this).find('#make_preferred_form').attr('action', '/admin/media/make_preferred/' + $(e.relatedTarget).data('key-name'));
+    });
+
+    $('#remove-preferred').on('show.bs.modal', function(e) {
+        $(this).find('#remove_preferred_form').attr('action', '/admin/media/remove_preferred/' + $(e.relatedTarget).data('key-name'));
+    });
+});
+</script>
+
+{% endblock %}

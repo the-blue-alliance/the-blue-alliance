@@ -80,3 +80,24 @@ class NotificationType(object):
         AWARDS: render_names[AWARDS],
         SCHEDULE_UPDATED: render_names[SCHEDULE_UPDATED],
     }
+
+    enabled_event_notifications = [
+        UPCOMING_MATCH,
+        MATCH_SCORE,
+        LEVEL_STARTING,
+        ALLIANCE_SELECTION,
+        AWARDS,
+        SCHEDULE_UPDATED
+    ]
+
+    enabled_team_notifications = [
+        UPCOMING_MATCH,
+        MATCH_SCORE,
+        ALLIANCE_SELECTION,
+        AWARDS
+    ]
+
+    enabled_match_notifications = [
+        UPCOMING_MATCH,
+        MATCH_SCORE
+    ]

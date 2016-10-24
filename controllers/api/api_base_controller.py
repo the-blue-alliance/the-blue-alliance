@@ -1,6 +1,8 @@
+import datetime
 import json
 import logging
 import md5
+import random
 import tba_config
 import urllib
 import uuid
@@ -13,6 +15,7 @@ from google.appengine.ext import ndb
 from consts.auth_type import AuthType
 from controllers.base_controller import CacheableHandler
 from datafeeds.parser_base import ParserInputException
+from helpers.user_bundle import UserBundle
 from helpers.validation_helper import ValidationHelper
 from models.api_auth_access import ApiAuthAccess
 from models.cached_response import CachedResponse
@@ -30,7 +33,7 @@ def track_call(api_action, api_label, x_tba_app_id):
         logging.warning("Missing sitevar: google_analytics.id. Can't track API usage.")
     else:
         GOOGLE_ANALYTICS_ID = analytics_id.contents['GOOGLE_ANALYTICS_ID']
-        params = urllib.urlencode({
+        payload = urllib.urlencode({
             'v': 1,
             'tid': GOOGLE_ANALYTICS_ID,
             'cid': uuid.uuid3(uuid.NAMESPACE_X500, str(x_tba_app_id)),
@@ -43,11 +46,12 @@ def track_call(api_action, api_label, x_tba_app_id):
             'sc': 'end',  # forces tracking session to end
         })
 
-        analytics_url = 'http://www.google-analytics.com/collect?%s' % params
         urlfetch.fetch(
-            url=analytics_url,
-            method=urlfetch.GET,
-            deadline=10,
+            url='https://www.google-analytics.com/collect',
+            validate_certificate=True,
+            method=urlfetch.POST,
+            deadline=30,
+            payload=payload,
         )
 
 
@@ -66,11 +70,11 @@ class ApiBaseController(CacheableHandler):
         response.
         Called by webapp when abort() is called, stops code excution.
         """
-        logging.info(exception)
         if isinstance(exception, webapp2.HTTPException):
             self.response.set_status(exception.code)
             self.response.out.write(self._errors)
         else:
+            logging.exception(exception)
             self.response.set_status(500)
 
     def get(self, *args, **kw):
@@ -82,23 +86,24 @@ class ApiBaseController(CacheableHandler):
         self._track_call(*args, **kw)
         super(ApiBaseController, self).get(*args, **kw)
         self.response.headers['X-TBA-Version'] = '{}'.format(self.API_VERSION)
-        self._set_cache_header_length(self.CACHE_HEADER_LENGTH)
+        self.response.headers['Vary'] = 'Accept-Encoding'
+
+    def options(self, *args, **kw):
+        """
+        Supply an OPTIONS method in order to comply with CORS preflghted requests
+        https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests
+        """
+        self.response.headers['Access-Control-Allow-Methods'] = "GET, OPTIONS"
+        self.response.headers['Access-Control-Allow-Headers'] = 'X-TBA-App-Id'
 
     def _read_cache(self):
         """
         Overrides parent method to use CachedResponse instead of memcache
-        Returns:
-        None if not cached
-        the cached response if cached
-        True if in not modified
         """
         response = CachedResponse.get_by_id(self.cache_key)
         if response:
-            if self._has_been_modified_since(response.updated):
-                response.headers['Last-Modified'] = self.response.headers['Last-Modified']
-                return response
-            else:
-                return True
+            self._last_modified = response.updated
+            return response
         else:
             return None
 
@@ -122,7 +127,8 @@ class ApiBaseController(CacheableHandler):
         ndb.delete_multi([ndb.Key(CachedResponse, cache_key) for cache_key in cache_keys])
 
     def _track_call_defer(self, api_action, api_label):
-        deferred.defer(track_call, api_action, api_label, self.x_tba_app_id, _queue="api-track-call")
+        if random.random() < tba_config.GA_RECORD_FRACTION:
+            deferred.defer(track_call, api_action, api_label, self.x_tba_app_id, _queue="api-track-call")
 
     def _validate_tba_app_id(self):
         """
@@ -143,14 +149,6 @@ class ApiBaseController(CacheableHandler):
             self._errors = json.dumps({"Error": "X-TBA-App-Id must follow a specific format. Please see http://www.thebluealliance.com/apidocs for more info."})
             self.abort(400)
 
-    def _set_cache_header_length(self, seconds):
-        if type(seconds) is not int:
-            logging.error("Cache-Control max-age is not integer: {}".format(seconds))
-            return
-
-        self.response.headers['Cache-Control'] = "public, max-age=%d" % max(seconds, 61)  # needs to be at least 61 seconds to work
-        self.response.headers['Pragma'] = 'Public'
-
 
 class ApiTrustedBaseController(webapp2.RequestHandler):
     REQUIRED_AUTH_TYPES = set()
@@ -158,6 +156,8 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
     def __init__(self, *args, **kw):
         super(ApiTrustedBaseController, self).__init__(*args, **kw)
         self.response.headers['content-type'] = 'application/json; charset="utf-8"'
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
+        self._user_bundle = UserBundle()
 
     def handle_exception(self, exception, debug):
         """
@@ -172,31 +172,44 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
         else:
             self.response.set_status(500)
 
+    def options(self, event_key):
+        """
+        Supply an OPTIONS method in order to comply with CORS preflghted requests
+        https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests
+        """
+        self.response.headers['Access-Control-Allow-Methods'] = "POST, OPTIONS"
+        self.response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-TBA-Auth-Id, X-TBA-Auth-Sig'
+
     def post(self, event_key):
-        auth_id = self.request.headers.get('X-TBA-Auth-Id')
-        if not auth_id:
-            self._errors = json.dumps({"Error": "Must provide a request header parameter 'X-TBA-Auth-Id'"})
-            self.abort(400)
+        event_key = event_key.lower()  # Normalize keys to lower case (TBA convention)
 
-        auth_sig = self.request.headers.get('X-TBA-Auth-Sig')
-        if not auth_sig:
-            self._errors = json.dumps({"Error": "Must provide a request header parameter 'X-TBA-Auth-Sig'"})
-            self.abort(400)
+        if not (self._user_bundle.user and self._user_bundle.is_current_user_admin):  # Allow admins to use without auth keys
+            auth_id = self.request.headers.get('X-TBA-Auth-Id')
+            if not auth_id:
+                self._errors = json.dumps({"Error": "Must provide a request header parameter 'X-TBA-Auth-Id'"})
+                self.abort(400)
 
-        auth = ApiAuthAccess.get_by_id(auth_id)
-        if not auth or md5.new('{}{}{}'.format(auth.secret, self.request.path, self.request.body)).hexdigest() != auth_sig:
-            self._errors = json.dumps({"Error": "Invalid X-TBA-Auth-Id and/or X-TBA-Auth-Sig!"})
-            self.abort(400)
+            auth_sig = self.request.headers.get('X-TBA-Auth-Sig')
+            if not auth_sig:
+                self._errors = json.dumps({"Error": "Must provide a request header parameter 'X-TBA-Auth-Sig'"})
+                self.abort(400)
 
-        allowed_event_keys = [ekey.id() for ekey in auth.event_list]
-        if event_key not in allowed_event_keys:
-            self._errors = json.dumps({"Error": "Only allowed to edit events: {}".format(', '.join(allowed_event_keys))})
-            self.abort(400)
+            auth = ApiAuthAccess.get_by_id(auth_id)
+            expected_sig = md5.new('{}{}{}'.format(auth.secret if auth else None, self.request.path, self.request.body)).hexdigest()
+            if not auth or expected_sig != auth_sig:
+                logging.info("Auth sig: {}, Expected sig: {}".format(auth_sig, expected_sig))
+                self._errors = json.dumps({"Error": "Invalid X-TBA-Auth-Id and/or X-TBA-Auth-Sig!"})
+                self.abort(401)
 
-        missing_auths = self.REQUIRED_AUTH_TYPES.difference(set(auth.auth_types_enum))
-        if missing_auths != set():
-            self._errors = json.dumps({"Error": "You do not have permission to edit: {}. If this is incorrect, please contact TBA admin.".format(",".join([AuthType.type_names[ma] for ma in missing_auths]))})
-            self.abort(400)
+            allowed_event_keys = [ekey.id() for ekey in auth.event_list]
+            if event_key not in allowed_event_keys:
+                self._errors = json.dumps({"Error": "Only allowed to edit events: {}".format(', '.join(allowed_event_keys))})
+                self.abort(401)
+
+            missing_auths = self.REQUIRED_AUTH_TYPES.difference(set(auth.auth_types_enum))
+            if missing_auths != set():
+                self._errors = json.dumps({"Error": "You do not have permission to edit: {}. If this is incorrect, please contact TBA admin.".format(",".join([AuthType.type_names[ma] for ma in missing_auths]))})
+                self.abort(401)
 
         try:
             self._process_request(self.request, event_key)

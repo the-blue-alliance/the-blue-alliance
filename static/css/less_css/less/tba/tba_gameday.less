@@ -63,7 +63,6 @@ body {
 
   .dropdown-toggle, .chat-toggle, .social-toggle, .ticker-toggle, .settings-button {
     padding: 6px 8px !important;
-    height: 18px !important;
   }
 
   .dropdown:hover, .chat:hover, .social:hover, .ticker:hover, .settings:hover {
@@ -112,6 +111,16 @@ body {
       background-image: url('/images/icons/tba-gameday-sprite.png');
       background-position: 95% -215px;
     }
+
+    .layout_7 {
+      background-image: url('/images/icons/tba-gameday-sprite.png');
+      background-position: 95% -250px;
+    }
+
+    .layout_8 {
+      background-image: url('/images/icons/tba-gameday-sprite.png');
+      background-position: 95% -285px;
+    }
   }
 
   ul.nav li.dropdown:hover ul.dropdown-menu{
@@ -131,7 +140,17 @@ body {
 
   #twitter-widget {
     background-color: #000000;
-    height: 100%;
+    position: absolute;
+    top: 0px;
+    bottom: 100px;
+    width: 100%;
+  }
+
+  #play-store-widget {
+    background-color: #ffffff;
+    position: absolute;
+    bottom: 0px;
+    height: 100px;
     width: 100%;
   }
 }
