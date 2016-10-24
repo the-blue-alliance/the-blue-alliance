@@ -40,27 +40,12 @@ Setup
   * Fork TBA by clicking on "Fork" in the top right of [its GitHub page](https://github.com/the-blue-alliance/the-blue-alliance)
   * Run `git clone https://github.com/USERNAME/the-blue-alliance.git` where _USERNAME_ is your GitHub username, or use GitHub's Windows or OS X app to clone it to your computer
   * For detailed instructions see [the GitHub guide on contributing](https://guides.github.com/activities/contributing-to-open-source/index.html#contributing)
-1. Install [numpy](http://www.numpy.org/)
-  * You can use your favorite package manager.
-  * Or download a binary of [the latest version of numpy](http://sourceforge.net/projects/numpy/files/latest/download?source=files).
-    * Unpack the archive
-    * cd into the archive
-    * Run `setup.py install` or `python setup.py install`
-  * Or compile it from source code. (On Windows, use the [Microsoft Visual C++ Compiler for Python 2.7](http://www.microsoft.com/en-us/download/details.aspx?id=44266).)
-  * NOTE: If you are using the Linux version, install v1.6.1 instead of the latest version through `pip install numpy==1.6.1`. Installing the latest version raises an `ImportError: No module named _ctypes` from Google App Engine when trying to launch the dev server.
+1. Install initial required Python packages
+  * `pip install -r requirements.txt`
 1. Install [Node.js](https://nodejs.org/) which includes [Node Package Manager](https://www.npmjs.org/)
 1. Install [gulp](https://github.com/gulpjs/gulp) by running `npm rm --global gulp && npm install --global gulp-cli`. This removes any version of `gulp` that was previously installed globally so it doesn't conflict with `gulp-cli`. Gulp is used as the build tool for Gameday2.
 1. Install all node dependencies by running `npm install`. This includes `less`, which is used to build CSS files for production, as well as a number of packages used in Gameday2.
-1. Install Jinja, which we use to build some of our HTML template files
-  * `pip install jinja2`
-  * or `easy_install jinja2`
-1. Install Paver, which we use to help run commands to build static files (like LESS and Jinja)
-  * `pip install Paver`
-  * or `easy_install Paver`
-1. Install pep8, a python code style linter, to avoid the `lint` error `[Error 2] The system cannot find the file specified`.
-  * `pip install pep8`
-  * or `easy_install pep8`
-1. Run `paver setup` to do an initial build of static files (CSS, HTML templates, javascript) to get you going
+1. Run `paver setup` to install remaining dependencies and do an initial build of static files (CSS, HTML templates, javascript) to get you going
 1. Run the app in GoogleAppEngineLauncher according to the directions below, and visit the local URL to see your own copy of The Blue Alliance!
 
 Run a local dev server

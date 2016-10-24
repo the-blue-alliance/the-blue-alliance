@@ -52,6 +52,11 @@ def gulp():
 
 
 @task
+def install_libs():
+    sh("pip install -r deploy_requirements.txt -t lib")
+
+
+@task
 def jinja2():
     sh("python compile_jinja2_templates.py")
 
@@ -90,6 +95,7 @@ def make():
 @task
 def preflight():
     """Prep a prod push"""
+    install_libs()
     test_function([])
     make()
 
@@ -125,6 +131,7 @@ def test_fast():
 
 
 def setup_function():
+    install_libs()
     make()
 
 
