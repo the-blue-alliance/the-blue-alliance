@@ -1,3 +1,4 @@
+# Packages that are needed for testing no Travis
 Django==1.4.3
 Paver==1.1.1
 WebTest==1.4.0
