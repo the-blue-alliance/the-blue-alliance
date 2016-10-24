@@ -142,7 +142,10 @@
       <h2>Connected Devices</h2>
     </div>
     <div class="col-md-10 col-md-offset-1">
-     {% if user_bundle.mobile_clients %}
+      <p class="notifications-disabled-visible">Push notifications (beta) for this device are <strong>disabled</strong>! <a class="btn btn-primary" role="button" onclick="setupMessaging(true)">Enable</a></p>
+      <p class="notifications-enabled-visible">Push notifications (beta) for this device are <strong>enabled</strong>! <a class="btn btn-danger" role="button" onclick="disableMessaging()">Disable</a></p>
+      {% if user_bundle.mobile_clients %}
+      <p>All devices will appear below, whether or not push notifications are enabled or disabled for a specific device.</p>
       <table class="table table-striped">
         <tr>
           <th>Type</th>

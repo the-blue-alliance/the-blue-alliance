@@ -1,39 +1,48 @@
 const messaging = firebase.messaging();
 
-// Setup messaging if logged in
-$.ajax({
-  type: 'GET',
-  url: '/_/account/info',
-}).done(function(accountInfo) {
-  if (accountInfo.logged_in) {
-    if (accountInfo.user_id != window.localStorage.getItem('TBA_lastFCMTokenUserId')) {
-      console.log('[TBA FCM] Different user logged in. Can\'t use same token.');
+// Setup messaging if logged in and permission granted, or if logged in and forced
+function setupMessaging(forceRequestPermission) {
+  $(".notifications-enabled-visible").hide();
+  $(".notifications-disabled-visible").show();
+  if (Notification.permission == 'denied' && forceRequestPermission) {
+    alert("You have blocked push notifications in your browser for this site. Please unblock and try again.");  // TODO show more elegantly
+  } else if (Notification.permission == 'granted' || forceRequestPermission) {
+    $.ajax({
+      type: 'GET',
+      url: '/_/account/info',
+    }).done(function(accountInfo) {
+      if (accountInfo.logged_in) {
+        if (accountInfo.user_id != window.localStorage.getItem('TBA_lastFCMTokenUserId')) {
+          console.log('[TBA FCM] Different user logged in. Can\'t use same token.');
 
-      messaging.requestPermission()
-      .then(function() {
-        return messaging.getToken();
-      })
-      .then(function(token) {
-        console.log('[TBA FCM] Deleting token:', token);
-        messaging.deleteToken(token)
-        .then(function() {
-          console.log('[TBA FCM] Token successfully deleted!')
-          setupMessaging(accountInfo);
-        })
-        .catch(function(err) {
-          console.log('[TBA FCM] Unable to delete token token. Cannot continue with FCM setup.', err);
-        });
-      })
-      .catch(function(err) {
-        console.log('[TBA FCM] Unable to get permission to delete token. Cannot continue with FCM setup.', err);
-      });
-    } else {
-      setupMessaging(accountInfo);
-    }
+          messaging.requestPermission()
+          .then(function() {
+            return messaging.getToken();
+          })
+          .then(function(token) {
+            console.log('[TBA FCM] Deleting token:', token);
+            messaging.deleteToken(token)
+            .then(function() {
+              console.log('[TBA FCM] Token successfully deleted!')
+              setupMessagingHelper(accountInfo);
+            })
+            .catch(function(err) {
+              console.log('[TBA FCM] Unable to delete token token. Cannot continue with FCM setup.', err);
+            });
+          })
+          .catch(function(err) {
+            console.log('[TBA FCM] Unable to get permission to delete token. Cannot continue with FCM setup.', err);
+          });
+        } else {
+          setupMessagingHelper(accountInfo);
+        }
+      }
+    });
   }
-});
+}
+setupMessaging(false);  // Always attempt to setup messaging without forcing
 
-function setupMessaging(accountInfo) {
+function setupMessagingHelper(accountInfo) {
   messaging.requestPermission()
   .then(function() {
     return messaging.getToken();
@@ -41,6 +50,8 @@ function setupMessaging(accountInfo) {
   .then(function(token) {
     console.log('[TBA FCM] Token:', token);
     sendTokenToServer(accountInfo, token);
+    $(".notifications-enabled-visible").show();
+    $(".notifications-disabled-visible").hide();
   })
   .catch(function(err) {
     console.log('[TBA FCM] Unable to get permission to setup messaging. ', err);
@@ -59,6 +70,22 @@ function setupMessaging(accountInfo) {
 
   messaging.onMessage(function(payload) {
     console.log("[TBA FCM] Message received. ", payload);
+  });
+}
+
+function disableMessaging() {
+  messaging.requestPermission()
+  .then(function() {
+    return messaging.getToken();
+  })
+  .then(function(token) {
+    console.log('[TBA FCM] Deleting token:', token);
+    messaging.deleteToken(token);
+    $(".notifications-enabled-visible").hide();
+    $(".notifications-disabled-visible").show();
+  })
+  .catch(function(err) {
+    console.log('[TBA FCM] Unable to delete token token. Cannot disable messaging.', err);
   });
 }
 
