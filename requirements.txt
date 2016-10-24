@@ -1,7 +1,4 @@
-Django==1.4.3
-Paver==1.1.1
-WebTest==1.4.0
-unittest2==0.5.1
-webapp2==2.5.2
 jinja2==2.6
-appengine-fixture-loader==0.1.8
+numpy==1.6.1
+Paver==1.2.4
+pep8==1.7.0
