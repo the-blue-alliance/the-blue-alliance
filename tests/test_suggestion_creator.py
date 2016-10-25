@@ -312,3 +312,25 @@ class TestApiWriteSuggestionCreator(unittest2.TestCase):
             "",
             [1, 2, 3])
         self.assertEqual(status, 'no_affiliation')
+
+    def testUndefinedAuthType(self):
+        event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.OFFSEASON)
+        event.put()
+
+        status = SuggestionCreator.createApiWriteSuggestion(
+            self.account.key,
+            "2016test",
+            "Event Organizer",
+            [1, 2, -1, -2])  # -1 and -2 should be filtered out
+        self.assertEqual(status, 'success')
+
+        # Ensure the Suggestion gets created
+        suggestions = Suggestion.query().fetch()
+        self.assertIsNotNone(suggestions)
+        self.assertEqual(len(suggestions), 1)
+
+        suggestion = suggestions[0]
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.contents['event_key'], "2016test")
+        self.assertEqual(suggestion.contents['affiliation'], "Event Organizer")
+        self.assertListEqual(suggestion.contents['auth_types'], [1, 2])

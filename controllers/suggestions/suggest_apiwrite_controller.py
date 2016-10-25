@@ -23,11 +23,13 @@ class SuggestApiWriteController(LoggedInHandler):
     def post(self):
         self._require_login()
 
+        auth_types = self.request.get_all("auth_types", [])
+        clean_auth_types = filter(lambda a: a in AuthType.type_names.keys(), auth_types)
         status = SuggestionCreator.createApiWriteSuggestion(
             author_account_key=self.user_bundle.account.key,
             event_key=self.request.get("event_key", None),
             affiliation=self.request.get("role", None),
-            auth_types=self.request.get_all("auth_types", [])
+            auth_types=clean_auth_types,
         )
         self.template_values.update({
             'status': status,

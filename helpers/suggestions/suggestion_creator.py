@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
 
+from consts.auth_type import AuthType
 from consts.event_type import EventType
 from helpers.media_helper import MediaParser
 from helpers.webcast_helper import WebcastParser
@@ -201,10 +202,12 @@ class SuggestionCreator(object):
                     author=author_account_key,
                     target_model="api_auth_access"
                 )
+                auth_types = [int(type) for type in auth_types]
+                clean_auth_types = filter(lambda a: a in AuthType.type_names.keys(), auth_types)
                 suggestion.contents = {
                     'event_key': event_key,
                     'affiliation': affiliation,
-                    'auth_types': [int(type) for type in auth_types],
+                    'auth_types': clean_auth_types,
                 }
                 suggestion.put()
                 return 'success'
