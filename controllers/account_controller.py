@@ -109,6 +109,7 @@ class AccountRegister(LoggedInHandler):
                 self.redirect('/account', abort=True)
 
         self.template_values['redirect'] = redirect
+        self.template_values['logout_url'] = self.user_bundle.create_logout_url(redirect)
         self.response.out.write(jinja2_engine.render('account_register.html', self.template_values))
 
     def post(self):
