@@ -22,16 +22,24 @@ class FMSAPIEventListParser(object):
     }
 
     EVENT_CODE_EXCEPTIONS = {
-        'cmp-archimedes': ('arc', 'Archimedes'),  # (code, short_name)
-        'cmp-carson': ('cars', 'Carson'),
-        'cmp-carver': ('carv', 'Carver'),
-        'cmp-curie': ('cur', 'Curie'),
-        'cmp-galileo': ('gal', 'Galileo'),
-        'cmp-hopper': ('hop', 'Hopper'),
-        'cmp-newton': ('new', 'Newton'),
-        'cmp-tesla': ('tes', 'Tesla'),
+        'archimedes': ('arc', 'Archimedes'),  # (code, short_name)
+        'carson': ('cars', 'Carson'),
+        'carver': ('carv', 'Carver'),
+        'curie': ('cur', 'Curie'),
+        'daly': ('dal', 'Daly'),
+        'darwin': ('dar', 'Darwin'),
+        'galileo': ('gal', 'Galileo'),
+        'hopper': ('hop', 'Hopper'),
+        'newton': ('new', 'Newton'),
+        'roebling': ('roe', 'Roebling'),
+        'tesla': ('tes', 'Tesla'),
+        'turing': ('tur', 'Turing'),
         'cmp': ('cmp', 'Einstein'),
+        'cmpmo': ('cmpmo', 'Einstein (MO)'),
+        'cmptx': ('cmptx', 'Einstein (TX)'),
     }
+
+    EINSTEIN_CODES = {'cmp', 'cmpmo', 'cmptx'}
 
     def __init__(self, season):
         self.season = int(season)
@@ -59,7 +67,7 @@ class FMSAPIEventListParser(object):
             # Special cases for champs
             if code in self.EVENT_CODE_EXCEPTIONS:
                 code, short_name = self.EVENT_CODE_EXCEPTIONS[code]
-                if code == 'cmp':  # Einstein
+                if code in self.EINSTEIN_CODES:
                     name = '{} Field'.format(short_name)
                     start = end.replace(hour=0, minute=0, second=0, microsecond=0)  # Set to beginning of last day
                 else:  # Divisions

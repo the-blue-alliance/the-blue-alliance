@@ -26,21 +26,40 @@ class DatafeedFMSAPI(object):
         'cars': 'carson',
         'carv': 'carver',
         'cur': 'curie',
+        'dal': 'daly',
+        'dar': 'darwin',
         'gal': 'galileo',
         'hop': 'hopper',
         'new': 'newton',
+        'roe': 'roebling',
         'tes': 'tesla',
+        'tur': 'turing',
     }
 
-    SUBDIV_TO_DIV = {
-        'arc': 'cmp-arte',
-        'cars': 'cmp-gaca',
-        'carv': 'cmp-cuca',
-        'cur': 'cmp-cuca',
-        'gal': 'cmp-gaca',
-        'hop': 'cmp-neho',
-        'new': 'cmp-neho',
-        'tes': 'cmp-arte',
+    SUBDIV_TO_DIV = {  # 2015, 2016
+        'arc': 'arte',
+        'cars': 'gaca',
+        'carv': 'cuca',
+        'cur': 'cuca',
+        'gal': 'gaca',
+        'hop': 'neho',
+        'new': 'neho',
+        'tes': 'arte',
+    }
+
+    SUBDIV_TO_DIV_2017 = {  # 2017+
+        'arc': 'arda',
+        'cars': 'cate',
+        'carv': 'cane',
+        'cur': 'cuda',
+        'dal': 'arda',
+        'dar': 'cuda',
+        'gal': 'garo',
+        'hop': 'hotu',
+        'new': 'cane',
+        'roe': 'garo',
+        'tes': 'cate',
+        'tur': 'hotu',
     }
 
     def __init__(self, version):
@@ -127,7 +146,11 @@ class DatafeedFMSAPI(object):
             event_team_keys = EventTeam.query(EventTeam.event == event.key).fetch(keys_only=True)
             valid_team_nums = set([int(etk.id().split('_')[1][3:]) for etk in event_team_keys])
 
-            awards += self._parse(self.FMS_API_AWARDS_URL_PATTERN % (event.year, self._get_event_short(self.SUBDIV_TO_DIV[event.event_short])), FMSAPIAwardsParser(event, valid_team_nums))
+            if event.year >= 2017:
+                division = self.SUBDIV_TO_DIV_2017[event.event_short]
+            else:
+                division = self.SUBDIV_TO_DIV[event.event_short]
+            awards += self._parse(self.FMS_API_AWARDS_URL_PATTERN % (event.year, self._get_event_short(division)), FMSAPIAwardsParser(event, valid_team_nums))
 
         awards += self._parse(self.FMS_API_AWARDS_URL_PATTERN % (event.year, self._get_event_short(event.event_short)), FMSAPIAwardsParser(event))
         return awards
