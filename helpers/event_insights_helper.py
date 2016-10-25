@@ -1,5 +1,6 @@
 import logging
 from collections import defaultdict
+from consts.event_type import EventType
 
 
 class EventInsightsHelper(object):
@@ -108,7 +109,12 @@ class EventInsightsHelper(object):
                             scales += 1
                     has_insights = True
                 except Exception, e:
-                    logging.warning("Event insights failed for {}".format(match.key.id()))
+                    msg = "Event insights failed for {}".format(match.key.id())
+                    # event.get() below should be cheap since it's backed by context cache
+                    if match.event.get().event_type_enum in EventType.SEASON_EVENT_TYPES:
+                        logging.warning(msg)
+                    else:
+                        logging.info(msg)
             finished_matches += 1
 
         if not has_insights:

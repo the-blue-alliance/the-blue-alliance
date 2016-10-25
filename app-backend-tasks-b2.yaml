@@ -22,7 +22,7 @@ libraries:
   version: "2.6"
 
 handlers:
-- url: /backend-tasks-b2/.*
+- url: .*
   script: backend_main_b2.app
   login: admin
 

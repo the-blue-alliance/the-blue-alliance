@@ -92,7 +92,7 @@ class MediaParser(object):
         """
         Takes a url, and turns it into a partial Media object dict
         """
-
+        url = url.strip()
         # Now, we can test for regular media type
         for s, media_type in cls.URL_PATTERNS:
             if s in url:
@@ -103,7 +103,8 @@ class MediaParser(object):
                 else:
                     return cls._create_media_dict(media_type, url)
 
-        logging.warning("Failed to determine media type from url: {}".format(url))
+        if url:
+            logging.warning("Failed to determine media type from url: {}".format(url))
         return None
 
     @classmethod
