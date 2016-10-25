@@ -22,7 +22,7 @@ class SuggestTeamMediaController(LoggedInHandler):
         team_key = self.request.get("team_key")
         year_str = self.request.get("year")
 
-        self._require_login()
+        self._require_registration()
 
         if not team_key or not year_str:
             self.redirect("/", abort=True)
@@ -45,7 +45,7 @@ class SuggestTeamMediaController(LoggedInHandler):
         self.response.out.write(jinja2_engine.render('suggest_team_media.html', self.template_values))
 
     def post(self):
-        self._require_login()
+        self._require_registration()
 
         team_key = self.request.get("team_key")
         year_str = self.request.get("year")
@@ -67,7 +67,7 @@ class SuggestTeamSocialMediaController(LoggedInHandler):
     def get(self):
         team_key = self.request.get("team_key")
 
-        self._require_login()
+        self._require_registration()
 
         if not team_key:
             self.redirect("/", abort=True)
@@ -88,7 +88,7 @@ class SuggestTeamSocialMediaController(LoggedInHandler):
         self.response.out.write(jinja2_engine.render('suggest_team_social_media.html', self.template_values))
 
     def post(self):
-        self._require_login()
+        self._require_registration()
 
         team_key = self.request.get("team_key")
 

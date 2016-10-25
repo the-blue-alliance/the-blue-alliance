@@ -35,7 +35,6 @@ import tba_config
 
 class AccountOverview(LoggedInHandler):
     def get(self):
-        self._require_login()
         self._require_registration()
 
         push_sitevar = Sitevar.get_by_id('notifications.enable')
@@ -78,13 +77,11 @@ class AccountOverview(LoggedInHandler):
 
 class AccountEdit(LoggedInHandler):
     def get(self):
-        self._require_login()
         self._require_registration()
 
         self.response.out.write(jinja2_engine.render('account_edit.html', self.template_values))
 
     def post(self):
-        self._require_login()
         self._require_registration()
 
         # Check to make sure that they aren't trying to edit another user
@@ -112,6 +109,7 @@ class AccountRegister(LoggedInHandler):
                 self.redirect('/account', abort=True)
 
         self.template_values['redirect'] = redirect
+        self.template_values['logout_url'] = self.user_bundle.create_logout_url(redirect)
         self.response.out.write(jinja2_engine.render('account_register.html', self.template_values))
 
     def post(self):
@@ -173,7 +171,6 @@ class AccountLogout(LoggedInHandler):
 
 class MyTBAController(LoggedInHandler):
     def get(self):
-        self._require_login()
         self._require_registration()
 
         user = self.user_bundle.account.key
@@ -272,7 +269,6 @@ class MyTBAController(LoggedInHandler):
 
 class myTBAAddHotMatchesController(LoggedInHandler):
     def get(self, event_key=None):
-        self._require_login()
         self._require_registration()
 
         if event_key is None:
@@ -333,7 +329,6 @@ class myTBAAddHotMatchesController(LoggedInHandler):
         self.response.out.write(jinja2_engine.render('mytba_add_hot_matches.html', self.template_values))
 
     def post(self, event_key):
-        self._require_login()
         self._require_registration()
 
         current_user_id = self.user_bundle.account.key.id()
@@ -361,7 +356,6 @@ class myTBAAddHotMatchesController(LoggedInHandler):
 
 class MyTBAEventController(LoggedInHandler):
     def get(self, event_key):
-        self._require_login()
         self._require_registration()
 
         # Handle wildcard for all events in a year
@@ -404,7 +398,6 @@ class MyTBAEventController(LoggedInHandler):
         self.response.out.write(jinja2_engine.render('mytba_event.html', self.template_values))
 
     def post(self, event_key):
-        self._require_login()
         self._require_registration()
 
         current_user_id = self.user_bundle.account.key.id()
@@ -438,7 +431,6 @@ class MyTBAEventController(LoggedInHandler):
 
 class MyTBAMatchController(LoggedInHandler):
     def get(self, match_key):
-        self._require_login()
         self._require_registration()
 
         match = Match.get_by_id(match_key)
@@ -465,7 +457,6 @@ class MyTBAMatchController(LoggedInHandler):
         self.response.out.write(jinja2_engine.render('mytba_match.html', self.template_values))
 
     def post(self, match_key):
-        self._require_login()
         self._require_registration()
 
         current_user_id = self.user_bundle.account.key.id()
@@ -500,7 +491,6 @@ class MyTBAMatchController(LoggedInHandler):
 
 class MyTBATeamController(LoggedInHandler):
     def get(self, team_number):
-        self._require_login()
         self._require_registration()
 
         team_key = 'frc{}'.format(team_number)
@@ -528,7 +518,6 @@ class MyTBATeamController(LoggedInHandler):
         self.response.out.write(jinja2_engine.render('mytba_team.html', self.template_values))
 
     def post(self, team_number):
-        self._require_login()
         self._require_registration()
 
         current_user_id = self.user_bundle.account.key.id()

@@ -182,7 +182,7 @@ function addSpinner(el) {
 $(document).ready(function(){
   // Setup redirect after login
   $('#mytba-login').click(function() {
-    window.location.href = '/login?redirect=' + escape(document.URL.replace(document.location.origin, ""));
+    window.location.href = '/login?redirect=' + escape('/account/register?redirect=' + document.URL.replace(document.location.origin, ""));
   });
 
   setupFavAddClick();
