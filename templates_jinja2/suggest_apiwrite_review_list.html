@@ -54,7 +54,7 @@
             <p><strong>Email:</strong> {{ account.email }}</p>
             <p><strong>User's role:</strong> {{ suggestion.contents.affiliation }}</p>
 
-            <form action="/suggest/apiwrite/review" method="post">
+            <form action="/suggest/apiwrite/review" method="post" id="apiwrite_review">
             <h4>Requested Auth Types</h4>
                 <ul>
                 {% for type,name in auth_names.iteritems() %}
@@ -80,6 +80,9 @@
             {% else %}
                 <p>No existing tokens for this event</p>
             {% endfor %}
+
+            <h4>Message for the User</h4>
+            <p><textarea name="user_message" form="apiwrite_review">Thanks for helping make TBA better!</textarea></p>
 
             <input type="hidden" name="suggestion_id" value="{{ suggestion_id }}" />
             <button type="submit" class="btn btn-primary" name="verdict" value="accept"><span class="glyphicon glyphicon-thumbs-up"></span> Add Auth</button>

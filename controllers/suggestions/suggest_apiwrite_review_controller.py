@@ -2,8 +2,12 @@ import logging
 import random
 import string
 from datetime import datetime, timedelta
+
+from google.appengine.api import mail
+from google.appengine.api.app_identity import app_identity
 from google.appengine.ext import ndb
 
+import tba_config
 from consts.account_permissions import AccountPermissions
 from consts.auth_type import AuthType
 from controllers.suggestions.suggestions_review_base_controller import \
@@ -37,10 +41,14 @@ class SuggestApiWriteReviewController(SuggestionsReviewBaseController):
     def post(self):
         self.verify_permissions()
         suggestion = Suggestion.get_by_id(int(self.request.get("suggestion_id")))
+        event_key = suggestion.contents['event_key']
         verdict = self.request.get("verdict")
+        message = self.request.get("user_message")
+        user = suggestion.author.get()
+        event = Event.get_by_id(event_key)
+        email_body = None
+        status = ''
         if verdict == "accept":
-            user = suggestion.author.get()
-            event = Event.get_by_id(suggestion.contents['event_key'])
             auth_id = ''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for _ in range(16))
             auth_types = self.request.get_all("auth_types", [])
             expiration_offset = int(self.request.get("expiration_days"))
@@ -52,7 +60,7 @@ class SuggestApiWriteReviewController(SuggestionsReviewBaseController):
                 id=auth_id,
                 description="{} @ {}".format(user.display_name, suggestion.contents['event_key']),
                 secret=''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for _ in range(64)),
-                event_list=[ndb.Key(Event, suggestion.contents['event_key'])],
+                event_list=[ndb.Key(Event, event_key)],
                 auth_types_enum=[int(type) for type in auth_types],
                 owner=suggestion.author,
                 expiration=expiration
@@ -64,18 +72,50 @@ class SuggestApiWriteReviewController(SuggestionsReviewBaseController):
             suggestion.reviewed_at = datetime.now()
             suggestion.put()
 
-            self.redirect("/suggest/apiwrite/review?success=accept")
-            return
+            status = 'accept'
+            email_body = """Hi {},
+
+We have approved your request for auth tokens so you can add data to the following event: {} {}
+
+You can find the keys on your account overview page: https://www.thebluealliance.com/account
+
+{}
+
+If you have any questions, please don't heasitate to reach out to us at contact@thebluealliance.com
+
+Thanks,
+TBA Admins
+            """.format(user.display_name, event.year, event.name, message)
+
         elif verdict == "reject":
             suggestion.review_state = Suggestion.REVIEW_REJECTED
             suggestion.reviewer = self.user_bundle.account.key
             suggestion.reviewed_at = datetime.now()
             suggestion.put()
 
-            self.redirect("/suggest/apiwrite/review?success=reject")
-            return
+            status = 'reject'
+            email_body = """Hi {},
 
-        self.redirect("/suggest/apiwrite/review")
+We have reviewer your request for auth tokens for {} {} and have regretfully declined with the following message:
+
+{}
+
+If you have any questions, please don't heasitate to reach out to us at contact@thebluealliance.com
+
+Thanks,
+TBA Admins
+""".format(user.display_name, event.year, event.name, message)
+
+        # Notify the user their keys are available
+        sender = "contact@thebluealliance.com" \
+            if tba_config.DEBUG \
+            else "{}@appspot.gserviceaccount.com".format(app_identity.get_application_id())
+        if email_body:
+            mail.send_mail(sender=sender,
+                           to=user.email,
+                           subject="The Blue Alliance Auth Tokens for {}".format(event_key),
+                           body=email_body)
+        self.redirect("/suggest/apiwrite/review?success={}".format(status))
 
     @classmethod
     def _ids_and_events(cls, suggestion):
