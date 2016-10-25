@@ -13,7 +13,7 @@ class SuggestEventWebcastController(LoggedInHandler):
     """
 
     def get(self):
-        self._require_login()
+        self._require_registration()
 
         if not self.request.get("event_key"):
             self.redirect("/", abort=True)
@@ -28,7 +28,7 @@ class SuggestEventWebcastController(LoggedInHandler):
         self.response.out.write(jinja2_engine.render('suggest_event_webcast.html', self.template_values))
 
     def post(self):
-        self._require_login()
+        self._require_registration()
 
         event_key = self.request.get("event_key")
         webcast_url = self.request.get("webcast_url")
