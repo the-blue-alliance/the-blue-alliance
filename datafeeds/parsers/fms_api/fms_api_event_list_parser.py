@@ -35,8 +35,8 @@ class FMSAPIEventListParser(object):
         'tesla': ('tes', 'Tesla'),
         'turing': ('tur', 'Turing'),
         'cmp': ('cmp', 'Einstein'),
-        'cmpmo': ('cmpmo', 'Einstein (MO)'),
-        'cmptx': ('cmptx', 'Einstein (TX)'),
+        'cmpmo': ('cmpmo', 'Einstein (St. Louis)'),
+        'cmptx': ('cmptx', 'Einstein (Houston)'),
     }
 
     EINSTEIN_CODES = {'cmp', 'cmpmo', 'cmptx'}
