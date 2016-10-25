@@ -76,6 +76,7 @@ class ChampSplitHelper(object):
         'Kingdom': BLUE,
         'Czech Republic': BLUE,
         'France': BLUE,
+        'Switzerland': BLUE,
     }
 
     @classmethod
@@ -95,5 +96,5 @@ class ChampSplitHelper(object):
                 return cls.LOCATION_CHAMP_MAP[team.country]
         else:
             if team.country is not None:
-                logging.warning("Unknown country: {}".format(team.country))
+                logging.warning("[champ_split_helper.py] Unknown country: {}".format(team.country))
             return None
