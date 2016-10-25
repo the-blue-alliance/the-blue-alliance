@@ -43,8 +43,8 @@
             "dateEnd":"2015-04-11T23:59:59"
         },
         {
-            "code":"CMP-TESLA",
-            "divisionCode":"CMP-ARTE",
+            "code":"TESLA",
+            "divisionCode":"ARTE",
             "name":"FIRST Championship - Tesla Subdivision",
             "type":"ChampionshipSubdivision",
             "districtCode":null,
@@ -57,7 +57,7 @@
             "dateEnd":"2015-04-25T23:59:59"
         },
         {
-            "code":"CMP-ARTE",
+            "code":"ARTE",
             "divisionCode":"CMP",
             "name":"FIRST Championship - ARTE Division",
             "type":"ChampionshipDivision",
