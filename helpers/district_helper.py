@@ -74,7 +74,11 @@ class DistrictHelper(object):
             for team, points in selection_points.items():
                 district_points['points'][team]['alliance_points'] += points
         else:
-            logging.warning("Event {} has no alliance selection district_points!".format(event.key.id()))
+            msg = "Event {} has no alliance selection district_points!".format(event.key.id())
+            if event.event_type_enum in EventType.SEASON_EVENT_TYPES:
+                logging.warning(msg)
+            else:
+                logging.info(msg)
 
         # award points
         for award in event.awards:
@@ -290,7 +294,11 @@ class DistrictHelper(object):
                 10.0 / cls.inverf(1.0 / alpha)) + 12))
                 district_points['points'][team]['qual_points'] = qual_points * POINTS_MULTIPLIER
         else:
-            logging.warning("Event {} has no rankings for qual_points calculations!".format(event.key.id()))
+            msg = "Event {} has no rankings for qual_points calculations!".format(event.key.id())
+            if event.event_type_enum in EventType.SEASON_EVENT_TYPES:
+                logging.warning(msg)
+            else:
+                logging.info(msg)
 
         matches = MatchHelper.organizeMatches(matches)
 
