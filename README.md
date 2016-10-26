@@ -46,6 +46,7 @@ Setup
 1. Install [UglifyJS2](https://github.com/mishoo/UglifyJS2) by running `npm install uglify-js -g`
 1. Install [gulp](https://github.com/gulpjs/gulp) by running `npm rm --global gulp && npm install --global gulp-cli`. This removes any version of `gulp` that was previously installed globally so it doesn't conflict with `gulp-cli`. Gulp is used as the build tool for Gameday2.
 1. Install all node dependencies by running `npm install`. This includes `less`, which is used to build CSS files for production, as well as a number of packages used in Gameday2.
+1. Fill out `static/javascript/tba_js/tba_keys_template.js` and save it in the same directory as `tba_keys.js`. It's okay to leave a key blank if you're not doing any development that requires it, but the file `tba_keys.js` must exist or else JavaScript won't compile.
 1. Run `paver setup` to install remaining dependencies and do an initial build of static files (CSS, HTML templates, javascript) to get you going
 1. Run the app in GoogleAppEngineLauncher according to the directions below, and visit the local URL to see your own copy of The Blue Alliance!
 
@@ -99,6 +100,7 @@ Setup notes:
   * `WARNING old_run.py:88 This function, oauth2client.tools.run(), and the use of the gflags library are deprecated and will be removed in a future version of the library.`
 * Ignore these warnings in a deployed server's logs:
   * `Exception: Missing sitevar: firebase.secrets. Can't write to Firebase` (It just means that no push notifications to GameDay will be sent, which is OK for a dev server.)
+* Make sure `static/javascript/tba_js/tba_keys.js` exists
 
 Notes:
 
