@@ -9,6 +9,7 @@ from google.appengine.ext import ndb
 from base_controller import LoggedInHandler
 
 from consts.account_permissions import AccountPermissions
+from consts.auth_type import AuthType
 from consts.client_type import ClientType
 from consts.model_type import ModelType
 from consts.notification_type import NotificationType
@@ -76,6 +77,7 @@ class AccountOverview(LoggedInHandler):
         self.template_values['num_reviewed'] = num_reviewed
         self.template_values['total_pending'] = total_pending
         self.template_values['trusted_keys'] = trusted_keys
+        self.template_values['auth_type_names'] = AuthType.type_names
 
         self.response.out.write(jinja2_engine.render('account_overview.html', self.template_values))
 

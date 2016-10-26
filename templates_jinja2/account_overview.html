@@ -121,6 +121,7 @@
       <table class="table table-striped">
         <tr>
           <th>Event</th>
+          <th>Permissions</th>
           <th>Expires</th>
           <th>Auth ID</th>
           <th>Auth Secret</th>
@@ -132,6 +133,13 @@
               {% for event in key.event_list %}
                 <a href="/event/{{ event.id() }}">{{ event.id() }}<br/></a>
               {% endfor %}
+              </td>
+              <td>
+                <ul>
+                {% for auth_type in key.auth_types_enum %}
+                  <li>{{auth_type_names[auth_type]}}</li>
+                {% endfor %}
+                </ul>
               </td>
               <td>
                 {% if key.expiration %}

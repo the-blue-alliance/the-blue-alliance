@@ -11,7 +11,7 @@ class AuthType(object):
     EVENT_AWARDS = 6
 
     type_names = {
-        EVENT_DATA: "event data",
+        # EVENT_DATA: "event data",  # DEPRECATED
         MATCH_VIDEO: "match video",
         EVENT_TEAMS: "event teams",
         EVENT_MATCHES: "event matches",
