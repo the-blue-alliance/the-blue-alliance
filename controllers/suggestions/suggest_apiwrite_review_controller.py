@@ -51,7 +51,9 @@ class SuggestApiWriteReviewController(SuggestionsReviewBaseController):
         auth_types = self.request.get_all("auth_types", [])
         expiration_offset = int(self.request.get("expiration_days"))
         if expiration_offset != -1:
-            expiration = event.end_date + timedelta(days=expiration_offset + 1)
+            expiration_event_end = event.end_date + timedelta(days=expiration_offset + 1)
+            expiration_now = datetime.now() + timedelta(days=expiration_offset)
+            expiration = max(expiration_event_end, expiration_now)
         else:
             expiration = None
         auth = ApiAuthAccess(
