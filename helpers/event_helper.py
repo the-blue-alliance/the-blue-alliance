@@ -54,7 +54,6 @@ class EventHelper(object):
         """
         Events should already be ordered by start_date
         """
-        year = events[0].year
         to_return = collections.OrderedDict()  # key: week_label, value: list of events
 
         weekless_events = []
@@ -62,7 +61,7 @@ class EventHelper(object):
         preseason_events = []
         for event in events:
             if event.official and event.event_type_enum in {EventType.CMP_DIVISION, EventType.CMP_FINALS}:
-                if year >= 2017:
+                if event.year >= 2017:
                     champs_label = TWO_CHAMPS_LABEL.format(event.city)
                 else:
                     champs_label = CHAMPIONSHIP_EVENTS_LABEL
