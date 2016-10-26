@@ -23,6 +23,7 @@ class AdminMobile(LoggedInHandler):
         all_clients = MobileClient.query()
         android = all_clients.filter(MobileClient.client_type == ClientType.OS_ANDROID).count()
         ios = all_clients.filter(MobileClient.client_type == ClientType.OS_IOS).count()
+        web = all_clients.filter(MobileClient.client_type == ClientType.WEB).count()
         webhook = all_clients.filter(MobileClient.client_type == ClientType.WEBHOOK).count()
 
         var = Sitevar.get_by_id('notifications.enable')
@@ -35,6 +36,7 @@ class AdminMobile(LoggedInHandler):
             'mobile_users': all_clients.count(),
             'android_users': android,
             'ios_users': ios,
+            'web_users': web,
             'webhooks': webhook,
             'broadcast_success': self.request.get('broadcast_success'),
             'push_enabled': push_enabled,
