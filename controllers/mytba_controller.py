@@ -17,7 +17,6 @@ from models.team import Team
 
 class MyTBALiveController(LoggedInHandler):
     def get(self):
-        self._require_login()
         self._require_registration()
 
         user = self.user_bundle.account.key

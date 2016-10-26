@@ -23,7 +23,7 @@ incoming notifications
 
 class TestNotificationController(LoggedInHandler):
     def get(self, type):
-        self._require_login('/account/')
+        self._require_registration('/account/')
         user_id = self.user_bundle.account.key.id()
 
         logging.info("Sending for {}".format(type))

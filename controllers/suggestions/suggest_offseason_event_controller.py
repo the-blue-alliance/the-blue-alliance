@@ -9,7 +9,7 @@ class SuggestOffseasonEventController(LoggedInHandler):
     """
 
     def get(self):
-        self._require_login()
+        self._require_registration()
         self.template_values.update({
             "status": self.request.get("status"),
         })
@@ -17,7 +17,7 @@ class SuggestOffseasonEventController(LoggedInHandler):
             jinja2_engine.render('suggest_offseason_event.html', self.template_values))
 
     def post(self):
-        self._require_login()
+        self._require_registration()
 
         status, failures = SuggestionCreator.createOffseasonEventSuggestion(
             author_account_key=self.user_bundle.account.key,

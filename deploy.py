@@ -32,6 +32,7 @@ def main():
     if args.yolo:
         print "Skipping tests!"
         print "Welcome to clowntown..."
+        os.system('paver install_libs')
         os.system('paver make')
     else:
         test_status = os.system('paver preflight')

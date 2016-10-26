@@ -16,6 +16,8 @@ The SDK Path is probably /usr/local/google_appengine on Mac OS
 SDK_PATH    Path to the SDK installation"""
 
 
+sys.path.insert(1, 'lib')
+
 def start_suite(suite, queue):
     sio = StringIO.StringIO()
     testresult = unittest2.TextTestRunner(sio, verbosity=2).run(suite)
