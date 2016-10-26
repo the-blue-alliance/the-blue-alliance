@@ -1,5 +1,3 @@
-import logging
-
 from consts.auth_type import AuthType
 from controllers.base_controller import LoggedInHandler
 from helpers.suggestions.suggestion_creator import SuggestionCreator
@@ -24,7 +22,7 @@ class SuggestApiWriteController(LoggedInHandler):
         self._require_login()
 
         auth_types = self.request.get_all("auth_types", [])
-        clean_auth_types = filter(lambda a: a in AuthType.type_names.keys(), auth_types)
+        clean_auth_types = filter(lambda a: int(a) in AuthType.type_names.keys(), auth_types)
         status = SuggestionCreator.createApiWriteSuggestion(
             author_account_key=self.user_bundle.account.key,
             event_key=self.request.get("event_key", None),

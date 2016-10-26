@@ -38,56 +38,71 @@ class SuggestApiWriteReviewController(SuggestionsReviewBaseController):
         self.response.out.write(
             jinja2_engine.render('suggest_apiwrite_review_list.html', self.template_values))
 
-    def post(self):
-        self.verify_permissions()
-        suggestion = Suggestion.get_by_id(int(self.request.get("suggestion_id")))
+    @ndb.transactional(xg=True)
+    def _process_accepted(self, suggestion_id, message):
+        suggestion = Suggestion.get_by_id(suggestion_id)
         event_key = suggestion.contents['event_key']
-        verdict = self.request.get("verdict")
-        message = self.request.get("user_message")
         user = suggestion.author.get()
         event = Event.get_by_id(event_key)
-        email_body = None
-        status = ''
-        if verdict == "accept":
-            auth_id = ''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for _ in range(16))
-            auth_types = self.request.get_all("auth_types", [])
-            expiration_offset = int(self.request.get("expiration_days"))
-            if expiration_offset != -1:
-                expiration = event.end_date + timedelta(days=expiration_offset + 1)
-            else:
-                expiration = None
-            auth = ApiAuthAccess(
-                id=auth_id,
-                description="{} @ {}".format(user.display_name, suggestion.contents['event_key']),
-                secret=''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for _ in range(64)),
-                event_list=[ndb.Key(Event, event_key)],
-                auth_types_enum=[int(type) for type in auth_types],
-                owner=suggestion.author,
-                expiration=expiration
-            )
-            auth.put()
 
-            suggestion.review_state = Suggestion.REVIEW_ACCEPTED
-            suggestion.reviewer = self.user_bundle.account.key
-            suggestion.reviewed_at = datetime.now()
-            suggestion.put()
+        auth_id = ''.join(
+            random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for _ in
+            range(16))
+        auth_types = self.request.get_all("auth_types", [])
+        expiration_offset = int(self.request.get("expiration_days"))
+        if expiration_offset != -1:
+            expiration = event.end_date + timedelta(days=expiration_offset + 1)
+        else:
+            expiration = None
+        auth = ApiAuthAccess(
+            id=auth_id,
+            description="{} @ {}".format(user.display_name, suggestion.contents['event_key']),
+            secret=''.join(
+                random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for _
+                in range(64)),
+            event_list=[ndb.Key(Event, event_key)],
+            auth_types_enum=[int(type) for type in auth_types],
+            owner=suggestion.author,
+            expiration=expiration
+        )
+        auth.put()
 
-            status = 'accept'
-            email_body = """Hi {},
+        suggestion.review_state = Suggestion.REVIEW_ACCEPTED
+        suggestion.reviewer = self.user_bundle.account.key
+        suggestion.reviewed_at = datetime.now()
+        suggestion.put()
+
+        return user, event_key, """Hi {},
 
 We have approved your request for auth tokens so you can add data to the following event: {} {}
 
 You can find the keys on your account overview page: https://www.thebluealliance.com/account
-
 {}
-
 If you have any questions, please don't heasitate to reach out to us at contact@thebluealliance.com
 
 Thanks,
 TBA Admins
             """.format(user.display_name, event.year, event.name, message)
 
+    def post(self):
+        self.verify_permissions()
+        suggestion_id = int(self.request.get("suggestion_id"))
+        verdict = self.request.get("verdict")
+        message = self.request.get("user_message")
+
+        email_body = None
+        user = None
+        event_key = None
+        status = ''
+        if verdict == "accept":
+            status = 'accept'
+            user, event_key, email_body = self._process_accepted(suggestion_id, message)
+
         elif verdict == "reject":
+            suggestion = Suggestion.get_by_id(suggestion_id)
+            event_key = suggestion.contents['event_key']
+            user = suggestion.author.get()
+            event = Event.get_by_id(event_key)
             suggestion.review_state = Suggestion.REVIEW_REJECTED
             suggestion.reviewer = self.user_bundle.account.key
             suggestion.reviewed_at = datetime.now()
@@ -107,11 +122,13 @@ TBA Admins
 """.format(user.display_name, event.year, event.name, message)
 
         # Notify the user their keys are available
-        sender = "contact@thebluealliance.com" \
+        sender = "{}@appspot.gserviceaccount.com".format(app_identity.get_application_id())
+        reply_to = "contact@thebluealliance.com" \
             if tba_config.DEBUG \
-            else "{}@appspot.gserviceaccount.com".format(app_identity.get_application_id())
+            else sender
         if email_body:
             mail.send_mail(sender=sender,
+                           reply_to=reply_to,
                            to=user.email,
                            subject="The Blue Alliance Auth Tokens for {}".format(event_key),
                            body=email_body)
@@ -122,5 +139,5 @@ TBA Admins
         event_key = suggestion.contents['event_key']
         account = suggestion.author.get()
         existing_keys = ApiAuthAccess.query(ApiAuthAccess.event_list == ndb.Key(Event, event_key))
-        existing_users = [key.owner.get() for key in existing_keys]
+        existing_users = [key.owner.get() if key.owner else None for key in existing_keys]
         return suggestion.key.id(), Event.get_by_id(event_key), account, zip(existing_keys, existing_users), suggestion

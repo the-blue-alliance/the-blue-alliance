@@ -75,7 +75,7 @@
             <h4>Existing Keys for This Event</h4>
             {% for auth,user in existing_users %}
                 <ul>
-                    <li><a href="/admin/api_auth/edit/{{ auth.key.id() }}">{{ user.email }}</a></li>
+                    <li><a href="/admin/api_auth/edit/{{ auth.key.id() }}">{% if user %} {{ user.email }} {% else %} -- {% endif %}</a></li>
                 </ul>
             {% else %}
                 <p>No existing tokens for this event</p>
