@@ -15,7 +15,8 @@ from models.event import Event
 from models.match import Match
 from models.sitevar import Sitevar
 
-CHAMPIONSHIP_EVENTS_LABEL = 'Championship Event'
+CHAMPIONSHIP_EVENTS_LABEL = 'FIRST Championship'
+TWO_CHAMPS_LABEL = 'FIRST Championship - {}'
 REGIONAL_EVENTS_LABEL = 'Week {}'
 WEEKLESS_EVENTS_LABEL = 'Other Official Events'
 OFFSEASON_EVENTS_LABEL = 'Offseason'
@@ -60,10 +61,14 @@ class EventHelper(object):
         preseason_events = []
         for event in events:
             if event.official and event.event_type_enum in {EventType.CMP_DIVISION, EventType.CMP_FINALS}:
-                if CHAMPIONSHIP_EVENTS_LABEL in to_return:
-                    to_return[CHAMPIONSHIP_EVENTS_LABEL].append(event)
+                if event.year >= 2017:
+                    champs_label = TWO_CHAMPS_LABEL.format(event.city)
                 else:
-                    to_return[CHAMPIONSHIP_EVENTS_LABEL] = [event]
+                    champs_label = CHAMPIONSHIP_EVENTS_LABEL
+                if champs_label in to_return:
+                    to_return[champs_label].append(event)
+                else:
+                    to_return[champs_label] = [event]
             elif event.official and event.event_type_enum in {EventType.REGIONAL, EventType.DISTRICT, EventType.DISTRICT_CMP}:
                 if (event.start_date is None or
                    (event.start_date.month == 12 and event.start_date.day == 31)):

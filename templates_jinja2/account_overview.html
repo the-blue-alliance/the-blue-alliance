@@ -112,6 +112,56 @@
   </div>
   <hr>
 
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+      <h2>Trusted API Keys</h2>
+      <p>These keys allow you to import data for your offseason event to TBA</p>
+    </div>
+    <div class="col-md-10 col-md-offset-1">
+      <table class="table table-striped">
+        <tr>
+          <th>Event</th>
+          <th>Permissions</th>
+          <th>Expires</th>
+          <th>Auth ID</th>
+          <th>Auth Secret</th>
+        </tr>
+        <tbody>
+          {% for key in trusted_keys %}
+            <tr>
+              <td>
+              {% for event in key.event_list %}
+                <a href="/event/{{ event.id() }}">{{ event.id() }}<br/></a>
+              {% endfor %}
+              </td>
+              <td>
+                <ul>
+                {% for auth_type in key.auth_types_enum %}
+                  <li>{{auth_type_names[auth_type]}}</li>
+                {% endfor %}
+                </ul>
+              </td>
+              <td>
+                {% if key.expiration %}
+                  {{ key.expiration.strftime('%Y-%m-%d') }}
+                {% else %}
+                  --
+                {% endif %}
+              </td>
+              <td>
+                {{ key.key.id() }}
+              </td>
+              <td>
+                {{ key.secret }}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <hr>
+
   {% if review_permissions %}
   <div class="row">
     <div class="col-md-10 col-md-offset-1">

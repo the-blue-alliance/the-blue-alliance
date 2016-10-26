@@ -17,8 +17,10 @@ class SuggestReviewHomeController(SuggestionsReviewBaseController):
         self.template_values['suggestions']['media'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "media")
         self.template_values['suggestions']['social'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "social-media")
         self.template_values['suggestions']['offseason'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "offseason-event")
+        self.template_values['suggestions']['apiwrite'] = SuggestionFetcher.count(Suggestion.REVIEW_PENDING, "api_auth_access")
 
         self.template_values['offseason_permission'] = AccountPermissions.REVIEW_OFFSEASON_EVENTS
+        self.template_values['apiwrite_permission'] = AccountPermissions.REVIEW_APIWRITE
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/suggest_review_home.html')
         self.response.out.write(template.render(path, self.template_values))

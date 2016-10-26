@@ -67,7 +67,9 @@ class DistrictDetail(CacheableHandler):
         district_cmp_keys_future = Event.query(Event.year == year, Event.event_type_enum == EventType.DISTRICT_CMP).fetch_async(None, keys_only=True)  # to compute valid_districts
 
         # Needed for active team statuses
-        live_events = EventHelper.getWeekEvents()
+        live_events = []
+        if year == datetime.datetime.now().year:  # Only show active teams for current year
+            live_events = EventHelper.getWeekEvents()
         live_eventteams_futures = []
         for event in live_events:
             live_eventteams_futures.append(EventTeamsQuery(event.key_name).fetch_async())

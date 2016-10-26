@@ -74,6 +74,13 @@ class TestApiTrustedController(unittest2.TestCase):
                                         event_list=[ndb.Key(Event, '2014casj')],
                                         auth_types_enum=[AuthType.MATCH_VIDEO])
 
+        self.expired_auth = ApiAuthAccess(id='tEsT_id_6',
+                                        secret='321tEsTsEcReT',
+                                        description='test',
+                                        event_list=[ndb.Key(Event, '2014casj')],
+                                        auth_types_enum=[AuthType.EVENT_MATCHES],
+                                        expiration=datetime.datetime(year=1970, month=1, day=1))
+
         self.event = Event(
             id='2014casj',
             event_type_enum=EventType.REGIONAL,
@@ -142,6 +149,11 @@ class TestApiTrustedController(unittest2.TestCase):
         # Fail; insufficient auth_types_enum
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
         response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_2', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
+        self.assertEqual(response.status_code, 401)
+
+        # Fail; expired keys
+        sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
+        response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_6', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 401)
 
     def test_alliance_selections_update(self):

@@ -2,10 +2,12 @@ import unittest2
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
+from consts.event_type import EventType
 from consts.media_type import MediaType
 from helpers.media_helper import MediaParser
 from helpers.suggestions.suggestion_creator import SuggestionCreator
 from models.account import Account
+from models.event import Event
 from models.media import Media
 from models.suggestion import Suggestion
 from models.team import Team
@@ -18,7 +20,6 @@ class TestTeamMediaSuggestionCreator(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
-
 
         self.account = Account.get_or_insert(
             "123",
@@ -127,7 +128,6 @@ class TestOffseasonEventSuggestionCreator(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
-
 
         self.account = Account.get_or_insert(
             "123",
@@ -243,3 +243,94 @@ class TestOffseasonEventSuggestionCreator(unittest2.TestCase):
             "123 Fake Street, New York, NY")
         self.assertEqual(status, 'validation_failure')
         self.assertTrue('end_date' in failures)
+
+
+class TestApiWriteSuggestionCreator(unittest2.TestCase):
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
+        self.account = Account.get_or_insert(
+            "123",
+            email="user@example.com",
+            registered=True)
+        self.account.put()
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def testCreateSuggestion(self):
+        event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.OFFSEASON)
+        event.put()
+
+        status = SuggestionCreator.createApiWriteSuggestion(
+            self.account.key,
+            "2016test",
+            "Event Organizer",
+            [1, 2, 3])
+        self.assertEqual(status, 'success')
+
+        # Ensure the Suggestion gets created
+        suggestions = Suggestion.query().fetch()
+        self.assertIsNotNone(suggestions)
+        self.assertEqual(len(suggestions), 1)
+
+        suggestion = suggestions[0]
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.contents['event_key'], "2016test")
+        self.assertEqual(suggestion.contents['affiliation'], "Event Organizer")
+        self.assertListEqual(suggestion.contents['auth_types'], [1, 2, 3])
+
+    def testOfficialEvent(self):
+        event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.REGIONAL)
+        event.put()
+
+        status = SuggestionCreator.createApiWriteSuggestion(
+            self.account.key,
+            "2016test",
+            "Event Organizer",
+            [1, 2, 3])
+        self.assertEqual(status, 'bad_event')
+
+    def testNoEvent(self):
+        status = SuggestionCreator.createApiWriteSuggestion(
+            self.account.key,
+            "2016test",
+            "Event Organizer",
+            [1, 2, 3])
+        self.assertEqual(status, 'bad_event')
+
+    def testNoRole(self):
+        event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.OFFSEASON)
+        event.put()
+        status = SuggestionCreator.createApiWriteSuggestion(
+            self.account.key,
+            "2016test",
+            "",
+            [1, 2, 3])
+        self.assertEqual(status, 'no_affiliation')
+
+    def testUndefinedAuthType(self):
+        event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.OFFSEASON)
+        event.put()
+
+        status = SuggestionCreator.createApiWriteSuggestion(
+            self.account.key,
+            "2016test",
+            "Event Organizer",
+            [1, 2, -1, -2])  # -1 and -2 should be filtered out
+        self.assertEqual(status, 'success')
+
+        # Ensure the Suggestion gets created
+        suggestions = Suggestion.query().fetch()
+        self.assertIsNotNone(suggestions)
+        self.assertEqual(len(suggestions), 1)
+
+        suggestion = suggestions[0]
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.contents['event_key'], "2016test")
+        self.assertEqual(suggestion.contents['affiliation'], "Event Organizer")
+        self.assertListEqual(suggestion.contents['auth_types'], [1, 2])

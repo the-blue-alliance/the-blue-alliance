@@ -9,6 +9,8 @@
 <table class="table table-striped">
   <tr>
     <th>Description</th>
+    <th>User</th>
+    <th>Expiration</th>
     <th>ID</th>
     <th>Secret</th>
     <th>Events</th>
@@ -22,6 +24,8 @@
   {% for auth in auths %}
   <tr>
     <td><a href="/admin/api_auth/edit/{{auth.key.id}}">{{ auth.description }}</a></td>
+    <td>{% if auth.owner %}<a href="/admin/user/{{ auth.owner.id }}">{{ auth.owner.id }} {% endif %}</a></td>
+    <td>{% if auth.expiration %} {{ auth.expiration }} {% endif %}</td>
     <td>{{auth.key.id}}</td>
     <td>{{auth.secret}}</td>
     <td>

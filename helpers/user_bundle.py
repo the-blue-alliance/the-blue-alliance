@@ -47,3 +47,6 @@ class UserBundle(object):
 
     def create_login_url(self, target_url="/"):
         return users.create_login_url(target_url)
+
+    def create_logout_url(self, target_url="/"):
+        return users.create_logout_url(target_url)

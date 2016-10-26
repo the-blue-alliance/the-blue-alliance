@@ -17,7 +17,7 @@ class SuggestMatchVideoController(LoggedInHandler):
     """
 
     def get(self):
-        self._require_login()
+        self._require_registration()
 
         if not self.request.get("match_key"):
             self.redirect("/", abort=True)
@@ -39,7 +39,7 @@ class SuggestMatchVideoController(LoggedInHandler):
         self.response.out.write(jinja2_engine.render('suggest_match_video.html', self.template_values))
 
     def post(self):
-        self._require_login()
+        self._require_registration()
 
         match_key = self.request.get("match_key")
         youtube_url = self.request.get("youtube_url")
@@ -55,7 +55,7 @@ class SuggestMatchVideoPlaylistController(LoggedInHandler):
     Allow users to suggest a playlist of YouTube videos for matches
     """
     def get(self):
-        self._require_login()
+        self._require_registration()
 
         if not self.request.get("event_key"):
             self.redirect("/", abort=True)
@@ -74,7 +74,7 @@ class SuggestMatchVideoPlaylistController(LoggedInHandler):
         self.response.out.write(jinja2_engine.render('suggest_match_video_playlist.html', self.template_values))
 
     def post(self):
-        self._require_login()
+        self._require_registration()
 
         event_key = self.request.get("event_key")
         if not event_key:

@@ -14,14 +14,12 @@ from models.mobile_client import MobileClient
 
 class WebhookAdd(LoggedInHandler):
     def get(self):
-        self._require_login()
         self._require_registration()
 
         path = os.path.join(os.path.dirname(__file__), '../templates/webhook_add.html')
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self):
-        self._require_login()
         self._require_registration()
 
         # Check to make sure that they aren't trying to edit another user
@@ -56,7 +54,6 @@ class WebhookAdd(LoggedInHandler):
 
 class WebhookDelete(LoggedInHandler):
     def post(self):
-        self._require_login()
         self._require_registration()
 
         # Check to make sure that they aren't trying to edit another user
@@ -73,7 +70,6 @@ class WebhookDelete(LoggedInHandler):
 
 class WebhookVerify(LoggedInHandler):
     def get(self, client_id):
-        self._require_login()
         self._require_registration()
 
         self.template_values['client_id'] = client_id
@@ -83,7 +79,6 @@ class WebhookVerify(LoggedInHandler):
         self.response.out.write(template.render(path, self.template_values))
 
     def post(self, client_id):
-        self._require_login()
         self._require_registration()
 
         # Check to make sure the user isn't trying to impersonate another
@@ -108,7 +103,6 @@ class WebhookVerify(LoggedInHandler):
 
 class WebhookVerificationSend(LoggedInHandler):
     def post(self):
-        self._require_login()
         self._require_registration()
 
         current_user_account_id = self.user_bundle.account.key.id()
