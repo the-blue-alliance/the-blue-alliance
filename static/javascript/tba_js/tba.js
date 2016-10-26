@@ -153,3 +153,13 @@ $(document).ready(function(){
     $("#robot-image").html('<div class="thumbnail carousel team-media-carousel"><a href="' + url + '" target="_blank"><img src="' + url + '" alt="April Fools!"></a></div>');
   }
 });
+
+// Init Firebase
+var config = {
+  apiKey: firebaseApiKey,
+  authDomain: firebaseAuthDomain,
+  databaseURL: firebaseDatabaseURL,
+  storageBucket: firebaseStorageBucket,
+  messagingSenderId: firebaseMessagingSenderId,
+};
+firebase.initializeApp(config);
