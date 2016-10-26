@@ -32,4 +32,13 @@
         </a>
     </li>
     {% endif %}
+
+    {% if apiwrite_permission in user_bundle.account.permissions %}
+    <li>
+        <a href="/suggest/apiwrite/review">
+            <span class="badge pull-right">{{suggestions.apiwrite}}</span>
+            Trusted API Requests
+        </a>
+    </li>
+    {% endif %}
 </ul>
