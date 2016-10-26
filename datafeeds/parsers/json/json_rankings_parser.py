@@ -61,7 +61,7 @@ class JSONRankingsParser(ParserBase):
             if has_record:
                 row.extend(['{}-{}-{}'.format(ranking['wins'], ranking['losses'], ranking['ties']), ranking['dqs'], ranking['played']])
             else:
-                row.extend([ranking['dqs'], ranking['played']])
+                row.extend([ranking['played'], ranking['dqs']])
             rankings.append(row)
 
         return rankings
