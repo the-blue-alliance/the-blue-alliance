@@ -132,7 +132,7 @@ TBA Admins
                            to=user.email,
                            subject="The Blue Alliance Auth Tokens for {}".format(event_key),
                            body=email_body)
-        self.redirect("/suggest/apiwrite/review?success={}".format(status))
+        self.redirect("/review/apiwrite/review?success={}".format(status))
 
     @classmethod
     def _ids_and_events(cls, suggestion):
