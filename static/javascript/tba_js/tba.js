@@ -156,10 +156,10 @@ $(document).ready(function(){
 
 // Init Firebase
 var config = {
-  apiKey: "AIzaSyDBlFwtAgb2i7hMCQ5vBv44UEKVsA543hs",
-  authDomain: "tbatv-prod-hrd.firebaseapp.com",
-  databaseURL: "https://tbatv-prod-hrd.firebaseio.com",
-  storageBucket: "tbatv-prod-hrd.appspot.com",
-  messagingSenderId: "836511118694"
+  apiKey: firebaseApiKey,
+  authDomain: firebaseAuthDomain,
+  databaseURL: firebaseDatabaseURL,
+  storageBucket: firebaseStorageBucket,
+  messagingSenderId: firebaseMessagingSenderId,
 };
 firebase.initializeApp(config);

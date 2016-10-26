@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import os.path
+import os
 import optparse
 
 YUI_COMPRESSOR = 'utils/yuicompressor-2.4.7.jar'
@@ -9,6 +9,7 @@ SCRIPTS_MAIN = ['static/jwplayer/jwplayer.js',
                 'static/xcharts/xcharts.min.js',
                 'static/javascript/utils/client_detection.js',
                 'static/javascript/tba_js/tablesorter.js',
+                'static/javascript/tba_js/tba_keys.js',
                 'static/javascript/tba_js/tba.js',
                 'static/javascript/tba_js/tba_charts.js',
                 'static/javascript/tba_js/tba_countdown.js',
@@ -18,6 +19,10 @@ SCRIPTS_MAIN = ['static/jwplayer/jwplayer.js',
                 'static/javascript/tba_js/tba_fcm.js',
                 'static/javascript/tba_js/ReView0.65b.js',
                 ]
+
+SCRIPTS_FIREBASE_SERVICEWORKER = ['static/javascript/tba_js/tba_keys.js',
+                                  'static/javascript/tba_js/firebase_messaging_serviceworker.js',
+                                  ]
 
 SCRIPTS_GAMEDAY = SCRIPTS_MAIN + ['static/javascript/tba_js/gameday.js',
                                   'static/javascript/tba_js/gameday_twitter.js',
@@ -39,11 +44,12 @@ STYLESHEETS_GAMEDAY = ['static/css/precompiled_css/jquery.fancybox.css',
                        'static/css/less_css/tba_style.gameday.css',
                        ]
 
-SCRIPTS_MAIN_OUT = 'static/javascript/tba_combined_js.main.min.js'
-SCRIPTS_GAMEDAY_OUT = 'static/javascript/tba_combined_js.gameday.min.js'
-SCRIPTS_EVENTWIZARD_OUT = 'static/javascript/tba_combined_js.eventwizard.min.js'
-STYLESHEETS_MAIN_OUT = 'static/css/tba_combined_style.main.min.css'
-STYLESHEETS_GAMEDAY_OUT = 'static/css/tba_combined_style.gameday.min.css'
+SCRIPTS_MAIN_OUT = 'static/compiled/javascript/tba_combined_js.main.min.js'
+SCRIPTS_GAMEDAY_OUT = 'static/compiled/javascript/tba_combined_js.gameday.min.js'
+SCRIPTS_FIREBASE_SERVICEWORKER_OUT = 'static/compiled/javascript/firebase-messaging-sw.js'
+SCRIPTS_EVENTWIZARD_OUT = 'static/compiled/javascript/tba_combined_js.eventwizard.min.js'
+STYLESHEETS_MAIN_OUT = 'static/compiled/css/tba_combined_style.main.min.css'
+STYLESHEETS_GAMEDAY_OUT = 'static/compiled/css/tba_combined_style.gameday.min.css'
 
 
 def compress_css(in_files, out_file, verbose=False, temp_file='.temp'):
@@ -85,9 +91,16 @@ def compress_js(in_files, out_file):
 
 
 def main(kind=None):
+    for directory in ['static/compiled/javascript', 'static/compiled/css']:
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
     if kind == 'js' or kind is None:
         print 'Compressing Main JavaScript...'
         compress_js(SCRIPTS_MAIN, SCRIPTS_MAIN_OUT)
+
+        print 'Compressing Firebase Messaging Serviceworker JavaScript...'
+        compress_js(SCRIPTS_FIREBASE_SERVICEWORKER, SCRIPTS_FIREBASE_SERVICEWORKER_OUT)
 
         print 'Compressing GameDay JavaScript...'
         compress_js(SCRIPTS_GAMEDAY, SCRIPTS_GAMEDAY_OUT)

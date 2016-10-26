@@ -27,12 +27,12 @@ libraries:
 
 handlers:
 - url: /css
-  static_dir: static/css
+  static_dir: static/compiled/css
 - url: /images
   static_dir: static/images
   expiration: "1h"
 - url: /javascript
-  static_dir: static/javascript
+  static_dir: static/compiled/javascript
 - url: /jwplayer
   static_dir: static/jwplayer
 - url: /flowplayer
@@ -55,8 +55,8 @@ handlers:
   upload: static/apple-touch-icon.png
   expiration: "1d"
 - url: /firebase-messaging-sw.js
-  static_files: static/firebase-messaging-sw.js
-  upload: static/firebase-messaging-sw.js
+  static_files: static/compiled/javascript/firebase-messaging-sw.js
+  upload: static/compiled/javascript/firebase-messaging-sw.js
   expiration: "1d"
 - url: /manifest.json
   static_files: static/manifest.json

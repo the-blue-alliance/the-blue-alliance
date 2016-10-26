@@ -63,9 +63,7 @@ $RECYCLE.BIN/
 # Compiled/Intermediate Files #
 ###############################
 static/css/less_css/*.css
-static/css/*.css
-static/javascript/*.js
-static/javascript/*.js.map
+static/compiled/*
 version_info.json
 
 # Node.js/npm #
@@ -77,3 +75,7 @@ node_modules
 # Jest Coverage reports #
 #########################
 coverage
+
+# Keys #
+########
+static/javascript/tba_js/tba_keys.js
