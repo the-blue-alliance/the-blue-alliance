@@ -125,9 +125,7 @@ TBA Admins
 
         # Notify the user their keys are available
         sender = "{}@appspot.gserviceaccount.com".format(app_identity.get_application_id())
-        reply_to = "contact@thebluealliance.com" \
-            if tba_config.DEBUG \
-            else sender
+        reply_to = sender if tba_config.DEBUG else "contact@thebluealliance.com"
         if email_body:
             mail.send_mail(sender=sender,
                            reply_to=reply_to,
