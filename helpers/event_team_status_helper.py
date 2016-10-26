@@ -45,7 +45,16 @@ class EventTeamStatusHelper(object):
         rank_headers = rankings[0]
         year = int(event_details.key.id()[:4])
         first_sort = team_line[RankingIndexes.CUMULATIVE_RANKING_SCORE[year]]
-        matches_played = int(team_line[RankingIndexes.MATCHES_PLAYED[year]])
+
+        # Search for 'Played' and fall back to RankingIndexes if not found
+        for i, name in enumerate(rankings[0]):
+            if name.lower() == 'played':
+                matches_played_index = i
+                break
+        else:
+            matches_played_index = RankingIndexes.MATCHES_PLAYED[year]
+        matches_played = int(team_line[matches_played_index])
+
         record = cls._build_record_string(team_line, year)
         breakdown = ", ".join("%s: %s" % tup for tup in zip(rank_headers[2:], team_line[2:]))
         # ^ a little python magic to automagically build comma-separated key/value pairs for breakdowns, but w/o team #
