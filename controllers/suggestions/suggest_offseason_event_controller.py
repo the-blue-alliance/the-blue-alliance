@@ -52,6 +52,6 @@ class SuggestOffseasonEventController(LoggedInHandler):
         subject = "New Offseason Event Suggestion: {}".format(event_name)
         body = """A new offseason event suggestion has been submitted with title: {}.
 
-Review the request at https://thebluealliance.com/offseason/apiwrite/review
+Review the request at https://thebluealliance.com/suggest/offseason/review
 """.format(event_name)
         return subject, body
