@@ -31,7 +31,7 @@ class SuggestionsBaseController(LoggedInHandler):
         # Only do this on prod
         if tba_config.DEBUG:
             return
-        sender = "keys@{}.appspotmail.com".format(app_identity.get_application_id())
+        sender = "suggestions@{}.appspotmail.com".format(app_identity.get_application_id())
         reply_to = "contact@thebluealliance.com"
         mail.send_mail(sender=sender,
                        reply_to=reply_to,
