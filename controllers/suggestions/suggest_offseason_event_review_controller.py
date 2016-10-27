@@ -3,7 +3,7 @@ from datetime import datetime
 from consts.account_permissions import AccountPermissions
 from consts.district_type import DistrictType
 from consts.event_type import EventType
-from controllers.suggestions.suggestions_base_controller import \
+from controllers.suggestions.suggestions_review_base_controller import \
     SuggestionsReviewBaseController
 from helpers.event_manipulator import EventManipulator
 from models.event import Event

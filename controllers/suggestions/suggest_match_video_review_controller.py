@@ -5,7 +5,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from consts.account_permissions import AccountPermissions
-from controllers.suggestions.suggestions_base_controller import SuggestionsReviewBaseController
+from controllers.suggestions.suggestions_review_base_controller import SuggestionsReviewBaseController
 from helpers.suggestions.match_suggestion_accepter import MatchSuggestionAccepter
 from models.suggestion import Suggestion
 
