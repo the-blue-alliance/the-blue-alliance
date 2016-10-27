@@ -1,11 +1,11 @@
 from consts.auth_type import AuthType
 from controllers.base_controller import LoggedInHandler
-from controllers.suggestions.suggestions_base_controller import SuggestionsBaseController
 from helpers.suggestions.suggestion_creator import SuggestionCreator
+from helpers.suggestions.suggestion_notifier import SuggestionNotifier
 from template_engine import jinja2_engine
 
 
-class SuggestApiWriteController(SuggestionsBaseController):
+class SuggestApiWriteController(LoggedInHandler):
     """
     Allow users to request trusted API keys for an offseason event
     """
@@ -32,7 +32,7 @@ class SuggestApiWriteController(SuggestionsBaseController):
             auth_types=clean_auth_types,
         )
         subject, body = self._gen_notification_email(event_key)
-        self.send_admin_alert_email(subject, body)
+        SuggestionNotifier.send_admin_alert_email(subject, body)
         self.template_values.update({
             'status': status,
             "auth_types": AuthType.type_names,

@@ -1,10 +1,10 @@
 from controllers.base_controller import LoggedInHandler
-from controllers.suggestions.suggestions_base_controller import SuggestionsBaseController
 from helpers.suggestions.suggestion_creator import SuggestionCreator
+from helpers.suggestions.suggestion_notifier import SuggestionNotifier
 from template_engine import jinja2_engine
 
 
-class SuggestOffseasonEventController(SuggestionsBaseController):
+class SuggestOffseasonEventController(LoggedInHandler):
     """
     Allow users to suggest Offseason Events
     """
@@ -44,7 +44,7 @@ class SuggestOffseasonEventController(SuggestionsBaseController):
                 jinja2_engine.render('suggest_offseason_event.html', self.template_values))
         else:
             subject, body = self._gen_notification_email(event_name)
-            self.send_admin_alert_email(subject, body)
+            SuggestionNotifier.send_admin_alert_email(subject, body)
             self.redirect('/suggest/offseason?status=%s' % status)
 
     @staticmethod
