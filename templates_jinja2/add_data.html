@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Add Your Own Data - The Blue Alliance{% endblock %}
+
+{% block meta_description %}Instructions to add your own FRC data to The Blue Alliance{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-3 col-lg-2">
+      <div class="tba-sidenav-affixed">
+        <h1 class="visible-xs end_header">Add Data to TBA!</h1>
+
+        <div class="tba-sidebar">
+          <ul class="nav tba-sidenav">
+              <li><a class="smooth-scroll" href="#match-videos">Match Video</a></li>
+              <li><a class="smooth-scroll" href="#webcasts">Event Webcasts</a></li>
+              <li><a class="smooth-scroll" href="#team-media">Team Media</a></li>
+              <li><a class="smooth-scroll" href="#offseason">Offseason Event</a></li>
+              <li><a class="smooth-scroll" href="#results">Event Results</a></li>
+              <li><a class="smooth-scroll" href="#other">Other</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-9 col-lg-10">
+      <h1 class="hidden-xs end_header">Add Data to TBA!</h1>
+      <p>Do you have some data you'd like to add to The Blue Alliance? This page will provide you with the resources you need to help maintain TBA.</p>
+
+      <h2 id="match-videos">Adding Match Videos</h2>
+      <p>If you have links to YouTube recording of match video, you can link them on TBA. Suggest videos individually from the detail page for a given match. If you have a YouTube playlist for an event, click the "Add Videos" button on the event details page and input the playlist link. Or, if you're webcasting and archiving an event and want to directly add videos as they get uploaded, you can <a href="/request/apiwrite">request write keys</a>.</p>
+
+      <h2 id="webcasts">Event Webcasts</h2>
+      <p>If you have the link to the webcast for an event, you can suggest it from the event's detail page, or from The Blue Alliance homepage if the event is currently active.</p>
+
+      <h2 id="team-media">Team Media</h2>
+      <p>You can suggest various types of team media to TBA from a team's detail page in a specific year. You can suggest robot pictures, reveal videos, and team social media accounts.</p>
+
+      <h2 id="offseason">Adding a New Offseason Event</h2>
+      <p>Do you know of an offseason event missing from TBA? You can suggest an event to be added <a href="/suggest/offseason">here</a>. The request will be reviewed and added shortly.</p>
+
+      <h2 id="results">Adding Offseason Event Results</h2>
+      <p>Will you be volunteering at an offseason event or do you have access to its data? Here are the choices you have for submitting that data to TBA:</p>
+        <h3>I am Volunteering at the Scoring Table</h3>
+        <p>If you are using the official FIRST FMS system, <a href="/request/apiwrite">request write keys</a> for your event and use the <a href="/eventwizard">TBA Event Wizard</a> to post live data. You can also input FMS reports to the Event Wizard.</p>
+        <p>Otherwise, we recommend you use <a href="https://github.com/Team254/cheesy-arena">Cheesy Arena</a>, which has the ability to automatically post results to The Blue Alliance. Before your event, be sure to <a href="/request/apiwrite">request write keys</a>!</p>
+
+        <h3>I have FMS Reports</h3>
+        <p>We can also import FMS Report exports into the Blue Alliance. You can either <a href="/request/apiwrite">obtain write keys</a> and use the <a href="/eventwizard">Event Wizard</a> to input the reports, or post them in our <a href="http://facebook.com/groups/moardata">Facebook Group</a>.</p>
+
+        <h3>I have Results in Some Other Form</h3>
+        <p>Post your data on <a href="http://facebook.com/groups/moardata">our Facebook Group</a> and we'll see what we can do.</p>
+
+      <h2 id="other">Other</h2>
+      <p>For other data you'd like to add, reach out on our <a href="http://facebook.com/groups/moardata">Facebook Group</a> or <a href="/contact">drop us a line</a>, we'll be happy to help!</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
