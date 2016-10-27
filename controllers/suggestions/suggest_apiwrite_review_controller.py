@@ -10,7 +10,7 @@ from google.appengine.ext import ndb
 import tba_config
 from consts.account_permissions import AccountPermissions
 from consts.auth_type import AuthType
-from controllers.suggestions.suggestions_review_base_controller import \
+from controllers.suggestions.suggestions_base_controller import \
     SuggestionsReviewBaseController
 from models.api_auth_access import ApiAuthAccess
 from models.event import Event
