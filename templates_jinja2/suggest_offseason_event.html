@@ -87,11 +87,47 @@
                                     </td>
                                 </tr>
                                 <tr>
+                                    <td>Venue Name</td>
+                                    <td>
+                                        <span{% if 'venue_name' in failures %} class="has-error"{% endif %}>
+                                            <input class="form-control" type="text" name="venue_name" placeholder="Jacob K. Javits Center"{% if venue_address %} value="{{venue_name}}"{% endif %}/>
+                                            {% if 'venue_name' in failures %}<span class="help-block">{{failures.venue_name}}</span>{% endif %}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
                                     <td>Venue Address</td>
                                     <td>
                                         <span{% if 'venue_address' in failures %} class="has-error"{% endif %}>
-                                            <input class="form-control" type="text" name="venue_address" placeholder="123 Fake St, New York, NY, USA"{% if venue_address %} value="{{venue_address}}"{% endif %}/>
+                                            <input class="form-control" type="text" name="venue_address" placeholder="123 Fake St"{% if venue_address %} value="{{venue_address}}"{% endif %}/>
                                             {% if 'venue_address' in failures %}<span class="help-block">{{failures.venue_address}}</span>{% endif %}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Venue City</td>
+                                    <td>
+                                        <span{% if 'venue_city' in failures %} class="has-error"{% endif %}>
+                                            <input class="form-control" type="text" name="venue_city" placeholder="New York"{% if venue_city %} value="{{venue_city}}"{% endif %}/>
+                                            {% if 'venue_city' in failures %}<span class="help-block">{{failures.venue_city}}</span>{% endif %}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Venue State</td>
+                                    <td>
+                                        <span{% if 'venue_state' in failures %} class="has-error"{% endif %}>
+                                            <input class="form-control" type="text" name="venue_state" placeholder="NY"{% if venue_state %} value="{{venue_state}}"{% endif %}/>
+                                            {% if 'venue_state' in failures %}<span class="help-block">{{failures.venue_state}}</span>{% endif %}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Venue Country</td>
+                                    <td>
+                                        <span{% if 'venue_country' in failures %} class="has-error"{% endif %}>
+                                            <input class="form-control" type="text" name="venue_country" placeholder="USA"{% if venue_country %} value="{{venue_country}}"{% endif %}/>
+                                            {% if 'venue_country' in failures %}<span class="help-block">{{failures.venue_country}}</span>{% endif %}
                                         </span>
                                     </td>
                                 </tr>

@@ -3,46 +3,56 @@
     <table class="table table-striped table-hover table-condensed">
         <tr>
             <td>Name</td>
-            <td><input type="text" name="name" value="{{ event.name }}"/></td>
+            <td><input type="text" name="name" {% if event.name %}value="{{ event.name }}"{% endif %}/></td>
         </tr>
         <tr>
             <td>Dates</td>
             <td>
-                <input type="text" name="start_date" value="{{ event.start_date.strftime("%Y-%m-%d")}}" placeholder="2012-04-04"/> to <input type="text" name="end_date" value="{{ event.end_date.strftime("%Y-%m-%d")}}" placeholder="2012-04-06"/>
+                <input type="text" name="start_date" {% if event.start_date %}value="{{ event.start_date.strftime("%Y-%m-%d")}}"{% endif %} placeholder="2012-04-04"/> to <input type="text" name="end_date" {% if event.end_date %}value="{{ event.end_date.strftime("%Y-%m-%d")}}" {% endif %}placeholder="2012-04-06"/>
             </td>
         </tr>
 
         <tr>
-            <td>Short Name</td>
-            <td><input type="text" name="short_name" value="{{ event.short_name }}"/></td>
+            <td><strong>Short Name</strong></td>
+            <td><input type="text" name="short_name" {% if event.short_name %}value="{{ event.short_name }}"{% endif %}/></td>
         </tr>
         <tr>
             <td>Website</td>
-            <td><input type="text" name="website" value="{{ event.website }}"/></td>
+            <td><input type="text" name="website" {% if event.website %}value="{{ event.website }}"{% endif %}/></td>
         </tr>
         <tr>
             <td>Year</td>
-            <td><input type="text" name="year" value="{{ event.year }}"/></td>
+            <td><input type="text" name="year" {% if event.year %}value="{{ event.year }}"{% endif %}/></td>
         </tr>
         <tr>
-            <td>Event Short</td>
-            <td><input type="text" name="event_short" value="{{ event.event_short }}"/></td>
+            <td><strong>Event Short</strong></td>
+            <td><input type="text" name="event_short" {% if event.event_short %}value="{{ event.event_short }}{% endif %}"/></td>
         </tr>
         <tr>
             <td>Event Venue</td>
-            <td><input type="text" name="venue" value="{{ event.venue }}"/></td>
+            <td><input type="text" name="venue" {% if event.venue %}value="{{ event.venue }}"{% endif %}/></td>
             <td><p><strong>Example:</strong><br>Jacob K. Javits Convention Center</p></td>
         </tr>
         <tr>
             <td>Event Venue Address</td>
-            <td><textarea name="venue_address">{{ event.venue_address }}</textarea>
-            <td><p><strong>Example:</strong><br>Jacob K. Javits Convention Center<br>655 West 34th Street<br>New York, NY 10001<br>USA</p></td>
+            <td><textarea name="venue_address">{% if event.venue_address %}{{ event.venue_address }}{% endif %}</textarea>
+            <td><p><strong>Example:</strong><br>Jacob K. Javits Convention Center<br>655 West 34th Street<br>New York, NY, USA</p></td>
         </tr>
         <tr>
-            <td>Event Location</td>
-            <td><input type="text" name="location" value="{{ event.location }}"/></td>
-            <td><p><strong>Example:</strong><br>New York, NY 10001, USA</p></td>
+            <td>Event City</td>
+            <td><input type="text" name="city" {% if event.city %}value="{{ event.city}}"{% endif %}/></td>
+            <td><p><strong>Example:</strong><br>New York</p></td>
         </tr>
+        <tr>
+            <td>Event State</td>
+            <td><input type="text" name="state" {% if event.state_prov %}value="{{ event.state_prov}}"{% endif %}/></td>
+            <td><p><strong>Example:</strong><br>NY</p></td>
+         </tr>
+         <tr>
+            <td>Event City</td>
+            <td><input type="text" name="country" {% if event.country %}value="{{ event.country}}"{% endif %}/></td>
+            <td><p><strong>Example:</strong><br>USA</p></td>
+         </tr>
     </table>
 
     <button type="submit" class="btn btn-primary" name="verdict" value="accept"><span class="glyphicon glyphicon-thumbs-up"></span> Add Event</button>
