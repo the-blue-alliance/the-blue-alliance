@@ -2,6 +2,7 @@ import unittest2
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
+from consts.auth_type import AuthType
 from consts.event_type import EventType
 from consts.media_type import MediaType
 from helpers.media_helper import MediaParser
@@ -292,8 +293,19 @@ class TestApiWriteSuggestionCreator(unittest2.TestCase):
             self.account.key,
             "2016test",
             "Event Organizer",
-            [1, 2, 3])
-        self.assertEqual(status, 'bad_event')
+            [AuthType.MATCH_VIDEO, AuthType.EVENT_MATCHES, AuthType.EVENT_ALLIANCES])
+        self.assertEqual(status, 'success')
+
+        # Ensure the Suggestion gets created with only MATCH_VIDEO permission
+        suggestions = Suggestion.query().fetch()
+        self.assertIsNotNone(suggestions)
+        self.assertEqual(len(suggestions), 1)
+
+        suggestion = suggestions[0]
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.contents['event_key'], "2016test")
+        self.assertEqual(suggestion.contents['affiliation'], "Event Organizer")
+        self.assertListEqual(suggestion.contents['auth_types'], [AuthType.MATCH_VIDEO])
 
     def testNoEvent(self):
         status = SuggestionCreator.createApiWriteSuggestion(
