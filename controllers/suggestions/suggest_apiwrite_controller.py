@@ -31,8 +31,9 @@ class SuggestApiWriteController(LoggedInHandler):
             affiliation=self.request.get("role", None),
             auth_types=clean_auth_types,
         )
-        subject, body = self._gen_notification_email(event_key)
-        SuggestionNotifier.send_admin_alert_email(subject, body)
+        if status == 'success':
+            subject, body = self._gen_notification_email(event_key)
+            SuggestionNotifier.send_admin_alert_email(subject, body)
         self.template_values.update({
             'status': status,
             "auth_types": AuthType.type_names,
