@@ -446,3 +446,15 @@ class WebhookDocumentationHandler(CacheableHandler):
         self.template_values['types'] = NotificationType.types
         path = os.path.join(os.path.dirname(__file__), "../templates/webhookdocs.html")
         return template.render(path, self.template_values)
+
+
+class AddDataHandler(CacheableHandler):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "add_data_instructions"
+
+    def __init__(self, *args, **kw):
+        super(AddDataHandler, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24 * 7
+
+    def _render(self, *args, **kw):
+        return jinja2_engine.render('add_data.html', self.template_values)

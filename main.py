@@ -16,7 +16,8 @@ from controllers.main_controller import TwoChampsHandler, ContactHandler, Hashta
     MainKickoffHandler, MainBuildseasonHandler, MainChampsHandler, MainCompetitionseasonHandler, \
     MainInsightsHandler, MainOffseasonHandler, OprHandler, PredictionsHandler, SearchHandler, \
     AboutHandler, ThanksHandler, handle_404, handle_500, \
-    GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler, ApiWriteHandler, MatchInputHandler, WebhookDocumentationHandler
+    GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler, ApiWriteHandler, MatchInputHandler, WebhookDocumentationHandler, \
+      AddDataHandler
 from controllers.match_controller import MatchDetail
 from controllers.mytba_controller import MyTBALiveController
 from controllers.nightbot_controller import NightbotTeamNextmatchHandler, NightbotTeamStatuskHandler
@@ -76,6 +77,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/account/mytba/event/<event_key>', MyTBAEventController, 'account-mytba-event', strict_slash=True),
       RedirectRoute(r'/account/mytba/match/<match_key>', MyTBAMatchController, 'account-mytba-match', strict_slash=True),
       RedirectRoute(r'/account/mytba/team/<team_number:[0-9]+>', MyTBATeamController, 'account-mytba-team', strict_slash=True),
+      RedirectRoute(r'/add-data', AddDataHandler, 'add-data', strict_slash=True),
       RedirectRoute(r'/apidocs', ApiDocumentationHandler, 'api-documentation', strict_slash=True),
       RedirectRoute(r'/apidocs/webhooks', WebhookDocumentationHandler, 'webhook-documentation', strict_slash=True),
       RedirectRoute(r'/apiwrite', ApiWriteHandler, 'api-write', strict_slash=True),
