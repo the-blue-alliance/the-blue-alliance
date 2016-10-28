@@ -76,7 +76,7 @@ class SuggestApiWriteReviewController(SuggestionsReviewBaseController):
 
         return user, event_key, """Hi {},
 
-We have approved your request for auth tokens so you can add data to the following event: {} {}
+We graciously accept your request for auth tokens so you can add data to the following event: {} {}
 
 You can find the keys on your account overview page: https://www.thebluealliance.com/account
 {}
