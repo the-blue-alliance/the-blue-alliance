@@ -20,7 +20,6 @@ class TestFIRSTElasticSearchEventListParser(unittest2.TestCase):
         self.testbed.init_memcache_stub()
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
-
     def tearDown(self):
         self.testbed.deactivate()
 
@@ -48,6 +47,7 @@ class TestFIRSTElasticSearchEventListParser(unittest2.TestCase):
                     self.assertEquals(event.venue, "Jacob K. Javits Convention Center")
                     self.assertEquals(event.city, "New York")
                     self.assertEquals(event.state_prov, "NY")
+                    self.assertEquals(event.postalcode, "10001")
                     self.assertEquals(event.country, "USA")
                     self.assertEquals(event.venue_address, "Jacob K. Javits Convention Center\n655 West 34th Street\nNew York, NY 10001\nUSA")
                     self.assertEquals(event.year, 2015)
@@ -71,6 +71,7 @@ class TestFIRSTElasticSearchEventListParser(unittest2.TestCase):
                     self.assertEquals(event.venue, "Hartford Public High School")
                     self.assertEquals(event.city, "Hartford")
                     self.assertEquals(event.state_prov, "CT")
+                    self.assertEquals(event.postalcode, "06105")
                     self.assertEquals(event.country, "USA")
                     self.assertEquals(event.venue_address, "Hartford Public High School\n55 Forest Street\nHartford, CT 06105\nUSA")
                     self.assertEquals(event.year, 2015)
@@ -94,6 +95,7 @@ class TestFIRSTElasticSearchEventListParser(unittest2.TestCase):
                     self.assertEquals(event.venue, "Sports and Recreation Center, WPI")
                     self.assertEquals(event.city, "Worcester")
                     self.assertEquals(event.state_prov, "MA")
+                    self.assertEquals(event.postalcode, "01609")
                     self.assertEquals(event.country, "USA")
                     self.assertEquals(event.venue_address, "Sports and Recreation Center, WPI\n100 Institute Road\nWorcester, MA 01609\nUSA")
                     self.assertEquals(event.year, 2015)

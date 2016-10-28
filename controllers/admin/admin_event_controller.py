@@ -314,6 +314,7 @@ class AdminEventEdit(LoggedInHandler):
             venue_address=self.request.get("venue_address"),
             city=self.request.get("city"),
             state_prov=self.request.get("state_prov"),
+            postalcode=self.request.get("postalcode"),
             country=self.request.get("country"),
             name=self.request.get("name"),
             short_name=self.request.get("short_name"),

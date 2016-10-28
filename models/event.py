@@ -31,6 +31,7 @@ class Event(ndb.Model):
     city = ndb.StringProperty()  # Equivalent to locality. From FRCAPI
     state_prov = ndb.StringProperty()  # Equivalent to region. From FRCAPI
     country = ndb.StringProperty()  # From FRCAPI
+    postalcode = ndb.StringProperty()  # From ElasticSearch only. String because it can be like "95126-1215"
     timezone_id = ndb.StringProperty()  # such as 'America/Los_Angeles' or 'Asia/Jerusalem'
     official = ndb.BooleanProperty(default=False)  # Is the event FIRST-official?
     first_eid = ndb.StringProperty()  # from USFIRST
@@ -283,7 +284,10 @@ class Event(ndb.Model):
             if self.city:
                 split_location.append(self.city)
             if self.state_prov:
-                split_location.append(self.state_prov)
+                if self.postalcode:
+                    split_location.append(self.state_prov + ' ' + self.postalcode)
+                else:
+                    split_location.append(self.state_prov)
             if self.country:
                 split_location.append(self.country)
             self._location = ', '.join(split_location)

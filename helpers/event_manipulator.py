@@ -53,6 +53,7 @@ class EventManipulator(ManipulatorBase):
             "city",
             "state_prov",
             "country",
+            "postalcode",
             "timezone_id",
             "name",
             "official",
