@@ -21,6 +21,7 @@ class TeamManipulator(ManipulatorBase):
             "city",
             "state_prov",
             "country",
+            "postalcode",
             "name",
             "nickname",
             "website",

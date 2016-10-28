@@ -15,7 +15,6 @@ class TestFIRSTElasticSearchTeamParser(unittest2.TestCase):
         self.testbed.init_memcache_stub()
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
-
     def tearDown(self):
         self.testbed.deactivate()
 
@@ -31,6 +30,7 @@ class TestFIRSTElasticSearchTeamParser(unittest2.TestCase):
                     self.assertEqual(team.team_number, 254)
                     self.assertEqual(team.nickname, "The Cheesy Poofs")
                     self.assertEqual(team.rookie_year, 1999)
+                    self.assertEqual(team.postalcode, "95126-1215")
                     self.assertEqual(team.website, "http://www.team254.com")
                     self.assertEqual(team.first_tpid, 357159)
                     self.assertEqual(team.first_tpid_year, 2015)
@@ -40,6 +40,7 @@ class TestFIRSTElasticSearchTeamParser(unittest2.TestCase):
                     self.assertEqual(team.team_number, 604)
                     self.assertEqual(team.nickname, "Quixilver")
                     self.assertEqual(team.rookie_year, 2001)
+                    self.assertEqual(team.postalcode, "95120")
                     self.assertEqual(team.website, "http://604robotics.com")
                     self.assertEqual(team.first_tpid, 357405)
                     self.assertEqual(team.first_tpid_year, 2015)
@@ -51,6 +52,7 @@ class TestFIRSTElasticSearchTeamParser(unittest2.TestCase):
                     self.assertEqual(team.team_number, 4990)
                     self.assertEqual(team.nickname, "Gryphon Robotics")
                     self.assertEqual(team.rookie_year, 2014)
+                    self.assertEqual(team.postalcode, "94010")
                     self.assertEqual(team.website, "http:///gryphonrobotics.org")
                     self.assertEqual(team.first_tpid, 361441)
                     self.assertEqual(team.first_tpid_year, 2015)

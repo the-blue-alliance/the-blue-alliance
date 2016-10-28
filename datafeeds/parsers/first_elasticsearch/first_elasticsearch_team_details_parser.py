@@ -26,6 +26,7 @@ class FIRSTElasticSearchTeamDetailsParser(object):
                 # city=None,
                 # state_prov=None,  # team_stateprov isn't in the same format as the FRC API (e.g. 'CA' instead of 'California'). Don't save to avoid unnecessary cache clearing.
                 # country=None,
+                postalcode=team.get('team_postalcode', None),
                 website=website,
                 rookie_year=team.get('team_rookieyear', None),
                 first_tpid=first_tpid,
