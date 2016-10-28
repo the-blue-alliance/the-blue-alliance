@@ -36,6 +36,7 @@ class FIRSTElasticSearchEventListParser(object):
             city = event.get('event_city', None)
             state_prov = event.get('event_stateprov', None)
             country = event.get('event_country', None)
+            postalcode = event.get('event_postalcode', None)
             start = datetime.datetime.strptime(event['date_start'], self.DATE_FORMAT_STR)
             end = datetime.datetime.strptime(event['date_end'], self.DATE_FORMAT_STR) + datetime.timedelta(hours=23, minutes=59, seconds=59)
             venue_address = event['event_venue']
@@ -61,6 +62,7 @@ class FIRSTElasticSearchEventListParser(object):
                 city=city,
                 state_prov=state_prov,
                 country=country,
+                postalcode=postalcode,
                 venue_address=venue_address,
                 year=self.season,
                 event_district_enum=district_enum,
