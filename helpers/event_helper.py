@@ -237,9 +237,9 @@ class EventHelper(object):
         return name_str.strip()
 
     @classmethod
-    def get_timezone_id(cls, location, event_key):
+    def get_lat_lon(cls, location, event_key):
         if location is None:
-            logging.warning('Could not get timezone for event {} with no location!'.format(event_key))
+            logging.warning('Could not get lat/lon for event {} with no location!'.format(event_key))
             return None
 
         google_secrets = Sitevar.get_by_id("google.secrets")
@@ -272,6 +272,25 @@ class EventHelper(object):
             return None
         lat = geocode_dict['results'][0]['geometry']['location']['lat']
         lng = geocode_dict['results'][0]['geometry']['location']['lng']
+        return lat, lng
+
+    @classmethod
+    def get_timezone_id(cls, location, event_key, lat_lon=None):
+        if lat_lon is None:
+            result = cls.get_lat_lon(location, event_key)
+            if result is None:
+                return None
+            else:
+                lat, lng = result
+        else:
+            lat, lng = lat_lon
+
+        google_secrets = Sitevar.get_by_id("google.secrets")
+        google_api_key = None
+        if google_secrets is None:
+            logging.warning("Missing sitevar: google.api_key. API calls rate limited by IP and may be over rate limit.")
+        else:
+            google_api_key = google_secrets.contents['api_key']
 
         # timezone request
         tz_params = {

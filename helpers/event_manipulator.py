@@ -2,6 +2,7 @@ import logging
 import traceback
 
 from google.appengine.api import taskqueue
+from google.appengine.ext import ndb
 
 from helpers.cache_clearer import CacheClearer
 from helpers.event_helper import EventHelper
@@ -23,11 +24,17 @@ class EventManipulator(ManipulatorBase):
         To run after models have been updated
         """
         for (event, updated_attrs) in zip(events, updated_attr_list):
-            try:
-                event.timezone_id = EventHelper.get_timezone_id(event.location, event.key.id())
+            lat_lon = EventHelper.get_lat_lon(event.location, event.key.id())
+            if not lat_lon:
+                logging.warning("Lat/Lon update for event {} failed!".format(event.key_name))
+            else:
+                event.lat_lon = ndb.GeoPt(lat_lon[0], lat_lon[1])
+                timezone_id = EventHelper.get_timezone_id(event.location, event.key.id(), lat_lon=lat_lon)
+                if not timezone_id:
+                    logging.warning("Timezone update for event {} failed!".format(event.key_name))
+                else:
+                    event.timezone_id = timezone_id
                 cls.createOrUpdate(event, run_post_update_hook=False)
-            except Exception:
-                logging.warning("Timezone update for event {} failed!".format(event.key_name))
 
         # Enqueue task to calculate district points
         for event in events:
@@ -54,6 +61,7 @@ class EventManipulator(ManipulatorBase):
             "state_prov",
             "country",
             "postalcode",
+            "lat_lon",
             "timezone_id",
             "name",
             "official",
