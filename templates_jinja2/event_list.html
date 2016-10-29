@@ -46,6 +46,7 @@
         </div>
         {% endif %}
 
+        {% if week_events %}
         <div class="tba-sidebar">
           <ul class="nav tba-sidenav">
           {% for label, events in week_events.items() %}
@@ -53,14 +54,45 @@
           {% endfor %}
           </ul>
         </div>
+        {% endif %}
       </div>
     </div>
     <div class="col-xs-12 col-sm-9 col-lg-10">
       <h1 class="hidden-xs end_header">{% if explicit_year %}{{selected_year}} {% endif %}<em>FIRST</em> Robotics Competition Events {% if events|length > 0 %}<small>{{ events|length }} Events</small>{% endif %}</h1>
-      {% for label, events in week_events.items() %}
-        <h2 id="{{label|slugify}}">{{ label }} <small>{{events|length}} Events</small></h2>
-        {% include "event_partials/event_table.html" %}
-      {% endfor %}
+
+      <form id="event-filter-form" class="form-inline" method="get">
+        <div class="form-group">
+          <select class="form-control" id="state-provs-select" name="state_prov">
+            <option value="">All States / Provinces</option>
+            {% for sp in valid_state_provs %}
+              <option value="{{sp}}"{% if sp == state_prov %} selected="selected"{% endif %}">{{sp}}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <input type="number" class="form-control" id="event-filter-postalcode" name="postalcode" placeholder="Zip / Postal Code" {% if postalcode %}value="{{postalcode}}"{% endif %} style="width: 150px;">
+        </div>
+        <div class="form-group">
+          <select class="form-control" id="event-filter-range" name="range">
+            {% for r in valid_ranges %}
+              <option value="{{r}}" {% if r == range %} selected="selected"{% endif %}>Within {{r}} km</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-filter"></span> Filter Events</button>
+        <a class="btn btn-danger" href="/events{% if explicit_year %}/{{selected_year}}{% endif %}"><span class="glyphicon glyphicon-remove"></span> Clear Filters</a>
+      </form>
+
+      {% if week_events %}
+        {% for label, events in week_events.items() %}
+          <h2 id="{{label|slugify}}">{{ label }} <small>{{events|length}} Events</small></h2>
+          {% include "event_partials/event_table.html" %}
+        {% endfor %}
+      {% else %}
+        <br>
+        <div class="well">No events found that match your filters! Try clearing some of them.</div>
+      {% endif %}
     </div>
   </div>
 </div>
