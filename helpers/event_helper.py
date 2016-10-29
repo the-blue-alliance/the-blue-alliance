@@ -237,10 +237,14 @@ class EventHelper(object):
         return name_str.strip()
 
     @classmethod
-    def get_lat_lon(cls, location, event_key):
+    def get_lat_lon(cls, location):
+        return cls.get_lat_lon_async(location).get_result()
+
+    @classmethod
+    @ndb.tasklet
+    def get_lat_lon_async(cls, location):
         if location is None:
-            logging.warning('Could not get lat/lon for event {} with no location!'.format(event_key))
-            return None
+            raise ndb.Return(None)
 
         google_secrets = Sitevar.get_by_id("google.secrets")
         google_api_key = None
@@ -258,26 +262,28 @@ class EventHelper(object):
             geocode_params['key'] = google_api_key
         geocode_url = 'https://maps.googleapis.com/maps/api/geocode/json?%s' % urllib.urlencode(geocode_params)
         try:
-            geocode_result = urlfetch.fetch(geocode_url)
+            rpc = urlfetch.create_rpc()
+            urlfetch.make_fetch_call(rpc, geocode_url)
+            geocode_result = yield rpc
         except Exception, e:
             logging.warning('urlfetch for geocode request failed: {}'.format(geocode_url))
             logging.info(e)
-            return None
+            raise ndb.Return(None)
         if geocode_result.status_code != 200:
-            logging.warning('Geocoding for event {} failed with url {}'.format(event_key, geocode_url))
-            return None
+            logging.warning('Geocoding failed with url {}'.format(geocode_url))
+            raise ndb.Return(None)
         geocode_dict = json.loads(geocode_result.content)
         if not geocode_dict['results']:
             logging.warning('No geocode results for event location: {}'.format(location))
-            return None
+            raise ndb.Return(None)
         lat = geocode_dict['results'][0]['geometry']['location']['lat']
         lng = geocode_dict['results'][0]['geometry']['location']['lng']
-        return lat, lng
+        raise ndb.Return((lat, lng))
 
     @classmethod
-    def get_timezone_id(cls, location, event_key, lat_lon=None):
+    def get_timezone_id(cls, location, lat_lon=None):
         if lat_lon is None:
-            result = cls.get_lat_lon(location, event_key)
+            result = cls.get_lat_lon(location)
             if result is None:
                 return None
             else:
