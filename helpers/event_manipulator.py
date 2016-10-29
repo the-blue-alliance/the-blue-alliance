@@ -1,7 +1,7 @@
 import logging
 import traceback
 
-from google.appengine.api import taskqueue
+from google.appengine.api import search, taskqueue
 from google.appengine.ext import ndb
 
 from helpers.cache_clearer import CacheClearer
@@ -41,6 +41,21 @@ class EventManipulator(ManipulatorBase):
             taskqueue.add(
                 url='/tasks/math/do/district_points_calc/{}'.format(event.key.id()),
                 method='GET')
+
+        # Add event to location info to search index
+        for event in events:
+            fields = [
+                search.NumberField(name='year', value=event.year)
+            ]
+            if event.city:
+                fields.append(search.TextField(name='city', value=event.city))
+            if event.state_prov:
+                fields.append(search.TextField(name='state_prov', value=event.state_prov))
+            if event.country:
+                fields.append(search.TextField(name='country', value=event.country))
+            if event.lat_lon:
+                fields.append(search.GeoField(name='location', value=search.GeoPoint(event.lat_lon.lat, event.lat_lon.lon)))
+            search.Index(name="eventLocation").put(search.Document(doc_id=event.key.id(), fields=fields))
 
     @classmethod
     def updateMerge(self, new_event, old_event, auto_union=True):
