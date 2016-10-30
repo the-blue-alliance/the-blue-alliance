@@ -306,22 +306,37 @@ class AdminBuildSearchIndexEnqueue(LoggedInHandler):
 class AdminBuildSearchIndexDo(LoggedInHandler):
     def get(self, model_type):
         if model_type == 'events':
-            events = Event.query().fetch()
-            for event in events:
-                lat_lon = event.get_lat_lon()
-                # Add event to lat/lon info to search index
-                if lat_lon:
-                    fields = [
-                        search.NumberField(name='year', value=event.year),
-                        search.GeoField(name='location', value=search.GeoPoint(lat_lon[0], lat_lon[1]))
-                    ]
-                    search.Index(name="eventLocation").put(search.Document(doc_id=event.key.id(), fields=fields))
+            event_keys = Event.query().fetch(keys_only=True)
+            for event_key in event_keys:
+                taskqueue.add(
+                    url='/tasks/admin/do/add_event_search_index/' + event_key.id(),
+                    method='GET')
         elif model_type == 'teams':
-            teams = Team.query().fetch()
-            for team in teams:
-                lat_lon = team.get_lat_lon()
-                if lat_lon:
-                    fields = [
-                        search.GeoField(name='location', value=search.GeoPoint(lat_lon[0], lat_lon[1]))
-                    ]
-                    search.Index(name="teamLocation").put(search.Document(doc_id=team.key.id(), fields=fields))
+            team_keys = Team.query().fetch(keys_only=True)
+            for team_key in team_keys:
+                taskqueue.add(
+                    url='/tasks/admin/do/add_team_search_index/' + team_key.id(),
+                    method='GET')
+
+
+class AdminAddEventSearchIndexDo(LoggedInHandler):
+    def get(self, event_key):
+        event = Event.get_by_id(event_key)
+        lat_lon = event.get_lat_lon()
+        if lat_lon:
+            fields = [
+                search.NumberField(name='year', value=event.year),
+                search.GeoField(name='location', value=search.GeoPoint(lat_lon[0], lat_lon[1]))
+            ]
+            search.Index(name="eventLocation").put(search.Document(doc_id=event.key.id(), fields=fields))
+
+
+class AdminAddTeamSearchIndexDo(LoggedInHandler):
+    def get(self, team_key):
+        team = Team.get_by_id(team_key)
+        lat_lon = team.get_lat_lon()
+        if lat_lon:
+            fields = [
+                search.GeoField(name='location', value=search.GeoPoint(lat_lon[0], lat_lon[1]))
+            ]
+            search.Index(name="teamLocation").put(search.Document(doc_id=team.key.id(), fields=fields))

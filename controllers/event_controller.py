@@ -108,7 +108,7 @@ class EventList(CacheableHandler):
 
     def memcacheFlush(self):
         year = datetime.datetime.now().year
-        keys = [self.CACHE_KEY_FORMAT.format(year, True), self.CACHE_KEY_FORMAT.format(year, False)]
+        keys = [self.CACHE_KEY_FORMAT.format(year, True, None), self.CACHE_KEY_FORMAT.format(year, False, None)]
         memcache.delete_multi(keys)
         return keys
 
