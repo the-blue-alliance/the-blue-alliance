@@ -102,10 +102,12 @@ class NearbyController(CacheableHandler):
                     else:
                         keys.append(ndb.Key('Event', result.doc_id))
 
-                results = ndb.get_multi(keys)
+                result_futures = ndb.get_multi_async(keys)
 
                 if search_type == 'teams':
-                    results = filter(lambda team: event_team_count_futures[team.key.id()].get_result() != 0, results)
+                    result_futures = filter(lambda team_key: event_team_count_futures[team_key.id()].get_result() != 0, keys)
+
+                results = [result_future.get_result() for result_future in result_futures]
 
         self.template_values.update({
             'valid_years': self.VALID_YEARS,
