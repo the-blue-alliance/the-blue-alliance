@@ -39,7 +39,7 @@
           <div class="col-sm-8">
             <select class="form-control" id="input-range-limit" name="range_limit">
               {% for valid_range in valid_ranges %}
-                <option value="{{valid_range}}"{% if range_limit == valid_range %} selected="selected"{% endif %}">{{valid_range}} km</option>
+                <option value="{{valid_range}}"{% if range_limit == valid_range %} selected="selected"{% endif %}">{{valid_range}} miles</option>
               {% endfor %}
             </select>
           </div>
@@ -77,7 +77,7 @@
     <div class="col-sm-8">
       {% if location %}
         {% if results %}
-          <p>{{num_results}} {% if search_type == 'teams' %}team{% else %}event{% endif %}{% if num_results != 1 %}s{% endif %} found within {{range_limit}} km {% if search_type == 'teams' %} active {% endif %} in {{year}}</p>
+          <p>{{num_results}} {% if search_type == 'teams' %}team{% else %}event{% endif %}{% if num_results != 1 %}s{% endif %} found within {{range_limit}} miles {% if search_type == 'teams' %} active {% endif %} in {{year}}</p>
 
           {% if num_results > page_size %}
             <nav aria-label="Page navigation">
@@ -140,7 +140,7 @@
                   </td>
                   {% endif %}
                   <td>
-                    {{(distances[result.key.id()] / 1000)|round|int}} km
+                    {{distances[result.key.id()]|round|int}} miles
                   </td>
                 </tr>
               {% endfor %}

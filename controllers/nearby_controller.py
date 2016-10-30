@@ -13,9 +13,10 @@ from template_engine import jinja2_engine
 
 class NearbyController(CacheableHandler):
     VALID_YEARS = list(reversed(range(1992, tba_config.MAX_YEAR + 1)))
-    VALID_RANGES = [500, 1000, 5000]
+    VALID_RANGES = [250, 500, 2500]
     DEFAULT_SEARCH_TYPE = 'teams'
     PAGE_SIZE = 20
+    METERS_PER_MILE = 5280 * 12 * 2.54 / 100
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "nearby_{}_{}_{}_{}_{}"  # (year, location, range_limit, search_type, page)
 
@@ -55,9 +56,9 @@ class NearbyController(CacheableHandler):
 
                 dist_expr = 'distance(location, geopoint({}, {}))'.format(lat, lon)
                 if search_type == 'teams':
-                    query_string = '{} < {}'.format(dist_expr, range_limit * 1000)
+                    query_string = '{} < {}'.format(dist_expr, range_limit * self.METERS_PER_MILE)
                 else:
-                    query_string = '{} < {} AND year={}'.format(dist_expr, range_limit * 1000, year)
+                    query_string = '{} < {} AND year={}'.format(dist_expr, range_limit * self.METERS_PER_MILE, year)
 
                 offset = self.PAGE_SIZE * page
 
@@ -93,7 +94,7 @@ class NearbyController(CacheableHandler):
                 keys = []
                 event_team_count_futures = {}
                 for result in docs.results:
-                    distances[result.doc_id] = result.expressions[0].value
+                    distances[result.doc_id] = result.expressions[0].value / self.METERS_PER_MILE
                     if search_type == 'teams':
                         event_team_count_futures[result.doc_id] = EventTeam.query(
                             EventTeam.team == ndb.Key('Team', result.doc_id),
@@ -105,9 +106,13 @@ class NearbyController(CacheableHandler):
                 result_futures = ndb.get_multi_async(keys)
 
                 if search_type == 'teams':
-                    result_futures = filter(lambda team_key: event_team_count_futures[team_key.id()].get_result() != 0, keys)
+                    results = []
+                    for result_future, team_key in zip(result_futures, keys):
+                        if event_team_count_futures[team_key.id()].get_result() != 0:
+                            results.append(result_future.get_result())
 
-                results = [result_future.get_result() for result_future in result_futures]
+                else:
+                    results = [result_future.get_result() for result_future in result_futures]
 
         self.template_values.update({
             'valid_years': self.VALID_YEARS,
