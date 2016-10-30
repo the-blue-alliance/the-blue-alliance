@@ -31,6 +31,8 @@ class NearbyController(CacheableHandler):
         year = int(year)
         location = self.request.get('location', None)
         range_limit = int(self.request.get('range_limit', self.VALID_RANGES[0]))
+        if range_limit not in self.VALID_RANGES:
+            range_limit = self.VALID_RANGES[0]
         search_type = self.request.get('search_type', self.DEFAULT_SEARCH_TYPE)
         if search_type != 'teams' and search_type != 'events':
             search_type = self.DEFAULT_SEARCH_TYPE
