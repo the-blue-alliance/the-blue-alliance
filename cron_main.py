@@ -18,7 +18,7 @@ from controllers.cron_controller import FinalMatchesRepairDo
 from controllers.cron_controller import UpcomingNotificationDo
 
 from controllers.admin.admin_cron_controller import AdminMobileClearEnqueue, AdminMobileClear, AdminSubsClearEnqueue, AdminSubsClear, \
-    AdminWebhooksClearEnqueue, AdminWebhooksClear, AdminRegistrationDayEnqueue
+    AdminWebhooksClearEnqueue, AdminWebhooksClear, AdminRegistrationDayEnqueue, AdminBuildSearchIndexEnqueue, AdminBuildSearchIndexDo
 
 app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackupEventsEnqueue),
                                ('/tasks/enqueue/csv_backup_events/([0-9]*)', TbaCSVBackupEventsEnqueue),
@@ -55,5 +55,7 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/admin/enqueue/clear_old_webhooks', AdminWebhooksClearEnqueue),
                                ('/tasks/admin/clear_old_webhooks', AdminWebhooksClear),
                                ('/tasks/admin/enqueue/registration_day', AdminRegistrationDayEnqueue),
+                               ('/tasks/admin/enqueue/build_search_index/(.*)', AdminBuildSearchIndexEnqueue),
+                               ('/tasks/admin/do/build_search_index/(.*)', AdminBuildSearchIndexDo),
                                ],
                               debug=tba_config.DEBUG)

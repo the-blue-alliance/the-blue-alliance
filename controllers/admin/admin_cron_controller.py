@@ -5,7 +5,7 @@ import logging
 import os
 import re
 
-from google.appengine.api import taskqueue
+from google.appengine.api import search, taskqueue
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
@@ -16,6 +16,7 @@ from consts.event_type import EventType
 from controllers.base_controller import LoggedInHandler
 from database import match_query
 from helpers.award_manipulator import AwardManipulator
+from helpers.event_helper import EventHelper
 from helpers.district_team_manipulator import DistrictTeamManipulator
 from helpers.match_helper import MatchHelper
 from helpers.notification_sender import NotificationSender
@@ -285,3 +286,59 @@ class AdminRegistrationDayEnqueue(LoggedInHandler):
         turbo_sitevar.put()
 
         self.response.out.write("Enqueued {} tasks to update {} events starting at {}".format((24*60/interval), event_year, start))
+
+
+class AdminBuildSearchIndexEnqueue(LoggedInHandler):
+    def get(self, model_type):
+        if model_type == 'events':
+            taskqueue.add(
+                url='/tasks/admin/do/build_search_index/events',
+                method='GET')
+            self.response.out.write("Enqueued build search index for events")
+        elif model_type == 'teams':
+            taskqueue.add(
+                url='/tasks/admin/do/build_search_index/teams',
+                method='GET')
+            self.response.out.write("Enqueued build search index for teams")
+        else:
+            self.response.out.write("Unknown model type: {}".format(model_type))
+
+
+class AdminBuildSearchIndexDo(LoggedInHandler):
+    def get(self, model_type):
+        if model_type == 'events':
+            events = Event.query().fetch()
+            for event in events:
+                lat_lon = EventHelper.get_lat_lon(event.venue_address)
+                if not lat_lon:
+                    logging.warning("Lat/Lon update for event {} failed with venue_address! Trying again with location".format(event.key_name))
+                    lat_lon = EventHelper.get_lat_lon(event.location)
+                if not lat_lon:
+                    logging.warning("Lat/Lon update for event {} failed with location!".format(event.key_name))
+
+                # Add event to lat/lon info to search index
+                if lat_lon:
+                    fields = [
+                        search.NumberField(name='year', value=event.year),
+                        search.GeoField(name='location', value=search.GeoPoint(lat_lon[0], lat_lon[1]))
+                    ]
+                    search.Index(name="eventLocation").put(search.Document(doc_id=event.key.id(), fields=fields))
+        elif model_type == 'teams':
+            teams = Team.query().fetch()
+            for team in teams:
+                lat_lon = EventHelper.get_lat_lon('{}\n{}'.format(team.split_name[0], team.location))
+                if not lat_lon:
+                    logging.warning("Finding Lat/Lon for team {} failed with split_name[0]! Trying again with location".format(team.key.id()))
+                    lat_lon = EventHelper.get_lat_lon('{}\n{}'.format(team.split_name[-1], team.location))
+                if not lat_lon:
+                    logging.warning("Finding Lat/Lon for team {} failed with split_name[-1]! Trying again with location".format(team.key.id()))
+                    lat_lon = EventHelper.get_lat_lon(team.location)
+                if not lat_lon:
+                    logging.warning("Finding Lat/Lon for tean {} failed with location!".format(team.key.id()))
+                else:
+                    # Add team to lat/lon info to search index
+                    if lat_lon:
+                        fields = [
+                            search.GeoField(name='location', value=search.GeoPoint(lat_lon[0], lat_lon[1]))
+                        ]
+                        search.Index(name="teamLocation").put(search.Document(doc_id=team.key.id(), fields=fields))
