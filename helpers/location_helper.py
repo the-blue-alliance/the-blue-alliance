@@ -121,7 +121,7 @@ class LocationHelper(object):
                         logging.info('No geocode results for location: {}'.format(location))
                     elif geocode_dict['status'] == 'OK':
                         lat_lon = geocode_dict['results'][0]['geometry']['location']['lat'], geocode_dict['results'][0]['geometry']['location']['lng']
-                        num_results = len(textsearch_dict['results'])
+                        num_results = len(geocode_dict['results'])
                     else:
                         logging.warning('Geocoding failed!')
                         logging.warning(geocode_dict)
