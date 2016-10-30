@@ -6,7 +6,7 @@ from google.appengine.api import search
 from google.appengine.ext import ndb
 
 from controllers.base_controller import CacheableHandler
-from helpers.event_helper import EventHelper
+from helpers.location_helper import LocationHelper
 from models.event_team import EventTeam
 from template_engine import jinja2_engine
 
@@ -50,7 +50,7 @@ class NearbyController(CacheableHandler):
         results = []
         distances = []
         if location:
-            lat_lon = EventHelper.get_lat_lon(location)
+            lat_lon, _ = LocationHelper.get_lat_lon(location)
             if lat_lon:
                 lat, lon = lat_lon
 

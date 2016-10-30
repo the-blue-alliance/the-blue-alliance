@@ -3,6 +3,7 @@ import re
 
 from google.appengine.ext import ndb
 from helpers.champ_split_helper import ChampSplitHelper
+from helpers.location_helper import LocationHelper
 
 
 class Team(ndb.Model):
@@ -39,6 +40,9 @@ class Team(ndb.Model):
     def championship_location(self):
         return ChampSplitHelper.get_champ(self)
 
+    def get_lat_lon(self):
+        return LocationHelper.get_team_lat_lon(self)
+
     @property
     def location(self):
         if self._location is None:
@@ -54,14 +58,6 @@ class Team(ndb.Model):
                 split_location.append(self.country)
             self._location = ', '.join(split_location)
         return self._location
-
-    @property
-    def split_name(self):
-        """
-        Guessing sponsors by splitting name by '/' or '&'
-        """
-        split_name = re.split('/|&', self.name)
-        return [x.strip() for x in split_name]
 
     @property
     def details_url(self):

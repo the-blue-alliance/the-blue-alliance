@@ -5,7 +5,7 @@ from google.appengine.api import search, taskqueue
 from google.appengine.ext import ndb
 
 from helpers.cache_clearer import CacheClearer
-from helpers.event_helper import EventHelper
+from helpers.location_helper import LocationHelper
 from helpers.manipulator_base import ManipulatorBase
 from helpers.notification_helper import NotificationHelper
 
@@ -33,14 +33,11 @@ class EventManipulator(ManipulatorBase):
         To run after models have been updated
         """
         for (event, updated_attrs) in zip(events, updated_attr_list):
-            lat_lon = EventHelper.get_lat_lon(event.venue_address)
-            if not lat_lon:
-                logging.warning("Lat/Lon update for event {} failed with venue_address! Trying again with location".format(event.key_name))
-                lat_lon = EventHelper.get_lat_lon(event.location)
+            lat_lon = event.get_lat_lon()
             if not lat_lon:
                 logging.warning("Lat/Lon update for event {} failed with location!".format(event.key_name))
             else:
-                timezone_id = EventHelper.get_timezone_id(None, lat_lon=lat_lon)
+                timezone_id = LocationHelper.get_timezone_id(None, lat_lon=lat_lon)
                 if not timezone_id:
                     logging.warning("Timezone update for event {} failed!".format(event.key_name))
                 else:

@@ -10,6 +10,7 @@ from consts.district_type import DistrictType
 from consts.event_type import EventType
 from consts.ranking_indexes import RankingIndexes
 from context_cache import context_cache
+from helpers.location_helper import LocationHelper
 from models.event_details import EventDetails
 
 
@@ -276,6 +277,9 @@ class Event(ndb.Model):
         else:
             self._rankings_enhanced = None
         return self._rankings_enhanced
+
+    def get_lat_lon(self):
+        return LocationHelper.get_event_lat_lon(self)
 
     @property
     def location(self):

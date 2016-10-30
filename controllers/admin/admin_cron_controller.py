@@ -16,7 +16,6 @@ from consts.event_type import EventType
 from controllers.base_controller import LoggedInHandler
 from database import match_query
 from helpers.award_manipulator import AwardManipulator
-from helpers.event_helper import EventHelper
 from helpers.district_team_manipulator import DistrictTeamManipulator
 from helpers.match_helper import MatchHelper
 from helpers.notification_sender import NotificationSender
@@ -309,13 +308,7 @@ class AdminBuildSearchIndexDo(LoggedInHandler):
         if model_type == 'events':
             events = Event.query().fetch()
             for event in events:
-                lat_lon = EventHelper.get_lat_lon(event.venue_address)
-                if not lat_lon:
-                    logging.warning("Lat/Lon update for event {} failed with venue_address! Trying again with location".format(event.key_name))
-                    lat_lon = EventHelper.get_lat_lon(event.location)
-                if not lat_lon:
-                    logging.warning("Lat/Lon update for event {} failed with location!".format(event.key_name))
-
+                lat_lon = event.get_lat_lon()
                 # Add event to lat/lon info to search index
                 if lat_lon:
                     fields = [
@@ -326,19 +319,9 @@ class AdminBuildSearchIndexDo(LoggedInHandler):
         elif model_type == 'teams':
             teams = Team.query().fetch()
             for team in teams:
-                lat_lon = EventHelper.get_lat_lon('{}\n{}'.format(team.split_name[0], team.location))
-                if not lat_lon:
-                    logging.warning("Finding Lat/Lon for team {} failed with split_name[0]! Trying again with location".format(team.key.id()))
-                    lat_lon = EventHelper.get_lat_lon('{}\n{}'.format(team.split_name[-1], team.location))
-                if not lat_lon:
-                    logging.warning("Finding Lat/Lon for team {} failed with split_name[-1]! Trying again with location".format(team.key.id()))
-                    lat_lon = EventHelper.get_lat_lon(team.location)
-                if not lat_lon:
-                    logging.warning("Finding Lat/Lon for tean {} failed with location!".format(team.key.id()))
-                else:
-                    # Add team to lat/lon info to search index
-                    if lat_lon:
-                        fields = [
-                            search.GeoField(name='location', value=search.GeoPoint(lat_lon[0], lat_lon[1]))
-                        ]
-                        search.Index(name="teamLocation").put(search.Document(doc_id=team.key.id(), fields=fields))
+                lat_lon = team.get_lat_lon()
+                if lat_lon:
+                    fields = [
+                        search.GeoField(name='location', value=search.GeoPoint(lat_lon[0], lat_lon[1]))
+                    ]
+                    search.Index(name="teamLocation").put(search.Document(doc_id=team.key.id(), fields=fields))
