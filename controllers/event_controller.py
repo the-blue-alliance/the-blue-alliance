@@ -31,7 +31,7 @@ class EventList(CacheableHandler):
     """
     VALID_YEARS = list(reversed(range(1992, tba_config.MAX_YEAR + 1)))
     CACHE_VERSION = 4
-    CACHE_KEY_FORMAT = "event_list_{}_{}"  # (year, explicit_year)
+    CACHE_KEY_FORMAT = "event_list_{}_{}_{}"  # (year, explicit_year, state_prov)
 
     def __init__(self, *args, **kw):
         super(EventList, self).__init__(*args, **kw)
@@ -52,7 +52,11 @@ class EventList(CacheableHandler):
             year = datetime.datetime.now().year
             explicit_year = False
 
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(year, explicit_year)
+        state_prov = self.request.get('state_prov', None)
+        if state_prov == '':
+            state_prov = None
+
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(year, explicit_year, state_prov)
         super(EventList, self).get(year, explicit_year)
 
     def _render(self, year=None, explicit_year=False):
@@ -65,7 +69,7 @@ class EventList(CacheableHandler):
             events_future = all_events_future
 
         events = events_future.get_result()
-        if state_prov and not events:
+        if state_prov == '' or (state_prov and not events):
             self.redirect(self.request.path, abort=True)
 
         EventHelper.sort_events(events)
