@@ -19,6 +19,7 @@
   <div class="row">
     <div class="col-xs-12">
       <h1>Teams {{cur_page_label}} <small>{{ num_teams }} teams</small></h1>
+      <a class="btn btn-default pull-right" href="/nearby"><span class="glyphicon glyphicon-search"></span> Search Nearby</a>
       <ul class="pagination pagination-small">
         {% for page_label in page_labels %}
         <li{% if loop.index == current_page %} class="active"{% endif %}><a href="/teams{% if not loop.first %}/{{loop.index}}{% endif %}">{{page_label}}</a></li>
