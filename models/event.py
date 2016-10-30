@@ -32,7 +32,6 @@ class Event(ndb.Model):
     state_prov = ndb.StringProperty()  # Equivalent to region. From FRCAPI
     country = ndb.StringProperty()  # From FRCAPI
     postalcode = ndb.StringProperty()  # From ElasticSearch only. String because it can be like "95126-1215"
-    lat_lon = ndb.GeoPtProperty()  # lat/lon
     timezone_id = ndb.StringProperty()  # such as 'America/Los_Angeles' or 'Asia/Jerusalem'
     official = ndb.BooleanProperty(default=False)  # Is the event FIRST-official?
     first_eid = ndb.StringProperty()  # from USFIRST

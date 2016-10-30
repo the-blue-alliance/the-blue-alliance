@@ -40,19 +40,18 @@ class EventManipulator(ManipulatorBase):
             if not lat_lon:
                 logging.warning("Lat/Lon update for event {} failed with location!".format(event.key_name))
             else:
-                event.lat_lon = ndb.GeoPt(lat_lon[0], lat_lon[1])
                 timezone_id = EventHelper.get_timezone_id(None, lat_lon=lat_lon)
                 if not timezone_id:
                     logging.warning("Timezone update for event {} failed!".format(event.key_name))
                 else:
                     event.timezone_id = timezone_id
-                cls.createOrUpdate(event, run_post_update_hook=False)
+                    cls.createOrUpdate(event, run_post_update_hook=False)
 
             # Add event to lat/lon info to search index
-            if event.lat_lon:
+            if lat_lon:
                 fields = [
                     search.NumberField(name='year', value=event.year),
-                    search.GeoField(name='location', value=search.GeoPoint(event.lat_lon.lat, event.lat_lon.lon))
+                    search.GeoField(name='location', value=search.GeoPoint(lat_lon[0], lat_lon[1]))
                 ]
                 search.Index(name="eventLocation").put(search.Document(doc_id=event.key.id(), fields=fields))
 
@@ -81,7 +80,6 @@ class EventManipulator(ManipulatorBase):
             "state_prov",
             "country",
             "postalcode",
-            "lat_lon",
             "timezone_id",
             "name",
             "official",
