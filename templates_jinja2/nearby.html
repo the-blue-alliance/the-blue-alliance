@@ -84,14 +84,14 @@
               <ul class="pagination">
                 {% if page != 0 %}
                 <li>
-                  <a href="/nearby?year={{year}}&location={{location}}&page={{page - 1}}&range_limit={{range_limit}}" aria-label="Previous">
+                  <a href="/nearby?year={{year}}&location={{location}}&page={{page - 1}}&range_limit={{range_limit}}&search_type={{search_type}}" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                   </a>
                 </li>
                 {% endif %}
                 {% for i in range((num_results / page_size)|ceil) %}
                   <li {% if i == page %}class="active"{% endif %}>
-                    <a href="/nearby?year={{year}}&location={{location}}&page={{i}}&range_limit={{range_limit}}">
+                    <a href="/nearby?year={{year}}&location={{location}}&page={{i}}&range_limit={{range_limit}}&search_type={{search_type}}">
                       {{page_size * i + 1}}-
                       {%- if loop.last -%}
                         {{page_size * i + num_results - page_size * i}}
@@ -103,7 +103,7 @@
                 {% endfor %}
                 {% if page != (num_results / page_size)|ceil - 1 %}
                 <li>
-                  <a href="/nearby?year={{year}}&location={{location}}&page={{page + 1}}&range_limit={{range_limit}}" aria-label="Next">
+                  <a href="/nearby?year={{year}}&location={{location}}&page={{page + 1}}&range_limit={{range_limit}}&search_type={{search_type}}" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                   </a>
                 </li>
