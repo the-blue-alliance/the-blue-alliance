@@ -30,10 +30,10 @@ class TeamManipulator(ManipulatorBase):
         To run after models have been updated
         """
         for (team, updated_attrs) in zip(teams, updated_attr_list):
-            lat_lon = EventHelper.get_lat_lon('{}\n{}'.format(team.split_name[0], team.location))
+            lat_lon = EventHelper.get_lat_lon(u'{} {}'.format(team.split_name[0], team.location))
             if not lat_lon:
                 logging.warning("Finding Lat/Lon for team {} failed with split_name[0]! Trying again with location".format(team.key.id()))
-                lat_lon = EventHelper.get_lat_lon('{}\n{}'.format(team.split_name[-1], team.location))
+                lat_lon = EventHelper.get_lat_lon(u'{} {}'.format(team.split_name[-1], team.location))
             if not lat_lon:
                 logging.warning("Finding Lat/Lon for team {} failed with split_name[-1]! Trying again with location".format(team.key.id()))
                 lat_lon = EventHelper.get_lat_lon(team.location)

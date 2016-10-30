@@ -246,7 +246,7 @@ class EventHelper(object):
         if location is None:
             raise ndb.Return(None)
 
-        location = location.encode('utf8')
+        location = location.encode('utf-8')
 
         google_secrets = Sitevar.get_by_id("google.secrets")
         google_api_key = None
