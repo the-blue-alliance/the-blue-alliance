@@ -255,12 +255,11 @@ class EventHelper(object):
 
         # geocode request
         geocode_params = {
-            'address': location,
-            'sensor': 'false',
+            'query': location,
         }
         if google_api_key is not None:
             geocode_params['key'] = google_api_key
-        geocode_url = 'https://maps.googleapis.com/maps/api/geocode/json?%s' % urllib.urlencode(geocode_params)
+        geocode_url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?%s' % urllib.urlencode(geocode_params)
         try:
             rpc = urlfetch.create_rpc()
             urlfetch.make_fetch_call(rpc, geocode_url)
@@ -275,6 +274,7 @@ class EventHelper(object):
         geocode_dict = json.loads(geocode_result.content)
         if not geocode_dict['results']:
             logging.warning('No geocode results for event location: {}'.format(location))
+            logging.info(geocode_dict)
             raise ndb.Return(None)
         lat = geocode_dict['results'][0]['geometry']['location']['lat']
         lng = geocode_dict['results'][0]['geometry']['location']['lng']

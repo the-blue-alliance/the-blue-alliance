@@ -9,40 +9,75 @@
   <div class="row">
     <div class="col-xs-12">
       <h1>Search for nearby Teams and Events</h1>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-sm-10 col-sm-offset-1">
-      <form id="location-search" class="form-inline" method="get">
-        <div class="form-group">
-          <label class="sr-only" for="input-year">Year</label>
-          <select class="form-control" id="input-year" name="year">
-            {% for valid_year in valid_years %}
-              <option value="{{valid_year}}"{% if valid_year == year %} selected="selected"{% endif %}">{{valid_year}}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="sr-only" for="input-location">Location</label>
-          <input type="text" class="form-control" id="input-location" name="location" placeholder="City / Zip / Address"{% if location %} value="{{location}}"{% endif %}">
-        </div>
-        <select class="form-control" id="input-range-limit" name="range_limit">
-          {% for valid_range in valid_ranges %}
-            <option value="{{valid_range}}"{% if range_limit == valid_range %} selected="selected"{% endif %}">Within {{valid_range}} km</option>
-          {% endfor %}
-        </select>
-        <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-search"></span> Search</button>
-      </form>
       <br>
     </div>
   </div>
 
   <div class="row">
-    <div class="col-sm-10 col-sm-offset-1">
+    <div class="col-sm-4">
+      <form class="form-horizontal" method="get">
+        <div class="form-group">
+          <label class="col-sm-4 control-label" for="input-year">Year</label>
+          <div class="col-sm-8">
+            <select class="form-control" id="input-year" name="year">
+              {% for valid_year in valid_years %}
+                <option value="{{valid_year}}"{% if valid_year == year %} selected="selected"{% endif %}>{{valid_year}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-sm-4 control-label" for="input-location">Location</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" id="input-location" name="location" placeholder="City / Zip / Address"{% if location %} value="{{location}}"{% endif %}">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-sm-4 control-label" for="input-range-limit">Range Limit </label>
+          <div class="col-sm-8">
+            <select class="form-control" id="input-range-limit" name="range_limit">
+              {% for valid_range in valid_ranges %}
+                <option value="{{valid_range}}"{% if range_limit == valid_range %} selected="selected"{% endif %}">{{valid_range}} km</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-offset-4 col-sm-8">
+            <div class="radio">
+              <label>
+                <input type="radio" name="search_type" value="teams" {% if search_type == 'teams' %}checked="checked"{% endif %}> Show Teams
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-offset-4 col-sm-8">
+            <div class="radio">
+              <label>
+                <input type="radio" name="search_type" value="events" {% if search_type == 'events' %}checked="checked"{% endif %}> Show Events
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-offset-4 col-sm-8">
+            <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-search"></span> Search</button>
+          </div>
+        </div>
+      </form>
+      <br>
+    </div>
+
+    <div class="col-sm-8">
       {% if location %}
-        {% if events %}
-          <p class="pull-right">{{num_results}} events found within {{range_limit}} km</p>
+        {% if results %}
+          <p>{{num_results}} {% if search_type == 'teams' %}team{% else %}event{% endif %}{% if num_results != 1 %}s{% endif %} found within {{range_limit}} km {% if search_type == 'teams' %} active {% endif %} in {{year}}</p>
 
           {% if num_results > page_size %}
             <nav aria-label="Page navigation">
@@ -80,34 +115,42 @@
           <table class="event-table">
             <thead>
               <tr>
-                <th>Event</th>
-                <th>Dates</th>
+                <th>{% if search_type == 'teams' %}Team{% else %}Event{% endif %}</th>
+                {% if search_type == 'events' %}<th>Dates</th>{% endif %}
                 <th>Distance</th>
               </tr>
             </thead>
             <tbody>
-              {% for event in events %}
+              {% for result in results %}
                 <tr>
                   <td>
-                    <a href="/event/{{event.key_name}}" title="{{event.name}}" itemprop="url"><span itemprop="summary">{{event.name}}</span></a>
-                    {% if event.location %}
-                      <br>
-                      <small>{{event.location}}</small>
+                    {% if search_type == 'teams' %}
+                      <a href="/team/{{result.team_number}}/{{year}}" title="Team {{result.team_number }} - {{result.nickname}}">Team {{result.team_number }} - {{result.nickname}}</a>
+                    {% else %}
+                      <a href="/event/{{result.key_name}}" title="{{result.name}}">{{result.name}}</a>
                     {% endif %}
+                      {% if result.location %}
+                        <br>
+                        <small>{{result.location}}</small>
+                      {% endif %}
                   </td>
+                  {% if search_type == 'events' %}
                   <td>
-                    {% if event.start_date %}<time itemprop="startDate" datetime="{{event.start_date|strftime("%c")}}">{{ event.start_date|strftime("%b %d") }}{% if event.start_date.date() != event.end_date.date() %}</time> to <time itemprop="endDate" datetime="{{event.end_date|strftime("%c")}}">{{ event.end_date|strftime("%b %d") }}{% endif %}{{ event.end_date|strftime(", %Y") }}</time>{% endif %}
+                    {% if result.start_date %}<time itemprop="startDate" datetime="{{result.start_date|strftime("%c")}}">{{ result.start_date|strftime("%b %d") }}{% if result.start_date.date() != result.end_date.date() %}</time> to <time itemprop="endDate" datetime="{{result.end_date|strftime("%c")}}">{{ result.end_date|strftime("%b %d") }}{% endif %}{{ result.end_date|strftime(", %Y") }}</time>{% endif %}
                   </td>
+                  {% endif %}
                   <td>
-                    {{(distances[event.key.id()] / 1000)|round|int}} km
+                    {{(distances[result.key.id()] / 1000)|round|int}} km
                   </td>
                 </tr>
               {% endfor %}
             </tbody>
           </table>
         {% else %}
-          <p>No events were found matching the search criteria. Try picking another location or increasing the search range.</p>
+          <p class="well">No {% if search_type == 'teams' %}teams{% else %}events {% endif %} were found matching the search criteria. Try picking another location or increasing the search range limit.</p>
         {% endif %}
+      {% else %}
+        <p class="well">Enter a location to start a search.</p>
       {% endif %}
     </div>
   </div>

@@ -19,7 +19,7 @@ class EventManipulator(ManipulatorBase):
         return CacheClearer.get_event_cache_keys_and_controllers(affected_refs)
 
     @classmethod
-    def postDeleteHook(cls, matches):
+    def postDeleteHook(cls, events):
         '''
         To run after the event has been deleted.
         '''
@@ -48,20 +48,19 @@ class EventManipulator(ManipulatorBase):
                     event.timezone_id = timezone_id
                 cls.createOrUpdate(event, run_post_update_hook=False)
 
-        # Enqueue task to calculate district points
-        for event in events:
-            taskqueue.add(
-                url='/tasks/math/do/district_points_calc/{}'.format(event.key.id()),
-                method='GET')
-
-        # Add event to lat/lon info to search index
-        for event in events:
+            # Add event to lat/lon info to search index
             if event.lat_lon:
                 fields = [
                     search.NumberField(name='year', value=event.year),
                     search.GeoField(name='location', value=search.GeoPoint(event.lat_lon.lat, event.lat_lon.lon))
                 ]
                 search.Index(name="eventLocation").put(search.Document(doc_id=event.key.id(), fields=fields))
+
+        # Enqueue task to calculate district points
+        for event in events:
+            taskqueue.add(
+                url='/tasks/math/do/district_points_calc/{}'.format(event.key.id()),
+                method='GET')
 
     @classmethod
     def updateMerge(self, new_event, old_event, auto_union=True):

@@ -56,6 +56,14 @@ class Team(ndb.Model):
         return self._location
 
     @property
+    def split_name(self):
+        """
+        Guessing sponsors by splitting name by '/' or '&'
+        """
+        split_name = re.split('/|&', self.name)
+        return [x.strip() for x in split_name]
+
+    @property
     def details_url(self):
         return "/team/%s" % self.team_number
 
