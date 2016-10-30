@@ -243,9 +243,10 @@ class EventHelper(object):
     @classmethod
     @ndb.tasklet
     def get_lat_lon_async(cls, location):
-        location = location.encode('utf8')
         if location is None:
             raise ndb.Return(None)
+
+        location = location.encode('utf8')
 
         google_secrets = Sitevar.get_by_id("google.secrets")
         google_api_key = None
@@ -254,32 +255,58 @@ class EventHelper(object):
         else:
             google_api_key = google_secrets.contents['api_key']
 
+        lat_lon = None
+
         # geocode request
         geocode_params = {
-            'query': location,
+            'address': location,
+            'sensor': 'false',
         }
         if google_api_key is not None:
             geocode_params['key'] = google_api_key
-        geocode_url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?%s' % urllib.urlencode(geocode_params)
+        geocode_url = 'https://maps.googleapis.com/maps/api/geocode/json?%s' % urllib.urlencode(geocode_params)
         try:
             rpc = urlfetch.create_rpc()
             urlfetch.make_fetch_call(rpc, geocode_url)
             geocode_result = yield rpc
+            if geocode_result.status_code == 200:
+                geocode_dict = json.loads(geocode_result.content)
+                if not geocode_dict['results']:
+                    logging.warning('No geocode results for event location: {}'.format(location))
+                    logging.warning(geocode_dict)
+                else:
+                    lat_lon = geocode_dict['results'][0]['geometry']['location']['lat'], geocode_dict['results'][0]['geometry']['location']['lng']
+            else:
+                logging.warning('Geocoding failed with url {}. Trying again with textsearch'.format(geocode_url))
         except Exception, e:
-            logging.warning('urlfetch for geocode request failed: {}'.format(geocode_url))
-            logging.info(e)
-            raise ndb.Return(None)
-        if geocode_result.status_code != 200:
-            logging.warning('Geocoding failed with url {}'.format(geocode_url))
-            raise ndb.Return(None)
-        geocode_dict = json.loads(geocode_result.content)
-        if not geocode_dict['results']:
-            logging.warning('No geocode results for event location: {}'.format(location))
-            logging.info(geocode_dict)
-            raise ndb.Return(None)
-        lat = geocode_dict['results'][0]['geometry']['location']['lat']
-        lng = geocode_dict['results'][0]['geometry']['location']['lng']
-        raise ndb.Return((lat, lng))
+            logging.warning('urlfetch for geocode request failed with url {}. Trying again with textsearch'.format(geocode_url))
+            logging.warning(e)
+
+        # textsearch request
+        if not lat_lon and google_api_key:
+            textsearch_params = {
+                'query': location,
+                'key': google_api_key,
+            }
+            textsearch_url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?%s' % urllib.urlencode(textsearch_params)
+            try:
+                rpc = urlfetch.create_rpc()
+                urlfetch.make_fetch_call(rpc, textsearch_url)
+                textsearch_result = yield rpc
+                if textsearch_result.status_code == 200:
+                    textsearch_dict = json.loads(textsearch_result.content)
+                    if not textsearch_dict['results']:
+                        logging.warning('No textsearch results for event location: {}'.format(location))
+                        logging.warning(textsearch_dict)
+                    else:
+                        lat_lon = textsearch_dict['results'][0]['geometry']['location']['lat'], textsearch_dict['results'][0]['geometry']['location']['lng']
+                else:
+                    logging.warning('Textsearch failed with url {}.'.format(textsearch_url))
+            except Exception, e:
+                logging.warning('urlfetch for textsearch request failed with url {}.'.format(textsearch_url))
+                logging.warning(e)
+
+        raise ndb.Return(lat_lon)
 
     @classmethod
     def get_timezone_id(cls, location, lat_lon=None):
