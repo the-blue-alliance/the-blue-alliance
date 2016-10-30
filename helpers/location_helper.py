@@ -136,7 +136,7 @@ class LocationHelper(object):
     @classmethod
     def get_timezone_id(cls, location, lat_lon=None):
         if lat_lon is None:
-            result = cls.get_lat_lon(location)
+            result, _ = cls.get_lat_lon(location)
             if result is None:
                 return None
             else:
