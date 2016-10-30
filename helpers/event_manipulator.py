@@ -19,17 +19,29 @@ class EventManipulator(ManipulatorBase):
         return CacheClearer.get_event_cache_keys_and_controllers(affected_refs)
 
     @classmethod
+    def postDeleteHook(cls, matches):
+        '''
+        To run after the event has been deleted.
+        '''
+        for event in events:
+            # Remove event from search index
+            search.Index(name="eventLocation").delete(event.key.id())
+
+    @classmethod
     def postUpdateHook(cls, events, updated_attr_list, is_new_list):
         """
         To run after models have been updated
         """
         for (event, updated_attrs) in zip(events, updated_attr_list):
-            lat_lon = EventHelper.get_lat_lon(event.location)
+            lat_lon = EventHelper.get_lat_lon(event.venue_address)
             if not lat_lon:
-                logging.warning("Lat/Lon update for event {} failed!".format(event.key_name))
+                logging.warning("Lat/Lon update for event {} failed with venue_address! Trying again with location".format(event.key_name))
+                lat_lon = EventHelper.get_lat_lon(event.location)
+            if not lat_lon:
+                logging.warning("Lat/Lon update for event {} failed with location!".format(event.key_name))
             else:
                 event.lat_lon = ndb.GeoPt(lat_lon[0], lat_lon[1])
-                timezone_id = EventHelper.get_timezone_id(event.location, lat_lon=lat_lon)
+                timezone_id = EventHelper.get_timezone_id(None, lat_lon=lat_lon)
                 if not timezone_id:
                     logging.warning("Timezone update for event {} failed!".format(event.key_name))
                 else:
