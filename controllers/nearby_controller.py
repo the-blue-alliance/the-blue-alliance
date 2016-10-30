@@ -17,9 +17,13 @@ class NearbyController(CacheableHandler):
     DEFAULT_SEARCH_TYPE = 'teams'
     PAGE_SIZE = 20
     CACHE_VERSION = 1
-    CACHE_KEY_FORMAT = "nearby"  # (year, location, range_limit, search_type, page)
+    CACHE_KEY_FORMAT = "nearby_{}_{}_{}_{}_{}"  # (year, location, range_limit, search_type, page)
 
-    def _render(self):
+    def __init__(self, *args, **kw):
+        super(NearbyController, self).__init__(*args, **kw)
+        self._cache_expiration = 60 * 60 * 24
+
+    def _get_params(self):
         year = self.request.get('year', None)
         if not year:
             year = datetime.datetime.now().year
@@ -30,6 +34,16 @@ class NearbyController(CacheableHandler):
         if search_type != 'teams' and search_type != 'events':
             search_type = self.DEFAULT_SEARCH_TYPE
         page = int(self.request.get('page', 0))
+
+        return year, location, range_limit, search_type, page
+
+    def get(self):
+        year, location, range_limit, search_type, page = self._get_params()
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(year, location, range_limit, search_type, page)
+        super(NearbyController, self).get()
+
+    def _render(self):
+        year, location, range_limit, search_type, page = self._get_params()
 
         num_results = 0
         results = []
@@ -92,7 +106,6 @@ class NearbyController(CacheableHandler):
 
                 if search_type == 'teams':
                     results = filter(lambda team: event_team_count_futures[team.key.id()].get_result() != 0, results)
-
 
         self.template_values.update({
             'valid_years': self.VALID_YEARS,
