@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}{% if explicit_year %}{{selected_year}} {% endif %}FIRST Robotics Events - The Blue Alliance{% endblock %}
+{% block title %}{% if explicit_year %}{{selected_year}} {% endif %}FIRST Robotics Events{% if state_prov %} in {{state_prov}}{% endif %} - The Blue Alliance{% endblock %}
 
-{% block meta_description %}Information, match results, and videos for FIRST Robotics Competition events{% if explicit_year %} from {{selected_year}}{% endif %}.{% endblock %}
+{% block meta_description %}Information, match results, and videos for FIRST Robotics Competition events{% if state_prov %} in {{state_prov}}{% endif %}{% if explicit_year %} from {{selected_year}}{% endif %}.{% endblock %}
 
 {% block more_head_tags %}
-  <meta property="og:title" content="{{selected_year}} FRC Event List" />
+  <meta property="og:title" content="{{selected_year}} FRC Event List{% if state_prov %} in {{state_prov}}{% endif %}" />
   <meta property="og:image" content="http://www.thebluealliance.com/images/logo_square_200.png" />
-  <meta property="og:description" content="Event list for the {{selected_year}} FIRST Robotics Competition."/>
+  <meta property="og:description" content="Event list for the {{selected_year}} FIRST Robotics Competition.{% if state_prov %} in {{state_prov}}{% endif %}"/>
   <meta property="og:site_name" content="The Blue Alliance" />
 {% endblock %}
 
@@ -46,6 +46,14 @@
         </div>
         {% endif %}
 
+        <label class="sr-only" for="input-state-provs">Filter by state / province</label>
+        <select class="form-control" id="input-state-provs" name="state_prov" onchange="window.location.href=this.value">
+          <option value="/events{% if explicit_year %}/{{selected_year}}{% endif %}">All States/Provs.</option>
+          {% for valid_state_prov in valid_state_provs %}
+            <option value="/events{% if explicit_year %}/{{selected_year}}{% endif %}?state_prov={{valid_state_prov}}"{% if valid_state_prov == state_prov %} selected="selected"{% endif %}">{{valid_state_prov}}</option>
+          {% endfor %}
+        </select>
+
         {% if week_events %}
         <div class="tba-sidebar">
           <ul class="nav tba-sidenav">
@@ -58,41 +66,14 @@
       </div>
     </div>
     <div class="col-xs-12 col-sm-9 col-lg-10">
-      <h1 class="hidden-xs end_header">{% if explicit_year %}{{selected_year}} {% endif %}<em>FIRST</em> Robotics Competition Events {% if events|length > 0 %}<small>{{ events|length }} Events</small>{% endif %}</h1>
+      <a class="btn btn-default pull-right" href="/nearby"><span class="glyphicon glyphicon-search"></span> Nearby Search</a>
 
-      <form id="event-filter-form" class="form-inline" method="get">
-        <div class="form-group">
-          <select class="form-control" id="state-provs-select" name="state_prov">
-            <option value="">All States / Provinces</option>
-            {% for sp in valid_state_provs %}
-              <option value="{{sp}}"{% if sp == state_prov %} selected="selected"{% endif %}">{{sp}}</option>
-            {% endfor %}
-          </select>
-        </div>
+      <h1 class="hidden-xs end_header">{% if explicit_year %}{{selected_year}} {% endif %}<em>FIRST</em> Robotics Competition Events{% if state_prov %} in {{state_prov}}{% endif %}{% if events|length > 0 %} <small>{{ events|length }} Events</small>{% endif %}</h1>
 
-        <div class="form-group">
-          <input type="number" class="form-control" id="event-filter-postalcode" name="postalcode" placeholder="Zip / Postal Code" {% if postalcode %}value="{{postalcode}}"{% endif %} style="width: 150px;">
-        </div>
-        <div class="form-group">
-          <select class="form-control" id="event-filter-range" name="range">
-            {% for r in valid_ranges %}
-              <option value="{{r}}" {% if r == range %} selected="selected"{% endif %}>Within {{r}} km</option>
-            {% endfor %}
-          </select>
-        </div>
-        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-filter"></span> Filter Events</button>
-        <a class="btn btn-danger" href="/events{% if explicit_year %}/{{selected_year}}{% endif %}"><span class="glyphicon glyphicon-remove"></span> Clear Filters</a>
-      </form>
-
-      {% if week_events %}
-        {% for label, events in week_events.items() %}
-          <h2 id="{{label|slugify}}">{{ label }} <small>{{events|length}} Events</small></h2>
-          {% include "event_partials/event_table.html" %}
-        {% endfor %}
-      {% else %}
-        <br>
-        <div class="well">No events found that match your filters! Try clearing some of them.</div>
-      {% endif %}
+      {% for label, events in week_events.items() %}
+        <h2 id="{{label|slugify}}">{{ label }} <small>{{events|length}} Events</small></h2>
+        {% include "event_partials/event_table.html" %}
+      {% endfor %}
     </div>
   </div>
 </div>

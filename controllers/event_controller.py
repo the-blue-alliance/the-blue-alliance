@@ -4,7 +4,7 @@ import json
 import os
 import tba_config
 
-from google.appengine.api import memcache, search
+from google.appengine.api import memcache
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
@@ -30,7 +30,6 @@ class EventList(CacheableHandler):
     List all Events.
     """
     VALID_YEARS = list(reversed(range(1992, tba_config.MAX_YEAR + 1)))
-    VALID_RANGES = [10, 50, 100, 500]  # in km
     CACHE_VERSION = 4
     CACHE_KEY_FORMAT = "event_list_{}_{}"  # (year, explicit_year)
 
@@ -58,33 +57,16 @@ class EventList(CacheableHandler):
 
     def _render(self, year=None, explicit_year=False):
         state_prov = self.request.get('state_prov', None)
-        postalcode = self.request.get('postalcode', None)
-        range_km = self.request.get('range', None)
-        if range_km and range_km.isdigit():
-            range_km = int(range_km)
-        else:
-            range_km = self.VALID_YEARS[0]
-        if postalcode:
-            lat_lon_future = EventHelper.get_lat_lon_async(postalcode)
 
-        all_events_future = event_query.EventListQuery(year).fetch_async()  # Needed for valid city/state_prov/country
-        if not state_prov:
-            events_future = all_events_future
-        else:
+        all_events_future = event_query.EventListQuery(year).fetch_async()  # Needed for state_prov
+        if state_prov:
             events_future = Event.query(Event.year==year, Event.state_prov==state_prov).fetch_async()
-
-        # Filter events by range
-        if postalcode:
-            if lat_lon_future.get_result():
-                lat, lon = lat_lon_future.get_result()
-                query_string = "distance(location, geopoint({}, {})) < {} AND year={}".format(lat, lon, range_km * 1000, year)
-                events_in_range = set([result.doc_id for result in search.Index(name="eventLocation").search(query_string).results])
-
-                events = filter(lambda e: e.key.id() in events_in_range, events_future.get_result())
-            else:
-                events = []
         else:
-            events = events_future.get_result()
+            events_future = all_events_future
+
+        events = events_future.get_result()
+        if state_prov and not events:
+            self.redirect(self.request.path, abort=True)
 
         EventHelper.sort_events(events)
 
@@ -115,10 +97,7 @@ class EventList(CacheableHandler):
             "week_events": week_events,
             "districts": districts,
             "state_prov": state_prov,
-            "postalcode": postalcode,
-            "range": range_km,
             "valid_state_provs": valid_state_provs,
-            "valid_ranges": self.VALID_RANGES,
         })
 
         return jinja2_engine.render('event_list.html', self.template_values)
