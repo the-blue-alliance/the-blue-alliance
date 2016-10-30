@@ -243,6 +243,7 @@ class EventHelper(object):
     @classmethod
     @ndb.tasklet
     def get_lat_lon_async(cls, location):
+        location = location.encode('utf8')
         if location is None:
             raise ndb.Return(None)
 

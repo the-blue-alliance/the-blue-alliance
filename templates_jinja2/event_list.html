@@ -30,7 +30,7 @@
           </ul>
         </div>
 
-        <h1 class="visible-xs end_header">{% if explicit_year %}{{selected_year}} {% endif %}<em>FIRST</em> Robotics Competition Events{% if state_prov %} in {{state_prov}}{% endif %}{% if events|length > 0 %}<small>{{ events|length }} Events</small>{% endif %}</h1>
+        <h1 class="visible-xs end_header">{% if explicit_year %}{{selected_year}} {% endif %}<em>FIRST</em> Robotics Competition Events{% if state_prov %} in {{state_prov}}{% endif %}{% if events|length > 0 %} <small>{{ events|length }} Events</small>{% endif %}</h1>
 
         {% if districts %}
         <div class="btn-group">
@@ -66,7 +66,7 @@
       </div>
     </div>
     <div class="col-xs-12 col-sm-9 col-lg-10">
-      <h1 class="hidden-xs end_header">{% if explicit_year %}{{selected_year}} {% endif %}<em>FIRST</em> Robotics Competition Events{% if state_prov %} in {{state_prov}}{% endif %}{% if events|length > 0 %}<small>{{ events|length }} Events</small>{% endif %}</h1>
+      <h1 class="hidden-xs end_header">{% if explicit_year %}{{selected_year}} {% endif %}<em>FIRST</em> Robotics Competition Events{% if state_prov %} in {{state_prov}}{% endif %}{% if events|length > 0 %} <small>{{ events|length }} Events</small>{% endif %}</h1>
 
       <a class="btn btn-default pull-right" href="/nearby?search_type=events"><span class="glyphicon glyphicon-search"></span> Search Nearby</a>
 

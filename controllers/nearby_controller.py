@@ -17,7 +17,7 @@ class NearbyController(CacheableHandler):
     DEFAULT_SEARCH_TYPE = 'teams'
     PAGE_SIZE = 20
     CACHE_VERSION = 1
-    CACHE_KEY_FORMAT = "near_me"  # (year, explicit_year)
+    CACHE_KEY_FORMAT = "nearby"  # (year, location, range_limit, search_type, page)
 
     def _render(self):
         year = self.request.get('year', None)
@@ -31,66 +31,68 @@ class NearbyController(CacheableHandler):
             search_type = self.DEFAULT_SEARCH_TYPE
         page = int(self.request.get('page', 0))
 
+        num_results = 0
+        results = []
+        distances = []
         if location:
-            lat, lon = EventHelper.get_lat_lon(location)
+            lat_lon = EventHelper.get_lat_lon(location)
+            if lat_lon:
+                lat, lon = lat_lon
 
-            dist_expr = 'distance(location, geopoint({}, {}))'.format(lat, lon)
-            if search_type == 'teams':
-                query_string = '{} < {}'.format(dist_expr, range_limit * 1000)
-            else:
-                query_string = '{} < {} AND year={}'.format(dist_expr, range_limit * 1000, year)
-
-            offset = self.PAGE_SIZE * page
-
-            query = search.Query(
-                query_string=query_string,
-                options=search.QueryOptions(
-                    limit=self.PAGE_SIZE,
-                    offset=offset,
-                    sort_options=search.SortOptions(
-                        expressions=[
-                            search.SortExpression(
-                                expression=dist_expr,
-                                direction=search.SortExpression.ASCENDING
-                            )
-                        ]
-                    ),
-                    returned_expressions=[
-                        search.FieldExpression(
-                            name='distance',
-                            expression=dist_expr
-                        )
-                    ],
-                )
-            )
-            if search_type == 'teams':
-                search_index = search.Index(name="teamLocation")
-            else:
-                search_index = search.Index(name="eventLocation")
-
-            docs = search_index.search(query)
-            num_results = docs.number_found
-            distances = {}
-            keys = []
-            event_team_count_futures = {}
-            for result in docs.results:
-                distances[result.doc_id] = result.expressions[0].value
+                dist_expr = 'distance(location, geopoint({}, {}))'.format(lat, lon)
                 if search_type == 'teams':
-                    event_team_count_futures[result.doc_id] = EventTeam.query(
-                        EventTeam.team == ndb.Key('Team', result.doc_id),
-                        EventTeam.year == year).count_async(limit=1, keys_only=True)
-                    keys.append(ndb.Key('Team', result.doc_id))
+                    query_string = '{} < {}'.format(dist_expr, range_limit * 1000)
                 else:
-                    keys.append(ndb.Key('Event', result.doc_id))
+                    query_string = '{} < {} AND year={}'.format(dist_expr, range_limit * 1000, year)
 
-            results = ndb.get_multi(keys)
+                offset = self.PAGE_SIZE * page
 
-            if search_type == 'teams':
-                results = filter(lambda team: event_team_count_futures[team.key.id()].get_result() != 0, results)
-        else:
-            num_results = 0
-            results = []
-            distances = []
+                query = search.Query(
+                    query_string=query_string,
+                    options=search.QueryOptions(
+                        limit=self.PAGE_SIZE,
+                        offset=offset,
+                        sort_options=search.SortOptions(
+                            expressions=[
+                                search.SortExpression(
+                                    expression=dist_expr,
+                                    direction=search.SortExpression.ASCENDING
+                                )
+                            ]
+                        ),
+                        returned_expressions=[
+                            search.FieldExpression(
+                                name='distance',
+                                expression=dist_expr
+                            )
+                        ],
+                    )
+                )
+                if search_type == 'teams':
+                    search_index = search.Index(name="teamLocation")
+                else:
+                    search_index = search.Index(name="eventLocation")
+
+                docs = search_index.search(query)
+                num_results = docs.number_found
+                distances = {}
+                keys = []
+                event_team_count_futures = {}
+                for result in docs.results:
+                    distances[result.doc_id] = result.expressions[0].value
+                    if search_type == 'teams':
+                        event_team_count_futures[result.doc_id] = EventTeam.query(
+                            EventTeam.team == ndb.Key('Team', result.doc_id),
+                            EventTeam.year == year).count_async(limit=1, keys_only=True)
+                        keys.append(ndb.Key('Team', result.doc_id))
+                    else:
+                        keys.append(ndb.Key('Event', result.doc_id))
+
+                results = ndb.get_multi(keys)
+
+                if search_type == 'teams':
+                    results = filter(lambda team: event_team_count_futures[team.key.id()].get_result() != 0, results)
+
 
         self.template_values.update({
             'valid_years': self.VALID_YEARS,
