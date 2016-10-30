@@ -22,6 +22,8 @@ class LocationHelper(object):
         if not lat_lon:
             lat_lon, _ = cls.get_lat_lon(event.location)
         if not lat_lon:
+            lat_lon, _ = cls.get_lat_lon(u'{} {}'.format(event.city, event.country))
+        if not lat_lon:
             logging.warning("Finding Lat/Lon for event {} failed!".format(event.key_name))
         return lat_lon
 
