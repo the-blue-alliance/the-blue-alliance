@@ -27,7 +27,11 @@ class SuggestOffseasonEventController(LoggedInHandler):
             start_date=self.request.get("start_date", None),
             end_date=self.request.get("end_date", None),
             website=self.request.get("website", None),
+            venue_name=self.request.get("venue_name", None),
             address=self.request.get("venue_address", None),
+            city=self.request.get("venue_city", None),
+            state=self.request.get("venue_state", None),
+            country=self.request.get("venue_country", None)
         )
         if status != 'success':
             # Don't completely wipe form data if validation fails

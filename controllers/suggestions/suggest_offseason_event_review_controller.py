@@ -36,6 +36,11 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
         suggestion = Suggestion.get_by_id(int(self.request.get("suggestion_id")))
         verdict = self.request.get("verdict")
         if verdict == "accept":
+            if not self.request.get("event_short", None):
+                # Need to supply a key :(
+                self.redirect("/suggest/offseason/review?success=missing_key")
+                return
+
             start_date = None
             if self.request.get("start_date"):
                 start_date = datetime.strptime(self.request.get("start_date"), "%Y-%m-%d")
@@ -52,7 +57,9 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
                 event_district_enum=DistrictType.NO_DISTRICT,
                 venue=self.request.get("venue"),
                 venue_address=self.request.get("venue_address"),
-                location=self.request.get("location"),
+                city=self.request.get("city"),
+                state_prov=self.request.get("state"),
+                country=self.request.get("country"),
                 name=self.request.get("name"),
                 short_name=self.request.get("short_name"),
                 start_date=start_date,
@@ -90,11 +97,21 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
         except ValueError:
             pass
 
+        venue = suggestion.contents['venue_name']
+        address = suggestion.contents['address']
+        city = suggestion.contents['city']
+        state = suggestion.contents['state']
+        country = suggestion.contents['country']
+        address = "{}\n{}\n{}, {}, {}".format(venue, address, city, state, country)
         return suggestion.key.id(), Event(
             end_date=end_date,
             event_type_enum=EventType.OFFSEASON,
             event_district_enum=DistrictType.NO_DISTRICT,
-            venue_address=suggestion.contents['address'],
+            venue=venue,
+            city=city,
+            state_prov=state,
+            country=country,
+            venue_address=address,
             name=suggestion.contents['name'],
             start_date=start_date,
             website=suggestion.contents['website'],
