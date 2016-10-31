@@ -18,12 +18,12 @@ var config = {
   gameday: {
     js: {
       src: ['./react/gameday2/gameday2.js'],
-      outputDir: './static/javascript',
+      outputDir: './static/compiled/javascript',
       outputFile: 'gameday2.min.js'
     },
     less: {
       src: ['./react/gameday2/gameday2.less'],
-      outputDir: './static/css/',
+      outputDir: './static/compiled/css/',
       outputFile: 'gameday2.min.css',
       watch: ['./react/gameday2/**/*.less']
     }
