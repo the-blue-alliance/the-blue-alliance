@@ -43,6 +43,7 @@ class SuggestApiWriteController(LoggedInHandler):
 
     @staticmethod
     def _gen_notification_email(event_key, user_bundle):
+        # Subject should match the one in suggest_apiwrite_review_controller
         subject = "Trusted API Key Request for {}".format(event_key)
         body = """{} has made a request for trusted API keys for the event {}.
 
