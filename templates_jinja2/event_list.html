@@ -46,13 +46,13 @@
         </div>
         {% endif %}
 
-        <label class="sr-only" for="input-state-provs">Filter by state / province</label>
+        <!-- <label class="sr-only" for="input-state-provs">Filter by state / province</label>
         <select class="form-control" id="input-state-provs" name="state_prov" onchange="window.location.href=this.value">
           <option value="/events{% if explicit_year %}/{{selected_year}}{% endif %}">All States/Provs.</option>
           {% for valid_state_prov in valid_state_provs %}
             <option value="/events{% if explicit_year %}/{{selected_year}}{% endif %}?state_prov={{valid_state_prov}}"{% if valid_state_prov == state_prov %} selected="selected"{% endif %}">{{valid_state_prov}}</option>
           {% endfor %}
-        </select>
+        </select> -->
 
         {% if week_events %}
         <div class="tba-sidebar">
