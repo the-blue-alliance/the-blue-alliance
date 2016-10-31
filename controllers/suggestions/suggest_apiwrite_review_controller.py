@@ -101,12 +101,12 @@ TBA Admins
         if verdict == "accept":
             status = 'accept'
             auth_id, user, event_key, email_body = self._process_accepted(suggestion_id, message)
-            admin_email_body = """{} has accepted the request with the following message:
+            admin_email_body = """{} ({}) has accepted the request with the following message:
 {}
 
 View the key: https://www.thebluealliance.com/admin/api_auth/edit/{}
 
-""".format(self.user_bundle.account.display_name, message, auth_id)
+""".format(self.user_bundle.account.display_name, self.user_bundle.account.email, message, auth_id)
 
         elif verdict == "reject":
             suggestion = Suggestion.get_by_id(suggestion_id)
@@ -131,9 +131,9 @@ Thanks,
 TBA Admins
 """.format(user.display_name, event.year, event.name, message)
 
-            admin_email_body = """{} has rejected this request with the following reason:
+            admin_email_body = """{} ({}) has rejected this request with the following reason:
 {}
-""".format(self.user_bundle.account.display_name, message)
+""".format(self.user_bundle.account.display_name, self.user_bundle.account.email, message)
 
         # Notify the user their keys are available
         sender = "keys@{}.appspotmail.com".format(app_identity.get_application_id())
