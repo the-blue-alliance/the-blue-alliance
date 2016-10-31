@@ -68,6 +68,7 @@ class LocationHelper(object):
         cache_key = u'get_lat_lon_{}'.format(location)
         result = memcache.get(cache_key)
         if not result:
+            context = ndb.get_context()
             lat_lon = None
             num_results = 0
 
@@ -91,9 +92,7 @@ class LocationHelper(object):
                 }
                 textsearch_url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?%s' % urllib.urlencode(textsearch_params)
                 try:
-                    rpc = urlfetch.create_rpc()
-                    urlfetch.make_fetch_call(rpc, textsearch_url)
-                    textsearch_result = yield rpc
+                    textsearch_result = yield context.urlfetch(textsearch_url)
                     if textsearch_result.status_code == 200:
                         textsearch_dict = json.loads(textsearch_result.content)
                         if textsearch_dict['status'] == 'ZERO_RESULTS':
@@ -120,9 +119,7 @@ class LocationHelper(object):
                     geocode_params['key'] = google_api_key
                 geocode_url = 'https://maps.googleapis.com/maps/api/geocode/json?%s' % urllib.urlencode(geocode_params)
                 try:
-                    rpc = urlfetch.create_rpc()
-                    urlfetch.make_fetch_call(rpc, geocode_url)
-                    geocode_result = yield rpc
+                    geocode_result = yield context.urlfetch(geocode_url)
                     if geocode_result.status_code == 200:
                         geocode_dict = json.loads(geocode_result.content)
                         if geocode_dict['status'] == 'ZERO_RESULTS':
