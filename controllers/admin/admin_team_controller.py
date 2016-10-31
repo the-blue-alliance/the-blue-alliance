@@ -38,6 +38,8 @@ class AdminTeamDetail(LoggedInHandler):
         self._require_admin()
 
         team = Team.get_by_id("frc" + team_number)
+        if not team:
+            self.abort(404)
         event_teams = EventTeam.query(EventTeam.team == team.key).fetch(500)
         team_medias = Media.query(Media.references == team.key).fetch(500)
         robots = Robot.query(Robot.team == team.key).fetch()
