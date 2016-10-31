@@ -3,6 +3,7 @@ import re
 
 from google.appengine.ext import ndb
 from helpers.champ_split_helper import ChampSplitHelper
+from helpers.location_helper import LocationHelper
 
 
 class Team(ndb.Model):
@@ -38,6 +39,9 @@ class Team(ndb.Model):
     @property
     def championship_location(self):
         return ChampSplitHelper.get_champ(self)
+
+    def get_lat_lon(self):
+        return LocationHelper.get_team_lat_lon(self)
 
     @property
     def location(self):

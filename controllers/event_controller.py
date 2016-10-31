@@ -31,7 +31,7 @@ class EventList(CacheableHandler):
     """
     VALID_YEARS = list(reversed(range(1992, tba_config.MAX_YEAR + 1)))
     CACHE_VERSION = 4
-    CACHE_KEY_FORMAT = "event_list_{}_{}"  # (year, explicit_year)
+    CACHE_KEY_FORMAT = "event_list_{}_{}_{}"  # (year, explicit_year, state_prov)
 
     def __init__(self, *args, **kw):
         super(EventList, self).__init__(*args, **kw)
@@ -52,11 +52,26 @@ class EventList(CacheableHandler):
             year = datetime.datetime.now().year
             explicit_year = False
 
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(year, explicit_year)
+        state_prov = self.request.get('state_prov', None)
+        if state_prov == '':
+            state_prov = None
+
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(year, explicit_year, state_prov)
         super(EventList, self).get(year, explicit_year)
 
     def _render(self, year=None, explicit_year=False):
-        events = event_query.EventListQuery(year).fetch()
+        state_prov = self.request.get('state_prov', None)
+
+        all_events_future = event_query.EventListQuery(year).fetch_async()  # Needed for state_prov
+        if state_prov:
+            events_future = Event.query(Event.year==year, Event.state_prov==state_prov).fetch_async()
+        else:
+            events_future = all_events_future
+
+        events = events_future.get_result()
+        if state_prov == '' or (state_prov and not events):
+            self.redirect(self.request.path, abort=True)
+
         EventHelper.sort_events(events)
 
         week_events = EventHelper.groupByWeek(events)
@@ -72,6 +87,12 @@ class EventList(CacheableHandler):
                               DistrictType.type_names[district_enum]))
         districts = sorted(districts, key=lambda d: d[1])
 
+        valid_state_provs = set()
+        for event in all_events_future.get_result():
+            if event.state_prov:
+                valid_state_provs.add(event.state_prov)
+        valid_state_provs = sorted(valid_state_provs)
+
         self.template_values.update({
             "events": events,
             "explicit_year": explicit_year,
@@ -79,13 +100,15 @@ class EventList(CacheableHandler):
             "valid_years": self.VALID_YEARS,
             "week_events": week_events,
             "districts": districts,
+            "state_prov": state_prov,
+            "valid_state_provs": valid_state_provs,
         })
 
         return jinja2_engine.render('event_list.html', self.template_values)
 
     def memcacheFlush(self):
         year = datetime.datetime.now().year
-        keys = [self.CACHE_KEY_FORMAT.format(year, True), self.CACHE_KEY_FORMAT.format(year, False)]
+        keys = [self.CACHE_KEY_FORMAT.format(year, True, None), self.CACHE_KEY_FORMAT.format(year, False, None)]
         memcache.delete_multi(keys)
         return keys
 

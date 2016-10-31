@@ -1,11 +1,8 @@
 import logging
 import collections
 import datetime
-import json
 import re
-import urllib
 
-from google.appengine.api import urlfetch
 from google.appengine.ext import ndb
 
 from consts.district_type import DistrictType
@@ -13,7 +10,6 @@ from consts.event_type import EventType
 
 from models.event import Event
 from models.match import Match
-from models.sitevar import Sitevar
 
 CHAMPIONSHIP_EVENTS_LABEL = 'FIRST Championship'
 TWO_CHAMPS_LABEL = 'FIRST Championship - {}'
@@ -235,67 +231,6 @@ class EventHelper(object):
             return result.strip()
 
         return name_str.strip()
-
-    @classmethod
-    def get_timezone_id(cls, location, event_key):
-        if location is None:
-            logging.warning('Could not get timezone for event {} with no location!'.format(event_key))
-            return None
-
-        google_secrets = Sitevar.get_by_id("google.secrets")
-        google_api_key = None
-        if google_secrets is None:
-            logging.warning("Missing sitevar: google.api_key. API calls rate limited by IP and may be over rate limit.")
-        else:
-            google_api_key = google_secrets.contents['api_key']
-
-        # geocode request
-        geocode_params = {
-            'address': location,
-            'sensor': 'false',
-        }
-        if google_api_key is not None:
-            geocode_params['key'] = google_api_key
-        geocode_url = 'https://maps.googleapis.com/maps/api/geocode/json?%s' % urllib.urlencode(geocode_params)
-        try:
-            geocode_result = urlfetch.fetch(geocode_url)
-        except Exception, e:
-            logging.warning('urlfetch for geocode request failed: {}'.format(geocode_url))
-            logging.info(e)
-            return None
-        if geocode_result.status_code != 200:
-            logging.warning('Geocoding for event {} failed with url {}'.format(event_key, geocode_url))
-            return None
-        geocode_dict = json.loads(geocode_result.content)
-        if not geocode_dict['results']:
-            logging.warning('No geocode results for event location: {}'.format(location))
-            return None
-        lat = geocode_dict['results'][0]['geometry']['location']['lat']
-        lng = geocode_dict['results'][0]['geometry']['location']['lng']
-
-        # timezone request
-        tz_params = {
-            'location': '%s,%s' % (lat, lng),
-            'timestamp': 0,  # we only care about timeZoneId, which doesn't depend on timestamp
-            'sensor': 'false',
-        }
-        if google_api_key is not None:
-            tz_params['key'] = google_api_key
-        tz_url = 'https://maps.googleapis.com/maps/api/timezone/json?%s' % urllib.urlencode(tz_params)
-        try:
-            tz_result = urlfetch.fetch(tz_url)
-        except Exception, e:
-            logging.warning('urlfetch for timezone request failed: {}'.format(tz_url))
-            logging.info(e)
-            return None
-        if tz_result.status_code != 200:
-            logging.warning('TZ lookup for (lat, lng) failed! ({}, {})'.format(lat, lng))
-            return None
-        tz_dict = json.loads(tz_result.content)
-        if 'timeZoneId' not in tz_dict:
-            logging.warning('No timeZoneId for (lat, lng)'.format(lat, lng))
-            return None
-        return tz_dict['timeZoneId']
 
     @classmethod
     def parseDistrictName(cls, district_name_str):

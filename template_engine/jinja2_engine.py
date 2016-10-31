@@ -20,6 +20,7 @@ def get_jinja_env(force_filesystemloader=False):
             loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), '../templates_jinja2')),
             extensions=['jinja2.ext.autoescape'],
             autoescape=True)
+    env.filters['ceil'] = jinja2_filters.ceil
     env.filters['defense_name'] = jinja2_filters.defense_name
     env.filters['digits'] = jinja2_filters.digits
     env.filters['floatformat'] = jinja2_filters.floatformat
