@@ -12,6 +12,7 @@ from consts.account_permissions import AccountPermissions
 from consts.auth_type import AuthType
 from controllers.suggestions.suggestions_review_base_controller import \
     SuggestionsReviewBaseController
+from helpers.suggestions.suggestion_notifier import SuggestionNotifier
 from models.api_auth_access import ApiAuthAccess
 from models.event import Event
 from models.suggestion import Suggestion
@@ -74,7 +75,7 @@ class SuggestApiWriteReviewController(SuggestionsReviewBaseController):
         suggestion.reviewed_at = datetime.now()
         suggestion.put()
 
-        return user, event_key, """Hi {},
+        return auth_id, user, event_key, """Hi {},
 
 We graciously accept your request for auth tokens so you can add data to the following event: {} {}
 
@@ -92,13 +93,20 @@ TBA Admins
         verdict = self.request.get("verdict")
         message = self.request.get("user_message")
 
+        admin_email_body = None
         email_body = None
         user = None
         event_key = None
         status = ''
         if verdict == "accept":
             status = 'accept'
-            user, event_key, email_body = self._process_accepted(suggestion_id, message)
+            auth_id, user, event_key, email_body = self._process_accepted(suggestion_id, message)
+            admin_email_body = """{} ({}) has accepted the request with the following message:
+{}
+
+View the key: https://www.thebluealliance.com/admin/api_auth/edit/{}
+
+""".format(self.user_bundle.account.display_name, self.user_bundle.account.email, message, auth_id)
 
         elif verdict == "reject":
             suggestion = Suggestion.get_by_id(suggestion_id)
@@ -117,11 +125,15 @@ We have reviewer your request for auth tokens for {} {} and have regretfully dec
 
 {}
 
-If you have any questions, please don't heasitate to reach out to us at contact@thebluealliance.com
+If you have any questions, please don't hesitate to reach out to us at contact@thebluealliance.com
 
 Thanks,
 TBA Admins
 """.format(user.display_name, event.year, event.name, message)
+
+            admin_email_body = """{} ({}) has rejected this request with the following reason:
+{}
+""".format(self.user_bundle.account.display_name, self.user_bundle.account.email, message)
 
         # Notify the user their keys are available
         sender = "keys@{}.appspotmail.com".format(app_identity.get_application_id())
@@ -132,6 +144,11 @@ TBA Admins
                            to=user.email,
                            subject="The Blue Alliance Auth Tokens for {}".format(event_key),
                            body=email_body)
+        if admin_email_body:
+            # Subject should match the one in suggest_apiwrite_controller
+            subject = "Trusted API Key Request for {}".format(event_key)
+            SuggestionNotifier.send_admin_alert_email(subject, admin_email_body)
+
         self.redirect("/suggest/apiwrite/review?success={}".format(status))
 
     @classmethod

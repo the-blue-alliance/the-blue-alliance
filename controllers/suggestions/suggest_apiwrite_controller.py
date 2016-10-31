@@ -32,7 +32,7 @@ class SuggestApiWriteController(LoggedInHandler):
             auth_types=clean_auth_types,
         )
         if status == 'success':
-            subject, body = self._gen_notification_email(event_key)
+            subject, body = self._gen_notification_email(event_key, self.user_bundle)
             SuggestionNotifier.send_admin_alert_email(subject, body)
         self.template_values.update({
             'status': status,
@@ -42,12 +42,13 @@ class SuggestApiWriteController(LoggedInHandler):
             jinja2_engine.render('suggest_apiwrite.html', self.template_values))
 
     @staticmethod
-    def _gen_notification_email(event_key):
+    def _gen_notification_email(event_key, user_bundle):
+        # Subject should match the one in suggest_apiwrite_review_controller
         subject = "Trusted API Key Request for {}".format(event_key)
-        body = """A new request has been made for trusted API keys for the event {}.
+        body = """{} ({}) has made a request for trusted API keys for the event {}.
 
 View the event at https://thebluealliance.com/event/{}
 
 Review the request at https://thebluealliance.com/suggest/apiwrite/review
-""".format(event_key, event_key)
+""".format(user_bundle.account.display_name, user_bundle.account.email, event_key, event_key)
         return subject, body
