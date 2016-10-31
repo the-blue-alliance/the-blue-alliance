@@ -59,12 +59,12 @@ class LocationHelper(object):
         return best_lat_lon
 
     @classmethod
-    def get_lat_lon(cls, location):
-        return cls.get_lat_lon_async(location).get_result()
+    def get_lat_lon(cls, location, geocode=False):
+        return cls.get_lat_lon_async(location, geocode=geocode).get_result()
 
     @classmethod
     @ndb.tasklet
-    def get_lat_lon_async(cls, location):
+    def get_lat_lon_async(cls, location, geocode=False):
         cache_key = u'get_lat_lon_{}'.format(location)
         result = memcache.get(cache_key)
         if not result:
@@ -84,7 +84,7 @@ class LocationHelper(object):
                 google_api_key = google_secrets.contents['api_key']
 
             # textsearch request
-            if google_api_key:
+            if google_api_key and not geocode:
                 textsearch_params = {
                     'query': location,
                     'key': google_api_key,
@@ -116,6 +116,8 @@ class LocationHelper(object):
                     'address': location,
                     'sensor': 'false',
                 }
+                if google_api_key:
+                    geocode_params['key'] = google_api_key
                 geocode_url = 'https://maps.googleapis.com/maps/api/geocode/json?%s' % urllib.urlencode(geocode_params)
                 try:
                     rpc = urlfetch.create_rpc()
