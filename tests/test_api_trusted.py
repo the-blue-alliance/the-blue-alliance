@@ -3,7 +3,6 @@ import unittest2
 import webtest
 import json
 import md5
-import webapp2
 
 import api_main
 
@@ -12,13 +11,10 @@ from google.appengine.ext import testbed
 
 from consts.auth_type import AuthType
 from consts.event_type import EventType
-
-from controllers.api.api_event_controller import ApiEventController
-
+from models.account import Account
 from models.api_auth_access import ApiAuthAccess
 from models.award import Award
 from models.event import Event
-from models.event import EventDetails
 from models.event_team import EventTeam
 from models.match import Match
 from models.team import Team
@@ -34,6 +30,7 @@ class TestApiTrustedController(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
+        self.testbed.init_user_stub()
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
         self.testbed.init_taskqueue_stub(root_path=".")
@@ -81,6 +78,21 @@ class TestApiTrustedController(unittest2.TestCase):
                                         auth_types_enum=[AuthType.EVENT_MATCHES],
                                         expiration=datetime.datetime(year=1970, month=1, day=1))
 
+        self.owned_auth = ApiAuthAccess(id='tEsT_id_7',
+                                        secret='321tEsTsEcReT',
+                                        description='test',
+                                        event_list=[ndb.Key(Event, '2014casj')],
+                                        auth_types_enum=[AuthType.EVENT_MATCHES],
+                                        owner=ndb.Key(Account, "42"))
+
+        self.owned_auth_expired = ApiAuthAccess(id='tEsT_id_8',
+                                        secret='321tEsTsEcReT',
+                                        description='test',
+                                        event_list=[ndb.Key(Event, '2014casj')],
+                                        auth_types_enum=[AuthType.EVENT_MATCHES],
+                                        owner=ndb.Key(Account, "42"),
+                                        expiration=datetime.datetime(year=1970, month=1, day=1))
+
         self.event = Event(
             id='2014casj',
             event_type_enum=EventType.REGIONAL,
@@ -91,6 +103,13 @@ class TestApiTrustedController(unittest2.TestCase):
 
     def tearDown(self):
         self.testbed.deactivate()
+
+    def loginUser(self, is_admin=False):
+        self.testbed.setup_env(
+            user_email="foo@bar.com",
+            user_id="42",
+            user_is_admin='1' if is_admin else '0',
+            overwrite=True)
 
     def test_auth(self):
         request_path = '/api/trusted/v1/event/2014casj/matches/update'
@@ -150,11 +169,45 @@ class TestApiTrustedController(unittest2.TestCase):
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
         response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_2', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 401)
+        self.assertTrue('Error' in response.json)
 
         # Fail; expired keys
         sig = md5.new('{}{}{}'.format('321tEsTsEcReT', request_path, request_body)).hexdigest()
         response = self.testapp.post(request_path, request_body, headers={'X-TBA-Auth-Id': 'tEsT_id_6', 'X-TBA-Auth-Sig': sig}, expect_errors=True)
         self.assertEqual(response.status_code, 401)
+        self.assertTrue('Error' in response.json)
+
+    def test_admin_auth(self):
+        # Ensure that a logged in admin user can access any evet
+        request_path = '/api/trusted/v1/event/2014casj/matches/update'
+        request_body = json.dumps([])
+        self.loginUser(is_admin=True)
+
+        response = self.testapp.post(request_path, request_body, expect_errors=True)
+        self.assertEqual(response.status_code, 200)
+
+    def test_user_auth(self):
+        # Ensure that a logged in user can use auths granted to their account
+        request_path = '/api/trusted/v1/event/2014casj/matches/update'
+        request_body = json.dumps([])
+        self.owned_auth.put()
+        self.loginUser()
+
+        response = self.testapp.post(request_path, request_body, expect_errors=True)
+        self.assertEqual(response.status_code, 200)
+
+    def test_user_expired_auth(self):
+        # Ensure that a logged in user can use auths granted to their account
+        request_path = '/api/trusted/v1/event/2014casj/matches/update'
+        request_body = json.dumps([])
+        self.owned_auth_expired.put()
+        self.loginUser()
+
+        # Should end up with a 400 error because the expired key didn't count and no explicit
+        # Auth-Id header was passed
+        response = self.testapp.post(request_path, request_body, expect_errors=True)
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('Error' in response.json)
 
     def test_alliance_selections_update(self):
         self.alliances_auth.put()
