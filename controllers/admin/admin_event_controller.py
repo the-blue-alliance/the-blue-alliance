@@ -104,8 +104,6 @@ class AdminEventRemapTeams(LoggedInHandler):
     def post(self, event_key_id):
         self._require_admin()
         event = Event.get_by_id(event_key_id)
-        if not event:
-            self.abort(404)
         event.prepAwardsMatchesTeams()
 
         remap_teams = {}
@@ -265,6 +263,8 @@ class AdminEventDetail(LoggedInHandler):
         self._require_admin()
 
         event = Event.get_by_id(event_key)
+        if not event:
+            self.abort(404)
         event.prepAwardsMatchesTeams()
 
         self.template_values.update({
