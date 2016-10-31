@@ -291,11 +291,13 @@ class AdminBuildSearchIndexEnqueue(LoggedInHandler):
     def get(self, model_type):
         if model_type == 'events':
             taskqueue.add(
+                queue_name='admin',
                 url='/tasks/admin/do/build_search_index/events',
                 method='GET')
             self.response.out.write("Enqueued build search index for events")
         elif model_type == 'teams':
             taskqueue.add(
+                queue_name='admin',
                 url='/tasks/admin/do/build_search_index/teams',
                 method='GET')
             self.response.out.write("Enqueued build search index for teams")
@@ -309,12 +311,14 @@ class AdminBuildSearchIndexDo(LoggedInHandler):
             event_keys = Event.query().fetch(keys_only=True)
             for event_key in event_keys:
                 taskqueue.add(
+                    queue_name='admin',
                     url='/tasks/admin/do/add_event_search_index/' + event_key.id(),
                     method='GET')
         elif model_type == 'teams':
             team_keys = Team.query().fetch(keys_only=True)
             for team_key in team_keys:
                 taskqueue.add(
+                    queue_name='admin',
                     url='/tasks/admin/do/add_team_search_index/' + team_key.id(),
                     method='GET')
 
