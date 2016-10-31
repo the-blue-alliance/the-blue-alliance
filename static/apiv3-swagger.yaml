@@ -1,0 +1,1707 @@
+swagger: '2.0'
+
+info:
+  version: "3.0.0 beta"
+  title: TBA API v3
+  description: The Blue Alliance API v3.
+
+host: www.thebluealliance.com
+
+schemes:
+ - https
+
+basePath: /api/v3
+
+produces:
+ - application/json
+
+security:
+  - apiKeyHeader: []
+  - apiKeyParameter: []
+
+parameters:
+  page_num:
+    name: page_num
+    in: path
+    description: Page number of results to return, zero-indexed
+    required: true
+    type: number
+    format: integer
+  year:
+    name: year
+    in: path
+    description: Competition Year (or Season)
+    required: true
+    type: number
+    format: integer
+  team_key:
+    name: team_key
+    in: path
+    description: TBA Team Key, eg `frc254`
+    required: true
+    type: string
+  event_key:
+    name: event_key
+    in: path
+    description: TBA Event Key, eg `2016nytr`
+    required: true
+    type: string
+  match_key:
+    name: match_key
+    in: path
+    description: TBA Match Key, eg `2016nytr_qm1`
+    required: true
+    type: string
+  district_key:
+    name: district_key
+    in: path
+    description: TBA District Key, eg `fim`
+    required: true
+    type: string
+  match_type:
+    name: match_type
+    in: path
+    description: Match Type, eg `qual`, `elim`, or `all`
+    required: true
+    type: string
+    enum:
+    - qual
+    - elim
+    - all
+
+paths:
+  # Team-oriented paths
+  /teams/{page_num}:
+    get:
+      tags:
+      - team
+      - list
+      description: |
+        Gets a list of `Team` objects, pagenated in groups of 500.
+      parameters:
+        - $ref: '#/parameters/page_num'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Team'
+  # Simple (non-full) responses need a separate path definition.
+  # See also https://github.com/OAI/OpenAPI-Specification/issues/270
+  /teams/{page_num}/simple:
+    get:
+      tags:
+      - team
+      - list
+      description: |
+        Gets a list of short form `Team_Simple` objects, pagenated in groups of 500.
+      parameters:
+        - $ref: '#/parameters/page_num'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Team_Simple'
+  /teams/{page_num}/keys:
+    get:
+      tags:
+      - team
+      - list
+      description: |
+        Gets a list of Team keys, pagenated in groups of 500.
+      parameters:
+        - $ref: '#/parameters/page_num'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: string
+  /teams/{year}/{page_num}:
+    get:
+      tags:
+      - team
+      - list
+      description: |
+        Gets a list of `Team` objects that competed in the
+        given year, pagenated in groups of 500.
+      parameters:
+        - $ref: '#/parameters/year'
+        - $ref: '#/parameters/page_num'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Team'
+  /teams/{year}/{page_num}/simple:
+    get:
+      tags:
+      - team
+      - list
+      description: |
+        Gets a list of short form `Team_Simple` objects that competed in the
+        given year, pagenated in groups of 500.
+      parameters:
+        - $ref: '#/parameters/year'
+        - $ref: '#/parameters/page_num'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Team_Simple'
+  /teams/{year}/{page_num}/keys:
+    get:
+      tags:
+      - team
+      - list
+      description: |
+        Gets a list Team Keys that competed in the
+        given year, pagenated in groups of 500.
+      parameters:
+        - $ref: '#/parameters/year'
+        - $ref: '#/parameters/page_num'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: string
+              description: Team Key
+  /team/{team_key}:
+    get:
+      tags:
+      - team
+      description: |
+        Gets a `Team` object for the team referenced by the given key.
+      parameters:
+        - $ref: '#/parameters/team_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/Team'
+  /team/{team_key}/simple:
+    get:
+      tags:
+      - team
+      description: |
+        Gets a `Team_Simple` object for the team referenced by the given key.
+      parameters:
+        - $ref: '#/parameters/team_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/Team_Simple'
+  /team/{team_key}/years_participated:
+    get:
+      tags:
+      - team
+      description: |
+        Gets a list of years in which the team participated in at least one
+        competition.
+      parameters:
+        - $ref: '#/parameters/team_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: integer
+  /team/{team_key}/districts:
+    get:
+      tags:
+      - team
+      - district
+      description: |
+        Gets a list or year and district pairs to denote each year the team was
+        in a district. Will return an empty array if the team was never in a
+        district.
+      parameters:
+        - $ref: '#/parameters/team_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                year:
+                  type: integer
+                district_key:
+                  type: string
+  /team/{team_key}/robots:
+    get:
+      tags:
+      - team
+      description: |
+        Gets a list of year and robot name pairs for each year that a robot
+        name was provided. Will return an empty array if the team has never
+        named a robot.
+      parameters:
+        - $ref: '#/parameters/team_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                year:
+                  type: integer
+                robot_name:
+                  type: string
+  /team/{team_key}/events:
+    get:
+      tags:
+      - team
+      - event
+      description: |
+        Gets a list of all events this team has competed at.
+      parameters:
+        - $ref: '#/parameters/team_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Event'
+  /team/{team_key}/events/simple:
+    get:
+      tags:
+      - team
+      - event
+      description: |
+        Gets a short-form list of all events this team has competed at.
+      parameters:
+        - $ref: '#/parameters/team_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Event_Simple'
+  /team/{team_key}/events/keys:
+    get:
+      tags:
+      - team
+      - event
+      description: |
+        Gets a list of the event keys for all events this team has competed at.
+      parameters:
+        - $ref: '#/parameters/team_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: string
+              description: Event Key
+  /team/{team_key}/events/{year}:
+    get:
+      tags:
+      - team
+      - event
+      description: |
+        Gets a list of events this team has competed at in the given year.
+      parameters:
+        - $ref: '#/parameters/team_key'
+        - $ref: '#/parameters/year'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Event'
+  /team/{team_key}/events/{year}/simple:
+    get:
+      tags:
+      - team
+      - event
+      description: |
+        Gets a short-form list of events this team has competed at in the given year.
+      parameters:
+        - $ref: '#/parameters/team_key'
+        - $ref: '#/parameters/year'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Event_Simple'
+  /team/{team_key}/events/{year}/keys:
+    get:
+      tags:
+      - team
+      - event
+      description: |
+        Gets a list of the event keys for events this team has competed at in the given year.
+      parameters:
+        - $ref: '#/parameters/team_key'
+        - $ref: '#/parameters/year'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: string
+              description: Event Key
+  /team/{team_key}/event/{event_key}/matches/{match_type}:
+    get:
+      tags:
+      - team
+      - event
+      - match
+      description: |
+        Gets a list of matches for the given team and event of the given match type.
+      parameters:
+        - $ref: '#/parameters/team_key'
+        - $ref: '#/parameters/event_key'
+        - $ref: '#/parameters/match_type'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Match'
+  /team/{team_key}/event/{event_key}/matches/{match_type}/simple:
+    get:
+      tags:
+      - team
+      - event
+      - match
+      description: |
+        Gets a short-form list of matches for the given team and event of the given match type.
+      parameters:
+        - $ref: '#/parameters/team_key'
+        - $ref: '#/parameters/event_key'
+        - $ref: '#/parameters/match_type'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Match'
+  /team/{team_key}/event/{event_key}/matches/{match_type}/keys:
+    get:
+      tags:
+      - team
+      - event
+      - match
+      description: |
+        Gets a list of match keys for matches for the given team and event of the given match type.
+      parameters:
+        - $ref: '#/parameters/team_key'
+        - $ref: '#/parameters/event_key'
+        - $ref: '#/parameters/match_type'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: string
+              description: Match Key
+  /team/{team_key}/event/{event_key}/awards:
+    get:
+      tags:
+      - team
+      - event
+      description: |
+        Gets a list of awards the given team won at the given event.
+      parameters:
+        - $ref: '#/parameters/team_key'
+        - $ref: '#/parameters/event_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Award'
+  ## /team/{team_key}/event/{event_key}/status: TODO -- Not sure what this one is for
+  /team/{team_key}/awards:
+    get:
+      tags:
+      - team
+      description: |
+        Gets a list of awards the given team has won.
+      parameters:
+        - $ref: '#/parameters/team_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Award'
+  /team/{team_key}/awards/{year}:
+    get:
+      tags:
+      - team
+      description: |
+        Gets a list of awards the given team has won in a given year.
+      parameters:
+        - $ref: '#/parameters/team_key'
+        - $ref: '#/parameters/year'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Award'
+  /team/{team_key}/matches/{year}:
+    get:
+      tags:
+      - team
+      - match
+      description: |
+        Gets a list of matches for the given team and year.
+      parameters:
+        - $ref: '#/parameters/team_key'
+        - $ref: '#/parameters/year'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Match'
+  /team/{team_key}/matches/{year}/simple:
+    get:
+      tags:
+      - team
+      - match
+      description: |
+        Gets a short-form list of matches for the given team and year.
+      parameters:
+        - $ref: '#/parameters/team_key'
+        - $ref: '#/parameters/year'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Match_Simple'
+  /team/{team_key}/matches/{year}/keys:
+    get:
+      tags:
+      - team
+      - match
+      description: |
+        Gets a list of match keys for matches for the given team and year.
+      parameters:
+        - $ref: '#/parameters/team_key'
+        - $ref: '#/parameters/year'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: string
+              description: Match Key
+  /team/{team_key}/media/{year}:
+    get:
+      tags:
+      - team
+      description: |
+        Gets a list of Media (videos / pictures) for the given team and year.
+      parameters:
+        - $ref: '#/parameters/team_key'
+        - $ref: '#/parameters/year'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Media'
+  /team/{team_key}/social_media:
+    get:
+      tags:
+      - team
+      description: |
+        Gets a list of Media (social media) for the given team.
+      parameters:
+        - $ref: '#/parameters/team_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Media'
+  /events/{year}:
+    get:
+      tags:
+      - event
+      - list
+      description: |
+        Gets a list of events in the given year.
+      parameters:
+        - $ref: '#/parameters/year'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Event'
+  /events/{year}/simple:
+    get:
+      tags:
+      - event
+      - list
+      description: |
+        Gets a short-form list of events in the given year.
+      parameters:
+        - $ref: '#/parameters/year'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Event_Simple'
+  /events/{year}/keys:
+    get:
+      tags:
+      - event
+      - list
+      description: |
+        Gets a list of event keys in the given year.
+      parameters:
+        - $ref: '#/parameters/year'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: string
+              description: Event Key
+  /event/{event_key}:
+    get:
+      tags:
+      - event
+      description: Gets an Event.
+      parameters:
+        - $ref: '#/parameters/event_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/Event'
+  /event/{event_key}/simple:
+    get:
+      tags:
+      - event
+      description: Gets a short-form Event.
+      parameters:
+        - $ref: '#/parameters/event_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/Event_Simple'
+  /event/{event_key}/elim_alliances:
+    get:
+      tags:
+      - event
+      description: Gets a list of Elimination Alliances for the given Event.
+      parameters:
+        - $ref: '#/parameters/event_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Elimination_Alliance'
+  #/event/{event_key}/stats: TODO -- What do we want to return here?
+  /event/{event_key}/rankings:
+    get:
+      tags:
+      - event
+      description: Gets a list of team rankings for the Event.
+      parameters:
+        - $ref: '#/parameters/event_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Ranking'
+  /event/{event_key}/district_points:
+    get:
+      tags:
+      - event
+      - district
+      description: Gets a list of team rankings for the Event.
+      parameters:
+        - $ref: '#/parameters/event_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Event_District_Points'
+  /event/{event_key}/teams:
+    get:
+      tags:
+      - event
+      - team
+      - list
+      description: |
+        Gets a list of `Team` objects that competed in the
+        given event.
+      parameters:
+        - $ref: '#/parameters/event_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Team'
+  /event/{event_key}/teams/simple:
+    get:
+      tags:
+      - event
+      - team
+      - list
+      description: |
+        Gets a short-form list of `Team` objects that competed in the
+        given event.
+      parameters:
+        - $ref: '#/parameters/event_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Team_Simple'
+  /event/{event_key}/teams/keys:
+    get:
+      tags:
+      - event
+      - team
+      - list
+      description: |
+        Gets a list of `Team` keys that competed in the
+        given event.
+      parameters:
+        - $ref: '#/parameters/event_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: string
+              description: Team Key
+  /event/{event_key}/matches:
+    get:
+      tags:
+      - event
+      - match
+      description: |
+        Gets a list of matches for the given event.
+      parameters:
+        - $ref: '#/parameters/event_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Match'
+  /event/{event_key}/matches/simple:
+    get:
+      tags:
+      - event
+      - match
+      description: |
+        Gets a short-form list of matches for the given event.
+      parameters:
+        - $ref: '#/parameters/event_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Match_Simple'
+  /event/{event_key}/matches/keys:
+    get:
+      tags:
+      - event
+      - match
+      description: |
+        Gets a list of match keys for the given event.
+      parameters:
+        - $ref: '#/parameters/event_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: string
+              description: Match Key
+  /event/{event_key}/awards:
+    get:
+      tags:
+      - event
+      description: |
+        Gets a list of awards from the given event.
+      parameters:
+        - $ref: '#/parameters/event_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Award'
+  /match/{match_key}:
+    get:
+      tags:
+      - match
+      description: |
+        Gets a `Match` object for the given match key.
+      parameters:
+        - $ref: '#/parameters/match_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/Match'
+  /match/{match_key}/simple:
+    get:
+      tags:
+      - match
+      description: |
+        Gets a short-form `Match` object for the given match key.
+      parameters:
+        - $ref: '#/parameters/match_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/Match_Simple'
+  /districts/{year}:
+    get:
+      tags:
+      - district
+      description: |
+        Gets a list of districts and their corresponding district key, for the given year.
+      parameters:
+        - $ref: '#/parameters/year'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: District Name
+                key:
+                  type: string
+                  description: District Key
+  /district/{district_key}/{year}/events:
+    get:
+      tags:
+      - district
+      - event
+      - list
+      description: |
+        Gets a list of events in the given district in the given year.
+      parameters:
+        - $ref: '#/parameters/district_key'
+        - $ref: '#/parameters/year'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Event'
+  /district/{district_key}/{year}/events/simple:
+    get:
+      tags:
+      - district
+      - event
+      - list
+      description: |
+        Gets a short-form list of events in the given district in the given year.
+      parameters:
+        - $ref: '#/parameters/district_key'
+        - $ref: '#/parameters/year'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Event_Simple'
+  /district/{district_key}/{year}/events/keys:
+    get:
+      tags:
+      - district
+      - event
+      - list
+      description: |
+        Gets a list of event keys for events in the given district in the given year.
+      parameters:
+        - $ref: '#/parameters/district_key'
+        - $ref: '#/parameters/year'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: string
+              description: Event Key
+  /district/{district_key}/{year}/teams:
+    get:
+      tags:
+      - district
+      - team
+      - list
+      description: |
+        Gets a list of `Team` objects that competed in events in the
+        given district in the given year.
+      parameters:
+        - $ref: '#/parameters/district_key'
+        - $ref: '#/parameters/year'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Team'
+  /district/{district_key}/{year}/teams/simple:
+    get:
+      tags:
+      - district
+      - team
+      - list
+      description: |
+        Gets a short-form list of `Team` objects that competed in events in the
+        given district in the given year.
+      parameters:
+        - $ref: '#/parameters/district_key'
+        - $ref: '#/parameters/year'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Team_Simple'
+  /district/{district_key}/{year}/teams/keys:
+    get:
+      tags:
+      - district
+      - team
+      - list
+      description: |
+        Gets a list of `Team` objects that competed in events in the
+        given district in the given year.
+      parameters:
+        - $ref: '#/parameters/district_key'
+        - $ref: '#/parameters/year'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: string
+              description: Team Key
+  /district/{district_key}/{year}/rankings:
+    get:
+      tags:
+      - district
+      - team
+      - list
+      description: |
+        Gets a list of team district rankings for the given district in the given year.
+      parameters:
+        - $ref: '#/parameters/district_key'
+        - $ref: '#/parameters/year'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/District_Ranking'
+
+securityDefinitions:
+  apiKeyHeader:
+    type: apiKey
+    in: header
+    name: X-TBA-API-Key
+    description: Your TBA API Key can be obtained from your Account Page on the TBA website.
+  apiKeyParameter:
+    type: apiKey
+    in: query
+    name: X-TBA-API-Key
+    description: Your TBA API Key can be obtained from your Account Page on the TBA website.
+
+tags:
+  -
+    name: team
+    description: Calls that return team or team-specific information.
+  -
+    name: list
+    description: Calls that return a list of records.
+  -
+    name: event
+    description: Calls that return event, or event-specific information.
+  -
+    name: match
+    description: Calls that return match, or match-specific information.
+  -
+    name: district
+    description: Calls that return district, or district-related information.
+
+
+definitions:
+  Team_Simple:
+    type: object
+    required:
+    - key
+    - name
+    - team_number
+    properties:
+      key:
+        type: string
+        description: TBA team key with the format frcyyyy
+      team_number:
+        type: integer
+        description: Official team number issued by FIRST
+      nickname:
+        type: string
+        description: Team nickname provided by FIRST
+      name:
+        type: string
+        description: Official long name registerd with FIRST
+  Team:
+    type: object
+    allOf:
+     - $ref: '#/definitions/Team_Simple'
+    properties:
+      website:
+        type: string
+        format: url
+        description: Official website associatd with the team
+      locality:
+        type: string
+        description: City of team derived from parsing the address registered with FIRST
+      region:
+        type: string
+        description: State of team derived from parsing the address registered with FIRST
+      country_name:
+        type: string
+        description: Country of team derived from parsing the address registered with FIRST
+      location:
+        type: string
+        description: Long form address that includes city, state, and country provided by FIRST
+      rookie_year:
+        type: integer
+        description: First year the team officially competed
+      motto:
+        type: string
+        description: Team's motto as provided by FIRST
+  Event_Simple:
+    type: object
+    required:
+    - key
+    - name
+    - event_code
+    - year
+    properties:
+      key:
+        type: string
+        description: |
+          TBA event key with the format yyyy[EVENT_CODE], where yyyy is the year,
+          and EVENT_CODE is the event code of the event.
+      name:
+        type: string
+        description: |
+          Official name of event on record either provided by FIRST or organizers of offseason event.
+      event_code:
+        type: string
+        description: Event short code, as provided by FIRST.
+      year:
+        type: integer
+        description: Year the event data is for.
+  Event:
+    type: object
+    allOf:
+     - $ref: '#/definitions/Event_Simple'
+    properties:
+      short_name:
+        type: string
+        description: |
+          Same as name but doesn't include event specifiers, such as 'Regional'
+          or 'District'. May be null.
+      event_type:
+        type: string
+        enum:
+        - Regional
+        - District
+        - District Championship
+        - Championship Division
+        - Championship Finals
+        - Offseason
+        - Preseason
+        description: Event Type, eg Regional, District, or Offseason.
+      event_district_name:
+        type: string
+        enum:
+        - Michigan
+        - Mid-Atlantic
+        - New England
+        - Pacific Northwest
+        - Indiana
+        - Chesapeake
+        - North Carolina
+        - Georgia
+        - Ontairo
+        - Isreal
+        description: Event District
+      event_district_key:
+        type: string
+        description: TBA Key for the District the Event is in, may be null.
+      week:
+        type: integer
+        description: Week of the compeition season this event is in.
+      location:
+        type: string
+        description: Long form address that includes city, and state provided by FIRST
+      venue_address:
+        type: string
+        description: Address of the event's venue, if available. Line breaks included.
+      timezone:
+        type: string
+        description: Timezone name
+      website:
+        type: string
+        description: The event's website, if any.
+      official_fms:
+        type: boolean
+        description: Whether this event uses the FIRST official FMS.
+      webcasts:
+        type: array
+        items:
+          $ref: '#/definitions/Webcast'
+        description: |
+          If the event has webcast data associated with it, this contains JSON data of the streams.
+  Webcast:
+    type: object
+    required:
+    - type
+    - channel
+    properties:
+      type:
+        type: string
+        enum:
+          - youtube
+          - twitch
+          - ustream
+          - iframe
+          - html5
+          - rtmp
+          - livestream
+        description: Type of webcast, typically descriptive of the streaming provider
+      channel:
+        type: string
+        description: |
+          Type specific channel information. May be the YouTube stream, or Twitch channel
+          name. In the case of iframe types, contains HTML to embed the stream in an HTML
+          iframe.
+      file:
+        type: string
+        description: File identification as may be required for some times. May be null.
+  Match_Simple:
+    type: object
+    required:
+    - key
+    - event_key
+    - comp_level
+    - match_number
+    - set_number
+    properties:
+      key:
+        type: string
+        description: |
+          TBA event key with the format yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER],
+          where yyyy is the year, and EVENT_CODE is the event code of the event,
+          COMP_LEVEL is (qm, ef, qf, sf, f), and MATCH_NUMBER is the match number
+          in the competition level. A set number may append the competition level
+          if more than one match in required per set.
+      comp_level:
+        type: string
+        enum:
+          - qm
+          - ef
+          - qf
+          - sf
+          - f
+        description: The competition level the match was played at.
+      set_number:
+        type: integer
+        description: |
+          The set number in a series of matches where more than one match is
+          required in the match series.
+      match_number:
+        type: integer
+        description: The match number of the match in the competition level.
+      alliances:
+        type: object
+        properties:
+          blue:
+            type: object
+            description: Blue Alliance
+            properties:
+              score:
+                type: integer
+              teams:
+                type: array
+                items:
+                  type: integer
+                  description: Team Number
+          red:
+            type: object
+            description: Red Alliance
+            properties:
+              score:
+                type: integer
+              teams:
+                type: array
+                items:
+                  type: integer
+                  description: Team Number
+        description: |
+          A list of alliances, the teams on the alliances, and their score.
+      event_key:
+        type: string
+        description: Event key of the event the match was played at.
+      time:
+        type: integer
+        format: int64
+        description: |
+          UNIX timestamp of match time, as taken from the published schedule
+      time_string:
+        type: string
+        description: |
+          Time string for this match, as published on the official schedule.
+          Of course, this may or may not be accurate, as events often run
+          ahead or behind schedule
+  Match:
+    type: object
+    allOf:
+     - $ref: '#/definitions/Match_Simple'
+    properties:
+      winning_alliance:
+        type: string
+        description: |
+          The name of the winning alliance, or `tie` if the match has been played. May be null.
+      score_breakdown:
+        type: string
+        format: json
+        description: |
+          Score breakdown for auto, teleop, etc. points. Varies from year to
+          year. May be null.
+      videos:
+        type: array
+        items:
+          $ref: '#/definitions/Media'
+        description: |
+          Array of Media associated with this match and corresponding
+          information
+  Media:
+    type: object
+    required:
+    - type
+    properties:
+      type:
+        type: string
+        enum:
+        - youtube
+        - cdphotothread
+        - imgur
+        - facebook-profile
+        - youtube-channel
+        - twitter-profile
+        - github-profile
+        - instagram-profile
+        - periscope-profile
+        description: String type of the media element.
+      foreign_key:
+        type: string
+        description: The key used to identify this media on the media site.
+      details:
+        type: string
+        format: json
+        description: If required, a JSON dict of additional media information.
+      preferred:
+        type: boolean
+        description: True if the media is of high quality
+  Elimination_Alliance:
+    type: object
+    required:
+    - picks
+    - captain
+    properties:
+      name:
+        type: string
+        description: Alliance name, may be null.
+      backup:
+        type: object
+        description: Backup team number called in, may be null.
+        properties:
+          out:
+            type: integer
+            description: Team number that was replaced by the backup team.
+          in:
+            type: integer
+            description: Team number that was called in as the backup.
+      declines:
+        type: array
+        description: List of team numbers that declined the alliance.
+        items:
+          type: integer
+          description: Team number that declined the alliance.
+      picks:
+        type: array
+        description: List of team numbers picked for the alliance.
+        items:
+          type: integer
+          description: Team number picked for the alliance.
+      captain:
+        type: integer
+        description: Team number of the alliance captain.
+  Ranking:
+    type: object
+    required:
+    - rank
+    - team
+    properties:
+      rank:
+        type: integer
+        description: The team's rank at the event as provided by FIRST.
+      team:
+        type: integer
+        description: The team number with this rank.
+      record:
+        type: object
+        description: Win-Loss-Tie ranking information, if avalable. May be null.
+        properties:
+          qualifications:
+            type: object
+            description: W-L-T record in qualification matches
+            properties:
+              wins:
+                type: integer
+              losses:
+                type: integer
+              ties:
+                type: integer
+          overall:
+            type: object
+            description: W-L-T record across all matches at an event
+            properties:
+              wins:
+                type: integer
+              losses:
+                type: integer
+              ties:
+                type: integer
+      played:
+        type: integer
+        description: Number of matches played by this team.
+      additional_properties:
+        type: array
+        description: Additional year-specific information, may be null.
+        items:
+          type: object
+          properties:
+            label:
+              type: string
+              description: The name of the additional property.
+            value:
+              type: string
+              description: The value for the property. May be of any type.
+  Event_District_Points:
+    type: object
+    required:
+    - points
+    properties:
+      points:
+        type: array
+        description: Points gained for each team at the event.
+        items:
+          type: object
+          properties:
+            team_number:
+              type: integer
+            alliance_points:
+              type: integer
+            award_points:
+              type: integer
+            qual_points:
+              type: integer
+            elim_points:
+              type: integer
+            total:
+              type: integer
+      tiebreakers:
+        type: array
+        description: Tiebreaker values for each team at the event.
+        items:
+          type: object
+          properties:
+            team_number:
+              type: integer
+            highest_qual_scores:
+              type: array
+              items:
+                type: integer
+            qual_wins:
+              type: integer
+  Award:
+    type: object
+    required:
+    - name
+    - award_type
+    - event_key
+    - year
+    properties:
+      name:
+        type: string
+        description: |
+          The name of the award as provided by FIRST. May vary for the same award type.
+      award_type:
+        type: string
+        enum:
+        - Chairman's
+        - Winner
+        - Finalist
+        - Woodie Flowers
+        - Dean's List
+        - Volunteer
+        - Founders
+        - Bart Kamen Memorial
+        - Make It Loud
+        - Engineering Inspiration
+        - Rookie All Star
+        - Gracious Professionalism
+        - Coopertition
+        - Judge's
+        - Highest Rookie Seed
+        - Rookie Inspiration
+        - Industrial Design
+        - Quality
+        - Safety
+        - Sportsmanship
+        - Creativity
+        - Engineering Excellence
+        - Entrepreneurship
+        - Excellence In Design
+        - Excellence in Design CAD
+        - Excellence in Design Animation
+        - Driving Tomorrows Technology
+        - Imagery
+        - Media and Technology
+        - Innovation in Control
+        - Spirit
+        - Website
+        - Visualization
+        - Autodesk Inventor
+        - Future Innovator
+        - Recgonition of Extraordinary Service
+        - Outstanding Cart
+        - WSU Aim Higher
+        - Leadership in Control
+        - Number 1 Seed
+        - Incredible Play
+        - People's Choice Animation
+        - Visualization Rising Star
+        - Best Offensive Round
+        - Best Play of the Day
+        - Featherweight in the Finals
+        - Most Photogenic
+        - Outstanding Defense
+        - Power to Simplify
+        - Against All Odds
+        - Rising Star
+        - Chairman's Honorable Mention
+        - Content and Communication Honorable Mention
+        - Technical Execution Honorable Mention
+        - Realization
+        - Realization Honorable Mention
+        - Design Your Future
+        - Design Your Future Honorable Mention
+        - Special Recognition Character Animation
+        - High Score
+        - Teacher Pioneer
+        - Best Craftsmanship
+        - Best Defensive Match
+        - Play of the Day
+        - Programming
+        - Professionalism
+        - Golden Corndog
+        - Most Improved Team
+        - Wildcard
+        description: Type of award given.
+      event_key:
+        type: string
+        description: The event_key of the event the award was won at.
+      recipient_list:
+        type: array
+        items:
+          $ref: '#/definitions/Award_Recipient'
+        description: |
+          A list of recipients of the award at the event. Either team_number or awardee
+          for individual awards.
+      year:
+        type: integer
+        description: The year this award was won.
+  Award_Recipient:
+    type: object
+    properties:
+      team_number:
+        type: integer
+        description: The FIRST official team number that was given the award. May be null.
+      awardee:
+        type: string
+        description: The name of the individual given the award. May be null.
+  District_Ranking:
+    type: object
+    required:
+    - team_number
+    - rank
+    - point_total
+    properties:
+      team_number:
+        type: integer
+      rank:
+        type: integer
+      rookie_bonus:
+        type: integer
+      point_total:
+        type: integer
+      event_points:
+        type: array
+        items:
+          type: object
+          properties:
+            event_key:
+              type: string
+            district_cmp:
+              type: boolean
+            alliance_points:
+              type: integer
+            award_points:
+              type: integer
+            qual_points:
+              type: integer
+            elim_points:
+              type: integer
+            total:
+              type: integer
