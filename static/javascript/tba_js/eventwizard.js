@@ -182,6 +182,17 @@ function playoffMatchAndSet(totalMatchNum, is_octo){
     }
 }
 
+/* Load all valid events for this user */
+var valid_events = [];
+$.get( "/_/account/apiwrite_events", function(data) {
+    valid_events.push('<option value="">Select Event</option>');
+    $.each(JSON.parse(data), function(key, value) {
+        valid_events.push('<option value="'+ key +'">'+ value +'</option>');
+    });
+    valid_events.push('<option value="other">Other</option>');
+    $('#event_key_select').html(valid_events.join(''));
+});
+
 if($('#event_key_select').val() != "other"){
     $('#event_key').hide();
 }
