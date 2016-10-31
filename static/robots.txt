@@ -9,3 +9,4 @@ Disallow: /request/
 Disallow: /suggest/
 Disallow: /tasks/
 Disallow: /mytba/
+Disallow: /nearby?*

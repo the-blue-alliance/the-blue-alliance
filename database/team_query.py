@@ -9,7 +9,7 @@ from models.team import Team
 
 
 class TeamListQuery(DatabaseQuery):
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'team_list_{}'  # (page_num)
     PAGE_SIZE = 500
 
@@ -26,7 +26,7 @@ class TeamListQuery(DatabaseQuery):
 
 
 class TeamListYearQuery(DatabaseQuery):
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'team_list_year_{}_{}'  # (year, page_num)
 
     def __init__(self, year, page_num):
@@ -50,7 +50,7 @@ class TeamListYearQuery(DatabaseQuery):
 
 
 class DistrictTeamsQuery(DatabaseQuery):
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'district_teams_{}'  # (district_key)
 
     def __init__(self, district_key):
@@ -71,7 +71,7 @@ class DistrictTeamsQuery(DatabaseQuery):
 
 
 class EventTeamsQuery(DatabaseQuery):
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'event_teams_{}'  # (event_key)
 
     def __init__(self, event_key):

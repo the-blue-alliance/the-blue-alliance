@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Search Nearby - The Blue Alliance{% endblock %}
+
+{% block meta_description %}Search for nearby teams and events{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12">
+      <h1>Search for nearby Teams and Events</h1>
+      <br>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-4">
+      <form class="form-horizontal" method="get">
+        <div class="form-group">
+          <label class="col-sm-4 control-label" for="input-year">Year</label>
+          <div class="col-sm-8">
+            <select class="form-control" id="input-year" name="year">
+              {% for valid_year in valid_years %}
+                <option value="{{valid_year}}"{% if valid_year == year %} selected="selected"{% endif %}>{{valid_year}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-sm-4 control-label" for="input-location">Location</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" id="input-location" name="location" placeholder="City / Zip / Address"{% if location %} value="{{location}}"{% endif %}">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-sm-4 control-label" for="input-range-limit">Range Limit </label>
+          <div class="col-sm-8">
+            <select class="form-control" id="input-range-limit" name="range_limit">
+              {% for valid_range in valid_ranges %}
+                <option value="{{valid_range}}"{% if range_limit == valid_range %} selected="selected"{% endif %}">{{valid_range}} miles</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-offset-4 col-sm-8">
+            <div class="radio">
+              <label>
+                <input type="radio" name="search_type" value="teams" {% if search_type == 'teams' %}checked="checked"{% endif %}> Show Teams
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-offset-4 col-sm-8">
+            <div class="radio">
+              <label>
+                <input type="radio" name="search_type" value="events" {% if search_type == 'events' %}checked="checked"{% endif %}> Show Events
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-offset-4 col-sm-8">
+            <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-search"></span> Search</button>
+          </div>
+        </div>
+      </form>
+      <br>
+    </div>
+
+    <div class="col-sm-8">
+      {% if location %}
+        {% if results %}
+          <p>{{num_results}} {% if search_type == 'teams' %}team{% else %}event{% endif %}{% if num_results != 1 %}s{% endif %} found within {{range_limit}} miles {% if search_type == 'teams' %} active {% endif %} in {{year}}</p>
+
+          {% if num_results > page_size %}
+            <nav aria-label="Page navigation">
+              <ul class="pagination">
+                {% if page != 0 %}
+                <li>
+                  <a href="/nearby?year={{year}}&location={{location}}&page={{page - 1}}&range_limit={{range_limit}}&search_type={{search_type}}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                  </a>
+                </li>
+                {% endif %}
+                {% for i in range((num_results / page_size)|ceil) %}
+                  <li {% if i == page %}class="active"{% endif %}>
+                    <a href="/nearby?year={{year}}&location={{location}}&page={{i}}&range_limit={{range_limit}}&search_type={{search_type}}">
+                      {{page_size * i + 1}}-
+                      {%- if loop.last -%}
+                        {{page_size * i + num_results - page_size * i}}
+                      {%- else -%}
+                        {{page_size * i + page_size}}
+                      {% endif %}
+                    </a>
+                  </li>
+                {% endfor %}
+                {% if page != (num_results / page_size)|ceil - 1 %}
+                <li>
+                  <a href="/nearby?year={{year}}&location={{location}}&page={{page + 1}}&range_limit={{range_limit}}&search_type={{search_type}}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
+                {% endif %}
+              </ul>
+            </nav>
+          {% endif %}
+
+          <table class="event-table">
+            <thead>
+              <tr>
+                <th>{% if search_type == 'teams' %}Team{% else %}Event{% endif %}</th>
+                {% if search_type == 'events' %}<th>Dates</th>{% endif %}
+                <th>Distance</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for result in results %}
+                <tr>
+                  <td>
+                    {% if search_type == 'teams' %}
+                      <a href="/team/{{result.team_number}}/{{year}}" title="Team {{result.team_number }} - {{result.nickname}}">Team {{result.team_number }} - {{result.nickname}}</a>
+                    {% else %}
+                      <a href="/event/{{result.key_name}}" title="{{result.name}}">{{result.name}}</a>
+                    {% endif %}
+                      {% if result.location %}
+                        <br>
+                        <small>{{result.location}}</small>
+                      {% endif %}
+                  </td>
+                  {% if search_type == 'events' %}
+                  <td>
+                    {% if result.start_date %}<time itemprop="startDate" datetime="{{result.start_date|strftime("%c")}}">{{ result.start_date|strftime("%b %d") }}{% if result.start_date.date() != result.end_date.date() %}</time> to <time itemprop="endDate" datetime="{{result.end_date|strftime("%c")}}">{{ result.end_date|strftime("%b %d") }}{% endif %}{{ result.end_date|strftime(", %Y") }}</time>{% endif %}
+                  </td>
+                  {% endif %}
+                  <td>
+                    {{distances[result.key.id()]|round|int}} miles
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p class="well">No {% if search_type == 'teams' %}teams{% else %}events {% endif %} were found matching the search criteria. Try picking another location or increasing the search range limit.</p>
+        {% endif %}
+      {% else %}
+        <p class="well">Enter a location to start a search.</p>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

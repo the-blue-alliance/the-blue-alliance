@@ -1,10 +1,11 @@
 import logging
 import traceback
 
-from google.appengine.api import taskqueue
+from google.appengine.api import search, taskqueue
+from google.appengine.ext import ndb
 
 from helpers.cache_clearer import CacheClearer
-from helpers.event_helper import EventHelper
+from helpers.location_helper import LocationHelper
 from helpers.manipulator_base import ManipulatorBase
 from helpers.notification_helper import NotificationHelper
 
@@ -18,16 +19,38 @@ class EventManipulator(ManipulatorBase):
         return CacheClearer.get_event_cache_keys_and_controllers(affected_refs)
 
     @classmethod
+    def postDeleteHook(cls, events):
+        '''
+        To run after the event has been deleted.
+        '''
+        for event in events:
+            # Remove event from search index
+            search.Index(name="eventLocation").delete(event.key.id())
+
+    @classmethod
     def postUpdateHook(cls, events, updated_attr_list, is_new_list):
         """
         To run after models have been updated
         """
         for (event, updated_attrs) in zip(events, updated_attr_list):
-            try:
-                event.timezone_id = EventHelper.get_timezone_id(event.location, event.key.id())
-                cls.createOrUpdate(event, run_post_update_hook=False)
-            except Exception:
-                logging.warning("Timezone update for event {} failed!".format(event.key_name))
+            lat_lon = event.get_lat_lon()
+            if not lat_lon:
+                logging.warning("Lat/Lon update for event {} failed with location!".format(event.key_name))
+            else:
+                timezone_id = LocationHelper.get_timezone_id(None, lat_lon=lat_lon)
+                if not timezone_id:
+                    logging.warning("Timezone update for event {} failed!".format(event.key_name))
+                else:
+                    event.timezone_id = timezone_id
+                    cls.createOrUpdate(event, run_post_update_hook=False)
+
+            # Add event to lat/lon info to search index
+            if lat_lon:
+                fields = [
+                    search.NumberField(name='year', value=event.year),
+                    search.GeoField(name='location', value=search.GeoPoint(lat_lon[0], lat_lon[1]))
+                ]
+                search.Index(name="eventLocation").put(search.Document(doc_id=event.key.id(), fields=fields))
 
         # Enqueue task to calculate district points
         for event in events:
@@ -53,6 +76,7 @@ class EventManipulator(ManipulatorBase):
             "city",
             "state_prov",
             "country",
+            "postalcode",
             "timezone_id",
             "name",
             "official",

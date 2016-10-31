@@ -8,7 +8,7 @@ from models.team import Team
 
 
 class EventListQuery(DatabaseQuery):
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'event_list_{}'  # (year)
 
     def __init__(self, year):
@@ -22,7 +22,7 @@ class EventListQuery(DatabaseQuery):
 
 
 class DistrictEventsQuery(DatabaseQuery):
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'district_events_{}'  # (district_key)
 
     def __init__(self, district_key):
@@ -41,7 +41,7 @@ class DistrictEventsQuery(DatabaseQuery):
 
 
 class TeamEventsQuery(DatabaseQuery):
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'team_events_{}'  # (team_key)
 
     def __init__(self, team_key):
@@ -57,7 +57,7 @@ class TeamEventsQuery(DatabaseQuery):
 
 
 class TeamYearEventsQuery(DatabaseQuery):
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'team_year_events_{}_{}'  # (team_key, year)
 
     def __init__(self, team_key, year):

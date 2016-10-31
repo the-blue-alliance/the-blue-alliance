@@ -2,6 +2,7 @@ from collections import defaultdict
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from helpers.cache_clearer import CacheClearer
+import tba_config
 
 
 class ManipulatorBase(object):
@@ -42,6 +43,9 @@ class ManipulatorBase(object):
         Makes a deferred call to clear cache.
         Needs to save _affected_references and dirty flag
         """
+        if not tba_config.CONFIG['database_query_cache'] and not tba_config.CONFIG['response_cache']:
+            return
+
         all_affected_references = []
         for model in models:
             if getattr(model, 'dirty', False) and hasattr(model, '_affected_references'):
