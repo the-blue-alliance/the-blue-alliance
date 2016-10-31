@@ -34,7 +34,10 @@ class LocationHelper(object):
         school or main sponsor) and team location to get latitude and longitude
         for a team
         """
-        split_name = re.split('/|&', team.name)  # Guessing sponsors/school by splitting name by '/' or '&'
+        if team.name:
+            split_name = re.split('/|&', team.name)  # Guessing sponsors/school by splitting name by '/' or '&'
+        else:
+            split_name = None
 
         best_lat_lon = None
         least_num_results = float('inf')
