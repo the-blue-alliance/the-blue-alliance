@@ -200,9 +200,15 @@ $('#event_key_select').change(function(){
     var eventKey = $(this).val();
     $('#event_key').val(eventKey);
     if(eventKey == "other"){
-        $('#event_key').val("").show()
+        $('#event_key').val("").show();
+        $('#auth-container').show();
+        $('#auth-tools').show();
     }else{
         $('#event_key').hide();
+
+        /* if the user is logged in, they don't need to manually input keys */
+        $('#auth-container').hide();
+        $('#auth-tools').hide();
     }
 
     // clear auth boxes
