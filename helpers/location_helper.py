@@ -4,6 +4,7 @@ import re
 import tba_config
 import urllib
 
+from difflib import SequenceMatcher
 from google.appengine.api import memcache, urlfetch
 from google.appengine.ext import ndb
 
@@ -36,6 +37,140 @@ class LocationHelper(object):
     #     if not lat_lon:
     #         logging.warning("Finding Lat/Lon for event {} failed!".format(event.key_name))
     #     return lat_lon
+    @classmethod
+    def get_event_location_info(cls, event):
+        """
+        Search for different combinations of venue, venue_address, city,
+        state_prov, postalcode, and country in attempt to find the correct
+        location associated with the event.
+        """
+        if not event.location:
+            return {}
+
+        # Possible queries for location that will match yield results
+        if event.venue:
+            possible_queries = [event.venue]
+        else:
+            possible_queries = []
+        if event.venue_address:
+            split_address = event.venue_address.split('\n')
+            for i in xrange(min(len(split_address), 2)):  # Venue takes up at most 2 lines
+                query = ' '.join(split_address[0:i+1])  # From the front
+                if query not in possible_queries:
+                    possible_queries.append(query)
+
+            for i in xrange(len(split_address)):
+                query = ' '.join(split_address[i:])  # From the back
+                if query not in possible_queries:
+                    possible_queries.append(query)
+
+        # print possible_queries
+
+        # Try to find place based on possible queries
+        best_score = 0
+        best_location_info = {}
+        textsearch_results_candidates = []  # More trustworthy candidates are added first
+        for query in possible_queries:
+            textsearch_results = cls.google_maps_textsearch_async(query).get_result()
+            if textsearch_results:
+                if len(textsearch_results) == 1:
+                    location_info = cls.construct_location_info_async(textsearch_results[0]).get_result()
+                    # print query
+                    # print location_info
+                    score = cls.compute_event_location_score(event, location_info)
+                    if score == 1:
+                        # Very likely to be correct if only 1 result and as a perfect score
+                        return location_info
+                    elif score > best_score:
+                        # Only 1 result but score is imperfect
+                        best_score = score
+                        best_location_info = location_info
+                else:
+                    # Save queries with multiple results for later evaluation
+                    textsearch_results_candidates.append(textsearch_results)
+
+        # Consider all candidates and find best one
+        for textsearch_results in textsearch_results_candidates:
+            for textsearch_result in textsearch_results:
+                location_info = cls.construct_location_info_async(textsearch_result).get_result()
+                score = cls.compute_event_location_score(event, location_info)
+                # print location_info
+                if score == 1:
+                    return location_info
+                elif score > best_score:
+                    best_score = score
+                    best_location_info = location_info
+
+        return best_location_info
+
+    @classmethod
+    def compute_event_location_score(cls, event, location_info):
+        """
+        Score for correctness. 1.0 is perfect.
+        Not checking for absolute equality in case of existing data errors.
+        Check with both long and short names
+        """
+        # score = SequenceMatcher(None, location_info['name'], event.venue).ratio()
+        # print '\n\n', score, '!!!!!!!!!!!!!!!!', '\n\n'
+        # if score > 0.5:
+        #     score = 1
+        # return score
+        max_score = 5.0
+        score = 0.0
+        if event.country:
+            score += max(
+                SequenceMatcher(None, location_info.get('country', ''), event.country).ratio(),
+                SequenceMatcher(None, location_info.get('country_short', ''), event.country).ratio())
+            # print score
+        if event.state_prov:
+            score += max(
+                SequenceMatcher(None, location_info.get('state_prov', ''), event.state_prov).ratio(),
+                SequenceMatcher(None, location_info.get('state_prov_short', ''), event.state_prov).ratio())
+            # print score
+        if event.city:
+            score += SequenceMatcher(None, location_info.get('city', ''), event.city).ratio()
+            # print score
+        if event.postalcode:
+            score += SequenceMatcher(None, location_info.get('postal_code', ''), event.postalcode).ratio()
+            # print score
+        if event.venue:
+            venue_score = SequenceMatcher(None, location_info.get('name', ''), event.venue).ratio()
+            # print venue_score, '!!!!!!!!!!!'
+            score += venue_score * 3
+
+        # if event.country and location_info.get('country', '') and \
+        #         (event.country.lower() in location_info['country'].lower() or
+        #         location_info['country'].lower() in event.country.lower() or
+        #         event.country.lower() in location_info['country_short'].lower() or
+        #         location_info['country_short'].lower() in event.country.lower()):
+        #     score += 1
+        #     print 1
+        # if event.state_prov and location_info.get('state_prov', '') and \
+        #         (event.state_prov.lower() in location_info['state_prov'].lower() or
+        #         location_info['state_prov'].lower() in event.state_prov.lower() or
+        #         event.state_prov.lower() in location_info['state_prov_short'].lower() or
+        #         location_info['state_prov_short'].lower() in event.state_prov.lower()):
+        #     score += 1
+        #     print 2
+        # if event.city and location_info.get('city', '') and \
+        #         (event.city.lower() in location_info['city'].lower() or
+        #         location_info['city'].lower() in event.city.lower()):
+        #     score += 1
+        #     print 3
+        # if event.postalcode and location_info.get('postal_code', '') and \
+        #         (event.postalcode.lower() in location_info['postal_code'].lower() or
+        #         location_info['postal_code'].lower() in event.postalcode.lower()):
+        #     score += 1
+        #     print 4
+        # if event.venue and location_info.get('name', ''):
+        #     ratio = SequenceMatcher(None, location_info['name'], event.venue).ratio()
+        #     if ratio > 0.50:
+        #         # Likely; bump score by up to 3
+        #         score += 3 * ratio
+        #        print 5, ratio
+
+        # print score
+        return min(1.0, score / max_score)
 
     @classmethod
     def update_team_location(cls, team):
@@ -63,7 +198,7 @@ class LocationHelper(object):
         """
         Search for different combinations of team name (which should include
         high school or title sponsor) with city, state_prov, postalcode, and country
-        in attempt to find the correct place associated with the team.
+        in attempt to find the correct location associated with the team.
         """
         if not team.location:
             return {}
@@ -177,6 +312,7 @@ class LocationHelper(object):
                 (team.postalcode.lower() in location_info['postal_code'].lower() or
                 location_info['postal_code'].lower() in team.postalcode.lower()):
             # If postal code is right and anything else is right, the confidence is very high
+            # Bump to over 0.5
             score += 3
         return min(1.0, score / max_score)
 
@@ -192,7 +328,7 @@ class LocationHelper(object):
             'lng': textsearch_result['geometry']['location']['lng'],
             'name': textsearch_result['name'],
         }
-        geocode_results = yield cls.google_maps_geocode_async(textsearch_result['formatted_address'])
+        geocode_results = yield cls.google_maps_geocode_async(textsearch_result['place_id'])
         if geocode_results:
             for component in geocode_results[0]['address_components']:
                 if 'street_number' in component['types']:
@@ -210,9 +346,9 @@ class LocationHelper(object):
                 elif 'postal_code' in component['types']:
                     location_info['postal_code'] = component['long_name']
 
-            location_info['formatted_address'] = geocode_results[0]['formatted_address']
-            location_info['lat'] = geocode_results[0]['geometry']['location']['lat']
-            location_info['lng'] = geocode_results[0]['geometry']['location']['lng']
+            # location_info['formatted_address'] = geocode_results[0]['formatted_address']
+            # location_info['lat'] = geocode_results[0]['geometry']['location']['lat']
+            # location_info['lng'] = geocode_results[0]['geometry']['location']['lng']
             # location_info['location_type'] = geocode_results[0]['geometry']['location_type']
 
         raise ndb.Return(location_info)
@@ -251,6 +387,7 @@ class LocationHelper(object):
                             logging.info('No textsearch results for query: {}'.format(query))
                         elif textsearch_dict['status'] == 'OK':
                             results = textsearch_dict['results']
+                            # print results
                         else:
                             logging.warning('Textsearch failed!')
                             logging.warning(textsearch_dict)
@@ -267,47 +404,46 @@ class LocationHelper(object):
 
     @classmethod
     @ndb.tasklet
-    def google_maps_geocode_async(cls, address):
+    def google_maps_geocode_async(cls, place_id):
         """
         https://developers.google.com/maps/documentation/geocoding/start
         """
         results = None
-        if address:
-            cache_key = u'google_maps_geocode:{}'.format(address.encode('ascii', 'ignore'))
-            address = address.encode('utf-8')
-            results = memcache.get(cache_key)
-            if not results:
-                geocode_params = {
-                    'address': address,
-                    'sensor': 'false',
-                }
-                if GOOGLE_API_KEY:
-                    geocode_params['key'] = GOOGLE_API_KEY
-                geocode_url = 'https://maps.googleapis.com/maps/api/geocode/json?%s' % urllib.urlencode(geocode_params)
-                try:
-                    # Make async urlfetch call
-                    rpc = urlfetch.create_rpc()
-                    urlfetch.make_fetch_call(rpc, geocode_url)
-                    geocode_result = yield rpc
+        cache_key = u'google_maps_geocode:{}'.format(place_id)
+        results = memcache.get(cache_key)
+        if not results:
+            geocode_params = {
+                'place_id': place_id,
+                'sensor': 'false',
+            }
+            if GOOGLE_API_KEY:
+                geocode_params['key'] = GOOGLE_API_KEY
+            geocode_url = 'https://maps.googleapis.com/maps/api/geocode/json?%s' % urllib.urlencode(geocode_params)
+            try:
+                # Make async urlfetch call
+                rpc = urlfetch.create_rpc()
+                urlfetch.make_fetch_call(rpc, geocode_url)
+                geocode_result = yield rpc
 
-                    # Parse urlfetch call
-                    if geocode_result.status_code == 200:
-                        geocode_dict = json.loads(geocode_result.content)
-                        if geocode_dict['status'] == 'ZERO_RESULTS':
-                            logging.info('No geocode results for address: {}'.format(address))
-                        elif geocode_dict['status'] == 'OK':
-                            results = geocode_dict['results']
-                        else:
-                            logging.warning('Geocoding failed!')
-                            logging.warning(geocode_dict)
+                # Parse urlfetch call
+                if geocode_result.status_code == 200:
+                    geocode_dict = json.loads(geocode_result.content)
+                    if geocode_dict['status'] == 'ZERO_RESULTS':
+                        logging.info('No geocode results for place_id: {}'.format(place_id))
+                    elif geocode_dict['status'] == 'OK':
+                        results = geocode_dict['results']
+                        # print results
                     else:
-                        logging.warning('Geocoding failed with url {}.'.format(geocode_url))
-                except Exception, e:
-                    logging.warning('urlfetch for geocode request failed with url {}.'.format(geocode_url))
-                    logging.warning(e)
+                        logging.warning('Geocoding failed!')
+                        logging.warning(geocode_dict)
+                else:
+                    logging.warning('Geocoding failed with url {}.'.format(geocode_url))
+            except Exception, e:
+                logging.warning('urlfetch for geocode request failed with url {}.'.format(geocode_url))
+                logging.warning(e)
 
-                if tba_config.CONFIG['memcache']:
-                    memcache.set(cache_key, result)
+            if tba_config.CONFIG['memcache']:
+                memcache.set(cache_key, result)
         raise ndb.Return(results)
 
     @classmethod
