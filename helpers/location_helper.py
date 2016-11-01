@@ -109,18 +109,18 @@ class LocationHelper(object):
         score = 0.0
         if event.country:
             score += max(
-                SequenceMatcher(None, location_info.get('country', ''), event.country).ratio(),
-                SequenceMatcher(None, location_info.get('country_short', ''), event.country).ratio())
+                SequenceMatcher(None, location_info.get('country', '').lower(), event.country.lower()).ratio(),
+                SequenceMatcher(None, location_info.get('country_short', '').lower(), event.country.lower()).ratio())
         if event.state_prov:
             score += max(
-                SequenceMatcher(None, location_info.get('state_prov', ''), event.state_prov).ratio(),
-                SequenceMatcher(None, location_info.get('state_prov_short', ''), event.state_prov).ratio())
+                SequenceMatcher(None, location_info.get('state_prov', '').lower(), event.state_prov.lower()).ratio(),
+                SequenceMatcher(None, location_info.get('state_prov_short', '').lower(), event.state_prov.lower()).ratio())
         if event.city:
-            score += SequenceMatcher(None, location_info.get('city', ''), event.city).ratio()
+            score += SequenceMatcher(None, location_info.get('city', '').lower(), event.city.lower()).ratio()
         if event.postalcode:
-            score += SequenceMatcher(None, location_info.get('postal_code', ''), event.postalcode).ratio()
+            score += SequenceMatcher(None, location_info.get('postal_code', '').lower(), event.postalcode.lower()).ratio()
         if event.venue:
-            venue_score = SequenceMatcher(None, location_info.get('name', ''), event.venue).ratio()
+            venue_score = SequenceMatcher(None, location_info.get('name', '').lower(), event.venue.lower()).ratio()
             score += venue_score * 3
 
         return min(1.0, score / max_score)
@@ -204,7 +204,7 @@ class LocationHelper(object):
                     textsearch_results_candidates.append(textsearch_results)
 
         # Check if we have found anything reasonable
-        if best_location_info and best_score > 0.5:
+        if best_location_info and best_score > 0.75:
             return best_location_info
 
         # Try to find place using only location
@@ -247,17 +247,16 @@ class LocationHelper(object):
         score = 0.0
         if team.country:
             score += max(
-                SequenceMatcher(None, location_info.get('country', ''), team.country).ratio(),
-                SequenceMatcher(None, location_info.get('country_short', ''), team.country).ratio())
+                SequenceMatcher(None, location_info.get('country', '').lower(), team.country.lower()).ratio(),
+                SequenceMatcher(None, location_info.get('country_short', '').lower(), team.country.lower()).ratio())
         if team.state_prov:
             score += max(
-                SequenceMatcher(None, location_info.get('state_prov', ''), team.state_prov).ratio(),
-                SequenceMatcher(None, location_info.get('state_prov_short', ''), team.state_prov).ratio())
+                SequenceMatcher(None, location_info.get('state_prov', '').lower(), team.state_prov.lower()).ratio(),
+                SequenceMatcher(None, location_info.get('state_prov_short', '').lower(), team.state_prov.lower()).ratio())
         if team.city:
-            score += SequenceMatcher(None, location_info.get('city', ''), team.city).ratio()
+            score += SequenceMatcher(None, location_info.get('city', '').lower().lower(), team.city.lower()).ratio()
         if team.postalcode:
-            score += SequenceMatcher(None, location_info.get('postal_code', ''), team.postalcode).ratio()
-
+            score += SequenceMatcher(None, location_info.get('postal_code', '').lower(), team.postalcode.lower()).ratio()
         return min(1.0, score / max_score)
 
     @classmethod
@@ -341,7 +340,7 @@ class LocationHelper(object):
                     logging.warning(e)
 
                 if tba_config.CONFIG['memcache']:
-                    memcache.set(cache_key, result)
+                    memcache.set(cache_key, results)
         raise ndb.Return(results)
 
     @classmethod
@@ -383,7 +382,7 @@ class LocationHelper(object):
                 logging.warning(e)
 
             if tba_config.CONFIG['memcache']:
-                memcache.set(cache_key, result)
+                memcache.set(cache_key, results)
         raise ndb.Return(results)
 
     @classmethod
