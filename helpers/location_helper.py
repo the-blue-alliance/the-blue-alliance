@@ -64,8 +64,6 @@ class LocationHelper(object):
                 if query not in possible_queries:
                     possible_queries.append(query)
 
-        # print possible_queries
-
         # Try to find place based on possible queries
         best_score = 0
         best_location_info = {}
@@ -75,8 +73,6 @@ class LocationHelper(object):
             if textsearch_results:
                 if len(textsearch_results) == 1:
                     location_info = cls.construct_location_info_async(textsearch_results[0]).get_result()
-                    # print query
-                    # print location_info
                     score = cls.compute_event_location_score(event, location_info)
                     if score == 1:
                         # Very likely to be correct if only 1 result and as a perfect score
@@ -94,7 +90,6 @@ class LocationHelper(object):
             for textsearch_result in textsearch_results:
                 location_info = cls.construct_location_info_async(textsearch_result).get_result()
                 score = cls.compute_event_location_score(event, location_info)
-                # print location_info
                 if score == 1:
                     return location_info
                 elif score > best_score:
@@ -110,66 +105,24 @@ class LocationHelper(object):
         Not checking for absolute equality in case of existing data errors.
         Check with both long and short names
         """
-        # score = SequenceMatcher(None, location_info['name'], event.venue).ratio()
-        # print '\n\n', score, '!!!!!!!!!!!!!!!!', '\n\n'
-        # if score > 0.5:
-        #     score = 1
-        # return score
         max_score = 5.0
         score = 0.0
         if event.country:
             score += max(
                 SequenceMatcher(None, location_info.get('country', ''), event.country).ratio(),
                 SequenceMatcher(None, location_info.get('country_short', ''), event.country).ratio())
-            # print score
         if event.state_prov:
             score += max(
                 SequenceMatcher(None, location_info.get('state_prov', ''), event.state_prov).ratio(),
                 SequenceMatcher(None, location_info.get('state_prov_short', ''), event.state_prov).ratio())
-            # print score
         if event.city:
             score += SequenceMatcher(None, location_info.get('city', ''), event.city).ratio()
-            # print score
         if event.postalcode:
             score += SequenceMatcher(None, location_info.get('postal_code', ''), event.postalcode).ratio()
-            # print score
         if event.venue:
             venue_score = SequenceMatcher(None, location_info.get('name', ''), event.venue).ratio()
-            # print venue_score, '!!!!!!!!!!!'
             score += venue_score * 3
 
-        # if event.country and location_info.get('country', '') and \
-        #         (event.country.lower() in location_info['country'].lower() or
-        #         location_info['country'].lower() in event.country.lower() or
-        #         event.country.lower() in location_info['country_short'].lower() or
-        #         location_info['country_short'].lower() in event.country.lower()):
-        #     score += 1
-        #     print 1
-        # if event.state_prov and location_info.get('state_prov', '') and \
-        #         (event.state_prov.lower() in location_info['state_prov'].lower() or
-        #         location_info['state_prov'].lower() in event.state_prov.lower() or
-        #         event.state_prov.lower() in location_info['state_prov_short'].lower() or
-        #         location_info['state_prov_short'].lower() in event.state_prov.lower()):
-        #     score += 1
-        #     print 2
-        # if event.city and location_info.get('city', '') and \
-        #         (event.city.lower() in location_info['city'].lower() or
-        #         location_info['city'].lower() in event.city.lower()):
-        #     score += 1
-        #     print 3
-        # if event.postalcode and location_info.get('postal_code', '') and \
-        #         (event.postalcode.lower() in location_info['postal_code'].lower() or
-        #         location_info['postal_code'].lower() in event.postalcode.lower()):
-        #     score += 1
-        #     print 4
-        # if event.venue and location_info.get('name', ''):
-        #     ratio = SequenceMatcher(None, location_info['name'], event.venue).ratio()
-        #     if ratio > 0.50:
-        #         # Likely; bump score by up to 3
-        #         score += 3 * ratio
-        #        print 5, ratio
-
-        # print score
         return min(1.0, score / max_score)
 
     @classmethod
@@ -376,9 +329,8 @@ class LocationHelper(object):
                 textsearch_url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?%s' % urllib.urlencode(textsearch_params)
                 try:
                     # Make async urlfetch call
-                    rpc = urlfetch.create_rpc()
-                    urlfetch.make_fetch_call(rpc, textsearch_url)
-                    textsearch_result = yield rpc
+                    context = ndb.get_context()
+                    textsearch_result = yield context.urlfetch(textsearch_url)
 
                     # Parse urlfetch result
                     if textsearch_result.status_code == 200:
@@ -387,7 +339,6 @@ class LocationHelper(object):
                             logging.info('No textsearch results for query: {}'.format(query))
                         elif textsearch_dict['status'] == 'OK':
                             results = textsearch_dict['results']
-                            # print results
                         else:
                             logging.warning('Textsearch failed!')
                             logging.warning(textsearch_dict)
@@ -421,9 +372,8 @@ class LocationHelper(object):
             geocode_url = 'https://maps.googleapis.com/maps/api/geocode/json?%s' % urllib.urlencode(geocode_params)
             try:
                 # Make async urlfetch call
-                rpc = urlfetch.create_rpc()
-                urlfetch.make_fetch_call(rpc, geocode_url)
-                geocode_result = yield rpc
+                context = ndb.get_context()
+                geocode_result = yield context.urlfetch(geocode_url)
 
                 # Parse urlfetch call
                 if geocode_result.status_code == 200:
@@ -432,7 +382,6 @@ class LocationHelper(object):
                         logging.info('No geocode results for place_id: {}'.format(place_id))
                     elif geocode_dict['status'] == 'OK':
                         results = geocode_dict['results']
-                        # print results
                     else:
                         logging.warning('Geocoding failed!')
                         logging.warning(geocode_dict)
