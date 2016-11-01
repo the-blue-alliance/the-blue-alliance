@@ -16,3 +16,7 @@ class Location(ndb.Model):
     country = ndb.StringProperty()  # Like "United States"
     country_short = ndb.StringProperty()  # Like "US"
     postal_code = ndb.StringProperty()  # String because it can be like "95126-1215"
+
+    # Google Maps stuff
+    place_id = ndb.StringProperty()  # Google Maps place ID
+    place_details = ndb.JsonProperty()  # Entire Place Details result from Google in case it comes in handy

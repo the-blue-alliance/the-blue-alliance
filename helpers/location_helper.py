@@ -144,6 +144,8 @@ class LocationHelper(object):
             country=location_info.get('country', None),
             country_short=location_info.get('country_short', None),
             postal_code=location_info.get('postal_code', None),
+            place_id=location_info.get('place_id', None),
+            place_details=location_info.get('place_details', None),
         )
 
     @classmethod
@@ -266,14 +268,15 @@ class LocationHelper(object):
         Gets location info given a textsearch result
         """
         location_info = {
+            'place_id': textsearch_result['place_id'],
             'formatted_address': textsearch_result['formatted_address'],
             'lat': textsearch_result['geometry']['location']['lat'],
             'lng': textsearch_result['geometry']['location']['lng'],
             'name': textsearch_result['name'],
         }
-        geocode_results = yield cls.google_maps_geocode_async(textsearch_result['place_id'])
-        if geocode_results:
-            for component in geocode_results[0]['address_components']:
+        place_details_result = yield cls.google_maps_place_details_async(textsearch_result['place_id'])
+        if place_details_result:
+            for component in place_details_result['address_components']:
                 if 'street_number' in component['types']:
                     location_info['street_number'] = component['long_name']
                 elif 'route' in component['types']:
@@ -289,10 +292,7 @@ class LocationHelper(object):
                 elif 'postal_code' in component['types']:
                     location_info['postal_code'] = component['long_name']
 
-            # location_info['formatted_address'] = geocode_results[0]['formatted_address']
-            # location_info['lat'] = geocode_results[0]['geometry']['location']['lat']
-            # location_info['lng'] = geocode_results[0]['geometry']['location']['lng']
-            # location_info['location_type'] = geocode_results[0]['geometry']['location_type']
+            location_info['place_details'] = place_details_result
 
         raise ndb.Return(location_info)
 
@@ -345,40 +345,42 @@ class LocationHelper(object):
 
     @classmethod
     @ndb.tasklet
-    def google_maps_geocode_async(cls, place_id):
+    def google_maps_place_details_async(cls, place_id):
         """
-        https://developers.google.com/maps/documentation/geocoding/start
+        https://developers.google.com/places/web-service/details#PlaceDetailsRequests
         """
+        if not GOOGLE_API_KEY:
+            logging.warning("Must have sitevar google.api_key to use Google Maps PlaceDetails")
+            raise ndb.Return(None)
+
         results = None
-        cache_key = u'google_maps_geocode:{}'.format(place_id)
+        cache_key = u'google_maps_place_details:{}'.format(place_id)
         results = memcache.get(cache_key)
         if not results:
-            geocode_params = {
-                'place_id': place_id,
-                'sensor': 'false',
+            place_details_params = {
+                'placeid': place_id,
+                'key': GOOGLE_API_KEY,
             }
-            if GOOGLE_API_KEY:
-                geocode_params['key'] = GOOGLE_API_KEY
-            geocode_url = 'https://maps.googleapis.com/maps/api/geocode/json?%s' % urllib.urlencode(geocode_params)
+            place_details_url = 'https://maps.googleapis.com/maps/api/place/details/json?%s' % urllib.urlencode(place_details_params)
             try:
                 # Make async urlfetch call
                 context = ndb.get_context()
-                geocode_result = yield context.urlfetch(geocode_url)
+                place_details_result = yield context.urlfetch(place_details_url)
 
                 # Parse urlfetch call
-                if geocode_result.status_code == 200:
-                    geocode_dict = json.loads(geocode_result.content)
-                    if geocode_dict['status'] == 'ZERO_RESULTS':
-                        logging.info('No geocode results for place_id: {}'.format(place_id))
-                    elif geocode_dict['status'] == 'OK':
-                        results = geocode_dict['results']
+                if place_details_result.status_code == 200:
+                    place_details_dict = json.loads(place_details_result.content)
+                    if place_details_dict['status'] == 'ZERO_RESULTS':
+                        logging.info('No place_details results for place_id: {}'.format(place_id))
+                    elif place_details_dict['status'] == 'OK':
+                        results = place_details_dict['result']
                     else:
-                        logging.warning('Geocoding failed!')
-                        logging.warning(geocode_dict)
+                        logging.warning('Placedetails failed!')
+                        logging.warning(place_details_dict)
                 else:
-                    logging.warning('Geocoding failed with url {}.'.format(geocode_url))
+                    logging.warning('Placedetails failed with url {}.'.format(place_details_url))
             except Exception, e:
-                logging.warning('urlfetch for geocode request failed with url {}.'.format(geocode_url))
+                logging.warning('urlfetch for place_details request failed with url {}.'.format(place_details_url))
                 logging.warning(e)
 
             if tba_config.CONFIG['memcache']:
