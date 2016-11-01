@@ -245,28 +245,19 @@ class LocationHelper(object):
         """
         max_score = 4.0
         score = 0.0
-        if team.country and location_info.get('country', None) and \
-                (team.country.lower() in location_info['country'].lower() or
-                location_info['country'].lower() in team.country.lower() or
-                team.country.lower() in location_info['country_short'].lower() or
-                location_info['country_short'].lower() in team.country.lower()):
-            score += 1
-        if team.state_prov and location_info.get('state_prov', None) and \
-                (team.state_prov.lower() in location_info['state_prov'].lower() or
-                location_info['state_prov'].lower() in team.state_prov.lower() or
-                team.state_prov.lower() in location_info['state_prov_short'].lower() or
-                location_info['state_prov_short'].lower() in team.state_prov.lower()):
-            score += 1
-        if team.city and location_info.get('city', None) and \
-                (team.city.lower() in location_info['city'].lower() or
-                location_info['city'].lower() in team.city.lower()):
-            score += 1
-        if team.postalcode and location_info.get('postal_code', None) and \
-                (team.postalcode.lower() in location_info['postal_code'].lower() or
-                location_info['postal_code'].lower() in team.postalcode.lower()):
-            # If postal code is right and anything else is right, the confidence is very high
-            # Bump to over 0.5
-            score += 3
+        if team.country:
+            score += max(
+                SequenceMatcher(None, location_info.get('country', ''), team.country).ratio(),
+                SequenceMatcher(None, location_info.get('country_short', ''), team.country).ratio())
+        if team.state_prov:
+            score += max(
+                SequenceMatcher(None, location_info.get('state_prov', ''), team.state_prov).ratio(),
+                SequenceMatcher(None, location_info.get('state_prov_short', ''), team.state_prov).ratio())
+        if team.city:
+            score += SequenceMatcher(None, location_info.get('city', ''), team.city).ratio()
+        if team.postalcode:
+            score += SequenceMatcher(None, location_info.get('postal_code', ''), team.postalcode).ratio()
+
         return min(1.0, score / max_score)
 
     @classmethod
