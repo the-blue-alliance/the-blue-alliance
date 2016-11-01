@@ -3,7 +3,7 @@ import re
 
 from google.appengine.ext import ndb
 from helpers.champ_split_helper import ChampSplitHelper
-from helpers.location_helper import LocationHelper
+from models.location import Location
 
 
 class Team(ndb.Model):
@@ -14,10 +14,15 @@ class Team(ndb.Model):
     team_number = ndb.IntegerProperty(required=True)
     name = ndb.TextProperty(indexed=False)
     nickname = ndb.StringProperty(indexed=False)
+
+    # city, state_prov, country, and postalcode are from FIRST
     city = ndb.StringProperty()  # Equivalent to locality. From FRCAPI
     state_prov = ndb.StringProperty()  # Equivalent to region. From FRCAPI
     country = ndb.StringProperty()  # From FRCAPI
     postalcode = ndb.StringProperty()  # From ElasticSearch only. String because it can be like "95126-1215"
+    # Normalized address from the Google Maps API, constructed using the above
+    normalized_location = ndb.StructuredProperty(Location)
+
     website = ndb.StringProperty(indexed=False)
     first_tpid = ndb.IntegerProperty()  # from USFIRST. FIRST team ID number. -greg 5/20/2010
     first_tpid_year = ndb.IntegerProperty()  # from USFIRST. Year tpid is applicable for. -greg 9 Jan 2011
@@ -39,9 +44,6 @@ class Team(ndb.Model):
     @property
     def championship_location(self):
         return ChampSplitHelper.get_champ(self)
-
-    def get_lat_lon(self):
-        return LocationHelper.get_team_lat_lon(self)
 
     @property
     def location(self):

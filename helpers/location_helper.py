@@ -7,8 +7,9 @@ import urllib
 from google.appengine.api import memcache, urlfetch
 from google.appengine.ext import ndb
 
+from models.location import Location
 from models.sitevar import Sitevar
-
+from models.team import Team
 
 GOOGLE_SECRETS = Sitevar.get_by_id("google.secrets")
 GOOGLE_API_KEY = None
@@ -36,36 +37,26 @@ class LocationHelper(object):
     #         logging.warning("Finding Lat/Lon for event {} failed!".format(event.key_name))
     #     return lat_lon
 
-    # @classmethod
-    # def get_team_lat_lon(cls, team):
-    #     """
-    #     Try different combinations of team name (which should include high
-    #     school or main sponsor) and team location to get latitude and longitude
-    #     for a team
-    #     """
-    #     if team.name:
-    #         split_name = re.split('/|&', team.name)  # Guessing sponsors/school by splitting name by '/' or '&'
-    #     else:
-    #         split_name = None
-
-    #     best_lat_lon = None
-    #     least_num_results = float('inf')
-    #     if split_name:
-    #         futures = []
-    #         for possible_location in [split_name[-1], split_name[0]]:
-    #             # Try to locate team. Usually first or last entries are best candidates, with last being the priority
-    #             futures.append(cls.get_lat_lon_async(u'{} {}'.format(possible_location, team.location)))
-
-    #         for future in futures:
-    #             lat_lon, num_results = future.get_result()
-    #             if lat_lon and num_results < least_num_results:  # Fewer results is less ambiguous and more likely to be correct
-    #                 best_lat_lon = lat_lon
-    #                 least_num_results = num_results
-    #     if not best_lat_lon:
-    #         best_lat_lon, _ = cls.get_lat_lon(team.location)
-    #     if not best_lat_lon:
-    #         logging.warning("Finding Lat/Lon for team {} failed!".format(team.key.id()))
-    #     return best_lat_lon
+    @classmethod
+    def update_team_location(cls, team):
+        location_info = cls.get_team_location_info(team)
+        if 'lat' in location_info and 'lng' in location_info:
+            lat_lng = ndb.GeoPt(location_info['lat'], location_info['lng'])
+        else:
+            lat_lng = None
+        team.normalized_location = Location(
+            name=location_info.get('name', None),
+            formatted_address=location_info.get('formatted_address', None),
+            lat_lng=lat_lng,
+            street_number=location_info.get('street_number', None),
+            street=location_info.get('street', None),
+            city=location_info.get('city', None),
+            state_prov=location_info.get('state_prov', None),
+            state_prov_short=location_info.get('state_prov_short', None),
+            country=location_info.get('country', None),
+            country_short=location_info.get('country_short', None),
+            postal_code=location_info.get('postal_code', None),
+        )
 
     @classmethod
     def get_team_location_info(cls, team):
@@ -172,26 +163,21 @@ class LocationHelper(object):
                 team.country.lower() in location_info['country_short'].lower() or
                 location_info['country_short'].lower() in team.country.lower()):
             score += 1
-            print 1
         if team.state_prov and location_info.get('state_prov', None) and \
                 (team.state_prov.lower() in location_info['state_prov'].lower() or
                 location_info['state_prov'].lower() in team.state_prov.lower() or
                 team.state_prov.lower() in location_info['state_prov_short'].lower() or
                 location_info['state_prov_short'].lower() in team.state_prov.lower()):
             score += 1
-            print 2
         if team.city and location_info.get('city', None) and \
                 (team.city.lower() in location_info['city'].lower() or
                 location_info['city'].lower() in team.city.lower()):
             score += 1
-            print 3
         if team.postalcode and location_info.get('postal_code', None) and \
                 (team.postalcode.lower() in location_info['postal_code'].lower() or
                 location_info['postal_code'].lower() in team.postalcode.lower()):
             # If postal code is right and anything else is right, the confidence is very high
             score += 3
-            print 4
-        print score
         return min(1.0, score / max_score)
 
     @classmethod
@@ -227,7 +213,7 @@ class LocationHelper(object):
             location_info['formatted_address'] = geocode_results[0]['formatted_address']
             location_info['lat'] = geocode_results[0]['geometry']['location']['lat']
             location_info['lng'] = geocode_results[0]['geometry']['location']['lng']
-            location_info['location_type'] = geocode_results[0]['geometry']['location_type']
+            # location_info['location_type'] = geocode_results[0]['geometry']['location_type']
 
         raise ndb.Return(location_info)
 
@@ -237,7 +223,6 @@ class LocationHelper(object):
         """
         https://developers.google.com/places/web-service/search#TextSearchRequests
         """
-        print "TEXTSEARCH " + query.encode('ascii', 'ignore')
         if not GOOGLE_API_KEY:
             logging.warning("Must have sitevar google.api_key to use Google Maps Textsearch")
             raise ndb.Return(None)
@@ -286,7 +271,6 @@ class LocationHelper(object):
         """
         https://developers.google.com/maps/documentation/geocoding/start
         """
-        print "GEOCODE " + address.encode('ascii', 'ignore')
         results = None
         if address:
             cache_key = u'google_maps_geocode:{}'.format(address.encode('ascii', 'ignore'))
