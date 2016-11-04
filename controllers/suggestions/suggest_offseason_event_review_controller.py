@@ -36,9 +36,15 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
         suggestion = Suggestion.get_by_id(int(self.request.get("suggestion_id")))
         verdict = self.request.get("verdict")
         if verdict == "accept":
-            if not self.request.get("event_short", None):
+            event_id = self.request.get("event_short", None)
+            event_key = str(self.request.get("year")) + str.lower(str(self.request.get("event_short")))
+            if not event_id:
                 # Need to supply a key :(
                 self.redirect("/suggest/offseason/review?success=missing_key")
+                return
+            if not Event.validate_key_name(event_key):
+                # Bad event key generated
+                self.redirect("/suggest/offseason/review?success=bad_key")
                 return
 
             start_date = None
@@ -50,7 +56,7 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
                 end_date = datetime.strptime(self.request.get("end_date"), "%Y-%m-%d")
 
             event = Event(
-                id=str(self.request.get("year")) + str.lower(str(self.request.get("event_short"))),
+                id=event_key,
                 end_date=end_date,
                 event_short=self.request.get("event_short"),
                 event_type_enum=EventType.OFFSEASON,
