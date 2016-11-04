@@ -7,7 +7,8 @@ import tba_config
 from controllers.admin.admin_api_controller import AdminApiAuthAdd, AdminApiAuthDelete, AdminApiAuthEdit, AdminApiAuthManage
 from controllers.admin.admin_apistatus_controller import AdminApiStatus
 from controllers.admin.admin_authkeys_controller import AdminAuthKeys
-from controllers.admin.admin_event_controller import AdminEventAddAllianceSelections, AdminEventDeleteTeams, AdminEventAddTeams, AdminEventRemapTeams, AdminEventAddWebcast, AdminEventCreate, AdminEventCreateTest, AdminEventDelete, AdminEventDetail, AdminEventEdit, AdminEventList
+from controllers.admin.admin_event_controller import AdminEventAddAllianceSelections, AdminEventDeleteTeams, AdminEventAddTeams, AdminEventRemapTeams, AdminEventAddWebcast, AdminEventCreate, AdminEventCreateTest, AdminEventDelete, AdminEventDetail, AdminEventEdit, AdminEventList, \
+    AdminAddAllianceBackup
 from controllers.admin.admin_main_controller import AdminDebugHandler, AdminMain, AdminTasksHandler
 from controllers.admin.admin_award_controller import AdminAwardDashboard, AdminAwardEdit, AdminAwardAdd
 from controllers.admin.admin_match_controller import AdminVideosAdd, AdminMatchCleanup, AdminMatchDashboard, AdminMatchDelete, AdminMatchDetail, AdminMatchAdd, AdminMatchEdit
@@ -35,6 +36,7 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/debug', AdminDebugHandler),
                                ('/admin/events', AdminEventList),
                                ('/admin/events/([0-9]*)', AdminEventList),
+                               ('/admin/event/add_alliance_backup/(.*)', AdminAddAllianceBackup),
                                ('/admin/event/add_alliance_selections/(.*)', AdminEventAddAllianceSelections),
                                ('/admin/event/add_teams/(.*)', AdminEventAddTeams),
                                ('/admin/event/delete_teams/(.*)', AdminEventDeleteTeams),
