@@ -136,11 +136,8 @@ TBA Admins
 """.format(self.user_bundle.account.display_name, self.user_bundle.account.email, message)
 
         # Notify the user their keys are available
-        sender = "keys@{}.appspotmail.com".format(app_identity.get_application_id())
-        reply_to = sender if tba_config.DEBUG else "contact@thebluealliance.com"
         if email_body:
-            mail.send_mail(sender=sender,
-                           reply_to=reply_to,
+            mail.send_mail(sender="The Blue Alliance Contact <contact@thebluealliance.com>",
                            to=user.email,
                            subject="The Blue Alliance Auth Tokens for {}".format(event_key),
                            body=email_body)
