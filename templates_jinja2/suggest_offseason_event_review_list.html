@@ -28,6 +28,13 @@
       <h4>Rejected event!</h4>
     </div>
   </div>
+  {% elif success == "bad_key" %}
+  <div class="row">
+    <div class="alert alert-warning">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <h4>You must enter a valid event short, used to generate the key (only letters and numbers allowed)!</h4>
+    </div>
+  </div>
   {% elif success == "missing_key" %}
   <div class="row">
     <div class="alert alert-warning">
