@@ -1218,6 +1218,7 @@ definitions:
     type: object
     required:
     - current_season
+    - current_season_week
     - max_season
     - is_datafeed_down
     - down_events
@@ -1227,6 +1228,9 @@ definitions:
       current_season:
         type: integer
         description: Year of the current FRC season.
+      current_season_week:
+        type: string
+        description: Current week of the current FRC competition season, 99 for offseason.
       max_season:
         type: integer
         description: Maximum FRC season year for valid queries.
