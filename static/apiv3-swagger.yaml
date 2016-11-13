@@ -104,6 +104,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
 
   # Team-oriented paths
   /teams/{page_num}:
@@ -139,6 +141,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
 
   # Simple (non-full) responses need a separate path definition.
   # See also https://github.com/OAI/OpenAPI-Specification/issues/270
@@ -175,6 +179,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /teams/{page_num}/keys:
     get:
       tags:
@@ -208,6 +214,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /teams/{year}/{page_num}:
     get:
       tags:
@@ -243,6 +251,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /teams/{year}/{page_num}/simple:
     get:
       tags:
@@ -278,6 +288,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
 
   /teams/{year}/{page_num}/keys:
     get:
@@ -315,6 +327,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /team/{team_key}:
     get:
       tags:
@@ -345,6 +359,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /team/{team_key}/simple:
     get:
       tags:
@@ -375,6 +391,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /team/{team_key}/years_participated:
     get:
       tags:
@@ -408,6 +426,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /team/{team_key}/districts:
     get:
       tags:
@@ -448,6 +468,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /team/{team_key}/robots:
     get:
       tags:
@@ -487,6 +509,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /team/{team_key}/events:
     get:
       tags:
@@ -520,6 +544,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /team/{team_key}/events/simple:
     get:
       tags:
@@ -553,6 +579,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /team/{team_key}/events/keys:
     get:
       tags:
@@ -587,6 +615,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /team/{team_key}/events/{year}:
     get:
       tags:
@@ -621,6 +651,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /team/{team_key}/events/{year}/simple:
     get:
       tags:
@@ -655,6 +687,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /team/{team_key}/events/{year}/keys:
     get:
       tags:
@@ -690,6 +724,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /team/{team_key}/event/{event_key}/matches/{match_type}:
     get:
       tags:
@@ -726,6 +762,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /team/{team_key}/event/{event_key}/matches/{match_type}/simple:
     get:
       tags:
@@ -762,6 +800,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /team/{team_key}/event/{event_key}/matches/{match_type}/keys:
     get:
       tags:
@@ -799,6 +839,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /team/{team_key}/event/{event_key}/awards:
     get:
       tags:
@@ -833,6 +875,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /team/{team_key}/event/{event_key}/status:
     get:
       tags:
@@ -865,6 +909,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /team/{team_key}/awards:
     get:
       tags:
@@ -897,6 +943,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /team/{team_key}/awards/{year}:
     get:
       tags:
@@ -930,6 +978,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /team/{team_key}/matches/{year}:
     get:
       tags:
@@ -964,6 +1014,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /team/{team_key}/matches/{year}/simple:
     get:
       tags:
@@ -998,6 +1050,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /team/{team_key}/matches/{year}/keys:
     get:
       tags:
@@ -1033,6 +1087,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /team/{team_key}/media/{year}:
     get:
       tags:
@@ -1066,6 +1122,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /team/{team_key}/social_media:
     get:
       tags:
@@ -1098,6 +1156,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
 
   # Event oriented paths
   /events/{year}:
@@ -1133,6 +1193,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /events/{year}/simple:
     get:
       tags:
@@ -1166,6 +1228,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /events/{year}/keys:
     get:
       tags:
@@ -1200,6 +1264,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /event/{event_key}:
     get:
       tags:
@@ -1229,6 +1295,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /event/{event_key}/simple:
     get:
       tags:
@@ -1258,6 +1326,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /event/{event_key}/elim_alliances:
     get:
       tags:
@@ -1289,6 +1359,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /event/{event_key}/stats:
     get:
       tags:
@@ -1321,6 +1393,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /event/{event_key}/rankings:
     get:
       tags:
@@ -1352,6 +1426,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /event/{event_key}/district_points:
     get:
       tags:
@@ -1384,6 +1460,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /event/{event_key}/teams:
     get:
       tags:
@@ -1419,6 +1497,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /event/{event_key}/teams/simple:
     get:
       tags:
@@ -1454,6 +1534,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /event/{event_key}/teams/keys:
     get:
       tags:
@@ -1490,6 +1572,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /event/{event_key}/matches:
     get:
       tags:
@@ -1523,6 +1607,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /event/{event_key}/matches/simple:
     get:
       tags:
@@ -1556,6 +1642,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /event/{event_key}/matches/keys:
     get:
       tags:
@@ -1590,6 +1678,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /event/{event_key}/awards:
     get:
       tags:
@@ -1622,6 +1712,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
 
   # Match-specific paths
   /match/{match_key}:
@@ -1654,6 +1746,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /match/{match_key}/simple:
     get:
       tags:
@@ -1684,6 +1778,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
 
   # District paths
   /districts/{year}:
@@ -1725,6 +1821,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /district/{district_key}/{year}/events:
     get:
       tags:
@@ -1760,6 +1858,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /district/{district_key}/{year}/events/simple:
     get:
       tags:
@@ -1795,6 +1895,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /district/{district_key}/{year}/events/keys:
     get:
       tags:
@@ -1831,6 +1933,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /district/{district_key}/{year}/teams:
     get:
       tags:
@@ -1867,6 +1971,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /district/{district_key}/{year}/teams/simple:
     get:
       tags:
@@ -1903,6 +2009,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /district/{district_key}/{year}/teams/keys:
     get:
       tags:
@@ -1940,6 +2048,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
   /district/{district_key}/{year}/rankings:
     get:
       tags:
@@ -1975,6 +2085,8 @@ paths:
                 contrins the number of seconds the result should be considered
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
+        304:
+          description: Not Modified - Use Local Cached Value
 
 securityDefinitions:
   # Swagger spec does not allow for a single definition that can be used as
@@ -1993,11 +2105,11 @@ securityDefinitions:
 
 tags:
   -
-    name: team
-    description: Calls that return team or team-specific information.
-  -
     name: list
     description: Calls that return a list of records.
+  -
+    name: team
+    description: Calls that return team or team-specific information.
   -
     name: event
     description: Calls that return event, or event-specific information.
