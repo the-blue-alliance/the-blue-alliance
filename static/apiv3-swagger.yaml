@@ -502,7 +502,24 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Award'
-  ## /team/{team_key}/event/{event_key}/status: TODO -- Not sure what this one is for
+  /team/{team_key}/event/{event_key}/status:
+    get:
+      tags:
+      - team
+      - event
+      description: |
+        Gets the competition rank and status of the team at the given event.
+      parameters:
+        - $ref: '#/parameters/team_key'
+        - $ref: '#/parameters/event_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/Team_Event_Status'
   /team/{team_key}/awards:
     get:
       tags:
@@ -743,7 +760,24 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Elimination_Alliance'
-  #/event/{event_key}/stats: TODO -- What do we want to return here?
+  /event/{event_key}/stats:
+    get:
+      tags:
+      - event
+      description: Gets a list of Stats for the given Event.
+      parameters:
+        - $ref: '#/parameters/event_key'
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: string
+            description: |
+              A year-specific event stat object expressed as a JSON string. See also
+              Event_Stats_2016
   /event/{event_key}/rankings:
     get:
       tags:
@@ -1179,6 +1213,15 @@ definitions:
       name:
         type: string
         description: Official long name registerd with FIRST
+      city:
+        type: string
+        description: City of team derived from parsing the address registered with FIRST
+      state:
+        type: string
+        description: State of team derived from parsing the address registered with FIRST
+      country:
+        type: string
+        description: Country of team derived from parsing the address registered with FIRST
   Team:
     type: object
     allOf:
@@ -1188,18 +1231,6 @@ definitions:
         type: string
         format: url
         description: Official website associatd with the team
-      locality:
-        type: string
-        description: City of team derived from parsing the address registered with FIRST
-      region:
-        type: string
-        description: State of team derived from parsing the address registered with FIRST
-      country_name:
-        type: string
-        description: Country of team derived from parsing the address registered with FIRST
-      location:
-        type: string
-        description: Long form address that includes city, state, and country provided by FIRST
       rookie_year:
         type: integer
         description: First year the team officially competed
@@ -1226,6 +1257,38 @@ definitions:
       event_code:
         type: string
         description: Event short code, as provided by FIRST.
+      event_type:
+        type: string
+        enum:
+        - Regional
+        - District
+        - District Championship
+        - Championship Division
+        - Championship Finals
+        - Offseason
+        - Preseason
+        description: Event Type, eg Regional, District, or Offseason.
+      event_district_key:
+        type: string
+        description: TBA Key for the District the Event is in, may be null.
+      city:
+        type: string
+        description: City of event
+      state:
+        type: string
+        description: State of event
+      country:
+        type: string
+        description: Country of event
+      start_date:
+        type: string
+        description: Event start date in `yyyy-mm-dd` format.
+      end_date:
+        type: string
+        description: Event end date in `yyyy-mm-dd` format.
+      timezone:
+        type: string
+        description: Timezone name
       year:
         type: integer
         description: Year the event data is for.
@@ -1239,17 +1302,6 @@ definitions:
         description: |
           Same as name but doesn't include event specifiers, such as 'Regional'
           or 'District'. May be null.
-      event_type:
-        type: string
-        enum:
-        - Regional
-        - District
-        - District Championship
-        - Championship Division
-        - Championship Finals
-        - Offseason
-        - Preseason
-        description: Event Type, eg Regional, District, or Offseason.
       event_district_name:
         type: string
         enum:
@@ -1264,33 +1316,274 @@ definitions:
         - Ontairo
         - Isreal
         description: Event District
-      event_district_key:
-        type: string
-        description: TBA Key for the District the Event is in, may be null.
       week:
         type: integer
         description: Week of the compeition season this event is in.
-      location:
-        type: string
-        description: Long form address that includes city, and state provided by FIRST
       venue_address:
         type: string
         description: Address of the event's venue, if available. Line breaks included.
-      timezone:
-        type: string
-        description: Timezone name
       website:
         type: string
         description: The event's website, if any.
-      official_fms:
-        type: boolean
-        description: Whether this event uses the FIRST official FMS.
       webcasts:
         type: array
         items:
           $ref: '#/definitions/Webcast'
         description: |
           If the event has webcast data associated with it, this contains JSON data of the streams.
+  Team_Event_Status:
+    type: object
+    properties:
+      rank:
+        type: object
+        properties:
+          first_sort:
+            type: integer
+          breakdown:
+            type: string
+            description: String of year-specific ranking details.
+          record:
+            type: string
+            description: |
+              Record as a string in the format WINS-LOSSES-TIES over all matches
+          played:
+            type: integer
+            description: Matches played
+          rank:
+            type: integer
+            description: Relative rank position
+          total:
+            type: integer
+            description: Number of teams at the event
+      alliance:
+        type: object
+        properties:
+          name:
+            type: string
+            description: Alliance name, may be null
+          backup:
+            type: object
+            description: Backup status, may be null
+            properties:
+              out:
+                type: string
+                description: TBA key for the team replaced by the backup.
+              in:
+                type: string
+                description: TBA key for the backup team called in.
+          position:
+            type: integer
+            description: |
+              Driver station position from 0-2, or -1 if the team has been
+              replaced with a backup.
+      playoff:
+        type: object
+        description: |
+          Playoff status for this team, may be null if the team did not make
+          playoffs, or playoffs have not begun.
+        properties:
+          level:
+            type: string
+            enum:
+              - qm
+              - ef
+              - qf
+              - sf
+              - f
+            description: The highest playoff level the team reached.
+          record:
+            type: string
+            description: |
+              Record in playoffs as a string in the format WINS-LOSSES-TIES
+          status:
+            type: string
+            enum:
+              - won
+              - eliminated
+              - playing
+            description: Current competition status for the playoffs
+  Event_Stats_2016:
+    type: object
+    properties:
+      LowBar:
+        type: array
+        minItems: 3
+        maxItems: 3
+        items:
+          type: number
+          format: float
+        description: |
+          For the Low Bar - An array with three values, number of times
+          damaged, number of opportunities to damage, and percentage.
+      A_ChevalDeFrise:
+        type: array
+        minItems: 3
+        maxItems: 3
+        items:
+          type: number
+          format: float
+        description: |
+          For the Cheval De Frise - An array with three values, number of times
+          damaged, number of opportunities to damage, and percentage.
+      A_Portcullis:
+        type: array
+        minItems: 3
+        maxItems: 3
+        items:
+          type: number
+          format: float
+        description: |
+          For the Portcullis - An array with three values, number of times
+          damaged, number of opportunities to damage, and percentage.
+      B_Ramparts:
+        type: array
+        minItems: 3
+        maxItems: 3
+        items:
+          type: number
+          format: float
+        description: |
+          For the Ramparts - An array with three values, number of times
+          damaged, number of opportunities to damage, and percentage.
+      B_Moat:
+        type: array
+        minItems: 3
+        maxItems: 3
+        items:
+          type: number
+          format: float
+        description: |
+          For the Moat - An array with three values, number of times
+          damaged, number of opportunities to damage, and percentage.
+      C_SallyPort:
+        type: array
+        minItems: 3
+        maxItems: 3
+        items:
+          type: number
+          format: float
+        description: |
+          For the Sally Port - An array with three values, number of times
+          damaged, number of opportunities to damage, and percentage.
+      C_Drawbridge:
+        type: array
+        minItems: 3
+        maxItems: 3
+        items:
+          type: number
+          format: float
+        description: |
+          For the Drawbridge - An array with three values, number of times
+          damaged, number of opportunities to damage, and percentage.
+      D_RoughTerrain:
+        type: array
+        minItems: 3
+        maxItems: 3
+        items:
+          type: number
+          format: float
+        description: |
+          For the Rough Terrain - An array with three values, number of times
+          damaged, number of opportunities to damage, and percentage.
+      D_RockWall:
+        type: array
+        minItems: 3
+        maxItems: 3
+        items:
+          type: number
+          format: float
+        description: |
+          For the Rock Wall - An array with three values, number of times
+          damaged, number of opportunities to damage, and percentage.
+      average_high_goals:
+        type: number
+        format: float
+        description: Average number of high goals scored.
+      average_low_goals:
+        type: number
+        format: float
+        description: Average number of low goals scored.
+      breaches:
+        type: array
+        minItems: 3
+        maxItems: 3
+        items:
+          type: number
+          format: float
+        description: |
+          An array with three values, number of times
+          breeched, number of opportunities to breech, and percentage.
+      scales:
+        type: array
+        minItems: 3
+        maxItems: 3
+        items:
+          type: number
+          format: float
+        description: |
+          An array with three values, number of times
+          scaled, number of opportunities to scale, and percentage.
+      challenges:
+        type: array
+        minItems: 3
+        maxItems: 3
+        items:
+          type: number
+          format: float
+        description: |
+          An array with three values, number of times
+          challenged, number of opportunities to challenge, and percentage.
+      captures:
+        type: array
+        minItems: 3
+        maxItems: 3
+        items:
+          type: number
+          format: float
+        description: |
+          An array with three values, number of times
+          captured, number of opportunities to capture, and percentage.
+      average_win_score:
+        type: number
+        format: float
+        description: Average winning score.
+      average_win_margin:
+        type: number
+        format: float
+        description: Average margin of victory.
+      average_score:
+        type: number
+        format: float
+        description: Average total score.
+      average_auto_score:
+        type: number
+        format: float
+        description: Average autonomous score.
+      average_crossing_score:
+        type: number
+        format: float
+        description: Average crossing score.
+      average_boulder_score:
+        type: number
+        format: float
+        description: Average boulder score.
+      average_tower_score:
+        type: number
+        format: float
+        description: Average tower score.
+      average_foul_score:
+        type: number
+        format: float
+        description: Average foul score.
+      high_score:
+        type: array
+        minItems: 3
+        maxItems: 3
+        items:
+          type: string
+        description: |
+          An array with three values, high score, match key from the match with
+          the high score, and the name of the match
   Webcast:
     type: object
     required:
@@ -1360,24 +1653,28 @@ definitions:
             properties:
               score:
                 type: integer
-              teams:
+              team_keys:
                 type: array
                 items:
-                  type: integer
-                  description: Team Number
+                  type: string
+                  description: Team keys
           red:
             type: object
             description: Red Alliance
             properties:
               score:
                 type: integer
-              teams:
+              team_keys:
                 type: array
                 items:
-                  type: integer
-                  description: Team Number
+                  type: string
+                  description: Team Keys
         description: |
           A list of alliances, the teams on the alliances, and their score.
+      winning_alliance:
+        type: string
+        description: |
+          The name of the winning alliance, or `tie` if the match has been played. May be null.
       event_key:
         type: string
         description: Event key of the event the match was played at.
@@ -1386,27 +1683,28 @@ definitions:
         format: int64
         description: |
           UNIX timestamp of match time, as taken from the published schedule
-      time_string:
-        type: string
+      actual_time:
+        type: integer
+        format: int64
         description: |
-          Time string for this match, as published on the official schedule.
-          Of course, this may or may not be accurate, as events often run
-          ahead or behind schedule
+          UNIX timestamp of actual match start time
   Match:
     type: object
     allOf:
      - $ref: '#/definitions/Match_Simple'
     properties:
-      winning_alliance:
-        type: string
-        description: |
-          The name of the winning alliance, or `tie` if the match has been played. May be null.
       score_breakdown:
         type: string
         format: json
         description: |
           Score breakdown for auto, teleop, etc. points. Varies from year to
           year. May be null.
+      time_string:
+        type: string
+        description: |
+          Time string for this match, as published on the official schedule.
+          Of course, this may or may not be accurate, as events often run
+          ahead or behind schedule
       videos:
         type: array
         items:
@@ -1419,6 +1717,9 @@ definitions:
     required:
     - type
     properties:
+      key:
+        type: string
+        description: TBA identifier for this media
       type:
         type: string
         enum:
@@ -1453,41 +1754,41 @@ definitions:
         description: Alliance name, may be null.
       backup:
         type: object
-        description: Backup team number called in, may be null.
+        description: Backup team called in, may be null.
         properties:
           out:
-            type: integer
-            description: Team number that was replaced by the backup team.
+            type: string
+            description: Team key that was replaced by the backup team.
           in:
-            type: integer
-            description: Team number that was called in as the backup.
+            type: string
+            description: Team key that was called in as the backup.
       declines:
         type: array
-        description: List of team numbers that declined the alliance.
+        description: List of teams that declined the alliance.
         items:
-          type: integer
-          description: Team number that declined the alliance.
+          type: string
+          description: Team key that declined the alliance.
       picks:
         type: array
-        description: List of team numbers picked for the alliance.
+        description: List of team keys picked for the alliance.
         items:
-          type: integer
-          description: Team number picked for the alliance.
+          type: string
+          description: Team key picked for the alliance.
       captain:
-        type: integer
-        description: Team number of the alliance captain.
+        type: string
+        description: Team key of the alliance captain.
   Ranking:
     type: object
     required:
     - rank
-    - team
+    - team_key
     properties:
       rank:
         type: integer
         description: The team's rank at the event as provided by FIRST.
-      team:
-        type: integer
-        description: The team number with this rank.
+      team_key:
+        type: string
+        description: The team with this rank.
       record:
         type: object
         description: Win-Loss-Tie ranking information, if avalable. May be null.
@@ -1538,8 +1839,8 @@ definitions:
         items:
           type: object
           properties:
-            team_number:
-              type: integer
+            team_key:
+              type: string
             alliance_points:
               type: integer
             award_points:
@@ -1556,8 +1857,8 @@ definitions:
         items:
           type: object
           properties:
-            team_number:
-              type: integer
+            team_key:
+              type: string
             highest_qual_scores:
               type: array
               items:
@@ -1657,29 +1958,29 @@ definitions:
         items:
           $ref: '#/definitions/Award_Recipient'
         description: |
-          A list of recipients of the award at the event. Either team_number or awardee
-          for individual awards.
+          A list of recipients of the award at the event. Either team_key
+          and/or awardee for individual awards.
       year:
         type: integer
         description: The year this award was won.
   Award_Recipient:
     type: object
     properties:
-      team_number:
-        type: integer
-        description: The FIRST official team number that was given the award. May be null.
+      team_key:
+        type: string
+        description: The TBA team key for the team that was given the award. May be null.
       awardee:
         type: string
         description: The name of the individual given the award. May be null.
   District_Ranking:
     type: object
     required:
-    - team_number
+    - team_key
     - rank
     - point_total
     properties:
-      team_number:
-        type: integer
+      team_key:
+        type: string
       rank:
         type: integer
       rookie_bonus:
