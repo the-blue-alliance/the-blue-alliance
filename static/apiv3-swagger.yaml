@@ -2709,16 +2709,83 @@ definitions:
         description: |
           Array of Media associated with this match and corresponding
           information
-  Match_Score_Breakdown_2016:
+  Match_Score_Breakdown_2015:
     type: object
+    description: See the 2015 FMS API documentation for a description of each value
     properties:
       blue:
-        $ref: '#/definitions/Match_Score_Breakdown_2016_Team'
+        $ref: '#/definitions/Match_Score_Breakdown_2015_Alliance'
       red:
-        $ref: '#/definitions/Match_Score_Breakdown_2016_Team'
-  Match_Score_Breakdown_2016_Team:
+        $ref: '#/definitions/Match_Score_Breakdown_2015_Alliance'
+      coopertition:
+        type: string
+        enum:
+        - None
+        - Unknown
+        - Stack
+      coopertition_points:
+        type: integer
+  Match_Score_Breakdown_2015_Alliance:
+    type: object
+    properties:
+      auto_points:
+        type: integer
+      teleop_points:
+        type: integer
+      container_points:
+        type: integer
+      tote_points:
+        type: integer
+      litter_points:
+        type: integer
+      foul_points:
+        type: integer
+      adjust_points:
+        type: integer
+      total_points:
+        type: integer
+      foul_count:
+        type: integer
+      tote_count_far:
+        type: integer
+      tote_count_near:
+        type: integer
+      tote_set:
+        type: boolean
+      tote_stack:
+        type: boolean
+      container_count_level1:
+        type: integer
+      container_count_level2:
+        type: integer
+      container_count_level3:
+        type: integer
+      container_count_level4:
+        type: integer
+      container_count_level5:
+        type: integer
+      container_count_level6:
+        type: integer
+      container_set:
+        type: boolean
+      litter_count_container:
+        type: integer
+      litter_count_landfill:
+        type: integer
+      litter_count_unprocessed:
+        type: integer
+      robot_set:
+        type: boolean
+  Match_Score_Breakdown_2016:
     type: object
     description: See the 2016 FMS API documentation for a description of each value.
+    properties:
+      blue:
+        $ref: '#/definitions/Match_Score_Breakdown_2016_Alliance'
+      red:
+        $ref: '#/definitions/Match_Score_Breakdown_2016_Alliance'
+  Match_Score_Breakdown_2016_Alliance:
+    type: object
     properties:
       autoPoints:
         type: integer
