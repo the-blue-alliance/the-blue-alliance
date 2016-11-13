@@ -20,6 +20,14 @@ security:
   - apiKeyParameter: []
 
 parameters:
+  If-Modified-Since:
+    name: If-Modified-Since
+    in: header
+    description: |
+      Value of the `Last-Modified` header in the most recently cached response
+      by the client.
+    required: false
+    type: string
   page_num:
     name: page_num
     in: path
@@ -73,6 +81,8 @@ paths:
   /status:
     get:
       description: Returns API status, and TBA status information.
+      parameters:
+        - $ref: '#/parameters/If-Modified-Since'
       security:
         - apiKeyHeader: []
         - apiKeyParameter: []
@@ -81,6 +91,20 @@ paths:
           description: Successful response
           schema:
             $ref: '#/definitions/API_Status'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
+
   # Team-oriented paths
   /teams/{page_num}:
     get:
@@ -90,6 +114,7 @@ paths:
       description: |
         Gets a list of `Team` objects, pagenated in groups of 500.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/page_num'
       security:
         - apiKeyHeader: []
@@ -101,6 +126,20 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Team'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
+
   # Simple (non-full) responses need a separate path definition.
   # See also https://github.com/OAI/OpenAPI-Specification/issues/270
   /teams/{page_num}/simple:
@@ -111,6 +150,7 @@ paths:
       description: |
         Gets a list of short form `Team_Simple` objects, pagenated in groups of 500.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/page_num'
       security:
         - apiKeyHeader: []
@@ -122,6 +162,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Team_Simple'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /teams/{page_num}/keys:
     get:
       tags:
@@ -130,6 +183,7 @@ paths:
       description: |
         Gets a list of Team keys, pagenated in groups of 500.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/page_num'
       security:
         - apiKeyHeader: []
@@ -141,6 +195,19 @@ paths:
             type: array
             items:
               type: string
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /teams/{year}/{page_num}:
     get:
       tags:
@@ -150,6 +217,7 @@ paths:
         Gets a list of `Team` objects that competed in the
         given year, pagenated in groups of 500.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/year'
         - $ref: '#/parameters/page_num'
       security:
@@ -162,6 +230,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Team'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /teams/{year}/{page_num}/simple:
     get:
       tags:
@@ -171,6 +252,7 @@ paths:
         Gets a list of short form `Team_Simple` objects that competed in the
         given year, pagenated in groups of 500.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/year'
         - $ref: '#/parameters/page_num'
       security:
@@ -183,6 +265,20 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Team_Simple'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
+
   /teams/{year}/{page_num}/keys:
     get:
       tags:
@@ -192,6 +288,7 @@ paths:
         Gets a list Team Keys that competed in the
         given year, pagenated in groups of 500.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/year'
         - $ref: '#/parameters/page_num'
       security:
@@ -205,6 +302,19 @@ paths:
             items:
               type: string
               description: Team Key
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /team/{team_key}:
     get:
       tags:
@@ -212,6 +322,7 @@ paths:
       description: |
         Gets a `Team` object for the team referenced by the given key.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/team_key'
       security:
         - apiKeyHeader: []
@@ -221,6 +332,19 @@ paths:
           description: Successful response
           schema:
             $ref: '#/definitions/Team'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /team/{team_key}/simple:
     get:
       tags:
@@ -228,6 +352,7 @@ paths:
       description: |
         Gets a `Team_Simple` object for the team referenced by the given key.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/team_key'
       security:
         - apiKeyHeader: []
@@ -237,6 +362,19 @@ paths:
           description: Successful response
           schema:
             $ref: '#/definitions/Team_Simple'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /team/{team_key}/years_participated:
     get:
       tags:
@@ -245,6 +383,7 @@ paths:
         Gets a list of years in which the team participated in at least one
         competition.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/team_key'
       security:
         - apiKeyHeader: []
@@ -256,6 +395,19 @@ paths:
             type: array
             items:
               type: integer
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /team/{team_key}/districts:
     get:
       tags:
@@ -266,6 +418,7 @@ paths:
         in a district. Will return an empty array if the team was never in a
         district.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/team_key'
       security:
         - apiKeyHeader: []
@@ -282,6 +435,19 @@ paths:
                   type: integer
                 district_key:
                   type: string
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /team/{team_key}/robots:
     get:
       tags:
@@ -291,6 +457,7 @@ paths:
         name was provided. Will return an empty array if the team has never
         named a robot.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/team_key'
       security:
         - apiKeyHeader: []
@@ -307,6 +474,19 @@ paths:
                   type: integer
                 robot_name:
                   type: string
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /team/{team_key}/events:
     get:
       tags:
@@ -315,6 +495,7 @@ paths:
       description: |
         Gets a list of all events this team has competed at.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/team_key'
       security:
         - apiKeyHeader: []
@@ -326,6 +507,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Event'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /team/{team_key}/events/simple:
     get:
       tags:
@@ -334,6 +528,7 @@ paths:
       description: |
         Gets a short-form list of all events this team has competed at.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/team_key'
       security:
         - apiKeyHeader: []
@@ -345,6 +540,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Event_Simple'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /team/{team_key}/events/keys:
     get:
       tags:
@@ -353,6 +561,7 @@ paths:
       description: |
         Gets a list of the event keys for all events this team has competed at.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/team_key'
       security:
         - apiKeyHeader: []
@@ -365,6 +574,19 @@ paths:
             items:
               type: string
               description: Event Key
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /team/{team_key}/events/{year}:
     get:
       tags:
@@ -373,6 +595,7 @@ paths:
       description: |
         Gets a list of events this team has competed at in the given year.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/team_key'
         - $ref: '#/parameters/year'
       security:
@@ -385,6 +608,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Event'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /team/{team_key}/events/{year}/simple:
     get:
       tags:
@@ -393,6 +629,7 @@ paths:
       description: |
         Gets a short-form list of events this team has competed at in the given year.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/team_key'
         - $ref: '#/parameters/year'
       security:
@@ -405,6 +642,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Event_Simple'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /team/{team_key}/events/{year}/keys:
     get:
       tags:
@@ -413,6 +663,7 @@ paths:
       description: |
         Gets a list of the event keys for events this team has competed at in the given year.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/team_key'
         - $ref: '#/parameters/year'
       security:
@@ -426,6 +677,19 @@ paths:
             items:
               type: string
               description: Event Key
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /team/{team_key}/event/{event_key}/matches/{match_type}:
     get:
       tags:
@@ -435,6 +699,7 @@ paths:
       description: |
         Gets a list of matches for the given team and event of the given match type.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/team_key'
         - $ref: '#/parameters/event_key'
         - $ref: '#/parameters/match_type'
@@ -448,6 +713,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Match'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /team/{team_key}/event/{event_key}/matches/{match_type}/simple:
     get:
       tags:
@@ -457,6 +735,7 @@ paths:
       description: |
         Gets a short-form list of matches for the given team and event of the given match type.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/team_key'
         - $ref: '#/parameters/event_key'
         - $ref: '#/parameters/match_type'
@@ -470,6 +749,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Match'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /team/{team_key}/event/{event_key}/matches/{match_type}/keys:
     get:
       tags:
@@ -479,6 +771,7 @@ paths:
       description: |
         Gets a list of match keys for matches for the given team and event of the given match type.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/team_key'
         - $ref: '#/parameters/event_key'
         - $ref: '#/parameters/match_type'
@@ -493,6 +786,19 @@ paths:
             items:
               type: string
               description: Match Key
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /team/{team_key}/event/{event_key}/awards:
     get:
       tags:
@@ -501,6 +807,7 @@ paths:
       description: |
         Gets a list of awards the given team won at the given event.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/team_key'
         - $ref: '#/parameters/event_key'
       security:
@@ -513,6 +820,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Award'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /team/{team_key}/event/{event_key}/status:
     get:
       tags:
@@ -521,6 +841,7 @@ paths:
       description: |
         Gets the competition rank and status of the team at the given event.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/team_key'
         - $ref: '#/parameters/event_key'
       security:
@@ -531,6 +852,19 @@ paths:
           description: Successful response
           schema:
             $ref: '#/definitions/Team_Event_Status'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /team/{team_key}/awards:
     get:
       tags:
@@ -538,6 +872,7 @@ paths:
       description: |
         Gets a list of awards the given team has won.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/team_key'
       security:
         - apiKeyHeader: []
@@ -549,6 +884,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Award'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /team/{team_key}/awards/{year}:
     get:
       tags:
@@ -556,6 +904,7 @@ paths:
       description: |
         Gets a list of awards the given team has won in a given year.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/team_key'
         - $ref: '#/parameters/year'
       security:
@@ -568,6 +917,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Award'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /team/{team_key}/matches/{year}:
     get:
       tags:
@@ -576,6 +938,7 @@ paths:
       description: |
         Gets a list of matches for the given team and year.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/team_key'
         - $ref: '#/parameters/year'
       security:
@@ -588,6 +951,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Match'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /team/{team_key}/matches/{year}/simple:
     get:
       tags:
@@ -596,6 +972,7 @@ paths:
       description: |
         Gets a short-form list of matches for the given team and year.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/team_key'
         - $ref: '#/parameters/year'
       security:
@@ -608,6 +985,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Match_Simple'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /team/{team_key}/matches/{year}/keys:
     get:
       tags:
@@ -616,6 +1006,7 @@ paths:
       description: |
         Gets a list of match keys for matches for the given team and year.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/team_key'
         - $ref: '#/parameters/year'
       security:
@@ -629,6 +1020,19 @@ paths:
             items:
               type: string
               description: Match Key
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /team/{team_key}/media/{year}:
     get:
       tags:
@@ -636,6 +1040,7 @@ paths:
       description: |
         Gets a list of Media (videos / pictures) for the given team and year.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/team_key'
         - $ref: '#/parameters/year'
       security:
@@ -648,6 +1053,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Media'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /team/{team_key}/social_media:
     get:
       tags:
@@ -655,6 +1073,7 @@ paths:
       description: |
         Gets a list of Media (social media) for the given team.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/team_key'
       security:
         - apiKeyHeader: []
@@ -666,6 +1085,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Media'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
 
   # Event oriented paths
   /events/{year}:
@@ -676,6 +1108,7 @@ paths:
       description: |
         Gets a list of events in the given year.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/year'
       security:
         - apiKeyHeader: []
@@ -687,6 +1120,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Event'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /events/{year}/simple:
     get:
       tags:
@@ -695,6 +1141,7 @@ paths:
       description: |
         Gets a short-form list of events in the given year.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/year'
       security:
         - apiKeyHeader: []
@@ -706,6 +1153,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Event_Simple'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /events/{year}/keys:
     get:
       tags:
@@ -714,6 +1174,7 @@ paths:
       description: |
         Gets a list of event keys in the given year.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/year'
       security:
         - apiKeyHeader: []
@@ -726,12 +1187,26 @@ paths:
             items:
               type: string
               description: Event Key
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /event/{event_key}:
     get:
       tags:
       - event
       description: Gets an Event.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/event_key'
       security:
         - apiKeyHeader: []
@@ -741,12 +1216,26 @@ paths:
           description: Successful response
           schema:
             $ref: '#/definitions/Event'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /event/{event_key}/simple:
     get:
       tags:
       - event
       description: Gets a short-form Event.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/event_key'
       security:
         - apiKeyHeader: []
@@ -756,12 +1245,26 @@ paths:
           description: Successful response
           schema:
             $ref: '#/definitions/Event_Simple'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /event/{event_key}/elim_alliances:
     get:
       tags:
       - event
       description: Gets a list of Elimination Alliances for the given Event.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/event_key'
       security:
         - apiKeyHeader: []
@@ -773,12 +1276,26 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Elimination_Alliance'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /event/{event_key}/stats:
     get:
       tags:
       - event
       description: Gets a list of Stats for the given Event.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/event_key'
       security:
         - apiKeyHeader: []
@@ -791,12 +1308,26 @@ paths:
             description: |
               A year-specific event stat object expressed as a JSON string. See also
               Event_Stats_2016
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /event/{event_key}/rankings:
     get:
       tags:
       - event
       description: Gets a list of team rankings for the Event.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/event_key'
       security:
         - apiKeyHeader: []
@@ -808,6 +1339,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Ranking'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /event/{event_key}/district_points:
     get:
       tags:
@@ -815,6 +1359,7 @@ paths:
       - district
       description: Gets a list of team rankings for the Event.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/event_key'
       security:
         - apiKeyHeader: []
@@ -826,6 +1371,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Event_District_Points'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /event/{event_key}/teams:
     get:
       tags:
@@ -836,6 +1394,7 @@ paths:
         Gets a list of `Team` objects that competed in the
         given event.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/event_key'
       security:
         - apiKeyHeader: []
@@ -847,6 +1406,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Team'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /event/{event_key}/teams/simple:
     get:
       tags:
@@ -857,6 +1429,7 @@ paths:
         Gets a short-form list of `Team` objects that competed in the
         given event.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/event_key'
       security:
         - apiKeyHeader: []
@@ -868,6 +1441,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Team_Simple'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /event/{event_key}/teams/keys:
     get:
       tags:
@@ -878,6 +1464,7 @@ paths:
         Gets a list of `Team` keys that competed in the
         given event.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/event_key'
       security:
         - apiKeyHeader: []
@@ -890,6 +1477,19 @@ paths:
             items:
               type: string
               description: Team Key
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /event/{event_key}/matches:
     get:
       tags:
@@ -898,6 +1498,7 @@ paths:
       description: |
         Gets a list of matches for the given event.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/event_key'
       security:
         - apiKeyHeader: []
@@ -909,6 +1510,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Match'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /event/{event_key}/matches/simple:
     get:
       tags:
@@ -917,6 +1531,7 @@ paths:
       description: |
         Gets a short-form list of matches for the given event.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/event_key'
       security:
         - apiKeyHeader: []
@@ -928,6 +1543,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Match_Simple'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /event/{event_key}/matches/keys:
     get:
       tags:
@@ -936,6 +1564,7 @@ paths:
       description: |
         Gets a list of match keys for the given event.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/event_key'
       security:
         - apiKeyHeader: []
@@ -948,6 +1577,19 @@ paths:
             items:
               type: string
               description: Match Key
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /event/{event_key}/awards:
     get:
       tags:
@@ -955,6 +1597,7 @@ paths:
       description: |
         Gets a list of awards from the given event.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/event_key'
       security:
         - apiKeyHeader: []
@@ -966,6 +1609,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Award'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
 
   # Match-specific paths
   /match/{match_key}:
@@ -975,6 +1631,7 @@ paths:
       description: |
         Gets a `Match` object for the given match key.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/match_key'
       security:
         - apiKeyHeader: []
@@ -984,6 +1641,19 @@ paths:
           description: Successful response
           schema:
             $ref: '#/definitions/Match'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /match/{match_key}/simple:
     get:
       tags:
@@ -991,6 +1661,7 @@ paths:
       description: |
         Gets a short-form `Match` object for the given match key.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/match_key'
       security:
         - apiKeyHeader: []
@@ -1000,6 +1671,19 @@ paths:
           description: Successful response
           schema:
             $ref: '#/definitions/Match_Simple'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
 
   # District paths
   /districts/{year}:
@@ -1009,6 +1693,7 @@ paths:
       description: |
         Gets a list of districts and their corresponding district key, for the given year.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/year'
       security:
         - apiKeyHeader: []
@@ -1027,6 +1712,19 @@ paths:
                 key:
                   type: string
                   description: District Key
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /district/{district_key}/{year}/events:
     get:
       tags:
@@ -1036,6 +1734,7 @@ paths:
       description: |
         Gets a list of events in the given district in the given year.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/district_key'
         - $ref: '#/parameters/year'
       security:
@@ -1048,6 +1747,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Event'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /district/{district_key}/{year}/events/simple:
     get:
       tags:
@@ -1057,6 +1769,7 @@ paths:
       description: |
         Gets a short-form list of events in the given district in the given year.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/district_key'
         - $ref: '#/parameters/year'
       security:
@@ -1069,6 +1782,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Event_Simple'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /district/{district_key}/{year}/events/keys:
     get:
       tags:
@@ -1078,6 +1804,7 @@ paths:
       description: |
         Gets a list of event keys for events in the given district in the given year.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/district_key'
         - $ref: '#/parameters/year'
       security:
@@ -1091,6 +1818,19 @@ paths:
             items:
               type: string
               description: Event Key
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /district/{district_key}/{year}/teams:
     get:
       tags:
@@ -1101,6 +1841,7 @@ paths:
         Gets a list of `Team` objects that competed in events in the
         given district in the given year.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/district_key'
         - $ref: '#/parameters/year'
       security:
@@ -1113,6 +1854,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Team'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /district/{district_key}/{year}/teams/simple:
     get:
       tags:
@@ -1123,6 +1877,7 @@ paths:
         Gets a short-form list of `Team` objects that competed in events in the
         given district in the given year.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/district_key'
         - $ref: '#/parameters/year'
       security:
@@ -1135,6 +1890,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Team_Simple'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /district/{district_key}/{year}/teams/keys:
     get:
       tags:
@@ -1145,6 +1913,7 @@ paths:
         Gets a list of `Team` objects that competed in events in the
         given district in the given year.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/district_key'
         - $ref: '#/parameters/year'
       security:
@@ -1158,6 +1927,19 @@ paths:
             items:
               type: string
               description: Team Key
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
   /district/{district_key}/{year}/rankings:
     get:
       tags:
@@ -1167,6 +1949,7 @@ paths:
       description: |
         Gets a list of team district rankings for the given district in the given year.
       parameters:
+        - $ref: '#/parameters/If-Modified-Since'
         - $ref: '#/parameters/district_key'
         - $ref: '#/parameters/year'
       security:
@@ -1179,6 +1962,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/District_Ranking'
+          headers:
+            Last-Modified:
+              type: string
+              description: |
+                Indicates the date and time the data returned was last updated.
+                Used by clients in the `If-Modified-Since` request header.
+            Cache-Control:
+              type: string
+              description: |
+                The `Cache-Control` header, in particular the `max-age` value,
+                contrins the number of seconds the result should be considered
+                valid for. During this time subsequent calls should return
+                from the local cache directly.
 
 securityDefinitions:
   # Swagger spec does not allow for a single definition that can be used as
