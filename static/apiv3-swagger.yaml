@@ -1710,9 +1710,15 @@ definitions:
         description: The match number of the match in the competition level.
       alliances:
         type: object
+        required:
+        - blue
+        - red
         properties:
           blue:
             type: object
+            required:
+            - score
+            - team_keys
             description: Blue Alliance
             properties:
               score:
@@ -1722,8 +1728,17 @@ definitions:
                 items:
                   type: string
                   description: Team keys
+              surrogate_team_keys:
+                type: array
+                description: TBA team keys of any teams playing as a surrogate.
+                items:
+                  type: string
+                  description: Team keys
           red:
             type: object
+            required:
+            - score
+            - team_keys
             description: Red Alliance
             properties:
               score:
@@ -1733,6 +1748,12 @@ definitions:
                 items:
                   type: string
                   description: Team Keys
+              surrogate_team_keys:
+                type: array
+                description: TBA team keys of any teams playing as a surrogate.
+                items:
+                  type: string
+                  description: Team keys
         description: |
           A list of alliances, the teams on the alliances, and their score.
       winning_alliance:
