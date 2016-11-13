@@ -70,6 +70,17 @@ parameters:
     - all
 
 paths:
+  /status:
+    get:
+      description: Returns API status, and TBA status information.
+      security:
+        - apiKeyHeader: []
+        - apiKeyParameter: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/API_Status'
   # Team-oriented paths
   /teams/{page_num}:
     get:
@@ -655,6 +666,8 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Media'
+
+  # Event oriented paths
   /events/{year}:
     get:
       tags:
@@ -953,6 +966,8 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Award'
+
+  # Match-specific paths
   /match/{match_key}:
     get:
       tags:
@@ -985,6 +1000,8 @@ paths:
           description: Successful response
           schema:
             $ref: '#/definitions/Match_Simple'
+
+  # District paths
   /districts/{year}:
     get:
       tags:
@@ -1164,6 +1181,9 @@ paths:
               $ref: '#/definitions/District_Ranking'
 
 securityDefinitions:
+  # Swagger spec does not allow for a single definition that can be used as
+  # either a header key/value pair or as a query parameter, hence we have
+  # two identical definitions, save usage location.
   apiKeyHeader:
     type: apiKey
     in: header
@@ -1194,6 +1214,50 @@ tags:
 
 
 definitions:
+  API_Status:
+    type: object
+    required:
+    - current_season
+    - max_season
+    - is_datafeed_down
+    - down_events
+    - ios
+    - android
+    properties:
+      current_season:
+        type: integer
+        description: Year of the current FRC season.
+      max_season:
+        type: integer
+        description: Maximum FRC season year for valid queries.
+      is_datafeed_down:
+        type: boolean
+        description: True if the entire FMS API provided by FIRST is down.
+      down_events:
+        type: array
+        description: |
+          An array of strings containing event keys of any active events that are no longer updating.
+        items:
+          type: string
+      ios:
+        $ref: '#/definitions/API_Status_App_Version'
+      android:
+        $ref: '#/definitions/API_Status_App_Version'
+  API_Status_App_Version:
+    type: object
+    required:
+    - min_app_version
+    - latest_app_version
+    properties:
+      min_app_version:
+        type: integer
+        description: |
+          Internal use - Minimum application version required to correctly
+          connect and process data.
+      latest_app_version:
+        type: integer
+        description: |
+          Internal use - Latest application version available.
   Team_Simple:
     type: object
     required:
@@ -1712,6 +1776,105 @@ definitions:
         description: |
           Array of Media associated with this match and corresponding
           information
+  Match_Score_Breakdown_2016:
+    type: object
+    properties:
+      blue:
+        $ref: '#/definitions/Match_Score_Breakdown_2016_Team'
+      red:
+        $ref: '#/definitions/Match_Score_Breakdown_2016_Team'
+  Match_Score_Breakdown_2016_Team:
+    type: object
+    description: See the 2016 FMS API documentation for a description of each value.
+    properties:
+      autoPoints:
+        type: integer
+      teleopPoints:
+        type: integer
+      breechPoints:
+        type: integer
+      foulPoints:
+        type: integer
+      capturePoints:
+        type: integer
+      adjustPoints:
+        type: integer
+      totalPoints:
+        type: integer
+      robot1Auto:
+        type: string
+        enum:
+        - Crossed
+        - Reached
+        - None
+      robot2Auto:
+        type: string
+        enum:
+        - Crossed
+        - Reached
+        - None
+      robot3Auto:
+        type: string
+        enum:
+        - Crossed
+        - Reached
+        - None
+      autoReachPoints:
+        type: integer
+      autoCrossingPoints:
+        type: integer
+      autoBouldersLow:
+        type: integer
+      autoBouldersHigh:
+        type: integer
+      autoBoulderPoints:
+        type: integer
+      teleopCrossingPoints:
+        type: integer
+      teleopBouldersLow:
+        type: integer
+      teleopBouldersHigh:
+        type: integer
+      teleopBoulderPoints:
+        type: integer
+      teleopDefensesBreached:
+        type: boolean
+      teleopChallengePoints:
+        type: integer
+      teleopScalePoints:
+        type: integer
+      teleopTowerCaptured:
+        type: integer
+      towerFaceA:
+        type: string
+      towerFaceB:
+        type: string
+      towerFaceC:
+        type: string
+      towerEndStrength:
+        type: integer
+      techFoulCount:
+        type: integer
+      foulCount:
+        type: integer
+      position2:
+        type: string
+      position3:
+        type: string
+      position4:
+        type: string
+      position5:
+        type: string
+      position1crossings:
+        type: integer
+      position2crossings:
+        type: integer
+      position3crossings:
+        type: integer
+      position4crossings:
+        type: integer
+      position5crossings:
+        type: integer
   Media:
     type: object
     required:
