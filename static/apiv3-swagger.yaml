@@ -2201,7 +2201,9 @@ definitions:
   Team:
     type: object
     allOf:
-     - $ref: '#/definitions/Team_Simple'
+      - $ref: '#/definitions/Team_Simple'
+    required:
+    - rookie_year
     properties:
       website:
         type: string
@@ -2219,6 +2221,9 @@ definitions:
     - key
     - name
     - event_code
+    - event_type
+    - start_date
+    - end_date
     - year
     properties:
       key:
