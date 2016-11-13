@@ -105,7 +105,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
 
   # Team-oriented paths
   /teams/{page_num}:
@@ -142,7 +142,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
 
   # Simple (non-full) responses need a separate path definition.
   # See also https://github.com/OAI/OpenAPI-Specification/issues/270
@@ -180,7 +180,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /teams/{page_num}/keys:
     get:
       tags:
@@ -215,7 +215,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /teams/{year}/{page_num}:
     get:
       tags:
@@ -252,7 +252,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /teams/{year}/{page_num}/simple:
     get:
       tags:
@@ -289,7 +289,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
 
   /teams/{year}/{page_num}/keys:
     get:
@@ -328,7 +328,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /team/{team_key}:
     get:
       tags:
@@ -360,7 +360,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /team/{team_key}/simple:
     get:
       tags:
@@ -392,7 +392,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /team/{team_key}/years_participated:
     get:
       tags:
@@ -427,7 +427,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /team/{team_key}/districts:
     get:
       tags:
@@ -469,7 +469,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /team/{team_key}/robots:
     get:
       tags:
@@ -510,7 +510,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /team/{team_key}/events:
     get:
       tags:
@@ -545,7 +545,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /team/{team_key}/events/simple:
     get:
       tags:
@@ -580,7 +580,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /team/{team_key}/events/keys:
     get:
       tags:
@@ -616,7 +616,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /team/{team_key}/events/{year}:
     get:
       tags:
@@ -652,7 +652,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /team/{team_key}/events/{year}/simple:
     get:
       tags:
@@ -688,7 +688,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /team/{team_key}/events/{year}/keys:
     get:
       tags:
@@ -725,7 +725,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /team/{team_key}/event/{event_key}/matches/{match_type}:
     get:
       tags:
@@ -763,7 +763,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /team/{team_key}/event/{event_key}/matches/{match_type}/simple:
     get:
       tags:
@@ -801,7 +801,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /team/{team_key}/event/{event_key}/matches/{match_type}/keys:
     get:
       tags:
@@ -840,7 +840,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /team/{team_key}/event/{event_key}/awards:
     get:
       tags:
@@ -876,7 +876,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /team/{team_key}/event/{event_key}/status:
     get:
       tags:
@@ -910,7 +910,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /team/{team_key}/awards:
     get:
       tags:
@@ -944,7 +944,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /team/{team_key}/awards/{year}:
     get:
       tags:
@@ -979,7 +979,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /team/{team_key}/matches/{year}:
     get:
       tags:
@@ -1015,7 +1015,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /team/{team_key}/matches/{year}/simple:
     get:
       tags:
@@ -1051,7 +1051,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /team/{team_key}/matches/{year}/keys:
     get:
       tags:
@@ -1088,7 +1088,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /team/{team_key}/media/{year}:
     get:
       tags:
@@ -1123,7 +1123,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /team/{team_key}/social_media:
     get:
       tags:
@@ -1157,7 +1157,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
 
   # Event oriented paths
   /events/{year}:
@@ -1194,7 +1194,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /events/{year}/simple:
     get:
       tags:
@@ -1229,7 +1229,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /events/{year}/keys:
     get:
       tags:
@@ -1265,7 +1265,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /event/{event_key}:
     get:
       tags:
@@ -1296,7 +1296,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /event/{event_key}/simple:
     get:
       tags:
@@ -1327,7 +1327,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /event/{event_key}/elim_alliances:
     get:
       tags:
@@ -1360,7 +1360,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /event/{event_key}/stats:
     get:
       tags:
@@ -1394,7 +1394,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /event/{event_key}/rankings:
     get:
       tags:
@@ -1427,7 +1427,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /event/{event_key}/district_points:
     get:
       tags:
@@ -1461,7 +1461,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /event/{event_key}/teams:
     get:
       tags:
@@ -1498,7 +1498,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /event/{event_key}/teams/simple:
     get:
       tags:
@@ -1535,7 +1535,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /event/{event_key}/teams/keys:
     get:
       tags:
@@ -1573,7 +1573,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /event/{event_key}/matches:
     get:
       tags:
@@ -1608,7 +1608,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /event/{event_key}/matches/simple:
     get:
       tags:
@@ -1643,7 +1643,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /event/{event_key}/matches/keys:
     get:
       tags:
@@ -1679,7 +1679,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /event/{event_key}/awards:
     get:
       tags:
@@ -1713,7 +1713,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
 
   # Match-specific paths
   /match/{match_key}:
@@ -1747,7 +1747,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /match/{match_key}/simple:
     get:
       tags:
@@ -1779,7 +1779,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
 
   # District paths
   /districts/{year}:
@@ -1822,7 +1822,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /district/{district_key}/{year}/events:
     get:
       tags:
@@ -1859,7 +1859,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /district/{district_key}/{year}/events/simple:
     get:
       tags:
@@ -1896,7 +1896,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /district/{district_key}/{year}/events/keys:
     get:
       tags:
@@ -1934,7 +1934,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /district/{district_key}/{year}/teams:
     get:
       tags:
@@ -1972,7 +1972,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /district/{district_key}/{year}/teams/simple:
     get:
       tags:
@@ -2010,7 +2010,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /district/{district_key}/{year}/teams/keys:
     get:
       tags:
@@ -2049,7 +2049,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
   /district/{district_key}/{year}/rankings:
     get:
       tags:
@@ -2086,7 +2086,7 @@ paths:
                 valid for. During this time subsequent calls should return
                 from the local cache directly.
         304:
-          description: Not Modified - Use Local Cached Value
+          $ref: '#/responses/NotModified'
 
 securityDefinitions:
   # Swagger spec does not allow for a single definition that can be used as
@@ -2120,6 +2120,9 @@ tags:
     name: district
     description: Calls that return district, or district-related information.
 
+responses:
+  NotModified:
+    description: Not Modified - Use Local Cached Value
 
 definitions:
   API_Status:
