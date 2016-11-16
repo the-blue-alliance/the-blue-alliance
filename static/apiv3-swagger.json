@@ -9,6 +9,10 @@
   "basePath": "/api/v3",
   "tags": [
     {
+      "name": "TBA",
+      "description": "Calls that expose TBA internals or status."
+    },
+    {
       "name": "list",
       "description": "Calls that return a list of records."
     },
@@ -116,6 +120,9 @@
   "paths": {
     "/status": {
       "get": {
+        "tags": [
+          "TBA"
+        ],
         "description": "Returns API status, and TBA status information.",
         "parameters": [
           {
@@ -1864,7 +1871,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Ranking"
+                "$ref": "#/definitions/Event_Ranking"
               }
             },
             "headers": {
@@ -2865,6 +2872,14 @@
         "motto": {
           "type": "string",
           "description": "Team's motto as provided by FIRST"
+        },
+        "home_championship": {
+          "type": "string",
+          "description": "Location of the team's current home championship expressed as `north` or `south`.",
+          "enum": [
+            "north",
+            "south"
+          ]
         }
       }
     },
@@ -2999,6 +3014,10 @@
           "type": "string",
           "description": "The event's website, if any."
         },
+        "first_event_id": {
+          "type": "integer",
+          "description": "The FIRST internal Event ID, used to link to the event on the FRC webpage."
+        },
         "webcasts": {
           "type": "array",
           "items": {
@@ -3105,7 +3124,143 @@
       },
       "description": "Playoff status for this team, may be null if the team did not make playoffs, or playoffs have not begun."
     },
+    "Event_Ranking": {
+      "type": "object",
+      "required": [
+        "rank",
+        "team_key"
+      ],
+      "properties": {
+        "rank": {
+          "type": "integer",
+          "description": "The team's rank at the event as provided by FIRST."
+        },
+        "team_key": {
+          "type": "string",
+          "description": "The team with this rank."
+        },
+        "record": {
+          "properties": {
+            "qualifications": {
+              "properties": {
+                "wins": {
+                  "type": "integer"
+                },
+                "losses": {
+                  "type": "integer"
+                },
+                "ties": {
+                  "type": "integer"
+                }
+              },
+              "description": "W-L-T record in qualification matches"
+            },
+            "overall": {
+              "properties": {
+                "wins": {
+                  "type": "integer"
+                },
+                "losses": {
+                  "type": "integer"
+                },
+                "ties": {
+                  "type": "integer"
+                }
+              },
+              "description": "W-L-T record across all matches at an event"
+            }
+          },
+          "description": "Win-Loss-Tie ranking information, if available. May be null."
+        },
+        "played": {
+          "type": "integer",
+          "description": "Number of matches played by this team."
+        },
+        "additional_properties": {
+          "type": "array",
+          "description": "Additional year-specific information, may be null.",
+          "items": {
+            "properties": {
+              "label": {
+                "type": "string",
+                "description": "The name of the additional property."
+              },
+              "value": {
+                "type": "string",
+                "description": "The value for the property. May be of any type."
+              }
+            }
+          }
+        }
+      }
+    },
+    "Event_District_Points": {
+      "type": "object",
+      "required": [
+        "points"
+      ],
+      "properties": {
+        "points": {
+          "type": "array",
+          "description": "Points gained for each team at the event.",
+          "items": {
+            "properties": {
+              "team_key": {
+                "type": "string"
+              },
+              "alliance_points": {
+                "type": "integer"
+              },
+              "award_points": {
+                "type": "integer"
+              },
+              "qual_points": {
+                "type": "integer"
+              },
+              "elim_points": {
+                "type": "integer"
+              },
+              "total": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "tiebreakers": {
+          "type": "array",
+          "description": "Tiebreaker values for each team at the event.",
+          "items": {
+            "properties": {
+              "team_key": {
+                "type": "string"
+              },
+              "highest_qual_scores": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "qual_wins": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    },
     "Event_Stats_2016": {
+      "type": "object",
+      "description": "Stats for FIRST Stronghold qualification and elimination matches.",
+      "properties": {
+        "qualifications": {
+          "$ref": "#/definitions/Event_Stats_2016_Detail"
+        },
+        "eliminations": {
+          "$ref": "#/definitions/Event_Stats_2016_Detail"
+        }
+      }
+    },
+    "Event_Stats_2016_Detail": {
       "type": "object",
       "properties": {
         "LowBar": {
@@ -3746,130 +3901,6 @@
         "captain": {
           "type": "string",
           "description": "Team key of the alliance captain."
-        }
-      }
-    },
-    "Ranking": {
-      "type": "object",
-      "required": [
-        "rank",
-        "team_key"
-      ],
-      "properties": {
-        "rank": {
-          "type": "integer",
-          "description": "The team's rank at the event as provided by FIRST."
-        },
-        "team_key": {
-          "type": "string",
-          "description": "The team with this rank."
-        },
-        "record": {
-          "properties": {
-            "qualifications": {
-              "properties": {
-                "wins": {
-                  "type": "integer"
-                },
-                "losses": {
-                  "type": "integer"
-                },
-                "ties": {
-                  "type": "integer"
-                }
-              },
-              "description": "W-L-T record in qualification matches"
-            },
-            "overall": {
-              "properties": {
-                "wins": {
-                  "type": "integer"
-                },
-                "losses": {
-                  "type": "integer"
-                },
-                "ties": {
-                  "type": "integer"
-                }
-              },
-              "description": "W-L-T record across all matches at an event"
-            }
-          },
-          "description": "Win-Loss-Tie ranking information, if available. May be null."
-        },
-        "played": {
-          "type": "integer",
-          "description": "Number of matches played by this team."
-        },
-        "additional_properties": {
-          "type": "array",
-          "description": "Additional year-specific information, may be null.",
-          "items": {
-            "properties": {
-              "label": {
-                "type": "string",
-                "description": "The name of the additional property."
-              },
-              "value": {
-                "type": "string",
-                "description": "The value for the property. May be of any type."
-              }
-            }
-          }
-        }
-      }
-    },
-    "Event_District_Points": {
-      "type": "object",
-      "required": [
-        "points"
-      ],
-      "properties": {
-        "points": {
-          "type": "array",
-          "description": "Points gained for each team at the event.",
-          "items": {
-            "properties": {
-              "team_key": {
-                "type": "string"
-              },
-              "alliance_points": {
-                "type": "integer"
-              },
-              "award_points": {
-                "type": "integer"
-              },
-              "qual_points": {
-                "type": "integer"
-              },
-              "elim_points": {
-                "type": "integer"
-              },
-              "total": {
-                "type": "integer"
-              }
-            }
-          }
-        },
-        "tiebreakers": {
-          "type": "array",
-          "description": "Tiebreaker values for each team at the event.",
-          "items": {
-            "properties": {
-              "team_key": {
-                "type": "string"
-              },
-              "highest_qual_scores": {
-                "type": "array",
-                "items": {
-                  "type": "integer"
-                }
-              },
-              "qual_wins": {
-                "type": "integer"
-              }
-            }
-          }
         }
       }
     },
