@@ -114,6 +114,30 @@ class TestMediaUrlParser(unittest2.TestCase):
         self.assertEqual(result['foreign_key'], 'evolution2626')
         self.assertEqual(result['site_name'], MediaType.type_names[MediaType.PERISCOPE_PROFILE])
         self.assertEqual(result['profile_url'], 'https://www.periscope.tv/evolution2626')
+        
+    def test_pinterest_profile_parse(self):
+        result = MediaParser.partial_media_dict_from_url("https://www.pinterest.com/evolution2626")
+        self.assertEqual(result['media_type_enum'], MediaType.PINTEREST_PROFILE)
+        self.assertEqual(result['is_social'], True)
+        self.assertEqual(result['foreign_key'], 'evolution2626')
+        self.assertEqual(result['site_name'], MediaType.type_names[MediaType.PINTEREST_PROFILE])
+        self.assertEqual(result['profile_url'], 'https://www.pinterest.com/evolution2626')
+        
+    def test_snapchat_profile_parse(self):
+        result = MediaParser.partial_media_dict_from_url("https://www.snapchat.com/add/evolution2626")
+        self.assertEqual(result['media_type_enum'], MediaType.SNAPCHAT_PROFILE)
+        self.assertEqual(result['is_social'], True)
+        self.assertEqual(result['foreign_key'], 'evolution2626')
+        self.assertEqual(result['site_name'], MediaType.type_names[MediaType.PERISCOPE_PROFILE])
+        self.assertEqual(result['profile_url'], 'https://www.snapchat.com/add/evolution2626')
+        
+    def test_twitch_profile_parse(self):
+        result = MediaParser.partial_media_dict_from_url("https://www.twitch.tv/evolution2626")
+        self.assertEqual(result['media_type_enum'], MediaType.TWITCH_CHANNEL)
+        self.assertEqual(result['is_social'], True)
+        self.assertEqual(result['foreign_key'], 'evolution2626')
+        self.assertEqual(result['site_name'], MediaType.type_names[MediaType.TWITCH_CHANNEL])
+        self.assertEqual(result['profile_url'], 'https://www.twitch.tv/evolution2626')
 
     def test_unsupported_url_parse(self):
         self.assertEqual(MediaParser.partial_media_dict_from_url("http://foo.bar"), None)
