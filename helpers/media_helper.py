@@ -18,6 +18,9 @@ class MediaHelper(object):
         MediaType.INSTAGRAM_PROFILE: 3,
         MediaType.PERISCOPE_PROFILE: 4,
         MediaType.GITHUB_PROFILE: 5,
+        MediaType.SNAPCHAT_PROFILE: 6,
+        MediaType.TWITCH_CHANNEL: 7,
+        MediaType.PINTEREST_PROFILE: 68,
     }
 
     @classmethod
@@ -61,6 +64,9 @@ class MediaParser(object):
         MediaType.IMGUR: [(r".*imgur.com\/(\w+)\/?\Z", 1), (r".*imgur.com\/(\w+)\.\w+\Z", 1)],
         MediaType.INSTAGRAM_PROFILE: [(r".*instagram.com\/(.*)(\/(.*))?", 1)],
         MediaType.PERISCOPE_PROFILE: [(r".*periscope.tv\/(.*)(\/(.*))?", 1)],
+        MediaType.PINTEREST_PROFILE: [(r".*pinterest.com\/(.*)(\/(.*))?", 1)],
+        MediaType.SNAPCHAT_PROFILE: [(r".*snapchat.com\/add\/(.*)(\/(.*))?", 1)],
+        MediaType.TWITCH_CHANNEL: [(r".*twitch.tv\/(.*)(\/(.*))?", 1)],
     }
 
     # Media URL patterns that map a URL -> Profile type (used to determine which type represents a given url)
@@ -73,6 +79,9 @@ class MediaParser(object):
         ('github.com/', MediaType.GITHUB_PROFILE),
         ('instagram.com/', MediaType.INSTAGRAM_PROFILE),
         ('periscope.tv/', MediaType.PERISCOPE_PROFILE),
+        ('pinterest.com/', MediaType.PINTEREST_PROFILE),
+        ('snapchat.com/add/', MediaType.SNAPCHAT_PROFILE),
+        ('twitch.tv/', MediaType.TWITCH_CHANNEL),
         ('chiefdelphi.com/media/photos/', MediaType.CD_PHOTO_THREAD),
         ('youtube.com/watch', MediaType.YOUTUBE_VIDEO),
         ('youtu.be', MediaType.YOUTUBE_VIDEO),
