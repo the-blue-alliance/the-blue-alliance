@@ -12,10 +12,7 @@ class SuggestionNotifier(object):
         # Only do this on prod
         if tba_config.DEBUG:
             return
-        sender = "suggestions@{}.appspotmail.com".format(app_identity.get_application_id())
-        reply_to = "contact@thebluealliance.com"
-        mail.send_mail(sender=sender,
-                       reply_to=reply_to,
+        mail.send_mail(sender="The Blue Alliance Contact <contact@thebluealliance.com>",
                        to="contact@thebluealliance.com",
                        subject=subject,
                        body=email_body)

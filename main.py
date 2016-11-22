@@ -6,7 +6,7 @@ import tba_config
 
 from controllers.account_controller import AccountEdit, AccountLoginRequired, AccountLogin, AccountLogout, AccountOverview, AccountRegister, MyTBAController, myTBAAddHotMatchesController, MyTBAEventController, MyTBAMatchController, MyTBATeamController
 from controllers.ajax_controller import AccountInfoHandler, AccountRegisterFCMToken, AccountFavoritesHandler, AccountFavoritesAddHandler, AccountFavoritesDeleteHandler, \
-      YouTubePlaylistHandler
+      YouTubePlaylistHandler, AllowedApiWriteEventsHandler
 from controllers.ajax_controller import LiveEventHandler, TypeaheadHandler, WebcastHandler
 from controllers.event_controller import EventList, EventDetail, EventInsights, EventRss
 from controllers.event_wizard_controller import EventWizardHandler
@@ -133,6 +133,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/webhooks/delete', WebhookDelete, 'webhook-delete', strict_slash=True),
       RedirectRoute(r'/webhooks/verify/<client_id:[0-9]+>', WebhookVerify, 'webhook-verify', strict_slash=True),
       RedirectRoute(r'/webhooks/send_verification', WebhookVerificationSend, 'webhook-send-verification', strict_slash=True),
+      RedirectRoute(r'/_/account/apiwrite_events', AllowedApiWriteEventsHandler, 'allowed-apiwrite-events', strict_slash=True),
       RedirectRoute(r'/_/account/info', AccountInfoHandler, 'account-info', strict_slash=True),
       RedirectRoute(r'/_/account/register_fcm_token', AccountRegisterFCMToken, 'account-register-web-client', strict_slash=True),
       RedirectRoute(r'/_/account/favorites/<model_type:[0-9]+>', AccountFavoritesHandler, 'ajax-account-favorites', strict_slash=True),

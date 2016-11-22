@@ -1,20 +1,28 @@
+<h3>Event Information</h3>
 <form action="/suggest/offseason/review" method="post">
     <input type="hidden" name="suggestion_id" value="{{ suggestion_id }}" />
     <table class="table table-striped table-hover table-condensed">
         <tr>
+            <td>Event ID (used in key)</td>
+            <td><input type="text" name="event_short" {% if event.event_short %}value="{{ event.event_short }}{% endif %}"/></td>
+            <td><p><strong>Example:</strong><br>nyny</p></td>
+        </tr>
+        <tr><td>&nbsp;</td></tr>
+        <tr>
             <td>Name</td>
             <td><input type="text" name="name" {% if event.name %}value="{{ event.name }}"{% endif %}/></td>
+            <td><p><strong>Example:</strong><br>New York City Regional</p></td>
+        </tr>
+         <tr>
+            <td>Short Name</td>
+            <td><input type="text" name="short_name" {% if event.short_name %}value="{{ event.short_name }}"{% endif %}/></td>
+             <td><p><strong>Example:</strong><br>New York City</p></td>
         </tr>
         <tr>
             <td>Dates</td>
             <td>
                 <input type="text" name="start_date" {% if event.start_date %}value="{{ event.start_date.strftime("%Y-%m-%d")}}"{% endif %} placeholder="2012-04-04"/> to <input type="text" name="end_date" {% if event.end_date %}value="{{ event.end_date.strftime("%Y-%m-%d")}}" {% endif %}placeholder="2012-04-06"/>
             </td>
-        </tr>
-
-        <tr>
-            <td><strong>Short Name</strong></td>
-            <td><input type="text" name="short_name" {% if event.short_name %}value="{{ event.short_name }}"{% endif %}/></td>
         </tr>
         <tr>
             <td>Website</td>
@@ -23,10 +31,6 @@
         <tr>
             <td>Year</td>
             <td><input type="text" name="year" {% if event.year %}value="{{ event.year }}"{% endif %}/></td>
-        </tr>
-        <tr>
-            <td><strong>Event Short</strong></td>
-            <td><input type="text" name="event_short" {% if event.event_short %}value="{{ event.event_short }}{% endif %}"/></td>
         </tr>
         <tr>
             <td>Event Venue</td>
@@ -49,7 +53,7 @@
             <td><p><strong>Example:</strong><br>NY</p></td>
          </tr>
          <tr>
-            <td>Event City</td>
+            <td>Event Country</td>
             <td><input type="text" name="country" {% if event.country %}value="{{ event.country}}"{% endif %}/></td>
             <td><p><strong>Example:</strong><br>USA</p></td>
          </tr>

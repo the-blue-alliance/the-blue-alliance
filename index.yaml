@@ -9,6 +9,17 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
+- kind: ApiAuthAccess
+  properties:
+  - name: event_list
+  - name: owner
+  - name: expiration
+
+- kind: ApiAuthAccess
+  properties:
+  - name: owner
+  - name: expiration
+
 - kind: Event
   properties:
   - name: __key__

@@ -49,6 +49,45 @@ class AdminEventAddAllianceSelections(LoggedInHandler):
         self.redirect("/admin/event/" + event.key_name)
 
 
+class AdminAddAllianceBackup(LoggedInHandler):
+    """
+    Add a backup team into the alliances dict
+    """
+    def post(self, event_key_id):
+        self._require_admin()
+        event = Event.get_by_id(event_key_id)
+        if not event:
+            self.redirect("/admin/event/" + event.key_name)
+            return
+        event_details = event.details
+        if not event_details or not event_details.alliance_selections:
+            # No alliance data to modify
+            self.redirect("/admin/event/" + event.key_name)
+            return
+
+        team_in = "frc{}".format(self.request.get("backup_in"))
+        team_out = "frc{}".format(self.request.get("backup_out"))
+
+        # Make sure both teams are attending the event
+        et_in = EventTeam.get_by_id("{}_{}".format(event.key_name, team_in))
+        et_out = EventTeam.get_by_id("{}_{}".format(event.key_name, team_out))
+        if not et_in and et_out:
+            # Bad teams supplied
+            self.redirect("/admin/event/" + event.key_name)
+            return
+
+        for alliance in event_details.alliance_selections:
+            if team_out in alliance.get('picks', []):
+                alliance['backup'] = {}
+                alliance['backup']['in'] = team_in
+                alliance['backup']['out'] = team_out
+                EventDetailsManipulator.createOrUpdate(event_details)
+                break
+
+        self.redirect("/admin/event/" + event.key_name)
+        return
+
+
 class AdminEventAddTeams(LoggedInHandler):
     """
     Add a teams to an Event. Useful for legacy and offseason events.
