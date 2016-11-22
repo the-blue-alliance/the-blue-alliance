@@ -12,6 +12,12 @@
   <span class="hashtag-link hashtag-instagram"></span>
 {% elif media.media_type_enum == 8 %}
   <span class="hashtag-link hashtag-periscope"></span>
+{% elif media.media_type_enum == 9 %}
+  <span class="hashtag-link hashtag-pinterest"></span>
+{% elif media.media_type_enum == 10 %}
+  <span class="hashtag-link hashtag-snapchat"></span>
+{% elif media.media_type_enum == 11 %}
+  <span class="hashtag-link hashtag-twitch"></span>
 {% endif %}
 {{ media.foreign_key }}</a>
 {% endmacro %}
@@ -57,6 +63,18 @@
         <a href="{{ suggestion.contents.profile_url }}">{{ suggestion.contents.foreign_key }}</a>
     {% elif suggestion.contents.media_type_enum == 8 %}
         <!-- Periscope profile -->
+        {{ suggestion.contents.site_name }}:
+        <a href="{{ suggestion.contents.profile_url }}">{{ suggestion.contents.foreign_key }}</a>
+    {% elif suggestion.contents.media_type_enum == 9 %}
+        <!-- Pinterest profile -->
+        {{ suggestion.contents.site_name }}:
+        <a href="{{ suggestion.contents.profile_url }}">{{ suggestion.contents.foreign_key }}</a>
+    {% elif suggestion.contents.media_type_enum == 10 %}
+        <!-- Snapchat profile -->
+        {{ suggestion.contents.site_name }}:
+        <a href="{{ suggestion.contents.profile_url }}">{{ suggestion.contents.foreign_key }}</a>
+    {% elif suggestion.contents.media_type_enum == 11 %}
+        <!-- Twitch channel -->
         {{ suggestion.contents.site_name }}:
         <a href="{{ suggestion.contents.profile_url }}">{{ suggestion.contents.foreign_key }}</a>
     {% endif %}
