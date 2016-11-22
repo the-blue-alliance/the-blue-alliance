@@ -23,6 +23,9 @@ class Media(ndb.Model):
         MediaType.GITHUB_PROFILE: 'github-profile',
         MediaType.INSTAGRAM_PROFILE: 'instagram-profile',
         MediaType.PERISCOPE_PROFILE: 'periscope-profile',
+        MediaType.PINTEREST_PROFILE: 'pinterest-profile',
+        MediaType.SNAPCHAT_PROFILE: 'snapchat-profile',
+        MediaType.TWITCH_CHANNEL: 'twitch-channel',
     }
 
     REFERENCE_MAP = {
