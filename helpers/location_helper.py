@@ -21,6 +21,17 @@ else:
 
 
 class LocationHelper(object):
+    @classmethod
+    def get_similarity(cls, a, b):
+        """
+        Returns similarity between two strings from 0 to 1.
+        Ignores case and order
+        """
+        a_sorted = ' '.join(sorted(re.split('\W+', a)))
+        b_sorted = ' '.join(sorted(re.split('\W+', b)))
+        return SequenceMatcher(None, a_sorted.lower(), b_sorted.lower()).ratio()
+
+
     # @classmethod
     # def get_event_lat_lon(cls, event):
     #     """
@@ -109,18 +120,18 @@ class LocationHelper(object):
         score = 0.0
         if event.country:
             score += max(
-                SequenceMatcher(None, location_info.get('country', '').lower(), event.country.lower()).ratio(),
-                SequenceMatcher(None, location_info.get('country_short', '').lower(), event.country.lower()).ratio())
+                cls.get_similarity(location_info.get('country', ''), event.country),
+                cls.get_similarity(location_info.get('country_short', ''), event.country))
         if event.state_prov:
             score += max(
-                SequenceMatcher(None, location_info.get('state_prov', '').lower(), event.state_prov.lower()).ratio(),
-                SequenceMatcher(None, location_info.get('state_prov_short', '').lower(), event.state_prov.lower()).ratio())
+                cls.get_similarity(location_info.get('state_prov', ''), event.state_prov),
+                cls.get_similarity(location_info.get('state_prov_short', ''), event.state_prov))
         if event.city:
-            score += SequenceMatcher(None, location_info.get('city', '').lower(), event.city.lower()).ratio()
+            score += cls.get_similarity(location_info.get('city', ''), event.city)
         if event.postalcode:
-            score += SequenceMatcher(None, location_info.get('postal_code', '').lower(), event.postalcode.lower()).ratio()
+            score += cls.get_similarity(location_info.get('postal_code', ''), event.postalcode)
         if event.venue:
-            venue_score = SequenceMatcher(None, location_info.get('name', '').lower(), event.venue.lower()).ratio()
+            venue_score = cls.get_similarity(location_info.get('name', ''), event.venue)
             score += venue_score * 3
 
         return min(1.0, score / max_score)
@@ -189,11 +200,13 @@ class LocationHelper(object):
         best_location_info = {}
         textsearch_results_candidates = []  # More trustworthy candidates are added first
         for query in possible_queries:
+            print query
+            print '!!!!!!!!!!!!'
             textsearch_results = cls.google_maps_textsearch_async(query).get_result()
             if textsearch_results:
                 if len(textsearch_results) == 1:
                     location_info = cls.construct_location_info_async(textsearch_results[0]).get_result()
-                    score = cls.compute_team_location_score(team, location_info)
+                    score = cls.compute_team_location_score(team, query, location_info)
                     if score == 1:
                         # Very likely to be correct if only 1 result and as a perfect score
                         return location_info
@@ -203,33 +216,35 @@ class LocationHelper(object):
                         best_location_info = location_info
                 else:
                     # Save queries with multiple results for later evaluation
-                    textsearch_results_candidates.append(textsearch_results)
+                    textsearch_results_candidates.append((textsearch_results, query))
 
         # Check if we have found anything reasonable
-        if best_location_info and best_score > 0.75:
+        if best_location_info and best_score > 0.9:
             return best_location_info
 
         # Try to find place using only location
         if not textsearch_results_candidates:
-            textsearch_results = cls.google_maps_textsearch_async(team.location).get_result()
+            query = team.location
+            textsearch_results = cls.google_maps_textsearch_async(query).get_result()
             if textsearch_results:
-                textsearch_results_candidates.append(textsearch_results)
+                textsearch_results_candidates.append((textsearch_results, query))
 
         # Try to find place using only city, country
         if not textsearch_results_candidates and team.city and team.country:
-            textsearch_results = cls.google_maps_textsearch_async(u'{} {}'.format(team.city, team.country)).get_result()
+            query = u'{} {}'.format(team.city, team.country)
+            textsearch_results = cls.google_maps_textsearch_async(query).get_result()
             if textsearch_results:
-                textsearch_results_candidates.append(textsearch_results)
+                textsearch_results_candidates.append((textsearch_results, query))
 
         if not textsearch_results_candidates:
             logging.warning("Finding textsearch results for team {} failed!".format(team.key.id()))
             return {}
 
         # Consider all candidates and find best one
-        for textsearch_results in textsearch_results_candidates:
+        for textsearch_results, query in textsearch_results_candidates:
             for textsearch_result in textsearch_results:
                 location_info = cls.construct_location_info_async(textsearch_result).get_result()
-                score = cls.compute_team_location_score(team, location_info)
+                score = cls.compute_team_location_score(team, query, location_info)
                 if score == 1:
                     return location_info
                 elif score > best_score:
@@ -239,26 +254,35 @@ class LocationHelper(object):
         return best_location_info
 
     @classmethod
-    def compute_team_location_score(cls, team, location_info):
+    def compute_team_location_score(cls, team, query, location_info):
         """
         Score for correctness. 1.0 is perfect.
         Not checking for absolute equality in case of existing data errors.
         Check with both long and short names
         """
-        max_score = 4.0
+        max_score = 5.0
         score = 0.0
         if team.country:
             score += max(
-                SequenceMatcher(None, location_info.get('country', '').lower(), team.country.lower()).ratio(),
-                SequenceMatcher(None, location_info.get('country_short', '').lower(), team.country.lower()).ratio())
+                cls.get_similarity(location_info.get('country', ''), team.country),
+                cls.get_similarity(location_info.get('country_short', ''), team.country))
+            print score
         if team.state_prov:
             score += max(
-                SequenceMatcher(None, location_info.get('state_prov', '').lower(), team.state_prov.lower()).ratio(),
-                SequenceMatcher(None, location_info.get('state_prov_short', '').lower(), team.state_prov.lower()).ratio())
+                cls.get_similarity(location_info.get('state_prov', ''), team.state_prov),
+                cls.get_similarity(location_info.get('state_prov_short', ''), team.state_prov))
+            print score
         if team.city:
-            score += SequenceMatcher(None, location_info.get('city', '').lower().lower(), team.city.lower()).ratio()
+            score += cls.get_similarity(location_info.get('city', ''), team.city)
+            print score
         if team.postalcode:
-            score += SequenceMatcher(None, location_info.get('postal_code', '').lower(), team.postalcode.lower()).ratio()
+            score += cls.get_similarity(location_info.get('postal_code', ''), team.postalcode)
+            print score
+
+        query_score = cls.get_similarity(location_info.get('name', ''), query)
+        score += query_score * 3
+        print score
+
         return min(1.0, score / max_score)
 
     @classmethod
@@ -341,6 +365,7 @@ class LocationHelper(object):
 
                 if tba_config.CONFIG['memcache']:
                     memcache.set(cache_key, results)
+        print results
         raise ndb.Return(results)
 
     @classmethod
@@ -353,10 +378,10 @@ class LocationHelper(object):
             logging.warning("Must have sitevar google.api_key to use Google Maps PlaceDetails")
             raise ndb.Return(None)
 
-        results = None
+        result = None
         cache_key = u'google_maps_place_details:{}'.format(place_id)
-        results = memcache.get(cache_key)
-        if not results:
+        result = memcache.get(cache_key)
+        if not result:
             place_details_params = {
                 'placeid': place_id,
                 'key': GOOGLE_API_KEY,
@@ -371,9 +396,9 @@ class LocationHelper(object):
                 if place_details_result.status_code == 200:
                     place_details_dict = json.loads(place_details_result.content)
                     if place_details_dict['status'] == 'ZERO_RESULTS':
-                        logging.info('No place_details results for place_id: {}'.format(place_id))
+                        logging.info('No place_details result for place_id: {}'.format(place_id))
                     elif place_details_dict['status'] == 'OK':
-                        results = place_details_dict['result']
+                        result = place_details_dict['result']
                     else:
                         logging.warning('Placedetails failed!')
                         logging.warning(place_details_dict)
@@ -384,8 +409,9 @@ class LocationHelper(object):
                 logging.warning(e)
 
             if tba_config.CONFIG['memcache']:
-                memcache.set(cache_key, results)
-        raise ndb.Return(results)
+                memcache.set(cache_key, result)
+
+        raise ndb.Return(result)
 
     @classmethod
     def get_timezone_id(cls, location, lat_lon=None):
