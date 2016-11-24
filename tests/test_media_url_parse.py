@@ -128,7 +128,7 @@ class TestMediaUrlParser(unittest2.TestCase):
         self.assertEqual(result['media_type_enum'], MediaType.SNAPCHAT_PROFILE)
         self.assertEqual(result['is_social'], True)
         self.assertEqual(result['foreign_key'], 'evolution2626')
-        self.assertEqual(result['site_name'], MediaType.type_names[MediaType.PERISCOPE_PROFILE])
+        self.assertEqual(result['site_name'], MediaType.type_names[MediaType.SNAPCHAT_PROFILE])
         self.assertEqual(result['profile_url'], 'https://www.snapchat.com/add/evolution2626')
         
     def test_twitch_profile_parse(self):
