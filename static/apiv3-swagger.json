@@ -3840,7 +3840,10 @@
             "twitter-profile",
             "github-profile",
             "instagram-profile",
-            "periscope-profile"
+            "periscope-profile",
+            "pinterest-profile",
+            "snapchat-profile",
+            "twitch-channel"
           ]
         },
         "foreign_key": {
