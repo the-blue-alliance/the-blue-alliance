@@ -7,16 +7,13 @@ const ChatSidebar = (props) => {
     'chat-sidebar': true,
   })
 
-  const protocol = /^http:/.test(document.location) ? 'http' : 'https'
-  const embedUrl = `${protocol}://twitch.tv/chat/embed?channel=tbagameday&amp;popout_chat=true`
-
   return (
     <div className={classes}>
       <iframe
         frameBorder="0"
         scrolling="no"
         id="chat_embed"
-        src={embedUrl}
+        src="https://twitch.tv/chat/embed?channel=tbagameday&amp;popout_chat=true"
         height="100%"
         width="100%"
       />
