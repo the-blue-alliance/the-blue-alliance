@@ -5,12 +5,17 @@ import { TOGGLE_CHAT_SIDEBAR_VISIBILITY, TOGGLE_HASHTAG_SIDEBAR_VISIBILITY } fro
 const defaultState = {
   hashtagSidebar: false,
   chatSidebar: false,
+  chatSidebarHasBeenVisible: false,
   tickerSidebar: false,
 }
 
-const toggleChatSidebarVisibility = (state) => (Object.assign({}, state, {
-  chatSidebar: !state.chatSidebar,
-}))
+const toggleChatSidebarVisibility = (state) => {
+  const hasBeenVisible = (state.chatSidebarHasBeenVisible || !state.chatSidebar)
+  return Object.assign({}, state, {
+    chatSidebar: !state.chatSidebar,
+    chatSidebarHasBeenVisible: hasBeenVisible,
+  })
+}
 
 const toggleHashtagSidebarVisibility = (state) => (Object.assign({}, state, {
   hashtagSidebar: !state.hashtagSidebar,
