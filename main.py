@@ -10,14 +10,14 @@ from controllers.ajax_controller import AccountInfoHandler, AccountRegisterFCMTo
 from controllers.ajax_controller import LiveEventHandler, TypeaheadHandler, WebcastHandler
 from controllers.event_controller import EventList, EventDetail, EventInsights, EventRss
 from controllers.event_wizard_controller import EventWizardHandler
-from controllers.gameday2_controller import Gameday2Controller
+from controllers.gameday_controller import Gameday2Controller, GamedayHandler, GamedayRedirectHandler
 from controllers.insights_controller import InsightsOverview, InsightsDetail
 from controllers.main_controller import TwoChampsHandler, ContactHandler, HashtagsHandler, \
     MainKickoffHandler, MainBuildseasonHandler, MainChampsHandler, MainCompetitionseasonHandler, \
     MainInsightsHandler, MainOffseasonHandler, OprHandler, PredictionsHandler, SearchHandler, \
     AboutHandler, ThanksHandler, handle_404, handle_500, \
-    GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler, ApiWriteHandler, MatchInputHandler, WebhookDocumentationHandler, \
-      AddDataHandler, GamedayRedirectHandler
+    WebcastsHandler, RecordHandler, ApiDocumentationHandler, ApiWriteHandler, MatchInputHandler, WebhookDocumentationHandler, \
+      AddDataHandler
 from controllers.match_controller import MatchDetail
 from controllers.mytba_controller import MyTBALiveController
 from controllers.nearby_controller import NearbyController
