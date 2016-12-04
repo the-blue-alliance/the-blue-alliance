@@ -232,7 +232,7 @@ class WebcastHandler(CacheableHandler):
             special_webcasts_future = Sitevar.get_by_id_async('gameday.special_webcasts')
             special_webcasts = special_webcasts_future.get_result()
             if special_webcasts:
-                special_webcasts = special_webcasts.contents
+                special_webcasts = special_webcasts.contents['webcasts']
             else:
                 special_webcasts = []
 
