@@ -13,6 +13,7 @@ from base_controller import CacheableHandler
 from consts.event_type import EventType
 from consts.notification_type import NotificationType
 from helpers.event_helper import EventHelper
+from helpers.validation_helper import ValidationHelper
 
 from models.event import Event
 from models.insight import Insight
@@ -369,8 +370,21 @@ class GamedayRedirectHandler(webapp2.RequestHandler):
         valid_aliases = [x for x in aliases if x['name'] == alias]
         if valid_aliases:
             self.redirect("/gameday{}".format(valid_aliases[0]['args']))
-        else:
-            self.redirect("/gameday")
+            return
+
+        # Allow an alias to be an event key
+        if not ValidationHelper.event_id_validator(alias):
+            event = Event.get_by_id(alias)
+            if event and event.webcast and event.within_a_day:
+                count = len(event.webcast)
+                layout = count - 1 if count < 5 else 5  # Fall back to hex-view
+                params = "#layout={}".format(layout)
+                for i, webcast in enumerate(event.webcast):
+                    params += "&view_{}={}-{}".format(i, webcast['key_name'], i+1)
+                self.redirect("/gameday{}".format(params))
+                return
+
+        self.redirect("/gameday")
         return
 
 
