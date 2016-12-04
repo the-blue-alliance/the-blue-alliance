@@ -12,6 +12,7 @@ import tba_config
 from base_controller import CacheableHandler
 from consts.event_type import EventType
 from consts.notification_type import NotificationType
+from database.event_query import TeamYearEventsQuery
 from helpers.event_helper import EventHelper
 from helpers.validation_helper import ValidationHelper
 
@@ -376,16 +377,35 @@ class GamedayRedirectHandler(webapp2.RequestHandler):
         if not ValidationHelper.event_id_validator(alias):
             event = Event.get_by_id(alias)
             if event and event.webcast and event.within_a_day:
-                count = len(event.webcast)
-                layout = count - 1 if count < 5 else 5  # Fall back to hex-view
-                params = "#layout={}".format(layout)
-                for i, webcast in enumerate(event.webcast):
-                    params += "&view_{}={}-{}".format(i, webcast['key_name'], i+1)
+                params = self.get_param_string_for_event(event)
                 self.redirect("/gameday{}".format(params))
                 return
 
+        # Allow an alias to be an event key
+        if not ValidationHelper.team_id_validator(alias):
+            now = datetime.datetime.now()
+            team_events_future = TeamYearEventsQuery(alias, now.year).fetch_async()
+            team_events = team_events_future.get_result()
+            for event in team_events:
+                if event and event.webcast and event.within_a_day:
+                    params = self.get_param_string_for_event(event)
+                    self.redirect("/gameday{}".format(params))
+                    return
+
         self.redirect("/gameday")
         return
+
+    @staticmethod
+    def get_param_string_for_event(event):
+        count = len(event.webcast)
+        if count == 0:
+            return ""
+        layout = count - 1 if count < 5 else 5  # Fall back to hex-view
+        params = "#layout={}".format(layout)
+        for i, webcast in enumerate(event.webcast):
+            params += "&view_{}={}-{}".format(i, webcast['key_name'], i+1)
+
+        return params
 
 
 class WebcastsHandler(CacheableHandler):
