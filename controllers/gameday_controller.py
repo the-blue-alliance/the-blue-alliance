@@ -137,10 +137,11 @@ class GamedayRedirectHandler(webapp2.RequestHandler):
                 self.redirect("/gameday{}".format(params))
                 return
 
-        # Allow an alias to be an event key
-        if not ValidationHelper.team_id_validator(alias):
+        # Allow an alias to be a team number
+        team_key = "frc{}".format(alias)
+        if not ValidationHelper.team_id_validator(team_key):
             now = datetime.datetime.now()
-            team_events_future = TeamYearEventsQuery(alias, now.year).fetch_async()
+            team_events_future = TeamYearEventsQuery(team_key, now.year).fetch_async()
             team_events = team_events_future.get_result()
             for event in team_events:
                 if event and event.webcast and event.within_a_day:
