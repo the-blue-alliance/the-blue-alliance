@@ -50,7 +50,6 @@ class AdminGamedayDashboard(LoggedInHandler):
         channel = self.request.get("webcast_channel")
         file = self.request.get("webcast_file")
         urlkey = self.request.get("webcast_urlkey")
-        logging.info("Data: {} {}".format(name, type))
         if not name or not type or not channel or not urlkey:
             return
 
