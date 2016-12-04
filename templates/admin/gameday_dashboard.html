@@ -34,13 +34,17 @@
 <!-- Row to add another special webcast -->
 <tr>
     <td><input type="text" class="form-control" name="webcast_name" form="add_webcast" placeholder="Display Name"/></td>
-    <td><input type="text" class="form-control" name="webcast_type" form="add_webcast" placeholder="Stream Type"/></td>
-    <td><input type="text" class="form-control" name="webcast_channel" form="add_webcast" placeholder="Stream Channel"/></td>
-    <td><input type="text" class="form-control" name="webcast_urlkey" form="add_webcast" placeholder="URL Key"/></td>
-    <td><form method="post" action="/admin/gameday" id="add_webcast">
+    <td>
+        <form method="post" action="/admin/gameday" id="add_webcast">
         <input type="hidden" name="action" value="add" />
         <input type="hidden" name="item" value="webcast" />
-        <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-thumbs-up"> Add</span></button>
+        {% include "partials/webcast_type_select.html" %}
+        </form>
+    </td>
+    <td><input type="text" class="form-control" name="webcast_channel" form="add_webcast" placeholder="Stream Channel"/></td>
+    <td><input type="text" class="form-control" name="webcast_urlkey" form="add_webcast" placeholder="URL Key"/></td>
+    <td>
+        <button class="btn btn-primary" type="submit" form="add_webcast"><span class="glyphicon glyphicon-thumbs-up"> Add</span></button>
     </form></td>
 </tr>
 </table>
@@ -65,7 +69,7 @@
 </tr>
 {% endfor %}
 
-<!-- Row to add another special webcast -->
+<!-- Row to add an alias -->
 <tr>
     <td><input type="text" class="form-control" name="alias_name" form="add_alias" placeholder="fun"/></td>
     <td><input type="text" class="form-control" name="alias_args" form="add_alias" placeholder="#layout=0&view_0=firstupdatesnow-1"/></td>
