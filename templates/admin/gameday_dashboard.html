@@ -59,14 +59,14 @@
     <th>Alias</th>
     <th>URL Params</th>
 </thead>
-{% for alias in aliases %}
+{% for name, args in aliases.items %}
 <tr>
-    <td><a href="/gameday/{{alias.name}}" target="_blank">{{alias.name}}</a></td>
-    <td><a href="/gameday{{alias.args}}" target="_blank">{{alias.args}}</a></td>
+    <td><a href="/gameday/{{name}}" target="_blank">{{name}}</a></td>
+    <td><a href="/gameday{{args}}" target="_blank">{{args}}</a></td>
     <td><form method="post" action="/admin/gameday">
         <input type="hidden" name="action" value="delete" />
         <input type="hidden" name="item" value="alias" />
-        <input type="hidden" name="alias_key" value="{{ alias.name }}" />
+        <input type="hidden" name="alias_key" value="{{ name }}" />
         <button class="btn btn-danger" type="submit"><span class="glyphicon glyphicon-trash"></span> Delete</button>
     </form></td>
 </tr>

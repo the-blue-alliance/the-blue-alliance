@@ -122,11 +122,10 @@ class GamedayRedirectHandler(webapp2.RequestHandler):
     def get(self, alias):
         special_webcasts_future = Sitevar.get_by_id_async('gameday.special_webcasts')
         special_webcasts = special_webcasts_future.get_result()
-        aliases = special_webcasts.contents.get("aliases", []) if special_webcasts else []
+        aliases = special_webcasts.contents.get("aliases", {}) if special_webcasts else {}
 
-        valid_aliases = [x for x in aliases if x['name'] == alias]
-        if valid_aliases:
-            self.redirect("/gameday{}".format(valid_aliases[0]['args']))
+        if alias in aliases:
+            self.redirect("/gameday{}".format(aliases[alias]))
             return
 
         # Allow an alias to be an event key

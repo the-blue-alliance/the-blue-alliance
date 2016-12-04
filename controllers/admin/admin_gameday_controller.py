@@ -15,7 +15,7 @@ class AdminGamedayDashboard(LoggedInHandler):
         self._require_admin()
         gd_sitevar = Sitevar.get_by_id("gameday.special_webcasts")
         special_webcasts = gd_sitevar.contents.get("webcasts", []) if gd_sitevar else []
-        path_aliases = gd_sitevar.contents.get("aliases", []) if gd_sitevar else []
+        path_aliases = gd_sitevar.contents.get("aliases", {}) if gd_sitevar else {}
 
         self.template_values.update({
             "webcasts": special_webcasts,
@@ -84,20 +84,17 @@ class AdminGamedayDashboard(LoggedInHandler):
 
         sitevar_contents = gd_sitevar.contents
         if 'aliases' not in sitevar_contents:
-            sitevar_contents['aliases'] = []
-        sitevar_contents['aliases'].append({
-            'name': name,
-            'args': args,
-        })
+            sitevar_contents['aliases'] = {}
+        sitevar_contents['aliases'][name] = args
         gd_sitevar.contents = sitevar_contents
         gd_sitevar.put()
 
     def delete_alias(self, gd_sitevar):
         key_to_delete = self.request.get("alias_key")
-        if not key_to_delete:
+        sitevar_contents = gd_sitevar.contents
+        if not key_to_delete or key_to_delete not in sitevar_contents['aliases']:
             return
 
-        sitevar_contents = gd_sitevar.contents
-        sitevar_contents['aliases'] = [x for x in sitevar_contents.get("aliases", []) if x['name'] != key_to_delete]
+        del sitevar_contents['aliases'][key_to_delete]
         gd_sitevar.contents = sitevar_contents
         gd_sitevar.put()
