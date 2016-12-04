@@ -48,6 +48,7 @@ class AdminGamedayDashboard(LoggedInHandler):
         name = self.request.get("webcast_name")
         type = self.request.get("webcast_type")
         channel = self.request.get("webcast_channel")
+        file = self.request.get("webcast_file")
         urlkey = self.request.get("webcast_urlkey")
         logging.info("Data: {} {}".format(name, type))
         if not name or not type or not channel or not urlkey:
@@ -59,6 +60,7 @@ class AdminGamedayDashboard(LoggedInHandler):
         sitevar_contents['webcasts'].append({
             'type': type,
             'channel': channel,
+            'file': file,
             'name': name,
             'key_name': urlkey,
         })
