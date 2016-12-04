@@ -9,6 +9,7 @@ from controllers.admin.admin_apistatus_controller import AdminApiStatus
 from controllers.admin.admin_authkeys_controller import AdminAuthKeys
 from controllers.admin.admin_event_controller import AdminEventAddAllianceSelections, AdminEventDeleteTeams, AdminEventAddTeams, AdminEventRemapTeams, AdminEventAddWebcast, AdminEventCreate, AdminEventCreateTest, AdminEventDelete, AdminEventDetail, AdminEventEdit, AdminEventList, \
     AdminAddAllianceBackup
+from controllers.admin.admin_gameday_controller import AdminGamedayDashboard
 from controllers.admin.admin_main_controller import AdminDebugHandler, AdminMain, AdminTasksHandler
 from controllers.admin.admin_award_controller import AdminAwardDashboard, AdminAwardEdit, AdminAwardAdd
 from controllers.admin.admin_match_controller import AdminVideosAdd, AdminMatchCleanup, AdminMatchDashboard, AdminMatchDelete, AdminMatchDetail, AdminMatchAdd, AdminMatchEdit
@@ -47,6 +48,7 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/event/delete/(.*)', AdminEventDelete),
                                ('/admin/event/edit/(.*)', AdminEventEdit),
                                ('/admin/event/(.*)', AdminEventDetail),
+                               ('/admin/gameday', AdminGamedayDashboard),
                                ('/admin/awards', AdminAwardDashboard),
                                ('/admin/award/add', AdminAwardAdd),
                                ('/admin/award/edit/(.*)', AdminAwardEdit),

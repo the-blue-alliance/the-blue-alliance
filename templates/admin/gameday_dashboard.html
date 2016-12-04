@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}GameDay{% endblock %}
+
+{% block content %}
+
+<h1>GameDay</h1>
+<p>Change things about GameDay</p>
+
+<h2>Special Webcasts</h2>
+<p>{{ webcasts|length }} special webcasts</p>
+<table class="table table-striped table-hover">
+<thead>
+    <th>Name</th>
+    <th>Type</th>
+    <th>Channel</th>
+    <th>URL Key</th>
+</thead>
+{% for webcast in webcasts %}
+<tr>
+    <td>{{webcast.name}}</td>
+    <td>{{webcast.type}}</td>
+    <td>{{webcast.channel}}</td>
+    <td>{{webcast.key_name}}</td>
+    <td><form method="post" action="/admin/gameday">
+        <input type="hidden" name="action" value="delete" />
+        <input type="hidden" name="item" value="webcast" />
+        <input type="hidden" name="webcast_key" value="{{ webcast.key_name }}" />
+        <button class="btn btn-danger" type="submit"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+    </form></td>
+</tr>
+{% empty %}
+    <p>No special webcasts</p>
+{% endfor %}
+
+<!-- Row to add another special webcast -->
+<tr>
+    <td><input type="text" class="form-control" name="webcast_name" form="add_webcast" placeholder="Display Name"/></td>
+    <td><input type="text" class="form-control" name="webcast_type" form="add_webcast" placeholder="Stream Type"/></td>
+    <td><input type="text" class="form-control" name="webcast_channel" form="add_webcast" placeholder="Stream Channel"/></td>
+    <td><input type="text" class="form-control" name="webcast_urlkey" form="add_webcast" placeholder="URL Key"/></td>
+    <td><form method="post" action="/admin/gameday" id="add_webcast">
+        <input type="hidden" name="action" value="add" />
+        <input type="hidden" name="item" value="webcast" />
+        <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-thumbs-up"> Add</span></button>
+    </form></td>
+</tr>
+</table>
+
+<h2>URL Aliases</h2>
+<p> {{ aliases|length }} URL aliases</p>
+
+{% endblock %}
