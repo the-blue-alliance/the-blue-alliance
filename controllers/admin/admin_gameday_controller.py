@@ -35,8 +35,11 @@ class AdminGamedayDashboard(LoggedInHandler):
         if action == "add" and item == "webcast":
             self.add_special_webcast(gd_sitevar)
         elif action == "delete" and item == "webcast":
-            logging.info("Deleting special webcast")
             self.delete_special_webcast(gd_sitevar)
+        elif action == "add" and item == "alias":
+            self.add_alias(gd_sitevar)
+        elif action == "delete" and item == "alias":
+            self.delete_alias(gd_sitevar)
 
         self.redirect("/admin/gameday")
         return
@@ -66,9 +69,33 @@ class AdminGamedayDashboard(LoggedInHandler):
         if not key_to_delete:
             return
 
-        logging.info("Deleting {}".format(key_to_delete))
         sitevar_contents = gd_sitevar.contents
         sitevar_contents['webcasts'] = [x for x in sitevar_contents.get("webcasts", []) if x['key_name'] != key_to_delete]
         gd_sitevar.contents = sitevar_contents
-        logging.info("data: {}".format(gd_sitevar.contents))
+        gd_sitevar.put()
+
+    def add_alias(self, gd_sitevar):
+        name = self.request.get("alias_name")
+        args = self.request.get("alias_args")
+        if not name or not args:
+            return
+
+        sitevar_contents = gd_sitevar.contents
+        if 'aliases' not in sitevar_contents:
+            sitevar_contents['aliases'] = []
+        sitevar_contents['aliases'].append({
+            'name': name,
+            'args': args,
+        })
+        gd_sitevar.contents = sitevar_contents
+        gd_sitevar.put()
+
+    def delete_alias(self, gd_sitevar):
+        key_to_delete = self.request.get("alias_key")
+        if not key_to_delete:
+            return
+
+        sitevar_contents = gd_sitevar.contents
+        sitevar_contents['aliases'] = [x for x in sitevar_contents.get("aliases", []) if x['name'] != key_to_delete]
+        gd_sitevar.contents = sitevar_contents
         gd_sitevar.put()

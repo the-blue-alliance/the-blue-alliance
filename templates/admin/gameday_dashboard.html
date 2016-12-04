@@ -29,8 +29,6 @@
         <button class="btn btn-danger" type="submit"><span class="glyphicon glyphicon-trash"></span> Delete</button>
     </form></td>
 </tr>
-{% empty %}
-    <p>No special webcasts</p>
 {% endfor %}
 
 <!-- Row to add another special webcast -->
@@ -49,5 +47,34 @@
 
 <h2>URL Aliases</h2>
 <p> {{ aliases|length }} URL aliases</p>
+<table class="table table-striped table-hover">
+<thead>
+    <th>Alias</th>
+    <th>URL Params</th>
+</thead>
+{% for alias in aliases %}
+<tr>
+    <td>{{alias.name}}</td>
+    <td><a href="/gameday{{alias.args}}" target="_blank">{{alias.args}}</a></td>
+    <td><form method="post" action="/admin/gameday">
+        <input type="hidden" name="action" value="delete" />
+        <input type="hidden" name="item" value="alias" />
+        <input type="hidden" name="alias_key" value="{{ alias.name }}" />
+        <button class="btn btn-danger" type="submit"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+    </form></td>
+</tr>
+{% endfor %}
+
+<!-- Row to add another special webcast -->
+<tr>
+    <td><input type="text" class="form-control" name="alias_name" form="add_alias" placeholder="fun"/></td>
+    <td><input type="text" class="form-control" name="alias_args" form="add_alias" placeholder="#layout=0&view_0=firstupdatesnow-1"/></td>
+    <td><form method="post" action="/admin/gameday" id="add_alias">
+        <input type="hidden" name="action" value="add" />
+        <input type="hidden" name="item" value="alias" />
+        <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-thumbs-up"> Add</span></button>
+    </form></td>
+</tr>
+</table>
 
 {% endblock %}
