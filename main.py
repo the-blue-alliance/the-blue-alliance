@@ -17,7 +17,7 @@ from controllers.main_controller import TwoChampsHandler, ContactHandler, Hashta
     MainInsightsHandler, MainOffseasonHandler, OprHandler, PredictionsHandler, SearchHandler, \
     AboutHandler, ThanksHandler, handle_404, handle_500, \
     GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler, ApiWriteHandler, MatchInputHandler, WebhookDocumentationHandler, \
-      AddDataHandler
+      AddDataHandler, GamedayRedirectHandler
 from controllers.match_controller import MatchDetail
 from controllers.mytba_controller import MyTBALiveController
 from controllers.nearby_controller import NearbyController
@@ -92,6 +92,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/events', EventList, 'event-list', strict_slash=True),
       RedirectRoute(r'/eventwizard', EventWizardHandler, 'event-wizard', strict_slash=True),
       RedirectRoute(r'/gameday', GamedayHandler, 'gameday', strict_slash=True),
+      RedirectRoute(r'/gameday/<alias>', GamedayRedirectHandler, 'gameday-alias', strict_slash=True),
       RedirectRoute(r'/gameday2', Gameday2Controller, 'gameday2', strict_slash=True),
       RedirectRoute(r'/hashtags', HashtagsHandler, 'hashtags', strict_slash=True),
       RedirectRoute(r'/insights/<year:[0-9]+>', InsightsDetail, 'insights-detail', strict_slash=True),
@@ -128,6 +129,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/teams/<page:[0-9]+>', TeamList, 'team-list-year', strict_slash=True),
       RedirectRoute(r'/teams', TeamList, 'team-list', strict_slash=True),
       RedirectRoute(r'/thanks', ThanksHandler, 'thanks', strict_slash=True),
+      RedirectRoute(r'/watch/<alias>', GamedayRedirectHandler, 'gameday-watch', strict_slash=True),
       RedirectRoute(r'/webcasts', WebcastsHandler, 'webcasts', strict_slash=True),
       RedirectRoute(r'/webhooks/add', WebhookAdd, 'webhook-add', strict_slash=True),
       RedirectRoute(r'/webhooks/delete', WebhookDelete, 'webhook-delete', strict_slash=True),

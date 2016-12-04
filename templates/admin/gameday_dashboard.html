@@ -54,7 +54,7 @@
 </thead>
 {% for alias in aliases %}
 <tr>
-    <td>{{alias.name}}</td>
+    <td><a href="/gameday/{{alias.name}}" target="_blank">{{alias.name}}</a></td>
     <td><a href="/gameday{{alias.args}}" target="_blank">{{alias.args}}</a></td>
     <td><form method="post" action="/admin/gameday">
         <input type="hidden" name="action" value="delete" />
