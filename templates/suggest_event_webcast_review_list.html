@@ -80,18 +80,7 @@
                                                 <table class="table table-striped table-hover table-condensed">
                                                     <tr>
                                                         <td>Type</td>
-                                                        <td><select name="webcast_type">
-                                                            <option value="livestream"{% if webcast.type == "livestream"%} selected{% endif %}>livestream</option>
-                                                            <option value="mms"{% if webcast.type == "mms" %} selected{% endif %}>mms</option>
-                                                            <option value="rtmp"{% if webcast.type == "rtmp" %} selected{% endif %}>rtmp</option>
-                                                            <option value="twitch"{% if webcast.type == "twitch" %} selected{% endif %}>twitch</option>
-                                                            <option value="ustream"{% if webcast.type == "ustream" %} selected{% endif %}>ustream</option>
-                                                            <option value="youtube"{% if webcast.type == "youtube" %} selected{% endif %}>youtube</option>
-                                                            <option value="iframe"{% if webcast.type == "iframe" %} selected{% endif %}>iframe</option>
-                                                            <option value="html5"{% if webcast.type == "html5" %} selected{% endif %}>html5</option>
-                                                            <option value="stemtv"{% if webcast.type == "stemtv" %} selected{% endif %}>stemtv</option>
-                                                            <option value="dacast"{% if webcast.type == "dacast" %} selected{% endif %}>dacast</option>
-                                                        </select></td>
+                                                        <td>{% include "admin/partials/webcast_type_select.html" %}</td>
                                                     </tr>
                                                     <tr>
                                                         <td>Channel</td>
