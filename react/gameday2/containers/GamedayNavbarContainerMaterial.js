@@ -15,7 +15,9 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   toggleChatSidebarVisibility: () => dispatch(actions.toggleChatSidebarVisibility()),
+  setChatSidebarVisibility: (visible) => dispatch(actions.setChatSidebarVisibility(visible)),
   toggleHashtagSidebarVisibility: () => dispatch(actions.toggleHashtagSidebarVisibility()),
+  setHashtagSidebarVisibility: (visible) => dispatch(actions.setHashtagSidebarVisibility(visible)),
   addWebcast: (id) => dispatch(actions.addWebcast(id)),
   resetWebcasts: () => dispatch(actions.resetWebcasts()),
   setLayout: (layoutId) => dispatch(actions.setLayout(layoutId)),

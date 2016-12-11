@@ -17,9 +17,23 @@ export function toggleChatSidebarVisibility() {
   }
 }
 
+export function setChatSidebarVisibility(visible) {
+  return {
+    type: types.SET_CHAT_SIDEBAR_VISIBILITY,
+    visible,
+  }
+}
+
 export function toggleHashtagSidebarVisibility() {
   return {
     type: types.TOGGLE_HASHTAG_SIDEBAR_VISIBILITY,
+  }
+}
+
+export function setHashtagSidebarVisibility(visible) {
+  return {
+    type: types.SET_HASHTAG_SIDEBAR_VISIBILITY,
+    visible,
   }
 }
 

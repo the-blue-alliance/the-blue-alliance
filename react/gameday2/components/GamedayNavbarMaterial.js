@@ -13,7 +13,9 @@ export default class GamedayNavbarMaterial extends React.Component {
     addWebcast: PropTypes.func.isRequired,
     resetWebcasts: PropTypes.func.isRequired,
     toggleHashtagSidebarVisibility: PropTypes.func.isRequired,
+    setHashtagSidebarVisibility: PropTypes.func.isRequired,
     toggleChatSidebarVisibility: PropTypes.func.isRequired,
+    setChatSidebarVisibility: PropTypes.func.isRequired,
     setLayout: PropTypes.func.isRequired,
     layoutId: PropTypes.number.isRequired,
     layoutSet: PropTypes.bool.isRequired,
@@ -42,11 +44,16 @@ export default class GamedayNavbarMaterial extends React.Component {
         />
       <LayoutDrawer
         setLayout={this.props.setLayout}
+        toggleChatSidebarVisibility={this.props.toggleChatSidebarVisibility}
+        toggleHashtagSidebarVisibility={this.props.toggleHashtagSidebarVisibility}
         selectedLayout={this.props.layoutId}
         layoutSet={this.props.layoutSet}
+        chatSidebarVisible={this.props.chatSidebarVisible}
+        hashtagSidebarVisible={this.props.hashtagSidebarVisible}
         layoutDrawerVisible={this.props.layoutDrawerVisible}
         setLayoutDrawerVisibility={this.props.setLayoutDrawerVisibility}
         hasWebcasts={this.props.webcasts.length > 0}
+        resetWebcasts={this.props.resetWebcasts}
       />
       </div>
     )
