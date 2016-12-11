@@ -23,6 +23,19 @@ export function toggleHashtagSidebarVisibility() {
   }
 }
 
+export function toggleLayoutDrawerVisibility() {
+  return {
+    type: types.TOGGLE_LAYOUT_DRAWER_OPEN_VISIBILITY,
+  }
+}
+
+export function setLayoutDrawerVisibility(visible) {
+  return {
+    type: types.SET_LAYOUT_DRAWER_VISIBILITY,
+    visible
+  }
+}
+
 const addWebcastNoCheck = (webcastId) => ({
   type: types.ADD_WEBCAST,
   webcastId,
