@@ -11,6 +11,7 @@ export default class LayoutDrawer extends React.Component {
   static propTypes = {
     setLayout: PropTypes.func.isRequired,
     selectedLayout: PropTypes.number.isRequired,
+    layoutSet: PropTypes.bool.isRequired,
     layoutDrawerVisible: PropTypes.bool.isRequired,
     setLayoutDrawerVisibility: PropTypes.func.isRequired,
     hasWebcasts: PropTypes.bool.isRequired,
@@ -25,8 +26,8 @@ export default class LayoutDrawer extends React.Component {
     // of unselectable checkboxes
     let layouts = []
     if (this.props.hasWebcasts) {
-      for (var i = 0; i < NUM_LAYOUTS; i++) {
-        const icon = (i == /*this.props.selectedLayout*/2) ? <CheckmarkIcon /> : null
+      for (let i = 0; i < NUM_LAYOUTS; i++) {
+        const icon = (i == this.props.selectedLayout && this.props.layoutSet) ? <CheckmarkIcon /> : null
 
         layouts.push(
           <ListItem
