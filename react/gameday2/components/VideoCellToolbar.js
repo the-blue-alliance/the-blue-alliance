@@ -30,16 +30,30 @@ export default class VideoCellToolbar extends React.Component {
         <ToolbarGroup>
           <ToolbarTitle
             text={this.props.webcast.name}
-            style={titleStyle} />
+            style={titleStyle}
+          />
         </ToolbarGroup>
         <ToolbarGroup lastChild>
-          <IconButton>
+          <IconButton
+            tooltip="Swap position"
+            tooltipPosition="top-center"
+            touch
+          >
             <SwapIcon color={white} />
           </IconButton>
-          <IconButton>
+          <IconButton
+            tooltip="Change webcast"
+            tooltipPosition="top-center"
+            touch
+          >
             <VideocamIcon color={white} />
           </IconButton>
-          <IconButton onTouchTap={() => this.props.removeWebcast(this.props.webcast.id)} >
+          <IconButton
+            onTouchTap={() => this.props.removeWebcast(this.props.webcast.id)}
+            tooltip="Close webcast"
+            tooltipPosition="top-left"
+            touch
+          >
             <CloseIcon color={white} />
           </IconButton>
         </ToolbarGroup>
