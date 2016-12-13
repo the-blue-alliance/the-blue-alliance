@@ -3,7 +3,7 @@ import AppBar from 'material-ui/AppBar'
 import FlatButton from 'material-ui/FlatButton'
 import LayoutDrawer from './LayoutDrawer'
 
-const GamedayNavbarMaterial = (props) => {
+const GamedayNavbar = (props) => {
   const configureLayoutButton = (
     <FlatButton
       label="Configure Layout"
@@ -35,7 +35,7 @@ const GamedayNavbarMaterial = (props) => {
   )
 }
 
-GamedayNavbarMaterial.propTypes = {
+GamedayNavbar.propTypes = {
   webcasts: PropTypes.array.isRequired,
   webcastsById: PropTypes.object.isRequired,
   hashtagSidebarVisible: PropTypes.bool.isRequired,
@@ -53,4 +53,4 @@ GamedayNavbarMaterial.propTypes = {
   setLayoutDrawerVisibility: PropTypes.func.isRequired,
 }
 
-export default GamedayNavbarMaterial
+export default GamedayNavbar

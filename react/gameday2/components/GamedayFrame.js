@@ -1,5 +1,5 @@
 import React from 'react'
-import GamedayNavbarContainerMaterial from '../containers/GamedayNavbarContainerMaterial'
+import GamedayNavbarContainer from '../containers/GamedayNavbarContainer'
 import MainContentContainer from '../containers/MainContentContainer'
 import ChatSidebarContainer from '../containers/ChatSidebarContainer'
 import HashtagSidebarContainer from '../containers/HashtagSidebarContainer'
@@ -22,7 +22,7 @@ const GamedayFrame = React.createClass({
   render() {
     return (
       <div className="gameday container-full">
-        <GamedayNavbarContainerMaterial />
+        <GamedayNavbarContainer />
         <HashtagSidebarContainer />
         <ChatSidebarContainer />
         <MainContentContainer />

@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import GamedayNavbarMaterial from '../components/GamedayNavbarMaterial'
+import GamedayNavbar from '../components/GamedayNavbar'
 import * as actions from '../actions'
 import { getWebcastIdsInDisplayOrder } from '../selectors'
 
@@ -25,4 +25,4 @@ const mapDispatchToProps = (dispatch) => ({
   setLayoutDrawerVisibility: (visible) => dispatch(actions.setLayoutDrawerVisibility(visible)),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(GamedayNavbarMaterial)
+export default connect(mapStateToProps, mapDispatchToProps)(GamedayNavbar)
