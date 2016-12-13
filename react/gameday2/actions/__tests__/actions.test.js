@@ -25,6 +25,13 @@ describe('actions', () => {
     expect(actions.toggleChatSidebarVisibility()).toEqual(expectedAction)
   })
 
+  it('should create an action to toggle the layout drawer visibility', () => {
+    const expectedAction = {
+      type: types.TOGGLE_LAYOUT_DRAWER_VISIBILITY,
+    }
+    expect(actions.toggleLayoutDrawerVisibility()).toEqual(expectedAction)
+  })
+
   it('should create an action to add a webcast if the webcast ID exists in webcastsById', () => {
     const webcastId = 'a'
     const getState = () => ({

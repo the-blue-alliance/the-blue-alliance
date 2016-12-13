@@ -39,7 +39,7 @@ export function setHashtagSidebarVisibility(visible) {
 
 export function toggleLayoutDrawerVisibility() {
   return {
-    type: types.TOGGLE_LAYOUT_DRAWER_OPEN_VISIBILITY,
+    type: types.TOGGLE_LAYOUT_DRAWER_VISIBILITY,
   }
 }
 
