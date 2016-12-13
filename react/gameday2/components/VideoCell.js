@@ -5,6 +5,7 @@ import WebcastSelectionPanel from './WebcastSelectionPanel'
 import EmbedUstream from './EmbedUstream'
 import EmbedYoutube from './EmbedYoutube'
 import EmbedTwitch from './EmbedTwitch'
+import VideoCellToolbarContainer from '../containers/VideoCellToolbarContainer'
 import { WebcastPropType } from '../utils/webcastUtils'
 
 const VideoCell = React.createClass({
@@ -61,9 +62,21 @@ const VideoCell = React.createClass({
           break
       }
 
+      const cellStyle = {
+        paddingBottom: '48px',
+      }
+
+      const toolbarStyle = {
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
+        height: '48px',
+      }
+
       return (
         <div
           className={classes}
+          style={cellStyle}
           onMouseOver={this.onMouseOver}
           onMouseOut={this.onMouseOut}
         >
@@ -73,6 +86,9 @@ const VideoCell = React.createClass({
             mouseOverContainer={this.state.mouseOver}
             location={this.props.location}
           />
+        <VideoCellToolbarContainer
+            style={toolbarStyle}
+            webcast={this.props.webcast} />
         </div>
       )
     }
