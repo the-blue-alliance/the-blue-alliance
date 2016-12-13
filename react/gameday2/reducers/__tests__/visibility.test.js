@@ -2,32 +2,24 @@ import visibility from '../visibility'
 import * as types from '../../constants/ActionTypes'
 
 describe('visibility reducer', () => {
+  const defaultState = {
+    hashtagSidebar: false,
+    chatSidebar: false,
+    chatSidebarHasBeenVisible: false,
+    tickerSidebar: false,
+    layoutDrawer: false,
+  }
+
   it('defaults all views to not visibile', () => {
-    const expectedState = {
-      hashtagSidebar: false,
-      chatSidebar: false,
-      chatSidebarHasBeenVisible: false,
-      tickerSidebar: false,
-      layoutDrawer: false,
-    }
-    expect(visibility(undefined, {})).toEqual(expectedState)
+    expect(visibility(undefined, {})).toEqual(defaultState)
   })
 
   it('toggles chat sidebar from false to true', () => {
-    const initialState = {
-      hashtagSidebar: false,
-      chatSidebar: false,
-      chatSidebarHasBeenVisible: false,
-      tickerSidebar: false,
-      layoutDrawer: false,
-    }
-    const expectedState = {
-      hashtagSidebar: false,
+    const initialState = defaultState
+    const expectedState = Object.assign({}, defaultState, {
       chatSidebar: true,
       chatSidebarHasBeenVisible: true,
-      tickerSidebar: false,
-      layoutDrawer: false,
-    }
+    })
     const action = {
       type: types.TOGGLE_CHAT_SIDEBAR_VISIBILITY,
     }
@@ -35,20 +27,13 @@ describe('visibility reducer', () => {
   })
 
   it('toggles chat sidebar from true to false', () => {
-    const initialState = {
-      hashtagSidebar: false,
+    const initialState = Object.assign({}, defaultState, {
       chatSidebar: true,
       chatSidebarHasBeenVisible: true,
-      tickerSidebar: false,
-      layoutDrawer: false,
-    }
-    const expectedState = {
-      hashtagSidebar: false,
-      chatSidebar: false,
+    })
+    const expectedState = Object.assign({}, defaultState, {
       chatSidebarHasBeenVisible: true,
-      tickerSidebar: false,
-      layoutDrawer: false,
-    }
+    })
     const action = {
       type: types.TOGGLE_CHAT_SIDEBAR_VISIBILITY,
     }
@@ -56,20 +41,10 @@ describe('visibility reducer', () => {
   })
 
   it('toggles hashtag sidebar from false to true', () => {
-    const initialState = {
-      hashtagSidebar: false,
-      chatSidebar: false,
-      chatSidebarHasBeenVisible: false,
-      tickerSidebar: false,
-      layoutDrawer: false,
-    }
-    const expectedState = {
+    const initialState = defaultState
+    const expectedState = Object.assign({}, defaultState, {
       hashtagSidebar: true,
-      chatSidebar: false,
-      chatSidebarHasBeenVisible: false,
-      tickerSidebar: false,
-      layoutDrawer: false,
-    }
+    })
     const action = {
       type: types.TOGGLE_HASHTAG_SIDEBAR_VISIBILITY,
     }
@@ -77,20 +52,10 @@ describe('visibility reducer', () => {
   })
 
   it('toggles hashtag sidebar from true to false', () => {
-    const initialState = {
+    const initialState = Object.assign({}, defaultState, {
       hashtagSidebar: true,
-      chatSidebar: false,
-      chatSidebarHasBeenVisible: false,
-      tickerSidebar: false,
-      layoutDrawer: false,
-    }
-    const expectedState = {
-      hashtagSidebar: false,
-      chatSidebar: false,
-      chatSidebarHasBeenVisible: false,
-      tickerSidebar: false,
-      layoutDrawer: false,
-    }
+    })
+    const expectedState = defaultState
     const action = {
       type: types.TOGGLE_HASHTAG_SIDEBAR_VISIBILITY,
     }
@@ -98,20 +63,10 @@ describe('visibility reducer', () => {
   })
 
   it('toggles layout drawer from false to true', () => {
-    const initialState = {
-      hashtagSidebar: false,
-      chatSidebar: false,
-      chatSidebarHasBeenVisible: false,
-      tickerSidebar: false,
-      layoutDrawer: false,
-    }
-    const expectedState = {
-      hashtagSidebar: false,
-      chatSidebar: false,
-      chatSidebarHasBeenVisible: false,
-      tickerSidebar: false,
+    const initialState = defaultState
+    const expectedState = Object.assign({}, defaultState, {
       layoutDrawer: true,
-    }
+    })
     const action = {
       type: types.TOGGLE_LAYOUT_DRAWER_VISIBILITY,
     }
@@ -119,20 +74,10 @@ describe('visibility reducer', () => {
   })
 
   it('toggles layout drawer from true to false', () => {
-    const initialState = {
-      hashtagSidebar: false,
-      chatSidebar: false,
-      chatSidebarHasBeenVisible: false,
-      tickerSidebar: false,
+    const initialState = Object.assign({}, defaultState, {
       layoutDrawer: true,
-    }
-    const expectedState = {
-      hashtagSidebar: false,
-      chatSidebar: false,
-      chatSidebarHasBeenVisible: false,
-      tickerSidebar: false,
-      layoutDrawer: false,
-    }
+    })
+    const expectedState = defaultState
     const action = {
       type: types.TOGGLE_LAYOUT_DRAWER_VISIBILITY,
     }
