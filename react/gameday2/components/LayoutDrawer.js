@@ -7,7 +7,7 @@ import Subheader from 'material-ui/Subheader'
 import Toggle from 'material-ui/Toggle'
 import { red500, fullWhite } from 'material-ui/styles/colors'
 import CheckmarkIcon from 'material-ui/svg-icons/navigation/check'
-import { NUM_LAYOUTS, NUM_VIEWS_FOR_LAYOUT, NAME_FOR_LAYOUT } from '../constants/LayoutConstants'
+import { NUM_LAYOUTS, NAME_FOR_LAYOUT } from '../constants/LayoutConstants'
 
 export default class LayoutDrawer extends React.Component {
   static propTypes = {
@@ -22,10 +22,7 @@ export default class LayoutDrawer extends React.Component {
     hasWebcasts: PropTypes.bool.isRequired,
     toggleChatSidebarVisibility: PropTypes.func.isRequired,
     toggleHashtagSidebarVisibility: PropTypes.func.isRequired,
-  }
-
-  constructor(props) {
-    super(props)
+    resetWebcasts: PropTypes.func.isRequired,
   }
 
   handleResetWebcasts() {
@@ -35,15 +32,16 @@ export default class LayoutDrawer extends React.Component {
   render() {
     // If there aren't any webcasts, display a message instead
     // of unselectable checkboxes
-    let layouts = []
+    const layouts = []
     if (this.props.hasWebcasts) {
       for (let i = 0; i < NUM_LAYOUTS; i++) {
-        const icon = (i == this.props.selectedLayout && this.props.layoutSet) ? <CheckmarkIcon /> : null
+        const showCheck = (i === this.props.selectedLayout && this.props.layoutSet)
+        const icon = showCheck ? <CheckmarkIcon /> : null
 
         layouts.push(
           <ListItem
             primaryText={NAME_FOR_LAYOUT[i]}
-            insetChildren={true}
+            insetChildren
             onTouchTap={() => this.props.setLayout(i)}
             key={i.toString()}
             leftIcon={icon}
@@ -54,7 +52,7 @@ export default class LayoutDrawer extends React.Component {
       layouts.push(
         <ListItem
           primaryText="There aren't any webcasts available right now. Check back later!"
-          disabled={true}
+          disabled
         />
       )
     }
@@ -78,7 +76,7 @@ export default class LayoutDrawer extends React.Component {
         docked={false}
         open={this.props.layoutDrawerVisible}
         onRequestChange={(open) => this.props.setLayoutDrawerVisibility(open)}
-        openSecondary={true}
+        openSecondary
         width={300}
       >
         <div>
@@ -90,21 +88,21 @@ export default class LayoutDrawer extends React.Component {
           <List>
             <Subheader>Enable/disable sidebars</Subheader>
             <ListItem
-              primaryText='Social Sidebar'
+              primaryText="Social Sidebar"
               rightToggle={hashtagToggle}
             />
             <ListItem
-              primaryText='Chat Sidebar'
+              primaryText="Chat Sidebar"
               rightToggle={chatToggle}
             />
           </List>
           <Divider />
-          <div style={{padding: 8}}>
+          <div style={{ padding: 8 }}>
             <RaisedButton
-              label='Reset Webcasts'
+              label="Reset Webcasts"
               backgroundColor={red500}
               labelColor={fullWhite}
-              fullWidth={true}
+              fullWidth
               onTouchTap={() => this.handleResetWebcasts()}
             />
           </div>

@@ -46,7 +46,7 @@ export function toggleLayoutDrawerVisibility() {
 export function setLayoutDrawerVisibility(visible) {
   return {
     type: types.SET_LAYOUT_DRAWER_VISIBILITY,
-    visible
+    visible,
   }
 }
 

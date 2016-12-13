@@ -1,5 +1,4 @@
 import React from 'react'
-import GamedayNavbarContainer from '../containers/GamedayNavbarContainer'
 import GamedayNavbarContainerMaterial from '../containers/GamedayNavbarContainerMaterial'
 import MainContentContainer from '../containers/MainContentContainer'
 import ChatSidebarContainer from '../containers/ChatSidebarContainer'
