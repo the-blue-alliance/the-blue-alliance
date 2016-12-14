@@ -6,7 +6,6 @@ import logging
 from google.appengine.ext import ndb
 
 from consts.account_permissions import AccountPermissions
-from consts.media_type import MediaType
 from controllers.suggestions.suggestions_review_base_controller import SuggestionsReviewBaseController
 from helpers.media_manipulator import MediaManipulator
 from helpers.suggestions.media_creator import MediaCreator
@@ -25,6 +24,21 @@ class SuggestDesignsReviewController(SuggestionsReviewBaseController):
     View the list of suggestions.
     """
     def get(self):
+
+        if self.request.get('action') and self.request.get('id'):
+            # Fast-path review
+            self.verify_permissions()
+            suggestion = Suggestion.get_by_id(self.request.get('id'))
+            if suggestion and suggestion.target_model == 'robot' and suggestion.review_state == Suggestion.REVIEW_PENDING:
+                if self.request.get('action') == 'accept':
+                    self._process_accepted(suggestion.key.id())
+                elif self.request.get('action') == 'reject':
+                    suggestion.review_state = Suggestion.REVIEW_REJECTED
+                    suggestion.reviewer = self.user_bundle.account.key
+                    suggestion.reviewed_at = datetime.datetime.now()
+                    suggestion.put()
+                self.redirect('/suggest/review', abort=True)
+
         suggestions = Suggestion.query().filter(
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
             Suggestion.target_model == "robot").fetch(limit=50)
@@ -80,6 +94,7 @@ class SuggestDesignsReviewController(SuggestionsReviewBaseController):
         suggestion.put()
 
     def post(self):
+        self.verify_permissions()
         accept_keys = []
         reject_keys = []
         for value in self.request.POST.values():

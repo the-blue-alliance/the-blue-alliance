@@ -32,7 +32,7 @@ class TestTeamMediaSuggestionCreator(unittest2.TestCase):
         self.testbed.deactivate()
 
     def testCreateSuggestion(self):
-        status = SuggestionCreator.createTeamMediaSuggestion(
+        status, _ = SuggestionCreator.createTeamMediaSuggestion(
             self.account.key,
             "http://imgur.com/ruRAxDm",
             "frc1124",
@@ -50,7 +50,7 @@ class TestTeamMediaSuggestionCreator(unittest2.TestCase):
         self.assertDictContainsSubset(expected_dict, suggestion.contents)
 
     def testCreateSuggestionWithUrlParams(self):
-        status = SuggestionCreator.createTeamMediaSuggestion(
+        status, _ = SuggestionCreator.createTeamMediaSuggestion(
             self.account.key,
             "https://www.youtube.com/watch?v=VP992UKFbko",
             "frc1124",
@@ -68,7 +68,7 @@ class TestTeamMediaSuggestionCreator(unittest2.TestCase):
         self.assertDictContainsSubset(expected_dict, suggestion.contents)
 
     def testCleanUrl(self):
-        status = SuggestionCreator.createTeamMediaSuggestion(
+        status, _ = SuggestionCreator.createTeamMediaSuggestion(
             self.account.key,
             " http://imgur.com/ruRAxDm?foo=bar#meow ",
             "frc1124",
@@ -92,7 +92,7 @@ class TestTeamMediaSuggestionCreator(unittest2.TestCase):
             target_key="2012cmp",
             target_model="event").put()
 
-        status = SuggestionCreator.createTeamMediaSuggestion(
+        status, _ = SuggestionCreator.createTeamMediaSuggestion(
             self.account.key,
             "http://imgur.com/ruRAxDm",
             "frc1124",
@@ -106,7 +106,7 @@ class TestTeamMediaSuggestionCreator(unittest2.TestCase):
             media_type_enum=MediaType.IMGUR,
             foreign_key='ruRAxDm',
             references=[ndb.Key(Team, 'frc1124')]).put()
-        status = SuggestionCreator.createTeamMediaSuggestion(
+        status, _ = SuggestionCreator.createTeamMediaSuggestion(
             self.account.key,
             "http://imgur.com/ruRAxDm",
             "frc1124",
@@ -114,7 +114,7 @@ class TestTeamMediaSuggestionCreator(unittest2.TestCase):
         self.assertEqual(status, 'media_exists')
 
     def testBadUrl(self):
-        status = SuggestionCreator.createTeamMediaSuggestion(
+        status, _ = SuggestionCreator.createTeamMediaSuggestion(
             self.account.key,
             "http://foo.com/blah",
             "frc1124",
