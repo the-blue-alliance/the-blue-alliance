@@ -203,11 +203,11 @@
             <div class="col-xs-12">
               <h3 id="photos">CAD Models</h3>
               {% if medias_by_slugname.grabcad %}
-                <ul>
                   {% for media in medias_by_slugname.grabcad %}
-                    <li><a href="https://grabcad.com/library/{{ media.foreign_key }}" target="_blank">GrabCAD Link #{{ loop.index }}</a></li>
+                    <div class="col-xs-6 col-sm-3">
+                      {% include "media_partials/media_display_partial.html" %}
+                    </div>
                   {% endfor %}
-                </ul>
               {% else %}
                   <p>No CAD for team {{team.team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank">Why not add some</a>?</p>
               {% endif %}

@@ -89,6 +89,8 @@ class MediaParser(object):
         MediaType.YOUTUBE_VIDEO: ['v'],
     }
 
+    GRABCAD_DETAIL_URL = "https://grabcad.com/community/api/v1/models/{}"  # Format w/ foreign key
+
     @classmethod
     def partial_media_dict_from_url(cls, url):
         """
@@ -102,6 +104,10 @@ class MediaParser(object):
                     # CD images are special - they need to do an additional urlfetch because the given url
                     # doesn't contain the foreign key
                     return cls._partial_media_dict_from_cd_photo_thread(url)
+                elif media_type == MediaType.GRABCAD:
+                    # GrabCAD images are special - we'll need to do a second fetch to a SUPER HACKY
+                    # API so we can get embed images and titles and stuff
+                    return cls._partial_media_dict_from_grabcad(url)
                 else:
                     return cls._create_media_dict(media_type, url)
 
@@ -188,6 +194,29 @@ class MediaParser(object):
             return None
         media_dict['details_json'] = json.dumps({'image_partial': image_partial})
 
+        return media_dict
+
+    @classmethod
+    def _partial_media_dict_from_grabcad(cls, url):
+        media_dict = cls._create_media_dict(MediaType.GRABCAD, url)
+        if not media_dict:
+            return None
+
+        url = cls.GRABCAD_DETAIL_URL.format(media_dict['foreign_key'])
+        urlfetch_result = urlfetch.fetch(url, deadline=10)
+        if urlfetch_result.status_code != 200:
+            logging.warning('Unable to retreive url: {}'.format(url))
+
+        grabcad_data = json.loads(urlfetch_result.content)
+        if not grabcad_data:
+            return None
+
+        media_dict['details_json'] = json.dumps({
+            'model_name': grabcad_data['name'],
+            'model_description': grabcad_data['raw_description'],
+            'model_image': grabcad_data['preview_image'],
+            'model_created': grabcad_data['created_at']
+        })
         return media_dict
 
     @classmethod

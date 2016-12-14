@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% import 'media_partials/social_media_macros.html' as smm %}
 
 {% block title %}Pending Suggestions{% endblock %}
 
@@ -38,7 +37,9 @@
                   </div>
                   <div class="col-xs-5 fitvids">
                       <p><strong><a href="/team/{{reference.team_number}}/{{suggestion.contents.year}}" target="_blank">Team {{reference.team_number}}{% if reference.nickname %} - {{reference.nickname}}{% endif %} ({{suggestion.contents.year}})</a></strong></p>
-                      <a href="https://grabcad.com/library/{{ suggestion.contents.foreign_key }}" target="_blank">https://grabcad.com/library/{{ suggestion.contents.foreign_key }}</a>
+                      <p><a href="https://grabcad.com/library/{{ suggestion.contents.foreign_key }}" target="_blank">https://grabcad.com/library/{{ suggestion.contents.foreign_key }}</a></p>
+                      {% set media = suggestion.candidate_media -%}
+                      {% include "media_partials/media_display_partial.html" %}
                   </div>
                   <div class="col-xs-2">
                       <ul>

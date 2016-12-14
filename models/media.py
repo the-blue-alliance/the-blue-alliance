@@ -129,6 +129,8 @@ class Media(ndb.Model):
             return self.cdphotothread_image_url
         elif self.media_type_enum == MediaType.IMGUR:
             return self.imgur_url
+        elif self.media_type_enum == MediaType.GRABCAD:
+            return "https://grabcad.com/library/{}".format(self.foreign_key)
         else:
             return ""
 
@@ -139,6 +141,8 @@ class Media(ndb.Model):
             return self.cdphotothread_image_url_med
         elif self.media_type_enum == MediaType.IMGUR:
             return self.imgur_direct_url
+        elif self.media_type_enum == MediaType.GRABCAD:
+            return self.details['model_image'].replace('card.jpg', 'large.png')
         else:
             return ""
 
@@ -158,6 +162,8 @@ class Media(ndb.Model):
             return self.cdphotothread_image_url_med
         elif self.media_type_enum == MediaType.IMGUR:
             return self.imgur_direct_url_med
+        elif self.media_type_enum == MediaType.GRABCAD:
+            return self.details['model_image']
         else:
             return ""
 
@@ -167,5 +173,7 @@ class Media(ndb.Model):
             return self.cdphotothread_image_url_sm
         elif self.media_type_enum == MediaType.IMGUR:
             return self.imgur_direct_url_sm
+        elif self.media_type_enum == MediaType.GRABCAD:
+            return self.details['model_image'].replace('large.jpg', 'tiny.jpg')
         else:
             return ""

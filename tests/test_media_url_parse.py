@@ -116,10 +116,15 @@ class TestMediaUrlParser(unittest2.TestCase):
         self.assertEqual(result['profile_url'], 'https://www.periscope.tv/evolution2626')
 
     def test_grabcad_link(self):
-        result = MediaParser.partial_media_dict_from_url("https://grabcad.com/library/2014-3467-the-windham-windup-1")
+        result = MediaParser.partial_media_dict_from_url("https://grabcad.com/library/2016-148-robowranglers-1")
         self.assertEqual(result['media_type_enum'], MediaType.GRABCAD)
         self.assertEqual(result['is_social'], False)
-        self.assertEqual(result['foreign_key'], '2014-3467-the-windham-windup-1')
+        self.assertEqual(result['foreign_key'], '2016-148-robowranglers-1')
+        details = json.loads(result['details_json'])
+        self.assertEqual(details['model_name'], '2016 | 148 - Robowranglers')
+        self.assertEqual(details['model_description'], 'Renegade')
+        self.assertEqual(details['model_image'], 'https://d2t1xqejof9utc.cloudfront.net/screenshots/pics/96268d5c5e6c1b7fe8892f713813bb40/card.jpg')
+        self.assertEqual(details['model_created'], '2016-09-19T11:52:23Z')
 
     def test_unsupported_url_parse(self):
         self.assertEqual(MediaParser.partial_media_dict_from_url("http://foo.bar"), None)
