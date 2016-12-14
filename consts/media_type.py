@@ -9,6 +9,7 @@ class MediaType(object):
     GITHUB_PROFILE = 6
     INSTAGRAM_PROFILE = 7
     PERISCOPE_PROFILE = 8
+    GRABCAD = 9
 
     type_names = {
         YOUTUBE_VIDEO: 'YouTube Video',
@@ -20,6 +21,7 @@ class MediaType(object):
         GITHUB_PROFILE: 'GitHub Profile',
         INSTAGRAM_PROFILE: 'Instagram Profile',
         PERISCOPE_PROFILE: 'Periscope Profile',
+        GRABCAD: 'GrabCAD',
     }
 
     image_types = [
@@ -34,6 +36,11 @@ class MediaType(object):
         GITHUB_PROFILE,
         INSTAGRAM_PROFILE,
         PERISCOPE_PROFILE,
+    ]
+
+    # Media used to back a Robot Profile
+    robot_types = [
+        GRABCAD,
     ]
 
     profile_urls = {  # Format with foreign_key

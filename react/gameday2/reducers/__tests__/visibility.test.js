@@ -6,6 +6,7 @@ describe('visibility reducer', () => {
     const expectedState = {
       hashtagSidebar: false,
       chatSidebar: false,
+      chatSidebarHasBeenVisible: false,
       tickerSidebar: false,
     }
     expect(visibility(undefined, {})).toEqual(expectedState)
@@ -15,11 +16,13 @@ describe('visibility reducer', () => {
     const initialState = {
       hashtagSidebar: false,
       chatSidebar: false,
+      chatSidebarHasBeenVisible: false,
       tickerSidebar: false,
     }
     const expectedState = {
       hashtagSidebar: false,
       chatSidebar: true,
+      chatSidebarHasBeenVisible: true,
       tickerSidebar: false,
     }
     const action = {
@@ -32,11 +35,13 @@ describe('visibility reducer', () => {
     const initialState = {
       hashtagSidebar: false,
       chatSidebar: true,
+      chatSidebarHasBeenVisible: true,
       tickerSidebar: false,
     }
     const expectedState = {
       hashtagSidebar: false,
       chatSidebar: false,
+      chatSidebarHasBeenVisible: true,
       tickerSidebar: false,
     }
     const action = {
@@ -49,11 +54,13 @@ describe('visibility reducer', () => {
     const initialState = {
       hashtagSidebar: false,
       chatSidebar: false,
+      chatSidebarHasBeenVisible: false,
       tickerSidebar: false,
     }
     const expectedState = {
       hashtagSidebar: true,
       chatSidebar: false,
+      chatSidebarHasBeenVisible: false,
       tickerSidebar: false,
     }
     const action = {
@@ -66,11 +73,13 @@ describe('visibility reducer', () => {
     const initialState = {
       hashtagSidebar: true,
       chatSidebar: false,
+      chatSidebarHasBeenVisible: false,
       tickerSidebar: false,
     }
     const expectedState = {
       hashtagSidebar: false,
       chatSidebar: false,
+      chatSidebarHasBeenVisible: false,
       tickerSidebar: false,
     }
     const action = {

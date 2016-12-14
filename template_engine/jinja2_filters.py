@@ -1,4 +1,5 @@
 from email import utils
+import math
 import re
 import time
 import urllib
@@ -14,6 +15,10 @@ defense_render_names_2016 = {
     'D_RoughTerrain': 'Rough Terrain',
     'D_RockWall': 'Rock Wall'
 }
+
+
+def ceil(value):
+    return int(math.ceil(value))
 
 
 def defense_name(value):

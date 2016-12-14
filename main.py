@@ -6,26 +6,28 @@ import tba_config
 
 from controllers.account_controller import AccountEdit, AccountLoginRequired, AccountLogin, AccountLogout, AccountOverview, AccountRegister, MyTBAController, myTBAAddHotMatchesController, MyTBAEventController, MyTBAMatchController, MyTBATeamController
 from controllers.ajax_controller import AccountInfoHandler, AccountRegisterFCMToken, AccountFavoritesHandler, AccountFavoritesAddHandler, AccountFavoritesDeleteHandler, \
-      YouTubePlaylistHandler
+      YouTubePlaylistHandler, AllowedApiWriteEventsHandler
 from controllers.ajax_controller import LiveEventHandler, TypeaheadHandler, WebcastHandler
 from controllers.event_controller import EventList, EventDetail, EventInsights, EventRss
 from controllers.event_wizard_controller import EventWizardHandler
-from controllers.gameday2_controller import Gameday2Controller
+from controllers.gameday_controller import Gameday2Controller, GamedayHandler, GamedayRedirectHandler
 from controllers.insights_controller import InsightsOverview, InsightsDetail
 from controllers.main_controller import TwoChampsHandler, ContactHandler, HashtagsHandler, \
     MainKickoffHandler, MainBuildseasonHandler, MainChampsHandler, MainCompetitionseasonHandler, \
     MainInsightsHandler, MainOffseasonHandler, OprHandler, PredictionsHandler, SearchHandler, \
     AboutHandler, ThanksHandler, handle_404, handle_500, \
-    GamedayHandler, WebcastsHandler, RecordHandler, ApiDocumentationHandler, ApiWriteHandler, MatchInputHandler, WebhookDocumentationHandler, \
+    WebcastsHandler, RecordHandler, ApiDocumentationHandler, ApiWriteHandler, MatchInputHandler, WebhookDocumentationHandler, \
       AddDataHandler
 from controllers.match_controller import MatchDetail
 from controllers.mytba_controller import MyTBALiveController
+from controllers.nearby_controller import NearbyController
 from controllers.nightbot_controller import NightbotTeamNextmatchHandler, NightbotTeamStatuskHandler
 from controllers.notification_controller import UserNotificationBroadcast
 from controllers.district_controller import DistrictDetail
 from controllers.suggestions.suggest_apiwrite_controller import SuggestApiWriteController
 from controllers.suggestions.suggest_apiwrite_review_controller import \
       SuggestApiWriteReviewController
+from controllers.suggestions.suggest_designs_review_controller import SuggestDesignsReviewController
 from controllers.suggestions.suggest_match_video_controller import SuggestMatchVideoController, \
       SuggestMatchVideoPlaylistController
 from controllers.suggestions.suggest_match_video_review_controller import SuggestMatchVideoReviewController
@@ -91,6 +93,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/events', EventList, 'event-list', strict_slash=True),
       RedirectRoute(r'/eventwizard', EventWizardHandler, 'event-wizard', strict_slash=True),
       RedirectRoute(r'/gameday', GamedayHandler, 'gameday', strict_slash=True),
+      RedirectRoute(r'/gameday/<alias>', GamedayRedirectHandler, 'gameday-alias', strict_slash=True),
       RedirectRoute(r'/gameday2', Gameday2Controller, 'gameday2', strict_slash=True),
       RedirectRoute(r'/hashtags', HashtagsHandler, 'hashtags', strict_slash=True),
       RedirectRoute(r'/insights/<year:[0-9]+>', InsightsDetail, 'insights-detail', strict_slash=True),
@@ -100,6 +103,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/match/<match_key>', MatchDetail, 'match-detail', strict_slash=True),
       RedirectRoute(r'/matchinput', MatchInputHandler, 'match-input', strict_slash=True),
       RedirectRoute(r'/mytba', MyTBALiveController, 'mytba-live', strict_slash=True),
+      RedirectRoute(r'/nearby', NearbyController, 'nearby', strict_slash=True),
       RedirectRoute(r'/notifications/broadcast', UserNotificationBroadcast, 'notification-broadcast', strict_slash=True),
       RedirectRoute(r'/notifications/test/<type:[0-9]+>', TestNotificationController, 'test-notifications', strict_slash=True),
       RedirectRoute(r'/opr', OprHandler, 'opr', strict_slash=True),
@@ -108,6 +112,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/request/apiwrite/', SuggestApiWriteController, 'request-apiwrite', strict_slash=True),
       RedirectRoute(r'/search', SearchHandler, 'search', strict_slash=True),
       RedirectRoute(r'/suggest/apiwrite/review', SuggestApiWriteReviewController, 'request-apiwrite-review', strict_slash=True),
+      RedirectRoute(r'/suggest/cad/review', SuggestDesignsReviewController, 'suggest-designs-review', strict_slash=True),
       RedirectRoute(r'/suggest/event/webcast', SuggestEventWebcastController, 'suggest-event-webcast', strict_slash=True),
       RedirectRoute(r'/suggest/event/webcast/review', SuggestEventWebcastReviewController, 'suggest-event-webcast-review', strict_slash=True),
       RedirectRoute(r'/suggest/event/video', SuggestMatchVideoPlaylistController, 'suggest-matches-playlist', strict_slash=True),
@@ -126,11 +131,13 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/teams/<page:[0-9]+>', TeamList, 'team-list-year', strict_slash=True),
       RedirectRoute(r'/teams', TeamList, 'team-list', strict_slash=True),
       RedirectRoute(r'/thanks', ThanksHandler, 'thanks', strict_slash=True),
+      RedirectRoute(r'/watch/<alias>', GamedayRedirectHandler, 'gameday-watch', strict_slash=True),
       RedirectRoute(r'/webcasts', WebcastsHandler, 'webcasts', strict_slash=True),
       RedirectRoute(r'/webhooks/add', WebhookAdd, 'webhook-add', strict_slash=True),
       RedirectRoute(r'/webhooks/delete', WebhookDelete, 'webhook-delete', strict_slash=True),
       RedirectRoute(r'/webhooks/verify/<client_id:[0-9]+>', WebhookVerify, 'webhook-verify', strict_slash=True),
       RedirectRoute(r'/webhooks/send_verification', WebhookVerificationSend, 'webhook-send-verification', strict_slash=True),
+      RedirectRoute(r'/_/account/apiwrite_events', AllowedApiWriteEventsHandler, 'allowed-apiwrite-events', strict_slash=True),
       RedirectRoute(r'/_/account/info', AccountInfoHandler, 'account-info', strict_slash=True),
       RedirectRoute(r'/_/account/register_fcm_token', AccountRegisterFCMToken, 'account-register-web-client', strict_slash=True),
       RedirectRoute(r'/_/account/favorites/<model_type:[0-9]+>', AccountFavoritesHandler, 'ajax-account-favorites', strict_slash=True),

@@ -34,4 +34,4 @@ queue:
     max_backoff_seconds: 30
 
 - name: admin
-  rate: 1/s
+  rate: 5/s

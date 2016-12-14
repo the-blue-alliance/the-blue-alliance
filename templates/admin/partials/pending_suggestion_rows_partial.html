@@ -1,4 +1,5 @@
 <ul class="nav nav-pills nav-stacked">
+    {% if media_permission in user_bundle.account.permissions %}
     <li>
         <a href="/suggest/match/video/review">
             <span class="badge pull-right">{{suggestions.match}}</span>
@@ -23,6 +24,16 @@
             Team Social Media Suggestions
         </a>
     </li>
+    {% endif %}
+
+    {% if cad_permission in user_bundle.account.permissions %}
+    <li>
+        <a href="/suggest/cad/review">
+            <span class="badge pull-right">{{suggestions.cad}}</span>
+            Team CAD Suggestions
+        </a>
+    </li>
+    {% endif %}
 
     {% if offseason_permission in user_bundle.account.permissions %}
     <li>

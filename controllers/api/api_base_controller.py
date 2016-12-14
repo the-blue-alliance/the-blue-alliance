@@ -19,6 +19,7 @@ from helpers.user_bundle import UserBundle
 from helpers.validation_helper import ValidationHelper
 from models.api_auth_access import ApiAuthAccess
 from models.cached_response import CachedResponse
+from models.event import Event
 from models.sitevar import Sitevar
 
 
@@ -180,10 +181,36 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
         self.response.headers['Access-Control-Allow-Methods'] = "POST, OPTIONS"
         self.response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-TBA-Auth-Id, X-TBA-Auth-Sig'
 
+    def _validate_auth(self, auth, event_key):
+        allowed_event_keys = [ekey.id() for ekey in auth.event_list]
+        if event_key not in allowed_event_keys:
+            return "Only allowed to edit events: {}".format(', '.join(allowed_event_keys))
+
+        missing_auths = self.REQUIRED_AUTH_TYPES.difference(set(auth.auth_types_enum))
+        if missing_auths != set():
+            return "You do not have permission to edit: {}. If this is incorrect, please contact TBA admin.".format(",".join([AuthType.type_names[ma] for ma in missing_auths]))
+
+        if auth.expiration and auth.expiration < datetime.datetime.now():
+            return "These keys expired on {}. Contact TBA admin to make changes".format(auth.expiration)
+
+        return None
+
     def post(self, event_key):
         event_key = event_key.lower()  # Normalize keys to lower case (TBA convention)
 
-        if not (self._user_bundle.user and self._user_bundle.is_current_user_admin):  # Allow admins to use without auth keys
+        # Start by allowing admins to edit any event
+        user_has_auth = (self._user_bundle.user and self._user_bundle.is_current_user_admin)
+
+        if not user_has_auth and self._user_bundle.user:
+            # See if this user has any auth keys granted to its account
+            now = datetime.datetime.now()
+            auth_tokens = ApiAuthAccess.query(ApiAuthAccess.owner == self._user_bundle.account.key,
+                                              ApiAuthAccess.event_list == ndb.Key(Event, event_key),
+                                              ndb.OR(ApiAuthAccess.expiration == None, ApiAuthAccess.expiration >= now)).fetch()
+            user_has_auth = any(self._validate_auth(auth, event_key) is None for auth in auth_tokens)
+
+        if not user_has_auth:
+            # If not, check if auth id/secret were passed as headers
             auth_id = self.request.headers.get('X-TBA-Auth-Id')
             if not auth_id:
                 self._errors = json.dumps({"Error": "Must provide a request header parameter 'X-TBA-Auth-Id'"})
@@ -201,18 +228,10 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
                 self._errors = json.dumps({"Error": "Invalid X-TBA-Auth-Id and/or X-TBA-Auth-Sig!"})
                 self.abort(401)
 
-            allowed_event_keys = [ekey.id() for ekey in auth.event_list]
-            if event_key not in allowed_event_keys:
-                self._errors = json.dumps({"Error": "Only allowed to edit events: {}".format(', '.join(allowed_event_keys))})
-                self.abort(401)
-
-            missing_auths = self.REQUIRED_AUTH_TYPES.difference(set(auth.auth_types_enum))
-            if missing_auths != set():
-                self._errors = json.dumps({"Error": "You do not have permission to edit: {}. If this is incorrect, please contact TBA admin.".format(",".join([AuthType.type_names[ma] for ma in missing_auths]))})
-                self.abort(401)
-
-            if auth.expiration and auth.expiration < datetime.datetime.now():
-                self._errors = json.dumps({"Error": "These keys expired on {}. Contact TBA admin to make changes".format(auth.expiration)})
+            # Checks event key is valid, correct auth types, and expiration
+            error = self._validate_auth(auth, event_key)
+            if error:
+                self._errors = json.dumps({"Error": error})
                 self.abort(401)
 
         try:

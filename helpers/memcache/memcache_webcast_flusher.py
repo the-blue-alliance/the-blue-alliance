@@ -1,6 +1,8 @@
 from controllers.ajax_controller import WebcastHandler
 from controllers.event_controller import EventList
-from controllers.main_controller import MainChampsHandler, MainCompetitionseasonHandler, MainOffseasonHandler, MainInsightsHandler, GamedayHandler, WebcastsHandler
+from controllers.main_controller import MainChampsHandler, MainCompetitionseasonHandler, MainOffseasonHandler, MainInsightsHandler, \
+    WebcastsHandler
+from controllers.gameday_controller import GamedayHandler
 
 
 class MemcacheWebcastFlusher(object):

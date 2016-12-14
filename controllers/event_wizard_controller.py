@@ -15,4 +15,5 @@ class EventWizardHandler(CacheableHandler):
 
     def _render(self, *args, **kw):
         path = os.path.join(os.path.dirname(__file__), "../templates/eventwizard.html")
+
         return template.render(path, self.template_values)

@@ -4,6 +4,8 @@ import urllib2
 import json
 import time
 
+import datetime
+
 from base_controller import CacheableHandler, LoggedInHandler
 from consts.client_type import ClientType
 from google.appengine.api import memcache
@@ -13,6 +15,7 @@ from google.appengine.ext.webapp import template
 from helpers.model_to_dict import ModelToDict
 from helpers.mytba_helper import MyTBAHelper
 from models.account import Account
+from models.api_auth_access import ApiAuthAccess
 from models.event import Event
 from models.favorite import Favorite
 from models.mobile_client import MobileClient
@@ -229,7 +232,7 @@ class WebcastHandler(CacheableHandler):
             special_webcasts_future = Sitevar.get_by_id_async('gameday.special_webcasts')
             special_webcasts = special_webcasts_future.get_result()
             if special_webcasts:
-                special_webcasts = special_webcasts.contents
+                special_webcasts = special_webcasts.contents['webcasts']
             else:
                 special_webcasts = []
 
@@ -304,3 +307,26 @@ class YouTubePlaylistHandler(LoggedInHandler):
             next_page_token = video_result["nextPageToken"]
 
         self.response.out.write(json.dumps(video_ids))
+
+
+class AllowedApiWriteEventsHandler(LoggedInHandler):
+    """
+    Get the events the current user is allowed to edit via the trusted API
+    """
+    def get(self):
+        if not self.user_bundle.user:
+            self.response.out.write(json.dumps([]))
+            return
+
+        now = datetime.datetime.now()
+        auth_tokens = ApiAuthAccess.query(ApiAuthAccess.owner == self.user_bundle.account.key,
+                                          ndb.OR(ApiAuthAccess.expiration == None, ApiAuthAccess.expiration >= now)).fetch()
+        event_keys = []
+        for token in auth_tokens:
+            event_keys.extend(token.event_list)
+
+        events = ndb.get_multi(event_keys)
+        details = {}
+        for event in events:
+            details[event.key_name] =  "{} {}".format(event.year, event.name)
+        self.response.out.write(json.dumps(details))

@@ -75,14 +75,11 @@ function setupViews() {
   // Choosing to start chat opened or closed
   setChat(true);
 
-  // Always start with ticker open
-  setTicker(true);
-
   // Special Kickoff Mode
   if (isKickoff != null) {
 	  layout_0();
 	  setChat(true);
-    setTicker(false);
+      setTicker(false);
 	  setSocial(true);
 	  setupView(0, $("#kickoff-1"));
 	  $("#nav-alert-container").html('<div class="alert alert-success nav-alert"><button type="button" class="close" data-dismiss="alert">&times;</button><strong>Welcome!</strong> Remember to come back during the competition season for webcasts, scores, and more!<br /><br />Have an android phone? <a href="https://goo.gl/Y3cpqi" target="_blank"><u>Install The Blue Alliance app</u></a> to get live notifications when your team is competing!</div>');

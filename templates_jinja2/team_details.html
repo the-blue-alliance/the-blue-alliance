@@ -44,6 +44,7 @@
                 <li><a class="smooth-scroll" href="#photos">Photos</a></li>
                 <li><a class="smooth-scroll" href="#videos">Videos</a></li>
               </ul>
+              <li><a class="smooth-scroll" href="#robot-profile">Robot Profile</a></li>
             </li>
           </ul>
         </div>
@@ -190,6 +191,30 @@
           </div>
         </div>
       </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+          <hr>
+          <a class="btn btn-success pull-right" href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add CAD!</a>
+          <h2 id="robot-profile">Robot Profile</h2>
+          {% if robot %}Robot Name: <strong>{{robot.robot_name}}</strong><br>{% endif %}
+
+          <div class="row">
+            <div class="col-xs-12">
+              <h3 id="photos">CAD Models</h3>
+              {% if medias_by_slugname.grabcad %}
+                  {% for media in medias_by_slugname.grabcad %}
+                    <div class="col-xs-6 col-sm-3">
+                      {% include "media_partials/media_display_partial.html" %}
+                    </div>
+                  {% endfor %}
+              {% else %}
+                  <p>No CAD for team {{team.team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank">Why not add some</a>?</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+    </div>
     </div>
   </div>
 </div>
