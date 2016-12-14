@@ -24,6 +24,15 @@
         </a>
     </li>
 
+    {% if cad_permission in user_bundle.account.permissions %}
+    <li>
+        <a href="/suggest/cad/review">
+            <span class="badge pull-right">{{suggestions.cad}}</span>
+            Team CAD Suggestions
+        </a>
+    </li>
+    {% endif %}
+
     {% if offseason_permission in user_bundle.account.permissions %}
     <li>
         <a href="/suggest/offseason/review">

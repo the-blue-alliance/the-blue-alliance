@@ -61,6 +61,7 @@ class MediaParser(object):
         MediaType.IMGUR: [(r".*imgur.com\/(\w+)\/?\Z", 1), (r".*imgur.com\/(\w+)\.\w+\Z", 1)],
         MediaType.INSTAGRAM_PROFILE: [(r".*instagram.com\/(.*)(\/(.*))?", 1)],
         MediaType.PERISCOPE_PROFILE: [(r".*periscope.tv\/(.*)(\/(.*))?", 1)],
+        MediaType.GRABCAD: [(r".*grabcad.com\/library\/(.*)", 1)]
     }
 
     # Media URL patterns that map a URL -> Profile type (used to determine which type represents a given url)
@@ -77,6 +78,7 @@ class MediaParser(object):
         ('youtube.com/watch', MediaType.YOUTUBE_VIDEO),
         ('youtu.be', MediaType.YOUTUBE_VIDEO),
         ('imgur.com/', MediaType.IMGUR),
+        ('grabcad.com/library/', MediaType.GRABCAD),
 
         # Keep this last, so it doesn't greedy match over other more specific youtube urls
         ('youtube.com/', MediaType.YOUTUBE_CHANNEL),
@@ -120,6 +122,7 @@ class MediaParser(object):
             logging.warning("Failed to determine {} foreign_key from url: {}".format(MediaType.type_names[media_type], url))
             return None
         foreign_key = foreign_key if media_type in cls.CASE_SENSITIVE_FOREIGN_KEYS else foreign_key.lower()
+        media_dict['media_type'] = media_type
         media_dict['is_social'] = media_type in MediaType.social_types
         media_dict['foreign_key'] = foreign_key
         media_dict['site_name'] = MediaType.type_names[media_type]

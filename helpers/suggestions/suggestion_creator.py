@@ -3,6 +3,7 @@ from datetime import datetime
 
 from consts.auth_type import AuthType
 from consts.event_type import EventType
+from consts.media_type import MediaType
 from helpers.media_helper import MediaParser
 from helpers.webcast_helper import WebcastParser
 
@@ -37,6 +38,9 @@ class SuggestionCreator(object):
                     target_model = "media"
                     if media_dict.get("is_social", False):
                         target_model = "social-media"
+
+                    if media_dict['media_type'] in MediaType.robot_types:
+                        target_model = "robot"
 
                     suggestion = Suggestion(
                         id=suggestion_id,

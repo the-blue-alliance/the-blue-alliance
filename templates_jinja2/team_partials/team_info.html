@@ -67,7 +67,17 @@
         <a class="btn btn-lg btn-success btn-block" href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add robot image!</a>
       {% endif %}
     {% endif %}
-    {% if robot %}<p class="text-center">Robot Name: <strong>{{robot.robot_name}}</strong></p>{% endif %}
+    <p class="text-center">
+    {% if robot %}Robot Name: <strong>{{robot.robot_name}}</strong><br>{% endif %}
+      {% if medias_by_slugname.grabcad %}
+       <span class="glyphicon glyphicon-hdd"></span><a href="https://grabcad.com/library/{{ medias_by_slugname.grabcad.0.foreign_key }}" target="_blank"> CAD Link</a>
+      {% else %}
+          <div class="text-center">
+            <a class="btn btn-xs btn-default text-center" href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank"><span class="glyphicon glyphicon-plus"></span> Add a robot profile!</a>
+          </div>
+      {% endif %}
+    </p>
+
     </div>
   {% endif %}
   </div>

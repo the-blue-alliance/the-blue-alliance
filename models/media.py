@@ -23,6 +23,7 @@ class Media(ndb.Model):
         MediaType.GITHUB_PROFILE: 'github-profile',
         MediaType.INSTAGRAM_PROFILE: 'instagram-profile',
         MediaType.PERISCOPE_PROFILE: 'periscope-profile',
+        MediaType.GRABCAD: 'grabcad',
     }
 
     REFERENCE_MAP = {
