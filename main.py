@@ -27,6 +27,7 @@ from controllers.district_controller import DistrictDetail
 from controllers.suggestions.suggest_apiwrite_controller import SuggestApiWriteController
 from controllers.suggestions.suggest_apiwrite_review_controller import \
       SuggestApiWriteReviewController
+from controllers.suggestions.suggest_designs_review_controller import SuggestDesignsReviewController
 from controllers.suggestions.suggest_match_video_controller import SuggestMatchVideoController, \
       SuggestMatchVideoPlaylistController
 from controllers.suggestions.suggest_match_video_review_controller import SuggestMatchVideoReviewController
@@ -111,6 +112,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/request/apiwrite/', SuggestApiWriteController, 'request-apiwrite', strict_slash=True),
       RedirectRoute(r'/search', SearchHandler, 'search', strict_slash=True),
       RedirectRoute(r'/suggest/apiwrite/review', SuggestApiWriteReviewController, 'request-apiwrite-review', strict_slash=True),
+      RedirectRoute(r'/suggest/cad/review', SuggestDesignsReviewController, 'suggest-designs-review', strict_slash=True),
       RedirectRoute(r'/suggest/event/webcast', SuggestEventWebcastController, 'suggest-event-webcast', strict_slash=True),
       RedirectRoute(r'/suggest/event/webcast/review', SuggestEventWebcastReviewController, 'suggest-event-webcast-review', strict_slash=True),
       RedirectRoute(r'/suggest/event/video', SuggestMatchVideoPlaylistController, 'suggest-matches-playlist', strict_slash=True),

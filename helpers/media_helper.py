@@ -61,6 +61,7 @@ class MediaParser(object):
         MediaType.IMGUR: [(r".*imgur.com\/(\w+)\/?\Z", 1), (r".*imgur.com\/(\w+)\.\w+\Z", 1)],
         MediaType.INSTAGRAM_PROFILE: [(r".*instagram.com\/(.*)(\/(.*))?", 1)],
         MediaType.PERISCOPE_PROFILE: [(r".*periscope.tv\/(.*)(\/(.*))?", 1)],
+        MediaType.GRABCAD: [(r".*grabcad.com\/library\/(.*)", 1)]
     }
 
     # Media URL patterns that map a URL -> Profile type (used to determine which type represents a given url)
@@ -77,6 +78,7 @@ class MediaParser(object):
         ('youtube.com/watch', MediaType.YOUTUBE_VIDEO),
         ('youtu.be', MediaType.YOUTUBE_VIDEO),
         ('imgur.com/', MediaType.IMGUR),
+        ('grabcad.com/library/', MediaType.GRABCAD),
 
         # Keep this last, so it doesn't greedy match over other more specific youtube urls
         ('youtube.com/', MediaType.YOUTUBE_CHANNEL),
@@ -86,6 +88,8 @@ class MediaParser(object):
     ALLOWED_URLPARAMS = {
         MediaType.YOUTUBE_VIDEO: ['v'],
     }
+
+    GRABCAD_DETAIL_URL = "https://grabcad.com/community/api/v1/models/{}"  # Format w/ foreign key
 
     @classmethod
     def partial_media_dict_from_url(cls, url):
@@ -100,6 +104,10 @@ class MediaParser(object):
                     # CD images are special - they need to do an additional urlfetch because the given url
                     # doesn't contain the foreign key
                     return cls._partial_media_dict_from_cd_photo_thread(url)
+                elif media_type == MediaType.GRABCAD:
+                    # GrabCAD images are special - we'll need to do a second fetch to a SUPER HACKY
+                    # API so we can get embed images and titles and stuff
+                    return cls._partial_media_dict_from_grabcad(url)
                 else:
                     return cls._create_media_dict(media_type, url)
 
@@ -120,6 +128,7 @@ class MediaParser(object):
             logging.warning("Failed to determine {} foreign_key from url: {}".format(MediaType.type_names[media_type], url))
             return None
         foreign_key = foreign_key if media_type in cls.CASE_SENSITIVE_FOREIGN_KEYS else foreign_key.lower()
+        media_dict['media_type'] = media_type
         media_dict['is_social'] = media_type in MediaType.social_types
         media_dict['foreign_key'] = foreign_key
         media_dict['site_name'] = MediaType.type_names[media_type]
@@ -185,6 +194,29 @@ class MediaParser(object):
             return None
         media_dict['details_json'] = json.dumps({'image_partial': image_partial})
 
+        return media_dict
+
+    @classmethod
+    def _partial_media_dict_from_grabcad(cls, url):
+        media_dict = cls._create_media_dict(MediaType.GRABCAD, url)
+        if not media_dict:
+            return None
+
+        url = cls.GRABCAD_DETAIL_URL.format(media_dict['foreign_key'])
+        urlfetch_result = urlfetch.fetch(url, deadline=10)
+        if urlfetch_result.status_code != 200:
+            logging.warning('Unable to retreive url: {}'.format(url))
+
+        grabcad_data = json.loads(urlfetch_result.content)
+        if not grabcad_data:
+            return None
+
+        media_dict['details_json'] = json.dumps({
+            'model_name': grabcad_data['name'],
+            'model_description': grabcad_data['raw_description'],
+            'model_image': grabcad_data['preview_image'],
+            'model_created': grabcad_data['created_at']
+        })
         return media_dict
 
     @classmethod
