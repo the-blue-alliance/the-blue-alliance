@@ -106,7 +106,7 @@ class TestMediaUrlParser(unittest2.TestCase):
         self.assertEqual(result['foreign_key'], '4hteamneutrino')
         self.assertEqual(result['site_name'], MediaType.type_names[MediaType.INSTAGRAM_PROFILE])
         self.assertEqual(result['profile_url'], 'https://www.instagram.com/4hteamneutrino')
-        
+
     def test_periscope_profile_parse(self):
         result = MediaParser.partial_media_dict_from_url("https://www.periscope.tv/evolution2626")
         self.assertEqual(result['media_type_enum'], MediaType.PERISCOPE_PROFILE)
@@ -114,6 +114,12 @@ class TestMediaUrlParser(unittest2.TestCase):
         self.assertEqual(result['foreign_key'], 'evolution2626')
         self.assertEqual(result['site_name'], MediaType.type_names[MediaType.PERISCOPE_PROFILE])
         self.assertEqual(result['profile_url'], 'https://www.periscope.tv/evolution2626')
+
+    def test_grabcad_link(self):
+        result = MediaParser.partial_media_dict_from_url("https://grabcad.com/library/2014-3467-the-windham-windup-1")
+        self.assertEqual(result['media_type_enum'], MediaType.GRABCAD)
+        self.assertEqual(result['is_social'], False)
+        self.assertEqual(result['foreign_key'], '2014-3467-the-windham-windup-1')
 
     def test_unsupported_url_parse(self):
         self.assertEqual(MediaParser.partial_media_dict_from_url("http://foo.bar"), None)
