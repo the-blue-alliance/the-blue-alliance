@@ -16,7 +16,7 @@ class SuggestReviewHomeController(SuggestionsReviewBaseController):
 
         # Ensure that the user is logged in and has some permission
         self._require_registration()
-        if not self.user_bundle.account.permissions:
+        if not self.user_bundle.account.permissions and not self.user_bundle.is_current_user_admin:
             self.redirect(
                 "/",
                 abort=True
