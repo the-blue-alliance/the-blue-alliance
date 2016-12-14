@@ -22,16 +22,20 @@ class SuggestionNotifier(object):
                        body=email_body)
 
     @classmethod
-    def send_slack_alert(cls, webhook_url, body_text, attachment_list):
+    def send_slack_alert(cls, webhook_url, body_text, attachment_list=None):
         # Send an alert to a specified slack channel to poke people to review this
         # Only do this on prod
-        if tba_config.DEBUG:
-            return
+        #if tba_config.DEBUG:
+        #    return
 
         post_dict = {
             'text': body_text,
-            'attachments': attachment_list,
         }
+        if attachment_list:
+            post_dict.update({
+                'attachments': attachment_list,
+            })
+
         post_data = urllib.urlencode({"payload": json.dumps(post_dict)})
         request = urllib2.Request(webhook_url, post_data)
         response = urllib2.urlopen(request)
