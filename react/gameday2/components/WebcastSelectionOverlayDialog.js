@@ -11,7 +11,7 @@ export default class VideoCellOverlayDialog extends React.Component {
     webcasts: PropTypes.array.isRequired,
     webcastsById: PropTypes.object.isRequired,
     displayedWebcasts: PropTypes.array.isRequired,
-    webcastSelected: PropTypes.func.isRequired,
+    onWebcastSelected: PropTypes.func.isRequired,
     onRequestClose: PropTypes.func.isRequired,
   }
 
@@ -77,7 +77,7 @@ export default class VideoCellOverlayDialog extends React.Component {
         <WebcastSelectionOverlayDialogItem
           key={webcast.id}
           webcast={webcast}
-          webcastSelected={this.props.webcastSelected}
+          webcastSelected={this.props.onWebcastSelected}
         />
       )
     }

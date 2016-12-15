@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react'
 import classNames from 'classnames'
-import VideoOverlayContainer from '../containers/VideoOverlayContainer'
 import WebcastSelectionPanel from './WebcastSelectionPanel'
 import EmbedUstream from './EmbedUstream'
 import EmbedYoutube from './EmbedYoutube'
@@ -23,19 +22,13 @@ const VideoCell = React.createClass({
       webcastSelectionDialogOpen: false,
     }
   },
-  onMouseOver() {
-    this.setState({ mouseOver: true })
-  },
-  onMouseOut() {
-    this.setState({ mouseOver: false })
-  },
   onRequestOpenWebcastSelectionDialog() {
     this.setState({ webcastSelectionDialogOpen: true })
   },
   onRequestCloseWebcastSelectionDialog() {
     this.setState({ webcastSelectionDialogOpen: false })
   },
-  webcastSelected(webcastId) {
+  onWebcastSelected(webcastId) {
     this.props.addWebcastAtLocation(webcastId, this.props.location)
     this.onRequestCloseWebcastSelectionDialog()
   },
@@ -77,15 +70,8 @@ const VideoCell = React.createClass({
         <div
           className={classes}
           style={cellStyle}
-          onMouseOver={this.onMouseOver}
-          onMouseOut={this.onMouseOut}
         >
           {cellEmbed}
-          <VideoOverlayContainer
-            webcast={this.props.webcast}
-            mouseOverContainer={this.state.mouseOver}
-            location={this.props.location}
-          />
           <VideoCellToolbarContainer
             style={toolbarStyle}
             webcast={this.props.webcast}
@@ -95,6 +81,7 @@ const VideoCell = React.createClass({
             open={this.state.webcastSelectionDialogOpen}
             webcast={this.props.webcast}
             onRequestClose={this.onRequestCloseWebcastSelectionDialog}
+            onWebcastSelected={this.onWebcastSelected}
           />
         </div>
       )
@@ -108,6 +95,7 @@ const VideoCell = React.createClass({
         open={this.state.webcastSelectionDialogOpen}
         webcast={this.props.webcast}
         onRequestClose={this.onRequestCloseWebcastSelectionDialog}
+        onWebcastSelected={this.onWebcastSelected}
       />
     </div>)
   },
