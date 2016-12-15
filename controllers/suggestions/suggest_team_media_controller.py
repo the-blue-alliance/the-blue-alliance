@@ -60,7 +60,7 @@ class SuggestTeamMediaController(LoggedInHandler):
             team_key=team_key,
             year_str=year_str)
 
-        if status == 'success' and suggestion.contents['media_type'] == MediaType.GRABCAD:
+        if status == 'success' and suggestion.contents.get('media_type') == MediaType.GRABCAD:
             # Send an update to the frcdesigns slack
             slack_sitevar = Sitevar.get_or_insert('slack.hookurls')
             if slack_sitevar:
@@ -93,8 +93,6 @@ class SuggestTeamMediaController(LoggedInHandler):
                     }
 
                     SuggestionNotifier.send_slack_alert(slack_url, message_body, [image_attachment])
-        else:
-            logging.info("not notifying slack")
 
         self.redirect('/suggest/team/media?team_key=%s&year=%s&status=%s' % (team_key, year_str, status))
 
