@@ -3,7 +3,7 @@
 {% block title %}GameDay - The Blue Alliance{% endblock %}
 
 {% block main_style %}
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />-->
     <link rel="stylesheet" href="/css/gameday2.min.css" type="text/css" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700">
@@ -27,7 +27,11 @@
   <div class="hidden" id="webcasts_json">{{ webcasts_json|safe }}</div>
 {% endblock %}
 
+{% block admin_bar %}{% endblock %}
+
 {% block footer %}{% endblock %}
+
+{% block login_modal %}{% endblock %}
 
 {% block main_javascript %}
     <script src="//cdnjs.cloudflare.com/ajax/libs/showdown/0.3.1/showdown.min.js"></script>
