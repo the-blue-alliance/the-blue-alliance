@@ -39,7 +39,7 @@ class SuggestionCreator(object):
                     if media_dict.get("is_social", False):
                         target_model = "social-media"
 
-                    if media_dict['media_type'] in MediaType.robot_types:
+                    if media_dict.get('media_type', '') in MediaType.robot_types:
                         target_model = "robot"
 
                     suggestion = Suggestion(
