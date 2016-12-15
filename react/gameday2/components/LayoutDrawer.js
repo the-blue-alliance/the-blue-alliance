@@ -51,6 +51,7 @@ export default class LayoutDrawer extends React.Component {
       layouts.push(
         <ListItem
           primaryText="There aren't any webcasts available right now. Check back later!"
+          key="empty"
           disabled
         />
       )
