@@ -9,30 +9,37 @@ import WebcastSelectionOverlayDialogContainer from '../containers/WebcastSelecti
 import { WebcastPropType } from '../utils/webcastUtils'
 import RaisedButton from 'material-ui/RaisedButton'
 
-const VideoCell = React.createClass({
-  propTypes: {
+export default class VideoCell extends React.Component {
+  static propTypes = {
     webcast: WebcastPropType,
     webcasts: PropTypes.array.isRequired,
     webcastsById: PropTypes.object.isRequired,
     displayedWebcasts: PropTypes.array.isRequired,
     location: PropTypes.number.isRequired,
     addWebcastAtLocation: PropTypes.func.isRequired,
-  },
-  getInitialState() {
-    return {
+  }
+
+  constructor(props) {
+    super(props)
+
+    this.state = {
       webcastSelectionDialogOpen: false,
     }
-  },
+  }
+
   onRequestOpenWebcastSelectionDialog() {
     this.setState({ webcastSelectionDialogOpen: true })
-  },
+  }
+
   onRequestCloseWebcastSelectionDialog() {
     this.setState({ webcastSelectionDialogOpen: false })
-  },
+  }
+
   onWebcastSelected(webcastId) {
     this.props.addWebcastAtLocation(webcastId, this.props.location)
     this.onRequestCloseWebcastSelectionDialog()
-  },
+  }
+
   render() {
     const classes = classNames({
       'video-cell': true,
@@ -116,8 +123,6 @@ const VideoCell = React.createClass({
           onWebcastSelected={this.onWebcastSelected}
         />
       </div>
-  )
-  },
-})
-
-export default VideoCell
+    )
+  }
+}
