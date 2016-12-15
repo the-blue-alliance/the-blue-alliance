@@ -212,7 +212,7 @@ class SuggestionCreator(object):
         if not affiliation:
             return 'no_affiliation'
 
-        if event_key is not None:
+        if event_key:
             event = Event.get_by_id(event_key)
             if event:
                 suggestion = Suggestion(
