@@ -3,7 +3,6 @@ import GamedayNavbarContainer from '../containers/GamedayNavbarContainer'
 import MainContentContainer from '../containers/MainContentContainer'
 import ChatSidebarContainer from '../containers/ChatSidebarContainer'
 import HashtagSidebarContainer from '../containers/HashtagSidebarContainer'
-import FollowingTeamsModal from './FollowingTeamsModal'
 
 const GamedayFrame = React.createClass({
   getInitialState() {
@@ -26,11 +25,6 @@ const GamedayFrame = React.createClass({
         <HashtagSidebarContainer />
         <ChatSidebarContainer />
         <MainContentContainer />
-        <FollowingTeamsModal
-          followingTeams={this.state.followingTeams}
-          onFollowTeam={this.handleFollowTeam}
-          onUnfollowTeam={this.handleUnfollowTeam}
-        />
       </div>
     )
   },
