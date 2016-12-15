@@ -31,7 +31,6 @@ class LocationHelper(object):
         b_sorted = ' '.join(sorted(re.split('\W+', b)))
         return SequenceMatcher(None, a_sorted.lower(), b_sorted.lower()).ratio()
 
-
     # @classmethod
     # def get_event_lat_lon(cls, event):
     #     """
@@ -315,7 +314,6 @@ class LocationHelper(object):
                     location_info['country_short'] = component['short_name']
                 elif 'postal_code' in component['types']:
                     location_info['postal_code'] = component['long_name']
-
             location_info['place_details'] = place_details_result
 
         raise ndb.Return(location_info)

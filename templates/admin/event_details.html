@@ -150,6 +150,14 @@
   <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Alliance Selections</button>
 </form>
 
+<h2>Add Backup Teams</h2>
+<p>Input a backup team used during eliminations. This will replace existing backup data for the specified alliance</p>
+<form action="/admin/event/add_alliance_backup/{{ event.key_name }}" method="post">
+  <p>Incoming Backup Team: <input name="backup_in" placeholder="123"/></p>
+  <p>Outgoing team that was replaced: <input name="backup_out" placeholder="456"/></p>
+  <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Add Backup Team</button>
+</form>
+
 <h2>Add Webcast</h2>
 {% include "partials/webcast_add_instructions_partial.html" %}
 <form action="/admin/event/add_webcast/{{event.key_name}}" method="post">
@@ -180,7 +188,7 @@
     <tr>
         <td>{{forloop.counter}}</td>
         {% for team in alliance.picks %}
-            <td>{{team}}</td>
+            <td>{{ team }}{% if alliance.backup and alliance.backup.out == team %} ({{alliance.backup.in}}){% endif %}</td>
         {% endfor %}
     </tr>
 {% endfor %}

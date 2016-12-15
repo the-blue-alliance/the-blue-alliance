@@ -182,6 +182,17 @@ function playoffMatchAndSet(totalMatchNum, is_octo){
     }
 }
 
+/* Load all valid events for this user */
+var valid_events = [];
+$.get( "/_/account/apiwrite_events", function(data) {
+    valid_events.push('<option value="">Select Event</option>');
+    $.each(JSON.parse(data), function(key, value) {
+        valid_events.push('<option value="'+ key +'">'+ value +'</option>');
+    });
+    valid_events.push('<option value="other">Other</option>');
+    $('#event_key_select').html(valid_events.join(''));
+});
+
 if($('#event_key_select').val() != "other"){
     $('#event_key').hide();
 }
@@ -189,9 +200,15 @@ $('#event_key_select').change(function(){
     var eventKey = $(this).val();
     $('#event_key').val(eventKey);
     if(eventKey == "other"){
-        $('#event_key').val("").show()
+        $('#event_key').val("").show();
+        $('#auth-container').show();
+        $('#auth-tools').show();
     }else{
         $('#event_key').hide();
+
+        /* if the user is logged in, they don't need to manually input keys */
+        $('#auth-container').hide();
+        $('#auth-tools').hide();
     }
 
     // clear auth boxes

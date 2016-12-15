@@ -69,6 +69,11 @@
                 <li>Example: <code>https://www.youtube.com/watch?v=DojyJ9bZ4fk</code></li>
               </ul>
             </li>
+            <li>GrabCAD Files
+              <ul>
+                <li>Example: <code>https://grabcad.com/library/cad-stuff</code></li>
+              </ul>
+            </li>
           </ul>
 
           <p><strong>Please do not submit:</strong></p>
@@ -115,6 +120,19 @@
               {% for media in medias_by_slugname.youtube %}
                 <div class="col-xs-12 col-md-6 fitvids">
                 {% include "media_partials/youtube_partial.html" %}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if medias_by_slugname.grabcad %}
+          <div class="row">
+            <div class="col-xs-12">
+              <h4>Existing CAD Models</h4>
+              {% for media in medias_by_slugname.grabcad%}
+                <div class="col-xs-12 col-md-6">
+                {% include "media_partials/grabcad_partial.html" %}
                 </div>
               {% endfor %}
             </div>

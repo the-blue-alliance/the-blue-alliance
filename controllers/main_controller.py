@@ -1,24 +1,20 @@
-import os
-import logging
 import datetime
-import webapp2
+import logging
+import os
 
+import webapp2
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 import tba_config
-
 from base_controller import CacheableHandler
 from consts.event_type import EventType
 from consts.notification_type import NotificationType
 from helpers.event_helper import EventHelper
-
 from models.event import Event
 from models.insight import Insight
 from models.team import Team
-from models.sitevar import Sitevar
-
 from template_engine import jinja2_engine
 
 
@@ -76,7 +72,7 @@ class MainKickoffHandler(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24
 
     def _render(self, *args, **kw):
-        kickoff_datetime_est = datetime.datetime(2016, 1, 9, 10, 30)
+        kickoff_datetime_est = datetime.datetime(2017, 1, 7, 10, 30)
         kickoff_datetime_utc = kickoff_datetime_est + datetime.timedelta(hours=5)
 
         is_kickoff = datetime.datetime.now() >= kickoff_datetime_est - datetime.timedelta(days=1)  # turn on 1 day before
@@ -303,60 +299,6 @@ class SearchHandler(webapp2.RequestHandler):
             logging.warning("warning: %s" % e)
         finally:
             self.response.out.write(render_static("search"))
-
-
-class GamedayHandler(CacheableHandler):
-    CACHE_VERSION = 2
-    CACHE_KEY_FORMAT = "main_gameday"
-
-    def __init__(self, *args, **kw):
-        super(GamedayHandler, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60
-
-    def _render(self, *args, **kw):
-        special_webcasts_future = Sitevar.get_by_id_async('gameday.special_webcasts')
-        special_webcasts_temp = special_webcasts_future.get_result()
-        if special_webcasts_temp:
-            special_webcasts_temp = special_webcasts_temp.contents
-        else:
-            special_webcasts_temp = []
-        special_webcasts = []
-        special_webcast_keys = set()
-        for webcast in special_webcasts_temp:
-            toAppend = {}
-            for key, value in webcast.items():
-                toAppend[str(key)] = str(value)
-            special_webcasts.append(toAppend)
-            special_webcast_keys.add(webcast['key_name'])
-
-        ongoing_events = []
-        ongoing_events_w_webcasts = []
-        week_events = EventHelper.getWeekEvents()
-        for event in week_events:
-            if event.now and event.key.id() not in special_webcast_keys:
-                ongoing_events.append(event)
-                if event.webcast:
-                    valid = []
-                    for webcast in event.webcast:
-                        if 'type' in webcast and 'channel' in webcast:
-                            event_webcast = {'event': event}
-                            valid.append(event_webcast)
-                    # Add webcast numbers if more than one for an event
-                    if len(valid) > 1:
-                        count = 1
-                        for event in valid:
-                            event['count'] = count
-                            count += 1
-                    ongoing_events_w_webcasts += valid
-
-        self.template_values.update({
-            'special_webcasts': special_webcasts,
-            'ongoing_events': ongoing_events,
-            'ongoing_events_w_webcasts': ongoing_events_w_webcasts
-        })
-
-        path = os.path.join(os.path.dirname(__file__), '../templates/gameday.html')
-        return template.render(path, self.template_values)
 
 
 class WebcastsHandler(CacheableHandler):

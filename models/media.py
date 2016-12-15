@@ -23,6 +23,7 @@ class Media(ndb.Model):
         MediaType.GITHUB_PROFILE: 'github-profile',
         MediaType.INSTAGRAM_PROFILE: 'instagram-profile',
         MediaType.PERISCOPE_PROFILE: 'periscope-profile',
+        MediaType.GRABCAD: 'grabcad',
     }
 
     REFERENCE_MAP = {
@@ -128,6 +129,8 @@ class Media(ndb.Model):
             return self.cdphotothread_image_url
         elif self.media_type_enum == MediaType.IMGUR:
             return self.imgur_url
+        elif self.media_type_enum == MediaType.GRABCAD:
+            return "https://grabcad.com/library/{}".format(self.foreign_key)
         else:
             return ""
 
@@ -138,6 +141,8 @@ class Media(ndb.Model):
             return self.cdphotothread_image_url_med
         elif self.media_type_enum == MediaType.IMGUR:
             return self.imgur_direct_url
+        elif self.media_type_enum == MediaType.GRABCAD:
+            return self.details['model_image'].replace('card.jpg', 'large.png')
         else:
             return ""
 
@@ -152,11 +157,17 @@ class Media(ndb.Model):
         return MediaType.type_names[self.media_type_enum]
 
     @property
+    def is_image(self):
+        return self.media_type_enum in MediaType.image_types
+
+    @property
     def image_direct_url_med(self):
         if self.media_type_enum == MediaType.CD_PHOTO_THREAD:
             return self.cdphotothread_image_url_med
         elif self.media_type_enum == MediaType.IMGUR:
             return self.imgur_direct_url_med
+        elif self.media_type_enum == MediaType.GRABCAD:
+            return self.details['model_image']
         else:
             return ""
 
@@ -166,5 +177,7 @@ class Media(ndb.Model):
             return self.cdphotothread_image_url_sm
         elif self.media_type_enum == MediaType.IMGUR:
             return self.imgur_direct_url_sm
+        elif self.media_type_enum == MediaType.GRABCAD:
+            return self.details['model_image'].replace('large.jpg', 'tiny.jpg')
         else:
             return ""

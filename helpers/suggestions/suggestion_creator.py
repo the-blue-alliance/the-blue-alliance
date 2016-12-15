@@ -3,6 +3,7 @@ from datetime import datetime
 
 from consts.auth_type import AuthType
 from consts.event_type import EventType
+from consts.media_type import MediaType
 from helpers.media_helper import MediaParser
 from helpers.webcast_helper import WebcastParser
 
@@ -20,7 +21,7 @@ class SuggestionCreator(object):
         media_dict = MediaParser.partial_media_dict_from_url(media_url)
         if media_dict is not None:
             if media_dict.get("is_social", False) != is_social:
-                return 'bad_url'
+                return 'bad_url', None
 
             existing_media = Media.get_by_id(Media.render_key_name(media_dict['media_type_enum'], media_dict['foreign_key']))
             if existing_media is None or team_key not in [reference.id() for reference in existing_media.references]:
@@ -38,6 +39,9 @@ class SuggestionCreator(object):
                     if media_dict.get("is_social", False):
                         target_model = "social-media"
 
+                    if media_dict.get('media_type', '') in MediaType.robot_types:
+                        target_model = "robot"
+
                     suggestion = Suggestion(
                         id=suggestion_id,
                         author=author_account_key,
@@ -45,13 +49,13 @@ class SuggestionCreator(object):
                         )
                     suggestion.contents = media_dict
                     suggestion.put()
-                    return 'success'
+                    return 'success', suggestion
                 else:
-                    return 'suggestion_exists'
+                    return 'suggestion_exists', None
             else:
-                return 'media_exists'
+                return 'media_exists', None
         else:
-            return 'bad_url'
+            return 'bad_url', None
 
     @classmethod
     def createEventWebcastSuggestion(cls, author_account_key, webcast_url, event_key):
@@ -133,7 +137,7 @@ class SuggestionCreator(object):
             return 'bad_url'
 
     @classmethod
-    def createOffseasonEventSuggestion(cls, author_account_key, name, start_date, end_date, website, address):
+    def createOffseasonEventSuggestion(cls, author_account_key, name, start_date, end_date, website, venue_name, address, city, state, country):
         """
         Create a suggestion for offseason event. Returns (status, failures):
         ('success', None)
@@ -150,6 +154,14 @@ class SuggestionCreator(object):
             failures['website'] = "Missing website"
         if not address:
             failures['venue_address'] = "Missing address"
+        if not venue_name:
+            failures['venue_name'] = "Missing venue name"
+        if not city:
+            failures['venue_city'] = "Missing city"
+        if not state:
+            failures['venue_state'] = "Missing state"
+        if not country:
+            failures['venue_country'] = "Missing country"
 
         start_datetime = None
         end_datetime = None
@@ -182,7 +194,12 @@ class SuggestionCreator(object):
             'start_date': start_date,
             'end_date': end_date,
             'website': website,
-            'address': address}
+            'venue_name': venue_name,
+            'address': address,
+            'city': city,
+            'state': state,
+            'country': country
+        }
         suggestion.put()
         return 'success', None
 

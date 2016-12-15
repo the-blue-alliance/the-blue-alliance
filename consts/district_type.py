@@ -14,6 +14,7 @@ class DistrictType(object):
     NORTH_CAROLINA = 7
     GEORGIA = 8
     ONTARIO = 9
+    ISRAEL = 10
 
     # Used for rendering
     type_names = {
@@ -27,6 +28,7 @@ class DistrictType(object):
         NORTH_CAROLINA: 'North Carolina',
         GEORGIA: 'Georgia',
         ONTARIO: 'Ontario',
+        ISRAEL: 'Israel',
     }
 
     # make sure abbreviations stay all lower case
@@ -41,9 +43,10 @@ class DistrictType(object):
         NORTH_CAROLINA: 'nc',
         GEORGIA: 'pch',
         ONTARIO: 'ont',
+        ISRAEL: 'isr',
     }
 
-    # Names used on the FIRST website
+    # Names used on the FIRST website & FRC API
     names = {
         'FIRST in Michigan': MICHIGAN,
         'Mid-Atlantic Robotics': MID_ATLANTIC,
@@ -53,7 +56,8 @@ class DistrictType(object):
         'FIRST Chesapeake': CHESAPEAKE,
         'North Carolina': NORTH_CAROLINA,
         'Georgia': GEORGIA,
-        'FIRST Ontario': ONTARIO,  # 2016-08-12 May be incorrect. Nothing posted yet.
+        'FIRST Ontario': ONTARIO,
+        'Israel': ISRAEL,
     }
 
     # Names used by FIRST ElasticSearch
@@ -69,6 +73,7 @@ class DistrictType(object):
         'FIRST North Carolina': NORTH_CAROLINA,  # 2017 uses a different name
         'Peachtree': GEORGIA,
         'FIRST Ontario': ONTARIO,
+        'FIRST Israel': ISRAEL,
     }
 
     # make sure abbreviations stay all lower case
@@ -82,4 +87,5 @@ class DistrictType(object):
         'nc': NORTH_CAROLINA,
         'pch': GEORGIA,
         'ont': ONTARIO,
+        'isr': ISRAEL,
     }
