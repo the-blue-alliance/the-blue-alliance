@@ -67,7 +67,7 @@ class SuggestTeamMediaController(LoggedInHandler):
                 slack_url = slack_sitevar.contents.get('tbablog', '')
                 if slack_url:
                     model_details = json.loads(suggestion.contents['details_json'])
-                    message_body = "{} ({}) has suggested a CAD model for team {} in {}.".format(
+                    message_body = "{0} ({1}) has suggested a CAD model for team <https://thebluealliance.com/team/{2}/{3}|{2} in {3}>.".format(
                         self.user_bundle.account.display_name,
                         self.user_bundle.account.email,
                         team_key[3:],

@@ -38,7 +38,7 @@ class SuggestDesignsReviewController(SuggestionsReviewBaseController):
                     if self.request.get('action') == 'accept':
                         self._process_accepted(suggestion.key.id())
                         status = 'accepted'
-                        slack_message = "{} ({}) accepted the <https://grabcad.com/library/{}|suggestion> for team {} in {}".format(
+                        slack_message = "{0} ({1}) accepted the <https://grabcad.com/library/{}|suggestion> for team <https://thebluealliance.com/team/{2}/{3}|{2} in {3}>".format(
                             self.user_bundle.account.display_name,
                             self.user_bundle.account.email,
                             suggestion.contents['foreign_key'],
@@ -51,7 +51,7 @@ class SuggestDesignsReviewController(SuggestionsReviewBaseController):
                         suggestion.reviewed_at = datetime.datetime.now()
                         suggestion.put()
                         status = 'rejected'
-                        slack_message = "{} ({}) rejected the <https://grabcad.com/library/{}|suggestion> for team {} in {}".format(
+                        slack_message = "{0} ({1}) rejected the <https://grabcad.com/library/{}|suggestion> for team <https://thebluealliance.com/team/{2}/{3}|{2} in {3}>".format(
                             self.user_bundle.account.display_name,
                             self.user_bundle.account.email,
                             suggestion.contents['foreign_key'],
