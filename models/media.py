@@ -157,6 +157,10 @@ class Media(ndb.Model):
         return MediaType.type_names[self.media_type_enum]
 
     @property
+    def is_image(self):
+        return self.media_type_enum in MediaType.image_types
+
+    @property
     def image_direct_url_med(self):
         if self.media_type_enum == MediaType.CD_PHOTO_THREAD:
             return self.cdphotothread_image_url_med
