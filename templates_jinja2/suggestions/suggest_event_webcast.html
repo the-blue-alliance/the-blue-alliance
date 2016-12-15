@@ -68,7 +68,7 @@
           <h4>Add a webcast</h4>
           {% endif %}
           <p>Find a webcast for {{event.name}} and paste it below so we can add it to the site :)</p>
-          <form action="/suggest/event/webcast" method="post">
+          <form action="/suggest/event/webcast" method="post" id="suggest_webcast">
             <input name="event_key" type="hidden" value="{{event.key.id()}}" />
             <div class="input-group">
               <input class="form-control" type="text" name="webcast_url" placeholder="like http://www.ustream.tv/nasa" value="" />
