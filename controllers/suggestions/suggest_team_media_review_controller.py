@@ -69,7 +69,7 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
             "max_preferred": Media.MAX_PREFERRED,
         })
 
-        self.response.out.write(jinja2_engine.render('suggest_team_media_review_list.html', self.template_values))
+        self.response.out.write(jinja2_engine.render('suggestions/suggest_team_media_review_list.html', self.template_values))
 
     @ndb.transactional(xg=True)
     def _process_accepted(self, accept_key, preferred_keys):

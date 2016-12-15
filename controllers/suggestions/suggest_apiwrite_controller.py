@@ -17,7 +17,7 @@ class SuggestApiWriteController(LoggedInHandler):
             "auth_types": AuthType.type_names,
         })
         self.response.out.write(
-            jinja2_engine.render('suggest_apiwrite.html', self.template_values))
+            jinja2_engine.render('suggestions/suggest_apiwrite.html', self.template_values))
 
     def post(self):
         self._require_login()

@@ -46,7 +46,7 @@ class SuggestTeamMediaController(LoggedInHandler):
             "medias_by_slugname": medias_by_slugname,
         })
 
-        self.response.out.write(jinja2_engine.render('suggest_team_media.html', self.template_values))
+        self.response.out.write(jinja2_engine.render('suggestions/suggest_team_media.html', self.template_values))
 
     def post(self):
         self._require_registration()

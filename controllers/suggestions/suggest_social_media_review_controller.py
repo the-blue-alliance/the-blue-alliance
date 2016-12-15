@@ -45,7 +45,7 @@ class SuggestSocialMediaReviewController(SuggestionsReviewBaseController):
             "suggestions_and_references": suggestions_and_references,
         })
 
-        self.response.out.write(jinja2_engine.render('suggest_team_social_review.html', self.template_values))
+        self.response.out.write(jinja2_engine.render('suggestions/suggest_team_social_review.html', self.template_values))
 
     @ndb.transactional(xg=True)
     def _process_accepted(self, accept_key):

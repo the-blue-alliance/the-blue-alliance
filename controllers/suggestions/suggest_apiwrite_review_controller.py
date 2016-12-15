@@ -37,7 +37,7 @@ class SuggestApiWriteReviewController(SuggestionsReviewBaseController):
             'auth_names': AuthType.type_names,
         })
         self.response.out.write(
-            jinja2_engine.render('suggest_apiwrite_review_list.html', self.template_values))
+            jinja2_engine.render('suggestions/suggest_apiwrite_review_list.html', self.template_values))
 
     @ndb.transactional(xg=True)
     def _process_accepted(self, suggestion_id, message):

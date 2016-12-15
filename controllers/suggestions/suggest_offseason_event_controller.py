@@ -15,7 +15,7 @@ class SuggestOffseasonEventController(LoggedInHandler):
             "status": self.request.get("status"),
         })
         self.response.out.write(
-            jinja2_engine.render('suggest_offseason_event.html', self.template_values))
+            jinja2_engine.render('suggestions/suggest_offseason_event.html', self.template_values))
 
     def post(self):
         self._require_registration()

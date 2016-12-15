@@ -36,7 +36,7 @@ class SuggestMatchVideoController(LoggedInHandler):
             "match": match,
         })
 
-        self.response.out.write(jinja2_engine.render('suggest_match_video.html', self.template_values))
+        self.response.out.write(jinja2_engine.render('suggestions/suggest_match_video.html', self.template_values))
 
     def post(self):
         self._require_registration()
