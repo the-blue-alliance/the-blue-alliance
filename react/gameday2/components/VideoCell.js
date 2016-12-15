@@ -7,6 +7,7 @@ import EmbedTwitch from './EmbedTwitch'
 import VideoCellToolbarContainer from '../containers/VideoCellToolbarContainer'
 import WebcastSelectionOverlayDialogContainer from '../containers/WebcastSelectionOverlayDialogContainer'
 import { WebcastPropType } from '../utils/webcastUtils'
+import RaisedButton from 'material-ui/RaisedButton'
 
 const VideoCell = React.createClass({
   propTypes: {
@@ -87,17 +88,35 @@ const VideoCell = React.createClass({
       )
     }
 
-    return (<div className={classes} >
-      <div className="empty-view">
-        <button type="button" className="btn btn-secondary" onClick={this.onRequestOpenWebcastSelectionDialog}>Select a webcast</button>
+    const emptyContainerStyle = {
+      width: '100%',
+      height: '100%',
+    }
+
+    const centerButtonStyle = {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translateX(-50%) translateY(-50%)',
+    }
+
+    return (
+      <div className={classes} >
+        <div style={emptyContainerStyle}>
+          <RaisedButton
+            label="Select a webcast"
+            style={centerButtonStyle}
+            onTouchTap={this.onRequestOpenWebcastSelectionDialog}
+          />
+        </div>
+        <WebcastSelectionOverlayDialogContainer
+          open={this.state.webcastSelectionDialogOpen}
+          webcast={this.props.webcast}
+          onRequestClose={this.onRequestCloseWebcastSelectionDialog}
+          onWebcastSelected={this.onWebcastSelected}
+        />
       </div>
-      <WebcastSelectionOverlayDialogContainer
-        open={this.state.webcastSelectionDialogOpen}
-        webcast={this.props.webcast}
-        onRequestClose={this.onRequestCloseWebcastSelectionDialog}
-        onWebcastSelected={this.onWebcastSelected}
-      />
-    </div>)
+  )
   },
 })
 
