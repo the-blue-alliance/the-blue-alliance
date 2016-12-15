@@ -11,6 +11,7 @@ export default class VideoCellToolbar extends React.Component {
 
   static propTypes = {
     webcast: PropTypes.object.isRequired,
+    onRequestOpenWebcastSelectionDialog: PropTypes.func.isRequired,
   }
 
   render() {
@@ -44,6 +45,7 @@ export default class VideoCellToolbar extends React.Component {
           <IconButton
             tooltip="Change webcast"
             tooltipPosition="top-center"
+            onTouchTap={() => this.props.onRequestOpenWebcastSelectionDialog()}
             touch
           >
             <VideocamIcon color={white} />

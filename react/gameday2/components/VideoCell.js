@@ -6,6 +6,7 @@ import EmbedUstream from './EmbedUstream'
 import EmbedYoutube from './EmbedYoutube'
 import EmbedTwitch from './EmbedTwitch'
 import VideoCellToolbarContainer from '../containers/VideoCellToolbarContainer'
+import WebcastSelectionOverlayDialogContainer from '../containers/WebcastSelectionOverlayDialogContainer'
 import { WebcastPropType } from '../utils/webcastUtils'
 
 const VideoCell = React.createClass({
@@ -19,8 +20,7 @@ const VideoCell = React.createClass({
   },
   getInitialState() {
     return {
-      mouseOver: false,
-      showWebcastSelectionPanel: false,
+      webcastSelectionDialogOpen: false,
     }
   },
   onMouseOver() {
@@ -29,15 +29,15 @@ const VideoCell = React.createClass({
   onMouseOut() {
     this.setState({ mouseOver: false })
   },
-  showWebcastSelectionPanel() {
-    this.setState({ showWebcastSelectionPanel: true })
+  onRequestOpenWebcastSelectionDialog() {
+    this.setState({ webcastSelectionDialogOpen: true })
   },
-  hideWebcastSelectionPanel() {
-    this.setState({ showWebcastSelectionPanel: false })
+  onRequestCloseWebcastSelectionDialog() {
+    this.setState({ webcastSelectionDialogOpen: false })
   },
   webcastSelected(webcastId) {
     this.props.addWebcastAtLocation(webcastId, this.props.location)
-    this.hideWebcastSelectionPanel()
+    this.onRequestCloseWebcastSelectionDialog()
   },
   render() {
     const classes = classNames({
@@ -86,24 +86,28 @@ const VideoCell = React.createClass({
             mouseOverContainer={this.state.mouseOver}
             location={this.props.location}
           />
-        <VideoCellToolbarContainer
+          <VideoCellToolbarContainer
             style={toolbarStyle}
-            webcast={this.props.webcast} />
+            webcast={this.props.webcast}
+            onRequestOpenWebcastSelectionDialog={() => this.onRequestOpenWebcastSelectionDialog()}
+          />
+          <WebcastSelectionOverlayDialogContainer
+            open={this.state.webcastSelectionDialogOpen}
+            webcast={this.props.webcast}
+            onRequestClose={this.onRequestCloseWebcastSelectionDialog}
+          />
         </div>
       )
     }
 
     return (<div className={classes} >
       <div className="empty-view">
-        <button type="button" className="btn btn-secondary" onClick={this.showWebcastSelectionPanel}>Select a webcast</button>
+        <button type="button" className="btn btn-secondary" onClick={this.onRequestOpenWebcastSelectionDialog}>Select a webcast</button>
       </div>
-      <WebcastSelectionPanel
-        webcasts={this.props.webcasts}
-        webcastsById={this.props.webcastsById}
-        displayedWebcasts={this.props.displayedWebcasts}
-        enabled={this.state.showWebcastSelectionPanel}
-        webcastSelected={this.webcastSelected}
-        closeWebcastSelectionPanel={this.hideWebcastSelectionPanel}
+      <WebcastSelectionOverlayDialogContainer
+        open={this.state.webcastSelectionDialogOpen}
+        webcast={this.props.webcast}
+        onRequestClose={this.onRequestCloseWebcastSelectionDialog}
       />
     </div>)
   },
