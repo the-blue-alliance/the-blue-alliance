@@ -2,6 +2,7 @@
 import multiprocessing
 import optparse
 import StringIO
+import os
 import sys
 import time
 import warnings
@@ -31,6 +32,7 @@ def main(sdk_path, test_pattern):
     sys.path.insert(0, sdk_path)
     import dev_appserver
     dev_appserver.fix_sys_path()
+    os.environ['IS_TBA_TEST'] = "true"
 
     suites = unittest2.loader.TestLoader().discover("tests", test_pattern)
 
@@ -44,6 +46,7 @@ def main(sdk_path, test_pattern):
     for process in processes:
         process.join()
 
+    os.unsetenv('IS_TBA_TEST')
     fail = False
     total_tests_run = 0
     while not result_queue.empty():
