@@ -168,6 +168,8 @@ class LocationHelper(object):
         if not team.location:
             return {}
 
+        SCORE_THRESHOLD = 0.9
+
         # Find possible schools/title sponsors
         possible_names = []
         MAX_SPLIT = 3  # Filters out long names that are unlikely
@@ -199,15 +201,13 @@ class LocationHelper(object):
         best_location_info = {}
         textsearch_results_candidates = []  # More trustworthy candidates are added first
         for query in possible_queries:
-            print query
-            print '!!!!!!!!!!!!'
             textsearch_results = cls.google_maps_textsearch_async(query).get_result()
             if textsearch_results:
                 if len(textsearch_results) == 1:
                     location_info = cls.construct_location_info_async(textsearch_results[0]).get_result()
                     score = cls.compute_team_location_score(team, query, location_info)
-                    if score == 1:
-                        # Very likely to be correct if only 1 result and as a perfect score
+                    if score >= SCORE_THRESHOLD:
+                        # Very likely to be correct if only 1 result and has a reasonable score
                         return location_info
                     elif score > best_score:
                         # Only 1 result but score is imperfect
@@ -218,7 +218,7 @@ class LocationHelper(object):
                     textsearch_results_candidates.append((textsearch_results, query))
 
         # Check if we have found anything reasonable
-        if best_location_info and best_score > 0.9:
+        if best_location_info and best_score > SCORE_THRESHOLD:
             return best_location_info
 
         # Try to find place using only location
@@ -244,7 +244,7 @@ class LocationHelper(object):
             for textsearch_result in textsearch_results:
                 location_info = cls.construct_location_info_async(textsearch_result).get_result()
                 score = cls.compute_team_location_score(team, query, location_info)
-                if score == 1:
+                if score == SCORE_THRESHOLD:
                     return location_info
                 elif score > best_score:
                     best_score = score
@@ -265,22 +265,19 @@ class LocationHelper(object):
             score += max(
                 cls.get_similarity(location_info.get('country', ''), team.country),
                 cls.get_similarity(location_info.get('country_short', ''), team.country))
-            print score
         if team.state_prov:
             score += max(
                 cls.get_similarity(location_info.get('state_prov', ''), team.state_prov),
                 cls.get_similarity(location_info.get('state_prov_short', ''), team.state_prov))
-            print score
         if team.city:
             score += cls.get_similarity(location_info.get('city', ''), team.city)
-            print score
         if team.postalcode:
             score += cls.get_similarity(location_info.get('postal_code', ''), team.postalcode)
-            print score
 
-        query_score = cls.get_similarity(location_info.get('name', ''), query)
-        score += query_score * 3
-        print score
+        score += cls.get_similarity(location_info.get('name', ''), query)
+
+        if 'point_of_interest' not in location_info.get('types', ''):
+            score *= 0.5
 
         return min(1.0, score / max_score)
 
@@ -296,6 +293,7 @@ class LocationHelper(object):
             'lat': textsearch_result['geometry']['location']['lat'],
             'lng': textsearch_result['geometry']['location']['lng'],
             'name': textsearch_result['name'],
+            'types': textsearch_result['types'],
         }
         place_details_result = yield cls.google_maps_place_details_async(textsearch_result['place_id'])
         if place_details_result:
@@ -363,7 +361,6 @@ class LocationHelper(object):
 
                 if tba_config.CONFIG['memcache']:
                     memcache.set(cache_key, results)
-        print results
         raise ndb.Return(results)
 
     @classmethod
