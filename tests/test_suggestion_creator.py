@@ -9,6 +9,7 @@ from helpers.media_helper import MediaParser
 from helpers.suggestions.suggestion_creator import SuggestionCreator
 from models.account import Account
 from models.event import Event
+from models.match import Match
 from models.media import Media
 from models.suggestion import Suggestion
 from models.team import Team
@@ -500,3 +501,64 @@ class TestSuggestEventWebcastCreator(unittest2.TestCase):
             "http://myweb.site/somewebcast",
             "2016test")
         self.assertEqual(status, 'suggestion_exists')
+
+
+class TestSuggestMatchVideoYouTube(unittest2.TestCase):
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
+        self.account = Account.get_or_insert(
+            "123",
+            email="user@example.com",
+            registered=True)
+        self.account.put()
+
+        event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.OFFSEASON)
+        event.put()
+        self.match = Match(id="2016test_f1m1", event=ndb.Key(Event, "2016test"), year=2016, comp_level="f", set_number=1, match_number=1, alliances_json='')
+        self.match.put()
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def testBadMatch(self):
+        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key, "37F5tbrFqJQ", "2016necmp_f1m2")
+        self.assertEqual(status, 'bad_match')
+
+    def testCreateSuggestion(self):
+        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key, "37F5tbrFqJQ", "2016test_f1m1")
+        self.assertEqual(status, 'success')
+
+        suggestion_id = "media_2016_match_2016test_f1m1_youtube_37F5tbrFqJQ"
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        self.assertIsNotNone(suggestion)
+
+        self.assertEqual(suggestion.author, self.account.key)
+        self.assertEqual(suggestion.target_key, '2016test_f1m1')
+        self.assertEqual(suggestion.target_model, 'match')
+        self.assertIsNotNone(suggestion.contents)
+        self.assertIsNotNone(suggestion.contents.get('youtube_videos'))
+        self.assertEqual(len(suggestion.contents.get('youtube_videos')), 1)
+        self.assertEqual(suggestion.contents.get('youtube_videos')[0], "37F5tbrFqJQ")
+
+    def testExistingVideo(self):
+        self.match.youtube_videos = ["37F5tbrFqJQ"]
+        self.match.put()
+
+        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key, "37F5tbrFqJQ", "2016test_f1m1")
+        self.assertEqual(status, 'video_exists')
+
+    def testExistingSuggestion(self):
+        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key, "37F5tbrFqJQ", "2016test_f1m1")
+        self.assertEqual(status, 'success')
+
+        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key, "37F5tbrFqJQ", "2016test_f1m1")
+        self.assertEqual(status, 'suggestion_exists')
+
+    def testBadYouTubeKey(self):
+        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(self.account.key, "", "2016test_f1m1")
+        self.assertEqual(status, 'bad_url')

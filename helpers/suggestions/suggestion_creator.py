@@ -115,9 +115,11 @@ class SuggestionCreator(object):
     @classmethod
     def createMatchVideoYouTubeSuggestion(cls, author_account_key, youtube_id, match_key):
         """Create a YouTube Match Video. Returns status (success, suggestion_exists, video_exists, bad_url)"""
-        if youtube_id is not None:
+        if youtube_id:
             match = Match.get_by_id(match_key)
-            if match and youtube_id not in match.youtube_videos:
+            if not match:
+                return 'bad_match'
+            if youtube_id not in match.youtube_videos:
                 year = match_key[:4]
                 suggestion_id = Suggestion.render_media_key_name(year, 'match', match_key, 'youtube', youtube_id)
                 suggestion = Suggestion.get_by_id(suggestion_id)

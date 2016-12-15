@@ -71,7 +71,7 @@ class SuggestMatchVideoPlaylistController(LoggedInHandler):
             "num_added": self.request.get("num_added")
         })
 
-        self.response.out.write(jinja2_engine.render('suggest_match_video_playlist.html', self.template_values))
+        self.response.out.write(jinja2_engine.render('suggestions/suggest_match_video_playlist.html', self.template_values))
 
     def post(self):
         self._require_registration()
