@@ -74,6 +74,8 @@ class SuggestionCreator(object):
         if webcast_dict is not None:
             # Check if webcast already exists in event
             event = Event.get_by_id(event_key)
+            if not event:
+                return 'bad_event'
             if event.webcast and webcast_dict in event.webcast:
                 return 'webcast_exists'
             else:

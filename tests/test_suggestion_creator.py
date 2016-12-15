@@ -374,3 +374,129 @@ class TestApiWriteSuggestionCreator(unittest2.TestCase):
         self.assertEqual(suggestion.contents['event_key'], "2016test")
         self.assertEqual(suggestion.contents['affiliation'], "Event Organizer")
         self.assertListEqual(suggestion.contents['auth_types'], [1, 2])
+
+
+class TestSuggestEventWebcastCreator(unittest2.TestCase):
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
+        self.account = Account.get_or_insert(
+            "123",
+            email="user@example.com",
+            registered=True)
+        self.account.put()
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def testBadEvent(self):
+        status = SuggestionCreator.createEventWebcastSuggestion(
+            self.account.key,
+            "http://twitch.tv/frcgamesense",
+            "2016test")
+        self.assertEqual(status, 'bad_event')
+
+    def testCreateSuggestion(self):
+        event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.OFFSEASON)
+        event.put()
+
+        status = SuggestionCreator.createEventWebcastSuggestion(
+            self.account.key,
+            "http://twitch.tv/frcgamesense",
+            "2016test")
+        self.assertEqual(status, 'success')
+
+        # Ensure the Suggestion gets created
+        expected_key = "webcast_2016test_twitch_frcgamesense_None"
+        suggestion = Suggestion.get_by_id(expected_key)
+
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.target_key, "2016test")
+        self.assertEqual(suggestion.author, self.account.key)
+        self.assertEqual(suggestion.review_state, Suggestion.REVIEW_PENDING)
+        self.assertIsNotNone(suggestion.contents)
+        self.assertEqual(suggestion.contents.get('webcast_url'), "http://twitch.tv/frcgamesense")
+        self.assertIsNotNone(suggestion.contents.get('webcast_dict'))
+
+    def testCleanupUrlWithoutScheme(self):
+        event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.OFFSEASON)
+        event.put()
+
+        status = SuggestionCreator.createEventWebcastSuggestion(
+            self.account.key,
+            "twitch.tv/frcgamesense",
+            "2016test")
+        self.assertEqual(status, 'success')
+        expected_key = "webcast_2016test_twitch_frcgamesense_None"
+        suggestion = Suggestion.get_by_id(expected_key)
+
+        self.assertIsNotNone(suggestion)
+        self.assertIsNotNone(suggestion.contents)
+        self.assertIsNotNone(suggestion.contents.get('webcast_dict'))
+        self.assertEqual(suggestion.contents.get('webcast_url'), "http://twitch.tv/frcgamesense")
+
+    def testUnknownUrlScheme(self):
+        event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.OFFSEASON)
+        event.put()
+
+        status = SuggestionCreator.createEventWebcastSuggestion(
+            self.account.key,
+            "http://myweb.site/somewebcast",
+            "2016test")
+        self.assertEqual(status, 'success')
+        suggestions = Suggestion.query().fetch()
+        self.assertIsNotNone(suggestions)
+        self.assertEqual(len(suggestions), 1)
+
+        suggestion = suggestions[0]
+
+        self.assertIsNotNone(suggestion)
+        self.assertIsNotNone(suggestion.contents)
+        self.assertIsNone(suggestion.contents.get('webcast_dict'))
+        self.assertEqual(suggestion.contents.get('webcast_url'), "http://myweb.site/somewebcast")
+
+    def testWebcastAlreadyExists(self):
+        event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016,
+                      event_type_enum=EventType.OFFSEASON,
+                      webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]")
+        event.put()
+
+        status = SuggestionCreator.createEventWebcastSuggestion(
+            self.account.key,
+            "http://twitch.tv/frcgamesense",
+            "2016test")
+        self.assertEqual(status, 'webcast_exists')
+
+    def testDuplicateSuggestion(self):
+        event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.OFFSEASON)
+        event.put()
+
+        status = SuggestionCreator.createEventWebcastSuggestion(
+            self.account.key,
+            "http://twitch.tv/frcgamesense",
+            "2016test")
+        self.assertEqual(status, 'success')
+        status = SuggestionCreator.createEventWebcastSuggestion(
+            self.account.key,
+            "http://twitch.tv/frcgamesense",
+            "2016test")
+        self.assertEqual(status, 'suggestion_exists')
+
+    def testDuplicateUnknownSuggestionType(self):
+        event = Event(id="2016test", name="Test Event", event_short="Test Event", year=2016, event_type_enum=EventType.OFFSEASON)
+        event.put()
+
+        status = SuggestionCreator.createEventWebcastSuggestion(
+            self.account.key,
+            "http://myweb.site/somewebcast",
+            "2016test")
+        self.assertEqual(status, 'success')
+        status = SuggestionCreator.createEventWebcastSuggestion(
+            self.account.key,
+            "http://myweb.site/somewebcast",
+            "2016test")
+        self.assertEqual(status, 'suggestion_exists')
