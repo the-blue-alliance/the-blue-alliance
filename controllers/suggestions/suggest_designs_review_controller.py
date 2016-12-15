@@ -31,36 +31,46 @@ class SuggestDesignsReviewController(SuggestionsReviewBaseController):
             # Fast-path review
             self.verify_permissions()
             suggestion = Suggestion.get_by_id(self.request.get('id'))
-            if suggestion and suggestion.target_model == 'robot' and suggestion.review_state == Suggestion.REVIEW_PENDING:
-                slack_message = None
-                if self.request.get('action') == 'accept':
-                    self._process_accepted(suggestion.key.id())
-                    slack_message = "{} ({}) accepted the <https://grabcad.com/library/{}|suggestion> for team {} in {}".format(
-                        self.user_bundle.account.display_name,
-                        self.user_bundle.account.email,
-                        suggestion.contents['foreign_key'],
-                        suggestion.contents['reference_key'][3:],
-                        suggestion.contents['year']
-                    )
-                elif self.request.get('action') == 'reject':
-                    suggestion.review_state = Suggestion.REVIEW_REJECTED
-                    suggestion.reviewer = self.user_bundle.account.key
-                    suggestion.reviewed_at = datetime.datetime.now()
-                    suggestion.put()
-                    slack_message = "{} ({}) rejected the <https://grabcad.com/library/{}|suggestion> for team {} in {}".format(
-                        self.user_bundle.account.display_name,
-                        self.user_bundle.account.email,
-                        suggestion.contents['foreign_key'],
-                        suggestion.contents['reference_key'][3:],
-                        suggestion.contents['year']
-                    )
+            status = None
+            if suggestion and suggestion.target_model == 'robot':
+                if suggestion.review_state == Suggestion.REVIEW_PENDING:
+                    slack_message = None
+                    if self.request.get('action') == 'accept':
+                        self._process_accepted(suggestion.key.id())
+                        status = 'accepted'
+                        slack_message = "{} ({}) accepted the <https://grabcad.com/library/{}|suggestion> for team {} in {}".format(
+                            self.user_bundle.account.display_name,
+                            self.user_bundle.account.email,
+                            suggestion.contents['foreign_key'],
+                            suggestion.contents['reference_key'][3:],
+                            suggestion.contents['year']
+                        )
+                    elif self.request.get('action') == 'reject':
+                        suggestion.review_state = Suggestion.REVIEW_REJECTED
+                        suggestion.reviewer = self.user_bundle.account.key
+                        suggestion.reviewed_at = datetime.datetime.now()
+                        suggestion.put()
+                        status = 'rejected'
+                        slack_message = "{} ({}) rejected the <https://grabcad.com/library/{}|suggestion> for team {} in {}".format(
+                            self.user_bundle.account.display_name,
+                            self.user_bundle.account.email,
+                            suggestion.contents['foreign_key'],
+                            suggestion.contents['reference_key'][3:],
+                            suggestion.contents['year']
+                        )
 
-                if slack_message:
-                    slack_sitevar = Sitevar.get_or_insert('slack.hookurls')
-                    if slack_sitevar:
-                        slack_url = slack_sitevar.contents.get('tbablog', '')
-                        SuggestionNotifier.send_slack_alert(slack_url, slack_message)
-                self.redirect('/suggest/review', abort=True)
+                    if slack_message:
+                        slack_sitevar = Sitevar.get_or_insert('slack.hookurls')
+                        if slack_sitevar:
+                            slack_url = slack_sitevar.contents.get('tbablog', '')
+                            SuggestionNotifier.send_slack_alert(slack_url, slack_message)
+                else:
+                    status = 'already_reviewed'
+            else:
+                status = 'bad_suggestion'
+
+            if status:
+                self.redirect('/suggest/review?status={}'.format(status), abort=True)
 
         suggestions = Suggestion.query().filter(
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(

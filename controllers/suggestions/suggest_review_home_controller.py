@@ -6,6 +6,7 @@ from consts.account_permissions import AccountPermissions
 from controllers.suggestions.suggestions_review_base_controller import SuggestionsReviewBaseController
 from helpers.suggestions.suggestion_fetcher import SuggestionFetcher
 from models.suggestion import Suggestion
+from template_engine import jinja2_engine
 
 
 class SuggestReviewHomeController(SuggestionsReviewBaseController):
@@ -36,6 +37,6 @@ class SuggestReviewHomeController(SuggestionsReviewBaseController):
         self.template_values['offseason_permission'] = AccountPermissions.REVIEW_OFFSEASON_EVENTS
         self.template_values['apiwrite_permission'] = AccountPermissions.REVIEW_APIWRITE
         self.template_values['cad_permission'] = AccountPermissions.REVIEW_DESIGNS
+        self.template_values['status'] = self.request.get('status')
 
-        path = os.path.join(os.path.dirname(__file__), '../../templates/suggest_review_home.html')
-        self.response.out.write(template.render(path, self.template_values))
+        self.response.out.write(jinja2_engine.render('suggest_review_home.html', self.template_values))
