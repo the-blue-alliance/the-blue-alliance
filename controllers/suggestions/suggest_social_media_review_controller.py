@@ -21,6 +21,10 @@ class SuggestSocialMediaReviewController(SuggestionsReviewBaseController):
         self.REQUIRED_PERMISSIONS.append(AccountPermissions.REVIEW_MEDIA)
         super(SuggestSocialMediaReviewController, self).__init__(*args, **kw)
 
+    def create_target_model(self, suggestion):
+        # Create a basic Media from this suggestion
+        MediaCreator.from_suggestion(suggestion)
+
     """
     View the list of suggestions.
     """
@@ -47,43 +51,6 @@ class SuggestSocialMediaReviewController(SuggestionsReviewBaseController):
 
         self.response.out.write(jinja2_engine.render('suggestions/suggest_team_social_review.html', self.template_values))
 
-    @ndb.transactional(xg=True)
-    def _process_accepted(self, accept_key):
-        """
-        Performs all actions for an accepted Suggestion in a Transaction.
-        Suggestions are processed one at a time (instead of in batch) in a
-        Transaction to prevent possible race conditions.
-
-        Actions include:
-        - Creating and saving a new Media for the Suggestion
-        - Removing a reference from another Media's preferred_references
-        - Marking the Suggestion as accepted and saving it
-        """
-        # Async get
-        suggestion_future = Suggestion.get_by_id_async(accept_key)
-
-        # Resolve async Futures
-        suggestion = suggestion_future.get_result()
-
-        # Make sure Suggestion hasn't been processed (by another thread)
-        if suggestion.review_state != Suggestion.REVIEW_PENDING:
-            return
-
-        team_reference = Media.create_reference(
-            suggestion.contents['reference_type'],
-            suggestion.contents['reference_key'])
-
-        media = MediaCreator.create_media(suggestion, team_reference)
-
-        # Mark Suggestion as accepted
-        suggestion.review_state = Suggestion.REVIEW_ACCEPTED
-        suggestion.reviewer = self.user_bundle.account.key
-        suggestion.reviewed_at = datetime.datetime.now()
-
-        # Do all DB writes
-        MediaManipulator.createOrUpdate(media)
-        suggestion.put()
-
     def post(self):
         accept_keys = []
         reject_keys = []
@@ -104,15 +71,6 @@ class SuggestSocialMediaReviewController(SuggestionsReviewBaseController):
             self._process_accepted(accept_key)
 
         # Process rejects
-        rejected_suggestion_futures = [Suggestion.get_by_id_async(key) for key in reject_keys]
-        rejected_suggestions = map(lambda a: a.get_result(), rejected_suggestion_futures)
-
-        for suggestion in rejected_suggestions:
-            if suggestion.review_state == Suggestion.REVIEW_PENDING:
-                suggestion.review_state = Suggestion.REVIEW_REJECTED
-                suggestion.reviewer = self.user_bundle.account.key
-                suggestion.reviewed_at = datetime.datetime.now()
-
-        ndb.put_multi(rejected_suggestions)
+        self._process_rejected(reject_keys)
 
         self.redirect("/suggest/team/social/review")

@@ -25,23 +25,8 @@ class SuggestApiWriteReviewController(SuggestionsReviewBaseController):
         self.REQUIRED_PERMISSIONS.append(AccountPermissions.REVIEW_APIWRITE)
         super(SuggestApiWriteReviewController, self).__init__(*args, **kw)
 
-    def get(self):
-        suggestions = Suggestion.query().filter(
-            Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
-            Suggestion.target_model == "api_auth_access").fetch()
-        suggestions = [self._ids_and_events(suggestion) for suggestion in suggestions]
-
-        self.template_values.update({
-            'success': self.request.get("success"),
-            'suggestions': suggestions,
-            'auth_names': AuthType.type_names,
-        })
-        self.response.out.write(
-            jinja2_engine.render('suggestions/suggest_apiwrite_review_list.html', self.template_values))
-
-    @ndb.transactional(xg=True)
-    def _process_accepted(self, suggestion_id, message):
-        suggestion = Suggestion.get_by_id(suggestion_id)
+    def create_target_model(self, suggestion):
+        message = self.request.get("user_message")
         event_key = suggestion.contents['event_key']
         user = suggestion.author.get()
         event = Event.get_by_id(event_key)
@@ -69,12 +54,6 @@ class SuggestApiWriteReviewController(SuggestionsReviewBaseController):
             expiration=expiration
         )
         auth.put()
-
-        suggestion.review_state = Suggestion.REVIEW_ACCEPTED
-        suggestion.reviewer = self.user_bundle.account.key
-        suggestion.reviewed_at = datetime.now()
-        suggestion.put()
-
         return auth_id, user, event_key, """Hi {},
 
 We graciously accept your request for auth tokens so you can add data to the following event: {} {}
@@ -86,6 +65,20 @@ If you have any questions, please don't heasitate to reach out to us at contact@
 Thanks,
 TBA Admins
             """.format(user.display_name, event.year, event.name, message)
+
+    def get(self):
+        suggestions = Suggestion.query().filter(
+            Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
+            Suggestion.target_model == "api_auth_access").fetch()
+        suggestions = [self._ids_and_events(suggestion) for suggestion in suggestions]
+
+        self.template_values.update({
+            'success': self.request.get("success"),
+            'suggestions': suggestions,
+            'auth_names': AuthType.type_names,
+        })
+        self.response.out.write(
+            jinja2_engine.render('suggestions/suggest_apiwrite_review_list.html', self.template_values))
 
     def post(self):
         self.verify_permissions()
@@ -100,7 +93,7 @@ TBA Admins
         status = ''
         if verdict == "accept":
             status = 'accept'
-            auth_id, user, event_key, email_body = self._process_accepted(suggestion_id, message)
+            auth_id, user, event_key, email_body = self._process_accepted(suggestion_id)
             admin_email_body = """{} ({}) has accepted the request with the following message:
 {}
 
@@ -113,10 +106,7 @@ View the key: https://www.thebluealliance.com/admin/api_auth/edit/{}
             event_key = suggestion.contents['event_key']
             user = suggestion.author.get()
             event = Event.get_by_id(event_key)
-            suggestion.review_state = Suggestion.REVIEW_REJECTED
-            suggestion.reviewer = self.user_bundle.account.key
-            suggestion.reviewed_at = datetime.now()
-            suggestion.put()
+            self._process_rejected(suggestion.key.id())
 
             status = 'reject'
             email_body = """Hi {},

@@ -17,6 +17,47 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
         self.REQUIRED_PERMISSIONS.append(AccountPermissions.REVIEW_OFFSEASON_EVENTS)
         super(SuggestOffseasonEventReviewController, self).__init__(*args, **kw)
 
+    def create_target_model(self, suggestion):
+        event_id = self.request.get("event_short", None)
+        event_key = str(self.request.get("year")) + str.lower(str(self.request.get("event_short")))
+        if not event_id:
+            # Need to supply a key :(
+            self.redirect("/suggest/offseason/review?success=missing_key")
+            return
+        if not Event.validate_key_name(event_key):
+            # Bad event key generated
+            self.redirect("/suggest/offseason/review?success=bad_key")
+            return
+
+        start_date = None
+        if self.request.get("start_date"):
+            start_date = datetime.strptime(self.request.get("start_date"), "%Y-%m-%d")
+
+        end_date = None
+        if self.request.get("end_date"):
+            end_date = datetime.strptime(self.request.get("end_date"), "%Y-%m-%d")
+
+        event = Event(
+            id=event_key,
+            end_date=end_date,
+            event_short=self.request.get("event_short"),
+            event_type_enum=EventType.OFFSEASON,
+            event_district_enum=DistrictType.NO_DISTRICT,
+            venue=self.request.get("venue"),
+            venue_address=self.request.get("venue_address"),
+            city=self.request.get("city"),
+            state_prov=self.request.get("state"),
+            country=self.request.get("country"),
+            name=self.request.get("name"),
+            short_name=self.request.get("short_name"),
+            start_date=start_date,
+            website=self.request.get("website"),
+            year=int(self.request.get("year")),
+            official=False,
+        )
+        EventManipulator.createOrUpdate(event)
+        return event_key
+
     def get(self):
         suggestions = Suggestion.query().filter(
             Suggestion.review_state == Suggestion.REVIEW_PENDING).filter(
@@ -33,61 +74,14 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
 
     def post(self):
         self.verify_permissions()
-        suggestion = Suggestion.get_by_id(int(self.request.get("suggestion_id")))
+        suggestion_id = int(self.request.get("suggestion_id"))
         verdict = self.request.get("verdict")
         if verdict == "accept":
-            event_id = self.request.get("event_short", None)
-            event_key = str(self.request.get("year")) + str.lower(str(self.request.get("event_short")))
-            if not event_id:
-                # Need to supply a key :(
-                self.redirect("/suggest/offseason/review?success=missing_key")
-                return
-            if not Event.validate_key_name(event_key):
-                # Bad event key generated
-                self.redirect("/suggest/offseason/review?success=bad_key")
-                return
-
-            start_date = None
-            if self.request.get("start_date"):
-                start_date = datetime.strptime(self.request.get("start_date"), "%Y-%m-%d")
-
-            end_date = None
-            if self.request.get("end_date"):
-                end_date = datetime.strptime(self.request.get("end_date"), "%Y-%m-%d")
-
-            event = Event(
-                id=event_key,
-                end_date=end_date,
-                event_short=self.request.get("event_short"),
-                event_type_enum=EventType.OFFSEASON,
-                event_district_enum=DistrictType.NO_DISTRICT,
-                venue=self.request.get("venue"),
-                venue_address=self.request.get("venue_address"),
-                city=self.request.get("city"),
-                state_prov=self.request.get("state"),
-                country=self.request.get("country"),
-                name=self.request.get("name"),
-                short_name=self.request.get("short_name"),
-                start_date=start_date,
-                website=self.request.get("website"),
-                year=int(self.request.get("year")),
-                official=False,
-            )
-            EventManipulator.createOrUpdate(event)
-
-            suggestion.review_state = Suggestion.REVIEW_ACCEPTED
-            suggestion.reviewer = self.user_bundle.account.key
-            suggestion.reviewed_at = datetime.now()
-            suggestion.put()
-
-            self.redirect("/suggest/offseason/review?success=accept&event_key=%s" % event.key.id())
+            event_key = self._process_accepted(suggestion_id)
+            self.redirect("/suggest/offseason/review?success=accept&event_key=%s" % event_key)
             return
         elif verdict == "reject":
-            suggestion.review_state = Suggestion.REVIEW_REJECTED
-            suggestion.reviewer = self.user_bundle.account.key
-            suggestion.reviewed_at = datetime.now()
-            suggestion.put()
-
+            self._process_rejected(suggestion_id)
             self.redirect("/suggest/offseason/review?success=reject")
             return
 
