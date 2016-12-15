@@ -12,7 +12,6 @@ import { NUM_LAYOUTS, NAME_FOR_LAYOUT } from '../constants/LayoutConstants'
 export default class LayoutDrawer extends React.Component {
   static propTypes = {
     setLayout: PropTypes.func.isRequired,
-    resetLayout: PropTypes.func.resetLayout,
     selectedLayout: PropTypes.number.isRequired,
     layoutSet: PropTypes.bool.isRequired,
     hashtagSidebarVisible: PropTypes.bool.isRequired,
