@@ -2,7 +2,6 @@ import React, { PropTypes } from 'react'
 import classNames from 'classnames'
 import VideoCell from './VideoCell'
 import { getNumViewsForLayout } from '../utils/layoutUtils'
-import { MAX_SUPPORTED_VIEWS } from '../constants/LayoutConstants'
 
 export default React.createClass({
   propTypes: {
@@ -28,16 +27,16 @@ export default React.createClass({
     // Set up reverse map between webcast ID and position
     const idPositionMap = {}
     for (let i = 0; i < positionMap.length; i++) {
-      let webcastId = domOrder[positionMap[i]]
+      const webcastId = domOrder[positionMap[i]]
       if (webcastId != null) {
-        idPositionMap[webcastId] = i;
+        idPositionMap[webcastId] = i
       }
     }
 
     // Compute which cells don't a webcast in them
     const emptyCellLocations = []
     for (let i = 0; i < positionMap.length; i++) {
-      if (positionMap[i] == -1 && i < webcastCount) {
+      if (positionMap[i] === -1 && i < webcastCount) {
         emptyCellLocations.push(i)
       }
     }
@@ -54,12 +53,10 @@ export default React.createClass({
         webcast = this.props.webcastsById[domOrder[i]]
         id = webcast.id
         location = idPositionMap[id]
+      } else if (emptyCellLocations.length > 0) {
+        location = emptyCellLocations.shift()
       } else {
-        if (emptyCellLocations.length > 0) {
-          location = emptyCellLocations.shift()
-        } else {
-          hasWebcast = false
-        }
+        hasWebcast = false
       }
       if (hasWebcast) {
         videoCells.push(
@@ -75,7 +72,7 @@ export default React.createClass({
         )
       } else {
         videoCells.push(
-          <div></div>
+          <div />
         )
       }
     }

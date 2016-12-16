@@ -1,13 +1,12 @@
 import React, { PropTypes } from 'react'
 import classNames from 'classnames'
-import WebcastSelectionPanel from './WebcastSelectionPanel'
+import RaisedButton from 'material-ui/RaisedButton'
 import EmbedUstream from './EmbedUstream'
 import EmbedYoutube from './EmbedYoutube'
 import EmbedTwitch from './EmbedTwitch'
 import VideoCellToolbarContainer from '../containers/VideoCellToolbarContainer'
 import WebcastSelectionOverlayDialogContainer from '../containers/WebcastSelectionOverlayDialogContainer'
 import { WebcastPropType } from '../utils/webcastUtils'
-import RaisedButton from 'material-ui/RaisedButton'
 
 export default class VideoCell extends React.Component {
   static propTypes = {
@@ -108,12 +107,10 @@ export default class VideoCell extends React.Component {
     }
 
     // All positions in this array which are non-null represent displayed webcasts
-    const displayedCount = this.props.displayedWebcasts.reduce((acc, curr) => {
-      return acc + (curr == null ? 0 : 1)
-    }, 0)
+    const displayedCount = this.props.displayedWebcasts.reduce((acc, curr) => acc + (curr == null ? 0 : 1), 0)
 
-    const webcastsAreAvailable = (this.props.webcasts.length != displayedCount)
-    const buttonLabel = webcastsAreAvailable ? "Select a webcast" : "No more webcasts available"
+    const webcastsAreAvailable = (this.props.webcasts.length !== displayedCount)
+    const buttonLabel = webcastsAreAvailable ? 'Select a webcast' : 'No more webcasts available'
 
     return (
       <div className={classes} >

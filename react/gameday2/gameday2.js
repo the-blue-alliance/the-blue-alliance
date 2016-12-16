@@ -57,7 +57,7 @@ for (let i = 0; i < MAX_SUPPORTED_VIEWS; i++) {
 
 // Subscribe to the store to keep the url hash in sync
 store.subscribe(() => {
-  const params = {}
+  const newParams = {}
 
   const state = store.getState()
 
@@ -67,20 +67,20 @@ store.subscribe(() => {
       layoutSet,
       positionMap,
       domOrder,
-    }
+    },
   } = state
 
   if (layoutSet) {
-    params.layout = layoutId
+    newParams.layout = layoutId
   }
 
   for (let i = 0; i < positionMap.length; i++) {
     if (domOrder[positionMap[i]]) {
-      params[`view_${i}`] = domOrder[positionMap[i]]
+      newParams[`view_${i}`] = domOrder[positionMap[i]]
     }
   }
 
-  const query = queryString.stringify(params)
+  const query = queryString.stringify(newParams)
   if (query) {
     location.replace(`#${query}`)
   }

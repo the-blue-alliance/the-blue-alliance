@@ -53,10 +53,10 @@ export default class VideoCellOverlayDialog extends React.Component {
       dialogHeight += dialogListContainer.nextSibling.offsetHeight
       dialogHeight += dialogList.offsetHeight
 
-      const maxHeight = component.offsetHeight - 2 * this.layout.dialogMargin
+      const maxHeight = component.offsetHeight - (2 * this.layout.dialogMargin)
       if (dialogHeight > maxHeight) {
         dialogListContainer.style.overflowY = 'auto'
-        let listContainerHeight = maxHeight;
+        let listContainerHeight = maxHeight
         listContainerHeight -= dialogListContainer.previousSibling.offsetHeight
         listContainerHeight -= dialogListContainer.nextSibling.offsetHeight
         dialogListContainer.style.height = `${listContainerHeight}px`
@@ -108,7 +108,8 @@ export default class VideoCellOverlayDialog extends React.Component {
       <div style={buttonContainerStyle}>
         <FlatButton
           label="Cancel"
-          onTouchTap={() => this.onRequestClose()} />
+          onTouchTap={() => this.onRequestClose()}
+        />
       </div>
     )
 
@@ -135,21 +136,23 @@ export default class VideoCellOverlayDialog extends React.Component {
         <div
           style={wrapperStyle}
           onTouchTap={() => this.onRequestClose()}
-          ref={e => this.component = e}>
+          ref={e => { this.component = e }}
+        >
           <EventListener
             target="window"
-            onResize={this.updateSizing.bind(this)}
+            onResize={() => this.updateSizing()}
           />
           <Paper
             style={paperStyle}
             zDepth={5}
-            onTouchTap={e => e.stopPropagation()}>
+            onTouchTap={e => e.stopPropagation()}
+          >
             <h3 style={titleStyle}>Select a webcast</h3>
             <div
               style={listContainerStyle}
-              ref={e => this.dialogListContainer = e}
+              ref={e => { this.dialogListContainer = e }}
             >
-              <div ref={e => this.dialogList = e}>
+              <div ref={e => { this.dialogList = e }}>
                 <List>
                   {webcastItems}
                 </List>
@@ -161,6 +164,6 @@ export default class VideoCellOverlayDialog extends React.Component {
       )
     }
 
-    return null;
+    return null
   }
 }
