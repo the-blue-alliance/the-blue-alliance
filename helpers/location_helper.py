@@ -159,6 +159,14 @@ class LocationHelper(object):
         )
 
     @classmethod
+    def _log_team_location_score(cls, team_key, score):
+        text = "Team {} location score: {}".format(team_key, score)
+        if score >= 0.8:
+            logging.info(text)
+        else:
+            logging.warning(text)
+
+    @classmethod
     def get_team_location_info(cls, team):
         """
         Search for different combinations of team name (which should include
@@ -206,6 +214,7 @@ class LocationHelper(object):
                     score = cls.compute_team_location_score(team, query, location_info)
                     if score == 1:
                         # Very likely to be correct if only 1 result and has a perfect score
+                        cls._log_team_location_score(team.key.id(), score)
                         return location_info
                     elif score > best_score:
                         # Only 1 result but score is imperfect
@@ -217,6 +226,7 @@ class LocationHelper(object):
 
         # Check if we have found anything reasonable
         if best_location_info and best_score > 0.9:
+            cls._log_team_location_score(team.key.id(), best_score)
             return best_location_info
 
         # Try to find place using only location
@@ -243,11 +253,13 @@ class LocationHelper(object):
                 location_info = cls.construct_location_info_async(textsearch_result).get_result()
                 score = cls.compute_team_location_score(team, query, location_info)
                 if score == 1:
+                    cls._log_team_location_score(team.key.id(), score)
                     return location_info
                 elif score > best_score:
                     best_score = score
                     best_location_info = location_info
 
+        cls._log_team_location_score(team.key.id(), best_score)
         return best_location_info
 
     @classmethod
