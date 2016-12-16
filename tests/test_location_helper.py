@@ -150,7 +150,7 @@ class TestLocationHelper(unittest2.TestCase):
         team = Team(
             id='frc6434',
             name='Bossley Park High School',
-            city=u'Bossley Park',
+            city='Bossley Park',
             state_prov='New South Wales',
             postalcode='2176',
             country='Australia'
@@ -167,3 +167,25 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(team.normalized_location.country_short, 'AU')
         self.assertEqual(team.normalized_location.postal_code, '2176')
         self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(-33.870024, 150.8753854))
+
+        # Team 2122 (Complicated team name, wrong postal code)
+        team = Team(
+            id='frc2122',
+            name='Micron Technology, Inc./Hewlett Packard/Boise Schools Educational Foundation/Laura Moore Cunningham Foundation/J.C. Jeker Foundation & Treasure Valley Math/Science',
+            city='Boise',
+            state_prov='Idaho',
+            postalcode='83709',
+            country='USA'
+            )
+        LocationHelper.update_team_location(team)
+        self.assertEqual(team.normalized_location.name, 'TVMSC')
+        self.assertEqual(team.normalized_location.formatted_address, '6801 N Gary Ln, Boise, ID 83714, United States')
+        self.assertEqual(team.normalized_location.street_number, '6801')
+        self.assertEqual(team.normalized_location.street, 'North Gary Lane')
+        self.assertEqual(team.normalized_location.city, 'Boise')
+        self.assertEqual(team.normalized_location.state_prov, 'Idaho')
+        self.assertEqual(team.normalized_location.state_prov_short, 'ID')
+        self.assertEqual(team.normalized_location.country, 'United States')
+        self.assertEqual(team.normalized_location.country_short, 'US')
+        self.assertEqual(team.normalized_location.postal_code, '83714')
+        self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(43.68010509999999, -116.2800371))
