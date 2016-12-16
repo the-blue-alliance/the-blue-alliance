@@ -65,17 +65,6 @@ const removeWebcast = (displayedWebcasts, webcastId) => {
   return webcasts
 }
 
-/**
- * Removes any extra webcasts when we switch to a layout with fewer available views
- */
-const trimToLayout = (displayedWebcasts, layoutId) => {
-  const webcasts = displayedWebcasts.slice(0)
-  while (displayedWebcasts.length > NUM_VIEWS_FOR_LAYOUT[layoutId]) {
-    webcasts.pop()
-  }
-  return webcasts
-}
-
 const displayedWebcasts = (state = [], action) => {
   switch (action.type) {
     case types.ADD_WEBCAST:
@@ -88,8 +77,6 @@ const displayedWebcasts = (state = [], action) => {
       return removeWebcast(state, action.webcastId)
     case types.RESET_WEBCASTS:
       return []
-    case types.SET_LAYOUT:
-      return trimToLayout(state, action.layoutId)
     default:
       return state
   }

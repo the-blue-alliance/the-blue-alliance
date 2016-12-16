@@ -62,11 +62,11 @@ const addWebcastAtLocation = (state, webcastId, location, maxSupportedViews) => 
     displayed.push(webcastId)
   }
 
-  return Object.assign({}, state, {
+  return trimToLayout(Object.assign({}, state, {
     displayed,
     domOrder,
     positionMap,
-  })
+  }))
 }
 
 const swapWebcasts = (state, firstLocation, secondLocation) => {
@@ -92,7 +92,7 @@ const swapWebcasts = (state, firstLocation, secondLocation) => {
  * If the specified webcast ID exists in displayedWebcasts, this function
  * replaces it with null.
  */
-const removeWebcast = (displayedWebcasts, webcastId) => {
+const removeWebcast = (state, webcastId) => {
   let {
     displayed,
     domOrder,
@@ -105,15 +105,15 @@ const removeWebcast = (displayedWebcasts, webcastId) => {
 
   // First, find and remove it from the DOM ordering list
   let domIndex = -1;
-  for (let i = 0; i < domOrder; i++) {
-    if (domOrder[i] === webcastId) {
+  for (let i = 0; i < domOrder.length; i++) {
+    if (domOrder[i] == webcastId) {
       domOrder[i] = null
       domIndex = i;
     }
   }
 
   // Remove any pointers to that DOM element from the position map
-  for (let i = 0; i < positionMap; i++) {
+  for (let i = 0; i < positionMap.length; i++) {
     if (positionMap[i] === domIndex) {
       positionMap[i] = -1
     }

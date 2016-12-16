@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react'
 import classNames from 'classnames'
-import VideoGridContainer from '../containers/VideoGridContainer'
+import VideoGridContainerUpdated from '../containers/VideoGridContainerUpdated'
 import LayoutSelectionPanel from './LayoutSelectionPanel'
 import NoWebcasts from './NoWebcasts'
 
@@ -27,7 +27,7 @@ const MainContent = (props) => {
     child = (<LayoutSelectionPanel setLayout={props.setLayout} />)
   } else {
     // Display the video grid
-    child = (<VideoGridContainer />)
+    child = (<VideoGridContainerUpdated />)
   }
 
   const classes = classNames({

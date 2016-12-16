@@ -39,29 +39,6 @@ ReactDOM.render(
   document.getElementById('content')
 )
 
-store.subscribe(() => {
-  const params = {}
-
-  const state = store.getState()
-  const layout = state.layout
-  if (layout && layout.layoutSet) {
-    params.layout = layout.layoutId
-  }
-
-  const displayedWebcasts = state.displayedWebcasts
-  if (displayedWebcasts) {
-    for (let i = 0; i < displayedWebcasts.length; i++) {
-      if (displayedWebcasts[i]) {
-        params[`view_${i}`] = displayedWebcasts[i]
-      }
-    }
-  }
-
-  const query = queryString.stringify(params)
-  if (query) {
-    location.replace(`#${query}`)
-  }
-})
 
 store.dispatch(setWebcastsRaw(webcastData))
 
@@ -71,10 +48,40 @@ const params = queryString.parse(location.hash)
 if (params.layout && Number.isInteger(Number.parseInt(params.layout, 10))) {
   store.dispatch(setLayout(Number.parseInt(params.layout, 10)))
 }
-
 for (let i = 0; i < MAX_SUPPORTED_VIEWS; i++) {
   const key = `view_${i}`
   if (params[key]) {
     store.dispatch(addWebcastAtLocation(params[key], i))
   }
 }
+
+// Subscribe to the store to keep the url hash in sync
+store.subscribe(() => {
+  const params = {}
+
+  const state = store.getState()
+
+  const {
+    videoGrid: {
+      layoutId,
+      layoutSet,
+      positionMap,
+      domOrder,
+    }
+  } = state
+
+  if (layoutSet) {
+    params.layout = layoutId
+  }
+
+  for (let i = 0; i < positionMap.length; i++) {
+    if (domOrder[positionMap[i]]) {
+      params[`view_${i}`] = domOrder[positionMap[i]]
+    }
+  }
+
+  const query = queryString.stringify(params)
+  if (query) {
+    location.replace(`#${query}`)
+  }
+})
