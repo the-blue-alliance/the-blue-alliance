@@ -168,8 +168,6 @@ class LocationHelper(object):
         if not team.location:
             return {}
 
-        SCORE_THRESHOLD = 0.9
-
         # Find possible schools/title sponsors
         possible_names = []
         MAX_SPLIT = 3  # Filters out long names that are unlikely
@@ -206,8 +204,8 @@ class LocationHelper(object):
                 if len(textsearch_results) == 1:
                     location_info = cls.construct_location_info_async(textsearch_results[0]).get_result()
                     score = cls.compute_team_location_score(team, query, location_info)
-                    if score >= SCORE_THRESHOLD:
-                        # Very likely to be correct if only 1 result and has a reasonable score
+                    if score == 1:
+                        # Very likely to be correct if only 1 result and has a perfect score
                         return location_info
                     elif score > best_score:
                         # Only 1 result but score is imperfect
@@ -218,7 +216,7 @@ class LocationHelper(object):
                     textsearch_results_candidates.append((textsearch_results, query))
 
         # Check if we have found anything reasonable
-        if best_location_info and best_score > SCORE_THRESHOLD:
+        if best_location_info and best_score > 0.9:
             return best_location_info
 
         # Try to find place using only location
@@ -244,7 +242,7 @@ class LocationHelper(object):
             for textsearch_result in textsearch_results:
                 location_info = cls.construct_location_info_async(textsearch_result).get_result()
                 score = cls.compute_team_location_score(team, query, location_info)
-                if score == SCORE_THRESHOLD:
+                if score == 1:
                     return location_info
                 elif score > best_score:
                     best_score = score
@@ -259,22 +257,28 @@ class LocationHelper(object):
         Not checking for absolute equality in case of existing data errors.
         Check with both long and short names
         """
+        SCORE_THRESHOLD = 0.5
         max_score = 5.0
         score = 0.0
         if team.country:
-            score += max(
+            partial = max(
                 cls.get_similarity(location_info.get('country', ''), team.country),
                 cls.get_similarity(location_info.get('country_short', ''), team.country))
+            score += partial if partial < SCORE_THRESHOLD else 1
         if team.state_prov:
-            score += max(
+            partial = max(
                 cls.get_similarity(location_info.get('state_prov', ''), team.state_prov),
                 cls.get_similarity(location_info.get('state_prov_short', ''), team.state_prov))
+            score += partial if partial < SCORE_THRESHOLD else 1
         if team.city:
-            score += cls.get_similarity(location_info.get('city', ''), team.city)
+            partial = cls.get_similarity(location_info.get('city', ''), team.city)
+            score += partial if partial < SCORE_THRESHOLD else 1
         if team.postalcode:
-            score += cls.get_similarity(location_info.get('postal_code', ''), team.postalcode)
+            partial = cls.get_similarity(location_info.get('postal_code', ''), team.postalcode)
+            score += partial if partial < SCORE_THRESHOLD else 1
 
-        score += cls.get_similarity(location_info.get('name', ''), query)
+        partial = cls.get_similarity(location_info.get('name', ''), query)
+        score += partial if partial < SCORE_THRESHOLD else 1
 
         if 'point_of_interest' not in location_info.get('types', ''):
             score *= 0.5
