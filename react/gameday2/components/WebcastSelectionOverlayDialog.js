@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react'
-import ReactDOM from 'react-dom'
 import Paper from 'material-ui/Paper'
 import FlatButton from 'material-ui/FlatButton'
 import List from 'material-ui/List'
@@ -29,12 +28,6 @@ export default class VideoCellOverlayDialog extends React.Component {
     }
   }
 
-  onRequestClose() {
-    if (this.props.onRequestClose) {
-      this.props.onRequestClose();
-    }
-  }
-
   componentDidMount() {
     this.updateSizing()
   }
@@ -43,28 +36,32 @@ export default class VideoCellOverlayDialog extends React.Component {
     this.updateSizing()
   }
 
+  onRequestClose() {
+    if (this.props.onRequestClose) {
+      this.props.onRequestClose()
+    }
+  }
+
   updateSizing() {
-    console.log("Updating sizing!")
     if (this.props.open) {
-      const component = ReactDOM.findDOMNode(this)
-      const dialogContainer = this.dialogContainer;
-      const dialogListContainer = this.dialogListContainer;
-      const dialogList = this.dialogList;
+      const component = this.component
+      const dialogListContainer = this.dialogListContainer
+      const dialogList = this.dialogList
 
       let dialogHeight = 0
       dialogHeight += dialogListContainer.previousSibling.offsetHeight
       dialogHeight += dialogListContainer.nextSibling.offsetHeight
-      dialogHeight += ReactDOM.findDOMNode(dialogList).offsetHeight
+      dialogHeight += dialogList.offsetHeight
 
-      const maxHeight = ReactDOM.findDOMNode(component).offsetHeight - 2 * this.layout.dialogMargin
+      const maxHeight = component.offsetHeight - 2 * this.layout.dialogMargin
       if (dialogHeight > maxHeight) {
-        ReactDOM.findDOMNode(dialogListContainer).style.overflowY = 'auto'
+        dialogListContainer.style.overflowY = 'auto'
         let listContainerHeight = maxHeight;
         listContainerHeight -= dialogListContainer.previousSibling.offsetHeight
         listContainerHeight -= dialogListContainer.nextSibling.offsetHeight
-        ReactDOM.findDOMNode(dialogListContainer).style.height = `${listContainerHeight}px`
+        dialogListContainer.style.height = `${listContainerHeight}px`
       } else {
-        ReactDOM.findDOMNode(dialogListContainer).style.height = null
+        dialogListContainer.style.height = null
       }
     }
   }
@@ -131,8 +128,14 @@ export default class VideoCellOverlayDialog extends React.Component {
     }
 
     if (this.props.open) {
+      // This "div" soup is needed because React is deprecating the ability to
+      // access the DOM nodes of components, so we need to wrap them in divs in
+      // order to measure and size them. See https://github.com/yannickcr/eslint-plugin-react/issues/678
       return (
-        <div style={wrapperStyle} onTouchTap={() => this.onRequestClose()}>
+        <div
+          style={wrapperStyle}
+          onTouchTap={() => this.onRequestClose()}
+          ref={e => this.component = e}>
           <EventListener
             target="window"
             onResize={this.updateSizing.bind(this)}
@@ -140,16 +143,17 @@ export default class VideoCellOverlayDialog extends React.Component {
           <Paper
             style={paperStyle}
             zDepth={5}
-            ref={e => this.dialogContainer = e}
             onTouchTap={e => e.stopPropagation()}>
             <h3 style={titleStyle}>Select a webcast</h3>
             <div
               style={listContainerStyle}
               ref={e => this.dialogListContainer = e}
             >
-              <List ref={e => this.dialogList = e}>
-                {webcastItems}
-              </List>
+              <div ref={e => this.dialogList = e}>
+                <List>
+                  {webcastItems}
+                </List>
+              </div>
             </div>
             {buttonContainerElement}
           </Paper>
