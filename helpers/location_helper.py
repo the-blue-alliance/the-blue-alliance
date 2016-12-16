@@ -292,7 +292,7 @@ class LocationHelper(object):
             partial = max(
                 cls.get_similarity(location_info.get('country', ''), team.country),
                 cls.get_similarity(location_info.get('country_short', ''), team.country))
-            score += partial if partial > 0.9 else 0
+            score += 1 if partial > 0.5 else 0
         if team.state_prov:
             partial = max(
                 cls.get_similarity(location_info.get('state_prov', ''), team.state_prov),
@@ -370,7 +370,7 @@ class LocationHelper(object):
             cache_key = u'google_maps_textsearch:{}'.format(query.encode('ascii', 'ignore'))
             query = query.encode('utf-8')
             results = memcache.get(cache_key)
-            if not results:
+            if results is None:
                 textsearch_params = {
                     'query': query,
                     'key': GOOGLE_API_KEY,
@@ -409,8 +409,8 @@ class LocationHelper(object):
                     logging.warning('urlfetch for textsearch request failed with url {}.'.format(textsearch_url))
                     logging.warning(e)
 
-                if tba_config.CONFIG['memcache']:
-                    memcache.set(cache_key, results)
+                memcache.set(cache_key, results if results else [])
+
         raise ndb.Return(results)
 
     @classmethod
