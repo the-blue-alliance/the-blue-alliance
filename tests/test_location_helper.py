@@ -19,7 +19,7 @@ class TestLocationHelper(unittest2.TestCase):
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
         # Load env vars that contain test keys
-        test_google_api_key = os.environ.get('TEST_GOOGLE_API_KEY', '')
+        test_google_api_key = os.environ.get('TEST_GOOGLE_API_KEY', '')  # Frome in Travis CI
         if not test_google_api_key:
             with open('test_keys.json') as data_file:
                 test_keys = json.load(data_file)
@@ -189,3 +189,135 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(team.normalized_location.country_short, 'US')
         self.assertEqual(team.normalized_location.postal_code, '83714')
         self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(43.68010509999999, -116.2800371))
+
+        # Team 3354 (Mexican team, special symbols, odd school name)
+        team = Team(
+            id='frc3354',
+            name='Mabe/Bombardier Aerospace Mexico/Coca Cola/Grupo Salinas/Fundacion Azteca/Navex/Red Cross/United Nations/Lego Education/Foundation For a Drug Free World & Tec de Monterrey',
+            city='Queretaro',
+            state_prov=u'Quer\xe9taro',
+            postalcode='76130',
+            country='Mexico'
+            )
+        LocationHelper.update_team_location(team)
+        self.assertEqual(team.normalized_location.name, u'Tecnol\xf3gico de Monterrey')
+        self.assertEqual(team.normalized_location.formatted_address, u'Epigmenio Gonz\xe1lez 500, San Pablo, 76130 Santiago de Quer\xe9taro, Qro., Mexico')
+        self.assertEqual(team.normalized_location.street_number, '500')
+        self.assertEqual(team.normalized_location.street, u'Epigmenio Gonz\xe1lez')
+        self.assertEqual(team.normalized_location.city, u'Santiago de Quer\xe9taro')
+        self.assertEqual(team.normalized_location.state_prov, u'Quer\xe9taro')
+        self.assertEqual(team.normalized_location.state_prov_short, 'Qro.')
+        self.assertEqual(team.normalized_location.country, 'Mexico')
+        self.assertEqual(team.normalized_location.country_short, 'MX')
+        self.assertEqual(team.normalized_location.postal_code, '76130')
+        self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(20.6133432, -100.4053132))
+
+        # Team 3933 (Mexican team, special symbols, odd school name)
+        team = Team(
+            id='frc3933',
+            name=u'General Motors Mexico & Tecnol\xe1gico de Monterrey Campus Santa Fe',
+            city='Mexico',
+            state_prov='Distrito Federal',
+            postalcode='01389',
+            country='Mexico'
+            )
+        LocationHelper.update_team_location(team)
+        self.assertEqual(team.normalized_location.name, 'Tec de Monterrey Campus Santa Fe (ITESM)')
+        self.assertEqual(team.normalized_location.formatted_address, u'Av. Carlos Lazo #100, \xc1lvaro Obreg\xf3n, Santa Fe, 01389 Ciudad de M\xe9xico, CDMX, Mexico')
+        self.assertEqual(team.normalized_location.street_number, None)
+        self.assertEqual(team.normalized_location.street, None)
+        self.assertEqual(team.normalized_location.city, u'Ciudad de M\xe9xico')
+        self.assertEqual(team.normalized_location.state_prov, u'Ciudad de M\xe9xico')
+        self.assertEqual(team.normalized_location.state_prov_short, 'CDMX')
+        self.assertEqual(team.normalized_location.country, 'Mexico')
+        self.assertEqual(team.normalized_location.country_short, 'MX')
+        self.assertEqual(team.normalized_location.postal_code, '01389')
+        self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(19.3593887, -99.26045889999999))
+
+        # Team 6227 (Chinese team, odd school name)
+        team = Team(
+            id='frc6227',
+            name='The Middle School Attached to Northwestern Polytechnical University / ROBOTERRA & Family Friends',
+            city='Xi\'An',
+            state_prov='Shaanxi',
+            postalcode=None,
+            country='China'
+            )
+        LocationHelper.update_team_location(team)
+        self.assertEqual(team.normalized_location.name, 'Northwestern Polytechnical University Affiliated Middle School')
+        self.assertEqual(team.normalized_location.formatted_address, '127 Youyi W Rd, Beilin, Xi\'an, Shaanxi, China')
+        self.assertEqual(team.normalized_location.street_number, u'127\u53f7')
+        self.assertEqual(team.normalized_location.street, 'Youyi West Road')
+        self.assertEqual(team.normalized_location.city, 'Xian Shi')
+        self.assertEqual(team.normalized_location.state_prov, 'Shaanxi Sheng')
+        self.assertEqual(team.normalized_location.state_prov_short, 'Shaanxi Sheng')
+        self.assertEqual(team.normalized_location.country, 'China')
+        self.assertEqual(team.normalized_location.country_short, 'CN')
+        self.assertEqual(team.normalized_location.postal_code, '710000')
+        self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(34.24073449999999, 108.916593))
+
+        # Team 6228 (Turkish team, odd school name)
+        team = Team(
+            id='frc6228',
+            name='Ministry of Education/Odeabank/Arena Advertising/Trio Machine/Turkish Airlines/Metalinoks/Sisli Municipality/Hisim Group/Fikret Yuksel Foundation/Metal Yapi & Macka Akif Tuncel Vocational and Technical High School',
+            city='Istanbul',
+            state_prov='Istanbul',
+            postalcode='34367',
+            country='Turkey'
+            )
+        LocationHelper.update_team_location(team)
+        self.assertEqual(team.normalized_location.name, u'Ma\xe7ka Akif Tuncel Mesleki ve Teknik Anadolu Lisesi')
+        self.assertEqual(team.normalized_location.formatted_address, u'Harbiye Mh., Ma\xe7ka Caddesi No10, 34367 \u015ei\u015fli/\u0130stanbul, Turkey')
+        self.assertEqual(team.normalized_location.street_number, None)
+        self.assertEqual(team.normalized_location.street, None)
+        self.assertEqual(team.normalized_location.city, u'\u0130stanbul')
+        self.assertEqual(team.normalized_location.state_prov, u'\u0130stanbul')
+        self.assertEqual(team.normalized_location.state_prov_short, u'\u0130stanbul')
+        self.assertEqual(team.normalized_location.country, 'Turkey')
+        self.assertEqual(team.normalized_location.country_short, 'TR')
+        self.assertEqual(team.normalized_location.postal_code, '34367')
+        self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(41.047045, 28.994531))
+
+        # Team 6231 (Turkish team, odd school name)
+        team = Team(
+            id='frc6231',
+            name=u'Haydar Ak\u0131n Mesleki Teknik Anadolu L\u0131ses\u0131 & Immib Bahcelievler Erkan Avci Mesleki ve Teknik Anadolu Lisesi',
+            city='Istanbul',
+            state_prov='Istanbul',
+            postalcode=None,
+            country='Turkey'
+            )
+        LocationHelper.update_team_location(team)
+        self.assertEqual(team.normalized_location.name, u'\u0130MM\u0130B Erkan Avc\u0131 Mesleki ve Teknik Anadolu Lisesi')
+        self.assertEqual(team.normalized_location.formatted_address, u'Bah\xe7elievler, K\xfclt\xfcr Sk. No:3, . K\xfclt\xfcr Sk. Bah\xe7elievler/\u0130stanbul, Turkey')
+        self.assertEqual(team.normalized_location.street_number, '3')
+        self.assertEqual(team.normalized_location.street, u'K\xfclt\xfcr Sokak')
+        self.assertEqual(team.normalized_location.city, u'\u0130stanbul')
+        self.assertEqual(team.normalized_location.state_prov, u'\u0130stanbul')
+        self.assertEqual(team.normalized_location.state_prov_short, u'\u0130stanbul')
+        self.assertEqual(team.normalized_location.country, 'Turkey')
+        self.assertEqual(team.normalized_location.country_short, 'TR')
+        self.assertEqual(team.normalized_location.postal_code, u'. K\xfclt\xfcr Sk.')
+        self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(40.996236, 28.8618779))
+
+        # Team 4403 (Turkish team, odd school name)
+        team = Team(
+            id='frc4403',
+            name=u'MET MEX PE\xd1OLES, S.A. DE C.V. & Tec de Monterrey Campus Laguna',
+            city='Torreon',
+            state_prov='Coahuila',
+            postalcode='27250',
+            country='Mexico'
+            )
+        LocationHelper.update_team_location(team)
+        self.assertEqual(team.normalized_location.name, u'Instituto Tecnol\xf3gico de Estudios Superiores de Monterrey')
+        self.assertEqual(team.normalized_location.formatted_address, u'Paseo del Tecnol\xf3gico 751, Amp la Rosita, 27250 Torre\xf3n, Coah., Mexico')
+        self.assertEqual(team.normalized_location.street_number, None)
+        self.assertEqual(team.normalized_location.street, None)
+        self.assertEqual(team.normalized_location.city, u'Torre\xf3n')
+        self.assertEqual(team.normalized_location.state_prov, 'Coahuila de Zaragoza')
+        self.assertEqual(team.normalized_location.state_prov_short, 'Coah.')
+        self.assertEqual(team.normalized_location.country, 'Mexico')
+        self.assertEqual(team.normalized_location.country_short, 'MX')
+        self.assertEqual(team.normalized_location.postal_code, '27250')
+        self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(25.5173546, -103.3976534))

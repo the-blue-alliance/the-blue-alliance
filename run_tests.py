@@ -18,6 +18,7 @@ SDK_PATH    Path to the SDK installation"""
 
 sys.path.insert(1, 'lib')
 
+
 def start_suite(suite, queue):
     sio = StringIO.StringIO()
     testresult = unittest2.TextTestRunner(sio, verbosity=2).run(suite)
@@ -49,7 +50,7 @@ def main(sdk_path, test_pattern):
         test_output, tests_run, was_successful = result_queue.get()
         total_tests_run += tests_run
         print '-----------------------'
-        print test_output
+        print test_output.encode('utf-8')
         if not was_successful:
             fail = True
 
