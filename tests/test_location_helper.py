@@ -19,6 +19,8 @@ class TestLocationHelper(unittest2.TestCase):
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
         # Load env vars that contain test keys
+        print '!!!!!!!!!!'
+        print os.environ
         test_google_api_key = os.environ.get('TEST_GOOGLE_API_KEY', '')  # Frome in Travis CI
         if not test_google_api_key:
             with open('test_keys.json') as data_file:

@@ -19,12 +19,6 @@ SDK_PATH    Path to the SDK installation"""
 sys.path.insert(1, 'lib')
 
 
-def start_suite(suite, queue):
-    sio = StringIO.StringIO()
-    testresult = unittest2.TextTestRunner(sio, verbosity=2).run(suite)
-    queue.put((sio.getvalue(), testresult.testsRun, testresult.wasSuccessful()))
-
-
 def main(sdk_path, test_pattern):
     start_time = time.time()
 
@@ -32,39 +26,13 @@ def main(sdk_path, test_pattern):
     import dev_appserver
     dev_appserver.fix_sys_path()
 
-    suites = unittest2.loader.TestLoader().discover("tests", test_pattern)
+    suite = unittest2.loader.TestLoader().discover("tests", test_pattern)
+    tests = unittest2.TextTestRunner(verbosity=2).run(suite)
 
-    processes = []
-    result_queue = multiprocessing.Queue()
-    for suite in suites:
-        process = multiprocessing.Process(target=start_suite, args=[suite, result_queue])
-        process.start()
-        processes.append(process)
-
-    for process in processes:
-        process.join()
-
-    fail = False
-    total_tests_run = 0
-    while not result_queue.empty():
-        test_output, tests_run, was_successful = result_queue.get()
-        total_tests_run += tests_run
-        print '-----------------------'
-        print test_output.encode('utf-8')
-        if not was_successful:
-            fail = True
-
-    print "================================"
-    print "Completed {} tests in: {} seconds".format(total_tests_run, time.time() - start_time)
-    if fail:
-        print "TESTS FAILED!"
-    else:
-        print "TESTS PASSED!"
-    print "================================"
-    if fail:
-        sys.exit(1)
-    else:
+    if tests.wasSuccessful():
         sys.exit(0)
+    else:
+        sys.exit(1)
 
 
 if __name__ == '__main__':
