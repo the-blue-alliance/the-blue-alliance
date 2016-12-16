@@ -9,7 +9,7 @@ const mapStateToProps = (state) => ({
   positionMap: state.videoGrid.positionMap,
   webcastsById: state.webcastsById,
   displayedWebcasts: state.videoGrid.displayed,
-  layoutId: state.layout.layoutId,
+  layoutId: state.videoGrid.layoutId,
 })
 
 const mapDispatchToProps = (dispatch) => ({

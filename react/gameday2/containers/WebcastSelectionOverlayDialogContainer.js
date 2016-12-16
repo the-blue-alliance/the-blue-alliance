@@ -6,8 +6,8 @@ import { getWebcastIdsInDisplayOrder } from '../selectors'
 const mapStateToProps = (state) => ({
   webcasts: getWebcastIdsInDisplayOrder(state),
   webcastsById: state.webcastsById,
-  displayedWebcasts: state.displayedWebcasts,
-  layoutId: state.layout.layoutId,
+  displayedWebcasts: state.videoGrid.displayed,
+  layoutId: state.videoGrid.layoutId,
 })
 
 const mapDispatchToProps = (dispatch) => ({
