@@ -1,7 +1,9 @@
 import React, { PropTypes } from 'react'
+import ReactDOM from 'react-dom'
 import Paper from 'material-ui/Paper'
 import FlatButton from 'material-ui/FlatButton'
 import List from 'material-ui/List'
+import EventListener from 'react-event-listener'
 import WebcastSelectionOverlayDialogItem from './WebcastSelectionOverlayDialogItem'
 
 export default class VideoCellOverlayDialog extends React.Component {
@@ -15,9 +17,55 @@ export default class VideoCellOverlayDialog extends React.Component {
     onRequestClose: PropTypes.func.isRequired,
   }
 
+  static layout = {
+    dialogMargin: 20,
+  }
+
+  constructor(props) {
+    super(props)
+
+    this.layout = {
+      dialogMargin: 20,
+    }
+  }
+
   onRequestClose() {
     if (this.props.onRequestClose) {
       this.props.onRequestClose();
+    }
+  }
+
+  componentDidMount() {
+    this.updateSizing()
+  }
+
+  componentDidUpdate() {
+    this.updateSizing()
+  }
+
+  updateSizing() {
+    console.log("Updating sizing!")
+    if (this.props.open) {
+      const component = ReactDOM.findDOMNode(this)
+      const dialogContainer = this.dialogContainer;
+      const dialogListContainer = this.dialogListContainer;
+      const dialogList = this.dialogList;
+
+      let dialogHeight = 0
+      dialogHeight += dialogListContainer.previousSibling.offsetHeight
+      dialogHeight += dialogListContainer.nextSibling.offsetHeight
+      dialogHeight += ReactDOM.findDOMNode(dialogList).offsetHeight
+
+      const maxHeight = ReactDOM.findDOMNode(component).offsetHeight - 2 * this.layout.dialogMargin
+      if (dialogHeight > maxHeight) {
+        ReactDOM.findDOMNode(dialogListContainer).style.overflowY = 'auto'
+        let listContainerHeight = maxHeight;
+        listContainerHeight -= dialogListContainer.previousSibling.offsetHeight
+        listContainerHeight -= dialogListContainer.nextSibling.offsetHeight
+        ReactDOM.findDOMNode(dialogListContainer).style.height = `${listContainerHeight}px`
+      } else {
+        ReactDOM.findDOMNode(dialogListContainer).style.height = null
+      }
     }
   }
 
@@ -32,18 +80,16 @@ export default class VideoCellOverlayDialog extends React.Component {
     }
 
     const paperStyle = {
-      margin: 20,
+      margin: this.layout.dialogMargin,
       width: 'calc(100% - 40px)',
       maxWidth: '400px',
-      height: '400px',
-      maxHeight: 'calc(100% - 40px)',
       marginLeft: 'auto',
       marginRight: 'auto',
       position: 'relative',
     }
 
     const titleStyle = {
-      padding: '24px 24px 20px',
+      padding: '16px',
       fontSize: '22px',
       margin: 0,
       fontWeight: 400,
@@ -55,8 +101,10 @@ export default class VideoCellOverlayDialog extends React.Component {
       width: '100%',
       textAlign: 'right',
       borderTop: '1px solid rgb(224, 224, 224)',
-      position: 'absolute',
-      bottom: 0,
+    }
+
+    const listContainerStyle = {
+      overflowY: 'auto',
     }
 
     const buttonContainerElement = (
@@ -84,12 +132,25 @@ export default class VideoCellOverlayDialog extends React.Component {
 
     if (this.props.open) {
       return (
-        <div style={wrapperStyle}>
-          <Paper style={paperStyle} zDepth={5}>
+        <div style={wrapperStyle} onTouchTap={() => this.onRequestClose()}>
+          <EventListener
+            target="window"
+            onResize={this.updateSizing.bind(this)}
+          />
+          <Paper
+            style={paperStyle}
+            zDepth={5}
+            ref={e => this.dialogContainer = e}
+            onTouchTap={e => e.stopPropagation()}>
             <h3 style={titleStyle}>Select a webcast</h3>
-            <List>
-              {webcastItems}
-            </List>
+            <div
+              style={listContainerStyle}
+              ref={e => this.dialogListContainer = e}
+            >
+              <List ref={e => this.dialogList = e}>
+                {webcastItems}
+              </List>
+            </div>
             {buttonContainerElement}
           </Paper>
         </div>

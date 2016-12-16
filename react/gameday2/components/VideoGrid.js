@@ -51,7 +51,6 @@ export default React.createClass({
       let hasWebcast = true
       if (domOrder[i]) {
         // There's a webcast to display here!
-        console.log("Rendering webcast in dom position " + i)
         webcast = this.props.webcastsById[domOrder[i]]
         id = webcast.id
         location = idPositionMap[id]
