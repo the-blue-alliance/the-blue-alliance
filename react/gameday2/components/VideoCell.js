@@ -88,8 +88,8 @@ export default class VideoCell extends React.Component {
           <WebcastSelectionOverlayDialogContainer
             open={this.state.webcastSelectionDialogOpen}
             webcast={this.props.webcast}
-            onRequestClose={this.onRequestCloseWebcastSelectionDialog}
-            onWebcastSelected={this.onWebcastSelected}
+            onRequestClose={() => this.onRequestCloseWebcastSelectionDialog()}
+            onWebcastSelected={(webcastId) => this.onWebcastSelected(webcastId)}
           />
         </div>
       )
@@ -107,20 +107,29 @@ export default class VideoCell extends React.Component {
       transform: 'translateX(-50%) translateY(-50%)',
     }
 
+    // All positions in this array which are non-null represent displayed webcasts
+    const displayedCount = this.props.displayedWebcasts.reduce((acc, curr) => {
+      return acc + (curr == null ? 0 : 1)
+    }, 0)
+
+    const webcastsAreAvailable = (this.props.webcasts.length != displayedCount)
+    const buttonLabel = webcastsAreAvailable ? "Select a webcast" : "No more webcasts available"
+
     return (
       <div className={classes} >
         <div style={emptyContainerStyle}>
           <RaisedButton
-            label="Select a webcast"
+            label={buttonLabel}
             style={centerButtonStyle}
-            onTouchTap={this.onRequestOpenWebcastSelectionDialog}
+            disabled={!webcastsAreAvailable}
+            onTouchTap={() => this.onRequestOpenWebcastSelectionDialog()}
           />
         </div>
         <WebcastSelectionOverlayDialogContainer
           open={this.state.webcastSelectionDialogOpen}
           webcast={this.props.webcast}
-          onRequestClose={this.onRequestCloseWebcastSelectionDialog}
-          onWebcastSelected={this.onWebcastSelected}
+          onRequestClose={() => this.onRequestCloseWebcastSelectionDialog()}
+          onWebcastSelected={(webcastId) => this.onWebcastSelected(webcastId)}
         />
       </div>
     )

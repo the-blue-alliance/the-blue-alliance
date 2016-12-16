@@ -13,7 +13,10 @@ export default class WebcastSelectionOverlayDialogItem extends React.Component {
 
   render() {
     return (
-      <ListItem primaryText={this.props.webcast.name} onTouchTap={() => this.handleClick()}/>
+      <ListItem
+        primaryText={this.props.webcast.name}
+        onTouchTap={() => this.handleClick()}
+      />
     )
   }
 }
