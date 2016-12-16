@@ -7,7 +7,7 @@ import { getNumViewsForLayout } from '../utils/layoutUtils'
  * Responsible for rendering a number of webcasts in a grid-like
  * presentation.
  *
- * Should pr provided with both {webcasts} and {displayedWebcasts} as properties.
+ * Should be provided with both {webcasts} and {displayedWebcasts} as properties.
  * {webcasts} should be an array of webcast objects, and {displayedWebcasts}
  * should be an array of webcast ids.
  *
