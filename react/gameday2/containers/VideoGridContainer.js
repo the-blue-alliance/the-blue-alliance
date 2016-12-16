@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import VideoGridUpdated from '../components/VideoGridUpdated'
+import VideoGrid from '../components/VideoGrid'
 import { addWebcastAtLocation, setLayout } from '../actions'
 import { getWebcastIdsInDisplayOrder } from '../selectors'
 
@@ -18,4 +18,4 @@ const mapDispatchToProps = (dispatch) => ({
 })
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(VideoGridUpdated)
+export default connect(mapStateToProps, mapDispatchToProps)(VideoGrid)
