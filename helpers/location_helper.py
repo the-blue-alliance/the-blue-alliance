@@ -12,15 +12,10 @@ from models.location import Location
 from models.sitevar import Sitevar
 from models.team import Team
 
-GOOGLE_SECRETS = Sitevar.get_by_id("google.secrets")
-GOOGLE_API_KEY = None
-if GOOGLE_SECRETS is None:
-    logging.warning("Missing sitevar: google.api_key. API calls rate limited by IP and may be over rate limit.")
-else:
-    GOOGLE_API_KEY = GOOGLE_SECRETS.contents['api_key']
-
 
 class LocationHelper(object):
+    GOOGLE_API_KEY = None
+
     @classmethod
     def get_similarity(cls, a, b):
         """
@@ -361,9 +356,13 @@ class LocationHelper(object):
         """
         https://developers.google.com/places/web-service/search#TextSearchRequests
         """
-        if not GOOGLE_API_KEY:
-            logging.warning("Must have sitevar google.api_key to use Google Maps Textsearch")
-            raise ndb.Return(None)
+        if not cls.GOOGLE_API_KEY:
+            GOOGLE_SECRETS = Sitevar.get_by_id("google.secrets")
+            if GOOGLE_SECRETS:
+                cls.GOOGLE_API_KEY = GOOGLE_SECRETS.contents['api_key']
+            else:
+                logging.warning("Must have sitevar google.api_key to use Google Maps Textsearch")
+                raise ndb.Return(None)
 
         results = None
         if query:
@@ -373,7 +372,7 @@ class LocationHelper(object):
             if results is None:
                 textsearch_params = {
                     'query': query,
-                    'key': GOOGLE_API_KEY,
+                    'key': cls.GOOGLE_API_KEY,
                 }
                 if radius is not None:
                     coarse_result = cls.google_maps_textsearch_async(location, location).get_result()
@@ -403,10 +402,10 @@ class LocationHelper(object):
                             logging.warning('Textsearch failed!')
                             logging.warning(textsearch_dict)
                     else:
-                        logging.warning('Textsearch failed with url {}.'.format(textsearch_url))
+                        logging.warning(u'Textsearch failed with query: {}, location: {}, radius: {}'.format(query.decode('utf-8'), location, radius))
                         logging.warning(textsearch_dict)
                 except Exception, e:
-                    logging.warning('urlfetch for textsearch request failed with url {}.'.format(textsearch_url))
+                    logging.warning(u'urlfetch for textsearch request failed with query: {}, location: {}, radius: {}'.format(query.decode('utf-8'), location, radius))
                     logging.warning(e)
 
                 memcache.set(cache_key, results if results else [])
@@ -419,9 +418,13 @@ class LocationHelper(object):
         """
         https://developers.google.com/places/web-service/details#PlaceDetailsRequests
         """
-        if not GOOGLE_API_KEY:
-            logging.warning("Must have sitevar google.api_key to use Google Maps PlaceDetails")
-            raise ndb.Return(None)
+        if not cls.GOOGLE_API_KEY:
+            GOOGLE_SECRETS = Sitevar.get_by_id("google.secrets")
+            if GOOGLE_SECRETS:
+                cls.GOOGLE_API_KEY = GOOGLE_SECRETS.contents['api_key']
+            else:
+                logging.warning("Must have sitevar google.api_key to use Google Maps PlaceDetails")
+                raise ndb.Return(None)
 
         result = None
         cache_key = u'google_maps_place_details:{}'.format(place_id)
@@ -429,7 +432,7 @@ class LocationHelper(object):
         if not result:
             place_details_params = {
                 'placeid': place_id,
-                'key': GOOGLE_API_KEY,
+                'key': cls.GOOGLE_API_KEY,
             }
             place_details_url = 'https://maps.googleapis.com/maps/api/place/details/json?%s' % urllib.urlencode(place_details_params)
             try:
@@ -448,9 +451,9 @@ class LocationHelper(object):
                         logging.warning('Placedetails failed!')
                         logging.warning(place_details_dict)
                 else:
-                    logging.warning('Placedetails failed with url {}.'.format(place_details_url))
+                    logging.warning('Placedetails failed with place_id: {}.'.format(place_id))
             except Exception, e:
-                logging.warning('urlfetch for place_details request failed with url {}.'.format(place_details_url))
+                logging.warning('urlfetch for place_details request failed with place_id: {}.'.format(place_id))
                 logging.warning(e)
 
             if tba_config.CONFIG['memcache']:
