@@ -12,10 +12,10 @@ export function getNumViewsForLayout(layoutId) {
   return 1
 }
 
-export function getLayoutSvgIcon(layoutId) {
+export function getLayoutSvgIcon(layoutId, color = '#757575') {
   const pathData = LAYOUT_SVG_PATHS[layoutId]
   return (
-    <SvgIcon color="#757575" viewBox="0 0 23 15">
+    <SvgIcon color={color} viewBox="0 0 23 15">
       <path d={pathData} />
     </SvgIcon>
   )

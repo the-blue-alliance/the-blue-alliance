@@ -2,11 +2,14 @@ import React, { PropTypes } from 'react'
 import AppBar from 'material-ui/AppBar'
 import FlatButton from 'material-ui/FlatButton'
 import LayoutDrawer from './LayoutDrawer'
+import { getLayoutSvgIcon } from '../utils/layoutUtils'
 
 const GamedayNavbar = (props) => {
   const configureLayoutButton = (
     <FlatButton
       label="Configure Layout"
+      labelPosition="before"
+      icon={getLayoutSvgIcon(props.layoutId, "#ffffff")}
       onTouchTap={() => props.setLayoutDrawerVisibility(true)}
     />
   )
