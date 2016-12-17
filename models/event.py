@@ -12,6 +12,7 @@ from consts.ranking_indexes import RankingIndexes
 from context_cache import context_cache
 from helpers.location_helper import LocationHelper
 from models.event_details import EventDetails
+from models.location import Location
 
 
 class Event(ndb.Model):
@@ -27,12 +28,17 @@ class Event(ndb.Model):
     event_district_enum = ndb.IntegerProperty(default=DistrictType.NO_DISTRICT)
     start_date = ndb.DateTimeProperty()
     end_date = ndb.DateTimeProperty()
+
+    # venue, venue_addresss, city, state_prov, country, and postalcode are from FIRST
     venue = ndb.StringProperty(indexed=False)  # Name of the event venue
     venue_address = ndb.StringProperty(indexed=False)  # Most detailed venue address (includes venue, street, and location separated by \n)
     city = ndb.StringProperty()  # Equivalent to locality. From FRCAPI
     state_prov = ndb.StringProperty()  # Equivalent to region. From FRCAPI
     country = ndb.StringProperty()  # From FRCAPI
     postalcode = ndb.StringProperty()  # From ElasticSearch only. String because it can be like "95126-1215"
+    # Normalized address from the Google Maps API, constructed using the above
+    normalized_location = ndb.StructuredProperty(Location)
+
     timezone_id = ndb.StringProperty()  # such as 'America/Los_Angeles' or 'Asia/Jerusalem'
     official = ndb.BooleanProperty(default=False)  # Is the event FIRST-official?
     first_eid = ndb.StringProperty()  # from USFIRST

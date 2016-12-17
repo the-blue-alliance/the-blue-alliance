@@ -59,6 +59,41 @@ class LocationHelper(object):
     #     if not lat_lon:
     #         logging.warning("Finding Lat/Lon for event {} failed!".format(event.key_name))
     #     return lat_lon
+
+    @classmethod
+    def update_event_location(cls, event):
+        location_info, score = cls.get_event_location_info(event)
+        if score < 0.7:
+            return
+
+        if 'lat' in location_info and 'lng' in location_info:
+            lat_lng = ndb.GeoPt(location_info['lat'], location_info['lng'])
+        else:
+            lat_lng = None
+        event.normalized_location = Location(
+            name=location_info.get('name', None),
+            formatted_address=location_info.get('formatted_address', None),
+            lat_lng=lat_lng,
+            street_number=location_info.get('street_number', None),
+            street=location_info.get('street', None),
+            city=location_info.get('city', None),
+            state_prov=location_info.get('state_prov', None),
+            state_prov_short=location_info.get('state_prov_short', None),
+            country=location_info.get('country', None),
+            country_short=location_info.get('country_short', None),
+            postal_code=location_info.get('postal_code', None),
+            place_id=location_info.get('place_id', None),
+            place_details=location_info.get('place_details', None),
+        )
+
+    @classmethod
+    def _log_event_location_score(cls, event_key, score):
+        text = "Event {} location score: {}".format(event_key, score)
+        if score < 0.7:
+            logging.warning(text)
+        else:
+            logging.info(text)
+
     @classmethod
     def get_event_location_info(cls, event):
         """
@@ -67,7 +102,7 @@ class LocationHelper(object):
         location associated with the event.
         """
         if not event.location:
-            return {}
+            return {}, 0
 
         # Possible queries for location that will match yield results
         if event.venue:
@@ -78,6 +113,9 @@ class LocationHelper(object):
             split_address = event.venue_address.split('\n')
             for i in xrange(min(len(split_address), 2)):  # Venue takes up at most 2 lines
                 query = ' '.join(split_address[0:i+1])  # From the front
+                if query not in possible_queries:
+                    possible_queries.append(query)
+                query = split_address[i]
                 if query not in possible_queries:
                     possible_queries.append(query)
 
@@ -91,37 +129,40 @@ class LocationHelper(object):
         best_location_info = {}
         textsearch_results_candidates = []  # More trustworthy candidates are added first
         for query in possible_queries:
-            textsearch_results = cls.google_maps_textsearch_async(query).get_result()
+            textsearch_results = cls.google_maps_textsearch_async(query, event.location).get_result()
             if textsearch_results:
                 if len(textsearch_results) == 1:
                     location_info = cls.construct_location_info_async(textsearch_results[0]).get_result()
-                    score = cls.compute_event_location_score(event, location_info)
+                    score = cls.compute_event_location_score(event, query, location_info)
                     if score == 1:
                         # Very likely to be correct if only 1 result and as a perfect score
-                        return location_info
+                        cls._log_event_location_score(event.key.id(), score)
+                        return location_info, score
                     elif score > best_score:
                         # Only 1 result but score is imperfect
                         best_score = score
                         best_location_info = location_info
                 else:
                     # Save queries with multiple results for later evaluation
-                    textsearch_results_candidates.append(textsearch_results)
+                    textsearch_results_candidates.append((textsearch_results, query))
 
         # Consider all candidates and find best one
-        for textsearch_results in textsearch_results_candidates:
+        for textsearch_results, query in textsearch_results_candidates:
             for textsearch_result in textsearch_results:
                 location_info = cls.construct_location_info_async(textsearch_result).get_result()
-                score = cls.compute_event_location_score(event, location_info)
+                score = cls.compute_event_location_score(event, query, location_info)
                 if score == 1:
-                    return location_info
+                    cls._log_event_location_score(event.key.id(), score)
+                    return location_info, score
                 elif score > best_score:
                     best_score = score
                     best_location_info = location_info
 
-        return best_location_info
+        cls._log_event_location_score(event.key.id(), best_score)
+        return best_location_info, best_score
 
     @classmethod
-    def compute_event_location_score(cls, event, location_info):
+    def compute_event_location_score(cls, event, query, location_info):
         """
         Score for correctness. 1.0 is perfect.
         Not checking for absolute equality in case of existing data errors.
@@ -130,26 +171,39 @@ class LocationHelper(object):
         max_score = 5.0
         score = 0.0
         if event.country:
-            score += max(
+            partial = max(
                 cls.get_similarity(location_info.get('country', ''), event.country),
                 cls.get_similarity(location_info.get('country_short', ''), event.country))
+            score += 1 if partial > 0.5 else 0
         if event.state_prov:
-            score += max(
+            partial = max(
                 cls.get_similarity(location_info.get('state_prov', ''), event.state_prov),
                 cls.get_similarity(location_info.get('state_prov_short', ''), event.state_prov))
+            score += partial if partial > 0.5 else 0
         if event.city:
-            score += cls.get_similarity(location_info.get('city', ''), event.city)
+            partial = cls.get_similarity(location_info.get('city', ''), event.city)
+            score += partial if partial > 0.5 else 0
         if event.postalcode:
-            score += cls.get_similarity(location_info.get('postal_code', ''), event.postalcode)
-        if event.venue:
-            venue_score = cls.get_similarity(location_info.get('name', ''), event.venue)
-            score += venue_score * 3
+            partial = cls.get_similarity(location_info.get('postal_code', ''), event.postalcode)
+            score += partial if partial > 0.9 else 0
+
+        if location_info.get('name', '') in query and 'point_of_interest' in location_info.get('types', ''):
+            score += 3  # If name matches, we're probably good
+        else:
+            partial = cls.get_similarity(location_info.get('name', ''), query)
+            score += partial if partial < 0.5 else 1
+
+        if 'point_of_interest' not in location_info.get('types', ''):
+            score *= 0.8
 
         return min(1.0, score / max_score)
 
     @classmethod
     def update_team_location(cls, team):
-        location_info = cls.get_team_location_info(team)
+        location_info, score = cls.get_team_location_info(team)
+        if score < 0.7:
+            return
+
         if 'lat' in location_info and 'lng' in location_info:
             lat_lng = ndb.GeoPt(location_info['lat'], location_info['lng'])
         else:
@@ -173,10 +227,10 @@ class LocationHelper(object):
     @classmethod
     def _log_team_location_score(cls, team_key, score):
         text = "Team {} location score: {}".format(team_key, score)
-        if score >= 0.8:
-            logging.info(text)
-        else:
+        if score < 0.7:
             logging.warning(text)
+        else:
+            logging.info(text)
 
     @classmethod
     def get_team_location_info(cls, team):
@@ -186,7 +240,7 @@ class LocationHelper(object):
         in attempt to find the correct location associated with the team.
         """
         if not team.location:
-            return {}
+            return {}, 0
 
         # Find possible schools/title sponsors
         possible_names = []
@@ -227,7 +281,7 @@ class LocationHelper(object):
                     if score == 1:
                         # Very likely to be correct if only 1 result and has a perfect score
                         cls._log_team_location_score(team.key.id(), score)
-                        return location_info
+                        return location_info, score
                     elif score > best_score:
                         # Only 1 result but score is imperfect
                         best_score = score
@@ -239,7 +293,7 @@ class LocationHelper(object):
         # Check if we have found anything reasonable
         if best_location_info and best_score > 0.9:
             cls._log_team_location_score(team.key.id(), best_score)
-            return best_location_info
+            return best_location_info, best_score
 
         # Try to find place using only location
         if not textsearch_results_candidates:
@@ -257,7 +311,7 @@ class LocationHelper(object):
 
         if not textsearch_results_candidates:
             logging.warning("Finding textsearch results for team {} failed!".format(team.key.id()))
-            return {}
+            return {}, 0
 
         # Consider all candidates and find best one
         for textsearch_results, query in textsearch_results_candidates:
@@ -266,13 +320,13 @@ class LocationHelper(object):
                 score = cls.compute_team_location_score(team, query, location_info)
                 if score == 1:
                     cls._log_team_location_score(team.key.id(), score)
-                    return location_info
+                    return location_info, score
                 elif score > best_score:
                     best_score = score
                     best_location_info = location_info
 
         cls._log_team_location_score(team.key.id(), best_score)
-        return best_location_info
+        return best_location_info, best_score
 
     @classmethod
     def compute_team_location_score(cls, team, query, location_info):
@@ -366,8 +420,8 @@ class LocationHelper(object):
 
         results = None
         if query:
-            cache_key = u'google_maps_textsearch:{}'.format(query.encode('ascii', 'ignore'))
             query = query.encode('ascii', 'ignore')
+            cache_key = u'google_maps_textsearch:{}'.format(query)
             results = memcache.get(cache_key)
             if results is None:
                 textsearch_params = {
@@ -399,7 +453,7 @@ class LocationHelper(object):
                         elif textsearch_dict['status'] == 'OK':
                             results = textsearch_dict['results']
                         else:
-                            logging.warning('Textsearch failed!')
+                            logging.warning(u'Textsearch failed with query: {}, location: {}, radius: {}'.format(query, location, radius))
                             logging.warning(textsearch_dict)
                     else:
                         logging.warning(u'Textsearch failed with query: {}, location: {}, radius: {}'.format(query, location, radius))
@@ -448,7 +502,7 @@ class LocationHelper(object):
                     elif place_details_dict['status'] == 'OK':
                         result = place_details_dict['result']
                     else:
-                        logging.warning('Placedetails failed!')
+                        logging.warning('Placedetails failed with place_id: {}.'.format(place_id))
                         logging.warning(place_details_dict)
                 else:
                     logging.warning('Placedetails failed with place_id: {}.'.format(place_id))
