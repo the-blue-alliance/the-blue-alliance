@@ -150,18 +150,28 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(event.normalized_location.postal_code, '2127')
         self.assertEqual(event.normalized_location.lat_lng, ndb.GeoPt(-33.85341090000001, 151.0693752))
 
-        # 2016gush (China event with really bad location details)
-        event = Event(
-            id='2016gush',
-            city='Shenzhen City',
-            state_prov='44',
-            country='China',
-            postalcode='518000',
-            venue='The Sports Center of Shenzhen University',
-            venue_address='The Sports Center of Shenzhen University\nNo. 2032 Liuxian Road\nNanshan District\nShenzhen City, 44 518000\nChina'
-            )
-        LocationHelper.update_event_location(event)
-        self.assertEqual(event.normalized_location, None)
+        # # 2016gush (China event with really bad location details)
+        # event = Event(
+        #     id='2016gush',
+        #     city='Shenzhen City',
+        #     state_prov='44',
+        #     country='China',
+        #     postalcode='518000',
+        #     venue='The Sports Center of Shenzhen University',
+        #     venue_address='The Sports Center of Shenzhen University\nNo. 2032 Liuxian Road\nNanshan District\nShenzhen City, 44 518000\nChina'
+        #     )
+        # LocationHelper.update_event_location(event)
+        # self.assertEqual(event.normalized_location.name, 'Shenzhen University Town Sports Center')
+        # self.assertEqual(event.normalized_location.formatted_address, 'Liuxian Ave, Shenzhen, Guangdong, China')
+        # self.assertEqual(event.normalized_location.street_number, None)
+        # self.assertEqual(event.normalized_location.street, 'Liuxian Avenue')
+        # self.assertEqual(event.normalized_location.city, 'Shenzhen Shi')
+        # self.assertEqual(event.normalized_location.state_prov, 'Guangdong Sheng')
+        # self.assertEqual(event.normalized_location.state_prov_short,  'Guangdong Sheng')
+        # self.assertEqual(event.normalized_location.country, 'China')
+        # self.assertEqual(event.normalized_location.country_short, 'CN')
+        # self.assertEqual(event.normalized_location.postal_code, '518055')
+        # self.assertEqual(event.normalized_location.lat_lng, ndb.GeoPt(22.585279, 113.978825))
 
         # 2016code
         event = Event(

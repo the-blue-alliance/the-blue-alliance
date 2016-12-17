@@ -63,7 +63,7 @@ class LocationHelper(object):
     @classmethod
     def update_event_location(cls, event):
         location_info, score = cls.get_event_location_info(event)
-        if score < 0.7:
+        if score < 0.5:
             return
 
         if 'lat' in location_info and 'lng' in location_info:
@@ -89,7 +89,7 @@ class LocationHelper(object):
     @classmethod
     def _log_event_location_score(cls, event_key, score):
         text = "Event {} location score: {}".format(event_key, score)
-        if score < 0.7:
+        if score < 0.8:
             logging.warning(text)
         else:
             logging.info(text)
@@ -109,6 +109,8 @@ class LocationHelper(object):
             possible_queries = [event.venue]
         else:
             possible_queries = []
+
+        lat_lng = None
         if event.venue_address:
             split_address = event.venue_address.split('\n')
             for i in xrange(min(len(split_address), 2)):  # Venue takes up at most 2 lines
@@ -124,12 +126,20 @@ class LocationHelper(object):
                 if query not in possible_queries:
                     possible_queries.append(query)
 
+            # Get general lat/lng
+            if event.venue_address:
+                textsearch_results = cls.google_maps_textsearch_async(' '.join(split_address[1:])).get_result()
+                if textsearch_results:
+                    lat_lng = '{},{}'.format(
+                        textsearch_results[0]['geometry']['location']['lat'],
+                        textsearch_results[0]['geometry']['location']['lng'])
+
         # Try to find place based on possible queries
         best_score = 0
         best_location_info = {}
         textsearch_results_candidates = []  # More trustworthy candidates are added first
         for query in possible_queries:
-            textsearch_results = cls.google_maps_textsearch_async(query, event.location).get_result()
+            textsearch_results = cls.google_maps_textsearch_async(query, lat_lng=lat_lng).get_result()
             if textsearch_results:
                 if len(textsearch_results) == 1:
                     location_info = cls.construct_location_info_async(textsearch_results[0]).get_result()
@@ -185,23 +195,23 @@ class LocationHelper(object):
             score += partial if partial > 0.5 else 0
         if event.postalcode:
             partial = cls.get_similarity(location_info.get('postal_code', ''), event.postalcode)
-            score += partial if partial > 0.9 else 0
+            score += partial if partial > 0.5 else 0
 
-        if location_info.get('name', '') in query and 'point_of_interest' in location_info.get('types', ''):
+        if location_info.get('name', '') in query and ('point_of_interest' in location_info.get('types', '') or 'premise' in location_info.get('types', '')):
             score += 3  # If name matches, we're probably good
         else:
             partial = cls.get_similarity(location_info.get('name', ''), query)
-            score += partial if partial < 0.5 else 1
+            score += partial
 
-        if 'point_of_interest' not in location_info.get('types', ''):
-            score *= 0.8
+        if 'point_of_interest' not in location_info.get('types', '') and 'premise' not in location_info.get('types', ''):
+            score *= 0.5
 
         return min(1.0, score / max_score)
 
     @classmethod
     def update_team_location(cls, team):
         location_info, score = cls.get_team_location_info(team)
-        if score < 0.7:
+        if score < 0.5:
             return
 
         if 'lat' in location_info and 'lng' in location_info:
@@ -227,7 +237,7 @@ class LocationHelper(object):
     @classmethod
     def _log_team_location_score(cls, team_key, score):
         text = "Team {} location score: {}".format(team_key, score)
-        if score < 0.7:
+        if score < 0.8:
             logging.warning(text)
         else:
             logging.info(text)
@@ -406,7 +416,7 @@ class LocationHelper(object):
 
     @classmethod
     @ndb.tasklet
-    def google_maps_textsearch_async(cls, query, location, radius=None):
+    def google_maps_textsearch_async(cls, query, lat_lng=None):
         """
         https://developers.google.com/places/web-service/search#TextSearchRequests
         """
@@ -428,14 +438,10 @@ class LocationHelper(object):
                     'query': query,
                     'key': cls.GOOGLE_API_KEY,
                 }
-                if radius is not None:
-                    coarse_result = cls.google_maps_textsearch_async(location, location).get_result()
-                    if coarse_result:
-                        textsearch_params['location'] = '{},{}'.format(
-                            coarse_result[0]['geometry']['location']['lat'], coarse_result[0]['geometry']['location']['lng'])
-                        textsearch_params['radius'] = radius
-                    else:
-                        raise ndb.Return(None)
+
+                # if lat_lng is not None:
+                #     textsearch_params['location'] = lat_lng
+                #     textsearch_params['radius'] = 1000
 
                 textsearch_url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?{}'.format(urllib.urlencode(textsearch_params))
                 try:
@@ -447,19 +453,17 @@ class LocationHelper(object):
                     if textsearch_result.status_code == 200:
                         textsearch_dict = json.loads(textsearch_result.content)
                         if textsearch_dict['status'] == 'ZERO_RESULTS':
-                            logging.info('No textsearch results for query: {}'.format(query))
-                            if not results and radius is None:
-                                results = cls.google_maps_textsearch_async(query, location, radius=100000).get_result()
+                            logging.info('No textsearch results for query: {}, lat_lng: {}'.format(query, lat_lng))
                         elif textsearch_dict['status'] == 'OK':
                             results = textsearch_dict['results']
                         else:
-                            logging.warning(u'Textsearch failed with query: {}, location: {}, radius: {}'.format(query, location, radius))
+                            logging.warning(u'Textsearch failed with query: {}, lat_lng: {}'.format(query, lat_lng))
                             logging.warning(textsearch_dict)
                     else:
-                        logging.warning(u'Textsearch failed with query: {}, location: {}, radius: {}'.format(query, location, radius))
+                        logging.warning(u'Textsearch failed with query: {}, lat_lng: {}'.format(query, lat_lng))
                         logging.warning(textsearch_dict)
                 except Exception, e:
-                    logging.warning(u'urlfetch for textsearch request failed with query: {}, location: {}, radius: {}'.format(query, location, radius))
+                    logging.warning(u'urlfetch for textsearch request failed with query: {}, lat_lng: {}'.format(query, lat_lng))
                     logging.warning(e)
 
                 memcache.set(cache_key, results if results else [])
