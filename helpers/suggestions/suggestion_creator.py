@@ -221,7 +221,8 @@ class SuggestionCreator(object):
             if event:
                 suggestion = Suggestion(
                     author=author_account_key,
-                    target_model="api_auth_access"
+                    target_model="api_auth_access",
+                    target_key=event_key,
                 )
                 auth_types = [int(type) for type in auth_types]
                 clean_auth_types = filter(lambda a: a in AuthType.type_names.keys(), auth_types)
