@@ -16,7 +16,7 @@ export function getLayoutSvgIcon(layoutId) {
   const pathData = LAYOUT_SVG_PATHS[layoutId]
   return (
     <SvgIcon color="#757575" viewBox="0 0 23 15">
-      <path d={pathData}/>
+      <path d={pathData} />
     </SvgIcon>
   )
 }
