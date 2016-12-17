@@ -367,7 +367,7 @@ class LocationHelper(object):
         results = None
         if query:
             cache_key = u'google_maps_textsearch:{}'.format(query.encode('ascii', 'ignore'))
-            query = query.encode('utf-8')
+            query = query.encode('ascii', 'ignore')
             results = memcache.get(cache_key)
             if results is None:
                 textsearch_params = {
@@ -383,7 +383,7 @@ class LocationHelper(object):
                     else:
                         raise ndb.Return(None)
 
-                textsearch_url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?%s' % urllib.urlencode(textsearch_params)
+                textsearch_url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?{}'.format(urllib.urlencode(textsearch_params))
                 try:
                     # Make async urlfetch call
                     context = ndb.get_context()
@@ -402,10 +402,10 @@ class LocationHelper(object):
                             logging.warning('Textsearch failed!')
                             logging.warning(textsearch_dict)
                     else:
-                        logging.warning(u'Textsearch failed with query: {}, location: {}, radius: {}'.format(query.decode('utf-8'), location, radius))
+                        logging.warning(u'Textsearch failed with query: {}, location: {}, radius: {}'.format(query, location, radius))
                         logging.warning(textsearch_dict)
                 except Exception, e:
-                    logging.warning(u'urlfetch for textsearch request failed with query: {}, location: {}, radius: {}'.format(query.decode('utf-8'), location, radius))
+                    logging.warning(u'urlfetch for textsearch request failed with query: {}, location: {}, radius: {}'.format(query, location, radius))
                     logging.warning(e)
 
                 memcache.set(cache_key, results if results else [])

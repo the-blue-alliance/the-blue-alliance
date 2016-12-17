@@ -5,6 +5,7 @@ import unittest2
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
+from helpers.location_helper import LocationHelper
 from models.sitevar import Sitevar
 from models.team import Team
 
@@ -32,10 +33,10 @@ class TestLocationHelper(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def test_team_location(self):
-        # Needs to be loaded after memcache_stub
-        from helpers.location_helper import LocationHelper
+    def test_event_location(self):
+        pass
 
+    def test_team_location(self):
         # Team 604 (generic team)
         team = Team(
             id='frc604',
