@@ -1,7 +1,7 @@
 import * as types from '../constants/ActionTypes'
 import { MAX_SUPPORTED_VIEWS, NUM_VIEWS_FOR_LAYOUT } from '../constants/LayoutConstants'
 
-// Position map maps from a location index in the grid to a position in the DOM ordering
+// Position map maps from a position index in the grid to a position in the DOM ordering
 
 const defaultPositionMap = []
 const defaultDomOrder = []
@@ -78,8 +78,8 @@ const trimToLayout = (state) => {
   })
 }
 
-const addWebcastAtLocation = (state, webcastId, location, maxSupportedViews) => {
-  if (location < 0 || location >= maxSupportedViews) {
+const addWebcastAtPosition = (state, webcastId, position, maxSupportedViews) => {
+  if (position < 0 || position >= maxSupportedViews) {
     return state
   }
 
@@ -93,8 +93,8 @@ const addWebcastAtLocation = (state, webcastId, location, maxSupportedViews) => 
   domOrder = domOrder.slice(0)
   positionMap = positionMap.slice(0)
 
-  // See if there's already a webcast at this location
-  const existingIndex = positionMap[location]
+  // See if there's already a webcast at this position
+  const existingIndex = positionMap[position]
   if (existingIndex >= 0) {
     // There's already a webcast at this position with a corresponding DOM element
     const oldId = domOrder[existingIndex]
@@ -114,7 +114,7 @@ const addWebcastAtLocation = (state, webcastId, location, maxSupportedViews) => 
       if (domOrder[i] == null) {
         // We found an opening!
         domOrder[i] = webcastId
-        positionMap[location] = i
+        positionMap[position] = i
         break
       }
     }
@@ -129,7 +129,7 @@ const addWebcastAtLocation = (state, webcastId, location, maxSupportedViews) => 
   }))
 }
 
-const swapWebcasts = (state, firstLocation, secondLocation) => {
+const swapWebcasts = (state, firstPosition, secondPosition) => {
   let {
     positionMap,
   } = state
@@ -139,9 +139,9 @@ const swapWebcasts = (state, firstLocation, secondLocation) => {
   // DOM order and the displayed array will stay the same
   // All we have to do is swap pointers in the position map
 
-  const temp = positionMap[firstLocation]
-  positionMap[firstLocation] = positionMap[secondLocation]
-  positionMap[secondLocation] = temp
+  const temp = positionMap[firstPosition]
+  positionMap[firstPosition] = positionMap[secondPosition]
+  positionMap[secondPosition] = temp
 
   return Object.assign({}, state, {
     positionMap,
@@ -203,10 +203,10 @@ const videoGrid = (state = defaultState, action) => {
       // Trim, if necessary
       return trimToLayout(newState)
     }
-    case types.ADD_WEBCAST_AT_LOCATION:
-      return addWebcastAtLocation(state, action.webcastId, action.location, MAX_SUPPORTED_VIEWS)
+    case types.ADD_WEBCAST_AT_POSITION:
+      return addWebcastAtPosition(state, action.webcastId, action.position, MAX_SUPPORTED_VIEWS)
     case types.SWAP_WEBCASTS:
-      return swapWebcasts(state, action.firstLocation, action.secondLocation)
+      return swapWebcasts(state, action.firstPosition, action.secondPosition)
     case types.REMOVE_WEBCAST:
       return removeWebcast(state, action.webcastId)
     case types.RESET_WEBCASTS:
