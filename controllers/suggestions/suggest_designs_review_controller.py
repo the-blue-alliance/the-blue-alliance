@@ -1,13 +1,7 @@
-import datetime
-import os
-import json
-import logging
-
 from google.appengine.ext import ndb
 
 from consts.account_permissions import AccountPermissions
 from controllers.suggestions.suggestions_review_base_controller import SuggestionsReviewBaseController
-from helpers.media_manipulator import MediaManipulator
 from helpers.suggestions.media_creator import MediaCreator
 from helpers.suggestions.suggestion_notifier import SuggestionNotifier
 from models.media import Media
@@ -103,7 +97,6 @@ class SuggestDesignsReviewController(SuggestionsReviewBaseController):
         accept_keys = []
         reject_keys = []
         for value in self.request.POST.values():
-            logging.debug(value)
             split_value = value.split('::')
             if len(split_value) == 2:
                 key = split_value[1]
