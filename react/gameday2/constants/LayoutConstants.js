@@ -117,7 +117,7 @@ const LAYOUT_3 = [
     left: 0,
     position: 'absolute',
   }, {
-    width: '35%',
+    width: '50%',
     height: '50%',
     top: 0,
     left: '50%',
@@ -366,7 +366,7 @@ const LAYOUT_8 = [
   }, {
     width: '33.33%',
     height: '33.33%',
-    top: '33.33',
+    top: '33.33%',
     left: 0,
     position: 'absolute',
   }, {

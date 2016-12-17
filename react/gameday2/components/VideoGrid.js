@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react'
-import classNames from 'classnames'
 import VideoCell from './VideoCell'
 import { getNumViewsForLayout } from '../utils/layoutUtils'
 
@@ -14,10 +13,10 @@ export default React.createClass({
     addWebcastAtPosition: PropTypes.func.isRequired,
   },
   renderLayout(webcastCount, layoutNumber) {
-    const classes = classNames({
-      [`layout-${layoutNumber}`]: true,
-      'video-grid': true,
-    })
+    const videoGridStyle = {
+      width: '100%',
+      height: '100%',
+    }
 
     const {
       domOrder,
@@ -62,6 +61,7 @@ export default React.createClass({
         videoCells.push(
           <VideoCell
             position={position}
+            layoutId={this.props.layoutId}
             key={id}
             webcast={webcast}
             webcasts={this.props.webcasts}
@@ -78,7 +78,7 @@ export default React.createClass({
     }
 
     return (
-      <div className={classes}>
+      <div style={videoGridStyle}>
         {videoCells}
       </div>
     )

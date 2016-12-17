@@ -8,6 +8,7 @@ import VideoCellToolbarContainer from '../containers/VideoCellToolbarContainer'
 import WebcastSelectionOverlayDialogContainer from '../containers/WebcastSelectionOverlayDialogContainer'
 import SwapPositionOverlayDialogContainer from '../containers/SwapPositionOverlayDialogContainer'
 import { WebcastPropType } from '../utils/webcastUtils'
+import { LAYOUT_STYLES } from '../constants/LayoutConstants'
 
 export default class VideoCell extends React.Component {
   static propTypes = {
@@ -15,6 +16,7 @@ export default class VideoCell extends React.Component {
     webcasts: PropTypes.array.isRequired,
     webcastsById: PropTypes.object.isRequired,
     displayedWebcasts: PropTypes.array.isRequired,
+    layoutId: PropTypes.number.isRequired,
     position: PropTypes.number.isRequired,
     addWebcastAtPosition: PropTypes.func.isRequired,
   }
@@ -50,9 +52,9 @@ export default class VideoCell extends React.Component {
   }
 
   render() {
-    const classes = classNames({
-      'video-cell': true,
-      [`video-${this.props.position}`]: true,
+    const cellStyle = Object.assign({}, LAYOUT_STYLES[this.props.layoutId][this.props.position], {
+      paddingBottom: '48px',
+      outline: '#fff solid 1px',
     })
 
     if (this.props.webcast) {
@@ -72,10 +74,6 @@ export default class VideoCell extends React.Component {
           break
       }
 
-      const cellStyle = {
-        paddingBottom: '48px',
-      }
-
       const toolbarStyle = {
         position: 'absolute',
         bottom: 0,
@@ -85,7 +83,6 @@ export default class VideoCell extends React.Component {
 
       return (
         <div
-          className={classes}
           style={cellStyle}
         >
           {cellEmbed}
@@ -129,7 +126,7 @@ export default class VideoCell extends React.Component {
     const buttonLabel = webcastsAreAvailable ? 'Select a webcast' : 'No more webcasts available'
 
     return (
-      <div className={classes} >
+      <div style={cellStyle} >
         <div style={emptyContainerStyle}>
           <RaisedButton
             label={buttonLabel}
