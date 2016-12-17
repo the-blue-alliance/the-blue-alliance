@@ -12,7 +12,7 @@ export default React.createClass({
     layoutId: PropTypes.number.isRequired,
     addWebcastAtPosition: PropTypes.func.isRequired,
   },
-  renderLayout(webcastCount, layoutNumber) {
+  renderLayout(webcastCount) {
     const videoGridStyle = {
       width: '100%',
       height: '100%',

@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react'
-import classNames from 'classnames'
 import RaisedButton from 'material-ui/RaisedButton'
 import EmbedUstream from './EmbedUstream'
 import EmbedYoutube from './EmbedYoutube'
