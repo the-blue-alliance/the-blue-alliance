@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import VideoGrid from '../components/VideoGrid'
-import { addWebcastAtLocation, setLayout } from '../actions'
+import { addWebcastAtPosition, setLayout } from '../actions'
 import { getWebcastIdsInDisplayOrder } from '../selectors'
 
 const mapStateToProps = (state) => ({
@@ -13,7 +13,7 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = (dispatch) => ({
-  addWebcastAtLocation: (webcastId, location) => dispatch(addWebcastAtLocation(webcastId, location)),
+  addWebcastAtPosition: (webcastId, position) => dispatch(addWebcastAtPosition(webcastId, position)),
   setLayout: (layoutId) => dispatch(setLayout(layoutId)),
 })
 

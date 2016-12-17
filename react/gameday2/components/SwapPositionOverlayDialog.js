@@ -57,7 +57,7 @@ function getStyles() {
 export default class SwapPositionOverlayDialog extends React.Component {
   static propTypes = {
     open: PropTypes.bool.isRequired,
-    location: PropTypes.number.isRequired,
+    position: PropTypes.number.isRequired,
     layoutId: PropTypes.number.isRequired,
     swapWebcasts: PropTypes.func.isRequired,
     onRequestClose: PropTypes.func.isRequired,
@@ -72,7 +72,7 @@ export default class SwapPositionOverlayDialog extends React.Component {
   }
 
   onRequestSwap(targetPosition) {
-    this.props.swapWebcasts(this.props.location, targetPosition)
+    this.props.swapWebcasts(this.props.position, targetPosition)
     this.onRequestClose()
   }
 
@@ -118,7 +118,7 @@ export default class SwapPositionOverlayDialog extends React.Component {
           <SwapPositionPreviewCell
             key={i.toString()}
             style={cellStyle}
-            enabled={i !== this.props.location}
+            enabled={i !== this.props.position}
             onClick={() => this.onRequestSwap(i)}
           />
         )

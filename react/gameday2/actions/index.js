@@ -67,13 +67,13 @@ export function addWebcast(webcastId) {
   }
 }
 
-const addWebcastAtLocationNoCheck = (webcastId, location) => ({
-  type: types.ADD_WEBCAST_AT_LOCATION,
+const addWebcastAtPositionNoCheck = (webcastId, position) => ({
+  type: types.ADD_WEBCAST_AT_POSITION,
   webcastId,
-  location,
+  position,
 })
 
-export function addWebcastAtLocation(webcastId, location) {
+export function addWebcastAtPosition(webcastId, position) {
   // Before displaying the webcast, check that the provided webcast ID
   // references a webcast that actually exists
   return (dispatch, getState) => {
@@ -81,15 +81,15 @@ export function addWebcastAtLocation(webcastId, location) {
       return
     }
 
-    dispatch(addWebcastAtLocationNoCheck(webcastId, location))
+    dispatch(addWebcastAtPositionNoCheck(webcastId, position))
   }
 }
 
-export function swapWebcasts(firstLocation, secondLocation) {
+export function swapWebcasts(firstPosition, secondPosition) {
   return {
     type: types.SWAP_WEBCASTS,
-    firstLocation,
-    secondLocation,
+    firstPosition,
+    secondPosition,
   }
 }
 

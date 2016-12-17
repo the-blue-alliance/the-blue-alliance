@@ -11,7 +11,7 @@ import { indigo500, indigo700 } from 'material-ui/styles/colors'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
 import GamedayFrame from './components/GamedayFrame'
 import gamedayReducer from './reducers'
-import { setWebcastsRaw, setLayout, addWebcastAtLocation } from './actions'
+import { setWebcastsRaw, setLayout, addWebcastAtPosition } from './actions'
 import { MAX_SUPPORTED_VIEWS } from './constants/LayoutConstants'
 
 injectTapEventPlugin()
@@ -51,7 +51,7 @@ if (params.layout && Number.isInteger(Number.parseInt(params.layout, 10))) {
 for (let i = 0; i < MAX_SUPPORTED_VIEWS; i++) {
   const key = `view_${i}`
   if (params[key]) {
-    store.dispatch(addWebcastAtLocation(params[key], i))
+    store.dispatch(addWebcastAtPosition(params[key], i))
   }
 }
 

@@ -15,8 +15,8 @@ export default class VideoCell extends React.Component {
     webcasts: PropTypes.array.isRequired,
     webcastsById: PropTypes.object.isRequired,
     displayedWebcasts: PropTypes.array.isRequired,
-    location: PropTypes.number.isRequired,
-    addWebcastAtLocation: PropTypes.func.isRequired,
+    position: PropTypes.number.isRequired,
+    addWebcastAtPosition: PropTypes.func.isRequired,
   }
 
   constructor(props) {
@@ -45,14 +45,14 @@ export default class VideoCell extends React.Component {
   }
 
   onWebcastSelected(webcastId) {
-    this.props.addWebcastAtLocation(webcastId, this.props.location)
+    this.props.addWebcastAtPosition(webcastId, this.props.position)
     this.onRequestCloseWebcastSelectionDialog()
   }
 
   render() {
     const classes = classNames({
       'video-cell': true,
-      [`video-${this.props.location}`]: true,
+      [`video-${this.props.position}`]: true,
     })
 
     if (this.props.webcast) {
@@ -103,7 +103,7 @@ export default class VideoCell extends React.Component {
           />
           <SwapPositionOverlayDialogContainer
             open={this.state.swapPositionDialogOpen}
-            location={this.props.location}
+            position={this.props.position}
             onRequestClose={() => this.onRequestCloseSwapPositionDialog()}
           />
         </div>

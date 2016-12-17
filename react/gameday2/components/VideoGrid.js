@@ -11,7 +11,7 @@ export default React.createClass({
     webcasts: PropTypes.array.isRequired,
     webcastsById: PropTypes.object.isRequired,
     layoutId: PropTypes.number.isRequired,
-    addWebcastAtLocation: PropTypes.func.isRequired,
+    addWebcastAtPosition: PropTypes.func.isRequired,
   },
   renderLayout(webcastCount, layoutNumber) {
     const classes = classNames({
@@ -34,10 +34,10 @@ export default React.createClass({
     }
 
     // Compute which cells don't a webcast in them
-    const emptyCellLocations = []
+    const emptyCellPositions = []
     for (let i = 0; i < positionMap.length; i++) {
       if (positionMap[i] === -1 && i < webcastCount) {
-        emptyCellLocations.push(i)
+        emptyCellPositions.push(i)
       }
     }
 
@@ -46,28 +46,28 @@ export default React.createClass({
     for (let i = 0; i < domOrder.length; i++) {
       let webcast = null
       let id = `video-${i}`
-      let location = null
+      let position = null
       let hasWebcast = true
       if (domOrder[i]) {
         // There's a webcast to display here!
         webcast = this.props.webcastsById[domOrder[i]]
         id = webcast.id
-        location = idPositionMap[id]
-      } else if (emptyCellLocations.length > 0) {
-        location = emptyCellLocations.shift()
+        position = idPositionMap[id]
+      } else if (emptyCellPositions.length > 0) {
+        position = emptyCellPositions.shift()
       } else {
         hasWebcast = false
       }
       if (hasWebcast) {
         videoCells.push(
           <VideoCell
-            location={location}
+            position={position}
             key={id}
             webcast={webcast}
             webcasts={this.props.webcasts}
             webcastsById={this.props.webcastsById}
             displayedWebcasts={this.props.displayedWebcasts}
-            addWebcastAtLocation={this.props.addWebcastAtLocation}
+            addWebcastAtPosition={this.props.addWebcastAtPosition}
           />
         )
       } else {
