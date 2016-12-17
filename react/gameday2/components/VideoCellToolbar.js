@@ -9,7 +9,7 @@ import { white, grey900 } from 'material-ui/styles/colors'
 const VideoCellToolbar = (props) => {
   const toolbarStyle = {
     backgroundColor: grey900,
-    ...this.props.style,
+    ...props.style,
   }
 
   const titleStyle = {

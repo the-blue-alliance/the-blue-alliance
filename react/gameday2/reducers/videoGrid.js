@@ -53,7 +53,7 @@ const trimToLayout = (state) => {
   while (positionMap.length > maxViewsForLayout) {
     const domPosition = positionMap.pop()
     const webcastId = domOrder[domPosition]
-    domOrder.splice(domPosition, 1)
+    domOrder[domPosition] = null
 
     const index = displayed.indexOf(webcastId)
     if (index >= 0) {
@@ -211,7 +211,9 @@ const videoGrid = (state = defaultState, action) => {
       return removeWebcast(state, action.webcastId)
     case types.RESET_WEBCASTS:
       return Object.assign({}, state, {
-        displayedWebcasts: [],
+        displayed: [],
+        domOrder: defaultDomOrder,
+        positionMap: defaultPositionMap,
       })
     default:
       return state
