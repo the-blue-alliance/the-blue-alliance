@@ -7,6 +7,7 @@ import Subheader from 'material-ui/Subheader'
 import Toggle from 'material-ui/Toggle'
 import { red500, fullWhite } from 'material-ui/styles/colors'
 import CheckmarkIcon from 'material-ui/svg-icons/navigation/check'
+import { getLayoutSvgIcon} from '../utils/layoutUtils'
 import { NUM_LAYOUTS, NAME_FOR_LAYOUT } from '../constants/LayoutConstants'
 
 export default class LayoutDrawer extends React.Component {
@@ -44,6 +45,7 @@ export default class LayoutDrawer extends React.Component {
             onTouchTap={() => this.props.setLayout(i)}
             key={i.toString()}
             leftIcon={icon}
+            rightIcon={getLayoutSvgIcon(i)}
           />
         )
       }
