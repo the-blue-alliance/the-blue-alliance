@@ -6,6 +6,7 @@ import EmbedYoutube from './EmbedYoutube'
 import EmbedTwitch from './EmbedTwitch'
 import VideoCellToolbarContainer from '../containers/VideoCellToolbarContainer'
 import WebcastSelectionOverlayDialogContainer from '../containers/WebcastSelectionOverlayDialogContainer'
+import SwapPositionOverlayDialogContainer from '../containers/SwapPositionOverlayDialogContainer'
 import { WebcastPropType } from '../utils/webcastUtils'
 
 export default class VideoCell extends React.Component {
@@ -23,6 +24,7 @@ export default class VideoCell extends React.Component {
 
     this.state = {
       webcastSelectionDialogOpen: false,
+      swapPositionDialogOpen: false,
     }
   }
 
@@ -32,6 +34,14 @@ export default class VideoCell extends React.Component {
 
   onRequestCloseWebcastSelectionDialog() {
     this.setState({ webcastSelectionDialogOpen: false })
+  }
+
+  onRequestOpenSwapPositionDialog() {
+    this.setState({ swapPositionDialogOpen: true })
+  }
+
+  onRequestCloseSwapPositionDialog() {
+    this.setState({ swapPositionDialogOpen: false })
   }
 
   onWebcastSelected(webcastId) {
@@ -83,12 +93,18 @@ export default class VideoCell extends React.Component {
             style={toolbarStyle}
             webcast={this.props.webcast}
             onRequestOpenWebcastSelectionDialog={() => this.onRequestOpenWebcastSelectionDialog()}
+            onRequestOpenSwapPositionDialog={() => this.onRequestOpenSwapPositionDialog()}
           />
           <WebcastSelectionOverlayDialogContainer
             open={this.state.webcastSelectionDialogOpen}
             webcast={this.props.webcast}
             onRequestClose={() => this.onRequestCloseWebcastSelectionDialog()}
             onWebcastSelected={(webcastId) => this.onWebcastSelected(webcastId)}
+          />
+          <SwapPositionOverlayDialogContainer
+            open={this.state.swapPositionDialogOpen}
+            location={this.props.location}
+            onRequestClose={() => this.onRequestCloseSwapPositionDialog()}
           />
         </div>
       )

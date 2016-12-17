@@ -29,6 +29,7 @@ const VideoCellToolbar = (props) => {
         <IconButton
           tooltip="Swap position"
           tooltipPosition="top-center"
+          onTouchTap={() => props.onRequestOpenSwapPositionDialog()}
           touch
         >
           <SwapIcon color={white} />
