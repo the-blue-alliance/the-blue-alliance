@@ -4,14 +4,15 @@ import FlatButton from 'material-ui/FlatButton'
 import List from 'material-ui/List'
 import EventListener from 'react-event-listener'
 import WebcastSelectionOverlayDialogItem from './WebcastSelectionOverlayDialogItem'
+import { webcastPropType } from '../utils/webcastUtils'
 
 export default class VideoCellOverlayDialog extends React.Component {
 
   static propTypes = {
     open: PropTypes.bool.isRequired,
-    webcasts: PropTypes.array.isRequired,
-    webcastsById: PropTypes.object.isRequired,
-    displayedWebcasts: PropTypes.array.isRequired,
+    webcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
+    webcastsById: PropTypes.objectOf(webcastPropType).isRequired,
+    displayedWebcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
     onWebcastSelected: PropTypes.func.isRequired,
     onRequestClose: PropTypes.func.isRequired,
   }
@@ -117,7 +118,7 @@ export default class VideoCellOverlayDialog extends React.Component {
     const webcastItems = []
     // Don't let the user choose a webcast that is already displayed elsewhere
     const availableWebcasts = this.props.webcasts.filter((webcastId) => this.props.displayedWebcasts.indexOf(webcastId) === -1)
-    for (const webcastId of availableWebcasts) {
+    availableWebcasts.forEach((webcastId) => {
       const webcast = this.props.webcastsById[webcastId]
       webcastItems.push(
         <WebcastSelectionOverlayDialogItem
@@ -126,7 +127,7 @@ export default class VideoCellOverlayDialog extends React.Component {
           webcastSelected={this.props.onWebcastSelected}
         />
       )
-    }
+    })
 
     if (this.props.open) {
       // This "div" soup is needed because React is deprecating the ability to
@@ -136,7 +137,7 @@ export default class VideoCellOverlayDialog extends React.Component {
         <div
           style={wrapperStyle}
           onTouchTap={() => this.onRequestClose()}
-          ref={e => { this.component = e }}
+          ref={(e) => { this.component = e }}
         >
           <EventListener
             target="window"
@@ -145,14 +146,14 @@ export default class VideoCellOverlayDialog extends React.Component {
           <Paper
             style={paperStyle}
             zDepth={5}
-            onTouchTap={e => e.stopPropagation()}
+            onTouchTap={(e) => e.stopPropagation()}
           >
             <h3 style={titleStyle}>Select a webcast</h3>
             <div
               style={listContainerStyle}
-              ref={e => { this.dialogListContainer = e }}
+              ref={(e) => { this.dialogListContainer = e }}
             >
-              <div ref={e => { this.dialogList = e }}>
+              <div ref={(e) => { this.dialogList = e }}>
                 <List>
                   {webcastItems}
                 </List>

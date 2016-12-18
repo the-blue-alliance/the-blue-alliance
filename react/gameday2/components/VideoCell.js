@@ -6,15 +6,14 @@ import EmbedTwitch from './EmbedTwitch'
 import VideoCellToolbarContainer from '../containers/VideoCellToolbarContainer'
 import WebcastSelectionOverlayDialogContainer from '../containers/WebcastSelectionOverlayDialogContainer'
 import SwapPositionOverlayDialogContainer from '../containers/SwapPositionOverlayDialogContainer'
-import { WebcastPropType } from '../utils/webcastUtils'
+import { webcastPropType } from '../utils/webcastUtils'
 import { LAYOUT_STYLES } from '../constants/LayoutConstants'
 
 export default class VideoCell extends React.Component {
   static propTypes = {
-    webcast: WebcastPropType,
-    webcasts: PropTypes.array.isRequired,
-    webcastsById: PropTypes.object.isRequired,
-    displayedWebcasts: PropTypes.array.isRequired,
+    webcast: webcastPropType,
+    webcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
+    displayedWebcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
     layoutId: PropTypes.number.isRequired,
     position: PropTypes.number.isRequired,
     addWebcastAtPosition: PropTypes.func.isRequired,

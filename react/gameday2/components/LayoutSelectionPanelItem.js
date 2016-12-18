@@ -25,6 +25,7 @@ export default React.createClass({
       [`layout-${layoutId}`]: true,
     })
 
+    /* eslint-disable jsx-a11y/no-static-element-interactions */
     return (
       <div className="col-md-4 layout-preview-container" onClick={this.handleClick} >
         <div className={containerClasses}>
@@ -33,5 +34,6 @@ export default React.createClass({
         <p>{NAME_FOR_LAYOUT[layoutId]}</p>
       </div>
     )
+    /* eslint-enable jsx-a11y/no-static-element-interactions */
   },
 })

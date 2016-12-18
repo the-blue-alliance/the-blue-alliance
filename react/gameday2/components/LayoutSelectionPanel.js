@@ -21,6 +21,7 @@ export default React.createClass({
             {currentRow}
           </div>)
         currentRow = []
+        /* eslint-disable no-plusplus */
         rowNum++
       }
     }

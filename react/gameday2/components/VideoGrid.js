@@ -1,15 +1,15 @@
 import React, { PropTypes } from 'react'
 import VideoCell from './VideoCell'
 import { getNumViewsForLayout } from '../utils/layoutUtils'
-import { WebcastPropType } from '../utils/webcastUtils'
+import { webcastPropType } from '../utils/webcastUtils'
 
 export default React.createClass({
   propTypes: {
     displayedWebcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
     domOrder: PropTypes.arrayOf(PropTypes.string).isRequired,
     positionMap: PropTypes.arrayOf(PropTypes.number).isRequired,
-    webcasts: PropTypes.arrayOf(WebcstPropType).isRequired,
-    webcastsById: PropTypes.object.isRequired,
+    webcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
+    webcastsById: PropTypes.objectOf(webcastPropType).isRequired,
     layoutId: PropTypes.number.isRequired,
     addWebcastAtPosition: PropTypes.func.isRequired,
   },
@@ -66,14 +66,13 @@ export default React.createClass({
             key={id}
             webcast={webcast}
             webcasts={this.props.webcasts}
-            webcastsById={this.props.webcastsById}
             displayedWebcasts={this.props.displayedWebcasts}
             addWebcastAtPosition={this.props.addWebcastAtPosition}
           />
         )
       } else {
         videoCells.push(
-          <div />
+          <div key={i.toString()} />
         )
       }
     }

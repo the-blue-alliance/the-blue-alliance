@@ -3,7 +3,7 @@ import VideoGrid from '../components/VideoGrid'
 import { addWebcastAtPosition, setLayout } from '../actions'
 import { getWebcastIdsInDisplayOrder } from '../selectors'
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   webcasts: getWebcastIdsInDisplayOrder(state),
   domOrder: state.videoGrid.domOrder,
   positionMap: state.videoGrid.positionMap,
@@ -12,9 +12,9 @@ const mapStateToProps = state => ({
   layoutId: state.videoGrid.layoutId,
 })
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
   addWebcastAtPosition: (webcastId, position) => dispatch(addWebcastAtPosition(webcastId, position)),
-  setLayout: layoutId => dispatch(setLayout(layoutId)),
+  setLayout: (layoutId) => dispatch(setLayout(layoutId)),
 })
 
 

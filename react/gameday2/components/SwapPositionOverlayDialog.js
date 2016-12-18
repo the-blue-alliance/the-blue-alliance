@@ -140,24 +140,24 @@ export default class SwapPositionOverlayDialog extends React.Component {
         <div
           style={styles.wrapperStyle}
           onTouchTap={() => this.onRequestClose()}
-          ref={e => { this.component = e }}
+          ref={(e) => { this.component = e }}
         >
           <EventListener
             target="window"
             onResize={() => this.updateSizing()}
           />
           <div
-            ref={e => { this.dialogContainer = e }}
+            ref={(e) => { this.dialogContainer = e }}
             style={styles.containerStyle}
           >
             <Paper
               style={styles.paperStyle}
               zDepth={5}
-              onTouchTap={e => e.stopPropagation()}
+              onTouchTap={(e) => e.stopPropagation()}
             >
               <h3 style={styles.titleStyle}>Select a position to swap with</h3>
               <div
-                ref={e => { this.dialogContent = e }}
+                ref={(e) => { this.dialogContent = e }}
                 style={styles.contentStyle}
               >
                 <div style={styles.previewContainerStyle}>

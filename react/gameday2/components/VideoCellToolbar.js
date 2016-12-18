@@ -57,7 +57,10 @@ const VideoCellToolbar = (props) => {
 
 VideoCellToolbar.propTypes = {
   webcast: PropTypes.object.isRequired,
+  /* eslint-disable react/no-unused-prop-types */
+  onRequestOpenSwapPositionDialog: PropTypes.func.isRequired,
   onRequestOpenWebcastSelectionDialog: PropTypes.func.isRequired,
+  /* eslint-enable react/no-unused-prop-types */
   removeWebcast: PropTypes.func.isRequired,
   style: PropTypes.object,
 }

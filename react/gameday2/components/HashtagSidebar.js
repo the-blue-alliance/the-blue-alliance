@@ -6,7 +6,7 @@ export default React.createClass({
     enabled: PropTypes.bool,
   },
   componentDidMount() {
-    (function (d, s, id) {
+    (function twitterEmbed(d, s, id) {
       const fjs = d.getElementsByTagName(s)[0]
       const p = /^http:/.test(d.location) ? 'http' : 'https'
       if (!d.getElementById(id)) {
@@ -23,13 +23,13 @@ export default React.createClass({
       'hashtag-sidebar': true,
     })
     const style = {
-      display: this.props.enabled ? null : 'none'
+      display: this.props.enabled ? null : 'none',
     }
 
     return (
       <div className={classes} style={style}>
         <div id="twitter-widget">
-          <a className="twitter-timeline" href="https://twitter.com/search?q=%23omgrobots" data-widget-id="406597120632709121">Tweets about "#omgrobots"</a>
+          <a className="twitter-timeline" href="https://twitter.com/search?q=%23omgrobots" data-widget-id="406597120632709121">Tweets about #omgrobots</a>
         </div>
       </div>
     )

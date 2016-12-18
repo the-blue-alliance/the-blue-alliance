@@ -24,8 +24,10 @@ function getStyles(props, state) {
 
 export default class SwapPositionPreviewCell extends React.Component {
   static propTypes = {
+    /* eslint-disable react/no-unused-prop-types */
     style: PropTypes.object.isRequired,
     enabled: PropTypes.bool.isRequired,
+    /* eslint-enable react/no-unused-prop-types */
     onClick: PropTypes.func.isRequired,
   }
 
@@ -58,6 +60,7 @@ export default class SwapPositionPreviewCell extends React.Component {
   render() {
     const styles = getStyles(this.props, this.state)
 
+    /* eslint-disable jsx-a11y/no-static-element-interactions */
     return (
       <div
         style={styles}
@@ -66,5 +69,6 @@ export default class SwapPositionPreviewCell extends React.Component {
         onClick={() => this.onClick()}
       />
     )
+    /* eslint-enable jsx-a11y/no-static-element-interactions */
   }
 }

@@ -3,7 +3,6 @@ import AppBar from 'material-ui/AppBar'
 import FlatButton from 'material-ui/FlatButton'
 import LayoutDrawer from './LayoutDrawer'
 import { getLayoutSvgIcon } from '../utils/layoutUtils'
-import { WebcastPropType } from '../utils/webcastUtils'
 
 const GamedayNavbar = (props) => {
   const configureLayoutButton = (
@@ -40,7 +39,7 @@ const GamedayNavbar = (props) => {
 }
 
 GamedayNavbar.propTypes = {
-  webcasts: PropTypes.arrayOf(WebcastPropType).isRequired,
+  webcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
   hashtagSidebarVisible: PropTypes.bool.isRequired,
   chatSidebarVisible: PropTypes.bool.isRequired,
   resetWebcasts: PropTypes.func.isRequired,
