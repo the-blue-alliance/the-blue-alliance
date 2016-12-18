@@ -35,6 +35,10 @@ def main(sdk_path, test_pattern):
     django.conf.global_settings.SECRET_KEY = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django.conf.global_settings')
 
+    # Set up custom django template filters
+    from google.appengine.ext.webapp import template
+    template.register_template_library('common.my_filters')
+
     sys.path.insert(0, sdk_path)
     import dev_appserver
     dev_appserver.fix_sys_path()
