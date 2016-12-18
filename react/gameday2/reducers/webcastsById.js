@@ -23,7 +23,7 @@ const getWebcastsFromRawWebcasts = (webcasts) => {
   })
 
   // Now, process normal event webcasts
-  eventsWithWebcasts.forEach(event => {
+  eventsWithWebcasts.forEach((event) => {
     event.webcast.forEach((webcast, index) => {
       let name = (event.short_name ? event.short_name : event.name)
       if (event.webcast.length > 1) {

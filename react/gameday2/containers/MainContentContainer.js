@@ -3,7 +3,7 @@ import MainContent from '../components/MainContent'
 import { setLayout } from '../actions'
 import { getWebcastIds } from '../selectors'
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   webcasts: getWebcastIds(state),
   hashtagSidebarVisible: state.visibility.hashtagSidebar,
   chatSidebarVisible: state.visibility.chatSidebar,
@@ -11,8 +11,8 @@ const mapStateToProps = (state) => ({
 })
 
 
-const mapDispatchToProps = (dispatch) => ({
-  setLayout: (layoutId) => dispatch(setLayout(layoutId)),
+const mapDispatchToProps = dispatch => ({
+  setLayout: layoutId => dispatch(setLayout(layoutId)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(MainContent)

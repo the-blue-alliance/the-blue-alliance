@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 import ChatSidebar from '../components/ChatSidebar'
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   enabled: state.visibility.chatSidebar,
   hasBeenVisible: state.visibility.chatSidebarHasBeenVisible,
 })

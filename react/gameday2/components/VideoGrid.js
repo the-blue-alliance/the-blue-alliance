@@ -1,13 +1,14 @@
 import React, { PropTypes } from 'react'
 import VideoCell from './VideoCell'
 import { getNumViewsForLayout } from '../utils/layoutUtils'
+import { WebcastPropType } from '../utils/webcastUtils'
 
 export default React.createClass({
   propTypes: {
-    displayedWebcasts: PropTypes.array.isRequired,
-    domOrder: PropTypes.array.isRequired,
-    positionMap: PropTypes.array.isRequired,
-    webcasts: PropTypes.array.isRequired,
+    displayedWebcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
+    domOrder: PropTypes.arrayOf(PropTypes.string).isRequired,
+    positionMap: PropTypes.arrayOf(PropTypes.number).isRequired,
+    webcasts: PropTypes.arrayOf(WebcstPropType).isRequired,
     webcastsById: PropTypes.object.isRequired,
     layoutId: PropTypes.number.isRequired,
     addWebcastAtPosition: PropTypes.func.isRequired,
