@@ -9,7 +9,7 @@ const GamedayNavbar = (props) => {
     <FlatButton
       label="Configure Layout"
       labelPosition="before"
-      icon={getLayoutSvgIcon(props.layoutId, "#ffffff")}
+      icon={getLayoutSvgIcon(props.layoutId, '#ffffff')}
       onTouchTap={() => props.setLayoutDrawerVisibility(true)}
     />
   )
