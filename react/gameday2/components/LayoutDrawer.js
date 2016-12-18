@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react'
+import muiThemeable from 'material-ui/styles/muiThemeable'
 import RaisedButton from 'material-ui/RaisedButton'
 import Drawer from 'material-ui/Drawer'
 import Divider from 'material-ui/Divider'
@@ -10,7 +11,7 @@ import CheckmarkIcon from 'material-ui/svg-icons/navigation/check'
 import { getLayoutSvgIcon } from '../utils/layoutUtils'
 import { NUM_LAYOUTS, NAME_FOR_LAYOUT } from '../constants/LayoutConstants'
 
-export default class LayoutDrawer extends React.Component {
+class LayoutDrawer extends React.Component {
   static propTypes = {
     setLayout: PropTypes.func.isRequired,
     selectedLayout: PropTypes.number.isRequired,
@@ -73,6 +74,8 @@ export default class LayoutDrawer extends React.Component {
       />
     )
 
+    const primaryColor = this.props.muiTheme.palette.primary1Color
+
     return (
       <Drawer
         docked={false}
@@ -83,12 +86,12 @@ export default class LayoutDrawer extends React.Component {
       >
         <div>
           <List>
-            <Subheader>Select video grid layout</Subheader>
+            <Subheader style={{ color: primaryColor }}>Select video grid layout</Subheader>
             {layouts}
           </List>
           <Divider />
           <List>
-            <Subheader>Enable/disable sidebars</Subheader>
+            <Subheader style={{ color: primaryColor }}>Enable/disable sidebars</Subheader>
             <ListItem
               primaryText="Social Sidebar"
               rightToggle={hashtagToggle}
@@ -113,3 +116,5 @@ export default class LayoutDrawer extends React.Component {
     )
   }
 }
+
+export default muiThemeable()(LayoutDrawer)
