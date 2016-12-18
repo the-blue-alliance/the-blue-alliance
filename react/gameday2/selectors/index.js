@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import { createSelector } from 'reselect'
 
-const getWebcastsById = (state) => state.webcastsById
+const getWebcastsById = state => state.webcastsById
 
 export const getWebcastIds = createSelector(
   [getWebcastsById],
@@ -11,7 +11,7 @@ export const getWebcastIds = createSelector(
     .filter(key => ({}.hasOwnProperty.call(webcastsById, key)))
     .forEach(key => webcastIds.push(key))
     return webcastIds
-  }
+  },
 )
 
 export const getWebcastIdsInDisplayOrder = createSelector(
@@ -31,19 +31,15 @@ export const getWebcastIdsInDisplayOrder = createSelector(
 
     const orderedWebcasts = webcastsArray.filter(webcast => ({}.hasOwnProperty.call(webcast, 'sortOrder')))
     const sortedOrderedWebcasts = orderedWebcasts.sort((a, b) => a.sortOrder > b.sortOrder)
-    for (const webcast of sortedOrderedWebcasts) {
-      displayOrderWebcastIds.push(webcast.id)
-    }
+    sortedOrderedWebcasts.forEach(webcast => displayOrderWebcastIds.push(webcast.id))
 
     // Next, sort all webcasts without an explicit sort order and sort them by
     // webcast name
 
     const unorderedWebcasts = webcastsArray.filter(webcast => !({}.hasOwnProperty.call(webcast, 'sortOrder')))
     const sortedUnorderedWebcasts = unorderedWebcasts.sort((a, b) => a.name.localeCompare(b.name))
-    for (const webcast of sortedUnorderedWebcasts) {
-      displayOrderWebcastIds.push(webcast.id)
-    }
+    sortedUnorderedWebcasts.forEach(webcast => displayOrderWebcastIds.push(webcast.id))
 
     return displayOrderWebcastIds
-  }
+  },
 )

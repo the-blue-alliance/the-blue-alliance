@@ -15,7 +15,7 @@ const GamedayFrame = React.createClass({
     this.setState({ followingTeams: newFollowingTeams })
   },
   handleUnfollowTeam(team) {
-    const newFollowingTeams = this.state.followingTeams.filter((a) => a !== team)
+    const newFollowingTeams = this.state.followingTeams.filter(a => a !== team)
     this.setState({ followingTeams: newFollowingTeams })
   },
   render() {

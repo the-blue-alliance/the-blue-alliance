@@ -30,7 +30,7 @@ const setChatSidebarVisibility = (visibility, state) => (Object.assign({}, state
   chatSidebarHasBeenVisible: (state.chatSidebarHasBeenVisible || visibility),
 }))
 
-const toggleHashtagSidebarVisibility = (state) => (Object.assign({}, state, {
+const toggleHashtagSidebarVisibility = state => (Object.assign({}, state, {
   hashtagSidebar: !state.hashtagSidebar,
 }))
 
@@ -38,7 +38,7 @@ const setHashtagSidebarVisibility = (visibility, state) => (Object.assign({}, st
   hashtagSidebar: visibility,
 }))
 
-const toggleLayoutDrawerVisibility = (state) => (Object.assign({}, state, {
+const toggleLayoutDrawerVisibility = state => (Object.assign({}, state, {
   layoutDrawer: !state.layoutDrawer,
 }))
 

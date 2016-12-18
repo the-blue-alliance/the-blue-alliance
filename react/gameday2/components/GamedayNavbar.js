@@ -40,15 +40,11 @@ const GamedayNavbar = (props) => {
 
 GamedayNavbar.propTypes = {
   webcasts: PropTypes.array.isRequired,
-  webcastsById: PropTypes.object.isRequired,
   hashtagSidebarVisible: PropTypes.bool.isRequired,
   chatSidebarVisible: PropTypes.bool.isRequired,
-  addWebcast: PropTypes.func.isRequired,
   resetWebcasts: PropTypes.func.isRequired,
   toggleHashtagSidebarVisibility: PropTypes.func.isRequired,
-  setHashtagSidebarVisibility: PropTypes.func.isRequired,
   toggleChatSidebarVisibility: PropTypes.func.isRequired,
-  setChatSidebarVisibility: PropTypes.func.isRequired,
   setLayout: PropTypes.func.isRequired,
   layoutId: PropTypes.number.isRequired,
   layoutSet: PropTypes.bool.isRequired,

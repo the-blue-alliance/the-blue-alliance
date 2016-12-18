@@ -20,7 +20,7 @@ const webcastData = $.parseJSON($('#webcasts_json').text())
 
 const store = createStore(gamedayReducer, compose(
   applyMiddleware(thunk),
-  window.devToolsExtension ? window.devToolsExtension() : f => f
+  window.devToolsExtension ? window.devToolsExtension() : f => f,
 ))
 
 const muiTheme = getMuiTheme({
@@ -36,7 +36,7 @@ ReactDOM.render(
       <GamedayFrame />
     </Provider>
   </MuiThemeProvider>,
-  document.getElementById('content')
+  document.getElementById('content'),
 )
 
 

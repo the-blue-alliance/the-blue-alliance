@@ -3,12 +3,10 @@ import { MAX_SUPPORTED_VIEWS, NUM_VIEWS_FOR_LAYOUT } from '../constants/LayoutCo
 
 // Position map maps from a position index in the grid to a position in the DOM ordering
 
-const defaultPositionMap = []
-const defaultDomOrder = []
-for (let i = 0; i < MAX_SUPPORTED_VIEWS; i++) {
-  defaultDomOrder.push(null)
-  defaultPositionMap.push(-1)
-}
+const defaultPositionMap = new Array(MAX_SUPPORTED_VIEWS)
+const defaultDomOrder = new Array(MAX_SUPPORTED_VIEWS)
+defaultDomOrder.fill(null)
+defaultPositionMap.fill(-1)
 
 const defaultState = {
   layoutId: 0,

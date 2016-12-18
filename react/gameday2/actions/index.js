@@ -50,7 +50,7 @@ export function setLayoutDrawerVisibility(visible) {
   }
 }
 
-const addWebcastNoCheck = (webcastId) => ({
+const addWebcastNoCheck = webcastId => ({
   type: types.ADD_WEBCAST,
   webcastId,
 })

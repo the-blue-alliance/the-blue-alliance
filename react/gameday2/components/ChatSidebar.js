@@ -7,7 +7,7 @@ const ChatSidebar = (props) => {
   })
 
   const style = {
-    display: props.enabled ? null : 'none'
+    display: props.enabled ? null : 'none',
   }
 
   let content

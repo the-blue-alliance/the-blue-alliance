@@ -5,7 +5,6 @@ import { getWebcastIdsInDisplayOrder } from '../selectors'
 
 const mapStateToProps = (state) => ({
   webcasts: getWebcastIdsInDisplayOrder(state),
-  webcastsById: state.webcastsById,
   layoutId: state.videoGrid.layoutId,
   layoutSet: state.videoGrid.layoutSet,
   hashtagSidebarVisible: state.visibility.hashtagSidebar,
@@ -18,7 +17,6 @@ const mapDispatchToProps = (dispatch) => ({
   setChatSidebarVisibility: (visible) => dispatch(actions.setChatSidebarVisibility(visible)),
   toggleHashtagSidebarVisibility: () => dispatch(actions.toggleHashtagSidebarVisibility()),
   setHashtagSidebarVisibility: (visible) => dispatch(actions.setHashtagSidebarVisibility(visible)),
-  addWebcast: (id) => dispatch(actions.addWebcast(id)),
   resetWebcasts: () => dispatch(actions.resetWebcasts()),
   setLayout: (layoutId) => dispatch(actions.setLayout(layoutId)),
   toggleLayoutDrawerVisibility: () => dispatch(actions.toggleLayoutDrawerVisibility()),
