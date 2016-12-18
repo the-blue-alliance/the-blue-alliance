@@ -20,11 +20,14 @@ export default React.createClass({
   },
   render() {
     const classes = classNames({
-      hidden: !this.props.enabled,
       'hashtag-sidebar': true,
     })
+    const style = {
+      display: this.props.enabled ? null : 'none'
+    }
+
     return (
-      <div className={classes}>
+      <div className={classes} style={style}>
         <div id="twitter-widget">
           <a className="twitter-timeline" href="https://twitter.com/search?q=%23omgrobots" data-widget-id="406597120632709121">Tweets about "#omgrobots"</a>
         </div>
