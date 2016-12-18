@@ -1,10 +1,11 @@
 import React, { PropTypes } from 'react'
 import classNames from 'classnames'
 
-export default React.createClass({
-  propTypes: {
+export default class HashtagSidebar extends React.Component {
+  static propTypes = {
     enabled: PropTypes.bool,
-  },
+  }
+
   componentDidMount() {
     (function twitterEmbed(d, s, id) {
       const fjs = d.getElementsByTagName(s)[0]
@@ -17,7 +18,8 @@ export default React.createClass({
         fjs.parentNode.insertBefore(js, fjs)
       }
     }(document, 'script', 'twitter-wjs'))
-  },
+  }
+
   render() {
     const classes = classNames({
       'hashtag-sidebar': true,
@@ -33,5 +35,5 @@ export default React.createClass({
         </div>
       </div>
     )
-  },
-})
+  }
+}

@@ -2,10 +2,11 @@ import React, { PropTypes } from 'react'
 import LayoutSelectionPanelItem from './LayoutSelectionPanelItem'
 import { NUM_LAYOUTS } from '../constants/LayoutConstants'
 
-export default React.createClass({
-  propTypes: {
+export default class LayoutSelectionPanel extends React.Component {
+  static propTypes = {
     setLayout: PropTypes.func.isRequired,
-  },
+  }
+
   generateLayoutRows() {
     const rows = []
     let currentRow = []
@@ -13,7 +14,7 @@ export default React.createClass({
     for (let i = 0; i < NUM_LAYOUTS; i++) {
       const layoutKey = `layout-${i}`
       currentRow.push(
-        <LayoutSelectionPanelItem layoutId={i} key={layoutKey} setLayout={this.props.setLayout} />
+        <LayoutSelectionPanelItem layoutId={i} key={layoutKey} setLayout={(layoutId) => this.props.setLayout(layoutId)} />
       )
       if (currentRow.length >= 3) {
         rows.push(
@@ -26,7 +27,8 @@ export default React.createClass({
       }
     }
     return rows
-  },
+  }
+
   render() {
     const rows = this.generateLayoutRows()
     return (
@@ -35,5 +37,5 @@ export default React.createClass({
         {rows}
       </div>
     )
-  },
-})
+  }
+}

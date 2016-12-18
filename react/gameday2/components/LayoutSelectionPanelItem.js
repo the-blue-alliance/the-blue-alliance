@@ -2,14 +2,16 @@ import React, { PropTypes } from 'react'
 import classNames from 'classnames'
 import { NUM_VIEWS_FOR_LAYOUT, NAME_FOR_LAYOUT } from '../constants/LayoutConstants'
 
-export default React.createClass({
-  propTypes: {
+export default class LayoutSelectionPanelItem extends React.Component {
+  static propTypes = {
     layoutId: PropTypes.number.isRequired,
     setLayout: PropTypes.func.isRequired,
-  },
+  }
+
   handleClick() {
     this.props.setLayout(this.props.layoutId)
-  },
+  }
+
   render() {
     const videoViews = []
     const layoutId = this.props.layoutId
@@ -27,7 +29,7 @@ export default React.createClass({
 
     /* eslint-disable jsx-a11y/no-static-element-interactions */
     return (
-      <div className="col-md-4 layout-preview-container" onClick={this.handleClick} >
+      <div className="col-md-4 layout-preview-container" onClick={() => this.handleClick()} >
         <div className={containerClasses}>
           {videoViews}
         </div>
@@ -35,5 +37,5 @@ export default React.createClass({
       </div>
     )
     /* eslint-enable jsx-a11y/no-static-element-interactions */
-  },
-})
+  }
+}

@@ -44,7 +44,7 @@ const MainContent = (props) => {
 }
 
 MainContent.propTypes = {
-  webcasts: PropTypes.array.isRequired,
+  webcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
   hashtagSidebarVisible: PropTypes.bool.isRequired,
   chatSidebarVisible: PropTypes.bool.isRequired,
   layoutSet: PropTypes.bool.isRequired,

@@ -3,8 +3,8 @@ import VideoCell from './VideoCell'
 import { getNumViewsForLayout } from '../utils/layoutUtils'
 import { webcastPropType } from '../utils/webcastUtils'
 
-export default React.createClass({
-  propTypes: {
+export default class VideoGrid extends React.Component {
+  static propTypes = {
     displayedWebcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
     domOrder: PropTypes.arrayOf(PropTypes.string).isRequired,
     positionMap: PropTypes.arrayOf(PropTypes.number).isRequired,
@@ -12,7 +12,8 @@ export default React.createClass({
     webcastsById: PropTypes.objectOf(webcastPropType).isRequired,
     layoutId: PropTypes.number.isRequired,
     addWebcastAtPosition: PropTypes.func.isRequired,
-  },
+  }
+
   renderLayout(webcastCount) {
     const videoGridStyle = {
       width: '100%',
@@ -82,10 +83,11 @@ export default React.createClass({
         {videoCells}
       </div>
     )
-  },
+  }
+
   render() {
     const selectedLayoutId = this.props.layoutId
     const numViews = getNumViewsForLayout(selectedLayoutId)
     return this.renderLayout(numViews, selectedLayoutId)
-  },
-})
+  }
+}
