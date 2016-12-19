@@ -1,8 +1,14 @@
-@import "layouts.less";
+@import "normalize.less";
 @import "sidebars.less";
 @import "nowebcasts.less";
 
 @navbar-height: 50px;
+
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
 
 html {
   height: 100%;
@@ -11,21 +17,12 @@ html {
 body {
   background: black;
   height: 100%;
-  padding-top: @navbar-height;
+  font-family: 'Roboto', sans-serif;
 }
 
 #content {
   height: 100%;
   overflow: hidden;
-}
-
-.navbar-default .navbar-nav a.navbar-icon {
-  padding-top: 0;
-  padding-bottom: 0;
-  i {
-    height: @navbar-height;
-    line-height: @navbar-height;
-  }
 }
 
 .container-full {
@@ -37,139 +34,12 @@ body {
   right: 0;
 }
 
-.video-grid {
-  width: 100%;
-  height: 100%;
-}
-
-.video-cell {
-  height: 100%;
-  width: 100%;
-  position: relative;
-  outline: 1px solid white;
-}
-
-.video-cell-overlay {
-  position: absolute;
-  top: 0;
-  width: 100%;
-  &.expanded {
-    height: 100%;
-  }
-}
-
-.video-cell-overlay.panel {
-  background-color: transparent;
-}
-
 #twitter-widget {
   height: 100%;
   background: white;
 }
 iframe[id^='twitter-widget-'] {
   height: 100% !important;
-}
-
-.panel-title {
-  display: inline-block;
-}
-
-.overlay-button-container {
-  float: right;
-  i {
-    line-height: 20px;
-  }
-}
-
-.overlay-button {
-  float: left;
-  color: #777;
-  margin-left: 10px;
-  cursor: pointer;
-  &:hover {
-    color: #333;
-  }
-}
-
-.jumbotron {
-  height: 100%;
-  text-align: center;
-  background-color: black;
-  color: white;
-}
-
-.empty-view {
-  width: 100%;
-  height: 100%;
-
-  .btn.btn-secondary {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-50%);
-  }
-}
-
-.webcast-selection-panel {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background-color: white;
-  overflow: auto;
-  padding-left: 40px;
-  padding-right: 40px;
-
-  .list-group {
-    max-width: 400px;
-    margin: auto;
-    margin-top: 15px;
-    margin-bottom: 15px;
-  }
-
-  .button-close {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-  }
-}
-
-.swap-panel {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background-color: black;
-  padding: 50px;
-
-  .layout-preview-container {
-    position: relative;
-    height: 100%;
-    width: 100%;
-  }
-
-  div[class^="video-"] {
-    background-color: white;
-    padding: 4px;
-    background-clip: content-box;
-
-    &:not(.current-location):hover {
-      background-color: #bbb;
-      cursor: pointer;
-    }
-
-    &.current-location {
-      background-color: #333;
-    }
-  }
-
-  .button-close {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-  }
 }
 
 .layout-selection-panel {

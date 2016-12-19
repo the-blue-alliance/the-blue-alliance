@@ -1,12 +1,13 @@
 import React, { PropTypes } from 'react'
 import classNames from 'classnames'
 
-export default React.createClass({
-  propTypes: {
+export default class HashtagSidebar extends React.Component {
+  static propTypes = {
     enabled: PropTypes.bool,
-  },
+  }
+
   componentDidMount() {
-    (function (d, s, id) {
+    (function twitterEmbed(d, s, id) {
       const fjs = d.getElementsByTagName(s)[0]
       const p = /^http:/.test(d.location) ? 'http' : 'https'
       if (!d.getElementById(id)) {
@@ -17,18 +18,22 @@ export default React.createClass({
         fjs.parentNode.insertBefore(js, fjs)
       }
     }(document, 'script', 'twitter-wjs'))
-  },
+  }
+
   render() {
     const classes = classNames({
-      hidden: !this.props.enabled,
       'hashtag-sidebar': true,
     })
+    const style = {
+      display: this.props.enabled ? null : 'none',
+    }
+
     return (
-      <div className={classes}>
+      <div className={classes} style={style}>
         <div id="twitter-widget">
-          <a className="twitter-timeline" href="https://twitter.com/search?q=%23omgrobots" data-widget-id="406597120632709121">Tweets about "#omgrobots"</a>
+          <a className="twitter-timeline" href="https://twitter.com/search?q=%23omgrobots" data-widget-id="406597120632709121">Tweets about #omgrobots</a>
         </div>
       </div>
     )
-  },
-})
+  }
+}

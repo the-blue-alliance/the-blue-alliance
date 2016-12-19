@@ -11,6 +11,7 @@ var cleanCSS = require('gulp-clean-css');
 var babelify = require('babelify');
 var uglify = require('gulp-uglify');
 var buffer = require('vinyl-buffer');
+var gulpif = require('gulp-if');
 
 var args = require('yargs').argv;
 
@@ -45,7 +46,7 @@ function compile(watch) {
     cache: {},
     packageCache: {},
   }).transform('babelify', {
-    presets: ['es2015', 'react']
+    presets: ['es2015', 'react', 'stage-2']
   });
 
   function rebundle() {
@@ -54,7 +55,7 @@ function compile(watch) {
       .pipe(source(config.gameday.js.outputFile))
       .pipe(buffer())
       .pipe(sourcemaps.init({loadMaps: true}))
-      .pipe(uglify())
+      .pipe(gulpif(args.production, uglify()))
       .on('error', errorHandler)
       .pipe(sourcemaps.write('./'))
       .pipe(debug())

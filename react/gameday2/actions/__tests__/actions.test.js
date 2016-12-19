@@ -25,6 +25,13 @@ describe('actions', () => {
     expect(actions.toggleChatSidebarVisibility()).toEqual(expectedAction)
   })
 
+  it('should create an action to toggle the layout drawer visibility', () => {
+    const expectedAction = {
+      type: types.TOGGLE_LAYOUT_DRAWER_VISIBILITY,
+    }
+    expect(actions.toggleLayoutDrawerVisibility()).toEqual(expectedAction)
+  })
+
   it('should create an action to add a webcast if the webcast ID exists in webcastsById', () => {
     const webcastId = 'a'
     const getState = () => ({
@@ -49,43 +56,43 @@ describe('actions', () => {
     expect(dispatch.calls.any()).toBe(false)
   })
 
-  it('should create an action to add a webcast at a specific location if the webcast ID exists in webcastsById', () => {
+  it('should create an action to add a webcast at a specific position if the webcast ID exists in webcastsById', () => {
     const webcastId = 'a'
-    const location = 0
+    const position = 0
     const getState = () => ({
       webcastsById: {
         [webcastId]: {},
       },
     })
     const dispatch = jasmine.createSpy()
-    actions.addWebcastAtLocation(webcastId, location)(dispatch, getState)
+    actions.addWebcastAtPosition(webcastId, position)(dispatch, getState)
     expect(dispatch).toHaveBeenCalledWith({
-      type: types.ADD_WEBCAST_AT_LOCATION,
+      type: types.ADD_WEBCAST_AT_POSITION,
       webcastId,
-      location,
+      position,
     })
   })
 
-  it('should not create an action to add a webcast at a specific location if the webcast ID does not exist in webcastsById', () => {
+  it('should not create an action to add a webcast at a specific position if the webcast ID does not exist in webcastsById', () => {
     const webcastId = 'a'
-    const location = 0
+    const position = 0
     const getState = () => ({
       webcastsById: {},
     })
     const dispatch = jasmine.createSpy()
-    actions.addWebcastAtLocation(webcastId, location)(dispatch, getState)
+    actions.addWebcastAtPosition(webcastId, position)(dispatch, getState)
     expect(dispatch.calls.any()).toBe(false)
   })
 
   it('should create an action to swap two webcasts', () => {
-    const firstLocation = 0
-    const secondLocation = 1
+    const firstPosition = 0
+    const secondPosition = 1
     const expectedAction = {
       type: types.SWAP_WEBCASTS,
-      firstLocation,
-      secondLocation,
+      firstPosition,
+      secondPosition,
     }
-    expect(actions.swapWebcasts(firstLocation, secondLocation)).toEqual(expectedAction)
+    expect(actions.swapWebcasts(firstPosition, secondPosition)).toEqual(expectedAction)
   })
 
   it('should create an action to remove a specified webcast', () => {

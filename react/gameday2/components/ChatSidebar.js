@@ -3,14 +3,17 @@ import classNames from 'classnames'
 
 const ChatSidebar = (props) => {
   const classes = classNames({
-    hidden: !props.enabled,
     'chat-sidebar': true,
   })
+
+  const style = {
+    display: props.enabled ? null : 'none',
+  }
 
   let content
   if (props.hasBeenVisible) {
     content = (
-      <div className={classes}>
+      <div className={classes} style={style}>
         <iframe
           frameBorder="0"
           scrolling="no"

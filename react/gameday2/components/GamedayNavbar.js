@@ -1,47 +1,55 @@
 import React, { PropTypes } from 'react'
-import SettingsDropdown from './SettingsDropdown'
-import SidebarToggleDropdown from './SidebarToggleDropdown'
-import LayoutDropdown from './LayoutDropdown'
+import AppBar from 'material-ui/AppBar'
+import FlatButton from 'material-ui/FlatButton'
+import LayoutDrawer from './LayoutDrawer'
+import { getLayoutSvgIcon } from '../utils/layoutUtils'
 
-const GamedayNavbar = (props) => (
-  <nav className="navbar navbar-default navbar-fixed-top" role="navigation">
-    <div className="container-fluid">
-      <div className="navbar-header">
-        <button type="button" className="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-          <span className="sr-only">Toggle navigation</span>
-          <span className="icon-bar" />
-          <span className="icon-bar" />
-          <span className="icon-bar" />
-        </button>
-        <span className="navbar-brand">Gameday</span>
-      </div>
+const GamedayNavbar = (props) => {
+  const configureLayoutButton = (
+    <FlatButton
+      label="Configure Layout"
+      labelPosition="before"
+      icon={getLayoutSvgIcon(props.layoutId, '#ffffff')}
+      onTouchTap={() => props.setLayoutDrawerVisibility(true)}
+    />
+  )
 
-      <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-        <ul className="nav navbar-nav navbar-right">
-          <LayoutDropdown setLayout={props.setLayout} />
-          <SidebarToggleDropdown
-            toggleChatSidebarVisibility={props.toggleChatSidebarVisibility}
-            toggleHashtagSidebarVisibility={props.toggleHashtagSidebarVisibility}
-            chatSidebarVisible={props.chatSidebarVisible}
-            hashtagSidebarVisible={props.hashtagSidebarVisible}
-          />
-          <SettingsDropdown resetWebcasts={props.resetWebcasts} />
-        </ul>
-      </div>
+  return (
+    <div>
+      <AppBar
+        title="GameDay"
+        showMenuIconButton={false}
+        iconElementRight={configureLayoutButton}
+      />
+      <LayoutDrawer
+        setLayout={props.setLayout}
+        toggleChatSidebarVisibility={props.toggleChatSidebarVisibility}
+        toggleHashtagSidebarVisibility={props.toggleHashtagSidebarVisibility}
+        selectedLayout={props.layoutId}
+        layoutSet={props.layoutSet}
+        chatSidebarVisible={props.chatSidebarVisible}
+        hashtagSidebarVisible={props.hashtagSidebarVisible}
+        layoutDrawerVisible={props.layoutDrawerVisible}
+        setLayoutDrawerVisibility={props.setLayoutDrawerVisibility}
+        hasWebcasts={props.webcasts.length > 0}
+        resetWebcasts={props.resetWebcasts}
+      />
     </div>
-  </nav>
-)
+  )
+}
 
 GamedayNavbar.propTypes = {
-  webcasts: PropTypes.array.isRequired,
-  webcastsById: PropTypes.object.isRequired,
+  webcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
   hashtagSidebarVisible: PropTypes.bool.isRequired,
   chatSidebarVisible: PropTypes.bool.isRequired,
-  addWebcast: PropTypes.func.isRequired,
   resetWebcasts: PropTypes.func.isRequired,
   toggleHashtagSidebarVisibility: PropTypes.func.isRequired,
   toggleChatSidebarVisibility: PropTypes.func.isRequired,
   setLayout: PropTypes.func.isRequired,
+  layoutId: PropTypes.number.isRequired,
+  layoutSet: PropTypes.bool.isRequired,
+  layoutDrawerVisible: PropTypes.bool.isRequired,
+  setLayoutDrawerVisibility: PropTypes.func.isRequired,
 }
 
 export default GamedayNavbar

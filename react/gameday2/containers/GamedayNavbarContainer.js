@@ -5,17 +5,22 @@ import { getWebcastIdsInDisplayOrder } from '../selectors'
 
 const mapStateToProps = (state) => ({
   webcasts: getWebcastIdsInDisplayOrder(state),
-  webcastsById: state.webcastsById,
+  layoutId: state.videoGrid.layoutId,
+  layoutSet: state.videoGrid.layoutSet,
   hashtagSidebarVisible: state.visibility.hashtagSidebar,
   chatSidebarVisible: state.visibility.chatSidebar,
+  layoutDrawerVisible: state.visibility.layoutDrawer,
 })
 
 const mapDispatchToProps = (dispatch) => ({
   toggleChatSidebarVisibility: () => dispatch(actions.toggleChatSidebarVisibility()),
+  setChatSidebarVisibility: (visible) => dispatch(actions.setChatSidebarVisibility(visible)),
   toggleHashtagSidebarVisibility: () => dispatch(actions.toggleHashtagSidebarVisibility()),
-  addWebcast: (id) => dispatch(actions.addWebcast(id)),
+  setHashtagSidebarVisibility: (visible) => dispatch(actions.setHashtagSidebarVisibility(visible)),
   resetWebcasts: () => dispatch(actions.resetWebcasts()),
   setLayout: (layoutId) => dispatch(actions.setLayout(layoutId)),
+  toggleLayoutDrawerVisibility: () => dispatch(actions.toggleLayoutDrawerVisibility()),
+  setLayoutDrawerVisibility: (visible) => dispatch(actions.setLayoutDrawerVisibility(visible)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(GamedayNavbar)
