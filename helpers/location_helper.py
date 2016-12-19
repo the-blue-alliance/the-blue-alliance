@@ -62,6 +62,9 @@ class LocationHelper(object):
 
     @classmethod
     def update_event_location(cls, event):
+        if not event.location:
+            return
+
         location_info, score = cls.get_event_location_info(event)
 
         # Log performance
@@ -71,25 +74,34 @@ class LocationHelper(object):
         else:
             logging.info(text)
 
+        # Fallback to location only
+        if not location_info:
+            logging.warning("Falling back to location only for event {}".format(event.key.id()))
+            geocode_result = cls.google_maps_geocode_async(event.location).get_result()
+            if geocode_result:
+                location_info = cls.construct_location_info_async(geocode_result[0]).get_result()
+            else:
+                logging.warning("Event {} location failed!".format(event.key.id()))
+
         # Update event
         if 'lat' in location_info and 'lng' in location_info:
             lat_lng = ndb.GeoPt(location_info['lat'], location_info['lng'])
         else:
             lat_lng = None
         event.normalized_location = Location(
-            name=location_info.get('name', None),
-            formatted_address=location_info.get('formatted_address', None),
+            name=location_info.get('name'),
+            formatted_address=location_info.get('formatted_address'),
             lat_lng=lat_lng,
-            street_number=location_info.get('street_number', None),
-            street=location_info.get('street', None),
-            city=location_info.get('city', None),
-            state_prov=location_info.get('state_prov', None),
-            state_prov_short=location_info.get('state_prov_short', None),
-            country=location_info.get('country', None),
-            country_short=location_info.get('country_short', None),
-            postal_code=location_info.get('postal_code', None),
-            place_id=location_info.get('place_id', None),
-            place_details=location_info.get('place_details', None),
+            street_number=location_info.get('street_number'),
+            street=location_info.get('street'),
+            city=location_info.get('city'),
+            state_prov=location_info.get('state_prov'),
+            state_prov_short=location_info.get('state_prov_short'),
+            country=location_info.get('country'),
+            country_short=location_info.get('country_short'),
+            postal_code=location_info.get('postal_code'),
+            place_id=location_info.get('place_id'),
+            place_details=location_info.get('place_details'),
         )
 
     @classmethod
@@ -99,9 +111,6 @@ class LocationHelper(object):
         state_prov, postalcode, and country in attempt to find the correct
         location associated with the event.
         """
-        if not event.location:
-            return {}, 0
-
         # Possible queries for location that will match yield results
         if event.venue:
             possible_queries = [event.venue]
@@ -115,7 +124,7 @@ class LocationHelper(object):
             possible_queries.append(' '.join(split_address[2:]))
 
         # Geocode for lat/lng
-        lat_lng, _ = cls.get_lat_lng_async(event.location).get_result()
+        lat_lng = cls.get_lat_lng(event.location)
 
         # Try to find place based on possible queries
         best_score = 0
@@ -164,6 +173,9 @@ class LocationHelper(object):
 
     @classmethod
     def update_team_location(cls, team):
+        if not team.location:
+            return
+
         # Try with and without textsearch, pick best
         location_info, score = cls.get_team_location_info(team)
         if score < 0.7:
@@ -180,25 +192,34 @@ class LocationHelper(object):
         else:
             logging.info(text)
 
+        # Fallback to location only
+        if not location_info:
+            logging.warning("Falling back to location only for team {}".format(team.key.id()))
+            geocode_result = cls.google_maps_geocode_async(team.location).get_result()
+            if geocode_result:
+                location_info = cls.construct_location_info_async(geocode_result[0]).get_result()
+            else:
+                logging.warning("Team {} location failed!".format(team.key.id()))
+
         # Update team
         if 'lat' in location_info and 'lng' in location_info:
             lat_lng = ndb.GeoPt(location_info['lat'], location_info['lng'])
         else:
             lat_lng = None
         team.normalized_location = Location(
-            name=location_info.get('name', None),
-            formatted_address=location_info.get('formatted_address', None),
+            name=location_info.get('name'),
+            formatted_address=location_info.get('formatted_address'),
             lat_lng=lat_lng,
-            street_number=location_info.get('street_number', None),
-            street=location_info.get('street', None),
-            city=location_info.get('city', None),
-            state_prov=location_info.get('state_prov', None),
-            state_prov_short=location_info.get('state_prov_short', None),
-            country=location_info.get('country', None),
-            country_short=location_info.get('country_short', None),
-            postal_code=location_info.get('postal_code', None),
-            place_id=location_info.get('place_id', None),
-            place_details=location_info.get('place_details', None),
+            street_number=location_info.get('street_number'),
+            street=location_info.get('street'),
+            city=location_info.get('city'),
+            state_prov=location_info.get('state_prov'),
+            state_prov_short=location_info.get('state_prov_short'),
+            country=location_info.get('country'),
+            country_short=location_info.get('country_short'),
+            postal_code=location_info.get('postal_code'),
+            place_id=location_info.get('place_id'),
+            place_details=location_info.get('place_details'),
         )
 
     @classmethod
@@ -208,9 +229,6 @@ class LocationHelper(object):
         high school or title sponsor) with city, state_prov, postalcode, and country
         in attempt to find the correct location associated with the team.
         """
-        if not team.location:
-            return {}, 0
-
         # Find possible schools/title sponsors
         possible_names = []
         MAX_SPLIT = 3  # Filters out long names that are unlikely
@@ -233,7 +251,7 @@ class LocationHelper(object):
                 possible_names.append(split2[0])
 
         # Geocode for lat/lng
-        lat_lng, _ = cls.get_lat_lng_async(team.location).get_result()
+        lat_lng = cls.get_lat_lng(team.location)
 
         # Try to find place based on possible queries
         best_score = 0
@@ -267,18 +285,18 @@ class LocationHelper(object):
 
     @classmethod
     @ndb.tasklet
-    def construct_location_info_async(cls, nearbysearch_result):
+    def construct_location_info_async(cls, gmaps_result):
         """
-        Gets location info given a nearbysearch result
+        Gets location info given a gmaps result
         """
         location_info = {
-            'place_id': nearbysearch_result['place_id'],
-            'lat': nearbysearch_result['geometry']['location']['lat'],
-            'lng': nearbysearch_result['geometry']['location']['lng'],
-            'name': nearbysearch_result['name'],
-            'types': nearbysearch_result['types'],
+            'place_id': gmaps_result['place_id'],
+            'lat': gmaps_result['geometry']['location']['lat'],
+            'lng': gmaps_result['geometry']['location']['lng'],
+            'name': gmaps_result.get('name'),
+            'types': gmaps_result['types'],
         }
-        place_details_result = yield cls.google_maps_place_details_async(nearbysearch_result['place_id'])
+        place_details_result = yield cls.google_maps_place_details_async(gmaps_result['place_id'])
         if place_details_result:
             has_city = False
             for component in place_details_result['address_components']:
@@ -314,6 +332,7 @@ class LocationHelper(object):
     def google_maps_placesearch_async(cls, query, lat_lng, textsearch=False):
         """
         https://developers.google.com/places/web-service/search#nearbysearchRequests
+        https://developers.google.com/places/web-service/search#TextSearchRequests
         """
         if not cls.GOOGLE_API_KEY:
             GOOGLE_SECRETS = Sitevar.get_by_id("google.secrets")
@@ -382,10 +401,9 @@ class LocationHelper(object):
                 logging.warning("Must have sitevar google.api_key to use Google Maps PlaceDetails")
                 raise ndb.Return(None)
 
-        result = None
         cache_key = u'google_maps_place_details:{}'.format(place_id)
         result = memcache.get(cache_key)
-        if not result:
+        if result is None:
             place_details_params = {
                 'placeid': place_id,
                 'key': cls.GOOGLE_API_KEY,
@@ -419,20 +437,22 @@ class LocationHelper(object):
 
     @classmethod
     def get_lat_lng(cls, location):
-        return cls.get_lat_lng_async(location).get_result()
+        results = cls.google_maps_geocode_async(location).get_result()
+        if results:
+            return results[0]['geometry']['location']['lat'], results[0]['geometry']['location']['lng']
+        else:
+            return None
 
     @classmethod
     @ndb.tasklet
-    def get_lat_lng_async(cls, location):
-        cache_key = u'get_lat_lng_{}'.format(location)
-        result = memcache.get(cache_key)
-        if not result:
+    def google_maps_geocode_async(cls, location):
+        cache_key = u'google_maps_geocode:{}'.format(location)
+        results = memcache.get(cache_key)
+        if results is None:
             context = ndb.get_context()
-            lat_lng = None
-            num_results = 0
 
             if not location:
-                raise ndb.Return(lat_lng, num_results)
+                raise ndb.Return([])
 
             location = location.encode('utf-8')
 
@@ -451,14 +471,13 @@ class LocationHelper(object):
                 geocode_params['key'] = google_api_key
             geocode_url = 'https://maps.googleapis.com/maps/api/geocode/json?%s' % urllib.urlencode(geocode_params)
             try:
-                geocode_result = yield context.urlfetch(geocode_url)
-                if geocode_result.status_code == 200:
-                    geocode_dict = json.loads(geocode_result.content)
+                geocode_results = yield context.urlfetch(geocode_url)
+                if geocode_results.status_code == 200:
+                    geocode_dict = json.loads(geocode_results.content)
                     if geocode_dict['status'] == 'ZERO_RESULTS':
                         logging.info('No geocode results for location: {}'.format(location))
                     elif geocode_dict['status'] == 'OK':
-                        lat_lng = geocode_dict['results'][0]['geometry']['location']['lat'], geocode_dict['results'][0]['geometry']['location']['lng']
-                        num_results = len(geocode_dict['results'])
+                        results = geocode_dict['results']
                     else:
                         logging.warning('Geocoding failed!')
                         logging.warning(geocode_dict)
@@ -468,10 +487,9 @@ class LocationHelper(object):
                 logging.warning('urlfetch for geocode request failed for location {}.'.format(location))
                 logging.warning(e)
 
-            result = lat_lng, num_results
-            memcache.set(cache_key, result)
+            memcache.set(cache_key, results if results else [])
 
-        raise ndb.Return(result)
+        raise ndb.Return(results if results else [])
 
     @classmethod
     def get_timezone_id(cls, location, lat_lng=None):
