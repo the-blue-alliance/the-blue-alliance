@@ -32,17 +32,18 @@ class EventManipulator(ManipulatorBase):
         To run after models have been updated
         """
         for (event, updated_attrs) in zip(events, updated_attr_list):
-            lat_lon = event.get_lat_lng()
-            if not lat_lon:
-                logging.warning("Lat/Lon update for event {} failed with location!".format(event.key_name))
-            else:
-                timezone_id = LocationHelper.get_timezone_id(None, lat_lon=lat_lon)
+            LocationHelper.update_event_location(event)
+
+            if event.normalized_location and event.normalized_location.lat_lng:
+                timezone_id = LocationHelper.get_timezone_id(
+                    None, lat_lon=event.normalized_location.lat_lng)
                 if not timezone_id:
                     logging.warning("Timezone update for event {} failed!".format(event.key_name))
                 else:
                     event.timezone_id = timezone_id
+            else:
+                logging.warning("No Lat/Lng to update timezone_id for event {}!".format(event.key_name))
 
-            LocationHelper.update_event_location(event)
         cls.createOrUpdate(events, run_post_update_hook=False)
 
         # Enqueue task to calculate district points

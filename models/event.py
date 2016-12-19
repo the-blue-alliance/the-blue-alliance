@@ -284,9 +284,6 @@ class Event(ndb.Model):
             self._rankings_enhanced = None
         return self._rankings_enhanced
 
-    def get_lat_lng(self):
-        return LocationHelper.get_event_lat_lng(self)
-
     @property
     def location(self):
         if self._location is None:

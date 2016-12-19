@@ -44,23 +44,6 @@ class LocationHelper(object):
             SequenceMatcher(None, a, b_acr).ratio()
         ])
 
-    # @classmethod
-    # def get_event_lat_lng(cls, event):
-    #     """
-    #     Try different combinations of venue, address, and location to
-    #     get latitude and longitude for an event
-    #     """
-    #     lat_lng = cls.get_lat_lng(event.venue_address_safe)
-    #     if not lat_lng:
-    #         lat_lng = cls.get_lat_lng(u'{} {}'.format(event.venue, event.location))
-    #     if not lat_lng:
-    #         lat_lng = cls.get_lat_lng(event.location)
-    #     if not lat_lng:
-    #         lat_lng = cls.get_lat_lng(u'{} {}'.format(event.city, event.country))
-    #     if not lat_lng:
-    #         logging.warning("Finding Lat/Lon for event {} failed!".format(event.key_name))
-    #     return lat_lng
-
     @classmethod
     def update_event_location(cls, event):
         if not event.location:
@@ -517,7 +500,7 @@ class LocationHelper(object):
             else:
                 lat, lng = result
         else:
-            lat, lng = lat_lng
+            lat, lng = lat_lng.lat, lat_lng.lon
 
         google_secrets = Sitevar.get_by_id("google.secrets")
         google_api_key = None
