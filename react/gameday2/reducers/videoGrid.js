@@ -39,11 +39,11 @@ const trimToLayout = (state) => {
   // required size. This lets us maintain as many webcasts as possible
 
   for (let i = positionMap.length; i >= 0; i--) {
+    if (positionMap.length === maxViewsForLayout) {
+      break
+    }
     if (positionMap[i] === -1) {
       positionMap.splice(i, 1)
-      if (positionMap.length === maxViewsForLayout) {
-        break
-      }
     }
   }
 
