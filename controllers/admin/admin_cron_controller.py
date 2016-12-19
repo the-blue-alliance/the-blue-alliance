@@ -17,9 +17,11 @@ from controllers.base_controller import LoggedInHandler
 from database import match_query
 from helpers.award_manipulator import AwardManipulator
 from helpers.district_team_manipulator import DistrictTeamManipulator
+from helpers.event_manipulator import EventManipulator
 from helpers.location_helper import LocationHelper
 from helpers.match_helper import MatchHelper
 from helpers.notification_sender import NotificationSender
+from helpers.team_manipulator import TeamManipulator
 from models.award import Award
 from models.district_team import DistrictTeam
 from models.event import Event
@@ -328,9 +330,13 @@ class AdminAddEventSearchIndexDo(LoggedInHandler):
     def get(self, event_key):
         event = Event.get_by_id(event_key)
         LocationHelper.update_event_location(event)
+        event.dirty = True
+        EventManipulator.createOrUpdate(event)
 
 
 class AdminAddTeamSearchIndexDo(LoggedInHandler):
     def get(self, team_key):
         team = Team.get_by_id(team_key)
         LocationHelper.update_team_location(team)
+        team.dirty = True
+        TeamManipulator.createOrUpdate(team)
