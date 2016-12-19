@@ -278,7 +278,7 @@ class LocationHelper(object):
             for i, place in enumerate(places[:5]):
                 location_info = cls.construct_location_info_async(place).get_result()
                 score = cls.compute_team_location_score(name, location_info)
-                score *= pow(0.7, i)  # discount by ranking
+                score *= pow(0.5, i)  # discount by ranking
                 if score == 1:
                     return location_info, score
                 elif score > best_score:
