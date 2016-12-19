@@ -311,6 +311,19 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(event.normalized_location.postal_code, '27250')
         self.assertEqual(event.normalized_location.lat_lng, ndb.GeoPt(25.5173546, -103.3976534))
 
+        # 2017micmp (Nonsense data)
+        event = Event(
+            id='2017micmp',
+            city='TBD',
+            state_prov='Mi',
+            country='USA',
+            postalcode='00000',
+            venue='TBD - See Site Information',
+            venue_address='TBD - See Site Information\nTBD\nTBD, MI 00000\nUSA'
+            )
+        LocationHelper.update_event_location(event)
+        self.assertEqual(event.normalized_location, None)
+
         # 2008cal (Only has city, state, country)
         event = Event(
             id='2008cal',
@@ -618,7 +631,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(team.normalized_location.postal_code, '27250')
         self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(25.5173546, -103.3976534))
 
-        # frc9999 (Only has city, state, country)
+        # Only has city, state, country
         team = Team(
             id='frc9999',
             city='San Jose',
@@ -637,3 +650,13 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(team.normalized_location.country_short, 'US')
         self.assertEqual(team.normalized_location.postal_code, None)
         self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(37.3382082, -121.8863286))
+
+        # Nonsense location
+        team = Team(
+            id='frc9999',
+            city='NOTACITY',
+            state_prov='NOTASTATE',
+            country='NOTACOUNTRY',
+            )
+        LocationHelper.update_team_location(team)
+        self.assertEqual(team.normalized_location, None)

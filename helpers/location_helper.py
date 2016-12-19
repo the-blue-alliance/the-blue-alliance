@@ -82,6 +82,7 @@ class LocationHelper(object):
                 location_info = cls.construct_location_info_async(geocode_result[0]).get_result()
             else:
                 logging.warning("Event {} location failed!".format(event.key.id()))
+                return
 
         # Update event
         if 'lat' in location_info and 'lng' in location_info:
@@ -125,6 +126,8 @@ class LocationHelper(object):
 
         # Geocode for lat/lng
         lat_lng = cls.get_lat_lng(event.location)
+        if not lat_lng:
+            return {}, 0
 
         # Try to find place based on possible queries
         best_score = 0
@@ -200,6 +203,7 @@ class LocationHelper(object):
                 location_info = cls.construct_location_info_async(geocode_result[0]).get_result()
             else:
                 logging.warning("Team {} location failed!".format(team.key.id()))
+                return
 
         # Update team
         if 'lat' in location_info and 'lng' in location_info:
@@ -252,6 +256,8 @@ class LocationHelper(object):
 
         # Geocode for lat/lng
         lat_lng = cls.get_lat_lng(team.location)
+        if not lat_lng:
+            return {}, 0
 
         # Try to find place based on possible queries
         best_score = 0
