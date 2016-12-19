@@ -13,7 +13,7 @@
   <div class="col-sm-7">
     <p>
       {% if team.city_state_country or (team.nl and team.nl.name and team.nl.city_state_country) %}
-        <span class="glyphicon glyphicon-map-marker"></span>From
+        <span class="glyphicon glyphicon-map-marker"></span> From
         {% if team.nl and team.nl.name %}
           <a href="{{team.nl.place_details.url}}" target="_blank">{{team.nl.name}}</a> in {{team.nl.city_state_country}}
         {% else %}
