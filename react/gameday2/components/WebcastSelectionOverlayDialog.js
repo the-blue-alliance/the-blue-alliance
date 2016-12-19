@@ -17,10 +17,6 @@ export default class VideoCellOverlayDialog extends React.Component {
     onRequestClose: PropTypes.func.isRequired,
   }
 
-  static layout = {
-    dialogMargin: 20,
-  }
-
   constructor(props) {
     super(props)
 
