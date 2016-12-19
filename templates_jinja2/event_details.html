@@ -39,7 +39,14 @@
         {% if event.start_date %}
           <span class="glyphicon glyphicon-calendar"></span> <time itemprop="startDate" datetime="{{event.start_date.isoformat()}}">{{ event.start_date|strftime("%B %d") }}{% if event.start_date.date() != event.end_date.date() %}</time> to <time itemprop="endDate" datetime="{{event.end_date.isoformat()}}">{{ event.end_date|strftime("%B %d") }}{% endif %}, {{ event.end_date|strftime("%Y") }}</time>
         {% endif %}
-        {% if event.location or event.venue_address_safe %}
+        {% if event.nl and event.nl.name and event.nl.city_state_country %}
+          <br><span class="glyphicon glyphicon-map-marker"></span>
+          {% if event.nl and event.nl.name %}
+            <a href="{{event.nl.place_details.url}}" target="_blank">{{event.nl.name}}</a> in {{event.nl.city_state_country}}
+          {% else %}
+            <a href="//maps.google.com/maps?q={{ event.city_state_country|urlencode }}" target="_blank">{{event.city_state_country}}</a>
+          {% endif %}
+        {% elif event.location or event.venue_address_safe %}
           <br><span class="glyphicon glyphicon-map-marker"></span>
           {% if event.venue_address_safe %}
             <a href="http://maps.google.com/maps?q={{ event.venue_address_safe|urlencode }}" target="_blank">{{ event.venue_or_venue_from_address }}</a>{% if event.location %} in {{event.location}}{% endif %}

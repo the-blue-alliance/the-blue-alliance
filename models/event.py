@@ -301,6 +301,29 @@ class Event(ndb.Model):
         return self._location
 
     @property
+    def city_state_country(self):
+        if not self._city_state_country and self.nl:
+            self._city_state_country = self.nl.city_state_country
+
+        if not self._city_state_country:
+            location_parts = []
+            if self.city:
+                location_parts.append(self.city)
+            if self.state_prov:
+                location_parts.append(self.state_prov)
+            if self.country:
+                country = self.country
+                if self.country == 'US':
+                    country = 'USA'
+                location_parts.append(country)
+            self._city_state_country = ', '.join(location_parts)
+        return self._city_state_country
+
+    @property
+    def nl(self):
+        return self.normalized_location
+
+    @property
     def venue_or_venue_from_address(self):
         if self.venue:
             return self.venue
