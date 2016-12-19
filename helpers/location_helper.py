@@ -179,6 +179,11 @@ class LocationHelper(object):
         else:
             logging.info(text)
 
+        # Don't trust anything below a certain threshold
+        if score < 0.7:
+            logging.warning("Location score too low for team {}".format(team.key.id()))
+            location_info = {}
+
         # Fallback to location only
         if not location_info:
             logging.warning("Falling back to location only for team {}".format(team.key.id()))

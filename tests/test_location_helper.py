@@ -392,6 +392,28 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(team.normalized_location.postal_code, '95120')
         self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(37.217065, -121.842901))
 
+        # Team 456 (Many schools, odd school ordering)
+        team = Team(
+            id='frc456',
+            name='US Army Engineer Research & Development Center / Vicksburg-Warren School District / National Defense Education Program / NASA / Diane and Donald Cargile / Ginny and Chuck Dickerson & Warren Central High School & Vicksburg Catholic School & Vicksburg High School & Home School',
+            city='Vicksburg',
+            state_prov='Mississippi',
+            postalcode='39180',
+            country='USA'
+            )
+        LocationHelper.update_team_location(team)
+        self.assertEqual(team.normalized_location.name, None)
+        self.assertEqual(team.normalized_location.formatted_address, 'Vicksburg, MS 39180, USA')
+        self.assertEqual(team.normalized_location.street_number, None)
+        self.assertEqual(team.normalized_location.street, None)
+        self.assertEqual(team.normalized_location.city, 'Vicksburg')
+        self.assertEqual(team.normalized_location.state_prov, 'Mississippi')
+        self.assertEqual(team.normalized_location.state_prov_short, 'MS')
+        self.assertEqual(team.normalized_location.country, 'United States')
+        self.assertEqual(team.normalized_location.country_short, 'US')
+        self.assertEqual(team.normalized_location.postal_code, '39180')
+        self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(32.2170441, -90.86751339999999))
+
         # Team 1868 (Odd Sponsors, multiple schools)
         team = Team(
             id='frc1868',
