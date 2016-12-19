@@ -49,7 +49,7 @@
               </div>
             </td>
             <td><a href="/team/{{ team.team_number }}">{% if team.nickname %}{{ team.nickname }}{% else %}--{% endif %}</a></td>
-            <td>{% if team.location %}{{ team.location }}{% else %}--{% endif %}</td>
+            <td>{% if team.city_state_country %}{{ team.city_state_country }}{% else %}--{% endif %}</td>
           </tr>
           {% endfor %}
         </tbody>
@@ -78,7 +78,7 @@
               </div>
             </td>
             <td><a href="/team/{{ team.team_number }}">{% if team.nickname %}{{ team.nickname }}{% else %}--{% endif %}</a></td>
-            <td>{% if team.location %}{{ team.location }}{% else %}--{% endif %}</td>
+            <td>{% if team.city_state_country %}{{ team.city_state_country }}{% else %}--{% endif %}</td>
           </tr>
           {% endfor %}
         </tbody>

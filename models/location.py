@@ -20,3 +20,23 @@ class Location(ndb.Model):
     # Google Maps stuff
     place_id = ndb.StringProperty()  # Google Maps place ID
     place_details = ndb.JsonProperty()  # Entire Place Details result from Google in case it comes in handy
+
+    def __init__(self, *args, **kw):
+        self._city_state_country = None
+        super(Location, self).__init__(*args, **kw)
+
+    @property
+    def city_state_country(self):
+        if not self._city_state_country:
+            location_parts = []
+            if self.city:
+                location_parts.append(self.city)
+            if self.state_prov_short:
+                location_parts.append(self.state_prov_short)
+            if self.country_short:
+                country_short = self.country_short
+                if self.country_short == 'US':
+                    country_short = 'USA'
+                location_parts.append(country_short)
+            self._city_state_country = ', '.join(location_parts)
+        return self._city_state_country

@@ -39,6 +39,7 @@ class Team(ndb.Model):
             'key': set(),
         }
         self._location = None
+        self._city_state_country = None
         super(Team, self).__init__(*args, **kw)
 
     @property
@@ -60,6 +61,29 @@ class Team(ndb.Model):
                 split_location.append(self.country)
             self._location = ', '.join(split_location)
         return self._location
+
+    @property
+    def city_state_country(self):
+        if not self._city_state_country and self.nl:
+            self._city_state_country = self.nl.city_state_country
+
+        if not self._city_state_country:
+            location_parts = []
+            if self.city:
+                location_parts.append(self.city)
+            if self.state_prov:
+                location_parts.append(self.state_prov)
+            if self.country:
+                country = self.country
+                if self.country == 'US':
+                    country = 'USA'
+                location_parts.append(country)
+            self._city_state_country = ', '.join(location_parts)
+        return self._city_state_country
+
+    @property
+    def nl(self):
+        return self.normalized_location
 
     @property
     def details_url(self):
