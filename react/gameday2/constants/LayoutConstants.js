@@ -31,7 +31,7 @@ export const LAYOUT_SVG_PATHS = [
   'M0 0h14v15h-14v-15zM15 0h8v7h-8v-7zM15 8h8v7h-8v-7z',
   'M0 0h11v7h-11v-7z M0 8h11v7h-11v-7z M12 0h11v7h-11v-7z M12 8h11v7h-11v-7z',
   'M0 0h14v15h-14v-15z M15 0h8v4.333h-8v-4.33z M15 5.33h8v4.333h-8v-4.33z M15 10.67h8v4.333h-8v-4.33z',
-  'M0 0h14v15h-14v-15z M15 0h8v3h-8v-3z M15 4h8v3h-8v3z M15 8h8v3h-8v-3z M15 12h8v3h-8v-3z',
+  'M0 0h15v15h-15v-15z M16 0h7v3h-7v-3z M16 4h7v3h-7v3z M16 8h7v3h-7v-3z M16 12h7v3h-7v-3z',
   'M0 0h7v7h-7v-7z M8 0h7v7h-7v-7z M16 0h7v7h-7v-7z M8 8h7v7h-7v-7z M16 8h7v7h-7v-7z M0 8h7v7h-7v-7z',
   'M0 0h5v7h-5v-7z M6 0h5v7h-5v-7z M12 0h5v7h-5v-7z M18 0h5v7h-5v-7z M0 8h5v7h-5v-7z M6 8h5v7h-5v-7z M12 8h5v7h-5v-7z M18 8h5v7h-5v-7z',
   'M0 0h7v4.33h-7v-4.33z M8 0h7v4.33h-7v-4.33z M16 0h7v4.33h-7v-4.33z M0 5.33h7v4.33h-7v-4.33z M8 5.33h7v4.33h-7v-4.33z M16 5.33h7v4.33h-7v-4.33z M0 10.67h7v4.33h-7v-4.33z M8 10.67h7v4.33h-7v-4.33z M16 10.67h7v4.33h-7v-4.33z',
