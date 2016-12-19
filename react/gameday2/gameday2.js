@@ -16,7 +16,7 @@ import { MAX_SUPPORTED_VIEWS } from './constants/LayoutConstants'
 
 injectTapEventPlugin()
 
-const webcastData = $.parseJSON($('#webcasts_json').text())
+const webcastData = JSON.parse(document.getElementById('webcasts_json').innerHTML)
 
 const store = createStore(gamedayReducer, compose(
   applyMiddleware(thunk),
