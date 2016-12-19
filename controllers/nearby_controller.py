@@ -52,7 +52,7 @@ class NearbyController(CacheableHandler):
         results = []
         distances = []
         if location:
-            lat_lon, _ = LocationHelper.get_lat_lng(location)
+            lat_lon = LocationHelper.get_lat_lng(location)
             if lat_lon:
                 lat, lon = lat_lon
 

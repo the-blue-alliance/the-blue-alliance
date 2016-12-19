@@ -49,13 +49,13 @@ class LocationHelper(object):
     #     Try different combinations of venue, address, and location to
     #     get latitude and longitude for an event
     #     """
-    #     lat_lng, _ = cls.get_lat_lng(event.venue_address_safe)
+    #     lat_lng = cls.get_lat_lng(event.venue_address_safe)
     #     if not lat_lng:
-    #         lat_lng, _ = cls.get_lat_lng(u'{} {}'.format(event.venue, event.location))
+    #         lat_lng = cls.get_lat_lng(u'{} {}'.format(event.venue, event.location))
     #     if not lat_lng:
-    #         lat_lng, _ = cls.get_lat_lng(event.location)
+    #         lat_lng = cls.get_lat_lng(event.location)
     #     if not lat_lng:
-    #         lat_lng, _ = cls.get_lat_lng(u'{} {}'.format(event.city, event.country))
+    #         lat_lng = cls.get_lat_lng(u'{} {}'.format(event.city, event.country))
     #     if not lat_lng:
     #         logging.warning("Finding Lat/Lon for event {} failed!".format(event.key_name))
     #     return lat_lng
@@ -500,7 +500,7 @@ class LocationHelper(object):
     @classmethod
     def get_timezone_id(cls, location, lat_lng=None):
         if lat_lng is None:
-            result, _ = cls.get_lat_lng(location)
+            result = cls.get_lat_lng(location)
             if result is None:
                 return None
             else:
