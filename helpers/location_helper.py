@@ -30,18 +30,23 @@ class LocationHelper(object):
         a = a.lower().strip()
         b = b.lower().strip()
 
-        a_split = re.split('\W+', a)
-        b_split = re.split('\W+', b)
+        a_split = filter(lambda x: x, re.split('\s+|,|-', a))
+        b_split = filter(lambda x: x, re.split('\s+|,|-', b))
         a_sorted = ' '.join(sorted(a_split))
         b_sorted = ' '.join(sorted(b_split))
         a_acr =  ''.join([w[0] if w else '' for w in a_split]).lower()
         b_acr =  ''.join([w[0] if w else '' for w in b_split]).lower()
 
-        return max([
-            SequenceMatcher(None, a, b).ratio(),
-            SequenceMatcher(None, a_sorted, b_sorted).ratio(),
-            SequenceMatcher(None, a_acr, b).ratio(),
-            SequenceMatcher(None, a, b_acr).ratio()
+        sm1 = SequenceMatcher(None, a, b)
+        sm2 = SequenceMatcher(None, a_sorted, b_sorted)
+        sm3 = SequenceMatcher(None, a_acr, b)
+        sm4 = SequenceMatcher(None, a, b_acr)
+
+        return  max([
+            sm1.ratio(),
+            sm2.ratio(),
+            sm3.ratio(),
+            sm4.ratio(),
         ])
 
     @classmethod
@@ -267,7 +272,7 @@ class LocationHelper(object):
             for i, place in enumerate(places[:5]):
                 location_info = cls.construct_location_info_async(place).get_result()
                 score = cls.compute_team_location_score(name, location_info)
-                score *= pow(0.5, i)  # discount by ranking
+                score *= pow(0.7, i)  # discount by ranking
                 if score == 1:
                     return location_info, score
                 elif score > best_score:
