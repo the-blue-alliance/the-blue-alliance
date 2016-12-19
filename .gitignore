@@ -79,3 +79,4 @@ coverage
 # Keys #
 ########
 static/javascript/tba_js/tba_keys.js
+test_keys.json
