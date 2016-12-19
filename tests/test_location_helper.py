@@ -18,6 +18,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_memcache_stub()
+        self.testbed.init_search_stub()
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
         # Load env vars that contain test keys
@@ -38,6 +39,7 @@ class TestLocationHelper(unittest2.TestCase):
         # 2016cama (generic event)
         event = Event(
             id='2016cama',
+            year=2016,
             city='Madera',
             state_prov='CA',
             country='USA',
@@ -61,6 +63,7 @@ class TestLocationHelper(unittest2.TestCase):
         # 2016cada (weird address)
         event = Event(
             id='2016cada',
+            year=2016,
             city='Davis',
             state_prov='CA',
             country='USA',
@@ -84,6 +87,7 @@ class TestLocationHelper(unittest2.TestCase):
         # 2016casj (weird venue)
         event = Event(
             id='2016casj',
+            year=2016,
             city='San Jose',
             state_prov='CA',
             country='USA',
@@ -107,6 +111,7 @@ class TestLocationHelper(unittest2.TestCase):
         # 2016cmp (no venue address)
         event = Event(
             id='2016cmp',
+            year=2016,
             city='St. Louis',
             state_prov='MO',
             country='USA',
@@ -130,6 +135,7 @@ class TestLocationHelper(unittest2.TestCase):
         # 2016ausy (Australia event)
         event = Event(
             id='2016ausy',
+            year=2016,
             city='Sydney Olympic Park',
             state_prov='NSW',
             country='Australia',
@@ -153,6 +159,7 @@ class TestLocationHelper(unittest2.TestCase):
         # 2016gush (China event with really bad location details)
         event = Event(
             id='2016gush',
+            year=2016,
             city='Shenzhen City',
             state_prov='44',
             country='China',
@@ -176,6 +183,7 @@ class TestLocationHelper(unittest2.TestCase):
         # 2016code
         event = Event(
             id='2016code',
+            year=2016,
             city='Denver',
             state_prov='CO',
             country='USA',
@@ -199,6 +207,7 @@ class TestLocationHelper(unittest2.TestCase):
         # 2016ilpe
         event = Event(
             id='2016ilpe',
+            year=2016,
             city='Peoria',
             state_prov='IL',
             country='USA',
@@ -222,6 +231,7 @@ class TestLocationHelper(unittest2.TestCase):
         # 2017isde1
         event = Event(
             id='2016ide1',
+            year=2016,
             city='Haifa',
             state_prov='HA',
             country='Israel',
@@ -245,6 +255,7 @@ class TestLocationHelper(unittest2.TestCase):
         # 2017isde3
         event = Event(
             id='2016isde3',
+            year=2016,
             city='Tel-Aviv, Yafo',
             state_prov='TA',
             country='Israel',
@@ -268,6 +279,7 @@ class TestLocationHelper(unittest2.TestCase):
         # 2017mndu
         event = Event(
             id='2016mndu',
+            year=2016,
             city='Duluth',
             state_prov='MN',
             country='USA',
@@ -291,6 +303,7 @@ class TestLocationHelper(unittest2.TestCase):
         # 2017mxto
         event = Event(
             id='2016mxto',
+            year=2016,
             city='Torreon',
             state_prov='COA',
             country='Mexico',
@@ -314,6 +327,7 @@ class TestLocationHelper(unittest2.TestCase):
         # 2017micmp (Nonsense data)
         event = Event(
             id='2017micmp',
+            year=2017,
             city='TBD',
             state_prov='Mi',
             country='USA',
@@ -337,6 +351,7 @@ class TestLocationHelper(unittest2.TestCase):
         # 2008cal (Only has city, state, country)
         event = Event(
             id='2008cal',
+            year=2008,
             city='San Jose',
             state_prov='CA',
             country='USA',

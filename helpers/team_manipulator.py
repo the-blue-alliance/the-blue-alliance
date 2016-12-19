@@ -5,6 +5,7 @@ from google.appengine.api import search
 from helpers.cache_clearer import CacheClearer
 from helpers.location_helper import LocationHelper
 from helpers.manipulator_base import ManipulatorBase
+from helpers.search_helper import SearchHelper
 
 
 class TeamManipulator(ManipulatorBase):
@@ -15,14 +16,13 @@ class TeamManipulator(ManipulatorBase):
     def getCacheKeysAndControllers(cls, affected_refs):
         return CacheClearer.get_team_cache_keys_and_controllers(affected_refs)
 
-    # @classmethod
-    # def postDeleteHook(cls, teams):
-    #     '''
-    #     To run after the team has been deleted.
-    #     '''
-    #     for team in teams:
-    #         # Remove team from search index
-    #         search.Index(name="teamLocation").delete(team.key.id())
+    @classmethod
+    def postDeleteHook(cls, teams):
+        '''
+        To run after the team has been deleted.
+        '''
+        for team in teams:
+            SearchHelper.remove_team_location_index(team)
 
     @classmethod
     def postUpdateHook(cls, teams, updated_attr_list, is_new_list):
@@ -30,16 +30,8 @@ class TeamManipulator(ManipulatorBase):
         To run after models have been updated
         """
         for (team, updated_attrs) in zip(teams, updated_attr_list):
-            if set(['name', 'city', 'state_prov', 'country', 'postalcode']).intersection(set(updated_attrs)):
-                LocationHelper.update_team_location(team)
-                cls.createOrUpdate(team, run_post_update_hook=False)
-            # lat_lon = team.get_lat_lng()
-            # # Add team to lat/lon info to search index
-            # if lat_lon:
-            #     fields = [
-            #         search.GeoField(name='location', value=search.GeoPoint(lat_lon[0], lat_lon[1]))
-            #     ]
-            #     search.Index(name="teamLocation").put(search.Document(doc_id=team.key.id(), fields=fields))
+            LocationHelper.update_team_location(team)
+        cls.createOrUpdate(teams, run_post_update_hook=False)
 
     @classmethod
     def updateMerge(self, new_team, old_team, auto_union=True):

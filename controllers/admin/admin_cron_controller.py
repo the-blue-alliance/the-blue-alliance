@@ -5,7 +5,7 @@ import logging
 import os
 import re
 
-from google.appengine.api import search, taskqueue
+from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
@@ -17,6 +17,7 @@ from controllers.base_controller import LoggedInHandler
 from database import match_query
 from helpers.award_manipulator import AwardManipulator
 from helpers.district_team_manipulator import DistrictTeamManipulator
+from helpers.location_helper import LocationHelper
 from helpers.match_helper import MatchHelper
 from helpers.notification_sender import NotificationSender
 from models.award import Award
@@ -326,21 +327,10 @@ class AdminBuildSearchIndexDo(LoggedInHandler):
 class AdminAddEventSearchIndexDo(LoggedInHandler):
     def get(self, event_key):
         event = Event.get_by_id(event_key)
-        lat_lon = event.get_lat_lng()
-        if lat_lon:
-            fields = [
-                search.NumberField(name='year', value=event.year),
-                search.GeoField(name='location', value=search.GeoPoint(lat_lon[0], lat_lon[1]))
-            ]
-            search.Index(name="eventLocation").put(search.Document(doc_id=event.key.id(), fields=fields))
+        LocationHelper.update_event_location(event)
 
 
 class AdminAddTeamSearchIndexDo(LoggedInHandler):
     def get(self, team_key):
         team = Team.get_by_id(team_key)
-        lat_lon = team.get_lat_lng()
-        if lat_lon:
-            fields = [
-                search.GeoField(name='location', value=search.GeoPoint(lat_lon[0], lat_lon[1]))
-            ]
-            search.Index(name="teamLocation").put(search.Document(doc_id=team.key.id(), fields=fields))
+        LocationHelper.update_team_location(team)
