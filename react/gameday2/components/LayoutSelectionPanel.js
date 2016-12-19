@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PropTypes } from 'react'
 import Paper from 'material-ui/Paper'
 import { List, ListItem } from 'material-ui/List'
 import EventListener from 'react-event-listener'
@@ -6,6 +6,10 @@ import { getLayoutSvgIcon } from '../utils/layoutUtils'
 import { NUM_LAYOUTS, NAME_FOR_LAYOUT } from '../constants/LayoutConstants'
 
 export default class LayoutSelectionPanelMaterial extends React.Component {
+  static propTypes = {
+    setLayout: PropTypes.func.isRequired,
+  }
+
   constructor(props) {
     super(props)
 
@@ -75,15 +79,15 @@ export default class LayoutSelectionPanelMaterial extends React.Component {
     }
 
     return (
-      <div style={componentStyle} ref={(e) => this.component = e}>
+      <div style={componentStyle} ref={(e) => { this.component = e }}>
         <Paper style={containerStyles}>
           <EventListener
             target="window"
             onResize={() => this.updateSizing()}
           />
           <h3 style={titleStyle}>Select a layout</h3>
-          <div ref={(e) => this.listContainer = e}>
-            <div ref={(e) => this.list = e}>
+          <div ref={(e) => { this.listContainer = e }}>
+            <div ref={(e) => { this.list = e }}>
               <List>
                 {layouts}
               </List>
