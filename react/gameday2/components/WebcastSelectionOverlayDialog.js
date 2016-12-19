@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react'
 import Paper from 'material-ui/Paper'
 import FlatButton from 'material-ui/FlatButton'
-import List from 'material-ui/List'
+import { List, ListItem } from 'material-ui/List'
 import EventListener from 'react-event-listener'
 import WebcastSelectionOverlayDialogItem from './WebcastSelectionOverlayDialogItem'
 import { webcastPropType } from '../utils/webcastUtils'
@@ -124,6 +124,16 @@ export default class VideoCellOverlayDialog extends React.Component {
         />
       )
     })
+
+    if (webcastItems.length === 0) {
+      // No more webcasts, indicate that
+      webcastItems.push(
+        <ListItem
+          primaryText="No more webcasts available"
+          disabled
+        />
+      )
+    }
 
     if (this.props.open) {
       // This "div" soup is needed because React is deprecating the ability to
