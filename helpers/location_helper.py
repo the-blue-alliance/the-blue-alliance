@@ -63,9 +63,15 @@ class LocationHelper(object):
     @classmethod
     def update_event_location(cls, event):
         location_info, score = cls.get_event_location_info(event)
-        if score < 0.5:
-            return
 
+        # Log performance
+        text = "Event {} location score: {}".format(event.key.id(), score)
+        if score < 0.8:
+            logging.warning(text)
+        else:
+            logging.info(text)
+
+        # Update event
         if 'lat' in location_info and 'lng' in location_info:
             lat_lng = ndb.GeoPt(location_info['lat'], location_info['lng'])
         else:
@@ -87,14 +93,6 @@ class LocationHelper(object):
         )
 
     @classmethod
-    def _log_event_location_score(cls, event_key, score):
-        text = "Event {} location score: {}".format(event_key, score)
-        if score < 0.8:
-            logging.warning(text)
-        else:
-            logging.info(text)
-
-    @classmethod
     def get_event_location_info(cls, event):
         """
         Search for different combinations of venue, venue_address, city,
@@ -110,103 +108,59 @@ class LocationHelper(object):
         else:
             possible_queries = []
 
-        lat_lng = None
         if event.venue_address:
             split_address = event.venue_address.split('\n')
-            for i in xrange(min(len(split_address), 2)):  # Venue takes up at most 2 lines
-                query = ' '.join(split_address[0:i+1])  # From the front
-                if query not in possible_queries:
-                    possible_queries.append(query)
-                query = split_address[i]
-                if query not in possible_queries:
-                    possible_queries.append(query)
+            # Venue takes up at most 2 lines. Isolate address
+            possible_queries.append(' '.join(split_address[1:]))
+            possible_queries.append(' '.join(split_address[2:]))
 
-            for i in xrange(len(split_address)):
-                query = ' '.join(split_address[i:])  # From the back
-                if query not in possible_queries:
-                    possible_queries.append(query)
-
-            # Get general lat/lng
-            if event.venue_address:
-                coarse_results = cls.find_places(' '.join(split_address[1:])).get_result()
-                if coarse_results:
-                    lat_lng = '{},{}'.format(
-                        coarse_results[0]['geometry']['location']['lat'],
-                        coarse_results[0]['geometry']['location']['lng'])
+        # Geocode for lat/lng
+        lat_lng, _ = cls.get_lat_lng_async(event.location).get_result()
 
         # Try to find place based on possible queries
         best_score = 0
         best_location_info = {}
         nearbysearch_results_candidates = []  # More trustworthy candidates are added first
         for query in possible_queries:
-            nearbysearch_results = cls.find_places(query, lat_lng=lat_lng).get_result()
-            if nearbysearch_results:
-                if len(nearbysearch_results) == 1:
-                    location_info = cls.construct_location_info_async(nearbysearch_results[0]).get_result()
-                    score = cls.compute_event_location_score(event, query, location_info)
-                    if score == 1:
-                        # Very likely to be correct if only 1 result and as a perfect score
-                        cls._log_event_location_score(event.key.id(), score)
-                        return location_info, score
-                    elif score > best_score:
-                        # Only 1 result but score is imperfect
-                        best_score = score
-                        best_location_info = location_info
-                else:
-                    # Save queries with multiple results for later evaluation
-                    nearbysearch_results_candidates.append((nearbysearch_results, query))
+            # Try both searches
+            nearbysearch_places =  cls.google_maps_placesearch_async(query, lat_lng)
+            textsearch_places = cls.google_maps_placesearch_async(query, lat_lng, textsearch=True)
 
-        # Consider all candidates and find best one
-        for nearbysearch_results, query in nearbysearch_results_candidates:
-            for nearbysearch_result in nearbysearch_results:
-                location_info = cls.construct_location_info_async(nearbysearch_result).get_result()
-                score = cls.compute_event_location_score(event, query, location_info)
+            for i, place in enumerate(nearbysearch_places.get_result()[:5]):
+                location_info = cls.construct_location_info_async(place).get_result()
+                score = cls.compute_event_location_score(query, location_info)
+                score *= pow(0.7, i)  # discount by ranking
                 if score == 1:
-                    cls._log_event_location_score(event.key.id(), score)
                     return location_info, score
                 elif score > best_score:
-                    best_score = score
                     best_location_info = location_info
+                    best_score = score
 
-        cls._log_event_location_score(event.key.id(), best_score)
+            for i, place in enumerate(textsearch_places.get_result()[:5]):
+                location_info = cls.construct_location_info_async(place).get_result()
+                score = cls.compute_event_location_score(query, location_info)
+                score *= pow(0.7, i)  # discount by ranking
+                if score == 1:
+                    return location_info, score
+                elif score > best_score:
+                    best_location_info = location_info
+                    best_score = score
+
         return best_location_info, best_score
 
     @classmethod
-    def compute_event_location_score(cls, event, query, location_info):
+    def compute_event_location_score(cls, query_name, location_info):
         """
         Score for correctness. 1.0 is perfect.
         Not checking for absolute equality in case of existing data errors.
-        Check with both long and short names
         """
-        max_score = 5.0
-        score = 0.0
-        if event.country:
-            partial = max(
-                cls.get_similarity(location_info.get('country', ''), event.country),
-                cls.get_similarity(location_info.get('country_short', ''), event.country))
-            score += 1 if partial > 0.5 else 0
-        if event.state_prov:
-            partial = max(
-                cls.get_similarity(location_info.get('state_prov', ''), event.state_prov),
-                cls.get_similarity(location_info.get('state_prov_short', ''), event.state_prov))
-            score += partial if partial > 0.5 else 0
-        if event.city:
-            partial = cls.get_similarity(location_info.get('city', ''), event.city)
-            score += partial if partial > 0.5 else 0
-        if event.postalcode:
-            partial = cls.get_similarity(location_info.get('postal_code', ''), event.postalcode)
-            score += partial if partial > 0.5 else 0
 
-        if location_info.get('name', '') in query and ('point_of_interest' in location_info.get('types', '') or 'premise' in location_info.get('types', '')):
-            score += 3  # If name matches, we're probably good
+        if {'point_of_interest', 'premise'}.intersection(set(location_info.get('types', ''))):
+            score = pow(cls.get_similarity(query_name, location_info['name']), 1.0/3)
         else:
-            partial = cls.get_similarity(location_info.get('name', ''), query)
-            score += partial
+            score = 0
 
-        if 'point_of_interest' not in location_info.get('types', '') and 'premise' not in location_info.get('types', ''):
-            score *= 0.5
-
-        return min(1.0, score / max_score)
+        return score
 
     @classmethod
     def update_team_location(cls, team):
@@ -289,7 +243,7 @@ class LocationHelper(object):
             places =  cls.google_maps_placesearch_async(name, lat_lng, textsearch=textsearch).get_result()
             for i, place in enumerate(places[:5]):
                 location_info = cls.construct_location_info_async(place).get_result()
-                score = cls.compute_team_location_score(team, name, location_info)
+                score = cls.compute_team_location_score(name, location_info)
                 score *= pow(0.7, i)  # discount by ranking
                 if score == 1:
                     return location_info, score
@@ -300,7 +254,7 @@ class LocationHelper(object):
         return best_location_info, best_score
 
     @classmethod
-    def compute_team_location_score(cls, team, query_name, location_info):
+    def compute_team_location_score(cls, query_name, location_info):
         """
         Score for correctness. 1.0 is perfect.
         Not checking for absolute equality in case of existing data errors.
@@ -465,17 +419,11 @@ class LocationHelper(object):
 
     @classmethod
     def get_lat_lng(cls, location):
-        """
-        DEPRRECATED TODO REMOVE AFTER MIGRATION
-        """
         return cls.get_lat_lng_async(location).get_result()
 
     @classmethod
     @ndb.tasklet
     def get_lat_lng_async(cls, location):
-        """
-        DEPRRECATED TODO REMOVE AFTER MIGRATION
-        """
         cache_key = u'get_lat_lng_{}'.format(location)
         result = memcache.get(cache_key)
         if not result:
