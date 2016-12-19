@@ -631,6 +631,28 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(team.normalized_location.postal_code, '27250')
         self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(25.5173546, -103.3976534))
 
+        # Team 3211 (odd location)
+        team = Team(
+            id='frc3211',
+            name='NRCN / Perrigo / The Yeruham Miami partnership / The Jewish federations of north america / Rashi foundation / Ministry of science / Ministry for the Development of the Negev and Galilee / Automation Yeruham / OPC / Perion / Cimatron / Gazit-Globe / Brand industries / The Yeruham Municipality / Matnas Yeruham / Rotem Industries Ltd. / Ben Gurion University department of mechanical engineering / The Jusidman Center for Science Oriented Youth in Ben-Gurion University & The Yeurham science center & Ort Sapir Yeruham & Belevav Shalem & Kama & IAF Technological College, Be\'er Sheva',
+            city='Yeruham',
+            state_prov='HaDarom (Southern)',
+            postalcode='80500',
+            country='Israel'
+            )
+        LocationHelper.update_team_location(team)
+        self.assertEqual(team.normalized_location.name, None)
+        self.assertEqual(team.normalized_location.formatted_address, 'Yeruham, Israel')
+        self.assertEqual(team.normalized_location.street_number, None)
+        self.assertEqual(team.normalized_location.street, None)
+        self.assertEqual(team.normalized_location.city, 'Yeruham')
+        self.assertEqual(team.normalized_location.state_prov, 'South District')
+        self.assertEqual(team.normalized_location.state_prov_short, 'South District')
+        self.assertEqual(team.normalized_location.country, 'Israel')
+        self.assertEqual(team.normalized_location.country_short, 'IL')
+        self.assertEqual(team.normalized_location.postal_code, None)
+        self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(30.987804, 34.929741))
+
         # Only has city, state, country
         team = Team(
             id='frc9999',

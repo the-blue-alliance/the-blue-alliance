@@ -201,6 +201,16 @@ class LocationHelper(object):
             geocode_result = cls.google_maps_geocode_async(team.location).get_result()
             if geocode_result:
                 location_info = cls.construct_location_info_async(geocode_result[0]).get_result()
+
+        # Fallback to city, country
+        if not location_info:
+            logging.warning("Falling back to city/country only for team {}".format(team.key.id()))
+            city_country = '{} {}'.format(
+                team.city if team.city else '',
+                team.country if team.country else '')
+            geocode_result = cls.google_maps_geocode_async(city_country).get_result()
+            if geocode_result:
+                location_info = cls.construct_location_info_async(geocode_result[0]).get_result()
             else:
                 logging.warning("Team {} location failed!".format(team.key.id()))
                 return
