@@ -326,7 +326,7 @@ class AdminBuildSearchIndexDo(LoggedInHandler):
 class AdminAddEventSearchIndexDo(LoggedInHandler):
     def get(self, event_key):
         event = Event.get_by_id(event_key)
-        lat_lon = event.get_lat_lon()
+        lat_lon = event.get_lat_lng()
         if lat_lon:
             fields = [
                 search.NumberField(name='year', value=event.year),
@@ -338,7 +338,7 @@ class AdminAddEventSearchIndexDo(LoggedInHandler):
 class AdminAddTeamSearchIndexDo(LoggedInHandler):
     def get(self, team_key):
         team = Team.get_by_id(team_key)
-        lat_lon = team.get_lat_lon()
+        lat_lon = team.get_lat_lng()
         if lat_lon:
             fields = [
                 search.GeoField(name='location', value=search.GeoPoint(lat_lon[0], lat_lon[1]))

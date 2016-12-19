@@ -33,7 +33,7 @@ class EventManipulator(ManipulatorBase):
     #     To run after models have been updated
     #     """
     #     for (event, updated_attrs) in zip(events, updated_attr_list):
-    #         lat_lon = event.get_lat_lon()
+    #         lat_lon = event.get_lat_lng()
     #         if not lat_lon:
     #             logging.warning("Lat/Lon update for event {} failed with location!".format(event.key_name))
     #         else:

@@ -33,7 +33,7 @@ class TeamManipulator(ManipulatorBase):
             if set(['name', 'city', 'state_prov', 'country', 'postalcode']).intersection(set(updated_attrs)):
                 LocationHelper.update_team_location(team)
                 cls.createOrUpdate(team, run_post_update_hook=False)
-            # lat_lon = team.get_lat_lon()
+            # lat_lon = team.get_lat_lng()
             # # Add team to lat/lon info to search index
             # if lat_lon:
             #     fields = [
