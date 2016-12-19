@@ -122,30 +122,21 @@ class LocationHelper(object):
         best_score = 0
         best_location_info = {}
         nearbysearch_results_candidates = []  # More trustworthy candidates are added first
-        for query in possible_queries:
+        for j, query in enumerate(possible_queries):
             # Try both searches
             nearbysearch_places =  cls.google_maps_placesearch_async(query, lat_lng)
             textsearch_places = cls.google_maps_placesearch_async(query, lat_lng, textsearch=True)
 
-            for i, place in enumerate(nearbysearch_places.get_result()[:5]):
-                location_info = cls.construct_location_info_async(place).get_result()
-                score = cls.compute_event_location_score(query, location_info)
-                score *= pow(0.7, i)  # discount by ranking
-                if score == 1:
-                    return location_info, score
-                elif score > best_score:
-                    best_location_info = location_info
-                    best_score = score
-
-            for i, place in enumerate(textsearch_places.get_result()[:5]):
-                location_info = cls.construct_location_info_async(place).get_result()
-                score = cls.compute_event_location_score(query, location_info)
-                score *= pow(0.7, i)  # discount by ranking
-                if score == 1:
-                    return location_info, score
-                elif score > best_score:
-                    best_location_info = location_info
-                    best_score = score
+            for results_future in [nearbysearch_places, textsearch_places]:
+                for i, place in enumerate(results_future.get_result()[:5]):
+                    location_info = cls.construct_location_info_async(place).get_result()
+                    score = cls.compute_event_location_score(query, location_info)
+                    score *= pow(0.7, j) * pow(0.7, i)  # discount by ranking
+                    if score == 1:
+                        return location_info, score
+                    elif score > best_score:
+                        best_location_info = location_info
+                        best_score = score
 
         return best_location_info, best_score
 
@@ -157,7 +148,9 @@ class LocationHelper(object):
         """
 
         if {'point_of_interest', 'premise'}.intersection(set(location_info.get('types', ''))):
-            score = pow(cls.get_similarity(query_name, location_info['name']), 1.0/3)
+            score = pow(max(
+                cls.get_similarity(query_name, location_info['name']),
+                cls.get_similarity(query_name, location_info['formatted_address'])), 1.0/3)
         else:
             score = 0
 
