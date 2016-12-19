@@ -32,17 +32,25 @@ class EventManipulator(ManipulatorBase):
         To run after models have been updated
         """
         for (event, updated_attrs) in zip(events, updated_attr_list):
-            LocationHelper.update_event_location(event)
+            try:
+                LocationHelper.update_event_location(event)
+            except Exception, e:
+                logging.error("update_event_location for {} errored!".format(event.key.id()))
+                logging.exception(e)
 
-            if event.normalized_location and event.normalized_location.lat_lng:
-                timezone_id = LocationHelper.get_timezone_id(
-                    None, lat_lon=event.normalized_location.lat_lng)
-                if not timezone_id:
-                    logging.warning("Timezone update for event {} failed!".format(event.key_name))
+            try:
+                if event.normalized_location and event.normalized_location.lat_lng:
+                    timezone_id = LocationHelper.get_timezone_id(
+                        None, lat_lng=event.normalized_location.lat_lng)
+                    if not timezone_id:
+                        logging.warning("Timezone update for event {} failed!".format(event.key_name))
+                    else:
+                        event.timezone_id = timezone_id
                 else:
-                    event.timezone_id = timezone_id
-            else:
-                logging.warning("No Lat/Lng to update timezone_id for event {}!".format(event.key_name))
+                    logging.warning("No Lat/Lng to update timezone_id for event {}!".format(event.key_name))
+            except Exception, e:
+                logging.error("Timezone update for {} errored!".format(event.key.id()))
+                logging.exception(e)
 
         cls.createOrUpdate(events, run_post_update_hook=False)
 
