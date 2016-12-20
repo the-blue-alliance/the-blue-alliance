@@ -34,7 +34,7 @@ queue:
     max_backoff_seconds: 30
 
 - name: search-index-update
-  rate: 5/s
+  rate: 10/s
 
 - name: admin
   rate: 5/s
