@@ -7,6 +7,7 @@ from helpers.cache_clearer import CacheClearer
 from helpers.location_helper import LocationHelper
 from helpers.manipulator_base import ManipulatorBase
 from helpers.notification_helper import NotificationHelper
+from helpers.search_helper import SearchHelper
 
 
 class EventManipulator(ManipulatorBase):
