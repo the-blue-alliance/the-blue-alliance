@@ -296,13 +296,13 @@ class AdminRunPostUpdateHooksEnqueue(LoggedInHandler):
                 queue_name='admin',
                 url='/tasks/admin/do/run_post_update_hooks/events',
                 method='GET')
-            self.response.out.write("Enqueued build search index for events")
+            self.response.out.write("Enqueued run post update hooks for events")
         elif model_type == 'teams':
             taskqueue.add(
                 queue_name='admin',
                 url='/tasks/admin/do/run_post_update_hooks/teams',
                 method='GET')
-            self.response.out.write("Enqueued build search index for teams")
+            self.response.out.write("Enqueued run post update hooks for teams")
         else:
             self.response.out.write("Unknown model type: {}".format(model_type))
 
