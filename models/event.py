@@ -62,6 +62,7 @@ class Event(ndb.Model):
         self._awards = None
         self._details = None
         self._location = None
+        self._city_state_country = None
         self._matches = None
         self._teams = None
         self._venue_address_safe = None
