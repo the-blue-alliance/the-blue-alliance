@@ -73,6 +73,7 @@ class SearchHelper(object):
         overall_fields = same_fields + [search.NumberField(name='year', value=0)]
         overall_event_types = set()
         overall_event_award_types = set()
+        overall_award_types = set()
         overall_bb_count = 0
         overall_divwin_count = 0
         overall_cmpwin_count = 0
@@ -91,20 +92,34 @@ class SearchHelper(object):
 
             # Awards
             year_event_award_types = set()
+            year_award_types = set()
             year_bb_count = 0
             year_divwin_count = 0
             year_cmpwin_count = 0
             for award in awards_by_year.get(year, []):
-                ea_type = 'e{} a{}'.format(award.event_type_enum, award.award_type_enum)
+                # Allow searching by award type and event tpye
+                ea_type = '{}_{}'.format(award.event_type_enum, award.award_type_enum)
                 if ea_type not in overall_event_award_types:
-                    overall_fields += [search.TextField(name='event_award_type', value=ea_type)]
+                    overall_fields += [search.AtomField(name='event_award_type', value=ea_type)]
                     overall_event_award_types.add(ea_type)
                 if ea_type not in year_event_award_types:
-                    year_fields += [search.TextField(name='event_award_type', value=ea_type)]
+                    year_fields += [search.AtomField(name='event_award_type', value=ea_type)]
                     year_event_award_types.add(ea_type)
+
+                # Allow searching by award type
+                if award.award_type_enum not in overall_award_types:
+                    overall_fields += [search.AtomField(name='award_type', value=str(award.award_type_enum))]
+                    overall_award_types.add(award.award_type_enum)
+                if award.award_type_enum not in year_award_types:
+                    year_fields += [search.AtomField(name='award_type', value=str(award.award_type_enum))]
+                    year_award_types.add(award.award_type_enum)
+
+                # Allow searching/sorting by blue banners
                 if award.award_type_enum in AwardType.BLUE_BANNER_AWARDS:
                     overall_bb_count += 1
                     year_bb_count += 1
+
+                # Allow searching/sorting by div/cmp winner
                 if award.award_type_enum == AwardType.WINNER:
                     if award.event_type_enum == EventType.CMP_DIVISION:
                         overall_divwin_count += 1
@@ -112,6 +127,7 @@ class SearchHelper(object):
                     elif award.event_type_enum == EventType.CMP_FINALS:
                         overall_cmpwin_count += 1
                         year_cmpwin_count += 1
+
             year_fields += [
                 search.NumberField(name='bb_count', value=year_bb_count),
                 search.NumberField(name='divwin_count', value=year_divwin_count),
