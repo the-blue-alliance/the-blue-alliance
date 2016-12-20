@@ -18,7 +18,6 @@ from database import match_query
 from helpers.award_manipulator import AwardManipulator
 from helpers.district_team_manipulator import DistrictTeamManipulator
 from helpers.event_manipulator import EventManipulator
-from helpers.location_helper import LocationHelper
 from helpers.match_helper import MatchHelper
 from helpers.notification_sender import NotificationSender
 from helpers.team_manipulator import TeamManipulator
@@ -290,53 +289,49 @@ class AdminRegistrationDayEnqueue(LoggedInHandler):
         self.response.out.write("Enqueued {} tasks to update {} events starting at {}".format((24*60/interval), event_year, start))
 
 
-class AdminBuildSearchIndexEnqueue(LoggedInHandler):
+class AdminRunPostUpdateHooksEnqueue(LoggedInHandler):
     def get(self, model_type):
         if model_type == 'events':
             taskqueue.add(
                 queue_name='admin',
-                url='/tasks/admin/do/build_search_index/events',
+                url='/tasks/admin/do/run_post_update_hooks/events',
                 method='GET')
             self.response.out.write("Enqueued build search index for events")
         elif model_type == 'teams':
             taskqueue.add(
                 queue_name='admin',
-                url='/tasks/admin/do/build_search_index/teams',
+                url='/tasks/admin/do/run_post_update_hooks/teams',
                 method='GET')
             self.response.out.write("Enqueued build search index for teams")
         else:
             self.response.out.write("Unknown model type: {}".format(model_type))
 
 
-class AdminBuildSearchIndexDo(LoggedInHandler):
+class AdminRunPostUpdateHooksDo(LoggedInHandler):
     def get(self, model_type):
         if model_type == 'events':
             event_keys = Event.query().fetch(keys_only=True)
             for event_key in event_keys:
                 taskqueue.add(
                     queue_name='admin',
-                    url='/tasks/admin/do/add_event_search_index/' + event_key.id(),
+                    url='/tasks/admin/do/run_event_post_update_hook/' + event_key.id(),
                     method='GET')
         elif model_type == 'teams':
             team_keys = Team.query().fetch(keys_only=True)
             for team_key in team_keys:
                 taskqueue.add(
                     queue_name='admin',
-                    url='/tasks/admin/do/add_team_search_index/' + team_key.id(),
+                    url='/tasks/admin/do/run_team_post_update_hook/' + team_key.id(),
                     method='GET')
 
 
-class AdminAddEventSearchIndexDo(LoggedInHandler):
+class AdminRunEventPostUpdateHookDo(LoggedInHandler):
     def get(self, event_key):
         event = Event.get_by_id(event_key)
-        LocationHelper.update_event_location(event)
-        event.dirty = True
-        EventManipulator.createOrUpdate(event)
+        EventManipulator.runPostUpdateHook([event])
 
 
-class AdminAddTeamSearchIndexDo(LoggedInHandler):
+class AdminRunTeamPostUpdateHookDo(LoggedInHandler):
     def get(self, team_key):
         team = Team.get_by_id(team_key)
-        LocationHelper.update_team_location(team)
-        team.dirty = True
-        TeamManipulator.createOrUpdate(team)
+        TeamManipulator.runPostUpdateHook([team])

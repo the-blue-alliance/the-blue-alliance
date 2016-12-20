@@ -1,6 +1,8 @@
 import logging
 import traceback
 
+from google.appengine.api import taskqueue
+
 from helpers.cache_clearer import CacheClearer
 from helpers.manipulator_base import ManipulatorBase
 from helpers.notification_helper import NotificationHelper
@@ -31,6 +33,15 @@ class EventDetailsManipulator(ManipulatorBase):
                     NotificationHelper.send_alliance_update(event)
             except Exception:
                 logging.error("Error sending alliance update notification for {}".format(event.key_name))
+                logging.error(traceback.format_exc())
+
+            # Enqueue task to calculate district points
+            try:
+                taskqueue.add(
+                    url='/tasks/math/do/district_points_calc/{}'.format(event.key.id()),
+                    method='GET')
+            except Exception:
+                logging.error("Error enqueuing district_points_calc for {}".format(event.key.id()))
                 logging.error(traceback.format_exc())
 
     @classmethod

@@ -35,6 +35,12 @@ class TeamManipulator(ManipulatorBase):
             except Exception, e:
                 logging.error("update_team_location for {} errored!".format(team.key.id()))
                 logging.exception(e)
+
+            try:
+                SearchHelper.update_team_location_index(team)
+            except Exception, e:
+                logging.error("update_team_location_index for {} errored!".format(team.key.id()))
+                logging.exception(e)
         cls.createOrUpdate(teams, run_post_update_hook=False)
 
     @classmethod

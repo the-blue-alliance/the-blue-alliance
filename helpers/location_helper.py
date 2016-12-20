@@ -8,7 +8,6 @@ from difflib import SequenceMatcher
 from google.appengine.api import memcache, urlfetch
 from google.appengine.ext import ndb
 
-from helpers.search_helper import SearchHelper
 from models.location import Location
 from models.sitevar import Sitevar
 from models.team import Team
@@ -92,7 +91,6 @@ class LocationHelper(object):
             place_id=location_info.get('place_id'),
             place_details=location_info.get('place_details'),
         )
-        SearchHelper.add_event_location_index(event)
 
     @classmethod
     def get_event_location_info(cls, event):
@@ -221,7 +219,6 @@ class LocationHelper(object):
             place_id=location_info.get('place_id'),
             place_details=location_info.get('place_details'),
         )
-        SearchHelper.add_team_location_index(team)
 
     @classmethod
     def get_team_location_info(cls, team, textsearch=False):

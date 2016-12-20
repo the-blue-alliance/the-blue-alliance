@@ -6,7 +6,7 @@ class SearchHelper(object):
     TEAM_LOCATION_INDEX = 'teamLocation'
 
     @classmethod
-    def add_event_location_index(cls, event):
+    def update_event_location_index(cls, event):
         if event.normalized_location and event.normalized_location.lat_lng:
             fields = [
                 search.NumberField(name='year', value=event.year),
@@ -22,7 +22,7 @@ class SearchHelper(object):
         search.Index(name=EVENT_LOCATION_INDEX).delete(event.key.id())
 
     @classmethod
-    def add_team_location_index(cls, team):
+    def update_team_location_index(cls, team):
         if team.normalized_location and team.normalized_location.lat_lng:
             fields = [
                 search.GeoField(name='location', value=search.GeoPoint(
