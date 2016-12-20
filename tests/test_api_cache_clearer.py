@@ -11,7 +11,7 @@ from google.appengine.api import taskqueue
 from google.appengine.ext import testbed
 
 import api_main
-
+import tba_config
 from consts.award_type import AwardType
 from consts.district_type import DistrictType
 from consts.event_type import EventType
@@ -72,6 +72,9 @@ class TestApiCacheClearer(unittest2.TestCase):
 
         self.testbed.init_taskqueue_stub(root_path=".")
         self.taskqueue_stub = self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME)
+
+        # Enable the cache we're testing
+        tba_config.CONFIG['response_cache'] = True
 
         # populate mini db
         self.event_2010sc_1 = Event(

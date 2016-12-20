@@ -59,7 +59,7 @@ class TestMatchSuggestionAccepter(unittest2.TestCase):
         self.testbed.deactivate()
 
     def test_accept_suggestions(self):
-        MatchSuggestionAccepter.accept_suggestions([self.suggestion])
+        MatchSuggestionAccepter.accept_suggestion(self.match, self.suggestion)
 
         match = Match.get_by_id("2012ct_qm1")
         self.assertTrue("abcdef" in match.youtube_videos)
