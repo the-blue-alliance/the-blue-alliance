@@ -33,10 +33,10 @@ class Location(ndb.Model):
                 location_parts.append(self.city)
             if self.state_prov_short:
                 location_parts.append(self.state_prov_short)
-            if self.country_short:
-                country_short = self.country_short
-                if self.country_short == 'US':
-                    country_short = 'USA'
-                location_parts.append(country_short)
+            if self.country:
+                country = self.country
+                if self.country == 'United States':
+                    country = 'USA'
+                location_parts.append(country)
             self._city_state_country = ', '.join(location_parts)
         return self._city_state_country

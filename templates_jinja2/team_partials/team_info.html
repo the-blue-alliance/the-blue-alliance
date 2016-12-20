@@ -17,7 +17,7 @@
         {% if team.nl and team.nl.name %}
           <a href="{{team.nl.place_details.url}}" target="_blank">{{team.nl.name}}</a> in {{team.nl.city_state_country}}
         {% else %}
-          <a href="{% if team.nl and team.nl.place_details and team.nl.place_details.url %}{{team.nl.place_details.url}}{% else %}//maps.google.com/maps?q={{ team.city_state_country|urlencode }}{% endif %}" target="_blank">{{team.city_state_country}}</a>
+          <a href="{% if team.nl and team.nl.name %}{{team.nl.place_details.url}}{% else %}//maps.google.com/maps?q={{ team.city_state_country|urlencode }}{% endif %}" target="_blank">{{team.city_state_country}}</a>
         {% endif %}
         <br>
       {% endif %}
