@@ -47,6 +47,7 @@ Setup
 1. Install [gulp](https://github.com/gulpjs/gulp) by running `npm rm --global gulp && npm install --global gulp-cli`. This removes any version of `gulp` that was previously installed globally so it doesn't conflict with `gulp-cli`. Gulp is used as the build tool for Gameday2.
 1. Install all node dependencies by running `npm install`. This includes `less`, which is used to build CSS files for production, as well as a number of packages used in Gameday2.
 1. Fill out `static/javascript/tba_js/tba_keys_template.js` and save it in the same directory as `tba_keys.js`. It's okay to leave a key blank if you're not doing any development that requires it, but the file `tba_keys.js` must exist or else JavaScript won't compile.
+1. Fill out `test_keys_template.json` and save it in the same directory as `test_keys.json`. These are used for unit testing on your local machine only.
 1. Run `paver setup` to install remaining dependencies and do an initial build of static files (CSS, HTML templates, javascript) to get you going
 1. Run the app in GoogleAppEngineLauncher according to the directions below, and visit the local URL to see your own copy of The Blue Alliance!
 

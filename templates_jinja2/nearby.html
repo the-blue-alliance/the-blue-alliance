@@ -129,9 +129,9 @@
                     {% else %}
                       <a href="/event/{{result.key_name}}" title="{{result.name}}">{{result.name}}</a>
                     {% endif %}
-                      {% if result.location %}
+                      {% if result.city_state_country %}
                         <br>
-                        <small>{{result.location}}</small>
+                        <small>{{result.city_state_country}}</small>
                       {% endif %}
                   </td>
                   {% if search_type == 'events' %}

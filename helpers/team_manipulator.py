@@ -3,7 +3,9 @@ import logging
 from google.appengine.api import search
 
 from helpers.cache_clearer import CacheClearer
+from helpers.location_helper import LocationHelper
 from helpers.manipulator_base import ManipulatorBase
+from helpers.search_helper import SearchHelper
 
 
 class TeamManipulator(ManipulatorBase):
@@ -20,8 +22,7 @@ class TeamManipulator(ManipulatorBase):
         To run after the team has been deleted.
         '''
         for team in teams:
-            # Remove team from search index
-            search.Index(name="teamLocation").delete(team.key.id())
+            SearchHelper.remove_team_location_index(team)
 
     @classmethod
     def postUpdateHook(cls, teams, updated_attr_list, is_new_list):
@@ -29,13 +30,18 @@ class TeamManipulator(ManipulatorBase):
         To run after models have been updated
         """
         for (team, updated_attrs) in zip(teams, updated_attr_list):
-            lat_lon = team.get_lat_lon()
-            # Add team to lat/lon info to search index
-            if lat_lon:
-                fields = [
-                    search.GeoField(name='location', value=search.GeoPoint(lat_lon[0], lat_lon[1]))
-                ]
-                search.Index(name="teamLocation").put(search.Document(doc_id=team.key.id(), fields=fields))
+            try:
+                LocationHelper.update_team_location(team)
+            except Exception, e:
+                logging.error("update_team_location for {} errored!".format(team.key.id()))
+                logging.exception(e)
+
+            try:
+                SearchHelper.update_team_location_index(team)
+            except Exception, e:
+                logging.error("update_team_location_index for {} errored!".format(team.key.id()))
+                logging.exception(e)
+        cls.createOrUpdate(teams, run_post_update_hook=False)
 
     @classmethod
     def updateMerge(self, new_team, old_team, auto_union=True):
@@ -49,6 +55,7 @@ class TeamManipulator(ManipulatorBase):
             "state_prov",
             "country",
             "postalcode",
+            "normalized_location",  # Overwrite whole thing as one
             "name",
             "nickname",
             "website",

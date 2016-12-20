@@ -3,7 +3,7 @@ import re
 
 from google.appengine.ext import ndb
 from helpers.champ_split_helper import ChampSplitHelper
-from helpers.location_helper import LocationHelper
+from models.location import Location
 
 
 class Team(ndb.Model):
@@ -14,10 +14,15 @@ class Team(ndb.Model):
     team_number = ndb.IntegerProperty(required=True)
     name = ndb.TextProperty(indexed=False)
     nickname = ndb.StringProperty(indexed=False)
+
+    # city, state_prov, country, and postalcode are from FIRST
     city = ndb.StringProperty()  # Equivalent to locality. From FRCAPI
     state_prov = ndb.StringProperty()  # Equivalent to region. From FRCAPI
     country = ndb.StringProperty()  # From FRCAPI
     postalcode = ndb.StringProperty()  # From ElasticSearch only. String because it can be like "95126-1215"
+    # Normalized address from the Google Maps API, constructed using the above
+    normalized_location = ndb.StructuredProperty(Location)
+
     website = ndb.StringProperty(indexed=False)
     first_tpid = ndb.IntegerProperty()  # from USFIRST. FIRST team ID number. -greg 5/20/2010
     first_tpid_year = ndb.IntegerProperty()  # from USFIRST. Year tpid is applicable for. -greg 9 Jan 2011
@@ -34,14 +39,12 @@ class Team(ndb.Model):
             'key': set(),
         }
         self._location = None
+        self._city_state_country = None
         super(Team, self).__init__(*args, **kw)
 
     @property
     def championship_location(self):
         return ChampSplitHelper.get_champ(self)
-
-    def get_lat_lon(self):
-        return LocationHelper.get_team_lat_lon(self)
 
     @property
     def location(self):
@@ -58,6 +61,29 @@ class Team(ndb.Model):
                 split_location.append(self.country)
             self._location = ', '.join(split_location)
         return self._location
+
+    @property
+    def city_state_country(self):
+        if not self._city_state_country and self.nl:
+            self._city_state_country = self.nl.city_state_country
+
+        if not self._city_state_country:
+            location_parts = []
+            if self.city:
+                location_parts.append(self.city)
+            if self.state_prov:
+                location_parts.append(self.state_prov)
+            if self.country:
+                country = self.country
+                if self.country == 'US':
+                    country = 'USA'
+                location_parts.append(country)
+            self._city_state_country = ', '.join(location_parts)
+        return self._city_state_country
+
+    @property
+    def nl(self):
+        return self.normalized_location
 
     @property
     def details_url(self):

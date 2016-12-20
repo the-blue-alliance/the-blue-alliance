@@ -18,8 +18,9 @@ from controllers.cron_controller import FinalMatchesRepairDo
 from controllers.cron_controller import UpcomingNotificationDo
 
 from controllers.admin.admin_cron_controller import AdminMobileClearEnqueue, AdminMobileClear, AdminSubsClearEnqueue, AdminSubsClear, \
-    AdminWebhooksClearEnqueue, AdminWebhooksClear, AdminRegistrationDayEnqueue, AdminBuildSearchIndexEnqueue, AdminBuildSearchIndexDo, \
-    AdminAddEventSearchIndexDo, AdminAddTeamSearchIndexDo
+    AdminWebhooksClearEnqueue, AdminWebhooksClear, AdminRegistrationDayEnqueue
+
+from controllers.admin.admin_cron_controller import AdminRunPostUpdateHooksEnqueue, AdminRunPostUpdateHooksDo, AdminRunEventPostUpdateHookDo, AdminRunTeamPostUpdateHookDo
 
 app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackupEventsEnqueue),
                                ('/tasks/enqueue/csv_backup_events/([0-9]*)', TbaCSVBackupEventsEnqueue),
@@ -56,9 +57,9 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/admin/enqueue/clear_old_webhooks', AdminWebhooksClearEnqueue),
                                ('/tasks/admin/clear_old_webhooks', AdminWebhooksClear),
                                ('/tasks/admin/enqueue/registration_day', AdminRegistrationDayEnqueue),
-                               ('/tasks/admin/enqueue/build_search_index/(.*)', AdminBuildSearchIndexEnqueue),
-                               ('/tasks/admin/do/build_search_index/(.*)', AdminBuildSearchIndexDo),
-                               ('/tasks/admin/do/add_event_search_index/(.*)', AdminAddEventSearchIndexDo),
-                               ('/tasks/admin/do/add_team_search_index/(.*)', AdminAddTeamSearchIndexDo),
+                               ('/tasks/admin/enqueue/run_post_update_hooks/(.*)', AdminRunPostUpdateHooksEnqueue),
+                               ('/tasks/admin/do/run_post_update_hooks/(.*)', AdminRunPostUpdateHooksDo),
+                               ('/tasks/admin/do/run_event_post_update_hook/(.*)', AdminRunEventPostUpdateHookDo),
+                               ('/tasks/admin/do/run_team_post_update_hook/(.*)', AdminRunTeamPostUpdateHookDo),
                                ],
                               debug=tba_config.DEBUG)
