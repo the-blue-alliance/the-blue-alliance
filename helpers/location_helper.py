@@ -177,8 +177,8 @@ class LocationHelper(object):
         else:
             logging.info(text)
 
-        # Don't trust anything below a certain threshold
-        if score < 0.7:
+        # Don't trust anything below a certain threshold Super strict for now.
+        if score < 0.9:
             logging.warning("Location score too low for team {}".format(team.key.id()))
             location_info = {}
 
@@ -260,12 +260,12 @@ class LocationHelper(object):
         best_score = 0
         best_location_info = {}
         nearbysearch_results_candidates = []  # More trustworthy candidates are added first
-        for name in possible_names:
+        for j, name in enumerate(possible_names):
             places =  cls.google_maps_placesearch_async(name, lat_lng, textsearch=textsearch).get_result()
             for i, place in enumerate(places[:5]):
                 location_info = cls.construct_location_info_async(place).get_result()
                 score = cls.compute_team_location_score(name, location_info)
-                score *= pow(0.7, i)  # discount by ranking
+                score *= pow(0.9, 0 if j < 2 else 1) * pow(0.9, i)  # discount by ranking
                 if score == 1:
                     return location_info, score
                 elif score > best_score:
@@ -280,9 +280,11 @@ class LocationHelper(object):
         Score for correctness. 1.0 is perfect.
         Not checking for absolute equality in case of existing data errors.
         """
-        score = pow(cls.get_similarity(query_name, location_info['name']), 1.0/3)
+        query_name = query_name.lower().replace('school', '')
+        result_name = location_info['name'].lower().replace('school', '')
+        score = pow(cls.get_similarity(query_name, result_name), 0.7)
         if not {'school', 'university'}.intersection(set(location_info.get('types', ''))):
-            score *= 0.7
+            score *= 0.9
 
         return score
 
