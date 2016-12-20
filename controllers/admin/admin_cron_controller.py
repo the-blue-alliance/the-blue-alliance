@@ -20,6 +20,7 @@ from helpers.district_team_manipulator import DistrictTeamManipulator
 from helpers.event_manipulator import EventManipulator
 from helpers.match_helper import MatchHelper
 from helpers.notification_sender import NotificationSender
+from helpers.search_helper import SearchHelper
 from helpers.team_manipulator import TeamManipulator
 from models.award import Award
 from models.district_team import DistrictTeam
@@ -335,3 +336,28 @@ class AdminRunTeamPostUpdateHookDo(LoggedInHandler):
     def get(self, team_key):
         team = Team.get_by_id(team_key)
         TeamManipulator.runPostUpdateHook([team])
+
+
+class AdminUpdateAllTeamSearchIndexEnqueue(LoggedInHandler):
+    def get(self):
+        taskqueue.add(
+            queue_name='search-index-update',
+            url='/backend-tasks/do/update_all_team_search_index',
+            method='GET')
+        self.response.out.write("Enqueued update all team search index")
+
+
+class AdminUpdateAllTeamSearchIndexDo(LoggedInHandler):
+    def get(self):
+        team_keys = Team.query().fetch(keys_only=True)
+        for team_key in team_keys:
+            taskqueue.add(
+                queue_name='search-index-update',
+                url='/backend-tasks/do/update_team_search_index/' + team_key.id(),
+                method='GET')
+
+
+class AdminUpdateTeamSearchIndexDo(LoggedInHandler):
+    def get(self, team_key):
+        team = Team.get_by_id(team_key)
+        SearchHelper.update_team_year_index(team)
