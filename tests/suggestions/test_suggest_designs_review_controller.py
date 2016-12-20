@@ -9,6 +9,7 @@ from webapp2_extras.routes import RedirectRoute
 from consts.account_permissions import AccountPermissions
 from consts.media_type import MediaType
 from controllers.suggestions.suggest_designs_review_controller import SuggestDesignsReviewController
+from controllers.suggestions.suggest_review_home_controller import SuggestReviewHomeController
 from helpers.suggestions.suggestion_creator import SuggestionCreator
 from models.account import Account
 from models.media import Media
@@ -54,6 +55,7 @@ class TestSuggestApiWriteController(unittest2.TestCase):
 
         app = webapp2.WSGIApplication([
             RedirectRoute(r'/suggest/cad/review', SuggestDesignsReviewController, 'review-designs', strict_slash=True),
+            RedirectRoute(r'/suggest/review', SuggestReviewHomeController, 'review-home', strict_slash=True),
         ], debug=True)
         self.testapp = webtest.TestApp(app)
 
@@ -130,3 +132,63 @@ class TestSuggestApiWriteController(unittest2.TestCase):
         suggestion = Suggestion.get_by_id(suggestion_id)
         self.assertIsNotNone(suggestion)
         self.assertEqual(suggestion.review_state, Suggestion.REVIEW_REJECTED)
+
+    def testFastPathAccept(self):
+        self.loginUser()
+        self.givePermission()
+        suggestion_id = self.createSuggestion()
+
+        response = self.testapp.get('/suggest/cad/review?action=accept&id={}'.format(suggestion_id))
+        response = response.follow()
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.request.GET.get('status'), 'accepted')
+
+        # Make sure the Media object gets created
+        media = Media.query().fetch()[0]
+        self.assertIsNotNone(media)
+        self.assertEqual(media.media_type_enum, MediaType.GRABCAD)
+        self.assertEqual(media.year, 2016)
+        self.assertListEqual(media.references, [self.team.key])
+
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.review_state, Suggestion.REVIEW_ACCEPTED)
+
+    def testFastPathReject(self):
+        self.loginUser()
+        self.givePermission()
+        suggestion_id = self.createSuggestion()
+
+        response = self.testapp.get('/suggest/cad/review?action=reject&id={}'.format(suggestion_id))
+        response = response.follow()
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.request.GET.get('status'), 'rejected')
+
+        medias = Media.query().fetch(keys_only=True)
+        self.assertEqual(len(medias), 0)
+
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.review_state, Suggestion.REVIEW_REJECTED)
+
+    def testFastPathAlreadyReviewed(self):
+        self.loginUser()
+        self.givePermission()
+        suggestion_id = self.createSuggestion()
+
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        suggestion.review_state = Suggestion.REVIEW_ACCEPTED
+        suggestion.put()
+
+        response = self.testapp.get('/suggest/cad/review?action=accept&id={}'.format(suggestion_id))
+        response = response.follow()
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.request.GET.get('status'), 'already_reviewed')
+
+    def testFastPathBadId(self):
+        self.loginUser()
+        self.givePermission()
+        response = self.testapp.get('/suggest/cad/review?action=accept&id=abc123')
+        response = response.follow()
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.request.GET.get('status'), 'bad_suggestion')

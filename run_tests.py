@@ -31,6 +31,8 @@ def start_suite(suite, queue):
 def main(sdk_path, test_pattern):
     start_time = time.time()
 
+    os.environ['IS_TBA_TEST'] = "true"
+
     # Fix django template loaders being messed up
     django.conf.global_settings.SECRET_KEY = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django.conf.global_settings')
@@ -42,7 +44,6 @@ def main(sdk_path, test_pattern):
     sys.path.insert(0, sdk_path)
     import dev_appserver
     dev_appserver.fix_sys_path()
-    os.environ['IS_TBA_TEST'] = "true"
 
     suites = unittest2.loader.TestLoader().discover("tests", test_pattern)
 
