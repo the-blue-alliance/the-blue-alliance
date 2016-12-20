@@ -18,6 +18,7 @@ const getWebcastsFromRawWebcasts = (webcasts) => {
       name: webcast.name,
       type: webcast.type,
       channel: webcast.channel,
+      file: webcast.file,
       sortOrder: index,
     }
   })
@@ -37,6 +38,7 @@ const getWebcastsFromRawWebcasts = (webcasts) => {
         name,
         type: webcast.type,
         channel: webcast.channel,
+        file: webcast.file,
       }
     })
   })

@@ -1,8 +1,6 @@
 import React, { PropTypes } from 'react'
 import RaisedButton from 'material-ui/RaisedButton'
-import EmbedUstream from './EmbedUstream'
-import EmbedYoutube from './EmbedYoutube'
-import EmbedTwitch from './EmbedTwitch'
+import WebcastEmbed from './WebcastEmbed'
 import VideoCellToolbarContainer from '../containers/VideoCellToolbarContainer'
 import WebcastSelectionOverlayDialogContainer from '../containers/WebcastSelectionOverlayDialogContainer'
 import SwapPositionOverlayDialogContainer from '../containers/SwapPositionOverlayDialogContainer'
@@ -56,22 +54,6 @@ export default class VideoCell extends React.Component {
     })
 
     if (this.props.webcast) {
-      let cellEmbed
-      switch (this.props.webcast.type) {
-        case 'ustream':
-          cellEmbed = (<EmbedUstream webcast={this.props.webcast} />)
-          break
-        case 'youtube':
-          cellEmbed = (<EmbedYoutube webcast={this.props.webcast} />)
-          break
-        case 'twitch':
-          cellEmbed = (<EmbedTwitch webcast={this.props.webcast} />)
-          break
-        default:
-          cellEmbed = ''
-          break
-      }
-
       const toolbarStyle = {
         position: 'absolute',
         bottom: 0,
@@ -83,7 +65,7 @@ export default class VideoCell extends React.Component {
         <div
           style={cellStyle}
         >
-          {cellEmbed}
+          <WebcastEmbed webcast={this.props.webcast} />
           <VideoCellToolbarContainer
             style={toolbarStyle}
             webcast={this.props.webcast}
