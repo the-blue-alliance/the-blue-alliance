@@ -62,21 +62,17 @@ class TeamManipulator(ManipulatorBase):
             "rookie_year",
             "motto",
         ]
-        old_team._updated_attrs = []
 
         for attr in attrs:
             if getattr(new_team, attr) is not None:
                 if getattr(new_team, attr) != getattr(old_team, attr):
                     setattr(old_team, attr, getattr(new_team, attr))
-                    old_team._updated_attrs.append(attr)
                     old_team.dirty = True
 
         # Take the new tpid and tpid_year iff the year is newer than the old one
         if (new_team.first_tpid_year > old_team.first_tpid_year):
             old_team.first_tpid_year = new_team.first_tpid_year
             old_team.first_tpid = new_team.first_tpid
-            old_team._updated_attrs.append('first_tpid')
-            old_team._updated_attrs.append('first_tpid_year')
             old_team.dirty = True
 
         return old_team
