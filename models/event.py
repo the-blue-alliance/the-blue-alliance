@@ -125,14 +125,21 @@ class Event(ndb.Model):
 
     @ndb.tasklet
     def get_matches_async(self):
-        from database import match_query
-        self._matches = yield match_query.EventMatchesQuery(self.key_name).fetch_async()
+        if self._matches is None:
+            from database import match_query
+            self._matches = yield match_query.EventMatchesQuery(self.key_name).fetch_async()
+
+    def prep_matches(self):
+        if self._matches is None:
+            from database import match_query
+            self._matches = match_query.EventMatchesQuery(self.key_name).fetch_async()
 
     @property
     def matches(self):
         if self._matches is None:
-            if self._matches is None:
-                self.get_matches_async().wait()
+            self.get_matches_async().wait()
+        elif type(self._matches) == Future:
+            self._matches = self._matches.get_result()
         return self._matches
 
     def local_time(self):

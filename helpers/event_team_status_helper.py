@@ -2,7 +2,6 @@ from google.appengine.ext import ndb
 from google.appengine.ext.ndb.tasklets import Future
 
 from consts.ranking_indexes import RankingIndexes
-from database.match_query import EventMatchesQuery
 from helpers.match_helper import MatchHelper
 from helpers.team_helper import TeamHelper
 from models.event_details import EventDetails
@@ -181,13 +180,14 @@ class EventTeamStatusHelper(object):
         return None, alliance_number  # Team didn't make it to elims
 
     @classmethod
-    def buildEventTeamStatus(cls, live_events, live_eventteams, team_filter):
+    def buildEventTeamStatus(cls, events, eventteams, team_filter):
         # Currently Competing Team Status
-        for event in live_events:
+        for event in events:
             event.prep_details()  # Prepare details for later
+            event.prep_matches()  # Prepare matches for later
 
-        live_events_with_teams = []
-        for event, teams in zip(live_events, live_eventteams):
+        events_with_teams = []
+        for event, teams in zip(events, eventteams):
             teams = teams.get_result() if type(teams) == Future else teams
             live_teams_in_filter = TeamHelper.sortTeams(filter(lambda t: t in team_filter, teams))
 
@@ -195,9 +195,9 @@ class EventTeamStatusHelper(object):
             for team in live_teams_in_filter:
                 teams_and_statuses_future.append([team, cls.generateTeamAtEventStatusAsync(team.key_name, event)])
             if teams_and_statuses_future:
-                live_events_with_teams.append((event, teams_and_statuses_future))
+                events_with_teams.append((event, teams_and_statuses_future))
 
-        return live_events_with_teams
+        return events_with_teams
 
     @classmethod
     def _get_alliance_number(cls, team_key, event_details):
@@ -251,10 +251,11 @@ class EventTeamStatusHelper(object):
         team_number = team_key[3:]
         event.prep_details()
         # We need all the event's playoff matches here to properly account for backup teams
-        matches = yield EventMatchesQuery(event.key.id()).fetch_async()
+        event.prep_matches()
         qual_match_count = 0
         playoff_match_count = 0
         playoff_matches = []
+        matches = event.matches
         for match in matches:
             if match.comp_level in Match.ELIM_LEVELS:
                 playoff_match_count += 1
