@@ -17,7 +17,7 @@ from models.suggestion import Suggestion
 from models.team import Team
 
 
-class TestSuggestApiWriteController(unittest2.TestCase):
+class TestSuggestDesignsReviewController(unittest2.TestCase):
 
     def loginUser(self):
         self.testbed.setup_env(
