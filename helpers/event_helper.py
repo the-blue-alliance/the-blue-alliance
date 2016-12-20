@@ -24,24 +24,30 @@ class EventHelper(object):
     Helper class for Events.
     """
     @classmethod
-    def alliance_selections_to_points(self, event_key, multiplier, alliance_selections):
+    def alliance_selections_to_points(self, event, multiplier, alliance_selections):
         team_points = {}
-        if event_key == "2015micmp":
-            # Special case for 2015 Michigan District CMP, due to there being 16 alliances instead of 8
-            # Uses max of 48 points and no multiplier
-            # See 2015 Admin Manual, section 7.4.3.1
-            # http://www.firstinspires.org/sites/default/files/uploads/resource_library/frc/game-and-season-info/archive/2015/AdminManual20150407.pdf
-            for n, alliance in enumerate(alliance_selections):
-                team_points[alliance['picks'][0]] = int(48 - (1.5 * n))
-                team_points[alliance['picks'][1]] = int(48 - (1.5 * n))
-                team_points[alliance['picks'][2]] = int((n + 1) * 1.5)
-                n += 1
-        else:
-            for n, alliance in enumerate(alliance_selections):
-                n += 1
-                team_points[alliance['picks'][0]] = (17 - n) * multiplier
-                team_points[alliance['picks'][1]] = (17 - n) * multiplier
-                team_points[alliance['picks'][2]] = n * multiplier
+        try:
+            if event.key.id() == "2015micmp":
+                # Special case for 2015 Michigan District CMP, due to there being 16 alliances instead of 8
+                # Uses max of 48 points and no multiplier
+                # See 2015 Admin Manual, section 7.4.3.1
+                # http://www.firstinspires.org/sites/default/files/uploads/resource_library/frc/game-and-season-info/archive/2015/AdminManual20150407.pdf
+                for n, alliance in enumerate(alliance_selections):
+                    team_points[alliance['picks'][0]] = int(48 - (1.5 * n))
+                    team_points[alliance['picks'][1]] = int(48 - (1.5 * n))
+                    team_points[alliance['picks'][2]] = int((n + 1) * 1.5)
+                    n += 1
+            else:
+                for n, alliance in enumerate(alliance_selections):
+                    n += 1
+                    team_points[alliance['picks'][0]] = (17 - n) * multiplier
+                    team_points[alliance['picks'][1]] = (17 - n) * multiplier
+                    team_points[alliance['picks'][2]] = n * multiplier
+        except Exception, e:
+            # Log only if this matters
+            if event.event_district_enum != DistrictType.NO_DISTRICT:
+                logging.error("Alliance points calc for {} errored!".format(event.key.id()))
+                logging.exception(e)
 
         return team_points
 
