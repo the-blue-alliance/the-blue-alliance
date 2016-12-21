@@ -11,7 +11,7 @@
     </ol>
     <h1>{{ suggestion_sets|length }} Pending Webcast Suggestions</h1>
 
-    <form action="/suggest/event/webcast/review" method="post">
+    <form action="/suggest/event/webcast/review" method="post" id="review_webcasts">
         <div class="col-xs-12">
 
             {% if success == "accept" %}
@@ -48,7 +48,7 @@
             {% for suggestion_set in suggestion_sets %}
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <form action="/suggest/event/webcast/review" method="post">
+                        <form action="/suggest/event/webcast/review" method="post" id="reject_all_{{ suggestion_set.event.key_name }}">
                             <input type="hidden" name="suggestion_keys" value="{% for suggestion in suggestion_set.suggestions %}{{suggestion.key.id}}{% if not forloop.last %},{% endif %}{% endfor %}" />
                             <input type="hidden" name="event_key" value="{{suggestion_set.event.key_name}}" />
                             <button type="submit" class="btn btn-xs btn-danger pull-right" name="verdict" value="reject_all"><span class="glyphicon glyphicon-thumbs-down"></span> Reject All</button>
@@ -71,7 +71,7 @@
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <p><strong><a href="{{suggestion.contents.webcast_url}}" target="_blank">{{suggestion.contents.webcast_url}}</a></strong></p>
-                                        <form action="/suggest/event/webcast/review" method="post">
+                                        <form action="/suggest/event/webcast/review" method="post" id="review_{{ suggestion.key.id }}">
                                             {% if suggestion.webcast_template %}
                                                 {% with suggestion.contents.webcast_dict as webcast %}
                                                 <div style="height:300px;">

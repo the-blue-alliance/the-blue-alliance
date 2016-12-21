@@ -143,8 +143,8 @@
           <div class="row">
             <div class="col-xs-12">
               <h4>Add more media</h4>
-              <form action="/suggest/team/media" method="post">
-                <input name="team_key" type="hidden" value="{{team.key.id()}}" />
+              <form action="/suggest/team/media" method="post" id="suggest_media">
+                <input name="team_key" type="hidden" value="{% if team %}{{team.key.id()}}{% endif %}" />
                 <input name="year" type="hidden" value="{{year}}" />
                 <div class="input-group">
                   <span class="input-group-addon">{{year}}</span>

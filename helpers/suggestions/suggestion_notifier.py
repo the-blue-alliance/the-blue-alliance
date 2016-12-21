@@ -25,8 +25,8 @@ class SuggestionNotifier(object):
     def send_slack_alert(cls, webhook_url, body_text, attachment_list=None):
         # Send an alert to a specified slack channel to poke people to review this
         # Only do this on prod
-        #if tba_config.DEBUG:
-        #    return
+        if tba_config.DEBUG:
+            return
 
         post_dict = {
             'text': body_text,

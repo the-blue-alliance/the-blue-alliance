@@ -34,6 +34,9 @@ class SuggestTeamMediaController(LoggedInHandler):
         year = int(year_str)
         team_future = Team.get_by_id_async(self.request.get("team_key"))
         team = team_future.get_result()
+        if not team:
+            self.redirect("/", abort=True)
+
         media_key_futures = Media.query(Media.references == team.key, Media.year == year).fetch_async(500, keys_only=True)
         media_futures = ndb.get_multi_async(media_key_futures.get_result())
         medias = [media_future.get_result() for media_future in media_futures]
@@ -46,7 +49,7 @@ class SuggestTeamMediaController(LoggedInHandler):
             "medias_by_slugname": medias_by_slugname,
         })
 
-        self.response.out.write(jinja2_engine.render('suggest_team_media.html', self.template_values))
+        self.response.out.write(jinja2_engine.render('suggestions/suggest_team_media.html', self.template_values))
 
     def post(self):
         self._require_registration()
@@ -112,6 +115,9 @@ class SuggestTeamSocialMediaController(LoggedInHandler):
 
         team_future = Team.get_by_id_async(self.request.get("team_key"))
         team = team_future.get_result()
+        if not team:
+            self.redirect("/", abort=True)
+
         media_key_futures = Media.query(Media.references == team.key, Media.year == None).fetch_async(500, keys_only=True)
         media_futures = ndb.get_multi_async(media_key_futures.get_result())
         medias = [media_future.get_result() for media_future in media_futures]
@@ -123,7 +129,7 @@ class SuggestTeamSocialMediaController(LoggedInHandler):
             "social_medias": social_medias,
         })
 
-        self.response.out.write(jinja2_engine.render('suggest_team_social_media.html', self.template_values))
+        self.response.out.write(jinja2_engine.render('suggestions/suggest_team_social_media.html', self.template_values))
 
     def post(self):
         self._require_registration()

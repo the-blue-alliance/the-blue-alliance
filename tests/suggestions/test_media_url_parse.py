@@ -6,6 +6,7 @@ from google.appengine.ext import testbed
 
 from consts.media_type import MediaType
 from helpers.media_helper import MediaParser
+from helpers.webcast_helper import WebcastParser
 
 
 class TestMediaUrlParser(unittest2.TestCase):
@@ -128,3 +129,54 @@ class TestMediaUrlParser(unittest2.TestCase):
 
     def test_unsupported_url_parse(self):
         self.assertEqual(MediaParser.partial_media_dict_from_url("http://foo.bar"), None)
+
+
+class TestWebcastUrlParser(unittest2.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.testbed = testbed.Testbed()
+        cls.testbed.activate()
+        cls.testbed.init_urlfetch_stub()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.testbed.deactivate()
+
+    def testTwitchUrl(self):
+        res = WebcastParser.webcast_dict_from_url("http://twitch.tv/frcgamesense")
+        self.assertIsNotNone(res)
+        self.assertEqual(res['type'], 'twitch')
+        self.assertEqual(res['channel'], 'frcgamesense')
+
+        unknown = WebcastParser.webcast_dict_from_url("http://twitch.tv/")
+        self.assertIsNone(unknown)
+
+    def testYouTubeUrl(self):
+        yt_long = WebcastParser.webcast_dict_from_url("http://www.youtube.com/watch?v=I-IrVbsl_K8")
+        self.assertIsNotNone(yt_long)
+        self.assertEqual(yt_long['type'], 'youtube')
+        self.assertEqual(yt_long['channel'], 'I-IrVbsl_K8')
+
+        yt_short = WebcastParser.webcast_dict_from_url("http://youtu.be/I-IrVbsl_K8")
+        self.assertIsNotNone(yt_short)
+        self.assertEqual(yt_short['type'], 'youtube')
+        self.assertEqual(yt_short['channel'], 'I-IrVbsl_K8')
+
+        bad_long = WebcastParser.webcast_dict_from_url('"http://www.youtube.com/')
+        self.assertIsNone(bad_long)
+
+        bad_short = WebcastParser.webcast_dict_from_url("http://youtu.be/")
+        self.assertIsNone(bad_short)
+
+    def testUstream(self):
+        res = WebcastParser.webcast_dict_from_url('http://www.ustream.tv/decoraheagles')
+        self.assertIsNotNone(res)
+        self.assertEqual(res['type'], 'ustream')
+        self.assertEqual(res['channel'], '3064708')
+
+        bad = WebcastParser.webcast_dict_from_url('http://ustream.tv/')
+        self.assertIsNone(bad)
+
+    def testUnknownUrl(self):
+        bad = WebcastParser.webcast_dict_from_url("http://mywebsite.somewebcast")
+        self.assertIsNone(bad)

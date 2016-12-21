@@ -55,7 +55,7 @@ class Suggestion(ndb.Model):
         team_reference = Media.create_reference(
             self.contents['reference_type'],
             self.contents['reference_key'])
-        return MediaCreator.create_media(self, team_reference)
+        return MediaCreator.create_media_model(self, team_reference)
 
     @property
     def youtube_video(self):
