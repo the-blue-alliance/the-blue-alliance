@@ -22,20 +22,24 @@ class TestLocationHelper(unittest2.TestCase):
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
         # Load env vars that contain test keys
-        test_google_api_key = os.environ.get('TEST_GOOGLE_API_KEY', '')  # Frome in Travis CI
-        if not test_google_api_key:
-            with open('test_keys.json') as data_file:
-                test_keys = json.load(data_file)
-                test_google_api_key = test_keys.get('test_google_api_key', '')
+        self.test_google_api_key = os.environ.get('TEST_GOOGLE_API_KEY', '')  # Frome in Travis CI
+        if not self.test_google_api_key:
+            try:
+                with open('test_keys.json') as data_file:
+                    test_keys = json.load(data_file)
+                    self.test_google_api_key = test_keys.get('test_google_api_key', '')
+            except:
+                # Just go without
+                pass
 
         Sitevar(
             id='google.secrets',
-            values_json=json.dumps({'api_key': test_google_api_key})).put()
+            values_json=json.dumps({'api_key': self.test_google_api_key})).put()
 
     def tearDown(self):
         self.testbed.deactivate()
 
-    def test_event_location(self):
+    def test_event_location_generic(self):
         # 2016cama (generic event)
         event = Event(
             id='2016cama',
@@ -48,6 +52,8 @@ class TestLocationHelper(unittest2.TestCase):
             venue_address='Madera South High School\n705 W. Pecan Avenue\nMadera, CA 93637\nUSA'
             )
         LocationHelper.update_event_location(event)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(event.normalized_location.name, 'Madera South High School')
         self.assertEqual(event.normalized_location.formatted_address, '705 W Pecan Ave, Madera, CA 93637, USA')
         self.assertEqual(event.normalized_location.street_number, '705')
@@ -60,6 +66,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(event.normalized_location.postal_code, '93637')
         self.assertEqual(event.normalized_location.lat_lng, ndb.GeoPt(36.9393999, -120.0664811))
 
+    def test_event_location_odd_address(self):
         # 2016cada (weird address)
         event = Event(
             id='2016cada',
@@ -72,6 +79,8 @@ class TestLocationHelper(unittest2.TestCase):
             venue_address='UC Davis ARC Pavilion\nCorner of Orchard and LaRue\nDavis, CA 95616\nUSA'
             )
         LocationHelper.update_event_location(event)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(event.normalized_location.name, 'The Pavilion')
         self.assertEqual(event.normalized_location.formatted_address, 'Davis, CA 95616, USA')
         self.assertEqual(event.normalized_location.street_number, None)
@@ -84,6 +93,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(event.normalized_location.postal_code, '95616')
         self.assertEqual(event.normalized_location.lat_lng, ndb.GeoPt(38.5418888, -121.7595864))
 
+    def test_event_location_odd_venue(self):
         # 2016casj (weird venue)
         event = Event(
             id='2016casj',
@@ -96,6 +106,8 @@ class TestLocationHelper(unittest2.TestCase):
             venue_address='San Jose State University - The Event Center\n290 South 7th Street\nSan Jose, CA 95112\nUSA'
             )
         LocationHelper.update_event_location(event)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(event.normalized_location.name, 'The Event Center at SJSU')
         self.assertEqual(event.normalized_location.formatted_address, '290 S 7th St, San Jose, CA 95112, USA')
         self.assertEqual(event.normalized_location.street_number, '290')
@@ -108,6 +120,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(event.normalized_location.postal_code, '95112')
         self.assertEqual(event.normalized_location.lat_lng, ndb.GeoPt(37.33522809999999, -121.8800817))
 
+    def test_event_location_no_address(self):
         # 2016cmp (no venue address)
         event = Event(
             id='2016cmp',
@@ -120,6 +133,8 @@ class TestLocationHelper(unittest2.TestCase):
             venue_address=None
             )
         LocationHelper.update_event_location(event)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(event.normalized_location.name, 'The Dome at America\'s Center')
         self.assertEqual(event.normalized_location.formatted_address, '901 N Broadway, St. Louis, MO 63101, USA')
         self.assertEqual(event.normalized_location.street_number, '901')
@@ -132,6 +147,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(event.normalized_location.postal_code, '63101')
         self.assertEqual(event.normalized_location.lat_lng, ndb.GeoPt(38.6328287, -90.1885095))
 
+    def test_event_location_australia(self):
         # 2016ausy (Australia event)
         event = Event(
             id='2016ausy',
@@ -144,6 +160,8 @@ class TestLocationHelper(unittest2.TestCase):
             venue_address='Sydney Olympic Park Sports Centre\nOlympic Boulevard\nSydney Olympic Park, NSW 2127\nAustralia'
             )
         LocationHelper.update_event_location(event)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(event.normalized_location.name, 'Sydney Olympic Park Sports Centre')
         self.assertEqual(event.normalized_location.formatted_address, 'Olympic Blvd, Sydney Olympic Park NSW 2127, Australia')
         self.assertEqual(event.normalized_location.street_number, None)
@@ -156,6 +174,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(event.normalized_location.postal_code, '2127')
         self.assertEqual(event.normalized_location.lat_lng, ndb.GeoPt(-33.85341090000001, 151.0693752))
 
+    def test_event_location_china(self):
         # 2016gush (China event with really bad location details)
         event = Event(
             id='2016gush',
@@ -168,6 +187,8 @@ class TestLocationHelper(unittest2.TestCase):
             venue_address='The Sports Center of Shenzhen University\nNo. 2032 Liuxian Road\nNanshan District\nShenzhen City, 44 518000\nChina'
             )
         LocationHelper.update_event_location(event)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(event.normalized_location.name, 'Shenzhen University Town Sports Center')
         self.assertEqual(event.normalized_location.formatted_address, 'Liuxian Ave, Nanshan Qu, Shenzhen Shi, Guangdong Sheng, China, 518055')
         self.assertEqual(event.normalized_location.street_number, None)
@@ -180,6 +201,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(event.normalized_location.postal_code, '518055')
         self.assertEqual(event.normalized_location.lat_lng, ndb.GeoPt(22.585279, 113.978825))
 
+    def test_event_location_2016code(self):
         # 2016code
         event = Event(
             id='2016code',
@@ -192,6 +214,8 @@ class TestLocationHelper(unittest2.TestCase):
             venue_address='University of Denver - Daniel L. Ritchie Center\n2201 East Asbury Ave\nDenver, CO 80210\nUSA'
             )
         LocationHelper.update_event_location(event)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(event.normalized_location.name, 'Ritchie Center')
         self.assertEqual(event.normalized_location.formatted_address, '2240 Buchtel Blvd S, Denver, CO 80210, USA')
         self.assertEqual(event.normalized_location.street_number, '2240')
@@ -204,6 +228,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(event.normalized_location.postal_code, '80210')
         self.assertEqual(event.normalized_location.lat_lng, ndb.GeoPt(39.6819652, -104.9618983))
 
+    def test_event_location_2016ilpe(self):
         # 2016ilpe
         event = Event(
             id='2016ilpe',
@@ -216,6 +241,8 @@ class TestLocationHelper(unittest2.TestCase):
             venue_address='Renaissance Coliseum - Bradley University\n1600 W. Main Street\nPeoria, IL 61625\nUSA'
             )
         LocationHelper.update_event_location(event)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(event.normalized_location.name, 'Renaissance Coliseum')
         self.assertEqual(event.normalized_location.formatted_address, 'Renaissance Coliseum, N Maplewood Ave, Peoria, IL 61606, USA')
         self.assertEqual(event.normalized_location.street_number, None)
@@ -228,6 +255,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(event.normalized_location.postal_code, '61606')
         self.assertEqual(event.normalized_location.lat_lng, ndb.GeoPt(40.69919369999999, -89.61780639999999))
 
+    def test_event_location_2017isde1(self):
         # 2017isde1
         event = Event(
             id='2016ide1',
@@ -240,6 +268,8 @@ class TestLocationHelper(unittest2.TestCase):
             venue_address='Technion Sports Center\nTechnion\nHaifa, HA 00000\nIsrael'
             )
         LocationHelper.update_event_location(event)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(event.normalized_location.name, 'Technion Sports Center')
         self.assertEqual(event.normalized_location.formatted_address, 'Derech Ya\'akov Dori, Haifa, Israel')
         self.assertEqual(event.normalized_location.street_number, None)
@@ -252,6 +282,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(event.normalized_location.postal_code, None)
         self.assertEqual(event.normalized_location.lat_lng, ndb.GeoPt(32.77911630000001, 35.01909250000001))
 
+    def test_event_location_2017isde3(self):
         # 2017isde3
         event = Event(
             id='2016isde3',
@@ -264,6 +295,8 @@ class TestLocationHelper(unittest2.TestCase):
             venue_address='Shlomo Group Arena\n7 Isaac Remba St\nTel-Aviv, Yafo, TA 00000\nIsrael'
             )
         LocationHelper.update_event_location(event)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(event.normalized_location.name, 'Shlomo Group arena')
         self.assertEqual(event.normalized_location.formatted_address, 'Isaac Remba St 27, Tel Aviv-Yafo, Israel')
         self.assertEqual(event.normalized_location.street_number, '27')
@@ -276,6 +309,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(event.normalized_location.postal_code, None)
         self.assertEqual(event.normalized_location.lat_lng, ndb.GeoPt(32.1090726,34.8113608))
 
+    def test_event_location_2016mndu(self):
         # 2017mndu
         event = Event(
             id='2016mndu',
@@ -288,6 +322,8 @@ class TestLocationHelper(unittest2.TestCase):
             venue_address='DECC Arena/South Pioneer Hall\nDuluth Entertainment Convention Center\n350 Harbor Drive\nDuluth, MN 55802\nUSA'
             )
         LocationHelper.update_event_location(event)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(event.normalized_location.name, 'Duluth Entertainment Convention Center')
         self.assertEqual(event.normalized_location.formatted_address, '350 Harbor Dr, Duluth, MN 55802, USA')
         self.assertEqual(event.normalized_location.street_number, '350')
@@ -300,6 +336,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(event.normalized_location.postal_code, '55802')
         self.assertEqual(event.normalized_location.lat_lng, ndb.GeoPt(46.78126760000001, -92.09950649999999))
 
+    def test_event_location_2017mxto(self):
         # 2017mxto
         event = Event(
             id='2016mxto',
@@ -312,6 +349,8 @@ class TestLocationHelper(unittest2.TestCase):
             venue_address='ITESM Campus Laguna - Santiago Garza de la Mora\nPaseo del Tecnologico #751\nTorreon, COA 27250\nMexico'
             )
         LocationHelper.update_event_location(event)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(event.normalized_location.name, u'Instituto Tecnol\xf3gico de Estudios Superiores de Monterrey')
         self.assertEqual(event.normalized_location.formatted_address, u'Paseo del Tecnol\xf3gico 751, La Rosita, Amp la Rosita, 27250 Torre\xf3n, Coah., Mexico')
         self.assertEqual(event.normalized_location.street_number, None)
@@ -324,6 +363,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(event.normalized_location.postal_code, '27250')
         self.assertEqual(event.normalized_location.lat_lng, ndb.GeoPt(25.5173546, -103.3976534))
 
+    def test_event_location_nonsense(self):
         # 2017micmp (Nonsense data)
         event = Event(
             id='2017micmp',
@@ -336,6 +376,8 @@ class TestLocationHelper(unittest2.TestCase):
             venue_address='TBD - See Site Information\nTBD\nTBD, MI 00000\nUSA'
             )
         LocationHelper.update_event_location(event)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(event.normalized_location.name, None)
         self.assertEqual(event.normalized_location.formatted_address, None)
         self.assertEqual(event.normalized_location.street_number, None)
@@ -348,6 +390,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(event.normalized_location.postal_code, None)
         self.assertEqual(event.normalized_location.lat_lng, None)
 
+    def test_event_location_2008cal(self):
         # 2008cal (Only has city, state, country)
         event = Event(
             id='2008cal',
@@ -357,6 +400,8 @@ class TestLocationHelper(unittest2.TestCase):
             country='USA',
             )
         LocationHelper.update_event_location(event)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(event.normalized_location.name, None)
         self.assertEqual(event.normalized_location.formatted_address, 'San Jose, CA, USA')
         self.assertEqual(event.normalized_location.street_number, None)
@@ -369,7 +414,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(event.normalized_location.postal_code, None)
         self.assertEqual(event.normalized_location.lat_lng, ndb.GeoPt(37.3382082, -121.8863286))
 
-    def test_team_location(self):
+    def test_team_location_604(self):
         # Team 604 (generic team)
         team = Team(
             id='frc604',
@@ -380,6 +425,8 @@ class TestLocationHelper(unittest2.TestCase):
             country='USA'
             )
         LocationHelper.update_team_location(team)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(team.normalized_location.name, 'Leland High School')
         self.assertEqual(team.normalized_location.formatted_address, '6677 Camden Avenue, San Jose, CA 95120, USA')
         self.assertEqual(team.normalized_location.street_number, '6677')
@@ -392,6 +439,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(team.normalized_location.postal_code, '95120')
         self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(37.217065, -121.842901))
 
+    def test_team_location_456(self):
         # Team 456 (Many schools, odd school ordering)
         team = Team(
             id='frc456',
@@ -402,6 +450,8 @@ class TestLocationHelper(unittest2.TestCase):
             country='USA'
             )
         LocationHelper.update_team_location(team)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(team.normalized_location.name, None)
         self.assertEqual(team.normalized_location.formatted_address, 'Vicksburg, MS 39180, USA')
         self.assertEqual(team.normalized_location.street_number, None)
@@ -414,6 +464,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(team.normalized_location.postal_code, '39180')
         self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(32.2170441, -90.86751339999999))
 
+    def test_team_location_1868(self):
         # Team 1868 (Odd Sponsors, multiple schools)
         team = Team(
             id='frc1868',
@@ -424,6 +475,8 @@ class TestLocationHelper(unittest2.TestCase):
             country='USA'
             )
         LocationHelper.update_team_location(team)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(team.normalized_location.name, None)
         self.assertEqual(team.normalized_location.formatted_address, 'Mountain View, CA 94035, USA')
         self.assertEqual(team.normalized_location.street_number, None)
@@ -448,6 +501,7 @@ class TestLocationHelper(unittest2.TestCase):
         # self.assertEqual(team.normalized_location.postal_code, '94035')
         # self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(37.4090697, -122.0638253))
 
+    def test_team_location_3504(self):
         # Team 3504 (Odd Sponsors, multiple schools)
         team = Team(
             id='frc3504',
@@ -458,6 +512,8 @@ class TestLocationHelper(unittest2.TestCase):
             country='USA'
             )
         LocationHelper.update_team_location(team)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(team.normalized_location.name, None)
         self.assertEqual(team.normalized_location.formatted_address, 'Pittsburgh, PA 15213, USA')
         self.assertEqual(team.normalized_location.street_number, None)
@@ -482,6 +538,7 @@ class TestLocationHelper(unittest2.TestCase):
         # self.assertEqual(team.normalized_location.postal_code, '15213')
         # self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(40.4433142, -79.9452154))
 
+    def test_team_location_67(self):
         # Team 67 (Multiple schools)
         team = Team(
             id='frc67',
@@ -492,6 +549,8 @@ class TestLocationHelper(unittest2.TestCase):
             country='USA'
             )
         LocationHelper.update_team_location(team)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(team.normalized_location.name, 'Huron Valley Schools')
         self.assertEqual(team.normalized_location.formatted_address, '2390 S Milford Rd, Highland, MI 48357, USA')
         self.assertEqual(team.normalized_location.street_number, '2390')
@@ -504,6 +563,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(team.normalized_location.postal_code, '48357')
         self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(42.6171756, -83.6182952))
 
+    def test_team_location_6018(self):
         # Team 6018 (School in China)
         team = Team(
             id='frc6018',
@@ -514,6 +574,8 @@ class TestLocationHelper(unittest2.TestCase):
             country='China'
             )
         LocationHelper.update_team_location(team)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(team.normalized_location.name, 'High School Attached To Northwest Normal University')
         self.assertEqual(team.normalized_location.formatted_address, '21 Shilidian S St, Anning Qu, Lanzhou Shi, Gansu Sheng, China, 730070')
         self.assertEqual(team.normalized_location.street_number, '21')
@@ -526,6 +588,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(team.normalized_location.postal_code, '730070')
         self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(36.09318959999999, 103.7491115))
 
+    def test_team_location_6434(self):
         # Team 6434 (School in Australia)
         team = Team(
             id='frc6434',
@@ -536,6 +599,8 @@ class TestLocationHelper(unittest2.TestCase):
             country='Australia'
             )
         LocationHelper.update_team_location(team)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(team.normalized_location.name, 'Bossley Park High School')
         self.assertEqual(team.normalized_location.formatted_address, '36-44 Prairie Vale Rd, Bossley Park NSW 2176, Australia')
         self.assertEqual(team.normalized_location.street_number, '36-44')
@@ -548,6 +613,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(team.normalized_location.postal_code, '2176')
         self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(-33.870024, 150.8753854))
 
+    def test_team_location_2122(self):
         # Team 2122 (Complicated team name, wrong postal code)
         team = Team(
             id='frc2122',
@@ -558,6 +624,8 @@ class TestLocationHelper(unittest2.TestCase):
             country='USA'
             )
         LocationHelper.update_team_location(team)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(team.normalized_location.name, None)
         self.assertEqual(team.normalized_location.formatted_address, 'Boise, ID 83709, USA')
         self.assertEqual(team.normalized_location.street_number, None)
@@ -582,6 +650,7 @@ class TestLocationHelper(unittest2.TestCase):
         # self.assertEqual(team.normalized_location.postal_code, '83714')
         # self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(43.68010509999999, -116.2800371))
 
+    def test_team_location_3354(self):
         # Team 3354 (Mexican team, special symbols, odd school name)
         team = Team(
             id='frc3354',
@@ -592,6 +661,8 @@ class TestLocationHelper(unittest2.TestCase):
             country='Mexico'
             )
         LocationHelper.update_team_location(team)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(team.normalized_location.name, None)
         self.assertEqual(team.normalized_location.formatted_address, u'San Pablo, 76130 Santiago de Quer\xe9taro, Qro., Mexico')
         self.assertEqual(team.normalized_location.street_number, None)
@@ -616,6 +687,7 @@ class TestLocationHelper(unittest2.TestCase):
         # self.assertEqual(team.normalized_location.postal_code, '76130')
         # self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(20.6133432, -100.4053132))
 
+    def test_team_location_3933(self):
         # Team 3933 (Mexican team, special symbols, odd school name)
         team = Team(
             id='frc3933',
@@ -626,6 +698,8 @@ class TestLocationHelper(unittest2.TestCase):
             country='Mexico'
             )
         LocationHelper.update_team_location(team)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(team.normalized_location.name, None)
         self.assertEqual(team.normalized_location.formatted_address, 'Mexico City, CDMX, Mexico')
         self.assertEqual(team.normalized_location.street_number, None)
@@ -650,6 +724,7 @@ class TestLocationHelper(unittest2.TestCase):
         # self.assertEqual(team.normalized_location.postal_code, '01389')
         # self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(19.3593887, -99.26045889999999))
 
+    def test_team_location_6227(self):
         # Team 6227 (Chinese team, odd school name)
         team = Team(
             id='frc6227',
@@ -660,6 +735,8 @@ class TestLocationHelper(unittest2.TestCase):
             country='China'
             )
         LocationHelper.update_team_location(team)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(team.normalized_location.name, None)
         self.assertEqual(team.normalized_location.formatted_address, 'Xi\'an, Shaanxi, China')
         self.assertEqual(team.normalized_location.street_number, None)
@@ -684,6 +761,7 @@ class TestLocationHelper(unittest2.TestCase):
         # self.assertEqual(team.normalized_location.postal_code, '710000')
         # self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(34.24073449999999, 108.916593))
 
+    def test_team_location_6228(self):
         # Team 6228 (Turkish team, odd school name)
         team = Team(
             id='frc6228',
@@ -694,6 +772,8 @@ class TestLocationHelper(unittest2.TestCase):
             country='Turkey'
             )
         LocationHelper.update_team_location(team)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(team.normalized_location.name, None)
         self.assertEqual(team.normalized_location.formatted_address, u'Harbiye, 34367 \u015ei\u015fli/\u0130stanbul, Turkey')
         self.assertEqual(team.normalized_location.street_number, None)
@@ -718,6 +798,7 @@ class TestLocationHelper(unittest2.TestCase):
         # self.assertEqual(team.normalized_location.postal_code, '34367')
         # self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(41.047045, 28.994531))
 
+    def test_team_location_6231(self):
         # Team 6231 (Turkish team, odd school name)
         team = Team(
             id='frc6231',
@@ -728,6 +809,8 @@ class TestLocationHelper(unittest2.TestCase):
             country='Turkey'
             )
         LocationHelper.update_team_location(team)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(team.normalized_location.name, u'\u0130MM\u0130B Erkan Avc\u0131 Mesleki ve Teknik Anadolu Lisesi')
         self.assertEqual(team.normalized_location.formatted_address, u'Bah\xe7elievler, K\xfclt\xfcr Sk. No:3, . K\xfclt\xfcr Sk. Bah\xe7elievler/\u0130stanbul, Turkey')
         self.assertEqual(team.normalized_location.street_number, '3')
@@ -740,6 +823,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(team.normalized_location.postal_code, u'. K\xfclt\xfcr Sk.')
         self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(40.996236, 28.8618779))
 
+    def test_team_location_4403(self):
         # Team 4403 (Turkish team, odd school name)
         team = Team(
             id='frc4403',
@@ -750,6 +834,8 @@ class TestLocationHelper(unittest2.TestCase):
             country='Mexico'
             )
         LocationHelper.update_team_location(team)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(team.normalized_location.name, None)
         self.assertEqual(team.normalized_location.formatted_address, u'Residencial Campestre la Rosita, 27250 Torre\xf3n, Coah., Mexico')
         self.assertEqual(team.normalized_location.street_number, None)
@@ -774,6 +860,7 @@ class TestLocationHelper(unittest2.TestCase):
         # self.assertEqual(team.normalized_location.postal_code, '27250')
         # self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(25.5173546, -103.3976534))
 
+    def test_team_location_3211(self):
         # Team 3211 (odd location)
         team = Team(
             id='frc3211',
@@ -784,6 +871,8 @@ class TestLocationHelper(unittest2.TestCase):
             country='Israel'
             )
         LocationHelper.update_team_location(team)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(team.normalized_location.name, None)
         self.assertEqual(team.normalized_location.formatted_address, 'Yeruham, Israel')
         self.assertEqual(team.normalized_location.street_number, None)
@@ -796,6 +885,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(team.normalized_location.postal_code, None)
         self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(30.987804, 34.929741))
 
+    def test_team_location_simple(self):
         # Only has city, state, country
         team = Team(
             id='frc9999',
@@ -804,6 +894,8 @@ class TestLocationHelper(unittest2.TestCase):
             country='USA',
             )
         LocationHelper.update_team_location(team)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(team.normalized_location.name, None)
         self.assertEqual(team.normalized_location.formatted_address, 'San Jose, CA, USA')
         self.assertEqual(team.normalized_location.street_number, None)
@@ -816,6 +908,7 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(team.normalized_location.postal_code, None)
         self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(37.3382082, -121.8863286))
 
+    def test_team_location_nonsense(self):
         # Nonsense location
         team = Team(
             id='frc9999',
@@ -824,6 +917,8 @@ class TestLocationHelper(unittest2.TestCase):
             country='NOTACOUNTRY',
             )
         LocationHelper.update_team_location(team)
+        if not self.test_google_api_key:
+            return
         self.assertEqual(team.normalized_location.name, None)
         self.assertEqual(team.normalized_location.formatted_address, None)
         self.assertEqual(team.normalized_location.street_number, None)

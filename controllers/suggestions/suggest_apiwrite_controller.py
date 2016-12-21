@@ -17,7 +17,7 @@ class SuggestApiWriteController(LoggedInHandler):
             "auth_types": AuthType.type_names,
         })
         self.response.out.write(
-            jinja2_engine.render('suggest_apiwrite.html', self.template_values))
+            jinja2_engine.render('suggestions/suggest_apiwrite.html', self.template_values))
 
     def post(self):
         self._require_login()
@@ -34,12 +34,7 @@ class SuggestApiWriteController(LoggedInHandler):
         if status == 'success':
             subject, body = self._gen_notification_email(event_key, self.user_bundle)
             SuggestionNotifier.send_admin_alert_email(subject, body)
-        self.template_values.update({
-            'status': status,
-            "auth_types": AuthType.type_names,
-        })
-        self.response.out.write(
-            jinja2_engine.render('suggest_apiwrite.html', self.template_values))
+        self.redirect('/request/apiwrite?status={}'.format(status), abort=True)
 
     @staticmethod
     def _gen_notification_email(event_key, user_bundle):

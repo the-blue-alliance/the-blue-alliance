@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import 'media_partials/social_media_macros.html' as smm %}
 
 {% block title %}Pending Suggestions{% endblock %}
 
@@ -7,11 +8,11 @@
 
   <ol class="breadcrumb">
     <li><a href="/suggest/review">Suggestions</a></li>
-    <li class="active">Team CAD Models</li>
+    <li class="active">Team Social Media</li>
   </ol>
-  <h1>{{ suggestions_and_references|length }} Pending CAD Suggestions</h1>
+  <h1>{{ suggestions_and_references|length }} Pending Team Social Media Suggestions</h1>
 
-  <form action="/suggest/cad/review" method="post">
+  <form action="/suggest/team/social/review" method="post" id="review_social">
       <div class="col-xs-12">
 
           <div class="row">
@@ -35,11 +36,9 @@
                       <input class="reject" type="radio" name="accept_reject-{{suggestion.key.id()}}" value="reject::{{suggestion.key.id()}}"> Reject
                     </label>
                   </div>
-                  <div class="col-xs-5">
+                  <div class="col-xs-5 fitvids">
                       <p><strong><a href="/team/{{reference.team_number}}/{{suggestion.contents.year}}" target="_blank">Team {{reference.team_number}}{% if reference.nickname %} - {{reference.nickname}}{% endif %} ({{suggestion.contents.year}})</a></strong></p>
-                      <p><a href="https://grabcad.com/library/{{ suggestion.contents.foreign_key }}" target="_blank">https://grabcad.com/library/{{ suggestion.contents.foreign_key }}</a></p>
-                      {% set media = suggestion.candidate_media -%}
-                      {% include "media_partials/media_display_partial.html" %}
+                      {{smm.social_media_card(suggestion)}}
                   </div>
                   <div class="col-xs-2">
                       <ul>

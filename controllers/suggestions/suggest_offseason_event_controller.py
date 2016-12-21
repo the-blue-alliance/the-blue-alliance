@@ -15,7 +15,7 @@ class SuggestOffseasonEventController(LoggedInHandler):
             "status": self.request.get("status"),
         })
         self.response.out.write(
-            jinja2_engine.render('suggest_offseason_event.html', self.template_values))
+            jinja2_engine.render('suggestions/suggest_offseason_event.html', self.template_values))
 
     def post(self):
         self._require_registration()
@@ -45,7 +45,7 @@ class SuggestOffseasonEventController(LoggedInHandler):
                 'venue_address': self.request.get('venue_address', None),
             })
             self.response.out.write(
-                jinja2_engine.render('suggest_offseason_event.html', self.template_values))
+                jinja2_engine.render('suggestions/suggest_offseason_event.html', self.template_values))
         else:
             subject, body = self._gen_notification_email(event_name)
             SuggestionNotifier.send_admin_alert_email(subject, body)

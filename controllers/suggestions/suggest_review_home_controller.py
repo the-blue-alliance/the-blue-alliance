@@ -39,4 +39,4 @@ class SuggestReviewHomeController(SuggestionsReviewBaseController):
         self.template_values['cad_permission'] = AccountPermissions.REVIEW_DESIGNS
         self.template_values['status'] = self.request.get('status')
 
-        self.response.out.write(jinja2_engine.render('suggest_review_home.html', self.template_values))
+        self.response.out.write(jinja2_engine.render('suggestions/suggest_review_home.html', self.template_values))
