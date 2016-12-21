@@ -83,6 +83,7 @@ class SearchHelper(object):
             # Events
             year_event_types = set()
             for event in events:
+                # Allow searching by event type
                 if event.event_type_enum not in overall_event_types:
                     overall_fields += [search.AtomField(name='event_type', value=str(event.event_type_enum))]
                     overall_event_types.add(event.event_type_enum)
@@ -97,7 +98,10 @@ class SearchHelper(object):
             year_divwin_count = 0
             year_cmpwin_count = 0
             for award in awards_by_year.get(year, []):
-                # Allow searching by award type and event tpye
+                if award.event_type_enum not in EventType.SEASON_EVENT_TYPES:
+                    continue
+
+                # Allow searching by award type and event type
                 ea_type = '{}_{}'.format(award.event_type_enum, award.award_type_enum)
                 if ea_type not in overall_event_award_types:
                     overall_fields += [search.AtomField(name='event_award_type', value=ea_type)]
