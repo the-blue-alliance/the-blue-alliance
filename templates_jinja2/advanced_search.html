@@ -30,7 +30,7 @@
 
             <div class="col-sm-6 col-md-3">
               <label class="sr-only" for="input-award">Award Filter</label>
-              <select class="form-control selectpicker" id="input-award" name="award_type" multiple title="Won Awards" data-actions-box="true" data-live-search="true">
+              <select class="form-control selectpicker" id="input-award-type" name="award_type" multiple title="Won Awards" data-actions-box="true" data-live-search="true">
                 {% for valid_award_type, valid_award_type_name in valid_award_types %}
                   <option value="{{valid_award_type}}"{% if valid_award_type in award_types %} selected="selected"{% endif %}>{{valid_award_type_name}}</option>
                   {% if loop.index == num_special_awards %}<option data-divider="true"></option>{% endif %}
@@ -40,7 +40,7 @@
 
             <div class="col-sm-6 col-md-3">
               <label class="sr-only" for="input-event-type">Event Filter</label>
-              <select class="form-control selectpicker" id="input-event-type" name="event_type" multiple title="At Events" data-actions-box="true">
+              <select class="form-control selectpicker" id="input-event-type" name="event_type" multiple title="At Events" data-actions-box="true" disabled>
                 {% for valid_event_type, valid_event_type_name in valid_event_types %}
                   <option value="{{valid_event_type}}"{% if valid_event_type in event_types %} selected="selected"{% endif %}>{{valid_event_type_name}}</option>
                 {% endfor %}
@@ -148,4 +148,18 @@
   </div>
 
 </div>
+{% endblock %}
+
+{% block inline_javascript %}
+<script>
+  $('#input-award-type').on('changed.bs.select loaded.bs.select', function () {
+    if ($(this).selectpicker('val') == null) {
+      $('#input-event-type').prop('disabled', true);
+      $('#input-event-type').selectpicker('refresh');
+    } else {
+      $('#input-event-type').prop('disabled', false);
+      $('#input-event-type').selectpicker('refresh');
+    }
+  });
+</script>
 {% endblock %}

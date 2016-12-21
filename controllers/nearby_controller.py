@@ -23,22 +23,17 @@ SORT_ORDER = {
 
 class NearbyController(CacheableHandler):
     VALID_YEARS = list(reversed(range(1992, tba_config.MAX_YEAR + 1)))
-    # VALID_AWARD_TYPES = [
-    #     (AwardType.CHAIRMANS, 'Chairman\'s'),
-    #     (AwardType.ENGINEERING_INSPIRATION, 'Engineering Inspiration'),
-    #     (AwardType.WINNER, 'Event Winner'),
-    #     (AwardType.FINALIST, 'Event Finalist'),
-    #     (AwardType.WOODIE_FLOWERS, 'Woodie Flowers'),
-    # ]
-    VALID_AWARD_TYPES = [kv for kv in AwardType.GENERIC_NAMES.items()]
 
+    VALID_AWARD_TYPES = [kv for kv in AwardType.GENERIC_NAMES.items()]
     VALID_AWARD_TYPES = sorted(
         VALID_AWARD_TYPES,
         key=lambda (event_type, name): SORT_ORDER.get(event_type, name))
+
     VALID_EVENT_TYPES = [
         (EventType.CMP_DIVISION, 'Championship Division'),
-        (EventType.CMP_FINALS, 'Einstein Field'),
+        (EventType.CMP_FINALS, 'Championship'),
     ]
+
     DEFAULT_SEARCH_TYPE = 'teams'
     PAGE_SIZE = 20
     METERS_PER_MILE = 5280 * 12 * 2.54 / 100
@@ -67,6 +62,10 @@ class NearbyController(CacheableHandler):
             # Sort to make caching more likely
             event_types = sorted([int(event_type) for event_type in event_types])
         else:
+            event_types = []
+
+        if event_types and not award_types:
+            # Don't allow only filtering by event
             event_types = []
 
         location = self.request.get('location', '')
@@ -117,21 +116,19 @@ class NearbyController(CacheableHandler):
                     )]
 
         returned_fields = ['bb_count']
+        query_type = None
         if award_types and event_types:
+            query_type = 'event_award'
             for award_type in award_types:
                 for event_type in event_types:
                     field = 'event_award_{}_{}_count'.format(event_type, award_type)
                     query_string += ' AND {} > 0'.format(field, event_type, award_type)
                     returned_fields += [field]
         elif award_types:
+            query_type = 'award'
             for award_type in award_types:
                 field = 'award_{}_count'.format(award_type)
                 query_string += ' AND {} > 0'.format(field, award_type)
-                returned_fields += [field]
-        elif event_types:
-            for event_type in event_types:
-                field = 'event_{}_count'.format(event_type)
-                query_string += ' AND {} > 0'.format(field, event_type)
                 returned_fields += [field]
 
         query = search.Query(
@@ -180,9 +177,22 @@ class NearbyController(CacheableHandler):
         field_names = []
         for field in returned_fields:
             if field == 'bb_count':
-                field_names.append('Blue Banners')
+                field_names.append('# Blue Banner')
             else:
-                field_names.append(field)
+                if query_type == 'event_award':
+                    split = field.split('_')
+                    event_type = int(split[2])
+                    award_type = int(split[3])
+
+                    if event_type == 3:  # TODO don't hardcode
+                        event_str = 'Championship Division'
+                    elif event_type == 4:
+                        event_str = 'Championship'
+
+                    field_names.append('# {} {}'.format(event_str, AwardType.GENERIC_NAMES.get(award_type)))
+                elif query_type == 'award':
+                    award_type = int(field.split('_')[1])
+                    field_names.append('# {}'.format(AwardType.GENERIC_NAMES.get(award_type)))
 
         results = zip([result_future.get_result() for result_future in result_futures], all_fields)
 
