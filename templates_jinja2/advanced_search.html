@@ -33,6 +33,7 @@
                 <!-- <option value="">No Award Filter</option> -->
                 {% for valid_award_type, valid_award_type_name in valid_award_types %}
                   <option value="{{valid_award_type}}"{% if valid_award_type in award_types %} selected="selected"{% endif %}>{{valid_award_type_name}}</option>
+                  {% if loop.index == num_special_awards %}<option data-divider="true"></option>{% endif %}
                 {% endfor %}
               </select>
             </div>

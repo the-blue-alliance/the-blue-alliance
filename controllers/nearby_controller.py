@@ -13,15 +13,29 @@ from models.event_team import EventTeam
 from template_engine import jinja2_engine
 
 
+SORT_ORDER = {
+    AwardType.CHAIRMANS: 0,
+    AwardType.ENGINEERING_INSPIRATION: 1,
+    AwardType.WINNER: 2,
+    AwardType.FINALIST: 3,
+    AwardType.WOODIE_FLOWERS: 4,
+}
+
+
 class NearbyController(CacheableHandler):
     VALID_YEARS = list(reversed(range(1992, tba_config.MAX_YEAR + 1)))
-    VALID_AWARD_TYPES = [
-        (AwardType.CHAIRMANS, 'Chairman\'s'),
-        (AwardType.ENGINEERING_INSPIRATION, 'Engineering Inspiration'),
-        (AwardType.WINNER, 'Event Winner'),
-        (AwardType.FINALIST, 'Event Finalist'),
-        (AwardType.WOODIE_FLOWERS, 'Woodie Flowers'),
-    ]
+    # VALID_AWARD_TYPES = [
+    #     (AwardType.CHAIRMANS, 'Chairman\'s'),
+    #     (AwardType.ENGINEERING_INSPIRATION, 'Engineering Inspiration'),
+    #     (AwardType.WINNER, 'Event Winner'),
+    #     (AwardType.FINALIST, 'Event Finalist'),
+    #     (AwardType.WOODIE_FLOWERS, 'Woodie Flowers'),
+    # ]
+    VALID_AWARD_TYPES = [kv for kv in AwardType.GENERIC_NAMES.items()]
+
+    VALID_AWARD_TYPES = sorted(
+        VALID_AWARD_TYPES,
+        key=lambda (event_type, name): SORT_ORDER.get(event_type, name))
     VALID_EVENT_TYPES = [
         (EventType.CMP_DIVISION, 'Championship Division'),
         (EventType.CMP_FINALS, 'Einstein Field'),
@@ -155,6 +169,7 @@ class NearbyController(CacheableHandler):
         self.template_values.update({
             'valid_years': self.VALID_YEARS,
             'valid_award_types': self.VALID_AWARD_TYPES,
+            'num_special_awards': len(SORT_ORDER),
             'valid_event_types': self.VALID_EVENT_TYPES,
             'page_size': self.PAGE_SIZE,
             'page': page,
