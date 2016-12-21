@@ -20,7 +20,8 @@
           <div class="row">
             <div class="col-sm-6 col-md-2">
               <label class="sr-only" for="input-year">Year</label>
-              <select class="form-control" id="input-year" name="year">
+              <select class="form-control selectpicker" id="input-year" name="year">
+                <option value="0">All Years</option>
                 {% for valid_year in valid_years %}
                   <option value="{{valid_year}}"{% if valid_year == year %} selected="selected"{% endif %}>{{valid_year}}</option>
                 {% endfor %}
@@ -30,7 +31,6 @@
             <div class="col-sm-6 col-md-3">
               <label class="sr-only" for="input-award">Award Filter</label>
               <select class="form-control selectpicker" id="input-award" name="award_type" multiple title="Won Awards" data-actions-box="true" data-live-search="true">
-                <!-- <option value="">No Award Filter</option> -->
                 {% for valid_award_type, valid_award_type_name in valid_award_types %}
                   <option value="{{valid_award_type}}"{% if valid_award_type in award_types %} selected="selected"{% endif %}>{{valid_award_type_name}}</option>
                   {% if loop.index == num_special_awards %}<option data-divider="true"></option>{% endif %}
@@ -41,7 +41,6 @@
             <div class="col-sm-6 col-md-3">
               <label class="sr-only" for="input-event-type">Event Filter</label>
               <select class="form-control selectpicker" id="input-event-type" name="event_type" multiple title="At Events" data-actions-box="true">
-                <!-- <option value="">No Event Filter</option> -->
                 {% for valid_event_type, valid_event_type_name in valid_event_types %}
                   <option value="{{valid_event_type}}"{% if valid_event_type in event_types %} selected="selected"{% endif %}>{{valid_event_type_name}}</option>
                 {% endfor %}
@@ -114,7 +113,7 @@
               <tr>
                 <td>
                   {% if search_type == 'teams' %}
-                    <a href="/team/{{result.team_number}}/{{year}}" title="Team {{result.team_number }} - {{result.nickname}}">Team {{result.team_number }} - {{result.nickname}}</a>
+                    <a href="/team/{{result.team_number}}/{% if year == 0 %}history{% else %}{{year}}{% endif %}" title="Team {{result.team_number }} - {{result.nickname}}">Team {{result.team_number }} - {{result.nickname}}</a>
                   {% else %}
                     <a href="/event/{{result.key_name}}" title="{{result.name}}">{{result.name}}</a>
                   {% endif %}

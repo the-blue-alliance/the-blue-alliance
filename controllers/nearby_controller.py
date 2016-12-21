@@ -1,4 +1,3 @@
-import datetime
 import logging
 import tba_config
 
@@ -51,9 +50,9 @@ class NearbyController(CacheableHandler):
         self._cache_expiration = 60 * 60 * 24
 
     def _get_params(self):
-        year = self.request.get('year', None)
+        year = self.request.get('year')
         if not year:
-            year = datetime.datetime.now().year
+            year = 0
         year = int(year)
 
         award_types = self.request.get('award_type', allow_multiple=True)
