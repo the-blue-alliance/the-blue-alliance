@@ -103,8 +103,8 @@ class SearchHelper(object):
                 year_event_award_types_count[ea_type] += 1
 
                 # Allow searching/sorting by award type
-                overall_award_types_count[award.event_type_enum] += 1
-                year_award_types_count[award.event_type_enum] += 1
+                overall_award_types_count[award.award_type_enum] += 1
+                year_award_types_count[award.award_type_enum] += 1
 
                 # Allow searching/sorting by blue banners
                 if award.award_type_enum in AwardType.BLUE_BANNER_AWARDS:
