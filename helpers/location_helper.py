@@ -190,7 +190,7 @@ class LocationHelper(object):
         # Fallback to city, country
         if not location_info:
             logging.warning("Falling back to city/country only for team {}".format(team.key.id()))
-            city_country = '{} {}'.format(
+            city_country = u'{} {}'.format(
                 team.city if team.city else '',
                 team.country if team.country else '')
             geocode_result = cls.google_maps_geocode_async(city_country).get_result()
