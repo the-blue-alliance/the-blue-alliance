@@ -71,9 +71,9 @@ class SearchHelper(object):
 
         # Construct overall and year specific fields
         overall_fields = same_fields + [search.NumberField(name='year', value=0)]
-        overall_event_types = set()
-        overall_event_award_types = set()
-        overall_award_types = set()
+        overall_event_types_count = defaultdict(int)
+        overall_event_award_types_count = defaultdict(int)
+        overall_award_types_count = defaultdict(int)
         overall_bb_count = 0
         overall_divwin_count = 0
         overall_cmpwin_count = 0
@@ -81,19 +81,19 @@ class SearchHelper(object):
             year_fields = same_fields + [search.NumberField(name='year', value=year)]
 
             # Events
-            year_event_types = set()
+            year_event_types_count = defaultdict(int)
             for event in events:
-                # Allow searching by event type
-                if event.event_type_enum not in overall_event_types:
+                # Allow searching/sorting by event type
+                overall_event_types_count[event.event_type_enum] += 1
+                if event.event_type_enum not in overall_event_types_count:
                     overall_fields += [search.AtomField(name='event_type', value=str(event.event_type_enum))]
-                    overall_event_types.add(event.event_type_enum)
-                if event.event_type_enum not in year_event_types:
+                year_event_types_count[event.event_type_enum] += 1
+                if event.event_type_enum not in year_event_types_count:
                     year_fields += [search.AtomField(name='event_type', value=str(event.event_type_enum))]
-                    year_event_types.add(event.event_type_enum)
 
             # Awards
-            year_event_award_types = set()
-            year_award_types = set()
+            year_event_award_types_count = defaultdict(int)
+            year_award_types_count = defaultdict(int)
             year_bb_count = 0
             year_divwin_count = 0
             year_cmpwin_count = 0
@@ -101,22 +101,22 @@ class SearchHelper(object):
                 if award.event_type_enum not in EventType.SEASON_EVENT_TYPES:
                     continue
 
-                # Allow searching by award type and event type
+                # Allow searching/sorting by award type and event type
                 ea_type = '{}_{}'.format(award.event_type_enum, award.award_type_enum)
-                if ea_type not in overall_event_award_types:
+                overall_event_award_types_count[ea_type] += 1
+                if ea_type not in overall_event_award_types_count:
                     overall_fields += [search.AtomField(name='event_award_type', value=ea_type)]
-                    overall_event_award_types.add(ea_type)
-                if ea_type not in year_event_award_types:
+                year_event_award_types_count[ea_type] += 1
+                if ea_type not in year_event_award_types_count:
                     year_fields += [search.AtomField(name='event_award_type', value=ea_type)]
-                    year_event_award_types.add(ea_type)
 
-                # Allow searching by award type
-                if award.award_type_enum not in overall_award_types:
+                # Allow searching/sorting by award type
+                overall_award_types_count[award.event_type_enum] += 1
+                if award.award_type_enum not in overall_award_types_count:
                     overall_fields += [search.AtomField(name='award_type', value=str(award.award_type_enum))]
-                    overall_award_types.add(award.award_type_enum)
-                if award.award_type_enum not in year_award_types:
+                year_award_types_count[award.event_type_enum] += 1
+                if award.award_type_enum not in year_award_types_count:
                     year_fields += [search.AtomField(name='award_type', value=str(award.award_type_enum))]
-                    year_award_types.add(award.award_type_enum)
 
                 # Allow searching/sorting by blue banners
                 if award.award_type_enum in AwardType.BLUE_BANNER_AWARDS:
@@ -135,8 +135,16 @@ class SearchHelper(object):
             year_fields += [
                 search.NumberField(name='bb_count', value=year_bb_count),
                 search.NumberField(name='divwin_count', value=year_divwin_count),
-                search.NumberField(name='cmpwin_count', value=year_cmpwin_count),
-            ]
+                search.NumberField(name='cmpwin_count', value=year_cmpwin_count)] + [
+                search.NumberField(
+                    name='event_{}_count'.format(event_type),
+                    value=count) for event_type, count in year_event_types_count.items()] + [
+                search.NumberField(
+                    name='event_award_{}_count'.format(event_award_type),
+                    value=count) for event_award_type, count in year_event_award_types_count.items()] + [
+                search.NumberField(
+                    name='award_{}_count'.format(award_type),
+                    value=count) for award_type, count in year_award_types_count.items()]
 
             # Put year index
             search.Index(name=cls.TEAM_YEAR_INDEX).put(
@@ -145,8 +153,16 @@ class SearchHelper(object):
         overall_fields += [
             search.NumberField(name='bb_count', value=overall_bb_count),
             search.NumberField(name='divwin_count', value=overall_divwin_count),
-            search.NumberField(name='cmpwin_count', value=overall_cmpwin_count),
-        ]
+            search.NumberField(name='cmpwin_count', value=overall_cmpwin_count)] + [
+            search.NumberField(
+                name='event_{}_count'.format(event_type),
+                value=count) for event_type, count in overall_event_types_count.items()] + [
+            search.NumberField(
+                name='event_award_{}_count'.format(event_award_type),
+                value=count) for event_award_type, count in overall_event_award_types_count.items()] + [
+            search.NumberField(
+                name='award_{}_count'.format(award_type),
+                value=count) for award_type, count in overall_award_types_count.items()]
 
         # Put overall index
         search.Index(name=cls.TEAM_YEAR_INDEX).put(
