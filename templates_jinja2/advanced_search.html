@@ -1,3 +1,5 @@
+{% import "advanced_search_partials/search_macros.html" as sm with context %}
+
 {% extends "base.html" %}
 
 {% block title %}Advanced Search - The Blue Alliance{% endblock %}
@@ -102,10 +104,10 @@
         <table class="event-table">
           <thead>
             <tr>
-              <th>{% if search_type == 'teams' %}Team{% else %}Event{% endif %}{% if sort_field == 0 %} <span class="glyphicon glyphicon-triangle-{% if sort_desc %}bottom{% else %}top{% endif %}"></span>{% endif %}</th>
+              <th>{{sm.sort_header('Team' if search_type == 'teams' else 'Event', 0)}}</th>
               {% if search_type == 'events' %}<th>Dates</th>{% endif %}
               {% for field_name in field_names %}
-              <th>{{field_name}}{% if sort_field == loop.index %} <span class="glyphicon glyphicon-triangle-{% if sort_desc %}bottom{% else %}top{% endif %}"></span>{% endif %}</th>
+              <th>{{sm.sort_header(field_name, loop.index)}}</th>
               {% endfor %}
             </tr>
           </thead>
