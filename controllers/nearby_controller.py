@@ -125,7 +125,7 @@ class NearbyController(CacheableHandler):
         if sort_field != 0 and sort_field <= len(returned_fields):
             sort_options_expressions.insert(0, search.SortExpression(
                 expression=returned_fields[sort_field - 1],
-                direction=search.SortExpression.DESCENDING if sort_desc else search.SortExpression.ASCENDING
+                direction=search.SortExpression.ASCENDING if sort_desc else search.SortExpression.DESCENDING
             ))
 
         if location:
