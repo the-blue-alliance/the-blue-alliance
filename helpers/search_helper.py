@@ -85,11 +85,7 @@ class SearchHelper(object):
             for event in events:
                 # Allow searching/sorting by event type
                 overall_event_types_count[event.event_type_enum] += 1
-                if event.event_type_enum not in overall_event_types_count:
-                    overall_fields += [search.AtomField(name='event_type', value=str(event.event_type_enum))]
                 year_event_types_count[event.event_type_enum] += 1
-                if event.event_type_enum not in year_event_types_count:
-                    year_fields += [search.AtomField(name='event_type', value=str(event.event_type_enum))]
 
             # Awards
             year_event_award_types_count = defaultdict(int)
@@ -104,19 +100,11 @@ class SearchHelper(object):
                 # Allow searching/sorting by award type and event type
                 ea_type = '{}_{}'.format(award.event_type_enum, award.award_type_enum)
                 overall_event_award_types_count[ea_type] += 1
-                if ea_type not in overall_event_award_types_count:
-                    overall_fields += [search.AtomField(name='event_award_type', value=ea_type)]
                 year_event_award_types_count[ea_type] += 1
-                if ea_type not in year_event_award_types_count:
-                    year_fields += [search.AtomField(name='event_award_type', value=ea_type)]
 
                 # Allow searching/sorting by award type
                 overall_award_types_count[award.event_type_enum] += 1
-                if award.award_type_enum not in overall_award_types_count:
-                    overall_fields += [search.AtomField(name='award_type', value=str(award.award_type_enum))]
                 year_award_types_count[award.event_type_enum] += 1
-                if award.award_type_enum not in year_award_types_count:
-                    year_fields += [search.AtomField(name='award_type', value=str(award.award_type_enum))]
 
                 # Allow searching/sorting by blue banners
                 if award.award_type_enum in AwardType.BLUE_BANNER_AWARDS:

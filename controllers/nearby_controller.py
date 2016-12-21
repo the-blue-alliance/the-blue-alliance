@@ -116,26 +116,31 @@ class NearbyController(CacheableHandler):
                         expression=dist_expr
                     )]
 
+        returned_fields = ['bb_count']
         if award_types and event_types:
             for award_type in award_types:
                 for event_type in event_types:
-                    query_string += ' AND event_award_type = {}_{}'.format(event_type, award_type)
+                    field = 'event_award_{}_{}_count'.format(event_type, award_type)
+                    query_string += ' AND {} > 0'.format(field, event_type, award_type)
+                    returned_fields += [field]
         elif award_types:
             for award_type in award_types:
-                query_string += ' AND award_type = {}'.format(award_type)
+                field = 'award_{}_count'.format(award_type)
+                query_string += ' AND {} > 0'.format(field, award_type)
+                returned_fields += [field]
         elif event_types:
             for event_type in event_types:
-                query_string += ' AND event_type = {}'.format(event_type)
-
-        offset = self.PAGE_SIZE * page
+                field = 'event_{}_count'.format(event_type)
+                query_string += ' AND {} > 0'.format(field, event_type)
+                returned_fields += [field]
 
         query = search.Query(
             query_string=query_string,
             options=search.QueryOptions(
                 limit=self.PAGE_SIZE,
                 number_found_accuracy=10000,  # Larger than the number of possible results
-                offset=offset,
-                returned_fields=['bb_count'],
+                offset=self.PAGE_SIZE * page,
+                returned_fields=returned_fields,
                 sort_options=search.SortOptions(
                     expressions=sort_options_expressions
                 ),
@@ -150,11 +155,18 @@ class NearbyController(CacheableHandler):
         docs = search_index.search(query)
         num_results = docs.number_found
         distances = {}
-        bb_count = {}
         keys = []
+        all_fields = []
         for result in docs.results:
             key = result.doc_id.split('_')[0]
-            bb_count[key] = result.fields[0].value
+
+            # Save fields
+            fields = {}
+            for field in result.fields:
+                fields[field.name] = field.value
+            all_fields.append(fields)
+
+            # Save distances
             if location and lat_lon:
                 distances[key] = result.expressions[0].value / self.METERS_PER_MILE
             if search_type == 'teams':
@@ -163,7 +175,16 @@ class NearbyController(CacheableHandler):
                 keys.append(ndb.Key('Event', key))
 
         result_futures = ndb.get_multi_async(keys)
-        results = [result_future.get_result() for result_future in result_futures]
+
+        # Construct field names
+        field_names = []
+        for field in returned_fields:
+            if field == 'bb_count':
+                field_names.append('Blue Banners')
+            else:
+                field_names.append(field)
+
+        results = zip([result_future.get_result() for result_future in result_futures], all_fields)
 
         self.template_values.update({
             'valid_years': self.VALID_YEARS,
@@ -179,7 +200,9 @@ class NearbyController(CacheableHandler):
             'search_type': search_type,
             'num_results': num_results,
             'results': results,
-            'bb_count': bb_count,
+            'returned_fields': returned_fields,
+            'field_names': field_names,
+            # 'bb_count': bb_count,
             'distances': distances,
         })
 
