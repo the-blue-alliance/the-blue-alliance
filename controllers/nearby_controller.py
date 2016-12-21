@@ -165,4 +165,4 @@ class NearbyController(CacheableHandler):
             'distances': distances,
         })
 
-        return jinja2_engine.render('nearby.html', self.template_values)
+        return jinja2_engine.render('advanced_search.html', self.template_values)

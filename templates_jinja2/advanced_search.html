@@ -9,85 +9,56 @@
   <div class="row">
     <div class="col-xs-12">
       <h1>Advanced Search</h1>
-      <br>
     </div>
   </div>
 
   <div class="row">
-    <div class="col-sm-4">
-      <form class="form-horizontal" method="get">
-        <div class="form-group">
-          <label class="col-sm-4 control-label" for="input-year">Year</label>
-          <div class="col-sm-8">
+    <div class="col-xs-12">
+      <div class="well">
+        <p>Narrow by:</p>
+        <form class="form-inline">
+          <div class="form-group">
+            <label class="sr-only" for="input-year">Year</label>
             <select class="form-control" id="input-year" name="year">
               {% for valid_year in valid_years %}
                 <option value="{{valid_year}}"{% if valid_year == year %} selected="selected"{% endif %}>{{valid_year}}</option>
               {% endfor %}
             </select>
           </div>
-        </div>
 
-        <div class="form-group">
-          <label class="col-sm-4 control-label" for="input-award">Award Filter</label>
-          <div class="col-sm-8">
+          <div class="form-group">
+            <label class="sr-only" for="input-award">Award Filter</label>
             <select class="form-control" id="input-award" name="award_type">
-              <option value="">--</option>
+              <option value="">No Award Filter</option>
               {% for valid_award_type, valid_award_type_name in valid_award_types %}
                 <option value="{{valid_award_type}}"{% if valid_award_type == award_type %} selected="selected"{% endif %}>{{valid_award_type_name}}</option>
               {% endfor %}
             </select>
           </div>
-        </div>
 
-        <div class="form-group">
-          <label class="col-sm-4 control-label" for="input-event-type">Event Filter</label>
-          <div class="col-sm-8">
+          <div class="form-group">
+            <label class="sr-only" for="input-event-type">Event Filter</label>
             <select class="form-control" id="input-event-type" name="event_type">
-              <option value="">--</option>
+              <option value="">No Event Filter</option>
               {% for valid_event_type, valid_event_type_name in valid_event_types %}
                 <option value="{{valid_event_type}}"{% if valid_event_type == event_type %} selected="selected"{% endif %}>{{valid_event_type_name}}</option>
               {% endfor %}
             </select>
           </div>
-        </div>
 
-        <div class="form-group">
-          <label class="col-sm-4 control-label" for="input-location">Near Location</label>
-          <div class="col-sm-8">
+          <div class="form-group">
+            <label class="sr-only" for="input-location">Near Location</label>
             <input type="text" class="form-control" id="input-location" name="location" placeholder="City / Zip / Address"{% if location %} value="{{location}}"{% endif %}">
           </div>
-        </div>
 
-        <div class="form-group">
-          <div class="col-sm-offset-4 col-sm-8">
-            <div class="radio">
-              <label>
-                <input type="radio" name="search_type" value="teams" {% if search_type == 'teams' %}checked="checked"{% endif %}> Show Teams
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <div class="col-sm-offset-4 col-sm-8">
-            <div class="radio">
-              <label>
-                <input type="radio" name="search_type" value="events" {% if search_type == 'events' %}checked="checked"{% endif %}> Show Events
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <div class="col-sm-offset-4 col-sm-8">
-            <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-search"></span> Search</button>
-          </div>
-        </div>
-      </form>
-      <br>
+          <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-search"></span> Search</button>
+        </form>
+      </div>
     </div>
+  </div>
 
-    <div class="col-sm-8">
+  <div class="row">
+    <div class="col-sm-8 col-sm-offset-2">
       {% if results %}
         <p>{{num_results}} {% if search_type == 'teams' %}team{% else %}event{% endif %}{% if num_results != 1 %}s{% endif %} found</p>
 
