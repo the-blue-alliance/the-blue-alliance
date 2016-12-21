@@ -42,17 +42,19 @@ class NearbyController(CacheableHandler):
             year = datetime.datetime.now().year
         year = int(year)
 
-        award_type = self.request.get('award_type')
-        if award_type:
-            award_type = int(award_type)
+        award_types = self.request.get('award_type', allow_multiple=True)
+        if award_types:
+            # Sort to make caching more likely
+            award_types = sorted([int(award_type) for award_type in award_types])
         else:
-            award_type = ''
+            award_types = []
 
-        event_type = self.request.get('event_type')
-        if event_type:
-            event_type = int(event_type)
+        event_types = self.request.get('event_type', allow_multiple=True)
+        if event_types:
+            # Sort to make caching more likely
+            event_types = sorted([int(event_type) for event_type in event_types])
         else:
-            event_type = ''
+            event_types = []
 
         location = self.request.get('location', '')
         search_type = self.request.get('search_type', self.DEFAULT_SEARCH_TYPE)
@@ -60,16 +62,15 @@ class NearbyController(CacheableHandler):
             search_type = self.DEFAULT_SEARCH_TYPE
         page = int(self.request.get('page', 0))
 
-        return year, award_type, event_type, location, search_type, page
+        return year, award_types, event_types, location, search_type, page
 
     def get(self):
-        year, award_type, event_type, location, search_type, page = self._get_params()
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(year, award_type, event_type, location, search_type, page)
+        year, award_types, event_types, location, search_type, page = self._get_params()
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(year, award_types, event_types, location, search_type, page)
         super(NearbyController, self).get()
 
     def _render(self):
-        year, award_type, event_type, location, search_type, page = self._get_params()
-        logging.info((year, award_type, event_type, location, search_type, page))
+        year, award_types, event_types, location, search_type, page = self._get_params()
 
         num_results = 0
         results = []
@@ -102,12 +103,16 @@ class NearbyController(CacheableHandler):
                         expression=dist_expr
                     )]
 
-        if award_type != '' and event_type != '':
-            query_string += ' AND event_award_type = {}_{}'.format(event_type, award_type)
-        elif award_type != '':
-            query_string += ' AND award_type = {}'.format(award_type)
-        elif event_type != '':
-            query_string += ' AND event_type = {}'.format(event_type)
+        if award_types and event_types:
+            for award_type in award_types:
+                for event_type in event_types:
+                    query_string += ' AND event_award_type = {}_{}'.format(event_type, award_type)
+        elif award_types:
+            for award_type in award_types:
+                query_string += ' AND award_type = {}'.format(award_type)
+        elif event_types:
+            for event_type in event_types:
+                query_string += ' AND event_type = {}'.format(event_type)
 
         offset = self.PAGE_SIZE * page
 
@@ -135,7 +140,6 @@ class NearbyController(CacheableHandler):
         bb_count = {}
         keys = []
         for result in docs.results:
-            logging.info(result)
             key = result.doc_id.split('_')[0]
             bb_count[key] = result.fields[0].value
             if location and lat_lon:
@@ -155,8 +159,8 @@ class NearbyController(CacheableHandler):
             'page_size': self.PAGE_SIZE,
             'page': page,
             'year': year,
-            'award_type': award_type,
-            'event_type': event_type,
+            'award_types': award_types,
+            'event_types': event_types,
             'location': location,
             'search_type': search_type,
             'num_results': num_results,
