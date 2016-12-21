@@ -102,12 +102,11 @@
         <table class="event-table">
           <thead>
             <tr>
-              <th>{% if search_type == 'teams' %}Team{% else %}Event{% endif %}</th>
+              <th>{% if search_type == 'teams' %}Team{% else %}Event{% endif %}{% if sort_field == 0 %} <span class="glyphicon glyphicon-triangle-{% if sort_desc %}bottom{% else %}top{% endif %}"></span>{% endif %}</th>
               {% if search_type == 'events' %}<th>Dates</th>{% endif %}
               {% for field_name in field_names %}
-              <th>{{field_name}}</th>
+              <th>{{field_name}}{% if sort_field == loop.index %} <span class="glyphicon glyphicon-triangle-{% if sort_desc %}bottom{% else %}top{% endif %}"></span>{% endif %}</th>
               {% endfor %}
-              {% if distances %}<th>Distance</th>{% endif %}
             </tr>
           </thead>
           <tbody>
@@ -130,13 +129,12 @@
                 </td>
                 {% endif %}
                 {% for returned_field in returned_fields %}
-                  <td>{{fields.get(returned_field)|int}}</td>
+                  {% if returned_field == 'distance' %}
+                    <td>{{fields.get(returned_field)|round|int}} miles</td>
+                  {% else %}
+                    <td>{{fields.get(returned_field)|int}}</td>
+                  {% endif %}
                 {% endfor %}
-                {% if distances %}
-                <td>
-                  {{distances[result.key.id()]|round|int}} miles
-                </td>
-                {% endif %}
               </tr>
             {% endfor %}
           </tbody>

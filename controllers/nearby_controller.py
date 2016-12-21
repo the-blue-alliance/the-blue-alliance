@@ -38,7 +38,7 @@ class NearbyController(CacheableHandler):
     PAGE_SIZE = 20
     METERS_PER_MILE = 5280 * 12 * 2.54 / 100
     CACHE_VERSION = 1
-    CACHE_KEY_FORMAT = "nearby_{}_{}_{}_{}_{}_{}"  # (year, award_type, event_type, location, search_type, page)
+    CACHE_KEY_FORMAT = "nearby_{}_{}_{}_{}_{}_{}_{}_{}"  # (year, award_type, event_type, location, search_type, sort_field, sort_desc, page)
 
     def __init__(self, *args, **kw):
         super(NearbyController, self).__init__(*args, **kw)
@@ -50,22 +50,29 @@ class NearbyController(CacheableHandler):
             year = 0
         year = int(year)
 
+        sort_field = self.request.get('sort_field')
+        if sort_field:
+            sort_field = int(sort_field)
+        else:
+            sort_field = 0  # Default to team number
+
+        if self.request.get('sort_desc'):
+            sort_desc = True
+        else:
+            sort_desc = False
+
         award_types = self.request.get('award_type', allow_multiple=True)
         if award_types:
             # Sort to make caching more likely
             award_types = sorted([int(award_type) for award_type in award_types])
+            event_types = self.request.get('event_type', allow_multiple=True)
+            if event_types:
+                # Sort to make caching more likely
+                event_types = sorted([int(event_type) for event_type in event_types])
+            else:
+                event_types = []
         else:
             award_types = []
-
-        event_types = self.request.get('event_type', allow_multiple=True)
-        if event_types:
-            # Sort to make caching more likely
-            event_types = sorted([int(event_type) for event_type in event_types])
-        else:
-            event_types = []
-
-        if event_types and not award_types:
-            # Don't allow only filtering by event
             event_types = []
 
         location = self.request.get('location', '')
@@ -74,40 +81,68 @@ class NearbyController(CacheableHandler):
             search_type = self.DEFAULT_SEARCH_TYPE
         page = int(self.request.get('page', 0))
 
-        return year, award_types, event_types, location, search_type, page
+        return year, award_types, event_types, location, search_type, sort_field, sort_desc, page
 
     def get(self):
-        year, award_types, event_types, location, search_type, page = self._get_params()
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(year, award_types, event_types, location, search_type, page)
+        year, award_types, event_types, location, search_type, sort_field, sort_desc, page = self._get_params()
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(year, award_types, event_types, location, search_type, sort_field, sort_desc, page)
         super(NearbyController, self).get()
 
     def _render(self):
-        year, award_types, event_types, location, search_type, page = self._get_params()
+        year, award_types, event_types, location, search_type, sort_field, sort_desc, page = self._get_params()
 
         num_results = 0
         results = []
         distances = []
 
+        query_string = 'year={}'.format(year)
+        returned_fields = ['bb_count']
+        num_fields = 1
+        query_type = None
+        if award_types and event_types:
+            query_type = 'event_award'
+            num_fields += len(award_types) * len(event_types)
+            for award_type in award_types:
+                for event_type in event_types:
+                    field = 'event_award_{}_{}_count'.format(event_type, award_type)
+                    query_string += ' AND {} > 0'.format(field, event_type, award_type)
+                    returned_fields.append(field)
+        elif award_types:
+            query_type = 'award'
+            num_fields += len(award_types)
+            for award_type in award_types:
+                field = 'award_{}_count'.format(award_type)
+                query_string += ' AND {} > 0'.format(field, award_type)
+                returned_fields.append(field)
+
         sort_options_expressions = [
             search.SortExpression(
                 expression='number',
-                direction=search.SortExpression.ASCENDING
+                direction=search.SortExpression.DESCENDING if (sort_field == 0 and sort_desc) else search.SortExpression.ASCENDING
             )]
         returned_expressions = []
 
-        query_string = 'year={}'.format(year)
+        if sort_field != 0 and sort_field <= len(returned_fields):
+            sort_options_expressions.insert(0, search.SortExpression(
+                expression=returned_fields[sort_field - 1],
+                direction=search.SortExpression.DESCENDING if sort_desc else search.SortExpression.ASCENDING
+            ))
+
         if location:
             lat_lon = LocationHelper.get_lat_lng(location)
             if lat_lon:
+                num_fields += 1
+                returned_fields.append('distance')
                 lat, lon = lat_lon
                 dist_expr = 'distance(location, geopoint({}, {}))'.format(lat, lon)
                 query_string = '{} > {} AND year={}'.format(dist_expr, -1, year)
 
-                sort_options_expressions = [
-                    search.SortExpression(
-                        expression=dist_expr,
-                        direction=search.SortExpression.ASCENDING
-                    )]
+                if sort_field == num_fields:
+                    sort_options_expressions = [
+                        search.SortExpression(
+                            expression=dist_expr,
+                            direction=search.SortExpression.DESCENDING if sort_desc else search.SortExpression.ASCENDING
+                        )]
 
                 returned_expressions = [
                     search.FieldExpression(
@@ -115,21 +150,8 @@ class NearbyController(CacheableHandler):
                         expression=dist_expr
                     )]
 
-        returned_fields = ['bb_count']
-        query_type = None
-        if award_types and event_types:
-            query_type = 'event_award'
-            for award_type in award_types:
-                for event_type in event_types:
-                    field = 'event_award_{}_{}_count'.format(event_type, award_type)
-                    query_string += ' AND {} > 0'.format(field, event_type, award_type)
-                    returned_fields += [field]
-        elif award_types:
-            query_type = 'award'
-            for award_type in award_types:
-                field = 'award_{}_count'.format(award_type)
-                query_string += ' AND {} > 0'.format(field, award_type)
-                returned_fields += [field]
+        if sort_field > len(returned_fields):
+            sort_field = 0
 
         query = search.Query(
             query_string=query_string,
@@ -161,11 +183,13 @@ class NearbyController(CacheableHandler):
             fields = {}
             for field in result.fields:
                 fields[field.name] = field.value
-            all_fields.append(fields)
 
             # Save distances
             if location and lat_lon:
-                distances[key] = result.expressions[0].value / self.METERS_PER_MILE
+                fields['distance'] = result.expressions[0].value / self.METERS_PER_MILE
+
+            all_fields.append(fields)
+
             if search_type == 'teams':
                 keys.append(ndb.Key('Team', key))
             else:
@@ -178,6 +202,8 @@ class NearbyController(CacheableHandler):
         for field in returned_fields:
             if field == 'bb_count':
                 field_names.append('# Blue Banner')
+            elif field == 'distance':
+                field_names.append('Distance')
             else:
                 if query_type == 'event_award':
                     split = field.split('_')
@@ -212,8 +238,8 @@ class NearbyController(CacheableHandler):
             'results': results,
             'returned_fields': returned_fields,
             'field_names': field_names,
-            # 'bb_count': bb_count,
-            'distances': distances,
+            'sort_field': sort_field,
+            'sort_desc': sort_desc,
         })
 
         return jinja2_engine.render('advanced_search.html', self.template_values)
