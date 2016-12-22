@@ -1,27 +1,29 @@
 import React from 'react'
 import { webcastPropType } from '../../utils/webcastUtils'
 
-const EmbedRtmp = (props) => {
-  const channel = props.webcast.channel
-  const file = props.webcast.file
-  const flashVars = `file=${file}&streamer=rtmp://${channel}&autostart=true&provider=rtmp`
-  return (
-    <object
-      width="100%"
-      height="100%"
-      data="/jwplayer/player.swf"
-      type="application/x-shockwave-flash"
+export default class EmbedHtml5 extends React.Component {
+  static propTypes = {
+    webcast: webcastPropType.isRequired,
+  }
+
+  componentDidMount() {
+    videojs(this.props.webcast.id, {
+      width: '100%',
+      height: '100%',
+      autoplay: true,
+    })
+  }
+
+  render() {
+    const src = `rtmp://${this.props.webcast.channel}&${this.props.webcast.file}`
+    return (
+      <video
+        controls
+        id={this.props.webcast.id}
+        className="video-js vjs-default-skin"
       >
-      <param name="flashvars" value={flashVars} />
-      <param name="allowfullscreen" value="true" />
-      <param name="background" value="transparent" />
-      <param name="wmode" value="transparent" />
-    </object>
-  )
+        <source src={src} type="rtmp/mp4" />
+      </video>
+    )
+  }
 }
-
-EmbedRtmp.propTypes = {
-  webcast: webcastPropType.isRequired,
-}
-
-export default EmbedRtmp

@@ -1,40 +1,28 @@
 import React from 'react'
 import { webcastPropType } from '../../utils/webcastUtils'
 
-const EmbedHtml5 = (props) => {
-  const flashVars = JSON.stringify({
-    plugins: {
-      flashls: {
-        url: '/flowplayer/flashlsFlowPlayer.swf',
-        hls_maxbufferlength: 20
-      }
-    },
-    clip: {
-      live: true,
-      url: `${props.webcast.channel}`,
-      provider: 'flashls',
-      urlResolvers: 'flashls',
-      scaling: 'fit'
-    }
-  })
-  const flashVarsConfig = `config=${flashVars}`
-  return (
-    <object
-      width="100%"
-      height="100%"
-      data="/flowplayer/flowplayer-3.2.18.swf"
-      type="application/x-shockwave-flash"
-    >
-      <param name="flashvars" value={flashVarsConfig} />
-      <param name="movie" value="/flowplayer/flowplayer-3.2.18.swf" />
-      <param name="allowfullscreen" value="true" />
-      <param name="bgcolor" value="222222" />
-    </object>
-  )
-}
+export default class EmbedHtml5 extends React.Component {
+  static propTypes = {
+    webcast: webcastPropType.isRequired,
+  }
 
-EmbedHtml5.propTypes = {
-  webcast: webcastPropType.isRequired,
-}
+  componentDidMount() {
+    videojs(this.props.webcast.id, {
+      width: '100%',
+      height: '100%',
+      autoplay: true,
+    })
+  }
 
-export default EmbedHtml5
+  render() {
+    return (
+      <video
+        controls
+        id={this.props.webcast.id}
+        className="video-js vjs-default-skin"
+      >
+        <source src={this.props.webcast.channel} type="application/x-mpegurl" />
+      </video>
+    )
+  }
+}
