@@ -5,6 +5,7 @@ from webapp2_extras.routes import RedirectRoute
 import tba_config
 
 from controllers.account_controller import AccountEdit, AccountLoginRequired, AccountLogin, AccountLogout, AccountOverview, AccountRegister, MyTBAController, myTBAAddHotMatchesController, MyTBAEventController, MyTBAMatchController, MyTBATeamController
+from controllers.advanced_search_controller import AdvancedSearchController
 from controllers.ajax_controller import AccountInfoHandler, AccountRegisterFCMToken, AccountFavoritesHandler, AccountFavoritesAddHandler, AccountFavoritesDeleteHandler, \
       YouTubePlaylistHandler, AllowedApiWriteEventsHandler
 from controllers.ajax_controller import LiveEventHandler, TypeaheadHandler, WebcastHandler
@@ -80,7 +81,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/account/mytba/match/<match_key>', MyTBAMatchController, 'account-mytba-match', strict_slash=True),
       RedirectRoute(r'/account/mytba/team/<team_number:[0-9]+>', MyTBATeamController, 'account-mytba-team', strict_slash=True),
       RedirectRoute(r'/add-data', AddDataHandler, 'add-data', strict_slash=True),
-      RedirectRoute(r'/advanced_search', NearbyController, 'advanced_search', strict_slash=True),
+      RedirectRoute(r'/advanced_search', AdvancedSearchController, 'advanced_search', strict_slash=True),
       RedirectRoute(r'/apidocs', ApiDocumentationHandler, 'api-documentation', strict_slash=True),
       RedirectRoute(r'/apidocs/webhooks', WebhookDocumentationHandler, 'webhook-documentation', strict_slash=True),
       RedirectRoute(r'/apiwrite', ApiWriteHandler, 'api-write', strict_slash=True),
@@ -104,6 +105,7 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/match/<match_key>', MatchDetail, 'match-detail', strict_slash=True),
       RedirectRoute(r'/matchinput', MatchInputHandler, 'match-input', strict_slash=True),
       RedirectRoute(r'/mytba', MyTBALiveController, 'mytba-live', strict_slash=True),
+      RedirectRoute(r'/nearby', NearbyController, 'nearby', strict_slash=True),
       RedirectRoute(r'/notifications/broadcast', UserNotificationBroadcast, 'notification-broadcast', strict_slash=True),
       RedirectRoute(r'/notifications/test/<type:[0-9]+>', TestNotificationController, 'test-notifications', strict_slash=True),
       RedirectRoute(r'/opr', OprHandler, 'opr', strict_slash=True),

@@ -1,245 +1,133 @@
+import datetime
 import logging
 import tba_config
 
 from google.appengine.api import search
 from google.appengine.ext import ndb
 
-from consts.award_type import AwardType
-from consts.event_type import EventType
 from controllers.base_controller import CacheableHandler
 from helpers.location_helper import LocationHelper
 from models.event_team import EventTeam
 from template_engine import jinja2_engine
 
 
-SORT_ORDER = {
-    AwardType.CHAIRMANS: 0,
-    AwardType.ENGINEERING_INSPIRATION: 1,
-    AwardType.WINNER: 2,
-    AwardType.FINALIST: 3,
-    AwardType.WOODIE_FLOWERS: 4,
-}
-
-
 class NearbyController(CacheableHandler):
     VALID_YEARS = list(reversed(range(1992, tba_config.MAX_YEAR + 1)))
-
-    VALID_AWARD_TYPES = [kv for kv in AwardType.GENERIC_NAMES.items()]
-    VALID_AWARD_TYPES = sorted(
-        VALID_AWARD_TYPES,
-        key=lambda (event_type, name): SORT_ORDER.get(event_type, name))
-
-    VALID_EVENT_TYPES = [
-        (EventType.CMP_DIVISION, 'Championship Division'),
-        (EventType.CMP_FINALS, 'Championship'),
-    ]
-
+    VALID_RANGES = [100, 250, 500, 2500]
     DEFAULT_SEARCH_TYPE = 'teams'
     PAGE_SIZE = 20
     METERS_PER_MILE = 5280 * 12 * 2.54 / 100
     CACHE_VERSION = 1
-    CACHE_KEY_FORMAT = "nearby_{}_{}_{}_{}_{}_{}_{}_{}"  # (year, award_type, event_type, location, search_type, sort_field, sort_desc, page)
+    CACHE_KEY_FORMAT = "nearby_{}_{}_{}_{}_{}"  # (year, location, range_limit, search_type, page)
 
     def __init__(self, *args, **kw):
         super(NearbyController, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
 
     def _get_params(self):
-        year = self.request.get('year')
+        year = self.request.get('year', None)
         if not year:
-            year = 0
+            year = datetime.datetime.now().year
         year = int(year)
-
-        sort_field = self.request.get('sort_field')
-        if sort_field:
-            sort_field = int(sort_field)
-        else:
-            sort_field = 0  # Default to team number
-
-        if self.request.get('sort_desc'):
-            sort_desc = True
-        else:
-            sort_desc = False
-
-        award_types = self.request.get('award_type', allow_multiple=True)
-        if award_types:
-            # Sort to make caching more likely
-            award_types = sorted([int(award_type) for award_type in award_types])
-            event_types = self.request.get('event_type', allow_multiple=True)
-            if event_types:
-                # Sort to make caching more likely
-                event_types = sorted([int(event_type) for event_type in event_types])
-            else:
-                event_types = []
-        else:
-            award_types = []
-            event_types = []
-
-        location = self.request.get('location', '')
+        location = self.request.get('location', None)
+        range_limit = int(self.request.get('range_limit', self.VALID_RANGES[0]))
+        if range_limit not in self.VALID_RANGES:
+            range_limit = self.VALID_RANGES[0]
         search_type = self.request.get('search_type', self.DEFAULT_SEARCH_TYPE)
         if search_type != 'teams' and search_type != 'events':
             search_type = self.DEFAULT_SEARCH_TYPE
         page = int(self.request.get('page', 0))
 
-        return year, award_types, event_types, location, search_type, sort_field, sort_desc, page
+        return year, location, range_limit, search_type, page
 
     def get(self):
-        year, award_types, event_types, location, search_type, sort_field, sort_desc, page = self._get_params()
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(year, award_types, event_types, location, search_type, sort_field, sort_desc, page)
+        year, location, range_limit, search_type, page = self._get_params()
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(year, location, range_limit, search_type, page)
         super(NearbyController, self).get()
 
     def _render(self):
-        year, award_types, event_types, location, search_type, sort_field, sort_desc, page = self._get_params()
+        year, location, range_limit, search_type, page = self._get_params()
 
         num_results = 0
         results = []
         distances = []
-
-        query_string = 'year={}'.format(year)
-        returned_fields = ['bb_count']
-        num_fields = 1
-        query_type = None
-        if award_types and event_types:
-            query_type = 'event_award'
-            num_fields += len(award_types) * len(event_types)
-            for award_type in award_types:
-                for event_type in event_types:
-                    field = 'event_award_{}_{}_count'.format(event_type, award_type)
-                    query_string += ' AND {} > 0'.format(field, event_type, award_type)
-                    returned_fields.append(field)
-        elif award_types:
-            query_type = 'award'
-            num_fields += len(award_types)
-            for award_type in award_types:
-                field = 'award_{}_count'.format(award_type)
-                query_string += ' AND {} > 0'.format(field, award_type)
-                returned_fields.append(field)
-
-        sort_options_expressions = [
-            search.SortExpression(
-                expression='number',
-                direction=search.SortExpression.DESCENDING if (sort_field == 0 and sort_desc) else search.SortExpression.ASCENDING
-            )]
-        returned_expressions = []
-
-        if sort_field != 0 and sort_field <= len(returned_fields):
-            sort_options_expressions.insert(0, search.SortExpression(
-                expression=returned_fields[sort_field - 1],
-                direction=search.SortExpression.ASCENDING if sort_desc else search.SortExpression.DESCENDING
-            ))
-
         if location:
             lat_lon = LocationHelper.get_lat_lng(location)
             if lat_lon:
-                num_fields += 1
-                returned_fields.append('distance')
                 lat, lon = lat_lon
+
                 dist_expr = 'distance(location, geopoint({}, {}))'.format(lat, lon)
-                query_string = '{} > {} AND year={}'.format(dist_expr, -1, year)
+                if search_type == 'teams':
+                    query_string = '{} < {}'.format(dist_expr, range_limit * self.METERS_PER_MILE)
+                else:
+                    query_string = '{} < {} AND year={}'.format(dist_expr, range_limit * self.METERS_PER_MILE, year)
 
-                if sort_field == num_fields:
-                    sort_options_expressions = [
-                        search.SortExpression(
-                            expression=dist_expr,
-                            direction=search.SortExpression.DESCENDING if sort_desc else search.SortExpression.ASCENDING
-                        )]
+                offset = self.PAGE_SIZE * page
 
-                returned_expressions = [
-                    search.FieldExpression(
-                        name='distance',
-                        expression=dist_expr
-                    )]
+                query = search.Query(
+                    query_string=query_string,
+                    options=search.QueryOptions(
+                        limit=self.PAGE_SIZE,
+                        offset=offset,
+                        sort_options=search.SortOptions(
+                            expressions=[
+                                search.SortExpression(
+                                    expression=dist_expr,
+                                    direction=search.SortExpression.ASCENDING
+                                )
+                            ]
+                        ),
+                        returned_expressions=[
+                            search.FieldExpression(
+                                name='distance',
+                                expression=dist_expr
+                            )
+                        ],
+                    )
+                )
+                if search_type == 'teams':
+                    search_index = search.Index(name="teamLocation")
+                else:
+                    search_index = search.Index(name="eventLocation")
 
-        if sort_field > len(returned_fields):
-            sort_field = 0
+                docs = search_index.search(query)
+                num_results = docs.number_found
+                distances = {}
+                keys = []
+                event_team_count_futures = {}
+                for result in docs.results:
+                    distances[result.doc_id] = result.expressions[0].value / self.METERS_PER_MILE
+                    if search_type == 'teams':
+                        event_team_count_futures[result.doc_id] = EventTeam.query(
+                            EventTeam.team == ndb.Key('Team', result.doc_id),
+                            EventTeam.year == year).count_async(limit=1, keys_only=True)
+                        keys.append(ndb.Key('Team', result.doc_id))
+                    else:
+                        keys.append(ndb.Key('Event', result.doc_id))
 
-        query = search.Query(
-            query_string=query_string,
-            options=search.QueryOptions(
-                limit=self.PAGE_SIZE,
-                number_found_accuracy=10000,  # Larger than the number of possible results
-                offset=self.PAGE_SIZE * page,
-                returned_fields=returned_fields,
-                sort_options=search.SortOptions(
-                    expressions=sort_options_expressions
-                ),
-                returned_expressions=returned_expressions
-            )
-        )
-        if search_type == 'teams':
-            search_index = search.Index(name="teamYear")
-        else:
-            search_index = search.Index(name="eventLocation")
+                result_futures = ndb.get_multi_async(keys)
 
-        docs = search_index.search(query)
-        num_results = docs.number_found
-        distances = {}
-        keys = []
-        all_fields = []
-        for result in docs.results:
-            key = result.doc_id.split('_')[0]
+                if search_type == 'teams':
+                    results = []
+                    for result_future, team_key in zip(result_futures, keys):
+                        if event_team_count_futures[team_key.id()].get_result() != 0:
+                            results.append(result_future.get_result())
 
-            # Save fields
-            fields = {}
-            for field in result.fields:
-                fields[field.name] = field.value
-
-            # Save distances
-            if location and lat_lon:
-                fields['distance'] = result.expressions[0].value / self.METERS_PER_MILE
-
-            all_fields.append(fields)
-
-            if search_type == 'teams':
-                keys.append(ndb.Key('Team', key))
-            else:
-                keys.append(ndb.Key('Event', key))
-
-        result_futures = ndb.get_multi_async(keys)
-
-        # Construct field names
-        field_names = []
-        for field in returned_fields:
-            if field == 'bb_count':
-                field_names.append('# Blue Banner')
-            elif field == 'distance':
-                field_names.append('Distance')
-            else:
-                if query_type == 'event_award':
-                    split = field.split('_')
-                    event_type = int(split[2])
-                    award_type = int(split[3])
-
-                    if event_type == 3:  # TODO don't hardcode
-                        event_str = 'Championship Division'
-                    elif event_type == 4:
-                        event_str = 'Championship'
-
-                    field_names.append('# {} {}'.format(event_str, AwardType.GENERIC_NAMES.get(award_type)))
-                elif query_type == 'award':
-                    award_type = int(field.split('_')[1])
-                    field_names.append('# {}'.format(AwardType.GENERIC_NAMES.get(award_type)))
-
-        results = zip([result_future.get_result() for result_future in result_futures], all_fields)
+                else:
+                    results = [result_future.get_result() for result_future in result_futures]
 
         self.template_values.update({
             'valid_years': self.VALID_YEARS,
-            'valid_award_types': self.VALID_AWARD_TYPES,
-            'num_special_awards': len(SORT_ORDER),
-            'valid_event_types': self.VALID_EVENT_TYPES,
+            'valid_ranges': self.VALID_RANGES,
             'page_size': self.PAGE_SIZE,
             'page': page,
             'year': year,
-            'award_types': award_types,
-            'event_types': event_types,
             'location': location,
+            'range_limit': range_limit,
             'search_type': search_type,
             'num_results': num_results,
             'results': results,
-            'returned_fields': returned_fields,
-            'field_names': field_names,
-            'sort_field': sort_field,
-            'sort_desc': sort_desc,
+            'distances': distances,
         })
 
-        return jinja2_engine.render('advanced_search.html', self.template_values)
+        return jinja2_engine.render('nearby.html', self.template_values)
