@@ -1,3 +1,4 @@
+/* eslint-disable react/no-danger */
 import React from 'react'
 import { webcastPropType } from '../../utils/webcastUtils'
 
@@ -13,8 +14,6 @@ const EmbedIframe = (props) => {
   const markup = {
     __html: iframeMarkup,
   }
-
-  console.log(markup)
 
   const elem = (
     <div

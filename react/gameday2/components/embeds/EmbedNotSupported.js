@@ -7,7 +7,7 @@ const EmbedNotSupported = () => {
   }
 
   const textStyles = {
-    color: '#ffffff'
+    color: '#ffffff',
   }
 
   return (

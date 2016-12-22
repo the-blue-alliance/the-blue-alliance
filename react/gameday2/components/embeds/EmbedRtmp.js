@@ -1,3 +1,4 @@
+/* global videojs */
 import React from 'react'
 import { webcastPropType } from '../../utils/webcastUtils'
 

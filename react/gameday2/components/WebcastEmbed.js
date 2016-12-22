@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react'
+import React from 'react'
 import EmbedUstream from './embeds/EmbedUstream'
 import EmbedYoutube from './embeds/EmbedYoutube'
 import EmbedTwitch from './embeds/EmbedTwitch'
