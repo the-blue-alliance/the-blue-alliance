@@ -161,4 +161,4 @@ class GamedayRedirectHandler(webapp2.RequestHandler):
         for i, webcast in enumerate(event.webcast):
             params += "&view_{}={}-{}".format(i, webcast['key_name'], i+1)
 
-        return param
+        return params
