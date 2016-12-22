@@ -1,7 +1,6 @@
 <select name="webcast_type">
     <option value="">Select Type</option>
     <option value="livestream"{% if webcast.type == "livestream"%} selected{% endif %}>livestream</option>
-    <option value="mms"{% if webcast.type == "mms" %} selected{% endif %}>mms</option>
     <option value="rtmp"{% if webcast.type == "rtmp" %} selected{% endif %}>rtmp</option>
     <option value="twitch"{% if webcast.type == "twitch" %} selected{% endif %}>twitch</option>
     <option value="ustream"{% if webcast.type == "ustream" %} selected{% endif %}>ustream</option>
