@@ -74,9 +74,9 @@
           </select>
         </div>
 
-        <div id="input-time-period-group" class="form-group{% if not event_types %} display-none{% endif %}">
+        <div id="input-time-period-group" class="form-group{% if not award_types %} display-none{% endif %}">
           <label class="sr-only" for="input-time-period">Time period</label>
-          <select class="form-control selectpicker" id="input-time-period" name="time_period" data-actions-box="true"{% if not event_types %} disabled{% endif %}>
+          <select class="form-control selectpicker" id="input-time-period" name="time_period" data-actions-box="true"{% if not award_types %} disabled{% endif %}>
             <option value="0"{% if time_period == 0 %} selected="selected"{% endif %}>Any time in their history</option>
             <option value="1"{% if time_period == 1 %} selected="selected"{% endif %}>In the same year</option>
             <option value="2"{% if time_period == 2 %} selected="selected"{% endif %}>At the same event</option>
@@ -261,26 +261,21 @@
     $('#input-award-type').selectpicker('refresh');
   });
 
-  // Show/hide event type
+  // Show/hide event type and time period
   $('#input-award-type').on('changed.bs.select loaded.bs.select refreshed.bs.select', function () {
     if ($(this).selectpicker('val') == null || $(this).is(':hidden')) {
       $('#input-event-type-group').hide();
       $('#input-event-type').prop('disabled', true);
       $('#input-event-type').selectpicker('refresh');
-    } else {
-      $('#input-event-type').prop('disabled', false);
-      $('#input-event-type-group').show();
-      $('#input-event-type').selectpicker('refresh');
-    }
-  });
 
-  // Show/hide time period
-  $('#input-event-type').on('changed.bs.select loaded.bs.select refreshed.bs.select', function () {
-    if ($(this).selectpicker('val') == null || $(this).is(':hidden')) {
       $('#input-time-period-group').hide();
       $('#input-time-period').prop('disabled', true);
       $('#input-time-period').selectpicker('refresh');
     } else {
+      $('#input-event-type').prop('disabled', false);
+      $('#input-event-type-group').show();
+      $('#input-event-type').selectpicker('refresh');
+
       $('#input-time-period').prop('disabled', false);
       $('#input-time-period-group').show();
       $('#input-time-period').selectpicker('refresh');
