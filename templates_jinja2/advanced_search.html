@@ -20,8 +20,8 @@
       <form>
         <div class="form-group">
           <label for="input-location-type">Search for teams</label>
-          <select class="form-control selectpicker" id="input-location-type" name="location_type">
-            <option value="0">Anywhere</option>
+          <select class="form-control selectpicker" data-dropup-auto="false" id="input-location-type" name="location_type">
+            <option value="0">From anywhere</option>
             <optgroup label="Within">
             {% for valid_range in valid_ranges %}
               <option value="{{loop.index}}" title="Within {{valid_range}} miles of"{% if loop.index == location_type %} selected="selected"{% endif %}>{{valid_range}} miles of</option>
@@ -30,7 +30,7 @@
           </select>
         </div>
 
-        <div id="input-location-group" class="form-group display-none{% if location_type != 0 and not location %} has-error has-feedback{% endif %}">
+        <div class="form-group display-none{% if location_type != 0 and not location %} has-error has-feedback{% endif %}">
           <label class="sr-only" for="input-location">Location</label>
           <input type="text" class="form-control" id="input-location" name="location" placeholder="City / Zip / Address"{% if location %} value="{{location}}"{% endif %}" disabled>
           {% if location_type != 0 and not location %}
@@ -39,25 +39,41 @@
         </div>
 
         <div class="form-group">
-          <label for="input-year">Active in</label>
-          <select class="form-control selectpicker" id="input-year" name="year">
-            <option value="0">Any year</option>
-            {% for valid_year in valid_years %}
-              <option value="{{valid_year}}"{% if valid_year == year %} selected="selected"{% endif %}>{{valid_year}}</option>
-            {% endfor %}
-          </select>
+          <label>Filtered by</label>
+          <div class="btn-group btn-group-block-3" data-toggle="buttons">
+            <label class="btn btn-default{% if filter_type == 0 %} active{% endif %}">
+              <input type="radio" name="filter_type" value="0" autocomplete="off"{% if filter_type == 0 %} checked{% endif %}>
+              Year
+            </label>
+            <label class="btn btn-default{% if filter_type == 1 %} active{% endif %}">
+              <input type="radio" name="filter_type" value="1" autocomplete="off"{% if filter_type == 1 %} checked{% endif %}>
+              Event
+            </label>
+            <label class="btn btn-default{% if filter_type == 2 %} active{% endif %}">
+              <input type="radio" name="filter_type" value="2" autocomplete="off"{% if filter_type == 2 %} checked{% endif %}>
+              Award
+            </label>
+          </div>
         </div>
 
-        <div id="add-award-filter-group" class="form-group{% if award_types %} display-none{% endif %}">
-          <button id="add-award-filter" class="btn btn-primary btn-block btn-xs"><span class="glyphicon glyphicon-plus"></span> Add award filter</button>
-        </div>
-        <div id="remove-award-filter-group" class="form-group{% if not award_types %} display-none{% endif %}">
-          <button id="remove-award-filter" class="btn btn-danger btn-block btn-xs"><span class="glyphicon glyphicon-minus"></span> Remove award filter</button>
+        <!-- Year Filter -->
+        <div class="form-group{% if filter_type != 0 %} display-none{% endif %}">
+          <label class="sr-only" for="input-year">Year</label>
+          <div class="input-group">
+            <div class="input-group-addon">active in</div>
+            <select class="form-control selectpicker" data-dropup-auto="false" id="input-year" name="year"{% if filter_type != 0 %} disabled{% endif %}>
+              <option value="0">any year</option>
+              {% for valid_year in valid_years %}
+                <option value="{{valid_year}}"{% if valid_year == year %} selected="selected"{% endif %}>{{valid_year}}</option>
+              {% endfor %}
+            </select>
+          </div>
         </div>
 
-        <div id="input-award-type-group" class="form-group{% if not award_types %} display-none{% endif %}">
+        <!-- Award Filter -->
+        <div class="form-group{% if filter_type != 2 %} display-none{% endif %}">
           <label for="input-award-type">That have won all the following awards:</label>
-          <select class="form-control selectpicker" id="input-award-type" name="award_type" multiple title="No awards selected" data-actions-box="true" data-live-search="true"{% if not award_types %} disabled{% endif %}>
+          <select class="form-control selectpicker" data-dropup-auto="false" id="input-award-type" name="award_type" multiple title="No awards selected" data-actions-box="true" data-live-search="true"{% if filter_type != 2 %} disabled{% endif %}>
             {% for valid_award_type, valid_award_type_name in valid_award_types %}
               <option value="{{valid_award_type}}"{% if valid_award_type in award_types %} selected="selected"{% endif %}>{{valid_award_type_name}}</option>
               {% if loop.index == num_special_awards %}<option data-divider="true"></option>{% endif %}
@@ -65,28 +81,69 @@
           </select>
         </div>
 
-        <div id="input-event-type-group" class="form-group{% if not award_types %} display-none{% endif %}">
+        <div class="form-group{% if not award_types or filter_type != 2 %} display-none{% endif %}">
           <label for="input-event-type">At any of the following competition levels:</label>
-          <select class="form-control selectpicker" id="input-event-type" name="event_type" multiple title="No competition levels selected" data-actions-box="true"{% if not award_types %} disabled{% endif %}>
+          <select class="form-control selectpicker" data-dropup-auto="false" id="input-event-type" name="event_type" multiple title="No competition levels selected" data-actions-box="true"{% if not award_types or filter_type != 2 %} disabled{% endif %}>
             {% for valid_event_type, valid_event_type_name in valid_event_types %}
               <option value="{{valid_event_type}}"{% if valid_event_type in event_types %} selected="selected"{% endif %}>{{valid_event_type_name}}</option>
             {% endfor %}
           </select>
         </div>
 
-        <div id="input-time-period-group" class="form-group{% if not award_types %} display-none{% endif %}">
-          <label class="sr-only" for="input-time-period">Time period</label>
-          <select class="form-control selectpicker" id="input-time-period" name="time_period" data-actions-box="true"{% if not award_types %} disabled{% endif %}>
-            <option value="0"{% if time_period == 0 %} selected="selected"{% endif %}>Any time in their history</option>
-            <option value="1"{% if time_period == 1 %} selected="selected"{% endif %}>In the same year</option>
-            <option value="2"{% if time_period == 2 %} selected="selected"{% endif %}>At the same event</option>
+        <div class="form-group{% if not award_types or filter_type != 2 %} display-none{% endif %}">
+          <label for="input-time-period">Within the period of</label>
+          <select class="form-control selectpicker" data-dropup-auto="false" id="input-time-period" name="time_period" data-actions-box="true"{% if not award_types or filter_type != 2 %} disabled{% endif %}>
+            <option value="0"{% if time_period == 0 %} selected="selected"{% endif %}>the team's history</option>
+            <option value="1"{% if time_period == 1 %} selected="selected"{% endif %}>one year</option>
+            <option value="2"{% if time_period == 2 %} selected="selected"{% endif %}>one event</option>
           </select>
         </div>
 
+        <div class="form-group{% if time_period == 0 or filter_type != 2 %} display-none{% endif %}">
+          <label class="sr-only" for="input-award-year">Award year</label>
+          <div class="input-group">
+            <div class="input-group-addon">in</div>
+            <select class="form-control selectpicker" data-dropup-auto="false" id="input-award-year" name="year"{% if time_period == 0 or filter_type != 2 %} disabled{% endif %}>
+              <option value="0">any year</option>
+              {% for valid_year in valid_years %}
+                <option value="{{valid_year}}"{% if valid_year == year %} selected="selected"{% endif %}>{{valid_year}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
 
-        <button type="submit" class="btn btn-success btn-block"><span class="glyphicon glyphicon-search"></span> Search</button>
-
+        <button id="submit-search" type="submit" class="btn btn-success btn-block{% if filter_type == 2 and not award_types %} disabled{% endif %}"><span class="glyphicon glyphicon-search"></span> Search</button>
       </form>
+    </div>
+
+    <div class="col-sm-8 col-lg-9">
+      {% if result_models %}
+        <p>{{num_results}} result{% if num_results != 1 %}s{% endif %} found</p>
+
+        <table class="event-table">
+          <thead>
+            <tr>
+              <th>Team</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for team in result_models %}
+              <tr>
+                <td>
+                  <a href="/team/{{team.team_number}}/{% if year == 0 %}history{% else %}{{year}}{% endif %}" title="Team {{team.team_number }} - {{team.nickname}}">Team {{team.team_number }} - {{team.nickname}}</a>
+
+                    {% if team.city_state_country %}
+                      <br>
+                      <small>{{team.city_state_country}}</small>
+                    {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="well">No results were found matching the search criteria. Try choosing less restrictive filters.</p>
+      {% endif %}
     </div>
   </div>
 <!--
@@ -98,7 +155,7 @@
           <div class="row">
             <div class="col-sm-6 col-md-2">
               <label class="sr-only" for="input-year">Year</label>
-              <select class="form-control selectpicker" id="input-year" name="year">
+              <select class="form-control selectpicker" data-dropup-auto="false" id="input-year" name="year">
                 <option value="0">All Years</option>
                 {% for valid_year in valid_years %}
                   <option value="{{valid_year}}"{% if valid_year == year %} selected="selected"{% endif %}>{{valid_year}}</option>
@@ -108,7 +165,7 @@
 
             <div class="col-sm-6 col-md-3">
               <label class="sr-only" for="input-award">Award Filter</label>
-              <select class="form-control selectpicker" id="input-award-type" name="award_type" multiple title="Won Awards" data-actions-box="true" data-live-search="true">
+              <select class="form-control selectpicker" data-dropup-auto="false" id="input-award-type" name="award_type" multiple title="Won Awards" data-actions-box="true" data-live-search="true">
                 {% for valid_award_type, valid_award_type_name in valid_award_types %}
                   <option value="{{valid_award_type}}"{% if valid_award_type in award_types %} selected="selected"{% endif %}>{{valid_award_type_name}}</option>
                   {% if loop.index == num_special_awards %}<option data-divider="true"></option>{% endif %}
@@ -118,7 +175,7 @@
 
             <div class="col-sm-6 col-md-3">
               <label class="sr-only" for="input-event-type">Event Filter</label>
-              <select class="form-control selectpicker" id="input-event-type" name="event_type" multiple title="At Events" data-actions-box="true" disabled>
+              <select class="form-control selectpicker" data-dropup-auto="false" id="input-event-type" name="event_type" multiple title="At Events" data-actions-box="true" disabled>
                 {% for valid_event_type, valid_event_type_name in valid_event_types %}
                   <option value="{{valid_event_type}}"{% if valid_event_type in event_types %} selected="selected"{% endif %}>{{valid_event_type_name}}</option>
                 {% endfor %}
@@ -228,57 +285,80 @@
 
 {% block inline_javascript %}
 <script>
+  function enable(input) {
+    input.prop('disabled', false);
+    input.closest('.form-group').show();
+    input.selectpicker('refresh');
+  }
+
+  function disable(input) {
+    input.closest('.form-group').hide();
+    input.prop('disabled', true);
+    input.selectpicker('refresh');
+  }
+
   // Show/hide location text input based on location type selection
   $('#input-location-type').on('changed.bs.select loaded.bs.select', function () {
     if ($(this).selectpicker('val') == 0) {
-      $('#input-location-group').hide();
-      $('#input-location').prop('disabled', true);
-      $('#input-location').selectpicker('refresh');
+      disable($('#input-location'));
     } else {
-      $('#input-location').prop('disabled', false);
-      $('#input-location-group').show();
-      $('#input-location').selectpicker('refresh');
+      enable($('#input-location'));
     }
   });
 
-  // Show/hide award filter
-  $('#add-award-filter').click(function (e) {
-    e.preventDefault();
-    $('#add-award-filter-group').hide();
-    $('#remove-award-filter-group').show();
+  // Handle filter options
+  $('input[type=radio][name=filter_type]').change(function() {
+    if (this.value == 0) {
+      $('#submit-search').removeClass('disabled');
+      // Show year filter
+      enable($('#input-year'));
 
-    $('#input-award-type-group').show();
-    $('#input-award-type').prop('disabled', false);
-    $('#input-award-type').selectpicker('refresh');
+      // Hide all others
+      disable($('#input-award-type'));
+
+    } else if (this.value == 1) {
+      $('#submit-search').removeClass('disabled');
+      // Show year filter
+
+      // Hide all others
+      disable($('#input-year'));
+      disable($('#input-award-type'));
+
+    } else if (this.value == 2) {
+      $('#submit-search').removeClass('disabled');
+      // Show award filter
+      enable($('#input-award-type'));
+
+      // Hide all others
+      disable($('#input-year'));
+    }
   });
-  $('#remove-award-filter').click(function (e) {
-    e.preventDefault();
-    $('#add-award-filter-group').show();
-    $('#remove-award-filter-group').hide();
 
-    $('#input-award-type-group').hide();
-    $('#input-award-type').prop('disabled', true);
-    $('#input-award-type').selectpicker('refresh');
-  });
-
-  // Show/hide event type and time period
+  // Show/hide depending on #input-award-type
   $('#input-award-type').on('changed.bs.select loaded.bs.select refreshed.bs.select', function () {
     if ($(this).selectpicker('val') == null || $(this).is(':hidden')) {
-      $('#input-event-type-group').hide();
-      $('#input-event-type').prop('disabled', true);
-      $('#input-event-type').selectpicker('refresh');
-
-      $('#input-time-period-group').hide();
-      $('#input-time-period').prop('disabled', true);
-      $('#input-time-period').selectpicker('refresh');
+      disable($('#input-event-type'));
+      disable($('#input-time-period'));
     } else {
-      $('#input-event-type').prop('disabled', false);
-      $('#input-event-type-group').show();
-      $('#input-event-type').selectpicker('refresh');
+      enable($('#input-event-type'));
+      enable($('#input-time-period'));
+    }
 
-      $('#input-time-period').prop('disabled', false);
-      $('#input-time-period-group').show();
-      $('#input-time-period').selectpicker('refresh');
+    if (!$(this).is(':hidden')) {
+      if ($(this).selectpicker('val') == null) {
+        $('#submit-search').addClass('disabled');
+      } else{
+        $('#submit-search').removeClass('disabled');
+      }
+    }
+  });
+
+  // Show/hide depending on #input-time-period
+  $('#input-time-period').on('changed.bs.select loaded.bs.select refreshed.bs.select', function () {
+    if ($(this).selectpicker('val') == 0 || $(this).is(':hidden')) {
+      disable($('#input-award-year'));
+    } else {
+      enable($('#input-award-year'));
     }
   });
 </script>

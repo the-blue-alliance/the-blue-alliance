@@ -8,6 +8,7 @@ from consts.award_type import AwardType
 from consts.event_type import EventType
 from controllers.base_controller import CacheableHandler
 from helpers.location_helper import LocationHelper
+from helpers.search_helper import SearchHelper
 from models.event_team import EventTeam
 from template_engine import jinja2_engine
 
@@ -45,48 +46,57 @@ class AdvancedSearchController(CacheableHandler):
         super(AdvancedSearchController, self).__init__(*args, **kw)
         self._cache_expiration = 60 * 60 * 24
 
+    def _sanitize_int_param(self, param_name, min_val, max_val):
+        """
+        Restricts a parameter to be within min_val and max_val
+        Returns 0 otherwise
+        """
+        param = self.request.get(param_name)
+        if not param or not param.isdigit():
+            param = 0
+        param = int(param)
+        if param < min_val or param > max_val:
+            param = 0
+        return param
+
     def _get_params(self):
         # Parse and sanitize inputs
-        self._location_type = self.request.get('location_type')
-        if not self._location_type or not self._location_type.isdigit():
-            self._location_type = 0
-        self._location_type = int(self._location_type)
-        if self._location_type not in range(0, len(self.VALID_RANGES) + 1):
-            self._location_type = 0
+        self._location_type = self._sanitize_int_param('location_type', 0, len(self.VALID_RANGES))
 
         self._location = self.request.get('location')
 
-        self._year = self.request.get('year')
-        if not self._year or not self._year.isdigit():
-            self._year = 0
-        self._year = int(self._year)
-        if self._year < 1992 or self._year > tba_config.MAX_YEAR:
-            self._year = 0
+        self._year = self._sanitize_int_param('year', 1992, tba_config.MAX_YEAR)
 
-        self._award_types = self.request.get('award_type', allow_multiple=True)
-        if self._award_types:
-            # Sort to make caching more likely
-            self._award_types = filter(lambda x: x is not None, sorted([
-                int(award_type) if award_type.isdigit() else None
-                for award_type in self._award_types]))
-            self._event_types = self.request.get('event_type', allow_multiple=True)
-            if self._event_types:
-                # Sort to make caching more likely
-                self._event_types = filter(lambda x: x is not None, sorted([
-                    int(event_type) if event_type.isdigit() else None
-                    for event_type in self._event_types]))
-            else:
-                self._event_types = []
-        else:
+        self._filter_type = self._sanitize_int_param('filter_type', 0, 2)
+        if self._filter_type == 0:
+            self._year = self._sanitize_int_param('year', 1992, tba_config.MAX_YEAR)
             self._award_types = []
             self._event_types = []
+            self._time_period = 0
+        elif self._filter_type == 2:
+            self._award_types = self.request.get('award_type', allow_multiple=True)
+            if self._award_types:
+                # Sort to make caching more likely
+                self._award_types = filter(lambda x: x is not None, sorted([
+                    int(award_type) if award_type.isdigit() else None
+                    for award_type in self._award_types]))
+                self._event_types = self.request.get('event_type', allow_multiple=True)
+                if self._event_types:
+                    # Sort to make caching more likely
+                    self._event_types = filter(lambda x: x is not None, sorted([
+                        int(event_type) if event_type.isdigit() else None
+                        for event_type in self._event_types]))
+                else:
+                    self._event_types = []
 
-        self._time_period = self.request.get('time_period')
-        if not self._time_period or not self._time_period.isdigit():
-            self._time_period = 0
-        self._time_period = int(self._time_period)
-        if self._time_period < 0 or self._time_period > 2:
-            self._time_period = 0
+                self._time_period = self._sanitize_int_param('time_period', 0, 2)
+                if self._time_period == 0:
+                    self._year = 0
+            else:
+                self._award_types = []
+                self._event_types = []
+                self._time_period = 0
+                self._year = 0
 
         # if self.request.get('sort_desc'):
         #     sort_desc = True
@@ -103,7 +113,10 @@ class AdvancedSearchController(CacheableHandler):
         # search_type = self.request.get('search_type', self.DEFAULT_SEARCH_TYPE)
         # if search_type != 'teams' and search_type != 'events':
         #     search_type = self.DEFAULT_SEARCH_TYPE
-        # page = int(self.request.get('page', 0))
+        self._page = self.request.get('page', 0)
+        if not self._page or not self._page.isdigit():
+            self._page = 0
+        self._page = int(self._page)
 
     def get(self):
         self._get_params();
@@ -112,6 +125,74 @@ class AdvancedSearchController(CacheableHandler):
         super(AdvancedSearchController, self).get()
 
     def _render(self):
+        # Construct query string
+        if self._filter_type == 0:  # Year filter
+            if self._year == 0:
+                search_index = search.Index(name=SearchHelper.TEAM_INDEX)
+            else:
+                search_index = search.Index(name=SearchHelper.TEAM_YEAR_INDEX)
+        elif self._filter_type == 2:  # Award filter
+            if self._time_period == 0:
+                search_index = search.Index(name=SearchHelper.TEAM_INDEX)
+            elif self._time_period == 1:
+                search_index = search.Index(name=SearchHelper.TEAM_YEAR_INDEX)
+            elif self._time_period == 2:
+                search_index = search.Index(name=SearchHelper.TEAM_EVENT_INDEX)
+
+        if self._year:
+            query_string = 'year={}'.format(self._year)
+        else:
+            query_string = ''
+
+        if self._award_types and self._event_types:
+            for award_type in self._award_types:
+                for event_type in self._event_types:
+                    field = 'event_award_{}_{}_count'.format(event_type, award_type)
+                    if query_string:
+                        query_string += ' AND '
+                    query_string += '{} > 0'.format(field)
+        elif self._award_types:
+            for award_type in self._award_types:
+                field = 'award_{}_count'.format(award_type)
+                if query_string:
+                    query_string += ' AND '
+                query_string += '{} > 0'.format(field)
+
+        returned_fields = []
+        sort_options_expressions = [
+            search.SortExpression(
+                expression='number',
+                direction=search.SortExpression.ASCENDING
+            )]
+        returned_expressions = []
+
+        # Perform query
+        logging.info(query_string)
+        query = search.Query(
+            query_string=query_string,
+            options=search.QueryOptions(
+                limit=self.PAGE_SIZE,
+                number_found_accuracy=10000,  # Larger than the number of possible results
+                offset=self.PAGE_SIZE * self._page,
+                returned_fields=returned_fields,
+                sort_options=search.SortOptions(
+                    expressions=sort_options_expressions
+                ),
+                returned_expressions=returned_expressions
+            )
+        )
+
+        docs = search_index.search(query)
+        num_results = docs.number_found
+        model_keys = []
+        for result in docs.results:
+            logging.info(result)
+            model_keys.append(ndb.Key('Team', result.doc_id.split('_')[0]))
+
+        model_futures = ndb.get_multi_async(model_keys)
+
+        result_models = [model_future.get_result() for model_future in model_futures]
+
         # year, award_types, event_types, location, search_type, sort_field, sort_desc, page = self._get_params()
 
         # num_results = 0
@@ -255,13 +336,14 @@ class AdvancedSearchController(CacheableHandler):
             # 'page': page,
             'location_type': self._location_type,
             'location': self._location,
+            'filter_type': self._filter_type,
             'year': self._year,
             'award_types': self._award_types,
             'event_types': self._event_types,
             'time_period': self._time_period,
             # 'search_type': search_type,
-            # 'num_results': num_results,
-            # 'results': results,
+            'num_results': num_results,
+            'result_models': result_models,
             # 'returned_fields': returned_fields,
             # 'field_names': field_names,
             # 'sort_field': sort_field,
