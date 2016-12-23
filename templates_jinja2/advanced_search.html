@@ -82,10 +82,11 @@
         </div>
 
         <div class="form-group{% if not award_types or filter_type != 2 %} display-none{% endif %}">
-          <label for="input-event-type">At any of the following competition levels:</label>
-          <select class="form-control selectpicker" data-dropup-auto="false" id="input-event-type" name="event_type" multiple title="No competition levels selected" data-actions-box="true"{% if not award_types or filter_type != 2 %} disabled{% endif %}>
+          <label for="input-event-type">At the following competition level:</label>
+          <select class="form-control selectpicker" data-dropup-auto="false" id="input-event-type" name="event_type"{% if not award_types or filter_type != 2 %} disabled{% endif %}>
+            <option value="-1"{% if event_type == -1 %} selected="selected"{% endif %}>Any competition level</option>
             {% for valid_event_type, valid_event_type_name in valid_event_types %}
-              <option value="{{valid_event_type}}"{% if valid_event_type in event_types %} selected="selected"{% endif %}>{{valid_event_type_name}}</option>
+              <option value="{{valid_event_type}}"{% if event_type == valid_event_type %} selected="selected"{% endif %}>{{valid_event_type_name}}</option>
             {% endfor %}
           </select>
         </div>

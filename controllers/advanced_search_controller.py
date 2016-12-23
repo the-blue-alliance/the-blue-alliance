@@ -32,6 +32,9 @@ class AdvancedSearchController(CacheableHandler):
         key=lambda (event_type, name): SORT_ORDER.get(event_type, name))
 
     VALID_EVENT_TYPES = [
+        (EventType.REGIONAL, 'Regional'),
+        (EventType.DISTRICT, 'District'),
+        (EventType.DISTRICT_CMP, 'District Championship'),
         (EventType.CMP_DIVISION, 'Championship Division'),
         (EventType.CMP_FINALS, 'Championship'),
     ]
@@ -71,7 +74,7 @@ class AdvancedSearchController(CacheableHandler):
         if self._filter_type == 0:
             self._year = self._sanitize_int_param('year', 1992, tba_config.MAX_YEAR)
             self._award_types = []
-            self._event_types = []
+            self._event_type = -1
             self._time_period = 0
         elif self._filter_type == 2:
             self._award_types = self.request.get('award_type', allow_multiple=True)
@@ -79,22 +82,21 @@ class AdvancedSearchController(CacheableHandler):
                 # Sort to make caching more likely
                 self._award_types = filter(lambda x: x in AwardType.SEARCHABLE, sorted(set([
                     int(award_type) if award_type.isdigit() else None
-                    for award_type in self._award_types])))
-                self._event_types = self.request.get('event_type', allow_multiple=True)
-                if self._event_types:
-                    # Sort to make caching more likely
-                    self._event_types = filter(lambda x: x in [e[0] for e in self.VALID_EVENT_TYPES], sorted(set([
-                        int(event_type) if event_type.isdigit() else None
-                        for event_type in self._event_types])))
+                    for award_type in self._award_types])))[:SearchHelper.MAX_AWARDS]
+                self._event_type = self.request.get('event_type')
+                if self._event_type:
+                    self._event_type = int(self._event_type) if self._event_type.isdigit() else -1
                 else:
-                    self._event_types = []
+                    self._event_type = -1
+                if self._event_type not in [x[0] for x in self.VALID_EVENT_TYPES]:
+                    self._event_type = -1
 
                 self._time_period = self._sanitize_int_param('time_period', 0, 2)
                 if self._time_period == 0:
                     self._year = 0
             else:
                 self._award_types = []
-                self._event_types = []
+                self._event_type = -1
                 self._time_period = 0
                 self._year = 0
 
@@ -133,54 +135,47 @@ class AdvancedSearchController(CacheableHandler):
 
             award_filter = '_'.join(['a{}'.format(award_type) for award_type in self._award_types])
 
-            if self._event_types:
-                event_type_filters = ['_e{}'.format(e) for e in self._event_types]
+            if self._event_type == -1:
+                event_type_filter = ''
             else:
-                event_type_filters = ['']
+                event_type_filter = '_e{}'.format(self._event_type)
 
             if self._year:
                 year_filter = '_y{}'.format(self._year)
             else:
                 year_filter = ''
 
-            query_partials = []
-            for etf in event_type_filters:
-                if self._time_period == 0:
-                    query_partials.append('o_{}{}{} > 0'.format(award_filter, etf, year_filter))
-                elif self._time_period == 1:
-                    query_partials.append('s_{}{}{} > 0'.format(award_filter, etf, year_filter))
-                elif self._time_period == 2:
-                    query_partials.append('e_{}{}{} > 0'.format(award_filter, etf, year_filter))
+            if self._time_period == 0:
+                expression = 'o_{}{}{}'.format(award_filter, event_type_filter, year_filter)
+            elif self._time_period == 1:
+                expression = 's_{}{}{}'.format(award_filter, event_type_filter, year_filter)
+            elif self._time_period == 2:
+                expression = 'e_{}{}{}'.format(award_filter, event_type_filter, year_filter)
+            query_string = '{} > 0'.format(expression)
 
-            logging.info(query_partials)
-            query_string = ' OR '.join(query_partials)
+            logging.info(query_string)
 
-        # if self._year:
-        #     query_string = 'year={}'.format(self._year)
-        # else:
-        #     query_string = ''
+            if self._time_period == 0:
+                sort_options_expressions = []
+                returned_expressions = []
+            else:
+                sort_expression = ' + '.join(expressions)
+                logging.info(sort_expression)
+                sort_options_expressions = [
+                    search.SortExpression(
+                    expression=sort_expression,
+                    direction=search.SortExpression.DESCENDING,
+                    default_value=0)]
+                returned_expressions = []
+                # returned_expressions = [
+                #     search.FieldExpression(
+                #         name='count',
+                #         expression='number')]
 
-        # if self._award_types and self._event_types:
-        #     for award_type in self._award_types:
-        #         for event_type in self._event_types:
-        #             field = 'event_award_{}_{}_count'.format(event_type, award_type)
-        #             if query_string:
-        #                 query_string += ' AND '
-        #             query_string += '{} > 0'.format(field)
-        # elif self._award_types:
-        #     for award_type in self._award_types:
-        #         field = 'award_{}_count'.format(award_type)
-        #         if query_string:
-        #             query_string += ' AND '
-        #         query_string += '{} > 0'.format(field)
-
-        returned_fields = []
-        sort_options_expressions = [
+        sort_options_expressions.append(
             search.SortExpression(
                 expression='number',
-                direction=search.SortExpression.DESCENDING
-            )]
-        returned_expressions = []
+                direction=search.SortExpression.ASCENDING))
 
         # Perform query
         logging.info(query_string)
@@ -190,7 +185,7 @@ class AdvancedSearchController(CacheableHandler):
                 limit=self.PAGE_SIZE,
                 number_found_accuracy=10000,  # Larger than the number of possible results
                 offset=self.PAGE_SIZE * self._page,
-                returned_fields=returned_fields,
+                ids_only=True,
                 sort_options=search.SortOptions(
                     expressions=sort_options_expressions
                 ),
@@ -356,7 +351,7 @@ class AdvancedSearchController(CacheableHandler):
             'filter_type': self._filter_type,
             'year': self._year,
             'award_types': self._award_types,
-            'event_types': self._event_types,
+            'event_type': self._event_type,
             'time_period': self._time_period,
             # 'search_type': search_type,
             'num_results': num_results,
