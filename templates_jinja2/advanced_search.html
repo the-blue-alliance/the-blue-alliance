@@ -14,10 +14,86 @@
     </div>
   </div>
 
+
+  <div class="row">
+    <div class="col-sm-4 col-lg-3">
+      <form>
+        <div class="form-group">
+          <label for="input-location-type">Search for teams</label>
+          <select class="form-control selectpicker" id="input-location-type" name="location_type">
+            <option value="0">Anywhere</option>
+            <optgroup label="Within">
+            {% for valid_range in valid_ranges %}
+              <option value="{{loop.index}}" title="Within {{valid_range}} miles of"{% if loop.index == location_type %} selected="selected"{% endif %}>{{valid_range}} miles of</option>
+            {% endfor %}
+            </optgroup>
+          </select>
+        </div>
+
+        <div id="input-location-group" class="form-group display-none{% if location_type != 0 and not location %} has-error has-feedback{% endif %}">
+          <label class="sr-only" for="input-location">Location</label>
+          <input type="text" class="form-control" id="input-location" name="location" placeholder="City / Zip / Address"{% if location %} value="{{location}}"{% endif %}" disabled>
+          {% if location_type != 0 and not location %}
+          <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="input-year">Active in</label>
+          <select class="form-control selectpicker" id="input-year" name="year">
+            <option value="0">Any year</option>
+            {% for valid_year in valid_years %}
+              <option value="{{valid_year}}"{% if valid_year == year %} selected="selected"{% endif %}>{{valid_year}}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div id="add-award-filter-group" class="form-group{% if award_types %} display-none{% endif %}">
+          <button id="add-award-filter" class="btn btn-primary btn-block btn-xs"><span class="glyphicon glyphicon-plus"></span> Add award filter</button>
+        </div>
+        <div id="remove-award-filter-group" class="form-group{% if not award_types %} display-none{% endif %}">
+          <button id="remove-award-filter" class="btn btn-danger btn-block btn-xs"><span class="glyphicon glyphicon-minus"></span> Remove award filter</button>
+        </div>
+
+        <div id="input-award-type-group" class="form-group{% if not award_types %} display-none{% endif %}">
+          <label for="input-award-type">That have won all the following awards:</label>
+          <select class="form-control selectpicker" id="input-award-type" name="award_type" multiple title="No awards selected" data-actions-box="true" data-live-search="true"{% if not award_types %} disabled{% endif %}>
+            {% for valid_award_type, valid_award_type_name in valid_award_types %}
+              <option value="{{valid_award_type}}"{% if valid_award_type in award_types %} selected="selected"{% endif %}>{{valid_award_type_name}}</option>
+              {% if loop.index == num_special_awards %}<option data-divider="true"></option>{% endif %}
+            {% endfor %}
+          </select>
+        </div>
+
+        <div id="input-event-type-group" class="form-group{% if not award_types %} display-none{% endif %}">
+          <label for="input-event-type">At any of the following competition levels:</label>
+          <select class="form-control selectpicker" id="input-event-type" name="event_type" multiple title="No competition levels selected" data-actions-box="true"{% if not award_types %} disabled{% endif %}>
+            {% for valid_event_type, valid_event_type_name in valid_event_types %}
+              <option value="{{valid_event_type}}"{% if valid_event_type in event_types %} selected="selected"{% endif %}>{{valid_event_type_name}}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div id="input-time-period-group" class="form-group{% if not event_types %} display-none{% endif %}">
+          <label class="sr-only" for="input-time-period">Time period</label>
+          <select class="form-control selectpicker" id="input-time-period" name="time_period" data-actions-box="true"{% if not event_types %} disabled{% endif %}>
+            <option value="0"{% if time_period == 0 %} selected="selected"{% endif %}>Any time in their history</option>
+            <option value="1"{% if time_period == 1 %} selected="selected"{% endif %}>In the same year</option>
+            <option value="2"{% if time_period == 2 %} selected="selected"{% endif %}>At the same event</option>
+          </select>
+        </div>
+
+
+        <button type="submit" class="btn btn-success btn-block"><span class="glyphicon glyphicon-search"></span> Search</button>
+
+      </form>
+    </div>
+  </div>
+<!--
+
   <div class="row">
     <div class="col-xs-12">
       <div class="well">
-        <p>Narrow by:</p>
         <form class="">
           <div class="row">
             <div class="col-sm-6 col-md-2">
@@ -146,19 +222,68 @@
       {% endif %}
     </div>
   </div>
-
+ -->
 </div>
 {% endblock %}
 
 {% block inline_javascript %}
 <script>
-  $('#input-award-type').on('changed.bs.select loaded.bs.select', function () {
-    if ($(this).selectpicker('val') == null) {
+  // Show/hide location text input based on location type selection
+  $('#input-location-type').on('changed.bs.select loaded.bs.select', function () {
+    if ($(this).selectpicker('val') == 0) {
+      $('#input-location-group').hide();
+      $('#input-location').prop('disabled', true);
+      $('#input-location').selectpicker('refresh');
+    } else {
+      $('#input-location').prop('disabled', false);
+      $('#input-location-group').show();
+      $('#input-location').selectpicker('refresh');
+    }
+  });
+
+  // Show/hide award filter
+  $('#add-award-filter').click(function (e) {
+    e.preventDefault();
+    $('#add-award-filter-group').hide();
+    $('#remove-award-filter-group').show();
+
+    $('#input-award-type-group').show();
+    $('#input-award-type').prop('disabled', false);
+    $('#input-award-type').selectpicker('refresh');
+  });
+  $('#remove-award-filter').click(function (e) {
+    e.preventDefault();
+    $('#add-award-filter-group').show();
+    $('#remove-award-filter-group').hide();
+
+    $('#input-award-type-group').hide();
+    $('#input-award-type').prop('disabled', true);
+    $('#input-award-type').selectpicker('refresh');
+  });
+
+  // Show/hide event type
+  $('#input-award-type').on('changed.bs.select loaded.bs.select refreshed.bs.select', function () {
+    if ($(this).selectpicker('val') == null || $(this).is(':hidden')) {
+      $('#input-event-type-group').hide();
       $('#input-event-type').prop('disabled', true);
       $('#input-event-type').selectpicker('refresh');
     } else {
       $('#input-event-type').prop('disabled', false);
+      $('#input-event-type-group').show();
       $('#input-event-type').selectpicker('refresh');
+    }
+  });
+
+  // Show/hide time period
+  $('#input-event-type').on('changed.bs.select loaded.bs.select refreshed.bs.select', function () {
+    if ($(this).selectpicker('val') == null || $(this).is(':hidden')) {
+      $('#input-time-period-group').hide();
+      $('#input-time-period').prop('disabled', true);
+      $('#input-time-period').selectpicker('refresh');
+    } else {
+      $('#input-time-period').prop('disabled', false);
+      $('#input-time-period-group').show();
+      $('#input-time-period').selectpicker('refresh');
     }
   });
 </script>
