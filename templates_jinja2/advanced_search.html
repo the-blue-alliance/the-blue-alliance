@@ -94,7 +94,7 @@
           <label for="input-time-period">Within the period of</label>
           <select class="form-control selectpicker" data-dropup-auto="false" id="input-time-period" name="time_period" data-actions-box="true"{% if not award_types or filter_type != 2 %} disabled{% endif %}>
             <option value="0"{% if time_period == 0 %} selected="selected"{% endif %}>the team's history</option>
-            <option value="1"{% if time_period == 1 %} selected="selected"{% endif %}>one year</option>
+            <option value="1"{% if time_period == 1 %} selected="selected"{% endif %}>one season</option>
             <option value="2"{% if time_period == 2 %} selected="selected"{% endif %}>one event</option>
           </select>
         </div>

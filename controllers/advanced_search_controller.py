@@ -26,7 +26,7 @@ class AdvancedSearchController(CacheableHandler):
     VALID_RANGES = [100, 500]  # Miles
     VALID_YEARS = list(reversed(range(1992, tba_config.MAX_YEAR + 1)))
 
-    VALID_AWARD_TYPES = [kv for kv in AwardType.GENERIC_NAMES.items()]
+    VALID_AWARD_TYPES = [kv for kv in AwardType.SEARCHABLE.items()]
     VALID_AWARD_TYPES = sorted(
         VALID_AWARD_TYPES,
         key=lambda (event_type, name): SORT_ORDER.get(event_type, name))
@@ -128,14 +128,14 @@ class AdvancedSearchController(CacheableHandler):
         # Construct query string
         if self._filter_type == 0:  # Year filter
             if self._year == 0:
-                search_index = search.Index(name=SearchHelper.TEAM_INDEX)
+                search_index = search.Index(name=SearchHelper.TEAM_AWARDS_INDEX)
             else:
-                search_index = search.Index(name=SearchHelper.TEAM_YEAR_INDEX)
+                search_index = search.Index(name=SearchHelper.TEAM_AWARDS_INDEX)
         elif self._filter_type == 2:  # Award filter
             if self._time_period == 0:
-                search_index = search.Index(name=SearchHelper.TEAM_INDEX)
+                search_index = search.Index(name=SearchHelper.TEAM_AWARDS_INDEX)
             elif self._time_period == 1:
-                search_index = search.Index(name=SearchHelper.TEAM_YEAR_INDEX)
+                search_index = search.Index(name=SearchHelper.TEAM_AWARDS_INDEX)
             elif self._time_period == 2:
                 search_index = search.Index(name=SearchHelper.TEAM_EVENT_INDEX)
 
@@ -319,10 +319,10 @@ class AdvancedSearchController(CacheableHandler):
         #             elif event_type == 4:
         #                 event_str = 'Championship'
 
-        #             field_names.append('# {} {}'.format(event_str, AwardType.GENERIC_NAMES.get(award_type)))
+        #             field_names.append('# {} {}'.format(event_str, AwardType.SEARCHABLE.get(award_type)))
         #         elif query_type == 'award':
         #             award_type = int(field.split('_')[1])
-        #             field_names.append('# {}'.format(AwardType.GENERIC_NAMES.get(award_type)))
+        #             field_names.append('# {}'.format(AwardType.SEARCHABLE.get(award_type)))
 
         # results = zip([result_future.get_result() for result_future in result_futures], all_fields)
 

@@ -112,7 +112,7 @@ class AwardType(object):
         },
     }
 
-    GENERIC_NAMES = {  # Obscure & old awards not listed
+    SEARCHABLE = {  # Only searchable awards. Obscure & old awards not listed
         CHAIRMANS: 'Chairman\'s',
         ENGINEERING_INSPIRATION: 'Engineering Inspiration',
         WINNER: 'Event Winner',
