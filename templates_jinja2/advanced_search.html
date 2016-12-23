@@ -72,8 +72,8 @@
 
         <!-- Award Filter -->
         <div class="form-group{% if filter_type != 2 %} display-none{% endif %}">
-          <label for="input-award-type">That have won all the following awards:</label>
-          <select class="form-control selectpicker" data-dropup-auto="false" id="input-award-type" name="award_type" multiple title="No awards selected" data-actions-box="true" data-live-search="true"{% if filter_type != 2 %} disabled{% endif %}>
+          <label for="input-award-type">That have won all the following awards (3 max):</label>
+          <select class="form-control selectpicker" data-dropup-auto="false" id="input-award-type" name="award_type" multiple title="No awards selected" data-max-options="{{max_awards}}" data-live-search="true"{% if filter_type != 2 %} disabled{% endif %}>
             {% for valid_award_type, valid_award_type_name in valid_award_types %}
               <option value="{{valid_award_type}}"{% if valid_award_type in award_types %} selected="selected"{% endif %}>{{valid_award_type_name}}</option>
               {% if loop.index == num_special_awards %}<option data-divider="true"></option>{% endif %}

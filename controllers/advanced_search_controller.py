@@ -77,15 +77,15 @@ class AdvancedSearchController(CacheableHandler):
             self._award_types = self.request.get('award_type', allow_multiple=True)
             if self._award_types:
                 # Sort to make caching more likely
-                self._award_types = filter(lambda x: x is not None, sorted([
+                self._award_types = filter(lambda x: x in AwardType.SEARCHABLE, sorted(set([
                     int(award_type) if award_type.isdigit() else None
-                    for award_type in self._award_types]))
+                    for award_type in self._award_types])))
                 self._event_types = self.request.get('event_type', allow_multiple=True)
                 if self._event_types:
                     # Sort to make caching more likely
-                    self._event_types = filter(lambda x: x is not None, sorted([
+                    self._event_types = filter(lambda x: x in [e[0] for e in self.VALID_EVENT_TYPES], sorted(set([
                         int(event_type) if event_type.isdigit() else None
-                        for event_type in self._event_types]))
+                        for event_type in self._event_types])))
                 else:
                     self._event_types = []
 
@@ -127,42 +127,58 @@ class AdvancedSearchController(CacheableHandler):
     def _render(self):
         # Construct query string
         if self._filter_type == 0:  # Year filter
-            if self._year == 0:
-                search_index = search.Index(name=SearchHelper.TEAM_AWARDS_INDEX)
-            else:
-                search_index = search.Index(name=SearchHelper.TEAM_AWARDS_INDEX)
+            search_index = search.Index(name=SearchHelper.TEAM_AWARDS_INDEX)
         elif self._filter_type == 2:  # Award filter
-            if self._time_period == 0:
-                search_index = search.Index(name=SearchHelper.TEAM_AWARDS_INDEX)
-            elif self._time_period == 1:
-                search_index = search.Index(name=SearchHelper.TEAM_AWARDS_INDEX)
-            elif self._time_period == 2:
-                search_index = search.Index(name=SearchHelper.TEAM_EVENT_INDEX)
+            search_index = search.Index(name=SearchHelper.TEAM_AWARDS_INDEX)
 
-        if self._year:
-            query_string = 'year={}'.format(self._year)
-        else:
-            query_string = ''
+            award_filter = '_'.join(['a{}'.format(award_type) for award_type in self._award_types])
 
-        if self._award_types and self._event_types:
-            for award_type in self._award_types:
-                for event_type in self._event_types:
-                    field = 'event_award_{}_{}_count'.format(event_type, award_type)
-                    if query_string:
-                        query_string += ' AND '
-                    query_string += '{} > 0'.format(field)
-        elif self._award_types:
-            for award_type in self._award_types:
-                field = 'award_{}_count'.format(award_type)
-                if query_string:
-                    query_string += ' AND '
-                query_string += '{} > 0'.format(field)
+            if self._event_types:
+                event_type_filters = ['_e{}'.format(e) for e in self._event_types]
+            else:
+                event_type_filters = ['']
+
+            if self._year:
+                year_filter = '_y{}'.format(self._year)
+            else:
+                year_filter = ''
+
+            query_partials = []
+            for etf in event_type_filters:
+                if self._time_period == 0:
+                    query_partials.append('o_{}{}{} > 0'.format(award_filter, etf, year_filter))
+                elif self._time_period == 1:
+                    query_partials.append('s_{}{}{} > 0'.format(award_filter, etf, year_filter))
+                elif self._time_period == 2:
+                    query_partials.append('e_{}{}{} > 0'.format(award_filter, etf, year_filter))
+
+            logging.info(query_partials)
+            query_string = ' OR '.join(query_partials)
+
+        # if self._year:
+        #     query_string = 'year={}'.format(self._year)
+        # else:
+        #     query_string = ''
+
+        # if self._award_types and self._event_types:
+        #     for award_type in self._award_types:
+        #         for event_type in self._event_types:
+        #             field = 'event_award_{}_{}_count'.format(event_type, award_type)
+        #             if query_string:
+        #                 query_string += ' AND '
+        #             query_string += '{} > 0'.format(field)
+        # elif self._award_types:
+        #     for award_type in self._award_types:
+        #         field = 'award_{}_count'.format(award_type)
+        #         if query_string:
+        #             query_string += ' AND '
+        #         query_string += '{} > 0'.format(field)
 
         returned_fields = []
         sort_options_expressions = [
             search.SortExpression(
                 expression='number',
-                direction=search.SortExpression.ASCENDING
+                direction=search.SortExpression.DESCENDING
             )]
         returned_expressions = []
 
@@ -332,6 +348,7 @@ class AdvancedSearchController(CacheableHandler):
             'valid_award_types': self.VALID_AWARD_TYPES,
             'num_special_awards': len(SORT_ORDER),
             'valid_event_types': self.VALID_EVENT_TYPES,
+            'max_awards': SearchHelper.MAX_AWARDS,
             # 'page_size': self.PAGE_SIZE,
             # 'page': page,
             'location_type': self._location_type,
