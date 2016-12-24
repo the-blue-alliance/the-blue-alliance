@@ -16,7 +16,7 @@
 
 
   <div class="row">
-    <div class="col-sm-4 col-lg-3">
+    <div class="col-sm-4">
       <form>
         <div class="form-group">
           <label for="input-location-type">Search for teams</label>
@@ -117,14 +117,56 @@
       </form>
     </div>
 
-    <div class="col-sm-8 col-lg-9">
+    <div class="col-sm-8">
       {% if result_models %}
         <p>{{num_results}} result{% if num_results != 1 %}s{% endif %} found</p>
+
+        {% if num_results > page_size %}
+          <nav aria-label="Page navigation">
+            <ul class="pagination">
+              {% if page != 0 %}
+              <li>
+                <a href="/advanced_search?year={{year}}{% for award_type in award_types %}&award_type={{award_type}}{% endfor %}{% for event_type in event_types %}&event_type={{event_type}}{% endfor %}&location={{location}}&page={{page - 1}}&search_type={{search_type}}" aria-label="Previous">
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+              </li>
+              {% endif %}
+              {% for i in range((num_results / page_size)|ceil) %}
+                <li {% if i == page %}class="active"{% endif %}>
+                  <a href="/advanced_search?year={{year}}{% for award_type in award_types %}&award_type={{award_type}}{% endfor %}{% for event_type in event_types %}&event_type={{event_type}}{% endfor %}&location={{location}}&page={{i}}&search_type={{search_type}}">
+                    {{page_size * i + 1}}-
+                    {%- if loop.last -%}
+                      {{page_size * i + num_results - page_size * i}}
+                    {%- else -%}
+                      {{page_size * i + page_size}}
+                    {% endif %}
+                  </a>
+                </li>
+              {% endfor %}
+              {% if page != (num_results / page_size)|ceil - 1 %}
+              <li>
+                <a href="/advanced_search?year={{year}}{% for award_type in award_types %}&award_type={{award_type}}{% endfor %}{% for event_type in event_types %}&event_type={{event_type}}{% endfor %}&location={{location}}&page={{page + 1}}&search_type={{search_type}}" aria-label="Next">
+                  <span aria-hidden="true">&raquo;</span>
+                </a>
+              </li>
+              {% endif %}
+            </ul>
+          </nav>
+        {% endif %}
 
         <table class="event-table">
           <thead>
             <tr>
               <th>Team</th>
+              {% if time_period == 1 %}
+              <th># Seasons</th>
+              {% elif time_period == 2 %}
+              <th># Events</th>
+              {% endif %}
+              </th>
+              {% if location %}
+              <th>Distance</th>
+              {% endif %}
             </tr>
           </thead>
           <tbody>
@@ -138,6 +180,12 @@
                       <small>{{team.city_state_country}}</small>
                     {% endif %}
                 </td>
+                {% if time_period != 0 %}
+                <td>{{result_expressions.get(team.key.id()).get('count')|int}}</td>
+                {% endif %}
+                {% if location %}
+                <td>{{result_expressions.get(team.key.id()).get('distance')|round|int}} miles</td>
+                {% endif %}
               </tr>
             {% endfor %}
           </tbody>

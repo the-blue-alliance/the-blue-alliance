@@ -1,3 +1,4 @@
+from collections import defaultdict
 import logging
 import tba_config
 
@@ -23,7 +24,7 @@ SORT_ORDER = {
 
 
 class AdvancedSearchController(CacheableHandler):
-    VALID_RANGES = [100, 500]  # Miles
+    VALID_RANGES = [100, 500, 2500]  # Miles
     VALID_YEARS = list(reversed(range(1992, tba_config.MAX_YEAR + 1)))
 
     VALID_AWARD_TYPES = [kv for kv in AwardType.SEARCHABLE.items()]
@@ -128,6 +129,31 @@ class AdvancedSearchController(CacheableHandler):
 
     def _render(self):
         # Construct query string
+        sort_options_expressions = []
+        returned_expressions = []
+        query_string = ''
+        if self._location:
+            lat_lon = LocationHelper.get_lat_lng(self._location)
+            if lat_lon:
+                lat, lon = lat_lon
+                dist_expr = 'distance(location, geopoint({}, {}))'.format(lat, lon)
+                query_string = '{} < {}'.format(
+                    dist_expr,
+                    self.VALID_RANGES[self._location_type-1] * self.METERS_PER_MILE)
+
+                # if sort_field == num_fields:
+                #     sort_options_expressions = [
+                #         search.SortExpression(
+                #             expression=dist_expr,
+                #             direction=search.SortExpression.DESCENDING if sort_desc else search.SortExpression.ASCENDING
+                #         )]
+
+                returned_expressions = [
+                    search.FieldExpression(
+                        name='distance',
+                        expression='{} / {}'.format(dist_expr, self.METERS_PER_MILE)
+                    )]
+
         if self._filter_type == 0:  # Year filter
             search_index = search.Index(name=SearchHelper.TEAM_AWARDS_INDEX)
         elif self._filter_type == 2:  # Award filter
@@ -151,26 +177,24 @@ class AdvancedSearchController(CacheableHandler):
                 expression = 's_{}{}{}'.format(award_filter, event_type_filter, year_filter)
             elif self._time_period == 2:
                 expression = 'e_{}{}{}'.format(award_filter, event_type_filter, year_filter)
-            query_string = '{} > 0'.format(expression)
+            partial_query = '{} > 0'.format(expression)
+            if query_string:
+                query_string = '{} AND {}'.format(query_string, partial_query)
+            else:
+                query_string = partial_query
 
             logging.info(query_string)
 
-            if self._time_period == 0:
-                sort_options_expressions = []
-                returned_expressions = []
-            else:
-                sort_expression = ' + '.join(expressions)
-                logging.info(sort_expression)
-                sort_options_expressions = [
+            if self._time_period != 0:
+                logging.info(expression)
+                sort_options_expressions += [
                     search.SortExpression(
-                    expression=sort_expression,
-                    direction=search.SortExpression.DESCENDING,
-                    default_value=0)]
-                returned_expressions = []
-                # returned_expressions = [
-                #     search.FieldExpression(
-                #         name='count',
-                #         expression='number')]
+                    expression=expression,
+                    direction=search.SortExpression.DESCENDING)]
+                returned_expressions += [
+                    search.FieldExpression(
+                        name='count',
+                        expression=expression)]
 
         sort_options_expressions.append(
             search.SortExpression(
@@ -196,9 +220,13 @@ class AdvancedSearchController(CacheableHandler):
         docs = search_index.search(query)
         num_results = docs.number_found
         model_keys = []
+        result_expressions = defaultdict(lambda: defaultdict(float))
         for result in docs.results:
             logging.info(result)
-            model_keys.append(ndb.Key('Team', result.doc_id.split('_')[0]))
+            team_key = result.doc_id.split('_')[0]
+            model_keys.append(ndb.Key('Team', team_key))
+            for expression in result.expressions:
+                result_expressions[team_key][expression.name] = expression.value
 
         model_futures = ndb.get_multi_async(model_keys)
 
@@ -344,8 +372,8 @@ class AdvancedSearchController(CacheableHandler):
             'num_special_awards': len(SORT_ORDER),
             'valid_event_types': self.VALID_EVENT_TYPES,
             'max_awards': SearchHelper.MAX_AWARDS,
-            # 'page_size': self.PAGE_SIZE,
-            # 'page': page,
+            'page_size': self.PAGE_SIZE,
+            'page': self._page,
             'location_type': self._location_type,
             'location': self._location,
             'filter_type': self._filter_type,
@@ -356,6 +384,7 @@ class AdvancedSearchController(CacheableHandler):
             # 'search_type': search_type,
             'num_results': num_results,
             'result_models': result_models,
+            'result_expressions': result_expressions,
             # 'returned_fields': returned_fields,
             # 'field_names': field_names,
             # 'sort_field': sort_field,
