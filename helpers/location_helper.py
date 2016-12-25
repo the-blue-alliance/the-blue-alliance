@@ -1,5 +1,6 @@
 import json
 import logging
+import math
 import re
 import tba_config
 import urllib
@@ -113,6 +114,7 @@ class LocationHelper(object):
 
         # Geocode for lat/lng
         lat_lng = cls.get_lat_lng(event.location)
+
         if not lat_lng:
             return {}, 0
 
@@ -128,7 +130,7 @@ class LocationHelper(object):
             for results_future in [nearbysearch_places, textsearch_places]:
                 for i, place in enumerate(results_future.get_result()[:5]):
                     location_info = cls.construct_location_info_async(place).get_result()
-                    score = cls.compute_event_location_score(query, location_info)
+                    score = cls.compute_event_location_score(query, location_info, lat_lng)
                     score *= pow(0.7, j) * pow(0.7, i)  # discount by ranking
                     if score == 1:
                         return location_info, score
@@ -139,11 +141,25 @@ class LocationHelper(object):
         return best_location_info, best_score
 
     @classmethod
-    def compute_event_location_score(cls, query_name, location_info):
+    def compute_event_location_score(cls, query_name, location_info, lat_lng):
         """
         Score for correctness. 1.0 is perfect.
         Not checking for absolute equality in case of existing data errors.
         """
+
+        # Check radius
+        R = 6373.0  # approximate radius of earth in km
+        lat1 = math.radians(lat_lng[0])
+        lon1 = math.radians(lat_lng[1])
+        lat2 = math.radians(location_info['lat'])
+        lon2 = math.radians(location_info['lng'])
+        dlon = lon2 - lon1
+        dlat = lat2 - lat1
+        a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+        distance = R * c
+        if distance > 25:
+            return 0
 
         if {'point_of_interest', 'premise'}.intersection(set(location_info.get('types', ''))):
             score = pow(max(
@@ -261,7 +277,7 @@ class LocationHelper(object):
             places =  cls.google_maps_placesearch_async(name, lat_lng, textsearch=textsearch).get_result()
             for i, place in enumerate(places[:5]):
                 location_info = cls.construct_location_info_async(place).get_result()
-                score = cls.compute_team_location_score(name, location_info)
+                score = cls.compute_team_location_score(name, location_info, lat_lng)
                 score *= pow(0.9, 0 if j < 2 else 1) * pow(0.9, i)  # discount by ranking
                 if score == 1:
                     return location_info, score
@@ -277,6 +293,20 @@ class LocationHelper(object):
         Score for correctness. 1.0 is perfect.
         Not checking for absolute equality in case of existing data errors.
         """
+        # Check radius
+        R = 6373.0  # approximate radius of earth in km
+        lat1 = math.radians(lat_lng[0])
+        lon1 = math.radians(lat_lng[1])
+        lat2 = math.radians(location_info['lat'])
+        lon2 = math.radians(location_info['lng'])
+        dlon = lon2 - lon1
+        dlat = lat2 - lat1
+        a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+        distance = R * c
+        if distance > 25:
+            return 0
+
         query_name = query_name.lower().replace('school', '')
         result_name = location_info['name'].lower().replace('school', '')
         score = pow(cls.get_similarity(query_name, result_name), 0.7)
