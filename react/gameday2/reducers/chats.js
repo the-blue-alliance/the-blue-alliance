@@ -1,4 +1,7 @@
-import { SET_TWITCH_CHAT } from '../constants/ActionTypes'
+import {
+  SET_TWITCH_CHAT,
+  WEBCASTS_UPDATED,
+} from '../constants/ActionTypes'
 
 /**
  * @typedef {Object} Chat
@@ -25,14 +28,28 @@ const defaultChat = {
 }
 
 const defaultState = {
-  chats: [
-    {
-      name: 'GameDay',
-      channel: 'tbagameday',
-    },
-  ],
+  chats: [ Object.assign({}, defaultChat) ],
   renderedChats: ['tbagameday'],
   currentChat: 'tbagameday',
+}
+
+const setChatsFromWebcasts = (webcasts, state) => {
+  const newState = Object.assign({}, defaultState)
+
+  const webcastValues = []
+  Object.keys(webcasts).forEach((key) => {
+    const webcast = webcasts[key]
+
+    if (webcast.type === 'twitch') {
+      // We found a twitch webcast!
+      newState.chats.push({
+        name: webcast.name,
+        channel: webcast.channel,
+      })
+    }
+  })
+
+  return newState
 }
 
 const setTwitchChat = (channel, state) => {
@@ -58,6 +75,8 @@ const setTwitchChat = (channel, state) => {
 
 const chats = (state = defaultState, action) => {
   switch (action.type) {
+    case WEBCASTS_UPDATED:
+      return setChatsFromWebcasts(action.webcasts, state)
     case SET_TWITCH_CHAT:
       return setTwitchChat(action.channel, state)
     default:

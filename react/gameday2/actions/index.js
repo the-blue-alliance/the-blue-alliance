@@ -13,6 +13,7 @@ export function setWebcastsRaw(webcasts) {
 
     dispatch({
       type: types.WEBCASTS_UPDATED,
+      webcasts: Object.assign({}, getState().webcastsById),
     })
   }
 }
