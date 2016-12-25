@@ -288,7 +288,7 @@ class LocationHelper(object):
         return best_location_info, best_score
 
     @classmethod
-    def compute_team_location_score(cls, query_name, location_info):
+    def compute_team_location_score(cls, query_name, location_info, lat_lng):
         """
         Score for correctness. 1.0 is perfect.
         Not checking for absolute equality in case of existing data errors.
