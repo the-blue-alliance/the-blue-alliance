@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react'
 import classNames from 'classnames'
+import TwitchChatEmbed from './TwitchChatEmbed'
 
 const ChatSidebar = (props) => {
   const classes = classNames({
@@ -14,13 +15,9 @@ const ChatSidebar = (props) => {
   if (props.hasBeenVisible) {
     content = (
       <div className={classes} style={style}>
-        <iframe
-          frameBorder="0"
-          scrolling="no"
-          id="chat_embed"
-          src="https://twitch.tv/chat/embed?channel=tbagameday&amp;popout_chat=true"
-          height="100%"
-          width="100%"
+        <TwitchChatEmbed
+          channel="tbagameday"
+          visible
         />
       </div>
     )
