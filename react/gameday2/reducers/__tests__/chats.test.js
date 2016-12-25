@@ -7,9 +7,9 @@ describe('chats reducer', () => {
       {
         name: 'GameDay',
         channel: 'tbagameday',
-        rendered: true,
       },
     ],
+    renderedChats: ['tbagameday'],
     currentChat: 'tbagameday',
   }
 
@@ -23,21 +23,49 @@ describe('chats reducer', () => {
         {
           name: 'Chat 1',
           channel: 'chat1',
-          rendered: true,
         },
         {
           name: 'Chat 2',
           channel: 'chat2',
-          rendered: false,
         },
       ],
+      renderedChats: ['chat1'],
       currentChat: 'chat1',
     }
 
     const expectedState = Object.assign({}, initialState, {
+      renderedChats: ['chat1', 'chat2'],
       currentChat: 'chat2',
     })
-    expectedState.chats[1].rendered = true
+
+    const action = {
+      type: SET_TWITCH_CHAT,
+      channel: 'chat2',
+    }
+
+    expect(chats(initialState, action)).toEqual(expectedState)
+  })
+
+  it('does not render an already-rendered chat again', () => {
+    const initialState = {
+      chats: [
+        {
+          name: 'Chat 1',
+          channel: 'chat1',
+        },
+        {
+          name: 'Chat 2',
+          channel: 'chat2',
+        },
+      ],
+      renderedChats: ['chat1', 'chat2'],
+      currentChat: 'chat1',
+    }
+
+    const expectedState = Object.assign({}, initialState, {
+      renderedChats: ['chat1', 'chat2'],
+      currentChat: 'chat2',
+    })
 
     const action = {
       type: SET_TWITCH_CHAT,

@@ -5,44 +5,53 @@ import { SET_TWITCH_CHAT } from '../constants/ActionTypes'
  * @property {string} name - A human-readable name for this chat; typically the
  * associated event/webcast name.
  * @property {string} channel - The Twitch channel of this chat.
- * @property {boolean} rendered - If this chat should be rendered to the DOM.
- * Used to keep track of chats that have been displayed before so we can avoid
- * having to reload the embed whenever the user switches chats while still
- * allowing us to lazy-load chat embeds as needed.
  **/
 
 /**
  * @typedef {Object} ChatsState
- * @property {Chat[]} chats - Array containing all chats
- * @property {string} currentChat - The channel of the currently visible chat
- * @property {boolean} chatPanelHasBeenOpen - If the chat panel has been open before; used to optimize loading
+ * @property {Chat[]} chats - Array containing all chats.
+ * @property {string[]} renderedChats - Array containing channels of all chats
+ * that have been rendered to the DOM. This lets us keep previously viewed
+ * chats in the DOM, but hidden, to make swapping between them quicker.
+ * NOTE: This is assumed to be an append-only array: once a channel is pushed
+ * to this array, that value, and its position, should never change.
+ * @property {string} currentChat - The channel of the currently visible chat.
  */
 
 // Default to having the GameDay chat as the only chat
+const defaultChat = {
+  name: 'GameDay',
+  channel: 'tbagameday',
+}
+
 const defaultState = {
   chats: [
     {
       name: 'GameDay',
       channel: 'tbagameday',
-      rendered: true,
     },
   ],
+  renderedChats: ['tbagameday'],
   currentChat: 'tbagameday',
 }
 
 const setTwitchChat = (channel, state) => {
   // Verify that the desired chat exists in the list of known chats
-  const chats = state.chats.slice(0)
-  const chat = chats.find((chat) => chat.channel === channel)
+  const chat = state.chats.find((chat) => chat.channel === channel)
   if (chat === undefined) {
     // Chat does not exist
     return state
   }
 
-  chat.rendered = true
+  // If the chat has not yet been rendered, add it to the list of chats that
+  // should be rendered to the DOM
+  const renderedChats = state.renderedChats.slice(0)
+  if (renderedChats.indexOf(channel) === -1) {
+    renderedChats.push(channel)
+  }
 
   return Object.assign({}, state, {
-    chats,
+    renderedChats,
     currentChat: channel,
   })
 }
