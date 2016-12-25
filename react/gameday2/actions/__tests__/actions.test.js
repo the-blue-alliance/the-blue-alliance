@@ -5,10 +5,7 @@ describe('actions', () => {
   it('should create an action to set webcsts from raw data', () => {
     const getState = () => {}
     const dispatch = jasmine.createSpy()
-    const webcasts = {
-      special_webcasts: [],
-      ongoing_events_w_webcasts: [],
-    }
+    const webcasts = {}
     actions.setWebcastsRaw(webcasts)(dispatch, getState)
     expect(dispatch.calls.count()).toBe(2)
     expect(dispatch.calls.argsFor(0)).toEqual([{
