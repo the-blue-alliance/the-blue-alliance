@@ -5,9 +5,14 @@ import * as types from '../constants/ActionTypes'
  * webcasts.
  */
 export function setWebcastsRaw(webcasts) {
-  return {
-    type: types.SET_WEBCASTS_RAW,
-    webcasts,
+  return function (dispatch, getState) {
+    dispatch({
+      type: types.SET_WEBCASTS_RAW,
+      webcasts,
+    })
+    dispatch({
+      type: types.WEBCASTS_UPDATED,
+    })
   }
 }
 
