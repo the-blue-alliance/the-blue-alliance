@@ -3,12 +3,12 @@ import { SET_TWITCH_CHAT } from '../../constants/ActionTypes'
 
 describe('chats reducer', () => {
   const defaultState = {
-    chats: [
-      {
+    chats: {
+      'tbagameday': {
         name: 'GameDay',
         channel: 'tbagameday',
       },
-    ],
+    },
     renderedChats: ['tbagameday'],
     currentChat: 'tbagameday',
   }
@@ -19,16 +19,16 @@ describe('chats reducer', () => {
 
   it('sets the current chat', () => {
     const initialState = {
-      chats: [
-        {
+      chats: {
+        'chat1': {
           name: 'Chat 1',
           channel: 'chat1',
         },
-        {
+        'chat2': {
           name: 'Chat 2',
           channel: 'chat2',
         },
-      ],
+      },
       renderedChats: ['chat1'],
       currentChat: 'chat1',
     }
@@ -48,16 +48,16 @@ describe('chats reducer', () => {
 
   it('does not render an already-rendered chat again', () => {
     const initialState = {
-      chats: [
-        {
+      chats: {
+        'chat1': {
           name: 'Chat 1',
           channel: 'chat1',
         },
-        {
+        'chat2': {
           name: 'Chat 2',
           channel: 'chat2',
         },
-      ],
+      },
       renderedChats: ['chat1', 'chat2'],
       currentChat: 'chat1',
     }

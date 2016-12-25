@@ -4,6 +4,13 @@ import ChatSidebar from '../components/ChatSidebar'
 const mapStateToProps = (state) => ({
   enabled: state.visibility.chatSidebar,
   hasBeenVisible: state.visibility.chatSidebarHasBeenVisible,
+  chats: state.chats.chats,
+  renderedChats: state.chats.renderedChats,
+  currentChat: state.chats.currentChat,
 })
 
-export default connect(mapStateToProps, null)(ChatSidebar)
+const mapDispatchToProps = (dispatch) => ({
+  setTwitchChat: (channel) => dispatch(actions.setTwitchChat(channel)),
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(ChatSidebar)

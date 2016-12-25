@@ -3,7 +3,9 @@ import * as actions from '../index'
 
 describe('actions', () => {
   it('should create an action to set webcsts from raw data', () => {
-    const getState = () => {}
+    const getState = () => ({
+      webcastsById: {},
+    })
     const dispatch = jasmine.createSpy()
     const webcasts = {}
     actions.setWebcastsRaw(webcasts)(dispatch, getState)
@@ -14,6 +16,7 @@ describe('actions', () => {
     }])
     expect(dispatch.calls.argsFor(1)).toEqual([{
       type: types.WEBCASTS_UPDATED,
+      webcasts: {},
     }])
   })
 

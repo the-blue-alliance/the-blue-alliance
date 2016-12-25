@@ -28,7 +28,9 @@ const defaultChat = {
 }
 
 const defaultState = {
-  chats: [ Object.assign({}, defaultChat) ],
+  chats: {
+    [defaultChat.channel]: Object.assign({}, defaultChat)
+  },
   renderedChats: ['tbagameday'],
   currentChat: 'tbagameday',
 }
@@ -42,10 +44,10 @@ const setChatsFromWebcasts = (webcasts, state) => {
 
     if (webcast.type === 'twitch') {
       // We found a twitch webcast!
-      newState.chats.push({
+      newState.chats[webcast.channel] = {
         name: webcast.name,
         channel: webcast.channel,
-      })
+      }
     }
   })
 
@@ -54,8 +56,7 @@ const setChatsFromWebcasts = (webcasts, state) => {
 
 const setTwitchChat = (channel, state) => {
   // Verify that the desired chat exists in the list of known chats
-  const chat = state.chats.find((chat) => chat.channel === channel)
-  if (chat === undefined) {
+  if (state.chats[channel] === undefined) {
     // Chat does not exist
     return state
   }
