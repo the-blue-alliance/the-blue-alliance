@@ -112,3 +112,10 @@ export function setLayout(layoutId) {
     layoutId,
   }
 }
+
+export function setTwitchChat(channel) {
+  return {
+    type: types.SET_TWITCH_CHAT,
+    channel,
+  }
+}

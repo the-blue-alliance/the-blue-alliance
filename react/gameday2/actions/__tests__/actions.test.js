@@ -119,4 +119,13 @@ describe('actions', () => {
     }
     expect(actions.setLayout(layoutId)).toEqual(expectedAction)
   })
+
+  it('should create an action to set the current twitch chat', () => {
+    const channel = 'tbagameday'
+    const expectedAction = {
+      type: types.SET_TWITCH_CHAT,
+      channel,
+    }
+    expect(actions.setTwitchChat(channel)).toEqual(expectedAction)
+  })
 })
