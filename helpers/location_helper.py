@@ -158,7 +158,7 @@ class LocationHelper(object):
         a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
         distance = R * c
-        if distance > 25:
+        if distance > 100:
             return 0
 
         if {'point_of_interest', 'premise'}.intersection(set(location_info.get('types', ''))):
@@ -304,7 +304,7 @@ class LocationHelper(object):
         a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
         distance = R * c
-        if distance > 25:
+        if distance > 100:
             return 0
 
         query_name = query_name.lower().replace('school', '')
