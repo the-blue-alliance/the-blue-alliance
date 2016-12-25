@@ -5,11 +5,12 @@ import * as types from '../constants/ActionTypes'
  * webcasts.
  */
 export function setWebcastsRaw(webcasts) {
-  return function (dispatch, getState) {
+  return (dispatch, getState) => {
     dispatch({
       type: types.SET_WEBCASTS_RAW,
       webcasts,
     })
+
     dispatch({
       type: types.WEBCASTS_UPDATED,
     })
