@@ -9,7 +9,7 @@ import TwitchChatEmbed from './TwitchChatEmbed'
 const ChatSidebar = (props) => {
 
   const metrics = {
-    switcherHeight: 48,
+    switcherHeight: 36,
   }
 
   const panelContainerStyle = {
@@ -42,6 +42,17 @@ const ChatSidebar = (props) => {
     fontSize: 16,
   }
 
+  const toolbarButtonStyle = {
+    width: metrics.switcherHeight,
+    height: metrics.switcherHeight,
+    padding: 8,
+  }
+
+  const toolbarButtonIconStyle = {
+    width: (metrics.switcherHeight - 16),
+    height: (metrics.switcherHeight - 16),
+  }
+
   let content
   if (props.hasBeenVisible) {
     content = (
@@ -60,7 +71,10 @@ const ChatSidebar = (props) => {
             />
           </ToolbarGroup>
           <ToolbarGroup lastChild>
-            <IconButton>
+            <IconButton
+              style={toolbarButtonStyle}
+              iconStyle={toolbarButtonIconStyle}
+            >
               <ArrowDropUp color={white} />
             </IconButton>
           </ToolbarGroup>
