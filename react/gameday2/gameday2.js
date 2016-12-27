@@ -28,6 +28,11 @@ const muiTheme = getMuiTheme({
     primary1Color: indigo500,
     primary2Color: indigo700,
   },
+  layout: {
+    appBarHeight: 64,
+    socialPanelWidth: 300,
+    chatPanelWidth: 300,
+  }
 })
 
 ReactDOM.render(
