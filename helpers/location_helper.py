@@ -307,8 +307,8 @@ class LocationHelper(object):
         if distance > 100:
             return 0
 
-        query_name = query_name.lower().replace('school', '')
-        result_name = location_info['name'].lower().replace('school', '')
+        query_name = query_name.lower().replace('school', '').replace('high', '')
+        result_name = location_info['name'].lower().replace('school', '').replace('high', '')
         score = pow(cls.get_similarity(query_name, result_name), 0.7)
         if not {'school', 'university'}.intersection(set(location_info.get('types', ''))):
             score *= 0.9

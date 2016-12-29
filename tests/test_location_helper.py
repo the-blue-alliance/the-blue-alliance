@@ -912,6 +912,31 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(team.normalized_location.postal_code, None)
         self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(30.987804, 34.929741))
 
+    def test_team_location_3298(self):
+        # Team 3298
+        team = Team(
+            id='frc3298',
+            name='The Boeing Company/Cherokee Nation & Sequoyah High School',
+            city='Tahlequah',
+            state_prov='Oklahoma',
+            postalcode='74465',
+            country='USA'
+            )
+        LocationHelper.update_team_location(team)
+        if not self.test_google_api_key:
+            return
+        self.assertEqual(team.normalized_location.name, 'Sequoyah School')
+        self.assertEqual(team.normalized_location.formatted_address, '17091 S Muskogee Ave, Tahlequah, OK 74464, USA')
+        self.assertEqual(team.normalized_location.street_number, '17091')
+        self.assertEqual(team.normalized_location.street, 'South Muskogee Avenue')
+        self.assertEqual(team.normalized_location.city, 'Tahlequah')
+        self.assertEqual(team.normalized_location.state_prov, 'Oklahoma')
+        self.assertEqual(team.normalized_location.state_prov_short, 'OK')
+        self.assertEqual(team.normalized_location.country, 'United States')
+        self.assertEqual(team.normalized_location.country_short, 'US')
+        self.assertEqual(team.normalized_location.postal_code, '74464')
+        self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(35.8488224, -95.00209149999999))
+
     def test_team_location_simple(self):
         # Only has city, state, country
         team = Team(
