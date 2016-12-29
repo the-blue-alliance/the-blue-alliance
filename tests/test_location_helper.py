@@ -912,10 +912,10 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(team.normalized_location.postal_code, None)
         self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(30.987804, 34.929741))
 
-    def test_team_location_3298(self):
-        # Team 3298
+    def test_team_location_2398(self):
+        # Team 2398
         team = Team(
-            id='frc3298',
+            id='frc2398',
             name='The Boeing Company/Cherokee Nation & Sequoyah High School',
             city='Tahlequah',
             state_prov='Oklahoma',
