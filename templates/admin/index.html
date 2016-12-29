@@ -152,8 +152,14 @@ $(function () {
             </div>
             <div class="panel-body">
                 <div class="row">
-                    {% include "partials/pending_suggestion_rows_partial.html" %}
+                    <div class="col-xs-12">
+                        <a href="/suggest/review">
+                            <span class="badge pull-right">{{suggestions_count}}</span>
+                            Pending Suggestions
+                        </a>
+                    </div>
                 </div>
+                <hr>
                 <div class="row">
                     <div id="graphdatabasequery" style="width: 100%; height: 400px;"></div>
                 </div>
