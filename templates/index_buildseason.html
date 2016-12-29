@@ -6,10 +6,10 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-sm-4">
+    <div class="col-sm-5 col-lg-4">
       {% include "index_lhc.html" %}
     </div>
-    <div class="col-sm-8">
+    <div class="col-sm-7 col-lg-8">
       <h2><span class="countdown-number countdown-days">--</span><span class="countdown-label day-label"> Days</span> Left to Build! <small>Build Season ends {{endbuild_datetime_est|date:"F jS"}}</small></h2>
       <div id="countdown-finish-time">{{endbuild_datetime_utc|date:"c"}}</div>
       <div class="btn-group game-manual">
