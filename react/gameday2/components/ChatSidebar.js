@@ -5,92 +5,137 @@ import ArrowDropUp from 'material-ui/svg-icons/navigation/arrow-drop-up'
 import { Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui/Toolbar'
 import { white } from 'material-ui/styles/colors'
 import TwitchChatEmbed from './TwitchChatEmbed'
+import ChatSelector from './ChatSelector'
+import { chatPropType } from '../utils/PropTypes'
 
-const ChatSidebar = (props) => {
-
-  const metrics = {
-    switcherHeight: 36,
+class ChatSidebar extends React.Component {
+  static propTypes = {
+    enabled: PropTypes.bool.isRequired,
+    hasBeenVisible: PropTypes.bool.isRequired,
+    chats: PropTypes.objectOf(chatPropType).isRequired,
+    renderedChats: PropTypes.arrayOf(PropTypes.string).isRequired,
+    currentChat: PropTypes.string.isRequired,
   }
 
-  const panelContainerStyle = {
-    position: 'absolute',
-    top: props.muiTheme.layout.appBarHeight,
-    right: 0,
-    bottom: 0,
-    width: props.muiTheme.layout.chatPanelWidth,
-    background: '#EFEEF1',
-    display: props.enabled ? null : 'none',
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      chatSelectorOpen: false,
+    }
   }
 
-  const chatEmbedContainerStyle = {
-    position: 'absolute',
-    top: 0,
-    bottom: metrics.switcherHeight,
-    width: '100%',
+  onRequestOpenChatSelector() {
+    this.setState({chatSelectorOpen: true})
   }
 
-  const switcherToolbarStyle = {
-    position: 'absolute',
-    bottom: 0,
-    height: metrics.switcherHeight,
-    width: '100%',
-    background: props.muiTheme.palette.primary1Color,
+  onRequestCloseChatSelector() {
+    this.setState({chatSelectorOpen: false})
   }
 
-  const toolbarTitleStyle = {
-    color: white,
-    fontSize: 16,
-  }
+  render() {
+    const metrics = {
+      switcherHeight: 36,
+    }
 
-  const toolbarButtonStyle = {
-    width: metrics.switcherHeight,
-    height: metrics.switcherHeight,
-    padding: 8,
-  }
+    const panelContainerStyle = {
+      position: 'absolute',
+      top: this.props.muiTheme.layout.appBarHeight,
+      right: 0,
+      bottom: 0,
+      width: this.props.muiTheme.layout.chatPanelWidth,
+      background: '#EFEEF1',
+      display: this.props.enabled ? null : 'none',
+    }
 
-  const toolbarButtonIconStyle = {
-    width: (metrics.switcherHeight - 16),
-    height: (metrics.switcherHeight - 16),
-  }
+    const chatEmbedContainerStyle = {
+      position: 'absolute',
+      top: 0,
+      bottom: metrics.switcherHeight,
+      width: '100%',
+    }
 
-  let content
-  if (props.hasBeenVisible) {
-    content = (
-      <div style={panelContainerStyle}>
-        <div style={chatEmbedContainerStyle}>
-          <TwitchChatEmbed
-            channel="tbagameday"
-            visible
+    const switcherToolbarStyle = {
+      position: 'absolute',
+      bottom: 0,
+      height: metrics.switcherHeight,
+      width: '100%',
+      background: this.props.muiTheme.palette.primary1Color,
+    }
+
+    const toolbarTitleStyle = {
+      color: white,
+      fontSize: 16,
+    }
+
+    const toolbarButtonStyle = {
+      width: metrics.switcherHeight,
+      height: metrics.switcherHeight,
+      padding: 8,
+    }
+
+    const toolbarButtonIconStyle = {
+      width: (metrics.switcherHeight - 16),
+      height: (metrics.switcherHeight - 16),
+    }
+
+    const renderedChats = []
+    this.props.renderedChats.forEach((chat) => {
+      const visible = (chat === this.props.currentChat)
+      renderedChats.push(
+        <TwitchChatEmbed
+          channel={chat}
+          key={chat}
+          visible={visible}
+        />
+      )
+    })
+
+    const currentChat = this.props.chats[this.props.currentChat]
+    let currentChatName = "UNKNOWN"
+    if (currentChat) {
+      currentChatName = currentChat.name
+    }
+
+    let content
+    if (this.props.hasBeenVisible) {
+      content = (
+        <div style={panelContainerStyle}>
+          <div style={chatEmbedContainerStyle}>
+            {renderedChats}
+          </div>
+          <Toolbar style={switcherToolbarStyle}>
+            <ToolbarGroup>
+              <ToolbarTitle
+                text={currentChatName}
+                style={toolbarTitleStyle}
+              />
+            </ToolbarGroup>
+            <ToolbarGroup lastChild>
+              <IconButton
+                style={toolbarButtonStyle}
+                iconStyle={toolbarButtonIconStyle}
+                onTouchTap={() => this.onRequestOpenChatSelector()}
+              >
+                <ArrowDropUp color={white} />
+              </IconButton>
+            </ToolbarGroup>
+          </Toolbar>
+          <ChatSelector
+            chats={this.props.chats}
+            currentChat={this.props.currentChat}
+            setTwitchChat={this.props.setTwitchChat}
+            open={this.state.chatSelectorOpen}
+            onRequestClose={() => this.onRequestCloseChatSelector()}
           />
         </div>
-        <Toolbar style={switcherToolbarStyle}>
-          <ToolbarGroup>
-            <ToolbarTitle
-              text="Hello!"
-              style={toolbarTitleStyle}
-            />
-          </ToolbarGroup>
-          <ToolbarGroup lastChild>
-            <IconButton
-              style={toolbarButtonStyle}
-              iconStyle={toolbarButtonIconStyle}
-            >
-              <ArrowDropUp color={white} />
-            </IconButton>
-          </ToolbarGroup>
-        </Toolbar>
-      </div>
-    )
-  } else {
-    content = (<div />)
+      )
+    } else {
+      content = (<div />)
+    }
+
+    return content
   }
-
-  return content
-}
-
-ChatSidebar.propTypes = {
-  enabled: PropTypes.bool,
-  hasBeenVisible: PropTypes.bool,
 }
 
 export default muiThemeable()(ChatSidebar)

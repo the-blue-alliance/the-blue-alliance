@@ -1,4 +1,5 @@
 import { connect } from 'react-redux'
+import { setTwitchChat } from '../actions'
 import ChatSidebar from '../components/ChatSidebar'
 
 const mapStateToProps = (state) => ({
@@ -10,7 +11,7 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = (dispatch) => ({
-  setTwitchChat: (channel) => dispatch(actions.setTwitchChat(channel)),
+  setTwitchChat: (channel) => dispatch(setTwitchChat(channel)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ChatSidebar)

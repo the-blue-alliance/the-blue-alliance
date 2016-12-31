@@ -10,7 +10,7 @@ export default class TwitchChatEmbed extends React.Component {
     const id = `twich-chat-${this.props.channel}`
     const src = `https://twitch.tv/chat/embed?channel=${this.props.channel}&amp;popout_chat=true`
     const style = {
-      visibility: this.props.visible ? null : 'none',
+      display: this.props.visible ? null : 'none',
       width: '100%',
       height: '100%',
     }
