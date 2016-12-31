@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react'
 import { List, ListItem } from 'material-ui/List'
+import CheckmarkIcon from 'material-ui/svg-icons/navigation/check'
 import { fullWhite } from 'material-ui/styles/colors'
 import { chatPropType } from '../utils/PropTypes'
 
@@ -13,7 +14,6 @@ export default class ChatSelector extends React.Component {
   }
 
   setTwitchChat(e, channel) {
-    //e.stopPropagation()
     this.props.setTwitchChat(channel)
     this.props.onRequestClose()
   }
@@ -27,9 +27,13 @@ export default class ChatSelector extends React.Component {
 
     const chatItems = []
     chats.forEach((chat) => {
+      const isSelected = (chat.channel === this.props.currentChat)
+      const icon = isSelected ? <CheckmarkIcon /> : null
+
       chatItems.push(
         <ListItem
           primaryText={chat.name}
+          rightIcon={icon}
           onTouchTap={(e) => this.setTwitchChat(e, chat.channel)}
           key={chat.channel}
         />
