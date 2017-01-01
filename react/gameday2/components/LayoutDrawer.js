@@ -46,8 +46,8 @@ class LayoutDrawer extends React.Component {
             insetChildren
             onTouchTap={() => this.props.setLayout(i)}
             key={i.toString()}
-            leftIcon={icon}
-            rightIcon={getLayoutSvgIcon(i)}
+            rightIcon={icon}
+            leftIcon={getLayoutSvgIcon(i)}
           />
         )
       }

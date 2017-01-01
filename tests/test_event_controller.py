@@ -51,9 +51,12 @@ class TestEventController(unittest2.TestCase):
                 webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
                 website="http://www.firstsv.org",
         )
+        self.event1.put()
+
+        # To test that /events defaults to current year
         this_year = datetime.now().year
         self.event2 = Event(
-                id="2016necmp",
+                id="{}necmp".format(this_year),
                 name="New England District Championship",
                 event_type_enum=EventType.DISTRICT_CMP,
                 event_district_enum=DistrictType.NEW_ENGLAND,
@@ -72,7 +75,6 @@ class TestEventController(unittest2.TestCase):
                 webcast_json="[{\"type\": \"twitch\", \"channel\": \"frcgamesense\"}]",
                 website="http://www.firstsv.org",
         )
-        self.event1.put()
         self.event2.put()
 
         self.event1_details = EventDetails(
