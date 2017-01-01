@@ -5,6 +5,7 @@ from consts.award_type import AwardType
 from consts.event_type import EventType
 from database.award_query import TeamAwardsQuery
 from database.event_query import TeamEventsQuery
+from database.team_query import TeamParticipationQuery
 
 
 class SearchHelper(object):
@@ -31,13 +32,21 @@ class SearchHelper(object):
     @classmethod
     def update_team_location_index(cls, team):
         if team.normalized_location and team.normalized_location.lat_lng:
-            fields = [
+            partial_fields = [
                 search.GeoField(name='location', value=search.GeoPoint(
                     team.normalized_location.lat_lng.lat,
                     team.normalized_location.lat_lng.lon))
             ]
+            # Teams by year
+            for year in TeamParticipationQuery(team.key.id()).fetch():
+                fields = partial_fields + [
+                    search.NumberField(name='year', value=year)
+                ]
+                search.Index(name=cls.TEAM_LOCATION_INDEX).put(
+                    search.Document(doc_id='{}_{}'.format(team.key.id(), year), fields=fields))
+            # Any year
             search.Index(name=cls.TEAM_LOCATION_INDEX).put(
-                search.Document(doc_id=team.key.id(), fields=fields))
+                    search.Document(doc_id=team.key.id(), fields=partial_fields))
 
     @classmethod
     def remove_team_location_index(cls, team):

@@ -174,6 +174,33 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(event.normalized_location.postal_code, '2127')
         self.assertEqual(event.normalized_location.lat_lng, ndb.GeoPt(-33.85341090000001, 151.0693752))
 
+    def test_event_location_canada(self):
+        # 2016abca (Canada event)
+        event = Event(
+            id='2016abca',
+            year=2016,
+            city='Calgary',
+            state_prov='AB',
+            country='Canada',
+            postalcode='T2N 1N4',
+            venue='The Olympic Oval',
+            venue_address='The Olympic Oval\nUniversity of Calgary\nCalgary, AB T2N 1N4\nCanada'
+            )
+        LocationHelper.update_event_location(event)
+        if not self.test_google_api_key:
+            return
+        self.assertEqual(event.normalized_location.name, 'Olympic Oval')
+        self.assertEqual(event.normalized_location.formatted_address, '2500 University Dr NW, Calgary, AB T2N 1N4, Canada')
+        self.assertEqual(event.normalized_location.street_number, '2500')
+        self.assertEqual(event.normalized_location.street, 'University Dr NW')
+        self.assertEqual(event.normalized_location.city, 'Calgary')
+        self.assertEqual(event.normalized_location.state_prov, 'Alberta')
+        self.assertEqual(event.normalized_location.state_prov_short,  'AB')
+        self.assertEqual(event.normalized_location.country, 'Canada')
+        self.assertEqual(event.normalized_location.country_short, 'CA')
+        self.assertEqual(event.normalized_location.postal_code, 'T2N 1N4')
+        self.assertEqual(event.normalized_location.lat_lng, ndb.GeoPt(51.07701139999999, -114.1357481))
+
     def test_event_location_china(self):
         # 2016gush (China event with really bad location details)
         event = Event(
@@ -884,6 +911,31 @@ class TestLocationHelper(unittest2.TestCase):
         self.assertEqual(team.normalized_location.country_short, 'IL')
         self.assertEqual(team.normalized_location.postal_code, None)
         self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(30.987804, 34.929741))
+
+    def test_team_location_2398(self):
+        # Team 2398
+        team = Team(
+            id='frc2398',
+            name='The Boeing Company/Cherokee Nation & Sequoyah High School',
+            city='Tahlequah',
+            state_prov='Oklahoma',
+            postalcode='74465',
+            country='USA'
+            )
+        LocationHelper.update_team_location(team)
+        if not self.test_google_api_key:
+            return
+        self.assertEqual(team.normalized_location.name, 'Sequoyah School')
+        self.assertEqual(team.normalized_location.formatted_address, '17091 S Muskogee Ave, Tahlequah, OK 74464, USA')
+        self.assertEqual(team.normalized_location.street_number, '17091')
+        self.assertEqual(team.normalized_location.street, 'South Muskogee Avenue')
+        self.assertEqual(team.normalized_location.city, 'Tahlequah')
+        self.assertEqual(team.normalized_location.state_prov, 'Oklahoma')
+        self.assertEqual(team.normalized_location.state_prov_short, 'OK')
+        self.assertEqual(team.normalized_location.country, 'United States')
+        self.assertEqual(team.normalized_location.country_short, 'US')
+        self.assertEqual(team.normalized_location.postal_code, '74464')
+        self.assertEqual(team.normalized_location.lat_lng, ndb.GeoPt(35.8488224, -95.00209149999999))
 
     def test_team_location_simple(self):
         # Only has city, state, country
