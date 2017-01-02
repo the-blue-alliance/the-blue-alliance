@@ -96,7 +96,7 @@ export default class ChatSelector extends React.Component {
     const overlayStyle = {
       width: '100%',
       height: '100%',
-      background: 'rgba(0,0,0,0.7)',
+      background: 'rgba(0,0,0,0.2)',
       position: 'absolute',
       transition: 'all 150ms ease-in',
       willChange: 'opacity'
