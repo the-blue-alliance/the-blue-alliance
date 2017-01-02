@@ -1,5 +1,3 @@
-import logging
-
 from collections import defaultdict
 from google.appengine.api import search
 from itertools import chain, combinations
@@ -83,12 +81,6 @@ class SearchHelper(object):
             search.TextField(name='name', value=team.name),
             search.TextField(name='nickname', value=team.nickname)
         ]
-        if team.normalized_location and team.normalized_location.lat_lng:
-            fields += [
-                search.GeoField(name='location', value=search.GeoPoint(
-                    team.normalized_location.lat_lng.lat,
-                    team.normalized_location.lat_lng.lon))
-            ]
 
         field_counts = defaultdict(int)
         overall_awards = set()
@@ -140,7 +132,6 @@ class SearchHelper(object):
                 set_name = cls._construct_set_name(award_set)
                 field_counts['o_{}_e{}'.format(set_name, event_type)] += 1
 
-        logging.info(len(field_counts))
         fields += [search.NumberField(name=field, value=count) for field, count in field_counts.items()]
         search.Index(name=cls.TEAM_AWARDS_INDEX).put(
             search.Document(doc_id='{}'.format(team.key.id()), fields=fields))
