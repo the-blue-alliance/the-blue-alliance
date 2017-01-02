@@ -317,7 +317,8 @@ class TeamDetailsGet(webapp.RequestHandler):
 
         fms_df = DatafeedFMSAPI('v2.0')
         df2 = DatafeedFIRSTElasticSearch()
-        fms_details = fms_df.getTeamDetails(datetime.date.today().year, key_name)
+        year = datetime.date.today().year
+        fms_details = fms_df.getTeamDetails(year, key_name)
 
         if fms_details:
             team, district_team, robot = fms_details[0]
@@ -337,8 +338,8 @@ class TeamDetailsGet(webapp.RequestHandler):
         # Clean up junk district teams
         # https://www.facebook.com/groups/moardata/permalink/1310068625680096/
         dt_keys = DistrictTeam.query(
-            DistrictTeam.team == district_team.team,
-            DistrictTeam.year == district_team.year).fetch(keys_only=True)
+            DistrictTeam.team == existing_team.key,
+            DistrictTeam.year == year).fetch(keys_only=True)
         keys_to_delete = set()
         for dt_key in dt_keys:
             if not district_team or dt_key.id() != district_team.key.id():
