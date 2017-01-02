@@ -70,7 +70,7 @@ class TeamManipulator(ManipulatorBase):
                     old_team.dirty = True
 
         # Take the new tpid and tpid_year iff the year is newer than or equal to the old one
-        if (new_team.first_tpid_year >= old_team.first_tpid_year):
+        if (new_team.first_tpid_year is not None and new_team.first_tpid_year >= old_team.first_tpid_year):
             old_team.first_tpid_year = new_team.first_tpid_year
             old_team.first_tpid = new_team.first_tpid
             old_team.dirty = True
