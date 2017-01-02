@@ -335,6 +335,16 @@ class TeamDetailsGet(webapp.RequestHandler):
             team = TeamManipulator.createOrUpdate(team)
 
         if district_team:
+            # Clean up junk district teams
+            # https://www.facebook.com/groups/moardata/permalink/1310068625680096/
+            dt_keys = DistrictTeam.query(
+                DistrictTeam.team == district_team.team,
+                DistrictTeam.year == district_team.year).fetch(keys_only=True)
+            keys_to_delete = set()
+            for dt_key in dt_keys:
+                if dt_key.id() != district_team.key.id():
+                    keys_to_delete.add(dt_key)
+            DistrictTeamManipulator.delete_keys(keys_to_delete)
             district_team = DistrictTeamManipulator.createOrUpdate(district_team)
 
         if robot:
