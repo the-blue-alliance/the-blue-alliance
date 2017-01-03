@@ -3,7 +3,7 @@ import tba_config
 import webapp2
 
 from controllers.apiv3.api_status_controller import ApiStatusController
-from controllers.apiv3.api_team_controller import ApiTeamListController
+from controllers.apiv3.api_team_controller import ApiTeamListController, ApiTeamController
 
 # Ensure that APIv3 routes include OPTIONS method for CORS preflight compatibility
 # https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests
@@ -22,9 +22,9 @@ app = webapp2.WSGIApplication([
         ApiTeamListController, methods=['GET', 'OPTIONS']),
     # Team
     webapp2.Route(r'/api/v3/team/<team_key:>',
-        ApiStatusController, methods=['GET', 'OPTIONS']),
-    webapp2.Route(r'/api/v3/team/<team_key:>/simple',
-        ApiStatusController, methods=['GET', 'OPTIONS']),
+        ApiTeamController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/team/<team_key:>/<model_type:(simple)>',
+        ApiTeamController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/team/<team_key:>/years_participated',
         ApiStatusController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/team/<team_key:>/districts',
@@ -67,7 +67,7 @@ app = webapp2.WSGIApplication([
     # Event
     webapp2.Route(r'/api/v3/event/<event_key:>',
         ApiStatusController, methods=['GET', 'OPTIONS']),
-    webapp2.Route(r'/api/v3/event/<event_key:>/<model_type:(simple|keys)',
+    webapp2.Route(r'/api/v3/event/<event_key:>/<model_type:(simple)',
         ApiStatusController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/event/<event_key:>/elim_alliances',
         ApiStatusController, methods=['GET', 'OPTIONS']),
@@ -90,7 +90,7 @@ app = webapp2.WSGIApplication([
     # Match
     webapp2.Route(r'/api/v3/match/<match_key:>',
         ApiStatusController, methods=['GET', 'OPTIONS']),
-    webapp2.Route(r'/api/v3/match/<match_key:>/<model_type:(simple|keys)',
+    webapp2.Route(r'/api/v3/match/<match_key:>/<model_type:(simple)',
         ApiStatusController, methods=['GET', 'OPTIONS']),
     # District List
     webapp2.Route(r'/api/v3/districts/<year:([0-9]+)>',

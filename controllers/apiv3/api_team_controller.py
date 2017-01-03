@@ -8,6 +8,7 @@ from google.appengine.ext import ndb
 from controllers.apiv3.api_base_controller import ApiBaseController
 from controllers.apiv3.model_properties import team_properties
 from database.team_query import TeamListQuery, TeamListYearQuery
+from helpers.model_to_dict import ModelToDict
 from models.team import Team
 
 
@@ -63,3 +64,30 @@ class ApiTeamListController(ApiTeamControllerBase):
         if model_type is not None:
             team_list = [{key: team[key] for key in team_properties[model_type]} for team in team_list]
         return json.dumps(team_list, ensure_ascii=True)
+
+
+class ApiTeamController(ApiTeamControllerBase):
+    CACHE_KEY_FORMAT = "apiv3_team_controller_{}_{}"  # (team_key, model_type)
+    CACHE_VERSION = 1
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamController, self).__init__(*args, **kw)
+        self.team_key = self.request.route_kwargs["team_key"]
+        self.model_type = self.request.route_kwargs.get('model_type')
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.model_type)
+
+    def _track_call(self, team_key, model_type=None):
+        action = 'team'
+        if self.model_type:
+            action += '/{}'.format(model_type)
+        self._track_call_defer(action, team_key)
+
+    def _render(self, team_key, model_type=None):
+        self._set_team(team_key)
+
+        team = ModelToDict.teamConverter_v3(self.team)
+        if model_type is not None:
+            team = {key: team[key] for key in team_properties[model_type]}
+
+        return json.dumps(team, ensure_ascii=True)
