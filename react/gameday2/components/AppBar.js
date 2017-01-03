@@ -12,6 +12,8 @@ const AppBar = (props) => {
     padding: 0,
     marginLeft: 8,
     marginRight: 8,
+    width: props.muiTheme.layout.appBarHeight,
+    height: props.muiTheme.layout.appBarHeight,
   }
 
   const configureLayoutButtonStyle = {
@@ -23,11 +25,20 @@ const AppBar = (props) => {
     backgroundColor: props.muiTheme.palette.primary1Color,
     position: 'relative',
     zIndex: props.muiTheme.zIndex.appBar,
+    paddingRight: 0,
   }
 
   const appBarTitleStyle = {
     color: props.muiTheme.appBar.textColor,
     fontSize: '24px',
+    paddingRight: 0,
+  }
+
+  const vexProStyle = {
+    color: props.muiTheme.appBar.textColor,
+    textDecoration: 'none',
+    marginLeft: 32,
+    fontSize: 12,
   }
 
   const tbaBrandingButton = (
@@ -38,8 +49,8 @@ const AppBar = (props) => {
       href="https://thebluealliance.com"
     >
       <LampIcon
-        width={props.muiTheme.layout.appBarHeight - 16}
-        height={props.muiTheme.layout.appBarHeight - 16}
+        width={props.muiTheme.layout.appBarHeight}
+        height={props.muiTheme.layout.appBarHeight}
       />
     </IconButton>
   )
@@ -62,6 +73,12 @@ const AppBar = (props) => {
         <ToolbarGroup firstChild>
           {tbaBrandingButton}
           <ToolbarTitle text="GameDay" style={appBarTitleStyle} />
+          <a
+            style={vexProStyle}
+            href="https://www.vexrobotics.com/vexpro/"
+          >
+            <span>POWERED BY </span><img src="/images/vexpro_horiz.png" height={16}/>
+          </a>
         </ToolbarGroup>
         <ToolbarGroup lastChild>
           {configureLayoutButton}

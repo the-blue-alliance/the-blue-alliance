@@ -29,7 +29,7 @@ const muiTheme = getMuiTheme({
     primary2Color: indigo700,
   },
   layout: {
-    appBarHeight: 64,
+    appBarHeight: 36,
     socialPanelWidth: 300,
     chatPanelWidth: 300,
   },
