@@ -44,9 +44,14 @@ export default class AnimatableContainer extends React.Component {
   }
 
   render() {
+    /* eslint-disable no-unused-vars */
+    // beginStyle and endStyle are unused, but we exclude them from ...other so
+    // they don't get passed as props to our div
     const {
       style,
       children,
+      beginStyle,
+      endStyle,
       ...other
     } = this.props
 

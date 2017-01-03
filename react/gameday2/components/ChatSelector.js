@@ -8,7 +8,7 @@ import AnimatableContainer from './AnimatableContainer'
 
 export default class ChatSelector extends React.Component {
   static propTypes = {
-    chats: PropTypes.objectOf(chatPropType).isRequired,
+    chats: PropTypes.arrayOf(chatPropType).isRequired,
     currentChat: PropTypes.string.isRequired,
     setTwitchChat: PropTypes.func.isRequired,
     open: PropTypes.bool.isRequired,
@@ -21,14 +21,8 @@ export default class ChatSelector extends React.Component {
   }
 
   render() {
-    // TODO: make this a selector
-    const chats = []
-    Object.keys(this.props.chats)
-    .filter((key) => ({}.hasOwnProperty.call(this.props.chats, key)))
-    .forEach((key) => chats.push(this.props.chats[key]))
-
     const chatItems = []
-    chats.forEach((chat) => {
+    this.props.chats.forEach((chat) => {
       const isSelected = (chat.channel === this.props.currentChat)
       const icon = isSelected ? <CheckmarkIcon /> : null
 
