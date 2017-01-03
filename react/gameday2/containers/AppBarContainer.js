@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import GamedayNavbar from '../components/GamedayNavbar'
+import AppBar from '../components/AppBar'
 import * as actions from '../actions'
 import { getWebcastIdsInDisplayOrder } from '../selectors'
 
@@ -23,4 +23,4 @@ const mapDispatchToProps = (dispatch) => ({
   setLayoutDrawerVisibility: (visible) => dispatch(actions.setLayoutDrawerVisibility(visible)),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(GamedayNavbar)
+export default connect(mapStateToProps, mapDispatchToProps)(AppBar)

@@ -5,7 +5,7 @@ import muiThemeable from 'material-ui/styles/muiThemeable'
 import LayoutDrawer from './LayoutDrawer'
 import { getLayoutSvgIcon } from '../utils/layoutUtils'
 
-const GamedayNavbar = (props) => {
+const AppBar = (props) => {
   const configureLayoutButton = (
     <FlatButton
       label="Configure Layout"
@@ -44,7 +44,7 @@ const GamedayNavbar = (props) => {
   )
 }
 
-GamedayNavbar.propTypes = {
+AppBar.propTypes = {
   webcasts: PropTypes.arrayOf(PropTypes.string).isRequired,
   hashtagSidebarVisible: PropTypes.bool.isRequired,
   chatSidebarVisible: PropTypes.bool.isRequired,
@@ -59,4 +59,4 @@ GamedayNavbar.propTypes = {
   muiTheme: PropTypes.object.isRequired,
 }
 
-export default muiThemeable()(GamedayNavbar)
+export default muiThemeable()(AppBar)
