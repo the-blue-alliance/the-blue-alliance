@@ -69,6 +69,8 @@ handlers:
 - url: /admin/.*
   script: admin_main.app
   login: admin
+- url: /api/v3/.*
+  script: apiv3_main.app
 - url: /api/.*
   script: api_main.app
 - url: /_ah/spi/.* # Endpoints for internal mobile API
