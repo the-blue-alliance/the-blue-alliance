@@ -6,6 +6,7 @@ from datetime import datetime
 from google.appengine.ext import ndb
 
 from controllers.apiv3.api_base_controller import ApiBaseController
+from controllers.apiv3.model_properties import team_properties
 
 from database.award_query import TeamAwardsQuery, TeamEventAwardsQuery
 from database.event_query import TeamEventsQuery, TeamYearEventsQuery
@@ -41,23 +42,29 @@ class ApiTeamListController(ApiTeamControllerBase):
     page_num = 2 returns teams from 1000-1499
     etc.
     """
-    CACHE_KEY_FORMAT = "apiv3_team_list_controller_{}"  # (page_num)
-    CACHE_VERSION = 2
+    CACHE_KEY_FORMAT = "apiv3_team_list_controller_{}_{}"  # (page_num, model_type)
+    CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 60 * 60 * 24
     PAGE_SIZE = 500
 
     def __init__(self, *args, **kw):
         super(ApiTeamListController, self).__init__(*args, **kw)
         self.page_num = self.request.route_kwargs['page_num']
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.page_num)
+        self.model_type = self.request.route_kwargs.get('model_type')
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.page_num, self.model_type)
 
     @property
     def _validators(self):
         return []
 
-    def _track_call(self, page_num):
-        self._track_call_defer('team/list', page_num)
+    def _track_call(self, page_num, model_type=None):
+        if model_type:
+            self._track_call_defer('team/list/{}'.format(model_type), page_num)
+        else:
+            self._track_call_defer('team/list', page_num)
 
-    def _render(self, page_num):
-        team_list = TeamListQuery(int(page_num)).fetch(api_version='apiv3')
+    def _render(self, page_num, model_type=None):
+        team_list = TeamListQuery(int(page_num)).fetch(dict_version='3')
+        if model_type is not None:
+            team_list = [{key: team[key] for key in team_properties[model_type]} for team in team_list]
         return json.dumps(team_list, ensure_ascii=True)

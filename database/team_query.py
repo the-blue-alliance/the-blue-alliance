@@ -18,13 +18,13 @@ class TeamListQuery(DatabaseQuery):
         self._query_args = (page_num, )
 
     @ndb.tasklet
-    def _query_async(self, api_version):
+    def _query_async(self, dict_version):
         page_num = self._query_args[0]
         start = self.PAGE_SIZE * page_num
         end = start + self.PAGE_SIZE
         teams = yield Team.query(Team.team_number >= start, Team.team_number < end).fetch_async()
-        if api_version:
-            converter = ModelToDict.teamConverter(api_version)
+        if dict_version:
+            converter = ModelToDict.teamConverter(dict_version)
             teams = map(converter, teams)
         raise ndb.Return(teams)
 
@@ -37,7 +37,7 @@ class TeamListYearQuery(DatabaseQuery):
         self._query_args = (year, page_num, )
 
     @ndb.tasklet
-    def _query_async(self, api_version):
+    def _query_async(self, dict_version):
         year = self._query_args[0]
         page_num = self._query_args[1]
 
@@ -61,7 +61,7 @@ class DistrictTeamsQuery(DatabaseQuery):
         self._query_args = (district_key, )
 
     @ndb.tasklet
-    def _query_async(self, api_version):
+    def _query_async(self, dict_version):
         district_key = self._query_args[0]
         year = int(district_key[:4])
         district_abbrev = district_key[4:]
@@ -82,7 +82,7 @@ class EventTeamsQuery(DatabaseQuery):
         self._query_args = (event_key, )
 
     @ndb.tasklet
-    def _query_async(self, api_version):
+    def _query_async(self, dict_version):
         event_key = self._query_args[0]
         event_teams = yield EventTeam.query(EventTeam.event == ndb.Key(Event, event_key)).fetch_async()
         team_keys = map(lambda event_team: event_team.team, event_teams)
@@ -98,7 +98,7 @@ class TeamParticipationQuery(DatabaseQuery):
         self._query_args = (team_key, )
 
     @ndb.tasklet
-    def _query_async(self, api_version):
+    def _query_async(self, dict_version):
         team_key = self._query_args[0]
         event_teams = yield EventTeam.query(EventTeam.team == ndb.Key(Team, team_key)).fetch_async(keys_only=True)
         years = map(lambda event_team: int(event_team.id()[:4]), event_teams)
@@ -113,7 +113,7 @@ class TeamDistrictsQuery(DatabaseQuery):
         self._query_args = (team_key, )
 
     @ndb.tasklet
-    def _query_async(self, api_version):
+    def _query_async(self, dict_version):
         team_key = self._query_args[0]
         district_team_keys = yield DistrictTeam.query(DistrictTeam.team == ndb.Key(Team, team_key)).fetch_async(keys_only=True)
         ret = {}

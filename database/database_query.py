@@ -14,7 +14,7 @@ class DatabaseQuery(object):
     DATABASE_HITS_MEMCACHE_KEYS = ['database_query_hits_{}:{}'.format(i, DATABASE_QUERY_VERSION) for i in range(25)]
     DATABASE_MISSES_MEMCACHE_KEYS = ['database_query_misses_{}:{}'.format(i, DATABASE_QUERY_VERSION) for i in range(25)]
     BASE_CACHE_KEY_FORMAT = "{}:{}:{}"  # (partial_cache_key, cache_version, database_query_version)
-    VALID_API_VERSIONS = {'apiv3'}
+    VALID_DICT_VERSIONS = {'3'}
 
     @property
     def cache_key(self):
@@ -31,23 +31,23 @@ class DatabaseQuery(object):
         all_cache_keys = []
         for cache_key in cache_keys:
             all_cache_keys.append(cache_key)
-            all_cache_keys += [cls._api_cache_key(cache_key, valid_api_version) for valid_api_version in cls.VALID_API_VERSIONS]
+            all_cache_keys += [cls._dict_cache_key(cache_key, valid_dict_version) for valid_dict_version in cls.VALID_DICT_VERSIONS]
         logging.info("Deleting db query cache keys: {}".format(all_cache_keys))
         ndb.delete_multi([ndb.Key(CachedQueryResult, cache_key) for cache_key in all_cache_keys])
 
     @classmethod
-    def _api_cache_key(self, cache_key, api_version):
-        return '{}~{}'.format(cache_key, api_version)
+    def _dict_cache_key(self, cache_key, dict_version):
+        return '{}~dictv{}'.format(cache_key, dict_version)
 
-    def fetch(self, api_version=None):
-        return self.fetch_async(api_version=api_version).get_result()
+    def fetch(self, dict_version=None):
+        return self.fetch_async(dict_version=dict_version).get_result()
 
     @ndb.tasklet
-    def fetch_async(self, api_version=None):
-        if api_version:
-            if api_version not in self.VALID_API_VERSIONS:
-                raise Exception("Bad api version for database query: {}".format(api_version))
-            cache_key = self._api_cache_key(self.cache_key, api_version)
+    def fetch_async(self, dict_version=None):
+        if dict_version:
+            if dict_version not in self.VALID_DICT_VERSIONS:
+                raise Exception("Bad api version for database query: {}".format(dict_version))
+            cache_key = self._dict_cache_key(self.cache_key, dict_version)
         else:
             cache_key = self.cache_key
 
@@ -59,9 +59,9 @@ class DatabaseQuery(object):
                 rpcs.append(MEMCACHE_CLIENT.incr_async(
                     random.choice(self.DATABASE_MISSES_MEMCACHE_KEYS),
                     initial_value=0))
-            query_result = yield self._query_async(api_version)
+            query_result = yield self._query_async(dict_version)
             if tba_config.CONFIG['database_query_cache']:
-                if api_version:
+                if dict_version:
                     rpcs.append(CachedQueryResult(
                         id=cache_key,
                         result_dict=query_result,
@@ -76,7 +76,7 @@ class DatabaseQuery(object):
                 rpcs.append(MEMCACHE_CLIENT.incr_async(
                     random.choice(self.DATABASE_HITS_MEMCACHE_KEYS),
                     initial_value=0))
-            if api_version:
+            if dict_version:
                 query_result = cached_query.result_dict
             else:
                 query_result = cached_query.result

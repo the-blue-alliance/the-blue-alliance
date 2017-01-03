@@ -15,7 +15,7 @@ class TeamSocialMediaQuery(DatabaseQuery):
         self._query_args = (team_key, )
 
     @ndb.tasklet
-    def _query_async(self, api_version):
+    def _query_async(self, dict_version):
         team_key = self._query_args[0]
         medias = yield Media.query(
             Media.references == ndb.Key(Team, team_key),
@@ -31,7 +31,7 @@ class TeamMediaQuery(DatabaseQuery):
         self._query_args = (team_key, )
 
     @ndb.tasklet
-    def _query_async(self, api_version):
+    def _query_async(self, dict_version):
         team_key = self._query_args[0]
         medias = yield Media.query(
             Media.references == ndb.Key(Team, team_key)).fetch_async()
@@ -46,7 +46,7 @@ class TeamYearMediaQuery(DatabaseQuery):
         self._query_args = (team_key, year, )
 
     @ndb.tasklet
-    def _query_async(self, api_version):
+    def _query_async(self, dict_version):
         team_key = self._query_args[0]
         year = self._query_args[1]
         medias = yield Media.query(
@@ -63,7 +63,7 @@ class EventTeamsMediasQuery(DatabaseQuery):
         self._query_args = (event_key, )
 
     @ndb.tasklet
-    def _query_async(self, api_version):
+    def _query_async(self, dict_version):
         event_key = self._query_args[0]
         year = int(event_key[:4])
         event_team_keys = yield EventTeam.query(EventTeam.event == ndb.Key(Event, event_key)).fetch_async(keys_only=True)
@@ -84,7 +84,7 @@ class EventTeamsPreferredMediasQuery(DatabaseQuery):
         self._query_args = (event_key, )
 
     @ndb.tasklet
-    def _query_async(self, api_version):
+    def _query_async(self, dict_version):
         event_key = self._query_args[0]
         year = int(event_key[:4])
         event_team_keys = yield EventTeam.query(EventTeam.event == ndb.Key(Event, event_key)).fetch_async(keys_only=True)

@@ -14,7 +14,7 @@ class EventAwardsQuery(DatabaseQuery):
         self._query_args = (event_key, )
 
     @ndb.tasklet
-    def _query_async(self, api_version):
+    def _query_async(self, dict_version):
         event_key = self._query_args[0]
         awards = yield Award.query(Award.event == ndb.Key(Event, event_key)).fetch_async()
         raise ndb.Return(awards)
@@ -28,7 +28,7 @@ class TeamAwardsQuery(DatabaseQuery):
         self._query_args = (team_key, )
 
     @ndb.tasklet
-    def _query_async(self, api_version):
+    def _query_async(self, dict_version):
         team_key = self._query_args[0]
         awards = yield Award.query(
             Award.team_list == ndb.Key(Team, team_key)).fetch_async()
@@ -43,7 +43,7 @@ class TeamYearAwardsQuery(DatabaseQuery):
         self._query_args = (team_key, year, )
 
     @ndb.tasklet
-    def _query_async(self, api_version):
+    def _query_async(self, dict_version):
         team_key = self._query_args[0]
         year = self._query_args[1]
         awards = yield Award.query(
@@ -60,7 +60,7 @@ class TeamEventAwardsQuery(DatabaseQuery):
         self._query_args = (team_key, event_key, )
 
     @ndb.tasklet
-    def _query_async(self, api_version):
+    def _query_async(self, dict_version):
         team_key = self._query_args[0]
         event_key = self._query_args[1]
         awards = yield Award.query(
