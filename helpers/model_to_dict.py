@@ -7,14 +7,14 @@ from consts.media_type import MediaType
 
 class ModelToDict(object):
     @classmethod
-    def teamConverter(cls, dict_version=None):
+    def getTeamConverter(cls, dict_version=None):
         TEAM_CONVERTERS = {
             '3': cls.teamConverter_v3,
         }
-        return TEAM_CONVERTERS.get(dict_version, cls.teamConverter_v2)
+        return TEAM_CONVERTERS.get(dict_version, cls.teamConverter)
 
     @classmethod
-    def teamConverter_v2(self, team):
+    def teamConverter(self, team):
         """
         return top level team dictionary
         """
