@@ -13,7 +13,7 @@ class TeamRobotsQuery(DatabaseQuery):
         self._query_args = (team_key, )
 
     @ndb.tasklet
-    def _query_async(self):
+    def _query_async(self, api_version):
         team_key = self._query_args[0]
         robots = yield Robot.query(
             Robot.team == ndb.Key(Team, team_key)).fetch_async()
