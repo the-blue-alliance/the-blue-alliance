@@ -62,7 +62,7 @@ class AdvancedSearchController(CacheableHandler):
         # Parse and sanitize inputs
         self._year = self._sanitize_int_param('year', 1992, tba_config.MAX_YEAR)
 
-        self._award_types = self.request.get('award_type', allow_multiple=True)
+        self._award_types = self.request.get_all('award_type')
         if self._award_types:
             # Sort to make caching more likely
             self._award_types = filter(lambda x: x in AwardType.SEARCHABLE, sorted(set([
@@ -163,7 +163,6 @@ class AdvancedSearchController(CacheableHandler):
                     limit=self.PAGE_SIZE,
                     number_found_accuracy=10000,  # Larger than the number of possible results
                     offset=self.PAGE_SIZE * self._page,
-                    ids_only=True,
                     sort_options=search.SortOptions(
                         expressions=sort_options_expressions
                     ),
