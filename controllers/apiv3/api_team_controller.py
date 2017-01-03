@@ -7,7 +7,8 @@ from google.appengine.ext import ndb
 
 from controllers.apiv3.api_base_controller import ApiBaseController
 from controllers.apiv3.model_properties import team_properties
-from database.team_query import TeamListQuery, TeamListYearQuery
+from database.team_query import TeamListQuery, TeamListYearQuery, TeamParticipationQuery, TeamDistrictsQuery
+from database.robot_query import TeamRobotsQuery
 from helpers.model_to_dict import ModelToDict
 from models.team import Team
 
@@ -91,3 +92,70 @@ class ApiTeamController(ApiTeamControllerBase):
             team = {key: team[key] for key in team_properties[model_type]}
 
         return json.dumps(team, ensure_ascii=True)
+
+
+class ApiTeamYearsParticipatedController(ApiTeamControllerBase):
+    CACHE_KEY_FORMAT = "apiv3_team_years_participated_controller_{}"  # (team_key)
+    CACHE_VERSION = 1
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamYearsParticipatedController, self).__init__(*args, **kw)
+        self.team_key = self.request.route_kwargs["team_key"]
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key)
+
+    def _track_call(self, team_key):
+        self._track_call_defer('team/years_participated', team_key)
+
+    def _render(self, team_key):
+        years_participated = sorted(TeamParticipationQuery(self.team_key).fetch())
+
+        return json.dumps(years_participated, ensure_ascii=True)
+
+
+class ApiTeamHistoryDistrictsController(ApiTeamControllerBase):
+    """
+    Returns a JSON list of all DistrictTeam models associated with a Team
+    """
+    CACHE_KEY_FORMAT = "apiv3_team_history_districts_controller_{}"  # (team_key)
+    CACHE_VERSION = 1
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamHistoryDistrictsController, self).__init__(*args, **kw)
+        self.team_key = self.request.route_kwargs['team_key']
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key)
+
+    def _track_call(self, team_key):
+        self._track_call_defer('team/history/districts', team_key)
+
+    def _render(self, team_key):
+        self._set_team(team_key)
+
+        team_districts = TeamDistrictsQuery(self.team_key).fetch()
+
+        return json.dumps(team_districts, ensure_ascii=True)
+
+
+class ApiTeamHistoryRobotsController(ApiTeamControllerBase):
+    """
+    Returns a JSON list of all robot models associated with a Team
+    """
+    CACHE_KEY_FORMAT = "apiv3_team_history_robots_controller_{}"  # (team_key)
+    CACHE_VERSION = 1
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamHistoryRobotsController, self).__init__(*args, **kw)
+        self.team_key = self.request.route_kwargs['team_key']
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key)
+
+    def _track_call(self, team_key):
+        self._track_call_defer('team/history/robots', team_key)
+
+    def _render(self, team_key):
+        self._set_team(team_key)
+
+        robots = TeamRobotsQuery(self.team_key).fetch(dict_version='3')
+
+        return json.dumps(robots, ensure_ascii=True)

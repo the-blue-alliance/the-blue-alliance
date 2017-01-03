@@ -14,6 +14,13 @@ class ModelToDict(object):
         return TEAM_CONVERTERS.get(dict_version, cls.teamConverter)
 
     @classmethod
+    def convertRobots(cls, robots, dict_version):
+        ROBOT_CONVERTERS = {
+            '3': cls.robotsConverter_v3,
+        }
+        return ROBOT_CONVERTERS[dict_version](robots)
+
+    @classmethod
     def teamConverter(self, team):
         """
         return top level team dictionary
@@ -170,3 +177,19 @@ class ModelToDict(object):
         robot_dict["year"] = robot.year
         robot_dict["name"] = robot.robot_name
         return robot_dict
+
+    @classmethod
+    def robotsConverter_v3(cls, robots):
+        robots_dict = {}
+        for robot in robots:
+            robots_dict[robot.year] = cls.robotConverter_v3(robot)
+        return robots_dict
+
+    @classmethod
+    def robotConverter_v3(cls, robot):
+        return {
+            'key': robot.key_name,
+            'team_key': robot.team.id(),
+            'year': robot.year,
+            'robot_name': robot.robot_name,
+        }
