@@ -29,16 +29,15 @@ const defaultChat = {
 
 const defaultState = {
   chats: {
-    [defaultChat.channel]: Object.assign({}, defaultChat)
+    [defaultChat.channel]: Object.assign({}, defaultChat),
   },
   renderedChats: ['tbagameday'],
   currentChat: 'tbagameday',
 }
 
-const setChatsFromWebcasts = (webcasts, state) => {
+const setChatsFromWebcasts = (webcasts) => {
   const newState = Object.assign({}, defaultState)
 
-  const webcastValues = []
   Object.keys(webcasts).forEach((key) => {
     const webcast = webcasts[key]
 
@@ -77,7 +76,7 @@ const setTwitchChat = (channel, state) => {
 const chats = (state = defaultState, action) => {
   switch (action.type) {
     case WEBCASTS_UPDATED:
-      return setChatsFromWebcasts(action.webcasts, state)
+      return setChatsFromWebcasts(action.webcasts)
     case SET_TWITCH_CHAT:
       return setTwitchChat(action.channel, state)
     default:

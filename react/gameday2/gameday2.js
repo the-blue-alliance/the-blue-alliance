@@ -32,7 +32,7 @@ const muiTheme = getMuiTheme({
     appBarHeight: 64,
     socialPanelWidth: 300,
     chatPanelWidth: 300,
-  }
+  },
 })
 
 ReactDOM.render(

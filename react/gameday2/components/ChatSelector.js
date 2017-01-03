@@ -3,59 +3,8 @@ import ReactTransitionGroup from 'react-addons-transition-group'
 import { List, ListItem } from 'material-ui/List'
 import Paper from 'material-ui/Paper'
 import CheckmarkIcon from 'material-ui/svg-icons/navigation/check'
-import { fullWhite } from 'material-ui/styles/colors'
 import { chatPropType } from '../utils/PropTypes'
-
-class AnimatableContainer extends React.Component {
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      style: props.beginStyle,
-    }
-  }
-
-  componentWillUnmount() {
-    clearTimeout(this.enterTimeout)
-    clearTimeout(this.leaveTimeout)
-  }
-
-  componentWillEnter(callback) {
-    this.componentWillAppear(callback)
-  }
-
-  componentWillAppear(callback) {
-    // Timeout needed so that the component can render with the original styles
-    // before we apply the ones to transition to
-    setTimeout(() => {this.setState({
-      style: this.props.endStyle
-    })}, 0)
-
-    this.enterTimeout = setTimeout(callback, 300)
-  }
-
-  componentWillLeave(callback) {
-    this.setState({
-      style: this.props.beginStyle,
-    })
-
-    this.leaveTimeout = setTimeout(callback, 300)
-  }
-
-  render() {
-    const {
-      style,
-      children,
-      ...other
-    } = this.props
-
-    return (
-      <div {...other} style={Object.assign({}, style, this.state.style)}>
-        {children}
-      </div>
-    )
-  }
-}
+import AnimatableContainer from './AnimatableContainer'
 
 export default class ChatSelector extends React.Component {
   static propTypes = {
@@ -99,7 +48,7 @@ export default class ChatSelector extends React.Component {
       background: 'rgba(0,0,0,0.2)',
       position: 'absolute',
       transition: 'all 150ms ease-in',
-      willChange: 'opacity'
+      willChange: 'opacity',
     }
 
     const listStyle = {
@@ -111,14 +60,7 @@ export default class ChatSelector extends React.Component {
     }
 
     return (
-      <ReactTransitionGroup
-        component="div"
-        transitionAppear={true}
-        transitionAppearTimeout={150}
-        transitionEnter={true}
-        transitionEnterTimeout={150}
-      >
-        <div />
+      <ReactTransitionGroup component="div">
         {this.props.open &&
           <AnimatableContainer
             key="overlay"
@@ -138,11 +80,11 @@ export default class ChatSelector extends React.Component {
             style={listStyle}
             beginStyle={{
               opacity: 0,
-              transform: 'translate(0, 50%)'
+              transform: 'translate(0, 50%)',
             }}
             endStyle={{
               opacity: 1,
-              transform: 'translate(0, 0)'
+              transform: 'translate(0, 0)',
             }}
           >
             <Paper zDepth={4}>

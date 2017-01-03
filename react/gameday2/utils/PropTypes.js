@@ -9,7 +9,7 @@ export const webcastPropType = PropTypes.shape({
   channel: PropTypes.string.isRequired,
 })
 
-export const chatPropTypes = PropTypes.shape({
+export const chatPropType = PropTypes.shape({
   name: PropTypes.string.isRequired,
   channel: PropTypes.string.isRequired,
 })

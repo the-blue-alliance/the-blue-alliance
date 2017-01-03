@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react'
 import muiThemeable from 'material-ui/styles/muiThemeable'
-import classNames from 'classnames'
 import VideoGridContainer from '../containers/VideoGridContainer'
 import LayoutSelectionPanel from './LayoutSelectionPanel'
 import NoWebcasts from './NoWebcasts'
@@ -54,6 +53,7 @@ MainContent.propTypes = {
   chatSidebarVisible: PropTypes.bool.isRequired,
   layoutSet: PropTypes.bool.isRequired,
   setLayout: PropTypes.func.isRequired,
+  muiTheme: PropTypes.object.isRequired,
 }
 
 export default muiThemeable()(MainContent)

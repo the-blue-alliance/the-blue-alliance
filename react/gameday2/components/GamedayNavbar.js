@@ -56,6 +56,7 @@ GamedayNavbar.propTypes = {
   layoutSet: PropTypes.bool.isRequired,
   layoutDrawerVisible: PropTypes.bool.isRequired,
   setLayoutDrawerVisibility: PropTypes.func.isRequired,
+  muiTheme: PropTypes.object.isRequired,
 }
 
 export default muiThemeable()(GamedayNavbar)

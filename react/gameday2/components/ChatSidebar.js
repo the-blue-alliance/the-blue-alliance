@@ -15,6 +15,8 @@ class ChatSidebar extends React.Component {
     chats: PropTypes.objectOf(chatPropType).isRequired,
     renderedChats: PropTypes.arrayOf(PropTypes.string).isRequired,
     currentChat: PropTypes.string.isRequired,
+    setTwitchChat: PropTypes.func.isRequired,
+    muiTheme: PropTypes.object.isRequired,
   }
 
   constructor(props) {
@@ -26,11 +28,15 @@ class ChatSidebar extends React.Component {
   }
 
   onRequestOpenChatSelector() {
-    this.setState({chatSelectorOpen: true})
+    this.setState({
+      chatSelectorOpen: true,
+    })
   }
 
   onRequestCloseChatSelector() {
-    this.setState({chatSelectorOpen: false})
+    this.setState({
+      chatSelectorOpen: false,
+    })
   }
 
   render() {
@@ -92,7 +98,7 @@ class ChatSidebar extends React.Component {
     })
 
     const currentChat = this.props.chats[this.props.currentChat]
-    let currentChatName = "UNKNOWN"
+    let currentChatName = 'UNKNOWN'
     if (currentChat) {
       currentChatName = currentChat.name
     }
