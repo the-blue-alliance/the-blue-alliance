@@ -4,8 +4,10 @@ from itertools import chain, combinations
 
 from consts.award_type import AwardType
 from consts.event_type import EventType
+from consts.media_type import MediaType
 from database.award_query import TeamAwardsQuery
 from database.event_query import TeamEventsQuery
+from database.media_query import TeamMediaQuery
 from database.team_query import TeamParticipationQuery
 
 
@@ -66,6 +68,7 @@ class SearchHelper(object):
     def update_team_awards_index(cls, team):
         awards_future = TeamAwardsQuery(team.key.id()).fetch_async()
         events_future = TeamEventsQuery(team.key.id()).fetch_async()
+        medias_future = TeamMediaQuery(team.key.id()).fetch_async()
 
         events_by_year = defaultdict(list)
         for event in events_future.get_result():
@@ -83,8 +86,6 @@ class SearchHelper(object):
         ]
 
         field_counts = defaultdict(int)
-        overall_awards = set()
-        overall_awards_event = defaultdict(set)
         for year, events in events_by_year.items():
             season_awards = set()
             season_awards_event = defaultdict(set)
@@ -107,9 +108,6 @@ class SearchHelper(object):
                 season_awards = season_awards.union(award_types)
                 season_awards_event[event.event_type_enum] = season_awards_event[event.event_type_enum].union(award_types)
 
-                overall_awards = overall_awards.union(award_types)
-                overall_awards_event[event.event_type_enum] = overall_awards_event[event.event_type_enum].union(award_types)
-
             # To search by year
             for award_set in cls._construct_powerset(season_awards):
                 set_name = cls._construct_set_name(award_set)
@@ -122,16 +120,19 @@ class SearchHelper(object):
                     field_counts['s_{}_e{}'.format(set_name, event_type)] += 1
                     field_counts['s_{}_e{}_y{}'.format(set_name, event_type, year)] += 1
 
-        # To search overall
-        for award_set in cls._construct_powerset(overall_awards):
-            set_name = cls._construct_set_name(award_set)
-            field_counts['o_{}'.format(set_name)] += 1
-
-        for event_type, awards in overall_awards_event.items():
-            for award_set in cls._construct_powerset(awards):
-                set_name = cls._construct_set_name(award_set)
-                field_counts['o_{}_e{}'.format(set_name, event_type)] += 1
-
         fields += [search.NumberField(name=field, value=count) for field, count in field_counts.items()]
+
+        # Medias
+        robot_photo_years = set()
+        cad_model_years = set()
+        for media in medias_future.get_result():
+            if media.media_type_enum in MediaType.image_types and team.key in media.preferred_references:
+                robot_photo_years.add(media.year)
+            elif media.media_type_enum in MediaType.robot_types:
+                cad_model_years.add(media.year)
+
+        fields += [search.AtomField(name='robot_photo_year', value=str(year)) for year in robot_photo_years]
+        fields += [search.AtomField(name='cad_model_year', value=str(year)) for year in cad_model_years]
+
         search.Index(name=cls.TEAM_AWARDS_INDEX).put(
             search.Document(doc_id='{}'.format(team.key.id()), fields=fields))

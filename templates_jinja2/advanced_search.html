@@ -40,18 +40,16 @@
         <div class="form-group{% if not award_types %} display-none{% endif %}">
           <label for="input-time-period">Within the period of</label>
           <select class="form-control selectpicker" data-dropup-auto="false" id="input-time-period" name="time_period" data-actions-box="true"{% if not award_types %} disabled{% endif %}>
-            <option value="0"{% if time_period == 0 %} selected="selected"{% endif %}>the team's history</option>
-            <option value="1"{% if time_period == 1 %} selected="selected"{% endif %}>one season</option>
-            <option value="2"{% if time_period == 2 %} selected="selected"{% endif %}>one event</option>
+            <option value="0"{% if time_period == 0 %} selected="selected"{% endif %}>one season</option>
+            <option value="1"{% if time_period == 1 %} selected="selected"{% endif %}>one event</option>
           </select>
         </div>
 
-        <div class="form-group{% if time_period == 0 %} display-none{% endif %}">
-          <label class="sr-only" for="input-award-year">Award year</label>
+        <div class="form-group">
+          <label class="sr-only" for="input-year">Year</label>
           <div class="input-group">
             <div class="input-group-addon">in</div>
-            <select class="form-control selectpicker" data-dropup-auto="false" id="input-award-year" name="year"{% if time_period == 0 %} disabled{% endif %}>
-              <option value="0">any year</option>
+            <select class="form-control selectpicker" data-dropup-auto="false" id="input-year" name="year">
               {% for valid_year in valid_years %}
                 <option value="{{valid_year}}"{% if valid_year == year %} selected="selected"{% endif %}>{{valid_year}}</option>
               {% endfor %}
@@ -59,222 +57,97 @@
           </div>
         </div>
 
-        <button id="submit-search" type="submit" class="btn btn-success btn-block{% if not award_types %} disabled{% endif %}"><span class="glyphicon glyphicon-search"></span> Search</button>
+        <div class="form-group">
+          <label>And have:</label>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" name="robot_photo"{% if robot_photo %} checked{% endif %}> a robot photo
+            </label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" name="cad_model"{% if cad_model %} checked{% endif %}> a CAD model
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-success btn-block"><span class="glyphicon glyphicon-search"></span> Search</button>
       </form>
     </div>
 
     <div class="col-sm-8">
-      {% if result_models %}
-        <p>{{num_results}} result{% if num_results != 1 %}s{% endif %} found</p>
+      {% if new_search %}
+        <p class="well">Add some filters to begin a search.</p>
+      {% else %}
+        {% if result_models %}
+          <p>{{num_results}} result{% if num_results != 1 %}s{% endif %} found</p>
 
-        {% if num_results > page_size %}
-          <nav aria-label="Page navigation">
-            <ul class="pagination">
-              {% if page != 0 %}
-              <li>
-                <a href="/advanced_search?year={{year}}{% for award_type in award_types %}&award_type={{award_type}}{% endfor %}{% for event_type in event_types %}&event_type={{event_type}}{% endfor %}&location={{location}}&page={{page - 1}}&search_type={{search_type}}" aria-label="Previous">
-                  <span aria-hidden="true">&laquo;</span>
-                </a>
-              </li>
-              {% endif %}
-              {% for i in range((num_results / page_size)|ceil) %}
-                <li {% if i == page %}class="active"{% endif %}>
-                  <a href="/advanced_search?year={{year}}{% for award_type in award_types %}&award_type={{award_type}}{% endfor %}{% for event_type in event_types %}&event_type={{event_type}}{% endfor %}&location={{location}}&page={{i}}&search_type={{search_type}}">
-                    {{page_size * i + 1}}-
-                    {%- if loop.last -%}
-                      {{page_size * i + num_results - page_size * i}}
-                    {%- else -%}
-                      {{page_size * i + page_size}}
-                    {% endif %}
+          {% if num_results > page_size %}
+            <nav aria-label="Page navigation">
+              <ul class="pagination">
+                {% if page != 0 %}
+                <li>
+                  <a href="/advanced_search?year={{year}}{% for award_type in award_types %}&award_type={{award_type}}{% endfor %}{% for event_type in event_types %}&event_type={{event_type}}{% endfor %}&location={{location}}&page={{page - 1}}&search_type={{search_type}}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
                   </a>
                 </li>
-              {% endfor %}
-              {% if page != (num_results / page_size)|ceil - 1 %}
-              <li>
-                <a href="/advanced_search?year={{year}}{% for award_type in award_types %}&award_type={{award_type}}{% endfor %}{% for event_type in event_types %}&event_type={{event_type}}{% endfor %}&location={{location}}&page={{page + 1}}&search_type={{search_type}}" aria-label="Next">
-                  <span aria-hidden="true">&raquo;</span>
-                </a>
-              </li>
-              {% endif %}
-            </ul>
-          </nav>
-        {% endif %}
+                {% endif %}
+                {% for i in range((num_results / page_size)|ceil) %}
+                  <li {% if i == page %}class="active"{% endif %}>
+                    <a href="/advanced_search?year={{year}}{% for award_type in award_types %}&award_type={{award_type}}{% endfor %}{% for event_type in event_types %}&event_type={{event_type}}{% endfor %}&location={{location}}&page={{i}}&search_type={{search_type}}">
+                      {{page_size * i + 1}}-
+                      {%- if loop.last -%}
+                        {{page_size * i + num_results - page_size * i}}
+                      {%- else -%}
+                        {{page_size * i + page_size}}
+                      {% endif %}
+                    </a>
+                  </li>
+                {% endfor %}
+                {% if page != (num_results / page_size)|ceil - 1 %}
+                <li>
+                  <a href="/advanced_search?year={{year}}{% for award_type in award_types %}&award_type={{award_type}}{% endfor %}{% for event_type in event_types %}&event_type={{event_type}}{% endfor %}&location={{location}}&page={{page + 1}}&search_type={{search_type}}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
+                {% endif %}
+              </ul>
+            </nav>
+          {% endif %}
 
-        <table class="event-table">
-          <thead>
-            <tr>
-              <th>Team</th>
-              {% if time_period == 1 %}
-              <th># Seasons</th>
-              {% elif time_period == 2 %}
-              <th># Events</th>
-              {% endif %}
-              </th>
-              {% if location %}
-              <th>Distance</th>
-              {% endif %}
-            </tr>
-          </thead>
-          <tbody>
-            {% for team in result_models %}
+          <table class="event-table">
+            <thead>
               <tr>
-                <td>
-                  <a href="/team/{{team.team_number}}/{% if year == 0 %}history{% else %}{{year}}{% endif %}" title="Team {{team.team_number }} - {{team.nickname}}">Team {{team.team_number }} - {{team.nickname}}</a>
-
+                <th>Team</th>
+                {% if time_period == 1 %}
+                <th># Events</th>
+                {% endif %}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for team in result_models %}
+                <tr>
+                  <td>
+                    <a href="/team/{{team.team_number}}/{% if year == 0 %}history{% else %}{{year}}{% endif %}" title="Team {{team.team_number }} - {{team.nickname}}">Team {{team.team_number }} - {{team.nickname}}</a>
                     {% if team.city_state_country %}
                       <br>
                       <small>{{team.city_state_country}}</small>
                     {% endif %}
-                </td>
-                {% if time_period != 0 %}
-                <td>{{result_expressions.get(team.key.id()).get('count')|int}}</td>
-                {% endif %}
-                {% if location %}
-                <td>{{result_expressions.get(team.key.id()).get('distance')|round|int}} miles</td>
-                {% endif %}
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      {% else %}
-        <p class="well">No results were found matching the search criteria. Try choosing less restrictive filters.</p>
-      {% endif %}
-    </div>
-  </div>
-<!--
-
-  <div class="row">
-    <div class="col-xs-12">
-      <div class="well">
-        <form class="">
-          <div class="row">
-            <div class="col-sm-6 col-md-2">
-              <label class="sr-only" for="input-year">Year</label>
-              <select class="form-control selectpicker" data-dropup-auto="false" id="input-year" name="year">
-                <option value="0">All Years</option>
-                {% for valid_year in valid_years %}
-                  <option value="{{valid_year}}"{% if valid_year == year %} selected="selected"{% endif %}>{{valid_year}}</option>
-                {% endfor %}
-              </select>
-            </div>
-
-            <div class="col-sm-6 col-md-3">
-              <label class="sr-only" for="input-award">Award Filter</label>
-              <select class="form-control selectpicker" data-dropup-auto="false" id="input-award-type" name="award_type" multiple title="Won Awards" data-actions-box="true" data-live-search="true">
-                {% for valid_award_type, valid_award_type_name in valid_award_types %}
-                  <option value="{{valid_award_type}}"{% if valid_award_type in award_types %} selected="selected"{% endif %}>{{valid_award_type_name}}</option>
-                  {% if loop.index == num_special_awards %}<option data-divider="true"></option>{% endif %}
-                {% endfor %}
-              </select>
-            </div>
-
-            <div class="col-sm-6 col-md-3">
-              <label class="sr-only" for="input-event-type">Event Filter</label>
-              <select class="form-control selectpicker" data-dropup-auto="false" id="input-event-type" name="event_type" multiple title="At Events" data-actions-box="true" disabled>
-                {% for valid_event_type, valid_event_type_name in valid_event_types %}
-                  <option value="{{valid_event_type}}"{% if valid_event_type in event_types %} selected="selected"{% endif %}>{{valid_event_type_name}}</option>
-                {% endfor %}
-              </select>
-            </div>
-
-            <div class="col-sm-6 col-md-2">
-              <label class="sr-only" for="input-location">Near Location</label>
-              <input type="text" class="form-control" id="input-location" name="location" placeholder="City / Zip / Address"{% if location %} value="{{location}}"{% endif %}">
-            </div>
-
-            <div class="col-sm-12 col-md-2">
-              <button type="submit" class="btn btn-success btn-block"><span class="glyphicon glyphicon-search"></span> Search</button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-sm-8 col-sm-offset-2">
-      {% if results %}
-        <p>{{num_results}} {% if search_type == 'teams' %}team{% else %}event{% endif %}{% if num_results != 1 %}s{% endif %} found</p>
-
-        {% if num_results > page_size %}
-          <nav aria-label="Page navigation">
-            <ul class="pagination">
-              {% if page != 0 %}
-              <li>
-                <a href="/nearby?year={{year}}{% for award_type in award_types %}&award_type={{award_type}}{% endfor %}{% for event_type in event_types %}&event_type={{event_type}}{% endfor %}&location={{location}}&page={{page - 1}}&search_type={{search_type}}" aria-label="Previous">
-                  <span aria-hidden="true">&laquo;</span>
-                </a>
-              </li>
-              {% endif %}
-              {% for i in range((num_results / page_size)|ceil) %}
-                <li {% if i == page %}class="active"{% endif %}>
-                  <a href="/nearby?year={{year}}{% for award_type in award_types %}&award_type={{award_type}}{% endfor %}{% for event_type in event_types %}&event_type={{event_type}}{% endfor %}&location={{location}}&page={{i}}&search_type={{search_type}}">
-                    {{page_size * i + 1}}-
-                    {%- if loop.last -%}
-                      {{page_size * i + num_results - page_size * i}}
-                    {%- else -%}
-                      {{page_size * i + page_size}}
-                    {% endif %}
-                  </a>
-                </li>
+                  </td>
+                  {% if award_types and time_period == 1 %}
+                  <td>{{result_expressions.get(team.key.id()).get('count')|int}}</td>
+                  {% endif %}
+                </tr>
               {% endfor %}
-              {% if page != (num_results / page_size)|ceil - 1 %}
-              <li>
-                <a href="/nearby?year={{year}}{% for award_type in award_types %}&award_type={{award_type}}{% endfor %}{% for event_type in event_types %}&event_type={{event_type}}{% endfor %}&location={{location}}&page={{page + 1}}&search_type={{search_type}}" aria-label="Next">
-                  <span aria-hidden="true">&raquo;</span>
-                </a>
-              </li>
-              {% endif %}
-            </ul>
-          </nav>
+            </tbody>
+          </table>
+        {% else %}
+          <p class="well">No results were found matching the search criteria. Try choosing less restrictive filters.</p>
         {% endif %}
-
-        <table class="event-table">
-          <thead>
-            <tr>
-              <th>{{sm.sort_header('Team' if search_type == 'teams' else 'Event', 0)}}</th>
-              {% if search_type == 'events' %}<th>Dates</th>{% endif %}
-              {% for field_name in field_names %}
-              <th>{{sm.sort_header(field_name, loop.index)}}</th>
-              {% endfor %}
-            </tr>
-          </thead>
-          <tbody>
-            {% for result, fields in results %}
-              <tr>
-                <td>
-                  {% if search_type == 'teams' %}
-                    <a href="/team/{{result.team_number}}/{% if year == 0 %}history{% else %}{{year}}{% endif %}" title="Team {{result.team_number }} - {{result.nickname}}">Team {{result.team_number }} - {{result.nickname}}</a>
-                  {% else %}
-                    <a href="/event/{{result.key_name}}" title="{{result.name}}">{{result.name}}</a>
-                  {% endif %}
-                    {% if result.city_state_country %}
-                      <br>
-                      <small>{{result.city_state_country}}</small>
-                    {% endif %}
-                </td>
-                {% if search_type == 'events' %}
-                <td>
-                  {% if result.start_date %}<time itemprop="startDate" datetime="{{result.start_date|strftime("%c")}}">{{ result.start_date|strftime("%b %d") }}{% if result.start_date.date() != result.end_date.date() %}</time> to <time itemprop="endDate" datetime="{{result.end_date|strftime("%c")}}">{{ result.end_date|strftime("%b %d") }}{% endif %}{{ result.end_date|strftime(", %Y") }}</time>{% endif %}
-                </td>
-                {% endif %}
-                {% for returned_field in returned_fields %}
-                  {% if returned_field == 'distance' %}
-                    <td>{{fields.get(returned_field)|round|int}} miles</td>
-                  {% else %}
-                    <td>{{fields.get(returned_field)|int}}</td>
-                  {% endif %}
-                {% endfor %}
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      {% else %}
-        <p class="well">No {% if search_type == 'teams' %}teams{% else %}events {% endif %} were found matching the search criteria. Try choosing less restrictive filters.</p>
       {% endif %}
     </div>
   </div>
- -->
 </div>
 {% endblock %}
 
@@ -300,23 +173,6 @@
     } else {
       enable($('#input-event-type'));
       enable($('#input-time-period'));
-    }
-
-    if (!$(this).is(':hidden')) {
-      if ($(this).selectpicker('val') == null) {
-        $('#submit-search').addClass('disabled');
-      } else{
-        $('#submit-search').removeClass('disabled');
-      }
-    }
-  });
-
-  // Show/hide depending on #input-time-period
-  $('#input-time-period').on('changed.bs.select loaded.bs.select refreshed.bs.select', function () {
-    if ($(this).selectpicker('val') == 0 || $(this).is(':hidden')) {
-      disable($('#input-award-year'));
-    } else {
-      enable($('#input-award-year'));
     }
   });
 </script>
