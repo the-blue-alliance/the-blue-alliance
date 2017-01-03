@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react'
 import MuiAppBar from 'material-ui/AppBar'
+import { Toolbar, ToolbarTitle, ToolbarGroup } from 'material-ui/Toolbar'
 import FlatButton from 'material-ui/FlatButton'
 import IconButton from 'material-ui/IconButton'
 import muiThemeable from 'material-ui/styles/muiThemeable'
@@ -8,9 +9,31 @@ import { getLayoutSvgIcon } from '../utils/layoutUtils'
 import LampIcon from './LampIcon'
 
 const AppBar = (props) => {
+  const tbaBrandingButtonStyle = {
+    padding: 0,
+    marginLeft: 8,
+    marginRight: 8,
+  }
+
+  const configureLayoutButtonStyle = {
+    color: props.muiTheme.appBar.textColor,
+  }
+
+  const appBarStyle = {
+    height: props.muiTheme.layout.appBarHeight,
+    backgroundColor: props.muiTheme.palette.primary1Color,
+    position: 'relative',
+    zIndex: props.muiTheme.zIndex.appBar,
+  }
+
+  const appBarTitleStyle = {
+    color: props.muiTheme.appBar.textColor,
+    fontSize: '24px',
+  }
+
   const tbaBrandingButton = (
     <IconButton
-      style={{ padding: 0 }}
+      style={tbaBrandingButtonStyle}
       tooltip="Go to The Blue Alliance"
       tooltipPosition="bottom-right"
       href="https://thebluealliance.com"
@@ -21,27 +44,30 @@ const AppBar = (props) => {
       />
     </IconButton>
   )
+
   const configureLayoutButton = (
     <FlatButton
       label="Configure Layout"
       labelPosition="before"
+      style={configureLayoutButtonStyle}
       icon={getLayoutSvgIcon(props.layoutId, '#ffffff')}
       onTouchTap={() => props.setLayoutDrawerVisibility(true)}
     />
   )
 
-  const appBarStyle = {
-    height: props.muiTheme.layout.appBarHeight,
-  }
-
   return (
     <div>
-      <MuiAppBar
+      <Toolbar
         style={appBarStyle}
-        title="GameDay"
-        iconElementLeft={tbaBrandingButton}
-        iconElementRight={configureLayoutButton}
-      />
+      >
+        <ToolbarGroup firstChild>
+          {tbaBrandingButton}
+          <ToolbarTitle text="GameDay" style={appBarTitleStyle} />
+        </ToolbarGroup>
+        <ToolbarGroup lastChild>
+          {configureLayoutButton}
+        </ToolbarGroup>
+      </Toolbar>
       <LayoutDrawer
         setLayout={props.setLayout}
         toggleChatSidebarVisibility={props.toggleChatSidebarVisibility}
