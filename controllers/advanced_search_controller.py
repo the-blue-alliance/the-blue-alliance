@@ -176,7 +176,7 @@ class AdvancedSearchController(CacheableHandler):
             model_keys = []
             result_expressions = defaultdict(lambda: defaultdict(float))
             for result in docs.results:
-                team_key = result.doc_id.split('_')[0]
+                team_key = result.doc_id
                 model_keys.append(ndb.Key('Team', team_key))
                 for expression in result.expressions:
                     result_expressions[team_key][expression.name] = expression.value
