@@ -1,11 +1,24 @@
 import React, { PropTypes } from 'react'
-import AppBar from 'material-ui/AppBar'
+import Avatar from 'material-ui/Avatar'
+import MuiAppBar from 'material-ui/AppBar'
 import FlatButton from 'material-ui/FlatButton'
+import IconButton from 'material-ui/IconButton'
 import muiThemeable from 'material-ui/styles/muiThemeable'
 import LayoutDrawer from './LayoutDrawer'
 import { getLayoutSvgIcon } from '../utils/layoutUtils'
+import LampIcon from './LampIcon'
 
 const AppBar = (props) => {
+  const tbaBrandingButton = (
+    <IconButton
+      style={{padding: 0}}
+      tooltip="Go to The Blue Alliance"
+      tooltipPosition="bottom-right"
+      href="https://thebluealliance.com"
+    >
+      <LampIcon />
+    </IconButton>
+  )
   const configureLayoutButton = (
     <FlatButton
       label="Configure Layout"
@@ -21,10 +34,10 @@ const AppBar = (props) => {
 
   return (
     <div>
-      <AppBar
+      <MuiAppBar
         style={appBarStyle}
         title="GameDay"
-        showMenuIconButton={false}
+        iconElementLeft={tbaBrandingButton}
         iconElementRight={configureLayoutButton}
       />
       <LayoutDrawer
