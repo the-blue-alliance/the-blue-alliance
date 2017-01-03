@@ -2,6 +2,7 @@ from google.appengine.ext import ndb
 
 from consts.district_type import DistrictType
 from database.database_query import DatabaseQuery
+from helpers.model_to_dict import ModelToDict
 from models.district_team import DistrictTeam
 from models.event import Event
 from models.event_team import EventTeam
@@ -17,11 +18,14 @@ class TeamListQuery(DatabaseQuery):
         self._query_args = (page_num, )
 
     @ndb.tasklet
-    def _query_async(self):
+    def _query_async(self, api_version):
         page_num = self._query_args[0]
         start = self.PAGE_SIZE * page_num
         end = start + self.PAGE_SIZE
         teams = yield Team.query(Team.team_number >= start, Team.team_number < end).fetch_async()
+        if api_version:
+            converter = ModelToDict.teamConverter(api_version)
+            teams = map(converter, teams)
         raise ndb.Return(teams)
 
 

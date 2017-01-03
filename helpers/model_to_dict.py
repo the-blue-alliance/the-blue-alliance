@@ -6,9 +6,15 @@ from consts.media_type import MediaType
 
 
 class ModelToDict(object):
+    @classmethod
+    def teamConverter(cls, api_version=None):
+        TEAM_CONVERTERS = {
+            'apiv3': cls.teamConverter_v3,
+        }
+        return TEAM_CONVERTERS.get(api_version, cls.teamConverter_v2)
 
     @classmethod
-    def teamConverter(self, team):
+    def teamConverter_v2(self, team):
         """
         return top level team dictionary
         """
@@ -31,6 +37,25 @@ class ModelToDict(object):
             logging.warning("Failed to include Address for api_team_info_%s: %s" % (team.key.id(), e))
 
         return team_dict
+
+    @classmethod
+    def teamConverter_v3(cls, team):
+        has_nl = team.nl and team.nl.city and team.nl.state_prov and team.nl.country
+        return {
+            'key': team.key.id(),
+            'team_number': team.team_number,
+            'nickname': team.nickname,
+            'name': team.name,
+            'website': team.website,
+            'rookie_year': team.rookie_year,
+            'motto': team.motto,
+            'home_championship': team.championship_location,
+            'city': team.nl.city if has_nl else team.city,
+            'state_prov': team.nl.state_prov if has_nl else team.state_prov,
+            'country': team.nl.country if has_nl else team.country,
+            'lat': team.nl.lat_lng.lat if has_nl else None,
+            'lng': team.nl.lat_lng.lon if has_nl else None,
+        }
 
     @classmethod
     def eventConverter(self, event):

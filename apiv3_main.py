@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 import tba_config
 import webapp2
-from controllers.api.api_status_controller import ApiStatusController  # TODO: temp placeholder
+
+from controllers.apiv3.api_status_controller import ApiStatusController
+from controllers.apiv3.api_team_controller import ApiTeamListController
 
 # Ensure that APIv3 routes include OPTIONS method for CORS preflight compatibility
 # https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests
@@ -11,7 +13,7 @@ app = webapp2.WSGIApplication([
         ApiStatusController, methods=['GET', 'OPTIONS']),
     # Team List
     webapp2.Route(r'/api/v3/teams/<page_num:([0-9]+)>',
-        ApiStatusController, methods=['GET', 'OPTIONS']),
+        ApiTeamListController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/teams/<page_num:([0-9]+)>/<type:(simple|keys)>',
         ApiStatusController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/teams/<year:([0-9]+)>/<page_num:([0-9]+)>',
