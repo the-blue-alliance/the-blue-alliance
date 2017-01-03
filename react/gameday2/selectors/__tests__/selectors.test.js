@@ -44,3 +44,58 @@ describe('getWebcastIdsInDisplayOrder selector', () => {
     expect(selectors.getWebcastIdsInDisplayOrder(sampleState)).toEqual(['b', 'c', 'a', 'e', 'd'])
   })
 })
+
+describe('getChats selector', () => {
+  it('correctly extracts the chats portion of the state', () => {
+    const sampleState = {
+      chats: {
+        chats: {
+          chat: {
+            name: 'chat',
+            channel: 'test',
+          },
+        },
+      },
+      other: {},
+    }
+
+    expect(selectors.getChats(sampleState)).toEqual({
+      chats: {
+        chat: {
+          name: 'chat',
+          channel: 'test',
+        },
+      },
+    })
+  })
+})
+
+describe('getChatsInDisplayOrder selector', () => {
+  it('correctly extrats and sorts the chats', () => {
+    const sampleState = {
+      chats: {
+        chats: {
+          chat1: {
+            name: 'Second in order',
+            channel: 'chat1',
+          },
+          chat2: {
+            name: 'First in order',
+            channel: 'chat2',
+          },
+        },
+      },
+    }
+
+    expect(selectors.getChatsInDisplayOrder(sampleState)).toEqual([
+      {
+        name: 'First in order',
+        channel: 'chat2',
+      },
+      {
+        name: 'Second in order',
+        channel: 'chat1',
+      },
+    ])
+  })
+})

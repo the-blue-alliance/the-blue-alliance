@@ -3,12 +3,21 @@ import * as actions from '../index'
 
 describe('actions', () => {
   it('should create an action to set webcsts from raw data', () => {
-    const webcasts = 'webcast string'
-    const expectedAction = {
+    const getState = () => ({
+      webcastsById: {},
+    })
+    const dispatch = jasmine.createSpy()
+    const webcasts = {}
+    actions.setWebcastsRaw(webcasts)(dispatch, getState)
+    expect(dispatch.calls.count()).toBe(2)
+    expect(dispatch.calls.argsFor(0)).toEqual([{
       type: types.SET_WEBCASTS_RAW,
       webcasts,
-    }
-    expect(actions.setWebcastsRaw(webcasts)).toEqual(expectedAction)
+    }])
+    expect(dispatch.calls.argsFor(1)).toEqual([{
+      type: types.WEBCASTS_UPDATED,
+      webcasts: {},
+    }])
   })
 
   it('should create an action to toggle the hashtag sidebar visibility', () => {
@@ -118,5 +127,14 @@ describe('actions', () => {
       layoutId,
     }
     expect(actions.setLayout(layoutId)).toEqual(expectedAction)
+  })
+
+  it('should create an action to set the current twitch chat', () => {
+    const channel = 'tbagameday'
+    const expectedAction = {
+      type: types.SET_TWITCH_CHAT,
+      channel,
+    }
+    expect(actions.setTwitchChat(channel)).toEqual(expectedAction)
   })
 })
