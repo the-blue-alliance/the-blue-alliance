@@ -77,7 +77,12 @@ const AppBar = (props) => {
             style={vexProStyle}
             href="https://www.vexrobotics.com/vexpro/"
           >
-            <span>POWERED BY </span><img src="/images/vexpro_horiz.png" height={16}/>
+            <span>POWERED BY </span>
+            <img
+              src="/images/vexpro_horiz.png"
+              alt="vexPRO"
+              height={16}
+            />
           </a>
         </ToolbarGroup>
         <ToolbarGroup lastChild>
