@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react'
-import MuiAppBar from 'material-ui/AppBar'
 import { Toolbar, ToolbarTitle, ToolbarGroup } from 'material-ui/Toolbar'
 import FlatButton from 'material-ui/FlatButton'
 import IconButton from 'material-ui/IconButton'
