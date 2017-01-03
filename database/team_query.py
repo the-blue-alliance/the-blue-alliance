@@ -50,6 +50,9 @@ class TeamListYearQuery(DatabaseQuery):
             year_team_keys.add(team_key)
 
         teams = filter(lambda team: team.key.id() in year_team_keys, teams_future.get_result())
+        if dict_version:
+            converter = ModelToDict.teamConverter(dict_version)
+            teams = map(converter, teams)
         raise ndb.Return(teams)
 
 

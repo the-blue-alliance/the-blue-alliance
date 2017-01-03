@@ -17,9 +17,9 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/v3/teams/<page_num:([0-9]+)>/<model_type:(simple|keys)>',
         ApiTeamListController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/teams/<year:([0-9]+)>/<page_num:([0-9]+)>',
-        ApiStatusController, methods=['GET', 'OPTIONS']),
+        ApiTeamListController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/teams/<year:([0-9]+)>/<page_num:([0-9]+)>/<model_type:(simple|keys)>',
-        ApiStatusController, methods=['GET', 'OPTIONS']),
+        ApiTeamListController, methods=['GET', 'OPTIONS']),
     # Team
     webapp2.Route(r'/api/v3/team/<team_key:>',
         ApiStatusController, methods=['GET', 'OPTIONS']),
