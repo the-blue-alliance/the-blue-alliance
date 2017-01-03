@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /_
+Disallow: /advanced_search?*
 Disallow: /admin/
 Disallow: /account/
 Disallow: /api/

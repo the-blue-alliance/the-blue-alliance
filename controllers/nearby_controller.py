@@ -7,7 +7,6 @@ from google.appengine.ext import ndb
 
 from controllers.base_controller import CacheableHandler
 from helpers.location_helper import LocationHelper
-from models.event_team import EventTeam
 from template_engine import jinja2_engine
 
 
@@ -57,10 +56,7 @@ class NearbyController(CacheableHandler):
                 lat, lon = lat_lon
 
                 dist_expr = 'distance(location, geopoint({}, {}))'.format(lat, lon)
-                if search_type == 'teams':
-                    query_string = '{} < {}'.format(dist_expr, range_limit * self.METERS_PER_MILE)
-                else:
-                    query_string = '{} < {} AND year={}'.format(dist_expr, range_limit * self.METERS_PER_MILE, year)
+                query_string = '{} < {} AND year={}'.format(dist_expr, range_limit * self.METERS_PER_MILE, year)
 
                 offset = self.PAGE_SIZE * page
 
@@ -94,27 +90,19 @@ class NearbyController(CacheableHandler):
                 num_results = docs.number_found
                 distances = {}
                 keys = []
-                event_team_count_futures = {}
                 for result in docs.results:
-                    distances[result.doc_id] = result.expressions[0].value / self.METERS_PER_MILE
+                    model_key = result.doc_id
+                    if '_' in model_key:
+                        model_key = model_key.split('_')[0]
+
+                    distances[model_key] = result.expressions[0].value / self.METERS_PER_MILE
                     if search_type == 'teams':
-                        event_team_count_futures[result.doc_id] = EventTeam.query(
-                            EventTeam.team == ndb.Key('Team', result.doc_id),
-                            EventTeam.year == year).count_async(limit=1, keys_only=True)
-                        keys.append(ndb.Key('Team', result.doc_id))
+                        keys.append(ndb.Key('Team', model_key))
                     else:
-                        keys.append(ndb.Key('Event', result.doc_id))
+                        keys.append(ndb.Key('Event', model_key))
 
                 result_futures = ndb.get_multi_async(keys)
-
-                if search_type == 'teams':
-                    results = []
-                    for result_future, team_key in zip(result_futures, keys):
-                        if event_team_count_futures[team_key.id()].get_result() != 0:
-                            results.append(result_future.get_result())
-
-                else:
-                    results = [result_future.get_result() for result_future in result_futures]
+                results = [result_future.get_result() for result_future in result_futures]
 
         self.template_values.update({
             'valid_years': self.VALID_YEARS,

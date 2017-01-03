@@ -43,3 +43,17 @@ export const getWebcastIdsInDisplayOrder = createSelector(
     return displayOrderWebcastIds
   }
 )
+
+export const getChats = (state) => state.chats
+
+export const getChatsInDisplayOrder = createSelector(
+  [getChats],
+  (chats) => {
+    const displayOrderChats = []
+    Object.keys(chats.chats)
+    .filter((key) => ({}.hasOwnProperty.call(chats.chats, key)))
+    .forEach((key) => displayOrderChats.push(chats.chats[key]))
+
+    return displayOrderChats.sort((a, b) => a.name.localeCompare(b.name))
+  }
+)

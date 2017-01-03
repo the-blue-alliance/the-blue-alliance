@@ -5,9 +5,16 @@ import * as types from '../constants/ActionTypes'
  * webcasts.
  */
 export function setWebcastsRaw(webcasts) {
-  return {
-    type: types.SET_WEBCASTS_RAW,
-    webcasts,
+  return (dispatch, getState) => {
+    dispatch({
+      type: types.SET_WEBCASTS_RAW,
+      webcasts,
+    })
+
+    dispatch({
+      type: types.WEBCASTS_UPDATED,
+      webcasts: Object.assign({}, getState().webcastsById),
+    })
   }
 }
 
@@ -110,5 +117,12 @@ export function setLayout(layoutId) {
   return {
     type: types.SET_LAYOUT,
     layoutId,
+  }
+}
+
+export function setTwitchChat(channel) {
+  return {
+    type: types.SET_TWITCH_CHAT,
+    channel,
   }
 }

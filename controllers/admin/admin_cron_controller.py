@@ -360,4 +360,4 @@ class AdminUpdateAllTeamSearchIndexDo(LoggedInHandler):
 class AdminUpdateTeamSearchIndexDo(LoggedInHandler):
     def get(self, team_key):
         team = Team.get_by_id(team_key)
-        SearchHelper.update_team_year_index(team)
+        SearchHelper.update_team_awards_index(team)
