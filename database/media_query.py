@@ -23,6 +23,21 @@ class TeamSocialMediaQuery(DatabaseQuery):
         raise ndb.Return(medias)
 
 
+class TeamMediaQuery(DatabaseQuery):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = 'team_media_{}'  # (team_key)
+
+    def __init__(self, team_key):
+        self._query_args = (team_key, )
+
+    @ndb.tasklet
+    def _query_async(self):
+        team_key = self._query_args[0]
+        medias = yield Media.query(
+            Media.references == ndb.Key(Team, team_key)).fetch_async()
+        raise ndb.Return(medias)
+
+
 class TeamYearMediaQuery(DatabaseQuery):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'team_year_media_{}_{}'  # (team_key, year)
