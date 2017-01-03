@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react'
-import Avatar from 'material-ui/Avatar'
 import MuiAppBar from 'material-ui/AppBar'
 import FlatButton from 'material-ui/FlatButton'
 import IconButton from 'material-ui/IconButton'
@@ -11,12 +10,15 @@ import LampIcon from './LampIcon'
 const AppBar = (props) => {
   const tbaBrandingButton = (
     <IconButton
-      style={{padding: 0}}
+      style={{ padding: 0 }}
       tooltip="Go to The Blue Alliance"
       tooltipPosition="bottom-right"
       href="https://thebluealliance.com"
     >
-      <LampIcon />
+      <LampIcon
+        width={props.muiTheme.layout.appBarHeight - 16}
+        height={props.muiTheme.layout.appBarHeight - 16}
+      />
     </IconButton>
   )
   const configureLayoutButton = (
