@@ -56,7 +56,7 @@ describe('getChats selector', () => {
           },
         },
       },
-      other: {}
+      other: {},
     }
 
     expect(selectors.getChats(sampleState)).toEqual({
@@ -95,7 +95,7 @@ describe('getChatsInDisplayOrder selector', () => {
       {
         name: 'Second in order',
         channel: 'chat1',
-      }
+      },
     ])
   })
 })
