@@ -44,7 +44,7 @@ export const getWebcastIdsInDisplayOrder = createSelector(
   }
 )
 
-const getChats = (state) => state.chats
+export const getChats = (state) => state.chats
 
 export const getChatsInDisplayOrder = createSelector(
   [getChats],
