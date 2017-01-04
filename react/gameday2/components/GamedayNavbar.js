@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react'
 import AppBar from 'material-ui/AppBar'
 import FlatButton from 'material-ui/FlatButton'
+import muiThemeable from 'material-ui/styles/muiThemeable'
 import LayoutDrawer from './LayoutDrawer'
 import { getLayoutSvgIcon } from '../utils/layoutUtils'
 
@@ -14,9 +15,14 @@ const GamedayNavbar = (props) => {
     />
   )
 
+  const appBarStyle = {
+    height: props.muiTheme.layout.appBarHeight,
+  }
+
   return (
     <div>
       <AppBar
+        style={appBarStyle}
         title="GameDay"
         showMenuIconButton={false}
         iconElementRight={configureLayoutButton}
@@ -50,6 +56,7 @@ GamedayNavbar.propTypes = {
   layoutSet: PropTypes.bool.isRequired,
   layoutDrawerVisible: PropTypes.bool.isRequired,
   setLayoutDrawerVisibility: PropTypes.func.isRequired,
+  muiTheme: PropTypes.object.isRequired,
 }
 
-export default GamedayNavbar
+export default muiThemeable()(GamedayNavbar)
