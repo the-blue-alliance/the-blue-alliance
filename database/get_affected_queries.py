@@ -1,5 +1,5 @@
 from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
-from database.event_query import EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
+from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
 from database.match_query import EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
 from database.media_query import TeamSocialMediaQuery, TeamYearMediaQuery, EventTeamsMediasQuery, EventTeamsPreferredMediasQuery
 from database.robot_query import TeamRobotsQuery
@@ -40,6 +40,9 @@ def event_updated(affected_refs):
     event_team_keys_future = EventTeam.query(EventTeam.event.IN([event_key for event_key in event_keys])).fetch_async(None, keys_only=True)
 
     queries_and_keys = []
+    for event_key in event_keys:
+        queries_and_keys.append((EventQuery(event_key.id())))
+
     for year in years:
         queries_and_keys.append((EventListQuery(year)))
 

@@ -5,7 +5,7 @@ from google.appengine.ext import testbed
 
 from database import get_affected_queries
 from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
-from database.event_query import EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
+from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
 from database.match_query import EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
 from database.media_query import TeamSocialMediaQuery, TeamYearMediaQuery, EventTeamsMediasQuery, EventTeamsPreferredMediasQuery
 from database.robot_query import TeamRobotsQuery
@@ -104,7 +104,9 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         }
         cache_keys = [q.cache_key for q in get_affected_queries.event_updated(affected_refs)]
 
-        self.assertEqual(len(cache_keys), 8)
+        self.assertEqual(len(cache_keys), 10)
+        self.assertTrue(EventQuery('2015casj').cache_key in cache_keys)
+        self.assertTrue(EventQuery('2015cama').cache_key in cache_keys)
         self.assertTrue(EventListQuery(2014).cache_key in cache_keys)
         self.assertTrue(EventListQuery(2015).cache_key in cache_keys)
         self.assertTrue(DistrictEventsQuery('2015fim').cache_key in cache_keys)
