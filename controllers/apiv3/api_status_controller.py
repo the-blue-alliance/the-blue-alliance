@@ -37,4 +37,4 @@ class ApiStatusController(ApiBaseController):
         fmsapi_sitevar = fmsapi_sitevar_future.get_result()
         status_dict['is_datafeed_down'] = True if fmsapi_sitevar and fmsapi_sitevar.contents == True else False
         status_dict['down_events'] = down_events_list if down_events_list is not None else []
-        return json.dumps(status_dict, ensure_ascii=True)
+        return json.dumps(status_dict, ensure_ascii=True, indent=2, sort_keys=True)

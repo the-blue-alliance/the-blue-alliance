@@ -43,7 +43,7 @@ class ApiTeamListController(ApiBaseController):
             team_list = TeamListYearQuery(int(year), int(page_num)).fetch(dict_version='3')
         if model_type is not None:
             team_list = filter_team_properties(team_list, model_type)
-        return json.dumps(team_list, ensure_ascii=True)
+        return json.dumps(team_list, ensure_ascii=True, indent=2, sort_keys=True)
 
 
 class ApiTeamController(ApiBaseController):
@@ -61,7 +61,7 @@ class ApiTeamController(ApiBaseController):
         if model_type is not None:
             team = filter_team_properties([team], model_type)[0]
 
-        return json.dumps(team, ensure_ascii=True)
+        return json.dumps(team, ensure_ascii=True, indent=2, sort_keys=True)
 
 
 class ApiTeamYearsParticipatedController(ApiBaseController):
@@ -74,7 +74,7 @@ class ApiTeamYearsParticipatedController(ApiBaseController):
     def _render(self, team_key):
         years_participated = sorted(TeamParticipationQuery(team_key).fetch())
 
-        return json.dumps(years_participated, ensure_ascii=True)
+        return json.dumps(years_participated, ensure_ascii=True, indent=2, sort_keys=True)
 
 
 class ApiTeamHistoryDistrictsController(ApiBaseController):
@@ -90,7 +90,7 @@ class ApiTeamHistoryDistrictsController(ApiBaseController):
     def _render(self, team_key):
         team_districts = TeamDistrictsQuery(team_key).fetch(dict_version='3')
 
-        return json.dumps(team_districts, ensure_ascii=True)
+        return json.dumps(team_districts, ensure_ascii=True, indent=2, sort_keys=True)
 
 
 class ApiTeamHistoryRobotsController(ApiBaseController):
@@ -106,7 +106,7 @@ class ApiTeamHistoryRobotsController(ApiBaseController):
     def _render(self, team_key):
         robots = TeamRobotsQuery(team_key).fetch(dict_version='3')
 
-        return json.dumps(robots, ensure_ascii=True)
+        return json.dumps(robots, ensure_ascii=True, indent=2, sort_keys=True)
 
 
 class ApiTeamEventsController(ApiBaseController):
@@ -129,7 +129,7 @@ class ApiTeamEventsController(ApiBaseController):
             events = TeamEventsQuery(team_key).fetch(dict_version='3')
         if model_type is not None:
             events = filter_event_properties(events, model_type)
-        return json.dumps(events, ensure_ascii=True)
+        return json.dumps(events, ensure_ascii=True, indent=2, sort_keys=True)
 
 
 class ApiTeamEventMatchesController(ApiBaseController):
@@ -147,7 +147,7 @@ class ApiTeamEventMatchesController(ApiBaseController):
         if model_type is not None:
             matches = filter_match_properties(matches, model_type)
 
-        return json.dumps(matches, ensure_ascii=True)
+        return json.dumps(matches, ensure_ascii=True, indent=2, sort_keys=True)
 
 
 class ApiTeamYearMatchesController(ApiBaseController):
@@ -165,7 +165,7 @@ class ApiTeamYearMatchesController(ApiBaseController):
         if model_type is not None:
             matches = filter_match_properties(matches, model_type)
 
-        return json.dumps(matches, ensure_ascii=True)
+        return json.dumps(matches, ensure_ascii=True, indent=2, sort_keys=True)
 
 
 class ApiTeamEventAwardsController(ApiBaseController):
@@ -178,7 +178,7 @@ class ApiTeamEventAwardsController(ApiBaseController):
     def _render(self, team_key, event_key):
         awards = TeamEventAwardsQuery(team_key, event_key).fetch(dict_version='3')
 
-        return json.dumps(awards, ensure_ascii=True)
+        return json.dumps(awards, ensure_ascii=True, indent=2, sort_keys=True)
 
 
 class ApiTeamYearAwardsController(ApiBaseController):
@@ -191,7 +191,7 @@ class ApiTeamYearAwardsController(ApiBaseController):
     def _render(self, team_key, year):
         awards = TeamYearAwardsQuery(team_key, int(year)).fetch(dict_version='3')
 
-        return json.dumps(awards, ensure_ascii=True)
+        return json.dumps(awards, ensure_ascii=True, indent=2, sort_keys=True)
 
 
 class ApiTeamHistoryAwardsController(ApiBaseController):
@@ -207,7 +207,7 @@ class ApiTeamHistoryAwardsController(ApiBaseController):
     def _render(self, team_key):
         awards = TeamAwardsQuery(team_key).fetch(dict_version='3')
 
-        return json.dumps(awards, ensure_ascii=True)
+        return json.dumps(awards, ensure_ascii=True, indent=2, sort_keys=True)
 
 
 class ApiTeamYearMediaController(ApiBaseController):
@@ -222,7 +222,7 @@ class ApiTeamYearMediaController(ApiBaseController):
     def _render(self, team_key, year):
         medias = TeamYearMediaQuery(team_key, int(year)).fetch(dict_version='3')
 
-        return json.dumps(medias, ensure_ascii=True)
+        return json.dumps(medias, ensure_ascii=True, indent=2, sort_keys=True)
 
 
 class ApiTeamSocialMediaController(ApiBaseController):
@@ -235,4 +235,4 @@ class ApiTeamSocialMediaController(ApiBaseController):
     def _render(self, team_key):
         social_medias = TeamSocialMediaQuery(team_key).fetch(dict_version='3')
 
-        return json.dumps(social_medias, ensure_ascii=True)
+        return json.dumps(social_medias, ensure_ascii=True, indent=2, sort_keys=True)
