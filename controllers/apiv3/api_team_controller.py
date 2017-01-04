@@ -8,7 +8,7 @@ from google.appengine.ext import ndb
 from controllers.apiv3.api_base_controller import ApiBaseController
 from controllers.apiv3.model_properties import team_properties, event_properties, match_properties
 from database.event_query import TeamEventsQuery, TeamYearEventsQuery
-from database.match_query import TeamEventMatchesQuery
+from database.match_query import TeamEventMatchesQuery, TeamYearMatchesQuery
 from database.team_query import TeamListQuery, TeamListYearQuery, TeamParticipationQuery, TeamDistrictsQuery
 from database.robot_query import TeamRobotsQuery
 from helpers.model_to_dict import ModelToDict
@@ -220,6 +220,36 @@ class ApiTeamEventMatchesController(ApiTeamControllerBase):
 
     def _render(self, team_key, event_key, model_type=None):
         matches = TeamEventMatchesQuery(self.team_key, self.event_key).fetch(dict_version='3')
+        if model_type is not None:
+            matches = [{key: match[key] for key in match_properties[model_type]} for match in matches]
+
+        return json.dumps(matches, ensure_ascii=True)
+
+
+class ApiTeamYearMatchesController(ApiTeamControllerBase):
+    CACHE_KEY_FORMAT = "apiv3_team_year_matches_controller_{}_{}_{}"  # (team_key, year, model_type)
+    CACHE_VERSION = 1
+    CACHE_HEADER_LENGTH = 61
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamYearMatchesController, self).__init__(*args, **kw)
+        self.team_key = self.request.route_kwargs["team_key"]
+        self.year = self.request.route_kwargs["year"]
+        self.model_type = self.request.route_kwargs.get('model_type')
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.year, self.model_type)
+
+    @property
+    def _validators(self):
+        return [("team_id_validator", self.team_key)]
+
+    def _track_call(self, team_key, year, model_type=None):
+        action = 'team/year/matches'
+        if model_type:
+            action += '/{}'.format(model_type)
+        self._track_call_defer(action, '{}/{}'.format(team_key, year))
+
+    def _render(self, team_key, year, model_type=None):
+        matches = TeamYearMatchesQuery(self.team_key, int(year)).fetch(dict_version='3')
         if model_type is not None:
             matches = [{key: match[key] for key in match_properties[model_type]} for match in matches]
 

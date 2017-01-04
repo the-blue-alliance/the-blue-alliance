@@ -56,4 +56,6 @@ class TeamYearMatchesQuery(DatabaseQuery):
             Match.team_key_names == team_key,
             Match.year == year).fetch_async(keys_only=True)
         matches = yield ndb.get_multi_async(match_keys)
+        if dict_version:
+            matches = ModelToDict.convertMatches(matches, dict_version)
         raise ndb.Return(matches)
