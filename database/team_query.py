@@ -62,6 +62,7 @@ class TeamListYearQuery(DatabaseQuery):
 class DistrictTeamsQuery(DatabaseQuery):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'district_teams_{}'  # (district_key)
+    DICT_CONVERTER = TeamConverter
 
     @ndb.tasklet
     def _query_async(self):
@@ -80,6 +81,7 @@ class DistrictTeamsQuery(DatabaseQuery):
 class EventTeamsQuery(DatabaseQuery):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'event_teams_{}'  # (event_key)
+    DICT_CONVERTER = TeamConverter
 
     @ndb.tasklet
     def _query_async(self):

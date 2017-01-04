@@ -11,6 +11,7 @@ from models.team import Team
 class EventListQuery(DatabaseQuery):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'event_list_{}'  # (year)
+    DICT_CONVERTER = EventConverter
 
     @ndb.tasklet
     def _query_async(self):
@@ -22,6 +23,7 @@ class EventListQuery(DatabaseQuery):
 class DistrictEventsQuery(DatabaseQuery):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'district_events_{}'  # (district_key)
+    DICT_CONVERTER = EventConverter
 
     @ndb.tasklet
     def _query_async(self):

@@ -15,6 +15,7 @@ class DatabaseQuery(object):
     DATABASE_MISSES_MEMCACHE_KEYS = ['database_query_misses_{}:{}'.format(i, DATABASE_QUERY_VERSION) for i in range(25)]
     BASE_CACHE_KEY_FORMAT = "{}:{}:{}"  # (partial_cache_key, cache_version, database_query_version)
     VALID_DICT_VERSIONS = {3}
+    DICT_CONVERTER = None
 
     def __init__(self, *args):
         self._query_args = args
@@ -34,7 +35,8 @@ class DatabaseQuery(object):
         all_cache_keys = []
         for cache_key in cache_keys:
             all_cache_keys.append(cache_key)
-            all_cache_keys += [cls._dict_cache_key(cache_key, valid_dict_version) for valid_dict_version in cls.VALID_DICT_VERSIONS]
+            if cls.DICT_CONVERTER is not None:
+                all_cache_keys += [cls._dict_cache_key(cache_key, valid_dict_version) for valid_dict_version in cls.VALID_DICT_VERSIONS]
         logging.info("Deleting db query cache keys: {}".format(all_cache_keys))
         ndb.delete_multi([ndb.Key(CachedQueryResult, cache_key) for cache_key in all_cache_keys])
 
