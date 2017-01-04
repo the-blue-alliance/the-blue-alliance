@@ -16,6 +16,9 @@ class DatabaseQuery(object):
     BASE_CACHE_KEY_FORMAT = "{}:{}:{}"  # (partial_cache_key, cache_version, database_query_version)
     VALID_DICT_VERSIONS = {'3'}
 
+    def __init__(self, *args):
+        self._query_args = args
+
     @property
     def cache_key(self):
         if not hasattr(self, '_cache_key'):

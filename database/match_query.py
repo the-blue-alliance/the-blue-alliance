@@ -10,9 +10,6 @@ class EventMatchesQuery(DatabaseQuery):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = 'event_matches_{}'  # (event_key)
 
-    def __init__(self, event_key):
-        self._query_args = (event_key, )
-
     @ndb.tasklet
     def _query_async(self, dict_version):
         event_key = self._query_args[0]
@@ -24,9 +21,6 @@ class EventMatchesQuery(DatabaseQuery):
 class TeamEventMatchesQuery(DatabaseQuery):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = 'team_event_matches_{}_{}'  # (team_key, event_key)
-
-    def __init__(self, team_key, event_key):
-        self._query_args = (team_key, event_key, )
 
     @ndb.tasklet
     def _query_async(self, dict_version):
@@ -44,9 +38,6 @@ class TeamEventMatchesQuery(DatabaseQuery):
 class TeamYearMatchesQuery(DatabaseQuery):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = 'team_year_matches_{}_{}'  # (team_key, year)
-
-    def __init__(self, team_key, year):
-        self._query_args = (team_key, year, )
 
     @ndb.tasklet
     def _query_async(self, dict_version):

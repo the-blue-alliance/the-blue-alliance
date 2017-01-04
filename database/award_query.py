@@ -11,9 +11,6 @@ class EventAwardsQuery(DatabaseQuery):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = 'event_awards_{}'  # (event_key)
 
-    def __init__(self, event_key):
-        self._query_args = (event_key, )
-
     @ndb.tasklet
     def _query_async(self, dict_version):
         event_key = self._query_args[0]
@@ -26,9 +23,6 @@ class EventAwardsQuery(DatabaseQuery):
 class TeamAwardsQuery(DatabaseQuery):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = 'team_awards_{}'  # (team_key)
-
-    def __init__(self, team_key):
-        self._query_args = (team_key, )
 
     @ndb.tasklet
     def _query_async(self, dict_version):
@@ -43,9 +37,6 @@ class TeamAwardsQuery(DatabaseQuery):
 class TeamYearAwardsQuery(DatabaseQuery):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = 'team_year_awards_{}_{}'  # (team_key, year)
-
-    def __init__(self, team_key, year):
-        self._query_args = (team_key, year, )
 
     @ndb.tasklet
     def _query_async(self, dict_version):
@@ -62,9 +53,6 @@ class TeamYearAwardsQuery(DatabaseQuery):
 class TeamEventAwardsQuery(DatabaseQuery):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = 'team_event_awards_{}_{}'  # (team_key, event_key)
-
-    def __init__(self, team_key, event_key):
-        self._query_args = (team_key, event_key, )
 
     @ndb.tasklet
     def _query_async(self, dict_version):

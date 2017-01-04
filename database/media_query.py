@@ -12,9 +12,6 @@ class TeamSocialMediaQuery(DatabaseQuery):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = 'team_social_media_{}'  # (team_key)
 
-    def __init__(self, team_key):
-        self._query_args = (team_key, )
-
     @ndb.tasklet
     def _query_async(self, dict_version):
         team_key = self._query_args[0]
@@ -30,9 +27,6 @@ class TeamMediaQuery(DatabaseQuery):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'team_media_{}'  # (team_key)
 
-    def __init__(self, team_key):
-        self._query_args = (team_key, )
-
     @ndb.tasklet
     def _query_async(self, dict_version):
         team_key = self._query_args[0]
@@ -44,9 +38,6 @@ class TeamMediaQuery(DatabaseQuery):
 class TeamYearMediaQuery(DatabaseQuery):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'team_year_media_{}_{}'  # (team_key, year)
-
-    def __init__(self, team_key, year):
-        self._query_args = (team_key, year, )
 
     @ndb.tasklet
     def _query_async(self, dict_version):
@@ -63,9 +54,6 @@ class TeamYearMediaQuery(DatabaseQuery):
 class EventTeamsMediasQuery(DatabaseQuery):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'event_teams_medias_{}'  # (event_key)
-
-    def __init__(self, event_key):
-        self._query_args = (event_key, )
 
     @ndb.tasklet
     def _query_async(self, dict_version):
@@ -84,9 +72,6 @@ class EventTeamsMediasQuery(DatabaseQuery):
 class EventTeamsPreferredMediasQuery(DatabaseQuery):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'event_teams_medias_preferred_{}'  # (event_key)
-
-    def __init__(self, event_key):
-        self._query_args = (event_key, )
 
     @ndb.tasklet
     def _query_async(self, dict_version):
