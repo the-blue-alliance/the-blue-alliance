@@ -1,6 +1,7 @@
 from google.appengine.ext import ndb
 
 from database.database_query import DatabaseQuery
+from helpers.model_to_dict import ModelToDict
 from models.award import Award
 from models.event import Event
 from models.team import Team
@@ -17,6 +18,8 @@ class EventAwardsQuery(DatabaseQuery):
     def _query_async(self, dict_version):
         event_key = self._query_args[0]
         awards = yield Award.query(Award.event == ndb.Key(Event, event_key)).fetch_async()
+        if dict_version:
+            awards = ModelToDict.convertAwards(awards, dict_version)
         raise ndb.Return(awards)
 
 
@@ -32,6 +35,8 @@ class TeamAwardsQuery(DatabaseQuery):
         team_key = self._query_args[0]
         awards = yield Award.query(
             Award.team_list == ndb.Key(Team, team_key)).fetch_async()
+        if dict_version:
+            awards = ModelToDict.convertAwards(awards, dict_version)
         raise ndb.Return(awards)
 
 
@@ -49,6 +54,8 @@ class TeamYearAwardsQuery(DatabaseQuery):
         awards = yield Award.query(
             Award.team_list == ndb.Key(Team, team_key),
             Award.year == year).fetch_async()
+        if dict_version:
+            awards = ModelToDict.convertAwards(awards, dict_version)
         raise ndb.Return(awards)
 
 
@@ -66,4 +73,6 @@ class TeamEventAwardsQuery(DatabaseQuery):
         awards = yield Award.query(
             Award.team_list == ndb.Key(Team, team_key),
             Award.event == ndb.Key(Event, event_key)).fetch_async()
+        if dict_version:
+            awards = ModelToDict.convertAwards(awards, dict_version)
         raise ndb.Return(awards)

@@ -232,6 +232,13 @@ class ModelToDict(object):
         return match_dict
 
     @classmethod
+    def convertAwards(cls, awards, dict_version):
+        AWARD_CONVERTERS = {
+            '3': cls.awardsConverter_v3,
+        }
+        return AWARD_CONVERTERS[dict_version](awards)
+
+    @classmethod
     def awardConverter(self, award):
         """
         return top level award dictionary
@@ -244,6 +251,27 @@ class ModelToDict(object):
         award_dict["recipient_list"] = award.recipient_list
 
         return award_dict
+
+    @classmethod
+    def awardsConverter_v3(cls, awards):
+        awards = map(cls.awardConverter_v3, awards)
+        return awards
+
+    @classmethod
+    def awardConverter_v3(cls, award):
+        recipient_list_fixed = []
+        for recipient in award.recipient_list:
+            recipient_list_fixed.append({
+                'awardee': recipient['awardee'],
+                'team_key': 'frc{}'.format(recipient['team_number']),
+            })
+        return {
+            'name': award.name_str,
+            'award_type': award.award_type_enum,
+            'year': award.year,
+            'event_key': award.event.id(),
+            'recipient_list': recipient_list_fixed,
+        }
 
     @classmethod
     def mediaConverter(self, media):

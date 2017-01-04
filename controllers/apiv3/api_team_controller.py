@@ -7,6 +7,7 @@ from google.appengine.ext import ndb
 
 from controllers.apiv3.api_base_controller import ApiBaseController
 from controllers.apiv3.model_properties import team_properties, event_properties, match_properties
+from database.award_query import TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
 from database.event_query import TeamEventsQuery, TeamYearEventsQuery
 from database.match_query import TeamEventMatchesQuery, TeamYearMatchesQuery
 from database.team_query import TeamListQuery, TeamListYearQuery, TeamParticipationQuery, TeamDistrictsQuery
@@ -254,3 +255,75 @@ class ApiTeamYearMatchesController(ApiTeamControllerBase):
             matches = [{key: match[key] for key in match_properties[model_type]} for match in matches]
 
         return json.dumps(matches, ensure_ascii=True)
+
+
+class ApiTeamEventAwardsController(ApiTeamControllerBase):
+    CACHE_KEY_FORMAT = "apiv3_team_event_awards_controller_{}_{}"  # (team_key, event_key)
+    CACHE_VERSION = 1
+    CACHE_HEADER_LENGTH = 60 * 60
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamEventAwardsController, self).__init__(*args, **kw)
+        self.team_key = self.request.route_kwargs["team_key"]
+        self.event_key = self.request.route_kwargs["event_key"]
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.event_key)
+
+    @property
+    def _validators(self):
+        return [("team_id_validator", self.team_key), ("event_id_validator", self.event_key)]
+
+    def _track_call(self, team_key, event_key):
+        self._track_call_defer('team/event/awards', '{}/{}'.format(team_key, event_key))
+
+    def _render(self, team_key, event_key):
+        awards = TeamEventAwardsQuery(self.team_key, self.event_key).fetch(dict_version='3')
+
+        return json.dumps(awards, ensure_ascii=True)
+
+
+class ApiTeamYearAwardsController(ApiTeamControllerBase):
+    CACHE_KEY_FORMAT = "apiv3_team_year_awards_controller_{}_{}"  # (team_key, year)
+    CACHE_VERSION = 1
+    CACHE_HEADER_LENGTH = 60 * 60
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamYearAwardsController, self).__init__(*args, **kw)
+        self.team_key = self.request.route_kwargs["team_key"]
+        self.year = self.request.route_kwargs["year"]
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.year)
+
+    @property
+    def _validators(self):
+        return [("team_id_validator", self.team_key)]
+
+    def _track_call(self, team_key, year):
+        self._track_call_defer('team/year/awards', '{}/{}'.format(team_key, year))
+
+    def _render(self, team_key, year):
+        awards = TeamYearAwardsQuery(self.team_key, int(year)).fetch(dict_version='3')
+
+        return json.dumps(awards, ensure_ascii=True)
+
+
+class ApiTeamHistoryAwardsController(ApiTeamControllerBase):
+    """
+    Returns a JSON list of award models won by a team
+    """
+    CACHE_KEY_FORMAT = "apiv3_team_history_awards_controller_{}"  # (team_key)
+    CACHE_VERSION = 1
+    CACHE_HEADER_LENGTH = 60 * 60
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamHistoryAwardsController, self).__init__(*args, **kw)
+        self.team_key = self.request.route_kwargs['team_key']
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key)
+
+    def _track_call(self, team_key):
+        self._track_call_defer('team/history/awards', team_key)
+
+    def _render(self, team_key):
+        self._set_team(team_key)
+
+        awards = TeamAwardsQuery(self.team_key).fetch(dict_version='3')
+
+        return json.dumps(awards, ensure_ascii=True)
