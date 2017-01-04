@@ -1,6 +1,7 @@
 from google.appengine.ext import ndb
 
 from database.database_query import DatabaseQuery
+from helpers.model_to_dict import ModelToDict
 from models.event import Event
 from models.match import Match
 
@@ -35,6 +36,8 @@ class TeamEventMatchesQuery(DatabaseQuery):
             Match.team_key_names == team_key,
             Match.event == ndb.Key(Event, event_key)).fetch_async(keys_only=True)
         matches = yield ndb.get_multi_async(match_keys)
+        if dict_version:
+            matches = ModelToDict.convertMatches(matches, dict_version)
         raise ndb.Return(matches)
 
 

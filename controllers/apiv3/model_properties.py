@@ -25,3 +25,17 @@ team_properties = {
         'country'],
     'keys': ['key']
 }
+
+match_properties = {
+    'simple': [
+        'key',
+        'event_key',
+        'comp_level',
+        'set_number',
+        'match_number',
+        'alliances',
+        'winning_alliance',
+        'time',
+        'actual_time'],
+    'keys': ['key']
+}
