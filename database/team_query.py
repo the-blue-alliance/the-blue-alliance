@@ -9,6 +9,19 @@ from models.event_team import EventTeam
 from models.team import Team
 
 
+class TeamQuery(DatabaseQuery):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = 'team_{}'  # (team_key)
+
+    @ndb.tasklet
+    def _query_async(self, dict_version):
+        team_key = self._query_args[0]
+        team = yield Team.get_by_id_async(team_key)
+        if dict_version:
+            team = ModelToDict.convertTeams([team], dict_version)[0]
+        raise ndb.Return(team)
+
+
 class TeamListQuery(DatabaseQuery):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'team_list_{}'  # (page_num)

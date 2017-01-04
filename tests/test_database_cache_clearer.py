@@ -9,7 +9,7 @@ from database.event_query import EventListQuery, DistrictEventsQuery, TeamEvents
 from database.match_query import EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
 from database.media_query import TeamSocialMediaQuery, TeamYearMediaQuery, EventTeamsMediasQuery, EventTeamsPreferredMediasQuery
 from database.robot_query import TeamRobotsQuery
-from database.team_query import TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
+from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
 
 from consts.district_type import DistrictType
 
@@ -169,7 +169,9 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         }
         cache_keys = [q.cache_key for q in get_affected_queries.team_updated(affected_refs)]
 
-        self.assertEqual(len(cache_keys), 10)
+        self.assertEqual(len(cache_keys), 12)
+        self.assertTrue(TeamQuery('frc254').cache_key in cache_keys)
+        self.assertTrue(TeamQuery('frc604').cache_key in cache_keys)
         self.assertTrue(TeamListQuery(0).cache_key in cache_keys)
         self.assertTrue(TeamListQuery(1).cache_key in cache_keys)
         self.assertTrue(TeamListYearQuery(2015, 0).cache_key in cache_keys)

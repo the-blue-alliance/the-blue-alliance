@@ -11,9 +11,8 @@ from database.award_query import TeamAwardsQuery, TeamYearAwardsQuery, TeamEvent
 from database.event_query import TeamEventsQuery, TeamYearEventsQuery
 from database.match_query import TeamEventMatchesQuery, TeamYearMatchesQuery
 from database.media_query import TeamYearMediaQuery, TeamSocialMediaQuery
-from database.team_query import TeamListQuery, TeamListYearQuery, TeamParticipationQuery, TeamDistrictsQuery
+from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, TeamParticipationQuery, TeamDistrictsQuery
 from database.robot_query import TeamRobotsQuery
-from helpers.model_to_dict import ModelToDict
 from models.team import Team
 
 
@@ -58,7 +57,7 @@ class ApiTeamController(ApiBaseController):
         self._track_call_defer(action, team_key)
 
     def _render(self, team_key, model_type=None):
-        team = ModelToDict.teamConverter_v3(Team.get_by_id(team_key))
+        team = TeamQuery(team_key).fetch(dict_version='3')
         if model_type is not None:
             team = {key: team[key] for key in team_properties[model_type]}
 
