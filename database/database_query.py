@@ -40,7 +40,6 @@ class DatabaseQuery(object):
 
     @classmethod
     def _dict_cache_key(cls, cache_key, dict_version):
-        print '{}~dictv{}.{}'.format(cache_key, dict_version, cls.DICT_CONVERTER.SUBVERSIONS[dict_version]), '!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
         return '{}~dictv{}.{}'.format(cache_key, dict_version, cls.DICT_CONVERTER.SUBVERSIONS[dict_version])
 
     def fetch(self, dict_version=None):
