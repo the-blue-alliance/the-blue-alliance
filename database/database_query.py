@@ -1,3 +1,4 @@
+import datetime
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
 
@@ -61,7 +62,6 @@ class DatabaseQuery(object):
         cached_query = yield CachedQueryResult.get_by_id_async(cache_key)
         do_stats = random.random() < tba_config.RECORD_FRACTION
         rpcs = []
-        updated = None
         if cached_query is None:
             if do_stats:
                 rpcs.append(MEMCACHE_CLIENT.incr_async(
@@ -81,6 +81,7 @@ class DatabaseQuery(object):
                         id=cache_key,
                         result=query_result,
                     ).put_async())
+            updated = datetime.datetime.now()
         else:
             if do_stats:
                 rpcs.append(MEMCACHE_CLIENT.incr_async(
