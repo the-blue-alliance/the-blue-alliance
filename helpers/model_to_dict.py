@@ -357,7 +357,5 @@ class ModelToDict(object):
         districts_dict = {}
         for district_key in district_keys:
             year_key = district_key.id().split('_')[0]
-            year = int(year_key[:4])
-            key = year_key[4:]
-            districts_dict[year] = key
+            districts_dict[int(year_key[:4])] = year_key[4:]
         return districts_dict
