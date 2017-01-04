@@ -3,7 +3,7 @@ from database.event_query import EventListQuery, DistrictEventsQuery, TeamEvents
 from database.match_query import EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
 from database.media_query import TeamSocialMediaQuery, TeamYearMediaQuery, EventTeamsMediasQuery, EventTeamsPreferredMediasQuery
 from database.robot_query import TeamRobotsQuery
-from database.team_query import TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
+from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
 
 from models.district_team import DistrictTeam
 from models.event_team import EventTeam
@@ -115,6 +115,7 @@ def team_updated(affected_refs):
 
     queries_and_keys = []
     for team_key in team_keys:
+        queries_and_keys.append((TeamQuery(team_key.id())))
         page_num = _get_team_page_num(team_key.id())
         queries_and_keys.append((TeamListQuery(page_num)))
 

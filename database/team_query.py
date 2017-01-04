@@ -1,6 +1,8 @@
 from google.appengine.ext import ndb
 
 from consts.district_type import DistrictType
+from database.dict_converters.district_converter import DistrictConverter
+from database.dict_converters.team_converter import TeamConverter
 from database.database_query import DatabaseQuery
 from models.district_team import DistrictTeam
 from models.event import Event
@@ -8,13 +10,23 @@ from models.event_team import EventTeam
 from models.team import Team
 
 
+class TeamQuery(DatabaseQuery):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = 'team_{}'  # (team_key)
+    DICT_CONVERTER = TeamConverter
+
+    @ndb.tasklet
+    def _query_async(self):
+        team_key = self._query_args[0]
+        team = yield Team.get_by_id_async(team_key)
+        raise ndb.Return(team)
+
+
 class TeamListQuery(DatabaseQuery):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'team_list_{}'  # (page_num)
     PAGE_SIZE = 500
-
-    def __init__(self, page_num):
-        self._query_args = (page_num, )
+    DICT_CONVERTER = TeamConverter
 
     @ndb.tasklet
     def _query_async(self):
@@ -28,9 +40,7 @@ class TeamListQuery(DatabaseQuery):
 class TeamListYearQuery(DatabaseQuery):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'team_list_year_{}_{}'  # (year, page_num)
-
-    def __init__(self, year, page_num):
-        self._query_args = (year, page_num, )
+    DICT_CONVERTER = TeamConverter
 
     @ndb.tasklet
     def _query_async(self):
@@ -52,9 +62,7 @@ class TeamListYearQuery(DatabaseQuery):
 class DistrictTeamsQuery(DatabaseQuery):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'district_teams_{}'  # (district_key)
-
-    def __init__(self, district_key):
-        self._query_args = (district_key, )
+    DICT_CONVERTER = TeamConverter
 
     @ndb.tasklet
     def _query_async(self):
@@ -73,9 +81,7 @@ class DistrictTeamsQuery(DatabaseQuery):
 class EventTeamsQuery(DatabaseQuery):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'event_teams_{}'  # (event_key)
-
-    def __init__(self, event_key):
-        self._query_args = (event_key, )
+    DICT_CONVERTER = TeamConverter
 
     @ndb.tasklet
     def _query_async(self):
@@ -90,9 +96,6 @@ class TeamParticipationQuery(DatabaseQuery):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = 'team_participation_{}'  # (team_key)
 
-    def __init__(self, team_key):
-        self._query_args = (team_key, )
-
     @ndb.tasklet
     def _query_async(self):
         team_key = self._query_args[0]
@@ -104,9 +107,7 @@ class TeamParticipationQuery(DatabaseQuery):
 class TeamDistrictsQuery(DatabaseQuery):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = 'team_districts_{}'  # (team_key)
-
-    def __init__(self, team_key):
-        self._query_args = (team_key, )
+    DICT_CONVERTER = DistrictConverter
 
     @ndb.tasklet
     def _query_async(self):
@@ -117,5 +118,4 @@ class TeamDistrictsQuery(DatabaseQuery):
             district_key = district_team_key.id().split('_')[0]
             year = int(district_key[:4])
             ret[year] = district_key
-
         raise ndb.Return(ret)

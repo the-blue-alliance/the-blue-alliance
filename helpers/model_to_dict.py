@@ -1,12 +1,8 @@
 import logging
 import time
 
-from consts.district_type import DistrictType
-from consts.media_type import MediaType
-
 
 class ModelToDict(object):
-
     @classmethod
     def teamConverter(self, team):
         """

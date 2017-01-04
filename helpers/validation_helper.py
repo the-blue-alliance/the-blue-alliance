@@ -2,6 +2,7 @@ from consts.district_type import DistrictType
 from models.event import Event
 from models.match import Match
 from models.team import Team
+import tba_config
 
 
 class ValidationHelper(object):
@@ -31,10 +32,51 @@ class ValidationHelper(object):
             return error_dict
 
     @classmethod
+    def validate_request(cls, handler):
+        kwargs = handler.request.route_kwargs
+        error_dict = {'Errors': []}
+        valid = True
+        team_future = None
+        event_future = None
+        # Check key formats
+        if 'team_key' in kwargs:
+            team_key = kwargs['team_key']
+            results = cls.team_id_validator(team_key)
+            if results:
+                error_dict['Errors'].append(results)
+                valid = False
+            else:
+                team_future = Team.get_by_id_async(team_key)
+        if 'event_key' in kwargs:
+            event_key = kwargs['event_key']
+            results = cls.event_id_validator(event_key)
+            if results:
+                error_dict['Errors'].append(results)
+                valid = False
+            else:
+                event_future = Event.get_by_id_async(event_key)
+        if 'year' in kwargs:
+            year = int(kwargs['year'])
+            if year > tba_config.MAX_YEAR or year < 1992:
+                error_dict['Errors'].append({'year': 'Invalid year: {}. Must be between 1992 and {} inclusive.'.format(year, tba_config.MAX_YEAR)})
+                valid = False
+
+        # Check if keys exist
+        if team_future and team_future.get_result() is None:
+            error_dict['Errors'].append({'team_id': 'team id {} does not exist'.format(team_key)})
+            valid = False
+        if event_future and event_future.get_result() is None:
+            error_dict['Errors'].append({'event_id': 'event id {} does not exist'.format(event_key)})
+            valid = False
+
+        if not valid:
+            return error_dict
+
+    @classmethod
     def is_valid_model_key(cls, key):
         return (Team.validate_key_name(key) or
             Event.validate_key_name(key) or
-            Match.validate_key_name(key) or 
+            Match.validate_key_name(key) or
             key[3:] in DistrictType.abbrevs)
 
     @classmethod

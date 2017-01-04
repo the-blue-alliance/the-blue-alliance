@@ -2,6 +2,7 @@ from google.appengine.ext import ndb
 
 from consts.district_type import DistrictType
 from database.database_query import DatabaseQuery
+from database.dict_converters.event_converter import EventConverter
 from models.event import Event
 from models.event_team import EventTeam
 from models.team import Team
@@ -10,9 +11,7 @@ from models.team import Team
 class EventListQuery(DatabaseQuery):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'event_list_{}'  # (year)
-
-    def __init__(self, year):
-        self._query_args = (year, )
+    DICT_CONVERTER = EventConverter
 
     @ndb.tasklet
     def _query_async(self):
@@ -24,9 +23,7 @@ class EventListQuery(DatabaseQuery):
 class DistrictEventsQuery(DatabaseQuery):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'district_events_{}'  # (district_key)
-
-    def __init__(self, district_key):
-        self._query_args = (district_key, )
+    DICT_CONVERTER = EventConverter
 
     @ndb.tasklet
     def _query_async(self):
@@ -43,9 +40,7 @@ class DistrictEventsQuery(DatabaseQuery):
 class TeamEventsQuery(DatabaseQuery):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'team_events_{}'  # (team_key)
-
-    def __init__(self, team_key):
-        self._query_args = (team_key, )
+    DICT_CONVERTER = EventConverter
 
     @ndb.tasklet
     def _query_async(self):
@@ -59,9 +54,7 @@ class TeamEventsQuery(DatabaseQuery):
 class TeamYearEventsQuery(DatabaseQuery):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'team_year_events_{}_{}'  # (team_key, year)
-
-    def __init__(self, team_key, year):
-        self._query_args = (team_key, year, )
+    DICT_CONVERTER = EventConverter
 
     @ndb.tasklet
     def _query_async(self):
