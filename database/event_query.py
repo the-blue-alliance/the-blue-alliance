@@ -8,6 +8,18 @@ from models.event_team import EventTeam
 from models.team import Team
 
 
+class EventQuery(DatabaseQuery):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = 'event_{}'  # (event_key)
+    DICT_CONVERTER = EventConverter
+
+    @ndb.tasklet
+    def _query_async(self):
+        event_key = self._query_args[0]
+        event = yield Event.get_by_id_async(event_key)
+        raise ndb.Return(event)
+
+
 class EventListQuery(DatabaseQuery):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'event_list_{}'  # (year)

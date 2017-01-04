@@ -6,7 +6,7 @@ from google.appengine.ext import ndb
 from controllers.apiv3.api_base_controller import ApiBaseController
 from controllers.apiv3.model_properties import filter_event_properties, filter_team_properties, filter_match_properties
 # from database.award_query import TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
-from database.event_query import EventListQuery
+from database.event_query import EventQuery, EventListQuery
 # from database.match_query import TeamEventMatchesQuery, TeamYearMatchesQuery
 # from database.media_query import TeamYearMediaQuery, TeamSocialMediaQuery
 # from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, TeamParticipationQuery, TeamDistrictsQuery
@@ -28,3 +28,21 @@ class ApiEventListController(ApiBaseController):
         if model_type is not None:
             events = filter_event_properties(events, model_type)
         return json.dumps(events, ensure_ascii=True, indent=True, sort_keys=True)
+
+
+class ApiEventController(ApiBaseController):
+    CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
+
+    def _track_call(self, event_key, model_type=None):
+        action = 'event'
+        if model_type:
+            action += '/{}'.format(model_type)
+        self._track_call_defer(action, event_key)
+
+    def _render(self, event_key, model_type=None):
+        event, self._last_modified = EventQuery(event_key).fetch(dict_version=3, return_updated=True)
+        if model_type is not None:
+            event = filter_event_properties([event], model_type)[0]
+
+        return json.dumps(event, ensure_ascii=True, indent=2, sort_keys=True)
