@@ -1,9 +1,6 @@
 import logging
 import time
 
-from consts.district_type import DistrictType
-from consts.media_type import MediaType
-
 
 class ModelToDict(object):
     @classmethod
@@ -347,3 +344,20 @@ class ModelToDict(object):
             'year': robot.year,
             'robot_name': robot.robot_name,
         }
+
+    @classmethod
+    def convertDistricts(cls, district_keys, dict_version):
+        DISTRICT_CONVERTERS = {
+            '3': cls.districtsConverter_v3,
+        }
+        return DISTRICT_CONVERTERS[dict_version](district_keys)
+
+    @classmethod
+    def districtsConverter_v3(cls, district_keys):
+        districts_dict = {}
+        for district_key in district_keys:
+            year_key = district_key.id().split('_')[0]
+            year = int(year_key[:4])
+            key = year_key[4:]
+            districts_dict[year] = key
+        return districts_dict

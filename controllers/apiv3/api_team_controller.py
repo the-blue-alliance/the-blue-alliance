@@ -88,7 +88,7 @@ class ApiTeamHistoryDistrictsController(ApiBaseController):
         self._track_call_defer('team/history/districts', team_key)
 
     def _render(self, team_key):
-        team_districts = TeamDistrictsQuery(team_key).fetch()
+        team_districts = TeamDistrictsQuery(team_key).fetch(dict_version='3')
 
         return json.dumps(team_districts, ensure_ascii=True)
 

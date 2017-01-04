@@ -112,10 +112,15 @@ class TeamDistrictsQuery(DatabaseQuery):
     def _query_async(self, dict_version):
         team_key = self._query_args[0]
         district_team_keys = yield DistrictTeam.query(DistrictTeam.team == ndb.Key(Team, team_key)).fetch_async(keys_only=True)
-        ret = {}
-        for district_team_key in district_team_keys:
-            district_key = district_team_key.id().split('_')[0]
-            year = int(district_key[:4])
-            ret[year] = district_key
+        if dict_version:
+            ret = ModelToDict.convertDistricts(district_team_keys, dict_version)
+        else:
+            # This conversion really shouldn't happen and the raw district_team_keys should be stored
+            # -fangeugene 2017/01/04
+            ret = {}
+            for district_team_key in district_team_keys:
+                district_key = district_team_key.id().split('_')[0]
+                year = int(district_key[:4])
+                ret[year] = district_key
 
         raise ndb.Return(ret)
