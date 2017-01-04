@@ -7,32 +7,6 @@ from consts.media_type import MediaType
 
 class ModelToDict(object):
     @classmethod
-    def constructLocation_v3(cls, model):
-        """
-        Works for teams and events
-        """
-        has_nl = model.nl and model.nl.city and model.nl.state_prov and model.nl.country
-        return {
-            'city': model.nl.city if has_nl else model.city,
-            'state_prov': model.nl.state_prov if has_nl else model.state_prov,
-            'country': model.nl.country if has_nl else model.country,
-            'postal_code': model.nl.postal_code if has_nl else model.postalcode,
-            'lat': model.nl.lat_lng.lat if has_nl else None,
-            'lng': model.nl.lat_lng.lon if has_nl else None,
-            'location_name': model.nl.name if has_nl else None,
-            'address': model.nl.formatted_address if has_nl else None,
-            'gmaps_place_id': model.nl.place_id if has_nl else None,
-            'gmaps_url': model.nl.place_details.get('url') if has_nl else None,
-        }
-
-    @classmethod
-    def convertTeams(cls, teams, dict_version):
-        TEAM_CONVERTERS = {
-            '3': cls.teamsConverter_v3,
-        }
-        return TEAM_CONVERTERS[dict_version](teams)
-
-    @classmethod
     def teamConverter(self, team):
         """
         return top level team dictionary
@@ -56,33 +30,6 @@ class ModelToDict(object):
             logging.warning("Failed to include Address for api_team_info_%s: %s" % (team.key.id(), e))
 
         return team_dict
-
-    @classmethod
-    def teamsConverter_v3(cls, teams):
-        return map(cls.teamConverter_v3, teams)
-
-    @classmethod
-    def teamConverter_v3(cls, team):
-        has_nl = team.nl and team.nl.city and team.nl.state_prov and team.nl.country
-        team_dict = {
-            'key': team.key.id(),
-            'team_number': team.team_number,
-            'nickname': team.nickname,
-            'name': team.name,
-            'website': team.website,
-            'rookie_year': team.rookie_year,
-            'motto': team.motto,
-            'home_championship': team.championship_location,
-        }
-        team_dict.update(cls.constructLocation_v3(team))
-        return team_dict
-
-    @classmethod
-    def convertEvents(cls, events, dict_version):
-        EVENT_CONVERTERS = {
-            '3': cls.eventsConverter_v3,
-        }
-        return EVENT_CONVERTERS[dict_version](events)
 
     @classmethod
     def eventConverter(self, event):
@@ -128,6 +75,133 @@ class ModelToDict(object):
         return event_dict
 
     @classmethod
+    def favoriteConverter(self, favorite):
+        return {
+            'model_type': favorite.model_type,
+            'model_key': favorite.model_key
+        }
+
+    @classmethod
+    def matchConverter(self, match):
+        """
+        return top level match dictionary
+        """
+        match_dict = dict()
+        match_dict["key"] = match.key_name
+        match_dict["event_key"] = match.event.id()
+        match_dict["alliances"] = match.alliances
+        match_dict["score_breakdown"] = match.score_breakdown
+        match_dict["comp_level"] = match.comp_level
+        match_dict["match_number"] = match.match_number
+        match_dict["set_number"] = match.set_number
+        match_dict["videos"] = match.videos
+        match_dict["time_string"] = match.time_string
+        if match.time is not None:
+            match_dict["time"] = int(time.mktime(match.time.timetuple()))
+        else:
+            match_dict["time"] = None
+
+        return match_dict
+
+    @classmethod
+    def awardConverter(self, award):
+        """
+        return top level award dictionary
+        """
+        award_dict = dict()
+        award_dict["name"] = award.name_str
+        award_dict["award_type"] = award.award_type_enum
+        award_dict["year"] = award.year
+        award_dict["event_key"] = award.event.id()
+        award_dict["recipient_list"] = award.recipient_list
+
+        return award_dict
+
+    @classmethod
+    def mediaConverter(self, media):
+        """
+        return top level media dictionary
+        """
+        media_dict = dict()
+        media_dict["type"] = media.slug_name
+        media_dict["foreign_key"] = media.foreign_key
+        if media.details is not None:
+            media_dict["details"] = media.details
+        else:
+            media_dict["details"] = {}
+        media_dict["preferred"] = True if media.preferred_references != [] else False
+
+        return media_dict
+
+    @classmethod
+    def robotConverter(self, robot):
+        """
+        return top level robot dict
+        """
+        robot_dict = dict()
+        robot_dict["key"] = robot.key_name
+        robot_dict["team_key"] = robot.team.id()
+        robot_dict["year"] = robot.year
+        robot_dict["name"] = robot.robot_name
+        return robot_dict
+
+    """
+    Begin converters for database queries
+    """
+    @classmethod
+    def constructLocation_v3(cls, model):
+        """
+        Works for teams and events
+        """
+        has_nl = model.nl and model.nl.city and model.nl.state_prov and model.nl.country
+        return {
+            'city': model.nl.city if has_nl else model.city,
+            'state_prov': model.nl.state_prov if has_nl else model.state_prov,
+            'country': model.nl.country if has_nl else model.country,
+            'postal_code': model.nl.postal_code if has_nl else model.postalcode,
+            'lat': model.nl.lat_lng.lat if has_nl else None,
+            'lng': model.nl.lat_lng.lon if has_nl else None,
+            'location_name': model.nl.name if has_nl else None,
+            'address': model.nl.formatted_address if has_nl else None,
+            'gmaps_place_id': model.nl.place_id if has_nl else None,
+            'gmaps_url': model.nl.place_details.get('url') if has_nl else None,
+        }
+
+    @classmethod
+    def convertTeams(cls, teams, dict_version):
+        TEAM_CONVERTERS = {
+            '3': cls.teamsConverter_v3,
+        }
+        return TEAM_CONVERTERS[dict_version](teams)
+
+    @classmethod
+    def teamsConverter_v3(cls, teams):
+        return map(cls.teamConverter_v3, teams)
+
+    @classmethod
+    def teamConverter_v3(cls, team):
+        has_nl = team.nl and team.nl.city and team.nl.state_prov and team.nl.country
+        team_dict = {
+            'key': team.key.id(),
+            'team_number': team.team_number,
+            'nickname': team.nickname,
+            'name': team.name,
+            'website': team.website,
+            'rookie_year': team.rookie_year,
+            'motto': team.motto,
+            'home_championship': team.championship_location,
+        }
+        team_dict.update(cls.constructLocation_v3(team))
+        return team_dict
+
+    @classmethod
+    def convertEvents(cls, events, dict_version):
+        EVENT_CONVERTERS = {
+            '3': cls.eventsConverter_v3,
+        }
+        return EVENT_CONVERTERS[dict_version](events)
+
+    @classmethod
     def eventsConverter_v3(cls, events):
         events = map(cls.eventConverter_v3, events)
         return events
@@ -168,40 +242,11 @@ class ModelToDict(object):
         return event_dict
 
     @classmethod
-    def favoriteConverter(self, favorite):
-        return {
-            'model_type': favorite.model_type,
-            'model_key': favorite.model_key
-        }
-
-    @classmethod
     def convertMatches(cls, matches, dict_version):
         MATCH_CONVERTERS = {
             '3': cls.matchesConverter_v3,
         }
         return MATCH_CONVERTERS[dict_version](matches)
-
-    @classmethod
-    def matchConverter(self, match):
-        """
-        return top level match dictionary
-        """
-        match_dict = dict()
-        match_dict["key"] = match.key_name
-        match_dict["event_key"] = match.event.id()
-        match_dict["alliances"] = match.alliances
-        match_dict["score_breakdown"] = match.score_breakdown
-        match_dict["comp_level"] = match.comp_level
-        match_dict["match_number"] = match.match_number
-        match_dict["set_number"] = match.set_number
-        match_dict["videos"] = match.videos
-        match_dict["time_string"] = match.time_string
-        if match.time is not None:
-            match_dict["time"] = int(time.mktime(match.time.timetuple()))
-        else:
-            match_dict["time"] = None
-
-        return match_dict
 
     @classmethod
     def matchesConverter_v3(cls, matches):
@@ -239,20 +284,6 @@ class ModelToDict(object):
         return AWARD_CONVERTERS[dict_version](awards)
 
     @classmethod
-    def awardConverter(self, award):
-        """
-        return top level award dictionary
-        """
-        award_dict = dict()
-        award_dict["name"] = award.name_str
-        award_dict["award_type"] = award.award_type_enum
-        award_dict["year"] = award.year
-        award_dict["event_key"] = award.event.id()
-        award_dict["recipient_list"] = award.recipient_list
-
-        return award_dict
-
-    @classmethod
     def awardsConverter_v3(cls, awards):
         awards = map(cls.awardConverter_v3, awards)
         return awards
@@ -281,22 +312,6 @@ class ModelToDict(object):
         return MEDIA_CONVERTERS[dict_version](medias)
 
     @classmethod
-    def mediaConverter(self, media):
-        """
-        return top level media dictionary
-        """
-        media_dict = dict()
-        media_dict["type"] = media.slug_name
-        media_dict["foreign_key"] = media.foreign_key
-        if media.details is not None:
-            media_dict["details"] = media.details
-        else:
-            media_dict["details"] = {}
-        media_dict["preferred"] = True if media.preferred_references != [] else False
-
-        return media_dict
-
-    @classmethod
     def mediasConverter_v3(cls, medias):
         medias = map(cls.mediaConverter_v3, medias)
         return medias
@@ -309,18 +324,6 @@ class ModelToDict(object):
             'details': media.details if media.details else {},
             'preferred': True if media.preferred_references != [] else False,
         }
-
-    @classmethod
-    def robotConverter(self, robot):
-        """
-        return top level robot dict
-        """
-        robot_dict = dict()
-        robot_dict["key"] = robot.key_name
-        robot_dict["team_key"] = robot.team.id()
-        robot_dict["year"] = robot.year
-        robot_dict["name"] = robot.robot_name
-        return robot_dict
 
     @classmethod
     def convertRobots(cls, robots, dict_version):
