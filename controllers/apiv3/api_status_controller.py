@@ -9,13 +9,6 @@ class ApiStatusController(ApiBaseController):
     CACHE_VERSION = 0
     CACHE_HEADER_LENGTH = 61
 
-    @property
-    def _validators(self):
-        '''
-        No validators for this endpoint
-        '''
-        return []
-
     def _track_call(self):
         self._track_call_defer('status', 'status')
 
