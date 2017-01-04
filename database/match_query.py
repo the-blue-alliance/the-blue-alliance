@@ -2,7 +2,6 @@ from google.appengine.ext import ndb
 
 from database.database_query import DatabaseQuery
 from database.dict_converters.match_converter import MatchConverter
-from helpers.model_to_dict import ModelToDict
 from models.event import Event
 from models.match import Match
 
