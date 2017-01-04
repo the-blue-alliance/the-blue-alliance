@@ -10,7 +10,7 @@ from controllers.apiv3.model_properties import team_properties, event_properties
 from database.award_query import TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
 from database.event_query import TeamEventsQuery, TeamYearEventsQuery
 from database.match_query import TeamEventMatchesQuery, TeamYearMatchesQuery
-from database.media_query import TeamYearMediaQuery
+from database.media_query import TeamYearMediaQuery, TeamSocialMediaQuery
 from database.team_query import TeamListQuery, TeamListYearQuery, TeamParticipationQuery, TeamDistrictsQuery
 from database.robot_query import TeamRobotsQuery
 from helpers.model_to_dict import ModelToDict
@@ -352,3 +352,24 @@ class ApiTeamYearMediaController(ApiTeamControllerBase):
         medias = TeamYearMediaQuery(self.team_key, int(year)).fetch(dict_version='3')
 
         return json.dumps(medias, ensure_ascii=True)
+
+
+class ApiTeamSocialMediaController(ApiTeamControllerBase):
+    CACHE_KEY_FORMAT = "apiv3_team_year_socialmedia_controller_{}"  # (team_key)
+    CACHE_VERSION = 1
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamSocialMediaController, self).__init__(*args, **kw)
+        self.team_key = self.request.route_kwargs["team_key"]
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key)
+
+    def _track_call(self, team_key):
+        self._track_call_defer('team/social_media', team_key)
+
+    def _render(self, team_key):
+        self._set_team(team_key)
+
+        social_medias = TeamSocialMediaQuery(self.team_key).fetch(dict_version='3')
+
+        return json.dumps(social_medias, ensure_ascii=True)

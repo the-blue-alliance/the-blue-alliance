@@ -32,6 +32,8 @@ app = webapp2.WSGIApplication([
         atc.ApiTeamHistoryDistrictsController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/team/<team_key:>/robots',
         atc.ApiTeamHistoryRobotsController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/team/<team_key:>/social_media',
+        atc.ApiTeamSocialMediaController, methods=['GET', 'OPTIONS']),
     # Team Events
     webapp2.Route(r'/api/v3/team/<team_key:>/events',
         atc.ApiTeamEventsController, methods=['GET', 'OPTIONS']),
@@ -61,8 +63,6 @@ app = webapp2.WSGIApplication([
         atc.ApiTeamYearMatchesController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/team/<team_key:>/media/<year:([0-9]+)>',
         atc.ApiTeamYearMediaController, methods=['GET', 'OPTIONS']),
-    # webapp2.Route(r'/api/v3/team/<team_key:>/social_media',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
     # # Event List
     # webapp2.Route(r'/api/v3/events/<year:([0-9]+)>',
     #     ApiStatusController, methods=['GET', 'OPTIONS']),

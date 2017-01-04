@@ -21,6 +21,8 @@ class TeamSocialMediaQuery(DatabaseQuery):
         medias = yield Media.query(
             Media.references == ndb.Key(Team, team_key),
             Media.year == None).fetch_async()
+        if dict_version:
+            medias = ModelToDict.convertMedias(medias, dict_version)
         raise ndb.Return(medias)
 
 
