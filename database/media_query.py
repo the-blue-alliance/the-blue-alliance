@@ -1,7 +1,7 @@
 from google.appengine.ext import ndb
 
 from database.database_query import DatabaseQuery
-from helpers.model_to_dict import ModelToDict
+from database.dict_converters.media_converter import MediaConverter
 from models.event import Event
 from models.event_team import EventTeam
 from models.media import Media
@@ -11,15 +11,14 @@ from models.team import Team
 class TeamSocialMediaQuery(DatabaseQuery):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = 'team_social_media_{}'  # (team_key)
+    DICT_CONVERTER = MediaConverter
 
     @ndb.tasklet
-    def _query_async(self, dict_version):
+    def _query_async(self):
         team_key = self._query_args[0]
         medias = yield Media.query(
             Media.references == ndb.Key(Team, team_key),
             Media.year == None).fetch_async()
-        if dict_version:
-            medias = ModelToDict.convertMedias(medias, dict_version)
         raise ndb.Return(medias)
 
 
@@ -28,7 +27,7 @@ class TeamMediaQuery(DatabaseQuery):
     CACHE_KEY_FORMAT = 'team_media_{}'  # (team_key)
 
     @ndb.tasklet
-    def _query_async(self, dict_version):
+    def _query_async(self):
         team_key = self._query_args[0]
         medias = yield Media.query(
             Media.references == ndb.Key(Team, team_key)).fetch_async()
@@ -38,16 +37,15 @@ class TeamMediaQuery(DatabaseQuery):
 class TeamYearMediaQuery(DatabaseQuery):
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = 'team_year_media_{}_{}'  # (team_key, year)
+    DICT_CONVERTER = MediaConverter
 
     @ndb.tasklet
-    def _query_async(self, dict_version):
+    def _query_async(self):
         team_key = self._query_args[0]
         year = self._query_args[1]
         medias = yield Media.query(
             Media.references == ndb.Key(Team, team_key),
             Media.year == year).fetch_async()
-        if dict_version:
-            medias = ModelToDict.convertMedias(medias, dict_version)
         raise ndb.Return(medias)
 
 
@@ -56,7 +54,7 @@ class EventTeamsMediasQuery(DatabaseQuery):
     CACHE_KEY_FORMAT = 'event_teams_medias_{}'  # (event_key)
 
     @ndb.tasklet
-    def _query_async(self, dict_version):
+    def _query_async(self):
         event_key = self._query_args[0]
         year = int(event_key[:4])
         event_team_keys = yield EventTeam.query(EventTeam.event == ndb.Key(Event, event_key)).fetch_async(keys_only=True)
@@ -74,7 +72,7 @@ class EventTeamsPreferredMediasQuery(DatabaseQuery):
     CACHE_KEY_FORMAT = 'event_teams_medias_preferred_{}'  # (event_key)
 
     @ndb.tasklet
-    def _query_async(self, dict_version):
+    def _query_async(self):
         event_key = self._query_args[0]
         year = int(event_key[:4])
         event_team_keys = yield EventTeam.query(EventTeam.event == ndb.Key(Event, event_key)).fetch_async(keys_only=True)

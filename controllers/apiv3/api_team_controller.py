@@ -38,9 +38,9 @@ class ApiTeamListController(ApiBaseController):
 
     def _render(self, page_num, year=None, model_type=None):
         if year is None:
-            team_list = TeamListQuery(int(page_num)).fetch(dict_version='3')
+            team_list = TeamListQuery(int(page_num)).fetch(dict_version=3)
         else:
-            team_list = TeamListYearQuery(int(year), int(page_num)).fetch(dict_version='3')
+            team_list = TeamListYearQuery(int(year), int(page_num)).fetch(dict_version=3)
         if model_type is not None:
             team_list = filter_team_properties(team_list, model_type)
         return json.dumps(team_list, ensure_ascii=True, indent=2, sort_keys=True)
@@ -57,7 +57,7 @@ class ApiTeamController(ApiBaseController):
         self._track_call_defer(action, team_key)
 
     def _render(self, team_key, model_type=None):
-        team = TeamQuery(team_key).fetch(dict_version='3')
+        team = TeamQuery(team_key).fetch(dict_version=3)
         if model_type is not None:
             team = filter_team_properties([team], model_type)[0]
 
@@ -88,7 +88,7 @@ class ApiTeamHistoryDistrictsController(ApiBaseController):
         self._track_call_defer('team/history/districts', team_key)
 
     def _render(self, team_key):
-        team_districts = TeamDistrictsQuery(team_key).fetch(dict_version='3')
+        team_districts = TeamDistrictsQuery(team_key).fetch(dict_version=3)
 
         return json.dumps(team_districts, ensure_ascii=True, indent=2, sort_keys=True)
 
@@ -104,7 +104,7 @@ class ApiTeamHistoryRobotsController(ApiBaseController):
         self._track_call_defer('team/history/robots', team_key)
 
     def _render(self, team_key):
-        robots = TeamRobotsQuery(team_key).fetch(dict_version='3')
+        robots = TeamRobotsQuery(team_key).fetch(dict_version=3)
 
         return json.dumps(robots, ensure_ascii=True, indent=2, sort_keys=True)
 
@@ -124,9 +124,9 @@ class ApiTeamEventsController(ApiBaseController):
 
     def _render(self, team_key, year=None, model_type=None):
         if year:
-            events = TeamYearEventsQuery(team_key, int(year)).fetch(dict_version='3')
+            events = TeamYearEventsQuery(team_key, int(year)).fetch(dict_version=3)
         else:
-            events = TeamEventsQuery(team_key).fetch(dict_version='3')
+            events = TeamEventsQuery(team_key).fetch(dict_version=3)
         if model_type is not None:
             events = filter_event_properties(events, model_type)
         return json.dumps(events, ensure_ascii=True, indent=2, sort_keys=True)
@@ -143,7 +143,7 @@ class ApiTeamEventMatchesController(ApiBaseController):
         self._track_call_defer(action, '{}/{}'.format(team_key, event_key))
 
     def _render(self, team_key, event_key, model_type=None):
-        matches = TeamEventMatchesQuery(team_key, event_key).fetch(dict_version='3')
+        matches = TeamEventMatchesQuery(team_key, event_key).fetch(dict_version=3)
         if model_type is not None:
             matches = filter_match_properties(matches, model_type)
 
@@ -161,7 +161,7 @@ class ApiTeamYearMatchesController(ApiBaseController):
         self._track_call_defer(action, '{}/{}'.format(team_key, year))
 
     def _render(self, team_key, year, model_type=None):
-        matches = TeamYearMatchesQuery(team_key, int(year)).fetch(dict_version='3')
+        matches = TeamYearMatchesQuery(team_key, int(year)).fetch(dict_version=3)
         if model_type is not None:
             matches = filter_match_properties(matches, model_type)
 
@@ -176,7 +176,7 @@ class ApiTeamEventAwardsController(ApiBaseController):
         self._track_call_defer('team/event/awards', '{}/{}'.format(team_key, event_key))
 
     def _render(self, team_key, event_key):
-        awards = TeamEventAwardsQuery(team_key, event_key).fetch(dict_version='3')
+        awards = TeamEventAwardsQuery(team_key, event_key).fetch(dict_version=3)
 
         return json.dumps(awards, ensure_ascii=True, indent=2, sort_keys=True)
 
@@ -189,7 +189,7 @@ class ApiTeamYearAwardsController(ApiBaseController):
         self._track_call_defer('team/year/awards', '{}/{}'.format(team_key, year))
 
     def _render(self, team_key, year):
-        awards = TeamYearAwardsQuery(team_key, int(year)).fetch(dict_version='3')
+        awards = TeamYearAwardsQuery(team_key, int(year)).fetch(dict_version=3)
 
         return json.dumps(awards, ensure_ascii=True, indent=2, sort_keys=True)
 
@@ -205,7 +205,7 @@ class ApiTeamHistoryAwardsController(ApiBaseController):
         self._track_call_defer('team/history/awards', team_key)
 
     def _render(self, team_key):
-        awards = TeamAwardsQuery(team_key).fetch(dict_version='3')
+        awards = TeamAwardsQuery(team_key).fetch(dict_version=3)
 
         return json.dumps(awards, ensure_ascii=True, indent=2, sort_keys=True)
 
@@ -220,7 +220,7 @@ class ApiTeamYearMediaController(ApiBaseController):
         self._track_call_defer('team/media', api_label)
 
     def _render(self, team_key, year):
-        medias = TeamYearMediaQuery(team_key, int(year)).fetch(dict_version='3')
+        medias = TeamYearMediaQuery(team_key, int(year)).fetch(dict_version=3)
 
         return json.dumps(medias, ensure_ascii=True, indent=2, sort_keys=True)
 
@@ -233,6 +233,6 @@ class ApiTeamSocialMediaController(ApiBaseController):
         self._track_call_defer('team/social_media', team_key)
 
     def _render(self, team_key):
-        social_medias = TeamSocialMediaQuery(team_key).fetch(dict_version='3')
+        social_medias = TeamSocialMediaQuery(team_key).fetch(dict_version=3)
 
         return json.dumps(social_medias, ensure_ascii=True, indent=2, sort_keys=True)

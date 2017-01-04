@@ -14,7 +14,7 @@ class DatabaseQuery(object):
     DATABASE_HITS_MEMCACHE_KEYS = ['database_query_hits_{}:{}'.format(i, DATABASE_QUERY_VERSION) for i in range(25)]
     DATABASE_MISSES_MEMCACHE_KEYS = ['database_query_misses_{}:{}'.format(i, DATABASE_QUERY_VERSION) for i in range(25)]
     BASE_CACHE_KEY_FORMAT = "{}:{}:{}"  # (partial_cache_key, cache_version, database_query_version)
-    VALID_DICT_VERSIONS = {'3'}
+    VALID_DICT_VERSIONS = {3}
 
     def __init__(self, *args):
         self._query_args = args
@@ -39,8 +39,9 @@ class DatabaseQuery(object):
         ndb.delete_multi([ndb.Key(CachedQueryResult, cache_key) for cache_key in all_cache_keys])
 
     @classmethod
-    def _dict_cache_key(self, cache_key, dict_version):
-        return '{}~dictv{}'.format(cache_key, dict_version)
+    def _dict_cache_key(cls, cache_key, dict_version):
+        print '{}~dictv{}.{}'.format(cache_key, dict_version, cls.DICT_CONVERTER.SUBVERSIONS[dict_version]), '!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+        return '{}~dictv{}.{}'.format(cache_key, dict_version, cls.DICT_CONVERTER.SUBVERSIONS[dict_version])
 
     def fetch(self, dict_version=None):
         return self.fetch_async(dict_version=dict_version).get_result()
@@ -62,7 +63,9 @@ class DatabaseQuery(object):
                 rpcs.append(MEMCACHE_CLIENT.incr_async(
                     random.choice(self.DATABASE_MISSES_MEMCACHE_KEYS),
                     initial_value=0))
-            query_result = yield self._query_async(dict_version)
+            query_result = yield self._query_async()
+            if dict_version:
+                query_result = self.DICT_CONVERTER.convert(query_result, dict_version)
             if tba_config.CONFIG['database_query_cache']:
                 if dict_version:
                     rpcs.append(CachedQueryResult(
