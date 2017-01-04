@@ -39,3 +39,15 @@ match_properties = {
         'actual_time'],
     'keys': ['key']
 }
+
+
+def filter_event_properties(events, model_type):
+    return [{key: event[key] for key in event_properties[model_type]} for event in events]
+
+
+def filter_team_properties(teams, model_type):
+    return [{key: team[key] for key in team_properties[model_type]} for team in teams]
+
+
+def filter_match_properties(matches, model_type):
+    return [{key: match[key] for key in match_properties[model_type]} for match in matches]

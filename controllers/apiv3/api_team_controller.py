@@ -6,7 +6,7 @@ from datetime import datetime
 from google.appengine.ext import ndb
 
 from controllers.apiv3.api_base_controller import ApiBaseController
-from controllers.apiv3.model_properties import team_properties, event_properties, match_properties
+from controllers.apiv3.model_properties import filter_event_properties, filter_team_properties, filter_match_properties
 from database.award_query import TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
 from database.event_query import TeamEventsQuery, TeamYearEventsQuery
 from database.match_query import TeamEventMatchesQuery, TeamYearMatchesQuery
@@ -42,7 +42,7 @@ class ApiTeamListController(ApiBaseController):
         else:
             team_list = TeamListYearQuery(int(year), int(page_num)).fetch(dict_version='3')
         if model_type is not None:
-            team_list = [{key: team[key] for key in team_properties[model_type]} for team in team_list]
+            team_list = filter_team_properties(team_list, model_type)
         return json.dumps(team_list, ensure_ascii=True)
 
 
@@ -59,7 +59,7 @@ class ApiTeamController(ApiBaseController):
     def _render(self, team_key, model_type=None):
         team = TeamQuery(team_key).fetch(dict_version='3')
         if model_type is not None:
-            team = {key: team[key] for key in team_properties[model_type]}
+            team = filter_team_properties([team], model_type)[0]
 
         return json.dumps(team, ensure_ascii=True)
 
@@ -128,7 +128,7 @@ class ApiTeamEventsController(ApiBaseController):
         else:
             events = TeamEventsQuery(team_key).fetch(dict_version='3')
         if model_type is not None:
-            events = [{key: event[key] for key in event_properties[model_type]} for event in events]
+            events = filter_event_properties(events, model_type)
         return json.dumps(events, ensure_ascii=True)
 
 
@@ -145,7 +145,7 @@ class ApiTeamEventMatchesController(ApiBaseController):
     def _render(self, team_key, event_key, model_type=None):
         matches = TeamEventMatchesQuery(team_key, event_key).fetch(dict_version='3')
         if model_type is not None:
-            matches = [{key: match[key] for key in match_properties[model_type]} for match in matches]
+            matches = filter_match_properties(matches, model_type)
 
         return json.dumps(matches, ensure_ascii=True)
 
@@ -163,7 +163,7 @@ class ApiTeamYearMatchesController(ApiBaseController):
     def _render(self, team_key, year, model_type=None):
         matches = TeamYearMatchesQuery(team_key, int(year)).fetch(dict_version='3')
         if model_type is not None:
-            matches = [{key: match[key] for key in match_properties[model_type]} for match in matches]
+            matches = filter_match_properties(matches, model_type)
 
         return json.dumps(matches, ensure_ascii=True)
 
