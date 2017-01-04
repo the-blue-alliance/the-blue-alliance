@@ -2,6 +2,7 @@ from consts.district_type import DistrictType
 from models.event import Event
 from models.match import Match
 from models.team import Team
+import tba_config
 
 
 class ValidationHelper(object):
@@ -54,6 +55,11 @@ class ValidationHelper(object):
                 valid = False
             else:
                 event_future = Event.get_by_id_async(event_key)
+        if 'year' in kwargs:
+            year = int(kwargs['year'])
+            if year > tba_config.MAX_YEAR or year < 1992:
+                error_dict['Errors'].append({'year': 'Invalid year: {}. Must be between 1992 and {} inclusive.'.format(year, tba_config.MAX_YEAR)})
+                valid = False
 
         # Check if keys exist
         if team_future and team_future.get_result() is None:
