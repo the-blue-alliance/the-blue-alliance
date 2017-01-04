@@ -7,18 +7,30 @@ from consts.media_type import MediaType
 
 class ModelToDict(object):
     @classmethod
+    def constructLocation_v3(cls, model):
+        """
+        Works for teams and events
+        """
+        has_nl = model.nl and model.nl.city and model.nl.state_prov and model.nl.country
+        return {
+            'city': model.nl.city if has_nl else model.city,
+            'state_prov': model.nl.state_prov if has_nl else model.state_prov,
+            'country': model.nl.country if has_nl else model.country,
+            'postal_code': model.nl.postal_code if has_nl else model.postalcode,
+            'lat': model.nl.lat_lng.lat if has_nl else None,
+            'lng': model.nl.lat_lng.lon if has_nl else None,
+            'location_name': model.nl.name if has_nl else None,
+            'address': model.nl.formatted_address if has_nl else None,
+            'gmaps_place_id': model.nl.place_id if has_nl else None,
+            'gmaps_url': model.nl.place_details.get('url') if has_nl else None,
+        }
+
+    @classmethod
     def convertTeams(cls, teams, dict_version):
         TEAM_CONVERTERS = {
             '3': cls.teamsConverter_v3,
         }
         return TEAM_CONVERTERS[dict_version](teams)
-
-    @classmethod
-    def convertRobots(cls, robots, dict_version):
-        ROBOT_CONVERTERS = {
-            '3': cls.robotsConverter_v3,
-        }
-        return ROBOT_CONVERTERS[dict_version](robots)
 
     @classmethod
     def teamConverter(self, team):
@@ -53,7 +65,7 @@ class ModelToDict(object):
     @classmethod
     def teamConverter_v3(cls, team):
         has_nl = team.nl and team.nl.city and team.nl.state_prov and team.nl.country
-        return {
+        team_dict = {
             'key': team.key.id(),
             'team_number': team.team_number,
             'nickname': team.nickname,
@@ -62,12 +74,16 @@ class ModelToDict(object):
             'rookie_year': team.rookie_year,
             'motto': team.motto,
             'home_championship': team.championship_location,
-            'city': team.nl.city if has_nl else team.city,
-            'state_prov': team.nl.state_prov if has_nl else team.state_prov,
-            'country': team.nl.country if has_nl else team.country,
-            'lat': team.nl.lat_lng.lat if has_nl else None,
-            'lng': team.nl.lat_lng.lon if has_nl else None,
         }
+        team_dict.update(cls.constructLocation_v3(team))
+        return team_dict
+
+    @classmethod
+    def convertEvents(cls, events, dict_version):
+        EVENT_CONVERTERS = {
+            '3': cls.eventsConverter_v3,
+        }
+        return EVENT_CONVERTERS[dict_version](events)
 
     @classmethod
     def eventConverter(self, event):
@@ -109,6 +125,46 @@ class ModelToDict(object):
             event_dict["webcast"] = event.webcast
         else:
             event_dict["webcast"] = []
+
+        return event_dict
+
+    @classmethod
+    def eventsConverter_v3(cls, events):
+        events = map(cls.eventConverter_v3, events)
+        return events
+
+    @classmethod
+    def eventConverter_v3(cls, event):
+        event_dict = {
+            'key': event.key.id(),
+            'name': event.name,
+            'short_name': event.short_name,
+            'event_code': event.event_short,
+            'event_type': event.event_type_enum,
+            'event_type_string': event.event_type_str,
+            'district_type': event.event_district_enum,
+            'district_type_string': event.event_district_str,
+            'first_event_id': event.first_eid,
+            'year': event.year,
+            'timezone': event.timezone_id,
+            'week': event.week,
+            'website': event.website,
+        }
+        event_dict.update(cls.constructLocation_v3(event))
+
+        if event.start_date:
+            event_dict['start_date'] = event.start_date.date().isoformat()
+        else:
+            event_dict['start_date'] = None
+        if event.end_date:
+            event_dict['end_date'] = event.end_date.date().isoformat()
+        else:
+            event_dict['end_date'] = None
+
+        if event.webcast:
+            event_dict['webcasts'] = event.webcast
+        else:
+            event_dict['webcasts'] = []
 
         return event_dict
 
@@ -182,6 +238,13 @@ class ModelToDict(object):
         robot_dict["year"] = robot.year
         robot_dict["name"] = robot.robot_name
         return robot_dict
+
+    @classmethod
+    def convertRobots(cls, robots, dict_version):
+        ROBOT_CONVERTERS = {
+            '3': cls.robotsConverter_v3,
+        }
+        return ROBOT_CONVERTERS[dict_version](robots)
 
     @classmethod
     def robotsConverter_v3(cls, robots):

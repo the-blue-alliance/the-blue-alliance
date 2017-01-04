@@ -2,6 +2,7 @@ from google.appengine.ext import ndb
 
 from consts.district_type import DistrictType
 from database.database_query import DatabaseQuery
+from helpers.model_to_dict import ModelToDict
 from models.event import Event
 from models.event_team import EventTeam
 from models.team import Team
@@ -53,6 +54,8 @@ class TeamEventsQuery(DatabaseQuery):
         event_teams = yield EventTeam.query(EventTeam.team == ndb.Key(Team, team_key)).fetch_async()
         event_keys = map(lambda event_team: event_team.event, event_teams)
         events = yield ndb.get_multi_async(event_keys)
+        if dict_version:
+            events = ModelToDict.convertEvents(events, dict_version)
         raise ndb.Return(events)
 
 
@@ -72,4 +75,6 @@ class TeamYearEventsQuery(DatabaseQuery):
             EventTeam.year == year).fetch_async()
         event_keys = map(lambda event_team: event_team.event, event_teams)
         events = yield ndb.get_multi_async(event_keys)
+        if dict_version:
+            events = ModelToDict.convertEvents(events, dict_version)
         raise ndb.Return(events)

@@ -6,7 +6,8 @@ from datetime import datetime
 from google.appengine.ext import ndb
 
 from controllers.apiv3.api_base_controller import ApiBaseController
-from controllers.apiv3.model_properties import team_properties
+from controllers.apiv3.model_properties import team_properties, event_properties
+from database.event_query import TeamEventsQuery, TeamYearEventsQuery
 from database.team_query import TeamListQuery, TeamListYearQuery, TeamParticipationQuery, TeamDistrictsQuery
 from database.robot_query import TeamRobotsQuery
 from helpers.model_to_dict import ModelToDict
@@ -159,3 +160,36 @@ class ApiTeamHistoryRobotsController(ApiTeamControllerBase):
         robots = TeamRobotsQuery(self.team_key).fetch(dict_version='3')
 
         return json.dumps(robots, ensure_ascii=True)
+
+
+class ApiTeamEventsController(ApiTeamControllerBase):
+    CACHE_KEY_FORMAT = "apiv3_team_events_controller_{}_{}_{}"  # (team_key, year, model_type)
+    CACHE_VERSION = 1
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamEventsController, self).__init__(*args, **kw)
+        self.team_key = self.request.route_kwargs["team_key"]
+        self.year = self.request.route_kwargs.get("year")
+        self.model_type = self.request.route_kwargs.get('model_type')
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.year, self.model_type)
+
+    def _track_call(self, team_key, year=None, model_type=None):
+        api_label = team_key
+        if year:
+            api_label += '/{}'.format(year)
+        action = 'team/events'
+        if model_type:
+            action += '/{}'.format(model_type)
+        self._track_call_defer(action, api_label)
+
+    def _render(self, team_key, year=None, model_type=None):
+        self._set_team(team_key)
+
+        if year:
+            events = TeamYearEventsQuery(self.team_key, int(year)).fetch(dict_version='3')
+        else:
+            events = TeamEventsQuery(self.team_key).fetch(dict_version='3')
+        if model_type is not None:
+            events = [{key: event[key] for key in event_properties[model_type]} for event in events]
+        return json.dumps(events, ensure_ascii=True)
