@@ -7,11 +7,11 @@ from consts.media_type import MediaType
 
 class ModelToDict(object):
     @classmethod
-    def getTeamConverter(cls, dict_version=None):
+    def convertTeams(cls, teams, dict_version):
         TEAM_CONVERTERS = {
-            '3': cls.teamConverter_v3,
+            '3': cls.teamsConverter_v3,
         }
-        return TEAM_CONVERTERS.get(dict_version, cls.teamConverter)
+        return TEAM_CONVERTERS[dict_version](teams)
 
     @classmethod
     def convertRobots(cls, robots, dict_version):
@@ -44,6 +44,11 @@ class ModelToDict(object):
             logging.warning("Failed to include Address for api_team_info_%s: %s" % (team.key.id(), e))
 
         return team_dict
+
+    @classmethod
+    def teamsConverter_v3(cls, teams):
+        teams = map(cls.teamConverter_v3, teams)
+        return teams
 
     @classmethod
     def teamConverter_v3(cls, team):

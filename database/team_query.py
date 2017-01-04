@@ -24,8 +24,7 @@ class TeamListQuery(DatabaseQuery):
         end = start + self.PAGE_SIZE
         teams = yield Team.query(Team.team_number >= start, Team.team_number < end).fetch_async()
         if dict_version:
-            converter = ModelToDict.getTeamConverter(dict_version)
-            teams = map(converter, teams)
+            teams = ModelToDict.convertTeams(teams, dict_version)
         raise ndb.Return(teams)
 
 
@@ -51,8 +50,7 @@ class TeamListYearQuery(DatabaseQuery):
 
         teams = filter(lambda team: team.key.id() in year_team_keys, teams_future.get_result())
         if dict_version:
-            converter = ModelToDict.getTeamConverter(dict_version)
-            teams = map(converter, teams)
+            teams = ModelToDict.convertTeams(teams, dict_version)
         raise ndb.Return(teams)
 
 
