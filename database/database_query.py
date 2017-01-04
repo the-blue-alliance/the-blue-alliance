@@ -44,11 +44,13 @@ class DatabaseQuery(object):
     def _dict_cache_key(cls, cache_key, dict_version):
         return '{}~dictv{}.{}'.format(cache_key, dict_version, cls.DICT_CONVERTER.SUBVERSIONS[dict_version])
 
-    def fetch(self, dict_version=None):
-        return self.fetch_async(dict_version=dict_version).get_result()
+    def fetch(self, dict_version=None, return_updated=False):
+        return self.fetch_async(
+            dict_version=dict_version,
+            return_updated=return_updated).get_result()
 
     @ndb.tasklet
-    def fetch_async(self, dict_version=None):
+    def fetch_async(self, dict_version=None, return_updated=False):
         if dict_version:
             if dict_version not in self.VALID_DICT_VERSIONS:
                 raise Exception("Bad api version for database query: {}".format(dict_version))
@@ -59,6 +61,7 @@ class DatabaseQuery(object):
         cached_query = yield CachedQueryResult.get_by_id_async(cache_key)
         do_stats = random.random() < tba_config.RECORD_FRACTION
         rpcs = []
+        updated = None
         if cached_query is None:
             if do_stats:
                 rpcs.append(MEMCACHE_CLIENT.incr_async(
@@ -87,10 +90,14 @@ class DatabaseQuery(object):
                 query_result = cached_query.result_dict
             else:
                 query_result = cached_query.result
+            updated = cached_query.updated
 
         for rpc in rpcs:
             try:
                 rpc.get_result()
             except Exception, e:
                 logging.warning("An RPC in DatabaseQuery.fetch_async() failed!")
-        raise ndb.Return(query_result)
+        if return_updated:
+            raise ndb.Return((query_result, updated))
+        else:
+            raise ndb.Return(query_result)
