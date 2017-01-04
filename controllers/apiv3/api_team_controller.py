@@ -10,6 +10,7 @@ from controllers.apiv3.model_properties import team_properties, event_properties
 from database.award_query import TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
 from database.event_query import TeamEventsQuery, TeamYearEventsQuery
 from database.match_query import TeamEventMatchesQuery, TeamYearMatchesQuery
+from database.media_query import TeamYearMediaQuery
 from database.team_query import TeamListQuery, TeamListYearQuery, TeamParticipationQuery, TeamDistrictsQuery
 from database.robot_query import TeamRobotsQuery
 from helpers.model_to_dict import ModelToDict
@@ -327,3 +328,27 @@ class ApiTeamHistoryAwardsController(ApiTeamControllerBase):
         awards = TeamAwardsQuery(self.team_key).fetch(dict_version='3')
 
         return json.dumps(awards, ensure_ascii=True)
+
+
+class ApiTeamYearMediaController(ApiTeamControllerBase):
+    CACHE_KEY_FORMAT = "apiv3_team_year_media_controller_{}_{}"  # (team_key, year)
+    CACHE_VERSION = 1
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
+
+    def __init__(self, *args, **kw):
+        super(ApiTeamYearMediaController, self).__init__(*args, **kw)
+        self.team_key = self.request.route_kwargs["team_key"]
+        self.year = self.request.route_kwargs.get("year")
+        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.year)
+
+    def _track_call(self, team_key, year):
+        api_label = team_key
+        api_label += '/{}'.format(year)
+        self._track_call_defer('team/media', api_label)
+
+    def _render(self, team_key, year):
+        self._set_team(team_key)
+
+        medias = TeamYearMediaQuery(self.team_key, int(year)).fetch(dict_version='3')
+
+        return json.dumps(medias, ensure_ascii=True)

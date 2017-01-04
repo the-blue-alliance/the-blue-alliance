@@ -1,6 +1,7 @@
 from google.appengine.ext import ndb
 
 from database.database_query import DatabaseQuery
+from helpers.model_to_dict import ModelToDict
 from models.event import Event
 from models.event_team import EventTeam
 from models.media import Media
@@ -52,6 +53,8 @@ class TeamYearMediaQuery(DatabaseQuery):
         medias = yield Media.query(
             Media.references == ndb.Key(Team, team_key),
             Media.year == year).fetch_async()
+        if dict_version:
+            medias = ModelToDict.convertMedias(medias, dict_version)
         raise ndb.Return(medias)
 
 

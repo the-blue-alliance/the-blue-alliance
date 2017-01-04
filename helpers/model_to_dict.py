@@ -274,6 +274,13 @@ class ModelToDict(object):
         }
 
     @classmethod
+    def convertMedias(cls, medias, dict_version):
+        MEDIA_CONVERTERS = {
+            '3': cls.mediasConverter_v3,
+        }
+        return MEDIA_CONVERTERS[dict_version](medias)
+
+    @classmethod
     def mediaConverter(self, media):
         """
         return top level media dictionary
@@ -288,6 +295,20 @@ class ModelToDict(object):
         media_dict["preferred"] = True if media.preferred_references != [] else False
 
         return media_dict
+
+    @classmethod
+    def mediasConverter_v3(cls, medias):
+        medias = map(cls.mediaConverter_v3, medias)
+        return medias
+
+    @classmethod
+    def mediaConverter_v3(cls, media):
+        return {
+            'type': media.slug_name,
+            'foreign_key': media.foreign_key,
+            'details': media.details if media.details else {},
+            'preferred': True if media.preferred_references != [] else False,
+        }
 
     @classmethod
     def robotConverter(self, robot):
