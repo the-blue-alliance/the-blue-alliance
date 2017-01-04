@@ -17,19 +17,7 @@ from helpers.model_to_dict import ModelToDict
 from models.team import Team
 
 
-class ApiTeamControllerBase(ApiBaseController):
-    @property
-    def _validators(self):
-        return [("team_id_validator", self.team_key)]
-
-    def _set_team(self, team_key):
-        self.team = Team.get_by_id(team_key)
-        if self.team is None:
-            self._errors = json.dumps({"404": "%s team not found" % team_key})
-            self.abort(404)
-
-
-class ApiTeamListController(ApiTeamControllerBase):
+class ApiTeamListController(ApiBaseController):
     """
     Returns a JSON list of teams, paginated by team number in sets of 500
     page_num = 0 returns teams from 0-499
@@ -37,21 +25,9 @@ class ApiTeamListController(ApiTeamControllerBase):
     page_num = 2 returns teams from 1000-1499
     etc.
     """
-    CACHE_KEY_FORMAT = "apiv3_team_list_controller_{}_{}_{}"  # (page_num, year, model_type)
     CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 60 * 60 * 24
     PAGE_SIZE = 500
-
-    def __init__(self, *args, **kw):
-        super(ApiTeamListController, self).__init__(*args, **kw)
-        self.page_num = self.request.route_kwargs['page_num']
-        self.year = self.request.route_kwargs.get('year')
-        self.model_type = self.request.route_kwargs.get('model_type')
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.page_num, self.year, self.model_type)
-
-    @property
-    def _validators(self):
-        return []
 
     def _track_call(self, page_num, year=None, model_type=None):
         action = 'team/list'
@@ -71,111 +47,72 @@ class ApiTeamListController(ApiTeamControllerBase):
         return json.dumps(team_list, ensure_ascii=True)
 
 
-class ApiTeamController(ApiTeamControllerBase):
-    CACHE_KEY_FORMAT = "apiv3_team_controller_{}_{}"  # (team_key, model_type)
+class ApiTeamController(ApiBaseController):
     CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 60 * 60 * 24
 
-    def __init__(self, *args, **kw):
-        super(ApiTeamController, self).__init__(*args, **kw)
-        self.team_key = self.request.route_kwargs["team_key"]
-        self.model_type = self.request.route_kwargs.get('model_type')
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.model_type)
-
     def _track_call(self, team_key, model_type=None):
         action = 'team'
-        if self.model_type:
+        if model_type:
             action += '/{}'.format(model_type)
         self._track_call_defer(action, team_key)
 
     def _render(self, team_key, model_type=None):
-        self._set_team(team_key)
-
-        team = ModelToDict.teamConverter_v3(self.team)
+        team = ModelToDict.teamConverter_v3(Team.get_by_id(team_key))
         if model_type is not None:
             team = {key: team[key] for key in team_properties[model_type]}
 
         return json.dumps(team, ensure_ascii=True)
 
 
-class ApiTeamYearsParticipatedController(ApiTeamControllerBase):
-    CACHE_KEY_FORMAT = "apiv3_team_years_participated_controller_{}"  # (team_key)
+class ApiTeamYearsParticipatedController(ApiBaseController):
     CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 60 * 60 * 24
-
-    def __init__(self, *args, **kw):
-        super(ApiTeamYearsParticipatedController, self).__init__(*args, **kw)
-        self.team_key = self.request.route_kwargs["team_key"]
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key)
 
     def _track_call(self, team_key):
         self._track_call_defer('team/years_participated', team_key)
 
     def _render(self, team_key):
-        years_participated = sorted(TeamParticipationQuery(self.team_key).fetch())
+        years_participated = sorted(TeamParticipationQuery(team_key).fetch())
 
         return json.dumps(years_participated, ensure_ascii=True)
 
 
-class ApiTeamHistoryDistrictsController(ApiTeamControllerBase):
+class ApiTeamHistoryDistrictsController(ApiBaseController):
     """
     Returns a JSON list of all DistrictTeam models associated with a Team
     """
-    CACHE_KEY_FORMAT = "apiv3_team_history_districts_controller_{}"  # (team_key)
     CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 60 * 60 * 24
-
-    def __init__(self, *args, **kw):
-        super(ApiTeamHistoryDistrictsController, self).__init__(*args, **kw)
-        self.team_key = self.request.route_kwargs['team_key']
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key)
 
     def _track_call(self, team_key):
         self._track_call_defer('team/history/districts', team_key)
 
     def _render(self, team_key):
-        self._set_team(team_key)
-
-        team_districts = TeamDistrictsQuery(self.team_key).fetch()
+        team_districts = TeamDistrictsQuery(team_key).fetch()
 
         return json.dumps(team_districts, ensure_ascii=True)
 
 
-class ApiTeamHistoryRobotsController(ApiTeamControllerBase):
+class ApiTeamHistoryRobotsController(ApiBaseController):
     """
     Returns a JSON list of all robot models associated with a Team
     """
-    CACHE_KEY_FORMAT = "apiv3_team_history_robots_controller_{}"  # (team_key)
     CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 60 * 60 * 24
-
-    def __init__(self, *args, **kw):
-        super(ApiTeamHistoryRobotsController, self).__init__(*args, **kw)
-        self.team_key = self.request.route_kwargs['team_key']
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key)
 
     def _track_call(self, team_key):
         self._track_call_defer('team/history/robots', team_key)
 
     def _render(self, team_key):
-        self._set_team(team_key)
-
-        robots = TeamRobotsQuery(self.team_key).fetch(dict_version='3')
+        robots = TeamRobotsQuery(team_key).fetch(dict_version='3')
 
         return json.dumps(robots, ensure_ascii=True)
 
 
-class ApiTeamEventsController(ApiTeamControllerBase):
-    CACHE_KEY_FORMAT = "apiv3_team_events_controller_{}_{}_{}"  # (team_key, year, model_type)
+class ApiTeamEventsController(ApiBaseController):
     CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 60 * 60 * 24
-
-    def __init__(self, *args, **kw):
-        super(ApiTeamEventsController, self).__init__(*args, **kw)
-        self.team_key = self.request.route_kwargs["team_key"]
-        self.year = self.request.route_kwargs.get("year")
-        self.model_type = self.request.route_kwargs.get('model_type')
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.year, self.model_type)
 
     def _track_call(self, team_key, year=None, model_type=None):
         api_label = team_key
@@ -187,32 +124,18 @@ class ApiTeamEventsController(ApiTeamControllerBase):
         self._track_call_defer(action, api_label)
 
     def _render(self, team_key, year=None, model_type=None):
-        self._set_team(team_key)
-
         if year:
-            events = TeamYearEventsQuery(self.team_key, int(year)).fetch(dict_version='3')
+            events = TeamYearEventsQuery(team_key, int(year)).fetch(dict_version='3')
         else:
-            events = TeamEventsQuery(self.team_key).fetch(dict_version='3')
+            events = TeamEventsQuery(team_key).fetch(dict_version='3')
         if model_type is not None:
             events = [{key: event[key] for key in event_properties[model_type]} for event in events]
         return json.dumps(events, ensure_ascii=True)
 
 
-class ApiTeamEventMatchesController(ApiTeamControllerBase):
-    CACHE_KEY_FORMAT = "apiv3_team_event_matches_controller_{}_{}_{}"  # (team_key, event_key, model_type)
+class ApiTeamEventMatchesController(ApiBaseController):
     CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 61
-
-    def __init__(self, *args, **kw):
-        super(ApiTeamEventMatchesController, self).__init__(*args, **kw)
-        self.team_key = self.request.route_kwargs["team_key"]
-        self.event_key = self.request.route_kwargs["event_key"]
-        self.model_type = self.request.route_kwargs.get('model_type')
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.event_key, self.model_type)
-
-    @property
-    def _validators(self):
-        return [("team_id_validator", self.team_key), ("event_id_validator", self.event_key)]
 
     def _track_call(self, team_key, event_key, model_type=None):
         action = 'team/event/matches'
@@ -221,28 +144,16 @@ class ApiTeamEventMatchesController(ApiTeamControllerBase):
         self._track_call_defer(action, '{}/{}'.format(team_key, event_key))
 
     def _render(self, team_key, event_key, model_type=None):
-        matches = TeamEventMatchesQuery(self.team_key, self.event_key).fetch(dict_version='3')
+        matches = TeamEventMatchesQuery(team_key, event_key).fetch(dict_version='3')
         if model_type is not None:
             matches = [{key: match[key] for key in match_properties[model_type]} for match in matches]
 
         return json.dumps(matches, ensure_ascii=True)
 
 
-class ApiTeamYearMatchesController(ApiTeamControllerBase):
-    CACHE_KEY_FORMAT = "apiv3_team_year_matches_controller_{}_{}_{}"  # (team_key, year, model_type)
+class ApiTeamYearMatchesController(ApiBaseController):
     CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 61
-
-    def __init__(self, *args, **kw):
-        super(ApiTeamYearMatchesController, self).__init__(*args, **kw)
-        self.team_key = self.request.route_kwargs["team_key"]
-        self.year = self.request.route_kwargs["year"]
-        self.model_type = self.request.route_kwargs.get('model_type')
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.year, self.model_type)
-
-    @property
-    def _validators(self):
-        return [("team_id_validator", self.team_key)]
 
     def _track_call(self, team_key, year, model_type=None):
         action = 'team/year/matches'
@@ -251,95 +162,58 @@ class ApiTeamYearMatchesController(ApiTeamControllerBase):
         self._track_call_defer(action, '{}/{}'.format(team_key, year))
 
     def _render(self, team_key, year, model_type=None):
-        matches = TeamYearMatchesQuery(self.team_key, int(year)).fetch(dict_version='3')
+        matches = TeamYearMatchesQuery(team_key, int(year)).fetch(dict_version='3')
         if model_type is not None:
             matches = [{key: match[key] for key in match_properties[model_type]} for match in matches]
 
         return json.dumps(matches, ensure_ascii=True)
 
 
-class ApiTeamEventAwardsController(ApiTeamControllerBase):
-    CACHE_KEY_FORMAT = "apiv3_team_event_awards_controller_{}_{}"  # (team_key, event_key)
+class ApiTeamEventAwardsController(ApiBaseController):
     CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 60 * 60
-
-    def __init__(self, *args, **kw):
-        super(ApiTeamEventAwardsController, self).__init__(*args, **kw)
-        self.team_key = self.request.route_kwargs["team_key"]
-        self.event_key = self.request.route_kwargs["event_key"]
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.event_key)
-
-    @property
-    def _validators(self):
-        return [("team_id_validator", self.team_key), ("event_id_validator", self.event_key)]
 
     def _track_call(self, team_key, event_key):
         self._track_call_defer('team/event/awards', '{}/{}'.format(team_key, event_key))
 
     def _render(self, team_key, event_key):
-        awards = TeamEventAwardsQuery(self.team_key, self.event_key).fetch(dict_version='3')
+        awards = TeamEventAwardsQuery(team_key, event_key).fetch(dict_version='3')
 
         return json.dumps(awards, ensure_ascii=True)
 
 
-class ApiTeamYearAwardsController(ApiTeamControllerBase):
-    CACHE_KEY_FORMAT = "apiv3_team_year_awards_controller_{}_{}"  # (team_key, year)
+class ApiTeamYearAwardsController(ApiBaseController):
     CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 60 * 60
-
-    def __init__(self, *args, **kw):
-        super(ApiTeamYearAwardsController, self).__init__(*args, **kw)
-        self.team_key = self.request.route_kwargs["team_key"]
-        self.year = self.request.route_kwargs["year"]
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.year)
-
-    @property
-    def _validators(self):
-        return [("team_id_validator", self.team_key)]
 
     def _track_call(self, team_key, year):
         self._track_call_defer('team/year/awards', '{}/{}'.format(team_key, year))
 
     def _render(self, team_key, year):
-        awards = TeamYearAwardsQuery(self.team_key, int(year)).fetch(dict_version='3')
+        awards = TeamYearAwardsQuery(team_key, int(year)).fetch(dict_version='3')
 
         return json.dumps(awards, ensure_ascii=True)
 
 
-class ApiTeamHistoryAwardsController(ApiTeamControllerBase):
+class ApiTeamHistoryAwardsController(ApiBaseController):
     """
     Returns a JSON list of award models won by a team
     """
-    CACHE_KEY_FORMAT = "apiv3_team_history_awards_controller_{}"  # (team_key)
     CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 60 * 60
-
-    def __init__(self, *args, **kw):
-        super(ApiTeamHistoryAwardsController, self).__init__(*args, **kw)
-        self.team_key = self.request.route_kwargs['team_key']
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key)
 
     def _track_call(self, team_key):
         self._track_call_defer('team/history/awards', team_key)
 
     def _render(self, team_key):
-        self._set_team(team_key)
-
-        awards = TeamAwardsQuery(self.team_key).fetch(dict_version='3')
+        awards = TeamAwardsQuery(team_key).fetch(dict_version='3')
 
         return json.dumps(awards, ensure_ascii=True)
 
 
-class ApiTeamYearMediaController(ApiTeamControllerBase):
-    CACHE_KEY_FORMAT = "apiv3_team_year_media_controller_{}_{}"  # (team_key, year)
+class ApiTeamYearMediaController(ApiBaseController):
     CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 60 * 60 * 24
-
-    def __init__(self, *args, **kw):
-        super(ApiTeamYearMediaController, self).__init__(*args, **kw)
-        self.team_key = self.request.route_kwargs["team_key"]
-        self.year = self.request.route_kwargs.get("year")
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key, self.year)
 
     def _track_call(self, team_key, year):
         api_label = team_key
@@ -347,29 +221,19 @@ class ApiTeamYearMediaController(ApiTeamControllerBase):
         self._track_call_defer('team/media', api_label)
 
     def _render(self, team_key, year):
-        self._set_team(team_key)
-
-        medias = TeamYearMediaQuery(self.team_key, int(year)).fetch(dict_version='3')
+        medias = TeamYearMediaQuery(team_key, int(year)).fetch(dict_version='3')
 
         return json.dumps(medias, ensure_ascii=True)
 
 
-class ApiTeamSocialMediaController(ApiTeamControllerBase):
-    CACHE_KEY_FORMAT = "apiv3_team_year_socialmedia_controller_{}"  # (team_key)
+class ApiTeamSocialMediaController(ApiBaseController):
     CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 60 * 60 * 24
-
-    def __init__(self, *args, **kw):
-        super(ApiTeamSocialMediaController, self).__init__(*args, **kw)
-        self.team_key = self.request.route_kwargs["team_key"]
-        self._partial_cache_key = self.CACHE_KEY_FORMAT.format(self.team_key)
 
     def _track_call(self, team_key):
         self._track_call_defer('team/social_media', team_key)
 
     def _render(self, team_key):
-        self._set_team(team_key)
-
-        social_medias = TeamSocialMediaQuery(self.team_key).fetch(dict_version='3')
+        social_medias = TeamSocialMediaQuery(team_key).fetch(dict_version='3')
 
         return json.dumps(social_medias, ensure_ascii=True)

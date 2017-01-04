@@ -6,13 +6,8 @@ from models.sitevar import Sitevar
 
 
 class ApiStatusController(ApiBaseController):
-    CACHE_KEY_FORMAT = "apiv3_status_controller"
     CACHE_VERSION = 0
     CACHE_HEADER_LENGTH = 61
-
-    def __init__(self, *args, **kw):
-        super(ApiStatusController, self).__init__(*args, **kw)
-        self._partial_cache_key = self.CACHE_KEY_FORMAT
 
     @property
     def _validators(self):

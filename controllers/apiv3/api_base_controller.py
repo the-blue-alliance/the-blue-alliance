@@ -64,6 +64,12 @@ class ApiBaseController(CacheableHandler):
         self.response.headers['content-type'] = 'application/json; charset="utf-8"'
         self.response.headers['Access-Control-Allow-Origin'] = '*'
 
+        # Set cache key based on class name, version, and kwargs
+        kwargs_sorted = sorted([(k, v) for k, v in self.request.route_kwargs.items()], key=lambda x: x[0])
+        self._partial_cache_key = '_'.join([
+            'v{}_{}'.format(self.API_VERSION, self.__class__.__name__)] +
+            [x[1] for x in kwargs_sorted])
+
     def handle_exception(self, exception, debug):
         """
         Handle an HTTP exception and actually writeout a
@@ -79,7 +85,7 @@ class ApiBaseController(CacheableHandler):
 
     def get(self, *args, **kw):
         # self._validate_tba_app_id()
-        self._errors = ValidationHelper.validate(self._validators)
+        self._errors = ValidationHelper.validate_request(self)
         if self._errors:
             self.abort(400)
 
