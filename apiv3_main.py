@@ -3,6 +3,7 @@ import tba_config
 import webapp2
 
 from controllers.apiv3 import api_status_controller as asc
+from controllers.apiv3 import api_event_controller as aec
 from controllers.apiv3 import api_team_controller as atc
 
 # Ensure that APIv3 routes include OPTIONS method for CORS preflight compatibility
@@ -64,10 +65,10 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/v3/team/<team_key:>/media/<year:([0-9]+)>',
         atc.ApiTeamYearMediaController, methods=['GET', 'OPTIONS']),
     # # Event List
-    # webapp2.Route(r'/api/v3/events/<year:([0-9]+)>',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # webapp2.Route(r'/api/v3/events/<year:([0-9]+)>/<model_type:(simple|keys)',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/events/<year:([0-9]+)>',
+        aec.ApiEventListController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/events/<year:([0-9]+)>/<model_type:(simple|keys)>',
+        aec.ApiEventListController, methods=['GET', 'OPTIONS']),
     # # Event
     # webapp2.Route(r'/api/v3/event/<event_key:>',
     #     ApiStatusController, methods=['GET', 'OPTIONS']),

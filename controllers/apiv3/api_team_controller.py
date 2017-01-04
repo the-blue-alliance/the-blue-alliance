@@ -1,8 +1,6 @@
 import json
 import webapp2
 
-from datetime import datetime
-
 from google.appengine.ext import ndb
 
 from controllers.apiv3.api_base_controller import ApiBaseController
