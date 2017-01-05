@@ -8,10 +8,8 @@ from controllers.apiv3.model_properties import filter_event_properties, filter_t
 from database.award_query import EventAwardsQuery
 from database.event_query import EventQuery, EventListQuery
 from database.event_details_query import EventDetailsQuery
-# from database.match_query import TeamEventMatchesQuery, TeamYearMatchesQuery
-# from database.media_query import TeamYearMediaQuery, TeamSocialMediaQuery
+from database.match_query import EventMatchesQuery
 from database.team_query import EventTeamsQuery
-# from database.robot_query import TeamRobotsQuery
 
 
 class ApiEventListController(ApiBaseController):
@@ -80,9 +78,27 @@ class ApiEventTeamsController(ApiBaseController):
         return json.dumps(teams, ensure_ascii=True, indent=2, sort_keys=True)
 
 
+class ApiEventMatchesController(ApiBaseController):
+    CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 61
+
+    def _track_call(self, event_key, model_type=None):
+        action = 'event/matches'
+        if model_type:
+            action += '/{}'.format(model_type)
+        self._track_call_defer(action, event_key)
+
+    def _render(self, event_key, model_type=None):
+        matches, self._last_modified = EventMatchesQuery(event_key).fetch(dict_version=3, return_updated=True)
+        if model_type is not None:
+            matches = filter_match_properties(matches, model_type)
+
+        return json.dumps(matches, ensure_ascii=True, indent=2, sort_keys=True)
+
+
 class ApiEventAwardsController(ApiBaseController):
     CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 60 * 60 * 24
+    CACHE_HEADER_LENGTH = 60 * 60
 
     def _track_call(self, event_key):
         self._track_call_defer('event/awards', event_key)

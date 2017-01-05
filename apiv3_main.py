@@ -64,12 +64,12 @@ app = webapp2.WSGIApplication([
         atc.ApiTeamYearMatchesController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/team/<team_key:>/media/<year:([0-9]+)>',
         atc.ApiTeamYearMediaController, methods=['GET', 'OPTIONS']),
-    # # Event List
+    # Event List
     webapp2.Route(r'/api/v3/events/<year:([0-9]+)>',
         aec.ApiEventListController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/events/<year:([0-9]+)>/<model_type:(simple|keys)>',
         aec.ApiEventListController, methods=['GET', 'OPTIONS']),
-    # # Event
+    # Event
     webapp2.Route(r'/api/v3/event/<event_key:>',
         aec.ApiEventController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/event/<event_key:>/<model_type:(simple)>',
@@ -80,13 +80,13 @@ app = webapp2.WSGIApplication([
         aec.ApiEventTeamsController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/event/<event_key:>/teams/<model_type:(simple|keys)>',
         aec.ApiEventTeamsController, methods=['GET', 'OPTIONS']),
-    # webapp2.Route(r'/api/v3/event/<event_key:>/matches',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # webapp2.Route(r'/api/v3/event/<event_key:>/matches/<model_type:(simple|keys)>',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/event/<event_key:>/matches',
+        aec.ApiEventMatchesController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/event/<event_key:>/matches/<model_type:(simple|keys)>',
+        aec.ApiEventMatchesController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/event/<event_key:>/awards',
         aec.ApiEventAwardsController, methods=['GET', 'OPTIONS']),
-    # # Match
+    # Match
     # webapp2.Route(r'/api/v3/match/<match_key:>',
     #     ApiStatusController, methods=['GET', 'OPTIONS']),
     # webapp2.Route(r'/api/v3/match/<match_key:>/<model_type:(simple)',
