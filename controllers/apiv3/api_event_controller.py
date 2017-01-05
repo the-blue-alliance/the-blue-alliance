@@ -5,7 +5,7 @@ from google.appengine.ext import ndb
 
 from controllers.apiv3.api_base_controller import ApiBaseController
 from controllers.apiv3.model_properties import filter_event_properties, filter_team_properties, filter_match_properties
-# from database.award_query import TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
+from database.award_query import EventAwardsQuery
 from database.event_query import EventQuery, EventListQuery
 from database.event_details_query import EventDetailsQuery
 # from database.match_query import TeamEventMatchesQuery, TeamYearMatchesQuery
@@ -78,3 +78,16 @@ class ApiEventTeamsController(ApiBaseController):
             teams = filter_team_properties(teams, model_type)
 
         return json.dumps(teams, ensure_ascii=True, indent=2, sort_keys=True)
+
+
+class ApiEventAwardsController(ApiBaseController):
+    CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
+
+    def _track_call(self, event_key):
+        self._track_call_defer('event/awards', event_key)
+
+    def _render(self, event_key):
+        awards, self._last_modified = EventAwardsQuery(event_key).fetch(dict_version=3, return_updated=True)
+
+        return json.dumps(awards, ensure_ascii=True, indent=2, sort_keys=True)

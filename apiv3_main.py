@@ -84,8 +84,8 @@ app = webapp2.WSGIApplication([
     #     ApiStatusController, methods=['GET', 'OPTIONS']),
     # webapp2.Route(r'/api/v3/event/<event_key:>/matches/<model_type:(simple|keys)>',
     #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # webapp2.Route(r'/api/v3/event/<event_key:>/awards',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/event/<event_key:>/awards',
+        aec.ApiEventAwardsController, methods=['GET', 'OPTIONS']),
     # # Match
     # webapp2.Route(r'/api/v3/match/<match_key:>',
     #     ApiStatusController, methods=['GET', 'OPTIONS']),
