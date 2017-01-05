@@ -6,6 +6,7 @@ from google.appengine.ext import testbed
 from database import get_affected_queries
 from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
 from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
+from database.event_details_query import EventDetailsQuery
 from database.match_query import EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
 from database.media_query import TeamSocialMediaQuery, TeamYearMediaQuery, EventTeamsMediasQuery, EventTeamsPreferredMediasQuery
 from database.robot_query import TeamRobotsQuery
@@ -15,6 +16,7 @@ from consts.district_type import DistrictType
 
 from models.district_team import DistrictTeam
 from models.event import Event
+from models.event_details import EventDetails
 from models.event_team import EventTeam
 from models.team import Team
 
@@ -115,6 +117,16 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         self.assertTrue(TeamEventsQuery('frc604').cache_key in cache_keys)
         self.assertTrue(TeamYearEventsQuery('frc254', 2015).cache_key in cache_keys)
         self.assertTrue(TeamYearEventsQuery('frc604', 2015).cache_key in cache_keys)
+
+    def test_event_details_updated(self):
+        affected_refs = {
+            'key': {ndb.Key(EventDetails, '2015casj'), ndb.Key(EventDetails, '2015cama')},
+        }
+        cache_keys = [q.cache_key for q in get_affected_queries.event_details_updated(affected_refs)]
+
+        self.assertEqual(len(cache_keys), 2)
+        self.assertTrue(EventDetailsQuery('2015casj').cache_key in cache_keys)
+        self.assertTrue(EventDetailsQuery('2015cama').cache_key in cache_keys)
 
     def test_match_updated(self):
         affected_refs = {

@@ -97,7 +97,8 @@ class CacheClearer(object):
             cls._get_team_events_cache_keys_and_controllers(team_keys, years) + \
             cls._get_districtlist_cache_keys_and_controllers(years) + \
             cls._get_district_events_cache_keys_and_controllers(event_district_abbrevs, years) + \
-            cls._get_district_rankings_cache_keys_and_controllers(event_district_abbrevs, years)
+            cls._get_district_rankings_cache_keys_and_controllers(event_district_abbrevs, years) + \
+            cls._queries_to_cache_keys_and_controllers(get_affected_queries.event_details_updated(affected_refs))
 
     @classmethod
     def get_eventteam_cache_keys_and_controllers(cls, affected_refs):
