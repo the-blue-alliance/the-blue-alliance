@@ -8,10 +8,11 @@ class EventConverter(ConverterBase):
 
     @classmethod
     def convert(cls, events, dict_version):
-        EVENT_CONVERTERS = {
+        CONVERTERS = {
             3: cls.eventsConverter_v3,
         }
-        return EVENT_CONVERTERS[dict_version](events)
+        converted_events = CONVERTERS[dict_version](cls._listify(events))
+        return cls._delistify(converted_events)
 
     @classmethod
     def eventsConverter_v3(cls, events):

@@ -38,6 +38,7 @@ class ValidationHelper(object):
         valid = True
         team_future = None
         event_future = None
+        match_future = None
         # Check key formats
         if 'team_key' in kwargs:
             team_key = kwargs['team_key']
@@ -55,6 +56,20 @@ class ValidationHelper(object):
                 valid = False
             else:
                 event_future = Event.get_by_id_async(event_key)
+        if 'match_key' in kwargs:
+            match_key = kwargs['match_key']
+            results = cls.match_id_validator(match_key)
+            if results:
+                error_dict['Errors'].append(results)
+                valid = False
+            else:
+                match_future = Match.get_by_id_async(match_key)
+        if 'district_key' in kwargs:
+            district_key = kwargs['district_key']
+            results = cls.district_id_validator(district_key)
+            if results:
+                error_dict['Errors'].append(results)
+                valid = False
         if 'year' in kwargs:
             year = int(kwargs['year'])
             if year > tba_config.MAX_YEAR or year < 1992:
@@ -67,6 +82,9 @@ class ValidationHelper(object):
             valid = False
         if event_future and event_future.get_result() is None:
             error_dict['Errors'].append({'event_id': 'event id {} does not exist'.format(event_key)})
+            valid = False
+        if match_future and match_future.get_result() is None:
+            error_dict['Errors'].append({'match_id': 'match id {} does not exist'.format(match_key)})
             valid = False
 
         if not valid:

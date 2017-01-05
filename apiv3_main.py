@@ -3,6 +3,9 @@ import tba_config
 import webapp2
 
 from controllers.apiv3 import api_status_controller as asc
+from controllers.apiv3 import api_district_controller as adc
+from controllers.apiv3 import api_event_controller as aec
+from controllers.apiv3 import api_match_controller as amc
 from controllers.apiv3 import api_team_controller as atc
 
 # Ensure that APIv3 routes include OPTIONS method for CORS preflight compatibility
@@ -63,51 +66,45 @@ app = webapp2.WSGIApplication([
         atc.ApiTeamYearMatchesController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/team/<team_key:>/media/<year:([0-9]+)>',
         atc.ApiTeamYearMediaController, methods=['GET', 'OPTIONS']),
-    # # Event List
-    # webapp2.Route(r'/api/v3/events/<year:([0-9]+)>',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # webapp2.Route(r'/api/v3/events/<year:([0-9]+)>/<model_type:(simple|keys)',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # # Event
-    # webapp2.Route(r'/api/v3/event/<event_key:>',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # webapp2.Route(r'/api/v3/event/<event_key:>/<model_type:(simple)',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # webapp2.Route(r'/api/v3/event/<event_key:>/elim_alliances',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # webapp2.Route(r'/api/v3/event/<event_key:>/stats',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # webapp2.Route(r'/api/v3/event/<event_key:>/rankings',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # webapp2.Route(r'/api/v3/event/<event_key:>/district_points',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # webapp2.Route(r'/api/v3/event/<event_key:>/teams',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # webapp2.Route(r'/api/v3/event/<event_key:>/teams/<model_type:(simple|keys)',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # webapp2.Route(r'/api/v3/event/<event_key:>/matches',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # webapp2.Route(r'/api/v3/event/<event_key:>/matches/<model_type:(simple|keys)',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # webapp2.Route(r'/api/v3/event/<event_key:>/awards',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # # Match
-    # webapp2.Route(r'/api/v3/match/<match_key:>',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # webapp2.Route(r'/api/v3/match/<match_key:>/<model_type:(simple)',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # # District List
-    # webapp2.Route(r'/api/v3/districts/<year:([0-9]+)>',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # # District
-    # webapp2.Route(r'/api/v3/district/<district_key:>/<year:([0-9]+)>/events',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # webapp2.Route(r'/api/v3/district/<district_key:>/<year:([0-9]+)>/events/<model_type:(simple|keys)',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # webapp2.Route(r'/api/v3/district/<district_key:>/<year:([0-9]+)>/teams',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # webapp2.Route(r'/api/v3/district/<district_key:>/<year:([0-9]+)>/teams/<model_type:(simple|keys)',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
+    # Event List
+    webapp2.Route(r'/api/v3/events/<year:([0-9]+)>',
+        aec.ApiEventListController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/events/<year:([0-9]+)>/<model_type:(simple|keys)>',
+        aec.ApiEventListController, methods=['GET', 'OPTIONS']),
+    # Event
+    webapp2.Route(r'/api/v3/event/<event_key:>',
+        aec.ApiEventController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/event/<event_key:>/<model_type:(simple)>',
+        aec.ApiEventController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/event/<event_key:>/<detail_type:(alliances|district_points|rankings|stats)>',
+        aec.ApiEventDetailsController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/event/<event_key:>/teams',
+        aec.ApiEventTeamsController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/event/<event_key:>/teams/<model_type:(simple|keys)>',
+        aec.ApiEventTeamsController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/event/<event_key:>/matches',
+        aec.ApiEventMatchesController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/event/<event_key:>/matches/<model_type:(simple|keys)>',
+        aec.ApiEventMatchesController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/event/<event_key:>/awards',
+        aec.ApiEventAwardsController, methods=['GET', 'OPTIONS']),
+    # Match
+    webapp2.Route(r'/api/v3/match/<match_key:>',
+        amc.ApiMatchController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/match/<match_key:>/<model_type:(simple)>',
+        amc.ApiMatchController, methods=['GET', 'OPTIONS']),
+    # District List
+    webapp2.Route(r'/api/v3/districts/<year:([0-9]+)>',
+        adc.ApiDistrictListController, methods=['GET', 'OPTIONS']),
+    # District
+    webapp2.Route(r'/api/v3/district/<district_key:>/<year:([0-9]+)>/events',
+        adc.ApiDistrictEventsController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/district/<district_key:>/<year:([0-9]+)>/events/<model_type:(simple|keys)>',
+        adc.ApiDistrictEventsController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/district/<district_key:>/<year:([0-9]+)>/teams',
+        adc.ApiDistrictTeamsController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/district/<district_key:>/<year:([0-9]+)>/teams/<model_type:(simple|keys)>',
+        adc.ApiDistrictTeamsController, methods=['GET', 'OPTIONS']),
     # webapp2.Route(r'/api/v3/district/<district_key:>/<year:([0-9]+)>/rankings',
     #     ApiStatusController, methods=['GET', 'OPTIONS']),
 ], debug=tba_config.DEBUG)

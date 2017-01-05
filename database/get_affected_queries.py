@@ -1,6 +1,7 @@
 from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
-from database.event_query import EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
-from database.match_query import EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
+from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
+from database.event_details_query import EventDetailsQuery
+from database.match_query import MatchQuery, EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
 from database.media_query import TeamSocialMediaQuery, TeamYearMediaQuery, EventTeamsMediasQuery, EventTeamsPreferredMediasQuery
 from database.robot_query import TeamRobotsQuery
 from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
@@ -40,6 +41,9 @@ def event_updated(affected_refs):
     event_team_keys_future = EventTeam.query(EventTeam.event.IN([event_key for event_key in event_keys])).fetch_async(None, keys_only=True)
 
     queries_and_keys = []
+    for event_key in event_keys:
+        queries_and_keys.append((EventQuery(event_key.id())))
+
     for year in years:
         queries_and_keys.append((EventListQuery(year)))
 
@@ -55,12 +59,26 @@ def event_updated(affected_refs):
     return queries_and_keys
 
 
+def event_details_updated(affected_refs):
+    event_details_keys = filter(None, affected_refs['key'])
+
+    queries_and_keys = []
+    for event_details_key in event_details_keys:
+        queries_and_keys.append((EventDetailsQuery(event_details_key.id())))
+
+    return queries_and_keys
+
+
 def match_updated(affected_refs):
+    match_keys = filter(None, affected_refs['key'])
     event_keys = filter(None, affected_refs['event'])
     team_keys = filter(None, affected_refs['team_keys'])
     years = filter(None, affected_refs['year'])
 
     queries_and_keys = []
+    for match_key in match_keys:
+        queries_and_keys.append((MatchQuery(match_key.id())))
+
     for event_key in event_keys:
         queries_and_keys.append((EventMatchesQuery(event_key.id())))
         for team_key in team_keys:

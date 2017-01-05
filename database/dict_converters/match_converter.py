@@ -9,10 +9,11 @@ class MatchConverter(ConverterBase):
 
     @classmethod
     def convert(cls, matches, dict_version):
-        MATCH_CONVERTERS = {
+        CONVERTERS = {
             3: cls.matchesConverter_v3,
         }
-        return MATCH_CONVERTERS[dict_version](matches)
+        converted_matches = CONVERTERS[dict_version](cls._listify(matches))
+        return cls._delistify(converted_matches)
 
     @classmethod
     def matchesConverter_v3(cls, matches):
