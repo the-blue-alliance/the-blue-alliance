@@ -64,6 +64,12 @@ class ValidationHelper(object):
                 valid = False
             else:
                 match_future = Match.get_by_id_async(match_key)
+        if 'district_key' in kwargs:
+            district_key = kwargs['district_key']
+            results = cls.district_id_validator(district_key)
+            if results:
+                error_dict['Errors'].append(results)
+                valid = False
         if 'year' in kwargs:
             year = int(kwargs['year'])
             if year > tba_config.MAX_YEAR or year < 1992:

@@ -42,12 +42,18 @@ match_properties = {
 
 
 def filter_event_properties(events, model_type):
+    if not events:
+        return []
     return [{key: event[key] for key in event_properties[model_type]} for event in events]
 
 
 def filter_team_properties(teams, model_type):
+    if not teams:
+        return []
     return [{key: team[key] for key in team_properties[model_type]} for team in teams]
 
 
 def filter_match_properties(matches, model_type):
+    if not matches:
+        return []
     return [{key: match[key] for key in match_properties[model_type]} for match in matches]

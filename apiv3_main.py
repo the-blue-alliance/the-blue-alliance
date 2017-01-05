@@ -3,6 +3,7 @@ import tba_config
 import webapp2
 
 from controllers.apiv3 import api_status_controller as asc
+from controllers.apiv3 import api_district_controller as adc
 from controllers.apiv3 import api_event_controller as aec
 from controllers.apiv3 import api_match_controller as amc
 from controllers.apiv3 import api_team_controller as atc
@@ -95,11 +96,11 @@ app = webapp2.WSGIApplication([
     # # District List
     # webapp2.Route(r'/api/v3/districts/<year:([0-9]+)>',
     #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # # District
-    # webapp2.Route(r'/api/v3/district/<district_key:>/<year:([0-9]+)>/events',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # webapp2.Route(r'/api/v3/district/<district_key:>/<year:([0-9]+)>/events/<model_type:(simple|keys)>',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
+    # District
+    webapp2.Route(r'/api/v3/district/<district_key:>/<year:([0-9]+)>/events',
+        adc.ApiDistrictEventsController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/district/<district_key:>/<year:([0-9]+)>/events/<model_type:(simple|keys)>',
+        adc.ApiDistrictEventsController, methods=['GET', 'OPTIONS']),
     # webapp2.Route(r'/api/v3/district/<district_key:>/<year:([0-9]+)>/teams',
     #     ApiStatusController, methods=['GET', 'OPTIONS']),
     # webapp2.Route(r'/api/v3/district/<district_key:>/<year:([0-9]+)>/teams/<model_type:(simple|keys)>',
