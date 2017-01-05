@@ -7,7 +7,7 @@ from database import get_affected_queries
 from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
 from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
 from database.event_details_query import EventDetailsQuery
-from database.match_query import EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
+from database.match_query import MatchQuery, EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
 from database.media_query import TeamSocialMediaQuery, TeamYearMediaQuery, EventTeamsMediasQuery, EventTeamsPreferredMediasQuery
 from database.robot_query import TeamRobotsQuery
 from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
@@ -18,6 +18,7 @@ from models.district_team import DistrictTeam
 from models.event import Event
 from models.event_details import EventDetails
 from models.event_team import EventTeam
+from models.match import Match
 from models.team import Team
 
 
@@ -130,13 +131,16 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
 
     def test_match_updated(self):
         affected_refs = {
+            'key': {ndb.Key(Match, '2015casj_qm1'), ndb.Key(Match, '2015casj_qm2')},
             'event': {ndb.Key(Event, '2015casj'), ndb.Key(Event, '2015cama')},
             'team_keys': {ndb.Key(Team, 'frc254'), ndb.Key(Team, 'frc604')},
             'year': {2014, 2015},
         }
         cache_keys = [q.cache_key for q in get_affected_queries.match_updated(affected_refs)]
 
-        self.assertEqual(len(cache_keys), 10)
+        self.assertEqual(len(cache_keys), 12)
+        self.assertTrue(MatchQuery('2015casj_qm1').cache_key in cache_keys)
+        self.assertTrue(MatchQuery('2015casj_qm2').cache_key in cache_keys)
         self.assertTrue(EventMatchesQuery('2015casj').cache_key in cache_keys)
         self.assertTrue(EventMatchesQuery('2015cama').cache_key in cache_keys)
         self.assertTrue(TeamEventMatchesQuery('frc254', '2015casj').cache_key in cache_keys)

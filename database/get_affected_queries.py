@@ -1,7 +1,7 @@
 from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
 from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
 from database.event_details_query import EventDetailsQuery
-from database.match_query import EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
+from database.match_query import MatchQuery, EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
 from database.media_query import TeamSocialMediaQuery, TeamYearMediaQuery, EventTeamsMediasQuery, EventTeamsPreferredMediasQuery
 from database.robot_query import TeamRobotsQuery
 from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
@@ -70,11 +70,15 @@ def event_details_updated(affected_refs):
 
 
 def match_updated(affected_refs):
+    match_keys = filter(None, affected_refs['key'])
     event_keys = filter(None, affected_refs['event'])
     team_keys = filter(None, affected_refs['team_keys'])
     years = filter(None, affected_refs['year'])
 
     queries_and_keys = []
+    for match_key in match_keys:
+        queries_and_keys.append((MatchQuery(match_key.id())))
+
     for event_key in event_keys:
         queries_and_keys.append((EventMatchesQuery(event_key.id())))
         for team_key in team_keys:
