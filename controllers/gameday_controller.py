@@ -159,6 +159,7 @@ class GamedayRedirectHandler(webapp2.RequestHandler):
         layout = count - 1 if count < 5 else 5  # Fall back to hex-view
         params = "#layout={}".format(layout)
         for i, webcast in enumerate(event.webcast):
-            params += "&view_{}={}-{}".format(i, webcast['key_name'], i+1)
+            # The various streams for an event are 0-indexed in GD2
+            params += "&view_{0}={1}-{0}".format(i, webcast['key_name'])
 
         return params
