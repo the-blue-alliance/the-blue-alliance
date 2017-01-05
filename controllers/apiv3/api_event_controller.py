@@ -10,7 +10,7 @@ from database.event_query import EventQuery, EventListQuery
 from database.event_details_query import EventDetailsQuery
 # from database.match_query import TeamEventMatchesQuery, TeamYearMatchesQuery
 # from database.media_query import TeamYearMediaQuery, TeamSocialMediaQuery
-# from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, TeamParticipationQuery, TeamDistrictsQuery
+from database.team_query import EventTeamsQuery
 # from database.robot_query import TeamRobotsQuery
 
 
@@ -60,3 +60,21 @@ class ApiEventDetailsController(ApiBaseController):
     def _render(self, event_key, detail_type):
         event_details, self._last_modified = EventDetailsQuery(event_key).fetch(dict_version=3, return_updated=True)
         return json.dumps(event_details[detail_type], ensure_ascii=True, indent=2, sort_keys=True)
+
+
+class ApiEventTeamsController(ApiBaseController):
+    CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
+
+    def _track_call(self, event_key, model_type=None):
+        action = 'event/teams'
+        if model_type:
+            action += '/{}'.format(model_type)
+        self._track_call_defer(action, event_key)
+
+    def _render(self, event_key, model_type=None):
+        teams, self._last_modified = EventTeamsQuery(event_key).fetch(dict_version=3, return_updated=True)
+        if model_type is not None:
+            teams = filter_team_properties(teams, model_type)
+
+        return json.dumps(teams, ensure_ascii=True, indent=2, sort_keys=True)
