@@ -11,7 +11,7 @@ import { indigo500, indigo700 } from 'material-ui/styles/colors'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
 import GamedayFrame from './components/GamedayFrame'
 import gamedayReducer from './reducers'
-import { setWebcastsRaw, setLayout, addWebcastAtPosition } from './actions'
+import { setWebcastsRaw, setLayout, addWebcastAtPosition, setTwitchChat, setChatSidebarVisibility } from './actions'
 import { MAX_SUPPORTED_VIEWS } from './constants/LayoutConstants'
 
 injectTapEventPlugin()
@@ -59,6 +59,10 @@ for (let i = 0; i < MAX_SUPPORTED_VIEWS; i++) {
     store.dispatch(addWebcastAtPosition(params[key], i))
   }
 }
+if (params.chat) {
+  store.dispatch(setChatSidebarVisibility(true))
+  store.dispatch(setTwitchChat(params.chat))
+}
 
 // Subscribe to the store to keep the url hash in sync
 store.subscribe(() => {
@@ -73,16 +77,29 @@ store.subscribe(() => {
       positionMap,
       domOrder,
     },
+    chats: {
+      currentChat,
+    },
+    visibility: {
+      chatSidebar,
+    },
   } = state
 
+  // Which layout is currently active
   if (layoutSet) {
     newParams.layout = layoutId
   }
 
+  // Positions of all webcasts
   for (let i = 0; i < positionMap.length; i++) {
     if (domOrder[positionMap[i]]) {
       newParams[`view_${i}`] = domOrder[positionMap[i]]
     }
+  }
+
+  // Chat sidebar
+  if (chatSidebar) {
+    newParams.chat = currentChat
   }
 
   const query = queryString.stringify(newParams)
