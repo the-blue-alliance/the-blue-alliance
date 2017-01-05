@@ -1,5 +1,4 @@
 import json
-import webapp2
 
 from google.appengine.ext import ndb
 

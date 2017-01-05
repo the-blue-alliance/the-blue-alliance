@@ -6,6 +6,18 @@ from models.event import Event
 from models.match import Match
 
 
+class MatchQuery(DatabaseQuery):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = 'match_{}'  # (match_key)
+    DICT_CONVERTER = MatchConverter
+
+    @ndb.tasklet
+    def _query_async(self):
+        match_key = self._query_args[0]
+        match = yield Match.get_by_id_async(match_key)
+        raise ndb.Return(match)
+
+
 class EventMatchesQuery(DatabaseQuery):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = 'event_matches_{}'  # (event_key)

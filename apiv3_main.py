@@ -4,6 +4,7 @@ import webapp2
 
 from controllers.apiv3 import api_status_controller as asc
 from controllers.apiv3 import api_event_controller as aec
+from controllers.apiv3 import api_match_controller as amc
 from controllers.apiv3 import api_team_controller as atc
 
 # Ensure that APIv3 routes include OPTIONS method for CORS preflight compatibility
@@ -87,10 +88,10 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/v3/event/<event_key:>/awards',
         aec.ApiEventAwardsController, methods=['GET', 'OPTIONS']),
     # Match
-    # webapp2.Route(r'/api/v3/match/<match_key:>',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
-    # webapp2.Route(r'/api/v3/match/<match_key:>/<model_type:(simple)',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/match/<match_key:>',
+        amc.ApiMatchController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/match/<match_key:>/<model_type:(simple)>',
+        amc.ApiMatchController, methods=['GET', 'OPTIONS']),
     # # District List
     # webapp2.Route(r'/api/v3/districts/<year:([0-9]+)>',
     #     ApiStatusController, methods=['GET', 'OPTIONS']),
