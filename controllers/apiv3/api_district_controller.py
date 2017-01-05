@@ -8,7 +8,7 @@ from controllers.apiv3.model_properties import filter_event_properties, filter_t
 from database.event_query import DistrictEventsQuery
 # from database.event_details_query import EventDetailsQuery
 # from database.match_query import EventMatchesQuery
-# from database.team_query import EventTeamsQuery
+from database.team_query import DistrictTeamsQuery
 
 
 class ApiDistrictEventsController(ApiBaseController):
@@ -26,3 +26,20 @@ class ApiDistrictEventsController(ApiBaseController):
         if model_type is not None:
             events = filter_event_properties(events, model_type)
         return json.dumps(events, ensure_ascii=True, indent=True, sort_keys=True)
+
+
+class ApiDistrictTeamsController(ApiBaseController):
+    CACHE_VERSION = 0
+    CACHE_HEADER_LENGTH = 60 * 60 * 24
+
+    def _track_call(self, district_key, year, model_type=None):
+        action = 'district/teams'
+        if model_type:
+            action += '/{}'.format(model_type)
+        self._track_call_defer(action, '{}/{}'.format(district_key, year))
+
+    def _render(self, district_key, year, model_type=None):
+        teams, self._last_modified = DistrictTeamsQuery('{}{}'.format(year, district_key)).fetch(dict_version=3, return_updated=True)
+        if model_type is not None:
+            teams = filter_team_properties(teams, model_type)
+        return json.dumps(teams, ensure_ascii=True, indent=True, sort_keys=True)
