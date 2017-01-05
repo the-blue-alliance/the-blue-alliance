@@ -93,9 +93,9 @@ app = webapp2.WSGIApplication([
         amc.ApiMatchController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/match/<match_key:>/<model_type:(simple)>',
         amc.ApiMatchController, methods=['GET', 'OPTIONS']),
-    # # District List
-    # webapp2.Route(r'/api/v3/districts/<year:([0-9]+)>',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
+    # District List
+    webapp2.Route(r'/api/v3/districts/<year:([0-9]+)>',
+        adc.ApiDistrictListController, methods=['GET', 'OPTIONS']),
     # District
     webapp2.Route(r'/api/v3/district/<district_key:>/<year:([0-9]+)>/events',
         adc.ApiDistrictEventsController, methods=['GET', 'OPTIONS']),
