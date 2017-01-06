@@ -90,14 +90,14 @@
               <ul class="pagination">
                 {% if page != 0 %}
                 <li>
-                  <a href="/advanced_search?year={{year}}{% for award_type in award_types %}&award_type={{award_type}}{% endfor %}{% for event_type in event_types %}&event_type={{event_type}}{% endfor %}&location={{location}}&page={{page - 1}}&search_type={{search_type}}" aria-label="Previous">
+                  <a href="/advanced_search?year={{year}}{% for award_type in award_types %}&award_type={{award_type}}{% endfor %}&seed={{seed}}&playoff_level={{playoff_level}}{% if cad_model %}&cad_model=on{% endif %}&page={{page - 1}}" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                   </a>
                 </li>
                 {% endif %}
                 {% for i in range((num_results / page_size)|ceil) %}
                   <li {% if i == page %}class="active"{% endif %}>
-                    <a href="/advanced_search?year={{year}}{% for award_type in award_types %}&award_type={{award_type}}{% endfor %}{% for event_type in event_types %}&event_type={{event_type}}{% endfor %}&location={{location}}&page={{i}}&search_type={{search_type}}">
+                    <a href="/advanced_search?year={{year}}{% for award_type in award_types %}&award_type={{award_type}}{% endfor %}&seed={{seed}}&playoff_level={{playoff_level}}{% if cad_model %}&cad_model=on{% endif %}&page={{i}}">
                       {{page_size * i + 1}}-
                       {%- if loop.last -%}
                         {{page_size * i + num_results - page_size * i}}
@@ -109,7 +109,7 @@
                 {% endfor %}
                 {% if page != (num_results / page_size)|ceil - 1 %}
                 <li>
-                  <a href="/advanced_search?year={{year}}{% for award_type in award_types %}&award_type={{award_type}}{% endfor %}{% for event_type in event_types %}&event_type={{event_type}}{% endfor %}&location={{location}}&page={{page + 1}}&search_type={{search_type}}" aria-label="Next">
+                  <a href="/advanced_search?year={{year}}{% for award_type in award_types %}&award_type={{award_type}}{% endfor %}&seed={{seed}}&playoff_level={{playoff_level}}{% if cad_model %}&cad_model=on{% endif %}&page={{page + 1}}" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                   </a>
                 </li>
