@@ -30,9 +30,8 @@ class AdvancedSearchController(CacheableHandler):
 
     VALID_SEEDS = [16, 8, 4, 2, 1]
     PLAYOFF_MAP = {
-        1: 'qf',
-        2: 'sf',
-        3: 'f',
+        1: 'sf',
+        2: 'f',
     }
 
     PAGE_SIZE = 20
@@ -76,7 +75,7 @@ class AdvancedSearchController(CacheableHandler):
         if self._seed not in self.VALID_SEEDS:
             self._seed = 0
 
-        self._playoff_level = self._sanitize_int_param('playoff_level', 0, 3)
+        self._playoff_level = self._sanitize_int_param('playoff_level', 0, 2)
 
         self._cad_model = self.request.get('cad_model')
         if self._cad_model:
