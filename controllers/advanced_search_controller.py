@@ -28,7 +28,7 @@ class AdvancedSearchController(CacheableHandler):
         VALID_AWARD_TYPES,
         key=lambda (event_type, name): SORT_ORDER.get(event_type, name))
 
-    VALID_SEEDS = [16, 8, 4, 2, 1]
+    VALID_SEEDS = [8, 4, 2, 1]
     PLAYOFF_MAP = {
         1: 'sf',
         2: 'f',
