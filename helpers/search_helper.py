@@ -7,6 +7,7 @@ from consts.event_type import EventType
 from consts.media_type import MediaType
 from database.award_query import TeamAwardsQuery
 from database.event_query import TeamEventsQuery
+from database.match_query import TeamYearMatchesQuery
 from database.media_query import TeamMediaQuery
 from database.team_query import TeamParticipationQuery
 
@@ -72,8 +73,7 @@ class SearchHelper(object):
         events_by_year = defaultdict(list)
         for event in events_future.get_result():
             events_by_year[event.year].append(event)
-            event.prep_matches()
-            event.prep_details()
+            event.prep_details()  # For rankings
 
         awards_by_event = defaultdict(list)
         for award in awards_future.get_result():
@@ -92,6 +92,7 @@ class SearchHelper(object):
 
         # field_counts = defaultdict(int)
         for year, events in events_by_year.items():
+            year_matches_future = TeamYearMatchesQuery(team.key.id(), year).fetch_async()
             qual_seeds = set()
             comp_levels = set()
             year_awards = set()
@@ -104,14 +105,13 @@ class SearchHelper(object):
                         if str(row[1]) == str(team.team_number):
                             qual_seeds.add(int(row[0]))
 
-                if event.matches:
-                    for match in event.matches:
-                        comp_levels.add(match.comp_level)
-
                 awards = awards_by_event.get(event.key.id(), [])
                 award_types = set([a.award_type_enum for a in awards])
                 award_types = filter(lambda a: a in AwardType.SEARCHABLE, award_types)
                 year_awards = year_awards.union(award_types)
+
+            for match in year_matches_future.get_result():
+                comp_levels.add(match.comp_level)
 
             has_cad = False
             for media in medias_by_year[year]:

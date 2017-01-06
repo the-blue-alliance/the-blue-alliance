@@ -4,7 +4,6 @@ from google.appengine.api import search
 from google.appengine.ext import ndb
 
 from consts.award_type import AwardType
-from consts.event_type import EventType
 from controllers.base_controller import CacheableHandler
 from helpers.search_helper import SearchHelper
 from models.event_team import EventTeam
@@ -29,17 +28,16 @@ class AdvancedSearchController(CacheableHandler):
         VALID_AWARD_TYPES,
         key=lambda (event_type, name): SORT_ORDER.get(event_type, name))
 
-    VALID_EVENT_TYPES = [
-        (EventType.REGIONAL, 'Regional'),
-        (EventType.DISTRICT, 'District'),
-        (EventType.DISTRICT_CMP, 'District Championship'),
-        (EventType.CMP_DIVISION, 'Championship Division'),
-        (EventType.CMP_FINALS, 'Championship'),
-    ]
+    VALID_SEEDS = [16, 8, 4, 2, 1]
+    PLAYOFF_MAP = {
+        1: 'qf',
+        2: 'sf',
+        3: 'f',
+    }
 
     PAGE_SIZE = 20
     CACHE_VERSION = 1
-    CACHE_KEY_FORMAT = "advanced_search_{}_{}_{}_{}_{}_{}_{}"  # (year, award_types, event_type, time_period, robot_photo, cad_model, page)
+    CACHE_KEY_FORMAT = "advanced_search_{}_{}_{}_{}_{}_{}"  # (year, award_types, seed, playoff_level, cad_model, page)
 
     def __init__(self, *args, **kw):
         super(AdvancedSearchController, self).__init__(*args, **kw)
@@ -67,27 +65,24 @@ class AdvancedSearchController(CacheableHandler):
             # Sort to make caching more likely
             self._award_types = filter(lambda x: x in AwardType.SEARCHABLE, sorted(set([
                 int(award_type) if award_type.isdigit() else None
-                for award_type in self._award_types])))[:SearchHelper.MAX_AWARDS]
-            self._event_type = self.request.get('event_type')
-            if self._event_type:
-                self._event_type = int(self._event_type) if self._event_type.isdigit() else -1
-            else:
-                self._event_type = -1
-            if self._event_type not in [x[0] for x in self.VALID_EVENT_TYPES]:
-                self._event_type = -1
-
-            self._time_period = self._sanitize_int_param('time_period', 0, 1)
+                for award_type in self._award_types])))
         else:
             self._award_types = []
-            self._event_type = -1
-            self._time_period = 0
 
-        self._robot_photo = self.request.get('robot_photo')
-        if self._robot_photo:
-            self._robot_photo = True
+        self._seed = self.request.get('seed')
+        if not self._seed or not self._seed.isdigit():
+            self._seed = 0
+        self._seed = int(self._seed)
+        if self._seed not in self.VALID_SEEDS:
+            self._seed = 0
+
+        self._playoff_level = self._sanitize_int_param('playoff_level', 0, 3)
+
         self._cad_model = self.request.get('cad_model')
         if self._cad_model:
             self._cad_model = True
+        else:
+            self._cad_model = False
 
         self._page = self.request.get('page', 0)
         if not self._page or not self._page.isdigit():
@@ -97,12 +92,11 @@ class AdvancedSearchController(CacheableHandler):
     def get(self):
         self._get_params();
         self._partial_cache_key = self.CACHE_KEY_FORMAT.format(
-            self._year, self._award_types, self._event_type, self._time_period,
-            self._robot_photo, self._cad_model, self._page)
+            self._year, self._award_types, self._seed, self._playoff_level, self._cad_model, self._page)
         super(AdvancedSearchController, self).get()
 
     def _render(self):
-        new_search = not self._award_types and not self._robot_photo and not self._cad_model
+        new_search = not self._year or (not self._award_types and not self._seed and not self._playoff_level and not self._cad_model)
         if new_search:
             result_models = []
             num_results = 0
@@ -115,41 +109,21 @@ class AdvancedSearchController(CacheableHandler):
 
             search_index = search.Index(name=SearchHelper.TEAM_AWARDS_INDEX)
 
-            award_filter = '_'.join(['a{}'.format(award_type) for award_type in self._award_types])
+            partial_queries.append('year={}'.format(self._year))
+            award_filter = ' OR '.join(['award={}'.format(award_type) for award_type in self._award_types])
+            if award_filter:
+                partial_queries.append(award_filter)
 
-            if self._event_type == -1:
-                event_type_filter = ''
-            else:
-                event_type_filter = '_e{}'.format(self._event_type)
+            if self._seed:
+                partial_queries.append('highest_seed<={}'.format(self._seed))
 
-            if self._year:
-                year_filter = '_y{}'.format(self._year)
-            else:
-                year_filter = ''
+            if self._playoff_level:
+                partial_queries.append('comp_level={}'.format(self.PLAYOFF_MAP[self._playoff_level]))
 
-            if self._award_types:
-                if self._time_period == 0:
-                    expression = 's_{}{}{}'.format(award_filter, event_type_filter, year_filter)
-                elif self._time_period == 1:
-                    expression = 'e_{}{}{}'.format(award_filter, event_type_filter, year_filter)
-                partial_queries.append('{} > 0'.format(expression))
-
-            if self._robot_photo:
-                partial_queries.append('robot_photo_year = {}'.format(self._year))
             if self._cad_model:
-                partial_queries.append('cad_model_year = {}'.format(self._year))
+                partial_queries.append('has_cad=1')
 
             query_string = ' AND ' .join(partial_queries)
-
-            if self._award_types:
-                sort_options_expressions += [
-                    search.SortExpression(
-                    expression=expression,
-                    direction=search.SortExpression.DESCENDING)]
-                returned_expressions += [
-                    search.FieldExpression(
-                        name='count',
-                        expression=expression)]
 
             sort_options_expressions.append(
                 search.SortExpression(
@@ -175,7 +149,7 @@ class AdvancedSearchController(CacheableHandler):
             model_keys = []
             result_expressions = defaultdict(lambda: defaultdict(float))
             for result in docs.results:
-                team_key = result.doc_id
+                team_key = result.doc_id.split('_')[0]
                 model_keys.append(ndb.Key('Team', team_key))
                 for expression in result.expressions:
                     result_expressions[team_key][expression.name] = expression.value
@@ -188,15 +162,13 @@ class AdvancedSearchController(CacheableHandler):
             'valid_years': self.VALID_YEARS,
             'valid_award_types': self.VALID_AWARD_TYPES,
             'num_special_awards': len(SORT_ORDER),
-            'valid_event_types': self.VALID_EVENT_TYPES,
-            'max_awards': SearchHelper.MAX_AWARDS,
+            'valid_seeds': self.VALID_SEEDS,
+            'seed': self._seed,
+            'playoff_level': self._playoff_level,
             'page_size': self.PAGE_SIZE,
             'page': self._page,
             'year': self._year,
             'award_types': self._award_types,
-            'event_type': self._event_type,
-            'time_period': self._time_period,
-            'robot_photo': self._robot_photo,
             'cad_model': self._cad_model,
             'new_search': new_search,
             'num_results': num_results,
