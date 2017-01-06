@@ -15,7 +15,6 @@ class SearchHelper(object):
     EVENT_LOCATION_INDEX = 'eventLocation'
     TEAM_LOCATION_INDEX = 'teamLocation'
     TEAM_AWARDS_INDEX = 'teamAwards'
-    MAX_AWARDS = 3  # Max number of awards to search for
 
     @classmethod
     def update_event_location_index(cls, event):
@@ -73,66 +72,68 @@ class SearchHelper(object):
         events_by_year = defaultdict(list)
         for event in events_future.get_result():
             events_by_year[event.year].append(event)
+            event.prep_matches()
+            event.prep_details()
 
         awards_by_event = defaultdict(list)
         for award in awards_future.get_result():
             awards_by_event[award.event.id()].append(award)
 
+        medias_by_year = defaultdict(list)
+        for media in medias_future.get_result():
+            medias_by_year[media.year].append(media)
+
         # General stuff that's the same for indexes
-        fields = [
+        partial_fields = [
             search.NumberField(name='number', value=team.team_number),
             search.TextField(name='name', value=team.name),
             search.TextField(name='nickname', value=team.nickname)
         ]
 
-        field_counts = defaultdict(int)
+        # field_counts = defaultdict(int)
         for year, events in events_by_year.items():
-            season_awards = set()
-            season_awards_event = defaultdict(set)
+            qual_seeds = set()
+            comp_levels = set()
+            year_awards = set()
             for event in events:
                 if event.event_type_enum not in EventType.SEASON_EVENT_TYPES:
                     continue
 
+                if event.rankings:
+                    for row in event.rankings:
+                        if str(row[1]) == str(team.team_number):
+                            qual_seeds.add(int(row[0]))
+
+                if event.matches:
+                    for match in event.matches:
+                        comp_levels.add(match.comp_level)
+
                 awards = awards_by_event.get(event.key.id(), [])
                 award_types = set([a.award_type_enum for a in awards])
                 award_types = filter(lambda a: a in AwardType.SEARCHABLE, award_types)
+                year_awards = year_awards.union(award_types)
 
-                # To search by event
-                for award_set in cls._construct_powerset(award_types):
-                    set_name = cls._construct_set_name(award_set)
-                    field_counts['e_{}'.format(set_name)] += 1
-                    field_counts['e_{}_y{}'.format(set_name, event.year)] += 1
-                    field_counts['e_{}_e{}'.format(set_name, event.event_type_enum)] += 1
-                    field_counts['e_{}_e{}_y{}'.format(set_name, event.event_type_enum, event.year)] += 1
+            has_cad = False
+            for media in medias_by_year[year]:
+                if media.media_type_enum in MediaType.robot_types:
+                    has_cad = True
+                    break
 
-                season_awards = season_awards.union(award_types)
-                season_awards_event[event.event_type_enum] = season_awards_event[event.event_type_enum].union(award_types)
+            fields = partial_fields + [
+                search.AtomField(name='comp_level', value=comp_level) for comp_level in comp_levels
+            ] + [
+                search.AtomField(name='award', value=str(award)) for award in year_awards
+            ] + [search.NumberField(name='year', value=year)]
 
-            # To search by year
-            for award_set in cls._construct_powerset(season_awards):
-                set_name = cls._construct_set_name(award_set)
-                field_counts['s_{}'.format(set_name)] += 1
-                field_counts['s_{}_y{}'.format(set_name, year)] += 1
+            if qual_seeds:
+                fields += [
+                    search.NumberField(name='highest_seed', value=min(qual_seeds))
+                ]
 
-            for event_type, awards in season_awards_event.items():
-                for award_set in cls._construct_powerset(awards):
-                    set_name = cls._construct_set_name(award_set)
-                    field_counts['s_{}_e{}'.format(set_name, event_type)] += 1
-                    field_counts['s_{}_e{}_y{}'.format(set_name, event_type, year)] += 1
+            if has_cad:
+                fields += [
+                    search.NumberField(name='has_cad', value=1)
+                ]
 
-        fields += [search.NumberField(name=field, value=count) for field, count in field_counts.items()]
-
-        # Medias
-        robot_photo_years = set()
-        cad_model_years = set()
-        for media in medias_future.get_result():
-            if media.media_type_enum in MediaType.image_types and team.key in media.preferred_references:
-                robot_photo_years.add(media.year)
-            elif media.media_type_enum in MediaType.robot_types:
-                cad_model_years.add(media.year)
-
-        fields += [search.AtomField(name='robot_photo_year', value=str(year)) for year in robot_photo_years]
-        fields += [search.AtomField(name='cad_model_year', value=str(year)) for year in cad_model_years]
-
-        search.Index(name=cls.TEAM_AWARDS_INDEX).put(
-            search.Document(doc_id='{}'.format(team.key.id()), fields=fields))
+            search.Index(name=cls.TEAM_AWARDS_INDEX).put(
+                search.Document(doc_id='{}_{}'.format(team.key.id(), year), fields=fields))
