@@ -1,6 +1,5 @@
 from collections import defaultdict
 from google.appengine.api import search
-from itertools import chain, combinations
 
 from consts.award_type import AwardType
 from consts.event_type import EventType
@@ -57,14 +56,6 @@ class SearchHelper(object):
         search.Index(name=TEAM_LOCATION_INDEX).delete(team.key.id())
 
     @classmethod
-    def _construct_powerset(cls, l):
-        return chain.from_iterable(combinations(l, n) for n in range(1, cls.MAX_AWARDS + 1))
-
-    @classmethod
-    def _construct_set_name(cls, award_set):
-        return '_'.join(['a{}'.format(a) for a in sorted(award_set)])
-
-    @classmethod
     def update_team_awards_index(cls, team):
         awards_future = TeamAwardsQuery(team.key.id()).fetch_async()
         events_future = TeamEventsQuery(team.key.id()).fetch_async()
@@ -93,8 +84,8 @@ class SearchHelper(object):
         # field_counts = defaultdict(int)
         for year, events in events_by_year.items():
             year_matches_future = TeamYearMatchesQuery(team.key.id(), year).fetch_async()
-            qual_seeds = set()
-            comp_levels = set()
+            qual_seeds = defaultdict(int)
+            comp_levels = defaultdict(int)
             year_awards = set()
             for event in events:
                 if event.event_type_enum not in EventType.SEASON_EVENT_TYPES:
@@ -103,15 +94,24 @@ class SearchHelper(object):
                 if event.rankings:
                     for row in event.rankings:
                         if str(row[1]) == str(team.team_number):
-                            qual_seeds.add(int(row[0]))
+                            seed = int(row[0])
+                            if seed <= 8:
+                                qual_seeds[seed] += 1
+                                break
 
                 awards = awards_by_event.get(event.key.id(), [])
                 award_types = set([a.award_type_enum for a in awards])
-                award_types = filter(lambda a: a in AwardType.SEARCHABLE, award_types)
-                year_awards = year_awards.union(award_types)
+                for award_type in award_types:
+                    if award_type in AwardType.SEARCHABLE:
+                        year_awards.add(award_type)
+                    if award_type == AwardType.WINNER:
+                        comp_levels['win'] += 1
 
+            event_levels = defaultdict(set)
             for match in year_matches_future.get_result():
-                comp_levels.add(match.comp_level)
+                if match.comp_level in {'sf', 'f'} and match.comp_level not in event_levels[match.event.id()]:
+                    comp_levels[match.comp_level] += 1
+                event_levels[match.event.id()].add(match.comp_level)
 
             has_cad = False
             for media in medias_by_year[year]:
@@ -120,15 +120,16 @@ class SearchHelper(object):
                     break
 
             fields = partial_fields + [
-                search.AtomField(name='comp_level', value=comp_level) for comp_level in comp_levels
-            ] + [
                 search.AtomField(name='award', value=str(award)) for award in year_awards
             ] + [search.NumberField(name='year', value=year)]
 
+            if comp_levels:
+                for level, count in comp_levels.items():
+                    fields += [search.NumberField(name='comp_level_{}'.format(level), value=count)]
+
             if qual_seeds:
-                fields += [
-                    search.NumberField(name='highest_seed', value=min(qual_seeds))
-                ]
+                for seed, count in qual_seeds.items():
+                    fields += [search.NumberField(name='seed_{}'.format(seed), value=count)]
 
             if has_cad:
                 fields += [

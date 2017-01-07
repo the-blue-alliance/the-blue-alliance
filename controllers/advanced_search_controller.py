@@ -14,8 +14,6 @@ import tba_config
 SORT_ORDER = {
     AwardType.CHAIRMANS: 0,
     AwardType.ENGINEERING_INSPIRATION: 1,
-    AwardType.WINNER: 2,
-    AwardType.FINALIST: 3,
     AwardType.WOODIE_FLOWERS: 4,
 }
 

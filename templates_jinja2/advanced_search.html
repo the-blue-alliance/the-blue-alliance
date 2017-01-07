@@ -53,12 +53,13 @@
         </div>
 
         <div class="form-group">
-          <label for="input-playoff-level">and made it to at least</label>
+          <label for="input-playoff-level">and</label>
           <div class="input-group">
             <select class="form-control selectpicker" data-dropup-auto="false" id="input-playoff-level" name="playoff_level">
               <option value="0"{% if playoff_level == 0 %} selected="selected"{% endif %}>--</option>
-              <option value="1"{% if playoff_level == 1 %} selected="selected"{% endif %}>Semifinals</option>
-              <option value="2"{% if playoff_level == 2 %} selected="selected"{% endif %}>Finals</option>
+              <option value="1"{% if playoff_level == 1 %} selected="selected"{% endif %}>Made it to Semifinals</option>
+              <option value="2"{% if playoff_level == 2 %} selected="selected"{% endif %}>Made it to Finals</option>
+              <option value="3"{% if playoff_level == 3 %} selected="selected"{% endif %}>Won the Event</option>
             </select>
             <div class="input-group-addon">in playoffs</div>
           </div>

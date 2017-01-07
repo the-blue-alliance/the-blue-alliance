@@ -115,8 +115,6 @@ class AwardType(object):
     SEARCHABLE = {  # Only searchable awards. Obscure & old awards not listed
         CHAIRMANS: 'Chairman\'s',
         ENGINEERING_INSPIRATION: 'Engineering Inspiration',
-        WINNER: 'Event Winner',
-        FINALIST: 'Event Finalist',
         COOPERTITION: 'Coopertition',
         CREATIVITY: 'Creativity',
         ENGINEERING_EXCELLENCE: 'Engineering Excellence',
