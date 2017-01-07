@@ -3,8 +3,7 @@ import webapp2
 
 import tba_config
 
-from controllers.admin.admin_cron_controller import AdminPostEventTasksDo, AdminCreateDistrictTeamsEnqueue, AdminCreateDistrictTeamsDo,\
-    AdminUpdateAllTeamSearchIndexEnqueue, AdminUpdateAllTeamSearchIndexDo, AdminUpdateTeamSearchIndexDo
+from controllers.admin.admin_cron_controller import AdminPostEventTasksDo, AdminCreateDistrictTeamsEnqueue, AdminCreateDistrictTeamsDo
 from controllers.datafeed_controller import EventListEnqueue, EventDetailsEnqueue
 from controllers.datafeed_controller import EventListGet, EventDetailsGet, TeamDetailsGet
 
@@ -17,8 +16,5 @@ app = webapp2.WSGIApplication([('/backend-tasks/enqueue/event_list/([0-9]*)', Ev
                                ('/backend-tasks/do/post_event_tasks/(.*)', AdminPostEventTasksDo),
                                ('/backend-tasks/enqueue/rebuild_district_teams/([0-9]+)', AdminCreateDistrictTeamsEnqueue),
                                ('/backend-tasks/do/rebuild_district_teams/([0-9]+)', AdminCreateDistrictTeamsDo),
-                               ('/backend-tasks/enqueue/update_all_team_search_index', AdminUpdateAllTeamSearchIndexEnqueue),
-                               ('/backend-tasks/do/update_all_team_search_index', AdminUpdateAllTeamSearchIndexDo),
-                               ('/backend-tasks/do/update_team_search_index/(.*)', AdminUpdateTeamSearchIndexDo),
                                ],
                               debug=tba_config.DEBUG)

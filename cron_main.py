@@ -20,7 +20,9 @@ from controllers.cron_controller import UpcomingNotificationDo
 from controllers.admin.admin_cron_controller import AdminMobileClearEnqueue, AdminMobileClear, AdminSubsClearEnqueue, AdminSubsClear, \
     AdminWebhooksClearEnqueue, AdminWebhooksClear, AdminRegistrationDayEnqueue
 
-from controllers.admin.admin_cron_controller import AdminRunPostUpdateHooksEnqueue, AdminRunPostUpdateHooksDo, AdminRunEventPostUpdateHookDo, AdminRunTeamPostUpdateHookDo
+from controllers.admin.admin_cron_controller import AdminRunPostUpdateHooksEnqueue, AdminRunPostUpdateHooksDo, AdminRunEventPostUpdateHookDo, AdminRunTeamPostUpdateHookDo, \
+    AdminUpdateAllTeamSearchIndexEnqueue, AdminUpdateAllTeamSearchIndexDo, AdminUpdateTeamSearchIndexDo
+
 
 app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackupEventsEnqueue),
                                ('/tasks/enqueue/csv_backup_events/([0-9]*)', TbaCSVBackupEventsEnqueue),
@@ -61,5 +63,8 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/admin/do/run_post_update_hooks/(.*)', AdminRunPostUpdateHooksDo),
                                ('/tasks/admin/do/run_event_post_update_hook/(.*)', AdminRunEventPostUpdateHookDo),
                                ('/tasks/admin/do/run_team_post_update_hook/(.*)', AdminRunTeamPostUpdateHookDo),
+                               ('/tasks/enqueue/update_all_team_search_index', AdminUpdateAllTeamSearchIndexEnqueue),
+                               ('/tasks/do/update_all_team_search_index', AdminUpdateAllTeamSearchIndexDo),
+                               ('/tasks/do/update_team_search_index/(.*)', AdminUpdateTeamSearchIndexDo),
                                ],
                               debug=tba_config.DEBUG)
