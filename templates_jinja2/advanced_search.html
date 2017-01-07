@@ -83,9 +83,9 @@
         <p class="well">Add some filters to begin a search.</p>
       {% else %}
         {% if result_models %}
-          <p>{{num_results}} result{% if num_results != 1 %}s{% endif %} found</p>
+          <p>{{num_results}} result{% if num_results != 1 %}s{% endif %} found.{% if num_results > max_results %} Only the top {{max_results}} are available.{% endif %}</p>
 
-          {% if num_results > page_size %}
+          {% if capped_num_results > page_size %}
             <nav aria-label="Page navigation">
               <ul class="pagination">
                 {% if page != 0 %}
@@ -95,23 +95,27 @@
                   </a>
                 </li>
                 {% endif %}
-                {% for i in range((num_results / page_size)|ceil) %}
+                {% for i in range((capped_num_results / page_size)|ceil) %}
                   <li {% if i == page %}class="active"{% endif %}>
                     <a href="{{sm.search_params(i)}}">
                       {{page_size * i + 1}}-
                       {%- if loop.last -%}
-                        {{page_size * i + num_results - page_size * i}}
+                        {{page_size * i + capped_num_results - page_size * i}}
                       {%- else -%}
                         {{page_size * i + page_size}}
                       {% endif %}
                     </a>
                   </li>
                 {% endfor %}
-                {% if page != (num_results / page_size)|ceil - 1 %}
+                {% if page != (capped_num_results / page_size)|ceil - 1 %}
                 <li>
                   <a href="{{sm.search_params(page+1)}}" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                   </a>
+                </li>
+                {% elif capped_num_results < num_results %}
+                <li>
+                  <span>More results not available</span>
                 </li>
                 {% endif %}
               </ul>

@@ -34,6 +34,7 @@ class AdvancedSearchController(CacheableHandler):
     }
 
     PAGE_SIZE = 20
+    MAX_RESULTS = 1000
     VALID_SORT_FIELDS = {'team', 'seed', 'playoff_level'}
 
     CACHE_VERSION = 1
@@ -88,6 +89,7 @@ class AdvancedSearchController(CacheableHandler):
         if not self._page or not self._page.isdigit():
             self._page = 0
         self._page = int(self._page)
+        self._page = min(self._page, self.MAX_RESULTS / self.PAGE_SIZE - 1)
 
         self._sort_field = self.request.get('sort_field')
         if self._sort_field not in self.VALID_SORT_FIELDS:
@@ -189,12 +191,14 @@ class AdvancedSearchController(CacheableHandler):
             'seed': self._seed,
             'playoff_level': self._playoff_level,
             'page_size': self.PAGE_SIZE,
+            'max_results': self.MAX_RESULTS,
             'page': self._page,
             'year': self._year,
             'award_types': self._award_types,
             'cad_model': self._cad_model,
             'new_search': new_search,
             'num_results': num_results,
+            'capped_num_results': min(self.MAX_RESULTS, num_results),
             'result_models': result_models,
             'result_expressions': result_expressions,
             'sort_field': self._sort_field,
