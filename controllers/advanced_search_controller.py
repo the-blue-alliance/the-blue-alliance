@@ -34,6 +34,8 @@ class AdvancedSearchController(CacheableHandler):
     }
 
     PAGE_SIZE = 20
+    VALID_SORT_FIELDS = {'team', 'seed', 'playoff_level'}
+
     CACHE_VERSION = 1
     CACHE_KEY_FORMAT = "advanced_search_{}_{}_{}_{}_{}_{}"  # (year, award_types, seed, playoff_level, cad_model, page)
 
@@ -87,6 +89,10 @@ class AdvancedSearchController(CacheableHandler):
             self._page = 0
         self._page = int(self._page)
 
+        self._sort_field = self.request.get('sort_field')
+        if self._sort_field not in self.VALID_SORT_FIELDS:
+            self._sort_field = 'team'
+
     def get(self):
         self._get_params();
         self._partial_cache_key = self.CACHE_KEY_FORMAT.format(
@@ -118,17 +124,30 @@ class AdvancedSearchController(CacheableHandler):
                 returned_expressions.append(search.FieldExpression(
                     name='seed_count', expression=seed_field_name))
 
+                if self._sort_field == 'seed':
+                    sort_options_expressions.append(
+                        search.SortExpression(
+                            expression=seed_field_name,
+                            direction=search.SortExpression.DESCENDING))
+
             if self._playoff_level:
                 comp_level_name = 'comp_level_{}'.format(self.PLAYOFF_MAP[self._playoff_level])
                 partial_queries.append('{}>0'.format(comp_level_name))
                 returned_expressions.append(search.FieldExpression(
                     name='comp_level_count', expression=comp_level_name))
 
+                if self._sort_field == 'playoff_level':
+                    sort_options_expressions.append(
+                        search.SortExpression(
+                            expression=comp_level_name,
+                            direction=search.SortExpression.DESCENDING))
+
             if self._cad_model:
                 partial_queries.append('has_cad=1')
 
             query_string = ' AND ' .join(partial_queries)
 
+            # Tiebreak sorting by number
             sort_options_expressions.append(
                 search.SortExpression(
                     expression='number',
@@ -178,6 +197,7 @@ class AdvancedSearchController(CacheableHandler):
             'num_results': num_results,
             'result_models': result_models,
             'result_expressions': result_expressions,
+            'sort_field': self._sort_field,
         })
 
         return jinja2_engine.render('advanced_search.html', self.template_values)

@@ -121,12 +121,12 @@
           <table class="event-table">
             <thead>
               <tr>
-                <th>Team</th>
+                <th>{{sm.sort_header('Team', 'team')}}</th>
                 {% if seed %}
-                <th># Events ranked top {{seed}}</th>
+                <th>{{sm.sort_header('# Events ranked top {}'.format(seed), 'seed')}}</th>
                 {% endif %}
                 {% if playoff_level %}
-                <th># {% if playoff_level == 1 %}Semifinals{% elif playoff_level == 2 %}Finals{% elif playoff_level == 3 %}Events Won{% endif %}</th>
+                <th>{{sm.sort_header('# ' + 'Semifinals' if playoff_level == 1 else 'Finals' if playoff_level == 2 else 'Events Won' if playoff_level == 3, 'playoff_level')}}</th>
                 {% endif %}
                 </th>
               </tr>
