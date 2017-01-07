@@ -53,7 +53,7 @@
         </div>
 
         <div class="form-group">
-          <label for="input-playoff-level">and</label>
+          <label for="input-playoff-level">and at least</label>
           <div class="input-group">
             <select class="form-control selectpicker" data-dropup-auto="false" id="input-playoff-level" name="playoff_level">
               <option value="0"{% if playoff_level == 0 %} selected="selected"{% endif %}>--</option>
@@ -122,8 +122,11 @@
             <thead>
               <tr>
                 <th>Team</th>
-                {% if time_period == 1 %}
-                <th># Events</th>
+                {% if seed %}
+                <th># Events ranked top {{seed}}</th>
+                {% endif %}
+                {% if playoff_level %}
+                <th># {% if playoff_level == 1 %}Semifinals{% elif playoff_level == 2 %}Finals{% elif playoff_level == 3 %}Events Won{% endif %}</th>
                 {% endif %}
                 </th>
               </tr>
@@ -138,8 +141,11 @@
                       <small>{{team.city_state_country}}</small>
                     {% endif %}
                   </td>
-                  {% if award_types and time_period == 1 %}
-                  <td>{{result_expressions.get(team.key.id()).get('count')|int}}</td>
+                  {% if seed %}
+                  <td>{{result_expressions.get(team.key.id()).get('seed_count')|int}}</td>
+                  {% endif %}
+                  {% if playoff_level %}
+                  <td>{{result_expressions.get(team.key.id()).get('comp_level_count')|int}}</td>
                   {% endif %}
                 </tr>
               {% endfor %}

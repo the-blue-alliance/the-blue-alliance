@@ -113,10 +113,16 @@ class AdvancedSearchController(CacheableHandler):
                 partial_queries.append(award_filter)
 
             if self._seed:
-                partial_queries.append('seed_{}>0'.format(self._seed))
+                seed_field_name = 'seed_{}'.format(self._seed)
+                partial_queries.append('{}>0'.format(seed_field_name))
+                returned_expressions.append(search.FieldExpression(
+                    name='seed_count', expression=seed_field_name))
 
             if self._playoff_level:
-                partial_queries.append('comp_level_{}>0'.format(self.PLAYOFF_MAP[self._playoff_level]))
+                comp_level_name = 'comp_level_{}'.format(self.PLAYOFF_MAP[self._playoff_level])
+                partial_queries.append('{}>0'.format(comp_level_name))
+                returned_expressions.append(search.FieldExpression(
+                    name='comp_level_count', expression=comp_level_name))
 
             if self._cad_model:
                 partial_queries.append('has_cad=1')
