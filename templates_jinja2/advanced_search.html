@@ -18,35 +18,7 @@
     <div class="col-sm-4">
       <form>
         <div class="form-group">
-          <label for="input-award-type">Search for teams that have won all the following awards (3 max):</label>
-          <select class="form-control selectpicker" data-dropup-auto="false" id="input-award-type" name="award_type" multiple title="No awards selected" data-max-options="{{max_awards}}" data-live-search="true">
-            {% for valid_award_type, valid_award_type_name in valid_award_types %}
-              <option value="{{valid_award_type}}"{% if valid_award_type in award_types %} selected="selected"{% endif %}>{{valid_award_type_name}}</option>
-              {% if loop.index == num_special_awards %}<option data-divider="true"></option>{% endif %}
-            {% endfor %}
-          </select>
-        </div>
-
-        <div class="form-group{% if not award_types %} display-none{% endif %}">
-          <label for="input-event-type">At the following competition level:</label>
-          <select class="form-control selectpicker" data-dropup-auto="false" id="input-event-type" name="event_type"{% if not award_types %} disabled{% endif %}>
-            <option value="-1"{% if event_type == -1 %} selected="selected"{% endif %}>Any competition level</option>
-            {% for valid_event_type, valid_event_type_name in valid_event_types %}
-              <option value="{{valid_event_type}}"{% if event_type == valid_event_type %} selected="selected"{% endif %}>{{valid_event_type_name}}</option>
-            {% endfor %}
-          </select>
-        </div>
-
-        <div class="form-group{% if not award_types %} display-none{% endif %}">
-          <label for="input-time-period">Within the period of</label>
-          <select class="form-control selectpicker" data-dropup-auto="false" id="input-time-period" name="time_period" data-actions-box="true"{% if not award_types %} disabled{% endif %}>
-            <option value="0"{% if time_period == 0 %} selected="selected"{% endif %}>one season</option>
-            <option value="1"{% if time_period == 1 %} selected="selected"{% endif %}>one event</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label class="sr-only" for="input-year">Year</label>
+          <label for="input-year">Search for teams</label>
           <div class="input-group">
             <div class="input-group-addon">in</div>
             <select class="form-control selectpicker" data-dropup-auto="false" id="input-year" name="year">
@@ -58,12 +30,43 @@
         </div>
 
         <div class="form-group">
-          <label>And have:</label>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" name="robot_photo"{% if robot_photo %} checked{% endif %}> a robot photo
-            </label>
+          <label for="input-award-type">that won any of the following awards:</label>
+          <select class="form-control selectpicker" data-dropup-auto="false" id="input-award-type" name="award_type" multiple title="No awards selected" data-live-search="true" data-actions-box="true">
+            {% for valid_award_type, valid_award_type_name in valid_award_types %}
+              <option value="{{valid_award_type}}"{% if valid_award_type in award_types %} selected="selected"{% endif %}>{{valid_award_type_name}}</option>
+              {% if loop.index == num_special_awards %}<option data-divider="true"></option>{% endif %}
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="input-seed">and were ranked</label>
+          <div class="input-group">
+            <select class="form-control selectpicker" data-dropup-auto="false" id="input-seed" name="seed">
+              <option value="0">Any Rank</option>
+              {% for valid_seed in valid_seeds %}
+                <option value="{{valid_seed}}"{% if valid_seed == seed %} selected="selected"{% endif %}>Top {{valid_seed}}</option>
+              {% endfor %}
+            </select>
+            <div class="input-group-addon">in quals</div>
           </div>
+        </div>
+
+        <div class="form-group">
+          <label for="input-playoff-level">and at least</label>
+          <div class="input-group">
+            <select class="form-control selectpicker" data-dropup-auto="false" id="input-playoff-level" name="playoff_level">
+              <option value="0"{% if playoff_level == 0 %} selected="selected"{% endif %}>--</option>
+              <option value="1"{% if playoff_level == 1 %} selected="selected"{% endif %}>Made it to Semifinals</option>
+              <option value="2"{% if playoff_level == 2 %} selected="selected"{% endif %}>Made it to Finals</option>
+              <option value="3"{% if playoff_level == 3 %} selected="selected"{% endif %}>Won the Event</option>
+            </select>
+            <div class="input-group-addon">in playoffs</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>and have:</label>
           <div class="checkbox">
             <label>
               <input type="checkbox" name="cad_model"{% if cad_model %} checked{% endif %}> a CAD model
@@ -80,35 +83,39 @@
         <p class="well">Add some filters to begin a search.</p>
       {% else %}
         {% if result_models %}
-          <p>{{num_results}} result{% if num_results != 1 %}s{% endif %} found</p>
+          <p>{{num_results}} result{% if num_results != 1 %}s{% endif %} found.{% if num_results > max_results %} Only the top {{max_results}} are available.{% endif %}</p>
 
-          {% if num_results > page_size %}
+          {% if capped_num_results > page_size %}
             <nav aria-label="Page navigation">
               <ul class="pagination">
                 {% if page != 0 %}
                 <li>
-                  <a href="/advanced_search?year={{year}}{% for award_type in award_types %}&award_type={{award_type}}{% endfor %}{% for event_type in event_types %}&event_type={{event_type}}{% endfor %}&location={{location}}&page={{page - 1}}&search_type={{search_type}}" aria-label="Previous">
+                  <a href="{{sm.search_params(page-1)}}" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                   </a>
                 </li>
                 {% endif %}
-                {% for i in range((num_results / page_size)|ceil) %}
+                {% for i in range((capped_num_results / page_size)|ceil) %}
                   <li {% if i == page %}class="active"{% endif %}>
-                    <a href="/advanced_search?year={{year}}{% for award_type in award_types %}&award_type={{award_type}}{% endfor %}{% for event_type in event_types %}&event_type={{event_type}}{% endfor %}&location={{location}}&page={{i}}&search_type={{search_type}}">
+                    <a href="{{sm.search_params(i)}}">
                       {{page_size * i + 1}}-
                       {%- if loop.last -%}
-                        {{page_size * i + num_results - page_size * i}}
+                        {{page_size * i + capped_num_results - page_size * i}}
                       {%- else -%}
                         {{page_size * i + page_size}}
                       {% endif %}
                     </a>
                   </li>
                 {% endfor %}
-                {% if page != (num_results / page_size)|ceil - 1 %}
+                {% if page != (capped_num_results / page_size)|ceil - 1 %}
                 <li>
-                  <a href="/advanced_search?year={{year}}{% for award_type in award_types %}&award_type={{award_type}}{% endfor %}{% for event_type in event_types %}&event_type={{event_type}}{% endfor %}&location={{location}}&page={{page + 1}}&search_type={{search_type}}" aria-label="Next">
+                  <a href="{{sm.search_params(page+1)}}" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                   </a>
+                </li>
+                {% elif capped_num_results < num_results %}
+                <li>
+                  <span>More results not available</span>
                 </li>
                 {% endif %}
               </ul>
@@ -118,9 +125,12 @@
           <table class="event-table">
             <thead>
               <tr>
-                <th>Team</th>
-                {% if time_period == 1 %}
-                <th># Events</th>
+                <th>{{sm.sort_header('Team', 'team')}}</th>
+                {% if seed %}
+                <th>{{sm.sort_header('# Events ranked top {}'.format(seed), 'seed')}}</th>
+                {% endif %}
+                {% if playoff_level %}
+                <th>{{sm.sort_header('# ' + 'Semifinals' if playoff_level == 1 else 'Finals' if playoff_level == 2 else 'Events Won' if playoff_level == 3, 'playoff_level')}}</th>
                 {% endif %}
                 </th>
               </tr>
@@ -135,8 +145,11 @@
                       <small>{{team.city_state_country}}</small>
                     {% endif %}
                   </td>
-                  {% if award_types and time_period == 1 %}
-                  <td>{{result_expressions.get(team.key.id()).get('count')|int}}</td>
+                  {% if seed %}
+                  <td>{{result_expressions.get(team.key.id()).get('seed_count')|int}}</td>
+                  {% endif %}
+                  {% if playoff_level %}
+                  <td>{{result_expressions.get(team.key.id()).get('comp_level_count')|int}}</td>
                   {% endif %}
                 </tr>
               {% endfor %}
@@ -149,31 +162,4 @@
     </div>
   </div>
 </div>
-{% endblock %}
-
-{% block inline_javascript %}
-<script>
-  function enable(input) {
-    input.prop('disabled', false);
-    input.closest('.form-group').show();
-    input.selectpicker('refresh');
-  }
-
-  function disable(input) {
-    input.closest('.form-group').hide();
-    input.prop('disabled', true);
-    input.selectpicker('refresh');
-  }
-
-  // Show/hide depending on #input-award-type
-  $('#input-award-type').on('changed.bs.select loaded.bs.select refreshed.bs.select', function () {
-    if ($(this).selectpicker('val') == null || $(this).is(':hidden')) {
-      disable($('#input-event-type'));
-      disable($('#input-time-period'));
-    } else {
-      enable($('#input-event-type'));
-      enable($('#input-time-period'));
-    }
-  });
-</script>
 {% endblock %}
