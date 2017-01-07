@@ -19,12 +19,12 @@ from helpers.event_helper import EventHelper
 
 
 class Gameday2Controller(CacheableHandler):
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "main_gameday2"
 
     def __init__(self, *args, **kw):
         super(Gameday2Controller, self).__init__(*args, **kw)
-        self._cache_expiration = 60 * 60 * 24 * 7
+        self._cache_expiration = 61
 
     def _render(self, *args, **kw):
         special_webcasts_future = Sitevar.get_by_id_async('gameday.special_webcasts')
