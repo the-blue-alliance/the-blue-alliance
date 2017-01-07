@@ -30,6 +30,7 @@ class AdvancedSearchController(CacheableHandler):
     PLAYOFF_MAP = {
         1: 'sf',
         2: 'f',
+        3: 'win',
     }
 
     PAGE_SIZE = 20
@@ -73,7 +74,7 @@ class AdvancedSearchController(CacheableHandler):
         if self._seed not in self.VALID_SEEDS:
             self._seed = 0
 
-        self._playoff_level = self._sanitize_int_param('playoff_level', 0, 2)
+        self._playoff_level = self._sanitize_int_param('playoff_level', 0, 3)
 
         self._cad_model = self.request.get('cad_model')
         if self._cad_model:
@@ -112,10 +113,10 @@ class AdvancedSearchController(CacheableHandler):
                 partial_queries.append(award_filter)
 
             if self._seed:
-                partial_queries.append('highest_seed<={}'.format(self._seed))
+                partial_queries.append('seed_{}>0'.format(self._seed))
 
             if self._playoff_level:
-                partial_queries.append('comp_level={}'.format(self.PLAYOFF_MAP[self._playoff_level]))
+                partial_queries.append('comp_level_{}>0'.format(self.PLAYOFF_MAP[self._playoff_level]))
 
             if self._cad_model:
                 partial_queries.append('has_cad=1')

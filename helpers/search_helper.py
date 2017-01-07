@@ -95,9 +95,9 @@ class SearchHelper(object):
                     for row in event.rankings:
                         if str(row[1]) == str(team.team_number):
                             seed = int(row[0])
-                            if seed <= 8:
-                                qual_seeds[seed] += 1
-                                break
+                            for s in xrange(seed, 9):
+                                qual_seeds[s] += 1
+                            break
 
                 awards = awards_by_event.get(event.key.id(), [])
                 award_types = set([a.award_type_enum for a in awards])
