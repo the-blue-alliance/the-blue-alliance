@@ -342,7 +342,7 @@ class AdminUpdateAllTeamSearchIndexEnqueue(LoggedInHandler):
     def get(self):
         taskqueue.add(
             queue_name='search-index-update',
-            url='/backend-tasks/do/update_all_team_search_index',
+            url='/tasks/do/update_all_team_search_index',
             method='GET')
         self.response.out.write("Enqueued update all team search index")
 
@@ -353,7 +353,7 @@ class AdminUpdateAllTeamSearchIndexDo(LoggedInHandler):
         for team_key in team_keys:
             taskqueue.add(
                 queue_name='search-index-update',
-                url='/backend-tasks/do/update_team_search_index/' + team_key.id(),
+                url='/tasks/do/update_team_search_index/' + team_key.id(),
                 method='GET')
 
 
