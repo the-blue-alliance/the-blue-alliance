@@ -13,8 +13,14 @@
       <h2><span class="countdown-number countdown-days">--</span><span class="countdown-label day-label"> Days</span> Left to Build! <small>Build Season ends {{endbuild_datetime_est|date:"F jS"}}</small></h2>
       <div id="countdown-finish-time">{{endbuild_datetime_utc|date:"c"}}</div>
       <div class="btn-group game-manual">
-        <a class="btn btn-default" href="http://www.firstinspires.org/resource-library/frc/competition-manual-qa-system" target="_blank"><span class="glyphicon glyphicon-file"></span> FIRST Stronghold Game Manual and Materials</a>
+        <a class="btn btn-default" href="http://www.firstinspires.org/resource-library/frc/competition-manual-qa-system" target="_blank"><span class="glyphicon glyphicon-file"></span> FIRST STEAMworks Game Manual and Materials</a>
+      </div><br>
+
+      <br>
+      <div>
+        <a class="btn btn-lg btn-success btn-block" href="/watch/fun"><span class="glyphicon glyphicon-play"></span> Watch Robot in 3 Days Live</a>
       </div>
+
       {% if events %}
         <h2>This Week's Events</h2>
         {% with events as events %}
@@ -25,7 +31,7 @@
           <a class="btn btn-default" href="/contact"><span class="glyphicon glyphicon-upload"></span> Add YouTube Videos</a>
         </div>
       {% endif %}
-      <br><br>
+      <br>
       <div class="fitvids">
         <iframe width="420" height="315" src="https://www.youtube.com/embed/VqOKzoHJDjA" frameborder="0" allowfullscreen></iframe>
       </div>
