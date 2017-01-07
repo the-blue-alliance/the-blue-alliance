@@ -2,6 +2,6 @@
 <a href="/advanced_search{{search_params(sort_field_override=index, sort_desc_override=(not sort_desc if index == sort_field else False))}}">{{text}}{% if index == sort_field %} <span class="glyphicon glyphicon-triangle-{% if sort_desc %}bottom{% else %}top{% endif %}"></span>{% endif %}</a>
 {% endmacro %}
 
-{% macro search_params(sort_field_override=None, sort_desc_override=None) %}
-?year={{year}}{% for award_type in award_types %}&award_type={{award_type}}{% endfor %}{% for event_type in event_types %}&event_type={{event_type}}{% endfor %}&location={{location}}&page={{page}}&search_type={{search_type}}&sort_field={% if sort_field_override != None %}{{sort_field_override}}{% else %}{{sort_field}}{% endif %}&sort_desc={% if sort_desc_override != None %}{% if sort_desc_override %}1{% endif %}{% else %}{% if sort_desc %}1{% endif %}{% endif %}
+{% macro search_params(new_page, sort_field_override=None, sort_desc_override=None) %}
+?year={{year}}{% for award_type in award_types %}&award_type={{award_type}}{% endfor %}&seed={{seed}}&playoff_level={{playoff_level}}{% if cad_model %}&cad_model=on{% endif %}&page={{new_page}}
 {% endmacro %}
