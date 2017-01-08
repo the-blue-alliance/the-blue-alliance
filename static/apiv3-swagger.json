@@ -98,18 +98,6 @@
       "description": "TBA District Key, eg `fim`",
       "required": true,
       "type": "string"
-    },
-    "match_type": {
-      "name": "match_type",
-      "in": "path",
-      "description": "Match Type, eg `qual`, `elim`, or `all`",
-      "required": true,
-      "type": "string",
-      "enum": [
-        "qual",
-        "elim",
-        "all"
-      ]
     }
   },
   "responses": {
@@ -592,9 +580,11 @@
           "200": {
             "description": "Successful response",
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Team_District"
+              "type": "object",
+              "description": "A key-value pair with year as key and district key as value",
+              "additionalProperties": {
+                "type": "string",
+                "description": "District key"
               }
             },
             "headers": {
@@ -637,8 +627,8 @@
           "200": {
             "description": "Successful response",
             "schema": {
-              "type": "array",
-              "items": {
+              "type": "object",
+              "additionalProperties": {
                 "$ref": "#/definitions/Team_Robot"
               }
             },
@@ -951,14 +941,14 @@
         ]
       }
     },
-    "/team/{team_key}/event/{event_key}/matches/{match_type}": {
+    "/team/{team_key}/event/{event_key}/matches": {
       "get": {
         "tags": [
           "team",
           "event",
           "match"
         ],
-        "description": "Gets a list of matches for the given team and event of the given match type.",
+        "description": "Gets a list of matches for the given team and event.",
         "parameters": [
           {
             "$ref": "#/parameters/If-Modified-Since"
@@ -968,9 +958,6 @@
           },
           {
             "$ref": "#/parameters/event_key"
-          },
-          {
-            "$ref": "#/parameters/match_type"
           }
         ],
         "responses": {
@@ -1004,14 +991,14 @@
         ]
       }
     },
-    "/team/{team_key}/event/{event_key}/matches/{match_type}/simple": {
+    "/team/{team_key}/event/{event_key}/matches/simple": {
       "get": {
         "tags": [
           "team",
           "event",
           "match"
         ],
-        "description": "Gets a short-form list of matches for the given team and event of the given match type.",
+        "description": "Gets a short-form list of matches for the given team and event.",
         "parameters": [
           {
             "$ref": "#/parameters/If-Modified-Since"
@@ -1021,9 +1008,6 @@
           },
           {
             "$ref": "#/parameters/event_key"
-          },
-          {
-            "$ref": "#/parameters/match_type"
           }
         ],
         "responses": {
@@ -1057,14 +1041,14 @@
         ]
       }
     },
-    "/team/{team_key}/event/{event_key}/matches/{match_type}/keys": {
+    "/team/{team_key}/event/{event_key}/matches/keys": {
       "get": {
         "tags": [
           "team",
           "event",
           "match"
         ],
-        "description": "Gets a list of match keys for matches for the given team and event of the given match type.",
+        "description": "Gets a list of match keys for matches for the given team and event.",
         "parameters": [
           {
             "$ref": "#/parameters/If-Modified-Since"
@@ -1074,9 +1058,6 @@
           },
           {
             "$ref": "#/parameters/event_key"
-          },
-          {
-            "$ref": "#/parameters/match_type"
           }
         ],
         "responses": {
@@ -1763,7 +1744,7 @@
         ]
       }
     },
-    "/event/{event_key}/elim_alliances": {
+    "/event/{event_key}/alliances": {
       "get": {
         "tags": [
           "event"
@@ -1826,7 +1807,7 @@
           "200": {
             "description": "Successful response",
             "schema": {
-              "type": "string",
+              "type": "object",
               "description": "A year-specific event stat object expressed as a JSON string. See also Event_Stats_2016"
             },
             "headers": {
@@ -2839,7 +2820,7 @@
           "type": "string",
           "description": "City of team derived from parsing the address registered with FIRST"
         },
-        "state": {
+        "state_prov": {
           "type": "string",
           "description": "State of team derived from parsing the address registered with FIRST"
         },
@@ -2860,6 +2841,37 @@
         "rookie_year"
       ],
       "properties": {
+        "address": {
+          "type": "string",
+          "description": "Address for the team"
+        },
+        "postal_code": {
+          "type": "string",
+          "description": "Postal code from the team address"
+        },
+        "gmaps_place_id": {
+          "type": "string",
+          "description": "Google Maps Place ID for the team address"
+        },
+        "gmaps_url": {
+          "type": "string",
+          "format": "url",
+          "description": "Link to address location on Google Maps"
+        },
+        "lat": {
+          "type": "number",
+          "format": "double",
+          "description": "Latitude for the team address"
+        },
+        "lng": {
+          "type": "number",
+          "format": "double",
+          "description": "Longitude for the team address"
+        },
+        "location_name": {
+          "type": "string",
+          "description": "Name of the location at the address for the team, eg. Blue Alliance High School"
+        },
         "website": {
           "type": "string",
           "format": "url",
@@ -2874,32 +2886,28 @@
           "description": "Team's motto as provided by FIRST"
         },
         "home_championship": {
-          "type": "string",
-          "description": "Location of the team's current home championship expressed as `north` or `south`.",
-          "enum": [
-            "north",
-            "south"
-          ]
+          "type": "object",
+          "description": "Location of the team's home championship each year as a key-value pair. The year is the key, and the city is the value."
         }
       }
     },
     "Team_Robot": {
       "properties": {
         "year": {
-          "type": "integer"
+          "type": "integer",
+          "description": "Year this robot competed in"
         },
         "robot_name": {
-          "type": "string"
-        }
-      }
-    },
-    "Team_District": {
-      "properties": {
-        "year": {
-          "type": "integer"
+          "type": "string",
+          "description": "Name of the robot as provided by the team"
         },
-        "district_key": {
-          "type": "string"
+        "key": {
+          "type": "string",
+          "description": "Internal TBA identifier for this robot"
+        },
+        "team_key": {
+          "type": "string",
+          "description": "TBA team key for this robot"
         }
       }
     },
@@ -2928,17 +2936,8 @@
           "description": "Event short code, as provided by FIRST."
         },
         "event_type": {
-          "type": "string",
-          "description": "Event Type, eg Regional, District, or Offseason.",
-          "enum": [
-            "Regional",
-            "District",
-            "District Championship",
-            "Championship Division",
-            "Championship Finals",
-            "Offseason",
-            "Preseason"
-          ]
+          "type": "integer",
+          "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2"
         },
         "event_district_key": {
           "type": "string",
@@ -2948,7 +2947,7 @@
           "type": "string",
           "description": "City of event"
         },
-        "state": {
+        "state_prov": {
           "type": "string",
           "description": "State of event"
         },
@@ -3002,13 +3001,54 @@
           ],
           "description": "Event District"
         },
+        "event_type_string": {
+          "type": "string",
+          "description": "Event Type, eg Regional, District, or Offseason.",
+          "enum": [
+            "Regional",
+            "District",
+            "District Championship",
+            "Championship Division",
+            "Championship Finals",
+            "Offseason",
+            "Preseason",
+            "--"
+          ]
+        },
         "week": {
           "type": "integer",
           "description": "Week of the competition season this event is in."
         },
-        "venue_address": {
+        "address": {
           "type": "string",
-          "description": "Address of the event's venue, if available. Line breaks included."
+          "description": "Address of the event's venue, if available."
+        },
+        "postal_code": {
+          "type": "string",
+          "description": "Postal code from the event address"
+        },
+        "gmaps_place_id": {
+          "type": "string",
+          "description": "Google Maps Place ID for the event address"
+        },
+        "gmaps_url": {
+          "type": "string",
+          "format": "url",
+          "description": "Link to address location on Google Maps"
+        },
+        "lat": {
+          "type": "number",
+          "format": "double",
+          "description": "Latitude for the event address"
+        },
+        "lng": {
+          "type": "number",
+          "format": "double",
+          "description": "Longitude for the event address"
+        },
+        "location_name": {
+          "type": "string",
+          "description": "Name of the location at the address for the event, eg. Blue Alliance High School"
         },
         "website": {
           "type": "string",
@@ -3502,7 +3542,12 @@
         },
         "winning_alliance": {
           "type": "string",
-          "description": "The name of the winning alliance, or `tie` if the match has been played. May be null."
+          "description": "The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie.",
+          "enum": [
+            "red",
+            "blue",
+            ""
+          ]
         },
         "event_key": {
           "type": "string",
@@ -3529,13 +3574,8 @@
       ],
       "properties": {
         "score_breakdown": {
-          "type": "string",
-          "format": "json",
+          "type": "object",
           "description": "Score breakdown for auto, teleop, etc. points. Varies from year to year. May be null."
-        },
-        "time_string": {
-          "type": "string",
-          "description": "Time string for this match, as published on the official schedule. Of course, this may or may not be accurate, as events often run ahead or behind schedule."
         },
         "videos": {
           "type": "array",
@@ -3547,6 +3587,7 @@
       }
     },
     "Match_alliance": {
+      "type": "object",
       "required": [
         "score",
         "team_keys"
@@ -3852,8 +3893,7 @@
           "description": "The key used to identify this media on the media site."
         },
         "details": {
-          "type": "string",
-          "format": "json",
+          "type": "object",
           "description": "If required, a JSON dict of additional media information."
         },
         "preferred": {
@@ -3874,6 +3914,7 @@
           "description": "Alliance name, may be null."
         },
         "backup": {
+          "type": "object",
           "properties": {
             "out": {
               "type": "string",
