@@ -54,7 +54,7 @@
         <div class="col-sm-4">
           <h3><a href="/event/{{ event.key_name }}">{{ event.name }}</a></h3>
           <p>
-            {% if event.location %}<span class="glyphicon glyphicon-map-marker"></span> in <a href="http://maps.google.com/maps?q={{ event.location }}" target="_blank">{{ event.location }}</a><br />{% endif %}
+            {% if event.city_state_country %}<span class="glyphicon glyphicon-map-marker"></span> in <a href="http://maps.google.com/maps?q={{ event.city_state_country }}" target="_blank">{{ event.city_state_country }}</a><br />{% endif %}
             {% if event.start_date %}<span class="glyphicon glyphicon-calendar"></span> {{ event.start_date|date:"M d" }}{% if event.start_date|date:"M d" != event.end_date|date:"M d" %} - {{ event.end_date|date:"M d" }}{% endif %}, {{ event.end_date|date:"Y" }}{% endif %}
           </p>
           <table class="table table-striped table-condensed">
