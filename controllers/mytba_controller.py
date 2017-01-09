@@ -53,7 +53,6 @@ class MyTBALiveController(LoggedInHandler):
                     if event.key_name not in future_events_by_event:
                         future_events_by_event[event.key_name] = (event, [])
                     future_events_by_event[event.key_name][1].append(team)
-                    break  # Only find one next event for each team
 
         past_events = []
         past_eventteams = []

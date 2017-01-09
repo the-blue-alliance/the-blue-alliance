@@ -9,6 +9,13 @@ register = webapp.template.create_template_register()
 
 
 @register.filter
+def batch(iterable, n):
+    l = len(iterable)
+    for ndx in range(0, l, n):
+        yield iterable[ndx:min(ndx + n, l)]
+
+
+@register.filter
 def digits(value):
     return re.sub('[^0-9]', '', value)
 
