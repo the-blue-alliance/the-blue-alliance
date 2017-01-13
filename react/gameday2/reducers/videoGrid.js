@@ -77,6 +77,10 @@ const trimToLayout = (state) => {
 }
 
 const addWebcastAtPosition = (state, webcastId, position, maxSupportedViews) => {
+  if (!state.layoutSet || position >= NUM_VIEWS_FOR_LAYOUT[state.layoutId]) {
+    return state
+  }
+
   if (position < 0 || position >= maxSupportedViews) {
     return state
   }
