@@ -44,7 +44,10 @@ describe('video grid recuder', () => {
   })
 
   it('adds a webcast at the 0th position', () => {
-    const initialState = Object.assign({}, defaultState)
+    const initialState = Object.assign({}, defaultState, {
+      layoutId: 0,
+      layoutSet: true,
+    })
 
     const domOrder = getDefaultDomOrder()
     domOrder[0] = 'webcast1'
@@ -52,7 +55,7 @@ describe('video grid recuder', () => {
     const positionMap = getDefaultPositionMap()
     positionMap[0] = 0
 
-    const expectedState = Object.assign({}, defaultState, {
+    const expectedState = Object.assign({}, initialState, {
       displayed: ['webcast1'],
       domOrder,
       positionMap,
@@ -76,6 +79,7 @@ describe('video grid recuder', () => {
 
     const initialState = Object.assign({}, defaultState, {
       layoutId: 1,
+      layoutSet: true,
       displayed: ['webcast1'],
       domOrder,
       positionMap,
@@ -87,8 +91,7 @@ describe('video grid recuder', () => {
     const expectedPositionMap = positionMap.slice(0)
     expectedPositionMap[1] = 0
 
-    const expectedState = Object.assign({}, defaultState, {
-      layoutId: 1,
+    const expectedState = Object.assign({}, initialState, {
       displayed: ['webcast1', 'webcast2'],
       domOrder: expectedDomOrder,
       positionMap: expectedPositionMap,
@@ -168,9 +171,7 @@ describe('video grid recuder', () => {
     const expectedPositionMap= positionMap.slice(0)
     expectedPositionMap[1] = -1
 
-    const expectedState = Object.assign({}, defaultState, {
-      layoutId: 2,
-      layoutSet: true,
+    const expectedState = Object.assign({}, initialState, {
       displayed: ['webcast1', 'webcast3'],
       domOrder: expectedDomOrder,
       positionMap: expectedPositionMap,
