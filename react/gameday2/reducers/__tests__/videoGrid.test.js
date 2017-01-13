@@ -1,5 +1,9 @@
 import videoGrid from '../videoGrid'
-import { MAX_SUPPORTED_VIEWS, NUM_VIEWS_FOR_LAYOUT } from '../../constants/LayoutConstants'
+import {
+  NUM_LAYOUTS,
+  MAX_SUPPORTED_VIEWS,
+  NUM_VIEWS_FOR_LAYOUT,
+} from '../../constants/LayoutConstants'
 import * as types from '../../constants/ActionTypes'
 
 describe('video grid recuder', () => {
@@ -138,4 +142,136 @@ describe('video grid recuder', () => {
 
     expect(videoGrid(initialState, action)).toEqual(expectedState)
   })
+
+  it('removes a webcast', () => {
+    const domOrder = getDefaultDomOrder()
+    domOrder[0] = 'webcast1'
+    domOrder[1] = 'webcast2'
+    domOrder[2] = 'webcast3'
+
+    const positionMap = getDefaultPositionMap()
+    positionMap[0] = 0
+    positionMap[1] = 1
+    positionMap[2] = 2
+
+    const initialState = Object.assign({}, defaultState, {
+      layoutId: 2,
+      layoutSet: true,
+      displayed: ['webcast1', 'webcast2', 'webcast3'],
+      domOrder,
+      positionMap,
+    })
+
+    const expectedDomOrder = domOrder.slice(0)
+    expectedDomOrder[1] = null
+
+    const expectedPositionMap= positionMap.slice(0)
+    expectedPositionMap[1] = -1
+
+    const expectedState = Object.assign({}, defaultState, {
+      layoutId: 2,
+      layoutSet: true,
+      displayed: ['webcast1', 'webcast3'],
+      domOrder: expectedDomOrder,
+      positionMap: expectedPositionMap,
+    })
+
+    const action = {
+      type: types.REMOVE_WEBCAST,
+      webcastId: 'webcast2',
+    }
+
+    expect(videoGrid(initialState, action)).toEqual(expectedState)
+  })
+
+  it('resets properly', () => {
+    const domOrder = getDefaultDomOrder()
+    domOrder[0] = 'webcast1'
+    domOrder[1] = 'webcast2'
+    domOrder[2] = 'webcast3'
+
+    const positionMap = getDefaultPositionMap()
+    positionMap[0] = 0
+    positionMap[1] = 1
+    positionMap[2] = 2
+
+    const initialState = Object.assign({}, defaultState, {
+      layoutId: 3,
+      layoutSet: true,
+      displayed: ['webcast1', 'webcast2', 'webcast3'],
+      domOrder,
+      positionMap,
+    })
+
+    const expectedState = Object.assign({}, defaultState, {
+      layoutId: 3,
+      layoutSet: true,
+    })
+
+    const action = {
+      type: types.RESET_WEBCASTS,
+    }
+
+    expect(videoGrid(initialState, action)).toEqual(expectedState)
+  })
+
+  // Test that we can handle adding a webcast to all possible views in all possible layouts
+  for (let i = 0; i < NUM_LAYOUTS; i++) {
+    const numViewsInLayout = NUM_VIEWS_FOR_LAYOUT[i]
+    it(`adds webcasts to all views in layout ${i}`, () => {
+      const initialState = Object.assign({}, defaultState, {
+        layoutId: i,
+        layoutSet: true,
+      })
+
+      const domOrder = getDefaultDomOrder()
+      const positionMap = getDefaultPositionMap()
+      const displayed = []
+      for (let j = 0; j < numViewsInLayout; j++) {
+        domOrder[j] = `webcast${j}`
+        positionMap[j] = j
+        displayed.push(`webcast${j}`)
+      }
+
+      const expectedState = Object.assign({}, initialState, {
+        displayed,
+        domOrder,
+        positionMap,
+      })
+
+      let state = initialState
+      for (let k = 0; k < numViewsInLayout; k++) {
+        const action = {
+          type: types.ADD_WEBCAST_AT_POSITION,
+          webcastId: `webcast${k}`,
+          position: k,
+        }
+        state = videoGrid(state, action)
+      }
+
+      expect(state).toEqual(expectedState)
+    })
+  }
+
+  // Test that we can't add a webcast to an invalid position in any layout
+  for(let i = 0; i < NUM_LAYOUTS; i++) {
+    it(`does not add a webcast at a location if layout ${i} cannot display it`, () => {
+      const initialState = Object.assign({}, defaultState, {
+        layoutId: i,
+        layoutSet: true,
+      })
+
+      const invalidIndex = NUM_VIEWS_FOR_LAYOUT[i]
+
+      const action = {
+        type: types.ADD_WEBCAST_AT_POSITION,
+        position: invalidIndex,
+        webcastId: 'webcast0',
+      }
+
+      console.log(action)
+
+      expect(videoGrid(initialState, action)).toEqual(initialState)
+    })
+  }
 })
