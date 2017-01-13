@@ -128,14 +128,14 @@ describe('video grid recuder', () => {
     const expectedDomOrder = domOrder.slice(0)
     expectedDomOrder[2] = null
 
-    const expectedPositionMap= positionMap.slice(0)
+    const expectedPositionMap = positionMap.slice(0)
     expectedPositionMap[2] = -1
 
     const expectedState = Object.assign({}, initialState, {
       layoutId: 1,
       displayed: ['webcast1', 'webcast2'],
       domOrder: expectedDomOrder,
-      positionMap: expectedPositionMap
+      positionMap: expectedPositionMap,
     })
 
     const action = {
@@ -168,7 +168,7 @@ describe('video grid recuder', () => {
     const expectedDomOrder = domOrder.slice(0)
     expectedDomOrder[1] = null
 
-    const expectedPositionMap= positionMap.slice(0)
+    const expectedPositionMap = positionMap.slice(0)
     expectedPositionMap[1] = -1
 
     const expectedState = Object.assign({}, initialState, {
@@ -255,7 +255,7 @@ describe('video grid recuder', () => {
   }
 
   // Test that we can't add a webcast to an invalid position in any layout
-  for(let i = 0; i < NUM_LAYOUTS; i++) {
+  for (let i = 0; i < NUM_LAYOUTS; i++) {
     it(`does not add a webcast at a location if layout ${i} cannot display it`, () => {
       const initialState = Object.assign({}, defaultState, {
         layoutId: i,
