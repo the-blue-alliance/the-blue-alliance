@@ -11,7 +11,7 @@ MEMCACHE_CLIENT = memcache.Client()
 
 
 class DatabaseQuery(object):
-    DATABASE_QUERY_VERSION = 1
+    DATABASE_QUERY_VERSION = 2
     DATABASE_HITS_MEMCACHE_KEYS = ['database_query_hits_{}:{}'.format(i, DATABASE_QUERY_VERSION) for i in range(25)]
     DATABASE_MISSES_MEMCACHE_KEYS = ['database_query_misses_{}:{}'.format(i, DATABASE_QUERY_VERSION) for i in range(25)]
     BASE_CACHE_KEY_FORMAT = "{}:{}:{}"  # (partial_cache_key, cache_version, database_query_version)
