@@ -269,8 +269,6 @@ describe('video grid recuder', () => {
         webcastId: 'webcast0',
       }
 
-      console.log(action)
-
       expect(videoGrid(initialState, action)).toEqual(initialState)
     })
   }
