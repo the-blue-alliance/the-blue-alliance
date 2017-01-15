@@ -58,7 +58,7 @@ class FMSAPITeamDetailsParser(object):
                     team=ndb.Key(Team, team.key_name),
                     year=self.year,
                     district=districtAbbrev,
-                    district_key=ndb.Key(District, District.renderKeyName(self.year, teamData['districtCode'])),
+                    district_key=ndb.Key(District, District.renderKeyName(self.year, teamData['districtCode'].lower())),
                 )
 
             robot = None

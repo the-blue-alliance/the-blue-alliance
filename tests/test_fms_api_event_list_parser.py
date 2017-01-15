@@ -9,7 +9,6 @@ from google.appengine.ext import testbed
 
 from consts.district_type import DistrictType
 from consts.event_type import EventType
-from models.event import Event
 
 
 class TestFMSAPIEventListParser(unittest2.TestCase):
@@ -20,22 +19,23 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
         self.testbed.init_memcache_stub()
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
-
     def tearDown(self):
         self.testbed.deactivate()
 
     def test_parse_event_list(self):
         with open('test_data/fms_api/2015_event_list.json', 'r') as f:
-            events = FMSAPIEventListParser(2015).parse(json.loads(f.read()))
+            events, districts = FMSAPIEventListParser(2015).parse(json.loads(f.read()))
 
             self.assertTrue(isinstance(events, list))
+            self.assertTrue(isinstance(districts, list))
 
             # File has 5 events, but we ignore CMP divisions (only subdivisions), so only 4 are expected back
             self.assertEquals(len(events), 4)
+            self.assertEquals(len(districts), 1)
 
     def test_parse_regional_event(self):
         with open('test_data/fms_api/2015_event_list.json', 'r') as f:
-            events = FMSAPIEventListParser(2015).parse(json.loads(f.read()))
+            events, districts = FMSAPIEventListParser(2015).parse(json.loads(f.read()))
             event = events[0]
 
             self.assertEquals(event.key_name, "2015nyny")
@@ -52,11 +52,13 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEquals(event.year, 2015)
             self.assertEquals(event.event_type_enum, EventType.REGIONAL)
             self.assertEquals(event.event_district_enum, DistrictType.NO_DISTRICT)
+            self.assertEquals(event.district_key, None)
 
     def test_parse_district_event(self):
         with open('test_data/fms_api/2015_event_list.json', 'r') as f:
-            events = FMSAPIEventListParser(2015).parse(json.loads(f.read()))
+            events, districts = FMSAPIEventListParser(2015).parse(json.loads(f.read()))
             event = events[1]
+            district = districts[0]
 
             self.assertEquals(event.key_name, "2015cthar")
             self.assertEquals(event.name, "NE District - Hartford Event")
@@ -72,10 +74,15 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEquals(event.year, 2015)
             self.assertEquals(event.event_type_enum, EventType.DISTRICT)
             self.assertEquals(event.event_district_enum, DistrictType.NEW_ENGLAND)
+            self.assertEquals(event.district_key, district.key)
+
+            self.assertEquals(district.key_name, "2015ne")
+            self.assertEquals(district.abbreviation, "ne")
+            self.assertEquals(district.year, 2015)
 
     def test_parse_district_cmp(self):
         with open('test_data/fms_api/2015_event_list.json', 'r') as f:
-            events = FMSAPIEventListParser(2015).parse(json.loads(f.read()))
+            events, districts = FMSAPIEventListParser(2015).parse(json.loads(f.read()))
             event = events[2]
 
             self.assertEquals(event.key_name, "2015necmp")
@@ -92,10 +99,11 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEquals(event.year, 2015)
             self.assertEquals(event.event_type_enum, EventType.DISTRICT_CMP)
             self.assertEquals(event.event_district_enum, DistrictType.NEW_ENGLAND)
+            self.assertEquals(event.district_key, districts[0].key)
 
     def test_parse_cmp_subdivision(self):
         with open('test_data/fms_api/2015_event_list.json', 'r') as f:
-            events = FMSAPIEventListParser(2015).parse(json.loads(f.read()))
+            events, districts = FMSAPIEventListParser(2015).parse(json.loads(f.read()))
             event = events[3]
 
             self.assertEquals(event.key_name, "2015tes")
@@ -112,3 +120,4 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEquals(event.year, 2015)
             self.assertEquals(event.event_type_enum, EventType.CMP_DIVISION)
             self.assertEquals(event.event_district_enum, DistrictType.NO_DISTRICT)
+            self.assertEquals(event.district_key, None)
