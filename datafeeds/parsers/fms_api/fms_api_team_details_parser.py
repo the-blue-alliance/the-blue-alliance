@@ -3,6 +3,7 @@ import urlparse
 from google.appengine.ext import ndb
 
 from consts.district_type import DistrictType
+from models.district import District
 from models.district_team import DistrictTeam
 from models.team import Team
 from models.robot import Robot
@@ -56,7 +57,8 @@ class FMSAPITeamDetailsParser(object):
                     id=DistrictTeam.renderKeyName(self.year, districtAbbrev, team.key_name),
                     team=ndb.Key(Team, team.key_name),
                     year=self.year,
-                    district=districtAbbrev
+                    district=districtAbbrev,
+                    district_key=ndb.Key(District, District.renderKeyName(self.year, teamData['districtCode'])),
                 )
 
             robot = None

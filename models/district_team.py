@@ -1,6 +1,7 @@
 from google.appengine.ext import ndb
 
 from consts.district_type import DistrictType
+from models.district import District
 from models.team import Team
 
 
@@ -14,7 +15,7 @@ class DistrictTeam(ndb.Model):
     team = ndb.KeyProperty(kind=Team)
     year = ndb.IntegerProperty()
     district = ndb.IntegerProperty()  # One of DistrictType constants, DEPRECATED, use district_key
-    district_key = ndb.KeyProperty()
+    district_key = ndb.KeyProperty(kind=District)
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
