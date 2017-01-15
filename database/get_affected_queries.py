@@ -185,3 +185,9 @@ def districtteam_updated(affected_refs):
         queries_and_keys.append(TeamDistrictsQuery(team_key.id()))
 
     return queries_and_keys
+
+
+def district_updated(affected_refs):
+    # TODO
+    return []
+

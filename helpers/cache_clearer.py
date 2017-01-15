@@ -163,6 +163,16 @@ class CacheClearer(object):
             cls._queries_to_cache_keys_and_controllers(get_affected_queries.robot_updated(affected_refs))
 
     @classmethod
+    def get_district_cache_keys_and_controllers(cls, affected_refs):
+        """
+        Gets cache keys and controllers that reference this district
+        """
+        years = affected_refs['year']
+
+        return cls._get_districtlist_cache_keys_and_controllers(years) + \
+            cls._queries_to_cache_keys_and_controllers(get_affected_queries.district_updated(affected_refs))
+
+    @classmethod
     def get_team_cache_keys_and_controllers(cls, affected_refs):
         """
         Gets cache keys and controllers that references this team
