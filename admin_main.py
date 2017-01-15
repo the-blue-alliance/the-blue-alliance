@@ -7,6 +7,7 @@ import tba_config
 from controllers.admin.admin_api_controller import AdminApiAuthAdd, AdminApiAuthDelete, AdminApiAuthEdit, AdminApiAuthManage
 from controllers.admin.admin_apistatus_controller import AdminApiStatus
 from controllers.admin.admin_authkeys_controller import AdminAuthKeys
+from controllers.admin.admin_district_controller import AdminDistrictList, AdminDistrictEdit
 from controllers.admin.admin_event_controller import AdminEventAddAllianceSelections, AdminEventDeleteTeams, AdminEventAddTeams, AdminEventRemapTeams, AdminEventAddWebcast, AdminEventCreate, AdminEventCreateTest, AdminEventDelete, AdminEventDetail, AdminEventEdit, AdminEventList, \
     AdminAddAllianceBackup
 from controllers.admin.admin_gameday_controller import AdminGamedayDashboard
@@ -35,6 +36,9 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/apistatus', AdminApiStatus),
                                ('/admin/authkeys', AdminAuthKeys),
                                ('/admin/debug', AdminDebugHandler),
+                               ('/admin/districts', AdminDistrictList),
+                               ('/admin/districts/([0-9]*)', AdminDistrictList),
+                               ('/admin/district/edit/(.*)', AdminDistrictEdit),
                                ('/admin/events', AdminEventList),
                                ('/admin/events/([0-9]*)', AdminEventList),
                                ('/admin/event/add_alliance_backup/(.*)', AdminAddAllianceBackup),
