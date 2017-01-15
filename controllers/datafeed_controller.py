@@ -15,7 +15,7 @@ from consts.event_type import EventType
 from datafeeds.datafeed_fms_api import DatafeedFMSAPI
 from datafeeds.datafeed_first_elasticsearch import DatafeedFIRSTElasticSearch
 from datafeeds.datafeed_tba import DatafeedTba
-
+from helpers.district_manipulator import DistrictManipulator
 from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
 from helpers.event_details_manipulator import EventDetailsManipulator
@@ -397,8 +397,11 @@ class EventListGet(webapp.RequestHandler):
         df = DatafeedFMSAPI('v2.0')
         df2 = DatafeedFIRSTElasticSearch()
 
-        merged_events = EventManipulator.mergeModels(df.getEventList(year), df2.getEventList(year))
+        fmsapi_events, fmsapi_districts = df.getEventList(year)
+        elasticsearch_events = df2.getEventList(year)
+        merged_events = EventManipulator.mergeModels(fmsapi_events, elasticsearch_events)
         events = EventManipulator.createOrUpdate(merged_events)
+        districts = DistrictManipulator.createOrUpdate(fmsapi_districts)
 
         # Fetch event details for each event
         for event in events:
@@ -410,7 +413,8 @@ class EventListGet(webapp.RequestHandler):
             )
 
         template_values = {
-            "events": events
+            "events": events,
+            "districts": districts,
         }
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue

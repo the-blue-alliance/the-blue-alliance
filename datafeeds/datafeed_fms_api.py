@@ -209,9 +209,10 @@ class DatafeedFMSAPI(object):
         else:
             return None
 
+    # Returns a tuple: (list(Event), list(District))
     def getEventList(self, year):
-        events = self._parse(self.FMS_API_EVENT_LIST_URL_PATTERN % (year), FMSAPIEventListParser(year))
-        return events
+        events, districts = self._parse(self.FMS_API_EVENT_LIST_URL_PATTERN % (year), FMSAPIEventListParser(year))
+        return events, districts
 
     # Returns list of tuples (team, districtteam, robot)
     def getEventTeams(self, event_key):

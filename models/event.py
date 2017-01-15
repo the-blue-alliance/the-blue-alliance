@@ -11,6 +11,7 @@ from consts.event_type import EventType
 from consts.ranking_indexes import RankingIndexes
 from context_cache import context_cache
 from helpers.location_helper import LocationHelper
+from models.district import District
 from models.event_details import EventDetails
 from models.location import Location
 
@@ -25,7 +26,8 @@ class Event(ndb.Model):
     short_name = ndb.StringProperty(indexed=False)  # Should not contain "Regional" or "Division", like "Hartford"
     event_short = ndb.StringProperty(required=True, indexed=False)  # Smaller abbreviation like "CT"
     year = ndb.IntegerProperty(required=True)
-    event_district_enum = ndb.IntegerProperty(default=DistrictType.NO_DISTRICT)
+    event_district_enum = ndb.IntegerProperty(default=DistrictType.NO_DISTRICT)  # Deprecated, use district_key instead
+    district_key = ndb.KeyProperty(kind=District)
     start_date = ndb.DateTimeProperty()
     end_date = ndb.DateTimeProperty()
 
