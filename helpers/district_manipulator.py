@@ -1,11 +1,33 @@
 from helpers.cache_clearer import CacheClearer
 from helpers.manipulator_base import ManipulatorBase
+from models.district import District
 
 
 class DistrictManipulator(ManipulatorBase):
     """
     Handles District database writes
     """
+
+    @classmethod
+    def postUpdateHook(cls, districts, updated_attr_list, is_new_list):
+        """
+        To run after a district has been updated.
+        For new districts, tries to guess the names based on other year's data
+        """
+        for (district, is_new) in zip(districts, is_new_list):
+            if is_new and (not district.display_name or not district.elasticsearch_name):
+                last_year_key = District.renderKeyName(district.year - 1, district.abbreviation)
+                last_year_district = District.get_by_id(last_year_key)
+                update = False
+                if last_year_district:
+                    if not district.display_name:
+                        district.display_name = last_year_district.display_name
+                        update = True
+                    if not district.elasticsearch_name:
+                        district.elasticsearch_name = last_year_district.elasticsearch_name
+                        update = True
+                    if update:
+                        cls.createOrUpdate(district, run_post_update_hook=False)
 
     @classmethod
     def getCacheKeysAndControllers(cls, affected_refs):
