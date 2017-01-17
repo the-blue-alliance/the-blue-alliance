@@ -1,4 +1,5 @@
 from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
+from database.district_query import DistrictsInYearQuery
 from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
 from database.event_details_query import EventDetailsQuery
 from database.match_query import MatchQuery, EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
@@ -188,6 +189,10 @@ def districtteam_updated(affected_refs):
 
 
 def district_updated(affected_refs):
-    # TODO
-    return []
+    years = filter(None, affected_refs['year'])
 
+    queries_and_keys = []
+    for year in years:
+        queries_and_keys.append(DistrictsInYearQuery(year))
+
+    return queries_and_keys
