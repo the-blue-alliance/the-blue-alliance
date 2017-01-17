@@ -246,7 +246,7 @@ class EventHelper(object):
         return district if district != DistrictType.NO_DISTRICT else DistrictType.abbrevs.get(district_name_str, DistrictType.NO_DISTRICT)
 
     @classmethod
-    def getDistrictFromEventName(cls, event_name):
+    def getDistrictEnumFromEventName(cls, event_name):
         for abbrev, district_type in DistrictType.abbrevs.items():
             if '{} district'.format(abbrev) in event_name.lower():
                 return district_type
@@ -256,6 +256,18 @@ class EventHelper(object):
                 return district_type
 
         return DistrictType.NO_DISTRICT
+
+    @classmethod
+    def getDistrictKeyFromEventName(cls, event_name, year_districts_future):
+        year_districts = year_districts_future.get_result()
+        for district in year_districts:
+            if '{} district'.format(district.abbreviation) in event_name.lower():
+                return district.key
+
+            if district.elasticsearch_name and district.elasticsearch_name in event_name:
+                return district.key
+
+        return None
 
     @classmethod
     def parseEventType(self, event_type_str):
