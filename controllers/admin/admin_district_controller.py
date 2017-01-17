@@ -64,3 +64,14 @@ class AdminDistrictEdit(LoggedInHandler):
         DistrictManipulator.createOrUpdate(district)
 
         self.redirect('/admin/districts/' + self.request.get("year"))
+
+
+class AdminDistrictCreate(LoggedInHandler):
+    """
+    Create an District. POSTs to AdminDistrictEdit.
+    """
+    def get(self):
+        self._require_admin()
+
+        path = os.path.join(os.path.dirname(__file__), '../../templates/admin/district_create.html')
+        self.response.out.write(template.render(path, self.template_values))
