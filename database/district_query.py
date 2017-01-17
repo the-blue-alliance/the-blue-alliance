@@ -33,3 +33,17 @@ class DistrictsInYearQuery(DatabaseQuery):
         district_keys = yield District.query(District.year == year).fetch_async(keys_only=True)
         districts = yield ndb.get_multi_async(district_keys)
         raise ndb.Return(districts)
+
+
+class DistrictHistoryQuery(DatabaseQuery):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "district_history_{}"  # (abbreviation)
+    DICT_CONVERTER = None  # For now (TODO)
+
+    @ndb.tasklet
+    def _query_async(self):
+        abbreviation = self._query_args[0]
+        district_keys = yield District.query(District.abbreviation == abbreviation).fetch_async(keys_only=True)
+        districts = yield ndb.get_multi_async(district_keys)
+        raise ndb.Return(districts)
+

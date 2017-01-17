@@ -19,6 +19,7 @@ class District(ndb.Model):
         # keys must be model properties
         self._affected_references = {
             'year': set(),
+            'abbreviation': set(),
         }
         super(District, self).__init__(*args, **kw)
 
