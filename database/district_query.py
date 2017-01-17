@@ -30,6 +30,6 @@ class DistrictsInYearQuery(DatabaseQuery):
     @ndb.tasklet
     def _query_async(self):
         year = self._query_args[0]
-        keys_future = yield District.query(District.year == year).fetch_async(keys_only=True)
-        districts = yield ndb.get_multi_async(keys_future)
+        district_keys = yield District.query(District.year == year).fetch_async(keys_only=True)
+        districts = yield ndb.get_multi_async(district_keys)
         raise ndb.Return(districts)
