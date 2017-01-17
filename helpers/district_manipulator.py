@@ -50,7 +50,7 @@ class DistrictManipulator(ManipulatorBase):
     @classmethod
     def updateMerge(self, new_district, old_district, auto_union=True):
         """
-        Update and return Robots
+        Update and return Districts
         """
         immutable_attrs = [
             "year",
