@@ -217,10 +217,10 @@ class TestLocationHelper(unittest2.TestCase):
         if not self.test_google_api_key:
             return
         self.assertEqual(event.normalized_location.name, 'Shenzhen University Town Sports Center')
-        self.assertEqual(event.normalized_location.formatted_address, 'Liuxian Ave, Nanshan Qu, Shenzhen, Guangdong Sheng, China, 518055')
+        self.assertEqual(event.normalized_location.formatted_address, 'Liuxian Ave, Nanshan Qu, Shenzhen Shi, Guangdong Sheng, China, 518055')
         self.assertEqual(event.normalized_location.street_number, None)
         self.assertEqual(event.normalized_location.street, 'Liuxian Avenue')
-        self.assertEqual(event.normalized_location.city, 'Shenzhen')
+        self.assertEqual(event.normalized_location.city, 'Shenzhen Shi')
         self.assertEqual(event.normalized_location.state_prov, 'Guangdong Sheng')
         self.assertEqual(event.normalized_location.state_prov_short,  'Guangdong Sheng')
         self.assertEqual(event.normalized_location.country, 'China')
@@ -604,12 +604,12 @@ class TestLocationHelper(unittest2.TestCase):
         if not self.test_google_api_key:
             return
         self.assertEqual(team.normalized_location.name, 'High School Attached To Northwest Normal University')
-        self.assertEqual(team.normalized_location.formatted_address, '21 Shilidian S St, Anning Qu, Lanzhou Shi, Gansu, China, 730070')
+        self.assertEqual(team.normalized_location.formatted_address, '21 Shilidian S St, Anning Qu, Lanzhou Shi, Gansu Sheng, China, 730070')
         self.assertEqual(team.normalized_location.street_number, '21')
         self.assertEqual(team.normalized_location.street, 'Shilidian South Street')
         self.assertEqual(team.normalized_location.city, 'Lanzhou Shi')
-        self.assertEqual(team.normalized_location.state_prov, 'Gansu')
-        self.assertEqual(team.normalized_location.state_prov_short, 'Gansu')
+        self.assertEqual(team.normalized_location.state_prov, 'Gansu Sheng')
+        self.assertEqual(team.normalized_location.state_prov_short, 'Gansu Sheng')
         self.assertEqual(team.normalized_location.country, 'China')
         self.assertEqual(team.normalized_location.country_short, 'CN')
         self.assertEqual(team.normalized_location.postal_code, '730070')
