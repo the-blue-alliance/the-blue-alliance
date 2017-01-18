@@ -4,7 +4,7 @@ from google.appengine.ext import ndb
 
 from controllers.apiv3.api_base_controller import ApiBaseController
 from controllers.apiv3.model_properties import filter_event_properties, filter_team_properties
-from database.district_query import DistrictListQuery
+from database.district_query import DistrictChampsInYearQuery
 from database.event_query import DistrictEventsQuery
 from database.team_query import DistrictTeamsQuery
 
@@ -17,7 +17,7 @@ class ApiDistrictListController(ApiBaseController):
         self._track_call_defer('district/list', year)
 
     def _render(self, year):
-        district_list, self._last_modified = DistrictListQuery(int(year)).fetch(dict_version=3, return_updated=True)
+        district_list, self._last_modified = DistrictChampsInYearQuery(int(year)).fetch(dict_version=3, return_updated=True)
         return json.dumps(district_list, ensure_ascii=True, indent=True, sort_keys=True)
 
 

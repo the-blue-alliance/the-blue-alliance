@@ -7,7 +7,7 @@ from models.district import District
 from models.event import Event
 
 
-class DistrictListQuery(DatabaseQuery):
+class DistrictChampsInYearQuery(DatabaseQuery):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = 'district_list_{}'  # (year)
     DICT_CONVERTER = DistrictListConverter

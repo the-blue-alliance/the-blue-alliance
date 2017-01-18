@@ -15,8 +15,8 @@ from consts.district_type import DistrictType
 from consts.event_type import EventType
 from controllers.base_controller import LoggedInHandler
 from database import match_query
-from database.district_query import DistrictListQuery
 from database.event_query import DistrictEventsQuery
+from database.district_query import DistrictChampsInYearQuery
 from helpers.award_manipulator import AwardManipulator
 from helpers.district_manipulator import DistrictManipulator
 from helpers.district_team_manipulator import DistrictTeamManipulator
@@ -209,7 +209,7 @@ class AdminCreateDistrictsEnqueue(LoggedInHandler):
 class AdminCreateDistrictsDo(LoggedInHandler):
     def get(self, year):
         year = int(year)
-        year_dcmps = DistrictListQuery(year).fetch()
+        year_dcmps = DistrictChampsInYearQuery(year).fetch()
         districts_to_write = []
 
         for dcmp in year_dcmps:
