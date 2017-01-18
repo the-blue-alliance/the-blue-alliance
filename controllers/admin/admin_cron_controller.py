@@ -16,6 +16,7 @@ from consts.event_type import EventType
 from controllers.base_controller import LoggedInHandler
 from database import match_query
 from database.district_query import DistrictListQuery
+from database.event_query import DistrictEventsQuery
 from helpers.award_manipulator import AwardManipulator
 from helpers.district_manipulator import DistrictManipulator
 from helpers.district_team_manipulator import DistrictTeamManipulator
@@ -210,19 +211,41 @@ class AdminCreateDistrictsDo(LoggedInHandler):
         year = int(year)
         year_dcmps = DistrictListQuery(year).fetch()
         districts_to_write = []
+        events_to_write = []
+        districtteams_to_write = []
         for dcmp in year_dcmps:
             district_abbrev = DistrictType.type_abbrevs[dcmp.event_district_enum]
             district_key = District.renderKeyName(year, district_abbrev)
             logging.info("Creating {}".format(district_key))
-            districts_to_write.append(District(
+            district_events_future = DistrictEventsQuery(district_key).fetch_async()
+            districtteams_future = DistrictTeam.query(DistrictTeam.year == year, DistrictTeam.district == DistrictType.abbrevs.get(district_abbrev, None)).fetch_async()
+
+            district = District(
                 id=district_key,
                 year=year,
                 abbreviation=district_abbrev,
                 display_name=DistrictType.type_names[dcmp.event_district_enum],
                 elasticsearch_name=next((k for k, v in DistrictType.elasticsearch_names.iteritems() if v == dcmp.event_district_enum), None)
-            ))
+            )
+            districts_to_write.append(district)
+
+            district_events = district_events_future.get_result()
+            logging.info("Found {} events to update".format(len(district_events)))
+            for event in district_events:
+                event.district_key = district.key
+                events_to_write.append(event)
+
+            districtteams = districtteams_future.get_result()
+            logging.info("Found {} DistrictTeams to update".format(len(districtteams)))
+            for districtteam in districtteams:
+                districtteam.district_key = district.key
+                districtteams_to_write.append(districtteam)
+
         logging.info("Writing {} new districts".format(len(districts_to_write)))
         DistrictManipulator.createOrUpdate(districts_to_write, run_post_update_hook=False)
+
+        EventManipulator.createOrUpdate(events_to_write)
+        DistrictTeamManipulator.createOrUpdate(districtteams_to_write)
 
 
 class AdminPostEventTasksDo(LoggedInHandler):

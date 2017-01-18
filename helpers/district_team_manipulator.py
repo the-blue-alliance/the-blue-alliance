@@ -18,11 +18,11 @@ class DistrictTeamManipulator(ManipulatorBase):
         immutable_attrs = [
             "team",
             "district",
-            "district_key",
             "year"
         ]  # These build key_name, and cannot be changed without deleting the model.
 
         attrs = [
+            "district_key",  # TEMPORARY, for migrations
         ]
 
         for attr in attrs:
