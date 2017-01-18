@@ -147,6 +147,10 @@ class LocationHelper(object):
         Not checking for absolute equality in case of existing data errors.
         """
 
+        # TODO FIX: Hacky special case for weird event. 2017-01-18 -fangeugene
+        if 'Shenzhen' in query_name and location_info['name'] != 'Shenzhen University Town Sports Center':
+            return 0
+
         # Check radius
         R = 6373.0  # approximate radius of earth in km
         lat1 = math.radians(lat_lng[0])
