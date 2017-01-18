@@ -3,6 +3,7 @@ import urlparse
 
 from consts.district_type import DistrictType
 from consts.event_type import EventType
+from database.district_query import DistrictsInYearQuery
 from helpers.event_helper import EventHelper
 
 from models.event import Event
@@ -17,6 +18,7 @@ class FIRSTElasticSearchEventListParser(object):
 
     def parse(self, response):
         events = []
+        year_districts_future = DistrictsInYearQuery(self.season).fetch_async()
         for event in response['hits']['hits']:
             first_eid = event['_id']
             event = event['_source']
@@ -29,10 +31,6 @@ class FIRSTElasticSearchEventListParser(object):
             key = "{}{}".format(self.season, code)
             name = event['event_name']
             short_name = EventHelper.getShortName(name)
-            if event_type in EventType.DISTRICT_EVENT_TYPES:
-                district_enum = EventHelper.getDistrictFromEventName(name)
-            else:
-                district_enum = DistrictType.NO_DISTRICT
             city = event.get('event_city', None)
             state_prov = event.get('event_stateprov', None)
             country = event.get('event_country', None)
@@ -48,6 +46,14 @@ class FIRSTElasticSearchEventListParser(object):
 
             raw_website = event.get('event_web_url', None)
             website = urlparse.urlparse(raw_website, 'http').geturl() if raw_website else None
+
+            # Decide what district (if any) this event is in
+            if event_type in EventType.DISTRICT_EVENT_TYPES:
+                district_enum = EventHelper.getDistrictEnumFromEventName(name)
+                district_key = EventHelper.getDistrictKeyFromEventName(name, year_districts_future)
+            else:
+                district_enum = DistrictType.NO_DISTRICT
+                district_key = None
 
             events.append(Event(
                 id=key,
@@ -66,6 +72,7 @@ class FIRSTElasticSearchEventListParser(object):
                 venue_address=venue_address,
                 year=self.season,
                 event_district_enum=district_enum,
+                district_key=district_key,
                 first_eid=first_eid,
                 website=website
             ))

@@ -8,6 +8,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
 from consts.district_type import DistrictType
+from models.district import District
 from models.district_team import DistrictTeam
 from models.robot import Robot
 from models.team import Team
@@ -49,6 +50,7 @@ class TestFMSAPITeamParser(unittest2.TestCase):
             self.assertEqual(districtTeam.key_name, "2015ne_frc1124")
             self.assertEqual(districtTeam.team.id(), "frc1124")
             self.assertEqual(districtTeam.district, DistrictType.abbrevs['ne'])
+            self.assertEqual(districtTeam.district_key, ndb.Key(District, '2015ne'))
 
             # Test the Robot model we get back
             self.assertNotEqual(robot, None)

@@ -1,10 +1,12 @@
 import datetime
 import logging
 
+from google.appengine.ext import ndb
+
 from consts.district_type import DistrictType
 from consts.event_type import EventType
 from helpers.event_helper import EventHelper
-
+from models.district import District
 from models.event import Event
 
 
@@ -46,6 +48,7 @@ class FMSAPIEventListParser(object):
 
     def parse(self, response):
         events = []
+        districts = {}
         for event in response['Events']:
             code = event['code'].lower()
             event_type = self.EVENT_TYPES.get(event['type'].lower(), None)
@@ -55,6 +58,7 @@ class FMSAPIEventListParser(object):
             name = event['name']
             short_name = EventHelper.getShortName(name)
             district_enum = EventHelper.parseDistrictName(event['districtCode'].lower()) if event['districtCode'] else DistrictType.NO_DISTRICT
+            district_key = District.renderKeyName(self.season, event['districtCode'].lower()) if event['districtCode'] else None
             venue = event['venue']
             city = event['city']
             state_prov = event['stateprov']
@@ -88,6 +92,15 @@ class FMSAPIEventListParser(object):
                 country=country,
                 venue_address=None,  # FIRST API doesn't provide detailed venue address
                 year=self.season,
-                event_district_enum=district_enum
+                event_district_enum=district_enum,
+                district_key=ndb.Key(District, district_key) if district_key else None,
             ))
-        return events
+
+            # Build District Model
+            if district_key and district_key not in districts:
+                districts[district_key] = District(
+                    id=district_key,
+                    year=self.season,
+                    abbreviation=event['districtCode'].lower(),
+                )
+        return events, list(districts.values())

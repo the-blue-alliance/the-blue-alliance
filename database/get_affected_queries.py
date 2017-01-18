@@ -1,4 +1,5 @@
 from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
+from database.district_query import DistrictsInYearQuery, DistrictHistoryQuery
 from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
 from database.event_details_query import EventDetailsQuery
 from database.match_query import MatchQuery, EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
@@ -183,5 +184,19 @@ def districtteam_updated(affected_refs):
 
     for team_key in team_keys:
         queries_and_keys.append(TeamDistrictsQuery(team_key.id()))
+
+    return queries_and_keys
+
+
+def district_updated(affected_refs):
+    years = filter(None, affected_refs['year'])
+    district_abbrevs = filter(None, affected_refs['abbreviation'])
+
+    queries_and_keys = []
+    for year in years:
+        queries_and_keys.append(DistrictsInYearQuery(year))
+
+    for abbrev in district_abbrevs:
+        queries_and_keys.append(DistrictHistoryQuery(abbrev))
 
     return queries_and_keys

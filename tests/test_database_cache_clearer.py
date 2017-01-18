@@ -5,6 +5,7 @@ from google.appengine.ext import testbed
 
 from database import get_affected_queries
 from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
+from database.district_query import DistrictsInYearQuery, DistrictHistoryQuery
 from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
 from database.event_details_query import EventDetailsQuery
 from database.match_query import MatchQuery, EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
@@ -13,7 +14,7 @@ from database.robot_query import TeamRobotsQuery
 from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
 
 from consts.district_type import DistrictType
-
+from models.district import District
 from models.district_team import DistrictTeam
 from models.event import Event
 from models.event_details import EventDetails
@@ -73,6 +74,20 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
 
         self.districtteam_2015fim_frc254.put()
         self.districtteam_2015mar_frc604.put()
+
+        self.district_2015ne = District(
+            id='2015ne',
+            year=2015,
+            abbreviation='ne',
+        )
+
+        self.district_2016chs = District(
+            id='2016chs',
+            year=2016,
+            abbreviation='chs',
+        )
+        self.district_2015ne.put()
+        self.district_2016chs.put()
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -241,3 +256,16 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         self.assertTrue(DistrictTeamsQuery('2015mar').cache_key in cache_keys)
         self.assertTrue(TeamDistrictsQuery('frc254').cache_key in cache_keys)
         self.assertTrue(TeamDistrictsQuery('frc604').cache_key in cache_keys)
+
+    def test_district_updated(self):
+        affected_refs = {
+            'year': {2015, 2016},
+            'abbreviation': {'ne', 'chs'}
+        }
+        cache_keys = [q.cache_key for q in get_affected_queries.district_updated(affected_refs)]
+
+        self.assertEqual(len(cache_keys), 4)
+        self.assertTrue(DistrictsInYearQuery(2015).cache_key in cache_keys)
+        self.assertTrue(DistrictsInYearQuery(2016).cache_key in cache_keys)
+        self.assertTrue(DistrictHistoryQuery('ne').cache_key in cache_keys)
+        self.assertTrue(DistrictHistoryQuery('chs').cache_key in cache_keys)

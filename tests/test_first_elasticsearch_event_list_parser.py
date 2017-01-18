@@ -9,6 +9,7 @@ from google.appengine.ext import testbed
 
 from consts.district_type import DistrictType
 from consts.event_type import EventType
+from models.district import District
 from models.event import Event
 
 
@@ -19,6 +20,14 @@ class TestFIRSTElasticSearchEventListParser(unittest2.TestCase):
         self.testbed.init_datastore_v3_stub()
         self.testbed.init_memcache_stub()
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
+        self.ne_district = District(
+            id='2015ne',
+            abbreviation='ne',
+            year=2015,
+            elasticsearch_name='NE FIRST'
+        )
+        self.ne_district.put()
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -77,6 +86,7 @@ class TestFIRSTElasticSearchEventListParser(unittest2.TestCase):
                     self.assertEquals(event.year, 2015)
                     self.assertEquals(event.event_type_enum, EventType.DISTRICT)
                     self.assertEquals(event.event_district_enum, DistrictType.NEW_ENGLAND)
+                    self.assertEqual(event.district_key, self.ne_district.key)
                     self.assertEquals(event.first_eid, '13443')
                     self.assertEquals(event.website, 'http://www.nefirst.org/')
 
@@ -101,5 +111,6 @@ class TestFIRSTElasticSearchEventListParser(unittest2.TestCase):
                     self.assertEquals(event.year, 2015)
                     self.assertEquals(event.event_type_enum, EventType.DISTRICT_CMP)
                     self.assertEquals(event.event_district_enum, DistrictType.NEW_ENGLAND)
+                    self.assertEqual(event.district_key, self.ne_district.key)
                     self.assertEquals(event.first_eid, '13423')
                     self.assertEquals(event.website, 'http:///www.nefirst.org/')
