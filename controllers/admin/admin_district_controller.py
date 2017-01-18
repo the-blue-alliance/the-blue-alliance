@@ -13,7 +13,7 @@ class AdminDistrictList(LoggedInHandler):
     """
     List all Districts.
     """
-    VALID_YEARS = range(1992, tba_config.MAX_YEAR + 1)
+    VALID_YEARS = range(2009, tba_config.MAX_YEAR + 1)
 
     def get(self, year=None):
         self._require_admin()
