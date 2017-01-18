@@ -246,7 +246,7 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
 
     def test_districtteam_updated(self):
         affected_refs = {
-            'district_key': {'2015fim', '2015mar'},
+            'district_key': {ndb.Key(District, '2015fim'), ndb.Key(District, '2015mar')},
             'team': {ndb.Key(Team, 'frc254'), ndb.Key(Team, 'frc604')}
         }
         cache_keys = [q.cache_key for q in get_affected_queries.districtteam_updated(affected_refs)]

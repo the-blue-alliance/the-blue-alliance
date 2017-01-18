@@ -262,8 +262,9 @@ class CacheClearer(object):
     def _get_districtteams_cache_keys_and_controllers(cls, district_keys, team_keys):
         cache_keys_and_controllers = []
         for district_key in filter(None, district_keys):
-            year = district_key[:4]
-            district_short = district_key[4:]
+            key_name = district_key.id()
+            year = key_name[:4]
+            district_short = key_name[4:]
             cache_keys_and_controllers.append((ApiDistrictTeamsController.get_cache_key_from_format(district_short, year), ApiDistrictTeamsController))
         for team_key in filter(None, team_keys):
             cache_keys_and_controllers.append((ApiTeamHistoryDistrictsController.get_cache_key_from_format(team_key.id()), ApiTeamHistoryDistrictsController))

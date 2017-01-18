@@ -180,7 +180,7 @@ def districtteam_updated(affected_refs):
 
     queries_and_keys = []
     for district_key in district_keys:
-        queries_and_keys.append(DistrictTeamsQuery(district_key))
+        queries_and_keys.append(DistrictTeamsQuery(district_key.id()))
 
     for team_key in team_keys:
         queries_and_keys.append(TeamDistrictsQuery(team_key.id()))
