@@ -29,6 +29,10 @@ class District(ndb.Model):
     def key_name(self):
         return "{}{}".format(self.year, self.abbreviation)
 
+    @property
+    def render_name(self):
+        return self.display_name if self.display_name else "{}".format(self.abbreviation).upper()
+
     @classmethod
     def renderKeyName(cls, year, district_abbrev):
         # Like 2016ne or 2016fim

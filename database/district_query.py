@@ -10,7 +10,7 @@ from models.event import Event
 class DistrictChampsInYearQuery(DatabaseQuery):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = 'district_list_{}'  # (year)
-    DICT_CONVERTER = DistrictListConverter
+    DICT_CONVERTER = None  # Not exposed in API, not needed
 
     @ndb.tasklet
     def _query_async(self):
@@ -25,7 +25,7 @@ class DistrictChampsInYearQuery(DatabaseQuery):
 class DistrictsInYearQuery(DatabaseQuery):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = "districts_in_year_{}"  # (year)
-    DICT_CONVERTER = None  # For now (TODO)
+    DICT_CONVERTER = DistrictListConverter
 
     @ndb.tasklet
     def _query_async(self):
@@ -38,7 +38,7 @@ class DistrictsInYearQuery(DatabaseQuery):
 class DistrictHistoryQuery(DatabaseQuery):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = "district_history_{}"  # (abbreviation)
-    DICT_CONVERTER = None  # For now (TODO)
+    DICT_CONVERTER = DistrictListConverter
 
     @ndb.tasklet
     def _query_async(self):
