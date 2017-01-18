@@ -200,7 +200,7 @@ class AdminCreateDistrictsEnqueue(LoggedInHandler):
         taskqueue.add(
             queue_name='admin',
             target='backend-tasks',
-            url='/backend-tasks/do/rebuild_districts/{}'.format(year),
+            url='/backend-tasks-b2/do/rebuild_districts/{}'.format(year),
             method='GET'
         )
         self.response.out.write("Enqueued district creation for {}".format(year))
@@ -238,7 +238,7 @@ class AdminCreateDistrictsDo(LoggedInHandler):
             logging.info("Found {} events to update".format(len(district_events)))
             events_to_write = []
             for event in district_events:
-                event.district_key = ndb.Key(District, district_key),
+                event.district_key = ndb.Key(District, district_key)
                 events_to_write.append(event)
             EventManipulator.createOrUpdate(events_to_write)
 
@@ -246,6 +246,7 @@ class AdminCreateDistrictsDo(LoggedInHandler):
             district_abbrev = DistrictType.type_abbrevs[dcmp.event_district_enum]
             district_key = District.renderKeyName(year, district_abbrev)
             districtteams_future = DistrictTeam.query(DistrictTeam.year == year, DistrictTeam.district == DistrictType.abbrevs.get(district_abbrev, None)).fetch_async()
+
             districtteams = districtteams_future.get_result()
             logging.info("Found {} DistrictTeams to update".format(len(districtteams)))
             districtteams_to_write = []
