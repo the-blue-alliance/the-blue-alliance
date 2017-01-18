@@ -15,7 +15,9 @@ from consts.district_type import DistrictType
 from consts.event_type import EventType
 from controllers.base_controller import LoggedInHandler
 from database import match_query
+from database.district_query import DistrictListQuery
 from helpers.award_manipulator import AwardManipulator
+from helpers.district_manipulator import DistrictManipulator
 from helpers.district_team_manipulator import DistrictTeamManipulator
 from helpers.event_manipulator import EventManipulator
 from helpers.match_helper import MatchHelper
@@ -23,6 +25,7 @@ from helpers.notification_sender import NotificationSender
 from helpers.search_helper import SearchHelper
 from helpers.team_manipulator import TeamManipulator
 from models.award import Award
+from models.district import District
 from models.district_team import DistrictTeam
 from models.event import Event
 from models.event_team import EventTeam
@@ -185,6 +188,41 @@ class AdminCreateDistrictTeamsDo(LoggedInHandler):
         logging.info("Finishing updating old district teams from event teams")
         DistrictTeamManipulator.createOrUpdate(new_district_teams)
         self.response.out.write("Finished creating district teams for {}".format(year))
+
+
+class AdminCreateDistrictsEnqueue(LoggedInHandler):
+    """
+    Create District models from old DCMPs
+    """
+    def get(self, year):
+        self._require_admin()
+        taskqueue.add(
+            queue_name='admin',
+            target='backend-tasks',
+            url='/backend-tasks/do/rebuild_districts/{}'.format(year),
+            method='GET'
+        )
+        self.response.out.write("Enqueued district creation for {}".format(year))
+
+
+class AdminCreateDistrictsDo(LoggedInHandler):
+    def get(self, year):
+        year = int(year)
+        year_dcmps = DistrictListQuery(year).fetch()
+        districts_to_write = []
+        for dcmp in year_dcmps:
+            district_abbrev = DistrictType.type_abbrevs[dcmp.event_district_enum]
+            district_key = District.renderKeyName(year, district_abbrev)
+            logging.info("Creating {}".format(district_key))
+            districts_to_write.append(District(
+                id=district_key,
+                year=year,
+                abbreviation=district_abbrev,
+                display_name=DistrictType.type_names[dcmp.event_district_enum],
+                elasticsearch_name=next((k for k, v in DistrictType.elasticsearch_names.iteritems() if v == dcmp.event_district_enum), None)
+            ))
+        logging.info("Writing {} new districts".format(len(districts_to_write)))
+        DistrictManipulator.createOrUpdate(districts_to_write, run_post_update_hook=False)
 
 
 class AdminPostEventTasksDo(LoggedInHandler):
