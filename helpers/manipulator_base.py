@@ -56,8 +56,7 @@ class ManipulatorBase(object):
                 cls._clearCacheDeferred,
                 all_affected_references,
                 _queue='cache-clearing',
-                _transactional=ndb.in_transaction(),
-                _target='backend-tasks')
+                _transactional=ndb.in_transaction())
 
     @classmethod
     def _clearCacheDeferred(cls, all_affected_references):
