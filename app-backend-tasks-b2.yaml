@@ -20,6 +20,8 @@ libraries:
   version: "1.6.1"
 - name: jinja2
   version: "2.6"
+- name: pytz
+  version: "2016.4"
 
 handlers:
 - url: .*
