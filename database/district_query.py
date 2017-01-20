@@ -7,6 +7,18 @@ from models.district import District
 from models.event import Event
 
 
+class DistrictQuery(DatabaseQuery):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = 'district_{}'  # (district_key)
+    DICT_CONVERTER = None
+
+    @ndb.tasklet
+    def _query_async(self):
+        district_key = self._query_args[0]
+        district = yield District.get_by_id(district_key)
+        raise ndb.Return(district)
+
+
 class DistrictChampsInYearQuery(DatabaseQuery):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = 'district_list_{}'  # (year)

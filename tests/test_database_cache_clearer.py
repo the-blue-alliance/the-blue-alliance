@@ -5,7 +5,7 @@ from google.appengine.ext import testbed
 
 from database import get_affected_queries
 from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
-from database.district_query import DistrictsInYearQuery, DistrictHistoryQuery
+from database.district_query import DistrictsInYearQuery, DistrictHistoryQuery, DistrictQuery
 from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
 from database.event_details_query import EventDetailsQuery
 from database.match_query import MatchQuery, EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
@@ -259,13 +259,15 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
 
     def test_district_updated(self):
         affected_refs = {
+            'key': {ndb.Key(District, '2016ne')},
             'year': {2015, 2016},
             'abbreviation': {'ne', 'chs'}
         }
         cache_keys = [q.cache_key for q in get_affected_queries.district_updated(affected_refs)]
 
-        self.assertEqual(len(cache_keys), 4)
+        self.assertEqual(len(cache_keys), 5)
         self.assertTrue(DistrictsInYearQuery(2015).cache_key in cache_keys)
         self.assertTrue(DistrictsInYearQuery(2016).cache_key in cache_keys)
         self.assertTrue(DistrictHistoryQuery('ne').cache_key in cache_keys)
         self.assertTrue(DistrictHistoryQuery('chs').cache_key in cache_keys)
+        self.assertTrue(DistrictQuery('2016ne').cache_key in cache_keys)

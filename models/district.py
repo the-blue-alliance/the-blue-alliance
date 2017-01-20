@@ -20,6 +20,7 @@ class District(ndb.Model):
         # store set of affected references referenced keys for cache clearing
         # keys must be model properties
         self._affected_references = {
+            'key': set(),
             'year': set(),
             'abbreviation': set(),
         }
