@@ -15,7 +15,7 @@ class DistrictQuery(DatabaseQuery):
     @ndb.tasklet
     def _query_async(self):
         district_key = self._query_args[0]
-        district = yield District.get_by_id(district_key)
+        district = yield District.get_by_id_async(district_key)
         raise ndb.Return(district)
 
 

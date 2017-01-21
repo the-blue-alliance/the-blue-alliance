@@ -82,7 +82,7 @@ class DistrictDetail(CacheableHandler):
         valid_districts = set()
         districts_in_year = districts_in_year_future.get_result()
         for dist in districts_in_year:
-            valid_districts.add((dist.name, dist.abbreviation))
+            valid_districts.add((dist.display_name, dist.abbreviation))
         valid_districts = sorted(valid_districts, key=lambda (name, _): name)
 
         teams = TeamHelper.sortTeams(district_teams_future.get_result())
@@ -107,7 +107,7 @@ class DistrictDetail(CacheableHandler):
             'year': year,
             'valid_years': valid_years,
             'valid_districts': valid_districts,
-            'district_name': district.name,
+            'district_name': district.display_name,
             'district_abbrev': district_abbrev,
             'week_events': week_events,
             'team_totals': team_totals,

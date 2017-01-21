@@ -125,14 +125,12 @@ class ApiDistrictRankingsController(ApiDistrictControllerBase):
         events = ndb.get_multi(event_keys)
 
         event_futures = ndb.get_multi_async(event_keys)
-        event_team_keys_future = EventTeam.query(EventTeam.event.IN(event_keys)).fetch_async(None, keys_only=True)
-
-        team_futures = ndb.get_multi_async(set([ndb.Key(Team, et_key.id().split('_')[1]) for et_key in event_team_keys_future.get_result()]))
+        district_teams_future = DistrictTeamsQuery("{}{}".format(year, district_abbrev)).fetch_async()
 
         events = [event_future.get_result() for event_future in event_futures]
         EventHelper.sort_events(events)
 
-        team_totals = DistrictHelper.calculate_rankings(events, team_futures, self.year)
+        team_totals = DistrictHelper.calculate_rankings(events, district_teams_future.get_result(), self.year)
 
         rankings = []
 
