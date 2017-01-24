@@ -88,7 +88,9 @@ class RankingsHelper(object):
         rankings2 = []
         for row in event_details.rankings[1:]:
             if ranking_index is None:
-                record = None
+                wins = 0
+                losses = 0
+                ties = 0
             elif type(ranking_index) == tuple:
                 wins = row[ranking_index[0]]
                 losses = row[ranking_index[1]]
