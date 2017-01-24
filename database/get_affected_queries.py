@@ -37,7 +37,7 @@ def award_updated(affected_refs):
 def event_updated(affected_refs):
     event_keys = filter(None, affected_refs['key'])
     years = filter(None, affected_refs['year'])
-    event_district_keys = filter(None, affected_refs['event_district_key'])
+    event_district_keys = filter(None, affected_refs['district_key'])
 
     event_team_keys_future = EventTeam.query(EventTeam.event.IN([event_key for event_key in event_keys])).fetch_async(None, keys_only=True)
 
@@ -49,7 +49,7 @@ def event_updated(affected_refs):
         queries_and_keys.append((EventListQuery(year)))
 
     for event_district_key in event_district_keys:
-        queries_and_keys.append((DistrictEventsQuery(event_district_key)))
+        queries_and_keys.append((DistrictEventsQuery(event_district_key.id())))
 
     for et_key in event_team_keys_future.get_result():
         team_key = et_key.id().split('_')[1]

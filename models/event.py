@@ -58,8 +58,7 @@ class Event(ndb.Model):
         self._affected_references = {
             'key': set(),
             'year': set(),
-            'event_district_abbrev': set(),
-            'event_district_key': set()
+            'district_key': set()
         }
         self._awards = None
         self._details = None

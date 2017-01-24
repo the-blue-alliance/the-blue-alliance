@@ -43,7 +43,7 @@ class TestEventApiController(unittest2.TestCase):
                 id="2010sc",
                 name="Palmetto Regional",
                 event_type_enum=EventType.REGIONAL,
-                event_district_enum=DistrictType.NO_DISTRICT,
+                district_key=None,
                 short_name="Palmetto",
                 event_short="sc",
                 year=2010,

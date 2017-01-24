@@ -16,6 +16,7 @@ from helpers.district_helper import DistrictHelper
 from helpers.event_helper import EventHelper
 from helpers.model_to_dict import ModelToDict
 from models import team
+from models.district import District
 from models.district_team import DistrictTeam
 from models.event import Event
 from models.event_team import EventTeam
@@ -117,15 +118,12 @@ class ApiDistrictRankingsController(ApiDistrictControllerBase):
         if self.year < 2009:
             return json.dumps([], ensure_ascii=True)
 
-        event_keys = Event.query(Event.year == self.year, Event.event_district_enum == self.district).fetch(None, keys_only=True)
-        if not event_keys:
-            return json.dumps([], ensure_ascii=True)
-        events = ndb.get_multi(event_keys)
-
-        event_futures = ndb.get_multi_async(event_keys)
+        events_future = DistrictEventsQuery(District.renderKeyName(self.year, district_abbrev)).fetch_async()
         district_teams_future = DistrictTeamsQuery("{}{}".format(year, district_abbrev)).fetch_async()
 
-        events = [event_future.get_result() for event_future in event_futures]
+        events = events_future.get_result()
+        if not events:
+            return json.dumps([], ensure_ascii=True)
         EventHelper.sort_events(events)
 
         team_totals = DistrictHelper.calculate_rankings(events, district_teams_future.get_result(), self.year)
