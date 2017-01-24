@@ -24,12 +24,13 @@ from models.team import Team
 
 class ApiDistrictControllerBase(ApiBaseController):
 
-    def _set_district(self, district):
+    def _set_district(self, district, year):
         self.district_abbrev = district
+        self.year = year
 
     @property
     def _validators(self):
-        return [("district_id_validator", self.district_abbrev)]
+        return [("district_id_validator", "{}{}".format(self.year, self.district_abbrev))]
 
 
 class ApiDistrictListController(ApiDistrictControllerBase):
@@ -84,7 +85,7 @@ class ApiDistrictEventsController(ApiDistrictControllerBase):
         self._track_call_defer('district/events', '{}{}'.format(year, district_abbrev))
 
     def _render(self, district_abbrev, year=None):
-        self._set_district(district_abbrev)
+        self._set_district(district_abbrev, self.year)
 
         events = DistrictEventsQuery('{}{}'.format(self.year, self.district_abbrev)).fetch()
 
@@ -111,7 +112,7 @@ class ApiDistrictRankingsController(ApiDistrictControllerBase):
         self._track_call_defer('district/rankings', '{}{}'.format(year, district_abbrev))
 
     def _render(self, district_abbrev, year=None):
-        self._set_district(district_abbrev)
+        self._set_district(district_abbrev, self.year)
 
         if self.year < 2009:
             return json.dumps([], ensure_ascii=True)
@@ -172,7 +173,7 @@ class ApiDistrictTeamsController(ApiDistrictControllerBase):
         self._track_call_defer('district/teams', '{}{}'.format(year, district_abbrev))
 
     def _render(self, district_abbrev, year=None):
-        self._set_district(district_abbrev)
+        self._set_district(district_abbrev, self.year)
 
         district_teams = DistrictTeamsQuery('{}{}'.format(self.year, self.district_abbrev)).fetch()
 
