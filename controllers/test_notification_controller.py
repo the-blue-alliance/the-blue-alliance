@@ -3,6 +3,7 @@ import logging
 from consts.notification_type import NotificationType
 from base_controller import LoggedInHandler
 from helpers.push_helper import PushHelper
+from models.district import District
 from models.match import Match
 from models.event import Event
 
@@ -37,6 +38,7 @@ class TestNotificationController(LoggedInHandler):
 
         event = Event.get_by_id('2014necmp')
         match = Match.get_by_id('2014necmp_f1m1')
+        district = District.get_by_id('2014ne')
 
         if type == NotificationType.UPCOMING_MATCH:
             notification = UpcomingMatchNotification(match, event)
@@ -52,7 +54,7 @@ class TestNotificationController(LoggedInHandler):
             # Not implemented yet
             pass
         elif type == NotificationType.DISTRICT_POINTS_UPDATED:
-            notification = DistrictPointsUpdatedNotification('2014ne')
+            notification = DistrictPointsUpdatedNotification(district)
         elif type == NotificationType.SCHEDULE_UPDATED:
             notification = ScheduleUpdatedNotification(event, match)
         elif type == NotificationType.FINAL_RESULTS:
