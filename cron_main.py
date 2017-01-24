@@ -11,6 +11,7 @@ from controllers.datafeed_controller import FMSAPIAwardsEnqueue, FMSAPIEventAlli
 from controllers.datafeed_controller import FMSAPIAwardsGet, FMSAPIEventAlliancesGet, FMSAPIEventRankingsGet, FMSAPIMatchesGet
 
 from controllers.cron_controller import DistrictPointsCalcEnqueue, DistrictPointsCalcDo
+from controllers.cron_controller import DistrictRankingsCalcEnqueue, DistrictRankingsCalcDo
 from controllers.cron_controller import EventShortNameCalcEnqueue, EventShortNameCalcDo
 from controllers.cron_controller import EventTeamRepairDo, EventTeamUpdate, EventTeamUpdateEnqueue
 from controllers.cron_controller import EventMatchstatsDo, EventMatchstatsEnqueue
@@ -43,6 +44,8 @@ app = webapp2.WSGIApplication([('/tasks/enqueue/csv_backup_events', TbaCSVBackup
                                ('/tasks/get/fmsapi_matches/(.*)', FMSAPIMatchesGet),
                                ('/tasks/math/enqueue/district_points_calc/([0-9]*)', DistrictPointsCalcEnqueue),
                                ('/tasks/math/do/district_points_calc/(.*)', DistrictPointsCalcDo),
+                               ('/tasks/math/enqueue/district_rankings_calc/([0-9]*)', DistrictRankingsCalcEnqueue),
+                               ('/tasks/math/do/district_rankings_calc/(.*)', DistrictRankingsCalcDo),
                                ('/tasks/math/enqueue/event_short_name_calc_enqueue/([0-9]*)', EventShortNameCalcEnqueue),
                                ('/tasks/math/do/event_short_name_calc_do/(.*)', EventShortNameCalcDo),
                                ('/tasks/math/enqueue/event_matchstats/(.*)', EventMatchstatsEnqueue),

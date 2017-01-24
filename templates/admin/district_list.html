@@ -26,6 +26,7 @@
         <th>Abbreviation</th>
         <th>Display Name</th>
         <th>Elasticsearch Name</th>
+        <th>Has Rankings</th>
     </thead>
 
     {% for district in districts %}
@@ -35,6 +36,7 @@
         <td>{{ district.abbreviation }}</td>
         <td>{{ district.display_name }}</td>
         <td>{{ district.elasticsearch_name }}</td>
+        <td>{% if district.rankings %}<span class="glyphicon glyphicon-ok"><span>{% endif %}</td>
         <td></td>
     </tr>
     {% endfor %}

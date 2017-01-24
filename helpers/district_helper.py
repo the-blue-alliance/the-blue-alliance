@@ -117,7 +117,7 @@ class DistrictHelper(object):
         return single_district_points
 
     @classmethod
-    def calculate_rankings(cls, events, team_futures, year):
+    def calculate_rankings(cls, events, teams, year):
         # aggregate points from first two events and district championship
         team_attendance_count = defaultdict(int)
         team_totals = defaultdict(lambda: {
@@ -145,8 +145,11 @@ class DistrictHelper(object):
                             team_totals[team_key]['tiebreakers'][5] = heapq.nlargest(3, event.district_points['tiebreakers'][team_key]['highest_qual_scores'] + team_totals[team_key]['tiebreakers'][5])
 
         # adding in rookie bonus
-        for team_future in team_futures:
-            team = team_future.get_result()
+        if type(teams) == ndb.tasklets.Future:
+            teams = teams.get_result()
+        for team in teams:
+            if type(team) == ndb.tasklets.Future:
+                team = team.get_result()
             bonus = None
             if team.rookie_year == year:
                 bonus = 10
