@@ -57,6 +57,7 @@ class EventDetailsManipulator(ManipulatorBase):
             'matchstats',
             'predictions',
             'rankings',
+            'rankings2',
         ]
 
         old_event_details._updated_attrs = []
