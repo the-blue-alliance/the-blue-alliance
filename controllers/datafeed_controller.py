@@ -193,11 +193,12 @@ class FMSAPIEventRankingsGet(webapp.RequestHandler):
     def get(self, event_key):
         df = DatafeedFMSAPI('v2.0')
 
-        rankings = df.getEventRankings(event_key)
+        rankings, rankings2 = df.getEventRankings(event_key)
 
         event_details = EventDetails(
             id=event_key,
-            rankings=rankings
+            rankings=rankings,
+            rankings2=rankings2
         )
         EventDetailsManipulator.createOrUpdate(event_details)
 

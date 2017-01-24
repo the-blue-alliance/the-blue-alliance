@@ -16,6 +16,36 @@ class RankingsHelper(object):
         2007: [6, 7, 8],
     }
 
+    NO_RECORD_YEARS = {2010, 2015}
+
+    QUAL_AVERAGE_YEARS = {2015}
+
+    @classmethod
+    def build_ranking(cls, year, rank, team_key, wins, losses, ties, qual_average, matches_played, dq, sort_orders):
+        if year in cls.NO_RECORD_YEARS:
+            record = None
+        else:
+            record = {
+                'wins': int(wins),
+                'losses': int(losses),
+                'ties': int(ties),
+            }
+
+        if year not in cls.QUAL_AVERAGE_YEARS:
+            qual_average = None
+        else:
+            qual_average = float(qual_average)
+
+        return {
+                'rank': int(rank),
+                'team_key': team_key,
+                'record': record,  # None if record doesn't affect rank (e.g. 2010, 2015)
+                'qual_average': qual_average,  # None if qual_average doesn't affect rank (all years except 2015)
+                'matches_played': int(matches_played),
+                'dq': int(dq),
+                'sort_orders': [float(so) for so in sort_orders],
+            }
+
     @classmethod
     def migrate_rankings(cls, event_key):
         """
@@ -42,7 +72,7 @@ class RankingsHelper(object):
                 dq_index = i
 
         sort_order_indices = cls.SORT_ORDERS[year]
-      # Special case for offseasons with different ordering
+        # Special case for offseasons with different ordering
         if year == 2015 and event_details.rankings[0][3].lower() == 'coopertition':
             sort_order_indices = [2, 3, 5, 4, 6, 7]
 
@@ -51,18 +81,11 @@ class RankingsHelper(object):
             if ranking_index is None:
                 record = None
             elif type(ranking_index) == tuple:
-                record = {
-                    'wins': int(row[ranking_index[0]]),
-                    'losses': int(row[ranking_index[1]]),
-                    'ties': int(row[ranking_index[2]])
-                }
+                wins = row[ranking_index[0]]
+                losses = row[ranking_index[1]]
+                ties = row[ranking_index[2]]
             else:
                 wins, losses, ties = row[ranking_index].split('-')
-                record = {
-                    'wins': int(wins),
-                    'losses': int(losses),
-                    'ties': int(ties)
-                }
 
             if dq_index is None:
                 dq = 0
@@ -76,15 +99,7 @@ class RankingsHelper(object):
 
             sort_orders = [float(row[index]) for index in sort_order_indices]
 
-            ranking = {
-                'rank': int(row[0]),
-                'team_key': 'frc{}'.format(row[1]),
-                'record': record,  # None if record doesn't affect rank (e.g. 2010, 2015)
-                'qual_average': qual_average,  # None if qual_average doesn't affect rank (all years except 2015)
-                'matches_played': row[mp_index],
-                'dq': dq,
-                'sort_orders': sort_orders,
-            }
-            rankings2.append(ranking)
+            rankings2.append(cls.build_ranking(
+                year, int(row[0]), 'frc{}'.format(row[1]), wins, losses, ties, qual_average, row[mp_index], dq, sort_orders))
 
         return rankings2

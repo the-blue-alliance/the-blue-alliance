@@ -1,3 +1,6 @@
+from helpers.rankings_helper import RankingsHelper
+
+
 class FMSAPIEventRankingsParser(object):
     def __init__(self, year):
         self.year = year
@@ -42,3 +45,26 @@ class FMSAPIEventRankingsParser(object):
                 team['matchesPlayed']])
 
         return rankings if len(rankings) > 1 else None
+
+
+class FMSAPIEventRankings2Parser(object):
+    def __init__(self, year):
+        self.year = year
+
+    def parse(self, response):
+        rankings = []
+        for team in response['Rankings']:
+            count = 1
+            order_name = 'sortOrder{}'.format(count)
+            sort_orders = []
+            while order_name in team:
+                sort_orders.append(team[order_name])
+                count += 1
+                order_name = 'sortOrder{}'.format(count)
+
+            rankings.append(RankingsHelper.build_ranking(
+                self.year, team['rank'], 'frc{}'.format(team['teamNumber']),
+                team['wins'], team['losses'], team['ties'],
+                team['qualAverage'], team['matchesPlayed'], team['dq'], sort_orders))
+
+        return rankings
