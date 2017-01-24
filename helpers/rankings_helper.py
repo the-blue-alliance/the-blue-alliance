@@ -47,13 +47,15 @@ class RankingsHelper(object):
             }
 
     @classmethod
-    def migrate_rankings(cls, event_key):
+    def convert_rankings(cls, event_details):
         """
         Converts event_details.rankings to event_details.rankings2
         """
-        event_details = EventDetails.get_by_id(event_key)
+        if not event_details.rankings:
+            return None
+
         year = event_details.year
-        if event_key == '2015mttd':  # 2015mttd played the 2014 game
+        if event_details.key.id() == '2015mttd':  # 2015mttd played the 2014 game
             year = 2014
 
         # Look up indexes

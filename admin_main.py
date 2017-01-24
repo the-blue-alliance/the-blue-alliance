@@ -17,7 +17,7 @@ from controllers.admin.admin_award_controller import AdminAwardDashboard, AdminA
 from controllers.admin.admin_match_controller import AdminVideosAdd, AdminMatchCleanup, AdminMatchDashboard, AdminMatchDelete, AdminMatchDetail, AdminMatchAdd, AdminMatchEdit
 from controllers.admin.admin_media_controller import AdminMediaDashboard, AdminMediaDeleteReference, AdminMediaMakePreferred, AdminMediaRemovePreferred, AdminMediaAdd
 from controllers.admin.admin_memcache_controller import AdminMemcacheMain
-from controllers.admin.admin_migration_controller import AdminMigration, AdminMigrationCreateEventDetails
+from controllers.admin.admin_migration_controller import AdminMigration, AdminMigrationCreateEventDetails, AdminMigrationRankings
 from controllers.admin.admin_mobile_controller import AdminMobile, AdminBroadcast, AdminMobileWebhooks
 from controllers.admin.admin_offseason_scraper_controller import AdminOffseasonScraperController
 from controllers.admin.admin_offseason_spreadsheet_controller import AdminOffseasonSpreadsheetController
@@ -72,6 +72,7 @@ app = webapp2.WSGIApplication([('/admin/', AdminMain),
                                ('/admin/memcache', AdminMemcacheMain),
                                ('/admin/migration', AdminMigration),
                                ('/admin/migration/create_event_details', AdminMigrationCreateEventDetails),
+                               ('/admin/migration/migrate_rankings/([0-9]*)', AdminMigrationRankings),
                                ('/admin/offseasons', AdminOffseasonScraperController),
                                ('/admin/offseasons/spreadsheet', AdminOffseasonSpreadsheetController),
                                ('/admin/sitevars', AdminSitevarList),
