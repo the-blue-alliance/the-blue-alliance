@@ -523,12 +523,11 @@ class DistrictRankingsCalcDo(webapp.RequestHandler):
             point_detail = {}
             point_detail["rank"] = current_rank
             point_detail["team_key"] = key
-            point_detail["event_points"] = {}
-            for event in points["event_points"]:
-                event_key = event[0].key_name
-                point_detail["event_points"][event_key] = event[1]
-                event_details = Event.get_by_id(event_key)
-                point_detail["event_points"][event[0].key_name]['district_cmp'] = True if event_details.event_type_enum == EventType.DISTRICT_CMP else False
+            point_detail["event_points"] = []
+            for event, event_points in points["event_points"]:
+                event_points['event_key'] = event.key.id()
+                event_points['district_cmp'] = True if event.event_type_enum == EventType.DISTRICT_CMP else False
+                point_detail["event_points"].append(event_points)
 
             point_detail["rookie_bonus"] = points.get("rookie_bonus", 0)
             point_detail["point_total"] = points["point_total"]
