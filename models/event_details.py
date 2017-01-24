@@ -12,6 +12,7 @@ class EventDetails(ndb.Model):
     matchstats = ndb.JsonProperty()  # for OPR, DPR, CCWM, etc.
     predictions = ndb.JsonProperty()
     rankings = ndb.JsonProperty()
+    rankings2 = ndb.JsonProperty()
 
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
@@ -26,3 +27,7 @@ class EventDetails(ndb.Model):
 
     def key_name(self):
         return self.key.id()
+
+    @property
+    def year(self):
+        return int(self.key.id()[:4])
