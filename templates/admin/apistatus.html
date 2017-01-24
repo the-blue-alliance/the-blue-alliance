@@ -1,13 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}APIv2 Status{% endblock %}
+{% block title %}API Status{% endblock %}
 
 {% block content %}
+
+<form method="post">
 
 <h1>APIv2 Status</h1>
 <p>Here you can edit the backed values that supply the Status API endpoint. This contains data about datafeeds that are down, as well as some configuration data for the mobile apps</p>
 
-<form method="post">
 <table class="table table-striped">
 <tr><td><p>Max Competition Season</p></td><td><input type="number" name="max_year" value="{{max_year}}" /></td></tr>
 <tr><td><p>Current Competition Season</p></td><td><input type="number" name="current_year" value="{{current_year}}" /></td></tr>
@@ -18,6 +19,11 @@
 <tr><td><p>iOS Min App Version Code</p></td><td><input type="number" name="ios_min_version" value="{{ios_min_version}}" /></td></tr>
 
 </table>
+
+<h1>Trusted API Status</h1>
+<p>Here you can enable and disable the Trusted API</p>
+<p>Currently, the Trusted API is <strong>{% if enable_trustedapi %}enabled{% else %}disabled{% endif %}</strong>.</p>
+<p>Enable the trusted API: <input type="checkbox" name="enable_trustedapi" {% if enable_trustedapi %}checked{% endif %} /></p>
 
 <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-thumbs-up"></span> Update</button>
 
