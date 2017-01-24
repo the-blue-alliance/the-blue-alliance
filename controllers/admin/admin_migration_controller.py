@@ -48,6 +48,7 @@ class AdminMigrationRankings(LoggedInHandler):
     updated = []
     for event_detail in event_details:
       if event_detail:
+        logging.info(event_detail.key.id())
         event_detail.rankings2 = RankingsHelper.convert_rankings(event_detail)
         updated.append(event_detail)
     EventDetailsManipulator.createOrUpdate(updated)
