@@ -60,6 +60,7 @@ class DistrictManipulator(ManipulatorBase):
         attrs = [
             "display_name",
             "elasticsearch_name",
+            "rankings"
         ]
 
         old_district._updated_attrs = []

@@ -11,8 +11,14 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
 from consts.district_type import DistrictType
+from consts.event_type import EventType
+
+from database.district_query import DistrictsInYearQuery
+from database.event_query import DistrictEventsQuery
+from database.team_query import DistrictTeamsQuery
 
 from helpers.district_helper import DistrictHelper
+from helpers.district_manipulator import DistrictManipulator
 from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
 from helpers.event_details_manipulator import EventDetailsManipulator
@@ -29,6 +35,7 @@ from helpers.insight_manipulator import InsightManipulator
 from helpers.team_manipulator import TeamManipulator
 from helpers.match_manipulator import MatchManipulator
 
+from models.district import District
 from models.event import Event
 from models.event_details import EventDetails
 from models.event_team import EventTeam
@@ -432,7 +439,7 @@ class TypeaheadCalcDo(webapp.RequestHandler):
 
 class DistrictPointsCalcEnqueue(webapp.RequestHandler):
     """
-    Enqueues calculation of district points for events within a district for a given year
+    Enqueues calculation of district points for all district events for a given year
     """
 
     def get(self, year):
@@ -470,7 +477,69 @@ class DistrictPointsCalcDo(webapp.RequestHandler):
         )
         EventDetailsManipulator.createOrUpdate(event_details)
 
-        self.response.out.write(event.district_points)
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            self.response.out.write(event.district_points)
+
+        # Enqueue task to update rankings
+        taskqueue.add(url='/tasks/math/do/district_rankings_calc/{}'.format(event.district_key.id()), method='GET')
+
+
+class DistrictRankingsCalcEnqueue(webapp.RequestHandler):
+    """
+    Enqueues calculation of rankings for all districts for a given year
+    """
+
+    def get(self, year):
+        districts = DistrictsInYearQuery(int(year)).fetch()
+        district_keys = [district.key.id() for district in districts]
+        for district_key in district_keys:
+            taskqueue.add(url='/tasks/math/do/district_rankings_calc/{}'.format(district_key), method='GET')
+
+        self.response.out.write("Enqueued for: {}".format(district_keys))
+
+
+class DistrictRankingsCalcDo(webapp.RequestHandler):
+    """
+    Calculates district rankings for a district year
+    """
+
+    def get(self, district_key):
+        district = District.get_by_id(district_key)
+        if not district:
+            self.response.out.write("District {} does not exist!".format(district_key))
+
+        events_future = DistrictEventsQuery(district_key).fetch_async()
+        teams_future = DistrictTeamsQuery(district_key).fetch_async()
+
+        events = events_future.get_result()
+        for event in events:
+            event.prep_details()
+        EventHelper.sort_events(events)
+        team_totals = DistrictHelper.calculate_rankings(events, teams_future, district.year)
+
+        rankings = []
+        current_rank = 1
+        for key, points in team_totals:
+            point_detail = {}
+            point_detail["rank"] = current_rank
+            point_detail["team_key"] = key
+            point_detail["event_points"] = []
+            for event, event_points in points["event_points"]:
+                event_points['event_key'] = event.key.id()
+                event_points['district_cmp'] = True if event.event_type_enum == EventType.DISTRICT_CMP else False
+                point_detail["event_points"].append(event_points)
+
+            point_detail["rookie_bonus"] = points.get("rookie_bonus", 0)
+            point_detail["point_total"] = points["point_total"]
+            rankings.append(point_detail)
+            current_rank += 1
+
+        if rankings:
+            district.rankings = rankings
+            DistrictManipulator.createOrUpdate(district)
+
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            self.response.out.write("Finished calculating rankings for: {}".format(district_key))
 
 
 class UpcomingNotificationDo(webapp.RequestHandler):
