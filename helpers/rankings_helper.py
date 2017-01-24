@@ -36,6 +36,13 @@ class RankingsHelper(object):
         else:
             qual_average = float(qual_average)
 
+        sort_orders_sanitized = []
+        for so in sort_orders:
+            try:
+                sort_orders_sanitized.append(float(so))
+            except:
+                sort_orders_sanitized.append(0.0)
+
         return {
                 'rank': int(rank),
                 'team_key': team_key,
@@ -43,7 +50,7 @@ class RankingsHelper(object):
                 'qual_average': qual_average,  # None if qual_average doesn't affect rank (all years except 2015)
                 'matches_played': int(matches_played),
                 'dq': int(dq),
-                'sort_orders': [float(so) for so in sort_orders],
+                'sort_orders': sort_orders_sanitized,
             }
 
     @classmethod
@@ -99,7 +106,7 @@ class RankingsHelper(object):
             else:
                 qual_average = None
 
-            sort_orders = [float(row[index]) for index in sort_order_indices]
+            sort_orders = [row[index] for index in sort_order_indices]
 
             rankings2.append(cls.build_ranking(
                 year, int(row[0]), 'frc{}'.format(row[1]), wins, losses, ties, qual_average, row[mp_index], dq, sort_orders))
