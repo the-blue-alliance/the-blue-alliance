@@ -51,7 +51,6 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEquals(event.country, "USA")
             self.assertEquals(event.year, 2015)
             self.assertEquals(event.event_type_enum, EventType.REGIONAL)
-            self.assertEquals(event.event_district_enum, DistrictType.NO_DISTRICT)
             self.assertEquals(event.district_key, None)
 
     def test_parse_district_event(self):
@@ -73,7 +72,6 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEquals(event.country, "USA")
             self.assertEquals(event.year, 2015)
             self.assertEquals(event.event_type_enum, EventType.DISTRICT)
-            self.assertEquals(event.event_district_enum, DistrictType.NEW_ENGLAND)
             self.assertEquals(event.district_key, district.key)
 
             self.assertEquals(district.key_name, "2015ne")
@@ -98,7 +96,6 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEquals(event.country, "USA")
             self.assertEquals(event.year, 2015)
             self.assertEquals(event.event_type_enum, EventType.DISTRICT_CMP)
-            self.assertEquals(event.event_district_enum, DistrictType.NEW_ENGLAND)
             self.assertEquals(event.district_key, districts[0].key)
 
     def test_parse_cmp_subdivision(self):
@@ -119,5 +116,4 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEquals(event.country, "USA")
             self.assertEquals(event.year, 2015)
             self.assertEquals(event.event_type_enum, EventType.CMP_DIVISION)
-            self.assertEquals(event.event_district_enum, DistrictType.NO_DISTRICT)
             self.assertEquals(event.district_key, None)

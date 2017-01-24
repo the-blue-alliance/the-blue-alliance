@@ -213,7 +213,7 @@ class EventHelper(object):
         See https://github.com/the-blue-alliance/the-blue-alliance-android/blob/master/android/src/test/java/com/thebluealliance/androidclient/test/helpers/EventHelperTest.java
         """
         # 2015+ districts
-        re_string = '(?:[A-Z]+ District -(.+)'
+        re_string = '(?:[A-Z]+ District -(.+))'
         match = re.match(re_string, name_str)
         if match:
             partial = match.group(1).strip()

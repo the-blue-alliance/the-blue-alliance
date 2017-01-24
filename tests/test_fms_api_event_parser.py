@@ -24,13 +24,12 @@ class TestFMSAPIEventParser(unittest2.TestCase):
         self.testbed.init_memcache_stub()
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
-
         self.event = Event(
             id="2015waamv",
             end_date=datetime.datetime(2015, 4, 2, 0, 0),
             event_short="waamv",
             event_type_enum=EventType.REGIONAL,
-            event_district_enum=DistrictType.NO_DISTRICT,
+            district_key=None,
             first_eid="13467",
             name="PNW District - Auburn Mountainview Event",
             start_date=datetime.datetime(2015, 3, 31, 0, 0),
