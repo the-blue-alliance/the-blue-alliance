@@ -45,7 +45,7 @@ class EventHelper(object):
                     team_points[alliance['picks'][2]] = n * multiplier
         except Exception, e:
             # Log only if this matters
-            if event.event_district_enum != DistrictType.NO_DISTRICT:
+            if event.district_key is not None:
                 logging.error("Alliance points calc for {} errored!".format(event.key.id()))
                 logging.exception(e)
 
@@ -213,7 +213,7 @@ class EventHelper(object):
         See https://github.com/the-blue-alliance/the-blue-alliance-android/blob/master/android/src/test/java/com/thebluealliance/androidclient/test/helpers/EventHelperTest.java
         """
         # 2015+ districts
-        re_string = '(?:' + '|'.join(DistrictType.abbrevs.keys()).upper() + ') District -(.+)'
+        re_string = '(?:[A-Z]+ District -(.+)'
         match = re.match(re_string, name_str)
         if match:
             partial = match.group(1).strip()
