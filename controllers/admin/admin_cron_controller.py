@@ -172,19 +172,19 @@ class AdminCreateDistrictTeamsDo(LoggedInHandler):
         year = int(year)
         team_districts = defaultdict(list)
         logging.info("Fetching events in {}".format(year))
-        year_events = Event.query(year == Event.year, Event.event_district_enum != DistrictType.NO_DISTRICT, Event.event_district_enum != None).fetch()
+        year_events = Event.query(year == Event.year, Event.district_key == None, Event.event_district_enum != None).fetch()
         for event in year_events:
             logging.info("Fetching EventTeams for {}".format(event.key_name))
             event_teams = EventTeam.query(EventTeam.event == event.key).fetch()
             for event_team in event_teams:
-                team_districts[event_team.team.id()].append(event.event_district_enum)
+                team_districts[event_team.team.id()].append(event.district_key.id())
 
         new_district_teams = []
         for team_key, districts in team_districts.iteritems():
-            most_frequent_district = max(set(districts), key=districts.count)
-            logging.info("Assuming team {} belongs to {}".format(team_key, DistrictType.type_names[most_frequent_district]))
-            dt_key = DistrictTeam.renderKeyName(year, most_frequent_district, team_key)
-            new_district_teams.append(DistrictTeam(id=dt_key, year=year, team=ndb.Key(Team, team_key), district=most_frequent_district))
+            most_frequent_district_key = max(set(districts), key=districts.count)
+            logging.info("Assuming team {} belongs to {}".format(team_key, most_frequent_district_key))
+            dt_key = DistrictTeam.renderKeyName(year, most_frequent_district_key[4:], team_key)
+            new_district_teams.append(DistrictTeam(id=dt_key, year=year, team=ndb.Key(Team, team_key), district_key=ndb.Key(District, most_frequent_district_key)))
 
         logging.info("Finishing updating old district teams from event teams")
         DistrictTeamManipulator.createOrUpdate(new_district_teams)
