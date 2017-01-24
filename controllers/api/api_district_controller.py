@@ -7,6 +7,7 @@ from consts.event_type import EventType
 
 from datetime import datetime
 
+from database.district_query import DistrictsInYearQuery
 from database.event_query import DistrictEventsQuery
 from google.appengine.ext import ndb
 
@@ -25,7 +26,6 @@ class ApiDistrictControllerBase(ApiBaseController):
 
     def _set_district(self, district):
         self.district_abbrev = district
-        self.district = DistrictType.abbrevs[self.district_abbrev]
 
     @property
     def _validators(self):
@@ -55,16 +55,13 @@ class ApiDistrictListController(ApiDistrictControllerBase):
         self._track_call_defer('district/list', year)
 
     def _render(self, year=None):
-        all_cmp_event_keys = Event.query(Event.year == int(self.year), Event.event_type_enum == EventType.DISTRICT_CMP).fetch(None, keys_only=True)
-        events = ndb.get_multi(all_cmp_event_keys)
-        district_keys = [DistrictType.type_abbrevs[event.event_district_enum] for event in events]
+        all_districts = DistrictsInYearQuery(self.year).fetch()
         districts = list()
-        for key in district_keys:
-            if key in DistrictType.abbrevs:
-                dictionary = dict()
-                dictionary["key"] = key
-                dictionary["name"] = DistrictType.type_names[DistrictType.abbrevs[key]]
-                districts.append(dictionary)
+        for district in all_districts:
+            dictionary = dict()
+            dictionary["key"] = district.abbreviation
+            dictionary["name"] = district.display_name
+            districts.append(dictionary)
 
         return json.dumps(districts, ensure_ascii=True)
 
