@@ -30,11 +30,12 @@ class TeamManipulator(ManipulatorBase):
         To run after models have been updated
         """
         for (team, updated_attrs) in zip(teams, updated_attr_list):
-            try:
-                LocationHelper.update_team_location(team)
-            except Exception, e:
-                logging.error("update_team_location for {} errored!".format(team.key.id()))
-                logging.exception(e)
+            # Disabled due to unreliability. 2017-01-24 -fangeugene
+            # try:
+            #     LocationHelper.update_team_location(team)
+            # except Exception, e:
+            #     logging.error("update_team_location for {} errored!".format(team.key.id()))
+            #     logging.exception(e)
 
             try:
                 SearchHelper.update_team_location_index(team)
