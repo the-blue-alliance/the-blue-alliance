@@ -8,6 +8,7 @@ from controllers.base_controller import LoggedInHandler
 from models.event import Event
 from models.event_details import EventDetails
 from helpers.event_details_manipulator import EventDetailsManipulator
+from helpers.match_helper import MatchHelper
 from helpers.rankings_helper import RankingsHelper
 
 
@@ -52,5 +53,16 @@ class AdminMigrationRankings(LoggedInHandler):
         event_detail.rankings2 = RankingsHelper.convert_rankings(event_detail)
         updated.append(event_detail)
     EventDetailsManipulator.createOrUpdate(updated)
+
+    self.response.out.write("DONE")
+
+
+class AdminMigrationAddSurrogates(LoggedInHandler):
+  def get(self, year):
+    self._require_admin()
+
+    events = Event.query(Event.year==int(year)).fetch()
+    for event in events:
+      deferred.defer(MatchHelper.add_surrogates, event, _queue="admin")
 
     self.response.out.write("DONE")
