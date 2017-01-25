@@ -141,6 +141,7 @@ class EventDetail(CacheableHandler):
             self.abort(404)
 
         event.prepAwardsMatchesTeams()
+        event.prep_details()
         medias_future = media_query.EventTeamsPreferredMediasQuery(event_key).fetch_async()
 
         awards = AwardHelper.organizeAwards(event.awards)
@@ -164,7 +165,7 @@ class EventDetail(CacheableHandler):
             middle_value += 1
         teams_a, teams_b = team_and_medias[:middle_value], team_and_medias[middle_value:]
 
-        oprs = [i for i in event.matchstats['oprs'].items()] if (event.matchstats is not None and 'oprs' in event.matchstats) else []
+        oprs = [i for i in event.details.matchstats['oprs'].items()] if (event.details.matchstats is not None and 'oprs' in event.details.matchstats) else []
         oprs = sorted(oprs, key=lambda t: t[1], reverse=True)  # sort by OPR
         oprs = oprs[:15]  # get the top 15 OPRs
 
@@ -175,10 +176,10 @@ class EventDetail(CacheableHandler):
             matches_recent = None
             matches_upcoming = None
 
-        bracket_table = MatchHelper.generateBracket(matches, event.alliance_selections)
+        bracket_table = MatchHelper.generateBracket(matches, event.details.alliance_selections)
         is_2015_playoff = EventHelper.is_2015_playoff(event_key)
         if is_2015_playoff:
-            playoff_advancement = MatchHelper.generatePlayoffAdvancement2015(matches, event.alliance_selections)
+            playoff_advancement = MatchHelper.generatePlayoffAdvancement2015(matches, event.details.alliance_selections)
             for comp_level in ['qf', 'sf']:
                 if comp_level in bracket_table:
                     del bracket_table[comp_level]
@@ -187,31 +188,12 @@ class EventDetail(CacheableHandler):
 
         district_points_sorted = None
         if event.district_points:
-            district_points_sorted = sorted(event.district_points['points'].items(), key=lambda (team, points): -points['total'])
+            district_points_sorted = sorted(event.details.district_points['points'].items(), key=lambda (team, points): -points['total'])
 
         event_insights = EventInsightsHelper.calculate_event_insights(cleaned_matches, event.year)
         event_insights_template = None
         if event_insights:
             event_insights_template = 'event_partials/event_insights_{}.html'.format(event.year)
-
-        # rankings processing for ranking score per match
-        full_rankings = event.rankings
-        rankings_enhanced = event.rankings_enhanced
-        if rankings_enhanced is not None:
-            rp_index = RankingIndexes.CUMULATIVE_RANKING_SCORE[event.year]
-            matches_index = RankingIndexes.MATCHES_PLAYED[event.year]
-            ranking_criterion_name = full_rankings[0][rp_index]
-            full_rankings[0].append(ranking_criterion_name + "/Match*")
-
-            for row in full_rankings[1:]:
-                team = row[1]
-                if rankings_enhanced["ranking_score_per_match"] is not None:
-                    rp_per_match = rankings_enhanced['ranking_score_per_match'][team]
-                    row.append(rp_per_match)
-                if rankings_enhanced["match_offset"] is not None:
-                    match_offset = rankings_enhanced["match_offset"][team]
-                    if match_offset != 0:
-                        row[matches_index] = "{} ({})".format(row[matches_index], match_offset)
 
         self.template_values.update({
             "event": event,

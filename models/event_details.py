@@ -39,3 +39,36 @@ class EventDetails(ndb.Model):
             'rankings': self.rankings2,
             'sort_order_info': RankingsHelper.get_sort_order_info(self),
         }
+
+    @property
+    def rankings_table(self):
+        from helpers.rankings_helper import RankingsHelper
+
+        precisions = []
+        for item in RankingsHelper.get_sort_order_info(self):
+            precisions.append(item['precision'])
+
+        rankings_table = []
+        has_record = False
+        for rank in self.rankings2:
+            row = [rank['rank'], rank['team_key'][3:]]
+            for i, item in enumerate(rank['sort_orders']):
+                row.append('%.*f' % (precisions[i], round(item, precisions[i])))
+            if rank['record']:
+                row.append('{}-{}-{}'.format(rank['record']['wins'], rank['record']['losses'], rank['record']['ties']))
+                has_record = True
+            row.append(rank['dq'])
+            row.append(rank['matches_played'])
+            row.append('%.*f' % (2, round(rank['sort_orders'][0] / rank['matches_played'], 2)))
+            rankings_table.append(row)
+
+        title_row = ['Rank', 'Team']
+        sort_order_info = RankingsHelper.get_sort_order_info(self)
+        for item in sort_order_info:
+            title_row.append(item['name'])
+        if has_record:
+            title_row += ['Record (W-L-T)']
+        title_row += ['DQ', 'Played', '{}/Match*'.format(sort_order_info[0]['name'])]
+
+        rankings_table = [title_row] + rankings_table
+        return rankings_table
