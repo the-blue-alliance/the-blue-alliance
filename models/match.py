@@ -38,14 +38,16 @@ class Match(ndb.Model):
     alliances_json = ndb.StringProperty(required=True, indexed=False)  # JSON dictionary with alliances and scores.
 
     # {
-    # "red": {
-    # "teams": ["frc177", "frc195", "frc125"], # These are Team keys
-    #    "score": 25
-    # },
-    # "blue": {
-    #    "teams": ["frc433", "frc254", "frc222"],
-    #    "score": 12
-    # }
+    #   "red": {
+    #     "teams": ["frc177", "frc195", "frc125"], # These are Team keys
+    #     "surrogates": ["frc177", "frc195"],
+    #     "score": 25
+    #   },
+    #   "blue": {
+    #     "teams": ["frc433", "frc254", "frc222"],
+    #     "surrogates": ["frc433"],
+    #     "score": 12
+    #   }
     # }
 
     score_breakdown_json = ndb.StringProperty(indexed=False)  # JSON dictionary with score breakdowns. Fields are those used for seeding. Varies by year.
