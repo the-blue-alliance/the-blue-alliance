@@ -69,7 +69,6 @@ class Event(ndb.Model):
         self._venue_address_safe = None
         self._webcast = None
         self._updated_attrs = []  # Used in EventManipulator to track what changed
-        self._rankings_enhanced = None
         self._week = None
         super(Event, self).__init__(*args, **kw)
 
@@ -261,37 +260,6 @@ class Event(ndb.Model):
             return None
         else:
             return self.details.rankings
-
-    @property
-    def rankings_enhanced(self):
-        valid_years = RankingIndexes.CUMULATIVE_RANKING_YEARS
-        rankings = self.rankings
-        if rankings is not None and self.year in valid_years and self.official:
-            self._rankings_enhanced = { "ranking_score_per_match": {},
-                                        "match_offset": None, }
-            team_index = RankingIndexes.TEAM_NUMBER
-            rp_index = RankingIndexes.CUMULATIVE_RANKING_SCORE[self.year]
-            matches_played_index = RankingIndexes.MATCHES_PLAYED[self.year]
-
-            max_matches = 0
-            if self.within_a_day:
-                max_matches = max([int(el[matches_played_index]) for el in rankings[1:]])
-                self._rankings_enhanced["match_offset"] = {}
-
-            for ranking in rankings[1:]:
-                team_number = ranking[team_index]
-                ranking_score = float(ranking[rp_index])
-                matches_played = int(ranking[matches_played_index])
-                if matches_played == 0:
-                    ranking_score_per_match = 0
-                else:
-                    ranking_score_per_match = round(ranking_score / matches_played, 2)
-                self._rankings_enhanced["ranking_score_per_match"][team_number] = ranking_score_per_match
-                if self.within_a_day:
-                    self._rankings_enhanced["match_offset"][team_number] = matches_played - max_matches
-        else:
-            self._rankings_enhanced = None
-        return self._rankings_enhanced
 
     @property
     def location(self):

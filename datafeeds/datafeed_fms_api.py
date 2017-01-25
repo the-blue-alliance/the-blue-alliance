@@ -15,7 +15,7 @@ from models.sitevar import Sitevar
 from parsers.fms_api.fms_api_awards_parser import FMSAPIAwardsParser
 from parsers.fms_api.fms_api_event_alliances_parser import FMSAPIEventAlliancesParser
 from parsers.fms_api.fms_api_event_list_parser import FMSAPIEventListParser
-from parsers.fms_api.fms_api_event_rankings_parser import FMSAPIEventRankingsParser
+from parsers.fms_api.fms_api_event_rankings_parser import FMSAPIEventRankingsParser, FMSAPIEventRankings2Parser
 from parsers.fms_api.fms_api_match_parser import FMSAPIHybridScheduleParser, FMSAPIMatchDetailsParser
 from parsers.fms_api.fms_api_team_details_parser import FMSAPITeamDetailsParser
 
@@ -198,7 +198,8 @@ class DatafeedFMSAPI(object):
         event_short = event_key[4:]
 
         rankings = self._parse(self.FMS_API_EVENT_RANKINGS_URL_PATTERN % (year, self._get_event_short(event_short)), FMSAPIEventRankingsParser(year))
-        return rankings
+        rankings2 = self._parse(self.FMS_API_EVENT_RANKINGS_URL_PATTERN % (year, self._get_event_short(event_short)), FMSAPIEventRankings2Parser(year))
+        return rankings, rankings2
 
     def getTeamDetails(self, year, team_key):
         team_number = team_key[3:]  # everything after 'frc'

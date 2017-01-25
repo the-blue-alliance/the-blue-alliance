@@ -138,6 +138,7 @@ class EventDetail(CacheableHandler):
             self.abort(404)
 
         event.prepAwardsMatchesTeams()
+        event.prep_details()
         medias_future = media_query.EventTeamsPreferredMediasQuery(event_key).fetch_async()
         district_future = DistrictQuery(event.district_key.id()).fetch_async() if event.district_key else None
 
@@ -191,25 +192,6 @@ class EventDetail(CacheableHandler):
         event_insights_template = None
         if event_insights:
             event_insights_template = 'event_partials/event_insights_{}.html'.format(event.year)
-
-        # rankings processing for ranking score per match
-        full_rankings = event.rankings
-        rankings_enhanced = event.rankings_enhanced
-        if rankings_enhanced is not None:
-            rp_index = RankingIndexes.CUMULATIVE_RANKING_SCORE[event.year]
-            matches_index = RankingIndexes.MATCHES_PLAYED[event.year]
-            ranking_criterion_name = full_rankings[0][rp_index]
-            full_rankings[0].append(ranking_criterion_name + "/Match*")
-
-            for row in full_rankings[1:]:
-                team = row[1]
-                if rankings_enhanced["ranking_score_per_match"] is not None:
-                    rp_per_match = rankings_enhanced['ranking_score_per_match'][team]
-                    row.append(rp_per_match)
-                if rankings_enhanced["match_offset"] is not None:
-                    match_offset = rankings_enhanced["match_offset"][team]
-                    if match_offset != 0:
-                        row[matches_index] = "{} ({})".format(row[matches_index], match_offset)
 
         district = district_future.get_result() if district_future else None
 

@@ -106,7 +106,7 @@
     <div class="col-sm-12">
       <ul class="nav nav-tabs">
         {% if matches.num > 0 %}<li class="active"><a href="#results" data-toggle="tab">Results</a></li>{% endif %}
-        {% if event.rankings %}<li><a href="#rankings" data-toggle="tab">Rankings</a></li>{% endif %}
+        {% if event.details and event.details.rankings_table %}<li><a href="#rankings" data-toggle="tab">Rankings</a></li>{% endif %}
         {% if awards %}<li><a href="#awards" data-toggle="tab">Awards</a></li>{% endif %}
         {% if district_points_sorted %}<li><a href="#district-points" data-toggle="tab">District Points</a></li>{% endif %}
         <li class="{% if matches.num == 0 %}active{% endif %}"><a href="#teams" data-toggle="tab">Teams <span class="badge">{{num_teams}}</span></a></li>
@@ -181,27 +181,20 @@
     </div>
     {% endif %}
 
-    {% if event.rankings %}
+    {% if event.details and event.details.rankings_table %}
     <div class="tab-pane" id="rankings">
       <div class="row">
         <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
-          {% if event.official %}
-            {% if event.year > 2014 %}
-              <p>Data from <a href="http://frc-events.firstinspires.org/{{event.year}}/{{event.event_short}}/rankings" target="_blank"> <em>FIRST</em>'s event page</a>.</p>
-            {% else %}
-              <p>Data from <a href="http://www2.usfirst.org/{{event.year}}comp/events/{{event.event_short}}/rankings.html" target="_blank"> <em>FIRST</em>'s event page</a>.</p>
-            {% endif %}
-          {% endif %}
           <table class="table table-striped table-condensed table-center tablesorter" id="rankingsTable">
             <thead>
               <tr>
-              {% for element in event.rankings.0 %}
+              {% for element in event.details.rankings_table.0 %}
                 <th>{{ element }}</th>
               {% endfor %}
               </tr>
             </thead>
             <tbody>
-              {% for row in event.rankings %}
+              {% for row in event.details.rankings_table %}
               {% if not loop.first %}
               <tr>
                 {% for element in row %}

@@ -12,6 +12,7 @@ class EventDetails(ndb.Model):
     matchstats = ndb.JsonProperty()  # for OPR, DPR, CCWM, etc.
     predictions = ndb.JsonProperty()
     rankings = ndb.JsonProperty()
+    rankings2 = ndb.JsonProperty()
 
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
@@ -26,3 +27,58 @@ class EventDetails(ndb.Model):
 
     def key_name(self):
         return self.key.id()
+
+    @property
+    def year(self):
+        return int(self.key.id()[:4])
+
+    @property
+    def renderable_rankings(self):
+        from helpers.rankings_helper import RankingsHelper
+        return {
+            'rankings': self.rankings2,
+            'sort_order_info': RankingsHelper.get_sort_order_info(self),
+        }
+
+    @property
+    def rankings_table(self):
+        if not self.rankings2:
+            return None
+
+        from helpers.rankings_helper import RankingsHelper
+
+        precisions = []
+        for item in RankingsHelper.get_sort_order_info(self):
+            precisions.append(item['precision'])
+
+        rankings_table = []
+        has_record = False
+        has_qual_avg = False
+        for rank in self.rankings2:
+            row = [rank['rank'], rank['team_key'][3:]]
+            for i, item in enumerate(rank['sort_orders']):
+                row.append('%.*f' % (precisions[i], round(item, precisions[i])))
+            if rank['record']:
+                row.append('{}-{}-{}'.format(rank['record']['wins'], rank['record']['losses'], rank['record']['ties']))
+                has_record = True
+            row.append(rank['dq'])
+            row.append(rank['matches_played'])
+            if rank['qual_average'] is None:
+                row.append('%.*f' % (2, round(
+                    rank['sort_orders'][0] / rank['matches_played'] if rank['matches_played'] > 0 else 0, 2)))
+            else:
+                has_qual_avg = True
+            rankings_table.append(row)
+
+        title_row = ['Rank', 'Team']
+        sort_order_info = RankingsHelper.get_sort_order_info(self)
+        for item in sort_order_info:
+            title_row.append(item['name'])
+        if has_record:
+            title_row += ['Record (W-L-T)']
+        title_row += ['DQ', 'Played']
+        if not has_qual_avg:
+            title_row.append('{}/Match*'.format(sort_order_info[0]['name']))
+
+        rankings_table = [title_row] + rankings_table
+        return rankings_table
