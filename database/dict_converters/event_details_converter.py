@@ -18,7 +18,7 @@ class EventDetailsConverter(ConverterBase):
         event_details_dict = {
             'alliances': event_details.alliance_selections,
             'district_points': event_details.district_points,
-            'rankings': event_details.rankings,  # TODO: New format
+            'rankings': event_details.renderable_rankings,
             'stats': event_details.matchstats,
         }
 

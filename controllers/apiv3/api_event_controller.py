@@ -47,7 +47,7 @@ class ApiEventController(ApiBaseController):
 
 
 class ApiEventDetailsController(ApiBaseController):
-    CACHE_VERSION = 0
+    CACHE_VERSION = 1
     CACHE_HEADER_LENGTH = 61
 
     def _track_call(self, event_key, detail_type):

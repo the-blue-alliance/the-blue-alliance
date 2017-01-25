@@ -31,3 +31,11 @@ class EventDetails(ndb.Model):
     @property
     def year(self):
         return int(self.key.id()[:4])
+
+    @property
+    def renderable_rankings(self):
+        from helpers.rankings_helper import RankingsHelper
+        return {
+            'rankings': self.rankings2,
+            'sort_order_info': RankingsHelper.get_sort_order_info(self),
+        }

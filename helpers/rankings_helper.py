@@ -16,6 +16,95 @@ class RankingsHelper(object):
         2007: [6, 7, 8],
     }
 
+    SORT_ORDER_INFO = {
+        2016: [
+            {'name': 'Ranking Score',
+             'precision': 0},
+            {'name': 'Auto',
+             'precision': 0},
+            {'name': 'Scale/Challenge',
+             'precision': 0},
+            {'name': 'Goals',
+             'precision': 0},
+            {'name': 'Defense',
+             'precision': 0}],
+        2015: [
+            {'name': 'Qual Avg.',
+             'precision': 1},
+            {'name': 'Coopertition',
+             'precision': 0},
+            {'name': 'Auto',
+             'precision': 0},
+            {'name': 'Container',
+             'precision': 0},
+            {'name': 'Tote',
+             'precision': 0},
+            {'name': 'Litter',
+             'precision': 0}],
+        2014: [
+            {'name': 'Qual Score',
+             'precision': 0},
+            {'name': 'Assist',
+             'precision': 0},
+            {'name': 'Auto',
+             'precision': 0},
+            {'name': 'Truss & Catch',
+             'precision': 0},
+            {'name': 'Teleop',
+             'precision': 0}],
+        2013: [
+            {'name': 'Qual Score',
+             'precision': 0},
+            {'name': 'Auto',
+             'precision': 0},
+            {'name': 'Climb',
+             'precision': 0},
+            {'name': 'Teleop',
+             'precision': 0}],
+        2012: [
+            {'name': 'Qual Score',
+             'precision': 0},
+            {'name': 'Hybrid',
+             'precision': 0},
+            {'name': 'Bridge',
+             'precision': 0},
+            {'name': 'Teleop',
+             'precision': 0}],
+        2011: [
+            {'name': 'Qual Score',
+             'precision': 0},
+            {'name': 'Ranking Score',
+             'precision': 2}],
+        2010: [
+            {'name': 'Seeding Score',
+             'precision': 0},
+            {'name': 'Coopertition Bonus',
+             'precision': 0},
+            {'name': 'Hanging Points',
+             'precision': 0}],
+        2009: [
+            {'name': 'Qual Score',
+             'precision': 0},
+            {'name': 'Seeding Score',
+             'precision': 2},
+            {'name': 'Match Points',
+             'precision': 0}],
+        2008: [
+            {'name': 'Qual Score',
+             'precision': 0},
+            {'name': 'Seeding Score',
+             'precision': 2},
+            {'name': 'Match Points',
+             'precision': 0}],
+        2007: [
+            {'name': 'Qual Score',
+             'precision': 0},
+            {'name': 'Seeding Score',
+             'precision': 2},
+            {'name': 'Match Points',
+             'precision': 0}],
+    }
+
     NO_RECORD_YEARS = {2010, 2015}
 
     QUAL_AVERAGE_YEARS = {2015}
@@ -52,6 +141,10 @@ class RankingsHelper(object):
                 'dq': int(dq),
                 'sort_orders': sort_orders_sanitized,
             }
+
+    @classmethod
+    def get_sort_order_info(cls, event_details):
+        return cls.SORT_ORDER_INFO[event_details.year]
 
     @classmethod
     def convert_rankings(cls, event_details):
