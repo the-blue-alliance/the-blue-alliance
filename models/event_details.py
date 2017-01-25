@@ -64,7 +64,8 @@ class EventDetails(ndb.Model):
             row.append(rank['dq'])
             row.append(rank['matches_played'])
             if rank['qual_average'] is None:
-                row.append('%.*f' % (2, round(rank['sort_orders'][0] / rank['matches_played'], 2)))
+                row.append('%.*f' % (2, round(
+                    rank['sort_orders'][0] / rank['matches_played'] if rank['matches_played'] > 0 else 0, 2)))
             else:
                 has_qual_avg = True
             rankings_table.append(row)
