@@ -53,6 +53,7 @@ class EventDetails(ndb.Model):
 
         rankings_table = []
         has_record = False
+        has_qual_avg = False
         for rank in self.rankings2:
             row = [rank['rank'], rank['team_key'][3:]]
             for i, item in enumerate(rank['sort_orders']):
@@ -62,7 +63,10 @@ class EventDetails(ndb.Model):
                 has_record = True
             row.append(rank['dq'])
             row.append(rank['matches_played'])
-            row.append('%.*f' % (2, round(rank['sort_orders'][0] / rank['matches_played'], 2)))
+            if rank['qual_average'] is None:
+                row.append('%.*f' % (2, round(rank['sort_orders'][0] / rank['matches_played'], 2)))
+            else:
+                has_qual_avg = True
             rankings_table.append(row)
 
         title_row = ['Rank', 'Team']
@@ -71,7 +75,9 @@ class EventDetails(ndb.Model):
             title_row.append(item['name'])
         if has_record:
             title_row += ['Record (W-L-T)']
-        title_row += ['DQ', 'Played', '{}/Match*'.format(sort_order_info[0]['name'])]
+        title_row += ['DQ', 'Played']
+        if not has_qual_avg:
+            title_row.append('{}/Match*'.format(sort_order_info[0]['name']))
 
         rankings_table = [title_row] + rankings_table
         return rankings_table
