@@ -17,6 +17,19 @@ class RankingsHelper(object):
     }
 
     SORT_ORDER_INFO = {
+        2017: [
+            {'name': 'Ranking Score',
+             'precision': 0},
+            {'name': 'Match Points',
+             'precision': 0},
+            {'name': 'Auto',
+             'precision': 0},
+            {'name': 'Rotor',
+             'precision': 0},
+            {'name': 'Touchpad',
+             'precision': 0},
+            {'name': 'Pressure',
+             'precision': 0}],
         2016: [
             {'name': 'Ranking Score',
              'precision': 0},
