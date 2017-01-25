@@ -22,8 +22,6 @@ from models.event import Event
 from models.match import Match
 from template_engine import jinja2_engine
 
-from consts.ranking_indexes import RankingIndexes
-
 
 class EventList(CacheableHandler):
     """
