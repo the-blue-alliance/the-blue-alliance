@@ -1,8 +1,8 @@
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb.tasklets import Future
 
-from consts.ranking_indexes import RankingIndexes
 from helpers.match_helper import MatchHelper
+from helpers.rankings_helper import RankingsHelper
 from helpers.team_helper import TeamHelper
 from models.event_details import EventDetails
 from models.match import Match
@@ -24,47 +24,37 @@ class EventTeamStatusHelper(object):
             matches = [match for match in matches if match.comp_level in Match.ELIM_LEVELS]
             matches = MatchHelper.organizeMatches(matches)
         return {
-            'rank': cls._build_ranking_info(team_key, event_details),
+            'qual': cls._build_qual_info(team_key, event_details),
             'alliance': cls._build_alliance_info(team_key, event_details),
-            'playoff': cls._build_playoff_status(team_key, event_details, matches)
+            'playoff': cls._build_playoff_info(team_key, event_details, matches)
         }
 
     @classmethod
-    def _build_ranking_info(cls, team_key, event_details):
+    def _build_qual_info(cls, team_key, event_details):
         if not event_details:
             return None
-        rankings = event_details.rankings
+        rankings = event_details.rankings2
         if not rankings:
             return None
-        team_index = next((int(row[0]) for row in rankings if str(row[1]) == team_key[3:]), None)
-        if not team_index:
-            return None
-        team_line = rankings[team_index]
-        total_teams = len(rankings) - 1  # First row is headers, that doesn't count
-        rank_headers = rankings[0]
-        year = int(event_details.key.id()[:4])
-        first_sort = team_line[RankingIndexes.CUMULATIVE_RANKING_SCORE[year]]
 
-        # Search for 'Played' and fall back to RankingIndexes if not found
-        for i, name in enumerate(rankings[0]):
-            if name.lower() == 'played':
-                matches_played_index = i
+        qual_info = None
+        for ranking in rankings:
+            if ranking['team_key'] == team_key:
+                qual_info = {
+                    'rank': ranking['rank'],
+                    'matches_played': ranking['matches_played'],
+                    'dq': ranking['dq'],
+                    'record': ranking['record'],
+                    'qual_average': ranking['qual_average'],
+                    'sort_orders': ranking['sort_orders'],
+                }
                 break
-        else:
-            matches_played_index = RankingIndexes.MATCHES_PLAYED[year]
-        matches_played = int(team_line[matches_played_index])
 
-        record = cls._build_record_string(team_line, year)
-        breakdown = ", ".join("%s: %s" % tup for tup in zip(rank_headers[2:], team_line[2:]))
-        # ^ a little python magic to automagically build comma-separated key/value pairs for breakdowns, but w/o team #
-        return {
-            'rank': team_index,
-            'total': total_teams,
-            'played': matches_played,
-            'first_sort': first_sort,
-            'record': record,
-            'breakdown': breakdown
-        }
+        if qual_info:
+            qual_info['total'] = len(rankings)
+            qual_info['sort_order_info'] = RankingsHelper.get_sort_order_info(event_details)
+
+        return qual_info
 
     @classmethod
     def _build_alliance_info(cls, team_key, event_details):
@@ -89,7 +79,7 @@ class EventTeamStatusHelper(object):
         }
 
     @classmethod
-    def _build_playoff_status(cls, team_key, event_details, matches):
+    def _build_playoff_info(cls, team_key, event_details, matches):
         # Matches needs to be all playoff matches at the event, to properly account for backups
         alliance, alliance_number = cls._get_alliance(team_key, event_details)
         complete_alliance = set(alliance['picks']) if alliance else set()
@@ -122,42 +112,38 @@ class EventTeamStatusHelper(object):
                                 else:
                                     level_losses += 1
                                     all_losses += 1
-                if status:
+                if not status:
                     # Only set this for the first comp level that gets this far,
                     # But run through the rest to calculate the full record
-                    continue
-                if level_wins == 2:
-                    status = {
-                        'status': 'won',
-                        'level': comp_level,
+                    if level_wins == 2:
+                        status = {
+                            'status': 'won',
+                            'level': comp_level,
+                        }
+                    elif level_losses == 2:
+                        status ={
+                            'status': 'eliminated',
+                            'level': comp_level
+                        }
+                    elif level_matches > 0:
+                        status = {
+                            'status': 'playing',
+                            'level': comp_level,
+                        }
+                    status['current_level_record'] = {
+                        'wins': level_wins,
+                        'losses': level_losses,
+                        'ties': level_ties
                     }
-                elif level_losses == 2:
-                    status ={
-                        'status': 'eliminated',
-                        'level': comp_level
-                    }
-                elif level_matches > 0:
-                    status = {
-                        'status': 'playing',
-                        'level': comp_level,
-                        'current_level_record': "{}-{}-{}".format(level_wins, level_losses, level_ties)
-                    }
-        if status:
-            status['record'] = "{}-{}-{}".format(all_wins, all_losses, all_ties)
-        return status
 
-    @classmethod
-    def _build_record_string(cls, ranking_row, year):
-        indexes = RankingIndexes.RECORD_INDEXES[year]
-        if not indexes:
-            return None
-        if isinstance(indexes, tuple):
-            # The item is the indexes of (wins, losses, ties)
-            return "{}-{}-{}".format(ranking_row[indexes[0]], ranking_row[indexes[1]], ranking_row[indexes[2]])
-        elif isinstance(indexes, int):
-            return ranking_row[indexes]
-        else:
-            return None
+        if status:
+            status['record'] =  {
+                'wins': all_wins,
+                'losses': all_losses,
+                'ties': all_ties
+            }
+            status['playoff_average'] = None
+        return status
 
     @classmethod
     def _get_alliance(cls, team_key, event_details):
