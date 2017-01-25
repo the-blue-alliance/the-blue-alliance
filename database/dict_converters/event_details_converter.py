@@ -16,10 +16,10 @@ class EventDetailsConverter(ConverterBase):
     @classmethod
     def eventDetailsConverter_v3(cls, event_details):
         event_details_dict = {
-            'alliances': event_details.alliance_selections,
-            'district_points': event_details.district_points,
-            'rankings': event_details.renderable_rankings,
-            'stats': event_details.matchstats,
+            'alliances': event_details.alliance_selections if event_details else None,
+            'district_points': event_details.district_points if event_details else None,
+            'rankings': event_details.renderable_rankings if event_details else None,
+            'stats': event_details.matchstats if event_details else None,
         }
 
         return event_details_dict
