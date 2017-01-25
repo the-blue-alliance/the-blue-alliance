@@ -106,7 +106,7 @@
     <div class="col-sm-12">
       <ul class="nav nav-tabs">
         {% if matches.num > 0 %}<li class="active"><a href="#results" data-toggle="tab">Results</a></li>{% endif %}
-        {% if event.details.rankings_table %}<li><a href="#rankings" data-toggle="tab">Rankings</a></li>{% endif %}
+        {% if event.details and event.details.rankings_table %}<li><a href="#rankings" data-toggle="tab">Rankings</a></li>{% endif %}
         {% if awards %}<li><a href="#awards" data-toggle="tab">Awards</a></li>{% endif %}
         {% if district_points_sorted %}<li><a href="#district-points" data-toggle="tab">District Points</a></li>{% endif %}
         <li class="{% if matches.num == 0 %}active{% endif %}"><a href="#teams" data-toggle="tab">Teams <span class="badge">{{num_teams}}</span></a></li>
@@ -181,7 +181,7 @@
     </div>
     {% endif %}
 
-    {% if event.details.rankings_table %}
+    {% if event.details and event.details.rankings_table %}
     <div class="tab-pane" id="rankings">
       <div class="row">
         <div class="col-sm-8 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">

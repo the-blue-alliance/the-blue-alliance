@@ -165,7 +165,7 @@ class EventDetail(CacheableHandler):
             middle_value += 1
         teams_a, teams_b = team_and_medias[:middle_value], team_and_medias[middle_value:]
 
-        oprs = [i for i in event.details.matchstats['oprs'].items()] if (event.details.matchstats is not None and 'oprs' in event.details.matchstats) else []
+        oprs = [i for i in event.matchstats['oprs'].items()] if (event.matchstats is not None and 'oprs' in event.matchstats) else []
         oprs = sorted(oprs, key=lambda t: t[1], reverse=True)  # sort by OPR
         oprs = oprs[:15]  # get the top 15 OPRs
 
@@ -176,10 +176,10 @@ class EventDetail(CacheableHandler):
             matches_recent = None
             matches_upcoming = None
 
-        bracket_table = MatchHelper.generateBracket(matches, event.details.alliance_selections)
+        bracket_table = MatchHelper.generateBracket(matches, event.alliance_selections)
         is_2015_playoff = EventHelper.is_2015_playoff(event_key)
         if is_2015_playoff:
-            playoff_advancement = MatchHelper.generatePlayoffAdvancement2015(matches, event.details.alliance_selections)
+            playoff_advancement = MatchHelper.generatePlayoffAdvancement2015(matches, event.alliance_selections)
             for comp_level in ['qf', 'sf']:
                 if comp_level in bracket_table:
                     del bracket_table[comp_level]
@@ -188,7 +188,7 @@ class EventDetail(CacheableHandler):
 
         district_points_sorted = None
         if event.district_points:
-            district_points_sorted = sorted(event.details.district_points['points'].items(), key=lambda (team, points): -points['total'])
+            district_points_sorted = sorted(event.district_points['points'].items(), key=lambda (team, points): -points['total'])
 
         event_insights = EventInsightsHelper.calculate_event_insights(cleaned_matches, event.year)
         event_insights_template = None

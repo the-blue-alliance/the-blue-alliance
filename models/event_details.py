@@ -42,6 +42,9 @@ class EventDetails(ndb.Model):
 
     @property
     def rankings_table(self):
+        if not self.rankings2:
+            return None
+
         from helpers.rankings_helper import RankingsHelper
 
         precisions = []
