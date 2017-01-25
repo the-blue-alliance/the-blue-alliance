@@ -71,6 +71,7 @@ class Test2016EventTeamStatusHelper(unittest2.TestCase):
         },
         "alliance": {
             "name": "Alliance 1",
+            "number": 1,
             "backup": None,
             "pick": 0
         }
@@ -135,6 +136,7 @@ class Test2016EventTeamStatusHelper(unittest2.TestCase):
         },
         "alliance": {
             "name": "Alliance 4",
+            "number": 4,
             "backup": None,
             "pick": 1
         }
@@ -199,6 +201,7 @@ class Test2016EventTeamStatusHelper(unittest2.TestCase):
         },
         "alliance": {
             "name": "Alliance 2",
+            "number": 2,
             "backup": {"out": "frc229", "in": "frc1665"},
             "pick": 2
         }
@@ -264,6 +267,7 @@ class Test2016EventTeamStatusHelper(unittest2.TestCase):
         },
         "alliance": {
             "name": "Alliance 2",
+            "number": 2,
             "backup": {"out": "frc229", "in": "frc1665"},
             "pick": -1
         }

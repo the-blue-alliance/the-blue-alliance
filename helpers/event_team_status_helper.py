@@ -75,6 +75,7 @@ class EventTeamStatusHelper(object):
         return {
             'pick': pick,
             'name': alliance.get('name', "Alliance {}".format(number)),
+            'number': number,
             'backup': alliance.get('backup'),
         }
 
