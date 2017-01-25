@@ -66,14 +66,14 @@ class EventTeamStatusHelper(object):
 
         # Calculate the role played by the team on the alliance
         backup_info = alliance.get('backup', {}) if alliance.get('backup') else {}
-        position = -1 if team_key == backup_info.get('in', "") else None
+        pick = -1 if team_key == backup_info.get('in', "") else None
         for i, team in enumerate(alliance['picks']):
             if team == team_key:
-                position = i
+                pick = i
                 break
 
         return {
-            'position': position,
+            'pick': pick,
             'name': alliance.get('name', "Alliance {}".format(number)),
             'backup': alliance.get('backup'),
         }
@@ -130,11 +130,12 @@ class EventTeamStatusHelper(object):
                             'status': 'playing',
                             'level': comp_level,
                         }
-                    status['current_level_record'] = {
-                        'wins': level_wins,
-                        'losses': level_losses,
-                        'ties': level_ties
-                    }
+                    if status:
+                        status['current_level_record'] = {
+                            'wins': level_wins,
+                            'losses': level_losses,
+                            'ties': level_ties
+                        }
 
         if status:
             status['record'] =  {
