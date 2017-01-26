@@ -1,10 +1,13 @@
 import logging
+from collections import defaultdict
 import copy
 import datetime
+import json
 import pytz
 import re
 
 from collections import defaultdict
+from consts.event_type import EventType
 
 from helpers.match_manipulator import MatchManipulator
 
@@ -44,6 +47,45 @@ class MatchHelper(object):
             last_match_time = match_time
 
             match.time = match_time - tz.utcoffset(match_time)
+
+    @classmethod
+    def add_surrogates(cls, event):
+        """
+        If a team has more scheduled matches than other teams, then the third
+        match is a surrogate.
+        Valid for 2008 and up, don't compute for offseasons.
+        """
+        if event.year < 2008 or event.event_type_enum not in EventType.SEASON_EVENT_TYPES:
+            return
+
+        qual_matches = cls.organizeMatches(event.matches)['qm']
+        if not qual_matches:
+            return
+
+        # Find surrogate teams
+        match_counts = defaultdict(int)
+        for match in qual_matches:
+            for alliance_color in ['red', 'blue']:
+                for team in match.alliances[alliance_color]['teams']:
+                    match_counts[team] += 1
+        num_matches = min(match_counts.values())
+        surrogate_teams = set()
+        for k, v in match_counts.items():
+            if v > num_matches:
+                surrogate_teams.add(k)
+
+        # Add surrogate info
+        num_played = defaultdict(int)
+        for match in qual_matches:
+            for alliance_color in ['red', 'blue']:
+                match.alliances[alliance_color]['surrogates'] = []
+                for team in match.alliances[alliance_color]['teams']:
+                    num_played[team] += 1
+                    if team in surrogate_teams and num_played[team] == 3:
+                        match.alliances[alliance_color]['surrogates'].append(team)
+            match.alliances_json = json.dumps(match.alliances)
+
+        MatchManipulator.createOrUpdate(qual_matches)
 
     """
     Helper to put matches into sub-dictionaries for the way we render match tables

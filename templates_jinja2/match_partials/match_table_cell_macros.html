@@ -57,7 +57,7 @@
   {% if fake_matches %}
   {{ team_key|strip_frc }}
   {% else %}
-  <a href="/team/{{team_key|digits}}/{{match.year}}">{{ team_key|strip_frc }}</a>
+  <a href="/team/{{team_key|digits}}/{{match.year}}"{% if team_key in match.alliances.get(alliance_color).surrogates %} class="surrogate" rel="tooltip" title="Team {{team_key|strip_frc}} is playing as a surrogate."{% endif %}>{{ team_key|strip_frc }}</a>
   {% endif %}
 </td>
 {% endmacro %}

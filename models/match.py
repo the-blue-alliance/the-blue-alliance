@@ -38,14 +38,16 @@ class Match(ndb.Model):
     alliances_json = ndb.StringProperty(required=True, indexed=False)  # JSON dictionary with alliances and scores.
 
     # {
-    # "red": {
-    # "teams": ["frc177", "frc195", "frc125"], # These are Team keys
-    #    "score": 25
-    # },
-    # "blue": {
-    #    "teams": ["frc433", "frc254", "frc222"],
-    #    "score": 12
-    # }
+    #   "red": {
+    #     "teams": ["frc177", "frc195", "frc125"], # These are Team keys
+    #     "surrogates": ["frc177", "frc195"],
+    #     "score": 25
+    #   },
+    #   "blue": {
+    #     "teams": ["frc433", "frc254", "frc222"],
+    #     "surrogates": ["frc433"],
+    #     "score": 12
+    #   }
     # }
 
     score_breakdown_json = ndb.StringProperty(indexed=False)  # JSON dictionary with score breakdowns. Fields are those used for seeding. Varies by year.
@@ -105,13 +107,17 @@ class Match(ndb.Model):
         if self._alliances is None:
             self._alliances = json.loads(self.alliances_json)
 
-            # score types are inconsistent in the db. convert everything to ints for now.
             for color in ['red', 'blue']:
+                # score types are inconsistent in the db. convert everything to ints for now.
                 score = self._alliances[color]['score']
                 if score is None:
                     self._alliances[color]['score'] = -1
                 else:
                     self._alliances[color]['score'] = int(score)
+
+                # add surrogates if not present
+                if 'surrogates' not in self._alliances[color]:
+                    self._alliances[color]['surrogates'] = []
 
         return self._alliances
 
