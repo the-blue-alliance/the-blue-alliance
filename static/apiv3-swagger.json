@@ -3113,9 +3113,9 @@
         "backup": {
           "$ref": "#/definitions/Team_Event_Status_alliance_backup"
         },
-        "position": {
+        "pick": {
           "type": "integer",
-          "description": "Driver station position from 0-2, or -1 if the team has been replaced with a backup."
+          "description": "Order the team was picked in the alliance from 0-2, with 0 being alliance captain."
         }
       }
     },
@@ -3927,7 +3927,6 @@
     "Elimination_Alliance": {
       "type": "object",
       "required": [
-        "captain",
         "picks"
       ],
       "properties": {
@@ -3959,15 +3958,11 @@
         },
         "picks": {
           "type": "array",
-          "description": "List of team keys picked for the alliance.",
+          "description": "List of team keys picked for the alliance. First pick is captain.",
           "items": {
             "type": "string",
             "description": "Team key picked for the alliance."
           }
-        },
-        "captain": {
-          "type": "string",
-          "description": "Team key of the alliance captain."
         }
       }
     },
