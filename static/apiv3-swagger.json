@@ -1850,10 +1850,7 @@
           "200": {
             "description": "Successful response",
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Event_Ranking"
-              }
+              "$ref": "#/definitions/Event_Ranking"
             },
             "headers": {
               "Last-Modified": {
@@ -3167,67 +3164,92 @@
     "Event_Ranking": {
       "type": "object",
       "required": [
-        "rank",
-        "team_key"
+        "rankings",
+        "sort_order_info"
       ],
       "properties": {
-        "rank": {
-          "type": "integer",
-          "description": "The team's rank at the event as provided by FIRST."
-        },
-        "team_key": {
-          "type": "string",
-          "description": "The team with this rank."
-        },
-        "record": {
-          "properties": {
-            "qualifications": {
-              "properties": {
-                "wins": {
-                  "type": "integer"
-                },
-                "losses": {
-                  "type": "integer"
-                },
-                "ties": {
-                  "type": "integer"
-                }
-              },
-              "description": "W-L-T record in qualification matches"
-            },
-            "overall": {
-              "properties": {
-                "wins": {
-                  "type": "integer"
-                },
-                "losses": {
-                  "type": "integer"
-                },
-                "ties": {
-                  "type": "integer"
-                }
-              },
-              "description": "W-L-T record across all matches at an event"
-            }
-          },
-          "description": "Win-Loss-Tie ranking information, if available. May be null."
-        },
-        "played": {
-          "type": "integer",
-          "description": "Number of matches played by this team."
-        },
-        "additional_properties": {
+        "rankings" : {
           "type": "array",
-          "description": "Additional year-specific information, may be null.",
+          "description": "List of rankings at the event.",
           "items": {
+            "type": "object",
             "properties": {
-              "label": {
-                "type": "string",
-                "description": "The name of the additional property."
+              "dq": {
+                "type": "integer",
+                "description": "Disqualifications"
               },
-              "value": {
+              "matches_played": {
+                "type": "integer",
+                "description": "Number of matches played by this team."
+              },
+              "qual_average": {
+                "type": "integer",
+                "description": "TODO"
+              },
+              "rank": {
+                "type": "integer",
+                "description": "The team's rank at the event as provided by FIRST."
+              },
+              "record": {
+                "properties": {
+                  "qualifications": {
+                    "properties": {
+                      "wins": {
+                        "type": "integer"
+                      },
+                      "losses": {
+                        "type": "integer"
+                      },
+                      "ties": {
+                        "type": "integer"
+                      }
+                    },
+                    "description": "W-L-T record in qualification matches"
+                  },
+                  "overall": {
+                    "properties": {
+                      "wins": {
+                        "type": "integer"
+                      },
+                      "losses": {
+                        "type": "integer"
+                      },
+                      "ties": {
+                        "type": "integer"
+                      }
+                    },
+                    "description": "W-L-T record across all matches at an event"
+                  }
+                },
+                "description": "Win-Loss-Tie record information, if available. May be null."
+              },
+              "sort_orders": {
+                "type": "array",
+                "description": "Additional year-specific information, may be null. See parent `sort_order_info` for details.",
+                "items": {
+                  "type": "number"
+                }
+              },
+              "team_key": {
                 "type": "string",
-                "description": "The value for the property. May be of any type."
+                "description": "The team with this rank."
+              }
+            }
+          }
+        },
+        "sort_order_info": {
+          "type": "array",
+          "description": "List of year-specific values provided in the `sort_orders` array for each team.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Name of the field used in the `sort_order` array"
+              },
+              "precision": {
+                "type": "integer",
+                "description": "Integer expressing the number of digits of precision in the number provided in `sort_orders`"
               }
             }
           }
