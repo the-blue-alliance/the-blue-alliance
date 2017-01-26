@@ -107,13 +107,17 @@ class Match(ndb.Model):
         if self._alliances is None:
             self._alliances = json.loads(self.alliances_json)
 
-            # score types are inconsistent in the db. convert everything to ints for now.
             for color in ['red', 'blue']:
+                # score types are inconsistent in the db. convert everything to ints for now.
                 score = self._alliances[color]['score']
                 if score is None:
                     self._alliances[color]['score'] = -1
                 else:
                     self._alliances[color]['score'] = int(score)
+
+                # add surrogates if not present
+                if 'surrogates' not in self._alliances[color]:
+                    self._alliances[color]['surrogates'] = []
 
         return self._alliances
 

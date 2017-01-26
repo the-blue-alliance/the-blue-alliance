@@ -34,10 +34,9 @@ class TestAddSurrogates(unittest2.TestCase):
     def testEventWinner(self):
         MatchHelper.add_surrogates(self.event)
         for match in self.event.matches:
-            if match.comp_level == 'qm':
-                if match.match_number != 18:
-                    for alliance_color in ['red', 'blue']:
-                        self.assertEqual(match.alliances[alliance_color]['surrogates'], [])
-                else:
-                    self.assertEqual(match.alliances['red']['surrogates'], ['frc5496'])
-                    self.assertEqual(match.alliances['blue']['surrogates'], ['frc1323'])
+            if match.comp_level != 'qm' or match.match_number != 18:
+                for alliance_color in ['red', 'blue']:
+                    self.assertEqual(match.alliances[alliance_color]['surrogates'], [])
+            else:
+                self.assertEqual(match.alliances['red']['surrogates'], ['frc5496'])
+                self.assertEqual(match.alliances['blue']['surrogates'], ['frc1323'])
