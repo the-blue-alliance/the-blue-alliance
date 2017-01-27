@@ -24,33 +24,31 @@ class Test2016EventTeamStatusHelper(unittest2.TestCase):
                 "ties": 0
             },
             "qual_average": None,
-            "sort_orders": [
-                39.0,
-                310.0,
-                165.0,
-                448.0,
-                600.0
-            ],
-            "sort_order_info": [
+            "ranking_sort_orders": [
                 {
                   "name": "Ranking Score",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 39
                 },
                 {
                   "name": "Auto",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 310
                 },
                 {
                   "name": "Scale/Challenge",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 165
                 },
                 {
                   "name": "Goals",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 448
                 },
                 {
                   "name": "Defense",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 600
                 }
             ],
         },
@@ -89,33 +87,31 @@ class Test2016EventTeamStatusHelper(unittest2.TestCase):
                 "ties": 0
             },
             "qual_average": None,
-            "sort_orders": [
-                28.0,
-                260.0,
-                150.0,
-                191.0,
-                575.0
-            ],
-            "sort_order_info": [
+            "ranking_sort_orders": [
                 {
                   "name": "Ranking Score",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 28
                 },
                 {
                   "name": "Auto",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 260
                 },
                 {
                   "name": "Scale/Challenge",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 150
                 },
                 {
                   "name": "Goals",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 191
                 },
                 {
                   "name": "Defense",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 575
                 }
             ],
         },
@@ -154,33 +150,31 @@ class Test2016EventTeamStatusHelper(unittest2.TestCase):
                 "ties": 0
             },
             "qual_average": None,
-            "sort_orders": [
-                20.0,
-                156.0,
-                130.0,
-                119.0,
-                525.0
-            ],
-            "sort_order_info": [
+            "ranking_sort_orders": [
                 {
                   "name": "Ranking Score",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 20
                 },
                 {
                   "name": "Auto",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 156
                 },
                 {
                   "name": "Scale/Challenge",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 130
                 },
                 {
                   "name": "Goals",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 119
                 },
                 {
                   "name": "Defense",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 525
                 }
             ],
         },
@@ -220,33 +214,31 @@ class Test2016EventTeamStatusHelper(unittest2.TestCase):
                 "ties": 0
             },
             "qual_average": None,
-            "sort_orders": [
-                20.0,
-                192.0,
-                105.0,
-                146.0,
-                525.0
-            ],
-            "sort_order_info": [
+            "ranking_sort_orders": [
                 {
                   "name": "Ranking Score",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 20
                 },
                 {
                   "name": "Auto",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 192
                 },
                 {
                   "name": "Scale/Challenge",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 105
                 },
                 {
                   "name": "Goals",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 146
                 },
                 {
                   "name": "Defense",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 525
                 }
             ],
         },
@@ -286,33 +278,31 @@ class Test2016EventTeamStatusHelper(unittest2.TestCase):
                 "ties": 0
             },
             "qual_average": None,
-            "sort_orders": [
-                19.0,
-                218.0,
-                110.0,
-                159.0,
-                520.0
-            ],
-            "sort_order_info": [
+            "ranking_sort_orders": [
                 {
                   "name": "Ranking Score",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 19
                 },
                 {
                   "name": "Auto",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 218
                 },
                 {
                   "name": "Scale/Challenge",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 110
                 },
                 {
                   "name": "Goals",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 159
                 },
                 {
                   "name": "Defense",
-                  "precision": 0
+                  "precision": 0,
+                  "value": 520
                 }
             ],
         },

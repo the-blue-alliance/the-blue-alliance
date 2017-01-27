@@ -46,13 +46,14 @@ class EventTeamStatusHelper(object):
                     'dq': ranking['dq'],
                     'record': ranking['record'],
                     'qual_average': ranking['qual_average'],
-                    'sort_orders': ranking['sort_orders'],
                 }
                 break
 
         if qual_info:
             qual_info['total'] = len(rankings)
-            qual_info['sort_order_info'] = RankingsHelper.get_sort_order_info(event_details)
+            qual_info['ranking_sort_orders'] = RankingsHelper.get_sort_order_info(event_details)
+            for info, value in zip(qual_info['ranking_sort_orders'], ranking['sort_orders']):
+                info['value'] = value
 
         return qual_info
 
