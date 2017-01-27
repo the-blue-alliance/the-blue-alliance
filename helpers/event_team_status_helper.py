@@ -1,3 +1,5 @@
+import numpy as np
+
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb.tasklets import Future
 
@@ -88,9 +90,12 @@ class EventTeamStatusHelper(object):
         if alliance and alliance.get('backup'):
             complete_alliance.add(alliance['backup']['in'])
 
+        is_2015 = event_details.year == 2015
+
         all_wins = 0
         all_losses = 0
         all_ties = 0
+        playoff_scores = []
         status = None
         for comp_level in ['f', 'sf', 'qf', 'ef']:  # playoffs
             if matches[comp_level]:
@@ -98,22 +103,27 @@ class EventTeamStatusHelper(object):
                 level_losses = 0
                 level_ties = 0
                 level_matches = 0
+                level_played = 0
                 for match in matches[comp_level]:
                     if match.has_been_played:
                         for color in ['red', 'blue']:
                             match_alliance = set(match.alliances[color]['teams'])
                             if len(match_alliance.intersection(complete_alliance)) >= 2:
+                                playoff_scores.append(match.alliances[color]['score'])
                                 level_matches += 1
                                 if match.winning_alliance == color:
                                     level_wins += 1
                                     all_wins += 1
                                 elif not match.winning_alliance:
-                                    # The match was a tie
-                                    level_ties += 1
-                                    all_ties += 1
+                                    if not (is_2015 and comp_level != 'f'):
+                                        # The match was a tie
+                                        level_ties += 1
+                                        all_ties += 1
                                 else:
                                     level_losses += 1
                                     all_losses += 1
+                                if match.has_been_played:
+                                    level_played += 1
                 if not status:
                     # Only set this for the first comp level that gets this far,
                     # But run through the rest to calculate the full record
@@ -123,15 +133,22 @@ class EventTeamStatusHelper(object):
                             'level': comp_level,
                         }
                     elif level_losses == 2:
-                        status ={
+                        status = {
                             'status': 'eliminated',
                             'level': comp_level
                         }
                     elif level_matches > 0:
-                        status = {
-                            'status': 'playing',
-                            'level': comp_level,
-                        }
+                        if is_2015:
+                            # This only works for past events, but 2015 is in the past so this works
+                            status = {
+                                'status': 'eliminated',
+                                'level': comp_level,
+                            }
+                        else:
+                            status = {
+                                'status': 'playing',
+                                'level': comp_level,
+                            }
                     if status:
                         status['current_level_record'] = {
                             'wins': level_wins,
@@ -145,7 +162,7 @@ class EventTeamStatusHelper(object):
                 'losses': all_losses,
                 'ties': all_ties
             }
-            status['playoff_average'] = None
+            status['playoff_average'] = np.mean(playoff_scores) if is_2015 else None
         return status
 
     @classmethod

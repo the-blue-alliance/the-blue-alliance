@@ -359,3 +359,221 @@ class Test2016EventTeamStatusHelper(unittest2.TestCase):
     def testTeamNotThere(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc1124', self.event)
         self.assertDictEqual(status, self.status_1124)
+
+
+class Test2015EventTeamStatusHelper(unittest2.TestCase):
+    status_254 = {
+        "qual": {
+            "rank": 1,
+            "total": 57,
+            "matches_played": 10,
+            "dq": 0,
+            "record": None,
+            "qual_average": 200.4,
+            "ranking_sort_orders": [
+                {
+                  "name": "Qual Avg.",
+                  "precision": 1,
+                  "value": 200.4
+                },
+                {
+                  "name": "Coopertition",
+                  "precision": 0,
+                  "value": 280
+                },
+                {
+                  "name": "Auto",
+                  "precision": 0,
+                  "value": 200
+                },
+                {
+                  "name": "Container",
+                  "precision": 0,
+                  "value": 836
+                },
+                {
+                  "name": "Tote",
+                  "precision": 0,
+                  "value": 522
+                },
+                {
+                  "name": "Litter",
+                  "precision": 0,
+                  "value": 166
+                }
+            ],
+        },
+        "playoff": {
+            "level": "f",
+            "record": {
+                "wins": 2,
+                "losses": 0,
+                "ties": 0
+            },
+            "current_level_record": {
+                "wins": 2,
+                "losses": 0,
+                "ties": 0
+            },
+            "playoff_average": 224.14285714285714,
+            "status": "won"
+        },
+        "alliance": {
+            "name": "Alliance 1",
+            "number": 1,
+            "backup": None,
+            "pick": 0
+        }
+    }
+
+    status_846 = {
+        "qual": {
+            "rank": 8,
+            "total": 57,
+            "matches_played": 10,
+            "dq": 0,
+            "record": None,
+            "qual_average": 97.0,
+            "ranking_sort_orders": [
+                {
+                  "name": "Qual Avg.",
+                  "precision": 1,
+                  "value": 97.0
+                },
+                {
+                  "name": "Coopertition",
+                  "precision": 0,
+                  "value": 200
+                },
+                {
+                  "name": "Auto",
+                  "precision": 0,
+                  "value": 20
+                },
+                {
+                  "name": "Container",
+                  "precision": 0,
+                  "value": 372
+                },
+                {
+                  "name": "Tote",
+                  "precision": 0,
+                  "value": 294
+                },
+                {
+                  "name": "Litter",
+                  "precision": 0,
+                  "value": 108
+                }
+            ],
+        },
+        "playoff": {
+            "level": "sf",
+            "record": {
+                "wins": 0,
+                "losses": 0,
+                "ties": 0
+            },
+            "current_level_record": {
+                "wins": 0,
+                "losses": 0,
+                "ties": 0
+            },
+            "playoff_average": 133.6,
+            "status": "eliminated"
+        },
+        "alliance": {
+            "name": "Alliance 3",
+            "number": 3,
+            "backup": None,
+            "pick": 1
+        }
+    }
+
+    status_8 = {
+        "qual": {
+            "rank": 53,
+            "total": 57,
+            "matches_played": 10,
+            "dq": 0,
+            "record": None,
+            "qual_average": 42.6,
+            "ranking_sort_orders": [
+                {
+                  "name": "Qual Avg.",
+                  "precision": 1,
+                  "value": 42.6
+                },
+                {
+                  "name": "Coopertition",
+                  "precision": 0,
+                  "value": 120
+                },
+                {
+                  "name": "Auto",
+                  "precision": 0,
+                  "value": 0
+                },
+                {
+                  "name": "Container",
+                  "precision": 0,
+                  "value": 84
+                },
+                {
+                  "name": "Tote",
+                  "precision": 0,
+                  "value": 150
+                },
+                {
+                  "name": "Litter",
+                  "precision": 0,
+                  "value": 72
+                }
+            ],
+        },
+        "playoff": None,
+        "alliance": None
+    }
+
+    status_1124 = {
+        "qual": None,
+        "playoff": None,
+        "alliance": None
+    }
+
+    # Because I can't figure out how to get these to generate
+    def event_key_adder(self, obj):
+        obj.event = ndb.Key(Event, '2015casj')
+
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
+        load_fixture('test_data/fixtures/2015casj.json',
+                      kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
+                      post_processor=self.event_key_adder)
+        self.event = Event.get_by_id('2015casj')
+        self.assertIsNotNone(self.event)
+        self.maxDiff = None
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def testEventWinner(self):
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc254', self.event)
+        self.assertDictEqual(status, self.status_254)
+
+    def testElimSemisAndFirstPick(self):
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc846', self.event)
+        self.assertDictEqual(status, self.status_846)
+
+    def testTeamNotPicked(self):
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc8', self.event)
+        self.assertDictEqual(status, self.status_8)
+
+    def testTeamNotThere(self):
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc1124', self.event)
+        self.assertDictEqual(status, self.status_1124)
