@@ -327,7 +327,7 @@ class Test2016EventTeamStatusHelper(unittest2.TestCase):
         self.testbed.init_memcache_stub()
         ndb.get_context().clear_cache()  # Prevent data from leaking between tests
 
-        load_fixture('test_data/event_team_status.json',
+        load_fixture('test_data/fixtures/2016nytr_event_team_status.json',
                       kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
                       post_processor=self.event_key_adder)
         self.event = Event.get_by_id('2016nytr')
