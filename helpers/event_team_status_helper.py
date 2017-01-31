@@ -1,3 +1,4 @@
+import copy
 import numpy as np
 
 from google.appengine.ext import ndb
@@ -23,47 +24,86 @@ class EventTeamStatusHelper(object):
         event_details = event.details
         if not matches:
             matches = event.matches
-            matches = [match for match in matches if match.comp_level in Match.ELIM_LEVELS]
             matches = MatchHelper.organizeMatches(matches)
         return {
-            'qual': cls._build_qual_info(team_key, event_details),
-            'alliance': cls._build_alliance_info(team_key, event_details),
+            'qual': cls._build_qual_info(team_key, event_details, matches, event.year),
+            'alliance': cls._build_alliance_info(team_key, event_details, matches),
             'playoff': cls._build_playoff_info(team_key, event_details, matches)
         }
 
     @classmethod
-    def _build_qual_info(cls, team_key, event_details):
-        if not event_details:
-            return None
-        rankings = event_details.rankings2
-        if not rankings:
-            return None
+    def _build_qual_info(cls, team_key, event_details, matches, year):
+        if event_details and event_details.rankings2:
+            rankings = event_details.rankings2
 
-        qual_info = None
-        for ranking in rankings:
-            if ranking['team_key'] == team_key:
-                qual_info = {
-                    'rank': ranking['rank'],
-                    'matches_played': ranking['matches_played'],
-                    'dq': ranking['dq'],
-                    'record': ranking['record'],
-                    'qual_average': ranking['qual_average'],
+            qual_info = None
+            for ranking in rankings:
+                if ranking['team_key'] == team_key:
+                    qual_info = {
+                        'rank': ranking['rank'],
+                        'matches_played': ranking['matches_played'],
+                        'dq': ranking['dq'],
+                        'record': ranking['record'],
+                        'qual_average': ranking['qual_average'],
+                    }
+                    break
+
+            if qual_info:
+                qual_info['total'] = len(rankings)
+                qual_info['ranking_sort_orders'] = RankingsHelper.get_sort_order_info(event_details)
+                for info, value in zip(qual_info['ranking_sort_orders'], ranking['sort_orders']):
+                    info['value'] = value
+
+            return qual_info
+        else:
+            # Use matches as fallback
+            all_teams = set()
+            wins = 0
+            losses = 0
+            ties = 0
+            qual_score_sum = 0
+            matches_played = 0
+            for match in matches['qm']:
+                for color in ['red', 'blue']:
+                    for team in match.alliances[color]['teams']:
+                        all_teams.add(team)
+                        if team == team_key and match.has_been_played and \
+                                team_key not in match.alliances[color]['surrogates']:
+                            matches_played += 1
+
+                            if match.winning_alliance == color:
+                                wins += 1
+                            elif match.winning_alliance == '':
+                                ties += 1
+                            else:
+                                losses += 1
+
+                            qual_score_sum += match.alliances[color]['score']
+
+            qual_average = qual_score_sum / matches_played if matches_played else 0
+
+            if team_key in all_teams:
+                return {
+                    'rank': None,
+                    'matches_played': matches_played,
+                    'dq': None,
+                    'record': {
+                        'wins': wins,
+                        'losses': losses,
+                        'ties': ties,
+                    } if year != 2015 else None,
+                    'qual_average': qual_average if year == 2015 else None,
+                    'total': len(all_teams),
+                    'ranking_sort_orders': None,
                 }
-                break
-
-        if qual_info:
-            qual_info['total'] = len(rankings)
-            qual_info['ranking_sort_orders'] = RankingsHelper.get_sort_order_info(event_details)
-            for info, value in zip(qual_info['ranking_sort_orders'], ranking['sort_orders']):
-                info['value'] = value
-
-        return qual_info
+            else:
+                return None
 
     @classmethod
-    def _build_alliance_info(cls, team_key, event_details):
+    def _build_alliance_info(cls, team_key, event_details, matches):
         if not event_details or not event_details.alliance_selections:
             return None
-        alliance, number = cls._get_alliance(team_key, event_details)
+        alliance, number = cls._get_alliance(team_key, event_details, matches)
         if not alliance:
             return None
 
@@ -85,12 +125,12 @@ class EventTeamStatusHelper(object):
     @classmethod
     def _build_playoff_info(cls, team_key, event_details, matches):
         # Matches needs to be all playoff matches at the event, to properly account for backups
-        alliance, alliance_number = cls._get_alliance(team_key, event_details)
+        alliance, _ = cls._get_alliance(team_key, event_details, matches)
         complete_alliance = set(alliance['picks']) if alliance else set()
         if alliance and alliance.get('backup'):
             complete_alliance.add(alliance['backup']['in'])
 
-        is_2015 = event_details.year == 2015
+        is_2015 = event_details.year == 2015 if event_details else False
 
         all_wins = 0
         all_losses = 0
@@ -166,7 +206,7 @@ class EventTeamStatusHelper(object):
         return status
 
     @classmethod
-    def _get_alliance(cls, team_key, event_details):
+    def _get_alliance(cls, team_key, event_details, matches):
         """
         Get the alliance number of the team
         Returns 0 when the team is not on an alliance
@@ -181,6 +221,24 @@ class EventTeamStatusHelper(object):
                 if team_key == backup_info.get('in', ""):
                     # If this team came in as a backup team
                     return alliance, alliance_number
+        else:
+            # No event_details. Use matches to generate alliances.
+            complete_alliances = []
+            for comp_level in Match.ELIM_LEVELS:
+                for match in matches[comp_level]:
+                    for color in ['red', 'blue']:
+                        alliance = copy.copy(match.alliances[color]['teams'])
+                        for i, complete_alliance in enumerate(complete_alliances):  # search for alliance. could be more efficient
+                            if len(set(alliance).intersection(set(complete_alliance))) >= 2:  # if >= 2 teams are the same, then the alliance is the same
+                                backups = list(set(alliance).difference(set(complete_alliance)))
+                                complete_alliances[i] += backups  # ensures that backup robots are listed last
+                                break
+                        else:
+                            complete_alliances.append(alliance)
+
+            for complete_alliance in complete_alliances:
+                if team_key in complete_alliance:
+                    return {'picks': complete_alliance}, None  # Alliance number is unknown
 
         alliance_number = 0
         return None, alliance_number  # Team didn't make it to elims
@@ -204,22 +262,6 @@ class EventTeamStatusHelper(object):
                 events_with_teams.append((event, teams_and_statuses_future))
 
         return events_with_teams
-
-    @classmethod
-    def _get_alliance_number(cls, team_key, event_details):
-        """
-        Get the alliance number of the team
-        Returns 0 when the team is not on an alliance
-        """
-        alliance_number = None
-        if event_details and event_details.alliance_selections:
-            for i, alliance in enumerate(event_details.alliance_selections):
-                if team_key in alliance['picks']:
-                    alliance_number = i + 1
-                    break
-            else:
-                alliance_number = 0  # Team didn't make it to elims
-        return alliance_number
 
     @classmethod
     def _get_playoff_status_string(cls, team_key, alliance_status, playoff_status):

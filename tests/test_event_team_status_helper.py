@@ -361,6 +361,208 @@ class Test2016EventTeamStatusHelper(unittest2.TestCase):
         self.assertDictEqual(status, self.status_1124)
 
 
+class Test2016EventTeamStatusHelperNoEventDetails(unittest2.TestCase):
+    status_359 = {
+        "qual": {
+            "rank": None,
+            "total": 36,
+            "matches_played": 12,
+            "dq": None,
+            "record": {
+                "wins": 11,
+                "losses": 1,
+                "ties": 0
+            },
+            "qual_average": None,
+            "ranking_sort_orders": None,
+        },
+        "playoff": {
+            "level": "f",
+            "record": {
+                "wins": 6,
+                "losses": 1,
+                "ties": 0
+            },
+            "current_level_record": {
+                "wins": 2,
+                "losses": 1,
+                "ties": 0
+            },
+            "playoff_average": None,
+            "status": "won"
+        },
+        "alliance": None
+    }
+
+    status_5240 = {
+        "qual": {
+            "rank": None,
+            "total": 36,
+            "matches_played": 12,
+            "dq": None,
+            "record": {
+                "wins": 9,
+                "losses": 3,
+                "ties": 0
+            },
+            "qual_average": None,
+            "ranking_sort_orders": None,
+        },
+        "playoff": {
+            "level": "sf",
+            "record": {
+                "wins": 2,
+                "losses": 3,
+                "ties": 0
+            },
+            "current_level_record": {
+                "wins": 0,
+                "losses": 2,
+                "ties": 0
+            },
+            "playoff_average": None,
+            "status": "eliminated"
+        },
+        "alliance": None
+    }
+
+    status_229 = {
+        "qual": {
+            "rank": None,
+            "total": 36,
+            "matches_played": 12,
+            "dq": None,
+            "record": {
+                "wins": 6,
+                "losses": 6,
+                "ties": 0
+            },
+            "qual_average": None,
+            "ranking_sort_orders": None,
+        },
+        "playoff": {
+            "level": "f",
+            "record": {
+                "wins": 5,
+                "losses": 3,
+                "ties": 0
+            },
+            "current_level_record": {
+                "wins": 1,
+                "losses": 2,
+                "ties": 0
+            },
+            "playoff_average": None,
+            "status": "eliminated"
+        },
+        "alliance": None
+
+    }
+
+    status_1665 = {
+        "qual": {
+            "rank": None,
+            "total": 36,
+            "matches_played": 12,
+            "dq": None,
+            "record": {
+                "wins": 6,
+                "losses": 6,
+                "ties": 0
+            },
+            "qual_average": None,
+            "ranking_sort_orders": None,
+        },
+        "playoff": {
+            "level": "f",
+            "record": {
+                "wins": 5,
+                "losses": 3,
+                "ties": 0
+            },
+            "current_level_record": {
+                "wins": 1,
+                "losses": 2,
+                "ties": 0
+            },
+            "playoff_average": None,
+            "status": "eliminated"
+        },
+        "alliance": None
+
+    }
+
+    status_5964 = {
+        "qual": {
+            "rank": None,
+            "total": 36,
+            "matches_played": 12,
+            "dq": None,
+            "record": {
+                "wins": 6,
+                "losses": 6,
+                "ties": 0
+            },
+            "qual_average": None,
+            "ranking_sort_orders": None
+        },
+        "playoff": None,
+        "alliance": None
+    }
+
+    status_1124 = {
+        "qual": None,
+        "playoff": None,
+        "alliance": None
+    }
+
+    # Because I can't figure out how to get these to generate
+    def event_key_adder(self, obj):
+        obj.event = ndb.Key(Event, '2016nytr')
+
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
+        load_fixture('test_data/fixtures/2016nytr_event_team_status.json',
+                      kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
+                      post_processor=self.event_key_adder)
+        self.event = Event.get_by_id('2016nytr')
+        EventDetails.get_by_id('2016nytr').key.delete()  # Remove EventDetails
+        self.assertIsNotNone(self.event)
+        self.maxDiff = None
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def testEventWinner(self):
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc359', self.event)
+        self.assertDictEqual(status, self.status_359)
+
+    def testElimSemisAndFirstPick(self):
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5240', self.event)
+        self.assertDictEqual(status, self.status_5240)
+
+    def testBackupOut(self):
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc229', self.event)
+        self.assertDictEqual(status, self.status_229)
+
+    def testBackupIn(self):
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc1665', self.event)
+        self.assertDictEqual(status, self.status_1665)
+
+    def testTeamNotPicked(self):
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5964', self.event)
+        self.assertDictEqual(status, self.status_5964)
+
+    def testTeamNotThere(self):
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc1124', self.event)
+        self.assertDictEqual(status, self.status_1124)
+
+
 class Test2015EventTeamStatusHelper(unittest2.TestCase):
     status_254 = {
         "qual": {
@@ -557,7 +759,6 @@ class Test2015EventTeamStatusHelper(unittest2.TestCase):
                       post_processor=self.event_key_adder)
         self.event = Event.get_by_id('2015casj')
         self.assertIsNotNone(self.event)
-        self.maxDiff = None
 
     def tearDown(self):
         self.testbed.deactivate()
