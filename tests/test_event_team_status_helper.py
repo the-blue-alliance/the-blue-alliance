@@ -11,7 +11,7 @@ from models.event_details import EventDetails
 from models.match import Match
 
 
-class Test2016EventTeamStatusHelper(unittest2.TestCase):
+class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
     status_359 = {
         "qual": {
             "rank": 1,
@@ -361,7 +361,7 @@ class Test2016EventTeamStatusHelper(unittest2.TestCase):
         self.assertDictEqual(status, self.status_1124)
 
 
-class Test2016EventTeamStatusHelperNoEventDetails(unittest2.TestCase):
+class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
     status_359 = {
         "qual": {
             "rank": None,
@@ -533,7 +533,6 @@ class Test2016EventTeamStatusHelperNoEventDetails(unittest2.TestCase):
         self.event = Event.get_by_id('2016nytr')
         EventDetails.get_by_id('2016nytr').key.delete()  # Remove EventDetails
         self.assertIsNotNone(self.event)
-        self.maxDiff = None
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -561,6 +560,64 @@ class Test2016EventTeamStatusHelperNoEventDetails(unittest2.TestCase):
     def testTeamNotThere(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc1124', self.event)
         self.assertDictEqual(status, self.status_1124)
+
+
+class Test2016casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
+    status_254 = {
+        "qual": {
+            "rank": None,
+            "total": 64,
+            "matches_played": 8,
+            "dq": None,
+            "record": {
+                "wins": 8,
+                "losses": 0,
+                "ties": 0
+            },
+            "qual_average": None,
+            "ranking_sort_orders": None,
+        },
+        "playoff": {
+            "level": "f",
+            "record": {
+                "wins": 6,
+                "losses": 0,
+                "ties": 0
+            },
+            "current_level_record": {
+                "wins": 2,
+                "losses": 0,
+                "ties": 0
+            },
+            "playoff_average": None,
+            "status": "won"
+        },
+        "alliance": None
+    }
+
+    # Because I can't figure out how to get these to generate
+    def event_key_adder(self, obj):
+        obj.event = ndb.Key(Event, '2016casj')
+
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
+        load_fixture('test_data/fixtures/2016casj.json',
+                      kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
+                      post_processor=self.event_key_adder)
+        self.event = Event.get_by_id('2016casj')
+        self.assertIsNotNone(self.event)
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def testEventWinner(self):
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc254', self.event)
+        self.assertDictEqual(status, self.status_254)
 
 
 class Test2015EventTeamStatusHelper(unittest2.TestCase):
