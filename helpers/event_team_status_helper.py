@@ -28,7 +28,7 @@ class EventTeamStatusHelper(object):
         return {
             'qual': cls._build_qual_info(team_key, event_details, matches, event.year),
             'alliance': cls._build_alliance_info(team_key, event_details, matches),
-            'playoff': cls._build_playoff_info(team_key, event_details, matches)
+            'playoff': cls._build_playoff_info(team_key, event_details, matches, event.year)
         }
 
     @classmethod
@@ -80,7 +80,7 @@ class EventTeamStatusHelper(object):
 
                             qual_score_sum += match.alliances[color]['score']
 
-            qual_average = qual_score_sum / matches_played if matches_played else 0
+            qual_average = float(qual_score_sum) / matches_played if matches_played else 0
 
             if team_key in all_teams:
                 return {
@@ -123,14 +123,12 @@ class EventTeamStatusHelper(object):
         }
 
     @classmethod
-    def _build_playoff_info(cls, team_key, event_details, matches):
+    def _build_playoff_info(cls, team_key, event_details, matches, year):
         # Matches needs to be all playoff matches at the event, to properly account for backups
         alliance, _ = cls._get_alliance(team_key, event_details, matches)
         complete_alliance = set(alliance['picks']) if alliance else set()
         if alliance and alliance.get('backup'):
             complete_alliance.add(alliance['backup']['in'])
-
-        is_2015 = event_details.year == 2015 if event_details else False
 
         all_wins = 0
         all_losses = 0
@@ -155,7 +153,7 @@ class EventTeamStatusHelper(object):
                                     level_wins += 1
                                     all_wins += 1
                                 elif not match.winning_alliance:
-                                    if not (is_2015 and comp_level != 'f'):
+                                    if not (year == 2015 and comp_level != 'f'):
                                         # The match was a tie
                                         level_ties += 1
                                         all_ties += 1
@@ -178,7 +176,7 @@ class EventTeamStatusHelper(object):
                             'level': comp_level
                         }
                     elif level_matches > 0:
-                        if is_2015:
+                        if year == 2015:
                             # This only works for past events, but 2015 is in the past so this works
                             status = {
                                 'status': 'eliminated',
@@ -202,7 +200,7 @@ class EventTeamStatusHelper(object):
                 'losses': all_losses,
                 'ties': all_ties
             }
-            status['playoff_average'] = np.mean(playoff_scores) if is_2015 else None
+            status['playoff_average'] = np.mean(playoff_scores) if year == 2015 else None
         return status
 
     @classmethod

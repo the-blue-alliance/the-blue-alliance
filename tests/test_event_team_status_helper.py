@@ -620,7 +620,7 @@ class Test2016casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
         self.assertDictEqual(status, self.status_254)
 
 
-class Test2015EventTeamStatusHelper(unittest2.TestCase):
+class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
     status_254 = {
         "qual": {
             "rank": 1,
@@ -815,6 +815,121 @@ class Test2015EventTeamStatusHelper(unittest2.TestCase):
                       kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
                       post_processor=self.event_key_adder)
         self.event = Event.get_by_id('2015casj')
+        self.assertIsNotNone(self.event)
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def testEventWinner(self):
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc254', self.event)
+        self.assertDictEqual(status, self.status_254)
+
+    def testElimSemisAndFirstPick(self):
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc846', self.event)
+        self.assertDictEqual(status, self.status_846)
+
+    def testTeamNotPicked(self):
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc8', self.event)
+        self.assertDictEqual(status, self.status_8)
+
+    def testTeamNotThere(self):
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc1124', self.event)
+        self.assertDictEqual(status, self.status_1124)
+
+
+class Test2015casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
+    status_254 = {
+        "qual": {
+            "rank": None,
+            "total": 57,
+            "matches_played": 10,
+            "dq": None,
+            "record": None,
+            "qual_average": 200.4,
+            "ranking_sort_orders": None,
+        },
+        "playoff": {
+            "level": "f",
+            "record": {
+                "wins": 2,
+                "losses": 0,
+                "ties": 0
+            },
+            "current_level_record": {
+                "wins": 2,
+                "losses": 0,
+                "ties": 0
+            },
+            "playoff_average": 224.14285714285714,
+            "status": "won"
+        },
+        "alliance": None
+    }
+
+    status_846 = {
+        "qual": {
+            "rank": None,
+            "total": 57,
+            "matches_played": 10,
+            "dq": None,
+            "record": None,
+            "qual_average": 97.0,
+            "ranking_sort_orders": None,
+        },
+        "playoff": {
+            "level": "sf",
+            "record": {
+                "wins": 0,
+                "losses": 0,
+                "ties": 0
+            },
+            "current_level_record": {
+                "wins": 0,
+                "losses": 0,
+                "ties": 0
+            },
+            "playoff_average": 133.6,
+            "status": "eliminated"
+        },
+        "alliance": None
+    }
+
+    status_8 = {
+        "qual": {
+            "rank": None,
+            "total": 57,
+            "matches_played": 10,
+            "dq": None,
+            "record": None,
+            "qual_average": 42.6,
+            "ranking_sort_orders": None,
+        },
+        "playoff": None,
+        "alliance": None
+    }
+
+    status_1124 = {
+        "qual": None,
+        "playoff": None,
+        "alliance": None
+    }
+
+    # Because I can't figure out how to get these to generate
+    def event_key_adder(self, obj):
+        obj.event = ndb.Key(Event, '2015casj')
+
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
+        load_fixture('test_data/fixtures/2015casj.json',
+                      kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
+                      post_processor=self.event_key_adder)
+        self.event = Event.get_by_id('2015casj')
+        EventDetails.get_by_id('2015casj').key.delete()  # Remove EventDetails
         self.assertIsNotNone(self.event)
 
     def tearDown(self):
