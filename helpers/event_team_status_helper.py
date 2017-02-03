@@ -25,11 +25,11 @@ class EventTeamStatusHelper(object):
         if not matches:
             matches = event.matches
             matches = MatchHelper.organizeMatches(matches)
-        return {
+        return copy.deepcopy({
             'qual': cls._build_qual_info(team_key, event_details, matches, event.year),
             'alliance': cls._build_alliance_info(team_key, event_details, matches),
             'playoff': cls._build_playoff_info(team_key, event_details, matches, event.year)
-        }
+        })  # TODO: Results are getting mixed unless copied. 2017-02-03 -fangeugene
 
     @classmethod
     def _build_qual_info(cls, team_key, event_details, matches, year):
