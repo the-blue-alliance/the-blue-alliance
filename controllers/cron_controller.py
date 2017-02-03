@@ -23,6 +23,7 @@ from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
 from helpers.event_details_manipulator import EventDetailsManipulator
 from helpers.event_team_manipulator import EventTeamManipulator
+from helpers.event_team_status_helper import EventTeamStatusHelper
 from helpers.event_team_repairer import EventTeamRepairer
 from helpers.event_team_updater import EventTeamUpdater
 from helpers.insights_helper import InsightsHelper
@@ -540,6 +541,34 @@ class DistrictRankingsCalcDo(webapp.RequestHandler):
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
             self.response.out.write("Finished calculating rankings for: {}".format(district_key))
+
+
+class EventTeamStatusCalcEnqueue(webapp.RequestHandler):
+    """
+    Enqueues calculation of event team status for a year
+    """
+
+    def get(self, year):
+        event_keys = [e.id() for e in Event.query(Event.year==int(year)).fetch(keys_only=True)]
+        for event_key in event_keys:
+            taskqueue.add(url='/tasks/math/do/event_team_status/{}'.format(event_key), method='GET')
+
+        self.response.out.write("Enqueued for: {}".format(event_keys))
+
+
+class EventTeamStatusCalcDo(webapp.RequestHandler):
+    """
+    Calculates event team statuses for all teams at an event
+    """
+    def get(self, event_key):
+        event = Event.get_by_id(event_key)
+        event_teams = EventTeam.query(EventTeam.event==event.key).fetch()
+        for event_team in event_teams:
+            event_team.status = EventTeamStatusHelper.generate_team_at_event_status(event_team.team.id(), event)
+        EventTeamManipulator.createOrUpdate(event_teams)
+
+        if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue
+            self.response.out.write("Finished calculating event team statuses for: {}".format(event_key))
 
 
 class UpcomingNotificationDo(webapp.RequestHandler):
