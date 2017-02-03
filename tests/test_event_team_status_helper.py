@@ -339,26 +339,44 @@ class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
     def testEventWinner(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc359', self.event)
         self.assertDictEqual(status, self.status_359)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
+            'Team 359 was <b>Rank 1/36</b> with a record of <b>11-1-0</b> in quals, competed in the playoffs as the <b>Captain</b> on <b>Alliance 1</b>, and <b>won the event</b> with a playoff record of <b>6-1-0</b>.')
 
     def testElimSemisAndFirstPick(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc5240', self.event)
         self.assertDictEqual(status, self.status_5240)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5240', status),
+            'Team 5240 was <b>Rank 6/36</b> with a record of <b>9-3-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> on <b>Alliance 4</b>, and was <b>eliminated in the Semifinals</b> with a playoff record of <b>2-3-0</b>.')
 
     def testBackupOut(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc229', self.event)
         self.assertDictEqual(status, self.status_229)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc229', status),
+            'Team 229 was <b>Rank 20/36</b> with a record of <b>6-6-0</b> in quals, competed in the playoffs as the <b>2nd Pick</b> on <b>Alliance 2</b>, and was <b>eliminated in the Finals</b> with a playoff record of <b>5-3-0</b>.')
 
     def testBackupIn(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc1665', self.event)
         self.assertDictEqual(status, self.status_1665)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc1665', status),
+            'Team 1665 was <b>Rank 18/36</b> with a record of <b>6-6-0</b> in quals, competed in the playoffs as the <b>Backup</b> on <b>Alliance 2</b>, and was <b>eliminated in the Finals</b> with a playoff record of <b>5-3-0</b>.')
 
     def testTeamNotPicked(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc5964', self.event)
         self.assertDictEqual(status, self.status_5964)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5964', status),
+            'Team 5964 was <b>Rank 23/36</b> with a record of <b>6-6-0</b> in quals.')
 
     def testTeamNotThere(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc1124', self.event)
         self.assertDictEqual(status, self.status_1124)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc1124', status),
+            None)
 
 
 class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):

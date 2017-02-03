@@ -12,6 +12,79 @@ from models.match import Match
 
 
 class EventTeamStatusHelper(object):
+    @classmethod
+    def generate_team_at_event_status_string(cls, team_key, status):
+        """
+        Generate a team at event status string from a status dict
+        """
+        qual = status.get('qual')
+        alliance = status.get('alliance')
+        playoff = status.get('playoff')
+
+        components = []
+        if qual:
+            rank = qual.get('rank')
+            total = qual.get('total')
+            record = qual.get('record')
+            qual_average = qual.get('qual_average')
+
+            if record:
+                record_str = '{}-{}-{}'.format(record['wins'], record['losses'], record['ties'])
+                if rank:
+                    total_str = ''
+                    if total:
+                        total_str = '/{}'.format(total)
+                    qual_str = 'was <b>Rank {}{}</b> with a record of <b>{}</b> in quals'.format(rank, total_str, record_str)
+                else:
+                    qual_str = 'had a record of <b>{}</b> in quals'.format(record_str)
+            components.append(qual_str)
+
+        if alliance:
+            pick = alliance['pick']
+            if pick == 0:
+                pick = 'Captain'
+            else:
+                # Convert to ordinal number http://stackoverflow.com/questions/9647202/ordinal-numbers-replacement
+                pick = '{} Pick'.format("%d%s" % (pick,"tsnrhtdd"[(pick/10%10!=1)*(pick%10<4)*pick%10::4]))
+            backup = alliance['backup']
+            if backup and team_key == backup['in']:
+                pick = 'Backup'
+            alliance_str = 'competed in the playoffs as the <b>{}</b> on <b>{}</b>'.format(pick, alliance['name'])
+            components.append(alliance_str)
+
+        if playoff:
+            level = playoff.get('level')
+            status = playoff.get('status')
+            record = playoff.get('record')
+            playoff_average = playoff.get('qual_average')
+
+            if status == 'won':
+                if level == 'f':
+                    playoff_str = '<b>won the event</b>'
+                else:
+                    playoff_str = '<b>won the {}</b>'.format(Match.COMP_LEVELS_VERBOSE_FULL[level])
+            elif status == 'competing':
+                playoff_str = 'is <b>competing in the {}</b>'.format(Match.COMP_LEVELS_VERBOSE_FULL[level])
+            elif status == 'eliminated':
+                playoff_str = 'was <b>eliminated in the {}</b>'.format(Match.COMP_LEVELS_VERBOSE_FULL[level])
+
+            if record:
+                record_str = '{}-{}-{}'.format(record['wins'], record['losses'], record['ties'])
+                if status == 'competing':
+                    playoff_str += ' and is currently <b>{}</b>'.format(record_str)
+                else:
+                    playoff_str += ' with a playoff record of <b>{}</b>'.format(record_str)
+
+            components.append(playoff_str)
+
+        if not components:
+            return None
+
+        team_str = 'Team {}'.format(team_key[3:])
+        if len(components) > 1:
+            components[-1] = 'and {}'.format(components[-1])
+
+        return '{} {}.'.format(team_str, ', '.join(components))
 
     @classmethod
     def generate_team_at_event_status(cls, team_key, event, matches=None):

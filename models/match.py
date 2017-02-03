@@ -27,6 +27,13 @@ class Match(ndb.Model):
         "sf": "Semis",
         "f": "Finals",
     }
+    COMP_LEVELS_VERBOSE_FULL = {
+        "qm": "Qualification",
+        "ef": "Octo-finals",
+        "qf": "Quarterfinals",
+        "sf": "Semifinals",
+        "f": "Finals",
+    }
     COMP_LEVELS_PLAY_ORDER = {
         'qm': 1,
         'ef': 2,
