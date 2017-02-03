@@ -79,17 +79,33 @@ class MatchManipulator(ManipulatorBase):
             except Exception:
                 logging.warning("Enqueuing Firebase push failed!")
 
-        # Enqueue task to calculate matchstats
         for event_key in event_keys:
-            taskqueue.add(
-                url='/tasks/math/do/event_matchstats/' + event_key,
-                method='GET')
+            # Enqueue task to calculate matchstats
+            try:
+                taskqueue.add(
+                    url='/tasks/math/do/event_matchstats/' + event_key,
+                    method='GET')
+            except Exception:
+                logging.error("Error enqueuing event_matchstats for {}".format(event_key))
+                logging.error(traceback.format_exc())
 
-        # Enqueue task to calculate district points
-        for event_key in event_keys:
-            taskqueue.add(
-                url='/tasks/math/do/district_points_calc/{}'.format(event_key),
-                method='GET')
+            # Enqueue task to calculate district points
+            try:
+                taskqueue.add(
+                    url='/tasks/math/do/district_points_calc/{}'.format(event_key),
+                    method='GET')
+            except Exception:
+                logging.error("Error enqueuing district_points_calc for {}".format(event_key))
+                logging.error(traceback.format_exc())
+
+            # Enqueue task to calculate event team status
+            try:
+                taskqueue.add(
+                    url='/tasks/math/do/event_team_status/{}'.format(event_key),
+                    method='GET')
+            except Exception:
+                logging.error("Error enqueuing event_team_status for {}".format(event_key))
+                logging.error(traceback.format_exc())
 
     @classmethod
     def updateMerge(self, new_match, old_match, auto_union=True):

@@ -8,7 +8,6 @@ import re
 
 from consts.district_type import DistrictType
 from consts.event_type import EventType
-from consts.ranking_indexes import RankingIndexes
 from context_cache import context_cache
 from helpers.location_helper import LocationHelper
 from models.district import District

@@ -44,6 +44,15 @@ class EventDetailsManipulator(ManipulatorBase):
                 logging.error("Error enqueuing district_points_calc for {}".format(event.key.id()))
                 logging.error(traceback.format_exc())
 
+            # Enqueue task to calculate event team status
+            try:
+                taskqueue.add(
+                    url='/tasks/math/do/event_team_status/{}'.format(event.key.id()),
+                    method='GET')
+            except Exception:
+                logging.error("Error enqueuing event_team_status for {}".format(event.key.id()))
+                logging.error(traceback.format_exc())
+
     @classmethod
     def updateMerge(self, new_event_details, old_event_details, auto_union=True):
         """
