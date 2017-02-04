@@ -558,26 +558,44 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
     def testEventWinner(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc359', self.event)
         self.assertDictEqual(status, self.status_359)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
+            'Team 359 had a record of <b>11-1-0</b> in quals and <b>won the event</b> with a playoff record of <b>6-1-0</b>.')
 
     def testElimSemisAndFirstPick(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc5240', self.event)
         self.assertDictEqual(status, self.status_5240)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5240', status),
+            'Team 5240 had a record of <b>9-3-0</b> in quals and was <b>eliminated in the Semifinals</b> with a playoff record of <b>2-3-0</b>.')
 
     def testBackupOut(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc229', self.event)
         self.assertDictEqual(status, self.status_229)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc229', status),
+            'Team 229 had a record of <b>6-6-0</b> in quals and was <b>eliminated in the Finals</b> with a playoff record of <b>5-3-0</b>.')
 
     def testBackupIn(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc1665', self.event)
         self.assertDictEqual(status, self.status_1665)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc1665', status),
+            'Team 1665 had a record of <b>6-6-0</b> in quals and was <b>eliminated in the Finals</b> with a playoff record of <b>5-3-0</b>.')
 
     def testTeamNotPicked(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc5964', self.event)
         self.assertDictEqual(status, self.status_5964)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5964', status),
+            'Team 5964 had a record of <b>6-6-0</b> in quals.')
 
     def testTeamNotThere(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc1124', self.event)
         self.assertDictEqual(status, self.status_1124)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc1124', status),
+            None)
 
 
 class Test2016casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
@@ -633,9 +651,12 @@ class Test2016casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def testEventWinner(self):
+    def testEventSurrogate(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc254', self.event)
         self.assertDictEqual(status, self.status_254)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc254', status),
+            'Team 254 had a record of <b>8-0-0</b> in quals and <b>won the event</b> with a playoff record of <b>6-0-0</b>.')
 
 
 class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
@@ -682,11 +703,7 @@ class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
         },
         "playoff": {
             "level": "f",
-            "record": {
-                "wins": 2,
-                "losses": 0,
-                "ties": 0
-            },
+            "record": None,
             "current_level_record": {
                 "wins": 2,
                 "losses": 0,
@@ -746,16 +763,8 @@ class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
         },
         "playoff": {
             "level": "sf",
-            "record": {
-                "wins": 0,
-                "losses": 0,
-                "ties": 0
-            },
-            "current_level_record": {
-                "wins": 0,
-                "losses": 0,
-                "ties": 0
-            },
+            "record": None,
+            "current_level_record": None,
             "playoff_average": 133.6,
             "status": "eliminated"
         },
@@ -834,6 +843,7 @@ class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
                       post_processor=self.event_key_adder)
         self.event = Event.get_by_id('2015casj')
         self.assertIsNotNone(self.event)
+        self.maxDiff = None
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -841,18 +851,30 @@ class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
     def testEventWinner(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc254', self.event)
         self.assertDictEqual(status, self.status_254)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc254', status),
+            'Team 254 was <b>Rank 1/57</b> with an average score of <b>200.4</b> in quals, competed in the playoffs as the <b>Captain</b> on <b>Alliance 1</b>, and <b>won the event</b> with a playoff average of <b>224.1</b>.')
 
     def testElimSemisAndFirstPick(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc846', self.event)
         self.assertDictEqual(status, self.status_846)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc846', status),
+            'Team 846 was <b>Rank 8/57</b> with an average score of <b>97.0</b> in quals, competed in the playoffs as the <b>1st Pick</b> on <b>Alliance 3</b>, and was <b>eliminated in the Semifinals</b> with a playoff average of <b>133.6</b>.')
 
     def testTeamNotPicked(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc8', self.event)
         self.assertDictEqual(status, self.status_8)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc8', status),
+            'Team 8 was <b>Rank 53/57</b> with an average score of <b>42.6</b> in quals.')
 
     def testTeamNotThere(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc1124', self.event)
         self.assertDictEqual(status, self.status_1124)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc1124', status),
+            None)
 
 
 class Test2015casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
@@ -868,11 +890,7 @@ class Test2015casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
         },
         "playoff": {
             "level": "f",
-            "record": {
-                "wins": 2,
-                "losses": 0,
-                "ties": 0
-            },
+            "record": None,
             "current_level_record": {
                 "wins": 2,
                 "losses": 0,
@@ -896,16 +914,8 @@ class Test2015casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
         },
         "playoff": {
             "level": "sf",
-            "record": {
-                "wins": 0,
-                "losses": 0,
-                "ties": 0
-            },
-            "current_level_record": {
-                "wins": 0,
-                "losses": 0,
-                "ties": 0
-            },
+            "record": None,
+            "current_level_record": None,
             "playoff_average": 133.6,
             "status": "eliminated"
         },
@@ -956,15 +966,27 @@ class Test2015casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
     def testEventWinner(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc254', self.event)
         self.assertDictEqual(status, self.status_254)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc254', status),
+            'Team 254 had an average score of <b>200.4</b> in quals and <b>won the event</b> with a playoff average of <b>224.1</b>.')
 
     def testElimSemisAndFirstPick(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc846', self.event)
         self.assertDictEqual(status, self.status_846)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc846', status),
+            'Team 846 had an average score of <b>97.0</b> in quals and was <b>eliminated in the Semifinals</b> with a playoff average of <b>133.6</b>.')
 
     def testTeamNotPicked(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc8', self.event)
         self.assertDictEqual(status, self.status_8)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc8', status),
+            'Team 8 had an average score of <b>42.6</b> in quals.')
 
     def testTeamNotThere(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc1124', self.event)
         self.assertDictEqual(status, self.status_1124)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc1124', status),
+            None)

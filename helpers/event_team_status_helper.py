@@ -28,16 +28,25 @@ class EventTeamStatusHelper(object):
             record = qual.get('record')
             qual_average = qual.get('qual_average')
 
+            total_str = ''
+            if total:
+                total_str = '/{}'.format(total)
+
+            qual_str = None
             if record:
                 record_str = '{}-{}-{}'.format(record['wins'], record['losses'], record['ties'])
                 if rank:
-                    total_str = ''
-                    if total:
-                        total_str = '/{}'.format(total)
                     qual_str = 'was <b>Rank {}{}</b> with a record of <b>{}</b> in quals'.format(rank, total_str, record_str)
                 else:
                     qual_str = 'had a record of <b>{}</b> in quals'.format(record_str)
-            components.append(qual_str)
+            elif qual_average:
+                if rank:
+                    qual_str = 'was <b>Rank {}{}</b> with an average score of <b>{:.1f}</b> in quals'.format(rank, total_str, qual_average)
+                else:
+                    qual_str = 'had an average score of <b>{:.1f}</b> in quals'.format(qual_average)
+
+            if qual_str:
+                components.append(qual_str)
 
         if alliance:
             pick = alliance['pick']
@@ -56,8 +65,9 @@ class EventTeamStatusHelper(object):
             level = playoff.get('level')
             status = playoff.get('status')
             record = playoff.get('record')
-            playoff_average = playoff.get('qual_average')
+            playoff_average = playoff.get('playoff_average')
 
+            playoff_str = None
             if status == 'won':
                 if level == 'f':
                     playoff_str = '<b>won the event</b>'
@@ -74,8 +84,11 @@ class EventTeamStatusHelper(object):
                     playoff_str += ' and is currently <b>{}</b>'.format(record_str)
                 else:
                     playoff_str += ' with a playoff record of <b>{}</b>'.format(record_str)
+            elif playoff_average:
+                playoff_str += ' with a playoff average of <b>{:.1f}</b>'.format(playoff_average)
 
-            components.append(playoff_str)
+            if playoff_str:
+                components.append(playoff_str)
 
         if not components:
             return None
@@ -83,8 +96,12 @@ class EventTeamStatusHelper(object):
         team_str = 'Team {}'.format(team_key[3:])
         if len(components) > 1:
             components[-1] = 'and {}'.format(components[-1])
+        if len(components) > 2:
+            join_str = ', '
+        else:
+            join_str = ' '
 
-        return '{} {}.'.format(team_str, ', '.join(components))
+        return '{} {}.'.format(team_str, join_str.join(components))
 
     @classmethod
     def generate_team_at_event_status(cls, team_key, event, matches=None):
@@ -265,14 +282,14 @@ class EventTeamStatusHelper(object):
                             'wins': level_wins,
                             'losses': level_losses,
                             'ties': level_ties
-                        }
+                        } if year != 2015 or comp_level == 'f' else None
 
         if status:
             status['record'] =  {
                 'wins': all_wins,
                 'losses': all_losses,
                 'ties': all_ties
-            }
+            } if year != 2015 else None
             status['playoff_average'] = np.mean(playoff_scores) if year == 2015 else None
         return status
 
