@@ -20,6 +20,7 @@ from helpers.team_manipulator import TeamManipulator
 from helpers.match_manipulator import MatchManipulator
 from helpers.memcache.memcache_webcast_flusher import MemcacheWebcastFlusher
 from models.award import Award
+from models.district import District
 from models.event import Event
 from models.event_details import EventDetails
 from models.event_team import EventTeam
@@ -350,7 +351,7 @@ class AdminEventEdit(LoggedInHandler):
             end_date=end_date,
             event_short=self.request.get("event_short"),
             event_type_enum=EventHelper.parseEventType(self.request.get("event_type_str")),
-            event_district_enum=EventHelper.parseDistrictName(self.request.get("event_district_str")),
+            district_key=ndb.Key(District, self.request.get("event_district_key")) if self.request.get("event_district_key", None) else None,
             venue=self.request.get("venue"),
             venue_address=self.request.get("venue_address"),
             city=self.request.get("city"),

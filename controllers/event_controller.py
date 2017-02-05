@@ -11,6 +11,8 @@ from google.appengine.ext.webapp import template
 from base_controller import CacheableHandler
 from consts.district_type import DistrictType
 from database import event_query, media_query
+from database.district_query import DistrictsInYearQuery, DistrictQuery
+from database.event_query import EventQuery
 from helpers.match_helper import MatchHelper
 from helpers.award_helper import AwardHelper
 from helpers.team_helper import TeamHelper
@@ -60,6 +62,7 @@ class EventList(CacheableHandler):
     def _render(self, year=None, explicit_year=False):
         state_prov = self.request.get('state_prov', None)
 
+        districts_future = DistrictsInYearQuery(year).fetch_async()
         all_events_future = event_query.EventListQuery(year).fetch_async()  # Needed for state_prov
         if state_prov:
             events_future = Event.query(Event.year==year, Event.state_prov==state_prov).fetch_async()
@@ -74,15 +77,9 @@ class EventList(CacheableHandler):
 
         week_events = EventHelper.groupByWeek(events)
 
-        district_enums = set()
-        for event in events:
-            if event.event_district_enum is not None and event.event_district_enum != DistrictType.NO_DISTRICT:
-                district_enums.add(event.event_district_enum)
-
         districts = []  # a tuple of (district abbrev, district name)
-        for district_enum in district_enums:
-            districts.append((DistrictType.type_abbrevs[district_enum],
-                              DistrictType.type_names[district_enum]))
+        for district in districts_future.get_result():
+            districts.append((district.abbreviation, district.display_name))
         districts = sorted(districts, key=lambda d: d[1])
 
         valid_state_provs = set()
@@ -133,7 +130,7 @@ class EventDetail(CacheableHandler):
         super(EventDetail, self).get(event_key)
 
     def _render(self, event_key):
-        event = Event.get_by_id(event_key)
+        event = EventQuery(event_key).fetch()
 
         if not event:
             self.abort(404)
@@ -141,6 +138,7 @@ class EventDetail(CacheableHandler):
         event.prepAwardsMatchesTeams()
         event.prep_details()
         medias_future = media_query.EventTeamsPreferredMediasQuery(event_key).fetch_async()
+        district_future = DistrictQuery(event.district_key.id()).fetch_async() if event.district_key else None
 
         awards = AwardHelper.organizeAwards(event.awards)
         cleaned_matches = MatchHelper.deleteInvalidMatches(event.matches)
@@ -193,10 +191,12 @@ class EventDetail(CacheableHandler):
         if event_insights:
             event_insights_template = 'event_partials/event_insights_{}.html'.format(event.year)
 
+        district = district_future.get_result() if district_future else None
+
         self.template_values.update({
             "event": event,
-            "district_name": DistrictType.type_names.get(event.event_district_enum, None),
-            "district_abbrev": DistrictType.type_abbrevs.get(event.event_district_enum, None),
+            "district_name": district.display_name if district else None,
+            "district_abbrev": district.abbreviation if district else None,
             "matches": matches,
             "matches_recent": matches_recent,
             "matches_upcoming": matches_upcoming,

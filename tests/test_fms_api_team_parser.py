@@ -49,7 +49,6 @@ class TestFMSAPITeamParser(unittest2.TestCase):
             self.assertNotEqual(districtTeam, None)
             self.assertEqual(districtTeam.key_name, "2015ne_frc1124")
             self.assertEqual(districtTeam.team.id(), "frc1124")
-            self.assertEqual(districtTeam.district, DistrictType.abbrevs['ne'])
             self.assertEqual(districtTeam.district_key, ndb.Key(District, '2015ne'))
 
             # Test the Robot model we get back

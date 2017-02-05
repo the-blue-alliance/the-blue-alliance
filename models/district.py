@@ -1,3 +1,5 @@
+import re
+
 from google.appengine.ext import ndb
 
 
@@ -20,6 +22,7 @@ class District(ndb.Model):
         # store set of affected references referenced keys for cache clearing
         # keys must be model properties
         self._affected_references = {
+            'key': set(),
             'year': set(),
             'abbreviation': set(),
         }
@@ -28,6 +31,16 @@ class District(ndb.Model):
     @property
     def key_name(self):
         return "{}{}".format(self.year, self.abbreviation)
+
+    @property
+    def render_name(self):
+        return self.display_name if self.display_name else "{}".format(self.abbreviation).upper()
+
+    @classmethod
+    def validate_key_name(self, district_key):
+        key_name_regex = re.compile(r'^[1-9]\d{3}[a-z]+[0-9]?$')
+        match = re.match(key_name_regex, district_key)
+        return True if match else False
 
     @classmethod
     def renderKeyName(cls, year, district_abbrev):

@@ -17,6 +17,7 @@ from consts.award_type import AwardType
 from consts.event_type import EventType
 
 from models.award import Award
+from models.district import District
 from models.district_team import DistrictTeam
 from models.event import Event
 from models.event_team import EventTeam
@@ -181,14 +182,21 @@ class TestDistrictTeamsApiController(unittest2.TestCase):
                 motto = "Infiltrating Young Minds One Robot at a Time",
         )
 
+        self.district = District(
+            id='2015ne',
+            year=2015,
+            abbreviation='ne',
+        )
+
         self.district_team = DistrictTeam(
                 id="2015ne_frc281",
                 team=self.team.key,
                 year=2015,
-                district=3
+                district_key=ndb.Key(District, '2015ne')
         )
 
         self.team.put()
+        self.district.put()
         self.district_team.put()
 
 

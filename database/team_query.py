@@ -4,6 +4,7 @@ from consts.district_type import DistrictType
 from database.dict_converters.district_converter import DistrictConverter
 from database.dict_converters.team_converter import TeamConverter
 from database.database_query import DatabaseQuery
+from models.district import District
 from models.district_team import DistrictTeam
 from models.event import Event
 from models.event_team import EventTeam
@@ -60,19 +61,15 @@ class TeamListYearQuery(DatabaseQuery):
 
 
 class DistrictTeamsQuery(DatabaseQuery):
-    CACHE_VERSION = 1
+    CACHE_VERSION = 2
     CACHE_KEY_FORMAT = 'district_teams_{}'  # (district_key)
     DICT_CONVERTER = TeamConverter
 
     @ndb.tasklet
     def _query_async(self):
         district_key = self._query_args[0]
-        year = int(district_key[:4])
-        district_abbrev = district_key[4:]
-        district_type = DistrictType.abbrevs.get(district_abbrev, None)
         district_teams = yield DistrictTeam.query(
-            DistrictTeam.year == year,
-            DistrictTeam.district == district_type).fetch_async()
+            DistrictTeam.district_key == ndb.Key(District, district_key)).fetch_async()
         team_keys = map(lambda district_team: district_team.team, district_teams)
         teams = yield ndb.get_multi_async(team_keys)
         raise ndb.Return(teams)

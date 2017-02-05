@@ -1,5 +1,5 @@
 from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
-from database.district_query import DistrictsInYearQuery, DistrictHistoryQuery
+from database.district_query import DistrictsInYearQuery, DistrictHistoryQuery, DistrictQuery
 from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
 from database.event_details_query import EventDetailsQuery
 from database.match_query import MatchQuery, EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
@@ -37,7 +37,7 @@ def award_updated(affected_refs):
 def event_updated(affected_refs):
     event_keys = filter(None, affected_refs['key'])
     years = filter(None, affected_refs['year'])
-    event_district_keys = filter(None, affected_refs['event_district_key'])
+    event_district_keys = filter(None, affected_refs['district_key'])
 
     event_team_keys_future = EventTeam.query(EventTeam.event.IN([event_key for event_key in event_keys])).fetch_async(None, keys_only=True)
 
@@ -49,7 +49,7 @@ def event_updated(affected_refs):
         queries_and_keys.append((EventListQuery(year)))
 
     for event_district_key in event_district_keys:
-        queries_and_keys.append((DistrictEventsQuery(event_district_key)))
+        queries_and_keys.append((DistrictEventsQuery(event_district_key.id())))
 
     for et_key in event_team_keys_future.get_result():
         team_key = et_key.id().split('_')[1]
@@ -191,6 +191,7 @@ def districtteam_updated(affected_refs):
 def district_updated(affected_refs):
     years = filter(None, affected_refs['year'])
     district_abbrevs = filter(None, affected_refs['abbreviation'])
+    district_keys = filter(None, affected_refs['key'])
 
     queries_and_keys = []
     for year in years:
@@ -198,5 +199,8 @@ def district_updated(affected_refs):
 
     for abbrev in district_abbrevs:
         queries_and_keys.append(DistrictHistoryQuery(abbrev))
+
+    for key in district_keys:
+        queries_and_keys.append(DistrictQuery(key.id()))
 
     return queries_and_keys

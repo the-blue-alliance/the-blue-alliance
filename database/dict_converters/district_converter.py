@@ -36,13 +36,11 @@ class DistrictListConverter(ConverterBase):
         return DISTRICT_CONVERTERS[dict_version](events)
 
     @classmethod
-    def districtListConverter_v3(cls, events):
-        districts = list()
-        district_keys = [DistrictType.type_abbrevs[event.event_district_enum] for event in events]
-        for key in district_keys:
-            if key in DistrictType.abbrevs:
-                dictionary = dict()
-                dictionary["key"] = key
-                dictionary["name"] = DistrictType.type_names[DistrictType.abbrevs[key]]
-                districts.append(dictionary)
-        return districts
+    def districtListConverter_v3(cls, districts):
+        abbreviations = list()
+        for district in districts:
+            dictionary = dict()
+            dictionary["key"] = district.abbreviation
+            dictionary["name"] = district.render_name
+            abbreviations.append(dictionary)
+        return abbreviations
