@@ -1,59 +1,68 @@
-event_properties = {
-    'simple': [
-        'key',
-        'name',
-        'year',
-        'event_code',
-        'event_type',
-        'district_type',
-        'start_date',
-        'end_date',
-        'city',
-        'state_prov',
-        'country'],
-    'keys': ['key']
-}
+simple_event_properties = [
+    'key',
+    'name',
+    'year',
+    'event_code',
+    'event_type',
+    'district_type',
+    'start_date',
+    'end_date',
+    'city',
+    'state_prov',
+    'country'
+]
 
-team_properties = {
-    'simple': [
-        'key',
-        'team_number',
-        'nickname',
-        'name',
-        'city',
-        'state_prov',
-        'country'],
-    'keys': ['key']
-}
+simple_team_properties = [
+    'key',
+    'team_number',
+    'nickname',
+    'name',
+    'city',
+    'state_prov',
+    'country'
+]
 
-match_properties = {
-    'simple': [
-        'key',
-        'event_key',
-        'comp_level',
-        'set_number',
-        'match_number',
-        'alliances',
-        'winning_alliance',
-        'time',
-        'actual_time'],
-    'keys': ['key']
-}
+simple_match_properties = [
+    'key',
+    'event_key',
+    'comp_level',
+    'set_number',
+    'match_number',
+    'alliances',
+    'winning_alliance',
+    'time',
+    'actual_time'
+]
 
 
 def filter_event_properties(events, model_type):
     if not events:
         return []
-    return [{key: event[key] for key in event_properties[model_type]} for event in events]
+    if model_type == 'simple':
+        return [{key: event[key] for key in simple_event_properties} for event in events]
+    elif model_type == 'keys':
+        return [event['key'] for event in events]
+    else:
+        raise Exception("Unknown model_type: {}".format(model_type))
 
 
 def filter_team_properties(teams, model_type):
     if not teams:
         return []
-    return [{key: team[key] for key in team_properties[model_type]} for team in teams]
+    if model_type == 'simple':
+        return [{key: team[key] for key in simple_team_properties} for team in teams]
+    elif model_type == 'keys':
+        return [team['key'] for team in teams]
+    else:
+        raise Exception("Unknown model_type: {}".format(model_type))
 
 
 def filter_match_properties(matches, model_type):
     if not matches:
         return []
-    return [{key: match[key] for key in match_properties[model_type]} for match in matches]
+    if model_type == 'simple':
+        return [{key: match[key] for key in simple_match_properties} for match in matches]
+    elif model_type == 'keys':
+        return [match['key'] for match in matches]
+    else:
+        raise Exception("Unknown model_type: {}".format(model_type))
