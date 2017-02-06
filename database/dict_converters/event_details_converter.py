@@ -4,7 +4,7 @@ from database.dict_converters.converter_base import ConverterBase
 
 class EventDetailsConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        3: 0,
+        3: 1,
     }
 
     @classmethod
