@@ -130,6 +130,11 @@ def test_fast():
     sh("python run_tests.py --test_pattern=test_event_get_short_name.py")
 
 
+@task
+def swagger():
+    sh("python swagger/generate.py")
+
+
 def setup_function():
     install_libs()
     make()
@@ -143,3 +148,4 @@ def test_function(args):
         test_pattern = " --test_pattern=*%s*" % args[0]
 
     sh("python run_tests.py%s 2> test_failures.temp" % test_pattern)
+
