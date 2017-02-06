@@ -130,22 +130,16 @@ class TeamRenderer(object):
         district_name = None
         district_abbrev = None
         team_districts = team_districts_future.get_result()
-        if year in team_districts:
-            district_key = team_districts[year]
-            district_future = DistrictQuery(district_key).fetch_async()
-        else:
-            district_future = None
+        for district in team_districts:
+            if district.year == year:
+                district_abbrev = district.abbreviation
+                district_name = district.display_name
 
         last_competed = None
         participation_years = participation_future.get_result()
         if len(participation_years) > 0:
             last_competed = max(participation_years)
         current_year = datetime.date.today().year
-
-        if district_future:
-            district = district_future.get_result()
-            district_abbrev = district.abbreviation
-            district_name = district.display_name
 
         handler.template_values.update({
             "is_canonical": is_canonical,

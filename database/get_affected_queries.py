@@ -193,6 +193,8 @@ def district_updated(affected_refs):
     district_abbrevs = filter(None, affected_refs['abbreviation'])
     district_keys = filter(None, affected_refs['key'])
 
+    district_team_keys_future = DistrictTeam.query(DistrictTeam.district_key.IN(list(district_keys))).fetch_async(None, keys_only=True)
+
     queries_and_keys = []
     for year in years:
         queries_and_keys.append(DistrictsInYearQuery(year))
@@ -202,5 +204,9 @@ def district_updated(affected_refs):
 
     for key in district_keys:
         queries_and_keys.append(DistrictQuery(key.id()))
+
+    for dt_key in district_team_keys_future.get_result():
+        team_key = dt_key.id().split('_')[1]
+        queries_and_keys.append(TeamDistrictsQuery(team_key))
 
     return queries_and_keys

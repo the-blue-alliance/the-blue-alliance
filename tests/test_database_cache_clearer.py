@@ -72,8 +72,16 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
             year=2015,
         )
 
+        self.districtteam_2016ne_frc604 = DistrictTeam(
+            id='2016ne_frc604',
+            district_key=ndb.Key(District, '2016ne'),
+            team=ndb.Key(Team, 'frc604'),
+            year=2016,
+        )
+
         self.districtteam_2015fim_frc254.put()
         self.districtteam_2015mar_frc604.put()
+        self.districtteam_2016ne_frc604.put()
 
         self.district_2015ne = District(
             id='2015ne',
@@ -202,7 +210,7 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         }
         cache_keys = [q.cache_key for q in get_affected_queries.team_updated(affected_refs)]
 
-        self.assertEqual(len(cache_keys), 12)
+        self.assertEqual(len(cache_keys), 13)
         self.assertTrue(TeamQuery('frc254').cache_key in cache_keys)
         self.assertTrue(TeamQuery('frc604').cache_key in cache_keys)
         self.assertTrue(TeamListQuery(0).cache_key in cache_keys)
@@ -212,6 +220,7 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         self.assertTrue(TeamListYearQuery(2010, 1).cache_key in cache_keys)
         self.assertTrue(DistrictTeamsQuery('2015fim').cache_key in cache_keys)
         self.assertTrue(DistrictTeamsQuery('2015mar').cache_key in cache_keys)
+        self.assertTrue(DistrictTeamsQuery('2016ne').cache_key in cache_keys)
         self.assertTrue(EventTeamsQuery('2015casj').cache_key in cache_keys)
         self.assertTrue(EventTeamsQuery('2015cama').cache_key in cache_keys)
         self.assertTrue(EventTeamsQuery('2010cama').cache_key in cache_keys)
@@ -265,9 +274,10 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         }
         cache_keys = [q.cache_key for q in get_affected_queries.district_updated(affected_refs)]
 
-        self.assertEqual(len(cache_keys), 5)
+        self.assertEqual(len(cache_keys), 6)
         self.assertTrue(DistrictsInYearQuery(2015).cache_key in cache_keys)
         self.assertTrue(DistrictsInYearQuery(2016).cache_key in cache_keys)
         self.assertTrue(DistrictHistoryQuery('ne').cache_key in cache_keys)
         self.assertTrue(DistrictHistoryQuery('chs').cache_key in cache_keys)
         self.assertTrue(DistrictQuery('2016ne').cache_key in cache_keys)
+        self.assertTrue(TeamDistrictsQuery('frc604').cache_key in cache_keys)

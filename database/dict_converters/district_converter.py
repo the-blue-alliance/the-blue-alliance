@@ -23,6 +23,7 @@ class DistrictConverter(ConverterBase):
     def districtConverter_v3(cls, district):
         district_dict = {
             'key': district.key.id(),
+            'year': district.year,
             'abbreviation': district.abbreviation,
             'display_name': district.display_name,
         }
