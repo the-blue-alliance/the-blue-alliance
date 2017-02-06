@@ -17,7 +17,6 @@ from helpers.match_helper import MatchHelper
 from helpers.award_helper import AwardHelper
 from helpers.team_helper import TeamHelper
 from helpers.event_helper import EventHelper
-from helpers.event_insights_helper import EventInsightsHelper
 from helpers.media_helper import MediaHelper
 
 from models.event import Event
@@ -186,7 +185,7 @@ class EventDetail(CacheableHandler):
         if event.district_points:
             district_points_sorted = sorted(event.district_points['points'].items(), key=lambda (team, points): -points['total'])
 
-        event_insights = EventInsightsHelper.calculate_event_insights(cleaned_matches, event.year)
+        event_insights = event.details.insights if event.details else None
         event_insights_template = None
         if event_insights:
             event_insights_template = 'event_partials/event_insights_{}.html'.format(event.year)
