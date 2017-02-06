@@ -1,4 +1,5 @@
 from database.dict_converters.converter_base import ConverterBase
+from database.dict_converters.district_converter import DistrictConverter
 
 
 class EventConverter(ConverterBase):
@@ -21,6 +22,7 @@ class EventConverter(ConverterBase):
 
     @classmethod
     def eventConverter_v3(cls, event):
+        district_future = event.district_key.get_async() if event.district_key else None
         event_dict = {
             'key': event.key.id(),
             'name': event.name,
@@ -28,8 +30,7 @@ class EventConverter(ConverterBase):
             'event_code': event.event_short,
             'event_type': event.event_type_enum,
             'event_type_string': event.event_type_str,
-            'district_type': event.event_district_enum,
-            'district_type_string': event.event_district_str,
+            'district': DistrictConverter.convert(district_future.get_result(), 3) if district_future else None,
             'first_event_id': event.first_eid,
             'year': event.year,
             'timezone': event.timezone_id,

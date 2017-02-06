@@ -13,7 +13,7 @@ from database.media_query import TeamSocialMediaQuery, TeamYearMediaQuery, Event
 from database.robot_query import TeamRobotsQuery
 from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
 
-from consts.district_type import DistrictType
+from consts.event_type import EventType
 from models.district import District
 from models.district_team import DistrictTeam
 from models.event import Event
@@ -54,9 +54,17 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
             year=2010,
         )
 
+        self.eventteam_2016necmp_frc125 = EventTeam(
+            id='2016necmp_frc125',
+            event=ndb.Key(Event, '2016necmp'),
+            team=ndb.Key(Team, 'frc125'),
+            year=2016,
+        )
+
         self.eventteam_2015casj_frc254.put()
         self.eventteam_2015cama_frc604.put()
         self.eventteam_2010cama_frc604.put()
+        self.eventteam_2016necmp_frc125.put()
 
         self.districtteam_2015fim_frc254 = DistrictTeam(
             id='2015fim_frc254',
@@ -96,6 +104,15 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         )
         self.district_2015ne.put()
         self.district_2016chs.put()
+
+        self.event_2016necmp = Event(
+            id='2016necmp',
+            year=2016,
+            district_key=ndb.Key(District, '2016ne'),
+            event_short='necmp',
+            event_type_enum=EventType.DISTRICT_CMP,
+        )
+        self.event_2016necmp.put()
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -274,10 +291,17 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         }
         cache_keys = [q.cache_key for q in get_affected_queries.district_updated(affected_refs)]
 
-        self.assertEqual(len(cache_keys), 6)
+        self.assertEqual(len(cache_keys), 11)
         self.assertTrue(DistrictsInYearQuery(2015).cache_key in cache_keys)
         self.assertTrue(DistrictsInYearQuery(2016).cache_key in cache_keys)
         self.assertTrue(DistrictHistoryQuery('ne').cache_key in cache_keys)
         self.assertTrue(DistrictHistoryQuery('chs').cache_key in cache_keys)
         self.assertTrue(DistrictQuery('2016ne').cache_key in cache_keys)
         self.assertTrue(TeamDistrictsQuery('frc604').cache_key in cache_keys)
+
+        # Necessary because APIv3 Event models include the District model
+        self.assertTrue(EventQuery('2016necmp').cache_key in cache_keys)
+        self.assertTrue(EventListQuery(2016).cache_key in cache_keys)
+        self.assertTrue(DistrictEventsQuery('2016ne').cache_key in cache_keys)
+        self.assertTrue(TeamEventsQuery('frc125').cache_key in cache_keys)
+        self.assertTrue(TeamYearEventsQuery('frc125', 2016).cache_key in cache_keys)

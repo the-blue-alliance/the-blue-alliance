@@ -8,6 +8,7 @@ from database.robot_query import TeamRobotsQuery
 from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
 
 from models.district_team import DistrictTeam
+from models.event import Event
 from models.event_team import EventTeam
 
 
@@ -194,6 +195,7 @@ def district_updated(affected_refs):
     district_keys = filter(None, affected_refs['key'])
 
     district_team_keys_future = DistrictTeam.query(DistrictTeam.district_key.IN(list(district_keys))).fetch_async(None, keys_only=True)
+    district_event_keys_future = Event.query(Event.district_key.IN(list(district_keys))).fetch_async(keys_only=True)
 
     queries_and_keys = []
     for year in years:
@@ -208,5 +210,16 @@ def district_updated(affected_refs):
     for dt_key in district_team_keys_future.get_result():
         team_key = dt_key.id().split('_')[1]
         queries_and_keys.append(TeamDistrictsQuery(team_key))
+
+    # Necessary because APIv3 Event models include the District model
+    affected_event_refs = {
+        'key': set(),
+        'year': set(),
+        'district_key': district_keys,
+    }
+    for event_key in district_event_keys_future.get_result():
+        affected_event_refs['key'].add(event_key)
+        affected_event_refs['year'].add(int(event_key.id()[:4]))
+    queries_and_keys += event_updated(affected_event_refs)
 
     return queries_and_keys

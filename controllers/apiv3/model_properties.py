@@ -4,7 +4,7 @@ simple_event_properties = [
     'year',
     'event_code',
     'event_type',
-    'district_type',
+    'district',
     'start_date',
     'end_date',
     'city',

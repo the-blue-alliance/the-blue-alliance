@@ -9,10 +9,11 @@ class DistrictConverter(ConverterBase):
 
     @classmethod
     def convert(cls, districts, dict_version):
-        DISTRICT_CONVERTERS = {
+        CONVERTERS = {
             3: cls.districtsConverter_v3,
         }
-        return DISTRICT_CONVERTERS[dict_version](districts)
+        converted_districts = CONVERTERS[dict_version](cls._listify(districts))
+        return cls._delistify(converted_districts)
 
     @classmethod
     def districtsConverter_v3(cls, districts):
