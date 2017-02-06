@@ -425,11 +425,17 @@ class TestTeamHistoryDistrictsApiController(unittest2.TestCase):
                 id="2015ne_frc1124",
                 team=self.team.key,
                 year=2015,
-                district=3
+                district_key=ndb.Key(District, '2015ne')
+        )
+
+        self.district = District(
+            id='2015ne',
+            year=2015,
         )
 
         self.team.put()
         self.district_team.put()
+        self.district.put()
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -442,4 +448,3 @@ class TestTeamHistoryDistrictsApiController(unittest2.TestCase):
         district_key = district_dict["2015"]
 
         self.assertEqual(district_key, "2015ne")
-
