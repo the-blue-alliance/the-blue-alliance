@@ -15,7 +15,7 @@ class ApiAuthAccess(ndb.Model):
     """
     # For both read and write:
     description = ndb.StringProperty(indexed=False)  # human-readable description
-    secret = ndb.StringProperty(indexed=False)
+    secret = ndb.StringProperty()
     auth_types_enum = ndb.IntegerProperty(repeated=True)  # read and write types should never be mixed
     owner = ndb.KeyProperty(kind=Account)
 
