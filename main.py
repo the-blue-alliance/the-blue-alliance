@@ -4,7 +4,9 @@ from webapp2_extras.routes import RedirectRoute
 
 import tba_config
 
-from controllers.account_controller import AccountEdit, AccountLoginRequired, AccountLogin, AccountLogout, AccountOverview, AccountRegister, MyTBAController, myTBAAddHotMatchesController, MyTBAEventController, MyTBAMatchController, MyTBATeamController
+from controllers.account_controller import AccountEdit, AccountLoginRequired, AccountLogin, AccountLogout, \
+AccountOverview, AccountRegister, MyTBAController, myTBAAddHotMatchesController, MyTBAEventController, \
+MyTBAMatchController, MyTBATeamController, AccountAPIReadKeyAdd, AccountAPIReadKeyDelete
 from controllers.advanced_search_controller import AdvancedSearchController
 from controllers.ajax_controller import AccountInfoHandler, AccountRegisterFCMToken, AccountFavoritesHandler, AccountFavoritesAddHandler, AccountFavoritesDeleteHandler, \
       YouTubePlaylistHandler, AllowedApiWriteEventsHandler
@@ -71,6 +73,8 @@ app = webapp2.WSGIApplication([
       RedirectRoute(r'/2champs', TwoChampsHandler, '2champs', strict_slash=True),
       RedirectRoute(r'/about', AboutHandler, 'about', strict_slash=True),
       RedirectRoute(r'/account', AccountOverview, 'account-overview', strict_slash=True),
+      RedirectRoute(r'/account/api/read_key_add', AccountAPIReadKeyAdd, 'account-api-read-key-add', strict_slash=True),
+      RedirectRoute(r'/account/api/read_key_delete', AccountAPIReadKeyDelete, 'account-api-read-key-delete', strict_slash=True),
       RedirectRoute(r'/account/edit', AccountEdit, 'account-edit', strict_slash=True),
       RedirectRoute(r'/account/register', AccountRegister, 'account-register', strict_slash=True),
       RedirectRoute(r'/account/login_required', AccountLoginRequired, 'account-login-required', strict_slash=True),

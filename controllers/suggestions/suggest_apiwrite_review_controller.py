@@ -75,7 +75,7 @@ TBA Admins
         self.template_values.update({
             'success': self.request.get("success"),
             'suggestions': suggestions,
-            'auth_names': AuthType.type_names,
+            'auth_names': AuthType.write_type_names,
         })
         self.response.out.write(
             jinja2_engine.render('suggestions/suggest_apiwrite_review_list.html', self.template_values))
