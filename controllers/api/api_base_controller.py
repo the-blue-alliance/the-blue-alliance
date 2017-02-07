@@ -189,7 +189,7 @@ class ApiTrustedBaseController(webapp2.RequestHandler):
 
         missing_auths = self.REQUIRED_AUTH_TYPES.difference(set(auth.auth_types_enum))
         if missing_auths != set():
-            return "You do not have permission to edit: {}. If this is incorrect, please contact TBA admin.".format(",".join([AuthType.type_names[ma] for ma in missing_auths]))
+            return "You do not have permission to edit: {}. If this is incorrect, please contact TBA admin.".format(",".join([AuthType.write_type_names[ma] for ma in missing_auths]))
 
         if auth.expiration and auth.expiration < datetime.datetime.now():
             return "These keys expired on {}. Contact TBA admin to make changes".format(auth.expiration)

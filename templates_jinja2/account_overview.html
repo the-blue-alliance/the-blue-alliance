@@ -21,6 +21,30 @@
         <h4>Oops!</h4>
         <p>Something went wrong with editing your profile. Please contact support if the problem persists.</p>
       </div>
+      {% elif status == 'read_key_add_success' %}
+        <div class="alert alert-success">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <h4>Success!</h4>
+          <p>A new read API key has been successfully added!</p>
+        </div>
+      {% elif status == 'read_key_add_no_description' %}
+      <div class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Oops!</h4>
+        <p>You must specify a description when adding a read API key. Please try again.</p>
+      </div>
+      {% elif status == 'read_key_delete_success' %}
+        <div class="alert alert-success">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <h4>Success!</h4>
+          <p>The selected read API key has been deleted.</p>
+        </div>
+      {% elif status == 'read_key_delete_failure' %}
+      <div class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4>Oops!</h4>
+        <p>Unable to delete the specified read API key. If this problem persists, please contact us.</p>
+      </div>
       {% endif %}
     </div>
   </div>
@@ -114,7 +138,55 @@
 
   <div class="row">
     <div class="col-md-10 col-md-offset-1">
-      <h2>Trusted API Keys</h2>
+      <h2>Read API Keys</h2>
+
+      <form class="form-inline pull-right" action="/account/api/read_key_add" method="post">
+        <div class="form-group">
+          <label for="form-description">Description</label>
+          <input type="text" class="form-control" id="form-description" name="description" placeholder="My Scouting App v1">
+        </div>
+        <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> Add new key</button>
+      </form>
+
+      <p>These keys allow you to access TBA's read APIv3</p>
+    </div>
+    <div class="col-md-10 col-md-offset-1">
+      <table class="table table-striped">
+        <tr>
+          <th>X-TBA-Auth-Key</th>
+          <th>Created</th>
+          <th>Description</th>
+          <th></th>
+        </tr>
+        <tbody>
+          {% for key in read_keys %}
+            <tr>
+              <td>
+                {{ key.key.id() }}
+              </td>
+              <td>
+                {{ key.created.strftime('%Y-%m-%d') }}
+              </td>
+              <td>
+                {{ key.description }}
+              </td>
+              <td>
+                <form class="form-inline" action="/account/api/read_key_delete" method="post">
+                  <input type="hidden" name="key_id" value="{{key.key.id()}}">
+                  <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <hr>
+
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+      <h2>Write API Keys</h2>
       <p>These keys allow you to import data for your offseason event to TBA</p>
     </div>
     <div class="col-md-10 col-md-offset-1">
@@ -127,7 +199,7 @@
           <th>Auth Secret</th>
         </tr>
         <tbody>
-          {% for key in trusted_keys %}
+          {% for key in write_keys %}
             <tr>
               <td>
               {% for event in key.event_list %}
@@ -137,7 +209,7 @@
               <td>
                 <ul>
                 {% for auth_type in key.auth_types_enum %}
-                  <li>{{auth_type_names[auth_type]}}</li>
+                  <li>{{auth_write_type_names[auth_type]}}</li>
                 {% endfor %}
                 </ul>
               </td>

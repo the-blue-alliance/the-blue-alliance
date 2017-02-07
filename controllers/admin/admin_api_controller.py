@@ -120,7 +120,8 @@ class AdminApiAuthManage(LoggedInHandler):
     def get(self):
         self._require_admin()
 
-        auths = ApiAuthAccess.query().fetch(None)
+        auths = ApiAuthAccess.query().fetch()
+        auths = filter(lambda auth: auth.is_write_key, auths)
 
         self.template_values.update({
             'auths': auths,

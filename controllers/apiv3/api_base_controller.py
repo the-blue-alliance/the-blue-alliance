@@ -1,59 +1,51 @@
-# import datetime
-# import json
+import json
 import logging
-# import md5
-# import random
-# import tba_config
-# import urllib
-# import uuid
+import random
+import tba_config
+import urllib
+import uuid
 import webapp2
 
-# from google.appengine.api import urlfetch
-# from google.appengine.ext import deferred
-# from google.appengine.ext import ndb
+from google.appengine.api import urlfetch
+from google.appengine.ext import deferred
 
-# from consts.auth_type import AuthType
 from controllers.base_controller import CacheableHandler
-# from datafeeds.parser_base import ParserInputException
-# from helpers.user_bundle import UserBundle
 from helpers.validation_helper import ValidationHelper
-# from models.api_auth_access import ApiAuthAccess
-# from models.cached_response import CachedResponse
-# from models.event import Event
-# from models.sitevar import Sitevar
+from models.api_auth_access import ApiAuthAccess
+from models.sitevar import Sitevar
 
 
-# # used for deferred call
-# def track_call(api_action, api_label, x_tba_app_id):
-#     """
-#     For more information about GAnalytics Protocol Parameters, visit
-#     https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
-#     """
-#     analytics_id = Sitevar.get_by_id("google_analytics.id")
-#     if analytics_id is None:
-#         logging.warning("Missing sitevar: google_analytics.id. Can't track API usage.")
-#     else:
-#         GOOGLE_ANALYTICS_ID = analytics_id.contents['GOOGLE_ANALYTICS_ID']
-#         payload = urllib.urlencode({
-#             'v': 1,
-#             'tid': GOOGLE_ANALYTICS_ID,
-#             'cid': uuid.uuid3(uuid.NAMESPACE_X500, str(x_tba_app_id)),
-#             't': 'event',
-#             'ec': 'api-v03',
-#             'ea': api_action,
-#             'el': api_label,
-#             'cd1': x_tba_app_id,  # custom dimension 1
-#             'ni': 1,
-#             'sc': 'end',  # forces tracking session to end
-#         })
+# used for deferred call
+def track_call(api_action, api_label, auth_owner):
+    """
+    For more information about GAnalytics Protocol Parameters, visit
+    https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
+    """
+    analytics_id = Sitevar.get_by_id("google_analytics.id")
+    if analytics_id is None:
+        logging.warning("Missing sitevar: google_analytics.id. Can't track API usage.")
+    else:
+        GOOGLE_ANALYTICS_ID = analytics_id.contents['GOOGLE_ANALYTICS_ID']
+        payload = urllib.urlencode({
+            'v': 1,
+            'tid': GOOGLE_ANALYTICS_ID,
+            'cid': uuid.uuid3(uuid.NAMESPACE_X500, str(auth_owner)),
+            't': 'event',
+            'ec': 'api-v03',
+            'ea': api_action,
+            'el': api_label,
+            'cd1': auth_owner,  # custom dimension 1
+            'ni': 1,
+            'sc': 'end',  # forces tracking session to end
+        })
 
-#         urlfetch.fetch(
-#             url='https://www.google-analytics.com/collect',
-#             validate_certificate=True,
-#             method=urlfetch.POST,
-#             deadline=30,
-#             payload=payload,
-#         )
+        urlfetch.fetch(
+            url='https://www.google-analytics.com/collect',
+            validate_certificate=True,
+            method=urlfetch.POST,
+            deadline=30,
+            payload=payload,
+        )
 
 
 class ApiBaseController(CacheableHandler):
@@ -84,7 +76,7 @@ class ApiBaseController(CacheableHandler):
             self.response.set_status(500)
 
     def get(self, *args, **kw):
-        # self._validate_tba_app_id()
+        self._validate_tba_auth_key()
         self._errors = ValidationHelper.validate_request(self)
         if self._errors:
             self.abort(400)
@@ -100,28 +92,28 @@ class ApiBaseController(CacheableHandler):
         https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests
         """
         self.response.headers['Access-Control-Allow-Methods'] = "GET, OPTIONS"
-        # self.response.headers['Access-Control-Allow-Headers'] = 'X-TBA-App-Id'
+        self.response.headers['Access-Control-Allow-Headers'] = 'X-TBA-Auth-Key'
 
     def _track_call_defer(self, api_action, api_label):
-        return
-        # if random.random() < tba_config.GA_RECORD_FRACTION:
-        #     deferred.defer(track_call, api_action, api_label, self.x_tba_app_id, _queue="api-track-call")
+        if random.random() < tba_config.GA_RECORD_FRACTION:
+            deferred.defer(track_call, api_action, api_label, self.auth_owner, _queue="api-track-call")
 
-    # def _validate_tba_app_id(self):
-    #     """
-    #     Tests the presence of a X-TBA-App-Id header or URL param.
-    #     """
-    #     self.x_tba_app_id = self.request.headers.get("X-TBA-App-Id")
-    #     if self.x_tba_app_id is None:
-    #         self.x_tba_app_id = self.request.get('X-TBA-App-Id')
+    def _validate_tba_auth_key(self):
+        """
+        Tests the presence of a X-TBA-Auth-Key header or URL param.
+        """
+        x_tba_auth_key = self.request.headers.get("X-TBA-Auth-Key")
+        if x_tba_auth_key is None:
+            x_tba_auth_key = self.request.get('X-TBA-Auth-Key')
 
-    #     logging.info("X-TBA-App-Id: {}".format(self.x_tba_app_id))
-    #     if not self.x_tba_app_id:
-    #         self._errors = json.dumps({"Error": "X-TBA-App-Id is a required header or URL param. Please see http://www.thebluealliance.com/apidocs for more info."})
-    #         self.abort(400)
+        if not x_tba_auth_key:
+            self._errors = json.dumps({"Error": "X-TBA-Auth-Key is a required header or URL param. Please get an access key at http://www.thebluealliance.com/account."})
+            self.abort(400)
 
-    #     x_tba_app_id_parts = self.x_tba_app_id.split(':')
-
-    #     if len(x_tba_app_id_parts) != 3 or any(len(part) == 0 for part in x_tba_app_id_parts):
-    #         self._errors = json.dumps({"Error": "X-TBA-App-Id must follow a specific format. Please see http://www.thebluealliance.com/apidocs for more info."})
-    #         self.abort(400)
+        auth = ApiAuthAccess.get_by_id(x_tba_auth_key)
+        if auth and auth.is_read_key:
+            self.auth_owner = auth.owner.id()
+            logging.info("Auth owner: {}, X-TBA-Auth-Key: {}".format(self.auth_owner, x_tba_auth_key))
+        else:
+            self._errors = json.dumps({"Error": "X-TBA-Auth-Key is invalid. Please get an access key at http://www.thebluealliance.com/account."})
+            self.abort(400)
