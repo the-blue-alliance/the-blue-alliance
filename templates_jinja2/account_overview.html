@@ -162,7 +162,7 @@
           {% for key in read_keys %}
             <tr>
               <td>
-                {{ key.secret }}
+                {{ key.key.id() }}
               </td>
               <td>
                 {{ key.created.strftime('%Y-%m-%d') }}

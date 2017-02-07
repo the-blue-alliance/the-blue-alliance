@@ -188,9 +188,9 @@ class AccountAPIReadKeyAdd(LoggedInHandler):
         description = self.request.get('description')
         if description:
             ApiAuthAccess(
+                id=''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for _ in range(64)),
                 owner=self.user_bundle.account.key,
                 auth_types_enum=[AuthType.READ_API],
-                secret=''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for _ in range(64)),
                 description=description,
             ).put()
             self.redirect('/account?status=read_key_add_success')
@@ -203,10 +203,7 @@ class AccountAPIReadKeyDelete(LoggedInHandler):
         self._require_registration()
 
         key_id = self.request.get('key_id')
-        if key_id and key_id.isdigit():
-            auth = ApiAuthAccess.get_by_id(int(key_id))
-        else:
-            auth = None
+        auth = ApiAuthAccess.get_by_id(key_id)
 
         if auth and auth.owner == self.user_bundle.account.key:
             auth.key.delete()

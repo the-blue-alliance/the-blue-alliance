@@ -9,10 +9,10 @@ import webapp2
 from google.appengine.api import urlfetch
 from google.appengine.ext import deferred
 
-from consts.auth_type import AuthType
 from controllers.base_controller import CacheableHandler
 from helpers.validation_helper import ValidationHelper
 from models.api_auth_access import ApiAuthAccess
+from models.sitevar import Sitevar
 
 
 # used for deferred call
@@ -110,11 +110,9 @@ class ApiBaseController(CacheableHandler):
             self._errors = json.dumps({"Error": "X-TBA-Auth-Key is a required header or URL param. Please get an access key at http://www.thebluealliance.com/account."})
             self.abort(400)
 
-        auth = ApiAuthAccess.query(
-            ApiAuthAccess.secret==x_tba_auth_key,
-            ApiAuthAccess.auth_types_enum==AuthType.READ_API).fetch(1)
-        if auth:
-            self.auth_owner = auth[0].owner.id()
+        auth = ApiAuthAccess.get_by_id(x_tba_auth_key)
+        if auth and auth.is_read_key:
+            self.auth_owner = auth.owner.id()
             logging.info("Auth owner: {}, X-TBA-Auth-Key: {}".format(self.auth_owner, x_tba_auth_key))
         else:
             self._errors = json.dumps({"Error": "X-TBA-Auth-Key is invalid. Please get an access key at http://www.thebluealliance.com/account."})

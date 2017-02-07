@@ -8,14 +8,13 @@ from models.event import Event
 class ApiAuthAccess(ndb.Model):
     """
     Manages secrets for access to the read and write APIs.
+    Models are fetched by ID, which will be some randomly generated alphanumeric string
 
     For the write API:
     - Access may be granted for more than one event.
-    - Models are fetched by ID, which will be some randomly generated alphanumeric string
     """
     # For both read and write:
     description = ndb.StringProperty(indexed=False)  # human-readable description
-    secret = ndb.StringProperty()
     auth_types_enum = ndb.IntegerProperty(repeated=True)  # read and write types should never be mixed
     owner = ndb.KeyProperty(kind=Account)
 
@@ -23,6 +22,7 @@ class ApiAuthAccess(ndb.Model):
     updated = ndb.DateTimeProperty(auto_now=True)
 
     # Write only:
+    secret = ndb.StringProperty(indexed=False)
     event_list = ndb.KeyProperty(kind=Event, repeated=True)  # events for which auth is granted
     expiration = ndb.DateTimeProperty()
 
