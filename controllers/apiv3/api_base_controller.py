@@ -10,7 +10,6 @@ from google.appengine.api import urlfetch
 from google.appengine.ext import deferred
 
 from controllers.base_controller import CacheableHandler
-from helpers.user_bundle import UserBundle
 from helpers.validation_helper import ValidationHelper
 from models.api_auth_access import ApiAuthAccess
 from models.sitevar import Sitevar
