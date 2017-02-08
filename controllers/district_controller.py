@@ -11,7 +11,6 @@ from consts.event_type import EventType
 from database.district_query import DistrictQuery, DistrictHistoryQuery, DistrictsInYearQuery
 from database.event_query import DistrictEventsQuery
 from database.team_query import DistrictTeamsQuery, EventTeamsQuery
-from helpers.district_helper import DistrictHelper
 from helpers.event_helper import EventHelper
 from helpers.event_team_status_helper import EventTeamStatusHelper
 from helpers.team_helper import TeamHelper
@@ -73,11 +72,10 @@ class DistrictDetail(CacheableHandler):
 
         events = events_future.get_result()
         EventHelper.sort_events(events)
+        events_by_key = {}
+        for event in events:
+            events_by_key[event.key.id()] = event
         week_events = EventHelper.groupByWeek(events)
-
-        team_totals = DistrictHelper.calculate_rankings(events,
-                                                        district_teams_future.get_result(),
-                                                        year)
 
         valid_districts = set()
         districts_in_year = districts_in_year_future.get_result()
@@ -110,7 +108,8 @@ class DistrictDetail(CacheableHandler):
             'district_name': district.display_name,
             'district_abbrev': district_abbrev,
             'week_events': week_events,
-            'team_totals': team_totals,
+            'events_by_key': events_by_key,
+            'rankings': district.rankings,
             'teams_a': teams_a,
             'teams_b': teams_b,
             'live_events_with_teams': live_events_with_teams,
