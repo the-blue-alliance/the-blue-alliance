@@ -10,6 +10,7 @@ from google.appengine.api import urlfetch
 from google.appengine.ext import deferred
 
 from controllers.base_controller import CacheableHandler
+from helpers.user_bundle import UserBundle
 from helpers.validation_helper import ValidationHelper
 from models.api_auth_access import ApiAuthAccess
 from models.sitevar import Sitevar
@@ -106,14 +107,22 @@ class ApiBaseController(CacheableHandler):
         if x_tba_auth_key is None:
             x_tba_auth_key = self.request.get('X-TBA-Auth-Key')
 
+        self.auth_owner = None
         if not x_tba_auth_key:
-            self._errors = json.dumps({"Error": "X-TBA-Auth-Key is a required header or URL param. Please get an access key at http://www.thebluealliance.com/account."})
-            self.abort(400)
+            account = self._user_bundle.account
+            if account:
+                self.auth_owner = account.key.id()
+            else:
+                self._errors = json.dumps({"Error": "X-TBA-Auth-Key is a required header or URL param. Please get an access key at http://www.thebluealliance.com/account."})
+                self.abort(400)
 
-        auth = ApiAuthAccess.get_by_id(x_tba_auth_key)
-        if auth and auth.is_read_key:
-            self.auth_owner = auth.owner.id()
-            logging.info("Auth owner: {}, X-TBA-Auth-Key: {}".format(self.auth_owner, x_tba_auth_key))
+        if self.auth_owner:
+            logging.info("Auth owner: {}, LOGGED IN".format(self.auth_owner))
         else:
-            self._errors = json.dumps({"Error": "X-TBA-Auth-Key is invalid. Please get an access key at http://www.thebluealliance.com/account."})
-            self.abort(400)
+            auth = ApiAuthAccess.get_by_id(x_tba_auth_key)
+            if auth and auth.is_read_key:
+                self.auth_owner = auth.owner.id()
+                logging.info("Auth owner: {}, X-TBA-Auth-Key: {}".format(self.auth_owner, x_tba_auth_key))
+            else:
+                self._errors = json.dumps({"Error": "X-TBA-Auth-Key is invalid. Please get an access key at http://www.thebluealliance.com/account."})
+                self.abort(400)
