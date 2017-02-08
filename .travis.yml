@@ -11,15 +11,15 @@ before_install:
 
 install:
   # Python test requirements
-  - pip install -r travis_requirements.txt
+  - travis_retry pip install -r travis_requirements.txt
   - paver install_libs
 
-  - wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.40.zip -nv
+  - travis_retry wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.40.zip -nv
   - unzip -q google_appengine_1.9.40.zip
   - export PYTHONPATH=${PYTHONPATH}:google_appengine
 
   # JavaScript test requirements
-  - npm install
+  - travis_retry npm install
 
 before_script:
   - paver make
