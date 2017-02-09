@@ -42,7 +42,7 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
             end_date=end_date,
             event_short=self.request.get("event_short"),
             event_type_enum=EventType.OFFSEASON,
-            event_district_enum=DistrictType.NO_DISTRICT,
+            district_key=None,
             venue=self.request.get("venue"),
             venue_address=self.request.get("venue_address"),
             city=self.request.get("city"),
@@ -106,7 +106,7 @@ class SuggestOffseasonEventReviewController(SuggestionsReviewBaseController):
         return suggestion.key.id(), Event(
             end_date=end_date,
             event_type_enum=EventType.OFFSEASON,
-            event_district_enum=DistrictType.NO_DISTRICT,
+            district_key=None,
             venue=venue,
             city=city,
             state_prov=state,

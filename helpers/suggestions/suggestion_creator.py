@@ -225,7 +225,7 @@ class SuggestionCreator(object):
                     target_key=event_key,
                 )
                 auth_types = [int(type) for type in auth_types]
-                clean_auth_types = filter(lambda a: a in AuthType.type_names.keys(), auth_types)
+                clean_auth_types = filter(lambda a: a in AuthType.write_type_names.keys(), auth_types)
 
                 # If we're requesting keys for an official event, filter out everything but videos
                 # Admin can still override this at review time, but it's unlikely

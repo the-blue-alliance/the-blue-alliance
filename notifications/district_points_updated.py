@@ -7,10 +7,9 @@ class DistrictPointsUpdatedNotification(BaseNotification):
 
     # disrict_key is like <year><enum>
     # Example: 2014ne
-    def __init__(self, district_key):
-        self.district_key = district_key
-        self.district_enum = DistrictType.abbrevs[district_key[4:]]
-        self._district_feed = self.district_enum
+    def __init__(self, district):
+        self.district_key = district.key_name
+        self.district_name = district.display_name
 
     @property
     def _type(self):
@@ -21,5 +20,5 @@ class DistrictPointsUpdatedNotification(BaseNotification):
         data['message_type'] = NotificationType.type_names[self._type]
         data['message_data'] = {}
         data['message_data']['district_key'] = self.district_key
-        data['message_data']['district_name'] = DistrictType.names[self.district_enum]
+        data['message_data']['district_name'] = self.district_name
         return data

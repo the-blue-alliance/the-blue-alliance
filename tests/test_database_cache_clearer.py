@@ -5,7 +5,7 @@ from google.appengine.ext import testbed
 
 from database import get_affected_queries
 from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
-from database.district_query import DistrictsInYearQuery, DistrictHistoryQuery
+from database.district_query import DistrictsInYearQuery, DistrictHistoryQuery, DistrictQuery
 from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
 from database.event_details_query import EventDetailsQuery
 from database.match_query import MatchQuery, EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
@@ -13,7 +13,7 @@ from database.media_query import TeamSocialMediaQuery, TeamYearMediaQuery, Event
 from database.robot_query import TeamRobotsQuery
 from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
 
-from consts.district_type import DistrictType
+from consts.event_type import EventType
 from models.district import District
 from models.district_team import DistrictTeam
 from models.event import Event
@@ -54,26 +54,42 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
             year=2010,
         )
 
+        self.eventteam_2016necmp_frc125 = EventTeam(
+            id='2016necmp_frc125',
+            event=ndb.Key(Event, '2016necmp'),
+            team=ndb.Key(Team, 'frc125'),
+            year=2016,
+        )
+
         self.eventteam_2015casj_frc254.put()
         self.eventteam_2015cama_frc604.put()
         self.eventteam_2010cama_frc604.put()
+        self.eventteam_2016necmp_frc125.put()
 
         self.districtteam_2015fim_frc254 = DistrictTeam(
             id='2015fim_frc254',
-            district=DistrictType.MICHIGAN,
+            district_key=ndb.Key(District, '2015fim'),
             team=ndb.Key(Team, 'frc254'),
             year=2015,
         )
 
         self.districtteam_2015mar_frc604 = DistrictTeam(
             id='2015mar_frc604',
-            district=DistrictType.MID_ATLANTIC,
+            district_key=ndb.Key(District, '2015mar'),
             team=ndb.Key(Team, 'frc604'),
             year=2015,
         )
 
+        self.districtteam_2016ne_frc604 = DistrictTeam(
+            id='2016ne_frc604',
+            district_key=ndb.Key(District, '2016ne'),
+            team=ndb.Key(Team, 'frc604'),
+            year=2016,
+        )
+
         self.districtteam_2015fim_frc254.put()
         self.districtteam_2015mar_frc604.put()
+        self.districtteam_2016ne_frc604.put()
 
         self.district_2015ne = District(
             id='2015ne',
@@ -88,6 +104,15 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         )
         self.district_2015ne.put()
         self.district_2016chs.put()
+
+        self.event_2016necmp = Event(
+            id='2016necmp',
+            year=2016,
+            district_key=ndb.Key(District, '2016ne'),
+            event_short='necmp',
+            event_type_enum=EventType.DISTRICT_CMP,
+        )
+        self.event_2016necmp.put()
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -118,7 +143,7 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         affected_refs = {
             'key': {ndb.Key(Event, '2015casj'), ndb.Key(Event, '2015cama')},
             'year': {2014, 2015},
-            'event_district_key': {'2015fim', '2014mar'}
+            'district_key': {ndb.Key(District, '2015fim'), ndb.Key(District, '2014mar')}
         }
         cache_keys = [q.cache_key for q in get_affected_queries.event_updated(affected_refs)]
 
@@ -202,7 +227,7 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         }
         cache_keys = [q.cache_key for q in get_affected_queries.team_updated(affected_refs)]
 
-        self.assertEqual(len(cache_keys), 12)
+        self.assertEqual(len(cache_keys), 13)
         self.assertTrue(TeamQuery('frc254').cache_key in cache_keys)
         self.assertTrue(TeamQuery('frc604').cache_key in cache_keys)
         self.assertTrue(TeamListQuery(0).cache_key in cache_keys)
@@ -212,6 +237,7 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
         self.assertTrue(TeamListYearQuery(2010, 1).cache_key in cache_keys)
         self.assertTrue(DistrictTeamsQuery('2015fim').cache_key in cache_keys)
         self.assertTrue(DistrictTeamsQuery('2015mar').cache_key in cache_keys)
+        self.assertTrue(DistrictTeamsQuery('2016ne').cache_key in cache_keys)
         self.assertTrue(EventTeamsQuery('2015casj').cache_key in cache_keys)
         self.assertTrue(EventTeamsQuery('2015cama').cache_key in cache_keys)
         self.assertTrue(EventTeamsQuery('2010cama').cache_key in cache_keys)
@@ -259,13 +285,23 @@ class TestDatabaseCacheClearer(unittest2.TestCase):
 
     def test_district_updated(self):
         affected_refs = {
+            'key': {ndb.Key(District, '2016ne')},
             'year': {2015, 2016},
             'abbreviation': {'ne', 'chs'}
         }
         cache_keys = [q.cache_key for q in get_affected_queries.district_updated(affected_refs)]
 
-        self.assertEqual(len(cache_keys), 4)
+        self.assertEqual(len(cache_keys), 11)
         self.assertTrue(DistrictsInYearQuery(2015).cache_key in cache_keys)
         self.assertTrue(DistrictsInYearQuery(2016).cache_key in cache_keys)
         self.assertTrue(DistrictHistoryQuery('ne').cache_key in cache_keys)
         self.assertTrue(DistrictHistoryQuery('chs').cache_key in cache_keys)
+        self.assertTrue(DistrictQuery('2016ne').cache_key in cache_keys)
+        self.assertTrue(TeamDistrictsQuery('frc604').cache_key in cache_keys)
+
+        # Necessary because APIv3 Event models include the District model
+        self.assertTrue(EventQuery('2016necmp').cache_key in cache_keys)
+        self.assertTrue(EventListQuery(2016).cache_key in cache_keys)
+        self.assertTrue(DistrictEventsQuery('2016ne').cache_key in cache_keys)
+        self.assertTrue(TeamEventsQuery('frc125').cache_key in cache_keys)
+        self.assertTrue(TeamYearEventsQuery('frc125', 2016).cache_key in cache_keys)

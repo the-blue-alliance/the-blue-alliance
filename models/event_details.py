@@ -10,6 +10,7 @@ class EventDetails(ndb.Model):
     alliance_selections = ndb.JsonProperty()  # Formatted as: [{'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] }, {'picks': [], 'declines': []}, ... ]
     district_points = ndb.JsonProperty()
     matchstats = ndb.JsonProperty()  # for OPR, DPR, CCWM, etc.
+    insights = ndb.JsonProperty()
     predictions = ndb.JsonProperty()
     rankings = ndb.JsonProperty()
     rankings2 = ndb.JsonProperty()

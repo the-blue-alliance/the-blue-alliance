@@ -1,5 +1,5 @@
 from database.award_query import EventAwardsQuery, TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
-from database.district_query import DistrictsInYearQuery, DistrictHistoryQuery
+from database.district_query import DistrictsInYearQuery, DistrictHistoryQuery, DistrictQuery
 from database.event_query import EventQuery, EventListQuery, DistrictEventsQuery, TeamEventsQuery, TeamYearEventsQuery
 from database.event_details_query import EventDetailsQuery
 from database.match_query import MatchQuery, EventMatchesQuery, TeamEventMatchesQuery, TeamYearMatchesQuery
@@ -8,6 +8,7 @@ from database.robot_query import TeamRobotsQuery
 from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, DistrictTeamsQuery, EventTeamsQuery, TeamParticipationQuery, TeamDistrictsQuery
 
 from models.district_team import DistrictTeam
+from models.event import Event
 from models.event_team import EventTeam
 
 
@@ -37,7 +38,7 @@ def award_updated(affected_refs):
 def event_updated(affected_refs):
     event_keys = filter(None, affected_refs['key'])
     years = filter(None, affected_refs['year'])
-    event_district_keys = filter(None, affected_refs['event_district_key'])
+    event_district_keys = filter(None, affected_refs['district_key'])
 
     event_team_keys_future = EventTeam.query(EventTeam.event.IN([event_key for event_key in event_keys])).fetch_async(None, keys_only=True)
 
@@ -49,7 +50,7 @@ def event_updated(affected_refs):
         queries_and_keys.append((EventListQuery(year)))
 
     for event_district_key in event_district_keys:
-        queries_and_keys.append((DistrictEventsQuery(event_district_key)))
+        queries_and_keys.append((DistrictEventsQuery(event_district_key.id())))
 
     for et_key in event_team_keys_future.get_result():
         team_key = et_key.id().split('_')[1]
@@ -191,6 +192,10 @@ def districtteam_updated(affected_refs):
 def district_updated(affected_refs):
     years = filter(None, affected_refs['year'])
     district_abbrevs = filter(None, affected_refs['abbreviation'])
+    district_keys = filter(None, affected_refs['key'])
+
+    district_team_keys_future = DistrictTeam.query(DistrictTeam.district_key.IN(list(district_keys))).fetch_async(None, keys_only=True)
+    district_event_keys_future = Event.query(Event.district_key.IN(list(district_keys))).fetch_async(keys_only=True)
 
     queries_and_keys = []
     for year in years:
@@ -198,5 +203,23 @@ def district_updated(affected_refs):
 
     for abbrev in district_abbrevs:
         queries_and_keys.append(DistrictHistoryQuery(abbrev))
+
+    for key in district_keys:
+        queries_and_keys.append(DistrictQuery(key.id()))
+
+    for dt_key in district_team_keys_future.get_result():
+        team_key = dt_key.id().split('_')[1]
+        queries_and_keys.append(TeamDistrictsQuery(team_key))
+
+    # Necessary because APIv3 Event models include the District model
+    affected_event_refs = {
+        'key': set(),
+        'year': set(),
+        'district_key': district_keys,
+    }
+    for event_key in district_event_keys_future.get_result():
+        affected_event_refs['key'].add(event_key)
+        affected_event_refs['year'].add(int(event_key.id()[:4]))
+    queries_and_keys += event_updated(affected_event_refs)
 
     return queries_and_keys

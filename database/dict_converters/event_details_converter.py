@@ -1,9 +1,10 @@
+from collections import defaultdict
 from database.dict_converters.converter_base import ConverterBase
 
 
 class EventDetailsConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        3: 0,
+        3: 1,
     }
 
     @classmethod
@@ -15,11 +16,22 @@ class EventDetailsConverter(ConverterBase):
 
     @classmethod
     def eventDetailsConverter_v3(cls, event_details):
+        normalized_oprs = defaultdict(dict)
+        if event_details and event_details.matchstats:
+            for stat_type, stats in event_details.matchstats.items():
+                if stat_type in {'oprs', 'dprs', 'ccwms'}:
+                    for team, value in stats.items():
+                        if 'frc' not in team:  # Normalize output
+                            team = 'frc{}'.format(team)
+                        normalized_oprs[stat_type][team] = value
+
+        event_details.matchstats if event_details else None
         event_details_dict = {
             'alliances': event_details.alliance_selections if event_details else None,
             'district_points': event_details.district_points if event_details else None,
+            'insights': event_details.insights if event_details else None,
+            'oprs': normalized_oprs if normalized_oprs else None,  # OPRs, DPRs, CCWMs
             'rankings': event_details.renderable_rankings if event_details else None,
-            'stats': event_details.matchstats if event_details else None,
         }
 
         return event_details_dict

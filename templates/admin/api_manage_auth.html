@@ -6,6 +6,7 @@
 
 <h1>Manage API Authentication</h1>
 
+<h2>Write API</h2>
 <table class="table table-striped">
   <tr>
     <th>Description</th>
@@ -21,7 +22,7 @@
     <th>Event Awards</th>
     <th>Match Video</th>
   </tr>
-  {% for auth in auths %}
+  {% for auth in write_auths %}
   <tr>
     <td><a href="/admin/api_auth/edit/{{auth.key.id}}">{{ auth.description }}</a></td>
     <td>{% if auth.owner %}<a href="/admin/user/{{ auth.owner.id }}">{{ auth.owner.id }} {% endif %}</a></td>
@@ -43,4 +44,21 @@
   {% endfor %}
 </table>
 
+<hr>
+
+<h2>Read API</h2>
+<table class="table table-striped">
+  <tr>
+    <th>Description</th>
+    <th>User</th>
+    <th>X-TBA-Auth-Key</th>
+  </tr>
+  {% for auth in read_auths %}
+  <tr>
+    <td>{{ auth.description }}</td>
+    <td>{% if auth.owner %}<a href="/admin/user/{{ auth.owner.id }}">{{ auth.owner.id }} {% endif %}</a></td>
+    <td>{{auth.key.id}}</td>
+  </tr>
+  {% endfor %}
+</table>
 {% endblock %}

@@ -22,6 +22,7 @@ from helpers.district_manipulator import DistrictManipulator
 from helpers.event_helper import EventHelper
 from helpers.event_manipulator import EventManipulator
 from helpers.event_details_manipulator import EventDetailsManipulator
+from helpers.event_insights_helper import EventInsightsHelper
 from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.event_team_status_helper import EventTeamStatusHelper
 from helpers.event_team_repairer import EventTeamRepairer
@@ -35,7 +36,6 @@ from helpers.prediction_helper import PredictionHelper
 from helpers.insight_manipulator import InsightManipulator
 from helpers.team_manipulator import TeamManipulator
 from helpers.match_manipulator import MatchManipulator
-
 from models.district import District
 from models.event import Event
 from models.event_details import EventDetails
@@ -153,6 +153,7 @@ class EventMatchstatsDo(webapp.RequestHandler):
     """
     Calculates match stats (OPR/DPR/CCWM) for an event
     Calculates predictions for an event
+    Calculates insights for an event
     """
     def get(self, event_key):
         event = Event.get_by_id(event_key)
@@ -176,10 +177,13 @@ class EventMatchstatsDo(webapp.RequestHandler):
                 'ranking_prediction_stats': ranking_prediction_stats
             }
 
+        event_insights = EventInsightsHelper.calculate_event_insights(event.matches, event.year)
+
         event_details = EventDetails(
             id=event_key,
             matchstats=matchstats_dict,
-            predictions=predictions_dict
+            predictions=predictions_dict,
+            insights=event_insights,
         )
         EventDetailsManipulator.createOrUpdate(event_details)
 
@@ -445,13 +449,11 @@ class DistrictPointsCalcEnqueue(webapp.RequestHandler):
 
     def get(self, year):
         all_event_keys = []
-        for district_type_enum in DistrictType.type_names.keys():
-            if district_type_enum == DistrictType.NO_DISTRICT:
-                continue
+        year = int(year)
+        districts_in_year = District.query(District.year == year).fetch(keys_only=True)
+        for district_key in districts_in_year:
 
-            year = int(year)
-
-            event_keys = Event.query(Event.year == year, Event.event_district_enum == district_type_enum).fetch(None, keys_only=True)
+            event_keys = Event.query(Event.year == year, Event.district_key == district_key).fetch(None, keys_only=True)
             all_event_keys += event_keys
             for event_key in event_keys:
                 taskqueue.add(url='/tasks/math/do/district_points_calc/{}'.format(event_key.id()), method='GET')
@@ -466,8 +468,9 @@ class DistrictPointsCalcDo(webapp.RequestHandler):
 
     def get(self, event_key):
         event = Event.get_by_id(event_key)
-        if event.event_district_enum == DistrictType.NO_DISTRICT:
-            self.response.out.write("Can't calculate district points for a non-district event!")
+        if event.district_key is None:
+            self.response.out.write("Can't calculate district points for a non-district event {}!"
+                                    .format(event.key_name))
             return
 
         district_points = DistrictHelper.calculate_event_points(event)

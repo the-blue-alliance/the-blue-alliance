@@ -15,7 +15,7 @@ class UserBundle(object):
 
     @property
     def account(self):
-        if self._account is None:
+        if self._account is None and self.user:
             self._account = Account.get_or_insert(
                 self.user.user_id(),
                 email = self.user.email(),

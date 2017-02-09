@@ -120,10 +120,13 @@ class AdminApiAuthManage(LoggedInHandler):
     def get(self):
         self._require_admin()
 
-        auths = ApiAuthAccess.query().fetch(None)
+        auths = ApiAuthAccess.query().fetch()
+        write_auths = filter(lambda auth: auth.is_write_key, auths)
+        read_auths = filter(lambda auth: auth.is_read_key, auths)
 
         self.template_values.update({
-            'auths': auths,
+            'write_auths': write_auths,
+            'read_auths': read_auths,
         })
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/admin/api_manage_auth.html')

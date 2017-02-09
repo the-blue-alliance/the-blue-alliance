@@ -287,7 +287,7 @@ class ApiTeamHistoryRobotsController(ApiTeamControllerBase):
 
 class ApiTeamHistoryDistrictsController(ApiTeamControllerBase):
     """
-    Returns a JSON list of all DistrictTeam models associated with a Team
+    Returns a mapping of year: district_key for a Team
     """
     CACHE_KEY_FORMAT = "apiv2_team_history_districts_controller_{}"  # (team_key)
     CACHE_VERSION = 1
@@ -304,7 +304,7 @@ class ApiTeamHistoryDistrictsController(ApiTeamControllerBase):
     def _render(self, team_key):
         self._set_team(team_key)
 
-        district_teams = TeamDistrictsQuery(self.team_key).fetch()
+        districts = TeamDistrictsQuery(self.team_key).fetch()
 
-        team_dict = {int(year): district_key for year, district_key in district_teams.iteritems()}
-        return json.dumps(team_dict, ensure_ascii=True)
+        ret = {district.year: district.key.id() for district in districts}
+        return json.dumps(ret, ensure_ascii=True)

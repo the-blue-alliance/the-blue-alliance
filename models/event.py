@@ -57,8 +57,7 @@ class Event(ndb.Model):
         self._affected_references = {
             'key': set(),
             'year': set(),
-            'event_district_abbrev': set(),
-            'event_district_key': set()
+            'district_key': set()
         }
         self._awards = None
         self._details = None
@@ -388,19 +387,25 @@ class Event(ndb.Model):
 
     @property
     def event_district_str(self):
-        return DistrictType.type_names.get(self.event_district_enum, None)
+        from database.district_query import DistrictQuery
+        if self.district_key is None:
+            return None
+        district = DistrictQuery(self.district_key.id()).fetch()
+        return district.display_name if district else None
 
     @property
     def event_district_abbrev(self):
-        return DistrictType.type_abbrevs.get(self.event_district_enum, None)
+        if self.district_key is None:
+            return None
+        else:
+            return self.district_key.id()[4:]
 
     @property
     def event_district_key(self):
-        district_abbrev = DistrictType.type_abbrevs.get(self.event_district_enum, None)
-        if district_abbrev is None:
+        if self.district_key is None:
             return None
         else:
-            return '{}{}'.format(self.year, district_abbrev)
+            return self.district_key.id()
 
     @property
     def event_type_str(self):
