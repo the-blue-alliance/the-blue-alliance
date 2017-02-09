@@ -64,6 +64,9 @@ handlers:
   static_files: static/manifest.json
   upload: static/manifest.json
   expiration: "1d"
+- url: /apiv3/swagger.json
+  static_files: static/swagger.json
+  upload: static/swagger.json
 
 - url: /tasks/.*
   script: cron_main.app

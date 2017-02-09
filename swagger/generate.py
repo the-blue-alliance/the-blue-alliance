@@ -61,6 +61,8 @@ base_json = {
         }
     },
     "paths": {},
+    "parameters": {},
+    "definitions": {},
 }
 
 if __name__ == '__main__':
@@ -79,7 +81,7 @@ if __name__ == '__main__':
             endpoints = handler._render.swagger_props
             for path, endpoint in endpoints:
                 # Add in some common things to build the entire object
-                endpoint['responses']['headers'] = {
+                endpoint['responses']['200']['headers'] = {
                     "Last-Modified": {
                         "type": "string",
                         "description": "Indicates the date and time the data returned was last updated. Used by clients in the `If-Modified-Since` request header."
@@ -89,11 +91,11 @@ if __name__ == '__main__':
                         "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly."
                     }
                 }
-                endpoint['parameters'].append('If-Modified-Since')
+                endpoint['parameters'].append({'$ref': '#/parameters/If-Modified-Since'})
                 endpoint['responses']['200']['description'] = 'Successful Response'
-                endpoint['responses']['304'] = {
-                    '$ref': '#/responses/NotModified'
-                }
+                #endpoint['responses']['304'] = {
+                #    '$ref': '#/responses/NotModified'
+                #}
                 base_json['paths'].update({path: {'get': endpoint}})
 
     # Generate Parameters
@@ -102,6 +104,7 @@ if __name__ == '__main__':
     for param in parameters:
         var = getattr(swagger_parameters, param)
         params_json[var.name] = var.render()
+    base_json['parameters'] = params_json
 
     # Generate Responses
     responses = filter(lambda x: not x.startswith("__") and x != "SwaggerResponse", dir(swagger_responses))
@@ -109,4 +112,7 @@ if __name__ == '__main__':
     for resp in responses:
         var = getattr(swagger_responses, resp)
         responses_json[var.name] = var.render()
-    print json.dumps(responses_json, indent=2)
+    base_json['definitions'] = responses_json
+
+    with open("static/swagger.json", "w") as text_file:
+        text_file.write(json.dumps(base_json, indent=2))

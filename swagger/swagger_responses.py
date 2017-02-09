@@ -60,7 +60,7 @@ TeamResponse = SwaggerResponse(
         "type": "object",
         "allOf": [
             {
-                "$ref": "#/Team_Simple"
+                "$ref": "#/definitions/TeamSimple"
             }
         ],
         "required": [

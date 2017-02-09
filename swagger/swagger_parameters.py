@@ -13,6 +13,7 @@ class SwaggerParameter(object):
 
     def render(self):
         return {
+            'name': self.name,
             'in': self.location,
             'description': self.description,
             'required': self.required,

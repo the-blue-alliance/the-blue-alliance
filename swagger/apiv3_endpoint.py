@@ -46,11 +46,11 @@ class ApiV3Endpoint(object):
 
         decorated.swagger_props.append((self.path, {
             'description': self.description,
-            'parameters': [{"$ref": "parameters.json#/{}".format(param.name)} for param in self.parameters],
+            'parameters': [{"$ref": "#/parameters/{}".format(param.name)} for param in self.parameters],
             'responses': {
                 "200": {
                     "schema": {
-                        "$ref": "{}.json".format(self.response.name)
+                        "$ref": "#/definitions/{}".format(self.response.name)
                     },
 
                 },
