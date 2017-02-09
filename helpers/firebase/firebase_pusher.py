@@ -10,11 +10,6 @@ from models.sitevar import Sitevar
 
 
 class FirebasePusher(object):
-
-    FIREHOSE_FEED = 'notifications'  # all the notifications
-    EVENT_FEED = 'events/{}/notifications'  # format with event key
-    DISTRICT_FEED = 'district/{}/notifications'  # format with district abbrev
-
     @classmethod
     def _get_secret(cls):
         firebase_secrets = Sitevar.get_by_id("firebase.secrets")
@@ -75,18 +70,3 @@ class FirebasePusher(object):
         payload_data_json = json.dumps(cls.match_to_payload_dict(match))
 
         deferred.defer(cls._put_data, payload_key, payload_data_json, _queue="firebase")
-
-    @classmethod
-    def push_notification(cls, notification):
-        payload_data_json = json.dumps({
-            'time': datetime.datetime.now().isoformat(),
-            'payload': notification._render_webhook()
-        })
-
-        deferred.defer(cls._push_data, cls.FIREHOSE_FEED, payload_data_json, _queue="firebase-notifications")
-
-        if notification._event_feed:
-            deferred.defer(cls._push_data, cls.EVENT_FEED.format(notification._event_feed), payload_data_json, _queue="firebase-notifications")
-
-        if notification._district_feed:
-            deferred.defer(cls._push_data, cls.DISTRICT_FEED.format(notification._district_feed), payload_data_json, _queue="firebase-notifications")

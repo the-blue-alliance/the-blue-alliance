@@ -8,7 +8,6 @@ class UpdateFavoritesNotification(BaseNotification):
 
     _supported_clients = [ClientType.OS_ANDROID, ClientType.WEBHOOK]
     _track_call = False
-    _push_firebase = False
 
     def __init__(self, user_id, sending_device_key):
         self.user_id = user_id
