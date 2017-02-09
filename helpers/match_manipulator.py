@@ -28,7 +28,7 @@ class MatchManipulator(ManipulatorBase):
             try:
                 FirebasePusher.delete_match(match)
             except Exception:
-                logging.warning("Enqueuing Firebase delete failed!")
+                logging.warning("Firebase delete_match failed!")
 
     @classmethod
     def postUpdateHook(cls, matches, updated_attr_list, is_new_list):
@@ -77,7 +77,7 @@ class MatchManipulator(ManipulatorBase):
             try:
                 FirebasePusher.update_match(match)
             except Exception:
-                logging.warning("Enqueuing Firebase push failed!")
+                logging.warning("Firebase update_match failed!")
 
         for event_key in event_keys:
             # Enqueue task to calculate matchstats
