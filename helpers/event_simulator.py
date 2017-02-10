@@ -37,7 +37,6 @@ class EventSimulator(object):
         self._has_event_details = has_event_details
         # whether to update next playoff level all at once, or as winners are determined
         self._batch_advance = batch_advance
-        # self.step()
 
         # Load and save complete data
         load_fixture('test_data/fixtures/2016nytr_event_team_status.json',
@@ -93,16 +92,10 @@ class EventSimulator(object):
         ndb.delete_multi([match.key for match in event.matches])
         ndb.get_context().clear_cache()
 
-    # def _reload_all(self):
-    #     load_fixture('test_data/fixtures/2016nytr_event_team_status.json',
-    #           kind={'EventDetails': EventDetails, 'Event': Event, 'Match': Match},
-    #           post_processor=self._event_key_adder)
-
     def _event_key_adder(self, obj):
         obj.event = ndb.Key(Event, '2016nytr')
 
     def step(self):
-        # self._reload_all()
         event = Event.get_by_id('2016nytr')
 
         if self._step == 0:  # Qual match schedule added
