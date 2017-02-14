@@ -66,7 +66,7 @@ class FMSAPIAwardsGet(webapp.RequestHandler):
     Handles updating awards
     """
     def get(self, event_key):
-        datafeed = DatafeedFMSAPI('v2.0')
+        datafeed = DatafeedFMSAPI('v2.0', save_response=True)
 
         event = Event.get_by_id(event_key)
         new_awards = AwardManipulator.createOrUpdate(datafeed.getAwards(event))
@@ -139,7 +139,7 @@ class FMSAPIEventAlliancesGet(webapp.RequestHandler):
     Handles updating an event's alliances
     """
     def get(self, event_key):
-        df = DatafeedFMSAPI('v2.0')
+        df = DatafeedFMSAPI('v2.0', save_response=True)
 
         event = Event.get_by_id(event_key)
 
@@ -191,7 +191,7 @@ class FMSAPIEventRankingsGet(webapp.RequestHandler):
     Handles updating an event's rankings
     """
     def get(self, event_key):
-        df = DatafeedFMSAPI('v2.0')
+        df = DatafeedFMSAPI('v2.0', save_response=True)
 
         rankings, rankings2 = df.getEventRankings(event_key)
 
@@ -242,7 +242,7 @@ class FMSAPIMatchesGet(webapp.RequestHandler):
     Handles updating matches
     """
     def get(self, event_key):
-        df = DatafeedFMSAPI('v2.0')
+        df = DatafeedFMSAPI('v2.0', save_response=True)
 
         new_matches = MatchManipulator.createOrUpdate(df.getMatches(event_key))
 
