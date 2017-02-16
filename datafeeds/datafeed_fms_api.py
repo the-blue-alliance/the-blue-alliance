@@ -3,6 +3,7 @@ import cloudstorage
 import datetime
 import json
 import logging
+import traceback
 
 from google.appengine.api import urlfetch
 from google.appengine.ext import ndb
@@ -64,7 +65,7 @@ class DatafeedFMSAPI(object):
         'tur': 'hotu',
     }
 
-    SAVED_RESPONSE_FILE_PATTERN = '/tbatv-prod-hrd.appspot.com/frc-api-response/{}/{}.json'  # % (url, datetime)
+    SAVED_RESPONSE_DIR_PATTERN = '/tbatv-prod-hrd.appspot.com/frc-api-response/{}/'  # % (url)
 
     def __init__(self, version, save_response=False):
         self._save_response = save_response
@@ -130,12 +131,28 @@ class DatafeedFMSAPI(object):
             self._is_down_sitevar.put()
             ApiStatusController.clear_cache_if_needed(old_status, self._is_down_sitevar.contents)
 
+            # Save raw API response into cloudstorage
             if self._save_response:
-                file_name = self.SAVED_RESPONSE_FILE_PATTERN.format(
-                    url.replace(self.FMS_API_DOMAIN, ''),
-                    datetime.datetime.now())
-                with cloudstorage.open(file_name, 'w') as json_file:
-                    json_file.write(result.content)
+                try:
+                    # Check for last response
+                    dir_name = self.SAVED_RESPONSE_DIR_PATTERN.format(url.replace(self.FMS_API_DOMAIN, ''))
+                    last_item = None
+                    for last_item in cloudstorage.listbucket(dir_name):
+                        pass
+
+                    write_new = True
+                    if last_item is not None:
+                        with cloudstorage.open(last_item.filename, 'r') as last_json_file:
+                            if last_json_file.read() == result.content:
+                                write_new = False  # Do not write if content didn't change
+
+                    if write_new:
+                        file_name = dir_name + '{}.json'.format(datetime.datetime.now())
+                        with cloudstorage.open(file_name, 'w') as json_file:
+                            json_file.write(result.content)
+                except Exception, exception:
+                    logging.error("Error saving API response for: {}".format(url))
+                    logging.error(traceback.format_exc())
 
             raise ndb.Return(parser.parse(json.loads(result.content)))
         elif result.status_code % 100 == 5:
