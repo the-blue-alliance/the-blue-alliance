@@ -45,47 +45,69 @@ class EventSimulator(object):
         event = Event.get_by_id('2016nytr')
 
         # Add 3rd matches that never got played
-        Match(
-            id='2016nytr_qf1m3',
-            year=2016,
-            event=event.key,
-            comp_level='qf',
-            set_number=1,
-            match_number=3,
-            alliances_json=json.dumps({
-                'red': {
-                    'teams': [],
-                    'score': -1,
-                },
-                'blue': {
-                    'teams': [],
-                    'score': -1,
-                }
-            }),
-            time=datetime.datetime(2016, 3, 19, 18, 34),
-        ).put()
-        Match(
-            id='2016nytr_qf3m3',
-            year=2016,
-            event=event.key,
-            comp_level='qf',
-            set_number=3,
-            match_number=3,
-            alliances_json=json.dumps({
-                'red': {
-                    'teams': [],
-                    'score': -1,
-                },
-                'blue': {
-                    'teams': [],
-                    'score': -1,
-                }
-            }),
-            time=datetime.datetime(2016, 3, 19, 18, 48),
-        ).put()
+        unplayed_matches = [
+            Match(
+                id='2016nytr_qf1m3',
+                year=2016,
+                event=event.key,
+                comp_level='qf',
+                set_number=1,
+                match_number=3,
+                alliances_json=json.dumps({
+                    'red': {
+                        'teams': ['frc3990', 'frc359', 'frc4508'],
+                        'score': -1,
+                    },
+                    'blue': {
+                        'teams': ['frc3044', 'frc4930', 'frc4481'],
+                        'score': -1,
+                    }
+                }),
+                time=datetime.datetime(2016, 3, 19, 18, 34),
+            ),
+            Match(
+                id='2016nytr_qf3m3',
+                year=2016,
+                event=event.key,
+                comp_level='qf',
+                set_number=3,
+                match_number=3,
+                alliances_json=json.dumps({
+                    'red': {
+                        'teams': ['frc20', 'frc5254', 'frc229'],
+                        'score': -1,
+                    },
+                    'blue': {
+                        'teams': ['frc3003', 'frc358', 'frc527'],
+                        'score': -1,
+                    }
+                }),
+                time=datetime.datetime(2016, 3, 19, 18, 48),
+            ),
+            Match(
+                id='2016nytr_sf1m3',
+                year=2016,
+                event=event.key,
+                comp_level='sf',
+                set_number=1,
+                match_number=3,
+                alliances_json=json.dumps({
+                    'red': {
+                        'teams': ['frc3990', 'frc359', 'frc4508'],
+                        'score': -1,
+                    },
+                    'blue': {
+                        'teams': ['frc5240', 'frc3419', 'frc663'],
+                        'score': -1,
+                    }
+                }),
+                time=datetime.datetime(2016, 3, 19, 19, 42),
+            )
+        ]
 
-        self._event_detials = event.details
+        self._event_details = event.details
         self._played_matches = MatchHelper.organizeMatches(event.matches)
+        self._all_matches = MatchHelper.organizeMatches(event.matches + unplayed_matches)
 
         # Delete data
         event.details.key.delete()
@@ -99,7 +121,7 @@ class EventSimulator(object):
         event = Event.get_by_id('2016nytr')
 
         if self._step == 0:  # Qual match schedule added
-            for match in copy.deepcopy(self._played_matches['qm']):
+            for match in copy.deepcopy(self._all_matches['qm']):
                 for alliance in ['red', 'blue']:
                     match.alliances[alliance]['score'] = -1
                 match.alliances_json = json.dumps(match.alliances)
@@ -118,21 +140,54 @@ class EventSimulator(object):
         elif self._step == 2:  # After alliance selections
             self._step += 1
         elif self._step == 3:  # QF schedule added
-            for match in copy.deepcopy(self._played_matches['qf']):
+            for match in copy.deepcopy(self._all_matches['qf']):
                 for alliance in ['red', 'blue']:
                     match.alliances[alliance]['score'] = -1
                 match.alliances_json = json.dumps(match.alliances)
                 match.score_breakdown_json = None
                 match.actual_time = None
                 match.put()
-
             self._step += 1
-        elif self._step == 4:  # After each qf match
+        elif self._step == 4:  # After each QF match
             MatchHelper.play_order_sort_matches(self._played_matches['qf'])[self._substep].put()
             if self._substep < len(self._played_matches['qf']) - 1:
                 self._substep += 1
             else:
                 self._step += 1
                 self._substep = 0
+        elif self._step == 5:  # SF schedule added
+            for match in copy.deepcopy(self._all_matches['sf']):
+                for alliance in ['red', 'blue']:
+                    match.alliances[alliance]['score'] = -1
+                match.alliances_json = json.dumps(match.alliances)
+                match.score_breakdown_json = None
+                match.actual_time = None
+                match.put()
+            self._step += 1
+        elif self._step == 6:  # After each SF match
+            MatchHelper.play_order_sort_matches(self._played_matches['sf'])[self._substep].put()
+            if self._substep < len(self._played_matches['sf']) - 1:
+                self._substep += 1
+            else:
+                self._step += 1
+                self._substep = 0
+        elif self._step == 7:  # F schedule added
+            for match in copy.deepcopy(self._all_matches['f']):
+                for alliance in ['red', 'blue']:
+                    match.alliances[alliance]['score'] = -1
+                match.alliances_json = json.dumps(match.alliances)
+                match.score_breakdown_json = None
+                match.actual_time = None
+                match.put()
+            self._step += 1
+        elif self._step == 8:  # After each F match
+            MatchHelper.play_order_sort_matches(self._played_matches['f'])[self._substep].put()
+            if self._substep < len(self._played_matches['f']) - 1:
+                self._substep += 1
+            else:
+                self._step += 1
+                self._substep = 0
 
+        ndb.get_context().clear_cache()
+        MatchHelper.deleteInvalidMatches(event.matches)
         ndb.get_context().clear_cache()
