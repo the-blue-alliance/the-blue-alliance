@@ -5,7 +5,6 @@ from notifications.base_notification import BaseNotification
 class PingNotification(BaseNotification):
 
     _track_call = False
-    _push_firebase = False
 
     @property
     def _type(self):
