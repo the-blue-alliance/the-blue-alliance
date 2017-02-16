@@ -76,6 +76,12 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBaseController):
         # Setup
         to_replace = None
         to_replace_id = self.request.POST.get('replace-preferred-{}'.format(suggestion.key.id()), None)
+        year = int(self.request.POST.get('year-{}'.format(suggestion.key.id())))
+
+        # Override year if necessary
+        suggestion.contents['year'] = year
+        suggestion.contents_json = json.dumps(suggestion.contents)
+        suggestion._contents = None
 
         # Remove preferred reference from another Media if specified
         team_reference = Media.create_reference(

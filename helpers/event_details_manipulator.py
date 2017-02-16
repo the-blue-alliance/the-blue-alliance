@@ -4,6 +4,7 @@ import traceback
 from google.appengine.api import taskqueue
 
 from helpers.cache_clearer import CacheClearer
+from helpers.firebase.firebase_pusher import FirebasePusher
 from helpers.manipulator_base import ManipulatorBase
 from helpers.notification_helper import NotificationHelper
 
@@ -52,6 +53,11 @@ class EventDetailsManipulator(ManipulatorBase):
             except Exception:
                 logging.error("Error enqueuing event_team_status for {}".format(event.key.id()))
                 logging.error(traceback.format_exc())
+
+            try:
+                FirebasePusher.update_event_details(event_details)
+            except Exception:
+                logging.warning("Firebase update_event_details failed!")
 
     @classmethod
     def updateMerge(self, new_event_details, old_event_details, auto_union=True):

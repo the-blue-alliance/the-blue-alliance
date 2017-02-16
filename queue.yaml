@@ -14,14 +14,7 @@ queue:
     task_age_limit: 1d
 
 - name: firebase
-  rate: 5/s
-
-- name: firebase-notifications
-  rate: 5/s
-  retry_parameters:
-    task_age_limit: 3m
-    min_backoff_seconds: 10
-    max_backoff_seconds: 30
+  rate: 50/s
 
 - name: post-update-hooks
   rate: 5/s

@@ -37,7 +37,7 @@ else:
         "memcache": True,
         "database_query_cache": True,
         "response_cache": True,
-        "firebase-url": "https://thebluealliance.firebaseio.com/{}.json?auth={}",
+        "firebase-url": "https://tbatv-prod-hrd.firebaseio.com/{}.json?auth={}",
         "use-compiled-templates": True
     }
 
