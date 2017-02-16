@@ -42,7 +42,6 @@ class TestEventSimulator(unittest2.TestCase):
         for match in event.matches:
             self.assertEqual(match.comp_level, 'qm')
             self.assertFalse(match.has_been_played)
-            self.assertEqual(match.score_breakdown, None)
             self.assertEqual(match.actual_time, None)
 
         # After each qual match
@@ -58,6 +57,7 @@ class TestEventSimulator(unittest2.TestCase):
             for j, match in enumerate(matches):
                 if j <= i:
                     self.assertTrue(match.has_been_played)
+                    self.assertNotEqual(match.actual_time, None)
                 else:
                     self.assertFalse(match.has_been_played)
 
@@ -78,10 +78,10 @@ class TestEventSimulator(unittest2.TestCase):
         for match in event.matches:
             if match.comp_level == 'qm':
                 self.assertTrue(match.has_been_played)
+                self.assertNotEqual(match.actual_time, None)
             else:
                 self.assertEqual(match.comp_level, 'qf')
                 self.assertFalse(match.has_been_played)
-                self.assertEqual(match.score_breakdown, None)
                 self.assertEqual(match.actual_time, None)
 
         # After each QF match
@@ -105,6 +105,7 @@ class TestEventSimulator(unittest2.TestCase):
                     self.assertFalse(match.has_been_played)
                 elif j <= i:
                     self.assertTrue(match.has_been_played)
+                    self.assertNotEqual(match.actual_time, None)
                 else:
                     self.assertFalse(match.has_been_played)
 
@@ -117,10 +118,10 @@ class TestEventSimulator(unittest2.TestCase):
         for match in event.matches:
             if match.comp_level in {'qm', 'qf'}:
                 self.assertTrue(match.has_been_played)
+                self.assertNotEqual(match.actual_time, None)
             else:
                 self.assertEqual(match.comp_level, 'sf')
                 self.assertFalse(match.has_been_played)
-                self.assertEqual(match.score_breakdown, None)
                 self.assertEqual(match.actual_time, None)
 
         # After each SF match
@@ -142,6 +143,7 @@ class TestEventSimulator(unittest2.TestCase):
                     self.assertFalse(match.has_been_played)
                 elif j <= i:
                     self.assertTrue(match.has_been_played)
+                    self.assertNotEqual(match.actual_time, None)
                 else:
                     self.assertFalse(match.has_been_played)
 
@@ -154,10 +156,10 @@ class TestEventSimulator(unittest2.TestCase):
         for match in event.matches:
             if match.comp_level in {'qm', 'qf', 'sf'}:
                 self.assertTrue(match.has_been_played)
+                self.assertNotEqual(match.actual_time, None)
             else:
                 self.assertEqual(match.comp_level, 'f')
                 self.assertFalse(match.has_been_played)
-                self.assertEqual(match.score_breakdown, None)
                 self.assertEqual(match.actual_time, None)
 
         # After each F match
@@ -173,5 +175,6 @@ class TestEventSimulator(unittest2.TestCase):
             for j, match in enumerate(matches):
                 if j <= i:
                     self.assertTrue(match.has_been_played)
+                    self.assertNotEqual(match.actual_time, None)
                 else:
                     self.assertFalse(match.has_been_played)
