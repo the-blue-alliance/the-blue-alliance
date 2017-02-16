@@ -7,6 +7,7 @@ from google.appengine.ext import ndb
 
 from helpers.event_details_manipulator import EventDetailsManipulator
 from helpers.match_helper import MatchHelper
+from helpers.match_manipulator import MatchManipulator
 from models.event import Event
 from models.event_details import EventDetails
 from models.match import Match
@@ -130,11 +131,11 @@ class EventSimulator(object):
                 match.alliances_json = json.dumps(match.alliances)
                 match.score_breakdown_json = None
                 match.actual_time = None
-                match.put()
+                MatchManipulator.createOrUpdate(match)
 
             self._step += 1
         elif self._step == 1:  # After each qual match
-            self._played_matches['qm'][self._substep].put()
+            MatchManipulator.createOrUpdate(self._played_matches['qm'][self._substep])
             if self._substep < len(self._played_matches['qm']) - 1:
                 self._substep += 1
             else:
@@ -154,10 +155,12 @@ class EventSimulator(object):
                 match.alliances_json = json.dumps(match.alliances)
                 match.score_breakdown_json = None
                 match.actual_time = None
-                match.put()
+                MatchManipulator.createOrUpdate(match)
             self._step += 1
         elif self._step == 4:  # After each QF match
-            MatchHelper.play_order_sort_matches(self._played_matches['qf'])[self._substep].put()
+            MatchManipulator.createOrUpdate(
+                MatchHelper.play_order_sort_matches(
+                    self._played_matches['qf'])[self._substep])
             if self._substep < len(self._played_matches['qf']) - 1:
                 self._substep += 1
             else:
@@ -170,10 +173,12 @@ class EventSimulator(object):
                 match.alliances_json = json.dumps(match.alliances)
                 match.score_breakdown_json = None
                 match.actual_time = None
-                match.put()
+                MatchManipulator.createOrUpdate(match)
             self._step += 1
         elif self._step == 6:  # After each SF match
-            MatchHelper.play_order_sort_matches(self._played_matches['sf'])[self._substep].put()
+            MatchManipulator.createOrUpdate(
+                MatchHelper.play_order_sort_matches(
+                    self._played_matches['sf'])[self._substep])
             # Backup robot introduced
             if self._substep == 3:
                 EventDetailsManipulator.createOrUpdate(EventDetails(
@@ -192,10 +197,12 @@ class EventSimulator(object):
                 match.alliances_json = json.dumps(match.alliances)
                 match.score_breakdown_json = None
                 match.actual_time = None
-                match.put()
+                MatchManipulator.createOrUpdate(match)
             self._step += 1
         elif self._step == 8:  # After each F match
-            MatchHelper.play_order_sort_matches(self._played_matches['f'])[self._substep].put()
+            MatchManipulator.createOrUpdate(
+                MatchHelper.play_order_sort_matches(
+                    self._played_matches['f'])[self._substep])
             if self._substep < len(self._played_matches['f']) - 1:
                 self._substep += 1
             else:
