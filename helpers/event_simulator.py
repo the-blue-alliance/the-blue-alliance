@@ -5,6 +5,7 @@ import json
 from appengine_fixture_loader.loader import load_fixture
 from google.appengine.ext import ndb
 
+from helpers.event_details_manipulator import EventDetailsManipulator
 from helpers.match_helper import MatchHelper
 from models.event import Event
 from models.event_details import EventDetails
@@ -106,6 +107,8 @@ class EventSimulator(object):
         ]
 
         self._event_details = event.details
+        self._alliance_selections_without_backup = copy.deepcopy(event.details.alliance_selections)
+        self._alliance_selections_without_backup[1]['backup'] = None
         self._played_matches = MatchHelper.organizeMatches(event.matches)
         self._all_matches = MatchHelper.organizeMatches(event.matches + unplayed_matches)
 
@@ -137,7 +140,12 @@ class EventSimulator(object):
             else:
                 self._step += 1
                 self._substep = 0
+            EventDetailsManipulator.createOrUpdate(EventDetails(id='2016nytr'))
         elif self._step == 2:  # After alliance selections
+            EventDetailsManipulator.createOrUpdate(EventDetails(
+                id='2016nytr',
+                alliance_selections=self._alliance_selections_without_backup
+            ))
             self._step += 1
         elif self._step == 3:  # QF schedule added
             for match in copy.deepcopy(self._all_matches['qf']):
@@ -166,6 +174,12 @@ class EventSimulator(object):
             self._step += 1
         elif self._step == 6:  # After each SF match
             MatchHelper.play_order_sort_matches(self._played_matches['sf'])[self._substep].put()
+            # Backup robot introduced
+            if self._substep == 3:
+                EventDetailsManipulator.createOrUpdate(EventDetails(
+                    id='2016nytr',
+                    alliance_selections=self._event_details.alliance_selections
+                ))
             if self._substep < len(self._played_matches['sf']) - 1:
                 self._substep += 1
             else:

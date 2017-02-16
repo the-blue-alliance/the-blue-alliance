@@ -23,6 +23,9 @@ class TestEventSimulator(unittest2.TestCase):
 
         self.es = EventSimulator()
 
+        self._alliance_selections = [{u'declines': [], u'backup': None, u'name': u'Alliance 1', u'picks': [u'frc359', u'frc3990', u'frc4508']}, {u'declines': [], u'backup': None, u'name': u'Alliance 2', u'picks': [u'frc5254', u'frc20', u'frc229']}, {u'declines': [], u'backup': None, u'name': u'Alliance 3', u'picks': [u'frc5236', u'frc2791', u'frc3624']}, {u'declines': [], u'backup': None, u'name': u'Alliance 4', u'picks': [u'frc3419', u'frc5240', u'frc663']}, {u'declines': [], u'backup': None, u'name': u'Alliance 5', u'picks': [u'frc48', u'frc1493', u'frc1551']}, {u'declines': [], u'backup': None, u'name': u'Alliance 6', u'picks': [u'frc250', u'frc333', u'frc145']}, {u'declines': [], u'backup': None, u'name': u'Alliance 7', u'picks': [u'frc358', u'frc3003', u'frc527']}, {u'declines': [], u'backup': None, u'name': u'Alliance 8', u'picks': [u'frc4930', u'frc3044', u'frc4481']}]
+        self._alliance_selections_with_backup = [{u'declines': [], u'backup': None, u'name': u'Alliance 1', u'picks': [u'frc359', u'frc3990', u'frc4508']}, {u'declines': [], u'backup': {u'in': u'frc1665', u'out': u'frc229'}, u'name': u'Alliance 2', u'picks': [u'frc5254', u'frc20', u'frc229']}, {u'declines': [], u'backup': None, u'name': u'Alliance 3', u'picks': [u'frc5236', u'frc2791', u'frc3624']}, {u'declines': [], u'backup': None, u'name': u'Alliance 4', u'picks': [u'frc3419', u'frc5240', u'frc663']}, {u'declines': [], u'backup': None, u'name': u'Alliance 5', u'picks': [u'frc48', u'frc1493', u'frc1551']}, {u'declines': [], u'backup': None, u'name': u'Alliance 6', u'picks': [u'frc250', u'frc333', u'frc145']}, {u'declines': [], u'backup': None, u'name': u'Alliance 7', u'picks': [u'frc358', u'frc3003', u'frc527']}, {u'declines': [], u'backup': None, u'name': u'Alliance 8', u'picks': [u'frc4930', u'frc3044', u'frc4481']}]
+
     def tearDown(self):
         self.testbed.deactivate()
 
@@ -49,8 +52,7 @@ class TestEventSimulator(unittest2.TestCase):
             self.es.step()
             event = Event.get_by_id('2016nytr')
             self.assertNotEqual(event, None)
-            # self.assertNotEqual(event.details, None)
-            # self.assertEqual(event.details.alliance_selections, None)
+            self.assertEqual(event.details.alliance_selections, None)
             self.assertEqual(len(event.matches), 72)
 
             matches = MatchHelper.play_order_sort_matches(event.matches)
@@ -65,15 +67,14 @@ class TestEventSimulator(unittest2.TestCase):
         self.es.step()
         event = Event.get_by_id('2016nytr')
         self.assertNotEqual(event, None)
-        # self.assertNotEqual(event.details, None)
-        # self.assertNotEqual(event.details.alliance_selections, None)
+        self.assertEqual(event.details.alliance_selections, self._alliance_selections)
         self.assertEqual(len(event.matches), 72)
 
         # QF schedule added
         self.es.step()
         event = Event.get_by_id('2016nytr')
         self.assertNotEqual(event, None)
-        self.assertEqual(event.details, None)
+        self.assertEqual(event.details.alliance_selections, self._alliance_selections)
         self.assertEqual(len(event.matches), 84)
         for match in event.matches:
             if match.comp_level == 'qm':
@@ -89,8 +90,7 @@ class TestEventSimulator(unittest2.TestCase):
             self.es.step()
             event = Event.get_by_id('2016nytr')
             self.assertNotEqual(event, None)
-            # self.assertNotEqual(event.details, None)
-            # self.assertEqual(event.details.alliance_selections, None)
+            self.assertEqual(event.details.alliance_selections, self._alliance_selections)
             if i <= 76:
                 self.assertEqual(len(event.matches), 84)
             elif i <= 78:
@@ -113,7 +113,7 @@ class TestEventSimulator(unittest2.TestCase):
         self.es.step()
         event = Event.get_by_id('2016nytr')
         self.assertNotEqual(event, None)
-        self.assertEqual(event.details, None)
+        self.assertEqual(event.details.alliance_selections, self._alliance_selections)
         self.assertEqual(len(event.matches), 88)
         for match in event.matches:
             if match.comp_level in {'qm', 'qf'}:
@@ -129,8 +129,12 @@ class TestEventSimulator(unittest2.TestCase):
             self.es.step()
             event = Event.get_by_id('2016nytr')
             self.assertNotEqual(event, None)
-            # self.assertNotEqual(event.details, None)
-            # self.assertEqual(event.details.alliance_selections, None)
+
+            if i < 85:
+                self.assertEqual(event.details.alliance_selections, self._alliance_selections)
+            else:
+                self.assertEqual(event.details.alliance_selections, self._alliance_selections_with_backup)
+
             if i <= 84:
                 self.assertEqual(len(event.matches), 88)
             else:
@@ -151,7 +155,7 @@ class TestEventSimulator(unittest2.TestCase):
         self.es.step()
         event = Event.get_by_id('2016nytr')
         self.assertNotEqual(event, None)
-        self.assertEqual(event.details, None)
+        self.assertEqual(event.details.alliance_selections, self._alliance_selections_with_backup)
         self.assertEqual(len(event.matches), 90)
         for match in event.matches:
             if match.comp_level in {'qm', 'qf', 'sf'}:
@@ -167,8 +171,7 @@ class TestEventSimulator(unittest2.TestCase):
             self.es.step()
             event = Event.get_by_id('2016nytr')
             self.assertNotEqual(event, None)
-            # self.assertNotEqual(event.details, None)
-            # self.assertEqual(event.details.alliance_selections, None)
+            self.assertEqual(event.details.alliance_selections, self._alliance_selections_with_backup)
             self.assertEqual(len(event.matches), 90)
 
             matches = MatchHelper.play_order_sort_matches(event.matches)
