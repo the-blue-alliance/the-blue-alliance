@@ -31,7 +31,7 @@ class FirebasePusher(object):
         url = tba_config.CONFIG['firebase-url'].format(key, secret)
         result = urlfetch.fetch(url, method='DELETE', deadline=10)
         if result.status_code != 204:
-            logging.warning("Error wirht DELETE data from Firebase: {}. ERROR {}: {}".format(url, result.status_code, result.content))
+            logging.error("Error with DELETE data from Firebase: {}. ERROR {}: {}".format(url, result.status_code, result.content))
 
     @classmethod
     def _put_data(cls, key, data_json):
@@ -44,7 +44,7 @@ class FirebasePusher(object):
         url = tba_config.CONFIG['firebase-url'].format(key, secret)
         result = urlfetch.fetch(url, payload=data_json, method='PUT', deadline=10)
         if result.status_code != 200:
-            logging.warning("Error with PUT data to Firebase: {}; {}. ERROR {}: {}".format(url, data_json, result.status_code, result.content))
+            logging.error("Error with PUT data to Firebase: {}; {}. ERROR {}: {}".format(url, data_json, result.status_code, result.content))
 
     @classmethod
     def _push_data(cls, key, data_json):
@@ -58,7 +58,7 @@ class FirebasePusher(object):
         url = tba_config.CONFIG['firebase-url'].format(key, secret)
         result = urlfetch.fetch(url, payload=data_json, method='POST', deadline=10)
         if result.status_code != 200:
-            logging.warning("Error with POST data to Firebase: {}; {}. ERROR {}: {}".format(url, data_json, result.status_code, result.content))
+            logging.error("Error with POST data to Firebase: {}; {}. ERROR {}: {}".format(url, data_json, result.status_code, result.content))
 
     @classmethod
     def delete_match(cls, match):
