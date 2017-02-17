@@ -51,7 +51,7 @@ class FMSAPIEventListParser(object):
         districts = {}
         for event in response['Events']:
             code = event['code'].lower()
-            event_type = self.EVENT_TYPES.get(event['type'].lower(), None)
+            event_type = EventType.PRESEASON if code == 'week0' else self.EVENT_TYPES.get(event['type'].lower(), None)
             if event_type is None:
                 logging.warn("Event type '{}' not recognized!".format(event['type']))
                 continue
