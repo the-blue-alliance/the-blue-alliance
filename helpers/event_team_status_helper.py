@@ -24,24 +24,24 @@ class EventTeamStatusHelper(object):
         components = []
         if qual:
             rank = qual.get('rank')
-            total = qual.get('total')
+            max_rank = qual.get('max_rank')
             record = qual.get('record')
             qual_average = qual.get('qual_average')
 
-            total_str = ''
-            if total:
-                total_str = '/{}'.format(total)
+            max_rank_str = ''
+            if max_rank:
+                max_rank_str = '/{}'.format(max_rank)
 
             qual_str = None
             if record:
                 record_str = '{}-{}-{}'.format(record['wins'], record['losses'], record['ties'])
                 if rank:
-                    qual_str = 'was <b>Rank {}{}</b> with a record of <b>{}</b> in quals'.format(rank, total_str, record_str)
+                    qual_str = 'was <b>Rank {}{}</b> with a record of <b>{}</b> in quals'.format(rank, max_rank_str, record_str)
                 else:
                     qual_str = 'had a record of <b>{}</b> in quals'.format(record_str)
             elif qual_average:
                 if rank:
-                    qual_str = 'was <b>Rank {}{}</b> with an average score of <b>{:.1f}</b> in quals'.format(rank, total_str, qual_average)
+                    qual_str = 'was <b>Rank {}{}</b> with an average score of <b>{:.1f}</b> in quals'.format(rank, max_rank_str, qual_average)
                 else:
                     qual_str = 'had an average score of <b>{:.1f}</b> in quals'.format(qual_average)
 
@@ -123,6 +123,15 @@ class EventTeamStatusHelper(object):
 
     @classmethod
     def _build_qual_info(cls, team_key, event_details, matches, year):
+        if not matches['qm']:
+            status = 'not_started'
+        else:
+            status = 'complete'
+            for match in matches['qm']:
+                if not match.has_been_played:
+                    status = 'playing'
+                    break
+
         if event_details and event_details.rankings2:
             rankings = event_details.rankings2
 
@@ -130,6 +139,7 @@ class EventTeamStatusHelper(object):
             for ranking in rankings:
                 if ranking['team_key'] == team_key:
                     qual_info = {
+                        'status': status,
                         'rank': ranking['rank'],
                         'matches_played': ranking['matches_played'],
                         'dq': ranking['dq'],
@@ -139,7 +149,7 @@ class EventTeamStatusHelper(object):
                     break
 
             if qual_info:
-                qual_info['total'] = len(rankings)
+                qual_info['max_rank'] = len(rankings)
                 qual_info['ranking_sort_orders'] = RankingsHelper.get_sort_order_info(event_details)
                 for info, value in zip(qual_info['ranking_sort_orders'], ranking['sort_orders']):
                     info['value'] = value
@@ -174,6 +184,7 @@ class EventTeamStatusHelper(object):
 
             if team_key in all_teams:
                 return {
+                    'status': status,
                     'rank': None,
                     'matches_played': matches_played,
                     'dq': None,
@@ -183,7 +194,7 @@ class EventTeamStatusHelper(object):
                         'ties': ties,
                     } if year != 2015 else None,
                     'qual_average': qual_average if year == 2015 else None,
-                    'total': len(all_teams),
+                    'max_rank': len(all_teams),
                     'ranking_sort_orders': None,
                 }
             else:

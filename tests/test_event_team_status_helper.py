@@ -5,17 +5,52 @@ from appengine_fixture_loader.loader import load_fixture
 from google.appengine.ext import testbed
 from google.appengine.ext import ndb
 
+from helpers.event_simulator import EventSimulator
 from helpers.event_team_status_helper import EventTeamStatusHelper
 from models.event import Event
 from models.event_details import EventDetails
 from models.match import Match
 
 
+class TestSimulated2016nytrEventTeamStatusHelper(unittest2.TestCase):
+
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+        self.testbed.init_taskqueue_stub(root_path=".")
+        ndb.get_context().clear_cache()  # Prevent data from leaking between tests
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def testSimulatedEvent(self):
+        es = EventSimulator()
+        event = Event.get_by_id('2016nytr')
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc359', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
+            None)
+
+        es.step()
+        event = Event.get_by_id('2016nytr')
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc359', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
+            'Team 359 is <b>Rank 15/36</b> with a record of <b>0-0-0</b> in quals.')
+
+        # self.assertEqual(
+        #     EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
+        #     'Team 359 was <b>Rank 1/36</b> with a record of <b>11-1-0</b> in quals, competed in the playoffs as the <b>Captain</b> on <b>Alliance 1</b>, and <b>won the event</b> with a playoff record of <b>6-1-0</b>.')
+
+
 class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
     status_359 = {
         "qual": {
+            "status": "complete",
             "rank": 1,
-            "total": 36,
+            "max_rank": 36,
             "matches_played": 12,
             "dq": 0,
             "record": {
@@ -77,8 +112,9 @@ class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
 
     status_5240 = {
         "qual": {
+            "status": "complete",
             "rank": 6,
-            "total": 36,
+            "max_rank": 36,
             "matches_played": 12,
             "dq": 0,
             "record": {
@@ -140,8 +176,9 @@ class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
 
     status_229 = {
         "qual": {
+            "status": "complete",
             "rank": 20,
-            "total": 36,
+            "max_rank": 36,
             "matches_played": 12,
             "dq": 0,
             "record": {
@@ -204,8 +241,9 @@ class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
 
     status_1665 = {
         "qual": {
+            "status": "complete",
             "rank": 18,
-            "total": 36,
+            "max_rank": 36,
             "matches_played": 12,
             "dq": 0,
             "record": {
@@ -268,8 +306,9 @@ class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
 
     status_5964 = {
         "qual": {
+            "status": "complete",
             "rank": 23,
-            "total": 36,
+            "max_rank": 36,
             "matches_played": 12,
             "dq": 0,
             "record": {
@@ -382,8 +421,9 @@ class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
 class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
     status_359 = {
         "qual": {
+            "status": "complete",
             "rank": None,
-            "total": 36,
+            "max_rank": 36,
             "matches_played": 12,
             "dq": None,
             "record": {
@@ -414,8 +454,9 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
 
     status_5240 = {
         "qual": {
+            "status": "complete",
             "rank": None,
-            "total": 36,
+            "max_rank": 36,
             "matches_played": 12,
             "dq": None,
             "record": {
@@ -446,8 +487,9 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
 
     status_229 = {
         "qual": {
+            "status": "complete",
             "rank": None,
-            "total": 36,
+            "max_rank": 36,
             "matches_played": 12,
             "dq": None,
             "record": {
@@ -479,8 +521,9 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
 
     status_1665 = {
         "qual": {
+            "status": "complete",
             "rank": None,
-            "total": 36,
+            "max_rank": 36,
             "matches_played": 12,
             "dq": None,
             "record": {
@@ -512,8 +555,9 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
 
     status_5964 = {
         "qual": {
+            "status": "complete",
             "rank": None,
-            "total": 36,
+            "max_rank": 36,
             "matches_played": 12,
             "dq": None,
             "record": {
@@ -601,8 +645,9 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
 class Test2016casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
     status_254 = {
         "qual": {
+            "status": "complete",
             "rank": None,
-            "total": 64,
+            "max_rank": 64,
             "matches_played": 8,
             "dq": None,
             "record": {
@@ -662,8 +707,9 @@ class Test2016casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
 class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
     status_254 = {
         "qual": {
+            "status": "complete",
             "rank": 1,
-            "total": 57,
+            "max_rank": 57,
             "matches_played": 10,
             "dq": 0,
             "record": None,
@@ -722,8 +768,9 @@ class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
 
     status_846 = {
         "qual": {
+            "status": "complete",
             "rank": 8,
-            "total": 57,
+            "max_rank": 57,
             "matches_played": 10,
             "dq": 0,
             "record": None,
@@ -778,8 +825,9 @@ class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
 
     status_8 = {
         "qual": {
+            "status": "complete",
             "rank": 53,
-            "total": 57,
+            "max_rank": 57,
             "matches_played": 10,
             "dq": 0,
             "record": None,
@@ -880,8 +928,9 @@ class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
 class Test2015casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
     status_254 = {
         "qual": {
+            "status": "complete",
             "rank": None,
-            "total": 57,
+            "max_rank": 57,
             "matches_played": 10,
             "dq": None,
             "record": None,
@@ -904,8 +953,9 @@ class Test2015casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
 
     status_846 = {
         "qual": {
+            "status": "complete",
             "rank": None,
-            "total": 57,
+            "max_rank": 57,
             "matches_played": 10,
             "dq": None,
             "record": None,
@@ -924,8 +974,9 @@ class Test2015casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
 
     status_8 = {
         "qual": {
+            "status": "complete",
             "rank": None,
-            "total": 57,
+            "max_rank": 57,
             "matches_played": 10,
             "dq": None,
             "record": None,
