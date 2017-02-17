@@ -4,16 +4,15 @@ from database.dict_converters.converter_base import ConverterBase
 
 class DistrictConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        3: 1,
+        3: 2,
     }
 
     @classmethod
-    def convert(cls, districts, dict_version):
+    def _convert(cls, districts, dict_version):
         CONVERTERS = {
             3: cls.districtsConverter_v3,
         }
-        converted_districts = CONVERTERS[dict_version](cls._listify(districts))
-        return cls._delistify(converted_districts)
+        return CONVERTERS[dict_version](districts)
 
     @classmethod
     def districtsConverter_v3(cls, districts):

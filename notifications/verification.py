@@ -8,7 +8,6 @@ from notifications.base_notification import BaseNotification
 class VerificationNotification(BaseNotification):
 
     _track_call = False
-    _push_firebase = False
 
     def __init__(self, url, secret):
         self.url = url

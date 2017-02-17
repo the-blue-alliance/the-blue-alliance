@@ -57,8 +57,10 @@ class EventDetails(ndb.Model):
         has_qual_avg = False
         for rank in self.rankings2:
             row = [rank['rank'], rank['team_key'][3:]]
-            for i, item in enumerate(rank['sort_orders']):
-                row.append('%.*f' % (precisions[i], round(item, precisions[i])))
+            # for i, item in enumerate(rank['sort_orders']):
+            for i, precision in enumerate(precisions):
+                # row.append('%.*f' % (precisions[i], round(item, precisions[i])))
+                row.append('%.*f' % (precision, round(rank['sort_orders'][i], precision)))
             if rank['record']:
                 row.append('{}-{}-{}'.format(rank['record']['wins'], rank['record']['losses'], rank['record']['ties']))
                 has_record = True

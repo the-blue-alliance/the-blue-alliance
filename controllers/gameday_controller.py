@@ -160,6 +160,6 @@ class GamedayRedirectHandler(webapp2.RequestHandler):
         params = "#layout={}".format(layout)
         for i, webcast in enumerate(event.webcast):
             # The various streams for an event are 0-indexed in GD2
-            params += "&view_{0}={1}-{0}".format(i, webcast['key_name'])
+            params += "&view_{0}={1}-{0}".format(i, event.key.id())
 
         return params

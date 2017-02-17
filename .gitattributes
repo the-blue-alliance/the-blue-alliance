@@ -1,0 +1,3 @@
+lib/* linguist-vendored
+subtrees/* linguist-vendored
+test_data/* linguist-vendored

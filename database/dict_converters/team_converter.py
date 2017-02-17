@@ -3,16 +3,15 @@ from database.dict_converters.converter_base import ConverterBase
 
 class TeamConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        3: 1,
+        3: 2,
     }
 
     @classmethod
-    def convert(cls, teams, dict_version):
+    def _convert(cls, teams, dict_version):
         CONVERTERS = {
             3: cls.teamsConverter_v3,
         }
-        converted_teams = CONVERTERS[dict_version](cls._listify(teams))
-        return cls._delistify(converted_teams)
+        return CONVERTERS[dict_version](teams)
 
     @classmethod
     def teamsConverter_v3(cls, teams):

@@ -30,7 +30,7 @@ class SearchHelper(object):
 
     @classmethod
     def remove_event_location_index(cls, event):
-        search.Index(name=EVENT_LOCATION_INDEX).delete(event.key.id())
+        search.Index(name=cls.EVENT_LOCATION_INDEX).delete(event.key.id())
 
     @classmethod
     def update_team_location_index(cls, team):

@@ -3,11 +3,11 @@ from database.dict_converters.converter_base import ConverterBase
 
 class AwardConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        3: 1,
+        3: 2,
     }
 
     @classmethod
-    def convert(cls, awards, dict_version):
+    def _convert(cls, awards, dict_version):
         AWARD_CONVERTERS = {
             3: cls.awardsConverter_v3,
         }

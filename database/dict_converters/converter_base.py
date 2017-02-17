@@ -1,5 +1,13 @@
 class ConverterBase(object):
     @classmethod
+    def convert(cls, thing, dict_version):
+        converted_thing = cls._convert(cls._listify(thing), dict_version)
+        if isinstance(thing, list):
+            return cls._listify(converted_thing)
+        else:
+            return cls._delistify(converted_thing)
+
+    @classmethod
     def _listify(cls, thing):
         if not isinstance(thing, list):
             return [thing]

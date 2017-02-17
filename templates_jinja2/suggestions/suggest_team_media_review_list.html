@@ -75,6 +75,7 @@
                     <label class="radio text-danger">
                       <input class="reject" type="radio" name="accept_reject-{{suggestion.key.id()}}" value="reject::{{suggestion.key.id()}}"> Reject
                     </label>
+                    <input type="text" class="form-control" name="year-{{suggestion.key.id()}}" placeholder="Year" value="{{suggestion.contents.year}}">
                   </div>
                   <div class="col-xs-5 fitvids">
                       <p><strong><a href="/team/{{reference.team_number}}/{{suggestion.contents.year}}" target="_blank">Team {{reference.team_number}}{% if reference.nickname %} - {{reference.nickname}}{% endif %} ({{suggestion.contents.year}})</a></strong></p>

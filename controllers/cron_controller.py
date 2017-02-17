@@ -511,6 +511,7 @@ class DistrictRankingsCalcDo(webapp.RequestHandler):
         district = District.get_by_id(district_key)
         if not district:
             self.response.out.write("District {} does not exist!".format(district_key))
+            return
 
         events_future = DistrictEventsQuery(district_key).fetch_async()
         teams_future = DistrictTeamsQuery(district_key).fetch_async()

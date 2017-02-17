@@ -46,7 +46,7 @@ class CacheClearer(object):
         """
         event_keys = affected_refs['key']
         years = affected_refs['year']
-        event_district_abbrevs = map(lambda x: x.id()[4:], affected_refs['district_key'])
+        event_district_abbrevs = map(lambda x: x.id()[4:], filter(None, affected_refs['district_key']))
 
         event_team_keys_future = EventTeam.query(EventTeam.event.IN([event_key for event_key in event_keys])).fetch_async(None, keys_only=True)
 
