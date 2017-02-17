@@ -10,7 +10,10 @@ class FMSAPIEventRankingsParser(object):
             2015: self.parse2015,
             2016: self.parse2016,
         }
-        return parsers[self.year](response)
+        if self.year not in parsers:
+            return None
+        else:
+            return parsers[self.year](response)
 
     def parse2015(self, response):
         rankings = [['Rank', 'Team', 'Qual Avg', 'Auto', 'Container', 'Coopertition', 'Litter', 'Tote', 'Played']]
