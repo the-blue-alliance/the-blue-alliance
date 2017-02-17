@@ -1,3 +1,4 @@
+from collections import defaultdict
 import copy
 import datetime
 import json
@@ -121,6 +122,56 @@ class EventSimulator(object):
     def _event_key_adder(self, obj):
         obj.event = ndb.Key(Event, '2016nytr')
 
+    def _update_rankings(self):
+        """
+        Generates and saves fake rankings
+        """
+        event = Event.get_by_id('2016nytr')
+
+        team_wins = defaultdict(int)
+        team_losses = defaultdict(int)
+        team_ties = defaultdict(int)
+        teams = set()
+        for match in event.matches:
+            if match.comp_level == 'qm':
+                for alliance in ['red', 'blue']:
+                    for team in match.alliances[alliance]['teams']:
+                        teams.add(team)
+                        if match.has_been_played:
+                            if alliance == match.winning_alliance:
+                                team_wins[team] += 1
+                            elif match.winning_alliance == '':
+                                team_ties[team] += 1
+                            else:
+                                team_losses[team] += 1
+
+        rankings = []
+        for team in sorted(teams):
+            wins = team_wins[team]
+            losses = team_losses[team]
+            ties = team_ties[team]
+            rankings.append({
+                'team_key': team,
+                'record': {
+                    'wins': wins,
+                    'losses': losses,
+                    'ties': ties,
+                },
+                'matches_played': wins + losses + ties,
+                'dq': 0,
+                'sort_orders': [2 * wins + ties, 0, 0, 0, 0],
+                'qual_average': None,
+            })
+        rankings = sorted(rankings, key=lambda r: -r['sort_orders'][0])
+
+        for i, ranking in enumerate(rankings):
+            ranking['rank'] = i + 1
+
+        EventDetailsManipulator.createOrUpdate(EventDetails(
+            id='2016nytr',
+            rankings2=rankings,
+        ))
+
     def step(self):
         event = Event.get_by_id('2016nytr')
 
@@ -212,3 +263,4 @@ class EventSimulator(object):
         ndb.get_context().clear_cache()
         MatchHelper.deleteInvalidMatches(event.matches)
         ndb.get_context().clear_cache()
+        self._update_rankings()

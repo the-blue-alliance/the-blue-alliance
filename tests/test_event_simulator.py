@@ -40,7 +40,10 @@ class TestEventSimulator(unittest2.TestCase):
         self.es.step()
         event = Event.get_by_id('2016nytr')
         self.assertNotEqual(event, None)
-        self.assertEqual(event.details, None)
+        self.assertNotEqual(event.details, None)
+        for rank in event.details.rankings2:
+            self.assertEqual(rank['sort_orders'][0], 0)
+
         self.assertEqual(len(event.matches), 72)
         for match in event.matches:
             self.assertEqual(match.comp_level, 'qm')
@@ -62,6 +65,10 @@ class TestEventSimulator(unittest2.TestCase):
                     self.assertNotEqual(match.actual_time, None)
                 else:
                     self.assertFalse(match.has_been_played)
+
+        # Check some final rankings
+        self.assertEqual(event.details.rankings2[0]['sort_orders'][0], 22)
+        self.assertEqual(event.details.rankings2[-1]['sort_orders'][0], 4)
 
         # After alliance selections
         self.es.step()
