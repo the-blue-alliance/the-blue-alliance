@@ -93,12 +93,16 @@ class EventManipulator(ManipulatorBase):
             "year"
         ]
 
+        allow_none_attrs = {
+            'district_key'
+        }
+
         list_attrs = []
 
         old_event._updated_attrs = []
 
         for attr in attrs:
-            if getattr(new_event, attr) is not None:
+            if getattr(new_event, attr) is not None or attr in allow_none_attrs:
                 if getattr(new_event, attr) != getattr(old_event, attr):
                     setattr(old_event, attr, getattr(new_event, attr))
                     old_event._updated_attrs.append(attr)

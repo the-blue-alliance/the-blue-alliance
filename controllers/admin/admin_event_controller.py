@@ -346,12 +346,14 @@ class AdminEventEdit(LoggedInHandler):
         if self.request.get("end_date"):
             end_date = datetime.strptime(self.request.get("end_date"), "%Y-%m-%d")
 
+        district_key = self.request.get("event_district_key", None)
+
         event = Event(
             id=str(self.request.get("year")) + str.lower(str(self.request.get("event_short"))),
             end_date=end_date,
             event_short=self.request.get("event_short"),
             event_type_enum=EventHelper.parseEventType(self.request.get("event_type_str")),
-            district_key=ndb.Key(District, self.request.get("event_district_key")) if self.request.get("event_district_key", None) else None,
+            district_key=ndb.Key(District, self.request.get("event_district_key")) if district_key and district_key != 'None' else None,
             venue=self.request.get("venue"),
             venue_address=self.request.get("venue_address"),
             city=self.request.get("city"),
