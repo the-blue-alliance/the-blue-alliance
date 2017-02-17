@@ -4,16 +4,15 @@ from database.dict_converters.converter_base import ConverterBase
 
 class MatchConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        3: 1,
+        3: 2,
     }
 
     @classmethod
-    def convert(cls, matches, dict_version):
+    def _convert(cls, matches, dict_version):
         CONVERTERS = {
             3: cls.matchesConverter_v3,
         }
-        converted_matches = CONVERTERS[dict_version](cls._listify(matches))
-        return cls._delistify(converted_matches)
+        return CONVERTERS[dict_version](matches)
 
     @classmethod
     def matchesConverter_v3(cls, matches):

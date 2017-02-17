@@ -8,7 +8,7 @@ class EventDetailsConverter(ConverterBase):
     }
 
     @classmethod
-    def convert(cls, event_details, dict_version):
+    def _convert(cls, event_details, dict_version):
         CONVERTERS = {
             3: cls.eventDetailsConverter_v3,
         }

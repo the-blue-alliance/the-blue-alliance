@@ -3,11 +3,11 @@ from database.dict_converters.converter_base import ConverterBase
 
 class MediaConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        3: 1,
+        3: 2,
     }
 
     @classmethod
-    def convert(cls, medias, dict_version):
+    def _convert(cls, medias, dict_version):
         MEDIA_CONVERTERS = {
             3: cls.mediasConverter_v3,
         }
