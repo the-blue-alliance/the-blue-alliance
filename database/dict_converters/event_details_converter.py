@@ -10,9 +10,14 @@ class EventDetailsConverter(ConverterBase):
     @classmethod
     def _convert(cls, event_details, dict_version):
         CONVERTERS = {
-            3: cls.eventDetailsConverter_v3,
+            3: cls.eventsDetailsConverter_v3,
         }
         return CONVERTERS[dict_version](event_details)
+
+    @classmethod
+    def eventsDetailsConverter_v3(cls, event_details):
+        event_details = map(cls.eventDetailsConverter_v3, event_details)
+        return event_details
 
     @classmethod
     def eventDetailsConverter_v3(cls, event_details):

@@ -5,7 +5,7 @@ class ConverterBase(object):
         if isinstance(thing, list):
             return cls._listify(converted_thing)
         else:
-            return converted_thing
+            return cls._delistify(converted_thing)
 
     @classmethod
     def _listify(cls, thing):
