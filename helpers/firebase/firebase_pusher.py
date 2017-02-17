@@ -92,7 +92,7 @@ class FirebasePusher(object):
         for team_key_name in match.team_key_names:
             deferred.defer(
                 cls._put_data,
-                'event_teams/{}_{}/matches/{}'.format(match.event.id(), team_key_name, match.key.id()),
+                'event_teams/{}/{}/matches/{}'.format(match.event.id(), team_key_name, match.key.id()),
                 match_data_json,
                 _queue="firebase")
 
