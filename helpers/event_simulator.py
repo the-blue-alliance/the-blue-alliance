@@ -33,7 +33,7 @@ class EventSimulator(object):
     (step 8, substep n) Add results of each of the n F matches +
         update alliance selection backups (if has_event_details)
     """
-    def __init__(self, has_event_details=True, batch_advance=True):
+    def __init__(self, has_event_details=True, batch_advance=False):
         self._step = 0
         self._substep = 0
         # whether to update rankings and alliance selections
@@ -118,6 +118,9 @@ class EventSimulator(object):
         event.details.key.delete()
         ndb.delete_multi([match.key for match in event.matches])
         ndb.get_context().clear_cache()
+
+        # Used to keep track of non-batch advancement
+        self._advancement_alliances = defaultdict(dict)
 
     def _event_key_adder(self, obj):
         obj.event = ndb.Key(Event, '2016nytr')
@@ -209,27 +212,94 @@ class EventSimulator(object):
                 MatchManipulator.createOrUpdate(match)
             self._step += 1
         elif self._step == 4:  # After each QF match
-            MatchManipulator.createOrUpdate(
-                MatchHelper.play_order_sort_matches(
-                    self._played_matches['qf'])[self._substep])
+            new_match = MatchHelper.play_order_sort_matches(self._played_matches['qf'])[self._substep]
+            MatchManipulator.createOrUpdate(new_match)
+
+            if not self._batch_advance:
+                win_counts = {
+                    'red': 0,
+                    'blue': 0,
+                }
+                for i in xrange(new_match.match_number):
+                    win_counts[Match.get_by_id(
+                        Match.renderKeyName(
+                            new_match.event.id(),
+                            new_match.comp_level,
+                            new_match.set_number,
+                            i+1)).winning_alliance] += 1
+                for alliance, wins in win_counts.items():
+                    if wins == 2:
+                        s = new_match.set_number
+                        if s in {1, 2}:
+                            self._advancement_alliances['sf1']['red' if s == 1 else 'blue'] = new_match.alliances[alliance]['teams']
+                        elif s in {3, 4}:
+                            self._advancement_alliances['sf2']['red' if s == 3 else 'blue'] = new_match.alliances[alliance]['teams']
+                        else:
+                            raise Exception("Invalid set number: {}".format(s))
+
+                        for match_set, alliances in self._advancement_alliances.items():
+                            if match_set.startswith('sf'):
+                                for i in xrange(3):
+                                    for match in copy.deepcopy(self._all_matches['sf']):
+                                        key = '2016nytr_{}m{}'.format(match_set, i+1)
+                                        if match.key.id() == key:
+                                            for color in ['red', 'blue']:
+                                                match.alliances[color]['score'] = -1
+                                                match.alliances[color]['teams'] = alliances.get(color)
+                                            match.alliances_json = json.dumps(match.alliances)
+                                            match.score_breakdown_json = None
+                                            match.actual_time = None
+                                            MatchManipulator.createOrUpdate(match)
+
             if self._substep < len(self._played_matches['qf']) - 1:
                 self._substep += 1
             else:
-                self._step += 1
+                self._step += 1 if self._batch_advance else 2
                 self._substep = 0
         elif self._step == 5:  # SF schedule added
-            for match in copy.deepcopy(self._all_matches['sf']):
-                for alliance in ['red', 'blue']:
-                    match.alliances[alliance]['score'] = -1
-                match.alliances_json = json.dumps(match.alliances)
-                match.score_breakdown_json = None
-                match.actual_time = None
-                MatchManipulator.createOrUpdate(match)
-            self._step += 1
+            if self._batch_advance:
+                for match in copy.deepcopy(self._all_matches['sf']):
+                    for alliance in ['red', 'blue']:
+                        match.alliances[alliance]['score'] = -1
+                    match.alliances_json = json.dumps(match.alliances)
+                    match.score_breakdown_json = None
+                    match.actual_time = None
+                    MatchManipulator.createOrUpdate(match)
+                self._step += 1
         elif self._step == 6:  # After each SF match
-            MatchManipulator.createOrUpdate(
-                MatchHelper.play_order_sort_matches(
-                    self._played_matches['sf'])[self._substep])
+            new_match = MatchHelper.play_order_sort_matches(self._played_matches['sf'])[self._substep]
+            MatchManipulator.createOrUpdate(new_match)
+
+            if not self._batch_advance:
+                win_counts = {
+                    'red': 0,
+                    'blue': 0,
+                }
+                for i in xrange(new_match.match_number):
+                    win_counts[Match.get_by_id(
+                        Match.renderKeyName(
+                            new_match.event.id(),
+                            new_match.comp_level,
+                            new_match.set_number,
+                            i+1)).winning_alliance] += 1
+                for alliance, wins in win_counts.items():
+                    if wins == 2:
+                        self._advancement_alliances['f1']['red' if new_match.set_number == 1 else 'blue'] = new_match.alliances[alliance]['teams']
+
+                        for match_set, alliances in self._advancement_alliances.items():
+                            if match_set.startswith('f'):
+                                for i in xrange(3):
+                                    for match in copy.deepcopy(self._all_matches['f']):
+                                        key = '2016nytr_{}m{}'.format(match_set, i+1)
+                                        if match.key.id() == key:
+                                            for color in ['red', 'blue']:
+                                                match.alliances[color]['score'] = -1
+                                                match.alliances[color]['teams'] = alliances.get(color)
+                                            match.alliances_json = json.dumps(match.alliances)
+                                            match.score_breakdown_json = None
+                                            match.actual_time = None
+                                            MatchManipulator.createOrUpdate(match)
+
             # Backup robot introduced
             if self._substep == 3:
                 EventDetailsManipulator.createOrUpdate(EventDetails(
@@ -239,17 +309,18 @@ class EventSimulator(object):
             if self._substep < len(self._played_matches['sf']) - 1:
                 self._substep += 1
             else:
-                self._step += 1
+                self._step += 1 if self._batch_advance else 2
                 self._substep = 0
         elif self._step == 7:  # F schedule added
-            for match in copy.deepcopy(self._all_matches['f']):
-                for alliance in ['red', 'blue']:
-                    match.alliances[alliance]['score'] = -1
-                match.alliances_json = json.dumps(match.alliances)
-                match.score_breakdown_json = None
-                match.actual_time = None
-                MatchManipulator.createOrUpdate(match)
-            self._step += 1
+            if self._batch_advance:
+                for match in copy.deepcopy(self._all_matches['f']):
+                    for alliance in ['red', 'blue']:
+                        match.alliances[alliance]['score'] = -1
+                    match.alliances_json = json.dumps(match.alliances)
+                    match.score_breakdown_json = None
+                    match.actual_time = None
+                    MatchManipulator.createOrUpdate(match)
+                self._step += 1
         elif self._step == 8:  # After each F match
             MatchManipulator.createOrUpdate(
                 MatchHelper.play_order_sort_matches(
@@ -261,6 +332,8 @@ class EventSimulator(object):
                 self._substep = 0
 
         ndb.get_context().clear_cache()
+        # Re fetch event matches
+        event = Event.get_by_id('2016nytr')
         MatchHelper.deleteInvalidMatches(event.matches)
         ndb.get_context().clear_cache()
         self._update_rankings()
