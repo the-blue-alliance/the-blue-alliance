@@ -17,23 +17,19 @@
                         <th>Team Name</th>
                         <th>Qual Record</th>
                         <th>Ranking</th>
+                        <th>Alliance</th>
                         <th>Playoff Status</th>
                     </tr>
-                    {% for team_and_status in live_event.1 %}
+                    {% for team, status, status_str in live_event.1 %}
                         <tr>
-                            {% with team_and_status.0 as team %}
-                                {% with team_and_status.1 as status %}
-                                    <td>{{ team.team_number }}</td>
-                                    <td>
-                                        <a href="/team/{{ team.team_number }}/{{ event.year }}#{{ event.key_name }}">{{ team.nickname }}</a>
-                                    </td>
-                                    <td>{{ status.1 }}</td>
-                                    <td>{{ status.2 }}</td>
-                                    {% with status.3 as playoff %}
-                                        <td>{% if playoff %} {{ playoff }} {% endif %}</td>
-                                    {% endwith %}
-                                {% endwith %}
-                            {% endwith %}
+                            <td>{{ team.team_number }}</td>
+                            <td>
+                                <a href="/team/{{ team.team_number }}/{{ event.year }}#{{ event.key_name }}">{{ team.nickname }}</a>
+                            </td>
+                            <td>{{ status.qual.record.wins }}-{{ status.qual.record.losses }}-{{ status.qual.record.ties }}</td>
+                            <td>{% if status.qual.rank %}{{ status.qual.rank }}/{{ status.qual.max_rank }}{% else %}--{% endif %}</td>
+                            <td>{{status_str.alliance|safe}}</td>
+                            <td>{{status_str.playoff|safe}}</td>
                         </tr>
                     {% endfor %}
                 </table>

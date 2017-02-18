@@ -27,6 +27,7 @@
       <hr>
     </div>
   </div>
+  {% if not past_only %}
   <div class="row">
     <div class="col-xs-12">
       <h2>Currently Competing</h2>
@@ -41,6 +42,7 @@
       {% endif %}
     </div>
   </div>
+  <hr>
   <div class="row">
     <div class="col-xs-12">
       <h2>Future Competitions</h2>
@@ -83,9 +85,11 @@
       </div>
     </div>
   {% endif %}
+  <hr>
+  {% endif %}
   <div class="row">
     <div class="col-xs-12">
-      <h2>Past Competitions This Year</h2>
+      <h2>Past Competitions In {{year}}</h2>
     </div>
   </div>
   <div class="row">

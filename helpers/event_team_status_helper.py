@@ -13,6 +13,55 @@ from models.match import Match
 
 class EventTeamStatusHelper(object):
     @classmethod
+    def generate_team_at_event_alliance_status_string(cls, team_key, status_dict):
+        alliance = status_dict.get('alliance')
+        if alliance:
+            pick = alliance['pick']
+            if pick == 0:
+                pick = 'Captain'
+            else:
+                # Convert to ordinal number http://stackoverflow.com/questions/9647202/ordinal-numbers-replacement
+                pick = '{} Pick'.format("%d%s" % (pick,"tsnrhtdd"[(pick/10%10!=1)*(pick%10<4)*pick%10::4]))
+            backup = alliance['backup']
+            if backup and team_key == backup['in']:
+                pick = 'Backup'
+
+            return '<b>{}</b> of <b>{}</b>'.format(pick, alliance['name'])
+        else:
+            return '--'
+
+    @classmethod
+    def generate_team_at_event_playoff_status_string(cls, team_key, status_dict):
+        playoff = status_dict.get('playoff')
+        if playoff:
+            level = playoff.get('level')
+            status = playoff.get('status')
+            record = playoff.get('record')
+            level_record = playoff.get('current_level_record')
+            playoff_average = playoff.get('playoff_average')
+
+            if status == 'playing':
+                record_str = '{}-{}-{}'.format(level_record['wins'], level_record['losses'], level_record['ties'])
+                playoff_str = 'Currently <b>{}</b> in the <b>{}</b>'.format(record_str, Match.COMP_LEVELS_VERBOSE_FULL[level])
+            else:
+                if status == 'won':
+                    if level == 'f':
+                        playoff_str = '<b>Won the event</b>'
+                    else:
+                        playoff_str = '<b>Won the {}</b>'.format(Match.COMP_LEVELS_VERBOSE_FULL[level])
+                elif status == 'eliminated':
+                    playoff_str = '<b>Eliminated in the {}</b>'.format(Match.COMP_LEVELS_VERBOSE_FULL[level])
+                else:
+                    raise Exception("Unknown playoff status: {}".format(status))
+                if record:
+                    playoff_str += ' with a playoff record of <b>{}-{}-{}</b>'.format(record['wins'], record['losses'], record['ties'])
+                if playoff_average:
+                    playoff_str += ' with a playoff average of <b>{:.1f}</b>'.format(playoff_average)
+            return playoff_str
+        else:
+            return '--'
+
+    @classmethod
     def generate_team_at_event_status_string(cls, team_key, status_dict):
         """
         Generate a team at event status string from a status dict
@@ -355,112 +404,112 @@ class EventTeamStatusHelper(object):
         alliance_number = 0
         return None, alliance_number  # Team didn't make it to elims
 
-    @classmethod
-    def buildEventTeamStatus(cls, events, eventteams, team_filter):
-        # Currently Competing Team Status
-        for event in events:
-            event.prep_details()  # Prepare details for later
-            event.prep_matches()  # Prepare matches for later
+    # @classmethod
+    # def buildEventTeamStatus(cls, events, eventteams, team_filter):
+    #     # Currently Competing Team Status
+    #     for event in events:
+    #         event.prep_details()  # Prepare details for later
+    #         event.prep_matches()  # Prepare matches for later
 
-        events_with_teams = []
-        for event, teams in zip(events, eventteams):
-            teams = teams.get_result() if type(teams) == Future else teams
-            live_teams_in_filter = TeamHelper.sortTeams(filter(lambda t: t in team_filter, teams))
+    #     events_with_teams = []
+    #     for event, teams in zip(events, eventteams):
+    #         teams = teams.get_result() if type(teams) == Future else teams
+    #         live_teams_in_filter = TeamHelper.sortTeams(filter(lambda t: t in team_filter, teams))
 
-            teams_and_statuses_future = []
-            for team in live_teams_in_filter:
-                teams_and_statuses_future.append([team, cls.generateTeamAtEventStatusAsync(team.key_name, event)])
-            if teams_and_statuses_future:
-                events_with_teams.append((event, teams_and_statuses_future))
+    #         teams_and_statuses_future = []
+    #         for team in live_teams_in_filter:
+    #             teams_and_statuses_future.append([team, cls.generateTeamAtEventStatusAsync(team.key_name, event)])
+    #         if teams_and_statuses_future:
+    #             events_with_teams.append((event, teams_and_statuses_future))
 
-        return events_with_teams
+    #     return events_with_teams
 
-    @classmethod
-    def _get_playoff_status_string(cls, team_key, alliance_status, playoff_status):
-        """
-        Returns a tuple <long status, short status> for the given team
-        """
-        if not playoff_status or not alliance_status:
-            return None, None
-        team_number = team_key[3:]
-        alliance_name = alliance_status['name']
-        level_map = {
-            'ef': 'octofinals',
-            'qf': 'quarters',
-            'sf': 'semis',
-            'f': 'the finals',
-        }
-        level_str = level_map[playoff_status['level']]
-        if playoff_status['status'] == 'won':
-            if playoff_status['level'] == 'f':
-                return "Team {} won the event on {}.".format(team_number, alliance_name), "Won on {}".format(alliance_name)
-            else:
-                return "Team {} won {} on {}.".format(team_number, level_str, alliance_name), "Won {} on {}".format(level_str, alliance_name)
-        elif playoff_status['status'] == 'eliminated':
-            return "Team {} got knocked out in {} on {}.".format(team_number, level_str, alliance_name), "Knocked out in {} on {}".format(level_str, alliance_name)
-        else:
-            return "Team {} is currently {} in {} on {}.".format(team_number, playoff_status['current_level_record'], level_str, alliance_name), "Currently {} in {} on {}".format(playoff_status['current_level_record'], level_str, alliance_name)
+    # @classmethod
+    # def _get_playoff_status_string(cls, team_key, alliance_status, playoff_status):
+    #     """
+    #     Returns a tuple <long status, short status> for the given team
+    #     """
+    #     if not playoff_status or not alliance_status:
+    #         return None, None
+    #     team_number = team_key[3:]
+    #     alliance_name = alliance_status['name']
+    #     level_map = {
+    #         'ef': 'octofinals',
+    #         'qf': 'quarters',
+    #         'sf': 'semis',
+    #         'f': 'the finals',
+    #     }
+    #     level_str = level_map[playoff_status['level']]
+    #     if playoff_status['status'] == 'won':
+    #         if playoff_status['level'] == 'f':
+    #             return "Team {} won the event on {}.".format(team_number, alliance_name), "Won on {}".format(alliance_name)
+    #         else:
+    #             return "Team {} won {} on {}.".format(team_number, level_str, alliance_name), "Won {} on {}".format(level_str, alliance_name)
+    #     elif playoff_status['status'] == 'eliminated':
+    #         return "Team {} got knocked out in {} on {}.".format(team_number, level_str, alliance_name), "Knocked out in {} on {}".format(level_str, alliance_name)
+    #     else:
+    #         return "Team {} is currently {} in {} on {}.".format(team_number, playoff_status['current_level_record'], level_str, alliance_name), "Currently {} in {} on {}".format(playoff_status['current_level_record'], level_str, alliance_name)
 
-    @classmethod
-    @ndb.tasklet
-    def generateTeamAtEventStatusAsync(cls, team_key, event):
-        """
-        Generate Team@Event status items
-        :return: a tuple future <long summary string, qual record, qual ranking, playoff status>
-        """
-        team_number = team_key[3:]
-        event.prep_details()
-        # We need all the event's playoff matches here to properly account for backup teams
-        event.prep_matches()
-        qual_match_count = 0
-        playoff_match_count = 0
-        playoff_matches = []
-        matches = event.matches
-        for match in matches:
-            if match.comp_level in Match.ELIM_LEVELS:
-                playoff_match_count += 1
-                playoff_matches.append(match)
-            else:
-                qual_match_count += 1
-        matches = MatchHelper.organizeMatches(playoff_matches)
+    # @classmethod
+    # @ndb.tasklet
+    # def generateTeamAtEventStatusAsync(cls, team_key, event):
+    #     """
+    #     Generate Team@Event status items
+    #     :return: a tuple future <long summary string, qual record, qual ranking, playoff status>
+    #     """
+    #     team_number = team_key[3:]
+    #     event.prep_details()
+    #     # We need all the event's playoff matches here to properly account for backup teams
+    #     event.prep_matches()
+    #     qual_match_count = 0
+    #     playoff_match_count = 0
+    #     playoff_matches = []
+    #     matches = event.matches
+    #     for match in matches:
+    #         if match.comp_level in Match.ELIM_LEVELS:
+    #             playoff_match_count += 1
+    #             playoff_matches.append(match)
+    #         else:
+    #             qual_match_count += 1
+    #     matches = MatchHelper.organizeMatches(playoff_matches)
 
-        team_status = cls.generate_team_at_event_status(team_key, event, matches)
-        rank_status = team_status.get('rank', None)
-        alliance_status = team_status.get('alliance', None)
-        playoff_status = team_status.get('playoff', None)
+    #     team_status = cls.generate_team_at_event_status(team_key, event, matches)
+    #     rank_status = team_status.get('rank', None)
+    #     alliance_status = team_status.get('alliance', None)
+    #     playoff_status = team_status.get('playoff', None)
 
-        # Playoff Status
-        status, short_playoff_status = cls._get_playoff_status_string(team_key, alliance_status, playoff_status)
+    #     # Playoff Status
+    #     status, short_playoff_status = cls._get_playoff_status_string(team_key, alliance_status, playoff_status)
 
-        # Still in quals or team did not make it to elims
-        if not rank_status or rank_status.get('played', 0) == 0:
-            # No matches played yet
-            status = "Team {} has not played any matches yet.".format(team_number) if not status else status
-            record = '?'
-            rank_str = '?'
-        else:
-            # Compute rank & num_teams
-            # Gets record from ranking data to account for surrogate matches
-            rank = rank_status.get('rank', '?')
-            ranking_points = rank_status.get('first_sort', '?')
-            record = rank_status.get('record', '?')
-            num_teams = rank_status.get('total', '?')
-            rank_str = "Rank {} with {} RP".format(rank, ranking_points)
-            alliance_name = alliance_status.get('name', '?') if alliance_status else '?'
+    #     # Still in quals or team did not make it to elims
+    #     if not rank_status or rank_status.get('played', 0) == 0:
+    #         # No matches played yet
+    #         status = "Team {} has not played any matches yet.".format(team_number) if not status else status
+    #         record = '?'
+    #         rank_str = '?'
+    #     else:
+    #         # Compute rank & num_teams
+    #         # Gets record from ranking data to account for surrogate matches
+    #         rank = rank_status.get('rank', '?')
+    #         ranking_points = rank_status.get('first_sort', '?')
+    #         record = rank_status.get('record', '?')
+    #         num_teams = rank_status.get('total', '?')
+    #         rank_str = "Rank {} with {} RP".format(rank, ranking_points)
+    #         alliance_name = alliance_status.get('name', '?') if alliance_status else '?'
 
-            # Compute final long status for nightbot, if one isn't already there
-            matches_per_team = qual_match_count // rank_status.get('total', 1)
-            if rank_status.get('played', 0) - matches_per_team > 0 and not status:
-                if rank is not None:
-                    status = "Team {} is currently rank {}/{} with a record of {} and {} ranking points.".format(team_number, rank, num_teams, record, ranking_points)
-                else:
-                    status = "Team {} currently has a record of {}.".format(team_number, record)
-            elif not status:
-                if alliance_status is None and playoff_match_count == 0:
-                    status = "Team {} ended qualification matches at rank {}/{} with a record of {}.".format(team_number, rank, num_teams, record)
-                elif alliance_status is None and playoff_match_count > 0:
-                    status = "Team {} ended qualification matches at rank {}/{} with a record of {} and was not picked for playoff matches.".format(team_number, rank, num_teams, record)
-                else:
-                    status = "Team {} will be competing in the playoff matches on {}.".format(team_number, alliance_name)
+    #         # Compute final long status for nightbot, if one isn't already there
+    #         matches_per_team = qual_match_count // rank_status.get('total', 1)
+    #         if rank_status.get('played', 0) - matches_per_team > 0 and not status:
+    #             if rank is not None:
+    #                 status = "Team {} is currently rank {}/{} with a record of {} and {} ranking points.".format(team_number, rank, num_teams, record, ranking_points)
+    #             else:
+    #                 status = "Team {} currently has a record of {}.".format(team_number, record)
+    #         elif not status:
+    #             if alliance_status is None and playoff_match_count == 0:
+    #                 status = "Team {} ended qualification matches at rank {}/{} with a record of {}.".format(team_number, rank, num_teams, record)
+    #             elif alliance_status is None and playoff_match_count > 0:
+    #                 status = "Team {} ended qualification matches at rank {}/{} with a record of {} and was not picked for playoff matches.".format(team_number, rank, num_teams, record)
+    #             else:
+    #                 status = "Team {} will be competing in the playoff matches on {}.".format(team_number, alliance_name)
 
-        raise ndb.Return(status, record, rank_str, short_playoff_status)
+    #     raise ndb.Return(status, record, rank_str, short_playoff_status)
