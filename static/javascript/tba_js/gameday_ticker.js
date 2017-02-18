@@ -1,4 +1,4 @@
-var firebase = new Firebase('https://thebluealliance.firebaseio.com/notifications/');
+// var firebase = new Firebase('https://thebluealliance.firebaseio.com/notifications/');
 var maxNumCards = 100;
 var numToAnimate = 3; // How many cards to animate
 var earliestKey = null;
@@ -9,19 +9,19 @@ $(window).load(function() {
         $('#ticker-filter-options').slideToggle();
     });
 
-    firebase.limitToLast(maxNumCards).on('child_added', function(childSnapshot) {
-        var card = buildNotificationCard(childSnapshot.val());
-        $('#ticker-notifications').prepend(card);
-        var len = $('#ticker-notifications').children().length;
-        if (len > maxNumCards) {
-            $('#ticker-notifications').children()[len-1].remove();
-        }
-        updateVisibility(card, card.attr('data-type'));
+    // firebase.limitToLast(maxNumCards).on('child_added', function(childSnapshot) {
+    //     var card = buildNotificationCard(childSnapshot.val());
+    //     $('#ticker-notifications').prepend(card);
+    //     var len = $('#ticker-notifications').children().length;
+    //     if (len > maxNumCards) {
+    //         $('#ticker-notifications').children()[len-1].remove();
+    //     }
+    //     updateVisibility(card, card.attr('data-type'));
 
-        if (earliestKey == null || childSnapshot.key() < earliestKey) {
-            earliestKey = childSnapshot.key();
-        }
-    });
+    //     if (earliestKey == null || childSnapshot.key() < earliestKey) {
+    //         earliestKey = childSnapshot.key();
+    //     }
+    // });
 
     // Show/hide notification types based on checkboxes
     $('input[type="checkbox"]').click(function(){

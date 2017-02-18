@@ -1,4 +1,5 @@
-var eventsRef = new Firebase('https://tbatv-prod-hrd.firebaseio.com/events/');
+var database = firebase.database();
+var eventsRef = database.ref('events');
 var savedSnapshots = {};
 
 function setActiveEvents(eventKeys) {
@@ -25,7 +26,7 @@ function setActiveEvents(eventKeys) {
 }
 
 function saveSnapshotAndUpdate(snapshot) {
-  var eventKey = snapshot.key()
+  var eventKey = snapshot.key
   savedSnapshots[eventKey] = snapshot;
   updateMatchbar(eventKey, snapshot);
 }
