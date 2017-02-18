@@ -14,6 +14,8 @@ from models.match import Match
 class EventTeamStatusHelper(object):
     @classmethod
     def generate_team_at_event_alliance_status_string(cls, team_key, status_dict):
+        if not status_dict:
+            return '--'
         alliance = status_dict.get('alliance')
         if alliance:
             pick = alliance['pick']
@@ -32,6 +34,8 @@ class EventTeamStatusHelper(object):
 
     @classmethod
     def generate_team_at_event_playoff_status_string(cls, team_key, status_dict):
+        if not status_dict:
+            return '--'
         playoff = status_dict.get('playoff')
         if playoff:
             level = playoff.get('level')
@@ -66,6 +70,9 @@ class EventTeamStatusHelper(object):
         """
         Generate a team at event status string from a status dict
         """
+        if not status_dict:
+            return 'Team {} is waiting for the event to begin.'.format(team_key[3:])
+
         qual = status_dict.get('qual')
         alliance = status_dict.get('alliance')
         playoff = status_dict.get('playoff')
