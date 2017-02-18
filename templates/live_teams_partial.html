@@ -19,8 +19,9 @@
                         <th>Ranking</th>
                         <th>Alliance</th>
                         <th>Playoff Status</th>
+                        <th>Awards</th>
                     </tr>
-                    {% for team, status, status_str in live_event.1 %}
+                    {% for team, status, status_str, awards in live_event.1 %}
                         <tr>
                             <td>{{ team.team_number }}</td>
                             <td>
@@ -30,6 +31,19 @@
                             <td>{% if status.qual.rank %}{{ status.qual.rank }}/{{ status.qual.max_rank }}{% else %}--{% endif %}</td>
                             <td>{{status_str.alliance|safe}}</td>
                             <td>{{status_str.playoff|safe}}</td>
+                            <td>
+                                <ul>
+                                {% for award in awards %}
+                                    {% for team_number, awardees in award.recipient_dict.items %}
+                                        {% if team_number == team.team_number %}
+                                            {% for awardee in awardees %}
+                                                <li>{{ award.name_str }}{% if awardee %} ({{ awardee }}){% endif %}</li>
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                                </ul>
+                            </td>
                         </tr>
                     {% endfor %}
                 </table>
