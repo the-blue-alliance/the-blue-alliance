@@ -11,7 +11,7 @@ from database.team_query import DistrictTeamsQuery
 
 class ApiDistrictListController(ApiBaseController):
     CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 60 * 60 * 24
+    CACHE_HEADER_LENGTH = 61
 
     def _track_call(self, year):
         self._track_call_defer('district/list', year)
@@ -23,7 +23,7 @@ class ApiDistrictListController(ApiBaseController):
 
 class ApiDistrictEventsController(ApiBaseController):
     CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 60 * 60 * 24
+    CACHE_HEADER_LENGTH = 61
 
     def _track_call(self, district_key, model_type=None):
         action = 'district/events'
@@ -40,7 +40,7 @@ class ApiDistrictEventsController(ApiBaseController):
 
 class ApiDistrictTeamsController(ApiBaseController):
     CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 60 * 60 * 24
+    CACHE_HEADER_LENGTH = 61
 
     def _track_call(self, district_key, model_type=None):
         action = 'district/teams'
@@ -57,7 +57,7 @@ class ApiDistrictTeamsController(ApiBaseController):
 
 class ApiDistrictRankingsController(ApiBaseController):
     CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 60 * 60
+    CACHE_HEADER_LENGTH = 61
 
     def _track_call(self, district_key, model_type=None):
         action = 'district/rankings'

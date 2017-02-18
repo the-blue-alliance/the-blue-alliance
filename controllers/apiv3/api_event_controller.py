@@ -13,7 +13,7 @@ from database.team_query import EventTeamsQuery
 
 class ApiEventListController(ApiBaseController):
     CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 60 * 60 * 24
+    CACHE_HEADER_LENGTH = 61
 
     def _track_call(self, year, model_type=None):
         action = 'event/list'
@@ -30,7 +30,7 @@ class ApiEventListController(ApiBaseController):
 
 class ApiEventController(ApiBaseController):
     CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 60 * 60 * 24
+    CACHE_HEADER_LENGTH = 61
 
     def _track_call(self, event_key, model_type=None):
         action = 'event'
@@ -61,7 +61,7 @@ class ApiEventDetailsController(ApiBaseController):
 
 class ApiEventTeamsController(ApiBaseController):
     CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 60 * 60 * 24
+    CACHE_HEADER_LENGTH = 61
 
     def _track_call(self, event_key, model_type=None):
         action = 'event/teams'
@@ -97,7 +97,7 @@ class ApiEventMatchesController(ApiBaseController):
 
 class ApiEventAwardsController(ApiBaseController):
     CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 60 * 60
+    CACHE_HEADER_LENGTH = 61
 
     def _track_call(self, event_key):
         self._track_call_defer('event/awards', event_key)

@@ -24,7 +24,7 @@ class ApiTeamListController(ApiBaseController):
     etc.
     """
     CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 60 * 60 * 24
+    CACHE_HEADER_LENGTH = 61
     PAGE_SIZE = 500
 
     def _track_call(self, page_num, year=None, model_type=None):
@@ -47,7 +47,7 @@ class ApiTeamListController(ApiBaseController):
 
 class ApiTeamController(ApiBaseController):
     CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 60 * 60 * 24
+    CACHE_HEADER_LENGTH = 61
 
     def _track_call(self, team_key, model_type=None):
         action = 'team'
@@ -65,7 +65,7 @@ class ApiTeamController(ApiBaseController):
 
 class ApiTeamYearsParticipatedController(ApiBaseController):
     CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 60 * 60 * 24
+    CACHE_HEADER_LENGTH = 61
 
     def _track_call(self, team_key):
         self._track_call_defer('team/years_participated', team_key)
@@ -82,7 +82,7 @@ class ApiTeamHistoryDistrictsController(ApiBaseController):
     Returns a JSON list of all DistrictTeam models associated with a Team
     """
     CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 60 * 60 * 24
+    CACHE_HEADER_LENGTH = 61
 
     def _track_call(self, team_key):
         self._track_call_defer('team/history/districts', team_key)
@@ -98,7 +98,7 @@ class ApiTeamHistoryRobotsController(ApiBaseController):
     Returns a JSON list of all robot models associated with a Team
     """
     CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 60 * 60 * 24
+    CACHE_HEADER_LENGTH = 61
 
     def _track_call(self, team_key):
         self._track_call_defer('team/history/robots', team_key)
@@ -111,7 +111,7 @@ class ApiTeamHistoryRobotsController(ApiBaseController):
 
 class ApiTeamEventsController(ApiBaseController):
     CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 60 * 60 * 24
+    CACHE_HEADER_LENGTH = 61
 
     def _track_call(self, team_key, year=None, model_type=None):
         api_label = team_key
@@ -201,7 +201,7 @@ class ApiTeamEventStatusController(ApiBaseController):
 
 class ApiTeamYearAwardsController(ApiBaseController):
     CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 60 * 60
+    CACHE_HEADER_LENGTH = 61
 
     def _track_call(self, team_key, year):
         self._track_call_defer('team/year/awards', '{}/{}'.format(team_key, year))
@@ -230,7 +230,7 @@ class ApiTeamHistoryAwardsController(ApiBaseController):
 
 class ApiTeamYearMediaController(ApiBaseController):
     CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 60 * 60 * 24
+    CACHE_HEADER_LENGTH = 61
 
     def _track_call(self, team_key, year):
         api_label = team_key
@@ -245,7 +245,7 @@ class ApiTeamYearMediaController(ApiBaseController):
 
 class ApiTeamSocialMediaController(ApiBaseController):
     CACHE_VERSION = 0
-    CACHE_HEADER_LENGTH = 60 * 60 * 24
+    CACHE_HEADER_LENGTH = 61
 
     def _track_call(self, team_key):
         self._track_call_defer('team/social_media', team_key)
