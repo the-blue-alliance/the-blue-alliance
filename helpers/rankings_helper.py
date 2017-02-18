@@ -157,7 +157,10 @@ class RankingsHelper(object):
 
     @classmethod
     def get_sort_order_info(cls, event_details):
-        return cls.SORT_ORDER_INFO[event_details.year]
+        year = event_details.year
+        if event_details.key.id() == '2015mttd':  # 2015mttd played the 2014 game
+            year = 2014
+        return cls.SORT_ORDER_INFO[year]
 
     @classmethod
     def convert_rankings(cls, event_details):
