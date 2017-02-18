@@ -27,6 +27,7 @@ from helpers.event_team_manipulator import EventTeamManipulator
 from helpers.event_team_status_helper import EventTeamStatusHelper
 from helpers.event_team_repairer import EventTeamRepairer
 from helpers.event_team_updater import EventTeamUpdater
+from helpers.firebase.firebase_pusher import FirebasePusher
 from helpers.insights_helper import InsightsHelper
 from helpers.match_helper import MatchHelper
 from helpers.matchstats_helper import MatchstatsHelper
@@ -568,7 +569,9 @@ class EventTeamStatusCalcDo(webapp.RequestHandler):
         event = Event.get_by_id(event_key)
         event_teams = EventTeam.query(EventTeam.event==event.key).fetch()
         for event_team in event_teams:
-            event_team.status = EventTeamStatusHelper.generate_team_at_event_status(event_team.team.id(), event)
+            status = EventTeamStatusHelper.generate_team_at_event_status(event_team.team.id(), event)
+            event_team.status = status
+            FirebasePusher.update_event_team_status(event_key, event_team.team.id(), status)
         EventTeamManipulator.createOrUpdate(event_teams)
 
         if 'X-Appengine-Taskname' not in self.request.headers:  # Only write out if not in taskqueue

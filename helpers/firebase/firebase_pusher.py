@@ -108,3 +108,25 @@ class FirebasePusher(object):
             'events/{}/details'.format(event_details.key.id()),
             event_details_json,
             _queue="firebase")
+
+    @classmethod
+    def update_event_team_status(cls, event_key, team_key, status):
+        """
+        Updates an event team status
+        """
+        from helpers.event_team_status_helper import EventTeamStatusHelper  # Prevent circular import
+
+        if status:
+            status.update({
+                'alliance_status_str': EventTeamStatusHelper.generate_team_at_event_alliance_status_string(team_key, status),
+                'playoff_status_str': EventTeamStatusHelper.generate_team_at_event_playoff_status_string(team_key, status),
+                'overall_status_str': EventTeamStatusHelper.generate_team_at_event_status_string(team_key, status),
+            })
+
+        status_json = json.dumps(status)
+
+        deferred.defer(
+            cls._put_data,
+            'event_teams/{}/{}/status'.format(event_key, team_key),
+            status_json,
+            _queue="firebase")
