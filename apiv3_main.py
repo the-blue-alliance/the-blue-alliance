@@ -53,8 +53,8 @@ app = webapp2.WSGIApplication([
         atc.ApiTeamEventMatchesController, methods=['GET', 'OPTIONS']),
     webapp2.Route(r'/api/v3/team/<team_key:>/event/<event_key:>/awards',
         atc.ApiTeamEventAwardsController, methods=['GET', 'OPTIONS']),
-    # webapp2.Route(r'/api/v3/team/<team_key:>/event/<event_key:>/status',
-    #     ApiStatusController, methods=['GET', 'OPTIONS']),
+    webapp2.Route(r'/api/v3/team/<team_key:>/event/<event_key:>/status',
+        atc.ApiTeamEventStatusController, methods=['GET', 'OPTIONS']),
     # Team Awards
     webapp2.Route(r'/api/v3/team/<team_key:>/awards',
         atc.ApiTeamHistoryAwardsController, methods=['GET', 'OPTIONS']),
