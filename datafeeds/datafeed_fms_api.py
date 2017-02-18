@@ -3,6 +3,7 @@ import cloudstorage
 import datetime
 import json
 import logging
+import tba_config
 import traceback
 
 from google.appengine.api import urlfetch
@@ -132,7 +133,7 @@ class DatafeedFMSAPI(object):
             ApiStatusController.clear_cache_if_needed(old_status, self._is_down_sitevar.contents)
 
             # Save raw API response into cloudstorage
-            if self._save_response:
+            if self._save_response and tba_config.CONFIG['save-frc-api-response']:
                 try:
                     # Check for last response
                     dir_name = self.SAVED_RESPONSE_DIR_PATTERN.format(url.replace(self.FMS_API_DOMAIN, ''))

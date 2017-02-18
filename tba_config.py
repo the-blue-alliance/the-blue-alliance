@@ -30,6 +30,7 @@ if DEBUG:
         "response_cache": False,
         "firebase-url": "https://thebluealliance-dev.firebaseio.com/{}.json?auth={}",
         "use-compiled-templates": False,
+        "save-frc-api-response": False,
     }
 else:
     CONFIG = {
@@ -38,7 +39,8 @@ else:
         "database_query_cache": True,
         "response_cache": True,
         "firebase-url": "https://tbatv-prod-hrd.firebaseio.com/{}.json?auth={}",
-        "use-compiled-templates": True
+        "use-compiled-templates": True,
+        "save-frc-api-response": True,
     }
 
 CONFIG['landing_handler'] = BUILDSEASON
