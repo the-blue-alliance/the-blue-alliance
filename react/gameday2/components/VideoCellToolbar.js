@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react'
-import { Toolbar, ToolbarGroup, ToolbarTitle, ToolbarSeparator } from 'material-ui/Toolbar'
+import { Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui/Toolbar'
 import IconButton from 'material-ui/IconButton'
 import CloseIcon from 'material-ui/svg-icons/navigation/close'
 import SwapIcon from 'material-ui/svg-icons/action/compare-arrows'
