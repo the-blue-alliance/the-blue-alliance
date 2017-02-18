@@ -25,6 +25,8 @@ class FirebasePusher(object):
         """
         Remove data from the specified Firebase database reference.
         """
+        if not tba_config.CONFIG['firebase-push']:
+            return
         secret = cls._get_secret()
         if secret is None:
             return
@@ -38,6 +40,8 @@ class FirebasePusher(object):
         """
         Write or replace data to a defined path, like messages/users/user1/<data>
         """
+        if not tba_config.CONFIG['firebase-push']:
+            return
         secret = cls._get_secret()
         if secret is None:
             return
@@ -52,6 +56,8 @@ class FirebasePusher(object):
         Add to a list of data in our Firebase database.
         Every time we send a POST request, the Firebase client generates a unique key, like messages/users/<unique-id>/<data>
         """
+        if not tba_config.CONFIG['firebase-push']:
+            return
         secret = cls._get_secret()
         if secret is None:
             return

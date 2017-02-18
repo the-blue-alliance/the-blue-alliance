@@ -29,6 +29,7 @@ if DEBUG:
         "database_query_cache": False,
         "response_cache": False,
         "firebase-url": "https://thebluealliance-dev.firebaseio.com/{}.json?auth={}",
+        "firebase-push": False,
         "use-compiled-templates": False,
         "save-frc-api-response": False,
     }
@@ -39,6 +40,7 @@ else:
         "database_query_cache": True,
         "response_cache": True,
         "firebase-url": "https://tbatv-prod-hrd.firebaseio.com/{}.json?auth={}",
+        "firebase-push": True,
         "use-compiled-templates": True,
         "save-frc-api-response": True,
     }
