@@ -1,10 +1,11 @@
 import React, { PropTypes } from 'react'
-import { Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui/Toolbar'
+import { Toolbar, ToolbarGroup, ToolbarTitle, ToolbarSeparator } from 'material-ui/Toolbar'
 import IconButton from 'material-ui/IconButton'
 import CloseIcon from 'material-ui/svg-icons/navigation/close'
 import SwapIcon from 'material-ui/svg-icons/action/compare-arrows'
 import VideocamIcon from 'material-ui/svg-icons/av/videocam'
 import { white, grey900 } from 'material-ui/styles/colors'
+import TickerMatch from './TickerMatch'
 
 const VideoCellToolbar = (props) => {
   const toolbarStyle = {
@@ -24,6 +25,26 @@ const VideoCellToolbar = (props) => {
           text={props.webcast.name}
           style={titleStyle}
         />
+      </ToolbarGroup>
+      <ToolbarGroup>
+        <div className="match_bar">
+          <TickerMatch
+            matchType="finishedRed"
+          />
+          <TickerMatch
+            matchType="finishedBlue"
+          />
+          <TickerMatch
+            matchType="finishedTie"
+          />
+          <TickerMatch
+            matchType="upcoming"
+          />
+          <TickerMatch
+            matchType="followed"
+          />
+
+        </div>
       </ToolbarGroup>
       <ToolbarGroup lastChild>
         <IconButton
