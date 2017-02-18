@@ -55,12 +55,52 @@ class TestSimulated2016nytrEventTeamStatusHelper(unittest2.TestCase):
             EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
             'Team 359 was <b>Rank 1/36</b> with a record of <b>11-1-0</b> in quals.')
 
-        es.step()
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5240', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5240', status),
+            'Team 5240 was <b>Rank 4/36</b> with a record of <b>9-3-0</b> in quals.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc229', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc229', status),
+            'Team 229 was <b>Rank 16/36</b> with a record of <b>6-6-0</b> in quals.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc1665', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc1665', status),
+            'Team 1665 was <b>Rank 15/36</b> with a record of <b>6-6-0</b> in quals.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5964', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5964', status),
+            'Team 5964 was <b>Rank 21/36</b> with a record of <b>6-6-0</b> in quals.')
+
+        es.step()  # Alliance selections added
         event = Event.get_by_id('2016nytr')
         status = EventTeamStatusHelper.generate_team_at_event_status('frc359', event)
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
             'Team 359 was <b>Rank 1/36</b> with a record of <b>11-1-0</b> in quals and will be competing in the playoffs as the <b>Captain</b> of <b>Alliance 1</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5240', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5240', status),
+            'Team 5240 was <b>Rank 4/36</b> with a record of <b>9-3-0</b> in quals and will be competing in the playoffs as the <b>1st Pick</b> of <b>Alliance 4</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc229', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc229', status),
+            'Team 229 was <b>Rank 16/36</b> with a record of <b>6-6-0</b> in quals and will be competing in the playoffs as the <b>2nd Pick</b> of <b>Alliance 2</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc1665', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc1665', status),
+            'Team 1665 was <b>Rank 15/36</b> with a record of <b>6-6-0</b> in quals.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5964', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5964', status),
+            'Team 5964 was <b>Rank 21/36</b> with a record of <b>6-6-0</b> in quals.')
 
         es.step()  # QF schedule added
         event = Event.get_by_id('2016nytr')
@@ -68,6 +108,26 @@ class TestSimulated2016nytrEventTeamStatusHelper(unittest2.TestCase):
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
             'Team 359 is <b>0-0-0</b> in the <b>Quarterfinals</b> as the <b>Captain</b> of <b>Alliance 1</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5240', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5240', status),
+            'Team 5240 is <b>0-0-0</b> in the <b>Quarterfinals</b> as the <b>1st Pick</b> of <b>Alliance 4</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc229', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc229', status),
+            'Team 229 is <b>0-0-0</b> in the <b>Quarterfinals</b> as the <b>2nd Pick</b> of <b>Alliance 2</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc1665', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc1665', status),
+            'Team 1665 was <b>Rank 15/36</b> with a record of <b>6-6-0</b> in quals.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5964', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5964', status),
+            'Team 5964 was <b>Rank 21/36</b> with a record of <b>6-6-0</b> in quals.')
 
         es.step()  # qf1m1
         event = Event.get_by_id('2016nytr')
@@ -86,10 +146,42 @@ class TestSimulated2016nytrEventTeamStatusHelper(unittest2.TestCase):
             EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
             'Team 359 is <b>0-0-0</b> in the <b>Semifinals</b> as the <b>Captain</b> of <b>Alliance 1</b>.')
 
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5240', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5240', status),
+            'Team 5240 is <b>0-1-0</b> in the <b>Quarterfinals</b> as the <b>1st Pick</b> of <b>Alliance 4</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc229', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc229', status),
+            'Team 229 is <b>1-0-0</b> in the <b>Quarterfinals</b> as the <b>2nd Pick</b> of <b>Alliance 2</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc1665', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc1665', status),
+            'Team 1665 was <b>Rank 15/36</b> with a record of <b>6-6-0</b> in quals.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5964', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5964', status),
+            'Team 5964 was <b>Rank 21/36</b> with a record of <b>6-6-0</b> in quals.')
+
         es.step()  # qf2m2
+        event = Event.get_by_id('2016nytr')
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5240', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5240', status),
+            'Team 5240 is <b>1-1-0</b> in the <b>Quarterfinals</b> as the <b>1st Pick</b> of <b>Alliance 4</b>.')
+
         es.step()  # qf3m2
         es.step()  # qf4m2
         es.step()  # qf2m3
+        event = Event.get_by_id('2016nytr')
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5240', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5240', status),
+            'Team 5240 is <b>0-0-0</b> in the <b>Semifinals</b> as the <b>1st Pick</b> of <b>Alliance 4</b>.')
+
         es.step()  # qf4m3
         es.step()  # sf1m1
         event = Event.get_by_id('2016nytr')
@@ -97,6 +189,26 @@ class TestSimulated2016nytrEventTeamStatusHelper(unittest2.TestCase):
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
             'Team 359 is <b>1-0-0</b> in the <b>Semifinals</b> as the <b>Captain</b> of <b>Alliance 1</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5240', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5240', status),
+            'Team 5240 is <b>0-1-0</b> in the <b>Semifinals</b> as the <b>1st Pick</b> of <b>Alliance 4</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc229', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc229', status),
+            'Team 229 is <b>0-0-0</b> in the <b>Semifinals</b> as the <b>2nd Pick</b> of <b>Alliance 2</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc1665', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc1665', status),
+            'Team 1665 was <b>Rank 15/36</b> with a record of <b>6-6-0</b> in quals.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5964', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5964', status),
+            'Team 5964 was <b>Rank 21/36</b> with a record of <b>6-6-0</b> in quals.')
 
         es.step()  # sf2m1
         es.step()  # sf1m2
@@ -106,14 +218,106 @@ class TestSimulated2016nytrEventTeamStatusHelper(unittest2.TestCase):
             EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
             'Team 359 is <b>0-0-0</b> in the <b>Finals</b> as the <b>Captain</b> of <b>Alliance 1</b>.')
 
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5240', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5240', status),
+            'Team 5240 was <b>Rank 4/36</b> with a record of <b>9-3-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 4</b>, and was <b>eliminated in the Semifinals</b> with a playoff record of <b>2-3-0</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc229', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc229', status),
+            'Team 229 is <b>0-1-0</b> in the <b>Semifinals</b> as the <b>2nd Pick</b> of <b>Alliance 2</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc1665', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc1665', status),
+            'Team 1665 was <b>Rank 15/36</b> with a record of <b>6-6-0</b> in quals.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5964', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5964', status),
+            'Team 5964 was <b>Rank 21/36</b> with a record of <b>6-6-0</b> in quals.')
+
         es.step()  # sf2m2
+        event = Event.get_by_id('2016nytr')
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc359', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
+            'Team 359 is <b>0-0-0</b> in the <b>Finals</b> as the <b>Captain</b> of <b>Alliance 1</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5240', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5240', status),
+            'Team 5240 was <b>Rank 4/36</b> with a record of <b>9-3-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 4</b>, and was <b>eliminated in the Semifinals</b> with a playoff record of <b>2-3-0</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc229', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc229', status),
+            'Team 229 is <b>1-1-0</b> in the <b>Semifinals</b> as the <b>2nd Pick</b> of <b>Alliance 2</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc1665', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc1665', status),
+            'Team 1665 is <b>1-1-0</b> in the <b>Semifinals</b> as the <b>Backup</b> of <b>Alliance 2</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5964', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5964', status),
+            'Team 5964 was <b>Rank 21/36</b> with a record of <b>6-6-0</b> in quals.')
+
         es.step()  # sf2m3
+        event = Event.get_by_id('2016nytr')
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc359', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
+            'Team 359 is <b>0-0-0</b> in the <b>Finals</b> as the <b>Captain</b> of <b>Alliance 1</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5240', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5240', status),
+            'Team 5240 was <b>Rank 4/36</b> with a record of <b>9-3-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 4</b>, and was <b>eliminated in the Semifinals</b> with a playoff record of <b>2-3-0</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc229', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc229', status),
+            'Team 229 is <b>0-0-0</b> in the <b>Finals</b> as the <b>2nd Pick</b> of <b>Alliance 2</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc1665', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc1665', status),
+            'Team 1665 is <b>0-0-0</b> in the <b>Finals</b> as the <b>Backup</b> of <b>Alliance 2</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5964', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5964', status),
+            'Team 5964 was <b>Rank 21/36</b> with a record of <b>6-6-0</b> in quals.')
+
         es.step()  # f1m1
         event = Event.get_by_id('2016nytr')
         status = EventTeamStatusHelper.generate_team_at_event_status('frc359', event)
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
             'Team 359 is <b>1-0-0</b> in the <b>Finals</b> as the <b>Captain</b> of <b>Alliance 1</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5240', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5240', status),
+            'Team 5240 was <b>Rank 4/36</b> with a record of <b>9-3-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 4</b>, and was <b>eliminated in the Semifinals</b> with a playoff record of <b>2-3-0</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc229', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc229', status),
+            'Team 229 is <b>0-1-0</b> in the <b>Finals</b> as the <b>2nd Pick</b> of <b>Alliance 2</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc1665', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc1665', status),
+            'Team 1665 is <b>0-1-0</b> in the <b>Finals</b> as the <b>Backup</b> of <b>Alliance 2</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5964', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5964', status),
+            'Team 5964 was <b>Rank 21/36</b> with a record of <b>6-6-0</b> in quals.')
 
         es.step()  # f1m2
         event = Event.get_by_id('2016nytr')
@@ -122,12 +326,52 @@ class TestSimulated2016nytrEventTeamStatusHelper(unittest2.TestCase):
             EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
             'Team 359 is <b>1-1-0</b> in the <b>Finals</b> as the <b>Captain</b> of <b>Alliance 1</b>.')
 
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5240', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5240', status),
+            'Team 5240 was <b>Rank 4/36</b> with a record of <b>9-3-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 4</b>, and was <b>eliminated in the Semifinals</b> with a playoff record of <b>2-3-0</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc229', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc229', status),
+            'Team 229 is <b>1-1-0</b> in the <b>Finals</b> as the <b>2nd Pick</b> of <b>Alliance 2</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc1665', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc1665', status),
+            'Team 1665 is <b>1-1-0</b> in the <b>Finals</b> as the <b>Backup</b> of <b>Alliance 2</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5964', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5964', status),
+            'Team 5964 was <b>Rank 21/36</b> with a record of <b>6-6-0</b> in quals.')
+
         es.step()  # f1m3
         event = Event.get_by_id('2016nytr')
         status = EventTeamStatusHelper.generate_team_at_event_status('frc359', event)
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
             'Team 359 was <b>Rank 1/36</b> with a record of <b>11-1-0</b> in quals, competed in the playoffs as the <b>Captain</b> of <b>Alliance 1</b>, and <b>won the event</b> with a playoff record of <b>6-1-0</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5240', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5240', status),
+            'Team 5240 was <b>Rank 4/36</b> with a record of <b>9-3-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 4</b>, and was <b>eliminated in the Semifinals</b> with a playoff record of <b>2-3-0</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc229', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc229', status),
+            'Team 229 was <b>Rank 16/36</b> with a record of <b>6-6-0</b> in quals, competed in the playoffs as the <b>2nd Pick</b> of <b>Alliance 2</b>, and was <b>eliminated in the Finals</b> with a playoff record of <b>5-3-0</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc1665', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc1665', status),
+            'Team 1665 was <b>Rank 15/36</b> with a record of <b>6-6-0</b> in quals, competed in the playoffs as the <b>Backup</b> of <b>Alliance 2</b>, and was <b>eliminated in the Finals</b> with a playoff record of <b>5-3-0</b>.')
+
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc5964', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc5964', status),
+            'Team 5964 was <b>Rank 21/36</b> with a record of <b>6-6-0</b> in quals.')
 
 
 class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
