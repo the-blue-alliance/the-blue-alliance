@@ -80,3 +80,7 @@ coverage
 ########
 static/javascript/tba_js/tba_keys.js
 test_keys.json
+
+# Swagger API File #
+####################
+static/swagger.json

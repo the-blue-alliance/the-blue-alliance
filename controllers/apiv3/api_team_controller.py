@@ -1,16 +1,16 @@
 import json
 
-from google.appengine.ext import ndb
-
 from controllers.apiv3.api_base_controller import ApiBaseController
 from controllers.apiv3.model_properties import filter_event_properties, filter_team_properties, filter_match_properties
 from database.award_query import TeamAwardsQuery, TeamYearAwardsQuery, TeamEventAwardsQuery
 from database.event_query import TeamEventsQuery, TeamYearEventsQuery
 from database.match_query import TeamEventMatchesQuery, TeamYearMatchesQuery
 from database.media_query import TeamYearMediaQuery, TeamSocialMediaQuery
-from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, TeamParticipationQuery, TeamDistrictsQuery
 from database.robot_query import TeamRobotsQuery
-from models.team import Team
+from database.team_query import TeamQuery, TeamListQuery, TeamListYearQuery, TeamParticipationQuery, TeamDistrictsQuery
+from swagger.apiv3_endpoint import ApiV3Endpoint
+from swagger.swagger_parameters import TeamKeyParameter
+from swagger.swagger_responses import SimpleTeamResponse, TeamResponse
 
 
 class ApiTeamListController(ApiBaseController):
@@ -53,6 +53,14 @@ class ApiTeamController(ApiBaseController):
             action += '/{}'.format(model_type)
         self._track_call_defer(action, team_key)
 
+    @ApiV3Endpoint(path="/team/{team_key}/simple",
+                   description="Get a simplified team object",
+                   parameters=TeamKeyParameter,
+                   response=SimpleTeamResponse)
+    @ApiV3Endpoint(path="/team/{team_key}",
+                   description="Get a team object",
+                   parameters=TeamKeyParameter,
+                   response=TeamResponse)
     def _render(self, team_key, model_type=None):
         team, self._last_modified = TeamQuery(team_key).fetch(dict_version=3, return_updated=True)
         if model_type is not None:
