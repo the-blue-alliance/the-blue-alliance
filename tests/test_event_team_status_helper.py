@@ -13,7 +13,6 @@ from models.match import Match
 
 
 class TestSimulated2016nytrEventTeamStatusHelper(unittest2.TestCase):
-
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
@@ -40,15 +39,101 @@ class TestSimulated2016nytrEventTeamStatusHelper(unittest2.TestCase):
             EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
             'Team 359 is <b>Rank 15/36</b> with a record of <b>0-0-0</b> in quals.')
 
-        # self.assertEqual(
-        #     EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
-        #     'Team 359 was <b>Rank 1/36</b> with a record of <b>11-1-0</b> in quals, competed in the playoffs as the <b>Captain</b> on <b>Alliance 1</b>, and <b>won the event</b> with a playoff record of <b>6-1-0</b>.')
+        for _ in xrange(5):
+            es.step()
+        event = Event.get_by_id('2016nytr')
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc359', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
+            'Team 359 is <b>Rank 6/36</b> with a record of <b>1-0-0</b> in quals.')
+
+        for _ in xrange(67):
+            es.step()
+        event = Event.get_by_id('2016nytr')
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc359', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
+            'Team 359 was <b>Rank 1/36</b> with a record of <b>11-1-0</b> in quals.')
+
+        es.step()
+        event = Event.get_by_id('2016nytr')
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc359', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
+            'Team 359 was <b>Rank 1/36</b> with a record of <b>11-1-0</b> in quals and will be competing in the playoffs as the <b>Captain</b> of <b>Alliance 1</b>.')
+
+        es.step()  # QF schedule added
+        event = Event.get_by_id('2016nytr')
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc359', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
+            'Team 359 is <b>0-0-0</b> in the <b>Quarterfinals</b> as the <b>Captain</b> of <b>Alliance 1</b>.')
+
+        es.step()  # qf1m1
+        event = Event.get_by_id('2016nytr')
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc359', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
+            'Team 359 is <b>1-0-0</b> in the <b>Quarterfinals</b> as the <b>Captain</b> of <b>Alliance 1</b>.')
+
+        es.step()  # qf2m1
+        es.step()  # qf3m1
+        es.step()  # qf4m1
+        es.step()  # qf1m2
+        event = Event.get_by_id('2016nytr')
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc359', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
+            'Team 359 is <b>0-0-0</b> in the <b>Semifinals</b> as the <b>Captain</b> of <b>Alliance 1</b>.')
+
+        es.step()  # qf2m2
+        es.step()  # qf3m2
+        es.step()  # qf4m2
+        es.step()  # qf2m3
+        es.step()  # qf4m3
+        es.step()  # sf1m1
+        event = Event.get_by_id('2016nytr')
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc359', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
+            'Team 359 is <b>1-0-0</b> in the <b>Semifinals</b> as the <b>Captain</b> of <b>Alliance 1</b>.')
+
+        es.step()  # sf2m1
+        es.step()  # sf1m2
+        event = Event.get_by_id('2016nytr')
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc359', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
+            'Team 359 is <b>0-0-0</b> in the <b>Finals</b> as the <b>Captain</b> of <b>Alliance 1</b>.')
+
+        es.step()  # sf2m2
+        es.step()  # sf2m3
+        es.step()  # f1m1
+        event = Event.get_by_id('2016nytr')
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc359', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
+            'Team 359 is <b>1-0-0</b> in the <b>Finals</b> as the <b>Captain</b> of <b>Alliance 1</b>.')
+
+        es.step()  # f1m2
+        event = Event.get_by_id('2016nytr')
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc359', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
+            'Team 359 is <b>1-1-0</b> in the <b>Finals</b> as the <b>Captain</b> of <b>Alliance 1</b>.')
+
+        es.step()  # f1m3
+        event = Event.get_by_id('2016nytr')
+        status = EventTeamStatusHelper.generate_team_at_event_status('frc359', event)
+        self.assertEqual(
+            EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
+            'Team 359 was <b>Rank 1/36</b> with a record of <b>11-1-0</b> in quals, competed in the playoffs as the <b>Captain</b> of <b>Alliance 1</b>, and <b>won the event</b> with a playoff record of <b>6-1-0</b>.')
 
 
 class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
     status_359 = {
         "qual": {
-            "status": "complete",
+            "status": "completed",
             "rank": 1,
             "max_rank": 36,
             "matches_played": 12,
@@ -112,7 +197,7 @@ class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
 
     status_5240 = {
         "qual": {
-            "status": "complete",
+            "status": "completed",
             "rank": 6,
             "max_rank": 36,
             "matches_played": 12,
@@ -176,7 +261,7 @@ class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
 
     status_229 = {
         "qual": {
-            "status": "complete",
+            "status": "completed",
             "rank": 20,
             "max_rank": 36,
             "matches_played": 12,
@@ -241,7 +326,7 @@ class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
 
     status_1665 = {
         "qual": {
-            "status": "complete",
+            "status": "completed",
             "rank": 18,
             "max_rank": 36,
             "matches_played": 12,
@@ -306,7 +391,7 @@ class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
 
     status_5964 = {
         "qual": {
-            "status": "complete",
+            "status": "completed",
             "rank": 23,
             "max_rank": 36,
             "matches_played": 12,
@@ -380,28 +465,28 @@ class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
         self.assertDictEqual(status, self.status_359)
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string('frc359', status),
-            'Team 359 was <b>Rank 1/36</b> with a record of <b>11-1-0</b> in quals, competed in the playoffs as the <b>Captain</b> on <b>Alliance 1</b>, and <b>won the event</b> with a playoff record of <b>6-1-0</b>.')
+            'Team 359 was <b>Rank 1/36</b> with a record of <b>11-1-0</b> in quals, competed in the playoffs as the <b>Captain</b> of <b>Alliance 1</b>, and <b>won the event</b> with a playoff record of <b>6-1-0</b>.')
 
     def testElimSemisAndFirstPick(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc5240', self.event)
         self.assertDictEqual(status, self.status_5240)
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string('frc5240', status),
-            'Team 5240 was <b>Rank 6/36</b> with a record of <b>9-3-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> on <b>Alliance 4</b>, and was <b>eliminated in the Semifinals</b> with a playoff record of <b>2-3-0</b>.')
+            'Team 5240 was <b>Rank 6/36</b> with a record of <b>9-3-0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 4</b>, and was <b>eliminated in the Semifinals</b> with a playoff record of <b>2-3-0</b>.')
 
     def testBackupOut(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc229', self.event)
         self.assertDictEqual(status, self.status_229)
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string('frc229', status),
-            'Team 229 was <b>Rank 20/36</b> with a record of <b>6-6-0</b> in quals, competed in the playoffs as the <b>2nd Pick</b> on <b>Alliance 2</b>, and was <b>eliminated in the Finals</b> with a playoff record of <b>5-3-0</b>.')
+            'Team 229 was <b>Rank 20/36</b> with a record of <b>6-6-0</b> in quals, competed in the playoffs as the <b>2nd Pick</b> of <b>Alliance 2</b>, and was <b>eliminated in the Finals</b> with a playoff record of <b>5-3-0</b>.')
 
     def testBackupIn(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc1665', self.event)
         self.assertDictEqual(status, self.status_1665)
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string('frc1665', status),
-            'Team 1665 was <b>Rank 18/36</b> with a record of <b>6-6-0</b> in quals, competed in the playoffs as the <b>Backup</b> on <b>Alliance 2</b>, and was <b>eliminated in the Finals</b> with a playoff record of <b>5-3-0</b>.')
+            'Team 1665 was <b>Rank 18/36</b> with a record of <b>6-6-0</b> in quals, competed in the playoffs as the <b>Backup</b> of <b>Alliance 2</b>, and was <b>eliminated in the Finals</b> with a playoff record of <b>5-3-0</b>.')
 
     def testTeamNotPicked(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc5964', self.event)
@@ -421,7 +506,7 @@ class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
 class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
     status_359 = {
         "qual": {
-            "status": "complete",
+            "status": "completed",
             "rank": None,
             "max_rank": 36,
             "matches_played": 12,
@@ -454,7 +539,7 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
 
     status_5240 = {
         "qual": {
-            "status": "complete",
+            "status": "completed",
             "rank": None,
             "max_rank": 36,
             "matches_played": 12,
@@ -487,7 +572,7 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
 
     status_229 = {
         "qual": {
-            "status": "complete",
+            "status": "completed",
             "rank": None,
             "max_rank": 36,
             "matches_played": 12,
@@ -521,7 +606,7 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
 
     status_1665 = {
         "qual": {
-            "status": "complete",
+            "status": "completed",
             "rank": None,
             "max_rank": 36,
             "matches_played": 12,
@@ -555,7 +640,7 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
 
     status_5964 = {
         "qual": {
-            "status": "complete",
+            "status": "completed",
             "rank": None,
             "max_rank": 36,
             "matches_played": 12,
@@ -645,7 +730,7 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
 class Test2016casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
     status_254 = {
         "qual": {
-            "status": "complete",
+            "status": "completed",
             "rank": None,
             "max_rank": 64,
             "matches_played": 8,
@@ -707,7 +792,7 @@ class Test2016casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
 class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
     status_254 = {
         "qual": {
-            "status": "complete",
+            "status": "completed",
             "rank": 1,
             "max_rank": 57,
             "matches_played": 10,
@@ -768,7 +853,7 @@ class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
 
     status_846 = {
         "qual": {
-            "status": "complete",
+            "status": "completed",
             "rank": 8,
             "max_rank": 57,
             "matches_played": 10,
@@ -825,7 +910,7 @@ class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
 
     status_8 = {
         "qual": {
-            "status": "complete",
+            "status": "completed",
             "rank": 53,
             "max_rank": 57,
             "matches_played": 10,
@@ -891,7 +976,6 @@ class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
                       post_processor=self.event_key_adder)
         self.event = Event.get_by_id('2015casj')
         self.assertIsNotNone(self.event)
-        self.maxDiff = None
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -901,14 +985,14 @@ class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
         self.assertDictEqual(status, self.status_254)
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string('frc254', status),
-            'Team 254 was <b>Rank 1/57</b> with an average score of <b>200.4</b> in quals, competed in the playoffs as the <b>Captain</b> on <b>Alliance 1</b>, and <b>won the event</b> with a playoff average of <b>224.1</b>.')
+            'Team 254 was <b>Rank 1/57</b> with an average score of <b>200.4</b> in quals, competed in the playoffs as the <b>Captain</b> of <b>Alliance 1</b>, and <b>won the event</b> with a playoff average of <b>224.1</b>.')
 
     def testElimSemisAndFirstPick(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc846', self.event)
         self.assertDictEqual(status, self.status_846)
         self.assertEqual(
             EventTeamStatusHelper.generate_team_at_event_status_string('frc846', status),
-            'Team 846 was <b>Rank 8/57</b> with an average score of <b>97.0</b> in quals, competed in the playoffs as the <b>1st Pick</b> on <b>Alliance 3</b>, and was <b>eliminated in the Semifinals</b> with a playoff average of <b>133.6</b>.')
+            'Team 846 was <b>Rank 8/57</b> with an average score of <b>97.0</b> in quals, competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 3</b>, and was <b>eliminated in the Semifinals</b> with a playoff average of <b>133.6</b>.')
 
     def testTeamNotPicked(self):
         status = EventTeamStatusHelper.generate_team_at_event_status('frc8', self.event)
@@ -928,7 +1012,7 @@ class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
 class Test2015casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
     status_254 = {
         "qual": {
-            "status": "complete",
+            "status": "completed",
             "rank": None,
             "max_rank": 57,
             "matches_played": 10,
@@ -953,7 +1037,7 @@ class Test2015casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
 
     status_846 = {
         "qual": {
-            "status": "complete",
+            "status": "completed",
             "rank": None,
             "max_rank": 57,
             "matches_played": 10,
@@ -974,7 +1058,7 @@ class Test2015casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
 
     status_8 = {
         "qual": {
-            "status": "complete",
+            "status": "completed",
             "rank": None,
             "max_rank": 57,
             "matches_played": 10,
