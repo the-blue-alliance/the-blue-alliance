@@ -62,13 +62,14 @@ class DistrictDetail(CacheableHandler):
         # needed for valid_districts
         districts_in_year_future = DistrictsInYearQuery(district.year).fetch_async()
 
-        # Needed for active team statuses
-        live_events = []
-        if year == datetime.datetime.now().year:  # Only show active teams for current year
-            live_events = EventHelper.getWeekEvents()
-        live_eventteams_futures = []
-        for event in live_events:
-            live_eventteams_futures.append(EventTeamsQuery(event.key_name).fetch_async())
+        # Temp disabled on 2017-02-18 -fangeugene
+        # # Needed for active team statuses
+        # live_events = []
+        # if year == datetime.datetime.now().year:  # Only show active teams for current year
+        #     live_events = EventHelper.getWeekEvents()
+        # live_eventteams_futures = []
+        # for event in live_events:
+        #     live_eventteams_futures.append(EventTeamsQuery(event.key_name).fetch_async())
 
         events = events_future.get_result()
         EventHelper.sort_events(events)
@@ -91,9 +92,10 @@ class DistrictDetail(CacheableHandler):
             middle_value += 1
         teams_a, teams_b = teams[:middle_value], teams[middle_value:]
 
-        # Currently Competing Team Status
-        live_events_with_teams = EventTeamStatusHelper.buildEventTeamStatus(live_events, live_eventteams_futures, teams)
-        live_events_with_teams.sort(key=lambda x: x[0].name)
+        # Temp disabled on 2017-02-18 -fangeugene
+        # # Currently Competing Team Status
+        # live_events_with_teams = EventTeamStatusHelper.buildEventTeamStatus(live_events, live_eventteams_futures, teams)
+        # live_events_with_teams.sort(key=lambda x: x[0].name)
 
         # Get valid years
         district_history = history_future.get_result()
@@ -112,7 +114,7 @@ class DistrictDetail(CacheableHandler):
             'rankings': district.rankings,
             'teams_a': teams_a,
             'teams_b': teams_b,
-            'live_events_with_teams': live_events_with_teams,
+            # 'live_events_with_teams': live_events_with_teams,  # Temp disabled on 2017-02-18 -fangeugene
         })
 
         return jinja2_engine.render('district_details.html', self.template_values)
