@@ -245,7 +245,7 @@ class EventSimulator(object):
                                         if match.key.id() == key:
                                             for color in ['red', 'blue']:
                                                 match.alliances[color]['score'] = -1
-                                                match.alliances[color]['teams'] = alliances.get(color)
+                                                match.alliances[color]['teams'] = alliances.get(color, [])
                                             match.alliances_json = json.dumps(match.alliances)
                                             match.score_breakdown_json = None
                                             match.actual_time = None
@@ -294,7 +294,7 @@ class EventSimulator(object):
                                         if match.key.id() == key:
                                             for color in ['red', 'blue']:
                                                 match.alliances[color]['score'] = -1
-                                                match.alliances[color]['teams'] = alliances.get(color)
+                                                match.alliances[color]['teams'] = alliances.get(color, [])
                                             match.alliances_json = json.dumps(match.alliances)
                                             match.score_breakdown_json = None
                                             match.actual_time = None
