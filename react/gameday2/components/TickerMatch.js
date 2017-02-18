@@ -11,9 +11,9 @@ const TickerMatch = (props) => {
     paddingRight: 10,
     paddingLeft: 10,
     display: 'inline-block',
-    webkitBoxShadow: 'rgba(0, 0, 0, 0.5) 0px 1px 6px, rgba(0, 0, 0, 0.5) 0px 1px 4px',
-    mozBoxShadow: 'rgba(0, 0, 0, 0.5) 0px 1px 6px, rgba(0, 0, 0, 0.5) 0px 1px 4px',
-    boxShadow: 'rgba(0, 0, 0, 0.5) 0px 1px 6px, rgba(0, 0, 0, 0.5) 0px 1px 4px',
+    WebkitBoxShadow: 'rgba(0, 0, 0, 0.5) 0px 1px 6px, rgba(0, 0, 0, 0.5) 0px 1px 4px',
+    MozBoxShadow: 'rgba(0, 0, 0, 0.5) 0px 1px 6px, rgba(0, 0, 0, 0.5) 0px 1px 4px',
+    BoxShadow: 'rgba(0, 0, 0, 0.5) 0px 1px 6px, rgba(0, 0, 0, 0.5) 0px 1px 4px',
   }
   const matchNumberStyle = {
     color: white,
@@ -56,7 +56,7 @@ const TickerMatch = (props) => {
     matchStyle.backgroundColor = '#e6c100'
     matchNumberStyle.color = black
   } else {
-    matchStyle.backgroundColor = grey900
+    matchStyle.backgroundColor = black
   }
 
   return (

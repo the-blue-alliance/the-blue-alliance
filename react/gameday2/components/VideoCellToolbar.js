@@ -18,6 +18,23 @@ const VideoCellToolbar = (props) => {
     fontSize: 16,
   }
 
+  const matchTickerGroupStyle = {
+    flexGrow: 1,
+  }
+
+  const matchTickerStyle = {
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+  }
+
+  const controlsStyle = {
+    position: 'absolute',
+    right: 0,
+    marginRight: 0,
+    backgroundColor: grey900,
+    boxShadow: '-5px 0px 25px 6px rgba(0, 0, 0, 0.75)'
+  }
+
   return (
     <Toolbar style={toolbarStyle}>
       <ToolbarGroup>
@@ -26,8 +43,8 @@ const VideoCellToolbar = (props) => {
           style={titleStyle}
         />
       </ToolbarGroup>
-      <ToolbarGroup>
-        <div className="match_bar">
+      <ToolbarGroup style={matchTickerGroupStyle}>
+        <div style={matchTickerStyle}>
           <TickerMatch
             matchType="finishedRed"
           />
@@ -43,10 +60,9 @@ const VideoCellToolbar = (props) => {
           <TickerMatch
             matchType="followed"
           />
-
         </div>
       </ToolbarGroup>
-      <ToolbarGroup lastChild>
+      <ToolbarGroup lastChild style={controlsStyle}>
         <IconButton
           tooltip="Swap position"
           tooltipPosition="top-center"
