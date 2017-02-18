@@ -61,6 +61,7 @@ class ApiBaseController(CacheableHandler):
         self._partial_cache_key = '_'.join([
             'v{}_{}'.format(self.API_VERSION, self.__class__.__name__)] +
             [x[1] for x in kwargs_sorted])
+        self._cache_expiration = self.CACHE_HEADER_LENGTH
 
     def handle_exception(self, exception, debug):
         """
