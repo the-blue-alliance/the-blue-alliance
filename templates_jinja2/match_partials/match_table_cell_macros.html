@@ -65,14 +65,16 @@
 
 {% macro match_score_td(match, alliance_color, cur_team_key, compact=False, force_played=False, predictions=None) %}
 <td{% if compact %} colspan="2"{% endif %} class="{{alliance_color}}Score{% if cur_team_key and cur_team_key in match.alliances.get(alliance_color).teams %} current-team{% endif %}">
-  {% if match.year == 2016 and match.score_breakdown and not predictions %}
-    {% if "teleopDefensesBreached" in match.score_breakdown.get(alliance_color) and match.score_breakdown.get(alliance_color).teleopDefensesBreached %}
-    <svg class="top-left-dot" rel="tooltip" title="Defenses Breached">
+  {% if match.score_breakdown and not predictions %}
+    {% if ("teleopDefensesBreached" in match.score_breakdown.get(alliance_color) and match.score_breakdown.get(alliance_color).teleopDefensesBreached)
+      or ("kPaRankingPointAchieved" in match.score_breakdown.get(alliance_color) and match.score_breakdown.get(alliance_color).kPaRankingPointAchieved) %}
+    <svg class="top-left-dot" rel="tooltip" title="{% if match.year == 2016 %}Defenses Breached{% elif match.year == 2017 %}Pressure Reached{% endif %}">
       <circle cx="2" cy="2" r="2"/>
     </svg>
     {% endif %}
-    {% if "teleopTowerCaptured" in match.score_breakdown.get(alliance_color) and match.score_breakdown.get(alliance_color).teleopTowerCaptured %}
-    <svg class="top-left-dot-2" rel="tooltip" title="Tower Captured">
+    {% if ("teleopTowerCaptured" in match.score_breakdown.get(alliance_color) and match.score_breakdown.get(alliance_color).teleopTowerCaptured)
+      or ("rotorRankingPointAchieved" in match.score_breakdown.get(alliance_color) and match.score_breakdown.get(alliance_color).rotorRankingPointAchieved) %}
+    <svg class="top-left-dot-2" rel="tooltip" title="{% if match.year == 2016 %}Tower Captured{% elif match.year == 2017 %}All Rotors Engaged{% endif %}">
       <circle cx="2" cy="2" r="2"/>
     </svg>
     {% endif %}
