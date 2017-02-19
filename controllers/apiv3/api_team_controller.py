@@ -189,7 +189,10 @@ class ApiTeamEventStatusController(ApiBaseController):
         self._track_call_defer('team/event/status', '{}/{}'.format(team_key, event_key))
 
     def _render(self, team_key, event_key):
-        status = EventTeam.get_by_id('{}_{}'.format(event_key, team_key)).status
+        event_team = EventTeam.get_by_id('{}_{}'.format(event_key, team_key))
+        status = None
+        if event_team:
+            status = event_team.status
         if status:
             status.update({
                 'alliance_status_str': EventTeamStatusHelper.generate_team_at_event_alliance_status_string(team_key, status),
