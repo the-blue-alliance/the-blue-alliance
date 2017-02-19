@@ -32,7 +32,7 @@ const VideoCellToolbar = (props) => {
     right: 0,
     marginRight: 0,
     backgroundColor: grey900,
-    boxShadow: '-5px 0px 25px 6px rgba(0, 0, 0, 0.75)'
+    boxShadow: '-2px 0px 15px 6px rgba(0, 0, 0, 0.5)'
   }
 
   return (
