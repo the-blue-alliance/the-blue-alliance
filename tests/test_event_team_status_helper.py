@@ -376,306 +376,335 @@ class TestSimulated2016nytrEventTeamStatusHelper(unittest2.TestCase):
 
 class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
     status_359 = {
-        "qual": {
-            "status": "completed",
-            "rank": 1,
-            "num_teams": 36,
-            "matches_played": 12,
-            "dq": 0,
-            "record": {
-                "wins": 11,
-                "losses": 1,
-                "ties": 0
-            },
-            "qual_average": None,
-            "ranking_sort_orders": [
-                {
-                  "name": "Ranking Score",
-                  "precision": 0,
-                  "value": 39
-                },
-                {
-                  "name": "Auto",
-                  "precision": 0,
-                  "value": 310
-                },
-                {
-                  "name": "Scale/Challenge",
-                  "precision": 0,
-                  "value": 165
-                },
-                {
-                  "name": "Goals",
-                  "precision": 0,
-                  "value": 448
-                },
-                {
-                  "name": "Defense",
-                  "precision": 0,
-                  "value": 600
-                }
-            ],
-        },
-        "playoff": {
-            "level": "f",
-            "record": {
-                "wins": 6,
-                "losses": 1,
-                "ties": 0
-            },
-            "current_level_record": {
-                "wins": 2,
-                "losses": 1,
-                "ties": 0
-            },
-            "playoff_average": None,
-            "status": "won"
-        },
         "alliance": {
+            "backup": None,
             "name": "Alliance 1",
             "number": 1,
-            "backup": None,
             "pick": 0
+        },
+        "playoff": {
+            "current_level_record": {
+                "losses": 1,
+                "ties": 0,
+                "wins": 2
+            },
+            "level": "f",
+            "playoff_average": None,
+            "record": {
+                "losses": 1,
+                "ties": 0,
+                "wins": 6
+            },
+            "status": "won"
+        },
+        "qual": {
+            "num_teams": 36,
+            "ranking": {
+                "dq": 0,
+                "matches_played": 12,
+                "qual_average": None,
+                "rank": 1,
+                "record": {
+                    "losses": 1,
+                    "ties": 0,
+                    "wins": 11
+                },
+                "sort_orders": [
+                    39.0,
+                    310.0,
+                    165.0,
+                    448.0,
+                    600.0
+                ],
+                "team_key": "frc359"
+            },
+            "sort_order_info": [
+                {
+                    "name": "Ranking Score",
+                    "precision": 0
+                },
+                {
+                    "name": "Auto",
+                    "precision": 0
+                },
+                {
+                    "name": "Scale/Challenge",
+                    "precision": 0
+                },
+                {
+                    "name": "Goals",
+                    "precision": 0
+                },
+                {
+                    "name": "Defense",
+                    "precision": 0
+                }
+            ],
+            "status": "completed"
         }
     }
 
     status_5240 = {
-        "qual": {
-            "status": "completed",
-            "rank": 6,
-            "num_teams": 36,
-            "matches_played": 12,
-            "dq": 0,
-            "record": {
-                "wins": 9,
-                "losses": 3,
-                "ties": 0
-            },
-            "qual_average": None,
-            "ranking_sort_orders": [
-                {
-                  "name": "Ranking Score",
-                  "precision": 0,
-                  "value": 28
-                },
-                {
-                  "name": "Auto",
-                  "precision": 0,
-                  "value": 260
-                },
-                {
-                  "name": "Scale/Challenge",
-                  "precision": 0,
-                  "value": 150
-                },
-                {
-                  "name": "Goals",
-                  "precision": 0,
-                  "value": 191
-                },
-                {
-                  "name": "Defense",
-                  "precision": 0,
-                  "value": 575
-                }
-            ],
-        },
-        "playoff": {
-            "level": "sf",
-            "record": {
-                "wins": 2,
-                "losses": 3,
-                "ties": 0
-            },
-            "current_level_record": {
-                "wins": 0,
-                "losses": 2,
-                "ties": 0
-            },
-            "playoff_average": None,
-            "status": "eliminated"
-        },
         "alliance": {
+            "backup": None,
             "name": "Alliance 4",
             "number": 4,
-            "backup": None,
             "pick": 1
+        },
+        "playoff": {
+            "current_level_record": {
+                "losses": 2,
+                "ties": 0,
+                "wins": 0
+            },
+            "level": "sf",
+            "playoff_average": None,
+            "record": {
+                "losses": 3,
+                "ties": 0,
+                "wins": 2
+            },
+            "status": "eliminated"
+        },
+        "qual": {
+            "num_teams": 36,
+            "ranking": {
+                "dq": 0,
+                "matches_played": 12,
+                "qual_average": None,
+                "rank": 6,
+                "record": {
+                    "losses": 3,
+                    "ties": 0,
+                    "wins": 9
+                },
+                "sort_orders": [
+                    28.0,
+                    260.0,
+                    150.0,
+                    191.0,
+                    575.0
+                ],
+                "team_key": "frc5240"
+            },
+            "sort_order_info": [
+                {
+                    "name": "Ranking Score",
+                    "precision": 0
+                },
+                {
+                    "name": "Auto",
+                    "precision": 0
+                },
+                {
+                    "name": "Scale/Challenge",
+                    "precision": 0
+                },
+                {
+                    "name": "Goals",
+                    "precision": 0
+                },
+                {
+                    "name": "Defense",
+                    "precision": 0
+                }
+            ],
+            "status": "completed"
         }
     }
 
     status_229 = {
-        "qual": {
-            "status": "completed",
-            "rank": 20,
-            "num_teams": 36,
-            "matches_played": 12,
-            "dq": 0,
-            "record": {
-                "wins": 6,
-                "losses": 6,
-                "ties": 0
-            },
-            "qual_average": None,
-            "ranking_sort_orders": [
-                {
-                  "name": "Ranking Score",
-                  "precision": 0,
-                  "value": 20
-                },
-                {
-                  "name": "Auto",
-                  "precision": 0,
-                  "value": 156
-                },
-                {
-                  "name": "Scale/Challenge",
-                  "precision": 0,
-                  "value": 130
-                },
-                {
-                  "name": "Goals",
-                  "precision": 0,
-                  "value": 119
-                },
-                {
-                  "name": "Defense",
-                  "precision": 0,
-                  "value": 525
-                }
-            ],
-        },
-        "playoff": {
-            "level": "f",
-            "record": {
-                "wins": 5,
-                "losses": 3,
-                "ties": 0
-            },
-            "current_level_record": {
-                "wins": 1,
-                "losses": 2,
-                "ties": 0
-            },
-            "playoff_average": None,
-            "status": "eliminated"
-        },
         "alliance": {
+            "backup": {
+                "in": "frc1665",
+                "out": "frc229"
+            },
             "name": "Alliance 2",
             "number": 2,
-            "backup": {"out": "frc229", "in": "frc1665"},
             "pick": 2
+        },
+        "playoff": {
+            "current_level_record": {
+                "losses": 2,
+                "ties": 0,
+                "wins": 1
+            },
+            "level": "f",
+            "playoff_average": None,
+            "record": {
+                "losses": 3,
+                "ties": 0,
+                "wins": 5
+            },
+            "status": "eliminated"
+        },
+        "qual": {
+            "num_teams": 36,
+            "ranking": {
+                "dq": 0,
+                "matches_played": 12,
+                "qual_average": None,
+                "rank": 20,
+                "record": {
+                    "losses": 6,
+                    "ties": 0,
+                    "wins": 6
+                },
+                "sort_orders": [
+                    20.0,
+                    156.0,
+                    130.0,
+                    119.0,
+                    525.0
+                ],
+                "team_key": "frc229"
+            },
+            "sort_order_info": [
+                {
+                    "name": "Ranking Score",
+                    "precision": 0
+                },
+                {
+                    "name": "Auto",
+                    "precision": 0
+                },
+                {
+                    "name": "Scale/Challenge",
+                    "precision": 0
+                },
+                {
+                    "name": "Goals",
+                    "precision": 0
+                },
+                {
+                    "name": "Defense",
+                    "precision": 0
+                }
+            ],
+            "status": "completed"
         }
-
     }
 
     status_1665 = {
-        "qual": {
-            "status": "completed",
-            "rank": 18,
-            "num_teams": 36,
-            "matches_played": 12,
-            "dq": 0,
-            "record": {
-                "wins": 6,
-                "losses": 6,
-                "ties": 0
-            },
-            "qual_average": None,
-            "ranking_sort_orders": [
-                {
-                  "name": "Ranking Score",
-                  "precision": 0,
-                  "value": 20
-                },
-                {
-                  "name": "Auto",
-                  "precision": 0,
-                  "value": 192
-                },
-                {
-                  "name": "Scale/Challenge",
-                  "precision": 0,
-                  "value": 105
-                },
-                {
-                  "name": "Goals",
-                  "precision": 0,
-                  "value": 146
-                },
-                {
-                  "name": "Defense",
-                  "precision": 0,
-                  "value": 525
-                }
-            ],
-        },
-        "playoff": {
-            "level": "f",
-            "record": {
-                "wins": 5,
-                "losses": 3,
-                "ties": 0
-            },
-            "current_level_record": {
-                "wins": 1,
-                "losses": 2,
-                "ties": 0
-            },
-            "playoff_average": None,
-            "status": "eliminated"
-        },
         "alliance": {
+            "backup": {
+                "in": "frc1665",
+                "out": "frc229"
+            },
             "name": "Alliance 2",
             "number": 2,
-            "backup": {"out": "frc229", "in": "frc1665"},
             "pick": -1
+        },
+        "playoff": {
+            "current_level_record": {
+                "losses": 2,
+                "ties": 0,
+                "wins": 1
+            },
+            "level": "f",
+            "playoff_average": None,
+            "record": {
+                "losses": 3,
+                "ties": 0,
+                "wins": 5
+            },
+            "status": "eliminated"
+        },
+        "qual": {
+            "num_teams": 36,
+            "ranking": {
+                "dq": 0,
+                "matches_played": 12,
+                "qual_average": None,
+                "rank": 18,
+                "record": {
+                    "losses": 6,
+                    "ties": 0,
+                    "wins": 6
+                },
+                "sort_orders": [
+                    20.0,
+                    192.0,
+                    105.0,
+                    146.0,
+                    525.0
+                ],
+                "team_key": "frc1665"
+            },
+            "sort_order_info": [
+                {
+                    "name": "Ranking Score",
+                    "precision": 0
+                },
+                {
+                    "name": "Auto",
+                    "precision": 0
+                },
+                {
+                    "name": "Scale/Challenge",
+                    "precision": 0
+                },
+                {
+                    "name": "Goals",
+                    "precision": 0
+                },
+                {
+                    "name": "Defense",
+                    "precision": 0
+                }
+            ],
+            "status": "completed"
         }
-
     }
 
     status_5964 = {
+        "alliance": None,
+        "playoff": None,
         "qual": {
-            "status": "completed",
-            "rank": 23,
             "num_teams": 36,
-            "matches_played": 12,
-            "dq": 0,
-            "record": {
-                "wins": 6,
-                "losses": 6,
-                "ties": 0
+            "ranking": {
+                "dq": 0,
+                "matches_played": 12,
+                "qual_average": None,
+                "rank": 23,
+                "record": {
+                    "losses": 6,
+                    "ties": 0,
+                    "wins": 6
+                },
+                "sort_orders": [
+                    19.0,
+                    218.0,
+                    110.0,
+                    159.0,
+                    520.0
+                ],
+                "team_key": "frc5964"
             },
-            "qual_average": None,
-            "ranking_sort_orders": [
+            "sort_order_info": [
                 {
-                  "name": "Ranking Score",
-                  "precision": 0,
-                  "value": 19
+                    "name": "Ranking Score",
+                    "precision": 0
                 },
                 {
-                  "name": "Auto",
-                  "precision": 0,
-                  "value": 218
+                    "name": "Auto",
+                    "precision": 0
                 },
                 {
-                  "name": "Scale/Challenge",
-                  "precision": 0,
-                  "value": 110
+                    "name": "Scale/Challenge",
+                    "precision": 0
                 },
                 {
-                  "name": "Goals",
-                  "precision": 0,
-                  "value": 159
+                    "name": "Goals",
+                    "precision": 0
                 },
                 {
-                  "name": "Defense",
-                  "precision": 0,
-                  "value": 520
+                    "name": "Defense",
+                    "precision": 0
                 }
             ],
-        },
-        "playoff": None,
-        "alliance": None
+            "status": "completed"
+        }
     }
 
     status_1124 = {
@@ -749,156 +778,169 @@ class Test2016nytrEventTeamStatusHelper(unittest2.TestCase):
 
 class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
     status_359 = {
-        "qual": {
-            "status": "completed",
-            "rank": None,
-            "num_teams": 36,
-            "matches_played": 12,
-            "dq": None,
-            "record": {
-                "wins": 11,
-                "losses": 1,
-                "ties": 0
-            },
-            "qual_average": None,
-            "ranking_sort_orders": None,
-        },
+        "alliance": None,
         "playoff": {
-            "level": "f",
-            "record": {
-                "wins": 6,
-                "losses": 1,
-                "ties": 0
-            },
             "current_level_record": {
-                "wins": 2,
                 "losses": 1,
-                "ties": 0
+                "ties": 0,
+                "wins": 2
             },
+            "level": "f",
             "playoff_average": None,
+            "record": {
+                "losses": 1,
+                "ties": 0,
+                "wins": 6
+            },
             "status": "won"
         },
-        "alliance": None
+        "qual": {
+            "num_teams": 36,
+            "ranking": {
+                "dq": None,
+                "matches_played": 12,
+                "qual_average": None,
+                "rank": None,
+                "record": {
+                    "losses": 1,
+                    "ties": 0,
+                    "wins": 11
+                },
+                "sort_orders": None
+            },
+            "sort_order_info": None,
+            "status": "completed"
+        }
     }
 
     status_5240 = {
-        "qual": {
-            "status": "completed",
-            "rank": None,
-            "num_teams": 36,
-            "matches_played": 12,
-            "dq": None,
-            "record": {
-                "wins": 9,
-                "losses": 3,
-                "ties": 0
-            },
-            "qual_average": None,
-            "ranking_sort_orders": None,
-        },
+        "alliance": None,
         "playoff": {
-            "level": "sf",
-            "record": {
-                "wins": 2,
-                "losses": 3,
-                "ties": 0
-            },
             "current_level_record": {
-                "wins": 0,
                 "losses": 2,
-                "ties": 0
+                "ties": 0,
+                "wins": 0
             },
+            "level": "sf",
             "playoff_average": None,
+            "record": {
+                "losses": 3,
+                "ties": 0,
+                "wins": 2
+            },
             "status": "eliminated"
         },
-        "alliance": None
+        "qual": {
+            "num_teams": 36,
+            "ranking": {
+                "dq": None,
+                "matches_played": 12,
+                "qual_average": None,
+                "rank": None,
+                "record": {
+                    "losses": 3,
+                    "ties": 0,
+                    "wins": 9
+                },
+                "sort_orders": None
+            },
+            "sort_order_info": None,
+            "status": "completed"
+        }
     }
 
     status_229 = {
-        "qual": {
-            "status": "completed",
-            "rank": None,
-            "num_teams": 36,
-            "matches_played": 12,
-            "dq": None,
-            "record": {
-                "wins": 6,
-                "losses": 6,
-                "ties": 0
-            },
-            "qual_average": None,
-            "ranking_sort_orders": None,
-        },
+        "alliance": None,
         "playoff": {
-            "level": "f",
-            "record": {
-                "wins": 5,
-                "losses": 3,
-                "ties": 0
-            },
             "current_level_record": {
-                "wins": 1,
                 "losses": 2,
-                "ties": 0
+                "ties": 0,
+                "wins": 1
             },
+            "level": "f",
             "playoff_average": None,
+            "record": {
+                "losses": 3,
+                "ties": 0,
+                "wins": 5
+            },
             "status": "eliminated"
         },
-        "alliance": None
-
+        "qual": {
+            "num_teams": 36,
+            "ranking": {
+                "dq": None,
+                "matches_played": 12,
+                "qual_average": None,
+                "rank": None,
+                "record": {
+                    "losses": 6,
+                    "ties": 0,
+                    "wins": 6
+                },
+                "sort_orders": None
+            },
+            "sort_order_info": None,
+            "status": "completed"
+        }
     }
 
     status_1665 = {
-        "qual": {
-            "status": "completed",
-            "rank": None,
-            "num_teams": 36,
-            "matches_played": 12,
-            "dq": None,
-            "record": {
-                "wins": 6,
-                "losses": 6,
-                "ties": 0
-            },
-            "qual_average": None,
-            "ranking_sort_orders": None,
-        },
+        "alliance": None,
         "playoff": {
-            "level": "f",
-            "record": {
-                "wins": 5,
-                "losses": 3,
-                "ties": 0
-            },
             "current_level_record": {
-                "wins": 1,
                 "losses": 2,
-                "ties": 0
+                "ties": 0,
+                "wins": 1
             },
+            "level": "f",
             "playoff_average": None,
+            "record": {
+                "losses": 3,
+                "ties": 0,
+                "wins": 5
+            },
             "status": "eliminated"
         },
-        "alliance": None
-
+        "qual": {
+            "num_teams": 36,
+            "ranking": {
+                "dq": None,
+                "matches_played": 12,
+                "qual_average": None,
+                "rank": None,
+                "record": {
+                    "losses": 6,
+                    "ties": 0,
+                    "wins": 6
+                },
+                "sort_orders": None
+            },
+            "sort_order_info": None,
+            "status": "completed"
+        }
     }
 
     status_5964 = {
-        "qual": {
-            "status": "completed",
-            "rank": None,
-            "num_teams": 36,
-            "matches_played": 12,
-            "dq": None,
-            "record": {
-                "wins": 6,
-                "losses": 6,
-                "ties": 0
-            },
-            "qual_average": None,
-            "ranking_sort_orders": None
-        },
+        "alliance": None,
         "playoff": None,
-        "alliance": None
+        "qual": {
+            "num_teams": 36,
+            "ranking": {
+                "dq": None,
+                "matches_played": 12,
+                "qual_average": None,
+                "rank": None,
+                "record": {
+                    "losses": 6,
+                    "ties": 0,
+                    "wins": 6
+                },
+                "sort_orders": None
+            },
+            "sort_order_info": None,
+            "status": "completed"
+        }
     }
 
     status_1124 = {
@@ -973,36 +1015,39 @@ class Test2016nytrEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
 
 class Test2016casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
     status_254 = {
-        "qual": {
-            "status": "completed",
-            "rank": None,
-            "num_teams": 64,
-            "matches_played": 8,
-            "dq": None,
-            "record": {
-                "wins": 8,
-                "losses": 0,
-                "ties": 0
-            },
-            "qual_average": None,
-            "ranking_sort_orders": None,
-        },
+        "alliance": None,
         "playoff": {
-            "level": "f",
-            "record": {
-                "wins": 6,
-                "losses": 0,
-                "ties": 0
-            },
             "current_level_record": {
-                "wins": 2,
                 "losses": 0,
-                "ties": 0
+                "ties": 0,
+                "wins": 2
             },
+            "level": "f",
             "playoff_average": None,
+            "record": {
+                "losses": 0,
+                "ties": 0,
+                "wins": 6
+            },
             "status": "won"
         },
-        "alliance": None
+        "qual": {
+            "num_teams": 64,
+            "ranking": {
+                "dq": None,
+                "matches_played": 8,
+                "qual_average": None,
+                "rank": None,
+                "record": {
+                    "losses": 0,
+                    "ties": 0,
+                    "wins": 8
+                },
+                "sort_orders": None
+            },
+            "sort_order_info": None,
+            "status": "completed"
+        }
     }
 
     # Because I can't figure out how to get these to generate
@@ -1035,167 +1080,182 @@ class Test2016casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
 
 class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
     status_254 = {
-        "qual": {
-            "status": "completed",
-            "rank": 1,
-            "num_teams": 57,
-            "matches_played": 10,
-            "dq": 0,
-            "record": None,
-            "qual_average": 200.4,
-            "ranking_sort_orders": [
-                {
-                  "name": "Qual Avg.",
-                  "precision": 1,
-                  "value": 200.4
-                },
-                {
-                  "name": "Coopertition",
-                  "precision": 0,
-                  "value": 280
-                },
-                {
-                  "name": "Auto",
-                  "precision": 0,
-                  "value": 200
-                },
-                {
-                  "name": "Container",
-                  "precision": 0,
-                  "value": 836
-                },
-                {
-                  "name": "Tote",
-                  "precision": 0,
-                  "value": 522
-                },
-                {
-                  "name": "Litter",
-                  "precision": 0,
-                  "value": 166
-                }
-            ],
-        },
-        "playoff": {
-            "level": "f",
-            "record": None,
-            "current_level_record": {
-                "wins": 2,
-                "losses": 0,
-                "ties": 0
-            },
-            "playoff_average": 224.14285714285714,
-            "status": "won"
-        },
         "alliance": {
+            "backup": None,
             "name": "Alliance 1",
             "number": 1,
-            "backup": None,
             "pick": 0
+        },
+        "playoff": {
+            "current_level_record": {
+                "losses": 0,
+                "ties": 0,
+                "wins": 2
+            },
+            "level": "f",
+            "playoff_average": 224.14285714285714,
+            "record": None,
+            "status": "won"
+        },
+        "qual": {
+            "num_teams": 57,
+            "ranking": {
+                "dq": 0,
+                "matches_played": 10,
+                "qual_average": 200.4,
+                "rank": 1,
+                "record": None,
+                "sort_orders": [
+                    200.4,
+                    280.0,
+                    200.0,
+                    836.0,
+                    522.0,
+                    166.0
+                ],
+                "team_key": "frc254"
+            },
+            "sort_order_info": [
+                {
+                    "name": "Qual Avg.",
+                    "precision": 1
+                },
+                {
+                    "name": "Coopertition",
+                    "precision": 0
+                },
+                {
+                    "name": "Auto",
+                    "precision": 0
+                },
+                {
+                    "name": "Container",
+                    "precision": 0
+                },
+                {
+                    "name": "Tote",
+                    "precision": 0
+                },
+                {
+                    "name": "Litter",
+                    "precision": 0
+                }
+            ],
+            "status": "completed"
         }
     }
 
     status_846 = {
-        "qual": {
-            "status": "completed",
-            "rank": 8,
-            "num_teams": 57,
-            "matches_played": 10,
-            "dq": 0,
-            "record": None,
-            "qual_average": 97.0,
-            "ranking_sort_orders": [
-                {
-                  "name": "Qual Avg.",
-                  "precision": 1,
-                  "value": 97.0
-                },
-                {
-                  "name": "Coopertition",
-                  "precision": 0,
-                  "value": 200
-                },
-                {
-                  "name": "Auto",
-                  "precision": 0,
-                  "value": 20
-                },
-                {
-                  "name": "Container",
-                  "precision": 0,
-                  "value": 372
-                },
-                {
-                  "name": "Tote",
-                  "precision": 0,
-                  "value": 294
-                },
-                {
-                  "name": "Litter",
-                  "precision": 0,
-                  "value": 108
-                }
-            ],
-        },
-        "playoff": {
-            "level": "sf",
-            "record": None,
-            "current_level_record": None,
-            "playoff_average": 133.6,
-            "status": "eliminated"
-        },
         "alliance": {
+            "backup": None,
             "name": "Alliance 3",
             "number": 3,
-            "backup": None,
             "pick": 1
+        },
+        "playoff": {
+            "current_level_record": None,
+            "level": "sf",
+            "playoff_average": 133.59999999999999,
+            "record": None,
+            "status": "eliminated"
+        },
+        "qual": {
+            "num_teams": 57,
+            "ranking": {
+                "dq": 0,
+                "matches_played": 10,
+                "qual_average": 97.0,
+                "rank": 8,
+                "record": None,
+                "sort_orders": [
+                    97.0,
+                    200.0,
+                    20.0,
+                    372.0,
+                    294.0,
+                    108.0
+                ],
+                "team_key": "frc846"
+            },
+            "sort_order_info": [
+                {
+                    "name": "Qual Avg.",
+                    "precision": 1
+                },
+                {
+                    "name": "Coopertition",
+                    "precision": 0
+                },
+                {
+                    "name": "Auto",
+                    "precision": 0
+                },
+                {
+                    "name": "Container",
+                    "precision": 0
+                },
+                {
+                    "name": "Tote",
+                    "precision": 0
+                },
+                {
+                    "name": "Litter",
+                    "precision": 0
+                }
+            ],
+            "status": "completed"
         }
     }
 
     status_8 = {
+        "alliance": None,
+        "playoff": None,
         "qual": {
-            "status": "completed",
-            "rank": 53,
             "num_teams": 57,
-            "matches_played": 10,
-            "dq": 0,
-            "record": None,
-            "qual_average": 42.6,
-            "ranking_sort_orders": [
+            "ranking": {
+                "dq": 0,
+                "matches_played": 10,
+                "qual_average": 42.6,
+                "rank": 53,
+                "record": None,
+                "sort_orders": [
+                    42.6,
+                    120.0,
+                    0.0,
+                    84.0,
+                    150.0,
+                    72.0
+                ],
+                "team_key": "frc8"
+            },
+            "sort_order_info": [
                 {
-                  "name": "Qual Avg.",
-                  "precision": 1,
-                  "value": 42.6
+                    "name": "Qual Avg.",
+                    "precision": 1
                 },
                 {
-                  "name": "Coopertition",
-                  "precision": 0,
-                  "value": 120
+                    "name": "Coopertition",
+                    "precision": 0
                 },
                 {
-                  "name": "Auto",
-                  "precision": 0,
-                  "value": 0
+                    "name": "Auto",
+                    "precision": 0
                 },
                 {
-                  "name": "Container",
-                  "precision": 0,
-                  "value": 84
+                    "name": "Container",
+                    "precision": 0
                 },
                 {
-                  "name": "Tote",
-                  "precision": 0,
-                  "value": 150
+                    "name": "Tote",
+                    "precision": 0
                 },
                 {
-                  "name": "Litter",
-                  "precision": 0,
-                  "value": 72
+                    "name": "Litter",
+                    "precision": 0
                 }
             ],
-        },
-        "playoff": None,
-        "alliance": None
+            "status": "completed"
+        }
     }
 
     status_1124 = {
@@ -1255,64 +1315,73 @@ class Test2015casjEventTeamStatusHelper(unittest2.TestCase):
 
 class Test2015casjEventTeamStatusHelperNoEventDetails(unittest2.TestCase):
     status_254 = {
-        "qual": {
-            "status": "completed",
-            "rank": None,
-            "num_teams": 57,
-            "matches_played": 10,
-            "dq": None,
-            "record": None,
-            "qual_average": 200.4,
-            "ranking_sort_orders": None,
-        },
+        "alliance": None,
         "playoff": {
-            "level": "f",
-            "record": None,
             "current_level_record": {
-                "wins": 2,
                 "losses": 0,
-                "ties": 0
+                "ties": 0,
+                "wins": 2
             },
+            "level": "f",
             "playoff_average": 224.14285714285714,
+            "record": None,
             "status": "won"
         },
-        "alliance": None
+        "qual": {
+            "num_teams": 57,
+            "ranking": {
+                "dq": None,
+                "matches_played": 10,
+                "qual_average": 200.4,
+                "rank": None,
+                "record": None,
+                "sort_orders": None
+            },
+            "sort_order_info": None,
+            "status": "completed"
+        }
     }
 
     status_846 = {
-        "qual": {
-            "status": "completed",
-            "rank": None,
-            "num_teams": 57,
-            "matches_played": 10,
-            "dq": None,
-            "record": None,
-            "qual_average": 97.0,
-            "ranking_sort_orders": None,
-        },
+        "alliance": None,
         "playoff": {
-            "level": "sf",
-            "record": None,
             "current_level_record": None,
-            "playoff_average": 133.6,
+            "level": "sf",
+            "playoff_average": 133.59999999999999,
+            "record": None,
             "status": "eliminated"
         },
-        "alliance": None
+        "qual": {
+            "num_teams": 57,
+            "ranking": {
+                "dq": None,
+                "matches_played": 10,
+                "qual_average": 97.0,
+                "rank": None,
+                "record": None,
+                "sort_orders": None
+            },
+            "sort_order_info": None,
+            "status": "completed"
+        }
     }
 
     status_8 = {
-        "qual": {
-            "status": "completed",
-            "rank": None,
-            "num_teams": 57,
-            "matches_played": 10,
-            "dq": None,
-            "record": None,
-            "qual_average": 42.6,
-            "ranking_sort_orders": None,
-        },
+        "alliance": None,
         "playoff": None,
-        "alliance": None
+        "qual": {
+            "num_teams": 57,
+            "ranking": {
+                "dq": None,
+                "matches_played": 10,
+                "qual_average": 42.6,
+                "rank": None,
+                "record": None,
+                "sort_orders": None
+            },
+            "sort_order_info": None,
+            "status": "completed"
+        }
     }
 
     status_1124 = {
