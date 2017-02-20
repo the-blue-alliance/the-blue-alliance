@@ -4,6 +4,8 @@
   "dependencies": {
     "babel-polyfill": "^6.8.0",
     "classnames": "^2.2.3",
+    "firebase": "^3.6.9",
+    "firedux": "^1.1.0",
     "material-ui": "^0.16.5",
     "query-string": "^4.1.0",
     "react": "^15.4.1",
