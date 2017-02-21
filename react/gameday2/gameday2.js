@@ -87,7 +87,25 @@ store.subscribe(() => {
   }
 })
 
+// Load any special webcasts
 store.dispatch(setWebcastsRaw(webcastData))
+
+// Subscribe to changes in webcasts
+firedux.ref.child('live_events').on('value', (snapshot) => {
+  const ongoingEventsWithWebcasts = []
+  Object.values(snapshot.val()).forEach((event) => {
+    if (event.webcasts) {
+      ongoingEventsWithWebcasts.push(event)
+    }
+  })
+
+  const webcasts = {
+    ongoing_events_w_webcasts: ongoingEventsWithWebcasts,
+    special_webcasts: webcastData.special_webcasts,
+  }
+
+  store.dispatch(setWebcastsRaw(webcasts))
+})
 
 // Now that webcasts are loaded, attempt to restore any state that's present in
 // the URL hash

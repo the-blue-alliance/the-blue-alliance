@@ -9,37 +9,41 @@ const getWebcastsFromRawWebcasts = (webcasts) => {
   // First, deal with special webcasts
   // Index will be used as sort order later if we ever have to reconstruct the
   // original ordering of the webcasts
-  specialWebcasts.forEach((webcast, index) => {
-    const id = getWebcastId(webcast.key_name, 0)
-    webcastsById[id] = {
-      key: webcast.key_name,
-      num: 0,
-      id,
-      name: webcast.name,
-      type: webcast.type,
-      channel: webcast.channel,
-      sortOrder: index,
-    }
-  })
-
-  // Now, process normal event webcasts
-  eventsWithWebcasts.forEach((event) => {
-    event.webcast.forEach((webcast, index) => {
-      let name = (event.short_name ? event.short_name : event.name)
-      if (event.webcast.length > 1) {
-        name = `${name} ${index + 1}`
-      }
-      const id = getWebcastId(event.key, index)
+  if (specialWebcasts) {
+    specialWebcasts.forEach((webcast, index) => {
+      const id = getWebcastId(webcast.key_name, 0)
       webcastsById[id] = {
-        key: event.key,
-        num: index,
+        key: webcast.key_name,
+        num: 0,
         id,
-        name,
+        name: webcast.name,
         type: webcast.type,
         channel: webcast.channel,
+        sortOrder: index,
       }
     })
-  })
+  }
+
+  // Now, process normal event webcasts
+  if (eventsWithWebcasts) {
+    eventsWithWebcasts.forEach((event) => {
+      event.webcasts.forEach((webcast, index) => {
+        let name = (event.short_name ? event.short_name : event.name)
+        if (event.webcasts.length > 1) {
+          name = `${name} ${index + 1}`
+        }
+        const id = getWebcastId(event.key, index)
+        webcastsById[id] = {
+          key: event.key,
+          num: index,
+          id,
+          name,
+          type: webcast.type,
+          channel: webcast.channel,
+        }
+      })
+    })
+  }
 
   return webcastsById
 }
