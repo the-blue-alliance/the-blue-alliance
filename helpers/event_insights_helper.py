@@ -57,6 +57,8 @@ class EventInsightsHelper(object):
         takeoff_counts = 0
 
         # Overall
+        rotor_1_engaged_auto = 0
+        rotor_2_engaged_auto = 0
         rotor_1_engaged = 0
         rotor_2_engaged = 0
         rotor_3_engaged = 0
@@ -117,6 +119,8 @@ class EventInsightsHelper(object):
                     takeoff_counts += 1 if alliance_breakdown['touchpadNear'] == 'ReadyForTakeoff' else 0
 
                     # Overall
+                    rotor_1_engaged_auto += 1 if alliance_breakdown['rotor1Auto'] else 0
+                    rotor_2_engaged_auto += 1 if alliance_breakdown['rotor2Auto'] else 0
                     rotor_1_engaged += 1 if alliance_breakdown['rotor1Engaged'] else 0
                     rotor_2_engaged += 1 if alliance_breakdown['rotor2Engaged'] else 0
                     rotor_3_engaged += 1 if alliance_breakdown['rotor3Engaged'] else 0
@@ -170,6 +174,8 @@ class EventInsightsHelper(object):
             'average_fuel_points': float(fuel_points) / (2 * finished_matches),
             'average_high_goals': float(high_goals) / (2 * finished_matches),
             'average_low_goals': float(low_goals) / (2 * finished_matches),
+            'rotor_1_engaged_auto': [rotor_1_engaged_auto, opportunities_1x, 100.0 * float(rotor_1_engaged_auto) / opportunities_1x],
+            'rotor_2_engaged_auto': [rotor_2_engaged_auto, opportunities_1x, 100.0 * float(rotor_2_engaged_auto) / opportunities_1x],
             'rotor_1_engaged': [rotor_1_engaged, opportunities_1x, 100.0 * float(rotor_1_engaged) / opportunities_1x],
             'rotor_2_engaged': [rotor_2_engaged, opportunities_1x, 100.0 * float(rotor_2_engaged) / opportunities_1x],
             'rotor_3_engaged': [rotor_3_engaged, opportunities_1x, 100.0 * float(rotor_3_engaged) / opportunities_1x],
