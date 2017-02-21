@@ -38,6 +38,60 @@ const VideoCellToolbar = (props) => {
     boxShadow: '-2px 0px 15px 6px rgba(0, 0, 0, 0.5)'
   }
 
+  // Create TickerMatches
+  var compLevelsPlayOrder = {
+    'qm': 1,
+    'ef': 2,
+    'qf': 3,
+    'sf': 4,
+    'f': 5,
+  }
+  function calculateOrder(match) {
+    return compLevelsPlayOrder[match.comp_level] * 1000000 + match.match_number * 1000 + match.set_number
+  }
+
+  var matches = []
+  if (props.firedux.data &&
+      props.firedux.data.events &&
+      props.firedux.data.events[props.webcast.key] &&
+      props.firedux.data.events[props.webcast.key].matches) {
+    matches = Object.values(props.firedux.data.events[props.webcast.key].matches)
+  }
+  matches.sort(function(match1, match2) {
+    return calculateOrder(match1) - calculateOrder(match2);
+  });
+
+  var lastMatch = null
+  var upcomingMatches = []
+  for (var i in matches) {
+    var match = matches[i]
+
+    if (match.alliances.red.score == -1 || match.alliances.blue.score == -1) {
+      upcomingMatches.push(match);
+    } else {
+      lastMatch = match
+      upcomingMatches = []  // Reset upcomingMatches if matches get skipped
+    }
+  }
+
+  var tickerMatches = []
+  if (lastMatch != null) {
+    tickerMatches.push(
+      <TickerMatch
+        key={lastMatch.key}
+        match={lastMatch}
+      />
+    )
+  }
+  for (var i in upcomingMatches) {
+    tickerMatches.push(
+      <TickerMatch
+        key={upcomingMatches[i].key}
+        match={upcomingMatches[i]}
+      />
+    )
+  }
+
   return (
     <Toolbar style={toolbarStyle}>
       <ToolbarGroup>
@@ -48,21 +102,7 @@ const VideoCellToolbar = (props) => {
       </ToolbarGroup>
       <ToolbarGroup style={matchTickerGroupStyle}>
         <div style={matchTickerStyle}>
-          <TickerMatch
-            matchType="finishedRed"
-          />
-          <TickerMatch
-            matchType="finishedBlue"
-          />
-          <TickerMatch
-            matchType="finishedTie"
-          />
-          <TickerMatch
-            matchType="upcoming"
-          />
-          <TickerMatch
-            matchType="followed"
-          />
+          {tickerMatches}
         </div>
       </ToolbarGroup>
       <ToolbarGroup lastChild style={controlsStyle}>

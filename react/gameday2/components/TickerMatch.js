@@ -3,6 +3,7 @@ import { black, grey900, white } from 'material-ui/styles/colors'
 
 const TickerMatch = (props) => {
   const matchStyle = {
+    backgroundColor: black,
     height: '100%',
     width: 'auto',
     borderRadius: 2,
@@ -15,7 +16,7 @@ const TickerMatch = (props) => {
     MozBoxShadow: 'rgba(0, 0, 0, 0.5) 0px 1px 6px, rgba(0, 0, 0, 0.5) 0px 1px 4px',
     BoxShadow: 'rgba(0, 0, 0, 0.5) 0px 1px 6px, rgba(0, 0, 0, 0.5) 0px 1px 4px',
   }
-  const matchNumberStyle = {
+  const matchLabelStyle = {
     color: white,
     fontSize: 16,
     width: 'auto',
@@ -46,28 +47,47 @@ const TickerMatch = (props) => {
     height: '50%',
     display: 'block',
   }
-  if (props.matchType === 'finishedRed') {
+
+  var match = props.match
+
+  // Set backgrounds
+  if (match.winning_alliance == 'red') {  // Red win
     matchStyle.backgroundColor = '#330000'
-  } else if (props.matchType === 'finishedBlue') {
+  } else if (match.winning_alliance == 'blue') {  // Blue win
     matchStyle.backgroundColor = '#000033'
-  } else if (props.matchType === 'finishedTie') {
+  } else if (match.alliances.red.score != -1 && match.alliances.blue.score != -1) {  // Tie
     matchStyle.backgroundColor = '#220022'
-  } else if (props.matchType === 'followed') {
+  } else if (false) {  // TODO check if team is favorite
     matchStyle.backgroundColor = '#e6c100'
-    matchNumberStyle.color = black
-  } else {
-    matchStyle.backgroundColor = black
+    matchLabelStyle.color = black
   }
+
+  // Generate strings
+  var compLevel = match.comp_level.toUpperCase()
+  compLevel = (compLevel == 'QM') ? 'Q' : compLevel
+  var matchNumber = (compLevel == 'QF' || compLevel == 'SF' || compLevel == 'F') ? match.set_number + '-' + match.match_number : match.match_number
+  var matchLabel = compLevel + matchNumber
+
+  var redScore = match.alliances.red.score;
+  var blueScore = match.alliances.blue.score;
+  redScore = (redScore == -1) ? '' : ' - ' + redScore;
+  blueScore = (blueScore == -1) ? '' : ' - ' + blueScore;
 
   return (
     <div style={matchStyle}>
-      <div style={matchNumberStyle}>QF1-1</div>
+      <div style={matchLabelStyle}>{matchLabel}</div>
       <div style={alliancesStyle}>
         <div style={redAllianceStyle}>
-          6324, 1153, 78 - 145
+          {match.alliances.red.team_keys[0].slice(3)},{" "}
+          {match.alliances.red.team_keys[1].slice(3)},{" "}
+          {match.alliances.red.team_keys[2].slice(3)}
+          {redScore}
         </div>
         <div style={blueAllianceStyle}>
-          501, 58, 88 - 160
+          {match.alliances.blue.team_keys[0].slice(3)},{" "}
+          {match.alliances.blue.team_keys[1].slice(3)},{" "}
+          {match.alliances.blue.team_keys[2].slice(3)}
+          {blueScore}
         </div>
       </div>
     </div>

@@ -4,6 +4,7 @@ import { addWebcastAtPosition, swapWebcasts, removeWebcast } from '../actions'
 import { getWebcastIdsInDisplayOrder } from '../selectors'
 
 const mapStateToProps = (state) => ({
+  firedux: state.firedux,  // TODO: This should only be one event's matches
   webcasts: getWebcastIdsInDisplayOrder(state),
   webcastsById: state.webcastsById,
   displayedWebcasts: state.videoGrid.displayed,
