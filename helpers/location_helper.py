@@ -179,30 +179,31 @@ class LocationHelper(object):
         if not team.location:
             return
 
-        # Try with and without textsearch, pick best
-        location_info, score = cls.get_team_location_info(team)
-        if score < 0.7:
-            logging.warning("Using textsearch for {}".format(team.key.id()))
-            location_info2, score2 = cls.get_team_location_info(team, textsearch=True)
-            if score2 > score:
-                location_info = location_info2
-                score = score2
+        # # Try with and without textsearch, pick best
+        # location_info, score = cls.get_team_location_info(team)
+        # if score < 0.7:
+        #     logging.warning("Using textsearch for {}".format(team.key.id()))
+        #     location_info2, score2 = cls.get_team_location_info(team, textsearch=True)
+        #     if score2 > score:
+        #         location_info = location_info2
+        #         score = score2
 
-        # Log performance
-        text = "Team {} location score: {}".format(team.key.id(), score)
-        if score < 0.8:
-            logging.warning(text)
-        else:
-            logging.info(text)
+        # # Log performance
+        # text = "Team {} location score: {}".format(team.key.id(), score)
+        # if score < 0.8:
+        #     logging.warning(text)
+        # else:
+        #     logging.info(text)
 
-        # Don't trust anything below a certain threshold Super strict for now.
-        if score < 0.9:
-            logging.warning("Location score too low for team {}".format(team.key.id()))
-            location_info = {}
+        # # Don't trust anything below a certain threshold Super strict for now.
+        # if score < 0.9:
+        #     logging.warning("Location score too low for team {}".format(team.key.id()))
+        #     location_info = {}
+        location_info = {}  # Force imprecise locations
 
         # Fallback to location only
         if not location_info:
-            logging.warning("Falling back to location only for team {}".format(team.key.id()))
+            # logging.warning("Falling back to location only for team {}".format(team.key.id()))
             geocode_result = cls.google_maps_geocode_async(team.location).get_result()
             if geocode_result:
                 location_info = cls.construct_location_info_async(geocode_result[0]).get_result()
