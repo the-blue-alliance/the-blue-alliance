@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-xs-12">
     <h3>Bonus Objective Statistics</h3>
-    <table class="table table-condensed text-right">
+    <table class="table table-condensed table-striped text-right">
       <thead>
         <tr>
           <th class="text-right">Objective</th>
@@ -80,15 +80,17 @@
         </tr>
       </tbody>
     </table>
-    <hr>
+
     <table class="table table-condensed table-striped text-right">
-      <tbody>
+      <thead>
         <tr>
             <th></th>
             <th class="text-right">Auto</th>
             <th class="text-right">Teleop</th>
             <th class="text-right">Overall</th>
         </tr>
+      </thead>
+      <tbody>
         <tr>
           <td>Average Mobility Points</td>
           <td>{{'%0.2f' | format(event_insights.average_mobility_points_auto|float)}}</td>
