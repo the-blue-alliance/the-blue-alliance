@@ -54,6 +54,9 @@ class LocationHelper(object):
         if not event.location:
             return
 
+        if event.normalized_location:  # Only set normalized_location once
+            return
+
         location_info, score = cls.get_event_location_info(event)
 
         # Log performance
