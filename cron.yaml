@@ -63,3 +63,7 @@ cron:
   url: /tasks/notifications/upcoming_match
   schedule: every 2 minutes
   timezone: America/Los_Angeles
+
+- description: Update live events
+  url: /tasks/do/update_live_events
+  schedule: every 1 hours

@@ -7,7 +7,9 @@ from google.appengine.ext import deferred
 from google.appengine.api import urlfetch
 
 from database.dict_converters.match_converter import MatchConverter
+from database.dict_converters.event_converter import EventConverter
 from database.dict_converters.event_details_converter import EventDetailsConverter
+from helpers.event_helper import EventHelper
 from models.sitevar import Sitevar
 
 
@@ -135,4 +137,22 @@ class FirebasePusher(object):
             cls._put_data,
             'event_teams/{}/{}/status'.format(event_key, team_key),
             status_json,
+            _queue="firebase")
+
+    @classmethod
+    def update_live_events(cls):
+        """
+        Updates live_events
+        """
+        week_events = EventHelper.getWeekEvents()
+        events_by_key = {}
+        for event in week_events:
+            if event.now:
+                events_by_key[event.key.id()] = EventConverter.convert(event, 3)
+        live_events_json = json.dumps(events_by_key)
+
+        deferred.defer(
+            cls._put_data,
+            'live_events',
+            live_events_json,
             _queue="firebase")

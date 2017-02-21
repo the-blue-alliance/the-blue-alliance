@@ -585,3 +585,11 @@ class UpcomingNotificationDo(webapp.RequestHandler):
     def get(self):
         live_events = EventHelper.getEventsWithinADay()
         NotificationHelper.send_upcoming_matches(live_events)
+
+
+class UpdateLiveEventsDo(webapp.RequestHandler):
+    """
+    Updates live events
+    """
+    def get(self):
+        FirebasePusher.update_live_events()
