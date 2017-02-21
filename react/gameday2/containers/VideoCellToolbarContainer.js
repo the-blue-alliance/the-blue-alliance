@@ -1,9 +1,11 @@
 import { connect } from 'react-redux'
 import VideoCellToolbar from '../components/VideoCellToolbar'
 import { addWebcastAtPosition, swapWebcasts, removeWebcast } from '../actions'
-import { getWebcastIdsInDisplayOrder } from '../selectors'
+import { getTickerMatches, getWebcastIdsInDisplayOrder } from '../selectors'
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state, props) => ({
+  matches: getTickerMatches(state, props),
+  favoriteTeams: state.favoriteTeams,
   webcasts: getWebcastIdsInDisplayOrder(state),
   webcastsById: state.webcastsById,
   displayedWebcasts: state.videoGrid.displayed,
