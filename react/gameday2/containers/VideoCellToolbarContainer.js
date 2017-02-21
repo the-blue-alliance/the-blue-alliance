@@ -1,10 +1,10 @@
 import { connect } from 'react-redux'
 import VideoCellToolbar from '../components/VideoCellToolbar'
 import { addWebcastAtPosition, swapWebcasts, removeWebcast } from '../actions'
-import { getWebcastIdsInDisplayOrder } from '../selectors'
+import { getTickerMatches, getWebcastIdsInDisplayOrder } from '../selectors'
 
-const mapStateToProps = (state) => ({
-  firedux: state.firedux,  // TODO: This should only be one event's matches
+const mapStateToProps = (state, props) => ({
+  matches: getTickerMatches(state, props),
   webcasts: getWebcastIdsInDisplayOrder(state),
   webcastsById: state.webcastsById,
   displayedWebcasts: state.videoGrid.displayed,
