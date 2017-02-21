@@ -1,5 +1,5 @@
-import React from 'react'
-import { black, grey900, white } from 'material-ui/styles/colors'
+import React, { PropTypes } from 'react'
+import { black, white } from 'material-ui/styles/colors'
 
 const TickerMatch = (props) => {
   const matchStyle = {
@@ -48,14 +48,14 @@ const TickerMatch = (props) => {
     display: 'block',
   }
 
-  var match = props.match
+  const match = props.match
 
   // Set backgrounds
-  if (match.winning_alliance == 'red') {  // Red win
+  if (match.winning_alliance === 'red') {  // Red win
     matchStyle.backgroundColor = '#330000'
-  } else if (match.winning_alliance == 'blue') {  // Blue win
+  } else if (match.winning_alliance === 'blue') {  // Blue win
     matchStyle.backgroundColor = '#000033'
-  } else if (match.alliances.red.score != -1 && match.alliances.blue.score != -1) {  // Tie
+  } else if (match.alliances.red.score !== -1 && match.alliances.blue.score !== -1) {  // Tie
     matchStyle.backgroundColor = '#220022'
   } else if (props.hasFavorite) {
     matchStyle.backgroundColor = '#e6c100'
@@ -63,35 +63,40 @@ const TickerMatch = (props) => {
   }
 
   // Generate strings
-  var compLevel = match.comp_level.toUpperCase()
-  compLevel = (compLevel == 'QM') ? 'Q' : compLevel
-  var matchNumber = (compLevel == 'QF' || compLevel == 'SF' || compLevel == 'F') ? match.set_number + '-' + match.match_number : match.match_number
-  var matchLabel = compLevel + matchNumber
+  let compLevel = match.comp_level.toUpperCase()
+  compLevel = (compLevel === 'QM') ? 'Q' : compLevel
+  const matchNumber = (compLevel === 'QF' || compLevel === 'SF' || compLevel === 'F') ? `${match.set_number}-${match.match_number}` : match.match_number
+  const matchLabel = `${compLevel}${matchNumber}`
 
-  var redScore = match.alliances.red.score;
-  var blueScore = match.alliances.blue.score;
-  redScore = (redScore == -1) ? '' : ' - ' + redScore;
-  blueScore = (blueScore == -1) ? '' : ' - ' + blueScore;
+  let redScore = match.alliances.red.score
+  let blueScore = match.alliances.blue.score
+  redScore = (redScore === -1) ? '' : ` - ${redScore}`
+  blueScore = (blueScore === -1) ? '' : ` - ${blueScore}`
 
   return (
     <div style={matchStyle}>
       <div style={matchLabelStyle}>{matchLabel}</div>
       <div style={alliancesStyle}>
         <div style={redAllianceStyle}>
-          {match.alliances.red.team_keys[0].substring(3)},{" "}
-          {match.alliances.red.team_keys[1].substring(3)},{" "}
+          {match.alliances.red.team_keys[0].substring(3)},{' '}
+          {match.alliances.red.team_keys[1].substring(3)},{' '}
           {match.alliances.red.team_keys[2].substring(3)}
           {redScore}
         </div>
         <div style={blueAllianceStyle}>
-          {match.alliances.blue.team_keys[0].substring(3)},{" "}
-          {match.alliances.blue.team_keys[1].substring(3)},{" "}
+          {match.alliances.blue.team_keys[0].substring(3)},{' '}
+          {match.alliances.blue.team_keys[1].substring(3)},{' '}
           {match.alliances.blue.team_keys[2].substring(3)}
           {blueScore}
         </div>
       </div>
     </div>
   )
+}
+
+TickerMatch.propTypes = {
+  match: PropTypes.object,
+  hasFavorite: PropTypes.bool,
 }
 
 export default TickerMatch

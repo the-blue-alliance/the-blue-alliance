@@ -10,8 +10,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import { indigo500, indigo700 } from 'material-ui/styles/colors'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
 import GamedayFrame from './components/GamedayFrame'
-import { firedux } from './reducers'
-import gamedayReducer from './reducers'
+import gamedayReducer, { firedux } from './reducers'
 import { setWebcastsRaw, setLayout, addWebcastAtPosition, setTwitchChat, setChatSidebarVisibility, setFavoriteTeams } from './actions'
 import { MAX_SUPPORTED_VIEWS } from './constants/LayoutConstants'
 
@@ -47,39 +46,36 @@ ReactDOM.render(
 )
 
 // Subscribe changes in state.videoGrid.displayed to watch the correct Firebase paths
-var lastDisplayed = [];
-var subscribedEvents = new Set()
+let lastDisplayed = []
+const subscribedEvents = new Set()
 store.subscribe(() => {
   const state = store.getState()
 
   // See what got added or removed
-  let a = new Set(lastDisplayed)
-  let b = new Set(state.videoGrid.displayed)
-  let added = new Set([...b].filter(x => !a.has(x)))
-  let removed = new Set([...a].filter(x => !b.has(x)))
+  const a = new Set(lastDisplayed)
+  const b = new Set(state.videoGrid.displayed)
+  const added = new Set([...b].filter((x) => !a.has(x)))
+  const removed = new Set([...a].filter((x) => !b.has(x)))
 
   // Subscribe to added event if not already added
-  added.forEach(function (webcastKey) {
-    let eventKey = state.webcastsById[webcastKey].key
+  added.forEach((webcastKey) => {
+    const eventKey = state.webcastsById[webcastKey].key
     if (!subscribedEvents.has(eventKey)) {
-      console.log("Subscribing Firebase to:", eventKey)
+      console.log('Subscribing Firebase to:', eventKey)
       subscribedEvents.add(eventKey)
 
       firedux.watch(`events/${eventKey}/matches`)
-      .then(({snapshot}) => {})
     }
   })
 
   // Unsubscribe from removed event if no more existing
-  removed.forEach(function (webcastKey) {
-    let existingEventKeys = new Set()
-    for (var i in state.videoGrid.displayed) {
-      existingEventKeys.add(state.webcastsById[state.videoGrid.displayed[i]].key)
-    }
+  removed.forEach((webcastKey) => {
+    const existingEventKeys = new Set()
+    state.videoGrid.displayed.forEach((displayed) => existingEventKeys.add(state.webcastsById[displayed].key))
 
-    let eventKey = state.webcastsById[webcastKey].key
+    const eventKey = state.webcastsById[webcastKey].key
     if (!existingEventKeys.has(eventKey)) {
-      console.log("Unsubscribing Firebase from", eventKey)
+      console.log('Unsubscribing Firebase from', eventKey)
       subscribedEvents.delete(eventKey)
 
       firedux.ref.child(`events/${eventKey}/matches`).off('value')
@@ -159,10 +155,9 @@ store.subscribe(() => {
 // Load myTBA Favorites
 fetch('/_/account/favorites/1', {
   credentials: 'same-origin',
-}).then(function (response) {
-  if (response.status == 200) {
+}).then((response) => {
+  if (response.status === 200) {
     return response.json()
-  } else {
-    return null
   }
-}).then(json => store.dispatch(setFavoriteTeams(json)))
+  return []
+}).then((json) => store.dispatch(setFavoriteTeams(json)))

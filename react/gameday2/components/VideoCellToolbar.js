@@ -35,24 +35,20 @@ const VideoCellToolbar = (props) => {
     right: 0,
     marginRight: 0,
     backgroundColor: grey900,
-    boxShadow: '-2px 0px 15px 6px rgba(0, 0, 0, 0.5)'
+    boxShadow: '-2px 0px 15px 6px rgba(0, 0, 0, 0.5)',
   }
 
   // Create tickerMatches
-  var tickerMatches = []
-  for (var i in props.matches) {
-    var match = props.matches[i]
-
+  const tickerMatches = []
+  props.matches.forEach((match) => {
     // See if match has a favorite team
-    var hasFavorite = false
-    var teamKeys = match.alliances.red.team_keys.concat(match.alliances.blue.team_keys)
-    for (var j in teamKeys) {
-      var teamKey = teamKeys[j]
+    let hasFavorite = false
+    const teamKeys = match.alliances.red.team_keys.concat(match.alliances.blue.team_keys)
+    teamKeys.forEach((teamKey) => {
       if (props.favoriteTeams.has(teamKey)) {
         hasFavorite = true
-        break
       }
-    }
+    })
 
     tickerMatches.push(
       <TickerMatch
@@ -61,7 +57,7 @@ const VideoCellToolbar = (props) => {
         hasFavorite={hasFavorite}
       />
     )
-  }
+  })
 
   return (
     <Toolbar style={toolbarStyle}>
@@ -107,6 +103,7 @@ const VideoCellToolbar = (props) => {
 }
 
 VideoCellToolbar.propTypes = {
+  matches: PropTypes.arrayOf(PropTypes.object).isRequired,
   webcast: PropTypes.object.isRequired,
   /* eslint-disable react/no-unused-prop-types */
   onRequestOpenSwapPositionDialog: PropTypes.func.isRequired,

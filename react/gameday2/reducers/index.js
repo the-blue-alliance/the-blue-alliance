@@ -8,12 +8,12 @@ import chats from './chats'
 import favoriteTeams from './favorites'
 
 // Firebase
-var firebaseApp = Firebase.initializeApp({
+const firebaseApp = Firebase.initializeApp({
   apiKey: 'AIzaSyDBlFwtAgb2i7hMCQ5vBv44UEKVsA543hs',
   authDomain: 'tbatv-prod-hrd.firebaseapp.com',
-  databaseURL: 'https://tbatv-prod-hrd.firebaseio.com'
+  databaseURL: 'https://tbatv-prod-hrd.firebaseio.com',
 })
-var ref = firebaseApp.database().ref()
+const ref = firebaseApp.database().ref()
 export const firedux = new Firedux({
   ref,
 })

@@ -4,18 +4,16 @@ import {
 
 const defaultState = new Set()
 
-const setFavoriteTeams = (favoriteTeams, state) => {
-  var favoriteTeamsSet = new Set()
-  for (var i in favoriteTeams) {
-    favoriteTeamsSet.add(favoriteTeams[i].model_key)
-  }
+const setFavoriteTeams = (favoriteTeams) => {
+  const favoriteTeamsSet = new Set()
+  favoriteTeams.forEach((favoriteTeam) => favoriteTeamsSet.add(favoriteTeam.model_key))
   return favoriteTeamsSet
 }
 
 const favoriteTeams = (state = defaultState, action) => {
   switch (action.type) {
     case SET_FAVORITE_TEAMS:
-      return setFavoriteTeams(action.favoriteTeams, state)
+      return setFavoriteTeams(action.favoriteTeams)
     default:
       return state
   }
