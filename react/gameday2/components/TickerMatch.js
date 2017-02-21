@@ -57,7 +57,7 @@ const TickerMatch = (props) => {
     matchStyle.backgroundColor = '#000033'
   } else if (match.alliances.red.score != -1 && match.alliances.blue.score != -1) {  // Tie
     matchStyle.backgroundColor = '#220022'
-  } else if (false) {  // TODO check if team is favorite
+  } else if (props.hasFavorite) {
     matchStyle.backgroundColor = '#e6c100'
     matchLabelStyle.color = black
   }
@@ -78,15 +78,15 @@ const TickerMatch = (props) => {
       <div style={matchLabelStyle}>{matchLabel}</div>
       <div style={alliancesStyle}>
         <div style={redAllianceStyle}>
-          {match.alliances.red.team_keys[0].slice(3)},{" "}
-          {match.alliances.red.team_keys[1].slice(3)},{" "}
-          {match.alliances.red.team_keys[2].slice(3)}
+          {match.alliances.red.team_keys[0].substring(3)},{" "}
+          {match.alliances.red.team_keys[1].substring(3)},{" "}
+          {match.alliances.red.team_keys[2].substring(3)}
           {redScore}
         </div>
         <div style={blueAllianceStyle}>
-          {match.alliances.blue.team_keys[0].slice(3)},{" "}
-          {match.alliances.blue.team_keys[1].slice(3)},{" "}
-          {match.alliances.blue.team_keys[2].slice(3)}
+          {match.alliances.blue.team_keys[0].substring(3)},{" "}
+          {match.alliances.blue.team_keys[1].substring(3)},{" "}
+          {match.alliances.blue.team_keys[2].substring(3)}
           {blueScore}
         </div>
       </div>

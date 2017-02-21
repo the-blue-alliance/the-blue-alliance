@@ -41,10 +41,24 @@ const VideoCellToolbar = (props) => {
   // Create tickerMatches
   var tickerMatches = []
   for (var i in props.matches) {
+    var match = props.matches[i]
+
+    // See if match has a favorite team
+    var hasFavorite = false
+    var teamKeys = match.alliances.red.team_keys.concat(match.alliances.blue.team_keys)
+    for (var j in teamKeys) {
+      var teamKey = teamKeys[j]
+      if (props.favoriteTeams.has(teamKey)) {
+        hasFavorite = true
+        break
+      }
+    }
+
     tickerMatches.push(
       <TickerMatch
-        key={props.matches[i].key}
-        match={props.matches[i]}
+        key={match.key}
+        match={match}
+        hasFavorite={hasFavorite}
       />
     )
   }

@@ -126,3 +126,10 @@ export function setTwitchChat(channel) {
     channel,
   }
 }
+
+export function setFavoriteTeams(favoriteTeams) {
+  return {
+    type: types.SET_FAVORITE_TEAMS,
+    favoriteTeams,
+  }
+}

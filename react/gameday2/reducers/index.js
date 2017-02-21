@@ -5,6 +5,7 @@ import webcastsById from './webcastsById'
 import visibility from './visibility'
 import videoGrid from './videoGrid'
 import chats from './chats'
+import favoriteTeams from './favorites'
 
 // Firebase
 var firebaseApp = Firebase.initializeApp({
@@ -23,6 +24,7 @@ const gamedayReducer = combineReducers({
   visibility,
   videoGrid,
   chats,
+  favoriteTeams,
 })
 
 export default gamedayReducer
