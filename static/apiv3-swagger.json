@@ -108,6 +108,7 @@
   "paths": {
     "/status": {
       "get": {
+        "operationId": "getStatus",
         "tags": [
           "TBA"
         ],
@@ -147,6 +148,7 @@
     },
     "/teams/{page_num}": {
       "get": {
+        "operationId": "getTeams",
         "tags": [
           "team",
           "list"
@@ -194,6 +196,7 @@
     "/teams/{page_num}/simple": {
       "x-comment": "Simple (non-full) responses need a separate path definition. See also https://github.com/OAI/OpenAPI-Specification/issues/270",
       "get": {
+        "operationId": "getTeamsSimple",
         "tags": [
           "team",
           "list"
@@ -240,6 +243,7 @@
     },
     "/teams/{page_num}/keys": {
       "get": {
+        "operationId": "getTeamsKeys",
         "tags": [
           "team",
           "list"
@@ -286,6 +290,7 @@
     },
     "/teams/{year}/{page_num}": {
       "get": {
+        "operationId": "getTeamsByYear",
         "tags": [
           "team",
           "list"
@@ -335,6 +340,7 @@
     },
     "/teams/{year}/{page_num}/simple": {
       "get": {
+        "operationId": "getTeamsByYearSimple",
         "tags": [
           "team",
           "list"
@@ -384,6 +390,7 @@
     },
     "/teams/{year}/{page_num}/keys": {
       "get": {
+        "operationId": "getTeamsByYearKeys",
         "tags": [
           "team",
           "list"
@@ -434,6 +441,7 @@
     },
     "/team/{team_key}": {
       "get": {
+        "operationId": "getTeam",
         "tags": [
           "team"
         ],
@@ -476,6 +484,7 @@
     },
     "/team/{team_key}/simple": {
       "get": {
+        "operationId": "getTeamSimple",
         "tags": [
           "team"
         ],
@@ -518,6 +527,7 @@
     },
     "/team/{team_key}/years_participated": {
       "get": {
+        "operationId": "getTeamYearsParticipated",
         "tags": [
           "team"
         ],
@@ -563,6 +573,7 @@
     },
     "/team/{team_key}/districts": {
       "get": {
+        "operationId": "getTeamDistricts",
         "tags": [
           "team",
           "district"
@@ -611,6 +622,7 @@
     },
     "/team/{team_key}/robots": {
       "get": {
+        "operationId": "getTeamRobots",
         "tags": [
           "team"
         ],
@@ -656,6 +668,7 @@
     },
     "/team/{team_key}/events": {
       "get": {
+        "operationId": "getTeamEvents",
         "tags": [
           "team",
           "event"
@@ -702,6 +715,7 @@
     },
     "/team/{team_key}/events/simple": {
       "get": {
+        "operationId": "getTeamEventsSimple",
         "tags": [
           "team",
           "event"
@@ -748,6 +762,7 @@
     },
     "/team/{team_key}/events/keys": {
       "get": {
+        "operationId": "getTeamEventsKeys",
         "tags": [
           "team",
           "event"
@@ -795,6 +810,7 @@
     },
     "/team/{team_key}/events/{year}": {
       "get": {
+        "operationId": "getTeamEventsByYear",
         "tags": [
           "team",
           "event"
@@ -844,6 +860,7 @@
     },
     "/team/{team_key}/events/{year}/simple": {
       "get": {
+        "operationId": "getTeamEventsByYearSimple",
         "tags": [
           "team",
           "event"
@@ -893,6 +910,7 @@
     },
     "/team/{team_key}/events/{year}/keys": {
       "get": {
+        "operationId": "getTeamEventsByYearKeys",
         "tags": [
           "team",
           "event"
@@ -943,6 +961,7 @@
     },
     "/team/{team_key}/event/{event_key}/matches": {
       "get": {
+        "operationId": "getTeamEventMatches",
         "tags": [
           "team",
           "event",
@@ -993,6 +1012,7 @@
     },
     "/team/{team_key}/event/{event_key}/matches/simple": {
       "get": {
+        "operationId": "getTeamEventMatchesSimple",
         "tags": [
           "team",
           "event",
@@ -1043,6 +1063,7 @@
     },
     "/team/{team_key}/event/{event_key}/matches/keys": {
       "get": {
+        "operationId": "getTeamEventMatchesKeys",
         "tags": [
           "team",
           "event",
@@ -1094,6 +1115,7 @@
     },
     "/team/{team_key}/event/{event_key}/awards": {
       "get": {
+        "operationId": "getTeamEventAwards",
         "tags": [
           "team",
           "event"
@@ -1143,6 +1165,7 @@
     },
     "/team/{team_key}/event/{event_key}/status": {
       "get": {
+        "operationId": "getTeamEventStatus",
         "tags": [
           "team",
           "event"
@@ -1189,6 +1212,7 @@
     },
     "/team/{team_key}/awards": {
       "get": {
+        "operationId": "getTeamAwards",
         "tags": [
           "team"
         ],
@@ -1234,6 +1258,7 @@
     },
     "/team/{team_key}/awards/{year}": {
       "get": {
+        "operationId": "getTeamAwardsByYear",
         "tags": [
           "team"
         ],
@@ -1282,6 +1307,7 @@
     },
     "/team/{team_key}/matches/{year}": {
       "get": {
+        "operationId": "getTeamMatchesByYear",
         "tags": [
           "team",
           "match"
@@ -1331,6 +1357,7 @@
     },
     "/team/{team_key}/matches/{year}/simple": {
       "get": {
+        "operationId": "getTeamMatchesByYearSimple",
         "tags": [
           "team",
           "match"
@@ -1380,6 +1407,7 @@
     },
     "/team/{team_key}/matches/{year}/keys": {
       "get": {
+        "operationId": "getTeamMatchesByYearKeys",
         "tags": [
           "team",
           "match"
@@ -1430,6 +1458,7 @@
     },
     "/team/{team_key}/media/{year}": {
       "get": {
+        "operationId": "getTeamMediaByYear",
         "tags": [
           "team"
         ],
@@ -1478,6 +1507,7 @@
     },
     "/team/{team_key}/social_media": {
       "get": {
+        "operationId": "getTeamSocialMedia",
         "tags": [
           "team"
         ],
@@ -1523,6 +1553,7 @@
     },
     "/events/{year}": {
       "get": {
+        "operationId": "getEventsByYear",
         "tags": [
           "event",
           "list"
@@ -1569,6 +1600,7 @@
     },
     "/events/{year}/simple": {
       "get": {
+        "operationId": "getEventsByYearSimple",
         "tags": [
           "event",
           "list"
@@ -1615,6 +1647,7 @@
     },
     "/events/{year}/keys": {
       "get": {
+        "operationId": "getEventsByYearKeys",
         "tags": [
           "event",
           "list"
@@ -1662,6 +1695,7 @@
     },
     "/event/{event_key}": {
       "get": {
+        "operationId": "getEvent",
         "tags": [
           "event"
         ],
@@ -1704,6 +1738,7 @@
     },
     "/event/{event_key}/simple": {
       "get": {
+        "operationId": "getEventSimple",
         "tags": [
           "event"
         ],
@@ -1746,6 +1781,7 @@
     },
     "/event/{event_key}/alliances": {
       "get": {
+        "operationId": "getEventAlliances",
         "tags": [
           "event"
         ],
@@ -1791,6 +1827,7 @@
     },
     "/event/{event_key}/stats": {
       "get": {
+        "operationId": "getEventStats",
         "tags": [
           "event"
         ],
@@ -1834,6 +1871,7 @@
     },
     "/event/{event_key}/rankings": {
       "get": {
+        "operationId": "getEventRankings",
         "tags": [
           "event"
         ],
@@ -1876,6 +1914,7 @@
     },
     "/event/{event_key}/district_points": {
       "get": {
+        "operationId": "getEventDistrictPoints",
         "tags": [
           "event",
           "district"
@@ -1922,6 +1961,7 @@
     },
     "/event/{event_key}/teams": {
       "get": {
+        "operationId": "getEventTeams",
         "tags": [
           "event",
           "team",
@@ -1969,6 +2009,7 @@
     },
     "/event/{event_key}/teams/simple": {
       "get": {
+        "operationId": "getEventTeamsSimple",
         "tags": [
           "event",
           "team",
@@ -2016,6 +2057,7 @@
     },
     "/event/{event_key}/teams/keys": {
       "get": {
+        "operationId": "getEventTeamsKeys",
         "tags": [
           "event",
           "team",
@@ -2064,6 +2106,7 @@
     },
     "/event/{event_key}/matches": {
       "get": {
+        "operationId": "getEventMatches",
         "tags": [
           "event",
           "match"
@@ -2110,6 +2153,7 @@
     },
     "/event/{event_key}/matches/simple": {
       "get": {
+        "operationId": "getEventMatchesSimple",
         "tags": [
           "event",
           "match"
@@ -2156,6 +2200,7 @@
     },
     "/event/{event_key}/matches/keys": {
       "get": {
+        "operationId": "getEventMatchesKeys",
         "tags": [
           "event",
           "match"
@@ -2203,6 +2248,7 @@
     },
     "/event/{event_key}/awards": {
       "get": {
+        "operationId": "getEventAwards",
         "tags": [
           "event"
         ],
@@ -2248,6 +2294,7 @@
     },
     "/match/{match_key}": {
       "get": {
+        "operationId": "getMatch",
         "tags": [
           "match"
         ],
@@ -2290,6 +2337,7 @@
     },
     "/match/{match_key}/simple": {
       "get": {
+        "operationId": "getMatchSimple",
         "tags": [
           "match"
         ],
@@ -2332,6 +2380,7 @@
     },
     "/districts/{year}": {
       "get": {
+        "operationId": "getDistrictsByYear",
         "tags": [
           "district"
         ],
@@ -2377,6 +2426,7 @@
     },
     "/district/{district_key}/{year}/events": {
       "get": {
+        "operationId": "getDistrictYearEvents",
         "tags": [
           "district",
           "event",
@@ -2427,6 +2477,7 @@
     },
     "/district/{district_key}/{year}/events/simple": {
       "get": {
+        "operationId": "getDistrictYearEventsSimple",
         "tags": [
           "district",
           "event",
@@ -2477,6 +2528,7 @@
     },
     "/district/{district_key}/{year}/events/keys": {
       "get": {
+        "operationId": "getDistrictYearEventsKeys",
         "tags": [
           "district",
           "event",
@@ -2528,6 +2580,7 @@
     },
     "/district/{district_key}/{year}/teams": {
       "get": {
+        "operationId": "getDistrictYearTeams",
         "tags": [
           "district",
           "team",
@@ -2578,6 +2631,7 @@
     },
     "/district/{district_key}/{year}/teams/simple": {
       "get": {
+        "operationId": "getDistrictYearTeamsSimple",
         "tags": [
           "district",
           "team",
@@ -2628,6 +2682,7 @@
     },
     "/district/{district_key}/{year}/teams/keys": {
       "get": {
+        "operationId": "getDistrictYearTeamsKeys",
         "tags": [
           "district",
           "team",
@@ -2679,6 +2734,7 @@
     },
     "/district/{district_key}/{year}/rankings": {
       "get": {
+        "operationId": "getDistrictYearRankings",
         "tags": [
           "district",
           "team",
