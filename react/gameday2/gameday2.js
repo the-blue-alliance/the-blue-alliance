@@ -61,7 +61,6 @@ store.subscribe(() => {
   added.forEach((webcastKey) => {
     const eventKey = state.webcastsById[webcastKey].key
     if (!subscribedEvents.has(eventKey)) {
-      console.log('Subscribing Firebase to:', eventKey)
       subscribedEvents.add(eventKey)
 
       firedux.watch(`events/${eventKey}/matches`)
@@ -75,7 +74,6 @@ store.subscribe(() => {
 
     const eventKey = state.webcastsById[webcastKey].key
     if (!existingEventKeys.has(eventKey)) {
-      console.log('Unsubscribing Firebase from', eventKey)
       subscribedEvents.delete(eventKey)
 
       firedux.ref.child(`events/${eventKey}/matches`).off('value')

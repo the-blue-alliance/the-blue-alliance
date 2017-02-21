@@ -101,7 +101,7 @@ class ChatSidebar extends React.Component {
     const currentChat = this.props.chats[this.props.currentChat]
     let currentChatName = 'UNKNOWN'
     if (currentChat) {
-      currentChatName = currentChat.name
+      currentChatName = `${currentChat.name} Chat`
     }
 
     let content
