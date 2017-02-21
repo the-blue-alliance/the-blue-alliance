@@ -3,7 +3,7 @@ from database.dict_converters.converter_base import ConverterBase
 
 class TeamConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        3: 2,
+        3: 3,
     }
 
     @classmethod

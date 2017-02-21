@@ -28,11 +28,11 @@ class ConverterBase(object):
         """
         Works for teams and events
         """
-        has_nl = model.nl and model.nl.city and model.nl.state_prov and model.nl.country
+        has_nl = model.nl and model.nl.city and model.nl.state_prov_short and model.nl.country_short_if_usa
         return {
             'city': model.nl.city if has_nl else model.city,
-            'state_prov': model.nl.state_prov if has_nl else model.state_prov,
-            'country': model.nl.country if has_nl else model.country,
+            'state_prov': model.nl.state_prov_short if has_nl else model.state_prov,
+            'country': model.nl.country_short_if_usa if has_nl else model.country,
             'postal_code': model.nl.postal_code if has_nl else model.postalcode,
             'lat': model.nl.lat_lng.lat if has_nl else None,
             'lng': model.nl.lat_lng.lon if has_nl else None,
