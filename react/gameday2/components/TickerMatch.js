@@ -27,7 +27,7 @@ const TickerMatch = (props) => {
   }
   const alliancesStyle = {
     display: 'inline-block',
-    height: '100%',
+    height: '28px',
     width: 'auto',
     float: 'left',
     marginTop: 5,
@@ -39,6 +39,7 @@ const TickerMatch = (props) => {
     width: 'auto',
     height: '50%',
     display: 'block',
+    lineHeight: '13px',
   }
   const blueAllianceStyle = {
     color: '#0066FF',
@@ -46,6 +47,7 @@ const TickerMatch = (props) => {
     width: 'auto',
     height: '50%',
     display: 'block',
+    lineHeight: '13px',
   }
 
   const match = props.match
