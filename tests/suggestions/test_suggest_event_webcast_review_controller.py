@@ -6,6 +6,7 @@ import unittest2
 import webapp2
 import webtest
 from google.appengine.datastore import datastore_stub_util
+from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 from webapp2_extras.routes import RedirectRoute
@@ -143,6 +144,11 @@ class TestSuggestApiWriteController(unittest2.TestCase):
         request = response.request
         self.assertEqual(request.GET.get('success'), 'accept')
 
+        # Process task queue
+        tasks = self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME).get_filtered_tasks()
+        for task in tasks:
+            deferred.run(task.payload)
+
         # Make sure we mark the Suggestion as REVIEWED
         suggestion = Suggestion.get_by_id(suggestion_id)
         self.assertIsNotNone(suggestion)
@@ -170,6 +176,11 @@ class TestSuggestApiWriteController(unittest2.TestCase):
 
         request = response.request
         self.assertEqual(request.GET.get('success'), 'accept')
+
+        # Process task queue
+        tasks = self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME).get_filtered_tasks()
+        for task in tasks:
+            deferred.run(task.payload)
 
         # Make sure we mark the Suggestion as REVIEWED
         suggestion = Suggestion.get_by_id(suggestion_id)
