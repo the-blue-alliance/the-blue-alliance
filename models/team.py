@@ -14,6 +14,8 @@ class Team(ndb.Model):
     team_number = ndb.IntegerProperty(required=True)
     name = ndb.TextProperty(indexed=False)
     nickname = ndb.StringProperty(indexed=False)
+    school_name = ndb.TextProperty(indexed=False)
+    home_cmp = ndb.StringProperty()
 
     # city, state_prov, country, and postalcode are from FIRST
     city = ndb.StringProperty()  # Equivalent to locality. From FRCAPI

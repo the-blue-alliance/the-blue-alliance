@@ -43,6 +43,8 @@ class FMSAPITeamDetailsParser(object):
                 team_number=teamData['teamNumber'],
                 name=teamData['nameFull'],
                 nickname=teamData['nameShort'],
+                school_name=teamData.get('schoolName'),
+                home_cmp=teamData.get('homeCMP').lower() if teamData.get('homeCMP') else None,
                 city=teamData['city'],
                 state_prov=teamData['stateProv'],
                 country=teamData['country'],

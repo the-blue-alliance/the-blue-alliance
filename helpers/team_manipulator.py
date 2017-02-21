@@ -59,6 +59,8 @@ class TeamManipulator(ManipulatorBase):
             "normalized_location",  # Overwrite whole thing as one
             "name",
             "nickname",
+            "school_name",
+            "home_cmp",
             "website",
             "rookie_year",
             "motto",
