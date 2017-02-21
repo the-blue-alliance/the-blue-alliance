@@ -147,7 +147,7 @@ class Event(ndb.Model):
             tz = pytz.timezone(self.timezone_id)
             try:
                 now = now + tz.utcoffset(now)
-            except pytz.NonExistentTimeError:  # may happen during DST
+            except (pytz.NonExistentTimeError, pytz.AmbiguousTimeError):  # may happen during DST
                 now = now + tz.utcoffset(now + datetime.timedelta(hours=1))  # add offset to get out of non-existant time
         return now
 

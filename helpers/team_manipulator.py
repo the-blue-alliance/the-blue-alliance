@@ -30,12 +30,11 @@ class TeamManipulator(ManipulatorBase):
         To run after models have been updated
         """
         for (team, updated_attrs) in zip(teams, updated_attr_list):
-            # Disabled due to unreliability. 2017-01-24 -fangeugene
-            # try:
-            #     LocationHelper.update_team_location(team)
-            # except Exception, e:
-            #     logging.error("update_team_location for {} errored!".format(team.key.id()))
-            #     logging.exception(e)
+            try:
+                LocationHelper.update_team_location(team)
+            except Exception, e:
+                logging.error("update_team_location for {} errored!".format(team.key.id()))
+                logging.exception(e)
 
             try:
                 SearchHelper.update_team_location_index(team)
@@ -59,6 +58,8 @@ class TeamManipulator(ManipulatorBase):
             "normalized_location",  # Overwrite whole thing as one
             "name",
             "nickname",
+            "school_name",
+            "home_cmp",
             "website",
             "rookie_year",
             "motto",

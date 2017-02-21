@@ -26,6 +26,13 @@ class Location(ndb.Model):
         super(Location, self).__init__(*args, **kw)
 
     @property
+    def country_short_if_usa(self):
+        if self.country == 'United States':
+            return 'USA'
+        else:
+            return self.country
+
+    @property
     def city_state_country(self):
         if not self._city_state_country:
             location_parts = []
@@ -33,10 +40,7 @@ class Location(ndb.Model):
                 location_parts.append(self.city)
             if self.state_prov_short:
                 location_parts.append(self.state_prov_short)
-            if self.country:
-                country = self.country
-                if self.country == 'United States':
-                    country = 'USA'
-                location_parts.append(country)
+            if self.country_short_if_usa:
+                location_parts.append(self.country_short_if_usa)
             self._city_state_country = ', '.join(location_parts)
         return self._city_state_country

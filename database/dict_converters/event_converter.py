@@ -4,7 +4,7 @@ from database.dict_converters.district_converter import DistrictConverter
 
 class EventConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        3: 2,
+        3: 3,
     }
 
     @classmethod

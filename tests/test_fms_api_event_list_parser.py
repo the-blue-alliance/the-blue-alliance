@@ -117,3 +117,26 @@ class TestFMSAPIEventListParser(unittest2.TestCase):
             self.assertEquals(event.year, 2015)
             self.assertEquals(event.event_type_enum, EventType.CMP_DIVISION)
             self.assertEquals(event.district_key, None)
+
+    def test_parse_2017_event(self):
+        with open('test_data/fms_api/2017_event_list.json', 'r') as f:
+            events, districts = FMSAPIEventListParser(2017).parse(json.loads(f.read()))
+            event = events[16]
+
+            self.assertEquals(event.key_name, "2017casj")
+            self.assertEquals(event.name, "Silicon Valley Regional")
+            self.assertEquals(event.short_name, "Silicon Valley")
+            self.assertEquals(event.event_short, "casj")
+            self.assertEquals(event.official, True)
+            self.assertEquals(event.start_date, datetime.datetime(year=2017, month=3, day=29, hour=0, minute=0, second=0))
+            self.assertEquals(event.end_date, datetime.datetime(year=2017, month=4, day=1, hour=23, minute=59, second=59))
+            self.assertEquals(event.venue, "San Jose State University - The Event Center")
+            self.assertEquals(event.city, "San Jose")
+            self.assertEquals(event.state_prov, "CA")
+            self.assertEquals(event.country, "USA")
+            self.assertEquals(event.year, 2017)
+            self.assertEquals(event.event_type_enum, EventType.REGIONAL)
+            self.assertEquals(event.district_key, None)
+
+            # New in 2017
+            self.assertEquals(event.website, "http://www.firstsv.org")
