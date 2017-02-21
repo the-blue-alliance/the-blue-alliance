@@ -6,6 +6,7 @@ import tba_config
 from google.appengine.ext import deferred
 from google.appengine.api import urlfetch
 
+from controllers.apiv3.model_properties import filter_match_properties
 from database.dict_converters.match_converter import MatchConverter
 from database.dict_converters.event_details_converter import EventDetailsConverter
 from models.sitevar import Sitevar
@@ -87,7 +88,7 @@ class FirebasePusher(object):
         """
         Updates a match in an event and event/team
         """
-        match_data_json = json.dumps(MatchConverter.convert(match, 3))
+        match_data_json = json.dumps(filter_match_properties([MatchConverter.convert(match, 3)], 'simple')[0])
 
         deferred.defer(
             cls._put_data,
