@@ -65,6 +65,7 @@ class FMSAPIEventListParser(object):
             country = event['country']
             start = datetime.datetime.strptime(event['dateStart'], self.DATE_FORMAT_STR)
             end = datetime.datetime.strptime(event['dateEnd'], self.DATE_FORMAT_STR)
+            website = event.get('website')
 
             # TODO read timezone from API
 
@@ -90,10 +91,11 @@ class FMSAPIEventListParser(object):
                 city=city,
                 state_prov=state_prov,
                 country=country,
-                venue_address=None,  # FIRST API doesn't provide detailed venue address
+                venue_address=None,  # Even though FRC API provides address, ElasticSearch is more detailed
                 year=self.season,
                 event_district_enum=district_enum,
                 district_key=ndb.Key(District, district_key) if district_key else None,
+                website=website,
             ))
 
             # Build District Model
