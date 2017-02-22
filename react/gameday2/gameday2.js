@@ -87,24 +87,52 @@ store.subscribe(() => {
   }
 })
 
+// Load any special webcasts
 store.dispatch(setWebcastsRaw(webcastData))
 
-// Now that webcasts are loaded, attempt to restore any state that's present in
-// the URL hash
+
+// Restore layout from URL hash.
 const params = queryString.parse(location.hash)
 if (params.layout && Number.isInteger(Number.parseInt(params.layout, 10))) {
   store.dispatch(setLayout(Number.parseInt(params.layout, 10)))
-}
-for (let i = 0; i < MAX_SUPPORTED_VIEWS; i++) {
-  const key = `view_${i}`
-  if (params[key]) {
-    store.dispatch(addWebcastAtPosition(params[key], i))
-  }
 }
 if (params.chat) {
   store.dispatch(setChatSidebarVisibility(true))
   store.dispatch(setTwitchChat(params.chat))
 }
+
+// Subscribe to live events for webcasts
+let isLoad = true
+firedux.ref.child('live_events').on('value', (snapshot) => {
+  const ongoingEventsWithWebcasts = []
+  const liveEvents = snapshot.val()
+  if (liveEvents != null) {
+    Object.values(liveEvents).forEach((event) => {
+      if (event.webcasts) {
+        ongoingEventsWithWebcasts.push(event)
+      }
+    })
+
+    const webcasts = {
+      ongoing_events_w_webcasts: ongoingEventsWithWebcasts,
+      special_webcasts: webcastData.special_webcasts,
+    }
+
+    store.dispatch(setWebcastsRaw(webcasts))
+  }
+
+  // Now that webcasts are loaded, attempt to restore any state that's present in
+  // the URL hash. Only run the first time.
+  if (isLoad) {
+    for (let i = 0; i < MAX_SUPPORTED_VIEWS; i++) {
+      const key = `view_${i}`
+      if (params[key]) {
+        store.dispatch(addWebcastAtPosition(params[key], i))
+      }
+    }
+    isLoad = false
+  }
+})
 
 // Subscribe to the store to keep the url hash in sync
 store.subscribe(() => {

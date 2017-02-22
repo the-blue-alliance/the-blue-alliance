@@ -40,19 +40,8 @@ class Gameday2Controller(CacheableHandler):
                 toAppend[str(key)] = str(value)
             special_webcasts.append(toAppend)
 
-        ongoing_events = []
-        ongoing_events_w_webcasts = []
-        week_events = EventHelper.getWeekEvents()
-        for event in week_events:
-            if event.now:
-                ongoing_events.append(ModelToDict.eventConverter(event))
-                if event.webcast:
-                    ongoing_events_w_webcasts.append(ModelToDict.eventConverter(event))
-
         webcasts_json = {
             'special_webcasts': special_webcasts,
-            'ongoing_events': ongoing_events,
-            'ongoing_events_w_webcasts': ongoing_events_w_webcasts
         }
 
         self.template_values.update({

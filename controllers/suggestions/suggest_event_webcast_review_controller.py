@@ -2,6 +2,7 @@ import datetime
 import os
 import logging
 
+from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
@@ -28,8 +29,9 @@ class SuggestEventWebcastReviewController(SuggestionsReviewBaseController):
             webcast["file"] = self.request.get("webcast_file")
 
         event = Event.get_by_id(self.request.get("event_key"))
-        EventWebcastAdder.add_webcast(event, webcast)
-        MemcacheWebcastFlusher.flush()
+        # Defer because of transactions
+        deferred.defer(EventWebcastAdder.add_webcast, event, webcast)
+        deferred.defer(MemcacheWebcastFlusher.flush)
 
     """
     View the list of suggestions.
