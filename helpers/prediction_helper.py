@@ -135,15 +135,15 @@ class ContributionCalculator(object):
             for color in ['red', 'blue']:
                 if self._stat == 'score':
                     means[color] = match.alliances[color]['score']
-                elif self._stat == '2016autoPointsOPR':
+                elif self._stat == 'auto_points':
                     means[color] = match.score_breakdown[color]['autoPoints']
-                elif self._stat == '2016bouldersOPR':
+                elif self._stat == 'boulders':
                     means[color] = (
                         match.score_breakdown[color].get('autoBouldersLow', 0) +
                         match.score_breakdown[color].get('autoBouldersHigh', 0) +
                         match.score_breakdown[color].get('teleopBouldersLow', 0) +
                         match.score_breakdown[color].get('teleopBouldersHigh', 0))
-                elif self._stat == '2016crossingsOPR':
+                elif self._stat == 'crossings':
                     means[color] = (
                         match.score_breakdown[color].get('position1crossings', 0) +
                         match.score_breakdown[color].get('position2crossings', 0) +
@@ -217,105 +217,80 @@ class ContributionCalculator(object):
 
 
 class PredictionHelper(object):
-    """
-    Only works for 2016
-    """
     @classmethod
     def _normcdf(cls, x):
         return (1.0 + math.erf(x / np.sqrt(2.0))) / 2.0
 
     @classmethod
-    def _predict_match(cls, match, stat_mean_vars, tower_strength):
-        # score_var = 40**2  # TODO temporary set variance to be huge
-        # boulder_var = 5**2  # TODO get real value
-        # crossing_var = 4**2  # TODO get real value
+    def _predict_match(cls, event, match, stat_mean_vars):
+        mean_vars = {
+            'red': defaultdict(lambda: defaultdict(int)),
+            'blue': defaultdict(lambda: defaultdict(int)),
+        }
+        for color in ['red', 'blue']:
+            for team in match.alliances[color]['teams']:
+                for stat, (mean, var) in stat_mean_vars.items():
+                    team_mean = mean[team]
+                    team_var = var[team]
 
-        red_score = 0
-        red_score_var = 0
-        red_auto_points = 0  # Used for tiebreaking
-        red_boulders = 0
-        red_boulders_var = 0
-        red_num_crossings = 0
-        red_num_crossings_var = 0
-        for team in match.alliances['red']['teams']:
-            red_score += stat_mean_vars['score'][0][team]
-            red_score_var += stat_mean_vars['score'][1][team]
+                    # Crossing OPR usually underestimates. hacky fix to make numbers more believable
+                    if stat == 'crossings':
+                        team_mean = max(0, team_mean) * 1.2
 
-            red_auto_points += stat_mean_vars['2016autoPointsOPR'][0][team]
-
-            red_boulders += stat_mean_vars['2016bouldersOPR'][0][team]
-            red_boulders_var += stat_mean_vars['2016bouldersOPR'][1][team]
-
-            # Crossing OPR usually underestimates. hacky fix to make numbers more believable
-            red_num_crossings += max(0, stat_mean_vars['2016crossingsOPR'][0][team]) * 1.2
-            red_num_crossings_var += stat_mean_vars['2016crossingsOPR'][1][team]
-
-        blue_score = 0
-        blue_score_var = 0
-        blue_auto_points = 0  # Used for tiebreaking
-        blue_boulders = 0
-        blue_boulders_var = 0
-        blue_num_crossings = 0
-        blue_num_crossings_var = 0
-        for team in match.alliances['blue']['teams']:
-            blue_score += stat_mean_vars['score'][0][team]
-            blue_score_var += stat_mean_vars['score'][1][team]
-
-            blue_auto_points += stat_mean_vars['2016autoPointsOPR'][0][team]
-
-            blue_boulders += stat_mean_vars['2016bouldersOPR'][0][team]
-            blue_boulders_var += stat_mean_vars['2016bouldersOPR'][1][team]
-
-            # Crossing OPR usually underestimates. hacky fix to make numbers more believable
-            blue_num_crossings += max(0, stat_mean_vars['2016crossingsOPR'][0][team]) * 1.2
-            blue_num_crossings_var += stat_mean_vars['2016crossingsOPR'][1][team]
+                    mean_vars[color][stat]['mean'] += team_mean
+                    mean_vars[color][stat]['var'] += team_var
 
         # Prob win
+        red_score = mean_vars['red']['score']['mean']
+        blue_score = mean_vars['blue']['score']['mean']
+        red_score_var = mean_vars['red']['score']['var']
+        blue_score_var = mean_vars['blue']['score']['var']
+
         mu = abs(red_score - blue_score)
         prob = 1 - cls._normcdf(-mu / np.sqrt(red_score_var + blue_score_var))
         if math.isnan(prob):
             prob = 0.5
-
-        # Prob capture
-        mu = red_boulders - tower_strength
-        red_prob_capture = 1 - cls._normcdf(-mu / np.sqrt(red_boulders_var))
-
-        mu = blue_boulders - tower_strength
-        blue_prob_capture = 1 - cls._normcdf(-mu / np.sqrt(blue_boulders_var))
 
         if red_score > blue_score:
             winning_alliance = 'red'
         elif blue_score > red_score:
             winning_alliance = 'blue'
         else:
-            winning_alliance = ''
-
-        # Prob breach
-        crossings_to_breach = 8
-        mu = red_num_crossings - crossings_to_breach
-        red_prob_breach = 1 - cls._normcdf(-mu / np.sqrt(red_num_crossings_var))
-
-        mu = blue_num_crossings - crossings_to_breach
-        blue_prob_breach = 1 - cls._normcdf(-mu / np.sqrt(blue_num_crossings_var))
+            winning_alliance = 'red'  # Choose red if predicted tie
 
         prediction = {
             'red': {
                 'score': red_score,
-                'auto_points': red_auto_points,
-                'boulders': red_boulders,
-                'prob_capture': red_prob_capture,
-                'prob_breach': red_prob_breach,
+                'score_var': red_score_var,
             },
             'blue': {
                 'score': blue_score,
-                'auto_points': blue_auto_points,
-                'boulders': blue_boulders,
-                'prob_capture': blue_prob_capture,
-                'prob_breach': blue_prob_breach,
+                'score_var': blue_score_var,
             },
             'winning_alliance': winning_alliance,
             'prob': prob,
         }
+
+        # Year specific
+        for stat in stat_mean_vars.keys():
+            for color in ['red', 'blue']:
+                if stat != 'score':
+                    prediction[color][stat] = mean_vars[color][stat]['mean']
+                    prediction[color]['{}_var'.format(stat)] = mean_vars[color][stat]['var']
+                # 2016
+                if stat == 'boulders':
+                    # Prob capture
+                    tower_strength = 10 if (event.event_type_enum in EventType.CMP_EVENT_TYPES or event.key.id() == '2016cc') else 8
+
+                    mu = mean_vars[color][stat]['mean'] - tower_strength
+                    prediction[color]['prob_capture'] = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
+                elif stat == 'crossings':
+                    # Prob breach
+                    crossings_to_breach = 8
+
+                    mu = mean_vars[color][stat]['mean'] - crossings_to_breach
+                    prediction[color]['prob_breach'] = 1 - cls._normcdf(-mu / np.sqrt(mean_vars[color][stat]['var']))
+
         return prediction
 
     @classmethod
@@ -345,9 +320,9 @@ class PredictionHelper(object):
         relevant_stats = [('score', 20, 10**2)]
         # TODO: populate based on year
         relevant_stats += [
-            ('2016autoPointsOPR', 20, 10**2),
-            ('2016crossingsOPR', 0, 1**2),
-            ('2016bouldersOPR', 0, 1**2),
+            ('auto_points', 20, 10**2),
+            ('crossings', 0, 1**2),
+            ('boulders', 0, 1**2),
         ]
         contribution_calculators = [ContributionCalculator(matches, s, m, v) for s, m, v in relevant_stats]
         for i, match in enumerate(matches):
@@ -358,8 +333,7 @@ class PredictionHelper(object):
 
             ####################################################################
             # Make prediction
-            tower_strength = 10 if (event.event_type_enum in EventType.CMP_EVENT_TYPES or event.key.id() == '2016cc') else 8
-            prediction = cls._predict_match(match, stat_mean_vars, tower_strength)
+            prediction = cls._predict_match(event, match, stat_mean_vars)
             predictions[match.key.id()] = prediction
 
             # Benchmark prediction
