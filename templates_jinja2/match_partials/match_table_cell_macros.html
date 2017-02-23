@@ -100,7 +100,7 @@
   {% else %}
     ?
   {% endif %}
-  <br><em>{{(predictions.get(match.key.id()).get(alliance_color).prob_breach*100)|round|int}}% / {{(predictions.get(match.key.id()).get(alliance_color).prob_capture*200)|round|int}}%</em>
+  <br><em>{{(predictions.get(match.key.id()).get(alliance_color).prob_breach*100)|round|int}}% / {{(predictions.get(match.key.id()).get(alliance_color).prob_capture*100)|round|int}}%</em>
 </td>
 {% endmacro %}
 

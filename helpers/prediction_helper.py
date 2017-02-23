@@ -304,14 +304,14 @@ class PredictionHelper(object):
                 'auto_points': red_auto_points,
                 'boulders': red_boulders,
                 'prob_capture': red_prob_capture,
-                'prob_breach': red_prob_breach
+                'prob_breach': red_prob_breach,
             },
             'blue': {
                 'score': blue_score,
                 'auto_points': blue_auto_points,
                 'boulders': blue_boulders,
                 'prob_capture': blue_prob_capture,
-                'prob_breach': blue_prob_breach
+                'prob_breach': blue_prob_breach,
             },
             'winning_alliance': winning_alliance,
             'prob': prob,
@@ -365,8 +365,8 @@ class PredictionHelper(object):
         correct_predictions = 0
         correct_predictions_75 = 0
         score_differences = []
-        stats_sum = defaultdict(int)
-        brier_sum = 0
+        stats_sum = defaultdict(float)
+        brier_sums = defaultdict(float)
         scores = []
         var_sums = []
         team_oprs = {}
@@ -405,9 +405,26 @@ class PredictionHelper(object):
                         correct_predictions_75 += 1
                     for alliance_color in ['red', 'blue']:
                         score_differences.append(abs(match.alliances[alliance_color]['score'] - prediction[alliance_color]['score']))
-                    brier_sum += pow(prediction['prob'] - 1, 2)
+                    brier_sums['score'] += pow(prediction['prob'] - 1, 2)
                 else:
-                    brier_sum += pow(prediction['prob'] - 0, 2)
+                    brier_sums['score'] += pow(prediction['prob'] - 0, 2)
+
+                for color in ['red', 'blue']:
+                    if match.score_breakdown[color]['teleopDefensesBreached']:
+                        brier_sums['breach'] += pow(prediction[color]['prob_breach'] - 1, 2)
+                    else:
+                        brier_sums['breach'] += pow(prediction[color]['prob_breach'] - 0, 2)
+                    if match.score_breakdown[color]['teleopTowerCaptured']:
+                        brier_sums['capture'] += pow(prediction[color]['prob_capture'] - 1, 2)
+                    else:
+                        brier_sums['capture'] += pow(prediction[color]['prob_capture'] - 0, 2)
+
+            brier_scores = {}
+            for stat, brier_sum in brier_sums.items():
+                if stat == 'score':
+                    brier_scores[stat] = brier_sum / played_matches
+                else:
+                    brier_scores[stat] = brier_sum / (2 * played_matches)
 
             # # Update init_stats
             # if match.has_been_played and match.score_breakdown:
@@ -441,7 +458,7 @@ class PredictionHelper(object):
             'wl_accuracy_75': None if played_matches_75 == 0 else 100 * float(correct_predictions_75) / played_matches_75,
             'err_mean': np.mean(score_differences) if score_differences else None,
             'err_var': np.var(score_differences) if score_differences else None,
-            'brier_score': brier_sum / played_matches,
+            'brier_scores': brier_scores,
         }
 
         return predictions, prediction_stats
