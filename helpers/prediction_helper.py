@@ -16,60 +16,73 @@ class PredictionHelper(object):
         return (1.0 + math.erf(x / np.sqrt(2.0))) / 2.0
 
     @classmethod
-    def _build_s_matrix(cls, matches, team_id_map, n, init_oprs, init_oprs_boulder, played_match_keys, init_opr=0, init_boulders=0):
-        s = np.zeros([n, 1])
-        s_boulder = np.zeros([n, 1])
-        for match in matches:
-            for alliance_color in ['red', 'blue']:
-                if match.has_been_played and match.key.id() in played_match_keys:
-                    score = match.alliances[alliance_color]['score']
-                    boulders = match.score_breakdown[alliance_color]['2016bouldersOPR']
-                else:
-                    score = 0
-                    boulders = 0
-                    for team in match.alliances[alliance_color]['teams']:
-                        team = team[3:]  # turns "frc254B" into "254B"
-                        score += init_oprs.get(team, init_opr)
-                        boulders += init_oprs_boulder.get(team, init_boulders)
-
-                for team in match.alliances[alliance_color]['teams']:
-                    team_id = team_id_map[team[3:]]
-                    s[team_id] += score
-                    s_boulder[team_id] += boulders
-
-        return s, s_boulder
+    def _normpdf(cls, x, mu, sigma):
+        x = float(x)
+        mu = float(mu)
+        sigma = float(sigma)
+        u = (x-mu)/abs(sigma)
+        y = (1.0/(np.sqrt(2.0*np.pi)*abs(sigma)))*np.exp(-u*u/2.0)
+        return y
 
     @classmethod
-    def _predict_match(cls, match, all_stats, tower_strength):
-        score_var = 40**2  # TODO temporary set variance to be huge
+    def _build_team_mapping(cls, matches):
+        """
+        Returns (team_list, team_id_map)
+        team_list: A list of team_str such as 'frc254' or 'frc254B'
+        team_id_map: A dict of key: team_str, value: row index in x_matrix that corresponds to the team
+        """
+        # Build team list
+        team_list = set()
+        for match in matches:
+            if match.comp_level != 'qm':  # only consider quals matches
+                continue
+            for alliance_color in ['red', 'blue']:
+                for team in match.alliances[alliance_color]['teams']:
+                    team_list.add(team)
+
+        team_list = list(team_list)
+        team_id_map = {}
+        for i, team in enumerate(team_list):
+            team_id_map[team] = i
+
+        return team_list, team_id_map
+
+    @classmethod
+    def _predict_match(cls, match, all_stats, team_vars, tower_strength):
+        # score_var = 40**2  # TODO temporary set variance to be huge
         boulder_var = 5**2  # TODO get real value
         crossing_var = 4**2  # TODO get real value
 
         red_score = 0
+        red_var = 0
         red_auto_points = 0  # Used for tiebreaking
         red_boulders = 0
         red_num_crossings = 0
         for team in match.alliances['red']['teams']:
-            red_score += all_stats['oprs'][team[3:]]
-            red_auto_points += all_stats['2016autoPointsOPR'][team[3:]]
-            red_boulders += all_stats['2016bouldersOPR'][team[3:]]
+            red_score += all_stats['oprs'][team]
+            red_var += team_vars[team]
+            # red_auto_points += all_stats['2016autoPointsOPR'][team]
+            # red_boulders += all_stats['2016bouldersOPR'][team]
             # Crossing OPR usually underestimates. hacky fix to make numbers more believable
-            red_num_crossings += max(0, all_stats['2016crossingsOPR'][team[3:]]) * 1.2
+            # red_num_crossings += max(0, all_stats['2016crossingsOPR'][team]) * 1.2
 
         blue_score = 0
+        blue_var = 0
         blue_auto_points = 0  # Used for tiebreaking
         blue_boulders = 0
         blue_num_crossings = 0
         for team in match.alliances['blue']['teams']:
-            blue_score += all_stats['oprs'][team[3:]]
-            blue_auto_points += all_stats['2016autoPointsOPR'][team[3:]]
-            blue_boulders += all_stats['2016bouldersOPR'][team[3:]]
+            blue_score += all_stats['oprs'][team]
+            blue_var += team_vars[team]
+            # blue_auto_points += all_stats['2016autoPointsOPR'][team]
+            # blue_boulders += all_stats['2016bouldersOPR'][team]
             # Crossing OPR usually underestimates. hacky fix to make numbers more believable
-            blue_num_crossings += max(0, all_stats['2016crossingsOPR'][team[3:]]) * 1.2
+            # blue_num_crossings += max(0, all_stats['2016crossingsOPR'][team]) * 1.2
 
         # Prob win
         mu = abs(red_score - blue_score)
-        var = 2 * score_var
+        # var = 2 * score_var
+        var = red_var + blue_var
         prob = 1 - cls._normcdf(-mu / np.sqrt(var))
         if math.isnan(prob):
             prob = 0.5
@@ -125,27 +138,36 @@ class PredictionHelper(object):
         event = event_key.get()
 
         # Setup
-        team_list, team_id_map = MatchstatsHelper.build_team_mapping(matches)
-        last_event_stats = MatchstatsHelper.get_last_event_stats(team_list, event_key)
-        Minv = MatchstatsHelper.build_Minv_matrix(matches, team_id_map)
+        team_list, team_id_map = cls._build_team_mapping(matches)
+        # last_event_stats = MatchstatsHelper.get_last_event_stats(team_list, event_key)
 
-        init_stats_sums = defaultdict(int)
-        init_stats_totals = defaultdict(int)
-        for _, stats in last_event_stats.items():
-            for stat, stat_value in stats.items():
-                init_stats_sums[stat] += stat_value
-                init_stats_totals[stat] += 1
+        # Setup matrices
+        m = len(matches)
+        t = len(team_list)
+        Ar = np.zeros((m, t))
+        Ab = np.zeros((m, t))
+        Mr_mean = np.zeros((m, 1))
+        Mb_mean = np.zeros((m, 1))
+        Mr_var = np.zeros((m, 1))
+        Mb_var = np.zeros((m, 1))
 
-        init_stats_default = defaultdict(int)
-        for stat, stat_sum in init_stats_sums.items():
-            init_stats_default[stat] = float(stat_sum) / init_stats_totals[stat]
+        # init_stats_sums = defaultdict(int)
+        # init_stats_totals = defaultdict(int)
+        # for _, stats in last_event_stats.items():
+        #     for stat, stat_value in stats.items():
+        #         init_stats_sums[stat] += stat_value
+        #         init_stats_totals[stat] += 1
 
-        relevant_stats = [
-            'oprs',
-            '2016autoPointsOPR',
-            '2016crossingsOPR',
-            '2016bouldersOPR'
-        ]
+        # init_stats_default = defaultdict(int)
+        # for stat, stat_sum in init_stats_sums.items():
+        #     init_stats_default[stat] = float(stat_sum) / init_stats_totals[stat]
+
+        # relevant_stats = [
+        #     'oprs',
+        #     '2016autoPointsOPR',
+        #     '2016crossingsOPR',
+        #     '2016bouldersOPR'
+        # ]
 
         # Make predictions before each match
         predictions = {}
@@ -156,27 +178,161 @@ class PredictionHelper(object):
         score_differences = []
         stats_sum = defaultdict(int)
         brier_sum = 0
+        scores = []
+        var_sums = []
+        team_oprs = {}
+        team_vars = {}
+        all_team_oprs = {}  # TODO
+        all_team_vars = {}  # TODO
         for i, match in enumerate(matches):
-            # Calculate ixOPR
-            all_ixoprs = {}
-            for stat in relevant_stats:
-                all_ixoprs[stat] = MatchstatsHelper.calc_stat(
-                    matches, team_list, team_id_map, Minv, stat,
-                    init_stats=last_event_stats,
-                    init_stats_default=init_stats_default[stat],
-                    limit_matches=i)
-            for _ in xrange(2):
-                for stat in relevant_stats:
-                    start = time.time()
-                    all_ixoprs[stat] = MatchstatsHelper.calc_stat(
-                        matches, team_list, team_id_map, Minv, stat,
-                        init_stats=all_ixoprs,
-                        init_stats_default=init_stats_default[stat],
-                        limit_matches=i)
+            # Used for both mean and var
+            Ao = np.vstack((Ar, Ab))
+            AoT = Ao.transpose()
+            Aoo = np.dot(AoT, Ao)
 
+            ####################################################################
+            # Estimate Team Means
+            Mo = np.vstack((Mr_mean, Mb_mean))
+
+            # Populate priors
+            Oe = np.zeros((t, 1))  # prior mean estimates
+            diags = np.ndarray(t)  # prior mean variance estimates
+            for team in team_list:
+                opr = 20
+                if team not in all_team_oprs:
+                    if all_team_oprs:
+                        opr = np.mean([ato[-1] for ato in all_team_oprs.values()])
+                    elif scores:
+                        opr = np.mean(scores) / 3
+                else:
+                    weight_sum = 0
+                    for j, o in enumerate(reversed(all_team_oprs[team])):
+                        weight = pow(0.1, j)
+                        opr += weight * o
+                        weight_sum += weight
+                    opr /= weight_sum
+
+                Oe[team_id_map[team]] = opr
+                diags[team_id_map[team]] = 3  # TODO
+
+            # MMSE Contribution Mean
+            Omeans = np.linalg.inv(Aoo + np.diag(diags)).dot(AoT.dot(Mo) + np.diag(diags).dot(Oe))
+
+            # Update team_oprs
+            for team, Omean in zip(team_list, Omeans):
+                team_oprs[team] = Omean[0]
+
+            all_ixoprs = {
+                'oprs': team_oprs,
+            }
+
+            ####################################################################
+            # Estimate Team Variances
+            Mo = np.vstack((Mr_var, Mb_var))
+
+            # Populate priors
+            Oe = np.zeros((t, 1))  # prior variance estimates
+            diags = np.ndarray(t)  # prior variance variance estimates
+            for team in team_list:
+                var = 10**2
+                if team not in all_team_vars:
+                    if all_team_vars:
+                        var = np.mean([ato[-1] for ato in all_team_vars.values()])
+                    elif var_sums:
+                        var = np.mean(var_sums) / 3
+                else:
+                    var = 0
+                    weight_sum = 0
+                    for j, o in enumerate(reversed(all_team_vars[team])):
+                        weight = pow(0.1, j)
+                        var += weight * o
+                        weight_sum += weight
+                    var /= weight_sum
+
+                Oe[team_id_map[team]] = var
+                diags[team_id_map[team]] = 3  # TODO
+
+            # MMSE Contribution Variance
+            Ovar = abs(np.linalg.inv(Aoo + np.diag(diags)).dot(AoT.dot(Mo) + np.diag(diags).dot(Oe)))
+
+            for team, stat in zip(team_list, Ovar):
+                team_vars[team] = stat[0]
+
+            ####################################################################
+            # Add results for next iter
+            if match.has_been_played:
+                Mr_mean[i] = match.alliances['red']['score']
+                Mb_mean[i] = match.alliances['blue']['score']
+
+                scores.append(match.alliances['red']['score'])
+                scores.append(match.alliances['blue']['score'])
+
+                predicted_score_red = 0
+                for team in match.alliances['red']['teams']:
+                    Ar[i, team_id_map[team]] = 1
+                    predicted_score_red += Omeans[team_id_map[team]]
+
+                predicted_score_blue = 0
+                for team in match.alliances['blue']['teams']:
+                    Ab[i, team_id_map[team]] = 1
+                    predicted_score_blue += Omeans[team_id_map[team]]
+
+                # Find max of prob over var_sum
+                best_prob = 0
+                best_var_sum = None
+                var_sum = 1.0
+                var_sum_step = 2.0**12
+                while var_sum > 0 and var_sum_step >= 1:
+                    prob = cls._normpdf(match.alliances['red']['score'], predicted_score_red, np.sqrt(var_sum))
+                    if prob >= best_prob:
+                        best_prob = prob
+                        best_var_sum = var_sum
+
+                    prob2 = cls._normpdf(match.alliances['red']['score'], predicted_score_red, np.sqrt(var_sum+1))
+                    if prob2 >= best_prob:
+                        best_prob = prob2
+                        best_var_sum = var_sum+1
+
+                    if prob2 > prob:
+                        var_sum += var_sum_step
+                    else:
+                        var_sum -= var_sum_step
+
+                    var_sum_step /= 2
+
+                Mr_var[i] = best_var_sum
+                var_sums.append(best_var_sum)
+
+                # Optimize prob over var_sum for max
+                best_prob = 0
+                best_var_sum = None
+                var_sum = 1.0
+                var_sum_step = 2.0**12
+                while var_sum > 0 and var_sum_step >= 1:
+                    prob = cls._normpdf(match.alliances['blue']['score'], predicted_score_blue, np.sqrt(var_sum))
+                    if prob >= best_prob:
+                        best_prob = prob
+                        best_var_sum = var_sum
+
+                    prob2 = cls._normpdf(match.alliances['blue']['score'], predicted_score_blue, np.sqrt(var_sum+1))
+                    if prob2 >= best_prob:
+                        best_prob = prob2
+                        best_var_sum = var_sum+1
+
+                    if prob2 > prob:
+                        var_sum += var_sum_step
+                    else:
+                        var_sum -= var_sum_step
+
+                    var_sum_step /= 2
+
+                Mb_var[i] = best_var_sum
+                var_sums.append(best_var_sum)
+
+            ####################################################################
             # Make prediction
             tower_strength = 10 if (event.event_type_enum in EventType.CMP_EVENT_TYPES or event.key.id() == '2016cc') else 8
-            prediction = cls._predict_match(match, all_ixoprs, tower_strength)
+            prediction = cls._predict_match(match, all_ixoprs, team_vars, tower_strength)
             predictions[match.key.id()] = prediction
 
             # Benchmark prediction
@@ -194,32 +350,32 @@ class PredictionHelper(object):
                 else:
                     brier_sum += pow(prediction['prob'] - 0, 2)
 
-            # Update init_stats
-            if match.has_been_played and match.score_breakdown:
-                for alliance_color in ['red', 'blue']:
-                    stats_sum['score'] += match.alliances[alliance_color]['score']
+            # # Update init_stats
+            # if match.has_been_played and match.score_breakdown:
+            #     for alliance_color in ['red', 'blue']:
+            #         stats_sum['score'] += match.alliances[alliance_color]['score']
 
-                    for stat in relevant_stats:
-                        if stat == '2016autoPointsOPR':
-                            init_stats_default[stat] += match.score_breakdown[alliance_color]['autoPoints']
-                        elif stat == '2016bouldersOPR':
-                            init_stats_default[stat] += (
-                                match.score_breakdown[alliance_color].get('autoBouldersLow', 0) +
-                                match.score_breakdown[alliance_color].get('autoBouldersHigh', 0) +
-                                match.score_breakdown[alliance_color].get('teleopBouldersLow', 0) +
-                                match.score_breakdown[alliance_color].get('teleopBouldersHigh', 0))
-                        elif stat == '2016crossingsOPR':
-                            init_stats_default[stat] += (
-                                match.score_breakdown[alliance_color].get('position1crossings', 0) +
-                                match.score_breakdown[alliance_color].get('position2crossings', 0) +
-                                match.score_breakdown[alliance_color].get('position3crossings', 0) +
-                                match.score_breakdown[alliance_color].get('position4crossings', 0) +
-                                match.score_breakdown[alliance_color].get('position5crossings', 0))
+            #         for stat in relevant_stats:
+            #             if stat == '2016autoPointsOPR':
+            #                 init_stats_default[stat] += match.score_breakdown[alliance_color]['autoPoints']
+            #             elif stat == '2016bouldersOPR':
+            #                 init_stats_default[stat] += (
+            #                     match.score_breakdown[alliance_color].get('autoBouldersLow', 0) +
+            #                     match.score_breakdown[alliance_color].get('autoBouldersHigh', 0) +
+            #                     match.score_breakdown[alliance_color].get('teleopBouldersLow', 0) +
+            #                     match.score_breakdown[alliance_color].get('teleopBouldersHigh', 0))
+            #             elif stat == '2016crossingsOPR':
+            #                 init_stats_default[stat] += (
+            #                     match.score_breakdown[alliance_color].get('position1crossings', 0) +
+            #                     match.score_breakdown[alliance_color].get('position2crossings', 0) +
+            #                     match.score_breakdown[alliance_color].get('position3crossings', 0) +
+            #                     match.score_breakdown[alliance_color].get('position4crossings', 0) +
+            #                     match.score_breakdown[alliance_color].get('position5crossings', 0))
 
-            init_stats_default['oprs'] = float(stats_sum['score']) / (i + 1) / 6  # Initialize with 1/3 of average scores (2 alliances per match)
-            for stat in relevant_stats:
-                if stat != 'oprs':
-                    init_stats_default[stat] = float(stats_sum[stat]) / (i + 1) / 6  # Initialize with 1/3 of average scores (2 alliances per match)
+            # init_stats_default['oprs'] = float(stats_sum['score']) / (i + 1) / 6  # Initialize with 1/3 of average scores (2 alliances per match)
+            # for stat in relevant_stats:
+            #     if stat != 'oprs':
+            #         init_stats_default[stat] = float(stats_sum[stat]) / (i + 1) / 6  # Initialize with 1/3 of average scores (2 alliances per match)
 
         prediction_stats = {
             'wl_accuracy': None if played_matches == 0 else 100 * float(correct_predictions) / played_matches,
