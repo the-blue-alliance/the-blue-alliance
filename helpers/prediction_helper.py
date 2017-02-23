@@ -10,7 +10,7 @@ from helpers.matchstats_helper import MatchstatsHelper
 class ContributionCalculator(object):
     def __init__(self, matches, stat, default_mean, default_var):
         """
-        stat: 'score' or a specific breakdown like '2016autoPoints'
+        stat: 'score' or a specific breakdown like 'auto_points' or 'boulders'
         """
         self._matches = matches
         self._stat = stat
@@ -364,7 +364,7 @@ class PredictionHelper(object):
             brier_scores = {}
             for stat, brier_sum in brier_sums.items():
                 if stat == 'score':
-                    brier_scores[stat] = brier_sum / played_matches
+                    brier_scores['win_loss'] = brier_sum / played_matches
                 else:
                     brier_scores[stat] = brier_sum / (2 * played_matches)
 
