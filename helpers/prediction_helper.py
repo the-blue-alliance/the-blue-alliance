@@ -26,6 +26,7 @@ class ContributionCalculator(object):
         self._Mmean = np.zeros((2*m, 1))  # Means
         self._Mvar = np.zeros((2*m, 1))  # Variances
 
+        # For finding event averages for initialization
         self._mean_sums = []
         self._var_sums = []
 
@@ -78,18 +79,21 @@ class ContributionCalculator(object):
         all_team_means = {}  # TODO
         for team in self._team_list:
             mean = self._default_mean
-            if team not in all_team_means:
-                if all_team_means:
-                    mean = np.mean([ato[-1] for ato in all_team_means.values()])
-                elif self._mean_sums:
-                    mean = np.mean(self._mean_sums) / 3
-            else:
+            if team in all_team_means:
+                # Use team's past means
                 weight_sum = 0
                 for j, o in enumerate(reversed(all_team_means[team])):
                     weight = pow(0.1, j)
                     opr += weight * o
                     weight_sum += weight
                 mean /= weight_sum
+            else:
+                if all_team_means:
+                    # Use averages from other past teams
+                    mean = np.mean([ato[-1] for ato in all_team_means.values()])
+                elif self._mean_sums:
+                    # Use averages from this event
+                    mean = np.mean(self._mean_sums) / 3
 
             self._Oe[self._team_id_map[team]] = mean
             self._diags[self._team_id_map[team]] = 3  # TODO
@@ -105,12 +109,8 @@ class ContributionCalculator(object):
         all_team_vars = {}  # TODO
         for team in self._team_list:
             var = self._default_var
-            if team not in all_team_vars:
-                if all_team_vars:
-                    var = np.mean([ato[-1] for ato in all_team_vars.values()])
-                elif self._var_sums:
-                    var = np.mean(self._var_sums) / 3
-            else:
+            if team in all_team_vars:
+                # Use team's past variances
                 var = 0
                 weight_sum = 0
                 for j, o in enumerate(reversed(all_team_vars[team])):
@@ -118,6 +118,13 @@ class ContributionCalculator(object):
                     var += weight * o
                     weight_sum += weight
                 var /= weight_sum
+            else:
+                if all_team_vars:
+                    # Use averages from other past teams
+                    var = np.mean([ato[-1] for ato in all_team_vars.values()])
+                elif self._var_sums:
+                    # Use averages from this event
+                    var = np.mean(self._var_sums) / 3
 
             self._Oe[self._team_id_map[team]] = var
             self._diags[self._team_id_map[team]] = 3  # TODO
