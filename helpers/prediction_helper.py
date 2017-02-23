@@ -213,7 +213,7 @@ class ContributionCalculator(object):
             self._Mvar[2*i+1] = best_var_sum
             self._var_sums.append(best_var_sum)
 
-        return self._means, self._vars
+        return {'mean': self._means, 'var': self._vars}
 
 
 class PredictionHelper(object):
@@ -229,9 +229,9 @@ class PredictionHelper(object):
         }
         for color in ['red', 'blue']:
             for team in match.alliances[color]['teams']:
-                for stat, (mean, var) in stat_mean_vars.items():
-                    team_mean = mean[team]
-                    team_var = var[team]
+                for stat, mean_var in stat_mean_vars.items():
+                    team_mean = mean_var['mean'][team]
+                    team_var = mean_var['var'][team]
 
                     # Crossing OPR usually underestimates. hacky fix to make numbers more believable
                     if stat == 'crossings':
@@ -376,7 +376,7 @@ class PredictionHelper(object):
             'brier_scores': brier_scores,
         }
 
-        return predictions, prediction_stats
+        return predictions, prediction_stats, stat_mean_vars
 
     @classmethod
     def get_ranking_predictions(cls, matches, match_predictions, n=1000):

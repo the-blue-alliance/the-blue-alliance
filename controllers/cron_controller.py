@@ -168,12 +168,13 @@ class EventMatchstatsDo(webapp.RequestHandler):
         predictions_dict = None
         if event.year == 2016:
             organized_matches = MatchHelper.organizeMatches(event.matches)
-            match_predictions, match_prediction_stats = PredictionHelper.get_match_predictions(organized_matches['qm'])
+            match_predictions, match_prediction_stats, stat_mean_vars = PredictionHelper.get_match_predictions(organized_matches['qm'])
             # ranking_predictions, ranking_prediction_stats = PredictionHelper.get_ranking_predictions(organized_matches['qm'], match_predictions)
 
             predictions_dict = {
                 'match_predictions': match_predictions,
                 'match_prediction_stats': match_prediction_stats,
+                'stat_mean_vars': stat_mean_vars,
                 # 'ranking_predictions': ranking_predictions,
                 # 'ranking_prediction_stats': ranking_prediction_stats
             }
